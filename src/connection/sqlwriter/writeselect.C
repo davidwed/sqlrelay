@@ -28,12 +28,6 @@ bool sqlwriter::from(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlwriter::where(xmldomnode *node, stringbuffer *output) {
-	debugFunction();
-	output->append("where");
-	return true;
-}
-
 bool sqlwriter::groupBy(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("group by");

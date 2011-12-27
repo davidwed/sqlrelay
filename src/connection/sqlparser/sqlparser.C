@@ -8,6 +8,7 @@
 
 sqlparser::sqlparser() {
 	tree=NULL;
+	error=false;
 }
 
 sqlparser::~sqlparser() {

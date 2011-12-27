@@ -8,10 +8,9 @@ bool sqlparser::parseSelect(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
-	*newptr=ptr;
 
 	// look for a select clause
-	if (!selectClause(*newptr,newptr)) {
+	if (!selectClause(ptr,newptr)) {
 		return false;
 	}
 
@@ -116,24 +115,6 @@ bool sqlparser::fromClause(const char *ptr, const char **newptr) {
 }
 
 const char *sqlparser::_from="from";
-
-bool sqlparser::parseWhere(xmldomnode *currentnode,
-					const char *ptr,
-					const char **newptr) {
-	debugFunction();
-	if (!whereClause(ptr,newptr)) {
-		return false;
-	}
-	newNode(currentnode,_where);
-	return true;
-}
-
-bool sqlparser::whereClause(const char *ptr, const char **newptr) {
-	debugFunction();
-	return comparePart(ptr,newptr,"where ");
-}
-
-const char *sqlparser::_where="where";
 
 bool sqlparser::parseGroupBy(xmldomnode *currentnode,
 					const char *ptr,

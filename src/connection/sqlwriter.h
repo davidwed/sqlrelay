@@ -192,6 +192,50 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	where(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	andClause(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	orClause(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	group(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	endGroup(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	notClause(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	between(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	notEquals(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	lessThan(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	greaterThan(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	lessThanOrEqualTo(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	greaterThanOrEqualTo(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	compliment(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	inverse(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	plus(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	minus(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	times(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	dividedBy(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	bitwiseAnd(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	bitwiseOr(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	bitwiseXor(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	logicalAnd(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	logicalOr(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	groupBy(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	having(xmldomnode *node,

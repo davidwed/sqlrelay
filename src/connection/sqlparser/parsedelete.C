@@ -11,7 +11,6 @@ bool sqlparser::parseDelete(xmldomnode *currentnode,
 
 	// look for a delete clause
 	if (!deleteClause(ptr,newptr)) {
-		debugPrintf("missing delete clause\n");
 		return false;
 	}
 
@@ -24,6 +23,7 @@ bool sqlparser::parseDelete(xmldomnode *currentnode,
 		// look for the from clause
 		if (parseDeleteFrom(deletenode,*newptr,newptr)) {
 			debugPrintf("missing from clause\n");
+			error=true;
 			break;
 		}
 
@@ -42,6 +42,7 @@ bool sqlparser::parseDelete(xmldomnode *currentnode,
 	// FIXME: in mysql, multiple tables may be specified
 	if (!parseName(deletenode,*newptr,newptr)) {
 		debugPrintf("missing table name\n");
+		error=true;
 		return false;
 	}
 

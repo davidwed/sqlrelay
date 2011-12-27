@@ -11,7 +11,6 @@ bool sqlparser::parseCreate(xmldomnode *currentnode,
 
 	// create clause
 	if (!createClause(ptr,newptr)) {
-		debugPrintf("missing create clause\n");
 		return false;
 	}
 
@@ -141,6 +140,7 @@ bool sqlparser::parseColumnAndConstraintDefinitions(
 	// left paren
 	if (!leftParen(ptr,newptr)) {
 		debugPrintf("missing left paren\n");
+		error=true;
 		return false;
 	}
 
@@ -186,12 +186,14 @@ bool sqlparser::parseColumnDefinition(xmldomnode *currentnode,
 	// column name
 	if (!parseName(currentnode,ptr,newptr)) {
 		debugPrintf("missing column name\n");
+		error=true;
 		return false;
 	}
 
 	// column type
 	if (!parseType(currentnode,*newptr,newptr)) {
 		debugPrintf("missing column type\n");
+		error=true;
 		return false;
 	}
 
@@ -601,12 +603,14 @@ bool sqlparser::parseReferenceDefinition(xmldomnode *currentnode,
 	// table name
 	if (!parseName(referencesnode,*newptr,newptr)) {
 		debugPrintf("missing table name\n");
+		error=true;
 		return false;
 	}
 
 	// left paren
 	if (!leftParen(*newptr,newptr)) {
 		debugPrintf("missing left paren\n");
+		error=true;
 		return false;
 	}
 
@@ -618,6 +622,7 @@ bool sqlparser::parseReferenceDefinition(xmldomnode *currentnode,
 	// right paren
 	if (!rightParen(*newptr,newptr)) {
 		debugPrintf("missing right paren\n");
+		error=true;
 		return false;
 	}
 
@@ -667,6 +672,7 @@ bool sqlparser::parseColumnNameList(xmldomnode *currentnode,
 		char	*column=getWord(*newptr,newptr);
 		if (!column) {
 			debugPrintf("missing right paren\n");
+			error=true;
 			return false;
 		}
 

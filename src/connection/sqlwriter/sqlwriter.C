@@ -155,6 +155,29 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_distinct,
 		sqlparser::_from,
 		sqlparser::_where,
+		sqlparser::_and,
+		sqlparser::_or,
+		sqlparser::_group,
+		sqlparser::_comparison,
+		sqlparser::_not,
+		sqlparser::_between,
+		sqlparser::_not_equals,
+		sqlparser::_less_than,
+		sqlparser::_greater_than,
+		sqlparser::_less_than_or_equal_to,
+		sqlparser::_greater_than_or_equal_to,
+		sqlparser::_expression,
+		sqlparser::_compliment,
+		sqlparser::_inverse,
+		sqlparser::_plus,
+		sqlparser::_minus,
+		sqlparser::_times,
+		sqlparser::_divided_by,
+		sqlparser::_logical_and,
+		sqlparser::_logical_or,
+		sqlparser::_bitwise_and,
+		sqlparser::_bitwise_or,
+		sqlparser::_bitwise_xor,
 		sqlparser::_group_by,
 		sqlparser::_having,
 		sqlparser::_order_by,
@@ -364,6 +387,50 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return from(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_where)) {
 		return where(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_and)) {
+		return andClause(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_or)) {
+		return orClause(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_group)) {
+		return group(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_not)) {
+		return notClause(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_between)) {
+		return between(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_not_equals)) {
+		return notEquals(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_less_than)) {
+		return lessThan(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_greater_than)) {
+		return greaterThan(node,output);
+	} else if (!charstring::compare(nodename,
+				sqlparser::_less_than_or_equal_to)) {
+		return lessThanOrEqualTo(node,output);
+	} else if (!charstring::compare(nodename,
+				sqlparser::_greater_than_or_equal_to)) {
+		return greaterThanOrEqualTo(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_compliment)) {
+		return compliment(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_inverse)) {
+		return inverse(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_plus)) {
+		return plus(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_minus)) {
+		return minus(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_times)) {
+		return times(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_divided_by)) {
+		return dividedBy(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_logical_and)) {
+		return logicalAnd(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_logical_or)) {
+		return logicalOr(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_bitwise_and)) {
+		return bitwiseAnd(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_bitwise_or)) {
+		return bitwiseOr(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_bitwise_xor)) {
+		return bitwiseXor(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_group_by)) {
 		return groupBy(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_having)) {
@@ -425,6 +492,10 @@ bool sqlwriter::handleEnd(xmldomnode *node, stringbuffer *output) {
 	// update...
 	} else if (!charstring::compare(nodename,sqlparser::_assignment)) {
 		return endAssignment(node,output);
+
+	// select...
+	} else if (!charstring::compare(nodename,sqlparser::_group)) {
+		return endGroup(node,output);
 	}
 	return true;
 }

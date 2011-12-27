@@ -14,9 +14,7 @@ bool sqlrcursor_svr::translateQuery() {
 	}
 
 	// parse the query
-	if (!conn->sqlp->parse(querybuffer)) {
-		return false;
-	}
+	bool	parsed=conn->sqlp->parse(querybuffer);
 
 	// get the parsed tree
 	xmldom	*tree=conn->sqlp->detachTree();
@@ -28,6 +26,13 @@ bool sqlrcursor_svr::translateQuery() {
 		debugPrintf("before translation:\n");
 		debugPrintQueryTree(tree);
 		debugPrintf("\n");
+	}
+
+	if (!parsed) {
+		debugPrintf("parse failed, using original:\n\"%s\"\n\n",
+								querybuffer);
+		delete tree;
+		return false;
 	}
 
 	// apply translation rules

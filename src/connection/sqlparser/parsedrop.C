@@ -11,7 +11,6 @@ bool sqlparser::parseDrop(xmldomnode *currentnode,
 
 	// look for a drop clause
 	if (!dropClause(ptr,newptr)) {
-		debugPrintf("no drop clause\n");
 		return false;
 	}
 
@@ -132,6 +131,7 @@ bool sqlparser::parseTableNameList(xmldomnode *currentnode,
 		// we have more table names to get
 		if (!comma(*newptr,newptr)) {
 			debugPrintf("missing comma or space\n");
+			error=true;
 			return false;
 		}
 	}

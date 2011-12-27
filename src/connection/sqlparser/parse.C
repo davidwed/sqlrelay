@@ -146,33 +146,32 @@ char *sqlparser::getVerbatim(const char *ptr, const char **newptr) {
 bool sqlparser::parse(const char *query) {
 	debugFunction();
 
+	// initialze error status
+	error=false;
+
 	// create the tree
 	delete tree;
 	tree=new xmldom();
 	tree->createRootNode();
+	xmldomnode	*currentnode=tree->getRootNode();
 
 	// parse the query
 	char		*ptr=cleanQuery(query);
 	const char	*newptr=ptr;
-	bool	retval=parseQuery(tree->getRootNode(),ptr,&newptr);
+	if (!parseCreate(currentnode,ptr,&newptr) &&
+		!parseDrop(currentnode,ptr,&newptr) &&
+		!parseInsert(currentnode,ptr,&newptr) &&
+		!parseUpdate(currentnode,ptr,&newptr) &&
+		!parseDelete(currentnode,ptr,&newptr) &&
+		!parseSelect(currentnode,ptr,&newptr) &&
+		!parseSet(currentnode,ptr,&newptr)) {
+		debugPrintf("unrecognized query\n");
+		error=true;
+	}
 	delete[] ptr;
 
 	// return result
-	return retval;
-}
-
-bool sqlparser::parseQuery(xmldomnode *currentnode,
-					const char *ptr,
-					const char **newptr) {
-	debugFunction();
-
-	return parseCreate(currentnode,ptr,newptr) ||
-		parseDrop(currentnode,ptr,newptr) ||
-		parseInsert(currentnode,ptr,newptr) ||
-		parseUpdate(currentnode,ptr,newptr) ||
-		parseDelete(currentnode,ptr,newptr) ||
-		parseSelect(currentnode,ptr,newptr) ||
-		parseSet(currentnode,ptr,newptr);
+	return !error;
 }
 
 bool sqlparser::parseName(xmldomnode *currentnode,
@@ -221,6 +220,7 @@ bool sqlparser::parseType(xmldomnode *currentnode,
 		// get right paren
 		if (!rightParen(*newptr,newptr)) {
 			debugPrintf("missing right paren\n");
+			error=true;
 			return false;
 		}
 
@@ -232,6 +232,7 @@ bool sqlparser::parseType(xmldomnode *currentnode,
 		// get length
 		if (!parseLength(sizenode,*newptr,newptr)) {
 			debugPrintf("missing column length\n");
+			error=true;
 			return false;
 		}
 
@@ -241,6 +242,7 @@ bool sqlparser::parseType(xmldomnode *currentnode,
 			// get scale
 			if (!parseScale(sizenode,*newptr,newptr)) {
 				debugPrintf("missing scale\n");
+				error=true;
 				return false;
 			}
 		}
@@ -248,6 +250,7 @@ bool sqlparser::parseType(xmldomnode *currentnode,
 		// get right paren
 		if (!rightParen(*newptr,newptr)) {
 			debugPrintf("missing right paren\n");
+			error=true;
 			return false;
 		}
 	}
@@ -276,6 +279,7 @@ bool sqlparser::parseValues(xmldomnode *currentnode,
 		char	*value=getVerbatim(*newptr,newptr);
 		if (!value) {
 			debugPrintf("missing right paren\n");
+			error=true;
 			return false;
 		}
 

@@ -11,7 +11,6 @@ bool sqlparser::parseUpdate(xmldomnode *currentnode,
 
 	// look for a update clause
 	if (!updateClause(ptr,newptr)) {
-		debugPrintf("no update clause\n");
 		return false;
 	}
 
@@ -26,6 +25,7 @@ bool sqlparser::parseUpdate(xmldomnode *currentnode,
 		// if we hit the end of the string then we've got a problem
 		if (!**newptr) {
 			debugPrintf("missing set clause\n");
+			error=true;
 			return false;
 		}
 
@@ -43,6 +43,7 @@ bool sqlparser::parseUpdate(xmldomnode *currentnode,
 			// a problem
 			if (*newptr==ptr) {
 				debugPrintf("missing table name\n");
+				error=true;
 				return false;
 			}
 
@@ -84,6 +85,7 @@ bool sqlparser::parseUpdate(xmldomnode *currentnode,
 	// table name
 	if (!parseName(updatenode,*newptr,newptr)) {
 		debugPrintf("missing table name\n");
+		error=true;
 		return false;
 	}
 
@@ -137,6 +139,7 @@ bool sqlparser::parseUpdateSet(xmldomnode *currentnode,
 	// set clause
 	if (!updateSetClause(ptr,newptr)) {
 		debugPrintf("missing set\n");
+		error=true;
 		return false;
 	}
 
@@ -170,6 +173,7 @@ bool sqlparser::parseUpdateSet(xmldomnode *currentnode,
 		// skip past the equals sign
 		if (!equals(*newptr,newptr)) {
 			debugPrintf("missing equals sign\n");
+			error=true;
 			return false;
 		}
 		newNode(assignmentnode,_equals);
@@ -196,4 +200,4 @@ bool sqlparser::updateSetClause(const char *ptr, const char **newptr) {
 
 const char *sqlparser::_update_set="update_set";
 const char *sqlparser::_assignment="assignment";
-const char *sqlparser::_equals="=";
+const char *sqlparser::_equals="equals";

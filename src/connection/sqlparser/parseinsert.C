@@ -11,7 +11,6 @@ bool sqlparser::parseInsert(xmldomnode *currentnode,
 
 	// look for a insert clause
 	if (!insertClause(ptr,newptr)) {
-		debugPrintf("no insert clause\n");
 		return false;
 	}
 
@@ -43,6 +42,7 @@ bool sqlparser::parseInsert(xmldomnode *currentnode,
 		!parseUpdateSet(insertnode,*newptr,newptr) &&
 		!parseSelect(insertnode,*newptr,newptr)) {
 		debugPrintf("missing value, values, set or select clause\n");
+		error=true;
 		return false;
 	}
 
@@ -73,6 +73,7 @@ bool sqlparser::parseInsertInto(xmldomnode *currentnode,
 	// table name
 	if (!parseName(intonode,*newptr,newptr)) {
 		debugPrintf("missing table name\n");
+		error=true;
 		return false;
 	}
 

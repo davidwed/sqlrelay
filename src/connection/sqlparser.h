@@ -52,8 +52,26 @@ class sqlparser {
 		bool	space(const char *ptr, const char **newptr);
 		bool	comma(const char *ptr, const char **newptr);
 		bool	equals(const char *ptr, const char **newptr);
+		bool	notEquals(const char *ptr, const char **newptr);
+		bool	lessThan(const char *ptr, const char **newptr);
+		bool	greaterThan(const char *ptr, const char **newptr);
+		bool	lessThanOrEqualTo(const char *ptr,
+						const char **newptr);
+		bool	greaterThanOrEqualTo(const char *ptr,
+						const char **newptr);
 		bool	leftParen(const char *ptr, const char **newptr);
 		bool	rightParen(const char *ptr, const char **newptr);
+		bool	compliment(const char *ptr, const char **newptr);
+		bool	inverse(const char *ptr, const char **newptr);
+		bool	plus(const char *ptr, const char **newptr);
+		bool	minus(const char *ptr, const char **newptr);
+		bool	times(const char *ptr, const char **newptr);
+		bool	dividedBy(const char *ptr, const char **newptr);
+		bool	bitwiseAnd(const char *ptr, const char **newptr);
+		bool	bitwiseOr(const char *ptr, const char **newptr);
+		bool	bitwiseXor(const char *ptr, const char **newptr);
+		bool	logicalAnd(const char *ptr, const char **newptr);
+		bool	logicalOr(const char *ptr, const char **newptr);
 
 
 	// Ideally these would be private but other classes (and their children)
@@ -62,9 +80,6 @@ class sqlparser {
 	// variable are all together.  Maybe I'll move them later.
 	public:
 		// generic...
-		bool	parseQuery(xmldomnode *currentnode,
-						const char *ptr,
-						const char **newptr);
 		bool	parseName(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
@@ -412,10 +427,118 @@ class sqlparser {
 						const char **newptr);
 		bool	whereClause(const char *ptr,
 						const char **newptr);
-		static const char *_where;
+		static const char	*_where;
+		bool	parseWhereClauseTerms(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseAnd(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	andClause(const char *ptr, const char **newptr);
+		static const char	*_and;
+		bool	parseOr(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	orClause(const char *ptr, const char **newptr);
+		static const char 	*_or;
+		bool	parseWhereClauseTerm(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_group;
+		bool	parseComparison(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_comparison;
+		bool	notClause(const char *ptr, const char **newptr);
+		static const char	*_not;
+		bool	parseBetween(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	betweenClause(const char *ptr, const char **newptr);
+		static const char	*_between;
+		bool	parseEquals(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseNotEquals(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_not_equals;
+		bool	parseLessThan(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_less_than;
+		bool	parseGreaterThan(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_greater_than;
+		bool	parseLessThanOrEqualTo(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_less_than_or_equal_to;
+		bool	parseGreaterThanOrEqualTo(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_greater_than_or_equal_to;
 		bool	parseGroupBy(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
+		bool	parseExpression(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_expression;
+		bool	parseUnaryOperator(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseCompliment(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_compliment;
+		bool	parseInverse(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_inverse;
+		bool	parseTerm(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseBinaryOperator(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseTimes(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_times;
+		bool	parseDividedBy(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_divided_by;
+		bool	parsePlus(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_plus;
+		bool	parseMinus(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_minus;
+		bool	parseLogicalAnd(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_logical_and;
+		bool	parseLogicalOr(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_logical_or;
+		bool	parseBitwiseAnd(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_bitwise_and;
+		bool	parseBitwiseOr(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_bitwise_or;
+		bool	parseBitwiseXor(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_bitwise_xor;
 		bool	groupByClause(const char *ptr,
 						const char **newptr);
 		static const char *_group_by;
@@ -495,6 +618,7 @@ class sqlparser {
 		static const char *_transaction_name;
 
 		xmldom	*tree;
+		bool	error;
 };
 
 #endif
