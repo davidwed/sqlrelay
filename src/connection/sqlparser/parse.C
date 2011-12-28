@@ -3,26 +3,38 @@
 
 #include <sqlparser.h>
 #include <debugprint.h>
+#include <rudiments/character.h>
+
+bool sqlparser::whiteSpace(const char *ptr, const char **newptr) {
+	while (*ptr && *ptr==' ') {
+		ptr++;
+	}
+	*newptr=ptr;
+	return true;
+}
 
 bool sqlparser::comparePart(const char *ptr, const char **newptr,
 							const char *part) {
 	debugFunction();
-	
+
+	// skip any whitespace
+	whiteSpace(ptr,newptr);
 
 	// get the part length
 	uint64_t	length=charstring::length(part);
 
 	// see if the next "length" bytes are equal to the part
-	if (!charstring::compareIgnoringCase(ptr,part,length)) {
+	if (!charstring::compareIgnoringCase(*newptr,part,length)) {
 
 		// if so then skip past the matching section
-		*newptr=ptr+length;
+		*newptr=*newptr+length;
 
 		// the part matched, return success
 		return true;
 	}
 
 	// the part did not match, return failure
+	*newptr=ptr;
 	return false;
 }
 
@@ -48,40 +60,45 @@ bool sqlparser::comparePart(const char *ptr, const char **newptr,
 char *sqlparser::getWord(const char *ptr, const char **newptr) {
 	debugFunction();
 
+	whiteSpace(ptr,newptr);
+
 	// get the next block of whatever until we hit a space,
 	// parenthesis, comma, operator, assignment operator or quotation
-	return getUntil(" (,)~!^*-+=<>/&|='\"",ptr,newptr);
+	return getUntil(" (,)~!^*-+=<>/%&|='\"",*newptr,newptr);
 }
 
 char *sqlparser::getClause(const char *ptr, const char *newptr) {
-	return charstring::duplicate(ptr,newptr-ptr);
+	const char	*start;
+	whiteSpace(ptr,&start);
+	return charstring::duplicate(start,newptr-start);
 }
 
 char *sqlparser::getUntil(const char *set,
 				const char *ptr, const char **newptr) {
 	debugFunction();
 
+	whiteSpace(ptr,newptr);
+
 	// find the next space, comma or right parentheses
-	const char	*end=charstring::findFirstOfSetOrEnd(ptr,set);
+	const char	*end=charstring::findFirstOfSetOrEnd(*newptr,set);
 
 	// make a copy of the word we found
-	char	*retval=charstring::duplicate(ptr,end-ptr);
+	char	*retval=charstring::duplicate(*newptr,end-*newptr);
 
 	// set the return pointer
 	*newptr=end;
-
-	// if there's a space afterward, then bump past it
-	space(*newptr,newptr);
 
 	// return the word
 	debugPrintf("getUntil: \"%s\"\n",retval);
 	return retval;
 }
 
-static const char *verbatimTerminators=" (,)~!^*-+=<>/&|";
+static const char *verbatimTerminators=" (,)~!^*-+=<>/%&|";
 
 char *sqlparser::getVerbatim(const char *ptr, const char **newptr) {
 	debugFunction();
+
+	whiteSpace(ptr,newptr);
 
 	// declare a buffer to store the data
 	stringbuffer	verbatim;
@@ -91,7 +108,7 @@ char *sqlparser::getVerbatim(const char *ptr, const char **newptr) {
 	bool		indoublequotes=false;
 
 	// initialize the location
-	const char	*chr=ptr;
+	const char	*chr=*newptr;
 
 	// if we find a character in our termination set
 	// then just return that by itself
@@ -255,9 +272,6 @@ bool sqlparser::parseType(xmldomnode *currentnode,
 		}
 	}
 
-	// consume any spaces after the type
-	space(*newptr,newptr);
-
 	return true;
 }
 
@@ -361,7 +375,6 @@ bool sqlparser::parseRemainderVerbatim(xmldomnode *currentnode,
 						const char **newptr) {
 	*newptr=ptr;
 	do {
-		space(*newptr,newptr);
 	} while (parseVerbatim(currentnode,*newptr,newptr));
 	return true;
 }

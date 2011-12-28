@@ -22,6 +22,11 @@ bool sqlwriter::orClause(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::comparison(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
 bool sqlwriter::notClause(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("not");

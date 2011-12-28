@@ -46,7 +46,6 @@ bool sqlparser::parseSelect(xmldomnode *currentnode,
 				newNode(selectnode,_verbatim,",");
 			}
 
-			space(*newptr,newptr);
 		} else {
 			break;
 		}

@@ -3,6 +3,7 @@
 
 #include <sqlparser.h>
 #include <debugprint.h>
+#include <rudiments/character.h>
 
 bool sqlparser::parseUpdate(xmldomnode *currentnode,
 					const char *ptr,
@@ -35,7 +36,8 @@ bool sqlparser::parseUpdate(xmldomnode *currentnode,
 
 			// find the space before the word before it
 			*newptr=startptr-2;
-			while (**newptr!=' ' && *newptr!=ptr) {
+			while (!character::isWhitespace(**newptr) &&
+							*newptr!=ptr) {
 				*newptr=*newptr-1;
 			}
 
@@ -47,8 +49,9 @@ bool sqlparser::parseUpdate(xmldomnode *currentnode,
 				return false;
 			}
 
-			// skip the space
-			space(*newptr,newptr);
+			// skip any whitespace
+			whiteSpace(*newptr,newptr);
+
 			tablenameptr=*newptr;
 			break;
 		}
@@ -75,9 +78,7 @@ bool sqlparser::parseUpdate(xmldomnode *currentnode,
 		// then there must be something in there that we don't
 		// understand.  It needs to be copied verbatim until we run
 		// into something that we do understand.
-		if (parseVerbatim(updatenode,*newptr,newptr)) {
-			space(*newptr,newptr);
-		} else {
+		if (!parseVerbatim(updatenode,*newptr,newptr)) {
 			break;
 		}
 	}
@@ -115,7 +116,6 @@ bool sqlparser::parseUpdate(xmldomnode *currentnode,
 				newNode(updatenode,_verbatim,",");
 			}
 
-			space(*newptr,newptr);
 		} else {
 			break;
 		}
@@ -179,17 +179,13 @@ bool sqlparser::parseUpdateSet(xmldomnode *currentnode,
 		newNode(assignmentnode,_equals);
 
 		// get the value assigned to the column
-		// this could be an expression, but for now,
-		// get the value verbatim
-		char	*value=getVerbatim(*newptr,newptr);
-		newNode(assignmentnode,_value,value);
-		delete[] value;
+		if (!parseExpression(assignmentnode,*newptr,newptr)) {
+			error=true;
+			return false;
+		}
 
 		// skip the comma, if there was one
 		comma(*newptr,newptr);
-
-		// skip the space, if there was one
-		space(*newptr,newptr);
 	}
 }
 

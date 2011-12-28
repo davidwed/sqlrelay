@@ -149,9 +149,13 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	insertInto(xmldomnode *node,
 						stringbuffer *output);
-		virtual bool	insertValues(xmldomnode *node,
+		virtual bool	insertValuesClause(xmldomnode *node,
 						stringbuffer *output);
-		virtual bool	endInsertValues(xmldomnode *node,
+		virtual bool	endInsertValuesClause(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	insertValueClause(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	endInsertValueClause(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	insertValue(xmldomnode *node,
 						stringbuffer *output);
@@ -200,6 +204,8 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	endGroup(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	comparison(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	notClause(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	between(xmldomnode *node,
@@ -214,9 +220,13 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	greaterThanOrEqualTo(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	expression(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	compliment(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	inverse(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	negative(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	plus(xmldomnode *node,
 						stringbuffer *output);
@@ -225,6 +235,8 @@ class sqlwriter {
 		virtual bool	times(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	dividedBy(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	modulo(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	bitwiseAnd(xmldomnode *node,
 						stringbuffer *output);
@@ -235,6 +247,22 @@ class sqlwriter {
 		virtual bool	logicalAnd(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	logicalOr(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	number(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	stringLiteral(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	bindVariable(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	function(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	parameters(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	endParameters(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	parameter(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	endParameter(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	groupBy(xmldomnode *node,
 						stringbuffer *output);

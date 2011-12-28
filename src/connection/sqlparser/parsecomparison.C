@@ -2,12 +2,12 @@
 // See the file COPYING for more information
 
 #include <sqlparser.h>
-#define DEBUG_MESSAGES
 #include <debugprint.h>
 
 bool sqlparser::parseComparison(xmldomnode *currentnode,
 					const char *ptr,
-					const char **newptr) {
+					const char **newptr,
+					bool checkforgroup) {
 	debugFunction();
 
 	// create the node
@@ -18,10 +18,53 @@ bool sqlparser::parseComparison(xmldomnode *currentnode,
 	if (notClause(*newptr,newptr)) {
 
 		// create the node
-		xmldomnode	*notnode=newNode(comparisonnode,_not);
+		newNode(comparisonnode,_not);
+	}
+
+	// handle parens around a comparison
+	const char	*beforeparen=*newptr;
+	if (checkforgroup && leftParen(*newptr,newptr)) {
+	
+		// create the node
+		xmldomnode	*groupnode=new xmldomnode(tree,
+						comparisonnode->getNullNode(),
+						TAG_XMLDOMNODETYPE,
+						_group,NULL);
 
 		// parse the comparison
-		return parseComparison(notnode,*newptr,newptr);
+		const char	*beforecomparison=*newptr;
+		if (parseComparison(groupnode,*newptr,newptr,true) &&
+					rightParen(*newptr,newptr)) {
+			comparisonnode->appendChild(groupnode);
+			return true;
+		}
+
+		// If this failed to parse then the thing we thought was a
+		// comparison might have been an expression instead.  Try
+		// again but don't check for groups.
+		*newptr=beforecomparison;
+		delete groupnode;
+		error=false;
+	
+		// create the node
+		groupnode=new xmldomnode(tree,
+					comparisonnode->getNullNode(),
+					TAG_XMLDOMNODETYPE,
+					_group,NULL);
+
+		// parse the comparison
+		if (parseComparison(groupnode,*newptr,newptr,false) &&
+					rightParen(*newptr,newptr)) {
+			comparisonnode->appendChild(groupnode);
+			return true;
+		}
+
+		// If this failed to parse then the initial paren we ran into
+		// might have been part of the first expression.  Clean up and
+		// start over.
+		*newptr=beforeparen;
+		delete groupnode;
+		error=false;
 	}
 
 	// get the lvalue
@@ -30,9 +73,6 @@ bool sqlparser::parseComparison(xmldomnode *currentnode,
 		error=true;
 		return false;
 	}
-
-	// if we have a between clause then there will be a space before it
-	space(*newptr,newptr);
 
 	// handle betweens
 	if (parseBetween(comparisonnode,*newptr,newptr)) {
@@ -56,9 +96,9 @@ bool sqlparser::parseComparison(xmldomnode *currentnode,
 		return true;
 	}
 
-	debugPrintf("missing comparator\n");
-	error=true;
-	return false;
+	// if the term was a boolean value or function returning a boolean
+	// then there might not be a comparator
+	return true;
 }
 
 const char *sqlparser::_comparison="comparison";
@@ -89,7 +129,6 @@ bool sqlparser::parseBetween(xmldomnode *currentnode,
 		error=true;
 		return false;
 	}
-	space(*newptr,newptr);
 	if (!parseAnd(betweennode,*newptr,newptr)) {
 		debugPrintf("missing and\n");
 		error=true;

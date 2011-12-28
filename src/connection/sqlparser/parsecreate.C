@@ -104,9 +104,7 @@ bool sqlparser::parseCreateTable(xmldomnode *currentnode,
 		// understand.  It needs to be copied verbatim until we run
 		// into something that we do understand or until we hit the
 		// end.
-		if (parseVerbatim(tablenode,*newptr,newptr)) {
-			space(*newptr,newptr);
-		} else {
+		if (!parseVerbatim(tablenode,*newptr,newptr)) {
 			return true;
 		}
 	}
@@ -166,10 +164,6 @@ bool sqlparser::parseColumnAndConstraintDefinitions(
 
 		// right paren
 		if (rightParen(*newptr,newptr)) {
-
-			// consume any spaces after the
-			// column/constraint definitions
-			space(*newptr,newptr);
 			return true;
 		}
 	}
@@ -253,9 +247,7 @@ bool sqlparser::parseConstraints(xmldomnode *currentnode,
 		// then there must be something in there that we don't
 		// understand.  It needs to be copied verbatim until we run
 		// into something that we do understand.
-		if (parseVerbatim(constraintsnode,*newptr,newptr)) {
-			space(*newptr,newptr);
-		} else {
+		if (!parseVerbatim(constraintsnode,*newptr,newptr)) {
 			break;
 		}
 	}
@@ -273,7 +265,6 @@ bool sqlparser::parseUnsigned(xmldomnode *currentnode,
 		return false;
 	}
 	newNode(currentnode,_unsigned);
-	space(*newptr,newptr);
 	return true;
 }
 
@@ -292,7 +283,6 @@ bool sqlparser::parseZeroFill(xmldomnode *currentnode,
 		return false;
 	}
 	newNode(currentnode,_zerofill);
-	space(*newptr,newptr);
 	return true;
 }
 
@@ -311,7 +301,6 @@ bool sqlparser::parseBinary(xmldomnode *currentnode,
 		return false;
 	}
 	newNode(currentnode,_binary);
-	space(*newptr,newptr);
 	return true;
 }
 
@@ -384,7 +373,6 @@ bool sqlparser::parseNull(xmldomnode *currentnode,
 		return false;
 	}
 	newNode(currentnode,_null);
-	space(*newptr,newptr);
 	return true;
 }
 
@@ -408,7 +396,6 @@ bool sqlparser::parseNotNull(xmldomnode *currentnode,
 		return false;
 	}
 	newNode(currentnode,_not_null);
-	space(*newptr,newptr);
 	return true;
 }
 
@@ -439,7 +426,6 @@ bool sqlparser::parseDefault(xmldomnode *currentnode,
 	newNode(currentnode,_default,value);
 	delete[] value;
 
-	space(*newptr,newptr);
 	return true;
 }
 
@@ -463,7 +449,6 @@ bool sqlparser::parseAutoIncrement(xmldomnode *currentnode,
 		return false;
 	}
 	newNode(currentnode,_auto_increment);
-	space(*newptr,newptr);
 	return true;
 }
 
@@ -482,7 +467,6 @@ bool sqlparser::parseUniqueKey(xmldomnode *currentnode,
 		return false;
 	}
 	newNode(currentnode,_unique_key);
-	space(*newptr,newptr);
 	return true;
 }
 
@@ -506,7 +490,6 @@ bool sqlparser::parsePrimaryKey(xmldomnode *currentnode,
 		return false;
 	}
 	newNode(currentnode,_primary_key);
-	space(*newptr,newptr);
 	return true;
 }
 
@@ -525,7 +508,6 @@ bool sqlparser::parseKey(xmldomnode *currentnode,
 		return false;
 	}
 	newNode(currentnode,_key);
-	space(*newptr,newptr);
 	return true;
 }
 
@@ -551,7 +533,6 @@ bool sqlparser::parseComment(xmldomnode *currentnode,
 	newNode(currentnode,_comment,value);
 	delete[] value;
 
-	space(*newptr,newptr);
 	return true;
 }
 
@@ -625,9 +606,6 @@ bool sqlparser::parseReferenceDefinition(xmldomnode *currentnode,
 		error=true;
 		return false;
 	}
-
-	// space
-	space(*newptr,newptr);
 
 	// these are optional
 	// try three times, we'll pick them all up if they're there
@@ -795,9 +773,6 @@ bool sqlparser::parseReferenceOption(xmldomnode *currentnode,
 	// clean up
 	delete[] value;
 
-	// consume any trailing spaces
-	space(*newptr,newptr);
-
 	// success
 	return true;
 }
@@ -842,9 +817,6 @@ bool sqlparser::parseOnCommit(xmldomnode *currentnode,
 
 	// clean up
 	delete[] value;
-
-	// consume any trailing spaces
-	space(*newptr,newptr);
 
 	// success
 	return true;

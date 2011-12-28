@@ -22,8 +22,6 @@ bool sqlparser::parseDelete(xmldomnode *currentnode,
 
 		// look for the from clause
 		if (parseDeleteFrom(deletenode,*newptr,newptr)) {
-			debugPrintf("missing from clause\n");
-			error=true;
 			break;
 		}
 
@@ -31,10 +29,10 @@ bool sqlparser::parseDelete(xmldomnode *currentnode,
 		// then there must be something in there that we don't
 		// understand.  It needs to be copied verbatim until we run
 		// into something that we do understand.
-		if (parseVerbatim(deletenode,*newptr,newptr)) {
-			space(*newptr,newptr);
-		} else {
-			break;
+		if (!parseVerbatim(deletenode,*newptr,newptr)) {
+			debugPrintf("missing from clause\n");
+			error=true;
+			return false;
 		}
 	}
 
@@ -68,7 +66,6 @@ bool sqlparser::parseDelete(xmldomnode *currentnode,
 				newNode(deletenode,_verbatim,",");
 			}
 
-			space(*newptr,newptr);
 		} else {
 			break;
 		}

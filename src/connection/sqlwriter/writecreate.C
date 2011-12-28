@@ -37,13 +37,11 @@ bool sqlwriter::columns(xmldomnode *node, stringbuffer *output) {
 bool sqlwriter::endColumns(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	rightParen(output);
-	output->append('\n');
 	return true;
 }
 
 bool sqlwriter::column(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
-	output->append("\n\t");
 	return true;
 }
 

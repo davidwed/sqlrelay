@@ -29,9 +29,7 @@ bool sqlparser::parseInsert(xmldomnode *currentnode,
 		// then there must be something in there that we don't
 		// understand.  It needs to be copied verbatim until we run
 		// into something that we do understand.
-		if (parseVerbatim(insertnode,*newptr,newptr)) {
-			space(*newptr,newptr);
-		} else {
+		if (!parseVerbatim(insertnode,*newptr,newptr)) {
 			break;
 		}
 	}
@@ -91,8 +89,6 @@ bool sqlparser::parseInsertInto(xmldomnode *currentnode,
 		}
 	}
 
-	// space
-	space(*newptr,newptr);
 	return true;
 }
 
@@ -114,7 +110,7 @@ bool sqlparser::parseInsertValues(xmldomnode *currentnode,
 	}
 	
 	// create the node
-	xmldomnode	*valuesnode=newNode(currentnode,_insert_values);
+	xmldomnode	*valuesnode=newNode(currentnode,_insert_values_clause);
 
 	// the values themselves
 	return parseInsertValuesList(valuesnode,*newptr,newptr);
@@ -125,7 +121,7 @@ bool sqlparser::insertValuesClause(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,"values ");
 }
 
-const char *sqlparser::_insert_values="insert_values";
+const char *sqlparser::_insert_values_clause="insert_values_clause";
 
 bool sqlparser::parseInsertValue(xmldomnode *currentnode,
 					const char *ptr,
@@ -149,7 +145,7 @@ bool sqlparser::insertValueClause(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,"value ");
 }
 
-const char *sqlparser::_insert_value="insert_value";
+const char *sqlparser::_insert_value_clause="insert_value_clause";
 
 bool sqlparser::parseInsertValuesList(xmldomnode *currentnode,
 					const char *ptr,
@@ -174,13 +170,15 @@ bool sqlparser::parseInsertValuesList(xmldomnode *currentnode,
 			return true;
 		}
 
-		// this could be an expression, but for now,
-		// get the value verbatim
-		char	*value=getUntil(",)",*newptr,newptr);
-		newNode(currentnode,_value,value);
-		delete[] value;
+		// get the value to insert
+		xmldomnode	*valuenode=newNode(currentnode,_insert_value);
+		if (!parseExpression(valuenode,*newptr,newptr)) {
+			return false;
+		}
 
 		// skip the comma, if there was one
 		comma(*newptr,newptr);
 	}
 }
+
+const char *sqlparser::_insert_value="insert_value";

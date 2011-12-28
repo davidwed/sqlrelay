@@ -16,19 +16,30 @@ bool sqlwriter::insertInto(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlwriter::insertValues(xmldomnode *node, stringbuffer *output) {
+bool sqlwriter::insertValuesClause(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("values (");
 	return true;
 }
 
-bool sqlwriter::insertValue(xmldomnode *node, stringbuffer *output) {
+bool sqlwriter::insertValueClause(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("value (");
 	return true;
 }
 
-bool sqlwriter::endInsertValues(xmldomnode *node, stringbuffer *output) {
+bool sqlwriter::insertValue(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::endInsertValuesClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append(")");
+	return true;
+}
+
+bool sqlwriter::endInsertValueClause(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append(")");
 	return true;
@@ -36,6 +47,8 @@ bool sqlwriter::endInsertValues(xmldomnode *node, stringbuffer *output) {
 
 bool sqlwriter::endInsertValue(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
-	output->append(")");
+	if (hasSibling(node)) {
+		comma(output);
+	}
 	return true;
 }

@@ -132,7 +132,8 @@ const char * const *sqlwriter::baseElements() {
 		// insert...
 		sqlparser::_insert,
 		sqlparser::_insert_into,
-		sqlparser::_insert_values,
+		sqlparser::_insert_values_clause,
+		sqlparser::_insert_value_clause,
 		sqlparser::_insert_value,
 
 
@@ -169,15 +170,23 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_expression,
 		sqlparser::_compliment,
 		sqlparser::_inverse,
+		sqlparser::_negative,
 		sqlparser::_plus,
 		sqlparser::_minus,
 		sqlparser::_times,
 		sqlparser::_divided_by,
+		sqlparser::_modulo,
 		sqlparser::_logical_and,
 		sqlparser::_logical_or,
 		sqlparser::_bitwise_and,
 		sqlparser::_bitwise_or,
 		sqlparser::_bitwise_xor,
+		sqlparser::_number,
+		sqlparser::_string_literal,
+		sqlparser::_bind_variable,
+		sqlparser::_function,
+		sqlparser::_parameters,
+		sqlparser::_parameter,
 		sqlparser::_group_by,
 		sqlparser::_having,
 		sqlparser::_order_by,
@@ -350,8 +359,12 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return insertQuery(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_insert_into)) {
 		return insertInto(node,output);
-	} else if (!charstring::compare(nodename,sqlparser::_insert_values)) {
-		return insertValues(node,output);
+	} else if (!charstring::compare(nodename,
+					sqlparser::_insert_values_clause)) {
+		return insertValuesClause(node,output);
+	} else if (!charstring::compare(nodename,
+					sqlparser::_insert_value_clause)) {
+		return insertValueClause(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_insert_value)) {
 		return insertValue(node,output);
 
@@ -393,6 +406,8 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return orClause(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_group)) {
 		return group(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_comparison)) {
+		return comparison(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_not)) {
 		return notClause(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_between)) {
@@ -409,10 +424,14 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 	} else if (!charstring::compare(nodename,
 				sqlparser::_greater_than_or_equal_to)) {
 		return greaterThanOrEqualTo(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_expression)) {
+		return expression(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_compliment)) {
 		return compliment(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_inverse)) {
 		return inverse(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_negative)) {
+		return negative(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_plus)) {
 		return plus(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_minus)) {
@@ -421,6 +440,8 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return times(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_divided_by)) {
 		return dividedBy(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_modulo)) {
+		return modulo(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_logical_and)) {
 		return logicalAnd(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_logical_or)) {
@@ -431,6 +452,18 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return bitwiseOr(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_bitwise_xor)) {
 		return bitwiseXor(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_number)) {
+		return number(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_string_literal)) {
+		return stringLiteral(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_bind_variable)) {
+		return bindVariable(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_function)) {
+		return function(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_parameters)) {
+		return parameters(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_parameter)) {
+		return parameter(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_group_by)) {
 		return groupBy(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_having)) {
@@ -484,8 +517,12 @@ bool sqlwriter::handleEnd(xmldomnode *node, stringbuffer *output) {
 		return endTableNameListItem(node,output);
 
 	// insert...
-	} else if (!charstring::compare(nodename,sqlparser::_insert_values)) {
-		return endInsertValues(node,output);
+	} else if (!charstring::compare(nodename,
+					sqlparser::_insert_values_clause)) {
+		return endInsertValuesClause(node,output);
+	} else if (!charstring::compare(nodename,
+					sqlparser::_insert_value_clause)) {
+		return endInsertValueClause(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_insert_value)) {
 		return endInsertValue(node,output);
 
@@ -496,6 +533,10 @@ bool sqlwriter::handleEnd(xmldomnode *node, stringbuffer *output) {
 	// select...
 	} else if (!charstring::compare(nodename,sqlparser::_group)) {
 		return endGroup(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_parameters)) {
+		return endParameters(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_parameter)) {
+		return endParameter(node,output);
 	}
 	return true;
 }

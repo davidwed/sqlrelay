@@ -49,7 +49,7 @@ class sqlparser {
 						const char *value);
 
 
-		bool	space(const char *ptr, const char **newptr);
+		bool	whiteSpace(const char *ptr, const char **newptr);
 		bool	comma(const char *ptr, const char **newptr);
 		bool	equals(const char *ptr, const char **newptr);
 		bool	notEquals(const char *ptr, const char **newptr);
@@ -67,6 +67,7 @@ class sqlparser {
 		bool	minus(const char *ptr, const char **newptr);
 		bool	times(const char *ptr, const char **newptr);
 		bool	dividedBy(const char *ptr, const char **newptr);
+		bool	modulo(const char *ptr, const char **newptr);
 		bool	bitwiseAnd(const char *ptr, const char **newptr);
 		bool	bitwiseOr(const char *ptr, const char **newptr);
 		bool	bitwiseXor(const char *ptr, const char **newptr);
@@ -344,16 +345,17 @@ class sqlparser {
 						const char **newptr);
 		bool	insertValuesClause(const char *ptr,
 						const char **newptr);
-		static const char *_insert_values;
+		static const char *_insert_values_clause;
 		bool	parseInsertValue(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	insertValueClause(const char *ptr,
 						const char **newptr);
-		static const char *_insert_value;
+		static const char *_insert_value_clause;
 		bool	parseInsertValuesList(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
+		static const char *_insert_value;
 
 
 
@@ -447,7 +449,8 @@ class sqlparser {
 		static const char	*_group;
 		bool	parseComparison(xmldomnode *currentnode,
 						const char *ptr,
-						const char **newptr);
+						const char **newptr,
+						bool checkforgroup);
 		static const char	*_comparison;
 		bool	notClause(const char *ptr, const char **newptr);
 		static const char	*_not;
@@ -497,9 +500,10 @@ class sqlparser {
 						const char *ptr,
 						const char **newptr);
 		static const char	*_inverse;
-		bool	parseTerm(xmldomnode *currentnode,
+		bool	parseNegative(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
+		static const char	*_negative;
 		bool	parseBinaryOperator(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
@@ -511,6 +515,10 @@ class sqlparser {
 						const char *ptr,
 						const char **newptr);
 		static const char	*_divided_by;
+		bool	parseModulo(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_modulo;
 		bool	parsePlus(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
@@ -539,6 +547,21 @@ class sqlparser {
 						const char *ptr,
 						const char **newptr);
 		static const char	*_bitwise_xor;
+		bool	parseTerm(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_number;
+		static const char	*_string_literal;
+		static const char	*_bind_variable;
+		bool	parseColumnOrFunction(xmldomnode *currentnode,
+						const char *name,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_function;
+		static const char	*_parameters;
+		static const char	*_parameter;
+		bool	specialFunctionName(const char *name);
+		virtual const char * const	 *specialFunctionNames();
 		bool	groupByClause(const char *ptr,
 						const char **newptr);
 		static const char *_group_by;

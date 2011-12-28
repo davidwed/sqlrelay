@@ -4,11 +4,6 @@
 #include <sqlparser.h>
 #include <debugprint.h>
 
-bool sqlparser::space(const char *ptr, const char **newptr) {
-	debugFunction();
-	return comparePart(ptr,newptr," ");
-}
-
 bool sqlparser::comma(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,",");
@@ -82,6 +77,11 @@ bool sqlparser::times(const char *ptr, const char **newptr) {
 bool sqlparser::dividedBy(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"/");
+}
+
+bool sqlparser::modulo(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"%");
 }
 
 bool sqlparser::bitwiseAnd(const char *ptr, const char **newptr) {

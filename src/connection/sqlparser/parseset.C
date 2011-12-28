@@ -92,7 +92,6 @@ bool sqlparser::parseTransaction(xmldomnode *currentnode,
 
 		// known clauses
 		if (parseIsolationLevel(txnode,*newptr,newptr)) {
-			space(*newptr,newptr);
 			continue;
 		}
 
@@ -101,9 +100,7 @@ bool sqlparser::parseTransaction(xmldomnode *currentnode,
 		// understand.  It needs to be copied verbatim until we run
 		// into something that we do understand or until we hit the
 		// end.
-		if (parseVerbatim(txnode,*newptr,newptr)) {
-			space(*newptr,newptr);
-		} else {
+		if (!parseVerbatim(txnode,*newptr,newptr)) {
 			return true;
 		}
 	}

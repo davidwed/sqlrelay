@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlparser.h>
-#define DEBUG_MESSAGES
 #include <debugprint.h>
 
 bool sqlparser::parseWhere(xmldomnode *currentnode,
@@ -51,9 +50,6 @@ bool sqlparser::parseWhereClauseTerms(xmldomnode *currentnode,
 			}
 			return true;
 		}
-
-		// eat up the space between the term and the and/or
-		space(*newptr,newptr);
 
 		// bail if it's not followed by an and or an or
 		if (!parseAnd(currentnode,*newptr,newptr) &&
@@ -107,28 +103,32 @@ bool sqlparser::parseWhereClauseTerm(xmldomnode *currentnode,
 	debugFunction();
 
 	// handle groups
-// FIXME: problem here....
-// it's possible that the left paren is just grouping terms on the left side of
-// an expression, not grouping comparisons in the where clause
 	*newptr=ptr;
 	if (leftParen(*newptr,newptr)) {
 
 		// create the node
-		xmldomnode	*groupnode=newNode(currentnode,_group);
+		xmldomnode	*groupnode=new xmldomnode(tree,
+						currentnode->getNullNode(),
+						TAG_XMLDOMNODETYPE,
+						_group,NULL);
 
-		// parse where clause terms
-		if (!parseWhereClauseTerms(groupnode,*newptr,newptr)) {
-			debugPrintf("missing terms inside parentheses\n");
-			error=true;
-			return false;
+		// parse where clause terms and look for a right paren
+		if (parseWhereClauseTerms(groupnode,*newptr,newptr) &&
+						rightParen(*newptr,newptr)) {
+			currentnode->appendChild(groupnode);
+			return true;
 		}
 
-		// look for a right paren
-		return rightParen(*newptr,newptr);
+		// If this failed to parse then the paren we ran into might
+		// have been part of the first comparison or expression.
+		// Clean up and start over.
+		*newptr=ptr;
+		delete groupnode;
+		error=false;
 	}
 
 	// handle single comparisons
-	return parseComparison(currentnode,*newptr,newptr);
+	return parseComparison(currentnode,*newptr,newptr,true);
 }
 
 const char *sqlparser::_group="group";
