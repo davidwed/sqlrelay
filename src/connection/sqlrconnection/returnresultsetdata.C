@@ -64,10 +64,13 @@ bool sqlrconnection_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 			return true;
 		}
 
+		if (dbgfile.debugEnabled()) {
+			debugstr=new stringbuffer();
+		}
+
 		cursor->returnRow();
 
 		if (dbgfile.debugEnabled()) {
-			debugstr=new stringbuffer();
 			dbgfile.debugPrint("connection",3,
 						debugstr->getString());
 			delete debugstr;
