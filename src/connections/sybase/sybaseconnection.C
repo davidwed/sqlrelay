@@ -898,6 +898,19 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 		ncols=0;
 	}
 
+	// For non-rpc language commands, we need to clean up here or
+	// subsequent select queries in other cursors will fail until this
+	// cursor is cleaned up.  They will fail with:
+	// Client Library error:
+	// severity(1)
+	// layer(1)
+	// origin(1)
+	// number(49)
+	// Error:	ct_send(): user api layer: external error: This routine cannot be called because another command structure has results pending.
+	if (cmd==languagecmd && !isrpcquery) {
+		cleanUpData(true,true);
+	}
+
 	// return success only if no error was generated
 	if (sybaseconn->errorstring) {
 		return false;
