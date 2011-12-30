@@ -1102,7 +1102,8 @@ void sqlrsh::displayHelp(environment *env) {
 	cyan(env);
 	printf("	clientversion		- ");
 	green(env);
-	printf("returns the version of the SQL Relay client library\n");
+	printf("returns the version of the SQL Relay\n");
+	printf("\t\t\t\t  client library\n");
 	cyan(env);
 	printf("	serverversion		- ");
 	green(env);
@@ -1174,6 +1175,12 @@ void sqlrsh::displayHelp(environment *env) {
 	printf("	reexecute                      - ");
 	green(env);
 	printf("reexecutes the previous query\n\n");
+	cyan(env);
+	printf("	lastinsertid                   - ");
+	green(env);
+	printf("returns the value of the most recently\n");
+	printf("\t\t\t\t\t updated auto-increment or identity\n");
+	printf("\t\t\t\t\t column, if the database supports it\n\n");
 	cyan(env);
 	printf("	show databases [like pattern]		-\n");
 	green(env);
