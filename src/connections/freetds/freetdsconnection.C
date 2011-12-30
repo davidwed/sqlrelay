@@ -1087,6 +1087,21 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length,
 		ncols=0;
 	}
 
+	// For non-rpc language commands, we need to discard the result sets
+	// here or subsequent select queries in other cursors will fail until
+	// this cursor is cleaned up.  They will fail with:
+	// Client Library error:
+	// severity(1)
+	// layer(1)
+	// origin(1)
+	// number(49)
+	// Error:	ct_send(): user api layer: external error: This routine cannot be called because another command structure has results pending.
+	// FIXME: this has to be done in the sybase connection but if it's
+	// done here then it hangs.
+	/*if (cmd==languagecmd && !isrpcquery) {
+		discardResults();
+	}*/
+
 	// return success only if no error was generated
 	if (freetdsconn->errorstring) {
 		return false;
