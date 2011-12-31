@@ -354,7 +354,7 @@ postgresqlcursor::~postgresqlcursor() {
 #endif
 	delete[] columnnames;
 
-	for (uint16_t i=0; i<bindcount; i++) {
+	for (uint16_t i=0; i<bindcounter; i++) {
 		delete[] bindvalues[i];
 	}
 	delete[] bindvalues;
@@ -1108,7 +1108,7 @@ void postgresqlcursor::getField(uint32_t col,
 void postgresqlcursor::cleanUpData(bool freeresult, bool freebinds) {
 
 	if (freebinds) {
-		for (uint16_t i=0; i<bindcount; i++) {
+		for (uint16_t i=0; i<bindcounter; i++) {
 			delete[] bindvalues[i];
 			bindvalues[i]=NULL;
 		}
