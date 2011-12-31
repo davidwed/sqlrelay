@@ -25,8 +25,19 @@ extern "C" {
 #define NEED_IS_BOOL_TYPE_CHAR
 #include <datatypes.h>
 
+bool usenumeric=false;
 PyObject *decimalmodule=NULL;
 PyObject *decimal=NULL;
+
+static PyObject *getNumericFieldsAsStrings(PyObject *self, PyObject *args) {
+  usenumeric=false;
+  return Py_BuildValue("h", 0);
+}
+
+static PyObject *getNumericFieldsAsNumbers(PyObject *self, PyObject *args) {
+  usenumeric=true;
+  return Py_BuildValue("h", 0);
+}
 
 static PyObject *sqlrcon_alloc(PyObject *self, PyObject *args) {
   sqlrconnection *sqlrcon;
@@ -1044,7 +1055,7 @@ static PyObject *getField(PyObject *self, PyObject *args) {
   if (!rc) {
     Py_INCREF(Py_None);
     return Py_None;
-  } else if (isFloatTypeChar(type)) {
+  } else if (usenumeric && isFloatTypeChar(type)) {
     if (decimal) {
       PyObject *tuple=PyTuple_New(1);
       PyTuple_SetItem(tuple, 0, Py_BuildValue("s#", rc, rl));
@@ -1052,7 +1063,7 @@ static PyObject *getField(PyObject *self, PyObject *args) {
     } else {
       return Py_BuildValue("f",(double)charstring::toFloat(rc));
     }
-  } else if (isNumberTypeChar(type)) {
+  } else if (usenumeric && isNumberTypeChar(type)) {
     return Py_BuildValue("L",charstring::toInteger(rc));
   } else if (isBitTypeChar(type)) {
     return Py_BuildValue("l",bitStringToLong(rc));
@@ -1166,7 +1177,7 @@ _get_row(sqlrcursor *sqlrcur, uint64_t row)
     if (!row_data[counter]) {
         Py_INCREF(Py_None);
         PyList_SetItem(my_list, counter, Py_None);
-    } else if (isFloatTypeChar(type)) {
+    } else if (usenumeric && isFloatTypeChar(type)) {
       PyObject *obj;
       if (decimal) {
         PyObject *tuple=PyTuple_New(1);
@@ -1176,7 +1187,7 @@ _get_row(sqlrcursor *sqlrcur, uint64_t row)
         obj=Py_BuildValue("f", (double)charstring::toFloat(row_data[counter]));
       }
       PyList_SetItem(my_list, counter, obj);
-    } else if (isNumberTypeChar(type)) {
+    } else if (usenumeric && isNumberTypeChar(type)) {
       PyList_SetItem(my_list, counter, Py_BuildValue("L", charstring::toInteger(row_data[counter])));
     } else if (isBitTypeChar(type)) {
       PyList_SetItem(my_list, counter, Py_BuildValue("l", bitStringToLong(row_data[counter])));
@@ -1235,7 +1246,7 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
     Py_END_ALLOW_THREADS
     name=((sqlrcursor *)sqlrcur)->getColumnName(counter);
     type=((sqlrcursor *)sqlrcur)->getColumnType(counter);
-    if (isFloatTypeChar(type)) {
+    if (usenumeric && isFloatTypeChar(type)) {
         if (decimal) {
           PyObject *tuple=PyTuple_New(1);
           PyTuple_SetItem(tuple, 0, Py_BuildValue("s", field));
@@ -1243,7 +1254,7 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
         } else {
           PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("f",(double)charstring::toFloat(field)));
         }
-    } else if (isNumberTypeChar(type)) {
+    } else if (usenumeric && isNumberTypeChar(type)) {
       PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("L", charstring::toInteger(field)));
     } else if (isBitTypeChar(type)) {
       PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("l", bitStringToLong(field)));
@@ -1709,6 +1720,8 @@ static PyObject *attachToBindCursor(PyObject *self, PyObject *args) {
 }
 
 static PyMethodDef SQLRMethods[] = {
+  {"getNumericFieldsAsStrings", getNumericFieldsAsStrings, METH_VARARGS},
+  {"getNumericFieldsAsNumbers", getNumericFieldsAsNumbers, METH_VARARGS},
   {"sqlrcon_alloc",  sqlrcon_alloc, METH_VARARGS},
   {"sqlrcon_free", sqlrcon_free, METH_VARARGS},
   {"setTimeout", setTimeout, METH_VARARGS},
@@ -1830,6 +1843,7 @@ initCSQLRelay()
 {
   (void) Py_InitModule("SQLRelay.CSQLRelay", SQLRMethods);
 
+  usenumeric=false;
   decimalmodule=PyImport_ImportModule("decimal");
   if (decimalmodule) {
     decimal=PyObject_GetAttrString(decimalmodule,"Decimal");

@@ -10,6 +10,8 @@ import string
 
 def main():
 
+	PySQLRClient.getNumericFieldsAsNumbers()
+
 	# instantiation
 	print "INSTANTIATION"
 	con=PySQLRClient.sqlrconnection("localhost",9000,

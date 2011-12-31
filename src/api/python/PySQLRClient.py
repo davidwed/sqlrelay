@@ -3,6 +3,23 @@
 
 from SQLRelay import CSQLRelay
 
+def getNumericFieldsAsStrings():
+    """
+    Instructs the API to return numeric fields as strings.  This is the
+    default setting.  Truncation cannot occur if this setting is used.
+    """
+    CSQLRelay.getNumericFieldsAsStrings()
+
+def getNumericFieldsAsNumbers():
+    """
+    Instructs the API to return numeric fields as numbers.  Integer fields will
+    be returned as integers and floating point fields will be returned as
+    Decimals if that class is avialable or floats otherwise.  The drawback to
+    using numerics is that under some circumstances truncation can occur.
+    """
+    CSQLRelay.getNumericFieldsAsNumbers()
+
+
 class sqlrconnection:
 
     """

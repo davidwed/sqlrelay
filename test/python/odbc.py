@@ -18,6 +18,7 @@ def checkSuccess(value,success):
 
 def main():
 
+	PySQLRClient.getNumericFieldsAsNumbers()
 
 	# instantiation
 	con=PySQLRClient.sqlrconnection("localhost",9000,

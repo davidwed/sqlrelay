@@ -21,6 +21,7 @@ def main():
 
 	getcontext().prec=1
 
+	PySQLRClient.getNumericFieldsAsNumbers()
 
 	# instantiation
 	con=PySQLRClient.sqlrconnection("localhost",9000,
