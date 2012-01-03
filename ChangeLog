@@ -19,6 +19,7 @@
 	implemented generic input bind faking
 	fixed a bug that caused an access-after-free condition when debugging
 		the connection
+	added getLastInsertId() methods and support in sqlrsh and perl DBI
 
 0.43 - updated ruby code build to take sitearch into account during includes
 	updated ruby code to map STR2CSTR to StringValuePtr for ruby 1.9
