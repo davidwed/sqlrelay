@@ -1644,6 +1644,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		if (!semset->waitWithUndo(1)) {
 			dbgfile.debugPrint("listener",0,
 				"failed to acquire exclusive shm access");
+			signalmanager::alarm(0);
 			return false;
 		}
 		dbgfile.debugPrint("listener",0,
@@ -1652,9 +1653,10 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		// wait for an available connection
 		dbgfile.debugPrint("listener",0,
 				"waiting for an available connection");
-		if (!semset->wait(2)) {
+		if (!semset->waitWithUndo(2)) {
 			dbgfile.debugPrint("listener",0,
 				"failed to wait for an available connection");
+			signalmanager::alarm(0);
 			return false;
 		}
 
@@ -1667,11 +1669,11 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		// lock on semaphore 1.
 		semset->setValue(2,0);
 
-		dbgfile.debugPrint("listener",0,
-				"done waiting for an available connection");
-
 		// turn off the alarm
 		signalmanager::alarm(0);
+
+		dbgfile.debugPrint("listener",0,
+				"done waiting for an available connection");
 
 		// if we're passing descriptors around, the connection will
 		// pass it's pid to us, otherwise it will pass it's inet and
