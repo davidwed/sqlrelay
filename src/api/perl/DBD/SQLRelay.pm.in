@@ -264,6 +264,14 @@ sub ping {
 	return $dbh->FETCH('driver_connection')->ping();
 }
 
+sub last_insert_id {
+
+	# ignore parameters
+
+	# get the last insert id
+	return $dbh->FETCH('driver_connection')->getLastInsertId();
+}
+
 
 # statement class
 package DBD::SQLRelay::st;
