@@ -1,608 +1,447 @@
-<HTML>
-<HEAD>
-<TITLE>/usr/local/src/sqlrelay-0.25/doc/api/python/test.py.html</TITLE>
-</HEAD>
-<BODY BGcolor=#FFFFFF TEXT=#000000>
-<PRE>
-<FONT color=#0000f8># Copyright (c) 2000 Roman Milner</FONT>
-<FONT color=#0000f8># See the file COPYING for more information</FONT>
-
-<FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> CSQLRelay
-
-<B><FONT color=#a02828>class</FONT></B> <FONT color=#008888>sqlrconnection</FONT>:
-
-    &quot;&quot;&quot;
-<FONT color=#f800f8>    A wrapper for the sqlrelay connection API.  Closely follows the C++ API.</FONT>
-<FONT color=#f800f8>    </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>__init__</FONT>(self, host, port, socket, user, password, retrytime=0, tries=1):
-        &quot;&quot;&quot;<FONT color=#f800f8> </FONT>
-<FONT color=#f800f8>        Opens a connection to the sqlrelay server and authenticates with</FONT>
-<FONT color=#f800f8>        user and password.  Failed connections are retried for tries times</FONT>
-<FONT color=#f800f8>        at retrytime interval.  If tries is 0 then retries will continue</FONT>
-<FONT color=#f800f8>        forever.  If retrytime is 0 then retries will be attempted on a</FONT>
-<FONT color=#f800f8>        default interval.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color="#a02828">def</FONT></B> <FONT color="#008888">setTimeout</FONT>(self, timeoutsec, timeoutusec):
-       &quot;&quot;&quot;
-<FONT color="#ff00f8">      Sets the server connect timeout in seconds</FONT>
-<FONT color="#ff00f8">      and milliseconds.  Setting either parameter</FONT>
-<FONT color="#ff00f8">      to -1 disables the timeout.</FONT>
-<FONT color="#ff00f8">      </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>endSession</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Ends the current session.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>suspendSession</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Disconnects this connection from the current</FONT>
-<FONT color=#f800f8>        session but leaves the session open so </FONT>
-<FONT color=#f800f8>        that another connection can connect to it </FONT>
-<FONT color=#f800f8>        using resumeSession().</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getConnectionPort</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the inet port that the connection is </FONT>
-<FONT color=#f800f8>        communicating over. This parameter may be </FONT>
-<FONT color=#f800f8>        passed to another connection for use in</FONT>
-<FONT color=#f800f8>        the resumeSession() method.</FONT>
-<FONT color=#f800f8>        Note: the value returned by this method is</FONT>
-<FONT color=#f800f8>        only valid after a call to suspendSession().</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getConnectionSocket</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the unix socket that the connection is </FONT>
-<FONT color=#f800f8>        communicating over. This parameter may be </FONT>
-<FONT color=#f800f8>        passed to another connection for use in</FONT>
-<FONT color=#f800f8>        the resumeSession() method.</FONT>
-<FONT color=#f800f8>        Note: the value returned by this method is</FONT>
-<FONT color=#f800f8>        only valid after a call to suspendSession().</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>resumeSession</FONT>(self, port, socket):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Resumes a session previously left open </FONT>
-<FONT color=#f800f8>        using suspendSession().</FONT>
-<FONT color=#f800f8>        Returns 1 on success and 0 on failure.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>ping</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns 1 if the database is up and 0</FONT>
-<FONT color=#f800f8>        if it's down.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>identify</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the type of database: </FONT>
-<FONT color=#f800f8>          oracle8, postgresql, mysql, etc.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>dbVersion</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the version of the database</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>serverVersion</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the version of the SQL Relay server software</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>clientVersion</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the version of the SQL Relay client software</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>bindFormat</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns a string representing the format</FONT>
-<FONT color=#f800f8>        of the bind variables used in the db.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a62828>def</FONT></B> <FONT color=#008a8e>autoCommitOn</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#ff00ff>        Instructs the database to perform a commit</FONT>
-<FONT color=#ff00ff>        after every successful query.</FONT>
-<FONT color=#ff00ff>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a62828>def</FONT></B> <FONT color=#008a8e>autoCommitOff</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#ff00ff>        Instructs the database to wait for the </FONT>
-<FONT color=#ff00ff>        client to tell it when to commit.</FONT>
-<FONT color=#ff00ff>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>commit</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Issues a commit.  Returns a 1 if the commit succeeded,</FONT>
-<FONT color=#f800f8>        0 if it failed and -1 if an error occurred.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>rollback</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Issues a rollback.  Returns a 1 if the rollback succeeded,</FONT>
-<FONT color=#f800f8>        0 if it failed and -1 if an error occurred.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>debugOn</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Turn verbose debugging on.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>debugOff</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Turn verbose debugging off.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getDebug</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns 1 if debugging is turned on and 0 if debugging is turned off.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-
-
-
-<B><FONT color=#a02828>class</FONT></B> <FONT color=#008888>sqlrcursor</FONT>:
-
-
-    &quot;&quot;&quot;
-<FONT color=#f800f8>    A wrapper for the sqlrelay cursor API.  Closely follows the C++ API.</FONT>
-<FONT color=#f800f8>    </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>__init__</FONT>(self, sqlrcon):
-        self.cursor = CSQLRelay.sqlrcur_alloc(sqlrcon.connection)
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>__del__</FONT>(self):
-        CSQLRelay.sqlrcur_free(self.cursor)
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>setResultSetBufferSize</FONT>(self, rows):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Sets the number of rows of the result set</FONT>
-<FONT color=#f800f8>        to buffer at a time.  0 (the default)</FONT>
-<FONT color=#f800f8>        means buffer the entire result set.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getResultSetBufferSize</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the number of result set rows that </FONT>
-<FONT color=#f800f8>        will be buffered at a time or 0 for the</FONT>
-<FONT color=#f800f8>        entire result set.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>dontGetColumnInfo</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Tells the server not to send any column</FONT>
-<FONT color=#f800f8>        info (names, types, sizes).  If you don't</FONT>
-<FONT color=#f800f8>        need that info, you should call this</FONT>
-<FONT color=#f800f8>        method to improve performance.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getColumnInfo</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Tells the server to send column info.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a62828>def</FONT></B> <FONT color=#008a8e>mixedCaseColumnNames</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#ff00ff>        Columns names are returned in the same</FONT>
-<FONT color=#ff00ff>        case as they are defined in the database.</FONT>
-<FONT color=#ff00ff>        This is the default.</FONT>
-<FONT color=#ff00ff>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a62828>def</FONT></B> <FONT color=#008a8e>upperCaseColumnNames</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#ff00ff>        Columns names are converted to upper case.</FONT>
-<FONT color=#ff00ff>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a62828>def</FONT></B> <FONT color=#008a8e>lowerCaseColumnNames</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#ff00ff>        Columns names are converted to lower case.</FONT>
-<FONT color=#ff00ff>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>cacheToFile</FONT>(self, filename):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Sets query caching on.  Future queries</FONT>
-<FONT color=#f800f8>        will be cached to the file &quot;filename&quot;.</FONT>
-<FONT color=#f800f8>        The full pathname of the file can be</FONT>
-<FONT color=#f800f8>        retrieved using getCacheFileName().</FONT>
-<FONT color=#f800f8>        </FONT>
-<FONT color=#f800f8>        A default time-to-live of 10 minutes is</FONT>
-<FONT color=#f800f8>        also set.</FONT>
-<FONT color=#f800f8>        </FONT>
-<FONT color=#f800f8>        Note that once cacheToFile() is called,</FONT>
-<FONT color=#f800f8>        the result sets of all future queries will</FONT>
-<FONT color=#f800f8>        be cached to that file until another call </FONT>
-<FONT color=#f800f8>        to cacheToFile() changes which file to</FONT>
-<FONT color=#f800f8>        cache to or a call to cacheOff() turns off</FONT>
-<FONT color=#f800f8>        caching.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>setCacheTtl</FONT>(self, ttl):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Sets the time-to-live for cached result</FONT>
-<FONT color=#f800f8>        sets. The sqlr-cachemanger will remove each </FONT>
-<FONT color=#f800f8>        cached result set &quot;ttl&quot; seconds after it's </FONT>
-<FONT color=#f800f8>        created.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getCacheFileName</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the name of the file containing the most</FONT>
-<FONT color=#f800f8>        recently cached result set.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>cacheOff</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Sets query caching off.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-
-    &quot;&quot;&quot;
-<FONT color=#f800f8>    If you don't need to use substitution or bind variables</FONT>
-<FONT color=#f800f8>    in your queries, use these two methods.</FONT>
-<FONT color=#f800f8>    </FONT>&quot;&quot;&quot;
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>sendQuery</FONT>(self, query):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Send a SQL query to the server and</FONT>
-<FONT color=#f800f8>        gets a result set.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a62828>def</FONT></B> <FONT color=#008a8e>sendQueryWithLength</FONT>(self, query, length):
-        &quot;&quot;&quot;
-<FONT color=#ff00ff>        Sends &quot;query&quot; with length &quot;length&quot; and gets</FONT>
-<FONT color=#ff00ff>        a result set. This method must be used if</FONT>
-<FONT color=#ff00ff>        the query contains binary data.</FONT>
-<FONT color=#ff00ff>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>sendFileQuery</FONT>(self, path, file):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Send the SQL query in path/file to the server and</FONT>
-<FONT color=#f800f8>        gets a result set.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    &quot;&quot;&quot;
-<FONT color=#f800f8>    If you need to use substitution or bind variables, in your</FONT>
-<FONT color=#f800f8>    queries use the following methods.  See the API documentation</FONT>
-<FONT color=#f800f8>    for more information about substitution and bind variables.</FONT>
-<FONT color=#f800f8>    </FONT>&quot;&quot;&quot;
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>prepareQuery</FONT>(self, query):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Prepare to execute query.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a62828>def</FONT></B> <FONT color=#008a8e>prepareQueryWithLength</FONT>(self, query, length):
-        &quot;&quot;&quot;
-<FONT color=#ff00ff>        Prepare to execute &quot;query&quot; with length </FONT>
-<FONT color=#ff00ff>        &quot;length&quot;.  This method must be used if the</FONT>
-<FONT color=#ff00ff>        query contains binary data.</FONT>
-<FONT color=#ff00ff>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>prepareFileQuery</FONT>(self, path, file):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Prepare to execute the contents of path/filename.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>substitution</FONT>(self, variable, value, precision=0, scale=0):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Define a substitution variable.</FONT>
-<FONT color=#f800f8>        Returns true if the variable was successfully substituted or false if</FONT>
-<FONT color=#f800f8>        the variable isn't a string, integer or floating point number, or if</FONT>
-<FONT color=#f800f8>        precision and scale aren't provided for a floating point number.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>inputBind</FONT>(self, variable, value, precision=0, scale=0):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Define an input bind varaible.</FONT>
-<FONT color=#f800f8>        Returns true if the variable was successfully bound or false if the</FONT>
-<FONT color=#f800f8>        variable isn't a string, integer or floating point number, or if</FONT>
-<FONT color=#f800f8>        precision and scale aren't provided for a floating point number.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>inputBindBlob</FONT>(self, variable, value, length):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Define a BLOB input bind varaible.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>inputBindClob</FONT>(self, variable, value, length):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Define a CLOB input bind varaible.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>defineOutputBindString</FONT>(self, variable, length):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Define a string output bind varaible.</FONT>
-<FONT color=#f800f8>        "length" bytes will be reserved to store the value.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>defineOutputBindInteger</FONT>(self, variable):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Define an integer output bind varaible.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>defineOutputBindDouble</FONT>(self, variable):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Define a double precision floating point</FONT>
-<FONT color=#f800f8>        output bind varaible.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>defineOutputBindBlob</FONT>(self, variable):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Define a BLOB output bind varaible.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>defineOutputBindClob</FONT>(self, variable):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Define a CLOB output bind varaible.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>defineOutputBindCursor</FONT>(self, variable):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Define a cursor output bind varaible.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>substitutions</FONT>(self, variables, values, precisions=None, scales=None):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Define substitution variables.</FONT>
-<FONT color=#f800f8>        Returns true if the variables were successfully substituted or false if</FONT>
-<FONT color=#f800f8>        one of the variables wasn't a string, integer or floating point number,</FONT>
-<FONT color=#f800f8>        or if precision and scale weren't provided for a floating point number.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>inputBinds</FONT>(self, variables, values, precisions=None, scales=None):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Define input bind variables.</FONT>
-<FONT color=#f800f8>        Returns true if the variables were successfully bound or false if one</FONT>
-<FONT color=#f800f8>        of the variables wasn't a string, integer or floating point number,</FONT>
-<FONT color=#f800f8>        or if precision and scale weren't provided for a floating point number.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-        
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>validateBinds</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        If you are binding to any variables that </FONT>
-<FONT color=#f800f8>        might not actually be in your query, call </FONT>
-<FONT color=#f800f8>        this to ensure that the database won't try </FONT>
-<FONT color=#f800f8>        to bind them unless they really are in the </FONT>
-<FONT color=#f800f8>        query.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-        
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>validBind</FONT>(self, variable):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns true if "variable" was a valid bind </FONT>
-<FONT color=#f800f8>        variable of the query. </FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>executeQuery</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Execute the query that was previously</FONT>
-<FONT color=#f800f8>        prepared and bound.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>fetchFromBindCursor</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Fetch from a cursor that was returned as</FONT>
-<FONT color=#f800f8>        an output bind variable.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getOutputBindString</FONT>(self, variable):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Retrieve the value of an output bind variable.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getOutputBindBlob</FONT>(self, variable):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Retrieve the value of an output bind variable.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getOutputBindClob</FONT>(self, variable):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Retrieve the value of an output bind variable.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getOutputBindInteger</FONT>(self, variable):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Retrieve the value of an output bind variable.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getOutputBindDouble</FONT>(self, variable):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Retrieve the value of an output bind variable.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getOutputBindLength</FONT>(self, variable):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Retrieve the length of an output bind variable.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getOutputBindCursor</FONT>(self, variable):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Get the cursor associated with a previously</FONT>
-<FONT color=#f800f8>        defined output bind variable.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>openCachedResultSet</FONT>(self, filename):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Open a result set after a sendCachedQeury</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>colCount</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the number of columns in the current result set.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>rowCount</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the number of rows in the current result set.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>totalRows</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the total number of rows that will </FONT>
-<FONT color=#f800f8>        be returned in the result set.  Not all </FONT>
-<FONT color=#f800f8>        databases support this call.  Don't use it </FONT>
-<FONT color=#f800f8>        for applications which are designed to be </FONT>
-<FONT color=#f800f8>        portable across databases.  -1 is returned</FONT>
-<FONT color=#f800f8>        by databases which don't support this option.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>affectedRows</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the number of rows that were </FONT>
-<FONT color=#f800f8>        updated, inserted or deleted by the query.</FONT>
-<FONT color=#f800f8>        Not all databases support this call.  Don't </FONT>
-<FONT color=#f800f8>        use it for applications which are designed </FONT>
-<FONT color=#f800f8>        to be portable across databases.  -1 is </FONT>
-<FONT color=#f800f8>        returned by databases which don't support </FONT>
-<FONT color=#f800f8>        this option.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>firstRowIndex</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the index of the first buffered row.</FONT>
-<FONT color=#f800f8>        This is useful when buffering only part of</FONT>
-<FONT color=#f800f8>        the result set at a time.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>endOfResultSet</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns 0 if part of the result set is still</FONT>
-<FONT color=#f800f8>        pending on the server and 1 if not.  This</FONT>
-<FONT color=#f800f8>        method can only return 0 if </FONT>
-<FONT color=#f800f8>        setResultSetBufferSize() has been called</FONT>
-<FONT color=#f800f8>        with a parameter other than 0.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>errorMessage</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        If the query failed, the error message will be returned</FONT>
-<FONT color=#f800f8>        from this method.  Otherwise, it returns None.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getNullsAsEmptyStrings</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Tells the cursor to return NULL fields and output</FONT>
-<FONT color=#f800f8>        bind variables as empty strings.</FONT>
-<FONT color=#f800f8>        This is the default.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getNullsAsNone</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Tells the cursor to return NULL fields and output</FONT>
-<FONT color=#f800f8>        bind variables as NULL's.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getField</FONT>(self, row, col):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the value of the specified row and</FONT>
-<FONT color=#f800f8>        column.  col may be a column name or number.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getFieldLength</FONT>(self, row, col):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the length of the specified row and</FONT>
-<FONT color=#f800f8>        column.  col may be a column name or number.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getRow</FONT>(self, row):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns a list of values in the given row.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getRowDictionary</FONT>(self, row):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the requested row as values in a dictionary</FONT>
-<FONT color=#f800f8>        with column names for keys.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getRowRange</FONT>(self, beg, end):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns a list of lists of the rows between beg and end.</FONT>
-<FONT color=#f800f8>        Note: this function has no equivalent in other SQL Relay API's.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getRowLengths</FONT>(self, row):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns a list of lengths in the given row.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getRowLengthsDictionary</FONT>(self, row):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the requested row lengths as values in a dictionary</FONT>
-<FONT color=#f800f8>        with column names for keys.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getRowLengthsRange</FONT>(self, beg, end):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns a list of lists of the lengths of rows between beg and end.</FONT>
-<FONT color=#f800f8>        Note: this function has no equivalent in other SQL Relay API's.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getColumnName</FONT>(self, col):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the name of column number col.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getColumnNames</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns a list of column names in the current result set.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getColumnType</FONT>(self, col):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the type of the specified column.  col may</FONT>
-<FONT color=#f800f8>        be a name or number.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getColumnLength</FONT>(self, col):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the length of the specified column.  col may</FONT>
-<FONT color=#f800f8>        be a name or number.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getLongest</FONT>(self, col):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the length of the specified column.  col may</FONT>
-<FONT color=#f800f8>        be a name or number.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>getResultSetId</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Returns the internal ID of this result set.</FONT>
-<FONT color=#f800f8>        This parameter may be passed to another </FONT>
-<FONT color=#f800f8>        cursor for use in the resumeResultSet() </FONT>
-<FONT color=#f800f8>        method.</FONT>
-<FONT color=#f800f8>        Note: the value returned by this method is</FONT>
-<FONT color=#f800f8>        only valid after a call to suspendResultSet().</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>suspendResultSet</FONT>(self):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Tells the server to leave this result</FONT>
-<FONT color=#f800f8>        set open when the cursor calls </FONT>
-<FONT color=#f800f8>        suspendSession() so that another cursor can </FONT>
-<FONT color=#f800f8>        connect to it using resumeResultSet() after </FONT>
-<FONT color=#f800f8>        it calls resumeSession().</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>resumeResultSet</FONT>(self, id):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Resumes a result set previously left open </FONT>
-<FONT color=#f800f8>        using suspendSession().</FONT>
-<FONT color=#f800f8>        Returns 1 on success and 0 on failure.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-
-    <B><FONT color=#a02828>def</FONT></B> <FONT color=#008888>resumeCachedResultSet</FONT>(self, id, filename):
-        &quot;&quot;&quot;
-<FONT color=#f800f8>        Resumes a result set previously left open</FONT>
-<FONT color=#f800f8>        using suspendSession() and continues caching</FONT>
-<FONT color=#f800f8>        the result set to &quot;filename&quot;.</FONT>
-<FONT color=#f800f8>        Returns 1 on success and 0 on failure.</FONT>
-<FONT color=#f800f8>        </FONT>&quot;&quot;&quot;
-</PRE>
-</BODY>
-</HTML>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module PySQLRClient</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>PySQLRClient</strong></big></big></font></td
+><td align=right valign=bottom
+></td></tr></table>
+    <p><tt>#&nbsp;Copyright&nbsp;(c)&nbsp;2000&nbsp;Roman&nbsp;Milner<br>
+#&nbsp;See&nbsp;the&nbsp;file&nbsp;COPYING&nbsp;for&nbsp;more&nbsp;information</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top>SQLRelay.CSQLRelay<br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="PySQLRClient.html#sqlrconnection">sqlrconnection</a>
+</font></dt><dt><font face="helvetica, arial"><a href="PySQLRClient.html#sqlrcursor">sqlrcursor</a>
+</font></dt></dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="sqlrconnection">class <strong>sqlrconnection</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;wrapper&nbsp;for&nbsp;the&nbsp;sqlrelay&nbsp;connection&nbsp;API.&nbsp;&nbsp;Closely&nbsp;follows&nbsp;the&nbsp;C++&nbsp;API.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="sqlrconnection-__del__"><strong>__del__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="sqlrconnection-__init__"><strong>__init__</strong></a>(self, host, port, socket, user, password, retrytime<font color="#909090">=0</font>, tries<font color="#909090">=1</font>)</dt><dd><tt>Opens&nbsp;a&nbsp;connection&nbsp;to&nbsp;the&nbsp;sqlrelay&nbsp;server&nbsp;and&nbsp;authenticates&nbsp;with<br>
+user&nbsp;and&nbsp;password.&nbsp;&nbsp;Failed&nbsp;connections&nbsp;are&nbsp;retried&nbsp;for&nbsp;tries&nbsp;times<br>
+at&nbsp;retrytime&nbsp;interval.&nbsp;&nbsp;If&nbsp;tries&nbsp;is&nbsp;0&nbsp;then&nbsp;retries&nbsp;will&nbsp;continue<br>
+forever.&nbsp;&nbsp;If&nbsp;retrytime&nbsp;is&nbsp;0&nbsp;then&nbsp;retries&nbsp;will&nbsp;be&nbsp;attempted&nbsp;on&nbsp;a<br>
+default&nbsp;interval.</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-autoCommitOff"><strong>autoCommitOff</strong></a>(self)</dt><dd><tt>Instructs&nbsp;the&nbsp;database&nbsp;to&nbsp;wait&nbsp;for&nbsp;the&nbsp;<br>
+client&nbsp;to&nbsp;tell&nbsp;it&nbsp;when&nbsp;to&nbsp;commit.</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-autoCommitOn"><strong>autoCommitOn</strong></a>(self)</dt><dd><tt>Instructs&nbsp;the&nbsp;database&nbsp;to&nbsp;perform&nbsp;a&nbsp;commit<br>
+after&nbsp;every&nbsp;successful&nbsp;query.</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-bindFormat"><strong>bindFormat</strong></a>(self)</dt><dd><tt>Returns&nbsp;a&nbsp;string&nbsp;representing&nbsp;the&nbsp;format<br>
+of&nbsp;the&nbsp;bind&nbsp;variables&nbsp;used&nbsp;in&nbsp;the&nbsp;db.</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-clientVersion"><strong>clientVersion</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;version&nbsp;of&nbsp;the&nbsp;SQL&nbsp;Relay&nbsp;client&nbsp;version</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-commit"><strong>commit</strong></a>(self)</dt><dd><tt>Issues&nbsp;a&nbsp;commit,&nbsp;returns&nbsp;1&nbsp;if&nbsp;the&nbsp;commit<br>
+succeeded,&nbsp;0&nbsp;if&nbsp;it&nbsp;failed&nbsp;and&nbsp;-1&nbsp;if&nbsp;an<br>
+error&nbsp;occurred.</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-dbVersion"><strong>dbVersion</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;version&nbsp;of&nbsp;the&nbsp;database</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-debugOff"><strong>debugOff</strong></a>(self)</dt><dd><tt>Turn&nbsp;verbose&nbsp;debugging&nbsp;off.</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-debugOn"><strong>debugOn</strong></a>(self)</dt><dd><tt>Turn&nbsp;verbose&nbsp;debugging&nbsp;on.</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-endSession"><strong>endSession</strong></a>(self)</dt><dd><tt>Ends&nbsp;the&nbsp;current&nbsp;session.</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-errorMessage"><strong>errorMessage</strong></a>(self)</dt><dd><tt>If&nbsp;the&nbsp;operation&nbsp;failed,&nbsp;the&nbsp;error&nbsp;message&nbsp;will&nbsp;be&nbsp;returned<br>
+from&nbsp;this&nbsp;method.&nbsp;&nbsp;Otherwise,&nbsp;it&nbsp;returns&nbsp;None.</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-getConnectionPort"><strong>getConnectionPort</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;inet&nbsp;port&nbsp;that&nbsp;the&nbsp;connection&nbsp;is&nbsp;<br>
+communicating&nbsp;over.&nbsp;This&nbsp;parameter&nbsp;may&nbsp;be&nbsp;<br>
+passed&nbsp;to&nbsp;another&nbsp;connection&nbsp;for&nbsp;use&nbsp;in<br>
+the&nbsp;<a href="#sqlrconnection-resumeSession">resumeSession</a>()&nbsp;method.<br>
+Note:&nbsp;the&nbsp;value&nbsp;returned&nbsp;by&nbsp;this&nbsp;method&nbsp;is<br>
+only&nbsp;valid&nbsp;after&nbsp;a&nbsp;call&nbsp;to&nbsp;<a href="#sqlrconnection-suspendSession">suspendSession</a>().</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-getConnectionSocket"><strong>getConnectionSocket</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;unix&nbsp;socket&nbsp;that&nbsp;the&nbsp;connection&nbsp;is&nbsp;<br>
+communicating&nbsp;over.&nbsp;This&nbsp;parameter&nbsp;may&nbsp;be&nbsp;<br>
+passed&nbsp;to&nbsp;another&nbsp;connection&nbsp;for&nbsp;use&nbsp;in<br>
+the&nbsp;<a href="#sqlrconnection-resumeSession">resumeSession</a>()&nbsp;method.<br>
+Note:&nbsp;the&nbsp;value&nbsp;returned&nbsp;by&nbsp;this&nbsp;method&nbsp;is<br>
+only&nbsp;valid&nbsp;after&nbsp;a&nbsp;call&nbsp;to&nbsp;<a href="#sqlrconnection-suspendSession">suspendSession</a>().</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-getCurrentDatabase"><strong>getCurrentDatabase</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;database/schema&nbsp;that&nbsp;is&nbsp;currently&nbsp;in&nbsp;use.</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-getDebug"><strong>getDebug</strong></a>(self)</dt><dd><tt>Returns&nbsp;1&nbsp;if&nbsp;debugging&nbsp;is&nbsp;turned&nbsp;on&nbsp;and&nbsp;0&nbsp;if&nbsp;debugging&nbsp;is&nbsp;turned&nbsp;off.</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-getLastInsertId"><strong>getLastInsertId</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;value&nbsp;of&nbsp;the&nbsp;autoincrement&nbsp;column&nbsp;for&nbsp;the&nbsp;last&nbsp;insert</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-identify"><strong>identify</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;type&nbsp;of&nbsp;database:&nbsp;<br>
+&nbsp;&nbsp;oracle8,&nbsp;postgresql,&nbsp;mysql,&nbsp;etc.</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-ping"><strong>ping</strong></a>(self)</dt><dd><tt>Returns&nbsp;1&nbsp;if&nbsp;the&nbsp;database&nbsp;is&nbsp;up&nbsp;and&nbsp;0<br>
+if&nbsp;it's&nbsp;down.</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-resumeSession"><strong>resumeSession</strong></a>(self, port, socket)</dt><dd><tt>Resumes&nbsp;a&nbsp;session&nbsp;previously&nbsp;left&nbsp;open&nbsp;<br>
+using&nbsp;<a href="#sqlrconnection-suspendSession">suspendSession</a>().<br>
+Returns&nbsp;1&nbsp;on&nbsp;success&nbsp;and&nbsp;0&nbsp;on&nbsp;failure.</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-rollback"><strong>rollback</strong></a>(self)</dt><dd><tt>Issues&nbsp;a&nbsp;rollback,&nbsp;returns&nbsp;1&nbsp;if&nbsp;the&nbsp;rollback<br>
+succeeded,&nbsp;0&nbsp;if&nbsp;it&nbsp;failed&nbsp;and&nbsp;-1&nbsp;if&nbsp;an<br>
+error&nbsp;occurred.</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-selectDatabase"><strong>selectDatabase</strong></a>(self, database)</dt><dd><tt>Sets&nbsp;the&nbsp;current&nbsp;database/schema&nbsp;to&nbsp;"database"</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-serverVersion"><strong>serverVersion</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;version&nbsp;of&nbsp;the&nbsp;SQL&nbsp;Relay&nbsp;server&nbsp;version</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-setTimeout"><strong>setTimeout</strong></a>(self, timeoutsec, timeoutusec)</dt><dd><tt>Sets&nbsp;the&nbsp;server&nbsp;connect&nbsp;timeout&nbsp;in&nbsp;seconds<br>
+and&nbsp;milliseconds.&nbsp;&nbsp;Setting&nbsp;either&nbsp;parameter<br>
+to&nbsp;-1&nbsp;disables&nbsp;the&nbsp;timeout.</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-suspendSession"><strong>suspendSession</strong></a>(self)</dt><dd><tt>Disconnects&nbsp;this&nbsp;connection&nbsp;from&nbsp;the&nbsp;current<br>
+session&nbsp;but&nbsp;leaves&nbsp;the&nbsp;session&nbsp;open&nbsp;so&nbsp;<br>
+that&nbsp;another&nbsp;connection&nbsp;can&nbsp;connect&nbsp;to&nbsp;it&nbsp;<br>
+using&nbsp;<a href="#sqlrconnection-resumeSession">resumeSession</a>().</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="sqlrcursor">class <strong>sqlrcursor</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;wrapper&nbsp;for&nbsp;the&nbsp;sqlrelay&nbsp;cursor&nbsp;API.&nbsp;&nbsp;Closely&nbsp;follows&nbsp;the&nbsp;C++&nbsp;API.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="sqlrcursor-__del__"><strong>__del__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="sqlrcursor-__init__"><strong>__init__</strong></a>(self, sqlrcon)</dt></dl>
+
+<dl><dt><a name="sqlrcursor-affectedRows"><strong>affectedRows</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;rows&nbsp;that&nbsp;were&nbsp;<br>
+updated,&nbsp;inserted&nbsp;or&nbsp;deleted&nbsp;by&nbsp;the&nbsp;query.<br>
+Not&nbsp;all&nbsp;databases&nbsp;support&nbsp;this&nbsp;call.&nbsp;&nbsp;Don't&nbsp;<br>
+use&nbsp;it&nbsp;for&nbsp;applications&nbsp;which&nbsp;are&nbsp;designed&nbsp;<br>
+to&nbsp;be&nbsp;portable&nbsp;across&nbsp;databases.&nbsp;&nbsp;-1&nbsp;is&nbsp;<br>
+returned&nbsp;by&nbsp;databases&nbsp;which&nbsp;don't&nbsp;support&nbsp;<br>
+this&nbsp;option.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-cacheOff"><strong>cacheOff</strong></a>(self)</dt><dd><tt>Sets&nbsp;query&nbsp;caching&nbsp;off.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-cacheToFile"><strong>cacheToFile</strong></a>(self, filename)</dt><dd><tt>Sets&nbsp;query&nbsp;caching&nbsp;on.&nbsp;&nbsp;Future&nbsp;queries<br>
+will&nbsp;be&nbsp;cached&nbsp;to&nbsp;the&nbsp;file&nbsp;"filename".<br>
+The&nbsp;full&nbsp;pathname&nbsp;of&nbsp;the&nbsp;file&nbsp;can&nbsp;be<br>
+retrieved&nbsp;using&nbsp;<a href="#sqlrcursor-getCacheFileName">getCacheFileName</a>().<br>
+&nbsp;<br>
+A&nbsp;default&nbsp;time-to-live&nbsp;of&nbsp;10&nbsp;minutes&nbsp;is<br>
+also&nbsp;set.<br>
+&nbsp;<br>
+Note&nbsp;that&nbsp;once&nbsp;<a href="#sqlrcursor-cacheToFile">cacheToFile</a>()&nbsp;is&nbsp;called,<br>
+the&nbsp;result&nbsp;sets&nbsp;of&nbsp;all&nbsp;future&nbsp;queries&nbsp;will<br>
+be&nbsp;cached&nbsp;to&nbsp;that&nbsp;file&nbsp;until&nbsp;another&nbsp;call&nbsp;<br>
+to&nbsp;<a href="#sqlrcursor-cacheToFile">cacheToFile</a>()&nbsp;changes&nbsp;which&nbsp;file&nbsp;to<br>
+cache&nbsp;to&nbsp;or&nbsp;a&nbsp;call&nbsp;to&nbsp;<a href="#sqlrcursor-cacheOff">cacheOff</a>()&nbsp;turns&nbsp;off<br>
+caching.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-clearBinds"><strong>clearBinds</strong></a>(self)</dt><dd><tt>Clear&nbsp;all&nbsp;binds&nbsp;variables.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-colCount"><strong>colCount</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;columns&nbsp;in&nbsp;the&nbsp;current&nbsp;result&nbsp;set.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-countBindVariables"><strong>countBindVariables</strong></a>(self)</dt><dd><tt>Parses&nbsp;the&nbsp;previously&nbsp;prepared&nbsp;query,<br>
+counts&nbsp;the&nbsp;number&nbsp;of&nbsp;bind&nbsp;variables&nbsp;defined<br>
+in&nbsp;it&nbsp;and&nbsp;returns&nbsp;that&nbsp;number.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-defineOutputBindBlob"><strong>defineOutputBindBlob</strong></a>(self, variable)</dt><dd><tt>Define&nbsp;an&nbsp;output&nbsp;bind&nbsp;varaible.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-defineOutputBindClob"><strong>defineOutputBindClob</strong></a>(self, variable)</dt><dd><tt>Define&nbsp;an&nbsp;output&nbsp;bind&nbsp;varaible.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-defineOutputBindCursor"><strong>defineOutputBindCursor</strong></a>(self, variable)</dt><dd><tt>Define&nbsp;an&nbsp;output&nbsp;bind&nbsp;varaible.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-defineOutputBindDouble"><strong>defineOutputBindDouble</strong></a>(self, variable)</dt><dd><tt>Define&nbsp;a&nbsp;double&nbsp;precision&nbsp;floating&nbsp;point&nbsp;output&nbsp;bind&nbsp;varaible.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-defineOutputBindInteger"><strong>defineOutputBindInteger</strong></a>(self, variable)</dt><dd><tt>Define&nbsp;an&nbsp;integer&nbsp;output&nbsp;bind&nbsp;varaible.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-defineOutputBindString"><strong>defineOutputBindString</strong></a>(self, variable, length)</dt><dd><tt>Define&nbsp;a&nbsp;string&nbsp;output&nbsp;bind&nbsp;varaible.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-dontGetColumnInfo"><strong>dontGetColumnInfo</strong></a>(self)</dt><dd><tt>Tells&nbsp;the&nbsp;server&nbsp;not&nbsp;to&nbsp;send&nbsp;any&nbsp;column<br>
+info&nbsp;(names,&nbsp;types,&nbsp;sizes).&nbsp;&nbsp;If&nbsp;you&nbsp;don't<br>
+need&nbsp;that&nbsp;info,&nbsp;you&nbsp;should&nbsp;call&nbsp;this<br>
+method&nbsp;to&nbsp;improve&nbsp;performance.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-endOfResultSet"><strong>endOfResultSet</strong></a>(self)</dt><dd><tt>Returns&nbsp;0&nbsp;if&nbsp;part&nbsp;of&nbsp;the&nbsp;result&nbsp;set&nbsp;is&nbsp;still<br>
+pending&nbsp;on&nbsp;the&nbsp;server&nbsp;and&nbsp;1&nbsp;if&nbsp;not.&nbsp;&nbsp;This<br>
+method&nbsp;can&nbsp;only&nbsp;return&nbsp;0&nbsp;if&nbsp;<br>
+<a href="#sqlrcursor-setResultSetBufferSize">setResultSetBufferSize</a>()&nbsp;has&nbsp;been&nbsp;called<br>
+with&nbsp;a&nbsp;parameter&nbsp;other&nbsp;than&nbsp;0.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-errorMessage"><strong>errorMessage</strong></a>(self)</dt><dd><tt>If&nbsp;the&nbsp;query&nbsp;failed,&nbsp;the&nbsp;error&nbsp;message&nbsp;will&nbsp;be&nbsp;returned<br>
+from&nbsp;this&nbsp;method.&nbsp;&nbsp;Otherwise,&nbsp;it&nbsp;returns&nbsp;None.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-executeQuery"><strong>executeQuery</strong></a>(self)</dt><dd><tt>Execute&nbsp;the&nbsp;query&nbsp;that&nbsp;was&nbsp;previously<br>
+prepared&nbsp;and&nbsp;bound.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-fetchFromBindCursor"><strong>fetchFromBindCursor</strong></a>(self)</dt><dd><tt>Fetch&nbsp;from&nbsp;a&nbsp;cursor&nbsp;that&nbsp;was&nbsp;returned&nbsp;as<br>
+an&nbsp;output&nbsp;bind&nbsp;variable.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-firstRowIndex"><strong>firstRowIndex</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;index&nbsp;of&nbsp;the&nbsp;first&nbsp;buffered&nbsp;row.<br>
+This&nbsp;is&nbsp;useful&nbsp;when&nbsp;buffering&nbsp;only&nbsp;part&nbsp;of<br>
+the&nbsp;result&nbsp;set&nbsp;at&nbsp;a&nbsp;time.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getCacheFileName"><strong>getCacheFileName</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;file&nbsp;containing&nbsp;the&nbsp;most<br>
+recently&nbsp;cached&nbsp;result&nbsp;set.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getColumnInfo"><strong>getColumnInfo</strong></a>(self)</dt><dd><tt>Tells&nbsp;the&nbsp;server&nbsp;to&nbsp;send&nbsp;column&nbsp;info.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getColumnIsAutoIncrement"><strong>getColumnIsAutoIncrement</strong></a>(self, col)</dt><dd><tt>Returns&nbsp;1&nbsp;if&nbsp;the&nbsp;specified&nbsp;column&nbsp;auto-increments&nbsp;and<br>
+0&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getColumnIsBinary"><strong>getColumnIsBinary</strong></a>(self, col)</dt><dd><tt>Returns&nbsp;1&nbsp;if&nbsp;the&nbsp;specified&nbsp;column&nbsp;contains&nbsp;binary&nbsp;data<br>
+and&nbsp;0&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getColumnIsNullable"><strong>getColumnIsNullable</strong></a>(self, col)</dt><dd><tt>Returns&nbsp;1&nbsp;if&nbsp;the&nbsp;specified&nbsp;column&nbsp;can&nbsp;contain&nbsp;nulls&nbsp;and<br>
+0&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getColumnIsPartOfKey"><strong>getColumnIsPartOfKey</strong></a>(self, col)</dt><dd><tt>Returns&nbsp;1&nbsp;if&nbsp;the&nbsp;specified&nbsp;column&nbsp;is&nbsp;part&nbsp;of&nbsp;a&nbsp;composite<br>
+key&nbsp;and&nbsp;0&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getColumnIsPrimaryKey"><strong>getColumnIsPrimaryKey</strong></a>(self, col)</dt><dd><tt>Returns&nbsp;1&nbsp;if&nbsp;the&nbsp;specified&nbsp;column&nbsp;is&nbsp;a&nbsp;primary&nbsp;key&nbsp;and<br>
+0&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getColumnIsUnique"><strong>getColumnIsUnique</strong></a>(self, col)</dt><dd><tt>Returns&nbsp;1&nbsp;if&nbsp;the&nbsp;specified&nbsp;column&nbsp;is&nbsp;unique&nbsp;and<br>
+0&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getColumnIsUnsigned"><strong>getColumnIsUnsigned</strong></a>(self, col)</dt><dd><tt>Returns&nbsp;1&nbsp;if&nbsp;the&nbsp;specified&nbsp;column&nbsp;is&nbsp;an&nbsp;unsigned&nbsp;number<br>
+and&nbsp;0&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getColumnIsZeroFilled"><strong>getColumnIsZeroFilled</strong></a>(self, col)</dt><dd><tt>Returns&nbsp;1&nbsp;if&nbsp;the&nbsp;specified&nbsp;column&nbsp;was&nbsp;created&nbsp;with&nbsp;the<br>
+zero-fill&nbsp;flag&nbsp;and&nbsp;0&nbsp;otherwise.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getColumnLength"><strong>getColumnLength</strong></a>(self, col)</dt><dd><tt>Returns&nbsp;the&nbsp;length&nbsp;of&nbsp;the&nbsp;specified&nbsp;column.&nbsp;&nbsp;col&nbsp;may<br>
+be&nbsp;a&nbsp;name&nbsp;or&nbsp;number.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getColumnList"><strong>getColumnList</strong></a>(sefl, table, wild)</dt><dd><tt>Sends&nbsp;a&nbsp;query&nbsp;that&nbsp;returns&nbsp;a&nbsp;list&nbsp;of&nbsp;columns<br>
+in&nbsp;the&nbsp;table&nbsp;specified&nbsp;by&nbsp;the&nbsp;"table"&nbsp;parameter<br>
+matching&nbsp;"wild".&nbsp;&nbsp;If&nbsp;wild&nbsp;is&nbsp;empty&nbsp;or&nbsp;NULL&nbsp;then<br>
+a&nbsp;list&nbsp;of&nbsp;all&nbsp;columns&nbsp;will&nbsp;be&nbsp;returned.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getColumnName"><strong>getColumnName</strong></a>(self, col)</dt><dd><tt>Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;column&nbsp;number&nbsp;col.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getColumnNames"><strong>getColumnNames</strong></a>(self)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;column&nbsp;names&nbsp;in&nbsp;the&nbsp;current&nbsp;result&nbsp;set.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getColumnPrecision"><strong>getColumnPrecision</strong></a>(self, col)</dt><dd><tt>Returns&nbsp;the&nbsp;precision&nbsp;of&nbsp;the&nbsp;specified&nbsp;column.<br>
+Precision&nbsp;is&nbsp;the&nbsp;total&nbsp;number&nbsp;of&nbsp;digits&nbsp;in&nbsp;a&nbsp;number.<br>
+eg:&nbsp;123.45&nbsp;has&nbsp;a&nbsp;precision&nbsp;of&nbsp;5.&nbsp;&nbsp;For&nbsp;non-numeric<br>
+types,&nbsp;it's&nbsp;the&nbsp;number&nbsp;of&nbsp;characters&nbsp;in&nbsp;the&nbsp;string.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getColumnScale"><strong>getColumnScale</strong></a>(self, col)</dt><dd><tt>Returns&nbsp;the&nbsp;scale&nbsp;of&nbsp;the&nbsp;specified&nbsp;column.&nbsp;&nbsp;Scale&nbsp;is<br>
+the&nbsp;total&nbsp;number&nbsp;of&nbsp;digits&nbsp;to&nbsp;the&nbsp;right&nbsp;of&nbsp;the&nbsp;decimal<br>
+point&nbsp;in&nbsp;a&nbsp;number.&nbsp;&nbsp;eg:&nbsp;123.45&nbsp;has&nbsp;a&nbsp;scale&nbsp;of&nbsp;2.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getColumnType"><strong>getColumnType</strong></a>(self, col)</dt><dd><tt>Returns&nbsp;the&nbsp;type&nbsp;of&nbsp;the&nbsp;specified&nbsp;column.&nbsp;&nbsp;col&nbsp;may<br>
+be&nbsp;a&nbsp;name&nbsp;or&nbsp;number.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getDatabaseList"><strong>getDatabaseList</strong></a>(self, wild)</dt><dd><tt>Sends&nbsp;a&nbsp;query&nbsp;that&nbsp;returns&nbsp;a&nbsp;list&nbsp;of<br>
+databases/schemas&nbsp;matching&nbsp;"wild".&nbsp;&nbsp;If&nbsp;wild&nbsp;is&nbsp;empty<br>
+or&nbsp;NULL&nbsp;then&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;databases/schemas&nbsp;will&nbsp;be<br>
+returned.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getField"><strong>getField</strong></a>(self, row, col)</dt><dd><tt>Returns&nbsp;the&nbsp;value&nbsp;of&nbsp;the&nbsp;specified&nbsp;row&nbsp;and<br>
+column.&nbsp;&nbsp;col&nbsp;may&nbsp;be&nbsp;a&nbsp;column&nbsp;name&nbsp;or&nbsp;number.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getFieldAsDouble"><strong>getFieldAsDouble</strong></a>(self, row, col)</dt><dd><tt>Returns&nbsp;the&nbsp;specified&nbsp;field&nbsp;as&nbsp;a&nbsp;double&nbsp;precision<br>
+floating&nbsp;point&nbsp;number.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getFieldAsInteger"><strong>getFieldAsInteger</strong></a>(self, row, col)</dt><dd><tt>Returns&nbsp;the&nbsp;specified&nbsp;field&nbsp;as&nbsp;a&nbsp;long&nbsp;integer.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getFieldLength"><strong>getFieldLength</strong></a>(self, row, col)</dt><dd><tt>Returns&nbsp;the&nbsp;length&nbsp;of&nbsp;the&nbsp;specified&nbsp;row&nbsp;and<br>
+column.&nbsp;&nbsp;col&nbsp;may&nbsp;be&nbsp;a&nbsp;column&nbsp;name&nbsp;or&nbsp;number.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getLongest"><strong>getLongest</strong></a>(self, col)</dt><dd><tt>Returns&nbsp;the&nbsp;length&nbsp;of&nbsp;the&nbsp;specified&nbsp;column.&nbsp;&nbsp;col&nbsp;may<br>
+be&nbsp;a&nbsp;name&nbsp;or&nbsp;number.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getNullsAsEmptyStrings"><strong>getNullsAsEmptyStrings</strong></a>(self)</dt><dd><tt>Tells&nbsp;the&nbsp;cursor&nbsp;to&nbsp;return&nbsp;NULL&nbsp;fields&nbsp;and&nbsp;output<br>
+bind&nbsp;variables&nbsp;as&nbsp;empty&nbsp;strings.<br>
+This&nbsp;is&nbsp;the&nbsp;default.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getNullsAsNone"><strong>getNullsAsNone</strong></a>(self)</dt><dd><tt>Tells&nbsp;the&nbsp;cursor&nbsp;to&nbsp;return&nbsp;NULL&nbsp;fields&nbsp;and&nbsp;output<br>
+bind&nbsp;variables&nbsp;as&nbsp;NULL's.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getOutputBindBlob"><strong>getOutputBindBlob</strong></a>(self, variable)</dt><dd><tt>Get&nbsp;the&nbsp;value&nbsp;stored&nbsp;in&nbsp;a&nbsp;previously<br>
+defined&nbsp;output&nbsp;bind&nbsp;variable.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getOutputBindClob"><strong>getOutputBindClob</strong></a>(self, variable)</dt><dd><tt>Get&nbsp;the&nbsp;value&nbsp;stored&nbsp;in&nbsp;a&nbsp;previously<br>
+defined&nbsp;output&nbsp;bind&nbsp;variable.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getOutputBindCursor"><strong>getOutputBindCursor</strong></a>(self, variable)</dt><dd><tt>Get&nbsp;the&nbsp;cursor&nbsp;associated&nbsp;with&nbsp;a&nbsp;previously<br>
+defined&nbsp;output&nbsp;bind&nbsp;variable.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getOutputBindDouble"><strong>getOutputBindDouble</strong></a>(self, variable)</dt><dd><tt>Get&nbsp;the&nbsp;value&nbsp;stored&nbsp;in&nbsp;a&nbsp;previously<br>
+defined&nbsp;output&nbsp;bind&nbsp;variable&nbsp;as&nbsp;a&nbsp;double<br>
+precision&nbsp;floating&nbsp;point&nbsp;number.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getOutputBindInteger"><strong>getOutputBindInteger</strong></a>(self, variable)</dt><dd><tt>Get&nbsp;the&nbsp;value&nbsp;stored&nbsp;in&nbsp;a&nbsp;previously<br>
+defined&nbsp;output&nbsp;bind&nbsp;variable&nbsp;as&nbsp;a&nbsp;long<br>
+integer.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getOutputBindLength"><strong>getOutputBindLength</strong></a>(self, variable)</dt><dd><tt>Retrieve&nbsp;the&nbsp;length&nbsp;of&nbsp;an&nbsp;output&nbsp;bind&nbsp;variable.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getOutputBindString"><strong>getOutputBindString</strong></a>(self, variable)</dt><dd><tt>Get&nbsp;the&nbsp;value&nbsp;stored&nbsp;in&nbsp;a&nbsp;previously<br>
+defined&nbsp;output&nbsp;bind&nbsp;variable.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getResultSetBufferSize"><strong>getResultSetBufferSize</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;result&nbsp;set&nbsp;rows&nbsp;that&nbsp;<br>
+will&nbsp;be&nbsp;buffered&nbsp;at&nbsp;a&nbsp;time&nbsp;or&nbsp;0&nbsp;for&nbsp;the<br>
+entire&nbsp;result&nbsp;set.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getResultSetId"><strong>getResultSetId</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;internal&nbsp;ID&nbsp;of&nbsp;this&nbsp;result&nbsp;set.<br>
+This&nbsp;parameter&nbsp;may&nbsp;be&nbsp;passed&nbsp;to&nbsp;another&nbsp;<br>
+cursor&nbsp;for&nbsp;use&nbsp;in&nbsp;the&nbsp;<a href="#sqlrcursor-resumeResultSet">resumeResultSet</a>()&nbsp;<br>
+method.<br>
+Note:&nbsp;the&nbsp;value&nbsp;returned&nbsp;by&nbsp;this&nbsp;method&nbsp;is<br>
+only&nbsp;valid&nbsp;after&nbsp;a&nbsp;call&nbsp;to&nbsp;<a href="#sqlrcursor-suspendResultSet">suspendResultSet</a>().</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getRow"><strong>getRow</strong></a>(self, row)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;values&nbsp;in&nbsp;the&nbsp;given&nbsp;row.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getRowDictionary"><strong>getRowDictionary</strong></a>(self, row)</dt><dd><tt>Returns&nbsp;the&nbsp;requested&nbsp;row&nbsp;as&nbsp;values&nbsp;in&nbsp;a&nbsp;dictionary<br>
+with&nbsp;column&nbsp;names&nbsp;for&nbsp;keys.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getRowLengths"><strong>getRowLengths</strong></a>(self, row)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;lengths&nbsp;in&nbsp;the&nbsp;given&nbsp;row.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getRowLengthsDictionary"><strong>getRowLengthsDictionary</strong></a>(self, row)</dt><dd><tt>Returns&nbsp;the&nbsp;requested&nbsp;row&nbsp;lengths&nbsp;as&nbsp;values&nbsp;in&nbsp;a&nbsp;dictionary<br>
+with&nbsp;column&nbsp;names&nbsp;for&nbsp;keys.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getRowLengthsRange"><strong>getRowLengthsRange</strong></a>(self, beg, end)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;lists&nbsp;of&nbsp;the&nbsp;lengths&nbsp;of&nbsp;rows&nbsp;between&nbsp;beg&nbsp;and&nbsp;end.<br>
+Note:&nbsp;this&nbsp;function&nbsp;has&nbsp;no&nbsp;equivalent&nbsp;in&nbsp;other&nbsp;SQL&nbsp;Relay&nbsp;API's.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getRowRange"><strong>getRowRange</strong></a>(self, beg, end)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;lists&nbsp;of&nbsp;the&nbsp;rows&nbsp;between&nbsp;beg&nbsp;and&nbsp;end.<br>
+Note:&nbsp;this&nbsp;function&nbsp;has&nbsp;no&nbsp;equivalent&nbsp;in&nbsp;other&nbsp;SQL&nbsp;Relay&nbsp;API's.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-getTableList"><strong>getTableList</strong></a>(self, wild)</dt><dd><tt>Sends&nbsp;a&nbsp;query&nbsp;that&nbsp;returns&nbsp;a&nbsp;list&nbsp;of&nbsp;tables<br>
+matching&nbsp;"wild".&nbsp;&nbsp;If&nbsp;wild&nbsp;is&nbsp;empty&nbsp;or&nbsp;NULL&nbsp;then<br>
+a&nbsp;list&nbsp;of&nbsp;all&nbsp;tables&nbsp;will&nbsp;be&nbsp;returned.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-inputBind"><strong>inputBind</strong></a>(self, variable, value, precision<font color="#909090">=0</font>, scale<font color="#909090">=0</font>)</dt><dd><tt>Define&nbsp;an&nbsp;input&nbsp;bind&nbsp;varaible.<br>
+Returns&nbsp;true&nbsp;if&nbsp;the&nbsp;variable&nbsp;was&nbsp;successfully&nbsp;bound&nbsp;or&nbsp;false&nbsp;if&nbsp;the<br>
+variable&nbsp;isn't&nbsp;a&nbsp;string,&nbsp;integer&nbsp;or&nbsp;floating&nbsp;point&nbsp;number,&nbsp;or&nbsp;if<br>
+precision&nbsp;and&nbsp;scale&nbsp;aren't&nbsp;provided&nbsp;for&nbsp;a&nbsp;floating&nbsp;point&nbsp;number.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-inputBindBlob"><strong>inputBindBlob</strong></a>(self, variable, value, length)</dt><dd><tt>Define&nbsp;an&nbsp;input&nbsp;bind&nbsp;varaible.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-inputBindClob"><strong>inputBindClob</strong></a>(self, variable, value, length)</dt><dd><tt>Define&nbsp;an&nbsp;input&nbsp;bind&nbsp;varaible.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-inputBinds"><strong>inputBinds</strong></a>(self, variables, values, precisions<font color="#909090">=None</font>, scales<font color="#909090">=None</font>)</dt><dd><tt>Define&nbsp;input&nbsp;bind&nbsp;variables.<br>
+Returns&nbsp;true&nbsp;if&nbsp;the&nbsp;variables&nbsp;were&nbsp;successfully&nbsp;bound&nbsp;or&nbsp;false&nbsp;if&nbsp;one<br>
+of&nbsp;the&nbsp;variables&nbsp;wasn't&nbsp;a&nbsp;string,&nbsp;integer&nbsp;or&nbsp;floating&nbsp;point&nbsp;number,<br>
+or&nbsp;if&nbsp;precision&nbsp;and&nbsp;scale&nbsp;weren't&nbsp;provided&nbsp;for&nbsp;a&nbsp;floating&nbsp;point&nbsp;number.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-lowerCaseColumnNames"><strong>lowerCaseColumnNames</strong></a>(self)</dt><dd><tt>Columns&nbsp;names&nbsp;are&nbsp;converted&nbsp;to&nbsp;lower&nbsp;case.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-mixedCaseColumnNames"><strong>mixedCaseColumnNames</strong></a>(self)</dt><dd><tt>Columns&nbsp;names&nbsp;are&nbsp;returned&nbsp;in&nbsp;the&nbsp;same<br>
+case&nbsp;as&nbsp;they&nbsp;are&nbsp;defined&nbsp;in&nbsp;the&nbsp;database.<br>
+This&nbsp;is&nbsp;the&nbsp;default.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-openCachedResultSet"><strong>openCachedResultSet</strong></a>(self, filename)</dt><dd><tt>Open&nbsp;a&nbsp;result&nbsp;set&nbsp;after&nbsp;a&nbsp;sendCachedQeury</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-prepareFileQuery"><strong>prepareFileQuery</strong></a>(self, path, file)</dt><dd><tt>Prepare&nbsp;to&nbsp;execute&nbsp;the&nbsp;contents&nbsp;of&nbsp;path/filename.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-prepareQuery"><strong>prepareQuery</strong></a>(self, query)</dt><dd><tt>Prepare&nbsp;to&nbsp;execute&nbsp;query.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-prepareQueryWithLength"><strong>prepareQueryWithLength</strong></a>(self, query, length)</dt><dd><tt>Prepare&nbsp;to&nbsp;execute&nbsp;"query"&nbsp;with&nbsp;length&nbsp;<br>
+"length".&nbsp;&nbsp;This&nbsp;method&nbsp;must&nbsp;be&nbsp;used&nbsp;if&nbsp;the<br>
+query&nbsp;contains&nbsp;binary&nbsp;data.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-resumeCachedResultSet"><strong>resumeCachedResultSet</strong></a>(self, id, filename)</dt><dd><tt>Resumes&nbsp;a&nbsp;result&nbsp;set&nbsp;previously&nbsp;left&nbsp;open<br>
+using&nbsp;suspendSession()&nbsp;and&nbsp;continues&nbsp;caching<br>
+the&nbsp;result&nbsp;set&nbsp;to&nbsp;"filename".<br>
+Returns&nbsp;1&nbsp;on&nbsp;success&nbsp;and&nbsp;0&nbsp;on&nbsp;failure.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-resumeResultSet"><strong>resumeResultSet</strong></a>(self, id)</dt><dd><tt>Resumes&nbsp;a&nbsp;result&nbsp;set&nbsp;previously&nbsp;left&nbsp;open&nbsp;<br>
+using&nbsp;suspendSession().<br>
+Returns&nbsp;1&nbsp;on&nbsp;success&nbsp;and&nbsp;0&nbsp;on&nbsp;failure.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-rowCount"><strong>rowCount</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;rows&nbsp;in&nbsp;the&nbsp;current&nbsp;result&nbsp;set.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-sendFileQuery"><strong>sendFileQuery</strong></a>(self, path, file)</dt><dd><tt>Send&nbsp;the&nbsp;SQL&nbsp;query&nbsp;in&nbsp;path/file&nbsp;to&nbsp;the&nbsp;server&nbsp;and<br>
+gets&nbsp;a&nbsp;result&nbsp;set.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-sendQuery"><strong>sendQuery</strong></a>(self, query)</dt><dd><tt>Send&nbsp;a&nbsp;SQL&nbsp;query&nbsp;to&nbsp;the&nbsp;server&nbsp;and<br>
+gets&nbsp;a&nbsp;result&nbsp;set.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-sendQueryWithLength"><strong>sendQueryWithLength</strong></a>(self, query, length)</dt><dd><tt>Sends&nbsp;"query"&nbsp;with&nbsp;length&nbsp;"length"&nbsp;and&nbsp;gets<br>
+a&nbsp;result&nbsp;set.&nbsp;This&nbsp;method&nbsp;must&nbsp;be&nbsp;used&nbsp;if<br>
+the&nbsp;query&nbsp;contains&nbsp;binary&nbsp;data.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-setCacheTtl"><strong>setCacheTtl</strong></a>(self, ttl)</dt><dd><tt>Sets&nbsp;the&nbsp;time-to-live&nbsp;for&nbsp;cached&nbsp;result<br>
+sets.&nbsp;The&nbsp;sqlr-cachemanger&nbsp;will&nbsp;remove&nbsp;each&nbsp;<br>
+cached&nbsp;result&nbsp;set&nbsp;"ttl"&nbsp;seconds&nbsp;after&nbsp;it's&nbsp;<br>
+created.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-setResultSetBufferSize"><strong>setResultSetBufferSize</strong></a>(self, rows)</dt><dd><tt>Sets&nbsp;the&nbsp;number&nbsp;of&nbsp;rows&nbsp;of&nbsp;the&nbsp;result&nbsp;set<br>
+to&nbsp;buffer&nbsp;at&nbsp;a&nbsp;time.&nbsp;&nbsp;0&nbsp;(the&nbsp;default)<br>
+means&nbsp;buffer&nbsp;the&nbsp;entire&nbsp;result&nbsp;set.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-substitution"><strong>substitution</strong></a>(self, variable, value, precision<font color="#909090">=0</font>, scale<font color="#909090">=0</font>)</dt><dd><tt>Define&nbsp;a&nbsp;substitution&nbsp;variable.<br>
+Returns&nbsp;true&nbsp;if&nbsp;the&nbsp;variable&nbsp;was&nbsp;successfully&nbsp;substituted&nbsp;or&nbsp;false&nbsp;if<br>
+the&nbsp;variable&nbsp;isn't&nbsp;a&nbsp;string,&nbsp;integer&nbsp;or&nbsp;floating&nbsp;point&nbsp;number,&nbsp;or&nbsp;if<br>
+precision&nbsp;and&nbsp;scale&nbsp;aren't&nbsp;provided&nbsp;for&nbsp;a&nbsp;floating&nbsp;point&nbsp;number.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-substitutions"><strong>substitutions</strong></a>(self, variables, values, precisions<font color="#909090">=None</font>, scales<font color="#909090">=None</font>)</dt><dd><tt>Define&nbsp;substitution&nbsp;variables.<br>
+Returns&nbsp;true&nbsp;if&nbsp;the&nbsp;variables&nbsp;were&nbsp;successfully&nbsp;substituted&nbsp;or&nbsp;false&nbsp;if<br>
+one&nbsp;of&nbsp;the&nbsp;variables&nbsp;wasn't&nbsp;a&nbsp;string,&nbsp;integer&nbsp;or&nbsp;floating&nbsp;point&nbsp;number,<br>
+or&nbsp;if&nbsp;precision&nbsp;and&nbsp;scale&nbsp;weren't&nbsp;provided&nbsp;for&nbsp;a&nbsp;floating&nbsp;point&nbsp;number.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-suspendResultSet"><strong>suspendResultSet</strong></a>(self)</dt><dd><tt>Tells&nbsp;the&nbsp;server&nbsp;to&nbsp;leave&nbsp;this&nbsp;result<br>
+set&nbsp;open&nbsp;when&nbsp;the&nbsp;cursor&nbsp;calls&nbsp;<br>
+suspendSession()&nbsp;so&nbsp;that&nbsp;another&nbsp;cursor&nbsp;can&nbsp;<br>
+connect&nbsp;to&nbsp;it&nbsp;using&nbsp;<a href="#sqlrcursor-resumeResultSet">resumeResultSet</a>()&nbsp;after&nbsp;<br>
+it&nbsp;calls&nbsp;resumeSession().</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-totalRows"><strong>totalRows</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;total&nbsp;number&nbsp;of&nbsp;rows&nbsp;that&nbsp;will&nbsp;<br>
+be&nbsp;returned&nbsp;in&nbsp;the&nbsp;result&nbsp;set.&nbsp;&nbsp;Not&nbsp;all&nbsp;<br>
+databases&nbsp;support&nbsp;this&nbsp;call.&nbsp;&nbsp;Don't&nbsp;use&nbsp;it&nbsp;<br>
+for&nbsp;applications&nbsp;which&nbsp;are&nbsp;designed&nbsp;to&nbsp;be&nbsp;<br>
+portable&nbsp;across&nbsp;databases.&nbsp;&nbsp;-1&nbsp;is&nbsp;returned<br>
+by&nbsp;databases&nbsp;which&nbsp;don't&nbsp;support&nbsp;this&nbsp;option.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-upperCaseColumnNames"><strong>upperCaseColumnNames</strong></a>(self)</dt><dd><tt>Columns&nbsp;names&nbsp;are&nbsp;converted&nbsp;to&nbsp;upper&nbsp;case.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-validBind"><strong>validBind</strong></a>(self, variable)</dt><dd><tt>Returns&nbsp;true&nbsp;if&nbsp;"variable"&nbsp;was&nbsp;a&nbsp;valid<br>
+input&nbsp;bind&nbsp;variable&nbsp;of&nbsp;the&nbsp;query.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-validateBinds"><strong>validateBinds</strong></a>(self)</dt><dd><tt>If&nbsp;you&nbsp;are&nbsp;binding&nbsp;to&nbsp;any&nbsp;variables&nbsp;that&nbsp;<br>
+might&nbsp;not&nbsp;actually&nbsp;be&nbsp;in&nbsp;your&nbsp;query,&nbsp;call&nbsp;<br>
+this&nbsp;to&nbsp;ensure&nbsp;that&nbsp;the&nbsp;database&nbsp;won't&nbsp;try&nbsp;<br>
+to&nbsp;bind&nbsp;them&nbsp;unless&nbsp;they&nbsp;really&nbsp;are&nbsp;in&nbsp;the&nbsp;<br>
+query.</tt></dd></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-getNumericFieldsAsNumbers"><strong>getNumericFieldsAsNumbers</strong></a>()</dt><dd><tt>Instructs&nbsp;the&nbsp;API&nbsp;to&nbsp;return&nbsp;numeric&nbsp;fields&nbsp;as&nbsp;numbers.&nbsp;&nbsp;Integer&nbsp;fields&nbsp;will<br>
+be&nbsp;returned&nbsp;as&nbsp;integers&nbsp;and&nbsp;floating&nbsp;point&nbsp;fields&nbsp;will&nbsp;be&nbsp;returned&nbsp;as<br>
+Decimals&nbsp;if&nbsp;that&nbsp;class&nbsp;is&nbsp;avialable&nbsp;or&nbsp;floats&nbsp;otherwise.&nbsp;&nbsp;The&nbsp;drawback&nbsp;to<br>
+using&nbsp;numerics&nbsp;is&nbsp;that&nbsp;under&nbsp;some&nbsp;circumstances&nbsp;truncation&nbsp;can&nbsp;occur.</tt></dd></dl>
+ <dl><dt><a name="-getNumericFieldsAsStrings"><strong>getNumericFieldsAsStrings</strong></a>()</dt><dd><tt>Instructs&nbsp;the&nbsp;API&nbsp;to&nbsp;return&nbsp;numeric&nbsp;fields&nbsp;as&nbsp;strings.&nbsp;&nbsp;This&nbsp;is&nbsp;the<br>
+default&nbsp;setting.&nbsp;&nbsp;Truncation&nbsp;cannot&nbsp;occur&nbsp;if&nbsp;this&nbsp;setting&nbsp;is&nbsp;used.</tt></dd></dl>
+</td></tr></table>
+</body></html>
