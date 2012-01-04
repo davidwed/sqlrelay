@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>fetch_scroll (DBI::DBD::SQLRelay::Statement)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File SQLRelay.rb, line 259</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">fetch_scroll</span>(<span class="ruby-identifier">direction</span>, <span class="ruby-identifier">offset</span>=<span class="ruby-value">1</span>)
+
+    <span class="ruby-comment cmt"># decide which row to fetch, take into account that the standard behavior</span>
+    <span class="ruby-comment cmt"># of a fetch command is to fetch the row and then skip to the next row</span>
+    <span class="ruby-comment cmt"># of the result set afterward</span>
+    <span class="ruby-identifier">fetch_row</span> = <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">direction</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-constant">DBI</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL_FETCH_NEXT</span>     <span class="ruby-keyword kw">then</span> <span class="ruby-ivar">@row_index</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-constant">DBI</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL_FETCH_PRIOR</span>    <span class="ruby-keyword kw">then</span> <span class="ruby-ivar">@row_index</span><span class="ruby-operator">-</span><span class="ruby-value">2</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-constant">DBI</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL_FETCH_FIRST</span>    <span class="ruby-keyword kw">then</span> <span class="ruby-value">0</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-constant">DBI</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL_FETCH_LAST</span>     <span class="ruby-keyword kw">then</span> <span class="ruby-ivar">@row_count</span><span class="ruby-operator">-</span><span class="ruby-value">1</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-constant">DBI</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL_FETCH_ABSOLUTE</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">offset</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-constant">DBI</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL_FETCH_RELATIVE</span> <span class="ruby-keyword kw">then</span> <span class="ruby-ivar">@row_index</span><span class="ruby-operator">+</span><span class="ruby-identifier">offset</span><span class="ruby-operator">-</span><span class="ruby-value">1</span>
+    <span class="ruby-keyword kw">end</span>
+    
+    <span class="ruby-comment cmt"># fetch the row</span>
+    <span class="ruby-identifier">row</span> = <span class="ruby-keyword kw">nil</span>
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">fetch_row</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">-1</span> <span class="ruby-keyword kw">and</span> <span class="ruby-identifier">fetch_row</span> <span class="ruby-operator">&lt;</span> <span class="ruby-ivar">@row_count</span>
+      <span class="ruby-identifier">row</span> = <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">getRow</span>(<span class="ruby-identifier">fetch_row</span>)
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-comment cmt"># set the current row, avoid running past </span>
+    <span class="ruby-comment cmt"># the end or beginning of the result set</span>
+    <span class="ruby-ivar">@row_index</span> = <span class="ruby-identifier">fetch_row</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>
+    <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@row_index</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">0</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-ivar">@row_index</span> = <span class="ruby-value">0</span>
+    <span class="ruby-keyword kw">elsif</span> <span class="ruby-ivar">@row_index</span> <span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@row_count</span>
+      <span class="ruby-ivar">@row_index</span> = <span class="ruby-ivar">@row_count</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">row</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

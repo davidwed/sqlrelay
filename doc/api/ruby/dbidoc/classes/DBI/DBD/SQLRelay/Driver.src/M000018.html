@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>connect (DBI::DBD::SQLRelay::Driver)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File SQLRelay.rb, line 51</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">dbname</span>, <span class="ruby-identifier">user</span>, <span class="ruby-identifier">auth</span>, <span class="ruby-identifier">attr</span>)
+
+    <span class="ruby-comment cmt"># connect to database</span>
+    
+    <span class="ruby-comment cmt"># dbname will have one of these formats:</span>
+    <span class="ruby-comment cmt"># dbi:SQLRelay:host:port</span>
+    <span class="ruby-comment cmt"># dbi:SQLRelay:host=xxx;port=xxx;socket=xxx;retrytime=xxx;tries=xxx</span>
+    <span class="ruby-identifier">hash</span> = <span class="ruby-constant">Utils</span>.<span class="ruby-identifier">parse_params</span>(<span class="ruby-identifier">dbname</span>)
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">has_key?</span> <span class="ruby-value str">&quot;database&quot;</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-comment cmt"># handle the first form</span>
+      <span class="ruby-identifier">hash</span>[<span class="ruby-value str">&quot;host&quot;</span>], <span class="ruby-identifier">hash</span>[<span class="ruby-value str">&quot;port&quot;</span>] = <span class="ruby-identifier">hash</span>[<span class="ruby-value str">&quot;database&quot;</span>], <span class="ruby-identifier">hash</span>[<span class="ruby-value str">&quot;host&quot;</span>]
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-comment cmt"># set default values if none were supplied</span>
+    <span class="ruby-identifier">hash</span>[<span class="ruby-value str">'host'</span>]      <span class="ruby-operator">||=</span> <span class="ruby-value str">&quot;localhost&quot;</span>
+    <span class="ruby-identifier">hash</span>[<span class="ruby-value str">'port'</span>]      <span class="ruby-operator">||=</span> <span class="ruby-value str">&quot;9000&quot;</span>
+    <span class="ruby-identifier">hash</span>[<span class="ruby-value str">'socket'</span>]    <span class="ruby-operator">||=</span> <span class="ruby-value str">&quot;&quot;</span>
+    <span class="ruby-identifier">hash</span>[<span class="ruby-value str">'retrytime'</span>] <span class="ruby-operator">||=</span> <span class="ruby-value str">&quot;0&quot;</span>
+    <span class="ruby-identifier">hash</span>[<span class="ruby-value str">'tries'</span>]     <span class="ruby-operator">||=</span> <span class="ruby-value str">&quot;1&quot;</span>
+    
+    <span class="ruby-comment cmt"># TODO: what happens on connection failure? return nil?</span>
+    <span class="ruby-identifier">handle</span> = <span class="ruby-constant">SQLRConnection</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">hash</span>[<span class="ruby-value str">'host'</span>], <span class="ruby-identifier">hash</span>[<span class="ruby-value str">'port'</span>].<span class="ruby-identifier">to_i</span>, 
+      <span class="ruby-identifier">hash</span>[<span class="ruby-value str">'socket'</span>], <span class="ruby-identifier">user</span>, <span class="ruby-identifier">auth</span>, <span class="ruby-identifier">hash</span>[<span class="ruby-value str">'retrytime'</span>].<span class="ruby-identifier">to_i</span>, <span class="ruby-identifier">hash</span>[<span class="ruby-value str">'tries'</span>].<span class="ruby-identifier">to_i</span>)
+
+    <span class="ruby-keyword kw">return</span> <span class="ruby-constant">Database</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">handle</span>, <span class="ruby-identifier">attr</span>)
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>
