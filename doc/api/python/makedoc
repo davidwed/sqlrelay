@@ -1,3 +1,5 @@
+rm -f PySQLRClient.html
+rm -f PySQLRDB.html
 export PYTHONPATH=../../../src/api/python
 pydoc -w PySQLRClient
 sed -e "s|<font.*><a href=\"\.\">index<.*<\/font>||" -e "s|<a href=\"SQLRelay\.CSQLRelay\.html\">SQLRelay\.CSQLRelay</a>|SQLRelay\.CSQLRelay|" PySQLRClient.html > PySQLRClient.py.html

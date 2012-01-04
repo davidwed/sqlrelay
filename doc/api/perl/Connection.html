@@ -131,6 +131,15 @@
             # Returns a string representing the format
             # of the bind variables used in the db.</pre>
 <pre>
+        selectDatabase(database);
+            # Sets the current database/schema to &quot;database&quot;
+        getCurrentDatabase();
+            # Returns the database/schema that is currently in use.</pre>
+<pre>
+        getLastInsertId();
+            # Returns the value of the autoincrement
+            # column for the last insert</pre>
+<pre>
         autoCommitOn();
             # Instructs the database to perform a commit
             # after every successful query.
@@ -150,6 +159,11 @@
         rollback();
             # Issues a rollback.  Returns true if the rollback
             # succeeded, false if it failed.</pre>
+<pre>
+        errorMessage();
+            # If an operation failed and generated an error, the
+            # error message is available here.  If there is no
+            # error then this method returns NULL.</pre>
 <pre>
         debugOn();
             # Causes verbose debugging information to be 

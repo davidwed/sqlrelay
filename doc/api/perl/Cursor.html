@@ -118,6 +118,21 @@
         cacheOff();
             # Sets query caching off.</pre>
 <pre>
+        getDatabaseList(wild);
+            # Sends a query that returns a list of
+            # databases/schemas matching &quot;wild&quot;.  If wild is empty
+            # or NULL then a list of all databases/schemas will be
+            # returned.
+        getTableList(wild);
+            # Sends a query that returns a list of tables
+            # matching &quot;wild&quot;.  If wild is empty or NULL then
+            # a list of all tables will be returned.
+        getColumnList(table,wild);
+            # Sends a query that returns a list of columns
+            # in the table specified by the &quot;table&quot; parameter
+            # matching &quot;wild&quot;.  If wild is empty or NULL then
+            # a list of all columns will be returned.</pre>
+<pre>
         # If you don't need to use substitution or bind variables
         # in your queries, use these two methods.
         sendQuery(query);
@@ -159,6 +174,7 @@
             # in it and returns that number.</pre>
 <pre>
         inputBind(variable,value);
+        inputBind(variable,value,length);
         inputBindBlob(variable,value,size);
         inputBindClob(variable,value,size);
             # Define an input bind variable.</pre>
@@ -263,8 +279,7 @@
         errorMessage();
             # If a query failed and generated an error, the
             # error message is available here.  If the 
-            # query succeeded then this method returns a 
-            # NULL.</pre>
+            # query succeeded then this method returns NULL.</pre>
 <pre>
         getNullsAsEmptyStrings();
             # Tells the client to return NULL fields and 
