@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>cacheToFile (SQLRCursor)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre>/**
+ *  call-seq:
+ *  cacheToFile(filename)
+ *
+ *  Sets query caching on.  Future queries will be cached to the
+ *  file &quot;filename&quot;.
+ * 
+ *  A default time-to-live of 10 minutes is also set.
+ * 
+ *  Note that once cacheToFile() is called, the result sets of all
+ *  future queries will be cached to that file until another call to
+ *  cacheToFile() changes which file to cache to or a call to
+ *  cacheOff() turns off caching. */
+static VALUE sqlrcur_cacheToFile(VALUE self, VALUE filename) {
+</pre>
+</body>
+</html>

@@ -1,0 +1,1764 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: SQLRCursor</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href=".././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">SQLRCursor</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../files/sqlrelay_C.html">
+                sqlrelay.C
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000051">affectedRows</a>&nbsp;&nbsp;
+      <a href="#M000012">cacheOff</a>&nbsp;&nbsp;
+      <a href="#M000009">cacheToFile</a>&nbsp;&nbsp;
+      <a href="#M000022">clearBinds</a>&nbsp;&nbsp;
+      <a href="#M000048">colCount</a>&nbsp;&nbsp;
+      <a href="#M000023">countBindVariables</a>&nbsp;&nbsp;
+      <a href="#M000031">defineOutputBindBlob</a>&nbsp;&nbsp;
+      <a href="#M000032">defineOutputBindClob</a>&nbsp;&nbsp;
+      <a href="#M000033">defineOutputBindCursor</a>&nbsp;&nbsp;
+      <a href="#M000030">defineOutputBindDouble</a>&nbsp;&nbsp;
+      <a href="#M000029">defineOutputBindInteger</a>&nbsp;&nbsp;
+      <a href="#M000028">defineOutputBindString</a>&nbsp;&nbsp;
+      <a href="#M000004">dontGetColumnInfo</a>&nbsp;&nbsp;
+      <a href="#M000053">endOfResultSet</a>&nbsp;&nbsp;
+      <a href="#M000054">errorMessage</a>&nbsp;&nbsp;
+      <a href="#M000038">executeQuery</a>&nbsp;&nbsp;
+      <a href="#M000039">fetchFromBindCursor</a>&nbsp;&nbsp;
+      <a href="#M000052">firstRowIndex</a>&nbsp;&nbsp;
+      <a href="#M000011">getCacheFileName</a>&nbsp;&nbsp;
+      <a href="#M000005">getColumnInfo</a>&nbsp;&nbsp;
+      <a href="#M000078">getColumnIsAutoIncrement</a>&nbsp;&nbsp;
+      <a href="#M000077">getColumnIsBinary</a>&nbsp;&nbsp;
+      <a href="#M000071">getColumnIsNullable</a>&nbsp;&nbsp;
+      <a href="#M000074">getColumnIsPartOfKey</a>&nbsp;&nbsp;
+      <a href="#M000072">getColumnIsPrimaryKey</a>&nbsp;&nbsp;
+      <a href="#M000073">getColumnIsUnique</a>&nbsp;&nbsp;
+      <a href="#M000075">getColumnIsUnsigned</a>&nbsp;&nbsp;
+      <a href="#M000076">getColumnIsZeroFilled</a>&nbsp;&nbsp;
+      <a href="#M000068">getColumnLength</a>&nbsp;&nbsp;
+      <a href="#M000015">getColumnList</a>&nbsp;&nbsp;
+      <a href="#M000066">getColumnName</a>&nbsp;&nbsp;
+      <a href="#M000065">getColumnNames</a>&nbsp;&nbsp;
+      <a href="#M000069">getColumnPrecision</a>&nbsp;&nbsp;
+      <a href="#M000070">getColumnScale</a>&nbsp;&nbsp;
+      <a href="#M000067">getColumnType</a>&nbsp;&nbsp;
+      <a href="#M000013">getDatabaseList</a>&nbsp;&nbsp;
+      <a href="#M000057">getField</a>&nbsp;&nbsp;
+      <a href="#M000059">getFieldAsDouble</a>&nbsp;&nbsp;
+      <a href="#M000058">getFieldAsInteger</a>&nbsp;&nbsp;
+      <a href="#M000060">getFieldLength</a>&nbsp;&nbsp;
+      <a href="#M000079">getLongest</a>&nbsp;&nbsp;
+      <a href="#M000055">getNullsAsEmptyStrings</a>&nbsp;&nbsp;
+      <a href="#M000056">getNullsAsNils</a>&nbsp;&nbsp;
+      <a href="#M000041">getOutputBindBlob</a>&nbsp;&nbsp;
+      <a href="#M000042">getOutputBindClob</a>&nbsp;&nbsp;
+      <a href="#M000046">getOutputBindCursor</a>&nbsp;&nbsp;
+      <a href="#M000044">getOutputBindDouble</a>&nbsp;&nbsp;
+      <a href="#M000043">getOutputBindInteger</a>&nbsp;&nbsp;
+      <a href="#M000045">getOutputBindLength</a>&nbsp;&nbsp;
+      <a href="#M000040">getOutputBindString</a>&nbsp;&nbsp;
+      <a href="#M000003">getResultSetBufferSize</a>&nbsp;&nbsp;
+      <a href="#M000080">getResultSetId</a>&nbsp;&nbsp;
+      <a href="#M000061">getRow</a>&nbsp;&nbsp;
+      <a href="#M000062">getRowHash</a>&nbsp;&nbsp;
+      <a href="#M000063">getRowLengths</a>&nbsp;&nbsp;
+      <a href="#M000064">getRowLengthsHash</a>&nbsp;&nbsp;
+      <a href="#M000014">getTableList</a>&nbsp;&nbsp;
+      <a href="#M000025">inputBind</a>&nbsp;&nbsp;
+      <a href="#M000026">inputBindBlob</a>&nbsp;&nbsp;
+      <a href="#M000027">inputBindClob</a>&nbsp;&nbsp;
+      <a href="#M000035">inputBinds</a>&nbsp;&nbsp;
+      <a href="#M000008">lowerCaseColumnNames</a>&nbsp;&nbsp;
+      <a href="#M000006">mixedCaseColumnNames</a>&nbsp;&nbsp;
+      <a href="#M000001">new</a>&nbsp;&nbsp;
+      <a href="#M000047">openCachedResultSet</a>&nbsp;&nbsp;
+      <a href="#M000021">prepareFileQuery</a>&nbsp;&nbsp;
+      <a href="#M000019">prepareQuery</a>&nbsp;&nbsp;
+      <a href="#M000020">prepareQueryWithLength</a>&nbsp;&nbsp;
+      <a href="#M000083">resumeCachedResultSet</a>&nbsp;&nbsp;
+      <a href="#M000082">resumeResultSet</a>&nbsp;&nbsp;
+      <a href="#M000049">rowCount</a>&nbsp;&nbsp;
+      <a href="#M000018">sendFileQuery</a>&nbsp;&nbsp;
+      <a href="#M000016">sendQuery</a>&nbsp;&nbsp;
+      <a href="#M000017">sendQueryWithLength</a>&nbsp;&nbsp;
+      <a href="#M000010">setCacheTtl</a>&nbsp;&nbsp;
+      <a href="#M000002">setResultSetBufferSize</a>&nbsp;&nbsp;
+      <a href="#M000024">substitution</a>&nbsp;&nbsp;
+      <a href="#M000034">substitutions</a>&nbsp;&nbsp;
+      <a href="#M000081">suspendResultSet</a>&nbsp;&nbsp;
+      <a href="#M000050">totalRows</a>&nbsp;&nbsp;
+      <a href="#M000007">upperCaseColumnNames</a>&nbsp;&nbsp;
+      <a href="#M000037">validBind</a>&nbsp;&nbsp;
+      <a href="#M000036">validateBinds</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000001" class="method-detail">
+        <a name="M000001"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000001.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000001.html');return false;">
+          <span class="method-name">new(connection)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Creates a cursor to run queries and fetch result sets using connection
+&quot;connection&quot;
+</p>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000051" class="method-detail">
+        <a name="M000051"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000051.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000051.html');return false;">
+          <span class="method-name">affectedRows</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the number of rows that were updated, inserted or deleted by the
+query. Not all databases support this call. Don&#8216;t use it for
+applications which are designed to be portable across databases. -1 is
+returned by databases which don&#8216;t support this option.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000012" class="method-detail">
+        <a name="M000012"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000012.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000012.html');return false;">
+          <span class="method-name">cacheOff</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Sets query caching off.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000009" class="method-detail">
+        <a name="M000009"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000009.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000009.html');return false;">
+          <span class="method-name">cacheToFile(filename)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Sets query caching on. Future queries will be cached to the file
+&quot;filename&quot;.
+</p>
+<p>
+A default time-to-live of 10 minutes is also set.
+</p>
+<p>
+Note that once <a href="SQLRCursor.html#M000009">cacheToFile</a>() is
+called, the result sets of all future queries will be cached to that file
+until another call to <a href="SQLRCursor.html#M000009">cacheToFile</a>()
+changes which file to cache to or a call to <a
+href="SQLRCursor.html#M000012">cacheOff</a>() turns off caching.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000022" class="method-detail">
+        <a name="M000022"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000022.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000022.html');return false;">
+          <span class="method-name">clearBinds</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Clears all bind variables.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000048" class="method-detail">
+        <a name="M000048"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000048.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000048.html');return false;">
+          <span class="method-name">colCount</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the number of columns in the current result set.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000023" class="method-detail">
+        <a name="M000023"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000023.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000023.html');return false;">
+          <span class="method-name">countBindVariables</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Parses the previously prepared query, counts the number of bind variables
+defined in it and returns that number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000031" class="method-detail">
+        <a name="M000031"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000031.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000031.html');return false;">
+          <span class="method-name">defineOuptutBindBlob(variable)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Defines a binary lob output bind variable
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000032" class="method-detail">
+        <a name="M000032"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000032.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000032.html');return false;">
+          <span class="method-name">defineOutputBindClob(variable)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Defines a character lob output bind variable
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000033" class="method-detail">
+        <a name="M000033"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000033.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000033.html');return false;">
+          <span class="method-name">defineOutputBindCursor(variable)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Defines a cursor output bind variable
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000030" class="method-detail">
+        <a name="M000030"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000030.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000030.html');return false;">
+          <span class="method-name">defineOutputBindDouble(variable)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Defines an decimal output bind variable.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000029" class="method-detail">
+        <a name="M000029"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000029.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000029.html');return false;">
+          <span class="method-name">defineOutputBindInteger(variable)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Defines an integer output bind variable.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000028" class="method-detail">
+        <a name="M000028"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000028.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000028.html');return false;">
+          <span class="method-name">defineOutputBindString(variable,length)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Defines a string output bind variable. &quot;length&quot; bytes will be
+reserved to store the value.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000004" class="method-detail">
+        <a name="M000004"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000004.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000004.html');return false;">
+          <span class="method-name">dontGetColumnInfo</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Tells the server not to send any column info (names, types, sizes). If you
+don&#8216;t need that info, you should call this function to improve
+performance.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000053" class="method-detail">
+        <a name="M000053"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000053.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000053.html');return false;">
+          <span class="method-name">endOfResultSet</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns 0 if part of the result set is still pending on the server and 1 if
+not. This function can only return 0 if <a
+href="SQLRCursor.html#M000002">setResultSetBufferSize</a>() has been called
+with a parameter other than 0.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000054" class="method-detail">
+        <a name="M000054"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000054.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000054.html');return false;">
+          <span class="method-name">errorMessage</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+If a query failed and generated an error, the error message is available
+here. If the query succeeded then this function returns a nil.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000038" class="method-detail">
+        <a name="M000038"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000038.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000038.html');return false;">
+          <span class="method-name">executeQuery</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Execute the query that was previously prepared and bound.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000039" class="method-detail">
+        <a name="M000039"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000039.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000039.html');return false;">
+          <span class="method-name">fetchFromBindCursor</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Fetch from a cursor that was returned as an output bind variable.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000052" class="method-detail">
+        <a name="M000052"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000052.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000052.html');return false;">
+          <span class="method-name">firstRowIndex</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the index of the first buffered row. This is useful when buffering
+only part of the result set at a time.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000011" class="method-detail">
+        <a name="M000011"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000011.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000011.html');return false;">
+          <span class="method-name">getCacheFileName</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the name of the file containing the most recently cached result
+set.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000005" class="method-detail">
+        <a name="M000005"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000005.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000005.html');return false;">
+          <span class="method-name">getColumnInfo</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Tells the server to send column info.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000078" class="method-detail">
+        <a name="M000078"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000078.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000078.html');return false;">
+          <span class="method-name">getColumnIsAutoIncrement(col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns 1 if the specified column auto-increments and 0 otherwise.
+&quot;col&quot; may be specified as the column name or number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000077" class="method-detail">
+        <a name="M000077"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000077.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000077.html');return false;">
+          <span class="method-name">getColumnIsBinary(col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns 1 if the specified column contains binary data and 0 otherwise.
+&quot;col&quot; may be specified as the column name or number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000071" class="method-detail">
+        <a name="M000071"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000071.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000071.html');return false;">
+          <span class="method-name">getColumnIsNullable(col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns 1 if the specified column can contain nulls and 0 otherwise.
+&quot;col&quot; may be specified as the colum name or number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000074" class="method-detail">
+        <a name="M000074"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000074.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000074.html');return false;">
+          <span class="method-name">getColumnIsPartOfKey(col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns 1 if the specified column is part of a composite key and 0
+otherwise. &quot;col&quot; may be specified as the column name or number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000072" class="method-detail">
+        <a name="M000072"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000072.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000072.html');return false;">
+          <span class="method-name">getColumnIsPrimaryKey(col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns 1 if the specified column is a primary key and 0 otherwise.
+&quot;col&quot; may be specified as the column name or number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000073" class="method-detail">
+        <a name="M000073"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000073.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000073.html');return false;">
+          <span class="method-name">getColumnIsUnique(col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns 1 if the specified column is unique and 0 otherwise.
+&quot;col&quot; may be specified as the column name or number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000075" class="method-detail">
+        <a name="M000075"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000075.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000075.html');return false;">
+          <span class="method-name">getColumnIsUnsigned(col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns 1 if the specified column is an unsigned number and 0 otherwise.
+&quot;col&quot; may be specified as the column name or number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000076" class="method-detail">
+        <a name="M000076"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000076.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000076.html');return false;">
+          <span class="method-name">getColumnIsZeroFilled(col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns 1 if the specified column was created with the zero-fill flag and 0
+otherwise. &quot;col&quot; may be specified as the column name or number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000068" class="method-detail">
+        <a name="M000068"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000068.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000068.html');return false;">
+          <span class="method-name">getColumnLength(col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the length of the specified column. &quot;col&quot; may be
+specified as the column name or number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000015" class="method-detail">
+        <a name="M000015"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000015.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000015.html');return false;">
+          <span class="method-name">getColumnList(table,wild)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Sends a query that returns a list of columns in the table specified by the
+&quot;table&quot; parameter matching &quot;wild&quot;. If wild is empty or
+nil then a list of all columns will be returned.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000066" class="method-detail">
+        <a name="M000066"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000066.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000066.html');return false;">
+          <span class="method-name">getColumnName(col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the name of the specified column.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000065" class="method-detail">
+        <a name="M000065"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000065.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000065.html');return false;">
+          <span class="method-name">getColumnNames</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns an array of the column names of the current result set.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000069" class="method-detail">
+        <a name="M000069"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000069.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000069.html');return false;">
+          <span class="method-name">getColumnPrecision(col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the precision of the specified column. Precision is the total
+number of digits in a number. eg: 123.45 has a precision of 5. For
+non-numeric types, it&#8216;s the number of characters in the string.
+&quot;col&quot; may be specified as the column name or number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000070" class="method-detail">
+        <a name="M000070"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000070.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000070.html');return false;">
+          <span class="method-name">getColumnScale(col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the scale of the specified column. Scale is the total number of
+digits to the right of the decimal point in a number. eg: 123.45 has a
+scale of 2. &quot;col&quot; may be specified as the column name or number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000067" class="method-detail">
+        <a name="M000067"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000067.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000067.html');return false;">
+          <span class="method-name">getColumnType(col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the type of the specified column. &quot;col&quot; may be specified
+as the column name or number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000013" class="method-detail">
+        <a name="M000013"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000013.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000013.html');return false;">
+          <span class="method-name">getDatabaseList(wild)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Sends a query that returns a list of databases/schemas matching
+&quot;wild&quot;. If wild is empty or nil then a list of all
+databases/schemas will be returned.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000057" class="method-detail">
+        <a name="M000057"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000057.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000057.html');return false;">
+          <span class="method-name">getField(row,col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the specified field as a string. &quot;col&quot; may be specified
+as the column name or number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000059" class="method-detail">
+        <a name="M000059"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000059.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000059.html');return false;">
+          <span class="method-name">getFieldAsDouble(row,col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the specified field as an decimal. &quot;col&quot; may be specified
+as the column name or number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000058" class="method-detail">
+        <a name="M000058"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000058.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000058.html');return false;">
+          <span class="method-name">getFieldAsInteger(row,col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the specified field as an integer. &quot;col&quot; may be specified
+as the column name or number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000060" class="method-detail">
+        <a name="M000060"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000060.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000060.html');return false;">
+          <span class="method-name">getFieldLength(row,col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the length of the specified row and column. &quot;col&quot; may be
+specified as the column name or number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000079" class="method-detail">
+        <a name="M000079"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000079.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000079.html');return false;">
+          <span class="method-name">getLongest(col)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the length of the longest field in the specified column.
+&quot;col&quot; may be specified as the column name or number.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000055" class="method-detail">
+        <a name="M000055"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000055.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000055.html');return false;">
+          <span class="method-name">getNullsAsEmptyStrings</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Tells the connection to return NULL fields and output bind variables as
+empty strings. This is the default.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000056" class="method-detail">
+        <a name="M000056"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000056.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000056.html');return false;">
+          <span class="method-name">getNullsAsNils</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Tells the connection to return NULL fields and output bind variables as
+nil&#8216;s.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000041" class="method-detail">
+        <a name="M000041"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000041.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000041.html');return false;">
+          <span class="method-name">getOutputBindBlob(variable)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get the value stored in a previously defined binary lob output bind
+variable.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000042" class="method-detail">
+        <a name="M000042"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000042.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000042.html');return false;">
+          <span class="method-name">getOutputBindClob(variable)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get the value stored in a previously defined character lob output bind
+variable.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000046" class="method-detail">
+        <a name="M000046"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000046.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000046.html');return false;">
+          <span class="method-name">getOutputBindCursor(variable)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get the cursor associated with a previously defined output bind variable.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000044" class="method-detail">
+        <a name="M000044"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000044.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000044.html');return false;">
+          <span class="method-name">getOutputBindDouble(variable)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get the value stored in a previously defined decimal output bind variable.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000043" class="method-detail">
+        <a name="M000043"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000043.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000043.html');return false;">
+          <span class="method-name">getOutputBindInteger(variable)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get the value stored in a previously defined integer output bind variable.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000045" class="method-detail">
+        <a name="M000045"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000045.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000045.html');return false;">
+          <span class="method-name">getOutputBindLength(variable)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get the length of the value stored in a previously defined output bind
+variable.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000040" class="method-detail">
+        <a name="M000040"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000040.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000040.html');return false;">
+          <span class="method-name">getOutputBindString(variable)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get the value stored in a previously defined string output bind variable.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000003" class="method-detail">
+        <a name="M000003"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000003.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000003.html');return false;">
+          <span class="method-name">getResultSetBufferSize</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the number of result set rows that will be buffered at a time or 0
+for the entire result set.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000080" class="method-detail">
+        <a name="M000080"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000080.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000080.html');return false;">
+          <span class="method-name">getResultSetId</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the internal ID of this result set. This parameter may be passed to
+another statement for use in the <a
+href="SQLRCursor.html#M000082">resumeResultSet</a>() function. Note: The
+value this function returns is only valid after a call to <a
+href="SQLRCursor.html#M000081">suspendResultSet</a>().
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000061" class="method-detail">
+        <a name="M000061"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000061.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000061.html');return false;">
+          <span class="method-name">getRow(row)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns an array of the values of the fields in the specified row.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000062" class="method-detail">
+        <a name="M000062"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000062.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000062.html');return false;">
+          <span class="method-name">getRowHash(row)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns a hash of the values of the fields in the specified row.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000063" class="method-detail">
+        <a name="M000063"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000063.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000063.html');return false;">
+          <span class="method-name">getRowLengths(row)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns an array of the lengths of the fields in the specified row.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000064" class="method-detail">
+        <a name="M000064"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000064.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000064.html');return false;">
+          <span class="method-name">getRowLengthsHash(row)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns a hash of the lengths of the fields in the specified row.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000014" class="method-detail">
+        <a name="M000014"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000014.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000014.html');return false;">
+          <span class="method-name">getTableList(wild)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Sends a query that returns a list of tables matching &quot;wild&quot;. If
+wild is empty or nil then a list of all tables will be returned.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000025" class="method-detail">
+        <a name="M000025"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000025.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000025.html');return false;">
+          <span class="method-name">inputBind(variable,value,(precision),(scale))<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Defines am input bind variable. The value may be a string, integer or
+decimal. If it is a decimal then the precision and scale may be specified.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000026" class="method-detail">
+        <a name="M000026"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000026.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000026.html');return false;">
+          <span class="method-name">inputBindBlob(variable,value,size)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Defines a binary lob input bind variable.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000027" class="method-detail">
+        <a name="M000027"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000027.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000027.html');return false;">
+          <span class="method-name">inputBindClob(variable,value,size)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Defines a character lob input bind variable.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000035" class="method-detail">
+        <a name="M000035"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000035.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000035.html');return false;">
+          <span class="method-name">inputBinds(variables,values,(precisions),(scales))<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Defines an array of input bind variables. The values may be strings,
+integers or decimals. If they are decimals then the precisions and scales
+may also be specified.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000008" class="method-detail">
+        <a name="M000008"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000008.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000008.html');return false;">
+          <span class="method-name">lowerCaseColumnNames</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Columns names are converted to lower case.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000006" class="method-detail">
+        <a name="M000006"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000006.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000006.html');return false;">
+          <span class="method-name">mixedCaseColumnNames</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Columns names are returned in the same case as they are defined in the
+database. This is the default.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000047" class="method-detail">
+        <a name="M000047"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000047.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000047.html');return false;">
+          <span class="method-name">openCachedResultSet(filename)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Opens a cached result set. Returns 1 on success and 0 on failure.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000021" class="method-detail">
+        <a name="M000021"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000021.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000021.html');return false;">
+          <span class="method-name">prepareFileQuery(path,filename)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Prepare to execute the contents of &quot;path&quot;/&quot;filename&quot;.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000019" class="method-detail">
+        <a name="M000019"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000019.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000019.html');return false;">
+          <span class="method-name">prepareQuery(query)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Prepare to execute &quot;query&quot;.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000020" class="method-detail">
+        <a name="M000020"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000020.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000020.html');return false;">
+          <span class="method-name">prepareQuery(query,length)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Prepare to execute &quot;query&quot; with length &quot;length&quot;. This
+function must be used if the query contains binary data.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000083" class="method-detail">
+        <a name="M000083"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000083.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000083.html');return false;">
+          <span class="method-name">resumeCachedResultSet(id,filename)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Resumes a result set previously left open using suspendSession() and
+continues caching the result set to &quot;filename&quot;. Returns 1 on
+success and 0 on failure.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000082" class="method-detail">
+        <a name="M000082"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000082.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000082.html');return false;">
+          <span class="method-name">resumeResultSet(id)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Resumes a result set previously left open using suspendSession(). Returns 1
+on success and 0 on failure.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000049" class="method-detail">
+        <a name="M000049"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000049.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000049.html');return false;">
+          <span class="method-name">rowCount</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the number of rows in the current result set.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000018" class="method-detail">
+        <a name="M000018"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000018.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000018.html');return false;">
+          <span class="method-name">sendFileQuery(path,filename)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Sends the query in file &quot;path&quot;/&quot;filename&quot; and gets a
+result set.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000016" class="method-detail">
+        <a name="M000016"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000016.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000016.html');return false;">
+          <span class="method-name">sendQuery(query)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Sends &quot;query&quot; directly and gets a result set.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000017" class="method-detail">
+        <a name="M000017"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000017.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000017.html');return false;">
+          <span class="method-name">sendQueryWithLength(query,length)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Sends &quot;query&quot; with length &quot;length&quot; directly and gets a
+result set. This function must be used if the query contains binary data.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000010" class="method-detail">
+        <a name="M000010"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000010.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000010.html');return false;">
+          <span class="method-name">setCacheTtl(ttl)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Sets the time-to-live for cached result sets. The sqlr-cachemanger will
+remove each cached result set &quot;ttl&quot; seconds after it&#8216;s
+created, provided it&#8216;s scanning the directory containing the cache
+files.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000002" class="method-detail">
+        <a name="M000002"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000002.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000002.html');return false;">
+          <span class="method-name">setResultSetBufferSize(rows)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Sets the number of rows of the result set to buffer at a time. 0 (the
+default) means buffer the entire result set.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000024" class="method-detail">
+        <a name="M000024"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000024.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000024.html');return false;">
+          <span class="method-name">substitution(variable,value,(precision),(scale))<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Defines a <a href="SQLRCursor.html#M000024">substitution</a> variable. The
+value may be a string, integer or decimal. If it is a decimal then the
+precision and scale may be specified.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000034" class="method-detail">
+        <a name="M000034"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000034.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000034.html');return false;">
+          <span class="method-name">substitutions(variables,values,(precisions),(scales))<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Defines an array of <a href="SQLRCursor.html#M000024">substitution</a>
+variables. The values may be strings, integers or decimals. If they are
+decimals then the precisions and scales may also be specified.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000081" class="method-detail">
+        <a name="M000081"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000081.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000081.html');return false;">
+          <span class="method-name">suspendResultSet</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Tells the server to leave this result set open when the connection calls
+suspendSession() so that another connection can connect to it using <a
+href="SQLRCursor.html#M000082">resumeResultSet</a>() after it calls
+resumeSession().
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000050" class="method-detail">
+        <a name="M000050"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000050.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000050.html');return false;">
+          <span class="method-name">totalRows</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the total number of rows that will be returned in the result set.
+Not all databases support this call. Don&#8216;t use it for applications
+which are designed to be portable across databases. -1 is returned by
+databases which don&#8216;t support this option.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000007" class="method-detail">
+        <a name="M000007"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000007.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000007.html');return false;">
+          <span class="method-name">upperCaseColumnNames</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Columns names are converted to upper case.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000037" class="method-detail">
+        <a name="M000037"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000037.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000037.html');return false;">
+          <span class="method-name">validBind(variable)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns true if &quot;variable&quot; was a valid bind variable of the
+query.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000036" class="method-detail">
+        <a name="M000036"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000036.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000036.html');return false;">
+          <span class="method-name">validateBinds</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+If you are binding to any variables that might not actually be in your
+query, call this to ensure that the database won&#8216;t try to bind them
+unless they really are in the query. There is a performance penalty for
+calling this function
+</p>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

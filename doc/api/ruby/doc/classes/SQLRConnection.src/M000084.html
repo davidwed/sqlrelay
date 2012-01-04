@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (SQLRConnection)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre>/**
+ *  call-seq:
+ *  new(host, port, socket, user, password, retrytime, tries)
+ *
+ *  Initiates a connection to &quot;host&quot; on &quot;port&quot; or to the unix &quot;socket&quot; on
+ *  the local machine and authenticates with &quot;user&quot; and &quot;password&quot;.  Failed
+ *  connections will be retried for &quot;tries&quot; times on interval &quot;retrytime&quot;.
+ *  If &quot;tries&quot; is 0 then retries will continue forever.  If &quot;retrytime&quot; is 0
+ *  then retries will be attempted on a default interval.
+ *  If the &quot;socket&quot; parameter is nether nil nor &quot;&quot; then an attempt will be
+ *  made to connect through it before attempting to connect to &quot;host&quot; on
+ *  &quot;port&quot;.  If it is nil or &quot;&quot; then no attempt will be made to connect
+ *  through the socket.*/
+static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
+                                VALUE user, VALUE password, 
+                                VALUE retrytime, VALUE tries) {
+</pre>
+</body>
+</html>

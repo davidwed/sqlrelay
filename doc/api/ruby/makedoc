@@ -1,0 +1,4 @@
+rm -f sqlrelay.C
+sed -e "s|(CAST)||" ../../../src/api/ruby/sqlrelay.C > sqlrelay.C
+rdoc sqlrelay.C
+rm -f sqlrelay.C

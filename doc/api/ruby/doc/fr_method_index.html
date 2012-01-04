@@ -1,0 +1,133 @@
+
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<!--
+
+    Methods
+
+  -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Methods</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="rdoc-style.css" type="text/css" />
+  <base target="docwin" />
+</head>
+<body>
+<div id="index">
+  <h1 class="section-bar">Methods</h1>
+  <div id="index-entries">
+    <a href="classes/SQLRCursor.html#M000051">affectedRows (SQLRCursor)</a><br />
+    <a href="classes/SQLRConnection.html#M000101">autoCommitOff (SQLRConnection)</a><br />
+    <a href="classes/SQLRConnection.html#M000100">autoCommitOn (SQLRConnection)</a><br />
+    <a href="classes/SQLRConnection.html#M000096">bindFormat (SQLRConnection)</a><br />
+    <a href="classes/SQLRCursor.html#M000012">cacheOff (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000009">cacheToFile (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000022">clearBinds (SQLRCursor)</a><br />
+    <a href="classes/SQLRConnection.html#M000095">clientVersion (SQLRConnection)</a><br />
+    <a href="classes/SQLRCursor.html#M000048">colCount (SQLRCursor)</a><br />
+    <a href="classes/SQLRConnection.html#M000102">commit (SQLRConnection)</a><br />
+    <a href="classes/SQLRCursor.html#M000023">countBindVariables (SQLRCursor)</a><br />
+    <a href="classes/SQLRConnection.html#M000093">dbVersion (SQLRConnection)</a><br />
+    <a href="classes/SQLRConnection.html#M000106">debugOff (SQLRConnection)</a><br />
+    <a href="classes/SQLRConnection.html#M000105">debugOn (SQLRConnection)</a><br />
+    <a href="classes/SQLRCursor.html#M000031">defineOutputBindBlob (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000032">defineOutputBindClob (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000033">defineOutputBindCursor (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000030">defineOutputBindDouble (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000029">defineOutputBindInteger (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000028">defineOutputBindString (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000004">dontGetColumnInfo (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000053">endOfResultSet (SQLRCursor)</a><br />
+    <a href="classes/SQLRConnection.html#M000086">endSession (SQLRConnection)</a><br />
+    <a href="classes/SQLRCursor.html#M000054">errorMessage (SQLRCursor)</a><br />
+    <a href="classes/SQLRConnection.html#M000104">errorMessage (SQLRConnection)</a><br />
+    <a href="classes/SQLRCursor.html#M000038">executeQuery (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000039">fetchFromBindCursor (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000052">firstRowIndex (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000011">getCacheFileName (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000005">getColumnInfo (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000078">getColumnIsAutoIncrement (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000077">getColumnIsBinary (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000071">getColumnIsNullable (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000074">getColumnIsPartOfKey (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000072">getColumnIsPrimaryKey (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000073">getColumnIsUnique (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000075">getColumnIsUnsigned (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000076">getColumnIsZeroFilled (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000068">getColumnLength (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000015">getColumnList (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000066">getColumnName (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000065">getColumnNames (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000069">getColumnPrecision (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000070">getColumnScale (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000067">getColumnType (SQLRCursor)</a><br />
+    <a href="classes/SQLRConnection.html#M000088">getConnectionPort (SQLRConnection)</a><br />
+    <a href="classes/SQLRConnection.html#M000089">getConnectionSocket (SQLRConnection)</a><br />
+    <a href="classes/SQLRConnection.html#M000098">getCurrentDatabase (SQLRConnection)</a><br />
+    <a href="classes/SQLRCursor.html#M000013">getDatabaseList (SQLRCursor)</a><br />
+    <a href="classes/SQLRConnection.html#M000107">getDebug (SQLRConnection)</a><br />
+    <a href="classes/SQLRCursor.html#M000057">getField (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000059">getFieldAsDouble (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000058">getFieldAsInteger (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000060">getFieldLength (SQLRCursor)</a><br />
+    <a href="classes/SQLRConnection.html#M000099">getLastInsertId (SQLRConnection)</a><br />
+    <a href="classes/SQLRCursor.html#M000079">getLongest (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000055">getNullsAsEmptyStrings (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000056">getNullsAsNils (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000041">getOutputBindBlob (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000042">getOutputBindClob (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000046">getOutputBindCursor (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000044">getOutputBindDouble (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000043">getOutputBindInteger (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000045">getOutputBindLength (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000040">getOutputBindString (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000003">getResultSetBufferSize (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000080">getResultSetId (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000061">getRow (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000062">getRowHash (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000063">getRowLengths (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000064">getRowLengthsHash (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000014">getTableList (SQLRCursor)</a><br />
+    <a href="classes/SQLRConnection.html#M000092">identify (SQLRConnection)</a><br />
+    <a href="classes/SQLRCursor.html#M000025">inputBind (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000026">inputBindBlob (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000027">inputBindClob (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000035">inputBinds (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000008">lowerCaseColumnNames (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000006">mixedCaseColumnNames (SQLRCursor)</a><br />
+    <a href="classes/SQLRConnection.html#M000084">new (SQLRConnection)</a><br />
+    <a href="classes/SQLRCursor.html#M000001">new (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000047">openCachedResultSet (SQLRCursor)</a><br />
+    <a href="classes/SQLRConnection.html#M000091">ping (SQLRConnection)</a><br />
+    <a href="classes/SQLRCursor.html#M000021">prepareFileQuery (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000019">prepareQuery (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000020">prepareQueryWithLength (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000083">resumeCachedResultSet (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000082">resumeResultSet (SQLRCursor)</a><br />
+    <a href="classes/SQLRConnection.html#M000090">resumeSession (SQLRConnection)</a><br />
+    <a href="classes/SQLRConnection.html#M000103">rollback (SQLRConnection)</a><br />
+    <a href="classes/SQLRCursor.html#M000049">rowCount (SQLRCursor)</a><br />
+    <a href="classes/SQLRConnection.html#M000097">selectDatabase (SQLRConnection)</a><br />
+    <a href="classes/SQLRCursor.html#M000018">sendFileQuery (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000016">sendQuery (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000017">sendQueryWithLength (SQLRCursor)</a><br />
+    <a href="classes/SQLRConnection.html#M000094">serverVersion (SQLRConnection)</a><br />
+    <a href="classes/SQLRCursor.html#M000010">setCacheTtl (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000002">setResultSetBufferSize (SQLRCursor)</a><br />
+    <a href="classes/SQLRConnection.html#M000085">setTimeout (SQLRConnection)</a><br />
+    <a href="classes/SQLRCursor.html#M000024">substitution (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000034">substitutions (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000081">suspendResultSet (SQLRCursor)</a><br />
+    <a href="classes/SQLRConnection.html#M000087">suspendSession (SQLRConnection)</a><br />
+    <a href="classes/SQLRCursor.html#M000050">totalRows (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000007">upperCaseColumnNames (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000037">validBind (SQLRCursor)</a><br />
+    <a href="classes/SQLRCursor.html#M000036">validateBinds (SQLRCursor)</a><br />
+  </div>
+</div>
+</body>
+</html>
