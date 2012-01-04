@@ -1,3 +1,5 @@
+find doc -name "*.html" -print | xargs rm -f
+find doc -name "*.css" -print | xargs rm -f
 rm -f sqlrelay.C
 sed -e "s|(CAST)||" ../../../src/api/ruby/sqlrelay.C > sqlrelay.C
 rdoc sqlrelay.C
