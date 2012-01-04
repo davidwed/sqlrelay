@@ -7,7 +7,7 @@
 #include <rudiments/private/inttypes.h>
 
 /** @file
- *  @defgroup sqlrclientwrapper */
+ *  @defgroup sqlrclientwrapper sqlrclientwrapper */
 
 typedef	struct sqlrconnection *sqlrcon;
 typedef	struct sqlrcursor *sqlrcur;
