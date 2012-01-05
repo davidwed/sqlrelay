@@ -1279,7 +1279,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getfield) {
 	RETURN_NULL();
 }
 
-DLEXPORT ZEND_FUNCTION(sqlrcur_getfieldaslong) {
+DLEXPORT ZEND_FUNCTION(sqlrcur_getfieldasinteger) {
 	zval **sqlrcur,**row,**col;
 	int64_t r=0;
 	if (ZEND_NUM_ARGS() != 3 || 
@@ -2172,6 +2172,8 @@ zend_function_entry sql_relay_functions[] = {
 	ZEND_FE(sqlrcur_getnullsasemptystrings,NULL)
 	ZEND_FE(sqlrcur_getnullsasnulls,NULL)
 	ZEND_FE(sqlrcur_getfield,NULL)
+	ZEND_FE(sqlrcur_getfieldasinteger,NULL)
+	ZEND_FE(sqlrcur_getfieldasdouble,NULL)
 	ZEND_FE(sqlrcur_getfieldlength,NULL)
 	ZEND_FE(sqlrcur_getrow,NULL)
 	ZEND_FE(sqlrcur_getrowassoc,NULL)
