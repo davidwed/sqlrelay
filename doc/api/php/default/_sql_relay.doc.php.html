@@ -1,0 +1,3081 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml">
+		<head>
+			<!-- template designed by Marco Von Ballmoos -->
+			<title>Docs for page sql_relay.doc.php</title>
+			<link rel="stylesheet" href="../media/stylesheet.css" />
+			<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'/>
+		</head>
+		<body>
+			<div class="page-body">			
+<h2 class="file-name">/sql_relay.doc.php</h2>
+
+<a name="sec-description"></a>
+<div class="info-box">
+	<div class="info-box-title">Description</div>
+	<div class="nav-bar">
+					<span class="disabled">Description</span> |
+															<a href="#sec-functions">Functions</a>
+			</div>
+	<div class="info-box-body">	
+		<!-- ========== Info from phpDoc block ========= -->
+		
+			</div>
+</div>
+		
+
+	
+	
+	
+	<a name="sec-functions"></a>	
+	<div class="info-box">
+		<div class="info-box-title">Functions</div>
+		<div class="nav-bar">
+			<a href="#sec-description">Description</a> |
+															<span class="disabled">Functions</span>
+		</div>
+		<div class="info-box-body">	
+			<a name="function" id="function"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title"></span> (line <span class="line-number">494</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns an array of the lengths of the fields in the specified row.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$row</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$row</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_alloc" id="functionsqlrcon_alloc"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_alloc</span> (line <span class="line-number">13</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Initiates a connection to &quot;server&quot; on &quot;port&quot; or to the unix &quot;socket&quot; on   the local machine and authenticates with &quot;user&quot; and &quot;password&quot;.  Failed   connections will be retried for &quot;tries&quot; times on interval &quot;retrytime&quot;.</p>
+<p class="description"><p>If &quot;tries&quot; is 0 then retries will continue forever.  If &quot;retrytime&quot; is 0   then retries will be attempted on a default interval.   If the &quot;socket&quot; parameter is nether NULL nor &quot;&quot; then an attempt will be   made to connect through it before attempting to connect to &quot;server&quot; on   &quot;port&quot;.  If it is NULL or &quot;&quot; then no attempt will be made to connect   through the socket.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_alloc
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$server</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$port</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$socket</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$user</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$password</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$retrytime</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$tries</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$server</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$port</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$socket</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$user</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$password</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$retrytime</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$tries</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_autoCommitOff" id="functionsqlrcon_autoCommitOff"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_autoCommitOff</span> (line <span class="line-number">106</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Instructs the database to wait for the client to tell it when to commit.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_autoCommitOff
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_autoCommitOn" id="functionsqlrcon_autoCommitOn"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_autoCommitOn</span> (line <span class="line-number">102</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Instructs the database to perform a commit after every successful query.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_autoCommitOn
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_bindFormat" id="functionsqlrcon_bindFormat"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_bindFormat</span> (line <span class="line-number">80</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns a string representing the format   of the bind variables used in the db.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_bindFormat
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_clientVersion" id="functionsqlrcon_clientVersion"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_clientVersion</span> (line <span class="line-number">75</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the version of the sqlrelay client software.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_clientVersion
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_commit" id="functionsqlrcon_commit"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_commit</span> (line <span class="line-number">113</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Issues a commit.  Returns 1 if the commit succeeded, 0 if it failed and -1   if an error occurred.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_commit
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_dbVersion" id="functionsqlrcon_dbVersion"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_dbVersion</span> (line <span class="line-number">67</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the version of the database</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_dbVersion
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_debugOff" id="functionsqlrcon_debugOff"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_debugOff</span> (line <span class="line-number">136</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Turns debugging off.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_debugOff
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_debugOn" id="functionsqlrcon_debugOn"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_debugOn</span> (line <span class="line-number">132</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Causes verbose debugging information to be sent to standard output.</p>
+<p class="description"><p>Another way to do this is to start a query with &quot;-- debug\n&quot;.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_debugOn
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_endSession" id="functionsqlrcon_endSession"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_endSession</span> (line <span class="line-number">28</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Ends the session.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_endSession
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_errorMessage" id="functionsqlrcon_errorMessage"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_errorMessage</span> (line <span class="line-number">125</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">If an operation failed and generated an error, the error message is</p>
+<p class="description"><p>available here.  If there is no error then this method returns NULL</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_errorMessage
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_free" id="functionsqlrcon_free"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_free</span> (line <span class="line-number">17</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Disconnects and ends the session if it hasn't been terminated already.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_free
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_getConnectionPort" id="functionsqlrcon_getConnectionPort"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_getConnectionPort</span> (line <span class="line-number">41</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the inet port that the connection is communicating over.  This   parameter may be passed to another connection for use in the   sqlrcon_resumeSession() command.  Note: The result this function returns   is only valid after a call to suspendSession().</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_getConnectionPort
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_getConnectionSocket" id="functionsqlrcon_getConnectionSocket"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_getConnectionSocket</span> (line <span class="line-number">48</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the unix socket that the connection is communicating over.  This   parameter may be passed to another connection for use in the   sqlrcon_resumeSession() command.  Note: The result this function returns   is only valid after a call to suspendSession().</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_getConnectionSocket
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_getCurrentDatabase" id="functionsqlrcon_getCurrentDatabase"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_getCurrentDatabase</span> (line <span class="line-number">90</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the database/schema that is currently in use.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_getCurrentDatabase
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_getDebug" id="functionsqlrcon_getDebug"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_getDebug</span> (line <span class="line-number">140</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns 0 if debugging is off and 1 if debugging is on.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_getDebug
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_getLastInsertId" id="functionsqlrcon_getLastInsertId"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_getLastInsertId</span> (line <span class="line-number">96</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the value of the autoincrement column for the last insert</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_getLastInsertId
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_identify" id="functionsqlrcon_identify"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_identify</span> (line <span class="line-number">63</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the type of database: oracle8, postgresql, mysql, etc.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_identify
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_ping" id="functionsqlrcon_ping"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_ping</span> (line <span class="line-number">59</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns 1 if the database is up and 0 if it's down.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_ping
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_resumeSession" id="functionsqlrcon_resumeSession"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_resumeSession</span> (line <span class="line-number">53</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Resumes a session previously left open using sqlrcon_suspendSession().</p>
+<p class="description"><p>Returns 1 on success and 0 on failure.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_resumeSession
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$port</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$socket</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$port</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$socket</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_rollback" id="functionsqlrcon_rollback"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_rollback</span> (line <span class="line-number">118</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Issues a rollback.  Returns 1 if the rollback succeeded, 0 if it failed   and -1 if an error occurred.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_rollback
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_selectDatabase" id="functionsqlrcon_selectDatabase"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_selectDatabase</span> (line <span class="line-number">86</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Sets the current database/schema to &quot;database&quot;</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_selectDatabase
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$database</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$database</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_serverVersion" id="functionsqlrcon_serverVersion"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_serverVersion</span> (line <span class="line-number">71</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the version of the sqlrelay server software.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_serverVersion
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_setTimeout" id="functionsqlrcon_setTimeout"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_setTimeout</span> (line <span class="line-number">24</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Sets the server connect timeout in seconds and milliseconds.</p>
+<p class="description"><p>Setting either parameter to -1 disables the timeout.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_setTimeout
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$timeoutsec</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$timeoutusec</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$timeoutsec</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$timeoutusec</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcon_suspendSession" id="functionsqlrcon_suspendSession"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcon_suspendSession</span> (line <span class="line-number">34</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Disconnects this connection from the current session but leaves the session   open so that another connection can connect to it using   sqlrcon_resumeSession().</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcon_suspendSession
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_affectedRows" id="functionsqlrcur_affectedRows"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_affectedRows</span> (line <span class="line-number">425</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the number of rows that were updated, inserted or deleted by the   query.  Not all databases support this call.  Don't use it for applications   which are designed to be portable across databases.  -1 is returned by   databases which don't support this option.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_affectedRows
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_alloc" id="functionsqlrcur_alloc"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_alloc</span> (line <span class="line-number">147</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Creates a cursor to run queries and fetch</p>
+<p class="description"><p>result sets using connection &quot;sqlrconref&quot;</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_alloc
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrconref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrconref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_cacheOff" id="functionsqlrcur_cacheOff"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_cacheOff</span> (line <span class="line-number">219</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Sets query caching off.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_cacheOff
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_cacheToFile" id="functionsqlrcur_cacheToFile"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_cacheToFile</span> (line <span class="line-number">204</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Sets query caching on.  Future queries will be cached to the   file &quot;filename&quot;.</p>
+<p class="description"><p>A default time-to-live of 10 minutes is also set.</p><p>Note that once sqlrcur_cacheToFile() is called, the result sets of all   future queries will be cached to that file until another call to   sqlrcur_cacheToFile() changes which file to cache to or a call to   sqlrcur_cacheOff() turns off caching.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_cacheToFile
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$filename</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$filename</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_clearBinds" id="functionsqlrcur_clearBinds"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_clearBinds</span> (line <span class="line-number">333</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Clears all bind variables.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_clearBinds
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_colCount" id="functionsqlrcur_colCount"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_colCount</span> (line <span class="line-number">407</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the number of columns in the current result set.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_colCount
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_countBindVariables" id="functionsqlrcur_countBindVariables"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_countBindVariables</span> (line <span class="line-number">338</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Parses the previously prepared query, counts the number of bind variables   defined in it and returns that number.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_countBindVariables
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_defineOutputBindBlob" id="functionsqlrcur_defineOutputBindBlob"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_defineOutputBindBlob</span> (line <span class="line-number">319</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Defines a binary lob output bind variable</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_defineOutputBindBlob
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$variable</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$variable</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_defineOutputBindClob" id="functionsqlrcur_defineOutputBindClob"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_defineOutputBindClob</span> (line <span class="line-number">323</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Defines a character lob output bind variable</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_defineOutputBindClob
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$variable</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$variable</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_defineOutputBindCursor" id="functionsqlrcur_defineOutputBindCursor"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_defineOutputBindCursor</span> (line <span class="line-number">327</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Defines a cursor output bind variable</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_defineOutputBindCursor
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$variable</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$variable</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_defineOutputBindDouble" id="functionsqlrcur_defineOutputBindDouble"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_defineOutputBindDouble</span> (line <span class="line-number">315</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Defines an decimal output bind variable.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_defineOutputBindDouble
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$variable</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$variable</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_defineOutputBindInteger" id="functionsqlrcur_defineOutputBindInteger"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_defineOutputBindInteger</span> (line <span class="line-number">311</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Defines an integer output bind variable.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_defineOutputBindInteger
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$variable</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$variable</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_defineOutputBindString" id="functionsqlrcur_defineOutputBindString"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_defineOutputBindString</span> (line <span class="line-number">307</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Defines a string output bind variable.</p>
+<p class="description"><p>&quot;length&quot; bytes will be reserved to store the value.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_defineOutputBindString
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$variable</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$length</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$variable</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$length</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_dontGetColumnInfo" id="functionsqlrcur_dontGetColumnInfo"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_dontGetColumnInfo</span> (line <span class="line-number">171</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Tells the server not to send any column info (names, types, sizes).  If   you don't need that info, you should call this function to improve   performance.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_dontGetColumnInfo
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_endOfResultSet" id="functionsqlrcur_endOfResultSet"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_endOfResultSet</span> (line <span class="line-number">436</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns 0 if part of the result set is still pending on the server and 1 if   not.  This function can only return 0 if setResultSetBufferSize() has been   called with a parameter other than 0.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_endOfResultSet
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_errorMessage" id="functionsqlrcur_errorMessage"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_errorMessage</span> (line <span class="line-number">443</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">If a query failed and generated an error, the error message is available   here.  If the query succeeded then this function returns a NULL.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_errorMessage
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_executeQuery" id="functionsqlrcur_executeQuery"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_executeQuery</span> (line <span class="line-number">355</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Execute the query that was previously prepared and bound.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_executeQuery
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_fetchFromBindCursor" id="functionsqlrcur_fetchFromBindCursor"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_fetchFromBindCursor</span> (line <span class="line-number">359</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Fetch from a cursor that was returned as an output bind variable.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_fetchFromBindCursor
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_firstRowIndex" id="functionsqlrcur_firstRowIndex"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_firstRowIndex</span> (line <span class="line-number">430</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the index of the first buffered row.  This is useful when buffering   only part of the result set at a time.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_firstRowIndex
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_free" id="functionsqlrcur_free"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_free</span> (line <span class="line-number">151</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Destroys the cursor and cleans up all associated result set data.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_free
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getCacheFileName" id="functionsqlrcur_getCacheFileName"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getCacheFileName</span> (line <span class="line-number">215</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the name of the file containing   the most recently cached result set.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getCacheFileName
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getColumnInfo" id="functionsqlrcur_getColumnInfo"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getColumnInfo</span> (line <span class="line-number">175</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Tells the server to send column info.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getColumnInfo
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getColumnIsAutoIncrement" id="functionsqlrcur_getColumnIsAutoIncrement"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getColumnIsAutoIncrement</span> (line <span class="line-number">571</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns 1 if the specified column auto-increments and 0 otherwise.</p>
+<p class="description"><p>&quot;col&quot; may be specified as the column name or number.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getColumnIsAutoIncrement
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getColumnIsBinary" id="functionsqlrcur_getColumnIsBinary"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getColumnIsBinary</span> (line <span class="line-number">566</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns 1 if the specified column contains binary data and 0 otherwise.</p>
+<p class="description"><p>&quot;col&quot; may be specified as the column name or number.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getColumnIsBinary
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getColumnIsNullable" id="functionsqlrcur_getColumnIsNullable"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getColumnIsNullable</span> (line <span class="line-number">536</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the scale of the specified column.  Scale is the total number of   digits to the right of the decimal point in a number.  eg: 123.45 has a   scale of 2.  &quot;col&quot; may be specified as the column name or number.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getColumnIsNullable
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getColumnIsPartOfKey" id="functionsqlrcur_getColumnIsPartOfKey"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getColumnIsPartOfKey</span> (line <span class="line-number">551</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns 1 if the specified column is part of a composite key and 0   otherwise.  &quot;col&quot; may be specified as the column name or number.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getColumnIsPartOfKey
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getColumnIsPrimaryKey" id="functionsqlrcur_getColumnIsPrimaryKey"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getColumnIsPrimaryKey</span> (line <span class="line-number">541</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns 1 if the specified column is a primary key and 0 otherwise.</p>
+<p class="description"><p>&quot;col&quot; may be specified as the column name or number.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getColumnIsPrimaryKey
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getColumnIsUnique" id="functionsqlrcur_getColumnIsUnique"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getColumnIsUnique</span> (line <span class="line-number">546</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns 1 if the specified column is unique and 0 otherwise.  &quot;col&quot;   may be specified as the column name or number.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getColumnIsUnique
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getColumnIsUnsigned" id="functionsqlrcur_getColumnIsUnsigned"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getColumnIsUnsigned</span> (line <span class="line-number">556</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns 1 if the specified column is an unsigned number and 0 otherwise.</p>
+<p class="description"><p>&quot;col&quot; may be specified as the column name or number.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getColumnIsUnsigned
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getColumnIsZeroFilled" id="functionsqlrcur_getColumnIsZeroFilled"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getColumnIsZeroFilled</span> (line <span class="line-number">561</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns 1 if the specified column is zero-filled and 0 otherwise.</p>
+<p class="description"><p>&quot;col&quot; may be specified as the with the zero-fill flag and 0 otherwise.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getColumnIsZeroFilled
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getColumnLength" id="functionsqlrcur_getColumnLength"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getColumnLength</span> (line <span class="line-number">517</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the length of the specified column.  &quot;col&quot; may be specified as the   column name or number.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getColumnLength
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getColumnList" id="functionsqlrcur_getColumnList"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getColumnList</span> (line <span class="line-number">238</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Sends a query that returns a list of columns in the table specified by the   &quot;table&quot; parameter matching &quot;wild&quot;.  If wild is empty or NULL then a list of   all columns will be returned.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getColumnList
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$table</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$wild</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$table</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$wild</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getColumnName" id="functionsqlrcur_getColumnName"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getColumnName</span> (line <span class="line-number">507</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the name of the specified column.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getColumnName
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getColumnNames" id="functionsqlrcur_getColumnNames"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getColumnNames</span> (line <span class="line-number">503</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns an array of the column names of the current result set.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getColumnNames
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getColumnPrecision" id="functionsqlrcur_getColumnPrecision"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getColumnPrecision</span> (line <span class="line-number">524</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the precision of the specified column.  Precision is the total   number of digits in a number.  eg: 123.45 has a precision of 5.  For   non-numeric types, it's the number of characters in the string.  &quot;col&quot;  may be specified as the column name or number.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getColumnPrecision
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getColumnScale" id="functionsqlrcur_getColumnScale"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getColumnScale</span> (line <span class="line-number">530</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the scale of the specified column.  Scale is the total number of   digits to the right of the decimal point in a number.  eg: 123.45 has a   scale of 2.  &quot;col&quot; may be specified as the column name or number.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getColumnScale
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getColumnType" id="functionsqlrcur_getColumnType"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getColumnType</span> (line <span class="line-number">512</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the type of the specified column.  &quot;col&quot; may be specified as the   column name or number.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getColumnType
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getDatabaseList" id="functionsqlrcur_getDatabaseList"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getDatabaseList</span> (line <span class="line-number">227</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Sends a query that returns a list of databases/schemas matching &quot;wild&quot;.</p>
+<p class="description"><p>If wild is empty or NULL then a list of all databases/schemas will be   returned.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getDatabaseList
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$wild</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$wild</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getField" id="functionsqlrcur_getField"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getField</span> (line <span class="line-number">462</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the specified field as a string. &quot;col&quot; may be specified as the   column name or number.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getField
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$row</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$row</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getFieldAsDouble" id="functionsqlrcur_getFieldAsDouble"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getFieldAsDouble</span> (line <span class="line-number">472</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the specified field as an decimal. &quot;col&quot; may be specified as the   column name or number.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getFieldAsDouble
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$row</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$row</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getFieldAsInteger" id="functionsqlrcur_getFieldAsInteger"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getFieldAsInteger</span> (line <span class="line-number">467</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the specified field as an integer. &quot;col&quot; may be specified as the   column name or number.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getFieldAsInteger
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$row</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$row</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getFieldLength" id="functionsqlrcur_getFieldLength"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getFieldLength</span> (line <span class="line-number">479</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the length of the specified row and column. &quot;col&quot; may be   specified as the column name or number.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getFieldLength
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$row</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$row</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getLongest" id="functionsqlrcur_getLongest"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getLongest</span> (line <span class="line-number">576</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the length of the longest field in the specified column.</p>
+<p class="description"><p>&quot;col&quot; may be specified as the column name or number.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getLongest
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$col</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$col</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getNullsAsEmptyStrings" id="functionsqlrcur_getNullsAsEmptyStrings"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getNullsAsEmptyStrings</span> (line <span class="line-number">450</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Tells the connection to return NULL fields and output bind variables as   empty strings.  This is the default.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getNullsAsEmptyStrings
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getNullsAsNulls" id="functionsqlrcur_getNullsAsNulls"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getNullsAsNulls</span> (line <span class="line-number">455</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Tells the connection to return NULL fields   and output bind variables as NULL's.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getNullsAsNulls
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getOutputBindBlob" id="functionsqlrcur_getOutputBindBlob"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getOutputBindBlob</span> (line <span class="line-number">381</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value stored in a previously defined   binary lob output bind variable.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getOutputBindBlob
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$variable</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$variable</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getOutputBindClob" id="functionsqlrcur_getOutputBindClob"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getOutputBindClob</span> (line <span class="line-number">386</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value stored in a previously defined   character lob output bind variable.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getOutputBindClob
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$variable</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$variable</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getOutputBindDouble" id="functionsqlrcur_getOutputBindDouble"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getOutputBindDouble</span> (line <span class="line-number">376</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value stored in a previously defined   decimal output bind variable.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getOutputBindDouble
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$variable</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$variable</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getOutputBindInteger" id="functionsqlrcur_getOutputBindInteger"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getOutputBindInteger</span> (line <span class="line-number">371</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value stored in a previously defined   integer output bind variable.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getOutputBindInteger
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$variable</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$variable</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getOutputBindLength" id="functionsqlrcur_getOutputBindLength"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getOutputBindLength</span> (line <span class="line-number">391</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the length of the value stored in a previously   defined output bind variable.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getOutputBindLength
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$variable</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$variable</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getOutputBindString" id="functionsqlrcur_getOutputBindString"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getOutputBindString</span> (line <span class="line-number">366</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Get the value stored in a previously defined   string output bind variable.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getOutputBindString
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$variable</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$variable</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getResultSetBufferSize" id="functionsqlrcur_getResultSetBufferSize"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getResultSetBufferSize</span> (line <span class="line-number">163</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the number of result set rows that will be buffered at a time or <ol><li>for the entire result set.</li></ol></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getResultSetBufferSize
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getResultSetId" id="functionsqlrcur_getResultSetId"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getResultSetId</span> (line <span class="line-number">591</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the internal ID of this result set.  This parameter may be passed   to another statement for use in the resumeResultSet() function.  Note: The   value this function returns is only valid after a call to   suspendResultSet().</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getResultSetId
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getRow" id="functionsqlrcur_getRow"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getRow</span> (line <span class="line-number">485</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns an array of the values of the fields in the specified row.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getRow
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$row</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$row</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getRowAssoc" id="functionsqlrcur_getRowAssoc"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getRowAssoc</span> (line <span class="line-number">490</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns an associative array of the   values of the fields in the specified row.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getRowAssoc
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$row</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$row</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getRowLenghtsAssoc" id="functionsqlrcur_getRowLenghtsAssoc"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getRowLenghtsAssoc</span> (line <span class="line-number">499</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns an associative array of the   lengths of the fields in the specified row.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getRowLenghtsAssoc
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$row</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$row</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_getTableList" id="functionsqlrcur_getTableList"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_getTableList</span> (line <span class="line-number">232</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Sends a query that returns a list of tables matching &quot;wild&quot;.  If wild is   empty or NULL then a list of all tables will be returned.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_getTableList
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$wild</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$wild</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_inputBind" id="functionsqlrcur_inputBind"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_inputBind</span> (line <span class="line-number">286</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Defines an input bind variable.  The value may be a string,</p>
+<p class="description"><p>integer or decimal.  If it is a decimal, then precision and scale may   also be specified</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_inputBind
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$variable</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$value</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$precision</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$scale</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$variable</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$value</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$precision</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$scale</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_inputBindBlob" id="functionsqlrcur_inputBindBlob"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_inputBindBlob</span> (line <span class="line-number">296</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Defines a binary lob input bind variable.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_inputBindBlob
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$variable</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$value</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$size</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$variable</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$value</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$size</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_inputBindClob" id="functionsqlrcur_inputBindClob"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_inputBindClob</span> (line <span class="line-number">300</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Defines a character lob input bind variable.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_inputBindClob
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$variable</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$value</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$size</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$variable</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$value</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$size</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_lowerCaseColumnNames" id="functionsqlrcur_lowerCaseColumnNames"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_lowerCaseColumnNames</span> (line <span class="line-number">190</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Columns names are converted to lower case.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_lowerCaseColumnNames
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_mixedCaseColumnNames" id="functionsqlrcur_mixedCaseColumnNames"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_mixedCaseColumnNames</span> (line <span class="line-number">182</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Columns names are returned in the same case as they are defined in the   database.  This is the default.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_mixedCaseColumnNames
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_openCachedResultSet" id="functionsqlrcur_openCachedResultSet"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_openCachedResultSet</span> (line <span class="line-number">401</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Opens a cached result set.  Returns 1 on success and 0 on failure.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_openCachedResultSet
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$filename</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$filename</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_prepareFileQuery" id="functionsqlrcur_prepareFileQuery"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_prepareFileQuery</span> (line <span class="line-number">268</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Prepare to execute the contents of &quot;path&quot;/&quot;filename&quot;.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_prepareFileQuery
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$path</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$filename</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$path</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$filename</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_prepareQuery" id="functionsqlrcur_prepareQuery"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_prepareQuery</span> (line <span class="line-number">259</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Prepare to execute &quot;query&quot;.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_prepareQuery
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$query</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$query</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_prepareQueryWithLength" id="functionsqlrcur_prepareQueryWithLength"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_prepareQueryWithLength</span> (line <span class="line-number">264</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Prepare to execute &quot;query&quot; with length &quot;length&quot;.  This function must be   used if the query contains binary data.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_prepareQueryWithLength
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$query</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$length</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$query</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$length</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_resumeCachedResultSet" id="functionsqlrcur_resumeCachedResultSet"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_resumeCachedResultSet</span> (line <span class="line-number">602</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Resumes a result set previously left open using suspendSession() and   continues caching the result set to &quot;filename&quot;.  Returns 1 on success and 0   on failure.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_resumeCachedResultSet
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$id</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$filename</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$id</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$filename</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_resumeResultSet" id="functionsqlrcur_resumeResultSet"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_resumeResultSet</span> (line <span class="line-number">596</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Resumes a result set previously left open using suspendSession().</p>
+<p class="description"><p>Returns 1 on success and 0 on failure.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_resumeResultSet
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$id</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$id</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_rowCount" id="functionsqlrcur_rowCount"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_rowCount</span> (line <span class="line-number">411</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the number of rows in the current result set.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_rowCount
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_sendFileQuery" id="functionsqlrcur_sendFileQuery"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_sendFileQuery</span> (line <span class="line-number">253</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Sends the query in file &quot;path&quot;/&quot;filename&quot; and gets a result set.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_sendFileQuery
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$path</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$filename</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$path</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$filename</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_sendQuery" id="functionsqlrcur_sendQuery"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_sendQuery</span> (line <span class="line-number">244</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Sends &quot;query&quot; directly and gets a result set.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_sendQuery
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$query</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$query</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_sendQueryWithLength" id="functionsqlrcur_sendQueryWithLength"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_sendQueryWithLength</span> (line <span class="line-number">249</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Sends &quot;query&quot; with length &quot;length&quot; directly and gets a result set. This   function must be used if the query contains binary data.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_sendQueryWithLength
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$query</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$length</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$query</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$length</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_setCacheTtl" id="functionsqlrcur_setCacheTtl"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_setCacheTtl</span> (line <span class="line-number">210</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Sets the time-to-live for cached result sets. The sqlr-cachemanger will   remove each cached result set &quot;ttl&quot; seconds after it's created, provided   it's scanning the directory containing the cache files.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_setCacheTtl
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$ttl</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$ttl</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_setResultSetBufferSize" id="functionsqlrcur_setResultSetBufferSize"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_setResultSetBufferSize</span> (line <span class="line-number">158</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Sets the number of rows of the result set to buffer at a time.</p>
+<p class="description"><p><ol><li>(the default) means buffer the entire result set.</li></ol></p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_setResultSetBufferSize
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$rows</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$rows</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_substitution" id="functionsqlrcur_substitution"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_substitution</span> (line <span class="line-number">274</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Defines a substitution variable.  The value may be a string,</p>
+<p class="description"><p>integer or decimal.  If it is a decimal, then precision and scale may   also be specified</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_substitution
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$variable</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$value</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$precision</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$scale</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$variable</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$value</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$precision</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$scale</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_suspendResultSet" id="functionsqlrcur_suspendResultSet"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_suspendResultSet</span> (line <span class="line-number">584</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Tells the server to leave this result set open when the connection calls   suspendSession() so that another connection can connect to it using   resumeResultSet() after it calls resumeSession().</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_suspendResultSet
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_totalRows" id="functionsqlrcur_totalRows"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_totalRows</span> (line <span class="line-number">418</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns the total number of rows that will be returned in the result set.</p>
+<p class="description"><p>Not all databases support this call.  Don't use it for applications which   are designed to be portable across databases.  -1 is returned by databases   which don't support this option.</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_totalRows
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_upperCaseColumnNames" id="functionsqlrcur_upperCaseColumnNames"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_upperCaseColumnNames</span> (line <span class="line-number">186</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Columns names are converted to upper case.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_upperCaseColumnNames
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_validateBinds" id="functionsqlrcur_validateBinds"><!-- --></a>
+<div class="evenrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_validateBinds</span> (line <span class="line-number">345</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">If you are binding to any variables that might not actually be in your</p>
+<p class="description"><p>query, call this to ensure that the database won't try to bind them unless   they really are in the query.  There is a performance penalty for calling   this function</p></p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_validateBinds
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+				</ul>
+		
+	
+</div>
+<a name="functionsqlrcur_validBind" id="functionsqlrcur_validBind"><!-- --></a>
+<div class="oddrow">
+	
+	<div>
+		<span class="method-title">sqlrcur_validBind</span> (line <span class="line-number">349</span>)
+	</div> 
+
+	<!-- ========== Info from phpDoc block ========= -->
+<p class="short-description">Returns true if &quot;variable&quot; was a valid bind variable of the query.</p>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			sqlrcur_validBind
+		</span>
+					(<span class="var-type"></span>&nbsp;<span class="var-name">$sqlrcurref</span>, <span class="var-type"></span>&nbsp;<span class="var-name">$variable</span>)
+			</div>
+
+			<ul class="parameters">
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$sqlrcurref</span>			</li>
+					<li>
+				<span class="var-type"></span>
+				<span class="var-name">$variable</span>			</li>
+				</ul>
+		
+	
+</div>
+		</div>
+	</div>
+	
+	<p class="notes" id="credit">
+		Documentation generated on Fri, 06 Jan 2012 04:33:57 -0500 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+	</p>
+	</div></body>
+</html>
