@@ -121,6 +121,8 @@ class sqlrconnection {
 		 *  client to tell it when to commit. */
 		bool	autoCommitOff();
 
+
+
 		/** Issues a commit.  Returns 1 if the commit
 		 *  succeeded, 0 if it failed. */
 		bool	commit();
@@ -173,6 +175,8 @@ class sqlrcursor {
 			/** Destroys the cursor and cleans up all assocuated
 			 *  result set data. */
 			~sqlrcursor();
+
+
 
 		/** Sets the number of rows of the result set
 		 *  to buffer at a time.  0 (the default)
@@ -504,6 +508,7 @@ class sqlrcursor {
 		 *  and output bind variables as NULL's rather
 		 *  than as empty strings. */
 		void	getNullsAsNulls();
+
 
 
 		/** Returns the specified field as a string. */

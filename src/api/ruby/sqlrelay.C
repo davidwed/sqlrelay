@@ -17,6 +17,19 @@ static void sqlrcon_free(void *sqlrcon) {
 	#define STR2CSTR(v) StringValuePtr(v)
 #endif
 
+/**
+ *  call-seq:
+ *  new(host, port, socket, user, password, retrytime, tries)
+ *
+ *  Initiates a connection to "host" on "port" or to the unix "socket" on
+ *  the local machine and authenticates with "user" and "password".  Failed
+ *  connections will be retried for "tries" times on interval "retrytime".
+ *  If "tries" is 0 then retries will continue forever.  If "retrytime" is 0
+ *  then retries will be attempted on a default interval.
+ *  If the "socket" parameter is nether nil nor "" then an attempt will be
+ *  made to connect through it before attempting to connect to "host" on
+ *  "port".  If it is nil or "" then no attempt will be made to connect
+ *  through the socket.*/
 static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
 				VALUE user, VALUE password, 
 				VALUE retrytime, VALUE tries) {
@@ -37,6 +50,12 @@ static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
 	return Data_Wrap_Struct(self,0,sqlrcon_free,(void *)sqlrcon);
 }
 
+/**
+ *  call-seq:
+ *  setTimeout(timeoutsec,timeoutusec)
+ *
+ *  Sets the server connect timeout in seconds and milliseconds.
+ *  Setting either parameter to -1 disables the timeout. */
 static VALUE sqlrcon_setTimeout(VALUE self,
 				VALUE timeoutsec, VALUE timeoutusec) {
 	sqlrconnection	*sqlrcon;
@@ -45,6 +64,7 @@ static VALUE sqlrcon_setTimeout(VALUE self,
 	return Qnil;
 }
 
+/** Ends the session. */
 static VALUE sqlrcon_endSession(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -52,18 +72,29 @@ static VALUE sqlrcon_endSession(VALUE self) {
 	return Qnil;
 }
 
+/** Disconnects this connection from the current session but leaves the session
+ *  open so that another connection can connect to it using
+ *  sqlrcon_resumeSession(). */
 static VALUE sqlrcon_suspendSession(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
 	return INT2NUM(sqlrcon->suspendSession());
 }
 
+/** Returns the inet port that the connection is communicating over.  This
+ *  parameter may be passed to another connection for use in the
+ *  sqlrcon_resumeSession() command.  Note: The result this function returns
+ *  is only valid after a call to suspendSession(). */
 static VALUE sqlrcon_getConnectionPort(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
 	return INT2NUM(sqlrcon->getConnectionPort());
 }
 
+/** Returns the unix socket that the connection is communicating over.  This
+ *  parameter may be passed to another connection for use in the
+ *  sqlrcon_resumeSession() command.  Note: The result this function returns
+ *  is only valid after a call to suspendSession(). */
 static VALUE sqlrcon_getConnectionSocket(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -75,6 +106,12 @@ static VALUE sqlrcon_getConnectionSocket(VALUE self) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  resumeSession(port,socket)
+ *
+ *  Resumes a session previously left open using sqlrcon_suspendSession().
+ *  Returns 1 on success and 0 on failure. */
 static VALUE sqlrcon_resumeSession(VALUE self, VALUE port, VALUE socket) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -82,12 +119,14 @@ static VALUE sqlrcon_resumeSession(VALUE self, VALUE port, VALUE socket) {
 							STR2CSTR(socket)));
 }
 
+/** Returns 1 if the database is up and 0 if it's down. */
 static VALUE sqlrcon_ping(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
 	return INT2NUM(sqlrcon->ping());
 }
 
+/** Returns the type of database: oracle8, postgresql, mysql, etc. */
 static VALUE sqlrcon_identify(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -99,6 +138,7 @@ static VALUE sqlrcon_identify(VALUE self) {
 	}
 }
 
+/** Returns the version of the database */
 static VALUE sqlrcon_dbVersion(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -110,6 +150,7 @@ static VALUE sqlrcon_dbVersion(VALUE self) {
 	}
 }
 
+/** Returns the version of the sqlrelay server software. */
 static VALUE sqlrcon_serverVersion(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -121,6 +162,7 @@ static VALUE sqlrcon_serverVersion(VALUE self) {
 	}
 }
 
+/** Returns the version of the sqlrelay client software. */
 static VALUE sqlrcon_clientVersion(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -132,6 +174,8 @@ static VALUE sqlrcon_clientVersion(VALUE self) {
 	}
 }
 
+/** Returns a string representing the format
+ *  of the bind variables used in the db. */
 static VALUE sqlrcon_bindFormat(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -143,12 +187,18 @@ static VALUE sqlrcon_bindFormat(VALUE self) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  selectDatabase(database)
+ *
+ *  Sets the current database/schema to "database" */
 static VALUE sqlrcon_selectDatabase(VALUE self, VALUE db) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
 	return INT2NUM(sqlrcon->selectDatabase(STR2CSTR(db)));
 }
 
+/** Returns the database/schema that is currently in use. */
 static VALUE sqlrcon_getCurrentDatabase(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -160,36 +210,45 @@ static VALUE sqlrcon_getCurrentDatabase(VALUE self) {
 	}
 }
 
+/** Returns the value of the autoincrement column for the last insert */
 static VALUE sqlrcon_getLastInsertId(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
 	return INT2NUM(sqlrcon->getLastInsertId());
 }
 
+/** Instructs the database to perform a commit after every successful query. */
 static VALUE sqlrcon_autoCommitOn(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
 	return INT2NUM(sqlrcon->autoCommitOn());
 }
 
+/** Instructs the database to wait for the client to tell it when to commit. */
 static VALUE sqlrcon_autoCommitOff(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
 	return INT2NUM(sqlrcon->autoCommitOff());
 }
 
+/** Issues a commit.  Returns 1 if the commit succeeded, 0 if it failed and -1
+ *  if an error occurred. */
 static VALUE sqlrcon_commit(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
 	return INT2NUM(sqlrcon->commit());
 }
 
+/** Issues a rollback.  Returns 1 if the rollback succeeded, 0 if it failed
+ *  and -1 if an error occurred. */
 static VALUE sqlrcon_rollback(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
 	return INT2NUM(sqlrcon->rollback());
 }
 
+/** If an operation failed and generated an error, the error message is
+ *  available here.  If there is no error then this method returns nil */
 static VALUE sqlrcon_errorMessage(VALUE self) {
 	sqlrconnection *sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -201,6 +260,8 @@ static VALUE sqlrcon_errorMessage(VALUE self) {
 	}
 }
 
+/** Causes verbose debugging information to be sent to standard output.
+ *  Another way to do this is to start a query with "-- debug\n". */
 static VALUE sqlrcon_debugOn(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -208,6 +269,7 @@ static VALUE sqlrcon_debugOn(VALUE self) {
 	return Qnil;
 }
 
+/** Turns debugging off. */
 static VALUE sqlrcon_debugOff(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -215,6 +277,7 @@ static VALUE sqlrcon_debugOff(VALUE self) {
 	return Qnil;
 }
 
+/** Returns 0 if debugging is off and 1 if debugging is on. */
 static VALUE sqlrcon_getDebug(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -225,6 +288,7 @@ static VALUE sqlrcon_getDebug(VALUE self) {
 
 VALUE csqlrconnection;
 
+/** */
 void Init_SQLRConnection() {
 	csqlrconnection=rb_define_class("SQLRConnection", rb_cObject);
 	rb_define_singleton_method(csqlrconnection,"new",
@@ -286,6 +350,12 @@ static void sqlrcur_free(void *sqlrcur) {
 	delete (sqlrcursor *)sqlrcur;
 }
 
+/**
+ *  call-seq:
+ *  new(connection)
+ *
+ *  Creates a cursor to run queries and fetch
+ *  result sets using connection "connection" */
 static VALUE sqlrcur_new(VALUE self, VALUE connection) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(connection,sqlrconnection,sqlrcon);
@@ -294,6 +364,12 @@ static VALUE sqlrcur_new(VALUE self, VALUE connection) {
 	return Data_Wrap_Struct(self,0,sqlrcur_free,(void *)sqlrcur);
 }
 
+/**
+ *  call-seq:
+ *  setResultSetBufferSize(rows)
+ *
+ *  Sets the number of rows of the result set to buffer at a time.
+ *  0 (the default) means buffer the entire result set. */
 static VALUE sqlrcur_setResultSetBufferSize(VALUE self, VALUE rows) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -301,12 +377,17 @@ static VALUE sqlrcur_setResultSetBufferSize(VALUE self, VALUE rows) {
 	return Qnil;
 }
 
+/** Returns the number of result set rows that will be buffered at a time or
+ *  0 for the entire result set. */
 static VALUE sqlrcur_getResultSetBufferSize(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->getResultSetBufferSize());
 }
 
+/** Tells the server not to send any column info (names, types, sizes).  If
+ *  you don't need that info, you should call this function to improve
+ *  performance. */
 static VALUE sqlrcur_dontGetColumnInfo(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -314,6 +395,7 @@ static VALUE sqlrcur_dontGetColumnInfo(VALUE self) {
 	return Qnil;
 }
 
+/** Tells the server to send column info. */
 static VALUE sqlrcur_getColumnInfo(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -321,6 +403,8 @@ static VALUE sqlrcur_getColumnInfo(VALUE self) {
 	return Qnil;
 }
 
+/** Columns names are returned in the same case as they are defined in the
+ *  database.  This is the default. */
 static VALUE sqlrcur_mixedCaseColumnNames(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -328,6 +412,7 @@ static VALUE sqlrcur_mixedCaseColumnNames(VALUE self) {
 	return Qnil;
 }
 
+/** Columns names are converted to upper case. */
 static VALUE sqlrcur_upperCaseColumnNames(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -335,6 +420,7 @@ static VALUE sqlrcur_upperCaseColumnNames(VALUE self) {
 	return Qnil;
 }
 
+/** Columns names are converted to lower case. */
 static VALUE sqlrcur_lowerCaseColumnNames(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -342,6 +428,19 @@ static VALUE sqlrcur_lowerCaseColumnNames(VALUE self) {
 	return Qnil;
 }
 
+/**
+ *  call-seq:
+ *  cacheToFile(filename)
+ *
+ *  Sets query caching on.  Future queries will be cached to the
+ *  file "filename".
+ * 
+ *  A default time-to-live of 10 minutes is also set.
+ * 
+ *  Note that once cacheToFile() is called, the result sets of all
+ *  future queries will be cached to that file until another call to
+ *  cacheToFile() changes which file to cache to or a call to
+ *  cacheOff() turns off caching. */
 static VALUE sqlrcur_cacheToFile(VALUE self, VALUE filename) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -349,6 +448,13 @@ static VALUE sqlrcur_cacheToFile(VALUE self, VALUE filename) {
 	return Qnil;
 }
 
+/**
+ *  call-seq:
+ *  setCacheTtl(ttl)
+ *
+ *  Sets the time-to-live for cached result sets. The sqlr-cachemanger will
+ *  remove each cached result set "ttl" seconds after it's created, provided
+ *  it's scanning the directory containing the cache files. */
 static VALUE sqlrcur_setCacheTtl(VALUE self, VALUE ttl) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -356,6 +462,8 @@ static VALUE sqlrcur_setCacheTtl(VALUE self, VALUE ttl) {
 	return Qnil;
 }
 
+/** Returns the name of the file containing
+ *  the most recently cached result set. */
 static VALUE sqlrcur_getCacheFileName(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -367,6 +475,7 @@ static VALUE sqlrcur_getCacheFileName(VALUE self) {
 	}
 }
 
+/** Sets query caching off. */
 static VALUE sqlrcur_cacheOff(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -374,30 +483,61 @@ static VALUE sqlrcur_cacheOff(VALUE self) {
 	return Qnil;
 }
 
+/**
+ *  call-seq:
+ *  getDatabaseList(wild)
+ *
+ *  Sends a query that returns a list of databases/schemas matching "wild".
+ *  If wild is empty or nil then a list of all databases/schemas will be
+ *  returned. */
 static VALUE sqlrcur_getDatabaseList(VALUE self, VALUE wild) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->getDatabaseList(STR2CSTR(wild)));
 }
 
+/**
+ *  call-seq:
+ *  getTableList(wild)
+ *
+ *  Sends a query that returns a list of tables matching "wild".  If wild is
+ *  empty or nil then a list of all tables will be returned. */
 static VALUE sqlrcur_getTableList(VALUE self, VALUE wild) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->getTableList(STR2CSTR(wild)));
 }
 
+/**
+ *  call-seq:
+ *  getColumnList(table,wild)
+ *
+ *  Sends a query that returns a list of columns in the table specified by the
+ *  "table" parameter matching "wild".  If wild is empty or nil then a list of
+ *  all columns will be returned. */
 static VALUE sqlrcur_getColumnList(VALUE self, VALUE table, VALUE wild) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->getColumnList(STR2CSTR(table),STR2CSTR(wild)));
 }
 
+/**
+ *  call-seq:
+ *  sendQuery(query)
+ *
+ *  Sends "query" directly and gets a result set. */
 static VALUE sqlrcur_sendQuery(VALUE self, VALUE query) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->sendQuery(STR2CSTR(query)));
 }
 
+/**
+ *  call-seq:
+ *  sendQueryWithLength(query,length)
+ *
+ *  Sends "query" with length "length" directly and gets a result set. This
+ *  function must be used if the query contains binary data. */
 static VALUE sqlrcur_sendQueryWithLength(VALUE self,
 					VALUE query, VALUE length) {
 	sqlrcursor	*sqlrcur;
@@ -405,6 +545,11 @@ static VALUE sqlrcur_sendQueryWithLength(VALUE self,
 	return INT2NUM(sqlrcur->sendQuery(STR2CSTR(query),NUM2INT(length)));
 }
 
+/**
+ *  call-seq:
+ *  sendFileQuery(path,filename)
+ *
+ *  Sends the query in file "path"/"filename" and gets a result set. */
 static VALUE sqlrcur_sendFileQuery(VALUE self, VALUE path, VALUE filename) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -412,6 +557,11 @@ static VALUE sqlrcur_sendFileQuery(VALUE self, VALUE path, VALUE filename) {
 						STR2CSTR(filename))); 
 }
 
+/**
+ *  call-seq:
+ *  prepareQuery(query)
+ *
+ *  Prepare to execute "query". */
 static VALUE sqlrcur_prepareQuery(VALUE self, VALUE query) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -419,6 +569,12 @@ static VALUE sqlrcur_prepareQuery(VALUE self, VALUE query) {
 	return Qnil;
 }
 
+/**
+ *  call-seq:
+ *  prepareQuery(query,length)
+ *
+ *  Prepare to execute "query" with length "length".  This function must be
+ *  used if the query contains binary data. */
 static VALUE sqlrcur_prepareQueryWithLength(VALUE self,
 					VALUE query, VALUE length) {
 	sqlrcursor	*sqlrcur;
@@ -427,6 +583,11 @@ static VALUE sqlrcur_prepareQueryWithLength(VALUE self,
 	return Qnil;
 }
 
+/**
+ *  call-seq:
+ *  prepareFileQuery(path,filename)
+ *
+ *  Prepare to execute the contents of "path"/"filename". */
 static VALUE sqlrcur_prepareFileQuery(VALUE self, VALUE path, VALUE filename) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -434,6 +595,7 @@ static VALUE sqlrcur_prepareFileQuery(VALUE self, VALUE path, VALUE filename) {
 						STR2CSTR(filename)));
 }
 
+/** Clears all bind variables. */
 static VALUE sqlrcur_clearBinds(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -441,12 +603,21 @@ static VALUE sqlrcur_clearBinds(VALUE self) {
 	return Qnil;
 }
 
+/** Parses the previously prepared query, counts the number of bind variables
+ *  defined in it and returns that number. */
 static VALUE sqlrcur_countBindVariables(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->countBindVariables());
 }
 
+/**
+ *  call-seq:
+ *  substitution(variable,value,(precision),(scale))
+ *
+ *  Defines a substitution variable.  The value may be a string, integer or
+ *  decimal.  If it is a decimal then the precision and scale may be
+ *  specified. */
 static VALUE sqlrcur_substitution(int argc, VALUE *argv, VALUE self) {
 	sqlrcursor	*sqlrcur;
 	VALUE	variable;
@@ -475,6 +646,13 @@ static VALUE sqlrcur_substitution(int argc, VALUE *argv, VALUE self) {
 	return INT2NUM(result);
 }
 
+/**
+ *  call-seq:
+ *  inputBind(variable,value,(precision),(scale))
+ *
+ *  Defines am input bind variable.  The value may be a string, integer or
+ *  decimal.  If it is a decimal then the precision and scale may be
+ *  specified. */
 static VALUE sqlrcur_inputBind(int argc, VALUE *argv, VALUE self) {
 	sqlrcursor	*sqlrcur;
 	VALUE	variable;
@@ -513,6 +691,11 @@ static VALUE sqlrcur_inputBind(int argc, VALUE *argv, VALUE self) {
 	return INT2NUM(success);
 }
 
+/**
+ *  call-seq:
+ *  inputBindBlob(variable,value,size)
+ *
+ *  Defines a binary lob input bind variable. */
 static VALUE sqlrcur_inputBindBlob(VALUE self, VALUE variable,
 					VALUE value, VALUE size) {
 	sqlrcursor	*sqlrcur;
@@ -529,6 +712,11 @@ static VALUE sqlrcur_inputBindBlob(VALUE self, VALUE variable,
 	return INT2NUM(success);
 }
 
+/**
+ *  call-seq:
+ *  inputBindClob(variable,value,size)
+ *
+ *  Defines a character lob input bind variable. */
 static VALUE sqlrcur_inputBindClob(VALUE self, VALUE variable,
 					VALUE value, VALUE size) {
 	sqlrcursor	*sqlrcur;
@@ -545,6 +733,12 @@ static VALUE sqlrcur_inputBindClob(VALUE self, VALUE variable,
 	return INT2NUM(success);
 }
 
+/**
+ *  call-seq:
+ *  defineOutputBindString(variable,length)
+ *
+ *  Defines a string output bind variable.
+ *  "length" bytes will be reserved to store the value. */
 static VALUE sqlrcur_defineOutputBindString(VALUE self, VALUE variable,
 							VALUE bufferlength) {
 	sqlrcursor	*sqlrcur;
@@ -553,6 +747,11 @@ static VALUE sqlrcur_defineOutputBindString(VALUE self, VALUE variable,
 	return Qnil;
 }
 
+/**
+ *  call-seq:
+ *  defineOutputBindInteger(variable)
+ *
+ *  Defines an integer output bind variable. */
 static VALUE sqlrcur_defineOutputBindInteger(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -560,6 +759,11 @@ static VALUE sqlrcur_defineOutputBindInteger(VALUE self, VALUE variable) {
 	return Qnil;
 }
 
+/**
+ *  call-seq:
+ *  defineOutputBindDouble(variable)
+ *
+ *  Defines an decimal output bind variable. */
 static VALUE sqlrcur_defineOutputBindDouble(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -567,6 +771,11 @@ static VALUE sqlrcur_defineOutputBindDouble(VALUE self, VALUE variable) {
 	return Qnil;
 }
 
+/**
+ *  call-seq:
+ *  defineOuptutBindBlob(variable)
+ *
+ *  Defines a binary lob output bind variable */
 static VALUE sqlrcur_defineOutputBindBlob(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -574,6 +783,11 @@ static VALUE sqlrcur_defineOutputBindBlob(VALUE self, VALUE variable) {
 	return Qnil;
 }
 
+/**
+ *  call-seq:
+ *  defineOutputBindClob(variable)
+ *
+ *  Defines a character lob output bind variable */
 static VALUE sqlrcur_defineOutputBindClob(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -581,6 +795,11 @@ static VALUE sqlrcur_defineOutputBindClob(VALUE self, VALUE variable) {
 	return Qnil;
 }
 
+/**
+ *  call-seq:
+ *  defineOutputBindCursor(variable)
+ *
+ *  Defines a cursor output bind variable */
 static VALUE sqlrcur_defineOutputBindCursor(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -588,6 +807,13 @@ static VALUE sqlrcur_defineOutputBindCursor(VALUE self, VALUE variable) {
 	return Qnil;
 }
 
+/**
+ *  call-seq:
+ *  substitutions(variables,values,(precisions),(scales))
+ *
+ *  Defines an array of substitution variables.  The values may be strings,
+ *  integers or decimals.  If they are decimals then the precisions and scales
+ *  may also be specified. */
 static VALUE sqlrcur_substitutions(int argc, VALUE *argv, VALUE self) {
 	sqlrcursor	*sqlrcur;
 	VALUE	variables;
@@ -639,6 +865,13 @@ static VALUE sqlrcur_substitutions(int argc, VALUE *argv, VALUE self) {
 	return INT2NUM(success);
 }
 
+/**
+ *  call-seq:
+ *  inputBinds(variables,values,(precisions),(scales))
+ *
+ *  Defines an array of input bind variables.  The values may be strings,
+ *  integers or decimals.  If they are decimals then the precisions and scales
+ *  may also be specified. */
 static VALUE sqlrcur_inputBinds(int argc, VALUE *argv, VALUE self) {
 	sqlrcursor	*sqlrcur;
 	VALUE	variables;
@@ -687,6 +920,10 @@ static VALUE sqlrcur_inputBinds(int argc, VALUE *argv, VALUE self) {
 	return INT2NUM(success);
 }
 
+/** If you are binding to any variables that might not actually be in your
+ *  query, call this to ensure that the database won't try to bind them unless
+ *  they really are in the query.  There is a performance penalty for calling
+ *  this function */
 static VALUE sqlrcur_validateBinds(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -694,24 +931,36 @@ static VALUE sqlrcur_validateBinds(VALUE self) {
 	return Qnil;
 }
 
+/**
+ *  call-seq:
+ *  validBind(variable)
+ *
+ *  Returns true if "variable" was a valid bind variable of the query. */
 static VALUE sqlrcur_validBind(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->validBind(STR2CSTR(variable)));
 }
 
+/** Execute the query that was previously prepared and bound. */
 static VALUE sqlrcur_executeQuery(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->executeQuery());
 }
 
+/** Fetch from a cursor that was returned as an output bind variable. */
 static VALUE sqlrcur_fetchFromBindCursor(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->fetchFromBindCursor());
 }
 
+/**
+ *  call-seq:
+ *  getOutputBindString(variable)
+ *
+ *  Get the value stored in a previously defined string output bind variable. */
 static VALUE sqlrcur_getOutputBindString(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -725,6 +974,12 @@ static VALUE sqlrcur_getOutputBindString(VALUE self, VALUE variable) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  getOutputBindBlob(variable)
+ *
+ *  Get the value stored in a previously defined
+ *  binary lob output bind variable. */
 static VALUE sqlrcur_getOutputBindBlob(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -738,6 +993,12 @@ static VALUE sqlrcur_getOutputBindBlob(VALUE self, VALUE variable) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  getOutputBindClob(variable)
+ *
+ *  Get the value stored in a previously defined
+ *  character lob output bind variable. */
 static VALUE sqlrcur_getOutputBindClob(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -751,6 +1012,12 @@ static VALUE sqlrcur_getOutputBindClob(VALUE self, VALUE variable) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  getOutputBindInteger(variable)
+ *
+ *  Get the value stored in a previously defined
+ *  integer output bind variable. */
 static VALUE sqlrcur_getOutputBindInteger(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -759,6 +1026,12 @@ static VALUE sqlrcur_getOutputBindInteger(VALUE self, VALUE variable) {
 	return INT2NUM(result);
 }
 
+/**
+ *  call-seq:
+ *  getOutputBindDouble(variable)
+ *
+ *  Get the value stored in a previously defined
+ *  decimal output bind variable. */
 static VALUE sqlrcur_getOutputBindDouble(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -767,12 +1040,23 @@ static VALUE sqlrcur_getOutputBindDouble(VALUE self, VALUE variable) {
 	return rb_float_new(result);
 }
 
+/**
+ *  call-seq:
+ *  getOutputBindLength(variable)
+ *
+ *  Get the length of the value stored in a previously
+ *  defined output bind variable. */
 static VALUE sqlrcur_getOutputBindLength(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->getOutputBindLength(STR2CSTR(variable)));
 }
 
+/**
+ *  call-seq:
+ *  getOutputBindCursor(variable)
+ *
+ *  Get the cursor associated with a previously defined output bind variable. */
 static VALUE sqlrcur_getOutputBindCursor(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -783,48 +1067,70 @@ static VALUE sqlrcur_getOutputBindCursor(VALUE self, VALUE variable) {
 					(void *)returnsqlrcur);
 }
 
+/**
+ *  call-seq:
+ *  openCachedResultSet(filename)
+ *
+ *  Opens a cached result set.  Returns 1 on success and 0 on failure. */
 static VALUE sqlrcur_openCachedResultSet(VALUE self, VALUE filename) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->openCachedResultSet(STR2CSTR(filename)));
 }
 
+/** Returns the number of columns in the current result set. */
 static VALUE sqlrcur_colCount(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->colCount());
 }
 
+/** Returns the number of rows in the current result set. */
 static VALUE sqlrcur_rowCount(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->rowCount());
 }
 
+/** Returns the total number of rows that will be returned in the result set.
+ *  Not all databases support this call.  Don't use it for applications which
+ *  are designed to be portable across databases.  -1 is returned by databases
+ *  which don't support this option. */
 static VALUE sqlrcur_totalRows(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->totalRows());
 }
 
+/** Returns the number of rows that were updated, inserted or deleted by the
+ *  query.  Not all databases support this call.  Don't use it for applications
+ *  which are designed to be portable across databases.  -1 is returned by
+ *  databases which don't support this option. */
 static VALUE sqlrcur_affectedRows(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->affectedRows());
 }
 
+/** Returns the index of the first buffered row.  This is useful when buffering
+ *  only part of the result set at a time. */
 static VALUE sqlrcur_firstRowIndex(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->firstRowIndex());
 }
 
+/** Returns 0 if part of the result set is still pending on the server and 1 if
+ *  not.  This function can only return 0 if setResultSetBufferSize() has been
+ *  called with a parameter other than 0. */
 static VALUE sqlrcur_endOfResultSet(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->endOfResultSet());
 }
 
+/** If a query failed and generated an error, the error message is available
+ *  here.  If the query succeeded then this function returns a nil. */
 static VALUE sqlrcur_errorMessage(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -836,6 +1142,8 @@ static VALUE sqlrcur_errorMessage(VALUE self) {
 	}
 }
 
+/** Tells the connection to return NULL fields and output bind variables as
+ *  empty strings.  This is the default. */
 static VALUE sqlrcur_getNullsAsEmptyStrings(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -843,6 +1151,8 @@ static VALUE sqlrcur_getNullsAsEmptyStrings(VALUE self) {
 	return Qnil;
 }
 
+/** Tells the connection to return NULL fields
+ *  and output bind variables as nil's. */
 static VALUE sqlrcur_getNullsAsNils(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -850,6 +1160,12 @@ static VALUE sqlrcur_getNullsAsNils(VALUE self) {
 	return Qnil;
 }
 
+/**
+ *  call-seq:
+ *  getField(row,col)
+ *
+ *  Returns the specified field as a string.  "col" may be specified as the 
+ *  column name or number. */
 static VALUE sqlrcur_getField(VALUE self, VALUE row, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -868,7 +1184,13 @@ static VALUE sqlrcur_getField(VALUE self, VALUE row, VALUE col) {
 		return Qnil;
 	}
 }
-
+  
+/**
+ *  call-seq:
+ *  getFieldAsInteger(row,col)
+ *
+ *  Returns the specified field as an integer.  "col" may be specified as the
+ *  column name or number. */
 static VALUE sqlrcur_getFieldAsInteger(VALUE self, VALUE row, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -881,6 +1203,12 @@ static VALUE sqlrcur_getFieldAsInteger(VALUE self, VALUE row, VALUE col) {
 	return INT2NUM(result);
 }
 
+/**
+ *  call-seq:
+ *  getFieldAsDouble(row,col)
+ *
+ *  Returns the specified field as an decimal.  "col" may be specified as the
+ *  column name or number. */
 static VALUE sqlrcur_getFieldAsDouble(VALUE self, VALUE row, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -893,6 +1221,12 @@ static VALUE sqlrcur_getFieldAsDouble(VALUE self, VALUE row, VALUE col) {
 	return rb_float_new(result);
 }
 
+/**
+ *  call-seq:
+ *  getFieldLength(row,col)
+ *
+ *  Returns the length of the specified row and column.  "col" may be specified
+ *  as the column name or number. */
 static VALUE sqlrcur_getFieldLength(VALUE self, VALUE row, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -905,6 +1239,11 @@ static VALUE sqlrcur_getFieldLength(VALUE self, VALUE row, VALUE col) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  getRow(row)
+ *
+ *  Returns an array of the values of the fields in the specified row. */
 static VALUE sqlrcur_getRow(VALUE self, VALUE row) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -922,6 +1261,11 @@ static VALUE sqlrcur_getRow(VALUE self, VALUE row) {
 	return fieldary;
 }
 
+/**
+ *  call-seq:
+ *  getRowHash(row)
+ *
+ *  Returns a hash of the values of the fields in the specified row. */
 static VALUE sqlrcur_getRowHash(VALUE self, VALUE row) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -942,6 +1286,11 @@ static VALUE sqlrcur_getRowHash(VALUE self, VALUE row) {
 	return fieldhash;
 }
 
+/**
+ *  call-seq:
+ *  getRowLengths(row)
+ *
+ *  Returns an array of the lengths of the fields in the specified row. */
 static VALUE sqlrcur_getRowLengths(VALUE self, VALUE row) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -956,6 +1305,11 @@ static VALUE sqlrcur_getRowLengths(VALUE self, VALUE row) {
 	return lengthary;
 }
 
+/**
+ *  call-seq:
+ *  getRowLengthsHash(row)
+ *
+ *  Returns a hash of the lengths of the fields in the specified row. */
 static VALUE sqlrcur_getRowLengthsHash(VALUE self, VALUE row) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -969,6 +1323,7 @@ static VALUE sqlrcur_getRowLengthsHash(VALUE self, VALUE row) {
 	return lengthhash;
 }
 
+/** Returns an array of the column names of the current result set. */
 static VALUE sqlrcur_getColumnNames(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -987,6 +1342,11 @@ static VALUE sqlrcur_getColumnNames(VALUE self) {
 	return nameary;
 }
 
+/**
+ *  call-seq:
+ *  getColumnName(col)
+ *
+ *  Returns the name of the specified column. */
 static VALUE sqlrcur_getColumnName(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -998,6 +1358,12 @@ static VALUE sqlrcur_getColumnName(VALUE self, VALUE col) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  getColumnType(col)
+ *
+ *  Returns the type of the specified column. "col" may be specified as the
+ *  column name or number. */
 static VALUE sqlrcur_getColumnType(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -1013,7 +1379,13 @@ static VALUE sqlrcur_getColumnType(VALUE self, VALUE col) {
 		return Qnil;
 	}
 }
-
+ 
+/**
+ *  call-seq:
+ *  getColumnLength(col)
+ *
+ *  Returns the length of the specified column. "col" may be specified as the
+ *  column name or number. */
 static VALUE sqlrcur_getColumnLength(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -1024,6 +1396,14 @@ static VALUE sqlrcur_getColumnLength(VALUE self, VALUE col) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  getColumnPrecision(col)
+ *
+ *  Returns the precision of the specified column.  Precision is the total
+ *  number of digits in a number.  eg: 123.45 has a precision of 5.  For
+ *  non-numeric types, it's the number of characters in the string.  "col"
+ *  may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnPrecision(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -1034,6 +1414,13 @@ static VALUE sqlrcur_getColumnPrecision(VALUE self, VALUE col) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  getColumnScale(col)
+ *
+ *  Returns the scale of the specified column.  Scale is the total number of
+ *  digits to the right of the decimal point in a number.  eg: 123.45 has a
+ *  scale of 2.  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnScale(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -1044,6 +1431,12 @@ static VALUE sqlrcur_getColumnScale(VALUE self, VALUE col) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  getColumnIsNullable(col)
+ *
+ *  Returns 1 if the specified column can contain nulls and 0 otherwise.
+ *  "col" may be specified as the colum name or number. */
 static VALUE sqlrcur_getColumnIsNullable(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -1054,6 +1447,12 @@ static VALUE sqlrcur_getColumnIsNullable(VALUE self, VALUE col) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  getColumnIsPrimaryKey(col)
+ *
+ *  Returns 1 if the specified column is a primary key and 0 otherwise.
+ *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsPrimaryKey(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -1064,6 +1463,12 @@ static VALUE sqlrcur_getColumnIsPrimaryKey(VALUE self, VALUE col) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  getColumnIsUnique(col)
+ *
+ *  Returns 1 if the specified column is unique and 0 otherwise. 
+ *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsUnique(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -1074,6 +1479,12 @@ static VALUE sqlrcur_getColumnIsUnique(VALUE self, VALUE col) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  getColumnIsPartOfKey(col)
+ *
+ *  Returns 1 if the specified column is part of a composite key and 0
+ *  otherwise.  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsPartOfKey(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -1084,6 +1495,12 @@ static VALUE sqlrcur_getColumnIsPartOfKey(VALUE self, VALUE col) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  getColumnIsUnsigned(col)
+ *
+ *  Returns 1 if the specified column is an unsigned number and 0 otherwise.
+ *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsUnsigned(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -1094,6 +1511,12 @@ static VALUE sqlrcur_getColumnIsUnsigned(VALUE self, VALUE col) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  getColumnIsZeroFilled(col)
+ *
+ *  Returns 1 if the specified column was created with the zero-fill flag and
+ *  0 otherwise.  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsZeroFilled(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -1104,6 +1527,12 @@ static VALUE sqlrcur_getColumnIsZeroFilled(VALUE self, VALUE col) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  getColumnIsBinary(col)
+ *
+ *  Returns 1 if the specified column contains binary data and 0 otherwise.
+ *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsBinary(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -1114,6 +1543,12 @@ static VALUE sqlrcur_getColumnIsBinary(VALUE self, VALUE col) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  getColumnIsAutoIncrement(col)
+ *  
+ *  Returns 1 if the specified column auto-increments and 0 otherwise.
+ *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsAutoIncrement(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -1126,6 +1561,12 @@ static VALUE sqlrcur_getColumnIsAutoIncrement(VALUE self, VALUE col) {
 	}
 }
 
+/**
+ *  call-seq:
+ *  getLongest(col)
+ *
+ *  Returns the length of the longest field in the specified column.
+ *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getLongest(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -1136,12 +1577,19 @@ static VALUE sqlrcur_getLongest(VALUE self, VALUE col) {
 	}
 }
 
+/** Returns the internal ID of this result set.  This parameter may be passed
+ *  to another statement for use in the resumeResultSet() function.  Note: The
+ *  value this function returns is only valid after a call to
+ *  suspendResultSet().*/
 static VALUE sqlrcur_getResultSetId(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->getResultSetId());
 }
 
+/** Tells the server to leave this result set open when the connection calls
+ *  suspendSession() so that another connection can connect to it using
+ *  resumeResultSet() after it calls resumeSession(). */
 static VALUE sqlrcur_suspendResultSet(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
@@ -1149,12 +1597,25 @@ static VALUE sqlrcur_suspendResultSet(VALUE self) {
 	return Qnil;
 }
 
+/**
+ *  call-seq:
+ *  resumeResultSet(id)
+ *
+ *  Resumes a result set previously left open using suspendSession().
+ *  Returns 1 on success and 0 on failure. */
 static VALUE sqlrcur_resumeResultSet(VALUE self, VALUE id) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	return INT2NUM(sqlrcur->resumeResultSet(NUM2INT(id)));
 }
 
+/**
+ *  call-seq:
+ *  resumeCachedResultSet(id,filename)
+ *
+ *  Resumes a result set previously left open using suspendSession() and
+ *  continues caching the result set to "filename".  Returns 1 on success and 0
+ *  on failure. */
 static VALUE sqlrcur_resumeCachedResultSet(VALUE self, 
 						VALUE id, VALUE filename) {
 	sqlrcursor	*sqlrcur;
@@ -1163,6 +1624,7 @@ static VALUE sqlrcur_resumeCachedResultSet(VALUE self,
 							STR2CSTR(filename)));
 }
 
+/** */
 void Init_SQLRCursor() {
 	csqlrcursor=rb_define_class("SQLRCursor", rb_cObject);
 	rb_define_singleton_method(csqlrcursor,"new",

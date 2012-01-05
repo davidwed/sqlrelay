@@ -8,8 +8,7 @@ public class SQLRConnection {
 		System.loadLibrary("SQLRConnection");
 	}
 
-	/** 
-	 *  Initiates a connection to "server" on "port"
+	/** Initiates a connection to "server" on "port"
 	 *  or to the unix "socket" on the local machine
 	 *  and authenticates with "user" and "password".
 	 *  Failed connections will be retried for 
@@ -31,7 +30,7 @@ public class SQLRConnection {
 						user,password,retrytime,tries);
 	}
 	/** Disconnects and ends the session if
-	 * it hasn't been ended already.  */
+	 *  it hasn't been ended already.  */
 	public native void	delete();
 
 	/** Sets the server connect timeout in seconds

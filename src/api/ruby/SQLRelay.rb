@@ -1,6 +1,6 @@
 # 
 # DBD::SQLRelay
-# $Id: SQLRelay.rb,v 1.2 2004-02-15 17:59:45 mused Exp $
+# $Id: SQLRelay.rb,v 1.3 2012-01-05 23:35:01 mused Exp $
 # 
 # Version : 0.1
 # Author  : Michael Neumann (neumann@s-direktnet.de)
@@ -42,13 +42,19 @@ class Driver < DBI::BaseDriver
   end
 
 
+  # dbname should have the format: 
+  # "DBI:SQLRelay:host=host;port=port;socket=socket;"
+  # 
+  # Opens a connection to the sqlrelay server and 
+  # authenticates with user and auth.  attr is
+  # currently ignored.
   def connect(dbname, user, auth, attr)
 
     # connect to database
     
     # dbname will have one of these formats:
-    # * dbi:SQLRelay:host:port
-    # * dbi:SQLRelay:host=xxx;port=xxx;socket=xxx;retrytime=xxx;tries=xxx
+    # dbi:SQLRelay:host:port
+    # dbi:SQLRelay:host=xxx;port=xxx;socket=xxx;retrytime=xxx;tries=xxx
     hash = Utils.parse_params(dbname)
 
     if hash.has_key? "database" then
@@ -76,21 +82,26 @@ end # class Driver
 
 class Database < DBI::BaseDatabase
 
+
+  # Ends the current session.
   def disconnect
     @handle.endSession
   end
 
 
+  # Returns true if the database is up and false if it's down.
   def ping
     @handle.ping == 1 ? true : false
   end
 
 
+  # Prepare to execute query.  Returns a Statement.
   def prepare(statement)
     Statement.new(@handle, statement)
   end
 
 
+  # Issues a commit.  Raises a DBI::ProgrammingError if it failed.
   def commit
     $stderr.puts "Warning: Commit ineffective while AutoCommit is on" if @attr['AutoCommit']
 
@@ -104,6 +115,7 @@ class Database < DBI::BaseDatabase
   end
 
 
+  # Issues a rollback.  Raises a DBI::ProgrammingError if it failed.
   def rollback
     $stderr.puts "Warning: Rollback ineffective while AutoCommit is on" if @attr['AutoCommit']
 
@@ -116,7 +128,10 @@ class Database < DBI::BaseDatabase
     end
   end
 
-
+  # Stores "value" associated with key "attr".
+  # sqlrelay_debug=true or false will toggle
+  # debugging and AutoCommit=true or false will
+  # toggle autocommit.
   def []=(attr, value)
 
     # AutoCommit and sqlrelay_debug are supported by this driver
@@ -161,6 +176,8 @@ class Statement < DBI::BaseStatement
   end
 
 
+  # Binds value to param defined earlier in the
+  # prepare call.  attribs is currently unused.
   def bind_param(param, value, attribs)
 
     # in SQL Relay, bind variable names can be names or numbers and values
@@ -189,6 +206,8 @@ class Statement < DBI::BaseStatement
   end
 
 
+  # Send a SQL query to the server and returns the number of rows returned.
+  # Raises a DBI::ProgrammingError if it failed.
   def execute
 
     # otherwise execute the already-prepared query, raising an error if it fails
@@ -206,11 +225,13 @@ class Statement < DBI::BaseStatement
   end
 
 
+  # Invalidates the statement.
   def finish
     @handle = nil
   end
 
 
+  # Returns one row of the result set.
   def fetch
 
     # if we're already at the end of the result set, return nil
@@ -226,6 +247,15 @@ class Statement < DBI::BaseStatement
   end
 
 
+  # Returns one row of the result set.
+  # Which row depends on direction and offset.
+  # For DBI::SQL_FETCH_NEXT the next row is returned.
+  # For DBI::SQL_FETCH_PRIOR the prior row is returned.
+  # For DBI::SQL_FETCH_FIRST the first row is returned.
+  # For DBI::SQL_FETCH_LAST the last row is returned.
+  # For DBI::SQL_FETCH_ABSOLUTE the "offset" row is returned.
+  # For DBI::SQL_FETCH_RELATIVE the row "offset" 
+  # rows from the current row is returned.
   def fetch_scroll(direction, offset=1)
 
     # decide which row to fetch, take into account that the standard behavior
@@ -259,6 +289,7 @@ class Statement < DBI::BaseStatement
   end
 
 
+  # Returns the next "cnt" rows rest of the result set.
   def fetch_many(cnt)
 
     # fetch the next "cnt" rows and return them
@@ -272,6 +303,7 @@ class Statement < DBI::BaseStatement
   end
 
 
+  # Returns the rest of the result set.
   def fetch_all
 
     # otherwise, fetch the rest of the rows and return them
@@ -285,6 +317,8 @@ class Statement < DBI::BaseStatement
   end
 
 
+  # Returns an array of hashes.
+  # Each hash contains a 'name', 'type_name' and 'precision' key.
   def column_info
 
     # build a column info hash
@@ -298,6 +332,7 @@ class Statement < DBI::BaseStatement
   end
 
 
+  # Returns the number of rows in the current result set.
   def rows
 
     # For DML or DDL queries, row_count is 0 but affected_rows could

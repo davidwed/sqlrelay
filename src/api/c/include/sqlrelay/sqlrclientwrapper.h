@@ -52,14 +52,14 @@ int	sqlrcon_suspendSession(sqlrcon sqlrconref);
  *  Returns the inet port that the connection is communicating over.  This
  *  parameter may be passed to another connection for use in the
  *  sqlrcon_resumeSession() command.  Note: The result this function returns
- *  is only valid after a call to suspendSession().*/
+ *  is only valid after a call to suspendSession(). */
 uint16_t	sqlrcon_getConnectionPort(sqlrcon sqlrconref);
 
 /** @ingroup sqlrclientwrapper
  *  Returns the unix socket that the connection is communicating over.  This
  *  parameter may be passed to another connection for use in the
  *  sqlrcon_resumeSession() command.  Note: The result this function returns
- *  is only valid after a call to suspendSession().*/
+ *  is only valid after a call to suspendSession(). */
 const char	*sqlrcon_getConnectionSocket(sqlrcon sqlrconref);
 
 /** @ingroup sqlrclientwrapper
@@ -669,7 +669,9 @@ uint32_t	sqlrcur_getColumnScaleByName(sqlrcur sqlrcurref,
 							const char *col);
 
 /** @ingroup sqlrclientwrapper
- *  Returns 1 if the specified column can contain nulls and 0 otherwise. */
+ *  Returns the scale of the specified column.  Scale is the total number of
+ *  digits to the right of the decimal point in a number.  eg: 123.45 has a
+ *  scale of 2. */
 int		sqlrcur_getColumnIsNullableByIndex(sqlrcur sqlrcurref,
 							uint32_t col);
 
