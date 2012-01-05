@@ -1,2 +1,2 @@
-rm -f *.html
-./tcldoc.tcl -f ./ ../../../src/api/tcl/sqlrelayCmd.tcl 
+rm -f *.html *.txt
+./tcldoc.tcl -f ./ ../../../src/api/tcl/sqlrconCmd.tcl ../../../src/api/tcl/sqlrcurCmd.tcl

@@ -20,42 +20,515 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <hr>
 :
 1
-A
-B
-C
-D
-E
-F
-G
+<a href="#A">A</a>
+<a href="#B">B</a>
+<a href="#C">C</a>
+<a href="#D">D</a>
+<a href="#E">E</a>
+<a href="#F">F</a>
+<a href="#G">G</a>
 H
-I
+<a href="#I">I</a>
 J
 K
-L
-M
+<a href="#L">L</a>
+<a href="#M">M</a>
 N
-O
-P
+<a href="#O">O</a>
+<a href="#P">P</a>
 Q
-R
+<a href="#R">R</a>
 <a href="#S">S</a>
 <a href="#T">T</a>
-U
-V
+<a href="#U">U</a>
+<a href="#V">V</a>
 W
 X
 Y
 Z
 <h1>Index of annotations</h1>
 <dl>
+<dt><h3><a name="A">A</a></h3>
+<dt><a href="sqlrcurCmd.tcl-annot.html#affectedRows">affectedRows</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the number of rows that were 
+ updated inserted or deleted by the query.
+<dt><a href="sqlrconCmd.tcl-annot.html#autoCommitOff">autoCommitOff</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Instructs the database to wait for the 
+ client to tell it when to
+<dt><a href="sqlrconCmd.tcl-annot.html#autoCommitOn">autoCommitOn</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Instructs the database to perform a commit
+ after every successful
+<dt><h3><a name="B">B</a></h3>
+<dt><a href="sqlrconCmd.tcl-annot.html#bindFormat">bindFormat</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Returns a string representing the format
+ of the bind variables used in the
+<dt><h3><a name="C">C</a></h3>
+<dt><a href="sqlrcurCmd.tcl-annot.html#cacheOff">cacheOff</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Sets query caching
+<dt><a href="sqlrcurCmd.tcl-annot.html#cacheToFile">cacheToFile</a> { filename } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Sets query caching on.
+<dt><a href="sqlrcurCmd.tcl-annot.html#clearBinds">clearBinds</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Clears all bind
+<dt><a href="sqlrconCmd.tcl-annot.html#clientVersion">clientVersion</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Returns the version of the sqlrelay client
+<dt><a href="sqlrcurCmd.tcl-annot.html#colCount">colCount</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the number of columns in the current
+ result
+<dt><a href="sqlrconCmd.tcl-annot.html#commit">commit</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Issues a commit.
+<dt><a href="sqlrcurCmd.tcl-annot.html#countBindVariables">countBindVariables</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Parses the previously prepared query
+ counts the number of bind variables defined
+ in it and returns that
+<dt><h3><a name="D">D</a></h3>
+<dt><a href="sqlrconCmd.tcl-annot.html#dbVersion">dbVersion</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Returns the version of the
+<dt><a href="sqlrconCmd.tcl-annot.html#debugOff">debugOff</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Turns debugging
+<dt><a href="sqlrconCmd.tcl-annot.html#debugOn">debugOn</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Causes verbose debugging information to be 
+ sent to standard output.
+<dt><a href="sqlrcurCmd.tcl-annot.html#defineOutputBindBlob">defineOutputBindBlob</a> { variable } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Defines a binary lob output bind
+<dt><a href="sqlrcurCmd.tcl-annot.html#defineOutputBindClob">defineOutputBindClob</a> { variable } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Defines a character lob output bind
+<dt><a href="sqlrcurCmd.tcl-annot.html#defineOutputBindCursor">defineOutputBindCursor</a> { variable } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Defines a cursor output bind
+<dt><a href="sqlrcurCmd.tcl-annot.html#defineOutputBindDouble">defineOutputBindDouble</a> { variable } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Defines a decimal output bind
+<dt><a href="sqlrcurCmd.tcl-annot.html#defineOutputBindInteger">defineOutputBindInteger</a> { variable } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Defines an integer output bind
+<dt><a href="sqlrcurCmd.tcl-annot.html#defineOutputBindString">defineOutputBindString</a> { variable bufferlength } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Defines an output bind variable.
+<dt><a href="sqlrcurCmd.tcl-annot.html#dontGetColumnInfo">dontGetColumnInfo</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Tells the server not to send any column
+ info  {names types sizes}.
+<dt><h3><a name="E">E</a></h3>
+<dt><a href="sqlrcurCmd.tcl-annot.html#endOfResultSet">endOfResultSet</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns false if part of the result set is
+ still pending on the server and true if not.
+<dt><a href="sqlrconCmd.tcl-annot.html#endSession">endSession</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Ends the
+<dt><a href="sqlrconCmd.tcl-annot.html#errorMessage">errorMessage</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>If an operation failed and generated an
+ error the error message is available here.
+<dt><a href="sqlrcurCmd.tcl-annot.html#errorMessage">errorMessage</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>If a query failed and generated an error 
+ the error message is available here.
+<dt><a href="sqlrcurCmd.tcl-annot.html#executeQuery">executeQuery</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Execute the query that was previously 
+ prepared and
+<dt><h3><a name="F">F</a></h3>
+<dt><a href="sqlrcurCmd.tcl-annot.html#fetchFromBindCursor">fetchFromBindCursor</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Fetch from a cursor that was returned as
+ an output bind
+<dt><a href="sqlrcurCmd.tcl-annot.html#firstRowIndex">firstRowIndex</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the index of the first buffered row.
+<dt><h3><a name="G">G</a></h3>
+<dt><a href="sqlrcurCmd.tcl-annot.html#getCacheFileName">getCacheFileName</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the name of the file containing the
+ cached result
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnInfo">getColumnInfo</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Tells the server to send column
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnIsAutoIncrementByIndex">getColumnIsAutoIncrementByIndex</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns true if the specified column
+ auto-increments and false
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnIsAutoIncrementByName">getColumnIsAutoIncrementByName</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns true if the specified column
+ auto-increments and false
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnIsBinaryByIndex">getColumnIsBinaryByIndex</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns true if the specified column
+ contains binary data and false
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnIsBinaryByName">getColumnIsBinaryByName</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns true if the specified column
+ contains binary data and false
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnIsNullableByIndex">getColumnIsNullableByIndex</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns true if the specified column can
+ contain nulls and false
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnIsNullableByName">getColumnIsNullableByName</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns true if the specified column can
+ contain nulls and false
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnIsPartOfKeyByIndex">getColumnIsPartOfKeyByIndex</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns true if the specified column is
+ part of a composite key and false
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnIsPartOfKeyByName">getColumnIsPartOfKeyByName</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns true if the specified column is
+ part of a composite key and false
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnIsPrimaryKeyByIndex">getColumnIsPrimaryKeyByIndex</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns true if the specified column is a
+ primary key and false
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnIsPrimaryKeyByName">getColumnIsPrimaryKeyByName</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns true if the specified column is a
+ primary key and false
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnIsUniqueByIndex">getColumnIsUniqueByIndex</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns true if the specified column is
+ unique and false
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnIsUniqueByName">getColumnIsUniqueByName</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns true if the specified column is
+ unique and false
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnIsUnsignedByIndex">getColumnIsUnsignedByIndex</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns true if the specified column is
+ an unsigned number and false
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnIsUnsignedByName">getColumnIsUnsignedByName</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns true if the specified column is
+ an unsigned number and false
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnIsZeroFilledByIndex">getColumnIsZeroFilledByIndex</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns true if the specified column was
+ created with the zero-fill flag and false
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnIsZeroFilledByName">getColumnIsZeroFilledByName</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns true if the specified column was
+ created with the zero-fill flag and false
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnLengthByIndex">getColumnLengthByIndex</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the number of bytes required on
+ the server to store the data for the specified
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnLengthByName">getColumnLengthByName</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the number of bytes required on
+ the server to store the data for the specified
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnList">getColumnList</a> { table wild } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Sends a query that returns a list of columns
+ in the table specified by the "table" parameter
+ matching "wild".
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnName">getColumnName</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the name of the specified
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnNameByIndex">getColumnNameByIndex</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the name of the specified
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnNames">getColumnNames</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns a null terminated array of the 
+ column names of the current result
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnPrecisionByIndex">getColumnPrecisionByIndex</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the precision of the specified
+ column.
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnPrecisionByName">getColumnPrecisionByName</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the precision of the specified
+ column.
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnScaleByIndex">getColumnScaleByIndex</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the scale of the specified column.
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnScaleByName">getColumnScaleByName</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the scale of the specified column.
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnTypeByIndex">getColumnTypeByIndex</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the type of the specified
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnTypeByName">getColumnTypeByName</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the type of the specified
+<dt><a href="sqlrcurCmd.tcl-annot.html#getColumnTypeByName">getColumnTypeByName</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the type of the specified
+<dt><a href="sqlrconCmd.tcl-annot.html#getConnectionPort">getConnectionPort</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Returns the inet port that the connection is 
+ communicating over.
+<dt><a href="sqlrconCmd.tcl-annot.html#getConnectionSocket">getConnectionSocket</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Returns the unix socket that the connection 
+ is communicating over.
+<dt><a href="sqlrconCmd.tcl-annot.html#getCurrentDatabase">getCurrentDatabase</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Returns the database/schema that is currently in
+<dt><a href="sqlrcurCmd.tcl-annot.html#getDatabaseList">getDatabaseList</a> { wild } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Sends a query that returns a list of
+ databases/schemas matching "wild".
+<dt><a href="sqlrconCmd.tcl-annot.html#getDebug">getDebug</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Returns false if debugging is off and true
+ if debugging is
+<dt><a href="sqlrcurCmd.tcl-annot.html#getFieldAsIntegerByIndex">getFieldAsIntegerByIndex</a> { row col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the specified field as an
+<dt><a href="sqlrcurCmd.tcl-annot.html#getFieldAsIntegerByName">getFieldAsIntegerByName</a> { row col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the specified field as an
+<dt><a href="sqlrcurCmd.tcl-annot.html#getFieldByIndex">getFieldByIndex</a> { row col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the specified field as a
+<dt><a href="sqlrcurCmd.tcl-annot.html#getFieldByName">getFieldByName</a> { row col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the specified field as a
+<dt><a href="sqlrcurCmd.tcl-annot.html#getFieldLengthByIndex">getFieldLengthByIndex</a> { row col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the length of the specified
+<dt><a href="sqlrcurCmd.tcl-annot.html#getFieldLengthByName">getFieldLengthByName</a> { row col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the length of the specified
+<dt><a href="sqlrconCmd.tcl-annot.html#getLastInsertId">getLastInsertId</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Returns the value of the autoincrement
+ column for the last
+<dt><a href="sqlrcurCmd.tcl-annot.html#getLongestByIndex">getLongestByIndex</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the length of the longest field
+ in the specified
+<dt><a href="sqlrcurCmd.tcl-annot.html#getLongestByName">getLongestByName</a> { col } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the length of the longest field
+ in the specified
+<dt><a href="sqlrcurCmd.tcl-annot.html#getOutputBindBlob">getOutputBindBlob</a> { variable } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Get the value stored in a previously
+ defined binary lob output bind
+<dt><a href="sqlrcurCmd.tcl-annot.html#getOutputBindClob">getOutputBindClob</a> { variable } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Get the value stored in a previously
+ defined character lob output bind
+<dt><a href="sqlrcurCmd.tcl-annot.html#getOutputBindCursor">getOutputBindCursor</a> { variable } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Get the cursor associated with a previously
+ defined output bind
+<dt><a href="sqlrcurCmd.tcl-annot.html#getOutputBindDouble">getOutputBindDouble</a> { variable } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Get the value stored in a previously
+ defined decimal output bind
+<dt><a href="sqlrcurCmd.tcl-annot.html#getOutputBindInteger">getOutputBindInteger</a> { variable } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Get the value stored in a previously
+ defined integer output bind
+<dt><a href="sqlrcurCmd.tcl-annot.html#getOutputBindLength">getOutputBindLength</a> { variable } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Get the length of the value stored in a
+ previously defined output bind
+<dt><a href="sqlrcurCmd.tcl-annot.html#getOutputBindString">getOutputBindString</a> { variable } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Get the value stored in a previously
+ defined string output bind
+<dt><a href="sqlrcurCmd.tcl-annot.html#getResultSetBufferSize">getResultSetBufferSize</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the number of result set rows that 
+ will be buffered at a time or 0 for the
+ entire result
+<dt><a href="sqlrcurCmd.tcl-annot.html#getResultSetId">getResultSetId</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the internal ID of this result set.
+<dt><a href="sqlrcurCmd.tcl-annot.html#getRow">getRow</a> { row } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns a null terminated array of the 
+ values of the fields in the specified
+<dt><a href="sqlrcurCmd.tcl-annot.html#getRowLengths">getRowLengths</a> { row } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns a null terminated array of the 
+ lengths of the fields in the specified
+<dt><a href="sqlrcurCmd.tcl-annot.html#getTableList">getTableList</a> { wild } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Sends a query that returns a list of tables
+ matching "wild".
+<dt><h3><a name="I">I</a></h3>
+<dt><a href="sqlrconCmd.tcl-annot.html#identify">identify</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Returns the type of database: 
+ oracle8 postgresql mysql
+<dt><a href="sqlrcurCmd.tcl-annot.html#inputBind">inputBind</a> { variable double value precision scale } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Defines a input bind
+<dt><a href="sqlrcurCmd.tcl-annot.html#inputBindBlob">inputBindBlob</a> { variable value size } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Defines a binary lob input bind
+<dt><a href="sqlrcurCmd.tcl-annot.html#inputBindClob">inputBindClob</a> { variable value size } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Defines a character lob input bind
+<dt><a href="sqlrcurCmd.tcl-annot.html#inputBinds">inputBinds</a> { variables values precisions scales } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Defines an array of input bind
+<dt><h3><a name="L">L</a></h3>
+<dt><a href="sqlrcurCmd.tcl-annot.html#lowerCaseColumnNames">lowerCaseColumnNames</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Columns names are converted to lower
+<dt><h3><a name="M">M</a></h3>
+<dt><a href="sqlrcurCmd.tcl-annot.html#mixedCaseColumnNames">mixedCaseColumnNames</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Columns names are returned in the same
+ case as they are defined in the database.
+<dt><h3><a name="O">O</a></h3>
+<dt><a href="sqlrcurCmd.tcl-annot.html#openCachedResultSet">openCachedResultSet</a> { filename } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Opens a cached result set.
+<dt><h3><a name="P">P</a></h3>
+<dt><a href="sqlrconCmd.tcl-annot.html#ping">ping</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Returns true if the database is up and false
+ if it's
+<dt><a href="sqlrcurCmd.tcl-annot.html#prepareFileQuery">prepareFileQuery</a> { path filename } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Prepare to execute the contents 
+ of "path"/"filename".
+<dt><a href="sqlrcurCmd.tcl-annot.html#prepareQuery">prepareQuery</a> { query } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Prepare to execute
+<dt><a href="sqlrcurCmd.tcl-annot.html#prepareQuery">prepareQuery</a> { query length } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Prepare to execute "query" with length 
+ "length".
+<dt><h3><a name="R">R</a></h3>
+<dt><a href="sqlrcurCmd.tcl-annot.html#resumeCachedResultSet">resumeCachedResultSet</a> { id filename } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Resumes a result set previously left open
+ using suspendSession and continues caching
+ the result set to "filename".
+<dt><a href="sqlrcurCmd.tcl-annot.html#resumeResultSet">resumeResultSet</a> { id } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Resumes a result set previously left open 
+ using suspendSession.
+<dt><a href="sqlrconCmd.tcl-annot.html#resumeSession">resumeSession</a> { port socket } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Resumes a session previously left open 
+ using suspendSession {}.
+<dt><a href="sqlrconCmd.tcl-annot.html#rollback">rollback</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Issues a rollback.
+<dt><a href="sqlrcurCmd.tcl-annot.html#rowCount">rowCount</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the number of rows in the current 
+ result set  {if the result set is being
+ stepped through this returns the number
+ of rows processed so
 <dt><h3><a name="S">S</a></h3>
-<dt><strong><a href="sqlrelayCmd.tcl-annot.html">sqlrelayCmd.tcl</a></strong>  - 
+<dt><a href="sqlrconCmd.tcl-annot.html#selectDatabase">selectDatabase</a> { database } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Sets the current database/schema to
+<dt><a href="sqlrcurCmd.tcl-annot.html#sendFileQuery">sendFileQuery</a> { path filename } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Sends the query in file "path"/"filename" directly
+ and gets a result
+<dt><a href="sqlrcurCmd.tcl-annot.html#sendQuery">sendQuery</a> { query } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Sends "query" directly and gets a result
+<dt><a href="sqlrcurCmd.tcl-annot.html#sendQuery">sendQuery</a> { query length } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Sends "query" with length "length" directly
+ and gets a result set.
+<dt><a href="sqlrconCmd.tcl-annot.html#serverVersion">serverVersion</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Returns the version of the sqlrelay server
+<dt><a href="sqlrcurCmd.tcl-annot.html#setCacheTtl">setCacheTtl</a> { ttl } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Sets the time-to-live for cached result
+ sets.
+<dt><a href="sqlrcurCmd.tcl-annot.html#setResultSetBufferSize">setResultSetBufferSize</a> { rows } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Sets the number of rows of the result set
+ to buffer at a time.
+<dt><a href="sqlrconCmd.tcl-annot.html#setTimeout">setTimeout</a> { timeoutsec timeoutusec } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Sets the server connect timeout in seconds
+ and milliseconds.
+<dt><a href="sqlrconCmd.tcl-annot.html#sqlrconCmd">sqlrconCmd</a> { server port socket user password retrytime tries } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Initiates a connection to "server" on "port"
+ or to the unix "socket" on the local machine
+ and authenticates with "user" and "password".
+<dt><strong><a href="sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a></strong>  - 
 file found in <code>../../../src/api/tcl</code>
 <dd>
+<dt><a href="sqlrconCmd.tcl-annot.html#sqlrconDelete">sqlrconDelete</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Disconnects and ends the session if
+ it hasn't been ended
+<dt><a href="sqlrcurCmd.tcl-annot.html#sqlrcurCmd">sqlrcurCmd</a> { sqlrc } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Creates a cursor to run queries and fetch result
+ sets using connecton
+<dt><strong><a href="sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a></strong>  - 
+file found in <code>../../../src/api/tcl</code>
+<dd>
+<dt><a href="sqlrcurCmd.tcl-annot.html#sqlrcurDelete">sqlrcurDelete</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Destroys the cursor and cleans up all assocuated
+ result set
+<dt><a href="sqlrcurCmd.tcl-annot.html#substitution">substitution</a> { variable value precision scale } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Defines a substitution
+<dt><a href="sqlrcurCmd.tcl-annot.html#substitutions">substitutions</a> { variables values precisions scales } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Defines an array of substitution
+<dt><a href="sqlrcurCmd.tcl-annot.html#suspendResultSet">suspendResultSet</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Tells the server to leave this result
+ set open when the connection calls 
+ suspendSession so that another connection 
+ can connect to it using resumeResultSet 
+ after it calls
+<dt><a href="sqlrconCmd.tcl-annot.html#suspendSession">suspendSession</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Disconnects this connection from the current
+ session but leaves the session open so 
+ that another connection can connect to it 
+ using resumeSession
 <dt><h3><a name="T">T</a></h3>
-<dt><a href="sqlrelayCmd.tcl-annot.html#test{p1">test{p1</a> { p2 } - 
-<a href="./sqlrelayCmd.tcl-annot.html">sqlrelayCmd.tcl</a>
-<dd>test function that does
+<dt><a href="sqlrcurCmd.tcl-annot.html#totalRows">totalRows</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns the total number of rows that will 
+ be returned in the result set.
+<dt><h3><a name="U">U</a></h3>
+<dt><a href="sqlrcurCmd.tcl-annot.html#upperCaseColumnNames">upperCaseColumnNames</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Columns names are converted to upper
+<dt><h3><a name="V">V</a></h3>
+<dt><a href="sqlrcurCmd.tcl-annot.html#validateBinds">validateBinds</a> {  } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>If you are binding to any variables that 
+ might not actually be in your query call 
+ this to ensure that the database won't try 
+ to bind them unless they really are in the 
+ query.
+<dt><a href="sqlrcurCmd.tcl-annot.html#validBind">validBind</a> { variable } - 
+<a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
+<dd>Returns true if "variable" was a valid
+ bind variable of the
 </dl>
 <hr>
 <font size="-2">
@@ -63,7 +536,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2012-01-06 at 05:32.</cite>
+<cite>File generated 2012-01-06 at 06:29.</cite>
 </font>
 </body>
 </html>
