@@ -465,6 +465,20 @@ int mysql_ssl_set(MYSQL *mysql, const char *key, const char *cert,
 	return 0;
 }
 
+const char *mysql_get_ssl_cipher(MYSQL *mysql) {
+	debugFunction();
+	return "";
+}
+
+my_bool mysql_thread_init(void) {
+	debugFunction();
+	return true;
+}
+
+void mysql_thread_end(void) {
+	debugFunction();
+}
+
 MYSQL *mysql_connect(MYSQL *mysql, const char *host,
 			const char *user, const char *passwd) {
 	debugFunction();
@@ -686,6 +700,13 @@ int mysql_set_character_set(MYSQL *mysql, const char *csname) {
 	debugFunction();
 	// FIXME: implement this somehow
 	return 0;
+}
+
+struct MY_CHARSET_INFO;
+
+void mysql_get_character_set_info(MYSQL *mysql, MY_CHARSET_INFO *charset) {
+	debugFunction();
+	// FIXME: implement this somehow
 }
 
 
@@ -2318,6 +2339,11 @@ void mysql_server_end() {
 void mysql_library_end() {
 	debugFunction();
 	// FIXME: do something?
+}
+
+my_bool mysql_embedded() {
+	debugFunction();
+	return false;
 }
 
 int unknownError(MYSQL *mysql) {
