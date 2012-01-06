@@ -107,33 +107,33 @@ install:
 	do \
 		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc; \
 	done
-	for file in `ls api/ruby/doc/classses/*.html`; \
+	for file in `ls api/ruby/dbidoc/classses/*.html`; \
 	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes; \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes; \
 	done
-	for file in `ls api/ruby/doc/classses/DBI/*.html`; \
+	for file in `ls api/ruby/dbidoc/classses/DBI/*.html`; \
 	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes/DBI; \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI; \
 	done
-	for file in `ls api/ruby/doc/classses/DBI/DBD/*.html`; \
+	for file in `ls api/ruby/dbidoc/classses/DBI/DBD/*.html`; \
 	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes/DBI/DBD; \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBD; \
 	done
-	for file in `ls api/ruby/doc/classses/DBI/DBD/SQLRelay/*.html`; \
+	for file in `ls api/ruby/dbidoc/classses/DBI/DBD/SQLRelay/*.html`; \
 	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes/DBI/DBDSQLRelay; \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBDSQLRelay; \
 	done
-	for file in `ls api/ruby/doc/classses/DBI/DBD/SQLRelay/Database.src/*.html`; \
+	for file in `ls api/ruby/dbidoc/classses/DBI/DBD/SQLRelay/Database.src/*.html`; \
 	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes/DBI/DBDSQLRelay/Database.src; \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBDSQLRelay/Database.src; \
 	done
-	for file in `ls api/ruby/doc/classses/DBI/DBD/SQLRelay/Driver.src/*.html`; \
+	for file in `ls api/ruby/dbidoc/classses/DBI/DBD/SQLRelay/Driver.src/*.html`; \
 	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes/DBI/DBDSQLRelay/Driver.src; \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBDSQLRelay/Driver.src; \
 	done
-	for file in `ls api/ruby/doc/classses/DBI/DBD/SQLRelay/Statement.src/*.html`; \
+	for file in `ls api/ruby/dbidoc/classses/DBI/DBD/SQLRelay/Statement.src/*.html`; \
 	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes/DBI/DBDSQLRelay/Statement.src; \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBDSQLRelay/Statement.src; \
 	done
 	$(INSTALL) -m 644 api/java/allclasses-frame.html $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/allclasses-noframe.html $(docdir)/api/java
