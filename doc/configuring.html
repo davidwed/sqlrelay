@@ -251,9 +251,29 @@ where <i>id</i> is the ID of the instance and <i>pid</i> is the process ID of
 the connection daemon that ran the query.  Setting both parameters to 0 will
 cause all queries to be logged.  Setting either to -1 will cause no queries
 to be logged.</li>
-<li><b>fakeinputbindvariables</b> ...</li>
-<li><b>translatebindvariables</b> ...</li>
-<li><b>isolationlevel</b> ...</li>
+<li><b>fakeinputbindvariables</b> - Instead of binding variables using the
+native database API, SQL Relay can fake input bind variables by rewriting the
+query and substituting values directly into it.  Setting this parameter to
+"yes" enables this functionality.  This is useful if you are using an old
+version of a database that doesn't support bind variables natively or if your
+are using a modern version but your app was originally written when the
+database didn't support bind variables natively or when SQL Relay didn't
+support native bind variables with that database.  If enabled, bind variables
+must be specified in the query as a colon, followed by a name or number (eg.
+:var1 or :1) unless the translatebindvariables parameter is also set to
+"yes".</p>
+</li>
+<li><b>translatebindvariables</b> - There is no standaradized format for bind
+variables across databases.  Some databases use question marks to identify bind
+variables, others use colon, dollar-sign or at-signs, followed by either names
+or numbers.  Setting this parameter to "yes" causes SQL Relay to remap the bind
+variables in a query to the native format for whatever database the query is
+being run against.  This is useful when migrating from one database to another
+or when using fake binds against a database that doesn't support
+colon-delimited bind variables.</li>
+<li><b>isolationlevel</b> - Sets the transaction isolation level to the
+specified value.  At the end of each client session, the isolation level will
+be reset to this value as well.</li>
 </ul>
 <li><b>user</b>
 <ul>
