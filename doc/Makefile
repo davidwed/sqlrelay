@@ -135,6 +135,10 @@ install:
 	do \
 		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBDSQLRelay/Statement.src; \
 	done
+	for file in `ls api/ruby/dbidoc/files/*.html`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/files; \
+	done
 	$(INSTALL) -m 644 api/java/allclasses-frame.html $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/allclasses-noframe.html $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/constant-values.html $(docdir)/api/java
