@@ -7,12 +7,19 @@ include ../config.mk
 install:
 	$(MKINSTALLDIRS) $(docdir)
 	$(MKINSTALLDIRS) $(docdir)/api
-	$(MKINSTALLDIRS) $(docdir)/api/c
-	$(MKINSTALLDIRS) $(docdir)/api/c++
+	$(MKINSTALLDIRS) $(docdir)/api/c/html
+	$(MKINSTALLDIRS) $(docdir)/api/c++/html
 	$(MKINSTALLDIRS) $(docdir)/api/perl
-	$(MKINSTALLDIRS) $(docdir)/api/php
+	$(MKINSTALLDIRS) $(docdir)/api/php/media
+	$(MKINSTALLDIRS) $(docdir)/api/php/sql_relay
 	$(MKINSTALLDIRS) $(docdir)/api/python
-	$(MKINSTALLDIRS) $(docdir)/api/ruby
+	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/classes/SQLRConnection.src
+	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/classes/SQLRCursor.src
+	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/files
+	$(MKINSTALLDIRS) $(docdir)/api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Database.src
+	$(MKINSTALLDIRS) $(docdir)/api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Driver.src
+	$(MKINSTALLDIRS) $(docdir)/api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Statement.src
+	$(MKINSTALLDIRS) $(docdir)/api/ruby/dbidoc/files
 	$(MKINSTALLDIRS) $(docdir)/api/java
 	$(MKINSTALLDIRS) $(docdir)/api/tcl
 	$(MKINSTALLDIRS) $(docdir)/dropin
@@ -50,17 +57,84 @@ install:
 	$(INSTALL) -m 644 faq.html $(docdir)
 	$(INSTALL) -m 644 windows.html $(docdir)
 	$(INSTALL) -m 644 css/styles.css $(docdir)/css
-	$(INSTALL) -m 644 api/c/sqlrclientwrapper.h.html $(docdir)/api/c
-	$(INSTALL) -m 644 api/c++/sqlrclient.h.html $(docdir)/api/c++
+	for file in `ls api/c/html/*.html api/c/html/*.css api/c/html/*.png api/c/html/*.js`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/c/html; \
+	done
+	for file in `ls api/c++/html/*.html api/c++/html/*.css api/c++/html/*.png api/c++/html/*.js`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/c++/html; \
+	done
 	$(INSTALL) -m 644 api/perl/perl.html $(docdir)/api/perl
 	$(INSTALL) -m 644 api/perl/Connection.html $(docdir)/api/perl
 	$(INSTALL) -m 644 api/perl/Cursor.html $(docdir)/api/perl
 	$(INSTALL) -m 644 api/perl/SQLRelay.html $(docdir)/api/perl
-	$(INSTALL) -m 644 api/php/doc.html $(docdir)/api/php
+	for file in `ls api/php/*.html`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/php; \
+	done
+	for file in `ls api/php/media/*.css`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/php/media; \
+	done
+	for file in `ls api/php/sql_relay/*.html`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/php/sql_relay; \
+	done
 	$(INSTALL) -m 644 api/python/PySQLRClient.py.html $(docdir)/api/python
 	$(INSTALL) -m 644 api/python/PySQLRDB.py.html $(docdir)/api/python
-	$(INSTALL) -m 644 api/ruby/ruby.html $(docdir)/api/ruby
-	$(INSTALL) -m 644 api/ruby/rubydbi.html $(docdir)/api/ruby
+	for file in `ls api/ruby/doc/*.html api/ruby/doc/*.css`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc; \
+	done
+	for file in `ls api/ruby/doc/classses/*.html`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes; \
+	done
+	for file in `ls api/ruby/doc/classses/SQLRConnection.src/*.html`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes/SQLRConnection.src; \
+	done
+	for file in `ls api/ruby/doc/classses/SQLRCursor.src/*.html`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes/SQLRCursor.src; \
+	done
+	for file in `ls api/ruby/doc/files/*.html`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/files; \
+	done
+	for file in `ls api/ruby/dbidoc/*.html api/ruby/dbidoc/*.css`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc; \
+	done
+	for file in `ls api/ruby/doc/classses/*.html`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes; \
+	done
+	for file in `ls api/ruby/doc/classses/DBI/*.html`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes/DBI; \
+	done
+	for file in `ls api/ruby/doc/classses/DBI/DBD/*.html`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes/DBI/DBD; \
+	done
+	for file in `ls api/ruby/doc/classses/DBI/DBD/SQLRelay/*.html`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes/DBI/DBDSQLRelay; \
+	done
+	for file in `ls api/ruby/doc/classses/DBI/DBD/SQLRelay/Database.src/*.html`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes/DBI/DBDSQLRelay/Database.src; \
+	done
+	for file in `ls api/ruby/doc/classses/DBI/DBD/SQLRelay/Driver.src/*.html`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes/DBI/DBDSQLRelay/Driver.src; \
+	done
+	for file in `ls api/ruby/doc/classses/DBI/DBD/SQLRelay/Statement.src/*.html`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes/DBI/DBDSQLRelay/Statement.src; \
+	done
 	$(INSTALL) -m 644 api/java/allclasses-frame.html $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/allclasses-noframe.html $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/constant-values.html $(docdir)/api/java
@@ -81,6 +155,10 @@ install:
 	$(INSTALL) -m 644 api/java/com/firstworks/sqlrelay/SQLRCursor.html $(docdir)/api/java/com/firstworks/sqlrelay
 	$(MKINSTALLDIRS) $(docdir)/api/java/resources
 	$(INSTALL) -m 644 api/java/resources/inherit.gif $(docdir)/api/java/resources
+	for file in `ls api/tcl/*.html api/tcl/*.txt`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/api/tcl; \
+	done
 	$(INSTALL) -m 644 dropin/mysql.html $(docdir)/dropin
 	$(INSTALL) -m 644 dropin/postgresql.html $(docdir)/dropin
 	$(INSTALL) -m 644 programming/binds.html $(docdir)/programming
