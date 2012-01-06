@@ -87,15 +87,15 @@ install:
 	do \
 		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc; \
 	done
-	for file in `ls api/ruby/doc/classses/*.html`; \
+	for file in `ls api/ruby/doc/classes/*.html`; \
 	do \
 		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes; \
 	done
-	for file in `ls api/ruby/doc/classses/SQLRConnection.src/*.html`; \
+	for file in `ls api/ruby/doc/classes/SQLRConnection.src/*.html`; \
 	do \
 		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes/SQLRConnection.src; \
 	done
-	for file in `ls api/ruby/doc/classses/SQLRCursor.src/*.html`; \
+	for file in `ls api/ruby/doc/classes/SQLRCursor.src/*.html`; \
 	do \
 		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/classes/SQLRCursor.src; \
 	done
@@ -107,31 +107,31 @@ install:
 	do \
 		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc; \
 	done
-	for file in `ls api/ruby/dbidoc/classses/*.html`; \
+	for file in `ls api/ruby/dbidoc/classes/*.html`; \
 	do \
 		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes; \
 	done
-	for file in `ls api/ruby/dbidoc/classses/DBI/*.html`; \
+	for file in `ls api/ruby/dbidoc/classes/DBI/*.html`; \
 	do \
 		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI; \
 	done
-	for file in `ls api/ruby/dbidoc/classses/DBI/DBD/*.html`; \
+	for file in `ls api/ruby/dbidoc/classes/DBI/DBD/*.html`; \
 	do \
 		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBD; \
 	done
-	for file in `ls api/ruby/dbidoc/classses/DBI/DBD/SQLRelay/*.html`; \
+	for file in `ls api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/*.html`; \
 	do \
 		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBDSQLRelay; \
 	done
-	for file in `ls api/ruby/dbidoc/classses/DBI/DBD/SQLRelay/Database.src/*.html`; \
+	for file in `ls api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Database.src/*.html`; \
 	do \
 		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBDSQLRelay/Database.src; \
 	done
-	for file in `ls api/ruby/dbidoc/classses/DBI/DBD/SQLRelay/Driver.src/*.html`; \
+	for file in `ls api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Driver.src/*.html`; \
 	do \
 		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBDSQLRelay/Driver.src; \
 	done
-	for file in `ls api/ruby/dbidoc/classses/DBI/DBD/SQLRelay/Statement.src/*.html`; \
+	for file in `ls api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Statement.src/*.html`; \
 	do \
 		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBDSQLRelay/Statement.src; \
 	done
