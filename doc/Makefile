@@ -121,19 +121,19 @@ install:
 	done
 	for file in `ls api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/*.html`; \
 	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBDSQLRelay; \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBD/SQLRelay; \
 	done
 	for file in `ls api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Database.src/*.html`; \
 	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBDSQLRelay/Database.src; \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Database.src; \
 	done
 	for file in `ls api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Driver.src/*.html`; \
 	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBDSQLRelay/Driver.src; \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Driver.src; \
 	done
 	for file in `ls api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Statement.src/*.html`; \
 	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBDSQLRelay/Statement.src; \
+		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Statement.src; \
 	done
 	for file in `ls api/ruby/dbidoc/files/*.html`; \
 	do \
