@@ -15,6 +15,7 @@
 <li><a href="#php">Using the drop-in replacement library with PHP</a></li>
 <li><a href="#modules">Using the drop-in replacement library with modules</a></li>
 <li><a href="#work">Function support</a></li>
+<li><a href="#tweaks">Tweaks</a></li>
 </ul>
 
 <br>
@@ -380,174 +381,16 @@ programs above)</a>).</p>
 
 <p>The SQL Relay drop-in replacement library for MySQL implements most of the
 native MySQL client library's functions, but there are a few functions that
-aren't implemented because SQL Relay doesn't have a good way to support them.
-These functions return safe values or a failure condition.</p>
+aren't implemented because SQL Relay doesn't d way to support them.  These
+functions return safe values or a failure condition.</p>
 
-<p>Here is a list of functions that are implemented and functions that are not.
-If your application uses one of the functions that is not implemented, you may
-or may not be able to use it with the SQL Relay drop-in replacement library for
-MySQL.</p>
+<br>
+<a name="tweaks"></a>
+<span class="heading2">Tweaks</span><br>
 
-<table border="1">
-<tr><th>Function</th><th>Implemented?</th></tr>
-<tr><td>mysql_thread_safe</td><td>always returns 1</td></tr>
-<tr><td>mysql_init</td><td>yes</td></tr>
-<tr><td>mysql_set_server_option</td><td>does nothing but always returns success</td></tr>
-<tr><td>mysql_options</td><td>does nothing but always returns success</td></tr>
-<tr><td>mysql_ssl_set</td><td>does nothing but always returns success</td></tr>
-<tr><td>mysql_connect</td><td>yes</td></tr>
-<tr><td>mysql_real_connect</td><td>yes</td></tr>
-<tr><td>mysql_close</td><td>yes</td></tr>
-<tr><td>mysql_ping</td><td>yes</td></tr>
-<tr><td>mysql_stat</td><td>returns a string similar to the real mysql_stat but with empty values</td></tr>
-<tr><td>mysql_shutdown</td><td>always returns CR_UNKNOWN_ERROR</td></tr>
-<tr><td>mysql_reload</td><td>yes</td></tr>
-<tr><td>mysql_refresh</td><td>only implemented for refresh_options==REFRESH_GRANT</td></tr>
-<tr><td>mysql_thread_id</td><td>always returns 0</td></tr>
-<tr><td>mysql_list_processes</td><td>always returns NULL</td></tr>
-<tr><td>mysql_kill</td><td>always returns CR_UNKNOWN_ERROR</td></tr>
-<tr><td>mysql_get_client_info</td><td>returns the version string of the client that the library emulates</td></tr>
-<tr><td>mysql_get_client_version</td><td>returns the version number of the client that the library emulates</td></tr>
-<tr><td>mysql_get_host_info</td><td>returns an empty string</td></tr>
-<tr><td>mysql_get_proto_info</td><td>returns the protocol version number of the client that the libary emulates</td></tr>
-<tr><td>mysql_get_server_info</td><td>returns the version string of the client that the library emulates</td></tr>
-<tr><td>mysql_get_server_version</td><td>returns the version number of the client that the libary emulates</td></tr>
-<tr><td>mysql_change_user</td><td>yes</td></tr>
-<tr><td>mysql_character_set_name</td><td>always returns latin1</td></tr>
-<tr><td>mysql_set_character_set</td><td>does nothing, returns success</td></tr>
-<tr><td>mysql_debug</td><td>does nothing</td></tr>
-<tr><td>mysql_dump_debug_info</td><td>always returns failure</td></tr>
-<tr><td>mysql_create_db</td><td>always returns failure</td></tr>
-<tr><td>mysql_select_db</td><td>always returns failure</td></tr>
-<tr><td>mysql_drop_db</td><td>always returns failure</td></tr>
-<tr><td>mysql_list_dbs</td><td>always returns NULL</td></tr>
-<tr><td>mysql_list_tables</td><td>always returns NULL</td></tr>
-<tr><td>mysql_escape_string</td><td>yes</td></tr>
-<tr><td>mysql_odbc_escape_string</td><td>always returns NULL</td></tr>
-<tr><td>myodbc_remove_escape</td><td>does nothing</td></tr>
-<tr><td>mysql_query</td><td>yes</td></tr>
-<tr><td>mysql_send_query</td><td>yes</td></tr>
-<tr><td>mysql_read_query_result</td><td>yes</td></tr>
-<tr><td>mysql_real_escape_string</td><td>implemented but only for utf-8 character set</td></tr>
-<tr><td>mysql_real_query</td><td>yes</td></tr>
-<tr><td>mysql_info</td><td>always returns an empty string</td></tr>
-<tr><td>mysql_insert_id</td><td>always returns 0</td></tr>
-<tr><td>mysql_store_result</td><td>yes</td></tr>
-<tr><td>mysql_use_result</td><td>yes</td></tr>
-<tr><td>mysql_free_result</td><td>yes</td></tr>
-<tr><td>mysql_more_results</td><td>always returns false</td></tr>
-<tr><td>mysql_next_result</td><td>always returns -1</td></tr>
-<tr><td>mysql_list_fields</td><td>always returns NULL</td></tr>
-<tr><td>mysql_num_fields</td><td>yes</td></tr>
-<tr><td>mysql_fetch_field</td><td>yes</td></tr>
-<tr><td>mysql_fetch_fields</td><td>yes</td></tr>
-<tr><td>mysql_fetch_field_direct</td><td>yes</td></tr>
-<tr><td>mysql_fetch_lengths</td><td>yes</td></tr>
-<tr><td>mysql_field_count</td><td>yes</td></tr>
-<tr><td>mysql_field_seek</td><td>yes</td></tr>
-<tr><td>mysql_field_tell</td><td>yes</td></tr>
-<tr><td>mysql_num_rows</td><td>yes</td></tr>
-<tr><td>mysql_affected_rows</td><td>yes</td></tr>
-<tr><td>mysql_row_seek</td><td>yes</td></tr>
-<tr><td>mysql_row_tell</td><td>yes</td></tr>
-<tr><td>mysql_data_seek</td><td>yes</td></tr>
-<tr><td>mysql_fetch_row</td><td>yes</td></tr>
-<tr><td>mysql_eof</td><td>yes</td></tr>
-<tr><td>mysql_warning_count</td><td>always returns 0</td></tr>
-<tr><td>mysql_errno</td><td>yes</td></tr>
-<tr><td>mysql_error</td><td>returns the SQL Relay error string</td></tr>
-<tr><td>mysql_sqlstate</td><td>always returns an empty string</td></tr>
-<tr><td>mysql_commit</td><td>yes</td></tr>
-<tr><td>mysql_rollback</td><td>yes</td></tr>
-<tr><td>mysql_autocommit</td><td>yes</td></tr>
-<tr><td>mysql_prepare</td><td>yes</td></tr>
-<tr><td>mysql_bind_param</td><td>yes, for all types except INT24 and GEOMETRY</td></tr>
-<tr><td>mysql_bind_result</td><td>yes</td></tr>
-<tr><td>mysql_execute</td><td>yes</td></tr>
-<tr><td>mysql_param_count</td><td>yes</td></tr>
-<tr><td>mysql_param_result</td><td>no, the MySQL docs don't even explain what this should do</td></tr>
-<tr><td>mysql_fetch</td><td>yes</td></tr>
-<tr><td>mysql_fetch_column</td><td>no, the MySQL docs don't even explain what this should do</td></tr>
-<tr><td>mysql_get_metadata</td><td>yes</td></tr>
-<tr><td>mysql_send_long_data</td><td>always returns false</td></tr>
-<tr><td>mysql_stmt_num_rows</td><td>yes</td></tr>
-<tr><td>mysql_stmt_affected_rows</td><td>yes</td></tr>
-<tr><td>mysql_stmt_row_seek</td><td>yes</td></tr>
-<tr><td>mysql_stmt_row_tell</td><td>yes</td></tr>
-<tr><td>mysql_stmt_data_seek</td><td>yes</td></tr>
-<tr><td>mysql_stmt_close</td><td>yes</td></tr>
-<tr><td>mysql_stmt_errno</td><td>yes</td></tr>
-<tr><td>mysql_stmt_error</td><td>returns the SQL Relay error string</td></tr>
-<tr><td>mysql_stmt_sqlstate</td><td>always returns an empty string</td></tr>
-<tr><td>mysql_stmt_store_result</td><td>yes</td></tr>
-<tr><td>mysql_stmt_free_result</td><td>yes</td></tr>
-<tr><td>mysql_stmt_reset</td><td>yes</td></tr>
-<tr><td>mysql_server_init</td><td>does nothing</td></tr>
-<tr><td>mysql_library_init</td><td>does nothing</td></tr>
-<tr><td>mysql_server_end</td><td>does nothing</td></tr>
-<tr><td>mysql_library_end</td><td>does nothing</td></tr>
-</table>
+<p>Oracle (and possibly other db's) have a date type that is actually a date/time type but whether you get time information back or not depends on how you fetch the column.  By default, Oracle dates are mapped to the MYSQL_TYPE_DATETIME type.  However, if you want the type to be returned as MYSQL_TYPE_DATE instead, then set the environment variable SQLR_MYSQL_MAP_DATETME_TO_DATE="yes".</p>
 
-<p>The native MySQL client API also defines several data structures.
-Applications are supposed to access fields of the MYSQL_FIELD and MYSQL_BIND
-structures directly.  Applications also access MYSQL_ROW's directly, but
-MYSQL_ROW is just a typedef for (char **).  The SQL Relay drop-in replacement
-library for MySQL supports MYSQL_ROW and the following fields of MYSQL_FIELD and
-MYSQL_BIND.  Note that the MYSQL_BIND structure is only available when emulating
-MySQL 4.1, 5.0 or 5.1 and that the fields of MYSQL_FIELD that are available
-depend on whether the drop-in library is emulating MySQL 3, 4.0, 4.1, 5.0 or
-5.1</p>
-
-<table><tr><td valign="top">
-
-<table border="1">
-<tr><th colspan="2">MYSQL_FIELD</th></tr>
-<tr><th>Field</th><th>Supported?</th></tr>
-<tr><td>name</td><td>yes</td></tr>
-<tr><td>org_name</td><td>no, is always set to the same value as name</td></tr>
-<tr><td>table</td><td>no, is always set to an empty string</td></tr>
-<tr><td>org_table</td><td>no, is always set to an empty string</td></tr>
-<tr><td>db</td><td>no, is always set to an empty string</td></tr>
-<tr><td>catalog</td><td>no, is always set to an empty string</td></tr>
-<tr><td>def</td><td>no, is always set to an empty string</td></tr>
-<tr><td>length</td><td>yes</td></tr>
-<tr><td>max_length</td><td>yes</td></tr>
-<tr><td>name_length</td><td>yes</td></tr>
-<tr><td>org_name_length</td><td>yes, but is always set to the length of name</td></tr>
-<tr><td>table_length</td><td>no, is always set to 0</td></tr>
-<tr><td>org_table_length</td><td>no, is always set to 0</td></tr>
-<tr><td>db_length</td><td>no, is always set to 0</td></tr>
-<tr><td>catalog_length</td><td>no, is always set to 0</td></tr>
-<tr><td>def_length</td><td>no, is always set to 0</td></tr>
-<tr><td>flags</td><td>yes</td></tr>
-<tr><td>decimals</td><td>yes</td></tr>
-<tr><td>charsetnr</td><td>no, is always set to 0</td></tr>
-<tr><td>type</td><td>yes</td></tr>
-</table>
-
-</td><td valign="top">
-
-<table border="1">
-<tr><th colspan="2">MYSQL_BIND</th></tr>
-<tr><th>Field</th><th>Supported?</th></tr>
-<tr><td>length</td><td>yes</td></tr>
-<tr><td>is_null</td><td>yes</td></tr>
-<tr><td>buffer</td><td>yes</td></tr>
-<tr><td>buffer_type</td><td>yes</td></tr>
-<tr><td>buffer_length</td><td>yes</td></tr>
-<tr><td>inter_buffer</td><td>no</td></tr>
-<tr><td>offset</td><td>no</td></tr>
-<tr><td>internal_length</td><td>no</td></tr>
-<tr><td>param_number</td><td>no</td></tr>
-<tr><td>long_data_used</td><td>no</td></tr>
-<tr><td>binary_data</td><td>no</td></tr>
-<tr><td>null_field</td><td>no</td></tr>
-<tr><td>internal_is_null</td><td>no</td></tr>
-<tr><td>store_param_func</td><td>no</td></tr>
-<tr><td>fetch_result</td><td>no</td></tr>
-</table>
-
-</td></tr></table>
+<p>When fetching a date into a MYSQL_TIME struct, the drop-in library attempts to interpret whatever it got back from the database as a date.  It can parse the native formats of all the databases that SQL Relay currently supports, but it cannot tell by examination whether a date like 2011-02-05 is in YYYY-MM-DD format or YYYY-DD-MM format.  By default, it assumes MMDD, but if you want it to assume DDMM instead, set the environment variable SQLR_MYSQL_DATE_DDMM="yes".</p>
 
 </body>
 </html>
