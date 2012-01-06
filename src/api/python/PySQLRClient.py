@@ -192,6 +192,8 @@ class sqlrconnection:
     def debugOn(self):
         """
         Turn verbose debugging on.
+	Another way to do this is to start a query with "-- debug\n".
+	Yet another way is to set the environment variable SQLRDEBUG to "ON"
         """
         return CSQLRelay.debugOn(self.connection)
 

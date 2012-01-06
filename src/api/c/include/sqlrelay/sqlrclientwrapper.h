@@ -144,7 +144,8 @@ const char	*sqlrcon_errorMessage(sqlrcon sqlrconref);
 
 /** @ingroup sqlrclientwrapper
  *  Causes verbose debugging information to be sent to standard output.
- *  Another way to do this is to start a query with "-- debug\n". */
+ *  Another way to do this is to start a query with "-- debug\n".
+ *  Yet another way is to set the environment variable SQLRDEBUG to "ON" */
 void	sqlrcon_debugOn(sqlrcon sqlrconref);
 
 /** @ingroup sqlrclientwrapper
@@ -171,7 +172,7 @@ void	sqlrcon_debugPrintFunction(sqlrcon sqlrconref,
 sqlrcur	sqlrcur_alloc(sqlrcon sqlrconref);
 
 /** @ingroup sqlrclientwrapper
- *  Destroys the cursor and cleans up all associated result set data. *//
+ *  Destroys the cursor and cleans up all associated result set data. */
 void	sqlrcur_free(sqlrcur sqlrcurref);
 
 

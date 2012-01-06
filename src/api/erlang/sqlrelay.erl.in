@@ -87,6 +87,7 @@ stop() ->
 % API functions
 %
 
+% alloc function documentation...
 alloc(Server, Port, Socket, User, Password, Retrytime, Tries) 
 	when is_list(Server), is_integer(Port), is_list(User), is_list(Password), is_integer(Retrytime), is_integer(Tries) -> 
 	put("connection", "true"),

@@ -127,6 +127,8 @@ proc errorMessage {}
 # Causes verbose debugging information to be 
 # sent to standard output.  Another way to do
 # this is to start a query with "-- debug\n".
+# Another way is to set the environment variable
+# SQLRDEBUG to "ON"
 proc debugOn {} 
 
 # Turns debugging off.

@@ -372,7 +372,7 @@ Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p>Causes verbose debugging information to be sent to standard output. Another way to do this is to start a query with "-- debug\n". </p>
+<p>Causes verbose debugging information to be sent to standard output. Another way to do this is to start a query with "-- debug\n". Yet another way is to set the environment variable SQLRDEBUG to "ON" </p>
 
 </div>
 </div>
@@ -1344,7 +1344,7 @@ Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p>Returns 1 if the specified column can contain nulls and 0 otherwise. </p>
+<p>Returns the scale of the specified column. Scale is the total number of digits to the right of the decimal point in a number. eg: 123.45 has a scale of 2. </p>
 
 </div>
 </div>
@@ -3737,7 +3737,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Wed Jan 4 2012 for SQL Relay C API by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Jan 6 2012 for SQL Relay C API by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

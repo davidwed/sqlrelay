@@ -118,7 +118,9 @@ public class SQLRConnection {
 
 	/** Causes verbose debugging information to be 
 	 *  sent to standard output.  Another way to do
-	 *  this is to start a query with "-- debug\n". */
+	 *  this is to start a query with "-- debug\n". 
+	 *  Yet another way is to set the environment
+	 *  variable SQLRDEBUG to "ON" */
 	public native void	debugOn();
 
 	/** Turns debugging off. */
