@@ -331,7 +331,11 @@ class sqlrcursor {
 		/** Defines a integer input bind variable. */
 		void	inputBind(const char *variable, int64_t value);
 
-		/** Defines a decimal input bind variable. */
+		/** Defines a decimal input bind variable.
+		  * (If you don't have the precision and scale then set
+		  * them both 0.  However in that case you may get
+		  * unexpected rounding behavior if the server is faking
+		  * binds.) */
 		void	inputBind(const char *variable, double value, 
 							uint32_t precision, 
 							uint32_t scale);

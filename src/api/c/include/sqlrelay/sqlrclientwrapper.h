@@ -352,7 +352,11 @@ void	sqlrcur_inputBindLong(sqlrcur sqlrcurref, const char *variable,
 							int64_t value);
 
 /** @ingroup sqlrclientwrapper
- *  Defines a decimal input bind variable. */
+ *  Defines a decimal input bind variable.
+ * (If you don't have the precision and scale then set
+ * them both to 0.  However in that case you may get
+ * unexpected rounding behavior if the server is faking
+ * binds.) */
 void	sqlrcur_inputBindDouble(sqlrcur sqlrcurref, 
 					const char *variable, double value,
 					uint32_t precision, 

@@ -341,8 +341,10 @@ a&nbsp;list&nbsp;of&nbsp;all&nbsp;tables&nbsp;will&nbsp;be&nbsp;returned.</tt></
 
 <dl><dt><a name="sqlrcursor-inputBind"><strong>inputBind</strong></a>(self, variable, value, precision<font color="#909090">=0</font>, scale<font color="#909090">=0</font>)</dt><dd><tt>Define&nbsp;an&nbsp;input&nbsp;bind&nbsp;varaible.<br>
 Returns&nbsp;true&nbsp;if&nbsp;the&nbsp;variable&nbsp;was&nbsp;successfully&nbsp;bound&nbsp;or&nbsp;false&nbsp;if&nbsp;the<br>
-variable&nbsp;isn't&nbsp;a&nbsp;string,&nbsp;integer&nbsp;or&nbsp;floating&nbsp;point&nbsp;number,&nbsp;or&nbsp;if<br>
-precision&nbsp;and&nbsp;scale&nbsp;aren't&nbsp;provided&nbsp;for&nbsp;a&nbsp;floating&nbsp;point&nbsp;number.</tt></dd></dl>
+variable&nbsp;isn't&nbsp;a&nbsp;string,&nbsp;integer&nbsp;or&nbsp;decimal.&nbsp;&nbsp;If&nbsp;the&nbsp;value&nbsp;is&nbsp;a&nbsp;decimal<br>
+then&nbsp;precision&nbsp;and&nbsp;scale&nbsp;may&nbsp;also&nbsp;be&nbsp;specified.&nbsp;&nbsp;If&nbsp;you&nbsp;don't&nbsp;have&nbsp;the<br>
+precision&nbsp;and&nbsp;scale&nbsp;then&nbsp;set&nbsp;them&nbsp;both&nbsp;to&nbsp;0.&nbsp;&nbsp;However&nbsp;in&nbsp;that&nbsp;case&nbsp;you<br>
+may&nbsp;get&nbsp;unexpected&nbsp;rounding&nbsp;behavior&nbsp;if&nbsp;the&nbsp;server&nbsp;is&nbsp;faking&nbsp;binds.</tt></dd></dl>
 
 <dl><dt><a name="sqlrcursor-inputBindBlob"><strong>inputBindBlob</strong></a>(self, variable, value, length)</dt><dd><tt>Define&nbsp;an&nbsp;input&nbsp;bind&nbsp;varaible.</tt></dd></dl>
 

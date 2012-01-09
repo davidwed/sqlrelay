@@ -422,8 +422,10 @@ class sqlrcursor:
         """
         Define an input bind varaible.
         Returns true if the variable was successfully bound or false if the
-        variable isn't a string, integer or floating point number, or if
-        precision and scale aren't provided for a floating point number.
+        variable isn't a string, integer or decimal.  If the value is a decimal
+	then precision and scale may also be specified.  If you don't have the
+	precision and scale then set them both to 0.  However in that case you
+	may get unexpected rounding behavior if the server is faking binds.
         """
         return CSQLRelay.inputBind(self.cursor, variable, value, precision, scale)
 

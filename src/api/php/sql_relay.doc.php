@@ -282,8 +282,10 @@ function sqlrcur_substitution($sqlrcurref, $variable, $value){}
 
 /** 
  *  Defines an input bind variable.  The value may be a string,
- *  integer or decimal.  If it is a decimal, then precision and scale may
- *  also be specified */
+ *  integer or decimal.  If the value is a decimal, then precision and scale may
+ *  also be specified.  If you don't have the precision and scale then set them
+ *  both to 0.  However in that case you may get unexpected rounding behavior
+ *  if the server is faking binds. */
 function sqlrcur_inputBind($sqlrcurref, $variable, $value, $precision, $scale){}
 
 /** 

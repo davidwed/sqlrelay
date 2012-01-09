@@ -114,7 +114,11 @@ public class SQLRCursor {
 						String value, int length);
 	/** Define an input bind variable.  */
 	public native void	inputBind(String variable, long value);
-	/** Define an input bind variable.  */
+	/** Define an input bind variable.
+	  * (If you don't have the precision and scale then they may
+	  * both be set to 0.  However in that case you may get
+	  * unexpected rounding behavior if the server is faking
+	  * binds.) */
 	public native void	inputBind(String variable, double value, 
 					int precision, int scale);
 	/** Define an input bind variable.  */

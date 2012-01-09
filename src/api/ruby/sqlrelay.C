@@ -653,7 +653,9 @@ static VALUE sqlrcur_substitution(int argc, VALUE *argv, VALUE self) {
  *
  *  Defines am input bind variable.  The value may be a string, integer or
  *  decimal.  If it is a decimal then the precision and scale may be
- *  specified. */
+ *  specified. If you don't have the precision and scale then set them
+ *  both to 0.  However in that case you may get unexpected rounding behavior
+ *  if the server is faking binds. */
 static VALUE sqlrcur_inputBind(int argc, VALUE *argv, VALUE self) {
 	sqlrcursor	*sqlrcur;
 	VALUE	variable;

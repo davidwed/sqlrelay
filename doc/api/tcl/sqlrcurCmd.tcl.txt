@@ -130,7 +130,11 @@ proc substitutions {variables values precisions scales}
 
 
 # Defines a input bind variable.
-proc inputBind {variable double value precision scale} 
+# The value may be a string, integer or decimal.  If the value is a decimal,
+# then precision and scale may also be specified.  If you don't have the
+# precision and scale then set them both to 0.  However in that case you may
+# get unexpected rounding behavior if the server is faking binds.
+proc inputBind {variable value precision scale} 
 
 # Defines a binary lob input bind variable.
 proc inputBindBlob {variable value size} 
@@ -295,10 +299,10 @@ proc getFieldAsIntegerByIndex {row  col}
 proc getFieldAsIntegerByName {row col} 
 
 # Returns the specified field as a decimal.
-double	getFieldAsDoubleByIndex {row  col} 
+proc getFieldAsDoubleByIndex {row  col} 
 
 # Returns the specified field as a decimal.
-double	getFieldAsDoubleByName {row col} 
+proc getFieldAsDoubleByName {row col} 
 
 
 

@@ -153,6 +153,10 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <tr><td><code><a href="#getDatabaseList">getDatabaseList</a> { wild }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sends a query that returns a list of
  databases/schemas matching "wild".</td></tr>
+<tr><td><code><a href="#getFieldAsDoubleByIndex">getFieldAsDoubleByIndex</a> { row col }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the specified field as a</td></tr>
+<tr><td><code><a href="#getFieldAsDoubleByName">getFieldAsDoubleByName</a> { row col }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the specified field as a</td></tr>
 <tr><td><code><a href="#getFieldAsIntegerByIndex">getFieldAsIntegerByIndex</a> { row col }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the specified field as an</td></tr>
 <tr><td><code><a href="#getFieldAsIntegerByName">getFieldAsIntegerByName</a> { row col }</code><br>
@@ -207,8 +211,8 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <tr><td><code><a href="#getTableList">getTableList</a> { wild }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sends a query that returns a list of tables
  matching "wild".</td></tr>
-<tr><td><code><a href="#inputBind">inputBind</a> { variable double value precision scale }</code><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Defines a input bind</td></tr>
+<tr><td><code><a href="#inputBind">inputBind</a> { variable value precision scale }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Defines a input bind variable.</td></tr>
 <tr><td><code><a href="#inputBindBlob">inputBindBlob</a> { variable value size }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Defines a binary lob input bind</td></tr>
 <tr><td><code><a href="#inputBindClob">inputBindClob</a> { variable value size }</code><br>
@@ -306,7 +310,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
  to be portable across databases.  0 is 
  returned by databases which don't support 
  this option.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#affectedRows_261">sqlrcurCmd.tcl, line 261</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#affectedRows_265">sqlrcurCmd.tcl, line 265</a>
 </dl></dl>
 
 <hr>
@@ -341,7 +345,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc clearBinds {  }</pre>
 <dl>
 <dd>Clears all bind variables.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#clearBinds_169">sqlrcurCmd.tcl, line 169</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#clearBinds_173">sqlrcurCmd.tcl, line 173</a>
 </dl></dl>
 
 <hr>
@@ -350,7 +354,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns the number of columns in the current
  result set.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#colCount_238">sqlrcurCmd.tcl, line 238</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#colCount_242">sqlrcurCmd.tcl, line 242</a>
 </dl></dl>
 
 <hr>
@@ -360,7 +364,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dd>Parses the previously prepared query
  counts the number of bind variables defined
  in it and returns that number.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#countBindVariables_174">sqlrcurCmd.tcl, line 174</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#countBindVariables_178">sqlrcurCmd.tcl, line 178</a>
 </dl></dl>
 
 <hr>
@@ -368,7 +372,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc defineOutputBindBlob { variable }</pre>
 <dl>
 <dd>Defines a binary lob output bind variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#defineOutputBindBlob_158">sqlrcurCmd.tcl, line 158</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#defineOutputBindBlob_162">sqlrcurCmd.tcl, line 162</a>
 </dl></dl>
 
 <hr>
@@ -376,7 +380,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc defineOutputBindClob { variable }</pre>
 <dl>
 <dd>Defines a character lob output bind variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#defineOutputBindClob_161">sqlrcurCmd.tcl, line 161</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#defineOutputBindClob_165">sqlrcurCmd.tcl, line 165</a>
 </dl></dl>
 
 <hr>
@@ -384,7 +388,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc defineOutputBindCursor { variable }</pre>
 <dl>
 <dd>Defines a cursor output bind variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#defineOutputBindCursor_164">sqlrcurCmd.tcl, line 164</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#defineOutputBindCursor_168">sqlrcurCmd.tcl, line 168</a>
 </dl></dl>
 
 <hr>
@@ -392,7 +396,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc defineOutputBindDouble { variable }</pre>
 <dl>
 <dd>Defines a decimal output bind variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#defineOutputBindDouble_155">sqlrcurCmd.tcl, line 155</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#defineOutputBindDouble_159">sqlrcurCmd.tcl, line 159</a>
 </dl></dl>
 
 <hr>
@@ -400,7 +404,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc defineOutputBindInteger { variable }</pre>
 <dl>
 <dd>Defines an integer output bind variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#defineOutputBindInteger_152">sqlrcurCmd.tcl, line 152</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#defineOutputBindInteger_156">sqlrcurCmd.tcl, line 156</a>
 </dl></dl>
 
 <hr>
@@ -410,7 +414,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dd>Defines an output bind variable.
  "bufferlength" bytes will be reserved
  to store the value.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#defineOutputBindString_149">sqlrcurCmd.tcl, line 149</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#defineOutputBindString_153">sqlrcurCmd.tcl, line 153</a>
 </dl></dl>
 
 <hr>
@@ -433,7 +437,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
  This method can only return false if 
  setResultSetBufferSize {} has been called
  with a parameter other than 0.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#endOfResultSet_273">sqlrcurCmd.tcl, line 273</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#endOfResultSet_277">sqlrcurCmd.tcl, line 277</a>
 </dl></dl>
 
 <hr>
@@ -444,7 +448,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
  the error message is available here.  If 
  the query succeeded then this method 
  returns NULL.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#errorMessage_281">sqlrcurCmd.tcl, line 281</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#errorMessage_285">sqlrcurCmd.tcl, line 285</a>
 </dl></dl>
 
 <hr>
@@ -453,7 +457,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Execute the query that was previously 
  prepared and bound.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#executeQuery_192">sqlrcurCmd.tcl, line 192</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#executeQuery_196">sqlrcurCmd.tcl, line 196</a>
 </dl></dl>
 
 <hr>
@@ -462,7 +466,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Fetch from a cursor that was returned as
  an output bind variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#fetchFromBindCursor_196">sqlrcurCmd.tcl, line 196</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#fetchFromBindCursor_200">sqlrcurCmd.tcl, line 200</a>
 </dl></dl>
 
 <hr>
@@ -472,7 +476,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dd>Returns the index of the first buffered row.
  This is useful when buffering only part of
  the result set at a time.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#firstRowIndex_266">sqlrcurCmd.tcl, line 266</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#firstRowIndex_270">sqlrcurCmd.tcl, line 270</a>
 </dl></dl>
 
 <hr>
@@ -498,7 +502,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns true if the specified column
  auto-increments and false otherwise.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsAutoIncrementByIndex_438">sqlrcurCmd.tcl, line 438</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsAutoIncrementByIndex_442">sqlrcurCmd.tcl, line 442</a>
 </dl></dl>
 
 <hr>
@@ -507,7 +511,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns true if the specified column
  auto-increments and false otherwise.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsAutoIncrementByName_442">sqlrcurCmd.tcl, line 442</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsAutoIncrementByName_446">sqlrcurCmd.tcl, line 446</a>
 </dl></dl>
 
 <hr>
@@ -517,7 +521,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dd>Returns true if the specified column
  contains binary data and false
  otherwise.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsBinaryByIndex_429">sqlrcurCmd.tcl, line 429</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsBinaryByIndex_433">sqlrcurCmd.tcl, line 433</a>
 </dl></dl>
 
 <hr>
@@ -527,7 +531,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dd>Returns true if the specified column
  contains binary data and false
  otherwise.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsBinaryByName_434">sqlrcurCmd.tcl, line 434</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsBinaryByName_438">sqlrcurCmd.tcl, line 438</a>
 </dl></dl>
 
 <hr>
@@ -536,7 +540,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns true if the specified column can
  contain nulls and false otherwise.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsNullableByIndex_378">sqlrcurCmd.tcl, line 378</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsNullableByIndex_382">sqlrcurCmd.tcl, line 382</a>
 </dl></dl>
 
 <hr>
@@ -545,7 +549,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns true if the specified column can
  contain nulls and false otherwise.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsNullableByName_382">sqlrcurCmd.tcl, line 382</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsNullableByName_386">sqlrcurCmd.tcl, line 386</a>
 </dl></dl>
 
 <hr>
@@ -554,7 +558,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns true if the specified column is
  part of a composite key and false otherwise.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsPartOfKeyByIndex_402">sqlrcurCmd.tcl, line 402</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsPartOfKeyByIndex_406">sqlrcurCmd.tcl, line 406</a>
 </dl></dl>
 
 <hr>
@@ -563,7 +567,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns true if the specified column is
  part of a composite key and false otherwise.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsPartOfKeyByName_406">sqlrcurCmd.tcl, line 406</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsPartOfKeyByName_410">sqlrcurCmd.tcl, line 410</a>
 </dl></dl>
 
 <hr>
@@ -572,7 +576,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns true if the specified column is a
  primary key and false otherwise.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsPrimaryKeyByIndex_386">sqlrcurCmd.tcl, line 386</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsPrimaryKeyByIndex_390">sqlrcurCmd.tcl, line 390</a>
 </dl></dl>
 
 <hr>
@@ -581,7 +585,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns true if the specified column is a
  primary key and false otherwise.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsPrimaryKeyByName_390">sqlrcurCmd.tcl, line 390</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsPrimaryKeyByName_394">sqlrcurCmd.tcl, line 394</a>
 </dl></dl>
 
 <hr>
@@ -590,7 +594,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns true if the specified column is
  unique and false otherwise.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsUniqueByIndex_394">sqlrcurCmd.tcl, line 394</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsUniqueByIndex_398">sqlrcurCmd.tcl, line 398</a>
 </dl></dl>
 
 <hr>
@@ -599,7 +603,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns true if the specified column is
  unique and false otherwise.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsUniqueByName_398">sqlrcurCmd.tcl, line 398</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsUniqueByName_402">sqlrcurCmd.tcl, line 402</a>
 </dl></dl>
 
 <hr>
@@ -608,7 +612,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns true if the specified column is
  an unsigned number and false otherwise.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsUnsignedByIndex_410">sqlrcurCmd.tcl, line 410</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsUnsignedByIndex_414">sqlrcurCmd.tcl, line 414</a>
 </dl></dl>
 
 <hr>
@@ -617,7 +621,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns true if the specified column is
  an unsigned number and false otherwise.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsUnsignedByName_414">sqlrcurCmd.tcl, line 414</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsUnsignedByName_418">sqlrcurCmd.tcl, line 418</a>
 </dl></dl>
 
 <hr>
@@ -627,7 +631,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dd>Returns true if the specified column was
  created with the zero-fill flag and false
  otherwise.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsZeroFilledByIndex_419">sqlrcurCmd.tcl, line 419</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsZeroFilledByIndex_423">sqlrcurCmd.tcl, line 423</a>
 </dl></dl>
 
 <hr>
@@ -637,7 +641,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dd>Returns true if the specified column was
  created with the zero-fill flag and false
  otherwise.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsZeroFilledByName_424">sqlrcurCmd.tcl, line 424</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnIsZeroFilledByName_428">sqlrcurCmd.tcl, line 428</a>
 </dl></dl>
 
 <hr>
@@ -646,7 +650,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns the number of bytes required on
  the server to store the data for the specified column<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnLengthByIndex_342">sqlrcurCmd.tcl, line 342</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnLengthByIndex_346">sqlrcurCmd.tcl, line 346</a>
 </dl></dl>
 
 <hr>
@@ -655,7 +659,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns the number of bytes required on
  the server to store the data for the specified column<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnLengthByName_346">sqlrcurCmd.tcl, line 346</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnLengthByName_350">sqlrcurCmd.tcl, line 350</a>
 </dl></dl>
 
 <hr>
@@ -674,7 +678,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc getColumnName { col }</pre>
 <dl>
 <dd>Returns the name of the specified column.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnName_326">sqlrcurCmd.tcl, line 326</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnName_330">sqlrcurCmd.tcl, line 330</a>
 </dl></dl>
 
 <hr>
@@ -682,7 +686,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc getColumnNameByIndex { col }</pre>
 <dl>
 <dd>Returns the name of the specified column.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnNameByIndex_329">sqlrcurCmd.tcl, line 329</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnNameByIndex_333">sqlrcurCmd.tcl, line 333</a>
 </dl></dl>
 
 <hr>
@@ -691,7 +695,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns a null terminated array of the 
  column names of the current result set.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnNames_323">sqlrcurCmd.tcl, line 323</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnNames_327">sqlrcurCmd.tcl, line 327</a>
 </dl></dl>
 
 <hr>
@@ -704,7 +708,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
  a number.  eg: 123.45 has a precision of 5.
  For non-numeric types it's the number of
  characters in the string.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnPrecisionByIndex_354">sqlrcurCmd.tcl, line 354</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnPrecisionByIndex_358">sqlrcurCmd.tcl, line 358</a>
 </dl></dl>
 
 <hr>
@@ -717,7 +721,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
  a number.  eg: 123.45 has a precision of 5.
  For non-numeric types it's the number of
  characters in the string.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnPrecisionByName_362">sqlrcurCmd.tcl, line 362</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnPrecisionByName_366">sqlrcurCmd.tcl, line 366</a>
 </dl></dl>
 
 <hr>
@@ -728,7 +732,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
  Scale is the total number of digits to the
  right of the decimal point in a number.
  eg: 123.45 has a scale of 2.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnScaleByIndex_368">sqlrcurCmd.tcl, line 368</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnScaleByIndex_372">sqlrcurCmd.tcl, line 372</a>
 </dl></dl>
 
 <hr>
@@ -739,7 +743,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
  Scale is the total number of digits to the
  right of the decimal point in a number.
  eg: 123.45 has a scale of 2.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnScaleByName_374">sqlrcurCmd.tcl, line 374</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnScaleByName_378">sqlrcurCmd.tcl, line 378</a>
 </dl></dl>
 
 <hr>
@@ -747,7 +751,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc getColumnTypeByIndex { col }</pre>
 <dl>
 <dd>Returns the type of the specified column.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnTypeByIndex_335">sqlrcurCmd.tcl, line 335</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnTypeByIndex_339">sqlrcurCmd.tcl, line 339</a>
 </dl></dl>
 
 <hr>
@@ -755,7 +759,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc getColumnTypeByName { col }</pre>
 <dl>
 <dd>Returns the type of the specified column.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnTypeByName_338">sqlrcurCmd.tcl, line 338</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnTypeByName_342">sqlrcurCmd.tcl, line 342</a>
 </dl></dl>
 
 <hr>
@@ -763,7 +767,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc getColumnTypeByName { col }</pre>
 <dl>
 <dd>Returns the type of the specified column.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnTypeByName_338">sqlrcurCmd.tcl, line 338</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getColumnTypeByName_342">sqlrcurCmd.tcl, line 342</a>
 </dl></dl>
 
 <hr>
@@ -778,11 +782,27 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 </dl></dl>
 
 <hr>
+<h3><a name="getFieldAsDoubleByIndex">getFieldAsDoubleByIndex</a></h3>
+<pre>proc getFieldAsDoubleByIndex { row col }</pre>
+<dl>
+<dd>Returns the specified field as a decimal.<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getFieldAsDoubleByIndex_302">sqlrcurCmd.tcl, line 302</a>
+</dl></dl>
+
+<hr>
+<h3><a name="getFieldAsDoubleByName">getFieldAsDoubleByName</a></h3>
+<pre>proc getFieldAsDoubleByName { row col }</pre>
+<dl>
+<dd>Returns the specified field as a decimal.<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getFieldAsDoubleByName_305">sqlrcurCmd.tcl, line 305</a>
+</dl></dl>
+
+<hr>
 <h3><a name="getFieldAsIntegerByIndex">getFieldAsIntegerByIndex</a></h3>
 <pre>proc getFieldAsIntegerByIndex { row col }</pre>
 <dl>
 <dd>Returns the specified field as an integer.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getFieldAsIntegerByIndex_292">sqlrcurCmd.tcl, line 292</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getFieldAsIntegerByIndex_296">sqlrcurCmd.tcl, line 296</a>
 </dl></dl>
 
 <hr>
@@ -790,7 +810,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc getFieldAsIntegerByName { row col }</pre>
 <dl>
 <dd>Returns the specified field as an integer.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getFieldAsIntegerByName_295">sqlrcurCmd.tcl, line 295</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getFieldAsIntegerByName_299">sqlrcurCmd.tcl, line 299</a>
 </dl></dl>
 
 <hr>
@@ -798,7 +818,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc getFieldByIndex { row col }</pre>
 <dl>
 <dd>Returns the specified field as a string.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getFieldByIndex_286">sqlrcurCmd.tcl, line 286</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getFieldByIndex_290">sqlrcurCmd.tcl, line 290</a>
 </dl></dl>
 
 <hr>
@@ -806,7 +826,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc getFieldByName { row col }</pre>
 <dl>
 <dd>Returns the specified field as a string<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getFieldByName_289">sqlrcurCmd.tcl, line 289</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getFieldByName_293">sqlrcurCmd.tcl, line 293</a>
 </dl></dl>
 
 <hr>
@@ -814,7 +834,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc getFieldLengthByIndex { row col }</pre>
 <dl>
 <dd>Returns the length of the specified field.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getFieldLengthByIndex_306">sqlrcurCmd.tcl, line 306</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getFieldLengthByIndex_310">sqlrcurCmd.tcl, line 310</a>
 </dl></dl>
 
 <hr>
@@ -822,7 +842,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc getFieldLengthByName { row col }</pre>
 <dl>
 <dd>Returns the length of the specified field.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getFieldLengthByName_309">sqlrcurCmd.tcl, line 309</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getFieldLengthByName_313">sqlrcurCmd.tcl, line 313</a>
 </dl></dl>
 
 <hr>
@@ -831,7 +851,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns the length of the longest field
  in the specified column.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getLongestByIndex_446">sqlrcurCmd.tcl, line 446</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getLongestByIndex_450">sqlrcurCmd.tcl, line 450</a>
 </dl></dl>
 
 <hr>
@@ -840,7 +860,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns the length of the longest field
  in the specified column.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getLongestByName_450">sqlrcurCmd.tcl, line 450</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getLongestByName_454">sqlrcurCmd.tcl, line 454</a>
 </dl></dl>
 
 <hr>
@@ -849,7 +869,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Get the value stored in a previously
  defined binary lob output bind variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getOutputBindBlob_214">sqlrcurCmd.tcl, line 214</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getOutputBindBlob_218">sqlrcurCmd.tcl, line 218</a>
 </dl></dl>
 
 <hr>
@@ -858,7 +878,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Get the value stored in a previously
  defined character lob output bind variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getOutputBindClob_218">sqlrcurCmd.tcl, line 218</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getOutputBindClob_222">sqlrcurCmd.tcl, line 222</a>
 </dl></dl>
 
 <hr>
@@ -867,7 +887,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Get the cursor associated with a previously
  defined output bind variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getOutputBindCursor_226">sqlrcurCmd.tcl, line 226</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getOutputBindCursor_230">sqlrcurCmd.tcl, line 230</a>
 </dl></dl>
 
 <hr>
@@ -876,7 +896,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Get the value stored in a previously
  defined decimal output bind variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getOutputBindDouble_210">sqlrcurCmd.tcl, line 210</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getOutputBindDouble_214">sqlrcurCmd.tcl, line 214</a>
 </dl></dl>
 
 <hr>
@@ -885,7 +905,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Get the value stored in a previously
  defined integer output bind variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getOutputBindInteger_206">sqlrcurCmd.tcl, line 206</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getOutputBindInteger_210">sqlrcurCmd.tcl, line 210</a>
 </dl></dl>
 
 <hr>
@@ -894,7 +914,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Get the length of the value stored in a
  previously defined output bind variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getOutputBindLength_222">sqlrcurCmd.tcl, line 222</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getOutputBindLength_226">sqlrcurCmd.tcl, line 226</a>
 </dl></dl>
 
 <hr>
@@ -903,7 +923,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Get the value stored in a previously
  defined string output bind variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getOutputBindString_202">sqlrcurCmd.tcl, line 202</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getOutputBindString_206">sqlrcurCmd.tcl, line 206</a>
 </dl></dl>
 
 <hr>
@@ -926,7 +946,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
  method.
  Note: The value this method returns is only
  valid after a call to suspendResultSet.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getResultSetId_467">sqlrcurCmd.tcl, line 467</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getResultSetId_471">sqlrcurCmd.tcl, line 471</a>
 </dl></dl>
 
 <hr>
@@ -935,7 +955,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns a null terminated array of the 
  values of the fields in the specified row.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getRow_315">sqlrcurCmd.tcl, line 315</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getRow_319">sqlrcurCmd.tcl, line 319</a>
 </dl></dl>
 
 <hr>
@@ -944,7 +964,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns a null terminated array of the 
  lengths of the fields in the specified row.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getRowLengths_319">sqlrcurCmd.tcl, line 319</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#getRowLengths_323">sqlrcurCmd.tcl, line 323</a>
 </dl></dl>
 
 <hr>
@@ -959,10 +979,14 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 
 <hr>
 <h3><a name="inputBind">inputBind</a></h3>
-<pre>proc inputBind { variable double value precision scale }</pre>
+<pre>proc inputBind { variable value precision scale }</pre>
 <dl>
-<dd>Defines a input bind variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#inputBind_133">sqlrcurCmd.tcl, line 133</a>
+<dd>Defines a input bind variable.
+ The value may be a string, integer or decimal.  If the value is a decimal,
+ then precision and scale may also be specified.  If you don't have the
+ precision and scale then set them both to 0.  However in that case you may
+ get unexpected rounding behavior if the server is faking binds.<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#inputBind_137">sqlrcurCmd.tcl, line 137</a>
 </dl></dl>
 
 <hr>
@@ -970,7 +994,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc inputBindBlob { variable value size }</pre>
 <dl>
 <dd>Defines a binary lob input bind variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#inputBindBlob_136">sqlrcurCmd.tcl, line 136</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#inputBindBlob_140">sqlrcurCmd.tcl, line 140</a>
 </dl></dl>
 
 <hr>
@@ -978,7 +1002,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc inputBindClob { variable value size }</pre>
 <dl>
 <dd>Defines a character lob input bind variable.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#inputBindClob_139">sqlrcurCmd.tcl, line 139</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#inputBindClob_143">sqlrcurCmd.tcl, line 143</a>
 </dl></dl>
 
 <hr>
@@ -986,7 +1010,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <pre>proc inputBinds { variables values precisions scales }</pre>
 <dl>
 <dd>Defines an array of input bind variables.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#inputBinds_142">sqlrcurCmd.tcl, line 142</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#inputBinds_146">sqlrcurCmd.tcl, line 146</a>
 </dl></dl>
 
 <hr>
@@ -1013,7 +1037,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Opens a cached result set.
  Returns true on success and false on failure.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#openCachedResultSet_232">sqlrcurCmd.tcl, line 232</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#openCachedResultSet_236">sqlrcurCmd.tcl, line 236</a>
 </dl></dl>
 
 <hr>
@@ -1054,7 +1078,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
  using suspendSession and continues caching
  the result set to "filename".
  Returns true on success and false on failure.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#resumeCachedResultSet_478">sqlrcurCmd.tcl, line 478</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#resumeCachedResultSet_482">sqlrcurCmd.tcl, line 482</a>
 </dl></dl>
 
 <hr>
@@ -1064,7 +1088,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dd>Resumes a result set previously left open 
  using suspendSession.
  Returns true on success and false on failure.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#resumeResultSet_472">sqlrcurCmd.tcl, line 472</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#resumeResultSet_476">sqlrcurCmd.tcl, line 476</a>
 </dl></dl>
 
 <hr>
@@ -1075,7 +1099,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
  result set  {if the result set is being
  stepped through this returns the number
  of rows processed so far}.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#rowCount_244">sqlrcurCmd.tcl, line 244</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#rowCount_248">sqlrcurCmd.tcl, line 248</a>
 </dl></dl>
 
 <hr>
@@ -1172,7 +1196,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
  suspendSession so that another connection 
  can connect to it using resumeResultSet 
  after it calls resumeSession.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#suspendResultSet_459">sqlrcurCmd.tcl, line 459</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#suspendResultSet_463">sqlrcurCmd.tcl, line 463</a>
 </dl></dl>
 
 <hr>
@@ -1185,7 +1209,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
  for applications which are designed to be 
  portable across databases.  0 is returned
  by databases which don't support this option.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#totalRows_252">sqlrcurCmd.tcl, line 252</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#totalRows_256">sqlrcurCmd.tcl, line 256</a>
 </dl></dl>
 
 <hr>
@@ -1206,7 +1230,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
  to bind them unless they really are in the 
  query.  There is a performance penalty for
  calling this method.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#validateBinds_182">sqlrcurCmd.tcl, line 182</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#validateBinds_186">sqlrcurCmd.tcl, line 186</a>
 </dl></dl>
 
 <hr>
@@ -1215,7 +1239,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Returns true if "variable" was a valid
  bind variable of the query.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#validBind_186">sqlrcurCmd.tcl, line 186</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#validBind_190">sqlrcurCmd.tcl, line 190</a>
 </dl></dl>
 
 <hr>
@@ -1224,7 +1248,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2012-01-06 at 09:08.</cite>
+<cite>File generated 2012-01-10 at 06:42.</cite>
 </font>
 </body>
 </html>

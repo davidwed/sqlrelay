@@ -139,10 +139,17 @@ void sqlrcursor_svr::performSubstitution(stringbuffer *buffer, int16_t index) {
 	} else if (inbindvars[index].type==INTEGER_BIND) {
 		buffer->append(inbindvars[index].value.integerval);
 	} else if (inbindvars[index].type==DOUBLE_BIND) {
-		char	*dbuf=charstring::parseNumber(
+		char	*dbuf=NULL;
+		if (!inbindvars[index].value.doubleval.precision &&
+				!inbindvars[index].value.doubleval.scale) {
+			dbuf=charstring::parseNumber(
+				inbindvars[index].value.doubleval.value);
+		} else {
+			dbuf=charstring::parseNumber(
 				inbindvars[index].value.doubleval.value,
 				inbindvars[index].value.doubleval.precision,
 				inbindvars[index].value.doubleval.scale);
+		}
 		// In some regions a comma is used rather than a period for
 		// the decimal and the i8n settings will cause snprintf to use
 		// a comma as the separator.  Databases don't like commas in

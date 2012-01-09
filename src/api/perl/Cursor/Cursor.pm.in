@@ -242,9 +242,14 @@ __END__
 
         inputBind(variable,value);
         inputBind(variable,value,length);
+        inputBind(variable,value,precision,scale);
         inputBindBlob(variable,value,size);
         inputBindClob(variable,value,size);
             # Define an input bind variable.
+            # (For floating point values, if you don't have the precision and
+            # scale then they may both be set to 0.  However in that case you
+            # may get unexpected rounding behavior if the server is faking
+            # binds.)
 
         defineOutputBindString(variable,bufferlength);
             # Define an output bind variable.

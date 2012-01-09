@@ -2228,7 +2228,6 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 			case MYSQL_TYPE_FLOAT:
 			case MYSQL_TYPE_DOUBLE: {
 				double	value=*((double *)bind[i].buffer);
-				// FIXME: precision/scale???
 				cursor->inputBind(variable,value,0,0);
 				break;
 			}
