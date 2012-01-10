@@ -183,8 +183,12 @@ bool sqltranslator::translateDateTimesInQuery(xmldomnode *querynode,
 	}
 
 	// convert this node...
-	if (!charstring::compare(querynode->getName(),sqlparser::_verbatim) ||
-		!charstring::compare(querynode->getName(),sqlparser::_value)) {
+	if (!charstring::compare(querynode->getName(),
+					sqlparser::_verbatim) ||
+		!charstring::compare(querynode->getName(),
+					sqlparser::_value) ||
+		!charstring::compare(querynode->getName(),
+					sqlparser::_string_literal)) {
 
 		// get the value
 		const char	*value=querynode->getAttributeValue(
