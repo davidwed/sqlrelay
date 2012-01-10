@@ -311,9 +311,11 @@ bool sqlparser::parseValues(xmldomnode *currentnode,
 		comma(*newptr,newptr);
 
 		// if we hit a right parentheses then we're done, but we need
-		// to stay on it, so we'll compare newptr directly rather than
-		// using rightParen()
-		if (**newptr==')') {
+		// to stay on it, so we'll reset the pointer afterward if we
+		// find one
+		const char	*before=*newptr;
+		if (rightParen(*newptr,newptr)) {
+			*newptr=before;
 			return true;
 		}
 	}

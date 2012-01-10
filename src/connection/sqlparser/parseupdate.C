@@ -67,6 +67,7 @@ bool sqlparser::parseUpdate(xmldomnode *currentnode,
 	for (;;) {
 
 		// if we hit the table name then we're done
+		whiteSpace(*newptr,newptr);
 		if (*newptr==tablenameptr) {
 			break;
 		}

@@ -4,6 +4,8 @@
 #include <sqlparser.h>
 #include <debugprint.h>
 
+//#define PARSE_WHERE
+
 bool sqlparser::parseWhere(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
@@ -17,8 +19,10 @@ bool sqlparser::parseWhere(xmldomnode *currentnode,
 	// create the node
 	xmldomnode	*wherenode=newNode(currentnode,_where);
 
-// bail here to disable where-clause parsing
-// return true;
+	#ifndef PARSE_WHERE
+		// bail here to disable where-clause parsing
+		return true;
+	#endif
 
 	// parse the where clause terms
 	return parseWhereClauseTerms(wherenode,*newptr,newptr);
