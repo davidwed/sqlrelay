@@ -42,6 +42,8 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 
 	isolationlevel=NULL;
 
+	ignoreselectdb=false;
+
 	maxquerysize=0;
 	maxstringbindvaluelength=0;
 	maxlobbindvaluelength=0;

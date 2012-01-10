@@ -180,6 +180,9 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 						isolationlevel:
 						getDefaultIsolationLevel());
 
+	// ignore selectDatabase() calls?
+	ignoreselectdb=cfgfl->getIgnoreSelectDatabase();
+
 	// get the database/schema we're using so
 	// we can switch back to it at end of session
 	originaldb=getCurrentDatabase();

@@ -82,6 +82,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	currenttag=NO_TAG;
 	sqltranslationrulesdepth=0;
 	isolationlevel=NULL;
+	ignoreselectdb=false;
 }
 
 sqlrconfigfile::~sqlrconfigfile() {
@@ -336,6 +337,10 @@ bool sqlrconfigfile::getTranslateBindVariables() {
 
 const char *sqlrconfigfile::getIsolationLevel() {
 	return isolationlevel;
+}
+
+bool sqlrconfigfile::getIgnoreSelectDatabase() {
+	return ignoreselectdb;
 }
 
 bool sqlrconfigfile::getSidEnabled() {
@@ -764,6 +769,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=TRANSLATEBINDVARIABLES_ATTRIBUTE;
 		} else if (!charstring::compare(name,"isolationlevel")) {
 			currentattribute=ISOLATIONLEVEL_ATTRIBUTE;
+		} else if (!charstring::compare(name,"ignoreselectdatabase")) {
+			currentattribute=IGNORESELECTDB_ATTRIBUTE;
 		}
 		break;
 	
@@ -1169,6 +1176,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 				!charstring::compareIgnoringCase(value,"yes");
 		} else if (currentattribute==ISOLATIONLEVEL_ATTRIBUTE) {
 			isolationlevel=charstring::duplicate(value);
+		} else if (currentattribute==IGNORESELECTDB_ATTRIBUTE) {
+			ignoreselectdb=
+				!charstring::compareIgnoringCase(value,"yes");
 		}
 	}
 	return true;

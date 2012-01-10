@@ -432,6 +432,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool		translatebinds;
 
 		const char	*isolationlevel;
+		bool		ignoreselectdb;
 
 		int32_t		accepttimeout;
 		bool		suspendedsession;

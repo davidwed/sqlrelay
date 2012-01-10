@@ -77,7 +77,8 @@ typedef enum {
 	FAKEINPUTBINDVARIABLES_ATTRIBUTE,
 	TRANSLATEBINDVARIABLES_ATTRIBUTE,
 	SQLTRANSLATIONRULES_ATTRIBUTE,
-	ISOLATIONLEVEL_ATTRIBUTE
+	ISOLATIONLEVEL_ATTRIBUTE,
+	IGNORESELECTDB_ATTRIBUTE
 } attribute;
 
 class usercontainer {
@@ -217,6 +218,7 @@ class sqlrconfigfile : public xmlsax {
 		bool		getFakeInputBindVariables();
 		bool		getTranslateBindVariables();
 		const char	*getIsolationLevel();
+		bool		getIgnoreSelectDatabase();
 
 		bool		getSidEnabled();
 		const char	*getSidHost();
@@ -306,6 +308,7 @@ class sqlrconfigfile : public xmlsax {
 		bool		fakeinputbindvariables;
 		bool		translatebindvariables;
 		char		*isolationlevel;
+		bool		ignoreselectdb;
 
 		bool		sidenabled;
 		char		*sidhost;

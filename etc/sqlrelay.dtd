@@ -38,6 +38,7 @@
 	<!ATTLIST instance fakeinputbindvariables (yes|no) "no">
 	<!ATTLIST instance translatebindvariables (yes|no) "no">
 	<!ATTLIST instance isolationlevel CDATA "read committed">
+	<!ATTLIST instance ignoreselectdatabase (yes|no) "no">
 
 <!ELEMENT users (user*)>
 <!ELEMENT user EMPTY>

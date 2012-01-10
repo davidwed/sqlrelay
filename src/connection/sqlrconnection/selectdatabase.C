@@ -38,9 +38,10 @@ void sqlrconnection_svr::selectDatabaseCommand() {
 	}
 	db[dblen]='\0';
 	
-	// select the db and send back the result
+	// Select the db and send back the result.  If we've been told to
+	// ignore these calls, skip the actual call but act like it succeeded.
 	char	*error=NULL;
-	bool	result=selectDatabase(db,&error);
+	bool	result=(ignoreselectdb)?true:selectDatabase(db,&error);
 	clientsock->write(result);
 
 	// if there was an error, send it back
