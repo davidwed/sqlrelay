@@ -2216,10 +2216,20 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 				MYSQL_TIME	*tm=
 						(MYSQL_TIME *)bind[i].buffer;
 
+				unsigned int	first=tm->month;
+				unsigned int	second=tm->day;
+				if (!charstring::compareIgnoringCase(
+					environment::getValue(
+					"SQLR_MYSQL_DATE_DDMM"),
+					"yes")) {
+					first=tm->day;
+					second=tm->month;
+				}
+
 				char	buffer[20];
 				snprintf(buffer,20,
 					"%04d/%02d/%02d %02d:%02d:%02d",
-					tm->year,tm->month,tm->day,
+					tm->year,first,second,
 					tm->hour,tm->minute,tm->second);
 				cursor->inputBind(variable,buffer);
 				break;
