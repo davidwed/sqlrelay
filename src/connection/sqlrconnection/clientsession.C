@@ -438,8 +438,6 @@ void sqlrconnection_svr::sessionEndQueries() {
 
 void sqlrconnection_svr::sessionQuery(const char *query) {
 
-	printf("%s\n",query);
-
 	// create the select database query
 	size_t	querylen=charstring::length(query);
 
