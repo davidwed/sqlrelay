@@ -4,12 +4,20 @@
 <instances>
 
 	<!-- Regular SQL Relay Instance -->
-	<instance id="example" port="9000" socket="/tmp/example.socket" dbase="oracle8" connections="3" maxconnections="15" maxqueuelength="5" growby="1" ttl="60" maxsessioncount="1000" endofsession="commit" sessiontimeout="600" runasuser="nobody" runasgroup="nobody" cursors="5" authtier="listener" handoff="pass" deniedips="" allowedips="" debug="none" maxquerysize="65536" maxstringbindvaluelength="4000" maxlobbindvaluelength="71680" idleclienttimeout="-1" maxlisteners="-1" listenertimeout="0" reloginatstart="no" timequeriessec="-1" timequeriesusec="-1" fakeinputbindvariables="no" translatebindvariables="no" isolationlevel="read committed">
+	<instance id="example" port="9000" socket="/tmp/example.socket" dbase="oracle8" connections="3" maxconnections="15" maxqueuelength="5" growby="1" ttl="60" maxsessioncount="1000" endofsession="commit" sessiontimeout="600" runasuser="nobody" runasgroup="nobody" cursors="5" authtier="listener" handoff="pass" deniedips="" allowedips="" debug="none" maxquerysize="65536" maxstringbindvaluelength="4000" maxlobbindvaluelength="71680" idleclienttimeout="-1" maxlisteners="-1" listenertimeout="0" reloginatstart="no" timequeriessec="-1" timequeriesusec="-1" fakeinputbindvariables="no" translatebindvariables="no" isolationlevel="read committed" ignoreselectdatabase="no">
 		<users>
 			<user user="user1" password="password1"/>
 			<user user="user2" password="password2"/>
 			<user user="user3" password="password3"/>
 		</users>
+		<session>
+			<start>
+				<runquery>alter session set nls_date_format='MM-DD-YYYY HH24:MI:SS'</runquery>
+			</start>
+			<end>
+				<runquery>alter session set nls_date_format='DD-MON-YYYY'</runquery>
+			</end>
+		</session>
 		<connections>
 			<connection connectionid="db1" string="user=exampleuser1;password=examplepassword1;oracle_sid=EXAMPLE1;" metric="1" behindloadbalancer="no"/>
 			<connection connectionid="db2" string="user=exampleuser2;password=examplepassword2;oracle_sid=EXAMPLE2;" metric="3" behindloadbalancer="no"/>

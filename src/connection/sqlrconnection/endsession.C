@@ -16,7 +16,7 @@ void sqlrconnection_svr::endSessionInternal() {
 
 	dbgfile.debugPrint("connection",2,"ending session...");
 
-	sessionEndCommands();
+	sessionEndQueries();
 
 	// must set suspendedsession to false here so resumed sessions won't 
 	// automatically re-suspend

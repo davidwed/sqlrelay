@@ -83,6 +83,8 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	sqltranslationrulesdepth=0;
 	isolationlevel=NULL;
 	ignoreselectdb=false;
+	instart=false;
+	inend=false;
 }
 
 sqlrconfigfile::~sqlrconfigfile() {
@@ -127,6 +129,15 @@ sqlrconfigfile::~sqlrconfigfile() {
 
 	for (routenode *rn=routelist.getFirstNode(); rn; rn=rn->getNext()) {
 		delete rn->getData();
+	}
+
+	for (stringlistnode *sln=sessionstartqueries.getFirstNode();
+						sln; sln=sln->getNext()) {
+		delete[] sln->getData();
+	}
+	for (stringlistnode *sln=sessionendqueries.getFirstNode();
+						sln; sln=sln->getNext()) {
+		delete[] sln->getData();
 	}
 }
 
@@ -343,6 +354,14 @@ bool sqlrconfigfile::getIgnoreSelectDatabase() {
 	return ignoreselectdb;
 }
 
+stringlist *sqlrconfigfile::getSessionStartQueries() {
+	return &sessionstartqueries;
+}
+
+stringlist *sqlrconfigfile::getSessionEndQueries() {
+	return &sessionendqueries;
+}
+
 bool sqlrconfigfile::getSidEnabled() {
 	return sidenabled;
 }
@@ -441,6 +460,8 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			currentname="instance";
 			if (!charstring::compare(name,"users")) {
 				thistag=USERS_TAG;
+			} else if (!charstring::compare(name,"session")) {
+				thistag=SESSION_TAG;
 			} else if (!charstring::compare(name,"connections")) {
 				thistag=CONNECTIONS_TAG;
 			} else if (!charstring::compare(name,"router")) {
@@ -459,6 +480,40 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			currentname="users";
 			if (!charstring::compare(name,"user")) {
 				thistag=USER_TAG;
+			} else {
+				ok=false;
+			}
+			break;
+		
+		// Session section, nested (start,end)
+		case SESSION_TAG:
+			currentname="session";
+			if (!charstring::compare(name,"start")) {
+				thistag=START_TAG;
+				instart=true;
+			} else if (!charstring::compare(name,"end")) {
+				thistag=END_TAG;
+				inend=true;
+			} else {
+				ok=false;
+			}
+			break;
+		
+		// Start section, nested (runquery*)
+		case START_TAG:
+			currentname="start";
+			if (!charstring::compare(name,"runquery")) {
+				thistag=RUNQUERY_TAG;
+			} else {
+				ok=false;
+			}
+			break;
+
+		// End section, nested (runquery*)
+		case END_TAG:
+			currentname="end";
+			if (!charstring::compare(name,"runquery")) {
+				thistag=RUNQUERY_TAG;
 			} else {
 				ok=false;
 			}
@@ -486,21 +541,21 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			}
 			break;
 		
-		// Filter section, nested (query*)
+		// Filter section, nested (runquery*)
 		case FILTER_TAG:
 			currentname="filter";
-			if (!charstring::compare(name,"query")) {
-				thistag=QUERY_TAG;
+			if (!charstring::compare(name,"runquery")) {
+				thistag=RUNQUERY_TAG;
 			} else {
 				ok=false;
 			}
 			break;
 		
-		// Filter section, nested (query*)
+		// Filter section, nested (runquery*)
 		case ROUTE_TAG:
 			currentname="route";
-			if (!charstring::compare(name,"query")) {
-				thistag=QUERY_TAG;
+			if (!charstring::compare(name,"runquery")) {
+				thistag=RUNQUERY_TAG;
 			} else {
 				ok=false;
 			}
@@ -517,6 +572,10 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			break;
 		case QUERY_TAG:
 			currentname="query";
+			ok=false;
+			break;
+		case RUNQUERY_TAG:
+			currentname="runquery";
 			ok=false;
 			break;
 		default:
@@ -571,6 +630,12 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			sqltranslationrules.append(name);
 			currenttag=thistag;
 			break;
+		case SESSION_TAG:
+		case START_TAG:
+		case END_TAG:
+		case RUNQUERY_TAG:
+			currenttag=thistag;
+			break;
 		default:
 			// Nothing to do
 		break;
@@ -603,7 +668,7 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 	}
 
 	// Close up the current tag
-	switch(currenttag) {
+	switch (currenttag) {
 		case ROUTER_TAG:
 			// Check closing tag, no need, but just in case
 			if (!charstring::compare(name,"router")) {
@@ -646,6 +711,20 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 			}
 			sqltranslationrulesdepth--;
 			break;
+		case SESSION_TAG:
+			currenttag=NO_TAG;
+			break;
+		case START_TAG:
+			instart=false;
+			currenttag=SESSION_TAG;
+			break;
+		case END_TAG:
+			inend=false;
+			currenttag=SESSION_TAG;
+			break;
+		case RUNQUERY_TAG:
+			currenttag=(instart)?START_TAG:END_TAG;
+			break;
 		default:
 			// just ignore the closing tag
 			break;
@@ -657,8 +736,6 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 	}
 	return true;
 }
-
-
 
 bool sqlrconfigfile::attributeName(const char *name) {
 
@@ -783,7 +860,7 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=PASSWORD_ATTRIBUTE;
 		}
 		break;
-	
+
 	// Attributes of the <connection> tag
 	case CONNECTIONS_TAG:
 	case CONNECTION_TAG:
@@ -835,9 +912,20 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=ROUTER_SOCKET_ATTRIBUTE;
 		}
 		break;
+
 	case SQLTRANSLATIONRULES_TAG:
 		sqltranslationrules.append(" ")->append(name);
 		currentattribute=SQLTRANSLATIONRULES_ATTRIBUTE;
+		break;
+
+	// these tags have no attributes and there's nothing to do but the
+	// compiler will complain if they aren't in the switch statement
+	case SESSION_TAG:
+	case START_TAG:
+		break;
+	case END_TAG:
+		break;
+	case RUNQUERY_TAG:
 		break;
 	}
 
@@ -873,6 +961,18 @@ bool sqlrconfigfile::attributeName(const char *name) {
 				break;
 			case SQLTRANSLATIONRULES_TAG:
 				tagname="sqltranslationrules";
+				break;
+			case SESSION_TAG:
+				tagname="session";
+				break;
+			case START_TAG:
+				tagname="start";
+				break;
+			case END_TAG:
+				tagname="end";
+				break;
+			case RUNQUERY_TAG:
+				tagname="runquery";
 				break;
 		}
 		fprintf(stderr,"WARNING: unrecognized attribute "
@@ -1181,6 +1281,23 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 				!charstring::compareIgnoringCase(value,"yes");
 		}
 	}
+	return true;
+}
+
+bool sqlrconfigfile::text(const char *string) {
+
+	if (currenttag==RUNQUERY_TAG) {
+		stringlist	*ptr=NULL;
+		if (instart) {
+			ptr=&sessionstartqueries;
+		} else if (inend) {
+			ptr=&sessionendqueries;
+		}
+		if (ptr) {
+			ptr->append(charstring::duplicate(string));
+		}
+	}
+
 	return true;
 }
 

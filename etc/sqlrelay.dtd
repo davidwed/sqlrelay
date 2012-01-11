@@ -45,6 +45,11 @@
 	<!ATTLIST user user CDATA "user">
 	<!ATTLIST user password CDATA "password">
 
+<!ELEMENT session (start,end)>
+<!ELEMENT start (query*)>
+<!ELEMENT end (query*)>
+<!ELEMENT query (#PCDATA)>
+
 <!ELEMENT connections (connection*)>
 <!ELEMENT connection EMPTY>
 	<!ATTLIST connection connectionid CDATA "defaultid">

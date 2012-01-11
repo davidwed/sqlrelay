@@ -384,8 +384,9 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	setInitialAutoCommitBehavior();
 		bool	openSockets();
 
-		void	sessionStartCommands();
-		void	sessionEndCommands();
+		void	sessionStartQueries();
+		void	sessionEndQueries();
+		void	sessionQuery(const char *query);
 
 		void	flushWriteBuffer();
 

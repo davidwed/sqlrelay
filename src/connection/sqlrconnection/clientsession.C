@@ -63,7 +63,7 @@ void sqlrconnection_svr::clientSession() {
 		// handle some things up front
 		if (command==AUTHENTICATE) {
 			if (authenticateCommand()) {
-				sessionStartCommands();
+				sessionStartQueries();
 				continue;
 			}
 			break;
@@ -417,38 +417,41 @@ bool sqlrconnection_svr::getCommand(uint16_t *command) {
 	return true;
 }
 
-void sqlrconnection_svr::sessionStartCommands() {
-
-	// this method provides an entry point for a configurable set of
-	// queries to be run at the start of each session, for example,
-	// the following...
-
-	/*
-	// create the select database query
-	const char	*initquery="alter session set nls_date_format='DD/MM/YYYY'";
-	size_t		initquerylen=charstring::length(initquery);
-
-	sqlrcursor_svr	*initcur=initCursorUpdateStats();
-	// since we're creating a new cursor for this, make sure it can't
-	// have an ID that might already exist
-	bool	retval=false;
-	if (initcur->openCursorInternal(cursorcount+1) &&
-		initcur->prepareQuery(initquery,initquerylen) &&
-		executeQueryUpdateStats(initcur,initquery,initquerylen,true)) {
-		initcur->cleanUpData(true,true);
-		retval=true;
-	} else {
-		bool	liveconnection;
-		error=charstring::duplicate(
-				initcur->errorMessage(&liveconnection));
+void sqlrconnection_svr::sessionStartQueries() {
+	// run a configurable set of queries at the start of each session
+printf("start queries length: %d\n",cfgfl->getSessionStartQueries()->getLength());
+	for (stringlistnode *node=
+		cfgfl->getSessionStartQueries()->getFirstNode();
+						node; node=node->getNext()) {
+		sessionQuery(node->getData());
 	}
-	initcur->closeCursor();
-	deleteCursorUpdateStats(initcur);*/
 }
 
-void sqlrconnection_svr::sessionEndCommands() {
+void sqlrconnection_svr::sessionEndQueries() {
+	// run a configurable set of queries at the end of each session
+	for (stringlistnode *node=
+		cfgfl->getSessionEndQueries()->getFirstNode();
+						node; node=node->getNext()) {
+		sessionQuery(node->getData());
+	}
+}
 
-	// this method provides an entry point for a configurable set of
-	// queries to be run at the end of each session, for example,
-	// the following...
+void sqlrconnection_svr::sessionQuery(const char *query) {
+
+	printf("%s\n",query);
+
+	// create the select database query
+	size_t	querylen=charstring::length(query);
+
+	sqlrcursor_svr	*cur=initCursorUpdateStats();
+
+	// since we're creating a new cursor for this, make sure it
+	// can't have an ID that might already exist
+	if (cur->openCursorInternal(cursorcount+1) &&
+		cur->prepareQuery(query,querylen) &&
+		executeQueryUpdateStats(cur,query,querylen,true)) {
+		cur->cleanUpData(true,true);
+	}
+	cur->closeCursor();
+	deleteCursorUpdateStats(cur);
 }

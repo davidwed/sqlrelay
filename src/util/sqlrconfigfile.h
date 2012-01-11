@@ -220,6 +220,9 @@ class sqlrconfigfile : public xmlsax {
 		const char	*getIsolationLevel();
 		bool		getIgnoreSelectDatabase();
 
+		stringlist	*getSessionStartQueries();
+		stringlist	*getSessionEndQueries();
+
 		bool		getSidEnabled();
 		const char	*getSidHost();
 		uint16_t	getSidPort();
@@ -251,6 +254,7 @@ class sqlrconfigfile : public xmlsax {
 		bool	tagStart(const char *name);
 		bool	attributeName(const char *name);
 		bool	attributeValue(const char *value);
+		bool	text(const char *string);
 		bool	tagEnd(const char *name);
 
 		routecontainer	*routeAlreadyExists(routecontainer *cur);
@@ -310,6 +314,11 @@ class sqlrconfigfile : public xmlsax {
 		char		*isolationlevel;
 		bool		ignoreselectdb;
 
+		bool		instart;
+		bool		inend;
+		stringlist	sessionstartqueries;
+		stringlist	sessionendqueries;
+
 		bool		sidenabled;
 		char		*sidhost;
 		uint16_t	sidport;
@@ -339,6 +348,10 @@ class sqlrconfigfile : public xmlsax {
 			NO_TAG,
 			USERS_TAG,
 			USER_TAG,
+			SESSION_TAG,
+			START_TAG,
+			END_TAG,
+			RUNQUERY_TAG,
 			CONNECTIONS_TAG,
 			CONNECTION_TAG,
 			ROUTER_TAG,

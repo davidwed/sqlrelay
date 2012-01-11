@@ -12,6 +12,7 @@
 		client-side debug
 	added bind variable support to sqlrsh
 	added selectDatabase/getCurrentDatabase methods and support in sqlrsh
+	added an option in sqlrelay.conf to ignore selectDatabase() calls
 	added errorMessage method at connection level
 	applied Renat's patch to decrement the session count in the listener
 		if the handoff fails
@@ -20,6 +21,8 @@
 	fixed a bug that caused an access-after-free condition when debugging
 		the connection
 	added getLastInsertId() methods and support in sqlrsh and perl DBI
+	added a feature to run a set of queries at the start and end of each
+		session
 
 0.43 - updated ruby code build to take sitearch into account during includes
 	updated ruby code to map STR2CSTR to StringValuePtr for ruby 1.9
