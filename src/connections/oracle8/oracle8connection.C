@@ -540,11 +540,25 @@ const char *oracle8connection::getDatabaseListQuery(bool wild) {
 }
 
 const char *oracle8connection::getTableListQuery(bool wild) {
-	return (wild)?"select table_name from user_tables "
-			"where table_name like upper('%s') "
-				"order by table_name":
-			"select table_name from user_tables "
-				"order by table_name";
+	return (wild)?"select "
+			"	table_name "
+			"from "
+			"	all_tables "
+			"where "
+			"	table_name like upper('%s') "
+			"	and "
+			"	owner=sys_context('userenv','current_schema') "
+			"order by "
+			"	table_name":
+
+			"select "
+			"	table_name "
+			"from "
+			"	all_tables "
+			"where "
+			"	owner=sys_context('userenv','current_schema') "
+			"order by "
+			"	table_name";
 }
 
 const char *oracle8connection::getColumnListQuery(bool wild) {
@@ -564,6 +578,12 @@ const char *oracle8connection::getColumnListQuery(bool wild) {
 			"	table_name=upper('%s') "
 			"	and "
 			"	column_name like upper('%s') "
+			"	and "
+			"	(owner=sys_context('userenv','current_schema') "
+			"	or "
+			"	owner='SYS' "
+			"	or "
+			"	owner='SYSTEM') "
 			"order by "
 			"	column_id":
 
@@ -581,6 +601,12 @@ const char *oracle8connection::getColumnListQuery(bool wild) {
 			"	all_tab_columns "
 			"where "
 			"	table_name=upper('%s') "
+			"	and "
+			"	(owner=sys_context('userenv','current_schema') "
+			"	or "
+			"	owner='SYS' "
+			"	or "
+			"	owner='SYSTEM') "
 			"order by "
 			"	column_id";
 }
