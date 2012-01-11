@@ -872,6 +872,7 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 
 			// determine the length...
 			// for decimals, attempt to use the precision (column 3)
+			// and add 2 (one for negative, one for decimal)
 			// for non-decimals, or if column 3 is empty, fall back
 			// to the "length" (column 2) otherwise fall back to 50
 			bool		gotlen=false;
@@ -879,7 +880,7 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 			if ((columntype==MYSQL_TYPE_DECIMAL ||
 				columntype==MYSQL_TYPE_NEWDECIMAL) &&
 				sqlrcur->getFieldLength(i,(uint32_t)3)) {
-				len=sqlrcur->getFieldAsInteger(i,(uint32_t)3);
+				len=sqlrcur->getFieldAsInteger(i,(uint32_t)3)+2;
 				gotlen=true;
 			}
 			if (!gotlen && sqlrcur->getFieldLength(i,(uint32_t)2)) {
