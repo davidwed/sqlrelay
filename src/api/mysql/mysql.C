@@ -60,6 +60,7 @@ enum enum_field_types {
 	MYSQL_TYPE_DATETIME,
 	MYSQL_TYPE_YEAR,
 	MYSQL_TYPE_NEWDATE,
+	MYSQL_TYPE_NEWDECIMAL=246,
 	MYSQL_TYPE_ENUM=247,
 	MYSQL_TYPE_SET=248,
 	MYSQL_TYPE_TINY_BLOB=249,
@@ -870,15 +871,22 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 			fields[i].type=columntype;
 
 			// determine the length...
-			// use the length provided in the length column,
-			// otherwise use precision(+2 for negative sign
-			// and decimal point), otherwise fall back to 50
+			// for decimals, attempt to use the precision (column 3)
+			// for non-decimals, or if column 3 is empty, fall back
+			// to the "length" (column 2) otherwise fall back to 50
+			bool		gotlen=false;
 			unsigned int	len=0;
-			if (sqlrcur->getFieldLength(i,(uint32_t)2)) {
+			if ((columntype==MYSQL_TYPE_DECIMAL ||
+				columntype==MYSQL_TYPE_NEWDECIMAL) &&
+				sqlrcur->getFieldLength(i,(uint32_t)3)) {
+				len=sqlrcur->getFieldAsInteger(i,(uint32_t)3);
+				gotlen=true;
+			}
+			if (!gotlen && sqlrcur->getFieldLength(i,(uint32_t)2)) {
 				len=sqlrcur->getFieldAsInteger(i,(uint32_t)2);
-			} else if (sqlrcur->getFieldLength(i,(uint32_t)3)) {
-				len=sqlrcur->getFieldAsInteger(i,(uint32_t)3)+2;
-			} else {
+				gotlen=true;
+			}
+			if (!gotlen) {
 				len=50;
 			}
 			fields[i].length=len;
@@ -1252,17 +1260,17 @@ static enum enum_field_types	mysqltypemap[]={
 	// "TINYINT"
 	MYSQL_TYPE_TINY,
 	// "MONEY"
-	MYSQL_TYPE_DECIMAL,
+	MYSQL_TYPE_NEWDECIMAL,
 	// "DATETIME"
 	MYSQL_TYPE_DATETIME,
 	// "NUMERIC"
-	MYSQL_TYPE_DECIMAL,
+	MYSQL_TYPE_NEWDECIMAL,
 	// "DECIMAL"
-	MYSQL_TYPE_DECIMAL,
+	MYSQL_TYPE_NEWDECIMAL,
 	// "SMALLDATETIME"
 	MYSQL_TYPE_DATETIME,
 	// "SMALLMONEY"
-	MYSQL_TYPE_DECIMAL,
+	MYSQL_TYPE_NEWDECIMAL,
 	// "IMAGE"
 	MYSQL_TYPE_BLOB,
 	// "BINARY"
@@ -1342,7 +1350,7 @@ static enum enum_field_types	mysqltypemap[]={
 	// "VARCHAR2"
 	MYSQL_TYPE_VAR_STRING,
 	// "NUMBER"
-	MYSQL_TYPE_DECIMAL,
+	MYSQL_TYPE_NEWDECIMAL,
 	// "ROWID"
 	MYSQL_TYPE_LONGLONG,
 	// "RAW"
@@ -1626,7 +1634,8 @@ enum enum_field_types map_col_type(const char *columntype, int64_t scale) {
 			// Those fields types get translated to "decimal"
 			// but if there are 0 decimal points, then we need to
 			// translate them to an integer type here.
-			if (retval==MYSQL_TYPE_DECIMAL && !scale) {
+			if ((retval==MYSQL_TYPE_DECIMAL ||
+				retval==MYSQL_TYPE_NEWDECIMAL) && !scale) {
 				retval=MYSQL_TYPE_LONG;
 			}
 
@@ -1793,6 +1802,7 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 						(float)charstring::
 							toFloat(row[i]);
 					break;
+				case MYSQL_TYPE_NEWDECIMAL:
 				case MYSQL_TYPE_DECIMAL:
 				case MYSQL_TYPE_DOUBLE:
 					*((double *)stmt->
@@ -2234,6 +2244,7 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 				cursor->inputBind(variable,buffer);
 				break;
 			}
+			case MYSQL_TYPE_NEWDECIMAL:
 			case MYSQL_TYPE_DECIMAL:
 			case MYSQL_TYPE_FLOAT:
 			case MYSQL_TYPE_DOUBLE: {
