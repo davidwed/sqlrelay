@@ -46,9 +46,9 @@
 	<!ATTLIST user password CDATA "password">
 
 <!ELEMENT session (start,end)>
-<!ELEMENT start (query*)>
-<!ELEMENT end (query*)>
-<!ELEMENT query (#PCDATA)>
+<!ELEMENT start (runquery*)>
+<!ELEMENT end (runquery*)>
+<!ELEMENT runquery (#PCDATA)>
 
 <!ELEMENT connections (connection*)>
 <!ELEMENT connection EMPTY>
