@@ -419,7 +419,6 @@ bool sqlrconnection_svr::getCommand(uint16_t *command) {
 
 void sqlrconnection_svr::sessionStartQueries() {
 	// run a configurable set of queries at the start of each session
-printf("start queries length: %d\n",cfgfl->getSessionStartQueries()->getLength());
 	for (stringlistnode *node=
 		cfgfl->getSessionStartQueries()->getFirstNode();
 						node; node=node->getNext()) {
