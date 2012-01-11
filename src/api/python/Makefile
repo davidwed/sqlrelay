@@ -28,6 +28,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o	
 	$(LIBTOOL) --mode=clean $(RM) *.so
+	$(LIBTOOL) --mode=clean $(RM) *.pyc
 	$(RMTREE) .libs
 
 libCSQLRelay.la: $(SRCS) $(LOBJS)
