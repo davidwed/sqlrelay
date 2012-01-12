@@ -74,13 +74,32 @@ bool sqlparser::parseComparison(xmldomnode *currentnode,
 		return false;
 	}
 
+	// look for not's again
+	if (notClause(*newptr,newptr)) {
+
+		// create the node
+		newNode(comparisonnode,_not);
+	}
+
 	// handle betweens
 	if (parseBetween(comparisonnode,*newptr,newptr)) {
 		return true;
 	}
 
+	// handle in
+	if (parseIn(comparisonnode,*newptr,newptr)) {
+		return true;
+	}
+
+	// handle exists
+	if (parseExists(comparisonnode,*newptr,newptr)) {
+		return true;
+	}
+
 	// get the comparator
-	if (parseEquals(comparisonnode,*newptr,newptr) ||
+	if (parseLike(comparisonnode,*newptr,newptr) ||
+		parseNullSafeEquals(comparisonnode,*newptr,newptr) ||
+		parseEquals(comparisonnode,*newptr,newptr) ||
 		parseNotEquals(comparisonnode,*newptr,newptr) ||
 		parseGreaterThanOrEqualTo(comparisonnode,*newptr,newptr) ||
 		parseLessThanOrEqualTo(comparisonnode,*newptr,newptr) ||
@@ -148,6 +167,118 @@ bool sqlparser::betweenClause(const char *ptr, const char **newptr) {
 }                                   
 
 const char *sqlparser::_between="between";
+
+bool sqlparser::parseIn(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+
+	// FIXME: implament this
+	return false;
+
+	// look for in
+	if (!inClause(ptr,newptr)) {
+		return false;
+	}
+
+	// create the node
+	xmldomnode	*innode=newNode(currentnode,_in);
+
+	// there should be a left paren
+	if (!leftParen(*newptr,newptr)) {
+		debugPrintf("missing left paren\n");
+		error=true;
+		return false;
+	}
+
+	// there could be a set of values or an entire query in here...
+
+	// FIXME: until full query parsing works,
+	// there's no good way to implement this
+
+	return false;
+}
+
+bool sqlparser::inClause(const char *ptr, const char **newptr) {
+        debugFunction();
+        return comparePart(ptr,newptr,"in ");
+}                                   
+
+const char *sqlparser::_in="in";
+
+bool sqlparser::parseExists(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	return false;
+	debugFunction();
+
+	// FIXME: implament this
+	return false;
+
+	// look for exists
+	if (!existsClause(ptr,newptr)) {
+		return false;
+	}
+
+	// create the node
+	xmldomnode	*existsnode=newNode(currentnode,_exists);
+
+	// there should be a left paren
+	if (!leftParen(*newptr,newptr)) {
+		debugPrintf("missing left paren\n");
+		error=true;
+		return false;
+	}
+
+	// there should be an entire query in here...
+
+	// FIXME: until full query parsing works,
+	// there's no good way to implement this
+
+}
+
+bool sqlparser::existsClause(const char *ptr, const char **newptr) {
+        debugFunction();
+        return comparePart(ptr,newptr,"exists ");
+}                                   
+
+const char *sqlparser::_exists="exists";
+
+bool sqlparser::parseLike(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!like(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_like);
+	return true;
+}
+
+bool sqlparser::like(const char *ptr, const char **newptr) {
+        debugFunction();
+        return comparePart(ptr,newptr,"like ");
+}                                   
+
+const char *sqlparser::_like="like";
+
+bool sqlparser::parseNullSafeEquals(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!nullSafeEquals(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_null_safe_equals);
+	return true;
+}
+
+bool sqlparser::nullSafeEquals(const char *ptr, const char **newptr) {
+        debugFunction();
+        return comparePart(ptr,newptr,"<=>");
+}                                   
+
+const char *sqlparser::_null_safe_equals="null_safe_equals";
 
 bool sqlparser::parseEquals(xmldomnode *currentnode,
 					const char *ptr,

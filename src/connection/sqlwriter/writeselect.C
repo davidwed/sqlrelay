@@ -46,6 +46,31 @@ bool sqlwriter::orderBy(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::orderByItem(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::endOrderByItem(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	if (hasSibling(node)) {
+		comma(output);
+	}
+	return true;
+}
+
+bool sqlwriter::asc(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("asc");
+	return true;
+}
+
+bool sqlwriter::desc(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("desc");
+	return true;
+}
+
 bool sqlwriter::limit(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("limit");

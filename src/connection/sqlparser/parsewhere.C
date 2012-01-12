@@ -4,7 +4,7 @@
 #include <sqlparser.h>
 #include <debugprint.h>
 
-//#define PARSE_WHERE
+#define PARSE_WHERE
 
 bool sqlparser::parseWhere(xmldomnode *currentnode,
 					const char *ptr,

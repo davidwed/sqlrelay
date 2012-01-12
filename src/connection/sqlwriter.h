@@ -212,6 +212,14 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	between(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	in(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	exists(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	like(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	nullSafeEquals(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	notEquals(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	lessThan(xmldomnode *node,
@@ -273,6 +281,14 @@ class sqlwriter {
 		virtual bool	having(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	orderBy(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	orderByItem(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	endOrderByItem(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	asc(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	desc(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	limit(xmldomnode *node,
 						stringbuffer *output);

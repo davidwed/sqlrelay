@@ -324,7 +324,7 @@ bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
 
 			// create the node
 			xmldomnode	*paramnode=
-					newNode(paramsnode,_parameter,name);
+					newNode(paramsnode,_parameter);
 
 			// parse the expression
 			parseExpression(paramnode,*newptr,newptr);

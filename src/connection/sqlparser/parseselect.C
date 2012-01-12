@@ -155,10 +155,39 @@ bool sqlparser::parseOrderBy(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
+
+	// look for order by
 	if (!orderByClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,_order_by);
+
+	// create the node
+	xmldomnode	*orderbynode=newNode(currentnode,_order_by);
+
+	for (;;) {
+		
+		// create the node
+		xmldomnode	*orderbyitemnode=
+				newNode(orderbynode,_order_by_item);
+
+		if (!parseExpression(orderbyitemnode,*newptr,newptr)) {	
+			debugPrintf("missing order by expression\n");
+			error=true;
+			return false;
+		}
+
+		// asc
+		parseAsc(orderbyitemnode,*newptr,newptr);
+
+		// desc
+		parseDesc(orderbyitemnode,*newptr,newptr);
+
+		// comma
+		if (!comma(*newptr,newptr)) {
+			break;
+		}
+	}
+
 	return true;
 }
 
@@ -168,6 +197,41 @@ bool sqlparser::orderByClause(const char *ptr, const char **newptr) {
 }
 
 const char *sqlparser::_order_by="order_by";
+const char *sqlparser::_order_by_item="order_by_item";
+
+bool sqlparser::parseAsc(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!asc(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_asc);
+}
+
+bool sqlparser::asc(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"asc");
+}
+
+const char *sqlparser::_asc="asc";
+
+bool sqlparser::parseDesc(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!desc(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_desc);
+}
+
+bool sqlparser::desc(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"desc");
+}
+
+const char *sqlparser::_desc="desc";
 
 bool sqlparser::parseLimit(xmldomnode *currentnode,
 					const char *ptr,

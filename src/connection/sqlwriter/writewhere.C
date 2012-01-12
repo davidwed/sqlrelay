@@ -51,6 +51,30 @@ bool sqlwriter::between(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::in(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("in");
+	return true;
+}
+
+bool sqlwriter::exists(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("exists");
+	return true;
+}
+
+bool sqlwriter::like(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("like");
+	return true;
+}
+
+bool sqlwriter::nullSafeEquals(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("<=>");
+	return true;
+}
+
 bool sqlwriter::notEquals(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("!=");

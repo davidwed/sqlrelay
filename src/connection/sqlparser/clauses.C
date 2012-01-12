@@ -16,7 +16,12 @@ bool sqlparser::equals(const char *ptr, const char **newptr) {
 
 bool sqlparser::notEquals(const char *ptr, const char **newptr) {
 	debugFunction();
-	return comparePart(ptr,newptr,"!=");
+	const char *parts[]={
+		"!=",
+		"<>",
+		NULL
+	};
+	return comparePart(ptr,newptr,parts);
 }
 
 bool sqlparser::lessThan(const char *ptr, const char **newptr) {

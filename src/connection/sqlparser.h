@@ -462,6 +462,26 @@ class sqlparser {
 						const char **newptr);
 		bool	betweenClause(const char *ptr, const char **newptr);
 		static const char	*_between;
+		bool	parseIn(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	inClause(const char *ptr, const char **newptr);
+		static const char	*_in;
+		bool	parseExists(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	existsClause(const char *ptr, const char **newptr);
+		static const char	*_exists;
+		bool	parseLike(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	like(const char *ptr, const char **newptr);
+		static const char	*_like;
+		bool	parseNullSafeEquals(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	nullSafeEquals(const char *ptr, const char **newptr);
+		static const char	*_null_safe_equals;
 		bool	parseEquals(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
@@ -581,6 +601,17 @@ class sqlparser {
 		bool	orderByClause(const char *ptr,
 						const char **newptr);
 		static const char *_order_by;
+		static const char *_order_by_item;
+		bool	parseAsc(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	asc(const char *ptr, const char **newptr);
+		static const char *_asc;
+		bool	parseDesc(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	desc(const char *ptr, const char **newptr);
+		static const char *_desc;
 		bool	parseLimit(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);

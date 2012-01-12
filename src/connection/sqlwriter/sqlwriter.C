@@ -163,6 +163,10 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_comparison,
 		sqlparser::_not,
 		sqlparser::_between,
+		sqlparser::_in,
+		sqlparser::_exists,
+		sqlparser::_like,
+		sqlparser::_null_safe_equals,
 		sqlparser::_not_equals,
 		sqlparser::_less_than,
 		sqlparser::_greater_than,
@@ -192,6 +196,9 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_group_by,
 		sqlparser::_having,
 		sqlparser::_order_by,
+		sqlparser::_order_by_item,
+		sqlparser::_asc,
+		sqlparser::_desc,
 		sqlparser::_limit,
 		sqlparser::_select_into,
 		sqlparser::_for_update,
@@ -416,6 +423,15 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return notClause(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_between)) {
 		return between(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_in)) {
+		return in(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_exists)) {
+		return exists(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_like)) {
+		return like(node,output);
+	} else if (!charstring::compare(nodename,
+				sqlparser::_null_safe_equals)) {
+		return nullSafeEquals(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_not_equals)) {
 		return notEquals(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_less_than)) {
@@ -477,6 +493,30 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return having(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_order_by)) {
 		return orderBy(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_order_by_item)) {
+		return orderByItem(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_asc)) {
+		return asc(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_desc)) {
+		return desc(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_limit)) {
+		return limit(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_select_into)) {
+		return selectInto(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_procedure)) {
+		return procedure(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_for_update)) {
+		return forUpdate(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_set)) {
+		return setQuery(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_set_global)) {
+		return setGlobal(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_set_session)) {
+		return setSession(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_transaction)) {
+		return transaction(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_isolation_level)) {
+		return isolationLevel(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_limit)) {
 		return limit(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_select_into)) {
@@ -544,6 +584,8 @@ bool sqlwriter::handleEnd(xmldomnode *node, stringbuffer *output) {
 		return endParameters(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_parameter)) {
 		return endParameter(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_order_by_item)) {
+		return endOrderByItem(node,output);
 	}
 	return true;
 }
