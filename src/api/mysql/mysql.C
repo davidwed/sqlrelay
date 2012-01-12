@@ -7,7 +7,7 @@
 #include <rudiments/stringbuffer.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/environment.h>
-#include <math.h>
+#include <locale.h>
 
 #define NEED_DATATYPESTRING 1
 #define NEED_IS_NUMBER_TYPE_CHAR 1
@@ -1699,6 +1699,15 @@ static void getDate(const char *field, uint32_t length, MYSQL_BIND *bind) {
 	delete[] buffer;
 }
 
+void fixDecimalPoint(char *str) {
+	struct lconv	*l=localeconv();
+	for (char *c=str; *c; c++) {
+		if (*c=='.') {
+			*c=*(l->decimal_point);
+		}
+	}
+}
+
 int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 	debugFunction();
 
@@ -1798,6 +1807,7 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 							toInteger(row[i]);
 					break;
 				case MYSQL_TYPE_FLOAT:
+					fixDecimalPoint(row[i]);
 					*((float *)stmt->
 						resultbinds[i].buffer)=
 						(float)charstring::
@@ -1806,6 +1816,7 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 				case MYSQL_TYPE_NEWDECIMAL:
 				case MYSQL_TYPE_DECIMAL:
 				case MYSQL_TYPE_DOUBLE:
+					fixDecimalPoint(row[i]);
 					*((double *)stmt->
 						resultbinds[i].buffer)=
 						(double)charstring::
