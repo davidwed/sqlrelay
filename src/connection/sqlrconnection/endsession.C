@@ -70,6 +70,11 @@ void sqlrconnection_svr::endSessionInternal() {
 						isolationlevel:
 						getDefaultIsolationLevel());
 
+	// reset sql translation
+	if (sqlt) {
+		sqlt->endSession();
+	}
+
 	// end the session
 	endSession();
 }

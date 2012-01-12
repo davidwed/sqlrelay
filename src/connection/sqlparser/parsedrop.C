@@ -111,7 +111,7 @@ bool sqlparser::parseTableNameList(xmldomnode *currentnode,
 				newNode(tablesnode,_table_name_list_item);
 
 		// get the table name
-		if (!parseName(tablenode,*newptr,newptr)) {
+		if (!parseTableName(tablenode,*newptr,newptr)) {
 			return false;
 		}
 
@@ -122,7 +122,7 @@ bool sqlparser::parseTableNameList(xmldomnode *currentnode,
 
 		// if there's a space afterward, we're done getting table names
 		// (we have to check 1 char back because the space would have
-		// been consumed by the parseName call above)
+		// been consumed by the parseTableName call above)
 		if (*(*newptr-1)==' ') {
 			return true;
 		}

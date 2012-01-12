@@ -7,17 +7,21 @@
 #include <sqlparser.h>
 #include <debugprint.h>
 
+#include <rudiments/process.h>
+
 sqltranslator::sqltranslator() {
 	debugFunction();
 	xmld=NULL;
 	tree=NULL;
 	sqlrcon=NULL;
 	sqlrcur=NULL;
+	temptablepool=new memorypool(0,128,100);
 }
 
 sqltranslator::~sqltranslator() {
 	debugFunction();
 	delete xmld;
+	delete temptablepool;
 }
 
 bool sqltranslator::loadRules(const char *rules) {
@@ -40,6 +44,11 @@ bool sqltranslator::applyRules(sqlrconnection_svr *sqlrcon,
 	this->sqlrcur=sqlrcur;
 	tree=querytree;
 	return applyRulesToQuery(querytree->getRootNode());
+}
+
+void sqltranslator::endSession() {
+	temptablepool->free();
+	temptablemap.clear();
 }
 
 bool sqltranslator::applyRulesToQuery(xmldomnode *query) {
@@ -68,6 +77,11 @@ bool sqltranslator::applyRulesToQuery(xmldomnode *query) {
 		} else if (!charstring::compare(rulename,
 				"translate_date_times")) {
 			if (!translateDateTimes(query,rule)) {
+				return false;
+			}
+		} else if (!charstring::compare(rulename,
+				"temp_tables_localize")) {
+			if (!tempTablesLocalize(query,rule)) {
 				return false;
 			}
 		}
@@ -457,4 +471,91 @@ bool sqltranslator::isString(const char *value) {
 	size_t	length=charstring::length(value);
 	return ((value[0]=='\'' && value[length-1]=='\'') ||
 			(value[0]=='"' && value[length-1]=='"'));
+}
+
+bool sqltranslator::tempTablesLocalize(xmldomnode *query, xmldomnode *rule) {
+
+	// for "create temporary table" queries, find the table name,
+	// come up with a session-local name for it and put it in the map...
+	xmldomnode	*tablenamenode=findCreateTemporaryTableName(query);
+	if (tablenamenode) {
+		const char	*oldname=tablenamenode->getAttributeValue(
+							sqlparser::_value);
+		uint64_t	size=charstring::length(oldname)+1;
+		char	*oldnamecopy=(char *)temptablepool->malloc(size);
+		charstring::copy(oldnamecopy,oldname);
+		const char	*newname=generateTempTableName(oldname);
+		temptablemap.setData((char *)oldnamecopy,(char *)newname);
+	}
+
+	// for all queries, look for table name nodes or verbatim nodes and
+	// apply the mapping
+	return replaceTempTableName(query);
+}
+
+xmldomnode *sqltranslator::findCreateTemporaryTableName(xmldomnode *node) {
+
+	// create...
+	node=node->getFirstTagChild(sqlparser::_create);
+	if (node->isNullNode()) {
+		return NULL;
+	}
+
+	// temporary...
+	node=node->getFirstTagChild(sqlparser::_create_temporary);
+	if (node->isNullNode()) {
+		return NULL;
+	}
+
+	// table...
+	node=node->getNextTagSibling(sqlparser::_table);
+	if (node->isNullNode()) {
+		return NULL;
+	}
+
+	// table name...
+	node=node->getFirstTagChild(sqlparser::_table_name);
+	if (node->isNullNode()) {
+		return NULL;
+	}
+
+	return node;
+}
+
+const char *sqltranslator::generateTempTableName(const char *oldname) {
+
+	uint64_t	pid=process::getProcessId();
+	uint64_t	size=2+charstring::length(oldname)+1+
+				charstring::integerLength(pid)+1;
+	char	*newname=(char *)temptablepool->malloc(size);
+	snprintf(newname,size,"t_%s_%lld",oldname,pid);
+	return newname;
+}
+
+bool sqltranslator::replaceTempTableName(xmldomnode *node) {
+
+	// if the current node is a table name or verbatim node then see
+	// if it needs to be replaced
+	const char	*name=node->getName();
+	const char	*parentname=node->getParent()->getName();
+	if (!charstring::compare(name,sqlparser::_table_name) ||
+		!charstring::compare(name,sqlparser::_verbatim)) {
+
+		char	*newname=NULL;
+		char	*value=(char *)node->getAttributeValue(
+						sqlparser::_value);
+		if (temptablemap.getData(value,&newname)) {
+			node->setAttributeValue(sqlparser::_value,newname);
+		}
+	}
+
+	// run through child nodes too...
+	for (node=node->getFirstTagChild();
+			!node->isNullNode();
+			node=node->getNextTagSibling()) {
+		if (!replaceTempTableName(node)) {
+			return false;
+		}
+	}
+	return true;
 }

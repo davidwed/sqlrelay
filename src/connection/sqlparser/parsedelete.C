@@ -38,7 +38,7 @@ bool sqlparser::parseDelete(xmldomnode *currentnode,
 
 	// table name
 	// FIXME: in mysql, multiple tables may be specified
-	if (!parseName(deletenode,*newptr,newptr)) {
+	if (!parseTableName(deletenode,*newptr,newptr)) {
 		debugPrintf("missing table name\n");
 		error=true;
 		return false;

@@ -76,6 +76,7 @@ bool sqlwriter::write(xmldomnode *node, stringbuffer *output) {
 const char * const *sqlwriter::baseElements() {
 	debugFunction();
 	static const char *baseelements[]={
+		sqlparser::_table_name,
 		sqlparser::_name,
 		sqlparser::_type,
 		sqlparser::_size,
@@ -257,7 +258,9 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 	const char	*nodename=node->getName();
 
 	// generic...
-	if (!charstring::compare(nodename,sqlparser::_name)) {
+	if (!charstring::compare(nodename,sqlparser::_table_name)) {
+		return tableName(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_name)) {
 		return name(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_type)) {
 		return type(node,output);

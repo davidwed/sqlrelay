@@ -191,6 +191,18 @@ bool sqlparser::parse(const char *query) {
 	return !error;
 }
 
+bool sqlparser::parseTableName(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	char	*tablename=getWord(ptr,newptr);
+	newNode(currentnode,_table_name,tablename);
+	delete[] tablename;
+	return true;
+}
+
+const char *sqlparser::_table_name="table_name";
+
 bool sqlparser::parseName(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {

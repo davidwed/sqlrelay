@@ -81,6 +81,10 @@ class sqlparser {
 	// variable are all together.  Maybe I'll move them later.
 	public:
 		// generic...
+		bool	parseTableName(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char *_table_name;
 		bool	parseName(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);

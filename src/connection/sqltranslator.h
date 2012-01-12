@@ -6,6 +6,8 @@
 
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
+#include <rudiments/memorypool.h>
+#include <rudiments/dictionary.h>
 
 using namespace rudiments;
 
@@ -21,6 +23,8 @@ class sqltranslator {
 		virtual bool	applyRules(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldom *querytree);
+
+		virtual void	endSession();
 	protected:
 		virtual bool	applyRulesToQuery(xmldomnode *query);
 		virtual bool	translateDatatypes(xmldomnode *query,
@@ -44,6 +48,12 @@ class sqltranslator {
 							int16_t hour,
 							int16_t minute,
 							int16_t second);
+		virtual bool	tempTablesLocalize(xmldomnode *query,
+							xmldomnode *rule);
+		xmldomnode	*findCreateTemporaryTableName(
+							xmldomnode *query);
+		const char	*generateTempTableName(const char *oldname);
+		bool		replaceTempTableName(xmldomnode *node);
 
 
 		// helper methods
@@ -81,6 +91,9 @@ class sqltranslator {
 
 		sqlrconnection_svr	*sqlrcon;
 		sqlrcursor_svr		*sqlrcur;
+
+		memorypool	*temptablepool;
+		namevaluepairs	temptablemap;
 };
 
 #endif

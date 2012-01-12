@@ -39,6 +39,8 @@ class sqlwriter {
 						stringbuffer *output);
 
 		// generic
+		virtual bool	tableName(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	name(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	type(xmldomnode *node,

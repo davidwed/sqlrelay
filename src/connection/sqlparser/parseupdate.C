@@ -85,7 +85,7 @@ bool sqlparser::parseUpdate(xmldomnode *currentnode,
 	}
 
 	// table name
-	if (!parseName(updatenode,*newptr,newptr)) {
+	if (!parseTableName(updatenode,*newptr,newptr)) {
 		debugPrintf("missing table name\n");
 		error=true;
 		return false;

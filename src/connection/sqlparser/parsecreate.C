@@ -77,7 +77,7 @@ bool sqlparser::parseCreateTable(xmldomnode *currentnode,
 	parseIfNotExists(tablenode,ptr,newptr);
 
 	// table name
-	parseName(tablenode,*newptr,newptr);
+	parseTableName(tablenode,*newptr,newptr);
 
 	// column and constrain definitions
 	// (optional for create ... as select ...
@@ -588,7 +588,7 @@ bool sqlparser::parseReferenceDefinition(xmldomnode *currentnode,
 						_references);
 
 	// table name
-	if (!parseName(referencesnode,*newptr,newptr)) {
+	if (!parseTableName(referencesnode,*newptr,newptr)) {
 		debugPrintf("missing table name\n");
 		error=true;
 		return false;

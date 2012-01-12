@@ -69,7 +69,7 @@ bool sqlparser::parseInsertInto(xmldomnode *currentnode,
 	xmldomnode	*intonode=newNode(currentnode,_insert_into);
 
 	// table name
-	if (!parseName(intonode,*newptr,newptr)) {
+	if (!parseTableName(intonode,*newptr,newptr)) {
 		debugPrintf("missing table name\n");
 		error=true;
 		return false;

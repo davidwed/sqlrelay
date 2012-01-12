@@ -4,6 +4,13 @@
 #include <sqlwriter.h>
 #include <debugprint.h>
 
+bool sqlwriter::tableName(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
+
 bool sqlwriter::name(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
