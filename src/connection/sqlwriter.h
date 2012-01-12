@@ -256,6 +256,8 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	bindVariable(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	columnReference(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	function(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	parameters(xmldomnode *node,

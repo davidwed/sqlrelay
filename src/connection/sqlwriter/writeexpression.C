@@ -105,6 +105,11 @@ bool sqlwriter::bindVariable(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::columnReference(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
 bool sqlwriter::function(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);

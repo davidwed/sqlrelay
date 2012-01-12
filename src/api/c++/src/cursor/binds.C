@@ -4,6 +4,7 @@
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/rawbuffer.h>
+#include <rudiments/character.h>
 #include <defines.h>
 
 uint16_t sqlrcursor::countBindVariables() const {
@@ -33,13 +34,11 @@ uint16_t sqlrcursor::countBindVariables() const {
 		// If we're not inside of a quoted string and we run into
 		// a ?, : (for oracle-style bind's), @ (for sybase-style
 		// binds) or $ (for postgresql-style binds) and the previous
-		// character was whitespace, or a comma, left parenthesis or
-		// equal sign then we must have found a bind variable.
+		// character was something that might come before a bind
+		// variable then we must have found a bind variable.
 		// count ?, :, @, $ separately
 		if (!inquotes &&
-			(lastchar==' ' || lastchar=='	' ||
-			lastchar=='\n' || lastchar=='\r' ||
-			lastchar=='=' || lastchar==',' || lastchar=='(')) {
+			character::inSet(lastchar," \t\n\r=<>,(+-*/%|&!~^")) {
 			if (*ptr=='?') {
 				questionmarkcount++;
 			} else if (*ptr==':') {

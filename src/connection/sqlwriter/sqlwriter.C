@@ -185,6 +185,7 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_number,
 		sqlparser::_string_literal,
 		sqlparser::_bind_variable,
+		sqlparser::_column_reference,
 		sqlparser::_function,
 		sqlparser::_parameters,
 		sqlparser::_parameter,
@@ -461,6 +462,9 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return stringLiteral(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_bind_variable)) {
 		return bindVariable(node,output);
+	} else if (!charstring::compare(nodename,
+					sqlparser::_column_reference)) {
+		return columnReference(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_function)) {
 		return function(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_parameters)) {

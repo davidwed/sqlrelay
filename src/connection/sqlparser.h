@@ -18,8 +18,6 @@ class sqlparser {
 		xmldom	*detachTree();
 
 	private:
-		bool	inSet(char c, const char *set);
-
 		char	*cleanQuery(const char *query);
 
 		bool	comparePart(const char *ptr,
@@ -562,6 +560,7 @@ class sqlparser {
 						const char *name,
 						const char *ptr,
 						const char **newptr);
+		static const char	*_column_reference;
 		static const char	*_function;
 		static const char	*_parameters;
 		static const char	*_parameter;

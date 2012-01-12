@@ -338,7 +338,7 @@ bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
 
 	// FIXME: split dot-delimited function names
 
-	const char	*type=_column;
+	const char	*type=_column_reference;
 
 	// some db's have special functions with no parameters
 	// (eg. sysdate, current_date, today, etc.)
@@ -346,7 +346,7 @@ bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
 	if (specialFunctionName(name)) {
 		type=_function;
 	} else {
-		type=_column;
+		type=_column_reference;
 	}
 
 	// create the nodes
@@ -355,6 +355,7 @@ bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
 	return true;
 }
 
+const char *sqlparser::_column_reference="column_reference";
 const char *sqlparser::_function="function";
 const char *sqlparser::_parameters="parameters";
 const char *sqlparser::_parameter="parameter";

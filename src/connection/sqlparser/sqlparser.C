@@ -109,12 +109,3 @@ char *sqlparser::cleanQuery(const char *query) {
 	debugPrintf("clean and fixed-up query:\n\"%s\"\n\n",retval);
 	return retval;
 }
-
-bool sqlparser::inSet(char c, const char *set) {
-	for (uint16_t i=0; set[i]; i++) {
-		if (set[i]==c) {
-			return true;
-		}
-	}
-	return false;
-}

@@ -43,7 +43,7 @@ main() {
 		"	blah blahtype(blah) blah not null blah unsigned blah(blah), "
 		"	foreign integer references foreign_table (col1, col2, col3) match full on delete set null on update cascade "
 		") "
-		//"	on commit preserve rows "
+		"	on commit preserve rows "
 		"	engine = innodb "
 		"	auto_increment = 50 "
 		"	avg_row_length = 100 "

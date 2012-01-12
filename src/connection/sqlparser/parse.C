@@ -112,7 +112,7 @@ char *sqlparser::getVerbatim(const char *ptr, const char **newptr) {
 
 	// if we find a character in our termination set
 	// then just return that by itself
-	if (inSet(*chr,verbatimTerminators)) {
+	if (character::inSet(*chr,verbatimTerminators)) {
 		verbatim.append(*chr);
 		*newptr=chr+1;
 		debugPrintf("verbatim: \"%s\"\n",verbatim.getString());
@@ -125,7 +125,7 @@ char *sqlparser::getVerbatim(const char *ptr, const char **newptr) {
 		// break on one of the termination characters
 		// unless we're in quotes
 		if (!*chr || (!inquotes && !indoublequotes &&
-					inSet(*chr,verbatimTerminators))) {
+				character::inSet(*chr,verbatimTerminators))) {
 			break;
 		}
 
