@@ -119,10 +119,42 @@ bool sqlparser::parseGroupBy(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
+
+	// look for group by
 	if (!groupByClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,_group_by);
+
+	// create the node
+	xmldomnode	*groupbynode=newNode(currentnode,_group_by);
+
+	for (;;) {
+		
+		// create the node
+		xmldomnode	*groupbyitemnode=
+				newNode(groupbynode,_group_by_item);
+
+		if (!parseExpression(groupbyitemnode,*newptr,newptr)) {	
+			debugPrintf("missing group by expression\n");
+			error=true;
+			return false;
+		}
+
+		// asc
+		parseAsc(groupbyitemnode,*newptr,newptr);
+
+		// desc
+		parseDesc(groupbyitemnode,*newptr,newptr);
+
+		// comma
+		if (!comma(*newptr,newptr)) {
+			break;
+		}
+	}
+
+	// with rollup (optional)
+	parseWithRollup(groupbynode,*newptr,newptr);
+
 	return true;
 }
 
@@ -132,24 +164,25 @@ bool sqlparser::groupByClause(const char *ptr, const char **newptr) {
 }
 
 const char *sqlparser::_group_by="group_by";
+const char *sqlparser::_group_by_item="group_by_item";
 
-bool sqlparser::parseHaving(xmldomnode *currentnode,
+bool sqlparser::parseWithRollup(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
-	if (!havingClause(ptr,newptr)) {
+	if (!withRollupClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,_having);
+	newNode(currentnode,_with_rollup);
 	return true;
 }
 
-bool sqlparser::havingClause(const char *ptr, const char **newptr) {
+bool sqlparser::withRollupClause(const char *ptr, const char **newptr) {
 	debugFunction();
-	return comparePart(ptr,newptr,"having ");
+	return comparePart(ptr,newptr,"with rollup");
 }
 
-const char *sqlparser::_having="having";
+const char *sqlparser::_with_rollup="with_rollup";
 
 bool sqlparser::parseOrderBy(xmldomnode *currentnode,
 					const char *ptr,
@@ -207,6 +240,7 @@ bool sqlparser::parseAsc(xmldomnode *currentnode,
 		return false;
 	}
 	newNode(currentnode,_asc);
+	return true;
 }
 
 bool sqlparser::asc(const char *ptr, const char **newptr) {
@@ -224,6 +258,7 @@ bool sqlparser::parseDesc(xmldomnode *currentnode,
 		return false;
 	}
 	newNode(currentnode,_desc);
+	return true;
 }
 
 bool sqlparser::desc(const char *ptr, const char **newptr) {

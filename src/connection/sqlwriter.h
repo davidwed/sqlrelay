@@ -278,6 +278,12 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	groupBy(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	groupByItem(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	endGroupByItem(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	withRollup(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	having(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	orderBy(xmldomnode *node,

@@ -35,6 +35,35 @@ bool sqlparser::whereClause(const char *ptr, const char **newptr) {
 
 const char *sqlparser::_where="where";
 
+bool sqlparser::parseHaving(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+
+	// look for a having clause
+	if (!havingClause(ptr,newptr)) {
+		return false;
+	}
+
+	// create the node
+	xmldomnode	*havingnode=newNode(currentnode,_having);
+
+	#ifndef PARSE_WHERE
+		// bail here to disable having-clause parsing
+		return true;
+	#endif
+
+	// parse the having clause terms
+	return parseWhereClauseTerms(havingnode,*newptr,newptr);
+}
+
+bool sqlparser::havingClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"having ");
+}
+
+const char *sqlparser::_having="having";
+
 bool sqlparser::parseWhereClauseTerms(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {

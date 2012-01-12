@@ -433,6 +433,12 @@ class sqlparser {
 		bool	whereClause(const char *ptr,
 						const char **newptr);
 		static const char	*_where;
+		bool	parseHaving(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	havingClause(const char *ptr,
+						const char **newptr);
+		static const char	*_having;
 		bool	parseWhereClauseTerms(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
@@ -505,9 +511,6 @@ class sqlparser {
 						const char *ptr,
 						const char **newptr);
 		static const char	*_greater_than_or_equal_to;
-		bool	parseGroupBy(xmldomnode *currentnode,
-						const char *ptr,
-						const char **newptr);
 		bool	parseExpression(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
@@ -586,15 +589,19 @@ class sqlparser {
 		static const char	*_parameter;
 		bool	specialFunctionName(const char *name);
 		virtual const char * const	 *specialFunctionNames();
+		bool	parseGroupBy(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
 		bool	groupByClause(const char *ptr,
 						const char **newptr);
 		static const char *_group_by;
-		bool	parseHaving(xmldomnode *currentnode,
+		static const char *_group_by_item;
+		bool	parseWithRollup(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	havingClause(const char *ptr,
+		bool	withRollupClause(const char *ptr,
 						const char **newptr);
-		static const char *_having;
+		static const char *_with_rollup;
 		bool	parseOrderBy(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);

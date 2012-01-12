@@ -194,6 +194,8 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_parameters,
 		sqlparser::_parameter,
 		sqlparser::_group_by,
+		sqlparser::_group_by_item,
+		sqlparser::_with_rollup,
 		sqlparser::_having,
 		sqlparser::_order_by,
 		sqlparser::_order_by_item,
@@ -489,6 +491,10 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return parameter(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_group_by)) {
 		return groupBy(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_group_by_item)) {
+		return groupByItem(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_with_rollup)) {
+		return withRollup(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_having)) {
 		return having(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_order_by)) {
@@ -586,6 +592,8 @@ bool sqlwriter::handleEnd(xmldomnode *node, stringbuffer *output) {
 		return endParameter(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_order_by_item)) {
 		return endOrderByItem(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_group_by_item)) {
+		return endGroupByItem(node,output);
 	}
 	return true;
 }

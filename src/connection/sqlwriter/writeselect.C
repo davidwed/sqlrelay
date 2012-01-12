@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlwriter.h>
+#include <sqlparser.h>
 #include <debugprint.h>
 
 bool sqlwriter::selectQuery(xmldomnode *node, stringbuffer *output) {
@@ -31,6 +32,29 @@ bool sqlwriter::from(xmldomnode *node, stringbuffer *output) {
 bool sqlwriter::groupBy(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("group by");
+	return true;
+}
+
+bool sqlwriter::groupByItem(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::endGroupByItem(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	// write a comma if the next node is another group-by-item
+	xmldomnode	*next=node->getNextTagSibling();
+	if (!next->isNullNode() &&
+		!charstring::compare(next->getName(),
+					sqlparser::_group_by_item)) {
+		comma(output);
+	}
+	return true;
+}
+
+bool sqlwriter::withRollup(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("with rollup");
 	return true;
 }
 
