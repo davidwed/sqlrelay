@@ -865,7 +865,7 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 			// figure out the column type
 			const char	*columntypestring=
 						sqlrcur->getField(i,1);
-			int64_t		scale=sqlrcur->getFieldAsInteger(i,4);
+			int64_t	scale=sqlrcur->getFieldAsInteger(i,4);
 			enum enum_field_types	columntype=
 					map_col_type(columntypestring,scale);
 			fields[i].type=columntype;
@@ -1909,7 +1909,16 @@ static void processFields(MYSQL_STMT *stmt) {
 			// figure out the column type
 			const char	*columntypestring=
 						sqlrcur->getColumnType(i);
-			int64_t	scale=sqlrcur->getColumnScale(i);
+			int64_t	precision=sqlrcur->getColumnPrecision(i);
+			// Occasionally an integer column will come back with a
+			// length and scale but no precision.  This has got to
+			// be some kind of error.  It causes the column to be
+			// defined as a decimal and causes various cascading
+			// problems later.  In those cases, also setting the
+			// scale to 0 is probably the best course of action.
+			// The column will remain an integer and the length
+			// instead of precision to size it.
+			int64_t	scale=(precision)?sqlrcur->getColumnScale(i):0;
 			enum enum_field_types	columntype=
 					map_col_type(columntypestring,scale);
 			fields[i].type=columntype;
