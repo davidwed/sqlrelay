@@ -54,6 +54,7 @@ class sqltranslator {
 							xmldomnode *query);
 		const char	*generateTempTableName(const char *oldname);
 		bool		replaceTempTableName(xmldomnode *node);
+		bool		verbatimTableReference(xmldomnode *node);
 
 
 		// helper methods

@@ -8,6 +8,7 @@
 #include <debugprint.h>
 
 #include <rudiments/process.h>
+#include <rudiments/character.h>
 
 sqltranslator::sqltranslator() {
 	debugFunction();
@@ -534,16 +535,15 @@ const char *sqltranslator::generateTempTableName(const char *oldname) {
 
 bool sqltranslator::replaceTempTableName(xmldomnode *node) {
 
-	// if the current node is a table name or verbatim node then see
+	// if the current node is a table name or valid verbatim node then see
 	// if it needs to be replaced
-	const char	*name=node->getName();
-	const char	*parentname=node->getParent()->getName();
-	if (!charstring::compare(name,sqlparser::_table_name) ||
-		!charstring::compare(name,sqlparser::_verbatim)) {
+	if (!charstring::compare(node->getName(),sqlparser::_table_name) ||
+						verbatimTableReference(node)) {
 
 		char	*newname=NULL;
 		char	*value=(char *)node->getAttributeValue(
 						sqlparser::_value);
+
 		if (temptablemap.getData(value,&newname)) {
 			node->setAttributeValue(sqlparser::_value,newname);
 		}
@@ -557,5 +557,97 @@ bool sqltranslator::replaceTempTableName(xmldomnode *node) {
 			return false;
 		}
 	}
+	return true;
+}
+
+bool sqltranslator::verbatimTableReference(xmldomnode *node) {
+
+	// is this a verbatim node?
+	if (charstring::compare(node->getName(),sqlparser::_verbatim)) {
+		return false;
+	}
+
+	// The query parsing isn't all that intelligent yet, so lots of things
+	// are just "verbatim" right now.  We need to attempt to determine
+	// whether this verbatim node is a reference to a table name or
+	// something else.
+
+	// We don't have to worry about columns in insert or update queries,
+	// they are parsed out already.  We just have to worry about
+	// where-clauses for various queries an the column list in a select,
+	// including subselects which may occur in other queries too.
+
+	// get the values of the next and previous siblings, we'll need them...
+	const char *nextvalue=node->getNextTagSibling()->
+					getAttributeValue(sqlparser::_value);
+	if (!nextvalue) {
+		nextvalue=node->getNextTagSibling()->getName();
+	}
+	const char *prevvalue=node->getPreviousTagSibling()->
+					getAttributeValue(sqlparser::_value);
+	if (!prevvalue) {
+		prevvalue=node->getPreviousTagSibling()->getName();
+	}
+
+	// if the next node is a period, then this is certainly a table name
+	// (actually, it could be a package name too or other schema name too)
+	if (nextvalue && *nextvalue=='.') {
+		return true;
+	}
+
+	// if the next or previous sibling starts with something
+	// non-alphabetical such as an operator, paren, etc.
+	// (but not a comma, they are ok) then this is definitely
+	// not a table name
+	if ((nextvalue &&
+		!character::isAlphabetical(*nextvalue) && *nextvalue!=',') || 
+		(prevvalue &&
+		!character::isAlphabetical(*prevvalue) && *prevvalue!=',')) {
+		return false;
+	}
+
+	// if the next or previous is a "from", "and", "or", "not", "like", etc.
+	// then this is definitely not a table name
+	if (!charstring::compareIgnoringCase(nextvalue,
+						"as") ||
+		!charstring::compareIgnoringCase(nextvalue,
+						sqlparser::_from) ||
+		!charstring::compareIgnoringCase(nextvalue,
+						sqlparser::_and) ||
+		!charstring::compareIgnoringCase(nextvalue,
+						sqlparser::_or) ||
+		!charstring::compareIgnoringCase(nextvalue,
+						sqlparser::_not) ||
+		!charstring::compareIgnoringCase(nextvalue,
+						"like") ||
+		!charstring::compareIgnoringCase(nextvalue,
+						sqlparser::_between) ||
+		!charstring::compareIgnoringCase(nextvalue,
+						"in") ||
+		!charstring::compareIgnoringCase(nextvalue,
+						"exists") ||
+
+
+		!charstring::compareIgnoringCase(prevvalue,
+						sqlparser::_and) ||
+		!charstring::compareIgnoringCase(prevvalue,
+						sqlparser::_or) ||
+		!charstring::compareIgnoringCase(prevvalue,
+						sqlparser::_not) ||
+		!charstring::compareIgnoringCase(prevvalue,
+						"like") ||
+		!charstring::compareIgnoringCase(prevvalue,
+						sqlparser::_between) ||
+		!charstring::compareIgnoringCase(prevvalue,
+						"in") ||
+		!charstring::compareIgnoringCase(prevvalue,
+						"exists") ||
+		!charstring::compareIgnoringCase(prevvalue,
+						sqlparser::_where) ||
+		!charstring::compareIgnoringCase(prevvalue,
+						sqlparser::_order_by)) {
+		return false;
+	}
+
 	return true;
 }

@@ -93,7 +93,7 @@ char *sqlparser::getUntil(const char *set,
 	return retval;
 }
 
-static const char *verbatimTerminators=" (,)~!^*-+=<>/%&|";
+static const char *verbatimTerminators=" (,)~!^*-+=<>/%&|.";
 
 char *sqlparser::getVerbatim(const char *ptr, const char **newptr) {
 	debugFunction();
