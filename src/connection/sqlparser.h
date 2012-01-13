@@ -83,33 +83,33 @@ class sqlparser {
 		bool	parseTableName(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		static const char *_table_name;
+		static const char	*_table_name;
 		bool	parseName(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		static const char *_name;
+		static const char	*_name;
 		bool	parseType(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		static const char *_type;
-		static const char *_size;
+		static const char	*_type;
+		static const char	*_size;
 		bool	parseValues(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		static const char *_values;
-		static const char *_value;
+		static const char	*_values;
+		static const char	*_value;
 		bool	parseLength(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		static const char *_length;
+		static const char	*_length;
 		bool	parseScale(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		static const char *_scale;
+		static const char	*_scale;
 		bool	parseVerbatim(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		static const char *_verbatim;
+		static const char	*_verbatim;
 		bool	parseRemainderVerbatim(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
@@ -122,13 +122,13 @@ class sqlparser {
 						const char **newptr);
 		bool	createClause(const char *ptr,
 						const char **newptr);
-		static const char *_create;
+		static const char	*_create;
 		bool	parseCreateTemporary(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	temporaryClause(const char *ptr,
 						const char **newptr);
-		static const char *_create_temporary;
+		static const char	*_create_temporary;
 		bool	tableClause(const char *ptr,
 						const char **newptr);
 
@@ -137,116 +137,116 @@ class sqlparser {
 		bool	parseCreateTable(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		static const char *_table;
+		static const char	*_table;
 		bool	parseIfNotExists(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	ifNotExistsClause(const char *ptr,
 						const char **newptr);
-		static const char *_if_not_exists;
+		static const char	*_if_not_exists;
 		bool	parseColumnAndConstraintDefinitions(
 						xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		static const char *_columns;
-		static const char *_column;
+		static const char	*_columns;
+		static const char	*_column;
 		bool	parseColumnDefinition(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	parseConstraints(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		static const char *_constraints;
+		static const char	*_constraints;
 		bool	parseUnsigned(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	unsignedClause(const char *ptr,
 						const char **newptr);
-		static const char *_unsigned;
+		static const char	*_unsigned;
 		bool	parseZeroFill(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	zeroFillClause(const char *ptr,
 						const char **newptr);
-		static const char *_zerofill;
+		static const char	*_zerofill;
 		bool	parseBinary(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	binaryClause(const char *ptr,
 						const char **newptr);
-		static const char *_binary;
+		static const char	*_binary;
 		bool	parseCharacterSet(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	characterSetClause(const char *ptr,
 						const char **newptr);
-		static const char *_character_set;
+		static const char	*_character_set;
 		bool	parseCollate(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	collateClause(const char *ptr,
 						const char **newptr);
-		static const char *_collate;
+		static const char	*_collate;
 		bool	parseNull(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	nullClause(const char *ptr,
 						const char **newptr);
-		static const char *_null;
+		static const char	*_null;
 		bool	parseNotNull(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	notNullClause(const char *ptr,
 						const char **newptr);
-		static const char *_not_null;
+		static const char	*_not_null;
 		bool	parseDefault(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	defaultClause(const char *ptr,
 						const char **newptr);
-		static const char *_default;
+		static const char	*_default;
 		bool	parseAutoIncrement(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	autoIncrementClause(const char *ptr,
 						const char **newptr);
-		static const char *_auto_increment;
+		static const char	*_auto_increment;
 		bool	parseUniqueKey(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	uniqueKeyClause(const char *ptr,
 						const char **newptr);
-		static const char *_unique_key;
+		static const char	*_unique_key;
 		bool	parsePrimaryKey(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	primaryKeyClause(const char *ptr,
 						const char **newptr);
-		static const char *_primary_key;
+		static const char	*_primary_key;
 		bool	parseKey(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	keyClause(const char *ptr,
 						const char **newptr);
-		static const char *_key;
+		static const char	*_key;
 		bool	parseComment(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	commentClause(const char *ptr,
 						const char **newptr);
-		static const char *_comment;
+		static const char	*_comment;
 		bool	parseColumnFormat(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	columnFormatClause(const char *ptr,
 						const char **newptr);
-		static const char *_column_format;
+		static const char	*_column_format;
 		bool	parseReferenceDefinition(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	referencesClause(const char *ptr,
 						const char **newptr);
-		static const char *_references;
+		static const char	*_references;
 		bool	parseColumnNameList(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
@@ -255,19 +255,19 @@ class sqlparser {
 						const char **newptr);
 		bool	matchClause(const char *ptr,
 						const char **newptr);
-		static const char *_match;
+		static const char	*_match;
 		bool	parseOnDelete(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	onDeleteClause(const char *ptr,
 						const char **newptr);
-		static const char *_on_delete;
+		static const char	*_on_delete;
 		bool	parseOnUpdate(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	onUpdateClause(const char *ptr,
 						const char **newptr);
-		static const char *_on_update;
+		static const char	*_on_update;
 		bool	parseReferenceOption(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
@@ -280,13 +280,13 @@ class sqlparser {
 						const char **newptr);
 		bool	onCommitOptionClause(const char *ptr,
 						const char **newptr);
-		static const char *_on_commit;
+		static const char	*_on_commit;
 		bool	parseAs(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	asClause(const char *ptr,
 						const char **newptr);
-		static const char *_as;
+		static const char	*_as;
 
 
 
@@ -296,11 +296,11 @@ class sqlparser {
 						const char **newptr);
 		bool	dropClause(const char *ptr,
 						const char **newptr);
-		static const char *_drop;
+		static const char	*_drop;
 		bool	parseDropTemporary(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		static const char *_drop_temporary;
+		static const char	*_drop_temporary;
 		bool	parseDropTable(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
@@ -309,24 +309,24 @@ class sqlparser {
 						const char **newptr);
 		bool	ifExistsClause(const char *ptr,
 						const char **newptr);
-		static const char *_if_exists;
+		static const char	*_if_exists;
 		bool	parseTableNameList(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		static const char *_table_name_list;
-		static const char *_table_name_list_item;
+		static const char	*_table_name_list;
+		static const char	*_table_name_list_item;
 		bool	parseRestrict(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	restrictClause(const char *ptr,
 						const char **newptr);
-		static const char *_restrict;
+		static const char	*_restrict;
 		bool	parseCascade(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	cascadeClause(const char *ptr,
 						const char **newptr);
-		static const char *_cascade;
+		static const char	*_cascade;
 
 
 
@@ -336,29 +336,29 @@ class sqlparser {
 						const char **newptr);
 		bool	insertClause(const char *ptr,
 						const char **newptr);
-		static const char *_insert;
+		static const char	*_insert;
 		bool	parseInsertInto(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	insertIntoClause(const char *ptr,
 						const char **newptr);
-		static const char *_insert_into;
+		static const char	*_insert_into;
 		bool	parseInsertValues(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	insertValuesClause(const char *ptr,
 						const char **newptr);
-		static const char *_insert_values_clause;
+		static const char	*_insert_values_clause;
 		bool	parseInsertValue(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	insertValueClause(const char *ptr,
 						const char **newptr);
-		static const char *_insert_value_clause;
+		static const char	*_insert_value_clause;
 		bool	parseInsertValuesList(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		static const char *_insert_value;
+		static const char	*_insert_value;
 
 
 
@@ -368,15 +368,15 @@ class sqlparser {
 						const char **newptr);
 		bool	updateClause(const char *ptr,
 						const char **newptr);
-		static const char *_update;
+		static const char	*_update;
 		bool	parseUpdateSet(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	updateSetClause(const char *ptr,
 						const char **newptr);
-		static const char *_update_set;
-		static const char *_assignment;
-		static const char *_equals;
+		static const char	*_update_set;
+		static const char	*_assignment;
+		static const char	*_equals;
 
 
 
@@ -386,19 +386,19 @@ class sqlparser {
 						const char **newptr);
 		bool	deleteClause(const char *ptr,
 						const char **newptr);
-		static const char *_delete;
+		static const char	*_delete;
 		bool	parseDeleteFrom(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	deleteFromClause(const char *ptr,
 						const char **newptr);
-		static const char *_delete_from;
+		static const char	*_delete_from;
 		bool	parseUsing(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	usingClause(const char *ptr,
 						const char **newptr);
-		static const char *_using;
+		static const char	*_using;
 
 
 
@@ -408,40 +408,109 @@ class sqlparser {
 						const char **newptr);
 		bool	selectClause(const char *ptr,
 						const char **newptr);
-		static const char *_select;
-		bool	parseSubSelects(xmldomnode *currentnode,
+		static const char	*_select;
+		static const char	*_select_expressions;
+		static const char	*_select_expression;
+		bool	parseSelectExpressionAlias(
+						xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		static const char *_sub_select;
 		bool	parseAlias(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr,
-						bool as);
-		static const char *_alias;
+						bool subselect);
+		bool	parseSubSelects(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_sub_select;
+		bool	parseSubSelectAlias(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_alias;
 		bool	parseUnion(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	unionClause(const char *ptr,
 						const char **newptr);
-		static const char *_union;
+		static const char	*_union;
+		bool	parseAll(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	allClause(const char *ptr,
+						const char **newptr);
+		static const char	*_all;
 		bool	parseUnique(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	uniqueClause(const char *ptr,
 						const char **newptr);
-		static const char *_unique;
+		static const char	*_unique;
 		bool	parseDistinct(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	distinctClause(const char *ptr,
 						const char **newptr);
-		static const char *_distinct;
+		static const char	*_distinct;
+		bool	parseDistinctRow(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	distinctRowClause(const char *ptr,
+						const char **newptr);
+		static const char	*_distinct_row;
+		bool	parseHighPriority(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr);
+		bool	highPriorityClause(const char *ptr,
+						const char **newptr);
+		static const char	*_high_priority;
+		bool	parseStraightJoin(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr);
+		bool	straightJoinClause(const char *ptr,
+						const char **newptr);
+		static const char	*_straight_join;
+		bool	parseSqlSmallResult(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr);
+		bool	sqlSmallResultClause(const char *ptr,
+						const char **newptr);
+		static const char	*_sql_small_result;
+		bool	parseSqlBigResult(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr);
+		bool	sqlBigResultClause(const char *ptr,
+						const char **newptr);
+		static const char	*_sql_big_result;
+		bool	parseSqlBufferResult(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr);
+		bool	sqlBufferResultClause(const char *ptr,
+						const char **newptr);
+		static const char	*_sql_buffer_result;
+		bool	parseSqlCache(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr);
+		bool	sqlCacheClause(const char *ptr,
+						const char **newptr);
+		static const char	*_sql_cache;
+		bool	parseSqlNoCache(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr);
+		bool	sqlNoCacheClause(const char *ptr,
+						const char **newptr);
+		static const char	*_sql_no_cache;
+		bool	parseSqlCalcFoundRows(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr);
+		bool	sqlCalcFoundRowsClause(const char *ptr,
+						const char **newptr);
+		static const char	*_sql_calc_found_rows;
 		bool	parseFrom(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	fromClause(const char *ptr,
 						const char **newptr);
-		static const char *_from;
+		static const char	*_from;
 		bool	parseWhere(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
@@ -612,55 +681,55 @@ class sqlparser {
 						const char **newptr);
 		bool	groupByClause(const char *ptr,
 						const char **newptr);
-		static const char *_group_by;
-		static const char *_group_by_item;
+		static const char	*_group_by;
+		static const char	*_group_by_item;
 		bool	parseWithRollup(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	withRollupClause(const char *ptr,
 						const char **newptr);
-		static const char *_with_rollup;
+		static const char	*_with_rollup;
 		bool	parseOrderBy(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	orderByClause(const char *ptr,
 						const char **newptr);
-		static const char *_order_by;
-		static const char *_order_by_item;
+		static const char	*_order_by;
+		static const char	*_order_by_item;
 		bool	parseAsc(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	asc(const char *ptr, const char **newptr);
-		static const char *_asc;
+		static const char	*_asc;
 		bool	parseDesc(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	desc(const char *ptr, const char **newptr);
-		static const char *_desc;
+		static const char	*_desc;
 		bool	parseLimit(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	limitClause(const char *ptr,
 						const char **newptr);
-		static const char *_limit;
+		static const char	*_limit;
 		bool	parseProcedure(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	procedureClause(const char *ptr,
 						const char **newptr);
-		static const char *_procedure;
+		static const char	*_procedure;
 		bool	parseSelectInto(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	selectIntoClause(const char *ptr,
 						const char **newptr);
-		static const char *_select_into;
+		static const char	*_select_into;
 		bool	parseForUpdate(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	forUpdateClause(const char *ptr,
 						const char **newptr);
-		static const char *_for_update;
+		static const char	*_for_update;
 
 
 		// set query...
@@ -668,29 +737,29 @@ class sqlparser {
 						const char *ptr,
 						const char **newptr);
 		bool setClause(const char *ptr, const char **newptr);
-		static const char *_set;
+		static const char	*_set;
 		bool parseSetGlobal(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool setGlobalClause(const char *ptr, const char **newptr);
-		static const char *_set_global;
+		static const char	*_set_global;
 		bool parseSetSession(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool setSessionClause(const char *ptr, const char **newptr);
-		static const char *_set_session;
+		static const char	*_set_session;
 		bool parseTransaction(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool transactionClause(const char *ptr,
 						const char **newptr);
-		static const char *_transaction;
+		static const char	*_transaction;
 		bool parseIsolationLevel(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool isolationLevelClause(const char *ptr,
 						const char **newptr);
-		static const char *_isolation_level;
+		static const char	*_isolation_level;
 		bool isolationLevelOptionClause(const char *ptr,
 						const char **newptr);
 		bool parseTransactionName(xmldomnode *currentnode,
@@ -698,7 +767,7 @@ class sqlparser {
 						const char **newptr);
 		bool transactionNameClause(const char *ptr,
 						const char **newptr);
-		static const char *_transaction_name;
+		static const char	*_transaction_name;
 
 		xmldom	*tree;
 		bool	error;

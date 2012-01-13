@@ -115,24 +115,10 @@ bool sqlparser::parseTableNameList(xmldomnode *currentnode,
 			return false;
 		}
 
-		// if we hit the end of the query then we're done
-		if (!**newptr) {
-			return true;
-		}
-
-		// if there's a space afterward, we're done getting table names
-		// (we have to check 1 char back because the space would have
-		// been consumed by the parseTableName call above)
-		if (*(*newptr-1)==' ') {
-			return true;
-		}
-
-		// if there's a comma afterward then
-		// we have more table names to get
+		// if there's a comma afterward then we have more
+		// table names to get, otherwise we're done
 		if (!comma(*newptr,newptr)) {
-			debugPrintf("missing comma or space\n");
-			error=true;
-			return false;
+			return true;
 		}
 	}
 }

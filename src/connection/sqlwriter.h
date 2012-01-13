@@ -190,6 +190,12 @@ class sqlwriter {
 		// select...
 		virtual bool	selectQuery(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	selectExpressions(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	selectExpression(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	endSelectExpression(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	subSelect(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	endSubSelect(xmldomnode *node,

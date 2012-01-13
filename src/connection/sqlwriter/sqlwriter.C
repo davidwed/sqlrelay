@@ -157,6 +157,8 @@ const char * const *sqlwriter::baseElements() {
 
 		// select...
 		sqlparser::_select,
+		sqlparser::_select_expression,
+		sqlparser::_select_expressions,
 		sqlparser::_sub_select,
 		sqlparser::_union,
 		sqlparser::_alias,
@@ -412,6 +414,12 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 	// select...
 	} else if (!charstring::compare(nodename,sqlparser::_select)) {
 		return selectQuery(node,output);
+	} else if (!charstring::compare(nodename,
+					sqlparser::_select_expressions)) {
+		return selectExpressions(node,output);
+	} else if (!charstring::compare(nodename,
+					sqlparser::_select_expression)) {
+		return selectExpression(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_sub_select)) {
 		return subSelect(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_union)) {
@@ -597,6 +605,9 @@ bool sqlwriter::handleEnd(xmldomnode *node, stringbuffer *output) {
 		return endAssignment(node,output);
 
 	// select...
+	} else if (!charstring::compare(nodename,
+					sqlparser::_select_expression)) {
+		return endSelectExpression(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_sub_select)) {
 		return endSubSelect(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_group)) {

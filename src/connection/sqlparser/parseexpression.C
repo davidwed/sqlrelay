@@ -3,7 +3,6 @@
 
 #include <sqlparser.h>
 #include <debugprint.h>
-#include <rudiments/snooze.h>
 
 bool sqlparser::parseExpression(xmldomnode *currentnode,
 					const char *ptr,
@@ -19,8 +18,7 @@ bool sqlparser::parseExpression(xmldomnode *currentnode,
 
 		// handle any unary operators
 		// (there could be any number of them, in any order)
-		while (parseUnaryOperator(expressionnode,*newptr,newptr)) {
-		}
+		do {} while (parseUnaryOperator(expressionnode,*newptr,newptr));
 
 		// handle expression groups
 		if (leftParen(*newptr,newptr)) {

@@ -3,6 +3,7 @@
 
 #include <sqlparser.h>
 #include <debugprint.h>
+#include <rudiments/snooze.h>
 
 bool sqlparser::parseSelect(xmldomnode *currentnode,
 					const char *ptr,
@@ -26,16 +27,82 @@ bool sqlparser::parseSelect(xmldomnode *currentnode,
 		// create the node
 		xmldomnode	*selectnode=newNode(currentnode,_select);
 
-		uint16_t	parenlevel=0;
-		foundunion=false;
+		// parse the select options
+		do {} while (parseAll(selectnode,*newptr,newptr) &&
+			parseUnique(selectnode,*newptr,newptr) &&
+			parseDistinct(selectnode,*newptr,newptr) &&
+			parseDistinctRow(selectnode,*newptr,newptr) &&
+			parseHighPriority(selectnode,*newptr,newptr) &&
+			parseStraightJoin(selectnode,*newptr,newptr) &&
+			parseSqlSmallResult(selectnode,*newptr,newptr) &&
+			parseSqlBigResult(selectnode,*newptr,newptr) &&
+			parseSqlBufferResult(selectnode,*newptr,newptr) &&
+			parseSqlCache(selectnode,*newptr,newptr) &&
+			parseSqlNoCache(selectnode,*newptr,newptr) &&
+			parseSqlCalcFoundRows(selectnode,*newptr,newptr));
+
+		// create a node
+		xmldomnode	*selectexprsnode=
+					newNode(selectnode,_select_expressions);
+
+		// parse the expressions
+		bool	first=true;
+		for (;;) {
+
+			// look for a from clause
+			// (do this first so the word "from" doesn't get
+			// mistaken for a term in an expression
+			const char	*beforefrom=*newptr;
+			if (fromClause(*newptr,newptr)) {
+				*newptr=beforefrom;
+				if (first) {
+					debugPrintf("no select expressions\n");
+					error=true;
+					return false;
+				}
+				break;
+			}
+
+			// there should be a comma after each expression
+			if (!first) {
+				if (!comma(*newptr,newptr)) {
+					debugPrintf("missing comma\n");
+					error=true;
+					return false;
+				}
+			}
+
+			// create a node
+			xmldomnode	*selectexprnode=
+					newNode(selectexprsnode,
+						_select_expression);
+
+			// look for expressions and subqueries
+			if (parseSubSelects(selectexprnode,
+						*newptr,newptr) ||
+				parseExpression(selectexprnode,
+						*newptr,newptr)) {
+
+				// alias
+				parseSelectExpressionAlias(selectexprnode,
+								*newptr,newptr);
+				first=false;
+				continue;
+			}
+
+			// if we got here then there was no from clause
+			debugPrintf("missing from clause\n");
+			error=true;
+			return false;
+		}
 
 		// parse the select clauses
+		uint16_t	parenlevel=0;
+		foundunion=false;
 		for (;;) {
 
 			// look for known options
-			if (parseUnique(selectnode,*newptr,newptr) ||
-				parseDistinct(selectnode,*newptr,newptr) ||
-				parseFrom(selectnode,*newptr,newptr) ||
+			if (parseFrom(selectnode,*newptr,newptr) ||
 				parseWhere(selectnode,*newptr,newptr) ||
 				parseGroupBy(selectnode,*newptr,newptr) ||
 				parseHaving(selectnode,*newptr,newptr) ||
@@ -94,6 +161,72 @@ bool sqlparser::selectClause(const char *ptr, const char **newptr) {
 }
 
 const char *sqlparser::_select="select";
+const char *sqlparser::_select_expressions="select_expressions";
+const char *sqlparser::_select_expression="select_expression";
+
+bool sqlparser::parseSelectExpressionAlias(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	return parseAlias(currentnode,ptr,newptr,false);
+}
+
+bool sqlparser::parseAlias(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr,
+						bool subselect) {
+	debugFunction();
+
+	const char	*reset=ptr;
+	bool		retval=true;
+	char		*as=NULL;
+
+	// get the next word
+	char	*word=getVerbatim(ptr,newptr);
+
+	// if it's "as" then get the word after that
+	if (!charstring::compareIgnoringCase(word,sqlparser::_as)) {
+		as=word;
+		reset=*newptr;
+		word=getVerbatim(*newptr,newptr);
+	}
+
+	// see if the word was something that would come after a select
+	// expression that can't be an alias
+	if (!charstring::length(word) ||
+		!charstring::compareIgnoringCase(word,",") ||
+		!charstring::compareIgnoringCase(word,")") ||
+		!charstring::compareIgnoringCase(word,sqlparser::_from) ||
+		(subselect &&
+		(!charstring::compareIgnoringCase(word,sqlparser::_where) ||
+		!charstring::compareIgnoringCase(word,sqlparser::_union)))) {
+
+		// if so...
+		if (charstring::length(as)) {
+			// if there was an "as" then it must be the alias
+			// store it and reset to before this last word
+			newNode(currentnode,_alias,as);
+			*newptr=reset;
+		} else {
+			// there was no as or alias, reset and bail
+			*newptr=reset;
+			retval=false;
+		}
+
+	} else {
+
+		// if not, append the alias
+		if (charstring::length(as)) {
+			currentnode=newNode(currentnode,_as);
+		}
+		newNode(currentnode,_alias,word);
+	}
+
+	// clean up
+	delete[] word;
+	delete[] as;
+
+	return retval;
+}
 
 bool sqlparser::parseSubSelects(xmldomnode *currentnode,
 					const char *ptr,
@@ -113,8 +246,10 @@ bool sqlparser::parseSubSelects(xmldomnode *currentnode,
 
 		// parse the subselect
 		if (!parseSelect(subselectnode,*newptr,newptr)) {
-			debugPrintf("missing subselect\n");
-			error=true;
+			// apparently this isn't a select at all, but some
+			// other grouping, reset and bail
+			*newptr=ptr;
+			currentnode->deleteChild(subselectnode);
 			return false;
 		}
 
@@ -125,57 +260,10 @@ bool sqlparser::parseSubSelects(xmldomnode *currentnode,
 			return false;
 		}
 
-		// It gets very complicated here.  There could be an alias,
-		// optionally with an "as" before it, there could be a union,
-		// or there could be nothing.  Since different DB's do their
-		// aliases differently, it's hard to say what the rules for
-		// a valid alias are and difficult to determine whether one
-		// is present.
+		// alias
+		parseSubSelectAlias(currentnode,*newptr,newptr);
 
-		// look for unions again
-		if (parseUnion(currentnode,*newptr,newptr)) {
-			continue;
-		}
-
-		// as clause (optional)
-		const char	*beforeas=*newptr;
-		bool		foundas=asClause(*newptr,newptr);
-
-		// look for unions again
-		if (parseUnion(currentnode,*newptr,newptr)) {
-			if (foundas) {
-				// apparently the "as" was the alias
-				parseAlias(currentnode,
-						beforeas,&beforeas,false);
-			}
-			continue;
-		}
-
-		// look for stuff that comes after a subselect
-		// FIXME: I really need to look for joins here too
-		const char	*beforealias=*newptr;
-		if (comma(*newptr,newptr) || rightParen(*newptr,newptr)) {
-			*newptr=beforealias;
-			if (foundas) {
-				// apparently the "as" was the alias
-				parseAlias(currentnode,*newptr,newptr,false);
-			}
-			return true;
-		}
-
-		// if we didn't find a union then
-		// the next word might be an alias
-		if (!parseAlias(currentnode,*newptr,newptr,foundas)) {
-			// if we found something other than an alias but
-			// we found an as clause earlier, then again, the
-			// "as" clause was the alias
-			if (foundas) {
-				parseAlias(currentnode,
-						beforeas,&beforeas,false);
-			}
-		}
-
-		// look for unions again
+		// unions
 		if (parseUnion(currentnode,*newptr,newptr)) {
 			continue;
 		}
@@ -188,22 +276,10 @@ bool sqlparser::parseSubSelects(xmldomnode *currentnode,
 
 const char *sqlparser::_sub_select="sub_select";
 
-bool sqlparser::parseAlias(xmldomnode *currentnode,
+bool sqlparser::parseSubSelectAlias(xmldomnode *currentnode,
 					const char *ptr,
-					const char **newptr,
-					bool as) {
-	debugFunction();
-	bool	retval=false;
-	char	*alias=getWord(ptr,newptr);
-	if (charstring::length(alias)) {
-		if (as) {
-			currentnode=newNode(currentnode,_as);
-		}
-		newNode(currentnode,_alias,alias);
-		retval=true;
-	}
-	delete[] alias;
-	return retval;
+					const char **newptr) {
+	return parseAlias(currentnode,ptr,newptr,true);
 }
 
 const char *sqlparser::_alias="alias";
@@ -225,6 +301,24 @@ bool sqlparser::unionClause(const char *ptr, const char **newptr) {
 }
 
 const char *sqlparser::_union="union";
+
+bool sqlparser::parseAll(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!allClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_all);
+	return true;
+}
+
+bool sqlparser::allClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"all ");
+}
+
+const char *sqlparser::_all="all";
 
 bool sqlparser::parseUnique(xmldomnode *currentnode,
 					const char *ptr,
@@ -261,6 +355,168 @@ bool sqlparser::distinctClause(const char *ptr, const char **newptr) {
 }
 
 const char *sqlparser::_distinct="distinct";
+
+bool sqlparser::parseDistinctRow(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!distinctRowClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_distinct_row);
+	return true;
+}
+
+bool sqlparser::distinctRowClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"distinctrow ");
+}
+
+const char *sqlparser::_distinct_row="distinct_row";
+
+bool sqlparser::parseHighPriority(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!highPriorityClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_high_priority);
+	return true;
+}
+
+bool sqlparser::highPriorityClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"high_priority ");
+}
+
+const char *sqlparser::_high_priority="high_priority";
+
+bool sqlparser::parseStraightJoin(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!straightJoinClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_straight_join);
+	return true;
+}
+
+bool sqlparser::straightJoinClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"straight_join ");
+}
+
+const char *sqlparser::_straight_join="straight_join";
+
+bool sqlparser::parseSqlSmallResult(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!sqlSmallResultClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_sql_small_result);
+	return true;
+}
+
+bool sqlparser::sqlSmallResultClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"sql_small_result ");
+}
+
+const char *sqlparser::_sql_small_result="sql_small_result";
+
+bool sqlparser::parseSqlBigResult(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!sqlBigResultClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_sql_big_result);
+	return true;
+}
+
+bool sqlparser::sqlBigResultClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"sql_big_result ");
+}
+
+const char *sqlparser::_sql_big_result="sql_big_result";
+
+bool sqlparser::parseSqlBufferResult(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!sqlBufferResultClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_sql_buffer_result);
+	return true;
+}
+
+bool sqlparser::sqlBufferResultClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"sql_buffer_result ");
+}
+
+const char *sqlparser::_sql_buffer_result="sql_buffer_result";
+
+bool sqlparser::parseSqlCache(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!sqlCacheClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_sql_cache);
+	return true;
+}
+
+bool sqlparser::sqlCacheClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"sql_cache ");
+}
+
+const char *sqlparser::_sql_cache="sql_cache";
+
+bool sqlparser::parseSqlNoCache(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!sqlNoCacheClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_sql_no_cache);
+	return true;
+}
+
+bool sqlparser::sqlNoCacheClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"sql_no_cache ");
+}
+
+const char *sqlparser::_sql_no_cache="sql_no_cache";
+
+bool sqlparser::parseSqlCalcFoundRows(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!sqlCalcFoundRowsClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_sql_calc_found_rows);
+	return true;
+}
+
+bool sqlparser::sqlCalcFoundRowsClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"sql_calc_found_rows ");
+}
+
+const char *sqlparser::_sql_calc_found_rows="sql_calc_found_rows";
 
 bool sqlparser::parseFrom(xmldomnode *currentnode,
 					const char *ptr,

@@ -11,6 +11,24 @@ bool sqlwriter::selectQuery(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::selectExpressions(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::selectExpression(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::endSelectExpression(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	if (hasSibling(node)) {
+		comma(output);
+	}
+	return true;
+}
+
 bool sqlwriter::subSelect(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	leftParen(output);
