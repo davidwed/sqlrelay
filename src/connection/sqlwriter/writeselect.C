@@ -11,6 +11,30 @@ bool sqlwriter::selectQuery(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::subSelect(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	leftParen(output);
+	return true;
+}
+
+bool sqlwriter::endSubSelect(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	rightParen(output);
+	return true;
+}
+
+bool sqlwriter::unionClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("union");
+	return true;
+}
+
+bool sqlwriter::alias(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
 bool sqlwriter::unique(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("unique");

@@ -67,6 +67,11 @@ bool sqlparser::parseComparison(xmldomnode *currentnode,
 		error=false;
 	}
 
+	// handle exists
+	if (parseExists(comparisonnode,*newptr,newptr)) {
+		return true;
+	}
+
 	// get the lvalue
 	if (!parseExpression(comparisonnode,*newptr,newptr)) {
 		debugPrintf("missing lvalue\n");
@@ -88,11 +93,6 @@ bool sqlparser::parseComparison(xmldomnode *currentnode,
 
 	// handle in
 	if (parseIn(comparisonnode,*newptr,newptr)) {
-		return true;
-	}
-
-	// handle exists
-	if (parseExists(comparisonnode,*newptr,newptr)) {
 		return true;
 	}
 
@@ -173,9 +173,6 @@ bool sqlparser::parseIn(xmldomnode *currentnode,
 					const char **newptr) {
 	debugFunction();
 
-	// FIXME: implament this
-	return false;
-
 	// look for in
 	if (!inClause(ptr,newptr)) {
 		return false;
@@ -191,10 +188,20 @@ bool sqlparser::parseIn(xmldomnode *currentnode,
 		return false;
 	}
 
-	// there could be a set of values or an entire query in here...
+	// parse the select
+	if (!parseSelect(innode,*newptr,newptr) ||
+		parseInSet(innode,*newptr,newptr)) {
+		debugPrintf("missing select\n");
+		error=true;
+		return false;
+	}
 
-	// FIXME: until full query parsing works,
-	// there's no good way to implement this
+	// there should be a right paren
+	if (!rightParen(*newptr,newptr)) {
+		debugPrintf("missing right paren\n");
+		error=true;
+		return false;
+	}
 
 	return false;
 }
@@ -206,16 +213,21 @@ bool sqlparser::inClause(const char *ptr, const char **newptr) {
 
 const char *sqlparser::_in="in";
 
+bool sqlparser::parseInSet(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	// FIXME: implement this
+	return false;
+}
+
 bool sqlparser::parseExists(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
-	return false;
 	debugFunction();
 
-	// FIXME: implament this
-	return false;
-
 	// look for exists
+printf("looking for exists: \"%s\"\n",ptr);
 	if (!existsClause(ptr,newptr)) {
 		return false;
 	}
@@ -230,11 +242,21 @@ bool sqlparser::parseExists(xmldomnode *currentnode,
 		return false;
 	}
 
-	// there should be an entire query in here...
+	// parse the select
+	if (!parseSelect(existsnode,*newptr,newptr)) {
+		debugPrintf("missing select\n");
+		error=true;
+		return false;
+	}
 
-	// FIXME: until full query parsing works,
-	// there's no good way to implement this
+	// there should be a right paren
+	if (!rightParen(*newptr,newptr)) {
+		debugPrintf("missing right paren\n");
+		error=true;
+		return false;
+	}
 
+	return true;
 }
 
 bool sqlparser::existsClause(const char *ptr, const char **newptr) {

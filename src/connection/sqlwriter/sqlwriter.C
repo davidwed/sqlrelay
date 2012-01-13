@@ -18,9 +18,7 @@ sqlwriter::~sqlwriter() {
 bool sqlwriter::write(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur,
 					xmldom *tree, stringbuffer *output) {
 	debugFunction();
-	this->sqlrcon=sqlrcon;
-	this->sqlrcur=sqlrcur;
-	return write(tree->getRootNode()->getFirstTagChild(),output);
+	return write(sqlrcon,sqlrcur,tree->getRootNode(),output);
 }
 
 bool sqlwriter::write(sqlrconnection_svr *sqlrcon,
@@ -30,7 +28,13 @@ bool sqlwriter::write(sqlrconnection_svr *sqlrcon,
 	debugFunction();
 	this->sqlrcon=sqlrcon;
 	this->sqlrcur=sqlrcur;
-	return write(tree,output);
+	for (xmldomnode *child=tree->getFirstTagChild();
+		!child->isNullNode(); child=child->getNextTagSibling()) {
+		if (!write(child,output)) {
+			return false;
+		}
+	}
+	return true;
 }
 
 bool sqlwriter::write(xmldomnode *node, stringbuffer *output) {
@@ -153,6 +157,9 @@ const char * const *sqlwriter::baseElements() {
 
 		// select...
 		sqlparser::_select,
+		sqlparser::_sub_select,
+		sqlparser::_union,
+		sqlparser::_alias,
 		sqlparser::_unique,
 		sqlparser::_distinct,
 		sqlparser::_from,
@@ -405,6 +412,12 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 	// select...
 	} else if (!charstring::compare(nodename,sqlparser::_select)) {
 		return selectQuery(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_sub_select)) {
+		return subSelect(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_union)) {
+		return unionClause(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_alias)) {
+		return alias(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_unique)) {
 		return unique(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_distinct)) {
@@ -584,6 +597,8 @@ bool sqlwriter::handleEnd(xmldomnode *node, stringbuffer *output) {
 		return endAssignment(node,output);
 
 	// select...
+	} else if (!charstring::compare(nodename,sqlparser::_sub_select)) {
+		return endSubSelect(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_group)) {
 		return endGroup(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_parameters)) {
@@ -594,6 +609,10 @@ bool sqlwriter::handleEnd(xmldomnode *node, stringbuffer *output) {
 		return endOrderByItem(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_group_by_item)) {
 		return endGroupByItem(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_in)) {
+		return endIn(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_exists)) {
+		return endExists(node,output);
 	}
 	return true;
 }

@@ -409,6 +409,21 @@ class sqlparser {
 		bool	selectClause(const char *ptr,
 						const char **newptr);
 		static const char *_select;
+		bool	parseSubSelects(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char *_sub_select;
+		bool	parseAlias(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr,
+						bool as);
+		static const char *_alias;
+		bool	parseUnion(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	unionClause(const char *ptr,
+						const char **newptr);
+		static const char *_union;
 		bool	parseUnique(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
@@ -473,6 +488,9 @@ class sqlparser {
 						const char **newptr);
 		bool	inClause(const char *ptr, const char **newptr);
 		static const char	*_in;
+		bool	parseInSet(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
 		bool	parseExists(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);

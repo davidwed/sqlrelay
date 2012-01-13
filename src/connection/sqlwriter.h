@@ -190,6 +190,14 @@ class sqlwriter {
 		// select...
 		virtual bool	selectQuery(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	subSelect(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	endSubSelect(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	unionClause(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	alias(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	unique(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	distinct(xmldomnode *node,
@@ -214,7 +222,11 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	in(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	endIn(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	exists(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	endExists(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	like(xmldomnode *node,
 						stringbuffer *output);
