@@ -23,6 +23,9 @@
 	added getLastInsertId() methods and support in sqlrsh and perl DBI
 	added a feature to run a set of queries at the start and end of each
 		session
+	added a feature to "localize" oracle global temporary tables by
+		appending a unique id to their names and rewriting all
+		subsequent queries to use the new table name
 
 0.43 - updated ruby code build to take sitearch into account during includes
 	updated ruby code to map STR2CSTR to StringValuePtr for ruby 1.9
