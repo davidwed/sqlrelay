@@ -87,6 +87,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlparser/parseselect.C \
 	sqlparser/parseupdate.C \
 	sqlparser/parseset.C \
+	sqlparser/parsefrom.C \
 	sqlparser/parsewhere.C \
 	sqlparser/parsecomparison.C \
 	sqlparser/parseexpression.C \
@@ -183,6 +184,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlparser/parseselect.lo \
 	sqlparser/parseupdate.lo \
 	sqlparser/parseset.lo \
+	sqlparser/parsefrom.lo \
 	sqlparser/parsewhere.lo \
 	sqlparser/parsecomparison.lo \
 	sqlparser/parseexpression.lo \

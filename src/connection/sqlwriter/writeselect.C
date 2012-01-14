@@ -71,6 +71,103 @@ bool sqlwriter::from(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::tableReferences(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::tableReference(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::endTableReference(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	// write a comma if the next node isn't a join clause
+	xmldomnode	*next=node->getNextTagSibling();
+	if (!next->isNullNode() &&
+		charstring::compare(next->getName(),sqlparser::_join_clause)) {
+		comma(output);
+	}
+	return true;
+}
+
+bool sqlwriter::joinClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::endJoinClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	// write a comma if the next node isn't a join clause
+	xmldomnode	*next=node->getNextTagSibling();
+	if (!next->isNullNode() &&
+		charstring::compare(next->getName(),sqlparser::_join_clause)) {
+		comma(output);
+	}
+	return true;
+}
+
+bool sqlwriter::inner(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("inner");
+	return true;
+}
+
+bool sqlwriter::cross(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("cross");
+	return true;
+}
+
+bool sqlwriter::straightJoin(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("straight_join");
+	return true;
+}
+
+bool sqlwriter::left(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("left");
+	return true;
+}
+
+bool sqlwriter::right(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("right");
+	return true;
+}
+
+bool sqlwriter::outer(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("outer");
+	return true;
+}
+
+bool sqlwriter::natural(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("natural");
+	return true;
+}
+
+bool sqlwriter::join(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("join");
+	return true;
+}
+
+bool sqlwriter::on(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("on");
+	return true;
+}
+
+bool sqlwriter::joinUsing(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("using");
+	return true;
+}
+
 bool sqlwriter::groupBy(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("group by");

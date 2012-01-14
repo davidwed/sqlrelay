@@ -72,6 +72,7 @@ class sqlparser {
 		bool	bitwiseXor(const char *ptr, const char **newptr);
 		bool	logicalAnd(const char *ptr, const char **newptr);
 		bool	logicalOr(const char *ptr, const char **newptr);
+		bool	endOfQuery(const char *ptr, const char **newptr);
 
 
 	// Ideally these would be private but other classes (and their children)
@@ -463,12 +464,13 @@ class sqlparser {
 		bool	highPriorityClause(const char *ptr,
 						const char **newptr);
 		static const char	*_high_priority;
-		bool	parseStraightJoin(xmldomnode *currentnode,
+		bool	parseStraightJoinSelectOption(
+					xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr);
-		bool	straightJoinClause(const char *ptr,
+		bool	straightJoinSelectOptionClause(const char *ptr,
 						const char **newptr);
-		static const char	*_straight_join;
+		static const char	*_straight_join_select_option;
 		bool	parseSqlSmallResult(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr);
@@ -511,6 +513,45 @@ class sqlparser {
 		bool	fromClause(const char *ptr,
 						const char **newptr);
 		static const char	*_from;
+		bool	parseTableReferences(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_table_references;
+		bool	parseTableReference(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_table_reference;
+		bool	parseJoin(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_join_clause;
+		bool	innerClause(const char *ptr, const char **newptr);
+		static const char	*_inner;
+		bool	crossClause(const char *ptr, const char **newptr);
+		static const char	*_cross;
+		bool	straightJoinClause(const char *ptr,
+						const char **newptr);
+		static const char	*_straight_join;
+		bool	leftClause(const char *ptr, const char **newptr);
+		static const char	*_left;
+		bool	outerClause(const char *ptr, const char **newptr);
+		static const char	*_right;
+		bool	rightClause(const char *ptr, const char **newptr);
+		static const char	*_outer;
+		bool	naturalClause(const char *ptr, const char **newptr);
+		static const char	*_natural;
+		bool	joinClause(const char *ptr, const char **newptr);
+		static const char	*_join;
+		bool	parseOn(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr);
+		bool	onClause(const char *ptr, const char **newptr);
+		static const char	*_on;
+		bool	parseJoinUsing(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr);
+		bool	joinUsingClause(const char *ptr, const char **newptr);
+		static const char	*_join_using;
 		bool	parseWhere(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
@@ -676,6 +717,14 @@ class sqlparser {
 		static const char	*_parameter;
 		bool	specialFunctionName(const char *name);
 		virtual const char * const	 *specialFunctionNames();
+		virtual void		splitColumnName(
+						xmldomnode *currentnode,
+						const char *name);
+		static const char	*_column_name_database;
+		static const char	*_column_name_schema;
+		static const char	*_column_name_table;
+		static const char	*_column_name_column;
+
 		bool	parseGroupBy(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);

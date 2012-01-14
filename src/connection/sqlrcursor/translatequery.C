@@ -2,15 +2,37 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
-#define DEBUG_MESSAGES
-#include <debugprint.h>
 #include <rudiments/character.h>
-#include <rudiments/xmldom.h>
+
+void sqlrcursor_svr::printQueryTree(xmldom *tree) {
+	const char	*xml=tree->getRootNode()->xml()->getString();
+	int16_t		indent=0;
+	bool		endtag;
+	for (const char *ptr=xml; *ptr; ptr++) {
+		if (*ptr=='<') {
+			if (*(ptr+1)=='/') {
+				indent=indent-2;
+				endtag=true;
+			}
+			for (uint16_t i=0; i<indent; i++) {
+				printf(" ");
+			}
+		}
+		printf("%c",*ptr);
+		if (*ptr=='>') {
+			printf("\n");
+			if (*(ptr-1)!='/' && !endtag) {
+				indent=indent+2;
+			}
+			endtag=false;
+		}
+	}
+}
 
 bool sqlrcursor_svr::translateQuery() {
 
 	if (conn->debugsqltranslation) {
-		debugPrintf("original:\n\"%s\"\n\n",querybuffer);
+		printf("original:\n\"%s\"\n\n",querybuffer);
 	}
 
 	// parse the query
@@ -23,14 +45,16 @@ bool sqlrcursor_svr::translateQuery() {
 	}
 
 	if (conn->debugsqltranslation) {
-		debugPrintf("before translation:\n");
-		debugPrintQueryTree(tree);
-		debugPrintf("\n");
+		printf("before translation:\n");
+		printQueryTree(tree);
+		printf("\n");
 	}
 
 	if (!parsed) {
-		debugPrintf("parse failed, using original:\n\"%s\"\n\n",
+		if (conn->debugsqltranslation) {
+			printf("parse failed, using original:\n\"%s\"\n\n",
 								querybuffer);
+		}
 		delete tree;
 		return false;
 	}
@@ -42,9 +66,9 @@ bool sqlrcursor_svr::translateQuery() {
 	}
 
 	if (conn->debugsqltranslation) {
-		debugPrintf("after translation:\n");
-		debugPrintQueryTree(tree);
-		debugPrintf("\n");
+		printf("after translation:\n");
+		printQueryTree(tree);
+		printf("\n");
 	}
 
 	// write the query back out
@@ -56,7 +80,7 @@ bool sqlrcursor_svr::translateQuery() {
 	delete tree;
 
 	if (conn->debugsqltranslation) {
-		debugPrintf("translated:\n\"%s\"\n\n",
+		printf("translated:\n\"%s\"\n\n",
 				translatedquery.getString());
 	}
 

@@ -33,7 +33,8 @@ bool sqlparser::parseSelect(xmldomnode *currentnode,
 			parseDistinct(selectnode,*newptr,newptr) &&
 			parseDistinctRow(selectnode,*newptr,newptr) &&
 			parseHighPriority(selectnode,*newptr,newptr) &&
-			parseStraightJoin(selectnode,*newptr,newptr) &&
+			parseStraightJoinSelectOption(selectnode,
+							*newptr,newptr) &&
 			parseSqlSmallResult(selectnode,*newptr,newptr) &&
 			parseSqlBigResult(selectnode,*newptr,newptr) &&
 			parseSqlBufferResult(selectnode,*newptr,newptr) &&
@@ -197,7 +198,19 @@ bool sqlparser::parseAlias(xmldomnode *currentnode,
 		!charstring::compareIgnoringCase(word,")") ||
 		!charstring::compareIgnoringCase(word,sqlparser::_from) ||
 		(subselect &&
+		// where clause
 		(!charstring::compareIgnoringCase(word,sqlparser::_where) ||
+		// join clauses
+		!charstring::compareIgnoringCase(word,sqlparser::_inner) ||
+		!charstring::compareIgnoringCase(word,sqlparser::_cross) ||
+		!charstring::compareIgnoringCase(
+					word,sqlparser::_straight_join) ||
+		!charstring::compareIgnoringCase(word,sqlparser::_left) ||
+		!charstring::compareIgnoringCase(word,sqlparser::_right) ||
+		!charstring::compareIgnoringCase(word,sqlparser::_natural) ||
+		!charstring::compareIgnoringCase(word,sqlparser::_on) ||
+		!charstring::compareIgnoringCase(word,sqlparser::_using) ||
+		// union clause
 		!charstring::compareIgnoringCase(word,sqlparser::_union)))) {
 
 		// if so...
@@ -268,8 +281,7 @@ bool sqlparser::parseSubSelects(xmldomnode *currentnode,
 			continue;
 		}
 
-		// if there was no union then we ought to be done
-		// FIXME: actually there could be mysql index hints here
+		// FIXME: mysql index hints...
 		return true;
 	}
 }
@@ -392,14 +404,14 @@ bool sqlparser::highPriorityClause(const char *ptr, const char **newptr) {
 
 const char *sqlparser::_high_priority="high_priority";
 
-bool sqlparser::parseStraightJoin(xmldomnode *currentnode,
-					const char *ptr,
-					const char **newptr) {
+bool sqlparser::parseStraightJoinSelectOption(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
 	debugFunction();
 	if (!straightJoinClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,_straight_join);
+	newNode(currentnode,_straight_join_select_option);
 	return true;
 }
 
@@ -408,7 +420,8 @@ bool sqlparser::straightJoinClause(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,"straight_join ");
 }
 
-const char *sqlparser::_straight_join="straight_join";
+const char *sqlparser::_straight_join_select_option=
+					"straight_join_select_option";
 
 bool sqlparser::parseSqlSmallResult(xmldomnode *currentnode,
 					const char *ptr,
@@ -517,24 +530,6 @@ bool sqlparser::sqlCalcFoundRowsClause(const char *ptr, const char **newptr) {
 }
 
 const char *sqlparser::_sql_calc_found_rows="sql_calc_found_rows";
-
-bool sqlparser::parseFrom(xmldomnode *currentnode,
-					const char *ptr,
-					const char **newptr) {
-	debugFunction();
-	if (!fromClause(ptr,newptr)) {
-		return false;
-	}
-	newNode(currentnode,_from);
-	return true;
-}
-
-bool sqlparser::fromClause(const char *ptr, const char **newptr) {
-	debugFunction();
-	return comparePart(ptr,newptr,"from ");
-}
-
-const char *sqlparser::_from="from";
 
 bool sqlparser::parseGroupBy(xmldomnode *currentnode,
 					const char *ptr,

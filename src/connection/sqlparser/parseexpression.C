@@ -349,7 +349,11 @@ bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
 
 	// create the nodes
 	xmldomnode	*newnode=newNode(currentnode,type);
-	newNode(newnode,_name,name);
+	if (type==_function) {
+		newNode(newnode,_name,name);
+	} else {
+		splitColumnName(newnode,name);
+	}
 	return true;
 }
 
@@ -389,3 +393,65 @@ bool sqlparser::specialFunctionName(const char *name) {
 const char * const *sqlparser::specialFunctionNames() {
 	return NULL;
 }
+
+void sqlparser::splitColumnName(xmldomnode *currentnode, const char *name) {
+
+	// split the name
+	char		**parts;
+	uint64_t	count;
+	charstring::split(name,".",true,&parts,&count);
+
+	char	*db=NULL;
+	char	*schema=NULL;
+	char	*table=NULL;
+	char	*column=NULL;
+
+	// combine initial parts into db name
+	uint64_t	start=0;
+	if (count>4) {
+		stringbuffer	dbstr;
+		for (start=0; start<count-3; start++) {
+			if (start) {
+				dbstr.append('.');
+			}
+			dbstr.append(parts[start]);
+		}
+		db=dbstr.detachString();
+	} else if (count>3) {
+		db=parts[start++];
+	}
+
+	// set schema, table, column names
+	if (count>2) {
+		schema=parts[start++];
+	}
+	if (count>1) {
+		table=parts[start++];
+	}
+	column=parts[start];
+
+	// create nodes for each part
+	if (db) {
+		newNode(currentnode,_column_name_database,db);
+	}
+	if (schema) {
+		newNode(currentnode,_column_name_schema,schema);
+	}
+	if (table) {
+		newNode(currentnode,_column_name_table,table);
+	}
+	if (column) {
+		newNode(currentnode,_column_name_column,column);
+	}
+
+	// clean up
+	for (uint64_t i=0; i<count; i++) {
+		delete[] parts[i];
+	}
+	delete[] parts;
+}
+
+const char *sqlparser::_column_name_database="column_name_database";
+const char *sqlparser::_column_name_schema="column_name_schema";
+const char *sqlparser::_column_name_table="column_name_table";
+const char *sqlparser::_column_name_column="column_name_column";

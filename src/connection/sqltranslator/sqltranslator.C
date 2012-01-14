@@ -535,10 +535,12 @@ const char *sqltranslator::generateTempTableName(const char *oldname) {
 
 bool sqltranslator::replaceTempTableName(xmldomnode *node) {
 
-	// if the current node is a table name or valid verbatim node then see
-	// if it needs to be replaced
-	if (!charstring::compare(node->getName(),sqlparser::_table_name) ||
-						verbatimTableReference(node)) {
+	// if the current node is a table name
+	// then see if it needs to be replaced
+	if (!charstring::compare(node->getName(),
+					sqlparser::_table_name) ||
+		!charstring::compare(node->getName(),
+					sqlparser::_column_name_table)) {
 
 		char	*newname=NULL;
 		char	*value=(char *)node->getAttributeValue(

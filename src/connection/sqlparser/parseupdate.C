@@ -167,8 +167,10 @@ bool sqlparser::parseUpdateSet(xmldomnode *currentnode,
 		xmldomnode	*assignmentnode=newNode(setnode,_assignment);
 
 		// get the column to assign to
+		xmldomnode	*colrefnode=
+				newNode(assignmentnode,_column_reference);
 		char	*column=getWord(*newptr,newptr);
-		newNode(assignmentnode,_name,column);
+		splitColumnName(colrefnode,column);
 		delete[] column;
 
 		// skip past the equals sign

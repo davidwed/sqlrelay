@@ -210,6 +210,36 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	from(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	tableReferences(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	tableReference(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	endTableReference(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	joinClause(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	endJoinClause(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	inner(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	cross(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	straightJoin(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	left(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	right(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	outer(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	natural(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	join(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	on(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	joinUsing(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	where(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	andClause(xmldomnode *node,
@@ -284,6 +314,14 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	columnReference(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	columnNameDatabase(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	columnNameSchema(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	columnNameTable(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	columnNameColumn(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	function(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	parameters(xmldomnode *node,
@@ -343,10 +381,11 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	space(stringbuffer *output);
 		virtual bool	comma(stringbuffer *output);
+		virtual bool	period(stringbuffer *output);
 		virtual bool	leftParen(stringbuffer *output);
 		virtual bool	rightParen(stringbuffer *output);
 		virtual bool	hasSibling(xmldomnode *node);
-		virtual bool	lastWasSpace(stringbuffer *output);
+		virtual bool	dontAppendSpace(stringbuffer *output);
 
 		sqlrconnection_svr *sqlrcon;
 		sqlrcursor_svr *sqlrcur;

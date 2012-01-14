@@ -4,6 +4,7 @@
 #include <sqlwriter.h>
 #include <sqlparser.h>
 #include <debugprint.h>
+#include <rudiments/character.h>
 
 sqlwriter::sqlwriter() {
 	debugFunction();
@@ -51,7 +52,7 @@ bool sqlwriter::write(xmldomnode *node, stringbuffer *output) {
 	}
 
 	// append a space afterward if it's got children
-	if (!lastWasSpace(output) &&
+	if (!dontAppendSpace(output) &&
 		!node->getFirstTagChild()->isNullNode()) {
 		space(output);
 	}
@@ -69,8 +70,9 @@ bool sqlwriter::write(xmldomnode *node, stringbuffer *output) {
 		return false;
 	}
 
-	// append a space afterward if it's got siblings
-	if (!lastWasSpace(output) &&
+	// append a space afterward if it's got
+	// siblings unless this one ends in a period
+	if (!dontAppendSpace(output) &&
 		!node->getNextTagSibling()->isNullNode()) {
 		space(output);
 	}
@@ -165,6 +167,19 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_unique,
 		sqlparser::_distinct,
 		sqlparser::_from,
+		sqlparser::_table_references,
+		sqlparser::_table_reference,
+		sqlparser::_join_clause,
+		sqlparser::_inner,
+		sqlparser::_cross,
+		sqlparser::_straight_join,
+		sqlparser::_left,
+		sqlparser::_right,
+		sqlparser::_outer,
+		sqlparser::_natural,
+		sqlparser::_join,
+		sqlparser::_on,
+		sqlparser::_join_using,
 		sqlparser::_where,
 		sqlparser::_and,
 		sqlparser::_or,
@@ -199,6 +214,10 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_string_literal,
 		sqlparser::_bind_variable,
 		sqlparser::_column_reference,
+		sqlparser::_column_name_database,
+		sqlparser::_column_name_schema,
+		sqlparser::_column_name_table,
+		sqlparser::_column_name_column,
 		sqlparser::_function,
 		sqlparser::_parameters,
 		sqlparser::_parameter,
@@ -432,6 +451,33 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return distinct(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_from)) {
 		return from(node,output);
+	} else if (!charstring::compare(nodename,
+					sqlparser::_table_references)) {
+		return tableReferences(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_table_reference)) {
+		return tableReference(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_join_clause)) {
+		return joinClause(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_inner)) {
+		return inner(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_cross)) {
+		return cross(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_straight_join)) {
+		return straightJoin(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_left)) {
+		return left(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_right)) {
+		return right(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_outer)) {
+		return outer(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_natural)) {
+		return natural(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_join)) {
+		return join(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_on)) {
+		return on(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_join_using)) {
+		return joinUsing(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_where)) {
 		return where(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_and)) {
@@ -504,6 +550,18 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 	} else if (!charstring::compare(nodename,
 					sqlparser::_column_reference)) {
 		return columnReference(node,output);
+	} else if (!charstring::compare(nodename,
+					sqlparser::_column_name_database)) {
+		return columnNameDatabase(node,output);
+	} else if (!charstring::compare(nodename,
+					sqlparser::_column_name_schema)) {
+		return columnNameSchema(node,output);
+	} else if (!charstring::compare(nodename,
+					sqlparser::_column_name_table)) {
+		return columnNameTable(node,output);
+	} else if (!charstring::compare(nodename,
+					sqlparser::_column_name_column)) {
+		return columnNameColumn(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_function)) {
 		return function(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_parameters)) {
@@ -616,6 +674,10 @@ bool sqlwriter::handleEnd(xmldomnode *node, stringbuffer *output) {
 		return endParameters(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_parameter)) {
 		return endParameter(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_table_reference)) {
+		return endTableReference(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_join_clause)) {
+		return endJoinClause(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_order_by_item)) {
 		return endOrderByItem(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_group_by_item)) {
@@ -646,6 +708,12 @@ bool sqlwriter::comma(stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::period(stringbuffer *output) {
+	debugFunction();
+	output->append(".");
+	return true;
+}
+
 bool sqlwriter::leftParen(stringbuffer *output) {
 	debugFunction();
 	output->append("(");
@@ -663,8 +731,9 @@ bool sqlwriter::hasSibling(xmldomnode *node) {
 	return !node->getNextTagSibling()->isNullNode();
 }
 
-bool sqlwriter::lastWasSpace(stringbuffer *output) {
+bool sqlwriter::dontAppendSpace(stringbuffer *output) {
 	debugFunction();
 	size_t	length=output->getStringLength();
-	return (length && output->getString()[length-1]==' ');
+	return (length &&
+		character::inSet(output->getString()[length-1]," .(,"));
 }

@@ -8,6 +8,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/regularexpression.h>
+#include <rudiments/xmldom.h>
 
 class bindvar_svr {
 	public:
@@ -242,6 +243,7 @@ class sqlrcursor_svr {
 		void	performSubstitution(stringbuffer *buffer,
 							int16_t index);
 		void	abort();
+		void	printQueryTree(xmldom *tree);
 
 		uint64_t	querysec;
 		uint64_t	queryusec;

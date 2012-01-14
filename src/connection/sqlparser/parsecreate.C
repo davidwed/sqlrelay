@@ -3,6 +3,7 @@
 
 #include <sqlparser.h>
 #include <debugprint.h>
+#include <rudiments/snooze.h>
 
 bool sqlparser::parseCreate(xmldomnode *currentnode,
 					const char *ptr,
@@ -654,7 +655,7 @@ bool sqlparser::parseColumnNameList(xmldomnode *currentnode,
 
 		// get the column
 		char	*column=getWord(*newptr,newptr);
-		if (!column) {
+		if (!charstring::length(column)) {
 			debugPrintf("missing right paren\n");
 			error=true;
 			return false;
@@ -663,7 +664,7 @@ bool sqlparser::parseColumnNameList(xmldomnode *currentnode,
 		// create new node
 		xmldomnode	*columnnode=
 				newNode(columnsnode,_column);
-		newNode(columnnode,_name,column);
+		splitColumnName(columnnode,column);
 
 		// clean up
 		delete[] column;

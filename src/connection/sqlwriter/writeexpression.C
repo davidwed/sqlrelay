@@ -110,6 +110,39 @@ bool sqlwriter::columnReference(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::columnNameDatabase(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		period(output);
+	}
+	return true;
+}
+
+bool sqlwriter::columnNameSchema(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		period(output);
+	}
+	return true;
+}
+
+bool sqlwriter::columnNameTable(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		period(output);
+	}
+	return true;
+}
+
+bool sqlwriter::columnNameColumn(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
 bool sqlwriter::function(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
