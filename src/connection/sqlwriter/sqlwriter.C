@@ -188,6 +188,7 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_not,
 		sqlparser::_between,
 		sqlparser::_in,
+		sqlparser::_in_set_item,
 		sqlparser::_exists,
 		sqlparser::_like,
 		sqlparser::_null_safe_equals,
@@ -494,6 +495,8 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return between(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_in)) {
 		return in(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_in_set_item)) {
+		return inSetItem(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_exists)) {
 		return exists(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_like)) {
@@ -684,6 +687,8 @@ bool sqlwriter::handleEnd(xmldomnode *node, stringbuffer *output) {
 		return endGroupByItem(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_in)) {
 		return endIn(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_in_set_item)) {
+		return endInSetItem(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_exists)) {
 		return endExists(node,output);
 	}

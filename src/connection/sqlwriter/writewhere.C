@@ -64,6 +64,19 @@ bool sqlwriter::endIn(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::inSetItem(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::endInSetItem(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	if (hasSibling(node)) {
+		comma(output);
+	}
+	return true;
+}
+
 bool sqlwriter::exists(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("exists ");

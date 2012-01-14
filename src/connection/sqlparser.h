@@ -601,6 +601,7 @@ class sqlparser {
 		bool	parseInSet(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
+		static const char	*_in_set_item;
 		bool	parseExists(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);

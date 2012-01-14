@@ -260,6 +260,10 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	endIn(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	inSetItem(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	endInSetItem(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	exists(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	endExists(xmldomnode *node,

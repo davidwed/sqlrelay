@@ -189,8 +189,8 @@ bool sqlparser::parseIn(xmldomnode *currentnode,
 	}
 
 	// parse the select
-	if (!parseSelect(innode,*newptr,newptr) ||
-		parseInSet(innode,*newptr,newptr)) {
+	if (!parseSelect(innode,*newptr,newptr) &&
+		!parseInSet(innode,*newptr,newptr)) {
 		debugPrintf("missing select\n");
 		error=true;
 		return false;
@@ -217,9 +217,34 @@ bool sqlparser::parseInSet(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
-	// FIXME: implement this
-	return false;
+
+	*newptr=ptr;
+	for (;;) {
+
+		// create the node
+		xmldomnode	*insetitemnode=
+				newNode(currentnode,_in_set_item);
+
+		// get the expression, bail when we don't find one
+		if (!parseExpression(insetitemnode,*newptr,newptr)) {
+			debugPrintf("missing expression\n");
+			error=true;
+			return false;
+		}
+
+		// get the comma after the expression
+		comma(*newptr,newptr);
+
+		// if we find a right paren then we're done
+		const char 	*before=*newptr;
+		if (rightParen(*newptr,newptr)) {
+			*newptr=before;
+			return true;
+		}
+	}
 }
+
+const char *sqlparser::_in_set_item="in_set_item";
 
 bool sqlparser::parseExists(xmldomnode *currentnode,
 					const char *ptr,
@@ -227,7 +252,6 @@ bool sqlparser::parseExists(xmldomnode *currentnode,
 	debugFunction();
 
 	// look for exists
-printf("looking for exists: \"%s\"\n",ptr);
 	if (!existsClause(ptr,newptr)) {
 		return false;
 	}
