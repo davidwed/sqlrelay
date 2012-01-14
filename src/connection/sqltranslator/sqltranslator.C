@@ -476,6 +476,12 @@ bool sqltranslator::isString(const char *value) {
 
 bool sqltranslator::tempTablesLocalize(xmldomnode *query, xmldomnode *rule) {
 
+	// get the unique id
+	const char	*uniqueid=rule->getAttributeValue("uniqueid");
+	if (!uniqueid) {
+		uniqueid="";
+	}
+
 	// for "create temporary table" queries, find the table name,
 	// come up with a session-local name for it and put it in the map...
 	xmldomnode	*tablenamenode=findCreateTemporaryTableName(query);
@@ -485,7 +491,8 @@ bool sqltranslator::tempTablesLocalize(xmldomnode *query, xmldomnode *rule) {
 		uint64_t	size=charstring::length(oldname)+1;
 		char	*oldnamecopy=(char *)temptablepool->malloc(size);
 		charstring::copy(oldnamecopy,oldname);
-		const char	*newname=generateTempTableName(oldname);
+		const char	*newname=generateTempTableName(oldname,
+								uniqueid);
 		temptablemap.setData((char *)oldnamecopy,(char *)newname);
 	}
 
@@ -523,13 +530,15 @@ xmldomnode *sqltranslator::findCreateTemporaryTableName(xmldomnode *node) {
 	return node;
 }
 
-const char *sqltranslator::generateTempTableName(const char *oldname) {
+const char *sqltranslator::generateTempTableName(const char *oldname,
+							const char *uniqueid) {
 
 	uint64_t	pid=process::getProcessId();
-	uint64_t	size=2+charstring::length(oldname)+1+
+	uint64_t	size=charstring::length(oldname)+1+
+				charstring::length(uniqueid)+1+
 				charstring::integerLength(pid)+1;
 	char	*newname=(char *)temptablepool->malloc(size);
-	snprintf(newname,size,"t_%s_%lld",oldname,pid);
+	snprintf(newname,size,"%s_%s_%lld",oldname,uniqueid,pid);
 	return newname;
 }
 
