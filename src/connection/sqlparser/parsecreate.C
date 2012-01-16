@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlparser.h>
+#define DEBUG_MESSAGES
 #include <debugprint.h>
 #include <rudiments/snooze.h>
 
@@ -18,12 +19,22 @@ bool sqlparser::parseCreate(xmldomnode *currentnode,
 	// create the node
 	xmldomnode	*createnode=newNode(currentnode,_create);
 
-	// temporary
+	// temporary (for tables)
 	parseCreateTemporary(createnode,*newptr,newptr);
 
+	// unique (for indices)
+	parseUnique(createnode,*newptr,newptr);
+
+	// fulltext (for indices)
+	parseFulltext(createnode,*newptr,newptr);
+
+	// spatial (for indices)
+	parseSpatial(createnode,*newptr,newptr);
+
 	// table, index, etc..
-	if (tableClause(*newptr,newptr)) {
-		return parseCreateTable(createnode,*newptr,newptr);
+	if (parseCreateTable(createnode,*newptr,newptr) ||
+		parseCreateIndex(createnode,*newptr,newptr)) {
+		return true;
 	}
 
 	// for now we only support tables
@@ -41,6 +52,7 @@ const char *sqlparser::_create="create";
 bool sqlparser::parseCreateTemporary(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
+	debugFunction();
 	if (!temporaryClause(ptr,newptr)) {
 		return false;
 	}
@@ -61,6 +73,42 @@ bool sqlparser::temporaryClause(const char *ptr, const char **newptr) {
 
 const char *sqlparser::_create_temporary="create_temporary";
 
+bool sqlparser::parseFulltext(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!fulltext(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_fulltext);
+	return true;
+}
+
+bool sqlparser::fulltext(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"fulltext ");
+}
+
+const char *sqlparser::_fulltext="fulltext";
+
+bool sqlparser::parseSpatial(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!spatial(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_spatial);
+	return true;
+}
+
+bool sqlparser::spatial(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"spatial ");
+}
+
+const char *sqlparser::_spatial="spatial";
+
 bool sqlparser::tableClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"table ");
@@ -71,11 +119,16 @@ bool sqlparser::parseCreateTable(xmldomnode *currentnode,
 					const char **newptr) {
 	debugFunction();
 
+	// table
+	if (!tableClause(ptr,newptr)) {
+		return false;
+	}
+
 	// create new node
 	xmldomnode	*tablenode=newNode(currentnode,_table);
 
 	// if not exists
-	parseIfNotExists(tablenode,ptr,newptr);
+	parseIfNotExists(tablenode,*newptr,newptr);
 
 	// table name
 	parseTableName(tablenode,*newptr,newptr);
@@ -670,7 +723,29 @@ bool sqlparser::parseColumnNameList(xmldomnode *currentnode,
 		delete[] column;
 
 		// skip the next comma
-		comma(*newptr,newptr);
+		if (comma(*newptr,newptr)) {
+			continue;
+		}
+
+		// If we didn't find a comma, look for column length and an
+		// asc/desc clause.  This method is used to parse the column
+		// list for "create index" queries and they might have those
+		// things.
+
+		// length
+		if (leftParen(*newptr,newptr)) {
+			xmldomnode	*sizenode=newNode(columnnode,_size);
+			parseLength(sizenode,*newptr,newptr);
+			if (!rightParen(*newptr,newptr)) {
+				debugPrintf("missing right paren\n");
+				error=true;
+				return false;
+			}
+		}
+
+		// asc/desc
+		parseAsc(columnnode,*newptr,newptr);
+		parseDesc(columnnode,*newptr,newptr);
 
 		// if we hit a right parentheses then we're done, but we need
 		// to stay on it, so we'll reset the pointer afterwards if we
@@ -864,3 +939,164 @@ bool sqlparser::asClause(const char *ptr, const char **newptr) {
 }
 
 const char *sqlparser::_as="as";
+
+bool sqlparser::parseCreateIndex(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+
+	// index
+	if (!indexClause(ptr,newptr)) {
+		return true;
+	}
+
+	// create new node
+	xmldomnode	*indexnode=newNode(currentnode,_index);
+
+	// index name
+	if (!parseIndexName(indexnode,*newptr,newptr)) {
+		debugPrintf("missing index name\n");
+		error=true;
+		return false;
+	}
+
+	// index type
+	parseIndexType(indexnode,*newptr,newptr);
+
+	// on
+	if (!parseOnClause(indexnode,*newptr,newptr)) {
+		debugPrintf("missing on clause\n");
+		error=true;
+		return false;
+	}
+
+	// table name
+	if (!parseTableName(indexnode,*newptr,newptr)) {
+		debugPrintf("missing table name\n");
+		error=true;
+		return false;
+	}
+
+	// columns
+	if (!leftParen(*newptr,newptr)) {
+		debugPrintf("missing left paren\n");
+		error=true;
+		return false;
+	}
+
+	// column list
+	if (!parseColumnNameList(indexnode,*newptr,newptr)) {
+		debugPrintf("missing column list\n");
+		error=true;
+		return false;
+	}
+
+	// right paren
+	if (!rightParen(*newptr,newptr)) {
+		debugPrintf("missing right paren\n");
+		error=true;
+		return false;
+	}
+
+	// index type
+	parseIndexType(indexnode,*newptr,newptr);
+
+	return true;
+}
+
+bool sqlparser::indexClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"index ");
+}
+
+const char *sqlparser::_index="index";
+
+bool sqlparser::parseIndexName(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	char	*indexname=getWord(ptr,newptr);
+	newNode(currentnode,_index_name,indexname);
+	delete[] indexname;
+	return true;
+}
+
+const char *sqlparser::_index_name="index_name";
+
+bool sqlparser::parseIndexType(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+
+	// bail right away if we find an on clause, which is
+	// the only thing that could follow the index type
+	if (onClause(ptr,newptr)) {
+		*newptr=ptr;
+		return false;
+	}
+
+	// using
+	if (!usingClause(*newptr,newptr)) {
+		return false;
+	}
+
+	// create the node
+	xmldomnode	*usingnode=newNode(currentnode,_using);
+
+	// btree or hash
+	if (parseBtree(usingnode,*newptr,newptr) ||
+		parseHash(usingnode,*newptr,newptr)) {
+		return true;
+	}
+
+	// some other, unrecognized index type
+	parseVerbatim(usingnode,*newptr,newptr);
+	return false;
+}
+
+bool sqlparser::parseBtree(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!btree(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_btree);
+	return true;
+}
+
+bool sqlparser::btree(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"btree ");
+}
+
+const char *sqlparser::_btree="btree";
+
+bool sqlparser::parseHash(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!hash(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_hash);
+	return true;
+}
+
+bool sqlparser::hash(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"hash ");
+}
+
+const char *sqlparser::_hash="hash";
+
+bool sqlparser::parseOnClause(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!onClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_on);
+	return true;
+}

@@ -217,3 +217,44 @@ bool sqlwriter::as(xmldomnode *node, stringbuffer *output) {
 	outputValue(node,output);
 	return true;
 }
+
+bool sqlwriter::fulltext(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("fulltext ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::spatial(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("spatial ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::index(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("index ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::indexName(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::btree(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("btree ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::hash(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("hash ");
+	outputValue(node,output);
+	return true;
+}

@@ -132,6 +132,17 @@ class sqlparser {
 		static const char	*_create_temporary;
 		bool	tableClause(const char *ptr,
 						const char **newptr);
+		bool	parseFulltext(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	fulltext(const char *ptr, const char **newptr);
+		static const char	*_fulltext;
+		bool	parseSpatial(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	spatial(const char *ptr, const char **newptr);
+		static const char	*_spatial;
+
 
 
 		// create table...
@@ -288,6 +299,35 @@ class sqlparser {
 		bool	asClause(const char *ptr,
 						const char **newptr);
 		static const char	*_as;
+
+
+
+		// create index
+		bool	parseCreateIndex(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	indexClause(const char *ptr, const char **newptr);
+		static const char	*_index;
+		bool	parseIndexName(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_index_name;
+		bool	parseIndexType(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseBtree(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	btree(const char *ptr, const char **newptr);
+		static const char	*_btree;
+		bool	parseHash(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	hash(const char *ptr, const char **newptr);
+		static const char	*_hash;
+		bool	parseOnClause(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
 
 
 

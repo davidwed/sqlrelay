@@ -68,6 +68,21 @@ class sqlwriter {
 		virtual bool	ifNotExists(xmldomnode *node,
 						stringbuffer *output);
 
+		// index...
+		virtual bool	fulltext(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	spatial(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	index(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	indexName(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	btree(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	hash(xmldomnode *node,
+						stringbuffer *output);
+		
+
 		// column definitions...
 		virtual bool	columns(xmldomnode *node,
 						stringbuffer *output);

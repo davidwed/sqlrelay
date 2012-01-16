@@ -100,6 +100,14 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_table,
 		sqlparser::_if_not_exists,
 
+		// index...
+		sqlparser::_fulltext,
+		sqlparser::_spatial,
+		sqlparser::_index,
+		sqlparser::_index_name,
+		sqlparser::_btree,
+		sqlparser::_hash,
+
 		// column definitions...
 		sqlparser::_columns,
 		sqlparser::_column,
@@ -323,6 +331,20 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return table(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_if_not_exists)) {
 		return ifNotExists(node,output);
+
+	// index...
+	} else if (!charstring::compare(nodename,sqlparser::_fulltext)) {
+		return fulltext(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_spatial)) {
+		return spatial(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_index)) {
+		return index(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_index_name)) {
+		return indexName(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_btree)) {
+		return btree(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_hash)) {
+		return hash(node,output);
 
 	// column definitions...
 	} else if (!charstring::compare(nodename,sqlparser::_columns)) {
