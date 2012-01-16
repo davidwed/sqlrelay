@@ -66,7 +66,11 @@ bool oracle8sqlwriter::uniqueKey(xmldomnode *node, stringbuffer *output) {
 
 bool oracle8sqlwriter::cascade(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
-	output->append("cascade constraints");
+	output->append("cascade");
+	if (node->getFirstTagChild(
+			sqlparser::_cascade_constraints_clause)->isNullNode()) {
+		output->append(" constraints");
+	}
 	return true;
 }
 

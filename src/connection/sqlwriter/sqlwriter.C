@@ -134,6 +134,7 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_table_name_list_item,
 		sqlparser::_restrict,
 		sqlparser::_cascade,
+		sqlparser::_cascade_constraints_clause,
 
 
 		// insert...
@@ -395,6 +396,9 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 	} else if (!charstring::compare(nodename,
 					sqlparser::_cascade)) {
 		return cascade(node,output);
+	} else if (!charstring::compare(nodename,
+				sqlparser::_cascade_constraints_clause)) {
+		return cascadeConstraintsClause(node,output);
 
 	// insert...
 	} else if (!charstring::compare(nodename,sqlparser::_insert)) {

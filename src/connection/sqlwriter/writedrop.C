@@ -35,3 +35,10 @@ bool sqlwriter::cascade(xmldomnode *node, stringbuffer *output) {
 	output->append("cascade");
 	return true;
 }
+
+bool sqlwriter::cascadeConstraintsClause(xmldomnode *node,
+						stringbuffer *output) {
+	debugFunction();
+	output->append("constraints");
+	return true;
+}

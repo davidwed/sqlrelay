@@ -144,6 +144,8 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	cascade(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	cascadeConstraintsClause(xmldomnode *node,
+						stringbuffer *output);
 
 
 		// insert...

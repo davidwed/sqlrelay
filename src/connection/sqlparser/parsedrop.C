@@ -148,21 +148,41 @@ bool sqlparser::parseCascade(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
+
+	// cascade
 	if (!cascadeClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,_cascade);
+
+	// create node
+	xmldomnode	*cascadenode=newNode(currentnode,_cascade);
+
+	// look for constraints
+	parseCascadeConstraintsClause(cascadenode,*newptr,newptr);
 	return true;
 }
 
 bool sqlparser::cascadeClause(const char *ptr, const char **newptr) {
 	debugFunction();
-	const char *parts[]={
-		"cascade",
-		"cascade constraints",
-		NULL
-	};
-	return comparePart(ptr,newptr,parts);
+	return comparePart(ptr,newptr,"cascade");
 }
 
 const char *sqlparser::_cascade="cascade";
+
+bool sqlparser::parseCascadeConstraintsClause(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+	if (!cascadeConstraintsClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_cascade_constraints_clause);
+	return true;
+}
+
+bool sqlparser::cascadeConstraintsClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"constraints");
+}
+
+const char *sqlparser::_cascade_constraints_clause="cascade_constraints_clause";

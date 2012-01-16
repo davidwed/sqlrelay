@@ -328,6 +328,12 @@ class sqlparser {
 		bool	cascadeClause(const char *ptr,
 						const char **newptr);
 		static const char	*_cascade;
+		bool	parseCascadeConstraintsClause(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	cascadeConstraintsClause(const char *ptr,
+						const char **newptr);
+		static const char	*_cascade_constraints_clause;
 
 
 
