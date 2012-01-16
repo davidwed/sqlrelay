@@ -37,7 +37,7 @@ bool sqlparser::parseInsert(xmldomnode *currentnode,
 	// "values" or "value" clause
 	if (!parseInsertValues(insertnode,*newptr,newptr) &&
 		!parseInsertValue(insertnode,*newptr,newptr) &&
-		!parseUpdateSet(insertnode,*newptr,newptr) &&
+		!parseUpdateSet(insertnode,*newptr,newptr,false) &&
 		!parseSelect(insertnode,*newptr,newptr)) {
 		debugPrintf("missing value, values, set or select clause\n");
 		error=true;

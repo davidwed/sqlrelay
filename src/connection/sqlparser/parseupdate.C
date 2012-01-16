@@ -92,7 +92,7 @@ bool sqlparser::parseUpdate(xmldomnode *currentnode,
 	}
 
 	// set clause
-	if (!parseUpdateSet(updatenode,*newptr,newptr)) {
+	if (!parseUpdateSet(updatenode,*newptr,newptr,true)) {
 		return false;
 	}
 
@@ -134,13 +134,16 @@ const char *sqlparser::_update="update";
 
 bool sqlparser::parseUpdateSet(xmldomnode *currentnode,
 					const char *ptr,
-					const char **newptr) {
+					const char **newptr,
+					bool required) {
 	debugFunction();
 
 	// set clause
 	if (!updateSetClause(ptr,newptr)) {
-		debugPrintf("missing set\n");
-		error=true;
+		if (required) {
+			debugPrintf("missing set\n");
+			error=true;
+		}
 		return false;
 	}
 

@@ -372,7 +372,8 @@ class sqlparser {
 		static const char	*_update;
 		bool	parseUpdateSet(xmldomnode *currentnode,
 						const char *ptr,
-						const char **newptr);
+						const char **newptr,
+						bool required);
 		bool	updateSetClause(const char *ptr,
 						const char **newptr);
 		static const char	*_update_set;
