@@ -260,8 +260,22 @@ bool sqlparser::parseTerm(xmldomnode *currentnode,
 	// initialize the return value
 	bool	retval=true;
 
-	// get the next chunk
+	// Get the next chunk.  If it ends in a . then get the one after
+	// because it's probably a * and they need to be stuck together.
 	char	*term=getVerbatim(ptr,newptr);
+	if (term[charstring::length(term)-1]=='.') {
+		const char	*before=*newptr;
+		char	*nextterm=getVerbatim(*newptr,newptr);
+		if (!charstring::compare(nextterm,"*")) {
+			stringbuffer	combined;
+			combined.append(term)->append(nextterm);
+			delete[] term;
+			term=combined.detachString();
+		} else {
+			*newptr=before;
+		}
+		delete[] nextterm;
+	}
 
 	// test for numbers, string literals and bind variables...
 	char	c=term[0];
