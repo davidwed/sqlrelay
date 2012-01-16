@@ -28,18 +28,18 @@ bool sqlparser::parseSelect(xmldomnode *currentnode,
 		xmldomnode	*selectnode=newNode(currentnode,_select);
 
 		// parse the select options
-		do {} while (parseAll(selectnode,*newptr,newptr) &&
-			parseUnique(selectnode,*newptr,newptr) &&
-			parseDistinct(selectnode,*newptr,newptr) &&
-			parseDistinctRow(selectnode,*newptr,newptr) &&
-			parseHighPriority(selectnode,*newptr,newptr) &&
+		do {} while (parseAll(selectnode,*newptr,newptr) ||
+			parseUnique(selectnode,*newptr,newptr) ||
+			parseDistinct(selectnode,*newptr,newptr) ||
+			parseDistinctRow(selectnode,*newptr,newptr) ||
+			parseHighPriority(selectnode,*newptr,newptr) ||
 			parseStraightJoinSelectOption(selectnode,
-							*newptr,newptr) &&
-			parseSqlSmallResult(selectnode,*newptr,newptr) &&
-			parseSqlBigResult(selectnode,*newptr,newptr) &&
-			parseSqlBufferResult(selectnode,*newptr,newptr) &&
-			parseSqlCache(selectnode,*newptr,newptr) &&
-			parseSqlNoCache(selectnode,*newptr,newptr) &&
+							*newptr,newptr) ||
+			parseSqlSmallResult(selectnode,*newptr,newptr) ||
+			parseSqlBigResult(selectnode,*newptr,newptr) ||
+			parseSqlBufferResult(selectnode,*newptr,newptr) ||
+			parseSqlCache(selectnode,*newptr,newptr) ||
+			parseSqlNoCache(selectnode,*newptr,newptr) ||
 			parseSqlCalcFoundRows(selectnode,*newptr,newptr));
 
 		// create a node
