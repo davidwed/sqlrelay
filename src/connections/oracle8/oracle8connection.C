@@ -1523,6 +1523,18 @@ const char *oracle8cursor::errorMessage(bool *liveconnection) {
 			*liveconnection=true;
 	}
 
+	// When dropping temporary tables, if any of those tables were created
+	// with "on commit preserve rows" then the session has to exit before
+	// the table can be dropped or oracle will return the following error:
+	// ORA-14452: attempt to create, alter or drop an index on temporary
+	// table already in use
+	// It's not really clear why, but that's the case.  If we encounter
+	// this error, then we'll declare the db down.  SQL Relay will then
+	// relogin and reexecute the query when it comes back up.
+	if (errcode==14452) {
+		*liveconnection=false;
+	}
+
 	// only return an error message if the error wasn't a dead database
 	delete errormessage;
 	errormessage=new stringbuffer();
