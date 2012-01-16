@@ -17,12 +17,14 @@ sqltranslator::sqltranslator() {
 	sqlrcon=NULL;
 	sqlrcur=NULL;
 	temptablepool=new memorypool(0,128,100);
+	tempindexpool=new memorypool(0,128,100);
 }
 
 sqltranslator::~sqltranslator() {
 	debugFunction();
 	delete xmld;
 	delete temptablepool;
+	delete tempindexpool;
 }
 
 bool sqltranslator::loadRules(const char *rules) {
@@ -50,6 +52,7 @@ bool sqltranslator::applyRules(sqlrconnection_svr *sqlrcon,
 void sqltranslator::endSession() {
 	temptablepool->free();
 	temptablemap.clear();
+	tempindexmap.clear();
 }
 
 bool sqltranslator::applyRulesToQuery(xmldomnode *query) {
@@ -484,50 +487,54 @@ bool sqltranslator::tempTablesLocalize(xmldomnode *query, xmldomnode *rule) {
 
 	// for "create temporary table" queries, find the table name,
 	// come up with a session-local name for it and put it in the map...
-	xmldomnode	*tablenamenode=findCreateTemporaryTableName(query);
-	if (tablenamenode) {
-		const char	*oldname=tablenamenode->getAttributeValue(
-							sqlparser::_value);
-		uint64_t	size=charstring::length(oldname)+1;
-		char	*oldnamecopy=(char *)temptablepool->malloc(size);
-		charstring::copy(oldnamecopy,oldname);
-		const char	*newname=generateTempTableName(oldname,
-								uniqueid);
-		temptablemap.setData((char *)oldnamecopy,(char *)newname);
-	}
+	mapCreateTemporaryTableName(query,uniqueid);
+
+	// for "create index" queries that refer to temporary tables, find the
+	// index name, come up with a session-local name for it and put it in
+	// the map...
+	mapCreateIndexOnTemporaryTableName(query,uniqueid);
 
 	// for all queries, look for table name nodes or verbatim nodes and
 	// apply the mapping
-	return replaceTempTableName(query);
+	return replaceTempNames(query);
 }
 
-xmldomnode *sqltranslator::findCreateTemporaryTableName(xmldomnode *node) {
+void sqltranslator::mapCreateTemporaryTableName(xmldomnode *node,
+						const char *uniqueid) {
 
 	// create...
 	node=node->getFirstTagChild(sqlparser::_create);
 	if (node->isNullNode()) {
-		return NULL;
+		return;
 	}
 
 	// temporary...
 	node=node->getFirstTagChild(sqlparser::_create_temporary);
 	if (node->isNullNode()) {
-		return NULL;
+		return;
 	}
 
 	// table...
 	node=node->getNextTagSibling(sqlparser::_table);
 	if (node->isNullNode()) {
-		return NULL;
+		return;
 	}
 
 	// table name...
 	node=node->getFirstTagChild(sqlparser::_table_name);
 	if (node->isNullNode()) {
-		return NULL;
+		return;
 	}
 
-	return node;
+	// create a session-local name and put it in the map...
+	const char	*oldtablename=
+			node->getAttributeValue(sqlparser::_value);
+	uint64_t	size=charstring::length(oldtablename)+1;
+	char		*oldtablenamecopy=(char *)temptablepool->malloc(size);
+	charstring::copy(oldtablenamecopy,oldtablename);
+	const char	*newtablename=
+			generateTempTableName(oldtablename,uniqueid);
+	temptablemap.setData((char *)oldtablenamecopy,(char *)newtablename);
 }
 
 const char *sqltranslator::generateTempTableName(const char *oldname,
@@ -542,7 +549,53 @@ const char *sqltranslator::generateTempTableName(const char *oldname,
 	return newname;
 }
 
-bool sqltranslator::replaceTempTableName(xmldomnode *node) {
+void sqltranslator::mapCreateIndexOnTemporaryTableName(xmldomnode *node,
+							const char *uniqueid) {
+
+	// create...
+	node=node->getFirstTagChild(sqlparser::_create);
+	if (node->isNullNode()) {
+		return;
+	}
+
+	// index...
+	node=node->getFirstTagChild(sqlparser::_index);
+	if (node->isNullNode()) {
+		return;
+	}
+
+	// index name...
+	xmldomnode	*indexnamenode=
+			node->getFirstTagChild(sqlparser::_index_name);
+	if (indexnamenode->isNullNode()) {
+		return;
+	}
+
+	// table name...
+	node=node->getFirstTagChild(sqlparser::_table_name);
+	if (node->isNullNode()) {
+		return;
+	}
+
+	// if the table name isn't in the temp table map then ignore this query
+	char	*newname;
+	if (!temptablemap.getData((char *)node->getAttributeValue(
+					sqlparser::_value),&newname)) {
+		return;
+	}
+
+	// create a session-local name and put it in the map...
+	const char	*oldindexname=
+			indexnamenode->getAttributeValue(sqlparser::_value);
+	uint64_t	size=charstring::length(oldindexname)+1;
+	char		*oldindexnamecopy=(char *)tempindexpool->malloc(size);
+	charstring::copy(oldindexnamecopy,oldindexname);
+	const char	*newindexname=
+			generateTempTableName(oldindexname,uniqueid);
+	tempindexmap.setData((char *)oldindexnamecopy,(char *)newindexname);
+}
+
+bool sqltranslator::replaceTempNames(xmldomnode *node) {
 
 	// if the current node is a table name
 	// then see if it needs to be replaced
@@ -560,11 +613,24 @@ bool sqltranslator::replaceTempTableName(xmldomnode *node) {
 		}
 	}
 
+	// if the current node is an index name
+	// then see if it needs to be replaced
+	if (!charstring::compare(node->getName(),sqlparser::_index_name)) {
+
+		char	*newname=NULL;
+		char	*value=(char *)node->getAttributeValue(
+						sqlparser::_value);
+
+		if (tempindexmap.getData(value,&newname)) {
+			node->setAttributeValue(sqlparser::_value,newname);
+		}
+	}
+
 	// run through child nodes too...
 	for (node=node->getFirstTagChild();
 			!node->isNullNode();
 			node=node->getNextTagSibling()) {
-		if (!replaceTempTableName(node)) {
+		if (!replaceTempNames(node)) {
 			return false;
 		}
 	}

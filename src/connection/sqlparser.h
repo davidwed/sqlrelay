@@ -374,6 +374,9 @@ class sqlparser {
 		bool	cascadeConstraintsClause(const char *ptr,
 						const char **newptr);
 		static const char	*_cascade_constraints_clause;
+		bool	parseDropIndex(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
 
 
 

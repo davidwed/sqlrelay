@@ -21,8 +21,9 @@ bool sqlparser::parseDrop(xmldomnode *currentnode,
 	parseDropTemporary(dropnode,*newptr,newptr);
 
 	// table, index, etc.
-	if (comparePart(*newptr,newptr,"table ")) {
-		return parseDropTable(dropnode,*newptr,newptr);
+	if (parseDropTable(dropnode,*newptr,newptr) ||
+		parseDropIndex(dropnode,*newptr,newptr)) {
+		return true;
 	}
 
 	// for now we only support tables
@@ -54,11 +55,16 @@ bool sqlparser::parseDropTable(xmldomnode *currentnode,
 					const char **newptr) {
 	debugFunction();
 
+	// table
+	if (!tableClause(ptr,newptr)) {
+		return false;
+	}
+
 	// create new node
 	xmldomnode	*tablenode=newNode(currentnode,_table);
 
 	// if not exists
-	parseIfExists(tablenode,ptr,newptr);
+	parseIfExists(tablenode,*newptr,newptr);
 
 	// table names
 	if (!parseTableNameList(tablenode,*newptr,newptr)) {
@@ -186,3 +192,30 @@ bool sqlparser::cascadeConstraintsClause(const char *ptr, const char **newptr) {
 }
 
 const char *sqlparser::_cascade_constraints_clause="cascade_constraints_clause";
+
+bool sqlparser::parseDropIndex(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+
+	// index
+	if (!indexClause(ptr,newptr)) {
+		return false;
+	}
+
+	// create new node
+	xmldomnode	*indexnode=newNode(currentnode,_index);
+
+	// index name
+	if (!parseIndexName(indexnode,*newptr,newptr)) {
+		return false;
+	}
+
+	// on
+	parseOnClause(indexnode,*newptr,newptr);
+
+	// table name
+	parseTableName(indexnode,*newptr,newptr);
+
+	return true;
+}

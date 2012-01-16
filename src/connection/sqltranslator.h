@@ -50,11 +50,15 @@ class sqltranslator {
 							int16_t second);
 		virtual bool	tempTablesLocalize(xmldomnode *query,
 							xmldomnode *rule);
-		xmldomnode	*findCreateTemporaryTableName(
-							xmldomnode *query);
+		void		mapCreateTemporaryTableName(
+							xmldomnode *query,
+							const char *uniqueid);
+		void		mapCreateIndexOnTemporaryTableName(
+							xmldomnode *query,
+							const char *uniqueid);
 		const char	*generateTempTableName(const char *oldname,
 							const char *uniqueid);
-		bool		replaceTempTableName(xmldomnode *node);
+		bool		replaceTempNames(xmldomnode *node);
 		bool		verbatimTableReference(xmldomnode *node);
 
 
@@ -95,7 +99,9 @@ class sqltranslator {
 		sqlrcursor_svr		*sqlrcur;
 
 		memorypool	*temptablepool;
+		memorypool	*tempindexpool;
 		namevaluepairs	temptablemap;
+		namevaluepairs	tempindexmap;
 };
 
 #endif
