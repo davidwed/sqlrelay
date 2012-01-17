@@ -963,8 +963,6 @@ void mysqlcursor::getField(uint32_t col,
 	} else {
 #endif
 		if (mysqlrow[col]) {
-			conn->sendField(mysqlrow[col],
-					mysqlrowlengths[col]);
 			*fld=mysqlrow[col];
 			*fldlength=mysqlrowlengths[col];
 		} else {

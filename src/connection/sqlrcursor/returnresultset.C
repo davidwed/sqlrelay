@@ -16,7 +16,7 @@ void sqlrcursor_svr::returnRow() {
 		bool		blob=false;
 		bool		null=false;
 
-		// get the fild
+		// get the field
 		getField(i,&field,&fieldlength,&blob,&null);
 
 		// send data to the client
