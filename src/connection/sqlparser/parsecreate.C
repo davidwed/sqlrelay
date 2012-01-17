@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlparser.h>
-#define DEBUG_MESSAGES
 #include <debugprint.h>
 #include <rudiments/snooze.h>
 
