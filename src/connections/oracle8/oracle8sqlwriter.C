@@ -54,7 +54,10 @@ const char * const *oracle8sqlwriter::unsupportedElements() {
 
 bool oracle8sqlwriter::temporary(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
-	output->append("global temporary");
+	if (node->getPreviousTagSibling("global")->isNullNode()) {
+		output->append("global ");
+	}
+	output->append("temporary");
 	return true;
 }
 

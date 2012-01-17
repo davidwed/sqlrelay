@@ -61,7 +61,7 @@ bool oracle8sqltranslator::tempTablesPreserveRowsByDefault(
 	// ignore non-temporary tables
 	xmldomnode	*temporary=
 			query->getFirstTagChild(sqlparser::_create)->
-				getFirstTagChild(sqlparser::_create_temporary);
+				getFirstTagChild(sqlparser::_temporary);
 	if (temporary->isNullNode()) {
 		return true;
 	}
@@ -107,7 +107,7 @@ bool oracle8sqltranslator::tempTablesAddMissingColumns(
 	// ignore non-temporary tables
 	xmldomnode	*temporary=
 			query->getFirstTagChild(sqlparser::_create)->
-				getFirstTagChild(sqlparser::_create_temporary);
+				getFirstTagChild(sqlparser::_temporary);
 	if (temporary->isNullNode()) {
 		return true;
 	}
