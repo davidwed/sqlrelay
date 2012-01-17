@@ -19,7 +19,8 @@ sqlwriter::~sqlwriter() {
 bool sqlwriter::write(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur,
 					xmldom *tree, stringbuffer *output) {
 	debugFunction();
-	return write(sqlrcon,sqlrcur,tree->getRootNode(),output);
+	return write(sqlrcon,sqlrcur,
+			tree->getRootNode()->getFirstTagChild(),output);
 }
 
 bool sqlwriter::write(sqlrconnection_svr *sqlrcon,
@@ -29,13 +30,7 @@ bool sqlwriter::write(sqlrconnection_svr *sqlrcon,
 	debugFunction();
 	this->sqlrcon=sqlrcon;
 	this->sqlrcur=sqlrcur;
-	for (xmldomnode *child=tree->getFirstTagChild();
-		!child->isNullNode(); child=child->getNextTagSibling()) {
-		if (!write(child,output)) {
-			return false;
-		}
-	}
-	return true;
+	return write(tree,output);
 }
 
 bool sqlwriter::write(xmldomnode *node, stringbuffer *output) {
