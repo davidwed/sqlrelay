@@ -300,10 +300,20 @@ bool sqlparser::parseUnion(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
+
+	// union
 	if (!unionClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,_union);
+
+	// create the node
+	xmldomnode	*unionnode=newNode(currentnode,_union);
+
+	// all
+	parseAll(unionnode,*newptr,newptr);
+
+	// distinct
+	parseDistinct(unionnode,*newptr,newptr);
 	return true;
 }
 

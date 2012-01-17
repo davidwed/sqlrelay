@@ -124,12 +124,18 @@ class sqlparser {
 		bool	createClause(const char *ptr,
 						const char **newptr);
 		static const char	*_create;
-		bool	parseCreateTemporary(xmldomnode *currentnode,
+		bool	parseGlobal(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	globalClause(const char *ptr,
+						const char **newptr);
+		static const char	*_global;
+		bool	parseTemporary(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	temporaryClause(const char *ptr,
 						const char **newptr);
-		static const char	*_create_temporary;
+		static const char	*_temporary;
 		bool	tableClause(const char *ptr,
 						const char **newptr);
 		bool	parseFulltext(xmldomnode *currentnode,

@@ -94,7 +94,8 @@ const char * const *sqlwriter::baseElements() {
 
 		// create query...
 		sqlparser::_create,
-		sqlparser::_create_temporary,
+		sqlparser::_global,
+		sqlparser::_temporary,
 
 		// table...
 		sqlparser::_table,
@@ -136,7 +137,6 @@ const char * const *sqlwriter::baseElements() {
 
 		// drop...
 		sqlparser::_drop,
-		sqlparser::_drop_temporary,
 		sqlparser::_if_exists,
 		sqlparser::_table_name_list,
 		sqlparser::_table_name_list_item,
@@ -322,8 +322,9 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 	// create query...
 	} else if (!charstring::compare(nodename,sqlparser::_create)) {
 		return createQuery(node,output);
-	} else if (!charstring::compare(nodename,
-					sqlparser::_create_temporary)) {
+	} else if (!charstring::compare(nodename,sqlparser::_global)) {
+		return global(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_temporary)) {
 		return temporary(node,output);
 
 	// table...
@@ -406,9 +407,6 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 	// drop...
 	} else if (!charstring::compare(nodename,sqlparser::_drop)) {
 		return dropQuery(node,output);
-	} else if (!charstring::compare(nodename,
-					sqlparser::_drop_temporary)) {
-		return temporary(node,output);
 	} else if (!charstring::compare(nodename,
 					sqlparser::_if_exists)) {
 		return ifExists(node,output);

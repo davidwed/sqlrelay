@@ -509,7 +509,7 @@ void sqltranslator::mapCreateTemporaryTableName(xmldomnode *node,
 	}
 
 	// temporary...
-	node=node->getFirstTagChild(sqlparser::_create_temporary);
+	node=node->getFirstTagChild(sqlparser::_temporary);
 	if (node->isNullNode()) {
 		return;
 	}

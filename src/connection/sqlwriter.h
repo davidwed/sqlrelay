@@ -63,6 +63,8 @@ class sqlwriter {
 		// table...
 		virtual bool	table(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	global(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	temporary(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	ifNotExists(xmldomnode *node,

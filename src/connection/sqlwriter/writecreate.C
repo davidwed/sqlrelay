@@ -16,6 +16,12 @@ bool sqlwriter::table(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::global(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("global");
+	return true;
+}
+
 bool sqlwriter::temporary(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("temporary");

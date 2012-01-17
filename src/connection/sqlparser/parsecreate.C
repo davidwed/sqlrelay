@@ -18,8 +18,11 @@ bool sqlparser::parseCreate(xmldomnode *currentnode,
 	// create the node
 	xmldomnode	*createnode=newNode(currentnode,_create);
 
+	// global (for tables)
+	parseGlobal(createnode,*newptr,newptr);
+
 	// temporary (for tables)
-	parseCreateTemporary(createnode,*newptr,newptr);
+	parseTemporary(createnode,*newptr,newptr);
 
 	// unique (for indices)
 	parseUnique(createnode,*newptr,newptr);
@@ -48,14 +51,32 @@ bool sqlparser::createClause(const char *ptr, const char **newptr) {
 
 const char *sqlparser::_create="create";
 
-bool sqlparser::parseCreateTemporary(xmldomnode *currentnode,
+bool sqlparser::parseGlobal(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!globalClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_global);
+	return true;
+}
+
+bool sqlparser::globalClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"global ");
+}
+
+const char *sqlparser::_global="global";
+
+bool sqlparser::parseTemporary(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
 	if (!temporaryClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,_create_temporary);
+	newNode(currentnode,_temporary);
 	return true;
 }
 
@@ -64,13 +85,12 @@ bool sqlparser::temporaryClause(const char *ptr, const char **newptr) {
 	const char *parts[]={
 		"temporary ",
 		"temp ",
-		"global temp ",
 		NULL
 	};
 	return comparePart(ptr,newptr,parts);
 }
 
-const char *sqlparser::_create_temporary="create_temporary";
+const char *sqlparser::_temporary="temporary";
 
 bool sqlparser::parseFulltext(xmldomnode *currentnode,
 					const char *ptr,
