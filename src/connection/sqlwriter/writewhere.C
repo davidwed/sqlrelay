@@ -90,6 +90,12 @@ bool sqlwriter::endExists(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::is(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("is");
+	return true;
+}
+
 bool sqlwriter::like(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("like");

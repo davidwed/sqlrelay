@@ -287,6 +287,8 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	endExists(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	is(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	like(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	nullSafeEquals(xmldomnode *node,

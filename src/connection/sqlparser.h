@@ -663,6 +663,11 @@ class sqlparser {
 						const char **newptr);
 		bool	existsClause(const char *ptr, const char **newptr);
 		static const char	*_exists;
+		bool	parseIs(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	is(const char *ptr, const char **newptr);
+		static const char	*_is;
 		bool	parseLike(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);

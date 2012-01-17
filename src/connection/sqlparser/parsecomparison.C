@@ -97,7 +97,8 @@ bool sqlparser::parseComparison(xmldomnode *currentnode,
 	}
 
 	// get the comparator
-	if (parseLike(comparisonnode,*newptr,newptr) ||
+	if (parseIs(comparisonnode,*newptr,newptr) ||
+		parseLike(comparisonnode,*newptr,newptr) ||
 		parseNullSafeEquals(comparisonnode,*newptr,newptr) ||
 		parseEquals(comparisonnode,*newptr,newptr) ||
 		parseNotEquals(comparisonnode,*newptr,newptr) ||
@@ -289,6 +290,24 @@ bool sqlparser::existsClause(const char *ptr, const char **newptr) {
 }                                   
 
 const char *sqlparser::_exists="exists";
+
+bool sqlparser::parseIs(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!is(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_is);
+	return true;
+}
+
+bool sqlparser::is(const char *ptr, const char **newptr) {
+        debugFunction();
+        return comparePart(ptr,newptr,"is ");
+}                                   
+
+const char *sqlparser::_is="is";
 
 bool sqlparser::parseLike(xmldomnode *currentnode,
 					const char *ptr,
