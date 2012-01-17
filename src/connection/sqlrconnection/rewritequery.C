@@ -182,13 +182,13 @@ void sqlrconnection_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 
 	// debug
 	if (debugsqltranslation) {
-		printf("query: \"%s\"\n",cursor->querybuffer);
+		printf("bind translation:\n\"%s\"\n",cursor->querybuffer);
 		for (uint16_t i=0; i<cursor->inbindcount; i++) {
-			printf("inbind: \"%s\"\n",
+			printf("  inbind: \"%s\"\n",
 					cursor->inbindvars[i].variable);
 		}
 		for (uint16_t i=0; i<cursor->outbindcount; i++) {
-			printf("outbind: \"%s\"\n",
+			printf("  outbind: \"%s\"\n",
 					cursor->outbindvars[i].variable);
 		}
 	}

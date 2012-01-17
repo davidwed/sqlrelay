@@ -180,7 +180,7 @@ char *sqltranslator::convertDateTime(const char *format,
 bool sqltranslator::translateDateTimesInQuery(xmldomnode *querynode,
 							xmldomnode *rule) {
 	debugFunction();
-
+	
 	// input format
 	bool		ddmm=!charstring::compare(
 				rule->getAttributeValue("ddmm"),
@@ -252,6 +252,11 @@ bool sqltranslator::translateDateTimesInQuery(xmldomnode *querynode,
 							year,month,day,
 							hour,minute,second);
 				if (converted) {
+
+					if (sqlrcon->debugsqltranslation) {
+						printf("    %s -> %s\n",
+							valuecopy,converted);
+					}
 
 					// repackage as a string
 					stringbuffer	output;
@@ -354,6 +359,11 @@ bool sqltranslator::translateDateTimesInBindVariables(
 			continue;
 		}
 
+		if (sqlrcon->debugsqltranslation) {
+			printf("    %s -> %s\n",
+				bind->value.stringval,converted);
+		}
+
 		// replace the value with the converted string
 		bind->valuesize=charstring::length(converted);
 		bind->value.stringval=
@@ -382,8 +392,31 @@ bool sqltranslator::trimColumnsComparedToStringBinds(xmldomnode *query,
 
 bool sqltranslator::translateDateTimes(xmldomnode *query, xmldomnode *rule) {
 	debugFunction();
-	return translateDateTimesInBindVariables(query,rule) &&
-			translateDateTimesInQuery(query,rule);
+	if (sqlrcon->debugsqltranslation) {
+		printf("date/time translation:\n");
+		printf("    ddmm: %s\n",
+			rule->getAttributeValue("ddmm"));
+		printf("    datetime: %s\n",
+			rule->getAttributeValue("datetime"));
+		printf("    date: %s\n",
+			rule->getAttributeValue("date"));
+		printf("    time: %s\n",
+			rule->getAttributeValue("time"));
+		printf("  binds:\n");
+	}
+	if (!translateDateTimesInBindVariables(query,rule)) {
+		return false;
+	}
+	if (sqlrcon->debugsqltranslation) {
+		printf("  query:\n");
+	}
+	if (!translateDateTimesInQuery(query,rule)) {
+		return false;
+	}
+	if (sqlrcon->debugsqltranslation) {
+		printf("\n");
+	}
+	return true;
 }
 
 xmldomnode *sqltranslator::newNode(xmldomnode *parentnode, const char *type) {

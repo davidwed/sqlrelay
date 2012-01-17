@@ -452,14 +452,14 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		memorypool	*bindmappingspool;
 		namevaluepairs	*inbindmappings;
 		namevaluepairs	*outbindmappings;
+
+		bool		debugsqltranslation;
 	private:
 		bool		fakeinputbinds;
 
 		sqlparser	*sqlp;
 		sqltranslator	*sqlt;
 		sqlwriter	*sqlw;
-
-		bool		debugsqltranslation;
 
 		sqlrcursor_svr	**cur;
 
