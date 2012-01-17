@@ -191,8 +191,6 @@ bool sqlparser::parseColumnAndConstraintDefinitions(
 
 	// left paren
 	if (!leftParen(ptr,newptr)) {
-		debugPrintf("missing left paren\n");
-		error=true;
 		return false;
 	}
 

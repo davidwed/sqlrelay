@@ -353,13 +353,11 @@ const char *sqlparser::_unique="unique";
 bool sqlparser::parseDistinct(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
-printf("looking for distinct: %s\n",ptr);
 	debugFunction();
 	if (!distinctClause(ptr,newptr)) {
 		return false;
 	}
 	newNode(currentnode,_distinct);
-printf("found distinct!\n");
 	return true;
 }
 
