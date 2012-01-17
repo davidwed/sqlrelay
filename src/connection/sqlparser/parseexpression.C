@@ -62,7 +62,8 @@ bool sqlparser::parseUnaryOperator(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
-	return (parseCompliment(currentnode,ptr,newptr) ||
+	return (parseDistinct(currentnode,ptr,newptr) ||
+		parseCompliment(currentnode,ptr,newptr) ||
 		parseInverse(currentnode,ptr,newptr) ||
 		parseNegative(currentnode,ptr,newptr));
 }
