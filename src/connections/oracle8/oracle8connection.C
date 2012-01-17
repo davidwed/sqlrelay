@@ -1283,7 +1283,7 @@ void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 	if (oracle8conn->droptemptables) {
 		// if "droptemptables" was specified...
 		conn->addSessionTempTableForDrop(tablename.getString());
-	} else if (!preserverows.match(ptr)) {
+	} else if (preserverows.match(ptr)) {
 		// if "on commit preserve rows" was not specified...
 		conn->addSessionTempTableForTrunc(tablename.getString());
 	}
