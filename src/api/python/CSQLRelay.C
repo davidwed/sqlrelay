@@ -660,7 +660,7 @@ static PyObject *inputBind(PyObject *self, PyObject *args) {
   } else if (PyString_Check(value)) {
     // if the 3rd parameter is a string then the
     // 4th parameter might be a length parameter
-    if (PyInt_Check(precision)) {
+    if (PyInt_Check(precision) && PyInt_AsLong(precision)>0) {
       ((sqlrcursor *)sqlrcur)->inputBind(variable, PyString_AsString(value), (uint32_t)PyInt_AsLong(precision));
     } else {
       ((sqlrcursor *)sqlrcur)->inputBind(variable, PyString_AsString(value));
@@ -672,6 +672,7 @@ static PyObject *inputBind(PyObject *self, PyObject *args) {
   } else if (PyFloat_Check(value)) {
     ((sqlrcursor *)sqlrcur)->inputBind(variable, (double)PyFloat_AsDouble(value), (uint32_t)PyInt_AsLong(precision), (uint32_t)scale);
   } else {
+printf("string bind -  %s: %s\n",variable,PyString_AsString(PyObject_Str(value)));
     ((sqlrcursor *)sqlrcur)->inputBind(variable, PyString_AsString(PyObject_Str(value)));
   }
   return Py_BuildValue("h", success);
