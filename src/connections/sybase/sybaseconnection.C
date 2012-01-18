@@ -43,6 +43,8 @@ void sybaseconnection::handleConnectString() {
 	language=connectStringValue("language");
 	hostname=connectStringValue("hostname");
 	packetsize=connectStringValue("packetsize");
+	fakeinputbinds=
+		!charstring::compare(connectStringValue("fakebinds"),"yes");
 }
 
 bool sybaseconnection::logIn(bool printerrors) {

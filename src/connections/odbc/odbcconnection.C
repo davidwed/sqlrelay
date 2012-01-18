@@ -164,6 +164,8 @@ void odbcconnection::handleConnectString() {
 	const char	*autocom=connectStringValue("autocommit");
 	setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
+	fakeinputbinds=
+		!charstring::compare(connectStringValue("fakebinds"),"yes");
 }
 
 bool odbcconnection::logIn(bool printerrors) {

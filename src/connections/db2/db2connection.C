@@ -33,6 +33,8 @@ void db2connection::handleConnectString() {
 	setFakeTransactionBlocksBehavior(
 		!charstring::compare(
 			connectStringValue("faketransactionblocks"),"yes"));
+	fakeinputbinds=
+		!charstring::compare(connectStringValue("fakebinds"),"yes");
 }
 
 bool db2connection::logIn(bool printerrors) {

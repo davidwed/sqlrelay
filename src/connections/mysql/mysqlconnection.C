@@ -49,6 +49,8 @@ void mysqlconnection::handleConnectString() {
 	port=connectStringValue("port");
 	socket=connectStringValue("socket");
 	charset=connectStringValue("charset");
+	fakeinputbinds=
+		!charstring::compare(connectStringValue("fakebinds"),"yes");
 }
 
 bool mysqlconnection::logIn(bool printerrors) {

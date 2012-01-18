@@ -38,6 +38,7 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 	faketransactionblocks=false;
 	faketransactionblocksautocommiton=false;
 
+	fakeinputbinds=false;
 	translatebinds=false;
 
 	isolationlevel=NULL;
