@@ -1062,6 +1062,7 @@ int	main(int argc, char **argv) {
 	printf("STORED PROCEDURES: \n");
 	// return no values
 	cur->sendQuery("drop procedure if exists testproc");
+con->debugOn();
 	checkSuccess(cur->sendQuery("create procedure testproc(in in1 int, in in2 float, in in3 char(20)) begin select in1, in2, in3; end;"),1);
 	cur->prepareQuery("call testproc(:in1,:in2,:in3)");
 	cur->inputBind("in1",1);

@@ -108,6 +108,11 @@ stringbuffer *sqlrcursor_svr::fakeInputBinds(const char *query) {
 		}
 	}
 
+	if (conn->debugsqltranslation) {
+		printf("after faking input binds:\n%s\n\n",
+				outputquery->getString());
+	}
+
 	return outputquery;
 }
 

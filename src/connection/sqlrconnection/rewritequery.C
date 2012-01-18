@@ -191,6 +191,7 @@ void sqlrconnection_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 			printf("  outbind: \"%s\"\n",
 					cursor->outbindvars[i].variable);
 		}
+		printf("\n");
 	}
 	dbgfile.debugPrint("connection",2,"converted:");
 	dbgfile.debugPrint("connection",2,cursor->querybuffer);
