@@ -74,6 +74,9 @@ void oracle8connection::handleConnectString() {
 		liiquery.append(" from dual");
 		lastinsertidquery=liiquery.detachString();
 	}
+
+	fakeinputbinds=
+		!charstring::compare(connectStringValue("fakebinds"),"yes");
 }
 
 void oracle8connection::dropTempTables(sqlrcursor_svr *cursor,

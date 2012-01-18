@@ -139,7 +139,8 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	setInitialAutoCommitBehavior();
 
 	// get fake input bind variable behavior
-	fakeinputbinds=cfgfl->getFakeInputBindVariables();
+	// (this may have already been set true by the connect string)
+	fakeinputbinds=(fakeinputbinds || cfgfl->getFakeInputBindVariables());
 
 	// get translate bind variable behavior
 	translatebinds=cfgfl->getTranslateBindVariables();

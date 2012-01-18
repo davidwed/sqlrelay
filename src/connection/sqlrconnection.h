@@ -455,7 +455,6 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 
 		bool		debugsqltranslation;
 	private:
-		bool		fakeinputbinds;
 
 		sqlparser	*sqlp;
 		sqltranslator	*sqlt;
@@ -482,6 +481,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		char		*pidfile;
 
 	protected:
+		bool		fakeinputbinds;
 
 		sharedmemory		*idmemory;
 		cmdline			*cmdl;

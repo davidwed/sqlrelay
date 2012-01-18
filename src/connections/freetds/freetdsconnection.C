@@ -57,6 +57,8 @@ void freetdsconnection::handleConnectString() {
 	language=connectStringValue("language");
 	hostname=connectStringValue("hostname");
 	packetsize=connectStringValue("packetsize");
+	fakeinputbinds=
+		!charstring::compare(connectStringValue("fakebinds"),"yes");
 }
 
 bool freetdsconnection::logIn(bool printerrors) {
