@@ -153,9 +153,9 @@ sqlrcursor::inputBind(variable,...)
 						(uint32_t)SvIV(ST(3)),
 						(uint32_t)SvIV(ST(4)));
 		} else if (SvPOK(ST(2))) {
-			if (SvIOK(ST(3))) {
+			if (SvIOK(ST(3)) && SvIV(ST(3))>0) {
 				THIS->inputBind(variable,SvPV(ST(2),na),
-						(uint32_t)SvIV(ST(3)));
+							(uint32_t)SvIV(ST(3)));
 			} else {
 				THIS->inputBind(variable,SvPV(ST(2),na));
 			}
