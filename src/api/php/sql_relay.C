@@ -652,7 +652,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_inputbind) {
 	if (cursor) {
 		if (Z_TYPE_PP(value)==IS_STRING) {
 			convert_to_string_ex(value);
-			if (ZEND_NUM_ARGS() == 4) {
+			if (ZEND_NUM_ARGS() == 4 && (*length)->value.lval>0) {
 				cursor->inputBind((*variable)->value.str.val,(*value)->value.str.val,(*length)->value.lval);
 			} else {
 				cursor->inputBind((*variable)->value.str.val,(*value)->value.str.val);
