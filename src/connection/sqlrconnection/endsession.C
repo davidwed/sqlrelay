@@ -16,6 +16,14 @@ void sqlrconnection_svr::endSessionInternal() {
 
 	dbgfile.debugPrint("connection",2,"ending session...");
 
+	// truncate/drop temp tables
+	// (Do this before running the end-session queries becuase
+	// with oracle, it may be necessary to log out and log back in to
+	// drop a temp table.  With each log-out the session end queries
+	// are run and with each log-in the session start queries are run.)
+	truncateTempTables(cur[0],&sessiontemptablesfortrunc);
+	dropTempTables(cur[0],&sessiontemptablesfordrop);
+
 	sessionEndQueries();
 
 	// must set suspendedsession to false here so resumed sessions won't 
@@ -23,10 +31,6 @@ void sqlrconnection_svr::endSessionInternal() {
 	suspendedsession=false;
 
 	abortAllCursors();
-
-	// truncate/drop temp tables
-	truncateTempTables(cur[0],&sessiontemptablesfortrunc);
-	dropTempTables(cur[0],&sessiontemptablesfordrop);
 
 	// commit or rollback if necessary
 	if (isTransactional() && commitorrollback) {
