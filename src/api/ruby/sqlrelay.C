@@ -666,10 +666,11 @@ static VALUE sqlrcur_inputBind(int argc, VALUE *argv, VALUE self) {
 	rb_scan_args(argc,argv,"22",&variable,&value,&precision,&scale);
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	if (rb_obj_is_instance_of(value,rb_cString)==Qtrue) {
-		if (rb_obj_is_instance_of(precision,rb_cBignum)==Qtrue ||
+		if ((rb_obj_is_instance_of(precision,rb_cBignum)==Qtrue ||
 			rb_obj_is_instance_of(precision,rb_cFixnum)==Qtrue ||
 			rb_obj_is_instance_of(precision,rb_cInteger)==Qtrue ||
-			rb_obj_is_instance_of(precision,rb_cNumeric)==Qtrue) {
+			rb_obj_is_instance_of(precision,rb_cNumeric)==Qtrue) && 
+			NUM2INT(precision)>0) {
 			// in this case, the precision parameter is actually
 			// the string length
 			sqlrcur->inputBind(STR2CSTR(variable),
