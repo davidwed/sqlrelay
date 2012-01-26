@@ -1111,10 +1111,13 @@ void postgresqlcursor::getField(uint32_t col,
 void postgresqlcursor::cleanUpData(bool freeresult, bool freebinds) {
 
 	if (freebinds) {
+#if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)
 		for (uint16_t i=0; i<bindcounter; i++) {
 			delete[] bindvalues[i];
 			bindvalues[i]=NULL;
 		}
+#endif
 	}
 
 	if (freeresult && pgresult) {
