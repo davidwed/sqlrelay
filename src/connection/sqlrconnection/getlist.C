@@ -85,6 +85,15 @@ bool sqlrconnection_svr::getListCommand(sqlrcursor_svr *cursor,
 
 		// some apps aren't well behaved, trim spaces off of both sides
 		charstring::bothTrim(table);
+
+		// translate table name, if necessary
+		if (sqlt) {
+			const char	*newname=NULL;
+			if (sqlt->getReplacementTableName(table,&newname)) {
+				delete[] table;
+				table=charstring::duplicate(newname);
+			}
+		}
 	}
 
 	// set the values that we won'tget from the client
@@ -189,9 +198,9 @@ bool sqlrconnection_svr::getListThroughApiCall(sqlrcursor_svr *cursor,
 	// initialize flags andbuffers
 	bool		success=false;
 	char		**cols=NULL;
-	uint32_t	colcount=NULL;
+	uint32_t	colcount=0;
 	char		***rows=NULL;
-	uint64_t	rowcount=NULL;
+	uint64_t	rowcount=0;
 
 	// get the appropriate list
 	switch (which) {

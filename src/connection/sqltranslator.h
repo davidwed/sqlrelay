@@ -24,6 +24,11 @@ class sqltranslator {
 						sqlrcursor_svr *sqlrcur,
 						xmldom *querytree);
 
+		virtual bool	getReplacementTableName(const char *oldname,
+							const char **newname);
+		virtual bool	getReplacementIndexName(const char *oldname,
+							const char **newname);
+
 		virtual void	endSession();
 	protected:
 		virtual bool	applyRulesToQuery(xmldomnode *query);
