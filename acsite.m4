@@ -512,6 +512,12 @@ else
 		fi
 	done
 
+	dnl FSU pthreads check
+	if ( test -z "$PTHREADLIB" )
+	then
+		FW_CHECK_HEADERS_AND_LIBS([$PTHREADPATH],[FSU],[pthread.h],[gthreads],[""],[""],[PTHREADINCLUDES],[PTHREADLIB],[PTHREADLIBPATH],[PTHREADSTATIC])
+	fi
+
 	if ( test -z "$PTHREADLIBS" )
 	then
 		dnl if we couldn't find the appropriate libraries, just
