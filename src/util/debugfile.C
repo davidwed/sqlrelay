@@ -47,9 +47,9 @@ void debugfile::init(const char *name, const char *localstatedir) {
 bool debugfile::openDebugFile() {
 
 	// create the debug file
-	mode_t	oldumask=umask(066);
+	mode_t	oldumask=process::setFileCreationMask(066);
 	dbgfile=new filedestination();
-	umask(oldumask);
+	process::setFileCreationMask(oldumask);
 
 	// open the file
 	bool	retval=false;
