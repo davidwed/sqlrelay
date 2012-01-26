@@ -353,8 +353,6 @@ postgresqlcursor::~postgresqlcursor() {
 		defined(HAVE_POSTGRESQL_PQPREPARE)
 	deallocateStatement();
 	delete[] cursorname;
-#endif
-	delete[] columnnames;
 
 	for (uint16_t i=0; i<bindcounter; i++) {
 		delete[] bindvalues[i];
@@ -362,6 +360,9 @@ postgresqlcursor::~postgresqlcursor() {
 	delete[] bindvalues;
 	delete[] bindlengths;
 	delete[] bindformats;
+#endif
+
+	delete[] columnnames;
 }
 
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
