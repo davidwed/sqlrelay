@@ -358,6 +358,9 @@
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE
 
+/* Rudiments supports threads */
+#undef RUDIMENTS_HAS_THREADS
+
 /* Some systems use SQLLEN * in SQLBindCol */
 #undef SQLBINDCOL_SQLLEN
 

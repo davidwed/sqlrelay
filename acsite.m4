@@ -477,36 +477,36 @@ dnl requires:  PTHREADPATH, RPATHFLAG, cross_compiling
 dnl sets the substitution variable PTHREADLIBS
 AC_DEFUN([FW_CHECK_PTHREAD],
 [
-
 HAVE_PTHREAD=""
 PTHREADINCLUDES=""
-PTHREADLIBS=""
+PTHREADLIB=""
 
 if ( test "$cross_compiling" = "yes" )
 then
 
 	dnl cross compiling
 	echo "cross compiling"
+
 	if ( test -n "$PTHREADPATH" )
 	then
 		PTHREADINCLUDES="$PTHREAD_COMPILE -I$PTHREADPATH/include"
-		PTHREADLIBS="-L$PTHREADPATH/lib -lpthread -phtread"
+		PTHREADLIB="-L$PTHREADPATH/lib -lpthread -phtread"
 	else
 		PTHREADINCLUDES="$PTHREAD_COMPILE"
-		PTHREADLIBS="-lpthread -pthread"
+		PTHREADLIB="-lpthread -pthread"
 	fi
 	HAVE_PTHREAD="yes"
 
 else
 
-	for i in "pthread" "c_r" "gthreads"
+	for i in "pthread" "c_r" "thread"
 	do
-		FW_CHECK_HEADERS_AND_LIBS([$PTHREADPATH],[pthread],[pthread.h],[$i],[""],[""],[PTHREADINCLUDES],[PTHREADLIBS],[PTHREADLIBPATH],[PTHREADSTATIC])
-		if ( test -n "$PTHREADLIBS" )
+		FW_CHECK_HEADERS_AND_LIBS([$PTHREADPATH],[pthread],[pthread.h],[$i],[""],[""],[PTHREADINCLUDES],[PTHREADLIB],[PTHREADLIBPATH],[PTHREADSTATIC])
+		if ( test -n "$PTHREADLIB" )
 		then
 			if ( test "$i" = "c_r" )
 			then
-				PTHREADLIBS="$PTHREADLIBS -pthread"
+				PTHREADLIB="$PTHREADLIB -pthread"
 			fi
 			break
 		fi
@@ -518,37 +518,57 @@ else
 		FW_CHECK_HEADERS_AND_LIBS([$PTHREADPATH],[FSU],[pthread.h],[gthreads],[""],[""],[PTHREADINCLUDES],[PTHREADLIB],[PTHREADLIBPATH],[PTHREADSTATIC])
 	fi
 
-	if ( test -z "$PTHREADLIBS" )
+	if ( test -z "$PTHREADLIB" )
 	then
 		dnl if we couldn't find the appropriate libraries, just
 		dnl try including pthread.h and using -lpthread, it
 		dnl works on some systems
-		FW_TRY_LINK([#include <pthread.h>],[pthread_create(NULL,NULL,NULL,NULL);],[$CPPFLAGS],[-pthread],[],[PTHREADLIBS="-pthread"],[])
+		FW_TRY_LINK([#include <pthread.h>],[pthread_create(NULL,NULL,NULL,NULL);],[$CPPFLAGS],[-pthread],[],[PTHREADLIB="-pthread"],[])
 	fi
 
-	if ( test -n "$PTHREADLIBS" )
+	if ( test -n "$PTHREADLIB" )
 	then
 		PTHREADINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
 		HAVE_PTHREAD="yes"
 	fi
 
-	dnl override PTHREADLIBS on microsoft platforms
+	dnl override PTHREADLIB on microsoft platforms
 	if ( test -n "$PTHREADINCLUDES" -a "$MICROSOFT" = "yes" )
 	then
-		PTHREADLIBS="-pthread"
+		PTHREADLIB="-pthread"
 	fi
 fi
 
 FW_INCLUDES(pthreads,[$PTHREADINCLUDES])
-FW_LIBS(pthreads,[$PTHREADLIBS])
+FW_LIBS(pthreads,[$PTHREADLIB])
 
-AC_SUBST(PTHREADINCLUDES)
-AC_SUBST(PTHREADLIBS)
 if ( test -z "$HAVE_PTHREAD" )
 then
-	AC_MSG_ERROR(pthread library not found.  SQL-Relay requires this package.)
+	AC_MSG_ERROR(pthread library not found.  Rudiments requires this package.)
 	exit
+
+else
+
+	dnl check for pthread macros - for now we're disabling
+	dnl thread support on systems that use them, they cause
+	dnl innumerable problems
+	PTHREAD_MACROS=""
+	AC_MSG_CHECKING(for pthread macros)
+	FW_TRY_COMPILE([#include <pthread.h>],
+[#ifdef __pthread_fork
+	#error pthread macros in use
+#endif],[-pthread],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes - disabling thread support); PTHREAD_MACROS="yes"])
+	if ( test -n "$PTHREAD_MACROS" )
+	then
+		PTHREADLIB=""
+		PTHREADINCLUDES=""
+	else
+		AC_DEFINE(RUDIMENTS_HAS_THREADS,1,Rudiments supports threads)
+	fi
 fi
+
+AC_SUBST(PTHREADINCLUDES)
+AC_SUBST(PTHREADLIB)
 ])
 
 

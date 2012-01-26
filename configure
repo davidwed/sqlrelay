@@ -843,7 +843,7 @@ ICONVINCLUDES
 AIOLIB
 DLLIB
 READLINELIB
-PTHREADLIBS
+PTHREADLIB
 PTHREADINCLUDES
 WALL
 WNOLONGDOUBLE
@@ -15257,28 +15257,28 @@ echo "******************************"
 echo
 echo "***** threads ****************"
 
-
 HAVE_PTHREAD=""
 PTHREADINCLUDES=""
-PTHREADLIBS=""
+PTHREADLIB=""
 
 if ( test "$cross_compiling" = "yes" )
 then
 
 		echo "cross compiling"
+
 	if ( test -n "$PTHREADPATH" )
 	then
 		PTHREADINCLUDES="$PTHREAD_COMPILE -I$PTHREADPATH/include"
-		PTHREADLIBS="-L$PTHREADPATH/lib -lpthread -phtread"
+		PTHREADLIB="-L$PTHREADPATH/lib -lpthread -phtread"
 	else
 		PTHREADINCLUDES="$PTHREAD_COMPILE"
-		PTHREADLIBS="-lpthread -pthread"
+		PTHREADLIB="-lpthread -pthread"
 	fi
 	HAVE_PTHREAD="yes"
 
 else
 
-	for i in "pthread" "c_r" "gthreads"
+	for i in "pthread" "c_r" "thread"
 	do
 
 
@@ -15296,7 +15296,7 @@ STATIC=""
 HEADERSANDLIBSPATH=""
 
 eval "PTHREADINCLUDES=\"\""
-eval "PTHREADLIBS=\"\""
+eval "PTHREADLIB=\"\""
 eval "PTHREADLIBPATH=\"\""
 eval "PTHREADSTATIC=\"\""
 if ( test -n "" )
@@ -15597,7 +15597,7 @@ LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib$||g" -e "s|-L/lib$||g" -e "s|-
 LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib64$||g" -e "s|-L/lib64$||g" -e "s|-L/usr/lib64 ||g" -e "s|-L/lib64 ||g"`
 
 eval "PTHREADINCLUDES=\"$INCLUDESTRING\""
-eval "PTHREADLIBS=\"$LIBSTRING\""
+eval "PTHREADLIB=\"$LIBSTRING\""
 eval "PTHREADLIBPATH=\"$LIBPATH\""
 eval "PTHREADSTATIC=\"$STATIC\""
 if ( test -n "" )
@@ -15605,11 +15605,11 @@ then
 	eval "=\"$HEADERSANDLIBSPATH\""
 fi
 
-		if ( test -n "$PTHREADLIBS" )
+		if ( test -n "$PTHREADLIB" )
 		then
 			if ( test "$i" = "c_r" )
 			then
-				PTHREADLIBS="$PTHREADLIBS -pthread"
+				PTHREADLIB="$PTHREADLIB -pthread"
 			fi
 			break
 		fi
@@ -15944,7 +15944,7 @@ fi
 
 	fi
 
-	if ( test -z "$PTHREADLIBS" )
+	if ( test -z "$PTHREADLIB" )
 	then
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -15966,7 +15966,7 @@ pthread_create(NULL,NULL,NULL,NULL);
 }
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
-  PTHREADLIBS="-pthread"
+  PTHREADLIB="-pthread"
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -15977,7 +15977,7 @@ export LD_LIBRARY_PATH
 
 	fi
 
-	if ( test -n "$PTHREADLIBS" )
+	if ( test -n "$PTHREADLIB" )
 	then
 		PTHREADINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
 		HAVE_PTHREAD="yes"
@@ -15985,7 +15985,7 @@ export LD_LIBRARY_PATH
 
 		if ( test -n "$PTHREADINCLUDES" -a "$MICROSOFT" = "yes" )
 	then
-		PTHREADLIBS="-pthread"
+		PTHREADLIB="-pthread"
 	fi
 fi
 
@@ -15996,19 +15996,61 @@ then
 fi
 
 
-if ( test -n "$PTHREADLIBS" )
+if ( test -n "$PTHREADLIB" )
 then
-	echo "pthreads libs... $PTHREADLIBS"
+	echo "pthreads libs... $PTHREADLIB"
 fi
-
-
 
 
 if ( test -z "$HAVE_PTHREAD" )
 then
-	as_fn_error $? "pthread library not found.  SQL-Relay requires this package." "$LINENO" 5
+	as_fn_error $? "pthread library not found.  Rudiments requires this package." "$LINENO" 5
 	exit
+
+else
+
+				PTHREAD_MACROS=""
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for pthread macros" >&5
+$as_echo_n "checking for pthread macros... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+CPPFLAGS="-pthread"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <pthread.h>
+int
+main ()
+{
+#ifdef __pthread_fork
+	#error pthread macros in use
+#endif
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes - disabling thread support" >&5
+$as_echo "yes - disabling thread support" >&6; }; PTHREAD_MACROS="yes"
 fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+
+	if ( test -n "$PTHREAD_MACROS" )
+	then
+		PTHREADLIB=""
+		PTHREADINCLUDES=""
+	else
+
+$as_echo "#define RUDIMENTS_HAS_THREADS 1" >>confdefs.h
+
+	fi
+fi
+
+
+
 
 echo "******************************"
 
