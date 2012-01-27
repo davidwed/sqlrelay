@@ -14983,9 +14983,35 @@ $as_echo "#define MINGW32 1" >>confdefs.h
 fi
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for minix" >&5
+$as_echo_n "checking for minix... " >&6; }
 case $host_os in
 	*minix* )
 		CPPFLAGS="$CPPFLAGS -D_MINIX -D_POSIX_SOURCE"
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		;;
+	* )
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		;;
+esac
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for haiku" >&5
+$as_echo_n "checking for haiku... " >&6; }
+case $host_os in
+	*haiku* )
+		if ( test "$prefix" = "NONE" )
+		then
+			prefix="/boot/common"
+		fi
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		;;
+	* )
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
 		;;
 esac
 

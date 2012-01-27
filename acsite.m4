@@ -402,9 +402,32 @@ AC_DEFUN([FW_CHECK_OSX],
 dnl Checks for minix and adds some macros if it is
 AC_DEFUN([FW_CHECK_MINIX],
 [
+AC_MSG_CHECKING(for minix)
 case $host_os in
 	*minix* )
 		CPPFLAGS="$CPPFLAGS -D_MINIX -D_POSIX_SOURCE"
+		AC_MSG_RESULT(yes)
+		;;
+	* )
+		AC_MSG_RESULT(no)
+		;;
+esac
+])
+
+dnl Checks for haiku and adds some macros if it is
+AC_DEFUN([FW_CHECK_HAIKU],
+[
+AC_MSG_CHECKING(for haiku)
+case $host_os in
+	*haiku* )
+		if ( test "$prefix" = "NONE" )
+		then
+			prefix="/boot/common"
+		fi
+		AC_MSG_RESULT(yes)
+		;;
+	* )
+		AC_MSG_RESULT(no)
 		;;
 esac
 ])
