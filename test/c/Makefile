@@ -5,7 +5,7 @@ include ../../config.mk
 .PHONY: all clean
 
 CPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
-LIBS = -L$(libdir) -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) -lm $(LIBEFENCE)
+LIBS = -L$(libdir) -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
 
 .SUFFIXES: .lo
 
