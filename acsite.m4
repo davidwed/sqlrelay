@@ -548,23 +548,7 @@ then
 	exit
 
 else
-
-	dnl check for pthread macros - for now we're disabling
-	dnl thread support on systems that use them, they cause
-	dnl innumerable problems
-	PTHREAD_MACROS=""
-	AC_MSG_CHECKING(for pthread macros)
-	FW_TRY_COMPILE([#include <pthread.h>],
-[#ifdef __pthread_fork
-	#error pthread macros in use
-#endif],[-pthread],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes - disabling thread support); PTHREAD_MACROS="yes"])
-	if ( test -n "$PTHREAD_MACROS" )
-	then
-		PTHREADLIB=""
-		PTHREADINCLUDES=""
-	else
-		AC_DEFINE(RUDIMENTS_HAS_THREADS,1,Rudiments supports threads)
-	fi
+	AC_DEFINE(RUDIMENTS_HAS_THREADS,1,Rudiments supports threads)
 fi
 
 AC_SUBST(PTHREADINCLUDES)

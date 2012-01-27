@@ -16009,44 +16009,8 @@ then
 
 else
 
-				PTHREAD_MACROS=""
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for pthread macros" >&5
-$as_echo_n "checking for pthread macros... " >&6; }
-
-SAVECPPFLAGS="$CPPFLAGS"
-CPPFLAGS="-pthread"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <pthread.h>
-int
-main ()
-{
-#ifdef __pthread_fork
-	#error pthread macros in use
-#endif
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes - disabling thread support" >&5
-$as_echo "yes - disabling thread support" >&6; }; PTHREAD_MACROS="yes"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-CPPFLAGS="$SAVECPPFLAGS"
-
-	if ( test -n "$PTHREAD_MACROS" )
-	then
-		PTHREADLIB=""
-		PTHREADINCLUDES=""
-	else
-
 $as_echo "#define RUDIMENTS_HAS_THREADS 1" >>confdefs.h
 
-	fi
 fi
 
 
