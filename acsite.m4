@@ -499,7 +499,7 @@ then
 
 else
 
-	for i in "pthread" "c_r" "thread"
+	for i in "pthread" "c_r" "thread" "pthreads"
 	do
 		FW_CHECK_HEADERS_AND_LIBS([$PTHREADPATH],[pthread],[pthread.h],[$i],[""],[""],[PTHREADINCLUDES],[PTHREADLIB],[PTHREADLIBPATH],[PTHREADSTATIC])
 		if ( test -n "$PTHREADLIB" )
@@ -524,6 +524,13 @@ else
 		dnl try including pthread.h and using -lpthread, it
 		dnl works on some systems
 		FW_TRY_LINK([#include <pthread.h>],[pthread_create(NULL,NULL,NULL,NULL);],[$CPPFLAGS],[-pthread],[],[PTHREADLIB="-pthread"],[])
+	fi
+
+	if ( test -z "$PTHREADLIB" )
+	then
+		dnl try that last test again, some older thread
+		dnl implementations have non-pointer 2nd parameters
+		FW_TRY_LINK([#include <pthread.h>],[pthread_create(NULL,pthread_attr_default,NULL,NULL);],[$CPPFLAGS],[-pthread],[],[PTHREADLIB="-pthread"],[])
 	fi
 
 	if ( test -n "$PTHREADLIB" )

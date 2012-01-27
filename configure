@@ -15278,7 +15278,7 @@ then
 
 else
 
-	for i in "pthread" "c_r" "thread"
+	for i in "pthread" "c_r" "thread" "pthreads"
 	do
 
 
@@ -15961,6 +15961,39 @@ int
 main ()
 {
 pthread_create(NULL,NULL,NULL,NULL);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  PTHREADLIB="-pthread"
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+	fi
+
+	if ( test -z "$PTHREADLIB" )
+	then
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$CPPFLAGS"
+LIBS="-pthread"
+LD_LIBRARY_PATH=""
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <pthread.h>
+int
+main ()
+{
+pthread_create(NULL,pthread_attr_default,NULL,NULL);
   ;
   return 0;
 }
