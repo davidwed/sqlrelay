@@ -618,7 +618,7 @@ then
 
 else
 
-	for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/sfw" "/usr/sfw" "/opt/csw" "/usr/pkg" "/sw" "/usr/local/firstworks"
+	for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/sfw" "/opt/csw" "/usr/pkg" "/sw" "/usr/local/firstworks" "/boot/common"
 	do
 		if ( test -n "$i" -a -d "$i" )
 		then
