@@ -4,7 +4,7 @@
 #include <sqlparser.h>
 #include <debugprint.h>
 
-bool sqlparser::parseExpression(xmldomnode *currentnode,
+/*bool sqlparser::parseExpression(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -24,8 +24,8 @@ bool sqlparser::parseExpression(xmldomnode *currentnode,
 		if (leftParen(*newptr,newptr)) {
 
 			// create the node
-			xmldomnode	*groupnode=newNode(
-						expressionnode,_group);
+			xmldomnode	*groupnode=
+					newNode(expressionnode,_group);
 
 			// parse the expression inside the parens
 			if (!parseExpression(groupnode,*newptr,newptr)) {
@@ -38,6 +38,66 @@ bool sqlparser::parseExpression(xmldomnode *currentnode,
 				error=true;
 				return false;
 			}
+
+		} else {
+
+			// get the term
+			if (!parseTerm(expressionnode,*newptr,newptr)) {
+				return false;
+			}
+		}
+
+		// get the operator
+		if (!parseBinaryOperator(expressionnode,*newptr,newptr)) {
+			// if there isn't one then we've reached the end of
+			// the expression
+			return true;
+		}
+	}
+}*/
+
+bool sqlparser::parseExpression(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+
+	// create the node
+	xmldomnode	*expressionnode=newNode(currentnode,_expression);
+
+	// any number of terms, separated by operators
+	*newptr=ptr;
+	for (;;) {
+
+		// handle any unary operators
+		// (there could be any number of them, in any order)
+		do {} while (parseUnaryOperator(expressionnode,*newptr,newptr));
+
+		// handle expression groups
+		const char	*beforeparen=*newptr;
+		if (leftParen(*newptr,newptr)) {
+
+			// create the node
+			xmldomnode	*groupnode=new xmldomnode(tree,
+						expressionnode->getNullNode(),
+						TAG_XMLDOMNODETYPE,
+						_group,NULL);
+
+			// parse the expression inside the parens
+			if (!parseExpression(groupnode,*newptr,newptr)) {
+				return false;
+			}
+
+			// look for a right paren
+			if (!rightParen(*newptr,newptr)) {
+				*newptr=beforeparen;
+				delete groupnode;
+				/*debugPrintf("missing right paren\n");	
+				error=true;*/
+				return false;
+			}
+
+			// append the node
+			expressionnode->appendChild(groupnode);
 
 		} else {
 

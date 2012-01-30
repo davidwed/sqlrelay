@@ -1,10 +1,8 @@
 // Copyright (c) 1999-2011  David Muse
 // See the file COPYING for more information
 
-#include <sqlparser.h>
+#include <sqlparser.h>	
 #include <debugprint.h>
-
-#define PARSE_WHERE
 
 bool sqlparser::parseWhere(xmldomnode *currentnode,
 					const char *ptr,
@@ -18,11 +16,6 @@ bool sqlparser::parseWhere(xmldomnode *currentnode,
 
 	// create the node
 	xmldomnode	*wherenode=newNode(currentnode,_where);
-
-	#ifndef PARSE_WHERE
-		// bail here to disable where-clause parsing
-		return true;
-	#endif
 
 	// parse the where clause terms
 	return parseWhereClauseTerms(wherenode,*newptr,newptr);
@@ -47,11 +40,6 @@ bool sqlparser::parseHaving(xmldomnode *currentnode,
 
 	// create the node
 	xmldomnode	*havingnode=newNode(currentnode,_having);
-
-	#ifndef PARSE_WHERE
-		// bail here to disable having-clause parsing
-		return true;
-	#endif
 
 	// parse the having clause terms
 	return parseWhereClauseTerms(havingnode,*newptr,newptr);
@@ -130,7 +118,7 @@ bool sqlparser::orClause(const char *ptr, const char **newptr) {
 
 const char *sqlparser::_or="or";
 
-bool sqlparser::parseWhereClauseTerm(xmldomnode *currentnode,
+/*bool sqlparser::parseWhereClauseTerm(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -162,6 +150,42 @@ bool sqlparser::parseWhereClauseTerm(xmldomnode *currentnode,
 
 	// handle single comparisons
 	return parseComparison(currentnode,*newptr,newptr,true);
+}*/
+
+bool sqlparser::parseWhereClauseTerm(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+
+	// handle single comparisons
+	if (parseComparison(currentnode,ptr,newptr,true)) {
+		return true;
+	}
+
+	// If the comparison failed to parse, it might be a where clause group.
+	// Look for a left paren.  If we don't find it then something is wrong.
+	*newptr=ptr;
+	if (!leftParen(*newptr,newptr)) {
+		return false;
+	}
+
+	// create the node
+	xmldomnode	*groupnode=new xmldomnode(tree,
+					currentnode->getNullNode(),
+					TAG_XMLDOMNODETYPE,
+					_group,NULL);
+
+	// parse where clause terms and look for a right paren
+	if (parseWhereClauseTerms(groupnode,*newptr,newptr) &&
+					rightParen(*newptr,newptr)) {
+		currentnode->appendChild(groupnode);
+		return true;
+	}
+
+	// If this failed to parse then it's really not clear what we've got.
+	debugPrintf("extraneous left paren\n");
+	error=true;
+	return false;
 }
 
 const char *sqlparser::_group="group";

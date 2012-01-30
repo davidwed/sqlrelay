@@ -4,7 +4,7 @@
 #include <sqlparser.h>
 #include <debugprint.h>
 
-bool sqlparser::parseComparison(xmldomnode *currentnode,
+/*bool sqlparser::parseComparison(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr,
 					bool checkforgroup) {
@@ -76,6 +76,104 @@ bool sqlparser::parseComparison(xmldomnode *currentnode,
 	if (!parseExpression(comparisonnode,*newptr,newptr)) {
 		debugPrintf("missing lvalue\n");
 		error=true;
+		return false;
+	}
+
+	// look for not's again
+	if (notClause(*newptr,newptr)) {
+
+		// create the node
+		newNode(comparisonnode,_not);
+	}
+
+	// handle betweens
+	if (parseBetween(comparisonnode,*newptr,newptr)) {
+		return true;
+	}
+
+	// handle in
+	if (parseIn(comparisonnode,*newptr,newptr)) {
+		return true;
+	}
+
+	// get the comparator
+	if (parseIs(comparisonnode,*newptr,newptr) ||
+		parseLike(comparisonnode,*newptr,newptr) ||
+		parseNullSafeEquals(comparisonnode,*newptr,newptr) ||
+		parseEquals(comparisonnode,*newptr,newptr) ||
+		parseNotEquals(comparisonnode,*newptr,newptr) ||
+		parseGreaterThanOrEqualTo(comparisonnode,*newptr,newptr) ||
+		parseLessThanOrEqualTo(comparisonnode,*newptr,newptr) ||
+		parseGreaterThan(comparisonnode,*newptr,newptr) ||
+		parseLessThan(comparisonnode,*newptr,newptr)) {
+
+		// get the rvalue
+		if (!parseExpression(comparisonnode,*newptr,newptr)) {
+			debugPrintf("missing rvalue\n");
+			error=true;
+			return false;
+		}
+		return true;
+	}
+
+	// if the term was a boolean value or function returning a boolean
+	// then there might not be a comparator
+	return true;
+}*/
+
+bool sqlparser::parseComparison(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr,
+					bool checkforgroup) {
+	debugFunction();
+
+	// create the node
+	xmldomnode	*comparisonnode=newNode(currentnode,_comparison);
+
+	// look for not's
+	if (notClause(ptr,newptr)) {
+
+		// create the node
+		newNode(comparisonnode,_not);
+	}
+
+	// handle exists
+	if (parseExists(comparisonnode,*newptr,newptr)) {
+		return true;
+	}
+
+	// get the lvalue
+	const char	*beforeexpr=*newptr;
+	if (!parseExpression(comparisonnode,*newptr,newptr)) {
+
+		// If the expression failed to parse, there might be parens
+		// around the entire comparison.  Look for a left paren,
+		// if we don't find it then something is wrong.
+		*newptr=beforeexpr;
+		if (!leftParen(*newptr,newptr)) {
+			debugPrintf("missing lvalue\n");
+			error=true;
+			return false;
+		}
+	
+		// create the node
+		xmldomnode	*groupnode=new xmldomnode(tree,
+						comparisonnode->getNullNode(),
+						TAG_XMLDOMNODETYPE,
+						_group,NULL);
+
+		// parse the comparison
+		if (parseComparison(groupnode,*newptr,newptr,false) &&
+					rightParen(*newptr,newptr)) {
+			comparisonnode->appendChild(groupnode);
+			return true;
+		}
+
+		// If this failed to parse then the paren we ran into might
+		// have been part of a group of where clause terms.  Clean up
+		// and bail so we can start over from there.
+		*newptr=beforeexpr;
+		delete groupnode;
 		return false;
 	}
 
