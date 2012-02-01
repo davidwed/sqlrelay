@@ -47,6 +47,12 @@ bool sqlwriter::unionClause(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::all(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("all");
+	return true;
+}
+
 bool sqlwriter::alias(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);

@@ -24,7 +24,8 @@ class sqlwriter {
 		virtual bool	write(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldomnode *tree,
-					stringbuffer *output);
+					stringbuffer *output,
+					bool omitsiblings);
 	protected:
 		virtual bool	write(xmldomnode *tree, stringbuffer *output);
 
@@ -220,6 +221,8 @@ class sqlwriter {
 		virtual bool	endSubSelect(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	unionClause(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	all(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	alias(xmldomnode *node,
 						stringbuffer *output);

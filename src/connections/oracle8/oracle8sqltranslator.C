@@ -134,7 +134,7 @@ bool oracle8sqltranslator::tempTablesAddMissingColumns(
 	}
 	stringbuffer	selectclause;
 	sqlwriter	sqlw;
-	if (!sqlw.write(sqlrcon,sqlrcur,select,&selectclause)) {
+	if (!sqlw.write(sqlrcon,sqlrcur,select,&selectclause,false)) {
 		return true;
 	}
 

@@ -16,21 +16,34 @@ sqlwriter::~sqlwriter() {
 	debugFunction();
 }
 
-bool sqlwriter::write(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur,
-					xmldom *tree, stringbuffer *output) {
+bool sqlwriter::write(sqlrconnection_svr *sqlrcon,
+					sqlrcursor_svr *sqlrcur,
+					xmldom *tree,
+					stringbuffer *output) {
 	debugFunction();
 	return write(sqlrcon,sqlrcur,
-			tree->getRootNode()->getFirstTagChild(),output);
+			tree->getRootNode()->getFirstTagChild(),
+			output,false);
 }
 
 bool sqlwriter::write(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldomnode *tree,
-					stringbuffer *output) {
+					stringbuffer *output,
+					bool omitsiblings) {
 	debugFunction();
 	this->sqlrcon=sqlrcon;
 	this->sqlrcur=sqlrcur;
-	return write(tree,output);
+	if (omitsiblings) {
+		return write(tree,output);
+	}
+	for (xmldomnode *node=tree;
+		!node->isNullNode(); node=node->getNextTagSibling()) {
+		if (!write(node,output)) {
+			return false;
+		}
+	}
+	return true;
 }
 
 bool sqlwriter::write(xmldomnode *node, stringbuffer *output) {
@@ -65,8 +78,7 @@ bool sqlwriter::write(xmldomnode *node, stringbuffer *output) {
 		return false;
 	}
 
-	// append a space afterward if it's got
-	// siblings unless this one ends in a period
+	// append a space afterward if it's got siblings
 	if (!dontAppendSpace(output) &&
 		!node->getNextTagSibling()->isNullNode()) {
 		space(output);
@@ -167,6 +179,7 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_select_expressions,
 		sqlparser::_sub_select,
 		sqlparser::_union,
+		sqlparser::_all,
 		sqlparser::_alias,
 		sqlparser::_unique,
 		sqlparser::_distinct,
@@ -464,6 +477,8 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return subSelect(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_union)) {
 		return unionClause(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_all)) {
+		return all(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_alias)) {
 		return alias(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_unique)) {
