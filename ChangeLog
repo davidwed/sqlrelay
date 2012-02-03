@@ -1,3 +1,5 @@
+0.45 - added trigger framework
+
 0.44 - updated postgresql drop-in lib for postgresql 8/9 compatibility
 	updated mysql drop-in lib for mysql 5.2+ compatibility
 	applied Renat's patch to fix the client session count in the stats
