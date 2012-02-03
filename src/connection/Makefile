@@ -103,7 +103,11 @@ SRCS = sqlrconnection/sqlrconnectionctor.C \
 	sqlwriter/writeexpression.C \
 	sqlwriter/writeupdate.C \
 	sqlwriter/writeset.C \
-	sqltranslator/sqltranslator.C
+	sqltranslator/sqltranslator.C \
+	sqltriggers/sqltriggers.C \
+	sqltriggers/sqltrigger.C \
+	sqltriggers/createtableautoincrementoracle.C \
+	sqltriggers/droptableautoincrementoracle.C
 LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/sqlrconnectiondtor.lo \
 	sqlrconnection/flushwritebuffer.lo \
@@ -200,7 +204,11 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlwriter/writeexpression.lo \
 	sqlwriter/writeupdate.lo \
 	sqlwriter/writeset.lo \
-	sqltranslator/sqltranslator.lo
+	sqltranslator/sqltranslator.lo \
+	sqltriggers/sqltriggers.lo \
+	sqltriggers/sqltrigger.lo \
+	sqltriggers/createtableautoincrementoracle.lo \
+	sqltriggers/droptableautoincrementoracle.lo
 
 .SUFFIXES: .lo
 

@@ -153,45 +153,47 @@ class sqlrcursor_svr {
 
 		// SID virtual methods
 
-		/* method performs SQL Injection Detection */
+		// method performs SQL Injection Detection
 		virtual bool	sql_injection_detection_ingress(
 							const char *query);
 		virtual bool	sql_injection_detection_egress();
 
-		/* method maintains log for SQL Injection Detection */
+		// method maintains log for SQL Injection Detection
 		virtual void 	sql_injection_detection_log(const char *query,
 							const char *parsed_sql,
 							const char *log_buffer);
 
-		/* method gets parameters for SQL Injection Detection */
+		// method gets parameters for SQL Injection Detection
 		virtual void 	sql_injection_detection_parameters();
 
-		/* method determines if SQL in black list */
+		// method determines if SQL in black list
 		virtual bool	sql_injection_detection_ingress_bl(
 							const char *query);
 		virtual bool	sql_injection_detection_egress_bl();
 
-		/* method determines if SQL in white list */
+		// method determines if SQL in white list
 		virtual bool	sql_injection_detection_ingress_wl(
 							const char *query);
 		virtual bool	sql_injection_detection_egress_wl();
 
-		/* method determines if SQL in learned database */
+		// method determines if SQL in learned database
 		virtual bool	sql_injection_detection_ingress_ldb();
 		virtual bool	sql_injection_detection_egress_ldb();
 
-		/* method parses the sql query */
+		// method parses the sql query
 		virtual void 	sql_injection_detection_parse_sql(
 							const char *query);
 		virtual void 	sql_injection_detection_parse_results(
 					int32_t num_fields,
 					const char * const *field_names);
 
-		/* method to check for a row in a sid db */
+		// method to check for a row in a sid db
 		virtual bool	sql_injection_detection_check_db(
 							const char *sid_db);
 
 		void		setFakeInputBindsForThisQuery(bool fake);
+
+		void	printQueryTree(xmldom *tree);
 	
 	protected:
 		// methods/variables used by derived classes
@@ -225,25 +227,27 @@ class sqlrcursor_svr {
 
 		char		*querybuffer;
 		uint32_t	querylength;
+		xmldom		*querytree;
 
 		bool	fakeinputbindsforthisquery;
 
-	// ideally these would be protected but
-	// the sql translators need to access them
+	// ideally these would be protected but the
+	// translators and triggers need to access them (for now)
 	public:
 		uint16_t	inbindcount;
 		bindvar_svr	inbindvars[MAXVAR];
 		uint16_t	outbindcount;
 		bindvar_svr	outbindvars[MAXVAR];
 
+		// this one too...
+		bool	openCursorInternal(uint16_t id);
+
 	private:
 		// methods used internally
-		bool	openCursorInternal(uint16_t id);
 		bool	handleBinds();
 		void	performSubstitution(stringbuffer *buffer,
 							int16_t index);
 		void	abort();
-		void	printQueryTree(xmldom *tree);
 
 		uint64_t	querysec;
 		uint64_t	queryusec;

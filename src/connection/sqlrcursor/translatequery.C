@@ -39,14 +39,15 @@ bool sqlrcursor_svr::translateQuery() {
 	bool	parsed=conn->sqlp->parse(querybuffer);
 
 	// get the parsed tree
-	xmldom	*tree=conn->sqlp->detachTree();
-	if (!tree) {
+	delete querytree;
+	querytree=conn->sqlp->detachTree();
+	if (!querytree) {
 		return false;
 	}
 
 	if (conn->debugsqltranslation) {
 		printf("before translation:\n");
-		printQueryTree(tree);
+		printQueryTree(querytree);
 		printf("\n");
 	}
 
@@ -55,29 +56,27 @@ bool sqlrcursor_svr::translateQuery() {
 			printf("parse failed, using original:\n\"%s\"\n\n",
 								querybuffer);
 		}
-		delete tree;
+		delete querytree;
+		querytree=NULL;
 		return false;
 	}
 
 	// apply translation rules
-	if (!conn->sqlt->applyRules(conn,this,tree)) {
-		delete tree;
+	if (!conn->sqlt->applyRules(conn,this,querytree)) {
 		return false;
 	}
 
 	if (conn->debugsqltranslation) {
 		printf("after translation:\n");
-		printQueryTree(tree);
+		printQueryTree(querytree);
 		printf("\n");
 	}
 
 	// write the query back out
 	stringbuffer	translatedquery;
-	if (!conn->sqlw->write(conn,this,tree,&translatedquery)) {
-		delete tree;
+	if (!conn->sqlw->write(conn,this,querytree,&translatedquery)) {
 		return false;
 	}
-	delete tree;
 
 	if (conn->debugsqltranslation) {
 		printf("translated:\n\"%s\"\n\n",

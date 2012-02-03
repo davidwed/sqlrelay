@@ -129,6 +129,18 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	}
 	debugsqltranslation=cfgfl->getDebugSqlTranslation();
 
+	// Get the triggers
+	const char	*triggers=cfgfl->getTriggers();
+	if (charstring::length(triggers)) {
+		// for triggers, we'll need an sqlparser as well
+		if (!sqlp) {
+			sqlp=new sqlparser;
+		}
+		sqltr=new sqltriggers;
+		sqltr->loadTriggers(triggers);
+	}
+	debugtriggers=cfgfl->getDebugTriggers();
+
 	// update maximum query size, bind value lengths and idle client timeout
 	maxquerysize=cfgfl->getMaxQuerySize();
 	maxstringbindvaluelength=cfgfl->getMaxStringBindValueLength();

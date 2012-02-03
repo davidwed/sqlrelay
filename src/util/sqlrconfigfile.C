@@ -52,6 +52,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	debuglistener=charstring::contains(debug,"listener");
 	debugconnection=charstring::contains(debug,"connection");
 	debugsqltranslation=charstring::contains(debug,"sqltranslation");
+	debugtriggers=charstring::contains(debug,"triggers");
 	maxquerysize=charstring::toInteger(DEFAULT_MAXQUERYSIZE);
 	maxstringbindvaluelength=charstring::toInteger(
 					DEFAULT_MAXSTRINGBINDVALUELENGTH);
@@ -81,6 +82,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	currentroute=NULL;
 	currenttag=NO_TAG;
 	sqltranslationrulesdepth=0;
+	triggersdepth=0;
 	isolationlevel=NULL;
 	ignoreselectdb=false;
 	instart=false;
@@ -302,6 +304,10 @@ bool sqlrconfigfile::getDebugSqlTranslation() {
 	return debugsqltranslation;
 }
 
+bool sqlrconfigfile::getDebugTriggers() {
+	return debugtriggers;
+}
+
 uint32_t sqlrconfigfile::getMaxQuerySize() {
 	return maxquerysize;
 }
@@ -390,6 +396,10 @@ const char *sqlrconfigfile::getSqlTranslationRules() {
 	return sqltranslationrules.getString();
 }
 
+const char *sqlrconfigfile::getTriggers() {
+	return triggers.getString();
+}
+
 linkedlist< usercontainer * > *sqlrconfigfile::getUserList() {
 	// if there are no users in the list, add a default user/password
 	if (!userlist.getLength()) {
@@ -470,6 +480,9 @@ bool sqlrconfigfile::tagStart(const char *name) {
 						"sqltranslationrules")) {
 				thistag=SQLTRANSLATIONRULES_TAG;
 				sqltranslationrules.clear();
+			} else if (!charstring::compare(name,"triggers")) {
+				thistag=TRIGGERS_TAG;
+				triggers.clear();
 			} else {
 				ok=false;
 			}
@@ -630,6 +643,19 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			sqltranslationrules.append(name);
 			currenttag=thistag;
 			break;
+		case TRIGGERS_TAG:
+			if (!charstring::compare(name,"triggers")) {
+				triggersdepth=0;
+			} else {
+				triggersdepth++;
+			}
+			if (triggersdepth) {
+				triggers.append(">");
+			}
+			triggers.append("<");
+			triggers.append(name);
+			currenttag=thistag;
+			break;
 		case SESSION_TAG:
 		case START_TAG:
 		case END_TAG:
@@ -710,6 +736,17 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 				sqltranslationrules.append(">");
 			}
 			sqltranslationrulesdepth--;
+			break;
+		case TRIGGERS_TAG:
+			if (!charstring::compare(name,"triggers")) {
+				currenttag=NO_TAG;
+			}
+			triggers.append("></");
+			triggers.append(name);
+			if (!triggersdepth) {
+				triggers.append(">");
+			}
+			triggersdepth--;
 			break;
 		case SESSION_TAG:
 			currenttag=NO_TAG;
@@ -918,6 +955,11 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		currentattribute=SQLTRANSLATIONRULES_ATTRIBUTE;
 		break;
 
+	case TRIGGERS_TAG:
+		triggers.append(" ")->append(name);
+		currentattribute=TRIGGERS_ATTRIBUTE;
+		break;
+
 	// these tags have no attributes and there's nothing to do but the
 	// compiler will complain if they aren't in the switch statement
 	case SESSION_TAG:
@@ -961,6 +1003,9 @@ bool sqlrconfigfile::attributeName(const char *name) {
 				break;
 			case SQLTRANSLATIONRULES_TAG:
 				tagname="sqltranslationrules";
+				break;
+			case TRIGGERS_TAG:
+				tagname="triggers";
 				break;
 			case SESSION_TAG:
 				tagname="session";
@@ -1007,6 +1052,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		if (currenttag==SQLTRANSLATIONRULES_TAG) {
 			sqltranslationrules.append("=\"");
 			sqltranslationrules.append(value)->append("\"");
+		} else if (currenttag==TRIGGERS_TAG) {
+			triggers.append("=\"");
+			triggers.append(value)->append("\"");
 		} else if (currentattribute==ADDRESSES_ATTRIBUTE) {
 			for (uint64_t index=0; index<addresscount; index++) {
 				delete[] addresses[index];
@@ -1129,6 +1177,8 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 							"connection");
 			debugsqltranslation=charstring::contains(debug,
 							"sqltranslation");
+			debugtriggers=charstring::contains(debug,
+							"triggers");
 		} else if (currentattribute==MAXQUERYSIZE_ATTRIBUTE) {
 			maxquerysize=charstring::toInteger((value)?value:
 							DEFAULT_MAXQUERYSIZE);

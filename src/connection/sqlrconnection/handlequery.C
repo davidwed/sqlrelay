@@ -86,6 +86,13 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 			bindpool->free();
 
 			dbgfile.debugPrint("connection",1,"handle query succeeded");
+
+			// handle after-triggers
+			if (sqltr) {
+				sqltr->runAfterTriggers(this,cursor,
+							cursor->querytree,true);
+			}
+
 			return 1;
 
 		} else {
@@ -96,6 +103,14 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 			// was a down database that has presumably
 			// come back up by now.  Loop back...
 			if (handleError(cursor)) {
+
+				// handle after-triggers
+				if (sqltr) {
+					sqltr->runAfterTriggers(
+						this,cursor,
+						cursor->querytree,false);
+				}
+
 				return -1;
 			}
 		}
@@ -192,6 +207,12 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 		// if we're reexecuting and not faking binds then
 		// the statement doesn't need to be prepared again...
 
+		// handle before-triggers
+		if (sqltr) {
+			sqltr->runBeforeTriggers(this,cursor,
+						cursor->querytree);
+		}
+
 		dbgfile.debugPrint("connection",3,"re-executing...");
 		success=(cursor->handleBinds() && 
 			executeQueryUpdateStats(cursor,
@@ -230,6 +251,12 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			success=true;
 
 		} else {
+
+			// handle before-triggers
+			if (sqltr) {
+				sqltr->runBeforeTriggers(this,cursor,
+							cursor->querytree);
+			}
 
 			const char	*queryptr=cursor->querybuffer;
 			uint32_t	querylen=cursor->querylength;

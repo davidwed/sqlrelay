@@ -77,6 +77,7 @@ typedef enum {
 	FAKEINPUTBINDVARIABLES_ATTRIBUTE,
 	TRANSLATEBINDVARIABLES_ATTRIBUTE,
 	SQLTRANSLATIONRULES_ATTRIBUTE,
+	TRIGGERS_ATTRIBUTE,
 	ISOLATIONLEVEL_ATTRIBUTE,
 	IGNORESELECTDB_ATTRIBUTE
 } attribute;
@@ -206,6 +207,7 @@ class sqlrconfigfile : public xmlsax {
 		bool		getDebugListener();
 		bool		getDebugConnection();
 		bool		getDebugSqlTranslation();
+		bool		getDebugTriggers();
 		uint32_t	getMaxQuerySize();
 		uint32_t	getMaxStringBindValueLength();
 		uint32_t	getMaxLobBindValueLength();
@@ -231,6 +233,8 @@ class sqlrconfigfile : public xmlsax {
 		const char	*getSidPassword();
 
 		const char	*getSqlTranslationRules();
+
+		const char	*getTriggers();
 
 		linkedlist< usercontainer * >	*getUserList();
 		linkedlist< connectstringcontainer * >
@@ -300,6 +304,7 @@ class sqlrconfigfile : public xmlsax {
 		bool		debuglistener;
 		bool		debugconnection;
 		bool		debugsqltranslation;
+		bool		debugtriggers;
 		uint32_t	maxquerysize;
 		uint32_t	maxstringbindvaluelength;
 		uint32_t	maxlobbindvaluelength;
@@ -328,6 +333,9 @@ class sqlrconfigfile : public xmlsax {
 
 		stringbuffer	sqltranslationrules;
 		uint16_t	sqltranslationrulesdepth;
+
+		stringbuffer	triggers;
+		uint16_t	triggersdepth;
 
 		usercontainer	*currentuser;
 
@@ -358,7 +366,8 @@ class sqlrconfigfile : public xmlsax {
 			ROUTE_TAG,
 			FILTER_TAG,
 			QUERY_TAG,
-	   		SQLTRANSLATIONRULES_TAG
+	   		SQLTRANSLATIONRULES_TAG,
+	   		TRIGGERS_TAG
 		} tag;
 		
 		tag currenttag;

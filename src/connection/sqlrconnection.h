@@ -29,6 +29,7 @@
 #include <sqlparser.h>
 #include <sqltranslator.h>
 #include <sqlwriter.h>
+#include <sqltriggers.h>
 
 #include <cmdline.h>
 
@@ -208,12 +209,18 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 
 		bool	logInUpdateStats(bool printerrors);
 		void	logOutUpdateStats();
+
+	// ideally these would be private but the
+	// translators and triggers need to access them (for now)
+	public:
 		sqlrcursor_svr	*initCursorUpdateStats();
 		void	deleteCursorUpdateStats(sqlrcursor_svr *curs);
 		bool	executeQueryUpdateStats(sqlrcursor_svr *curs,
 							const char *query,
 							uint32_t length,
 							bool execute);
+
+	private:
 
 		void	setUserAndGroup();
 		bool	initCursors();
@@ -446,7 +453,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		filedescriptor		*clientsock;
 
 	// ideally these would be private but the
-	// sql translator needs to access them
+	// translators and triggers need to access them (for now)
 	public:
 		memorypool	*bindpool;
 		memorypool	*bindmappingspool;
@@ -454,11 +461,16 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		namevaluepairs	*outbindmappings;
 
 		bool		debugsqltranslation;
+		bool		debugtriggers;
+
+		uint16_t	cursorcount;
+
 	private:
 
 		sqlparser	*sqlp;
 		sqltranslator	*sqlt;
 		sqlwriter	*sqlw;
+		sqltriggers	*sqltr;
 
 		sqlrcursor_svr	**cur;
 
@@ -471,8 +483,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		const char	*connectionid;
 		unsigned int	ttl;
 
-		uint16_t	cursorcount;
-
+	private:
 		sqlrstatistics	*statistics;
 		semaphoreset	*semset;
 

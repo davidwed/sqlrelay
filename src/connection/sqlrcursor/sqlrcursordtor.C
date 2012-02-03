@@ -6,4 +6,5 @@
 sqlrcursor_svr::~sqlrcursor_svr() {
 	delete sid_sqlrcur;
 	delete[] querybuffer;
+	delete querytree;
 }
