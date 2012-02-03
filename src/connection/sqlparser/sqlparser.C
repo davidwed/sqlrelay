@@ -16,6 +16,10 @@ sqlparser::~sqlparser() {
 	delete tree;
 }
 
+xmldom *sqlparser::getTree() {
+	return tree;
+}
+
 xmldom *sqlparser::detachTree() {
 	xmldom	*retval=tree;
 	tree=NULL;

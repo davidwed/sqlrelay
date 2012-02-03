@@ -15,6 +15,7 @@ class sqlparser {
 		virtual	~sqlparser();
 
 		bool	parse(const char *query);
+		xmldom	*getTree();
 		xmldom	*detachTree();
 
 	private:

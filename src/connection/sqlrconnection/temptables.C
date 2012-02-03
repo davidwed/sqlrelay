@@ -19,12 +19,27 @@ void sqlrconnection_svr::dropTempTable(sqlrcursor_svr *cursor,
 					const char *tablename) {
 	stringbuffer	dropquery;
 	dropquery.append("drop table ")->append(tablename);
+
+	// FIXME: I need to refactor all of this so that this just gets
+	// run as a matter of course instead of explicitly getting run here
+	if (sqltr) {
+		if (sqlp->parse(dropquery.getString())) {
+			sqltr->runBeforeTriggers(this,cursor,sqlp->getTree());
+		}
+	}
+
 	if (cursor->prepareQuery(dropquery.getString(),
 					dropquery.getStringLength())) {
 		executeQueryUpdateStats(cursor,dropquery.getString(),
 					dropquery.getStringLength(),true);
 	}
 	cursor->cleanUpData(true,true);
+
+	// FIXME: I need to refactor all of this so that this just gets
+	// run as a matter of course instead of explicitly getting run here
+	if (sqltr) {
+		sqltr->runAfterTriggers(this,cursor,sqlp->getTree(),true);
+	}
 }
 
 void sqlrconnection_svr::truncateTempTables(sqlrcursor_svr *cursor,
