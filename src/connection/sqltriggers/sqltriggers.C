@@ -134,6 +134,9 @@ void sqltriggers::runTriggers(sqlrconnection_svr *sqlrcon,
 					bool before,
 					bool success) {
 	debugFunction();
+	if (!querytree) {
+		return;
+	}
 	for (linkedlistnode< sqltrigger * > *node=list->getFirstNode();
 						node; node=node->getNext()) {
 		node->getData()->run(sqlrcon,sqlrcur,querytree,before,success);

@@ -106,8 +106,11 @@ bool droptableautoincrementoracle::dropSequences(sqlrconnection_svr *sqlrcon,
 	} else {
 		// error...
 		if (sqlrcon->debugtriggers) {
-			bool	liveconn;
-			printf("error:\n%s\n\n",cur->errorMessage(&liveconn));
+			const char	*err;
+			int64_t		errno;
+			bool		liveconn;
+			cur->errorMessage(&err,&errno,&liveconn);
+			printf("error:\n%s\n\n",err);
 		}
 	}
 	cur->cleanUpData(true,true);
@@ -145,8 +148,11 @@ bool droptableautoincrementoracle::dropSequence(sqlrconnection_svr *sqlrcon,
 	} else {
 		// error...
 		if (sqlrcon->debugtriggers) {
-			bool	liveconn;
-			printf("error:\n%s\n\n",cur->errorMessage(&liveconn));
+			const char	*err;
+			int64_t		errno;
+			bool		liveconn;
+			cur->errorMessage(&err,&errno,&liveconn);
+			printf("error:\n%s\n\n",err);
 		}
 	}
 	cur->cleanUpData(true,true);
@@ -183,8 +189,11 @@ bool droptableautoincrementoracle::deleteSequence(sqlrconnection_svr *sqlrcon,
 	} else {
 		// error...
 		if (sqlrcon->debugtriggers) {
-			bool	liveconn;
-			printf("error:\n%s\n\n",cur->errorMessage(&liveconn));
+			const char	*err;
+			int64_t		errno;
+			bool		liveconn;
+			cur->errorMessage(&err,&errno,&liveconn);
+			printf("error:\n%s\n\n",err);
 		}
 	}
 	cur->cleanUpData(true,true);

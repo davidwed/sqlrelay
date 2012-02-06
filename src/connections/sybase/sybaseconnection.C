@@ -423,8 +423,11 @@ bool sybasecursor::openCursor(uint16_t id) {
 		snprintf(query,len+1,"use %s",sybaseconn->db);
 		if (!(prepareQuery(query,len) &&
 				executeQuery(query,len,true))) {
-			bool	live;
-			fprintf(stderr,"%s\n",errorMessage(&live));
+			const char	*err;
+			int64_t		errno;
+			bool		live;
+			errorMessage(&err,&errno,&live);
+			fprintf(stderr,"%s\n",err);
 			retval=false;
 		} else {
 			sybaseconn->dbused=true;
@@ -920,16 +923,20 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 	return true;
 }
 
-const char *sybasecursor::errorMessage(bool *liveconnection) {
+void sybasecursor::errorMessage(const char **errorstring,
+				int64_t *errorcode,
+				bool *liveconnection) {
 	if (sybaseconn->deadconnection) {
 		*liveconnection=false;
 	} else {
 		*liveconnection=true;
 	}
+	// FIXME: set this
+	*errorcode=0;
 	if (sybaseconn->errorstring) {
-		return sybaseconn->errorstring->getString();
+		*errorstring=sybaseconn->errorstring->getString();
 	} else {
-		return NULL;
+		*errorstring=NULL;
 	}
 }
 

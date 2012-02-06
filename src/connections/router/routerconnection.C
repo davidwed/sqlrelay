@@ -698,10 +698,14 @@ bool routercursor::begin(const char *query, uint32_t length) {
 	return result;
 }
 
-const char *routercursor::errorMessage(bool *liveconnection) {
+void routercursor::errorMessage(const char **errormessage,
+				int64_t *errorcode,
+				bool *liveconnection) {
 	// FIXME: detect downed database or downed relay
 	*liveconnection=true;
-	return (cur)?cur->errorMessage():"";
+	*errormessage=(cur)?cur->errorMessage():"";
+	// FIXME: set this
+	*errorcode=0;
 }
 
 bool routercursor::knowsRowCount() {

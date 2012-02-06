@@ -618,9 +618,13 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
 	return true;
 }
 
-const char *postgresqlcursor::errorMessage(bool *liveconnection) {
+void postgresqlcursor::errorMessage(const char **errorstring,
+					int64_t *errorcode,
+					bool *liveconnection) {
 	*liveconnection=(PQstatus(postgresqlconn->pgconn)==CONNECTION_OK);
-	return PQerrorMessage(postgresqlconn->pgconn);
+	*errorstring=PQerrorMessage(postgresqlconn->pgconn);
+	// FIXME: set this
+	*errorcode=0;
 }
 
 bool postgresqlcursor::knowsRowCount() {

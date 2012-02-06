@@ -943,7 +943,9 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 	return true;
 }
 
-const char *odbccursor::errorMessage(bool *liveconnection) {
+void odbccursor::errorMessage(const char **errorstring,
+				int64_t *errornumber,
+				bool *liveconnection) {
 
 	SQLCHAR		error[501];
 	SQLCHAR		state[10];
@@ -961,7 +963,9 @@ const char *odbccursor::errorMessage(bool *liveconnection) {
 
 	*liveconnection=true;
 
-	return errormsg->getString();
+	// set return values
+	*errorstring=errormsg->getString();
+	*errornumber=errnum;
 }
 
 bool odbccursor::knowsRowCount() {

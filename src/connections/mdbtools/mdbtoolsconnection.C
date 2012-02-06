@@ -182,9 +182,12 @@ bool mdbtoolscursor::executeQuery(const char *query, uint32_t length,
 	return true;
 }
 
-const char *mdbtoolscursor::errorMessage(bool *liveconnection) {
+void mdbtoolscursor::errorMessage(const char **errorstring,
+					int64_t *errorcode,
+					bool *liveconnection) {
+	*errorstring="error";
+	*errorcode=0;
 	*liveconnection=true;
-	return "error";
 }
 
 bool mdbtoolscursor::knowsRowCount() {

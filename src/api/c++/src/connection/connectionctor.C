@@ -64,7 +64,8 @@ sqlrconnection::sqlrconnection(const char *server, uint16_t port,
 	// copy references, delete cursors flags
 	copyrefs=false;
 
-	// error string
+	// error
+	errorno=0;
 	error=NULL;
 
 	// cursor list

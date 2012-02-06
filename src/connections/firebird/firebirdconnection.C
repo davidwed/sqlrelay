@@ -783,7 +783,9 @@ bool firebirdcursor::queryIsCommitOrRollback() {
 		querytype==isc_info_sql_stmt_rollback);
 }
 
-const char *firebirdcursor::errorMessage(bool *liveconnection) {
+void firebirdcursor::errorMessage(const char **errorstring,
+					int64_t *errorcode,
+					bool *liveconnection) {
 
 	char		msg[512];
 	ISC_STATUS	*pvector=firebirdconn->error;
@@ -813,7 +815,10 @@ const char *firebirdcursor::errorMessage(bool *liveconnection) {
 				errormsg->getString(),
 				"Error writing data to the connection"));
 
-	return errormsg->getString();
+	// set return values
+	*errorstring=errormsg->getString();
+	// FIXME: get this...
+	*errorcode=0;
 }
 
 bool firebirdcursor::knowsRowCount() {

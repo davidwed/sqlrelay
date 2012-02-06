@@ -3,6 +3,10 @@
 
 #include <sqlrelay/sqlrclient.h>
 
+int64_t sqlrconnection::errorNumber() {
+	return errorno;
+}
+
 const char *sqlrconnection::errorMessage() {
 	return error;
 }
@@ -10,6 +14,7 @@ const char *sqlrconnection::errorMessage() {
 void sqlrconnection::clearError() {
 	delete[] error;
 	error=NULL;
+	errorno=0;
 }
 
 void sqlrconnection::setError(const char *err) {
@@ -33,6 +38,11 @@ void sqlrconnection::setError(const char *err) {
 bool sqlrconnection::getError() {
 
 	clearError();
+
+	// get the error code
+	if (cs->read((uint64_t *)&errorno)!=sizeof(uint64_t)) {
+		return false;
+	}
 
 	// get the error size
 	bool		goterror=true;

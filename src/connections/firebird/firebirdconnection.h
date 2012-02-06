@@ -75,7 +75,9 @@ class firebirdcursor : public sqlrcursor_svr {
 						bool execute);
 		bool		queryIsNotSelect();
 		bool		queryIsCommitOrRollback();
-		const char	*errorMessage(bool *liveconnection);
+		void		errorMessage(const char **errorstring,
+						int64_t	*errorcode,
+						bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
 		bool		knowsAffectedRows();

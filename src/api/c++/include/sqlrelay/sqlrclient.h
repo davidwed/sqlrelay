@@ -139,6 +139,12 @@ class sqlrconnection {
 		 *  returns NULL. */
 		const char	*errorMessage();
 
+		/** If an operation failed and generated an
+		 *  error, the error number is available here.
+		 *  If there is no error then this method 
+		 *  returns 0. */
+		int64_t		errorNumber();
+
 
 
 		/** Causes verbose debugging information to be 
@@ -502,6 +508,12 @@ class sqlrcursor {
 		 *  the query succeeded then this method 
 		 *  returns NULL. */
 		const char	*errorMessage();
+
+		/** If a query failed and generated an
+		 *  error, the error number is available here.
+		 *  If there is no error then this method 
+		 *  returns 0. */
+		int64_t		errorNumber();
 
 
 

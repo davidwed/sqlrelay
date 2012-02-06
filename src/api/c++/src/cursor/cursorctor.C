@@ -41,6 +41,7 @@ sqlrcursor::sqlrcursor(sqlrconnection *sqlrc) {
 	affectedrows=0;
 	endofresultset=true;
 
+	errorno=0;
 	error=NULL;
 
 	rows=NULL;

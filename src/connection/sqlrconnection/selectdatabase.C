@@ -100,9 +100,11 @@ bool sqlrconnection_svr::selectDatabase(const char *database, char **error) {
 		// so it can be reset at the end of the session
 		dbselected=true;
 	} else {
-		bool	liveconnection;
-		*error=charstring::duplicate(
-				sdcur->errorMessage(&liveconnection));
+		const char	*err;
+		int64_t		errno;
+		bool		liveconnection;
+		sdcur->errorMessage(&err,&errno,&liveconnection);
+		*error=charstring::duplicate(err);
 	}
 	delete[] sdquery;
 	sdcur->closeCursor();

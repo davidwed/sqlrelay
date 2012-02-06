@@ -60,6 +60,7 @@
 		bool		reconnect;
 
 		// error
+		int64_t		errorno;
 		char		*error;
 
 		// identify

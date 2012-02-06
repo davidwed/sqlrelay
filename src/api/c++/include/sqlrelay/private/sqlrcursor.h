@@ -173,6 +173,7 @@
 		file		*cachesourceind;
 
 		// error
+		int64_t		errorno;
 		char		*error;
 
 		// copy references flag

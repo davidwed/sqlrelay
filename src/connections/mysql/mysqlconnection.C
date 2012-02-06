@@ -680,7 +680,9 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length,
 	return true;
 }
 
-const char *mysqlcursor::errorMessage(bool *liveconnection) {
+void mysqlcursor::errorMessage(const char **errorstring,
+				int64_t *errorcode,
+				bool *liveconnection) {
 
 	*liveconnection=true;
 
@@ -727,7 +729,10 @@ const char *mysqlcursor::errorMessage(bool *liveconnection) {
 			"Lost connection to MySQL server during query")*/) {
 		*liveconnection=false;
 	}
-	return err;
+
+	// set return values
+	*errorstring=err;
+	*errorcode=errn;
 }
 
 uint32_t mysqlcursor::colCount() {

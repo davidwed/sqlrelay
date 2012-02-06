@@ -169,16 +169,28 @@ void sqlrcursor::getErrorFromServer() {
 		sqlrc->debugPreEnd();
 	}
 
-	// get the length of the error string
-	uint16_t	length;
-	if (getShort(&length)!=sizeof(uint16_t)) {
+	bool	networkerror=true;
+
+	// get the error code
+	if (getLongLong((uint64_t *)&errorno)==sizeof(uint64_t)) {
+
+		// get the length of the error string
+		uint16_t	length;
+		if (getShort(&length)==sizeof(uint16_t)) {
+
+			// get the error string
+			error=new char[length+1];
+			sqlrc->cs->read(error,length);
+			error[length]='\0';
+
+			networkerror=false;
+		}
+	}
+
+	if (networkerror) {
 		error=new char[77];
-		charstring::copy(error,"There was an error, but the connection died trying to retrieve it.  Sorry.");
-	} else {
-		// get the error string
-		error=new char[length+1];
-		sqlrc->cs->read(error,length);
-		error[length]='\0';
+		charstring::copy(error,"There was an error, but the connection"
+					" died trying to retrieve it.  Sorry.");
 	}
 	
 	handleError();

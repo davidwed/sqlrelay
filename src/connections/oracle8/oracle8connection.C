@@ -1495,7 +1495,9 @@ bool oracle8cursor::queryIsNotSelect() {
 	return (stmttype!=OCI_STMT_SELECT);
 }
 
-const char *oracle8cursor::errorMessage(bool *liveconnection) {
+void oracle8cursor::errorMessage(const char **errorstring,
+					int64_t *errorcode,
+					bool *liveconnection) {
 
 	// get the message from oracle
 	text	message[1024];
@@ -1545,7 +1547,9 @@ const char *oracle8cursor::errorMessage(bool *liveconnection) {
 		errormessage->append((const char *)message);
 	}
 
-	return errormessage->getString();
+	// set return values
+	*errorstring=errormessage->getString();
+	*errorcode=errcode;
 }
 
 bool oracle8cursor::knowsRowCount() {

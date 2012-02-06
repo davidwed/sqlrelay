@@ -149,7 +149,8 @@ class	sqlrsh {
 		void	initStats(environment *env);
 		void	displayError(environment *env,
 					const char *message,
-					const char *error);
+					const char *error,
+					int64_t errno);
 		void	displayHeader(sqlrcursor *sqlrcur, environment *env);
 		void	displayResultSet(sqlrcursor *sqlrcur, environment *env);
 		void	displayStats(sqlrcursor *sqlrcur, environment *env);
@@ -406,7 +407,9 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"use ",4)) {	
 		if (!sqlrcon->selectDatabase(ptr+4)) {
-			displayError(env,NULL,sqlrcon->errorMessage());
+			displayError(env,NULL,
+					sqlrcon->errorMessage(),
+					sqlrcon->errorNumber());
 		}
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"currentdb",9)) {	
@@ -458,7 +461,9 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"lastinsertid",12)) {	
 		if (!lastinsertid(sqlrcon,env)) {
-			displayError(env,NULL,sqlrcon->errorMessage());
+			displayError(env,NULL,
+					sqlrcon->errorMessage(),
+					sqlrcon->errorNumber());
 		}
 		return;
 	} else {
@@ -563,7 +568,9 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 		if (sqlrcur->errorMessage()) {
 
 			// display the error
-			displayError(env,NULL,sqlrcur->errorMessage());
+			displayError(env,NULL,
+					sqlrcur->errorMessage(),
+					sqlrcur->errorNumber());
 
 		} else {
 
@@ -710,11 +717,14 @@ void sqlrsh::initStats(environment *env) {
 }
 
 void sqlrsh::displayError(environment *env,
-				const char *message, const char *error) {
+				const char *message,
+				const char *error,
+				int64_t errno) {
 	cyan(env);
 	if (charstring::length(message)) {
 		printf("%s\n",message);
 	}
+	printf("%lld:\n",errno);
 	if (charstring::length(error)) {
 		printf("%s\n\n",error);
 	}

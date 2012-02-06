@@ -197,8 +197,11 @@ bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
 	} else {
 		// error...
 		if (sqlrcon->debugtriggers) {
-			bool	liveconn;
-			printf("error:\n%s\n",cur->errorMessage(&liveconn));
+			const char	*err;
+			int64_t		errno;
+			bool		liveconn;
+			cur->errorMessage(&err,&errno,&liveconn);
+			printf("error:\n%s\n",err);
 		}
 	}
 	if (sqlrcon->debugtriggers) {

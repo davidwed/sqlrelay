@@ -67,7 +67,9 @@ class freetdscursor : public sqlrcursor_svr {
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
-		const char	*errorMessage(bool *liveconnection);
+		void		errorMessage(const char **errorstring,
+						int64_t	*errorcode,
+						bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
 		bool		knowsAffectedRows();

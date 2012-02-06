@@ -113,7 +113,9 @@ class sqlrcursor_svr {
 							bool execute)=0;
 		virtual	bool		queryIsNotSelect();
 		virtual	bool		queryIsCommitOrRollback();
-		virtual	const char	*errorMessage(bool *liveconnection)=0;
+		virtual	void		errorMessage(const char **errorstring,
+							int64_t *errorcode,
+							bool *liveconnection)=0;
 		virtual bool		knowsRowCount()=0;
 		virtual uint64_t	rowCount()=0;
 		virtual bool		knowsAffectedRows()=0;

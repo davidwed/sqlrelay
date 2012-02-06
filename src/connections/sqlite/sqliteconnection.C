@@ -378,7 +378,9 @@ void sqlitecursor::selectLastInsertRowId() {
 							sqliteconn->sqliteptr));
 }
 
-const char *sqlitecursor::errorMessage(bool *liveconnection) {
+void sqlitecursor::errorMessage(const char **errorstring,
+				int64_t *errorcode,
+				bool *liveconnection) {
 	*liveconnection=true;
 	if (sqliteconn->errmesg &&
 		(!charstring::compare(sqliteconn->errmesg,
@@ -387,7 +389,11 @@ const char *sqlitecursor::errorMessage(bool *liveconnection) {
 					"not a directory",15))) {
 		*liveconnection=false;
 	}
-	return sqliteconn->errmesg;
+
+	// set return values
+	*errorstring=sqliteconn->errmesg;
+	// FIXME: set this
+	*errorcode=0;
 }
 
 bool sqlitecursor::knowsRowCount() {

@@ -32,6 +32,7 @@ void sqlrcursor::clearResultSet() {
 void sqlrcursor::clearError() {
 	delete[] error;
 	error=NULL;
+	errorno=0;
 	if (sqlrc) {
 		sqlrc->clearError();
 	}
