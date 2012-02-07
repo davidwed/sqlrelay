@@ -7,6 +7,8 @@
 #include <rudiments/stringbuffer.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/environment.h>
+#include <rudiments/dictionary.h>
+#include <rudiments/file.h>
 #include <locale.h>
 
 #define NEED_DATATYPESTRING 1
@@ -254,6 +256,7 @@ struct MYSQL {
 	bool		deleteonclose;
 	char		*error;
 	int		errorno;
+	dictionary< int64_t, unsigned int >	*errormap;
 };
 
 
@@ -409,7 +412,8 @@ void mysql_library_end();
 static int unknownError(MYSQL *mysql);
 static void setMySQLError(MYSQL *mysql,
 			const char *error, unsigned int errorno);
-
+static unsigned int mapErrorNumber(MYSQL *mysql, int64_t errorno);
+static void loadErrorMap(MYSQL *mysql, const char *errormap);
 
 unsigned int mysql_thread_safe() {
 	debugFunction();
@@ -499,6 +503,11 @@ MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
 	mysql->sqlrcon=new sqlrconnection(host,port,unix_socket,
 						user,passwd,0,1);
 	mysql->sqlrcon->copyReferences();
+	mysql->errormap=NULL;
+	const char	*errormap=environment::getValue("SQLR_MYSQL_ERROR_MAP");
+	if (charstring::length(errormap)) {
+		loadErrorMap(mysql,errormap);
+	}
 	mysql->currentstmt=NULL;
 	mysql_select_db(mysql,db);
 	return mysql;
@@ -511,6 +520,8 @@ void mysql_close(MYSQL *mysql) {
 		delete mysql->sqlrcon;
 		setMySQLError(mysql,NULL,0);
 		if (mysql->deleteonclose) {
+			delete[] mysql->error;
+			delete mysql->errormap;
 			delete mysql;
 		}
 	}
@@ -2088,7 +2099,8 @@ int mysql_stmt_execute(MYSQL_STMT *stmt) {
 	if (retval) {
 		setMySQLError(stmt->mysql,
 				sqlrcur->errorMessage(),
-				CR_UNKNOWN_ERROR);
+				mapErrorNumber(stmt->mysql,
+						sqlrcur->errorNumber()));
 	}
 	return retval;
 }
@@ -2393,9 +2405,64 @@ int unknownError(MYSQL *mysql) {
 }
 
 void setMySQLError(MYSQL *mysql, const char *error, unsigned int errorno) {
+	debugFunction();
 	mysql->errorno=errorno;
 	delete[] mysql->error;
 	mysql->error=charstring::duplicate(error);
+}
+
+unsigned int mapErrorNumber(MYSQL *mysql, int64_t errorno) {
+	debugFunction();
+	unsigned int	retval=CR_UNKNOWN_ERROR;
+	if (mysql->errormap) {
+		mysql->errormap->getData(errorno,&retval);
+	}
+	return retval;
+}
+
+void loadErrorMap(MYSQL *mysql, const char *errormap) {
+	debugFunction();
+
+	debugPrintf("error map file: %s\n",errormap);
+
+	// parse the error map file
+	file	mapfile;
+	if (!mapfile.open(errormap,O_RDONLY)) {
+		debugPrintf("failed to open error map file\n");
+		return;
+	}
+
+	// create a new errormap
+	mysql->errormap=new dictionary< int64_t, unsigned int >;
+
+	// run through the file, line-by line...
+	char	*line=NULL;
+	ssize_t	linelength=0;
+	for (;;) {
+
+		// clean up after the previous line
+		delete[] line;
+
+		// get a line
+		linelength=mapfile.read(&line,"\n");
+		if (linelength<1) {
+			return;
+		}
+
+		// ignore lines that start with #'s (comments)
+		if (line[0]=='#') {
+			continue;
+		}
+
+		// it should be in <native code>:<mysql code> format...
+		const char	*colon=charstring::findFirst(line,':');
+		if (colon) {
+			int64_t		nativecode=charstring::toInteger(line);
+			unsigned int	mysqlcode=
+				(unsigned int)charstring::toInteger(colon+1);
+			mysql->errormap->setData(nativecode,mysqlcode);
+		}
+	}
 }
 
 }

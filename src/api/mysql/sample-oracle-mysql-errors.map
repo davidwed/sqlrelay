@@ -1,0 +1,25 @@
+# sample oracle to mysql error mappings...
+# format: <oracle error number>:<mysql error number>
+
+# FROM keyword not found where expected... -> ER_PARSER_ERROR
+# (oracle actually has lots of syntax errors and they all need to be mapped to
+# ER_PARSE_ERROR)
+923:1064
+
+# table or view does not exist -> ER_NO_SUCH_TABLE
+942:1146
+
+# invalid identifier -> ER_BAD_FIELD_ERROR
+904:1054
+
+# too many values -> ER_WRONG_VALUE_COUNT_ON_ROW
+913:1136
+
+# unique constraint violated -> ER_DUP_ENTRY
+1:1062
+
+# name is already used by an existing object -> ER_TABLE_EXISTS_ERROR
+955:1050
+
+# cannot insert NULL into ... -> ER_BAD_NULL_ERROR
+1400:1048

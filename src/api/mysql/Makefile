@@ -59,6 +59,8 @@ libmysql51sqlrelay.la: mysql.C mysql51.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ mysql51.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
 install:
+	$(MKINSTALLDIRS) $(EXAMPLEDIR)
+	$(INSTALL) -m 644 sample-oracle-mysql-errors.map $(EXAMPLEDIR)
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libmysql3sqlrelay.la $(libdir)
 	$(LTINSTALL) libmysql40sqlrelay.la $(libdir)
@@ -68,6 +70,7 @@ install:
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:
+	$(RM) $(EXAMPLEDIR)/sample-oracle-mysql-errors.map
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libmysql3sqlrelay.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libmysql40sqlrelay.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libmysql41sqlrelay.la
