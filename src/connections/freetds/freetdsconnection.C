@@ -19,12 +19,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-stringbuffer	*freetdsconnection::errorstring;
-bool		freetdsconnection::deadconnection;
+stringbuffer	freetdsconnection::errorstring;
+int64_t		freetdsconnection::errorcode;
+bool		freetdsconnection::liveconnection;
 
 
 freetdsconnection::freetdsconnection() : sqlrconnection_svr() {
-	errorstring=NULL;
 	dbused=false;
 
 	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
@@ -38,7 +38,6 @@ freetdsconnection::freetdsconnection() : sqlrconnection_svr() {
 }
 
 freetdsconnection::~freetdsconnection() {
-	delete errorstring;
 	delete[] dbversion;
 }
 
@@ -230,8 +229,8 @@ void freetdsconnection::logInError(const char *error, uint16_t stage) {
 
 	fprintf(stderr,"%s\n",error);
 
-	if (errorstring) {
-		fprintf(stderr,"%s\n",errorstring->getString());
+	if (errorstring.getStringLength()) {
+		fprintf(stderr,"%s\n",errorstring.getString());
 	}
 
 	if (stage>5) {
@@ -846,11 +845,9 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
 
 	// clear out any errors
-	if (freetdsconn->errorstring) {
-		freetdsconn->deadconnection=false;
-		delete freetdsconn->errorstring;
-		freetdsconn->errorstring=NULL;
-	}
+	freetdsconn->errorstring.clear();
+	freetdsconn->errorcode=0;
+	freetdsconn->liveconnection=true;
 
 	if (ct_command(cmd,CS_LANG_CMD,
 			(CS_CHAR *)query,length,
@@ -939,7 +936,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length,
 		// if we got here, then we don't want to process this result
 		// set, cancel it and move on to the next one...
 		if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
-			freetdsconn->deadconnection=true;
+			freetdsconn->liveconnection=false;
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
 			return false;
 		}
@@ -994,22 +991,18 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length,
 				if (moneytest.datatype==CS_MONEY_TYPE ||
 					moneytest.datatype==CS_MONEY4_TYPE) {
 					moneycolumn=true;
-					if (freetdsconn->errorstring) {
-						delete freetdsconn->errorstring;
-					}
-					freetdsconn->errorstring=
-						new stringbuffer();
-					freetdsconn->errorstring->append(
+					freetdsconn->errorstring.clear();
+					freetdsconn->errorstring.append(
 						"FreeTDS versions prior to ");
-					freetdsconn->errorstring->append( 
+					freetdsconn->errorstring.append( 
 						"0.53 do not support MONEY ");
-					freetdsconn->errorstring->append( 
+					freetdsconn->errorstring.append( 
 						"or SMALLMONEY datatypes. ");
-					freetdsconn->errorstring->append( 
+					freetdsconn->errorstring.append( 
 						"Please upgrade SQL Relay to ");
-					freetdsconn->errorstring->append( 
+					freetdsconn->errorstring.append( 
 						"a version compiled against ");
-					freetdsconn->errorstring->append( 
+					freetdsconn->errorstring.append( 
 						"FreeTDS >= 0.53 ");
 				}
 			}
@@ -1046,7 +1039,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length,
 	// errors to the screen when cleanUpData() is called.
 	if (moneycolumn) {
 		if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
-			freetdsconn->deadconnection=true;
+			freetdsconn->liveconnection=false;
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
 			return false;
 		}
@@ -1108,7 +1101,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length,
 	}*/
 
 	// return success only if no error was generated
-	if (freetdsconn->errorstring) {
+	if (freetdsconn->errorstring.getStringLength()) {
 		return false;
 	}
 	return true;
@@ -1117,19 +1110,10 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length,
 void freetdscursor::errorMessage(const char **errorstring,
 					int64_t *errorcode,
 					bool *liveconnection) {
-
-	if (freetdsconn->deadconnection) {
-		*liveconnection=false;
-	} else {
-		*liveconnection=true;
-	}
-	// FIXME: set this
-	*errorcode=0;
-	if (freetdsconn->errorstring) {
-		*errorstring=freetdsconn->errorstring->getString();
-	} else {
-		*errorstring=NULL;
-	}
+	*liveconnection=freetdsconn->liveconnection;
+	*errorcode=freetdsconn->errorcode;
+	*errorstring=(freetdsconn->errorstring.getStringLength())?
+			freetdsconn->errorstring.getString():NULL;
 }
 
 bool freetdscursor::knowsRowCount() {
@@ -1345,7 +1329,7 @@ void freetdscursor::discardResults() {
 	if (results==CS_SUCCEED) {
 		do {
 			if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
-				freetdsconn->deadconnection=true;
+				freetdsconn->liveconnection=false;
 				// FIXME: call ct_close(CS_FORCE_CLOSE)
 				// maybe return false
 			}
@@ -1355,7 +1339,7 @@ void freetdscursor::discardResults() {
 
 	if (results==CS_FAIL) {
 		if (ct_cancel(NULL,cmd,CS_CANCEL_ALL)==CS_FAIL) {
-			freetdsconn->deadconnection=true;
+			freetdsconn->liveconnection=false;
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
 			// maybe return false
 		}
@@ -1384,49 +1368,50 @@ char freetdscursor::escapeChar() {
 
 CS_RETCODE freetdsconnection::csMessageCallback(CS_CONTEXT *ctxt, 
 						CS_CLIENTMSG *msgp) {
-	if (errorstring) {
+	if (errorstring.getStringLength()) {
 		return CS_SUCCEED;
 	}
-	errorstring=new stringbuffer();
 
-	errorstring->append("Client Library error:\n");
-	errorstring->append("	severity(")->
+	errorcode=msgp->msgnumber;
+
+	errorstring.append("Client Library error:\n");
+	errorstring.append("	severity(")->
 				append((int32_t)CS_SEVERITY(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("	layer(")->
+	errorstring.append("	layer(")->
 				append((int32_t)CS_LAYER(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("	origin(")->
+	errorstring.append("	origin(")->
 				append((int32_t)CS_ORIGIN(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("	number(")->
+	errorstring.append("	number(")->
 				append((int32_t)CS_NUMBER(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("Error:	")->append(msgp->msgstring)->
+	errorstring.append("Error:	")->append(msgp->msgstring)->
 				append("\n");
 
 	if (msgp->osstringlen>0) {
-		errorstring->append("Operating System Error:\n");
-		errorstring->append("\n	")->append(msgp->osstring)->
+		errorstring.append("Operating System Error:\n");
+		errorstring.append("\n	")->append(msgp->osstring)->
 							append("\n");
 	}
 
-	//printf("csMessageCallback:\n%s\n",errorstring->getString());
-
-	// for a timeout message, set deadconnection to 1
+	// for a timeout message,
+	// set liveconnection to false
 	if (CS_SEVERITY(msgp->msgnumber)==CS_SV_RETRY_FAIL &&
 		CS_LAYER(msgp->msgnumber)==63 &&
 		CS_ORIGIN(msgp->msgnumber)==63 &&
 		CS_NUMBER(msgp->msgnumber)==63) {
-		deadconnection=true;
+		liveconnection=false;
 
-	// for a read from sql server failed message, set deadconnection to 1
+	// for a read from sql server failed message,
+	// set liveconnection to false
 	} else if (CS_SEVERITY(msgp->msgnumber)==78 &&
 		CS_LAYER(msgp->msgnumber)==0 &&
 		CS_ORIGIN(msgp->msgnumber)==0 &&
 		(CS_NUMBER(msgp->msgnumber)==36 ||
 		CS_NUMBER(msgp->msgnumber)==38)) {
-		deadconnection=true;
+		liveconnection=false;
 	}
 	// FIXME: sybase connection has another case, do we need it?
 
@@ -1436,49 +1421,50 @@ CS_RETCODE freetdsconnection::csMessageCallback(CS_CONTEXT *ctxt,
 CS_RETCODE freetdsconnection::clientMessageCallback(CS_CONTEXT *ctxt, 
 						CS_CONNECTION *cnn,
 						CS_CLIENTMSG *msgp) {
-	if (errorstring) {
+	if (errorstring.getStringLength()) {
 		return CS_SUCCEED;
 	}
-	errorstring=new stringbuffer();
 
-	errorstring->append("Client Library error:\n");
-	errorstring->append("	severity(")->
+	errorcode=msgp->msgnumber;
+
+	errorstring.append("Client Library error:\n");
+	errorstring.append("	severity(")->
 				append((int32_t)CS_SEVERITY(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("	layer(")->
+	errorstring.append("	layer(")->
 				append((int32_t)CS_LAYER(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("	origin(")->
+	errorstring.append("	origin(")->
 				append((int32_t)CS_ORIGIN(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("	number(")->
+	errorstring.append("	number(")->
 				append((int32_t)CS_NUMBER(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("Error:	")->append(msgp->msgstring)->
+	errorstring.append("Error:	")->append(msgp->msgstring)->
 				append("\n");
 
 	if (msgp->osstringlen>0) {
-		errorstring->append("Operating System Error:\n");
-		errorstring->append("\n	")->append(msgp->osstring)->
+		errorstring.append("Operating System Error:\n");
+		errorstring.append("\n	")->append(msgp->osstring)->
 							append("\n");
 	}
 
-	//printf("clientMessageCallback:\n%s\n",errorstring->getString());
-
-	// for a timeout message, set deadconnection to 1
+	// for a timeout message,
+	// set liveconnection to false
 	if (CS_SEVERITY(msgp->msgnumber)==CS_SV_RETRY_FAIL &&
 		CS_LAYER(msgp->msgnumber)==63 &&
 		CS_ORIGIN(msgp->msgnumber)==63 &&
 		CS_NUMBER(msgp->msgnumber)==63) {
-		deadconnection=true;
+		liveconnection=false;
 
-	// for a read from sql server failed message, set deadconnection to 1
+	// for a read from sql server failed message,
+	// set liveconnection to false
 	} else if (CS_SEVERITY(msgp->msgnumber)==78 &&
 		CS_LAYER(msgp->msgnumber)==0 &&
 		CS_ORIGIN(msgp->msgnumber)==0 &&
 		(CS_NUMBER(msgp->msgnumber)==36 ||
 		CS_NUMBER(msgp->msgnumber)==38)) {
-		deadconnection=true;
+		liveconnection=false;
 	}
 	// FIXME: sybase connection has another case, do we need it?
 
@@ -1499,30 +1485,29 @@ CS_RETCODE freetdsconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 		return CS_SUCCEED;
 	}
 
-	if (errorstring) {
+	if (errorstring.getStringLength()) {
 		return CS_SUCCEED;
 	}
-	errorstring=new stringbuffer();
 
-	errorstring->append("Server message:\n");
-	errorstring->append("	severity(")->
+	errorcode=msgp->msgnumber;
+
+	errorstring.append("Server message:\n");
+	errorstring.append("	severity(")->
 				append((int32_t)CS_SEVERITY(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("	number(")->
+	errorstring.append("	number(")->
 				append((int32_t)CS_NUMBER(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("	state(")->
+	errorstring.append("	state(")->
 				append((int32_t)msgp->state)->append(")\n");
-	errorstring->append("	line(")->
+	errorstring.append("	line(")->
 				append((int32_t)msgp->line)->append(")\n");
-	errorstring->append("Server Name:\n")->
+	errorstring.append("Server Name:\n")->
 				append(msgp->svrname)->append("\n");
-	errorstring->append("Procedure Name:\n")->
+	errorstring.append("Procedure Name:\n")->
 				append(msgp->proc)->append("\n");
-	errorstring->append("Error:	")->
+	errorstring.append("Error:	")->
 				append(msgp->text)->append("\n");
-
-	//printf("serverMessageCallback:\n%s\n",errorstring->getString());
 
 	return CS_SUCCEED;
 }

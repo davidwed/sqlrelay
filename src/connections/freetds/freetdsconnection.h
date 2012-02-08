@@ -196,8 +196,9 @@ class freetdsconnection : public sqlrconnection_svr {
 
 		char		*dbversion;
 
-		static	stringbuffer	*errorstring;
-		static	bool		deadconnection;
+		static	stringbuffer	errorstring;
+		static	int64_t		errorcode;
+		static	bool		liveconnection;
 
 		static	CS_RETCODE	csMessageCallback(CS_CONTEXT *ctxt,
 						CS_CLIENTMSG *msgp);
