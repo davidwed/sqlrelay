@@ -149,6 +149,12 @@ __END__
             # error message is available here.  If there is no
             # error then this method returns NULL.
 
+        errorNumber();
+            # If an operation failed and generated an
+            # error, the error number is available here.
+            # If there is no error then this method 
+            # returns 0.
+
 
         debugOn();
             # Causes verbose debugging information to be 

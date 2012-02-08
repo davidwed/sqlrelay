@@ -96,6 +96,9 @@ sqlrconnection::bindFormat()
 const char *
 sqlrconnection::errorMessage()
 
+int64_t
+sqlrconnection::errorNumber()
+
 void
 sqlrconnection::debugOn()
 

@@ -334,6 +334,9 @@ sqlrcursor::endOfResultSet()
 const char *
 sqlrcursor::errorMessage()
 
+int64_t
+sqlrcursor::errorNumber()
+
 void
 sqlrcursor::getNullsAsEmptyStrings()
 
