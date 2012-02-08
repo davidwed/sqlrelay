@@ -704,7 +704,7 @@ void routercursor::errorMessage(const char **errormessage,
 	// FIXME: detect downed database or downed relay
 	*liveconnection=true;
 	*errormessage=(cur)?cur->errorMessage():"";
-	// FIXME: set this
+	*errorcode=cur->errorNumber();
 	*errorcode=0;
 }
 
