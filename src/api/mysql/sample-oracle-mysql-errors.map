@@ -6,6 +6,9 @@
 # ER_PARSE_ERROR)
 923:1064
 
+# quoted string not properly terminated -> ER_PARSE_ERROR
+1756:1064
+
 # table or view does not exist -> ER_NO_SUCH_TABLE
 942:1146
 
@@ -23,3 +26,15 @@
 
 # cannot insert NULL into ... -> ER_BAD_NULL_ERROR
 1400:1048
+
+# (SQL Relay META-ERROR) begin while already in transaction block -> 
+#
+999999:535
+
+# (SQL Relay META-ERROR) commit while not in transaction block -> 
+#
+999998:255
+
+# (SQL Relay META-ERROR) rollback while not in transaction block -> 
+#
+999997:255

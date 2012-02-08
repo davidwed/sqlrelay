@@ -11,32 +11,51 @@ bool sqlrconnection_svr::supportsTransactionBlocks() {
 	return true;
 }
 
-bool sqlrconnection_svr::handleFakeBeginTransaction(sqlrcursor_svr *cursor) {
+bool sqlrconnection_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
+						bool *wasfaketransactionquery,
+						const char **error,
+						int64_t *errno) {
 
-	// just return if we're not faking transactionblocks
-	if (!faketransactionblocks) {
-		return false;
-	}
+	*wasfaketransactionquery=false;
 
 	// Intercept begins and handle them.  If we're faking begins, commit
 	// and rollback queries also need to be intercepted as well, otherwise
 	// the query will be sent directly to the db and endFakeBeginTransaction
 	// won't get called.
 	if (isBeginTransactionQuery(cursor)) {
-		beginFakeTransactionBlock();
+		*wasfaketransactionquery=true;
 		cursor->inbindcount=0;
 		cursor->outbindcount=0;
 		sendcolumninfo=DONT_SEND_COLUMN_INFO;
-		return true;
+		if (intransactionblock) {
+			*error="begin while already in transaction block";
+			*errno=999999;
+			return false;
+		}
+		return beginFakeTransactionBlock();
 	} else if (isCommitQuery(cursor)) {
+		*wasfaketransactionquery=true;
 		cursor->inbindcount=0;
 		cursor->outbindcount=0;
 		sendcolumninfo=DONT_SEND_COLUMN_INFO;
+		// FIXME: move this into commitInternal
+		if (!intransactionblock) {
+			*error="commit while not in transaction block";
+			*errno=999998;
+			return false;
+		}
 		return commitInternal();
 	} else if (isRollbackQuery(cursor)) {
+		*wasfaketransactionquery=true;
 		cursor->inbindcount=0;
 		cursor->outbindcount=0;
 		sendcolumninfo=DONT_SEND_COLUMN_INFO;
+		// FIXME: move this into rollbackInternal
+		if (!intransactionblock) {
+			*error="rollback while not in transaction block";
+			*errno=999997;
+			return false;
+		}
 		return rollbackInternal();
 	}
 	return false;
@@ -79,8 +98,11 @@ bool sqlrconnection_svr::beginFakeTransactionBlock() {
 
 	// if autocommit is on, turn it off
 	if (autocommit) {
-		return autoCommitOffInternal();
+		if (!autoCommitOffInternal()) {
+			return false;
+		}
 	}
+	intransactionblock=true;
 	return true;
 }
 
@@ -89,11 +111,14 @@ bool sqlrconnection_svr::endFakeTransactionBlock() {
 	// if we're faking begins and autocommit is on,
 	// reset autocommit behavior
 	if (faketransactionblocks && faketransactionblocksautocommiton) {
-		return autoCommitOnInternal();
+		if (!autoCommitOnInternal()) {
+			return false;
+		}
 	} else if (faketransactionblocks &&
 			!faketransactionblocksautocommiton) {
 		// don't do anything
 	}
+	intransactionblock=false;
 	return true;
 }
 

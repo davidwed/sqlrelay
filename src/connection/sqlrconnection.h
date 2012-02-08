@@ -283,7 +283,10 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool	autoCommitOnInternal();
 		bool	autoCommitOffInternal();
 		void	translateBeginTransaction(sqlrcursor_svr *cursor);
-		bool	handleFakeBeginTransaction(sqlrcursor_svr *cursor);
+		bool	handleFakeTransactionQueries(sqlrcursor_svr *cursor,
+						bool *wasfaketransactionquery,
+						const char **error,
+						int64_t *errno);
 		bool	beginFakeTransactionBlock();
 		bool	endFakeTransactionBlock();
 		bool	isBeginTransactionQuery(sqlrcursor_svr *cursor);
@@ -375,7 +378,9 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 						sqlrcursor_svr *cursor);
 		void	commitOrRollback(sqlrcursor_svr *cursor);
 		bool	handleError(sqlrcursor_svr *cursor);
-		bool	returnError(sqlrcursor_svr *cursor);
+		void	returnError(sqlrcursor_svr *cursor,
+						const char *error,
+						int64_t errno);
 		void	returnResultSet();
 		void	returnOutputBindValues(sqlrcursor_svr *cursor);
 		void	returnResultSetHeader(sqlrcursor_svr *cursor);
@@ -436,6 +441,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool		translatebegins;
 		bool		faketransactionblocks;
 		bool		faketransactionblocksautocommiton;
+		bool		intransactionblock;
 
 		bool		translatebinds;
 

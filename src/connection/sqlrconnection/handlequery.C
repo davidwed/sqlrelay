@@ -27,7 +27,7 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 
 	// handle fake begins
 	// FIXME: do we need to loop to detect downed db's somehow?
-	if (!reexecute && !bindcursor && handleFakeBeginTransaction(cursor)) {
+	/*if (!reexecute && !bindcursor && handleFakeTransactionQueries(cursor)) {
 
 		dbgfile.debugPrint("connection",1,"query was fake begin...");
 
@@ -58,13 +58,35 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 		dbgfile.debugPrint("connection",1,"done handling query...");
 
 		return 1;
-	}
+	}*/
 
 	// loop here to handle down databases
+	const char	*error;
+	int64_t		errno;
+	bool		liveconnection;
 	for (;;) {
 
+		// init error
+		error=NULL;
+		errno=0;
+		liveconnection=true;
+
 		// process the query
-		if (processQuery(cursor,reexecute,bindcursor,reallyexecute)) {
+		bool	success=false;
+		bool	wasfaketransactionquery=false;
+		if (!reexecute && !bindcursor && faketransactionblocks) {
+			success=handleFakeTransactionQueries(cursor,
+						&wasfaketransactionquery,
+						&error,
+						&errno);
+		}
+		if (!wasfaketransactionquery) {
+			success=processQuery(cursor,reexecute,
+						bindcursor,reallyexecute);
+		}
+
+
+		if (success) {
 
 			// indicate that no error has occurred
 			clientsock->write((uint16_t)NO_ERROR);
@@ -85,7 +107,8 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 			// free memory used by binds
 			bindpool->free();
 
-			dbgfile.debugPrint("connection",1,"handle query succeeded");
+			dbgfile.debugPrint("connection",1,
+						"handle query succeeded");
 
 			// handle after-triggers
 			if (sqltr) {
@@ -97,22 +120,33 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 
 		} else {
 
-			// If the query didn't process ok,
-			// handle the error.
-			// If handleError returns false then the error
-			// was a down database that has presumably
-			// come back up by now.  Loop back...
-			if (handleError(cursor)) {
-
-				// handle after-triggers
-				if (sqltr) {
-					sqltr->runAfterTriggers(
-						this,cursor,
-						cursor->querytree,false);
-				}
-
-				return -1;
+			// get the error message from the database
+			// (unless it was already set)
+			if (!error) {
+				cursor->errorMessage(&error,&errno,
+							&liveconnection);
 			}
+
+			// if the error was a dead connection,
+			// re-establish the connection
+			if (!liveconnection) {
+				dbgfile.debugPrint("connection",3,
+							"database is down...");
+				reLogIn();
+				continue;
+			}
+
+			// return the error
+			returnError(cursor,error,errno);
+
+			// handle after-triggers
+			if (sqltr) {
+				sqltr->runAfterTriggers(
+					this,cursor,
+					cursor->querytree,false);
+			}
+
+			return -1;
 		}
 	}
 }
@@ -362,4 +396,46 @@ void sqlrconnection_svr::commitOrRollback(sqlrcursor_svr *cursor) {
 
 void sqlrconnection_svr::setFakeInputBinds(bool fake) {
 	fakeinputbinds=fake;
+}
+
+void sqlrconnection_svr::returnError(sqlrcursor_svr *cursor,
+					const char *error, int64_t errno) {
+
+	dbgfile.debugPrint("connection",2,"returning error...");
+
+	// indicate that an error has occurred
+	clientsock->write((uint16_t)ERROR);
+
+	// send the error code
+	clientsock->write((uint64_t)errno);
+
+	// send the error string
+	size_t	errorlen=charstring::length(error);
+		
+	#ifdef RETURN_QUERY_WITH_ERROR
+		clientsock->write((uint16_t)(errorlen+
+			charstring::length(cursor->querybuffer)+18));
+		clientsock->write(error,errorlen);
+		// send the attempted query back too
+		clientsock->write("\nAttempted Query:\n");
+		clientsock->write(cursor->querybuffer);
+	#else
+		clientsock->write((uint16_t)(errorlen));
+		clientsock->write(error);
+	#endif
+
+	// client will be sending skip/fetch,
+	// better get it even though we're not gonna
+	// use it
+	uint64_t	skipfetch;
+	clientsock->read(&skipfetch,idleclienttimeout,0);
+	clientsock->read(&skipfetch,idleclienttimeout,0);
+
+	// Even though there was an error, we still 
+	// need to send the client the id of the 
+	// cursor that it's going to use.
+	clientsock->write(cursor->id);
+	flushWriteBuffer();
+
+	dbgfile.debugPrint("connection",2,"done returning error");
 }
