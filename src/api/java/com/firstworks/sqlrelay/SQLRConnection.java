@@ -115,6 +115,12 @@ public class SQLRConnection {
 	 *  is no error then this method returns NULL.  */
 	public native String	errorMessage();
 
+	/** If an operation failed and generated an
+	 *  error, the error number is available here.
+	 *  If there is no error then this method 
+	 *  returns 0. */
+	public native long	errorNumber();
+
 
 	/** Causes verbose debugging information to be 
 	 *  sent to standard output.  Another way to do

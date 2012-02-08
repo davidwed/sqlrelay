@@ -911,6 +911,16 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_errorMessage
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    errorNumber
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_errorNumber
+  (JNIEnv *env, jobject self) {
+	return (jlong)getSqlrCursor(env,self)->errorNumber();
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
  * Method:    getNullsAsEmptyStrings
  * Signature: ()V
  */

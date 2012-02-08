@@ -262,6 +262,12 @@ public class SQLRCursor {
 	 *  returns NULL.  */
 	public native String	errorMessage();
 
+	/** If a query failed and generated an
+	 *  error, the error number is available here.
+	 *  If there is no error then this method 
+	 *  returns 0. */
+	public native long	errorNumber();
+
 
 	/** Tells the connection to return NULL fields
 	 *  and output bind variables as empty strings. 
