@@ -139,6 +139,7 @@ class sqliteconnection : public sqlrconnection_svr {
 		sqlite	*sqliteptr;
 #endif
 		char	*errmesg;
+		int64_t	errcode;
 };
 
 #endif

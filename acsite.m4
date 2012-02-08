@@ -497,7 +497,7 @@ AC_DEFUN([FW_CXX_NAMESPACES],
 
 dnl checks for the pthreads library
 dnl requires:  PTHREADPATH, RPATHFLAG, cross_compiling
-dnl sets the substitution variable PTHREADLIBS
+dnl sets the substitution variable PTHREADSLIB
 AC_DEFUN([FW_CHECK_PTHREAD],
 [
 HAVE_PTHREAD=""
@@ -1332,7 +1332,7 @@ then
 			STATICFLAG="-static"
 		fi
 		
-		if ( test -n "$PTHREADLIBS" )
+		if ( test -n "$PTHREADLIB" )
 		then
 			FW_CHECK_HEADERS_AND_LIBS([$SQLITEPATH],[sqlite],[sqlite.h],[sqlite],[$STATICFLAG],[$RPATHFLAG],[SQLITEINCLUDES],[SQLITELIBS],[SQLITELIBSPATH],[SQLITESTATIC])
 			if ( test -z "$SQLITELIBS" )
@@ -1728,7 +1728,7 @@ then
 			FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env); SQLAllocHandle(SQL_HANDLE_DBC,env,&dbc); SQLFreeHandle(SQL_HANDLE_DBC,dbc); SQLFreeHandle(SQL_HANDLE_ENV,env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCINCLUDES="$ODBCINCLUDES $PTHREADINCLUDES"; ODBCLIBS="$ODBCLIBS $PTHREADLIBS"])
+#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env); SQLAllocHandle(SQL_HANDLE_DBC,env,&dbc); SQLFreeHandle(SQL_HANDLE_DBC,dbc); SQLFreeHandle(SQL_HANDLE_ENV,env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCINCLUDES="$ODBCINCLUDES $PTHREADINCLUDES"; ODBCLIBS="$ODBCLIBS $PTHREADLIB"])
 		fi
 		if ( test -n "$HAVE_IODBC" )
 		then
@@ -1737,7 +1737,7 @@ then
 			FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocEnv(&env); SQLAllocConnect(env,&dbc); SQLFreeConnect(&dbc); SQLFreeEnv(&env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCINCLUDES="$ODBCINCLUDES $PTHREADINCLUDES"; ODBCLIBS="$ODBCLIBS $PTHREADLIBS"])
+#include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocEnv(&env); SQLAllocConnect(env,&dbc); SQLFreeConnect(&dbc); SQLFreeEnv(&env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIB],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCINCLUDES="$ODBCINCLUDES $PTHREADINCLUDES"; ODBCLIBS="$ODBCLIBS $PTHREADLIB"])
 		fi
 		if ( test -z "$ODBCLIBS" )
 		then
@@ -2974,11 +2974,11 @@ then
 		else
 			HAVE_TCL="yes"
 			AC_MSG_CHECKING(for Tcl_GetString)
-			FW_TRY_LINK([#include <tcl.h>],[Tcl_GetString(NULL);],[$TCLINCLUDE $PTHREADINCLUDES],[$TCLLIB $PTHREADLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_GETSTRING,1,Some versions of TCL don't have Tcl_GetString)],[AC_MSG_RESULT(no)])
+			FW_TRY_LINK([#include <tcl.h>],[Tcl_GetString(NULL);],[$TCLINCLUDE $PTHREADINCLUDES],[$TCLLIB $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_GETSTRING,1,Some versions of TCL don't have Tcl_GetString)],[AC_MSG_RESULT(no)])
 			AC_MSG_CHECKING(for Tcl_WideInt)
-			FW_TRY_LINK([#include <tcl.h>],[Tcl_WideInt row;],[$TCLINCLUDE $PTHREADINCLUDES],[$TCLLIB $PTHREADLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_WIDEINT,1,Some versions of TCL don't have Tcl_WideInt)],[AC_MSG_RESULT(no)])
+			FW_TRY_LINK([#include <tcl.h>],[Tcl_WideInt row;],[$TCLINCLUDE $PTHREADINCLUDES],[$TCLLIB $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_WIDEINT,1,Some versions of TCL don't have Tcl_WideInt)],[AC_MSG_RESULT(no)])
 			AC_MSG_CHECKING(for const char ** support)
-			FW_TRY_LINK([#include <tcl.h>],[static const char *options[]={""}; Tcl_GetIndexFromObj(NULL,NULL,(const char **)options,NULL,0,NULL);],[$TCLINCLUDE $PTHREADINCLUDES],[$TCLLIB $PTHREADLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_CONSTCHAR,1,Some versions of TCL don't use const char ** arguments)],[AC_MSG_RESULT(no)])
+			FW_TRY_LINK([#include <tcl.h>],[static const char *options[]={""}; Tcl_GetIndexFromObj(NULL,NULL,(const char **)options,NULL,0,NULL);],[$TCLINCLUDE $PTHREADINCLUDES],[$TCLLIB $PTHREADSLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_CONSTCHAR,1,Some versions of TCL don't use const char ** arguments)],[AC_MSG_RESULT(no)])
 		fi
 	fi
 

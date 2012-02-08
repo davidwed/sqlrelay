@@ -21,6 +21,7 @@
 sqliteconnection::sqliteconnection() : sqlrconnection_svr() {
 	sqliteptr=NULL;
 	errmesg=NULL;
+	errcode=0;
 }
 
 uint16_t sqliteconnection::getNumberOfConnectStringVars() {
@@ -33,16 +34,17 @@ void sqliteconnection::handleConnectString() {
 
 bool sqliteconnection::logIn(bool printerrors) {
 #ifdef SQLITE_TRANSACTIONAL
-#ifdef SQLITE3
-	if (sqlite3_open(db,&sqliteptr)==SQLITE_OK) {
-#else
-	if ((sqliteptr=sqlite3_open(db,666,&errmesg))) {
-#endif
-		return true;
-	}
-#ifdef SQLITE3
-	errmesg=duplicate(sqlite3_errmsg(sqliteptr));
-#endif
+	#ifdef SQLITE3
+		if (sqlite3_open(db,&sqliteptr)==SQLITE_OK) {
+			return true;
+		}
+		errmesg=duplicate(sqlite3_errmsg(sqliteptr));
+		errcode=sqlite3_errcode(sqliteptr);
+	#else
+		if ((sqliteptr=sqlite3_open(db,666,&errmesg))) {
+			return true;
+		}
+	#endif
 	if (errmesg) {
 		fprintf(stderr,"%s\n",errmesg);
 	}
@@ -275,7 +277,8 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length,
 		// For any other return values, jump out of the loop.
 		if (success==SQLITE_SCHEMA) {
 			continue;
-		} else if (success==SQLITE_ERROR && sqliteconn->errmesg && 
+		} else if (success==SQLITE_ERROR &&
+				sqliteconn->errmesg && 
 				!charstring::compare(sqliteconn->errmesg,
 							"no such table:",14)) {
 
@@ -305,13 +308,17 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length,
 		sqliteconn->errmesg=
 			sqliteconn->duplicate(
 				sqlite3_errmsg(sqliteconn->sqliteptr));
+		sqliteconn->errcode=
+			sqlite3_errcode(sqliteconn->sqliteptr);
+		return false;
+	}
 #else
 	if (!(sqliteconn->sqliteptr=
 			sqlite_open(sqliteconn->db,666,
 						&sqliteconn->errmesg))) {
-#endif
 		return false;
 	}
+#endif
 	success=runQuery(query);
 #endif
 
@@ -336,6 +343,7 @@ int sqlitecursor::runQuery(const char *query) {
 	if (sqliteconn->errmesg) {
 		sqlite3_free((void *)sqliteconn->errmesg);
 		sqliteconn->errmesg=NULL;
+		sqliteconn->errcode=0;
 	}
 
 	// clean up old column names
@@ -361,10 +369,14 @@ int sqlitecursor::runQuery(const char *query) {
 	}
 
 	// run the appropriate query
-	return sqlite3_get_table(sqliteconn->sqliteptr,
+	int	retval=sqlite3_get_table(sqliteconn->sqliteptr,
 					query,
 					&result,&nrow,&ncolumn,
 					&sqliteconn->errmesg);
+	if (retval==SQLITE_ERROR) {
+		sqliteconn->errcode=sqlite3_errcode(sqliteconn->sqliteptr);
+	}
+	return retval;
 }
 
 void sqlitecursor::selectLastInsertRowId() {
@@ -392,8 +404,7 @@ void sqlitecursor::errorMessage(const char **errorstring,
 
 	// set return values
 	*errorstring=sqliteconn->errmesg;
-	// FIXME: set this
-	*errorcode=0;
+	*errorcode=sqliteconn->errcode;
 }
 
 bool sqlitecursor::knowsRowCount() {

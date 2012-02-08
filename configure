@@ -21099,7 +21099,7 @@ fi
 			STATICFLAG="-static"
 		fi
 
-		if ( test -n "$PTHREADLIBS" )
+		if ( test -n "$PTHREADLIB" )
 		then
 
 
@@ -24527,7 +24527,7 @@ if ac_fn_cxx_try_link "$LINENO"; then :
 $as_echo "no" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }; ODBCINCLUDES="$ODBCINCLUDES $PTHREADINCLUDES"; ODBCLIBS="$ODBCLIBS $PTHREADLIBS"
+$as_echo "yes" >&6; }; ODBCINCLUDES="$ODBCINCLUDES $PTHREADINCLUDES"; ODBCLIBS="$ODBCLIBS $PTHREADLIB"
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -24571,7 +24571,7 @@ if ac_fn_cxx_try_link "$LINENO"; then :
 $as_echo "no" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }; ODBCINCLUDES="$ODBCINCLUDES $PTHREADINCLUDES"; ODBCLIBS="$ODBCLIBS $PTHREADLIBS"
+$as_echo "yes" >&6; }; ODBCINCLUDES="$ODBCINCLUDES $PTHREADINCLUDES"; ODBCLIBS="$ODBCLIBS $PTHREADLIB"
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -29272,7 +29272,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$TCLINCLUDE $PTHREADINCLUDES"
-LIBS="$TCLLIB $PTHREADLIBS"
+LIBS="$TCLLIB $PTHREADLIB"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -29311,7 +29311,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$TCLINCLUDE $PTHREADINCLUDES"
-LIBS="$TCLLIB $PTHREADLIBS"
+LIBS="$TCLLIB $PTHREADLIB"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -29350,7 +29350,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$TCLINCLUDE $PTHREADINCLUDES"
-LIBS="$TCLLIB $PTHREADLIBS"
+LIBS="$TCLLIB $PTHREADSLIB"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext

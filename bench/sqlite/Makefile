@@ -8,4 +8,4 @@ clean:
 	$(RM) sqlitetest
 
 sqlitetest: sqlitetest.C
-	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(SQLITEINCLUDES) $? -s -o $@ $(SQLITELIBS) $(PTHREADLIBS) $(EXTRALIBS) $(SOCKETLIBS)
+	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(SQLITEINCLUDES) $? -s -o $@ $(SQLITELIBS) $(PTHREADLIB) $(EXTRALIBS) $(SOCKETLIBS)
