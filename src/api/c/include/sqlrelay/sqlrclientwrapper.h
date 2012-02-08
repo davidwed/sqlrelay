@@ -140,6 +140,10 @@ int	sqlrcon_rollback(sqlrcon sqlrconref);
  *  available here.  If there is no error then this method returns NULL */
 const char	*sqlrcon_errorMessage(sqlrcon sqlrconref);
 
+/** @ingroup sqlrclientwrapper
+ *  If an operation failed and generated an error, the error number is
+ *  available here.  If there is no error then this method returns 0. */
+int64_t		sqlrcon_errorNumber(sqlrcon sqlrconref);
 
 
 /** @ingroup sqlrclientwrapper
@@ -549,6 +553,10 @@ int	sqlrcur_endOfResultSet(sqlrcur sqlrcurref);
  *  here.  If the query succeeded then this function returns a NULL. */
 const char	*sqlrcur_errorMessage(sqlrcur sqlrcurref);
 
+/** @ingroup sqlrclientwrapper
+ *  If a query failed and generated an error, the error number is available
+ *  here.  If there is no error then this method returns 0. */
+int64_t		sqlrcur_errorNumber(sqlrcur sqlrcurref);
 
 
 /** @ingroup sqlrclientwrapper
