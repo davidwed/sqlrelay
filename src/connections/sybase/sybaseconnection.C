@@ -13,18 +13,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-stringbuffer	*sybaseconnection::errorstring;
-bool		sybaseconnection::deadconnection;
+stringbuffer	sybaseconnection::errorstring;
+int64_t		sybaseconnection::errorcode;
+bool		sybaseconnection::liveconnection;
 
 
 sybaseconnection::sybaseconnection() : sqlrconnection_svr() {
-	errorstring=NULL;
 	dbused=false;
 	dbversion=NULL;
 }
 
 sybaseconnection::~sybaseconnection() {
-	delete errorstring;
 	delete[] dbversion;
 }
 
@@ -221,8 +220,8 @@ void sybaseconnection::logInError(const char *error, uint16_t stage) {
 
 	fprintf(stderr,"%s\n",error);
 
-	if (errorstring) {
-		fprintf(stderr,"%s\n",errorstring->getString());
+	if (errorstring.getStringLength()) {
+		fprintf(stderr,"%s\n",errorstring.getString());
 	}
 
 	if (stage>5) {
@@ -727,11 +726,9 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
 
 	// clear out any errors
-	if (sybaseconn->errorstring) {
-		sybaseconn->deadconnection=false;
-		delete sybaseconn->errorstring;
-		sybaseconn->errorstring=NULL;
-	}
+	sybaseconn->errorstring.clear();
+	sybaseconn->errorcode=0;
+	sybaseconn->liveconnection=true;
 
 	// initialize return values
 	ncols=0;
@@ -807,7 +804,7 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 		// if we got here, then we don't want to process this result
 		// set, cancel it and move on to the next one...
 		if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
-			sybaseconn->deadconnection=true;
+			sybaseconn->liveconnection=false;
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
 			return false;
 		}
@@ -917,7 +914,7 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 	}
 
 	// return success only if no error was generated
-	if (sybaseconn->errorstring) {
+	if (sybaseconn->errorstring.getStringLength()) {
 		return false;
 	}
 	return true;
@@ -926,18 +923,10 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 void sybasecursor::errorMessage(const char **errorstring,
 				int64_t *errorcode,
 				bool *liveconnection) {
-	if (sybaseconn->deadconnection) {
-		*liveconnection=false;
-	} else {
-		*liveconnection=true;
-	}
-	// FIXME: set this
-	*errorcode=0;
-	if (sybaseconn->errorstring) {
-		*errorstring=sybaseconn->errorstring->getString();
-	} else {
-		*errorstring=NULL;
-	}
+	*liveconnection=sybaseconn->liveconnection;
+	*errorcode=sybaseconn->errorcode;
+	*errorstring=(sybaseconn->errorstring.getStringLength())?
+				sybaseconn->errorstring.getString():NULL;
 }
 
 bool sybasecursor::knowsRowCount() {
@@ -1149,7 +1138,7 @@ void sybasecursor::discardResults() {
 	if (results==CS_SUCCEED) {
 		do {
 			if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
-				sybaseconn->deadconnection=true;
+				sybaseconn->liveconnection=false;
 				// FIXME: call ct_close(CS_FORCE_CLOSE)
 				// maybe return false
 			}
@@ -1159,7 +1148,7 @@ void sybasecursor::discardResults() {
 
 	if (results==CS_FAIL) {
 		if (ct_cancel(NULL,cmd,CS_CANCEL_ALL)==CS_FAIL) {
-			sybaseconn->deadconnection=true;
+			sybaseconn->liveconnection=false;
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
 			// maybe return false
 		}
@@ -1182,49 +1171,49 @@ void sybasecursor::discardCursor() {
 
 CS_RETCODE sybaseconnection::csMessageCallback(CS_CONTEXT *ctxt, 
 						CS_CLIENTMSG *msgp) {
-	if (errorstring) {
+	if (errorstring.getStringLength()) {
 		return CS_SUCCEED;
 	}
-	errorstring=new stringbuffer();
 
-	errorstring->append("Client Library error:\n");
-	errorstring->append("	severity(")->
+	errorcode=msgp->msgnumber;
+
+	errorstring.append("Client Library error:\n");
+	errorstring.append("	severity(")->
 				append((int32_t)CS_SEVERITY(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("	layer(")->
+	errorstring.append("	layer(")->
 				append((int32_t)CS_LAYER(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("	origin(")->
+	errorstring.append("	origin(")->
 				append((int32_t)CS_ORIGIN(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("	number(")->
+	errorstring.append("	number(")->
 				append((int32_t)CS_NUMBER(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("Error:	")->append(msgp->msgstring)->
+	errorstring.append("Error:	")->append(msgp->msgstring)->
 				append("\n");
 
 	if (msgp->osstringlen>0) {
-		errorstring->append("Operating System Error:\n");
-		errorstring->append("\n	")->append(msgp->osstring)->
+		errorstring.append("Operating System Error:\n");
+		errorstring.append("\n	")->append(msgp->osstring)->
 							append("\n");
 	}
 
-	//printf("csMessageCallback:\n%s\n",errorstring->getString());
-
-	// for a timeout message, set deadconnection to 1
+	// for a timeout message,
+	// set liveconnection to false
 	if (CS_SEVERITY(msgp->msgnumber)==CS_SV_RETRY_FAIL &&
 		CS_LAYER(msgp->msgnumber)==63 &&
 		CS_ORIGIN(msgp->msgnumber)==63 &&
 		CS_NUMBER(msgp->msgnumber)==63) {
-		deadconnection=true;
+		liveconnection=false;
 	} else
 	// for a net-libraryoperation terminated due to disconnect,
-	// set deadconnection to 1
+	// set liveconnection to false
 	if (CS_SEVERITY(msgp->msgnumber)==5 &&
 		CS_LAYER(msgp->msgnumber)==5 &&
 		CS_ORIGIN(msgp->msgnumber)==3 &&
 		CS_NUMBER(msgp->msgnumber)==6) {
-		deadconnection=true;
+		liveconnection=false;
 	}
 	// FIXME: freetds connection has another case, do we need it?
 
@@ -1234,49 +1223,49 @@ CS_RETCODE sybaseconnection::csMessageCallback(CS_CONTEXT *ctxt,
 CS_RETCODE sybaseconnection::clientMessageCallback(CS_CONTEXT *ctxt, 
 						CS_CONNECTION *cnn,
 						CS_CLIENTMSG *msgp) {
-	if (errorstring) {
+	if (errorstring.getStringLength()) {
 		return CS_SUCCEED;
 	}
-	errorstring=new stringbuffer();
 
-	errorstring->append("Client Library error:\n");
-	errorstring->append("	severity(")->
+	errorcode=msgp->msgnumber;
+
+	errorstring.append("Client Library error:\n");
+	errorstring.append("	severity(")->
 				append((int32_t)CS_SEVERITY(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("	layer(")->
+	errorstring.append("	layer(")->
 				append((int32_t)CS_LAYER(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("	origin(")->
+	errorstring.append("	origin(")->
 				append((int32_t)CS_ORIGIN(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("	number(")->
+	errorstring.append("	number(")->
 				append((int32_t)CS_NUMBER(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("Error:	")->append(msgp->msgstring)->
+	errorstring.append("Error:	")->append(msgp->msgstring)->
 				append("\n");
 
 	if (msgp->osstringlen>0) {
-		errorstring->append("Operating System Error:\n");
-		errorstring->append("\n	")->append(msgp->osstring)->
+		errorstring.append("Operating System Error:\n");
+		errorstring.append("\n	")->append(msgp->osstring)->
 							append("\n");
 	}
 
-	//printf("clientMessageCallback:\n%s\n",errorstring->getString());
-
-	// for a timeout message, set deadconnection to 1
+	// for a timeout message,
+	// set liveconnection to false
 	if (CS_SEVERITY(msgp->msgnumber)==CS_SV_RETRY_FAIL &&
 		CS_NUMBER(msgp->msgnumber)==63 &&
 		CS_ORIGIN(msgp->msgnumber)==63 &&
 		CS_LAYER(msgp->msgnumber)==63) {
-		deadconnection=true;
+		liveconnection=false;
 	} else
 	// for a net-libraryoperation terminated due to disconnect,
-	// set deadconnection to 1
+	// set liveconnection to false
 	if (CS_SEVERITY(msgp->msgnumber)==5 &&
 		CS_LAYER(msgp->msgnumber)==5 &&
 		CS_ORIGIN(msgp->msgnumber)==3 &&
 		CS_NUMBER(msgp->msgnumber)==6) {
-		deadconnection=true;
+		liveconnection=false;
 	}
 	// FIXME: freetds connection has another case, do we need it?
 
@@ -1296,30 +1285,29 @@ CS_RETCODE sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 		return CS_SUCCEED;
 	}
 
-	if (errorstring) {
+	if (errorstring.getStringLength()) {
 		return CS_SUCCEED;
 	}
-	errorstring=new stringbuffer();
 
-	errorstring->append("Server message:\n");
-	errorstring->append("	severity(")->
+	errorcode=msgp->msgnumber;
+
+	errorstring.append("Server message:\n");
+	errorstring.append("	severity(")->
 				append((int32_t)CS_SEVERITY(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("	number(")->
+	errorstring.append("	number(")->
 				append((int32_t)CS_NUMBER(msgp->msgnumber))->
 				append(")\n");
-	errorstring->append("	state(")->
+	errorstring.append("	state(")->
 				append((int32_t)msgp->state)->append(")\n");
-	errorstring->append("	line(")->
+	errorstring.append("	line(")->
 				append((int32_t)msgp->line)->append(")\n");
-	errorstring->append("Server Name:\n")->
+	errorstring.append("Server Name:\n")->
 				append(msgp->svrname)->append("\n");
-	errorstring->append("Procedure Name:\n")->
+	errorstring.append("Procedure Name:\n")->
 				append(msgp->proc)->append("\n");
-	errorstring->append("Error:	")->
+	errorstring.append("Error:	")->
 				append(msgp->text)->append("\n");
-
-	//printf("serverMessageCallback:\n%s\n",errorstring->getString());
 
 	return CS_SUCCEED;
 }
