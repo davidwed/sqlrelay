@@ -353,7 +353,6 @@ const char *firebirdconnection::getLastInsertIdQuery() {
 firebirdcursor::firebirdcursor(sqlrconnection_svr *conn) :
 						sqlrcursor_svr(conn) {
 	firebirdconn=(firebirdconnection *)conn;
-	errormsg=NULL;
 
 	outsqlda=(XSQLDA ISC_FAR *)malloc(XSQLDA_LENGTH(MAX_SELECT_LIST_SIZE));
 	outsqlda->version=SQLDA_VERSION1;
@@ -373,9 +372,6 @@ firebirdcursor::firebirdcursor(sqlrconnection_svr *conn) :
 }
 
 firebirdcursor::~firebirdcursor() {
-	if (errormsg) {
-		delete errormsg;
-	}
 	free(outsqlda);
 	free(insqlda);
 }
@@ -787,38 +783,32 @@ void firebirdcursor::errorMessage(const char **errorstring,
 					int64_t *errorcode,
 					bool *liveconnection) {
 
+	// declare a buffer for the error
+	errormsg.clear();
+
 	char		msg[512];
 	ISC_STATUS	*pvector=firebirdconn->error;
 
-	// declare a buffer for the error
-	if (errormsg) {
-		delete errormsg;
-	}
-	errormsg=new stringbuffer();
-
 	// get the status message
 	while (isc_interprete(msg,&pvector)) {
-		errormsg->append(msg)->append(" \n");
+		errormsg.append(msg)->append(" \n");
 	}
 
 	// get the error message
-	// FIXME: vladimir commented this out why?
 	ISC_LONG	sqlcode=isc_sqlcode(firebirdconn->error);
-	isc_sql_interprete(sqlcode, msg, 512);
-	errormsg->append(msg);
-
+	isc_sql_interprete(sqlcode,msg,512);
+	errormsg.append(msg);
 
 	*liveconnection=!(charstring::contains(
-				errormsg->getString(),
+				errormsg.getString(),
 				"Error reading data from the connection") ||
 			charstring::contains(
-				errormsg->getString(),
+				errormsg.getString(),
 				"Error writing data to the connection"));
 
 	// set return values
-	*errorstring=errormsg->getString();
-	// FIXME: get this...
-	*errorcode=0;
+	*errorstring=errormsg.getString();
+	*errorcode=sqlcode;
 }
 
 bool firebirdcursor::knowsRowCount() {

@@ -110,7 +110,7 @@ class firebirdcursor : public sqlrcursor_svr {
 		fieldstruct	field[MAX_SELECT_LIST_SIZE];
 		stringbuffer	fieldbuffer;
 
-		stringbuffer	*errormsg;
+		stringbuffer	errormsg;
 
 		firebirdconnection	*firebirdconn;
 
