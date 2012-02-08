@@ -60,6 +60,7 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga34872269e459b8e93b7a6eb871bc531f">sqlrcon_commit</a> (sqlrcon sqlrconref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga1e6364e69e821134a4ba7777e7e13f60">sqlrcon_rollback</a> (sqlrcon sqlrconref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga89a16bbb0636b1b85e549fc05ee2c4ad">sqlrcon_errorMessage</a> (sqlrcon sqlrconref)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga9c981804cf3b75b335756c1f5badb95a">sqlrcon_errorNumber</a> (sqlrcon sqlrconref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#gad1a66c32165d25c2128300731c29a2c3">sqlrcon_debugOn</a> (sqlrcon sqlrconref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#gad01707bc7afaee4fe1fcad69855f344e">sqlrcon_debugOff</a> (sqlrcon sqlrconref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga61f4737f12a8016a71b46c3bfd55aef6">sqlrcon_getDebug</a> (sqlrcon sqlrconref)</td></tr>
@@ -128,6 +129,7 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga80a613301c0185c78bf40bd18b571346">sqlrcur_firstRowIndex</a> (sqlrcur sqlrcurref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga3caa53c3d673a11231a9c14a97c3acff">sqlrcur_endOfResultSet</a> (sqlrcur sqlrcurref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga14f42b396d0d4265b8d2e790e1d01e88">sqlrcur_errorMessage</a> (sqlrcur sqlrcurref)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga32283d29bba8aec26eb0586fbfe56168">sqlrcur_errorNumber</a> (sqlrcur sqlrcurref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga64f896585e12864d013dc7b8ac7e62ef">sqlrcur_getNullsAsEmptyStrings</a> (sqlrcur sqlrcurref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga0ced72475314909306c18af2165cfb83">sqlrcur_getNullsAsNulls</a> (sqlrcur sqlrcurref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#gae33994c8b3d9cff8d1051964317583d7">sqlrcur_getFieldByIndex</a> (sqlrcur sqlrcurref, uint64_t row, uint32_t col)</td></tr>
@@ -437,6 +439,24 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 <p>If an operation failed and generated an error, the error message is available here. If there is no error then this method returns NULL </p>
+
+</div>
+</div>
+<a class="anchor" id="ga9c981804cf3b75b335756c1f5badb95a"></a><!-- doxytag: member="sqlrclientwrapper.h::sqlrcon_errorNumber" ref="ga9c981804cf3b75b335756c1f5badb95a" args="(sqlrcon sqlrconref)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int64_t sqlrcon_errorNumber </td>
+          <td>(</td>
+          <td class="paramtype">sqlrcon&#160;</td>
+          <td class="paramname"><em>sqlrconref</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>If an operation failed and generated an error, the error number is available here. If there is no error then this method returns 0. </p>
 
 </div>
 </div>
@@ -1097,6 +1117,24 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 <p>If a query failed and generated an error, the error message is available here. If the query succeeded then this function returns a NULL. </p>
+
+</div>
+</div>
+<a class="anchor" id="ga32283d29bba8aec26eb0586fbfe56168"></a><!-- doxytag: member="sqlrclientwrapper.h::sqlrcur_errorNumber" ref="ga32283d29bba8aec26eb0586fbfe56168" args="(sqlrcur sqlrcurref)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int64_t sqlrcur_errorNumber </td>
+          <td>(</td>
+          <td class="paramtype">sqlrcur&#160;</td>
+          <td class="paramname"><em>sqlrcurref</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>If a query failed and generated an error, the error number is available here. If there is no error then this method returns 0. </p>
 
 </div>
 </div>
@@ -3737,7 +3775,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Jan 10 2012 for SQL Relay C API by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Feb 9 2012 for SQL Relay C API by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

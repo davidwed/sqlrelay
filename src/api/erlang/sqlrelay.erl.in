@@ -8,7 +8,7 @@
 -export([start/0, start/1, stop/0]).
 
 -export([alloc/7, connectionFree/0, cursorFree/0, endSession/0, suspendSession/0, resumeSession/2]).
--export([ping/0, identify/0, dbVersion/0, bindFormat/0, connectionErrorMessage/0, errorMessage/0]).
+-export([ping/0, identify/0, dbVersion/0, bindFormat/0, connectionErrorMessage/0, connectionErrorNumber/0, errorMessage/0, errorNumber/0]).
 -export([selectDatabase/1, getCurrentDatabase/0]).
 -export([getConnectionPort/0, getConnectionSocket/0]).
 -export([autoCommitOn/0, autoCommitOff/0, commit/0, rollback/0]).
@@ -278,7 +278,11 @@ endOfResultSet() -> call_port({endOfResultSet}).
 
 connectionErrorMessage() -> call_port({connectionErrorMessage}).
 
+connectionErrorNumber() -> call_port({connectionErrorNumber}).
+
 errorMessage() -> call_port({errorMessage}).
+
+errorNumber() -> call_port({errorNumber}).
 
 getNullsAsEmptyStrings() -> call_port({getNullsAsEmptyStrings}).
 

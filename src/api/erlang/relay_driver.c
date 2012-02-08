@@ -474,6 +474,17 @@ int main() {
 				return ERR_ENCODING_ARGS;
 			}
 		}
+
+		if (strcmp("connectionErrorNumber", command) == TRUE) {
+			// check number of arguments
+		    	if (arity != 0) return ERR_NUMBER_OF_ARGS;
+
+			// encode result 
+			if (ei_x_encode_atom(&result, "ok") || 
+				ei_x_encode_long(&result, sqlrcon_errorNumber(con) )) {
+				return ERR_ENCODING_ARGS;
+			}
+		}
 		
 		if (strcmp("debugOn", command) == TRUE) {
 			// check number of arguments
@@ -1387,6 +1398,17 @@ int main() {
 			// encode result 
 			if (ei_x_encode_atom(&result, "ok") || 
 				ei_x_encode_string(&result, sqlrcur_errorMessage(cur) )) {
+				return ERR_ENCODING_ARGS;
+			}
+		}
+
+		if (strcmp("errorNumber", command) == TRUE) {
+			// check number of arguments
+		    	if (arity != 0) return ERR_NUMBER_OF_ARGS;
+
+			// encode result 
+			if (ei_x_encode_atom(&result, "ok") || 
+				ei_x_encode_long(&result, sqlrcur_errorNumber(cur) )) {
 				return ERR_ENCODING_ARGS;
 			}
 		}
