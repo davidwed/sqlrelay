@@ -124,6 +124,14 @@ proc errorMessage {}
 
 
 
+# If an operation failed and generated an
+# error, the error number is available here.
+# If there is no error then this method 
+# returns 0.
+proc errorNumber {}
+
+
+
 # Causes verbose debugging information to be 
 # sent to standard output.  Another way to do
 # this is to start a query with "-- debug\n".

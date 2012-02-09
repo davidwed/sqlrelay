@@ -44,6 +44,9 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <tr><td><code><a href="#errorMessage">errorMessage</a> {  }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If an operation failed and generated an
  error the error message is available here.</td></tr>
+<tr><td><code><a href="#errorNumber">errorNumber</a> {  }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If an operation failed and generated an
+ error, the error number is available here.</td></tr>
 <tr><td><code><a href="#getConnectionPort">getConnectionPort</a> {  }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the inet port that the connection is 
  communicating over.</td></tr>
@@ -152,7 +155,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc debugOff {  }</pre>
 <dl>
 <dd>Turns debugging off.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOff_135">sqlrconCmd.tcl, line 135</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOff_143">sqlrconCmd.tcl, line 143</a>
 </dl></dl>
 
 <hr>
@@ -164,7 +167,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  this is to start a query with "-- debug\n".
  Another way is to set the environment variable
  SQLRDEBUG to "ON"<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOn_132">sqlrconCmd.tcl, line 132</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOn_140">sqlrconCmd.tcl, line 140</a>
 </dl></dl>
 
 <hr>
@@ -184,6 +187,17 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  If there is no error then this method 
  returns NULL.<dl>
 <dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorMessage_123">sqlrconCmd.tcl, line 123</a>
+</dl></dl>
+
+<hr>
+<h3><a name="errorNumber">errorNumber</a></h3>
+<pre>proc errorNumber {  }</pre>
+<dl>
+<dd>If an operation failed and generated an
+ error, the error number is available here.
+ If there is no error then this method 
+ returns 0.<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorNumber_131">sqlrconCmd.tcl, line 131</a>
 </dl></dl>
 
 <hr>
@@ -226,7 +240,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Returns false if debugging is off and true
  if debugging is on.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getDebug_139">sqlrconCmd.tcl, line 139</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getDebug_147">sqlrconCmd.tcl, line 147</a>
 </dl></dl>
 
 <hr>
@@ -349,7 +363,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2012-01-10 at 06:42.</cite>
+<cite>File generated 2012-02-09 at 10:01.</cite>
 </font>
 </body>
 </html>

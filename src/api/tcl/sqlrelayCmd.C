@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.33 2012-01-18 03:23:13 mused Exp $
+ * $Id: sqlrelayCmd.C,v 1.34 2012-02-09 03:04:52 mused Exp $
  */
 
 #include <tcl.h>
@@ -115,6 +115,7 @@ void sqlrcurDelete(ClientData data) {
  *   $cur firstRowIndex
  *   $cur endOfResultSet
  *   $cur errorMessage
+ *   $cur errorNumber
  *   $cur getFieldByIndex row col
  *   $cur getFieldByName row col
  *   $cur getFieldAsIntegerByIndex row col
@@ -218,6 +219,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     "firstRowIndex",
     "endOfResultSet",
     "errorMessage",
+    "errorNumber",
     "getFieldByIndex",
     "getFieldByName",
     "getFieldAsIntegerByIndex",
@@ -315,6 +317,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     SQLRCUR_firstRowIndex,
     SQLRCUR_endOfResultSet,
     SQLRCUR_errorMessage,
+    SQLRCUR_errorNumber,
     SQLRCUR_getFieldByIndex,
     SQLRCUR_getFieldByName,
     SQLRCUR_getFieldAsIntegerByIndex,
@@ -1142,6 +1145,15 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	Tcl_SetObjResult(interp, Tcl_NewStringObj(msg, -1));
 	break;
       }
+    case SQLRCUR_errorNumber:
+      {
+	if (objc > 2) {
+	  Tcl_WrongNumArgs(interp, 2, objv, NULL);
+	  return TCL_ERROR;
+	}
+	Tcl_SetObjResult(interp, Tcl_NewLongObj(cur->errorNumber()));
+	break;
+      }
       /*
     case SQLRCUR_getNullsAsEmptyStrings:
     case SQLRCUR_getNullsAsNulls:
@@ -1860,6 +1872,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     SQLR_COMMIT,
     SQLR_ROLLBACK,
     SQLR_ERRORMESSAGE,
+    SQLR_ERRORNUMBER,
     SQLR_DEBUG,
     SQLR_SQLRCUR,
   };
@@ -2066,6 +2079,14 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       return TCL_ERROR;
     }
     Tcl_SetObjResult(interp,Tcl_NewStringObj(con->errorMessage(), -1));
+    break;
+  }
+  case SQLR_ERRORNUMBER: {
+    if (objc > 2) {
+      Tcl_WrongNumArgs(interp, 2, objv, NULL);
+      return TCL_ERROR;
+    }
+    Tcl_SetObjResult(interp, Tcl_NewLongObj(con->errorNumber()));
     break;
   }
   case SQLR_DEBUG: {

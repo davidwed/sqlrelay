@@ -302,68 +302,76 @@ Index by:  <a href="index_main.html#sqlrcurCmd.tcl">file name</a> |
 
 
 
+<font color="#208020"># If a query failed and generated an</font>
+<font color="#208020"># error, the error number is available here.</font>
+<font color="#208020"># If there is no error then this method </font>
+<font color="#208020"># returns 0.</font>
+<strong><a name="errorNumber_293">proc <a href="sqlrcurCmd.tcl-annot.html#errorNumber">errorNumber</a></a></strong><a name="errorNumber"></a> {}
+
+
+
 <font color="#208020"># Returns the specified field as a string.</font>
-<strong><a name="getFieldByIndex_290">proc <a href="sqlrcurCmd.tcl-annot.html#getFieldByIndex">getFieldByIndex</a></a></strong><a name="getFieldByIndex"></a> {row  col} 
+<strong><a name="getFieldByIndex_298">proc <a href="sqlrcurCmd.tcl-annot.html#getFieldByIndex">getFieldByIndex</a></a></strong><a name="getFieldByIndex"></a> {row  col} 
 
 <font color="#208020"># Returns the specified field as a string</font>
-<strong><a name="getFieldByName_293">proc <a href="sqlrcurCmd.tcl-annot.html#getFieldByName">getFieldByName</a></a></strong><a name="getFieldByName"></a> {row col} 
+<strong><a name="getFieldByName_301">proc <a href="sqlrcurCmd.tcl-annot.html#getFieldByName">getFieldByName</a></a></strong><a name="getFieldByName"></a> {row col} 
 
 <font color="#208020"># Returns the specified field as an integer.</font>
-<strong><a name="getFieldAsIntegerByIndex_296">proc <a href="sqlrcurCmd.tcl-annot.html#getFieldAsIntegerByIndex">getFieldAsIntegerByIndex</a></a></strong><a name="getFieldAsIntegerByIndex"></a> {row  col} 
+<strong><a name="getFieldAsIntegerByIndex_304">proc <a href="sqlrcurCmd.tcl-annot.html#getFieldAsIntegerByIndex">getFieldAsIntegerByIndex</a></a></strong><a name="getFieldAsIntegerByIndex"></a> {row  col} 
 
 <font color="#208020"># Returns the specified field as an integer.</font>
-<strong><a name="getFieldAsIntegerByName_299">proc <a href="sqlrcurCmd.tcl-annot.html#getFieldAsIntegerByName">getFieldAsIntegerByName</a></a></strong><a name="getFieldAsIntegerByName"></a> {row col} 
+<strong><a name="getFieldAsIntegerByName_307">proc <a href="sqlrcurCmd.tcl-annot.html#getFieldAsIntegerByName">getFieldAsIntegerByName</a></a></strong><a name="getFieldAsIntegerByName"></a> {row col} 
 
 <font color="#208020"># Returns the specified field as a decimal.</font>
-<strong><a name="getFieldAsDoubleByIndex_302">proc <a href="sqlrcurCmd.tcl-annot.html#getFieldAsDoubleByIndex">getFieldAsDoubleByIndex</a></a></strong><a name="getFieldAsDoubleByIndex"></a> {row  col} 
+<strong><a name="getFieldAsDoubleByIndex_310">proc <a href="sqlrcurCmd.tcl-annot.html#getFieldAsDoubleByIndex">getFieldAsDoubleByIndex</a></a></strong><a name="getFieldAsDoubleByIndex"></a> {row  col} 
 
 <font color="#208020"># Returns the specified field as a decimal.</font>
-<strong><a name="getFieldAsDoubleByName_305">proc <a href="sqlrcurCmd.tcl-annot.html#getFieldAsDoubleByName">getFieldAsDoubleByName</a></a></strong><a name="getFieldAsDoubleByName"></a> {row col} 
+<strong><a name="getFieldAsDoubleByName_313">proc <a href="sqlrcurCmd.tcl-annot.html#getFieldAsDoubleByName">getFieldAsDoubleByName</a></a></strong><a name="getFieldAsDoubleByName"></a> {row col} 
 
 
 
 <font color="#208020"># Returns the length of the specified field.</font>
-<strong><a name="getFieldLengthByIndex_310">proc <a href="sqlrcurCmd.tcl-annot.html#getFieldLengthByIndex">getFieldLengthByIndex</a></a></strong><a name="getFieldLengthByIndex"></a> {row  col} 
+<strong><a name="getFieldLengthByIndex_318">proc <a href="sqlrcurCmd.tcl-annot.html#getFieldLengthByIndex">getFieldLengthByIndex</a></a></strong><a name="getFieldLengthByIndex"></a> {row  col} 
 
 <font color="#208020"># Returns the length of the specified field.</font>
-<strong><a name="getFieldLengthByName_313">proc <a href="sqlrcurCmd.tcl-annot.html#getFieldLengthByName">getFieldLengthByName</a></a></strong><a name="getFieldLengthByName"></a> {row col} 
+<strong><a name="getFieldLengthByName_321">proc <a href="sqlrcurCmd.tcl-annot.html#getFieldLengthByName">getFieldLengthByName</a></a></strong><a name="getFieldLengthByName"></a> {row col} 
 
 
 
 <font color="#208020"># Returns a null terminated array of the </font>
 <font color="#208020"># values of the fields in the specified row.</font>
-<strong><a name="getRow_319">proc <a href="sqlrcurCmd.tcl-annot.html#getRow">getRow</a></a></strong><a name="getRow"></a> {row} 
+<strong><a name="getRow_327">proc <a href="sqlrcurCmd.tcl-annot.html#getRow">getRow</a></a></strong><a name="getRow"></a> {row} 
 
 <font color="#208020"># Returns a null terminated array of the </font>
 <font color="#208020"># lengths of the fields in the specified row.</font>
-<strong><a name="getRowLengths_323">proc <a href="sqlrcurCmd.tcl-annot.html#getRowLengths">getRowLengths</a></a></strong><a name="getRowLengths"></a> {row} 
+<strong><a name="getRowLengths_331">proc <a href="sqlrcurCmd.tcl-annot.html#getRowLengths">getRowLengths</a></a></strong><a name="getRowLengths"></a> {row} 
 
 <font color="#208020"># Returns a null terminated array of the </font>
 <font color="#208020"># column names of the current result set.</font>
-<strong><a name="getColumnNames_327">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnNames">getColumnNames</a></a></strong><a name="getColumnNames"></a> {} 
+<strong><a name="getColumnNames_335">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnNames">getColumnNames</a></a></strong><a name="getColumnNames"></a> {} 
 
 <font color="#208020"># Returns the name of the specified column.</font>
-<strong><a name="getColumnName_330">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnName">getColumnName</a></a></strong><a name="getColumnName"></a> {col} 
+<strong><a name="getColumnName_338">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnName">getColumnName</a></a></strong><a name="getColumnName"></a> {col} 
 
 <font color="#208020"># Returns the name of the specified column.</font>
-<strong><a name="getColumnNameByIndex_333">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnNameByIndex">getColumnNameByIndex</a></a></strong><a name="getColumnNameByIndex"></a> {col} 
+<strong><a name="getColumnNameByIndex_341">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnNameByIndex">getColumnNameByIndex</a></a></strong><a name="getColumnNameByIndex"></a> {col} 
 
 <font color="#208020"># Returns the type of the specified column.</font>
-<strong><a name="getColumnTypeByName_336">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnTypeByName">getColumnTypeByName</a></a></strong> {col} 
+<strong><a name="getColumnTypeByName_344">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnTypeByName">getColumnTypeByName</a></a></strong> {col} 
 
 <font color="#208020"># Returns the type of the specified column.</font>
-<strong><a name="getColumnTypeByIndex_339">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnTypeByIndex">getColumnTypeByIndex</a></a></strong><a name="getColumnTypeByIndex"></a> {col} 
+<strong><a name="getColumnTypeByIndex_347">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnTypeByIndex">getColumnTypeByIndex</a></a></strong><a name="getColumnTypeByIndex"></a> {col} 
 
 <font color="#208020"># Returns the type of the specified column.</font>
-<strong><a name="getColumnTypeByName_342">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnTypeByName">getColumnTypeByName</a></a></strong><a name="getColumnTypeByName"></a> {col} 
+<strong><a name="getColumnTypeByName_350">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnTypeByName">getColumnTypeByName</a></a></strong><a name="getColumnTypeByName"></a> {col} 
 
 <font color="#208020"># Returns the number of bytes required on</font>
 <font color="#208020"># the server to store the data for the specified column</font>
-<strong><a name="getColumnLengthByIndex_346">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnLengthByIndex">getColumnLengthByIndex</a></a></strong><a name="getColumnLengthByIndex"></a> {col} 
+<strong><a name="getColumnLengthByIndex_354">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnLengthByIndex">getColumnLengthByIndex</a></a></strong><a name="getColumnLengthByIndex"></a> {col} 
 
 <font color="#208020"># Returns the number of bytes required on</font>
 <font color="#208020"># the server to store the data for the specified column</font>
-<strong><a name="getColumnLengthByName_350">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnLengthByName">getColumnLengthByName</a></a></strong><a name="getColumnLengthByName"></a> {col} 
+<strong><a name="getColumnLengthByName_358">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnLengthByName">getColumnLengthByName</a></a></strong><a name="getColumnLengthByName"></a> {col} 
 
 <font color="#208020"># Returns the precision of the specified</font>
 <font color="#208020"># column.</font>
@@ -371,7 +379,7 @@ Index by:  <a href="index_main.html#sqlrcurCmd.tcl">file name</a> |
 <font color="#208020"># a number.  eg: 123.45 has a precision of 5.</font>
 <font color="#208020"># For non-numeric types it's the number of</font>
 <font color="#208020"># characters in the string.</font>
-<strong><a name="getColumnPrecisionByIndex_358">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnPrecisionByIndex">getColumnPrecisionByIndex</a></a></strong><a name="getColumnPrecisionByIndex"></a> {col} 
+<strong><a name="getColumnPrecisionByIndex_366">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnPrecisionByIndex">getColumnPrecisionByIndex</a></a></strong><a name="getColumnPrecisionByIndex"></a> {col} 
 
 <font color="#208020"># Returns the precision of the specified</font>
 <font color="#208020"># column.</font>
@@ -379,95 +387,95 @@ Index by:  <a href="index_main.html#sqlrcurCmd.tcl">file name</a> |
 <font color="#208020"># a number.  eg: 123.45 has a precision of 5.</font>
 <font color="#208020"># For non-numeric types it's the number of</font>
 <font color="#208020"># characters in the string.</font>
-<strong><a name="getColumnPrecisionByName_366">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnPrecisionByName">getColumnPrecisionByName</a></a></strong><a name="getColumnPrecisionByName"></a> {col} 
+<strong><a name="getColumnPrecisionByName_374">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnPrecisionByName">getColumnPrecisionByName</a></a></strong><a name="getColumnPrecisionByName"></a> {col} 
 
 <font color="#208020"># Returns the scale of the specified column.</font>
 <font color="#208020"># Scale is the total number of digits to the</font>
 <font color="#208020"># right of the decimal point in a number.</font>
 <font color="#208020"># eg: 123.45 has a scale of 2.</font>
-<strong><a name="getColumnScaleByIndex_372">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnScaleByIndex">getColumnScaleByIndex</a></a></strong><a name="getColumnScaleByIndex"></a> {col} 
+<strong><a name="getColumnScaleByIndex_380">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnScaleByIndex">getColumnScaleByIndex</a></a></strong><a name="getColumnScaleByIndex"></a> {col} 
 
 <font color="#208020"># Returns the scale of the specified column.</font>
 <font color="#208020"># Scale is the total number of digits to the</font>
 <font color="#208020"># right of the decimal point in a number.</font>
 <font color="#208020"># eg: 123.45 has a scale of 2.</font>
-<strong><a name="getColumnScaleByName_378">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnScaleByName">getColumnScaleByName</a></a></strong><a name="getColumnScaleByName"></a> {col} 
+<strong><a name="getColumnScaleByName_386">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnScaleByName">getColumnScaleByName</a></a></strong><a name="getColumnScaleByName"></a> {col} 
 
 <font color="#208020"># Returns true if the specified column can</font>
 <font color="#208020"># contain nulls and false otherwise.</font>
-<strong><a name="getColumnIsNullableByIndex_382">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsNullableByIndex">getColumnIsNullableByIndex</a></a></strong><a name="getColumnIsNullableByIndex"></a> {col} 
+<strong><a name="getColumnIsNullableByIndex_390">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsNullableByIndex">getColumnIsNullableByIndex</a></a></strong><a name="getColumnIsNullableByIndex"></a> {col} 
 
 <font color="#208020"># Returns true if the specified column can</font>
 <font color="#208020"># contain nulls and false otherwise.</font>
-<strong><a name="getColumnIsNullableByName_386">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsNullableByName">getColumnIsNullableByName</a></a></strong><a name="getColumnIsNullableByName"></a> {col} 
+<strong><a name="getColumnIsNullableByName_394">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsNullableByName">getColumnIsNullableByName</a></a></strong><a name="getColumnIsNullableByName"></a> {col} 
 
 <font color="#208020"># Returns true if the specified column is a</font>
 <font color="#208020"># primary key and false otherwise.</font>
-<strong><a name="getColumnIsPrimaryKeyByIndex_390">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsPrimaryKeyByIndex">getColumnIsPrimaryKeyByIndex</a></a></strong><a name="getColumnIsPrimaryKeyByIndex"></a> {col} 
+<strong><a name="getColumnIsPrimaryKeyByIndex_398">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsPrimaryKeyByIndex">getColumnIsPrimaryKeyByIndex</a></a></strong><a name="getColumnIsPrimaryKeyByIndex"></a> {col} 
 
 <font color="#208020"># Returns true if the specified column is a</font>
 <font color="#208020"># primary key and false otherwise.</font>
-<strong><a name="getColumnIsPrimaryKeyByName_394">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsPrimaryKeyByName">getColumnIsPrimaryKeyByName</a></a></strong><a name="getColumnIsPrimaryKeyByName"></a> {col} 
+<strong><a name="getColumnIsPrimaryKeyByName_402">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsPrimaryKeyByName">getColumnIsPrimaryKeyByName</a></a></strong><a name="getColumnIsPrimaryKeyByName"></a> {col} 
 
 <font color="#208020"># Returns true if the specified column is</font>
  	<font color="#208020"># unique and false otherwise.</font>
-<strong><a name="getColumnIsUniqueByIndex_398">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsUniqueByIndex">getColumnIsUniqueByIndex</a></a></strong><a name="getColumnIsUniqueByIndex"></a> {col} 
+<strong><a name="getColumnIsUniqueByIndex_406">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsUniqueByIndex">getColumnIsUniqueByIndex</a></a></strong><a name="getColumnIsUniqueByIndex"></a> {col} 
 
 <font color="#208020"># Returns true if the specified column is</font>
  	<font color="#208020"># unique and false otherwise.</font>
-<strong><a name="getColumnIsUniqueByName_402">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsUniqueByName">getColumnIsUniqueByName</a></a></strong><a name="getColumnIsUniqueByName"></a> {col} 
+<strong><a name="getColumnIsUniqueByName_410">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsUniqueByName">getColumnIsUniqueByName</a></a></strong><a name="getColumnIsUniqueByName"></a> {col} 
 
 <font color="#208020"># Returns true if the specified column is</font>
 <font color="#208020"># part of a composite key and false otherwise.</font>
-<strong><a name="getColumnIsPartOfKeyByIndex_406">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsPartOfKeyByIndex">getColumnIsPartOfKeyByIndex</a></a></strong><a name="getColumnIsPartOfKeyByIndex"></a> {col} 
+<strong><a name="getColumnIsPartOfKeyByIndex_414">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsPartOfKeyByIndex">getColumnIsPartOfKeyByIndex</a></a></strong><a name="getColumnIsPartOfKeyByIndex"></a> {col} 
 
 <font color="#208020"># Returns true if the specified column is</font>
 <font color="#208020"># part of a composite key and false otherwise.</font>
-<strong><a name="getColumnIsPartOfKeyByName_410">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsPartOfKeyByName">getColumnIsPartOfKeyByName</a></a></strong><a name="getColumnIsPartOfKeyByName"></a> {col} 
+<strong><a name="getColumnIsPartOfKeyByName_418">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsPartOfKeyByName">getColumnIsPartOfKeyByName</a></a></strong><a name="getColumnIsPartOfKeyByName"></a> {col} 
 
 <font color="#208020"># Returns true if the specified column is</font>
 <font color="#208020"># an unsigned number and false otherwise.</font>
-<strong><a name="getColumnIsUnsignedByIndex_414">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsUnsignedByIndex">getColumnIsUnsignedByIndex</a></a></strong><a name="getColumnIsUnsignedByIndex"></a> {col} 
+<strong><a name="getColumnIsUnsignedByIndex_422">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsUnsignedByIndex">getColumnIsUnsignedByIndex</a></a></strong><a name="getColumnIsUnsignedByIndex"></a> {col} 
 
 <font color="#208020"># Returns true if the specified column is</font>
 <font color="#208020"># an unsigned number and false otherwise.</font>
-<strong><a name="getColumnIsUnsignedByName_418">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsUnsignedByName">getColumnIsUnsignedByName</a></a></strong><a name="getColumnIsUnsignedByName"></a> {col} 
+<strong><a name="getColumnIsUnsignedByName_426">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsUnsignedByName">getColumnIsUnsignedByName</a></a></strong><a name="getColumnIsUnsignedByName"></a> {col} 
 
 <font color="#208020"># Returns true if the specified column was</font>
 <font color="#208020"># created with the zero-fill flag and false</font>
 <font color="#208020"># otherwise.</font>
-<strong><a name="getColumnIsZeroFilledByIndex_423">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsZeroFilledByIndex">getColumnIsZeroFilledByIndex</a></a></strong><a name="getColumnIsZeroFilledByIndex"></a> {col} 
+<strong><a name="getColumnIsZeroFilledByIndex_431">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsZeroFilledByIndex">getColumnIsZeroFilledByIndex</a></a></strong><a name="getColumnIsZeroFilledByIndex"></a> {col} 
 
 <font color="#208020"># Returns true if the specified column was</font>
 <font color="#208020"># created with the zero-fill flag and false</font>
 <font color="#208020"># otherwise.</font>
-<strong><a name="getColumnIsZeroFilledByName_428">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsZeroFilledByName">getColumnIsZeroFilledByName</a></a></strong><a name="getColumnIsZeroFilledByName"></a> {col} 
+<strong><a name="getColumnIsZeroFilledByName_436">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsZeroFilledByName">getColumnIsZeroFilledByName</a></a></strong><a name="getColumnIsZeroFilledByName"></a> {col} 
 
 <font color="#208020"># Returns true if the specified column</font>
 <font color="#208020"># contains binary data and false</font>
 <font color="#208020"># otherwise.</font>
-<strong><a name="getColumnIsBinaryByIndex_433">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsBinaryByIndex">getColumnIsBinaryByIndex</a></a></strong><a name="getColumnIsBinaryByIndex"></a> {col} 
+<strong><a name="getColumnIsBinaryByIndex_441">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsBinaryByIndex">getColumnIsBinaryByIndex</a></a></strong><a name="getColumnIsBinaryByIndex"></a> {col} 
 
 <font color="#208020"># Returns true if the specified column</font>
 <font color="#208020"># contains binary data and false</font>
 <font color="#208020"># otherwise.</font>
-<strong><a name="getColumnIsBinaryByName_438">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsBinaryByName">getColumnIsBinaryByName</a></a></strong><a name="getColumnIsBinaryByName"></a> {col} 
+<strong><a name="getColumnIsBinaryByName_446">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsBinaryByName">getColumnIsBinaryByName</a></a></strong><a name="getColumnIsBinaryByName"></a> {col} 
 
 <font color="#208020"># Returns true if the specified column</font>
 <font color="#208020"># auto-increments and false otherwise.</font>
-<strong><a name="getColumnIsAutoIncrementByIndex_442">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsAutoIncrementByIndex">getColumnIsAutoIncrementByIndex</a></a></strong><a name="getColumnIsAutoIncrementByIndex"></a> {col} 
+<strong><a name="getColumnIsAutoIncrementByIndex_450">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsAutoIncrementByIndex">getColumnIsAutoIncrementByIndex</a></a></strong><a name="getColumnIsAutoIncrementByIndex"></a> {col} 
 
 <font color="#208020"># Returns true if the specified column</font>
 <font color="#208020"># auto-increments and false otherwise.</font>
-<strong><a name="getColumnIsAutoIncrementByName_446">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsAutoIncrementByName">getColumnIsAutoIncrementByName</a></a></strong><a name="getColumnIsAutoIncrementByName"></a> {col} 
+<strong><a name="getColumnIsAutoIncrementByName_454">proc <a href="sqlrcurCmd.tcl-annot.html#getColumnIsAutoIncrementByName">getColumnIsAutoIncrementByName</a></a></strong><a name="getColumnIsAutoIncrementByName"></a> {col} 
 
 <font color="#208020"># Returns the length of the longest field</font>
 <font color="#208020"># in the specified column.</font>
-<strong><a name="getLongestByIndex_450">proc <a href="sqlrcurCmd.tcl-annot.html#getLongestByIndex">getLongestByIndex</a></a></strong><a name="getLongestByIndex"></a> {col} 
+<strong><a name="getLongestByIndex_458">proc <a href="sqlrcurCmd.tcl-annot.html#getLongestByIndex">getLongestByIndex</a></a></strong><a name="getLongestByIndex"></a> {col} 
 
 <font color="#208020"># Returns the length of the longest field</font>
 <font color="#208020"># in the specified column.</font>
-<strong><a name="getLongestByName_454">proc <a href="sqlrcurCmd.tcl-annot.html#getLongestByName">getLongestByName</a></a></strong><a name="getLongestByName"></a> {col} 
+<strong><a name="getLongestByName_462">proc <a href="sqlrcurCmd.tcl-annot.html#getLongestByName">getLongestByName</a></a></strong><a name="getLongestByName"></a> {col} 
 
 
 
@@ -476,7 +484,7 @@ Index by:  <a href="index_main.html#sqlrcurCmd.tcl">file name</a> |
 <font color="#208020"># suspendSession so that another connection </font>
 <font color="#208020"># can connect to it using resumeResultSet </font>
 <font color="#208020"># after it calls resumeSession.</font>
-<strong><a name="suspendResultSet_463">proc <a href="sqlrcurCmd.tcl-annot.html#suspendResultSet">suspendResultSet</a></a></strong><a name="suspendResultSet"></a> {} 
+<strong><a name="suspendResultSet_471">proc <a href="sqlrcurCmd.tcl-annot.html#suspendResultSet">suspendResultSet</a></a></strong><a name="suspendResultSet"></a> {} 
 
 <font color="#208020"># Returns the internal ID of this result set.</font>
 <font color="#208020"># This parameter may be passed to another </font>
@@ -484,18 +492,18 @@ Index by:  <a href="index_main.html#sqlrcurCmd.tcl">file name</a> |
 <font color="#208020"># method.</font>
 <font color="#208020"># Note: The value this method returns is only</font>
 <font color="#208020"># valid after a call to suspendResultSet.</font>
-<strong><a name="getResultSetId_471">proc <a href="sqlrcurCmd.tcl-annot.html#getResultSetId">getResultSetId</a></a></strong><a name="getResultSetId"></a> {} 
+<strong><a name="getResultSetId_479">proc <a href="sqlrcurCmd.tcl-annot.html#getResultSetId">getResultSetId</a></a></strong><a name="getResultSetId"></a> {} 
 
 <font color="#208020"># Resumes a result set previously left open </font>
 <font color="#208020"># using suspendSession.</font>
 <font color="#208020"># Returns true on success and false on failure.</font>
-<strong><a name="resumeResultSet_476">proc <a href="sqlrcurCmd.tcl-annot.html#resumeResultSet">resumeResultSet</a></a></strong><a name="resumeResultSet"></a> {id} 
+<strong><a name="resumeResultSet_484">proc <a href="sqlrcurCmd.tcl-annot.html#resumeResultSet">resumeResultSet</a></a></strong><a name="resumeResultSet"></a> {id} 
 
 <font color="#208020"># Resumes a result set previously left open</font>
 <font color="#208020"># using suspendSession and continues caching</font>
 <font color="#208020"># the result set to &#34;filename&#34;.</font>
 <font color="#208020"># Returns true on success and false on failure.</font>
-<strong><a name="resumeCachedResultSet_482">proc <a href="sqlrcurCmd.tcl-annot.html#resumeCachedResultSet">resumeCachedResultSet</a></a></strong><a name="resumeCachedResultSet"></a> {id filename} 
+<strong><a name="resumeCachedResultSet_490">proc <a href="sqlrcurCmd.tcl-annot.html#resumeCachedResultSet">resumeCachedResultSet</a></a></strong><a name="resumeCachedResultSet"></a> {id filename} 
 </pre>
 <hr>
 <font size="-2">
@@ -503,7 +511,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2012-01-10 at 06:42.</cite>
+<cite>File generated 2012-02-09 at 10:01.</cite>
 </font>
 </body>
 </html>

@@ -286,6 +286,14 @@ proc errorMessage {}
 
 
 
+# If a query failed and generated an
+# error, the error number is available here.
+# If there is no error then this method 
+# returns 0.
+proc errorNumber {}
+
+
+
 # Returns the specified field as a string.
 proc getFieldByIndex {row  col} 
 
