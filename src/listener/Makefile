@@ -13,13 +13,12 @@ ifeq ($(SERVERUSERPATH),yes)
 endif
 endif
 
-SRCS = sqlrlistener.C main.C
+SRCS = sqlrlistener.cpp main.cpp
 LOBJS = sqlrlistener.lo main.lo
-DLOBJS = sqlrlistener.d.lo main.d.lo
 
-.SUFFIXES: .lo .d.lo
+.SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: sqlr-listener$(EXE)
