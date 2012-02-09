@@ -125,6 +125,12 @@ function sqlrcon_rollback($sqlrconref){}
 function sqlrcon_errorMessage($sqlrconref){}
 
 
+/**
+ *  If an operation failed and generated an error, the error number is
+ *  available here.  If there is no error then this method returns 0. */
+function sqlrcon_errorNumber($sqlrconref){}
+
+
 
 /** 
  *  Causes verbose debugging information to be sent to standard output.
@@ -444,6 +450,12 @@ function sqlrcur_endOfResultSet($sqlrcurref){}
  *  If a query failed and generated an error, the error message is available
  *  here.  If the query succeeded then this function returns a NULL. */
 function sqlrcur_errorMessage($sqlrcurref){}
+
+
+/**
+ *  If a query failed and generated an error, the error number is available
+ *  here.  If there is no error then this method returns 0. */
+function sqlrcur_errorNumber($sqlrcurref){}
 
 
 
