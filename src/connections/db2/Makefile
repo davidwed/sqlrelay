@@ -17,13 +17,12 @@ ifeq ($(SERVERUSERPATH),yes)
 endif
 endif
 
-SRCS= db2connection.C main.C
+SRCS= db2connection.cpp main.cpp
 LOBJS= db2connection.lo main.lo
-DLOBJS= db2connection.d.lo main.d.lo
 
-.SUFFIXES: .lo .d.lo
+.SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: sqlr-connection-db2$(EXE)

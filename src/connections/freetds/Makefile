@@ -17,13 +17,12 @@ ifeq ($(SERVERUSERPATH),yes)
 endif
 endif
 
-SRCS= freetdsconnection.C main.C
+SRCS= freetdsconnection.cpp main.cpp
 LOBJS= freetdsconnection.lo main.lo
-DLOBJS= freetdsconnection.d.lo main.d.lo
 
-.SUFFIXES: .lo .d.lo
+.SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: sqlr-connection-freetds$(EXE)

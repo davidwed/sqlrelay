@@ -13,12 +13,12 @@ ifeq ($(CLIENTUSERPATH),yes)
 endif
 endif
 
-SRCS = main.C
+SRCS = main.cpp
 LOBJS = main.lo
 
 .SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: sqlr-start$(EXE)

@@ -17,16 +17,12 @@ ifeq ($(SERVERUSERPATH),yes)
 endif
 endif
 
-SRCS= firebirdconnection.C main.C
+SRCS= firebirdconnection.cpp main.cpp
 LOBJS= firebirdconnection.lo main.lo
-DLOBJS= firebirdconnection.d.lo main.d.lo
 
 .SUFFIXES: .lo .d.lo
 
-.C.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-
-.C.d.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: sqlr-connection-firebird$(EXE)

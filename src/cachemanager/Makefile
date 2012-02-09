@@ -13,12 +13,12 @@ ifeq ($(SERVERUSERPATH),yes)
 endif
 endif
 
-SRCS = cachemanager.C main.C
+SRCS = cachemanager.cpp main.cpp
 LOBJS = cachemanager.lo main.lo
 
 .SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: sqlr-cachemanager$(EXE)

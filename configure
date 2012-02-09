@@ -703,7 +703,7 @@ PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 PACKAGE_URL=
 
-ac_unique_file="src/listener/sqlrlistener.C"
+ac_unique_file="src/listener/sqlrlistener.cpp"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>

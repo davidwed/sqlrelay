@@ -15,7 +15,7 @@ endif
 
 .SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: query$(EXE) fields$(EXE) sqlrsh$(EXE) sqlr-export$(EXE) sqlr-import$(EXE)
@@ -30,19 +30,19 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlrsh$(EXE)
 	$(RMTREE) .libs
 
-query$(EXE): query.C query.lo
+query$(EXE): query.cpp query.lo
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ query.lo $(LIBS) $(RPATH)
 
-sqlr-export$(EXE): sqlr-export.C sqlr-export.lo
+sqlr-export$(EXE): sqlr-export.cpp sqlr-export.lo
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-export.lo $(LIBS) $(RPATH)
 
-sqlr-import$(EXE): sqlr-import.C sqlr-import.lo
+sqlr-import$(EXE): sqlr-import.cpp sqlr-import.lo
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-import.lo $(LIBS) $(RPATH)
 
-fields$(EXE): fields.C fields.lo
+fields$(EXE): fields.cpp fields.lo
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ fields.lo $(LIBS) $(RPATH)
 
-sqlrsh$(EXE): sqlrsh.C sqlrsh.lo 
+sqlrsh$(EXE): sqlrsh.cpp sqlrsh.lo 
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.lo $(LIBS) $(READLINELIB) $(RPATH)
 
 install:
