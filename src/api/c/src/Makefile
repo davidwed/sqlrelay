@@ -12,12 +12,12 @@ ifeq ($(CUSERPATH),yes)
 endif
 endif
 
-SRCS = sqlrclientwrapper.C
+SRCS = sqlrclientwrapper.cpp
 LOBJS = sqlrclientwrapper.lo
 
 .SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: libsqlrclientwrapper.la
