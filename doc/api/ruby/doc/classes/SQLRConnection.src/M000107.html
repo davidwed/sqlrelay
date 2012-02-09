@@ -5,13 +5,15 @@
 
 <html>
 <head>
-  <title>getDebug (SQLRConnection)</title>
+  <title>debugOn (SQLRConnection)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre>/** Returns 0 if debugging is off and 1 if debugging is on. */
-static VALUE sqlrcon_getDebug(VALUE self) {
+  <pre>/** Causes verbose debugging information to be sent to standard output.
+ *  Another way to do this is to start a query with &quot;-- debug\n&quot;.  Yet
+ *  another way is to set the environment variable SQLRDEBUG to &quot;ON&quot; */
+static VALUE sqlrcon_debugOn(VALUE self) {
 </pre>
 </body>
 </html>

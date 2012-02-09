@@ -260,6 +260,14 @@ static VALUE sqlrcon_errorMessage(VALUE self) {
 	}
 }
 
+/** If an operation failed and generated an error, the error number is
+ *  available here.  If there is no error then this method returns 0. */
+static VALUE sqlrcon_errorNumber(VALUE self) {
+	sqlrconnection *sqlrcon;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	return INT2NUM(sqlrcon->errorNumber());
+}
+
 /** Causes verbose debugging information to be sent to standard output.
  *  Another way to do this is to start a query with "-- debug\n".  Yet
  *  another way is to set the environment variable SQLRDEBUG to "ON" */
@@ -334,6 +342,8 @@ void Init_SQLRConnection() {
 				(CAST)sqlrcon_rollback,0);
 	rb_define_method(csqlrconnection,"errorMessage",
 				(CAST)sqlrcon_errorMessage,0);
+	rb_define_method(csqlrconnection,"errorNumber",
+				(CAST)sqlrcon_errorNumber,0);
 	rb_define_method(csqlrconnection,"debugOn",
 				(CAST)sqlrcon_debugOn,0);
 	rb_define_method(csqlrconnection,"debugOff",
@@ -1146,6 +1156,14 @@ static VALUE sqlrcur_errorMessage(VALUE self) {
 	}
 }
 
+/** If a query failed and generated an error, the error number is
+ *  available here.  If there is no error then this method returns 0. */
+static VALUE sqlrcur_errorNumber(VALUE self) {
+	sqlrcursor *sqlrcur;
+	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	return INT2NUM(sqlrcur->errorNumber());
+}
+
 /** Tells the connection to return NULL fields and output bind variables as
  *  empty strings.  This is the default. */
 static VALUE sqlrcur_getNullsAsEmptyStrings(VALUE self) {
@@ -1739,6 +1757,8 @@ void Init_SQLRCursor() {
 				(CAST)sqlrcur_endOfResultSet,0);
 	rb_define_method(csqlrcursor,"errorMessage",
 				(CAST)sqlrcur_errorMessage,0);
+	rb_define_method(csqlrcursor,"errorNumber",
+				(CAST)sqlrcur_errorNumber,0);
 	rb_define_method(csqlrcursor,"getNullsAsEmptyStrings",
 				(CAST)sqlrcur_getNullsAsEmptyStrings,0);
 	rb_define_method(csqlrcursor,"getNullsAsNils",

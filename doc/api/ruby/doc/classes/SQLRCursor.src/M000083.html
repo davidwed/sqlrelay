@@ -5,20 +5,18 @@
 
 <html>
 <head>
-  <title>resumeCachedResultSet (SQLRCursor)</title>
+  <title>resumeResultSet (SQLRCursor)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
   <pre>/**
  *  call-seq:
- *  resumeCachedResultSet(id,filename)
+ *  resumeResultSet(id)
  *
- *  Resumes a result set previously left open using suspendSession() and
- *  continues caching the result set to &quot;filename&quot;.  Returns 1 on success and 0
- *  on failure. */
-static VALUE sqlrcur_resumeCachedResultSet(VALUE self, 
-                                                VALUE id, VALUE filename) {
+ *  Resumes a result set previously left open using suspendSession().
+ *  Returns 1 on success and 0 on failure. */
+static VALUE sqlrcur_resumeResultSet(VALUE self, VALUE id) {
 </pre>
 </body>
 </html>

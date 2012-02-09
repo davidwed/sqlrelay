@@ -5,18 +5,18 @@
 
 <html>
 <head>
-  <title>getFieldAsInteger (SQLRCursor)</title>
+  <title>getField (SQLRCursor)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
   <pre>/**
  *  call-seq:
- *  getFieldAsInteger(row,col)
+ *  getField(row,col)
  *
- *  Returns the specified field as an integer.  &quot;col&quot; may be specified as the
+ *  Returns the specified field as a string.  &quot;col&quot; may be specified as the 
  *  column name or number. */
-static VALUE sqlrcur_getFieldAsInteger(VALUE self, VALUE row, VALUE col) {
+static VALUE sqlrcur_getField(VALUE self, VALUE row, VALUE col) {
 </pre>
 </body>
 </html>

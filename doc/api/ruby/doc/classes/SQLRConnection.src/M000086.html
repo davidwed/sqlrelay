@@ -5,13 +5,19 @@
 
 <html>
 <head>
-  <title>endSession (SQLRConnection)</title>
+  <title>setTimeout (SQLRConnection)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre>/** Ends the session. */
-static VALUE sqlrcon_endSession(VALUE self) {
+  <pre>/**
+ *  call-seq:
+ *  setTimeout(timeoutsec,timeoutusec)
+ *
+ *  Sets the server connect timeout in seconds and milliseconds.
+ *  Setting either parameter to -1 disables the timeout. */
+static VALUE sqlrcon_setTimeout(VALUE self,
+                                VALUE timeoutsec, VALUE timeoutusec) {
 </pre>
 </body>
 </html>

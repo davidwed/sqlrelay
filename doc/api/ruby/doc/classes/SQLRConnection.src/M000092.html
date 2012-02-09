@@ -5,13 +5,13 @@
 
 <html>
 <head>
-  <title>identify (SQLRConnection)</title>
+  <title>ping (SQLRConnection)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre>/** Returns the type of database: oracle8, postgresql, mysql, etc. */
-static VALUE sqlrcon_identify(VALUE self) {
+  <pre>/** Returns 1 if the database is up and 0 if it's down. */
+static VALUE sqlrcon_ping(VALUE self) {
 </pre>
 </body>
 </html>

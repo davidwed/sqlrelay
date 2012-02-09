@@ -5,19 +5,20 @@
 
 <html>
 <head>
-  <title>getColumnScale (SQLRCursor)</title>
+  <title>getColumnPrecision (SQLRCursor)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
   <pre>/**
  *  call-seq:
- *  getColumnScale(col)
+ *  getColumnPrecision(col)
  *
- *  Returns the scale of the specified column.  Scale is the total number of
- *  digits to the right of the decimal point in a number.  eg: 123.45 has a
- *  scale of 2.  &quot;col&quot; may be specified as the column name or number. */
-static VALUE sqlrcur_getColumnScale(VALUE self, VALUE col) {
+ *  Returns the precision of the specified column.  Precision is the total
+ *  number of digits in a number.  eg: 123.45 has a precision of 5.  For
+ *  non-numeric types, it's the number of characters in the string.  &quot;col&quot;
+ *  may be specified as the column name or number. */
+static VALUE sqlrcur_getColumnPrecision(VALUE self, VALUE col) {
 </pre>
 </body>
 </html>

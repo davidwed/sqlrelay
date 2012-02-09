@@ -5,14 +5,14 @@
 
 <html>
 <head>
-  <title>getNullsAsNils (SQLRCursor)</title>
+  <title>getNullsAsEmptyStrings (SQLRCursor)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre>/** Tells the connection to return NULL fields
- *  and output bind variables as nil's. */
-static VALUE sqlrcur_getNullsAsNils(VALUE self) {
+  <pre>/** Tells the connection to return NULL fields and output bind variables as
+ *  empty strings.  This is the default. */
+static VALUE sqlrcur_getNullsAsEmptyStrings(VALUE self) {
 </pre>
 </body>
 </html>

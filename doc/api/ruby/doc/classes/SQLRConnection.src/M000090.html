@@ -5,18 +5,16 @@
 
 <html>
 <head>
-  <title>resumeSession (SQLRConnection)</title>
+  <title>getConnectionSocket (SQLRConnection)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre>/**
- *  call-seq:
- *  resumeSession(port,socket)
- *
- *  Resumes a session previously left open using sqlrcon_suspendSession().
- *  Returns 1 on success and 0 on failure. */
-static VALUE sqlrcon_resumeSession(VALUE self, VALUE port, VALUE socket) {
+  <pre>/** Returns the unix socket that the connection is communicating over.  This
+ *  parameter may be passed to another connection for use in the
+ *  sqlrcon_resumeSession() command.  Note: The result this function returns
+ *  is only valid after a call to suspendSession(). */
+static VALUE sqlrcon_getConnectionSocket(VALUE self) {
 </pre>
 </body>
 </html>

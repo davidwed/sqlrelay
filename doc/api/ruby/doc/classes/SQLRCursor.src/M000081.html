@@ -5,15 +5,16 @@
 
 <html>
 <head>
-  <title>suspendResultSet (SQLRCursor)</title>
+  <title>getResultSetId (SQLRCursor)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre>/** Tells the server to leave this result set open when the connection calls
- *  suspendSession() so that another connection can connect to it using
- *  resumeResultSet() after it calls resumeSession(). */
-static VALUE sqlrcur_suspendResultSet(VALUE self) {
+  <pre>/** Returns the internal ID of this result set.  This parameter may be passed
+ *  to another statement for use in the resumeResultSet() function.  Note: The
+ *  value this function returns is only valid after a call to
+ *  suspendResultSet().*/
+static VALUE sqlrcur_getResultSetId(VALUE self) {
 </pre>
 </body>
 </html>

@@ -5,18 +5,18 @@
 
 <html>
 <head>
-  <title>getColumnIsBinary (SQLRCursor)</title>
+  <title>getColumnIsZeroFilled (SQLRCursor)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
   <pre>/**
  *  call-seq:
- *  getColumnIsBinary(col)
+ *  getColumnIsZeroFilled(col)
  *
- *  Returns 1 if the specified column contains binary data and 0 otherwise.
- *  &quot;col&quot; may be specified as the column name or number. */
-static VALUE sqlrcur_getColumnIsBinary(VALUE self, VALUE col) {
+ *  Returns 1 if the specified column was created with the zero-fill flag and
+ *  0 otherwise.  &quot;col&quot; may be specified as the column name or number. */
+static VALUE sqlrcur_getColumnIsZeroFilled(VALUE self, VALUE col) {
 </pre>
 </body>
 </html>
