@@ -8,65 +8,65 @@ CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c++
 LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 
-SRCS = connection/connectionctor.C \
-	connection/connectiondtor.C \
-	connection/copyreferences.C \
-	connection/ping.C \
-	connection/identify.C \
-	connection/dbversion.C \
-	connection/selectdatabase.C \
-	connection/lastinsertid.C \
-	connection/bindformat.C \
-	connection/endsession.C \
-	connection/suspendsession.C \
-	connection/resumesession.C \
-	connection/autocommit.C \
-	connection/commit.C \
-	connection/rollback.C \
-	connection/serverversion.C \
-	connection/debug.C \
-	connection/error.C \
-	connection/flushwritebuffer.C \
-	connection/getreconnect.C \
-	connection/getconnectionport.C \
-	connection/getconnectionsocket.C \
-	connection/authentication.C \
-	connection/getnewport.C \
-	connection/clearsessionflags.C \
-	connection/clientversion.C \
-	connection/opensession.C \
-	connection/closeconnection.C \
-	cursor/cursorctor.C \
-	cursor/cursordtor.C \
-	cursor/copyreferences.C \
-	cursor/columns.C \
-	cursor/fields.C \
-	cursor/columnnamecase.C \
-	cursor/nulls.C \
-	cursor/suspendresultset.C \
-	cursor/binds.C \
-	cursor/fetchfrombindcursor.C \
-	cursor/rowcounts.C \
-	cursor/getcolumninfo.C \
-	cursor/resultsetbuffersize.C \
-	cursor/errormessage.C \
-	cursor/readcache.C \
-	cursor/writecache.C \
-	cursor/resume.C \
-	cursor/getresultsetid.C \
-	cursor/preparequery.C \
-	cursor/sendquery.C \
-	cursor/executequery.C \
-	cursor/runquery.C \
-	cursor/receiveresultset.C \
-	cursor/parsecolumninfo.C \
-	cursor/parseoutputbinds.C \
-	cursor/parsedata.C \
-	cursor/clearresultset.C \
-	cursor/skipandfetch.C \
-	cursor/abortresultset.C \
-	cursor/getlist.C \
-	row/row.C
+SRCS = connection/connectionctor.cpp \
+	connection/connectiondtor.cpp \
+	connection/copyreferences.cpp \
+	connection/ping.cpp \
+	connection/identify.cpp \
+	connection/dbversion.cpp \
+	connection/selectdatabase.cpp \
+	connection/lastinsertid.cpp \
+	connection/bindformat.cpp \
+	connection/endsession.cpp \
+	connection/suspendsession.cpp \
+	connection/resumesession.cpp \
+	connection/autocommit.cpp \
+	connection/commit.cpp \
+	connection/rollback.cpp \
+	connection/serverversion.cpp \
+	connection/debug.cpp \
+	connection/error.cpp \
+	connection/flushwritebuffer.cpp \
+	connection/getreconnect.cpp \
+	connection/getconnectionport.cpp \
+	connection/getconnectionsocket.cpp \
+	connection/authentication.cpp \
+	connection/getnewport.cpp \
+	connection/clearsessionflags.cpp \
+	connection/clientversion.cpp \
+	connection/opensession.cpp \
+	connection/closeconnection.cpp \
+	cursor/cursorctor.cpp \
+	cursor/cursordtor.cpp \
+	cursor/copyreferences.cpp \
+	cursor/columns.cpp \
+	cursor/fields.cpp \
+	cursor/columnnamecase.cpp \
+	cursor/nulls.cpp \
+	cursor/suspendresultset.cpp \
+	cursor/binds.cpp \
+	cursor/fetchfrombindcursor.cpp \
+	cursor/rowcounts.cpp \
+	cursor/getcolumninfo.cpp \
+	cursor/resultsetbuffersize.cpp \
+	cursor/errormessage.cpp \
+	cursor/readcache.cpp \
+	cursor/writecache.cpp \
+	cursor/resume.cpp \
+	cursor/getresultsetid.cpp \
+	cursor/preparequery.cpp \
+	cursor/sendquery.cpp \
+	cursor/executequery.cpp \
+	cursor/runquery.cpp \
+	cursor/receiveresultset.cpp \
+	cursor/parsecolumninfo.cpp \
+	cursor/parseoutputbinds.cpp \
+	cursor/parsedata.cpp \
+	cursor/clearresultset.cpp \
+	cursor/skipandfetch.cpp \
+	cursor/abortresultset.cpp \
+	cursor/getlist.cpp \
+	row/row.cpp
 LOBJS = connection/connectionctor.lo \
 	connection/connectiondtor.lo \
 	connection/copyreferences.lo \
@@ -129,7 +129,7 @@ LOBJS = connection/connectionctor.lo \
 
 .SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: libsqlrclient.la
