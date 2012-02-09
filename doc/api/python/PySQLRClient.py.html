@@ -77,6 +77,11 @@ error&nbsp;occurred.</tt></dd></dl>
 <dl><dt><a name="sqlrconnection-errorMessage"><strong>errorMessage</strong></a>(self)</dt><dd><tt>If&nbsp;the&nbsp;operation&nbsp;failed,&nbsp;the&nbsp;error&nbsp;message&nbsp;will&nbsp;be&nbsp;returned<br>
 from&nbsp;this&nbsp;method.&nbsp;&nbsp;Otherwise,&nbsp;it&nbsp;returns&nbsp;None.</tt></dd></dl>
 
+<dl><dt><a name="sqlrconnection-errorNumber"><strong>errorNumber</strong></a>(self)</dt><dd><tt>If&nbsp;an&nbsp;operation&nbsp;failed&nbsp;and&nbsp;generated&nbsp;an<br>
+error,&nbsp;the&nbsp;error&nbsp;number&nbsp;is&nbsp;available&nbsp;here.<br>
+If&nbsp;there&nbsp;is&nbsp;no&nbsp;error&nbsp;then&nbsp;this&nbsp;method&nbsp;<br>
+returns&nbsp;0.</tt></dd></dl>
+
 <dl><dt><a name="sqlrconnection-getConnectionPort"><strong>getConnectionPort</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;inet&nbsp;port&nbsp;that&nbsp;the&nbsp;connection&nbsp;is&nbsp;<br>
 communicating&nbsp;over.&nbsp;This&nbsp;parameter&nbsp;may&nbsp;be&nbsp;<br>
 passed&nbsp;to&nbsp;another&nbsp;connection&nbsp;for&nbsp;use&nbsp;in<br>
@@ -196,6 +201,11 @@ with&nbsp;a&nbsp;parameter&nbsp;other&nbsp;than&nbsp;0.</tt></dd></dl>
 
 <dl><dt><a name="sqlrcursor-errorMessage"><strong>errorMessage</strong></a>(self)</dt><dd><tt>If&nbsp;the&nbsp;query&nbsp;failed,&nbsp;the&nbsp;error&nbsp;message&nbsp;will&nbsp;be&nbsp;returned<br>
 from&nbsp;this&nbsp;method.&nbsp;&nbsp;Otherwise,&nbsp;it&nbsp;returns&nbsp;None.</tt></dd></dl>
+
+<dl><dt><a name="sqlrcursor-errorNumber"><strong>errorNumber</strong></a>(self)</dt><dd><tt>If&nbsp;the&nbsp;query&nbsp;failed&nbsp;and&nbsp;generated&nbsp;an<br>
+error,&nbsp;the&nbsp;error&nbsp;number&nbsp;is&nbsp;available&nbsp;here.<br>
+If&nbsp;there&nbsp;is&nbsp;no&nbsp;error&nbsp;then&nbsp;this&nbsp;method&nbsp;<br>
+returns&nbsp;0.</tt></dd></dl>
 
 <dl><dt><a name="sqlrcursor-executeQuery"><strong>executeQuery</strong></a>(self)</dt><dd><tt>Execute&nbsp;the&nbsp;query&nbsp;that&nbsp;was&nbsp;previously<br>
 prepared&nbsp;and&nbsp;bound.</tt></dd></dl>

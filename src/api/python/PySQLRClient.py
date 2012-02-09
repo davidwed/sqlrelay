@@ -189,6 +189,15 @@ class sqlrconnection:
         """
         return CSQLRelay.connectionErrorMessage(self.connection)
 
+    def errorNumber(self):
+        """
+        If an operation failed and generated an
+        error, the error number is available here.
+        If there is no error then this method 
+        returns 0.
+        """
+        return CSQLRelay.connectionErrorNumber(self.connection)
+
     def debugOn(self):
         """
         Turn verbose debugging on.
@@ -649,6 +658,15 @@ class sqlrcursor:
         from this method.  Otherwise, it returns None.
         """
         return CSQLRelay.cursorErrorMessage(self.cursor)
+
+    def errorNumber(self):
+        """
+        If the query failed and generated an
+        error, the error number is available here.
+        If there is no error then this method 
+        returns 0.
+        """
+        return CSQLRelay.cursorErrorNumber(self.cursor)
 
     def getNullsAsEmptyStrings(self):
         """

@@ -291,6 +291,14 @@ static PyObject *connectionErrorMessage(PyObject *self, PyObject *args) {
   return Py_BuildValue("s", ((sqlrconnection *)sqlrcon)->errorMessage());
 }
 
+static PyObject *connectionErrorNumber(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  // FIXME: lame, python doesn't support building values from int64_t's
+  return Py_BuildValue("l", (long)((sqlrconnection *)sqlrcon)->errorNumber());
+}
+
 static PyObject *debugOn(PyObject *self, PyObject *args) {
   long sqlrcon;
   if (!PyArg_ParseTuple(args, "l", &sqlrcon))
@@ -1009,6 +1017,14 @@ static PyObject *cursorErrorMessage(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, "l", &sqlrcur))
     return NULL;
   return Py_BuildValue("s", ((sqlrcursor *)sqlrcur)->errorMessage());
+}
+
+static PyObject *cursorErrorNumber(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcur))
+    return NULL;
+  // FIXME: lame, python doesn't support building values from int64_t's
+  return Py_BuildValue("l", (long)((sqlrcursor *)sqlrcur)->errorNumber());
 }
 
 static PyObject *getNullsAsEmptyStrings(PyObject *self, PyObject *args) {
@@ -1745,6 +1761,7 @@ static PyMethodDef SQLRMethods[] = {
   {"commit", commit, METH_VARARGS},
   {"rollback", rollback, METH_VARARGS},
   {"connectionErrorMessage", connectionErrorMessage, METH_VARARGS},
+  {"connectionErrorNumber", connectionErrorNumber, METH_VARARGS},
   {"debugOn", debugOn, METH_VARARGS},
   {"debugOff", debugOff, METH_VARARGS},
   {"getDebug", getDebug, METH_VARARGS},
@@ -1802,6 +1819,7 @@ static PyMethodDef SQLRMethods[] = {
   {"firstRowIndex", firstRowIndex, METH_VARARGS},
   {"endOfResultSet", endOfResultSet, METH_VARARGS},
   {"cursorErrorMessage", cursorErrorMessage, METH_VARARGS},
+  {"cursorErrorNumber", cursorErrorNumber, METH_VARARGS},
   {"getNullsAsEmptyStrings", getNullsAsEmptyStrings, METH_VARARGS},
   {"getNullsAsNone", getNullsAsNone, METH_VARARGS},
   {"getField", getField, METH_VARARGS},
