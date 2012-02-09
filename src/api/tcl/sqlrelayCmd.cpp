@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.C,v 1.34 2012-02-09 03:04:52 mused Exp $
+ * $Id: sqlrelayCmd.cpp,v 1.1 2012-02-09 21:47:13 mused Exp $
  */
 
 #include <tcl.h>

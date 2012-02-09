@@ -22,7 +22,7 @@ all: libsqlrodbc.la
 
 .SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 clean:
@@ -31,7 +31,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs
 
-libsqlrodbc.la: sqlrodbc.C sqlrodbc.lo
+libsqlrodbc.la: sqlrodbc.cpp sqlrodbc.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrodbc.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
 install:

@@ -13,7 +13,7 @@ ifeq ($(TCLUSERPATH),yes)
 endif
 endif
 
-SRCS = sqlrelayCmd.C
+SRCS = sqlrelayCmd.cpp
 LOBJS = sqlrelayCmd.lo
 
 all: libsqlrelay.la
@@ -27,7 +27,7 @@ clean:
 
 .SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 libsqlrelay.la: $(SRCS) $(LOBJS)

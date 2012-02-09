@@ -14,7 +14,7 @@ endif
 
 .SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: java libSQLRConnection.la libSQLRCursor.la sqlrelay.jar
@@ -31,10 +31,10 @@ clean:
 java:
 	$(JAVAC) com/firstworks/sqlrelay/*.java
 
-libSQLRConnection.la: com_firstworks_sqlrelay_SQLRConnection.C com_firstworks_sqlrelay_SQLRConnection.lo
+libSQLRConnection.la: com_firstworks_sqlrelay_SQLRConnection.cpp com_firstworks_sqlrelay_SQLRConnection.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ com_firstworks_sqlrelay_SQLRConnection.lo $(LDFLAGS) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) -rpath $(javadir)/com/firstworks/sqlrelay $(RPATH) -module -no-undefined
 
-libSQLRCursor.la: com_firstworks_sqlrelay_SQLRCursor.C com_firstworks_sqlrelay_SQLRCursor.lo
+libSQLRCursor.la: com_firstworks_sqlrelay_SQLRCursor.cpp com_firstworks_sqlrelay_SQLRCursor.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ com_firstworks_sqlrelay_SQLRCursor.lo $(LDFLAGS) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) -rpath $(javadir)/com/firstworks/sqlrelay $(RPATH) -module -no-undefined
 
 libSQLRConnection.so:

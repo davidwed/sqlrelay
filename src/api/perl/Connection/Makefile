@@ -35,10 +35,10 @@ endif
 
 .SUFFIXES: .lo .xs
 
-.xs.C:
+.xs.cpp:
 	$(PERL) $(PERL_LIB)/ExtUtils/xsubpp -noprototypes -C++ -typemap $(PERL_LIB)/ExtUtils/typemap -typemap perlobject.map -typemap typemap $< > $<c && mv $<c $@
 
-.C.lo:
+.cpp.lo:
 	cp perlincludes1.h perlincludes.h; \
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ 2> errors1; \
 	if ( test ! -r Connection.lo ); then \
@@ -82,7 +82,7 @@ endif
 all: libConnection.la
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.C
+	$(LIBTOOL) --mode=clean $(RM) *.cpp
 	$(LIBTOOL) --mode=clean $(RM) *.la
 	$(LIBTOOL) --mode=clean $(RM) *.lo*
 	$(LIBTOOL) --mode=clean $(RM) *.o	
@@ -92,7 +92,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) perlincludes.h
 	$(RMTREE) .libs
 
-libConnection.la: Connection.xs Connection.C Connection.lo
+libConnection.la: Connection.xs Connection.cpp Connection.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ Connection.lo $(LDFLAGS) $(LIBS) -rpath $(PERLSITEARCH)/auto/SQLRelay/Connection $(RPATH) -module -no-undefined
 
 Connection.so:

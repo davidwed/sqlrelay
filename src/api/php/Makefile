@@ -15,7 +15,7 @@ endif
 
 .SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPILE_DL=1 -c $< -o $@
 
 all:
@@ -62,7 +62,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) errors3
 	$(RMTREE) .libs
 
-libsql_relay.la: sql_relay.C sql_relay.lo
+libsql_relay.la: sql_relay.cpp sql_relay.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sql_relay.lo $(LDFLAGS) $(LIBS) -rpath $(PHPEXTDIR) $(RPATH) -module
 
 sql_relay.so:

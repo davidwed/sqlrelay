@@ -13,12 +13,12 @@ ifeq ($(PYTHONUSERPATH),yes)
 endif
 endif
 
-SRCS = CSQLRelay.C
+SRCS = CSQLRelay.cpp
 LOBJS = CSQLRelay.lo
 
 .SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: libCSQLRelay.la

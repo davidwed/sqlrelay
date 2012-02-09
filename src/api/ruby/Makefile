@@ -27,12 +27,12 @@ ifeq ($(RUBYUSERPATH),yes)
 endif
 endif
 
-SRCS = sqlrelay.C
+SRCS = sqlrelay.cpp
 LOBJS = sqlrelay.lo
 
 .SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	cp rubyincludes1.h rubyincludes.h; \
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ 2> errors1; \
 	if ( test ! -r sqlrelay.lo ); then \

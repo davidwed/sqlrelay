@@ -22,19 +22,19 @@ all: libmysql3sqlrelay.la libmysql40sqlrelay.la libmysql41sqlrelay.la libmysql50
 
 .SUFFIXES: .lo
 
-mysql3.lo: mysql.C
+mysql3.lo: mysql.cpp
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_3=1 -c $< -o $@
 
-mysql40.lo: mysql.C
+mysql40.lo: mysql.cpp
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_4_0=1 -c $< -o $@
 
-mysql41.lo: mysql.C
+mysql41.lo: mysql.cpp
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_4_1=1 -c $< -o $@
 
-mysql50.lo: mysql.C
+mysql50.lo: mysql.cpp
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_5_0=1 -c $< -o $@
 
-mysql51.lo: mysql.C
+mysql51.lo: mysql.cpp
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_5_1=1 -c $< -o $@
 
 clean:
@@ -43,19 +43,19 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs
 
-libmysql3sqlrelay.la: mysql.C mysql3.lo
+libmysql3sqlrelay.la: mysql.cpp mysql3.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ mysql3.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
-libmysql40sqlrelay.la: mysql.C mysql40.lo
+libmysql40sqlrelay.la: mysql.cpp mysql40.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ mysql40.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
-libmysql41sqlrelay.la: mysql.C mysql41.lo
+libmysql41sqlrelay.la: mysql.cpp mysql41.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ mysql41.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
-libmysql50sqlrelay.la: mysql.C mysql50.lo
+libmysql50sqlrelay.la: mysql.cpp mysql50.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ mysql50.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
-libmysql51sqlrelay.la: mysql.C mysql51.lo
+libmysql51sqlrelay.la: mysql.cpp mysql51.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ mysql51.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
 install:

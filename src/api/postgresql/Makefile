@@ -18,16 +18,16 @@ ifeq ($(PSQLUSERPATH),yes)
 endif
 endif
 
-SRCS = pqasync.C pqconndefaults.C pqconnection.C pqcopy.C \
-	pqencoding.C pqescape.C pqfastpath.C pqlob.C \
-	pqnotifies.C pqprint.C pqresult.C pqtrace.C
+SRCS = pqasync.cpp pqconndefaults.cpp pqconnection.cpp pqcopy.cpp \
+	pqencoding.cpp pqescape.cpp pqfastpath.cpp pqlob.cpp \
+	pqnotifies.cpp pqprint.cpp pqresult.cpp pqtrace.cpp
 LOBJS = pqasync.lo pqconndefaults.lo pqconnection.lo pqcopy.lo \
 	pqencoding.lo pqescape.lo pqfastpath.lo pqlob.lo \
 	pqnotifies.lo pqprint.lo pqresult.lo pqtrace.lo
 
 .SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: libpqsqlrelay.la
