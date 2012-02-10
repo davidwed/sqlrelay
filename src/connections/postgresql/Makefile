@@ -17,13 +17,12 @@ ifeq ($(SERVERUSERPATH),yes)
 endif
 endif
 
-SRCS= postgresqlconnection.C main.C
+SRCS= postgresqlconnection.cpp main.cpp
 LOBJS= postgresqlconnection.lo main.lo
-DLOBJS= postgresqlconnection.d.lo main.d.lo
 
 .SUFFIXES: .lo .d.lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: sqlr-connection-postgresql$(EXE)

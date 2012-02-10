@@ -17,13 +17,12 @@ ifeq ($(SERVERUSERPATH),yes)
 endif
 endif
 
-SRCS= routerconnection.C main.C
+SRCS= routerconnection.cpp main.cpp
 LOBJS= routerconnection.lo main.lo
-DLOBJS= routerconnection.d.lo main.d.lo
 
-.SUFFIXES: .lo .d.lo
+.SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: sqlr-connection-router$(EXE)

@@ -17,13 +17,12 @@ ifeq ($(SERVERUSERPATH),yes)
 endif
 endif
 
-SRCS= mdbtoolsconnection.C main.C
+SRCS= mdbtoolsconnection.cpp main.cpp
 LOBJS= mdbtoolsconnection.lo main.lo
-DLOBJS= mdbtoolsconnection.d.lo main.d.lo
 
 .SUFFIXES: .lo .d.lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: sqlr-connection-mdbtools$(EXE)

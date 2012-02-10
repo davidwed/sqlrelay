@@ -17,13 +17,12 @@ ifeq ($(SERVERUSERPATH),yes)
 endif
 endif
 
-SRCS= sybaseconnection.C main.C
+SRCS= sybaseconnection.cpp main.cpp
 LOBJS= sybaseconnection.lo main.lo
-DLOBJS= sybaseconnection.d.lo main.d.lo
 
-.SUFFIXES: .lo .d.lo
+.SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: sqlr-connection-sybase$(EXE)

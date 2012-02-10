@@ -17,13 +17,12 @@ ifeq ($(SERVERUSERPATH),yes)
 endif
 endif
 
-SRCS= statusconnection.C main.C
+SRCS= statusconnection.cpp main.cpp
 LOBJS= statusconnection.lo main.lo
-DLOBJS= statusconnection.d.lo main.d.lo
 
-.SUFFIXES: .lo .d.lo
+.SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: sqlr-status$(EXE)

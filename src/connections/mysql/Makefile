@@ -17,13 +17,12 @@ ifeq ($(SERVERUSERPATH),yes)
 endif
 endif
 
-SRCS= mysqlconnection.C mysqlsqlwriter.C main.C
+SRCS= mysqlconnection.cpp mysqlsqlwriter.cpp main.cpp
 LOBJS= mysqlconnection.lo mysqlsqlwriter.lo main.lo
-DLOBJS= mysqlconnection.d.lo main.d.lo
 
-.SUFFIXES: .lo .d.lo
+.SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: sqlr-connection-mysql$(EXE)

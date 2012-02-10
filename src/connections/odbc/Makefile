@@ -22,13 +22,12 @@ ifeq ($(SERVERUSERPATH),yes)
 endif
 endif
 
-SRCS= odbcconnection.C main.C
+SRCS= odbcconnection.cpp main.cpp
 LOBJS= odbcconnection.lo main.lo
-DLOBJS= odbcconnection.d.lo main.d.lo
 
-.SUFFIXES: .lo .d.lo
+.SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: sqlr-connection-odbc$(EXE)
