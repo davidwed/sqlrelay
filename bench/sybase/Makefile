@@ -7,5 +7,5 @@ all: sybasetest
 clean:
 	$(RM) sybasetest
 
-sybasetest: sybasetest.C
+sybasetest: sybasetest.cpp
 	$(CXX) $(LDFLAGS) $(CXXFLAGS) -I./ $(SYBASEINCLUDES) $(RUDIMENTSINCLUDES) $? -s -o $@ $(SYBASELIBS) $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIBS)

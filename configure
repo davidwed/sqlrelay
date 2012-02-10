@@ -842,6 +842,7 @@ ICONVLIBS
 ICONVINCLUDES
 AIOLIB
 DLLIB
+SOCKETLIBS
 READLINELIB
 PTHREADLIB
 PTHREADINCLUDES
@@ -5857,13 +5858,13 @@ if test "${lt_cv_nm_interface+set}" = set; then :
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:5860: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:5861: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5863: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:5864: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5866: output\"" >&5)
+  (eval echo "\"\$as_me:5867: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -7055,7 +7056,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 7058 "configure"' > conftest.$ac_ext
+  echo '#line 7059 "configure"' > conftest.$ac_ext
   if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8845,11 +8846,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8848: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8849: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8852: \$? = $ac_status" >&5
+   echo "$as_me:8853: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9184,11 +9185,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9187: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9188: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9191: \$? = $ac_status" >&5
+   echo "$as_me:9192: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9289,11 +9290,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9292: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9293: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9296: \$? = $ac_status" >&5
+   echo "$as_me:9297: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9344,11 +9345,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9347: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9348: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9351: \$? = $ac_status" >&5
+   echo "$as_me:9352: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -11728,7 +11729,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11731 "configure"
+#line 11732 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11824,7 +11825,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11827 "configure"
+#line 11828 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13780,11 +13781,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13783: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13784: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13787: \$? = $ac_status" >&5
+   echo "$as_me:13788: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13879,11 +13880,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13882: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13883: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13886: \$? = $ac_status" >&5
+   echo "$as_me:13887: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13931,11 +13932,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13934: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13935: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13938: \$? = $ac_status" >&5
+   echo "$as_me:13939: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -16254,7 +16255,78 @@ _ACEOF
 
 fi
 
-#FW_CHECK_SOCKET_LIBS
+
+	ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+	SOCKETLIBS=""
+	DONE=""
+	for i in "" "-lnsl" "-lsocket" "-lsocket -lnsl" "-lxnet"
+	do
+		if ( test -n "$i" )
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking $i is required for socket-related calls" >&5
+$as_echo_n "checking $i is required for socket-related calls... " >&6; }
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking no extra libraries are required for socket-related calls" >&5
+$as_echo_n "checking no extra libraries are required for socket-related calls... " >&6; }
+		fi
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS=""
+LIBS="$i"
+LD_LIBRARY_PATH=""
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdlib.h>
+int
+main ()
+{
+connect(0,NULL,0); listen(0,0); bind(0,NULL,0); accept(0,NULL,0); send(0,NULL,0,0); sendto(0,NULL,0,0,NULL,0); sendmsg(0,NULL,0); gethostbyname(NULL);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  SOCKETLIBS="$i"; DONE="yes"; { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+		if ( test -n "$DONE" )
+		then
+			break
+		fi
+	done
+	ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+	LDFLAGS="$OLDLDFLAGS"
+
+	if ( test -z "$DONE" )
+	then
+		as_fn_error $? "no combination of networking libraries was found." "$LINENO" 5
+	fi
+
+
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for dlopen in -ldl" >&5
 $as_echo_n "checking for dlopen in -ldl... " >&6; }
 if test "${ac_cv_lib_dl_dlopen+set}" = set; then :
@@ -17117,7 +17189,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES"
-LIBS="$ORACLELIBS $SOCKETLIB"
+LIBS="$ORACLELIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -17157,7 +17229,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES"
-LIBS="$ORACLELIBS $SOCKETLIB"
+LIBS="$ORACLELIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -17207,7 +17279,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES"
-LIBS="$ORACLELIBS $SOCKETLIB"
+LIBS="$ORACLELIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -17247,7 +17319,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES"
-LIBS="$ORACLELIBS $SOCKETLIB"
+LIBS="$ORACLELIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -17293,7 +17365,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES"
-LIBS="$ORACLELIBS $SOCKETLIB $DLLIB"
+LIBS="$ORACLELIBS $SOCKETLIBS $DLLIB"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -17332,7 +17404,7 @@ export LD_LIBRARY_PATH
 SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES,$ORACLELIBS $SOCKETLIB $DLLIB"
+CPPFLAGS="$ORACLESTATIC $ORACLEINCLUDES,$ORACLELIBS $SOCKETLIBS $DLLIB"
 LIBS="$LD_LIBRARY_PATH"
 LD_LIBRARY_PATH="{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }; ORACLELIBS="$ORACLELIBS $DLLIB"; LINKFAIL="""
@@ -17380,7 +17452,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ORACLEINCLUDES"
-LIBS="$ORACLELIBS $SOCKETLIB"
+LIBS="$ORACLELIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -17420,7 +17492,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ORACLEINCLUDES"
-LIBS="$ORACLELIBS $SOCKETLIB"
+LIBS="$ORACLELIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -17466,7 +17538,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ORACLEINCLUDES"
-LIBS="$ORACLELIBS $SOCKETLIB $DLLIB"
+LIBS="$ORACLELIBS $SOCKETLIBS $DLLIB"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -17506,7 +17578,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ORACLEINCLUDES"
-LIBS="$ORACLELIBS $SOCKETLIB $DLLIB"
+LIBS="$ORACLELIBS $SOCKETLIBS $DLLIB"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -17656,7 +17728,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18042,7 +18114,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18145,7 +18217,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18184,7 +18256,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18223,7 +18295,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18262,7 +18334,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18301,7 +18373,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18340,7 +18412,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18379,7 +18451,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18418,7 +18490,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18457,7 +18529,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18496,7 +18568,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18535,7 +18607,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18575,7 +18647,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18615,7 +18687,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18654,7 +18726,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18693,7 +18765,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18732,7 +18804,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18771,7 +18843,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18810,7 +18882,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -18849,7 +18921,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
-LIBS="$MYSQLLIBS $SOCKETLIB"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20258,7 +20330,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$POSTGRESQLSTATIC $POSTGRESQLINCLUDES"
-LIBS="$POSTGRESQLLIBS $SOCKETLIB"
+LIBS="$POSTGRESQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20296,7 +20368,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$POSTGRESQLSTATIC $POSTGRESQLINCLUDES"
-LIBS="$POSTGRESQLLIBS $SOCKETLIB -lcrypt"
+LIBS="$POSTGRESQLLIBS $SOCKETLIBS -lcrypt"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20337,7 +20409,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$POSTGRESQLINCLUDES"
-LIBS="$POSTGRESQLLIBS $SOCKETLIB"
+LIBS="$POSTGRESQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20375,7 +20447,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$POSTGRESQLINCLUDES"
-LIBS="$POSTGRESQLLIBS $SOCKETLIB -lcrypt"
+LIBS="$POSTGRESQLLIBS $SOCKETLIBS -lcrypt"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20437,7 +20509,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$POSTGRESQLINCLUDES"
-LIBS="$POSTGRESQLLIBS $SOCKETLIB"
+LIBS="$POSTGRESQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20475,7 +20547,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$POSTGRESQLINCLUDES"
-LIBS="$POSTGRESQLLIBS $SOCKETLIB"
+LIBS="$POSTGRESQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20513,7 +20585,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$POSTGRESQLINCLUDES"
-LIBS="$POSTGRESQLLIBS $SOCKETLIB"
+LIBS="$POSTGRESQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20551,7 +20623,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$POSTGRESQLINCLUDES"
-LIBS="$POSTGRESQLLIBS $SOCKETLIB"
+LIBS="$POSTGRESQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20589,7 +20661,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$POSTGRESQLINCLUDES"
-LIBS="$POSTGRESQLLIBS $SOCKETLIB"
+LIBS="$POSTGRESQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20627,7 +20699,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$POSTGRESQLINCLUDES"
-LIBS="$POSTGRESQLLIBS $SOCKETLIB"
+LIBS="$POSTGRESQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -20665,7 +20737,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$POSTGRESQLINCLUDES"
-LIBS="$POSTGRESQLLIBS $SOCKETLIB"
+LIBS="$POSTGRESQLLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -21778,7 +21850,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$SQLITESTATIC $SQLITEINCLUDES"
-LIBS="$SQLITELIBS $SOCKETLIB"
+LIBS="$SQLITELIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SQLITELIBSPATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -22876,7 +22948,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$SYBASESTATIC $SYBASEINCLUDES"
-LIBS="$SYBASELIBS $SOCKETLIB"
+LIBS="$SYBASELIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -22916,7 +22988,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$SYBASESTATIC $SYBASEINCLUDES"
-LIBS="$SYBASELIBS $SOCKETLIB $DLLIB"
+LIBS="$SYBASELIBS $SOCKETLIBS $DLLIB"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -22959,7 +23031,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$SYBASEINCLUDES"
-LIBS="$SYBASELIBS $SOCKETLIB"
+LIBS="$SYBASELIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SYBASELIBSPATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -22999,7 +23071,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$SYBASEINCLUDES"
-LIBS="$SYBASELIBS $SOCKETLIB $DLLIB"
+LIBS="$SYBASELIBS $SOCKETLIBS $DLLIB"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SYBASELIBSPATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -24505,7 +24577,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ODBCSTATIC $ODBCINCLUDES"
-LIBS="$ODBCLIBS $SOCKETLIB"
+LIBS="$ODBCLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ODBCLIBSPATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -24549,7 +24621,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ODBCSTATIC $ODBCINCLUDES"
-LIBS="$ODBCLIBS $SOCKETLIB"
+LIBS="$ODBCLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ODBCLIBSPATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -24598,7 +24670,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ODBCSTATIC $ODBCINCLUDES"
-LIBS="$ODBCLIBS $SOCKETLIB"
+LIBS="$ODBCLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ODBCLIBSPATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -24736,7 +24808,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ODBCSTATIC $ODBCINCLUDES"
-LIBS="$ODBCLIBS $SOCKETLIB"
+LIBS="$ODBCLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ODBCLIBSPATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -24777,7 +24849,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$ODBCSTATIC $ODBCINCLUDES"
-LIBS="$ODBCLIBS $SOCKETLIB"
+LIBS="$ODBCLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ODBCLIBSPATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -26875,7 +26947,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$FIREBIRDSTATIC $FIREBIRDINCLUDES"
-LIBS="$FIREBIRDLIBS $SOCKETLIB"
+LIBS="$FIREBIRDLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -26913,7 +26985,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$FIREBIRDSTATIC $FIREBIRDINCLUDES"
-LIBS="$FIREBIRDLIBS $SOCKETLIB $DLLIB"
+LIBS="$FIREBIRDLIBS $SOCKETLIBS $DLLIB"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -26954,7 +27026,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$FIREBIRDINCLUDES"
-LIBS="$FIREBIRDLIBS $SOCKETLIB"
+LIBS="$FIREBIRDLIBS $SOCKETLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -26992,7 +27064,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$FIREBIRDINCLUDES"
-LIBS="$FIREBIRDLIBS $SOCKETLIB $DLLIB"
+LIBS="$FIREBIRDLIBS $SOCKETLIBS $DLLIB"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -28123,7 +28195,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MDBTOOLSINCLUDES"
-LIBS="$MDBTOOLSLIBS $SOCKETLIB $DLLIB -lm"
+LIBS="$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -28163,7 +28235,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MDBTOOLSINCLUDES"
-LIBS="$MDBTOOLSLIBS $SOCKETLIB $DLLIB -lm"
+LIBS="$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -28203,7 +28275,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MDBTOOLSINCLUDES"
-LIBS="$MDBTOOLSLIBS $SOCKETLIB $DLLIB -lm"
+LIBS="$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -28243,7 +28315,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$MDBTOOLSINCLUDES"
-LIBS="$MDBTOOLSLIBS $SOCKETLIB $DLLIB -lm"
+LIBS="$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext

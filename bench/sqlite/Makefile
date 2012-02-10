@@ -7,5 +7,5 @@ all: sqlitetest
 clean:
 	$(RM) sqlitetest
 
-sqlitetest: sqlitetest.C
+sqlitetest: sqlitetest.cpp
 	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(SQLITEINCLUDES) $? -s -o $@ $(SQLITELIBS) $(PTHREADLIB) $(EXTRALIBS) $(SOCKETLIBS)

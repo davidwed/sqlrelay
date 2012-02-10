@@ -9,5 +9,5 @@ all: sqlrtest
 clean:
 	$(RM) sqlrtest
 
-sqlrtest: sqlrtest.C
+sqlrtest: sqlrtest.cpp
 	$(CXX) $(LDFLAGS) $(CXXFLAGS) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $? -s -o $@ -L$(top_builddir)/src/api/c++/lib -lsqlrclient $(RUDIMENTSLIBS) $(EXTRALIBS)

@@ -8,7 +8,7 @@
 #include <time.h>
 
 extern "C" {
-	#include <sqlite.h>
+	#include <sqlite3.h>
 }
 
 #ifndef SQLITE3

@@ -9,7 +9,7 @@ LIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
 
 .SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all:
@@ -41,37 +41,37 @@ ifneq ($(ENABLE_ROUTER)),)
 	$(MAKE) router
 endif
 
-db2: db2.C db2.lo
+db2: db2.cpp db2.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ db2.lo $(LIBS)
 
-freetds: freetds.C freetds.lo
+freetds: freetds.cpp freetds.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ freetds.lo $(LIBS)
 
-firebird: firebird.C firebird.lo
+firebird: firebird.cpp firebird.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ firebird.lo $(LIBS)
 
-mysql: mysql.C mysql.lo
+mysql: mysql.cpp mysql.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ mysql.lo $(LIBS)
 
-oracle: oracle.C oracle.lo
+oracle: oracle.cpp oracle.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle.lo $(LIBS)
 
-postgresql: postgresql.C postgresql.lo
+postgresql: postgresql.cpp postgresql.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ postgresql.lo $(LIBS)
 
-oracleclobinsert: oracleclobinsert.C oracleclobinsert.lo
+oracleclobinsert: oracleclobinsert.cpp oracleclobinsert.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracleclobinsert.lo $(LIBS)
 
-oracleclobfetch: oracleclobfetch.C oracleclobfetch.lo
+oracleclobfetch: oracleclobfetch.cpp oracleclobfetch.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracleclobfetch.lo $(LIBS)
 
-sqlite: sqlite.C sqlite.lo
+sqlite: sqlite.cpp sqlite.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlite.lo $(LIBS)
 
-sybase: sybase.C sybase.lo
+sybase: sybase.cpp sybase.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sybase.lo $(LIBS)
 
-router: router.C router.lo
+router: router.cpp router.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ router.lo $(LIBS)
 
 clean:

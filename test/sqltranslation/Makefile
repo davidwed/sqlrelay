@@ -9,10 +9,10 @@ LIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
 
 .SUFFIXES: .lo
 
-.C.lo:
+.cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-test: test.C test.lo
+test: test.cpp test.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ test.lo $(LIBS)
 
 clean:

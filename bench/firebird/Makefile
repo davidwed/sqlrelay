@@ -7,5 +7,5 @@ all: firebirdtest
 clean:
 	$(RM) firebirdtest
 
-firebirdtest: firebirdtest.C
+firebirdtest: firebirdtest.cpp
 	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(FIREBIRDINCLUDES) $(RUDIMENTSINCLUDES) $? -s -o $@ $(RUDIMENTSLIBS) $(FIREBIRDLIBS) $(EXTRALIBS) $(SOCKETLIBS)

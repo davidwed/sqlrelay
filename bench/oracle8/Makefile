@@ -8,8 +8,8 @@ clean:
 	$(RM) ora8test
 	$(RM) ora8clobtest
 
-ora8test: ora8test.C
+ora8test: ora8test.cpp
 	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(ORACLEINCLUDES) $(RUDIMENTSINCLUDES) $? -s -o $@ $(ORACLELIBS) $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIBS)
 
-ora8clobtest: ora8clobtest.C
+ora8clobtest: ora8clobtest.cpp
 	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(ORACLEINCLUDES) $(RUDIMENTSINCLUDES) $? -s -o $@ $(ORACLELIBS) $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIBS)
