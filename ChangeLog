@@ -1,5 +1,6 @@
 0.45 - added trigger framework
 	added support for getting the native database error number
+	renamed all .C files to .cpp for windows
 
 0.44 - updated postgresql drop-in lib for postgresql 8/9 compatibility
 	updated mysql drop-in lib for mysql 5.2+ compatibility
