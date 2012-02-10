@@ -3160,31 +3160,86 @@ fi
 ])
 
 dnl check to see which should be used of -lsocket, -lnsl and -lxnet
+dnl AC_DEFUN([FW_CHECK_SOCKET_LIBS],
+dnl [
+	dnl AC_LANG(C)
+	dnl SOCKETLIBS=""
+	dnl DONE=""
+	dnl for i in "" "-lnsl" "-lsocket" "-lsocket -lnsl" "-lxnet"
+	dnl do
+		dnl if ( test -n "$i" )
+		dnl then
+			dnl AC_MSG_CHECKING($i is required for socket-related calls)
+		dnl else
+			dnl AC_MSG_CHECKING(no extra libraries are required for socket-related calls)
+		dnl fi
+		dnl FW_TRY_LINK([#include <stdlib.h>],[connect(0,NULL,0); listen(0,0); bind(0,NULL,0); accept(0,NULL,0); send(0,NULL,0,0); sendto(0,NULL,0,0,NULL,0); sendmsg(0,NULL,0); gethostbyname(NULL);],[],[$i],[],[SOCKETLIBS="$i"; DONE="yes"; AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
+		dnl if ( test -n "$DONE" )
+		dnl then
+			dnl break
+		dnl fi
+	dnl done
+	dnl AC_LANG(C++)
+	dnl LDFLAGS="$OLDLDFLAGS"
+dnl 
+	dnl if ( test -z "$DONE" )
+	dnl then
+		dnl AC_MSG_ERROR(no combination of networking libraries was found.)
+	dnl fi
+dnl 
+	dnl AC_SUBST(SOCKETLIBS)
+dnl ])
+
+dnl check to see which should be used of -lsocket, -lnsl and -lxnet
 AC_DEFUN([FW_CHECK_SOCKET_LIBS],
 [
+
+	AC_MSG_CHECKING(for socket libraries)
+
+	AC_LANG_SAVE
 	AC_LANG(C)
 	SOCKETLIBS=""
 	DONE=""
-	for i in "" "-lnsl" "-lsocket" "-lsocket -lnsl" "-lxnet"
+	for i in "" "-lnsl" "-lsocket" "-lsocket -lnsl" "-lxnet" "-lwsock32 -lnetapi32" "-lnetwork"
 	do
-		if ( test -n "$i" )
-		then
-			AC_MSG_CHECKING($i is required for socket-related calls)
-		else
-			AC_MSG_CHECKING(no extra libraries are required for socket-related calls)
-		fi
-		FW_TRY_LINK([#include <stdlib.h>],[connect(0,NULL,0); listen(0,0); bind(0,NULL,0); accept(0,NULL,0); send(0,NULL,0,0); sendto(0,NULL,0,0,NULL,0); sendmsg(0,NULL,0); gethostbyname(NULL);],[],[$i],[],[SOCKETLIBS="$i"; DONE="yes"; AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
+		FW_TRY_LINK([#ifdef HAVE_STDLIB_H
+	#include <stdlib.h>
+#endif
+#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
+	#include <sys/socket.h>
+#endif
+#ifdef __MINGW32__
+	#include <winsock2.h>
+#endif],[connect(0,NULL,0);
+listen(0,0);
+bind(0,NULL,0);
+accept(0,NULL,0);
+send(0,NULL,0,0);
+sendto(0,NULL,0,0,NULL,0);
+#ifndef __MINGW32__
+	sendmsg(0,NULL,0);
+#endif
+gethostbyname(NULL);],[$CPPFLAGS],[$i],[],[SOCKETLIBS="$i"; DONE="yes"],[])
 		if ( test -n "$DONE" )
 		then
 			break
 		fi
 	done
-	AC_LANG(C++)
-	LDFLAGS="$OLDLDFLAGS"
+	AC_LANG_RESTORE
 
 	if ( test -z "$DONE" )
 	then
 		AC_MSG_ERROR(no combination of networking libraries was found.)
+	fi
+
+	if ( test -z "$SOCKETLIBS" )
+	then
+		AC_MSG_RESULT(none)
+	else
+		AC_MSG_RESULT($SOCKETLIBS)
 	fi
 
 	AC_SUBST(SOCKETLIBS)

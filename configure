@@ -16256,6 +16256,11 @@ _ACEOF
 fi
 
 
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for socket libraries" >&5
+$as_echo_n "checking for socket libraries... " >&6; }
+
+
 	ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16264,41 +16269,49 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 	SOCKETLIBS=""
 	DONE=""
-	for i in "" "-lnsl" "-lsocket" "-lsocket -lnsl" "-lxnet"
+	for i in "" "-lnsl" "-lsocket" "-lsocket -lnsl" "-lxnet" "-lwsock32 -lnetapi32" "-lnetwork"
 	do
-		if ( test -n "$i" )
-		then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking $i is required for socket-related calls" >&5
-$as_echo_n "checking $i is required for socket-related calls... " >&6; }
-		else
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking no extra libraries are required for socket-related calls" >&5
-$as_echo_n "checking no extra libraries are required for socket-related calls... " >&6; }
-		fi
 
 SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS=""
+CPPFLAGS="$CPPFLAGS"
 LIBS="$i"
 LD_LIBRARY_PATH=""
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#include <stdlib.h>
+#ifdef HAVE_STDLIB_H
+	#include <stdlib.h>
+#endif
+#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
+	#include <sys/socket.h>
+#endif
+#ifdef __MINGW32__
+	#include <winsock2.h>
+#endif
 int
 main ()
 {
-connect(0,NULL,0); listen(0,0); bind(0,NULL,0); accept(0,NULL,0); send(0,NULL,0,0); sendto(0,NULL,0,0,NULL,0); sendmsg(0,NULL,0); gethostbyname(NULL);
+connect(0,NULL,0);
+listen(0,0);
+bind(0,NULL,0);
+accept(0,NULL,0);
+send(0,NULL,0,0);
+sendto(0,NULL,0,0,NULL,0);
+#ifndef __MINGW32__
+	sendmsg(0,NULL,0);
+#endif
+gethostbyname(NULL);
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  SOCKETLIBS="$i"; DONE="yes"; { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
+  SOCKETLIBS="$i"; DONE="yes"
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -16318,11 +16331,19 @@ ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-	LDFLAGS="$OLDLDFLAGS"
 
 	if ( test -z "$DONE" )
 	then
 		as_fn_error $? "no combination of networking libraries was found." "$LINENO" 5
+	fi
+
+	if ( test -z "$SOCKETLIBS" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: none" >&5
+$as_echo "none" >&6; }
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $SOCKETLIBS" >&5
+$as_echo "$SOCKETLIBS" >&6; }
 	fi
 
 
