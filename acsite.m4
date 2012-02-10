@@ -3160,37 +3160,6 @@ fi
 ])
 
 dnl check to see which should be used of -lsocket, -lnsl and -lxnet
-dnl AC_DEFUN([FW_CHECK_SOCKET_LIBS],
-dnl [
-	dnl AC_LANG(C)
-	dnl SOCKETLIBS=""
-	dnl DONE=""
-	dnl for i in "" "-lnsl" "-lsocket" "-lsocket -lnsl" "-lxnet"
-	dnl do
-		dnl if ( test -n "$i" )
-		dnl then
-			dnl AC_MSG_CHECKING($i is required for socket-related calls)
-		dnl else
-			dnl AC_MSG_CHECKING(no extra libraries are required for socket-related calls)
-		dnl fi
-		dnl FW_TRY_LINK([#include <stdlib.h>],[connect(0,NULL,0); listen(0,0); bind(0,NULL,0); accept(0,NULL,0); send(0,NULL,0,0); sendto(0,NULL,0,0,NULL,0); sendmsg(0,NULL,0); gethostbyname(NULL);],[],[$i],[],[SOCKETLIBS="$i"; DONE="yes"; AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
-		dnl if ( test -n "$DONE" )
-		dnl then
-			dnl break
-		dnl fi
-	dnl done
-	dnl AC_LANG(C++)
-	dnl LDFLAGS="$OLDLDFLAGS"
-dnl 
-	dnl if ( test -z "$DONE" )
-	dnl then
-		dnl AC_MSG_ERROR(no combination of networking libraries was found.)
-	dnl fi
-dnl 
-	dnl AC_SUBST(SOCKETLIBS)
-dnl ])
-
-dnl check to see which should be used of -lsocket, -lnsl and -lxnet
 AC_DEFUN([FW_CHECK_SOCKET_LIBS],
 [
 
