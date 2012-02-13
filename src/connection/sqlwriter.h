@@ -403,6 +403,19 @@ class sqlwriter {
 						stringbuffer *output);
 
 
+		// lock...
+		virtual bool	lockQuery(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	inMode(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	lockMode(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	mode(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	noWait(xmldomnode *node,
+						stringbuffer *output);
+
+
 
 		// helper methods
 		virtual bool	outputValue(xmldomnode *node,

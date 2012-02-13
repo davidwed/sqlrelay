@@ -90,6 +90,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqlparser/parsewhere.cpp \
 	sqlparser/parsecomparison.cpp \
 	sqlparser/parseexpression.cpp \
+	sqlparser/parselock.cpp \
 	sqlparser/sqlparser.cpp \
 	sqlwriter/sqlwriter.cpp \
 	sqlwriter/writecreate.cpp \
@@ -102,6 +103,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqlwriter/writeexpression.cpp \
 	sqlwriter/writeupdate.cpp \
 	sqlwriter/writeset.cpp \
+	sqlwriter/writelock.cpp \
 	sqltranslator/sqltranslator.cpp \
 	sqltriggers/sqltriggers.cpp \
 	sqltriggers/sqltrigger.cpp \
@@ -190,6 +192,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlparser/parsewhere.lo \
 	sqlparser/parsecomparison.lo \
 	sqlparser/parseexpression.lo \
+	sqlparser/parselock.lo \
 	sqlparser/sqlparser.lo \
 	sqlwriter/sqlwriter.lo \
 	sqlwriter/writecreate.lo \
@@ -202,6 +205,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlwriter/writeexpression.lo \
 	sqlwriter/writeupdate.lo \
 	sqlwriter/writeset.lo \
+	sqlwriter/writelock.lo \
 	sqltranslator/sqltranslator.lo \
 	sqltriggers/sqltriggers.lo \
 	sqltriggers/sqltrigger.lo \

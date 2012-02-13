@@ -845,41 +845,65 @@ class sqlparser {
 
 
 		// set query...
-		bool parseSet(xmldomnode *currentnode,
+		bool	parseSet(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool setClause(const char *ptr, const char **newptr);
 		static const char	*_set;
-		bool parseSetGlobal(xmldomnode *currentnode,
+		bool	parseSetGlobal(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool setGlobalClause(const char *ptr, const char **newptr);
+		bool	setGlobalClause(const char *ptr, const char **newptr);
 		static const char	*_set_global;
-		bool parseSetSession(xmldomnode *currentnode,
+		bool	parseSetSession(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool setSessionClause(const char *ptr, const char **newptr);
+		bool	setSessionClause(const char *ptr, const char **newptr);
 		static const char	*_set_session;
-		bool parseTransaction(xmldomnode *currentnode,
+		bool	parseTransaction(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool transactionClause(const char *ptr,
+		bool	transactionClause(const char *ptr,
 						const char **newptr);
 		static const char	*_transaction;
-		bool parseIsolationLevel(xmldomnode *currentnode,
+		bool	parseIsolationLevel(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool isolationLevelClause(const char *ptr,
+		bool	isolationLevelClause(const char *ptr,
 						const char **newptr);
 		static const char	*_isolation_level;
-		bool isolationLevelOptionClause(const char *ptr,
+		bool	isolationLevelOptionClause(const char *ptr,
 						const char **newptr);
-		bool parseTransactionName(xmldomnode *currentnode,
+		bool	parseTransactionName(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool transactionNameClause(const char *ptr,
+		bool	transactionNameClause(const char *ptr,
 						const char **newptr);
 		static const char	*_transaction_name;
+
+
+		// lock query
+		bool	parseLock(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	lockClause(const char *ptr, const char **newptr);
+		static const char	*_lock;
+		static const char	*_in_mode;
+		bool	parseLockMode(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	lockModeClause(const char *ptr, const char **newptr);
+		static const char	*_lock_mode;
+		bool	parseMode(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr);
+		bool	modeClause(const char *ptr, const char **newptr);
+		static const char	*_mode;
+		bool	parseNoWait(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr);
+		bool	noWaitClause(const char *ptr, const char **newptr);
+		static const char	*_nowait;
 
 		xmldom	*tree;
 		bool	error;

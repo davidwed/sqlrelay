@@ -65,6 +65,7 @@ class sqltranslator {
 							const char *uniqueid);
 		bool		replaceTempNames(xmldomnode *node);
 		bool		verbatimTableReference(xmldomnode *node);
+		virtual bool	locksNoWaitByDefault(xmldomnode *query);
 
 
 		// helper methods

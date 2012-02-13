@@ -188,6 +188,7 @@ const char *sqlparser::_table="table";
 bool sqlparser::parseIfNotExists(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
+	debugFunction();
 	if (!ifNotExistsClause(ptr,newptr)) {
 		return false;
 	}

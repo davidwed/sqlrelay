@@ -252,12 +252,21 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_select_into,
 		sqlparser::_for_update,
 
+
 		// set...
 		sqlparser::_set,
 		sqlparser::_set_global,
 		sqlparser::_set_session,
 		sqlparser::_transaction,
 		sqlparser::_isolation_level,
+
+
+		// lock...
+		sqlparser::_lock,
+		sqlparser::_in_mode,
+		sqlparser::_lock_mode,
+		sqlparser::_mode,
+		sqlparser::_nowait,
 
 		NULL
 	};
@@ -640,8 +649,6 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return setSession(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_transaction)) {
 		return transaction(node,output);
-	} else if (!charstring::compare(nodename,sqlparser::_isolation_level)) {
-		return isolationLevel(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_limit)) {
 		return limit(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_select_into)) {
@@ -660,6 +667,16 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return transaction(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_isolation_level)) {
 		return isolationLevel(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_lock)) {
+		return lockQuery(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_in_mode)) {
+		return inMode(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_lock_mode)) {
+		return lockMode(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_mode)) {
+		return mode(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_nowait)) {
+		return noWait(node,output);
 	}
 	return true;
 }

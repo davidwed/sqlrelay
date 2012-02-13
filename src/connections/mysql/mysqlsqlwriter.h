@@ -12,6 +12,7 @@ class mysqlsqlwriter : public sqlwriter {
 
 	private:
 		virtual const char * const *additionalElements();
+		virtual const char * const *unsupportedElements();
 };
 
 #endif

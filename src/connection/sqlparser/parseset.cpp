@@ -170,7 +170,8 @@ bool sqlparser::isolationLevelOptionClause(const char *ptr,
 		"SNAPSHOT",
 		"SNAPSHOT TABLE STABILITY",
 		"READ COMMITTED NO RECORD_VERSION",
-		"READ COMMITTED RECORD VERSION"
+		"READ COMMITTED RECORD VERSION",
+		NULL
 	};
 	return comparePart(ptr,newptr,parts);
 }

@@ -21,3 +21,13 @@ const char * const *mysqlsqlwriter::additionalElements() {
 	};
 	return additionalelements;
 }
+
+const char * const *mysqlsqlwriter::unsupportedElements() {
+	debugFunction();
+	static const char *unsupportedelements[]={
+		// nowait...
+		sqlparser::_nowait,
+		NULL
+	};
+	return unsupportedelements;
+}

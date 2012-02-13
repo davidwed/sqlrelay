@@ -111,7 +111,8 @@ bool sqlparser::parseSelect(xmldomnode *currentnode,
 				parseLimit(selectnode,*newptr,newptr) ||
 				parseProcedure(selectnode,*newptr,newptr) ||
 				parseSelectInto(selectnode,*newptr,newptr) ||
-				parseForUpdate(selectnode,*newptr,newptr)) {
+				parseForUpdate(selectnode,*newptr,newptr) ||
+				parseNoWait(selectnode,*newptr,newptr)) {
 				continue;
 			}
 
@@ -197,6 +198,7 @@ bool sqlparser::parseAlias(xmldomnode *currentnode,
 		!charstring::compareIgnoringCase(word,",") ||
 		!charstring::compareIgnoringCase(word,")") ||
 		!charstring::compareIgnoringCase(word,sqlparser::_from) ||
+		!charstring::compareIgnoringCase(word,"for") ||
 		(subselect &&
 		// where clause
 		(!charstring::compareIgnoringCase(word,sqlparser::_where) ||
@@ -761,7 +763,7 @@ bool sqlparser::parseForUpdate(xmldomnode *currentnode,
 
 bool sqlparser::forUpdateClause(const char *ptr, const char **newptr) {
 	debugFunction();
-	return comparePart(ptr,newptr,"for update ");
+	return comparePart(ptr,newptr,"for update");
 }
 
 const char *sqlparser::_for_update="for_update";

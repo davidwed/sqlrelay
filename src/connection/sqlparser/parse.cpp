@@ -181,7 +181,8 @@ bool sqlparser::parse(const char *query) {
 		!parseUpdate(currentnode,ptr,&newptr) &&
 		!parseDelete(currentnode,ptr,&newptr) &&
 		!parseSelect(currentnode,ptr,&newptr) &&
-		!parseSet(currentnode,ptr,&newptr)) {
+		!parseSet(currentnode,ptr,&newptr) &&
+		!parseLock(currentnode,ptr,&newptr)) {
 		debugPrintf("unrecognized query\n");
 		error=true;
 	}
