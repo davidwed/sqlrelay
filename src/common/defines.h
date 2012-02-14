@@ -35,8 +35,8 @@
 #define GET_CURRENT_DATABASE 22
 #define GET_LAST_INSERT_ID 23
 
-#define ERROR 0
-#define NO_ERROR 1
+#define ERROR_OCCURRED 0
+#define NO_ERROR_OCCURRED 1
 
 #define DONT_RECONNECT 0
 #define RECONNECT 1

@@ -1172,7 +1172,7 @@ void sqlrlistener::errorClientSession(filedescriptor *clientsock,
 							const char *err) {
 	// get auth and ignore the result
 	getAuth(clientsock);
-	clientsock->write((uint16_t)ERROR);
+	clientsock->write((uint16_t)ERROR_OCCURRED);
 	clientsock->write((uint16_t)strlen(err));
 	clientsock->write(err);
 	flushWriteBuffer(clientsock);
@@ -1283,7 +1283,7 @@ void sqlrlistener::sqlrelayClientSession(filedescriptor *clientsock) {
 		// brute-force password attacks
 		snooze::macrosnooze(2);
 		const char	err[]="Authentication Error.";
-		clientsock->write((uint16_t)ERROR);
+		clientsock->write((uint16_t)ERROR_OCCURRED);
 		clientsock->write((uint16_t)strlen(err));
 		clientsock->write(err);
 		flushWriteBuffer(clientsock);
@@ -1547,7 +1547,7 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 		if (!getAConnection(&connectionpid,&inetport,
 					unixportstr,&unixportstrlen)) {
 			// fatal error occurred while getting a connection
-			sock->write((uint16_t)ERROR);
+			sock->write((uint16_t)ERROR_OCCURRED);
 			sock->write((uint16_t)70);
 			sock->write("The listener failed to hand the client off to the database connection.");
 			retval=false;
@@ -1576,7 +1576,7 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 				// FIXME: should there be a limit to the number
 				// of times we retry?  If so, should we return
 				// this error
-				/*sock->write((uint16_t)ERROR);
+				/*sock->write((uint16_t)ERROR_OCCURRED);
 				sock->write((uint16_t)70);
 				sock->write("The listener failed to hand the client off to the database connection.");
 				retval=false;
@@ -1593,7 +1593,7 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 
 			// if we got this far, everything has worked,
 			// inform the client...
-			sock->write((uint16_t)NO_ERROR);
+			sock->write((uint16_t)NO_ERROR_OCCURRED);
 			sock->write((uint16_t)DONT_RECONNECT);
 			flushWriteBuffer(sock);
 			retval=true;
@@ -1604,7 +1604,7 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 			// FIXME: if we're not passing around file descriptors,
 			// how can we deterimine if a connection has crashed
 			// or been killed?
-			sock->write((uint16_t)NO_ERROR);
+			sock->write((uint16_t)NO_ERROR_OCCURRED);
 			sock->write((uint16_t)RECONNECT);
 			sock->write(unixportstrlen);
 			sock->write(unixportstr);

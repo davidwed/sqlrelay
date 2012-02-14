@@ -22,7 +22,7 @@ void sqlrconnection_svr::resumeResultSet(sqlrcursor_svr *cursor) {
 		dbgfile.debugPrint("connection",2,"previous result set was suspended");
 
 		// indicate that no error has occurred
-		clientsock->write((uint16_t)NO_ERROR);
+		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 
 		// send the client the id of the 
 		// cursor that it's going to use
@@ -41,7 +41,7 @@ void sqlrconnection_svr::resumeResultSet(sqlrcursor_svr *cursor) {
 				"previous result set was not suspended");
 
 		// indicate that an error has occurred
-		clientsock->write((uint16_t)ERROR);
+		clientsock->write((uint16_t)ERROR_OCCURRED);
 
 		// send the error itself
 		clientsock->write((uint16_t)43);

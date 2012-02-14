@@ -393,7 +393,7 @@ void sqlrconnection_svr::noAvailableCursors(uint16_t command) {
 	delete[] dummy;
 
 	// indicate that an error has occurred
-	clientsock->write((uint16_t)ERROR);
+	clientsock->write((uint16_t)ERROR_OCCURRED);
 
 	// send the error itself
 	uint16_t	len=charstring::length(NOCURSORSERROR);

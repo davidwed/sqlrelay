@@ -78,7 +78,7 @@ bool sqlrcursor::noError() {
 		return false;
 	}
 
-	if (success==NO_ERROR) {
+	if (success==NO_ERROR_OCCURRED) {
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("none.\n");

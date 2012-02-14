@@ -24,8 +24,8 @@ void sqlrcursor::cacheToFile(const char *filename) {
 	delete[] cachedestindname;
 	size_t	cachedestindnamelen=charstring::length(filename)+5;
 	cachedestindname=new char[cachedestindnamelen];
-	charstring::copy(cachedstindname,filename);
-	charstring::append(cachedstindname,".ind");
+	charstring::copy(cachedestindname,filename);
+	charstring::append(cachedestindname,".ind");
 }
 
 void sqlrcursor::setCacheTtl(uint32_t ttl) {
@@ -124,7 +124,7 @@ void sqlrcursor::cacheNoError() {
 		return;
 	}
 
-	cachedest->write((uint16_t)NO_ERROR);
+	cachedest->write((uint16_t)NO_ERROR_OCCURRED);
 }
 
 void sqlrcursor::cacheColumnInfo() {

@@ -32,7 +32,7 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 		dbgfile.debugPrint("connection",1,"query was fake begin...");
 
 		// indicate that no error has occurred
-		clientsock->write((uint16_t)NO_ERROR);
+		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 
 		// send the client the id of the 
 		// cursor that it's going to use
@@ -89,7 +89,7 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 		if (success) {
 
 			// indicate that no error has occurred
-			clientsock->write((uint16_t)NO_ERROR);
+			clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 
 			// send the client the id of the 
 			// cursor that it's going to use
@@ -404,7 +404,7 @@ void sqlrconnection_svr::returnError(sqlrcursor_svr *cursor,
 	dbgfile.debugPrint("connection",2,"returning error...");
 
 	// indicate that an error has occurred
-	clientsock->write((uint16_t)ERROR);
+	clientsock->write((uint16_t)ERROR_OCCURRED);
 
 	// send the error code
 	clientsock->write((uint64_t)errno);

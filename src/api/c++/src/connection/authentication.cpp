@@ -52,7 +52,7 @@ bool sqlrconnection::genericAuthentication() {
 		setError("Failed to authenticate.\n A network error may have ocurred.");
 		return false;
 	}
-	if (authsuccess==ERROR) {
+	if (authsuccess==ERROR_OCCURRED) {
 
 		if (!getError()) {
 			setError("Authentication Error.");
