@@ -5,8 +5,9 @@
 #define ROW_H
 
 #include <rudiments/private/inttypes.h>
+#include <sqlrelay/private/dll.h>
 
-class row {
+class DLLSPEC row {
 	friend class sqlrcursor;
 	private:
 			row(uint32_t colcount);

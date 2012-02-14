@@ -4,6 +4,8 @@
 #ifndef BINDVAR_H
 #define BINDVAR_H
 
+#include <sqlrelay/private/dll.h>
+
 enum bindtype {
 	NULL_BIND,
 	STRING_BIND,
@@ -14,7 +16,7 @@ enum bindtype {
 	CURSOR_BIND
 };
 
-class bindvar {
+class DLLSPEC bindvar {
 	friend class sqlrcursor;
 	private:
 		char	*variable;
