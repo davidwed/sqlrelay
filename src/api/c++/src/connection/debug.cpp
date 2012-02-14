@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrclient.h>
+#include <rudiments/environment.h>
 
 void sqlrconnection::debugOn() {
 	debug=true;
@@ -17,7 +18,7 @@ bool sqlrconnection::getDebug() {
 
 void sqlrconnection::debugPreStart() {
 	if (webdebug==-1) {
-		char	*docroot=getenv("DOCUMENT_ROOT");
+		const char	*docroot=environment::getValue("DOCUMENT_ROOT");
 		if (docroot && docroot[0]) {
 			webdebug=1;
 		} else {

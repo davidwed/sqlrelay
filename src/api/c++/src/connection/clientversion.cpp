@@ -5,5 +5,5 @@
 #include <defines.h>
 
 const char *sqlrconnection::clientVersion() {
-	return CLIENT_VERSION;
+	return SQLR_VERSION;
 }
