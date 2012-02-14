@@ -138,7 +138,7 @@ void sqlrconnection_svr::registerForHandoff(const char *tmpdir) {
 	delete[] handoffsockname;
 }
 
-bool sqlrconnection_svr::receiveFileDescriptor(int *descriptor) {
+bool sqlrconnection_svr::receiveFileDescriptor(int32_t *descriptor) {
 	bool	retval=handoffsockun.receiveFileDescriptor(descriptor);
 	if (!retval) {
 		handoffsockun.close();

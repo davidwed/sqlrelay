@@ -235,7 +235,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 					uint16_t inetport,
 					const char *connectionid);
 		void	registerForHandoff(const char *tmpdir);
-		bool	receiveFileDescriptor(int *descriptor);
+		bool	receiveFileDescriptor(int32_t *descriptor);
 		void	deRegisterForHandoff(const char *tmpdir);
 		bool	getUnixSocket(const char *tmpdir,
 						char *unixsocketptr);
