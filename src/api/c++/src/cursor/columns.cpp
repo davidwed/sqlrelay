@@ -172,7 +172,7 @@ uint32_t sqlrcursor::getColumnScale(const char *col) {
 
 bool sqlrcursor::getColumnIsNullable(const char *col) {
 	column	*whichcol=getColumn(col);
-	return (whichcol)?whichcol->nullable:false;
+	return (whichcol)?(whichcol->nullable!=0):false;
 }
 
 bool sqlrcursor::getColumnIsPrimaryKey(const char *col) {

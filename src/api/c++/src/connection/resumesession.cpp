@@ -25,16 +25,18 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 
 	// first, try for the unix port
 	if (socket && socket[0]) {
-		connected=ucs.connect(socket,-1,-1,retrytime,tries);
-		if (connected==RESULT_SUCCESS) {
+		connected=(ucs.connect(socket,-1,-1,
+					retrytime,tries)==RESULT_SUCCESS);
+		if (connected) {
 			cs=&ucs;
 		}
 	}
 
 	// then try for the inet port
 	if (connected!=RESULT_SUCCESS) {
-		connected=ics.connect(server,port,-1,-1,retrytime,tries);
-		if (connected==RESULT_SUCCESS) {
+		connected=(ics.connect(server,port,-1,-1,
+					retrytime,tries)==RESULT_SUCCESS);
+		if (connected) {
 			cs=&ics;
 		}
 	}
@@ -45,7 +47,7 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 		debugPreEnd();
 	}
 
-	if (connected==RESULT_SUCCESS) {
+	if (connected) {
 
 		// use 8k read and write buffers
 		cs->dontUseNaglesAlgorithm();
@@ -72,5 +74,5 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 		}
 	}
 
-	return (connected==RESULT_SUCCESS);
+	return connected;
 }
