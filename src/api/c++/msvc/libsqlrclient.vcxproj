@@ -15,7 +15,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CLRSupport>true</CLRSupport>
   </PropertyGroup>
@@ -36,7 +36,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -54,7 +54,8 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>librudiments.lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>c:\Program Files\Firstworks\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>copy ..\..\..\..\config.windows.h ..\..\..\..\config.h</Command>
@@ -84,9 +85,9 @@
     <ClCompile Include="..\src\connection\clientversion.cpp" />
     <ClCompile Include="..\src\connection\closeconnection.cpp" />
     <ClCompile Include="..\src\connection\commit.cpp" />
+    <ClCompile Include="..\src\connection\connectioncopyreferences.cpp" />
     <ClCompile Include="..\src\connection\connectionctor.cpp" />
     <ClCompile Include="..\src\connection\connectiondtor.cpp" />
-    <ClCompile Include="..\src\connection\copyreferences.cpp" />
     <ClCompile Include="..\src\connection\dbversion.cpp" />
     <ClCompile Include="..\src\connection\debug.cpp" />
     <ClCompile Include="..\src\connection\endsession.cpp" />
@@ -110,7 +111,7 @@
     <ClCompile Include="..\src\cursor\clearresultset.cpp" />
     <ClCompile Include="..\src\cursor\columnnamecase.cpp" />
     <ClCompile Include="..\src\cursor\columns.cpp" />
-    <ClCompile Include="..\src\cursor\copyreferences.cpp" />
+    <ClCompile Include="..\src\cursor\cursorcopyreferences.cpp" />
     <ClCompile Include="..\src\cursor\cursorctor.cpp" />
     <ClCompile Include="..\src\cursor\cursordtor.cpp" />
     <ClCompile Include="..\src\cursor\errormessage.cpp" />
