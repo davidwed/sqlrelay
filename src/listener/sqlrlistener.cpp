@@ -405,7 +405,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
 	// main listenter process/listener children:
 	// 10 - listener: number of busy listeners
 	//
-	int	vals[11]={1,1,0,0,1,1,0,0,0,1,0};
+	int32_t	vals[11]={1,1,0,0,1,1,0,0,0,1,0};
 	semset=new semaphoreset();
 	if (!semset->create(key,permissions::ownerReadWrite(),11,vals)) {
 
@@ -842,7 +842,7 @@ void sqlrlistener::blockSignals() {
 	alarmhandler.handleSignal(SIGALRM);
 }
 
-void sqlrlistener::alarmHandler(int signum) {
+void sqlrlistener::alarmHandler(int32_t signum) {
 	staticlistener->decForkedListeners();
 	delete staticlistener;
 	process::exit(0);
@@ -1925,7 +1925,7 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 	}
 
 	// get the file descriptor of the socket
-	int	fd;
+	int32_t	fd;
 	if (!fixupclientsockun.receiveFileDescriptor(&fd)) {
 		dbgfile.debugPrint("listener",0,"failed to receive the socket");
 		return false;
