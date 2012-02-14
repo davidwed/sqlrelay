@@ -150,7 +150,7 @@ class	sqlrsh {
 		void	displayError(environment *env,
 					const char *message,
 					const char *error,
-					int64_t errno);
+					int64_t errornumber);
 		void	displayHeader(sqlrcursor *sqlrcur, environment *env);
 		void	displayResultSet(sqlrcursor *sqlrcur, environment *env);
 		void	displayStats(sqlrcursor *sqlrcur, environment *env);
@@ -720,12 +720,12 @@ void sqlrsh::initStats(environment *env) {
 void sqlrsh::displayError(environment *env,
 				const char *message,
 				const char *error,
-				int64_t errno) {
+				int64_t errornumber) {
 	cyan(env);
 	if (charstring::length(message)) {
 		printf("%s\n",message);
 	}
-	printf("%lld:\n",errno);
+	printf("%lld:\n",errornumber);
 	if (charstring::length(error)) {
 		printf("%s\n\n",error);
 	}
