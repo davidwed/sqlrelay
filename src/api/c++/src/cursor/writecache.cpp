@@ -3,6 +3,7 @@
 
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
+#include <rudiments/charstring.h>
 #include <rudiments/permissions.h>
 #include <rudiments/datetime.h>
 #include <defines.h>
@@ -23,7 +24,8 @@ void sqlrcursor::cacheToFile(const char *filename) {
 	delete[] cachedestindname;
 	size_t	cachedestindnamelen=charstring::length(filename)+5;
 	cachedestindname=new char[cachedestindnamelen];
-	snprintf(cachedestindname,cachedestindnamelen,"%s.ind",filename);
+	charstring::copy(cachedstindname,filename);
+	charstring::append(cachedstindname,".ind");
 }
 
 void sqlrcursor::setCacheTtl(uint32_t ttl) {

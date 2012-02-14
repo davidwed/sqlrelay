@@ -3,6 +3,7 @@
 
 #include <config.h>
 #include <sqlrelay/sqlrclient.h>
+#include <rudiments/charstring.h>
 
 bool sqlrcursor::openCachedResultSet(const char *filename) {
 
@@ -25,7 +26,8 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 	// create the index file name
 	size_t	indexfilenamelen=charstring::length(filename)+5;
 	char	*indexfilename=new char[indexfilenamelen];
-	snprintf(indexfilename,indexfilenamelen,"%s.ind",filename);
+	charstring::copy(indexfilename,filename);
+	charstring::append(indexfilename,".ind");
 
 	// open the file
 	cachesource=new file();
