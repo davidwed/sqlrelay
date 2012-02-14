@@ -10,7 +10,7 @@ void cleanUp() {
 	delete s;
 }
 
-RETSIGTYPE shutDown(int signum) {
+void shutDown(int32_t signum) {
 	cleanUp();
 	process::exit(0);
 }

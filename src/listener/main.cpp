@@ -6,12 +6,12 @@
 
 sqlrlistener	*lsnr;
 
-RETSIGTYPE	crash(int signum) {
+void crash(int32_t signum) {
 	delete lsnr;
 	process::exit(0);
 }
 
-RETSIGTYPE	shutDown(int signum) {
+void shutDown(int32_t signum) {
 	delete lsnr;
 	process::exit(0);
 }
