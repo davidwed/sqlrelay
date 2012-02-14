@@ -67,3 +67,6 @@ distclean: clean
 	$(RM) libtool.gcc
 	$(RM) sqlrelay-c.pc
 	$(RM) sqlrelay-c++.pc
+	$(RM) src/api/c++/msvc/libsqlrclient.opensdf
+	$(RM) src/api/c++/msvc/libsqlrclient.sdf
+	$(RM) src/api/c++/msvc/libsqlrclient.suo
