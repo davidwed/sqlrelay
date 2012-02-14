@@ -109,7 +109,7 @@ class sqlrlistener : public daemonprocess, public listener {
 						filedescriptor *clientsock);
 		void	flushWriteBuffer(filedescriptor *fd);
 
-		static void	alarmHandler(int signum);
+		static void	alarmHandler(int32_t signum);
 
 		bool		passdescriptor;
 
