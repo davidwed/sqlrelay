@@ -134,7 +134,7 @@ int32_t sqlrconnection_svr::waitForClient() {
 
 		// receive the descriptor and use it, if we failed to get the
 		// descriptor, delete the socket and return failure
-		int	descriptor;
+		int32_t	descriptor;
 		if (!receiveFileDescriptor(&descriptor)) {
 
 			dbgfile.debugPrint("connection",1,"pass failed");

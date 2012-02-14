@@ -11,7 +11,7 @@
 
 cachemanager	*cacheman;
 
-void shutDown(int signum) {
+void shutDown(int32_t signum) {
 	delete cacheman;
 	process::exit(0);
 }

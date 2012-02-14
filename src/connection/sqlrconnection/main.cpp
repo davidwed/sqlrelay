@@ -15,7 +15,7 @@ void sqlrconnection_svr::cleanUp() {
 	delete sigh;
 }
 
-void sqlrconnection_svr::shutDown(int signum) {
+void sqlrconnection_svr::shutDown(int32_t signum) {
 
 	if (!signalhandler::isSignalHandlerIntUsed()) {
 		cleanUp();

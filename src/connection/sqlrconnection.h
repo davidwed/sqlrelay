@@ -194,7 +194,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 							const char *id);
 		void		cleanUpAllCursorData(bool freeresult,
 							bool freebinds);
-		virtual signalhandler	*handleSignals(void (*shutdownfunction)(int));
+		virtual signalhandler	*handleSignals(
+					void (*shutdownfunction)(int32_t));
 
 		virtual	bool		getColumnNames(const char *query,
 						stringbuffer *output);
@@ -205,7 +206,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool	listen();
 		void	closeConnection();
 		static void	cleanUp();
-		static void	shutDown(int signum);
+		static void	shutDown(int32_t signum);
 
 		bool	logInUpdateStats(bool printerrors);
 		void	logOutUpdateStats();
