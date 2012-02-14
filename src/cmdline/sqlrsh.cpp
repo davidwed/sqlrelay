@@ -218,7 +218,8 @@ void sqlrsh::userRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	// build rcfilename
 	size_t	userrcfilelen=charstring::length(home)+10+1;
 	char	*userrcfile=new char[userrcfilelen];
-	snprintf(userrcfile,userrcfilelen,"%s/.sqlrshrc",home);
+	charstring::copy(userrcfile,home);
+	charstring::append(userrcfile,"/.sqlrshrc");
 
 	// process the file
 	runScript(sqlrcon,sqlrcur,env,userrcfile,false,false);
@@ -1398,8 +1399,8 @@ void sqlrsh::execute(int argc, const char **argv) {
 		if (home && home[0]) {
 			filenamelen=charstring::length(home)+16+1;
 			filename=new char[filenamelen];
-			snprintf(filename,filenamelen,
-					"%s/.sqlrsh_history",home);
+			charstring::copy(filename,home);
+			charstring::append(filename,"/.sqlrsh_history");
 
 			// create the history file if it doesn't exist now
 			FILE	*historyfile=fopen(filename,"a");
