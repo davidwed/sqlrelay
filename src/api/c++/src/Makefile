@@ -69,7 +69,7 @@ SRCS = connection/connectionctor.cpp \
 	row/row.cpp
 LOBJS = connection/connectionctor.lo \
 	connection/connectiondtor.lo \
-	connection/copyreferences.lo \
+	connection/connectioncopyreferences.lo \
 	connection/ping.lo \
 	connection/identify.lo \
 	connection/dbversion.lo \
@@ -97,7 +97,7 @@ LOBJS = connection/connectionctor.lo \
 	connection/closeconnection.lo \
 	cursor/cursorctor.lo \
 	cursor/cursordtor.lo \
-	cursor/copyreferences.lo \
+	cursor/cursorcopyreferences.lo \
 	cursor/columns.lo \
 	cursor/fields.lo \
 	cursor/columnnamecase.lo \

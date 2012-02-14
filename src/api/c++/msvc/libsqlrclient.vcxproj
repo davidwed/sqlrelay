@@ -60,6 +60,15 @@
     <PreBuildEvent>
       <Command>copy ..\..\..\..\config.windows.h ..\..\..\..\config.h</Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>mkdir c:\"Program Files"\Firstworks\lib
+mkdir c:\"Program Files"\Firstworks\include\sqlrelay\private
+mkdir c:\"Program Files"\Firstworks\bin
+copy Debug\libsqlrclient.dll c:\"Program Files"\Firstworks\bin
+copy Debug\libsqlrclient.lib c:\"Program Files"\Firstworks\lib
+copy ..\include\sqlrelay\*.h c:\"Program Files"\Firstworks\include\sqlrelay
+copy ..\include\sqlrelay\private\*.h c:\"Program Files"\Firstworks\include\sqlrelay\private</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
