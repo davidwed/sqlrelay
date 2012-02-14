@@ -7,7 +7,7 @@
 #include <rudiments/private/inttypes.h>
 #include <sqlrelay/private/dll.h>
 
-class DLLSPEC row {
+class SQLRCLIENT_DLLSPEC row {
 	friend class sqlrcursor;
 	private:
 			row(uint32_t colcount);

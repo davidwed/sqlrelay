@@ -10,7 +10,7 @@
 using namespace rudiments;
 #endif
 
-class DLLSPEC sqlrconnection {
+class SQLRCLIENT_DLLSPEC sqlrconnection {
 	public:
 			/** Initiates a connection to "server" on "port"
 			 *  or to the unix "socket" on the local machine
@@ -174,7 +174,7 @@ class DLLSPEC sqlrconnection {
 };
 
 
-class DLLSPEC sqlrcursor {
+class SQLRCLIENT_DLLSPEC sqlrcursor {
 	public:
 			/** Creates a cursor to run queries and fetch result
 			 *  sets using connecton "sqlrc". */

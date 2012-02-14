@@ -16,7 +16,7 @@ enum bindtype {
 	CURSOR_BIND
 };
 
-class DLLSPEC bindvar {
+class SQLRCLIENT_DLLSPEC bindvar {
 	friend class sqlrcursor;
 	private:
 		char	*variable;

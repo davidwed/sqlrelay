@@ -6,12 +6,12 @@
 
 #ifdef _WIN32
 	#ifdef LIBSQLRCLIENT_EXPORTS
-		#define DLLSPEC __declspec(dllexport)
+		#define SQLRCLIENT_DLLSPEC __declspec(dllexport)
 	#else
-		#define DLLSPEC __declspec(dllimport)
+		#define SQLRCLIENT_DLLSPEC __declspec(dllimport)
 	#endif
 #else
-	#define DLLSPEC
+	#define SQLRCLIENT_DLLSPEC
 #endif
 
 #endif
