@@ -100,42 +100,42 @@ uint32_t sqlrcursor::getColumnScale(uint32_t col) {
 
 bool sqlrcursor::getColumnIsNullable(uint32_t col) {
 	column	*whichcol=getColumn(col);
-	return (whichcol)?(bool)whichcol->nullable:false;
+	return (whichcol)?(whichcol->nullable!=0):false;
 }
 
 bool sqlrcursor::getColumnIsPrimaryKey(uint32_t col) {
 	column	*whichcol=getColumn(col);
-	return (whichcol)?(bool)whichcol->primarykey:false;
+	return (whichcol)?(whichcol->primarykey!=0):false;
 }
 
 bool sqlrcursor::getColumnIsUnique(uint32_t col) {
 	column	*whichcol=getColumn(col);
-	return (whichcol)?(bool)whichcol->unique:false;
+	return (whichcol)?(whichcol->unique!=0):false;
 }
 
 bool sqlrcursor::getColumnIsPartOfKey(uint32_t col) {
 	column	*whichcol=getColumn(col);
-	return (whichcol)?(bool)whichcol->partofkey:false;
+	return (whichcol)?(whichcol->partofkey!=0):false;
 }
 
 bool sqlrcursor::getColumnIsUnsigned(uint32_t col) {
 	column	*whichcol=getColumn(col);
-	return (whichcol)?(bool)whichcol->unsignednumber:false;
+	return (whichcol)?(whichcol->unsignednumber!=0):false;
 }
 
 bool sqlrcursor::getColumnIsZeroFilled(uint32_t col) {
 	column	*whichcol=getColumn(col);
-	return (whichcol)?(bool)whichcol->zerofill:false;
+	return (whichcol)?(whichcol->zerofill!=0):false;
 }
 
 bool sqlrcursor::getColumnIsBinary(uint32_t col) {
 	column	*whichcol=getColumn(col);
-	return (whichcol)?(bool)whichcol->binary:false;
+	return (whichcol)?(whichcol->binary!=0):false;
 }
 
 bool sqlrcursor::getColumnIsAutoIncrement(uint32_t col) {
 	column	*whichcol=getColumn(col);
-	return (whichcol)?(bool)whichcol->autoincrement:false;
+	return (whichcol)?(whichcol->autoincrement!=0):false;
 }
 
 uint32_t sqlrcursor::getLongest(uint32_t col) {
@@ -177,37 +177,37 @@ bool sqlrcursor::getColumnIsNullable(const char *col) {
 
 bool sqlrcursor::getColumnIsPrimaryKey(const char *col) {
 	column	*whichcol=getColumn(col);
-	return (whichcol)?(bool)whichcol->primarykey:false;
+	return (whichcol)?(whichcol->primarykey!=0):false;
 }
 
 bool sqlrcursor::getColumnIsUnique(const char *col) {
 	column	*whichcol=getColumn(col);
-	return (whichcol)?(bool)whichcol->unique:false;
+	return (whichcol)?(whichcol->unique!=0):false;
 }
 
 bool sqlrcursor::getColumnIsPartOfKey(const char *col) {
 	column	*whichcol=getColumn(col);
-	return (whichcol)?(bool)whichcol->partofkey:false;
+	return (whichcol)?(whichcol->partofkey!=0):false;
 }
 
 bool sqlrcursor::getColumnIsUnsigned(const char *col) {
 	column	*whichcol=getColumn(col);
-	return (whichcol)?(bool)whichcol->unsignednumber:false;
+	return (whichcol)?(whichcol->unsignednumber!=0):false;
 }
 
 bool sqlrcursor::getColumnIsZeroFilled(const char *col) {
 	column	*whichcol=getColumn(col);
-	return (whichcol)?(bool)whichcol->zerofill:false;
+	return (whichcol)?(whichcol->zerofill!=0):false;
 }
 
 bool sqlrcursor::getColumnIsBinary(const char *col) {
 	column	*whichcol=getColumn(col);
-	return (whichcol)?(bool)whichcol->binary:false;
+	return (whichcol)?(whichcol->binary!=0):false;
 }
 
 bool sqlrcursor::getColumnIsAutoIncrement(const char *col) {
 	column	*whichcol=getColumn(col);
-	return (whichcol)?(bool)whichcol->autoincrement:false;
+	return (whichcol)?(whichcol->autoincrement!=0):false;
 }
 
 
