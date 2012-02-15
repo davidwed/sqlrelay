@@ -4,6 +4,7 @@
 #include <config.h>
 #include <sqlrconfigfile.h>
 #include <rudiments/stringbuffer.h>
+#include <rudiments/environment.h>
 
 #include <stdlib.h>
 
@@ -1413,12 +1414,13 @@ bool sqlrconfigfile::parse(const char *config, const char *id,
 	}
 
 	// parse the user's .sqlrelay.conf file
-	const char	*homedir=getenv("HOME");
+	const char	*homedir=environment::getValue("HOME");
 	char		*filename;
 	if (homedir && homedir[0]) {
 		size_t	filenamelen=charstring::length(homedir)+15+1;
 		filename=new char[filenamelen];
-		snprintf(filename,filenamelen,"%s/.sqlrelay.conf",homedir);
+		charstring::copy(filename,homedir);
+		charstring::append(filename,"/.sqlrelay.conf");
 	} else {
 		filename=charstring::duplicate("~/.sqlrelay.conf");
 	}

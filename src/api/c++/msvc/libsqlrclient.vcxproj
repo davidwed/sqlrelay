@@ -44,7 +44,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;LIBSQLRCLIENT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>c:\Program Files\Firstworks\include;..\include;..\..\..\common;..\..\..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\Firstworks\include;..\include;..\..\..\common;..\..\..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -54,26 +54,27 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>c:\Program Files\Firstworks\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\Firstworks\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>copy ..\..\..\..\config.windows.h ..\..\..\..\config.h</Command>
+      <Command>cd ..\..\..\..
+copy /Y config.windows.h config.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>mkdir c:\"Program Files"\Firstworks\lib
-mkdir c:\"Program Files"\Firstworks\include\sqlrelay\private
-mkdir c:\"Program Files"\Firstworks\bin
-copy Debug\libsqlrclient.dll c:\"Program Files"\Firstworks\bin
-copy Debug\libsqlrclient.lib c:\"Program Files"\Firstworks\lib
-copy ..\include\sqlrelay\*.h c:\"Program Files"\Firstworks\include\sqlrelay
-copy ..\include\sqlrelay\private\*.h c:\"Program Files"\Firstworks\include\sqlrelay\private</Command>
+      <Command>mkdir C:\"Program Files"\Firstworks\lib
+mkdir C:\"Program Files"\Firstworks\include\sqlrelay\private
+mkdir C:\"Program Files"\Firstworks\bin
+copy /Y Debug\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
+copy /Y Debug\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
+copy /Y ..\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
+copy /Y ..\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;LIBSQLRCLIENT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>c:\Program Files\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>

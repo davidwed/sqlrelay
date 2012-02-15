@@ -8,8 +8,8 @@ tempdir::tempdir(cmdline *cmdl) {
 	if (cmdl->getLocalStateDir()[0]) {
 		tmpdirlen=charstring::length(cmdl->getLocalStateDir())+13;
 		tmpdir=new char[tmpdirlen+1];
-		snprintf(tmpdir,tmpdirlen+1,
-				"%s/sqlrelay/tmp",cmdl->getLocalStateDir());
+		charstring::copy(tmpdir,cmdl->getLocalStateDir());
+		charstring::append(tmpdir,"/sqlrelay/tmp");
 	} else {
 		tmpdir=charstring::duplicate(TMP_DIR);
 		tmpdirlen=charstring::length(tmpdir);

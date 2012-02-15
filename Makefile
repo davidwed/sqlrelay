@@ -70,3 +70,12 @@ distclean: clean
 	$(RM) src/api/c++/msvc/libsqlrclient.opensdf
 	$(RM) src/api/c++/msvc/libsqlrclient.sdf
 	$(RM) src/api/c++/msvc/libsqlrclient.suo
+	$(RMTREE) src/api/c++/msvc/Debug
+	$(RM) src/cmdline/msvc/sqlrsh.opensdf
+	$(RM) src/cmdline/msvc/sqlrsh.sdf
+	$(RM) src/cmdline/msvc/sqlrsh.suo
+	$(RMTREE) src/cmdline/msvc/Debug
+	$(RM) src/util/msvc/libsqlrutil.opensdf
+	$(RM) src/util/msvc/libsqlrutil.sdf
+	$(RM) src/util/msvc/libsqlrutil.suo
+	$(RMTREE) src/util/msvc/Debug

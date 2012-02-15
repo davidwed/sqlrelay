@@ -6,6 +6,8 @@
 
 #include <config.h>
 
+#include <dll.h>
+
 #include <rudiments/xmlsax.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/linkedlist.h>
@@ -82,7 +84,7 @@ typedef enum {
 	IGNORESELECTDB_ATTRIBUTE
 } attribute;
 
-class usercontainer {
+class SQLRUTIL_DLLSPEC usercontainer {
 	friend class sqlrconfigfile;
 	public:
 				usercontainer();
@@ -99,7 +101,7 @@ class usercontainer {
 
 typedef linkedlistnode< usercontainer * >	usernode;
 
-class connectstringcontainer {
+class SQLRUTIL_DLLSPEC connectstringcontainer {
 	public:
 				connectstringcontainer(
 						uint16_t connectstringcount);
@@ -128,7 +130,7 @@ class connectstringcontainer {
 
 typedef linkedlistnode< connectstringcontainer * >	connectstringnode;
 
-class routecontainer {
+class SQLRUTIL_DLLSPEC routecontainer {
 	friend class sqlrconfigfile;
 	public:
 			routecontainer();
@@ -160,7 +162,7 @@ class routecontainer {
 
 typedef linkedlistnode< routecontainer * >	routenode;
 
-class sqlrconfigfile : public xmlsax {
+class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 	public:
 			sqlrconfigfile();
 			~sqlrconfigfile();
