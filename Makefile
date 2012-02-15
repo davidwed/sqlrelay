@@ -71,6 +71,10 @@ distclean: clean
 	$(RM) src/api/c++/msvc/libsqlrclient.sdf
 	$(RM) src/api/c++/msvc/libsqlrclient.suo
 	$(RMTREE) src/api/c++/msvc/Debug
+	$(RM) src/api/c/msvc/libsqlrclientwrapper.opensdf
+	$(RM) src/api/c/msvc/libsqlrclientwrapper.sdf
+	$(RM) src/api/c/msvc/libsqlrclientwrapper.suo
+	$(RMTREE) src/api/c++/msvc/Debug
 	$(RM) src/cmdline/msvc/sqlrsh.opensdf
 	$(RM) src/cmdline/msvc/sqlrsh.sdf
 	$(RM) src/cmdline/msvc/sqlrsh.suo
