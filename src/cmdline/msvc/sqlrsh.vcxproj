@@ -41,7 +41,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;DEFAULT_CONFIG_FILE="C:\Program Files\Firstworks\etc\sqlrelay.conf";SYSTEM_SQLRSHRC="C:\Program Files\Firstworks\etc\sqlrshrc";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";SYSTEM_SQLRSHRC="C:\\Program Files\\Firstworks\\etc\\sqlrshrc";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\api\c++\include;..\..\..;..\..\common;..\..\util;c:\Program Files\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
