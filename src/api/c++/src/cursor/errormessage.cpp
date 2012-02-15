@@ -10,7 +10,7 @@ int64_t sqlrcursor::errorNumber() {
 	// the message to see which code to return
 	if (error) {
 		return errorno;
-	} else if (sqlrc->errorno) {
+	} else if (sqlrc->error) {
 		return sqlrc->errorno;
 	}
 	return 0;
