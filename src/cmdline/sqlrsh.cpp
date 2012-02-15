@@ -9,6 +9,7 @@
 #include <rudiments/file.h>
 #include <rudiments/filedescriptor.h>
 #include <rudiments/process.h>
+#include <rudiments/environment.h>
 #include <sqlrconfigfile.h>
 
 // for clock()
@@ -54,10 +55,10 @@ class sqlrshbindvalue {
 		uint32_t	outputstringbindlength;
 };
 
-class environment {
+class sqlrshenv {
 	public:
-			environment();
-			~environment();
+			sqlrshenv();
+			~sqlrshenv();
 		void	 clearbinds(
 			stringdictionary< sqlrshbindvalue * > *binds);
 		bool	color;
@@ -70,7 +71,7 @@ class environment {
 		stringdictionary< sqlrshbindvalue * >	outputbinds;
 };
 
-environment::environment() {
+sqlrshenv::sqlrshenv() {
 	color=false;
 	headers=true;
 	stats=true;
@@ -79,12 +80,12 @@ environment::environment() {
 	delimiter=';';
 }
 
-environment::~environment() {
+sqlrshenv::~sqlrshenv() {
 	clearbinds(&inputbinds);
 	clearbinds(&outputbinds);
 }
 
-void environment::clearbinds(stringdictionary< sqlrshbindvalue * > *binds) {
+void sqlrshenv::clearbinds(stringdictionary< sqlrshbindvalue * > *binds) {
 
 	for (stringdictionarylistnode< sqlrshbindvalue * > *node=
 		(stringdictionarylistnode< sqlrshbindvalue *> *)
@@ -116,78 +117,78 @@ class	sqlrsh {
 #endif
 		void	execute(int argc, const char **argv);
 	private:
-		void	startupMessage(environment *env,
+		void	startupMessage(sqlrshenv *env,
 					const char *host, uint16_t port,
 					const char *user);
 		void	systemRcFile(sqlrconnection *sqlrcon, 
 					sqlrcursor *sqlrcur, 
-					environment *env);
+					sqlrshenv *env);
 		void	userRcFile(sqlrconnection *sqlrcon, 
 					sqlrcursor *sqlrcur, 
-					environment *env);
+					sqlrshenv *env);
 		void	runScript(sqlrconnection *sqlrcon,
-					sqlrcursor *sqlrcur, environment *env, 
+					sqlrcursor *sqlrcur, sqlrshenv *env, 
 					const char *filename, bool returnerror,
 					bool displaycommand);
 		bool	getCommandFromFile(file *fl,
 					stringbuffer *cmdbuffer,
-					environment *env);
+					sqlrshenv *env);
 		bool	runCommand(sqlrconnection *sqlrcon, 
 					sqlrcursor *sqlrcur, 
-					environment *env, const char *command);
+					sqlrshenv *env, const char *command);
 		int	commandType(const char *command);
 		void	internalCommand(sqlrconnection *sqlrcon,
-					sqlrcursor *sqlrcur, environment *env,
+					sqlrcursor *sqlrcur, sqlrshenv *env,
 					const char *command);
 		void	externalCommand(sqlrconnection *sqlrcon,
-					sqlrcursor *sqlrcur, environment *env, 
+					sqlrcursor *sqlrcur, sqlrshenv *env, 
 					const char *command);
-		void	executeQuery(sqlrcursor *sqlrcur, environment *env);
+		void	executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env);
 		char	*getWild(const char *command);
 		char	*getTable(enum querytype_t querytype,
 					const char *command);
-		void	initStats(environment *env);
-		void	displayError(environment *env,
+		void	initStats(sqlrshenv *env);
+		void	displayError(sqlrshenv *env,
 					const char *message,
 					const char *error,
 					int64_t errornumber);
-		void	displayHeader(sqlrcursor *sqlrcur, environment *env);
-		void	displayResultSet(sqlrcursor *sqlrcur, environment *env);
-		void	displayStats(sqlrcursor *sqlrcur, environment *env);
-		void	ping(sqlrconnection *sqlrcon, environment *env);
-		void	identify(sqlrconnection *sqlrcon, environment *env);
-		void	dbversion(sqlrconnection *sqlrcon, environment *env);
+		void	displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env);
+		void	displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env);
+		void	displayStats(sqlrcursor *sqlrcur, sqlrshenv *env);
+		void	ping(sqlrconnection *sqlrcon, sqlrshenv *env);
+		void	identify(sqlrconnection *sqlrcon, sqlrshenv *env);
+		void	dbversion(sqlrconnection *sqlrcon, sqlrshenv *env);
 		void	clientversion(sqlrconnection *sqlrcon,
-						environment *env);
+						sqlrshenv *env);
 		void	serverversion(sqlrconnection *sqlrcon,
-						environment *env);
-		bool	lastinsertid(sqlrconnection *sqlrcon, environment *env);
+						sqlrshenv *env);
+		bool	lastinsertid(sqlrconnection *sqlrcon, sqlrshenv *env);
 		void	inputbind(sqlrcursor *sqlrcur,
-						environment *env,
+						sqlrshenv *env,
 						const char *command);
 		void	outputbind(sqlrcursor *sqlrcur,
-						environment *env,
+						sqlrshenv *env,
 						const char *command);
 		void	printbinds(const char *type,
 				stringdictionary< sqlrshbindvalue * >
 								*binds);
 		void	clearbinds(stringdictionary< sqlrshbindvalue * >
 								*binds);
-		void	displayHelp(environment *env);
+		void	displayHelp(sqlrshenv *env);
 		void	interactWithUser(sqlrconnection *sqlrcon,
-					sqlrcursor *sqlrcur, environment *env);
+					sqlrcursor *sqlrcur, sqlrshenv *env);
 		void	prompt(unsigned long promptcount);
 		void	error(const char *errstring);
 
-		void	setColor(environment *env, int value);
-		void	black(environment *env);
-		void	red(environment *env);
-		void	green(environment *env);
-		void	yellow(environment *env);
-		void	blue(environment *env);
-		void	magenta(environment *env);
-		void	cyan(environment *env);
-		void	white(environment *env);
+		void	setColor(sqlrshenv *env, int value);
+		void	black(sqlrshenv *env);
+		void	red(sqlrshenv *env);
+		void	green(sqlrshenv *env);
+		void	yellow(sqlrshenv *env);
+		void	blue(sqlrshenv *env);
+		void	magenta(sqlrshenv *env);
+		void	cyan(sqlrshenv *env);
+		void	white(sqlrshenv *env);
 
 #ifndef HAVE_READLINE
 		filedescriptor	standardin;
@@ -202,15 +203,15 @@ sqlrsh::sqlrsh() {
 #endif
 
 void sqlrsh::systemRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
-						environment *env) {
+						sqlrshenv *env) {
 	runScript(sqlrcon,sqlrcur,env,SYSTEM_SQLRSHRC,false,false);
 }
 
 void sqlrsh::userRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
-						environment *env) {
+						sqlrshenv *env) {
 
 	// get user's home directory
-	const char	*home=getenv("HOME");
+	const char	*home=environment::getValue("HOME");
 	if (!home) {
 		home="~";
 	}
@@ -227,7 +228,7 @@ void sqlrsh::userRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 }
 
 void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
-			environment *env, const char *filename,
+			sqlrshenv *env, const char *filename,
 			bool returnerror, bool displaycommand) {
 
 	char	*trimmedfilename=charstring::duplicate(filename);
@@ -272,7 +273,7 @@ void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 }
 
 bool sqlrsh::getCommandFromFile(file *fl, stringbuffer *cmdbuffer,
-						environment *env) {
+						sqlrshenv *env) {
 
 	char	character;
 	
@@ -306,7 +307,7 @@ bool sqlrsh::getCommandFromFile(file *fl, stringbuffer *cmdbuffer,
 }
 
 bool sqlrsh::runCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
-					environment *env, const char *command) {
+					sqlrshenv *env, const char *command) {
 
 	int	cmdtype=commandType(command);
 
@@ -375,7 +376,7 @@ int sqlrsh::commandType(const char *command) {
 }
 
 void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
-					environment *env, const char *command) {
+					sqlrshenv *env, const char *command) {
 
 	// skip white space
 	char	*ptr=(char *)command;
@@ -508,7 +509,7 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 }
 
 void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
-				sqlrcursor *sqlrcur, environment *env, 
+				sqlrcursor *sqlrcur, sqlrshenv *env, 
 				const char *command) {
 
 	// init stats
@@ -594,7 +595,7 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 	displayStats(sqlrcur,env);
 }
 
-void sqlrsh::executeQuery(sqlrcursor *sqlrcur, environment *env) {
+void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	sqlrcur->clearBinds();
 
@@ -707,7 +708,7 @@ char *sqlrsh::getTable(querytype_t querytype, const char *command) {
 	return NULL;
 }
 
-void sqlrsh::initStats(environment *env) {
+void sqlrsh::initStats(sqlrshenv *env) {
 
 	if (!env->stats) {
 		return;
@@ -717,7 +718,7 @@ void sqlrsh::initStats(environment *env) {
 	clock();
 }
 
-void sqlrsh::displayError(environment *env,
+void sqlrsh::displayError(sqlrshenv *env,
 				const char *message,
 				const char *error,
 				int64_t errornumber) {
@@ -732,7 +733,7 @@ void sqlrsh::displayError(environment *env,
 	white(env);
 }
 
-void sqlrsh::displayHeader(sqlrcursor *sqlrcur, environment *env) {
+void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	if (!env->headers) {
 		return;
@@ -792,7 +793,7 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, environment *env) {
 	white(env);
 }
 
-void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, environment *env) {
+void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	// display column names
 	uint32_t	colcount=sqlrcur->colCount();
@@ -849,7 +850,7 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, environment *env) {
 	}
 }
 
-void sqlrsh::displayStats(sqlrcursor *sqlrcur, environment *env) {
+void sqlrsh::displayStats(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	if (!env->stats) {
 		return;
@@ -872,14 +873,14 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, environment *env) {
 	printf("\n");
 }
 
-void sqlrsh::ping(sqlrconnection *sqlrcon, environment *env) {
+void sqlrsh::ping(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	red(env);
 	printf((sqlrcon->ping())?"	The database is up.\n":
 				"	The database is down.\n");
 	white(env);
 }
 
-bool sqlrsh::lastinsertid(sqlrconnection *sqlrcon, environment *env) {
+bool sqlrsh::lastinsertid(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	red(env);
 	bool		retval=false;
 	uint64_t	id=sqlrcon->getLastInsertId();
@@ -891,32 +892,32 @@ bool sqlrsh::lastinsertid(sqlrconnection *sqlrcon, environment *env) {
 	return retval;
 }
 
-void sqlrsh::identify(sqlrconnection *sqlrcon, environment *env) {
+void sqlrsh::identify(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	red(env);
 	printf("%s\n",sqlrcon->identify());
 	white(env);
 }
 
-void sqlrsh::dbversion(sqlrconnection *sqlrcon, environment *env) {
+void sqlrsh::dbversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	red(env);
 	printf("%s\n",sqlrcon->dbVersion());
 	white(env);
 }
 
-void sqlrsh::clientversion(sqlrconnection *sqlrcon, environment *env) {
+void sqlrsh::clientversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	red(env);
 	printf("%s\n",sqlrcon->clientVersion());
 	white(env);
 }
 
-void sqlrsh::serverversion(sqlrconnection *sqlrcon, environment *env) {
+void sqlrsh::serverversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	red(env);
 	printf("%s\n",sqlrcon->serverVersion());
 	white(env);
 }
 
 void sqlrsh::inputbind(sqlrcursor *sqlrcur,
-				environment *env, const char *command) {
+				sqlrshenv *env, const char *command) {
 
 	// sanity check
 	const char	*ptr=command+10;
@@ -994,7 +995,7 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 }
 
 void sqlrsh::outputbind(sqlrcursor *sqlrcur,
-				environment *env, const char *command) {
+				sqlrshenv *env, const char *command) {
 
 	// split the command on ' '
 	char		**parts;
@@ -1091,7 +1092,7 @@ void sqlrsh::printbinds(const char *type,
 	}
 }
 
-void sqlrsh::displayHelp(environment *env) {
+void sqlrsh::displayHelp(sqlrshenv *env) {
 
 	printf("\n");
 	yellow(env);
@@ -1218,7 +1219,7 @@ void sqlrsh::displayHelp(environment *env) {
 	white(env);
 }
 
-void sqlrsh::startupMessage(environment *env, const char *host,
+void sqlrsh::startupMessage(sqlrshenv *env, const char *host,
 					uint16_t port, const char *user) {
 
 	red(env);
@@ -1235,7 +1236,7 @@ void sqlrsh::startupMessage(environment *env, const char *host,
 }
 
 void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
-							environment *env) {
+							sqlrshenv *env) {
 
 	// init some variables
 	stringbuffer	command;
@@ -1382,8 +1383,8 @@ void sqlrsh::execute(int argc, const char **argv) {
 	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);
 	sqlrcursor	sqlrcur(&sqlrcon);
 
-	// set up an environment
-	environment	env;
+	// set up an sqlrshenv
+	sqlrshenv	env;
 
 	// process RC files
 	systemRcFile(&sqlrcon,&sqlrcur,&env);
@@ -1395,7 +1396,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 		// handle the history file
 		size_t		filenamelen;
 		char		*filename;
-		const char	*home=getenv("HOME");
+		const char	*home=environment::getValue("HOME");
 		if (home && home[0]) {
 			filenamelen=charstring::length(home)+16+1;
 			filename=new char[filenamelen];
@@ -1429,41 +1430,41 @@ void sqlrsh::execute(int argc, const char **argv) {
 	#endif
 }
 
-void sqlrsh::setColor(environment *env, int value) {
+void sqlrsh::setColor(sqlrshenv *env, int value) {
 	if (env->color) {
 		printf("\033[0;%dm",value);
 	}
 }
 
-void sqlrsh::black(environment *env) {
+void sqlrsh::black(sqlrshenv *env) {
 	setColor(env,30);
 }
 
-void sqlrsh::red(environment *env) {
+void sqlrsh::red(sqlrshenv *env) {
 	setColor(env,31);
 }
 
-void sqlrsh::green(environment *env) {
+void sqlrsh::green(sqlrshenv *env) {
 	setColor(env,32);
 }
 
-void sqlrsh::yellow(environment *env) {
+void sqlrsh::yellow(sqlrshenv *env) {
 	setColor(env,33);
 }
 
-void sqlrsh::blue(environment *env) {
+void sqlrsh::blue(sqlrshenv *env) {
 	setColor(env,34);
 }
 
-void sqlrsh::magenta(environment *env) {
+void sqlrsh::magenta(sqlrshenv *env) {
 	setColor(env,35);
 }
 
-void sqlrsh::cyan(environment *env) {
+void sqlrsh::cyan(sqlrshenv *env) {
 	setColor(env,36);
 }
 
-void sqlrsh::white(environment *env) {
+void sqlrsh::white(sqlrshenv *env) {
 	setColor(env,37);
 }
 
