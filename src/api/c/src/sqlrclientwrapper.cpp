@@ -122,6 +122,10 @@ void sqlrcon_debugPrintFunction(sqlrcon sqlrconref,
 	sqlrconref->debugPrintFunction(printfunction);
 }
 
+void sqlrcon_copyReferences(sqlrcon sqlrconref) {
+	sqlrconref->copyReferences();
+}
+
 
 sqlrcur sqlrcur_alloc(sqlrcon sqlrconref) {
 	sqlrcur	sqlrcurref=new sqlrcursor(sqlrconref);
@@ -606,6 +610,10 @@ int sqlrcur_resumeResultSet(sqlrcur sqlrcurref, uint16_t id) {
 int sqlrcur_resumeCachedResultSet(sqlrcur sqlrcurref,
 					uint16_t id, const char *filename) {
 	return sqlrcurref->resumeCachedResultSet(id,filename);
+}
+
+void sqlrcur_copyReferences(sqlrcur sqlrcurref) {
+	sqlrcurref->copyReferences();
 }
 
 }

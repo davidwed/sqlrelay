@@ -196,6 +196,12 @@ SQLRCLIENTWRAPPER_DLLSPEC
 void	sqlrcon_debugPrintFunction(sqlrcon sqlrconref, 
 					int (*printfunction)(const char *,...));
 
+/** @ingroup sqlrclientwrapper
+ *  Causes the library to keep internal copies of strings and other objects.
+ *  This is mainly used by code for binding to other languages. */
+SQLRCLIENTWRAPPER_DLLSPEC
+void	sqlrcon_copyReferences(sqlrcon sqlrconref);
+
 
 
 /** @ingroup sqlrclientwrapper
@@ -937,5 +943,11 @@ int	sqlrcur_resumeResultSet(sqlrcur sqlrcurref, uint16_t id);
 SQLRCLIENTWRAPPER_DLLSPEC
 int	sqlrcur_resumeCachedResultSet(sqlrcur sqlrcurref, 
 					uint16_t id, const char *filename);
+
+/** @ingroup sqlrclientwrapper
+ *  Causes the library to keep internal copies of strings and other objects.
+ *  This is mainly used by code for binding to other languages. */
+SQLRCLIENTWRAPPER_DLLSPEC
+void	sqlrcur_copyReferences(sqlrcur sqlrcurref);
 
 #endif
