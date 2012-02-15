@@ -17,6 +17,7 @@ install:
 	$(INSTALL) -m 644 sqlrelay/private/sqlrdefines.h $(includedir)/sqlrelay/private
 	$(INSTALL) -m 644 sqlrelay/private/sqlrincludes.h $(includedir)/sqlrelay/private
 	$(INSTALL) -m 644 sqlrelay/private/sqlrcursor.h $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 sqlrelay/private/dll.h $(includedir)/sqlrelay/private
 
 uninstall:
 	$(RM) $(includedir)/sqlrclient.h
