@@ -2237,6 +2237,24 @@ then
 							break
 						fi
 					fi
+					if ( test -d "$im" )
+					then
+						PYTHONINCLUDES="-I$im"
+						if ( test -n "$PYTHONINCLUDES" )
+						then
+							PYTHONVERSION=`echo $j | sed -e "s|\.||"`
+							break
+						fi
+					fi
+					if ( test -d "$imu" )
+					then
+						PYTHONINCLUDES="-I$imu"
+						if ( test -n "$PYTHONINCLUDES" )
+						then
+							PYTHONVERSION=`echo $j | sed -e "s|\.||"`
+							break
+						fi
+					fi
 				done
 
 				for i in "/usr/lib64/python$j" "/usr/lib/python$j" "/usr/local/lib64/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib64/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j" "/usr/sfw/lib/python$j" "/sfw/lib/python$j" "/opt/csw/lib/python$j" "/sw/lib/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/lib/python$j"
