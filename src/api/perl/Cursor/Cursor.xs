@@ -22,8 +22,7 @@ sqlrcursor *
 sqlrcursor::new(sqlrc)
 		sqlrconnection *sqlrc
 	CODE:
-		RETVAL=new sqlrcursor(sqlrc);
-		RETVAL->copyReferences();
+		RETVAL=new sqlrcursor(sqlrc,true);
 	OUTPUT:
 		RETVAL
 
@@ -304,8 +303,7 @@ sqlrcursor::getOutputBindCursor(variable)
 		// char * rather than const char *
 		char *	CLASS = "SQLRelay::Cursor";
 	CODE:
-		RETVAL=THIS->getOutputBindCursor(variable);
-		RETVAL->copyReferences();
+		RETVAL=THIS->getOutputBindCursor(variable,true);
 	OUTPUT:
 		RETVAL
 

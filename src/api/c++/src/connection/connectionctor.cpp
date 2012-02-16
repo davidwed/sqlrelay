@@ -7,7 +7,25 @@
 sqlrconnection::sqlrconnection(const char *server, uint16_t port,
 					const char *socket,
 					const char *user, const char *password, 
+					int32_t retrytime, int32_t tries,
+					bool copyreferences) {
+	init(server,port,socket,user,password,retrytime,tries,copyreferences);
+}
+
+sqlrconnection::sqlrconnection(const char *server, uint16_t port,
+					const char *socket,
+					const char *user, const char *password, 
 					int32_t retrytime, int32_t tries) {
+	init(server,port,socket,user,password,retrytime,tries,false);
+}
+
+void sqlrconnection::init(const char *server, uint16_t port,
+					const char *socket,
+					const char *user, const char *password, 
+					int32_t retrytime, int32_t tries,
+					bool copyreferences) {
+
+	copyrefs=copyreferences;
 
 	// initialize...
 	setTimeout(-1,-1);
@@ -19,15 +37,23 @@ sqlrconnection::sqlrconnection(const char *server, uint16_t port,
 	cs=&ucs;
 
 	// connection
-	this->server=(char *)server;
+	this->server=(copyrefs)?
+			charstring::duplicate(server):
+			(char *)server;
 	listenerinetport=port;
-	listenerunixport=(char *)socket;
+	listenerunixport=(copyrefs)?
+				charstring::duplicate(socket):
+				(char *)socket;
 	this->retrytime=retrytime;
 	this->tries=tries;
 
 	// authentication
-	this->user=(char *)user;
-	this->password=(char *)password;
+	this->user=(copyrefs)?
+			charstring::duplicate(user):
+			(char *)user;
+	this->password=(copyrefs)?
+			charstring::duplicate(password):
+			(char *)password;
 	userlen=charstring::length(user);
 	passwordlen=charstring::length(password);
 	reconnect=false;

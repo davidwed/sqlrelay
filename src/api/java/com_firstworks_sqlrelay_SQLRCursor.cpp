@@ -41,8 +41,7 @@ static void curReleaseStringUTFChars(JNIEnv *env, jstring string,
  */
 JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_alloc
   (JNIEnv *env, jobject self, jlong con) {
-	sqlrcursor	*cur=new sqlrcursor((sqlrconnection *)con);
-	cur->copyReferences();
+	sqlrcursor	*cur=new sqlrcursor((sqlrconnection *)con,true);
 	return (jlong)cur;
 }
 
@@ -819,7 +818,7 @@ JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindCur
   (JNIEnv *env, jobject self, jstring variable) {
 	char	*variablestring=curGetStringUTFChars(env,variable,0);
 	sqlrcursor	*bindcur=getSqlrCursor(env,self)->
-					getOutputBindCursor(variablestring);
+				getOutputBindCursor(variablestring,true);
 	curReleaseStringUTFChars(env,variable,variablestring);
 	return (jlong)bindcur;
 }

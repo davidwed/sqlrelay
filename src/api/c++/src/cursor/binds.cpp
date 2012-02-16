@@ -576,12 +576,17 @@ double sqlrcursor::getOutputBindDouble(const char *variable) {
 }
 
 sqlrcursor *sqlrcursor::getOutputBindCursor(const char *variable) {
+	return getOutputBindCursor(variable,false);
+}
+
+sqlrcursor *sqlrcursor::getOutputBindCursor(const char *variable,
+							bool copyrefs) {
 
 	if (!outputBindCursorIdIsValid(variable)) {
 		return NULL;
 	}
 	uint16_t	bindcursorid=getOutputBindCursorId(variable);
-	sqlrcursor	*bindcursor=new sqlrcursor(sqlrc);
+	sqlrcursor	*bindcursor=new sqlrcursor(sqlrc,copyrefs);
 	bindcursor->attachToBindCursor(bindcursorid);
 	return bindcursor;
 }

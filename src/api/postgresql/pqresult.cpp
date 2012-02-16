@@ -80,8 +80,7 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 
 	if (query && query[0]) {
 
-		result->sqlrcur=new sqlrcursor(conn->sqlrcon);
-		result->sqlrcur->copyReferences();
+		result->sqlrcur=new sqlrcursor(conn->sqlrcon,true);
 
 		if (conn->removetrailingsemicolons==-1) {
 

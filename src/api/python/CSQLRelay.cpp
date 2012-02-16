@@ -57,8 +57,7 @@ static PyObject *sqlrcon_alloc(PyObject *self, PyObject *args) {
 		&host, &port, &socket, &user, &password, &retrytime, &tries))
     return NULL;
   sqlrcon = new sqlrconnection(host, port, socket, user, password,
-							retrytime, tries);
-  sqlrcon->copyReferences();
+							retrytime, tries,true);
   return Py_BuildValue("l", (long)sqlrcon);
 }
 
@@ -327,8 +326,7 @@ static PyObject *sqlrcur_alloc(PyObject *self, PyObject *args) {
   sqlrcursor *sqlrcur;
   if (!PyArg_ParseTuple(args, "l", &sqlrcon))
     return NULL;
-  sqlrcur = new sqlrcursor((sqlrconnection *)sqlrcon);
-  sqlrcur->copyReferences();
+  sqlrcur = new sqlrcursor((sqlrconnection *)sqlrcon,true);
   return Py_BuildValue("l", (long)sqlrcur);
 }
 

@@ -10,7 +10,6 @@ LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS = connection/connectionctor.cpp \
 	connection/connectiondtor.cpp \
-	connection/connectioncopyreferences.cpp \
 	connection/ping.cpp \
 	connection/identify.cpp \
 	connection/dbversion.cpp \
@@ -38,7 +37,6 @@ SRCS = connection/connectionctor.cpp \
 	connection/closeconnection.cpp \
 	cursor/cursorctor.cpp \
 	cursor/cursordtor.cpp \
-	cursor/cursorcopyreferences.cpp \
 	cursor/columns.cpp \
 	cursor/fields.cpp \
 	cursor/columnnamecase.cpp \
@@ -69,7 +67,6 @@ SRCS = connection/connectionctor.cpp \
 	row/row.cpp
 LOBJS = connection/connectionctor.lo \
 	connection/connectiondtor.lo \
-	connection/connectioncopyreferences.lo \
 	connection/ping.lo \
 	connection/identify.lo \
 	connection/dbversion.lo \
@@ -97,7 +94,6 @@ LOBJS = connection/connectionctor.lo \
 	connection/closeconnection.lo \
 	cursor/cursorctor.lo \
 	cursor/cursordtor.lo \
-	cursor/cursorcopyreferences.lo \
 	cursor/columns.lo \
 	cursor/fields.lo \
 	cursor/columnnamecase.lo \

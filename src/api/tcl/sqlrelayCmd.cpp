@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.cpp,v 1.1 2012-02-09 21:47:13 mused Exp $
+ * $Id: sqlrelayCmd.cpp,v 1.2 2012-02-16 03:21:22 mused Exp $
  */
 
 #include <tcl.h>
@@ -1040,8 +1040,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	  Tcl_WrongNumArgs(interp, 2, objv, "variable");
 	  return TCL_ERROR;
 	}
-	newcur = cur->getOutputBindCursor(Tcl_GetString(objv[2]));
-	newcur->copyReferences();
+	newcur = cur->getOutputBindCursor(Tcl_GetString(objv[2]),true);
 	if (newcur != (sqlrcursor *)NULL) {
 	  id = getCursorID();
 	  Tcl_CreateObjCommand(interp,
@@ -1768,11 +1767,10 @@ int sqlrcurCmd(ClientData data, Tcl_Interp *interp,
   sqlrcursor *cur = (sqlrcursor *)NULL;
   Tcl_Obj *id;
 
-  if ((cur = new sqlrcursor(con)) == (sqlrcursor *)NULL) {
+  if ((cur = new sqlrcursor(con,true)) == (sqlrcursor *)NULL) {
     Tcl_AppendResult(interp, "cannot allocate sqlrcursor", (char *)NULL);
     return TCL_ERROR;
   }
-  cur->copyReferences();
 
   id = getCursorID();
   Tcl_CreateObjCommand(interp,
@@ -2226,8 +2224,7 @@ int sqlrconCmd(ClientData dummy, Tcl_Interp *interp,
   }
 
   con = new sqlrconnection(server, port, socket, user, password,
-		                retrytime, tries);
-  con->copyReferences();
+		                retrytime, tries,true);
   
 
   id = Tcl_NewStringObj("sqlrcon", -1);

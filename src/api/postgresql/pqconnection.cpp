@@ -100,8 +100,7 @@ PGconn *allocatePGconn(const char *conninfo,
 	conn->sqlrcon=new sqlrconnection((portnumber)?conn->host:"",
 					portnumber,
 					(!portnumber)?conn->port:"",
-					conn->user,conn->password,0,1);
-	conn->sqlrcon->copyReferences();
+					conn->user,conn->password,0,1,true);
 
 	conn->removetrailingsemicolons=-1;
 

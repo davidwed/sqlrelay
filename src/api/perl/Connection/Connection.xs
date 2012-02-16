@@ -21,8 +21,7 @@ sqlrconnection::new(server,port,socket,user,password,retrytime,tries)
 		int32_t tries
 	CODE:
 		RETVAL=new sqlrconnection(server,port,socket,
-					user,password,retrytime,tries);
-		RETVAL->copyReferences();
+					user,password,retrytime,tries,true);
 	OUTPUT:
 		RETVAL
 

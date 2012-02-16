@@ -28,9 +28,7 @@ End Sub
 
 Public Function open_cursor(ByVal sqlrcon As Long) As Long
 
-open_cursor = sqlrcursor(sqlrcon)
-'we set copyrefs = 1 to reserve the variables transferred from VB code
-Call sqlrcur_copyReferences(open_cursor)
+open_cursor = sqlrcursor(sqlrcon,1)
 
 End Function
 

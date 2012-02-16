@@ -55,8 +55,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_alloc) {
 	connection=new sqlrconnection((*server)->value.str.val,
 			(*port)->value.lval,(*socket)->value.str.val,
 			(*user)->value.str.val,(*password)->value.str.val,
-			(*retrytime)->value.lval,(*tries)->value.lval);
-	connection->copyReferences();
+			(*retrytime)->value.lval,(*tries)->value.lval,true);
 	connection->debugPrintFunction(zend_printf);
 	ZEND_REGISTER_RESOURCE(return_value,connection,sqlrelay_connection);
 }
@@ -260,8 +259,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_alloc) {
 	if (!connection) {
 		RETURN_LONG(0);
 	}
-	sqlrcursor	*cursor=new sqlrcursor(connection);
-	cursor->copyReferences();
+	sqlrcursor	*cursor=new sqlrcursor(connection,true);
 	ZEND_REGISTER_RESOURCE(return_value,cursor,sqlrelay_cursor);
 }
 
@@ -1107,8 +1105,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getoutputbindcursor) {
 	if (!cursor) {
 		RETURN_LONG(0);
 	}
-	sqlrcursor	*s=cursor->getOutputBindCursor((*variable)->value.str.val);
-	s->copyReferences();
+	sqlrcursor	*s=cursor->getOutputBindCursor((*variable)->value.str.val,true);
 	ZEND_REGISTER_RESOURCE(return_value,s,sqlrelay_cursor);
 }
 

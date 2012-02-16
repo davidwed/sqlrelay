@@ -45,8 +45,8 @@ static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
 							STR2CSTR(user),
 							STR2CSTR(password),
 							NUM2INT(retrytime),
-							NUM2INT(tries));
-	sqlrcon->copyReferences();
+							NUM2INT(tries),
+							true);
 	return Data_Wrap_Struct(self,0,sqlrcon_free,(void *)sqlrcon);
 }
 
@@ -370,8 +370,7 @@ static void sqlrcur_free(void *sqlrcur) {
 static VALUE sqlrcur_new(VALUE self, VALUE connection) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(connection,sqlrconnection,sqlrcon);
-	sqlrcursor	*sqlrcur=new sqlrcursor(sqlrcon);
-	sqlrcur->copyReferences();
+	sqlrcursor	*sqlrcur=new sqlrcursor(sqlrcon,true);
 	return Data_Wrap_Struct(self,0,sqlrcur_free,(void *)sqlrcur);
 }
 
@@ -1075,8 +1074,8 @@ static VALUE sqlrcur_getOutputBindCursor(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	sqlrcursor	*returnsqlrcur=sqlrcur->getOutputBindCursor(
-							STR2CSTR(variable));
-	returnsqlrcur->copyReferences();
+							STR2CSTR(variable),
+							true);
 	return Data_Wrap_Struct(csqlrcursor,0,sqlrcur_free,
 					(void *)returnsqlrcur);
 }

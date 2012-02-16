@@ -43,8 +43,6 @@ Declare Sub sqlrcon_debugOff Lib "libsqlrclientwrapper.dll" (ByVal sqlrconref As
 
 Declare Function sqlrcon_getDebug Lib "libsqlrclientwrapper.dll" (ByVal sqlrconref As Long) As Long
 
-Declare Sub sqlrcur_copyReferences Lib "libsqlrclientwrapper.dll" (ByVal sqlrcurref As Long)
-
 Declare Sub sqlrcur_free Lib "libsqlrclientwrapper.dll" (ByVal sqlrconref As Long)
 
 Declare Sub sqlrcur_setResultSetBufferSize Lib "libsqlrclientwrapper.dll" (ByVal sqlrcurref As Long, ByVal rows As Long)

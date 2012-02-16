@@ -52,8 +52,8 @@ JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_alloc(JNIEnv
 						socketstring,
 						userstring,passwordstring,
 						(int32_t)retrytime,
-						(int32_t)tries);
-	con->copyReferences();
+						(int32_t)tries,
+						true);
 
 	conReleaseStringUTFChars(env,host,hoststring);
 	conReleaseStringUTFChars(env,socket,socketstring);

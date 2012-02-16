@@ -2,6 +2,14 @@
 // See the file COPYING for more information.
 
 	private:
+		void	init(const char *server,
+				uint16_t port,
+				const char *socket,
+				const char *user,
+				const char *password,
+				int32_t retrytime,
+				int32_t tries,
+				bool copyreferences);
 		bool	openSession();
 		void	closeConnection();
 
@@ -91,6 +99,10 @@
 		sqlrcursor	*lastcursor;
 
 	public:
-		void		copyReferences();
+		sqlrconnection(const char *server, uint16_t port,
+					const char *socket,
+					const char *user, const char *password, 
+					int32_t retrytime, int32_t tries,
+					bool copyreferences);
 
 	friend class sqlrcursor;

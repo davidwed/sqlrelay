@@ -33,10 +33,9 @@ int	main(int argc, char **argv) {
 
 		// instantiation
 		con=new sqlrconnection("localhost",9000, 
-					"/tmp/test.socket","test","test",0,1);
-		con->copyReferences();
-		cur=new sqlrcursor(con);
-		cur->copyReferences();
+					"/tmp/test.socket","test","test",0,1,
+					true);
+		cur=new sqlrcursor(con,true);
 
 
 

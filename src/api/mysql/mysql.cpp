@@ -501,8 +501,7 @@ MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user,
 	mysql->unix_socket=unix_socket;
 
 	mysql->sqlrcon=new sqlrconnection(host,port,unix_socket,
-						user,passwd,0,1);
-	mysql->sqlrcon->copyReferences();
+						user,passwd,0,1,true);
 	mysql->errormap=NULL;
 	const char	*errormap=environment::getValue("SQLR_MYSQL_ERROR_MAP");
 	if (charstring::length(errormap)) {
@@ -757,8 +756,7 @@ MYSQL_RES *mysql_list_dbs(MYSQL *mysql, const char *wild) {
 	mysql->currentstmt=new MYSQL_STMT;
 	mysql->currentstmt->result=new MYSQL_RES;
 	mysql->currentstmt->result->stmtbackptr=NULL;
-	mysql->currentstmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
-	mysql->currentstmt->result->sqlrcur->copyReferences();
+	mysql->currentstmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon,true);
 	mysql->currentstmt->result->errorno=0;
 	mysql->currentstmt->result->fields=NULL;
 	mysql->currentstmt->result->lengths=NULL;
@@ -779,8 +777,7 @@ MYSQL_RES *mysql_list_tables(MYSQL *mysql, const char *wild) {
 	mysql->currentstmt=new MYSQL_STMT;
 	mysql->currentstmt->result=new MYSQL_RES;
 	mysql->currentstmt->result->stmtbackptr=NULL;
-	mysql->currentstmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
-	mysql->currentstmt->result->sqlrcur->copyReferences();
+	mysql->currentstmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon,true);
 	mysql->currentstmt->result->errorno=0;
 	mysql->currentstmt->result->fields=NULL;
 	mysql->currentstmt->result->lengths=NULL;
@@ -813,8 +810,7 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 	mysql->currentstmt=stmt;
 	stmt->result=new MYSQL_RES;
 	stmt->result->stmtbackptr=NULL;
-	stmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
-	stmt->result->sqlrcur->copyReferences();
+	stmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon,true);
 	stmt->result->errorno=0;
 	stmt->result->fields=NULL;
 	stmt->result->lengths=NULL;
@@ -2064,8 +2060,7 @@ MYSQL_STMT *mysql_stmt_init(MYSQL *mysql) {
 	stmt->mysql=mysql;
 	stmt->result=new MYSQL_RES;
 	stmt->result->stmtbackptr=stmt;
-	stmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon);
-	stmt->result->sqlrcur->copyReferences();
+	stmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon,true);
 	stmt->result->errorno=0;
 	stmt->result->fields=NULL;
 	stmt->result->lengths=NULL;

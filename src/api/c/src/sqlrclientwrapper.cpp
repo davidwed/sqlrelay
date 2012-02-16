@@ -10,8 +10,18 @@ extern "C" {
 sqlrcon sqlrcon_alloc(const char *server, uint16_t port, const char *socket,
 				const char *user, const char *password, 
 				int32_t retrytime, int32_t tries) {
+	return sqlrcon_alloc_copyrefs(server,port,socket,user,password,
+							retrytime,tries,0);
+}
+
+sqlrcon sqlrcon_alloc_copyrefs(const char *server,
+				uint16_t port, const char *socket,
+				const char *user, const char *password, 
+				int32_t retrytime, int32_t tries,
+				int copyrefs) {
 	sqlrcon	sqlrconref=new sqlrconnection(server,port,socket,
-					user,password,retrytime,tries);
+					user,password,retrytime,tries,
+					(copyrefs!=0));
 	return sqlrconref;
 }
 
@@ -122,13 +132,13 @@ void sqlrcon_debugPrintFunction(sqlrcon sqlrconref,
 	sqlrconref->debugPrintFunction(printfunction);
 }
 
-void sqlrcon_copyReferences(sqlrcon sqlrconref) {
-	sqlrconref->copyReferences();
-}
-
 
 sqlrcur sqlrcur_alloc(sqlrcon sqlrconref) {
-	sqlrcur	sqlrcurref=new sqlrcursor(sqlrconref);
+	return sqlrcur_alloc_copyrefs(sqlrconref,0);
+}
+
+sqlrcur sqlrcur_alloc_copyrefs(sqlrcon sqlrconref, int copyreferences) {
+	sqlrcur	sqlrcurref=new sqlrcursor(sqlrconref,(copyreferences!=0));
 	return sqlrcurref;
 }
 
@@ -390,6 +400,11 @@ sqlrcur sqlrcur_getOutputBindCursor(sqlrcur sqlrcurref, const char *variable) {
 	return sqlrcurref->getOutputBindCursor(variable);
 }
 
+sqlrcur sqlrcur_getOutputBindCursor_copyrefs(sqlrcur sqlrcurref,
+					const char *variable, int copyrefs) {
+	return sqlrcurref->getOutputBindCursor(variable,copyrefs);
+}
+
 int sqlrcur_openCachedResultSet(sqlrcur sqlrcurref, const char *filename) {
 	return sqlrcurref->openCachedResultSet(filename);
 }
@@ -610,10 +625,6 @@ int sqlrcur_resumeResultSet(sqlrcur sqlrcurref, uint16_t id) {
 int sqlrcur_resumeCachedResultSet(sqlrcur sqlrcurref,
 					uint16_t id, const char *filename) {
 	return sqlrcurref->resumeCachedResultSet(id,filename);
-}
-
-void sqlrcur_copyReferences(sqlrcur sqlrcurref) {
-	sqlrcurref->copyReferences();
 }
 
 }

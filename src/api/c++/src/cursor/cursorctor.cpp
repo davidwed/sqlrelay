@@ -6,10 +6,18 @@
 #include <defines.h>
 #include <datatypes.h>
 
+sqlrcursor::sqlrcursor(sqlrconnection *sqlrc, bool copyreferences) {
+	init(sqlrc,copyreferences);
+}
+
 sqlrcursor::sqlrcursor(sqlrconnection *sqlrc) {
+	init(sqlrc,false);
+}
+
+void sqlrcursor::init(sqlrconnection *sqlrc, bool copyreferences) {
 
 	// copy references
-	copyrefs=false;
+	copyrefs=copyreferences;
 
 	this->sqlrc=sqlrc;
 

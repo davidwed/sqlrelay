@@ -2,6 +2,7 @@
 // See the file COPYING for more information.
 
 	private:
+		void	init(sqlrconnection *sqlrc, bool copyreferences);
 		void	clearConnectionPorts();
 		void	clearResultSet();
 		void	clearCacheDest();
@@ -191,8 +192,10 @@
 		bool		havecursorid;
 
 	public:
-		void		copyReferences();
+		sqlrcursor(sqlrconnection *sqlrcon, bool copyreferences);
 		bool		outputBindCursorIdIsValid(const char *variable);
+		sqlrcursor	*getOutputBindCursor(const char *variable,
+								bool copyrefs);
 		uint16_t	getOutputBindCursorId(const char *variable);
 		void		attachToBindCursor(uint16_t bindcursorid);
 
