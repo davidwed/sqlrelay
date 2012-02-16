@@ -2228,32 +2228,21 @@ then
 			do
 				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j" "/opt/csw/include/python$j" "/sw/include/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/include/python$j"
 				do
-					if ( test -d "$imu" )
-					then
-						PYTHONINCLUDES="-I$imu"
-						if ( test -n "$PYTHONINCLUDES" )
+					for k in "mu" "m" "u" ""
+					do
+						if ( test -d "$i$k" )
 						then
-							PYTHONVERSION=`echo $j | sed -e "s|\.||"`
-							break
+							PYTHONINCLUDES="-I$i$k"
+							if ( test -n "$PYTHONINCLUDES" )
+							then
+								PYTHONVERSION=`echo $j | sed -e "s|\.||"`
+								break
+							fi
 						fi
-					fi
-					if ( test -d "$im" )
+					done
+					if ( test -n "$PYTHONINCLUDES" )
 					then
-						PYTHONINCLUDES="-I$im"
-						if ( test -n "$PYTHONINCLUDES" )
-						then
-							PYTHONVERSION=`echo $j | sed -e "s|\.||"`
-							break
-						fi
-					fi
-					if ( test -d "$i" )
-					then
-						PYTHONINCLUDES="-I$i"
-						if ( test -n "$PYTHONINCLUDES" )
-						then
-							PYTHONVERSION=`echo $j | sed -e "s|\.||"`
-							break
-						fi
+						break
 					fi
 				done
 
