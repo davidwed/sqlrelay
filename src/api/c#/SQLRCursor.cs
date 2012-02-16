@@ -109,9 +109,9 @@ public class SQLRCursor
     int sqlrcur_getTableList(IntPtr sqlrcurref, string wild);
 
     /** 
-     *  Sends a query that returns a list of columns in the table specified by the
-     *  "table" parameter matching "wild".  If wild is empty or NULL then a list of
-     *  all columns will be returned. */
+     *  Sends a query that returns a list of columns in the table specified by
+     *  the "table" parameter matching "wild".  If wild is empty or NULL then a
+     *  list of all columns will be returned. */
     [DllImport("libsqlrclientwrapper.dll")]
     int sqlrcur_getColumnList(IntPtr sqlrcurref, string table, string wild);
 
@@ -156,49 +156,33 @@ public class SQLRCursor
     /** 
      *  Defines a string substitution variable. */
     [DllImport("libsqlrclientwrapper.dll")]
-    void sqlrcur_subString(IntPtr sqlrcurref, string variable, string value);
+    void sqlrcur_subString(IntPtr sqlrcurref, string variable, string val);
 
     /** 
      *  Defines a integer substitution variable. */
     [DllImport("libsqlrclientwrapper.dll")]
-    void sqlrcur_subLong(IntPtr sqlrcurref, string variable, long value);
+    void sqlrcur_subLong(IntPtr sqlrcurref, string variable, long val);
 
     /** 
      *  Defines a decimal substitution variable. */
     [DllImport("libsqlrclientwrapper.dll")]
-    void sqlrcur_subDouble(IntPtr sqlrcurref, string variable, double value, uint precision, uint scale);
-
-    /** 
-     *  Defines an array of string substitution variables. */
-    [DllImport("libsqlrclientwrapper.dll")]
-    void sqlrcur_subStrings(IntPtr sqlrcurref, const char * const *variables, const char * const *values);
-
-    /** 
-     *  Defines an array of integer substitution variables. */
-    [DllImport("libsqlrclientwrapper.dll")]
-    void sqlrcur_subLongs(IntPtr sqlrcurref, const char * const *variables, const long *values);
-
-    /** 
-     *  Defines an array of decmial substitution variables. */
-    [DllImport("libsqlrclientwrapper.dll")]
-    void sqlrcur_subDoubles(IntPtr sqlrcurref, const char * const *variables, const double *values, const uint *precisions, const uint *scales);
-
+    void sqlrcur_subDouble(IntPtr sqlrcurref, string variable, double val, uint precision, uint scale);
 
 
     /** 
      *  Defines a string input bind variable. */
     [DllImport("libsqlrclientwrapper.dll")]
-    void sqlrcur_inputBindString(IntPtr sqlrcurref, string variable, string value);
+    void sqlrcur_inputBindString(IntPtr sqlrcurref, string variable, string val);
 
     /** 
      *  Defines a string input bind variable. */
     [DllImport("libsqlrclientwrapper.dll")]
-    void sqlrcur_inputBindStringWithLength(IntPtr sqlrcurref, string variable, string value, uint valuelength);
+    void sqlrcur_inputBindStringWithLength(IntPtr sqlrcurref, string variable, string val, uint vallength);
 
     /** 
      *  Defines a integer input bind variable. */
     [DllImport("libsqlrclientwrapper.dll")]
-    void sqlrcur_inputBindLong(IntPtr sqlrcurref, string variable, long value);
+    void sqlrcur_inputBindLong(IntPtr sqlrcurref, string variable, long val);
 
     /** 
      *  Defines a decimal input bind variable.
@@ -207,32 +191,17 @@ public class SQLRCursor
      * unexpected rounding behavior if the server is faking
      * binds.) */
     [DllImport("libsqlrclientwrapper.dll")]
-    void sqlrcur_inputBindDouble(IntPtr sqlrcurref, string variable, double value, uint precision, uint scale);
+    void sqlrcur_inputBindDouble(IntPtr sqlrcurref, string variable, double val, uint precision, uint scale);
 
     /** 
      *  Defines a binary lob input bind variable. */
     [DllImport("libsqlrclientwrapper.dll")]
-    void sqlrcur_inputBindBlob(IntPtr sqlrcurref, string variable, string value, uint size);
+    void sqlrcur_inputBindBlob(IntPtr sqlrcurref, string variable, string val, uint size);
 
     /** 
      *  Defines a character lob input bind variable. */
     [DllImport("libsqlrclientwrapper.dll")]
-    void sqlrcur_inputBindClob(IntPtr sqlrcurref, string variable, string value, uint size);
-
-    /** 
-     *  Defines an array of string input bind variables. */
-    [DllImport("libsqlrclientwrapper.dll")]
-    void sqlrcur_inputBindStrings(IntPtr sqlrcurref, const char * const *variables, const char * const *values);
-
-    /** 
-     *  Defines an array of integer input bind variables. */
-    [DllImport("libsqlrclientwrapper.dll")]
-    void sqlrcur_inputBindLongs(IntPtr sqlrcurref, const char * const *variables, const long *values);
-
-    /** 
-     *  Defines an array of decimal input bind variables. */
-    [DllImport("libsqlrclientwrapper.dll")]
-    void sqlrcur_inputBindDoubles(IntPtr sqlrcurref, const char * const *variables, const double *values, const uint *precisions, const uint *scales);
+    void sqlrcur_inputBindClob(IntPtr sqlrcurref, string variable, string val, uint size);
 
 
 
@@ -275,16 +244,16 @@ public class SQLRCursor
     void sqlrcur_clearBinds(IntPtr sqlrcurref);
 
     /** 
-     *  Parses the previously prepared query, counts the number of bind variables
-     *  defined in it and returns that number. */
+     *  Parses the previously prepared query, counts the number of bind
+     *  variables defined in it and returns that number. */
     [DllImport("libsqlrclientwrapper.dll")]
-    uint16_t sqlrcur_countBindVariables(IntPtr sqlrcurref);
+    ushort sqlrcur_countBindVariables(IntPtr sqlrcurref);
 
     /** 
      *  If you are binding to any variables that might not actually be in your
-     *  query, call this to ensure that the database won't try to bind them unless
-     *  they really are in the query.  There is a performance penalty for calling
-     *  this function */
+     *  query, call this to ensure that the database won't try to bind them
+     *  unless they really are in the query.  There is a performance penalty
+     *  for calling this function */
     [DllImport("libsqlrclientwrapper.dll")]
     void sqlrcur_validateBinds(IntPtr sqlrcurref);
 
@@ -344,7 +313,8 @@ public class SQLRCursor
     uint sqlrcur_getOutputBindLength(IntPtr sqlrcurref, string variable);
 
     /** 
-     *  Get the cursor associated with a previously defined output bind variable. */
+     *  Get the cursor associated with a previously defined output bind
+     *  variable. */
     [DllImport("libsqlrclientwrapper.dll")]
     IntPtr sqlrcur_getOutputBindCursor(IntPtr sqlrcurref, string variable);
 
@@ -368,31 +338,31 @@ public class SQLRCursor
     ulong sqlrcur_rowCount(IntPtr sqlrcurref);
 
     /** 
-     *  Returns the total number of rows that will be returned in the result set.
-     *  Not all databases support this call.  Don't use it for applications which
-     *  are designed to be portable across databases.  -1 is returned by databases
-     *  which don't support this option. */
+     *  Returns the total number of rows that will be returned in the result
+     *  set.  Not all databases support this call.  Don't use it for
+     *  applications which are designed to be portable across databases.  -1
+     *  is returned by databases which don't support this option. */
     [DllImport("libsqlrclientwrapper.dll")]
     ulong sqlrcur_totalRows(IntPtr sqlrcurref);
 
     /** 
-     *  Returns the number of rows that were updated, inserted or deleted by the
-     *  query.  Not all databases support this call.  Don't use it for applications
-     *  which are designed to be portable across databases.  -1 is returned by
-     *  databases which don't support this option. */
+     *  Returns the number of rows that were updated, inserted or deleted by
+     *  the query.  Not all databases support this call.  Don't use it for
+     *  applications which are designed to be portable across databases.  -1
+     *  is returned by databases which don't support this option. */
     [DllImport("libsqlrclientwrapper.dll")]
     ulong sqlrcur_affectedRows(IntPtr sqlrcurref);
 
     /** 
-     *  Returns the index of the first buffered row.  This is useful when buffering
-     *  only part of the result set at a time. */
+     *  Returns the index of the first buffered row.  This is useful when
+     *  buffering only part of the result set at a time. */
     [DllImport("libsqlrclientwrapper.dll")]
     ulong sqlrcur_firstRowIndex(IntPtr sqlrcurref);
 
     /** 
-     *  Returns 0 if part of the result set is still pending on the server and 1 if
-     *  not.  This function can only return 0 if setResultSetBufferSize() has been
-     *  called with a parameter other than 0. */
+     *  Returns 0 if part of the result set is still pending on the server and
+     *  1 if not.  This function can only return 0 if setResultSetBufferSize()
+     *  has been called with a parameter other than 0. */
     [DllImport("libsqlrclientwrapper.dll")]
     int sqlrcur_endOfResultSet(IntPtr sqlrcurref);
 
@@ -468,24 +438,6 @@ public class SQLRCursor
     uint sqlrcur_getFieldLengthByName(IntPtr sqlrcurref, ulong row, string col);
 
 
-
-    /** 
-     *  Returns a null terminated array of the values
-     *  of the fields in the specified row. */
-    [DllImport("libsqlrclientwrapper.dll")]
-    const char * const *sqlrcur_getRow(IntPtr sqlrcurref, ulong row);
-
-    /** 
-     *  Returns a null terminated array of the lengths
-     *  of the fields in the specified row. */
-    [DllImport("libsqlrclientwrapper.dll")]
-    uint *sqlrcur_getRowLengths(IntPtr sqlrcurref, ulong row);
-
-    /** 
-     *  Returns a null terminated array of the
-     *  column names of the current result set. */
-    [DllImport("libsqlrclientwrapper.dll")]
-    const char * const *sqlrcur_getColumnNames(IntPtr sqlrcurref);
 
     /** 
      *  Returns the name of the specified column. */
@@ -584,12 +536,14 @@ public class SQLRCursor
     int sqlrcur_getColumnIsPartOfKeyByName(IntPtr sqlrcurref, string col);
 
     /** 
-     *  Returns 1 if the specified column is an unsigned number and 0 otherwise. */
+     *  Returns 1 if the specified column is an unsigned number and 0
+     *  otherwise. */
     [DllImport("libsqlrclientwrapper.dll")]
     int sqlrcur_getColumnIsUnsignedByIndex(IntPtr sqlrcurref, uint col);
 
     /** 
-     *  Returns 1 if the specified column is an unsigned number and 0 otherwise. */
+     *  Returns 1 if the specified column is an unsigned number and 0
+     *  otherwise. */
     [DllImport("libsqlrclientwrapper.dll")]
     int sqlrcur_getColumnIsUnsignedByName(IntPtr sqlrcurref, string col);
 
@@ -606,12 +560,14 @@ public class SQLRCursor
     int sqlrcur_getColumnIsZeroFilledByName(IntPtr sqlrcurref, string col);
 
     /** 
-     *  Returns 1 if the specified column contains binary data and 0 otherwise. */
+     *  Returns 1 if the specified column contains binary data and 0
+     *  otherwise. */
     [DllImport("libsqlrclientwrapper.dll")]
     int sqlrcur_getColumnIsBinaryByIndex(IntPtr sqlrcurref, uint col);
 
     /** 
-     *  Returns 1 if the specified column contains binary data and 0 otherwise. */
+     *  Returns 1 if the specified column contains binary data and 0
+     *  otherwise. */
     [DllImport("libsqlrclientwrapper.dll")]
     int sqlrcur_getColumnIsBinaryByName(IntPtr sqlrcurref, string col);
 
@@ -645,12 +601,12 @@ public class SQLRCursor
     void sqlrcur_suspendResultSet(IntPtr sqlrcurref);
 
     /** 
-     *  Returns the internal ID of this result set.  This parameter may be passed
-     *  to another statement for use in the resumeResultSet() function.  Note: The
-     *  value this function returns is only valid after a call to
+     *  Returns the internal ID of this result set.  This parameter may be
+     *  passed to another statement for use in the resumeResultSet() function.
+     *  Note: The value this function returns is only valid after a call to
      *  suspendResultSet().*/
     [DllImport("libsqlrclientwrapper.dll")]
-    uint16_t sqlrcur_getResultSetId(IntPtr sqlrcurref);
+    ushort sqlrcur_getResultSetId(IntPtr sqlrcurref);
 
     /** 
      *  Resumes a result set previously left open using suspendSession().
@@ -660,8 +616,9 @@ public class SQLRCursor
 
     /** 
      *  Resumes a result set previously left open using suspendSession() and
-     *  continues caching the result set to "filename".  Returns 1 on success and 0
-     *  on failure. */
+     *  continues caching the result set to "filename".  Returns 1 on success
+     *  and 0 on failure. */
     [DllImport("libsqlrclientwrapper.dll")]
     int sqlrcur_resumeCachedResultSet(IntPtr sqlrcurref, ushort id, string filename);
+
 }

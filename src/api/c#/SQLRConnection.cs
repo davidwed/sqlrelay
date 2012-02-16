@@ -17,7 +17,8 @@ public class SQLRConnection
     IntPtr sqlrcon_alloc(string server, ushort port, string socket, string user, string password, int retrytime, int tries);
     
     /** 
-     *  Disconnects and ends the session if it hasn't been terminated already. */
+     *  Disconnects and ends the session if it hasn't been terminated
+     *  already. */
     [DllImport("libsqlrclientwrapper.dll")]
     void sqlrcon_free(IntPtr sqlrconref);
     
@@ -35,8 +36,8 @@ public class SQLRConnection
     void sqlrcon_endSession(IntPtr sqlrconref);
     
     /** 
-     *  Disconnects this connection from the current session but leaves the session
-     *  open so that another connection can connect to it using
+     *  Disconnects this connection from the current session but leaves the
+     *  session open so that another connection can connect to it using
      *  sqlrcon_resumeSession(). */
     [DllImport("libsqlrclientwrapper.dll")]
     int sqlrcon_suspendSession(IntPtr sqlrconref);
@@ -118,20 +119,22 @@ public class SQLRConnection
     
     
     /** 
-     *  Instructs the database to perform a commit after every successful query. */
+     *  Instructs the database to perform a commit after every successful
+     *  query. */
     [DllImport("libsqlrclientwrapper.dll")]
     int sqlrcon_autoCommitOn(IntPtr sqlrconref);
     
     /** 
-     *  Instructs the database to wait for the client to tell it when to commit. */
+     *  Instructs the database to wait for the client to tell it when to
+     *  commit. */
     [DllImport("libsqlrclientwrapper.dll")]
     int sqlrcon_autoCommitOff(IntPtr sqlrconref);
     
     
     
     /** 
-     *  Issues a commit.  Returns 1 if the commit succeeded, 0 if it failed and -1
-     *  if an error occurred. */
+     *  Issues a commit.  Returns 1 if the commit succeeded, 0 if it failed and
+     *  -1 if an error occurred. */
     [DllImport("libsqlrclientwrapper.dll")]
     int sqlrcon_commit(IntPtr sqlrconref);
     
@@ -172,4 +175,5 @@ public class SQLRConnection
      *  Returns 0 if debugging is off and 1 if debugging is on. */
     [DllImport("libsqlrclientwrapper.dll")]
     int sqlrcon_getDebug(IntPtr sqlrconref);
+
 }
