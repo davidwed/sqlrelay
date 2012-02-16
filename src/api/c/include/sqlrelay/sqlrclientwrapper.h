@@ -824,6 +824,7 @@ int	sqlrcur_getColumnIsPrimaryKeyByName(sqlrcur sqlrcurref,
 
 /** @ingroup sqlrclientwrapper
  *  Returns 1 if the specified column is unique and 0 otherwise. */
+SQLRCLIENTWRAPPER_DLLSPEC
 int		sqlrcur_getColumnIsUniqueByIndex(sqlrcur sqlrcurref,
 							uint32_t col);
 
