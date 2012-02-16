@@ -369,10 +369,11 @@ public class SQLRCursor
 
 
 
-    /** Opens a cached result set.  Returns 1 on success and 0 on failure. */
-    public int openCachedResultSet(string filename)
+    /** Opens a cached result set.  Returns true on success and
+     * false on failure. */
+    public bool openCachedResultSet(string filename)
     {
-        return sqlrcur_openCachedResultSet(sqlrcurref, filename);
+        return sqlrcur_openCachedResultSet(sqlrcurref, filename)!=0;
     }
 
 
@@ -414,12 +415,13 @@ public class SQLRCursor
         return sqlrcur_firstRowIndex(sqlrcurref);
     }
 
-    /** Returns 0 if part of the result set is still pending on the server and
-     *  1 if not.  This function can only return 0 if setResultSetBufferSize()
-     *  has been called with a parameter other than 0. */
-    public int endOfResultSet()
+    /** Returns false if part of the result set is still pending on the server
+     *  and true if not.  This function can only return false if
+     *  setResultSetBufferSize() has been called with a parameter other than
+     *  0. */
+    public bool endOfResultSet()
     {
-        return sqlrcur_endOfResultSet(sqlrcurref);
+        return sqlrcur_endOfResultSet(sqlrcurref)!=0;
     }
 
 
@@ -569,111 +571,114 @@ public class SQLRCursor
         return sqlrcur_getColumnScaleByName(sqlrcurref, col);
     }
 
-    /** Returns the scale of the specified column.  Scale is the total number of
-     *  digits to the right of the decimal point in a number.  eg: 123.45 has a
-     *  scale of 2. */
-    public int getColumnIsNullableByIndex(uint col)
+    /** Returns true if the specified column can contain
+     *  nulls and false otherwise. */
+    public bool getColumnIsNullableByIndex(uint col)
     {
-        return sqlrcur_getColumnIsNullableByIndex(sqlrcurref, col);
+        return sqlrcur_getColumnIsNullableByIndex(sqlrcurref, col)!=0;
     }
 
-    /** Returns 1 if the specified column can contain nulls and 0 otherwise. */
-    public int getColumnIsNullableByName(string col)
+    /** Returns true if the specified column can contain
+     *  nulls and false otherwise. */
+    public bool getColumnIsNullableByName(string col)
     {
-        return sqlrcur_getColumnIsNullableByName(sqlrcurref, col);
+        return sqlrcur_getColumnIsNullableByName(sqlrcurref, col)!=0;
     }
 
-    /** Returns 1 if the specified column is a primary key and 0 otherwise. */
-    public int getColumnIsPrimaryKeyByIndex(uint col)
+    /** Returns true if the specified column is a
+     *  primary key and false otherwise. */
+    public bool getColumnIsPrimaryKeyByIndex(uint col)
     {
-        return sqlrcur_getColumnIsPrimaryKeyByIndex(sqlrcurref, col);
+        return sqlrcur_getColumnIsPrimaryKeyByIndex(sqlrcurref, col)!=0;
     }
 
-    /** Returns 1 if the specified column is a primary key and 0 otherwise. */
-    public int getColumnIsPrimaryKeyByName(string col)
+    /** Returns true if the specified column is a
+     *  primary key and false otherwise. */
+    public bool getColumnIsPrimaryKeyByName(string col)
     {
-        return sqlrcur_getColumnIsPrimaryKeyByName(sqlrcurref, col);
+        return sqlrcur_getColumnIsPrimaryKeyByName(sqlrcurref, col)!=0;
     }
 
-    /** 
-     *  Returns 1 if the specified column is unique and 0 otherwise. */
-    public int getColumnIsUniqueByIndex(uint col)
+    /** Returns true if the specified column is unique and false otherwise. */
+    public bool getColumnIsUniqueByIndex(uint col)
     {
-        return sqlrcur_getColumnIsUniqueByIndex(sqlrcurref, col);
+        return sqlrcur_getColumnIsUniqueByIndex(sqlrcurref, col)!=0;
     }
 
-    /** Returns 1 if the specified column is unique and 0 otherwise. */
-    public int getColumnIsUniqueByName(string col)
+    /** Returns true if the specified column is unique and false otherwise. */
+    public bool getColumnIsUniqueByName(string col)
     {
-        return sqlrcur_getColumnIsUniqueByName(sqlrcurref, col);
+        return sqlrcur_getColumnIsUniqueByName(sqlrcurref, col)!=0;
     }
 
-    /** Returns 1 if the specified column is part of a composite key and 0
+    /** Returns true if the specified column is part of a composite key and
+     *  false otherwise. */
+    public bool getColumnIsPartOfKeyByIndex(uint col)
+    {
+        return sqlrcur_getColumnIsPartOfKeyByIndex(sqlrcurref, col)!=0;
+    }
+
+    /** Returns true if the specified column is part of a composite key and
+     *  false otherwise. */
+    public bool getColumnIsPartOfKeyByName(string col)
+    {
+        return sqlrcur_getColumnIsPartOfKeyByName(sqlrcurref, col)!=0;
+    }
+
+    /** Returns true if the specified column is an unsigned number and false
      *  otherwise. */
-    public int getColumnIsPartOfKeyByIndex(uint col)
+    public bool getColumnIsUnsignedByIndex(uint col)
     {
-        return sqlrcur_getColumnIsPartOfKeyByIndex(sqlrcurref, col);
+        return sqlrcur_getColumnIsUnsignedByIndex(sqlrcurref, col)!=0;
     }
 
-    /** Returns 1 if the specified column is part of a composite key and 0
+    /** Returns true if the specified column is an unsigned number and false
      *  otherwise. */
-    public int getColumnIsPartOfKeyByName(string col)
+    public bool getColumnIsUnsignedByName(string col)
     {
-        return sqlrcur_getColumnIsPartOfKeyByName(sqlrcurref, col);
+        return sqlrcur_getColumnIsUnsignedByName(sqlrcurref, col)!=0;
     }
 
-    /** Returns 1 if the specified column is an unsigned number and 0
+    /** Returns true if the specified column was created
+     *  with the zero-fill flag and false otherwise. */
+    public bool getColumnIsZeroFilledByIndex(uint col)
+    {
+        return sqlrcur_getColumnIsZeroFilledByIndex(sqlrcurref, col)!=0;
+    }
+
+    /** Returns true if the specified column was created
+     *  with the zero-fill flag and false otherwise. */
+    public bool getColumnIsZeroFilledByName(string col)
+    {
+        return sqlrcur_getColumnIsZeroFilledByName(sqlrcurref, col)!=0;
+    }
+
+    /** Returns true if the specified column contains binary data and false
      *  otherwise. */
-    public int getColumnIsUnsignedByIndex(uint col)
+    public bool getColumnIsBinaryByIndex(uint col)
     {
-        return sqlrcur_getColumnIsUnsignedByIndex(sqlrcurref, col);
+        return sqlrcur_getColumnIsBinaryByIndex(sqlrcurref, col)!=0;
     }
 
-    /** Returns 1 if the specified column is an unsigned number and 0
+    /** Returns true if the specified column contains binary data and false
      *  otherwise. */
-    public int getColumnIsUnsignedByName(string col)
+    public bool getColumnIsBinaryByName(string col)
     {
-        return sqlrcur_getColumnIsUnsignedByName(sqlrcurref, col);
+        return sqlrcur_getColumnIsBinaryByName(sqlrcurref, col)!=0;
     }
 
-    /** Returns 1 if the specified column was created
-     *  with the zero-fill flag and 0 otherwise. */
-    public int getColumnIsZeroFilledByIndex(uint col)
+    /** Returns true if the specified column auto-increments
+     *  and false otherwise. */
+    public bool getColumnIsAutoIncrementByIndex(uint col)
     {
-        return sqlrcur_getColumnIsZeroFilledByIndex(sqlrcurref, col);
+        return sqlrcur_getColumnIsAutoIncrementByIndex(sqlrcurref, col)!=0;
     }
 
-    /** Returns 1 if the specified column was created
-     *  with the zero-fill flag and 0 otherwise. */
-    public int getColumnIsZeroFilledByName(string col)
+    /** Returns true if the specified column auto-increments
+     *  and false otherwise. */
+    public bool getColumnIsAutoIncrementByName(string col)
     {
-        return sqlrcur_getColumnIsZeroFilledByName(sqlrcurref, col);
-    }
-
-    /** Returns 1 if the specified column contains binary data and 0
-     *  otherwise. */
-    public int getColumnIsBinaryByIndex(uint col)
-    {
-        return sqlrcur_getColumnIsBinaryByIndex(sqlrcurref, col);
-    }
-
-    /** Returns 1 if the specified column contains binary data and 0
-     *  otherwise. */
-    public int getColumnIsBinaryByName(string col)
-    {
-        return sqlrcur_getColumnIsBinaryByName(sqlrcurref, col);
-    }
-
-    /** Returns 1 if the specified column auto-increments and 0 otherwise. */
-    public int getColumnIsAutoIncrementByIndex(uint col)
-    {
-        return sqlrcur_getColumnIsAutoIncrementByIndex(sqlrcurref, col);
-    }
-
-    /** Returns 1 if the specified column auto-increments and 0 otherwise. */
-    public int getColumnIsAutoIncrementByName(string col)
-    {
-        return sqlrcur_getColumnIsAutoIncrementByName(sqlrcurref, col);
+        return sqlrcur_getColumnIsAutoIncrementByName(sqlrcurref, col)!=0;
     }
 
     /** Returns the length of the longest field in the specified column. */
@@ -708,18 +713,18 @@ public class SQLRCursor
     }
 
     /** Resumes a result set previously left open using suspendSession().
-     *  Returns 1 on success and 0 on failure. */
-    public int resumeResultSet(ushort id)
+     *  Returns true on success and false on failure. */
+    public bool resumeResultSet(ushort id)
     {
-        return sqlrcur_resumeResultSet(sqlrcurref, id);
+        return sqlrcur_resumeResultSet(sqlrcurref, id)!=0;
     }
 
     /** Resumes a result set previously left open using suspendSession() and
-     *  continues caching the result set to "filename".  Returns 1 on success
-     *  and 0 on failure. */
-    public int resumeCachedResultSet(ushort id, string filename)
+     *  continues caching the result set to "filename".  Returns true on success
+     *  and false on failure. */
+    public bool resumeCachedResultSet(ushort id, string filename)
     {
-        return sqlrcur_resumeCachedResultSet(sqlrcurref, id, filename);
+        return sqlrcur_resumeCachedResultSet(sqlrcurref, id, filename)!=0;
     }
 
     private IntPtr sqlrcurref;
