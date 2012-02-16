@@ -1,7 +1,10 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using SQLRConnection;
+using SQLRClient.SQLRConnection;
+
+namespace SQLRClient
+{
 
 public class SQLRCursor : IDisposable
 {
@@ -1050,4 +1053,6 @@ public class SQLRCursor : IDisposable
 
     [DllImport("libsqlrclientwrapper.dll")]
     private static extern int sqlrcur_resumeCachedResultSet(IntPtr sqlrcurref, ushort id, string filename);
+}
+
 }

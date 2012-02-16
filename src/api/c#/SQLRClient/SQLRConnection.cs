@@ -2,6 +2,9 @@ using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
+namespace SQLRClient
+{
+
 public class SQLRConnection : IDisposable
 {
     /** Initiates a connection to "server" on "port" or to the unix "socket" on
@@ -304,4 +307,6 @@ public class SQLRConnection : IDisposable
     
     [DllImport("libsqlrclientwrapper.dll")]
     private static extern int sqlrcon_getDebug(IntPtr sqlrconref);
+}
+
 }
