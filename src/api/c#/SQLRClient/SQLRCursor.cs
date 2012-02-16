@@ -140,7 +140,7 @@ public class SQLRCursor
 
     /** Sends "query" with length "length" directly and gets a result set. This
      *  function must be used if the query contains binary data. */
-    public int sendQueryWithLength(string query, uint length)
+    public int sendQuery(string query, uint length)
     {
         return sqlrcur_sendQueryWithLength(sqlrcurref, query, length);
     }
@@ -161,7 +161,7 @@ public class SQLRCursor
 
     /** Prepare to execute "query" with length "length".  This function must be
      *  used if the query contains binary data. */
-    public void prepareQueryWithLength(string query, uint length)
+    public void prepareQuery(string query, uint length)
     {
         sqlrcur_prepareQueryWithLength(sqlrcurref, query, length);
     }
@@ -175,38 +175,38 @@ public class SQLRCursor
 
 
     /** Defines a string substitution variable. */
-    public void subString(string variable, string val)
+    public void substitution(string variable, string val)
     {
         sqlrcur_subString(sqlrcurref, variable, val);
     }
 
     /** Defines a integer substitution variable. */
-    public void subLong(string variable, long val)
+    public void substitution(string variable, long val)
     {
         sqlrcur_subLong(sqlrcurref, variable, val);
     }
 
     /** Defines a decimal substitution variable. */
-    public void subDouble(string variable, double val, uint precision, uint scale)
+    public void substitution(string variable, double val, uint precision, uint scale)
     {
         sqlrcur_subDouble(sqlrcurref, variable, val, precision, scale);
     }
 
 
     /** Defines a string input bind variable. */
-    public void inputBindString(string variable, string val)
+    public void inputBind(string variable, string val)
     {
         sqlrcur_inputBindString(sqlrcurref, variable, val);
     }
 
     /** Defines a string input bind variable. */
-    public void inputBindStringWithLength(string variable, string val, uint vallength)
+    public void inputBind(string variable, string val, uint vallength)
     {
         sqlrcur_inputBindStringWithLength(sqlrcurref, variable, val, vallength);
     }
 
     /** Defines a integer input bind variable. */
-    public void inputBindLong(string variable, long val)
+    public void inputBind(string variable, long val)
     {
         sqlrcur_inputBindLong(sqlrcurref, variable, val);
     }
@@ -216,7 +216,7 @@ public class SQLRCursor
      * them both to 0.  However in that case you may get
      * unexpected rounding behavior if the server is faking
      * binds.) */
-    public void inputBindDouble(string variable, double val, uint precision, uint scale)
+    public void inputBind(string variable, double val, uint precision, uint scale)
     {
         sqlrcur_inputBindDouble(sqlrcurref, variable, val, precision, scale);
     }
@@ -364,7 +364,7 @@ public class SQLRCursor
      *  variable. */
     public IntPtr getOutputBindCursor(string variable)
     {
-        return sqlrcur_getOutputBindCursor(sqlrcurref, variable);
+        return sqlrcur_getOutputBindCursor_copyrefs(sqlrcurref, variable, 1);
     }
 
 
@@ -458,37 +458,37 @@ public class SQLRCursor
 
 
     /** Returns the specified field as a string. */
-    public string getFieldByIndex(ulong row, uint col)
+    public string getField(ulong row, uint col)
     {
         return sqlrcur_getFieldByIndex(sqlrcurref, row, col);
     }
 
     /** Returns the specified field as a string. */
-    public string getFieldByName(ulong row, string col)
+    public string getField(ulong row, string col)
     {
         return sqlrcur_getFieldByName(sqlrcurref, row, col);
     }
 
     /** Returns the specified field as an integer. */
-    public long getFieldAsIntegerByIndex(ulong row, uint col)
+    public long getFieldAsInteger(ulong row, uint col)
     {
         return sqlrcur_getFieldAsIntegerByIndex(sqlrcurref, row, col);
     }
 
     /** Returns the specified field as an integer. */
-    public long getFieldAsIntegerByName(ulong row, string col)
+    public long getFieldAsInteger(ulong row, string col)
     {
         return sqlrcur_getFieldAsIntegerByName(sqlrcurref, row, col);
     }
 
     /** Returns the specified field as an decimal. */
-    public double getFieldAsDoubleByIndex(ulong row, uint col)
+    public double getFieldAsDouble(ulong row, uint col)
     {
         return sqlrcur_getFieldAsDoubleByIndex(sqlrcurref, row, col);
     }
 
     /** Returns the specified field as an decimal. */
-    public double getFieldAsDoubleByName(ulong row, string col)
+    public double getFieldAsDouble(ulong row, string col)
     {
         return sqlrcur_getFieldAsDoubleByName(sqlrcurref, row, col);
     }
@@ -496,13 +496,13 @@ public class SQLRCursor
 
 
     /** Returns the length of the specified row and column. */
-    public uint getFieldLengthByIndex(ulong row, uint col)
+    public uint getFieldLength(ulong row, uint col)
     {
         return sqlrcur_getFieldLengthByIndex(sqlrcurref, row, col);
     }
 
     /** Returns the length of the specified row and column. */
-    public uint getFieldLengthByName(ulong row, string col)
+    public uint getFieldLength(ulong row, string col)
     {
         return sqlrcur_getFieldLengthByName(sqlrcurref, row, col);
     }
@@ -516,25 +516,25 @@ public class SQLRCursor
     }
 
     /** Returns the type of the specified column. */
-    public string getColumnTypeByIndex(uint col)
+    public string getColumnType(uint col)
     {
         return sqlrcur_getColumnTypeByIndex(sqlrcurref, col);
     }
 
     /** Returns the type of the specified column. */
-    public string getColumnTypeByName(string col)
+    public string getColumnType(string col)
     {
         return sqlrcur_getColumnTypeByName(sqlrcurref, col);
     }
 
     /** Returns the length of the specified column. */
-    public uint getColumnLengthByIndex(uint col)
+    public uint getColumnLength(uint col)
     {
         return sqlrcur_getColumnLengthByIndex(sqlrcurref, col);
     }
 
     /** Returns the length of the specified column. */
-    public uint getColumnLengthByName(string col)
+    public uint getColumnLength(string col)
     {
         return sqlrcur_getColumnLengthByName(sqlrcurref, col);
     }
@@ -542,7 +542,7 @@ public class SQLRCursor
     /** Returns the precision of the specified column.  Precision is the total
      *  number of digits in a number.  eg: 123.45 has a precision of 5.  For
      *  non-numeric types, it's the number of characters in the string. */
-    public uint getColumnPrecisionByIndex(uint col)
+    public uint getColumnPrecision(uint col)
     {
         return sqlrcur_getColumnPrecisionByIndex(sqlrcurref, col);
     }
@@ -550,7 +550,7 @@ public class SQLRCursor
     /** Returns the precision of the specified column.  Precision is the total
      *  number of digits in a number.  eg: 123.45 has a precision of 5.  For
      *  non-numeric types, it's the number of characters in the string. */
-    public uint getColumnPrecisionByName(string col)
+    public uint getColumnPrecision(string col)
     {
         return sqlrcur_getColumnPrecisionByName(sqlrcurref, col);
     }
@@ -558,7 +558,7 @@ public class SQLRCursor
     /** Returns the scale of the specified column.  Scale is the total number of
      *  digits to the right of the decimal point in a number.  eg: 123.45 has a
      *  scale of 2. */
-    public uint getColumnScaleByIndex(uint col)
+    public uint getColumnScale(uint col)
     {
         return sqlrcur_getColumnScaleByIndex(sqlrcurref, col);
     }
@@ -566,129 +566,129 @@ public class SQLRCursor
     /** Returns the scale of the specified column.  Scale is the total number of
      *  digits to the right of the decimal point in a number.  eg: 123.45 has a 
      *  scale of 2. */
-    public uint getColumnScaleByName(string col)
+    public uint getColumnScale(string col)
     {
         return sqlrcur_getColumnScaleByName(sqlrcurref, col);
     }
 
     /** Returns true if the specified column can contain
      *  nulls and false otherwise. */
-    public bool getColumnIsNullableByIndex(uint col)
+    public bool getColumnIsNullable(uint col)
     {
         return sqlrcur_getColumnIsNullableByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column can contain
      *  nulls and false otherwise. */
-    public bool getColumnIsNullableByName(string col)
+    public bool getColumnIsNullable(string col)
     {
         return sqlrcur_getColumnIsNullableByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is a
      *  primary key and false otherwise. */
-    public bool getColumnIsPrimaryKeyByIndex(uint col)
+    public bool getColumnIsPrimaryKey(uint col)
     {
         return sqlrcur_getColumnIsPrimaryKeyByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is a
      *  primary key and false otherwise. */
-    public bool getColumnIsPrimaryKeyByName(string col)
+    public bool getColumnIsPrimaryKey(string col)
     {
         return sqlrcur_getColumnIsPrimaryKeyByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is unique and false otherwise. */
-    public bool getColumnIsUniqueByIndex(uint col)
+    public bool getColumnIsUnique(uint col)
     {
         return sqlrcur_getColumnIsUniqueByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is unique and false otherwise. */
-    public bool getColumnIsUniqueByName(string col)
+    public bool getColumnIsUnique(string col)
     {
         return sqlrcur_getColumnIsUniqueByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is part of a composite key and
      *  false otherwise. */
-    public bool getColumnIsPartOfKeyByIndex(uint col)
+    public bool getColumnIsPartOfKey(uint col)
     {
         return sqlrcur_getColumnIsPartOfKeyByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is part of a composite key and
      *  false otherwise. */
-    public bool getColumnIsPartOfKeyByName(string col)
+    public bool getColumnIsPartOfKey(string col)
     {
         return sqlrcur_getColumnIsPartOfKeyByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is an unsigned number and false
      *  otherwise. */
-    public bool getColumnIsUnsignedByIndex(uint col)
+    public bool getColumnIsUnsigned(uint col)
     {
         return sqlrcur_getColumnIsUnsignedByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is an unsigned number and false
      *  otherwise. */
-    public bool getColumnIsUnsignedByName(string col)
+    public bool getColumnIsUnsigned(string col)
     {
         return sqlrcur_getColumnIsUnsignedByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column was created
      *  with the zero-fill flag and false otherwise. */
-    public bool getColumnIsZeroFilledByIndex(uint col)
+    public bool getColumnIsZeroFilled(uint col)
     {
         return sqlrcur_getColumnIsZeroFilledByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column was created
      *  with the zero-fill flag and false otherwise. */
-    public bool getColumnIsZeroFilledByName(string col)
+    public bool getColumnIsZeroFilled(string col)
     {
         return sqlrcur_getColumnIsZeroFilledByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column contains binary data and false
      *  otherwise. */
-    public bool getColumnIsBinaryByIndex(uint col)
+    public bool getColumnIsBinary(uint col)
     {
         return sqlrcur_getColumnIsBinaryByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column contains binary data and false
      *  otherwise. */
-    public bool getColumnIsBinaryByName(string col)
+    public bool getColumnIsBinary(string col)
     {
         return sqlrcur_getColumnIsBinaryByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column auto-increments
      *  and false otherwise. */
-    public bool getColumnIsAutoIncrementByIndex(uint col)
+    public bool getColumnIsAutoIncrement(uint col)
     {
         return sqlrcur_getColumnIsAutoIncrementByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column auto-increments
      *  and false otherwise. */
-    public bool getColumnIsAutoIncrementByName(string col)
+    public bool getColumnIsAutoIncrement(string col)
     {
         return sqlrcur_getColumnIsAutoIncrementByName(sqlrcurref, col)!=0;
     }
 
     /** Returns the length of the longest field in the specified column. */
-    public uint getLongestByIndex(uint col)
+    public uint getLongest(uint col)
     {
         return sqlrcur_getLongestByIndex(sqlrcurref, col);
     }
 
     /** Returns the length of the longest field in the specified column. */
-    public uint getLongestByName(string col)
+    public uint getLongest(string col)
     {
         return sqlrcur_getLongestByName(sqlrcurref, col);
     }
@@ -878,7 +878,7 @@ public class SQLRCursor
     private static extern uint sqlrcur_getOutputBindLength(IntPtr sqlrcurref, string variable);
 
     [DllImport("libsqlrclientwrapper.dll")]
-    private static extern IntPtr sqlrcur_getOutputBindCursor(IntPtr sqlrcurref, string variable);
+    private static extern IntPtr sqlrcur_getOutputBindCursor_copyrefs(IntPtr sqlrcurref, string variable, int copyrefs);
 
     [DllImport("libsqlrclientwrapper.dll")]
     private static extern int sqlrcur_openCachedResultSet(IntPtr sqlrcurref, string filename);
@@ -917,7 +917,7 @@ public class SQLRCursor
     private static extern string sqlrcur_getFieldByIndex(IntPtr sqlrcurref, ulong row, uint col);
 
     [DllImport("libsqlrclientwrapper.dll")]
-    private static extern string sqlrcur_getFieldByName(IntPtr sqlrcurref, ulong row, string col);
+    private static extern string sqlrcur_getField(IntPtr sqlrcurref, ulong row, string col);
 
     [DllImport("libsqlrclientwrapper.dll")]
     private static extern long sqlrcur_getFieldAsIntegerByIndex(IntPtr sqlrcurref, ulong row, uint col);
