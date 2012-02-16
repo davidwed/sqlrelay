@@ -268,7 +268,7 @@ public class SQLRConnection
     /** Returns the version of the sqlrelay server software. */
     public string serverVersion()
     {
-        return sqlrcon_serverVersion(sqlrconref)
+        return sqlrcon_serverVersion(sqlrconref);
     }
     
     /** Returns the version of the sqlrelay client software. */
@@ -360,13 +360,13 @@ public class SQLRConnection
      *  Yet another way is to set the environment variable SQLRDEBUG to "ON" */
     public void debugOn()
     {
-        return sqlrcon_debugOn(sqlrconref);
+        sqlrcon_debugOn(sqlrconref);
     }
     
     /** Turns debugging off. */
     public void debugOff()
     {
-        return sqlrcon_debugOff(sqlrconref);
+        sqlrcon_debugOff(sqlrconref);
     }
     
     /** Returns 0 if debugging is off and 1 if debugging is on. */
