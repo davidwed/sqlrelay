@@ -8,7 +8,7 @@ public class SQLRCursor
      *  result sets using connection "sqlrconref" */
     public SQLRCursor(IntPtr sqlrconref)
     {
-        sqlrcurref = sqlrcur_alloc(sqlrconref, 1);
+        sqlrcurref = sqlrcur_alloc_copyrefs(sqlrconref, 1);
     }
 
     /** Destroys the cursor and cleans up all associated result set data. */
@@ -528,7 +528,7 @@ public class SQLRCursor
     /** Returns the length of the specified column. */
     public uint getColumnLengthByIndex(uint col)
     {
-        return sqlrcur_getColumnLengthByIndex(sqlrcurref,t col);
+        return sqlrcur_getColumnLengthByIndex(sqlrcurref, col);
     }
 
     /** Returns the length of the specified column. */
@@ -695,7 +695,7 @@ public class SQLRCursor
      *  resumeResultSet() after it calls resumeSession(). */
     public void suspendResultSet()
     {
-        return sqlrcur_suspendResultSet(sqlrcurref);
+        sqlrcur_suspendResultSet(sqlrcurref);
     }
 
     /** Returns the internal ID of this result set.  This parameter may be
