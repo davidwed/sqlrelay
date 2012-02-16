@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using SQLRClient.SQLRConnection;
+using SQLRClient;
 
 namespace SQLRClient
 {
@@ -941,7 +941,7 @@ public class SQLRCursor : IDisposable
     private static extern string sqlrcur_getFieldByIndex(IntPtr sqlrcurref, ulong row, uint col);
 
     [DllImport("libsqlrclientwrapper.dll")]
-    private static extern string sqlrcur_getField(IntPtr sqlrcurref, ulong row, string col);
+    private static extern string sqlrcur_getFieldByName(IntPtr sqlrcurref, ulong row, string col);
 
     [DllImport("libsqlrclientwrapper.dll")]
     private static extern long sqlrcur_getFieldAsIntegerByIndex(IntPtr sqlrcurref, ulong row, uint col);
