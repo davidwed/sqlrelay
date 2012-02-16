@@ -15,7 +15,7 @@ public class SQLRConnection
      *  "port".  If it is NULL or "" then no attempt will be made to connect
      *  through the socket.*/
     [DllImport("libsqlrclientwrapper.dll")]
-    public static extern IntPtr sqlrcon_alloc(string server, ushort port, string socket, string user, string password, int retrytime, int tries);
+    public static extern IntPtr sqlrcon_alloc_copyrefs(string server, ushort port, string socket, string user, string password, int retrytime, int tries, bool copyreferences);
     
     /** 
      *  Disconnects and ends the session if it hasn't been terminated
@@ -177,4 +177,32 @@ public class SQLRConnection
     [DllImport("libsqlrclientwrapper.dll")]
     public static extern int sqlrcon_getDebug(IntPtr sqlrconref);
 
+    private IntPtr sqlrconref;
+
+    /** Initiates a connection to "server" on "port" or to the unix "socket" on
+     *  the local machine and authenticates with "user" and "password".  Failed
+     *  connections will be retried for "tries" times on interval "retrytime".
+     *  If "tries" is 0 then retries will continue forever.  If "retrytime" is 0
+     *  then retries will be attempted on a default interval.
+     *  If the "socket" parameter is nether NULL nor "" then an attempt will be
+     *  made to connect through it before attempting to connect to "server" on
+     *  "port".  If it is NULL or "" then no attempt will be made to connect
+     *  through the socket.*/
+    public SQLRConnection(string server, ushort port, string socket, string user, string password, int retrytime, int tries)
+    {
+        sqlrconref = sqlrcon_alloc_copyrefs(server, port, socket, user, password, retrytime, tries, true);
+    }
+    
+    /** Disconnects and ends the session if it hasn't been terminated
+     *  already. */
+    /*sqlrcon_free(IntPtr sqlrconref);*/
+    
+    
+    
+    /** Sets the server connect timeout in seconds and milliseconds.
+     *  Setting either parameter to -1 disables the timeout. */
+    void setTimeout(IntPtr sqlrconref, int timeoutsec, int timeoutusec)
+    {
+        sqlrcon_setTimeout(sqlrconref, timeoutsec, timeoutusec);
+    }
 }
