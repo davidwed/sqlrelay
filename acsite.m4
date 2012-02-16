@@ -2252,7 +2252,7 @@ echo "found: $PYTHONINCLUDES"
 				do
 
 					PYTHONDIR=""
-					for k in "config" "config-$j" "config-$jmu" "config-$jm" "config-$ju"
+					for k in "config" "config-$j" "config-${j}mu" "config-${j}m" "config-${j}u"
 					do
 
 echo "testing: $i/$k"
