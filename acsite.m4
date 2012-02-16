@@ -2250,25 +2250,34 @@ then
 
 				for i in "/usr/lib64/python$j" "/usr/lib/python$j" "/usr/local/lib64/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib64/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j" "/usr/sfw/lib/python$j" "/sfw/lib/python$j" "/opt/csw/lib/python$j" "/sw/lib/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/lib/python$j"
 				do
-					if ( test -d "$i/config" )
+
+					for k in "config" "config-$j" "config-$jmu" "config-$jm" "config-$ju"
+					do
+
+						if ( test -d "$i/$k" )
+						then
+							dnl for cygwin and mac os x
+							dnl add -lpython
+							if ( test -n "$CYGWIN" -a -r "$i/$k/libpython$j.dll.a" )
+							then
+								PYTHONDIR="$i"
+								PYTHONLIB="-L$PYTHONDIR/$k -lpython$j"
+							elif ( test "$UNAME" = "Darwin" )
+							then
+								PYTHONDIR="$i"
+								PYTHONLIB="-lpython$j"
+							else
+								PYTHONDIR="$i"
+							fi
+							if ( test -n "$PYTHONDIR" )
+							then
+								break
+							fi
+						fi
+					done
+					if ( test -n "$PYTHONDIR" )
 					then
-						dnl for cygwin and mac os x
-						dnl add -lpython
-						if ( test -n "$CYGWIN" -a -r "$i/config/libpython$j.dll.a" )
-						then
-							PYTHONDIR="$i"
-							PYTHONLIB="-L$PYTHONDIR/config -lpython$j"
-						elif ( test "$UNAME" = "Darwin" )
-						then
-							PYTHONDIR="$i"
-							PYTHONLIB="-lpython$j"
-						else
-							PYTHONDIR="$i"
-						fi
-						if ( test -n "$PYTHONDIR" )
-						then
-							break
-						fi
+						break
 					fi
 				done
 
