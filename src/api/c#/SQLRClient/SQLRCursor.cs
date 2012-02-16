@@ -167,7 +167,7 @@ public class SQLRCursor
     }
 
     /** Prepare to execute the contents of "path"/"filename". */
-    public void prepareFileQuery(string path, string filename);
+    public void prepareFileQuery(string path, string filename)
     {
         sqlrcur_prepareFileQuery(sqlrcurref, path, filename);
     }
