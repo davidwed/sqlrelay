@@ -1,18 +1,39 @@
 using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
+using SQLRConnection;
 
-public class SQLRCursor
+public class SQLRCursor : IDisposable
 {
 
     /** Creates a cursor to run queries and fetch
-     *  result sets using connection "sqlrconref" */
-    public SQLRCursor(IntPtr sqlrconref)
+     *  result sets using connection "conn" */
+    public SQLRCursor(SQLRConnection conn)
     {
-        sqlrcurref = sqlrcur_alloc_copyrefs(sqlrconref, 1);
+        sqlrcurref = sqlrcur_alloc_copyrefs(conn.getInternalConnectionStructure(), 1);
+    }
+
+    /** Dispose framework */
+    private bool disposed = false;
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposed)
+        {
+            sqlrcur_free(sqlrcurref);
+            disposed = true;
+        }
     }
 
     /** Destroys the cursor and cleans up all associated result set data. */
-    /* public void sqlrcur_free(IntPtr sqlrcurref); */
+    ~SQLRCursor()
+    {
+        Dispose(false);
+    }
 
 
 

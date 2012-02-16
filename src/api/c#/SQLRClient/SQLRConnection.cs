@@ -1,7 +1,8 @@
 using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-public class SQLRConnection
+public class SQLRConnection : IDisposable
 {
     /** Initiates a connection to "server" on "port" or to the unix "socket" on
      *  the local machine and authenticates with "user" and "password".  Failed
@@ -17,9 +18,28 @@ public class SQLRConnection
         sqlrconref = sqlrcon_alloc_copyrefs(server, port, socket, user, password, retrytime, tries, true);
     }
     
+    /** Dispose framework */
+    private bool disposed = false;
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposed)
+        {
+            sqlrcon_free(sqlrconref);
+            disposed = true;
+        }
+    }
+
     /** Disconnects and ends the session if it hasn't been terminated
      *  already. */
-    /*sqlrcon_free()*/
+    ~SQLRConnection()
+    {
+        Dispose(false);
+    }
     
     
     
@@ -197,6 +217,12 @@ public class SQLRConnection
     public bool getDebug()
     {
         return sqlrcon_getDebug(sqlrconref)!=0;
+    }
+
+    /** Returns a pointer to the internal connection structure */
+    public IntPtr getInternalConnectionStructure()
+    {
+        return sqlrconref;
     }
 
     private IntPtr sqlrconref;
