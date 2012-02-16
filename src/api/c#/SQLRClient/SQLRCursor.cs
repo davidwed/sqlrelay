@@ -330,6 +330,7 @@ public class SQLRCursor
     public long getOutputBindInteger(string variable)
     {
         return sqlrcur_getOutputBindInteger(sqlrcurref, variable);
+    }
 
     /** Get the value stored in a previously defined
      *  decimal output bind variable. */
