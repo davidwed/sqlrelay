@@ -14,7 +14,7 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 	// clear bind mappings and reset fakeinputbindsforthisquery flag
 	if (!reexecute && !bindcursor) {
 		clearBindMappings();
-		cursor->fakeinputbindsforthisquery=false;
+		cursor->fakeinputbindsforthisquery=fakeinputbinds;
 	}
 
 	if (getquery) {
@@ -24,41 +24,6 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 			return 0;
 		}
 	}
-
-	// handle fake begins
-	// FIXME: do we need to loop to detect downed db's somehow?
-	/*if (!reexecute && !bindcursor && handleFakeTransactionQueries(cursor)) {
-
-		dbgfile.debugPrint("connection",1,"query was fake begin...");
-
-		// indicate that no error has occurred
-		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
-
-		// send the client the id of the 
-		// cursor that it's going to use
-		clientsock->write(cursor->id);
-
-		// tell the client that this is not a
-		// suspended result set
-		clientsock->write((uint16_t)NO_SUSPENDED_RESULT_SET);
-
-		// row counts
-		sendRowCounts(cursor->knowsRowCount(),0,
-				cursor->knowsAffectedRows(),0);
-
-		// send column info or not
-		clientsock->write((uint16_t)DONT_SEND_COLUMN_INFO);
-
-		// column count
-		clientsock->write((uint32_t)0);
-
-		// no bind vars
-		clientsock->write((uint16_t)END_BIND_VARS);
-
-		dbgfile.debugPrint("connection",1,"done handling query...");
-
-		return 1;
-	}*/
 
 	// loop here to handle down databases
 	const char	*error;
@@ -234,7 +199,6 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	bool	doegress=true;
 
 	if (reexecute &&
-		!fakeinputbinds &&
 		!cursor->fakeinputbindsforthisquery &&
 		cursor->supportsNativeBinds()) {
 
@@ -297,8 +261,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 
 			// fake input binds if necessary
 			stringbuffer	*newquery=NULL;
-			if (fakeinputbinds ||
-				cursor->fakeinputbindsforthisquery ||
+			if (cursor->fakeinputbindsforthisquery ||
 				!cursor->supportsNativeBinds()) {
 
 				dbgfile.debugPrint("connection",3,
@@ -323,7 +286,6 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			// if we're not faking binds then
 			// handle the binds for real
 			if (success &&
-				!fakeinputbinds &&
 				!cursor->fakeinputbindsforthisquery &&
 				cursor->supportsNativeBinds()) {
 				success=cursor->handleBinds();

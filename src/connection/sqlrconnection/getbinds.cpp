@@ -38,6 +38,8 @@ bool sqlrconnection_svr::getInputBinds(sqlrcursor_svr *cursor) {
 				return false;
 			}
 		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
+			// can't fake blob/clob binds
+			cursor->fakeinputbindsforthisquery=false;
 			if (!getLobBind(bv)) {
 				return false;
 			}
