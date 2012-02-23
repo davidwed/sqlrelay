@@ -1751,7 +1751,11 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 					stmt->resultbinds[i].buffer=NULL;
 					break;
 				case MYSQL_TYPE_VAR_STRING:
-				case MYSQL_TYPE_STRING: {
+				case MYSQL_TYPE_STRING:
+				case MYSQL_TYPE_TINY_BLOB:
+				case MYSQL_TYPE_MEDIUM_BLOB:
+				case MYSQL_TYPE_LONG_BLOB:
+				case MYSQL_TYPE_BLOB: {
 
 					// initialize len to the buffer size
 					unsigned long	len=stmt->
@@ -1829,13 +1833,6 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 						(double)charstring::
 							toFloat(row[i]);
 					break;
-				case MYSQL_TYPE_TINY_BLOB:
-				case MYSQL_TYPE_MEDIUM_BLOB:
-				case MYSQL_TYPE_LONG_BLOB:
-				case MYSQL_TYPE_BLOB:
-					// FIXME: I'm not sure what
-					// to do with these types
-					//break;
 				case MYSQL_TYPE_ENUM:
 				case MYSQL_TYPE_SET:
 				case MYSQL_TYPE_GEOMETRY:
