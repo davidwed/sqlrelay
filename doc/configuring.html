@@ -293,7 +293,9 @@ or when using fake binds against a database that doesn't support
 colon-delimited bind variables.</li>
 <li><b>isolationlevel</b> - Sets the transaction isolation level to the
 specified value.  At the end of each client session, the isolation level will
-be reset to this value as well.</li>
+be reset to this value as well.  If this is left blank or omitted entirely then
+nothing will be done to set or reset the isolation level at the beginning or
+end of each session.</li>
 <li><b>ignoreselectdatabase</b> - Intructs sqlrelay to ignore selectDatabase() calls from the client.  If you want to point an instance at a test database and a program at the instance but the program manually selects the database to use, effectively aiming itself back at production, this is useful in preventing it from doing so.</li>
 </ul>
 <li><b>user</b>
