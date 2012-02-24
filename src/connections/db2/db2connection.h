@@ -145,7 +145,6 @@ class db2connection : public sqlrconnection_svr {
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
 		const char	*setIsolationLevelQuery();
-		const char	*getDefaultIsolationLevel();
 		const char	*bindFormat();
 
 		SQLHENV		env;

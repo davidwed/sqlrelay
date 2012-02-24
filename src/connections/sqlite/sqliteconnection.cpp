@@ -152,10 +152,6 @@ const char *sqliteconnection::getColumnListQuery(bool wild) {
 const char *sqliteconnection::setIsolationLevelQuery() {
 	return "pragma %s";
 }
-
-const char *sqliteconnection::getDefaultIsolationLevel() {
-	return "read_committed=false";
-}
 #endif
 
 bool sqliteconnection::getLastInsertId(uint64_t *id, char **error) {

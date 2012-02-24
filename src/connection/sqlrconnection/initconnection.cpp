@@ -189,9 +189,7 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 
 	// set the transaction isolation level
 	isolationlevel=cfgfl->getIsolationLevel();
-	setIsolationLevel(charstring::length(isolationlevel)?
-						isolationlevel:
-						getDefaultIsolationLevel());
+	setIsolationLevel(isolationlevel);
 
 	// ignore selectDatabase() calls?
 	ignoreselectdb=cfgfl->getIgnoreSelectDatabase();

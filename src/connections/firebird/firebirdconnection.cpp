@@ -338,10 +338,6 @@ const char *firebirdconnection::getColumnListQuery(bool wild) {
 		"	r.rdb$field_position";
 }
 
-const char *firebirdconnection::getDefaultIsolationLevel() {
-	return "read committed no record_version";
-}
-
 const char *firebirdconnection::bindFormat() {
 	return "?";
 }

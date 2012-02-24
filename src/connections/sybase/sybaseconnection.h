@@ -156,7 +156,6 @@ class sybaseconnection : public sqlrconnection_svr {
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
-		const char	*getDefaultIsolationLevel();
 		const char	*bindFormat();
 		const char	*beginTransactionQuery();
 		char		bindVariablePrefix();

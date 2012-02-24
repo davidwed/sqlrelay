@@ -63,7 +63,3 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 const char *sqlrconnection_svr::setIsolationLevelQuery() {
 	return "set transaction isolation level %s";
 }
-
-const char *sqlrconnection_svr::getDefaultIsolationLevel() {
-	return "read committed";
-}

@@ -356,10 +356,6 @@ const char *sybaseconnection::getLastInsertIdQuery() {
 	return "select @@identity";
 }
 
-const char *sybaseconnection::getDefaultIsolationLevel() {
-	return "1";
-}
-
 const char *sybaseconnection::bindFormat() {
 	return "@*";
 }

@@ -385,10 +385,6 @@ const char *freetdsconnection::getLastInsertIdQuery() {
 	return "select @@identity";
 }
 
-const char *freetdsconnection::getDefaultIsolationLevel() {
-	return "1";
-}
-
 const char *freetdsconnection::bindFormat() {
 	return "@*";
 }

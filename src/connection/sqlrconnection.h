@@ -76,7 +76,6 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual const char	*getLastInsertIdQuery();
 		virtual bool		setIsolationLevel(const char *isolevel);
 		virtual const char	*setIsolationLevelQuery();
-		virtual const char	*getDefaultIsolationLevel();
 		virtual const char	*pingQuery();
 		virtual const char	*beginTransactionQuery();
 		virtual bool		ping();

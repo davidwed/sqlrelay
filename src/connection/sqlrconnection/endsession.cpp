@@ -70,9 +70,7 @@ void sqlrconnection_svr::endSessionInternal() {
 	dbgfile.debugPrint("connection",1,"done ending session");
 
 	// set isolation level
-	setIsolationLevel(charstring::length(isolationlevel)?
-						isolationlevel:
-						getDefaultIsolationLevel());
+	setIsolationLevel(isolationlevel);
 
 	// reset sql translation
 	if (sqlt) {
