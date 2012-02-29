@@ -118,7 +118,8 @@ stringbuffer *sqlrcursor_svr::fakeInputBinds(const char *query) {
 
 void sqlrcursor_svr::performSubstitution(stringbuffer *buffer, int16_t index) {
 
-	if (inbindvars[index].type==STRING_BIND) {
+	if (inbindvars[index].type==STRING_BIND ||
+		inbindvars[index].type==CLOB_BIND) {
 
 		char	escchar=escapeChar();
 

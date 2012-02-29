@@ -37,9 +37,13 @@ bool sqlrconnection_svr::getInputBinds(sqlrcursor_svr *cursor) {
 			if (!getDoubleBind(bv)) {
 				return false;
 			}
-		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
-			// can't fake blob/clob binds
+		} else if (bv->type==BLOB_BIND) {
+			// can't fake blob binds
 			cursor->fakeinputbindsforthisquery=false;
+			if (!getLobBind(bv)) {
+				return false;
+			}
+		} else if (bv->type==CLOB_BIND) {
 			if (!getLobBind(bv)) {
 				return false;
 			}
@@ -236,7 +240,8 @@ bool sqlrconnection_svr::getStringBind(bindvar_svr *bv) {
 					bv->valuesize,
 					idleclienttimeout,0))!=
 						(uint32_t)(bv->valuesize)) {
-		dbgfile.debugPrint("connection",2,"getting binds failed: bad value");
+		dbgfile.debugPrint("connection",2,
+					"getting binds failed: bad value");
 		return false;
 	}
 	bv->value.stringval[bv->valuesize]='\0';
