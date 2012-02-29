@@ -1767,8 +1767,17 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 					if (lengths[i]<stmt->
 						resultbinds[i].buffer_length) {
 
+						len=lengths[i];
+
 						// add 1 for the null terminator
-						len=lengths[i]+1;
+						if (stmt->resultbinds[i].
+							buffer_type==
+							MYSQL_TYPE_VAR_STRING ||
+							stmt->resultbinds[i].
+							buffer_type==
+							MYSQL_TYPE_STRING) {
+							len++;
+						}
 					}
 
 					// set the output length (if we can)
