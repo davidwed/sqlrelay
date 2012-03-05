@@ -224,10 +224,12 @@ bool sqlparser::parseColumnAndConstraintDefinitions(
 		xmldomnode	*coldefnode=newNode(columnsnode,
 							_column);
 
-		// FIXME: handle constraints here
-
-		// column definition
-		parseColumnDefinition(coldefnode,*newptr,newptr);
+		// column definition or constraint
+		const char	*start=*newptr;
+		if (!parseColumnDefinition(coldefnode,start,newptr) &&
+			!parseConstraint(coldefnode,start,newptr)) {
+			return false;
+		}
 
 		// comma
 		if (comma(*newptr,newptr)) {
@@ -1117,4 +1119,14 @@ bool sqlparser::parseOnClause(xmldomnode *currentnode,
 	}
 	newNode(currentnode,_on);
 	return true;
+}
+
+bool sqlparser::parseConstraint(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+
+	// FIXME: implement this...
+
+	return false;
 }

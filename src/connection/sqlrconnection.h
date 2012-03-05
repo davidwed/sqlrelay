@@ -487,7 +487,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 
 		bool		scalerspawned;
 		const char	*connectionid;
-		unsigned int	ttl;
+		int32_t		ttl;
 
 	private:
 		sqlrstatistics	*statistics;

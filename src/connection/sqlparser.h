@@ -306,6 +306,9 @@ class sqlparser {
 		bool	asClause(const char *ptr,
 						const char **newptr);
 		static const char	*_as;
+		bool	parseConstraint(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
 
 
 

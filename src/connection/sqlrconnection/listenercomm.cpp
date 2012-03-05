@@ -26,7 +26,10 @@ void sqlrconnection_svr::announceAvailability(const char *tmpdir,
 	}
 
 	// handle time-to-live
-	signalmanager::alarm(ttl);
+	if (ttl>0) {
+printf("setting alarm\n");
+		signalmanager::alarm(ttl);
+	}
 
 	acquireAnnounceMutex();
 
@@ -51,7 +54,9 @@ void sqlrconnection_svr::announceAvailability(const char *tmpdir,
 	// undo a semaphore.
 	//
 	// What a mess.
-	signalmanager::alarm(0);
+	if (ttl>0) {
+		signalmanager::alarm(0);
+	}
 
 	// get a pointer to the shared memory segment
 	shmdata	*idmemoryptr=getAnnounceBuffer();

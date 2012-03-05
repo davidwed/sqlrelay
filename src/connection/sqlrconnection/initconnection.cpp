@@ -28,7 +28,9 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	}
 
 	// get the time to live from the command line
-	ttl=charstring::toInteger(cmdl->getValue("-ttl"));
+	const char	*ttlstr=cmdl->getValue("-ttl");
+	ttl=(ttlstr)?charstring::toInteger(cmdl->getValue("-ttl")):-1;
+printf("ttl=%d\n",ttl);
 
 	silent=cmdl->found("-silent");
 

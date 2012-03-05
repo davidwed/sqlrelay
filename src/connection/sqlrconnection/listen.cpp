@@ -65,17 +65,23 @@ bool sqlrconnection_svr::listen() {
 		}
 
 		if (cfgfl->getDynamicScaling()) {
+
 			decrementSessionCount();
+
 			if (clientconnectfailed) {
 				return false;
 			}
-		}
 
-		if (cfgfl->getDynamicScaling() && ttl &&
-				cfgfl->getMaxSessionCount()) {
-			sessioncount++;
-			if (sessioncount==cfgfl->getMaxSessionCount()) {
+			if (ttl==0) {
+printf("ttl=0, returning\n");
 				return true;
+			}
+
+			if (ttl>0 && cfgfl->getMaxSessionCount()) {
+				sessioncount++;
+				if (sessioncount==cfgfl->getMaxSessionCount()) {
+					return true;
+				}
 			}
 		}
 	}

@@ -212,7 +212,7 @@ uint32_t sqlrconfigfile::getGrowBy() {
 	return growby;
 }
 
-uint32_t sqlrconfigfile::getTtl() {
+int32_t sqlrconfigfile::getTtl() {
 	return ttl;
 }
 
@@ -221,7 +221,7 @@ uint16_t sqlrconfigfile::getMaxSessionCount() {
 }
 
 bool sqlrconfigfile::getDynamicScaling() {
-	return (maxconnections>connections && growby>0 && ttl>0 &&
+	return (maxconnections>connections && growby>0 && ttl>-1 &&
 		(maxlisteners==-1 || maxqueuelength<=maxlisteners));
 }
 
@@ -1117,7 +1117,7 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currentattribute==GROWBY_ATTRIBUTE) {
 			growby=atouint32_t(value,DEFAULT_GROWBY,1);
 		} else if (currentattribute==TTL_ATTRIBUTE) {
-			ttl=atouint32_t(value,DEFAULT_TTL,1);
+			ttl=atouint32_t(value,DEFAULT_TTL,0);
 		} else if (currentattribute==MAXSESSIONCOUNT_ATTRIBUTE) {
 			maxsessioncount=
 				atouint32_t(value,DEFAULT_MAXSESSIONCOUNT,0);
@@ -1358,6 +1358,15 @@ uint32_t sqlrconfigfile::atouint32_t(const char *value,
 						(value)?value:defaultvalue);
 	if (retval<minvalue) {
 		retval=charstring::toUnsignedInteger(defaultvalue);
+	}
+	return retval;
+}
+
+int32_t sqlrconfigfile::atoint32_t(const char *value,
+				const char *defaultvalue, int32_t minvalue) {
+	int32_t	retval=charstring::toInteger((value)?value:defaultvalue);
+	if (retval<minvalue) {
+		retval=charstring::toInteger(defaultvalue);
 	}
 	return retval;
 }

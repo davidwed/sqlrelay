@@ -186,7 +186,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		uint32_t	getMaxConnections();
 		uint32_t	getMaxQueueLength();
 		uint32_t	getGrowBy();
-		uint32_t	getTtl();
+		int32_t		getTtl();
 		uint16_t	getMaxSessionCount();
 		bool		getDynamicScaling();
 		const char	*getEndOfSession();
@@ -256,6 +256,9 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		uint32_t	atouint32_t(const char *value,
 					const char *defaultvalue,
 					uint32_t minvalue);
+		int32_t	atoint32_t(const char *value,
+					const char *defaultvalue,
+					int32_t minvalue);
 
 		bool	tagStart(const char *name);
 		bool	attributeName(const char *name);
@@ -284,7 +287,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		uint32_t	maxconnections;
 		uint32_t	maxqueuelength;
 		uint32_t	growby;
-		uint32_t	ttl;
+		int32_t		ttl;
 		uint16_t	maxsessioncount;
 		char		*endofsession;
 		bool		endofsessioncommit;
