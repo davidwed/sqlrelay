@@ -3,6 +3,7 @@
 	renamed all .C files to .cpp for windows
 	added msvc projects for sqlrclient, sqlrclientwrapper, sqlrutil and
 		sqlrsh and got them all working natively on windows
+	updated code so ttl="0" works as expected
 
 0.44 - updated postgresql drop-in lib for postgresql 8/9 compatibility
 	updated mysql drop-in lib for mysql 5.2+ compatibility
