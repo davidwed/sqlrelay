@@ -4,6 +4,8 @@
 	added msvc projects for sqlrclient, sqlrclientwrapper, sqlrutil and
 		sqlrsh and got them all working natively on windows
 	updated code so ttl="0" works as expected
+	updated code so dynamic scaling of cursors works as expected
+	documented dynamic scaling of cursors somewhat
 
 0.44 - updated postgresql drop-in lib for postgresql 8/9 compatibility
 	updated mysql drop-in lib for mysql 5.2+ compatibility
