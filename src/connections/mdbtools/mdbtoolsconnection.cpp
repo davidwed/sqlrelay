@@ -3,6 +3,10 @@
 
 #include <mdbtoolsconnection.h>
 
+extern "C" {
+        #include <mdbsql.h>
+}
+
 #include <config.h>
 
 #include <datatypes.h>
@@ -125,10 +129,12 @@ mdbtoolscursor::mdbtoolscursor(sqlrconnection_svr *conn) :
 					sqlrcursor_svr(conn) {
 	mdbtoolsconn=(mdbtoolsconnection *)conn;
 	columnnames=NULL;
+	mdbsql=(void *)new MdbSQL;
 }
 
 mdbtoolscursor::~mdbtoolscursor() {
 	delete[] columnnames;
+	delete (MdbSQL *)mdbsql;
 }
 
 bool mdbtoolscursor::openCursor(uint16_t id) {
@@ -141,7 +147,7 @@ bool mdbtoolscursor::openCursor(uint16_t id) {
 		dbval="";
 	}
 
-	return mdb_sql_open(&mdbsql,const_cast<char *>(dbval));
+	return mdb_sql_open((MdbSQL *)mdbsql,const_cast<char *>(dbval));
 }
 
 bool mdbtoolscursor::closeCursor() {
@@ -150,7 +156,7 @@ bool mdbtoolscursor::closeCursor() {
 		return false;
 	}
 
-	mdb_sql_exit(&mdbsql);
+	mdb_sql_exit((MdbSQL *)mdbsql);
 	return true;
 }
 
@@ -162,18 +168,18 @@ bool mdbtoolscursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
 
 	// execute the query
-	mdb_sql_reset(&mdbsql);
+	mdb_sql_reset((MdbSQL *)mdbsql);
 #if defined(HAVE_MDB_RUN_QUERY)
-	if (!mdb_run_query(&mdbsql,(char *)query)) {
+	if (!mdb_run_query((MdbSQL *)mdbsql,(char *)query)) {
 		return false;
 	}
 #elif defined(HAVE_MDB_SQL_RUN_QUERY)
-	if (!mdb_sql_run_query(&mdbsql,(char *)query)) {
+	if (!mdb_sql_run_query((MdbSQL *)mdbsql,(char *)query)) {
 		return false;
 	}
 #else
 	g_input_ptr=(char *)query;
-	_mdb_sql(&mdbsql);
+	_mdb_sql((MdbSQL *)mdbsql);
 	if (yyparse()) {
 		return false;
 	}
@@ -207,14 +213,14 @@ uint64_t mdbtoolscursor::affectedRows() {
 }
 
 uint32_t mdbtoolscursor::colCount() {
-	return mdbsql.num_columns;
+	return ((MdbSQL *)mdbsql)->num_columns;
 }
 
 const char * const *mdbtoolscursor::columnNames() {
-	columnnames=new char *[mdbsql.num_columns];
-	for (unsigned int i=0; i<mdbsql.num_columns; i++) {
+	columnnames=new char *[((MdbSQL *)mdbsql)->num_columns];
+	for (unsigned int i=0; i<((MdbSQL *)mdbsql)->num_columns; i++) {
 		MdbSQLColumn	*col=(MdbSQLColumn *)
-			g_ptr_array_index(mdbsql.columns,i);
+			g_ptr_array_index(((MdbSQL *)mdbsql)->columns,i);
 		columnnames[i]=col->name;
 	}
 	return columnnames;
@@ -227,11 +233,11 @@ uint16_t mdbtoolscursor::columnTypeFormat() {
 void mdbtoolscursor::returnColumnInfo() {
 
 	// for each column...
-	for (unsigned int i=0; i<mdbsql.num_columns; i++) {
+	for (unsigned int i=0; i<((MdbSQL *)mdbsql)->num_columns; i++) {
 
 		// get the column
 		MdbSQLColumn	*col=(MdbSQLColumn *)
-			g_ptr_array_index(mdbsql.columns,i);
+			g_ptr_array_index(((MdbSQL *)mdbsql)->columns,i);
 
 		// send the column definition
 		conn->sendColumnDefinition(col->name,
@@ -242,7 +248,7 @@ void mdbtoolscursor::returnColumnInfo() {
 
 bool mdbtoolscursor::noRowsToReturn() {
 	// if there were no columns then there can be no rows
-	return (mdbsql.num_columns==0);
+	return (((MdbSQL *)mdbsql)->num_columns==0);
 }
 
 bool mdbtoolscursor::skipRow() {
@@ -251,9 +257,10 @@ bool mdbtoolscursor::skipRow() {
 
 bool mdbtoolscursor::fetchRow() {
 #ifdef HAVE_MDB_SQL_FETCH_ROW
-	return mdb_sql_fetch_row(&mdbsql,mdbsql.cur_table);
+	return mdb_sql_fetch_row((MdbSQL *)mdbsql,
+				((MdbSQL *)mdbsql)->cur_table);
 #else
-	return mdb_fetch_row(mdbsql.cur_table);
+	return mdb_fetch_row(((MdbSQL *)mdbsql)->cur_table);
 #endif
 }
 
@@ -262,9 +269,9 @@ void mdbtoolscursor::getField(uint32_t col,
 				bool *blob, bool *null) {
 
 	// find the corresponding column in the current table
-	MdbTableDef	*table=mdbsql.cur_table;
+	MdbTableDef	*table=((MdbSQL *)mdbsql)->cur_table;
 	MdbSQLColumn	*column=(MdbSQLColumn *)
-				g_ptr_array_index(mdbsql.columns,col);
+			g_ptr_array_index(((MdbSQL *)mdbsql)->columns,col);
 
 	for (unsigned int tcol=0; tcol<table->num_cols; tcol++) {
 		MdbColumn	*tablecolumn=(MdbColumn *)
@@ -274,14 +281,14 @@ void mdbtoolscursor::getField(uint32_t col,
 							column->name)) {
 #ifdef HAVE_MDB_COL_TO_STRING_5_PARAM
 			char	*data=mdb_col_to_string(
-					mdbsql.mdb,
-					mdbsql.mdb->pg_buf,
+					((MdbSQL *)mdbsql)->mdb,
+					((MdbSQL *)mdbsql)->mdb->pg_buf,
 					tablecolumn->cur_value_start,
 					tablecolumn->col_type,
 					tablecolumn->cur_value_len);
 #else
 			char	*data=mdb_col_to_string(
-					mdbsql.mdb,
+					((MdbSQL *)mdbsql)->mdb,
 					tablecolumn->cur_value_start,
 					tablecolumn->col_type,
 					tablecolumn->cur_value_len);

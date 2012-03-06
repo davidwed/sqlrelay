@@ -8,10 +8,6 @@
 
 #include <sqlrconnection.h>
 
-extern "C" {
-	#include <mdbsql.h>
-}
-
 class mdbtoolsconnection;
 
 class mdbtoolscursor : public sqlrcursor_svr {
@@ -50,7 +46,7 @@ class mdbtoolscursor : public sqlrcursor_svr {
 
 		char	**columnnames;
 
-		MdbSQL	mdbsql;
+		void	*mdbsql;
 };
 
 class mdbtoolsconnection : public sqlrconnection_svr {
