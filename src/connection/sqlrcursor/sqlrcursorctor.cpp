@@ -12,7 +12,7 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 
 	createtemp.compile("(create|CREATE|declare|DECLARE)[ \\t\\r\\n]+((global|GLOBAL|local|LOCAL)?[ \\t\\r\\n]+)?(temp|TEMP|temporary|TEMPORARY)?[ \\t\\r\\n]+(table|TABLE)[ \\t\\r\\n]+");
 
-	querybuffer=NULL;
+	querybuffer=new char[conn->maxquerysize+1];
 	querytree=NULL;
 	fakeinputbindsforthisquery=false;
 

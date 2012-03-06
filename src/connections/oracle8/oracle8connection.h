@@ -65,8 +65,7 @@ class oracle8cursor : public sqlrcursor_svr {
 		void		allocateResultSetBuffers(uint32_t fetchatonce,
 							int32_t selectlistsize,
 							int32_t itembuffersize);
-		void		deallocateResultSetBuffers(
-							int32_t selectlistsize);
+		void		deallocateResultSetBuffers();
 		bool		openCursor(uint16_t id);
 		bool		closeCursor();
 		bool		prepareQuery(const char *query,
@@ -185,6 +184,7 @@ class oracle8cursor : public sqlrcursor_svr {
 		sword		ncols;
 		stringbuffer	*errormessage;
 
+		int32_t		resultsetbuffercount;
 		describe	*desc;
 		char		**columnnames;
 		OCIDefine	**def;

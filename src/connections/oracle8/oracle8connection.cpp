@@ -683,7 +683,7 @@ oracle8cursor::~oracle8cursor() {
 		delete[] outintbindstring[i];
 	}
 
-	deallocateResultSetBuffers(oracle8conn->maxselectlistsize);
+	deallocateResultSetBuffers();
 }
 
 void oracle8cursor::allocateResultSetBuffers(uint32_t fetchatonce,
@@ -691,6 +691,7 @@ void oracle8cursor::allocateResultSetBuffers(uint32_t fetchatonce,
 						int32_t itembuffersize) {
 
 	if (selectlistsize==-1) {
+		resultsetbuffercount=0;
 		desc=NULL;
 		columnnames=NULL;
 		def=NULL;
@@ -700,15 +701,16 @@ void oracle8cursor::allocateResultSetBuffers(uint32_t fetchatonce,
 		def_col_retlen=NULL;
 		def_col_retcode=NULL;
 	} else {
-		desc=new describe[selectlistsize];
-		columnnames=new char *[selectlistsize];
-		def=new OCIDefine *[selectlistsize];
-		def_lob=new OCILobLocator **[selectlistsize];
-		def_buf=new ub1 *[selectlistsize];
-		def_indp=new sb2 *[selectlistsize];
-		def_col_retlen=new ub2 *[selectlistsize];
-		def_col_retcode=new ub2 *[selectlistsize];
-		for (int32_t i=0; i<selectlistsize; i++) {
+		resultsetbuffercount=selectlistsize;
+		desc=new describe[resultsetbuffercount];
+		columnnames=new char *[resultsetbuffercount];
+		def=new OCIDefine *[resultsetbuffercount];
+		def_lob=new OCILobLocator **[resultsetbuffercount];
+		def_buf=new ub1 *[resultsetbuffercount];
+		def_indp=new sb2 *[resultsetbuffercount];
+		def_col_retlen=new ub2 *[resultsetbuffercount];
+		def_col_retcode=new ub2 *[resultsetbuffercount];
+		for (int32_t i=0; i<resultsetbuffercount; i++) {
 			def_lob[i]=new OCILobLocator *[fetchatonce];
 			for (uint32_t j=0; j<fetchatonce; j++) {
 				def_lob[i][j]=NULL;
@@ -722,9 +724,9 @@ void oracle8cursor::allocateResultSetBuffers(uint32_t fetchatonce,
 	}
 }
 
-void oracle8cursor::deallocateResultSetBuffers(int32_t selectlistsize) {
-	if (selectlistsize!=-1) {
-		for (int32_t i=0; i<selectlistsize; i++) {
+void oracle8cursor::deallocateResultSetBuffers() {
+	if (resultsetbuffercount) {
+		for (int32_t i=0; i<resultsetbuffercount; i++) {
 			delete[] def_col_retcode[i];
 			delete[] def_col_retlen[i];
 			delete[] def_indp[i];
@@ -739,6 +741,7 @@ void oracle8cursor::deallocateResultSetBuffers(int32_t selectlistsize) {
 		delete[] def;
 		delete[] desc;
 		delete[] columnnames;
+		resultsetbuffercount=0;
 	}
 }
 
@@ -1240,7 +1243,6 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 	// initialize values as if a statement has been prepared and executed
 	((oracle8cursor *)cursor)->stmttype=0;
 	((oracle8cursor *)cursor)->ncols=0;
-	((oracle8cursor *)cursor)->stmttype=0;
 	((oracle8cursor *)cursor)->row=0;
 	((oracle8cursor *)cursor)->maxrow=0;
 	((oracle8cursor *)cursor)->totalrows=0;
@@ -1845,7 +1847,7 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 		// deallocate buffers, if necessary
 		if (stmttype==OCI_STMT_SELECT &&
 			oracle8conn->maxselectlistsize==-1) {
-			deallocateResultSetBuffers(ncols);
+			deallocateResultSetBuffers();
 		}
 
 		resultfreed=true;

@@ -374,8 +374,6 @@ bool sqlrconnection_svr::initCursors() {
 
 		if (!cur[i]) {
 			cur[i]=initCursorUpdateStats();
-			// FIXME: LAME!!!  oh god this is lame....
-			cur[i]->querybuffer=new char[maxquerysize+1];
 		}
 		if (!cur[i]->openCursorInternal(i)) {
 

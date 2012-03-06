@@ -80,7 +80,6 @@ void sqlrconnection_svr::endSessionInternal() {
 	// shrink the cursor array, if necessary
 	while (cursorcount>mincursorcount) {
 		cursorcount--;
-printf("clearing cursor %d\n",cursorcount);
 		delete cur[cursorcount];
 		cur[cursorcount]=NULL;
 	}

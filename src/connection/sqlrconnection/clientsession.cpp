@@ -275,10 +275,7 @@ sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
 	}
 	uint16_t	firstnewcursor=cursorcount;
 	do {
-printf("creating new cursor: %d\n",cursorcount);
 		cur[cursorcount]=initCursorUpdateStats();
-		// FIXME: LAME!!!  oh god this is lame....
-		cur[cursorcount]->querybuffer=new char[maxquerysize+1];
 		cur[cursorcount]->suspendresultset=false;
 		if (!cur[cursorcount]->openCursorInternal(cursorcount)) {
 			dbgfile.debugPrint("connection",1,
