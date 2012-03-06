@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <mdbtoolsconnection.h>
+#include <rudiments/rawbuffer.h>
 
 extern "C" {
         #include <mdbsql.h>
@@ -32,6 +33,7 @@ void mdbtoolsconnection::handleConnectString() {
 }
 
 bool mdbtoolsconnection::logIn(bool printerrors) {
+	mdb_init_backends();
 	return true;
 }
 
@@ -44,6 +46,7 @@ void mdbtoolsconnection::deleteCursor(sqlrcursor_svr *curs) {
 }
 
 void mdbtoolsconnection::logOut() {
+	mdb_remove_backends();
 }
 
 bool mdbtoolsconnection::ping() {
@@ -130,6 +133,7 @@ mdbtoolscursor::mdbtoolscursor(sqlrconnection_svr *conn) :
 	mdbtoolsconn=(mdbtoolsconnection *)conn;
 	columnnames=NULL;
 	mdbsql=(void *)new MdbSQL;
+	rawbuffer::zero(mdbsql,sizeof(MdbSQL));
 }
 
 mdbtoolscursor::~mdbtoolscursor() {
