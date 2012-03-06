@@ -6,6 +6,7 @@
 	updated code so ttl="0" works as expected
 	updated code so dynamic scaling of cursors works as expected
 	documented dynamic scaling of cursors somewhat
+	fixed a few mdbtools errors
 
 0.44 - updated postgresql drop-in lib for postgresql 8/9 compatibility
 	updated mysql drop-in lib for mysql 5.2+ compatibility
