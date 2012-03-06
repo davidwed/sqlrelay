@@ -38,17 +38,20 @@ void oracle8connection::handleConnectString() {
 	const char	*autocom=connectStringValue("autocommit");
 	setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
+
 	fetchatonce=charstring::toUnsignedInteger(
 				connectStringValue("fetchatonce"));
 	if (!fetchatonce) {
 		fetchatonce=FETCH_AT_ONCE;
 	}
-	maxselectlistsize=charstring::toUnsignedInteger(
+
+	maxselectlistsize=charstring::toInteger(
 				connectStringValue("maxselectlistsize"));
 	if (!maxselectlistsize) {
 		maxselectlistsize=MAX_SELECT_LIST_SIZE;
 	}
-	maxitembuffersize=charstring::toUnsignedInteger(
+
+	maxitembuffersize=charstring::toInteger(
 				connectStringValue("maxitembuffersize"));
 	if (!maxitembuffersize) {
 		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
@@ -56,6 +59,7 @@ void oracle8connection::handleConnectString() {
 	if (maxitembuffersize<MAX_BYTES_PER_CHAR) {
 		maxitembuffersize=MAX_BYTES_PER_CHAR;
 	}
+
 	setFakeTransactionBlocksBehavior(
 		!charstring::compare(
 			connectStringValue("faketransactionblocks"),"yes"));
@@ -633,6 +637,7 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	ncols=0;
 
 	prepared=false;
+	resultfreed=true;
 	errormessage=NULL;
 	oracle8conn=(oracle8connection *)conn;
 #ifdef HAVE_ORACLE_8i
@@ -651,26 +656,9 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 		outintbind[i]=NULL;
 	}
 
-	desc=new describe[oracle8conn->maxselectlistsize];
-	columnnames=new char *[oracle8conn->maxselectlistsize];
-	def=new OCIDefine *[oracle8conn->maxselectlistsize];
-	def_lob=new OCILobLocator **[oracle8conn->maxselectlistsize];
-	def_buf=new ub1 *[oracle8conn->maxselectlistsize];
-	def_indp=new sb2 *[oracle8conn->maxselectlistsize];
-	def_col_retlen=new ub2 *[oracle8conn->maxselectlistsize];
-	def_col_retcode=new ub2 *[oracle8conn->maxselectlistsize];
-	for (uint16_t i=0; i<oracle8conn->maxselectlistsize; i++) {
-		def_lob[i]=new OCILobLocator *[oracle8conn->fetchatonce];
-		for (uint32_t j=0; j<oracle8conn->fetchatonce; j++) {
-			def_lob[i][j]=NULL;
-		}
-		def_buf[i]=new ub1[oracle8conn->fetchatonce*
-					oracle8conn->maxitembuffersize];
-		def_indp[i]=new sb2[oracle8conn->fetchatonce];
-		def_col_retlen[i]=new ub2[oracle8conn->fetchatonce];
-		def_col_retcode[i]=new ub2[oracle8conn->fetchatonce];
-		def[i]=NULL;
-	}
+	allocateResultSetBuffers(oracle8conn->fetchatonce,
+					oracle8conn->maxselectlistsize,
+					oracle8conn->maxitembuffersize);
 
 #ifdef HAVE_ORACLE_8i
 	createtemp.compile("(create|CREATE)[ \\t\\n\\r]+(global|GLOBAL)[ \\t\\n\\r]+(temporary|TEMPORARY)[ \\t\\n\\r]+(table|TABLE)[ \\t\\n\\r]+");
@@ -688,27 +676,70 @@ oracle8cursor::~oracle8cursor() {
 
 	delete errormessage;
 
-	for (uint16_t i=0; i<oracle8conn->maxselectlistsize; i++) {
-		delete[] def_col_retcode[i];
-		delete[] def_col_retlen[i];
-		delete[] def_indp[i];
-		delete[] def_lob[i];
-		delete[] def_buf[i];
-	}
 	for (uint16_t i=0; i<orainbindcount; i++) {
 		delete[] inintbindstring[i];
 	}
 	for (uint16_t i=0; i<oraoutbindcount; i++) {
 		delete[] outintbindstring[i];
 	}
-	delete[] def_col_retcode;
-	delete[] def_col_retlen;
-	delete[] def_indp;
-	delete[] def_lob;
-	delete[] def_buf;
-	delete[] def;
-	delete[] desc;
-	delete[] columnnames;
+
+	deallocateResultSetBuffers(oracle8conn->maxselectlistsize);
+}
+
+void oracle8cursor::allocateResultSetBuffers(uint32_t fetchatonce,
+						int32_t selectlistsize,
+						int32_t itembuffersize) {
+
+	if (selectlistsize==-1) {
+		desc=NULL;
+		columnnames=NULL;
+		def=NULL;
+		def_lob=NULL;
+		def_buf=NULL;
+		def_indp=NULL;
+		def_col_retlen=NULL;
+		def_col_retcode=NULL;
+	} else {
+		desc=new describe[selectlistsize];
+		columnnames=new char *[selectlistsize];
+		def=new OCIDefine *[selectlistsize];
+		def_lob=new OCILobLocator **[selectlistsize];
+		def_buf=new ub1 *[selectlistsize];
+		def_indp=new sb2 *[selectlistsize];
+		def_col_retlen=new ub2 *[selectlistsize];
+		def_col_retcode=new ub2 *[selectlistsize];
+		for (int32_t i=0; i<selectlistsize; i++) {
+			def_lob[i]=new OCILobLocator *[fetchatonce];
+			for (uint32_t j=0; j<fetchatonce; j++) {
+				def_lob[i][j]=NULL;
+			}
+			def_buf[i]=new ub1[fetchatonce*itembuffersize];
+			def_indp[i]=new sb2[fetchatonce];
+			def_col_retlen[i]=new ub2[fetchatonce];
+			def_col_retcode[i]=new ub2[fetchatonce];
+			def[i]=NULL;
+		}
+	}
+}
+
+void oracle8cursor::deallocateResultSetBuffers(int32_t selectlistsize) {
+	if (selectlistsize!=-1) {
+		for (int32_t i=0; i<selectlistsize; i++) {
+			delete[] def_col_retcode[i];
+			delete[] def_col_retlen[i];
+			delete[] def_indp[i];
+			delete[] def_lob[i];
+			delete[] def_buf[i];
+		}
+		delete[] def_col_retcode;
+		delete[] def_col_retlen;
+		delete[] def_indp;
+		delete[] def_lob;
+		delete[] def_buf;
+		delete[] def;
+		delete[] desc;
+		delete[] columnnames;
+	}
 }
 
 bool oracle8cursor::openCursor(uint16_t id) {
@@ -1347,6 +1378,15 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 			return false;
 		}
 
+		// allocate buffers, if necessary
+		if (oracle8conn->maxselectlistsize==-1) {
+			allocateResultSetBuffers(oracle8conn->fetchatonce,
+					ncols,oracle8conn->maxitembuffersize);
+		}
+
+		// indicate that the result needs to be freed
+		resultfreed=false;
+
 		// run through the columns...
 		for (sword i=0; i<ncols; i++) {
 
@@ -1665,8 +1705,9 @@ bool oracle8cursor::fetchRow() {
 		return false;
 	}
 	if (!row) {
-		OCIStmtFetch(stmt,oracle8conn->err,oracle8conn->fetchatonce,
-						OCI_FETCH_NEXT,OCI_DEFAULT);
+		OCIStmtFetch(stmt,oracle8conn->err,
+				(ub4)oracle8conn->fetchatonce,
+				OCI_FETCH_NEXT,OCI_DEFAULT);
 		ub4	currentrow;
 		OCIAttrGet(stmt,OCI_HTYPE_STMT,
 				(dvoid *)&currentrow,(ub4 *)NULL,
@@ -1776,12 +1817,17 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 	}
 
 	// free row/column resources
-	if (freeresult) {
-		for (ub4 i=0; i<oracle8conn->maxselectlistsize; i++) {
+	if (freeresult && !resultfreed) {
+
+		int32_t	selectlistsize=(oracle8conn->maxselectlistsize==-1)?
+					ncols:oracle8conn->maxselectlistsize;
+
+		for (int32_t i=0; i<selectlistsize; i++) {
+
 			for (uint32_t j=0; j<oracle8conn->fetchatonce; j++) {
 				if (def_lob[i][j]) {
-					OCIDescriptorFree(def_lob[i][j],
-								OCI_DTYPE_LOB);
+					OCIDescriptorFree(
+						def_lob[i][j],OCI_DTYPE_LOB);
 					def_lob[i][j]=NULL;
 				}
 			}
@@ -1795,6 +1841,14 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 			// memory will be deallocated.
 			def[i]=NULL;
 		}
+
+		// deallocate buffers, if necessary
+		if (stmttype==OCI_STMT_SELECT &&
+			oracle8conn->maxselectlistsize==-1) {
+			deallocateResultSetBuffers(ncols);
+		}
+
+		resultfreed=true;
 	}
 
 	if (freebinds) {

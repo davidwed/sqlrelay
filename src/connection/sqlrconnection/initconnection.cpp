@@ -9,6 +9,7 @@
 #include <rudiments/permissions.h>
 #include <rudiments/snooze.h>
 #include <rudiments/filesystem.h>
+#include <rudiments/rawbuffer.h>
 
 bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 
@@ -30,7 +31,6 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	// get the time to live from the command line
 	const char	*ttlstr=cmdl->getValue("-ttl");
 	ttl=(ttlstr)?charstring::toInteger(cmdl->getValue("-ttl")):-1;
-printf("ttl=%d\n",ttl);
 
 	silent=cmdl->found("-silent");
 
@@ -361,11 +361,11 @@ bool sqlrconnection_svr::initCursors() {
 	dbgfile.debugPrint("connection",0,"initializing cursors...");
 
 	cursorcount=cfgfl->getCursors();
+	mincursorcount=cursorcount;
+	maxcursorcount=cfgfl->getMaxCursors();
 	if (!cur) {
-		cur=(sqlrcursor_svr **)malloc(sizeof(sqlrcursor_svr **)*cursorcount);
-		for (int32_t i=0; i<cursorcount; i++) {
-			cur[i]=NULL;
-		}
+		cur=new sqlrcursor_svr *[maxcursorcount];
+		rawbuffer::zero(cur,maxcursorcount*sizeof(sqlrcursor *));
 	}
 
 	for (int32_t i=0; i<cursorcount; i++) {
@@ -379,10 +379,10 @@ bool sqlrconnection_svr::initCursors() {
 		}
 		if (!cur[i]->openCursorInternal(i)) {
 
-			dbgfile.debugPrint("connection",1,"cursor init failure...");
+			dbgfile.debugPrint("connection",1,
+					"cursor init failure...");
 
 			logOutUpdateStats();
-			//fprintf(stderr,"Couldn't create cursors.\n");
 			return false;
 		}
 	}

@@ -251,60 +251,46 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 
 sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
 
-	uint16_t	i=0;
-	for (; i<cursorcount; i++) {
+	// find an available cursor
+	for (uint16_t i=0; i<cursorcount; i++) {
 		if (!cur[i]->busy) {
-			dbgfile.debugPrint("connection",2,"found a free cursor:");
+			dbgfile.debugPrint("connection",2,"available cursor:");
 			dbgfile.debugPrint("connection",3,(int32_t)i);
 			return cur[i];
 		}
 	}
 
-	// check if dynamic cursors is disabled, spit out the v0.41 error
-	if (cfgfl->getMaxCursors()==0) {
-		dbgfile.debugPrint("connection",2,
-			"find available cursor failed: all cursors are busy");
+	// apparently there weren't any available cursors...
+
+	// if we can't create any new cursors then return an error
+	if (cursorcount==maxcursorcount) {
+		dbgfile.debugPrint("connection",2,"all cursors are busy");
 		return NULL;
 	}
 
-	// if we're already at a maximum amount of cursors, return failure
+	// create new cursors
 	uint16_t	expandto=cursorcount+cfgfl->getCursorsGrowBy();
-	if (expandto>=cfgfl->getMaxCursors()) {
-		dbgfile.debugPrint("connection", 1, "Can't expand cursors, already at maximum");
-		return NULL;
+	if (expandto>=maxcursorcount) {
+		expandto=maxcursorcount;
 	}
-
-	// we're here because there are no free cursors left.
-	// Lets make some more baby!
-	sqlrcursor_svr	**tmp =
-			(sqlrcursor_svr **)realloc((void *)cur,
-					sizeof(sqlrcursor_svr **)*expandto);
-	
-	// in case we're out of memory, we don't want to destroy the cur array
-	if (tmp==NULL) {
-		dbgfile.debugPrint("connection",1,
-				"Out of memory allocating cursors");
-		return NULL;
-	}
-	cursorcount=expandto;
-	cur=tmp;
-	
-	uint16_t	firstopen=i;
-	
-	for (uint16_t j=firstopen; j<cursorcount; j++,i++) {
-		cur[i]=initCursorUpdateStats();
+	uint16_t	firstnewcursor=cursorcount;
+	do {
+printf("creating new cursor: %d\n",cursorcount);
+		cur[cursorcount]=initCursorUpdateStats();
 		// FIXME: LAME!!!  oh god this is lame....
-		cur[i]->querybuffer=new char[maxquerysize+1];
-		cur[i]->suspendresultset=false;
-		if (!cur[i]->openCursorInternal(i)) {
-			dbgfile.debugPrint("connection",1,"realloc cursor init failure...");
-
+		cur[cursorcount]->querybuffer=new char[maxquerysize+1];
+		cur[cursorcount]->suspendresultset=false;
+		if (!cur[cursorcount]->openCursorInternal(cursorcount)) {
+			dbgfile.debugPrint("connection",1,
+					"cursor init failure...");
 			logOutUpdateStats();
 			return NULL;
 		}
-	}
+		cursorcount++;
+	} while (cursorcount<expandto);
 	
-	return cur[firstopen];
+	// return the first new cursor that we created
+	return cur[firstnewcursor];
 }
 
 void sqlrconnection_svr::waitForClientClose() {

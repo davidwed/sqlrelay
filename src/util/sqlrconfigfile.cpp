@@ -39,7 +39,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	runasuser=charstring::duplicate(DEFAULT_RUNASUSER);
 	runasgroup=charstring::duplicate(DEFAULT_RUNASGROUP);
 	cursors=charstring::toInteger(DEFAULT_CURSORS);
-	maxcursors=charstring::toInteger(DEFAULT_MAXCURSORS);
+	maxcursors=charstring::toInteger(DEFAULT_CURSORS);
 	cursorsgrowby=charstring::toInteger(DEFAULT_CURSORS_GROWBY);
 	authtier=charstring::duplicate(DEFAULT_AUTHTIER);
 	authonlistener=charstring::contains(authtier,"listener");
@@ -1139,9 +1139,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			runasgroup=charstring::duplicate((value)?value:
 							DEFAULT_RUNASGROUP);
 		} else if (currentattribute==CURSORS_ATTRIBUTE) {
-			cursors=atouint32_t(value,DEFAULT_CURSORS,1);
+			cursors=atouint32_t(value,DEFAULT_CURSORS,0);
 		} else if (currentattribute==MAXCURSORS_ATTRIBUTE) {
-			maxcursors=atouint32_t(value,DEFAULT_MAXCURSORS,1);
+			maxcursors=atouint32_t(value,DEFAULT_CURSORS,1);
 		} else if (currentattribute==CURSORS_GROWBY_ATTRIBUTE) {
 			cursorsgrowby=atouint32_t(value,
 						DEFAULT_CURSORS_GROWBY,1);

@@ -62,6 +62,11 @@ class oracle8cursor : public sqlrcursor_svr {
 	private:
 				oracle8cursor(sqlrconnection_svr *conn);
 				~oracle8cursor();
+		void		allocateResultSetBuffers(uint32_t fetchatonce,
+							int32_t selectlistsize,
+							int32_t itembuffersize);
+		void		deallocateResultSetBuffers(
+							int32_t selectlistsize);
 		bool		openCursor(uint16_t id);
 		bool		closeCursor();
 		bool		prepareQuery(const char *query,
@@ -214,6 +219,8 @@ class oracle8cursor : public sqlrcursor_svr {
 		uint32_t	length;
 		bool		prepared;
 
+		bool		resultfreed;
+
 		oracle8connection	*oracle8conn;
 
 #ifdef HAVE_ORACLE_8i
@@ -283,9 +290,9 @@ class oracle8connection : public sqlrconnection_svr {
 
 		char		*lastinsertidquery;
 
-		ub4		fetchatonce;
-		ub4		maxselectlistsize;
-		ub4		maxitembuffersize;
+		uint32_t	fetchatonce;
+		int32_t		maxselectlistsize;
+		int32_t		maxitembuffersize;
 
 #ifdef HAVE_ORACLE_8i
 		bool		droptemptables;

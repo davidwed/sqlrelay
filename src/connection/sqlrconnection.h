@@ -470,6 +470,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool		debugtriggers;
 
 		uint16_t	cursorcount;
+		uint16_t	mincursorcount;
+		uint16_t	maxcursorcount;
 
 	private:
 

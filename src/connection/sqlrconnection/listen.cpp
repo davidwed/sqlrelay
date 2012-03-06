@@ -73,7 +73,6 @@ bool sqlrconnection_svr::listen() {
 			}
 
 			if (ttl==0) {
-printf("ttl=0, returning\n");
 				return true;
 			}
 
