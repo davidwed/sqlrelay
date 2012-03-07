@@ -160,7 +160,9 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	translatebinds=cfgfl->getTranslateBindVariables();
 
 	// initialize cursors
-	if (!initCursors()) {
+	mincursorcount=cfgfl->getCursors();
+	maxcursorcount=cfgfl->getMaxCursors();
+	if (!initCursors(mincursorcount)) {
 		return false;
 	}
 
@@ -356,13 +358,11 @@ void sqlrconnection_svr::setInitialAutoCommitBehavior() {
 	dbgfile.debugPrint("connection",0,"done setting autocommit");
 }
 
-bool sqlrconnection_svr::initCursors() {
+bool sqlrconnection_svr::initCursors(int32_t count) {
 
 	dbgfile.debugPrint("connection",0,"initializing cursors...");
 
-	cursorcount=cfgfl->getCursors();
-	mincursorcount=cursorcount;
-	maxcursorcount=cfgfl->getMaxCursors();
+	cursorcount=count;
 	if (!cur) {
 		cur=new sqlrcursor_svr *[maxcursorcount];
 		rawbuffer::zero(cur,maxcursorcount*sizeof(sqlrcursor *));

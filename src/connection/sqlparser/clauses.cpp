@@ -118,10 +118,8 @@ bool sqlparser::endOfQuery(const char *ptr, const char **newptr) {
 	debugFunction();
 	whiteSpace(ptr,newptr);
 	if (**newptr=='\0') {
-printf("found end of query\n");
 		return true;
 	}
 	*newptr=ptr;
-printf("did not find end of query\n");
 	return false;
 }

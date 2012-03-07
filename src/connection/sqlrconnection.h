@@ -223,7 +223,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 	private:
 
 		void	setUserAndGroup();
-		bool	initCursors();
+		bool	initCursors(int32_t count);
 		void	incrementConnectionCount();
 		void	decrementConnectionCount();
 		void	decrementSessionCount();

@@ -22,6 +22,7 @@ void sqlrconnection_svr::reLogIn() {
 	dbgfile.debugPrint("connection",4,"relogging in...");
 
 	// attempt to log in over and over, once every 5 seconds
+	int32_t	oldcursorcount=cursorcount;
 	closeCursors(false);
 	logOutUpdateStats();
 	for (;;) {
@@ -29,7 +30,7 @@ void sqlrconnection_svr::reLogIn() {
 		dbgfile.debugPrint("connection",5,"trying...");
 
 		if (logInUpdateStats(false)) {
-			if (!initCursors()) {
+			if (!initCursors(oldcursorcount)) {
 				closeCursors(false);
 				logOutUpdateStats();
 			} else {

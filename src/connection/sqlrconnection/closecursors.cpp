@@ -8,20 +8,22 @@ void sqlrconnection_svr::closeCursors(bool destroy) {
 	dbgfile.debugPrint("connection",0,"closing cursors...");
 
 	if (cur) {
-		for (int32_t i=0; i<cursorcount; i++) {
+		while (cursorcount) {
+			cursorcount--;
 
-			dbgfile.debugPrint("connection",1,i);
+			dbgfile.debugPrint("connection",1,cursorcount);
 
-			if (cur[i]) {
-				cur[i]->cleanUpData(true,true);
-				cur[i]->closeCursor();
+			if (cur[cursorcount]) {
+				cur[cursorcount]->cleanUpData(true,true);
+				cur[cursorcount]->closeCursor();
 				if (destroy) {
-					deleteCursorUpdateStats(cur[i]);
+					deleteCursorUpdateStats(
+							cur[cursorcount]);
 				}
 			}
 		}
 		if (destroy) {
-			free(cur);
+			delete[] cur;
 			cur=NULL;
 		}
 	}

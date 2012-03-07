@@ -8,11 +8,12 @@ bool sqlrconnection_svr::changeUser(const char *newuser,
 
 	dbgfile.debugPrint("connection",2,"change user");
 
+	int32_t	oldcursorcount=cursorcount;
 	closeCursors(false);
 	logOutUpdateStats();
 	setUser(newuser);
 	setPassword(newpassword);
-	return (logInUpdateStats(false) && initCursors());
+	return (logInUpdateStats(false) && initCursors(cursorcount));
 }
 
 void sqlrconnection_svr::setUser(const char *user) {
