@@ -22,11 +22,10 @@ void sqlrconnection_svr::shutDown(int32_t signum) {
 		process::exit(0);
 	}
 
-	/* Since this handler is established for more than one kind of signal,
-	   it might still get invoked recursively by delivery of some other kind
-	   of signal.  Use a static variable to keep track of that. */
+	// Since this handler is established for more than one kind of signal,
+	// it might still get invoked recursively by delivery of some other kind
+	// of signal.  Use a static variable to keep track of that.
 	if (shutdowninprogress) {
-		//raise(signum);
 		return;
 	}
 	shutdowninprogress=1;

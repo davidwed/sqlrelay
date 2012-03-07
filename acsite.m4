@@ -497,7 +497,7 @@ AC_DEFUN([FW_CXX_NAMESPACES],
 
 dnl checks for the pthreads library
 dnl requires:  PTHREADPATH, RPATHFLAG, cross_compiling
-dnl sets the substitution variable PTHREADSLIB
+dnl sets the substitution variable PTHREADLIB
 AC_DEFUN([FW_CHECK_PTHREAD],
 [
 HAVE_PTHREAD=""
@@ -1446,7 +1446,7 @@ then
 			dnl some versions of freetds need libiconv, see if
 			dnl a simple test will link
 			LINKFAILED=""
-			FW_TRY_LINK([],[],[$FREETDSINCLUDES],[$FREETDSLIBS],[$LD_LIBRARY_PATH],[],[LINKFAILED="yes"])
+			FW_TRY_LINK([],[],[$FREETDSINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $PTHREADLIBS],[$LD_LIBRARY_PATH],[],[LINKFAILED="yes"])
 
 			dnl if not, search for iconv
 			if ( test -n "$LINKFAILED" )
@@ -1460,7 +1460,7 @@ then
 				then
 					AC_MSG_CHECKING(whether freetds requires libiconv)
 
-					FW_TRY_LINK([],[],[$FREETDSINCLUDES $ICONVINCLUDES],[$FREETDSLIBS $ICONVLIBS],[$LD_LIBRARY_PATH],[FREETDSINCLUDES="$FREETDSINCLUDES $ICONVINCLUDES"; FREETDSLIBS="$FREETDSLIBS $ICONVLIBS"; AC_MSG_RESULT(yes)],[FREETDSLIBS=""; FREETDSINCLUDES=""; AC_MSG_RESULT(no)])
+					FW_TRY_LINK([],[],[$FREETDSINCLUDES $ICONVINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $ICONVLIBS $PTHREADLIBS],[$LD_LIBRARY_PATH],[FREETDSINCLUDES="$FREETDSINCLUDES $ICONVINCLUDES"; FREETDSLIBS="$FREETDSLIBS $ICONVLIBS"; AC_MSG_RESULT(yes)],[FREETDSLIBS=""; FREETDSINCLUDES=""; AC_MSG_RESULT(no)])
 				else
 					FREETDSLIBS=""
 					FREETDSINCLUDES=""
@@ -1474,7 +1474,7 @@ then
 			then
 				AC_MSG_CHECKING(whether ctpublic.h contains function definitions)
 				FW_TRY_LINK([#include <ctpublic.h>
-#include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$FREETDSINCLUDES],[$FREETDSLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_FUNCTION_DEFINITIONS,1,Some versions of FreeTDS have function definitions)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$FREETDSINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $PTHREADLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_FUNCTION_DEFINITIONS,1,Some versions of FreeTDS have function definitions)],[AC_MSG_RESULT(no)])
 			fi
 		fi
 
@@ -1482,7 +1482,7 @@ then
 		if ( test -n "$FREETDSLIBS" )
 		then
 			AC_MSG_CHECKING(whether tdsver.h exists)
-			FW_TRY_LINK([#include <tdsver.h>],[],[$FREETDSINCLUDES],[$FREETDSLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_H,1,Some versions of FreeTDS have tdsver.h)],[AC_MSG_RESULT(no)])
+			FW_TRY_LINK([#include <tdsver.h>],[],[$FREETDSINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $PTHREADLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_H,1,Some versions of FreeTDS have tdsver.h)],[AC_MSG_RESULT(no)])
 		fi
 
 		dnl if FREETDSLIBS isn't defined at this point, then freetds
@@ -2998,7 +2998,7 @@ then
 			AC_MSG_CHECKING(for Tcl_WideInt)
 			FW_TRY_LINK([#include <tcl.h>],[Tcl_WideInt row;],[$TCLINCLUDE $PTHREADINCLUDES],[$TCLLIB $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_WIDEINT,1,Some versions of TCL don't have Tcl_WideInt)],[AC_MSG_RESULT(no)])
 			AC_MSG_CHECKING(for const char ** support)
-			FW_TRY_LINK([#include <tcl.h>],[static const char *options[]={""}; Tcl_GetIndexFromObj(NULL,NULL,(const char **)options,NULL,0,NULL);],[$TCLINCLUDE $PTHREADINCLUDES],[$TCLLIB $PTHREADSLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_CONSTCHAR,1,Some versions of TCL don't use const char ** arguments)],[AC_MSG_RESULT(no)])
+			FW_TRY_LINK([#include <tcl.h>],[static const char *options[]={""}; Tcl_GetIndexFromObj(NULL,NULL,(const char **)options,NULL,0,NULL);],[$TCLINCLUDE $PTHREADINCLUDES],[$TCLLIB $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(HAVE_TCL_CONSTCHAR,1,Some versions of TCL don't use const char ** arguments)],[AC_MSG_RESULT(no)])
 		fi
 	fi
 

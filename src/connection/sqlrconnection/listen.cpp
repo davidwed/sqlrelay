@@ -41,12 +41,10 @@ bool sqlrconnection_svr::listen() {
 
 				// if waitForClient() errors out, break out of
 				// the suspendedsession loop and loop back
-				// for another session
-				// the suspendedsession loop and
-				// close connection if it is possible
-				// otherwise wait for session, but
-				// it seems that on hard load it's impossible
-				// to change handoff socket for pid
+				// for another session and close connection if
+				// it is possible otherwise wait for session,
+				// but it seems that on hard load it's
+				// impossible to change handoff socket for pid
 				clientconnectfailed=true;
 				break;
 
@@ -68,18 +66,22 @@ bool sqlrconnection_svr::listen() {
 
 			decrementSessionCount();
 
-			if (clientconnectfailed) {
-				return false;
-			}
+			if (scalerspawned) {
 
-			if (ttl==0) {
-				return true;
-			}
+				if (clientconnectfailed) {
+					return false;
+				}
 
-			if (ttl>0 && cfgfl->getMaxSessionCount()) {
-				sessioncount++;
-				if (sessioncount==cfgfl->getMaxSessionCount()) {
+				if (ttl==0) {
 					return true;
+				}
+
+				if (ttl>0 && cfgfl->getMaxSessionCount()) {
+					sessioncount++;
+					if (sessioncount==
+						cfgfl->getMaxSessionCount()) {
+						return true;
+					}
 				}
 			}
 		}

@@ -6170,7 +6170,7 @@ aix[4-9]*)
   lt_cv_deplibs_check_method=pass_all
   ;;
 
-beos* | haiku*)
+beos*)
   lt_cv_deplibs_check_method=pass_all
   ;;
 
@@ -8532,7 +8532,7 @@ $as_echo_n "checking for $compiler option to produce PIC... " >&6; }
       esac
       ;;
 
-    beos* | haiku* | irix5* | irix6* | nonstopux* | osf3* | osf4* | osf5*)
+    beos* | irix5* | irix6* | nonstopux* | osf3* | osf4* | osf5*)
       # PIC is the default for these OSes.
       ;;
 
@@ -9184,7 +9184,7 @@ _LT_EOF
       esac
       ;;
 
-    beos* | haiku*)
+    beos*)
       if $LD --help 2>&1 | $GREP ': supported targets:.* elf' > /dev/null; then
 	allow_undefined_flag=unsupported
 	# Joseph Beckenbach <jrb3@best.com> says some releases of gcc
@@ -10511,7 +10511,7 @@ amigaos*)
   esac
   ;;
 
-beos* | haiku*)
+beos*)
   library_names_spec='${libname}${shared_ext}'
   dynamic_linker="$host_os ld.so"
   shlibpath_var=LIBRARY_PATH
@@ -11195,7 +11195,7 @@ else
   lt_cv_dlopen_libs=
 
   case $host_os in
-  beos* | haiku*)
+  beos*)
     lt_cv_dlopen="load_add_on"
     lt_cv_dlopen_libs=
     lt_cv_dlopen_self=yes
@@ -12408,7 +12408,7 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
         fi
         ;;
 
-      beos* | haiku*)
+      beos*)
 	if $LD --help 2>&1 | $GREP ': supported targets:.* elf' > /dev/null; then
 	  allow_undefined_flag_CXX=unsupported
 	  # Joseph Beckenbach <jrb3@best.com> says some releases of gcc
@@ -13393,7 +13393,7 @@ $as_echo_n "checking for $compiler option to produce PIC... " >&6; }
       esac
       ;;
 
-    beos* | haiku* | irix5* | irix6* | nonstopux* | osf3* | osf4* | osf5*)
+    beos* | irix5* | irix6* | nonstopux* | osf3* | osf4* | osf5*)
       # PIC is the default for these OSes.
       ;;
     mingw* | cygwin* | os2* | pw32* | cegcc*)
@@ -14180,7 +14180,7 @@ amigaos*)
   esac
   ;;
 
-beos* | haiku*)
+beos*)
   library_names_spec='${libname}${shared_ext}'
   dynamic_linker="$host_os ld.so"
   shlibpath_var=LIBRARY_PATH
@@ -22300,8 +22300,8 @@ fi
 SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$FREETDSINCLUDES"
-LIBS="$FREETDSLIBS"
+CPPFLAGS="$FREETDSINCLUDES $PTHREADINCLUDES"
+LIBS="$FREETDSLIBS $PTHREADLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -22340,8 +22340,8 @@ $as_echo_n "checking whether freetds requires libiconv... " >&6; }
 SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$FREETDSINCLUDES $ICONVINCLUDES"
-LIBS="$FREETDSLIBS $ICONVLIBS"
+CPPFLAGS="$FREETDSINCLUDES $ICONVINCLUDES $PTHREADINCLUDES"
+LIBS="$FREETDSLIBS $ICONVLIBS $PTHREADLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -22383,8 +22383,8 @@ $as_echo_n "checking whether ctpublic.h contains function definitions... " >&6; 
 SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$FREETDSINCLUDES"
-LIBS="$FREETDSLIBS"
+CPPFLAGS="$FREETDSINCLUDES $PTHREADINCLUDES"
+LIBS="$FREETDSLIBS $PTHREADLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -22426,8 +22426,8 @@ $as_echo_n "checking whether tdsver.h exists... " >&6; }
 SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$FREETDSINCLUDES"
-LIBS="$FREETDSLIBS"
+CPPFLAGS="$FREETDSINCLUDES $PTHREADINCLUDES"
+LIBS="$FREETDSLIBS $PTHREADLIBS"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -29401,7 +29401,7 @@ SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 CPPFLAGS="$TCLINCLUDE $PTHREADINCLUDES"
-LIBS="$TCLLIB $PTHREADSLIB"
+LIBS="$TCLLIB $PTHREADLIB"
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
