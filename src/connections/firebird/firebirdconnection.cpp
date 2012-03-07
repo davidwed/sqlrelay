@@ -832,7 +832,7 @@ uint32_t firebirdcursor::colCount() {
 
 const char * const *firebirdcursor::columnNames() {
 	for (short i=0; i<outsqlda->sqld; i++) {
-		columnnames[i]=outsqlda->sqlvar[i].sqlname;
+		columnnames[i]=outsqlda->sqlvar[i].aliasname;
 	}
 	return columnnames;
 }
@@ -891,9 +891,8 @@ void firebirdcursor::returnColumnInfo() {
 
 		// send column definition
 		// (oddly, scale is given as a negative number)
-		conn->sendColumnDefinition(outsqlda->sqlvar[i].sqlname,
-					charstring::length(
-						outsqlda->sqlvar[i].sqlname),
+		conn->sendColumnDefinition(outsqlda->sqlvar[i].aliasname,
+					outsqlda->sqlvar[i].aliasname_length,
 					field[i].sqlrtype,
 					outsqlda->sqlvar[i].sqllen,
 					precision,
