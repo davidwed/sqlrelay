@@ -27,7 +27,6 @@ void sqlrconnection_svr::announceAvailability(const char *tmpdir,
 
 	// handle time-to-live
 	if (ttl>0) {
-printf("setting alarm\n");
 		signalmanager::alarm(ttl);
 	}
 
