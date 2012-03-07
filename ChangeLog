@@ -7,6 +7,7 @@
 	updated code so dynamic scaling of cursors works as expected
 	documented dynamic scaling of cursors somewhat
 	fixed a few mdbtools errors
+	column aliases work as expected now with firebird
 
 0.44 - updated postgresql drop-in lib for postgresql 8/9 compatibility
 	updated mysql drop-in lib for mysql 5.2+ compatibility
