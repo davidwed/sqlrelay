@@ -555,21 +555,21 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			}
 			break;
 		
-		// Filter section, nested (runquery*)
+		// Filter section, nested (query*)
 		case FILTER_TAG:
 			currentname="filter";
-			if (!charstring::compare(name,"runquery")) {
-				thistag=RUNQUERY_TAG;
+			if (!charstring::compare(name,"query")) {
+				thistag=QUERY_TAG;
 			} else {
 				ok=false;
 			}
 			break;
 		
-		// Filter section, nested (runquery*)
+		// Filter section, nested (query*)
 		case ROUTE_TAG:
 			currentname="route";
-			if (!charstring::compare(name,"runquery")) {
-				thistag=RUNQUERY_TAG;
+			if (!charstring::compare(name,"query")) {
+				thistag=QUERY_TAG;
 			} else {
 				ok=false;
 			}
