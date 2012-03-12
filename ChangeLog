@@ -8,6 +8,10 @@
 	documented dynamic scaling of cursors somewhat
 	fixed a few mdbtools errors
 	column aliases work as expected now with firebird
+	fixed a bug where if an app either enabled or disabled autocommit,
+		that could become the default status of autocommit rather than
+		what was set in the config file
+	added autocommit on/off to sqlrsh
 
 0.44 - updated postgresql drop-in lib for postgresql 8/9 compatibility
 	updated mysql drop-in lib for mysql 5.2+ compatibility
