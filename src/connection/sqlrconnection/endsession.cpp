@@ -56,18 +56,7 @@ void sqlrconnection_svr::endSessionInternal() {
 	}
 
 	// reset autocommit behavior
-	dbgfile.debugPrint("connection",2,"resetting autocommit behavior...");
-	if (autocommit) {
-		dbgfile.debugPrint("connection",3,"setting autocommit on...");
-		autoCommitOn();
-		dbgfile.debugPrint("connection",3,"done setting autocommit on...");
-	} else {
-		dbgfile.debugPrint("connection",3,"setting autocommit off...");
-		autoCommitOff();
-		dbgfile.debugPrint("connection",3,"done setting autocommit off...");
-	}
-	dbgfile.debugPrint("connection",2,"done resetting autocommit behavior...");
-	dbgfile.debugPrint("connection",1,"done ending session");
+	setAutoCommit(autocommit);
 
 	// set isolation level
 	setIsolationLevel(isolationlevel);
@@ -86,6 +75,8 @@ void sqlrconnection_svr::endSessionInternal() {
 
 	// end the session
 	endSession();
+
+	dbgfile.debugPrint("connection",1,"done ending session");
 }
 
 void sqlrconnection_svr::abortAllCursors() {

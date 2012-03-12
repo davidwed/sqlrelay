@@ -66,6 +66,7 @@ class sqlrshenv {
 		bool	stats;
 		bool	debug;
 		bool	final;
+		bool	autocommit;
 		char	delimiter;
 		stringdictionary< sqlrshbindvalue * >	inputbinds;
 		stringdictionary< sqlrshbindvalue * >	outputbinds;
@@ -77,6 +78,7 @@ sqlrshenv::sqlrshenv() {
 	stats=true;
 	debug=false;
 	final=false;
+	autocommit=false;
 	delimiter=';';
 }
 
@@ -338,6 +340,7 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"headers",7) ||
 		!charstring::compareIgnoringCase(ptr,"stats",5) ||
 		!charstring::compareIgnoringCase(ptr,"debug",5) ||
+		!charstring::compareIgnoringCase(ptr,"autocommit",10) ||
 		!charstring::compareIgnoringCase(ptr,"final",5) ||
 		!charstring::compareIgnoringCase(ptr,"help",4) ||
 		!charstring::compareIgnoringCase(ptr,"ping",4) ||
@@ -398,6 +401,9 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr,"debug",5)) {	
 		ptr=ptr+5;
 		cmdtype=4;
+	} else if (!charstring::compareIgnoringCase(ptr,"autocommit",10)) {	
+		ptr=ptr+10;
+		cmdtype=8;
 	} else if (!charstring::compareIgnoringCase(ptr,"final",5)) {	
 		ptr=ptr+5;
 		cmdtype=5;
@@ -504,6 +510,17 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		env->delimiter=ptr[0];
 		cyan(env);
 		printf("Delimiter set to %c\n",env->delimiter);
+		white(env);
+	} else if (cmdtype==8) {
+		cyan(env);
+		printf("Autocommit set ");
+		if (toggle) {
+			sqlrcon->autoCommitOn();
+			printf("on\n");
+		} else {
+			sqlrcon->autoCommitOff();
+			printf("off\n");
+		}
 		white(env);
 	}
 }
@@ -1148,6 +1165,10 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	printf("	debug on/off		- ");
 	green(env);
 	printf("toggles debug messages\n");
+	cyan(env);
+	printf("	autocommit on/off	- ");
+	green(env);
+	printf("toggles autocommit\n");
 	cyan(env);
 	printf("	final on/off		- ");
 	green(env);

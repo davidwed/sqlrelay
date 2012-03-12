@@ -94,10 +94,10 @@ bool sqlrconnection_svr::isBeginTransactionQuery(sqlrcursor_svr *cursor) {
 bool sqlrconnection_svr::beginFakeTransactionBlock() {
 
 	// save the current autocommit state
-	faketransactionblocksautocommiton=autocommit;
+	faketransactionblocksautocommiton=autocommitforthissession;
 
 	// if autocommit is on, turn it off
-	if (autocommit) {
+	if (autocommitforthissession) {
 		if (!autoCommitOffInternal()) {
 			return false;
 		}
@@ -114,9 +114,6 @@ bool sqlrconnection_svr::endFakeTransactionBlock() {
 		if (!autoCommitOnInternal()) {
 			return false;
 		}
-	} else if (faketransactionblocks &&
-			!faketransactionblocksautocommiton) {
-		// don't do anything
 	}
 	intransactionblock=false;
 	return true;

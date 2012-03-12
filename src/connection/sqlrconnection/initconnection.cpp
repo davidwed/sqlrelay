@@ -80,11 +80,6 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 
 	bool	nodetach=cmdl->found("-nodetach");
 
-	/*if (!nodetach && reloginatstart) {
-		// detach from the controlling tty
-		detach();
-	}*/
-
 	if (!createSharedMemoryAndSemaphores(tmpdir->getString(),
 							cmdl->getId())) {
 		return false;
@@ -107,7 +102,6 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 		}
 	}
 
-	//if (!nodetach && !reloginatstart) {
 	if (!nodetach) {
 		// detach from the controlling tty
 		detach();
@@ -150,7 +144,7 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	idleclienttimeout=cfgfl->getIdleClientTimeout();
 
 	// set autocommit behavior
-	setInitialAutoCommitBehavior();
+	setAutoCommit(autocommit);
 
 	// get fake input bind variable behavior
 	// (this may have already been set true by the connect string)
@@ -335,27 +329,6 @@ bool sqlrconnection_svr::attemptLogIn(bool printerrors) {
 	}
 	dbgfile.debugPrint("connection",0,"done logging in");
 	return true;
-}
-
-void sqlrconnection_svr::setInitialAutoCommitBehavior() {
-
-	dbgfile.debugPrint("connection",0,"setting autocommit...");
-	if (autocommit) {
-		if (!autoCommitOn()) {
-			dbgfile.debugPrint("connection",0,
-					"setting autocommit on failed");
-			fprintf(stderr,"Couldn't set autocommit on.\n");
-			return;
-		}
-	} else {
-		if (!autoCommitOff()) {
-			dbgfile.debugPrint("connection",0,
-					"setting autocommit off failed");
-			fprintf(stderr,"Couldn't set autocommit off.\n");
-			return;
-		}
-	}
-	dbgfile.debugPrint("connection",0,"done setting autocommit");
 }
 
 bool sqlrconnection_svr::initCursors(int32_t count) {

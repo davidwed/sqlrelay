@@ -136,7 +136,6 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		// methods used by derived classes
 		const char	*connectStringValue(const char *variable);
 		void		setAutoCommitBehavior(bool ac);
-		bool		getAutoCommitBehavior();
 		void		setFakeTransactionBlocksBehavior(bool ftb);
 		void		setFakeInputBinds(bool fake);
 		bool		sendColumnInfo();
@@ -393,7 +392,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	markDatabaseAvailable();
 
 		bool	attemptLogIn(bool printerrors);
-		void	setInitialAutoCommitBehavior();
+		void	setAutoCommit(bool ac);
 		bool	openSockets();
 
 		void	sessionStartQueries();
@@ -436,6 +435,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool		commitorrollback;
 
 		bool		autocommit;
+		bool		autocommitforthissession;
 		bool		fakeautocommit;
 
 		bool		translatebegins;

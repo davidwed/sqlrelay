@@ -7,10 +7,6 @@ void sqlrconnection_svr::setAutoCommitBehavior(bool ac) {
 	autocommit=ac;
 }
 
-bool sqlrconnection_svr::getAutoCommitBehavior() {
-	return autocommit;
-}
-
 void sqlrconnection_svr::autoCommitCommand() {
 	dbgfile.debugPrint("connection",1,"autocommit...");
 	bool	on;
@@ -26,13 +22,33 @@ void sqlrconnection_svr::autoCommitCommand() {
 	flushWriteBuffer();
 }
 
+void sqlrconnection_svr::setAutoCommit(bool ac) {
+	dbgfile.debugPrint("connection",0,"setting autocommit...");
+	if (ac) {
+		if (!autoCommitOnInternal()) {
+			dbgfile.debugPrint("connection",0,
+					"setting autocommit on failed");
+			fprintf(stderr,"Couldn't set autocommit on.\n");
+			return;
+		}
+	} else {
+		if (!autoCommitOffInternal()) {
+			dbgfile.debugPrint("connection",0,
+					"setting autocommit off failed");
+			fprintf(stderr,"Couldn't set autocommit off.\n");
+			return;
+		}
+	}
+	dbgfile.debugPrint("connection",0,"done setting autocommit");
+}
+
 bool sqlrconnection_svr::autoCommitOnInternal() {
-	autocommit=true;
+	autocommitforthissession=true;
 	return autoCommitOn();
 }
 
 bool sqlrconnection_svr::autoCommitOffInternal() {
-	autocommit=false;
+	autocommitforthissession=false;
 	return autoCommitOff();
 }
 
