@@ -32,16 +32,29 @@ void sqlrconnection_svr::endSessionInternal() {
 
 	abortAllCursors();
 
-	// commit or rollback if necessary
-	if (isTransactional() && commitorrollback) {
+	// if we're faking transaction blocks and the session was ended but we
+	// haven't ended the transaction block, then we need to rollback and
+	// end the block
+	if (intransactionblock) {
+
+		rollbackInternal();
+		intransactionblock=false;
+
+	} else if (isTransactional() && commitorrollback) {
+
+		// otherwise, commit or rollback as necessary
 		if (cfgfl->getEndOfSessionCommit()) {
-			dbgfile.debugPrint("connection",2,"committing...");
+			dbgfile.debugPrint("connection",2,
+						"committing...");
 			commitInternal();
-			dbgfile.debugPrint("connection",2,"done committing...");
+			dbgfile.debugPrint("connection",2,
+						"done committing...");
 		} else {
-			dbgfile.debugPrint("connection",2,"rolling back...");
+			dbgfile.debugPrint("connection",2,
+						"rolling back...");
 			rollbackInternal();
-			dbgfile.debugPrint("connection",2,"done rolling back...");
+			dbgfile.debugPrint("connection",2,
+						"done rolling back...");
 		}
 	}
 
