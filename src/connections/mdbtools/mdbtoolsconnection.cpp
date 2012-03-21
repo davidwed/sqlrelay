@@ -46,7 +46,9 @@ void mdbtoolsconnection::deleteCursor(sqlrcursor_svr *curs) {
 }
 
 void mdbtoolsconnection::logOut() {
+#ifdef HAVE_MDB_REMOVE_BACKENDS
 	mdb_remove_backends();
+#endif
 }
 
 bool mdbtoolsconnection::ping() {

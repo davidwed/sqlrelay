@@ -2068,6 +2068,12 @@ then
 #include <mdbsql.h>
 }
 #include <stdlib.h>],[mdb_col_to_string(NULL,NULL,0,0,0);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_COL_TO_STRING_5_PARAM,1,Some versions of mdbtools have 5 param mdb_col_to_string)],[AC_MSG_RESULT(no)])
+
+				AC_MSG_CHECKING(if MDB Tools has mdb_remove_backends)
+				FW_TRY_LINK([extern "C" {
+#include <mdbtoold.h>
+}
+#include <stdlib.h>],[mdb_remove_bacends();],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_REMOVE_BACKENDS,1,Some versions of mdbtools have mdb_remove_backends())],[AC_MSG_RESULT(no)])
 			fi
 		
 		fi
