@@ -28323,13 +28323,13 @@ export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 extern "C" {
-#include <mdbtoold.h>
+#include <mdbtools.h>
 }
 #include <stdlib.h>
 int
 main ()
 {
-mdb_remove_bacends();
+mdb_remove_backends();
   ;
   return 0;
 }

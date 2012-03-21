@@ -2071,9 +2071,9 @@ then
 
 				AC_MSG_CHECKING(if MDB Tools has mdb_remove_backends)
 				FW_TRY_LINK([extern "C" {
-#include <mdbtoold.h>
+#include <mdbtools.h>
 }
-#include <stdlib.h>],[mdb_remove_bacends();],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_REMOVE_BACKENDS,1,Some versions of mdbtools have mdb_remove_backends())],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[mdb_remove_backends();],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_REMOVE_BACKENDS,1,Some versions of mdbtools have mdb_remove_backends())],[AC_MSG_RESULT(no)])
 			fi
 		
 		fi
