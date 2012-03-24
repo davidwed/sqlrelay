@@ -21,9 +21,6 @@
 #define DEFAULT_ENDOFSESSION "commit"
 	// default action to take at end of session
 
-#define DEFAULT_MAXCONNECTIONS "1"
-	// default maximum number of connections
-
 #define DEFAULT_MAXQUEUELENGTH "1"
 	// default maximum queue length before
 	// another connection will be fired off

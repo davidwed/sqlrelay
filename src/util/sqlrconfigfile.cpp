@@ -28,7 +28,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	mysqllistenonunix=false;
 	dbase=charstring::duplicate(DEFAULT_DBASE);
 	connections=charstring::toInteger(DEFAULT_CONNECTIONS);
-	maxconnections=charstring::toInteger(DEFAULT_MAXCONNECTIONS);
+	maxconnections=0;
 	maxqueuelength=charstring::toInteger(DEFAULT_MAXQUEUELENGTH);
 	growby=charstring::toInteger(DEFAULT_GROWBY);
 	ttl=charstring::toInteger(DEFAULT_TTL);
@@ -39,7 +39,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	runasuser=charstring::duplicate(DEFAULT_RUNASUSER);
 	runasgroup=charstring::duplicate(DEFAULT_RUNASGROUP);
 	cursors=charstring::toInteger(DEFAULT_CURSORS);
-	maxcursors=charstring::toInteger(DEFAULT_CURSORS);
+	maxcursors=0;
 	cursorsgrowby=charstring::toInteger(DEFAULT_CURSORS_GROWBY);
 	authtier=charstring::duplicate(DEFAULT_AUTHTIER);
 	authonlistener=charstring::contains(authtier,"listener");
@@ -1108,9 +1108,14 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 							DEFAULT_DBASE);
 		} else if (currentattribute==CONNECTIONS_ATTRIBUTE) {
 			connections=atouint32_t(value,DEFAULT_CONNECTIONS,0);
+			if (maxconnections<connections) {
+				maxconnections=connections;
+			}
 		} else if (currentattribute==MAXCONNECTIONS_ATTRIBUTE) {
-			maxconnections=
-				atouint32_t(value,DEFAULT_MAXCONNECTIONS,1);
+			maxconnections=atouint32_t(value,DEFAULT_CONNECTIONS,1);
+			if (maxconnections<connections) {
+				maxconnections=connections;
+			}
 		} else if (currentattribute==MAXQUEUELENGTH_ATTRIBUTE) {
 			maxqueuelength=
 				atouint32_t(value,DEFAULT_MAXQUEUELENGTH,0);
@@ -1140,8 +1145,14 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 							DEFAULT_RUNASGROUP);
 		} else if (currentattribute==CURSORS_ATTRIBUTE) {
 			cursors=atouint32_t(value,DEFAULT_CURSORS,0);
+			if (maxcursors<cursors) {
+				maxcursors=cursors;
+			}
 		} else if (currentattribute==MAXCURSORS_ATTRIBUTE) {
 			maxcursors=atouint32_t(value,DEFAULT_CURSORS,1);
+			if (maxcursors<cursors) {
+				maxcursors=cursors;
+			}
 		} else if (currentattribute==CURSORS_GROWBY_ATTRIBUTE) {
 			cursorsgrowby=atouint32_t(value,
 						DEFAULT_CURSORS_GROWBY,1);
