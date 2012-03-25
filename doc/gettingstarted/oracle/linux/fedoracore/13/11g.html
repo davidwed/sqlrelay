@@ -13,14 +13,8 @@
 on your system.  Run the following yum command to install them:</p>
 
 <blockquote>
-<b>yum install libaio libaio-devel compat-libstdc++-33 elfutils-libelf-devel sysstat</b>
+<b>yum install libaio libaio-devel compat-libstdc++-33 elfutils-libelf-devel sysstat unixODBC unixODBC-devel ksh</b>
 </blockquote>
-
-<p>It also requires the <b>pdksh</b> package, version 5.2.14, which is not
-available on many modern linux systems.  Versions for older linux systems may
-be found at <a href="http://rpmfind.net">rpmfind</a>.  You could either build
-and instal an rpm for your system from a source rpm or just try an older
-version and see if it works on your system.</p>
 
 <span class="heading1">Configure the Kernel</span><br>
 
@@ -61,6 +55,12 @@ unzip linux_11gR2_database_1of2.zip<br>
 unzip linux_11gR2_database_2of2.zip<br>
 </b></blockquote>
 
+Sometimes 11g installations fail late in the process if the hostname is set to localhost.  So, prior to installation, make sure the hostname is set to something else.  Even localhost.localdomain appears to work.  Also, make sure the /etc/hosts file contains an entry for the hostname you use.  You can set the hostname to localhost.localdomain, for example, as root, using the command:<br><br>
+
+<b>hostname localhost.localdomain</b><br><br>
+
+It appears to be OK to set it back to whatever it was before after installation.<br><br>
+
 Change directories to the database directory.<br><br>
 
 Type <b>./runInstaller</b><br><br>
@@ -80,9 +80,7 @@ On the <b>Create Inventory</b> screen, accept the defaults and click <b>Next</b>
 On the <b>Perform Prerequisite Checks</b> screen, operating system requirements will be checked.  When it's done,
 click <b>Next</b>.<br><br>
 
-Some of the prerequisite checks have failed.  Many are likely tunable system parameters and may be fixed by clicking <b>Fix & Check Again</b> and following the instructions.
-Others, such as missing packages, may not be fixable by the installer and may require manual intervention.  After fixing them, click <b>Check Again</b>.  When all is well,
-a <b>Summary</b> screen will appear.  Click <b>Finish</b>.<br><br>
+Some of the prerequisite checks have failed.  Many are likely tunable system parameters and may be fixed by clicking <b>Fix & Check Again</b> and following the instructions.  Other failures, such as missing packages, may not be fixable by the installer and may require manual intervention.  Sometimes the installation will complain because it's looking for older packages than the ones that are actually installed.  I have always been able to safely ignore this.  After fixing them, click <b>Check Again</b>.  When all is well, a <b>Summary</b> screen will appear.  Click <b>Finish</b>.<br><br>
 
 On the <b>Oracle Configuration Manager Registration</b> screen, just click <b>Next</b>.<br><br>
 
