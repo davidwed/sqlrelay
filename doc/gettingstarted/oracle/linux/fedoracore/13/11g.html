@@ -96,7 +96,7 @@ Partway through the installation, you may get an error dialog saying something l
 gcc -o /u01/app/oracle/product/11.2.0/sysman/lib/emdctl -L/u01/app/oracle/product/11.2.0/lib/ -L/u01/app/oracle/product/11.2.0/sysman/lib/ -L/u01/app/oracle/product/11.2.0/lib/stubs/       `cat /u01/app/oracle/product/11.2.0/lib/sysliblist` -Wl,-rpath,/u01/app/oracle/product/11.2.0/lib -lm    `cat /u01/app/oracle/product/11.2.0/lib/sysliblist` -ldl -lm   -L/u01/app/oracle/product/11.2.0/lib /u01/app/oracle/product/11.2.0/sysman/lib/s0nmectl.o -lnmectl -lclntsh -L/u01/app/oracle/product/11.2.0/lib  -L/u01/app/oracle/product/11.2.0/sysman/lib/ -lnmemso -lnnz11 -lcore11 -Wl,-rpath,/u01/app/oracle/product/11.2.0/lib/:/u01/app/oracle/product/11.2.0/sysman/lib/:/u01/app/oracle/product/11.2.0/jdk/jre/lib/i386/client:/u01/app/oracle/product/11.2.0/jdk/jre/lib/i386 -L/u01/app/oracle/product/11.2.0/jdk/jre/lib/i386/client -L/u01/app/oracle/product/11.2.0/jdk/jre/lib/i386 -z lazyload -ljava -ljvm -lverify -z nolazyload -Wl,-rpath,/u01/app/oracle/product/11.2.0/lib/:/u01/app/oracle/product/11.2.0/sysman/lib/:/u01/app/oracle/product/11.2.0/jdk/jre/lib/i386/client:/u01/app/oracle/product/11.2.0/jdk/jre/lib/i386 -Wl,--allow-shlib-undefined    `cat /u01/app/oracle/product/11.2.0/lib/sysliblist` -ldl -lm
 </blockquote>
 
-Then click the <b>Continue</b>.<br><br>
+On 64 bit machines, you will have to replace <b>i386</b> with either <b>x86_64</b> or <b>amd64</b>.  On some installations you might have to replace <b>client</b> with <b>server</b>.  Try various permutations until it succeeds then click the <b>Continue</b>.<br><br>
 
 Eventually, a <b>Database Configuration Assistant</b> dialog should pop up.
 The image on
