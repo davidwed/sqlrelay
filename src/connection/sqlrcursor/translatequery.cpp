@@ -5,9 +5,10 @@
 #include <rudiments/character.h>
 
 void sqlrcursor_svr::printQueryTree(xmldom *tree) {
-	const char	*xml=tree->getRootNode()->xml()->getString();
+	stringbuffer	*xmlstr=tree->getRootNode()->xml();
+	const char	*xml=xmlstr->getString();
 	int16_t		indent=0;
-	bool		endtag;
+	bool		endtag=false;
 	for (const char *ptr=xml; *ptr; ptr++) {
 		if (*ptr=='<') {
 			if (*(ptr+1)=='/') {
@@ -27,6 +28,7 @@ void sqlrcursor_svr::printQueryTree(xmldom *tree) {
 			endtag=false;
 		}
 	}
+	delete xmlstr;
 }
 
 bool sqlrcursor_svr::translateQuery() {
