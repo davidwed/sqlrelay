@@ -7,6 +7,14 @@
 
 <body>
 
+<span class="heading1">Set the Host Name</span><br>
+
+Sometimes 11g installations fail late in the process if the hostname is set to localhost.  So, prior to installation, make sure the hostname is set to something other than localhost.  Even localhost.localdomain appears to work.  Also, make sure the /etc/hosts file contains an entry for the hostname you use.  You can set the hostname to localhost.localdomain, for example, by editing /etc/sysconfig/network and setting:<br><br>
+
+<b>HOSTNAME=localhost.localdomain</b><br><br>
+
+and then rebooting.  Do not just temporarily set the hostname during installation and then set it back later as the tns listener will refuse to start if you do.<br><br>
+
 <span class="heading1">Install Software Packages</span><br>
 
 <p>Oracle 11g requires some software packages that may not have been installed
@@ -54,12 +62,6 @@ distribution, extract the file using:<p>
 unzip linux_11gR2_database_1of2.zip<br>
 unzip linux_11gR2_database_2of2.zip<br>
 </b></blockquote>
-
-Sometimes 11g installations fail late in the process if the hostname is set to localhost.  So, prior to installation, make sure the hostname is set to something else.  Even localhost.localdomain appears to work.  Also, make sure the /etc/hosts file contains an entry for the hostname you use.  You can set the hostname to localhost.localdomain, for example, as root, using the command:<br><br>
-
-<b>hostname localhost.localdomain</b><br><br>
-
-It appears to be OK to set it back to whatever it was before after installation.<br><br>
 
 Change directories to the database directory.<br><br>
 
