@@ -9,6 +9,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/dictionary.h>
 #include <rudiments/file.h>
+#include <rudiments/memorypool.h>
 #include <locale.h>
 
 #define NEED_DATATYPESTRING 1
@@ -245,6 +246,7 @@ struct MYSQL_STMT {
 	MYSQL_RES	*result;
 	MYSQL_BIND	*resultbinds;
 	MYSQL		*mysql;
+	memorypool	*bindvarnames;
 };
 
 struct MYSQL {
@@ -428,7 +430,7 @@ my_bool my_init() {
 	debugFunction();
 	mysql_parameters.p_max_allowed_packet=&p_max_allowed_packet;
 	mysql_parameters.p_net_buffer_length=&p_net_buffer_length;
-	return true;
+	return 0;
 }
 
 MYSQL_PARAMETERS *mysql_get_parameters() {
@@ -477,7 +479,7 @@ const char *mysql_get_ssl_cipher(MYSQL *mysql) {
 
 my_bool mysql_thread_init(void) {
 	debugFunction();
-	return true;
+	return 0;
 }
 
 void mysql_thread_end(void) {
@@ -694,12 +696,12 @@ my_bool	mysql_change_user(MYSQL *mysql, const char *user,
 	debugFunction();
 
 	if (!mysql->sqlrcon->rollback()) {
-		return false;
+		return 1;
 	}
 	mysql_stmt_close(mysql->currentstmt);
 	delete mysql->sqlrcon;
 	return (mysql_real_connect(mysql,mysql->host,user,password,db,
-				mysql->port,mysql->unix_socket,0))?true:false;
+					mysql->port,mysql->unix_socket,0))?0:1;
 }
 
 const char *mysql_character_set_name(MYSQL *mysql) {
@@ -754,6 +756,7 @@ MYSQL_RES *mysql_list_dbs(MYSQL *mysql, const char *wild) {
 	mysql_stmt_close(mysql->currentstmt);
 
 	mysql->currentstmt=new MYSQL_STMT;
+	mysql->currentstmt->bindvarnames=new memorypool(0,128,100);
 	mysql->currentstmt->result=new MYSQL_RES;
 	mysql->currentstmt->result->stmtbackptr=NULL;
 	mysql->currentstmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon,true);
@@ -775,6 +778,7 @@ MYSQL_RES *mysql_list_tables(MYSQL *mysql, const char *wild) {
 	mysql_stmt_close(mysql->currentstmt);
 
 	mysql->currentstmt=new MYSQL_STMT;
+	mysql->currentstmt->bindvarnames=new memorypool(0,128,100);
 	mysql->currentstmt->result=new MYSQL_RES;
 	mysql->currentstmt->result->stmtbackptr=NULL;
 	mysql->currentstmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon,true);
@@ -807,6 +811,7 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 	mysql_stmt_close(mysql->currentstmt);
 
 	MYSQL_STMT	*stmt=new MYSQL_STMT;
+	stmt->bindvarnames=new memorypool(0,128,100);
 	mysql->currentstmt=stmt;
 	stmt->result=new MYSQL_RES;
 	stmt->result->stmtbackptr=NULL;
@@ -1074,7 +1079,7 @@ void mysql_free_result(MYSQL_RES *result) {
 
 my_bool mysql_more_results(MYSQL *mysql) {
 	debugFunction();
-	return false;
+	return 0;
 }
 
 int mysql_next_result(MYSQL *mysql) {
@@ -2063,6 +2068,7 @@ my_bool mysql_send_long_data(MYSQL_STMT *stmt,
 MYSQL_STMT *mysql_stmt_init(MYSQL *mysql) {
 	debugFunction();
 	MYSQL_STMT	*stmt=new MYSQL_STMT;
+	stmt->bindvarnames=new memorypool(0,128,100);
 	stmt->mysql=mysql;
 	stmt->result=new MYSQL_RES;
 	stmt->result->stmtbackptr=stmt;
@@ -2138,9 +2144,10 @@ my_bool mysql_stmt_close(MYSQL_STMT *stmt) {
 	debugFunction();
 	if (stmt) {
 		mysql_free_result(stmt->result);
+		delete stmt->bindvarnames;
 		delete stmt;
 	}
-	return true;
+	return 0;
 }
 
 
@@ -2197,7 +2204,7 @@ my_bool mysql_stmt_attr_set(MYSQL_STMT *stmt,
 				setResultSetBufferSize((uint64_t)(*val));
 			break;
 	}
-	return true;
+	return 0;
 }
 
 my_bool mysql_stmt_attr_get(MYSQL_STMT *stmt,
@@ -2215,18 +2222,22 @@ my_bool mysql_stmt_attr_get(MYSQL_STMT *stmt,
 						getResultSetBufferSize();
 			break;
 	}
-	return true;
+	return 0;
 }
 
 my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 	debugFunction();
 
+	stmt->bindvarnames->free();
+
 	unsigned long	paramcount=mysql_param_count(stmt);
 	for (unsigned long i=0; i<paramcount; i++) {
 
 		// use 1-based index for variable names
-		char		*variable=
-				charstring::parseNumber((uint32_t)i+1);
+		size_t	buffersize=charstring::integerLength((uint32_t)i+1)+1;
+		char	*variable=
+			(char *)stmt->bindvarnames->malloc(buffersize);
+		snprintf(variable,buffersize,"%ld",i+1);
 
 		// get the cursor
 		sqlrcursor	*cursor=stmt->result->sqlrcur;
@@ -2321,22 +2332,22 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 			case MYSQL_TYPE_SET:
 			case MYSQL_TYPE_GEOMETRY: {
 				// FIXME: what should I do here?
-				return false;
+				return 1;
 				break;
 			}
 			default: {
 				// FIXME: what should I do here?
-				return false;
+				return 1;
 			}
 		}
 	}
-	return true;
+	return 0;
 }
 
 my_bool mysql_stmt_bind_result(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 	debugFunction();
 	stmt->resultbinds=bind;
-	return true;
+	return 0;
 }
 
 my_bool mysql_stmt_send_long_data(MYSQL_STMT *stmt, 
@@ -2344,7 +2355,7 @@ my_bool mysql_stmt_send_long_data(MYSQL_STMT *stmt,
                                           const char *data, 
                                           unsigned long length) {
 	debugFunction();
-	return false;
+	return 1;
 }
 
 MYSQL_RES *mysql_stmt_result_metadata(MYSQL_STMT *stmt) {
@@ -2362,13 +2373,13 @@ MYSQL_RES *mysql_stmt_param_metadata(MYSQL_STMT *stmt) {
 my_bool mysql_stmt_free_result(MYSQL_STMT *stmt) {
 	debugFunction();
 	mysql_free_result(stmt->result);
-	return true;
+	return 0;
 }
 
 my_bool mysql_stmt_reset(MYSQL_STMT *stmt) {
 	debugFunction();
 	stmt->result->sqlrcur->clearBinds();
-	return true;
+	return 0;
 }
 
 
@@ -2397,7 +2408,7 @@ void mysql_library_end() {
 
 my_bool mysql_embedded() {
 	debugFunction();
-	return false;
+	return 0;
 }
 
 int unknownError(MYSQL *mysql) {
