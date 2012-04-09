@@ -12,6 +12,8 @@
 		that could become the default status of autocommit rather than
 		what was set in the config file
 	added autocommit on/off to sqlrsh
+	fixed a bind-var-related memory leak in mysql drop-in lib
+	fixed return values in mysql drop-in lib
 
 0.44 - updated postgresql drop-in lib for postgresql 8/9 compatibility
 	updated mysql drop-in lib for mysql 5.2+ compatibility

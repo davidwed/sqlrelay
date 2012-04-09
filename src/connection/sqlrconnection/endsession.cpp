@@ -16,6 +16,8 @@ void sqlrconnection_svr::endSessionInternal() {
 
 	dbgfile.debugPrint("connection",2,"ending session...");
 
+	abortAllCursors();
+
 	// truncate/drop temp tables
 	// (Do this before running the end-session queries becuase
 	// with oracle, it may be necessary to log out and log back in to
@@ -29,8 +31,6 @@ void sqlrconnection_svr::endSessionInternal() {
 	// must set suspendedsession to false here so resumed sessions won't 
 	// automatically re-suspend
 	suspendedsession=false;
-
-	abortAllCursors();
 
 	// if we're faking transaction blocks and the session was ended but we
 	// haven't ended the transaction block, then we need to rollback and

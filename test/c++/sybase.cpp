@@ -85,6 +85,7 @@ int	main(int argc, char **argv) {
 							"test","test",0,1);
 	cur=new sqlrcursor(con);
 
+
 	// get database type
 	printf("IDENTIFY: \n");
 	checkSuccess(con->identify(),"sybase");
@@ -261,7 +262,6 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("SELECT: \n");
-con->debugOn();
 	checkSuccess(cur->sendQuery("select * from testtable order by testint"),1);
 	printf("\n");
 
