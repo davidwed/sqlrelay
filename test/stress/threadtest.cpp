@@ -5,7 +5,6 @@
 #include <sqlrelay/sqlrclient.h>
 #include <stdio.h>
 #include <pthread.h>
-#include <config.h>
 
 const char	*host;
 int		port;
@@ -25,9 +24,9 @@ void	runQuery(void *id) {
 	cur->sendQuery(query);
 	con->endSession();
 	
-	for (int i=0; i<cur->rowCount(); i++) {
-		printf("%d  ",(uint64_t)id);
-		for (int j=0; j<cur->colCount(); j++) {
+	for (uint64_t i=0; i<cur->rowCount(); i++) {
+		printf("%d  ",(int)id);
+		for (uint32_t j=0; j<cur->colCount(); j++) {
 			printf("\"%s\",",cur->getField(i,j));
 		}
 		printf("\n");
@@ -37,7 +36,7 @@ void	runQuery(void *id) {
 	delete con;
 }
 
-main(int argc, char **argv) {
+int main(int argc, char **argv) {
 
 	host="localhost";
 	port=9000;

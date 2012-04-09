@@ -1,8 +1,0 @@
-g++ -I../../ -I/usr/local/firstworks/include -o threadtest threadtest.cpp -L/usr/local/firstworks/lib -lsqlrclient -lrudiments -lpthread
-g++ -I../../ -I/usr/local/firstworks/include -o forktest forktest.cpp -L/usr/local/firstworks/lib -lsqlrclient -lrudiments
-g++ -I../../ -I/usr/local/firstworks/include -o querytest querytest.cpp -L/usr/local/firstworks/lib -lsqlrclient -lrudiments
-g++ -I../../ -I/usr/local/firstworks/include -o query query.cpp -L/usr/local/firstworks/lib -lsqlrclient -lrudiments
-g++ -I../../ -I/usr/local/firstworks/include -o cursortest cursortest.cpp -L/usr/local/firstworks/lib -lsqlrclient -lrudiments
-g++ -I../../ -I/usr/local/firstworks/include -o timeouttest timeouttest.cpp -L/usr/local/firstworks/lib -lsqlrclient -lrudiments
-g++ -I../../ -I/usr/local/firstworks/include -o socketeater socketeater.cpp -L/usr/local/firstworks/lib -lrudiments
-g++ -I../../ -I/usr/local/firstworks/include -o random random.cpp -L/usr/local/firstworks/lib -lsqlrclient -lrudiments

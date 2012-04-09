@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <config.h>
-
 sqlrconnection	*con;
 sqlrcursor	*cur;
 sqlrconnection	*secondcon;
