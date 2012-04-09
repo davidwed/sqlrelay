@@ -53,16 +53,18 @@ bool sqlrconnection::genericAuthentication() {
 		return false;
 	}
 	if (authsuccess==ERROR_OCCURRED) {
-
-		if (!getError()) {
-			setError("Authentication Error.");
-		}
 		
 		// clear all result sets
 		sqlrcursor	*currentcursor=firstcursor;
 		while (currentcursor) {
 			currentcursor->clearResultSet();
 			currentcursor=currentcursor->next;
+		}
+
+		// do this after clearing the result sets
+		// or the error will get cleared out as well
+		if (!getError()) {
+			setError("Authentication Error.");
 		}
 
 		if (debug) {

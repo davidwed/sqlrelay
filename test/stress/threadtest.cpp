@@ -7,13 +7,13 @@
 #include <pthread.h>
 #include <config.h>
 
-char	*host;
-int	port;
-char	*sock;
-char	*login;
-char	*password;
-char	*query;
-int	threadcount;
+const char	*host;
+int		port;
+const char	*sock;
+const char	*login;
+const char	*password;
+const char	*query;
+int		threadcount;
 
 void	runQuery(void *id) {
 
@@ -39,7 +39,7 @@ void	runQuery(void *id) {
 
 main(int argc, char **argv) {
 
-	host="localhost"
+	host="localhost";
 	port=9000;
 	sock="/tmp/test.socket";
 	login="test";

@@ -14,13 +14,13 @@
 using namespace rudiments;
 #endif
 
-char	*host;
-int	port;
-char	*sock;
-char	*login;
-char	*password;
-char	*query;
-int	forkcount;
+const char	*host;
+int		port;
+const  char	*sock;
+const char	*login;
+const char	*password;
+const char	*query;
+int		forkcount;
 
 void	runQuery(int seed) {
 

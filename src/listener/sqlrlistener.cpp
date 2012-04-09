@@ -1173,6 +1173,7 @@ void sqlrlistener::errorClientSession(filedescriptor *clientsock,
 	// get auth and ignore the result
 	getAuth(clientsock);
 	clientsock->write((uint16_t)ERROR_OCCURRED);
+	clientsock->write((uint64_t)0);
 	clientsock->write((uint16_t)strlen(err));
 	clientsock->write(err);
 	flushWriteBuffer(clientsock);
@@ -1284,6 +1285,7 @@ void sqlrlistener::sqlrelayClientSession(filedescriptor *clientsock) {
 		snooze::macrosnooze(2);
 		const char	err[]="Authentication Error.";
 		clientsock->write((uint16_t)ERROR_OCCURRED);
+		clientsock->write((uint64_t)0);
 		clientsock->write((uint16_t)strlen(err));
 		clientsock->write(err);
 		flushWriteBuffer(clientsock);
@@ -1548,6 +1550,7 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 					unixportstr,&unixportstrlen)) {
 			// fatal error occurred while getting a connection
 			sock->write((uint16_t)ERROR_OCCURRED);
+			sock->write((uint64_t)0);
 			sock->write((uint16_t)70);
 			sock->write("The listener failed to hand the client off to the database connection.");
 			retval=false;
@@ -1577,6 +1580,7 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 				// of times we retry?  If so, should we return
 				// this error
 				/*sock->write((uint16_t)ERROR_OCCURRED);
+				sock->write((uint64_t)0);
 				sock->write((uint16_t)70);
 				sock->write("The listener failed to hand the client off to the database connection.");
 				retval=false;

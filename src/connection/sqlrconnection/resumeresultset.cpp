@@ -43,6 +43,9 @@ void sqlrconnection_svr::resumeResultSet(sqlrcursor_svr *cursor) {
 		// indicate that an error has occurred
 		clientsock->write((uint16_t)ERROR_OCCURRED);
 
+		// send the error code (zero for now)
+		clientsock->write((uint64_t)0);
+
 		// send the error itself
 		clientsock->write((uint16_t)43);
 		clientsock->write("The requested result set was not suspended.",

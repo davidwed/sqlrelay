@@ -11,6 +11,7 @@ bool sqlrconnection_svr::authenticateCommand() {
 	if (!authenticate()) {
 		// indicate that an error has occurred
 		clientsock->write((uint16_t)ERROR_OCCURRED);
+		clientsock->write((uint64_t)0);
 		clientsock->write((uint16_t)21);
 		clientsock->write("Authentication Error.");
 		flushWriteBuffer();
