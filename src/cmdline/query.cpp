@@ -72,9 +72,7 @@ int main(int argc, const char **argv) {
 			password=currentnode->getPassword();
 
 			// find the query and optional debug
-			if (cmdline.found("debug")) {
-				debug=true;
-			}
+			debug=cmdline.found("debug");
 
 			// find the query
 			for (int i=1; i<argc; i++) {
