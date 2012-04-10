@@ -83,6 +83,11 @@ class sqlrlistener : public daemonprocess, public listener {
 		void	incBusyListeners();
 		void	decBusyListeners();
 		int     getBusyListeners();
+		bool	acquireShmAccess();
+		bool	releaseShmAccess();
+		bool	waitForConnection();
+		bool	signalConnectionWeHaveRead();
+		bool	isAlarmRang();
 		bool	handOffClient(filedescriptor *sock);
 		bool	getAConnection(uint32_t *connectionpid,
 					uint16_t *inetport,
@@ -160,8 +165,8 @@ class sqlrlistener : public daemonprocess, public listener {
 
 		bool			isforkedchild;
 
-		signalhandler		alarmhandler;
-		static	sqlrlistener	*staticlistener;
+		static	signalhandler		alarmhandler;
+		static	volatile sig_atomic_t	alarmrang;
 
 		sqlrconfigfile		cfgfl;
 		uint32_t		runningconnections;

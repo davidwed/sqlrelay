@@ -19,6 +19,7 @@
 	updated getTableList() to exclude system tables
 	applied Benno Lange's localstatedir patch to fix a case where the
 		localstatedir command line parameter wasn't working properly
+	applied Renat's listener alarm handling patch 
 
 0.44 - updated postgresql drop-in lib for postgresql 8/9 compatibility
 	updated mysql drop-in lib for mysql 5.2+ compatibility

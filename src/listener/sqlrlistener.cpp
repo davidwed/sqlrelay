@@ -27,7 +27,14 @@
 using namespace rudiments;
 #endif
 
-sqlrlistener	*sqlrlistener::staticlistener;
+signalhandler		sqlrlistener::alarmhandler;
+volatile sig_atomic_t	sqlrlistener::alarmrang=0;
+
+// The signal handler just turn the flag on and re-enables itself.
+void sqlrlistener::alarmHandler(int32_t signum) {
+	alarmrang=1;
+	alarmhandler.handleSignal(SIGALRM);
+}
 
 sqlrlistener::sqlrlistener() : daemonprocess(), listener() {
 
@@ -92,6 +99,7 @@ void sqlrlistener::cleanUp() {
 
 	delete authc;
 	delete[] unixport;
+	delete[] pidfile;
 	delete clientsockun;
 	for (uint64_t index=0; index<clientsockincount; index++) {
 		delete clientsockin[index];
@@ -119,7 +127,6 @@ void sqlrlistener::cleanUp() {
 
 	dbgfile.closeDebugFile();
 
-	delete[] pidfile;
 	delete tmpdir;
 }
 
@@ -329,7 +336,8 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	char	*idfilename=new char[idfilenamelen];
 	snprintf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir->getString(),id);
 
-	dbgfile.debugPrint("listener",0,"creating shared memory and semaphores");
+	dbgfile.debugPrint("listener",0,
+			"creating shared memory and semaphores");
 	dbgfile.debugPrint("listener",0,"id filename: ");
 	dbgfile.debugPrint("listener",0,idfilename);
 
@@ -494,8 +502,8 @@ bool sqlrlistener::listenOnClientSockets() {
 				continue;
 			}
 			clientsockin[index]=new inetserversocket();
-			listening=clientsockin[index]->listen(addresses[index],
-								port,15);
+			listening=clientsockin[index]->
+					listen(addresses[index],port,15);
 			if (listening) {
 				addFileDescriptor(clientsockin[index]);
 			} else {
@@ -676,9 +684,6 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 
 void sqlrlistener::listen() {
 
-	// set the alarm handler's pointer
-	staticlistener=this;
-
 	// wait until all of the connections have started
 	shmdata	*ptr=(shmdata *)idmemory->getPointer();
 	for (;;) {
@@ -686,11 +691,14 @@ void sqlrlistener::listen() {
 		int32_t	opensvrconnections=ptr->statistics.open_svr_connections;
 		semset->signalWithUndo(9);
 
-		if (opensvrconnections<static_cast<int32_t>(cfgfl.getConnections())) {
-			dbgfile.debugPrint("listener",0,"waiting for server connections (sleeping 1s)");
+		if (opensvrconnections<
+			static_cast<int32_t>(cfgfl.getConnections())) {
+			dbgfile.debugPrint("listener",0,
+				"waiting for server connections (sleeping 1s)");
 			snooze::macrosnooze(1);
 		} else {
-			dbgfile.debugPrint("listener",0,"done waiting for server connections");
+			dbgfile.debugPrint("listener",0,
+				"done waiting for server connections");
 			break;
 		}
 	}
@@ -844,12 +852,6 @@ void sqlrlistener::blockSignals() {
 	alarmhandler.handleSignal(SIGALRM);
 }
 
-void sqlrlistener::alarmHandler(int32_t signum) {
-	staticlistener->decForkedListeners();
-	delete staticlistener;
-	process::exit(0);
-}
-
 filedescriptor *sqlrlistener::waitForData() {
 
 	dbgfile.debugPrint("listener",0,"waiting for client connection...");
@@ -903,8 +905,7 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 		return false;
 	}
 
-
-	// If something connected to the handoff or deregistration 
+	// If something connected to the handoff or deregistration
 	// socket, it must have been a connection.
 	//
 	// If something connected to the fixup socket, it must have been a
@@ -1128,7 +1129,7 @@ bool sqlrlistener::deniedIp(filedescriptor *clientsock) {
 	dbgfile.debugPrint("listener",0,"checking for valid ip...");
 
 	char	*ip=clientsock->getPeerAddress();
-	if (ip && denied->match(ip) && 
+	if (ip && denied->match(ip) &&
 			(!allowed || (allowed && !allowed->match(ip)))) {
 
 		dbgfile.debugPrint("listener",0,"invalid ip...");
@@ -1368,7 +1369,7 @@ int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 	// just return 1 as if authentication succeeded.
 	if (authc) {
 
-		// Return 1 if what the client sent matches one of the 
+		// Return 1 if what the client sent matches one of the
 		// user/password sets and 0 if no match is found.
 		bool	retval=authc->authenticate(userbuffer,passwordbuffer);
 		if (retval) {
@@ -1376,7 +1377,8 @@ int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 				"listener-based authentication succeeded");
 		} else {
 			dbgfile.debugPrint("listener",1,
-				"listener-based authentication failed: invalid user/password");
+				"listener-based authentication failed: "
+				"invalid user/password");
 		}
 		return (retval)?1:0;
 	}
@@ -1624,131 +1626,208 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 	return retval;
 }
 
+// wait for exclusive access to the
+// shared memory among listeners
+bool sqlrlistener::acquireShmAccess()
+{
+       dbgfile.debugPrint("listener",0,
+                       "acquiring exclusive shm access");
+       if (alarmrang || !semset->waitWithUndo(1)) {
+               if (alarmrang) {
+                       dbgfile.debugPrint(     "listener",0,
+                                       "timeout occured");
+               }
+               dbgfile.debugPrint("listener",0,
+                       "failed to acquire exclusive shm access");
+               return false;
+       }
+       dbgfile.debugPrint("listener",0,
+                       "done acquiring exclusive shm access");
+
+       return true;
+}
+
+// allow other listeners access to the shared memory
+bool sqlrlistener::releaseShmAccess()
+{
+       dbgfile.debugPrint("listener",-1,
+                       "releasing exclusive shm access");
+       if (!semset->signalWithUndo(1)) {
+               dbgfile.debugPrint("listener",0,
+                       "failed to release exclusive shm access");
+               return false;
+       }
+       dbgfile.debugPrint("listener",0,
+                       "done releasing exclusive shm access");
+
+       return true;
+}
+
+// wait for an available connection
+bool sqlrlistener::waitForConnection()
+{
+    dbgfile.debugPrint("listener",0,
+            "waiting for an available connection");
+
+        if (alarmrang || !semset->wait(2) ) {
+                if (alarmrang) {
+                        dbgfile.debugPrint(     "listener",0,
+                                        "timeout occured");
+                }
+                dbgfile.debugPrint("listener",0,
+                                "failed to wait for an available connection");
+                return false;
+        } else {
+
+                // Reset this semaphore to 0.
+                // It can get left incremented if a sqlr-connection process
+                // is killed between calls to signalListenerToRead() and
+                // waitForListenerToFinishReading().
+                // It's ok to reset it here because no one except this process
+                // has access to this semaphore at this time because of the
+                // lock on semaphore 1.
+                semset->setValue(2,0);
+
+                dbgfile.debugPrint("listener",0,
+                                "done waiting for an available connection");
+        }
+
+        return true;
+}
+
+// tell the connection that we've gotten it's data
+bool sqlrlistener::signalConnectionWeHaveRead()
+{
+        dbgfile.debugPrint("listener",0,
+                        "signalling connection that we've read");
+        if (!semset->signal(3)) {
+                dbgfile.debugPrint("listener",0,
+                                "failed to signal connection that we've read");
+                return false;
+        }
+        dbgfile.debugPrint("listener",0,
+                        "done signalling connection that we've read");
+
+        return true;
+}
+
 bool sqlrlistener::getAConnection(uint32_t *connectionpid,
-					uint16_t *inetport,
-					char *unixportstr,
-					uint16_t *unixportstrlen) {
+                                        uint16_t *inetport,
+                                        char *unixportstr,
+                                        uint16_t *unixportstrlen) {
 
 	// get a pointer to the shared memory segment
-	shmdata	*ptr=(shmdata *)idmemory->getPointer();
+	shmdata *ptr=(shmdata *)idmemory->getPointer();
 
-	for (;;) {
+	bool	ok=true;
+	bool	usealarm=(isforkedchild && listenertimeout);
 
+	semset->dontRetryInterruptedOperations();
+
+	while (ok) {
 		dbgfile.debugPrint("listener",0,"getting a connection...");
 
 		// if we're a forked child, set an alarm
 		// we could wait on the semaphore with a timeout, but that
 		// wouldn't be as portable...
-		if (isforkedchild && listenertimeout) {
+		if (usealarm) {
+			alarmrang=0;
 			signalmanager::alarm(listenertimeout);
 		}
 
-		// wait for exclusive access to the
-		// shared memory among listeners
-		dbgfile.debugPrint("listener",0,
-				"acquiring exclusive shm access");
-		if (!semset->waitWithUndo(1)) {
-			dbgfile.debugPrint("listener",0,
-				"failed to acquire exclusive shm access");
+		ok=acquireShmAccess();
+		if (ok) {
+			// This section should be executed without returns or
+			// breaks so that release shm mutex will get called
+			// at the end
+
+			ok=waitForConnection();
+
+			// turn off the alarm
 			signalmanager::alarm(0);
-			return false;
+
+			if (ok) {
+				// We have to signal connection we've read
+				// since we've done waiting for it, so no
+				// returns or breaks in this section
+
+				// if we're passing descriptors around, the
+				// connection will pass it's pid to us,
+				// otherwise it will pass it's inet and unix
+				// ports
+				if (passdescriptor) {
+
+					dbgfile.debugPrint("listener",1,
+							"handoff=pass");
+
+					// get the pid
+					*connectionpid=ptr->connectioninfo.
+								connectionpid;
+
+				} else {
+
+					dbgfile.debugPrint("listener",1,
+							"handoff=reconnect");
+
+					// get the inet port
+					*inetport=ptr->connectioninfo.
+							sockets.inetport;
+
+					// get the unix port
+					charstring::copy(unixportstr,
+							ptr->connectioninfo.
+							sockets.unixsocket,
+							MAXPATHLEN);
+					*unixportstrlen=charstring::length(
+								unixportstr);
+
+					size_t  debugstringlen=
+						15+*unixportstrlen+21;
+					char    *debugstring=
+						new char[debugstringlen];
+					snprintf(debugstring,debugstringlen,
+							"socket=%s  port=%d",
+							unixportstr,*inetport);
+					dbgfile.debugPrint("listener",1,
+								debugstring);
+					delete[] debugstring;
+				}
+
+				// If we done waiting for connection we have
+				// to signal we've read
+				ok=signalConnectionWeHaveRead();
+			}
+
+			// If we got access than we have to release it anyway
+			ok=(releaseShmAccess() && ok);
 		}
-		dbgfile.debugPrint("listener",0,
-				"done acquiring exclusive shm access");
 
-		// wait for an available connection
-		dbgfile.debugPrint("listener",0,
-				"waiting for an available connection");
-		if (!semset->waitWithUndo(2)) {
-			dbgfile.debugPrint("listener",0,
-				"failed to wait for an available connection");
-			signalmanager::alarm(0);
-			return false;
-		}
-
-		// Reset this semaphore to 0.
-		// It can get left incremented if a sqlr-connection process
-		// is killed between calls to signalListenerToRead() and
-		// waitForListenerToFinishReading().
-		// It's ok to reset it here because no one except this process
-		// has access to this semaphore at this time because of the
-		// lock on semaphore 1.
-		semset->setValue(2,0);
-
-		// turn off the alarm
+		// turn off the alarm if we haven't done it yet
 		signalmanager::alarm(0);
 
-		dbgfile.debugPrint("listener",0,
-				"done waiting for an available connection");
-
-		// if we're passing descriptors around, the connection will
-		// pass it's pid to us, otherwise it will pass it's inet and
-		// unix ports
-		if (passdescriptor) {
-
-			dbgfile.debugPrint("listener",1,"handoff=pass");
-
-			// get the pid
-			*connectionpid=ptr->connectioninfo.connectionpid;
-
-		} else {
-
-			dbgfile.debugPrint("listener",1,"handoff=reconnect");
-
-			// get the inet port
-			*inetport=ptr->connectioninfo.sockets.inetport;
-
-			// get the unix port
-			charstring::copy(unixportstr,
-				ptr->connectioninfo.sockets.unixsocket,
-				MAXPATHLEN);
-			*unixportstrlen=charstring::length(unixportstr);
-
-			size_t	debugstringlen=15+*unixportstrlen+21;
-			char	*debugstring=new char[debugstringlen];
-			snprintf(debugstring,debugstringlen,
-					"socket=%s  port=%d",
-						unixportstr,*inetport);
-			dbgfile.debugPrint("listener",1,debugstring);
-			delete[] debugstring;
-
-		}
-
-		// tell the connection that we've gotten it's data
-		dbgfile.debugPrint("listener",0,
-				"signalling connection that we've read");
-		if (!semset->signal(3)) {
-			dbgfile.debugPrint("listener",0,
-				"failed to signal connection that we've read");
-			return false;
-		}
-		dbgfile.debugPrint("listener",0,
-				"done signalling connection that we've read");
-
-		// allow other listeners access to the shared memory
-		dbgfile.debugPrint("listener",0,
-				"releasing exclusive shm access");
-		if (!semset->signalWithUndo(1)) {
-			dbgfile.debugPrint("listener",0,
-				"failed to release exclusive shm access");
-			return false;
-		}
-		dbgfile.debugPrint("listener",0,
-				"done releasing exclusive shm access");
-
-		// make sure the connection is actually up, if not,
-		// fork a child to jog it, spin back and get another connection
-		if (connectionIsUp(ptr->connectionid)) {
-			dbgfile.debugPrint("listener",1,
+		// execute this only if code above executed without errors
+		if (ok) {
+			// make sure the connection is actually up, if not,
+			// fork a child to jog it, spin back and get another
+			// connection
+			if (connectionIsUp(ptr->connectionid)) {
+				dbgfile.debugPrint("listener",1,
 						"done getting a connection");
-			break;
-		} else {
-			dbgfile.debugPrint("listener",1,"connection was down");
-			pingDatabase(*connectionpid,unixportstr,*inetport);
+				break;
+			} else {
+				dbgfile.debugPrint("listener",1,
+						"connection was down");
+				pingDatabase(*connectionpid,
+						unixportstr,*inetport);
+			}
 		}
 	}
 
-	return true;
+	if (usealarm) {
+		semset->retryInterruptedOperations();
+	}
+
+	return ok;
 }
 
 bool sqlrlistener::connectionIsUp(const char *connectionid) {
@@ -1771,8 +1850,11 @@ void sqlrlistener::pingDatabase(uint32_t connectionpid,
 
 	// fork off and cause the connection to ping the database, this should
 	// cause it to reconnect
-	pid_t	childpid;
-	if (!(childpid=process::fork())) {
+	pid_t	childpid=process::fork();
+
+	if (!childpid) {
+
+		isforkedchild=true;
 
 		// connect to the database connection
 		filedescriptor	*connsock=connectToConnection(connectionpid,
@@ -1793,12 +1875,6 @@ void sqlrlistener::pingDatabase(uint32_t connectionpid,
 			// disconnect
 			disconnectFromConnection(connsock);
 		}
-
-		// since this is the forked off listener, we don't
-		// want to actually remove the semaphore set or shared
-		// memory segment
-		idmemory->dontRemove();
-		semset->dontRemove();
 
 		cleanUp();
 		process::exit(0);
