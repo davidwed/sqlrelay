@@ -302,7 +302,9 @@ const char *freetdsconnection::getTableListQuery(bool wild) {
 		"from "
 		"	sysobjects "
 		"where "
-		"	type in ('S','U','V') "
+		"	loginame is not NULL "
+		"	and "
+		"	type in ('U','V') "
 		"	and "
 		"	name like '%s' "
 		"order by "
@@ -313,7 +315,9 @@ const char *freetdsconnection::getTableListQuery(bool wild) {
 		"from "
 		"	sysobjects "
 		"where "
-		"	type in ('S','U','V') "
+		"	loginame is not NULL "
+		"	and "
+		"	type in ('U','V') "
 		"order by "
 		"	name";
 }
