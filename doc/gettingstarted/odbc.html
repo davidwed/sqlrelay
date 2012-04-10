@@ -13,6 +13,7 @@
 <li><a href="#installation">Installation</a></li>
 <li><a href="#accessing">Accessing a Database</a></li>
 <li><a href="#sqlrelay">Accessing a Database With SQL Relay</a></li>
+<li><a href="#quirks">ODBC Quirks</a></li>
 </ul>
 
 <a name="installation"></a>
@@ -196,6 +197,37 @@ odbctest.  This instance connects to the TestDB DSN.</p>
 <blockquote>
 <b>sqlr-stop odbctest</b>
 </blockquote>
+
+<a name="quirks"></a>
+<span class="heading1">ODBC Quirks</span><br>
+
+<p>Many databases support named bind variables.  For example, in Oracle, you can have a query like:</p>
+
+<blockquote><b>
+select * from mytable where col1=:value1 and col2=:value2
+</b></blockquote>
+
+<p>In this query, <b>:value1</b> and <b>:value2</b> are bind variables.  Since Oracle supports binding by both name and position, SQL Relay also allows you to bind values to them by name or by position.  For example, either of the following bits of code should work.</p>
+
+<p>By name:</p>
+
+<blockquote><pre>
+cur-&gt;prepareQuery("select * from mytable where col1=:value1 and col2=:value2");
+cur-&gt;inputBind("value1","hello");
+cur-&gt;inputBind("value2","goodbye");
+cur-&gt;executeQuery();
+</pre></blockquote>
+
+<p>By position:</p>
+
+<blockquote><pre>
+cur-&gt;prepareQuery("select * from mytable where col1=:value1 and col2=:value2");
+cur-&gt;inputBind("1","hello");
+cur-&gt;inputBind("2","goodbye");
+cur-&gt;executeQuery();
+</pre></blockquote>
+
+<p>When using SQL Relay directly against Oracle, both bits of code work as expected.  However, ODBC does not appear to support binding by name, even if the underlying database does, or if ODBC does support it, I can't figure out how.  As such, if you use ODBC to connect SQL Relay to a database, then your client programs must bind by position, not by name, even if the underlying database supports binding by name.</p>
 
 </body>
 
