@@ -35,7 +35,7 @@ bool startListener(const char *id, const char *config,
 	command.append("sqlr-listener");
 	command.append(" -id ")->append(id);
 	command.append(" -config ")->append(config);
-	if (localstatedir[0]) {
+	if (charstring::length(localstatedir)) {
 		command.append(" -localstatedir ")->append(localstatedir);
 	}
 	if (listenerdebug) {
@@ -70,7 +70,7 @@ bool startConnection(bool strace, const char *dbase,
 		command.append(" -connectionid ")->append(connectionid);
 	}
 	command.append(" -config ")->append(config);
-	if (localstatedir[0]) {
+	if (charstring::length(localstatedir)) {
 		command.append(" -localstatedir ")->append(localstatedir);
 	}
 	if (connectiondebug) {
@@ -187,7 +187,7 @@ bool startScaler(sqlrconfigfile *cfgfile, const char *id, const char *config,
 		command.append(" -debug ");
 	}
 	command.append(" -config ")->append(config);
-	if (localstatedir[0]) {
+	if (charstring::length(localstatedir)) {
 		command.append(" -localstatedir ")->append(localstatedir);
 	}
 	printf("  %s\n",command.getString());
@@ -225,9 +225,11 @@ bool startCacheManager(const char *localstatedir) {
 		printf("\nStarting cache manager:\n");
 	
 		command.append("sqlr-cachemanager");
-		if (localstatedir[0]) {
+		if (charstring::length(localstatedir)) {
 			command.append(" -cachedirs ")->append(localstatedir);
 			command.append("/sqlrelay/cache");
+			command.append(" -localstatedir ");
+			command.append(localstatedir);
 		}
 		printf("  %s\n",command.getString());
 

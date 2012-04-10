@@ -60,6 +60,7 @@ do
 					echo "   success"
 				else
 					echo "   failed"
+					rm -f $file
 				fi
 			fi
 		done
