@@ -1153,6 +1153,8 @@ delete con;
 delete cur;
 </pre>
 
+<p>ODBC appears to only support binding by position, so when using ODBC to connect SQL Relay to a database, you must bind by position, even if the underlying database supports binding by name.</p>
+
 <a name="vectorbinds"></a>
 <span class="heading3">Why can't I do vector binds?</span>
 
