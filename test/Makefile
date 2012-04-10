@@ -9,6 +9,7 @@ ifneq ($(HAVE_JAVA),)
 	$(MAKE) -C java all
 endif
 	$(MAKE) -C dropin all
+	$(MAKE) -C stress all
 
 clean:
 	$(MAKE) -C c clean
@@ -20,3 +21,4 @@ clean:
 	$(MAKE) -C tcl clean
 	$(MAKE) -C dropin clean
 	$(MAKE) -C sqltranslation clean
+	$(MAKE) -C stress clean
