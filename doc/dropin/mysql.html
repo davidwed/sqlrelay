@@ -16,6 +16,7 @@
 <li><a href="#modules">Using the drop-in replacement library with modules</a></li>
 <li><a href="#work">Function support</a></li>
 <li><a href="#tweaks">Tweaks</a></li>
+<li><a href="#mappingerrorcodes">Mapping Error Codes</a></li>
 </ul>
 
 <br>
@@ -391,6 +392,39 @@ functions return safe values or a failure condition.</p>
 <p>Oracle (and possibly other db's) have a date type that is actually a date/time type but whether you get time information back or not depends on how you fetch the column.  By default, Oracle dates are mapped to the MYSQL_TYPE_DATETIME type.  However, if you want the type to be returned as MYSQL_TYPE_DATE instead, then set the environment variable SQLR_MYSQL_MAP_DATETME_TO_DATE="yes".</p>
 
 <p>When fetching a date into a MYSQL_TIME struct, the drop-in library attempts to interpret whatever it got back from the database as a date.  It can parse the native formats of all the databases that SQL Relay currently supports, but it cannot tell by examination whether a date like 2011-02-05 is in YYYY-MM-DD format or YYYY-DD-MM format.  By default, it assumes MMDD, but if you want it to assume DDMM instead, set the environment variable SQLR_MYSQL_DATE_DDMM="yes".</p>
+
+<br>
+<a name="mappingerrorcodes"></a>
+<span class="heading2">Mapping Error Codes</span><br>
+
+<p>By default, mysql_stmt_errno and mysql_errno return the native error code from the database.  For example, if SQL Relay is pointed at Oracle and a query is missing a FROM clause, then the Oracle error code 923 will be returned - the error code corresponding to the error "FROM keyword not found where expected".</p>
+
+<p>Since various databases have thousands of error codes, it's not feasible to map every one to the corresponding MySQL error code.  It is rare for an app to react to specific error codes, but if your app does, and requires specific MySQL error codes to be returned, then there it is possible to map native error codes to MySQL error codes.</p>
+
+<p>To do this, you must set the environment variable SQLR_MYSQL_ERROR_MAP to the location of an error map file.  For example:</p>
+
+<blockquote>
+export SQLR_MYSQL_ERROR_MAP=/usr/local/firstworks/etc/oracle-mysql-errors.map
+</blockquote>
+
+<p>This must be set on the client side - on the machine and in the shell where the drop-in replacement library is being run.</p>
+
+<p>An example error map file is provided at /usr/local/firstworks/share/examples/sample-oracle-mysql-errors.map</p>
+
+<p>The format is described at the top of the file and examples follow:</p>
+
+<blockquote><pre>
+# sample oracle to mysql error mappings...
+# format: &lt;oracle error number&gt;:&lt;mysql error number&gt;
+
+# FROM keyword not found where expected... -&gt; ER_PARSER_ERROR
+# (oracle actually has lots of syntax errors and they all need to be mapped to
+# ER_PARSE_ERROR)
+923:1064
+
+# quoted string not properly terminated -&gt; ER_PARSE_ERROR
+1756:1064
+</pre></blockquote>
 
 </body>
 </html>
