@@ -41,6 +41,7 @@ sqlrlistener::sqlrlistener() : daemonprocess(), listener() {
 	idmemory=NULL;
 
 	pidfile=NULL;
+	tmpdir=NULL;
 
 	clientsockin=NULL;
 	clientsockincount=0;
@@ -117,6 +118,9 @@ void sqlrlistener::cleanUp() {
 	delete allowed;
 
 	dbgfile.closeDebugFile();
+
+	delete[] pidfile;
+	delete tmpdir;
 }
 
 bool sqlrlistener::initListener(int argc, const char **argv) {
@@ -125,7 +129,7 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 
 	cmdl=new cmdline(argc,argv);
 
-	tempdir		tmpdir(cmdl);
+	tmpdir=new tempdir(cmdl);
 
 	if (!cfgfl.parse(cmdl->getConfig(),cmdl->getId())) {
 		return false;
@@ -142,7 +146,7 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 		dbgfile.enable();
 	}
 
-	if (!handlePidFile(&tmpdir,cmdl->getId())) {
+	if (!handlePidFile(cmdl->getId())) {
 		return false;
 	}
 
@@ -156,18 +160,18 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 
 	setIpPermissions();
 
-	if (!createSharedMemoryAndSemaphores(&tmpdir,cmdl->getId())) {
+	if (!createSharedMemoryAndSemaphores(cmdl->getId())) {
 		return false;
 	}
 
 	if ((passdescriptor=cfgfl.getPassDescriptor())) {
-		if (!listenOnHandoffSocket(&tmpdir,cmdl->getId())) {
+		if (!listenOnHandoffSocket(cmdl->getId())) {
 			return false;
 		}
-		if (!listenOnDeregistrationSocket(&tmpdir,cmdl->getId())) {
+		if (!listenOnDeregistrationSocket(cmdl->getId())) {
 			return false;
 		}
-		if (!listenOnFixupSocket(&tmpdir,cmdl->getId())) {
+		if (!listenOnFixupSocket(cmdl->getId())) {
 			return false;
 		}
 	}
@@ -256,7 +260,7 @@ bool sqlrlistener::verifyAccessToConfigFile(const char *configfile) {
 	return true;
 }
 
-bool sqlrlistener::handlePidFile(tempdir *tmpdir, const char *id) {
+bool sqlrlistener::handlePidFile(const char *id) {
 
 	// check/set pid file
 	size_t	pidfilelen=tmpdir->getLength()+20+charstring::length(id)+1;
@@ -318,8 +322,7 @@ void sqlrlistener::setIpPermissions() {
 	}
 }
 
-bool sqlrlistener::createSharedMemoryAndSemaphores(tempdir *tmpdir,
-							const char *id) {
+bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 
 	// initialize the ipc filename
 	size_t	idfilenamelen=tmpdir->getLength()+5+charstring::length(id)+1;
@@ -592,7 +595,7 @@ bool sqlrlistener::listenOnClientSockets() {
 	return listening;
 }
 
-bool sqlrlistener::listenOnHandoffSocket(tempdir *tmpdir, const char *id) {
+bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 
 	// the handoff socket
 	size_t	handoffsocknamelen=tmpdir->getLength()+9+
@@ -618,8 +621,7 @@ bool sqlrlistener::listenOnHandoffSocket(tempdir *tmpdir, const char *id) {
 	return success;
 }
 
-bool sqlrlistener::listenOnDeregistrationSocket(tempdir *tmpdir,
-							const char *id) {
+bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 
 	// the deregistration socket
 	size_t	removehandoffsocknamelen=tmpdir->getLength()+9+
@@ -647,7 +649,7 @@ bool sqlrlistener::listenOnDeregistrationSocket(tempdir *tmpdir,
 	return success;
 }
 
-bool sqlrlistener::listenOnFixupSocket(tempdir *tmpdir, const char *id) {
+bool sqlrlistener::listenOnFixupSocket(const char *id) {
 
 	// the fixup socket
 	size_t	fixupsocknamelen=tmpdir->getLength()+9+
@@ -1752,12 +1754,12 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 bool sqlrlistener::connectionIsUp(const char *connectionid) {
 
 	// initialize the database up/down filename
-	size_t	updownlen=charstring::length(TMP_DIR)+5+
+	size_t	updownlen=tmpdir->getLength()+5+
 			charstring::length(cmdl->getId())+1+
 			charstring::length(connectionid)+1;
 	char	*updown=new char[updownlen];
 	snprintf(updown,updownlen,"%s/ipc/%s-%s",
-			TMP_DIR,cmdl->getId(),connectionid);
+			tmpdir->getString(),cmdl->getId(),connectionid);
 	bool	retval=file::exists(updown);
 	delete[] updown;
 	return retval;

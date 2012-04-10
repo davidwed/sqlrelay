@@ -367,6 +367,10 @@ pid_t scaler::openOneConnection() {
 	argv[p++]=(char *)connectionid;
 	argv[p++]=(char *)"-config";
 	argv[p++]=config;
+	if (charstring::length(cmdl->getLocalStateDir())) {
+		argv[p++]=(char *)"-localstatedir";
+		argv[p++]=(char *)cmdl->getLocalStateDir();
+	}
 	argv[p++]=(char *)"-scaler";
 	if (debug) {
 		argv[p++]=(char *)"-debug";
