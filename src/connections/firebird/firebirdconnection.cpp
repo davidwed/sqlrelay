@@ -247,6 +247,8 @@ const char *firebirdconnection::getTableListQuery(bool wild) {
 		"from "
 		"	rdb$relations "
 		"where "
+		"	rdb$system_flag=0 "
+		"	and "
 		"	rdb$relation_name like '%s' "
 		"order by "
 		"	rdb$relation_name":
@@ -255,6 +257,8 @@ const char *firebirdconnection::getTableListQuery(bool wild) {
 		"	rdb$relation_name "
 		"from "
 		"	rdb$relations "
+		"where "
+		"	rdb$system_flag=0 "
 		"order by "
 		"	rdb$relation_name";
 }
