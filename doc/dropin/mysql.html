@@ -397,7 +397,7 @@ functions return safe values or a failure condition.</p>
 <a name="mappingerrorcodes"></a>
 <span class="heading2">Mapping Error Codes</span><br>
 
-<p>By default, mysql_stmt_errno and mysql_errno return the native error code from the database.  For example, if SQL Relay is pointed at Oracle and a query is missing a FROM clause, then the Oracle error code 923 will be returned - the error code corresponding to the error "FROM keyword not found where expected".</p>
+<p>By default, mysql_stmt_errno and mysql_errno return the native error code from the database.  For example, if SQL Relay is pointed at Oracle and a query is missing a FROM clause, then the Oracle error code 923 will be returned - the error code corresponding to the Oracle error "FROM keyword not found where expected" rather than the MySQL error code 1064 corresponding to the MySQL error "ER_PARSE_ERROR".</p>
 
 <p>Since various databases have thousands of error codes, it's not feasible to map every one to the corresponding MySQL error code.  It is rare for an app to react to specific error codes, but if your app does, and requires specific MySQL error codes to be returned, then there it is possible to map native error codes to MySQL error codes.</p>
 

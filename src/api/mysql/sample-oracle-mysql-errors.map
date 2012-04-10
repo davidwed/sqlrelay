@@ -1,7 +1,7 @@
 # sample oracle to mysql error mappings...
 # format: <oracle error number>:<mysql error number>
 
-# FROM keyword not found where expected... -> ER_PARSER_ERROR
+# FROM keyword not found where expected... -> ER_PARSE_ERROR
 # (oracle actually has lots of syntax errors and they all need to be mapped to
 # ER_PARSE_ERROR)
 923:1064
