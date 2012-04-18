@@ -393,7 +393,7 @@ const char *sqlrconfigfile::getSidPassword() {
 	return sidpassword;
 }
 
-const char *sqlrconfigfile::getSqlTranslationRules() {
+const char *sqlrconfigfile::getSqlTranslations() {
 	return sqltranslationrules.getString();
 }
 

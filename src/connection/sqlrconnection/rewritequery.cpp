@@ -32,8 +32,8 @@ sqlwriter *sqlrconnection_svr::getSqlWriter() {
 	return new sqlwriter;
 }
 
-sqltranslator *sqlrconnection_svr::getSqlTranslator() {
-	return new sqltranslator;
+sqltranslations *sqlrconnection_svr::getSqlTranslations() {
+	return new sqltranslations;
 }
 
 void sqlrconnection_svr::translateBindVariables(sqlrcursor_svr *cursor) {

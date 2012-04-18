@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2011  David Muse
 // See the file COPYING for more information
 
-#include <sqltranslator.h>
+#include <sqltranslations.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
@@ -10,7 +10,7 @@
 #include <rudiments/process.h>
 #include <rudiments/character.h>
 
-sqltranslator::sqltranslator() {
+sqltranslations::sqltranslations() {
 	debugFunction();
 	xmld=NULL;
 	tree=NULL;
@@ -20,14 +20,14 @@ sqltranslator::sqltranslator() {
 	tempindexpool=new memorypool(0,128,100);
 }
 
-sqltranslator::~sqltranslator() {
+sqltranslations::~sqltranslations() {
 	debugFunction();
 	delete xmld;
 	delete temptablepool;
 	delete tempindexpool;
 }
 
-bool sqltranslator::loadRules(const char *rules) {
+bool sqltranslations::loadTranslations(const char *rules) {
 	debugFunction();
 	delete xmld;
 	xmld=new xmldom();
@@ -39,23 +39,23 @@ bool sqltranslator::loadRules(const char *rules) {
 	return false;
 }
 
-bool sqltranslator::applyRules(sqlrconnection_svr *sqlrcon,
+bool sqltranslations::runTranslations(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree) {
 	debugFunction();
 	this->sqlrcon=sqlrcon;
 	this->sqlrcur=sqlrcur;
 	tree=querytree;
-	return applyRulesToQuery(querytree->getRootNode());
+	return applyTranslationsToQuery(querytree->getRootNode());
 }
 
-void sqltranslator::endSession() {
+void sqltranslations::endSession() {
 	temptablepool->free();
 	temptablemap.clear();
 	tempindexmap.clear();
 }
 
-bool sqltranslator::applyRulesToQuery(xmldomnode *query) {
+bool sqltranslations::applyTranslationsToQuery(xmldomnode *query) {
 	debugFunction();
 
 	for (xmldomnode *rule=rulesnode->getFirstTagChild();
@@ -98,18 +98,18 @@ bool sqltranslator::applyRulesToQuery(xmldomnode *query) {
 	return true;
 }
 
-bool sqltranslator::translateDatatypes(xmldomnode *query, xmldomnode *rule) {
+bool sqltranslations::translateDatatypes(xmldomnode *query, xmldomnode *rule) {
 	debugFunction();
 	return true;
 }
 
-bool sqltranslator::convertDatatypes(xmldomnode *query, xmldomnode *rule) {
+bool sqltranslations::convertDatatypes(xmldomnode *query, xmldomnode *rule) {
 	debugFunction();
 	return true;
 }
 
 #include <parsedatetime.h>
-char *sqltranslator::convertDateTime(const char *format,
+char *sqltranslations::convertDateTime(const char *format,
 			int16_t year, int16_t month, int16_t day,
 			int16_t hour, int16_t minute, int16_t second) {
 
@@ -182,7 +182,7 @@ char *sqltranslator::convertDateTime(const char *format,
 	return output.detachString();
 }
 
-bool sqltranslator::translateDateTimesInQuery(xmldomnode *querynode,
+bool sqltranslations::translateDateTimesInQuery(xmldomnode *querynode,
 							xmldomnode *rule) {
 	debugFunction();
 	
@@ -294,7 +294,7 @@ bool sqltranslator::translateDateTimesInQuery(xmldomnode *querynode,
 	return true;
 }
 
-bool sqltranslator::translateDateTimesInBindVariables(
+bool sqltranslations::translateDateTimesInBindVariables(
 						xmldomnode *querynode,
 						xmldomnode *rule) {
 	debugFunction();
@@ -381,21 +381,21 @@ bool sqltranslator::translateDateTimesInBindVariables(
 	return true;
 }
 
-const char * const *sqltranslator::getShortMonths() {
+const char * const *sqltranslations::getShortMonths() {
 	return shortmonths;
 }
 
-const char * const *sqltranslator::getLongMonths() {
+const char * const *sqltranslations::getLongMonths() {
 	return longmonths;
 }
 
-bool sqltranslator::trimColumnsComparedToStringBinds(xmldomnode *query,
+bool sqltranslations::trimColumnsComparedToStringBinds(xmldomnode *query,
 							xmldomnode *rule) {
 	debugFunction();
 	return true;
 }
 
-bool sqltranslator::translateDateTimes(xmldomnode *query, xmldomnode *rule) {
+bool sqltranslations::translateDateTimes(xmldomnode *query, xmldomnode *rule) {
 	debugFunction();
 	if (sqlrcon->debugsqltranslation) {
 		printf("date/time translation:\n");
@@ -424,21 +424,21 @@ bool sqltranslator::translateDateTimes(xmldomnode *query, xmldomnode *rule) {
 	return true;
 }
 
-xmldomnode *sqltranslator::newNode(xmldomnode *parentnode, const char *type) {
+xmldomnode *sqltranslations::newNode(xmldomnode *parentnode, const char *type) {
 	xmldomnode	*retval=new xmldomnode(tree,parentnode->getNullNode(),
 						TAG_XMLDOMNODETYPE,type,NULL);
 	parentnode->appendChild(retval);
 	return retval;
 }
 
-xmldomnode *sqltranslator::newNode(xmldomnode *parentnode,
+xmldomnode *sqltranslations::newNode(xmldomnode *parentnode,
 				const char *type, const char *value) {
 	xmldomnode	*node=newNode(parentnode,type);
 	setAttribute(node,sqlparser::_value,value);
 	return node;
 }
 
-xmldomnode *sqltranslator::newNodeAfter(xmldomnode *parentnode,
+xmldomnode *sqltranslations::newNodeAfter(xmldomnode *parentnode,
 						xmldomnode *node,
 						const char *type) {
 
@@ -459,7 +459,7 @@ xmldomnode *sqltranslator::newNodeAfter(xmldomnode *parentnode,
 	return retval;
 }
 
-xmldomnode *sqltranslator::newNodeAfter(xmldomnode *parentnode,
+xmldomnode *sqltranslations::newNodeAfter(xmldomnode *parentnode,
 						xmldomnode *node,
 						const char *type,
 						const char *value) {
@@ -468,7 +468,7 @@ xmldomnode *sqltranslator::newNodeAfter(xmldomnode *parentnode,
 	return retval;
 }
 
-xmldomnode *sqltranslator::newNodeBefore(xmldomnode *parentnode,
+xmldomnode *sqltranslations::newNodeBefore(xmldomnode *parentnode,
 						xmldomnode *node,
 						const char *type) {
 
@@ -489,7 +489,7 @@ xmldomnode *sqltranslator::newNodeBefore(xmldomnode *parentnode,
 	return retval;
 }
 
-xmldomnode *sqltranslator::newNodeBefore(xmldomnode *parentnode,
+xmldomnode *sqltranslations::newNodeBefore(xmldomnode *parentnode,
 						xmldomnode *node,
 						const char *type,
 						const char *value) {
@@ -498,7 +498,7 @@ xmldomnode *sqltranslator::newNodeBefore(xmldomnode *parentnode,
 	return retval;
 }
 
-void sqltranslator::setAttribute(xmldomnode *node,
+void sqltranslations::setAttribute(xmldomnode *node,
 				const char *name, const char *value) {
 	// FIXME: I shouldn't have to do this.
 	// setAttribute should append it automatically
@@ -509,13 +509,13 @@ void sqltranslator::setAttribute(xmldomnode *node,
 	}
 }
 
-bool sqltranslator::isString(const char *value) {
+bool sqltranslations::isString(const char *value) {
 	size_t	length=charstring::length(value);
 	return ((value[0]=='\'' && value[length-1]=='\'') ||
 			(value[0]=='"' && value[length-1]=='"'));
 }
 
-bool sqltranslator::tempTablesLocalize(xmldomnode *query, xmldomnode *rule) {
+bool sqltranslations::tempTablesLocalize(xmldomnode *query, xmldomnode *rule) {
 
 	// get the unique id
 	const char	*uniqueid=rule->getAttributeValue("uniqueid");
@@ -537,7 +537,7 @@ bool sqltranslator::tempTablesLocalize(xmldomnode *query, xmldomnode *rule) {
 	return replaceTempNames(query);
 }
 
-void sqltranslator::mapCreateTemporaryTableName(xmldomnode *node,
+void sqltranslations::mapCreateTemporaryTableName(xmldomnode *node,
 						const char *uniqueid) {
 
 	// create...
@@ -575,7 +575,7 @@ void sqltranslator::mapCreateTemporaryTableName(xmldomnode *node,
 	temptablemap.setData((char *)oldtablenamecopy,(char *)newtablename);
 }
 
-const char *sqltranslator::generateTempTableName(const char *oldname,
+const char *sqltranslations::generateTempTableName(const char *oldname,
 							const char *uniqueid) {
 
 	uint64_t	pid=process::getProcessId();
@@ -587,7 +587,7 @@ const char *sqltranslator::generateTempTableName(const char *oldname,
 	return newname;
 }
 
-void sqltranslator::mapCreateIndexOnTemporaryTableName(xmldomnode *node,
+void sqltranslations::mapCreateIndexOnTemporaryTableName(xmldomnode *node,
 							const char *uniqueid) {
 
 	// create...
@@ -633,7 +633,7 @@ void sqltranslator::mapCreateIndexOnTemporaryTableName(xmldomnode *node,
 	tempindexmap.setData((char *)oldindexnamecopy,(char *)newindexname);
 }
 
-bool sqltranslator::replaceTempNames(xmldomnode *node) {
+bool sqltranslations::replaceTempNames(xmldomnode *node) {
 
 	// if the current node is a table name
 	// then see if it needs to be replaced
@@ -675,17 +675,17 @@ bool sqltranslator::replaceTempNames(xmldomnode *node) {
 	return true;
 }
 
-bool	sqltranslator::getReplacementTableName(const char *oldname,
+bool	sqltranslations::getReplacementTableName(const char *oldname,
 						const char **newname) {
 	return temptablemap.getData((char *)oldname,(char **)newname);
 }
 
-bool	sqltranslator::getReplacementIndexName(const char *oldname,
+bool	sqltranslations::getReplacementIndexName(const char *oldname,
 						const char **newname) {
 	return tempindexmap.getData((char *)oldname,(char **)newname);
 }
 
-bool sqltranslator::locksNoWaitByDefault(xmldomnode *query) {
+bool sqltranslations::locksNoWaitByDefault(xmldomnode *query) {
 
 	// lock query...
 	xmldomnode	*locknode=query->getFirstTagChild(sqlparser::_lock);

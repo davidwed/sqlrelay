@@ -1,16 +1,16 @@
 #ifndef ORACLE8SQLTRANSLATOR_H
 #define ORACLE8SQLTRANSLATOR_H
 
-#include <sqltranslator.h>
+#include <sqltranslations.h>
 
 using namespace rudiments;
 
-class oracle8sqltranslator : public sqltranslator {
+class oracle8sqltranslations : public sqltranslations {
 	public:
-			oracle8sqltranslator();
-			~oracle8sqltranslator();
+			oracle8sqltranslations();
+			~oracle8sqltranslations();
 	protected:
-		bool	applyRulesToQuery(xmldomnode *query);
+		bool	applyTranslationsToQuery(xmldomnode *query);
 		bool	tempTablesPreserveRowsByDefault(xmldomnode *query,
 							xmldomnode *rule);
 		bool	translateDatatypes(xmldomnode *query,

@@ -234,7 +234,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		const char	*getSidUser();
 		const char	*getSidPassword();
 
-		const char	*getSqlTranslationRules();
+		const char	*getSqlTranslations();
 
 		const char	*getTriggers();
 

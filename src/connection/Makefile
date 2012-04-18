@@ -104,7 +104,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqlwriter/writeupdate.cpp \
 	sqlwriter/writeset.cpp \
 	sqlwriter/writelock.cpp \
-	sqltranslator/sqltranslator.cpp \
+	sqltranslations/sqltranslations.cpp \
 	sqltriggers/sqltriggers.cpp \
 	sqltriggers/sqltrigger.cpp \
 	sqltriggers/createtableautoincrementoracle.cpp \
@@ -206,7 +206,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlwriter/writeupdate.lo \
 	sqlwriter/writeset.lo \
 	sqlwriter/writelock.lo \
-	sqltranslator/sqltranslator.lo \
+	sqltranslations/sqltranslations.lo \
 	sqltriggers/sqltriggers.lo \
 	sqltriggers/sqltrigger.lo \
 	sqltriggers/createtableautoincrementoracle.lo \

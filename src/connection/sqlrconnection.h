@@ -27,7 +27,7 @@
 
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslator.h>
+#include <sqltranslations.h>
 #include <sqlwriter.h>
 #include <sqltriggers.h>
 
@@ -129,7 +129,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 						const char *tablename);
 		virtual void	endSession();
 
-		virtual sqltranslator	*getSqlTranslator();
+		virtual sqltranslations	*getSqlTranslations();
 		virtual sqlwriter	*getSqlWriter();
 
 	public:
@@ -476,7 +476,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 	private:
 
 		sqlparser	*sqlp;
-		sqltranslator	*sqlt;
+		sqltranslations	*sqlt;
 		sqlwriter	*sqlw;
 		sqltriggers	*sqltr;
 

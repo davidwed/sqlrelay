@@ -64,7 +64,7 @@ bool sqlrcursor_svr::translateQuery() {
 	}
 
 	// apply translation rules
-	if (!conn->sqlt->applyRules(conn,this,querytree)) {
+	if (!conn->sqlt->runTranslations(conn,this,querytree)) {
 		return false;
 	}
 

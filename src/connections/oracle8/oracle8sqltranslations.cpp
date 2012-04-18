@@ -1,21 +1,21 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <oracle8sqltranslator.h>
+#include <oracle8sqltranslations.h>
 #include <sqlparser.h>
 #include <sqlwriter.h>
 #include <debugprint.h>
 #include <sqlrconnection.h>
 
-oracle8sqltranslator::oracle8sqltranslator() : sqltranslator() {
+oracle8sqltranslations::oracle8sqltranslations() : sqltranslations() {
 	debugFunction();
 }
 
-oracle8sqltranslator::~oracle8sqltranslator() {
+oracle8sqltranslations::~oracle8sqltranslations() {
 	debugFunction();
 }
 
-bool oracle8sqltranslator::applyRulesToQuery(xmldomnode *query) {
+bool oracle8sqltranslations::applyTranslationsToQuery(xmldomnode *query) {
 	debugFunction();
 
 	for (xmldomnode *rule=rulesnode->getFirstTagChild();
@@ -36,16 +36,16 @@ bool oracle8sqltranslator::applyRulesToQuery(xmldomnode *query) {
 		}
 	}
 
-	return sqltranslator::applyRulesToQuery(query);
+	return sqltranslations::applyTranslationsToQuery(query);
 }
 
-bool oracle8sqltranslator::translateDatatypes(xmldomnode *query,
+bool oracle8sqltranslations::translateDatatypes(xmldomnode *query,
 						xmldomnode *rule) {
 	debugFunction();
 	return true;
 }
 
-bool oracle8sqltranslator::tempTablesPreserveRowsByDefault(
+bool oracle8sqltranslations::tempTablesPreserveRowsByDefault(
 						xmldomnode *query,
 						xmldomnode *rule) {
 	debugFunction();
@@ -91,7 +91,7 @@ bool oracle8sqltranslator::tempTablesPreserveRowsByDefault(
 	return true;
 }
 
-bool oracle8sqltranslator::tempTablesAddMissingColumns(
+bool oracle8sqltranslations::tempTablesAddMissingColumns(
 						xmldomnode *query,
 						xmldomnode *rule) {
 	debugFunction();

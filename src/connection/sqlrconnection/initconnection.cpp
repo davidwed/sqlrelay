@@ -116,11 +116,11 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	// Get the query translators.  Do it after logging in, as
 	// getSqlTranslator might return a different class depending on what
 	// version of the db it gets logged into
-	const char	*sqltranslationrules=cfgfl->getSqlTranslationRules();
+	const char	*sqltranslationrules=cfgfl->getSqlTranslations();
 	if (charstring::length(sqltranslationrules)) {
 		sqlp=new sqlparser;
-		sqlt=getSqlTranslator();
-		sqlt->loadRules(sqltranslationrules);
+		sqlt=getSqlTranslations();
+		sqlt->loadTranslations(sqltranslationrules);
 		sqlw=getSqlWriter();
 	}
 	debugsqltranslation=cfgfl->getDebugSqlTranslation();

@@ -14,13 +14,13 @@ using namespace rudiments;
 class sqlrconnection_svr;
 class sqlrcursor_svr;
 
-class sqltranslator {
+class sqltranslations {
 	public:
-			sqltranslator();
-		virtual	~sqltranslator();
+			sqltranslations();
+		virtual	~sqltranslations();
 
-		virtual bool	loadRules(const char *rules);
-		virtual bool	applyRules(sqlrconnection_svr *sqlrcon,
+		virtual bool	loadTranslations(const char *rules);
+		virtual bool	runTranslations(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldom *querytree);
 
@@ -31,7 +31,7 @@ class sqltranslator {
 
 		virtual void	endSession();
 	protected:
-		virtual bool	applyRulesToQuery(xmldomnode *query);
+		virtual bool	applyTranslationsToQuery(xmldomnode *query);
 		virtual bool	translateDatatypes(xmldomnode *query,
 							xmldomnode *rule);
 		virtual bool	convertDatatypes(xmldomnode *query,
