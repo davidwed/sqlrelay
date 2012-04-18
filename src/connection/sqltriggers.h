@@ -27,16 +27,16 @@ class sqltriggers {
 						xmldom *querytree,
 						bool success);
 	private:
-		void	unloadTriggers();
+		void		unloadTriggers();
 		sqltrigger	*loadTrigger(xmldomnode *trigger);
-		void	runTriggers(sqlrconnection_svr *sqlrcon,
+		void		runTriggers(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree,
 					linkedlist< sqltrigger * > *list,
 					bool before,
 					bool success);
 
-		xmldom		*xmld;
+		xmldom				*xmld;
 		linkedlist< sqltrigger * >	beforetriggers;
 		linkedlist< sqltrigger * >	aftertriggers;
 };

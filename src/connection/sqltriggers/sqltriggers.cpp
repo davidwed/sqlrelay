@@ -64,12 +64,11 @@ bool sqltriggers::loadTriggers(const char *triggers) {
 			list->append(tr);
 		}
 	}
-
-	// populate the trigger lists
 	return true;
 }
 
 void sqltriggers::unloadTriggers() {
+	debugFunction();
 	for (linkedlistnode< sqltrigger * > *node=
 			beforetriggers.getFirstNode();
 				node; node=node->getNext()) {

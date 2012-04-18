@@ -11,7 +11,6 @@
 #define NUM_CONNECT_STRING_VARS 6
 
 #include <sqlrconnection.h>
-#include <sqltranslations.h>
 #include <sqlwriter.h>
 #ifdef HAVE_ORACLE_8i
 	#include <rudiments/regularexpression.h>
@@ -232,7 +231,6 @@ class oracle8cursor : public sqlrcursor_svr {
 	
 class oracle8connection : public sqlrconnection_svr {
 	friend class oracle8cursor;
-	friend class oracle8sqltranslations;
 	public:
 				oracle8connection();
 				~oracle8connection();
@@ -265,7 +263,6 @@ class oracle8connection : public sqlrconnection_svr {
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
 
-		sqltranslations	*getSqlTranslations();
 		sqlwriter	*getSqlWriter();
 
 		ub4		statementmode;

@@ -105,6 +105,12 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqlwriter/writeset.cpp \
 	sqlwriter/writelock.cpp \
 	sqltranslations/sqltranslations.cpp \
+	sqltranslations/sqltranslation.cpp \
+	sqltranslations/translatedatetimes.cpp \
+	sqltranslations/temptableslocalize.cpp \
+	sqltranslations/locksnowaitbydefault.cpp \
+	sqltranslations/temptablesaddmissingcolumns.cpp \
+	sqltranslations/oracletemptablespreserverowsbydefault.cpp \
 	sqltriggers/sqltriggers.cpp \
 	sqltriggers/sqltrigger.cpp \
 	sqltriggers/createtableautoincrementoracle.cpp \
@@ -207,6 +213,12 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlwriter/writeset.lo \
 	sqlwriter/writelock.lo \
 	sqltranslations/sqltranslations.lo \
+	sqltranslations/sqltranslation.lo \
+	sqltranslations/translatedatetimes.lo \
+	sqltranslations/temptableslocalize.lo \
+	sqltranslations/locksnowaitbydefault.lo \
+	sqltranslations/temptablesaddmissingcolumns.lo \
+	sqltranslations/oracletemptablespreserverowsbydefault.lo \
 	sqltriggers/sqltriggers.lo \
 	sqltriggers/sqltrigger.lo \
 	sqltriggers/createtableautoincrementoracle.lo \

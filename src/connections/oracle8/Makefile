@@ -18,11 +18,9 @@ endif
 endif
 
 SRCS= oracle8connection.cpp \
-	oracle8sqltranslations.cpp \
 	oracle8sqlwriter.cpp \
 	main.cpp
 LOBJS= oracle8connection.lo \
-	oracle8sqltranslations.lo \
 	oracle8sqlwriter.lo \
 	main.lo
 

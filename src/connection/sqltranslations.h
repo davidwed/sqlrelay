@@ -8,6 +8,7 @@
 #include <rudiments/xmldomnode.h>
 #include <rudiments/memorypool.h>
 #include <rudiments/dictionary.h>
+#include <sqltranslation.h>
 
 using namespace rudiments;
 
@@ -17,57 +18,29 @@ class sqlrcursor_svr;
 class sqltranslations {
 	public:
 			sqltranslations();
-		virtual	~sqltranslations();
+			~sqltranslations();
 
-		virtual bool	loadTranslations(const char *rules);
-		virtual bool	runTranslations(sqlrconnection_svr *sqlrcon,
+		bool	loadTranslations(const char *translations);
+		bool	runTranslations(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldom *querytree);
 
-		virtual bool	getReplacementTableName(const char *oldname,
+		bool	getReplacementTableName(const char *oldname,
 							const char **newname);
-		virtual bool	getReplacementIndexName(const char *oldname,
+		bool	getReplacementIndexName(const char *oldname,
 							const char **newname);
 
-		virtual void	endSession();
-	protected:
-		virtual bool	applyTranslationsToQuery(xmldomnode *query);
-		virtual bool	translateDatatypes(xmldomnode *query,
-							xmldomnode *rule);
-		virtual bool	convertDatatypes(xmldomnode *query,
-							xmldomnode *rule);
-		virtual bool	trimColumnsComparedToStringBinds(
-							xmldomnode *query,
-							xmldomnode *rule);
-		virtual bool	translateDateTimes(xmldomnode *query,
-							xmldomnode *rule);
-		bool		translateDateTimesInQuery(xmldomnode *querynode,
-							xmldomnode *rule);
-		bool		translateDateTimesInBindVariables(
-							xmldomnode *querynode,
-							xmldomnode *rule);
-		char		*convertDateTime(const char *format,
-							int16_t year,
-							int16_t month,
-							int16_t day,
-							int16_t hour,
-							int16_t minute,
-							int16_t second);
-		virtual bool	tempTablesLocalize(xmldomnode *query,
-							xmldomnode *rule);
-		void		mapCreateTemporaryTableName(
-							xmldomnode *query,
-							const char *uniqueid);
-		void		mapCreateIndexOnTemporaryTableName(
-							xmldomnode *query,
-							const char *uniqueid);
-		const char	*generateTempTableName(const char *oldname,
-							const char *uniqueid);
-		bool		replaceTempNames(xmldomnode *node);
-		bool		verbatimTableReference(xmldomnode *node);
-		virtual bool	locksNoWaitByDefault(xmldomnode *query);
+		void	endSession();
+	private:
+		void		unloadTranslations();
+		sqltranslation	*loadTranslation(xmldomnode *translation);
+		
+		xmldom				*xmld;
+		xmldom				*tree;
+		linkedlist< sqltranslation * >	tlist;
 
 
+	public:
 		// helper methods
 		xmldomnode	*newNode(xmldomnode *parentnode,
 						const char *type);
@@ -92,17 +65,6 @@ class sqltranslations {
 						const char *name,
 						const char *value);
 		bool		isString(const char *value);
-		const char * const	*getShortMonths();
-		const char * const	*getLongMonths();
-
-
-		xmldomnode	*rulesnode;
-	protected:
-		xmldom		*xmld;
-		xmldom		*tree;
-
-		sqlrconnection_svr	*sqlrcon;
-		sqlrcursor_svr		*sqlrcur;
 
 		memorypool	*temptablepool;
 		memorypool	*tempindexpool;

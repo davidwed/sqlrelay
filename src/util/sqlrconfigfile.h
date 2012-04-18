@@ -78,7 +78,7 @@ typedef enum {
 	TIMEQUERIESUSEC_ATTRIBUTE,
 	FAKEINPUTBINDVARIABLES_ATTRIBUTE,
 	TRANSLATEBINDVARIABLES_ATTRIBUTE,
-	SQLTRANSLATIONRULES_ATTRIBUTE,
+	TRANSLATIONS_ATTRIBUTE,
 	TRIGGERS_ATTRIBUTE,
 	ISOLATIONLEVEL_ATTRIBUTE,
 	IGNORESELECTDB_ATTRIBUTE
@@ -208,7 +208,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		const char	*getDebug();
 		bool		getDebugListener();
 		bool		getDebugConnection();
-		bool		getDebugSqlTranslation();
+		bool		getDebugTranslations();
 		bool		getDebugTriggers();
 		uint32_t	getMaxQuerySize();
 		uint32_t	getMaxStringBindValueLength();
@@ -234,7 +234,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		const char	*getSidUser();
 		const char	*getSidPassword();
 
-		const char	*getSqlTranslations();
+		const char	*getTranslations();
 
 		const char	*getTriggers();
 
@@ -308,7 +308,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		char		*debug;
 		bool		debuglistener;
 		bool		debugconnection;
-		bool		debugsqltranslation;
+		bool		debugtranslations;
 		bool		debugtriggers;
 		uint32_t	maxquerysize;
 		uint32_t	maxstringbindvaluelength;
@@ -336,8 +336,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		char		*siduser;
 		char		*sidpassword;
 
-		stringbuffer	sqltranslationrules;
-		uint16_t	sqltranslationrulesdepth;
+		stringbuffer	translations;
+		uint16_t	translationsdepth;
 
 		stringbuffer	triggers;
 		uint16_t	triggersdepth;
@@ -371,7 +371,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 			ROUTE_TAG,
 			FILTER_TAG,
 			QUERY_TAG,
-	   		SQLTRANSLATIONRULES_TAG,
+	   		TRANSLATIONS_TAG,
 	   		TRIGGERS_TAG
 		} tag;
 		

@@ -52,7 +52,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	debug=charstring::duplicate(DEFAULT_DEBUG);
 	debuglistener=charstring::contains(debug,"listener");
 	debugconnection=charstring::contains(debug,"connection");
-	debugsqltranslation=charstring::contains(debug,"sqltranslation");
+	debugtranslations=charstring::contains(debug,"translations");
 	debugtriggers=charstring::contains(debug,"triggers");
 	maxquerysize=charstring::toInteger(DEFAULT_MAXQUERYSIZE);
 	maxstringbindvaluelength=charstring::toInteger(
@@ -82,7 +82,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 					DEFAULT_TRANSLATEBINDVARIABLES,"yes");
 	currentroute=NULL;
 	currenttag=NO_TAG;
-	sqltranslationrulesdepth=0;
+	translationsdepth=0;
 	triggersdepth=0;
 	isolationlevel=NULL;
 	ignoreselectdb=false;
@@ -301,8 +301,8 @@ bool sqlrconfigfile::getDebugConnection() {
 	return debugconnection;
 }
 
-bool sqlrconfigfile::getDebugSqlTranslation() {
-	return debugsqltranslation;
+bool sqlrconfigfile::getDebugTranslations() {
+	return debugtranslations;
 }
 
 bool sqlrconfigfile::getDebugTriggers() {
@@ -393,8 +393,8 @@ const char *sqlrconfigfile::getSidPassword() {
 	return sidpassword;
 }
 
-const char *sqlrconfigfile::getSqlTranslations() {
-	return sqltranslationrules.getString();
+const char *sqlrconfigfile::getTranslations() {
+	return translations.getString();
 }
 
 const char *sqlrconfigfile::getTriggers() {
@@ -477,10 +477,9 @@ bool sqlrconfigfile::tagStart(const char *name) {
 				thistag=CONNECTIONS_TAG;
 			} else if (!charstring::compare(name,"router")) {
 				thistag=ROUTER_TAG;
-			} else if (!charstring::compare(name,
-						"sqltranslationrules")) {
-				thistag=SQLTRANSLATIONRULES_TAG;
-				sqltranslationrules.clear();
+			} else if (!charstring::compare(name,"translations")) {
+				thistag=TRANSLATIONS_TAG;
+				translations.clear();
 			} else if (!charstring::compare(name,"triggers")) {
 				thistag=TRIGGERS_TAG;
 				triggers.clear();
@@ -631,17 +630,17 @@ bool sqlrconfigfile::tagStart(const char *name) {
 		case CONNECTIONS_TAG:
 			currenttag=thistag;
 			break;
-		case SQLTRANSLATIONRULES_TAG:
-			if (!charstring::compare(name,"sqltranslationrules")) {
-				sqltranslationrulesdepth=0;
+		case TRANSLATIONS_TAG:
+			if (!charstring::compare(name,"translations")) {
+				translationsdepth=0;
 			} else {
-				sqltranslationrulesdepth++;
+				translationsdepth++;
 			}
-			if (sqltranslationrulesdepth) {
-				sqltranslationrules.append(">");
+			if (translationsdepth) {
+				translations.append(">");
 			}
-			sqltranslationrules.append("<");
-			sqltranslationrules.append(name);
+			translations.append("<");
+			translations.append(name);
 			currenttag=thistag;
 			break;
 		case TRIGGERS_TAG:
@@ -727,16 +726,16 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 				}
 			}
 			break;
-		case SQLTRANSLATIONRULES_TAG:
-			if (!charstring::compare(name,"sqltranslationrules")) {
+		case TRANSLATIONS_TAG:
+			if (!charstring::compare(name,"translations")) {
 				currenttag=NO_TAG;
 			}
-			sqltranslationrules.append("></");
-			sqltranslationrules.append(name);
-			if (!sqltranslationrulesdepth) {
-				sqltranslationrules.append(">");
+			translations.append("></");
+			translations.append(name);
+			if (!translationsdepth) {
+				translations.append(">");
 			}
-			sqltranslationrulesdepth--;
+			translationsdepth--;
 			break;
 		case TRIGGERS_TAG:
 			if (!charstring::compare(name,"triggers")) {
@@ -951,9 +950,9 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		}
 		break;
 
-	case SQLTRANSLATIONRULES_TAG:
-		sqltranslationrules.append(" ")->append(name);
-		currentattribute=SQLTRANSLATIONRULES_ATTRIBUTE;
+	case TRANSLATIONS_TAG:
+		translations.append(" ")->append(name);
+		currentattribute=TRANSLATIONS_ATTRIBUTE;
 		break;
 
 	case TRIGGERS_TAG:
@@ -1002,8 +1001,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			case QUERY_TAG:
 				tagname="query";
 				break;
-			case SQLTRANSLATIONRULES_TAG:
-				tagname="sqltranslationrules";
+			case TRANSLATIONS_TAG:
+				tagname="translations";
 				break;
 			case TRIGGERS_TAG:
 				tagname="triggers";
@@ -1050,9 +1049,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 
 		// if we have found the correct id, process the attribute...
 
-		if (currenttag==SQLTRANSLATIONRULES_TAG) {
-			sqltranslationrules.append("=\"");
-			sqltranslationrules.append(value)->append("\"");
+		if (currenttag==TRANSLATIONS_TAG) {
+			translations.append("=\"");
+			translations.append(value)->append("\"");
 		} else if (currenttag==TRIGGERS_TAG) {
 			triggers.append("=\"");
 			triggers.append(value)->append("\"");
@@ -1187,8 +1186,8 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 							"listener");
 			debugconnection=charstring::contains(debug,
 							"connection");
-			debugsqltranslation=charstring::contains(debug,
-							"sqltranslation");
+			debugtranslations=charstring::contains(debug,
+							"translations");
 			debugtriggers=charstring::contains(debug,
 							"triggers");
 		} else if (currentattribute==MAXQUERYSIZE_ATTRIBUTE) {

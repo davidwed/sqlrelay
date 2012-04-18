@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <oracle8connection.h>
-#include <oracle8sqltranslations.h>
 #include <oracle8sqlwriter.h>
 #include <rudiments/charstring.h>
 #include <rudiments/rawbuffer.h>
@@ -516,10 +515,6 @@ bool oracle8connection::rollback() {
 
 sqlwriter *oracle8connection::getSqlWriter() {
 	return new oracle8sqlwriter;
-}
-
-sqltranslations *oracle8connection::getSqlTranslations() {
-	return new oracle8sqltranslations;
 }
 
 const char *oracle8connection::pingQuery() {
