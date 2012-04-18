@@ -1,3 +1,5 @@
+0.46 - refactored the translation framework to mimic the trigger framework
+
 0.45 - added trigger framework
 	added support for getting the native database error number
 	added support for mapping native error numbers to MySQL error numbers
