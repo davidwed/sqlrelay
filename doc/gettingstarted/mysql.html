@@ -468,12 +468,20 @@ attribute of the connection tag.</p>
 <a name="quirks"></a>
 <span class="heading1">MySQL Quirks</span><br>
 
-<p>Most versions of MySQL don't support transactions, but some do.  If you're
-using MySQL-max or if you built MySQL with Innodb support, then you have the
-option of running MySQL with support for transactions.</p>
+<p>MySQL supports multiple backend storage engines, the most popular being the
+InnoDB and MyISAM engines.  Since MySQL 5.5, InnoDB has been the default
+storage engine and it fully supports both transactions and foreign key
+constraints.</p>
 
-<p>MySQL does not support foreign key constraints.  For example, take the
-following table declarations:</p>
+<p>However, prior to version 5.5, MyISAM was the default storage engine and
+prior to version 4.0 you needed to use MySQL-max to get support for InnoDB.</p>
+
+<p>While unlikely, it is possible that you may end up using an older version of
+MySQL, or one where someone has specifically chosen to use MyISAM tables, and
+in that case it is important to note that the MyISAM storage engine doesn't
+support transactions at all and handles foreign key constraints oddly.</p>
+
+<p>For example, take the following table declarations:</p>
 
 <blockquote>
 <pre>
@@ -497,13 +505,14 @@ following table declarations:</p>
 </pre>
 </blockquote>
 
-<p>In many other databases, attempting to insert car_id's and carkey_id's into
+<p>When using InnoDB tables, an attempt to insert car_id's and carkey_id's into
 the keys_of_cars table will fail unless those car_id's and carkey_id's exist in
-the cars and carkeys tables respectively.  Under MySQL, this will not fail.</p>
+the cars and carkeys tables respectively.  When using MyISAM tables, this will
+not fail.</p>
 
-<p>What's quirky about MySQL is that it allows the foreign key syntax, but
-ignores it.  Other databases that don't support foreign keys don't allow the
-syntax either.</p>
+<p>What's quirky about using MyISAM tables with MySQL is that it the foreign
+key syntax is allowed, but ignored.  Other databases that don't support foreign
+keys don't allow the syntax either.</p>
 
 </body>
 
