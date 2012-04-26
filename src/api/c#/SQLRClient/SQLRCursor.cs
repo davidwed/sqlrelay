@@ -134,45 +134,45 @@ public class SQLRCursor : IDisposable
     /** Sends a query that returns a list of databases/schemas matching "wild".
      *  If wild is empty or NULL then a list of all databases/schemas will be
      *  returned. */
-    public int getDatabaseList(string wild)
+    public bool getDatabaseList(string wild)
     {
-        return sqlrcur_getDatabaseList(sqlrcurref, wild);
+        return sqlrcur_getDatabaseList(sqlrcurref, wild) != 0;
     }
 
     /** Sends a query that returns a list of tables matching "wild".  If wild is
      *  empty or NULL then a list of all tables will be returned. */
-    public int getTableList(string wild)
+    public bool getTableList(string wild)
     {
-        return sqlrcur_getTableList(sqlrcurref, wild);
+        return sqlrcur_getTableList(sqlrcurref, wild) != 0;
     }
 
     /** Sends a query that returns a list of columns in the table specified by
      *  the "table" parameter matching "wild".  If wild is empty or NULL then a
      *  list of all columns will be returned. */
-    public int getColumnList(string table, string wild)
+    public bool getColumnList(string table, string wild)
     {
-        return sqlrcur_getColumnList(sqlrcurref, table, wild);
+        return sqlrcur_getColumnList(sqlrcurref, table, wild) != 0;
     }
 
 
 
     /** Sends "query" directly and gets a result set. */
-    public int sendQuery(string query)
+    public bool sendQuery(string query)
     {
-        return sqlrcur_sendQuery(sqlrcurref, query);
+        return sqlrcur_sendQuery(sqlrcurref, query) != 0;
     }
 
     /** Sends "query" with length "length" directly and gets a result set. This
      *  function must be used if the query contains binary data. */
-    public int sendQuery(string query, uint length)
+    public bool sendQuery(string query, uint length)
     {
-        return sqlrcur_sendQueryWithLength(sqlrcurref, query, length);
+        return sqlrcur_sendQueryWithLength(sqlrcurref, query, length) != 0;
     }
 
     /** Sends the query in file "path"/"filename" and gets a result set. */
-    public int sendFileQuery(IntPtr sqlrcurref, string path, string filename)
+    public bool sendFileQuery(IntPtr sqlrcurref, string path, string filename)
     {
-        return sqlrcur_sendFileQuery(sqlrcurref, path, filename);
+        return sqlrcur_sendFileQuery(sqlrcurref, path, filename) != 0;
     }
 
 
@@ -321,23 +321,23 @@ public class SQLRCursor : IDisposable
     }
 
     /** Returns true if "variable" was a valid bind variable of the query. */
-    public int validBind(string variable)
+    public bool validBind(string variable)
     {
-        return sqlrcur_validBind(sqlrcurref, variable);
+        return sqlrcur_validBind(sqlrcurref, variable) != 0;
     }
 
 
 
     /** Execute the query that was previously prepared and bound. */
-    public int executeQuery()
+    public bool executeQuery()
     {
-        return sqlrcur_executeQuery(sqlrcurref);
+        return sqlrcur_executeQuery(sqlrcurref) != 0;
     }
 
     /** Fetch from a cursor that was returned as an output bind variable. */
-    public int fetchFromBindCursor()
+    public bool fetchFromBindCursor()
     {
-        return sqlrcur_fetchFromBindCursor(sqlrcurref);
+        return sqlrcur_fetchFromBindCursor(sqlrcurref) != 0;
     }
 
 

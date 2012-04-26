@@ -6,10 +6,10 @@ using System.Data;
 
 namespace SQLRClient
 {
-    class SQLRelayTransaction : IDbTransaction
+    public class SQLRelayTransaction : IDbTransaction
     {
-        private SQLRelayConnection _sqlrelaycon;
-        private SQLRConnection _sqlrcon;
+        private SQLRelayConnection _sqlrelaycon = null;
+        private SQLRConnection _sqlrcon = null;
 
         public IsolationLevel IsolationLevel
         {
@@ -49,7 +49,7 @@ namespace SQLRClient
             }
         }
 
-        public void IDisposable.Dispose()
+        void IDisposable.Dispose()
         {
             this.Dispose(true);
             System.GC.SuppressFinalize(this);

@@ -6,11 +6,13 @@ using System.Data;
 
 namespace SQLRClient
 {
-    class SQLRelayCommand : IDbCommand
+    public class SQLRelayCommand : IDbCommand
     {
-        private SQLRelayConnection _sqlrelaycon;
-        private SQLRelayTransaction _sqlrelaytran;
-        private string _commandtext;
+        private SQLRelayConnection _sqlrelaycon = null;
+        private SQLRelayTransaction _sqlrelaytran = null;
+        private SQLRCursor _sqlrcur = null;
+        private string _commandtext = null;
+        private bool _prepared = false;
         private UpdateRowSource _updaterowsource = UpdateRowSource.None;
         private SQLRelayParameterCollection _sqlrelayparams = new SQLRelayParameterCollection();
 
@@ -20,20 +22,16 @@ namespace SQLRClient
 
         public SQLRelayCommand(string commandtext)
         {
-            init(commandtext, null, null);
+            _commandtext = commandtext;
         }
 
         public SQLRelayCommand(string commandtext, SQLRelayConnection sqlrelaycon)
         {
-            init(commandtext, sqlrelaycon, null);
+            _commandtext = commandtext;
+            _sqlrelaycon = sqlrelaycon;
         }
 
         public SQLRelayCommand(string commandtext, SQLRelayConnection sqlrelaycon, SQLRelayTransaction sqlrelaytran)
-        {
-            init(commandtext, sqlrelaycon, sqlrelaytran);
-        }
-
-        private void init(string commandtext, SQLRelayConnection sqlrelaycon, SQLRelayTransaction sqlrelaytran)
         {
             _commandtext = commandtext;
             _sqlrelaycon = sqlrelaycon;
@@ -49,6 +47,7 @@ namespace SQLRClient
             set
             {
                 _commandtext = value;
+                _prepared = false;
             }
         }
 
@@ -90,10 +89,12 @@ namespace SQLRClient
             }
             set
             {
-                // set the tranaction to null if the connection is changed
+                // set the tranaction and cursor to null if the connection is changed
                 if (value != _sqlrelaycon)
                 {
                     _sqlrelaytran = null;
+                    _sqlrcur = null;
+                    _prepared = false;
                 }
                 _sqlrelaycon = (SQLRelayConnection)value;
             }   
@@ -107,7 +108,7 @@ namespace SQLRClient
             }
         }
 
-        private IDataParameterCollection IDbCommand.Parameters
+        IDataParameterCollection IDbCommand.Parameters
         {
             // huh?
             get
@@ -128,7 +129,7 @@ namespace SQLRClient
             }
         }
 
-        public UpdateRowSource UpdateRowSource
+        public UpdateRowSource UpdatedRowSource
         {
             get
             {
@@ -145,18 +146,9 @@ namespace SQLRClient
             throw new NotSupportedException();
         }
 
-        public IDataParameter CreateParameter()
+        public IDbDataParameter CreateParameter()
         {
-            return (IDataParameter)(new SQLRelayParameter());
-        }
-
-        public int ExecuteNonQuery()
-        {
-
-            validConnection();
-
-            // FIXME: execute the query and return the number of affected rows
-            return 0;
+            return (IDbDataParameter)(new SQLRelayParameter());
         }
 
         private void validConnection()
@@ -167,36 +159,53 @@ namespace SQLRClient
             }
         }
 
+        private SQLRCursor getCursor()
+        {
+            if (_sqlrcur == null)
+            {
+                _sqlrcur = new SQLRCursor(_sqlrelaycon.SQLRConnection);
+            }
+            return _sqlrcur;
+        }
+
+        private bool runQuery()
+        {
+            if (_commandtext == null)
+            {
+                return false;
+            }
+
+            validConnection();
+            getCursor();
+
+            return (_prepared && _sqlrcur.executeQuery()) || (!_prepared && _sqlrcur.sendQuery(_commandtext));
+        }
+
+        public int ExecuteNonQuery()
+        {
+            return (runQuery()) ? (int)_sqlrcur.affectedRows() : 0;
+        }
+
         public IDataReader ExecuteReader()
         {
-            validConnection();
-
-            // FIXME: execute the query and return a result set
-            return new SQLRelayDataReader();
+            return ExecuteReader(CommandBehavior.Default);
         }
 
         public IDataReader ExecuteReader(CommandBehavior commandbehavior)
         {
-            validConnection();
-
-            // FIXME: execute the query and return a result set
-
-            if (commandbehavior == CommandBehavior.CloseConnection)
-            {
-                // FIXME: set a flag so endSession gets called
-                return new SQLRelayDataReader();
-            }
-            else
-            {
-                return new SQLRelayDataReader();
-            }
+            return (runQuery()) ? new SQLRelayDataReader(_sqlrelaycon, _sqlrcur, commandbehavior == CommandBehavior.CloseConnection) : null;
         }
 
         public object ExecuteScalar()
         {
-            validConnection();
-
-            // FIXME: execute the query and return the first column of the first row
+            if (runQuery())
+            {
+                if (_sqlrcur.rowCount() == 0)
+                {
+                    return null;
+                }
+                return (object)_sqlrcur.getField(0, 0);
+            }
             return null;
         }
 
@@ -204,10 +213,11 @@ namespace SQLRClient
         {
             validConnection();
 
-            // FIXME: prepare query
+            getCursor().prepareQuery(_commandtext);
+            _prepared = true;
         }
 
-        public void IDisposable.Dispose()
+        void IDisposable.Dispose()
         {
             this.Dispose(true);
             System.GC.SuppressFinalize(this);

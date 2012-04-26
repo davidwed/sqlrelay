@@ -6,7 +6,7 @@ using System.Data;
 
 namespace SQLRClient
 {
-    class SQLRelayParameter : IDataParameter
+    public class SQLRelayParameter : IDataParameter
     {
         DbType _dbtype = DbType.Object;
         ParameterDirection _paramaterdirection = ParameterDirection.Input;

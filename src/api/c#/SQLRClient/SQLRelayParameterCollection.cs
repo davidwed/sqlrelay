@@ -7,7 +7,7 @@ using System.Globalization;
 
 namespace SQLRClient
 {
-    class SQLRelayParameterCollection : ArrayList, IDataParameterCollection
+    public class SQLRelayParameterCollection : ArrayList, IDataParameterCollection
     {
         public object this[string index]
         {

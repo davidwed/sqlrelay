@@ -45,7 +45,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SQLRConnection.cs" />
     <Compile Include="SQLRCursor.cs" />
-    <Compile Include="SQLRelayDataAdapter.cs" />
     <Compile Include="SQLRelayParameter.cs" />
     <Compile Include="SQLRelayParameterCollection.cs" />
     <Compile Include="SQLRelayDataReader.cs" />
