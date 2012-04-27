@@ -1,48 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Data;
 
 namespace SQLRClient
 {
     public class SQLRelayTransaction : IDbTransaction
     {
-        private SQLRelayConnection _sqlrelaycon = null;
-        private SQLRConnection _sqlrcon = null;
 
-        public IsolationLevel IsolationLevel
-        {
-            get
-            {
-                // FIXME: is there an interface for getting this?
-                return IsolationLevel.ReadCommitted;
-            }
-        }
+        #region member variables
 
-        public void Commit()
-        {
-            _sqlrcon.commit();
-        }
+        private bool _open = false;
 
-        public void Rollback()
-        {
-            _sqlrcon.rollback();
-        }
+        #endregion
 
-        public IDbConnection Connection
+
+        #region constructors and destructors
+
+        internal SQLRelayTransaction()
         {
-            get
-            {
-                return this.Connection;
-            }
+            _open = true;
         }
 
         private void Dispose(bool disposing)
         {
             if (disposing)
             {
-                if (this.Connection != null)
+                if (_open && Connection != null)
                 {
                     Rollback();
                 }
@@ -54,5 +36,68 @@ namespace SQLRClient
             this.Dispose(true);
             System.GC.SuppressFinalize(this);
         }
+
+        #endregion
+
+
+        #region properties
+
+        public IDbConnection Connection
+        {
+            get;
+            set;
+        }
+
+        public IsolationLevel IsolationLevel
+        {
+            // FIXME: ideally this would do something
+            // I may need to add some methods to the C++ API
+            get
+            {
+                return IsolationLevel.ReadCommitted;
+            }
+        }
+
+        #endregion
+
+
+        #region public methods
+
+        public void Commit()
+        {
+            validTransaction();
+            ((SQLRelayConnection)Connection).SQLRConnection.commit();
+            _open = false;
+        }
+
+        public void Rollback()
+        {
+            validTransaction();
+            ((SQLRelayConnection)Connection).SQLRConnection.rollback();
+            _open = false;
+        }
+
+        #endregion
+
+
+        #region private methods
+
+        private void validTransaction()
+        {
+            if (!_open)
+            {
+                throw new InvalidOperationException("Transaction must be open");
+            }
+            if (Connection == null)
+            {
+                throw new InvalidOperationException("Connection must be non-null");
+            }
+            if (Connection.State != ConnectionState.Open)
+            {
+                throw new InvalidOperationException("Connection must be open");
+            }
+        }
+
+        #endregion
     }
 }

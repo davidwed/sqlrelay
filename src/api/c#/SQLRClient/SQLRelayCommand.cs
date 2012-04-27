@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Data;
 
 namespace SQLRClient
 {
     public class SQLRelayCommand : IDbCommand
     {
+
+        #region member variables
+
         private SQLRelayConnection _sqlrelaycon = null;
         private SQLRelayTransaction _sqlrelaytran = null;
         private SQLRCursor _sqlrcur = null;
@@ -15,6 +15,11 @@ namespace SQLRClient
         private bool _prepared = false;
         private UpdateRowSource _updaterowsource = UpdateRowSource.None;
         private SQLRelayParameterCollection _sqlrelayparams = new SQLRelayParameterCollection();
+
+        #endregion
+
+
+        #region constructors and destructors
 
         public SQLRelayCommand()
         {
@@ -37,6 +42,22 @@ namespace SQLRClient
             _sqlrelaycon = sqlrelaycon;
             _sqlrelaytran = sqlrelaytran;
         }
+
+        void IDisposable.Dispose()
+        {
+            this.Dispose(true);
+            System.GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            // FIXME: do anything?
+        }
+
+        #endregion
+
+
+        #region properties
 
         public string CommandText
         {
@@ -110,7 +131,6 @@ namespace SQLRClient
 
         IDataParameterCollection IDbCommand.Parameters
         {
-            // huh?
             get
             {
                 return _sqlrelayparams;
@@ -141,6 +161,11 @@ namespace SQLRClient
             }
         }
 
+        #endregion
+
+
+        #region public methods
+
         public void Cancel()
         {
             throw new NotSupportedException();
@@ -149,36 +174,6 @@ namespace SQLRClient
         public IDbDataParameter CreateParameter()
         {
             return (IDbDataParameter)(new SQLRelayParameter());
-        }
-
-        private void validConnection()
-        {
-            if (_sqlrelaycon == null || _sqlrelaycon.State != ConnectionState.Open)
-            {
-                throw new InvalidOperationException("Connection must be valid and open.");
-            }
-        }
-
-        private SQLRCursor getCursor()
-        {
-            if (_sqlrcur == null)
-            {
-                _sqlrcur = new SQLRCursor(_sqlrelaycon.SQLRConnection);
-            }
-            return _sqlrcur;
-        }
-
-        private bool runQuery()
-        {
-            if (_commandtext == null)
-            {
-                return false;
-            }
-
-            validConnection();
-            getCursor();
-
-            return (_prepared && _sqlrcur.executeQuery()) || (!_prepared && _sqlrcur.sendQuery(_commandtext));
         }
 
         public int ExecuteNonQuery()
@@ -217,15 +212,74 @@ namespace SQLRClient
             _prepared = true;
         }
 
-        void IDisposable.Dispose()
+        #endregion
+
+
+        #region private methods
+
+        private void validConnection()
         {
-            this.Dispose(true);
-            System.GC.SuppressFinalize(this);
+            if (_sqlrelaycon == null || _sqlrelaycon.State != ConnectionState.Open)
+            {
+                throw new InvalidOperationException("Connection must be valid and open.");
+            }
         }
 
-        private void Dispose(bool disposing)
+        private SQLRCursor getCursor()
         {
-            // FIXME: do anything?
+            if (_sqlrcur == null)
+            {
+                _sqlrcur = new SQLRCursor(_sqlrelaycon.SQLRConnection);
+            }
+            return _sqlrcur;
         }
+
+        private bool runQuery()
+        {
+            if (_commandtext == null)
+            {
+                return false;
+            }
+
+            validConnection();
+            getCursor();
+
+            if (Parameters.Count == 0)
+            {
+                if (_prepared)
+                {
+                    return _sqlrcur.executeQuery();
+                }
+                else
+                {
+                    return _sqlrcur.sendQuery(_commandtext);
+                }
+            }
+            else
+            {
+                if (!_prepared)
+                {
+                    Prepare();
+                }
+
+                bindParameters();
+
+                return _sqlrcur.executeQuery();
+            }
+        }
+
+        private void bindParameters()
+        {
+
+            for (int i = 0; i < Parameters.Count; i++)
+            {
+
+                Type type = Parameters[i].GetType();
+
+                // FIXME: run different bind functions depending on the type
+            }
+        }
+
+        #endregion
     }
 }

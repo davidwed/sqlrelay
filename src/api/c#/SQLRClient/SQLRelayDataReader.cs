@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Data;
 using System.Globalization;
 
@@ -9,7 +6,7 @@ namespace SQLRClient
 {
     public class SQLRelayDataReader : IDataReader
     {
-        private bool _open = false;
+        private bool _open = true;
         private SQLRelayConnection _sqlrelaycon = null;
         private SQLRCursor _sqlrcur = null;
         private bool _endsession = false;
@@ -81,7 +78,7 @@ namespace SQLRClient
 
         public DataTable GetSchemaTable()
         {
-            // FIXME: getTableList()?
+            // FIXME: implement this
             throw new NotSupportedException();
         }
 
@@ -105,7 +102,7 @@ namespace SQLRClient
 
         public Type GetFieldType(int i)
         {
-            // FIXME: Return the actual Type class for the data type.
+            // FIXME: return the actual Type class the data type
             return null;
         }
 
@@ -234,7 +231,7 @@ namespace SQLRClient
         public bool IsDBNull(int i)
         {
             // FIXME: this will need to be modified if getNullsAsNulls is exposed
-            return (this[i] == "");
+            return ((string)this[i] == "");
         }
 
         private int cultureAwareCompare(string strA, string strB)
