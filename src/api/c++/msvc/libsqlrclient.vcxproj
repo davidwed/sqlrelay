@@ -95,7 +95,6 @@ copy /Y ..\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sq
     <ClCompile Include="..\src\connection\clientversion.cpp" />
     <ClCompile Include="..\src\connection\closeconnection.cpp" />
     <ClCompile Include="..\src\connection\commit.cpp" />
-    <ClCompile Include="..\src\connection\connectioncopyreferences.cpp" />
     <ClCompile Include="..\src\connection\connectionctor.cpp" />
     <ClCompile Include="..\src\connection\connectiondtor.cpp" />
     <ClCompile Include="..\src\connection\dbversion.cpp" />
@@ -121,7 +120,6 @@ copy /Y ..\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sq
     <ClCompile Include="..\src\cursor\clearresultset.cpp" />
     <ClCompile Include="..\src\cursor\columnnamecase.cpp" />
     <ClCompile Include="..\src\cursor\columns.cpp" />
-    <ClCompile Include="..\src\cursor\cursorcopyreferences.cpp" />
     <ClCompile Include="..\src\cursor\cursorctor.cpp" />
     <ClCompile Include="..\src\cursor\cursordtor.cpp" />
     <ClCompile Include="..\src\cursor\errormessage.cpp" />

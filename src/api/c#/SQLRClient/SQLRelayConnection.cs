@@ -31,7 +31,7 @@ namespace SQLRClient
 
         public SQLRelayConnection(string connectstring)
         {
-            _connectionstring = connectstring;
+            ConnectionString = connectstring;
         }
 
         private void Dispose(bool disposing)
@@ -159,6 +159,7 @@ namespace SQLRClient
             _connectionstate = ConnectionState.Open;
             _sqlrcon = new SQLRConnection(_host, _port, _socket, _user, _password, _retrytime, _tries);
             ChangeDatabase(_db);
+            _sqlrcon.debugOn();
         }
 
         public void Close()
