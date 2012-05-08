@@ -18,7 +18,7 @@ namespace SQLRClient
         {
         }
 
-        public SQLRelayCommand SelectCommand
+        new public SQLRelayCommand SelectCommand
         {
             get
             {
@@ -42,7 +42,7 @@ namespace SQLRClient
             }
         }
 
-        public SQLRelayCommand InsertCommand
+        new public SQLRelayCommand InsertCommand
         {
             get
             {
@@ -66,7 +66,7 @@ namespace SQLRClient
             }
         }
 
-        public SQLRelayCommand UpdateCommand
+        new public SQLRelayCommand UpdateCommand
         {
             get
             {
@@ -90,7 +90,7 @@ namespace SQLRClient
             }
         }
 
-        public SQLRelayCommand DeleteCommand
+        new public SQLRelayCommand DeleteCommand
         {
             get
             {

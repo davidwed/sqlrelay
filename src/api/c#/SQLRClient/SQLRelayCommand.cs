@@ -264,19 +264,193 @@ namespace SQLRClient
 
                 bindParameters();
 
-                return _sqlrcur.executeQuery();
+                if (!_sqlrcur.executeQuery())
+                {
+                    return false;
+                }
+
+                copyOutBindValues();
+                return true;
             }
         }
 
         private void bindParameters()
         {
-
+            
             for (int i = 0; i < Parameters.Count; i++)
             {
 
-                Type type = Parameters[i].GetType();
+                SQLRelayParameter param = (SQLRelayParameter)Parameters[i];
 
-                // FIXME: run different bind functions depending on the type
+                if (param.Direction == ParameterDirection.Input)
+                {
+
+                    switch (param.DbType)
+                    {
+                        case DbType.AnsiString:
+                        case DbType.AnsiStringFixedLength:
+                        case DbType.Date:
+                        case DbType.DateTime:
+                        case DbType.DateTime2:
+                        case DbType.DateTimeOffset:
+                        case DbType.String:
+                        case DbType.StringFixedLength:
+                        case DbType.Time:
+                        case DbType.Guid:
+                            _sqlrcur.inputBind(param.ParameterName, (string)param.Value);
+                            return;
+
+                        case DbType.Binary:
+                            // FIXME: I should use inputBindBlob but how do i get the size?
+                            return;
+
+                        case DbType.Boolean:
+                            _sqlrcur.inputBind(param.ParameterName, (((bool)param.Value)==true) ? 1 : 0);
+                            return;
+
+                        case DbType.Currency:
+                        case DbType.Decimal:
+                        case DbType.Single:
+                        case DbType.Double:
+                        case DbType.VarNumeric:
+                            _sqlrcur.inputBind(param.ParameterName, (double)param.Value, 0, 0);
+                            return;
+
+                        case DbType.Byte:
+                        case DbType.Int16:
+                        case DbType.Int32:
+                        case DbType.Int64:
+                        case DbType.SByte:
+                        case DbType.UInt16:
+                        case DbType.UInt32:
+                        case DbType.UInt64:
+                            _sqlrcur.inputBind(param.ParameterName, (long)param.Value);
+                            return;
+
+                        case DbType.Object:
+                        case DbType.Xml:
+                            _sqlrcur.inputBind(param.ParameterName, param.Value.ToString());
+                            return;
+                    }
+
+                }
+                else if (param.Direction == ParameterDirection.Output)
+                {
+                    switch (param.DbType)
+                    {
+                        case DbType.AnsiString:
+                        case DbType.AnsiStringFixedLength:
+                        case DbType.Date:
+                        case DbType.DateTime:
+                        case DbType.DateTime2:
+                        case DbType.DateTimeOffset:
+                        case DbType.String:
+                        case DbType.StringFixedLength:
+                        case DbType.Time:
+                        case DbType.Guid:
+                            // FIXME: length?
+                            _sqlrcur.defineOutputBindString(param.ParameterName, 32768);
+                            return;
+
+                        case DbType.Binary:
+                            // FIXME: I should use inputBindBlob but how do i get the size?
+                            return;
+
+                        case DbType.Boolean:
+                            _sqlrcur.defineOutputBindInteger(param.ParameterName);
+                            return;
+
+                        case DbType.Currency:
+                        case DbType.Decimal:
+                        case DbType.Single:
+                        case DbType.Double:
+                        case DbType.VarNumeric:
+                            _sqlrcur.defineOutputBindDouble(param.ParameterName);
+                            return;
+
+                        case DbType.Byte:
+                        case DbType.Int16:
+                        case DbType.Int32:
+                        case DbType.Int64:
+                        case DbType.SByte:
+                        case DbType.UInt16:
+                        case DbType.UInt32:
+                        case DbType.UInt64:
+                            _sqlrcur.defineOutputBindInteger(param.ParameterName);
+                            return;
+
+                        case DbType.Object:
+                        case DbType.Xml:
+                            // FIXME: length?
+                            _sqlrcur.defineOutputBindString(param.ParameterName, 32768);
+                            return;
+                    }
+                }
+                else if (param.Direction == ParameterDirection.InputOutput)
+                {
+                    // FIXME: SQL Relay doesn't currently support in/out parameters
+                    throw new NotSupportedException();
+                }
+            }
+        }
+
+        private void copyOutBindValues()
+        {
+            for (int i = 0; i < Parameters.Count; i++)
+            {
+
+                SQLRelayParameter param = (SQLRelayParameter)Parameters[i];
+
+                if (param.Direction == ParameterDirection.Output)
+                {
+                    switch (param.DbType)
+                    {
+                        case DbType.AnsiString:
+                        case DbType.AnsiStringFixedLength:
+                        case DbType.Date:
+                        case DbType.DateTime:
+                        case DbType.DateTime2:
+                        case DbType.DateTimeOffset:
+                        case DbType.String:
+                        case DbType.StringFixedLength:
+                        case DbType.Time:
+                        case DbType.Guid:
+                            param.Value = _sqlrcur.getOutputBindString(param.ParameterName);
+                            return;
+
+                        case DbType.Binary:
+                            param.Value = _sqlrcur.getOutputBindBlob(param.ParameterName);
+                            return;
+
+                        case DbType.Boolean:
+                            param.Value = _sqlrcur.getOutputBindInteger(param.ParameterName);
+                            return;
+
+                        case DbType.Currency:
+                        case DbType.Decimal:
+                        case DbType.Single:
+                        case DbType.Double:
+                        case DbType.VarNumeric:
+                            param.Value = _sqlrcur.getOutputBindDouble(param.ParameterName);
+                            return;
+
+                        case DbType.Byte:
+                        case DbType.Int16:
+                        case DbType.Int32:
+                        case DbType.Int64:
+                        case DbType.SByte:
+                        case DbType.UInt16:
+                        case DbType.UInt32:
+                        case DbType.UInt64:
+                            param.Value = _sqlrcur.getOutputBindInteger(param.ParameterName);
+                            return;
+
+                        case DbType.Object:
+                        case DbType.Xml:
+                            param.Value = _sqlrcur.getOutputBindString(param.ParameterName);
+                            return;
+                    }
+                }
             }
         }
 
