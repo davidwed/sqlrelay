@@ -230,82 +230,82 @@ public class SQLRConnection : IDisposable
 
     private IntPtr sqlrconref;
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern IntPtr sqlrcon_alloc_copyrefs(string server, ushort port, string socket, string user, string password, int retrytime, int tries, bool copyreferences);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_free(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_setTimeout(IntPtr sqlrconref, int timeoutsec, int timeoutusec);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_endSession(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcon_suspendSession(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern ushort sqlrcon_getConnectionPort(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern string sqlrcon_getConnectionSocket(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcon_resumeSession(IntPtr sqlrconref, ushort port, string socket);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcon_ping(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern string sqlrcon_identify(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern string sqlrcon_dbVersion(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern string sqlrcon_serverVersion(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern string sqlrcon_clientVersion(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern string sqlrcon_bindFormat(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcon_selectDatabase(IntPtr sqlrconref, string database);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern string sqlrcon_getCurrentDatabase(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern ulong sqlrcon_getLastInsertId(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcon_autoCommitOn(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcon_autoCommitOff(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcon_commit(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcon_rollback(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern string sqlrcon_errorMessage(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern long sqlrcon_errorNumber(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_debugOn(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_debugOff(IntPtr sqlrconref);
     
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcon_getDebug(IntPtr sqlrconref);
 }
 
