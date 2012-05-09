@@ -322,11 +322,11 @@ namespace SQLRClient
             }
             else if (type == "TEXT")
             {
-                return Convert.ToString(System.Text.Encoding.Default.GetString(field));
+                return System.Text.Encoding.Default.GetString(field);
             }
             else if (type == "VARCHAR")
             {
-                return Convert.ToString(System.Text.Encoding.Default.GetString(field));
+                return System.Text.Encoding.Default.GetString(field);
             }
             else if (type == "VARBINARY")
             {
@@ -334,7 +334,7 @@ namespace SQLRClient
             }
             else if (type == "LONGCHAR")
             {
-                return Convert.ToString(System.Text.Encoding.Default.GetString(field));
+                return System.Text.Encoding.Default.GetString(field);
             }
             else if (type == "LONGBINARY")
             {
@@ -1074,32 +1074,38 @@ namespace SQLRClient
 
         public Int16 GetInt16(int i)
         {
-            return Convert.ToInt16(GetValue(i));
+            //return Convert.ToInt16(GetValue(i));
+            return (Int16)_sqlrcur.getFieldAsInteger(_currentrow, (uint)i);
         }
 
         public Int32 GetInt32(int i)
         {
-            return Convert.ToInt32(GetValue(i));
+            //return Convert.ToInt32(GetValue(i));
+            return (Int32)_sqlrcur.getFieldAsInteger(_currentrow, (uint)i);
         }
 
         public Int64 GetInt64(int i)
         {
-            return Convert.ToInt64(GetValue(i));
+            //return Convert.ToInt64(GetValue(i));
+            return _sqlrcur.getFieldAsInteger(_currentrow, (uint)i);
         }
 
         public float GetFloat(int i)
         {
-            return (float)Convert.ToSingle(GetValue(i));
+            //return (float)Convert.ToSingle(GetValue(i));
+            return (float)_sqlrcur.getFieldAsDouble(_currentrow, (uint)i);
         }
 
         public double GetDouble(int i)
         {
-            return Convert.ToDouble(GetValue(i));
+            //return Convert.ToDouble(GetValue(i));
+            return _sqlrcur.getFieldAsDouble(_currentrow, (uint)i);
         }
 
         public String GetString(int i)
         {
-            return Convert.ToString(GetValue(i));
+            //return Convert.ToString(GetValue(i));
+            return _sqlrcur.getField(_currentrow, (uint)i);
         }
 
         public Decimal GetDecimal(int i)

@@ -246,13 +246,9 @@ namespace SQLRClient
 
             if (Parameters.Count == 0)
             {
-                if (_prepared)
+                if ((_prepared) ? _sqlrcur.executeQuery() : _sqlrcur.sendQuery(_commandtext))
                 {
-                    return _sqlrcur.executeQuery();
-                }
-                else
-                {
-                    return _sqlrcur.sendQuery(_commandtext);
+                    return true;
                 }
             }
             else
@@ -264,14 +260,15 @@ namespace SQLRClient
 
                 bindParameters();
 
-                if (!_sqlrcur.executeQuery())
+                if (_sqlrcur.executeQuery())
                 {
-                    return false;
+                    copyOutBindValues();
+                    return true;
                 }
-
-                copyOutBindValues();
-                return true;
             }
+
+            // FIXME: this should probably be some particular kind of exception5
+            throw new Exception(_sqlrcur.errorMessage());
         }
 
         private void bindParameters()
@@ -300,15 +297,15 @@ namespace SQLRClient
                         case DbType.Time:
                         case DbType.Guid:
                             _sqlrcur.inputBind(param.ParameterName, (string)param.Value);
-                            return;
+                            break;
 
                         case DbType.Binary:
                             // FIXME: I should use inputBindBlob but how do i get the size?
-                            return;
+                            break;
 
                         case DbType.Boolean:
                             _sqlrcur.inputBind(param.ParameterName, (((bool)param.Value)==true) ? 1 : 0);
-                            return;
+                            break;
 
                         case DbType.Currency:
                         case DbType.Decimal:
@@ -316,7 +313,7 @@ namespace SQLRClient
                         case DbType.Double:
                         case DbType.VarNumeric:
                             _sqlrcur.inputBind(param.ParameterName, (double)param.Value, 0, 0);
-                            return;
+                            break;
 
                         case DbType.Byte:
                         case DbType.Int16:
@@ -327,12 +324,12 @@ namespace SQLRClient
                         case DbType.UInt32:
                         case DbType.UInt64:
                             _sqlrcur.inputBind(param.ParameterName, (long)param.Value);
-                            return;
+                            break;
 
                         case DbType.Object:
                         case DbType.Xml:
                             _sqlrcur.inputBind(param.ParameterName, param.Value.ToString());
-                            return;
+                            break;
                     }
 
                 }
@@ -352,15 +349,15 @@ namespace SQLRClient
                         case DbType.Guid:
                             // FIXME: length?
                             _sqlrcur.defineOutputBindString(param.ParameterName, 32768);
-                            return;
+                            break;
 
                         case DbType.Binary:
                             // FIXME: I should use inputBindBlob but how do i get the size?
-                            return;
+                            break;
 
                         case DbType.Boolean:
                             _sqlrcur.defineOutputBindInteger(param.ParameterName);
-                            return;
+                            break;
 
                         case DbType.Currency:
                         case DbType.Decimal:
@@ -368,7 +365,7 @@ namespace SQLRClient
                         case DbType.Double:
                         case DbType.VarNumeric:
                             _sqlrcur.defineOutputBindDouble(param.ParameterName);
-                            return;
+                            break;
 
                         case DbType.Byte:
                         case DbType.Int16:
@@ -379,13 +376,13 @@ namespace SQLRClient
                         case DbType.UInt32:
                         case DbType.UInt64:
                             _sqlrcur.defineOutputBindInteger(param.ParameterName);
-                            return;
+                            break;
 
                         case DbType.Object:
                         case DbType.Xml:
                             // FIXME: length?
                             _sqlrcur.defineOutputBindString(param.ParameterName, 32768);
-                            return;
+                            break;
                     }
                 }
                 else if (param.Direction == ParameterDirection.InputOutput)
@@ -418,15 +415,15 @@ namespace SQLRClient
                         case DbType.Time:
                         case DbType.Guid:
                             param.Value = _sqlrcur.getOutputBindString(param.ParameterName);
-                            return;
+                            break;
 
                         case DbType.Binary:
                             param.Value = _sqlrcur.getOutputBindBlob(param.ParameterName);
-                            return;
+                            break;
 
                         case DbType.Boolean:
                             param.Value = _sqlrcur.getOutputBindInteger(param.ParameterName);
-                            return;
+                            break;
 
                         case DbType.Currency:
                         case DbType.Decimal:
@@ -434,7 +431,7 @@ namespace SQLRClient
                         case DbType.Double:
                         case DbType.VarNumeric:
                             param.Value = _sqlrcur.getOutputBindDouble(param.ParameterName);
-                            return;
+                            break;
 
                         case DbType.Byte:
                         case DbType.Int16:
@@ -445,12 +442,12 @@ namespace SQLRClient
                         case DbType.UInt32:
                         case DbType.UInt64:
                             param.Value = _sqlrcur.getOutputBindInteger(param.ParameterName);
-                            return;
+                            break;
 
                         case DbType.Object:
                         case DbType.Xml:
                             param.Value = _sqlrcur.getOutputBindString(param.ParameterName);
-                            return;
+                            break;
                     }
                 }
             }

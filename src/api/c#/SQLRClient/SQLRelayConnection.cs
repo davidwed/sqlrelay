@@ -145,6 +145,26 @@ namespace SQLRClient
             }
         }
 
+        public bool Debug
+        {
+            get
+            {
+                return _debug;
+            }
+            set
+            {
+                _debug = value;
+                if (_debug)
+                {
+                    _sqlrcon.debugOn();
+                }
+                else
+                {
+                    _sqlrcon.debugOff();
+                }
+            }
+        }
+
         #endregion
 
 
@@ -165,7 +185,11 @@ namespace SQLRClient
             _connectionstate = ConnectionState.Open;
             _sqlrcon = new SQLRConnection(_host, _port, _socket, _user, _password, _retrytime, _tries);
             ChangeDatabase(_db);
-            _sqlrcon.debugOn();
+
+            if (_debug)
+            {
+                _sqlrcon.debugOn();
+            }
         }
 
         public void Close()

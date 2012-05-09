@@ -55,7 +55,9 @@ namespace SQLRClient
                 return base.Add(value);
             }
             else
+            {
                 throw new ArgumentException("parameter must be named");
+            }
         }
 
         public int Add(string parameterName, DbType type)
