@@ -19,6 +19,7 @@ namespace SQLRClient
         private int _retrytime = 0;
         private int _tries = 1;
         private string _db = null;
+        private bool _debug = false;
 
         #endregion
 
@@ -72,6 +73,7 @@ namespace SQLRClient
                 _retrytime = 0;
                 _tries = 0;
                 _db = null;
+                _debug = false;
 
                 // parse the connection string
                 string[] parts = ConnectionString.Split(";".ToCharArray());
@@ -110,6 +112,10 @@ namespace SQLRClient
                     else if (subparts[0] == "db")
                     {
                         _db = subparts[1];
+                    }
+                    else if (subparts[0] == "debug")
+                    {
+                        _debug = (subparts[1] == "true");
                     }
                 }
             }

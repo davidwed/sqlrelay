@@ -276,7 +276,9 @@ namespace SQLRClient
 
         private void bindParameters()
         {
-            
+
+            _sqlrcur.clearBinds();
+
             for (int i = 0; i < Parameters.Count; i++)
             {
 

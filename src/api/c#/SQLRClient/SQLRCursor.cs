@@ -765,305 +765,305 @@ public class SQLRCursor : IDisposable
 
     private IntPtr sqlrcurref;
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern IntPtr sqlrcur_alloc_copyrefs(IntPtr sqlrconref, int copyrefs);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_free(IntPtr sqlrcurref);
 
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_setResultSetBufferSize(IntPtr sqlrcurref, ulong rows);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern ulong sqlrcur_getResultSetBufferSize(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_dontGetColumnInfo(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_getColumnInfo(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_mixedCaseColumnNames(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_upperCaseColumnNames(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_lowerCaseColumnNames(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_cacheToFile(IntPtr sqlrcurref, string filename);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_setCacheTtl(IntPtr sqlrcurref, uint ttl);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern string sqlrcur_getCacheFileName(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_cacheOff(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getDatabaseList(IntPtr sqlrcurref, string wild);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getTableList(IntPtr sqlrcurref, string wild);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getColumnList(IntPtr sqlrcurref, string table, string wild);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_sendQuery(IntPtr sqlrcurref, string query);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_sendQueryWithLength(IntPtr sqlrcurref, string query, uint length);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_sendFileQuery(IntPtr sqlrcurref, string path, string filename);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_prepareQuery(IntPtr sqlrcurref, string query);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_prepareQueryWithLength(IntPtr sqlrcurref, string query, uint length);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_prepareFileQuery(IntPtr sqlrcurref, string path, string filename);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_subString(IntPtr sqlrcurref, string variable, string val);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_subLong(IntPtr sqlrcurref, string variable, long val);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_subDouble(IntPtr sqlrcurref, string variable, double val, uint precision, uint scale);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_inputBindString(IntPtr sqlrcurref, string variable, string val);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_inputBindStringWithLength(IntPtr sqlrcurref, string variable, string val, uint vallength);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_inputBindLong(IntPtr sqlrcurref, string variable, long val);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_inputBindDouble(IntPtr sqlrcurref, string variable, double val, uint precision, uint scale);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_inputBindBlob(IntPtr sqlrcurref, string variable, string val, uint size);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_inputBindClob(IntPtr sqlrcurref, string variable, string val, uint size);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_defineOutputBindString(IntPtr sqlrcurref, string variable, uint length);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_defineOutputBindInteger(IntPtr sqlrcurref, string variable);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_defineOutputBindDouble(IntPtr sqlrcurref, string variable);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_defineOutputBindBlob(IntPtr sqlrcurref, string variable);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_defineOutputBindClob(IntPtr sqlrcurref, string variable);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_defineOutputBindCursor(IntPtr sqlrcurref, string variable);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_clearBinds(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern ushort sqlrcur_countBindVariables(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_validateBinds(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_validBind(IntPtr sqlrcurref, string variable);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_executeQuery(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_fetchFromBindCursor(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern string sqlrcur_getOutputBindString(IntPtr sqlrcurref, string variable);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern long sqlrcur_getOutputBindInteger(IntPtr sqlrcurref, string variable);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern double sqlrcur_getOutputBindDouble(IntPtr sqlrcurref, string variable);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern string sqlrcur_getOutputBindBlob(IntPtr sqlrcurref, string variable);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern string sqlrcur_getOutputBindClob(IntPtr sqlrcurref, string variable);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern uint sqlrcur_getOutputBindLength(IntPtr sqlrcurref, string variable);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern IntPtr sqlrcur_getOutputBindCursor_copyrefs(IntPtr sqlrcurref, string variable, int copyrefs);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_openCachedResultSet(IntPtr sqlrcurref, string filename);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern uint sqlrcur_colCount(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern ulong sqlrcur_rowCount(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern ulong sqlrcur_totalRows(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern ulong sqlrcur_affectedRows(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern ulong sqlrcur_firstRowIndex(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_endOfResultSet(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern string sqlrcur_errorMessage(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern long sqlrcur_errorNumber(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_getNullsAsEmptyStrings(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_getNullsAsNulls(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern byte[] sqlrcur_getFieldByIndex(IntPtr sqlrcurref, ulong row, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern byte[] sqlrcur_getFieldByName(IntPtr sqlrcurref, ulong row, string col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern long sqlrcur_getFieldAsIntegerByIndex(IntPtr sqlrcurref, ulong row, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern long sqlrcur_getFieldAsIntegerByName(IntPtr sqlrcurref, ulong row, string col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern double sqlrcur_getFieldAsDoubleByIndex(IntPtr sqlrcurref, ulong row, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern double sqlrcur_getFieldAsDoubleByName(IntPtr sqlrcurref, ulong row, string col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern uint sqlrcur_getFieldLengthByIndex(IntPtr sqlrcurref, ulong row, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern uint sqlrcur_getFieldLengthByName(IntPtr sqlrcurref, ulong row, string col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern string sqlrcur_getColumnName(IntPtr sqlrcurref, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern string sqlrcur_getColumnTypeByIndex(IntPtr sqlrcurref, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern string sqlrcur_getColumnTypeByName(IntPtr sqlrcurref, string col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern uint sqlrcur_getColumnLengthByIndex(IntPtr sqlrcurref, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern uint sqlrcur_getColumnLengthByName(IntPtr sqlrcurref, string col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern uint sqlrcur_getColumnPrecisionByIndex(IntPtr sqlrcurref, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern uint sqlrcur_getColumnPrecisionByName(IntPtr sqlrcurref, string col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern uint sqlrcur_getColumnScaleByIndex(IntPtr sqlrcurref, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern uint sqlrcur_getColumnScaleByName(IntPtr sqlrcurref, string col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getColumnIsNullableByIndex(IntPtr sqlrcurref, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getColumnIsNullableByName(IntPtr sqlrcurref, string col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getColumnIsPrimaryKeyByIndex(IntPtr sqlrcurref, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getColumnIsPrimaryKeyByName(IntPtr sqlrcurref, string col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getColumnIsUniqueByIndex(IntPtr sqlrcurref, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getColumnIsUniqueByName(IntPtr sqlrcurref, string col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getColumnIsPartOfKeyByIndex(IntPtr sqlrcurref, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getColumnIsPartOfKeyByName(IntPtr sqlrcurref, string col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getColumnIsUnsignedByIndex(IntPtr sqlrcurref, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getColumnIsUnsignedByName(IntPtr sqlrcurref, string col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getColumnIsZeroFilledByIndex(IntPtr sqlrcurref, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getColumnIsZeroFilledByName(IntPtr sqlrcurref, string col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getColumnIsBinaryByIndex(IntPtr sqlrcurref, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getColumnIsBinaryByName(IntPtr sqlrcurref, string col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getColumnIsAutoIncrementByIndex(IntPtr sqlrcurref, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_getColumnIsAutoIncrementByName(IntPtr sqlrcurref, string col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern uint sqlrcur_getLongestByIndex(IntPtr sqlrcurref, uint col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern uint sqlrcur_getLongestByName(IntPtr sqlrcurref, string col);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_suspendResultSet(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern ushort sqlrcur_getResultSetId(IntPtr sqlrcurref);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_resumeResultSet(IntPtr sqlrcurref, ushort id);
 
-    [DllImport("libsqlrclientwrapper.dll")]
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern int sqlrcur_resumeCachedResultSet(IntPtr sqlrcurref, ushort id, string filename);
 }
 
