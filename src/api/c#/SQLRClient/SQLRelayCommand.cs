@@ -199,7 +199,7 @@ namespace SQLRClient
                 {
                     return null;
                 }
-                return (object)_sqlrcur.getField(0, 0);
+                return SQLRelayDataReader.convertField(_sqlrcur.getFieldAsByteArray(0, 0), _sqlrcur.getColumnType(0), _sqlrcur.getColumnScale(0));
             }
             return null;
         }

@@ -6,16 +6,22 @@ namespace SQLRClient
 {
     public class SQLRelayDataReader : IDataReader
     {
+
+        #region member variables
+
         private bool _open = true;
         private SQLRelayConnection _sqlrelaycon = null;
         private SQLRCursor _sqlrcur = null;
         private bool _endsession = false;
         private bool _unfetched = true;
         private ulong _currentrow = 0;
-
         private bool[] _havevalues = null;
         private object[] _values = null;
-        
+
+        #endregion
+
+
+        #region constructors and destructors
 
         internal SQLRelayDataReader(SQLRelayConnection sqlrelaycon, SQLRCursor sqlrcur, bool endsession)
         {
@@ -23,6 +29,33 @@ namespace SQLRClient
             _sqlrcur = sqlrcur;
             _endsession = endsession;
         }
+
+        void IDisposable.Dispose()
+        {
+            this.Dispose(true);
+            System.GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                try
+                {
+                    this.Close();
+                }
+                catch (Exception e)
+                {
+                    throw new SystemException("An exception of type " + e.GetType() +
+                                              " was encountered while closing the SQLRelayDataReader.");
+                }
+            }
+        }
+
+        #endregion
+
+
+        #region properties
 
         public int Depth
         {
@@ -48,6 +81,11 @@ namespace SQLRClient
                 return (int)_sqlrcur.affectedRows();
             }
         }
+
+        #endregion
+
+
+        #region public methods
 
         public void Close()
         {
@@ -90,8 +128,79 @@ namespace SQLRClient
 
         public DataTable GetSchemaTable()
         {
-            // FIXME: implement this
-            throw new NotSupportedException();
+
+            DataTable datatable = new DataTable();
+
+            datatable.Columns.Add("ColumnName", typeof(String));
+            datatable.Columns.Add("ColumnOrdinal", typeof(UInt32));
+            datatable.Columns.Add("ColumnSize", typeof(UInt32));
+            datatable.Columns.Add("NumericPrecision", typeof(UInt32));
+            datatable.Columns.Add("NumericScale", typeof(UInt32));
+            datatable.Columns.Add("IsUnique", typeof(Boolean));
+            datatable.Columns.Add("IsKey", typeof(Boolean));
+            datatable.Columns.Add("BaseServerName", typeof(String));
+            datatable.Columns.Add("BaseCatalogName", typeof(String));
+            datatable.Columns.Add("BaseColumnName", typeof(String));
+            datatable.Columns.Add("BaseSchemaName", typeof(String));
+            datatable.Columns.Add("BaseTableName", typeof(String));
+            datatable.Columns.Add("DataType", typeof(Type));
+            datatable.Columns.Add("AllowDBNull", typeof(Boolean));
+            datatable.Columns.Add("ProviderType", typeof(String));
+            datatable.Columns.Add("IsAliased", typeof(Boolean));
+            datatable.Columns.Add("IsExpression", typeof(Boolean));
+            datatable.Columns.Add("IsIdentity", typeof(Boolean));
+            datatable.Columns.Add("IsAutoIncrement", typeof(Boolean));
+            datatable.Columns.Add("IsRowVersion", typeof(Boolean));
+            datatable.Columns.Add("IsHidden", typeof(Boolean));
+            datatable.Columns.Add("IsLong", typeof(Boolean));
+            datatable.Columns.Add("IsReadOnly", typeof(Boolean));
+            datatable.Columns.Add("ProviderSpecificDataType", typeof(String));
+            datatable.Columns.Add("DataTypeName", typeof(String));
+            datatable.Columns.Add("XmlSchemaCollectionDatabase", typeof(String));
+            datatable.Columns.Add("XmlSchemaCollectionOwningSchema", typeof(String));
+            datatable.Columns.Add("XmlSchemaCollectionName", typeof(String));
+
+            datatable.BeginLoadData();
+            for (uint i=0; i<FieldCount; i++)
+            {
+
+                DataRow row = datatable.NewRow();
+                
+                row["ColumnName"] = GetName((int)i);
+                row["ColumnOrdinal"] = i;
+                row["ColumnSize"] = _sqlrcur.getColumnLength(i);
+                row["NumericPrecision"] = _sqlrcur.getColumnPrecision(i);
+                row["NumericScale"] = _sqlrcur.getColumnScale(i);
+                row["IsUnique"] = _sqlrcur.getColumnIsUnique(i);
+                row["IsKey"] = _sqlrcur.getColumnIsPrimaryKey(i) || _sqlrcur.getColumnIsPartOfKey(i);
+                row["BaseServerName"] = null;
+                row["BaseCatalogName"] = null;
+                row["BaseColumnName"] = GetName((int)i);
+                row["BaseSchemaName"] = null;
+                row["BaseTableName"] = null;
+                row["DataType"] = null; // FIXME
+                row["AllowDBNull"] = _sqlrcur.getColumnIsNullable(i);
+                row["ProviderType"] = _sqlrcur.getColumnType(i);
+                row["IsAliased"] = false;
+                row["IsExpression"] = false;
+                row["IsIdentity"] = false;
+                row["IsAutoIncrement"] = _sqlrcur.getColumnIsAutoIncrement(i);
+                row["IsRowVersion"] = false;
+                row["IsHidden"] = false;
+                row["IsLong"] = false; // FIXME
+                row["IsReadOnly"] = false;
+                row["ProviderSpecificDataType"] = _sqlrcur.getColumnType(i);
+                row["DataTypeName"] = _sqlrcur.getColumnType(i);
+                row["XmlSchemaCollectionDatabase"] = null;
+                row["XmlSchemaCollectionOwningSchema"] = null;
+                row["XmlSchemaCollectionName"] = null;
+
+                datatable.Rows.Add(row);
+                datatable.AcceptChanges();
+            }
+            datatable.EndLoadData();
+
+            return datatable;
         }
 
         public int FieldCount
@@ -131,734 +240,7 @@ namespace SQLRClient
             }
 
             // get the field
-            object field = _sqlrcur.getField(_currentrow, (uint)i);
-
-            // convert as appropriate
-            string type = GetDataTypeName(i);
-
-            // map the field type a value in the .NET Type class
-            object retval = null;
-            if (type == "UNKNOWN")
-            {
-                retval = Convert.ToString(field);
-            }
-            // addded by freetds
-            else if (type == "CHAR")                        // 1
-            {
-                retval = Convert.ToString(field);
-            }
-            else if (type == "INT")
-            {
-                retval = Convert.ToInt32(field);
-            }
-            else if (type == "SMALLINT")
-            {
-                retval = Convert.ToInt16(field);
-            }
-            else if (type == "TINYINT")
-            {
-                retval = Convert.ToChar(field);
-            }
-            else if (type == "MONEY")
-            {
-                retval = Convert.ToDecimal(field);
-            }
-            else if (type == "DATETIME")
-            {
-                retval = DateTime.Parse(Convert.ToString(field));
-            }
-            else if (type == "NUMERIC")
-            {
-                retval = Convert.ToDecimal(retval);
-            }
-            else if (type == "DECIMAL")
-            {
-                retval = Convert.ToDecimal(retval);
-            }
-            else if (type == "SMALLDATETIME")
-            {
-                retval = DateTime.Parse(Convert.ToString(field));
-            }
-            else if (type == "SMALLMONEY")
-            {
-                retval = Convert.ToDecimal(retval);
-            }
-            else if (type == "IMAGE")
-            {
-                retval = field;
-            }
-            else if (type == "BINARY")
-            {
-                retval = field;
-            }
-            else if (type == "BIT")
-            {
-                retval = Convert.ToBoolean(retval);
-            }
-            else if (type == "REAL")
-            {
-                retval = Convert.ToDouble(retval);
-            }
-            else if (type == "FLOAT")
-            {
-                retval = Convert.ToSingle(retval);
-            }
-            else if (type == "TEXT")
-            {
-                retval = Convert.ToString(retval);
-            }
-            else if (type == "VARCHAR")
-            {
-                retval = Convert.ToString(retval);
-            }
-            else if (type == "VARBINARY")
-            {
-                retval = field;
-            }
-            else if (type == "LONGCHAR")
-            {
-                retval = Convert.ToString(retval);
-            }
-            else if (type == "LONGBINARY")
-            {
-                retval = field;
-            }
-            else if (type == "LONG")
-            {
-                retval = field;
-            }
-            else if (type == "ILLEGAL")
-            {
-                retval = field;
-            }
-            else if (type == "SENSITIVITY")
-            {
-                retval = field;
-            }
-            else if (type == "BOUNDARY")
-            {
-                retval = field;
-            }
-            else if (type == "VOID")
-            {
-                retval = null;
-            }
-            else if (type == "USHORT")
-            {
-                retval = Convert.ToUInt16(field);
-            }
-            // added by lago
-            else if (type == "UNDEFINED")            // 27
-            {
-                retval = field;
-            }
-            else if (type == "DOUBLE")
-            {
-                retval = Convert.ToDouble(field);
-            }
-            else if (type == "DATE")
-            {
-                retval = DateTime.Parse(Convert.ToString(field));
-            }
-            else if (type == "TIME")
-            {
-                retval = DateTime.Parse(Convert.ToString(field));
-            }
-            else if (type == "TIMESTAMP")
-            {
-                retval = DateTime.Parse(Convert.ToString(field));
-            }
-            // added by msql
-            else if (type == "UINT")                        // 32
-            {
-                retval = Convert.ToUInt32(field);
-            }
-            else if (type == "LASTREAL")
-            {
-                retval = Convert.ToDouble(field);
-            }
-            // added by mysql
-            else if (type == "STRING")            // 34
-            {
-                retval = Convert.ToString(field);
-            }
-            else if (type == "VARSTRING")
-            {
-                retval = Convert.ToString(field);
-            }
-            else if (type == "LONGLONG")
-            {
-                retval = Convert.ToInt64(field);
-            }
-            else if (type == "MEDIUMINT")
-            {
-                retval = Convert.ToInt32(field);
-            }
-            else if (type == "YEAR")
-            {
-                retval = Convert.ToInt64(field);
-            }
-            else if (type == "NEWDATE")
-            {
-                retval = DateTime.Parse(Convert.ToString(field));
-            }
-            else if (type == "NULL")
-            {
-                retval = null;
-            }
-            else if (type == "ENUM")
-            {
-                retval = field;
-            }
-            else if (type == "SET")
-            {
-                retval = field;
-            }
-            else if (type == "TINYBLOB")
-            {
-                retval = field;
-            }
-            else if (type == "MEDIUMBLOB")
-            {
-                retval = field;
-            }
-            else if (type == "LONGBLOB")
-            {
-                retval = field;
-            }
-            else if (type == "BLOB")
-            {
-                retval = field;
-            }
-            // added by oracle
-            else if (type == "VARCHAR2")            // 47
-            {
-                retval = Convert.ToString(field);
-            }
-            else if (type == "NUMBER")
-            {
-                if (_sqlrcur.getColumnScale((uint)i) == 0)
-                {
-                    retval = Convert.ToInt64(field);
-                }
-                else
-                {
-                    retval = Convert.ToDecimal(field);
-                }
-            }
-            else if (type == "ROWID")
-            {
-                retval = Convert.ToUInt64(field);
-            }
-            else if (type == "RAW")
-            {
-                retval = field;
-            }
-            else if (type == "LONG_RAW")
-            {
-                retval = field;
-            }
-            else if (type == "MLSLABEL")
-            {
-                retval = field;
-            }
-            else if (type == "CLOB")
-            {
-                retval = Convert.ToString(field);
-            }
-            else if (type == "BFILE")
-            {
-                retval = field;
-            }
-            // added by odbc
-            else if (type == "BIGINT")            // 55
-            {
-                retval = Convert.ToInt64(field);
-            }
-            else if (type == "INTEGER")
-            {
-                retval = Convert.ToInt32(field);
-            }
-            else if (type == "LONGVARBINARY")
-            {
-                retval = field;
-            }
-            else if (type == "LONGVARCHAR")
-            {
-                retval = Convert.ToString(field);
-            }
-            // added by db2
-            else if (type == "GRAPHIC")            // 59
-            {
-                retval = field;
-            }
-            else if (type == "VARGRAPHIC")
-            {
-                retval = field;
-            }
-            else if (type == "LONGVARGRAPHIC")
-            {
-                retval = field;
-            }
-            else if (type == "DBCLOB")
-            {
-                retval = Convert.ToString(field);
-            }
-            else if (type == "DATALINK")
-            {
-                retval = field;
-            }
-            else if (type == "USER_DEFINED_TYPE")
-            {
-                retval = field;
-            }
-            else if (type == "SHORT_DATATYPE")
-            {
-                retval = Convert.ToInt16(field);
-            }
-            else if (type == "TINY_DATATYPE")
-            {
-                retval = Convert.ToChar(field);
-            }
-            // added by firebird
-            else if (type == "D_FLOAT")            // 67
-            {
-                retval = Convert.ToSingle(field);
-            }
-            else if (type == "ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "QUAD")
-            {
-                retval = Convert.ToUInt64(field);
-            }
-            else if (type == "INT64")
-            {
-                retval = Convert.ToInt64(field);
-            }
-            else if (type == "DOUBLE PRECISION")
-            {
-                retval = Convert.ToDouble(field);
-            }
-            // added by postgresql
-            else if (type == "BOOL")
-            {
-                retval = Convert.ToBoolean(field);
-            }
-            else if (type == "BYTEA")
-            {
-                retval = field;
-            }
-            else if (type == "NAME")
-            {
-                retval = Convert.ToString(field);
-            }
-            else if (type == "INT8")
-            {
-                retval = Convert.ToInt64(field);
-            }
-            else if (type == "INT2")
-            {
-                retval = Convert.ToInt16(field);
-            }
-            else if (type == "INT2VECTOR")
-            {
-                retval = field;
-            }
-            else if (type == "INT4")
-            {
-                retval = Convert.ToInt32(field);
-            }
-            else if (type == "REGPROC")
-            {
-                retval = field;
-            }
-            else if (type == "OID")
-            {
-                retval = Convert.ToInt64(field);
-            }
-            else if (type == "TID")
-            {
-                retval = Convert.ToInt64(field);
-            }
-            else if (type == "XID")
-            {
-                retval = Convert.ToInt64(field);
-            }
-            else if (type == "CID")
-            {
-                retval = Convert.ToInt64(field);
-            }
-            else if (type == "OIDVECTOR")
-            {
-                retval = field;
-            }
-            else if (type == "SMGR")
-            {
-                retval = field;
-            }
-            else if (type == "POINT")
-            {
-                retval = field;
-            }
-            else if (type == "LSEG")
-            {
-                retval = field;
-            }
-            else if (type == "PATH")
-            {
-                retval = field;
-            }
-            else if (type == "BOX")
-            {
-                retval = field;
-            }
-            else if (type == "POLYGON")
-            {
-                retval = field;
-            }
-            else if (type == "LINE")
-            {
-                retval = field;
-            }
-            else if (type == "LINE_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "FLOAT4")
-            {
-                retval = Convert.ToSingle(field);
-            }
-            else if (type == "FLOAT8")
-            {
-                retval = Convert.ToDouble(field);
-            }
-            else if (type == "ABSTIME")
-            {
-                // I guess...
-                retval = Convert.ToInt64(field);
-            }
-            else if (type == "RELTIME")
-            {
-                // I guess...
-                retval = Convert.ToInt64(field);
-            }
-            else if (type == "TINTERVAL")
-            {
-                retval = Convert.ToInt64(field);
-            }
-            else if (type == "CIRCLE")
-            {
-                retval = field;
-            }
-            else if (type == "CIRCLE_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "MONEY_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "MACADDR")
-            {
-                // not sure what to do with a mac addr, presumably it's a 4 byte array
-                retval = field;
-            }
-            else if (type == "INET")
-            {
-                retval = field;
-            }
-            else if (type == "CIDR")
-            {
-                retval = field;
-            }
-            else if (type == "BOOL_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "BYTEA_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "CHAR_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "NAME_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "INT2_ARRAY")
-            {
-                // ???
-                retval = field;
-            }
-            else if (type == "INT2VECTOR_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "INT4_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "REGPROC_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "TEXT_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "OID_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "TID_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "XID_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "CID_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "OIDVECTOR_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "BPCHAR_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "VARCHAR_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "INT8_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "POINT_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "LSEG_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "PATH_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "BOX_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "FLOAT4_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "FLOAT8_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "ABSTIME_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "RELTIME_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "TINTERVAL_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "POLYGON_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "ACLITEM")
-            {
-                retval = field;
-            }
-            else if (type == "ACLITEM_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "MACADDR_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "INET_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "CIDR_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "BPCHAR")
-            {
-                retval = Convert.ToString(field);
-            }
-            else if (type == "TIMESTAMP_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "DATE_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "TIME_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "TIMESTAMPTZ")
-            {
-                retval = field;
-            }
-            else if (type == "TIMESTAMPTZ_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "INTERVAL")
-            {
-                retval = field;
-            }
-            else if (type == "INTERVAL_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "NUMERIC_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "TIMETZ")
-            {
-                retval = field;
-            }
-            else if (type == "TIMETZ_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "BIT_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "VARBIT")
-            {
-                retval = field;
-            }
-            else if (type == "VARBIT_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "REFCURSOR")
-            {
-                retval = field;
-            }
-            else if (type == "REFCURSOR_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "REGPROCEDURE")
-            {
-                retval = field;
-            }
-            else if (type == "REGOPER")
-            {
-                retval = field;
-            }
-            else if (type == "REGOPERATOR")
-            {
-                retval = field;
-            }
-            else if (type == "REGCLASS")
-            {
-                retval = field;
-            }
-            else if (type == "REGTYPE")
-            {
-                retval = field;
-            }
-            else if (type == "REGPROCEDURE_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "REGOPER_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "REGOPERATOR_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "REGCLASS_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "REGTYPE_ARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "RECORD")
-            {
-                retval = field;
-            }
-            else if (type == "CSTRING")
-            {
-                retval = Convert.ToString(field);
-            }
-            else if (type == "ANY")
-            {
-                retval = field;
-            }
-            else if (type == "ANYARRAY")
-            {
-                retval = field;
-            }
-            else if (type == "TRIGGER")
-            {
-                retval = field;
-            }
-            else if (type == "LANGUAGE_HANDLER")
-            {
-                retval = field;
-            }
-            else if (type == "INTERNAL")
-            {
-                retval = field;
-            }
-            else if (type == "OPAQUE")
-            {
-                retval = field;
-            }
-            else if (type == "ANYELEMENT")
-            {
-                retval = field;
-            }
-            else if (type == "PG_TYPE")
-            {
-                retval = field;
-            }
-            else if (type == "PG_ATTRIBUTE")
-            {
-                retval = field;
-            }
-            else if (type == "PG_PROC")
-            {
-                retval = field;
-            }
-            else if (type == "PG_CLASS")
-            {
-                retval = field;
-            }
-            // none added by sqlite
+            object retval = convertField(_sqlrcur.getFieldAsByteArray(_currentrow, (uint)i), GetDataTypeName(i), _sqlrcur.getColumnScale((uint)i));
 
             // cache the value
             _havevalues[i] = true;
@@ -866,6 +248,737 @@ namespace SQLRClient
 
             // return the value
             return retval;
+        }
+
+        public static Object convertField(byte[] field, string type, uint scale)
+        {
+
+            // convert the field to a native type...
+
+            if (type == "UNKNOWN")
+            {
+                return System.Text.Encoding.Default.GetString(field);
+            }
+            // addded by freetds
+            else if (type == "CHAR")                        // 1
+            {
+                return System.Text.Encoding.Default.GetString(field);
+            }
+            else if (type == "INT")
+            {
+                return Convert.ToInt32(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "SMALLINT")
+            {
+                return Convert.ToInt16(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "TINYINT")
+            {
+                return Convert.ToInt16(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "MONEY")
+            {
+                return Convert.ToDecimal(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "DATETIME")
+            {
+                return DateTime.Parse(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "NUMERIC")
+            {
+                return Convert.ToDecimal(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "DECIMAL")
+            {
+                return Convert.ToDecimal(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "SMALLDATETIME")
+            {
+                return DateTime.Parse(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "SMALLMONEY")
+            {
+                return Convert.ToDecimal(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "IMAGE")
+            {
+                return field;
+            }
+            else if (type == "BINARY")
+            {
+                return field;
+            }
+            else if (type == "BIT")
+            {
+                return Convert.ToBoolean(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "REAL")
+            {
+                return Convert.ToDouble(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "FLOAT")
+            {
+                return Convert.ToSingle(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "TEXT")
+            {
+                return Convert.ToString(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "VARCHAR")
+            {
+                return Convert.ToString(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "VARBINARY")
+            {
+                return field;
+            }
+            else if (type == "LONGCHAR")
+            {
+                return Convert.ToString(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "LONGBINARY")
+            {
+                return field;
+            }
+            else if (type == "LONG")
+            {
+                return field;
+            }
+            else if (type == "ILLEGAL")
+            {
+                return field;
+            }
+            else if (type == "SENSITIVITY")
+            {
+                return field;
+            }
+            else if (type == "BOUNDARY")
+            {
+                return field;
+            }
+            else if (type == "VOID")
+            {
+                return null;
+            }
+            else if (type == "USHORT")
+            {
+                return Convert.ToUInt16(System.Text.Encoding.Default.GetString(field));
+            }
+            // added by lago
+            else if (type == "UNDEFINED")            // 27
+            {
+                return field;
+            }
+            else if (type == "DOUBLE")
+            {
+                return Convert.ToDouble(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "DATE")
+            {
+                return DateTime.Parse(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "TIME")
+            {
+                return DateTime.Parse(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "TIMESTAMP")
+            {
+                return DateTime.Parse(System.Text.Encoding.Default.GetString(field));
+            }
+            // added by msql
+            else if (type == "UINT")                        // 32
+            {
+                return Convert.ToUInt32(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "LASTREAL")
+            {
+                return Convert.ToDouble(System.Text.Encoding.Default.GetString(field));
+            }
+            // added by mysql
+            else if (type == "STRING")            // 34
+            {
+                return System.Text.Encoding.Default.GetString(field);
+            }
+            else if (type == "VARSTRING")
+            {
+                return System.Text.Encoding.Default.GetString(field);
+            }
+            else if (type == "LONGLONG")
+            {
+                return Convert.ToInt64(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "MEDIUMINT")
+            {
+                return Convert.ToInt32(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "YEAR")
+            {
+                return Convert.ToInt64(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "NEWDATE")
+            {
+                return DateTime.Parse(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "NULL")
+            {
+                return null;
+            }
+            else if (type == "ENUM")
+            {
+                return field;
+            }
+            else if (type == "SET")
+            {
+                return field;
+            }
+            else if (type == "TINYBLOB")
+            {
+                return field;
+            }
+            else if (type == "MEDIUMBLOB")
+            {
+                return field;
+            }
+            else if (type == "LONGBLOB")
+            {
+                return field;
+            }
+            else if (type == "BLOB")
+            {
+                return field;
+            }
+            // added by oracle
+            else if (type == "VARCHAR2")            // 47
+            {
+                return System.Text.Encoding.Default.GetString(field);
+            }
+            else if (type == "NUMBER")
+            {
+                if (scale == 0)
+                {
+                    return Convert.ToInt64(System.Text.Encoding.Default.GetString(field));
+                }
+                else
+                {
+                    return Convert.ToDecimal(System.Text.Encoding.Default.GetString(field));
+                }
+            }
+            else if (type == "ROWID")
+            {
+                return Convert.ToUInt64(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "RAW")
+            {
+                return field;
+            }
+            else if (type == "LONG_RAW")
+            {
+                return field;
+            }
+            else if (type == "MLSLABEL")
+            {
+                return field;
+            }
+            else if (type == "CLOB")
+            {
+                return System.Text.Encoding.Default.GetString(field);
+            }
+            else if (type == "BFILE")
+            {
+                return field;
+            }
+            // added by odbc
+            else if (type == "BIGINT")            // 55
+            {
+                return Convert.ToInt64(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "INTEGER")
+            {
+                return Convert.ToInt32(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "LONGVARBINARY")
+            {
+                return field;
+            }
+            else if (type == "LONGVARCHAR")
+            {
+                return Convert.ToString(System.Text.Encoding.Default.GetString(field));
+            }
+            // added by db2
+            else if (type == "GRAPHIC")            // 59
+            {
+                return field;
+            }
+            else if (type == "VARGRAPHIC")
+            {
+                return field;
+            }
+            else if (type == "LONGVARGRAPHIC")
+            {
+                return field;
+            }
+            else if (type == "DBCLOB")
+            {
+                return System.Text.Encoding.Default.GetString(field);
+            }
+            else if (type == "DATALINK")
+            {
+                return field;
+            }
+            else if (type == "USER_DEFINED_TYPE")
+            {
+                return field;
+            }
+            else if (type == "SHORT_DATATYPE")
+            {
+                return Convert.ToInt16(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "TINY_DATATYPE")
+            {
+                return Convert.ToInt16(System.Text.Encoding.Default.GetString(field));
+            }
+            // added by firebird
+            else if (type == "D_FLOAT")            // 67
+            {
+                return Convert.ToSingle(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "ARRAY")
+            {
+                return field;
+            }
+            else if (type == "QUAD")
+            {
+                return Convert.ToUInt64(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "INT64")
+            {
+                return Convert.ToInt64(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "DOUBLE PRECISION")
+            {
+                return Convert.ToDouble(System.Text.Encoding.Default.GetString(field));
+            }
+            // added by postgresql
+            else if (type == "BOOL")
+            {
+                return Convert.ToBoolean(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "BYTEA")
+            {
+                return field;
+            }
+            else if (type == "NAME")
+            {
+                return System.Text.Encoding.Default.GetString(field);
+            }
+            else if (type == "INT8")
+            {
+                return Convert.ToInt64(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "INT2")
+            {
+                return Convert.ToInt16(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "INT2VECTOR")
+            {
+                return field;
+            }
+            else if (type == "INT4")
+            {
+                return Convert.ToInt32(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "REGPROC")
+            {
+                return field;
+            }
+            else if (type == "OID")
+            {
+                return Convert.ToInt64(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "TID")
+            {
+                return Convert.ToInt64(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "XID")
+            {
+                return Convert.ToInt64(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "CID")
+            {
+                return Convert.ToInt64(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "OIDVECTOR")
+            {
+                return field;
+            }
+            else if (type == "SMGR")
+            {
+                return field;
+            }
+            else if (type == "POINT")
+            {
+                return field;
+            }
+            else if (type == "LSEG")
+            {
+                return field;
+            }
+            else if (type == "PATH")
+            {
+                return field;
+            }
+            else if (type == "BOX")
+            {
+                return field;
+            }
+            else if (type == "POLYGON")
+            {
+                return field;
+            }
+            else if (type == "LINE")
+            {
+                return field;
+            }
+            else if (type == "LINE_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "FLOAT4")
+            {
+                return Convert.ToSingle(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "FLOAT8")
+            {
+                return Convert.ToDouble(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "ABSTIME")
+            {
+                // I guess...
+                return Convert.ToInt64(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "RELTIME")
+            {
+                // I guess...
+                return Convert.ToInt64(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "TINTERVAL")
+            {
+                return Convert.ToInt64(System.Text.Encoding.Default.GetString(field));
+            }
+            else if (type == "CIRCLE")
+            {
+                return field;
+            }
+            else if (type == "CIRCLE_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "MONEY_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "MACADDR")
+            {
+                // not sure what to do with a mac addr, presumably it's a 4 byte array
+                return field;
+            }
+            else if (type == "INET")
+            {
+                return field;
+            }
+            else if (type == "CIDR")
+            {
+                return field;
+            }
+            else if (type == "BOOL_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "BYTEA_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "CHAR_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "NAME_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "INT2_ARRAY")
+            {
+                // ???
+                return field;
+            }
+            else if (type == "INT2VECTOR_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "INT4_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "REGPROC_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "TEXT_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "OID_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "TID_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "XID_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "CID_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "OIDVECTOR_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "BPCHAR_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "VARCHAR_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "INT8_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "POINT_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "LSEG_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "PATH_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "BOX_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "FLOAT4_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "FLOAT8_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "ABSTIME_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "RELTIME_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "TINTERVAL_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "POLYGON_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "ACLITEM")
+            {
+                return field;
+            }
+            else if (type == "ACLITEM_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "MACADDR_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "INET_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "CIDR_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "BPCHAR")
+            {
+                return System.Text.Encoding.Default.GetString(field);
+            }
+            else if (type == "TIMESTAMP_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "DATE_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "TIME_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "TIMESTAMPTZ")
+            {
+                return field;
+            }
+            else if (type == "TIMESTAMPTZ_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "INTERVAL")
+            {
+                return field;
+            }
+            else if (type == "INTERVAL_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "NUMERIC_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "TIMETZ")
+            {
+                return field;
+            }
+            else if (type == "TIMETZ_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "BIT_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "VARBIT")
+            {
+                return field;
+            }
+            else if (type == "VARBIT_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "REFCURSOR")
+            {
+                return field;
+            }
+            else if (type == "REFCURSOR_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "REGPROCEDURE")
+            {
+                return field;
+            }
+            else if (type == "REGOPER")
+            {
+                return field;
+            }
+            else if (type == "REGOPERATOR")
+            {
+                return field;
+            }
+            else if (type == "REGCLASS")
+            {
+                return field;
+            }
+            else if (type == "REGTYPE")
+            {
+                return field;
+            }
+            else if (type == "REGPROCEDURE_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "REGOPER_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "REGOPERATOR_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "REGCLASS_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "REGTYPE_ARRAY")
+            {
+                return field;
+            }
+            else if (type == "RECORD")
+            {
+                return field;
+            }
+            else if (type == "CSTRING")
+            {
+                return Convert.ToString(field);
+            }
+            else if (type == "ANY")
+            {
+                return field;
+            }
+            else if (type == "ANYARRAY")
+            {
+                return field;
+            }
+            else if (type == "TRIGGER")
+            {
+                return field;
+            }
+            else if (type == "LANGUAGE_HANDLER")
+            {
+                return field;
+            }
+            else if (type == "INTERNAL")
+            {
+                return field;
+            }
+            else if (type == "OPAQUE")
+            {
+                return field;
+            }
+            else if (type == "ANYELEMENT")
+            {
+                return field;
+            }
+            else if (type == "PG_TYPE")
+            {
+                return field;
+            }
+            else if (type == "PG_ATTRIBUTE")
+            {
+                return field;
+            }
+            else if (type == "PG_PROC")
+            {
+                return field;
+            }
+            else if (type == "PG_CLASS")
+            {
+                return field;
+            }
+            // none added by sqlite
+
+            // unrecognized type
+            return field;
         }
 
         public int GetValues(object[] values)
@@ -909,25 +1022,33 @@ namespace SQLRClient
 
         public bool GetBoolean(int i)
         {
-            return (bool)GetValue(i);
+            return Convert.ToBoolean(GetValue(i));
         }
 
         public byte GetByte(int i)
         {
-            return (byte)GetValue(i);
+            return Convert.ToByte(GetValue(i));
         }
 
-        public long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length)
+        public long GetBytes(int i, long fieldoffset, byte[] buffer, int bufferoffset, int length)
         {
-            // FIXME: This is tricky because the C# wrapper for getField converts the char (byte) array into a string which
-            // may be different from the char array due to the encoding.  I may need to add a method to the C# wrapper that
-            // returns the field as a byte array.
-            throw new NotSupportedException("GetBytes not supported.");
+
+            // get the field
+            byte[] field = _sqlrcur.getFieldAsByteArray(_currentrow,(uint)i);
+
+            // copy chars from the field into the buffer
+            uint j = 0;
+            while (j < length && fieldoffset + j < field.Length)
+            {
+                buffer[bufferoffset + i] = field[(int)(fieldoffset + j)];
+                j++;
+            }
+            return (long)j;
         }
 
         public char GetChar(int i)
         {
-            return (char)GetValue(i);
+            return Convert.ToChar(GetValue(i));
         }
 
         public long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length)
@@ -953,42 +1074,42 @@ namespace SQLRClient
 
         public Int16 GetInt16(int i)
         {
-            return (Int16)GetValue(i);
+            return Convert.ToInt16(GetValue(i));
         }
 
         public Int32 GetInt32(int i)
         {
-            return (Int32)GetValue(i);
+            return Convert.ToInt32(GetValue(i));
         }
 
         public Int64 GetInt64(int i)
         {
-            return (Int64)GetValue(i);
+            return Convert.ToInt64(GetValue(i));
         }
 
         public float GetFloat(int i)
         {
-            return (float)GetValue(i);
+            return (float)Convert.ToSingle(GetValue(i));
         }
 
         public double GetDouble(int i)
         {
-            return (double)GetValue(i);
+            return Convert.ToDouble(GetValue(i));
         }
 
         public String GetString(int i)
         {
-            return (String)GetValue(i);
+            return Convert.ToString(GetValue(i));
         }
 
         public Decimal GetDecimal(int i)
         {
-            return (Decimal)GetValue(i);
+            return Convert.ToDecimal(GetValue(i));
         }
 
         public DateTime GetDateTime(int i)
         {
-            return (DateTime)GetValue(i);
+            return Convert.ToDateTime(GetValue(i));
         }
 
         public IDataReader GetData(int i)
@@ -1000,34 +1121,17 @@ namespace SQLRClient
         public bool IsDBNull(int i)
         {
             // FIXME: this will need to be modified if getNullsAsNulls is exposed
-            return ((string)GetValue(i) == "");
+            return (GetString(i) == "");
         }
+
+        #endregion
+
+
+        #region private methods
 
         private int cultureAwareCompare(string strA, string strB)
         {
             return CultureInfo.CurrentCulture.CompareInfo.Compare(strA, strB, CompareOptions.IgnoreKanaType | CompareOptions.IgnoreWidth | CompareOptions.IgnoreCase);
-        }
-
-        void IDisposable.Dispose()
-        {
-            this.Dispose(true);
-            System.GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                try
-                {
-                    this.Close();
-                }
-                catch (Exception e)
-                {
-                    throw new SystemException("An exception of type " + e.GetType() +
-                                              " was encountered while closing the SQLRelayDataReader.");
-                }
-            }
         }
 
         private void invalidColumnIndex(int i)
@@ -1037,5 +1141,7 @@ namespace SQLRClient
                 throw new IndexOutOfRangeException();
             }
         }
+
+        #endregion
     }
 }
