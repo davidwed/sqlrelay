@@ -482,15 +482,15 @@ public class SQLRCursor : IDisposable
 
 
     /** Returns the specified field as a string. */
-    public string getFieldAsString(ulong row, uint col)
+    public string getField(ulong row, uint col)
     {
-        return System.Text.Encoding.Default.GetString(sqlrcur_getFieldByIndex(sqlrcurref, row, col));
+        return System.Text.Encoding.Default.GetString(getFieldAsByteArray(row,col));
     }
 
     /** Returns the specified field as a string. */
-    public string getFieldAsString(ulong row, string col)
+    public string getField(ulong row, string col)
     {
-        return System.Text.Encoding.Default.GetString(sqlrcur_getFieldByName(sqlrcurref, row, col));
+        return System.Text.Encoding.Default.GetString(getFieldAsByteArray(row,col));
     }
 
     /** Returns the specified field as an integer. */
@@ -520,13 +520,19 @@ public class SQLRCursor : IDisposable
     /** Returns the specified field as a string. */
     public byte[] getFieldAsByteArray(ulong row, uint col)
     {
-        return sqlrcur_getFieldByIndex(sqlrcurref, row, col);
+        int size = (int)sqlrcur_getFieldLengthByIndex(sqlrcurref, row, col);
+        byte[] retval = new byte[size];
+        Marshal.Copy(sqlrcur_getFieldByIndex(sqlrcurref, row, col), retval, 0, size);
+        return retval;
     }
 
     /** Returns the specified field as a string. */
     public byte[] getFieldAsByteArray(ulong row, string col)
     {
-        return sqlrcur_getFieldByName(sqlrcurref, row, col);
+        int size = (int)sqlrcur_getFieldLengthByName(sqlrcurref, row, col);
+        byte[] retval = new byte[size];
+        Marshal.Copy(sqlrcur_getFieldByName(sqlrcurref, row, col), retval, 0, size);
+        return retval;
     }
 
 
@@ -950,10 +956,10 @@ public class SQLRCursor : IDisposable
     private static extern void sqlrcur_getNullsAsNulls(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern byte[] sqlrcur_getFieldByIndex(IntPtr sqlrcurref, ulong row, uint col);
+    private static extern IntPtr sqlrcur_getFieldByIndex(IntPtr sqlrcurref, ulong row, uint col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern byte[] sqlrcur_getFieldByName(IntPtr sqlrcurref, ulong row, string col);
+    private static extern IntPtr sqlrcur_getFieldByName(IntPtr sqlrcurref, ulong row, string col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern long sqlrcur_getFieldAsIntegerByIndex(IntPtr sqlrcurref, ulong row, uint col);
