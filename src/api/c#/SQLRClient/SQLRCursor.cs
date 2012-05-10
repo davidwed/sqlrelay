@@ -484,13 +484,23 @@ public class SQLRCursor : IDisposable
     /** Returns the specified field as a string. */
     public string getField(ulong row, uint col)
     {
-        return System.Text.Encoding.Default.GetString(getFieldAsByteArray(row,col));
+        byte[] field = getFieldAsByteArray(row,col);
+        if (field == null)
+        {
+            return null;
+        }
+        return System.Text.Encoding.Default.GetString(field);
     }
 
     /** Returns the specified field as a string. */
     public string getField(ulong row, string col)
     {
-        return System.Text.Encoding.Default.GetString(getFieldAsByteArray(row,col));
+        byte[] field = getFieldAsByteArray(row, col);
+        if (field == null)
+        {
+            return null;
+        }
+        return System.Text.Encoding.Default.GetString(field);
     }
 
     /** Returns the specified field as an integer. */
@@ -521,6 +531,10 @@ public class SQLRCursor : IDisposable
     public byte[] getFieldAsByteArray(ulong row, uint col)
     {
         int size = (int)sqlrcur_getFieldLengthByIndex(sqlrcurref, row, col);
+        if (size == 0)
+        {
+            return null;
+        }
         byte[] retval = new byte[size];
         Marshal.Copy(sqlrcur_getFieldByIndex(sqlrcurref, row, col), retval, 0, size);
         return retval;
@@ -530,6 +544,10 @@ public class SQLRCursor : IDisposable
     public byte[] getFieldAsByteArray(ulong row, string col)
     {
         int size = (int)sqlrcur_getFieldLengthByName(sqlrcurref, row, col);
+        if (size == 0)
+        {
+            return null;
+        }
         byte[] retval = new byte[size];
         Marshal.Copy(sqlrcur_getFieldByName(sqlrcurref, row, col), retval, 0, size);
         return retval;

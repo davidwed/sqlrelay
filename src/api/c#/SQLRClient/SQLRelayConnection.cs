@@ -225,7 +225,7 @@ namespace SQLRClient
 
         public IDbCommand CreateCommand()
         {
-            return new SQLRelayCommand();
+            return new SQLRelayCommand(null, this);
         }
 
         internal SQLRConnection SQLRConnection

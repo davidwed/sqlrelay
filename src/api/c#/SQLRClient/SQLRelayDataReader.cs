@@ -123,7 +123,7 @@ namespace SQLRClient
             _values = new object[FieldCount];
 
             // this will need to be updated if getNullsAsNulls is exposed
-            return (_values[0] != null);
+            return (_sqlrcur.getField(_currentrow, (uint)0) != null);
         }
 
         public DataTable GetSchemaTable()
@@ -983,12 +983,13 @@ namespace SQLRClient
 
         public int GetValues(object[] values)
         {
-            uint colcount=_sqlrcur.colCount();
-            for (uint i = 0; i < colcount; i++)
+            int colcount=(int)_sqlrcur.colCount();
+            int i = 0;
+            for (; i < colcount && i < values.Length; i++)
             {
-                values[i] = GetValue((int)i);
+                values[i] = GetValue(i);
             }
-            return (int)colcount;
+            return i;
         }
 
         public int GetOrdinal(string name)
