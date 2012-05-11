@@ -178,7 +178,7 @@ namespace SQLRClient
                 row["BaseColumnName"] = GetName((int)i);
                 row["BaseSchemaName"] = null;
                 row["BaseTableName"] = null;
-                row["DataType"] = null; // FIXME
+                row["DataType"] = GetFieldType((int)i);
                 row["AllowDBNull"] = _sqlrcur.getColumnIsNullable(i);
                 row["ProviderType"] = _sqlrcur.getColumnType(i);
                 row["IsAliased"] = false;
@@ -187,7 +187,7 @@ namespace SQLRClient
                 row["IsAutoIncrement"] = _sqlrcur.getColumnIsAutoIncrement(i);
                 row["IsRowVersion"] = false;
                 row["IsHidden"] = false;
-                row["IsLong"] = false; // FIXME
+                row["IsLong"] = (GetFieldType((int)i) == typeof(byte[]));
                 row["IsReadOnly"] = false;
                 row["ProviderSpecificDataType"] = _sqlrcur.getColumnType(i);
                 row["DataTypeName"] = _sqlrcur.getColumnType(i);

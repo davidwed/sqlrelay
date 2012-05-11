@@ -209,13 +209,19 @@ namespace SQLRClientTest
             // column types
             Console.WriteLine("COLUMN TYPES:");
             checkSuccess(datareader.GetDataTypeName(0), "NUMBER");
-            Console.WriteLine("type: " + datareader.GetFieldType(0).ToString());
+            checkSuccess(datareader.GetFieldType(0).ToString(), "System.Int64");
             checkSuccess(datareader.GetDataTypeName(1), "CHAR");
+            checkSuccess(datareader.GetFieldType(1).ToString(), "System.String");
             checkSuccess(datareader.GetDataTypeName(2), "VARCHAR2");
+            checkSuccess(datareader.GetFieldType(2).ToString(), "System.String");
             checkSuccess(datareader.GetDataTypeName(3), "DATE");
+            checkSuccess(datareader.GetFieldType(3).ToString(), "System.DateTime");
             checkSuccess(datareader.GetDataTypeName(4), "LONG");
+            checkSuccess(datareader.GetFieldType(4).ToString(), "System.Byte[]");
             checkSuccess(datareader.GetDataTypeName(5), "CLOB");
+            checkSuccess(datareader.GetFieldType(5).ToString(), "System.String");
             checkSuccess(datareader.GetDataTypeName(6), "BLOB");
+            checkSuccess(datareader.GetFieldType(6).ToString(), "System.Byte[]");
             Console.WriteLine("\n");
 
             // schema table
@@ -233,7 +239,7 @@ namespace SQLRClientTest
             checkSuccess(Convert.ToString(schematable.Rows[0]["BaseColumnName"]), "TESTNUMBER");
             checkSuccess(Convert.ToString(schematable.Rows[0]["BaseSchemaName"]), "");
             checkSuccess(Convert.ToString(schematable.Rows[0]["BaseTableName"]), "");
-            checkSuccess(Convert.ToString(schematable.Rows[0]["DataType"]), "");
+            checkSuccess(Convert.ToString(schematable.Rows[0]["DataType"]), "System.Int64");
             checkSuccess(Convert.ToBoolean(schematable.Rows[0]["AllowDBNull"]), true);
             checkSuccess(Convert.ToString(schematable.Rows[0]["ProviderType"]), "NUMBER");
             checkSuccess(Convert.ToBoolean(schematable.Rows[0]["IsAliased"]), false);
@@ -262,7 +268,7 @@ namespace SQLRClientTest
             checkSuccess(Convert.ToString(schematable.Rows[1]["BaseColumnName"]), "TESTCHAR");
             checkSuccess(Convert.ToString(schematable.Rows[1]["BaseSchemaName"]), "");
             checkSuccess(Convert.ToString(schematable.Rows[1]["BaseTableName"]), "");
-            checkSuccess(Convert.ToString(schematable.Rows[1]["DataType"]), "");
+            checkSuccess(Convert.ToString(schematable.Rows[1]["DataType"]), "System.String");
             checkSuccess(Convert.ToBoolean(schematable.Rows[1]["AllowDBNull"]), true);
             checkSuccess(Convert.ToString(schematable.Rows[1]["ProviderType"]), "CHAR");
             checkSuccess(Convert.ToBoolean(schematable.Rows[1]["IsAliased"]), false);
@@ -291,7 +297,7 @@ namespace SQLRClientTest
             checkSuccess(Convert.ToString(schematable.Rows[2]["BaseColumnName"]), "TESTVARCHAR");
             checkSuccess(Convert.ToString(schematable.Rows[2]["BaseSchemaName"]), "");
             checkSuccess(Convert.ToString(schematable.Rows[2]["BaseTableName"]), "");
-            checkSuccess(Convert.ToString(schematable.Rows[2]["DataType"]), "");
+            checkSuccess(Convert.ToString(schematable.Rows[2]["DataType"]), "System.String");
             checkSuccess(Convert.ToBoolean(schematable.Rows[2]["AllowDBNull"]), true);
             checkSuccess(Convert.ToString(schematable.Rows[2]["ProviderType"]), "VARCHAR2");
             checkSuccess(Convert.ToBoolean(schematable.Rows[2]["IsAliased"]), false);
@@ -320,7 +326,7 @@ namespace SQLRClientTest
             checkSuccess(Convert.ToString(schematable.Rows[3]["BaseColumnName"]), "TESTDATE");
             checkSuccess(Convert.ToString(schematable.Rows[3]["BaseSchemaName"]), "");
             checkSuccess(Convert.ToString(schematable.Rows[3]["BaseTableName"]), "");
-            checkSuccess(Convert.ToString(schematable.Rows[3]["DataType"]), "");
+            checkSuccess(Convert.ToString(schematable.Rows[3]["DataType"]), "System.DateTime");
             checkSuccess(Convert.ToBoolean(schematable.Rows[3]["AllowDBNull"]), true);
             checkSuccess(Convert.ToString(schematable.Rows[3]["ProviderType"]), "DATE");
             checkSuccess(Convert.ToBoolean(schematable.Rows[3]["IsAliased"]), false);
@@ -349,7 +355,7 @@ namespace SQLRClientTest
             checkSuccess(Convert.ToString(schematable.Rows[4]["BaseColumnName"]), "TESTLONG");
             checkSuccess(Convert.ToString(schematable.Rows[4]["BaseSchemaName"]), "");
             checkSuccess(Convert.ToString(schematable.Rows[4]["BaseTableName"]), "");
-            checkSuccess(Convert.ToString(schematable.Rows[4]["DataType"]), "");
+            checkSuccess(Convert.ToString(schematable.Rows[4]["DataType"]), "System.Byte[]");
             checkSuccess(Convert.ToBoolean(schematable.Rows[4]["AllowDBNull"]), true);
             checkSuccess(Convert.ToString(schematable.Rows[4]["ProviderType"]), "LONG");
             checkSuccess(Convert.ToBoolean(schematable.Rows[4]["IsAliased"]), false);
@@ -358,7 +364,7 @@ namespace SQLRClientTest
             checkSuccess(Convert.ToBoolean(schematable.Rows[4]["IsAutoIncrement"]), false);
             checkSuccess(Convert.ToBoolean(schematable.Rows[4]["IsRowVersion"]), false);
             checkSuccess(Convert.ToBoolean(schematable.Rows[4]["IsHidden"]), false);
-            checkSuccess(Convert.ToBoolean(schematable.Rows[4]["IsLong"]), false);
+            checkSuccess(Convert.ToBoolean(schematable.Rows[4]["IsLong"]), true);
             checkSuccess(Convert.ToBoolean(schematable.Rows[4]["IsReadOnly"]), false);
             checkSuccess(Convert.ToString(schematable.Rows[4]["ProviderSpecificDataType"]), "LONG");
             checkSuccess(Convert.ToString(schematable.Rows[4]["DataTypeName"]), "LONG");
@@ -378,7 +384,7 @@ namespace SQLRClientTest
             checkSuccess(Convert.ToString(schematable.Rows[5]["BaseColumnName"]), "TESTCLOB");
             checkSuccess(Convert.ToString(schematable.Rows[5]["BaseSchemaName"]), "");
             checkSuccess(Convert.ToString(schematable.Rows[5]["BaseTableName"]), "");
-            checkSuccess(Convert.ToString(schematable.Rows[5]["DataType"]), "");
+            checkSuccess(Convert.ToString(schematable.Rows[5]["DataType"]), "System.String");
             checkSuccess(Convert.ToBoolean(schematable.Rows[5]["AllowDBNull"]), true);
             checkSuccess(Convert.ToString(schematable.Rows[5]["ProviderType"]), "CLOB");
             checkSuccess(Convert.ToBoolean(schematable.Rows[5]["IsAliased"]), false);
@@ -407,7 +413,7 @@ namespace SQLRClientTest
             checkSuccess(Convert.ToString(schematable.Rows[6]["BaseColumnName"]), "TESTBLOB");
             checkSuccess(Convert.ToString(schematable.Rows[6]["BaseSchemaName"]), "");
             checkSuccess(Convert.ToString(schematable.Rows[6]["BaseTableName"]), "");
-            checkSuccess(Convert.ToString(schematable.Rows[6]["DataType"]), "");
+            checkSuccess(Convert.ToString(schematable.Rows[6]["DataType"]), "System.Byte[]");
             checkSuccess(Convert.ToBoolean(schematable.Rows[6]["AllowDBNull"]), true);
             checkSuccess(Convert.ToString(schematable.Rows[6]["ProviderType"]), "BLOB");
             checkSuccess(Convert.ToBoolean(schematable.Rows[6]["IsAliased"]), false);
@@ -416,7 +422,7 @@ namespace SQLRClientTest
             checkSuccess(Convert.ToBoolean(schematable.Rows[6]["IsAutoIncrement"]), false);
             checkSuccess(Convert.ToBoolean(schematable.Rows[6]["IsRowVersion"]), false);
             checkSuccess(Convert.ToBoolean(schematable.Rows[6]["IsHidden"]), false);
-            checkSuccess(Convert.ToBoolean(schematable.Rows[6]["IsLong"]), false);
+            checkSuccess(Convert.ToBoolean(schematable.Rows[6]["IsLong"]), true);
             checkSuccess(Convert.ToBoolean(schematable.Rows[6]["IsReadOnly"]), false);
             checkSuccess(Convert.ToString(schematable.Rows[6]["ProviderSpecificDataType"]), "BLOB");
             checkSuccess(Convert.ToString(schematable.Rows[6]["DataTypeName"]), "BLOB");
