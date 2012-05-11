@@ -267,8 +267,7 @@ namespace SQLRClient
                 }
             }
 
-            // FIXME: this should probably be some particular kind of exception5
-            throw new Exception(_sqlrcur.errorMessage());
+            throw new SQLRelayException(_sqlrcur.errorNumber(),_sqlrcur.errorMessage());
         }
 
         private void bindParameters()

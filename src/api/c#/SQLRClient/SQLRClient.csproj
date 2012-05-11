@@ -48,6 +48,7 @@
     <Compile Include="SQLRelayDataAdapter.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="SQLRelayException.cs" />
     <Compile Include="SQLRelayParameter.cs" />
     <Compile Include="SQLRelayParameterCollection.cs" />
     <Compile Include="SQLRelayDataReader.cs" />
