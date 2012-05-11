@@ -209,7 +209,7 @@ namespace SQLRClientTest
             // column types
             Console.WriteLine("COLUMN TYPES:");
             checkSuccess(datareader.GetDataTypeName(0), "NUMBER");
-            //Console.WriteLine("type: " + datareader.GetFieldType(0));
+            Console.WriteLine("type: " + datareader.GetFieldType(0).ToString());
             checkSuccess(datareader.GetDataTypeName(1), "CHAR");
             checkSuccess(datareader.GetDataTypeName(2), "VARCHAR2");
             checkSuccess(datareader.GetDataTypeName(3), "DATE");

@@ -225,8 +225,737 @@ namespace SQLRClient
 
         public Type GetFieldType(int i)
         {
-            invalidColumnIndex(i);
-            return GetValue(i).GetType();
+            String type = GetDataTypeName(i);
+
+            if (type == "UNKNOWN")
+            {
+                return typeof(string);
+            }
+            // addded by freetds
+            else if (type == "CHAR")                        // 1
+            {
+                return typeof(string);
+            }
+            else if (type == "INT")
+            {
+                return typeof(Int32);
+            }
+            else if (type == "SMALLINT")
+            {
+                return typeof(Int16);
+            }
+            else if (type == "TINYINT")
+            {
+                return typeof(Int16);
+            }
+            else if (type == "MONEY")
+            {
+                return typeof(Decimal);
+            }
+            else if (type == "DATETIME")
+            {
+                return typeof(DateTime);
+            }
+            else if (type == "NUMERIC")
+            {
+                return typeof(Decimal);
+            }
+            else if (type == "DECIMAL")
+            {
+                return typeof(Decimal);
+            }
+            else if (type == "SMALLDATETIME")
+            {
+                return typeof(DateTime);
+            }
+            else if (type == "SMALLMONEY")
+            {
+                return typeof(Decimal);
+            }
+            else if (type == "IMAGE")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "BINARY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "BIT")
+            {
+                return typeof(Boolean);
+            }
+            else if (type == "REAL")
+            {
+                return typeof(Double);
+            }
+            else if (type == "FLOAT")
+            {
+                return typeof(Single);
+            }
+            else if (type == "TEXT")
+            {
+                return typeof(string);
+            }
+            else if (type == "VARCHAR")
+            {
+                return typeof(string);
+            }
+            else if (type == "VARBINARY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "LONGCHAR")
+            {
+                return typeof(string);
+            }
+            else if (type == "LONGBINARY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "LONG")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "ILLEGAL")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "SENSITIVITY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "BOUNDARY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "VOID")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "USHORT")
+            {
+                return typeof(UInt16);
+            }
+            // added by lago
+            else if (type == "UNDEFINED")            // 27
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "DOUBLE")
+            {
+                return typeof(Double);
+            }
+            else if (type == "DATE")
+            {
+                return typeof(DateTime);
+            }
+            else if (type == "TIME")
+            {
+                return typeof(DateTime);
+            }
+            else if (type == "TIMESTAMP")
+            {
+                return typeof(DateTime);
+            }
+            // added by msql
+            else if (type == "UINT")                        // 32
+            {
+                return typeof(UInt32);
+            }
+            else if (type == "LASTREAL")
+            {
+                return typeof(Double);
+            }
+            // added by mysql
+            else if (type == "STRING")            // 34
+            {
+                return typeof(string);
+            }
+            else if (type == "VARSTRING")
+            {
+                return typeof(string);
+            }
+            else if (type == "LONGLONG")
+            {
+                return typeof(Int64);
+            }
+            else if (type == "MEDIUMINT")
+            {
+                return typeof(Int32);
+            }
+            else if (type == "YEAR")
+            {
+                return typeof(Int64);
+            }
+            else if (type == "NEWDATE")
+            {
+                return typeof(DateTime);
+            }
+            else if (type == "NULL")
+            {
+                return null;
+            }
+            else if (type == "ENUM")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "SET")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "TINYBLOB")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "MEDIUMBLOB")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "LONGBLOB")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "BLOB")
+            {
+                return typeof(byte[]);
+            }
+            // added by oracle
+            else if (type == "VARCHAR2")            // 47
+            {
+                return typeof(string);
+            }
+            else if (type == "NUMBER")
+            {
+                // Numbers witout scale are integers.  However,
+                // occasionally integers will come back with length
+                // and scale but no precision.  Oracle does this.
+                // So, check for lack of either.
+                if (_sqlrcur.getColumnScale((uint)i) == 0 ||
+                    _sqlrcur.getColumnPrecision((uint)i) == 0)
+                {
+                    return typeof(Int64);
+                }
+                else
+                {
+                    return typeof(Decimal);
+                }
+            }
+            else if (type == "ROWID")
+            {
+                return typeof(UInt64);
+            }
+            else if (type == "RAW")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "LONG_RAW")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "MLSLABEL")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "CLOB")
+            {
+                return typeof(string);
+            }
+            else if (type == "BFILE")
+            {
+                return typeof(byte[]);
+            }
+            // added by odbc
+            else if (type == "BIGINT")            // 55
+            {
+                return typeof(Int64);
+            }
+            else if (type == "INTEGER")
+            {
+                return typeof(Int32);
+            }
+            else if (type == "LONGVARBINARY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "LONGVARCHAR")
+            {
+                return typeof(string);
+            }
+            // added by db2
+            else if (type == "GRAPHIC")            // 59
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "VARGRAPHIC")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "LONGVARGRAPHIC")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "DBCLOB")
+            {
+                return typeof(string);
+            }
+            else if (type == "DATALINK")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "USER_DEFINED_TYPE")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "SHORT_DATATYPE")
+            {
+                return typeof(Int16);
+            }
+            else if (type == "TINY_DATATYPE")
+            {
+                return typeof(Int16);
+            }
+            // added by firebird
+            else if (type == "D_FLOAT")            // 67
+            {
+                return typeof(Single);
+            }
+            else if (type == "ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "QUAD")
+            {
+                return typeof(UInt64);
+            }
+            else if (type == "INT64")
+            {
+                return typeof(Int64);
+            }
+            else if (type == "DOUBLE PRECISION")
+            {
+                return typeof(Double);
+            }
+            // added by postgresql
+            else if (type == "BOOL")
+            {
+                return typeof(Boolean);
+            }
+            else if (type == "BYTEA")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "NAME")
+            {
+                return typeof(string);
+            }
+            else if (type == "INT8")
+            {
+                return typeof(Int64);
+            }
+            else if (type == "INT2")
+            {
+                return typeof(Int16);
+            }
+            else if (type == "INT2VECTOR")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "INT4")
+            {
+                return typeof(Int32);
+            }
+            else if (type == "REGPROC")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "OID")
+            {
+                return typeof(Int64);
+            }
+            else if (type == "TID")
+            {
+                return typeof(Int64);
+            }
+            else if (type == "XID")
+            {
+                return typeof(Int64);
+            }
+            else if (type == "CID")
+            {
+                return typeof(Int64);
+            }
+            else if (type == "OIDVECTOR")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "SMGR")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "POINT")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "LSEG")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "PATH")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "BOX")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "POLYGON")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "LINE")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "LINE_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "FLOAT4")
+            {
+                return typeof(Single);
+            }
+            else if (type == "FLOAT8")
+            {
+                return typeof(Double);
+            }
+            else if (type == "ABSTIME")
+            {
+                // I guess...
+                return typeof(Int64);
+            }
+            else if (type == "RELTIME")
+            {
+                // I guess...
+                return typeof(Int64);
+            }
+            else if (type == "TINTERVAL")
+            {
+                return typeof(Int64);
+            }
+            else if (type == "CIRCLE")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "CIRCLE_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "MONEY_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "MACADDR")
+            {
+                // not sure what to do with a mac addr, presumably it's a 4 byte array
+                return typeof(byte[]);
+            }
+            else if (type == "INET")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "CIDR")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "BOOL_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "BYTEA_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "CHAR_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "NAME_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "INT2_ARRAY")
+            {
+                // ???
+                return typeof(byte[]);
+            }
+            else if (type == "INT2VECTOR_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "INT4_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "REGPROC_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "TEXT_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "OID_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "TID_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "XID_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "CID_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "OIDVECTOR_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "BPCHAR_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "VARCHAR_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "INT8_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "POINT_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "LSEG_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "PATH_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "BOX_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "FLOAT4_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "FLOAT8_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "ABSTIME_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "RELTIME_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "TINTERVAL_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "POLYGON_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "ACLITEM")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "ACLITEM_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "MACADDR_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "INET_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "CIDR_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "BPCHAR")
+            {
+                return typeof(string);
+            }
+            else if (type == "TIMESTAMP_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "DATE_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "TIME_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "TIMESTAMPTZ")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "TIMESTAMPTZ_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "INTERVAL")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "INTERVAL_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "NUMERIC_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "TIMETZ")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "TIMETZ_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "BIT_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "VARBIT")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "VARBIT_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "REFCURSOR")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "REFCURSOR_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "REGPROCEDURE")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "REGOPER")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "REGOPERATOR")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "REGCLASS")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "REGTYPE")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "REGPROCEDURE_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "REGOPER_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "REGOPERATOR_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "REGCLASS_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "REGTYPE_ARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "RECORD")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "CSTRING")
+            {
+                return typeof(string);
+            }
+            else if (type == "ANY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "ANYARRAY")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "TRIGGER")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "LANGUAGE_HANDLER")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "INTERNAL")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "OPAQUE")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "ANYELEMENT")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "PG_TYPE")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "PG_ATTRIBUTE")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "PG_PROC")
+            {
+                return typeof(byte[]);
+            }
+            else if (type == "PG_CLASS")
+            {
+                return typeof(byte[]);
+            }
+            // none added by sqlite
+
+            // unrecognized type
+            return typeof(byte[]);
         }
 
         public Object GetValue(int i)
@@ -240,7 +969,7 @@ namespace SQLRClient
             }
 
             // get the field
-            object retval = convertField(_sqlrcur.getFieldAsByteArray(_currentrow, (uint)i), GetDataTypeName(i), _sqlrcur.getColumnScale((uint)i));
+            object retval = convertField(_sqlrcur.getFieldAsByteArray(_currentrow, (uint)i), GetDataTypeName(i), _sqlrcur.getColumnPrecision((uint)i), _sqlrcur.getColumnScale((uint)i));
 
             // cache the value
             _havevalues[i] = true;
@@ -250,7 +979,7 @@ namespace SQLRClient
             return retval;
         }
 
-        public static Object convertField(byte[] field, string type, uint scale)
+        public static Object convertField(byte[] field, string type, uint precision, uint scale)
         {
 
             // convert the field to a native type...
@@ -454,7 +1183,11 @@ namespace SQLRClient
             }
             else if (type == "NUMBER")
             {
-                if (scale == 0)
+                // Numbers witout scale are integers.  However,
+                // occasionally integers will come back with length
+                // and scale but no precision.  Oracle does this.
+                // So, check for lack of either.
+                if (scale == 0 || precision == 0)
                 {
                     return Convert.ToInt64(System.Text.Encoding.Default.GetString(field));
                 }
