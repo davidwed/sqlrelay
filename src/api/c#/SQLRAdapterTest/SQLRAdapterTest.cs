@@ -102,7 +102,7 @@ namespace SQLRClientTest
         {
 
             // open connection and command
-            SQLRelayConnection sqlrcon = new SQLRelayConnection("host=fedora;port=9000;socket=;user=test;password=test;retrytime=0;tries=1;debug=false");
+            SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;RetryTime=0;Tries=1;Debug=false");
             sqlrcon.Open();
 
             // execute scalar
@@ -494,7 +494,7 @@ namespace SQLRClientTest
 
             // commit and rollback
             Console.WriteLine("COMMIT AND ROLLBACK:");
-            SQLRelayConnection sqlrcon2 = new SQLRelayConnection("host=fedora;port=9000;socket=;user=test;password=test;retrytime=0;tries=1;debug=false");
+            SQLRelayConnection sqlrcon2 = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;RetryTime=0;Tries=1;Debug=false");
             sqlrcon2.Open();
             SQLRelayCommand sqlrcom2 = new SQLRelayCommand("select count(*) from testtable", sqlrcon2);
             checkSuccess(Convert.ToInt64(sqlrcom2.ExecuteScalar()), 0);

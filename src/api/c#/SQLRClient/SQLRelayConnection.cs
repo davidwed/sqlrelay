@@ -81,39 +81,50 @@ namespace SQLRClient
                 foreach (string part in parts)
                 {
                     string[] subparts = part.Split("=".ToCharArray());
-                    if (subparts[0] == "host")
+                    if (subparts[0] == "Data Source")
                     {
-                        _host = subparts[1];
+                        string datasource = subparts[1];
+
+                        // split the data source, look for one of the following formats:
+                        // host:port:socket
+                        // host:port
+                        // socket
+                        string[] subsubparts = datasource.Split(":".ToCharArray());
+                        if (subsubparts.Length == 1)
+                        {
+                            _socket = subsubparts[0];
+                        }
+                        else
+                        {
+                            _host = subsubparts[0];
+                            _port = ushort.Parse(subsubparts[1]);
+                            if (subsubparts.Length > 2)
+                            {
+                                _socket = subsubparts[2];
+                            }
+                        }
                     }
-                    else if (subparts[0] == "port")
-                    {
-                        _port = ushort.Parse(subparts[1]);
-                    }
-                    else if (subparts[0] == "socket")
-                    {
-                        _socket = subparts[1];
-                    }
-                    else if (subparts[0] == "user")
+                    else if (subparts[0] == "User ID")
                     {
                         _user = subparts[1];
                     }
-                    else if (subparts[0] == "password")
+                    else if (subparts[0] == "Password")
                     {
                         _password = subparts[1];
                     }
-                    else if (subparts[0] == "retrytime")
+                    else if (subparts[0] == "Retry Time")
                     {
                         _retrytime = int.Parse(subparts[1]);
                     }
-                    else if (subparts[0] == "tries")
+                    else if (subparts[0] == "Tries")
                     {
                         _tries = int.Parse(subparts[1]);
                     }
-                    else if (subparts[0] == "db")
+                    else if (subparts[0] == "Initial Catalog")
                     {
                         _db = subparts[1];
                     }
-                    else if (subparts[0] == "debug")
+                    else if (subparts[0] == "Debug")
                     {
                         _debug = (subparts[1] == "true");
                     }
