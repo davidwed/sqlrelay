@@ -5,13 +5,22 @@ namespace SQLRClient
 {
     public class SQLRelayParameter : IDataParameter
     {
+
+        #region member variables
+
         DbType _dbtype = DbType.Object;
+        SQLRelayType _sqlrelaytype = SQLRelayType.Object;
         ParameterDirection _paramaterdirection = ParameterDirection.Input;
         bool _nullable = false;
         string _parametername = null;
         string _sourcecolumn = null;
         DataRowVersion _sourceversion = DataRowVersion.Current;
         object _value = null;
+
+        #endregion
+
+
+        #region constructors and destructors
 
         public SQLRelayParameter()
         {
@@ -36,6 +45,11 @@ namespace SQLRClient
             _sourcecolumn = sourcecolumn;
         }
 
+        #endregion
+
+
+        #region parameters
+
         public DbType DbType
         {
             get
@@ -45,6 +59,18 @@ namespace SQLRClient
             set
             {
                 _dbtype = value;
+            }
+        }
+
+        public SQLRelayType SQLRelayType
+        {
+            get
+            {
+                return _sqlrelaytype;
+            }
+            set
+            {
+                _sqlrelaytype = value;
             }
         }
 
@@ -117,6 +143,11 @@ namespace SQLRClient
             }
         }
 
+        #endregion
+
+
+        #region private methods
+
         private DbType inferType(object value)
         {
             switch (Type.GetTypeCode(value.GetType()))
@@ -170,5 +201,7 @@ namespace SQLRClient
                     throw new SystemException("Value is of unknown data type");
             }
         }
+
+        #endregion
     }
 }

@@ -141,13 +141,17 @@ namespace SQLRClientTest
             // bind by position
             Console.WriteLine("BIND BY POSITION:");
             //sqlrcom.CommandText = "insert into testtable values (:var1, :var2, :var3, :var4, :var5, :var6, :var7)";
-            sqlrcom.CommandText = "insert into testtable values (:var1, :var2, :var3, :var4, :var5, null, null)";
+            sqlrcom.CommandText = "insert into testtable values (:var1, :var2, :var3, :var4, :var5, :var6, null)";
             sqlrcom.Parameters.Add("1", 2);
             sqlrcom.Parameters.Add("2", "testchar2");
             sqlrcom.Parameters.Add("3", "testvarchar2");
             sqlrcom.Parameters.Add("4", "01-JAN-2002");
             sqlrcom.Parameters.Add("5", "testlong2");
-            //sqlrcom.Parameters.Add("6", "testclob2");
+            SQLRelayParameter var6 = new SQLRelayParameter();
+            var6.ParameterName = "6";
+            var6.Value = "testclob2";
+            var6.SQLRelayType = SQLRelayType.Clob;
+            sqlrcom.Parameters.Add(var6);
             //sqlrcom.Parameters.Add("7", "testblob2");
             checkSuccess(ExecuteNonQuery(sqlrcom), 1);
             sqlrcom.Parameters.Clear();
@@ -156,7 +160,8 @@ namespace SQLRClientTest
             sqlrcom.Parameters.Add("3", "testvarchar3");
             sqlrcom.Parameters.Add("4", "01-JAN-2003");
             sqlrcom.Parameters.Add("5", "testlong3");
-            //sqlrcom.Parameters.Add("6", "testclob3");
+            var6.Value = "testclob3";
+            sqlrcom.Parameters.Add(var6);
             //sqlrcom.Parameters.Add("7", "testblob3");
             checkSuccess(ExecuteNonQuery(sqlrcom), 1);
             sqlrcom.Parameters.Clear();
@@ -168,7 +173,8 @@ namespace SQLRClientTest
             sqlrcom.Parameters.Add("var3", "testvarchar4");
             sqlrcom.Parameters.Add("var4", "01-JAN-2004");
             sqlrcom.Parameters.Add("var5", "testlong4");
-            //sqlrcom.Parameters.Add("var6", "testclob4");
+            var6.Value = "testclob4";
+            sqlrcom.Parameters.Add(var6);
             //sqlrcom.Parameters.Add("var7", "testblob4");
             checkSuccess(ExecuteNonQuery(sqlrcom), 1);
             sqlrcom.Parameters.Clear();
@@ -177,7 +183,8 @@ namespace SQLRClientTest
             sqlrcom.Parameters.Add("var3", "testvarchar5");
             sqlrcom.Parameters.Add("var4", "01-JAN-2005");
             sqlrcom.Parameters.Add("var5", "testlong5");
-            //sqlrcom.Parameters.Add("var6", "testclob5");
+            var6.Value = "testclob4";
+            sqlrcom.Parameters.Add(var6);
             //sqlrcom.Parameters.Add("var7", "testblob5");
             checkSuccess(ExecuteNonQuery(sqlrcom), 1);
             sqlrcom.Parameters.Clear();
@@ -448,7 +455,7 @@ namespace SQLRClientTest
             //checkSuccess(Convert.ToString(datareader[3]), "01-JAN-01");
             checkSuccess(datareader.GetString(4), "testlong1");
             checkSuccess(System.Text.Encoding.Default.GetString((byte[])datareader[4]), "testlong1");
-            //checkSuccess(datareader.GetString(5), "testclob1");
+            checkSuccess(datareader.GetString(5), "testclob1");
             //checkSuccess(datareader.GetString(6), "testblob1");
             Console.WriteLine("\n");
 
@@ -466,8 +473,8 @@ namespace SQLRClientTest
             //checkSuccess(datareader.GetString(datareader.GetOrdinal("TESTDATE")), "01-JAN-01");
             checkSuccess(System.Text.Encoding.Default.GetString((byte[])datareader["TESTLONG"]), "testlong1");
             checkSuccess(datareader.GetString(datareader.GetOrdinal("TESTLONG")), "testlong1");
-            //checkSuccess(System.Text.Encoding.Default.GetString((byte[])datareader["TESTCLOB"]), "testclob1");
-            //checkSuccess(datareader.GetString(datareader.GetOrdinal("TESTCLOB")), "testclob1");
+            checkSuccess(Convert.ToString(datareader["TESTCLOB"]), "testclob1");
+            checkSuccess(datareader.GetString(datareader.GetOrdinal("TESTCLOB")), "testclob1");
             //checkSuccess(System.Text.Encoding.Default.GetString((byte[])datareader["TESTBLOB"]), "testblob1");
             //checkSuccess(datareader.GetString(datareader.GetOrdinal("TESTBLOB")), "testblob1");
             Console.WriteLine("\n");
@@ -481,7 +488,7 @@ namespace SQLRClientTest
             checkSuccess(Convert.ToString(fields[2]), "testvarchar1");
             //checkSuccess(Convert.ToString(fields[3]), "01-JAN-01");
             checkSuccess(System.Text.Encoding.Default.GetString((byte[])fields[4]), "testlong1");
-            //checkSuccess(System.Text.Encoding.Default.GetString((byte[])fields[5]), "testclob1);
+            checkSuccess(Convert.ToString(fields[5]), "testclob1");
             //checkSuccess(System.Text.Encoding.Default.GetString((byte[])fields[6]), "testblob1");
             Console.WriteLine("\n");
 

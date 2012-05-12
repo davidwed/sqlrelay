@@ -53,6 +53,7 @@
     <Compile Include="SQLRelayParameterCollection.cs" />
     <Compile Include="SQLRelayDataReader.cs" />
     <Compile Include="SQLRelayTransaction.cs" />
+    <Compile Include="SQLRelayType.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
