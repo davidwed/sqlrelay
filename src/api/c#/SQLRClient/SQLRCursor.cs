@@ -170,7 +170,7 @@ public class SQLRCursor : IDisposable
     }
 
     /** Sends the query in file "path"/"filename" and gets a result set. */
-    public Boolean  sendFileQuery(IntPtr sqlrcurref, String path, String filename)
+    public Boolean  sendFileQuery(String path, String filename)
     {
         return sqlrcur_sendFileQuery(sqlrcurref, path, filename) != 0;
     }
@@ -499,7 +499,6 @@ public class SQLRCursor : IDisposable
         }
 
         // if we didn't get a null field, return an actual string
-        Console.WriteLine("actual value");
         return System.Text.Encoding.Default.GetString(field);
     }
 
