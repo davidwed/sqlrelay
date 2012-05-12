@@ -353,6 +353,19 @@ namespace SQLRClient
                 }
                 else if (param.Direction == ParameterDirection.Output)
                 {
+                    switch (param.SQLRelayType)
+                    {
+                        case SQLRelayType.Clob:
+                            _sqlrcur.defineOutputBindClob(param.ParameterName);
+                            continue;
+                        case SQLRelayType.Blob:
+                            _sqlrcur.defineOutputBindBlob(param.ParameterName);
+                            continue;
+                        case SQLRelayType.Cursor:
+                            // FIXME: not implemented yet
+                            throw new NotSupportedException();
+                    }
+
                     switch (param.DbType)
                     {
                         case DbType.AnsiString:
@@ -370,7 +383,7 @@ namespace SQLRClient
                             continue;
 
                         case DbType.Binary:
-                            // FIXME: I should use inputBindBlob but how do i get the size?
+                            _sqlrcur.defineOutputBindBlob(param.ParameterName);
                             continue;
 
                         case DbType.Boolean:
@@ -420,6 +433,19 @@ namespace SQLRClient
 
                 if (param.Direction == ParameterDirection.Output)
                 {
+                    switch (param.SQLRelayType)
+                    {
+                        case SQLRelayType.Clob:
+                            param.Value = _sqlrcur.getOutputBindClob(param.ParameterName);
+                            continue;
+                        case SQLRelayType.Blob:
+                            param.Value = _sqlrcur.getOutputBindBlob(param.ParameterName);
+                            continue;
+                        case SQLRelayType.Cursor:
+                            // FIXME: not implemented yet
+                            throw new NotSupportedException();
+                    }
+
                     switch (param.DbType)
                     {
                         case DbType.AnsiString:
