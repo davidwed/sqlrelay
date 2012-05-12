@@ -19,7 +19,7 @@ namespace SQLRClient
             }
         }
 
-        public Boolean  Contains(String parametername)
+        public Boolean Contains(String parametername)
         {
             return (-1 != IndexOf(parametername));
         }

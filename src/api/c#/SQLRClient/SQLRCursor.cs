@@ -484,22 +484,43 @@ public class SQLRCursor : IDisposable
     /** Returns the specified field as a string. */
     public String getField(UInt64 row, UInt32 col)
     {
-        Byte[] field = getFieldAsByteArray(row,col);
-        if (field == null)
+        // if we're getting nulls as nulls or we've run off the end of the result set,
+        // return a null for a null field
+        if (sqlrcur_getFieldByIndex(sqlrcurref, row, col) == IntPtr.Zero)
         {
             return null;
         }
+
+        // if we're getting nulls as empty strings, return an empty string for a null field
+        Byte[] field = getFieldAsByteArray(row,col);
+        if (field == null)
+        {
+            return "";
+        }
+
+        // if we didn't get a null field, return an actual string
+        Console.WriteLine("actual value");
         return System.Text.Encoding.Default.GetString(field);
     }
 
     /** Returns the specified field as a string. */
     public String getField(UInt64 row, String col)
     {
-        Byte[] field = getFieldAsByteArray(row, col);
-        if (field == null)
+        // if we're getting nulls as nulls or we've run off the end of the result set,
+        // return a null for a null field
+        if (sqlrcur_getFieldByName(sqlrcurref, row, col) == IntPtr.Zero)
         {
             return null;
         }
+
+        // if we're getting nulls as empty strings, return an empty string for a null field
+        Byte[] field = getFieldAsByteArray(row, col);
+        if (field == null)
+        {
+            return "";
+        }
+
+        // if we didn't get a null field, return an actual string
         return System.Text.Encoding.Default.GetString(field);
     }
 
@@ -530,7 +551,7 @@ public class SQLRCursor : IDisposable
     /** Returns the specified field as a string. */
     public Byte[] getFieldAsByteArray(UInt64 row, UInt32 col)
     {
-        Int32 size = (int)sqlrcur_getFieldLengthByIndex(sqlrcurref, row, col);
+        Int32 size = (Int32)sqlrcur_getFieldLengthByIndex(sqlrcurref, row, col);
         if (size == 0)
         {
             return null;
@@ -543,7 +564,7 @@ public class SQLRCursor : IDisposable
     /** Returns the specified field as a string. */
     public Byte[] getFieldAsByteArray(UInt64 row, String col)
     {
-        Int32 size = (int)sqlrcur_getFieldLengthByName(sqlrcurref, row, col);
+        Int32 size = (Int32)sqlrcur_getFieldLengthByName(sqlrcurref, row, col);
         if (size == 0)
         {
             return null;

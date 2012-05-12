@@ -17,6 +17,7 @@ namespace SQLRClient
         String _sourcecolumn = null;
         DataRowVersion _sourceversion = DataRowVersion.Current;
         Object _value = null;
+        Boolean _isnull = true;
 
         #endregion
 
@@ -30,19 +31,19 @@ namespace SQLRClient
         public SQLRelayParameter(String parametername, DbType dbtype)
         {
             _parametername = parametername;
-            _dbtype = dbtype;
+            DbType = dbtype;
         }
 
         public SQLRelayParameter(String parametername, Object value)
         {
             _parametername = parametername;
-            _value = value;
+            Value = value;
         }
 
         public SQLRelayParameter(String parametername, DbType dbtype, String sourcecolumn)
         {
             _parametername = parametername;
-            _dbtype = dbtype;
+            DbType = dbtype;
             _sourcecolumn = sourcecolumn;
         }
 
@@ -142,7 +143,16 @@ namespace SQLRClient
             set
             {
                 _value = value;
+                _isnull = (_value == null);
                 determineDbType();
+            }
+        }
+
+        public Boolean IsNull
+        {
+            get
+            {
+                return _isnull;
             }
         }
 

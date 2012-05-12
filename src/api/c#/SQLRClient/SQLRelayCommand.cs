@@ -178,7 +178,7 @@ namespace SQLRClient
 
         public Int32 ExecuteNonQuery()
         {
-            return (runQuery()) ? (int)_sqlrcur.affectedRows() : 0;
+            return (runQuery()) ? (Int32)_sqlrcur.affectedRows() : 0;
         }
 
         public IDataReader ExecuteReader()
@@ -283,13 +283,18 @@ namespace SQLRClient
                 if (param.Direction == ParameterDirection.Input)
                 {
 
+                    if (param.IsNull)
+                    {
+                        _sqlrcur.inputBind(param.ParameterName, null);
+                        continue;
+                    }
+
                     switch (param.SQLRelayType)
                     {
                         case SQLRelayType.Clob:
-                            _sqlrcur.inputBindClob(param.ParameterName, (String)param.Value, (UInt32)((String)param.Value).Length);
+                            _sqlrcur.inputBindClob(param.ParameterName, Convert.ToString(param.Value), (UInt32)Convert.ToString(param.Value).Length);
                             continue;
                         case SQLRelayType.Blob:
-                            Console.WriteLine("binding blob 1");
                             _sqlrcur.inputBindBlob(param.ParameterName, (Byte[])param.Value, (UInt32)((Byte[])param.Value).Length);
                             continue;
                         case SQLRelayType.Cursor:

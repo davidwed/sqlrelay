@@ -78,7 +78,7 @@ namespace SQLRClient
         {
             get
             {
-                return (int)_sqlrcur.affectedRows();
+                return (Int32)_sqlrcur.affectedRows();
             }
         }
 
@@ -122,8 +122,8 @@ namespace SQLRClient
             }
             _values = new Object[FieldCount];
 
-            // this will need to be updated if getNullsAsNulls is exposed
-            return (_sqlrcur.getField(_currentrow, (UInt32)0) != null);
+            // return whether or not we've read past the end of the result set
+            return (!_sqlrcur.endOfResultSet() || _currentrow < _sqlrcur.rowCount());
         }
 
         public DataTable GetSchemaTable()
@@ -166,7 +166,7 @@ namespace SQLRClient
 
                 DataRow row = datatable.NewRow();
                 
-                row["ColumnName"] = GetName((int)i);
+                row["ColumnName"] = GetName((Int32)i);
                 row["ColumnOrdinal"] = i;
                 row["ColumnSize"] = _sqlrcur.getColumnLength(i);
                 row["NumericPrecision"] = _sqlrcur.getColumnPrecision(i);
@@ -175,10 +175,10 @@ namespace SQLRClient
                 row["IsKey"] = _sqlrcur.getColumnIsPrimaryKey(i) || _sqlrcur.getColumnIsPartOfKey(i);
                 row["BaseServerName"] = null;
                 row["BaseCatalogName"] = null;
-                row["BaseColumnName"] = GetName((int)i);
+                row["BaseColumnName"] = GetName((Int32)i);
                 row["BaseSchemaName"] = null;
                 row["BaseTableName"] = null;
-                row["DataType"] = GetFieldType((int)i);
+                row["DataType"] = GetFieldType((Int32)i);
                 row["AllowDBNull"] = _sqlrcur.getColumnIsNullable(i);
                 row["ProviderType"] = _sqlrcur.getColumnType(i);
                 row["IsAliased"] = false;
@@ -187,7 +187,7 @@ namespace SQLRClient
                 row["IsAutoIncrement"] = _sqlrcur.getColumnIsAutoIncrement(i);
                 row["IsRowVersion"] = false;
                 row["IsHidden"] = false;
-                row["IsLong"] = (GetFieldType((int)i) == typeof(Byte[]));
+                row["IsLong"] = (GetFieldType((Int32)i) == typeof(Byte[]));
                 row["IsReadOnly"] = false;
                 row["ProviderSpecificDataType"] = _sqlrcur.getColumnType(i);
                 row["DataTypeName"] = _sqlrcur.getColumnType(i);
@@ -207,7 +207,7 @@ namespace SQLRClient
         {
             get
             {
-                return (int)_sqlrcur.colCount();
+                return (Int32)_sqlrcur.colCount();
             }
         }
 
@@ -1716,7 +1716,7 @@ namespace SQLRClient
 
         public Int32 GetValues(Object[] values)
         {
-            Int32 colcount=(int)_sqlrcur.colCount();
+            Int32 colcount=(Int32)_sqlrcur.colCount();
             Int32 i = 0;
             for (; i < colcount && i < values.Length; i++)
             {
@@ -1732,7 +1732,7 @@ namespace SQLRClient
             {
                 if (cultureAwareCompare(name, _sqlrcur.getColumnName(i)) == 0)
                 {
-                    return (int)i;
+                    return (Int32)i;
                 }
             }
             throw new IndexOutOfRangeException("Could not find specified column in results");
@@ -1774,7 +1774,7 @@ namespace SQLRClient
             UInt32 j = 0;
             while (j < length && fieldoffset + j < field.Length)
             {
-                buffer[bufferoffset + i] = field[(int)(fieldoffset + j)];
+                buffer[bufferoffset + i] = field[(Int32)(fieldoffset + j)];
                 j++;
             }
             return (Int64)j;
@@ -1795,7 +1795,7 @@ namespace SQLRClient
             UInt32 j = 0;
             while (j < length && fieldoffset + j < field.Length)
             {
-                buffer[bufferoffset + i] = field[(int)(fieldoffset + j)];
+                buffer[bufferoffset + i] = field[(Int32)(fieldoffset + j)];
                 j++;
             }
             return (Int64)j;
