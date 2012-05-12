@@ -286,11 +286,10 @@ namespace SQLRClient
                     switch (param.SQLRelayType)
                     {
                         case SQLRelayType.Clob:
-                            Console.WriteLine("binding clob");
                             _sqlrcur.inputBindClob(param.ParameterName, (string)param.Value, (uint)((string)param.Value).Length);
                             continue;
                         case SQLRelayType.Blob:
-                            //_sqlrcur.inputBindBlob(param.ParameterName, (byte[])param.Value, (uint)(byte[])param.Value).Length);
+                            _sqlrcur.inputBindBlob(param.ParameterName, (byte[])param.Value, (uint)((byte[])param.Value).Length);
                             continue;
                         case SQLRelayType.Cursor:
                             // FIXME: not implemented yet
@@ -313,7 +312,7 @@ namespace SQLRClient
                             continue;
 
                         case DbType.Binary:
-                            //_sqlrcur.inputBindBlob(param.ParameterName, (byte[])param.Value, (uint)(byte[])param.Value).Length);
+                            _sqlrcur.inputBindBlob(param.ParameterName, (byte[])param.Value, (uint)((byte[])param.Value).Length);
                             continue;
 
                         case DbType.Boolean:

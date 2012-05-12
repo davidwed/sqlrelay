@@ -246,7 +246,7 @@ public class SQLRCursor : IDisposable
     }
 
     /** Defines a binary lob input bind variable. */
-    public void inputBindBlob(string variable, string val, uint size)
+    public void inputBindBlob(string variable, byte[] val, uint size)
     {
         sqlrcur_inputBindBlob(sqlrcurref, variable, val, size);
     }
@@ -365,7 +365,7 @@ public class SQLRCursor : IDisposable
 
     /** Get the value stored in a previously defined
      *  binary lob output bind variable. */
-    public string getOutputBindBlob(string variable)
+    public byte[] getOutputBindBlob(string variable)
     {
         return sqlrcur_getOutputBindBlob(sqlrcurref, variable);
     }
@@ -878,7 +878,7 @@ public class SQLRCursor : IDisposable
     private static extern void sqlrcur_inputBindDouble(IntPtr sqlrcurref, string variable, double val, uint precision, uint scale);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_inputBindBlob(IntPtr sqlrcurref, string variable, string val, uint size);
+    private static extern void sqlrcur_inputBindBlob(IntPtr sqlrcurref, string variable, byte[] val, uint size);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_inputBindClob(IntPtr sqlrcurref, string variable, string val, uint size);
@@ -929,7 +929,7 @@ public class SQLRCursor : IDisposable
     private static extern double sqlrcur_getOutputBindDouble(IntPtr sqlrcurref, string variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern string sqlrcur_getOutputBindBlob(IntPtr sqlrcurref, string variable);
+    private static extern byte[] sqlrcur_getOutputBindBlob(IntPtr sqlrcurref, string variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern string sqlrcur_getOutputBindClob(IntPtr sqlrcurref, string variable);
