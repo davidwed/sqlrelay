@@ -8,14 +8,15 @@ namespace SQLRClient
 
         #region member variables
 
+        Boolean _dbtypeset = false;
         DbType _dbtype = DbType.Object;
         SQLRelayType _sqlrelaytype = SQLRelayType.Object;
         ParameterDirection _paramaterdirection = ParameterDirection.Input;
-        bool _nullable = false;
-        string _parametername = null;
-        string _sourcecolumn = null;
+        Boolean _nullable = false;
+        String _parametername = null;
+        String _sourcecolumn = null;
         DataRowVersion _sourceversion = DataRowVersion.Current;
-        object _value = null;
+        Object _value = null;
 
         #endregion
 
@@ -26,19 +27,19 @@ namespace SQLRClient
         {
         }
 
-        public SQLRelayParameter(string parametername, DbType dbtype)
+        public SQLRelayParameter(String parametername, DbType dbtype)
         {
             _parametername = parametername;
             _dbtype = dbtype;
         }
 
-        public SQLRelayParameter(string parametername, object value)
+        public SQLRelayParameter(String parametername, Object value)
         {
             _parametername = parametername;
             _value = value;
         }
 
-        public SQLRelayParameter(string parametername, DbType dbtype, string sourcecolumn)
+        public SQLRelayParameter(String parametername, DbType dbtype, String sourcecolumn)
         {
             _parametername = parametername;
             _dbtype = dbtype;
@@ -54,11 +55,13 @@ namespace SQLRClient
         {
             get
             {
+                determineDbType();
                 return _dbtype;
             }
             set
             {
                 _dbtype = value;
+                _dbtypeset = true;
             }
         }
 
@@ -86,7 +89,7 @@ namespace SQLRClient
             }
         }
 
-        public bool IsNullable
+        public Boolean  IsNullable
         {
             get
             {
@@ -130,7 +133,7 @@ namespace SQLRClient
             }
         }
 
-        public object Value
+        public Object Value
         {
             get
             {
@@ -139,7 +142,7 @@ namespace SQLRClient
             set
             {
                 _value = value;
-                _dbtype = inferType(_value);
+                determineDbType();
             }
         }
 
@@ -148,57 +151,93 @@ namespace SQLRClient
 
         #region private methods
 
-        private DbType inferType(object value)
+        private void determineDbType()
         {
-            switch (Type.GetTypeCode(value.GetType()))
+            // dont change the type if it's already been set manually
+            if (_dbtypeset == true)
+            {
+                return;
+            }
+
+            _dbtypeset = true;
+
+            if (_value == null)
+            {
+                _dbtype = DbType.Object;
+                return;
+            }
+
+            switch (Type.GetTypeCode(_value.GetType()))
             {
                 case TypeCode.Empty:
-                    throw new SystemException("Invalid data type");
-
                 case TypeCode.Object:
-                    return DbType.Object;
-
                 case TypeCode.DBNull:
+                    _dbtype = DbType.Object;
+                    return;
+
                 case TypeCode.Char:
+                    _dbtype = DbType.UInt16;
+                    return;
+
                 case TypeCode.SByte:
+                    _dbtype = DbType.Int16;
+                    return;
+
                 case TypeCode.UInt16:
+                    _dbtype = DbType.UInt16;
+                    return;
+
                 case TypeCode.UInt32:
-                case TypeCode.UInt64:
-                    // Throw a SystemException for unsupported data types.
-                    throw new SystemException("Invalid data type");
+                    _dbtype = DbType.UInt32;
+                    return;
+
+                case TypeCode.UInt64 :
+                    _dbtype = DbType.UInt64 ;
+                    return;
 
                 case TypeCode.Boolean:
-                    return DbType.Boolean;
+                    _dbtype = DbType.Boolean;
+                    return;
 
                 case TypeCode.Byte:
-                    return DbType.Byte;
+                    _dbtype = DbType.Byte;
+                    return;
 
                 case TypeCode.Int16:
-                    return DbType.Int16;
+                    _dbtype = DbType.Int16;
+                    return;
 
                 case TypeCode.Int32:
-                    return DbType.Int32;
+                    _dbtype = DbType.Int32;
+                    return;
 
                 case TypeCode.Int64:
-                    return DbType.Int64;
+                    _dbtype = DbType.Int64;
+                    return;
 
                 case TypeCode.Single:
-                    return DbType.Single;
+                    _dbtype = DbType.Single;
+                    return;
 
                 case TypeCode.Double:
-                    return DbType.Double;
+                    _dbtype = DbType.Double;
+                    return;
 
                 case TypeCode.Decimal:
-                    return DbType.Decimal;
+                    _dbtype = DbType.Decimal;
+                    return;
 
                 case TypeCode.DateTime:
-                    return DbType.DateTime;
+                    _dbtype = DbType.DateTime;
+                    return;
 
                 case TypeCode.String:
-                    return DbType.String;
+                    _dbtype = DbType.String;
+                    return;
 
                 default:
-                    throw new SystemException("Value is of unknown data type");
+                    _dbtype = DbType.Object;
+                    return;
             }
         }
 

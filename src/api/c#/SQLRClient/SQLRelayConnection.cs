@@ -10,16 +10,16 @@ namespace SQLRClient
 
         private ConnectionState _connectionstate = ConnectionState.Closed;
         private SQLRConnection _sqlrcon = null;
-        private string _connectionstring = null;
-        private string _host = null;
-        private ushort _port = 0;
-        private string _socket = null;
-        private string _user = null;
-        private string _password = null;
-        private int _retrytime = 0;
-        private int _tries = 1;
-        private string _db = null;
-        private bool _debug = false;
+        private String _connectionstring = null;
+        private String _host = null;
+        private UInt16 _port = 0;
+        private String _socket = null;
+        private String _user = null;
+        private String _password = null;
+        private Int32 _retrytime = 0;
+        private Int32 _tries = 1;
+        private String _db = null;
+        private Boolean  _debug = false;
 
         #endregion
 
@@ -30,12 +30,12 @@ namespace SQLRClient
         {
         }
 
-        public SQLRelayConnection(string connectstring)
+        public SQLRelayConnection(String connectstring)
         {
             ConnectionString = connectstring;
         }
 
-        private void Dispose(bool disposing)
+        private void Dispose(Boolean  disposing)
         {
             if (_connectionstate == ConnectionState.Open)
             {
@@ -54,7 +54,7 @@ namespace SQLRClient
 
         #region properties
 
-        public string ConnectionString
+        public String ConnectionString
         {
             get
             {
@@ -76,20 +76,20 @@ namespace SQLRClient
                 _debug = false;
 
                 // parse the connection string
-                string[] parts = ConnectionString.Split(";".ToCharArray());
+                String[] parts = ConnectionString.Split(";".ToCharArray());
 
-                foreach (string part in parts)
+                foreach (String part in parts)
                 {
-                    string[] subparts = part.Split("=".ToCharArray());
+                    String[] subparts = part.Split("=".ToCharArray());
                     if (subparts[0] == "Data Source")
                     {
-                        string datasource = subparts[1];
+                        String datasource = subparts[1];
 
                         // split the data source, look for one of the following formats:
                         // host:port:socket
                         // host:port
                         // socket
-                        string[] subsubparts = datasource.Split(":".ToCharArray());
+                        String[] subsubparts = datasource.Split(":".ToCharArray());
                         if (subsubparts.Length == 1)
                         {
                             _socket = subsubparts[0];
@@ -97,7 +97,7 @@ namespace SQLRClient
                         else
                         {
                             _host = subsubparts[0];
-                            _port = ushort.Parse(subsubparts[1]);
+                            _port = Convert.ToUInt16(subsubparts[1]);
                             if (subsubparts.Length > 2)
                             {
                                 _socket = subsubparts[2];
@@ -114,11 +114,11 @@ namespace SQLRClient
                     }
                     else if (subparts[0] == "Retry Time")
                     {
-                        _retrytime = int.Parse(subparts[1]);
+                        _retrytime = Convert.ToInt32(subparts[1]);
                     }
                     else if (subparts[0] == "Tries")
                     {
-                        _tries = int.Parse(subparts[1]);
+                        _tries = Convert.ToInt32(subparts[1]);
                     }
                     else if (subparts[0] == "Initial Catalog")
                     {
@@ -132,7 +132,7 @@ namespace SQLRClient
             }
         }
 
-        public int ConnectionTimeout
+        public Int32 ConnectionTimeout
         {
             get
             {
@@ -140,7 +140,7 @@ namespace SQLRClient
             }
         }
 
-        public string Database
+        public String Database
         {
             get
             {
@@ -156,7 +156,7 @@ namespace SQLRClient
             }
         }
 
-        public bool Debug
+        public Boolean  Debug
         {
             get
             {
@@ -227,7 +227,7 @@ namespace SQLRClient
             throw new InvalidOperationException();
         }
 
-        public void ChangeDatabase(string db)
+        public void ChangeDatabase(String db)
         {
             validConnection();
             _db = db;

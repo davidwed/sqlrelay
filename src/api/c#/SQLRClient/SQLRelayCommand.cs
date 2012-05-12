@@ -11,8 +11,8 @@ namespace SQLRClient
         private SQLRelayConnection _sqlrelaycon = null;
         private SQLRelayTransaction _sqlrelaytran = null;
         private SQLRCursor _sqlrcur = null;
-        private string _commandtext = null;
-        private bool _prepared = false;
+        private String _commandtext = null;
+        private Boolean  _prepared = false;
         private UpdateRowSource _updaterowsource = UpdateRowSource.None;
         private SQLRelayParameterCollection _sqlrelayparams = new SQLRelayParameterCollection();
 
@@ -25,18 +25,18 @@ namespace SQLRClient
         {
         }
 
-        public SQLRelayCommand(string commandtext)
+        public SQLRelayCommand(String commandtext)
         {
             _commandtext = commandtext;
         }
 
-        public SQLRelayCommand(string commandtext, SQLRelayConnection sqlrelaycon)
+        public SQLRelayCommand(String commandtext, SQLRelayConnection sqlrelaycon)
         {
             _commandtext = commandtext;
             _sqlrelaycon = sqlrelaycon;
         }
 
-        public SQLRelayCommand(string commandtext, SQLRelayConnection sqlrelaycon, SQLRelayTransaction sqlrelaytran)
+        public SQLRelayCommand(String commandtext, SQLRelayConnection sqlrelaycon, SQLRelayTransaction sqlrelaytran)
         {
             _commandtext = commandtext;
             _sqlrelaycon = sqlrelaycon;
@@ -49,7 +49,7 @@ namespace SQLRClient
             System.GC.SuppressFinalize(this);
         }
 
-        private void Dispose(bool disposing)
+        private void Dispose(Boolean  disposing)
         {
             // FIXME: do anything?
         }
@@ -59,7 +59,7 @@ namespace SQLRClient
 
         #region properties
 
-        public string CommandText
+        public String CommandText
         {
             get
             {
@@ -72,7 +72,7 @@ namespace SQLRClient
             }
         }
 
-        public int CommandTimeout
+        public Int32 CommandTimeout
         {
             get
             {
@@ -176,7 +176,7 @@ namespace SQLRClient
             return (IDbDataParameter)(new SQLRelayParameter());
         }
 
-        public int ExecuteNonQuery()
+        public Int32 ExecuteNonQuery()
         {
             return (runQuery()) ? (int)_sqlrcur.affectedRows() : 0;
         }
@@ -191,7 +191,7 @@ namespace SQLRClient
             return (runQuery()) ? new SQLRelayDataReader(_sqlrelaycon, _sqlrcur, commandbehavior == CommandBehavior.CloseConnection) : null;
         }
 
-        public object ExecuteScalar()
+        public Object ExecuteScalar()
         {
             if (runQuery())
             {
@@ -234,7 +234,7 @@ namespace SQLRClient
             return _sqlrcur;
         }
 
-        private bool runQuery()
+        private Boolean  runQuery()
         {
             if (_commandtext == null)
             {
@@ -275,7 +275,7 @@ namespace SQLRClient
 
             _sqlrcur.clearBinds();
 
-            for (int i = 0; i < Parameters.Count; i++)
+            for (Int32 i = 0; i < Parameters.Count; i++)
             {
 
                 SQLRelayParameter param = (SQLRelayParameter)Parameters[i];
@@ -286,10 +286,11 @@ namespace SQLRClient
                     switch (param.SQLRelayType)
                     {
                         case SQLRelayType.Clob:
-                            _sqlrcur.inputBindClob(param.ParameterName, (string)param.Value, (uint)((string)param.Value).Length);
+                            _sqlrcur.inputBindClob(param.ParameterName, (String)param.Value, (UInt32)((String)param.Value).Length);
                             continue;
                         case SQLRelayType.Blob:
-                            _sqlrcur.inputBindBlob(param.ParameterName, (byte[])param.Value, (uint)((byte[])param.Value).Length);
+                            Console.WriteLine("binding blob 1");
+                            _sqlrcur.inputBindBlob(param.ParameterName, (Byte[])param.Value, (UInt32)((Byte[])param.Value).Length);
                             continue;
                         case SQLRelayType.Cursor:
                             // FIXME: not implemented yet
@@ -308,15 +309,15 @@ namespace SQLRClient
                         case DbType.StringFixedLength:
                         case DbType.Time:
                         case DbType.Guid:
-                            _sqlrcur.inputBind(param.ParameterName, (string)param.Value);
+                            _sqlrcur.inputBind(param.ParameterName, Convert.ToString(param.Value));
                             continue;
 
                         case DbType.Binary:
-                            _sqlrcur.inputBindBlob(param.ParameterName, (byte[])param.Value, (uint)((byte[])param.Value).Length);
+                            _sqlrcur.inputBindBlob(param.ParameterName, (Byte[])param.Value, (UInt32)((Byte[])param.Value).Length);
                             continue;
 
                         case DbType.Boolean:
-                            _sqlrcur.inputBind(param.ParameterName, (((bool)param.Value)==true) ? 1 : 0);
+                            _sqlrcur.inputBind(param.ParameterName, (Convert.ToBoolean(param.Value)==true) ? 1 : 0);
                             continue;
 
                         case DbType.Currency:
@@ -324,7 +325,7 @@ namespace SQLRClient
                         case DbType.Single:
                         case DbType.Double:
                         case DbType.VarNumeric:
-                            _sqlrcur.inputBind(param.ParameterName, (double)param.Value, 0, 0);
+                            _sqlrcur.inputBind(param.ParameterName, Convert.ToDouble(param.Value), 0, 0);
                             continue;
 
                         case DbType.Byte:
@@ -334,13 +335,13 @@ namespace SQLRClient
                         case DbType.SByte:
                         case DbType.UInt16:
                         case DbType.UInt32:
-                        case DbType.UInt64:
-                            _sqlrcur.inputBind(param.ParameterName, (long)param.Value);
+                        case DbType.UInt64 :
+                            _sqlrcur.inputBind(param.ParameterName, Convert.ToInt64(param.Value));
                             continue;
 
                         case DbType.Object:
                         case DbType.Xml:
-                            _sqlrcur.inputBind(param.ParameterName, param.Value.ToString());
+                            _sqlrcur.inputBind(param.ParameterName, Convert.ToString(param.Value));
                             continue;
                     }
 
@@ -386,7 +387,7 @@ namespace SQLRClient
                         case DbType.SByte:
                         case DbType.UInt16:
                         case DbType.UInt32:
-                        case DbType.UInt64:
+                        case DbType.UInt64 :
                             _sqlrcur.defineOutputBindInteger(param.ParameterName);
                             continue;
 
@@ -407,7 +408,7 @@ namespace SQLRClient
 
         private void copyOutBindValues()
         {
-            for (int i = 0; i < Parameters.Count; i++)
+            for (Int32 i = 0; i < Parameters.Count; i++)
             {
 
                 SQLRelayParameter param = (SQLRelayParameter)Parameters[i];
@@ -452,7 +453,7 @@ namespace SQLRClient
                         case DbType.SByte:
                         case DbType.UInt16:
                         case DbType.UInt32:
-                        case DbType.UInt64:
+                        case DbType.UInt64 :
                             param.Value = _sqlrcur.getOutputBindInteger(param.ParameterName);
                             break;
 

@@ -17,13 +17,13 @@ public class SQLRCursor : IDisposable
     }
 
     /** Dispose framework */
-    private bool disposed = false;
+    private Boolean  disposed = false;
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-    protected virtual void Dispose(bool disposing)
+    protected virtual void Dispose(Boolean  disposing)
     {
         if (!disposed)
         {
@@ -42,14 +42,14 @@ public class SQLRCursor : IDisposable
 
     /** Sets the number of rows of the result set to buffer at a time.
      *  0 (the default) means buffer the entire result set. */
-    public void setResultSetBufferSize(ulong rows)
+    public void setResultSetBufferSize(UInt64 rows)
     {
         sqlrcur_setResultSetBufferSize(sqlrcurref, rows);
     }
 
     /** Returns the number of result set rows that will be buffered at a time or
      *  0 for the entire result set. */
-    public ulong getResultSetBufferSize()
+    public UInt64 getResultSetBufferSize()
     {
         return sqlrcur_getResultSetBufferSize(sqlrcurref);
     }
@@ -103,7 +103,7 @@ public class SQLRCursor : IDisposable
      *  future queries will be cached to that file until another call to
      *  sqlrcur_cacheToFile() changes which file to cache to or a call to
      *  sqlrcur_cacheOff() turns off caching. */
-    public void cacheToFile(string filename)
+    public void cacheToFile(String filename)
     {
         sqlrcur_cacheToFile(sqlrcurref, filename);
     }
@@ -111,14 +111,14 @@ public class SQLRCursor : IDisposable
     /** Sets the time-to-live for cached result sets. The sqlr-cachemanger will
      *  remove each cached result set "ttl" seconds after it's created, provided
      *  it's scanning the directory containing the cache files. */
-    public void setCacheTtl(uint ttl)
+    public void setCacheTtl(UInt32 ttl)
     {
         sqlrcur_setCacheTtl(sqlrcurref, ttl);
     }
 
     /** Returns the name of the file containing
      *  the most recently cached result set. */
-    public string getCacheFileName()
+    public String getCacheFileName()
     {
         return sqlrcur_getCacheFileName(sqlrcurref);
     }
@@ -134,14 +134,14 @@ public class SQLRCursor : IDisposable
     /** Sends a query that returns a list of databases/schemas matching "wild".
      *  If wild is empty or NULL then a list of all databases/schemas will be
      *  returned. */
-    public bool getDatabaseList(string wild)
+    public Boolean  getDatabaseList(String wild)
     {
         return sqlrcur_getDatabaseList(sqlrcurref, wild) != 0;
     }
 
     /** Sends a query that returns a list of tables matching "wild".  If wild is
      *  empty or NULL then a list of all tables will be returned. */
-    public bool getTableList(string wild)
+    public Boolean  getTableList(String wild)
     {
         return sqlrcur_getTableList(sqlrcurref, wild) != 0;
     }
@@ -149,7 +149,7 @@ public class SQLRCursor : IDisposable
     /** Sends a query that returns a list of columns in the table specified by
      *  the "table" parameter matching "wild".  If wild is empty or NULL then a
      *  list of all columns will be returned. */
-    public bool getColumnList(string table, string wild)
+    public Boolean  getColumnList(String table, String wild)
     {
         return sqlrcur_getColumnList(sqlrcurref, table, wild) != 0;
     }
@@ -157,20 +157,20 @@ public class SQLRCursor : IDisposable
 
 
     /** Sends "query" directly and gets a result set. */
-    public bool sendQuery(string query)
+    public Boolean  sendQuery(String query)
     {
         return sqlrcur_sendQuery(sqlrcurref, query) != 0;
     }
 
     /** Sends "query" with length "length" directly and gets a result set. This
      *  function must be used if the query contains binary data. */
-    public bool sendQuery(string query, uint length)
+    public Boolean  sendQuery(String query, UInt32 length)
     {
         return sqlrcur_sendQueryWithLength(sqlrcurref, query, length) != 0;
     }
 
     /** Sends the query in file "path"/"filename" and gets a result set. */
-    public bool sendFileQuery(IntPtr sqlrcurref, string path, string filename)
+    public Boolean  sendFileQuery(IntPtr sqlrcurref, String path, String filename)
     {
         return sqlrcur_sendFileQuery(sqlrcurref, path, filename) != 0;
     }
@@ -178,59 +178,59 @@ public class SQLRCursor : IDisposable
 
 
     /** Prepare to execute "query". */
-    public void prepareQuery(string query)
+    public void prepareQuery(String query)
     {
         sqlrcur_prepareQuery(sqlrcurref, query);
     }
 
     /** Prepare to execute "query" with length "length".  This function must be
      *  used if the query contains binary data. */
-    public void prepareQuery(string query, uint length)
+    public void prepareQuery(String query, UInt32 length)
     {
         sqlrcur_prepareQueryWithLength(sqlrcurref, query, length);
     }
 
     /** Prepare to execute the contents of "path"/"filename". */
-    public void prepareFileQuery(string path, string filename)
+    public void prepareFileQuery(String path, String filename)
     {
         sqlrcur_prepareFileQuery(sqlrcurref, path, filename);
     }
 
 
 
-    /** Defines a string substitution variable. */
-    public void substitution(string variable, string val)
+    /** Defines a String substitution variable. */
+    public void substitution(String variable, String val)
     {
         sqlrcur_subString(sqlrcurref, variable, val);
     }
 
     /** Defines a integer substitution variable. */
-    public void substitution(string variable, long val)
+    public void substitution(String variable, Int64 val)
     {
         sqlrcur_subLong(sqlrcurref, variable, val);
     }
 
     /** Defines a decimal substitution variable. */
-    public void substitution(string variable, double val, uint precision, uint scale)
+    public void substitution(String variable, Double val, UInt32 precision, UInt32 scale)
     {
         sqlrcur_subDouble(sqlrcurref, variable, val, precision, scale);
     }
 
 
-    /** Defines a string input bind variable. */
-    public void inputBind(string variable, string val)
+    /** Defines a String input bind variable. */
+    public void inputBind(String variable, String val)
     {
         sqlrcur_inputBindString(sqlrcurref, variable, val);
     }
 
-    /** Defines a string input bind variable. */
-    public void inputBind(string variable, string val, uint vallength)
+    /** Defines a String input bind variable. */
+    public void inputBind(String variable, String val, UInt32 vallength)
     {
         sqlrcur_inputBindStringWithLength(sqlrcurref, variable, val, vallength);
     }
 
     /** Defines a integer input bind variable. */
-    public void inputBind(string variable, long val)
+    public void inputBind(String variable, Int64 val)
     {
         sqlrcur_inputBindLong(sqlrcurref, variable, val);
     }
@@ -240,58 +240,58 @@ public class SQLRCursor : IDisposable
      * them both to 0.  However in that case you may get
      * unexpected rounding behavior if the server is faking
      * binds.) */
-    public void inputBind(string variable, double val, uint precision, uint scale)
+    public void inputBind(String variable, Double val, UInt32 precision, UInt32 scale)
     {
         sqlrcur_inputBindDouble(sqlrcurref, variable, val, precision, scale);
     }
 
     /** Defines a binary lob input bind variable. */
-    public void inputBindBlob(string variable, byte[] val, uint size)
+    public void inputBindBlob(String variable, Byte[] val, UInt32 size)
     {
         sqlrcur_inputBindBlob(sqlrcurref, variable, val, size);
     }
 
     /** Defines a character lob input bind variable. */
-    public void inputBindClob(string variable, string val, uint size)
+    public void inputBindClob(String variable, String val, UInt32 size)
     {
         sqlrcur_inputBindClob(sqlrcurref, variable, val, size);
     }
 
 
 
-    /** Defines a string output bind variable.
-     *  "length" bytes will be reserved to store the value. */
-    public void defineOutputBindString(string variable, uint length)
+    /** Defines a String output bind variable.
+     *  "length" Bytes will be reserved to store the value. */
+    public void defineOutputBindString(String variable, UInt32 length)
     {
         sqlrcur_defineOutputBindString(sqlrcurref, variable, length);
     }
 
     /** Defines an integer output bind variable. */
-    public void defineOutputBindInteger(string variable)
+    public void defineOutputBindInteger(String variable)
     {
         sqlrcur_defineOutputBindInteger(sqlrcurref, variable);
     }
 
     /** Defines an decimal output bind variable. */
-    public void defineOutputBindDouble(string variable)
+    public void defineOutputBindDouble(String variable)
     {
         sqlrcur_defineOutputBindDouble(sqlrcurref, variable);
     }
 
     /** Defines a binary lob output bind variable */
-    public void defineOutputBindBlob(string variable)
+    public void defineOutputBindBlob(String variable)
     {
         sqlrcur_defineOutputBindBlob(sqlrcurref, variable);
     }
 
     /** Defines a character lob output bind variable */
-    public void defineOutputBindClob(string variable)
+    public void defineOutputBindClob(String variable)
     {
         sqlrcur_defineOutputBindClob(sqlrcurref, variable);
     }
 
     /** Defines a cursor output bind variable */
-    public void defineOutputBindCursor(string variable)
+    public void defineOutputBindCursor(String variable)
     {
     	sqlrcur_defineOutputBindCursor(sqlrcurref, variable);
     }
@@ -306,7 +306,7 @@ public class SQLRCursor : IDisposable
 
     /** Parses the previously prepared query, counts the number of bind
      *  variables defined in it and returns that number. */
-    public ushort countBindVariables()
+    public UInt16 countBindVariables()
     {
         return sqlrcur_countBindVariables(sqlrcurref);
     }
@@ -321,7 +321,7 @@ public class SQLRCursor : IDisposable
     }
 
     /** Returns true if "variable" was a valid bind variable of the query. */
-    public bool validBind(string variable)
+    public Boolean  validBind(String variable)
     {
         return sqlrcur_validBind(sqlrcurref, variable) != 0;
     }
@@ -329,13 +329,13 @@ public class SQLRCursor : IDisposable
 
 
     /** Execute the query that was previously prepared and bound. */
-    public bool executeQuery()
+    public Boolean  executeQuery()
     {
         return sqlrcur_executeQuery(sqlrcurref) != 0;
     }
 
     /** Fetch from a cursor that was returned as an output bind variable. */
-    public bool fetchFromBindCursor()
+    public Boolean  fetchFromBindCursor()
     {
         return sqlrcur_fetchFromBindCursor(sqlrcurref) != 0;
     }
@@ -343,50 +343,50 @@ public class SQLRCursor : IDisposable
 
 
     /** Get the value stored in a previously defined
-     *  string output bind variable. */
-    public string getOutputBindString(string variable)
+     *  String output bind variable. */
+    public String getOutputBindString(String variable)
     {
         return sqlrcur_getOutputBindString(sqlrcurref, variable);
     }
 
     /** Get the value stored in a previously defined
      *  integer output bind variable. */
-    public long getOutputBindInteger(string variable)
+    public Int64 getOutputBindInteger(String variable)
     {
         return sqlrcur_getOutputBindInteger(sqlrcurref, variable);
     }
 
     /** Get the value stored in a previously defined
      *  decimal output bind variable. */
-    public double getOutputBindDouble(string variable)
+    public double getOutputBindDouble(String variable)
     {
         return sqlrcur_getOutputBindDouble(sqlrcurref, variable);
     }
 
     /** Get the value stored in a previously defined
      *  binary lob output bind variable. */
-    public byte[] getOutputBindBlob(string variable)
+    public Byte[] getOutputBindBlob(String variable)
     {
         return sqlrcur_getOutputBindBlob(sqlrcurref, variable);
     }
 
     /** Get the value stored in a previously defined
      *  character lob output bind variable. */
-    public string getOutputBindClob(string variable)
+    public String getOutputBindClob(String variable)
     {
         return sqlrcur_getOutputBindClob(sqlrcurref, variable);
     }
 
     /** Get the length of the value stored in a previously
      *  defined output bind variable. */
-    public uint getOutputBindLength(string variable)
+    public UInt32 getOutputBindLength(String variable)
     {
         return sqlrcur_getOutputBindLength(sqlrcurref, variable);
     }
 
     /** Get the cursor associated with a previously defined output bind
      *  variable. */
-    public IntPtr getOutputBindCursor(string variable)
+    public IntPtr getOutputBindCursor(String variable)
     {
         return sqlrcur_getOutputBindCursor_copyrefs(sqlrcurref, variable, 1);
     }
@@ -395,7 +395,7 @@ public class SQLRCursor : IDisposable
 
     /** Opens a cached result set.  Returns true on success and
      * false on failure. */
-    public bool openCachedResultSet(string filename)
+    public Boolean  openCachedResultSet(String filename)
     {
         return sqlrcur_openCachedResultSet(sqlrcurref, filename)!=0;
     }
@@ -403,13 +403,13 @@ public class SQLRCursor : IDisposable
 
 
     /** Returns the number of columns in the current result set. */
-    public uint colCount()
+    public UInt32 colCount()
     {
         return sqlrcur_colCount(sqlrcurref);
     }
 
     /** Returns the number of rows in the current result set. */
-    public ulong rowCount()
+    public UInt64 rowCount()
     {
         return sqlrcur_rowCount(sqlrcurref);
     }
@@ -418,7 +418,7 @@ public class SQLRCursor : IDisposable
      *  set.  Not all databases support this call.  Don't use it for
      *  applications which are designed to be portable across databases.  -1
      *  is returned by databases which don't support this option. */
-    public ulong totalRows()
+    public UInt64 totalRows()
     {
         return sqlrcur_totalRows(sqlrcurref);
     }
@@ -427,14 +427,14 @@ public class SQLRCursor : IDisposable
      *  the query.  Not all databases support this call.  Don't use it for
      *  applications which are designed to be portable across databases.  -1
      *  is returned by databases which don't support this option. */
-    public ulong affectedRows()
+    public UInt64 affectedRows()
     {
         return sqlrcur_affectedRows(sqlrcurref);
     }
 
     /** Returns the index of the first buffered row.  This is useful when
      *  buffering only part of the result set at a time. */
-    public ulong firstRowIndex()
+    public UInt64 firstRowIndex()
     {
         return sqlrcur_firstRowIndex(sqlrcurref);
     }
@@ -443,7 +443,7 @@ public class SQLRCursor : IDisposable
      *  and true if not.  This function can only return false if
      *  setResultSetBufferSize() has been called with a parameter other than
      *  0. */
-    public bool endOfResultSet()
+    public Boolean  endOfResultSet()
     {
         return sqlrcur_endOfResultSet(sqlrcurref)!=0;
     }
@@ -452,14 +452,14 @@ public class SQLRCursor : IDisposable
 
     /** If a query failed and generated an error, the error message is available
      *  here.  If the query succeeded then this function returns a NULL. */
-    public string errorMessage()
+    public String errorMessage()
     {
         return sqlrcur_errorMessage(sqlrcurref);
     }
 
     /** If a query failed and generated an error, the error number is available
      *  here.  If there is no error then this method returns 0. */
-    public long errorNumber()
+    public Int64 errorNumber()
     {
         return sqlrcur_errorNumber(sqlrcurref);
     }
@@ -482,9 +482,9 @@ public class SQLRCursor : IDisposable
 
 
     /** Returns the specified field as a string. */
-    public string getField(ulong row, uint col)
+    public String getField(UInt64 row, UInt32 col)
     {
-        byte[] field = getFieldAsByteArray(row,col);
+        Byte[] field = getFieldAsByteArray(row,col);
         if (field == null)
         {
             return null;
@@ -493,9 +493,9 @@ public class SQLRCursor : IDisposable
     }
 
     /** Returns the specified field as a string. */
-    public string getField(ulong row, string col)
+    public String getField(UInt64 row, String col)
     {
-        byte[] field = getFieldAsByteArray(row, col);
+        Byte[] field = getFieldAsByteArray(row, col);
         if (field == null)
         {
             return null;
@@ -504,51 +504,51 @@ public class SQLRCursor : IDisposable
     }
 
     /** Returns the specified field as an integer. */
-    public long getFieldAsInteger(ulong row, uint col)
+    public Int64 getFieldAsInteger(UInt64 row, UInt32 col)
     {
         return sqlrcur_getFieldAsIntegerByIndex(sqlrcurref, row, col);
     }
 
     /** Returns the specified field as an integer. */
-    public long getFieldAsInteger(ulong row, string col)
+    public Int64 getFieldAsInteger(UInt64 row, String col)
     {
         return sqlrcur_getFieldAsIntegerByName(sqlrcurref, row, col);
     }
 
     /** Returns the specified field as an decimal. */
-    public double getFieldAsDouble(ulong row, uint col)
+    public Double getFieldAsDouble(UInt64 row, UInt32 col)
     {
         return sqlrcur_getFieldAsDoubleByIndex(sqlrcurref, row, col);
     }
 
     /** Returns the specified field as an decimal. */
-    public double getFieldAsDouble(ulong row, string col)
+    public Double getFieldAsDouble(UInt64 row, String col)
     {
         return sqlrcur_getFieldAsDoubleByName(sqlrcurref, row, col);
     }
 
     /** Returns the specified field as a string. */
-    public byte[] getFieldAsByteArray(ulong row, uint col)
+    public Byte[] getFieldAsByteArray(UInt64 row, UInt32 col)
     {
-        int size = (int)sqlrcur_getFieldLengthByIndex(sqlrcurref, row, col);
+        Int32 size = (int)sqlrcur_getFieldLengthByIndex(sqlrcurref, row, col);
         if (size == 0)
         {
             return null;
         }
-        byte[] retval = new byte[size];
+        Byte[] retval = new Byte[size];
         Marshal.Copy(sqlrcur_getFieldByIndex(sqlrcurref, row, col), retval, 0, size);
         return retval;
     }
 
     /** Returns the specified field as a string. */
-    public byte[] getFieldAsByteArray(ulong row, string col)
+    public Byte[] getFieldAsByteArray(UInt64 row, String col)
     {
-        int size = (int)sqlrcur_getFieldLengthByName(sqlrcurref, row, col);
+        Int32 size = (int)sqlrcur_getFieldLengthByName(sqlrcurref, row, col);
         if (size == 0)
         {
             return null;
         }
-        byte[] retval = new byte[size];
+        Byte[] retval = new Byte[size];
         Marshal.Copy(sqlrcur_getFieldByName(sqlrcurref, row, col), retval, 0, size);
         return retval;
     }
@@ -556,13 +556,13 @@ public class SQLRCursor : IDisposable
 
 
     /** Returns the length of the specified row and column. */
-    public uint getFieldLength(ulong row, uint col)
+    public UInt32 getFieldLength(UInt64 row, UInt32 col)
     {
         return sqlrcur_getFieldLengthByIndex(sqlrcurref, row, col);
     }
 
     /** Returns the length of the specified row and column. */
-    public uint getFieldLength(ulong row, string col)
+    public UInt32 getFieldLength(UInt64 row, String col)
     {
         return sqlrcur_getFieldLengthByName(sqlrcurref, row, col);
     }
@@ -570,31 +570,31 @@ public class SQLRCursor : IDisposable
 
 
     /** Returns the name of the specified column. */
-    public string getColumnName(uint col)
+    public String getColumnName(UInt32 col)
     {
         return sqlrcur_getColumnName(sqlrcurref, col);
     }
 
     /** Returns the type of the specified column. */
-    public string getColumnType(uint col)
+    public String getColumnType(UInt32 col)
     {
         return sqlrcur_getColumnTypeByIndex(sqlrcurref, col);
     }
 
     /** Returns the type of the specified column. */
-    public string getColumnType(string col)
+    public String getColumnType(String col)
     {
         return sqlrcur_getColumnTypeByName(sqlrcurref, col);
     }
 
     /** Returns the length of the specified column. */
-    public uint getColumnLength(uint col)
+    public UInt32 getColumnLength(UInt32 col)
     {
         return sqlrcur_getColumnLengthByIndex(sqlrcurref, col);
     }
 
     /** Returns the length of the specified column. */
-    public uint getColumnLength(string col)
+    public UInt32 getColumnLength(String col)
     {
         return sqlrcur_getColumnLengthByName(sqlrcurref, col);
     }
@@ -602,7 +602,7 @@ public class SQLRCursor : IDisposable
     /** Returns the precision of the specified column.  Precision is the total
      *  number of digits in a number.  eg: 123.45 has a precision of 5.  For
      *  non-numeric types, it's the number of characters in the string. */
-    public uint getColumnPrecision(uint col)
+    public UInt32 getColumnPrecision(UInt32 col)
     {
         return sqlrcur_getColumnPrecisionByIndex(sqlrcurref, col);
     }
@@ -610,145 +610,145 @@ public class SQLRCursor : IDisposable
     /** Returns the precision of the specified column.  Precision is the total
      *  number of digits in a number.  eg: 123.45 has a precision of 5.  For
      *  non-numeric types, it's the number of characters in the string. */
-    public uint getColumnPrecision(string col)
+    public UInt32 getColumnPrecision(String col)
     {
         return sqlrcur_getColumnPrecisionByName(sqlrcurref, col);
     }
 
     /** Returns the scale of the specified column.  Scale is the total number of
-     *  digits to the right of the decimal point in a number.  eg: 123.45 has a
+     *  digits to the right of the decimal poInt32 in a number.  eg: 123.45 has a
      *  scale of 2. */
-    public uint getColumnScale(uint col)
+    public UInt32 getColumnScale(UInt32 col)
     {
         return sqlrcur_getColumnScaleByIndex(sqlrcurref, col);
     }
 
     /** Returns the scale of the specified column.  Scale is the total number of
-     *  digits to the right of the decimal point in a number.  eg: 123.45 has a 
+     *  digits to the right of the decimal poInt32 in a number.  eg: 123.45 has a 
      *  scale of 2. */
-    public uint getColumnScale(string col)
+    public UInt32 getColumnScale(String col)
     {
         return sqlrcur_getColumnScaleByName(sqlrcurref, col);
     }
 
     /** Returns true if the specified column can contain
      *  nulls and false otherwise. */
-    public bool getColumnIsNullable(uint col)
+    public Boolean  getColumnIsNullable(UInt32 col)
     {
         return sqlrcur_getColumnIsNullableByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column can contain
      *  nulls and false otherwise. */
-    public bool getColumnIsNullable(string col)
+    public Boolean  getColumnIsNullable(String col)
     {
         return sqlrcur_getColumnIsNullableByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is a
      *  primary key and false otherwise. */
-    public bool getColumnIsPrimaryKey(uint col)
+    public Boolean  getColumnIsPrimaryKey(UInt32 col)
     {
         return sqlrcur_getColumnIsPrimaryKeyByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is a
      *  primary key and false otherwise. */
-    public bool getColumnIsPrimaryKey(string col)
+    public Boolean  getColumnIsPrimaryKey(String col)
     {
         return sqlrcur_getColumnIsPrimaryKeyByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is unique and false otherwise. */
-    public bool getColumnIsUnique(uint col)
+    public Boolean  getColumnIsUnique(UInt32 col)
     {
         return sqlrcur_getColumnIsUniqueByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is unique and false otherwise. */
-    public bool getColumnIsUnique(string col)
+    public Boolean  getColumnIsUnique(String col)
     {
         return sqlrcur_getColumnIsUniqueByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is part of a composite key and
      *  false otherwise. */
-    public bool getColumnIsPartOfKey(uint col)
+    public Boolean  getColumnIsPartOfKey(UInt32 col)
     {
         return sqlrcur_getColumnIsPartOfKeyByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is part of a composite key and
      *  false otherwise. */
-    public bool getColumnIsPartOfKey(string col)
+    public Boolean  getColumnIsPartOfKey(String col)
     {
         return sqlrcur_getColumnIsPartOfKeyByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is an unsigned number and false
      *  otherwise. */
-    public bool getColumnIsUnsigned(uint col)
+    public Boolean  getColumnIsUnsigned(UInt32 col)
     {
         return sqlrcur_getColumnIsUnsignedByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is an unsigned number and false
      *  otherwise. */
-    public bool getColumnIsUnsigned(string col)
+    public Boolean  getColumnIsUnsigned(String col)
     {
         return sqlrcur_getColumnIsUnsignedByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column was created
      *  with the zero-fill flag and false otherwise. */
-    public bool getColumnIsZeroFilled(uint col)
+    public Boolean  getColumnIsZeroFilled(UInt32 col)
     {
         return sqlrcur_getColumnIsZeroFilledByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column was created
      *  with the zero-fill flag and false otherwise. */
-    public bool getColumnIsZeroFilled(string col)
+    public Boolean  getColumnIsZeroFilled(String col)
     {
         return sqlrcur_getColumnIsZeroFilledByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column contains binary data and false
      *  otherwise. */
-    public bool getColumnIsBinary(uint col)
+    public Boolean  getColumnIsBinary(UInt32 col)
     {
         return sqlrcur_getColumnIsBinaryByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column contains binary data and false
      *  otherwise. */
-    public bool getColumnIsBinary(string col)
+    public Boolean  getColumnIsBinary(String col)
     {
         return sqlrcur_getColumnIsBinaryByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column auto-increments
      *  and false otherwise. */
-    public bool getColumnIsAutoIncrement(uint col)
+    public Boolean  getColumnIsAutoIncrement(UInt32 col)
     {
         return sqlrcur_getColumnIsAutoIncrementByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column auto-increments
      *  and false otherwise. */
-    public bool getColumnIsAutoIncrement(string col)
+    public Boolean  getColumnIsAutoIncrement(String col)
     {
         return sqlrcur_getColumnIsAutoIncrementByName(sqlrcurref, col)!=0;
     }
 
     /** Returns the length of the longest field in the specified column. */
-    public uint getLongest(uint col)
+    public UInt32 getLongest(UInt32 col)
     {
         return sqlrcur_getLongestByIndex(sqlrcurref, col);
     }
 
     /** Returns the length of the longest field in the specified column. */
-    public uint getLongest(string col)
+    public UInt32 getLongest(String col)
     {
         return sqlrcur_getLongestByName(sqlrcurref, col);
     }
@@ -767,14 +767,14 @@ public class SQLRCursor : IDisposable
      *  passed to another statement for use in the resumeResultSet() function.
      *  Note: The value this function returns is only valid after a call to
      *  suspendResultSet().*/
-    public ushort getResultSetId()
+    public UInt16 getResultSetId()
     {
         return sqlrcur_getResultSetId(sqlrcurref);
     }
 
     /** Resumes a result set previously left open using suspendSession().
      *  Returns true on success and false on failure. */
-    public bool resumeResultSet(ushort id)
+    public Boolean  resumeResultSet(UInt16 id)
     {
         return sqlrcur_resumeResultSet(sqlrcurref, id)!=0;
     }
@@ -782,7 +782,7 @@ public class SQLRCursor : IDisposable
     /** Resumes a result set previously left open using suspendSession() and
      *  continues caching the result set to "filename".  Returns true on success
      *  and false on failure. */
-    public bool resumeCachedResultSet(ushort id, string filename)
+    public Boolean  resumeCachedResultSet(UInt16 id, String filename)
     {
         return sqlrcur_resumeCachedResultSet(sqlrcurref, id, filename)!=0;
     }
@@ -790,17 +790,17 @@ public class SQLRCursor : IDisposable
     private IntPtr sqlrcurref;
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern IntPtr sqlrcur_alloc_copyrefs(IntPtr sqlrconref, int copyrefs);
+    private static extern IntPtr sqlrcur_alloc_copyrefs(IntPtr sqlrconref, Int32 copyrefs);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_free(IntPtr sqlrcurref);
 
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_setResultSetBufferSize(IntPtr sqlrcurref, ulong rows);
+    private static extern void sqlrcur_setResultSetBufferSize(IntPtr sqlrcurref, UInt64 rows);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern ulong sqlrcur_getResultSetBufferSize(IntPtr sqlrcurref);
+    private static extern UInt64 sqlrcur_getResultSetBufferSize(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_dontGetColumnInfo(IntPtr sqlrcurref);
@@ -818,154 +818,154 @@ public class SQLRCursor : IDisposable
     private static extern void sqlrcur_lowerCaseColumnNames(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_cacheToFile(IntPtr sqlrcurref, string filename);
+    private static extern void sqlrcur_cacheToFile(IntPtr sqlrcurref, String filename);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_setCacheTtl(IntPtr sqlrcurref, uint ttl);
+    private static extern void sqlrcur_setCacheTtl(IntPtr sqlrcurref, UInt32 ttl);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern string sqlrcur_getCacheFileName(IntPtr sqlrcurref);
+    private static extern String sqlrcur_getCacheFileName(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_cacheOff(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getDatabaseList(IntPtr sqlrcurref, string wild);
+    private static extern Int32 sqlrcur_getDatabaseList(IntPtr sqlrcurref, String wild);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getTableList(IntPtr sqlrcurref, string wild);
+    private static extern Int32 sqlrcur_getTableList(IntPtr sqlrcurref, String wild);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getColumnList(IntPtr sqlrcurref, string table, string wild);
+    private static extern Int32 sqlrcur_getColumnList(IntPtr sqlrcurref, String table, String wild);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_sendQuery(IntPtr sqlrcurref, string query);
+    private static extern Int32 sqlrcur_sendQuery(IntPtr sqlrcurref, String query);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_sendQueryWithLength(IntPtr sqlrcurref, string query, uint length);
+    private static extern Int32 sqlrcur_sendQueryWithLength(IntPtr sqlrcurref, String query, UInt32 length);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_sendFileQuery(IntPtr sqlrcurref, string path, string filename);
+    private static extern Int32 sqlrcur_sendFileQuery(IntPtr sqlrcurref, String path, String filename);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_prepareQuery(IntPtr sqlrcurref, string query);
+    private static extern void sqlrcur_prepareQuery(IntPtr sqlrcurref, String query);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_prepareQueryWithLength(IntPtr sqlrcurref, string query, uint length);
+    private static extern void sqlrcur_prepareQueryWithLength(IntPtr sqlrcurref, String query, UInt32 length);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_prepareFileQuery(IntPtr sqlrcurref, string path, string filename);
+    private static extern void sqlrcur_prepareFileQuery(IntPtr sqlrcurref, String path, String filename);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_subString(IntPtr sqlrcurref, string variable, string val);
+    private static extern void sqlrcur_subString(IntPtr sqlrcurref, String variable, String val);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_subLong(IntPtr sqlrcurref, string variable, long val);
+    private static extern void sqlrcur_subLong(IntPtr sqlrcurref, String variable, Int64 val);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_subDouble(IntPtr sqlrcurref, string variable, double val, uint precision, uint scale);
+    private static extern void sqlrcur_subDouble(IntPtr sqlrcurref, String variable, Double val, UInt32 precision, UInt32 scale);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_inputBindString(IntPtr sqlrcurref, string variable, string val);
+    private static extern void sqlrcur_inputBindString(IntPtr sqlrcurref, String variable, String val);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_inputBindStringWithLength(IntPtr sqlrcurref, string variable, string val, uint vallength);
+    private static extern void sqlrcur_inputBindStringWithLength(IntPtr sqlrcurref, String variable, String val, UInt32 vallength);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_inputBindLong(IntPtr sqlrcurref, string variable, long val);
+    private static extern void sqlrcur_inputBindLong(IntPtr sqlrcurref, String variable, Int64 val);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_inputBindDouble(IntPtr sqlrcurref, string variable, double val, uint precision, uint scale);
+    private static extern void sqlrcur_inputBindDouble(IntPtr sqlrcurref, String variable, Double val, UInt32 precision, UInt32 scale);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_inputBindBlob(IntPtr sqlrcurref, string variable, byte[] val, uint size);
+    private static extern void sqlrcur_inputBindBlob(IntPtr sqlrcurref, String variable, Byte[] val, UInt32 size);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_inputBindClob(IntPtr sqlrcurref, string variable, string val, uint size);
+    private static extern void sqlrcur_inputBindClob(IntPtr sqlrcurref, String variable, String val, UInt32 size);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_defineOutputBindString(IntPtr sqlrcurref, string variable, uint length);
+    private static extern void sqlrcur_defineOutputBindString(IntPtr sqlrcurref, String variable, UInt32 length);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_defineOutputBindInteger(IntPtr sqlrcurref, string variable);
+    private static extern void sqlrcur_defineOutputBindInteger(IntPtr sqlrcurref, String variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_defineOutputBindDouble(IntPtr sqlrcurref, string variable);
+    private static extern void sqlrcur_defineOutputBindDouble(IntPtr sqlrcurref, String variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_defineOutputBindBlob(IntPtr sqlrcurref, string variable);
+    private static extern void sqlrcur_defineOutputBindBlob(IntPtr sqlrcurref, String variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_defineOutputBindClob(IntPtr sqlrcurref, string variable);
+    private static extern void sqlrcur_defineOutputBindClob(IntPtr sqlrcurref, String variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_defineOutputBindCursor(IntPtr sqlrcurref, string variable);
+    private static extern void sqlrcur_defineOutputBindCursor(IntPtr sqlrcurref, String variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_clearBinds(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern ushort sqlrcur_countBindVariables(IntPtr sqlrcurref);
+    private static extern UInt16 sqlrcur_countBindVariables(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_validateBinds(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_validBind(IntPtr sqlrcurref, string variable);
+    private static extern Int32 sqlrcur_validBind(IntPtr sqlrcurref, String variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_executeQuery(IntPtr sqlrcurref);
+    private static extern Int32 sqlrcur_executeQuery(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_fetchFromBindCursor(IntPtr sqlrcurref);
+    private static extern Int32 sqlrcur_fetchFromBindCursor(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern string sqlrcur_getOutputBindString(IntPtr sqlrcurref, string variable);
+    private static extern String sqlrcur_getOutputBindString(IntPtr sqlrcurref, String variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern long sqlrcur_getOutputBindInteger(IntPtr sqlrcurref, string variable);
+    private static extern Int64 sqlrcur_getOutputBindInteger(IntPtr sqlrcurref, String variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern double sqlrcur_getOutputBindDouble(IntPtr sqlrcurref, string variable);
+    private static extern Double sqlrcur_getOutputBindDouble(IntPtr sqlrcurref, String variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern byte[] sqlrcur_getOutputBindBlob(IntPtr sqlrcurref, string variable);
+    private static extern Byte[] sqlrcur_getOutputBindBlob(IntPtr sqlrcurref, String variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern string sqlrcur_getOutputBindClob(IntPtr sqlrcurref, string variable);
+    private static extern String sqlrcur_getOutputBindClob(IntPtr sqlrcurref, String variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern uint sqlrcur_getOutputBindLength(IntPtr sqlrcurref, string variable);
+    private static extern UInt32 sqlrcur_getOutputBindLength(IntPtr sqlrcurref, String variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern IntPtr sqlrcur_getOutputBindCursor_copyrefs(IntPtr sqlrcurref, string variable, int copyrefs);
+    private static extern IntPtr sqlrcur_getOutputBindCursor_copyrefs(IntPtr sqlrcurref, String variable, Int32 copyrefs);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_openCachedResultSet(IntPtr sqlrcurref, string filename);
+    private static extern Int32 sqlrcur_openCachedResultSet(IntPtr sqlrcurref, String filename);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern uint sqlrcur_colCount(IntPtr sqlrcurref);
+    private static extern UInt32 sqlrcur_colCount(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern ulong sqlrcur_rowCount(IntPtr sqlrcurref);
+    private static extern UInt64 sqlrcur_rowCount(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern ulong sqlrcur_totalRows(IntPtr sqlrcurref);
+    private static extern UInt64 sqlrcur_totalRows(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern ulong sqlrcur_affectedRows(IntPtr sqlrcurref);
+    private static extern UInt64 sqlrcur_affectedRows(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern ulong sqlrcur_firstRowIndex(IntPtr sqlrcurref);
+    private static extern UInt64 sqlrcur_firstRowIndex(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_endOfResultSet(IntPtr sqlrcurref);
+    private static extern Int32 sqlrcur_endOfResultSet(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern string sqlrcur_errorMessage(IntPtr sqlrcurref);
+    private static extern String sqlrcur_errorMessage(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern long sqlrcur_errorNumber(IntPtr sqlrcurref);
+    private static extern Int64 sqlrcur_errorNumber(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_getNullsAsEmptyStrings(IntPtr sqlrcurref);
@@ -974,121 +974,121 @@ public class SQLRCursor : IDisposable
     private static extern void sqlrcur_getNullsAsNulls(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern IntPtr sqlrcur_getFieldByIndex(IntPtr sqlrcurref, ulong row, uint col);
+    private static extern IntPtr sqlrcur_getFieldByIndex(IntPtr sqlrcurref, UInt64 row, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern IntPtr sqlrcur_getFieldByName(IntPtr sqlrcurref, ulong row, string col);
+    private static extern IntPtr sqlrcur_getFieldByName(IntPtr sqlrcurref, UInt64 row, String col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern long sqlrcur_getFieldAsIntegerByIndex(IntPtr sqlrcurref, ulong row, uint col);
+    private static extern Int64 sqlrcur_getFieldAsIntegerByIndex(IntPtr sqlrcurref, UInt64 row, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern long sqlrcur_getFieldAsIntegerByName(IntPtr sqlrcurref, ulong row, string col);
+    private static extern Int64 sqlrcur_getFieldAsIntegerByName(IntPtr sqlrcurref, UInt64 row, String col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern double sqlrcur_getFieldAsDoubleByIndex(IntPtr sqlrcurref, ulong row, uint col);
+    private static extern Double sqlrcur_getFieldAsDoubleByIndex(IntPtr sqlrcurref, UInt64 row, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern double sqlrcur_getFieldAsDoubleByName(IntPtr sqlrcurref, ulong row, string col);
+    private static extern Double sqlrcur_getFieldAsDoubleByName(IntPtr sqlrcurref, UInt64 row, String col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern uint sqlrcur_getFieldLengthByIndex(IntPtr sqlrcurref, ulong row, uint col);
+    private static extern UInt32 sqlrcur_getFieldLengthByIndex(IntPtr sqlrcurref, UInt64 row, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern uint sqlrcur_getFieldLengthByName(IntPtr sqlrcurref, ulong row, string col);
+    private static extern UInt32 sqlrcur_getFieldLengthByName(IntPtr sqlrcurref, UInt64 row, String col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern string sqlrcur_getColumnName(IntPtr sqlrcurref, uint col);
+    private static extern String sqlrcur_getColumnName(IntPtr sqlrcurref, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern string sqlrcur_getColumnTypeByIndex(IntPtr sqlrcurref, uint col);
+    private static extern String sqlrcur_getColumnTypeByIndex(IntPtr sqlrcurref, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern string sqlrcur_getColumnTypeByName(IntPtr sqlrcurref, string col);
+    private static extern String sqlrcur_getColumnTypeByName(IntPtr sqlrcurref, String col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern uint sqlrcur_getColumnLengthByIndex(IntPtr sqlrcurref, uint col);
+    private static extern UInt32 sqlrcur_getColumnLengthByIndex(IntPtr sqlrcurref, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern uint sqlrcur_getColumnLengthByName(IntPtr sqlrcurref, string col);
+    private static extern UInt32 sqlrcur_getColumnLengthByName(IntPtr sqlrcurref, String col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern uint sqlrcur_getColumnPrecisionByIndex(IntPtr sqlrcurref, uint col);
+    private static extern UInt32 sqlrcur_getColumnPrecisionByIndex(IntPtr sqlrcurref, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern uint sqlrcur_getColumnPrecisionByName(IntPtr sqlrcurref, string col);
+    private static extern UInt32 sqlrcur_getColumnPrecisionByName(IntPtr sqlrcurref, String col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern uint sqlrcur_getColumnScaleByIndex(IntPtr sqlrcurref, uint col);
+    private static extern UInt32 sqlrcur_getColumnScaleByIndex(IntPtr sqlrcurref, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern uint sqlrcur_getColumnScaleByName(IntPtr sqlrcurref, string col);
+    private static extern UInt32 sqlrcur_getColumnScaleByName(IntPtr sqlrcurref, String col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getColumnIsNullableByIndex(IntPtr sqlrcurref, uint col);
+    private static extern Int32 sqlrcur_getColumnIsNullableByIndex(IntPtr sqlrcurref, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getColumnIsNullableByName(IntPtr sqlrcurref, string col);
+    private static extern Int32 sqlrcur_getColumnIsNullableByName(IntPtr sqlrcurref, String col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getColumnIsPrimaryKeyByIndex(IntPtr sqlrcurref, uint col);
+    private static extern Int32 sqlrcur_getColumnIsPrimaryKeyByIndex(IntPtr sqlrcurref, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getColumnIsPrimaryKeyByName(IntPtr sqlrcurref, string col);
+    private static extern Int32 sqlrcur_getColumnIsPrimaryKeyByName(IntPtr sqlrcurref, String col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getColumnIsUniqueByIndex(IntPtr sqlrcurref, uint col);
+    private static extern Int32 sqlrcur_getColumnIsUniqueByIndex(IntPtr sqlrcurref, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getColumnIsUniqueByName(IntPtr sqlrcurref, string col);
+    private static extern Int32 sqlrcur_getColumnIsUniqueByName(IntPtr sqlrcurref, String col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getColumnIsPartOfKeyByIndex(IntPtr sqlrcurref, uint col);
+    private static extern Int32 sqlrcur_getColumnIsPartOfKeyByIndex(IntPtr sqlrcurref, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getColumnIsPartOfKeyByName(IntPtr sqlrcurref, string col);
+    private static extern Int32 sqlrcur_getColumnIsPartOfKeyByName(IntPtr sqlrcurref, String col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getColumnIsUnsignedByIndex(IntPtr sqlrcurref, uint col);
+    private static extern Int32 sqlrcur_getColumnIsUnsignedByIndex(IntPtr sqlrcurref, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getColumnIsUnsignedByName(IntPtr sqlrcurref, string col);
+    private static extern Int32 sqlrcur_getColumnIsUnsignedByName(IntPtr sqlrcurref, String col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getColumnIsZeroFilledByIndex(IntPtr sqlrcurref, uint col);
+    private static extern Int32 sqlrcur_getColumnIsZeroFilledByIndex(IntPtr sqlrcurref, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getColumnIsZeroFilledByName(IntPtr sqlrcurref, string col);
+    private static extern Int32 sqlrcur_getColumnIsZeroFilledByName(IntPtr sqlrcurref, String col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getColumnIsBinaryByIndex(IntPtr sqlrcurref, uint col);
+    private static extern Int32 sqlrcur_getColumnIsBinaryByIndex(IntPtr sqlrcurref, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getColumnIsBinaryByName(IntPtr sqlrcurref, string col);
+    private static extern Int32 sqlrcur_getColumnIsBinaryByName(IntPtr sqlrcurref, String col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getColumnIsAutoIncrementByIndex(IntPtr sqlrcurref, uint col);
+    private static extern Int32 sqlrcur_getColumnIsAutoIncrementByIndex(IntPtr sqlrcurref, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_getColumnIsAutoIncrementByName(IntPtr sqlrcurref, string col);
+    private static extern Int32 sqlrcur_getColumnIsAutoIncrementByName(IntPtr sqlrcurref, String col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern uint sqlrcur_getLongestByIndex(IntPtr sqlrcurref, uint col);
+    private static extern UInt32 sqlrcur_getLongestByIndex(IntPtr sqlrcurref, UInt32 col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern uint sqlrcur_getLongestByName(IntPtr sqlrcurref, string col);
+    private static extern UInt32 sqlrcur_getLongestByName(IntPtr sqlrcurref, String col);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_suspendResultSet(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern ushort sqlrcur_getResultSetId(IntPtr sqlrcurref);
+    private static extern UInt16 sqlrcur_getResultSetId(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_resumeResultSet(IntPtr sqlrcurref, ushort id);
+    private static extern Int32 sqlrcur_resumeResultSet(IntPtr sqlrcurref, UInt16 id);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcur_resumeCachedResultSet(IntPtr sqlrcurref, ushort id, string filename);
+    private static extern Int32 sqlrcur_resumeCachedResultSet(IntPtr sqlrcurref, UInt16 id, String filename);
 }
 
 }

@@ -11,8 +11,8 @@ namespace SQLRClient
         private SQLRelayCommand _updatecommand;
         private SQLRelayCommand _deletecommand;
 
-        static private readonly object EventRowUpdating = new object();
-        static private readonly object EventRowUpdated = new object();
+        static private readonly Object EventRowUpdating = new Object();
+        static private readonly Object EventRowUpdated = new Object();
 
         public SQLRelayDataAdapter()
         {
@@ -167,8 +167,8 @@ namespace SQLRClient
         }
     }
 
-    public delegate void SQLRelayRowUpdatingEventHandler(object sender, SQLRelayRowUpdatingEventArgs e);
-    public delegate void SQLRelayRowUpdatedEventHandler(object sender, SQLRelayRowUpdatedEventArgs e);
+    public delegate void SQLRelayRowUpdatingEventHandler(Object sender, SQLRelayRowUpdatingEventArgs e);
+    public delegate void SQLRelayRowUpdatedEventHandler(Object sender, SQLRelayRowUpdatedEventArgs e);
 
     public class SQLRelayRowUpdatingEventArgs : RowUpdatingEventArgs
     {

@@ -11,7 +11,7 @@ namespace SQLRClient
         #endregion
 
         #region constructors and destructors
-        internal SQLRelayException(Int64 number, string message)
+        internal SQLRelayException(Int64 number, String message)
             : base(message)
         {
             this.number = number;

@@ -7,7 +7,7 @@ namespace SQLRClient
 {
     public class SQLRelayParameterCollection : ArrayList, IDataParameterCollection
     {
-        public object this[string index]
+        public Object this[String index]
         {
             get
             {
@@ -19,14 +19,14 @@ namespace SQLRClient
             }
         }
 
-        public bool Contains(string parametername)
+        public Boolean  Contains(String parametername)
         {
             return (-1 != IndexOf(parametername));
         }
 
-        public int IndexOf(string parametername)
+        public Int32 IndexOf(String parametername)
         {
-            int index = 0;
+            Int32 index = 0;
             foreach (SQLRelayParameter item in this)
             {
                 if (0 == cultureAwareCompare(item.ParameterName, parametername))
@@ -38,17 +38,17 @@ namespace SQLRClient
             return -1;
         }
 
-        public void RemoveAt(string parametername)
+        public void RemoveAt(String parametername)
         {
             RemoveAt(IndexOf(parametername));
         }
 
-        public override int Add(object value)
+        public override Int32 Add(Object value)
         {
             return Add((SQLRelayParameter)value);
         }
 
-        public int Add(SQLRelayParameter value)
+        public Int32 Add(SQLRelayParameter value)
         {
             if (((SQLRelayParameter)value).ParameterName != null)
             {
@@ -60,22 +60,22 @@ namespace SQLRClient
             }
         }
 
-        public int Add(string parameterName, DbType type)
+        public Int32 Add(String parameterName, DbType type)
         {
             return Add(new SQLRelayParameter(parameterName, type));
         }
 
-        public int Add(string parameterName, object value)
+        public Int32 Add(String parameterName, object value)
         {
             return Add(new SQLRelayParameter(parameterName, value));
         }
 
-        public int Add(string parameterName, DbType dbType, string sourceColumn)
+        public Int32 Add(String parameterName, DbType dbtype, String sourcecolumn)
         {
-            return Add(new SQLRelayParameter(parameterName, dbType, sourceColumn));
+            return Add(new SQLRelayParameter(parameterName, dbtype, sourcecolumn));
         }
 
-        private int cultureAwareCompare(string stringa, string stringb)
+        private Int32 cultureAwareCompare(String stringa, String stringb)
         {
             return CultureInfo.CurrentCulture.CompareInfo.Compare(stringa, stringb, CompareOptions.IgnoreKanaType | CompareOptions.IgnoreWidth | CompareOptions.IgnoreCase);
         }

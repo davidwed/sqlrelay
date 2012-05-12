@@ -16,19 +16,19 @@ public class SQLRConnection : IDisposable
      *  made to connect through it before attempting to connect to "server" on
      *  "port".  If it is NULL or "" then no attempt will be made to connect
      *  through the socket.*/
-    public SQLRConnection(string server, ushort port, string socket, string user, string password, int retrytime, int tries)
+    public SQLRConnection(String server, UInt16 port, String socket, String user, String password, Int32 retrytime, Int32 tries)
     {
         sqlrconref = sqlrcon_alloc_copyrefs(server, port, socket, user, password, retrytime, tries, true);
     }
     
     /** Dispose framework */
-    private bool disposed = false;
+    private Boolean  disposed = false;
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-    protected virtual void Dispose(bool disposing)
+    protected virtual void Dispose(Boolean  disposing)
     {
         if (!disposed)
         {
@@ -48,7 +48,7 @@ public class SQLRConnection : IDisposable
     
     /** Sets the server connect timeout in seconds and milliseconds.
      *  Setting either parameter to -1 disables the timeout. */
-    public void setTimeout(int timeoutsec, int timeoutusec)
+    public void setTimeout(Int32 timeoutsec, Int32 timeoutusec)
     {
         sqlrcon_setTimeout(sqlrconref, timeoutsec, timeoutusec);
     }
@@ -62,7 +62,7 @@ public class SQLRConnection : IDisposable
     /** Disconnects this connection from the current session but leaves the
      *  session open so that another connection can connect to it using
      *  sqlrcon_resumeSession(). */
-    public bool suspendSession()
+    public Boolean  suspendSession()
     {
         return sqlrcon_suspendSession(sqlrconref)!=0;
     }
@@ -71,7 +71,7 @@ public class SQLRConnection : IDisposable
      *  parameter may be passed to another connection for use in the
      *  sqlrcon_resumeSession() command.  Note: The result this function returns
      *  is only valid after a call to suspendSession(). */
-    public ushort getConnectionPort()
+    public UInt16 getConnectionPort()
     {
         return sqlrcon_getConnectionPort(sqlrconref);
     }
@@ -80,14 +80,14 @@ public class SQLRConnection : IDisposable
      *  parameter may be passed to another connection for use in the
      *  sqlrcon_resumeSession() command.  Note: The result this function returns
      *  is only valid after a call to suspendSession(). */
-    public string getConnectionSocket()
+    public String getConnectionSocket()
     {
     	return sqlrcon_getConnectionSocket(sqlrconref);
     }
     
     /** Resumes a session previously left open using sqlrcon_suspendSession().
      *  Returns true on success and false on failure. */
-    public bool resumeSession(ushort port, string socket)
+    public Boolean  resumeSession(UInt16 port, String socket)
     {
     	return sqlrcon_resumeSession(sqlrconref, port, socket)!=0;
     }
@@ -95,38 +95,38 @@ public class SQLRConnection : IDisposable
     
     
     /** Returns true if the database is up and false if it's down. */
-    public bool ping()
+    public Boolean  ping()
     {
         return sqlrcon_ping(sqlrconref)!=0;
     }
     
     /** Returns the type of database: oracle8, postgresql, mysql, etc. */
-    public string identify()
+    public String identify()
     {
         return sqlrcon_identify(sqlrconref);
     }
     
     /** Returns the version of the database */
-    public string dbVersion()
+    public String dbVersion()
     {
     	return sqlrcon_dbVersion(sqlrconref);
     }
     
     /** Returns the version of the sqlrelay server software. */
-    public string serverVersion()
+    public String serverVersion()
     {
         return sqlrcon_serverVersion(sqlrconref);
     }
     
     /** Returns the version of the sqlrelay client software. */
-    public string clientVersion()
+    public String clientVersion()
     {
         return sqlrcon_clientVersion(sqlrconref);
     }
     
-    /** Returns a string representing the format
+    /** Returns a String representing the format
      *  of the bind variables used in the db. */
-    public string bindFormat()
+    public String bindFormat()
     {
         return sqlrcon_bindFormat(sqlrconref);
     }
@@ -134,13 +134,13 @@ public class SQLRConnection : IDisposable
     
     
     /** Sets the current database/schema to "database" */
-    public bool selectDatabase(string database)
+    public Boolean  selectDatabase(String database)
     {
         return sqlrcon_selectDatabase(sqlrconref, database)!=0;
     }
     
     /** Returns the database/schema that is currently in use. */
-    public string getCurrentDatabase()
+    public String getCurrentDatabase()
     {
         return sqlrcon_getCurrentDatabase(sqlrconref);
     }
@@ -148,7 +148,7 @@ public class SQLRConnection : IDisposable
     
     
     /** Returns the value of the autoincrement column for the last insert */
-    public ulong getLastInsertId()
+    public UInt64 getLastInsertId()
     {
         return sqlrcon_getLastInsertId(sqlrconref);
     }
@@ -157,14 +157,14 @@ public class SQLRConnection : IDisposable
     
     /** Instructs the database to perform a commit after every successful
      *  query. */
-    public bool autoCommitOn()
+    public Boolean  autoCommitOn()
     {
         return sqlrcon_autoCommitOn(sqlrconref)!=0;
     }
     
     /** Instructs the database to wait for the client to tell it when to
      *  commit. */
-    public bool autoCommitOff()
+    public Boolean  autoCommitOff()
     {
         return sqlrcon_autoCommitOff(sqlrconref)!=0;
     }
@@ -173,14 +173,14 @@ public class SQLRConnection : IDisposable
     
     /** Issues a commit.  Returns 1 if the commit succeeded, 0 if it failed and
      *  -1 if an error occurred. */
-    public int commit()
+    public Int32 commit()
     {
         return sqlrcon_commit(sqlrconref);
     }
     
     /** Issues a rollback.  Returns 1 if the rollback succeeded, 0 if it failed
      *  and -1 if an error occurred. */
-    public int rollback()
+    public Int32 rollback()
     {
         return sqlrcon_rollback(sqlrconref);
     }
@@ -189,14 +189,14 @@ public class SQLRConnection : IDisposable
     
     /** If an operation failed and generated an error, the error message is
      *  available here.  If there is no error then this method returns NULL */
-    public string errorMessage()
+    public String errorMessage()
     {
         return sqlrcon_errorMessage(sqlrconref);
     }
     
     /** If an operation failed and generated an error, the error number is
      *  available here.  If there is no error then this method returns 0. */
-    public long errorNumber()
+    public Int64 errorNumber()
     {
         return sqlrcon_errorNumber(sqlrconref);
     }
@@ -217,7 +217,7 @@ public class SQLRConnection : IDisposable
     }
     
     /** Returns false if debugging is off and true if debugging is on. */
-    public bool getDebug()
+    public Boolean  getDebug()
     {
         return sqlrcon_getDebug(sqlrconref)!=0;
     }
@@ -231,73 +231,73 @@ public class SQLRConnection : IDisposable
     private IntPtr sqlrconref;
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern IntPtr sqlrcon_alloc_copyrefs(string server, ushort port, string socket, string user, string password, int retrytime, int tries, bool copyreferences);
+    private static extern IntPtr sqlrcon_alloc_copyrefs(String server, UInt16 port, String socket, String user, String password, Int32 retrytime, Int32 tries, Boolean  copyreferences);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_free(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcon_setTimeout(IntPtr sqlrconref, int timeoutsec, int timeoutusec);
+    private static extern void sqlrcon_setTimeout(IntPtr sqlrconref, Int32 timeoutsec, Int32 timeoutusec);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_endSession(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcon_suspendSession(IntPtr sqlrconref);
+    private static extern Int32 sqlrcon_suspendSession(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern ushort sqlrcon_getConnectionPort(IntPtr sqlrconref);
+    private static extern UInt16 sqlrcon_getConnectionPort(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern string sqlrcon_getConnectionSocket(IntPtr sqlrconref);
+    private static extern String sqlrcon_getConnectionSocket(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcon_resumeSession(IntPtr sqlrconref, ushort port, string socket);
+    private static extern Int32 sqlrcon_resumeSession(IntPtr sqlrconref, UInt16 port, String socket);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcon_ping(IntPtr sqlrconref);
+    private static extern Int32 sqlrcon_ping(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern string sqlrcon_identify(IntPtr sqlrconref);
+    private static extern String sqlrcon_identify(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern string sqlrcon_dbVersion(IntPtr sqlrconref);
+    private static extern String sqlrcon_dbVersion(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern string sqlrcon_serverVersion(IntPtr sqlrconref);
+    private static extern String sqlrcon_serverVersion(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern string sqlrcon_clientVersion(IntPtr sqlrconref);
+    private static extern String sqlrcon_clientVersion(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern string sqlrcon_bindFormat(IntPtr sqlrconref);
+    private static extern String sqlrcon_bindFormat(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcon_selectDatabase(IntPtr sqlrconref, string database);
+    private static extern Int32 sqlrcon_selectDatabase(IntPtr sqlrconref, String database);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern string sqlrcon_getCurrentDatabase(IntPtr sqlrconref);
+    private static extern String sqlrcon_getCurrentDatabase(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern ulong sqlrcon_getLastInsertId(IntPtr sqlrconref);
+    private static extern UInt64 sqlrcon_getLastInsertId(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcon_autoCommitOn(IntPtr sqlrconref);
+    private static extern Int32 sqlrcon_autoCommitOn(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcon_autoCommitOff(IntPtr sqlrconref);
+    private static extern Int32 sqlrcon_autoCommitOff(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcon_commit(IntPtr sqlrconref);
+    private static extern Int32 sqlrcon_commit(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcon_rollback(IntPtr sqlrconref);
+    private static extern Int32 sqlrcon_rollback(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern string sqlrcon_errorMessage(IntPtr sqlrconref);
+    private static extern String sqlrcon_errorMessage(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern long sqlrcon_errorNumber(IntPtr sqlrconref);
+    private static extern Int64 sqlrcon_errorNumber(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_debugOn(IntPtr sqlrconref);
@@ -306,7 +306,7 @@ public class SQLRConnection : IDisposable
     private static extern void sqlrcon_debugOff(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern int sqlrcon_getDebug(IntPtr sqlrconref);
+    private static extern Int32 sqlrcon_getDebug(IntPtr sqlrconref);
 }
 
 }

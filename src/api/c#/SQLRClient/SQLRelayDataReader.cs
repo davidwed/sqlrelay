@@ -9,21 +9,21 @@ namespace SQLRClient
 
         #region member variables
 
-        private bool _open = true;
+        private Boolean _open = true;
         private SQLRelayConnection _sqlrelaycon = null;
         private SQLRCursor _sqlrcur = null;
-        private bool _endsession = false;
-        private bool _unfetched = true;
-        private ulong _currentrow = 0;
-        private bool[] _havevalues = null;
-        private object[] _values = null;
+        private Boolean _endsession = false;
+        private Boolean _unfetched = true;
+        private UInt64 _currentrow = 0;
+        private Boolean[] _havevalues = null;
+        private Object[] _values = null;
 
         #endregion
 
 
         #region constructors and destructors
 
-        internal SQLRelayDataReader(SQLRelayConnection sqlrelaycon, SQLRCursor sqlrcur, bool endsession)
+        internal SQLRelayDataReader(SQLRelayConnection sqlrelaycon, SQLRCursor sqlrcur, Boolean  endsession)
         {
             _sqlrelaycon = sqlrelaycon;
             _sqlrcur = sqlrcur;
@@ -36,7 +36,7 @@ namespace SQLRClient
             System.GC.SuppressFinalize(this);
         }
 
-        private void Dispose(bool disposing)
+        private void Dispose(Boolean  disposing)
         {
             if (disposing)
             {
@@ -57,7 +57,7 @@ namespace SQLRClient
 
         #region properties
 
-        public int Depth
+        public Int32 Depth
         {
             // FIXME: Return 0 if nesting isn't supported.  What is nesting?
             get
@@ -66,7 +66,7 @@ namespace SQLRClient
             }
         }
 
-        public bool IsClosed
+        public Boolean  IsClosed
         {
             get
             {
@@ -74,7 +74,7 @@ namespace SQLRClient
             }
         }
 
-        public int RecordsAffected
+        public Int32 RecordsAffected
         {
             get
             {
@@ -93,13 +93,13 @@ namespace SQLRClient
             _open = false;
         }
 
-        public bool NextResult()
+        public Boolean  NextResult()
         {
             // SQL Relay doesn't support multiple result sets
             return false;
         }
 
-        public bool Read()
+        public Boolean  Read()
         {
             // we need to move to the next row and see if it's valid
             // if we haven't fetched anything yet then the next row is 0
@@ -115,15 +115,15 @@ namespace SQLRClient
             }
             
             // re-init the value cache
-            _havevalues = new bool[FieldCount];
-            for (int i = 0; i < FieldCount; i++)
+            _havevalues = new Boolean [FieldCount];
+            for (Int32 i = 0; i < FieldCount; i++)
             {
                 _havevalues[i] = false;
             }
-            _values = new object[FieldCount];
+            _values = new Object[FieldCount];
 
             // this will need to be updated if getNullsAsNulls is exposed
-            return (_sqlrcur.getField(_currentrow, (uint)0) != null);
+            return (_sqlrcur.getField(_currentrow, (UInt32)0) != null);
         }
 
         public DataTable GetSchemaTable()
@@ -161,7 +161,7 @@ namespace SQLRClient
             datatable.Columns.Add("XmlSchemaCollectionName", typeof(String));
 
             datatable.BeginLoadData();
-            for (uint i=0; i<FieldCount; i++)
+            for (UInt32 i=0; i<FieldCount; i++)
             {
 
                 DataRow row = datatable.NewRow();
@@ -187,7 +187,7 @@ namespace SQLRClient
                 row["IsAutoIncrement"] = _sqlrcur.getColumnIsAutoIncrement(i);
                 row["IsRowVersion"] = false;
                 row["IsHidden"] = false;
-                row["IsLong"] = (GetFieldType((int)i) == typeof(byte[]));
+                row["IsLong"] = (GetFieldType((int)i) == typeof(Byte[]));
                 row["IsReadOnly"] = false;
                 row["ProviderSpecificDataType"] = _sqlrcur.getColumnType(i);
                 row["DataTypeName"] = _sqlrcur.getColumnType(i);
@@ -203,7 +203,7 @@ namespace SQLRClient
             return datatable;
         }
 
-        public int FieldCount
+        public Int32 FieldCount
         {
             get
             {
@@ -211,30 +211,30 @@ namespace SQLRClient
             }
         }
 
-        public String GetName(int i)
+        public String GetName(Int32 i)
         {
             invalidColumnIndex(i);
-            return _sqlrcur.getColumnName((uint)i);
+            return _sqlrcur.getColumnName((UInt32)i);
         }
 
-        public String GetDataTypeName(int i)
+        public String GetDataTypeName(Int32 i)
         {
             invalidColumnIndex(i);
-            return _sqlrcur.getColumnType((uint)i);
+            return _sqlrcur.getColumnType((UInt32)i);
         }
 
-        public Type GetFieldType(int i)
+        public Type GetFieldType(Int32 i)
         {
             String type = GetDataTypeName(i);
 
             if (type == "UNKNOWN")
             {
-                return typeof(string);
+                return typeof(String);
             }
             // addded by freetds
             else if (type == "CHAR")                        // 1
             {
-                return typeof(string);
+                return typeof(String);
             }
             else if (type == "INT")
             {
@@ -274,11 +274,11 @@ namespace SQLRClient
             }
             else if (type == "IMAGE")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "BINARY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "BIT")
             {
@@ -294,43 +294,43 @@ namespace SQLRClient
             }
             else if (type == "TEXT")
             {
-                return typeof(string);
+                return typeof(String);
             }
             else if (type == "VARCHAR")
             {
-                return typeof(string);
+                return typeof(String);
             }
             else if (type == "VARBINARY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "LONGCHAR")
             {
-                return typeof(string);
+                return typeof(String);
             }
             else if (type == "LONGBINARY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "LONG")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "ILLEGAL")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "SENSITIVITY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "BOUNDARY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "VOID")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "USHORT")
             {
@@ -339,7 +339,7 @@ namespace SQLRClient
             // added by lago
             else if (type == "UNDEFINED")            // 27
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "DOUBLE")
             {
@@ -369,11 +369,11 @@ namespace SQLRClient
             // added by mysql
             else if (type == "STRING")            // 34
             {
-                return typeof(string);
+                return typeof(String);
             }
             else if (type == "VARSTRING")
             {
-                return typeof(string);
+                return typeof(String);
             }
             else if (type == "LONGLONG")
             {
@@ -397,32 +397,32 @@ namespace SQLRClient
             }
             else if (type == "ENUM")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "SET")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "TINYBLOB")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "MEDIUMBLOB")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "LONGBLOB")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "BLOB")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             // added by oracle
             else if (type == "VARCHAR2")            // 47
             {
-                return typeof(string);
+                return typeof(String);
             }
             else if (type == "NUMBER")
             {
@@ -430,8 +430,8 @@ namespace SQLRClient
                 // occasionally integers will come back with length
                 // and scale but no precision.  Oracle does this.
                 // So, check for lack of either.
-                if (_sqlrcur.getColumnScale((uint)i) == 0 ||
-                    _sqlrcur.getColumnPrecision((uint)i) == 0)
+                if (_sqlrcur.getColumnScale((UInt32)i) == 0 ||
+                    _sqlrcur.getColumnPrecision((UInt32)i) == 0)
                 {
                     return typeof(Int64);
                 }
@@ -442,27 +442,27 @@ namespace SQLRClient
             }
             else if (type == "ROWID")
             {
-                return typeof(UInt64);
+                return typeof(UInt64 );
             }
             else if (type == "RAW")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "LONG_RAW")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "MLSLABEL")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "CLOB")
             {
-                return typeof(string);
+                return typeof(String);
             }
             else if (type == "BFILE")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             // added by odbc
             else if (type == "BIGINT")            // 55
@@ -475,36 +475,36 @@ namespace SQLRClient
             }
             else if (type == "LONGVARBINARY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "LONGVARCHAR")
             {
-                return typeof(string);
+                return typeof(String);
             }
             // added by db2
             else if (type == "GRAPHIC")            // 59
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "VARGRAPHIC")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "LONGVARGRAPHIC")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "DBCLOB")
             {
-                return typeof(string);
+                return typeof(String);
             }
             else if (type == "DATALINK")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "USER_DEFINED_TYPE")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "SHORT_DATATYPE")
             {
@@ -521,11 +521,11 @@ namespace SQLRClient
             }
             else if (type == "ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "QUAD")
             {
-                return typeof(UInt64);
+                return typeof(UInt64 );
             }
             else if (type == "INT64")
             {
@@ -536,17 +536,17 @@ namespace SQLRClient
                 return typeof(Double);
             }
             // added by postgresql
-            else if (type == "BOOL")
+            else if (type == "Boolean ")
             {
                 return typeof(Boolean);
             }
             else if (type == "BYTEA")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "NAME")
             {
-                return typeof(string);
+                return typeof(String);
             }
             else if (type == "INT8")
             {
@@ -558,7 +558,7 @@ namespace SQLRClient
             }
             else if (type == "INT2VECTOR")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "INT4")
             {
@@ -566,7 +566,7 @@ namespace SQLRClient
             }
             else if (type == "REGPROC")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "OID")
             {
@@ -586,39 +586,39 @@ namespace SQLRClient
             }
             else if (type == "OIDVECTOR")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "SMGR")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "POINT")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "LSEG")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "PATH")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "BOX")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "POLYGON")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "LINE")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "LINE_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "FLOAT4")
             {
@@ -644,321 +644,321 @@ namespace SQLRClient
             }
             else if (type == "CIRCLE")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "CIRCLE_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "MONEY_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "MACADDR")
             {
-                // not sure what to do with a mac addr, presumably it's a 4 byte array
-                return typeof(byte[]);
+                // not sure what to do with a mac addr, presumably it's a 4 Byte array
+                return typeof(Byte[]);
             }
             else if (type == "INET")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "CIDR")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
-            else if (type == "BOOL_ARRAY")
+            else if (type == "Boolean _ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "BYTEA_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "CHAR_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "NAME_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "INT2_ARRAY")
             {
                 // ???
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "INT2VECTOR_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "INT4_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "REGPROC_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "TEXT_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "OID_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "TID_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "XID_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "CID_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "OIDVECTOR_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "BPCHAR_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "VARCHAR_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "INT8_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "POINT_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "LSEG_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "PATH_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "BOX_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "FLOAT4_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "FLOAT8_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "ABSTIME_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "RELTIME_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "TINTERVAL_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "POLYGON_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "ACLITEM")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "ACLITEM_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "MACADDR_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "INET_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "CIDR_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "BPCHAR")
             {
-                return typeof(string);
+                return typeof(String);
             }
             else if (type == "TIMESTAMP_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "DATE_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "TIME_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "TIMESTAMPTZ")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "TIMESTAMPTZ_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "INTERVAL")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "INTERVAL_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "NUMERIC_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "TIMETZ")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "TIMETZ_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "BIT_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "VARBIT")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "VARBIT_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "REFCURSOR")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "REFCURSOR_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "REGPROCEDURE")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "REGOPER")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "REGOPERATOR")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "REGCLASS")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "REGTYPE")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "REGPROCEDURE_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "REGOPER_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "REGOPERATOR_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "REGCLASS_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "REGTYPE_ARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "RECORD")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "CSTRING")
             {
-                return typeof(string);
+                return typeof(String);
             }
             else if (type == "ANY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "ANYARRAY")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "TRIGGER")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "LANGUAGE_HANDLER")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "INTERNAL")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "OPAQUE")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "ANYELEMENT")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "PG_TYPE")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "PG_ATTRIBUTE")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "PG_PROC")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             else if (type == "PG_CLASS")
             {
-                return typeof(byte[]);
+                return typeof(Byte[]);
             }
             // none added by sqlite
 
             // unrecognized type
-            return typeof(byte[]);
+            return typeof(Byte[]);
         }
 
-        public Object GetValue(int i)
+        public Object GetValue(Int32 i)
         {
             invalidColumnIndex(i);
             
@@ -969,7 +969,7 @@ namespace SQLRClient
             }
 
             // get the field
-            object retval = convertField(_sqlrcur.getFieldAsByteArray(_currentrow, (uint)i), GetDataTypeName(i), _sqlrcur.getColumnPrecision((uint)i), _sqlrcur.getColumnScale((uint)i));
+            Object retval = convertField(_sqlrcur.getFieldAsByteArray(_currentrow, (UInt32)i), GetDataTypeName(i), _sqlrcur.getColumnPrecision((UInt32)i), _sqlrcur.getColumnScale((UInt32)i));
 
             // cache the value
             _havevalues[i] = true;
@@ -979,7 +979,7 @@ namespace SQLRClient
             return retval;
         }
 
-        public static Object convertField(byte[] field, string type, uint precision, uint scale)
+        public static Object convertField(Byte[] field, String type, UInt32 precision, UInt32 scale)
         {
 
             // convert the field to a native type...
@@ -1198,7 +1198,7 @@ namespace SQLRClient
             }
             else if (type == "ROWID")
             {
-                return Convert.ToUInt64(System.Text.Encoding.Default.GetString(field));
+                return Convert.ToUInt64 (System.Text.Encoding.Default.GetString(field));
             }
             else if (type == "RAW")
             {
@@ -1281,7 +1281,7 @@ namespace SQLRClient
             }
             else if (type == "QUAD")
             {
-                return Convert.ToUInt64(System.Text.Encoding.Default.GetString(field));
+                return Convert.ToUInt64 (System.Text.Encoding.Default.GetString(field));
             }
             else if (type == "INT64")
             {
@@ -1292,7 +1292,7 @@ namespace SQLRClient
                 return Convert.ToDouble(System.Text.Encoding.Default.GetString(field));
             }
             // added by postgresql
-            else if (type == "BOOL")
+            else if (type == "Boolean ")
             {
                 return Convert.ToBoolean(System.Text.Encoding.Default.GetString(field));
             }
@@ -1412,7 +1412,7 @@ namespace SQLRClient
             }
             else if (type == "MACADDR")
             {
-                // not sure what to do with a mac addr, presumably it's a 4 byte array
+                // not sure what to do with a mac addr, presumably it's a 4 Byte array
                 return field;
             }
             else if (type == "INET")
@@ -1423,7 +1423,7 @@ namespace SQLRClient
             {
                 return field;
             }
-            else if (type == "BOOL_ARRAY")
+            else if (type == "Boolean _ARRAY")
             {
                 return field;
             }
@@ -1714,10 +1714,10 @@ namespace SQLRClient
             return field;
         }
 
-        public int GetValues(object[] values)
+        public Int32 GetValues(Object[] values)
         {
-            int colcount=(int)_sqlrcur.colCount();
-            int i = 0;
+            Int32 colcount=(int)_sqlrcur.colCount();
+            Int32 i = 0;
             for (; i < colcount && i < values.Length; i++)
             {
                 values[i] = GetValue(i);
@@ -1725,10 +1725,10 @@ namespace SQLRClient
             return i;
         }
 
-        public int GetOrdinal(string name)
+        public Int32 GetOrdinal(String name)
         {
-            uint colcount = _sqlrcur.colCount();
-            for (uint i = 0; i < colcount; i++)
+            UInt32 colcount = _sqlrcur.colCount();
+            for (UInt32 i = 0; i < colcount; i++)
             {
                 if (cultureAwareCompare(name, _sqlrcur.getColumnName(i)) == 0)
                 {
@@ -1738,7 +1738,7 @@ namespace SQLRClient
             throw new IndexOutOfRangeException("Could not find specified column in results");
         }
 
-        public object this[int i]
+        public Object this[Int32 i]
         {
             get
             {
@@ -1746,7 +1746,7 @@ namespace SQLRClient
             }
         }
 
-        public object this[String name]
+        public Object this[String name]
         {
             get
             {
@@ -1754,111 +1754,111 @@ namespace SQLRClient
             }
         }
 
-        public bool GetBoolean(int i)
+        public Boolean  GetBoolean(Int32 i)
         {
             return Convert.ToBoolean(GetValue(i));
         }
 
-        public byte GetByte(int i)
+        public Byte GetByte(Int32 i)
         {
             return Convert.ToByte(GetValue(i));
         }
 
-        public long GetBytes(int i, long fieldoffset, byte[] buffer, int bufferoffset, int length)
+        public Int64 GetBytes(Int32 i, Int64 fieldoffset, Byte[] buffer, Int32 bufferoffset, Int32 length)
         {
 
             // get the field
-            byte[] field = _sqlrcur.getFieldAsByteArray(_currentrow,(uint)i);
+            Byte[] field = _sqlrcur.getFieldAsByteArray(_currentrow,(UInt32)i);
 
             // copy chars from the field into the buffer
-            uint j = 0;
+            UInt32 j = 0;
             while (j < length && fieldoffset + j < field.Length)
             {
                 buffer[bufferoffset + i] = field[(int)(fieldoffset + j)];
                 j++;
             }
-            return (long)j;
+            return (Int64)j;
         }
 
-        public char GetChar(int i)
+        public Char GetChar(Int32 i)
         {
             return Convert.ToChar(GetValue(i));
         }
 
-        public long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length)
+        public Int64 GetChars(Int32 i, Int64 fieldoffset, Char[] buffer, Int32 bufferoffset, Int32 length)
         {
 
             // get the field
-            string field = GetString(i);
+            String field = GetString(i);
 
             // copy chars from the field into the buffer
-            uint j = 0;
+            UInt32 j = 0;
             while (j < length && fieldoffset + j < field.Length)
             {
                 buffer[bufferoffset + i] = field[(int)(fieldoffset + j)];
                 j++;
             }
-            return (long)j;
+            return (Int64)j;
         }
 
-        public Guid GetGuid(int i)
+        public Guid GetGuid(Int32 i)
         {
             return (Guid)GetValue(i);
         }
 
-        public Int16 GetInt16(int i)
+        public Int16 GetInt16(Int32 i)
         {
             //return Convert.ToInt16(GetValue(i));
-            return (Int16)_sqlrcur.getFieldAsInteger(_currentrow, (uint)i);
+            return (Int16)_sqlrcur.getFieldAsInteger(_currentrow, (UInt32)i);
         }
 
-        public Int32 GetInt32(int i)
+        public Int32 GetInt32(Int32 i)
         {
             //return Convert.ToInt32(GetValue(i));
-            return (Int32)_sqlrcur.getFieldAsInteger(_currentrow, (uint)i);
+            return (Int32)_sqlrcur.getFieldAsInteger(_currentrow, (UInt32)i);
         }
 
-        public Int64 GetInt64(int i)
+        public Int64 GetInt64(Int32 i)
         {
             //return Convert.ToInt64(GetValue(i));
-            return _sqlrcur.getFieldAsInteger(_currentrow, (uint)i);
+            return _sqlrcur.getFieldAsInteger(_currentrow, (UInt32)i);
         }
 
-        public float GetFloat(int i)
+        public float GetFloat(Int32 i)
         {
             //return (float)Convert.ToSingle(GetValue(i));
-            return (float)_sqlrcur.getFieldAsDouble(_currentrow, (uint)i);
+            return (float)_sqlrcur.getFieldAsDouble(_currentrow, (UInt32)i);
         }
 
-        public double GetDouble(int i)
+        public Double GetDouble(Int32 i)
         {
             //return Convert.ToDouble(GetValue(i));
-            return _sqlrcur.getFieldAsDouble(_currentrow, (uint)i);
+            return _sqlrcur.getFieldAsDouble(_currentrow, (UInt32)i);
         }
 
-        public String GetString(int i)
+        public String GetString(Int32 i)
         {
             //return Convert.ToString(GetValue(i));
-            return _sqlrcur.getField(_currentrow, (uint)i);
+            return _sqlrcur.getField(_currentrow, (UInt32)i);
         }
 
-        public Decimal GetDecimal(int i)
+        public Decimal GetDecimal(Int32 i)
         {
             return Convert.ToDecimal(GetValue(i));
         }
 
-        public DateTime GetDateTime(int i)
+        public DateTime GetDateTime(Int32 i)
         {
             return Convert.ToDateTime(GetValue(i));
         }
 
-        public IDataReader GetData(int i)
+        public IDataReader GetData(Int32 i)
         {
             // Normally, this would be used to expose nested tables and other hierarchical data.
             throw new NotSupportedException("GetData not supported.");
         }
 
-        public bool IsDBNull(int i)
+        public Boolean  IsDBNull(Int32 i)
         {
             // FIXME: this will need to be modified if getNullsAsNulls is exposed
             return (GetString(i) == "");
@@ -1869,12 +1869,12 @@ namespace SQLRClient
 
         #region private methods
 
-        private int cultureAwareCompare(string strA, string strB)
+        private Int32 cultureAwareCompare(String strA, String strB)
         {
             return CultureInfo.CurrentCulture.CompareInfo.Compare(strA, strB, CompareOptions.IgnoreKanaType | CompareOptions.IgnoreWidth | CompareOptions.IgnoreCase);
         }
 
-        private void invalidColumnIndex(int i)
+        private void invalidColumnIndex(Int32 i)
         {
             if (i < 0 || i > FieldCount)
             {
