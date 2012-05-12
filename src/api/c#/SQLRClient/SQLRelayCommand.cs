@@ -436,9 +436,11 @@ namespace SQLRClient
                     switch (param.SQLRelayType)
                     {
                         case SQLRelayType.Clob:
+                            // FIXME: where can I store the length?
                             param.Value = _sqlrcur.getOutputBindClob(param.ParameterName);
                             continue;
                         case SQLRelayType.Blob:
+                            // FIXME: where can I store the length?
                             param.Value = _sqlrcur.getOutputBindBlob(param.ParameterName);
                             continue;
                         case SQLRelayType.Cursor:
@@ -458,14 +460,17 @@ namespace SQLRClient
                         case DbType.StringFixedLength:
                         case DbType.Time:
                         case DbType.Guid:
+                            // FIXME: where can I store the length?
                             param.Value = _sqlrcur.getOutputBindString(param.ParameterName);
                             break;
 
                         case DbType.Binary:
+                            // FIXME: where can I store the length?
                             param.Value = _sqlrcur.getOutputBindBlob(param.ParameterName);
                             break;
 
                         case DbType.Boolean:
+                            // FIXME: where can I store the length?
                             param.Value = _sqlrcur.getOutputBindInteger(param.ParameterName);
                             break;
 
@@ -490,6 +495,7 @@ namespace SQLRClient
 
                         case DbType.Object:
                         case DbType.Xml:
+                            // FIXME: where can I store the length?
                             param.Value = _sqlrcur.getOutputBindString(param.ParameterName);
                             break;
                     }
