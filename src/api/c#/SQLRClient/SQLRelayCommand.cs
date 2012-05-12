@@ -366,6 +366,8 @@ namespace SQLRClient
                             throw new NotSupportedException();
                     }
 
+                    UInt32 size = 0;
+
                     switch (param.DbType)
                     {
                         case DbType.AnsiString:
@@ -378,8 +380,8 @@ namespace SQLRClient
                         case DbType.StringFixedLength:
                         case DbType.Time:
                         case DbType.Guid:
-                            // FIXME: length?
-                            _sqlrcur.defineOutputBindString(param.ParameterName, 32768);
+                            size = param.Size;
+                            _sqlrcur.defineOutputBindString(param.ParameterName, (size == 0) ? 32768 : size);
                             continue;
 
                         case DbType.Binary:
@@ -411,8 +413,8 @@ namespace SQLRClient
 
                         case DbType.Object:
                         case DbType.Xml:
-                            // FIXME: length?
-                            _sqlrcur.defineOutputBindString(param.ParameterName, 32768);
+                            size = param.Size;
+                            _sqlrcur.defineOutputBindString(param.ParameterName, (size == 0) ? 32768 : size);
                             continue;
                     }
                 }
@@ -433,14 +435,15 @@ namespace SQLRClient
 
                 if (param.Direction == ParameterDirection.Output)
                 {
+
+                    param.Size = _sqlrcur.getOutputBindLength(param.ParameterName);
+
                     switch (param.SQLRelayType)
                     {
                         case SQLRelayType.Clob:
-                            // FIXME: where can I store the length?
                             param.Value = _sqlrcur.getOutputBindClob(param.ParameterName);
                             continue;
                         case SQLRelayType.Blob:
-                            // FIXME: where can I store the length?
                             param.Value = _sqlrcur.getOutputBindBlob(param.ParameterName);
                             continue;
                         case SQLRelayType.Cursor:
@@ -460,17 +463,14 @@ namespace SQLRClient
                         case DbType.StringFixedLength:
                         case DbType.Time:
                         case DbType.Guid:
-                            // FIXME: where can I store the length?
                             param.Value = _sqlrcur.getOutputBindString(param.ParameterName);
                             break;
 
                         case DbType.Binary:
-                            // FIXME: where can I store the length?
                             param.Value = _sqlrcur.getOutputBindBlob(param.ParameterName);
                             break;
 
                         case DbType.Boolean:
-                            // FIXME: where can I store the length?
                             param.Value = _sqlrcur.getOutputBindInteger(param.ParameterName);
                             break;
 
@@ -495,7 +495,6 @@ namespace SQLRClient
 
                         case DbType.Object:
                         case DbType.Xml:
-                            // FIXME: where can I store the length?
                             param.Value = _sqlrcur.getOutputBindString(param.ParameterName);
                             break;
                     }

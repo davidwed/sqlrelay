@@ -17,6 +17,7 @@ namespace SQLRClient
         String _sourcecolumn = null;
         DataRowVersion _sourceversion = DataRowVersion.Current;
         Object _value = null;
+        UInt32 _size = 0;
         Boolean _isnull = true;
 
         #endregion
@@ -145,6 +146,18 @@ namespace SQLRClient
                 _value = value;
                 _isnull = (_value == null);
                 determineDbType();
+            }
+        }
+
+        public UInt32 Size
+        {
+            get
+            {
+                return _size;
+            }
+            set
+            {
+                _size = value;
             }
         }
 
