@@ -366,8 +366,6 @@ namespace SQLRClient
                             throw new NotSupportedException();
                     }
 
-                    UInt32 size = 0;
-
                     switch (param.DbType)
                     {
                         case DbType.AnsiString:
@@ -380,8 +378,7 @@ namespace SQLRClient
                         case DbType.StringFixedLength:
                         case DbType.Time:
                         case DbType.Guid:
-                            size = param.Size;
-                            _sqlrcur.defineOutputBindString(param.ParameterName, (size == 0) ? 32768 : size);
+                            _sqlrcur.defineOutputBindString(param.ParameterName, param.Size);
                             continue;
 
                         case DbType.Binary:
@@ -413,8 +410,7 @@ namespace SQLRClient
 
                         case DbType.Object:
                         case DbType.Xml:
-                            size = param.Size;
-                            _sqlrcur.defineOutputBindString(param.ParameterName, (size == 0) ? 32768 : size);
+                            _sqlrcur.defineOutputBindString(param.ParameterName, param.Size);
                             continue;
                     }
                 }
