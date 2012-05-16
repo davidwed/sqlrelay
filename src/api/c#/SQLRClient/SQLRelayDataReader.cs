@@ -82,6 +82,14 @@ namespace SQLRClient
             }
         }
 
+        public Boolean HasRows
+        {
+            get
+            {
+                return (_sqlrcur.rowCount() > 0);
+            }
+        }
+
         #endregion
 
 
@@ -101,6 +109,12 @@ namespace SQLRClient
 
         public Boolean  Read()
         {
+
+            if (IsClosed == true)
+            {
+                throw new InvalidOperationException("Reader must be open");
+            }
+
             // we need to move to the next row and see if it's valid
             // if we haven't fetched anything yet then the next row is 0
             // if we have, then the next row is just the current row + 1

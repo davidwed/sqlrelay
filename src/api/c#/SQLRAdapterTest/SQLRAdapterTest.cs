@@ -580,12 +580,6 @@ namespace SQLRClientTest
             sqlrcon2.Close();
             Console.WriteLine("\n");
 
-            // drop table
-            Console.WriteLine("DROP TABLE:");
-            sqlrcom.CommandText = "drop table testtable";
-            checkSuccess(ExecuteNonQuery(sqlrcom), 0);
-            Console.WriteLine("\n");
-
             // output bind by name
             Console.WriteLine("OUTPUT BINDS BY NAME:");
             sqlrcom.CommandText = "begin  :numvar:=1;  :stringvar:='hello';  :floatvar:=2.5; end;";
@@ -641,7 +635,7 @@ namespace SQLRClientTest
             Console.WriteLine("\n");
 
             // clob and blob output bind
-            Console.WriteLine("CLOB AND BLOB OUTPUT BINDS");
+            Console.WriteLine("CLOB AND BLOB OUTPUT BINDS:");
             sqlrcom.CommandText = "drop table testtable1";
             ExecuteNonQuery(sqlrcom);
             sqlrcom.CommandText = "create table testtable1 (testclob clob, testblob blob)";
@@ -675,11 +669,90 @@ namespace SQLRClientTest
             checkSuccess(ExecuteNonQuery(sqlrcom), 0);
             Console.WriteLine("\n");
 
-            // null and empty 
+            // null and empty clobs and blobs
+            Console.WriteLine("NULL AND EMPTY CLOBS AND BLOBS:");
+            sqlrcom.CommandText = "create table testtable1 (testclob1 clob, testclob2 clob, testblob1 blob, testblob2 blob)";
+            checkSuccess(ExecuteNonQuery(sqlrcom), 0);
+            sqlrcom.CommandText = "insert into testtable1 values (:testclob1, :testclob2, :testblob1, :testblob2)";
+            SQLRelayParameter testclob1 = new SQLRelayParameter();
+            testclob1.ParameterName = "testclob1";
+            testclob1.SQLRelayType = SQLRelayType.Clob;
+            testclob1.Value = "";
+            sqlrcom.Parameters.Add(testclob1);
+            SQLRelayParameter testclob2 = new SQLRelayParameter();
+            testclob2.ParameterName = "testclob2";
+            testclob2.SQLRelayType = SQLRelayType.Clob;
+            testclob2.Value = null;
+            sqlrcom.Parameters.Add(testclob2);
+            SQLRelayParameter testblob1 = new SQLRelayParameter();
+            testblob1.ParameterName = "testblob1";
+            testblob1.SQLRelayType = SQLRelayType.Blob;
+            testblob1.Value = System.Text.Encoding.Default.GetBytes("");
+            sqlrcom.Parameters.Add(testblob1);
+            SQLRelayParameter testblob2 = new SQLRelayParameter();
+            testblob2.ParameterName = "testblob2";
+            testblob2.SQLRelayType = SQLRelayType.Blob;
+            testblob2.Value = null;
+            sqlrcom.Parameters.Add(testblob2);
+            checkSuccess(ExecuteNonQuery(sqlrcom), 1);
+            sqlrcom.Parameters.Clear();
+            sqlrcom.CommandText = "select * from testtable1";
+            datareader = ExecuteReader(sqlrcom);
+            checkSuccess(datareader != null, true);
+            checkSuccess(datareader.Read(), true);
+            datareader.Read();
+            // FIXME: I'd expect these to come out as empty strings, not null's
+            checkSuccess(datareader.GetString(0), null);
+            checkSuccess(datareader.GetString(1), null);
+            checkSuccess(datareader.GetString(2), null);
+            checkSuccess(datareader.GetString(3), null);
+            sqlrcom.CommandText = "drop table testtable1";
+            checkSuccess(ExecuteNonQuery(sqlrcom), 0);
+            Console.WriteLine("\n");
 
             // switching connection of command
+            Console.WriteLine("SWITCHING CONNECTION OF COMMAND:");
+            sqlrcom.Connection = sqlrcon2;
+            sqlrcom.CommandText = "select count(*) from testtable";
+            try
+            {
+                sqlrcom.ExecuteScalar();
+                checkSuccess(false, true);
+            }
+            catch
+            {
+                // this should fail because sqlrcon2 was closed earlier
+                checkSuccess(true, true);
+            }
+            sqlrcom.Connection = sqlrcon;
+            checkSuccess(ExecuteScalar(sqlrcom), 6);
+            Console.WriteLine("\n");
 
             // closed datareader
+            Console.WriteLine("CLOSED DATAREADER:");
+            sqlrcom.CommandText = "select * from testtable";
+            datareader = sqlrcom.ExecuteReader();
+            checkSuccess(datareader != null, true);
+            datareader.Read();
+            datareader.Close();
+            checkSuccess(datareader.IsClosed, true);
+            try
+            {
+                datareader.Read();
+                checkSuccess(false, true);
+            }
+            catch
+            {
+                // this should fail because datareader was closed earlier
+                checkSuccess(true, true);
+            }
+            Console.WriteLine("\n");
+
+            // drop table
+            Console.WriteLine("DROP TABLE:");
+            sqlrcom.CommandText = "drop table testtable";
+            checkSuccess(ExecuteNonQuery(sqlrcom), 0);
+            Console.WriteLine("\n");
 
             // invalid queries
 
