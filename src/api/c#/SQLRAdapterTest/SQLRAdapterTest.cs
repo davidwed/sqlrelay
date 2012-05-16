@@ -38,6 +38,22 @@ namespace SQLRClientTest
             }
         }
 
+        private static void checkSuccess(String value, String success, Int32 size)
+        {
+            if (value.Substring(0,size) == success.Substring(0,size))
+            {
+                Console.Write("success ");
+                Console.Out.Flush();
+            }
+            else
+            {
+                Console.WriteLine("failure");
+                Console.WriteLine("\"" + value + "\" != \"" + success + "\"");
+                Console.Out.Flush();
+                Environment.Exit(1);
+            }
+        }
+
         private static void checkSuccess(Int64 value, Int64 success)
         {
             if (value == success)
@@ -80,7 +96,7 @@ namespace SQLRClientTest
             {
                 Console.WriteLine(ex.Message);
                 Console.Out.Flush();
-                return 0;
+                return -1;
             }
         }
 
@@ -94,7 +110,7 @@ namespace SQLRClientTest
             {
                 Console.WriteLine(ex.Message);
                 Console.Out.Flush();
-                return 0;
+                return -1;
             }
         }
 
@@ -625,6 +641,41 @@ namespace SQLRClientTest
             Console.WriteLine("\n");
 
             // clob and blob output bind
+            Console.WriteLine("CLOB AND BLOB OUTPUT BINDS");
+            sqlrcom.CommandText = "drop table testtable1";
+            ExecuteNonQuery(sqlrcom);
+            sqlrcom.CommandText = "create table testtable1 (testclob clob, testblob blob)";
+            checkSuccess(ExecuteNonQuery(sqlrcom), 0);
+            sqlrcom.CommandText = "insert into testtable1 values ('hello', :var1)";
+            SQLRelayParameter var1 = new SQLRelayParameter();
+            var1.ParameterName = "var1";
+            var1.Value = System.Text.Encoding.Default.GetBytes("hello");
+            var1.SQLRelayType = SQLRelayType.Blob;
+            sqlrcom.Parameters.Add(var1);
+            checkSuccess(ExecuteNonQuery(sqlrcom), 1);
+            sqlrcom.Parameters.Clear();
+            sqlrcom.CommandText = "begin select testclob into :clobvar from testtable1; select testblob into :blobvar from testtable1; end;";
+            SQLRelayParameter clobvar = new SQLRelayParameter();
+            clobvar.Direction = ParameterDirection.Output;
+            clobvar.ParameterName = "clobvar";
+            clobvar.SQLRelayType = SQLRelayType.Clob;
+            sqlrcom.Parameters.Add(clobvar);
+            SQLRelayParameter blobvar = new SQLRelayParameter();
+            blobvar.ParameterName = "blobvar";
+            blobvar.SQLRelayType = SQLRelayType.Blob;
+            blobvar.Direction = ParameterDirection.Output;
+            sqlrcom.Parameters.Add(blobvar);
+            checkSuccess(ExecuteNonQuery(sqlrcom), 1);
+            sqlrcom.Parameters.Clear();
+            checkSuccess(Convert.ToString(clobvar.Value), "hello", 5);
+            checkSuccess(clobvar.Size, 5);
+            checkSuccess(System.Text.Encoding.Default.GetString((byte[])blobvar.Value), "hello");
+            checkSuccess(blobvar.Size, 5);
+            sqlrcom.CommandText = "drop table testtable1";
+            checkSuccess(ExecuteNonQuery(sqlrcom), 0);
+            Console.WriteLine("\n");
+
+            // null and empty 
 
             // switching connection of command
 

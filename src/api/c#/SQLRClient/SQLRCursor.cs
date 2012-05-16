@@ -367,7 +367,14 @@ public class SQLRCursor : IDisposable
      *  binary lob output bind variable. */
     public Byte[] getOutputBindBlob(String variable)
     {
-        return sqlrcur_getOutputBindBlob(sqlrcurref, variable);
+        Int32 size = (Int32)sqlrcur_getOutputBindLength(sqlrcurref, variable);
+        if (size == 0)
+        {
+            return null;
+        }
+        Byte[] retval = new Byte[size];
+        Marshal.Copy(sqlrcur_getOutputBindBlob(sqlrcurref, variable), retval, 0, size);
+        return retval;
     }
 
     /** Get the value stored in a previously defined
@@ -949,7 +956,7 @@ public class SQLRCursor : IDisposable
     private static extern Double sqlrcur_getOutputBindDouble(IntPtr sqlrcurref, String variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern Byte[] sqlrcur_getOutputBindBlob(IntPtr sqlrcurref, String variable);
+    private static extern IntPtr sqlrcur_getOutputBindBlob(IntPtr sqlrcurref, String variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern String sqlrcur_getOutputBindClob(IntPtr sqlrcurref, String variable);
