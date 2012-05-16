@@ -748,6 +748,20 @@ namespace SQLRClientTest
             }
             Console.WriteLine("\n");
 
+            // has rows
+            Console.WriteLine("HAS ROWS:");
+            sqlrcom.CommandText = "select * from testtable";
+            datareader = ExecuteReader(sqlrcom);
+            checkSuccess(datareader != null, true);
+            checkSuccess(((SQLRelayDataReader)datareader).HasRows, true);
+            sqlrcom.CommandText = "delete from testtable";
+            checkSuccess(ExecuteNonQuery(sqlrcom), 6);
+            sqlrcom.CommandText = "select * from testtable";
+            datareader = ExecuteReader(sqlrcom);
+            checkSuccess(datareader != null, true);
+            checkSuccess(((SQLRelayDataReader)datareader).HasRows, false);
+            Console.WriteLine("\n");
+
             // drop table
             Console.WriteLine("DROP TABLE:");
             sqlrcom.CommandText = "drop table testtable";
