@@ -169,7 +169,12 @@ public class SQLRConnection : IDisposable
         return sqlrcon_autoCommitOff(sqlrconref)!=0;
     }
 
-
+    /** Begins a transaction.  Returns true if the begin
+     *  succeeded, false if it failed.  If the database
+     *  automatically begins a new transaction when a
+     *  commit or rollback is issued then this doesn't
+     *  do anything unless SQL Relay is faking transaction
+     *  blocks. */
     public Boolean begin()
     {
         return (sqlrcon_begin(sqlrconref) == 1);
