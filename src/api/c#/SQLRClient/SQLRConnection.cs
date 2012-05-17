@@ -168,21 +168,24 @@ public class SQLRConnection : IDisposable
     {
         return sqlrcon_autoCommitOff(sqlrconref)!=0;
     }
-    
-    
-    
-    /** Issues a commit.  Returns 1 if the commit succeeded, 0 if it failed and
-     *  -1 if an error occurred. */
-    public Int32 commit()
+
+
+    public Boolean begin()
     {
-        return sqlrcon_commit(sqlrconref);
+        return (sqlrcon_begin(sqlrconref) == 1);
     }
     
-    /** Issues a rollback.  Returns 1 if the rollback succeeded, 0 if it failed
-     *  and -1 if an error occurred. */
-    public Int32 rollback()
+    
+    /** Issues a commit.  Returns true if the commit succeeded and false if it failed. */
+    public Boolean commit()
     {
-        return sqlrcon_rollback(sqlrconref);
+        return (sqlrcon_commit(sqlrconref) == 1);
+    }
+    
+    /** Issues a rollback.  Returns true if the rollback succeeded, false if it failed. */
+    public Boolean rollback()
+    {
+        return (sqlrcon_rollback(sqlrconref) == 1);
     }
     
     
@@ -286,6 +289,9 @@ public class SQLRConnection : IDisposable
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern Int32 sqlrcon_autoCommitOff(IntPtr sqlrconref);
+
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern Int32 sqlrcon_begin(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern Int32 sqlrcon_commit(IntPtr sqlrconref);

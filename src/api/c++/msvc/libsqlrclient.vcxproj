@@ -90,6 +90,7 @@ copy /Y ..\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sq
   <ItemGroup>
     <ClCompile Include="..\src\connection\authentication.cpp" />
     <ClCompile Include="..\src\connection\autocommit.cpp" />
+    <ClCompile Include="..\src\connection\begin.cpp" />
     <ClCompile Include="..\src\connection\bindformat.cpp" />
     <ClCompile Include="..\src\connection\clearsessionflags.cpp" />
     <ClCompile Include="..\src\connection\clientversion.cpp" />
