@@ -11,7 +11,7 @@
 -export([ping/0, identify/0, dbVersion/0, bindFormat/0, connectionErrorMessage/0, connectionErrorNumber/0, errorMessage/0, errorNumber/0]).
 -export([selectDatabase/1, getCurrentDatabase/0]).
 -export([getConnectionPort/0, getConnectionSocket/0]).
--export([autoCommitOn/0, autoCommitOff/0, commit/0, rollback/0]).
+-export([autoCommitOn/0, autoCommitOff/0, beginTransaction/0, commit/0, rollback/0]).
 -export([debugOn/0, debugOff/0, getDebug/0]).
 -export([setResultSetBufferSize/1, getResultSetBufferSize/0]).
 -export([dontGetColumnInfo/0, getColumnInfo/0]).
@@ -122,6 +122,8 @@ getCurrentDatabase() -> call_port({getCurrentDatabase}).
 autoCommitOn() -> call_port({autoCommitOn}).
 
 autoCommitOff() -> call_port({autoCommitOff}).
+
+beginTransaction() -> call_port({beginTransaction}).
 
 commit() -> call_port({commit}).
 

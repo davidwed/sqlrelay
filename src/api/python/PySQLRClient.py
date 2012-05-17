@@ -166,19 +166,28 @@ class sqlrconnection:
         """
         return CSQLRelay.autoCommitOff(self.connection)
 
+    def begin(self):
+        """
+        Begins a transaction.  Returns true if the begin
+        succeeded, false if it failed.  If the database
+        automatically begins a new transaction when a
+        commit or rollback is issued then this doesn't
+        do anything unless SQL Relay is faking transaction
+        blocks.
+        """
+        return CSQLRelay.begin(self.connection)
+
     def commit(self):
         """
-        Issues a commit, returns 1 if the commit
-        succeeded, 0 if it failed and -1 if an
-        error occurred.
+        Issues a commit, returns true if the commit
+        succeeded, false if it failed.
         """
         return CSQLRelay.commit(self.connection)
 
     def rollback(self):
         """
-        Issues a rollback, returns 1 if the rollback
-        succeeded, 0 if it failed and -1 if an
-        error occurred.
+        Issues a rollback, returns true if the rollback
+        succeeded, false if it failed.
         """
         return CSQLRelay.rollback(self.connection)
 

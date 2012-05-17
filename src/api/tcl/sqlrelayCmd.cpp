@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.cpp,v 1.2 2012-02-16 03:21:22 mused Exp $
+ * $Id: sqlrelayCmd.cpp,v 1.3 2012-05-17 05:08:40 mused Exp $
  */
 
 #include <tcl.h>
@@ -1814,6 +1814,7 @@ void sqlrconDelete(ClientData data) {
  *  $con getCurrentDatabase
  *  $con getLastInsertId
  *  $con autoCommit bool
+ *  $con begin
  *  $con commit
  *  $con rollback
  *  $con errorMessage
@@ -1843,6 +1844,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     "getCurrentDatabase",
     "getLastInsertId",
     "autoCommit",
+    "begin",
     "commit",
     "rollback",
     "errorMessage",
@@ -1867,6 +1869,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     SQLR_GETCURRENTDATABASE,
     SQLR_GETLASTINSERTID,
     SQLR_AUTOCOMMIT,
+    SQLR_BEGIN,
     SQLR_COMMIT,
     SQLR_ROLLBACK,
     SQLR_ERRORMESSAGE,
@@ -2054,6 +2057,14 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     } else {
       Tcl_SetObjResult(interp, Tcl_NewIntObj(con->autoCommitOff()));
     }
+    break;
+  }
+  case SQLR_BEGIN: {
+    if (objc > 2) {
+      Tcl_WrongNumArgs(interp, 2, objv, NULL);
+      return TCL_ERROR;
+    }
+    Tcl_SetObjResult(interp, Tcl_NewIntObj(con->begin()));
     break;
   }
   case SQLR_COMMIT: {

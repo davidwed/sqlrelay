@@ -537,8 +537,12 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 		sqlrcon->debugOn();
 	}
 
-	// handle a commit/rollback
-	if (!charstring::compareIgnoringCase(command,"commit",6)) {
+	// handle begin, commit and rollback
+	if (!charstring::compareIgnoringCase(command,"begin",5)) {
+
+		sqlrcon->begin();
+
+	} else if (!charstring::compareIgnoringCase(command,"commit",6)) {
 
 		sqlrcon->commit();
 

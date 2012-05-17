@@ -231,16 +231,28 @@ static VALUE sqlrcon_autoCommitOff(VALUE self) {
 	return INT2NUM(sqlrcon->autoCommitOff());
 }
 
-/** Issues a commit.  Returns 1 if the commit succeeded, 0 if it failed and -1
- *  if an error occurred. */
+/** Begins a transaction.  Returns true if the begin
+ *  succeeded, false if it failed.  If the database
+ *  automatically begins a new transaction when a
+ *  commit or rollback is issued then this doesn't
+ *  do anything unless SQL Relay is faking transaction
+ *  blocks. */
+static VALUE sqlrcon_begin(VALUE self) {
+	sqlrconnection	*sqlrcon;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	return INT2NUM(sqlrcon->begin());
+}
+
+/** Issues a commit.  Returns true if the commit succeeded,
+ *  false if it failed. */
 static VALUE sqlrcon_commit(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
 	return INT2NUM(sqlrcon->commit());
 }
 
-/** Issues a rollback.  Returns 1 if the rollback succeeded, 0 if it failed
- *  and -1 if an error occurred. */
+/** Issues a rollback.  Returns true if the rollback succeeded,
+ *  false if it failed. */
 static VALUE sqlrcon_rollback(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -336,6 +348,8 @@ void Init_SQLRConnection() {
 				(CAST)sqlrcon_autoCommitOn,0);
 	rb_define_method(csqlrconnection,"autoCommitOff",
 				(CAST)sqlrcon_autoCommitOff,0);
+	rb_define_method(csqlrconnection,"begin",
+				(CAST)sqlrcon_begin,0);
 	rb_define_method(csqlrconnection,"commit",
 				(CAST)sqlrcon_commit,0);
 	rb_define_method(csqlrconnection,"rollback",

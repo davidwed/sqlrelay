@@ -442,6 +442,17 @@ int main() {
 			}
 		}
 		
+		if (strcmp("beginTransaction", command) == TRUE) {
+			// check number of arguments
+		    	if (arity != 0) return ERR_NUMBER_OF_ARGS;
+
+			// call function and encode result 
+			if (ei_x_encode_atom(&result, "ok") || 
+				ei_x_encode_long(&result, sqlrcon_begin(con))) {
+				return ERR_ENCODING_ARGS;
+			}
+		}
+		
 		if (strcmp("commit", command) == TRUE) {
 			// check number of arguments
 		    	if (arity != 0) return ERR_NUMBER_OF_ARGS;
