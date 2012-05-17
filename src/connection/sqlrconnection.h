@@ -63,6 +63,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 						const char *newpassword);
 		virtual bool	autoCommitOn();
 		virtual bool	autoCommitOff();
+		virtual bool	begin();
 		virtual bool	commit();
 		virtual bool	rollback();
 		virtual bool	supportsTransactionBlocks();
@@ -291,6 +292,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool	isBeginTransactionQuery(sqlrcursor_svr *cursor);
 		bool	isCommitQuery(sqlrcursor_svr *cursor);
 		bool	isRollbackQuery(sqlrcursor_svr *cursor);
+		void	beginCommand();
+		bool	beginInternal();
 		void	commitCommand();
 		bool	commitInternal();
 		void	rollbackCommand();

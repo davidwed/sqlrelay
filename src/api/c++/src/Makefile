@@ -20,6 +20,7 @@ SRCS = connection/connectionctor.cpp \
 	connection/suspendsession.cpp \
 	connection/resumesession.cpp \
 	connection/autocommit.cpp \
+	connection/begin.cpp \
 	connection/commit.cpp \
 	connection/rollback.cpp \
 	connection/serverversion.cpp \
@@ -77,6 +78,7 @@ LOBJS = connection/connectionctor.lo \
 	connection/suspendsession.lo \
 	connection/resumesession.lo \
 	connection/autocommit.lo \
+	connection/begin.lo \
 	connection/commit.lo \
 	connection/rollback.lo \
 	connection/serverversion.lo \

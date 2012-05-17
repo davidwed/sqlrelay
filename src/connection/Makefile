@@ -23,6 +23,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqlrconnection/lastinsertid.cpp \
 	sqlrconnection/ping.cpp \
 	sqlrconnection/identify.cpp \
+	sqlrconnection/begin.cpp \
 	sqlrconnection/autocommit.cpp \
 	sqlrconnection/commit.cpp \
 	sqlrconnection/connectioncount.cpp \
@@ -131,6 +132,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/lastinsertid.lo \
 	sqlrconnection/ping.lo \
 	sqlrconnection/identify.lo \
+	sqlrconnection/begin.lo \
 	sqlrconnection/autocommit.lo \
 	sqlrconnection/commit.lo \
 	sqlrconnection/connectioncount.lo \

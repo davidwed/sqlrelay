@@ -122,13 +122,20 @@ class SQLRCLIENT_DLLSPEC sqlrconnection {
 		bool	autoCommitOff();
 
 
+		/** Begins a transaction.  Returns true if the begin
+		 *  succeeded, false if it failed.  If the database
+		 *  automatically begins a new transaction when a
+		 *  commit or rollback is issued then this doesn't
+		 *  do anything unless SQL Relay is faking transaction
+		 *  blocks. */
+		bool	begin();
 
-		/** Issues a commit.  Returns 1 if the commit
-		 *  succeeded, 0 if it failed. */
+		/** Commits a transaction.  Returns true if the commit
+		 *  succeeded, false if it failed. */
 		bool	commit();
 
-		/** Issues a rollback.  Returns 1 if the rollback
-		 *  succeeded, 0 if it failed. */
+		/** Rolls back a transaction.  Returns true if the rollback
+		 *  succeeded, false if it failed. */
 		bool	rollback();
 
 

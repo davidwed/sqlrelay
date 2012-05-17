@@ -82,6 +82,9 @@ void sqlrconnection_svr::clientSession() {
 		} else if (command==AUTOCOMMIT) {
 			autoCommitCommand();
 			continue;
+		} else if (command==BEGIN) {
+			beginCommand();
+			continue;
 		} else if (command==COMMIT) {
 			commitCommand();
 			continue;

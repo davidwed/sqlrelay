@@ -408,10 +408,6 @@ void sqlrconnection_svr::translateBeginTransaction(sqlrcursor_svr *cursor) {
 	dbgfile.debugPrint("connection",2,cursor->querybuffer);
 }
 
-const char *sqlrconnection_svr::beginTransactionQuery() {
-	return "BEGIN";
-}
-
 bool sqlrconnection_svr::getColumnNames(const char *query,
 					stringbuffer *output) {
 
