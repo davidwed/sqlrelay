@@ -215,10 +215,13 @@ namespace SQLRClient
         {
             validConnection();
 
+            if (!_sqlrcon.begin())
+            {
+                return null;
+            }
+
             SQLRelayTransaction trans = new SQLRelayTransaction();
             trans.Connection = this;
-            // FIXME: some db's require a "begin"
-            // maybe I need to add a method to the c++ api for that
             return trans;
         }
 
