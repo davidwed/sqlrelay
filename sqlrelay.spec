@@ -416,6 +416,7 @@ rm -rf %{buildroot}
 %defattr(-, root, root)
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.conf.example
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.dtd
+%config %attr(600, root, root) %{_sysconfdir}/sqlrelay.xsd
 %config(noreplace) %attr(600, root, root) %{inittab}
 %{initscript}
 %{_bindir}/sqlr-cachemanager*
