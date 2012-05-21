@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="instances">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="instance"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="instance">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="users"/>
+        <xs:element minOccurs="0" ref="connections"/>
+        <xs:element minOccurs="0" ref="router"/>
+      </xs:sequence>
+      <xs:attribute name="id" default="defaultid"/>
+      <xs:attribute name="addresses" default="0.0.0.0"/>
+      <xs:attribute name="port" default="9000"/>
+      <xs:attribute name="socket" default="/tmp/sqlrelay.socket"/>
+      <xs:attribute name="mysqladdresses" default="0.0.0.0"/>
+      <xs:attribute name="mysqlport" default="9001"/>
+      <xs:attribute name="mysqlsocket" default="/tmp/mysqlsqlrelay.socket"/>
+      <xs:attribute name="dbase" default="oracle8">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="oracle8"/>
+            <xs:enumeration value="mysql"/>
+            <xs:enumeration value="postgresql"/>
+            <xs:enumeration value="sqlite"/>
+            <xs:enumeration value="freetds"/>
+            <xs:enumeration value="sybase"/>
+            <xs:enumeration value="odbc"/>
+            <xs:enumeration value="db2"/>
+            <xs:enumeration value="firebird"/>
+            <xs:enumeration value="mdbtools"/>
+            <xs:enumeration value="router"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="connections" default="1"/>
+      <xs:attribute name="maxconnections" default="1"/>
+      <xs:attribute name="maxqueuelength" default="0"/>
+      <xs:attribute name="growby" default="1"/>
+      <xs:attribute name="ttl" default="60"/>
+      <xs:attribute name="maxsessioncount" default="0"/>
+      <xs:attribute name="endofsession" default="commit">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="commit"/>
+            <xs:enumeration value="rollback"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="sessiontimeout" default="60"/>
+      <xs:attribute name="runasuser" default="nobody"/>
+      <xs:attribute name="runasgroup" default="nobody"/>
+      <xs:attribute name="cursors" default="5"/>
+      <xs:attribute name="maxcursors" default="1300"/>
+      <xs:attribute name="cursors_growby" default="5"/>
+      <xs:attribute name="authtier" default="listener">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="listener"/>
+            <xs:enumeration value="connection"/>
+            <xs:enumeration value="listener_and_connection"/>
+            <xs:enumeration value="database"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="handoff" default="reconnect">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="pass"/>
+            <xs:enumeration value="reconnect"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="deniedips" default=""/>
+      <xs:attribute name="allowedips" default=""/>
+      <xs:attribute name="debug" default="none">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="none"/>
+            <xs:enumeration value="listener"/>
+            <xs:enumeration value="connection"/>
+            <xs:enumeration value="sqltranslation"/>
+            <xs:enumeration value="listener_and_connection"/>
+            <xs:enumeration value="listener_and_connection_and_sqltranslation"/>
+            <xs:enumeration value="connection_and_sqltranslation"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="maxquerysize" default="65536"/>
+      <xs:attribute name="maxstringbindvaluelength" default="4000"/>
+      <xs:attribute name="maxlobbindvaluelength" default="71680"/>
+      <xs:attribute name="idleclienttimeout" default="-1"/>
+      <xs:attribute name="maxlisteners" default="-1"/>
+      <xs:attribute name="listenertimeout" default="0"/>
+      <xs:attribute name="reloginatstart" default="no">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="yes"/>
+            <xs:enumeration value="no"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="timequeriessec" default="-1"/>
+      <xs:attribute name="timequeriesusec" default="-1"/>
+      <xs:attribute name="fakeinputbindvariables" default="no">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="yes"/>
+            <xs:enumeration value="no"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="translatebindvariables" default="no">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="yes"/>
+            <xs:enumeration value="no"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="isolationlevel" default="read committed"/>
+      <xs:attribute name="ignoreselectdatabase" default="no">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="yes"/>
+            <xs:enumeration value="no"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="users">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="user"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="user">
+    <xs:complexType>
+      <xs:attribute name="user" default="user"/>
+      <xs:attribute name="password" default="password"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="session">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="start"/>
+        <xs:element ref="end"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="start">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="runquery"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="end">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="runquery"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="runquery" type="xs:string"/>
+  <xs:element name="connections">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="connection"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="connection">
+    <xs:complexType>
+      <xs:attribute name="connectionid" default="defaultid"/>
+      <xs:attribute name="string" default="user=scott;password=tiger"/>
+      <xs:attribute name="metric" default="1"/>
+      <xs:attribute name="behindloadbalancer" default="no">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="yes"/>
+            <xs:enumeration value="no"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="router">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="route"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="filter"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="route">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="query"/>
+      </xs:sequence>
+      <xs:attribute name="host" default=""/>
+      <xs:attribute name="port" default=""/>
+      <xs:attribute name="socket" default=""/>
+      <xs:attribute name="user" default=""/>
+      <xs:attribute name="password" default=""/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="filter">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="query"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="query">
+    <xs:complexType>
+      <xs:attribute name="pattern" default=""/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
