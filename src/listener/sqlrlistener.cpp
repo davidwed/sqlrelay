@@ -384,11 +384,11 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	//
 	// connection/listener registration interlocks:
 	// 2 - connection/listener: ensures that it's safe for a listener to
-	//                          read a registration
+	//			  read a registration
 	//       listener waits for a connection to register itself
 	//       connection signals when it's done registering
 	// 3 - connection/listener: ensures that it's safe for a connection to
-	//                          register itself
+	//			  register itself
 	//       connection waits for the listener to read its registration
 	//       listener signals when it's done reading a registration
 	//
@@ -400,14 +400,14 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	//       connection increases/decreases connection count
 	//       scalar reads connection count
 	// 5 - connection/listener: session count mutex
-        //       listener increases session count when a client connects
+	//       listener increases session count when a client connects
 	//       connection decreases session count when a client disconnects
 	// 7 - scaler/listener: used to decide whether to scale or not
 	//       scaler signals after counting sessions/connections
 	//       listener waits for scaler to count sessions/connections
 	// 8 - scaler/connection:
 	//       scaler waits for the connection count to increase
-	//                 (in effect, waiting for a new connection to fire up)
+	//		 (in effect, waiting for a new connection to fire up)
 	//       connection signals after increasing connection count
 	//
 	// statistics:
@@ -1474,19 +1474,20 @@ printf("got: %d\n",clientflags1);
 }
 
 void sqlrlistener::acquireSessionCountMutex() {
-    // wait for access
-    dbgfile.debugPrint("listener",1,"waiting for exclusive access...");
-    if (!semset->waitWithUndo(5)) {
-        // FIXME: bail somehow
-    }
-    dbgfile.debugPrint("listener",1,"done waiting for exclusive access...");
+	// wait for access
+	dbgfile.debugPrint("listener",1,"waiting for exclusive access...");
+	if (!semset->waitWithUndo(5)) {
+		// FIXME: bail somehow
+	}
+	dbgfile.debugPrint("listener",1,"done waiting for exclusive access...");
 }
 
 void sqlrlistener::releaseSessionCountMutex() {
-    // signal that others may have access
-    if (!semset->signalWithUndo(5)) {
-        // FIXME: bail somehow
-    }
+
+	// signal that others may have access
+	if (!semset->signalWithUndo(5)) {
+		// FIXME: bail somehow
+	}
 }
 
 void sqlrlistener::incrementSessionCount() {
@@ -1628,93 +1629,88 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 
 // wait for exclusive access to the
 // shared memory among listeners
-bool sqlrlistener::acquireShmAccess()
-{
-       dbgfile.debugPrint("listener",0,
-                       "acquiring exclusive shm access");
-       if (alarmrang || !semset->waitWithUndo(1)) {
-               if (alarmrang) {
-                       dbgfile.debugPrint(     "listener",0,
-                                       "timeout occured");
-               }
-               dbgfile.debugPrint("listener",0,
-                       "failed to acquire exclusive shm access");
-               return false;
-       }
-       dbgfile.debugPrint("listener",0,
-                       "done acquiring exclusive shm access");
+bool sqlrlistener::acquireShmAccess() {
 
-       return true;
+	dbgfile.debugPrint("listener",0,"acquiring exclusive shm access");
+	if (alarmrang || !semset->waitWithUndo(1)) {
+		if (alarmrang) {
+			dbgfile.debugPrint("listener",0,"timeout occured");
+		}
+		dbgfile.debugPrint("listener",0,
+			"failed to acquire exclusive shm access");
+		return false;
+	}
+	dbgfile.debugPrint("listener",0,
+			"done acquiring exclusive shm access");
+
+	return true;
 }
 
 // allow other listeners access to the shared memory
-bool sqlrlistener::releaseShmAccess()
-{
-       dbgfile.debugPrint("listener",-1,
-                       "releasing exclusive shm access");
-       if (!semset->signalWithUndo(1)) {
-               dbgfile.debugPrint("listener",0,
-                       "failed to release exclusive shm access");
-               return false;
-       }
-       dbgfile.debugPrint("listener",0,
-                       "done releasing exclusive shm access");
+bool sqlrlistener::releaseShmAccess() {
 
-       return true;
+	dbgfile.debugPrint("listener",-1,"releasing exclusive shm access");
+	if (!semset->signalWithUndo(1)) {
+		dbgfile.debugPrint("listener",0,
+			"failed to release exclusive shm access");
+		return false;
+	}
+	dbgfile.debugPrint("listener",0,
+			"done releasing exclusive shm access");
+
+	return true;
 }
 
 // wait for an available connection
-bool sqlrlistener::waitForConnection()
-{
-    dbgfile.debugPrint("listener",0,
-            "waiting for an available connection");
+bool sqlrlistener::waitForConnection() {
 
-        if (alarmrang || !semset->wait(2) ) {
-                if (alarmrang) {
-                        dbgfile.debugPrint(     "listener",0,
-                                        "timeout occured");
-                }
-                dbgfile.debugPrint("listener",0,
-                                "failed to wait for an available connection");
-                return false;
-        } else {
+	dbgfile.debugPrint("listener",0,"waiting for an available connection");
 
-                // Reset this semaphore to 0.
-                // It can get left incremented if a sqlr-connection process
-                // is killed between calls to signalListenerToRead() and
-                // waitForListenerToFinishReading().
-                // It's ok to reset it here because no one except this process
-                // has access to this semaphore at this time because of the
-                // lock on semaphore 1.
-                semset->setValue(2,0);
+	if (alarmrang || !semset->wait(2) ) {
+		if (alarmrang) {
+			dbgfile.debugPrint("listener",0,"timeout occured");
+		}
+		dbgfile.debugPrint("listener",0,
+				"failed to wait for an available connection");
+		return false;
+	} else {
 
-                dbgfile.debugPrint("listener",0,
-                                "done waiting for an available connection");
-        }
+		// Reset this semaphore to 0.
+		// It can get left incremented if a sqlr-connection process
+		// is killed between calls to signalListenerToRead() and
+		// waitForListenerToFinishReading().
+		// It's ok to reset it here because no one except this process
+		// has access to this semaphore at this time because of the
+		// lock on semaphore 1.
+		semset->setValue(2,0);
 
-        return true;
+		dbgfile.debugPrint("listener",0,
+				"done waiting for an available connection");
+	}
+
+	return true;
 }
 
 // tell the connection that we've gotten it's data
-bool sqlrlistener::signalConnectionWeHaveRead()
-{
-        dbgfile.debugPrint("listener",0,
-                        "signalling connection that we've read");
-        if (!semset->signal(3)) {
-                dbgfile.debugPrint("listener",0,
-                                "failed to signal connection that we've read");
-                return false;
-        }
-        dbgfile.debugPrint("listener",0,
-                        "done signalling connection that we've read");
+bool sqlrlistener::signalConnectionWeHaveRead() {
 
-        return true;
+	dbgfile.debugPrint("listener",0,
+			"signalling connection that we've read");
+	if (!semset->signal(3)) {
+		dbgfile.debugPrint("listener",0,
+				"failed to signal connection that we've read");
+		return false;
+	}
+	dbgfile.debugPrint("listener",0,
+			"done signalling connection that we've read");
+
+	return true;
 }
 
 bool sqlrlistener::getAConnection(uint32_t *connectionpid,
-                                        uint16_t *inetport,
-                                        char *unixportstr,
-                                        uint16_t *unixportstrlen) {
+					uint16_t *inetport,
+					char *unixportstr,
+					uint16_t *unixportstrlen) {
 
 	// get a pointer to the shared memory segment
 	shmdata *ptr=(shmdata *)idmemory->getPointer();
@@ -1737,6 +1733,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 		ok=acquireShmAccess();
 		if (ok) {
+
 			// This section should be executed without returns or
 			// breaks so that release shm mutex will get called
 			// at the end
@@ -1783,7 +1780,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 					size_t  debugstringlen=
 						15+*unixportstrlen+21;
-					char    *debugstring=
+					char	*debugstring=
 						new char[debugstringlen];
 					snprintf(debugstring,debugstringlen,
 							"socket=%s  port=%d",
@@ -1807,6 +1804,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 		// execute this only if code above executed without errors
 		if (ok) {
+
 			// make sure the connection is actually up, if not,
 			// fork a child to jog it, spin back and get another
 			// connection
