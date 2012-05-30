@@ -115,6 +115,9 @@ void sqlrcursor::deleteVariables() {
 			if (subvars[i].type==STRING_BIND) {
 				delete[] subvars[i].value.stringval;
 			}
+			if (subvars[i].type==DATE_BIND) {
+				delete[] subvars[i].value.dateval.tz;
+			}
 		}
 	}
 
@@ -285,7 +288,27 @@ void sqlrcursor::inputBind(const char *variable, double value,
 		bv=&inbindvars[inbindcount];
 		inbindcount++;
 	}
-	doubleVar(bv,variable,value,precision, scale);
+	doubleVar(bv,variable,value,precision,scale);
+	bv->send=true;
+	dirtybinds=true;
+}
+
+void sqlrcursor::inputBind(const char *variable,
+				int16_t year, int16_t month, int16_t day,
+				int16_t hour, int16_t minute, int16_t second,
+				const char *tz) {
+	if (!variable || !variable[0]) {
+		return;
+	}
+	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
+	if (!bv) {
+		if (inbindcount>=MAXVAR) {
+			return;
+		}
+		bv=&inbindvars[inbindcount];
+		inbindcount++;
+	}
+	dateVar(bv,variable,year,month,day,hour,minute,second,tz);
 	bv->send=true;
 	dirtybinds=true;
 }
@@ -371,6 +394,25 @@ void sqlrcursor::doubleVar(bindvar *var, const char *variable, double value,
 	var->value.doubleval.scale=scale;
 }
 
+void sqlrcursor::dateVar(bindvar *var, const char *variable,
+				int16_t year, int16_t month, int16_t day,
+				int16_t hour, int16_t minute, int16_t second,
+				const char *tz) {
+	initVar(var,variable);
+	var->type=DATE_BIND;
+	var->value.dateval.year=year;
+	var->value.dateval.month=month;
+	var->value.dateval.day=day;
+	var->value.dateval.hour=hour;
+	var->value.dateval.minute=minute;
+	var->value.dateval.second=second;
+	if (copyrefs) {
+		var->value.dateval.tz=charstring::duplicate(tz);
+	} else {
+		var->value.dateval.tz=(char *)tz;
+	}
+}
+
 void sqlrcursor::lobVar(bindvar *var, const char *variable,
 			const char *value, uint32_t size, bindtype type) {
 
@@ -439,6 +481,10 @@ void sqlrcursor::defineOutputBindInteger(const char *variable) {
 
 void sqlrcursor::defineOutputBindDouble(const char *variable) {
 	defineOutputBindGeneric(variable,DOUBLE_BIND,sizeof(double));
+}
+
+void sqlrcursor::defineOutputBindDate(const char *variable) {
+	defineOutputBindGeneric(variable,DATE_BIND,sizeof(double));
 }
 
 void sqlrcursor::defineOutputBindBlob(const char *variable) {
@@ -573,6 +619,30 @@ double sqlrcursor::getOutputBindDouble(const char *variable) {
 		}
 	}
 	return -1.0;
+}
+
+bool sqlrcursor::getOutputBindDate(const char *variable,
+			int16_t *year, int16_t *month, int16_t *day,
+			int16_t *hour, int16_t *minute, int16_t *second,
+			const char **tz) {
+
+	if (variable) {
+		for (int16_t i=0; i<outbindcount; i++) {
+			if (!charstring::compare(
+					outbindvars[i].variable,variable) &&
+					outbindvars[i].type==DATE_BIND) {
+				*year=outbindvars[i].value.dateval.year;
+				*month=outbindvars[i].value.dateval.month;
+				*day=outbindvars[i].value.dateval.day;
+				*hour=outbindvars[i].value.dateval.hour;
+				*minute=outbindvars[i].value.dateval.minute;
+				*second=outbindvars[i].value.dateval.second;
+				*tz=outbindvars[i].value.dateval.tz;
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 sqlrcursor *sqlrcursor::getOutputBindCursor(const char *variable) {

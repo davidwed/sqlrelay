@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
+#include <parsedatetime.h>
 
 bool sqlrcursor_svr::supportsNativeBinds() {
 	return true;
@@ -34,6 +35,21 @@ bool sqlrcursor_svr::handleBinds() {
 				&inbindvars[i].value.doubleval.value,
 				inbindvars[i].value.doubleval.precision,
 				inbindvars[i].value.doubleval.scale)) {
+				return false;
+			}
+		} else if (inbindvars[i].type==DATE_BIND) {
+			if (!inputBindDate(inbindvars[i].variable,
+				inbindvars[i].variablesize,
+				inbindvars[i].value.dateval.year,
+				inbindvars[i].value.dateval.month,
+				inbindvars[i].value.dateval.day,
+				inbindvars[i].value.dateval.hour,
+				inbindvars[i].value.dateval.minute,
+				inbindvars[i].value.dateval.second,
+				inbindvars[i].value.dateval.tz,
+				inbindvars[i].value.dateval.buffer,
+				inbindvars[i].value.dateval.buffersize,
+				&inbindvars[i].isnull)) {
 				return false;
 			}
 		} else if (inbindvars[i].type==BLOB_BIND) {
@@ -78,6 +94,19 @@ bool sqlrcursor_svr::handleBinds() {
 				&outbindvars[i].value.doubleval.value,
 				&outbindvars[i].value.doubleval.precision,
 				&outbindvars[i].value.doubleval.scale,
+				&outbindvars[i].isnull)) {
+				return false;
+			}
+		} else if (outbindvars[i].type==DATE_BIND) {
+			if (!outputBindDate(outbindvars[i].variable,
+				outbindvars[i].variablesize,
+				&outbindvars[i].value.dateval.year,
+				&outbindvars[i].value.dateval.month,
+				&outbindvars[i].value.dateval.day,
+				&outbindvars[i].value.dateval.hour,
+				&outbindvars[i].value.dateval.minute,
+				&outbindvars[i].value.dateval.second,
+				&outbindvars[i].value.dateval.tz,
 				&outbindvars[i].isnull)) {
 				return false;
 			}
@@ -149,6 +178,55 @@ bool sqlrcursor_svr::inputBindDouble(const char *variable,
 	return true;
 }
 
+void sqlrcursor_svr::dateToString(char *buffer, uint16_t buffersize,
+				int16_t year, int16_t month, int16_t day,
+				int16_t hour, int16_t minute, int16_t second,
+				const char *tz) {
+	if (year==-1 && month==-1 && day==-1 &&
+		hour==-1 && minute==-1 && second==-1) {
+		// if all are -1 then treat it as a NULL
+		buffer[0]='\0';
+	} else if (year==-1 || month==-1 || day==-1) {
+		// if any date parts are -1 then exclude the date
+		snprintf(buffer,buffersize,"%02d:%02d:%02d",hour,minute,second);
+	} else if (hour==-1 || minute==-1 || second==-1) {
+		// if any time parts are -1 then exclude the time
+		snprintf(buffer,buffersize,"%04d-%02d-%02d",year,month,day);
+	} else {
+		// if no parts are -1 then use all parts
+		snprintf(buffer,buffersize,"%04d-%02d-%02d %02d:%02d:%02d",
+					year,month,day,hour,minute,second);
+	}
+}
+
+void sqlrcursor_svr::stringToDate(const char *string,
+			int16_t *year, int16_t *month, int16_t *day,
+			int16_t *hour, int16_t *minute, int16_t *second,
+			char **tz) {
+	parseDateTime(string,false,year,month,day,hour,minute,second);
+	*tz=NULL;
+}
+
+bool sqlrcursor_svr::inputBindDate(const char *variable,
+					uint16_t variablesize,
+					uint64_t year,
+					uint16_t month,
+					uint16_t day,
+					uint16_t hour,
+					uint16_t minute,
+					uint16_t second,
+					const char *tz,
+					char *buffer,
+					uint16_t buffersize,
+					int16_t *isnull) {
+	dateToString(buffer,buffersize,year,month,day,hour,minute,second,tz);
+	if (buffer[0]=='\0') {
+		*isnull=conn->nullBindValue();
+	}
+	return inputBindString(variable,variablesize,
+				buffer,buffersize,isnull);
+}
+
 bool sqlrcursor_svr::inputBindBlob(const char *variable,
 					uint16_t variablesize,
 					const char *value,
@@ -189,6 +267,20 @@ bool sqlrcursor_svr::outputBindDouble(const char *variable,
 					double *value,
 					uint32_t *precision,
 					uint32_t *scale,
+					int16_t *isnull) {
+	// by default, do nothing...
+	return true;
+}
+
+bool sqlrcursor_svr::outputBindDate(const char *variable,
+					uint16_t variablesize,
+					int16_t *year,
+					int16_t *month,
+					int16_t *day,
+					int16_t *hour,
+					int16_t *minute,
+					int16_t *second,
+					char **tz,
 					int16_t *isnull) {
 	// by default, do nothing...
 	return true;

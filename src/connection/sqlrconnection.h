@@ -358,6 +358,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool	getStringBind(bindvar_svr *bv);
 		bool	getIntegerBind(bindvar_svr *bv);
 		bool	getDoubleBind(bindvar_svr *bv);
+		bool	getDateBind(bindvar_svr *bv);
 		bool	getLobBind(bindvar_svr *bv);
 		bool	getSendColumnInfo();
 		bool	processQuery(sqlrcursor_svr *cursor,

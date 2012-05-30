@@ -85,6 +85,37 @@ void sqlrconnection_svr::returnOutputBindValues(sqlrcursor_svr *cursor) {
 			clientsock->write((uint32_t)bv->value.
 						doubleval.scale);
 
+		} else if (bv->type==DATE_BIND) {
+
+			if (dbgfile.debugEnabled()) {
+				debugstr->append("DATE:\n");
+				debugstr->append(bv->value.dateval.year);
+				debugstr->append("-");
+				debugstr->append(bv->value.dateval.month);
+				debugstr->append("-");
+				debugstr->append(bv->value.dateval.day);
+				debugstr->append(" ");
+				debugstr->append(bv->value.dateval.hour);
+				debugstr->append(":");
+				debugstr->append(bv->value.dateval.minute);
+				debugstr->append(":");
+				debugstr->append(bv->value.dateval.second);
+				debugstr->append(" ");
+				debugstr->append(bv->value.dateval.tz);
+			}
+
+			clientsock->write((uint16_t)DATE_DATA);
+			clientsock->write(bv->value.dateval.year);
+			clientsock->write(bv->value.dateval.month);
+			clientsock->write(bv->value.dateval.day);
+			clientsock->write(bv->value.dateval.hour);
+			clientsock->write(bv->value.dateval.minute);
+			clientsock->write(bv->value.dateval.second);
+			uint16_t	length=charstring::length(
+						bv->value.dateval.tz);
+			clientsock->write(length);
+			clientsock->write(bv->value.dateval.tz,length);
+
 		} else if (bv->type==CURSOR_BIND) {
 
 			if (dbgfile.debugEnabled()) {

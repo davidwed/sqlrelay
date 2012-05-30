@@ -178,6 +178,16 @@ class oracle8cursor : public sqlrcursor_svr {
 
 		void		checkRePrepare();
 
+		void		dateToString(char *buffer,
+						uint16_t buffersize,
+						int16_t year,
+						int16_t month,
+						int16_t day,
+						int16_t hour,
+						int16_t minute,
+						int16_t second,
+						const char *tz);
+
 		OCIStmt		*stmt;
 		ub2		stmttype;
 		sword		ncols;

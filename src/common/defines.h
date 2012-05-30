@@ -65,6 +65,7 @@
 #define CURSOR_DATA 4
 #define INTEGER_DATA 5
 #define DOUBLE_DATA 6
+#define DATE_DATA 7
 
 #define END_BIND_VARS 7 
 

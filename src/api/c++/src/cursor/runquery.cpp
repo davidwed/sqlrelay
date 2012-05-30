@@ -236,6 +236,51 @@ void sqlrcursor::sendInputBinds() {
 				sqlrc->debugPreEnd();
 			}
 
+		} else if (inbindvars[i].type==DATE_BIND) {
+
+			sqlrc->cs->write((uint16_t)
+					inbindvars[i].value.dateval.year);
+			sqlrc->cs->write((uint16_t)
+					inbindvars[i].value.dateval.month);
+			sqlrc->cs->write((uint16_t)
+					inbindvars[i].value.dateval.day);
+			sqlrc->cs->write((uint16_t)
+					inbindvars[i].value.dateval.hour);
+			sqlrc->cs->write((uint16_t)
+					inbindvars[i].value.dateval.minute);
+			sqlrc->cs->write((uint16_t)
+					inbindvars[i].value.dateval.second);
+			sqlrc->cs->write((uint16_t)
+					charstring::length(
+					inbindvars[i].value.dateval.tz));
+			sqlrc->cs->write(inbindvars[i].value.dateval.tz);
+
+			if (sqlrc->debug) {
+				sqlrc->debugPrint(":DATE)=");
+				sqlrc->debugPrint((int64_t)
+					inbindvars[i].value.dateval.year);
+				sqlrc->debugPrint("-");
+				sqlrc->debugPrint((int64_t)
+					inbindvars[i].value.dateval.month);
+				sqlrc->debugPrint("-");
+				sqlrc->debugPrint((int64_t)
+					inbindvars[i].value.dateval.day);
+				sqlrc->debugPrint(" ");
+				sqlrc->debugPrint((int64_t)
+					inbindvars[i].value.dateval.hour);
+				sqlrc->debugPrint(":");
+				sqlrc->debugPrint((int64_t)
+					inbindvars[i].value.dateval.minute);
+				sqlrc->debugPrint(":");
+				sqlrc->debugPrint((int64_t)
+					inbindvars[i].value.dateval.second);
+				sqlrc->debugPrint(" ");
+				sqlrc->debugPrint(
+					inbindvars[i].value.dateval.tz);
+				sqlrc->debugPrint("\n");
+				sqlrc->debugPreEnd();
+			}
+
 		} else if (inbindvars[i].type==BLOB_BIND ||
 				inbindvars[i].type==CLOB_BIND) {
 
@@ -325,6 +370,9 @@ void sqlrcursor::sendOutputBinds() {
 					break;
 				case DOUBLE_BIND:
 					bindtype="(DOUBLE)";
+					break;
+				case DATE_BIND:
+					bindtype="(DATE)";
 					break;
 				case BLOB_BIND:
 					bindtype="(BLOB)";

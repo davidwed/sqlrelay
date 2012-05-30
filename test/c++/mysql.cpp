@@ -118,7 +118,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("8",5.1,2,1);
 	cur->inputBind("9","2005-01-01");
 	cur->inputBind("10","05:00:00");
-	cur->inputBind("11","2005-01-01 05:00:00");
+	cur->inputBind("11",2005,1,1,5,0,0,NULL);
 	cur->inputBind("12","2005");
 	cur->inputBind("13","char5");
 	cur->inputBind("14","varchar5");
@@ -142,7 +142,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("8",6.1,2,1);
 	cur->inputBind("9","2006-01-01");
 	cur->inputBind("10","06:00:00");
-	cur->inputBind("11","2006-01-01 06:00:00");
+	cur->inputBind("11",2006,1,1,6,0,0,NULL);
 	cur->inputBind("12","2006");
 	cur->inputBind("13","char6");
 	cur->inputBind("14","varchar6");
@@ -166,7 +166,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("8",7.1,2,1);
 	cur->inputBind("9","2007-01-01");
 	cur->inputBind("10","07:00:00");
-	cur->inputBind("11","2007-01-01 07:00:00");
+	cur->inputBind("11",2007,1,1,7,0,0,NULL);
 	cur->inputBind("12","2007");
 	cur->inputBind("13","char7");
 	cur->inputBind("14","varchar7");
@@ -193,7 +193,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("8",8.1,2,1);
 	cur->inputBind("9","2008-01-01");
 	cur->inputBind("10","08:00:00");
-	cur->inputBind("11","2008-01-01 08:00:00");
+	cur->inputBind("11",2008,1,1,8,0,0,NULL);
 	cur->inputBind("12","2008");
 	cur->inputBind("13","char8");
 	cur->inputBind("14","varchar8");
@@ -210,6 +210,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("SELECT: \n");
+con->debugOn();
 	checkSuccess(cur->sendQuery("select * from testtable order by testtinyint"),1);
 	printf("\n");
 

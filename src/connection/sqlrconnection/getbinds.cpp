@@ -37,6 +37,10 @@ bool sqlrconnection_svr::getInputBinds(sqlrcursor_svr *cursor) {
 			if (!getDoubleBind(bv)) {
 				return false;
 			}
+		} else if (bv->type==DATE_BIND) {
+			if (!getDateBind(bv)) {
+				return false;
+			}
 		} else if (bv->type==BLOB_BIND) {
 			// can't fake blob binds
 			cursor->fakeinputbindsforthisquery=false;
@@ -78,7 +82,7 @@ bool sqlrconnection_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 			if (!getBindSize(bv,maxstringbindvaluelength)) {
 				return false;
 			}
-			// This must be a calloc because oracle8 get's angry if
+			// This must be a calloc because oracle8 gets angry if
 			// these aren't initialized to NULL's.  It's possible
 			// that just the first character needs to be NULL, but
 			// for now I'm just going to go ahead and use calloc
@@ -94,6 +98,8 @@ bool sqlrconnection_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 			// initialize them
 			bv->value.doubleval.precision=0;
 			bv->value.doubleval.scale=0;
+		} else if (bv->type==DATE_BIND) {
+			dbgfile.debugPrint("connection",4,"DATE");
 		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
 			if (!getBindSize(bv,maxlobbindvaluelength)) {
 				return false;
@@ -301,6 +307,99 @@ bool sqlrconnection_svr::getDoubleBind(bindvar_svr *bv) {
 	}
 
 	dbgfile.debugPrint("connection",4,bv->value.doubleval.value);
+
+	return true;
+}
+
+bool sqlrconnection_svr::getDateBind(bindvar_svr *bv) {
+
+	dbgfile.debugPrint("connection",4,"DATE");
+
+	uint16_t	temp;
+
+	// get the year
+	if (clientsock->read(&temp,idleclienttimeout,0)!=sizeof(uint16_t)) {
+		dbgfile.debugPrint("connection",2,
+					"getting binds failed: bad year");
+		return false;
+	}
+	bv->value.dateval.year=(int16_t)temp;
+
+	// get the month
+	if (clientsock->read(&temp,idleclienttimeout,0)!=sizeof(uint16_t)) {
+		dbgfile.debugPrint("connection",2,
+					"getting binds failed: bad month");
+		return false;
+	}
+	bv->value.dateval.month=(int16_t)temp;
+
+	// get the day
+	if (clientsock->read(&temp,idleclienttimeout,0)!=sizeof(uint16_t)) {
+		dbgfile.debugPrint("connection",2,
+					"getting binds failed: bad day");
+		return false;
+	}
+	bv->value.dateval.day=(int16_t)temp;
+
+	// get the hour
+	if (clientsock->read(&temp,idleclienttimeout,0)!=sizeof(uint16_t)) {
+		dbgfile.debugPrint("connection",2,
+					"getting binds failed: bad month");
+		return false;
+	}
+	bv->value.dateval.hour=(int16_t)temp;
+
+	// get the minute
+	if (clientsock->read(&temp,idleclienttimeout,0)!=sizeof(uint16_t)) {
+		dbgfile.debugPrint("connection",2,
+					"getting binds failed: bad month");
+		return false;
+	}
+	bv->value.dateval.minute=(int16_t)temp;
+
+	// get the second
+	if (clientsock->read(&temp,idleclienttimeout,0)!=sizeof(uint16_t)) {
+		dbgfile.debugPrint("connection",2,
+					"getting binds failed: bad month");
+		return false;
+	}
+	bv->value.dateval.second=(int16_t)temp;
+
+	// get the size of the time zone
+	uint16_t	length;
+	if (clientsock->read(&length,idleclienttimeout,0)!=sizeof(uint16_t)) {
+		return false;
+	}
+
+	// allocate space to store the time zone
+	bv->value.dateval.tz=(char *)bindpool->malloc(length+1);
+
+	// get the time zone
+	if ((uint16_t)(clientsock->read(bv->value.dateval.tz,length,
+					idleclienttimeout,0))!=length) {
+		dbgfile.debugPrint("connection",2,
+					"getting binds failed: bad tz");
+		return false;
+	}
+	bv->value.dateval.tz[length]='\0';
+
+	// allocate enough space to store the date/time string
+	// 64 bytes ought to be enough
+	bv->value.dateval.buffersize=64;
+	bv->value.dateval.buffer=(char *)bindpool->malloc(
+					bv->value.dateval.buffersize);
+
+	if (dbgfile.debugEnabled()) {
+		stringbuffer	str;
+		str.append(bv->value.dateval.year)->append("-");
+		str.append(bv->value.dateval.month)->append("-");
+		str.append(bv->value.dateval.day)->append(" ");
+		str.append(bv->value.dateval.hour)->append(":");
+		str.append(bv->value.dateval.minute)->append(":");
+		str.append(bv->value.dateval.second)->append(" ");
+		str.append(bv->value.dateval.tz);
+		dbgfile.debugPrint("connection",4,str.getString());
+	}
 
 	return true;
 }

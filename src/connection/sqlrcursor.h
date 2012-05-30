@@ -22,6 +22,17 @@ class bindvar_svr {
 				uint32_t	precision;
 				uint32_t	scale;
 			} doubleval;
+			struct {
+				int16_t		year;
+				int16_t		month;
+				int16_t		day;
+				int16_t		hour;
+				int16_t		minute;
+				int16_t		second;
+				char		*tz;
+				char		*buffer;
+				uint16_t	buffersize;
+			} dateval;
 			uint16_t	cursorid;
 		} value;
 		uint32_t	valuesize;
@@ -58,6 +69,35 @@ class sqlrcursor_svr {
 						double *value,
 						uint32_t precision,
 						uint32_t scale);
+		virtual void	dateToString(char *buffer,
+						uint16_t buffersize,
+						int16_t year,
+						int16_t month,
+						int16_t day,
+						int16_t hour,
+						int16_t minute,
+						int16_t second,
+						const char *tz);
+		virtual void	stringToDate(const char *string,
+						int16_t *year,
+						int16_t *month,
+						int16_t *day,
+						int16_t *hour,
+						int16_t *minute,
+						int16_t *second,
+						char **tz);
+		virtual bool	inputBindDate(const char *variable,
+						uint16_t variablesize,
+						uint64_t year,
+						uint16_t month,
+						uint16_t day,
+						uint16_t hour,
+						uint16_t minute,
+						uint16_t second,
+						const char *tz,
+						char *buffer,
+						uint16_t buffersize,
+						int16_t *isnull);
 		virtual	bool	inputBindBlob(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -83,6 +123,16 @@ class sqlrcursor_svr {
 						uint32_t *precision,
 						uint32_t *scale,
 						int16_t *isnull);
+		virtual bool	outputBindDate(const char *variable,
+						uint16_t variablesize,
+						int16_t *year,
+						int16_t *month,
+						int16_t *day,
+						int16_t *hour,
+						int16_t *minute,
+						int16_t *second,
+						char **tz,
+						int16_t *isnull) ;
 		virtual	bool	outputBindBlob(const char *variable, 
 						uint16_t variablesize,
 						uint16_t index,

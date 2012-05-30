@@ -75,6 +75,22 @@ bool sqlrcursor::parseOutputBinds() {
 				outbindvars[count].value.doubleval.value=0;
 				outbindvars[count].value.doubleval.precision=0;
 				outbindvars[count].value.doubleval.scale=0;
+			} else if (outbindvars[count].type==DATE_BIND) {
+				outbindvars[count].value.dateval.year=0;
+				outbindvars[count].value.dateval.month=0;
+				outbindvars[count].value.dateval.day=0;
+				outbindvars[count].value.dateval.hour=0;
+				outbindvars[count].value.dateval.minute=0;
+				outbindvars[count].value.dateval.second=0;
+				if (returnnulls) {
+					outbindvars[count].
+						value.dateval.tz=NULL;
+				} else {
+					outbindvars[count].
+						value.dateval.tz=new char[1];
+					outbindvars[count].
+						value.dateval.tz[0]='\0';
+				}
 			} 
 
 			if (sqlrc->debug) {
@@ -177,6 +193,88 @@ bool sqlrcursor::parseOutputBinds() {
 						doubleval.scale)!=
 						sizeof(uint32_t)) {
 				setError("Failed to get scale.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("		");
+				sqlrc->debugPrint("done fetching\n");
+				sqlrc->debugPreEnd();
+			}
+
+		} else if (type==DATE_DATA) {
+
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("	DATE output bind\n");
+				sqlrc->debugPreEnd();
+			}
+
+			uint16_t	temp;
+
+			// get the year
+			if (getShort(&temp)!=sizeof(uint16_t)) {
+				setError("Failed to get long value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			outbindvars[count].value.dateval.year=(int16_t)temp;
+
+			// get the month
+			if (getShort(&temp)!=sizeof(uint16_t)) {
+				setError("Failed to get long value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			outbindvars[count].value.dateval.month=(int16_t)temp;
+
+			// get the day
+			if (getShort(&temp)!=sizeof(uint16_t)) {
+				setError("Failed to get long value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			outbindvars[count].value.dateval.day=(int16_t)temp;
+
+			// get the hour
+			if (getShort(&temp)!=sizeof(uint16_t)) {
+				setError("Failed to get long value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			outbindvars[count].value.dateval.hour=(int16_t)temp;
+
+			// get the minute
+			if (getShort(&temp)!=sizeof(uint16_t)) {
+				setError("Failed to get long value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			outbindvars[count].value.dateval.minute=(int16_t)temp;
+
+			// get the second
+			if (getShort(&temp)!=sizeof(uint16_t)) {
+				setError("Failed to get long value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			outbindvars[count].value.dateval.second=(int16_t)temp;
+
+			// get the timezone length
+			uint16_t	length;
+			if (getShort(&length)!=sizeof(uint16_t)) {
+				setError("Failed to get timezone length.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			outbindvars[count].value.dateval.tz=new char[length+1];
+
+			// get the timezone
+			if ((uint16_t)getString(outbindvars[count].value.
+						dateval.tz,length)!=length) {
+				setError("Failed to get timezone.\n "
 					"A network error may have occurred.");
 				return false;
 			}

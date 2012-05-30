@@ -13,7 +13,8 @@ enum bindtype {
 	DOUBLE_BIND,
 	BLOB_BIND,
 	CLOB_BIND,
-	CURSOR_BIND
+	CURSOR_BIND,
+	DATE_BIND
 };
 
 class SQLRCLIENT_DLLSPEC bindvar {
@@ -28,6 +29,15 @@ class SQLRCLIENT_DLLSPEC bindvar {
 				uint32_t	precision;
 				uint32_t	scale;
 			} doubleval;
+			struct {
+				int16_t	year;
+				int16_t	month;
+				int16_t	day;
+				int16_t	hour;
+				int16_t	minute;
+				int16_t	second;
+				char	*tz;
+			} dateval;
 			char		*lobval;
 			uint16_t	cursorid;
 		} value;

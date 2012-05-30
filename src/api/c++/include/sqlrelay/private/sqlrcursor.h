@@ -41,6 +41,14 @@
 						double value,
 						uint32_t precision,
 						uint32_t scale);
+		void	dateVar(bindvar *var, const char *variable,
+						int16_t year,
+						int16_t month,
+						int16_t day,
+						int16_t hour,
+						int16_t minute,
+						int16_t second,
+						const char *tz);
 		void	lobVar(bindvar *var, const char *variable,
 					const char *value, uint32_t size,
 					bindtype type);

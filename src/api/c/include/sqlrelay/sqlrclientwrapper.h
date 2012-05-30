@@ -434,6 +434,18 @@ void	sqlrcur_inputBindDouble(sqlrcur sqlrcurref,
 					uint32_t precision, 
 					uint32_t scale);
 
+/** @ingroup sqlrclientwraper
+ *  Defines a date input bind variable.  "day" should be
+ *  1-31 and "month" should be 1-12.  Any date components
+ *  that you don't want used should be set to -1.  "tz" may
+ *  be left NULL.  Most databases ignore "tz".  */
+SQLRCLIENTWRAPPER_DLLSPEC
+void	sqlrcur_inputBindDate(sqlrcur sqlrcurref,
+				const char *variable,
+				int16_t year, int16_t month, int16_t day,
+				int16_t hour, int16_t minute, int16_t second,
+				const char *tz);
+
 /** @ingroup sqlrclientwrapper
  *  Defines a binary lob input bind variable. */
 SQLRCLIENTWRAPPER_DLLSPEC
@@ -490,6 +502,12 @@ void	sqlrcur_defineOutputBindInteger(sqlrcur sqlrcurref,
  *  Defines an decimal output bind variable. */
 SQLRCLIENTWRAPPER_DLLSPEC
 void	sqlrcur_defineOutputBindDouble(sqlrcur sqlrcurref,
+					const char *variable);
+
+/** @ingroup sqlrclientwrapper
+ *   Defines a date output bind variable. */
+SQLRCLIENTWRAPPER_DLLSPEC
+void	sqlrcur_defineOutputBindDate(sqlrcur sqlrcurref,
 					const char *variable);
 
 /** @ingroup sqlrclientwrapper
@@ -570,6 +588,16 @@ int64_t	sqlrcur_getOutputBindInteger(sqlrcur sqlrcurref,
 SQLRCLIENTWRAPPER_DLLSPEC
 double	sqlrcur_getOutputBindDouble(sqlrcur sqlrcurref,
 						const char *variable);
+
+/** @ingroup sqlrclientwrapper
+ *  Get the value stored in a previously
+ *  defined date output bind variable. */
+SQLRCLIENTWRAPPER_DLLSPEC
+int	sqlrcur_getOutputBindDate(sqlrcur sqlrcurref,
+				const char *variable,
+				int16_t *year, int16_t *month, int16_t *day,
+				int16_t *hour, int16_t *minute, int16_t *second,
+				const char **tz);
 
 /** @ingroup sqlrclientwrapper
  *  Get the value stored in a previously defined

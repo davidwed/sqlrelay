@@ -3,6 +3,7 @@
 
 #include <oracle8connection.h>
 #include <oracle8sqlwriter.h>
+#include <parsedatetime.h>
 #include <rudiments/charstring.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/character.h>
@@ -796,6 +797,20 @@ void oracle8cursor::checkRePrepare() {
 	}
 }
 
+void oracle8cursor::dateToString(char *buffer, uint16_t buffersize,
+				int16_t year, int16_t month, int16_t day,
+				int16_t hour, int16_t minute, int16_t second,
+				const char *tz) {
+	if (month<=0) {
+		month=1;
+	}
+	if (month>12) {
+		month=12;
+	}
+	snprintf(buffer,buffersize,"%02d-%s-%04d",
+			day,shortmonths[month-1],year);
+}
+
 bool oracle8cursor::inputBindString(const char *variable,
 						uint16_t variablesize,
 						const char *value,
@@ -909,6 +924,7 @@ bool oracle8cursor::inputBindDouble(const char *variable,
 	orainbindcount++;
 	return true;
 }
+
 
 bool oracle8cursor::outputBindString(const char *variable,
 						uint16_t variablesize,
