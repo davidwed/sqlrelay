@@ -306,15 +306,19 @@ namespace SQLRClient
                     {
                         case DbType.AnsiString:
                         case DbType.AnsiStringFixedLength:
-                        case DbType.Date:
-                        case DbType.DateTime:
-                        case DbType.DateTime2:
-                        case DbType.DateTimeOffset:
                         case DbType.String:
                         case DbType.StringFixedLength:
                         case DbType.Time:
                         case DbType.Guid:
                             _sqlrcur.inputBind(param.ParameterName, Convert.ToString(param.Value));
+                            continue;
+
+                        case DbType.Date:
+                        case DbType.DateTime:
+                        case DbType.DateTime2:
+                        case DbType.DateTimeOffset:
+                            DateTime dt = Convert.ToDateTime(param.Value);
+                            _sqlrcur.inputBind(param.ParameterName, Convert.ToInt16(dt.Year), Convert.ToInt16(dt.Month), Convert.ToInt16(dt.Day), Convert.ToInt16(dt.Hour), Convert.ToInt16(dt.Minute), Convert.ToInt16(dt.Second), null);
                             continue;
 
                         case DbType.Binary:
@@ -370,15 +374,18 @@ namespace SQLRClient
                     {
                         case DbType.AnsiString:
                         case DbType.AnsiStringFixedLength:
-                        case DbType.Date:
-                        case DbType.DateTime:
-                        case DbType.DateTime2:
-                        case DbType.DateTimeOffset:
                         case DbType.String:
                         case DbType.StringFixedLength:
                         case DbType.Time:
                         case DbType.Guid:
                             _sqlrcur.defineOutputBindString(param.ParameterName, param.Size);
+                            continue;
+
+                        case DbType.Date:
+                        case DbType.DateTime:
+                        case DbType.DateTime2:
+                        case DbType.DateTimeOffset:
+                            _sqlrcur.defineOutputBindDate(param.ParameterName);
                             continue;
 
                         case DbType.Binary:
@@ -451,15 +458,50 @@ namespace SQLRClient
                     {
                         case DbType.AnsiString:
                         case DbType.AnsiStringFixedLength:
-                        case DbType.Date:
-                        case DbType.DateTime:
-                        case DbType.DateTime2:
-                        case DbType.DateTimeOffset:
                         case DbType.String:
                         case DbType.StringFixedLength:
                         case DbType.Time:
                         case DbType.Guid:
                             param.Value = _sqlrcur.getOutputBindString(param.ParameterName);
+                            break;
+
+                        case DbType.Date:
+                        case DbType.DateTime:
+                        case DbType.DateTime2:
+                        case DbType.DateTimeOffset:
+                            Int16 year = 0;
+                            Int16 month = 0;
+                            Int16 day = 0;
+                            Int16 hour = 0;
+                            Int16 minute = 0;
+                            Int16 second = 0;
+                            String tz = null;
+                            _sqlrcur.getOutputBindDate(param.ParameterName, out year, out month, out day, out hour, out minute, out second, out tz);
+                            if (year == -1)
+                            {
+                                year = 0;
+                            }
+                            if (month == -1)
+                            {
+                                month = 0;
+                            }
+                            if (day == -1)
+                            {
+                                day = 0;
+                            }
+                            if (hour == -1)
+                            {
+                                hour = 0;
+                            }
+                            if (minute == -1)
+                            {
+                                minute = 0;
+                            }
+                            if (second == -1)
+                            {
+                                second = 0;
+                            }
+                            param.Value = new DateTime(year, month, day, hour, minute, second);
                             break;
 
                         case DbType.Binary:
