@@ -16,7 +16,7 @@ void sqlrconnection::endSession() {
 	sqlrcursor	*currentcursor=firstcursor;
 	while (currentcursor) {
 		if (!currentcursor->endofresultset) {
-			currentcursor->abortResultSet();
+			currentcursor->closeResultSet();
 		}
 		currentcursor=currentcursor->next;
 	}

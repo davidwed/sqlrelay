@@ -12,7 +12,7 @@ namespace SQLRClient
         private SQLRelayTransaction _sqlrelaytran = null;
         private SQLRCursor _sqlrcur = null;
         private String _commandtext = null;
-        private Boolean  _prepared = false;
+        private Boolean _prepared = false;
         private UpdateRowSource _updaterowsource = UpdateRowSource.None;
         private SQLRelayParameterCollection _sqlrelayparams = new SQLRelayParameterCollection();
 
@@ -49,7 +49,7 @@ namespace SQLRClient
             System.GC.SuppressFinalize(this);
         }
 
-        private void Dispose(Boolean  disposing)
+        private void Dispose(Boolean disposing)
         {
             // FIXME: do anything?
         }
@@ -234,7 +234,7 @@ namespace SQLRClient
             return _sqlrcur;
         }
 
-        private Boolean  runQuery()
+        private Boolean runQuery()
         {
             if (_commandtext == null)
             {

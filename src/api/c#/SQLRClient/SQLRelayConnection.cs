@@ -19,7 +19,7 @@ namespace SQLRClient
         private Int32 _retrytime = 0;
         private Int32 _tries = 1;
         private String _db = null;
-        private Boolean  _debug = false;
+        private Boolean _debug = false;
 
         #endregion
 
@@ -35,7 +35,7 @@ namespace SQLRClient
             ConnectionString = connectstring;
         }
 
-        private void Dispose(Boolean  disposing)
+        private void Dispose(Boolean disposing)
         {
             if (_connectionstate == ConnectionState.Open)
             {
@@ -156,7 +156,7 @@ namespace SQLRClient
             }
         }
 
-        public Boolean  Debug
+        public Boolean Debug
         {
             get
             {

@@ -91,7 +91,7 @@ namespace SQLRClient
             }
         }
 
-        public Boolean  IsNullable
+        public Boolean IsNullable
         {
             get
             {

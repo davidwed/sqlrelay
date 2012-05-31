@@ -8,7 +8,7 @@ namespace SQLRClient
 
         #region member variables
 
-        private Boolean  _open = false;
+        private Boolean _open = false;
 
         #endregion
 
@@ -20,7 +20,7 @@ namespace SQLRClient
             _open = true;
         }
 
-        private void Dispose(Boolean  disposing)
+        private void Dispose(Boolean disposing)
         {
             if (disposing)
             {

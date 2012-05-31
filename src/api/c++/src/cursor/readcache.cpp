@@ -16,7 +16,7 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 	}
 
 	if (!endofresultset) {
-		abortResultSet();
+		closeResultSet();
 	}
 	clearResultSet();
 

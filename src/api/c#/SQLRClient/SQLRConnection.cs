@@ -22,13 +22,13 @@ public class SQLRConnection : IDisposable
     }
     
     /** Dispose framework */
-    private Boolean  disposed = false;
+    private Boolean disposed = false;
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-    protected virtual void Dispose(Boolean  disposing)
+    protected virtual void Dispose(Boolean disposing)
     {
         if (!disposed)
         {
@@ -62,7 +62,7 @@ public class SQLRConnection : IDisposable
     /** Disconnects this connection from the current session but leaves the
      *  session open so that another connection can connect to it using
      *  sqlrcon_resumeSession(). */
-    public Boolean  suspendSession()
+    public Boolean suspendSession()
     {
         return sqlrcon_suspendSession(sqlrconref)!=0;
     }
@@ -87,7 +87,7 @@ public class SQLRConnection : IDisposable
     
     /** Resumes a session previously left open using sqlrcon_suspendSession().
      *  Returns true on success and false on failure. */
-    public Boolean  resumeSession(UInt16 port, String socket)
+    public Boolean resumeSession(UInt16 port, String socket)
     {
     	return sqlrcon_resumeSession(sqlrconref, port, socket)!=0;
     }
@@ -95,7 +95,7 @@ public class SQLRConnection : IDisposable
     
     
     /** Returns true if the database is up and false if it's down. */
-    public Boolean  ping()
+    public Boolean ping()
     {
         return sqlrcon_ping(sqlrconref)!=0;
     }
@@ -134,7 +134,7 @@ public class SQLRConnection : IDisposable
     
     
     /** Sets the current database/schema to "database" */
-    public Boolean  selectDatabase(String database)
+    public Boolean selectDatabase(String database)
     {
         return sqlrcon_selectDatabase(sqlrconref, database)!=0;
     }
@@ -157,14 +157,14 @@ public class SQLRConnection : IDisposable
     
     /** Instructs the database to perform a commit after every successful
      *  query. */
-    public Boolean  autoCommitOn()
+    public Boolean autoCommitOn()
     {
         return sqlrcon_autoCommitOn(sqlrconref)!=0;
     }
     
     /** Instructs the database to wait for the client to tell it when to
      *  commit. */
-    public Boolean  autoCommitOff()
+    public Boolean autoCommitOff()
     {
         return sqlrcon_autoCommitOff(sqlrconref)!=0;
     }
@@ -225,7 +225,7 @@ public class SQLRConnection : IDisposable
     }
     
     /** Returns false if debugging is off and true if debugging is on. */
-    public Boolean  getDebug()
+    public Boolean getDebug()
     {
         return sqlrcon_getDebug(sqlrconref)!=0;
     }
@@ -239,7 +239,7 @@ public class SQLRConnection : IDisposable
     private IntPtr sqlrconref;
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern IntPtr sqlrcon_alloc_copyrefs(String server, UInt16 port, String socket, String user, String password, Int32 retrytime, Int32 tries, Boolean  copyreferences);
+    private static extern IntPtr sqlrcon_alloc_copyrefs(String server, UInt16 port, String socket, String user, String password, Int32 retrytime, Int32 tries, Boolean copyreferences);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_free(IntPtr sqlrconref);

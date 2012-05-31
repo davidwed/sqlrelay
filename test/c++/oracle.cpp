@@ -254,7 +254,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(tz,"");
 	printf("\n");
 
-	printf("OUTPUT BIND BY NAME: \n");
+	printf("OUTPUT BIND BY POSITION: \n");
 	cur->clearBinds();
 	cur->defineOutputBindInteger("1");
 	cur->defineOutputBindString("2",10);
@@ -845,7 +845,7 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table testtable1");
 	printf("\n");
 
-	printf("NULL AND EMPTY CLOBS AND CLOBS: \n");
+	printf("NULL AND EMPTY CLOBS AND BLOBS: \n");
 	cur->getNullsAsNulls();
 	cur->sendQuery("create table testtable1 (testclob1 clob, testclob2 clob, testblob1 blob, testblob2 blob)");
 	cur->prepareQuery("insert into testtable1 values (:var1,:var2,:var3,:var4)");

@@ -8,7 +8,7 @@ sqlrcursor::~sqlrcursor() {
 
 	// abort result set if necessary
 	if (sqlrc && !sqlrc->endsessionsent && !sqlrc->suspendsessionsent) {
-		abortResultSet();
+		closeResultSet();
 	}
 
 	// deallocate copied references

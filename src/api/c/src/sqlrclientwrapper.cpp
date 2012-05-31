@@ -650,4 +650,8 @@ int sqlrcur_resumeCachedResultSet(sqlrcur sqlrcurref,
 	return sqlrcurref->resumeCachedResultSet(id,filename);
 }
 
+void sqlrcur_closeResultSet(sqlrcur sqlrcurref) {
+	return sqlrcurref->closeResultSet();
+}
+
 }

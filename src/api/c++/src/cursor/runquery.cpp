@@ -38,7 +38,7 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 	}
 
 	if (!endofresultset) {
-		abortResultSet();
+		closeResultSet();
 	}
 	clearResultSet();
 

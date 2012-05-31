@@ -22,13 +22,13 @@ public class SQLRCursor : IDisposable
     }
 
     /** Dispose framework */
-    private Boolean  disposed = false;
+    private Boolean disposed = false;
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-    protected virtual void Dispose(Boolean  disposing)
+    protected virtual void Dispose(Boolean disposing)
     {
         if (!disposed)
         {
@@ -139,14 +139,14 @@ public class SQLRCursor : IDisposable
     /** Sends a query that returns a list of databases/schemas matching "wild".
      *  If wild is empty or NULL then a list of all databases/schemas will be
      *  returned. */
-    public Boolean  getDatabaseList(String wild)
+    public Boolean getDatabaseList(String wild)
     {
         return sqlrcur_getDatabaseList(sqlrcurref, wild) != 0;
     }
 
     /** Sends a query that returns a list of tables matching "wild".  If wild is
      *  empty or NULL then a list of all tables will be returned. */
-    public Boolean  getTableList(String wild)
+    public Boolean getTableList(String wild)
     {
         return sqlrcur_getTableList(sqlrcurref, wild) != 0;
     }
@@ -154,7 +154,7 @@ public class SQLRCursor : IDisposable
     /** Sends a query that returns a list of columns in the table specified by
      *  the "table" parameter matching "wild".  If wild is empty or NULL then a
      *  list of all columns will be returned. */
-    public Boolean  getColumnList(String table, String wild)
+    public Boolean getColumnList(String table, String wild)
     {
         return sqlrcur_getColumnList(sqlrcurref, table, wild) != 0;
     }
@@ -162,20 +162,20 @@ public class SQLRCursor : IDisposable
 
 
     /** Sends "query" directly and gets a result set. */
-    public Boolean  sendQuery(String query)
+    public Boolean sendQuery(String query)
     {
         return sqlrcur_sendQuery(sqlrcurref, query) != 0;
     }
 
     /** Sends "query" with length "length" directly and gets a result set. This
      *  function must be used if the query contains binary data. */
-    public Boolean  sendQuery(String query, UInt32 length)
+    public Boolean sendQuery(String query, UInt32 length)
     {
         return sqlrcur_sendQueryWithLength(sqlrcurref, query, length) != 0;
     }
 
     /** Sends the query in file "path"/"filename" and gets a result set. */
-    public Boolean  sendFileQuery(String path, String filename)
+    public Boolean sendFileQuery(String path, String filename)
     {
         return sqlrcur_sendFileQuery(sqlrcurref, path, filename) != 0;
     }
@@ -340,7 +340,7 @@ public class SQLRCursor : IDisposable
     }
 
     /** Returns true if "variable" was a valid bind variable of the query. */
-    public Boolean  validBind(String variable)
+    public Boolean validBind(String variable)
     {
         return sqlrcur_validBind(sqlrcurref, variable) != 0;
     }
@@ -348,13 +348,13 @@ public class SQLRCursor : IDisposable
 
 
     /** Execute the query that was previously prepared and bound. */
-    public Boolean  executeQuery()
+    public Boolean executeQuery()
     {
         return sqlrcur_executeQuery(sqlrcurref) != 0;
     }
 
     /** Fetch from a cursor that was returned as an output bind variable. */
-    public Boolean  fetchFromBindCursor()
+    public Boolean fetchFromBindCursor()
     {
         return sqlrcur_fetchFromBindCursor(sqlrcurref) != 0;
     }
@@ -436,7 +436,7 @@ public class SQLRCursor : IDisposable
 
     /** Opens a cached result set.  Returns true on success and
      * false on failure. */
-    public Boolean  openCachedResultSet(String filename)
+    public Boolean openCachedResultSet(String filename)
     {
         return sqlrcur_openCachedResultSet(sqlrcurref, filename)!=0;
     }
@@ -484,7 +484,7 @@ public class SQLRCursor : IDisposable
      *  and true if not.  This function can only return false if
      *  setResultSetBufferSize() has been called with a parameter other than
      *  0. */
-    public Boolean  endOfResultSet()
+    public Boolean endOfResultSet()
     {
         return sqlrcur_endOfResultSet(sqlrcurref)!=0;
     }
@@ -694,110 +694,110 @@ public class SQLRCursor : IDisposable
 
     /** Returns true if the specified column can contain
      *  nulls and false otherwise. */
-    public Boolean  getColumnIsNullable(UInt32 col)
+    public Boolean getColumnIsNullable(UInt32 col)
     {
         return sqlrcur_getColumnIsNullableByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column can contain
      *  nulls and false otherwise. */
-    public Boolean  getColumnIsNullable(String col)
+    public Boolean getColumnIsNullable(String col)
     {
         return sqlrcur_getColumnIsNullableByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is a
      *  primary key and false otherwise. */
-    public Boolean  getColumnIsPrimaryKey(UInt32 col)
+    public Boolean getColumnIsPrimaryKey(UInt32 col)
     {
         return sqlrcur_getColumnIsPrimaryKeyByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is a
      *  primary key and false otherwise. */
-    public Boolean  getColumnIsPrimaryKey(String col)
+    public Boolean getColumnIsPrimaryKey(String col)
     {
         return sqlrcur_getColumnIsPrimaryKeyByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is unique and false otherwise. */
-    public Boolean  getColumnIsUnique(UInt32 col)
+    public Boolean getColumnIsUnique(UInt32 col)
     {
         return sqlrcur_getColumnIsUniqueByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is unique and false otherwise. */
-    public Boolean  getColumnIsUnique(String col)
+    public Boolean getColumnIsUnique(String col)
     {
         return sqlrcur_getColumnIsUniqueByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is part of a composite key and
      *  false otherwise. */
-    public Boolean  getColumnIsPartOfKey(UInt32 col)
+    public Boolean getColumnIsPartOfKey(UInt32 col)
     {
         return sqlrcur_getColumnIsPartOfKeyByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is part of a composite key and
      *  false otherwise. */
-    public Boolean  getColumnIsPartOfKey(String col)
+    public Boolean getColumnIsPartOfKey(String col)
     {
         return sqlrcur_getColumnIsPartOfKeyByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is an unsigned number and false
      *  otherwise. */
-    public Boolean  getColumnIsUnsigned(UInt32 col)
+    public Boolean getColumnIsUnsigned(UInt32 col)
     {
         return sqlrcur_getColumnIsUnsignedByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column is an unsigned number and false
      *  otherwise. */
-    public Boolean  getColumnIsUnsigned(String col)
+    public Boolean getColumnIsUnsigned(String col)
     {
         return sqlrcur_getColumnIsUnsignedByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column was created
      *  with the zero-fill flag and false otherwise. */
-    public Boolean  getColumnIsZeroFilled(UInt32 col)
+    public Boolean getColumnIsZeroFilled(UInt32 col)
     {
         return sqlrcur_getColumnIsZeroFilledByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column was created
      *  with the zero-fill flag and false otherwise. */
-    public Boolean  getColumnIsZeroFilled(String col)
+    public Boolean getColumnIsZeroFilled(String col)
     {
         return sqlrcur_getColumnIsZeroFilledByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column contains binary data and false
      *  otherwise. */
-    public Boolean  getColumnIsBinary(UInt32 col)
+    public Boolean getColumnIsBinary(UInt32 col)
     {
         return sqlrcur_getColumnIsBinaryByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column contains binary data and false
      *  otherwise. */
-    public Boolean  getColumnIsBinary(String col)
+    public Boolean getColumnIsBinary(String col)
     {
         return sqlrcur_getColumnIsBinaryByName(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column auto-increments
      *  and false otherwise. */
-    public Boolean  getColumnIsAutoIncrement(UInt32 col)
+    public Boolean getColumnIsAutoIncrement(UInt32 col)
     {
         return sqlrcur_getColumnIsAutoIncrementByIndex(sqlrcurref, col)!=0;
     }
 
     /** Returns true if the specified column auto-increments
      *  and false otherwise. */
-    public Boolean  getColumnIsAutoIncrement(String col)
+    public Boolean getColumnIsAutoIncrement(String col)
     {
         return sqlrcur_getColumnIsAutoIncrementByName(sqlrcurref, col)!=0;
     }
@@ -835,7 +835,7 @@ public class SQLRCursor : IDisposable
 
     /** Resumes a result set previously left open using suspendSession().
      *  Returns true on success and false on failure. */
-    public Boolean  resumeResultSet(UInt16 id)
+    public Boolean resumeResultSet(UInt16 id)
     {
         return sqlrcur_resumeResultSet(sqlrcurref, id)!=0;
     }
@@ -843,9 +843,18 @@ public class SQLRCursor : IDisposable
     /** Resumes a result set previously left open using suspendSession() and
      *  continues caching the result set to "filename".  Returns true on success
      *  and false on failure. */
-    public Boolean  resumeCachedResultSet(UInt16 id, String filename)
+    public Boolean resumeCachedResultSet(UInt16 id, String filename)
     {
         return sqlrcur_resumeCachedResultSet(sqlrcurref, id, filename)!=0;
+    }
+
+    /** Closes the current result set, if one is open.  Data
+     *  that has been fetched already is still available but
+     *  no more data may be fetched.  Server side resources
+     *  for the result set are freed as well. */
+    public void closeResultSet()
+    {
+        return sqlrcur_closeResultSet(sqlrcurref);
     }
 
     private IntPtr sqlrcurref;
@@ -1159,6 +1168,9 @@ public class SQLRCursor : IDisposable
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern Int32 sqlrcur_resumeCachedResultSet(IntPtr sqlrcurref, UInt16 id, String filename);
+
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern void sqlrcur_closeResultSet(IntPtr sqlrcurref);
 }
 
 }

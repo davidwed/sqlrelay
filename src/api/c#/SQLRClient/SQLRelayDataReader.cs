@@ -23,7 +23,7 @@ namespace SQLRClient
 
         #region constructors and destructors
 
-        internal SQLRelayDataReader(SQLRelayConnection sqlrelaycon, SQLRCursor sqlrcur, Boolean  endsession)
+        internal SQLRelayDataReader(SQLRelayConnection sqlrelaycon, SQLRCursor sqlrcur, Boolean endsession)
         {
             _sqlrelaycon = sqlrelaycon;
             _sqlrcur = sqlrcur;
@@ -36,7 +36,7 @@ namespace SQLRClient
             System.GC.SuppressFinalize(this);
         }
 
-        private void Dispose(Boolean  disposing)
+        private void Dispose(Boolean disposing)
         {
             if (disposing)
             {
@@ -66,7 +66,7 @@ namespace SQLRClient
             }
         }
 
-        public Boolean  IsClosed
+        public Boolean IsClosed
         {
             get
             {
@@ -97,17 +97,17 @@ namespace SQLRClient
 
         public void Close()
         {
-            // FIXME: clean up anything?
             _open = false;
+            _sqlrcur.closeResultSet();
         }
 
-        public Boolean  NextResult()
+        public Boolean NextResult()
         {
             // SQL Relay doesn't support multiple result sets
             return false;
         }
 
-        public Boolean  Read()
+        public Boolean Read()
         {
 
             if (IsClosed == true)
@@ -1768,7 +1768,7 @@ namespace SQLRClient
             }
         }
 
-        public Boolean  GetBoolean(Int32 i)
+        public Boolean GetBoolean(Int32 i)
         {
             return Convert.ToBoolean(GetValue(i));
         }
@@ -1866,7 +1866,7 @@ namespace SQLRClient
             throw new NotSupportedException("GetData not supported.");
         }
 
-        public Boolean  IsDBNull(Int32 i)
+        public Boolean IsDBNull(Int32 i)
         {
             // FIXME: this will need to be modified if getNullsAsNulls is exposed
             return (GetString(i) == "");

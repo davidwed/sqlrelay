@@ -59,7 +59,6 @@
 		void	performSubstitution(stringbuffer *buffer,
 							uint16_t which);
 		bool	runQuery(const char *query);
-		void	abortResultSet();
 		bool	processResultSet(bool getallrows, uint64_t rowtoget);
 
 		int32_t	getString(char *string, int32_t size);

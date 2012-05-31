@@ -5,7 +5,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <defines.h>
 
-void sqlrcursor::abortResultSet() {
+void sqlrcursor::closeResultSet() {
 
 	// If the end of the previous result set was never reached, abort it.
 	// If we're caching data to a local file, get the rest of the data; we
