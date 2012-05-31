@@ -100,12 +100,12 @@ bool sqlrconnection_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 			bv->value.doubleval.scale=0;
 		} else if (bv->type==DATE_BIND) {
 			dbgfile.debugPrint("connection",4,"DATE");
-			bv->value.dateval.year=-1;
-			bv->value.dateval.month=-1;
-			bv->value.dateval.day=-1;
-			bv->value.dateval.hour=-1;
-			bv->value.dateval.minute=-1;
-			bv->value.dateval.second=-1;
+			bv->value.dateval.year=0;
+			bv->value.dateval.month=0;
+			bv->value.dateval.day=0;
+			bv->value.dateval.hour=0;
+			bv->value.dateval.minute=0;
+			bv->value.dateval.second=0;
 			bv->value.dateval.tz=NULL;
 			// allocate enough space to store the date/time string
 			// 64 bytes ought to be enough
