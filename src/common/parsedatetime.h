@@ -222,7 +222,7 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 								dateparts[1],
 								longmonths[i]))
 						{
-							*month=i;
+							*month=i+1;
 						}
 					}
 					*year=charstring::toInteger(

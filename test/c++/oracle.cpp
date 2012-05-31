@@ -224,7 +224,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("OUTPUT BIND BY NAME: \n");
-	cur->prepareQuery("begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; :datevar:='01-JAN-2001'; end;");
+	cur->prepareQuery("begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; :datevar:='03-FEB-2001'; end;");
 	cur->defineOutputBindInteger("numvar");
 	cur->defineOutputBindString("stringvar",10);
 	cur->defineOutputBindDouble("floatvar");
@@ -246,8 +246,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(stringvar,"hello");
 	checkSuccess(floatvar,2.5);
 	checkSuccess(year,2001);
-	checkSuccess(month,1);
-	checkSuccess(day,1);
+	checkSuccess(month,2);
+	checkSuccess(day,3);
 	checkSuccess(hour,-1);
 	checkSuccess(minute,-1);
 	checkSuccess(second,-1);
@@ -270,8 +270,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(stringvar,"hello");
 	checkSuccess(floatvar,2.5);
 	checkSuccess(year,2001);
-	checkSuccess(month,1);
-	checkSuccess(day,1);
+	checkSuccess(month,2);
+	checkSuccess(day,3);
 	checkSuccess(hour,-1);
 	checkSuccess(minute,-1);
 	checkSuccess(second,-1);
@@ -296,8 +296,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(stringvar,"hello");
 	checkSuccess(floatvar,2.5);
 	checkSuccess(year,2001);
-	checkSuccess(month,1);
-	checkSuccess(day,1);
+	checkSuccess(month,2);
+	checkSuccess(day,3);
 	checkSuccess(hour,-1);
 	checkSuccess(minute,-1);
 	checkSuccess(second,-1);
