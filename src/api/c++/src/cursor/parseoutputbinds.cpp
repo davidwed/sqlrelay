@@ -278,6 +278,7 @@ bool sqlrcursor::parseOutputBinds() {
 					"A network error may have occurred.");
 				return false;
 			}
+			outbindvars[count].value. dateval.tz[length]='\0';
 
 			if (sqlrc->debug) {
 				sqlrc->debugPreStart();
@@ -431,6 +432,27 @@ bool sqlrcursor::parseOutputBinds() {
 				sqlrc->debugPrint((int64_t)outbindvars[count].
 						value.doubleval.scale);
 				sqlrc->debugPrint(")");
+			} else if (outbindvars[count].type==DATE_BIND) {
+				sqlrc->debugPrint((int64_t)outbindvars[count].
+							value.dateval.year);
+				sqlrc->debugPrint("-");
+				sqlrc->debugPrint((int64_t)outbindvars[count].
+							value.dateval.month);
+				sqlrc->debugPrint("-");
+				sqlrc->debugPrint((int64_t)outbindvars[count].
+							value.dateval.day);
+				sqlrc->debugPrint(" ");
+				sqlrc->debugPrint((int64_t)outbindvars[count].
+							value.dateval.hour);
+				sqlrc->debugPrint(":");
+				sqlrc->debugPrint((int64_t)outbindvars[count].
+							value.dateval.minute);
+				sqlrc->debugPrint(":");
+				sqlrc->debugPrint((int64_t)outbindvars[count].
+							value.dateval.second);
+				sqlrc->debugPrint(" ");
+				sqlrc->debugPrint(outbindvars[count].
+							value.dateval.tz);
 			} else {
 				sqlrc->debugPrint(outbindvars[count].
 							value.stringval);

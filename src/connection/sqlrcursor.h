@@ -132,7 +132,9 @@ class sqlrcursor_svr {
 						int16_t *minute,
 						int16_t *second,
 						char **tz,
-						int16_t *isnull) ;
+						char *buffer,
+						uint16_t buffersize,
+						int16_t *isnull);
 		virtual	bool	outputBindBlob(const char *variable, 
 						uint16_t variablesize,
 						uint16_t index,

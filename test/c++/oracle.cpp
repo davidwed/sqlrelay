@@ -224,17 +224,34 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("OUTPUT BIND BY NAME: \n");
-	cur->prepareQuery("begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; end;");
+	cur->prepareQuery("begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; :datevar:='01-JAN-2001'; end;");
 	cur->defineOutputBindInteger("numvar");
 	cur->defineOutputBindString("stringvar",10);
 	cur->defineOutputBindDouble("floatvar");
+	cur->defineOutputBindDate("datevar");
 	checkSuccess(cur->executeQuery(),1);
 	numvar=cur->getOutputBindInteger("numvar");
 	stringvar=cur->getOutputBindString("stringvar");
 	floatvar=cur->getOutputBindDouble("floatvar");
+	int16_t	year=0;
+	int16_t	month=0;
+	int16_t	day=0;
+	int16_t	hour=0;
+	int16_t	minute=0;
+	int16_t	second=0;
+	const char	*tz=NULL;
+	cur->getOutputBindDate("datevar",&year,&month,&day,
+					&hour,&minute,&second,&tz);
 	checkSuccess(numvar,1);
 	checkSuccess(stringvar,"hello");
 	checkSuccess(floatvar,2.5);
+	checkSuccess(year,2001);
+	checkSuccess(month,1);
+	checkSuccess(day,1);
+	checkSuccess(hour,-1);
+	checkSuccess(minute,-1);
+	checkSuccess(second,-1);
+	checkSuccess(tz,"");
 	printf("\n");
 
 	printf("OUTPUT BIND BY NAME: \n");
@@ -242,13 +259,23 @@ int	main(int argc, char **argv) {
 	cur->defineOutputBindInteger("1");
 	cur->defineOutputBindString("2",10);
 	cur->defineOutputBindDouble("3");
+	cur->defineOutputBindDate("4");
 	checkSuccess(cur->executeQuery(),1);
 	numvar=cur->getOutputBindInteger("1");
 	stringvar=cur->getOutputBindString("2");
 	floatvar=cur->getOutputBindDouble("3");
+	cur->getOutputBindDate("datevar",&year,&month,&day,
+					&hour,&minute,&second,&tz);
 	checkSuccess(numvar,1);
 	checkSuccess(stringvar,"hello");
 	checkSuccess(floatvar,2.5);
+	checkSuccess(year,2001);
+	checkSuccess(month,1);
+	checkSuccess(day,1);
+	checkSuccess(hour,-1);
+	checkSuccess(minute,-1);
+	checkSuccess(second,-1);
+	checkSuccess(tz,"");
 	printf("\n");
 
 	printf("OUTPUT BIND BY NAME WITH VALIDATION: \n");
@@ -256,15 +283,25 @@ int	main(int argc, char **argv) {
 	cur->defineOutputBindInteger("numvar");
 	cur->defineOutputBindString("stringvar",10);
 	cur->defineOutputBindDouble("floatvar");
+	cur->defineOutputBindDate("datevar");
 	cur->defineOutputBindString("dummyvar",10);
 	cur->validateBinds();
 	checkSuccess(cur->executeQuery(),1);
 	numvar=cur->getOutputBindInteger("numvar");
 	stringvar=cur->getOutputBindString("stringvar");
 	floatvar=cur->getOutputBindDouble("floatvar");
+	cur->getOutputBindDate("datevar",&year,&month,&day,
+					&hour,&minute,&second,&tz);
 	checkSuccess(numvar,1);
 	checkSuccess(stringvar,"hello");
 	checkSuccess(floatvar,2.5);
+	checkSuccess(year,2001);
+	checkSuccess(month,1);
+	checkSuccess(day,1);
+	checkSuccess(hour,-1);
+	checkSuccess(minute,-1);
+	checkSuccess(second,-1);
+	checkSuccess(tz,"");
 	printf("\n");
 
 	printf("SELECT: \n");

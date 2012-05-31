@@ -67,7 +67,7 @@
 #define DOUBLE_DATA 6
 #define DATE_DATA 7
 
-#define END_BIND_VARS 7 
+#define END_BIND_VARS 8 
 
 #define DONT_RE_EXECUTE 0
 #define RE_EXECUTE 1

@@ -105,12 +105,12 @@ void sqlrconnection_svr::returnOutputBindValues(sqlrcursor_svr *cursor) {
 			}
 
 			clientsock->write((uint16_t)DATE_DATA);
-			clientsock->write(bv->value.dateval.year);
-			clientsock->write(bv->value.dateval.month);
-			clientsock->write(bv->value.dateval.day);
-			clientsock->write(bv->value.dateval.hour);
-			clientsock->write(bv->value.dateval.minute);
-			clientsock->write(bv->value.dateval.second);
+			clientsock->write((uint16_t)bv->value.dateval.year);
+			clientsock->write((uint16_t)bv->value.dateval.month);
+			clientsock->write((uint16_t)bv->value.dateval.day);
+			clientsock->write((uint16_t)bv->value.dateval.hour);
+			clientsock->write((uint16_t)bv->value.dateval.minute);
+			clientsock->write((uint16_t)bv->value.dateval.second);
 			uint16_t	length=charstring::length(
 						bv->value.dateval.tz);
 			clientsock->write(length);

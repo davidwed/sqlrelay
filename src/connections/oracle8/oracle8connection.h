@@ -54,6 +54,18 @@ struct describe {
 	ub1		nullok;
 };
 
+struct datebind {
+	int16_t	*year;
+	int16_t	*month;
+	int16_t	*day;
+	int16_t	*hour;
+	int16_t	*minute;
+	int16_t	*second;
+	char	**tz;
+	char    *buffer;
+	int16_t	buffersize;
+};
+
 class oracle8connection;
 
 class oracle8cursor : public sqlrcursor_svr {
@@ -96,6 +108,18 @@ class oracle8cursor : public sqlrcursor_svr {
 						double *value,
 						uint32_t *precision,
 						uint32_t *scale,
+						int16_t *isnull);
+		bool		outputBindDate(const char *variable,
+						uint16_t variablesize,
+						int16_t *year,
+						int16_t *month,
+						int16_t *day,
+						int16_t *hour,
+						int16_t *minute,
+						int16_t *second,
+						char **tz,
+						char *buffer,
+						uint16_t buffersize,
 						int16_t *isnull);
 #ifdef HAVE_ORACLE_8i
 		bool		inputBindBlob(const char *variable, 
@@ -208,6 +232,7 @@ class oracle8cursor : public sqlrcursor_svr {
 		OCIBind		*curbindpp[MAXVAR];
 		char		*inintbindstring[MAXVAR];
 		char		*outintbindstring[MAXVAR];
+		datebind	*outdatebind[MAXVAR];
 		int64_t		*outintbind[MAXVAR];
 		uint16_t	orainbindcount;
 		uint16_t	oraoutbindcount;
