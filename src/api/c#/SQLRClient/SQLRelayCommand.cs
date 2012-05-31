@@ -450,11 +450,10 @@ namespace SQLRClient
                             continue;
                         case SQLRelayType.Cursor:
                             SQLRCursor cursor = _sqlrcur.getOutputBindCursor(param.ParameterName);
-                            SQLRelayCommand command = new SQLRelayCommand();
-                            command.Connection = Connection;
-                            command.Transaction = Transaction;
-                            command._sqlrcur = cursor;
-                            param.Value = command.ExecuteReader();
+                            if (cursor.fetchFromBindCursor())
+                            {
+                                param.Value = new SQLRelayDataReader(_sqlrelaycon, cursor, false);
+                            }
                             continue;
                     }
 
