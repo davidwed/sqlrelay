@@ -167,6 +167,17 @@ void sqlrcursor_svr::performSubstitution(stringbuffer *buffer, int16_t index) {
 		}
 		buffer->append(dbuf);
 		delete[] dbuf;
+	} else if (inbindvars[index].type==DATE_BIND) {
+		char	buf[64];
+		dateToString(buf,sizeof(buf),
+				inbindvars[index].value.dateval.year,
+				inbindvars[index].value.dateval.month,
+				inbindvars[index].value.dateval.day,
+				inbindvars[index].value.dateval.hour,
+				inbindvars[index].value.dateval.minute,
+				inbindvars[index].value.dateval.second,
+				inbindvars[index].value.dateval.tz);
+		buffer->append("'")->append(buf)->append("'");
 	} else if (inbindvars[index].type==NULL_BIND) {
 		buffer->append("NULL");
 	}
