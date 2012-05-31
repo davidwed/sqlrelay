@@ -854,7 +854,7 @@ public class SQLRCursor : IDisposable
      *  for the result set are freed as well. */
     public void closeResultSet()
     {
-        return sqlrcur_closeResultSet(sqlrcurref);
+        sqlrcur_closeResultSet(sqlrcurref);
     }
 
     private IntPtr sqlrcurref;
