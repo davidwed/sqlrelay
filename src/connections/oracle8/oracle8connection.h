@@ -62,8 +62,7 @@ struct datebind {
 	int16_t	*minute;
 	int16_t	*second;
 	char	**tz;
-	char    *buffer;
-	int16_t	buffersize;
+	OCIDate	*ocidate;
 };
 
 class oracle8connection;
@@ -94,6 +93,18 @@ class oracle8cursor : public sqlrcursor_svr {
 						double *value,
 						uint32_t precision,
 						uint32_t scale);
+		bool		inputBindDate(const char *variable,
+						uint16_t variablesize,
+						int64_t year,
+						int16_t month,
+						int16_t day,
+						int16_t hour,
+						int16_t minute,
+						int16_t second,
+						const char *tz,
+						char *buffer,
+						uint16_t buffersize,
+						int16_t *isnull);
 		bool		outputBindString(const char *variable, 
 						uint16_t variablesize,
 						char *value,
@@ -231,6 +242,7 @@ class oracle8cursor : public sqlrcursor_svr {
 		OCIBind		*outbindpp[MAXVAR];
 		OCIBind		*curbindpp[MAXVAR];
 		char		*inintbindstring[MAXVAR];
+		OCIDate		*indatebind[MAXVAR];
 		char		*outintbindstring[MAXVAR];
 		datebind	*outdatebind[MAXVAR];
 		int64_t		*outintbind[MAXVAR];

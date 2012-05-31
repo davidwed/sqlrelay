@@ -228,9 +228,7 @@ bool sqlrcursor::parseOutputBinds() {
 					"A network error may have occurred.");
 				return false;
 			}
-printf("month-%d\n",temp);
 			outbindvars[count].value.dateval.month=(int16_t)temp;
-printf("month-%d\n",outbindvars[count].value.dateval.month);
 
 			// get the day
 			if (getShort(&temp)!=sizeof(uint16_t)) {

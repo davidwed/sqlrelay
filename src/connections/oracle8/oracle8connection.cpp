@@ -647,6 +647,7 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 		outbindpp[i]=NULL;
 		curbindpp[i]=NULL;
 		inintbindstring[i]=NULL;
+		indatebind[i]=NULL;
 		outintbindstring[i]=NULL;
 		outdatebind[i]=NULL;
 		outintbind[i]=NULL;
@@ -674,10 +675,14 @@ oracle8cursor::~oracle8cursor() {
 
 	for (uint16_t i=0; i<orainbindcount; i++) {
 		delete[] inintbindstring[i];
+		delete indatebind[i];
 	}
 	for (uint16_t i=0; i<oraoutbindcount; i++) {
 		delete[] outintbindstring[i];
-		delete[] outdatebind[i];
+		if (outdatebind[i]) {
+			delete outdatebind[i]->ocidate;
+		}
+		delete outdatebind[i];
 	}
 
 	deallocateResultSetBuffers();
@@ -803,14 +808,16 @@ void oracle8cursor::dateToString(char *buffer, uint16_t buffersize,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
 				const char *tz) {
-	if (month<=0) {
-		month=1;
+	// typically oracle just wants DD-MON-YYYY but if hour,
+	// minute and second are non-zero then use them too
+	if (hour && minute && second) {
+		snprintf(buffer,buffersize,"%02d-%s-%04d %02d:%02d:%02d",
+				day,shortmonths[month-1],year,
+				hour,minute,second);
+	} else {
+		snprintf(buffer,buffersize,"%02d-%s-%04d",
+				day,shortmonths[month-1],year);
 	}
-	if (month>12) {
-		month=12;
-	}
-	snprintf(buffer,buffersize,"%02d-%s-%04d",
-			day,shortmonths[month-1],year);
 }
 
 bool oracle8cursor::inputBindString(const char *variable,
@@ -918,6 +925,55 @@ bool oracle8cursor::inputBindDouble(const char *variable,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)value,(sb4)sizeof(double),
 				SQLT_FLT,
+				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
+				OCI_DEFAULT)!=OCI_SUCCESS) {
+			return false;
+		}
+	}
+	orainbindcount++;
+	return true;
+}
+
+
+bool oracle8cursor::inputBindDate(const char *variable,
+						uint16_t variablesize,
+						int64_t year,
+						int16_t month,
+						int16_t day,
+						int16_t hour,
+						int16_t minute,
+						int16_t second,
+						const char *tz,
+						char *buffer,
+						uint16_t buffersize,
+						int16_t *isnull) {
+	checkRePrepare();
+
+	indatebind[orainbindcount]=new OCIDate;
+	OCIDateSetDate(indatebind[orainbindcount],year,month,day);
+	OCIDateSetTime(indatebind[orainbindcount],hour,minute,second);
+
+	if (charstring::isInteger(variable+1,variablesize-1)) {
+		if (!charstring::toInteger(variable+1)) {
+			return false;
+		}
+		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
+				oracle8conn->err,
+				(ub4)charstring::toInteger(variable+1),
+				(dvoid *)indatebind[orainbindcount],
+				(sb4)sizeof(OCIDate),
+				SQLT_ODT,
+				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
+				OCI_DEFAULT)!=OCI_SUCCESS) {
+			return false;
+		}
+	} else {
+		if (OCIBindByName(stmt,&inbindpp[orainbindcount],
+				oracle8conn->err,
+				(text *)variable,(sb4)variablesize,
+				(dvoid *)indatebind[orainbindcount],
+				(sb4)sizeof(OCIDate),
+				SQLT_ODT,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
 			return false;
@@ -1077,8 +1133,7 @@ bool oracle8cursor::outputBindDate(const char *variable,
 	db->minute=minute;
 	db->second=second;
 	db->tz=tz;
-	db->buffer=buffer;
-	db->buffersize=buffersize;
+	db->ocidate=new OCIDate;
 	outdatebind[oraoutbindcount]=db;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
@@ -1088,9 +1143,9 @@ bool oracle8cursor::outputBindDate(const char *variable,
 		if (OCIBindByPos(stmt,&outbindpp[oraoutbindcount],
 				oracle8conn->err,
 				(ub4)charstring::toInteger(variable+1),
-				(dvoid *)buffer,
-				(sb4)buffersize,
-				SQLT_STR,
+				(dvoid *)db->ocidate,
+				(sb4)sizeof(OCIDate),
+				SQLT_ODT,
 				(dvoid *)isnull,(ub2 *)0,
 				(ub2 *)0,0,(ub4 *)0,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
@@ -1100,9 +1155,9 @@ bool oracle8cursor::outputBindDate(const char *variable,
 		if (OCIBindByName(stmt,&outbindpp[oraoutbindcount],
 				oracle8conn->err,
 				(text *)variable,(sb4)variablesize,
-				(dvoid *)buffer,
-				(sb4)buffersize,
-				SQLT_STR,
+				(dvoid *)db->ocidate,
+				(sb4)sizeof(OCIDate),
+				SQLT_ODT,
 				(dvoid *)isnull,(ub2 *)0,
 				(ub2 *)0,0,(ub4 *)0,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
@@ -1608,10 +1663,21 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 	for (uint16_t i=0; i<oraoutbindcount; i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
-			stringToDate(db->buffer,
-					db->year,db->month,db->day,
-					db->hour,db->minute,db->second,
-					db->tz);
+			sb2	year;
+			ub1	month;
+			ub1	day;
+			ub1	hour;
+			ub1	minute;
+			ub1	second;
+			OCIDateGetDate(db->ocidate,&year,&month,&day);
+			OCIDateGetTime(db->ocidate,&hour,&minute,&second);
+			*db->year=year;
+			*db->month=month;
+			*db->day=day;
+			*db->hour=hour;
+			*db->minute=minute;
+			*db->second=second;
+			*db->tz=NULL;
 		}
 	}
 
@@ -1969,11 +2035,18 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 		for (uint16_t i=0; i<orainbindcount; i++) {
 			delete[] inintbindstring[i];
 			inintbindstring[i]=NULL;
+			delete indatebind[i];
+			indatebind[i]=NULL;
 		}
 		for (uint16_t i=0; i<oraoutbindcount; i++) {
 			delete[] outintbindstring[i];
 			outintbindstring[i]=NULL;
 			outintbind[i]=NULL;
+			if (outdatebind[i]) {
+				delete outdatebind[i]->ocidate;
+			}
+			delete outdatebind[i];
+			outdatebind[i]=NULL;
 		}
 		orainbindcount=0;
 		oraoutbindcount=0;

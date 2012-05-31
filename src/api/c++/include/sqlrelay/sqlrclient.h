@@ -354,9 +354,8 @@ class SQLRCLIENT_DLLSPEC sqlrcursor {
 							uint32_t scale);
 
 		/** Defines a date input bind variable.  "day" should be
-		 *  1-31 and "month" should be 1-12.  Any date components
-		 *  that you don't want used should be set to -1.  "tz" may
-		 *  be left NULL.  Most databases ignore "tz".  */
+		 *  1-31 and "month" should be 1-12.  "tz" may be left NULL.
+		 *  Most databases ignore "tz".  */
 		void	inputBind(const char *variable,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,

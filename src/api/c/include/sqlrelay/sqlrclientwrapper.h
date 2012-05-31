@@ -436,9 +436,8 @@ void	sqlrcur_inputBindDouble(sqlrcur sqlrcurref,
 
 /** @ingroup sqlrclientwraper
  *  Defines a date input bind variable.  "day" should be
- *  1-31 and "month" should be 1-12.  Any date components
- *  that you don't want used should be set to -1.  "tz" may
- *  be left NULL.  Most databases ignore "tz".  */
+ *  1-31 and "month" should be 1-12.  "tz" may be left NULL.
+ *  Most databases ignore "tz".  */
 SQLRCLIENTWRAPPER_DLLSPEC
 void	sqlrcur_inputBindDate(sqlrcur sqlrcurref,
 				const char *variable,

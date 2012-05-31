@@ -184,21 +184,8 @@ void sqlrcursor_svr::dateToString(char *buffer, uint16_t buffersize,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
 				const char *tz) {
-	if (year==-1 && month==-1 && day==-1 &&
-		hour==-1 && minute==-1 && second==-1) {
-		// if all are -1 then treat it as a NULL
-		buffer[0]='\0';
-	} else if (year==-1 || month==-1 || day==-1) {
-		// if any date parts are -1 then exclude the date
-		snprintf(buffer,buffersize,"%02d:%02d:%02d",hour,minute,second);
-	} else if (hour==-1 || minute==-1 || second==-1) {
-		// if any time parts are -1 then exclude the time
-		snprintf(buffer,buffersize,"%04d-%02d-%02d",year,month,day);
-	} else {
-		// if no parts are -1 then use all parts
-		snprintf(buffer,buffersize,"%04d-%02d-%02d %02d:%02d:%02d",
+	snprintf(buffer,buffersize,"%04d-%02d-%02d %02d:%02d:%02d",
 					year,month,day,hour,minute,second);
-	}
 }
 
 void sqlrcursor_svr::stringToDate(const char *string,
@@ -211,12 +198,12 @@ void sqlrcursor_svr::stringToDate(const char *string,
 
 bool sqlrcursor_svr::inputBindDate(const char *variable,
 					uint16_t variablesize,
-					uint64_t year,
-					uint16_t month,
-					uint16_t day,
-					uint16_t hour,
-					uint16_t minute,
-					uint16_t second,
+					int64_t year,
+					int16_t month,
+					int16_t day,
+					int16_t hour,
+					int16_t minute,
+					int16_t second,
 					const char *tz,
 					char *buffer,
 					uint16_t buffersize,
