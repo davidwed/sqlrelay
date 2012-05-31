@@ -1822,37 +1822,31 @@ namespace SQLRClient
 
         public Int16 GetInt16(Int32 i)
         {
-            //return Convert.ToInt16(GetValue(i));
             return (Int16)_sqlrcur.getFieldAsInteger(_currentrow, (UInt32)i);
         }
 
         public Int32 GetInt32(Int32 i)
         {
-            //return Convert.ToInt32(GetValue(i));
             return (Int32)_sqlrcur.getFieldAsInteger(_currentrow, (UInt32)i);
         }
 
         public Int64 GetInt64(Int32 i)
         {
-            //return Convert.ToInt64(GetValue(i));
             return _sqlrcur.getFieldAsInteger(_currentrow, (UInt32)i);
         }
 
         public float GetFloat(Int32 i)
         {
-            //return (float)Convert.ToSingle(GetValue(i));
             return (float)_sqlrcur.getFieldAsDouble(_currentrow, (UInt32)i);
         }
 
         public Double GetDouble(Int32 i)
         {
-            //return Convert.ToDouble(GetValue(i));
             return _sqlrcur.getFieldAsDouble(_currentrow, (UInt32)i);
         }
 
         public String GetString(Int32 i)
         {
-            //return Convert.ToString(GetValue(i));
             return _sqlrcur.getField(_currentrow, (UInt32)i);
         }
 

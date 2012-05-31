@@ -716,12 +716,11 @@ namespace SQLRClientTest
             datareader = ExecuteReader(sqlrcom);
             checkSuccess(datareader != null, true);
             checkSuccess(datareader.Read(), true);
-            datareader.Read();
             // FIXME: I'd expect these to come out as empty strings, not null's
-            checkSuccess(datareader.GetString(0), null);
-            checkSuccess(datareader.GetString(1), null);
-            checkSuccess(datareader.GetString(2), null);
-            checkSuccess(datareader.GetString(3), null);
+            checkSuccess(datareader.GetString(0), "");
+            checkSuccess(datareader.GetString(1), "");
+            checkSuccess(datareader.GetString(2), "");
+            checkSuccess(datareader.GetString(3), "");
             sqlrcom.CommandText = "drop table testtable1";
             checkSuccess(ExecuteNonQuery(sqlrcom), 0);
             Console.WriteLine("\n");
