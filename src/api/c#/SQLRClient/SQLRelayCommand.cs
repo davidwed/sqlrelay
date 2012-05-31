@@ -477,30 +477,6 @@ namespace SQLRClient
                             Int16 second = 0;
                             String tz = null;
                             _sqlrcur.getOutputBindDate(param.ParameterName, out year, out month, out day, out hour, out minute, out second, out tz);
-                            if (year == -1)
-                            {
-                                year = 0;
-                            }
-                            if (month == -1)
-                            {
-                                month = 0;
-                            }
-                            if (day == -1)
-                            {
-                                day = 0;
-                            }
-                            if (hour == -1)
-                            {
-                                hour = 0;
-                            }
-                            if (minute == -1)
-                            {
-                                minute = 0;
-                            }
-                            if (second == -1)
-                            {
-                                second = 0;
-                            }
                             param.Value = new DateTime(year, month, day, hour, minute, second);
                             break;
 

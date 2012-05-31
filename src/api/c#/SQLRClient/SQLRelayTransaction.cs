@@ -50,11 +50,9 @@ namespace SQLRClient
 
         public IsolationLevel IsolationLevel
         {
-            // FIXME: ideally this would do something
-            // I may need to add some methods to the C++ API
             get
             {
-                return IsolationLevel.ReadCommitted;
+                return IsolationLevel.Unspecified;
             }
         }
 

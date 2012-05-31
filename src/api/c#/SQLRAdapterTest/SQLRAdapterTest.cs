@@ -567,7 +567,7 @@ namespace SQLRClientTest
             sqlrcon2.Open();
             SQLRelayCommand sqlrcom2 = new SQLRelayCommand("select count(*) from testtable", sqlrcon2);
             checkSuccess(Convert.ToInt64(sqlrcom2.ExecuteScalar()), 0);
-            IDbTransaction sqlrtran = sqlrcon.BeginTransaction();
+            SQLRelayTransaction sqlrtran = sqlrcon.BeginTransaction();
             sqlrtran.Commit();
             checkSuccess(Convert.ToInt64(sqlrcom2.ExecuteScalar()), 6);
             sqlrtran = sqlrcon.BeginTransaction();

@@ -211,7 +211,12 @@ namespace SQLRClient
             _sqlrcon.endSession();
         }
 
-        public IDbTransaction BeginTransaction()
+        IDbTransaction IDbConnection.BeginTransaction()
+        {
+            return BeginTransaction();
+        }
+
+        public SQLRelayTransaction BeginTransaction()
         {
             validConnection();
 
@@ -225,7 +230,12 @@ namespace SQLRClient
             return trans;
         }
 
-        public IDbTransaction BeginTransaction(IsolationLevel isolationlevel)
+        IDbTransaction IDbConnection.BeginTransaction(IsolationLevel isolationlevel)
+        {
+            return BeginTransaction(isolationlevel);
+        }
+
+        public SQLRelayTransaction BeginTransaction(IsolationLevel isolationlevel)
         {
             throw new InvalidOperationException();
         }
