@@ -16,6 +16,11 @@ public class SQLRCursor : IDisposable
         sqlrcurref = sqlrcur_alloc_copyrefs(conn.getInternalConnectionStructure(), 1);
     }
 
+    private SQLRCursor(IntPtr sqlrcurref)
+    {
+        this.sqlrcurref = sqlrcurref;
+    }
+
     /** Dispose framework */
     private Boolean  disposed = false;
     public void Dispose()
@@ -422,9 +427,9 @@ public class SQLRCursor : IDisposable
 
     /** Get the cursor associated with a previously defined output bind
      *  variable. */
-    public IntPtr getOutputBindCursor(String variable)
+    public SQLRCursor getOutputBindCursor(String variable)
     {
-        return sqlrcur_getOutputBindCursor_copyrefs(sqlrcurref, variable, 1);
+        return new SQLRCursor(sqlrcur_getOutputBindCursor_copyrefs(sqlrcurref, variable, 1));
     }
 
 

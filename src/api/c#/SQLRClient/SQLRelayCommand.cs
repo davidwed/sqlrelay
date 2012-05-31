@@ -298,7 +298,6 @@ namespace SQLRClient
                             _sqlrcur.inputBindBlob(param.ParameterName, (Byte[])param.Value, (UInt32)((Byte[])param.Value).Length);
                             continue;
                         case SQLRelayType.Cursor:
-                            // FIXME: not implemented yet
                             throw new NotSupportedException();
                     }
 
@@ -366,8 +365,8 @@ namespace SQLRClient
                             _sqlrcur.defineOutputBindBlob(param.ParameterName);
                             continue;
                         case SQLRelayType.Cursor:
-                            // FIXME: not implemented yet
-                            throw new NotSupportedException();
+                            _sqlrcur.defineOutputBindCursor(param.ParameterName);
+                            continue;
                     }
 
                     switch (param.DbType)
@@ -450,8 +449,13 @@ namespace SQLRClient
                             param.Value = _sqlrcur.getOutputBindBlob(param.ParameterName);
                             continue;
                         case SQLRelayType.Cursor:
-                            // FIXME: not implemented yet
-                            throw new NotSupportedException();
+                            SQLRCursor cursor = _sqlrcur.getOutputBindCursor(param.ParameterName);
+                            SQLRelayCommand command = new SQLRelayCommand();
+                            command.Connection = Connection;
+                            command.Transaction = Transaction;
+                            command._sqlrcur = cursor;
+                            param.Value = command.ExecuteReader();
+                            continue;
                     }
 
                     switch (param.DbType)
