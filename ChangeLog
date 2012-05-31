@@ -3,6 +3,7 @@
 	added C# API and ADO.NET adapter
 	added begin method to API's
 	added sqlrelay.xsd
+	added date binds
 
 0.45 - added trigger framework
 	added support for getting the native database error number
