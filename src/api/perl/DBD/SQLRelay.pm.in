@@ -266,7 +266,8 @@ sub ping {
 
 sub last_insert_id {
 
-	# ignore parameters
+	# get parameters
+	my ($dbh)=@_;
 
 	# get the last insert id
 	return $dbh->FETCH('driver_connection')->getLastInsertId();
