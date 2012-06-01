@@ -161,6 +161,18 @@ namespace SQLRClient
             }
         }
 
+        public UInt64 ResultSetBufferSize
+        {
+            get
+            {
+                return _sqlrcur.getResultSetBufferSize();
+            }
+            set
+            {
+                _sqlrcur.setResultSetBufferSize(value);
+            }
+        }
+
         #endregion
 
 
