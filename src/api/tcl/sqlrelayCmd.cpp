@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.cpp,v 1.3 2012-05-17 05:08:40 mused Exp $
+ * $Id: sqlrelayCmd.cpp,v 1.4 2012-06-01 19:23:05 mused Exp $
  */
 
 #include <tcl.h>
@@ -158,6 +158,7 @@ void sqlrcurDelete(ClientData data) {
  *   $cur suspendResultSet
  *   $cur resumeResultSet is
  *   $cur resumeCachedResultSet id filename
+ *   $cur closeResultSet
  *  Note:
  *   cur->getNullsAsEmptyStrings, and cur->getNullsAsNulls are not
  *   supported.
@@ -262,6 +263,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     "suspendResultSet",
     "resumeResultSet",
     "resumeCachedResultSet",
+    "closeResultSet",
   };
   
   enum options {
@@ -360,6 +362,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
     SQLRCUR_suspendResultSet,
     SQLRCUR_resumeResultSet,
     SQLRCUR_resumeCachedResultSet,
+    SQLRCUR_closeResultSet,
   };
 
   if (objc < 2) {
@@ -1750,6 +1753,15 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	}
 	Tcl_SetObjResult(interp,
 			 Tcl_NewBooleanObj(cur->resumeCachedResultSet(id, Tcl_GetString(objv[3]))));
+	break;
+      }
+    case SQLRCUR_closeResultSet:
+      {
+	if (objc > 2) {
+	  Tcl_WrongNumArgs(interp, 2, objv, NULL);
+	  return TCL_ERROR;
+	}
+	cur->closeResultSet();
 	break;
       }
     }

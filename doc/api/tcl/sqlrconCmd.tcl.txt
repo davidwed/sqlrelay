@@ -106,12 +106,20 @@ proc autoCommitOff {}
 
 
 
-# Issues a commit.  Returns 1 if the commit
-# succeeded 0 if it failed.
+# Begins a transaction.  Returns true if the begin
+# succeeded, false if it failed.  If the database
+# automatically begins a new transaction when a
+# commit or rollback is issued then this doesn't
+# do anything unless SQL Relay is faking transaction
+# blocks.
+proc begin {} 
+
+# Issues a commit.  Returns true if the commit
+# succeeded false if it failed.
 proc commit {} 
 
-# Issues a rollback.  Returns 1 if the rollback
-# succeeded 0 if it failed.
+# Issues a rollback.  Returns true if the rollback
+# succeeded false if it failed.
 proc rollback {} 
 
 

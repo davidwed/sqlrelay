@@ -5,15 +5,13 @@
 
 <html>
 <head>
-  <title>suspendSession (SQLRConnection)</title>
+  <title>endSession (SQLRConnection)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre>/** Disconnects this connection from the current session but leaves the session
- *  open so that another connection can connect to it using
- *  sqlrcon_resumeSession(). */
-static VALUE sqlrcon_suspendSession(VALUE self) {
+  <pre>/** Ends the session. */
+static VALUE sqlrcon_endSession(VALUE self) {
 </pre>
 </body>
 </html>

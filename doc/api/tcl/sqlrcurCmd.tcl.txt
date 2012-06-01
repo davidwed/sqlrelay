@@ -488,3 +488,9 @@ proc resumeResultSet {id}
 # the result set to "filename".
 # Returns true on success and false on failure.
 proc resumeCachedResultSet {id filename} 
+
+# Closes the current result set, if one is open.  Data
+# that has been fetched already is still available but
+# no more data may be fetched.  Server side resources
+# for the result set are freed as well. */
+proc closeResultSet {}

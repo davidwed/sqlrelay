@@ -902,3 +902,12 @@ class sqlrcursor:
         Returns 1 on success and 0 on failure.
         """
         return CSQLRelay.resumeCachedResultSet(self.cursor, id, filename)
+
+    def closeResultSet():
+        """
+        Closes the current result set, if one is open.  Data
+        that has been fetched already is still available but
+        no more data may be fetched.  Server side resources
+        for the result set are freed as well.
+        """
+        return CSQLRelay.closeResultSet(self.cursor)

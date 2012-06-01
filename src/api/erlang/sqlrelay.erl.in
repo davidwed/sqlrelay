@@ -54,7 +54,7 @@
 -export([getColumnIsAutoIncrementByIndex/1, getColumnIsAutoIncrementByName/1]).
 -export([getLongestByIndex/1, getLongestByName/1]).
 
--export([suspendResultSet/0, getResultSetId/0, resumeResultSet/1, resumeCachedResultSet/2]).
+-export([suspendResultSet/0, getResultSetId/0, resumeResultSet/1, resumeCachedResultSet/2, closeResultSet/0]).
 
 
 % Internal exports
@@ -367,6 +367,7 @@ getResultSetId() -> call_port({getResultSetId}).
 resumeResultSet(Id) when is_integer(Id) -> call_port({resumeResultSet, Id}).
 resumeCachedResultSet(Id, Filename) when is_integer(Id), is_list(Filename) -> 
 	call_port({resumeCachedResultSet, Id, Filename}).
+closeResultSet() -> call_port({closeResultSet}).
 
 % Special function to replace the getRow from the SQLRelay client wrapper
 % After a query has been run return a tuple

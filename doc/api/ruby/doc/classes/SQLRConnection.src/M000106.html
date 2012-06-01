@@ -5,14 +5,14 @@
 
 <html>
 <head>
-  <title>errorNumber (SQLRConnection)</title>
+  <title>rollback (SQLRConnection)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre>/** If an operation failed and generated an error, the error number is
- *  available here.  If there is no error then this method returns 0. */
-static VALUE sqlrcon_errorNumber(VALUE self) {
+  <pre>/** Issues a rollback.  Returns true if the rollback succeeded,
+ *  false if it failed. */
+static VALUE sqlrcon_rollback(VALUE self) {
 </pre>
 </body>
 </html>

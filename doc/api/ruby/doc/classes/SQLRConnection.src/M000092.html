@@ -5,13 +5,18 @@
 
 <html>
 <head>
-  <title>ping (SQLRConnection)</title>
+  <title>resumeSession (SQLRConnection)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre>/** Returns 1 if the database is up and 0 if it's down. */
-static VALUE sqlrcon_ping(VALUE self) {
+  <pre>/**
+ *  call-seq:
+ *  resumeSession(port,socket)
+ *
+ *  Resumes a session previously left open using sqlrcon_suspendSession().
+ *  Returns 1 on success and 0 on failure. */
+static VALUE sqlrcon_resumeSession(VALUE self, VALUE port, VALUE socket) {
 </pre>
 </body>
 </html>

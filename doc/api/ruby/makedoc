@@ -1,9 +1,9 @@
 find doc -name "*.html" -print | xargs rm -f
 find doc -name "*.css" -print | xargs rm -f
-rm -f sqlrelay.C
-sed -e "s|(CAST)||" ../../../src/api/ruby/sqlrelay.C > sqlrelay.C
-rdoc sqlrelay.C
-rm -f sqlrelay.C
+rm -f sqlrelay.cpp
+sed -e "s|(CAST)||" ../../../src/api/ruby/sqlrelay.cpp > sqlrelay.cpp
+rdoc sqlrelay.cpp
+rm -f sqlrelay.cpp
 
 find dbidoc -name "*.html" -print | xargs rm -f
 find dbidoc -name "*.css" -print | xargs rm -f

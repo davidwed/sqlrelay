@@ -431,6 +431,11 @@ public class SQLRCursor {
 	 *  Returns 1 on success and 0 on failure.  */
 	public native boolean	resumeCachedResultSet(short id,
 							String filename);
+	/** Closes the current result set, if one is open.  Data
+ 	 *  that has been fetched already is still available but
+ 	 *  no more data may be fetched.  Server side resources
+ 	 *  for the result set are freed as well. */
+	public native void	closeResultSet();
 
 
 	/** cursor and connection are used internally, they're just

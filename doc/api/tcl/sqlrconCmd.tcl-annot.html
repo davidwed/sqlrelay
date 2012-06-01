@@ -25,6 +25,8 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <tr><td><code><a href="#autoCommitOn">autoCommitOn</a> {  }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Instructs the database to perform a commit
  after every successful</td></tr>
+<tr><td><code><a href="#begin">begin</a> {  }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Begins a transaction.</td></tr>
 <tr><td><code><a href="#bindFormat">bindFormat</a> {  }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a string representing the format
  of the bind variables used in the</td></tr>
@@ -117,6 +119,19 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 </dl></dl>
 
 <hr>
+<h3><a name="begin">begin</a></h3>
+<pre>proc begin {  }</pre>
+<dl>
+<dd>Begins a transaction.  Returns true if the begin
+ succeeded, false if it failed.  If the database
+ automatically begins a new transaction when a
+ commit or rollback is issued then this doesn't
+ do anything unless SQL Relay is faking transaction
+ blocks.<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#begin_115">sqlrconCmd.tcl, line 115</a>
+</dl></dl>
+
+<hr>
 <h3><a name="bindFormat">bindFormat</a></h3>
 <pre>proc bindFormat {  }</pre>
 <dl>
@@ -137,9 +152,9 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <h3><a name="commit">commit</a></h3>
 <pre>proc commit {  }</pre>
 <dl>
-<dd>Issues a commit.  Returns 1 if the commit
- succeeded 0 if it failed.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#commit_111">sqlrconCmd.tcl, line 111</a>
+<dd>Issues a commit.  Returns true if the commit
+ succeeded false if it failed.<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#commit_119">sqlrconCmd.tcl, line 119</a>
 </dl></dl>
 
 <hr>
@@ -155,7 +170,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc debugOff {  }</pre>
 <dl>
 <dd>Turns debugging off.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOff_143">sqlrconCmd.tcl, line 143</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOff_151">sqlrconCmd.tcl, line 151</a>
 </dl></dl>
 
 <hr>
@@ -167,7 +182,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  this is to start a query with "-- debug\n".
  Another way is to set the environment variable
  SQLRDEBUG to "ON"<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOn_140">sqlrconCmd.tcl, line 140</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOn_148">sqlrconCmd.tcl, line 148</a>
 </dl></dl>
 
 <hr>
@@ -186,7 +201,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  error the error message is available here.
  If there is no error then this method 
  returns NULL.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorMessage_123">sqlrconCmd.tcl, line 123</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorMessage_131">sqlrconCmd.tcl, line 131</a>
 </dl></dl>
 
 <hr>
@@ -197,7 +212,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  error, the error number is available here.
  If there is no error then this method 
  returns 0.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorNumber_131">sqlrconCmd.tcl, line 131</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorNumber_139">sqlrconCmd.tcl, line 139</a>
 </dl></dl>
 
 <hr>
@@ -240,7 +255,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Returns false if debugging is off and true
  if debugging is on.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getDebug_147">sqlrconCmd.tcl, line 147</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getDebug_155">sqlrconCmd.tcl, line 155</a>
 </dl></dl>
 
 <hr>
@@ -284,9 +299,9 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <h3><a name="rollback">rollback</a></h3>
 <pre>proc rollback {  }</pre>
 <dl>
-<dd>Issues a rollback.  Returns 1 if the rollback
- succeeded 0 if it failed.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#rollback_115">sqlrconCmd.tcl, line 115</a>
+<dd>Issues a rollback.  Returns true if the rollback
+ succeeded false if it failed.<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#rollback_123">sqlrconCmd.tcl, line 123</a>
 </dl></dl>
 
 <hr>
@@ -363,7 +378,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2012-02-09 at 10:01.</cite>
+<cite>File generated 2012-06-02 at 03:11.</cite>
 </font>
 </body>
 </html>

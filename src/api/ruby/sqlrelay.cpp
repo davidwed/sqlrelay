@@ -1659,6 +1659,17 @@ static VALUE sqlrcur_resumeCachedResultSet(VALUE self,
 							STR2CSTR(filename)));
 }
 
+/** Closes the current result set, if one is open.  Data
+ *  that has been fetched already is still available but
+ *  no more data may be fetched.  Server side resources
+ *  for the result set are freed as well. */
+static VALUE sqlrcur_closeResultSet(VALUE self) {
+	sqlrcursor	*sqlrcur;
+	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcur->closeResultSet();
+	return Qnil;
+}
+
 /** */
 void Init_SQLRCursor() {
 	csqlrcursor=rb_define_class("SQLRCursor", rb_cObject);
@@ -1830,6 +1841,8 @@ void Init_SQLRCursor() {
 				(CAST)sqlrcur_resumeResultSet,1);
 	rb_define_method(csqlrcursor,"resumeCachedResultSet",
 				(CAST)sqlrcur_resumeCachedResultSet,2);
+	rb_define_method(csqlrcursor,"closeResultSet",
+				(CAST)sqlrcur_closeResultSet,0);
 }
 
 void Init_sqlrelay() {

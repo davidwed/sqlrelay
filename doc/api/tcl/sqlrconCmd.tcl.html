@@ -122,13 +122,21 @@ Index by:  <a href="index_main.html#sqlrconCmd.tcl">file name</a> |
 
 
 
-<font color="#208020"># Issues a commit.  Returns 1 if the commit</font>
-<font color="#208020"># succeeded 0 if it failed.</font>
-<strong><a name="commit_111">proc <a href="sqlrconCmd.tcl-annot.html#commit">commit</a></a></strong><a name="commit"></a> {} 
+<font color="#208020"># Begins a transaction.  Returns true if the begin</font>
+<font color="#208020"># succeeded, false if it failed.  If the database</font>
+<font color="#208020"># automatically begins a new transaction when a</font>
+<font color="#208020"># commit or rollback is issued then this doesn't</font>
+<font color="#208020"># do anything unless SQL Relay is faking transaction</font>
+<font color="#208020"># blocks.</font>
+<strong><a name="begin_115">proc <a href="sqlrconCmd.tcl-annot.html#begin">begin</a></a></strong><a name="begin"></a> {} 
 
-<font color="#208020"># Issues a rollback.  Returns 1 if the rollback</font>
-<font color="#208020"># succeeded 0 if it failed.</font>
-<strong><a name="rollback_115">proc <a href="sqlrconCmd.tcl-annot.html#rollback">rollback</a></a></strong><a name="rollback"></a> {} 
+<font color="#208020"># Issues a commit.  Returns true if the commit</font>
+<font color="#208020"># succeeded false if it failed.</font>
+<strong><a name="commit_119">proc <a href="sqlrconCmd.tcl-annot.html#commit">commit</a></a></strong><a name="commit"></a> {} 
+
+<font color="#208020"># Issues a rollback.  Returns true if the rollback</font>
+<font color="#208020"># succeeded false if it failed.</font>
+<strong><a name="rollback_123">proc <a href="sqlrconCmd.tcl-annot.html#rollback">rollback</a></a></strong><a name="rollback"></a> {} 
 
 
 
@@ -136,7 +144,7 @@ Index by:  <a href="index_main.html#sqlrconCmd.tcl">file name</a> |
 <font color="#208020"># error the error message is available here.</font>
 <font color="#208020"># If there is no error then this method </font>
 <font color="#208020"># returns NULL.</font>
-<strong><a name="errorMessage_123">proc <a href="sqlrconCmd.tcl-annot.html#errorMessage">errorMessage</a></a></strong><a name="errorMessage"></a> {} 
+<strong><a name="errorMessage_131">proc <a href="sqlrconCmd.tcl-annot.html#errorMessage">errorMessage</a></a></strong><a name="errorMessage"></a> {} 
 
 
 
@@ -144,7 +152,7 @@ Index by:  <a href="index_main.html#sqlrconCmd.tcl">file name</a> |
 <font color="#208020"># error, the error number is available here.</font>
 <font color="#208020"># If there is no error then this method </font>
 <font color="#208020"># returns 0.</font>
-<strong><a name="errorNumber_131">proc <a href="sqlrconCmd.tcl-annot.html#errorNumber">errorNumber</a></a></strong><a name="errorNumber"></a> {}
+<strong><a name="errorNumber_139">proc <a href="sqlrconCmd.tcl-annot.html#errorNumber">errorNumber</a></a></strong><a name="errorNumber"></a> {}
 
 
 
@@ -153,14 +161,14 @@ Index by:  <a href="index_main.html#sqlrconCmd.tcl">file name</a> |
 <font color="#208020"># this is to start a query with &#34;-- debug\n&#34;.</font>
 <font color="#208020"># Another way is to set the environment variable</font>
 <font color="#208020"># SQLRDEBUG to &#34;ON&#34;</font>
-<strong><a name="debugOn_140">proc <a href="sqlrconCmd.tcl-annot.html#debugOn">debugOn</a></a></strong><a name="debugOn"></a> {} 
+<strong><a name="debugOn_148">proc <a href="sqlrconCmd.tcl-annot.html#debugOn">debugOn</a></a></strong><a name="debugOn"></a> {} 
 
 <font color="#208020"># Turns debugging off.</font>
-<strong><a name="debugOff_143">proc <a href="sqlrconCmd.tcl-annot.html#debugOff">debugOff</a></a></strong><a name="debugOff"></a> {} 
+<strong><a name="debugOff_151">proc <a href="sqlrconCmd.tcl-annot.html#debugOff">debugOff</a></a></strong><a name="debugOff"></a> {} 
 
 <font color="#208020"># Returns false if debugging is off and true</font>
 <font color="#208020"># if debugging is on.</font>
-<strong><a name="getDebug_147">proc <a href="sqlrconCmd.tcl-annot.html#getDebug">getDebug</a></a></strong><a name="getDebug"></a> {} 
+<strong><a name="getDebug_155">proc <a href="sqlrconCmd.tcl-annot.html#getDebug">getDebug</a></a></strong><a name="getDebug"></a> {} 
 </pre>
 <hr>
 <font size="-2">
@@ -168,7 +176,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2012-02-09 at 10:01.</cite>
+<cite>File generated 2012-06-02 at 03:11.</cite>
 </font>
 </body>
 </html>

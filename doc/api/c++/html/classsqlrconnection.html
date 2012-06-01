@@ -65,9 +65,11 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrconnection.html#a502ccc0a7e0de6740aa154fde38ed9df">getLastInsertId</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrconnection.html#a2f7b39fb42e88f1b69e9cf1f454e7056">autoCommitOn</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrconnection.html#a1054728d06dd3081601df019b6c24aac">autoCommitOff</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrconnection.html#acc988fd58dc10a073e01be3f6857db45">begin</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrconnection.html#a8110b0c203dfeb86be7726d1f9a1eefa">commit</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrconnection.html#afb90db2c0d228497dee3bbd790eec9a3">rollback</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrconnection.html#afbeaa25b96cf6f9e5570527de2d135f3">errorMessage</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrconnection.html#acf93af90adf6cd0b2ac21af6998783bc">errorNumber</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrconnection.html#a9d173d00277936dcb5e4bc74c399a452">debugOn</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrconnection.html#ad6a7e0a8e1dddb177adf7dae4c1d093e">debugOff</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrconnection.html#a5fcfd9aea315d9aaaff62f40c56a7b88">getDebug</a> ()</td></tr>
@@ -185,6 +187,23 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="acc988fd58dc10a073e01be3f6857db45"></a><!-- doxytag: member="sqlrconnection::begin" ref="acc988fd58dc10a073e01be3f6857db45" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool sqlrconnection::begin </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Begins a transaction. Returns true if the begin succeeded, false if it failed. If the database automatically begins a new transaction when a commit or rollback is issued then this doesn't do anything unless SQL Relay is faking transaction blocks. </p>
+
+</div>
+</div>
 <a class="anchor" id="af6834187692947c915c061ff0dbabb97"></a><!-- doxytag: member="sqlrconnection::bindFormat" ref="af6834187692947c915c061ff0dbabb97" args="()" -->
 <div class="memitem">
 <div class="memproto">
@@ -232,7 +251,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p>Issues a commit. Returns 1 if the commit succeeded, 0 if it failed. </p>
+<p>Commits a transaction. Returns true if the commit succeeded, false if it failed. </p>
 
 </div>
 </div>
@@ -336,6 +355,23 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 <p>If an operation failed and generated an error, the error message is available here. If there is no error then this method returns NULL. </p>
+
+</div>
+</div>
+<a class="anchor" id="acf93af90adf6cd0b2ac21af6998783bc"></a><!-- doxytag: member="sqlrconnection::errorNumber" ref="acf93af90adf6cd0b2ac21af6998783bc" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int64_t sqlrconnection::errorNumber </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>If an operation failed and generated an error, the error number is available here. If there is no error then this method returns 0. </p>
 
 </div>
 </div>
@@ -499,7 +535,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p>Issues a rollback. Returns 1 if the rollback succeeded, 0 if it failed. </p>
+<p>Rolls back a transaction. Returns true if the rollback succeeded, false if it failed. </p>
 
 </div>
 </div>
@@ -584,7 +620,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Jan 10 2012 for SQL Relay C++ API by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 2 2012 for SQL Relay C++ API by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

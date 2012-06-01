@@ -55,8 +55,8 @@
         <tr class="top-aligned-row">
             <td><strong>In:</strong></td>
             <td>
-                <a href="../files/sqlrelay_C.html">
-                sqlrelay.C
+                <a href="../files/sqlrelay_cpp.html">
+                sqlrelay.cpp
                 </a>
         <br />
             </td>
@@ -90,6 +90,7 @@
       <a href="#M000012">cacheOff</a>&nbsp;&nbsp;
       <a href="#M000009">cacheToFile</a>&nbsp;&nbsp;
       <a href="#M000022">clearBinds</a>&nbsp;&nbsp;
+      <a href="#M000085">closeResultSet</a>&nbsp;&nbsp;
       <a href="#M000048">colCount</a>&nbsp;&nbsp;
       <a href="#M000023">countBindVariables</a>&nbsp;&nbsp;
       <a href="#M000031">defineOutputBindBlob</a>&nbsp;&nbsp;
@@ -291,6 +292,25 @@ href="SQLRCursor.html#M000012">cacheOff</a>() turns off caching.
         <div class="method-description">
           <p>
 Clears all bind variables.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000085" class="method-detail">
+        <a name="M000085"></a>
+
+        <div class="method-heading">
+          <a href="SQLRCursor.src/M000085.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRCursor.src/M000085.html');return false;">
+          <span class="method-name">closeResultSet</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Closes the current result set, if one is open. Data that has been fetched
+already is still available but no more data may be fetched. Server side
+resources for the result set are freed as well.
 </p>
         </div>
       </div>

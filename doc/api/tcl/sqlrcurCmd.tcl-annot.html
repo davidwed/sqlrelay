@@ -28,6 +28,8 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets query caching on.</td></tr>
 <tr><td><code><a href="#clearBinds">clearBinds</a> {  }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Clears all bind</td></tr>
+<tr><td><code><a href="#closeResultSet">closeResultSet</a> {  }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Closes the current result set, if one is open.</td></tr>
 <tr><td><code><a href="#colCount">colCount</a> {  }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the number of columns in the current
  result</td></tr>
@@ -349,6 +351,17 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dl>
 <dd>Clears all bind variables.<dl>
 <dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#clearBinds_173">sqlrcurCmd.tcl, line 173</a>
+</dl></dl>
+
+<hr>
+<h3><a name="closeResultSet">closeResultSet</a></h3>
+<pre>proc closeResultSet {  }</pre>
+<dl>
+<dd>Closes the current result set, if one is open.  Data
+ that has been fetched already is still available but
+ no more data may be fetched.  Server side resources
+ for the result set are freed as well. */<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#closeResultSet_496">sqlrcurCmd.tcl, line 496</a>
 </dl></dl>
 
 <hr>
@@ -1262,7 +1275,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2012-02-09 at 10:01.</cite>
+<cite>File generated 2012-06-02 at 03:11.</cite>
 </font>
 </body>
 </html>

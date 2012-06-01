@@ -1703,6 +1703,16 @@ static PyObject *resumeCachedResultSet(PyObject *self, PyObject *args) {
   return Py_BuildValue("h", (short)rc);
 }
 
+static PyObject *closeResultSet(PyObject *self, PyObject *args) {
+  long sqlrcur;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcur))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  ((sqlrcursor *)sqlrcur)->closeResultSet();
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("h", 0);
+}
+
 static PyObject *outputBindCursorIdIsValid(PyObject *self, PyObject *args) {
   long sqlrcur;
   bool rc;
@@ -1861,6 +1871,7 @@ static PyMethodDef SQLRMethods[] = {
   {"suspendResultSet", suspendResultSet, METH_VARARGS},
   {"resumeResultSet", resumeResultSet, METH_VARARGS},
   {"resumeCachedResultSet", resumeCachedResultSet, METH_VARARGS},
+  {"closeResultSet", closeResultSet, METH_VARARGS},
   {"outputBindCursorIdIsValid", outputBindCursorIdIsValid, METH_VARARGS},
   {"getOutputBindCursorId", getOutputBindCursorId, METH_VARARGS},
   {"attachToBindCursor", attachToBindCursor, METH_VARARGS},

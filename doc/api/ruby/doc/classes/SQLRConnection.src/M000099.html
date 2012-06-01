@@ -5,13 +5,17 @@
 
 <html>
 <head>
-  <title>getCurrentDatabase (SQLRConnection)</title>
+  <title>selectDatabase (SQLRConnection)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre>/** Returns the database/schema that is currently in use. */
-static VALUE sqlrcon_getCurrentDatabase(VALUE self) {
+  <pre>/**
+ *  call-seq:
+ *  selectDatabase(database)
+ *
+ *  Sets the current database/schema to &quot;database&quot; */
+static VALUE sqlrcon_selectDatabase(VALUE self, VALUE db) {
 </pre>
 </body>
 </html>

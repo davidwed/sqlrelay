@@ -1915,6 +1915,19 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_resumecachedresultset) {
 	RETURN_LONG(0);
 }
 
+DLEXPORT ZEND_FUNCTION(sqlrcur_closeresultset) {
+	zval **sqlrcur;
+	if (ZEND_NUM_ARGS() != 1 || 
+		zend_get_parameters_ex(1,&sqlrcur) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	sqlrcursor *cursor=NULL;
+	ZEND_FETCH_RESOURCE(cursor,sqlrcursor *,sqlrcur,-1,"sqlrelay cursor",sqlrelay_cursor);
+	if (cursor) {
+		cursor->closeResultSet();
+	}
+}
+
 DLEXPORT ZEND_FUNCTION(sqlrcon_ping) {
 	zval **sqlrcon;
 	bool r;

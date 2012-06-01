@@ -423,6 +423,12 @@
             # using suspendSession() and continues caching
             # the result set to &quot;filename&quot;.
             # Returns true on success and false on failure.</pre>
+<pre>
+        closeResultSet();
+            # Closes the current result set, if one is open.  Data
+            # that has been fetched already is still available but
+            # no more data may be fetched.  Server side resources
+            # for the result set are freed as well.</pre>
 <p>
 </p>
 <hr />

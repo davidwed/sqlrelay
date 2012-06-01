@@ -1541,6 +1541,16 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_resumeCachedR
 	return retval;
 }
 
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    closeResultSet
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_closeResultSet
+  (JNIEnv *env, jobject self) {
+	getSqlrCursor(env,self)->closeResultSet();
+}
+
 #ifdef __cplusplus
 }
 #endif

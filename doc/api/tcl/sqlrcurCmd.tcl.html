@@ -504,6 +504,12 @@ Index by:  <a href="index_main.html#sqlrcurCmd.tcl">file name</a> |
 <font color="#208020"># the result set to &#34;filename&#34;.</font>
 <font color="#208020"># Returns true on success and false on failure.</font>
 <strong><a name="resumeCachedResultSet_490">proc <a href="sqlrcurCmd.tcl-annot.html#resumeCachedResultSet">resumeCachedResultSet</a></a></strong><a name="resumeCachedResultSet"></a> {id filename} 
+
+<font color="#208020"># Closes the current result set, if one is open.  Data</font>
+<font color="#208020"># that has been fetched already is still available but</font>
+<font color="#208020"># no more data may be fetched.  Server side resources</font>
+<font color="#208020"># for the result set are freed as well. */</font>
+<strong><a name="closeResultSet_496">proc <a href="sqlrcurCmd.tcl-annot.html#closeResultSet">closeResultSet</a></a></strong><a name="closeResultSet"></a> {}
 </pre>
 <hr>
 <font size="-2">
@@ -511,7 +517,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2012-02-09 at 10:01.</cite>
+<cite>File generated 2012-06-02 at 03:11.</cite>
 </font>
 </body>
 </html>

@@ -616,4 +616,11 @@ function sqlrcur_resumeResultSet($sqlrcurref, $id){}
  *  on failure. */
 function sqlrcur_resumeCachedResultSet($sqlrcurref, $id, $filename){}
 
+/**
+ *  Closes the current result set, if one is open.  Data
+ *  that has been fetched already is still available but
+ *  no more data may be fetched.  Server side resources
+ *  for the result set are freed as well. */
+function sqlrcur_closeResultSet($sqlrcurref){}
+
 ?>

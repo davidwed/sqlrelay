@@ -2469,6 +2469,15 @@ int main() {
 			}
 		}
 
+		if (strcmp("closeResultSet", command) == TRUE) {
+			// check number of arguments
+		    	if (arity != 0) return ERR_NUMBER_OF_ARGS;
+
+			// call function and encode result 
+			sqlrcur_closeResultSet(cur); 	
+			ENCODE_VOID;   
+		}
+
 
 
 		// write the result buffer back to the 

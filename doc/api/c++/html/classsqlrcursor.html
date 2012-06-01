@@ -78,6 +78,7 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#acf06451b48df06ef3f30e5a2931f0fc7">inputBind</a> (const char *variable, const char *value, uint32_t valuelength)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a5fe35a71c3f11b9a6f2505a5060e3447">inputBind</a> (const char *variable, int64_t value)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#ac8a0a9b4382955b0d39e6d2b33434a4c">inputBind</a> (const char *variable, double value, uint32_t precision, uint32_t scale)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#abd81584ad87456fb291a4163e937c0c5">inputBind</a> (const char *variable, int16_t year, int16_t month, int16_t day, int16_t hour, int16_t minute, int16_t second, const char *tz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a672d2c92314b991b53cddf052e32d748">inputBindBlob</a> (const char *variable, const char *value, uint32_t size)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a89e789eb0b9a1d5ab51926d3c028beee">inputBindClob</a> (const char *variable, const char *value, uint32_t size)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#aa9d7b7d76b169a432c9fd6d24c3ce7ca">inputBinds</a> (const char **variables, const char **values)</td></tr>
@@ -86,6 +87,7 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a555bb8e501748b270e51cede23742667">defineOutputBindString</a> (const char *variable, uint32_t bufferlength)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#abc2b0f3aee315286f31e01d84bbd7c8f">defineOutputBindInteger</a> (const char *variable)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a1a525ef8e951c52380145e55d5696680">defineOutputBindDouble</a> (const char *variable)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a3c56f242a44fc6436350d4983661ceb6">defineOutputBindDate</a> (const char *variable)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a391d581cbf1def6e200b5f9f0feb6e39">defineOutputBindBlob</a> (const char *variable)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a08a2618cbc2f961668b73b44953d1719">defineOutputBindClob</a> (const char *variable)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a4c407f62e3993ac009dd3f1969eecc0f">defineOutputBindCursor</a> (const char *variable)</td></tr>
@@ -98,6 +100,7 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a715541b2b5fb5b26a7f6d9f175708f3d">getOutputBindString</a> (const char *variable)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#af50cc897b815d474a2cd8dfb69ceeac8">getOutputBindInteger</a> (const char *variable)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a05d54c3841d06f7e4e68515c61d1f2ec">getOutputBindDouble</a> (const char *variable)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#afa4431563dad1469d51c51a02c2632b7">getOutputBindDate</a> (const char *variable, int16_t *year, int16_t *month, int16_t *day, int16_t *hour, int16_t *minute, int16_t *second, const char **tz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#ae5a6134c0b390ff3652a0dab275c2bb7">getOutputBindBlob</a> (const char *variable)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a78ffb95fe547da5582e0d208dcbf73d5">getOutputBindClob</a> (const char *variable)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#ad63727c1c955458fb542be80247cde63">getOutputBindLength</a> (const char *variable)</td></tr>
@@ -110,6 +113,7 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#afa70296a2d30b611af1392960cb5dc29">firstRowIndex</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a672194d9e3334ae47fa2e838b6165a6d">endOfResultSet</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a4bff221cc794e64b11320be8cadbf604">errorMessage</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#ac490a15383a64251dc35bfb9b6415bc4">errorNumber</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#aad04cb0a960be78744839d23f90675e8">getNullsAsEmptyStrings</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a867fad2f5ddda57107826eb2f3b3af5e">getNullsAsNulls</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a0a2e7a5cc24a23c27d6464f547d29119">getField</a> (uint64_t row, uint32_t col)</td></tr>
@@ -154,6 +158,7 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#aaa8557fa3c5c1c60b25611a2fdaab842">getResultSetId</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#ae0eb42bf5bdb25dde2caea470e377be6">resumeResultSet</a> (uint16_t id)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a8caed1e86cc7f6ecb808cdbad353ac6f">resumeCachedResultSet</a> (uint16_t id, const char *filename)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#abbc19f47f7eaedf1e28017955be8b2f8">closeResultSet</a> ()</td></tr>
 </table>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="aeb56e72530729c116ba1af1de14a0c09"></a><!-- doxytag: member="sqlrcursor::sqlrcursor" ref="aeb56e72530729c116ba1af1de14a0c09" args="(sqlrconnection *sqlrc)" -->
@@ -263,6 +268,23 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="abbc19f47f7eaedf1e28017955be8b2f8"></a><!-- doxytag: member="sqlrcursor::closeResultSet" ref="abbc19f47f7eaedf1e28017955be8b2f8" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void sqlrcursor::closeResultSet </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Closes the current result set, if one is open. Data that has been fetched already is still available but no more data may be fetched. Server side resources for the result set are freed as well. </p>
+
+</div>
+</div>
 <a class="anchor" id="a7d5bcfbdb69f610ee777ce68e0a7d82a"></a><!-- doxytag: member="sqlrcursor::colCount" ref="a7d5bcfbdb69f610ee777ce68e0a7d82a" args="()" -->
 <div class="memitem">
 <div class="memproto">
@@ -348,6 +370,24 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 <p>Defines a cursor output bind variable. </p>
+
+</div>
+</div>
+<a class="anchor" id="a3c56f242a44fc6436350d4983661ceb6"></a><!-- doxytag: member="sqlrcursor::defineOutputBindDate" ref="a3c56f242a44fc6436350d4983661ceb6" args="(const char *variable)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void sqlrcursor::defineOutputBindDate </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>variable</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Defines a date output bind variable. </p>
 
 </div>
 </div>
@@ -463,6 +503,23 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 <p>If a query failed and generated an error, the error message is available here. If the query succeeded then this method returns NULL. </p>
+
+</div>
+</div>
+<a class="anchor" id="ac490a15383a64251dc35bfb9b6415bc4"></a><!-- doxytag: member="sqlrcursor::errorNumber" ref="ac490a15383a64251dc35bfb9b6415bc4" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int64_t sqlrcursor::errorNumber </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>If a query failed and generated an error, the error number is available here. If there is no error then this method returns 0. </p>
 
 </div>
 </div>
@@ -587,14 +644,14 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aa1675f5eb034865b6d3e7676f457341a"></a><!-- doxytag: member="sqlrcursor::getColumnIsBinary" ref="aa1675f5eb034865b6d3e7676f457341a" args="(const char *col)" -->
+<a class="anchor" id="a9182dcdd19d2a4268121effa146f1109"></a><!-- doxytag: member="sqlrcursor::getColumnIsBinary" ref="a9182dcdd19d2a4268121effa146f1109" args="(uint32_t col)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool sqlrcursor::getColumnIsBinary </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype">uint32_t&#160;</td>
           <td class="paramname"><em>col</em></td><td>)</td>
           <td></td>
         </tr>
@@ -605,14 +662,14 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a9182dcdd19d2a4268121effa146f1109"></a><!-- doxytag: member="sqlrcursor::getColumnIsBinary" ref="a9182dcdd19d2a4268121effa146f1109" args="(uint32_t col)" -->
+<a class="anchor" id="aa1675f5eb034865b6d3e7676f457341a"></a><!-- doxytag: member="sqlrcursor::getColumnIsBinary" ref="aa1675f5eb034865b6d3e7676f457341a" args="(const char *col)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool sqlrcursor::getColumnIsBinary </td>
           <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>col</em></td><td>)</td>
           <td></td>
         </tr>
@@ -659,14 +716,14 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ad93d34f16fc0ff00a18bfeb24d5c7a5c"></a><!-- doxytag: member="sqlrcursor::getColumnIsPartOfKey" ref="ad93d34f16fc0ff00a18bfeb24d5c7a5c" args="(uint32_t col)" -->
+<a class="anchor" id="a62de604531cedf850be794fe3596648e"></a><!-- doxytag: member="sqlrcursor::getColumnIsPartOfKey" ref="a62de604531cedf850be794fe3596648e" args="(const char *col)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool sqlrcursor::getColumnIsPartOfKey </td>
           <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>col</em></td><td>)</td>
           <td></td>
         </tr>
@@ -677,14 +734,14 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a62de604531cedf850be794fe3596648e"></a><!-- doxytag: member="sqlrcursor::getColumnIsPartOfKey" ref="a62de604531cedf850be794fe3596648e" args="(const char *col)" -->
+<a class="anchor" id="ad93d34f16fc0ff00a18bfeb24d5c7a5c"></a><!-- doxytag: member="sqlrcursor::getColumnIsPartOfKey" ref="ad93d34f16fc0ff00a18bfeb24d5c7a5c" args="(uint32_t col)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool sqlrcursor::getColumnIsPartOfKey </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype">uint32_t&#160;</td>
           <td class="paramname"><em>col</em></td><td>)</td>
           <td></td>
         </tr>
@@ -731,14 +788,14 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ae4ee21d173b6e0d47366a80f0e5f64a3"></a><!-- doxytag: member="sqlrcursor::getColumnIsUnique" ref="ae4ee21d173b6e0d47366a80f0e5f64a3" args="(uint32_t col)" -->
+<a class="anchor" id="a6b4c40d8abf9bd12b637810e9dcdea8a"></a><!-- doxytag: member="sqlrcursor::getColumnIsUnique" ref="a6b4c40d8abf9bd12b637810e9dcdea8a" args="(const char *col)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool sqlrcursor::getColumnIsUnique </td>
           <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>col</em></td><td>)</td>
           <td></td>
         </tr>
@@ -749,14 +806,14 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a6b4c40d8abf9bd12b637810e9dcdea8a"></a><!-- doxytag: member="sqlrcursor::getColumnIsUnique" ref="a6b4c40d8abf9bd12b637810e9dcdea8a" args="(const char *col)" -->
+<a class="anchor" id="ae4ee21d173b6e0d47366a80f0e5f64a3"></a><!-- doxytag: member="sqlrcursor::getColumnIsUnique" ref="ae4ee21d173b6e0d47366a80f0e5f64a3" args="(uint32_t col)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool sqlrcursor::getColumnIsUnique </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype">uint32_t&#160;</td>
           <td class="paramname"><em>col</em></td><td>)</td>
           <td></td>
         </tr>
@@ -803,14 +860,14 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a84cf24dbe361e7451d5a6bd0716e546a"></a><!-- doxytag: member="sqlrcursor::getColumnIsZeroFilled" ref="a84cf24dbe361e7451d5a6bd0716e546a" args="(const char *col)" -->
+<a class="anchor" id="ab5cdacf1dd60b3c002064708e1d569a5"></a><!-- doxytag: member="sqlrcursor::getColumnIsZeroFilled" ref="ab5cdacf1dd60b3c002064708e1d569a5" args="(uint32_t col)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool sqlrcursor::getColumnIsZeroFilled </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype">uint32_t&#160;</td>
           <td class="paramname"><em>col</em></td><td>)</td>
           <td></td>
         </tr>
@@ -821,14 +878,14 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ab5cdacf1dd60b3c002064708e1d569a5"></a><!-- doxytag: member="sqlrcursor::getColumnIsZeroFilled" ref="ab5cdacf1dd60b3c002064708e1d569a5" args="(uint32_t col)" -->
+<a class="anchor" id="a84cf24dbe361e7451d5a6bd0716e546a"></a><!-- doxytag: member="sqlrcursor::getColumnIsZeroFilled" ref="a84cf24dbe361e7451d5a6bd0716e546a" args="(const char *col)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool sqlrcursor::getColumnIsZeroFilled </td>
           <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>col</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1232,34 +1289,6 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a5a734e39d05f04c69399556d88ddd7cd"></a><!-- doxytag: member="sqlrcursor::getFieldLength" ref="a5a734e39d05f04c69399556d88ddd7cd" args="(uint64_t row, const char *col)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32_t sqlrcursor::getFieldLength </td>
-          <td>(</td>
-          <td class="paramtype">uint64_t&#160;</td>
-          <td class="paramname"><em>row</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>col</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Returns the length of the specified field. </p>
-
-</div>
-</div>
 <a class="anchor" id="aeeb88ffeda3f395220b31f9f71900534"></a><!-- doxytag: member="sqlrcursor::getFieldLength" ref="aeeb88ffeda3f395220b31f9f71900534" args="(uint64_t row, uint32_t col)" -->
 <div class="memitem">
 <div class="memproto">
@@ -1274,6 +1303,34 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>col</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Returns the length of the specified field. </p>
+
+</div>
+</div>
+<a class="anchor" id="a5a734e39d05f04c69399556d88ddd7cd"></a><!-- doxytag: member="sqlrcursor::getFieldLength" ref="a5a734e39d05f04c69399556d88ddd7cd" args="(uint64_t row, const char *col)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t sqlrcursor::getFieldLength </td>
+          <td>(</td>
+          <td class="paramtype">uint64_t&#160;</td>
+          <td class="paramname"><em>row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>col</em>&#160;</td>
         </tr>
         <tr>
@@ -1409,6 +1466,70 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 <p>Get the cursor associated with a previously defined output bind variable. </p>
+
+</div>
+</div>
+<a class="anchor" id="afa4431563dad1469d51c51a02c2632b7"></a><!-- doxytag: member="sqlrcursor::getOutputBindDate" ref="afa4431563dad1469d51c51a02c2632b7" args="(const char *variable, int16_t *year, int16_t *month, int16_t *day, int16_t *hour, int16_t *minute, int16_t *second, const char **tz)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool sqlrcursor::getOutputBindDate </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>variable</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int16_t *&#160;</td>
+          <td class="paramname"><em>year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int16_t *&#160;</td>
+          <td class="paramname"><em>month</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int16_t *&#160;</td>
+          <td class="paramname"><em>day</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int16_t *&#160;</td>
+          <td class="paramname"><em>hour</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int16_t *&#160;</td>
+          <td class="paramname"><em>minute</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int16_t *&#160;</td>
+          <td class="paramname"><em>second</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char **&#160;</td>
+          <td class="paramname"><em>tz</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get the value stored in a previously defined date output bind variable. </p>
 
 </div>
 </div>
@@ -1572,7 +1693,7 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a0c4c6b1a6508b64f3c644016f7b1a2b6"></a><!-- doxytag: member="sqlrcursor::inputBind" ref="a0c4c6b1a6508b64f3c644016f7b1a2b6" args="(const char *variable, const char *value)" -->
+<a class="anchor" id="ac8a0a9b4382955b0d39e6d2b33434a4c"></a><!-- doxytag: member="sqlrcursor::inputBind" ref="ac8a0a9b4382955b0d39e6d2b33434a4c" args="(const char *variable, double value, uint32_t precision, uint32_t scale)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1585,8 +1706,20 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>precision</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>scale</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1596,7 +1729,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p>Defines a string input bind variable. </p>
+<p>Defines a decimal input bind variable. (If you don't have the precision and scale then set them both 0. However in that case you may get unexpected rounding behavior if the server is faking binds.) </p>
 
 </div>
 </div>
@@ -1662,7 +1795,7 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ac8a0a9b4382955b0d39e6d2b33434a4c"></a><!-- doxytag: member="sqlrcursor::inputBind" ref="ac8a0a9b4382955b0d39e6d2b33434a4c" args="(const char *variable, double value, uint32_t precision, uint32_t scale)" -->
+<a class="anchor" id="a0c4c6b1a6508b64f3c644016f7b1a2b6"></a><!-- doxytag: member="sqlrcursor::inputBind" ref="a0c4c6b1a6508b64f3c644016f7b1a2b6" args="(const char *variable, const char *value)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1675,20 +1808,8 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>value</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>precision</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>scale</em>&#160;</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1698,7 +1819,71 @@ Public Member Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p>Defines a decimal input bind variable. (If you don't have the precision and scale then set them both 0. However in that case you may get unexpected rounding behavior if the server is faking binds.) </p>
+<p>Defines a string input bind variable. </p>
+
+</div>
+</div>
+<a class="anchor" id="abd81584ad87456fb291a4163e937c0c5"></a><!-- doxytag: member="sqlrcursor::inputBind" ref="abd81584ad87456fb291a4163e937c0c5" args="(const char *variable, int16_t year, int16_t month, int16_t day, int16_t hour, int16_t minute, int16_t second, const char *tz)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void sqlrcursor::inputBind </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>variable</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int16_t&#160;</td>
+          <td class="paramname"><em>year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int16_t&#160;</td>
+          <td class="paramname"><em>month</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int16_t&#160;</td>
+          <td class="paramname"><em>day</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int16_t&#160;</td>
+          <td class="paramname"><em>hour</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int16_t&#160;</td>
+          <td class="paramname"><em>minute</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int16_t&#160;</td>
+          <td class="paramname"><em>second</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>tz</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Defines a date input bind variable. "day" should be 1-31 and "month" should be 1-12. "tz" may be left NULL. Most databases ignore "tz". </p>
 
 </div>
 </div>
@@ -1770,6 +1955,62 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ae694bbefd12f178dcdb9161ef02db08d"></a><!-- doxytag: member="sqlrcursor::inputBinds" ref="ae694bbefd12f178dcdb9161ef02db08d" args="(const char **variables, const int64_t *values)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void sqlrcursor::inputBinds </td>
+          <td>(</td>
+          <td class="paramtype">const char **&#160;</td>
+          <td class="paramname"><em>variables</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int64_t *&#160;</td>
+          <td class="paramname"><em>values</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Defines an array of integer input bind variables. </p>
+
+</div>
+</div>
+<a class="anchor" id="aa9d7b7d76b169a432c9fd6d24c3ce7ca"></a><!-- doxytag: member="sqlrcursor::inputBinds" ref="aa9d7b7d76b169a432c9fd6d24c3ce7ca" args="(const char **variables, const char **values)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void sqlrcursor::inputBinds </td>
+          <td>(</td>
+          <td class="paramtype">const char **&#160;</td>
+          <td class="paramname"><em>variables</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char **&#160;</td>
+          <td class="paramname"><em>values</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Defines an array of string input bind variables. </p>
+
+</div>
+</div>
 <a class="anchor" id="ae2d3dd5967fd30c93531ba5ee483ed9d"></a><!-- doxytag: member="sqlrcursor::inputBinds" ref="ae2d3dd5967fd30c93531ba5ee483ed9d" args="(const char **variables, const double *values, const uint32_t *precisions, const uint32_t *scales)" -->
 <div class="memitem">
 <div class="memproto">
@@ -1807,62 +2048,6 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 <p>Defines an array of decimal input bind variables. </p>
-
-</div>
-</div>
-<a class="anchor" id="aa9d7b7d76b169a432c9fd6d24c3ce7ca"></a><!-- doxytag: member="sqlrcursor::inputBinds" ref="aa9d7b7d76b169a432c9fd6d24c3ce7ca" args="(const char **variables, const char **values)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void sqlrcursor::inputBinds </td>
-          <td>(</td>
-          <td class="paramtype">const char **&#160;</td>
-          <td class="paramname"><em>variables</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char **&#160;</td>
-          <td class="paramname"><em>values</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Defines an array of string input bind variables. </p>
-
-</div>
-</div>
-<a class="anchor" id="ae694bbefd12f178dcdb9161ef02db08d"></a><!-- doxytag: member="sqlrcursor::inputBinds" ref="ae694bbefd12f178dcdb9161ef02db08d" args="(const char **variables, const int64_t *values)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void sqlrcursor::inputBinds </td>
-          <td>(</td>
-          <td class="paramtype">const char **&#160;</td>
-          <td class="paramname"><em>variables</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const int64_t *&#160;</td>
-          <td class="paramname"><em>values</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Defines an array of integer input bind variables. </p>
 
 </div>
 </div>
@@ -1946,24 +2131,6 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ad197c0f702a47a12a63ec56b60712c83"></a><!-- doxytag: member="sqlrcursor::prepareQuery" ref="ad197c0f702a47a12a63ec56b60712c83" args="(const char *query)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void sqlrcursor::prepareQuery </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>query</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Prepare to execute "query". </p>
-
-</div>
-</div>
 <a class="anchor" id="aa74438335dabd96a4ceb2470a2d85667"></a><!-- doxytag: member="sqlrcursor::prepareQuery" ref="aa74438335dabd96a4ceb2470a2d85667" args="(const char *query, uint32_t length)" -->
 <div class="memitem">
 <div class="memproto">
@@ -1989,6 +2156,24 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 <p>Prepare to execute "query" with length "length". This method must be used if the query contains binary data. </p>
+
+</div>
+</div>
+<a class="anchor" id="ad197c0f702a47a12a63ec56b60712c83"></a><!-- doxytag: member="sqlrcursor::prepareQuery" ref="ad197c0f702a47a12a63ec56b60712c83" args="(const char *query)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void sqlrcursor::prepareQuery </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>query</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Prepare to execute "query". </p>
 
 </div>
 </div>
@@ -2165,34 +2350,6 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a9b5ec0e7db88f273468b7f1f2f8116e8"></a><!-- doxytag: member="sqlrcursor::substitution" ref="a9b5ec0e7db88f273468b7f1f2f8116e8" args="(const char *variable, int64_t value)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void sqlrcursor::substitution </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>variable</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int64_t&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Defines an integer substitution variable. </p>
-
-</div>
-</div>
 <a class="anchor" id="a8c7a07bca2bbc7db09730f8e6f123666"></a><!-- doxytag: member="sqlrcursor::substitution" ref="a8c7a07bca2bbc7db09730f8e6f123666" args="(const char *variable, double value, uint32_t precision, uint32_t scale)" -->
 <div class="memitem">
 <div class="memproto">
@@ -2230,6 +2387,34 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 <p>Defines a decimal substitution variable. </p>
+
+</div>
+</div>
+<a class="anchor" id="a9b5ec0e7db88f273468b7f1f2f8116e8"></a><!-- doxytag: member="sqlrcursor::substitution" ref="a9b5ec0e7db88f273468b7f1f2f8116e8" args="(const char *variable, int64_t value)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void sqlrcursor::substitution </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>variable</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int64_t&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Defines an integer substitution variable. </p>
 
 </div>
 </div>
@@ -2289,34 +2474,6 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="af0afeaf7f97a46c5de1c2caba55b8822"></a><!-- doxytag: member="sqlrcursor::substitutions" ref="af0afeaf7f97a46c5de1c2caba55b8822" args="(const char **variables, const char **values)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void sqlrcursor::substitutions </td>
-          <td>(</td>
-          <td class="paramtype">const char **&#160;</td>
-          <td class="paramname"><em>variables</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char **&#160;</td>
-          <td class="paramname"><em>values</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Defines an array of string substitution variables. </p>
-
-</div>
-</div>
 <a class="anchor" id="a4a8fe83e3be1bc19c0fe4b3ab3ca2460"></a><!-- doxytag: member="sqlrcursor::substitutions" ref="a4a8fe83e3be1bc19c0fe4b3ab3ca2460" args="(const char **variables, const double *values, const uint32_t *precisions, const uint32_t *scales)" -->
 <div class="memitem">
 <div class="memproto">
@@ -2354,6 +2511,34 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 <p>Defines an array of decimal substitution variables. </p>
+
+</div>
+</div>
+<a class="anchor" id="af0afeaf7f97a46c5de1c2caba55b8822"></a><!-- doxytag: member="sqlrcursor::substitutions" ref="af0afeaf7f97a46c5de1c2caba55b8822" args="(const char **variables, const char **values)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void sqlrcursor::substitutions </td>
+          <td>(</td>
+          <td class="paramtype">const char **&#160;</td>
+          <td class="paramname"><em>variables</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char **&#160;</td>
+          <td class="paramname"><em>values</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Defines an array of string substitution variables. </p>
 
 </div>
 </div>
@@ -2444,7 +2629,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Tue Jan 10 2012 for SQL Relay C++ API by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 2 2012 for SQL Relay C++ API by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
