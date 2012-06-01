@@ -188,7 +188,36 @@ namespace SQLRClient
 
         public IDataReader ExecuteReader(CommandBehavior commandbehavior)
         {
-            return (runQuery()) ? new SQLRelayDataReader(_sqlrelaycon, _sqlrcur, commandbehavior == CommandBehavior.CloseConnection) : null;
+
+            // run the query...
+            if (!runQuery())
+            {
+                return null;
+            }
+
+            // if there were output bind cursors then create a data reader and attach them as multiple result sets
+            SQLRelayDataReader retval = null;
+            foreach (SQLRelayParameter param in Parameters)
+            {
+                if (param.Direction == ParameterDirection.Output && param.SQLRelayType == SQLRelayType.Cursor)
+                {
+                    if (retval == null)
+                    {
+                        retval = new SQLRelayDataReader(_sqlrelaycon, ((SQLRelayDataReader)param.Value).Cursor, commandbehavior == CommandBehavior.CloseConnection);
+                    }
+                    else
+                    {
+                        retval.appendCursor(((SQLRelayDataReader)param.Value).Cursor);
+                    }
+                }
+            }
+            if (retval != null)
+            {
+                return retval;
+            }
+
+            // otherwise just return a data reader that uses the current cursor
+            return new SQLRelayDataReader(_sqlrelaycon, _sqlrcur, commandbehavior == CommandBehavior.CloseConnection);
         }
 
         public Object ExecuteScalar()

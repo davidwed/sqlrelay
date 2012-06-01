@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Globalization;
+using System.Collections.Generic;
 
 namespace SQLRClient
 {
@@ -17,10 +18,11 @@ namespace SQLRClient
         private UInt64 _currentrow = 0;
         private Boolean[] _havevalues = null;
         private Object[] _values = null;
+        private Queue<SQLRCursor> _sqlrcurlist = new Queue<SQLRCursor>();
 
         #endregion
 
-
+      
         #region constructors and destructors
 
         internal SQLRelayDataReader(SQLRelayConnection sqlrelaycon, SQLRCursor sqlrcur, Boolean endsession)
@@ -90,6 +92,14 @@ namespace SQLRClient
             }
         }
 
+        internal SQLRCursor Cursor
+        {
+            get
+            {
+                return _sqlrcur;
+            }
+        }
+
         #endregion
 
 
@@ -103,8 +113,31 @@ namespace SQLRClient
 
         public Boolean NextResult()
         {
-            // SQL Relay doesn't support multiple result sets
-            return false;
+
+            // If a query returns multiple output bind cursors then
+            // they will be queued up in the _sqlrcurlist.  Try to
+            // dequeue one.  If it fails then there are no more
+            // results.
+            SQLRCursor sqlrcur = null;
+            try
+            {
+                sqlrcur = _sqlrcurlist.Dequeue();
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+            // If there was another result set then close the current
+            // one, switch cursors and reset the various flags.
+            Close();
+            _sqlrcur = sqlrcur;
+            _open = true;
+            _unfetched = true;
+            _currentrow = 0;
+            _havevalues = null;
+            _values = null;
+            return true;
         }
 
         public Boolean Read()
@@ -1888,6 +1921,11 @@ namespace SQLRClient
             {
                 throw new IndexOutOfRangeException();
             }
+        }
+
+        internal void appendCursor(SQLRCursor sqlrcursor)
+        {
+            _sqlrcurlist.Enqueue(sqlrcursor);
         }
 
         #endregion
