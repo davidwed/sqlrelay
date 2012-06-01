@@ -4,19 +4,18 @@
 # See the file COPYING for more information.
 
 from SQLRelay import PySQLRDB
+from SQLRelay import CSQLRelay
 import sys
 import string
 
 
 def main():
 
-	PySQLRClient.getNumericFieldsAsNumbers()
+	CSQLRelay.getNumericFieldsAsNumbers()
 
 	# instantiation
 	print "INSTANTIATION"
-	con=PySQLRClient.sqlrconnection("localhost",9000,
-						"/tmp/test.socket",
-						"test","test")
+	con=PySQLRDB.connect("localhost",9000,"/tmp/test.socket","test","test",0,1)
 	cur=con.cursor()
 	print
 	print

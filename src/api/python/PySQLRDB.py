@@ -115,7 +115,7 @@ class SQLRCursor:
                                 scale=precision-len(str(int(parameters.keys())))-1
                         CSQLRelay.inputBind(self.cursor,i,parameters[i],precision,scale)
         CSQLRelay.executeQuery(self.cursor)
-        the_error=CSQLRelay.errorMessage(self.cursor)
+        the_error=CSQLRelay.cursorErrorMessage(self.cursor)
         if the_error:
             raise DatabaseError, '<pre>%s</pre>' % the_error
         self.__set_description()
@@ -141,7 +141,7 @@ class SQLRCursor:
                                                 scale=precision-len(str(int(p.keys())))-1
                                         CSQLRelay.inputBind(self.cursor,i,p[i],precision,scale)
                         CSQLRelay.executeQuery(self.cursor)
-                        the_error=CSQLRelay.errorMessage(self.cursor)
+                        the_error=CSQLRelay.cursorErrorMessage(self.cursor)
                         if the_error:
                                 raise DatabaseError, '<pre>%s</pre>' % the_error
                         self.__set_description()
