@@ -221,6 +221,34 @@ public class SQLRCursor : IDisposable
         sqlrcur_subDouble(sqlrcurref, variable, val, precision, scale);
     }
 
+    /** Defines an array of String substitution variable. */
+    public void substitutions(String[] variables, String[] vals)
+    {
+        for (Int32 i = 0; i < variables.Length; i++)
+        {
+            sqlrcur_subString(sqlrcurref, variables[i], vals[i]);
+        }
+    }
+
+    /** Defines an array of integer substitution variable. */
+    public void substitution(String[] variables, Int64[] vals)
+    {
+        for (Int32 i = 0; i < variables.Length; i++)
+        {
+            sqlrcur_subLong(sqlrcurref, variables[i], vals[i]);
+        }
+    }
+
+    /** Defines an array of decimal substitution variable. */
+    public void substitution(String[] variables, Double[] vals, UInt32[] precisions, UInt32[] scales)
+    {
+        for (Int32 i = 0; i < variables.Length; i++)
+        {
+            sqlrcur_subDouble(sqlrcurref, variables[i], vals[i], precisions[i], scales[i]);
+        }
+    }
+
+
 
     /** Defines a String input bind variable. */
     public void inputBind(String variable, String val)
@@ -248,6 +276,37 @@ public class SQLRCursor : IDisposable
     public void inputBind(String variable, Double val, UInt32 precision, UInt32 scale)
     {
         sqlrcur_inputBindDouble(sqlrcurref, variable, val, precision, scale);
+    }
+
+    /** Defines an array of String input bind variables. */
+    public void inputBind(String[] variables, String[] vals)
+    {
+        for (UInt32 i = 0; i < variables.Length; i++)
+        {
+            sqlrcur_inputBindString(sqlrcurref, variables[i], vals[i]);
+        }
+    }
+
+    /** Defines an array of integer input bind variables. */
+    public void inputBind(String[] variables, Int64[] vals)
+    {
+        for (UInt32 i = 0; i < variables.Length; i++)
+        {
+            sqlrcur_inputBindLong(sqlrcurref, variables[i], vals[i]);
+        }
+    }
+
+    /** Defines an array of decimal input bind variables.
+     * (If you don't have the precision and scale then set
+     * them both to 0.  However in that case you may get
+     * unexpected rounding behavior if the server is faking
+     * binds.) */
+    public void inputBinds(String[] variables, Double[] vals, UInt32[] precisions, UInt32[] scales)
+    {
+        for (UInt32 i = 0; i < variables.Length; i++)
+        {
+            sqlrcur_inputBindDouble(sqlrcurref, variables[i], vals[i], precisions[i], scales[i]);
+        }
     }
 
     /**  Defines a date input bind variable.  "day" should be
@@ -628,7 +687,31 @@ public class SQLRCursor : IDisposable
         return sqlrcur_getFieldLengthByName(sqlrcurref, row, col);
     }
 
+    /** Returns an array of the values of the fields in the
+     *  specified row. */
+    public String[] getRow(UInt64 row)
+    {
+        UInt32 colcount = sqlrcur_colCount(sqlrcurref);
+        String[] retval = new String[colcount];
+        for (UInt32 i = 0; i < colcount; i++)
+        {
+            retval[i] = getField(row, i);
+        }
+        return retval;
+    }
 
+    /** Returns an array of the lengths of the fields in the
+     *  specified row. */
+    public UInt32[] getRowLengths(UInt64 row)
+    {
+        UInt32 colcount = sqlrcur_colCount(sqlrcurref);
+        UInt32[] retval = new UInt32[colcount];
+        for (UInt32 i = 0; i < colcount; i++)
+        {
+            retval[i] = getFieldLength(row, i);
+        }
+        return retval;
+    }
 
     /** Returns the name of the specified column. */
     public String getColumnName(UInt32 col)
