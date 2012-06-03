@@ -8,6 +8,7 @@
 <span class="heading1">Programming with SQL Relay using the PHP Pear DB API</span><br><br>
 
 <ul>
+<li><a href="#config">PHP Configuration</a></li>
 <li><a href="#session">Establishing a Sessions</a></li>
 <li><a href="#query">Executing Queries</a></li>
 <li><a href="#commit">Commits and Rollbacks</a></li>
@@ -21,6 +22,21 @@
 <li><a href="#storedprocedures">Stored Procedures</a></li>
 <li><a href="#lastinsertid">Getting the Last Insert ID in SQLite</a></li>
 </ul>
+
+<a name="config"></a>
+<span class="heading2">PHP Configuration</span><br><br>
+
+<p>The PHP Pear DB framework has been long deprecated and hasn't been maintained in a while.  The PHP Pear DB driver can be used with older versions of PHP, but starting with PHP 5.4, it will not work without a special configuration change.</p>
+
+<p>PHP Pear DB uses the PEAR::loadExtension() method which in turn calls the DL() function.  DL() isn't supported in PHP 5.4 or higher, which causes PEAR::loadExtension() to fail and the driver to complain about not being able to load the SQL Relay extension.</p>
+
+<p>To work around this, you must pre-load the extension by adding the following line to /etc/php.ini (or wherever php.ini file is for your PHP installation):</p>
+
+<blockquote>
+<b>extension=sql_relay.so</b>
+</blockquote>
+
+<p>This can safely be done for any version of PHP but is required for versions equal to or greater than 5.4.</p>
 
 <a name="session"></a>
 <span class="heading2">Establishing a Session</span><br><br>
