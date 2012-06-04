@@ -3,9 +3,10 @@
 # Copyright (c) 2001  David Muse
 # See the file COPYING for more information.
 
+require 'rubygems'
 require 'dbi'
 
-for index in 0..ARGV[1].to_i-1 do
+#for index in 0..ARGV[1].to_i-1 do
 
 
 	# instantiation
@@ -14,8 +15,8 @@ for index in 0..ARGV[1].to_i-1 do
 
 
 	# debug and autocommit attributes
-	db["sqlrelay_debug"]=true
-	db["AutoCommit"]=true
+	db["sqlrelay_debug"]=false
+	#db["AutoCommit"]=true
 
 
 	# query functions
@@ -41,6 +42,7 @@ for index in 0..ARGV[1].to_i-1 do
 
 
 	print "FETCH MANY\n"
+	stmt.execute()
 	for i in stmt.fetch_many(5) do
 		for j in i do
 			print j+" "
@@ -51,16 +53,17 @@ for index in 0..ARGV[1].to_i-1 do
 
 
 	print "FETCH SCROLL\n"
+	stmt.execute()
 	print "NEXT\n"
 	for j in stmt.fetch_scroll(DBI::SQL_FETCH_NEXT) do
 		print j+" "
 	end
 	print "\n"
-	print "PRIOR\n"
-	for j in stmt.fetch_scroll(DBI::SQL_FETCH_PRIOR) do
-		print j+" "
-	end
-	print "\n"
+	#print "PRIOR\n"
+	#for j in stmt.fetch_scroll(DBI::SQL_FETCH_PRIOR) do
+		#print j+" "
+	#end
+	#print "\n"
 	print "FIRST\n"
 	for j in stmt.fetch_scroll(DBI::SQL_FETCH_FIRST) do
 		print j+" "
@@ -76,10 +79,10 @@ for index in 0..ARGV[1].to_i-1 do
 		print j+" "
 	end
 	print "\n"
-	print "RELATIVE 5\n"
-	for j in stmt.fetch_scroll(DBI::SQL_FETCH_RELATIVE,5) do
-		print j+" "
-	end
+	#print "RELATIVE 5\n"
+	#for j in stmt.fetch_scroll(DBI::SQL_FETCH_RELATIVE,5) do
+		#print j+" "
+	#end
 	print "\n\n"
 
 
@@ -183,4 +186,4 @@ for index in 0..ARGV[1].to_i-1 do
 
 
 	GC::start()
-end
+#end
