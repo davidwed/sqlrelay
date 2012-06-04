@@ -1,6 +1,6 @@
 # 
 # DBD::SQLRelay
-# $Id: SQLRelay.rb,v 1.3 2012-01-05 23:35:01 mused Exp $
+# $Id: SQLRelay.rb,v 1.4 2012-06-04 02:19:44 mused Exp $
 # 
 # Version : 0.1
 # Author  : Michael Neumann (neumann@s-direktnet.de)
@@ -31,14 +31,21 @@ module SQLRelay
 
 
 VERSION          = "0.1"
-USED_DBD_VERSION = "0.1"
+USED_DBD_VERSION = "0.4.5"
 
+def self.driver_name
+	return "SQLRelay"
+end
 
 class Driver < DBI::BaseDriver
 
 
   def initialize
     super(USED_DBD_VERSION)
+  end
+
+  def driver_name
+    return "SQLRelay"
   end
 
 
