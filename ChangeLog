@@ -4,6 +4,7 @@
 	added begin method to API's
 	added sqlrelay.xsd
 	added date binds
+	applied Georgiy Kirichenko's missing flushWriteBuffer() patch
 
 0.45 - added trigger framework
 	added support for getting the native database error number
