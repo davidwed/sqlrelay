@@ -1558,6 +1558,7 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 			sock->write((uint64_t)0);
 			sock->write((uint16_t)70);
 			sock->write("The listener failed to hand the client off to the database connection.");
+			flushWriteBuffer(sock);
 			retval=false;
 			break;
 		}
@@ -1588,6 +1589,7 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 				sock->write((uint64_t)0);
 				sock->write((uint16_t)70);
 				sock->write("The listener failed to hand the client off to the database connection.");
+				flushWriteBuffer(sock);
 				retval=false;
 				break;*/
 				continue;
