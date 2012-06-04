@@ -5,6 +5,8 @@
 	added sqlrelay.xsd
 	added date binds
 	applied Georgiy Kirichenko's missing flushWriteBuffer() patch
+	fixed some subtle bugs in the Ruby DBI module that modern versions of
+		Ruby DBI reveal
 
 0.45 - added trigger framework
 	added support for getting the native database error number

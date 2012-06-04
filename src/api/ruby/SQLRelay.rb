@@ -1,6 +1,6 @@
 # 
 # DBD::SQLRelay
-# $Id: SQLRelay.rb,v 1.4 2012-06-04 02:19:44 mused Exp $
+# $Id: SQLRelay.rb,v 1.5 2012-06-04 02:52:53 mused Exp $
 # 
 # Version : 0.1
 # Author  : Michael Neumann (neumann@s-direktnet.de)
@@ -178,7 +178,7 @@ class Statement < DBI::BaseStatement
 
     @db = handle 
     @handle = SQLRCursor.new(@db)
-    @handle.setResultSetBufferSize(100)
+    #@handle.setResultSetBufferSize(100)
     @handle.prepareQuery(stmt)
   end
 
