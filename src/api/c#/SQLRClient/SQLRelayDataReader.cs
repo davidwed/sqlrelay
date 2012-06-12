@@ -1035,6 +1035,10 @@ namespace SQLRClient
 
         public static Object convertField(Byte[] field, String type, UInt32 precision, UInt32 scale)
         {
+            if (field == null)
+            {
+                return null;
+            }
 
             // convert the field to a native type...
 
