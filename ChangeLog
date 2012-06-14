@@ -10,6 +10,8 @@
 	fixed sql parser errors involving "not null" and union clauses
 	added a translation to replace double-quoted string literals with
 		single-quoted string literals
+	fixed a sql parser bug where "group" of a group by clause could be
+		misinterpreted as a table alias
 
 0.45 - added trigger framework
 	added support for getting the native database error number
