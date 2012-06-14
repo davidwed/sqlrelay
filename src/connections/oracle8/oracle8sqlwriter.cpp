@@ -84,7 +84,9 @@ bool oracle8sqlwriter::selectQuery(xmldomnode *node, stringbuffer *output) {
 	if (!charstring::compare(node->getParent()->getName(),
 						sqlparser::_table) &&
 		charstring::compare(node->getPreviousSibling()->getName(),
-							sqlparser::_as)) {
+							sqlparser::_as) &&
+		charstring::compare(node->getPreviousSibling()->getName(),
+							sqlparser::_union)) {
 		if (!as(node,output)) {
 			return false;
 		}
