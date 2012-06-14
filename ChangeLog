@@ -7,6 +7,8 @@
 	applied Georgiy Kirichenko's missing flushWriteBuffer() patch
 	fixed some subtle bugs in the Ruby DBI module that modern versions of
 		Ruby DBI reveal
+	added a translation to replace double-quoted string literals with
+		single-quoted string literals
 
 0.45 - added trigger framework
 	added support for getting the native database error number

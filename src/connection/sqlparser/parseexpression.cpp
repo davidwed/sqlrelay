@@ -70,10 +70,22 @@ bool sqlparser::parseUnaryOperator(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
-	return (parseDistinct(currentnode,ptr,newptr) ||
+	return (parseNot(currentnode,ptr,newptr) ||
+		parseDistinct(currentnode,ptr,newptr) ||
 		parseCompliment(currentnode,ptr,newptr) ||
 		parseInverse(currentnode,ptr,newptr) ||
 		parseNegative(currentnode,ptr,newptr));
+}
+
+bool sqlparser::parseNot(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!notClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_not);
+	return true;
 }
 
 bool sqlparser::parseCompliment(xmldomnode *currentnode,

@@ -506,6 +506,9 @@ class sqlparser {
 		bool	uniqueClause(const char *ptr,
 						const char **newptr);
 		static const char	*_unique;
+		bool	parseNot(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
 		bool	parseDistinct(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);

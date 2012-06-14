@@ -10,6 +10,7 @@
 #include <sqltranslations/locksnowaitbydefault.h>
 #include <sqltranslations/oracletemptablespreserverowsbydefault.h>
 #include <sqltranslations/temptablesaddmissingcolumns.h>
+#include <sqltranslations/doublequotestosinglequotes.h>
 #include <debugprint.h>
 
 #include <rudiments/process.h>
@@ -108,6 +109,8 @@ sqltranslation *sqltranslations::loadTranslation(xmldomnode *translation) {
 			"oracletemptablespreserverowsbydefault")) {
 		return new oracletemptablespreserverowsbydefault(
 							this,translation);
+	} else if (!charstring::compare(file,"doublequotestosinglequotes")) {
+		return new doublequotestosinglequotes(this,translation);
 	}
 	return NULL;
 }
