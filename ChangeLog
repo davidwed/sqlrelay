@@ -7,6 +7,7 @@
 	applied Georgiy Kirichenko's missing flushWriteBuffer() patch
 	fixed some subtle bugs in the Ruby DBI module that modern versions of
 		Ruby DBI reveal
+	fixed sql parser errors involving "not null" and union clauses
 	added a translation to replace double-quoted string literals with
 		single-quoted string literals
 
