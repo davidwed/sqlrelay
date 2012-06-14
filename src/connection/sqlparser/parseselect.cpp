@@ -197,9 +197,14 @@ bool sqlparser::parseAlias(xmldomnode *currentnode,
 	if (!charstring::length(word) ||
 		!charstring::compareIgnoringCase(word,",") ||
 		!charstring::compareIgnoringCase(word,")") ||
+		// from clause
 		!charstring::compareIgnoringCase(word,sqlparser::_from) ||
+		// for clause
 		!charstring::compareIgnoringCase(word,"for") ||
+		// order by clause
 		!charstring::compareIgnoringCase(word,"order") ||
+		// grop by clause
+		!charstring::compareIgnoringCase(word,"group") ||
 		(subselect &&
 		// where clause
 		(!charstring::compareIgnoringCase(word,sqlparser::_where) ||
