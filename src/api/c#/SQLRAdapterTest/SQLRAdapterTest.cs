@@ -585,8 +585,7 @@ namespace SQLRClientTest
 
             // output bind by name
             Console.WriteLine("OUTPUT BINDS BY NAME:");
-            //sqlrcom.CommandText = "begin  :numvar:=1;  :stringvar:='hello';  :floatvar:=2.5;  :datevar:='03-FEB-2001'; end;";
-            sqlrcom.CommandText = "begin  :numvar:=1;  :stringvar:='hello';  :floatvar:=2.5;  end;";
+            sqlrcom.CommandText = "begin  :numvar:=1;  :stringvar:='hello';  :floatvar:=2.5;  :datevar:='03-FEB-2001'; end;";
             SQLRelayParameter numvar = new SQLRelayParameter();
             numvar.ParameterName = "numvar";
             numvar.Direction = ParameterDirection.Output;
@@ -603,24 +602,24 @@ namespace SQLRClientTest
             floatvar.Direction = ParameterDirection.Output;
             floatvar.DbType = DbType.Double;
             sqlrcom.Parameters.Add(floatvar);
-            /*SQLRelayParameter datevar = new SQLRelayParameter();
+            SQLRelayParameter datevar = new SQLRelayParameter();
             datevar.ParameterName = "datevar";
             datevar.Direction = ParameterDirection.Output;
             datevar.DbType = DbType.DateTime;
-            sqlrcom.Parameters.Add(datevar);*/
+            sqlrcom.Parameters.Add(datevar);
             checkSuccess(ExecuteNonQuery(sqlrcom), 1);
             checkSuccess(Convert.ToInt64(numvar.Value), 1);
             checkSuccess(Convert.ToString(stringvar.Value), "hello");
             checkSuccess(Convert.ToInt64(stringvar.Size), 5);
             checkSuccess(Convert.ToString(floatvar.Value), "2.5");
-            /*checkSuccess(Convert.ToInt64(Convert.ToDateTime(datevar.Value).Year), 2001);
+            checkSuccess(Convert.ToInt64(Convert.ToDateTime(datevar.Value).Year), 2001);
             checkSuccess(Convert.ToInt64(Convert.ToDateTime(datevar.Value).Month), 2);
-            checkSuccess(Convert.ToInt64(Convert.ToDateTime(datevar.Value).Day), 3);*/
+            checkSuccess(Convert.ToInt64(Convert.ToDateTime(datevar.Value).Day), 3);
             sqlrcom.Parameters.Clear();
             Console.WriteLine("\n");
 
             // output bind by position
-            /*Console.WriteLine("OUTPUT BINDS BY POSITION:");
+            Console.WriteLine("OUTPUT BINDS BY POSITION:");
             sqlrcom.CommandText = "begin  :numvar:=1;  :stringvar:='hello';  :floatvar:=2.5;  :datevar:='03-FEB-2001'; end;";
             numvar = new SQLRelayParameter();
             numvar.ParameterName = "1";
@@ -652,7 +651,7 @@ namespace SQLRClientTest
             checkSuccess(Convert.ToInt64(Convert.ToDateTime(datevar.Value).Month), 2);
             checkSuccess(Convert.ToInt64(Convert.ToDateTime(datevar.Value).Day), 3);
             sqlrcom.Parameters.Clear();
-            Console.WriteLine("\n");*/
+            Console.WriteLine("\n");
 
 
 
