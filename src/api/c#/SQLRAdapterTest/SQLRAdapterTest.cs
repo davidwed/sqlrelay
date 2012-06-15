@@ -584,7 +584,7 @@ namespace SQLRClientTest
             Console.WriteLine("\n");
 
             // output bind by name
-            Console.WriteLine("OUTPUT BINDS BY NAME:");
+            /*Console.WriteLine("OUTPUT BINDS BY NAME:");
             sqlrcom.CommandText = "begin  :numvar:=1;  :stringvar:='hello';  :floatvar:=2.5;  :datevar:='03-FEB-2001'; end;";
             SQLRelayParameter numvar = new SQLRelayParameter();
             numvar.ParameterName = "numvar";
@@ -651,7 +651,7 @@ namespace SQLRClientTest
             checkSuccess(Convert.ToInt64(Convert.ToDateTime(datevar.Value).Month), 2);
             checkSuccess(Convert.ToInt64(Convert.ToDateTime(datevar.Value).Day), 3);
             sqlrcom.Parameters.Clear();
-            Console.WriteLine("\n");
+            Console.WriteLine("\n");*/
 
 
 
