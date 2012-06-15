@@ -554,7 +554,7 @@ public class SQLRCursor : IDisposable
      *  here.  If the query succeeded then this function returns a NULL. */
     public String errorMessage()
     {
-        return sqlrcur_errorMessage(sqlrcurref);
+        return Marshal.PtrToStringAnsi(sqlrcur_errorMessage(sqlrcurref));
     }
 
     /** If a query failed and generated an error, the error number is available
@@ -1124,7 +1124,7 @@ public class SQLRCursor : IDisposable
     private static extern Int32 sqlrcur_endOfResultSet(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern String sqlrcur_errorMessage(IntPtr sqlrcurref);
+    private static extern IntPtr sqlrcur_errorMessage(IntPtr sqlrcurref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern Int64 sqlrcur_errorNumber(IntPtr sqlrcurref);

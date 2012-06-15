@@ -1,6 +1,8 @@
 ﻿using System;
 using SQLRClient;
 using System.Data;
+using System.IO;
+using System.Drawing;
 
 namespace SQLRClientTest
 {
@@ -135,6 +137,7 @@ namespace SQLRClientTest
             // open connection and command
             SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;RetryTime=0;Tries=1;Debug=false");
             sqlrcon.Open();
+
 
             // execute scalar
             SQLRelayCommand sqlrcom = (SQLRelayCommand)sqlrcon.CreateCommand();
