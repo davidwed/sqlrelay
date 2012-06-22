@@ -17,11 +17,12 @@ class temptableslocalize : public sqltranslation {
 					xmldom *querytree);
 	private:
 		void		mapCreateTemporaryTableName(
-							xmldomnode *query,
-							const char *uniqueid);
+						sqlrconnection_svr *sqlrcon,
+						xmldomnode *query,
+						const char *uniqueid);
 		void		mapCreateIndexOnTemporaryTableName(
-							xmldomnode *query,
-							const char *uniqueid);
+						xmldomnode *query,
+						const char *uniqueid);
 		const char	*generateTempTableName(const char *oldname,
 							const char *uniqueid);
 		bool		replaceTempNames(xmldomnode *node);

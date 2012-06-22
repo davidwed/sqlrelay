@@ -24,7 +24,7 @@ bool temptableslocalize::run(sqlrconnection_svr *sqlrcon,
 
 	// for "create temporary table" queries, find the table name,
 	// come up with a session-local name for it and put it in the map...
-	mapCreateTemporaryTableName(querytree->getRootNode(),uniqueid);
+	mapCreateTemporaryTableName(sqlrcon,querytree->getRootNode(),uniqueid);
 
 	// for "create index" queries that refer to temporary tables, find the
 	// index name, come up with a session-local name for it and put it in
@@ -36,7 +36,9 @@ bool temptableslocalize::run(sqlrconnection_svr *sqlrcon,
 	return replaceTempNames(querytree->getRootNode());
 }
 
-void temptableslocalize::mapCreateTemporaryTableName(xmldomnode *node,
+void temptableslocalize::mapCreateTemporaryTableName(
+						sqlrconnection_svr *sqlrcon,
+						xmldomnode *node,
 						const char *uniqueid) {
 
 	// create...
@@ -44,18 +46,21 @@ void temptableslocalize::mapCreateTemporaryTableName(xmldomnode *node,
 	if (node->isNullNode()) {
 		return;
 	}
+	xmldomnode	*createnode=node;
 
 	// temporary...
 	node=node->getFirstTagChild(sqlparser::_temporary);
 	if (node->isNullNode()) {
 		return;
 	}
+	xmldomnode	*temporarynode=node;
 
 	// table...
 	node=node->getNextTagSibling(sqlparser::_table);
 	if (node->isNullNode()) {
 		return;
 	}
+	xmldomnode	*tablenode=node;
 
 	// table name...
 	node=node->getFirstTagChild(sqlparser::_table_name);
@@ -74,6 +79,19 @@ void temptableslocalize::mapCreateTemporaryTableName(xmldomnode *node,
 			generateTempTableName(oldtablename,uniqueid);
 	sqlts->temptablemap.setData((char *)oldtablenamecopy,
 					(char *)newtablename);
+
+	// remove the temporary qualifier
+	createnode->deleteChild(temporarynode);
+
+	// truncate on commit qualifiers
+	xmldomnode	*oncommitnode=
+			tablenode->getFirstTagChild(sqlparser::_on_commit);
+	if (!oncommitnode->isNullNode()) {
+		tablenode->deleteChild(oncommitnode);
+	}
+
+	// add table name to drop-at-session-end list
+	sqlrcon->addSessionTempTableForDrop(newtablename);
 }
 
 const char *temptableslocalize::generateTempTableName(const char *oldname,

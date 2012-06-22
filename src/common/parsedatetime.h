@@ -71,7 +71,7 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 
 		if (charstring::contains(parts[i],':')) {
 
-			// the section with :'s is probably the date...
+			// the section with :'s is probably the time...
 
 			// split on :
 			char		**timeparts;
@@ -230,6 +230,92 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 				} else {
 
 					// it could be yyyy-xx-xx or xx-xx-yyyy
+					if (charstring::length(
+							dateparts[0])==4) {
+						*year=charstring::toInteger(
+								dateparts[0]);
+						if (ddmm) {
+							*day=
+							charstring::toInteger(
+								dateparts[1]);
+							*month=
+							charstring::toInteger(
+								dateparts[2]);
+						} else {
+							*month=
+							charstring::toInteger(
+								dateparts[1]);
+							*day=
+							charstring::toInteger(
+								dateparts[2]);
+						}
+					} else {
+						if (ddmm) {
+							*day=
+							charstring::toInteger(
+								dateparts[0]);
+							*month=
+							charstring::toInteger(
+								dateparts[1]);
+						} else {
+							*month=
+							charstring::toInteger(
+								dateparts[0]);
+							*day=
+							charstring::toInteger(
+								dateparts[1]);
+						}
+						*year=charstring::toInteger(
+								dateparts[2]);
+					}
+				}
+			}
+
+			// clean up
+			for (uint64_t i=0; i<datepartcount; i++) {
+				delete[] dateparts[i];
+			}
+			delete[] dateparts;
+
+		} else if (charstring::contains(parts[i],'.')) {
+
+			// the section with .'s is the date...
+
+			// split on .
+			char		**dateparts;
+			uint64_t	datepartcount;
+			charstring::split(parts[i],".",1,true,
+						&dateparts,&datepartcount);
+
+			// there must be three parts, 0 and 2 must be numbers
+			if (datepartcount==3 &&
+				charstring::isNumber(dateparts[0]) &&
+				charstring::isNumber(dateparts[2])) {
+
+				// some dates have a non-numeric month in part 2
+				if (!charstring::isNumber(dateparts[1])) {
+
+					*day=charstring::toInteger(
+								dateparts[0]);
+					for (int i=0; shortmonths[i]; i++) {
+						if (!charstring::
+							compareIgnoringCase(
+								dateparts[1],
+								shortmonths[i]) 
+							||
+							!charstring::
+							compareIgnoringCase(
+								dateparts[1],
+								longmonths[i]))
+						{
+							*month=i+1;
+						}
+					}
+					*year=charstring::toInteger(
+								dateparts[2]);
+				} else {
+
+					// it could be yyyy.xx.xx or xx.xx.yyyy
 					if (charstring::length(
 							dateparts[0])==4) {
 						*year=charstring::toInteger(
