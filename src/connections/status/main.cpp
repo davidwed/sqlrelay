@@ -9,19 +9,25 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+void printAcquisitionStatus(int32_t sem) {
+	printf("%s (%d)\n",(sem)?"acquired    ":"not acquired",sem);
+}
+
+void printTriggeredStatus(int32_t sem) {
+	printf("%s (%d)\n",(sem)?"triggered    ":"not triggered",sem);
+}
+
 int main(int argc, const char **argv) {
 
 	#include <version.h>
 
-	statusconnection	*conn=new statusconnection();
-	
-	sqlrstatistics      *statistics;
+	statusconnection	conn;
 
 	// open the connection
 	// this will fail, just ignore it for now
-	conn->init(argc,argv);
+	conn.init(argc,argv);
 	
-	statistics=conn->getStatistics();
+	sqlrstatistics      *statistics=conn.getStatistics();
 
 	printf( 
 		"  Open   Server Connections:  %d\n" 
@@ -59,28 +65,56 @@ int main(int argc, const char **argv) {
 		"  Connections:                %d\n"
 		"  Sessions:                   %d\n"
 		"\n",
-		conn->getConnectionCount(),
-		conn->getSessionCount()
+		conn.getConnectionCount(),
+		conn.getSessionCount()
 		);
 
 	#define SEM_COUNT	11
-	int	sem[SEM_COUNT];
-	for (int i=0; i<SEM_COUNT; i++) {
-		sem[i]=conn->getSemset()->getValue(i);
+	int32_t	sem[SEM_COUNT];
+	for (uint16_t i=0; i<SEM_COUNT; i++) {
+		sem[i]=conn.getSemset()->getValue(i);
 	}
 
-	printf(
-		"Semaphores:\n"
+	printf("Mutexes:\n");
+	printf("  Connection Announce               : ");
+	printAcquisitionStatus(sem[0]);
+	printf("  Shared Memory Access              : ");
+	printAcquisitionStatus(sem[1]);
+	printf("  Connection Count                  : ");
+	printAcquisitionStatus(sem[4]);
+	printf("  Session Count                     : ");
+	printAcquisitionStatus(sem[5]);
+	printf("  Open Connections/Forked Listeners : ");
+	printAcquisitionStatus(sem[9]);
+	printf("\n");
+
+	printf("Triggers:\n");
+	printf("  Accept Available Connection (l-w, c-s)         : ");
+	printTriggeredStatus(sem[2]);
+	printf("  Done Accepting Available Connection (c-w, l-s) : ");
+	printTriggeredStatus(sem[3]);
+	printf("  Evaluate Connection Count (s-w, l-s)           : ");
+	printTriggeredStatus(sem[6]);
+	printf("  Done Evaluating Connection Count (l-w, s-s)    : ");
+	printTriggeredStatus(sem[7]);
+	printf("  Connection Has Started (s-w, c-s)              : ");
+	printTriggeredStatus(sem[8]);
+	printf("\n");
+
+	printf("Counts:\n");
+	printf("  Busy Listener Count : %d\n",sem[10]);
+
+	printf("\n");
+
+	printf("Raw Semaphores:\n"
 		"  +---------------------------------------------+\n"
 		"  | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |  10 |\n"
 		"  +---+---+---+---+---+---+---+---+---+---+-----+\n"
 		"  | %d | %d | %d | %d | %d | %d | %d | %d | %d | %d | %3d |\n"
-		"  +---------------------------------------------+\n"
-		"\n",
+		"  +---------------------------------------------+\n",
 		sem[0],sem[1],sem[2],sem[3],sem[4],sem[5],sem[6],sem[7],sem[8],sem[9],sem[10]
 		);
 
 
-	delete conn;
 	process::exit(0);
 }

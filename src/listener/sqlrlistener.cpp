@@ -1465,7 +1465,6 @@ int32_t sqlrlistener::getMySQLAuth(filedescriptor *clientsock) {
 	// get client authentication packet...
 	uint16_t	clientflags1;
 	clientsock->read(&clientflags1);
-printf("got: %d\n",clientflags1);
 	
 
 	// send ok/error packet...
@@ -1663,17 +1662,16 @@ bool sqlrlistener::releaseShmAccess() {
 	return true;
 }
 
-// wait for an available connection
-bool sqlrlistener::waitForConnection() {
+bool sqlrlistener::acceptAvailableConnection() {
 
-	dbgfile.debugPrint("listener",0,"waiting for an available connection");
+	dbgfile.debugPrint("listener",0,"accepting an available connection");
 
 	if (alarmrang || !semset->wait(2) ) {
 		if (alarmrang) {
 			dbgfile.debugPrint("listener",0,"timeout occured");
 		}
 		dbgfile.debugPrint("listener",0,
-				"failed to wait for an available connection");
+				"failed to accept an available connection");
 		return false;
 	} else {
 
@@ -1687,25 +1685,23 @@ bool sqlrlistener::waitForConnection() {
 		semset->setValue(2,0);
 
 		dbgfile.debugPrint("listener",0,
-				"done waiting for an available connection");
+				"done accepting an available connection");
 	}
 
 	return true;
 }
 
-// tell the connection that we've gotten it's data
-bool sqlrlistener::signalConnectionWeHaveRead() {
+bool sqlrlistener::availableConnectionAccepted() {
 
 	dbgfile.debugPrint("listener",0,
-			"signalling connection that we've read");
+		"signalling available connection that we've accepted it");
 	if (!semset->signal(3)) {
 		dbgfile.debugPrint("listener",0,
-				"failed to signal connection that we've read");
+		"failed to signal available connection that we've accepted it");
 		return false;
 	}
 	dbgfile.debugPrint("listener",0,
-			"done signalling connection that we've read");
-
+		"done signalling available connection that we've accepted it");
 	return true;
 }
 
@@ -1740,7 +1736,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			// breaks so that release shm mutex will get called
 			// at the end
 
-			ok=waitForConnection();
+			ok=acceptAvailableConnection();
 
 			// turn off the alarm
 			signalmanager::alarm(0);
@@ -1792,9 +1788,9 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					delete[] debugstring;
 				}
 
-				// If we done waiting for connection we have
-				// to signal we've read
-				ok=signalConnectionWeHaveRead();
+				// Signal the connection that we've read its
+				// data
+				ok=availableConnectionAccepted();
 			}
 
 			// If we got access than we have to release it anyway

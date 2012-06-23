@@ -433,6 +433,13 @@ bool scaler::openMoreConnections() {
 	semset->signal(7);
 
 	// do we need to open more connections?
+	// FIXME: There's an issue here... If there is only one connection
+	// open, with a short ttl and a client is done with it, and it's ready
+	// to die off, but another client has connected before it decrements
+	// the connection count, then it will appear to the scaler that there
+	// is an available connection and it won't start another one.  The
+	// scaler has no way of knowing that the connection is about to die off
+	// and isn't really available.
 	if ((sessions-currentconnections)<=maxqueuelength) {
 		return true;
 	}
