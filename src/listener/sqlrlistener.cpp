@@ -698,7 +698,7 @@ void sqlrlistener::listen() {
 			snooze::macrosnooze(1);
 		} else {
 			dbgfile.debugPrint("listener",0,
-				"done waiting for server connections");
+				"finished waiting for server connections");
 			break;
 		}
 	}
@@ -867,7 +867,8 @@ filedescriptor *sqlrlistener::waitForData() {
 	filedescriptor	*fd=NULL;
 	listener::getReadyList()->getDataByIndex(0,&fd);
 
-	dbgfile.debugPrint("listener",0,"done waiting for client connection");
+	dbgfile.debugPrint("listener",0,
+			"finished waiting for client connection");
 
 	return fd;
 }
@@ -875,23 +876,19 @@ filedescriptor *sqlrlistener::waitForData() {
 // increment the number of "busy listeners"
 void sqlrlistener::incBusyListeners() {
 	dbgfile.debugPrint("listener",0,"incrementing busy listeners");
-
 	if (!semset->signal(10)) {
 		// FIXME: bail somehow
 	}
-
-	dbgfile.debugPrint("listener",0,"done incrementing busy listeners");
+	dbgfile.debugPrint("listener",0,"finished incrementing busy listeners");
 }
 
 // decrement the number of "busy listeners"
 void sqlrlistener::decBusyListeners() {
 	dbgfile.debugPrint("listener",0,"decrementing busy listeners");
-
 	if (!semset->wait(10)) {
 		// FIXME: bail somehow
 	}
-
-	dbgfile.debugPrint("listener",0,"done decrementing busy listeners");
+	dbgfile.debugPrint("listener",0,"finished decrementing busy listeners");
 }
 
 // get number of "busy listeners"
@@ -1051,7 +1048,7 @@ bool sqlrlistener::registerHandoff(filedescriptor *sock) {
 		handoffsocklist=newhandoffsocklist;
 	}
 
-	dbgfile.debugPrint("listener",0,"done registering handoff...");
+	dbgfile.debugPrint("listener",0,"finished registering handoff...");
 	return true;
 }
 
@@ -1080,7 +1077,7 @@ bool sqlrlistener::deRegisterHandoff(filedescriptor *sock) {
 	// clean up
 	delete sock;
 
-	dbgfile.debugPrint("listener",0,"done de-registering handoff...");
+	dbgfile.debugPrint("listener",0,"finished de-registering handoff...");
 	return true;
 }
 
@@ -1119,7 +1116,7 @@ bool sqlrlistener::fixup(filedescriptor *sock) {
 	delete sock;
 
 	dbgfile.debugPrint("listener",0,
-			"done passing socket of newly spawned connection");
+			"finished passing socket of newly spawned connection");
 
 	return retval;
 }
@@ -1268,7 +1265,6 @@ void sqlrlistener::sqlrelayClientSession(filedescriptor *clientsock) {
 		if (dynamicscaling) {
 			incrementSessionCount();
 		}
-
 		passstatus=handOffClient(clientsock);
 
 		// If the handoff failed, decrement the session count.
@@ -1383,7 +1379,7 @@ int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 		return (retval)?1:0;
 	}
 
-	dbgfile.debugPrint("listener",0,"done getting authentication");
+	dbgfile.debugPrint("listener",0,"finished getting authentication");
 
 	return 1;
 }
@@ -1473,17 +1469,12 @@ int32_t sqlrlistener::getMySQLAuth(filedescriptor *clientsock) {
 }
 
 void sqlrlistener::acquireSessionCountMutex() {
-	// wait for access
-	dbgfile.debugPrint("listener",1,"waiting for exclusive access...");
 	if (!semset->waitWithUndo(5)) {
 		// FIXME: bail somehow
 	}
-	dbgfile.debugPrint("listener",1,"done waiting for exclusive access...");
 }
 
 void sqlrlistener::releaseSessionCountMutex() {
-
-	// signal that others may have access
 	if (!semset->signalWithUndo(5)) {
 		// FIXME: bail somehow
 	}
@@ -1501,42 +1492,54 @@ void sqlrlistener::incrementSessionCount() {
 
 	dbgfile.debugPrint("listener",1,ptr->connectionsinuse);
 
-	if (dynamicscaling) {
+	// If the system supports timed semaphore ops then the scaler can be
+	// jogged into running on-demand, and we can do that here.  If the 
+	// sytem does not support timed semaphore ops then the scaler will
+	// just loop periodically on its own and we shouldn't attempt to
+	// jog it.
+	if (semset->supportsTimedSemaphoreOperations()) {
 
-		// signal the scaler
+		// signal the scaler to evaluate the connection count
+		// and start more connections if necessary
+		dbgfile.debugPrint("listener",1,"signalling the scaler...");
 		if (!semset->signal(6)) {
 			// FIXME: bail somehow
 		}
+		dbgfile.debugPrint("listener",1,
+					"finished signalling the scaler...");
 
 		// wait for the scaler
 		dbgfile.debugPrint("listener",1,"waiting for the scaler...");
-
 		if (!semset->wait(7)) {
 			// FIXME: bail somehow
 		}
-
-		dbgfile.debugPrint("listener",1,"done waiting for the scaler...");
+		dbgfile.debugPrint("listener",1,
+					"finished waiting for the scaler...");
 	}
 
 	releaseSessionCountMutex();
 
-	dbgfile.debugPrint("listener",0,"done incrementing session count");
+	dbgfile.debugPrint("listener",0,"finished incrementing session count");
 }
 
 void sqlrlistener::decrementSessionCount() {
+
 	dbgfile.debugPrint("listener",0,"decrementing session count...");
  
 	acquireSessionCountMutex();
 
-	// increment the counter
+	// decrement the counter
 	shmdata	*ptr=(shmdata *)idmemory->getPointer();
-	if (--ptr->connectionsinuse<0) {
+	ptr->connectionsinuse--;
+	if (ptr->connectionsinuse<0) {
 		ptr->connectionsinuse=0;
 	}
 
+	dbgfile.debugPrint("listener",1,ptr->connectionsinuse);
+
 	releaseSessionCountMutex();
 
-	dbgfile.debugPrint("listener",0,"done decrementing session count");
+	dbgfile.debugPrint("listener",0,"finished decrementing session count");
 }
 
 bool sqlrlistener::handOffClient(filedescriptor *sock) {
@@ -1642,7 +1645,7 @@ bool sqlrlistener::acquireShmAccess() {
 		return false;
 	}
 	dbgfile.debugPrint("listener",0,
-			"done acquiring exclusive shm access");
+			"finished acquiring exclusive shm access");
 
 	return true;
 }
@@ -1657,7 +1660,7 @@ bool sqlrlistener::releaseShmAccess() {
 		return false;
 	}
 	dbgfile.debugPrint("listener",0,
-			"done releasing exclusive shm access");
+			"finished releasing exclusive shm access");
 
 	return true;
 }
@@ -1665,7 +1668,6 @@ bool sqlrlistener::releaseShmAccess() {
 bool sqlrlistener::acceptAvailableConnection() {
 
 	dbgfile.debugPrint("listener",0,"accepting an available connection");
-
 	if (alarmrang || !semset->wait(2) ) {
 		if (alarmrang) {
 			dbgfile.debugPrint("listener",0,"timeout occured");
@@ -1685,23 +1687,23 @@ bool sqlrlistener::acceptAvailableConnection() {
 		semset->setValue(2,0);
 
 		dbgfile.debugPrint("listener",0,
-				"done accepting an available connection");
+				"succeeded accepting an available connection");
 	}
 
 	return true;
 }
 
-bool sqlrlistener::availableConnectionAccepted() {
+bool sqlrlistener::doneAcceptingAvailableConnection() {
 
 	dbgfile.debugPrint("listener",0,
-		"signalling available connection that we've accepted it");
+		"finished accepting available connection");
 	if (!semset->signal(3)) {
 		dbgfile.debugPrint("listener",0,
-		"failed to signal available connection that we've accepted it");
+		"failed to finish accepting available connection");
 		return false;
 	}
 	dbgfile.debugPrint("listener",0,
-		"done signalling available connection that we've accepted it");
+		"succeeded finishing accepting available connection");
 	return true;
 }
 
@@ -1788,9 +1790,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					delete[] debugstring;
 				}
 
-				// Signal the connection that we've read its
-				// data
-				ok=availableConnectionAccepted();
+				ok=doneAcceptingAvailableConnection();
 			}
 
 			// If we got access than we have to release it anyway
@@ -1808,7 +1808,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			// connection
 			if (connectionIsUp(ptr->connectionid)) {
 				dbgfile.debugPrint("listener",1,
-						"done getting a connection");
+					"finished getting a connection");
 				break;
 			} else {
 				dbgfile.debugPrint("listener",1,
@@ -1935,7 +1935,7 @@ bool sqlrlistener::passClientFileDescriptorToConnection(
 	bool	retval=connectionsock->passFileDescriptor(fd);
 	if (retval) {
 
-		dbgfile.debugPrint("listener",0,"done passing descriptor");
+		dbgfile.debugPrint("listener",0,"finished passing descriptor");
 
 	} else {
 

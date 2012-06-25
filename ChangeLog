@@ -12,6 +12,9 @@
 		single-quoted string literals
 	fixed a sql parser bug where "group" of a group by clause could be
 		misinterpreted as a table alias
+	updated the scaler to poll 10 times per second and also accept a
+		trigger from the listener to mitigate race conditions that
+		can become problematic when connections="0" is used
 
 0.45 - added trigger framework
 	added support for getting the native database error number

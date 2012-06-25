@@ -86,7 +86,7 @@ class sqlrlistener : public daemonprocess, public listener {
 		bool	acquireShmAccess();
 		bool	releaseShmAccess();
 		bool	acceptAvailableConnection();
-		bool	availableConnectionAccepted();
+		bool	doneAcceptingAvailableConnection();
 		bool	isAlarmRang();
 		bool	handOffClient(filedescriptor *sock);
 		bool	getAConnection(uint32_t *connectionpid,

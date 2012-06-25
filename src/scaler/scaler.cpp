@@ -397,14 +397,12 @@ pid_t scaler::openOneConnection() {
 
 bool scaler::openMoreConnections() {
 
-	for (;;) {
-
-		// Wait for a new listener to fire up and increment the
-		// listener count.  If we can, use a 5 second timeout, so that
-		// we can reap children periodically.
-		bool	waitresult=semset->supportsTimedSemaphoreOperations()?
-							semset->wait(6,5,0):
-							semset->wait(6);
+	// Wait 1/10th of a second.  If the os supports timed semaphore
+	// operations then wait on a semaphore too so the listener can
+	// cause this to run on-demand.
+	bool	waitresult=false;
+	if (semset->supportsTimedSemaphoreOperations()) {
+		waitresult=semset->wait(6,0,100);
 
 		// If the wait returned false for some other reason than a
 		// timeout, then an error has occurred and the semaphore can't
@@ -413,92 +411,84 @@ bool scaler::openMoreConnections() {
 		if (!waitresult && error::getErrorNumber()!=EAGAIN) {
 			return false;
 		}
-
-		// reap children here, no matter what
-		reapChildren(-1);
-		
-		// if the wait succeeded, break out of the loop
-		if (waitresult) {
-			break;
-		}
-
-		// otherwise loop back and wait again...
+	} else {
+		snooze::microsnooze(0,100000);
 	}
 
+	// reap children here, no matter what
+	reapChildren(-1);
+		
 	// get session and connection counts
 	int	sessions=countSessions();
 	int32_t	currentconnections=countConnections();
 
-	// signal listener to keep going
-	semset->signal(7);
+	// if we were signalled by the listener, signal
+	// the listener back so that it can keep going
+	if (waitresult) {
+		semset->signal(7);
+	}
 
 	// do we need to open more connections?
-	// FIXME: There's an issue here... If there is only one connection
-	// open, with a short ttl and a client is done with it, and it's ready
-	// to die off, but another client has connected before it decrements
-	// the connection count, then it will appear to the scaler that there
-	// is an available connection and it won't start another one.  The
-	// scaler has no way of knowing that the connection is about to die off
-	// and isn't really available.
 	if ((sessions-currentconnections)<=maxqueuelength) {
 		return true;
 	}
 
 	// can more be opened, or will we exceed the max?
-	if ((currentconnections+growby)<=maxconnections) {
+	if ((currentconnections+growby)>maxconnections) {
+		return true;
+	}
 
-		// open "growby" connections
-		for (int32_t i=0; i<growby; i++) {
+	// open "growby" connections
+	for (int32_t i=0; i<growby; i++) {
 
-			// loop until a connection is successfully started
-			pid_t	connpid=0;
-			while (!connpid) {
+		// loop until a connection is successfully started
+		pid_t	connpid=0;
+		while (!connpid) {
 
-				getRandomConnectionId();
+			getRandomConnectionId();
 
-				// if the database associated with the
-				// connection id that was randomly chosen is
-				// currently unavailable, loop back and get
-				// another one
-				// if no connections are currently open then
-				// we won't know if the database is up or down
-				// because no connections have tried to log
-				// in to it yet, so in that case, don't even
-				// test to see if the database is up or down
-				if (currentconnections && !availableDatabase()) {
-					snooze::macrosnooze(1);
-					continue;
-				}
+			// if the database associated with the
+			// connection id that was randomly chosen is
+			// currently unavailable, loop back and get
+			// another one
+			// if no connections are currently open then
+			// we won't know if the database is up or down
+			// because no connections have tried to log
+			// in to it yet, so in that case, don't even
+			// test to see if the database is up or down
+			if (currentconnections && !availableDatabase()) {
+				snooze::macrosnooze(1);
+				continue;
+			}
 
-				// The semaphore should be at 0, though the
-				// race condition described below could
-				// potentially leave it set to 1, so we'll make
-				// sure to set it back to 0 here.
-				semset->setValue(8,0);
+			// The semaphore should be at 0, though the
+			// race condition described below could
+			// potentially leave it set to 1, so we'll make
+			// sure to set it back to 0 here.
+			semset->setValue(8,0);
 
-				connpid=openOneConnection();
+			connpid=openOneConnection();
 
-				if (connpid) {
-					incConnections();
-					if (!connectionStarted()) {
-						// There is a race condition
-						// here.  connectionStarted()
-						// waits for 10 seconds.
-						// Presumably the connection
-						// will start up and signal
-						// during that time, or will be
-						// killed before it signals,
-						// but if it takes just barely
-						// longer than that for the
-						// connection to start, the wait
-						// could time out, then the
-						// connection could signal,
-						// then it could be killed,
-						// leaving the semaphore set to
-						// 1 rather than 0.
-						killConnection(connpid);
-						connpid=0;
-					}
+			if (connpid) {
+				incConnections();
+				if (!connectionStarted()) {
+					// There is a race condition
+					// here.  connectionStarted()
+					// waits for 10 seconds.
+					// Presumably the connection
+					// will start up and signal
+					// during that time, or will be
+					// killed before it signals,
+					// but if it takes just barely
+					// longer than that for the
+					// connection to start, the wait
+					// could time out, then the
+					// connection could signal,
+					// then it could be killed,
+					// leaving the semaphore set to
+					// 1 rather than 0.
+					killConnection(connpid);
+					connpid=0;
 				}
 			}
 		}
@@ -581,7 +571,7 @@ bool scaler::availableDatabase() {
 
 int32_t scaler::countSessions() {
 
-	// get the number of open connections
+	// get the number of open sessions
 	shmdata	*ptr=(shmdata *)idmemory->getPointer();
 	return ptr->connectionsinuse;
 }
