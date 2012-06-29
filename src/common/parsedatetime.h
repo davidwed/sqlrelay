@@ -277,7 +277,7 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 			}
 			delete[] dateparts;
 
-		} else if (charstring::contains(parts[i],'.')) {
+		} /*else if (charstring::contains(parts[i],'.')) {
 
 			// the section with .'s is the date...
 
@@ -362,7 +362,7 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 				delete[] dateparts[i];
 			}
 			delete[] dateparts;
-		}
+		}*/
 	}
 
 	// clean up
