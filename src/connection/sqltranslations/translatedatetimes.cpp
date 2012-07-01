@@ -176,7 +176,7 @@ bool translatedatetimes::translateDateTimesInQuery(
 			int16_t	second=-1;
 	
 			// parse the date/time
-			if (parseDateTime(valuecopy,ddmm,
+			if (parseDateTime(valuecopy,ddmm,false,
 						&year,&month,&day,
 						&hour,&minute,&second)) {
 
@@ -287,7 +287,7 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 		int16_t	second=-1;
 	
 		// parse the date/time
-		if (!parseDateTime(bind->value.stringval,ddmm,
+		if (!parseDateTime(bind->value.stringval,ddmm,false,
 						&year,&month,&day,
 						&hour,&minute,&second)) {
 			continue;

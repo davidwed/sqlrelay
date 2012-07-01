@@ -39,6 +39,7 @@ static const char *longmonths[]={
 };
 
 static bool parseDateTime(const char *datetime, bool ddmm,
+			bool supportdotdelimiteddate,
 			int16_t *year, int16_t *month, int16_t *day,
 			int16_t *hour, int16_t *minute, int16_t *second) {
 
@@ -277,7 +278,8 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 			}
 			delete[] dateparts;
 
-		} /*else if (charstring::contains(parts[i],'.')) {
+		} else if (supportdotdelimiteddate &&
+				charstring::contains(parts[i],'.')) {
 
 			// the section with .'s is the date...
 
@@ -362,7 +364,7 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 				delete[] dateparts[i];
 			}
 			delete[] dateparts;
-		}*/
+		}
 	}
 
 	// clean up

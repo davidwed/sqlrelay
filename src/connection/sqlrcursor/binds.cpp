@@ -188,14 +188,6 @@ void sqlrcursor_svr::dateToString(char *buffer, uint16_t buffersize,
 					year,month,day,hour,minute,second);
 }
 
-void sqlrcursor_svr::stringToDate(const char *string,
-			int16_t *year, int16_t *month, int16_t *day,
-			int16_t *hour, int16_t *minute, int16_t *second,
-			char **tz) {
-	parseDateTime(string,false,year,month,day,hour,minute,second);
-	*tz=NULL;
-}
-
 bool sqlrcursor_svr::inputBindDate(const char *variable,
 					uint16_t variablesize,
 					int64_t year,

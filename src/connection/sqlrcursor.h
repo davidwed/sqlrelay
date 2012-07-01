@@ -78,14 +78,6 @@ class sqlrcursor_svr {
 						int16_t minute,
 						int16_t second,
 						const char *tz);
-		virtual void	stringToDate(const char *string,
-						int16_t *year,
-						int16_t *month,
-						int16_t *day,
-						int16_t *hour,
-						int16_t *minute,
-						int16_t *second,
-						char **tz);
 		virtual bool	inputBindDate(const char *variable,
 						uint16_t variablesize,
 						int64_t year,
