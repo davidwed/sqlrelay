@@ -9,7 +9,7 @@ msbuild.exe
 cd ..\..\c\msvc
 msbuild.exe /target:Clean
 msbuild.exe
-cd ..\..\c#\SQLRClient
+cd ..\..\cs\SQLRClient
 msbuild.exe /target:Clean
 msbuild.exe
 cd ..\..\..\util\msvc
