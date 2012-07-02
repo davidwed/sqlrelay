@@ -9,7 +9,9 @@
 
 <ul>
 <li><a href="#introduction">Introduction</a></li>
-<li><a href="#building">Building SQL Relay</a></li>
+<li><a href="#installation">Installing Native SQL Relay</a></li>
+<li><a href="#buildingnatively">Building SQL Relay Natively</a></li>
+<li><a href="#buildingcygwin">Building SQL Relay Under Cygwin</a></li>
 <li><a href="#server">Running the SQL Relay Server</a></li>
 <li><a href="#cmdline">Using the Command Line Interfaces</a></li>
 </ul>
@@ -17,14 +19,24 @@
 <a name="introduction"></a>
 <span class="heading2">Introduction</span><br><br>
 
-<p>SQL Relay is not production-ready for Windows.  You have to build it from
-source, many databases and languages are unsupported and I haven't done any
-performance benchmarking yet.  But, that said, you can run a database, SQL
-Relay server and certain SQL Relay clients, entirely on Windows.  So, if you're
-interested in tinkering with SQL Relay on Windows, you can.</p>
+<p>Support for SQL Relay on Windows has come a long way recently, mainly between release 0.45 and 0.46, but it still has a ways to go.</p>
 
-<a name="building"></a>
-<span class="heading2">Building SQL Relay</span><br><br>
+<p>The SQL Relay client API's for C++, C, C# and ADO.NET and command line clients can be built using Visual Studio and run natively.  They are also available as binaries.</p>
+
+<p>The SQL Relay server components and other API's must be built from source and run under Cygwin.  Many databases and languages are unsupported and I haven't done any performance benchmarking yet.</p>
+
+<a name="installation"></a>
+<span class="heading2">Installing Native SQL Relay</span><br><br>
+
+<p>...</p>
+
+<a name="buildingnatively"></a>
+<span class="heading2">Building SQL Relay Natively</span><br><br>
+
+<p>...</p>
+
+<a name="buildingcygwin"></a>
+<span class="heading2">Building SQL Relay Under Cygwin</span><br><br>
 
 <p>SQL Relay requires <a href="http://www.cygwin.com">Cygwin</a> to build and
 run, so the first step in building SQL Relay is to
@@ -75,11 +87,7 @@ it must be started and stopped manually from a Cygwin shell.</p>
 <a name="cmdline"></a>
 <span class="heading2">Using the Command Line Interfaces</span><br><br>
 
-<p>Once the SQL Relay server is running, you can access it from the SQL Relay
-command line interfaces.  Follow the <a href="running.html#cmdline">standard
-instructions</a> for running the command line interfaces.  Again, you should
-use the Cygwin shell rather than the Windows Command Line or DOS shell when
-running the SQL Relay command line interfaces.</p>
+<p>Follow the <a href="running.html#cmdline">standard instructions</a> for running the command line interfaces.  If you built and/or installed the native software then you may use the Windows Command Line or DOS shell when running the SQL Relay command line interfaces.  If you built and installed using Cygwin then you must use the Cygwin command line instead.</p>
 
 </body>
 </html>
