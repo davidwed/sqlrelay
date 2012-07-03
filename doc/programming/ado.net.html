@@ -1775,10 +1775,7 @@ each database that SQL Relay supports.</p>
 
 <span class="heading4">Oracle</span><br>
 
-<p>Stored procedures in Oracle can return open cursors as return values or
-output parameters.  A client-side cursor can be bound to this open cursor and
-rows can be fetched from it.  However the SQL Relay driver for Perl DBI does
-not currently support output bind cursors.</p>
+<p>...</p>
 
 <span class="heading4">Sybase and Microsoft SQL Server</span><br>
 
@@ -1795,7 +1792,16 @@ following.</p>
 
 <blockquote>
 <pre>
-...
+sqlrcom.CommandText = "exec testproc";
+System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
+datareader.Read();
+Int64 out1 = datareader.GetInt64(0);
+Double out2 = datareader.GetDouble(1);
+String out3 = datareader.GetString(2);
+datareader.Read();
+out1 = datareader.GetInt64(0);
+out2 = datareader.GetDouble(1);
+out3 = datareader.GetString(2);
 </pre>
 </blockquote>
 
@@ -1844,7 +1850,16 @@ following.</p>
 
 <blockquote>
 <pre>
-...
+sqlrcom.CommandText = "select * from testfunc() as (testint int, testfloat float, testchar char(40))";
+System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
+datareader.Read();
+Int64 out1 = datareader.GetInt64(0);
+Double out2 = datareader.GetDouble(1);
+String out3 = datareader.GetString(2);
+datareader.Read();
+out1 = datareader.GetInt64(0);
+out2 = datareader.GetDouble(1);
+out3 = datareader.GetString(2);
 </pre>
 </blockquote>
 
@@ -1883,7 +1898,16 @@ following.</p>
 
 <blockquote>
 <pre>
-...
+sqlrcom.CommandText = "call testproc()";
+System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
+datareader.Read();
+Int64 out1 = datareader.GetInt64(0);
+Double out2 = datareader.GetDouble(1);
+String out3 = datareader.GetString(2);
+datareader.Read();
+out1 = datareader.GetInt64(0);
+out2 = datareader.GetDouble(1);
+out3 = datareader.GetString(2);
 </pre>
 </blockquote>
 
