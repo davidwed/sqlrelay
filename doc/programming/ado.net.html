@@ -1,13 +1,14 @@
 <html>
 <head>
-<title>firstworks   Programming with SQL Relay using the Perl DBI API</title>
+<title>firstworks   Programming with SQL Relay using the ADO.NET API</title>
 <link href="../css/styles.css" rel="stylesheet">
 </head>
 <body>
 
-<span class="heading1">Programming with SQL Relay using the Perl DBI API</span><br><br>
+<span class="heading1">Programming with SQL Relay using the ADO.NET API</span><br><br>
 
 <ul>
+<li><a href="#languages">Language Compatibility</a></li>
 <li><a href="#session">Establishing a Sessions</a></li>
 <li><a href="#query">Executing Queries</a></li>
 <li><a href="#commit">Commits and Rollbacks</a></li>
@@ -21,6 +22,13 @@
 <li><a href="#storedprocedures">Stored Procedures</a></li>
 <li><a href="#lastinsertid">Getting the Last Insert ID in SQLite</a></li>
 </ul>
+
+<a name="languages"></a>
+<span class="heading2">Language Compatibility</span><br><br>
+
+<p>Currently, the SQL Relay ADO.NET Adapter is only supported on Windows.  Mono support is planned but is not currently implemented.</p>
+
+<p>The example code below is given in C# but the SQL Relay ADO.NET Adapter can be used from any language capable of using the .NET API.</p>
 
 <a name="session"></a>
 <span class="heading2">Establishing a Session</span><br><br>
@@ -411,29 +419,135 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 
 <blockquote>
 <PRE>
+using System;
+using SQLRClient;
+using System.Data;
+using System.IO;
+
+namespace SQLRExamples
+{
+	class SQLRExample
+	{
+		public static void Main()
+		{
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			sqlrcon.Open();
+
+			// Prepare the query...
+			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+			sqlrcom.CommandText = "insert into testtable values (:var1,:var2,:var3)";
+
+
+			// Execute once...
+			sqlrcom.Parameters.Add("var1", 1);
+			sqlrcom.Parameters.Add("var2", "hello");
+			sqlrcom.Parameters.Add("var2", new DateTime(2001, 1, 1, 0, 0, 0));
+			try
+			{
+				sqlrcom.ExecuteNonQuery();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+			sqlrcom.Parameters.Clear();
+
+
+			// Execute again with new values...
+			sqlrcom.Parameters.Add("var1", 2);
+			sqlrcom.Parameters.Add("var2", "bye");
+			sqlrcom.Parameters.Add("var2", new DateTime(2002, 2, 2, 0, 0, 0));
+			try
+			{
+				sqlrcom.ExecuteNonQuery();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+
+
+			... re-bind and re-execute again and again ...
+		}
+	}
+}
 </PRE>
 </blockquote>
 
 <a name="fields"></a>
 <span class="heading2">Accessing Fields in the Result Set</span><br><br>
 
-<p>The fetchrow_array(), bind_columns() and fetch() functions are useful for 
-processing result sets.  fetchrow_array() returns an array of values.  
-bind_columns() associates variables with columns which are set when fetch() is
-called.</p>
+<p>Once returned from an ExecuteReader call, the SQLRelayDataReader provides methods for accessing the fields of the result set.</p>
 
-<p>Here's an example using fetchrow_array().</p>
+<p>To fetch a row, call the Read() method.  This method will return false if no more rows are available.</p>
 
-<blockquote>
-<PRE>
-</PRE>
-</blockquote>
+<p>After the row has been fetched, individual fields of that row may be accessed through a wide variety of methods.  The raw data for each field can be accessed by index using GetValue(), as a numeric array returned by the GetValues() or by using the SQLRelayDataReader directly as either a numeric or associative array.  The GetOrdinal() method can also be used to get the numeric index of a column name as well.</p>
 
-<p>Here's an example using bind_columns() and fetch().  Note that the first
-bind_columns() parameter must be "undef".</p>
+<p>Further, the raw data for each field can be coaxed into a native type using the GetBoolean(), GetByte(), GetBytes(), GetChar(), GetChars(), GetGuid(), GetInt16(), GetInt32(), GetInt64(), GetFloat(), GetDouble(), GetString(), GetDecimal() and GetDateTime() methods.</p>
 
 <blockquote>
 <PRE>
+using System;
+using SQLRClient;
+using System.Data;
+using System.IO;
+
+namespace SQLRExamples
+{
+	class SQLRExample
+	{
+		public static void Main()
+		{
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			sqlrcon.Open();
+
+			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+			sqlrcom.CommandText = "select col1,col2 from testtable";
+
+			try
+			{
+				System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
+				
+				// read row...
+				datareader.Read();
+
+				// get the raw data of the first field in a variety of ways
+				Object o1 = datareader.GetValue(0);
+				o1 = datareader[0];
+				o1 = datareader.GetValue(datareader.GetOrdinal("col1"));
+				o1 = datareader["col1"];
+				Object[] os1 = datareader.GetValues();
+				o1 = os1[0];
+
+				// get the first field as a string
+				String s1 = datareader.GetString(0);
+
+
+				// get the raw data of the second field in a variety of ways
+				Object o2 = datareader.GetValue(1);
+				o2 = datareader[1];
+				o2 = datareader.GetValue(datareader.GetOrdinal("col2"));
+				o2 = datareader["col2"];
+				Object[] os2 = datareader.GetValues();
+				o2 = os2[1];
+
+				// get the second field as a string
+				String s2 = datareader.GetString(1);
+				
+				// read another row...
+				datareader.Read();
+
+				... do something with this row ...
+
+				... fetch more rows ...
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+		}
+	}
+}
 </PRE>
 </blockquote>
 
@@ -446,24 +560,180 @@ set of another query.  You can select rows from a table in one query, then
 iterate through its result set, inserting rows into another table, using only 
 1 database connection for both operations.</p>
 
+<p>In the ADO.NET API, cursors are abstracted by the SQLRelayCommand class.  Each SQLRelayCommand can be thought of as a separate cursor and in many cases, each SQLRelayCommand consumes a separate server-side cursor.</p>
+
 <p>For example:</p>
 
 <blockquote>
 <PRE>
+using System;
+using SQLRClient;
+using System.Data;
+using System.IO;
+
+namespace SQLRExamples
+{
+	class SQLRExample
+	{
+		public static void Main()
+		{
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			sqlrcon.Open();
+
+			SQLRelayCommand sqlrcom1 = (SQLRelayComand)sqlrcon.CreateCommand();
+			sqlrcom1.CommandText = "select * from my_first_table";
+
+
+			SQLRelayCommand sqlrcom2 = (SQLRelayComand)sqlrcon.CreateCommand();
+			sqlrcom2.CommandText = "insert into my_second_table values (:col1, :col2, :col3)";
+
+			try
+			{
+				System.Data.IDataReader datareader = sqlrcom1.ExecuteReader();
+				while (datareader.Read())
+				{
+					sqlrcom2.Parameters.Clear();
+					sqlrcom2.Parameters.Add("col1",datareader.GetString(0));
+					sqlrcom2.Parameters.Add("col2",datareader.GetString(1));
+					sqlrcom2.Parameters.Add("col3",datareader.GetString(2));
+					try
+					{
+						sqlrcom2.ExecuteNonQuery();
+					}
+					catch (Exception ex)
+					{
+						Console.WriteLine(ex.Message);
+					}
+				}
+				
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+		}
+	}
+}
 </PRE>
 </blockquote>
 
 <a name="columns"></a>
 <span class="heading2">Getting Column Information</span><br><br>
 
-<p>After executing a query, the column count is stored in the NUMBER_OF_FIELDS
-statement property and column names are stored in the NAME statement property.
-They are accessible as follows:</p>
+<p>After executing a query, the column count is stored in the FieldCount property of the SQLRelayDataReader class.  Column names are accessible via the GetName() method.  Column types are available from the GetDataTypeName().  The native .NET data type for the field is avialable from the GetFieldType() method.  They may be used as follows:</p>
 
 <blockquote>
 <PRE>
+using System;
+using SQLRClient;
+using System.Data;
+using System.IO;
+
+namespace SQLRExamples
+{
+	class SQLRExample
+	{
+		public static void Main()
+		{
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			sqlrcon.Open();
+
+			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+			sqlrcom.CommandText = "select * from my_first_table";
+
+			try
+			{
+				System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
+				for (UInt32 index = 0; index &lt; sqlrcom.FieldCount; index++)
+				{
+					String name = datareader.GetName(index);
+					String datatype = datareader.GetDataTypename(index);
+					String nativedatatype = datareader.GetFieldType(index).ToString();
+
+					... do someting with the column data ...
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+		}
+	}
+}
 </PRE>
 </blockquote>
+
+<p>Extended column information is available from the GetSchemaTable method.  Usage is best illustrated by example.</p>
+
+<blockquote>
+<PRE>
+using System;
+using SQLRClient;
+using System.Data;
+using System.IO;
+
+namespace SQLRExamples
+{
+	class SQLRExample
+	{
+		public static void Main()
+		{
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			sqlrcon.Open();
+
+			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+			sqlrcom.CommandText = "select * from my_first_table";
+
+			try
+			{
+				System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
+
+				DataTable schematable = datareader.GetSchemaTable();
+				for (UInt32 index = 0; index &lt; sqlrcom.FieldCount; index++)
+				{
+					String columnname = Convert.ToString(schematable.Rows[index]["ColumnName"]);
+					Int64 columnordinal = Convert.ToInt64(schematable.Rows[index]["ColumnOrdinal"]);
+            				Int64 columnsize = Convert.ToInt64(schematable.Rows[index]["ColumnSize"]);
+            				Int64 numericprecision = Convert.ToInt64(schematable.Rows[index]["NumericPrecision"]);
+            				Int64 numericscale = Convert.ToInt64(schematable.Rows[index]["NumericScale"]);
+            				Boolean isunique = Convert.ToBoolean(schematable.Rows[index]["IsUnique"]);
+            				Boolean iskey = Convert.ToBoolean(schematable.Rows[index]["IsKey"]);
+            				String baseservername = Convert.ToString(schematable.Rows[index]["BaseServerName"]);
+            				String basecatalogname = Convert.ToString(schematable.Rows[index]["BaseCatalogName"]);
+            				String basecolumnname = Convert.ToString(schematable.Rows[index]["BaseColumnName"]);
+            				String baseschemaname = Convert.ToString(schematable.Rows[index]["BaseSchemaName"]);
+            				String basetablename = Convert.ToString(schematable.Rows[index]["BaseTableName"]);
+            				String datatype = Convert.ToString(schematable.Rows[index]["DataType"]);
+            				Boolean allowdbnull = Convert.ToBoolean(schematable.Rows[index]["AllowDBNull"]);
+            				String providertype = Convert.ToString(schematable.Rows[index]["ProviderType"]);
+            				Boolean isaliased = Convert.ToBoolean(schematable.Rows[index]["IsAliased"]);
+            				Boolean isexpression = Convert.ToBoolean(schematable.Rows[index]["IsExpression"]);
+            				Boolean isidentity = Convert.ToBoolean(schematable.Rows[index]["IsIdentity"]);
+            				Boolean isautoincrement = Convert.ToBoolean(schematable.Rows[index]["IsAutoIncrement"]);
+            				Boolean isrowversion = Convert.ToBoolean(schematable.Rows[index]["IsRowVersion"]);
+            				Boolean ishidden = Convert.ToBoolean(schematable.Rows[index]["IsHidden"]);
+            				Boolean islong = Convert.ToBoolean(schematable.Rows[index]["IsLong"]);
+            				Boolean isreadonly = Convert.ToBoolean(schematable.Rows[index]["IsReadOnly"]);
+            				String providerspecificdatatype = Convert.ToString(schematable.Rows[index]["ProviderSpecificDataType"]);
+            				String datatypename = Convert.ToString(schematable.Rows[index]["DataTypeName"]);
+            				String xmlschemacollectiondatabase = Convert.ToString(schematable.Rows[index]["XmlSchemaCollectionDatabase"]);
+            				String xmlschemacollectionowningschema = Convert.ToString(schematable.Rows[index]["XmlSchemaCollectionOwningSchema"]);
+            				String xmlschemacollectionname = Convert.ToString(schematable.Rows[index]["XmlSchemaCollectionName"]);
+
+					... do something with all these bits of information ...
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+		}
+	}
+}
+</PRE>
+</blockquote>
+
+<p>SQL Relay support most of the fields that might be returned in the schema table but not all.  Most databases don't support all of these fields either.  In the future, support may improve.</p>
 
 <a name="storedprocedures"></a>
 <span class="heading2">Stored Procedures</span><br><br>
