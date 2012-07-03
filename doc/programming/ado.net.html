@@ -1775,7 +1775,86 @@ each database that SQL Relay supports.</p>
 
 <span class="heading4">Oracle</span><br>
 
-<p>...</p>
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#a52829"><b>or</b></font> replace package types <font color="#6b59ce">as</font>
+        <font color="#6b59ce">type</font> cursorType <font color="#6b59ce">is</font> ref <font color="#6b59ce">cursor</font>;
+<font color="#6b59ce">end</font>;
+
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testproc <font color="#6b59ce">return</font> types.cursortype <font color="#6b59ce">is</font>
+        l_cursor    types.cursorType;
+<font color="#6b59ce">begin</font>
+        open l_cursor <font color="#6b59ce">for</font> <font color="#a52829"><b>select</b></font> * <font color="#6b59ce">from</font> mytable;
+        <font color="#6b59ce">return</font> l_cursor;
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>In Oracle, for a result set to be fetched from a stored procedure, the result set must be bound to an output parameter of type cursor.  That cursor may then be opened and fetched from.  In fact, a stored procedure may return multiple result sets and each may be bound to a cursor.</p>
+
+<p>ADO.NET abstracts this with the "multiple result sets" paradigm.  Output cursors must be defined when the query is executed.  Once the main query has been executed, NextResult may be called to step through the result sets bound to each cursor.</p>
+
+<p>For example:</p>
+
+<blockquote>
+<pre>
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "begin :curs=testproc; end;";
+
+SQLRelayParameter curs = new SQLRelayParameter();
+curs.ParameterName = "curs";
+curs.Direction = ParameterDirection.Output;
+curs.SQLRelayType = SQLRelayType.Cursor;
+sqlrcom.Parameters.Add(curs);
+
+System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
+
+// the main result set will be empty, skip to the result set of the cursor
+datareader.NextResult();
+
+datareader.Read();
+Int64 out1 = datareader.GetInt64(0);
+Double out2 = datareader.GetDouble(1);
+String out3 = datareader.GetString(2);
+</pre>
+</blockquote>
+
+<p>This approach has some drawbacks though.  Mainly, if a stored procedure returns multiple results sets then they must be accessed sequentially.  The SQL Relay ADO.NET adapter provides another way of accessing the result sets of a stored procedure.  After execution, the Value of each cursor parameter may be cast to a SQLRelayDataReader and data may be fetched from it.  This approach allows data to be fetched from any result set, in any order.</p>
+
+<p>For example:</p>
+
+<blockquote>
+<pre>
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "begin :curs=testproc; end;";
+
+SQLRelayParameter curs = new SQLRelayParameter();
+curs.ParameterName = "curs";
+curs.Direction = ParameterDirection.Output;
+curs.SQLRelayType = SQLRelayType.Cursor;
+sqlrcom.Parameters.Add(curs);
+
+sqlrcom.ExecuteNonQuery();
+
+SQLRelayDataReader datareader = (SQLRelayDataReader)curs.Value;
+
+datareader.Read();
+Int64 out1 = datareader.GetInt64(0);
+Double out2 = datareader.GetDouble(1);
+String out3 = datareader.GetString(2);
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testproc
+<font color="#a52829"><b>drop</b></font> package types
+</pre>
+</blockquote>
 
 <span class="heading4">Sybase and Microsoft SQL Server</span><br>
 
