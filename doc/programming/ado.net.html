@@ -17,9 +17,11 @@
 <li><a href="#bindvars">Bind Variables</a></li>
 <li><a href="#rebinding">Re-Binding and Re-Executing</a></li>
 <li><a href="#fields">Accessing Fields in the Result Set</a></li>
+<li><a href="#largeresultsets">Dealing With Large Result Sets</a></li>
 <li><a href="#cursors">Cursors</a></li>
 <li><a href="#columns">Getting Column Information</a></li>
 <li><a href="#storedprocedures">Stored Procedures</a></li>
+<li><a href="#extensions">Extensions</a></li>
 <li><a href="#lastinsertid">Getting the Last Insert ID in SQLite</a></li>
 </ul>
 
@@ -342,6 +344,8 @@ namespace SQLRExamples
 </pre>
 </blockquote>
 
+<p>Note that in the above code, the Parameter.SQLRelayType must be set rather than Parameter.DbType, which would generally be set.  DbType is constrained to a set of values defined in the ADO.NET spec, which does not include Clob or Blob types.</p>
+
 <p>Output bind variables can be used too.  The Direction and DbType attributes of the parameter must be specified though and for strings, the Size of the buffer to allocate for the return value must be specified as well.</p>
 
 <blockquote>
@@ -551,6 +555,14 @@ namespace SQLRExamples
 </PRE>
 </blockquote>
 
+
+<a name="largeresultsets"></a>
+<span class="heading2">Dealing With Large Result Sets</span><br><br>
+
+<p>SQL Relay normally buffers the entire result set.  This can speed things up 
+at the cost of memory.  With large enough result sets, it makes sense to buffer the result set in chunks instead of all at once.</p>
+
+<p>Use the parameter SQLRelayCommand.ResultSetBufferSize to set the number of rows to buffer at a time.  Calls to SQLRelayDataReader.Read() cause the chunk containing the requested field to be fetched.</p>
 
 <a name="cursors"></a>
 <span class="heading2">Cursors</span><br><br>
@@ -1820,6 +1832,8 @@ Double out2 = datareader.GetDouble(1);
 String out3 = datareader.GetString(2);
 </pre>
 </blockquote>
+
+<p>Note that in the above code, the Parameter.SQLRelayType must be set rather than Parameter.DbType, which would generally be set.  DbType is constrained to a set of values defined in the ADO.NET spec, which does not include Cursor types.</p>
 
 <p>This approach has some drawbacks though.  Mainly, if a stored procedure returns multiple results sets then they must be accessed sequentially.  The SQL Relay ADO.NET adapter provides another way of accessing the result sets of a stored procedure.  After execution, the Value of each cursor parameter may be cast to a SQLRelayDataReader and data may be fetched from it.  This approach allows data to be fetched from any result set, in any order.</p>
 
