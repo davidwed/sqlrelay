@@ -1,0 +1,1589 @@
+<html>
+<head>
+<title>firstworks   Programming with SQL Relay using the Perl DBI API</title>
+<link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Programming with SQL Relay using the Perl DBI API</span><br><br>
+
+<ul>
+<li><a href="#session">Establishing a Sessions</a></li>
+<li><a href="#query">Executing Queries</a></li>
+<li><a href="#commit">Commits and Rollbacks</a></li>
+<li><a href="#temptables">Temporary Tables</a></li>
+<li><a href="#errors">Catching Errors</a></li>
+<li><a href="#bindvars">Bind Variables</a></li>
+<li><a href="#rebinding">Re-Binding and Re-Executing</a></li>
+<li><a href="#fields">Accessing Fields in the Result Set</a></li>
+<li><a href="#cursors">Cursors</a></li>
+<li><a href="#columns">Getting Column Information</a></li>
+<li><a href="#storedprocedures">Stored Procedures</a></li>
+<li><a href="#lastinsertid">Getting the Last Insert ID in SQLite</a></li>
+</ul>
+
+<a name="session"></a>
+<span class="heading2">Establishing a Session</span><br><br>
+
+<p>To use SQL Relay, you have to first open a connection.</p>
+
+<blockquote>
+<PRE>
+using System;
+using SQLRClient;
+using System.Data;
+using System.IO;
+
+namespace SQLRExamples
+{
+	class SQLRExample
+	{
+		public static void Main()
+		{
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			sqlrcon.Open();
+		}
+	}
+}
+</PRE>
+</blockquote>
+
+<p>The following connect string variables control attributes of the connection:</p>
+
+<ul>
+<li><b>Data Source</b> - The SQL Relay server to connect to.  This may be specified as <i>host:port</i>, <i>host:port:socket</i> or just <i>socket</i>.  If host, port and socket are all three specified, then a connection will first be attempted to the local socket and then to the host/port.</li>
+<li><b>User ID</b> - The username to use when logging into SQL Relay.</li>
+<li><b>Password</b> - The password to use when logging into SQL Relay.</li>
+<li><b>Retry Time</b> - If a connection fails, it will be retried on this interval (in seconds).</li>
+<li><b>Tries</b> - If a connection fails, it will be retried this many times.</li>
+<li><b>Debug</b> - If this is set to true then debug is enabled.</li>
+</ul>
+
+<p>After opening  the connection, a session is established when the first 
+query is run.</p>
+
+<p>For the duration of the session, the client occupies one of the database
+connection daemons, so care should be taken to minimize the length of a
+session.</p>
+
+<p>If you're using a transactional database, ending a session has a catch.
+Database connection daemons can be configured to send either a commit or
+rollback at the end of a session if DML queries were executed during the
+session with no commit or rollback.  Program accordingly.</p>
+
+<a name="query"></a>
+<span class="heading2">Executing Queries</span><br><br>
+
+<p>There are three ways to execute queries.</p>
+
+<p>If a query doesn't return a result set, such as DML (insert, update, delete, etc.) or DDL (create, drop, etc.) then you can use ExecuteNonQuery.  If the query returns a single value you can use ExecuteScalar.  If the query returns a result set then you must use ExecuteReader.</p>
+
+<p>In any case, you must create an instance of SQLRelayCommand and set its CommandText.</p>
+
+<blockquote>
+<PRE>
+using System;
+using SQLRClient;
+using System.Data;
+using System.IO;
+
+namespace SQLRExamples
+{
+	class SQLRExample
+	{
+		public static void Main()
+		{
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			sqlrcon.Open();
+
+
+			// DML queries...
+			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+			sqlrcom.CommandText = "insert into testtable values (1,'hello')";
+			try
+			{
+				sqlrcom.ExecuteNonQuery();
+			}
+			catch (Exception ex)
+			{
+				... handle exceptions ...
+			}
+
+
+			// Single values
+			sqlrcom.CommandText = "select 1 from dual";
+			try
+			{
+				Int64 value = sqlrcom.ExecuteScalar();
+
+				... do something with the value ...
+			}
+			catch (Exception ex)
+			{
+				... handle exceptions ...
+			}
+
+
+			// Multiple rows
+			sqlrcom.CommandText = "select * from testtable";
+			try
+			{
+				System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
+
+				... do something with the result set ...
+			}
+			catch (Exception ex)
+			{
+				... handle exceptions ...
+			}
+		}
+	}
+}
+</PRE>
+</blockquote>
+
+<a name="commit"></a>
+<span class="heading2">Commits and Rollbacks</span><br><br>
+
+<p>If you need to execute a commit or rollback, you should create an instance of the SQLRelayTransaction class and use its commit() and rollback() methods rather than sending "commit" or "rollback" queries.  There are two reasons for this.  First, it's much more efficient to call the methods.  Second, if you're writing code that can run on transactional or non-transactional databases, some non-transactional databases will throw errors if they receive a "commit" or "rollback" query, but by calling the commit() and rollback() methods you instruct the database connection daemon to call the commit and rollback API methods for that database rather than issuing them as queries.  If the API's have no commit or rollback methods, the calls do nothing and the database throws no error.  This is especially important when using SQL Relay with ODBC.</p>
+
+<blockquote>
+<PRE>
+using System;
+using SQLRClient;
+using System.Data;
+using System.IO;
+
+namespace SQLRExamples
+{
+	class SQLRExample
+	{
+		public static void Main()
+		{
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			sqlrcon.Open();
+
+			SQLRelayTransaction sqlrtran = sqlrcon.BeginTransaction();
+
+			... run some queries that we want to keep the results of ...
+
+			sqlrtran.Commit();
+
+			... run some queries that we don't want to keep the results of ...
+
+			sqlrtran.Rollback();
+		}
+	}
+}
+</PRE>
+</blockquote>
+
+<a name="temptables"></a>
+<span class="heading2">Temporary Tables</span><br><br>
+
+<p>Some databases support temporary tables.  That is, tables which are
+automatically dropped or truncated when an application closes its connection
+to the database or when a transaction is committed or rolled back.</p>
+
+<p>For databases which drop or truncate tables when a transaction is committed
+or rolled back, temporary tables work naturally.</p>
+
+<p>However, for databases which drop or truncate tables when an application
+closes its connection to the database, there is an issue.  Since SQL Relay
+maintains persistent database connections, when an application disconnects from
+SQL Relay, the connection between SQL Relay and the database remains, so
+the database does not know to drop or truncate the table.  To remedy this
+situation, SQL Relay parses each query to see if it created a temporary table,
+keeps a list of temporary tables and drops (or truncates them) when the
+application disconnects from SQL Relay.  Since each database has slightly
+different syntax for creating a temporary table, SQL Relay parses each query
+according to the rules for that database.</p>
+
+<p>In effect, temporary tables should work when an application connects to
+SQL Relay in the same manner that they would work if the application connected
+directly to the database.</p>
+
+<a name="errors"></a>
+<span class="heading2">Catching Errors</span><br><br>
+
+<p>If your calls to ExecuteNonQuery, ExecuteScaler or ExecuteReader fail, you can catch the error an exception.</p>
+
+<blockquote>
+<PRE>
+using System;
+using SQLRClient;
+using System.Data;
+using System.IO;
+
+namespace SQLRExamples
+{
+	class SQLRExample
+	{
+		public static void Main()
+		{
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			sqlrcon.Open();
+
+			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+			sqlrcom.CommandText = "insert into testtable values (1,'hello')";
+			try
+			{
+				sqlrcom.ExecuteNonQuery();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+		}
+	}
+}
+</PRE>
+</blockquote>
+
+<a name="bindvars"></a>
+<span class="heading2">Bind Variables</span><br><br>
+
+<p>Programs rarely execute fixed queries.  More often than not, some part
+of the query is dynamically generated.  The ADO.NET API provides means
+for using bind variables (also known as parameters) in those queries.</p>
+
+<p>For a detailed discussion of binds, see 
+<a href="binds.html">this document</a>.</p>
+
+<p>To use bind variables (parameters) with the ADO.NET API, you must add variable/value pairs to the parameter collection associated with each instance of SQLRelayCommand.  For numeric, string or date variables, this is straightforward, you can just use the Parameters.Add() method.</p>
+
+<blockquote>
+<PRE>
+using System;
+using SQLRClient;
+using System.Data;
+using System.IO;
+
+namespace SQLRExamples
+{
+	class SQLRExample
+	{
+		public static void Main()
+		{
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			sqlrcon.Open();
+
+			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+			sqlrcom.CommandText = "insert into testtable values (:var1,:var2,:var3)";
+			sqlrcom.Parameters.Add("var1", 1);
+			sqlrcom.Parameters.Add("var2", "hello");
+			sqlrcom.Parameters.Add("var2", new DateTime(2001, 1, 1, 0, 0, 0));
+			try
+			{
+				sqlrcom.ExecuteNonQuery();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+		}
+	}
+}
+</PRE>
+</blockquote>
+
+<p>With Oracle version 8i or greater, you can also bind CLOB's and BLOB's.  It is a little more complex but not terribly.</p>
+
+<blockquote>
+<pre>
+using System;
+using SQLRClient;
+using System.Data;
+using System.IO;
+
+namespace SQLRExamples
+{
+	class SQLRExample
+	{
+		public static void Main()
+		{
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			sqlrcon.Open();
+
+			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+			sqlrcom.CommandText = "insert into testtable values (:clobvar,:blobvar)";
+
+			SQLRelayParameter clobvar = new SQLRelayParameter();
+			clobvar.ParameterName = "clobvar";
+			clobvar.Value = "testclob";
+			clobvar.SQLRelayType = SQLRelayType.Clob;
+			sqlrcom.Parameters.Add(clobvar);
+
+			SQLRelayParameter blobvar = new SQLRelayParameter();
+			blobvar.ParameterName = "blobvar";
+			blobvar.Value = System.Text.Encoding.Default.GetBytes("testblob");
+			blobvar.SQLRelayType = SQLRelayType.Blob;
+			sqlrcom.Parameters.Add(blobvar);
+
+			try
+			{
+				sqlrcom.ExecuteNonQuery();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+		}
+	}
+}
+</pre>
+</blockquote>
+
+<p>Output bind variables can be used too.  The Direction and DbType attributes of the parameter must be specified though and for strings, the Size of the buffer to allocate for the return value must be specified as well.</p>
+
+<blockquote>
+<pre>
+using System;
+using SQLRClient;
+using System.Data;
+using System.IO;
+
+namespace SQLRExamples
+{
+	class SQLRExample
+	{
+		public static void Main()
+		{
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			sqlrcon.Open();
+
+			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+			sqlrcom.CommandText = "begin  :numvar:=1;  :stringvar:='hello';  :floatvar:=2.5;  :datevar:='03-FEB-2001'; end;";
+
+			SQLRelayParameter numvar = new SQLRelayParameter();
+			numvar.ParameterName = "numvar";
+			numvar.Direction = ParameterDirection.Output;
+			numvar.DbType = DbType.Int64;
+			sqlrcom.Parameters.Add(numvar);
+
+			SQLRelayParameter stringvar = new SQLRelayParameter();
+			stringvar.ParameterName = "stringvar";
+			stringvar.Direction = ParameterDirection.Output;
+			stringvar.DbType = DbType.String;
+			stringvar.Size = 20;
+			sqlrcom.Parameters.Add(stringvar);
+
+			SQLRelayParameter floatvar = new SQLRelayParameter();
+			floatvar.ParameterName = "floatvar";
+			floatvar.Direction = ParameterDirection.Output;
+			floatvar.DbType = DbType.Double;
+			sqlrcom.Parameters.Add(floatvar);
+
+			SQLRelayParameter datevar = new SQLRelayParameter();
+			datevar.ParameterName = "datevar";
+			datevar.Direction = ParameterDirection.Output;
+			datevar.DbType = DbType.DateTime;
+			sqlrcom.Parameters.Add(datevar);
+
+			try
+			{
+				sqlrcom.ExecuteNonQuery();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+
+			... do something with numvar.Value ...
+			... do something with stringvar.Value ...
+			... do something with floatvar.Value ...
+			... do something with datevar.Value ...
+		}
+	}
+}
+</pre>
+</blockquote>
+
+<p>FIXME: ... clob, blob and cursor output bind ...</p>
+
+<a name="rebinding"></a>
+<span class="heading2">Re-Binding and Re-Execution</span><br><br>
+
+<p>A feature of the prepare/bind/execute paradigm is the ability to prepare, 
+bind and execute a query once, then re-bind and re-execute the query 
+over and over without re-preparing it.  If your backend database natively 
+supports this paradigm, you can reap a substantial performance improvement.</p>
+
+<blockquote>
+<PRE>
+</PRE>
+</blockquote>
+
+<a name="fields"></a>
+<span class="heading2">Accessing Fields in the Result Set</span><br><br>
+
+<p>The fetchrow_array(), bind_columns() and fetch() functions are useful for 
+processing result sets.  fetchrow_array() returns an array of values.  
+bind_columns() associates variables with columns which are set when fetch() is
+called.</p>
+
+<p>Here's an example using fetchrow_array().</p>
+
+<blockquote>
+<PRE>
+</PRE>
+</blockquote>
+
+<p>Here's an example using bind_columns() and fetch().  Note that the first
+bind_columns() parameter must be "undef".</p>
+
+<blockquote>
+<PRE>
+</PRE>
+</blockquote>
+
+
+<a name="cursors"></a>
+<span class="heading2">Cursors</span><br><br>
+
+<p>Cursors make it possible to execute queries while processing the result
+set of another query.  You can select rows from a table in one query, then 
+iterate through its result set, inserting rows into another table, using only 
+1 database connection for both operations.</p>
+
+<p>For example:</p>
+
+<blockquote>
+<PRE>
+</PRE>
+</blockquote>
+
+<a name="columns"></a>
+<span class="heading2">Getting Column Information</span><br><br>
+
+<p>After executing a query, the column count is stored in the NUMBER_OF_FIELDS
+statement property and column names are stored in the NAME statement property.
+They are accessible as follows:</p>
+
+<blockquote>
+<PRE>
+</PRE>
+</blockquote>
+
+<a name="storedprocedures"></a>
+<span class="heading2">Stored Procedures</span><br><br>
+
+<p>Many databases support stored procedures.  Stored procedures are sets of
+queries and procedural code that are executed inside of the database itself.
+For example, a stored procedure may select rows from one table, iterate through
+the result set and, based on the values in each row, insert, update or delete
+rows in other tables.  A client program could do this as well, but a stored
+procedure is generally more efficient because queries and result sets don't
+have to be sent back and forth between the client and database.  Also, stored
+procedures are generally stored in the database in a compiled state, while
+queries may have to be re-parsed and re-compiled each time they are sent.</p>
+
+<p>While many databases support stored procedures.  The syntax for creating
+and executing stored procedures varies greatly between databases.</p>
+
+<p>SQL Relay supports stored procedures for most databases, but there are
+some caveats.  Stored procedures are not currently supported when using FreeTDS
+against Sybase or Microsoft SQL Server.  Blob/Clob bind variables are only
+supported in Oracle 8i or higher.  Sybase stored procedures must use varchar
+output parameters.</p>
+
+<p>Stored procedures typically take input paramters from client programs through
+input bind variables and return values back to client programs either through
+bind variables or result sets.  Stored procedures can be broken down into
+several categories, based on the values that they return.  Some stored
+procedures don't return any values, some return a single value, some return
+multiple values and some return entire result sets.</p>
+
+<span class="heading3">No Values</span><br>
+
+<p>Some stored procedures don't return any values.  Below are examples,
+illustrating how to create, execute and drop this kind of stored procedure for
+each database that SQL Relay supports.</p>
+
+<span class="heading4">Oracle</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>) <font color="#6b59ce">is</font>
+<font color="#6b59ce">begin</font>
+        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> (in1,in2,in3);
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>-&gt;<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">begin testproc(:in1,:in2,:in3); end;</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+<span class="heading4">Sybase and Microsoft SQL Server</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc @in1 int, @in2 <font color="#298a52"><b>float</b></font>, @in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>) <font color="#6b59ce">as</font>
+        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> (@in1,@in2,@in3)
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>-&gt;<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">exec testproc</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+<span class="heading4">Firebird</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#298a52"><b>integer</b></font>, in2 <font color="#298a52"><b>float</b></font>, in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) <font color="#6b59ce">as</font>
+<font color="#6b59ce">begin</font>
+        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> (in1,in2,in3);
+        suspend;
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">execute procedure testproc ?, ?, ?</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+<span class="heading4">DB2</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(<font color="#a52829"><b>in</b></font> in1 int, <font color="#a52829"><b>in</b></font> in2 double, <font color="#a52829"><b>in</b></font> in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) language sql
+<font color="#6b59ce">begin</font>
+        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> (in1,in2,in3);
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(?,?,?)</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+<span class="heading4">Postgresql</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns void <font color="#6b59ce">as</font> '
+<font color="#6b59ce">begin</font>
+        <font color="#a52829"><b>insert</b></font> <font color="#6b59ce">into</font> mytable <font color="#6b59ce">values</font> ($<font color="#ff00ff">1</font>,$<font color="#ff00ff">2</font>,$<font color="#ff00ff">3</font>);
+        <font color="#6b59ce">return</font>;
+<font color="#6b59ce">end</font>;' language plpgsql
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select testfunc(:in1,:in2,:in3)</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>))
+</pre>
+</blockquote>
+
+<span class="heading4">MySQL</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc(<font color="#a52a2a"><b>in</b></font> in1 int, <font color="#a52a2a"><b>in</b></font> in2 <font color="#2e8b57"><b>float</b></font>, <font color="#a52a2a"><b>in</b></font> in3 <font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>))
+<font color="#6a5acd">begin</font>
+        <font color="#a52a2a"><b>insert</b></font> <font color="#6a5acd">into</font> mytable <font color="#6a5acd">values</font> (in1,in2,in3);
+<font color="#6a5acd">end</font>;
+</pre>
+</blockquote>
+
+<p>MySQL 4.1.2 supports native input binds with its Statement API but the
+Statement API cannot be used to call stored procedures yet.  As a result,
+SQL Relay must fake input binds when calling MySQL stored procedures, so queries
+which call stored procedures must be written with colon-delimited bind
+variables rather than MySQL's native ?'s.</p>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select testfunc(?,?,?)</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+
+
+<br><span class="heading3">Single Values</span><br>
+
+<p>Some stored procedures return single values.  Below are examples,
+illustrating how to create, execute and drop this kind of stored procedure for
+each database that SQL Relay supports.</p>
+
+<span class="heading4">Oracle</span><br>
+
+<p>In Oracle, stored procedures can return values through output parameters or
+as return values of the procedure itself.</p>
+
+<p>Here is an example where the procedure itself returns a value.  Note that
+Oracle calls these functions.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>) returns <font color="#298a52"><b>number</b></font> <font color="#6b59ce">is</font>
+<font color="#6b59ce">begin</font>
+        <font color="#6b59ce">return</font> in1;
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select testproc(:in1,:in2,:in3) from dual</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>;
+<font color="#008a8c">$sth</font>-&gt;bind_columns(<font color="#a52829"><b>undef</b></font>,<font color="#008a8c">\$result</font>);
+<font color="#008a8c">$sth</font>-&gt;fetch();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testproc
+</pre>
+</blockquote>
+
+<p>Here is an example where the value is returned through an output
+parameter.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>, out1 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>number</b></font>) <font color="#6b59ce">as</font>
+<font color="#6b59ce">begin</font>
+        out1:=in1;
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">begin testproc(:in1,:in2,:in3,:out1); end;</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>;
+<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$result</font>,<font color="#ff00ff">20</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+<span class="heading4">Sybase and Microsoft SQL Server</span><br>
+
+<p>In Sybase and Microsoft SQL Server, stored procedures return values
+through output parameters rather than as return values of the procedure
+itself.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc @in1 int, @in2 <font color="#298a52"><b>float</b></font>, @in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), @out1 int output <font color="#6b59ce">as</font>
+        <font color="#a52829"><b>select</b></font> @out1=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in1)
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dth</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">exec testproc</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>;
+<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$result</font>,<font color="#ff00ff">20</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+<span class="heading4">Firebird</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#298a52"><b>integer</b></font>, in2 <font color="#298a52"><b>float</b></font>, in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns (out1 <font color="#298a52"><b>integer</b></font>) <font color="#6b59ce">as</font>
+<font color="#6b59ce">begin</font>
+        out1=in1;
+        suspend;
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dth</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testproc(?,?,?)</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>;
+<font color="#008a8c">$sth</font>-&gt;bind_columns(<font color="#a52829"><b>undef</b></font>,<font color="#008a8c">\$result</font>);
+<font color="#008a8c">$sth</font>-&gt;fetch();
+</pre>
+</blockquote>
+
+<p>Alternatively, you can run a query like the following and receive the result
+using an output bind variable.  Note that in Firebird, input and
+output bind variable indices are distict from one another.  The index of the
+output bind variable is 1 rather than 4, even though there were 3 input bind
+variables.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">execute procedure testproc ?, ?, ?</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>;
+<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$result</font>,<font color="#ff00ff">20</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+<span class="heading4">DB2</span><br>
+
+<p>In DB2, stored procedures return values through output parameters rather
+than as return values of the procedure itself.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(<font color="#a52829"><b>in</b></font> in1 int, <font color="#a52829"><b>in</b></font> in2 double, <font color="#a52829"><b>in</b></font> in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), <font color="#a52829"><b>out</b></font> out1 int) language sql
+<font color="#6b59ce">begin</font>
+        <font color="#a52829"><b>set</b></font> out1 = in1;
+<font color="#6b59ce">end</font>
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(?,?,?,?)</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>;
+<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">4</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$result</font>,<font color="#ff00ff">25</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+<span class="heading4">Postgresql</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>)) returns int <font color="#6b59ce">as</font> '
+declare
+        in1 int;
+        in2 <font color="#298a52"><b>float</b></font>;
+        in3 <font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>);
+<font color="#6b59ce">begin</font>
+        in1:=$<font color="#ff00ff">1</font>;
+        <font color="#6b59ce">return</font>;
+<font color="#6b59ce">end</font>;
+' language plpgsql
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testfunc(:in1,:in2,:in3)</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>;
+<font color="#008a8c">$sth</font>-&gt;bind_columns(<font color="#a52829"><b>undef</b></font>,<font color="#008a8c">\$result</font>);
+<font color="#008a8c">$sth</font>-&gt;fetch();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>))
+</pre>
+</blockquote>
+
+<span class="heading4">MySQL</span><br>
+
+<p>A single value can be returned from a MySQL function.</p>
+
+<p>To create the function, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">function</font> testfunc(<font color="#a52a2a"><b>in</b></font> in1 int, <font color="#a52a2a"><b>in</b></font> in2 <font color="#2e8b57"><b>float</b></font>, <font color="#a52a2a"><b>in</b></font> in3 <font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns int <font color="#6a5acd">return</font> in1;
+</pre>
+</blockquote>
+
+<p>To execute the function from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select testfunc(?,?,?)</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out1</font>;
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_columns</font>(<font color="#a52a2a"><b>undef</b></font>,<font color="#008b8b">\$out1</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;fetch</font>();
+</pre>
+</blockquote>
+
+<p>To drop the function, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">function</font> testfunc
+</pre>
+</blockquote>
+
+<p>A single value can be returned in the result set of a MySQL procedure.</p>
+
+<p>To create the procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc() <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> <font color="#ff00ff">1</font>; <font color="#6a5acd">end</font>;
+</pre>
+</blockquote>
+
+<p>To execeute the procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select testproc()</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_columns</font>(<font color="#a52a2a"><b>undef</b></font>,<font color="#008b8b">\$out1</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;fetch</font>();
+</pre>
+</blockquote>
+
+<p>To drop the procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+</pre>
+</blockquote>
+
+<p>A single value can be returned using the output variable of a MySQL
+procedure.</p>
+
+<p>To create the procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc(<font color="#a52a2a"><b>out</b></font> out1 int) <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> <font color="#ff00ff">1</font> <font color="#6a5acd">into</font> out1; <font color="#6a5acd">end</font>;
+</pre>
+</blockquote>
+
+<p>To execeute the procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select </font><font color="#6a5acd">\@</font><font color="#ff00ff">out1=0</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(</font><font color="#6a5acd">\@</font><font color="#ff00ff">out1)</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select </font><font color="#6a5acd">\@</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_columns</font>(<font color="#a52a2a"><b>undef</b></font>,<font color="#008b8b">\$out1</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;fetch</font>();
+</pre>
+</blockquote>
+
+<p>To drop the procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+
+
+
+<br><span class="heading3">Multiple Values</span><br>
+
+<p>Some stored procedures return multiple values.  Below are examples,
+illustrating how to create, execute and drop this kind of stored procedure for
+each database that SQL Relay supports.</p>
+
+<span class="heading4">Oracle</span><br>
+
+<p>In Oracle, stored procedures can return values through output parameters or
+as return values of the procedure itself.  If a procedure needs to return
+multiple values, it can return one of them as the return value of the procedure
+itself, but the rest must be returned through output parameters.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>, out1 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>number</b></font>, out2 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>number</b></font>, out3 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>varchar2</b></font>) <font color="#6b59ce">is</font>
+<font color="#6b59ce">begin</font>
+        out1:=in1;
+        out2:=in2;
+        out3:=in3;
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">begin testproc(:in1,:in2,:in3,:out1,:out2,:out3); end;</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>;
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>;
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>;
+<font color="#008a8c">$sth</font>-&gt;bind_input_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out1</font>,<font color="#ff00ff">20</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_input_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out2</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out2</font>,<font color="#ff00ff">20</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_input_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out3</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out3</font>,<font color="#ff00ff">20</font>);
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+<span class="heading4">Sybase and Microsoft SQL Server</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc @in1 int, @in2 <font color="#298a52"><b>float</b></font>, @in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), @out1 int output, @out2 int output, @out3 int output <font color="#6b59ce">as</font>
+        <font color="#a52829"><b>select</b></font> @out1=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in1),
+                @out2=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in2),
+                @out2=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in2)
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dth</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">exec testproc</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>;
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>;
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>;
+<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out1</font>,<font color="#ff00ff">20</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out2</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out2</font>,<font color="#ff00ff">20</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out3</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out3</font>,<font color="#ff00ff">20</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+<span class="heading4">Firebird</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#298a52"><b>integer</b></font>, in2 <font color="#298a52"><b>float</b></font>, in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) returns (out1 <font color="#298a52"><b>integer</b></font>, out2 <font color="#298a52"><b>float</b></font>, out3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) <font color="#6b59ce">as</font>
+<font color="#6b59ce">begin</font>
+        out1=in1;
+        out2=in2;
+        out3=in3;
+        suspend;
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dth</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testproc(?,?,?)</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>;
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>;
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>;
+<font color="#008a8c">$sth</font>-&gt;bind_columns(<font color="#a52829"><b>undef</b></font>,<font color="#008a8c">\$out1</font>,<font color="#008a8c">\$out1</font>,<font color="#008a8c">\$out3</font>);
+<font color="#008a8c">$sth</font>-&gt;fetch();
+</pre>
+</blockquote>
+
+<p>Alternatively, you can run a query like the following and receive the result
+using a output bind variables.  Note that in Firebird, input and
+output bind variable indices are distict from one another.  The index of the
+first output bind variable is 1 rather than 4, even though there were 3 input
+bind variables.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">execute procedure testproc ?, ?, ?</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>;
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>;
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>;
+<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out1</font>,<font color="#ff00ff">20</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out2</font>,<font color="#ff00ff">20</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out3</font>,<font color="#ff00ff">20</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+<span class="heading4">DB2</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(<font color="#a52829"><b>in</b></font> in1 int, <font color="#a52829"><b>in</b></font> in2 double, <font color="#a52829"><b>in</b></font> in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), <font color="#a52829"><b>out</b></font> out1 int, <font color="#a52829"><b>out</b></font> out2 double, <font color="#a52829"><b>out</b></font> out3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) language sql
+<font color="#6b59ce">begin</font>
+        <font color="#a52829"><b>set</b></font> out1 = in1;
+        <font color="#a52829"><b>set</b></font> out2 = in2;
+        <font color="#a52829"><b>set</b></font> out3 = in3;
+<font color="#6b59ce">end</font>
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(?,?,?,?,?,?)</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>;
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>;
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>;
+<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">4</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out1</font>,<font color="#ff00ff">25</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">5</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out2</font>,<font color="#ff00ff">25</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">6</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out3</font>,<font color="#ff00ff">25</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+<span class="heading4">Postgresql</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>)) returns record <font color="#6b59ce">as</font> '
+declare
+        output record;
+<font color="#6b59ce">begin</font>
+        <font color="#a52829"><b>select</b></font> $<font color="#ff00ff">1</font>,$<font color="#ff00ff">2</font>,$<font color="#ff00ff">3</font> <font color="#6b59ce">into</font> output;
+        <font color="#6b59ce">return</font> output;
+<font color="#6b59ce">end</font>;
+' language plpgsql
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testfunc(:in1,:in2,:in3) as (col1 int, col2 float, col3 char(20))</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
+<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>;
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>;
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>;
+<font color="#008a8c">$sth</font>-&gt;bind_columns(<font color="#a52829"><b>undef</b></font>,<font color="#008a8c">\$out1</font>,<font color="#008a8c">\$out2</font>,<font color="#008a8c">\$out3</font>);
+<font color="#008a8c">$sth</font>-&gt;fetch();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testfunc(int,<font color="#298a52"><b>float</b></font>,<font color="#298a52"><b>char</b></font>(<font color="#ff00ff">20</font>))
+</pre>
+</blockquote>
+
+<span class="heading4">MySQL</span><br>
+
+<p>Here's how you can get multiple values from the result
+set of a MySQL procedure.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc(<font color="#a52a2a"><b>in</b></font> in1 int, <font color="#a52a2a"><b>in</b></font> in2 <font color="#2e8b57"><b>float</b></font>, <font color="#a52a2a"><b>in</b></font> in3 <font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> in1, in2, in3; <font color="#6a5acd">end</font>;
+</pre>
+</blockquote>
+
+<p>MySQL 4.1.2 supports native input binds with its Statement API but the
+Statement API cannot be used to call stored procedures yet.  As a result,
+SQL Relay must fake input binds when calling MySQL stored procedures, so queries
+which call stored procedures must be written with colon-delimited bind
+variables rather than MySQL's native ?'s.</p>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(:in1,:in2,:in3)</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out1</font>;
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out2</font>;
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out3</font>;
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_columns</font>(<font color="#a52a2a"><b>undef</b></font>,<font color="#008b8b">\$out1</font>,<font color="#008b8b">\$out2</font>,<font color="#008b8b">\$out3</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;fetch</font>();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+</pre>
+</blockquote>
+
+<p>Here's how you can get multiple values from the output variables
+of a MySQL procedure.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc(<font color="#a52a2a"><b>out</b></font> out1 int, <font color="#a52a2a"><b>out</b></font> out2 <font color="#2e8b57"><b>float</b></font>, <font color="#a52a2a"><b>out</b></font> out3 <font color="#2e8b57"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> <font color="#ff00ff">1</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">'hello'</font> <font color="#6a5acd">into</font> out1, out2, out3; <font color="#6a5acd">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">set </font><font color="#6a5acd">\@</font><font color="#ff00ff">out1=0, </font><font color="#6a5acd">\@</font><font color="#ff00ff">out2=0.0, </font><font color="#6a5acd">\@</font><font color="#ff00ff">out3='')</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
+<font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(</font><font color="#6a5acd">\@</font><font color="#ff00ff">out1,</font><font color="#6a5acd">\@</font><font color="#ff00ff">out2,</font><font color="#6a5acd">\@</font><font color="#ff00ff">out3)</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
+<font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select </font><font color="#6a5acd">\@</font><font color="#ff00ff">out1,</font><font color="#6a5acd">\@</font><font color="#ff00ff">out2,</font><font color="#6a5acd">\@</font><font color="#ff00ff">out3</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out1</font>;
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out2</font>;
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out3</font>;
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_columns</font>(<font color="#a52a2a"><b>undef</b></font>,<font color="#008b8b">\$out1</font>,<font color="#008b8b">\$out2</font>,<font color="#008b8b">\$out3</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;fetch</font>();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+
+<br><span class="heading3">Result Sets</span><br>
+
+<p>Some stored procedures return entire result sets.  Below are examples,
+illustrating how to create, execute and drop this kind of stored procedure for
+each database that SQL Relay supports.</p>
+
+<span class="heading4">Oracle</span><br>
+
+<p>Stored procedures in Oracle can return open cursors as return values or
+output parameters.  A client-side cursor can be bound to this open cursor and
+rows can be fetched from it.  However the SQL Relay driver for Perl DBI does
+not currently support output bind cursors.</p>
+
+<span class="heading4">Sybase and Microsoft SQL Server</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc <font color="#6a5acd">as</font> <font color="#a52a2a"><b>select</b></font> * <font color="#6a5acd">from</font> testtable
+</pre>
+</blockquote>
+
+<p>To exceute the stored procedure from an SQL Relay program, ue code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepareQuery</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">exec testproc</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out1</font>;
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out2</font>;
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out3</font>;
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_columns</font>(<font color="#a52a2a"><b>undef</b></font>,<font color="#008b8b">\$out1</font>,<font color="#008b8b">\$out2</font>,<font color="#008b8b">\$out3</font>);
+<font color="#a52a2a"><b>while</b></font> (<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;fetch</font>()) {
+        <font color="#a52a2a"><b>print</b></font> <font color="#ff00ff">&quot;</font><font color="#008b8b">$out1</font><font color="#ff00ff">, </font><font color="#008b8b">$out2</font><font color="#ff00ff">, </font><font color="#008b8b">$out3</font><font color="#6a5acd">\n</font><font color="#ff00ff">&quot;</font>;
+}
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+</pre>
+</blockquote>
+
+
+<span class="heading4">Firebird</span><br>
+
+<p>Stored procedures in Firebird can return a result set if a
+select query in the procedure selects values into the output parameters and
+then issues a suspend command, however SQL Relay doesn't currently support
+stored procedures that return result sets.</p>
+
+<span class="heading4">DB2</span><br>
+
+<p>Stored procedures in DB2 can return a result set if the procedure is declared
+to return one, however SQL Relay doesn't currently support stored procedures
+that return result sets.</p>
+
+<span class="heading4">Postgresql</span><br>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">function</font> testfunc() returns setof record <font color="#6b59ce">as</font> '
+        declare output record;
+<font color="#6b59ce">begin</font>
+        <font color="#6b59ce">for</font> output <font color="#a52829"><b>in</b></font> <font color="#a52829"><b>select</b></font> * <font color="#6b59ce">from</font> mytable <font color="#6b59ce">loop</font>
+                <font color="#6b59ce">return</font> next output;
+        <font color="#6b59ce">end</font> <font color="#6b59ce">loop</font>;
+        <font color="#6b59ce">return</font>;
+<font color="#6b59ce">end</font>;
+' language plpgsql
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testfunc() as (testint int, testfloat float, testchar char(40))</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$sth</font>-&gt;execute();
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$col1</font>;
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$col2</font>;
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$col3</font>;
+<font color="#008a8c">$sth</font>-&gt;bind_columns(<font color="#a52829"><b>undef</b></font>,<font color="#008a8c">\$col1</font>,<font color="#008a8c">\$col2</font>,<font color="#008a8c">\$col3</font>);
+<font color="#a52829"><b>while</b></font> (<font color="#008a8c">$sth</font>-&gt;fetch()) {
+        <font color="#a52829"><b>print</b></font> <font color="#ff00ff">&quot;</font><font color="#008a8c">$col1</font><font color="#ff00ff">, </font><font color="#008a8c">$col2</font><font color="#ff00ff">, </font><font color="#008a8c">$col3</font><font color="#6b59ce">\n</font><font color="#ff00ff">&quot;</font>;
+}
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">function</font> testfunc
+</pre>
+</blockquote>
+
+<span class="heading4">MySQL</span><br>
+
+<p>The result sets of all select statements called within MySQL stored
+procedures (that aren't selected into variables) are returned from the procedure
+call.  Though MySQL stored procedures can return multiple result sets,
+currently SQL Relay can only fetch the first result set.</p>
+
+<p>To create the stored procedure which returns a result set, run a query like
+the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>create</b></font> <font color="#6a5acd">procedure</font> testproc() <font color="#6a5acd">begin</font> <font color="#a52a2a"><b>select</b></font> * <font color="#6a5acd">from</font> mytable; <font color="#6a5acd">end</font>;
+</pre>
+</blockquote>
+
+<p>MySQL 4.1.2 supports native input binds with its Statement API but the
+Statement API cannot be used to call stored procedures yet.  As a result,
+SQL Relay must fake input binds when calling MySQL stored procedures, so queries
+which call stored procedures must be written with colon-delimited bind
+variables rather than MySQL's native ?'s.</p>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepareQuery</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(:in1,:in2,:in3)</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out1</font>;
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out2</font>;
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out3</font>;
+<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_columns</font>(<font color="#a52a2a"><b>undef</b></font>,<font color="#008b8b">\$out1</font>,<font color="#008b8b">\$out2</font>,<font color="#008b8b">\$out3</font>);
+<font color="#a52a2a"><b>while</b></font> (<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;fetch</font>()) {
+        <font color="#a52a2a"><b>print</b></font> <font color="#ff00ff">&quot;</font><font color="#008b8b">$out1</font><font color="#ff00ff">, </font><font color="#008b8b">$out2</font><font color="#ff00ff">, </font><font color="#008b8b">$out3</font><font color="#6a5acd">\n</font><font color="#ff00ff">&quot;</font>;
+}
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52a2a"><b>drop</b></font> <font color="#6a5acd">procedure</font> testproc
+</pre>
+</blockquote>
+
+<a name="lastinsertid"></a>
+<span class="heading2">Getting the Last Insert ID in SQLite</span><br><br>
+
+<p>The SQLite API provides a function which returns the "last insert rowid";
+the rowid of the most recent insert into the database or 0 if no inserts have 
+ever been performed during the session.</p>
+
+<p>SQL Relay supports fetching the last insert rowid from an SQLite database
+as well.  You just have to run the query:
+
+<blockquote>
+<b>select last insert rowid</b>
+</blockquote>
+
+
+</body>
+</html>
