@@ -788,11 +788,12 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>-&gt;<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">begin testproc(:in1,:in2,:in3); end;</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "begin testproc(:in1,:in2,:in3); end;";
+sqlrcom.Parameters.Add("in1",1);
+sqlrcom.Parameters.Add("in2",1.1);
+sqlrcom.Parameters.Add("in3","hello");
+sqlrcom.ExecuteNonQuery();
 </pre>
 </blockquote>
 
@@ -821,11 +822,12 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>-&gt;<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">exec testproc</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "exec testproc";
+sqlrcom.Parameters.Add("in1",1);
+sqlrcom.Parameters.Add("in2",1.1);
+sqlrcom.Parameters.Add("in3","hello");
+sqlrcom.ExecuteNonQuery();
 </pre>
 </blockquote>
 
@@ -856,11 +858,12 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">execute procedure testproc ?, ?, ?</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "execute procedure testproc ?, ?, ?";
+sqlrcom.Parameters.Add("1",1);
+sqlrcom.Parameters.Add("2",1.1);
+sqlrcom.Parameters.Add("3","hello");
+sqlrcom.ExecuteNonQuery();
 </pre>
 </blockquote>
 
@@ -890,11 +893,12 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(?,?,?)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "call testproc(?,?,?)";
+sqlrcom.Parameters.Add("1",1);
+sqlrcom.Parameters.Add("2",1.1);
+sqlrcom.Parameters.Add("3","hello");
+sqlrcom.ExecuteNonQuery();
 </pre>
 </blockquote>
 
@@ -925,11 +929,12 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select testfunc(:in1,:in2,:in3)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "call testfunc(:in1,:in2,:in3)";
+sqlrcom.Parameters.Add("in1",1);
+sqlrcom.Parameters.Add("in2",1.1);
+sqlrcom.Parameters.Add("in3","hello");
+sqlrcom.ExecuteNonQuery();
 </pre>
 </blockquote>
 
@@ -965,11 +970,12 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select testfunc(?,?,?)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "call testproc(:in1,:in2,:in3)";
+sqlrcom.Parameters.Add("in1",1);
+sqlrcom.Parameters.Add("in2",1.1);
+sqlrcom.Parameters.Add("in3","hello");
+sqlrcom.ExecuteNonQuery();
 </pre>
 </blockquote>
 
@@ -1014,14 +1020,12 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select testproc(:in1,:in2,:in3) from dual</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>;
-<font color="#008a8c">$sth</font>-&gt;bind_columns(<font color="#a52829"><b>undef</b></font>,<font color="#008a8c">\$result</font>);
-<font color="#008a8c">$sth</font>-&gt;fetch();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "select testproc(:in1,:in2,:in3) from dual";
+sqlrcom.Parameters.Add("in1",1);
+sqlrcom.Parameters.Add("in2",1.1);
+sqlrcom.Parameters.Add("in3","hello");
+Int64 result=sqlrcom.ExecuteScalar();
 </pre>
 </blockquote>
 
@@ -1052,13 +1056,18 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">begin testproc(:in1,:in2,:in3,:out1); end;</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>;
-<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$result</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "begin testproc(:in1,:in2,:in3,:out1); end";
+sqlrcom.Parameters.Add("in1",1);
+sqlrcom.Parameters.Add("in2",1.1);
+sqlrcom.Parameters.Add("in3","hello");
+SQLRelayParameter out1 = new SQLRelayParameter();
+out1.ParameterName = "out1";
+out1.Direction = ParameterDirection.Output;
+out1.DbType = DbType.Int64;
+sqlrcom.Parameters.Add(out1);
+sqlrcom.ExecuteNonQuery();
+Int64 result = Convert.ToInt64(out1.Value);
 </pre>
 </blockquote>
 
@@ -1091,13 +1100,18 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dth</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">exec testproc</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>;
-<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$result</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "exec testproc";
+sqlrcom.Parameters.Add("in1",1);
+sqlrcom.Parameters.Add("in2",1.1);
+sqlrcom.Parameters.Add("in3","hello");
+SQLRelayParameter out1 = new SQLRelayParameter();
+out1.ParameterName = "out1";
+out1.Direction = ParameterDirection.Output;
+out1.DbType = DbType.Int64;
+sqlrcom.Parameters.Add(out1);
+sqlrcom.ExecuteNonQuery();
+Int64 result = Convert.ToInt64(out1.Value);
 </pre>
 </blockquote>
 
@@ -1129,14 +1143,12 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dth</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testproc(?,?,?)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>;
-<font color="#008a8c">$sth</font>-&gt;bind_columns(<font color="#a52829"><b>undef</b></font>,<font color="#008a8c">\$result</font>);
-<font color="#008a8c">$sth</font>-&gt;fetch();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "select * from testproc(?,?,?)";
+sqlrcom.Parameters.Add("1",1);
+sqlrcom.Parameters.Add("2",1.1);
+sqlrcom.Parameters.Add("3","hello");
+Int64 result = sqlrcom.ExecuteScalar();
 </pre>
 </blockquote>
 
@@ -1148,13 +1160,18 @@ variables.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">execute procedure testproc ?, ?, ?</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>;
-<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$result</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "execute procedure testproc ?, ?, ?";
+sqlrcom.Parameters.Add("1",1);
+sqlrcom.Parameters.Add("2",1.1);
+sqlrcom.Parameters.Add("3","hello");
+SQLRelayParameter out1 = new SQLRelayParameter();
+out1.ParameterName = "1";
+out1.Direction = ParameterDirection.Output;
+out1.DbType = DbType.Int64;
+sqlrcom.Parameters.Add(out1);
+sqlrcom.ExecuteNonQuery();
+Int64 result = Convert.ToInt64(out1.Value);
 </pre>
 </blockquote>
 
@@ -1188,13 +1205,18 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(?,?,?,?)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>;
-<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">4</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$result</font>,<font color="#ff00ff">25</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "call testproc(?,?,?,?)";
+sqlrcom.Parameters.Add("1",1);
+sqlrcom.Parameters.Add("2",1.1);
+sqlrcom.Parameters.Add("3","hello");
+SQLRelayParameter out4 = new SQLRelayParameter();
+out4.ParameterName = "4";
+out4.Direction = ParameterDirection.Output;
+out4.DbType = DbType.Int64;
+sqlrcom.Parameters.Add(out4);
+sqlrcom.ExecuteNonQuery();
+Int64 result = Convert.ToInt64(out4.Value);
 </pre>
 </blockquote>
 
@@ -1231,14 +1253,12 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testfunc(:in1,:in2,:in3)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>;
-<font color="#008a8c">$sth</font>-&gt;bind_columns(<font color="#a52829"><b>undef</b></font>,<font color="#008a8c">\$result</font>);
-<font color="#008a8c">$sth</font>-&gt;fetch();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "select * from testfunc(?,?,?)";
+sqlrcom.Parameters.Add("1",1);
+sqlrcom.Parameters.Add("2",1.1);
+sqlrcom.Parameters.Add("3","hello");
+Int64 result = sqlrcom.ExecuteScalar();
 </pre>
 </blockquote>
 
@@ -1267,14 +1287,12 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select testfunc(?,?,?)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out1</font>;
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_columns</font>(<font color="#a52a2a"><b>undef</b></font>,<font color="#008b8b">\$out1</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;fetch</font>();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "select * from testfunc(?,?,?)";
+sqlrcom.Parameters.Add("1",1);
+sqlrcom.Parameters.Add("2",1.1);
+sqlrcom.Parameters.Add("3","hello");
+Int64 result = sqlrcom.ExecuteScalar();
 </pre>
 </blockquote>
 
@@ -1301,10 +1319,9 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select testproc()</font><font color="#ff00ff">&quot;</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_columns</font>(<font color="#a52a2a"><b>undef</b></font>,<font color="#008b8b">\$out1</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;fetch</font>();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "select testproc()";
+Int64 result = sqlrcom.ExecuteScalar();
 </pre>
 </blockquote>
 
@@ -1332,14 +1349,16 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select </font><font color="#6a5acd">\@</font><font color="#ff00ff">out1=0</font><font color="#ff00ff">&quot;</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(</font><font color="#6a5acd">\@</font><font color="#ff00ff">out1)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select </font><font color="#6a5acd">\@</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_columns</font>(<font color="#a52a2a"><b>undef</b></font>,<font color="#008b8b">\$out1</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;fetch</font>();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+
+sqlrcom.CommandText = "set @out1=0";
+Int64 result = sqlrcom.ExecuteNonQuery();
+
+sqlrcom.CommandText = "call testproc(@out1)";
+Int64 result = sqlrcom.ExecuteNonQuery();
+
+sqlrcom.CommandText = "select @out1";
+Int64 result = sqlrcom.ExecuteScalar();
 </pre>
 </blockquote>
 
@@ -1386,16 +1405,31 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">begin testproc(:in1,:in2,:in3,:out1,:out2,:out3); end;</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>;
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>;
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>;
-<font color="#008a8c">$sth</font>-&gt;bind_input_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out1</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_input_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out2</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out2</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_input_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out3</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out3</font>,<font color="#ff00ff">20</font>);
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "begin testproc(:in1,:in2,:in3,:out1,:out2,:out3); end;";
+sqlrcom.Parameters.Add("in1",1);
+sqlrcom.Parameters.Add("in2",1.1);
+sqlrcom.Parameters.Add("in3","hello");
+SQLRelayParameter out1 = new SQLRelayParameter();
+out1.ParameterName = "out1";
+out1.Direction = ParameterDirection.Output;
+out1.DbType = DbType.Int64;
+sqlrcom.Parameters.Add(out1);
+SQLRelayParameter out2 = new SQLRelayParameter();
+out2.ParameterName = "out2";
+out2.Direction = ParameterDirection.Output;
+out2.DbType = DbType.Double;
+sqlrcom.Parameters.Add(out2);
+SQLRelayParameter out2 = new SQLRelayParameter();
+out3.ParameterName = "out3";
+out3.Direction = ParameterDirection.Output;
+out3.DbType = DbType.String;
+out3.Size = 20;
+sqlrcom.Parameters.Add(out3);
+sqlrcom.ExecuteNonQuery();
+Int64 result1 = Convert.ToInt64(out1.Value);
+Double result2 = Convert.ToDouble(out2.Value);
+String result3 = Convert.ToString(out3.Value);
 </pre>
 </blockquote>
 
@@ -1426,17 +1460,31 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dth</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">exec testproc</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>;
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>;
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>;
-<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out1</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out1</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out2</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out2</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">out3</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out3</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "exec testproc";
+sqlrcom.Parameters.Add("in1",1);
+sqlrcom.Parameters.Add("in2",1.1);
+sqlrcom.Parameters.Add("in3","hello");
+SQLRelayParameter out1 = new SQLRelayParameter();
+out1.ParameterName = "out1";
+out1.Direction = ParameterDirection.Output;
+out1.DbType = DbType.Int64;
+sqlrcom.Parameters.Add(out1);
+SQLRelayParameter out2 = new SQLRelayParameter();
+out2.ParameterName = "out2";
+out2.Direction = ParameterDirection.Output;
+out2.DbType = DbType.Double;
+sqlrcom.Parameters.Add(out2);
+SQLRelayParameter out2 = new SQLRelayParameter();
+out3.ParameterName = "out3";
+out3.Direction = ParameterDirection.Output;
+out3.DbType = DbType.String;
+out3.Size = 20;
+sqlrcom.Parameters.Add(out3);
+sqlrcom.ExecuteNonQuery();
+Int64 result1 = Convert.ToInt64(out1.Value);
+Double result2 = Convert.ToDouble(out2.Value);
+String result3 = Convert.ToString(out3.Value);
 </pre>
 </blockquote>
 
@@ -1470,16 +1518,17 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dth</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testproc(?,?,?)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>;
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>;
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>;
-<font color="#008a8c">$sth</font>-&gt;bind_columns(<font color="#a52829"><b>undef</b></font>,<font color="#008a8c">\$out1</font>,<font color="#008a8c">\$out1</font>,<font color="#008a8c">\$out3</font>);
-<font color="#008a8c">$sth</font>-&gt;fetch();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "select * from testproc(?,?,?)";
+sqlrcom.Parameters.Add("1",1);
+sqlrcom.Parameters.Add("2",1.1);
+sqlrcom.Parameters.Add("3","hello");
+sqlrcom.ExecuteReader();
+System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
+datareader.Read();
+Int64 out1 = datareader.GetInt64(0);
+Double out2 = datareader.GetDouble(1);
+String out3 = datareader.GetString(2);
 </pre>
 </blockquote>
 
@@ -1491,17 +1540,31 @@ bind variables.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">execute procedure testproc ?, ?, ?</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>;
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>;
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>;
-<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out1</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out2</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out3</font>,<font color="#ff00ff">20</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "exec procedure testproc ?, ?, ?";
+sqlrcom.Parameters.Add("1",1);
+sqlrcom.Parameters.Add("2",1.1);
+sqlrcom.Parameters.Add("3","hello");
+SQLRelayParameter out1 = new SQLRelayParameter();
+out1.ParameterName = "1";
+out1.Direction = ParameterDirection.Output;
+out1.DbType = DbType.Int64;
+sqlrcom.Parameters.Add(out1);
+SQLRelayParameter out2 = new SQLRelayParameter();
+out2.ParameterName = "2";
+out2.Direction = ParameterDirection.Output;
+out2.DbType = DbType.Double;
+sqlrcom.Parameters.Add(out2);
+SQLRelayParameter out2 = new SQLRelayParameter();
+out3.ParameterName = "3";
+out3.Direction = ParameterDirection.Output;
+out3.DbType = DbType.String;
+out3.Size = 20;
+sqlrcom.Parameters.Add(out3);
+sqlrcom.ExecuteNonQuery();
+Int64 result1 = Convert.ToInt64(out1.Value);
+Double result2 = Convert.ToDouble(out2.Value);
+String result3 = Convert.ToString(out3.Value);
 </pre>
 </blockquote>
 
@@ -1534,17 +1597,31 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(?,?,?,?,?,?)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>;
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>;
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>;
-<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">4</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out1</font>,<font color="#ff00ff">25</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">5</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out2</font>,<font color="#ff00ff">25</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_inout_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">6</font><font color="#ff00ff">&quot;</font>,<font color="#008a8c">\$out3</font>,<font color="#ff00ff">25</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "call testproc(?,?,?,?,?,?)";
+sqlrcom.Parameters.Add("1",1);
+sqlrcom.Parameters.Add("2",1.1);
+sqlrcom.Parameters.Add("3","hello");
+SQLRelayParameter out1 = new SQLRelayParameter();
+out1.ParameterName = "4";
+out1.Direction = ParameterDirection.Output;
+out1.DbType = DbType.Int64;
+sqlrcom.Parameters.Add(out1);
+SQLRelayParameter out2 = new SQLRelayParameter();
+out2.ParameterName = "5";
+out2.Direction = ParameterDirection.Output;
+out2.DbType = DbType.Double;
+sqlrcom.Parameters.Add(out2);
+SQLRelayParameter out2 = new SQLRelayParameter();
+out3.ParameterName = "6";
+out3.Direction = ParameterDirection.Output;
+out3.DbType = DbType.String;
+out3.Size = 20;
+sqlrcom.Parameters.Add(out3);
+sqlrcom.ExecuteNonQuery();
+Int64 result1 = Convert.ToInt64(out1.Value);
+Double result2 = Convert.ToDouble(out2.Value);
+String result3 = Convert.ToString(out3.Value);
 </pre>
 </blockquote>
 
@@ -1579,16 +1656,17 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testfunc(:in1,:in2,:in3) as (col1 int, col2 float, col3 char(20))</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
-<font color="#008a8c">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>;
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>;
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$out3</font>;
-<font color="#008a8c">$sth</font>-&gt;bind_columns(<font color="#a52829"><b>undef</b></font>,<font color="#008a8c">\$out1</font>,<font color="#008a8c">\$out2</font>,<font color="#008a8c">\$out3</font>);
-<font color="#008a8c">$sth</font>-&gt;fetch();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "select * from testfunc(?,?,?) as (col1 int, col2 float, col3 char(20))";
+sqlrcom.Parameters.Add("in1",1);
+sqlrcom.Parameters.Add("in2",1.1);
+sqlrcom.Parameters.Add("in3","hello");
+sqlrcom.ExecuteReader();
+System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
+datareader.Read();
+Int64 out1 = datareader.GetInt64(0);
+Double out2 = datareader.GetDouble(1);
+String out3 = datareader.GetString(2);
 </pre>
 </blockquote>
 
@@ -1624,16 +1702,17 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(:in1,:in2,:in3)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out1</font>;
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out2</font>;
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out3</font>;
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_columns</font>(<font color="#a52a2a"><b>undef</b></font>,<font color="#008b8b">\$out1</font>,<font color="#008b8b">\$out2</font>,<font color="#008b8b">\$out3</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;fetch</font>();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+sqlrcom.CommandText = "call testproc(:in1,:in2,:in3)";
+sqlrcom.Parameters.Add("in1",1);
+sqlrcom.Parameters.Add("in2",1.1);
+sqlrcom.Parameters.Add("in3","hello");
+sqlrcom.ExecuteReader();
+System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
+datareader.Read();
+Int64 out1 = datareader.GetInt64(0);
+Double out2 = datareader.GetDouble(1);
+String out3 = datareader.GetString(2);
 </pre>
 </blockquote>
 
@@ -1661,17 +1740,20 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">set </font><font color="#6a5acd">\@</font><font color="#ff00ff">out1=0, </font><font color="#6a5acd">\@</font><font color="#ff00ff">out2=0.0, </font><font color="#6a5acd">\@</font><font color="#ff00ff">out3='')</font><font color="#ff00ff">&quot;</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
-<font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(</font><font color="#6a5acd">\@</font><font color="#ff00ff">out1,</font><font color="#6a5acd">\@</font><font color="#ff00ff">out2,</font><font color="#6a5acd">\@</font><font color="#ff00ff">out3)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
-<font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepare</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select </font><font color="#6a5acd">\@</font><font color="#ff00ff">out1,</font><font color="#6a5acd">\@</font><font color="#ff00ff">out2,</font><font color="#6a5acd">\@</font><font color="#ff00ff">out3</font><font color="#ff00ff">&quot;</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out1</font>;
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out2</font>;
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out3</font>;
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_columns</font>(<font color="#a52a2a"><b>undef</b></font>,<font color="#008b8b">\$out1</font>,<font color="#008b8b">\$out2</font>,<font color="#008b8b">\$out3</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;fetch</font>();
+SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
+
+sqlrcom.CommandText = "set @out1=0, @out2=0.0, @out3=''";
+Int64 result = sqlrcom.ExecuteNonQuery();
+
+sqlrcom.CommandText = "call testproc(@out1,@out2,@out3)";
+Int64 result = sqlrcom.ExecuteNonQuery();
+
+sqlrcom.CommandText = "select @out1,@out2,@out3";
+System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
+datareader.Read();
+Int64 out1 = datareader.GetInt64(0);
+Double out2 = datareader.GetDouble(1);
+String out3 = datareader.GetString(2);
 </pre>
 </blockquote>
 
@@ -1713,15 +1795,7 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepareQuery</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">exec testproc</font><font color="#ff00ff">&quot;</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out1</font>;
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out2</font>;
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out3</font>;
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_columns</font>(<font color="#a52a2a"><b>undef</b></font>,<font color="#008b8b">\$out1</font>,<font color="#008b8b">\$out2</font>,<font color="#008b8b">\$out3</font>);
-<font color="#a52a2a"><b>while</b></font> (<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;fetch</font>()) {
-        <font color="#a52a2a"><b>print</b></font> <font color="#ff00ff">&quot;</font><font color="#008b8b">$out1</font><font color="#ff00ff">, </font><font color="#008b8b">$out2</font><font color="#ff00ff">, </font><font color="#008b8b">$out3</font><font color="#6a5acd">\n</font><font color="#ff00ff">&quot;</font>;
-}
+...
 </pre>
 </blockquote>
 
@@ -1770,15 +1844,7 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testfunc() as (testint int, testfloat float, testchar char(40))</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$sth</font>-&gt;execute();
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$col1</font>;
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$col2</font>;
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$col3</font>;
-<font color="#008a8c">$sth</font>-&gt;bind_columns(<font color="#a52829"><b>undef</b></font>,<font color="#008a8c">\$col1</font>,<font color="#008a8c">\$col2</font>,<font color="#008a8c">\$col3</font>);
-<font color="#a52829"><b>while</b></font> (<font color="#008a8c">$sth</font>-&gt;fetch()) {
-        <font color="#a52829"><b>print</b></font> <font color="#ff00ff">&quot;</font><font color="#008a8c">$col1</font><font color="#ff00ff">, </font><font color="#008a8c">$col2</font><font color="#ff00ff">, </font><font color="#008a8c">$col3</font><font color="#6b59ce">\n</font><font color="#ff00ff">&quot;</font>;
-}
+...
 </pre>
 </blockquote>
 
@@ -1817,18 +1883,7 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font><font color="#008b8b">-&gt;prepareQuery</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">call testproc(:in1,:in2,:in3)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_param</font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;execute</font>();
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out1</font>;
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out2</font>;
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$out3</font>;
-<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;bind_columns</font>(<font color="#a52a2a"><b>undef</b></font>,<font color="#008b8b">\$out1</font>,<font color="#008b8b">\$out2</font>,<font color="#008b8b">\$out3</font>);
-<font color="#a52a2a"><b>while</b></font> (<font color="#008b8b">$sth</font><font color="#008b8b">-&gt;fetch</font>()) {
-        <font color="#a52a2a"><b>print</b></font> <font color="#ff00ff">&quot;</font><font color="#008b8b">$out1</font><font color="#ff00ff">, </font><font color="#008b8b">$out2</font><font color="#ff00ff">, </font><font color="#008b8b">$out3</font><font color="#6a5acd">\n</font><font color="#ff00ff">&quot;</font>;
-}
+...
 </pre>
 </blockquote>
 
