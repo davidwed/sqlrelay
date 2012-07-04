@@ -21,21 +21,29 @@ namespace SQLRClient
 
         #region constructors and destructors
 
+        /** Initializes a new instance of the SQLRelayCommand class. */
         public SQLRelayCommand()
         {
         }
 
+        /** Initializes a new instance of the SQLRelayCommand class with the
+         *  text of the query. */
         public SQLRelayCommand(String commandtext)
         {
             _commandtext = commandtext;
         }
 
+        /** Initializes a new instance of the SQLRelayCommand class with the
+         *  text of the query and a SQLRelayConnection */
         public SQLRelayCommand(String commandtext, SQLRelayConnection sqlrelaycon)
         {
             _commandtext = commandtext;
             _sqlrelaycon = sqlrelaycon;
         }
 
+        /** Initializes a new instance of the SQLRelayCommand class with the
+         *  text of the query, a SQLRelayConnection, and the
+         *  SQLRelayTransaction. */
         public SQLRelayCommand(String commandtext, SQLRelayConnection sqlrelaycon, SQLRelayTransaction sqlrelaytran)
         {
             _commandtext = commandtext;
@@ -43,6 +51,7 @@ namespace SQLRClient
             _sqlrelaytran = sqlrelaytran;
         }
 
+        /** Releases all resources used by the SQLRelayCommand. */
         void IDisposable.Dispose()
         {
             this.Dispose(true);
@@ -59,6 +68,8 @@ namespace SQLRClient
 
         #region properties
 
+        /** Gets or sets the text of the query that will be executed when
+         *  ExecuteNonQuery, ExecuteScalar or ExecuteReader are called. */
         public String CommandText
         {
             get
@@ -72,6 +83,11 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or sets the wait time before terminating the attempt to
+         *  execute a command and generating an error.  This method is
+         *  implemented because it is required by the interface but SQLRelay
+         *  does not support command timeouts, so a Get returns 0 and a Set to
+         *  any value but 0 throws NotSupportedException. */
         public Int32 CommandTimeout
         {
             get
@@ -87,6 +103,11 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or sets a value indicating how the CommandText property is to
+         *  be interpreted.  This method is implemented because it is required
+         *  by the interface but SQLRelay does not support command types, so a
+         *  Get returns CommandType.Text and a Set to any type other than
+         *  CommandType.Text throws NotSupportedException. */
         public CommandType CommandType
         {
             get
@@ -102,6 +123,8 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or sets the SQLRelayConnection used by this instance of
+         *  SQLRelayCommand. */
         public IDbConnection Connection
         {
             get
@@ -121,6 +144,7 @@ namespace SQLRClient
             }   
         }
 
+        /** Gets the SQLRelayParameterCollection. */
         public SQLRelayParameterCollection Parameters
         {
             get
@@ -129,6 +153,7 @@ namespace SQLRClient
             }
         }
 
+        /** Gets the SQLRelayParameterCollection. */
         IDataParameterCollection IDbCommand.Parameters
         {
             get
@@ -137,6 +162,8 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or sets the SQLRelayTransaction within which the
+         *  SQLRelayCommand executes. */
         public IDbTransaction Transaction
         {
             get
@@ -149,6 +176,8 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or sets how command results are applied to the DataRow when
+         *  used by the Update method of the DbDataAdapter. */
         public UpdateRowSource UpdatedRowSource
         {
             get
@@ -161,6 +190,8 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or sets the number of rows of the result set to buffer at
+         *  a time.  0 (the default) means buffer the entire result set. */
         public UInt64 ResultSetBufferSize
         {
             get
@@ -178,26 +209,38 @@ namespace SQLRClient
 
         #region public methods
 
+        /** Tries to cancel the executeion of a SQLRelayCommand.  This method is
+         *  implemented because it is required by the interface but SQLRelay
+         *  does not support cancelling commands and calling it will throw
+         *  NotSupportedException. */
         public void Cancel()
         {
             throw new NotSupportedException();
         }
 
+        /** Creates a new instance of an SQLRelayParameter object. */
         public IDbDataParameter CreateParameter()
         {
             return (IDbDataParameter)(new SQLRelayParameter());
         }
 
+        /** Sends the CommandText to the SQLRelayConnection and returns the
+         *  number of rows affected. */
         public Int32 ExecuteNonQuery()
         {
             return (runQuery()) ? (Int32)_sqlrcur.affectedRows() : 0;
         }
 
+        /** Sends the CommandText to the SQLRelayConnection and builds and
+         *  returns a SQLRelayDataReader. */
         public IDataReader ExecuteReader()
         {
             return ExecuteReader(CommandBehavior.Default);
         }
 
+        /** Sends the CommandText to the SQLRelayConnection and builds and
+         *  returns a SQLRelayDataReader using one of the CommandBehavior
+         *  values. */
         public IDataReader ExecuteReader(CommandBehavior commandbehavior)
         {
 
@@ -232,6 +275,9 @@ namespace SQLRClient
             return new SQLRelayDataReader(_sqlrelaycon, _sqlrcur, commandbehavior == CommandBehavior.CloseConnection);
         }
 
+        /** Sends the CommandText to the SQLRelayConnection and returns the
+         *  first column of the first row in the result set returned by the
+         *  query.  Additional columns or rows are ignored. */
         public Object ExecuteScalar()
         {
             if (runQuery())
@@ -245,6 +291,7 @@ namespace SQLRClient
             return null;
         }
 
+        /** Creates a prepared version of the command on the database. */
         public void Prepare()
         {
             validConnection();

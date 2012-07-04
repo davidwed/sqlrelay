@@ -26,10 +26,34 @@ namespace SQLRClient
 
         #region constructors and destructors
 
+        /** Initializes a new instance of the SQLRelayConnection class. */
         public SQLRelayConnection()
         {
         }
 
+        /** Initializes a new instance of the SQLRelayConnection class when
+         *  given a string that contains the connection string.  The connection
+         *  string must be of the following format:
+         *  "variable=value;variable=value;"  Valid variables include:
+         *
+         *  Data Source - The SQL Relay server to connect to.  This may be
+         *  specified as host:port, host:port:socket or just socket.  If host,
+         *  port and socket are all three specified, then a connection will
+         *  first be attempted to the local socket and then to the host/port.
+         *
+         *  User ID - The username to use when logging into SQL Relay.
+         *
+         *  Password - The password to use when logging into SQL Relay.
+         *
+         *  Retry Time - If a connection fails, it will be retried in this
+         *  interval (in seconds).
+         *
+         *  Tries - If a connection fails, it will be retries this many times.
+         *
+         *  Initial Catalog - The database/schema to switch to after logging in.
+         *  Optional.
+         *
+         *  Debug - If this is set to true then debug is enabled. */
         public SQLRelayConnection(String connectstring)
         {
             ConnectionString = connectstring;
@@ -43,6 +67,7 @@ namespace SQLRClient
             }
         }
 
+        /** Releases all resources used by the SQLRelayConnection. */
         void IDisposable.Dispose()
         {
             Dispose(true);
@@ -54,6 +79,8 @@ namespace SQLRClient
 
         #region properties
 
+        /** Gets or set the string used to open a connection to SQL Relay.
+         *  See the constructor for a descripton of the connection string. */
         public String ConnectionString
         {
             get
@@ -132,6 +159,8 @@ namespace SQLRClient
             }
         }
 
+        /** Gets Retry Time * Tries.  See the constructor for a descripton
+         *  of Retry Time and Tries. */
         public Int32 ConnectionTimeout
         {
             get
@@ -140,6 +169,8 @@ namespace SQLRClient
             }
         }
 
+        /** Gets the Initial Catalog, if one was set.  See the constructor for
+         *  a descripton of the Initial Catalog. */
         public String Database
         {
             get
@@ -148,6 +179,8 @@ namespace SQLRClient
             }
         }
 
+        /** Indicates the state of the SQLRelayConnection when the most recent
+         *  network operation was performed on the connection. */
         public ConnectionState State
         {
             get
@@ -156,6 +189,7 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or sets whether debug is enabled. */
         public Boolean Debug
         {
             get
@@ -181,6 +215,8 @@ namespace SQLRClient
 
         #region public methods
 
+        /** Opens a database connection with the property settings specified by
+         *  the ConnectionString.  */
         public void Open()
         {
             if (_connectionstring == null)
@@ -203,6 +239,8 @@ namespace SQLRClient
             }
         }
 
+        /** Closes the connection to the database.  This is the preferred
+         *  method of closing any open connection. */
         public void Close()
         {
             validConnection();
@@ -211,11 +249,13 @@ namespace SQLRClient
             _sqlrcon.endSession();
         }
 
+        /** Starts a database transaction. */
         IDbTransaction IDbConnection.BeginTransaction()
         {
             return BeginTransaction();
         }
 
+        /** Starts a database transaction. */
         public SQLRelayTransaction BeginTransaction()
         {
             validConnection();
@@ -230,16 +270,25 @@ namespace SQLRClient
             return trans;
         }
 
+        /** Starts a database transaction with the specified isolation level.
+         *  This method is implemented because it is required by the interface
+         *  but SQL Relay doesn't currently support setting the isolation level
+         *  here. */
         IDbTransaction IDbConnection.BeginTransaction(IsolationLevel isolationlevel)
         {
             return BeginTransaction(isolationlevel);
         }
 
+        /** Starts a database transaction with the specified isolation level.
+         *  This method is implemented because it is required by the interface
+         *  but SQL Relay doesn't currently support setting the isolation level
+         *  here. */
         public SQLRelayTransaction BeginTransaction(IsolationLevel isolationlevel)
         {
             throw new InvalidOperationException();
         }
 
+        /** Changes the current database for an open SQLRelayConnection. */
         public void ChangeDatabase(String db)
         {
             validConnection();
@@ -247,6 +296,8 @@ namespace SQLRClient
             _sqlrcon.selectDatabase(db);
         }
 
+        /** Creates and returns a SQLRelayCommand object associated with the
+         *  SQLRelayConnection. */
         public IDbCommand CreateCommand()
         {
             return new SQLRelayCommand(null, this);

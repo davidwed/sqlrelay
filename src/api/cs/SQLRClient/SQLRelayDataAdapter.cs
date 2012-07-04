@@ -14,10 +14,12 @@ namespace SQLRClient
         static private readonly Object EventRowUpdating = new Object();
         static private readonly Object EventRowUpdated = new Object();
 
+        /** Initializes a new instance of the SQLRelayDataAdapter class. */
         public SQLRelayDataAdapter()
         {
         }
 
+        /** Gets or set the query used to select records in the data source. */
         new public SQLRelayCommand SelectCommand
         {
             get
@@ -30,6 +32,7 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or set the query used to select records in the data source. */
         IDbCommand IDbDataAdapter.SelectCommand
         {
             get
@@ -42,6 +45,8 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or set the query used to insert records into the data
+         *  source. */
         new public SQLRelayCommand InsertCommand
         {
             get
@@ -54,6 +59,8 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or set the query used to insert records into the data
+         *  source. */
         IDbCommand IDbDataAdapter.InsertCommand
         {
             get
@@ -66,6 +73,7 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or set the query used to update records in the data source. */
         new public SQLRelayCommand UpdateCommand
         {
             get
@@ -78,6 +86,7 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or set the query used to update records in the data source. */
         IDbCommand IDbDataAdapter.UpdateCommand
         {
             get
@@ -90,6 +99,8 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or set the query used to delete records from the data
+         *  source. */
         new public SQLRelayCommand DeleteCommand
         {
             get
@@ -102,6 +113,8 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or set the query used to delete records from the data
+         *  source. */
         IDbCommand IDbDataAdapter.DeleteCommand
         {
             get
@@ -114,16 +127,19 @@ namespace SQLRClient
             }
         }
 
+        /** Initializes a new instance of the RowUpdatingEventArgs class. */
         override protected RowUpdatingEventArgs CreateRowUpdatingEvent(DataRow datarow, IDbCommand command, StatementType statementtype, DataTableMapping datatablemapping)
         {
             return new SQLRelayRowUpdatingEventArgs(datarow, command, statementtype, datatablemapping);
         }
 
+        /** Initializes a new instance of the RowUpdatingEventArgs class. */
         override protected RowUpdatedEventArgs CreateRowUpdatedEvent(DataRow datarow, IDbCommand command, StatementType statementtype, DataTableMapping datatablemapping)
         {
             return new SQLRelayRowUpdatedEventArgs(datarow, command, statementtype, datatablemapping);
         }
 
+        /** Raises the RowUpdating event of a .NET Framework data provider. */
         protected override void OnRowUpdating(RowUpdatingEventArgs value)
         {
             SQLRelayRowUpdatingEventHandler handler = (SQLRelayRowUpdatingEventHandler)Events[EventRowUpdating];
@@ -133,6 +149,7 @@ namespace SQLRClient
             }
         }
 
+        /** Raises the RowUpdated event of a .NET Framework data provider. */
         protected override void OnRowUpdated(RowUpdatedEventArgs value)
         {
             SQLRelayRowUpdatedEventHandler handler = (SQLRelayRowUpdatedEventHandler)Events[EventRowUpdated];
@@ -142,6 +159,8 @@ namespace SQLRClient
             }
         }
 
+        /** Occurs during Update before a command is executed against the
+         *  data source.  The attempt to update is made, so the even fires. */
         public event SQLRelayRowUpdatingEventHandler RowUpdating
         {
             add
@@ -154,6 +173,8 @@ namespace SQLRClient
             }
         }
 
+        /** Occurs during Update after a command is executed against the
+         *  data source.  The attempt to update is made, so the even fires. */
         public event SQLRelayRowUpdatedEventHandler RowUpdated
         {
             add
