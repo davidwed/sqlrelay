@@ -15,6 +15,7 @@
 	updated the scaler to poll 10 times per second and also accept a
 		trigger from the listener to mitigate race conditions that
 		can become problematic when connections="0" is used
+	added C# and ADO.NET docs and updated windows documentation
 
 0.45 - added trigger framework
 	added support for getting the native database error number

@@ -76,7 +76,7 @@ BuildRequires: rudiments-devel >= 0.34
 SQL Relay is a persistent database connection pooling, proxying and load 
 balancing system for Unix and Linux supporting ODBC, Oracle, MySQL,
 PostgreSQL, Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and
-MS Access (minimally) with APIs for C, C++, Perl, Perl-DBD, Python,
+MS Access (minimally) with APIs for C, C++, .NET, Perl, Perl-DBD, Python,
 Python-DB, Zope, PHP, Ruby, Ruby-DBD, Java, TCL and Erlang, drop-in
 replacement libraries for MySQL and PostgreSQL clients, command line
 clients and extensive documentation.  The APIs support advanced database
