@@ -116,7 +116,7 @@ work?</a></li>
 SQL Relay is a persistent database connection pooling, proxying and load 
 balancing system for Unix and Linux supporting ODBC, Oracle, MySQL,
 PostgreSQL, Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and
-MS Access (minimally) with APIs for C, C++, Perl, Perl-DBD, Python,
+MS Access (minimally) with APIs for C, C++, .NET, ODBC, Perl, Perl-DBD, Python,
 Python-DB, Zope, PHP, Ruby, Ruby-DBD, Java and TCL, drop-in replacement
 libraries for MySQL and PostgreSQL clients, command line clients
 and extensive documentation.  The APIs support advanced
@@ -141,14 +141,11 @@ configuration and possibly programming to be useful.</p>
 <a name="platforms"></a>
 <span class="heading3">What platforms does SQL Relay run on?</span>
 
-<p>Unix variants.  It is known to run on Linux (x86 and PPC), SCO Open Server,
-Solaris, FreeBSD, OpenBSD and NetBSD.  The client API's compile and work on 
-Win32 platforms using Cygwin or UWIN.   I only have access to Linux, SCO,
-Solaris, FreeBSD, OpenBSD, NetBSD and Win32 systems, so from time to time a new
-release breaks compatibility with other platforms.  If there's a platform you'd
-like to see supported and if you can grant me access to a machine running that
-platform, send mail to
-<a href="mailto:david.muse@firstworks.com">david.muse@firstworks.com</a>.</p>
+<p>All SQL Relay components should build and run on Linux, Solaris, FreeBSD, OpenBSD, NetBSD, Mac OS X, Haiku and SCO OpenServer 5.  x86 and x86_64 platforms are supported, as are non-x86 architectures such as ARM, Sparc, Mips, PPC and others.</p>
+
+<p>The client-side software should build and run on uClibc/Linux-based systems and possibly on uClibc/non-Linux-based systems as well.</p>
+
+<p>The command line clients and C, C++ and .NET API's should build and run natively on Windows.  The server and client components should all build and run under Cygwin on Windows though there are currently performance and compatibility issues under Cygwin.</p>
 
 <a name="howwork"></a>
 <span class="heading3">How does SQL Relay work?</span>
@@ -230,8 +227,7 @@ are especially heavyweight compared to other databases.  Moving that overhead
 out of your application is especially advantageous with Oracle.</p>
 
 <a name="freebsd"></a>
-<span class="heading3">Why is SQL Relay especially good for Open/Net/FreeBSD and 
-non-x86 Linux?</span>
+<span class="heading3">Why is SQL Relay especially good for Open/Net/FreeBSD and non-x86 Linux?</span>
 
 <p>Open/Net/FreeBSD and non-x86 Linux are good platforms but lack API
 support from prominent commercial database vendors.  SQL Relay provides a
