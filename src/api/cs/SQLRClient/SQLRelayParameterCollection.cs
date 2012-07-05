@@ -21,7 +21,7 @@ namespace SQLRClient
             }
         }
 
-        /** Returns whether the specified parameter is in the collection. */
+        /** Returns whether the specified parameter is in the collection.
          *  SQLRelayParameterCollection. */
         public Boolean Contains(String parametername)
         {
