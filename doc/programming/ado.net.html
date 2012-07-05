@@ -441,6 +441,7 @@ namespace SQLRExamples
 			// Prepare the query...
 			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
 			sqlrcom.CommandText = "insert into testtable values (:var1,:var2,:var3)";
+			sqlrcom.Prepare();
 
 
 			// Execute once...
