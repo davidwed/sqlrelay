@@ -113,6 +113,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqltranslations/temptablesaddmissingcolumns.cpp \
 	sqltranslations/oracletemptablespreserverowsbydefault.cpp \
 	sqltranslations/doublequotestosinglequotes.cpp \
+	sqltranslations/extendtooracletodate.cpp \
 	sqltriggers/sqltriggers.cpp \
 	sqltriggers/sqltrigger.cpp \
 	sqltriggers/createtableautoincrementoracle.cpp \
@@ -223,6 +224,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqltranslations/temptablesaddmissingcolumns.lo \
 	sqltranslations/oracletemptablespreserverowsbydefault.lo \
 	sqltranslations/doublequotestosinglequotes.lo \
+	sqltranslations/extendtooracletodate.lo \
 	sqltriggers/sqltriggers.lo \
 	sqltriggers/sqltrigger.lo \
 	sqltriggers/createtableautoincrementoracle.lo \

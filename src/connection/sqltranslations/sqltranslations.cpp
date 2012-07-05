@@ -11,6 +11,7 @@
 #include <sqltranslations/oracletemptablespreserverowsbydefault.h>
 #include <sqltranslations/temptablesaddmissingcolumns.h>
 #include <sqltranslations/doublequotestosinglequotes.h>
+#include <sqltranslations/extendtooracletodate.h>
 #include <debugprint.h>
 
 #include <rudiments/process.h>
@@ -111,6 +112,8 @@ sqltranslation *sqltranslations::loadTranslation(xmldomnode *translation) {
 							this,translation);
 	} else if (!charstring::compare(file,"doublequotestosinglequotes")) {
 		return new doublequotestosinglequotes(this,translation);
+	} else if (!charstring::compare(file,"extendtooracletodate")) {
+		return new extendtooracletodate(this,translation);
 	}
 	return NULL;
 }
