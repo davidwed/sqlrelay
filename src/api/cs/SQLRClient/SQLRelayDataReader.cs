@@ -32,6 +32,8 @@ namespace SQLRClient
             _endsession = endsession;
         }
 
+        /** Performs application-defined tasks associated with freeing,
+         *  releasing or resetting unmanaged resources. */
         void IDisposable.Dispose()
         {
             this.Dispose(true);
@@ -59,6 +61,7 @@ namespace SQLRClient
 
         #region properties
 
+        /** Gets a value indicating the depth of nesting for the current row. */
         public Int32 Depth
         {
             // FIXME: Return 0 if nesting isn't supported.  What is nesting?
@@ -68,6 +71,16 @@ namespace SQLRClient
             }
         }
 
+        /** Gets the number of columns in the current row. */
+        public Int32 FieldCount
+        {
+            get
+            {
+                return (Int32)_sqlrcur.colCount();
+            }
+        }
+
+        /** Gets a value indicating whether the data reader is closed. */
         public Boolean IsClosed
         {
             get
@@ -76,6 +89,8 @@ namespace SQLRClient
             }
         }
 
+        /** Gets the number of rows changed, inserted, or deleted by execution
+         *  of the SQL statement. */
         public Int32 RecordsAffected
         {
             get
@@ -84,6 +99,8 @@ namespace SQLRClient
             }
         }
 
+        /** Gets true or false, indicating whether the result set contains any 
+         *  rows at all. */
         public Boolean HasRows
         {
             get
@@ -100,17 +117,38 @@ namespace SQLRClient
             }
         }
 
+        /** Return the value of the specified field. */
+        public Object this[Int32 i]
+        {
+            get
+            {
+                return GetValue(i);
+            }
+        }
+
+        /** Return the value of the specified field. */
+        public Object this[String name]
+        {
+            get
+            {
+                return GetValue(GetOrdinal(name));
+            }
+        }
+
         #endregion
 
 
         #region public methods
 
+        /** Closes the SQLRelayDataReader object. */
         public void Close()
         {
             _open = false;
             _sqlrcur.closeResultSet();
         }
 
+        /** Advances the data reader to the next result, when reading the
+         *  results a query which returns multiple result sets. */
         public Boolean NextResult()
         {
 
@@ -140,6 +178,7 @@ namespace SQLRClient
             return true;
         }
 
+        /** Advances the SQLRelayDataReader to the next record. */
         public Boolean Read()
         {
 
@@ -180,6 +219,8 @@ namespace SQLRClient
             return (!_sqlrcur.endOfResultSet() || _currentrow < _sqlrcur.rowCount());
         }
 
+        /** Returns a DataTable that describes the colum metadata of the
+         *  SQLRelayDataReader. */
         public DataTable GetSchemaTable()
         {
 
@@ -257,26 +298,22 @@ namespace SQLRClient
             return datatable;
         }
 
-        public Int32 FieldCount
-        {
-            get
-            {
-                return (Int32)_sqlrcur.colCount();
-            }
-        }
-
+        /** Returns the name for the specified field. */
         public String GetName(Int32 i)
         {
             invalidColumnIndex(i);
             return _sqlrcur.getColumnName((UInt32)i);
         }
 
+        /** Gets the data type information for the specified field. */
         public String GetDataTypeName(Int32 i)
         {
             invalidColumnIndex(i);
             return _sqlrcur.getColumnType((UInt32)i);
         }
 
+        /** Gets the Type information corresponding to the type of Object that
+         *  would be returned from GetValue. */
         public Type GetFieldType(Int32 i)
         {
             String type = GetDataTypeName(i);
@@ -1012,6 +1049,7 @@ namespace SQLRClient
             return typeof(Byte[]);
         }
 
+        /** Return the value of the specified field. */
         public Object GetValue(Int32 i)
         {
             invalidColumnIndex(i);
@@ -1772,6 +1810,8 @@ namespace SQLRClient
             return field;
         }
 
+        /** Populates an array of obects with the column values
+         *  of the current record. */
         public Int32 GetValues(Object[] values)
         {
             Int32 colcount=(Int32)_sqlrcur.colCount();
@@ -1783,6 +1823,7 @@ namespace SQLRClient
             return i;
         }
 
+        /** Return the index of the named field. */
         public Int32 GetOrdinal(String name)
         {
             UInt32 colcount = _sqlrcur.colCount();
@@ -1796,32 +1837,20 @@ namespace SQLRClient
             throw new IndexOutOfRangeException("Could not find specified column in results");
         }
 
-        public Object this[Int32 i]
-        {
-            get
-            {
-                return GetValue(i);
-            }
-        }
-
-        public Object this[String name]
-        {
-            get
-            {
-                return GetValue(GetOrdinal(name));
-            }
-        }
-
+        /** Gets the value of the specified column as a Boolean. */
         public Boolean GetBoolean(Int32 i)
         {
             return Convert.ToBoolean(GetValue(i));
         }
 
+        /** Gets the 8-bit unsigned integer value of the specified column. */
         public Byte GetByte(Int32 i)
         {
             return Convert.ToByte(GetValue(i));
         }
 
+        /** Reads a stream of bytes from the specified column offset into the
+         *  buffer as an array, starting at the given buffer offset. */
         public Int64 GetBytes(Int32 i, Int64 fieldoffset, Byte[] buffer, Int32 bufferoffset, Int32 length)
         {
 
@@ -1838,11 +1867,14 @@ namespace SQLRClient
             return (Int64)j;
         }
 
+        /** Gets the character value of the specified column. */
         public Char GetChar(Int32 i)
         {
             return Convert.ToChar(GetValue(i));
         }
 
+        /** Reads a stream of characters from the specified column offset into
+         *  the buffer as an array, starting at the given buffer offset. */
         public Int64 GetChars(Int32 i, Int64 fieldoffset, Char[] buffer, Int32 bufferoffset, Int32 length)
         {
 
@@ -1859,57 +1891,73 @@ namespace SQLRClient
             return (Int64)j;
         }
 
+        /** Returns the GUID value of the specified field. */
         public Guid GetGuid(Int32 i)
         {
             return (Guid)GetValue(i);
         }
 
+        /** Gets the 16-bit signed integer value of the specified field. */
         public Int16 GetInt16(Int32 i)
         {
             return (Int16)_sqlrcur.getFieldAsInteger(_currentrow, (UInt32)i);
         }
 
+        /** Gets the 32-bit signed integer value of the specified field. */
         public Int32 GetInt32(Int32 i)
         {
             return (Int32)_sqlrcur.getFieldAsInteger(_currentrow, (UInt32)i);
         }
 
+        /** Gets the 64-bit signed integer value of the specified field. */
         public Int64 GetInt64(Int32 i)
         {
             return _sqlrcur.getFieldAsInteger(_currentrow, (UInt32)i);
         }
 
+        /** Gets the single-precision floating point number of the specified
+         *  field. */
         public float GetFloat(Int32 i)
         {
             return (float)_sqlrcur.getFieldAsDouble(_currentrow, (UInt32)i);
         }
 
+        /** Gets the double-precision floating point number of the specified
+         *  field. */
         public Double GetDouble(Int32 i)
         {
             return _sqlrcur.getFieldAsDouble(_currentrow, (UInt32)i);
         }
 
+        /** Gets the string value of the specified field. */
         public String GetString(Int32 i)
         {
             return _sqlrcur.getField(_currentrow, (UInt32)i);
         }
 
+        /** Gets the fixed position numeric value of the specified field. */
         public Decimal GetDecimal(Int32 i)
         {
             return Convert.ToDecimal(GetValue(i));
         }
 
+        /** Gets the date and time data value of the specified field. */
         public DateTime GetDateTime(Int32 i)
         {
             return Convert.ToDateTime(GetValue(i));
         }
 
+        /** Returns an IDataReader for the specified column ordinal.  This
+         *  method is included because it is required by the interface, but
+         *  since nested tables and other heirarchical data are currently
+         *  unsupported by SQL Relay, it just throws a NotSupportedException. */
         public IDataReader GetData(Int32 i)
         {
             // Normally, this would be used to expose nested tables and other hierarchical data.
             throw new NotSupportedException("GetData not supported.");
         }
 
+        /** Returns whether the specified field is set to null. */
         public Boolean IsDBNull(Int32 i)
         {
             // FIXME: this will need to be modified if getNullsAsNulls is exposed

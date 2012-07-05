@@ -25,22 +25,29 @@ namespace SQLRClient
 
         #region constructors and destructors
 
+        /** Initializes a new instance of the SQLRelayParameter class. */
         public SQLRelayParameter()
         {
         }
 
+        /** Initializes a new instance of the SQLRelayParameter class that
+         *  uses the parameter name and DbType. */
         public SQLRelayParameter(String parametername, DbType dbtype)
         {
             _parametername = parametername;
             DbType = dbtype;
         }
 
+        /** Initializes a new instance of the SQLRelayParameter class that
+         *  uses the parameter name and value. */
         public SQLRelayParameter(String parametername, Object value)
         {
             _parametername = parametername;
             Value = value;
         }
 
+        /** Initializes a new instance of the SQLRelayParameter class that
+         *  uses the parameter name, DbType and source column. */
         public SQLRelayParameter(String parametername, DbType dbtype, String sourcecolumn)
         {
             _parametername = parametername;
@@ -53,6 +60,8 @@ namespace SQLRClient
 
         #region parameters
 
+        /** Gets or sets the DbType of the parameter.  This should be used with
+         *  parameters that are not Clob, Blob or Cursor parameters. */
         public DbType DbType
         {
             get
@@ -67,6 +76,8 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or sets the SQLRelayType of the parameter.  This should be
+         *  used with Clob, Blob or Cursor parameters. */
         public SQLRelayType SQLRelayType
         {
             get
@@ -79,6 +90,9 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or sets a value that indicates whether the parameter is
+         *  input-only or output-only.  SQL Relay only supports input and
+         *  output parameters.  Other parameter directions will be ignored. */
         public ParameterDirection Direction
         {
             get
@@ -91,6 +105,8 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or sets a value that indicates whether the parameter accepts
+         *  null values. */
         public Boolean IsNullable
         {
             get
@@ -99,6 +115,7 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or sets the name of the parameter. */
         public String ParameterName
         {
             get
@@ -111,6 +128,8 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or sets the name of the source column mapped to the DataSet
+         *  and used for loading or returning the Value. */
         public String SourceColumn
         {
             get
@@ -123,6 +142,7 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or sets the DataRowVersion to use when you load Value. */
         public DataRowVersion SourceVersion
         {
             get
@@ -135,6 +155,7 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or sets the value of the parameter. */
         public Object Value
         {
             get
@@ -149,6 +170,8 @@ namespace SQLRClient
             }
         }
 
+        /** Gets or sets the maximum size, in bytes, of the data within the
+         *  parameter. */
         public UInt32 Size
         {
             get
@@ -161,6 +184,7 @@ namespace SQLRClient
             }
         }
 
+        /** Gets whether or not the parameter data is null. */
         public Boolean IsNull
         {
             get

@@ -31,6 +31,7 @@ namespace SQLRClient
             }
         }
 
+        /** Releases the unmanaged resources used by the SQLRelayTransaction. */
         void IDisposable.Dispose()
         {
             this.Dispose(true);
@@ -61,6 +62,7 @@ namespace SQLRClient
 
         #region public methods
 
+        /** Commits the database transaction. */
         public void Commit()
         {
             validTransaction();
@@ -68,6 +70,7 @@ namespace SQLRClient
             _open = false;
         }
 
+        /** Rolls back the database transaction. */
         public void Rollback()
         {
             validTransaction();
