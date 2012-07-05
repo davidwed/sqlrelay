@@ -776,6 +776,23 @@ class sqlparser {
 		static const char	*_number;
 		static const char	*_string_literal;
 		static const char	*_bind_variable;
+		bool	parseIntervalQualifier(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_interval_qualifier;
+		bool	parseTo(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	toClause(const char *ptr, const char **newptr);
+		static const char	*_to;
+		bool	parseTimeComponent(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr,
+						const char *timecomponent,
+						const char *precscale);
+		static const char	*_first_time_component;
+		static const char	*_second_time_component;
+		static const char	*_precision;
 		bool	parseColumnOrFunction(xmldomnode *currentnode,
 						const char *name,
 						const char *ptr,

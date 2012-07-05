@@ -278,6 +278,11 @@ bool sqlparser::parseTerm(xmldomnode *currentnode,
 					const char **newptr) {
 	debugFunction();
 
+	// first, check to see if it's an interval qualifier
+	if (parseIntervalQualifier(currentnode,ptr,newptr)) {
+		return true;
+	}
+
 	// initialize the return value
 	bool	retval=true;
 
@@ -328,6 +333,101 @@ bool sqlparser::parseTerm(xmldomnode *currentnode,
 const char *sqlparser::_number="number";
 const char *sqlparser::_string_literal="string_literal";
 const char *sqlparser::_bind_variable="bind_variable";
+
+bool sqlparser::parseIntervalQualifier(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+
+	// create the node
+	xmldomnode	*iqnode=new xmldomnode(tree,
+					currentnode->getNullNode(),
+					TAG_XMLDOMNODETYPE,
+					_interval_qualifier,NULL);
+
+	// look for a time component, to, and another time component
+	bool	retval=parseTimeComponent(iqnode,ptr,newptr,
+						_first_time_component,
+						_precision) &&
+			parseTo(iqnode,*newptr,newptr) &&
+			parseTimeComponent(iqnode,*newptr,newptr,
+						_second_time_component,
+						_scale);
+
+	// if everything went well, attach the node,
+	// otherwise reset the string pointer and delete it
+	if (retval) {
+		currentnode->appendChild(iqnode);
+	} else {
+		*newptr=ptr;
+		delete iqnode;
+	}
+
+	return retval;
+}
+
+const char *sqlparser::_interval_qualifier="interval_qualifier";
+
+bool sqlparser::parseTo(xmldomnode *currentnode,
+				const char *ptr,
+				const char **newptr) {
+	debugFunction();
+	return toClause(ptr,newptr);
+}
+
+bool sqlparser::toClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"to ");
+}
+
+const char *sqlparser::_to="to";
+
+bool sqlparser::parseTimeComponent(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr,
+					const char *timecomponent,
+					const char *precscale) {
+	debugFunction();
+
+	// verify the time component
+	const char *parts[]={
+		"day",
+		"month",
+		"year",
+		"hour",
+		"minute",
+		"second",
+		"fraction",
+		NULL
+	};
+	if (!comparePart(ptr,newptr,parts)) {
+		return false;
+	}
+
+	// back up, get it and add it as an attribute
+	*newptr=ptr;
+	char	*part=getVerbatim(*newptr,newptr);
+	currentnode->setAttributeValue(timecomponent,part);
+	delete[] part;
+
+	// check for precision/scale
+	if (!leftParen(*newptr,newptr)) {
+		return true;
+	}
+	char	*number=getVerbatim(*newptr,newptr);
+	if (charstring::isNumber(number)) {
+		currentnode->setAttributeValue(precscale,number);
+		delete[] number;
+	} else {
+		delete[] number;
+		return false;
+	}
+	return rightParen(*newptr,newptr);
+}
+
+const char *sqlparser::_first_time_component="first_time_component";
+const char *sqlparser::_second_time_component="second_time_component";
+const char *sqlparser::_precision="precision";
 
 bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
 						const char *name,

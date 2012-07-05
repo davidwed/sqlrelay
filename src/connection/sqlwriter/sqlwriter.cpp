@@ -216,6 +216,7 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_less_than_or_equal_to,
 		sqlparser::_greater_than_or_equal_to,
 		sqlparser::_expression,
+		sqlparser::_interval_qualifier,
 		sqlparser::_compliment,
 		sqlparser::_inverse,
 		sqlparser::_negative,
@@ -564,6 +565,9 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return greaterThanOrEqualTo(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_expression)) {
 		return expression(node,output);
+	} else if (!charstring::compare(nodename,
+				sqlparser::_interval_qualifier)) {
+		return intervalQualifier(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_compliment)) {
 		return compliment(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_inverse)) {
