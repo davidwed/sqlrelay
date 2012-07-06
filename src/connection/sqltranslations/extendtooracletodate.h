@@ -18,10 +18,10 @@ class extendtooracletodate : public sqltranslation {
 	private:
 		bool	translateExtends(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldomnode *querynode);
+					xmldomnode *node);
 		bool	translateExtend(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldomnode *querynode);
+					xmldomnode *node);
 };
 
 #endif
