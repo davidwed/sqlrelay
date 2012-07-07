@@ -107,194 +107,77 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <a name="whatis"></a>
 <span class="heading3">What is SQL Relay?</span><br><br>
 
-<p>SQL Relay is a persistent database connection pooling, proxying, throttling, load balancing and query routing/filtering system for Unix and Linux supporting ODBC, Oracle, MySQL, PostgreSQL, Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and MS Access (minimally) with APIs for C, C++, .NET, ADO.NET, Perl, Perl-DBI, Python, Python-DB, Zope, PHP, PHP PearDB, Ruby, Ruby-DBI, Java, TCL and Erlang, drop-in replacement libraries for MySQL and PostgreSQL, command line clients and extensive documentation.  The APIs support advanced database operations such as bind variables, multi-row fetches, client-side result set caching and suspended transactions.  It is ideal for speeding up database-driven web-based applications, accessing databases from unsupported platforms, migrating between databases, distributing access to replicated or clustered databases and throttling database access.</p>
+<p>See the description in the <a href="introduction.html">Introduction to SQL Relay</a> doc.</p>
 
 <a name="connectionpooling"></a>
 <span class="heading3">What is "persistent database connection pooling"?</span><br><br>
 
-<p>Logging into some databases can take a noticable amount of time.  In fact, it may take longer for an application to log in than to run all of the queries it needs to run.  This can be especially problematic for transient apps; those that fire up, connect, query, and shut down, over and over, such as web-based applications.</p>
-
-<p>A persistent database connection pooling system maintains a pool of already-logged-in database connections to applications that may need them, thereby reducing the time associated with connecting to the database to the time it takes for the app to connect to the pooling system.</p>
-
-<p>Many connection pooling systems are built into application servers but can only be used by applications running within that server.  SQL Relay runs stand-alone and may be used by any application, including applications running on other servers.  This is especially useful if you have apps written in different languages that all need to talk to the same database.</p>
+<p>See the description in the <a href="introduction.html#connectionpooling">Introduction to SQL Relay</a> doc.</p>
 
 <a name="proxying"></a>
 <span class="heading3">What is "proxying"?</span><br><br>
 
-<p>Proxying provides access to databases from unsupported platforms.</p>
-
-<p>Oracle, for example, doesn't support OpenBSD but by using the SQL Relay server components on a supported platform and the SQL Relay client components on OpenBSD, the OpenBSD machine can access the Oracle database.</p>
-
-<p>SQL Relay can be built and run on most unix-like systems, independent of architecture, thus SQL Relay can provide access to databases from a wide variety of platforms not supported by the database vendor.</p>
+<p>See the description in the <a href="introduction.html#proxying">Introduction to SQL Relay</a> doc.</p>
 
 <a name="throttling"></a>
 <span class="heading3">What is "throttling"?</span><br><br>
 
-<p>Throttling limits the number of connections that will be started to a given database and queues up client requests rather than denying access outright.</p>
-
-<p>"Too many connections." is a common error seen by MySQL users, for example.  An app got very busy for a while and tried to open more connections than the database could handle.  The app wasn't written to detect that particular error and retry though, so it just failed, printing the error out on the web page.</p>
-
-<p>The database could be tuned to allow more connections and bounced, but most likely, the app only gets busy under certain circumstances and it would be nice if the database could be left alone and the app could just be throttled back somehow.  It might also be that the database has already been tuned up as far as it can go but it's still getting hammered from time-to-time.</p>
-
-<p>SQL Relay can be configured to maintain a certain number of database connections and open more, on-demand, up to a certain point.  If the app is so busy that it needs more connections than the maximum number configured, SQL Relay will begin queueing clients up, rather than returning an error, effectively throttling back the application.  The queued-up connections consume relatively few resources and may be configured to wait for a certain amount of time before giving up, or wait indefinitely.</p>
+<p>See the description in the <a href="introduction.html#throttling">Introduction to SQL Relay</a> doc.</p>
 
 <a name="loadbalancing"></a>
 <span class="heading3">What is "load balancing"?</span><br><br>
 
-<p>Load balancing distributes queries over a pool of servers to aid in scaling.</p>
-
-<p>For example, if you have a database cluster or set of replicated servers, then SQL Relay can be configured to distribute queries over them.</p>
-
-<p>Weight metrics can be assigned as well.  If some of the database machines are more powerful than others, load can be dispoportionally distributed to them and away from the less powerful database servers.</p>
-
-<p>Note that SQL Relay cannot currently be used to replicate databases or keep replicated databases synchronized.  If you are using SQL Relay to access replicated databases then it is assumed that there is some means by which the databases are kept synchronized external to SQL Relay.</p>
+<p>See the description in the <a href="introduction.html#loadbalancing">Introduction to SQL Relay</a> doc.</p>
 
 <a name="queryrouting"></a>
 <span class="heading3">What is "query routing/filtering"?</span><br><br>
 
-<p>Query routing sends queries that match one pattern to one set of database servers and queries that match another pattern to another set of servers.</p>
-
-<p>A comon use for query routing is to route DML and DDL queries to a master and distribute alll other queries over a pool of slaves.</p>
-
-<p>Query filtering prevents queries that match a certian pattern from being run at all.</p>
-
-<p>There are often certain queries that will bring the entire database to its knees.  A common use for query filtering is to identify those queries and prevent them from being run.</p>
+<p>See the description in the <a href="introduction.html#queryrouting">Introduction to SQL Relay</a> doc.</p>
 
 <a name="dropinlibs"></a>
 <span class="heading3">What are "drop-in replacement libraries"?</span><br><br>
 
-<p>The SQL Relay Drop-In Replacement Libraries for MySQL and PostgreSQL are libraries that can be LD_PRELOAD'ed to take the place of the native MySQL and PostgreSQL client libraries.</p>
-
-<p>They allow many applications that are written to use MySQL or PostgreSQL directly to use SQL Relay without modification.  This allows an app to immediately take advantage of SQL Relay features such as connection pooling, load balancing, query routing and throttling.  It is also useful for migrating an application from one database to another.</p>
-
-<p>See <a href="dropin/mysql.html">SQL Relay Drop-In Replacement Library for MySQL</a> and <a href="dropin/postgresql.html">SQL Relay Drop-In Replacement Library for PostgreSQL</a> for more information.</p>
+<p>See the description in the <a href="introduction.html#dropinlibs">Introduction to SQL Relay</a> doc.</p>
 
 <a name="databases"></a>
 <span class="heading3">What databases does SQL Relay support?</span>
 
-<p>SQL Relay supporting Oracle, MySQL, PostgreSQL, Sybase, IBM DB2, Firebird and SQLite databases directly, using the native client API's for those databases.</p>
-
-<p>Support is provided for Microsoft SQL Server via the FreeTDS API.  Reportedly, some versions of Microsoft SQL Server can also be accessed using some versions of the Sybase database API.  So, depending on what version of Sybase you build SQL Relay against, you might be able to access certain versions of SQL Server.  I have never tried this myself.  Your milage may vary.</p>
-
-<p>FreeTDS supports Sybase as well.  So you can access both SQL Server and Sybase databases using FreeTDS.</p>
-
-<p>See the section on <a name="sybasefreetdsdiff">FreeTDS</a> below for more information.</p>
-
-<p>Minimal support is provided for Microsoft Access databases via the MDB Tools API.  Select queries are supported but DML and DDL is not.</p>
-
-<p>ODBC is supported via the UnixODBC and iODBC libraries.  If you can find a compatible ODBC driver for the database that you want to use then you should be able to access that database through SQL Relay.  You can also use the ODBC to ODBC bridge to access databases for which there is no ODBC driver for the platform you are runnin SQL Relay on.</p>
-
-<p>Microsoft recently (as of July 2012) released a SQL Server ODBC driver that is compatible with certain versions of UnixODBC on certain versions of Red Hat Enterprise Linux on the x86_64 platform, so that is another possible way to connect to SQL Server that is supported by SQL Relay.</p>
+<p>See the description in the <a href="introduction.html#databases">Introduction to SQL Relay</a> doc.</p>
 
 <a name="platforms"></a>
 <span class="heading3">What platforms does SQL Relay run on?</span>
 
-<p>All SQL Relay components should build and run on Linux, Solaris, FreeBSD, OpenBSD, NetBSD, Mac OS X, Haiku and SCO OpenServer 5.  x86 and x86_64 platforms are supported, as are non-x86 architectures such as ARM, Sparc, Mips, PPC and others.</p>
-
-<p>The client-side software should build and run on uClibc/Linux-based systems and possibly on uClibc/non-Linux-based systems as well.</p>
-
-<p>The command line clients and C, C++ and .NET API's should build and run natively on Windows.  The server and client components should all build and run under Cygwin on Windows though there are currently performance and compatibility issues under Cygwin.</p>
+<p>See the description in the <a href="introduction.html#platforms">Introduction to SQL Relay</a> doc.</p>
 
 <a name="languages"></a>
 <span class="heading3">What languages does SQL Relay support?</span>
 
-<p>SQL Relay currently supports C, C++, .NET-capable languages, Perl, Python, Zope, PHP, Ruby, Java, TCL and Erlang.</p>
-
-<p>Adapters could also be written for any language that can call functions from one of the above-listed languages.</p>
+<p>See the description in the <a href="introduction.html#languages">Introduction to SQL Relay</a> doc.</p>
 
 <a name="dbabstraction"></a>
 <span class="heading3">What database abstraction layers does SQL Relay support?</span>
 
-<p>SQL Relay currently supports ADO.NET, Perl-DBI, Python-DB, PHP PearDB and Ruby-DBI.</p>
-
-<p>The native SQL Relay Client API's are database abstraction layers as well, as the SQL Relay server can be connected to a variety of database and applications written using an SQL Relay Client API can talk to any SQL Relay server.</p>
+<p>See the description in the <a href="introduction.html#dbabstraction">Introduction to SQL Relay</a> doc.</p>
 
 <a name="whatarebindvars"></a>
 <span class="heading3">What are "bind variables"?</span>
 
-<p>Bind variables are parameters that can be dynamically inserted into a query.</p>
-
-<p>For example, in the query:</p>
-
-<blockquote><b>
-select * from  mytable where col1=:val1 and col2=:val2 and col3=:val3
-</b></blockquote>
-
-<p>...the variables <i>:val1</i>, <i>:val2</i> and <i>:val3</i> are bind variables.</p>
-
-<p>When the datbase receives a query, it must be parsed and the database must come up with a plan for executing it.  This process is often called "preparing" the query and it takes time.  If you need to run the same query over and over, many times, it can really add up.  If the query could be "prepared" once, with placeholders for the some of the values, and then executed over and over, just plugging in values with each execution, it would improve performance significantly.  This is what bind variables achieve.</p>
-
-<p>The basic process is:</p>
-
-<blockquote><pre>
-prepare("select * from  mytable where col1=:val1 and col2=:val2 and col3=:val3");
-inputBind("val1","hello");
-inputBind("val2",5);
-inputBind("val2",20);
-execute();
-inputBind("val1","goodbye");
-inputBind("val2",7);
-inputBind("val2",34);
-execute();
-inputBind("val1","hi");
-inputBind("val2",9);
-inputBind("val2",23);
-execute();
-... and so on ...
-</pre></blockquote>
-
-<p>In addition to running faster, the program is much cleaner.  The query doesn't need to be reconstructed each time it is run.</p>
-
-<p>Most modern databases support bind variables.  MDB Tools does not and older versions of MySQL, PostgreSQL and SQLite don't either.  For databases that don't support bind variables, SQL Relay fakes them by rewriting the query and inserting the values manually.  The cost of re-preparing the query is incurred, but there is no way to get around it with those databases anyway.</p>
-
-<p>Some databases support "vector binds" where each variable can be assigned an array of values and when the query is executed, the server executes it multiple times, once for each member of the array.  This significantly speeds up insert/update/delete queries.  SQL Relay does not currently support vector binds.</p>
-
-<p>See <a href="bindvars">How do I use bind variables?</a> below for more information on bind variables.  A more complete explanation of bind variables is given in <a href="programming/binds.html">here</a> as well, and the programming guides for each language explain how to use them with queries and stored procedures.</p>
+<p>See the description in the <a href="introduction.html#bindvars">Introduction to SQL Relay</a> doc.</p>
 
 <a name="multirow"></a>
 <span class="heading3">What are "multi-row fetches"?</span>
 
-<p>Multi-row fetches improve performance by reducing round-trips to the database.</p>
-
-<p>To fetch a result set, most database API's provide a "fetch" function that fetches a single row.  The app can then do something with that row and then fetch another row.</p>
-
-<p>If instead, multiple rows were fetched at once and buffered, it would reduce the number of round-trips to the database and improve performance, at the cost of memory.</p>
-
-<p>Some database API's do exactly this and provide a "fetchatonce" parameter that can be used to control how many rows are fetched at once.</p>
-
-<p>When using a database that provides a "fetchatonce" parameter, SQL Relay uses it and exposes it in the configuration file.  So, the SQL Relay server does multi-row fetches from the database, if possible.</p>
-
-<p>The SQL Relay client goes even further.  By default, it fetches the entire result set in one round-trip to the SQL Relay server.  For small result sets, like the ones that would likely be used to build a web page, this is very fast and usually doesn't consume an inordinate amount of memory.  However for larger result sets, it can be very inefficient so the SQL Relay API's provide methods for setting how many rows will be fetched and buffered at once.</p>
-
-<p>See <a href="#buffer">Why does SQL Relay buffer the entire result set?</a> and <a href="#nobuffer">How do keep SQL Relay from buffering the entire result set?</a> below for more information.  The programming guides for each language delve into this subject as well.</p>
-
-<p>If the database does not support multi-row fetches, and the SQL Relay server is run on the same machine as the database and the client is run on a separate machine, since the SQL Relay client can do multi-row fetches, using SQL Relay generally improves performance over native database access because of the reduced number of round-trips across the network, fetching the result set.</p>
+<p>See the description in the <a href="introduction.html#multirow">Introduction to SQL Relay</a> doc.</p>
 
 <a name="resultsetcaching"></a>
 <span class="heading3">What is "client-side result set caching"?</span>
 
-<p>Client-side result set caching is a feature of the SQL Relay API that allows you to save whatever part of the result set that you have fetched so far to a local file.  This file can be re-opened later and rows that were already fetched can be read from it again and new rows can be appended to it.</p>
-
-<p>When used with <a href="#suspendedtx">suspended transactions</a> efficient paging can be accomplished.</p>
-
-<p>For example, if you have 1000 items that you want to display, 50 at a time, you can select the rows, begin fetching them and cache them to a local file.  When the app is done fetching the first 50 items, the transaction can be suspended and picked up again by the next invocations of the app.  If the user wants to view the next 50 items, then 50 more rows can be fetched and cached.  If the user wants to view the previous 50 items, then there is no need to run the query again, the rows can just be fetched from the file.</p>
-
-<p>Cached result sets have a TTL (time-to-live) setting and are periodically removed by the sqlr-cachemanager daemon.</p>
-
-<p>The programming docs for each language give more detail on this subject.</p>
+<p>See the description in the <a href="introduction.html#resultsetcaching">Introduction to SQL Relay</a> doc.</p>
 
 <a name="suspendedtx"></a>
 <span class="heading3">What are "suspended transactions"?</span>
 
-<p>Suspended transactions allow a single transaction to span mulitple invocations of an app or set of apps.</p>
-
-<p>A challenge associated with transient apps - apps which start up, connect to the database, perform some operations, log out and die - is how to handle situations where a single transaction might need to span multiple invocations of the app or span invocations of a set of apps.  Since each invocation of an app connects and disconnects from the database, and transactions start with the connection and end with the disconnection, how can this be done?  There are many solutions, but they usually involve storing stateful data in a set of tables, in effect building an app-specific transaction model on top of the database rather than using the database's built-in transactional capabilities.</p>
-
-<p>With SQL Relay's suspended transaction feature, you can begin a transaction, perform some operations, then suspend the transaction and pass credentials to another app.  The next app can then pick up that same transactions, perform more operations, then either commit, rollback or suspend the transaction again.</p>
-
-<p>This could be useful when collecting pages of information about a user, in ecommerce checkout processes, or in paging through a large result set.</p>
-
-<p>The programming docs for each language give more detail on this subject.</p>
+<p>See the description in the <a href="introduction.html#suspendedtx">Introduction to SQL Relay</a> doc.</p>
 
 <a name="howwork"></a>
 <span class="heading3">How does SQL Relay work?</span>
@@ -324,7 +207,7 @@ through the session maintained by that daemon.</p>
 <a name="unsupported"></a>
 <span class="heading3">How does SQL Relay allow me to access a database from a platform not supported by the database vendor?</span>
 
-<p>See the question about <a href="#proxying">proxying</a> above.</p>
+<p>See the description of Proxying in the <a href="introduction.html#proxying">Introduction to SQL Relay</a> doc.</p>
 
 <a name="migration"></a>
 <span class="heading3">How can SQL Relay help migrating my application from one database to another?</span>
@@ -343,7 +226,7 @@ through the session maintained by that daemon.</p>
 <span class="heading3">How can SQL Relay be used with replicated or clustered 
 databases?</span>
 
-<p>See the question about <a href="#loadbalancing">loadbalancing</a> above.</p>
+<p>See the description of Load Balancing in the <a href="introduction.html#loadbalancing">Introduction to SQL Relay</a> doc.</p>
 
 <a name="databaseusers"></a>
 <span class="heading3">Can SQL Relay proxy multiple database users instead of using the same user for every session?</span>
@@ -459,7 +342,7 @@ ln -s bash sh
 <a name="canxxxdb"></a>
 <span class="heading3">Can I use SQL Relay to connect to XXX database?</span>
 
-<p>See the question about <a href="#databases">what databases SQL Relay supports</a> above.</p>
+<p>See the description of Supported Databases in the <a href="introduction.html#databases">Introduction to SQL Relay</a> doc.</p>
 
 <a name="whyxxxdb"></a>
 <span class="heading3">Why should I use SQL Relay with XXX database?</span>
