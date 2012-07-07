@@ -20,22 +20,9 @@
 <a name="whatis"></a>
 <span class="heading2">What is a drop-in replacement library?</span><br>
 
-<p>The SQL Relay drop-in replacement library for PostgreSQL clients allows you
-to run an application that was written using the native PostgreSQL client API
-against SQL Relay without rewriting the application.</p>
+<p>The SQL Relay Drop-In Replacement Library for PostgreSQL is a shared-object library that can be LD_PRELOAD'ed to take the place of the native PostgreSQL client library.</p>
 
-<p>The drop-in replacement library is a shared object library that implements
-PostgreSQL client library functions as calls to similar SQL Relay API functions
-which then map the results back into native PostgreSQL client data
-structures.</p>
-
-<p>There are a variety of reasons that you might want to use the SQL Relay
-drop-in replacement library for PostgreSQL clients.  An application written for
-PostgreSQL could, for instance, be made to run queries against an Oracle or
-Microsoft SQL Server database without modification.  Or you could simply put
-SQL Relay between an application and the PostgreSQL database that it normally
-runs against to take advantage of SQL Relay's persistence, load balancing or
-throttling facilities.</p>
+<p>It allows many applications that are written to use PostgreSQL directly to use SQL Relay without modification.  This allows an app to immediately take advantage of SQL Relay features such as connection pooling, load balancing, query routing and throttling.  It can also be used to aim an app that was written to use PostgreSQL at a different database.</p>
 
 <br>
 <a name="commandline"></a>
