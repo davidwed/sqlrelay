@@ -54,7 +54,6 @@ install:
 	$(INSTALL) -m 644 running.html $(docdir)
 	$(INSTALL) -m 644 tuning.html $(docdir)
 	$(INSTALL) -m 644 faq.html $(docdir)
-	$(INSTALL) -m 644 windows.html $(docdir)
 	$(INSTALL) -m 644 css/styles.css $(docdir)/css
 	for file in `ls api/c/html/*.html api/c/html/*.css api/c/html/*.png api/c/html/*.js`; \
 	do \

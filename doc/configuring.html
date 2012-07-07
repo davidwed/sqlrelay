@@ -159,18 +159,13 @@
 
 <p>So what do all these tags do?</p>
 
-<p>The <b>instances</b> tag is just the root tag.  The sqlrelay.conf
-file should have only one of these tags surrounding all other tags.</p>
+<p>The <b>instances</b> tag is just the root tag.  The sqlrelay.conf file should have only one of these tags surrounding all other tags.</p>
 
-<p>Each <b>instance</b> tag defines an instance of sqlrelay.  An
-instance consists of one sqlr-listener and one or more sqlr-connection daemons.
-You can define as many of these as you like.</p>
+<p>Each <b>instance</b> tag defines an instance of sqlrelay.  An instance consists of one sqlr-listener and one or more sqlr-connection daemons.  You can define as many of these as you like.</p>
 
-<p>The <b>users</b> tag surrounds the list of users that may connect to
-the instance.</p>
+<p>The <b>users</b> tag surrounds the list of users that may connect to the instance.</p>
 
-<p>Each <b>user</b> tag defines a user/password combination that
-may be used to connect to the instance.</p>
+<p>Each <b>user</b> tag defines a user/password combination that may be used to connect to the instance.</p>
 
 <p>The <b>session</b> tag surrounds a set of queries to be run at the start and end of each session.  The entire <b>session</b> block is optional.</p>
 
@@ -178,32 +173,17 @@ may be used to connect to the instance.</p>
 
 <p>The <b>runquery</b> tag surrounds a query to be run at the beginning or end of a session.  Any number (including 0) of these may be specified.</p>
 
-<p>The <b>connections</b> tag surrounds the list of sqlr-connection
-daemon configurations used by the instance.</p>
+<p>The <b>connections</b> tag surrounds the list of sqlr-connection daemon configurations used by the instance.</p>
 
-<p>Each <b>connection</b> tag defines a sqlr-connection daemon 
-configuration.  In most cases, there will be only 1 of these tags.  In cases
-where clustered or replicated databases are used, the sqlr-connection daemons 
-may need to be able to connect to multiple machines.  In that case, there would
-be more than 1 line here.  See <a href="loadbalfailover.html">SQL Relay Load
-Balancing and Failover</a> for more information.</p>
+<p>Each <b>connection</b> tag defines a sqlr-connection daemon configuration.  In most cases, there will be only 1 of these tags.  In cases where clustered or replicated databases are used, the sqlr-connection daemons may need to be able to connect to multiple machines.  In that case, there would be more than 1 line here.  See <a href="loadbalfailover.html">SQL Relay Load Balancing and Failover</a> for more information.</p>
 
-<p>The <b>router</b> tag sets up the instance to route and filter queries to
-other SQL Relay instances.  If this tag is present, the instance should contain
-no <b>connections</b> tags.  See <a href="router.html">Routing and Filtering Queries with SQL Relay</a> for detailed information about configuring SQL Relay to route and filter quries.</p>
+<p>The <b>router</b> tag sets up the instance to route and filter queries to other SQL Relay instances.  If this tag is present, the instance should contain no <b>connections</b> tags.  See <a href="router.html">Routing and Filtering Queries with SQL Relay</a> for detailed information about configuring SQL Relay to route and filter quries.</p> 
 
-<p>The <b>route</b> tag designates an instance of SQL Relay to route queries
-to.  It should contain a set of <b>query</b> tags defining which queries
-to route to the designated instance.  This tag is only valid inside a
-<b>router</b> tag.</p>
+<p>The <b>route</b> tag designates an instance of SQL Relay to route queries to.  It should contain a set of <b>query</b> tags defining which queries to route to the designated instance.  This tag is only valid inside a <b>router</b> tag.</p>
 
-<p>The <b>filter</b> tag defines a set of queries to be filtered out (ie.
-if a client sends one of these queries, the SQL Relay server won't run it
-against the database and will simply return an error).  This tag is only valid
-inside a <b>router</b> tag.</p>
+<p>The <b>filter</b> tag defines a set of queries to be filtered out (ie.  if a client sends one of these queries, the SQL Relay server won't run it against the database and will simply return an error).  This tag is only valid inside a <b>router</b> tag.</p>
 
-<p>The <b>query</b> tag defines a regular expression which the <b>route</b>
-and <b>filter</b> tags use to match queries.</p>
+<p>The <b>query</b> tag defines a regular expression which the <b>route</b> and <b>filter</b> tags use to match queries.</p>
 
 <p>Below is a description of the attributes for each tag.</p>
 
@@ -234,70 +214,17 @@ and <b>filter</b> tags use to match queries.</p>
 <li><b>allowedips</b> - A <a href="http://www.regular-expressions.info">regular expression</a> indicating which IP addresses will be allowed access, overriding deniedips (for example, to allow access to clients from the 192.168.2.0 and 64.45.22.0 networks: allowedips="(192\.168\.2\..*|64\.45\.22\..*)")</li>
 <li><b>debug</b> - Instructs the listener and/or connection daemons to log debugging information when sqlr-start is run with the -debug option, see note 
 below</li>
-<li><b>maxquerysize</b> - Sets the maximum query length that the SQL Relay
-server will accept, if a client tries to send a longer query, the server will
-close the connection (defaults to 64k bytes)</li>
-<li><b>maxstringbindvaluelength</b> - Sets the maximum length of a string 
-bind value that the SQL Relay server will accept, if the client tries to send a
-longer string bind value, the server will close the connection (defaults to
-32k bytes)</li>
-<li><b>maxlobbindvaluelength</b> - Sets the maximum length of a LOB/CLOB
-bind value that the SQL Relay server will accept, if the client tries to send a
-longer LOB/CLOB bind value, the server will close the connection (defaults to
-70k bytes)</li>
-<li><b>idleclienttimeout</b> - Sets the number of seconds that a client can
-sit idle while logged into the SQL Relay server before it will be disconnected
-(defaults to -1 which means forever)</li>
-<li><b>maxlisteners</b> - When a client connects to the listener but no
-connections are available, a child listener is forked off to wait for an
-available connection.  Since these can pile up and consume system resources,
-this parameter allows you to limit the number of child listeners that can be
-running simultaneously before an error will be returned to the client.  Set to
--1 (the default) to run without a limit.</li>
-<li><b>listenertimeout</b> - Sets the number of seconds that a listener will
-wait for an avaialable connection before giving up, 0 (the default) means wait
-forever</li>
-<li><b>reloginatstart</b> - When SQL Relay starts up, it attempts to log into
-the database.  If this parameter is set to yes, then if the login fails,
-SQL Relay will fork off into the background and attempt to log in over and until
-it succeeds or until it is shut down.  If this parameter is set to no, then
-if the login fails, SQL Relay will print out an error and exit.</li>
-<li><b>timequeriessec</b> and <b>timequeriesusec</b> - These parameters allow
-you to log queries which take longer than a certain amount of time to run.
-If either is set to -1, the default, no logging will occur.  If both are set
-to a number other than -1, then any query which takes longer than
-<b>timequeriessec</b> seconds and <b>timequeriesusec</b> milliseconds will be
-written out to a log file.  The log file will be in the location:
-/usr/local/firstworks/var/sqlrelay/debug/sqlr-connection-<i>id</i>-querylog.<i>pid</i>
-where <i>id</i> is the ID of the instance and <i>pid</i> is the process ID of
-the connection daemon that ran the query.  Setting both parameters to 0 will
-cause all queries to be logged.  Setting either to -1 will cause no queries
-to be logged.</li>
-<li><b>fakeinputbindvariables</b> - Instead of binding variables using the
-native database API, SQL Relay can fake input bind variables by rewriting the
-query and substituting values directly into it.  Setting this parameter to
-"yes" enables this functionality.  This is useful if you are using an old
-version of a database that doesn't support bind variables natively or if your
-are using a modern version but your app was originally written when the
-database didn't support bind variables natively or when SQL Relay didn't
-support native bind variables with that database.  If enabled, bind variables
-must be specified in the query as a colon, followed by a name or number (eg.
-:var1 or :1) unless the translatebindvariables parameter is also set to
-"yes".</p>
-</li>
-<li><b>translatebindvariables</b> - There is no standaradized format for bind
-variables across databases.  Some databases use question marks to identify bind
-variables, others use colon, dollar-sign or at-signs, followed by either names
-or numbers.  Setting this parameter to "yes" causes SQL Relay to remap the bind
-variables in a query to the native format for whatever database the query is
-being run against.  This is useful when migrating from one database to another
-or when using fake binds against a database that doesn't support
-colon-delimited bind variables.</li>
-<li><b>isolationlevel</b> - Sets the transaction isolation level to the
-specified value.  At the end of each client session, the isolation level will
-be reset to this value as well.  If this is left blank or omitted entirely then
-nothing will be done to set or reset the isolation level at the beginning or
-end of each session.</li>
+<li><b>maxquerysize</b> - Sets the maximum query length that the SQL Relay server will accept, if a client tries to send a longer query, the server will close the connection (defaults to 64k bytes)</li>
+<li><b>maxstringbindvaluelength</b> - Sets the maximum length of a string bind value that the SQL Relay server will accept, if the client tries to send a longer string bind value, the server will close the connection (defaults to 32k bytes)</li>
+<li><b>maxlobbindvaluelength</b> - Sets the maximum length of a LOB/CLOB bind value that the SQL Relay server will accept, if the client tries to send a longer LOB/CLOB bind value, the server will close the connection (defaults to 70k bytes)</li>
+<li><b>idleclienttimeout</b> - Sets the number of seconds that a client can sit idle while logged into the SQL Relay server before it will be disconnected (defaults to -1 which means forever)</li>
+<li><b>maxlisteners</b> - When a client connects to the listener but no connections are available, a child listener is forked off to wait for an available connection.  Since these can pile up and consume system resources, this parameter allows you to limit the number of child listeners that can be running simultaneously before an error will be returned to the client.  Set to -1 (the default) to run without a limit.</li>
+<li><b>listenertimeout</b> - Sets the number of seconds that a listener will wait for an avaialable connection before giving up, 0 (the default) means wait forever</li>
+<li><b>reloginatstart</b> - When SQL Relay starts up, it attempts to log into the database.  If this parameter is set to yes, then if the login fails, SQL Relay will fork off into the background and attempt to log in over and until it succeeds or until it is shut down.  If this parameter is set to no, then if the login fails, SQL Relay will print out an error and exit.</li>
+<li><b>timequeriessec</b> and <b>timequeriesusec</b> - These parameters allow you to log queries which take longer than a certain amount of time to run.  If either is set to -1, the default, no logging will occur.  If both are set to a number other than -1, then any query which takes longer than <b>timequeriessec</b> seconds and <b>timequeriesusec</b> milliseconds will be written out to a log file.  The log file will be in the location: /usr/local/firstworks/var/sqlrelay/debug/sqlr-connection-<i>id</i>-querylog.<i>pid</i> where <i>id</i> is the ID of the instance and <i>pid</i> is the process ID of the connection daemon that ran the query.  Setting both parameters to 0 will cause all queries to be logged.  Setting either to -1 will cause no queries to be logged.</li>
+<li><b>fakeinputbindvariables</b> - Instead of binding variables using the native database API, SQL Relay can fake input bind variables by rewriting the query and substituting values directly into it.  Setting this parameter to "yes" enables this functionality.  This is useful if you are using an old version of a database that doesn't support bind variables natively or if your are using a modern version but your app was originally written when the database didn't support bind variables natively or when SQL Relay didn't support native bind variables with that database.  If enabled, bind variables must be specified in the query as a colon, followed by a name or number (eg.  :var1 or :1) unless the translatebindvariables parameter is also set to "yes".</li>
+<li><b>translatebindvariables</b> - There is no standaradized format for bind variables across databases.  Some databases use question marks to identify bind variables, others use colon, dollar-sign or at-signs, followed by either names or numbers.  Setting this parameter to "yes" causes SQL Relay to remap the bind variables in a query to the native format for whatever database the query is being run against.  This is useful when migrating from one database to another or when using fake binds against a database that doesn't support colon-delimited bind variables.</li>
+<li><b>isolationlevel</b> - Sets the transaction isolation level to the specified value.  At the end of each client session, the isolation level will be reset to this value as well.  If this is left blank or omitted entirely then nothing will be done to set or reset the isolation level at the beginning or end of each session.</li>
 <li><b>ignoreselectdatabase</b> - Intructs sqlrelay to ignore selectDatabase() calls from the client.  If you want to point an instance at a test database and a program at the instance but the program manually selects the database to use, effectively aiming itself back at production, this is useful in preventing it from doing so.</li>
 </ul>
 <li><b>user</b>
@@ -312,31 +239,20 @@ end of each session.</li>
 <ul>
 <li>For <b>oracle8</b> databases, the connect string syntax is "user=USER;password=PASSWORD;oracle_sid=ORACLE_SID;oracle_home=ORACLE_HOME;nls_lang=NLS_LANG;autocommit=yes/no;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;faketransactionblocks=YESORNO;droptemptables=YESORNO;lastinsertidfunction=LASTINSERTIDFUNCTION"
 <ul>
-<li><b>user</b>: The username SQL Relay should use to log into the
-database.  Required.</li>
-<li><b>password</b>: The password SQL Relay should use to log into the
-database.  Required.</li>
-<li><b>oracle_sid</b>: Which Oracle SID to use.  Optional if
-the ORACLE_SID environment variable is set.  Overrides the ORACLE_SID 
-environment variable.  This parameter can either be an SID name corresponding
-to an entry in the tnsnames.ora file such as:
+<li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
+<li><b>password</b>: The password SQL Relay should use to log into the database.  Required.</li>
+<li><b>oracle_sid</b>: Which Oracle SID to use.  Optional if the ORACLE_SID environment variable is set.  Overrides the ORACLE_SID environment variable.  This parameter can either be an SID name corresponding to an entry in the tnsnames.ora file such as:
 <blockquote><i>oracle_sid=ora1</i></blockquote>
 or a tnsnames-style expression such as:
 <blockquote>
 <i>oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost.localdomain)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))</i></blockquote></li>
-<li><b>oracle_home</b>: The base directory of the oracle installation to use.
-Optional if the ORACLE_HOME environment variable is set.  The SID will be looked
-up in $ORACLE_HOME/network/admin/tnsnames.ora</li>
-<li><b>nls_lang</b>: The NLS_LANG to use.  Optional if the NLS_LANG environment
-variable is set.  Overrides the NLS_LANG environment variable.</li>
-<li><b>autocommit</b>: Whether to commit each insert, update or delete
-immediately or not.  Optional, defaults to no.</li>
+<li><b>oracle_home</b>: The base directory of the oracle installation to use.  Optional if the ORACLE_HOME environment variable is set.  The SID will be looked up in $ORACLE_HOME/network/admin/tnsnames.ora</li>
+<li><b>nls_lang</b>: The NLS_LANG to use.  Optional if the NLS_LANG environment variable is set.  Overrides the NLS_LANG environment variable.</li>
+<li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
 <li><b>fetchatonce</b>: The number of rows that SQL Relay fetches from the database in each round trip.  Defaults to 10. (see
 <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
-<li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256. (see <a href="tuning.html#memoryusage">here</a>
-for more info on this parameter)</li>
-<li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Fields longer than that will be truncated.  Defaults to 32768. (see
-<a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
+<li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
+<li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Fields longer than that will be truncated.  Defaults to 32768. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 <li><b>faketransactionblocks</b>: Some databases are in autocommit mode until you explicitly start a transaction with a "start" or "begin" statement.  Oracle is always in a transaction though, unless autocommit is turned on.  Setting this parameter to "yes" causes SQL Relay to put the database in autocommit mode until a "start" or "begin" statement is issued, and then put it back in autocommit mode when a commit or rollback is issued.  In effect, emulating the behavior of databases which require an explicit "start" or "begin".</li>
 <li><b>droptemptables</b>: In most databases, temporary tables are dropped at the end of the client session.  In Oracle however, the rows may be deleted but the table itself remains.  Setting this parameter to "yes" causes any temporary tables that were created during an SQL Relay client session, to be dropped when the session is over, in effect emulating the behavior or other databases.</li>
 <li><b>lastinsertidfunction</b>: Many databases support auto-increment columns (also called serial or identity columns) and after an insert into a table containing one, the id that was generated may be retrieved via some stored procedure call, api call or special variable.  Oracle doesn't support auto-increment columns but they can be simulated using triggers and sequences.  Trigger-sequence packages are often developed when migrating from a database that supports auto-increment columns to Oracle.  When implementing a trigger-sequence package, it is possible to store the value that was most-recently fetched from the sequence in a package-local variable and provide a function to access it.  This parameter allows you to specify that function so that a call to getLastInsertId() by a SQL Relay client will return whatever value is returned by that function.</li>
@@ -344,56 +260,26 @@ for more info on this parameter)</li>
 </li>
 <li>For <b>mysql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;socket=SOCKET;fakebinds=FAKEBINDS;charset=CHARSET"
 <ul>
-<li><b>user</b>: The username SQL Relay should use to log into the
-database.  Required.</li>
-<li><b>password</b>: The password SQL Relay should use to log into the
-database.  Required.</li>
+<li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
+<li><b>password</b>: The password SQL Relay should use to log into the database.  Required.</li>
 <li><b>db</b>: The database to log into.  Required.</li>
 <li><b>host</b>: The host to connect to.  Required.</li>
-<li><b>port</b>: The port to connect to on a remote host.
-Optional, defaults to 3306.</li>
-<li><b>socket</b>: The unix socket to connect to.  Optional if host and/or port
-are specified.  Overrides host/port.  host and port are optional if socket is
-specified.</li>
-<li><b>fakebinds</b>: MySQL 4.1.2 supports bind variables natively.  Versions
-prior to 4.1.2 did not, and SQL Relay had to substitute the values of bind
-variables into the query itself (fake binds).  In MySQL 4.1.2, bind variables
-are identified by ?'s in the query, while in versions prior to 4.1.2, bind
-variables are identified by :var1, :var2, :var3, etc.  Converting queries
-and code which was written to use the older syntax to use MySQL 4.1.2 syntax
-can be a lot of work, so this parameter is provided to make code which was
-written to run against older versions of MySQL work against MySQL 4.1.2.  This
-parameter may be set to "yes" (meaning allow only older syntax and fake binds)
-or "no" (meaning only allow MySQL 4.1.2 syntax and use native binds).</li>
+<li><b>port</b>: The port to connect to on a remote host.  Optional, defaults to 3306.</li>
+<li><b>socket</b>: The unix socket to connect to.  Optional if host and/or port are specified.  Overrides host/port.  host and port are optional if socket is specified.</li>
+<li><b>fakebinds</b>: MySQL 4.1.2 supports bind variables natively.  Versions prior to 4.1.2 did not, and SQL Relay had to substitute the values of bind variables into the query itself (fake binds).  In MySQL 4.1.2, bind variables are identified by ?'s in the query, while in versions prior to 4.1.2, bind variables are identified by :var1, :var2, :var3, etc.  Converting queries and code which was written to use the older syntax to use MySQL 4.1.2 syntax can be a lot of work, so this parameter is provided to make code which was written to run against older versions of MySQL work against MySQL 4.1.2.  This parameter may be set to "yes" (meaning allow only older syntax and fake binds) or "no" (meaning only allow MySQL 4.1.2 syntax and use native binds).</li>
 <li><b>charset</b>: The character set to translate data coming out of the database into.  Excluding this parameter causes the data to be translated to whatever character set the MySQL client library was configured to use at compile time, probably latin1.  Setting this to "binary" will cause the data not to be translated at all.  This parameter is only supported when SQL Relay is compiled against version 5.0.7 or newer of the MySQL client library.</li>
 </ul>
 </li>
 <li>For <b>postgresql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;options=OPTIONS;typemangling=MANGLING;fakebinds=FAKEBINDS;charset=CHARSET;lastinsertidfunction=LASTINSERTDFUNCTION"
 <ul>
-<li><b>user</b>: The username SQL Relay should use to log into the
-database.  Required.</li>
-<li><b>password</b>: The password SQL Relay should use to log into the
-database.  Required.</li>
+<li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
+<li><b>password</b>: The password SQL Relay should use to log into the database.  Required.</li>
 <li><b>db</b>: The database to log into.  Required.</li>
-<li><b>host</b>: The host to connect to.  Required.  If host begins with a 
-slash (/) then it is assumed to be the directory containing a unix socket 
-starting with .s.PGSQL.</li>
-<li><b>port</b>: The port to connect to on a remote host.
-Optional, defaults to 5432.  If host refers to a unix socket, then port is
-the extension on the socket name (eg. /tmp/.s.PGSQL.5432).</li>
-<li><b>options</b>: Command line options to be sent to the server.
-Optional.</li>
+<li><b>host</b>: The host to connect to.  Required.  If host begins with a slash (/) then it is assumed to be the directory containing a unix socket starting with .s.PGSQL.</li>
+<li><b>port</b>: The port to connect to on a remote host.  Optional, defaults to 5432.  If host refers to a unix socket, then port is the extension on the socket name (eg. /tmp/.s.PGSQL.5432).</li>
+<li><b>options</b>: Command line options to be sent to the server.  Optional.</li>
 <li><b>typemangling</b>: If set to "yes" then column types are translated to standard types.  If set to "lookup" then the pg_type table is queried at startup and column type names are returned as they appear in that table.  By default (or if set to "no"), the type number is returned.</li>
-<li><b>fakebinds</b>: Postgresql 8 supports bind variables natively.  Versions
-prior to 8 did not, and SQL Relay had to substitute the values of bind variables
-into the query itself (fake binds).  In Postgresql 8, bind variables are
-identified by $1, $2, $3, etc. in the query, while in versions prior to 8, 
-bind variables are identified by :var1, :var2, :var3, etc.  Converting queries
-and code which was written to use Postgresql 7 syntax to use Postgresql 8 syntax
-can be a lot of work, so this parameter is provided to make code which was
-written to run against Postgresql 7 work against Postgresql 8.  This parameter
-may be set to "yes" (meaning allow only Postgresql 7 syntax and fake binds) or
-"no" (meaning only allow Postgresql 8 syntax and use native binds).</li>
+<li><b>fakebinds</b>: Postgresql 8 supports bind variables natively.  Versions prior to 8 did not, and SQL Relay had to substitute the values of bind variables into the query itself (fake binds).  In Postgresql 8, bind variables are identified by $1, $2, $3, etc. in the query, while in versions prior to 8, bind variables are identified by :var1, :var2, :var3, etc.  Converting queries and code which was written to use Postgresql 7 syntax to use Postgresql 8 syntax can be a lot of work, so this parameter is provided to make code which was written to run against Postgresql 7 work against Postgresql 8.  This parameter may be set to "yes" (meaning allow only Postgresql 7 syntax and fake binds) or "no" (meaning only allow Postgresql 8 syntax and use native binds).</li>
 <li><b>charset</b>: The character set to translate data coming out of the database into.  Optional.</li>
 <li><b>lastinsertidfunction</b>: Many databases support auto-increment columns (also called serial or identity columns) and after an insert into a table containing one, the id that was generated may be retrieved via some stored procedure call, api call or special variable.  Postgresql doesn't support auto-increment columns but they can be simulated using triggers and sequences.  Trigger-sequence packages are often developed when migrating from a database that supports auto-increment columns to Postgresql.  When implementing a trigger-sequence package, it is possible to store the value that was most-recently fetched from the sequence in a package-local variable and provide a function to access it.  This parameter allows you to specify that function so that a call to getLastInsertId() by a SQL Relay client will return whatever value is returned by that function.</li>
 </ul>
@@ -405,79 +291,55 @@ may be set to "yes" (meaning allow only Postgresql 7 syntax and fake binds) or
 </li>
 <li>For <b>freetds</b> databases, the connect string syntax is "sybase=SYBASE;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;"
 <ul>
-<li><b>sybase</b>: The directory containing the "interfaces" or "freetds.conf"
-file.  Optional if the SYBASE environment variable is set.  Overrides the
-SYBASE environment variable.</li>
-<li><b>user</b>: The username SQL Relay should use to log into the
-database.  Required.</li>
-<li><b>password</b>: The password SQL Relay should use to log into the
-database.  Required.</li>
-<li><b>server</b>: The entry in the "interfaces" or "freetds.conf" file which
-specifies host, port and other database connection parameters.</li>
+<li><b>sybase</b>: The directory containing the "interfaces" or "freetds.conf" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.</li>
+<li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
+<li><b>password</b>: The password SQL Relay should use to log into the database.  Required.</li>
+<li><b>server</b>: The entry in the "interfaces" or "freetds.conf" file which specifies host, port and other database connection parameters.</li>
 <li><b>db</b>: The database to log into.  Required.</li>
 <li><b>charset</b>: The character set to use.  Optional.</li>
 <li><b>language</b>: The language to use.  Optional.</li>
-<li><b>hostname</b>: The host to connect to.  Optional, overrides the host in
-the "interfaces" or "freetds.conf" file.</li>
+<li><b>hostname</b>: The host to connect to.  Optional, overrides the host in the "interfaces" or "freetds.conf" file.</li>
 <li><b>packetsize</b>: The packetsize to use.  Optional.</li>
 </ul>
 </li>
 <li>For <b>sybase</b> databases, the connect string syntax is "sybase=SYBASE;lang=LANG;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;"
 <ul>
-<li><b>sybase</b>: The directory containing the "interfaces" or "freetds.conf"
-file.  Optional if the SYBASE environment variable is set.  Overrides the
-SYBASE environment variable.</li>
-<li><b>user</b>: The username SQL Relay should use to log into the
-database.  Required.</li>
-<li><b>password</b>: The password SQL Relay should use to log into the
-database.  Required.</li>
-<li><b>server</b>: The entry in the "interfaces" or "freetds.conf" file which
-specifies host, port and other database connection parameters.</li>
+<li><b>sybase</b>: The directory containing the "interfaces" or "freetds.conf" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.</li>
+<li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
+<li><b>password</b>: The password SQL Relay should use to log into the database.  Required.</li>
+<li><b>server</b>: The entry in the "interfaces" or "freetds.conf" file which specifies host, port and other database connection parameters.</li>
 <li><b>db</b>: The database to log into.  Required.</li>
 <li><b>charset</b>: The character set to translate data coming out of the database into.  Optional.</li>
 <li><b>language</b>: The language to use.  Optional.</li>
-<li><b>hostname</b>: The host to connect to.  Optional, overrides the host in
-the "interfaces" or "freetds.conf" file.</li>
+<li><b>hostname</b>: The host to connect to.  Optional, overrides the host in the "interfaces" or "freetds.conf" file.</li>
 <li><b>packetsize</b>: The packetsize to use.  Optional.</li>
 </ul>
 </li>
-<li>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;"
+<li>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;"</li>
 <ul>
-<li><b>user</b>: The username SQL Relay should use to log into the
-database.  Required.</li>
-<li><b>password</b>: The password SQL Relay should use to log into the
-database.  Required.</li>
-<li><b>dsn</b>: The entry in the the odbcinst.ini which specifies host, port
-and other database connection parameters.</li>
-<li><b>autocommit</b>: Whether to commit each insert, update or delete
-immediately or not.  Optional, defaults to no.</li>
+<li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
+<li><b>password</b>: The password SQL Relay should use to log into the database.  Required.</li>
+<li><b>dsn</b>: The entry in the the odbcinst.ini which specifies host, port and other database connection parameters.</li>
+<li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
 </ul>
 </li>
-<li>For <b>db2</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;autocommit=yes/no;faketransactionblocks=YESORNO"
+<li>For <b>db2</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;autocommit=yes/no;faketransactionblocks=YESORNO"</li>
 <ul>
-<li><b>user</b>: The username SQL Relay should use to log into the
-database.  Required.</li>
-<li><b>password</b>: The password SQL Relay should use to log into the
-database.  Required.</li>
+<li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
+<li><b>password</b>: The password SQL Relay should use to log into the database.  Required.</li>
 <li><b>db</b>: The server instance to connect to.</li>
-<li><b>autocommit</b>: Whether to commit each insert, update or delete
-immediately or not.  Optional, defaults to no.</li>
-<li><b>lang</b>: Sets/overrides the LANG environment variable and by extension,
-all locale-related variables.  Optional if the LANG environment variable is
-set.</li>
+<li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
+<li><b>lang</b>: Sets/overrides the LANG environment variable and by extension, all locale-related variables.  Optional if the LANG environment variable is set.</li>
 <li><b>faketransactionblocks</b>: Some databases are in autocommit mode until you explicitly start a transaction with a "start" or "begin" statement.  DB2 is always in a transaction though, unless autocommit is turned on.  Setting this parameter to "yes" causes SQL Relay to put the database in autocommit mode until a "start" or "begin" statement is issued, and then put it back in autocommit mode when a commit or rollback is issued.  In effect, emulating the behavior of databases which require an explicit "start" or "begin".</li>
 </ul>
 </li>
-<li>For <b>firebird</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DATABASE;dialect=DIALECT;autocommit=yes/no;charset=CHARSET;faketransactionblocks=YESORNO;lastinsertidfunction=LASTINSERTIDFUNCTION"
+<li>For <b>firebird</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DATABASE;dialect=DIALECT;autocommit=yes/no;charset=CHARSET;faketransactionblocks=YESORNO;lastinsertidfunction=LASTINSERTIDFUNCTION"</li>
 <ul>
-<li><b>user</b>: The username SQL Relay should use to log into the
-database.  Required.</li>
-<li><b>password</b>: The password SQL Relay should use to log into the
-database.  Required.</li>
+<li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
+<li><b>password</b>: The password SQL Relay should use to log into the database.  Required.</li>
 <li><b>db</b>: The filename of the database open.  Required.</li>
 <li><b>dialect</b>: The database dialect to use.  Optional, defaults to 3.</li>
-<li><b>autocommit</b>: Whether to commit each insert, update or delete
-immediately or not.  Optional, defaults to no.</li>
+<li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
 <li><b>charset</b>: The character set to translate data coming out of the database into.  Optional.</li>
 <li><b>faketransactionblocks</b>: Some databases are in autocommit mode until you explicitly start a transaction with a "start" or "begin" statement.  Firebird is always in a transaction though, unless autocommit is turned on.  Setting this parameter to "yes" causes SQL Relay to put the database in autocommit mode until a "start" or "begin" statement is issued, and then put it back in autocommit mode when a commit or rollback is issued.  In effect, emulating the behavior of databases which require an explicit "start" or "begin".</li>
 <li><b>lastinsertidfunction</b>: Many databases support auto-increment columns (also called serial or identity columns) and after an insert into a table containing one, the id that was generated may be retrieved via some stored procedure call, api call or special variable.  Firebird doesn't support auto-increment columns but they can be simulated using triggers and sequences.  Trigger-sequence packages are often developed when migrating from a database that supports auto-increment columns to Firebird.  When implementing a trigger-sequence package, it is possible to store the value that was most-recently fetched from the sequence in a package-local variable and provide a function to access it.  This parameter allows you to specify that function so that a call to getLastInsertId() by a SQL Relay client will return whatever value is returned by that function.</li>
@@ -506,98 +368,39 @@ immediately or not.  Optional, defaults to no.</li>
 </ul>
 </ul>
 
-<p>Most of the tag attributes are straightforward.  The most complicated one
-are the <b>metric</b> attribute of the <b>connection</b> tag and the 
-<b>authtier</b> attribute of the <b>instance</b> tag.</p>
+<p>Most of the tag attributes are straightforward.  The most complicated one are the <b>metric</b> attribute of the <b>connection</b> tag and the <b>authtier</b> attribute of the <b>instance</b> tag.</p>
 
 <span class="heading2">Metric</span><br><br>
 
-<p>The <b>metric</b> attribute doesn't define how many connections are started, 
-the <b>connections</b> attribute of the <b>instance</b> tag defines that.  The 
-<b>metric</b> attribute influences how many of the total connections will be of
-that connection type.  The higher the metric relative to the other metrics, the
-more of that connection type will be started.</p>
+<p>The <b>metric</b> attribute doesn't define how many connections are started, the <b>connections</b> attribute of the <b>instance</b> tag defines that.  The <b>metric</b> attribute influences how many of the total connections will be of that connection type.  The higher the metric relative to the other metrics, the more of that connection type will be started.</p>
 
 <span class="heading2">Authtier</span><br><br>
 
-<p>The client will send a user and password to the sqlr-listener and 
-sqlr-connection daemons when it connects to them.  The <b>authtier</b> 
-attribute indicates which daemon will actually pay attention to that user
-and password.</p>
+<p>The client will send a user and password to the sqlr-listener and sqlr-connection daemons when it connects to them.  The <b>authtier</b> attribute indicates which daemon will actually pay attention to that user and password.</p>
 
-<p>If the <b>authtier</b> attribute is set to "listener", the sqlr-listener will
-compare the user/password to the list of user/passwords in the sqlrelay.conf
-file defined in the <b>users</b> tag and accept or reject the client connection.
-If the client is accepted, it is handed off to the sqlr-connection-database
-daemon which assumes that it has already been authenticated and does not perform
-its own authentication.</p>
+<p>If the <b>authtier</b> attribute is set to "listener", the sqlr-listener will compare the user/password to the list of user/passwords in the sqlrelay.conf file defined in the <b>users</b> tag and accept or reject the client connection.  If the client is accepted, it is handed off to the sqlr-connection-database daemon which assumes that it has already been authenticated and does not perform its own authentication.</p>
 
-<p>If the <b>authtier</b> attribute is set to "connection", the sqlr-listener 
-will ignore the user/password and just hand off the client to the 
-sqlr-connection-database daemon which will compare the user/password to the 
-list of user/passwords in the sqlrelay.conf file and accept or reject the 
-client connection.</p>
+<p>If the <b>authtier</b> attribute is set to "connection", the sqlr-listener will ignore the user/password and just hand off the client to the sqlr-connection-database daemon which will compare the user/password to the list of user/passwords in the sqlrelay.conf file and accept or reject the client connection.</p>
 
-<p>If the <b>authtier</b> attribute is set to "listener_and_connection" then 
-both daemons will perform the authentication.  This is the most secure method
-and the default but is slower than "listener" or "connection" alone.</p>
+<p>If the <b>authtier</b> attribute is set to "listener_and_connection" then both daemons will perform the authentication.  This is the most secure method and the default but is slower than "listener" or "connection" alone.</p>
 
-<p>If the <b>authtier</b> attribute is set to "database", the sqlr-listener
-daemon will ignore the user/password and the sqlr-connection-database daemon
-may use database-specific methods for authenticating and proxying the user.</p>
+<p>If the <b>authtier</b> attribute is set to "database", the sqlr-listener daemon will ignore the user/password and the sqlr-connection-database daemon may use database-specific methods for authenticating and proxying the user.</p>
 
-<p>When SQL Relay is used with Oracle 8i or higher, the sqlr-connection-database
-daemon switches users without logging out.  The sqlr-connection-database 
-daemon must be configured to log into the database as a user that can proxy 
-other users and the client must attempt to log in to <b>SQL Relay</b> as one 
-of the users that can be proxied.  See 
-<a href="oraclentier.html">this document</a> for more information including
-instructions for configuring Oracle.</p>
+<p>When SQL Relay is used with Oracle 8i or higher, the sqlr-connection-database daemon switches users without logging out.  The sqlr-connection-database daemon must be configured to log into the database as a user that can proxy other users and the client must attempt to log in to <b>SQL Relay</b> as one of the users that can be proxied.  See <a href="oraclentier.html">this document</a> for more information including instructions for configuring Oracle.</p>
 
-<p>When SQL Relay is used with any other database, it simply logs out and logs
-back in as a different user.  This is quite ineffecient and defeats the 
-value of keeping persistent database connections.</p>
+<p>When SQL Relay is used with any other database, it simply logs out and logs back in as a different user.  This is quite ineffecient and defeats the value of keeping persistent database connections.</p>
 
-<p><b>NOTE:</b> authtier="database" can't be used in an instance where
-dbase="router".  It's OK for the instances that the router uses to use
-authtier="database" but not the router instance itself.  If authtier="database"
-is set on that instance, it will be overridden to
-authier="listener_and_connection".</p>
+<p><b>NOTE:</b> authtier="database" can't be used in an instance where dbase="router".  It's OK for the instances that the router uses to use authtier="database" but not the router instance itself.  If authtier="database" is set on that instance, it will be overridden to authier="listener_and_connection".</p>
 
 <span class="heading2">Handoff</span><br><br>
 
-<p>When an <b>SQL Relay</b> client needs to talk to the database, it connects
-to a listener process which queues it up until a database connection daemon is
-available.  When a daemon is available, the client is "handed off" to it.  This
-"handoff" can be done in one of two ways.  The client can disconnect from the
-listener and reconnect to the connection daemon, or the existing connection to 
-the client can be passed from the listener to the connection daemon.  These two
-methods are referred to as "reconnect" and "pass".  "Reconnect" works on every 
-platform.  "Pass" works on most platforms but not all.  SCO OpenServer and 
-Linux kernels prior to 2.2 don't support "pass".  Other platforms may not 
-support "pass" as well but those certainly don't.  If <b>SQL Relay</b> is being
-run on a different machine than its clients, "pass" is substantially faster 
-than "reconnect" and more lightweight in any case.  It should be used if
-possible.</p>
+<p>When an <b>SQL Relay</b> client needs to talk to the database, it connects to a listener process which queues it up until a database connection daemon is available.  When a daemon is available, the client is "handed off" to it.  This "handoff" can be done in one of two ways.  The client can disconnect from the listener and reconnect to the connection daemon, or the existing connection to the client can be passed from the listener to the connection daemon.  These two methods are referred to as "reconnect" and "pass".  "reconnect" works on every platform.  "pass" works on most platforms but not all.  Cygwin, SCO OpenServer and Linux kernels prior to 2.2 don't support "pass".  Other platforms may not support "pass" as well but those certainly don't.  If <b>SQL Relay</b> is being run on a different machine than its clients, "pass" is substantially faster than "reconnect" and more lightweight in any case.  It should be used if possible.</p>
 
 <span class="heading2">Debug</span><br><br>
 
-<p>If the debug attribute is not set to "none", when <b>sqlr-start</b> is run,
-it runs special versions of the <b>sqlr-listener</b> and 
-<b>sqlr-connection</b> daemons which log debug information to files in 
-/usr/local/firstworks/var/sqlrelay/debug.  When the daemons start up, they 
-print out the exact filename that they are logging to.  This filename will be 
-listener.PID or connection.PID where PID is the process ID of the daemon.  Note
-that the <b>sqlr-listener</b> forks each time it gets a client connection and 
-generates a seperate file for each forked process as well as one for the main 
-process.</p>
+<p>If the debug attribute is not set to "none", when <b>sqlr-start</b> is run, it runs special versions of the <b>sqlr-listener</b> and <b>sqlr-connection</b> daemons which log debug information to files in /usr/local/firstworks/var/sqlrelay/debug.  When the daemons start up, they print out the exact filename that they are logging to.  This filename will be listener.PID or connection.PID where PID is the process ID of the daemon.  Note that the <b>sqlr-listener</b> forks each time it gets a client connection and generates a seperate file for each forked process as well as one for the main process.</p>
 
-<p>The debug attribute can be one of: "none", "listener", "connection" or 
-"listener_and_connection".  If "none" is specified, no debugging information
-is logged.  If "listener" is specified, then only the listener daemon logs 
-debug information.  If "connection" is specified, then only the connection 
-daemons log debug information.  If "listener_and_connection" is specified, all 
-daemons log debug information.</p> 
+<p>The debug attribute can be one of: "none", "listener", "connection" or "listener_and_connection".  If "none" is specified, no debugging information is logged.  If "listener" is specified, then only the listener daemon logs debug information.  If "connection" is specified, then only the connection daemons log debug information.  If "listener_and_connection" is specified, all daemons log debug information.</p> 
 
 </body>
 </html>
