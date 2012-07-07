@@ -7,8 +7,9 @@
 
 <span class="heading1">Configuring SQL Relay</span><br><br>
 
-<p>The SQL Relay configuration file
-(usually /usr/local/firstworks/etc/sqlrelay.conf) may be edited by hand.</p>
+<p>The SQL Relay configuration file (usually /usr/local/firstworks/etc/sqlrelay.conf) may be edited by hand.</p>
+
+<p>The file format is complex and is best explained with an example:</p>
 
 <blockquote>
 <font face="monospace">
@@ -78,7 +79,6 @@
 </font>
 </blockquote>
 
-<p>The file format is complicated and is best explained with an example.</p>
 <p>As you can see, it's an XML file.  Below is its DTD.</p>
 
 <blockquote>
@@ -546,7 +546,7 @@ and the default but is slower than "listener" or "connection" alone.</p>
 daemon will ignore the user/password and the sqlr-connection-database daemon
 may use database-specific methods for authenticating and proxying the user.</p>
 
-<p>When SQL Relay is used with Oracle 8i/9i, the sqlr-connection-database
+<p>When SQL Relay is used with Oracle 8i or higher, the sqlr-connection-database
 daemon switches users without logging out.  The sqlr-connection-database 
 daemon must be configured to log into the database as a user that can proxy 
 other users and the client must attempt to log in to <b>SQL Relay</b> as one 

@@ -23,6 +23,7 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/api/java
 	$(MKINSTALLDIRS) $(docdir)/api/tcl
 	$(MKINSTALLDIRS) $(docdir)/dropin
+	$(MKINSTALLDIRS) $(docdir)/features
 	$(MKINSTALLDIRS) $(docdir)/css
 	$(MKINSTALLDIRS) $(docdir)/programming
 	$(MKINSTALLDIRS) $(docdir)/programming/zope
@@ -48,7 +49,6 @@ install:
 	$(INSTALL) -m 644 configuring.html $(docdir)
 	$(INSTALL) -m 644 index.html $(docdir)
 	$(INSTALL) -m 644 installing.html $(docdir)
-	$(INSTALL) -m 644 introduction.html $(docdir)
 	$(INSTALL) -m 644 invisible.gif $(docdir)
 	$(INSTALL) -m 644 oraclentier.html $(docdir)
 	$(INSTALL) -m 644 running.html $(docdir)
@@ -164,6 +164,19 @@ install:
 	done
 	$(INSTALL) -m 644 dropin/mysql.html $(docdir)/dropin
 	$(INSTALL) -m 644 dropin/postgresql.html $(docdir)/dropin
+	$(INSTALL) -m 644 features/connectionpooling.html $(docdir)/features
+	$(INSTALL) -m 644 features/databases.html $(docdir)/features
+	$(INSTALL) -m 644 features/dbabstractionlayers.html $(docdir)/features
+	$(INSTALL) -m 644 features/languages.html $(docdir)/features
+	$(INSTALL) -m 644 features/loadbalancing.html $(docdir)/features
+	$(INSTALL) -m 644 features/multirowfetches.html $(docdir)/features
+	$(INSTALL) -m 644 features/platforms.html $(docdir)/features
+	$(INSTALL) -m 644 features/proxying.html $(docdir)/features
+	$(INSTALL) -m 644 features/queryrouting.html $(docdir)/features
+	$(INSTALL) -m 644 features/resultsetcaching.html $(docdir)/features
+	$(INSTALL) -m 644 features/substitutionandbindvars.html $(docdir)/features
+	$(INSTALL) -m 644 features/suspendedtx.html $(docdir)/features
+	$(INSTALL) -m 644 features/throttling.html $(docdir)/features
 	$(INSTALL) -m 644 programming/binds.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/odbc.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/jdbc.html $(docdir)/programming
