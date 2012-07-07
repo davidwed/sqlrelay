@@ -1,0 +1,21 @@
+<html>
+<head>
+<title>firstworks   SQL Relay - Client-Side Result Set Caching</title>
+<link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Client-Side Result Set Caching</span><br><br>
+
+<p>Client-side result set caching is a feature of the SQL Relay API that allows you to save whatever part of the result set that you have fetched so far to a local file.  This file can be re-opened later and rows that were already fetched can be read from it again and new rows can be appended to it.</p>
+
+<p>When used with <a href="#suspendedtx">suspended transactions</a> efficient paging can be accomplished.</p>
+
+<p>For example, if you have 1000 items that you want to display, 50 at a time, you can select the rows, begin fetching them and cache them to a local file.  When the app is done fetching the first 50 items, the transaction can be suspended and picked up again by the next invocations of the app.  If the user wants to view the next 50 items, then 50 more rows can be fetched and cached.  If the user wants to view the previous 50 items, then there is no need to run the query again, the rows can just be fetched from the file.</p>
+
+<p>Cached result sets have a TTL (time-to-live) setting and are periodically removed by the sqlr-cachemanager daemon.</p>
+
+<p>The programming docs for each language give more detail on this subject.</p>
+
+</body>
+</html>

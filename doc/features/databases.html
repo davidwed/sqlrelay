@@ -1,0 +1,25 @@
+<html>
+<head>
+<title>firstworks   SQL Relay - Supported Databases</title>
+<link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Supported Databases</span><br><br>
+
+<p>SQL Relay supporting Oracle, MySQL, PostgreSQL, Sybase, IBM DB2, Firebird and SQLite databases directly, using the native client API's for those databases.</p>
+
+<p>Support is provided for Microsoft SQL Server via the FreeTDS API.  Reportedly, some versions of Microsoft SQL Server can also be accessed using some versions of the Sybase database API.  So, depending on what version of Sybase you build SQL Relay against, you might be able to access certain versions of SQL Server.  I have never tried this myself.  Your milage may vary.</p>
+
+<p>FreeTDS supports Sybase as well.  So you can access both SQL Server and Sybase databases using FreeTDS.</p>
+
+<p>See the section on <a name="sybasefreetdsdiff">FreeTDS</a> below for more information.</p>
+
+<p>Minimal support is provided for Microsoft Access databases via the MDB Tools API.  Select queries are supported but DML and DDL is not.</p>
+
+<p>ODBC is supported via the UnixODBC and iODBC libraries.  If you can find a compatible ODBC driver for the database that you want to use then you should be able to access that database through SQL Relay.  You can also use the ODBC to ODBC bridge to access databases for which there is no ODBC driver for the platform you are runnin SQL Relay on.</p>
+
+<p>Microsoft recently (as of July 2012) released a SQL Server ODBC driver that is compatible with certain versions of UnixODBC on certain versions of Red Hat Enterprise Linux on the x86_64 platform, so that is another possible way to connect to SQL Server that is supported by SQL Relay.</p>
+
+</body>
+</html>

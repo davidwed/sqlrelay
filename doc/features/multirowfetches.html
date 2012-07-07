@@ -1,0 +1,30 @@
+<html>
+<head>
+<title>firstworks   SQL Relay - Multi-Row Fetches</title>
+<link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Multi-Row Fetches</span><br><br>
+
+<a name="multirow"></a>
+<span class="heading3">Multi-Row Fetches</span>
+
+<p>Multi-row fetches improve performance by reducing round-trips to the database.</p>
+
+<p>To fetch a result set, most database API's provide a "fetch" function that fetches a single row.  The app can then do something with that row and then fetch another row.</p>
+
+<p>If instead, multiple rows were fetched at once and buffered, it would reduce the number of round-trips to the database and improve performance, at the cost of memory.</p>
+
+<p>Some database API's do exactly this and provide a "fetchatonce" parameter that can be used to control how many rows are fetched at once.</p>
+
+<p>When using a database that provides a "fetchatonce" parameter, SQL Relay uses it and exposes it in the configuration file.  So, the SQL Relay server does multi-row fetches from the database, if possible.</p>
+
+<p>The SQL Relay client goes even further.  By default, it fetches the entire result set in one round-trip to the SQL Relay server.  For small result sets, like the ones that would likely be used to build a web page, this is very fast and usually doesn't consume an inordinate amount of memory.  However for larger result sets, it can be very inefficient so the SQL Relay API's provide methods for setting how many rows will be fetched and buffered at once.</p>
+
+<p>See the FAQ items <a href="faq.html#buffer">Why does SQL Relay buffer the entire result set?</a> and <a href="faq.html#nobuffer">How do keep SQL Relay from buffering the entire result set?</a> below for more information.  The programming guides for each language delve into this subject as well.</p>
+
+<p>If the database does not support multi-row fetches, and the SQL Relay server is run on the same machine as the database and the client is run on a separate machine, since the SQL Relay client can do multi-row fetches, using SQL Relay generally improves performance over native database access because of the reduced number of round-trips across the network, fetching the result set.</p>
+
+</body>
+</html>

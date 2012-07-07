@@ -1,0 +1,19 @@
+<html>
+<head>
+<title>firstworks   SQL Relay - Throttling</title>
+<link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Throttling</span><br><br>
+
+<p>Throttling limits the number of connections that will be started to a given database and queues up client requests rather than denying access outright.</p>
+
+<p>"Too many connections." is a common error seen by MySQL users, for example.  An app got very busy for a while and tried to open more connections than the database could handle.  The app wasn't written to detect that particular error and retry though, so it just failed, printing the error out on the web page.</p>
+
+<p>The database could be tuned to allow more connections and bounced, but most likely, the app only gets busy under certain circumstances and it would be nice if the database could be left alone and the app could just be throttled back somehow.  It might also be that the database has already been tuned up as far as it can go but it's still getting hammered from time-to-time.</p>
+
+<p>SQL Relay can be configured to maintain a certain number of database connections and open more, on-demand, up to a certain point.  If the app is so busy that it needs more connections than the maximum number configured, SQL Relay will begin queueing clients up, rather than returning an error, effectively throttling back the application.  The queued-up connections consume relatively few resources and may be configured to wait for a certain amount of time before giving up, or wait indefinitely.</p>
+
+</body>
+</html>

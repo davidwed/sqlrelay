@@ -1,0 +1,19 @@
+<html>
+<head>
+<title>firstworks   SQL Relay - Load Balancing</title>
+<link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Load Balancing</span><br><br>
+
+<p>Load balancing distributes queries over a pool of servers to aid in scaling.</p>
+
+<p>For example, if you have a database cluster or set of replicated servers, then SQL Relay can be configured to distribute queries over them.</p>
+
+<p>Weight metrics can be assigned as well.  If some of the database machines are more powerful than others, load can be dispoportionally distributed to them and away from the less powerful database servers.</p>
+
+<p>Note that SQL Relay cannot currently be used to replicate databases or keep replicated databases synchronized.  If you are using SQL Relay to access replicated databases then it is assumed that there is some means by which the databases are kept synchronized external to SQL Relay.</p>
+
+</body>
+</html>
