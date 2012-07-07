@@ -49,7 +49,6 @@ install:
 	$(INSTALL) -m 644 index.html $(docdir)
 	$(INSTALL) -m 644 installing.html $(docdir)
 	$(INSTALL) -m 644 introduction.html $(docdir)
-	$(INSTALL) -m 644 introtowebdb.html $(docdir)
 	$(INSTALL) -m 644 invisible.gif $(docdir)
 	$(INSTALL) -m 644 oraclentier.html $(docdir)
 	$(INSTALL) -m 644 running.html $(docdir)
