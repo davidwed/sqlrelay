@@ -1,19 +1,15 @@
 <html>
 <head>
-<title>firstworks   SQL Relay - Query Routing</title>
-<link href="css/styles.css" rel="stylesheet">
+<title>firstworks   SQL Relay - Query Routing and Filtering</title>
+<link href="../css/styles.css" rel="stylesheet">
 </head>
 <body>
 
-<span class="heading1">Query Routing</span><br><br>
+<span class="heading1">Query Routing and Filtering</span><br><br>
 
-<p>Query routing sends queries that match one pattern to one set of database servers and queries that match another pattern to another set of servers.</p>
+<p>Query routing sends queries that match one pattern to one set of database servers and queries that match another pattern to another set of servers.  A comon use for query routing is to route DML and DDL queries to a master and distribute alll other queries over a pool of slaves.</p>
 
-<p>A comon use for query routing is to route DML and DDL queries to a master and distribute alll other queries over a pool of slaves.</p>
-
-<p>Query filtering prevents queries that match a certian pattern from being run at all.</p>
-
-<p>There are often certain queries that will bring the entire database to its knees.  A common use for query filtering is to identify those queries and prevent them from being run.</p>
+<p>Query filtering prevents queries that match a certian pattern from being run at all.  There are often certain queries that will bring the entire database to its knees.  A common use for query filtering is to identify those queries and prevent them from being run.</p>
 
 </body>
 </html>

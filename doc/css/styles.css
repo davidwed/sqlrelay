@@ -6,6 +6,10 @@ body {
 	font-size:	10pt;
 }
 
+.indented {
+	margin-left:	40px;
+}
+
 .heading1 {
 	color:		black;
 	font-family:	arial;
