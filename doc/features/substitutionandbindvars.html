@@ -9,15 +9,10 @@
 
 <p>Bind variables are parameters that can be dynamically inserted into a query.</p>
 
-<p>For example, in the query:</p>
+<p>Before executing a query, the datbase must parse it and comes up with an execution plan.  This process is called "preparing" the query and it takes time.  If you need to run a large set of similar queries, and each must be prepared separately, then this prepare-time can add up.</p>
 
-<blockquote><b>
-select * from  mytable where col1=:val1 and col2=:val2 and col3=:val3
-</b></blockquote>
+<p>Bind variables allow the query to be prepared only once, with placeholders for the some of the values, and then executed over and over, just plugging in values for each execution.  By eliminating the prepare-time before every execution, performance can be improved significantly.</p>
 
-<p>...the variables <i>:val1</i>, <i>:val2</i> and <i>:val3</i> are bind variables.</p>
-
-<p>When the datbase receives a query, it must be parsed and the database must come up with a plan for executing it.  This process is often called "preparing" the query and it takes time.  If you need to run the same query over and over, many times, it can really add up.  If the query could be "prepared" once, with placeholders for the some of the values, and then executed over and over, just plugging in values with each execution, it would improve performance significantly.  This is what bind variables achieve.</p>
 
 <p>The basic process is:</p>
 
@@ -38,13 +33,11 @@ execute();
 ... and so on ...
 </pre></blockquote>
 
-<p>In addition to running faster, the program is much cleaner.  The query doesn't need to be reconstructed each time it is run.</p>
+<p>In addition to running faster, the program is much cleaner.  The program doesn't need to be reconstruct the query each time it is run.</p>
 
-<p>Most modern databases support bind variables.  MDB Tools does not and older versions of MySQL, PostgreSQL and SQLite don't either.  For databases that don't support bind variables, SQL Relay fakes them by rewriting the query and inserting the values manually.  The cost of re-preparing the query is incurred, but there is no way to get around it with those databases anyway.</p>
+<p>Most modern databases support bind variables.  MDB Tools and older versions of MySQL, PostgreSQL and SQLite are exceptions.  For databases that don't support bind variables, SQL Relay fakes them by rewriting the query and inserting the values manually.  The cost of re-preparing the query is incurred, but there is no way to get around it with those databases anyway.</p>
 
-<p>Some databases support "vector binds" where each variable can be assigned an array of values and when the query is executed, the server executes it multiple times, once for each member of the array.  This significantly speeds up insert/update/delete queries.  SQL Relay does not currently support vector binds.</p>
-
-<p>See the FAQ item <a href="faq.html#bindvars">How do I use bind variables?</a> below for more information on bind variables.  A more complete explanation of bind variables is given in <a href="programming/binds.html">here</a> as well, and the programming guides for each language explain how to use them with queries and stored procedures.</p>
+<p>See the FAQ item <a href="../faq.html#bindvars">How do I use bind variables?</a> for more information.  A more complete explanation is also given in <a href="../programming/binds.html">here</a>, and the programming guides for each language explain how to use them with queries and stored procedures.</p>
 
 </body>
 </html>

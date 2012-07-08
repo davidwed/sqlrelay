@@ -6,6 +6,7 @@ include ../config.mk
 
 install:
 	$(MKINSTALLDIRS) $(docdir)
+	$(MKINSTALLDIRS) $(docdir)/admin
 	$(MKINSTALLDIRS) $(docdir)/api
 	$(MKINSTALLDIRS) $(docdir)/api/c/html
 	$(MKINSTALLDIRS) $(docdir)/api/c++/html
@@ -46,14 +47,16 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/suse/9.0
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/sybase
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/db2
-	$(INSTALL) -m 644 configuring.html $(docdir)
 	$(INSTALL) -m 644 index.html $(docdir)
-	$(INSTALL) -m 644 installing.html $(docdir)
-	$(INSTALL) -m 644 invisible.gif $(docdir)
-	$(INSTALL) -m 644 oraclentier.html $(docdir)
-	$(INSTALL) -m 644 running.html $(docdir)
-	$(INSTALL) -m 644 tuning.html $(docdir)
 	$(INSTALL) -m 644 faq.html $(docdir)
+	$(INSTALL) -m 644 oraclentier.html $(docdir)
+	$(INSTALL) -m 644 admin/configuring.html $(docdir)/admin
+	$(INSTALL) -m 644 admin/installing.html $(docdir)/admin
+	$(INSTALL) -m 644 admin/loadbalfailover.html $(docdir)/admin
+	$(INSTALL) -m 644 admin/router.html $(docdir)/admin
+	$(INSTALL) -m 644 admin/router.png $(docdir)/admin
+	$(INSTALL) -m 644 admin/running.html $(docdir)/admin
+	$(INSTALL) -m 644 admin/tuning.html $(docdir)/admin
 	$(INSTALL) -m 644 css/styles.css $(docdir)/css
 	for file in `ls api/c/html/*.html api/c/html/*.css api/c/html/*.png api/c/html/*.js`; \
 	do \
