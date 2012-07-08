@@ -16,7 +16,7 @@
 		trigger from the listener to mitigate race conditions that
 		can become problematic when connections="0" is used
 	added C# and ADO.NET docs and updated windows documentation
-	updated the faq
+	updated the documentation
 
 0.45 - added trigger framework
 	added support for getting the native database error number
