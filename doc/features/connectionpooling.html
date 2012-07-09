@@ -9,9 +9,17 @@
 
 <p>A persistent database connection pooling system maintains a pool of already-logged-in database connections and hands them off to applications, reducing the time it takes the app to connect to the database.</p>
 
-<p>Logging into some databases can take a noticable amount of time.  In fact, it may take longer for an application to log in than to run all of the queries it needs to run.  This can be especially problematic for transient apps such as web-based applications which start up, connect, query, and shut down, over and over.</p>
+<p>Logging into some databases can take a noticable amount of time...</p>
 
-<p>By maintaining already-logged-in database connections, a connection pooling system can significantly reduce the amount of time it takes an app to begin running queries.</p>
+<img src="../images/app-to-db.png"><br>
+
+<p>In fact, it may take longer for an application to log in than to run all of the queries it needs to run.  This can be especially problematic for transient apps such as web-based applications which start up, connect, query, and shut down, over and over.</p>
+
+<p>Logging into a connection pooling takes a very short amount of time and since the connection pooling system has been maintaining already-logged-in database connections, the database is immediately available.</p>
+
+<img src="../images/app-to-sqlr-to-db.png"><br>
+
+<p>A connection pooling system can significantly reduce the amount of time it takes an app to begin running queries.</p>
 
 <p>Many connection pooling systems are built into application servers or run within a web-server but can only be used by applications running within that server and usually only by applications written in a particular language.  SQL Relay runs stand-alone and may be used by any application, including applications running on other machines across the network.  This is especially useful if you have a variety of apps, written in different languages, running on various platforms that all need to talk to the same database.</p>
 

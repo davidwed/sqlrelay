@@ -25,6 +25,7 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/api/tcl
 	$(MKINSTALLDIRS) $(docdir)/dropin
 	$(MKINSTALLDIRS) $(docdir)/features
+	$(MKINSTALLDIRS) $(docdir)/images
 	$(MKINSTALLDIRS) $(docdir)/css
 	$(MKINSTALLDIRS) $(docdir)/programming
 	$(MKINSTALLDIRS) $(docdir)/programming/zope
@@ -179,6 +180,7 @@ install:
 	$(INSTALL) -m 644 features/substitutionandbindvars.html $(docdir)/features
 	$(INSTALL) -m 644 features/suspendedtx.html $(docdir)/features
 	$(INSTALL) -m 644 features/throttling.html $(docdir)/features
+	$(INSTALL) -m 644 images/*.png $(docdir)/images
 	$(INSTALL) -m 644 programming/binds.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/odbc.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/jdbc.html $(docdir)/programming
