@@ -128,10 +128,10 @@ bool extendtooracletodate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldomnode *node) {
 
-	// "function" -> current_date
+	// "function" -> systimestamp
 	// or
 	// "function" interval_qualifier ->
-	// 	to_date(to_char(current_date, format_string), format_string)
+	// 	to_date(to_char(systimestamp, format_string), format_string)
 	// ...
 
 	debugFunction();
@@ -139,8 +139,8 @@ bool extendtooracletodate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 	// get the function node
 	xmldomnode	*functionnode=node;
 
-	// translate the current-date function to current_date
-	functionnode->setAttributeValue(sqlparser::_value,"current_date");
+	// translate the current-date function to systimestamp
+	functionnode->setAttributeValue(sqlparser::_value,"systimestamp");
 
 	// get the interval qualifier node, if there is one...
 	xmldomnode	*intervalqualifiernode=
@@ -192,6 +192,14 @@ bool extendtooracletodate::translateDateTime(sqlrconnection_svr *sqlrcon,
 		return true;
 	}
 
+	// get the first parameter string literal node, if there is one...
+	xmldomnode	*stringliteralnode=
+				firstparameternode->getFirstTagChild(
+						sqlparser::_string_literal);
+	if (stringliteralnode->isNullNode()) {
+		return true;
+	}
+
 	// get the interval qualifier node, if there is one...
 	xmldomnode	*intervalqualifiernode=
 				functionnode->getNextTagSibling(
@@ -203,7 +211,14 @@ bool extendtooracletodate::translateDateTime(sqlrconnection_svr *sqlrcon,
 	// translate datetime to to_date
 	functionnode->setAttributeValue(sqlparser::_value,"to_date");
 
-	// FIXME: convert the date/time parameter to a string
+	// quote the date/time parameter
+	stringbuffer	newdatetimeparam;
+	newdatetimeparam.append('\'');
+	newdatetimeparam.append(
+		stringliteralnode->getAttributeValue(sqlparser::_value));
+	newdatetimeparam.append('\'');
+	stringliteralnode->setAttributeValue(sqlparser::_value,
+						newdatetimeparam.getString());
 
 	// translate the interval qualifier to a string format...
 	stringbuffer	formatstring;
@@ -236,12 +251,11 @@ bool extendtooracletodate::translateInterval(sqlrconnection_svr *sqlrcon,
 	// get the function node
 	xmldomnode	*functionnode=node;
 
-	// get the interval value, it should just be a single number
+	// get the interval value
 	const char	*interval=
 				node->getFirstTagChild(sqlparser::_parameters)->
 				getFirstTagChild(sqlparser::_parameter)->
-				getFirstTagChild(sqlparser::_expression)->
-				getFirstTagChild(sqlparser::_number)->
+				getFirstTagChild(sqlparser::_string_literal)->
 				getAttributeValue(sqlparser::_value);
 
 	// bail if there was no single-number interval value
@@ -350,7 +364,7 @@ void extendtooracletodate::translateIntervalQualifier(
 	if (start<=TIMEPARTS_SECOND && end>=TIMEPARTS_SECOND) {
 		formatstring->append("SS");
 		if (end!=TIMEPARTS_SECOND) {
-			formatstring->append(":");
+			formatstring->append(".");
 		}
 	}
 	if (start<=TIMEPARTS_FRACTION && end>=TIMEPARTS_FRACTION) {

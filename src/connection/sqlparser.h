@@ -791,6 +791,9 @@ class sqlparser {
 						const char *timecomponent,
 						const char *precscale);
 		static const char	*_precision;
+		bool	parseUnquotedLiteral(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
 		bool	parseColumnOrFunction(xmldomnode *currentnode,
 						const char *name,
 						const char *ptr,

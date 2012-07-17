@@ -1,6 +1,7 @@
 // Copyright (c) 1999-2011  David Muse
 // See the file COPYING for more information
 
+#include <rudiments/snooze.h>
 #include <sqlparser.h>
 #include <debugprint.h>
 
@@ -339,6 +340,9 @@ bool sqlparser::parseIntervalQualifier(xmldomnode *currentnode,
 					const char **newptr) {
 	debugFunction();
 
+	// save the starting point, in case this fails
+	const char	*startptr=ptr;
+
 	// create the node
 	xmldomnode	*iqnode=new xmldomnode(tree,
 					currentnode->getNullNode(),
@@ -357,6 +361,11 @@ bool sqlparser::parseIntervalQualifier(xmldomnode *currentnode,
 	} else {
 		*newptr=ptr;
 		delete iqnode;
+	}
+
+	// restore newptr if this failed
+	if (!retval) {
+		*newptr=startptr;
 	}
 
 	return retval;
@@ -423,11 +432,42 @@ bool sqlparser::parseTimeComponent(xmldomnode *currentnode,
 
 const char *sqlparser::_precision="precision";
 
+bool sqlparser::parseUnquotedLiteral(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+
+	// buffer to store the unquoted literal
+	stringbuffer	unqoutedliteral;
+
+	// get and append characters until we hit a comma or right paren
+	const char	*chptr=NULL;
+	for (chptr=ptr; *chptr && *chptr!=',' && *chptr!=')'; chptr++) {
+		unqoutedliteral.append(*chptr);
+	}
+
+	// set newptr
+	*newptr=chptr;
+
+	// add a new node containing the unqouted literal
+	newNode(currentnode,
+		sqlparser::_string_literal,
+		unqoutedliteral.getString());
+
+	return true;
+}
+
 bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
 						const char *name,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
+
+	// some date/time functions have unquoted date/time literals as
+	// their only argument, check for those
+	bool	unqoutedliteral=
+		(!charstring::compareIgnoringCase(name,"datetime") ||
+		!charstring::compareIgnoringCase(name,"interval"));
 	
 
 	// functions generally have parameters or at least empty parameters
@@ -449,12 +489,8 @@ bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
 
 				// some databases allow an interval qualifier
 				// immediately after a function, test for that
-				const char	*save=*newptr;
-				if (!parseIntervalQualifier(currentnode,
-							*newptr,newptr)) {
-					*newptr=save;
-				}
-
+				parseIntervalQualifier(currentnode,
+							*newptr,newptr);
 				return true;
 			}
 
@@ -462,8 +498,19 @@ bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
 			xmldomnode	*paramnode=
 					newNode(paramsnode,_parameter);
 
-			// parse the expression
-			parseExpression(paramnode,*newptr,newptr);
+			// parse the unquoted literal or expression
+			if (unqoutedliteral) {
+
+				// parse the unquoted literal
+				parseUnquotedLiteral(paramnode,*newptr,newptr);
+
+				// don't look for it on the next pass
+				unqoutedliteral=false;
+			} else {
+
+				// parse the expression
+				parseExpression(paramnode,*newptr,newptr);
+			}
 
 			// skip any commas
 			comma(*newptr,newptr);
@@ -492,10 +539,7 @@ bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
 
 		// some databases allow an interval qualifier
 		// immediately after a function, test for that
-		const char	*save=*newptr;
-		if (!parseIntervalQualifier(currentnode,*newptr,newptr)) {
-			*newptr=save;
-		}
+		parseIntervalQualifier(currentnode,*newptr,newptr);
 
 	} else {
 		xmldomnode	*newnode=newNode(currentnode,type);
@@ -512,9 +556,11 @@ const char *sqlparser::_parameter="parameter";
 static const char *defaultspecialfunctionnames[]={
 	// date functions
 	"sysdate",
+	"systimestamp",
 	"current_date",
 	"current",
 	"call_dtime",
+	// other functions...
 	NULL
 };
 
