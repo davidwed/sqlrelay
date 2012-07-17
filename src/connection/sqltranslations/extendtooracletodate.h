@@ -16,12 +16,34 @@ class extendtooracletodate : public sqltranslation {
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
 	private:
-		bool	translateExtends(sqlrconnection_svr *sqlrcon,
+		bool	translateFunctions(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldomnode *node);
 		bool	translateExtend(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldomnode *node);
+		bool	translateCurrentDate(sqlrconnection_svr *sqlrcon,
+					sqlrcursor_svr *sqlrcur,
+					xmldomnode *node);
+		bool	translateDateTime(sqlrconnection_svr *sqlrcon,
+					sqlrcursor_svr *sqlrcur,
+					xmldomnode *node);
+		bool	translateInterval(sqlrconnection_svr *sqlrcon,
+					sqlrcursor_svr *sqlrcur,
+					xmldomnode *node);
+
+		void	translateIntervalQualifier(
+					stringbuffer *formatstring,
+					xmldomnode *intervalqualifiernode);
+		xmldomnode	*wrapBoth(xmldomnode *functionnode,
+					const char *formatstring);
+		xmldomnode	*wrapToChar(xmldomnode *functionnode,
+					const char *formatstring);
+		xmldomnode	*wrapToDate(xmldomnode *functionnode,
+					const char *formatstring);
+		xmldomnode	*wrap(xmldomnode *functionnode,
+					const char *function,
+					const char *formatstring);
 };
 
 #endif

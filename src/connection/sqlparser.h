@@ -790,8 +790,6 @@ class sqlparser {
 						const char **newptr,
 						const char *timecomponent,
 						const char *precscale);
-		static const char	*_first_time_component;
-		static const char	*_second_time_component;
 		static const char	*_precision;
 		bool	parseColumnOrFunction(xmldomnode *currentnode,
 						const char *name,

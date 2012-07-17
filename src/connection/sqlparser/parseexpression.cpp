@@ -346,13 +346,9 @@ bool sqlparser::parseIntervalQualifier(xmldomnode *currentnode,
 					_interval_qualifier,NULL);
 
 	// look for a time component, to, and another time component
-	bool	retval=parseTimeComponent(iqnode,ptr,newptr,
-						_first_time_component,
-						_precision) &&
+	bool	retval=parseTimeComponent(iqnode,ptr,newptr,_from,_precision) &&
 			parseTo(iqnode,*newptr,newptr) &&
-			parseTimeComponent(iqnode,*newptr,newptr,
-						_second_time_component,
-						_scale);
+			parseTimeComponent(iqnode,*newptr,newptr,_to,_scale);
 
 	// if everything went well, attach the node,
 	// otherwise reset the string pointer and delete it
@@ -425,8 +421,6 @@ bool sqlparser::parseTimeComponent(xmldomnode *currentnode,
 	return rightParen(*newptr,newptr);
 }
 
-const char *sqlparser::_first_time_component="first_time_component";
-const char *sqlparser::_second_time_component="second_time_component";
 const char *sqlparser::_precision="precision";
 
 bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
@@ -452,6 +446,15 @@ bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
 
 			// bail when we find a right paren
 			if (rightParen(*newptr,newptr)) {
+
+				// some databases allow an interval qualifier
+				// immediately after a function, test for that
+				const char	*save=*newptr;
+				if (!parseIntervalQualifier(currentnode,
+							*newptr,newptr)) {
+					*newptr=save;
+				}
+
 				return true;
 			}
 
@@ -483,10 +486,19 @@ bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
 	}
 
 	// create the nodes
-	xmldomnode	*newnode=newNode(currentnode,type);
 	if (type==_function) {
-		newNode(newnode,_name,name);
+
+		newNode(currentnode,type,name);
+
+		// some databases allow an interval qualifier
+		// immediately after a function, test for that
+		const char	*save=*newptr;
+		if (!parseIntervalQualifier(currentnode,*newptr,newptr)) {
+			*newptr=save;
+		}
+
 	} else {
+		xmldomnode	*newnode=newNode(currentnode,type);
 		splitColumnName(newnode,name);
 	}
 	return true;
@@ -498,8 +510,11 @@ const char *sqlparser::_parameters="parameters";
 const char *sqlparser::_parameter="parameter";
 
 static const char *defaultspecialfunctionnames[]={
+	// date functions
 	"sysdate",
 	"current_date",
+	"current",
+	"call_dtime",
 	NULL
 };
 

@@ -12,8 +12,7 @@ bool sqlwriter::expression(xmldomnode *node, stringbuffer *output) {
 
 bool sqlwriter::intervalQualifier(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
-	output->append(node->getAttributeValue(
-			sqlparser::_first_time_component));
+	output->append(node->getAttributeValue(sqlparser::_from));
 	const char	*precision=
 			node->getAttributeValue(sqlparser::_precision);
 	if (precision) {
@@ -22,8 +21,7 @@ bool sqlwriter::intervalQualifier(xmldomnode *node, stringbuffer *output) {
 		rightParen(output);
 	}
 	output->append(" to ");
-	output->append(node->getAttributeValue(
-			sqlparser::_second_time_component));
+	output->append(node->getAttributeValue(sqlparser::_to));
 	const char	*scale=
 			node->getAttributeValue(sqlparser::_scale);
 	if (scale) {
