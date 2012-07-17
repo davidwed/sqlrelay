@@ -1,16 +1,16 @@
 // Copyright (c) 2012  David Muse
 // See the file COPYING for more information
 
-#ifndef EXTENDTOORACLETODATE_H
-#define EXTENDTOORACLETODATE_H
+#ifndef INFORMIXTOORACLETODATE_H
+#define INFORMIXTOORACLETODATE_H
 
 #include <sqltranslation.h>
 
 using namespace rudiments;
 
-class extendtooracletodate : public sqltranslation {
+class informixtooracletodate : public sqltranslation {
 	public:
-			extendtooracletodate(sqltranslations *sqlts,
+			informixtooracletodate(sqltranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,

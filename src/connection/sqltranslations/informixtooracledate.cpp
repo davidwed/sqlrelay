@@ -1,24 +1,24 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqltranslations/extendtooracletodate.h>
+#include <sqltranslations/informixtooracletodate.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <debugprint.h>
 
-extendtooracletodate::extendtooracletodate(sqltranslations *sqlts,
+informixtooracletodate::informixtooracletodate(sqltranslations *sqlts,
 					xmldomnode *parameters) :
 					sqltranslation(sqlts,parameters) {
 }
 
-bool extendtooracletodate::run(sqlrconnection_svr *sqlrcon,
+bool informixtooracletodate::run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree) {
 
 	return translateFunctions(sqlrcon,sqlrcur,querytree->getRootNode());
 }
 
-bool extendtooracletodate::translateFunctions(sqlrconnection_svr *sqlrcon,
+bool informixtooracletodate::translateFunctions(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldomnode *node) {
 	debugFunction();
@@ -69,7 +69,7 @@ bool extendtooracletodate::translateFunctions(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool extendtooracletodate::translateExtend(sqlrconnection_svr *sqlrcon,
+bool informixtooracletodate::translateExtend(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldomnode *node) {
 	debugFunction();
@@ -124,7 +124,7 @@ bool extendtooracletodate::translateExtend(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool extendtooracletodate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
+bool informixtooracletodate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldomnode *node) {
 
@@ -164,7 +164,7 @@ bool extendtooracletodate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool extendtooracletodate::translateDateTime(sqlrconnection_svr *sqlrcon,
+bool informixtooracletodate::translateDateTime(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldomnode *node) {
 
@@ -241,7 +241,7 @@ bool extendtooracletodate::translateDateTime(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool extendtooracletodate::translateInterval(sqlrconnection_svr *sqlrcon,
+bool informixtooracletodate::translateInterval(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldomnode *node) {
 
@@ -302,7 +302,7 @@ static const char *timeparts[]={
 	NULL
 };
 
-void extendtooracletodate::translateIntervalQualifier(
+void informixtooracletodate::translateIntervalQualifier(
 					stringbuffer *formatstring,
 					xmldomnode *intervalqualifiernode) {
 
@@ -375,23 +375,23 @@ void extendtooracletodate::translateIntervalQualifier(
 	formatstring->append("'");
 }
 
-xmldomnode *extendtooracletodate::wrapBoth(xmldomnode *functionnode,
+xmldomnode *informixtooracletodate::wrapBoth(xmldomnode *functionnode,
 						const char *formatstring) {
 	xmldomnode	*tocharnode=wrapToChar(functionnode,formatstring);
 	return wrapToDate(tocharnode,formatstring);
 }
 
-xmldomnode *extendtooracletodate::wrapToChar(xmldomnode *functionnode,
+xmldomnode *informixtooracletodate::wrapToChar(xmldomnode *functionnode,
 						const char *formatstring) {
 	return wrap(functionnode,"to_char",formatstring);
 }
 
-xmldomnode *extendtooracletodate::wrapToDate(xmldomnode *functionnode,
+xmldomnode *informixtooracletodate::wrapToDate(xmldomnode *functionnode,
 						const char *formatstring) {
 	return wrap(functionnode,"to_date",formatstring);
 }
 
-xmldomnode *extendtooracletodate::wrap(xmldomnode *functionnode,
+xmldomnode *informixtooracletodate::wrap(xmldomnode *functionnode,
 					const char *function,
 					const char *formatstring) {
 
