@@ -8,9 +8,9 @@
 
 using namespace rudiments;
 
-class informixtooracletodate : public sqltranslation {
+class informixtooracledate : public sqltranslation {
 	public:
-			informixtooracletodate(sqltranslations *sqlts,
+			informixtooracledate(sqltranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
