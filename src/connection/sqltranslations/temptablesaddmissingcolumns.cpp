@@ -67,19 +67,26 @@ bool temptablesaddmissingcolumns::run(sqlrconnection_svr *sqlrcon,
 		debugPrintf("failed to get column list\n");
 	}
 
-	// create the columns node
-	columns=sqlts->newNodeBefore(table,as,sqlparser::_columns);
-
-	// insert the columns themselves
-	char		**parts;
-	uint64_t	partscount;
+	// insert the columns themselves, if there are any
+	char		**parts=NULL;
+	uint64_t	partscount=0;
 	charstring::split(collist.getString(),",",true,&parts,&partscount);
-	for (uint64_t i=0; i<partscount; i++) {
-		xmldomnode	*column=sqlts->newNode(columns,"column");
-		sqlts->newNode(column,"name",parts[i]);
-	}
-	for (uint64_t i=0; i<partscount; i++) {
-		delete[] parts[i];
+
+	if (partscount) {
+
+		// create the columns node
+		columns=sqlts->newNodeBefore(table,as,sqlparser::_columns);
+
+		for (uint64_t i=0; i<partscount; i++) {
+			xmldomnode	*column=
+					sqlts->newNode(columns,"column");
+			sqlts->newNode(column,"name",parts[i]);
+		}
+
+		for (uint64_t i=0; i<partscount; i++) {
+			delete[] parts[i];
+		}
+
 	}
 	delete[] parts;
 
