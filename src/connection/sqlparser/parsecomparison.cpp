@@ -267,7 +267,7 @@ bool sqlparser::parseExists(xmldomnode *currentnode,
 
 bool sqlparser::existsClause(const char *ptr, const char **newptr) {
         debugFunction();
-        return comparePart(ptr,newptr,"exists ");
+        return comparePart(ptr,newptr,"exists");
 }                                   
 
 const char *sqlparser::_exists="exists";
