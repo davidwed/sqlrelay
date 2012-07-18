@@ -20,6 +20,7 @@ bool sqlrconnection_svr::listen() {
 						connectionid);
 
 		// loop to handle suspended sessions
+		bool	loopback=false;
 		for (;;) {
 
 			int	success=waitForClient();
@@ -36,6 +37,15 @@ bool sqlrconnection_svr::listen() {
 				if (!suspendedsession) {
 					break;
 				}
+
+			} else if (success==2) {
+
+				// this is a special case, basically it means
+				// that the listener wants the connection to
+				// reconnect to the database, just loop back
+				// so that can be handled naturally
+				loopback=true;
+				break;
 
 			} else if (success==-1) {
 
@@ -62,7 +72,7 @@ bool sqlrconnection_svr::listen() {
 			}
 		}
 
-		if (cfgfl->getDynamicScaling()) {
+		if (!loopback && cfgfl->getDynamicScaling()) {
 
 			decrementSessionCount();
 
@@ -138,6 +148,19 @@ int32_t sqlrconnection_svr::waitForClient() {
 	// file descriptors around, wait for one to be passed to us, otherwise,
 	// accept on the unix/inet sockets. 
 	if (!suspendedsession && cfgfl->getPassDescriptor()) {
+
+		// get what we're supposed to do...
+		uint16_t	command;
+		if (handoffsockun.read(&command)!=sizeof(uint16_t)) {
+			dbgfile.debugPrint("connection",1,"pass failed");
+			dbgfile.debugPrint("connection",0,"done waiting for client");
+			return -1;
+		}
+
+		// if we're supposed to reconnect, then just do that...
+		if (command==HANDOFF_RECONNECT) {
+			return 2;
+		}
 
 		// receive the descriptor and use it, if we failed to get the
 		// descriptor, delete the socket and return failure

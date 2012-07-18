@@ -5,6 +5,7 @@
 #include <rudiments/snooze.h>
 #include <rudiments/process.h>
 #include <rudiments/signalclasses.h>
+#include <rudiments/error.h>
 
 // for sprintf
 #include <stdio.h>
@@ -145,6 +146,7 @@ void sqlrconnection_svr::registerForHandoff(const char *tmpdir) {
 bool sqlrconnection_svr::receiveFileDescriptor(int32_t *descriptor) {
 	bool	retval=handoffsockun.receiveFileDescriptor(descriptor);
 	if (!retval) {
+		// FIXME:? should we just close here, or re-connect?
 		handoffsockun.close();
 		connected=false;
 	}

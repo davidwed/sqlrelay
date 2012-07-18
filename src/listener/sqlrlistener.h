@@ -104,7 +104,6 @@ class sqlrlistener : public daemonprocess, public listener {
 		filedescriptor	*connectToConnection(uint32_t connectionpid,
 						const char *unixportstr,
 						uint16_t inetport);
-		void	disconnectFromConnection(filedescriptor *sock);
 		bool	passClientFileDescriptorToConnection(
 					filedescriptor *connectionsock,
 					int fd);

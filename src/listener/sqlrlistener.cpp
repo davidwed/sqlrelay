@@ -1631,79 +1631,115 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 	return retval;
 }
 
-// wait for exclusive access to the
-// shared memory among listeners
 bool sqlrlistener::acquireShmAccess() {
 
 	dbgfile.debugPrint("listener",0,"acquiring exclusive shm access");
-	if (alarmrang || !semset->waitWithUndo(1)) {
-		if (alarmrang) {
-			dbgfile.debugPrint("listener",0,"timeout occured");
-		}
+
+	// don't even begin to wait if the alarm already rang
+	if (alarmrang) {
+		dbgfile.debugPrint("listener",0,"timeout occured");
+		return false;
+	}
+
+	// Loop, waiting.  Retry the wait if it was interrupted by a signal,
+	// other than an alarm, but if an alarm interrupted it then bail.
+	bool	result=true;
+	do {
+		result=semset->waitWithUndo(1);
+	} while (!result && error::getErrorNumber()==EINTR && alarmrang!=1);
+
+	// handle alarm...
+	if (alarmrang) {
+		dbgfile.debugPrint("listener",0,"timeout occured");
+		return false;
+	}
+
+	// handle general failure...
+	if (!result) {
 		dbgfile.debugPrint("listener",0,
 			"failed to acquire exclusive shm access");
 		return false;
 	}
-	dbgfile.debugPrint("listener",0,
-			"finished acquiring exclusive shm access");
 
+	// success...
+	dbgfile.debugPrint("listener",0,"acquired exclusive shm access");
 	return true;
 }
 
-// allow other listeners access to the shared memory
 bool sqlrlistener::releaseShmAccess() {
 
 	dbgfile.debugPrint("listener",-1,"releasing exclusive shm access");
+
 	if (!semset->signalWithUndo(1)) {
 		dbgfile.debugPrint("listener",0,
 			"failed to release exclusive shm access");
 		return false;
 	}
+
 	dbgfile.debugPrint("listener",0,
 			"finished releasing exclusive shm access");
-
 	return true;
 }
 
 bool sqlrlistener::acceptAvailableConnection() {
 
-	dbgfile.debugPrint("listener",0,"accepting an available connection");
-	if (alarmrang || !semset->wait(2) ) {
-		if (alarmrang) {
-			dbgfile.debugPrint("listener",0,"timeout occured");
-		}
-		dbgfile.debugPrint("listener",0,
-				"failed to accept an available connection");
+	dbgfile.debugPrint("listener",0,"waiting for an available connection");
+
+	// don't even begin to wait if the alarm already rang
+	if (alarmrang) {
+		dbgfile.debugPrint("listener",0,"timeout occured");
 		return false;
-	} else {
-
-		// Reset this semaphore to 0.
-		// It can get left incremented if a sqlr-connection process
-		// is killed between calls to signalListenerToRead() and
-		// waitForListenerToFinishReading().
-		// It's ok to reset it here because no one except this process
-		// has access to this semaphore at this time because of the
-		// lock on semaphore 1.
-		semset->setValue(2,0);
-
-		dbgfile.debugPrint("listener",0,
-				"succeeded accepting an available connection");
 	}
 
+	// Loop, waiting.  Retry the wait if it was interrupted by a signal,
+	// other than an alarm, but if an alarm interrupted it then bail.
+	bool	result=true;
+	do {
+		result=semset->wait(2);
+	} while (!result && error::getErrorNumber()==EINTR && alarmrang!=1);
+
+	// handle alarm...
+	if (alarmrang) {
+		dbgfile.debugPrint("listener",0,"timeout occured");
+		return false;
+	}
+
+	// handle general failure...
+	if (!result) {
+		dbgfile.debugPrint("listener",0,
+			"failed to wait for an available connection");
+		return false;
+	}
+
+	// success...
+
+	// Reset this semaphore to 0.
+	// It can get left incremented if a sqlr-connection process is killed
+	// between calls to signalListenerToRead() and
+	// waitForListenerToFinishReading().  It's ok to reset it here because
+	// no one except this process has access to this semaphore at this time
+	// because of the lock on semaphore 1.
+	semset->setValue(2,0);
+
+	dbgfile.debugPrint("listener",0,
+			"succeeded in waiting for an available connection");
 	return true;
 }
 
 bool sqlrlistener::doneAcceptingAvailableConnection() {
 
 	dbgfile.debugPrint("listener",0,
-		"finished accepting available connection");
+		"signalling accepted connection");
+
 	if (!semset->signal(3)) {
 		dbgfile.debugPrint("listener",0,
-		"failed to finish accepting available connection");
+		"failed to signal accapted connection");
 		return false;
 	}
+
 	dbgfile.debugPrint("listener",0,
-		"succeeded finishing accepting available connection");
+		"succeeded signalling accepted connection");
+
 	return true;
 }
 
@@ -1715,38 +1751,45 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 	// get a pointer to the shared memory segment
 	shmdata *ptr=(shmdata *)idmemory->getPointer();
 
-	bool	ok=true;
+	// use an alarm, if we're a forked child and a timeout is set
 	bool	usealarm=(isforkedchild && listenertimeout);
 
-	semset->dontRetryInterruptedOperations();
+	bool	ok=true;
+	for (;;) {
 
-	while (ok) {
 		dbgfile.debugPrint("listener",0,"getting a connection...");
 
-		// if we're a forked child, set an alarm
-		// we could wait on the semaphore with a timeout, but that
-		// wouldn't be as portable...
+		// set an alarm
 		if (usealarm) {
+			semset->dontRetryInterruptedOperations();
 			alarmrang=0;
 			signalmanager::alarm(listenertimeout);
 		}
 
+		// acquire access to the shared memory
 		ok=acquireShmAccess();
-		if (ok) {
+
+		if (ok) {	
 
 			// This section should be executed without returns or
-			// breaks so that release shm mutex will get called
-			// at the end
+			// breaks so that releaseShmAccess will get called
+			// at the end, no matter what...
 
+			// wait for an available connection
 			ok=acceptAvailableConnection();
 
 			// turn off the alarm
-			signalmanager::alarm(0);
+			if (usealarm) {
+				signalmanager::alarm(0);
+				semset->retryInterruptedOperations();
+			}
 
 			if (ok) {
-				// We have to signal connection we've read
-				// since we've done waiting for it, so no
-				// returns or breaks in this section
+
+				// This section should be executed without
+				// returns or breaks so that
+				// signalAcceptedConnection will get called at
+				// the end, no matter what...
 
 				// if we're passing descriptors around, the
 				// connection will pass it's pid to us,
@@ -1778,6 +1821,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					*unixportstrlen=charstring::length(
 								unixportstr);
 
+					// debug...
 					size_t  debugstringlen=
 						15+*unixportstrlen+21;
 					char	*debugstring=
@@ -1790,37 +1834,35 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					delete[] debugstring;
 				}
 
+				// signal the connection that we waited for
 				ok=doneAcceptingAvailableConnection();
 			}
 
-			// If we got access than we have to release it anyway
+			// release access to the shared memory
 			ok=(releaseShmAccess() && ok);
 		}
 
-		// turn off the alarm if we haven't done it yet
-		signalmanager::alarm(0);
+		// turn off the alarm
+		if (usealarm) {
+			signalmanager::alarm(0);
+			semset->retryInterruptedOperations();
+		}
 
 		// execute this only if code above executed without errors
 		if (ok) {
 
-			// make sure the connection is actually up, if not,
-			// fork a child to jog it, spin back and get another
-			// connection
+			// make sure the connection is actually up...
 			if (connectionIsUp(ptr->connectionid)) {
 				dbgfile.debugPrint("listener",1,
 					"finished getting a connection");
 				break;
-			} else {
-				dbgfile.debugPrint("listener",1,
-						"connection was down");
-				pingDatabase(*connectionpid,
-						unixportstr,*inetport);
 			}
-		}
-	}
 
-	if (usealarm) {
-		semset->retryInterruptedOperations();
+			// if the connection wasn't up, fork a child to jog it,
+			// spin back and get another connection
+			dbgfile.debugPrint("listener",1,"connection was down");
+			pingDatabase(*connectionpid,unixportstr,*inetport);
+		}
 	}
 
 	return ok;
@@ -1844,15 +1886,27 @@ void sqlrlistener::pingDatabase(uint32_t connectionpid,
 					const char *unixportstr,
 					uint16_t inetport) {
 
-	// fork off and cause the connection to ping the database, this should
-	// cause it to reconnect
-	pid_t	childpid=process::fork();
+	// fork off and cause the connection to ping the database,
+	// this should cause it to reconnect
+	if (process::fork()) {
+		return;
+	}
 
-	if (!childpid) {
+	isforkedchild=true;
 
-		isforkedchild=true;
+	if (passdescriptor) {
 
-		// connect to the database connection
+		// send file descriptor 0 to the connection,
+		// it will interpret this as a ping
+		filedescriptor	connectionsock;
+		if (findMatchingSocket(connectionpid,&connectionsock)) {
+			connectionsock.write((uint16_t)HANDOFF_RECONNECT);
+			snooze::macrosnooze(1);
+		}
+
+	} else {
+
+		// connect to the database connection daemon
 		filedescriptor	*connsock=connectToConnection(connectionpid,
 								unixportstr,
 								inetport);
@@ -1869,59 +1923,38 @@ void sqlrlistener::pingDatabase(uint32_t connectionpid,
 			}
 
 			// disconnect
-			disconnectFromConnection(connsock);
-		}
+			connsock->close();
 
-		cleanUp();
-		process::exit(0);
+			// clean up
+			delete connsock;
+		}
 	}
+
+	cleanUp();
+	process::exit(0);
 }
 
 filedescriptor *sqlrlistener::connectToConnection(uint32_t connectionpid,
 						const char *unixportstr,
 						uint16_t inetport) {
 
-	if (passdescriptor) {
-
-		for (int32_t i=0; i<maxconnections; i++) {
-			if (handoffsocklist[i].pid==connectionpid) {
-				return handoffsocklist[i].sock;
-			}
+	// first, try for the unix port
+	if (unixportstr && unixportstr[0]) {
+		unixclientsocket	*unixsock=new unixclientsocket();
+		if (unixsock->connect(unixportstr,-1,-1,0,1)==RESULT_SUCCESS) {
+			return unixsock;
 		}
-
-	} else {
-
-		int32_t connected=RESULT_ERROR;
-
-		// first, try for the unix port
-		if (unixportstr && unixportstr[0]) {
-			unixclientsocket	*unixsock=
-							new unixclientsocket();
-			connected=unixsock->connect(unixportstr,-1,-1,0,1);
-			if (connected==RESULT_SUCCESS) {
-				return unixsock;
-			}
-		}
-
-		// then try for the inet port
-		if (connected!=RESULT_SUCCESS) {
-			inetclientsocket	*inetsock=
-							new inetclientsocket();
-			connected=inetsock->connect("127.0.0.1",inetport,
-								-1,-1,0,1);
-			if (connected==RESULT_SUCCESS) {
-				return inetsock;
-			}
-		}
+		delete unixsock;
 	}
+
+	// then try for the inet port
+	inetclientsocket	*inetsock=new inetclientsocket();
+	if (inetsock->connect("127.0.0.1",inetport,-1,-1,0,1)==RESULT_SUCCESS) {
+		return inetsock;
+	}
+	delete inetsock;
+
 	return NULL;
-}
-
-void sqlrlistener::disconnectFromConnection(filedescriptor *sock) {
-	sock->close();
-	if (!passdescriptor) {
-		delete sock;
-	}
 }
 
 bool sqlrlistener::passClientFileDescriptorToConnection(
@@ -1930,32 +1963,20 @@ bool sqlrlistener::passClientFileDescriptorToConnection(
 
 	dbgfile.debugPrint("listener",1,"passing descriptor...");
 
-	// pass the file descriptor of the connected client over to the
-	// available connection
-	bool	retval=connectionsock->passFileDescriptor(fd);
-	if (retval) {
-
-		dbgfile.debugPrint("listener",0,"finished passing descriptor");
-
-	} else {
-
+	// tell the connection we're passing a file descriptor
+	if (connectionsock->write((uint16_t)HANDOFF_FD)!=sizeof(uint16_t)) {
 		dbgfile.debugPrint("listener",0,"passing descriptor failed");
-
-		// If we get an error, delete the socket and remove the
-		// connection from the list.  The connection must be out of
-		// commission for some reason, perhaps it died.  We need to
-		// remove it from the list because if we didn't fork off to
-		// handle the client and another client connects, we'll be
-		// using the same list and we don't want to run into this
-		// trouble again.
-		// FIXME: What if a client gets forked off and runs into the
-		// bad connection?  The bad connection is still in the parent
-		// process's list.
-		/*delete availableconnectionsock;
-		availableconnectionsock=NULL;
-		*availableconnectionpid=0;*/
+		return false;
 	}
-	return retval;
+
+	// pass the file descriptor
+	if (!connectionsock->passFileDescriptor(fd)) {
+		dbgfile.debugPrint("listener",0,"passing descriptor failed");
+		return false;
+	}
+
+	dbgfile.debugPrint("listener",0,"finished passing descriptor");
+	return true;
 }
 
 bool sqlrlistener::findMatchingSocket(uint32_t connectionpid,
@@ -1977,8 +1998,7 @@ bool sqlrlistener::findMatchingSocket(uint32_t connectionpid,
 	// fired up after we forked, so we'll need to connect back to the main
 	// listener process and ask it for the pid
 	//return requestFixup(connectionpid,connectionsock);
-	bool	retval=requestFixup(connectionpid,connectionsock);
-	return retval;
+	return requestFixup(connectionpid,connectionsock);
 }
 
 bool sqlrlistener::requestFixup(uint32_t connectionpid,
