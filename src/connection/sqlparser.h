@@ -341,6 +341,19 @@ class sqlparser {
 
 
 
+		// create synonym
+		bool	parseCreateSynonym(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	synonymClause(const char *ptr, const char **newptr);
+		static const char	*_synonym;
+		bool	parseFor(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	forClause(const char *ptr, const char **newptr);
+		static const char	*_for;
+
+
 		// drop query...
 		bool	parseDrop(xmldomnode *currentnode,
 						const char *ptr,

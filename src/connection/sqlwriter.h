@@ -84,6 +84,13 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	hash(xmldomnode *node,
 						stringbuffer *output);
+
+
+		// synonym...
+		virtual bool	synonym(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	forClause(xmldomnode *node,
+						stringbuffer *output);
 		
 
 		// column definitions...

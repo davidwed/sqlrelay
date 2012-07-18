@@ -116,6 +116,10 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_btree,
 		sqlparser::_hash,
 
+		// synonym...
+		sqlparser::_synonym,
+		sqlparser::_for,
+
 		// column definitions...
 		sqlparser::_columns,
 		sqlparser::_column,
@@ -365,6 +369,12 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return btree(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_hash)) {
 		return hash(node,output);
+
+	// synonym...
+	} else if (!charstring::compare(nodename,sqlparser::_synonym)) {
+		return synonym(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_for)) {
+		return forClause(node,output);
 
 	// column definitions...
 	} else if (!charstring::compare(nodename,sqlparser::_columns)) {

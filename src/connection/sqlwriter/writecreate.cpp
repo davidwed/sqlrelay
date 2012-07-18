@@ -264,3 +264,15 @@ bool sqlwriter::hash(xmldomnode *node, stringbuffer *output) {
 	outputValue(node,output);
 	return true;
 }
+
+bool sqlwriter::synonym(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("synonym ");
+	return true;
+}
+
+bool sqlwriter::forClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("for ");
+	return true;
+}

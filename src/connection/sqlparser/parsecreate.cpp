@@ -35,7 +35,8 @@ bool sqlparser::parseCreate(xmldomnode *currentnode,
 
 	// table, index, etc..
 	if (parseCreateTable(createnode,*newptr,newptr) ||
-		parseCreateIndex(createnode,*newptr,newptr)) {
+		parseCreateIndex(createnode,*newptr,newptr) ||
+		parseCreateSynonym(createnode,*newptr,newptr)) {
 		return true;
 	}
 
@@ -967,7 +968,7 @@ bool sqlparser::parseCreateIndex(xmldomnode *currentnode,
 
 	// index
 	if (!indexClause(ptr,newptr)) {
-		return true;
+		return false;
 	}
 
 	// create new node
@@ -1130,3 +1131,65 @@ bool sqlparser::parseConstraint(xmldomnode *currentnode,
 
 	return false;
 }
+
+bool sqlparser::parseCreateSynonym(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+
+	// synonym
+	if (!synonymClause(ptr,newptr)) {
+		return true;
+	}
+
+	// create new node
+	xmldomnode	*synonymnode=newNode(currentnode,_synonym);
+
+	// synonym name
+	if (!parseName(synonymnode,*newptr,newptr)) {
+		debugPrintf("missing object name\n");
+		error=true;
+		return false;
+	}
+
+	// for
+	if (!parseFor(synonymnode,*newptr,newptr)) {
+		debugPrintf("missing for\n");
+		error=true;
+		return false;
+	}
+
+	// original object name
+	if (!parseName(synonymnode,*newptr,newptr)) {
+		debugPrintf("missing object name\n");
+		error=true;
+		return false;
+	}
+
+	return true;
+}
+
+bool sqlparser::synonymClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"synonym ");
+}
+
+const char *sqlparser::_synonym="synonym";
+
+bool sqlparser::parseFor(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+	if (!forClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_for);
+	return true;
+}
+
+bool sqlparser::forClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"for ");
+}
+
+const char *sqlparser::_for="for";
