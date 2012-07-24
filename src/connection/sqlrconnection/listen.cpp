@@ -11,7 +11,6 @@ bool sqlrconnection_svr::listen() {
 
 	for (;;) {
 
-printf("%d: waiting for available db\n",getpid());
 		waitForAvailableDatabase();
 		initSession();
 		announceAvailability(tmpdir->getString(),
@@ -24,7 +23,6 @@ printf("%d: waiting for available db\n",getpid());
 		bool	loopback=false;
 		for (;;) {
 
-printf("%d: waiting for client\n",getpid());
 			int	success=waitForClient();
 
 			if (success==1) {
@@ -33,7 +31,6 @@ printf("%d: waiting for client\n",getpid());
 
 				// have a session with the client
 				clientSession();
-printf("%d: client session over\n",getpid());
 
 				// break out of the loop unless the client
 				// suspended the session
@@ -98,7 +95,6 @@ printf("%d: client session over\n",getpid());
 				}
 			}
 		}
-printf("%d: looping back\n",getpid());
 	}
 }
 
