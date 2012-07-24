@@ -1736,9 +1736,7 @@ void oracle8cursor::errorMessage(const char **errorstring,
 	// only return an error message if the error wasn't a dead database
 	delete errormessage;
 	errormessage=new stringbuffer();
-	if (*liveconnection) {
-		errormessage->append((const char *)message);
-	}
+	errormessage->append((const char *)message);
 
 	// set return values
 	*errorstring=errormessage->getString();

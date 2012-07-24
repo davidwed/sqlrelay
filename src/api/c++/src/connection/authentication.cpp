@@ -49,7 +49,8 @@ bool sqlrconnection::genericAuthentication() {
 	// check whether authentication was successful or not
 	uint16_t	authsuccess;
 	if (cs->read(&authsuccess)!=sizeof(uint16_t)) {
-		setError("Failed to authenticate.\n A network error may have ocurred.");
+		setError("Failed to authenticate.\n "
+			"A network error may have ocurred.");
 		return false;
 	}
 	if (authsuccess==ERROR_OCCURRED) {

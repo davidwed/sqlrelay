@@ -92,17 +92,29 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 							&liveconnection);
 			}
 
-			// if the error was a dead connection,
-			// re-establish the connection
+			// if the db is still up, or if we're not waiting
+			// for them if they're down, then return the error
+			if (liveconnection ||
+				!cfgfl->getWaitForDownDatabase()) {
+
+				// return the error
+				returnError(cursor,error,errno,!liveconnection);
+			}
+
+			// if the error was a dead connection
+			// then re-establish the connection
 			if (!liveconnection) {
+
 				dbgfile.debugPrint("connection",3,
 							"database is down...");
 				reLogIn();
-				continue;
-			}
 
-			// return the error
-			returnError(cursor,error,errno);
+				// if we're waiting for down databases then
+				// loop back and try the query again
+				if (cfgfl->getWaitForDownDatabase()) {
+					continue;
+				}
+			}
 
 			// handle after-triggers
 			if (sqltr) {
@@ -361,12 +373,17 @@ void sqlrconnection_svr::setFakeInputBinds(bool fake) {
 }
 
 void sqlrconnection_svr::returnError(sqlrcursor_svr *cursor,
-					const char *error, int64_t errno) {
+					const char *error, int64_t errno,
+					bool disconnect) {
 
 	dbgfile.debugPrint("connection",2,"returning error...");
 
 	// indicate that an error has occurred
-	clientsock->write((uint16_t)ERROR_OCCURRED);
+	if (disconnect) {
+		clientsock->write((uint16_t)ERROR_OCCURRED_DISCONNECT);
+	} else {
+		clientsock->write((uint16_t)ERROR_OCCURRED);
+	}
 
 	// send the error code
 	clientsock->write((uint64_t)errno);
@@ -386,9 +403,8 @@ void sqlrconnection_svr::returnError(sqlrcursor_svr *cursor,
 		clientsock->write(error);
 	#endif
 
-	// client will be sending skip/fetch,
-	// better get it even though we're not gonna
-	// use it
+	// client will be sending skip/fetch, better get
+	// it even though we're not going to use it
 	uint64_t	skipfetch;
 	clientsock->read(&skipfetch,idleclienttimeout,0);
 	clientsock->read(&skipfetch,idleclienttimeout,0);

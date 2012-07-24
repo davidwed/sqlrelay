@@ -15,7 +15,7 @@ bool sqlrconnection_svr::newQueryInternal(sqlrcursor_svr *cursor,
 	// handleQuery() will return:
 	//	1 for success,
 	//	0 for network error
-	//	-1 for a bad query
+	//	-1 for a query error
 	int32_t	querystatus=handleQuery(cursor,false,false,true,getquery);
 	if (querystatus==1) {
 

@@ -67,7 +67,8 @@
 		int32_t	getLongLong(uint64_t *integer);
 		int32_t	getDouble(double *value);
 
-		bool	noError();
+		uint16_t	getErrorStatus();
+
 		bool	getCursorId();
 		bool	getSuspended();
 		bool	parseColumnInfo();

@@ -1268,7 +1268,7 @@ void sqlrlistener::sqlrelayClientSession(filedescriptor *clientsock) {
 		passstatus=handOffClient(clientsock);
 
 		// If the handoff failed, decrement the session count.
-		// If it had succeeded then the connection daemin would
+		// If it had succeeded then the connection daemon would
 		// decrement it later.
 		if (dynamicscaling && !passstatus) {
 			decrementSessionCount();
@@ -1754,7 +1754,6 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 	// use an alarm, if we're a forked child and a timeout is set
 	bool	usealarm=(isforkedchild && listenertimeout);
 
-	bool	ok=true;
 	for (;;) {
 
 		dbgfile.debugPrint("listener",0,"getting a connection...");
@@ -1764,10 +1763,11 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			semset->dontRetryInterruptedOperations();
 			alarmrang=0;
 			signalmanager::alarm(listenertimeout);
+printf("setting alarm: %d\n",listenertimeout);
 		}
 
 		// acquire access to the shared memory
-		ok=acquireShmAccess();
+		bool	ok=acquireShmAccess();
 
 		if (ok) {	
 
@@ -1781,6 +1781,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			// turn off the alarm
 			if (usealarm) {
 				signalmanager::alarm(0);
+printf("disabling alarm\n");
 				semset->retryInterruptedOperations();
 			}
 
@@ -1845,17 +1846,25 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		// turn off the alarm
 		if (usealarm) {
 			signalmanager::alarm(0);
+printf("disabling alarm\n");
 			semset->retryInterruptedOperations();
 		}
 
-		// execute this only if code above executed without errors
+		// execute this only if code above executed without errors...
 		if (ok) {
+
+			// if we're not waiting for down databases then return
+			if (!cfgfl.getWaitForDownDatabase()) {
+				dbgfile.debugPrint("listener",1,
+					"finished getting a connection");
+				return true;
+			}
 
 			// make sure the connection is actually up...
 			if (connectionIsUp(ptr->connectionid)) {
 				dbgfile.debugPrint("listener",1,
 					"finished getting a connection");
-				break;
+				return true;
 			}
 
 			// if the connection wasn't up, fork a child to jog it,
@@ -1863,9 +1872,12 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			dbgfile.debugPrint("listener",1,"connection was down");
 			pingDatabase(*connectionpid,unixportstr,*inetport);
 		}
-	}
 
-	return ok;
+		// bail if the timeout was reached
+		if (alarmrang) {
+			return false;
+		}
+	}
 }
 
 bool sqlrlistener::connectionIsUp(const char *connectionid) {

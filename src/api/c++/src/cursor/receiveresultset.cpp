@@ -25,14 +25,26 @@ bool sqlrcursor::processResultSet(bool getallrows, uint64_t rowtoget) {
 	}
 
 	// check for an error
-	if (success && !noError()) {
-		getErrorFromServer();
-		// Don't get the cursor if the error was that there were no
-		// cursors available.
-		if (charstring::compare(error,NOCURSORSERROR)) {
-			getCursorId();
+	if (success) {
+
+		uint16_t	err=getErrorStatus();
+
+		if (err!=NO_ERROR_OCCURRED) {
+
+			getErrorFromServer();
+
+			// Don't get the cursor if the error was that there
+			// were no cursors available.
+			if (charstring::compare(error,NOCURSORSERROR)) {
+				getCursorId();
+			}
+
+			// if we need to disconnect then end the session
+			if (err==ERROR_OCCURRED_DISCONNECT) {
+				sqlrc->endSession();
+			}
+			return false;
 		}
-		return false;
 	}
 
 	// get data back from the server
@@ -63,7 +75,7 @@ bool sqlrcursor::processResultSet(bool getallrows, uint64_t rowtoget) {
 	return success;
 }
 
-bool sqlrcursor::noError() {
+uint16_t sqlrcursor::getErrorStatus() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
@@ -72,20 +84,20 @@ bool sqlrcursor::noError() {
 	}
 
 	// get a flag indicating whether there's been an error or not
-	uint16_t	success;
-	if (getShort(&success)!=sizeof(uint16_t)) {
+	uint16_t	err;
+	if (getShort(&err)!=sizeof(uint16_t)) {
 		setError("Failed to determine whether an error occurred or not.\n A network error may have ocurred.");
 		return false;
 	}
 
-	if (success==NO_ERROR_OCCURRED) {
+	if (err==NO_ERROR_OCCURRED) {
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
 			sqlrc->debugPrint("none.\n");
 			sqlrc->debugPreEnd();
 		}
 		cacheNoError();
-		return true;
+		return NO_ERROR_OCCURRED;
 	}
 
 	if (sqlrc->debug) {
@@ -93,7 +105,7 @@ bool sqlrcursor::noError() {
 		sqlrc->debugPrint("error!!!\n");
 		sqlrc->debugPreEnd();
 	}
-	return false;
+	return err;
 }
 
 bool sqlrcursor::getCursorId() {

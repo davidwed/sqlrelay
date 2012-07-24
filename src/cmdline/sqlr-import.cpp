@@ -282,8 +282,6 @@ bool sqlrimport::sequenceTagEnd() {
 	const char	*dbtype=sqlrcon->identify();
 	query.clear();
 
-	bool	supported=true;
-		supported=false;
 	// sqlite, mysql, sybase/mssql have autoincrementing fields
 	// mdbtools has nothing
 	// odbc can't tell what kind of underlying db we're using

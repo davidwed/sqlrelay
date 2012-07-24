@@ -86,6 +86,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	triggersdepth=0;
 	isolationlevel=NULL;
 	ignoreselectdb=false;
+	waitfordowndb=true;
 	instart=false;
 	inend=false;
 }
@@ -359,6 +360,10 @@ const char *sqlrconfigfile::getIsolationLevel() {
 
 bool sqlrconfigfile::getIgnoreSelectDatabase() {
 	return ignoreselectdb;
+}
+
+bool sqlrconfigfile::getWaitForDownDatabase() {
+	return waitfordowndb;
 }
 
 stringlist *sqlrconfigfile::getSessionStartQueries() {
@@ -885,6 +890,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=ISOLATIONLEVEL_ATTRIBUTE;
 		} else if (!charstring::compare(name,"ignoreselectdatabase")) {
 			currentattribute=IGNORESELECTDB_ATTRIBUTE;
+		} else if (!charstring::compare(name,"waitfordowndatabase")) {
+			currentattribute=WAITFORDOWNDB_ATTRIBUTE;
 		}
 		break;
 	
@@ -1339,6 +1346,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			isolationlevel=charstring::duplicate(value);
 		} else if (currentattribute==IGNORESELECTDB_ATTRIBUTE) {
 			ignoreselectdb=
+				!charstring::compareIgnoringCase(value,"yes");
+		} else if (currentattribute==WAITFORDOWNDB_ATTRIBUTE) {
+			waitfordowndb=
 				!charstring::compareIgnoringCase(value,"yes");
 		}
 	}

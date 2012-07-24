@@ -81,7 +81,8 @@ typedef enum {
 	TRANSLATIONS_ATTRIBUTE,
 	TRIGGERS_ATTRIBUTE,
 	ISOLATIONLEVEL_ATTRIBUTE,
-	IGNORESELECTDB_ATTRIBUTE
+	IGNORESELECTDB_ATTRIBUTE,
+	WAITFORDOWNDB_ATTRIBUTE
 } attribute;
 
 class SQLRUTIL_DLLSPEC usercontainer {
@@ -223,6 +224,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		bool		getTranslateBindVariables();
 		const char	*getIsolationLevel();
 		bool		getIgnoreSelectDatabase();
+		bool		getWaitForDownDatabase();
 
 		stringlist	*getSessionStartQueries();
 		stringlist	*getSessionEndQueries();
@@ -323,6 +325,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		bool		translatebindvariables;
 		char		*isolationlevel;
 		bool		ignoreselectdb;
+		bool		waitfordowndb;
 
 		bool		instart;
 		bool		inend;

@@ -396,11 +396,14 @@ bool sqlrconnection_svr::getCommand(uint16_t *command) {
 	dbgfile.debugPrint("connection",1,"getting command...");
 
 	// get the command
+printf("%d: getting command\n",getpid());
 	if (clientsock->read(command,idleclienttimeout,0)!=sizeof(uint16_t)) {
+printf("%d: error getting command\n",getpid());
 		dbgfile.debugPrint("connection",1,
 		"getting command failed: client sent bad command or timed out");
 		return false;
 	}
+printf("%d: got command\n",getpid());
 
 	dbgfile.debugPrint("connection",1,"done getting command");
 	return true;

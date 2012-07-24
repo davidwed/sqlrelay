@@ -25,6 +25,7 @@ void sqlrconnection_svr::reLogIn() {
 	int32_t	oldcursorcount=cursorcount;
 	closeCursors(false);
 	logOutUpdateStats();
+printf("%d: relogging in\n",getpid());
 	for (;;) {
 			
 		dbgfile.debugPrint("connection",5,"trying...");
@@ -39,6 +40,7 @@ void sqlrconnection_svr::reLogIn() {
 		}
 		snooze::macrosnooze(5);
 	}
+printf("%d: done relogging in\n",getpid());
 
 	dbgfile.debugPrint("connection",4,"done relogging in");
 
