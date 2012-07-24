@@ -85,14 +85,15 @@ class sqlrlistener : public daemonprocess, public listener {
 		int     getBusyListeners();
 		bool	acquireShmAccess();
 		bool	releaseShmAccess();
-		bool	acceptAvailableConnection();
+		bool	acceptAvailableConnection(bool *alldbsdown);
 		bool	doneAcceptingAvailableConnection();
 		bool	isAlarmRang();
 		bool	handOffClient(filedescriptor *sock);
 		bool	getAConnection(uint32_t *connectionpid,
 					uint16_t *inetport,
 					char *unixportstr,
-					uint16_t *unixportstrlen);
+					uint16_t *unixportstrlen,
+					filedescriptor *sock);
 		bool	findMatchingSocket(uint32_t connectionpid,
 					filedescriptor *connectionsock);
 		bool	requestFixup(uint32_t connectionpid,

@@ -1554,13 +1554,9 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 	for (;;) {
 
 		if (!getAConnection(&connectionpid,&inetport,
-					unixportstr,&unixportstrlen)) {
+					unixportstr,&unixportstrlen,
+					sock)) {
 			// fatal error occurred while getting a connection
-			sock->write((uint16_t)ERROR_OCCURRED);
-			sock->write((uint64_t)0);
-			sock->write((uint16_t)70);
-			sock->write("The listener failed to hand the client off to the database connection.");
-			flushWriteBuffer(sock);
 			retval=false;
 			break;
 		}
@@ -1644,9 +1640,11 @@ bool sqlrlistener::acquireShmAccess() {
 	// Loop, waiting.  Retry the wait if it was interrupted by a signal,
 	// other than an alarm, but if an alarm interrupted it then bail.
 	bool	result=true;
+	semset->dontRetryInterruptedOperations();
 	do {
 		result=semset->waitWithUndo(1);
 	} while (!result && error::getErrorNumber()==EINTR && alarmrang!=1);
+	semset->retryInterruptedOperations();
 
 	// handle alarm...
 	if (alarmrang) {
@@ -1681,7 +1679,28 @@ bool sqlrlistener::releaseShmAccess() {
 	return true;
 }
 
-bool sqlrlistener::acceptAvailableConnection() {
+bool sqlrlistener::acceptAvailableConnection(bool *alldbsdown) {
+
+	// If we don't want to wait for down databases, then check to see if
+	// any of the db's are up.  If none are, then don't even wait for an
+	// available connection, just bail immediately.
+	if (!cfgfl.getWaitForDownDatabase()) {
+		*alldbsdown=true;
+		linkedlist< connectstringcontainer * >	*csl=
+					cfgfl.getConnectStringList();
+		for (linkedlistnode< connectstringcontainer * > *node=
+						csl->getFirstNode(); node;
+						node=node->getNext()) {
+			connectstringcontainer	*cs=node->getData();
+			if (connectionIsUp(cs->getConnectionId())) {
+				*alldbsdown=false;
+				break;
+			}
+		}
+		if (*alldbsdown) {
+			return false;
+		}
+	}
 
 	dbgfile.debugPrint("listener",0,"waiting for an available connection");
 
@@ -1694,9 +1713,11 @@ bool sqlrlistener::acceptAvailableConnection() {
 	// Loop, waiting.  Retry the wait if it was interrupted by a signal,
 	// other than an alarm, but if an alarm interrupted it then bail.
 	bool	result=true;
+	semset->dontRetryInterruptedOperations();
 	do {
 		result=semset->wait(2);
 	} while (!result && error::getErrorNumber()==EINTR && alarmrang!=1);
+	semset->retryInterruptedOperations();
 
 	// handle alarm...
 	if (alarmrang) {
@@ -1746,7 +1767,8 @@ bool sqlrlistener::doneAcceptingAvailableConnection() {
 bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					uint16_t *inetport,
 					char *unixportstr,
-					uint16_t *unixportstrlen) {
+					uint16_t *unixportstrlen,
+					filedescriptor *sock) {
 
 	// get a pointer to the shared memory segment
 	shmdata *ptr=(shmdata *)idmemory->getPointer();
@@ -1760,29 +1782,28 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 		// set an alarm
 		if (usealarm) {
-			semset->dontRetryInterruptedOperations();
 			alarmrang=0;
 			signalmanager::alarm(listenertimeout);
-printf("setting alarm: %d\n",listenertimeout);
 		}
+
+		// set "all db's down" flag
+		bool	alldbsdown=false;
 
 		// acquire access to the shared memory
 		bool	ok=acquireShmAccess();
 
-		if (ok) {	
+		if (ok) {
 
 			// This section should be executed without returns or
 			// breaks so that releaseShmAccess will get called
 			// at the end, no matter what...
 
 			// wait for an available connection
-			ok=acceptAvailableConnection();
+			ok=acceptAvailableConnection(&alldbsdown);
 
 			// turn off the alarm
 			if (usealarm) {
 				signalmanager::alarm(0);
-printf("disabling alarm\n");
-				semset->retryInterruptedOperations();
 			}
 
 			if (ok) {
@@ -1846,19 +1867,10 @@ printf("disabling alarm\n");
 		// turn off the alarm
 		if (usealarm) {
 			signalmanager::alarm(0);
-printf("disabling alarm\n");
-			semset->retryInterruptedOperations();
 		}
 
 		// execute this only if code above executed without errors...
 		if (ok) {
-
-			// if we're not waiting for down databases then return
-			if (!cfgfl.getWaitForDownDatabase()) {
-				dbgfile.debugPrint("listener",1,
-					"finished getting a connection");
-				return true;
-			}
 
 			// make sure the connection is actually up...
 			if (connectionIsUp(ptr->connectionid)) {
@@ -1873,8 +1885,24 @@ printf("disabling alarm\n");
 			pingDatabase(*connectionpid,unixportstr,*inetport);
 		}
 
-		// bail if the timeout was reached
+		// return an error if the timeout was reached
 		if (alarmrang) {
+			sock->write((uint16_t)ERROR_OCCURRED);
+			sock->write((uint64_t)0);
+			sock->write((uint16_t)70);
+			sock->write("The listener failed to hand the client "
+					"off to the database connection.");
+			flushWriteBuffer(sock);
+			return false;
+		}
+
+		// return an error if all db's were down
+		if (alldbsdown) {
+			sock->write((uint16_t)ERROR_OCCURRED);
+			sock->write((uint64_t)0);
+			sock->write((uint16_t)33);
+			sock->write("All databases are currently down.");
+			flushWriteBuffer(sock);
 			return false;
 		}
 	}
