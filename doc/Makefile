@@ -173,7 +173,6 @@ install:
 	$(INSTALL) -m 644 features/languages.html $(docdir)/features
 	$(INSTALL) -m 644 features/loadbalancing.html $(docdir)/features
 	$(INSTALL) -m 644 features/multirowfetches.html $(docdir)/features
-	#$(INSTALL) -m 644 features/platforms.html $(docdir)/features
 	$(INSTALL) -m 644 features/proxying.html $(docdir)/features
 	$(INSTALL) -m 644 features/queryrouting.html $(docdir)/features
 	$(INSTALL) -m 644 features/resultsetcaching.html $(docdir)/features
