@@ -1730,7 +1730,7 @@ SQLRETURN SQL_API SQLFetch(SQLHSTMT statementhandle) {
 
 SQLRETURN SQLR_SQLFetchScroll(SQLHSTMT statementhandle,
 					SQLSMALLINT fetchorientation,
-					SQLROWOFFSET fetchoffset) {
+					SQLLEN fetchoffset) {
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
@@ -1758,7 +1758,7 @@ SQLRETURN SQLR_SQLFetchScroll(SQLHSTMT statementhandle,
 			break;
 		case SQL_FETCH_RELATIVE:
 			if (fetchoffset<0 &&
-				static_cast<SQLROWOFFSET>(stmt->currentfetchrow)<fetchoffset*-1) {
+				static_cast<SQLLEN>(stmt->currentfetchrow)<fetchoffset*-1) {
 				stmt->currentfetchrow=0;
 			} else {
 				stmt->currentfetchrow=
@@ -1779,7 +1779,7 @@ SQLRETURN SQLR_SQLFetchScroll(SQLHSTMT statementhandle,
 #if (ODBCVER >= 0x0300)
 SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT statementhandle,
 					SQLSMALLINT fetchorientation,
-					SQLROWOFFSET fetchoffset) {
+					SQLLEN fetchoffset) {
 	debugFunction();
 	return SQLR_SQLFetchScroll(statementhandle,
 					fetchorientation,
@@ -3290,7 +3290,7 @@ SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT statementhandle,
 
 SQLRETURN SQL_API SQLSetStmtOption(SQLHSTMT statementhandle,
 					SQLUSMALLINT option,
-					SQLROWCOUNT value) {
+					SQLULEN value) {
 	debugFunction();
 	return SQLR_SQLSetStmtAttr(statementhandle,option,(SQLPOINTER)value,0);
 }
@@ -3668,8 +3668,8 @@ SQLRETURN SQL_API SQLDescribeParam(SQLHSTMT statementhandle,
 
 SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT statementhandle,
 					SQLUSMALLINT ffetchtype,
-					SQLROWOFFSET irow,
-					SQLROWSETSIZE *pcrow,
+					SQLLEN irow,
+					SQLULEN *pcrow,
 					SQLUSMALLINT *rgfrowstatus) {
 	debugFunction();
 	SQLRETURN	retval=SQLR_SQLFetchScroll(statementhandle,

@@ -17,6 +17,8 @@
 		can become problematic when connections="0" is used
 	added C# and ADO.NET docs and updated windows documentation
 	updated the documentation
+	added support for waitfordowndatabase config parameter
+	applied some odbc fixes from Chae Young-ku
 
 0.45 - added trigger framework
 	added support for getting the native database error number

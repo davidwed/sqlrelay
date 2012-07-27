@@ -430,7 +430,7 @@ bool odbccursor::inputBindString(const char *variable,
 				SQL_C_CHAR,
 				#endif
 				SQL_CHAR,
-				0,
+				1,
 				0,
 				#ifdef HAVE_SQLCONNECTW
 				(SQLPOINTER)value_ucs,
@@ -454,7 +454,7 @@ bool odbccursor::inputBindString(const char *variable,
 				SQL_C_CHAR,
 				#endif
 				SQL_CHAR,
-				0,
+				valuesize,
 				0,
 				#ifdef HAVE_SQLCONNECTW
 				(SQLPOINTER)value_ucs,
