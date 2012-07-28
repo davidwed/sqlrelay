@@ -19,6 +19,7 @@
 	updated the documentation
 	added support for waitfordowndatabase config parameter
 	applied some odbc fixes from Chae Young-ku
+	added explicit support for outer join operators to the sql parser
 
 0.45 - added trigger framework
 	added support for getting the native database error number

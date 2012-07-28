@@ -824,6 +824,12 @@ class sqlparser {
 		static const char	*_column_name_schema;
 		static const char	*_column_name_table;
 		static const char	*_column_name_column;
+		bool	parseOuterJoinOperator(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	outerJoinOperatorClause(const char *ptr,
+						const char **newptr);
+		static const char	*_outer_join_operator;
 
 		bool	parseGroupBy(xmldomnode *currentnode,
 						const char *ptr,

@@ -32,6 +32,12 @@ bool sqlwriter::intervalQualifier(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::outerJoinOperator(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("(+)");
+	return true;
+}
+
 bool sqlwriter::compliment(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("~");

@@ -317,6 +317,8 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	intervalQualifier(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	outerJoinOperator(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	compliment(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	inverse(xmldomnode *node,

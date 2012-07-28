@@ -468,10 +468,15 @@ bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
 	bool	unqoutedliteral=
 		(!charstring::compareIgnoringCase(name,"datetime") ||
 		!charstring::compareIgnoringCase(name,"interval"));
-	
+
+	// Check for an outer join operator "(+)" just so we don't confuse it
+	// with function parameters.  In either case, reset newptr afterwards.
+	// If we found one, we'll actually parse it later.
+	bool	outerjoin=outerJoinOperatorClause(ptr,newptr);
+	*newptr=ptr;
 
 	// functions generally have parameters or at least empty parameters
-	if (leftParen(ptr,newptr)) {
+	if (!outerjoin && leftParen(*newptr,newptr)) {
 
 		// FIXME: split dot-delimited function names
 
@@ -490,6 +495,10 @@ bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
 				// some databases allow an interval qualifier
 				// immediately after a function, test for that
 				parseIntervalQualifier(currentnode,
+							*newptr,newptr);
+
+				// check for an outer join operator here too
+				parseOuterJoinOperator(currentnode,
 							*newptr,newptr);
 				return true;
 			}
@@ -521,30 +530,28 @@ bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
 
 	// FIXME: split dot-delimited function names
 
-	const char	*type=_column_reference;
 
 	// some db's have special functions with no parameters
 	// (eg. sysdate, current_date, today, etc.)
 	// if it's not one of those then it's just a regular column
-	if (specialFunctionName(name)) {
-		type=_function;
-	} else {
-		type=_column_reference;
-	}
+	const char	*type=(specialFunctionName(name))?
+				_function:_column_reference;
 
 	// create the nodes
 	if (type==_function) {
-
 		newNode(currentnode,type,name);
-
-		// some databases allow an interval qualifier
-		// immediately after a function, test for that
-		parseIntervalQualifier(currentnode,*newptr,newptr);
-
 	} else {
 		xmldomnode	*newnode=newNode(currentnode,type);
 		splitColumnName(newnode,name);
 	}
+
+	// some databases allow an interval qualifier immediately
+	// after a function or column, test for that
+	parseIntervalQualifier(currentnode,*newptr,newptr);
+
+	// check for an outer join operator here too
+	parseOuterJoinOperator(currentnode,*newptr,newptr);
+
 	return true;
 }
 
@@ -651,3 +658,27 @@ const char *sqlparser::_column_name_database="column_name_database";
 const char *sqlparser::_column_name_schema="column_name_schema";
 const char *sqlparser::_column_name_table="column_name_table";
 const char *sqlparser::_column_name_column="column_name_column";
+
+bool sqlparser::parseOuterJoinOperator(xmldomnode *currentnode,
+					const char *ptr, const char **newptr) {
+	debugFunction();
+	if (!outerJoinOperatorClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_outer_join_operator);
+	return true;
+}
+
+bool sqlparser::outerJoinOperatorClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	const char	*start=ptr;
+	if (!(leftParen(ptr,newptr) &&
+		plus(*newptr,newptr) &&
+		rightParen(*newptr,newptr))) {
+		*newptr=start;
+		return false;
+	}
+	return true;
+}
+
+const char *sqlparser::_outer_join_operator="outer_join_operator";
