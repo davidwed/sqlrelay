@@ -2,24 +2,56 @@
 <head>
 <title>firstworks   SQL Relay - Supported Databases</title>
 <link href="../css/styles.css" rel="stylesheet">
+<script language="Javascript" src="../js/rotate.js"></script>
 </head>
-<body>
+<body onload="rotate();">
 
 <span class="heading1">Supported Databases</span><br><br>
 
-<p>SQL Relay supports Oracle, MySQL, PostgreSQL, Sybase, IBM DB2, Firebird and SQLite databases directly, using the native client API's for those databases.</p>
+<div class="slide">
+<br>
+<table>
+<tr>
+<td><img src="../images/oracle.png">
+<img style="margin-left: 10px" src="../images/sybase.png">
+<img style="margin-left: 10px" src="../images/ibm.png"></td>
+<td><img style="margin-left: 10px" src="../images/mssqlserver.png"></td>
+</tr>
+</table>
+</div>
 
-<p>Support is provided for Microsoft SQL Server via the FreeTDS API.  Reportedly, some versions of Microsoft SQL Server can also be accessed using some versions of the Sybase database API.  So, depending on what version of Sybase you build SQL Relay against, you might be able to access certain versions of SQL Server.  I have never tried this myself.  Your milage may vary.</p>
+<div class="slide hidden">
+<img src="../images/mysql.png">
+<img style="margin-left: 10px" src="../images/postgresql.png">
+<img style="margin-left: 10px" src="../images/firebird.png">
+<img style="margin-left: 10px" src="../images/sqlite.png">
+</div>
+
+<div class="slide hidden">
+<table>
+<tr>
+<td><img src="../images/unixodbc.png">
+<img style="margin-left: 10px" src="../images/iodbc.png"></td>
+<td><img style="margin-left: 10px" src="../images/freetds.png">
+<br><br><img style="margin-left: 10px" src="../images/mdbtools.png"></td>
+<td><img style="margin-left: 10px" src="../images/blackray.png"></td>
+</tr>
+</table>
+</div>
+
+<p>SQL Relay supports <a href="http://oracle.com">Oracle</a>, <a href="http://www.mysql.com">MySQL</a>, <a href="http://postgresql.org">PostgreSQL</a>, <a href="http://sybase.com">Sybase</a>, <a href="http://www-01.ibm.com/software/data/db2/">IBM DB2</a>, <a href="http://www.firebirdsql.org">Firebird</a> and <a href="http://sqlite.org">SQLite</a> databases directly, using the native client API's for those databases.</p>
+
+<p>Support is provided for Microsoft SQL Server via the <a href="http://www.freetds.org">FreeTDS</a> API.  Reportedly, some versions of Microsoft SQL Server can also be accessed using some versions of the Sybase database API.  So, depending on what version of Sybase you build SQL Relay against, you might be able to access certain versions of SQL Server.  I have never tried this myself.  Your milage may vary.</p>
 
 <p>FreeTDS supports Sybase as well.  So you can access both SQL Server and Sybase databases using FreeTDS.</p>
 
-<p>Minimal support is provided for Microsoft Access databases via the MDB Tools API.  Select queries are supported but DML and DDL is not.</p>
+<p>Minimal support is provided for Microsoft Access databases via the <a href="http://mdbtools.sourceforge.net">MDB Tools</a> API.  Select queries are supported but DML and DDL is not.</p>
 
-<p>ODBC is supported via the UnixODBC and iODBC libraries.  If you can find a compatible ODBC driver for the database that you want to use then you should be able to access that database through SQL Relay.  You can also use the ODBC to ODBC bridge to access databases for which there is no ODBC driver for the platform you are running SQL Relay on.</p>
+<p>ODBC is supported via the <a href="http://www.unixodbc.org">UnixODBC</a> and <a href="http://www.iodbc.org">iODBC</a> libraries.  If you can find a compatible ODBC driver for the database that you want to use then you should be able to access that database through SQL Relay.  You can also use the ODBC to ODBC bridge to access databases for which there is no ODBC driver for the platform you are running SQL Relay on.</p>
 
 <p>Microsoft recently (as of July 2012) released a SQL Server ODBC driver that is compatible with certain versions of UnixODBC on certain versions of Red Hat Enterprise Linux on the x86_64 platform, so that is another possible way to connect to SQL Server that is supported by SQL Relay.</p>
 
-<p>Blackray databases can also be accessed because they implement the PostgreSQL client-server protocol.</p>
+<p><a href="http://sourceforge.net/projects/blackray/">Blackray</a> databases can also be accessed because they implement the PostgreSQL client-server protocol.</p>
 
 </body>
 </html>

@@ -11,7 +11,16 @@
 
 <p>For example, if you have a database cluster or set of replicated servers, then SQL Relay can be configured to distribute queries over them.</p>
 
+<table>
+<tr>
+<td><img src="../images/cluster.png"></td>
+<td><img style="margin-left: 40px;" src="../images/replicated.png"></td>
+</tr>
+</table>
+
 <p>Weight metrics can be assigned as well.  If some of the database machines are more powerful than others, load can be dispoportionally distributed to them and away from the less powerful database servers.</p>
+
+<img src="../images/replicated-disproportionate.png">
 
 <p>Note that SQL Relay cannot currently be used to replicate databases or keep replicated databases synchronized.  If you are using SQL Relay to access replicated databases then it is assumed that there is some means by which the databases are kept synchronized external to SQL Relay.</p>
 

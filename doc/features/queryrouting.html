@@ -9,9 +9,21 @@
 
 <p>Query routing sends queries that match one pattern to one set of database servers and queries that match another pattern to another set of servers.  A comon use for query routing is to route DML and DDL queries to a master and distribute alll other queries over a pool of slaves.</p>
 
+<img src="../images/queryrouting.png">
+
 <p>Query filtering prevents queries that match a certian pattern from being run at all.  There are often certain queries that will bring the entire database to its knees.  A common use for query filtering is to identify those queries and prevent them from being run.</p>
 
-<p>A complete descripton of query routing and filtering with example configuration files is given <a href="../router.html">here</a>.</p>
+<p>For example, <i>select * from hugetable where id=100</i> might be fine...</p>
+
+<img src="../images/query-allowed.png">
+
+<p>...but <i>select * from hugetable</i> without a where clause might crush the database.</p>
+
+<img src="../images/query-rejected.png">
+
+<p>SQL Relay can be configured to allow one and reject the other.</p>
+
+<p>The configuration is a bit more complex than suggested by these diagrams, but a complete descripton of query routing and filtering with example configuration files is given <a href="../admin/router.html">here</a>.</p>
 
 </body>
 </html>

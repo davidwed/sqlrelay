@@ -73,6 +73,14 @@ input {
 	font-size:	10pt;
 }
 
+.slide {
+	height: 100px;
+}
+
+.hidden {
+	display: none;
+}
+
 p {
 	background:	white;
 	color:		black;
