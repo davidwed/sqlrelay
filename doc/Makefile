@@ -26,6 +26,7 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/dropin
 	$(MKINSTALLDIRS) $(docdir)/features
 	$(MKINSTALLDIRS) $(docdir)/images
+	$(MKINSTALLDIRS) $(docdir)/js
 	$(MKINSTALLDIRS) $(docdir)/css
 	$(MKINSTALLDIRS) $(docdir)/programming
 	$(MKINSTALLDIRS) $(docdir)/programming/zope
@@ -170,6 +171,7 @@ install:
 	$(INSTALL) -m 644 features/connectionpooling.html $(docdir)/features
 	$(INSTALL) -m 644 features/databases.html $(docdir)/features
 	$(INSTALL) -m 644 features/dbabstractionlayers.html $(docdir)/features
+	$(INSTALL) -m 644 features/dropinreplacementlibs.html $(docdir)/features
 	$(INSTALL) -m 644 features/languages.html $(docdir)/features
 	$(INSTALL) -m 644 features/loadbalancing.html $(docdir)/features
 	$(INSTALL) -m 644 features/multirowfetches.html $(docdir)/features
@@ -179,7 +181,11 @@ install:
 	$(INSTALL) -m 644 features/substitutionandbindvars.html $(docdir)/features
 	$(INSTALL) -m 644 features/suspendedtx.html $(docdir)/features
 	$(INSTALL) -m 644 features/throttling.html $(docdir)/features
-	$(INSTALL) -m 644 images/*.png $(docdir)/images
+	for file in `ls images/*.png`; \
+	do \
+		$(INSTALL) -m 644 $$file $(docdir)/images; \
+	done
+	$(INSTALL) -m 644 js/rotate.js $(docdir)/js
 	$(INSTALL) -m 644 programming/binds.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/odbc.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/jdbc.html $(docdir)/programming
