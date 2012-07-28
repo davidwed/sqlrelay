@@ -183,7 +183,7 @@ install:
 	$(INSTALL) -m 644 features/substitutionandbindvars.html $(docdir)/features
 	$(INSTALL) -m 644 features/suspendedtx.html $(docdir)/features
 	$(INSTALL) -m 644 features/throttling.html $(docdir)/features
-	for file in `ls images/*.png`; \
+	for file in `ls images/*.png images/*.PNG`; \
 	do \
 		$(INSTALL) -m 644 $$file $(docdir)/images; \
 	done
