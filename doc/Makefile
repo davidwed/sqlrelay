@@ -2,7 +2,9 @@ top_builddir = ..
 
 include ../config.mk
 
-.PHONY: install uninstall
+.PHONY: all install uninstall
+
+all:
 
 install:
 	$(MKINSTALLDIRS) $(docdir)
