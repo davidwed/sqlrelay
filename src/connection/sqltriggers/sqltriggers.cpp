@@ -4,10 +4,9 @@
 #include <sqltriggers.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
-#include <sqltriggers/createtableautoincrementoracle.h>
-#include <sqltriggers/droptableautoincrementoracle.h>
 #include <debugprint.h>
 
+#include <rudiments/dynamiclib.h>
 #include <rudiments/xmldomnode.h>
 
 sqltriggers::sqltriggers() {
@@ -91,9 +90,6 @@ sqltrigger *sqltriggers::loadTrigger(xmldomnode *trigger) {
 		return NULL;
 	}
 
-	// ultimatelty this should dynamically load plugins,
-	// but for now it's static...
-
 	// get the trigger name
 	const char	*file=trigger->getAttributeValue("file");
 	if (!charstring::length(file)) {
@@ -102,13 +98,42 @@ sqltrigger *sqltriggers::loadTrigger(xmldomnode *trigger) {
 
 	debugPrintf("loading trigger: %s\n",file);
 
-	// load the trigger itself
-	if (!charstring::compare(file,"createtableautoincrementoracle")) {
-		return new createtableautoincrementoracle(trigger);
-	} else if (!charstring::compare(file,"droptableautoincrementoracle")) {
-		return new droptableautoincrementoracle(trigger);
+	// load the trigger module
+	stringbuffer	modulename;
+	modulename.append(LIBDIR);
+	modulename.append("/libsqlrelay_sqltrigger_");
+	modulename.append(file)->append(".so");
+	dynamiclib	*dl=new dynamiclib();
+	if (!dl->open(modulename.getString(),true,true)) {
+		printf("failed to load trigger module: %s\n",file);
+		char	*error=dl->getError();
+		printf("%s\n",error);
+		delete[] error;
+		delete dl;
+		return NULL;
 	}
-	return NULL;
+
+	// load the trigger itself
+	stringbuffer	functionname;
+	functionname.append("new_")->append(file);
+	sqltrigger *(*newTrigger)(xmldomnode *)=
+			(sqltrigger *(*)(xmldomnode *))
+				dl->getSymbol(functionname.getString());
+	if (!newTrigger) {
+		printf("failed to create trigger: %s\n",file);
+		char	*error=dl->getError();
+		printf("%s\n",error);
+		delete[] error;
+		dl->close();
+		delete dl;
+		return NULL;
+	}
+	sqltrigger	*tr=(*newTrigger)(trigger);
+
+	// attach the module so deleting the trigger also closes the library
+	tr->attachModule(dl);
+
+	return tr;
 }
 
 void sqltriggers::runBeforeTriggers(sqlrconnection_svr *sqlrcon,

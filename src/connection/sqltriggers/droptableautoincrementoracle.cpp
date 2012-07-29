@@ -7,6 +7,13 @@
 #include <sqlparser.h>
 #include <debugprint.h>
 
+extern "C" {
+	sqltrigger	*new_droptableautoincrementoracle(
+					xmldomnode *parameters) {
+		return new droptableautoincrementoracle(parameters);
+	}
+}
+
 droptableautoincrementoracle::droptableautoincrementoracle(
 			xmldomnode *parameters) : sqltrigger(parameters) {
 }

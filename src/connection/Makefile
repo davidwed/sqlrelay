@@ -4,7 +4,7 @@ include ../../config.mk
 
 .PHONY: all clean install uninstall
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) $(SIDINCLUDES) $(DEBUGDIRCPPFLAG) -DSERVER_VERSION=\"$(SQLR_VERSION)\"
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) $(SIDINCLUDES) $(DEBUGDIRCPPFLAG) -DSERVER_VERSION=\"$(SQLR_VERSION)\" -DLIBDIR=\"$(libdir)\"
 LIBS = -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(SIDLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS = sqlrconnection/sqlrconnectionctor.cpp \
@@ -115,9 +115,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqltranslations/doublequotestosinglequotes.cpp \
 	sqltranslations/informixtooracledate.cpp \
 	sqltriggers/sqltriggers.cpp \
-	sqltriggers/sqltrigger.cpp \
-	sqltriggers/createtableautoincrementoracle.cpp \
-	sqltriggers/droptableautoincrementoracle.cpp
+	sqltriggers/sqltrigger.cpp
 LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/sqlrconnectiondtor.lo \
 	sqlrconnection/flushwritebuffer.lo \
@@ -226,16 +224,16 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqltranslations/doublequotestosinglequotes.lo \
 	sqltranslations/informixtooracledate.lo \
 	sqltriggers/sqltriggers.lo \
-	sqltriggers/sqltrigger.lo \
-	sqltriggers/createtableautoincrementoracle.lo \
-	sqltriggers/droptableautoincrementoracle.lo
+	sqltriggers/sqltrigger.lo
 
 .SUFFIXES: .lo
 
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: libsqlrconnection.la
+all: libsqlrconnection.la \
+	libsqlrelay_sqltrigger_createtableautoincrementoracle.la \
+	libsqlrelay_sqltrigger_droptableautoincrementoracle.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -249,9 +247,20 @@ clean:
 libsqlrconnection.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
+libsqlrelay_sqltrigger_createtableautoincrementoracle.la: sqltriggers/createtableautoincrementoracle.cpp sqltriggers/createtableautoincrementoracle.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltriggers/createtableautoincrementoracle.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+
+libsqlrelay_sqltrigger_droptableautoincrementoracle.la: sqltriggers/droptableautoincrementoracle.cpp sqltriggers/droptableautoincrementoracle.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltriggers/droptableautoincrementoracle.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+	
+
 install:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libsqlrconnection.la $(libdir)
+	$(LTINSTALL) libsqlrelay_sqltrigger_createtableautoincrementoracle.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqltrigger_createtableautoincrementoracle.a
+	$(LTINSTALL) libsqlrelay_sqltrigger_droptableautoincrementoracle.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqltrigger_droptableautoincrementoracle.a
 	$(LIBTOOL) --mode=finish $(libdir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
@@ -266,6 +275,8 @@ install:
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltrigger_createtableautoincrementoracle.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltrigger_droptableautoincrementoracle.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection_p.la
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp

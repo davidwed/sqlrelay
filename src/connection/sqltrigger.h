@@ -6,6 +6,7 @@
 
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
+#include <rudiments/dynamiclib.h>
 
 using namespace rudiments;
 
@@ -17,6 +18,8 @@ class sqltrigger {
 			sqltrigger(xmldomnode *parameters);
 		virtual	~sqltrigger();
 
+		void	attachModule(dynamiclib *dl);
+
 		virtual bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree,
@@ -24,6 +27,7 @@ class sqltrigger {
 					bool success);
 	protected:
 		xmldomnode	*parameters;
+		dynamiclib	*dl;
 };
 
 #endif

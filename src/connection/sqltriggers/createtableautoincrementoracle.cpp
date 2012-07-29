@@ -7,6 +7,13 @@
 #include <sqlparser.h>
 #include <debugprint.h>
 
+extern "C" {
+	sqltrigger	*new_createtableautoincrementoracle(
+					xmldomnode *parameters) {
+		return new createtableautoincrementoracle(parameters);
+	}
+}
+
 createtableautoincrementoracle::createtableautoincrementoracle(
 			xmldomnode *parameters) : sqltrigger(parameters) {
 }
