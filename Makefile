@@ -83,6 +83,6 @@ distclean: clean
 	$(RM) src/util/msvc/libsqlrutil.sdf
 	$(RM) src/util/msvc/libsqlrutil.suo
 	$(RMTREE) src/util/msvc/Debug
-	$(RM) src/api/c#/SQLRClient/SQLRClient.suo
-	$(RMTREE) src/api/c#/SQLRClient/bin
-	$(RMTREE) src/api/c#/SQLRClient/obj
+	$(RM) src/api/cs/SQLRClient/SQLRClient.suo
+	$(RMTREE) src/api/cs/SQLRClient/bin
+	$(RMTREE) src/api/cs/SQLRClient/obj
