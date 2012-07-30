@@ -6,6 +6,14 @@
 #include <sqlrcursor.h>
 #include <debugprint.h>
 
+extern "C" {
+	sqltranslation	*new_informixtooracledate(
+					sqltranslations *sqlts,
+					xmldomnode *parameters) {
+		return new informixtooracledate(sqlts,parameters);
+	}
+}
+
 informixtooracledate::informixtooracledate(sqltranslations *sqlts,
 					xmldomnode *parameters) :
 					sqltranslation(sqlts,parameters) {

@@ -107,15 +107,9 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqlwriter/writelock.cpp \
 	sqltranslations/sqltranslations.cpp \
 	sqltranslations/sqltranslation.cpp \
-	sqltranslations/translatedatetimes.cpp \
-	sqltranslations/temptableslocalize.cpp \
-	sqltranslations/locksnowaitbydefault.cpp \
-	sqltranslations/temptablesaddmissingcolumns.cpp \
-	sqltranslations/oracletemptablespreserverowsbydefault.cpp \
-	sqltranslations/doublequotestosinglequotes.cpp \
-	sqltranslations/informixtooracledate.cpp \
 	sqltriggers/sqltriggers.cpp \
 	sqltriggers/sqltrigger.cpp
+
 LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/sqlrconnectiondtor.lo \
 	sqlrconnection/flushwritebuffer.lo \
@@ -216,13 +210,6 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlwriter/writelock.lo \
 	sqltranslations/sqltranslations.lo \
 	sqltranslations/sqltranslation.lo \
-	sqltranslations/translatedatetimes.lo \
-	sqltranslations/temptableslocalize.lo \
-	sqltranslations/locksnowaitbydefault.lo \
-	sqltranslations/temptablesaddmissingcolumns.lo \
-	sqltranslations/oracletemptablespreserverowsbydefault.lo \
-	sqltranslations/doublequotestosinglequotes.lo \
-	sqltranslations/informixtooracledate.lo \
 	sqltriggers/sqltriggers.lo \
 	sqltriggers/sqltrigger.lo
 
@@ -233,7 +220,14 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 
 all: libsqlrconnection.la \
 	libsqlrelay_sqltrigger_createtableautoincrementoracle.la \
-	libsqlrelay_sqltrigger_droptableautoincrementoracle.la
+	libsqlrelay_sqltrigger_droptableautoincrementoracle.la \
+	libsqlrelay_sqltranslation_doublequotestosinglequotes.la \
+	libsqlrelay_sqltranslation_informixtooracledate.la \
+	libsqlrelay_sqltranslation_locksnowaitbydefault.la \
+	libsqlrelay_sqltranslation_oracletemptablespreserverowsbydefault.la \
+	libsqlrelay_sqltranslation_temptablesaddmissingcolumns.la \
+	libsqlrelay_sqltranslation_temptableslocalize.la \
+	libsqlrelay_sqltranslation_translatedatetimes.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -252,6 +246,27 @@ libsqlrelay_sqltrigger_createtableautoincrementoracle.la: sqltriggers/createtabl
 
 libsqlrelay_sqltrigger_droptableautoincrementoracle.la: sqltriggers/droptableautoincrementoracle.cpp sqltriggers/droptableautoincrementoracle.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltriggers/droptableautoincrementoracle.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+
+libsqlrelay_sqltranslation_doublequotestosinglequotes.la: sqltranslations/doublequotestosinglequotes.cpp sqltranslations/doublequotestosinglequotes.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/doublequotestosinglequotes.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+
+libsqlrelay_sqltranslation_informixtooracledate.la: sqltranslations/informixtooracledate.cpp sqltranslations/informixtooracledate.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/informixtooracledate.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+
+libsqlrelay_sqltranslation_locksnowaitbydefault.la: sqltranslations/locksnowaitbydefault.cpp sqltranslations/locksnowaitbydefault.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/locksnowaitbydefault.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+
+libsqlrelay_sqltranslation_oracletemptablespreserverowsbydefault.la: sqltranslations/oracletemptablespreserverowsbydefault.cpp sqltranslations/oracletemptablespreserverowsbydefault.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/oracletemptablespreserverowsbydefault.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+
+libsqlrelay_sqltranslation_temptablesaddmissingcolumns.la: sqltranslations/temptablesaddmissingcolumns.cpp sqltranslations/temptablesaddmissingcolumns.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/temptablesaddmissingcolumns.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+
+libsqlrelay_sqltranslation_temptableslocalize.la: sqltranslations/temptableslocalize.cpp sqltranslations/temptableslocalize.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/temptableslocalize.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+
+libsqlrelay_sqltranslation_translatedatetimes.la: sqltranslations/translatedatetimes.cpp sqltranslations/translatedatetimes.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/translatedatetimes.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
 	
 
 install:
@@ -261,6 +276,20 @@ install:
 	$(RM) $(libdir)/libsqlrelay_sqltrigger_createtableautoincrementoracle.a
 	$(LTINSTALL) libsqlrelay_sqltrigger_droptableautoincrementoracle.la $(libdir)
 	$(RM) $(libdir)/libsqlrelay_sqltrigger_droptableautoincrementoracle.a
+	$(LTINSTALL) libsqlrelay_sqltranslation_doublequotestosinglequotes.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqltranslation_doublequotestosinglequotes.a
+	$(LTINSTALL) libsqlrelay_sqltranslation_informixtooracledate.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqltranslation_informixtooracledate.a
+	$(LTINSTALL) libsqlrelay_sqltranslation_locksnowaitbydefault.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqltranslation_locksnowaitbydefault.a
+	$(LTINSTALL) libsqlrelay_sqltranslation_oracletemptablespreserverowsbydefault.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqltranslation_oracletemptablespreserverowsbydefault.a
+	$(LTINSTALL) libsqlrelay_sqltranslation_temptablesaddmissingcolumns.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqltranslation_temptablesaddmissingcolumns.a
+	$(LTINSTALL) libsqlrelay_sqltranslation_temptableslocalize.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqltranslation_temptableslocalize.a
+	$(LTINSTALL) libsqlrelay_sqltranslation_translatedatetimes.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqltranslation_translatedatetimes.a
 	$(LIBTOOL) --mode=finish $(libdir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
@@ -278,6 +307,13 @@ uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltrigger_createtableautoincrementoracle.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltrigger_droptableautoincrementoracle.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection_p.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_doublequotestosinglequotes.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_informixtooracledate.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_locksnowaitbydefault.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_oracletemptablespreserverowsbydefault.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_temptablesaddmissingcolumns.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_temptableslocalize.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_translatedatetimes.la
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

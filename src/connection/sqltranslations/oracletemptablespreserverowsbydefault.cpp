@@ -6,6 +6,15 @@
 #include <sqlrcursor.h>
 #include <debugprint.h>
 
+extern "C" {
+	sqltranslation	*new_oracletemptablespreserverowsbydefault(
+					sqltranslations *sqlts,
+					xmldomnode *parameters) {
+		return new oracletemptablespreserverowsbydefault(
+							sqlts,parameters);
+	}
+}
+
 oracletemptablespreserverowsbydefault::oracletemptablespreserverowsbydefault(
 					sqltranslations *sqlts,
 					xmldomnode *parameters) :

@@ -6,6 +6,7 @@
 
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
+#include <rudiments/dynamiclib.h>
 
 using namespace rudiments;
 
@@ -19,12 +20,15 @@ class sqltranslation {
 					xmldomnode *parameters);
 		virtual	~sqltranslation();
 
+		void	attachModule(dynamiclib *dl);
+
 		virtual bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
 	protected:
 		sqltranslations	*sqlts;
 		xmldomnode	*parameters;
+		dynamiclib	*dl;
 };
 
 #endif

@@ -6,6 +6,14 @@
 #include <sqlrcursor.h>
 #include <debugprint.h>
 
+extern "C" {
+	sqltranslation	*new_temptablesaddmissingcolumns(
+					sqltranslations *sqlts,
+					xmldomnode *parameters) {
+		return new temptablesaddmissingcolumns(sqlts,parameters);
+	}
+}
+
 temptablesaddmissingcolumns::temptablesaddmissingcolumns(
 					sqltranslations *sqlts,
 					xmldomnode *parameters) :

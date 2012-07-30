@@ -86,9 +86,6 @@ sqltranslation *sqltranslations::loadTranslation(xmldomnode *translation) {
 		return NULL;
 	}
 
-	// ultimatelty this should dynamically load plugins,
-	// but for now it's static...
-
 	// get the translation name
 	const char	*file=translation->getAttributeValue("file");
 	if (!charstring::length(file)) {
@@ -97,25 +94,42 @@ sqltranslation *sqltranslations::loadTranslation(xmldomnode *translation) {
 
 	debugPrintf("loading translation: %s\n",file);
 
-	// load the translation itself
-	if (!charstring::compare(file,"translatedatetimes")) {
-		return new translatedatetimes(this,translation);
-	} else if (!charstring::compare(file,"temptableslocalize")) {
-		return new temptableslocalize(this,translation);
-	} else if (!charstring::compare(file,"locksnowaitbydefault")) {
-		return new locksnowaitbydefault(this,translation);
-	} else if (!charstring::compare(file,"temptablesaddmissingcolumns")) {
-		return new temptablesaddmissingcolumns(this,translation);
-	} else if (!charstring::compare(file,
-			"oracletemptablespreserverowsbydefault")) {
-		return new oracletemptablespreserverowsbydefault(
-							this,translation);
-	} else if (!charstring::compare(file,"doublequotestosinglequotes")) {
-		return new doublequotestosinglequotes(this,translation);
-	} else if (!charstring::compare(file,"informixtooracledate")) {
-		return new informixtooracledate(this,translation);
+	// load the translation module
+	stringbuffer	modulename;
+	modulename.append(LIBDIR);
+	modulename.append("/libsqlrelay_sqltranslation_");
+	modulename.append(file)->append(".so");
+	dynamiclib	*dl=new dynamiclib();
+	if (!dl->open(modulename.getString(),true,true)) {
+		printf("failed to load translation module: %s\n",file);
+		char	*error=dl->getError();
+		printf("%s\n",error);
+		delete[] error;
+		delete dl;
+		return NULL;
 	}
-	return NULL;
+
+	// load the translation itself
+	stringbuffer	functionname;
+	functionname.append("new_")->append(file);
+	sqltranslation *(*newTranslation)(sqltranslations *, xmldomnode *)=
+			(sqltranslation *(*)(sqltranslations *, xmldomnode *))
+				dl->getSymbol(functionname.getString());
+	if (!newTranslation) {
+		printf("failed to create translation: %s\n",file);
+		char	*error=dl->getError();
+		printf("%s\n",error);
+		delete[] error;
+		dl->close();
+		delete dl;
+		return NULL;
+	}
+	sqltranslation	*tr=(*newTranslation)(this,translation);
+
+	// attach the module so deleting the translation also closes the library
+	tr->attachModule(dl);
+
+	return tr;
 }
 
 bool sqltranslations::runTranslations(sqlrconnection_svr *sqlrcon,

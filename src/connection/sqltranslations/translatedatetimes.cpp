@@ -6,6 +6,14 @@
 #include <sqlrcursor.h>
 #include <debugprint.h>
 
+extern "C" {
+	sqltranslation	*new_translatedatetimes(
+					sqltranslations *sqlts,
+					xmldomnode *parameters) {
+		return new translatedatetimes(sqlts,parameters);
+	}
+}
+
 translatedatetimes::translatedatetimes(sqltranslations *sqlts,
 					xmldomnode *parameters) :
 					sqltranslation(sqlts,parameters) {

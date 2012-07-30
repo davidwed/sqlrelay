@@ -6,6 +6,14 @@
 #include <sqlrcursor.h>
 #include <debugprint.h>
 
+extern "C" {
+	sqltranslation	*new_locksnowaitbydefault(
+					sqltranslations *sqlts,
+					xmldomnode *parameters) {
+		return new locksnowaitbydefault(sqlts,parameters);
+	}
+}
+
 locksnowaitbydefault::locksnowaitbydefault(sqltranslations *sqlts,
 					xmldomnode *parameters) :
 					sqltranslation(sqlts,parameters) {

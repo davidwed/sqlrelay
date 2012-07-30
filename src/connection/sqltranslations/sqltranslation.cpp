@@ -9,9 +9,18 @@ sqltranslation::sqltranslation(sqltranslations *sqlts,
 				xmldomnode *parameters) {
 	this->sqlts=sqlts;
 	this->parameters=parameters;
+	dl=NULL;
 }
 
 sqltranslation::~sqltranslation() {
+	if (dl) {
+		dl->close();
+		delete dl;
+	}
+}
+
+void sqltranslation::attachModule(dynamiclib *dl) {
+	this->dl=dl;
 }
 
 bool sqltranslation::run(sqlrconnection_svr *sqlrcon,

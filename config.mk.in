@@ -1,11 +1,6 @@
 SHELL = @SHELL@
 VPATH = @srcdir@
 
-#abs_srcdir = @abs_srcdir@
-#top_srcdir = $(abs_srcdir)
-#abs_builddir = @abs_builddir@
-#top_builddir = $(abs_builddir)
-
 SQLR_VERSION = @SQLR_VERSION@
 SONAME_VERSION_INFO = @SONAME_VERSION_INFO@
 

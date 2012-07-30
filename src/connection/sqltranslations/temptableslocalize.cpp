@@ -7,6 +7,14 @@
 #include <debugprint.h>
 #include <rudiments/process.h>
 
+extern "C" {
+	sqltranslation	*new_temptableslocalize(
+					sqltranslations *sqlts,
+					xmldomnode *parameters) {
+		return new temptableslocalize(sqlts,parameters);
+	}
+}
+
 temptableslocalize::temptableslocalize(sqltranslations *sqlts,
 					xmldomnode *parameters) :
 					sqltranslation(sqlts,parameters) {
@@ -102,7 +110,7 @@ const char *temptableslocalize::generateTempTableName(const char *oldname,
 				charstring::length(uniqueid)+1+
 				charstring::integerLength(pid)+1;
 	char	*newname=(char *)sqlts->temptablepool->malloc(size);
-	snprintf(newname,size,"%s_%s_%lld",oldname,uniqueid,pid);
+	snprintf(newname,size,"%s_%s_%lld",oldname,uniqueid,(long long)pid);
 	return newname;
 }
 

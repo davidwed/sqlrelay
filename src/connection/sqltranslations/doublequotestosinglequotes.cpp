@@ -6,6 +6,14 @@
 #include <sqlrcursor.h>
 #include <debugprint.h>
 
+extern "C" {
+	sqltranslation	*new_doublequotestosinglequotes(
+					sqltranslations *sqlts,
+					xmldomnode *parameters) {
+		return new doublequotestosinglequotes(sqlts,parameters);
+	}
+}
+
 doublequotestosinglequotes::doublequotestosinglequotes(sqltranslations *sqlts,
 					xmldomnode *parameters) :
 					sqltranslation(sqlts,parameters) {
