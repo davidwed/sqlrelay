@@ -7,6 +7,7 @@
 void sqlrconnection_svr::closeConnection() {
 
 	if (inclientsession) {
+		endSessionCommand();
 		decrementClientSessionCount();
 	}
 
