@@ -315,6 +315,8 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	greaterThanOrEqualTo(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	escape(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	expression(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	intervalQualifier(xmldomnode *node,

@@ -220,6 +220,7 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_greater_than,
 		sqlparser::_less_than_or_equal_to,
 		sqlparser::_greater_than_or_equal_to,
+		sqlparser::_escape,
 		sqlparser::_expression,
 		sqlparser::_interval_qualifier,
 		sqlparser::_outer_join_operator,
@@ -577,6 +578,8 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 	} else if (!charstring::compare(nodename,
 				sqlparser::_greater_than_or_equal_to)) {
 		return greaterThanOrEqualTo(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_escape)) {
+		return escape(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_expression)) {
 		return expression(node,output);
 	} else if (!charstring::compare(nodename,

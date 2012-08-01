@@ -176,19 +176,19 @@ xmldomnode *sqltranslations::newNodeAfter(xmldomnode *parentnode,
 						const char *type) {
 
 	// find the position after "node"
-	uint64_t	position=1;
+	/*uint64_t	position=1;
 	for (xmldomnode *child=parentnode->getChild((uint64_t)0);
 		!child->isNullNode(); child=child->getNextSibling()) {
 		if (child==node) {
 			break;
 		}
 		position++;
-	}
+	}*/
 
 	// create a new node and insert it at that position
 	xmldomnode	*retval=new xmldomnode(tree,parentnode->getNullNode(),
 						TAG_XMLDOMNODETYPE,type,NULL);
-	parentnode->insertChild(retval,position);
+	parentnode->insertChild(retval,node->getPosition()+1);
 	return retval;
 }
 
@@ -205,20 +205,20 @@ xmldomnode *sqltranslations::newNodeBefore(xmldomnode *parentnode,
 						xmldomnode *node,
 						const char *type) {
 
-	// find the position after "node"
-	uint64_t	position=0;
+	// find the position before "node"
+	/*uint64_t	position=0;
 	for (xmldomnode *child=parentnode->getChild((uint64_t)0);
 		!child->isNullNode(); child=child->getNextSibling()) {
 		if (child==node) {
 			break;
 		}
 		position++;
-	}
+	}*/
 
 	// create a new node and insert it at that position
 	xmldomnode	*retval=new xmldomnode(tree,parentnode->getNullNode(),
 						TAG_XMLDOMNODETYPE,type,NULL);
-	parentnode->insertChild(retval,position);
+	parentnode->insertChild(retval,node->getPosition());
 	return retval;
 }
 

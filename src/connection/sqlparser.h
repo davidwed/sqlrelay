@@ -726,6 +726,11 @@ class sqlparser {
 						const char *ptr,
 						const char **newptr);
 		static const char	*_greater_than_or_equal_to;
+		bool	parseEscape(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	escape(const char *ptr, const char **newptr);
+		static const char	*_escape;
 		bool	parseExpression(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);

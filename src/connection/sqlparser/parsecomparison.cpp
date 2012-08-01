@@ -95,6 +95,10 @@ bool sqlparser::parseComparison(xmldomnode *currentnode,
 			error=true;
 			return false;
 		}
+
+		// get the escape clause, if there is one
+		parseEscape(comparisonnode,*newptr,newptr);
+
 		return true;
 	}
 
@@ -420,3 +424,21 @@ bool sqlparser::parseGreaterThanOrEqualTo(xmldomnode *currentnode,
 }
 
 const char *sqlparser::_greater_than_or_equal_to="greaterthanorequalto";
+
+bool sqlparser::parseEscape(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!escape(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_escape);
+	return parseTerm(currentnode,*newptr,newptr);
+}
+
+bool sqlparser::escape(const char *ptr, const char **newptr) {
+        debugFunction();
+        return comparePart(ptr,newptr,"escape ");
+}                                   
+
+const char *sqlparser::_escape="escape";

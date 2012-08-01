@@ -143,3 +143,9 @@ bool sqlwriter::greaterThanOrEqualTo(xmldomnode *node, stringbuffer *output) {
 	output->append(">=");
 	return true;
 }
+
+bool sqlwriter::escape(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("escape");
+	return true;
+}

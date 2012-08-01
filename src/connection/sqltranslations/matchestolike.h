@@ -17,7 +17,7 @@ class matchestolike : public sqltranslation {
 					xmldom *querytree);
 	private:
 		bool	replaceMatchesWithLike(xmldomnode *node);
-		void	wrapConcat(xmldomnode *node);
+		void	wrap(xmldomnode *node);
 };
 
 #endif
