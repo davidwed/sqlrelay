@@ -80,6 +80,7 @@ bool sqlparser::parseComparison(xmldomnode *currentnode,
 	// get the comparator
 	if (parseIs(comparisonnode,*newptr,newptr) ||
 		parseLike(comparisonnode,*newptr,newptr) ||
+		parseMatches(comparisonnode,*newptr,newptr) ||
 		parseNullSafeEquals(comparisonnode,*newptr,newptr) ||
 		parseEquals(comparisonnode,*newptr,newptr) ||
 		parseNotEquals(comparisonnode,*newptr,newptr) ||
@@ -307,6 +308,24 @@ bool sqlparser::like(const char *ptr, const char **newptr) {
 }                                   
 
 const char *sqlparser::_like="like";
+
+bool sqlparser::parseMatches(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+	if (!matches(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_matches);
+	return true;
+}
+
+bool sqlparser::matches(const char *ptr, const char **newptr) {
+        debugFunction();
+        return comparePart(ptr,newptr,"matches ");
+}                                   
+
+const char *sqlparser::_matches="matches";
 
 bool sqlparser::parseNullSafeEquals(xmldomnode *currentnode,
 					const char *ptr,

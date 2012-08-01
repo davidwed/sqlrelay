@@ -227,7 +227,8 @@ all: libsqlrconnection.la \
 	libsqlrelay_sqltranslation_oracletemptablespreserverowsbydefault.la \
 	libsqlrelay_sqltranslation_temptablesaddmissingcolumns.la \
 	libsqlrelay_sqltranslation_temptableslocalize.la \
-	libsqlrelay_sqltranslation_translatedatetimes.la
+	libsqlrelay_sqltranslation_translatedatetimes.la \
+	libsqlrelay_sqltranslation_matchestolike.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -267,6 +268,9 @@ libsqlrelay_sqltranslation_temptableslocalize.la: sqltranslations/temptablesloca
 
 libsqlrelay_sqltranslation_translatedatetimes.la: sqltranslations/translatedatetimes.cpp sqltranslations/translatedatetimes.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/translatedatetimes.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+
+libsqlrelay_sqltranslation_matchestolike.la: sqltranslations/matchestolike.cpp sqltranslations/matchestolike.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/matchestolike.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
 	
 
 install:
@@ -290,6 +294,8 @@ install:
 	$(RM) $(libdir)/libsqlrelay_sqltranslation_temptableslocalize.a
 	$(LTINSTALL) libsqlrelay_sqltranslation_translatedatetimes.la $(libdir)
 	$(RM) $(libdir)/libsqlrelay_sqltranslation_translatedatetimes.a
+	$(LTINSTALL) libsqlrelay_sqltranslation_matchestolike.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqltranslation_matchestolike.a
 	$(LIBTOOL) --mode=finish $(libdir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
@@ -314,6 +320,7 @@ uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_temptablesaddmissingcolumns.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_temptableslocalize.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_translatedatetimes.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_matchestolike.la
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

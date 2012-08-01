@@ -102,6 +102,12 @@ bool sqlwriter::like(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::matches(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("matches");
+	return true;
+}
+
 bool sqlwriter::nullSafeEquals(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("<=>");

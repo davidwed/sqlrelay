@@ -301,6 +301,8 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	like(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	matches(xmldomnode *node,
+						stringbuffer *output);
 		virtual bool	nullSafeEquals(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	notEquals(xmldomnode *node,

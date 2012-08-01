@@ -213,6 +213,7 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_exists,
 		sqlparser::_is,
 		sqlparser::_like,
+		sqlparser::_matches,
 		sqlparser::_null_safe_equals,
 		sqlparser::_not_equals,
 		sqlparser::_less_than,
@@ -559,6 +560,8 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return is(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_like)) {
 		return like(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_matches)) {
+		return matches(node,output);
 	} else if (!charstring::compare(nodename,
 				sqlparser::_null_safe_equals)) {
 		return nullSafeEquals(node,output);

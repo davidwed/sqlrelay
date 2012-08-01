@@ -693,6 +693,11 @@ class sqlparser {
 						const char **newptr);
 		bool	like(const char *ptr, const char **newptr);
 		static const char	*_like;
+		bool	parseMatches(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	matches(const char *ptr, const char **newptr);
+		static const char	*_matches;
 		bool	parseNullSafeEquals(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
