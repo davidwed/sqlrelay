@@ -11,17 +11,6 @@ oracle8sqlwriter::~oracle8sqlwriter() {
 	debugFunction();
 }
 
-const char * const *oracle8sqlwriter::additionalElements() {
-	debugFunction();
-	static const char *additionalelements[]={
-		// on commit...
-		sqlparser::_on_commit,
-		sqlparser::_as,
-		NULL
-	};
-	return additionalelements;
-}
-
 const char * const *oracle8sqlwriter::unsupportedElements() {
 	debugFunction();
 	static const char *unsupportedelements[]={
@@ -38,6 +27,9 @@ const char * const *oracle8sqlwriter::unsupportedElements() {
 		sqlparser::_match,
 		sqlparser::_on_delete,
 		sqlparser::_on_update,
+
+		// create
+		sqlparser::_with_no_log,
 
 		// drop...
 		sqlparser::_drop_temporary,

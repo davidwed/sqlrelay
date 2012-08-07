@@ -11,7 +11,6 @@ class oracle8sqlwriter : public sqlwriter {
 		virtual	~oracle8sqlwriter();
 
 	private:
-		virtual const char * const *additionalElements();
 		virtual const char * const *unsupportedElements();
 
 		virtual bool	temporary(xmldomnode *node,

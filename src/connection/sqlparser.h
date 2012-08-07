@@ -12,7 +12,7 @@ using namespace rudiments;
 class sqlparser {
 	public:
 			sqlparser();
-		virtual	~sqlparser();
+			~sqlparser();
 
 		bool	parse(const char *query);
 		xmldom	*getTree();
@@ -306,6 +306,10 @@ class sqlparser {
 		bool	asClause(const char *ptr,
 						const char **newptr);
 		static const char	*_as;
+		bool	parseWithNoLog(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_with_no_log;
 		bool	parseConstraint(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
@@ -826,9 +830,7 @@ class sqlparser {
 		static const char	*_parameters;
 		static const char	*_parameter;
 		bool	specialFunctionName(const char *name);
-		virtual const char * const	 *specialFunctionNames();
-		virtual void		splitColumnName(
-						xmldomnode *currentnode,
+		void	splitColumnName(xmldomnode *currentnode,
 						const char *name);
 		static const char	*_column_name_database;
 		static const char	*_column_name_schema;

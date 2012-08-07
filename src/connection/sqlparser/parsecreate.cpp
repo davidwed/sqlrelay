@@ -164,7 +164,8 @@ bool sqlparser::parseCreateTable(xmldomnode *currentnode,
 	for (;;) {
 
 		// known clauses
-		if (parseAs(tablenode,*newptr,newptr)) {
+		if (parseAs(tablenode,*newptr,newptr) ||
+			parseWithNoLog(tablenode,*newptr,newptr)) {
 			continue;
 		}
 
@@ -960,6 +961,22 @@ bool sqlparser::asClause(const char *ptr, const char **newptr) {
 }
 
 const char *sqlparser::_as="as";
+
+bool sqlparser::parseWithNoLog(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	const char	*start=ptr;
+	if (comparePart(ptr,newptr,"with ") &&
+		comparePart(*newptr,newptr,"no ") &&
+		comparePart(*newptr,newptr,"log")) {
+		newNode(currentnode,_with_no_log);
+		return true;
+	}
+	*newptr=start;
+	return false;
+}
+
+const char *sqlparser::_with_no_log="with_no_log";
 
 bool sqlparser::parseCreateIndex(xmldomnode *currentnode,
 					const char *ptr,

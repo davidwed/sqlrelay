@@ -573,28 +573,13 @@ static const char *defaultspecialfunctionnames[]={
 
 bool sqlparser::specialFunctionName(const char *name) {
 
-	// check the default list
 	const char * const	*names=defaultspecialfunctionnames;
 	for (uint64_t i=0; names[i]; i++) {
 		if (!charstring::compare(name,names[i])) {
 			return true;
 		}
 	}
-
-	// check the db-specific list
-	names=specialFunctionNames();
-	if (names) {
-		for (uint64_t i=0; names[i]; i++) {
-			if (!charstring::compare(name,names[i])) {
-				return true;
-			}
-		}
-	}
 	return false;
-}
-
-const char * const *sqlparser::specialFunctionNames() {
-	return NULL;
 }
 
 void sqlparser::splitColumnName(xmldomnode *currentnode, const char *name) {

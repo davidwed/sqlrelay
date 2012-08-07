@@ -86,7 +86,7 @@ bool sqlwriter::write(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-const char * const *sqlwriter::baseElements() {
+const char * const *sqlwriter::supportedElements() {
 	debugFunction();
 	static const char *baseelements[]={
 		sqlparser::_table_name,
@@ -144,6 +144,12 @@ const char * const *sqlwriter::baseElements() {
 		sqlparser::_match,
 		sqlparser::_on_delete,
 		sqlparser::_on_update,
+		sqlparser::_on_commit,
+		sqlparser::_as,
+
+
+		// table creation qualifiers...
+		sqlparser::_with_no_log,
 
 
 		// drop...
@@ -281,14 +287,6 @@ const char * const *sqlwriter::baseElements() {
 	return baseelements;
 }
 
-const char * const *sqlwriter::additionalElements() {
-	debugFunction();
-	static const char *additionalelements[]={
-		NULL
-	};
-	return additionalelements;
-}
-
 const char * const *sqlwriter::unsupportedElements() {
 	debugFunction();
 	static const char *unsupportedelements[]={
@@ -308,16 +306,8 @@ bool sqlwriter::elementSupported(const char *element) {
 		}
 	}
 
-	// is it among the base elements
-	elements=baseElements();
-	for (uint64_t i=0; elements[i]; i++) {
-		if (!charstring::compare(element,elements[i])) {
-			return true;
-		}
-	}
-
-	// is it an additional element supported by the subclass
-	elements=additionalElements();
+	// is it among the supported elements
+	elements=supportedElements();
 	for (uint64_t i=0; elements[i]; i++) {
 		if (!charstring::compare(element,elements[i])) {
 			return true;

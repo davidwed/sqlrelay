@@ -224,6 +224,13 @@ bool sqlwriter::as(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::withNoLog(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("with no log ");
+	outputValue(node,output);
+	return true;
+}
+
 bool sqlwriter::fulltext(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("fulltext ");

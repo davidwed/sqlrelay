@@ -51,43 +51,6 @@ bool matchestolike::replaceMatchesWithLike(xmldomnode *node) {
 
 void matchestolike::wrap(xmldomnode *node) {
 
-	// wrap -> concat(...expression...,'%')
-	/*xmldomnode	*concat1func=sqlts->newNodeAfter(node->getParent(),
-							node,
-							sqlparser::_function,
-							"concat");
-	xmldomnode	*concat1params=sqlts->newNode(concat1func,
-							sqlparser::_parameters);
-	xmldomnode	*concat1parameter1=sqlts->newNode(concat1params,
-							sqlparser::_parameter);
-	xmldomnode	*concat1expression1=sqlts->newNode(concat1parameter1,
-							sqlparser::_expression);
-	node->getParent()->moveChild(node,concat1expression1,0);
-	xmldomnode	*concat1parameter2=sqlts->newNode(concat1params,
-							sqlparser::_parameter);
-	xmldomnode	*concat1expression2=sqlts->newNode(concat1parameter2,
-							sqlparser::_expression);
-	sqlts->newNode(concat1expression2,sqlparser::_string_literal,"'%'");
-	
-	// wrap -> concat('%',concat(...expression...,'%'))
-	xmldomnode	*concat2func=sqlts->newNodeAfter(
-						concat1func->getParent(),
-						concat1func,
-						sqlparser::_function,
-						"concat");
-	xmldomnode	*concat2params=sqlts->newNode(concat2func,
-							sqlparser::_parameters);
-	xmldomnode	*concat2parameter1=sqlts->newNode(concat2params,
-							sqlparser::_parameter);
-	xmldomnode	*concat2expression1=sqlts->newNode(concat2parameter1,
-							sqlparser::_expression);
-	sqlts->newNode(concat2expression1,sqlparser::_string_literal,"'%'");
-	xmldomnode	*concat2parameter2=sqlts->newNode(concat2params,
-							sqlparser::_parameter);
-	xmldomnode	*concat2expression2=sqlts->newNode(concat2parameter2,
-							sqlparser::_expression);
-	concat1func->getParent()->moveChild(concat1func,concat2expression2,0);*/
-
 	// wrap -> replace(...,'*','%')
 	xmldomnode	*replace1func=sqlts->newNodeAfter(
 						node->getParent(),

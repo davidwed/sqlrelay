@@ -29,8 +29,7 @@ class sqlwriter {
 	protected:
 		virtual bool	write(xmldomnode *tree, stringbuffer *output);
 
-		virtual const char * const *baseElements();
-		virtual const char * const *additionalElements();
+		virtual const char * const *supportedElements();
 		virtual const char * const *unsupportedElements();
 
 		virtual	bool	elementSupported(const char *element);
@@ -155,6 +154,11 @@ class sqlwriter {
 		virtual bool	onCommit(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	as(xmldomnode *node,
+						stringbuffer *output);
+
+
+		// table creation qualifiers...
+		virtual bool	withNoLog(xmldomnode *node,
 						stringbuffer *output);
 
 
