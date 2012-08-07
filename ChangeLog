@@ -22,6 +22,7 @@
 	added explicit support for outer join operators to the sql parser
 	dynamic-ized triggers and translations
 	added a "matches" to "like" translation
+	added a "serial" to "autoincrement" translation
 
 0.45 - added trigger framework
 	added support for getting the native database error number

@@ -415,6 +415,7 @@ rm -rf %{buildroot}
 %{_bindir}/sqlr-stop
 %{_libdir}/libsqlrconnection*
 %{_libdir}/libsqlrutil*
+%{_libdir}/libsqlrelay*
 %{_localstatedir}/sqlrelay/tmp
 %{_localstatedir}/sqlrelay/debug
 

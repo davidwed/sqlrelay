@@ -40,14 +40,22 @@ bool serialtoautoincrement::run(sqlrconnection_svr *sqlrcon,
 		}
 
 		// skip non-serial types
-		if (charstring::compare(
-			typenode->getAttributeValue(sqlparser::_value),
-			"serial")) {
+		const char	*coltype=
+			typenode->getAttributeValue(sqlparser::_value);
+		bool	serial=!charstring::compare(coltype,"serial");
+		bool	serial8=!charstring::compare(coltype,"serial8");
+		if (!serial && !serial8) {
 			continue;
 		}
 
-		// replace serial with int
-		typenode->setAttributeValue(sqlparser::_value,"int");
+		// replace column type
+		const char	*newcoltype="int";
+		if (serial8) {
+			// FIXME: for some db's this needs to be a
+			// type other than "int" such as long, quad or
+			// something else
+		}
+		typenode->setAttributeValue(sqlparser::_value,newcoltype);
 
 		// find the constraints node or create one
 		xmldomnode	*constraintsnode=
