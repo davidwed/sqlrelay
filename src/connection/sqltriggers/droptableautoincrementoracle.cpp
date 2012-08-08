@@ -53,32 +53,52 @@ bool droptableautoincrementoracle::run(sqlrconnection_svr *sqlrcon,
 				getNextTagSibling(
 					sqlparser::_table_name_list_item)) {
 
+		// table name database and schema...
+		node=listitemnode->getFirstTagChild(
+					sqlparser::_table_name_database);
+		const char	*database=
+				node->getAttributeValue(sqlparser::_value);
+		node=listitemnode->getFirstTagChild(
+					sqlparser::_table_name_schema);
+		const char	*schema=
+				node->getAttributeValue(sqlparser::_value);
+
 		// table name...
-		node=listitemnode->getFirstTagChild(sqlparser::_table_name);
+		node=listitemnode->getFirstTagChild(
+					sqlparser::_table_name_table);
 		if (node->isNullNode()) {
 			continue;
 		}
-		const char	*tablename=
+		const char	*table=
 				node->getAttributeValue(sqlparser::_value);
-		if (!tablename) {
+		if (!table) {
 			continue;
 		}
 
 		// drop the sequences
-		dropSequences(sqlrcon,sqlrcur,tablename);
+		dropSequences(sqlrcon,sqlrcur,database,schema,table);
 	}
 	return true;
 }
 
 bool droptableautoincrementoracle::dropSequences(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
-						const char *tablename) {
+						const char *database,
+						const char *schema,
+						const char *table) {
 	debugFunction();
 
 	// query to get the sequences from the table-sequence map table
 	stringbuffer	query;
 	query.append("select * from autoincrement_sequences ");
-	query.append("where tablename='")->append(tablename)->append("'");
+	query.append("where tablename='");
+	if (database) {
+		query.append(database)->append('.');
+	}
+	if (schema) {
+		query.append(schema)->append('.');
+	}
+	query.append(table)->append("'");
 
 	// get the sequences from the table-sequence map table
 	if (sqlrcon->debugtriggers) {
@@ -110,7 +130,15 @@ bool droptableautoincrementoracle::dropSequences(sqlrconnection_svr *sqlrcon,
 
 			cur->nextRow();
 		}
+
 	} else {
+
+		// FIXME: If this failed, it might be because the table was
+		// created by explicitly specifying the current database and
+		// schema but dropped by just specifying the table or
+		// schema.table.  We need to try again, specifying the current
+		// schema and database explicitly.
+
 		// error...
 		if (sqlrcon->debugtriggers) {
 			const char	*err;

@@ -39,7 +39,11 @@ class sqlwriter {
 						stringbuffer *output);
 
 		// generic
-		virtual bool	tableName(xmldomnode *node,
+		virtual bool	tableNameDatabase(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	tableNameSchema(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	tableNameTable(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	name(xmldomnode *node,
 						stringbuffer *output);
@@ -77,7 +81,11 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	index(xmldomnode *node,
 						stringbuffer *output);
-		virtual bool	indexName(xmldomnode *node,
+		virtual bool	indexNameDatabase(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	indexNameSchema(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	indexNameIndex(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	btree(xmldomnode *node,
 						stringbuffer *output);

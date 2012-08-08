@@ -89,7 +89,8 @@ bool sqlrconnection_svr::getListCommand(sqlrcursor_svr *cursor,
 		// translate table name, if necessary
 		if (sqlt) {
 			const char	*newname=NULL;
-			if (sqlt->getReplacementTableName(table,&newname)) {
+			if (sqlt->getReplacementTableName(NULL,NULL,
+							table,&newname)) {
 				delete[] table;
 				table=charstring::duplicate(newname);
 			}

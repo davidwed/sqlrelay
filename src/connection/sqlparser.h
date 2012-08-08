@@ -85,7 +85,14 @@ class sqlparser {
 		bool	parseTableName(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		static const char	*_table_name;
+		static const char	*_table_name_database;
+		static const char	*_table_name_schema;
+		static const char	*_table_name_table;
+		void	splitDatabaseObjectName(xmldomnode *currentnode,
+						const char *name,
+						const char *databasetag,
+						const char *schematag,
+						const char *objecttag);
 		bool	parseName(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
@@ -325,7 +332,9 @@ class sqlparser {
 		bool	parseIndexName(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		static const char	*_index_name;
+		static const char	*_index_name_database;
+		static const char	*_index_name_schema;
+		static const char	*_index_name_index;
 		bool	parseIndexType(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);

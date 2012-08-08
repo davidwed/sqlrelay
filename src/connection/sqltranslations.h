@@ -15,6 +15,14 @@ using namespace rudiments;
 class sqlrconnection_svr;
 class sqlrcursor_svr;
 
+class databaseobject {
+	public:
+		bool	operator==(const databaseobject &dbo);
+		const char	*database;
+		const char	*schema;
+		const char	*object;
+};
+
 class sqltranslations {
 	public:
 			sqltranslations();
@@ -25,15 +33,30 @@ class sqltranslations {
 						sqlrcursor_svr *sqlrcur,
 						xmldom *querytree);
 
-		bool	getReplacementTableName(const char *oldname,
-							const char **newname);
-		bool	getReplacementIndexName(const char *oldname,
-							const char **newname);
+		bool	getReplacementTableName(const char *database,
+						const char *schema,
+						const char *oldname,
+						const char **newname);
+		bool	getReplacementIndexName(const char *database,
+						const char *schema,
+						const char *oldname,
+						const char **newname);
+		databaseobject *createDatabaseObject(memorypool *pool,
+						const char *database,
+						const char *schema,
+						const char *object);
 
 		void	endSession();
 	private:
 		void		unloadTranslations();
 		sqltranslation	*loadTranslation(xmldomnode *translation);
+
+		bool	getReplacementName(
+				dictionary< databaseobject *, char *> *dict,
+				const char *database,
+				const char *schema,
+				const char *oldname,
+				const char **newname);
 		
 		xmldom				*xmld;
 		xmldom				*tree;
@@ -68,8 +91,8 @@ class sqltranslations {
 
 		memorypool	*temptablepool;
 		memorypool	*tempindexpool;
-		namevaluepairs	temptablemap;
-		namevaluepairs	tempindexmap;
+		dictionary< databaseobject *, char * >	temptablemap;
+		dictionary< databaseobject *, char * >	tempindexmap;
 };
 
 #endif

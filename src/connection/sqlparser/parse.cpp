@@ -197,12 +197,75 @@ bool sqlparser::parseTableName(xmldomnode *currentnode,
 					const char **newptr) {
 	debugFunction();
 	char	*tablename=getWord(ptr,newptr);
-	newNode(currentnode,_table_name,tablename);
+	splitDatabaseObjectName(currentnode,
+				tablename,
+				_table_name_database,
+				_table_name_schema,
+				_table_name_table);
 	delete[] tablename;
 	return true;
 }
 
-const char *sqlparser::_table_name="table_name";
+const char *sqlparser::_table_name_database="table_name_database";
+const char *sqlparser::_table_name_schema="table_name_schema";
+const char *sqlparser::_table_name_table="table_name_table";
+
+void sqlparser::splitDatabaseObjectName(xmldomnode *currentnode,
+						const char *name,
+						const char *databasetag,
+						const char *schematag,
+						const char *objecttag) {
+	debugFunction();
+
+	// split the name
+	char		**parts;
+	uint64_t	count;
+	charstring::split(name,".",true,&parts,&count);
+
+	char	*db=NULL;
+	char	*schema=NULL;
+	char	*object=NULL;
+
+	// combine initial parts into db name
+	uint64_t	start=0;
+	if (count>3) {
+		stringbuffer	dbstr;
+		for (start=0; start<count-2; start++) {
+			if (start) {
+				dbstr.append('.');
+			}
+			dbstr.append(parts[start]);
+		}
+		db=dbstr.detachString();
+	} else if (count>2) {
+		db=parts[start++];
+	}
+
+	// set schema, object names
+	if (count>1) {
+		schema=parts[start++];
+	}
+	if (count>0) {
+		object=parts[start++];
+	}
+
+	// create nodes for each part
+	if (db) {
+		newNode(currentnode,databasetag,db);
+	}
+	if (schema) {
+		newNode(currentnode,schematag,schema);
+	}
+	if (object) {
+		newNode(currentnode,objecttag,object);
+	}
+
+	// clean up
+	for (uint64_t i=0; i<count; i++) {
+		delete[] parts[i];
+	}
+	delete[] parts;
+}
 
 bool sqlparser::parseName(xmldomnode *currentnode,
 					const char *ptr,

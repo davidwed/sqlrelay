@@ -1054,12 +1054,18 @@ bool sqlparser::parseIndexName(xmldomnode *currentnode,
 					const char **newptr) {
 	debugFunction();
 	char	*indexname=getWord(ptr,newptr);
-	newNode(currentnode,_index_name,indexname);
+	splitDatabaseObjectName(currentnode,
+				indexname,
+				_index_name_database,
+				_index_name_schema,
+				_index_name_index);
 	delete[] indexname;
 	return true;
 }
 
-const char *sqlparser::_index_name="index_name";
+const char *sqlparser::_index_name_database="index_name_database";
+const char *sqlparser::_index_name_schema="index_name_schema";
+const char *sqlparser::_index_name_index="index_name_index";
 
 bool sqlparser::parseIndexType(xmldomnode *currentnode,
 					const char *ptr,

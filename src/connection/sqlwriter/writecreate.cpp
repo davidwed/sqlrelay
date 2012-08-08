@@ -252,7 +252,25 @@ bool sqlwriter::index(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlwriter::indexName(xmldomnode *node, stringbuffer *output) {
+bool sqlwriter::indexNameDatabase(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		period(output);
+	}
+	return true;
+}
+
+bool sqlwriter::indexNameSchema(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		period(output);
+	}
+	return true;
+}
+
+bool sqlwriter::indexNameIndex(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	return true;

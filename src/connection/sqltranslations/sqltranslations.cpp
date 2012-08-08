@@ -17,6 +17,16 @@
 #include <rudiments/process.h>
 #include <rudiments/character.h>
 
+bool databaseobject::operator==(const databaseobject &dbo) {
+printf("-------\n");
+printf("db: %s==%s\n",database,dbo.database);
+printf("sc: %s==%s\n",schema,dbo.schema);
+printf("tb: %s==%s\n\n",object,dbo.object);
+	return !charstring::compare(database,dbo.database) &&
+		!charstring::compare(schema,dbo.schema) &&
+		!charstring::compare(object,dbo.object);
+}
+
 sqltranslations::sqltranslations() {
 	debugFunction();
 	xmld=NULL;
@@ -248,12 +258,89 @@ bool sqltranslations::isString(const char *value) {
 			(value[0]=='"' && value[length-1]=='"'));
 }
 
-bool	sqltranslations::getReplacementTableName(const char *oldname,
+bool	sqltranslations::getReplacementTableName(const char *database,
+						const char *schema,
+						const char *oldname,
 						const char **newname) {
-	return temptablemap.getData((char *)oldname,(char **)newname);
+		return getReplacementName(&temptablemap,
+						database,schema,
+						oldname,newname);
 }
 
-bool	sqltranslations::getReplacementIndexName(const char *oldname,
+bool	sqltranslations::getReplacementIndexName(const char *database,
+						const char *schema,
+						const char *oldname,
 						const char **newname) {
-	return tempindexmap.getData((char *)oldname,(char **)newname);
+		return getReplacementName(&tempindexmap,
+						database,schema,
+						oldname,newname);
+}
+
+bool	sqltranslations::getReplacementName(
+				dictionary< databaseobject *, char *> *dict,
+				const char *database,
+				const char *schema,
+				const char *oldname,
+				const char **newname) {
+
+	*newname=NULL;
+	for (dictionarylistnode< databaseobject *, char * > *node=
+					dict->getList()->getFirstNode();
+		node;
+		node=(dictionarylistnode< databaseobject *, char *> *)
+							node->getNext()) {
+
+		databaseobject	*dbo=node->getData()->getKey();
+		if (!charstring::compare(dbo->database,database) &&
+			!charstring::compare(dbo->schema,schema) &&
+			!charstring::compare(dbo->object,oldname)) {
+			*newname=node->getData()->getData();
+			return true;
+		}
+	}
+	return false;
+}
+
+databaseobject *sqltranslations::createDatabaseObject(memorypool *pool,
+						const char *database,
+						const char *schema,
+						const char *object) {
+
+	// initialize copy pointers
+	char	*databasecopy=NULL;
+	char	*schemacopy=NULL;
+	char	*objectcopy=NULL;
+
+	// create buffers and copy data into them
+	if (database) {
+		databasecopy=(char *)pool->malloc(
+				charstring::length(database)+1);
+		charstring::copy(databasecopy,database);
+	}
+	if (schema) {
+		schemacopy=(char *)pool->malloc(
+				charstring::length(schema)+1);
+		charstring::copy(schemacopy,schema);
+	}
+	if (object) {
+		objectcopy=(char *)pool->malloc(
+				charstring::length(object)+1);
+		charstring::copy(objectcopy,object);
+	}
+
+	// create the databaseobject
+	databaseobject	*dbo=
+		(databaseobject *)pool->malloc(sizeof(databaseobject));
+
+
+	// populate it
+	// (if placement new worked as expected on all platforms, we wouldn't
+	// need to do this, we could pass them into the constructor or
+	// use setters or something...)
+	dbo->database=databasecopy;
+	dbo->schema=schemacopy;
+	dbo->object=objectcopy;
+
+	// return it
+	return dbo;
 }

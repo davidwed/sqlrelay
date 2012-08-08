@@ -19,6 +19,8 @@ class droptableautoincrementoracle : public sqltrigger {
 	private:
 		bool	dropSequences(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
+						const char *database,
+						const char *schema,
 						const char *tablename);
 		bool	dropSequence(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,

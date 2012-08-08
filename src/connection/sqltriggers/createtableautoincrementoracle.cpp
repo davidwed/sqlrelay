@@ -38,12 +38,18 @@ bool createtableautoincrementoracle::run(sqlrconnection_svr *sqlrcon,
 		return false;
 	}
 
+	// table name database and schema...
+	node=tablenode->getFirstTagChild(sqlparser::_table_name_database);
+	const char	*database=node->getAttributeValue(sqlparser::_value);
+	node=tablenode->getFirstTagChild(sqlparser::_table_name_schema);
+	const char	*schema=node->getAttributeValue(sqlparser::_value);
+
 	// table name...
-	node=tablenode->getFirstTagChild(sqlparser::_table_name);
+	node=tablenode->getFirstTagChild(sqlparser::_table_name_table);
 	if (node->isNullNode()) {
 		return false;
 	}
-	const char	*tablename=node->getAttributeValue(sqlparser::_value);
+	const char	*table=node->getAttributeValue(sqlparser::_value);
 
 	// columns
 	node=tablenode->getFirstTagChild(sqlparser::_columns);
@@ -82,7 +88,8 @@ bool createtableautoincrementoracle::run(sqlrconnection_svr *sqlrcon,
 		const char	*columnname=
 				namenode->getAttributeValue(sqlparser::_value);
 
-		createSequenceAndTrigger(sqlrcon,sqlrcur,tablename,columnname);
+		createSequenceAndTrigger(sqlrcon,sqlrcur,
+					database,schema,table,columnname);
 	}
 
 	return true;
@@ -91,7 +98,9 @@ bool createtableautoincrementoracle::run(sqlrconnection_svr *sqlrcon,
 bool createtableautoincrementoracle::createSequenceAndTrigger(
 						sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
-						const char *tablename,
+						const char *database,
+						const char *schema,
+						const char *table,
 						const char *columnname) {
 	debugFunction();
 
@@ -107,13 +116,25 @@ bool createtableautoincrementoracle::createSequenceAndTrigger(
 
 	// sequence name
 	stringbuffer	seqname;
-	seqname.append("seq_")->append(tablename);
+	if (database) {
+		seqname.append(database)->append('.');
+	}
+	if (schema) {
+		seqname.append(schema)->append('.');
+	}
+	seqname.append("seq_")->append(table);
 	seqname.append('_')->append(columnname);
 
 	// query to add the sequence to the map table
 	query.clear();
 	query.append("insert into autoincrement_sequences values ('");
-	query.append(tablename);
+	if (database) {
+		query.append(database)->append('.');
+	}
+	if (schema) {
+		query.append(schema)->append('.');
+	}
+	query.append(table);
 	query.append("','");
 	query.append(seqname.getString());
 	query.append("')");
@@ -136,7 +157,13 @@ bool createtableautoincrementoracle::createSequenceAndTrigger(
 
 	// trigger name
 	stringbuffer	trgname;
-	trgname.append("trg_")->append(tablename);
+	if (database) {
+		trgname.append(database)->append('.');
+	}
+	if (schema) {
+		trgname.append(schema)->append('.');
+	}
+	trgname.append("trg_")->append(table);
 	trgname.append('_')->append(columnname);
 
 	// query to create the trigger
@@ -144,7 +171,7 @@ bool createtableautoincrementoracle::createSequenceAndTrigger(
 	query.append("create or replace trigger ");
 	query.append(trgname.getString());
 	query.append(" before insert on ");
-	query.append(tablename);
+	query.append(table);
 	query.append(" for each row ");
 	query.append("	declare ");
 	query.append("		v_newval number(12) := 0; ");

@@ -19,7 +19,9 @@ class createtableautoincrementoracle : public sqltrigger {
 	private:
 		bool	createSequenceAndTrigger(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
-						const char *tablename,
+						const char *database,
+						const char *schema,
+						const char *table,
 						const char *columnname);
 		bool	runQuery(sqlrconnection_svr *sqlrcon,
 						const char *query,

@@ -23,6 +23,7 @@ temptableslocalize::temptableslocalize(sqltranslations *sqlts,
 bool temptableslocalize::run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree) {
+	debugFunction();
 
 	// get the unique id
 	const char	*uniqueid=parameters->getAttributeValue("uniqueid");
@@ -48,6 +49,7 @@ void temptableslocalize::mapCreateTemporaryTableName(
 						sqlrconnection_svr *sqlrcon,
 						xmldomnode *node,
 						const char *uniqueid) {
+	debugFunction();
 
 	// create...
 	node=node->getFirstTagChild(sqlparser::_create);
@@ -64,29 +66,32 @@ void temptableslocalize::mapCreateTemporaryTableName(
 	xmldomnode	*temporarynode=node;
 
 	// table...
-	node=node->getNextTagSibling(sqlparser::_table);
-	if (node->isNullNode()) {
+	xmldomnode	*tablenode=node->getNextTagSibling(sqlparser::_table);
+	if (tablenode->isNullNode()) {
 		return;
 	}
-	xmldomnode	*tablenode=node;
+
+	// table database...
+	node=tablenode->getFirstTagChild(sqlparser::_table_name_database);
+	const char	*database=node->getAttributeValue(sqlparser::_value);
+
+	// table schema...
+	node=tablenode->getFirstTagChild(sqlparser::_table_name_schema);
+	const char	*schema=node->getAttributeValue(sqlparser::_value);
 
 	// table name...
-	node=node->getFirstTagChild(sqlparser::_table_name);
+	node=tablenode->getFirstTagChild(sqlparser::_table_name_table);
 	if (node->isNullNode()) {
 		return;
 	}
+	const char	*oldtable=node->getAttributeValue(sqlparser::_value);
 
 	// create a session-local name and put it in the map...
-	const char	*oldtablename=
-			node->getAttributeValue(sqlparser::_value);
-	uint64_t	size=charstring::length(oldtablename)+1;
-	char		*oldtablenamecopy=
-			(char *)sqlts->temptablepool->malloc(size);
-	charstring::copy(oldtablenamecopy,oldtablename);
-	const char	*newtablename=
-			generateTempTableName(oldtablename,uniqueid);
-	sqlts->temptablemap.setData((char *)oldtablenamecopy,
-					(char *)newtablename);
+	databaseobject	*oldtabledbo=sqlts->createDatabaseObject(
+						sqlts->temptablepool,
+						database,schema,oldtable);
+	const char	*newtable=generateTempTableName(oldtable,uniqueid);
+	sqlts->temptablemap.setData(oldtabledbo,(char *)newtable);
 
 	// remove the temporary qualifier
 	createnode->deleteChild(temporarynode);
@@ -99,23 +104,36 @@ void temptableslocalize::mapCreateTemporaryTableName(
 	}
 
 	// add table name to drop-at-session-end list
-	sqlrcon->addSessionTempTableForDrop(newtablename);
+	sqlrcon->addSessionTempTableForDrop(newtable);
 }
 
-const char *temptableslocalize::generateTempTableName(const char *oldname,
+const char *temptableslocalize::generateTempTableName(const char *oldtable,
 							const char *uniqueid) {
+	debugFunction();
 
+	// get the process id
 	uint64_t	pid=process::getProcessId();
-	uint64_t	size=charstring::length(oldname)+1+
+
+	// calculate the size we need to store the new table name
+	uint64_t	size=charstring::length(oldtable)+1+
 				charstring::length(uniqueid)+1+
 				charstring::integerLength(pid)+1;
-	char	*newname=(char *)sqlts->temptablepool->malloc(size);
-	snprintf(newname,size,"%s_%s_%lld",oldname,uniqueid,(long long)pid);
-	return newname;
+
+	// allocate storage for the new table name
+	char	*newtable=(char *)sqlts->temptablepool->malloc(size);
+
+	// build up the new table name
+	charstring::copy(newtable,oldtable);
+	charstring::append(newtable,"_");
+	charstring::append(newtable,uniqueid);
+	charstring::append(newtable,"_");
+	charstring::append(newtable,pid);
+	return newtable;
 }
 
 void temptableslocalize::mapCreateIndexOnTemporaryTableName(xmldomnode *node,
 							const char *uniqueid) {
+	debugFunction();
 
 	// create...
 	node=node->getFirstTagChild(sqlparser::_create);
@@ -124,71 +142,139 @@ void temptableslocalize::mapCreateIndexOnTemporaryTableName(xmldomnode *node,
 	}
 
 	// index...
-	node=node->getFirstTagChild(sqlparser::_index);
-	if (node->isNullNode()) {
+	xmldomnode	*indexnode=node->getFirstTagChild(sqlparser::_index);
+	if (indexnode->isNullNode()) {
 		return;
 	}
+
+	// index database...
+	node=indexnode->getFirstTagChild(sqlparser::_index_name_database);
+	const char	*indexdatabase=
+			node->getAttributeValue(sqlparser::_value);
+
+	// index schema...
+	node=indexnode->getFirstTagChild(sqlparser::_index_name_schema);
+	const char	*indexschema=
+			node->getAttributeValue(sqlparser::_value);
 
 	// index name...
-	xmldomnode	*indexnamenode=
-			node->getFirstTagChild(sqlparser::_index_name);
-	if (indexnamenode->isNullNode()) {
-		return;
-	}
-
-	// table name...
-	node=node->getFirstTagChild(sqlparser::_table_name);
+	node=indexnode->getFirstTagChild(sqlparser::_index_name_index);
 	if (node->isNullNode()) {
 		return;
 	}
+	const char	*oldindex=node->getAttributeValue(sqlparser::_value);
+
+	// table database...
+	node=indexnode->getFirstTagChild(sqlparser::_table_name_database);
+	const char	*tabledatabase=
+			node->getAttributeValue(sqlparser::_value);
+
+	// table schema...
+	node=indexnode->getFirstTagChild(sqlparser::_table_name_schema);
+	const char	*tableschema=
+			node->getAttributeValue(sqlparser::_value);
+
+	// table name...
+	node=indexnode->getFirstTagChild(sqlparser::_table_name_table);
+	if (node->isNullNode()) {
+		return;
+	}
+	const char	*oldtable=node->getAttributeValue(sqlparser::_value);
 
 	// if the table name isn't in the temp table map then ignore this query
-	char	*newname;
-	if (!sqlts->temptablemap.getData((char *)node->getAttributeValue(
-						sqlparser::_value),&newname)) {
+	databaseobject	oldtabledbo;
+	oldtabledbo.database=tabledatabase;
+	oldtabledbo.schema=tableschema;
+	oldtabledbo.object=oldtable;
+	char		*newtable;
+	if (!sqlts->temptablemap.getData(&oldtabledbo,&newtable)) {
 		return;
 	}
 
 	// create a session-local name and put it in the map...
-	const char	*oldindexname=
-			indexnamenode->getAttributeValue(sqlparser::_value);
-	uint64_t	size=charstring::length(oldindexname)+1;
-	char		*oldindexnamecopy=
-			(char *)sqlts->tempindexpool->malloc(size);
-	charstring::copy(oldindexnamecopy,oldindexname);
-	const char	*newindexname=
-			generateTempTableName(oldindexname,uniqueid);
-	sqlts->tempindexmap.setData((char *)oldindexnamecopy,
-					(char *)newindexname);
+	databaseobject	*oldindexdbo=sqlts->createDatabaseObject(
+						sqlts->tempindexpool,
+						indexdatabase,
+						indexschema,
+						oldindex);
+	const char	*newindex=generateTempTableName(oldindex,uniqueid);
+	sqlts->tempindexmap.setData(oldindexdbo,(char *)newindex);
 }
 
 bool temptableslocalize::replaceTempNames(xmldomnode *node) {
+	debugFunction();
 
 	// if the current node is a table name
 	// then see if it needs to be replaced
-	if (!charstring::compare(node->getName(),
-					sqlparser::_table_name) ||
-		!charstring::compare(node->getName(),
-					sqlparser::_column_name_table)) {
+	bool	tablenametable=!charstring::compare(node->getName(),
+						sqlparser::_table_name_table);
+	bool	columnnametable=!charstring::compare(node->getName(),
+						sqlparser::_column_name_table);
 
-		const char	*newname=NULL;
-		const char	*value=node->getAttributeValue(
+	if (tablenametable || columnnametable) {
+printf("found a %s\n",node->getName());
+
+		// get the table name
+		const char	*table=node->getAttributeValue(
 						sqlparser::_value);
 
-		if (sqlts->getReplacementTableName(value,&newname)) {
+		// try to get the database name
+		xmldomnode	*databasenode=
+				(tablenametable)?
+				node->getPreviousTagSibling(
+					sqlparser::_table_name_database):
+				node->getPreviousTagSibling(
+					sqlparser::_column_name_database);
+		const char	*database=databasenode->getAttributeValue(
+							sqlparser::_value);
+
+		// try to get the schema name
+		xmldomnode	*schemanode=
+				(tablenametable)?
+				node->getPreviousTagSibling(
+					sqlparser::_table_name_schema):
+				node->getPreviousTagSibling(
+					sqlparser::_column_name_schema);
+		const char	*schema=schemanode->getAttributeValue(
+							sqlparser::_value);
+
+		// get the replacement table name and update it
+		const char	*newname=NULL;
+printf("db=%s  sch=%s  tab=%s\n",database,schema,table);
+		if (sqlts->getReplacementTableName(database,schema,
+							table,&newname)) {
+printf("newname=%s\n",newname);
 			node->setAttributeValue(sqlparser::_value,newname);
 		}
 	}
 
 	// if the current node is an index name
 	// then see if it needs to be replaced
-	if (!charstring::compare(node->getName(),sqlparser::_index_name)) {
+	if (!charstring::compare(node->getName(),
+					sqlparser::_index_name_index)) {
 
-		const char	*newname=NULL;
-		const char	*value=node->getAttributeValue(
+		// get the index name
+		const char	*index=node->getAttributeValue(
 						sqlparser::_value);
 
-		if (sqlts->getReplacementIndexName(value,&newname)) {
+		// try to get the database name
+		xmldomnode	*databasenode=
+				node->getPreviousTagSibling(
+					sqlparser::_index_name_database);
+		const char	*database=databasenode->getAttributeValue(
+							sqlparser::_value);
+
+		// try to get the schema name
+		xmldomnode	*schemanode=
+				node->getPreviousTagSibling(
+					sqlparser::_index_name_schema);
+		const char	*schema=schemanode->getAttributeValue(
+							sqlparser::_value);
+
+		// get the replacement index name and update it
+		const char	*newname=NULL;
+		if (sqlts->getReplacementIndexName(database,schema,
+							index,&newname)) {
 			node->setAttributeValue(sqlparser::_value,newname);
 		}
 	}

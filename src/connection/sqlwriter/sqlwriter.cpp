@@ -89,7 +89,9 @@ bool sqlwriter::write(xmldomnode *node, stringbuffer *output) {
 const char * const *sqlwriter::supportedElements() {
 	debugFunction();
 	static const char *baseelements[]={
-		sqlparser::_table_name,
+		sqlparser::_table_name_database,
+		sqlparser::_table_name_schema,
+		sqlparser::_table_name_table,
 		sqlparser::_name,
 		sqlparser::_type,
 		sqlparser::_size,
@@ -112,7 +114,9 @@ const char * const *sqlwriter::supportedElements() {
 		sqlparser::_fulltext,
 		sqlparser::_spatial,
 		sqlparser::_index,
-		sqlparser::_index_name,
+		sqlparser::_index_name_database,
+		sqlparser::_index_name_schema,
+		sqlparser::_index_name_index,
 		sqlparser::_btree,
 		sqlparser::_hash,
 
@@ -322,8 +326,15 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 	const char	*nodename=node->getName();
 
 	// generic...
-	if (!charstring::compare(nodename,sqlparser::_table_name)) {
-		return tableName(node,output);
+	if (!charstring::compare(nodename,
+					sqlparser::_table_name_database)) {
+		return tableNameDatabase(node,output);
+	} else if (!charstring::compare(nodename,
+					sqlparser::_table_name_schema)) {
+		return tableNameSchema(node,output);
+	} else if (!charstring::compare(nodename,
+					sqlparser::_table_name_table)) {
+		return tableNameTable(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_name)) {
 		return name(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_type)) {
@@ -356,8 +367,15 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return spatial(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_index)) {
 		return index(node,output);
-	} else if (!charstring::compare(nodename,sqlparser::_index_name)) {
-		return indexName(node,output);
+	} else if (!charstring::compare(nodename,
+					sqlparser::_index_name_database)) {
+		return indexNameDatabase(node,output);
+	} else if (!charstring::compare(nodename,
+					sqlparser::_index_name_schema)) {
+		return indexNameSchema(node,output);
+	} else if (!charstring::compare(nodename,
+					sqlparser::_index_name_index)) {
+		return indexNameIndex(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_btree)) {
 		return btree(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_hash)) {

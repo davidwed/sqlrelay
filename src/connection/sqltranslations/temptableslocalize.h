@@ -23,7 +23,7 @@ class temptableslocalize : public sqltranslation {
 		void		mapCreateIndexOnTemporaryTableName(
 						xmldomnode *query,
 						const char *uniqueid);
-		const char	*generateTempTableName(const char *oldname,
+		const char	*generateTempTableName(const char *oldtable,
 							const char *uniqueid);
 		bool		replaceTempNames(xmldomnode *node);
 		bool		verbatimTableReference(xmldomnode *node);

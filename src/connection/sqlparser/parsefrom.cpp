@@ -91,7 +91,11 @@ bool sqlparser::parseTableReference(xmldomnode *currentnode,
 
 	// create the nodes
 	xmldomnode	*tablerefnode=newNode(currentnode,_table_reference);
-	newNode(tablerefnode,_table_name,word);
+	splitDatabaseObjectName(tablerefnode,
+				word,
+				_table_name_database,
+				_table_name_schema,
+				_table_name_table);
 
 	// alias
 	parseSubSelectAlias(tablerefnode,*newptr,newptr);
