@@ -262,6 +262,7 @@ bool	sqltranslations::getReplacementTableName(const char *database,
 						const char *schema,
 						const char *oldname,
 						const char **newname) {
+printf("\nreplacement table:\n");
 		return getReplacementName(&temptablemap,
 						database,schema,
 						oldname,newname);
@@ -271,6 +272,7 @@ bool	sqltranslations::getReplacementIndexName(const char *database,
 						const char *schema,
 						const char *oldname,
 						const char **newname) {
+printf("\nreplacement index:\n");
 		return getReplacementName(&tempindexmap,
 						database,schema,
 						oldname,newname);
@@ -291,6 +293,10 @@ bool	sqltranslations::getReplacementName(
 							node->getNext()) {
 
 		databaseobject	*dbo=node->getData()->getKey();
+printf("=========\n");
+printf("%s=%s\n",database,dbo->database);
+printf("%s=%s\n",schema,dbo->schema);
+printf("%s=%s\n\n",oldname,dbo->object);
 		if (!charstring::compare(dbo->database,database) &&
 			!charstring::compare(dbo->schema,schema) &&
 			!charstring::compare(dbo->object,oldname)) {

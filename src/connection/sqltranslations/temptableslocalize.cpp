@@ -182,12 +182,9 @@ void temptableslocalize::mapCreateIndexOnTemporaryTableName(xmldomnode *node,
 	const char	*oldtable=node->getAttributeValue(sqlparser::_value);
 
 	// if the table name isn't in the temp table map then ignore this query
-	databaseobject	oldtabledbo;
-	oldtabledbo.database=tabledatabase;
-	oldtabledbo.schema=tableschema;
-	oldtabledbo.object=oldtable;
-	char		*newtable;
-	if (!sqlts->temptablemap.getData(&oldtabledbo,&newtable)) {
+	const char	*newtable=NULL;
+	if (!sqlts->getReplacementTableName(tabledatabase,tableschema,
+						oldtable,&newtable)) {
 		return;
 	}
 
@@ -212,7 +209,6 @@ bool temptableslocalize::replaceTempNames(xmldomnode *node) {
 						sqlparser::_column_name_table);
 
 	if (tablenametable || columnnametable) {
-printf("found a %s\n",node->getName());
 
 		// get the table name
 		const char	*table=node->getAttributeValue(
@@ -240,10 +236,8 @@ printf("found a %s\n",node->getName());
 
 		// get the replacement table name and update it
 		const char	*newname=NULL;
-printf("db=%s  sch=%s  tab=%s\n",database,schema,table);
 		if (sqlts->getReplacementTableName(database,schema,
 							table,&newname)) {
-printf("newname=%s\n",newname);
 			node->setAttributeValue(sqlparser::_value,newname);
 		}
 	}
@@ -252,6 +246,7 @@ printf("newname=%s\n",newname);
 	// then see if it needs to be replaced
 	if (!charstring::compare(node->getName(),
 					sqlparser::_index_name_index)) {
+printf("found a %s\n",node->getName());
 
 		// get the index name
 		const char	*index=node->getAttributeValue(
@@ -273,8 +268,10 @@ printf("newname=%s\n",newname);
 
 		// get the replacement index name and update it
 		const char	*newname=NULL;
+printf("db=%s  sch=%s  ind=%s\n",database,schema,index);
 		if (sqlts->getReplacementIndexName(database,schema,
 							index,&newname)) {
+printf("newname=%s\n",newname);
 			node->setAttributeValue(sqlparser::_value,newname);
 		}
 	}
