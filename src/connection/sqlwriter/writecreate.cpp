@@ -301,3 +301,27 @@ bool sqlwriter::forClause(xmldomnode *node, stringbuffer *output) {
 	output->append("for ");
 	return true;
 }
+
+bool sqlwriter::objectNameDatabase(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		period(output);
+	}
+	return true;
+}
+
+bool sqlwriter::objectNameSchema(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		period(output);
+	}
+	return true;
+}
+
+bool sqlwriter::objectNameObject(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}

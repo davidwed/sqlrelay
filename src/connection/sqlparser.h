@@ -365,6 +365,12 @@ class sqlparser {
 						const char **newptr);
 		bool	forClause(const char *ptr, const char **newptr);
 		static const char	*_for;
+		bool	parseDatabaseObjectName(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		static const char	*_object_name_database;
+		static const char	*_object_name_schema;
+		static const char	*_object_name_object;
 
 
 		// drop query...

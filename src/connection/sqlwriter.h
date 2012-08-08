@@ -98,6 +98,12 @@ class sqlwriter {
 						stringbuffer *output);
 		virtual bool	forClause(xmldomnode *node,
 						stringbuffer *output);
+		virtual bool	objectNameDatabase(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	objectNameSchema(xmldomnode *node,
+						stringbuffer *output);
+		virtual bool	objectNameObject(xmldomnode *node,
+						stringbuffer *output);
 		
 
 		// column definitions...

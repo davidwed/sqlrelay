@@ -1169,7 +1169,7 @@ bool sqlparser::parseCreateSynonym(xmldomnode *currentnode,
 	xmldomnode	*synonymnode=newNode(currentnode,_synonym);
 
 	// synonym name
-	if (!parseName(synonymnode,*newptr,newptr)) {
+	if (!parseDatabaseObjectName(synonymnode,*newptr,newptr)) {
 		debugPrintf("missing object name\n");
 		error=true;
 		return false;
@@ -1183,7 +1183,7 @@ bool sqlparser::parseCreateSynonym(xmldomnode *currentnode,
 	}
 
 	// original object name
-	if (!parseName(synonymnode,*newptr,newptr)) {
+	if (!parseDatabaseObjectName(synonymnode,*newptr,newptr)) {
 		debugPrintf("missing object name\n");
 		error=true;
 		return false;
@@ -1198,6 +1198,24 @@ bool sqlparser::synonymClause(const char *ptr, const char **newptr) {
 }
 
 const char *sqlparser::_synonym="synonym";
+
+bool sqlparser::parseDatabaseObjectName(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+	char	*objectname=getWord(ptr,newptr);
+	splitDatabaseObjectName(currentnode,
+				objectname,
+				_object_name_database,
+				_object_name_schema,
+				_object_name_object);
+	delete[] objectname;
+	return true;
+}
+
+const char *sqlparser::_object_name_database="object_name_database";
+const char *sqlparser::_object_name_schema="object_name_schema";
+const char *sqlparser::_object_name_object="object_name_object";
 
 bool sqlparser::parseFor(xmldomnode *currentnode,
 						const char *ptr,
