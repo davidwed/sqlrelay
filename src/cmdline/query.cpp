@@ -54,7 +54,8 @@ int main(int argc, const char **argv) {
 		user=argv[4];
 		password=argv[5];
 		query=argv[6];
-		if (argv[7] && !charstring::compare(argv[7],"debug")) {
+		if (argc>7 && argv[7] &&
+			!charstring::compare(argv[7],"debug")) {
 			debug=true;
 		}
 
@@ -71,11 +72,9 @@ int main(int argc, const char **argv) {
 			user=currentnode->getUser();
 			password=currentnode->getPassword();
 
-			// find the query and optional debug
-			debug=cmdline.found("debug");
-
 			// find the query
-			for (int i=1; i<argc; i++) {
+			int	i=1;
+			for (; i<argc; i++) {
 				if (argv[i][0]=='-') {
 					i++;
 					continue;
@@ -85,6 +84,12 @@ int main(int argc, const char **argv) {
 				}
 				query=argv[i];
 				break;
+			}
+
+			// find the optional debug flag
+			if (argc>(i+1) && argv[i+1] &&
+				!charstring::compare(argv[i+1],"debug")) {
+				debug=true;
 			}
 		} else {
 			process::exit(1);
