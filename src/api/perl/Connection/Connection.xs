@@ -5,6 +5,14 @@
 
 #include "perlincludes.h"
 
+/* xsubpp outputs __attribute__((noreturn)) this isn't
+ * understood by gcc < 3.0. */
+#ifdef __GNUC__
+	#if __GNUC__ < 3
+		#define __attribute__(x)
+	#endif
+#endif
+
 typedef class sqlrconnection sqlrconnection;
 
 MODULE = SQLRelay::Connection	PACKAGE = SQLRelay::Connection
