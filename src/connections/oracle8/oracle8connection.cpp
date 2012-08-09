@@ -389,9 +389,10 @@ bool oracle8connection::logIn(bool printerrors) {
 	if (OCIServerVersion((dvoid *)svc,err,
 				(text *)versionbuf,sizeof(versionbuf),
 				OCI_HTYPE_SVCCTX)==OCI_SUCCESS &&
-			(!charstring::compare(versionbuf,"Oracle8i ",9) ||
-			!charstring::compare(versionbuf,"Oracle9i ",9) ||
-			!charstring::compare(versionbuf,"Oracle10g ",10))) {
+			(charstring::contains(versionbuf,"8i ") ||
+			charstring::contains(versionbuf,"9i ") ||
+			charstring::compare(versionbuf,"10g ") ||
+			charstring::compare(versionbuf,"11g "))) {
 		supportsproxycredentials=true;
 	}
 #endif
