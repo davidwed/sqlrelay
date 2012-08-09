@@ -13,6 +13,14 @@
 	#define sv_undef PL_sv_undef
 #endif
 
+/* xsubpp outputs __attribute__((noreturn)) this isn't
+ * understood by gcc < 3.0. */
+#ifdef __GNUC__
+	#if __GNUC__ < 3
+		#define __attribute__(x)
+	#endif
+#endif
+
 typedef class sqlrcursor sqlrcursor;
 
 MODULE = SQLRelay::Cursor		PACKAGE = SQLRelay::Cursor
