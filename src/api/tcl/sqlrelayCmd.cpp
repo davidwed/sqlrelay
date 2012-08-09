@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.cpp,v 1.4 2012-06-01 19:23:05 mused Exp $
+ * $Id: sqlrelayCmd.cpp,v 1.5 2012-08-09 03:35:54 mused Exp $
  */
 
 #include <tcl.h>
@@ -1860,6 +1860,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     "commit",
     "rollback",
     "errorMessage",
+    "errorNumber",
     "debug",
     "sqlrcur",
   };
