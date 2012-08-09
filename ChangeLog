@@ -27,6 +27,7 @@
 	added javac compile test to configure script
 	fixed an __attribute__ problem that could occur if perl was compiled
 		with gcc>2.95 but used on a system with only gcc-2.95 available
+	fixed an oustanding tcl bug that caused cursors not to be created
 
 0.45 - added trigger framework
 	added support for getting the native database error number
