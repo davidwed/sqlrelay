@@ -44,12 +44,13 @@ bool doublequotestosinglequotes::replaceDoubleQuotes(xmldomnode *node) {
 		// unescaping escaped double quotes and escaping single quotes
 		stringbuffer	newvalue;
 		newvalue.append('\'');
+		const char	*start=value+1;
 		const char	*end=value+valuelength-2;
-		for (const char *c=value+1; c<=end; c++) {
-			if (*c=='\\' && *(c+1)=='"') {
+		for (const char *c=start; c<=end; c++) {
+			if (c<end && *c=='"' && *(c+1)=='"') {
 				c++;
 			} else if (*c=='\'') {
-				newvalue.append('\\');
+				newvalue.append('\'');
 			}
 			newvalue.append(*c);
 		}

@@ -19,6 +19,9 @@ class sqlparser {
 		xmldom	*detachTree();
 
 	private:
+		bool	parseInternal(const char *query,
+					bool useescapecharacters);
+
 		char	*cleanQuery(const char *query);
 
 		bool	comparePart(const char *ptr,
@@ -977,6 +980,8 @@ class sqlparser {
 
 		xmldom	*tree;
 		bool	error;
+
+		bool	useescapecharacters;
 };
 
 #endif

@@ -703,7 +703,19 @@ char *sqlrsh::getWild(const char *command) {
 	if (!endptr) {
 		return NULL;
 	}
-	return charstring::duplicate(wildptr,endptr-wildptr);
+
+	// unescape single quotes
+	stringbuffer	output;
+	for (const char *ch=wildptr; ch<endptr; ch++) {
+printf("%c\n",*ch);
+		if (*ch=='\'' && *(ch+1)=='\'') {
+			ch++;
+		}
+		output.append(*ch);
+	}
+printf("wild: %s\n",output.getString());
+
+	return output.detachString();
 }
 
 char *sqlrsh::getTable(querytype_t querytype, const char *command) {

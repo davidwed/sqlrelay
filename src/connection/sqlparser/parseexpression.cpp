@@ -489,6 +489,13 @@ bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
 		// parse parameters
 		for (;;) {
 
+			// bail if we ran off the end of the string
+			if (!(**newptr)) {
+				debugPrintf("ran off the end of the string\n");	
+				error=true;
+				return false;
+			}
+
 			// bail when we find a right paren
 			if (rightParen(*newptr,newptr)) {
 

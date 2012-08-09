@@ -5,10 +5,6 @@
 
 #include <sqlrconnection.h>
 
-char sqlrcursor_svr::escapeChar() {
-	return '\\';
-}
-
 void sqlrcursor_svr::setFakeInputBindsForThisQuery(bool fake) {
 	fakeinputbindsforthisquery=fake;
 }
@@ -121,8 +117,6 @@ void sqlrcursor_svr::performSubstitution(stringbuffer *buffer, int16_t index) {
 	if (inbindvars[index].type==STRING_BIND ||
 		inbindvars[index].type==CLOB_BIND) {
 
-		char	escchar=escapeChar();
-
 		buffer->append("'");
 
 		size_t	length=inbindvars[index].valuesize;
@@ -131,10 +125,13 @@ void sqlrcursor_svr::performSubstitution(stringbuffer *buffer, int16_t index) {
 
 			char	ch=inbindvars[index].value.stringval[ind];
 
-			// escape quotes, the escape char and NULL's
-			if (ch=='\'' || ch==escchar) {
-				buffer->append(escchar);
+			// escape quotes and NULL's
+			if (ch=='\'') {
+				buffer->append('\'');
 			} else if (ch=='\0') {
+				// FIXME: I assume this is how NULL's should
+				// be escaped, but I'm not really sure for
+				// all db's...
 				buffer->append("\\0");
 			}
 			buffer->append(ch);

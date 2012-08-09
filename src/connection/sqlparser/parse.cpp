@@ -104,8 +104,8 @@ char *sqlparser::getVerbatim(const char *ptr, const char **newptr) {
 	stringbuffer	verbatim;
 
 	// set state flags
-	bool		inquotes=false;
-	bool		indoublequotes=false;
+	bool	inquotes=false;
+	bool	indoublequotes=false;
 
 	// initialize the location
 	const char	*chr=*newptr;
@@ -129,9 +129,14 @@ char *sqlparser::getVerbatim(const char *ptr, const char **newptr) {
 			break;
 		}
 
-		// if we're in quotes and we hit an escape character
-		// then blindly append the next character and move on
-		if ((inquotes || indoublequotes) && *chr=='\\') {
+		// if we encounter an escaped sequence then
+		// append the entire escaped sequence and move on
+		if ((useescapecharacters &&
+			(inquotes || indoublequotes) &&
+				*chr=='\\' && *(chr+1)) ||
+			(inquotes && *chr=='\'' && *(chr+1)=='\'') ||
+			(indoublequotes && *chr=='"' && *(chr+1)=='"')) {
+			verbatim.append(*chr);
 			chr++;
 			verbatim.append(*chr);
 			chr++;
@@ -161,7 +166,14 @@ char *sqlparser::getVerbatim(const char *ptr, const char **newptr) {
 }
 
 bool sqlparser::parse(const char *query) {
+	return parseInternal(query,true) || parseInternal(query,false);
+}
+
+bool sqlparser::parseInternal(const char *query, bool useescapecharacters) {
 	debugFunction();
+
+	// set the useescapecharacters flag
+	this->useescapecharacters=useescapecharacters;
 
 	// initialze error status
 	error=false;
@@ -187,6 +199,10 @@ bool sqlparser::parse(const char *query) {
 		error=true;
 	}
 	delete[] ptr;
+
+	printf("parse %susing escape characters %s\n\n",
+				(useescapecharacters)?"":"without ",
+				(error)?"failed":"succeeded");
 
 	// return result
 	return !error;

@@ -190,7 +190,6 @@ class sqlrcursor_svr {
 		virtual void		cleanUpLobField(uint32_t col);
 		virtual	void		cleanUpData(bool freeresult,
 							bool freebinds);
-		virtual	char		escapeChar();
 
 		virtual bool		translateQuery();
 

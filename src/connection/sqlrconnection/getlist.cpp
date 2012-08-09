@@ -170,10 +170,10 @@ void sqlrconnection_svr::escapeParameter(stringbuffer *buffer,
 		return;
 	}
 
-	// escape single quotes and slashes
+	// escape single quotes
 	for (const char *ptr=parameter; *ptr; ptr++) {
-		if (*ptr=='\'' || *ptr=='\\') {
-			buffer->append('\\');
+		if (*ptr=='\'') {
+			buffer->append('\'');
 		}
 		buffer->append(*ptr);
 	}
