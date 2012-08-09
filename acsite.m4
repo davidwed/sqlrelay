@@ -2659,7 +2659,7 @@ public class conftest {
 	}
 }
 EOF
-		$JAVAC conftest.java
+		$JAVAC conftest.java 2> /dev/null
 		if ( test -r "conftest.class" )
 		then
 			AC_MSG_RESULT(yes)

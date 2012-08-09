@@ -29217,7 +29217,7 @@ public class conftest {
 	}
 }
 EOF
-		$JAVAC conftest.java
+		$JAVAC conftest.java 2> /dev/null
 		if ( test -r "conftest.class" )
 		then
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
