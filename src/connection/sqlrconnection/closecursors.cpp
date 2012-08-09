@@ -11,7 +11,8 @@ void sqlrconnection_svr::closeCursors(bool destroy) {
 		while (cursorcount) {
 			cursorcount--;
 
-			dbgfile.debugPrint("connection",1,cursorcount);
+			dbgfile.debugPrint("connection",1,
+						(uint32_t)cursorcount);
 
 			if (cur[cursorcount]) {
 				cur[cursorcount]->cleanUpData(true,true);
