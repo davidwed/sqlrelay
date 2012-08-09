@@ -29208,6 +29208,30 @@ fi
 
 	if ( test -n "$HAVE_JAVA" )
 	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $JAVAC works" >&5
+$as_echo_n "checking whether $JAVAC works... " >&6; }
+		cat << EOF > conftest.java
+public class conftest {
+	public static void main(String args) {
+		System.out.println("hello world");
+	}
+}
+EOF
+		$JAVAC conftest.java
+		if ( test -r "conftest.class" )
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+			rm -f conftest.class
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+			HAVE_JAVA=""
+		fi
+	fi
+
+	if ( test -n "$HAVE_JAVA" )
+	then
 
 SAVECPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$JAVAINCLUDES"
