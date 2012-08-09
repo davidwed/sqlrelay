@@ -171,6 +171,19 @@ bool oracle8connection::logIn(bool printerrors) {
 		}
 	}
 
+	// handle error reading tnsnames.ora
+	if (!sidtnsnameformat) {
+		if (!charstring::length(home)) {
+			home=environment::getValue("ORACLE_HOME");
+		}
+		char	*tnsnamesora=new char[charstring::length(home)+28];
+		charstring::copy(tnsnamesora,home);
+		charstring::append(tnsnamesora,"/network/admin/tnsnames.ora");
+		if (!file::readable(tnsnamesora)) {
+			fprintf(stderr,"Warning: %s/tnsnames.ora is not readable by %s:%s\n",home,cfgfl->getRunAsUser(),cfgfl->getRunAsGroup());
+		}
+	}
+
 	// handle NLS_LANG
 	if (nlslang) {
 		if (!environment::setValue("NLS_LANG",nlslang)) {
