@@ -711,6 +711,8 @@ WALL
 WNOLONGDOUBLE
 PIPE
 PS
+TRANSLATIONPLUGINLIBS
+TRIGGERPLUGINLIBS
 PYTHONFRAMEWORK
 MICROSOFT
 EXE
@@ -14958,10 +14960,16 @@ esac
 
 
 	PYTHONFRAMEWORK=""
+	TRIGGERPLUGINLIBS=""
+	TRANSLATIONPLUGINLIBS=""
 	if ( test "$UNAME" = "Darwin" )
 	then
 		PYTHONFRAMEWORK="-framework Python"
+		TRIGGERPLUGINLIBS="-L./ -lsqlrconnection"
+		TRANSLATIONPLUGINLIBS="-L./ -lsqlrconnection"
 	fi
+
+
 
 
 
@@ -17079,7 +17087,7 @@ fi
 					ORACLEVERSION="11g"
 				fi
 				ORACLELIBSPATH="$ORACLE_INSTANTCLIENT_PREFIX"
-				NNZ=`basename $ORACLELIBSPATH/libnnz*.so | sed -e "s|lib||" -e "s|.so||"`
+				NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
 				ORACLELIBS="-L$ORACLE_INSTANTCLIENT_PREFIX -lclntsh -l$NNZ"
 				ORACLEINCLUDES="-I$ORACLE_INSTANTCLIENT_PREFIX/sdk/include"
 			fi
@@ -17099,7 +17107,7 @@ fi
 						ORACLEVERSION="11g"
 					fi
 					ORACLELIBSPATH="/usr/lib/oracle/$version/client/lib"
-					NNZ=`basename $ORACLELIBSPATH/libnnz*.so | sed -e "s|lib||" -e "s|.so||"`
+					NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
 					ORACLELIBS="-L/usr/lib/oracle/$version/client/lib -lclntsh -l$NNZ"
 					ORACLEINCLUDES="-I/usr/include/oracle/$version/client"
 				fi
@@ -17113,7 +17121,7 @@ fi
 						ORACLEVERSION="11g"
 					fi
 					ORACLELIBSPATH="/usr/lib/oracle/$version/client64/lib"
-					NNZ=`basename $ORACLELIBSPATH/libnnz*.so | sed -e "s|lib||" -e "s|.so||"`
+					NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
 					ORACLELIBS="-L/usr/lib/oracle/$version/client64/lib -lclntsh -l$NNZ"
 					ORACLEINCLUDES="-I/usr/include/oracle/$version/client64"
 				fi

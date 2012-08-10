@@ -392,11 +392,17 @@ fi
 AC_DEFUN([FW_CHECK_OSX],
 [
 	PYTHONFRAMEWORK=""
+	TRIGGERPLUGINLIBS=""
+	TRANSLATIONPLUGINLIBS=""
 	if ( test "$UNAME" = "Darwin" )
 	then
 		PYTHONFRAMEWORK="-framework Python"
+		TRIGGERPLUGINLIBS="-L./ -lsqlrconnection"
+		TRANSLATIONPLUGINLIBS="-L./ -lsqlrconnection"
 	fi
 	AC_SUBST(PYTHONFRAMEWORK)
+	AC_SUBST(TRIGGERPLUGINLIBS)
+	AC_SUBST(TRANSLATIONPLUGINLIBS)
 ])
 
 dnl Checks for minix and adds some macros if it is
@@ -711,7 +717,7 @@ then
 					ORACLEVERSION="11g"
 				fi
 				ORACLELIBSPATH="$ORACLE_INSTANTCLIENT_PREFIX"
-				NNZ=`basename $ORACLELIBSPATH/libnnz*.so | sed -e "s|lib||" -e "s|.so||"`
+				NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
 				ORACLELIBS="-L$ORACLE_INSTANTCLIENT_PREFIX -lclntsh -l$NNZ"
 				ORACLEINCLUDES="-I$ORACLE_INSTANTCLIENT_PREFIX/sdk/include"
 			fi
@@ -731,7 +737,7 @@ then
 						ORACLEVERSION="11g"
 					fi
 					ORACLELIBSPATH="/usr/lib/oracle/$version/client/lib"
-					NNZ=`basename $ORACLELIBSPATH/libnnz*.so | sed -e "s|lib||" -e "s|.so||"`
+					NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
 					ORACLELIBS="-L/usr/lib/oracle/$version/client/lib -lclntsh -l$NNZ"
 					ORACLEINCLUDES="-I/usr/include/oracle/$version/client"
 				fi
@@ -745,7 +751,7 @@ then
 						ORACLEVERSION="11g"
 					fi
 					ORACLELIBSPATH="/usr/lib/oracle/$version/client64/lib"
-					NNZ=`basename $ORACLELIBSPATH/libnnz*.so | sed -e "s|lib||" -e "s|.so||"`
+					NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
 					ORACLELIBS="-L/usr/lib/oracle/$version/client64/lib -lclntsh -l$NNZ"
 					ORACLEINCLUDES="-I/usr/include/oracle/$version/client64"
 				fi
