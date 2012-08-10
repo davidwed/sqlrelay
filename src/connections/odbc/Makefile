@@ -5,7 +5,7 @@ include ../../../config.mk
 .PHONY: all clean install uninstall
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/connection $(RUDIMENTSINCLUDES) $(ODBCINCLUDES) $(ICONVINCLUDES) $(SIDINCLUDES)
-LIBS = $(ODBCLIBS) $(ICONVLIBS) -L$(top_builddir)/src/connection -lsqlrconnection -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SIDLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+LIBS = $(ODBCLIBS) $(ICONVLIBS) -L$(top_builddir)/src/connection -lsqlrconnection -L$(top_builddir)/src/util -lsqlrutil $(SIDLIBS) $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(ODBCLIBSPATH)),)
 ifeq ($(ODBCUSERPATH),yes)
 	RPATH = -R $(ODBCLIBSPATH)

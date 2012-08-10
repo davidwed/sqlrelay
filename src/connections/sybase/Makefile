@@ -5,7 +5,7 @@ include ../../../config.mk
 .PHONY: all clean install uninstall
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/connection $(RUDIMENTSINCLUDES) $(SYBASEINCLUDES) $(SIDINCLUDES)
-LIBS = $(SYBASELIBS) -L$(top_builddir)/src/connection -lsqlrconnection -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(SIDLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+LIBS = $(SYBASELIBS) -L$(top_builddir)/src/connection -lsqlrconnection -L$(top_builddir)/src/util -lsqlrutil $(SIDLIBS) $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(SYBASELIBSPATH)),)
 ifeq ($(SYBASEUSERPATH),yes)
 	RPATH = -R $(SYBASELIBSPATH)
