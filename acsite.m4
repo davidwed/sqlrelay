@@ -725,7 +725,7 @@ then
 				done
 			fi
 
-			if ( test -n "$ORACLE_INSTANTCLIENT_PREFIX" -a -r "$ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX" -a -r "$ORACLE_INSTANTCLIENT_PREFIX/sdk/include/oci.h" )
+			if ( test -n "$ORACLE_INSTANTCLIENT_PREFIX" -a -r "`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX.* 2> /dev/null | tail -n1`" -a -r "$ORACLE_INSTANTCLIENT_PREFIX/sdk/include/oci.h" )
 			then
 				ORACLEVERSION="10g"
 				if ( test -n `echo $ORACLE_INSTANTCLIENT_PREFIX | grep 11` )
