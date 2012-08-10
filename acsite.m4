@@ -709,7 +709,23 @@ then
 		# if we didn't find anything yet, look for instantclient
 		if ( test -z "$ORACLELIBS" )
 		then
-			if ( test -r "$ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX" -a -r "$ORACLE_INSTANTCLIENT_PREFIX/sdk/include/oci.h" )
+
+			dnl if a prefix wasn't passed in,
+			dnl look in some common places
+			if ( test -z "$ORACLE_INSTANTCLIENT_PREFIX" )
+			then
+				for i in "/usr" "/usr/lib" "/usr/local" "/opt"
+				do
+					INSTCLNT=`ls -d $i/instantclient* 2> /dev/null | tail -n1`
+					if ( test -n "$INSTCLNT" )
+					then
+						ORACLE_INSTANTCLIENT_PREFIX=$INSTCLNT
+						break
+					fi
+				done
+			fi
+
+			if ( test -n "$ORACLE_INSTANTCLIENT_PREFIX" -a -r "$ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX" -a -r "$ORACLE_INSTANTCLIENT_PREFIX/sdk/include/oci.h" )
 			then
 				ORACLEVERSION="10g"
 				if ( test -n `echo $ORACLE_INSTANTCLIENT_PREFIX | grep 11` )
