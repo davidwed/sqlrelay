@@ -1132,7 +1132,7 @@ bool oracle8cursor::outputBindDate(const char *variable,
 						int16_t *hour,
 						int16_t *minute,
 						int16_t *second,
-						char **tz,
+						const char **tz,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull) {

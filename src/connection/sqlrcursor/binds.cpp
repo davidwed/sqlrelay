@@ -106,7 +106,7 @@ bool sqlrcursor_svr::handleBinds() {
 				&outbindvars[i].value.dateval.hour,
 				&outbindvars[i].value.dateval.minute,
 				&outbindvars[i].value.dateval.second,
-				&outbindvars[i].value.dateval.tz,
+				(const char **)&outbindvars[i].value.dateval.tz,
 				outbindvars[i].value.dateval.buffer,
 				outbindvars[i].value.dateval.buffersize,
 				&outbindvars[i].isnull)) {
@@ -261,7 +261,7 @@ bool sqlrcursor_svr::outputBindDate(const char *variable,
 					int16_t *hour,
 					int16_t *minute,
 					int16_t *second,
-					char **tz,
+					const char **tz,
 					char *buffer,
 					uint16_t buffersize,
 					int16_t *isnull) {

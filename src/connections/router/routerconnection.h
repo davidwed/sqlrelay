@@ -17,6 +17,15 @@ struct outputbindvar {
 		char		*stringvalue;
 		int64_t		*intvalue;
 		double		*doublevalue;
+		struct {
+			int16_t		*year;
+			int16_t		*month;
+			int16_t		*day;
+			int16_t		*hour;
+			int16_t		*minute;
+			int16_t		*second;
+			const char	**tz;
+		} datevalue;
 	} value;
 	uint16_t	valuesize;
 	bindtype	type;
@@ -52,6 +61,18 @@ class routercursor : public sqlrcursor_svr {
 						double *value,
 						uint32_t precision,
 						uint32_t scale);
+		bool		inputBindDate(const char *variable,
+						uint16_t variablesize,
+						int64_t year,
+						int16_t month,
+						int16_t day,
+						int16_t hour,
+						int16_t minute,
+						int16_t second,
+						const char *tz,
+						char *buffer,
+						uint16_t buffersize,
+						int16_t *isnull);
 		bool		inputBindBlob(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -76,6 +97,18 @@ class routercursor : public sqlrcursor_svr {
 						double *value,
 						uint32_t *precision,
 						uint32_t *scale,
+						int16_t *isnull);
+		bool		outputBindDate(const char *variable,
+						uint16_t variablesize,
+						int16_t *year,
+						int16_t *month,
+						int16_t *day,
+						int16_t *hour,
+						int16_t *minute,
+						int16_t *second,
+						const char **tz,
+						char *buffer,
+						uint16_t buffersize,
 						int16_t *isnull);
 		bool		outputBindBlob(const char *variable, 
 						uint16_t variablesize,

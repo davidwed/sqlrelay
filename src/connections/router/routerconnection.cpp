@@ -428,6 +428,22 @@ bool routercursor::inputBindDouble(const char *variable,
 	return true;
 }
 
+bool routercursor::inputBindDate(const char *variable,
+                                                uint16_t variablesize,
+                                                int64_t year,
+                                                int16_t month,
+                                                int16_t day,
+                                                int16_t hour,
+                                                int16_t minute,
+                                                int16_t second,
+                                                const char *tz,
+                                                char *buffer,
+                                                uint16_t buffersize,
+                                                int16_t *isnull) {
+	cur->inputBind(variable+1,year,month,day,hour,minute,second,tz);
+	return true;
+}
+
 bool routercursor::inputBindBlob(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -488,6 +504,34 @@ bool routercursor::outputBindDouble(const char *variable,
 	obcount++;
 	return true;
 }
+
+bool routercursor::outputBindDate(const char *variable,
+                                                uint16_t variablesize,
+                                                int16_t *year,
+                                                int16_t *month,
+                                                int16_t *day,
+                                                int16_t *hour,
+                                                int16_t *minute,
+                                                int16_t *second,
+                                                const char **tz,
+                                                char *buffer,
+                                                uint16_t buffersize,
+                                                int16_t *isnull) {
+	cur->defineOutputBindDouble(variable+1);
+	obv[obcount].variable=variable+1;
+	obv[obcount].type=DATE_BIND;
+	obv[obcount].value.datevalue.year=year;
+	obv[obcount].value.datevalue.month=month;
+	obv[obcount].value.datevalue.day=day;
+	obv[obcount].value.datevalue.hour=hour;
+	obv[obcount].value.datevalue.minute=minute;
+	obv[obcount].value.datevalue.second=second;
+	obv[obcount].value.datevalue.tz=tz;
+	obv[obcount].isnull=isnull;
+	obcount++;
+	return true;
+}
+
 
 bool routercursor::outputBindBlob(const char *variable, 
 						uint16_t variablesize,
@@ -589,6 +633,15 @@ bool routercursor::executeQuery(const char *query, uint32_t length,
 		} else if (obv[index].type==DOUBLE_BIND) {
 			*(obv[index].value.doublevalue)=
 					cur->getOutputBindDouble(variable);
+		} else if (obv[index].type==DATE_BIND) {
+			cur->getOutputBindDate(variable,
+					obv[index].value.datevalue.year,
+					obv[index].value.datevalue.month,
+					obv[index].value.datevalue.day,
+					obv[index].value.datevalue.hour,
+					obv[index].value.datevalue.minute,
+					obv[index].value.datevalue.second,
+					obv[index].value.datevalue.tz);
 		}
 	}
 

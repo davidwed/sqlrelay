@@ -55,14 +55,14 @@ struct describe {
 };
 
 struct datebind {
-	int16_t	*year;
-	int16_t	*month;
-	int16_t	*day;
-	int16_t	*hour;
-	int16_t	*minute;
-	int16_t	*second;
-	char	**tz;
-	OCIDate	*ocidate;
+	int16_t		*year;
+	int16_t		*month;
+	int16_t		*day;
+	int16_t		*hour;
+	int16_t		*minute;
+	int16_t		*second;
+	const char	**tz;
+	OCIDate		*ocidate;
 };
 
 class oracle8connection;
@@ -128,7 +128,7 @@ class oracle8cursor : public sqlrcursor_svr {
 						int16_t *hour,
 						int16_t *minute,
 						int16_t *second,
-						char **tz,
+						const char **tz,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
