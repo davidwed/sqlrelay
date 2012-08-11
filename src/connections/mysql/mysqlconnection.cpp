@@ -526,6 +526,59 @@ bool mysqlcursor::inputBindDouble(const char *variable,
 	return true;
 }
 
+bool mysqlcursor::inputBindDate(const char *variable,
+					uint16_t variablesize,
+					int64_t year,
+					int16_t month,
+					int16_t day,
+					int16_t hour,
+					int16_t minute,
+					int16_t second,
+					const char *tz,
+					char *buffer,
+					uint16_t buffersize,
+					int16_t *isnull) {
+
+	if (!usestmtprepare) {
+		return true;
+	}
+
+	// don't attempt to bind beyond the number of
+	// variables defined when the query was prepared
+	if (bindcounter>bindcount) {
+		return false;
+	}
+
+	bindvaluesize[bindcounter]=sizeof(MYSQL_TIME);
+
+	if (*isnull) {
+		bind[bindcounter].buffer_type=MYSQL_TYPE_NULL;
+		bind[bindcounter].buffer=(void *)NULL;
+		bind[bindcounter].buffer_length=0;
+		bind[bindcounter].length=0;
+	} else {
+		MYSQL_TIME	*t=(MYSQL_TIME *)buffer;
+		t->year=year;
+		t->month=month;
+		t->day=day;
+		t->hour=hour;
+		t->minute=minute;
+		t->second=second;
+		t->second_part=0;
+		t->neg=FALSE;
+		t->time_type=MYSQL_TIMESTAMP_DATETIME;
+
+		bind[bindcounter].buffer_type=MYSQL_TYPE_DATETIME;
+		bind[bindcounter].buffer=(void *)buffer;
+		bind[bindcounter].buffer_length=sizeof(MYSQL_TIME);
+		bind[bindcounter].length=&bindvaluesize[bindcounter];
+	}
+	bind[bindcounter].is_null=(my_bool *)isnull;
+	bindcounter++;
+
+	return true;
+}
+
 bool mysqlcursor::inputBindBlob(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
