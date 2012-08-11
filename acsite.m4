@@ -706,7 +706,8 @@ then
 			FW_CHECK_LIB([$ORACLE_HOME/lib/libclntsh.a],[ORACLESTATIC=\"$STATICFLAG\"])
 		fi
 
-		# if we didn't find anything yet, look for instantclient
+		dnl if we didn't find anything yet,
+		dnl look for non-RPM-based instantclient
 		if ( test -z "$ORACLELIBS" )
 		then
 
@@ -725,6 +726,9 @@ then
 				done
 			fi
 
+			dnl For some reason libclntsh.so is not included in the
+			dnl non-RPM versions, so we have to look for and use
+			dnl the file with a version number tacked on to the end.
 			if ( test -n "$ORACLE_INSTANTCLIENT_PREFIX" -a -r "`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX.* 2> /dev/null | tail -n1`" -a -r "$ORACLE_INSTANTCLIENT_PREFIX/sdk/include/oci.h" )
 			then
 				ORACLEVERSION="10g"
@@ -733,14 +737,16 @@ then
 					ORACLEVERSION="11g"
 				fi
 				ORACLELIBSPATH="$ORACLE_INSTANTCLIENT_PREFIX"
+				CLNTSH="`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX.* 2> /dev/null | tail -n1`"
 				NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
-				ORACLELIBS="-L$ORACLE_INSTANTCLIENT_PREFIX -lclntsh -l$NNZ"
+				ORACLELIBS="$CLNTSH -L$ORACLE_INSTANTCLIENT_PREFIX -l$NNZ"
 				ORACLEINCLUDES="-I$ORACLE_INSTANTCLIENT_PREFIX/sdk/include"
 			fi
 		fi
 
-		# if we didn't find anything yet,
-		# look for RPM-based instantclient
+		dnl if we didn't find anything yet, look for RPM-based
+		dnl instantclient, which, oddly enough, does contain
+		dnl libclntsh.so
 		if ( test -z "$ORACLELIBS" )
 		then
 			for version in `cd /usr/lib/oracle 2> /dev/null; ls -d * 2> /dev/null`
@@ -758,7 +764,7 @@ then
 					ORACLEINCLUDES="-I/usr/include/oracle/$version/client"
 				fi
 
-				# x86_64 uses client64 rather than client
+				dnl x86_64 uses client64 rather than client
 				if ( test -r "/usr/lib/oracle/$version/client64/lib/libclntsh.$SOSUFFIX" -a -r "/usr/include/oracle/$version/client64/oci.h" )
 				then
 					ORACLEVERSION="10g"
