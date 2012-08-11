@@ -345,6 +345,9 @@ odbccursor::odbccursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	errormsg=NULL;
 	odbcconn=(odbcconnection *)conn;
 	stmt=NULL;
+	for (uint16_t i=0; i<MAXVAR; i++) {
+		outdatebind[i]=NULL;
+	}
 }
 
 odbccursor::~odbccursor() {
@@ -531,11 +534,58 @@ bool odbccursor::inputBindDouble(const char *variable,
 	return true;
 }
 
+bool odbccursor::inputBindDate(const char *variable,
+					uint16_t variablesize,
+					int64_t year,
+					int16_t month,
+					int16_t day,
+					int16_t hour,
+					int16_t minute,
+					int16_t second,
+					const char *tz,
+					char *buffer,
+					uint16_t buffersize,
+					int16_t *isnull) {
+
+	SQL_TIMESTAMP_STRUCT	*ts=(SQL_TIMESTAMP_STRUCT *)buffer;
+	ts->year=year;
+	ts->month=month;
+	ts->day=day;
+	ts->hour=hour;
+	ts->minute=minute;
+	ts->second=second;
+	ts->fraction=0;
+
+	erg=SQLBindParameter(stmt,
+				charstring::toInteger(variable+1),
+				SQL_PARAM_INPUT,
+				SQL_C_TIMESTAMP,
+				SQL_TIMESTAMP,
+				0,
+				0,
+				buffer,
+				0,
+				#ifdef SQLBINDPARAMETER_SQLLEN
+				(SQLLEN *)NULL
+				#elif defined(SQLBINDPARAMETER_SQLLEN)
+				(unsigned long *)NULL
+				#else
+				(SQLINTEGER *)NULL
+				#endif
+				);
+	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		return false;
+	}
+	return true;
+}
+
 bool odbccursor::outputBindString(const char *variable, 
 					uint16_t variablesize,
 					const char *value, 
 					uint16_t valuesize, 
 					short *isnull) {
+
+	outdatebind[outbindcount]=NULL;
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
@@ -564,6 +614,8 @@ bool odbccursor::outputBindInteger(const char *variable,
 						uint16_t variablesize,
 						int64_t *value,
 						int16_t *isnull) {
+
+	outdatebind[outbindcount]=NULL;
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
@@ -595,6 +647,8 @@ bool odbccursor::outputBindDouble(const char *variable,
 						uint32_t *scale,
 						int16_t *isnull) {
 
+	outdatebind[outbindcount]=NULL;
+
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_OUTPUT,
@@ -604,6 +658,53 @@ bool odbccursor::outputBindDouble(const char *variable,
 				0,
 				value,
 				sizeof(double),
+				#ifdef SQLBINDPARAMETER_SQLLEN
+				(SQLLEN *)isnull
+				#elif defined(SQLBINDPARAMETER_SQLLEN)
+				(unsigned long *)isnull
+				#else
+				(SQLINTEGER *)isnull
+				#endif
+				);
+	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		return false;
+	}
+	return true;
+}
+
+bool odbccursor::outputBindDate(const char *variable,
+						uint16_t variablesize,
+						int16_t *year,
+						int16_t *month,
+						int16_t *day,
+						int16_t *hour,
+						int16_t *minute,
+						int16_t *second,
+						const char **tz,
+						char *buffer,
+						uint16_t buffersize,
+						int16_t *isnull) {
+
+	datebind	*db=new datebind;
+	db->year=year;
+	db->month=month;
+	db->day=day;
+	db->hour=hour;
+	db->minute=minute;
+	db->second=second;
+	db->tz=tz;
+	db->buffer=buffer;
+	outdatebind[outbindcount]=db;
+
+	erg=SQLBindParameter(stmt,
+				charstring::toInteger(variable+1),
+				SQL_PARAM_OUTPUT,
+				SQL_C_TIMESTAMP,
+				SQL_TIMESTAMP,
+				0,
+				0,
+				buffer,
+				0,
 				#ifdef SQLBINDPARAMETER_SQLLEN
 				(SQLLEN *)isnull
 				#elif defined(SQLBINDPARAMETER_SQLLEN)
@@ -940,6 +1041,23 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
+
+	// convert date output binds
+	for (uint16_t i=0; i<MAXVAR; i++) {
+		if (outdatebind[i]) {
+			datebind	*db=outdatebind[i];
+			SQL_TIMESTAMP_STRUCT	*ts=
+				(SQL_TIMESTAMP_STRUCT *)db->buffer;
+			*(db->year)=ts->year;
+			*(db->month)=ts->month;
+			*(db->day)=ts->day;
+			*(db->hour)=ts->hour;
+			*(db->minute)=ts->minute;
+			*(db->second)=ts->second;
+			*(db->tz)=NULL;
+		}
+	}
+
 	return true;
 }
 
@@ -1169,4 +1287,14 @@ void odbccursor::nextRow() {
 	// successfully supports array fetches
 
 	//row++;
+}
+
+void odbccursor::cleanUpData(bool freeresult, bool freebinds) {
+
+	if (freebinds) {
+		for (uint16_t i=0; i<MAXVAR; i++) {
+			delete outdatebind[i];
+			outdatebind[i]=NULL;
+		}
+	}
 }

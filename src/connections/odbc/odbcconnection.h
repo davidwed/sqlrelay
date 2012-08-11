@@ -48,6 +48,17 @@ struct odbccolumn {
 	uint16_t	autoincrement;
 };
 
+struct datebind {
+	int16_t		*year;
+	int16_t		*month;
+	int16_t		*day;
+	int16_t		*hour;
+	int16_t		*minute;
+	int16_t		*second;
+	const char	**tz;
+	char		*buffer;
+};
+
 class odbcconnection;
 
 class odbccursor : public sqlrcursor_svr {
@@ -70,6 +81,18 @@ class odbccursor : public sqlrcursor_svr {
 						double *value, 
 						uint32_t precision,
 						uint32_t scale);
+		bool		inputBindDate(const char *variable,
+						uint16_t variablesize,
+						int64_t year,
+						int16_t month,
+						int16_t day,
+						int16_t hour,
+						int16_t minute,
+						int16_t second,
+						const char *tz,
+						char *buffer,
+						uint16_t buffersize,
+						int16_t *isnull);
 		bool		outputBindString(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -84,6 +107,18 @@ class odbccursor : public sqlrcursor_svr {
 						double *value,
 						uint32_t *precision,
 						uint32_t *scale,
+						int16_t *isnull);
+		bool		outputBindDate(const char *variable,
+						uint16_t variablesize,
+						int16_t *year,
+						int16_t *month,
+						int16_t *day,
+						int16_t *hour,
+						int16_t *minute,
+						int16_t *second,
+						const char **tz,
+						char *buffer,
+						uint16_t buffersize,
 						int16_t *isnull);
 		short		nonNullBindValue();
 		short		nullBindValue();
@@ -111,6 +146,7 @@ class odbccursor : public sqlrcursor_svr {
 					bool *blob,
 					bool *null);
 		void		nextRow();
+		void		cleanUpData(bool freeresult, bool freebinds);
 
 
 		SQLRETURN	erg;
@@ -134,6 +170,8 @@ class odbccursor : public sqlrcursor_svr {
 //#endif
 		odbccolumn 	col[MAX_SELECT_LIST_SIZE];
 		char		*columnnames[MAX_SELECT_LIST_SIZE];
+
+		datebind	*outdatebind[MAXVAR];
 
 		uint32_t	row;
 		uint32_t	maxrow;
