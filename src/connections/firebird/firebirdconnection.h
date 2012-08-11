@@ -33,6 +33,16 @@ struct fieldstruct {
 	short		nullindicator;
 };
 
+struct datebind {
+        int16_t         *year;
+        int16_t         *month;
+        int16_t         *day;
+        int16_t         *hour;
+        int16_t         *minute;
+        int16_t         *second;
+        const char      **tz;
+};
+
 class firebirdconnection;
 
 class firebirdcursor : public sqlrcursor_svr {
@@ -82,6 +92,18 @@ class firebirdcursor : public sqlrcursor_svr {
 						uint32_t *precision,
 						uint32_t *scale,
 						int16_t *isnull);
+		bool		outputBindDate(const char *variable,
+						uint16_t variablesize,
+						int16_t *year,
+						int16_t *month,
+						int16_t *day,
+						int16_t *hour,
+						int16_t *minute,
+						int16_t *second,
+						const char **tz,
+						char *buffer,
+						uint16_t buffersize,
+						int16_t *isnull);
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
@@ -111,7 +133,8 @@ class firebirdcursor : public sqlrcursor_svr {
 
 		isc_stmt_handle	stmt;
 		uint16_t	outbindcount;
-		bool		outbindisstring[MAXVAR];
+		datebind	outdatebind[MAX_BIND_VARS];
+		
 		XSQLDA	ISC_FAR	*outsqlda;
 		char		*columnnames[MAX_SELECT_LIST_SIZE];
 		XSQLDA	ISC_FAR	*insqlda;

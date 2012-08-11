@@ -559,7 +559,6 @@ bool firebirdcursor::outputBindString(const char *variable,
 				uint16_t valuesize, 
 				int16_t *isnull) {
 
-	outbindisstring[outbindcount]=true;
 	outbindcount++;
 
 	// if we're doing output binds then the
@@ -593,7 +592,6 @@ bool firebirdcursor::outputBindInteger(const char *variable,
 						int64_t *value,
 						int16_t *isnull) {
 
-	outbindisstring[outbindcount]=false;
 	outbindcount++;
 
 	// if we're doing output binds then the
@@ -629,7 +627,6 @@ bool firebirdcursor::outputBindDouble(const char *variable,
 						uint32_t *scale,
 						int16_t *isnull) {
 
-	outbindisstring[outbindcount]=false;
 	outbindcount++;
 
 	// if we're doing output binds then the
@@ -646,6 +643,56 @@ bool firebirdcursor::outputBindDouble(const char *variable,
 	outsqlda->sqlvar[index].sqlsubtype=0;
 	outsqlda->sqlvar[index].sqllen=sizeof(double);
 	outsqlda->sqlvar[index].sqldata=(char *)value;
+	outsqlda->sqlvar[index].sqlind=isnull;
+	outsqlda->sqlvar[index].sqlname_length=0;
+	outsqlda->sqlvar[index].sqlname[0]='\0';
+	outsqlda->sqlvar[index].relname_length=0;
+	outsqlda->sqlvar[index].relname[0]='\0';
+	outsqlda->sqlvar[index].ownname_length=0;
+	outsqlda->sqlvar[index].ownname[0]='\0';
+	outsqlda->sqlvar[index].aliasname_length=0;
+	outsqlda->sqlvar[index].aliasname[0]='\0';
+	return true;
+}
+
+bool firebirdcursor::outputBindDate(const char *variable,
+						uint16_t variablesize,
+						int16_t *year,
+						int16_t *month,
+						int16_t *day,
+						int16_t *hour,
+						int16_t *minute,
+						int16_t *second,
+						const char **tz,
+						char *buffer,
+						uint16_t buffersize,
+						int16_t *isnull) {
+
+	// store the pointers
+	outdatebind[outbindcount].year=year;
+	outdatebind[outbindcount].month=month;
+	outdatebind[outbindcount].day=day;
+	outdatebind[outbindcount].hour=hour;
+	outdatebind[outbindcount].minute=minute;
+	outdatebind[outbindcount].second=second;
+	outdatebind[outbindcount].tz=tz;
+
+	outbindcount++;
+
+	// if we're doing output binds then the
+	// query must be a stored procedure
+	queryIsExecSP=true;
+
+	// make bind vars 1 based like all other db's
+	long	index=charstring::toInteger(variable+1)-1;
+	if (index<0) {
+		return false;
+	}
+	outsqlda->sqlvar[index].sqltype=SQL_TIMESTAMP;
+	outsqlda->sqlvar[index].sqlscale=0;
+	outsqlda->sqlvar[index].sqlsubtype=0;
+	outsqlda->sqlvar[index].sqllen=sizeof(ISC_TIMESTAMP);
+	outsqlda->sqlvar[index].sqldata=buffer;
 	outsqlda->sqlvar[index].sqlind=isnull;
 	outsqlda->sqlvar[index].sqlname_length=0;
 	outsqlda->sqlvar[index].sqlname[0]='\0';
@@ -675,11 +722,27 @@ bool firebirdcursor::executeQuery(const char *query, uint32_t length,
 						&firebirdconn->tr,
 						&stmt,1,insqlda,outsqlda);
 
-		// make sure each output bind variable gets null terminated
 		for (short i=0; i<outsqlda->sqld; i++) {
-			if (outbindisstring[i]) {
+
+			if (outsqlda->sqlvar[i].sqltype==SQL_TEXT+1) {
+
+				// null-terminate strings
 				outsqlda->sqlvar[i].
 					sqldata[outsqlda->sqlvar[i].sqllen-1]=0;
+
+			} else if (outsqlda->sqlvar[i].sqltype==SQL_TIMESTAMP) {
+
+				// copy out date bind data
+				tm	t;
+				isc_decode_timestamp((ISC_TIMESTAMP *)
+						outsqlda->sqlvar[i].sqldata,&t);
+				*(outdatebind[i].year)=t.tm_year+1900;
+				*(outdatebind[i].month)=t.tm_mon+1;
+				*(outdatebind[i].day)=t.tm_mday;
+				*(outdatebind[i].hour)=t.tm_hour;
+				*(outdatebind[i].minute)=t.tm_min;
+				*(outdatebind[i].second)=t.tm_sec;
+				*(outdatebind[i].tz)=NULL;
 			}
 		}
 

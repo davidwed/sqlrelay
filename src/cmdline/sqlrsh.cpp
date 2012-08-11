@@ -642,6 +642,12 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			sqlrshbindvalue	*bv=node->getData()->getData();
 			if (bv->type==STRING_BIND) {
 				sqlrcur->inputBind(name,bv->stringval);
+			} else if (bv->type==INTEGER_BIND) {
+				sqlrcur->inputBind(name,bv->integerval);
+			} else if (bv->type==DOUBLE_BIND) {
+				sqlrcur->inputBind(name,bv->doubleval.value,
+							bv->doubleval.precision,
+							bv->doubleval.scale);
 			} else if (bv->type==DATE_BIND) {
 				sqlrcur->inputBind(name,
 						bv->dateval.year,
@@ -651,12 +657,6 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 						bv->dateval.minute,
 						bv->dateval.second,
 						bv->dateval.tz);
-			} else if (bv->type==INTEGER_BIND) {
-				sqlrcur->inputBind(name,bv->integerval);
-			} else if (bv->type==DOUBLE_BIND) {
-				sqlrcur->inputBind(name,bv->doubleval.value,
-							bv->doubleval.precision,
-							bv->doubleval.scale);
 			} else if (bv->type==NULL_BIND) {
 				sqlrcur->inputBind(name,(const char *)NULL);
 			}
@@ -681,6 +681,8 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 				sqlrcur->defineOutputBindInteger(name);
 			} else if (bv->type==DOUBLE_BIND) {
 				sqlrcur->defineOutputBindDouble(name);
+			} else if (bv->type==DATE_BIND) {
+				sqlrcur->defineOutputBindDate(name);
 			}
 		}
 	}
@@ -707,6 +709,15 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			} else if (bv->type==DOUBLE_BIND) {
 				bv->doubleval.value=
 					sqlrcur->getOutputBindDouble(name);
+			} else if (bv->type==DATE_BIND) {
+				sqlrcur->getOutputBindDate(name,
+							&(bv->dateval.year),
+							&(bv->dateval.month),
+							&(bv->dateval.day),
+							&(bv->dateval.hour),
+							&(bv->dateval.minute),
+							&(bv->dateval.second),
+							&(bv->dateval.tz));
 			}
 		}
 	}
@@ -1102,6 +1113,17 @@ void sqlrsh::outputbind(sqlrcursor *sqlrcur,
 				charstring::toInteger(parts[3]);
 			bv->doubleval.scale=
 				charstring::toInteger(parts[4]);
+		} else if (!charstring::compareIgnoringCase(
+						parts[2],"date") &&
+						partcount==3) {
+			bv->type=DATE_BIND;
+			bv->dateval.year=0;
+			bv->dateval.month=0;
+			bv->dateval.day=0;
+			bv->dateval.hour=0;
+			bv->dateval.minute=0;
+			bv->dateval.second=0;
+			bv->dateval.tz="";
 		} else {
 			sane=false;
 		}
@@ -1152,6 +1174,15 @@ void sqlrsh::printbinds(const char *type,
 						bv->doubleval.precision,
 						bv->doubleval.scale,
 						bv->doubleval.value);
+		} else if (bv->type==DATE_BIND) {
+			printf("(DATE) = %02d/%02d/%04d %02d:%02d:%02d %s\n",
+						bv->dateval.month,
+						bv->dateval.day,
+						bv->dateval.year,
+						bv->dateval.hour,
+						bv->dateval.minute,
+						bv->dateval.second,
+						bv->dateval.tz);
 		} else if (bv->type==NULL_BIND) {
 			printf("NULL\n");
 		}
@@ -1242,6 +1273,7 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	printf("		outputbind [variable] string [length]\n");
 	printf("		outputbind [variable] integer\n");
 	printf("		outputbind [variable] double [precision] [scale}\n");
+	printf("		outputbind [variable] date\n");
 	printf("	printbinds                     - ");
 	green(env);
 	printf("prints all bind variables\n");
