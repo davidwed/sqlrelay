@@ -18,6 +18,16 @@ extern "C" {
 	#include <ctpublic.h>
 }
 
+struct datebind {
+        int16_t         *year;
+        int16_t         *month;
+        int16_t         *day;
+        int16_t         *hour;
+        int16_t         *minute;
+        int16_t         *second;
+        const char      **tz;
+};
+
 class sybaseconnection;
 
 class sybasecursor : public sqlrcursor_svr {
@@ -68,6 +78,18 @@ class sybasecursor : public sqlrcursor_svr {
 						double *value,
 						uint32_t *precision,
 						uint32_t *scale,
+						int16_t *isnull);
+		bool		outputBindDate(const char *variable,
+						uint16_t variablesize,
+						int16_t *year,
+						int16_t *month,
+						int16_t *day,
+						int16_t *hour,
+						int16_t *minute,
+						int16_t *second,
+						const char **tz,
+						char *buffer,
+						uint16_t buffersize,
 						int16_t *isnull);
 		bool		executeQuery(const char *query,
 						uint32_t length,
@@ -121,6 +143,7 @@ class sybasecursor : public sqlrcursor_svr {
 		uint16_t	outbindstringlengths[MAX_BIND_VARS];
 		int64_t		*outbindints[MAX_BIND_VARS];
 		double		*outbinddoubles[MAX_BIND_VARS];
+		datebind	outbinddates[MAX_BIND_VARS];
 		uint16_t	outbindindex;
 
 		CS_DATAFMT	column[MAX_SELECT_LIST_SIZE];

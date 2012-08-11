@@ -770,6 +770,51 @@ bool sybasecursor::outputBindDouble(const char *variable,
 	return true;
 }
 
+bool sybasecursor::outputBindDate(const char *variable,
+						uint16_t variablesize,
+						int16_t *year,
+						int16_t *month,
+						int16_t *day,
+						int16_t *hour,
+						int16_t *minute,
+						int16_t *second,
+						const char **tz,
+						char *buffer,
+						uint16_t buffersize,
+						int16_t *isnull) {
+	checkRePrepare();
+
+	outbindtype[outbindindex]=CS_DATETIME_TYPE;
+	outbinddates[outbindindex].year=year;
+	outbinddates[outbindindex].month=month;
+	outbinddates[outbindindex].day=day;
+	outbinddates[outbindindex].hour=hour;
+	outbinddates[outbindindex].minute=minute;
+	outbinddates[outbindindex].second=second;
+	outbinddates[outbindindex].tz=tz;
+	outbindindex++;
+
+	rawbuffer::zero(&parameter[paramindex],sizeof(parameter[paramindex]));
+	if (charstring::isInteger(variable+1,variablesize-1)) {
+		parameter[paramindex].name[0]='\0';
+		parameter[paramindex].namelen=0;
+	} else {
+		charstring::copy(parameter[paramindex].name,variable);
+		parameter[paramindex].namelen=variablesize;
+	}
+	parameter[paramindex].datatype=CS_DATETIME_TYPE;
+	parameter[paramindex].maxlength=CS_UNUSED;
+	parameter[paramindex].status=CS_RETURN;
+	parameter[paramindex].locale=NULL;
+	if (ct_param(cmd,&parameter[paramindex],
+			(CS_VOID *)NULL,0,
+			(CS_SMALLINT)*isnull)!=CS_SUCCEED) {
+		return false;
+	}
+	paramindex++;
+	return true;
+}
+
 bool sybasecursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
 
@@ -886,10 +931,20 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 
 			// get the field as a null terminated character string
 			// no longer than MAX_ITEM_BUFFER_SIZE, override some
-			// other values that might have been set also
-			column[i].datatype=CS_CHAR_TYPE;
-			column[i].format=CS_FMT_NULLTERM;
-			column[i].maxlength=MAX_ITEM_BUFFER_SIZE;
+			// other values that might have been set also...
+			//
+			// however, if we're getting the output bind variables
+			// of a stored procedure that returns dates, then use
+			// the datetime type instead...
+			if (isrpcquery && outbindtype[i]==CS_DATETIME_TYPE) {
+				column[i].datatype=CS_DATETIME_TYPE;
+				column[i].format=CS_FMT_UNUSED;
+				column[i].maxlength=sizeof(CS_DATETIME);
+			} else {
+				column[i].datatype=CS_CHAR_TYPE;
+				column[i].format=CS_FMT_NULLTERM;
+				column[i].maxlength=MAX_ITEM_BUFFER_SIZE;
+			}
 			column[i].scale=CS_UNUSED;
 			column[i].precision=CS_UNUSED;
 			column[i].status=CS_UNUSED;
@@ -941,6 +996,22 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 			} else if (outbindtype[i]==CS_FLOAT_TYPE) {
 				*outbinddoubles[i]=charstring::toFloat(
 								data[i][0]);
+			} else if (outbindtype[i]==CS_DATETIME_TYPE) {
+
+				// convert to a CS_DATEREC
+				CS_DATEREC	dr;
+				cs_dt_crack(sybaseconn->context,
+						CS_DATETIME_TYPE,
+						(CS_VOID *)data[i][0],&dr);
+
+				datebind	*db=&outbinddates[i];
+				*(db->year)=dr.dateyear;
+				*(db->month)=dr.datemonth+1;
+				*(db->day)=dr.datedmonth;
+				*(db->hour)=dr.datehour;
+				*(db->minute)=dr.dateminute;
+				*(db->second)=dr.datesecond;
+				*(db->tz)=NULL;
 			}
 		}
 

@@ -22,6 +22,16 @@ extern "C" {
 	#include <ctpublic.h>
 }
 
+struct datebind {
+        int16_t         *year;
+        int16_t         *month;
+        int16_t         *day;
+        int16_t         *hour;
+        int16_t         *minute;
+        int16_t         *second;
+        const char      **tz;
+};
+
 class freetdsconnection;
 
 class freetdscursor : public sqlrcursor_svr {
@@ -133,6 +143,7 @@ class freetdscursor : public sqlrcursor_svr {
 		uint16_t	outbindstringlengths[MAX_BIND_VARS];
 		int64_t		*outbindints[MAX_BIND_VARS];
 		double		*outbinddoubles[MAX_BIND_VARS];
+		datebind	outbinddates[MAX_BIND_VARS];
 		uint16_t	outbindindex;
 
 		CS_DATAFMT	column[MAX_SELECT_LIST_SIZE];
