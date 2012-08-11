@@ -1041,6 +1041,7 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 
 		datetime	dt;
 		dt.initialize(value);
+		bv->type=DATE_BIND;
 		bv->dateval.year=dt.getYear();
 		bv->dateval.month=dt.getMonth();
 		bv->dateval.day=dt.getDayOfMonth();
