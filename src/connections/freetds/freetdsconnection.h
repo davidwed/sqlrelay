@@ -9,7 +9,6 @@
 #define FETCH_AT_ONCE		1
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	4096
-#define MAX_BIND_VARS		512
 
 //#define FREETDS_SUPPORTS_CURSORS
 
@@ -136,14 +135,14 @@ class freetdscursor : public sqlrcursor_svr {
 		CS_INT		maxrow;
 		CS_INT		totalrows;
 
-		CS_DATAFMT	parameter[MAX_BIND_VARS];
+		CS_DATAFMT	parameter[MAXVAR];
 		uint16_t	paramindex;
-		CS_INT		outbindtype[MAX_BIND_VARS];
-		char		*outbindstrings[MAX_BIND_VARS];
-		uint16_t	outbindstringlengths[MAX_BIND_VARS];
-		int64_t		*outbindints[MAX_BIND_VARS];
-		double		*outbinddoubles[MAX_BIND_VARS];
-		datebind	outbinddates[MAX_BIND_VARS];
+		CS_INT		outbindtype[MAXVAR];
+		char		*outbindstrings[MAXVAR];
+		uint16_t	outbindstringlengths[MAXVAR];
+		int64_t		*outbindints[MAXVAR];
+		double		*outbinddoubles[MAXVAR];
+		datebind	outbinddates[MAXVAR];
 		uint16_t	outbindindex;
 
 		CS_DATAFMT	column[MAX_SELECT_LIST_SIZE];

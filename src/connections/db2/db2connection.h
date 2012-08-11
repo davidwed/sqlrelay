@@ -32,6 +32,17 @@ struct db2column {
 	uint16_t	autoincrement;
 };
 
+struct datebind {
+	int16_t		*year;
+	int16_t		*month;
+	int16_t		*day;
+	int16_t		*hour;
+	int16_t		*minute;
+	int16_t		*second;
+	const char	**tz;
+	char		*buffer;
+};
+
 class db2connection;
 
 class db2cursor : public sqlrcursor_svr {
@@ -55,6 +66,18 @@ class db2cursor : public sqlrcursor_svr {
 						double *value, 
 						uint32_t precision,
 						uint32_t scale);
+		bool		inputBindDate(const char *variable,
+						uint16_t variablesize,
+						int64_t year,
+						int16_t month,
+						int16_t day,
+						int16_t hour,
+						int16_t minute,
+						int16_t second,
+						const char *tz,
+						char *buffer,
+						uint16_t buffersize,
+						int16_t *isnull);
 		bool		outputBindString(const char *variable, 
 						uint16_t variablesize,
 						char *value, 
@@ -69,6 +92,18 @@ class db2cursor : public sqlrcursor_svr {
 						double *value,
 						uint32_t *precision,
 						uint32_t *scale,
+						int16_t *isnull);
+		bool		outputBindDate(const char *variable,
+						uint16_t variablesize,
+						int16_t *year,
+						int16_t *month,
+						int16_t *day,
+						int16_t *hour,
+						int16_t *minute,
+						int16_t *second,
+						const char **tz,
+						char *buffer,
+						uint16_t buffersize,
 						int16_t *isnull);
 		bool		executeQuery(const char *query,
 						uint32_t length,
@@ -93,6 +128,7 @@ class db2cursor : public sqlrcursor_svr {
 					bool *blob,
 					bool *null);
 		void		nextRow();
+		void		cleanUpData(bool freeresult, bool freebinds);
 
 		SQLRETURN	erg;
 		SQLHSTMT	stmt;
@@ -108,6 +144,8 @@ class db2cursor : public sqlrcursor_svr {
 #endif
 		db2column	col[MAX_SELECT_LIST_SIZE];
 		char		*columnnames[MAX_SELECT_LIST_SIZE];
+
+		datebind	*outdatebind[MAXVAR];
 
 		uint64_t	rowgroupindex;
 		uint64_t	totalinrowgroup;

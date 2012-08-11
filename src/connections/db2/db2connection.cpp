@@ -254,6 +254,9 @@ db2cursor::db2cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	db2conn=(db2connection *)conn;
 	errormsg=NULL;
 	stmt=0;
+	for (uint16_t i=0; i<MAXVAR; i++) {
+		outdatebind[i]=NULL;
+	}
 }
 
 db2cursor::~db2cursor() {
@@ -375,11 +378,51 @@ bool db2cursor::inputBindDouble(const char *variable,
 	return true;
 }
 
+bool db2cursor::inputBindDate(const char *variable,
+					uint16_t variablesize,
+					int64_t year,
+					int16_t month,
+					int16_t day,
+					int16_t hour,
+					int16_t minute,
+					int16_t second,
+					const char *tz,
+					char *buffer,
+					uint16_t buffersize,
+					int16_t *isnull) {
+
+	SQL_TIMESTAMP_STRUCT	*ts=(SQL_TIMESTAMP_STRUCT *)buffer;
+	ts->year=year;
+	ts->month=month;
+	ts->day=day;
+	ts->hour=hour;
+	ts->minute=minute;
+	ts->second=second;
+	ts->fraction=0;
+
+	erg=SQLBindParameter(stmt,
+				charstring::toInteger(variable+1),
+				SQL_PARAM_INPUT,
+				SQL_C_TIMESTAMP,
+				SQL_TIMESTAMP,
+				0,
+				0,
+				buffer,
+				0,
+				(SQLINTEGER *)NULL);
+	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		return false;
+	}
+	return true;
+}
+
 bool db2cursor::outputBindString(const char *variable, 
 					uint16_t variablesize,
 					char *value, 
 					uint16_t valuesize, 
 					int16_t *isnull) {
+
+	outdatebind[outbindcount]=NULL;
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
@@ -401,6 +444,8 @@ bool db2cursor::outputBindInteger(const char *variable,
 						uint16_t variablesize,
 						int64_t *value,
 						int16_t *isnull) {
+
+	outdatebind[outbindcount]=NULL;
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
@@ -425,6 +470,8 @@ bool db2cursor::outputBindDouble(const char *variable,
 						uint32_t *scale,
 						int16_t *isnull) {
 
+	outdatebind[outbindcount]=NULL;
+
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_OUTPUT,
@@ -434,6 +481,46 @@ bool db2cursor::outputBindDouble(const char *variable,
 				0,
 				value,
 				sizeof(double),
+				(SQLINTEGER *)isnull);
+	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		return false;
+	}
+	return true;
+}
+
+bool db2cursor::outputBindDate(const char *variable,
+						uint16_t variablesize,
+						int16_t *year,
+						int16_t *month,
+						int16_t *day,
+						int16_t *hour,
+						int16_t *minute,
+						int16_t *second,
+						const char **tz,
+						char *buffer,
+						uint16_t buffersize,
+						int16_t *isnull) {
+
+	datebind	*db=new datebind;
+	db->year=year;
+	db->month=month;
+	db->day=day;
+	db->hour=hour;
+	db->minute=minute;
+	db->second=second;
+	db->tz=tz;
+	db->buffer=buffer;
+	outdatebind[outbindcount]=db;
+
+	erg=SQLBindParameter(stmt,
+				charstring::toInteger(variable+1),
+				SQL_PARAM_OUTPUT,
+				SQL_C_TIMESTAMP,
+				SQL_TIMESTAMP,
+				0,
+				0,
+				buffer,
+				0,
 				(SQLINTEGER *)isnull);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
@@ -557,6 +644,23 @@ bool db2cursor::executeQuery(const char *query, uint32_t length, bool execute) {
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
+
+	// convert date output binds
+	for (uint16_t i=0; i<MAXVAR; i++) {
+		if (outdatebind[i]) {
+			datebind	*db=outdatebind[i];
+			SQL_TIMESTAMP_STRUCT	*ts=
+				(SQL_TIMESTAMP_STRUCT *)db->buffer;
+			*(db->year)=ts->year;
+			*(db->month)=ts->month;
+			*(db->day)=ts->day;
+			*(db->hour)=ts->hour;
+			*(db->minute)=ts->minute;
+			*(db->second)=ts->second;
+			*(db->tz)=NULL;
+		}
+	}
+	
 	return true;
 }
 
@@ -806,4 +910,14 @@ void db2cursor::getField(uint32_t col,
 
 void db2cursor::nextRow() {
 	rowgroupindex++;
+}
+
+void db2cursor::cleanUpData(bool freeresult, bool freebinds) {
+
+	if (freebinds) {
+		for (uint16_t i=0; i<MAXVAR; i++) {
+			delete outdatebind[i];
+			outdatebind[i]=NULL;
+		}
+	}
 }
