@@ -540,8 +540,7 @@ bool sybasecursor::inputBindString(const char *variable,
 
 	checkRePrepare();
 
-	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
-				sizeof(parameter[paramindex]));
+	rawbuffer::zero(&parameter[paramindex],sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
@@ -567,8 +566,7 @@ bool sybasecursor::inputBindInteger(const char *variable,
 
 	checkRePrepare();
 
-	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
-				sizeof(parameter[paramindex]));
+	rawbuffer::zero(&parameter[paramindex],sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
@@ -596,8 +594,7 @@ bool sybasecursor::inputBindDouble(const char *variable,
 
 	checkRePrepare();
 
-	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
-				sizeof(parameter[paramindex]));
+	rawbuffer::zero(&parameter[paramindex],sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
@@ -619,6 +616,60 @@ bool sybasecursor::inputBindDouble(const char *variable,
 	return true;
 }
 
+static const char *monthname[]={
+	"Jan","Feb","Mar","Apr","May","Jun",
+	"Jul","Aug","Sep","Oct","Nov","Dec",
+	NULL
+};
+
+bool sybasecursor::inputBindDate(const char *variable,
+					uint16_t variablesize,
+					int64_t year,
+					int16_t month,
+					int16_t day,
+					int16_t hour,
+					int16_t minute,
+					int16_t second,
+					const char *tz,
+					char *buffer,
+					uint16_t buffersize,
+					int16_t *isnull) {
+
+	checkRePrepare();
+
+	// Sybase requires this format: "Jan 2 2012 4:5:3:000PM"
+	if (month<1) {
+		month=1;
+	}
+	if (month>12) {
+		month=12;
+	}
+	const char	*ampm="AM";
+	if (hour==0) {
+		hour=12;
+	} else if (hour==12) {
+		ampm="PM";
+	} else if (hour>12) {
+		hour=hour-12;
+		ampm="PM";
+	}
+	charstring::copy(buffer,monthname[month-1]);
+	charstring::append(buffer," ");
+	charstring::append(buffer,(int64_t)day);
+	charstring::append(buffer," ");
+	charstring::append(buffer,(int64_t)year);
+	charstring::append(buffer," ");
+	charstring::append(buffer,(int64_t)hour);
+	charstring::append(buffer,":");
+	charstring::append(buffer,(int64_t)minute);
+	charstring::append(buffer,":");
+	charstring::append(buffer,(int64_t)second);
+	charstring::append(buffer,":000");
+	charstring::append(buffer,ampm);
+	return inputBindString(variable,variablesize,
+				buffer,charstring::length(buffer),isnull);
+}
+
 bool sybasecursor::outputBindString(const char *variable, 
 					uint16_t variablesize,
 					char *value, 
@@ -632,8 +683,7 @@ bool sybasecursor::outputBindString(const char *variable,
 	outbindstringlengths[outbindindex]=valuesize;
 	outbindindex++;
 
-	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
-				sizeof(parameter[paramindex]));
+	rawbuffer::zero(&parameter[paramindex],sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
@@ -665,8 +715,7 @@ bool sybasecursor::outputBindInteger(const char *variable,
 	outbindints[outbindindex]=value;
 	outbindindex++;
 
-	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
-				sizeof(parameter[paramindex]));
+	rawbuffer::zero(&parameter[paramindex],sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
@@ -700,8 +749,7 @@ bool sybasecursor::outputBindDouble(const char *variable,
 	outbinddoubles[outbindindex]=value;
 	outbindindex++;
 
-	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
-				sizeof(parameter[paramindex]));
+	rawbuffer::zero(&parameter[paramindex],sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;

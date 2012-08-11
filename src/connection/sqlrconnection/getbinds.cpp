@@ -108,8 +108,9 @@ bool sqlrconnection_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 			bv->value.dateval.second=0;
 			bv->value.dateval.tz=NULL;
 			// allocate enough space to store the date/time string
-			// 64 bytes ought to be enough
-			bv->value.dateval.buffersize=64;
+			// or whatever buffer a child might need to store a
+			// date 512 bytes ought to be enough
+			bv->value.dateval.buffersize=512;
 			bv->value.dateval.buffer=(char *)bindpool->malloc(
 						bv->value.dateval.buffersize);
 		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {

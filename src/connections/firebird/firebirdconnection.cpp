@@ -527,8 +527,8 @@ bool firebirdcursor::inputBindDate(const char *variable,
 	t.tm_min=minute;
 	t.tm_hour=hour;
 	t.tm_mday=day;
-	t.tm_mon=month;
-	t.tm_year=year;
+	t.tm_mon=month-1;
+	t.tm_year=year-1900;
 	isc_encode_timestamp(&t,(ISC_TIMESTAMP *)buffer);
 
 	// make bind vars 1 based like all other db's
