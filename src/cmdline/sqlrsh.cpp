@@ -10,6 +10,7 @@
 #include <rudiments/filedescriptor.h>
 #include <rudiments/process.h>
 #include <rudiments/environment.h>
+#include <rudiments/datetime.h>
 #include <sqlrconfigfile.h>
 
 // for clock()
@@ -50,6 +51,15 @@ class sqlrshbindvalue {
 				uint32_t	precision;
 				uint32_t	scale;
 			} doubleval;
+			struct {
+				int16_t		year;
+				int16_t		month;
+				int16_t		day;
+				int16_t		hour;
+				int16_t		minute;
+				int16_t		second;
+				const char	*tz;
+			} dateval;
 		};
 		bindtype	type;
 		uint32_t	outputstringbindlength;
@@ -632,6 +642,15 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			sqlrshbindvalue	*bv=node->getData()->getData();
 			if (bv->type==STRING_BIND) {
 				sqlrcur->inputBind(name,bv->stringval);
+			} else if (bv->type==DATE_BIND) {
+				sqlrcur->inputBind(name,
+						bv->dateval.year,
+						bv->dateval.month,
+						bv->dateval.day,
+						bv->dateval.hour,
+						bv->dateval.minute,
+						bv->dateval.second,
+						bv->dateval.tz);
 			} else if (bv->type==INTEGER_BIND) {
 				sqlrcur->inputBind(name,bv->integerval);
 			} else if (bv->type==DOUBLE_BIND) {
@@ -988,7 +1007,7 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 
 	// first handle nulls, then...
 	// anything enclosed in quotes is a string
-	// if it's unquoted, check to see if it's an integer or float
+	// if it's unquoted, check to see if it's an integer, float or date
 	// if it's not, then it's a string
 	if (!value) {
 		bv->type=NULL_BIND;
@@ -1005,6 +1024,20 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		// unescape the string
 		bv->stringval=charstring::unescape(newvalue);
 		delete[] newvalue;
+
+	} else if (charstring::contains(value,"/") && 
+			charstring::contains(value,":")) {
+
+		datetime	dt;
+		dt.initialize(value);
+		bv->dateval.year=dt.getYear();
+		bv->dateval.month=dt.getMonth();
+		bv->dateval.day=dt.getDayOfMonth();
+		bv->dateval.hour=dt.getHour();
+		bv->dateval.minute=dt.getMinutes();
+		bv->dateval.second=dt.getSeconds();
+		bv->dateval.tz=dt.getTimeZoneString();
+		delete[] value;
 
 	} else if (charstring::isInteger(value)) {
 		bv->type=INTEGER_BIND;
@@ -1194,10 +1227,14 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	green(env);
 	printf("sets delimiter character to [character]\n\n");
 	cyan(env);
-	printf("	inputbind [variable] = [value] - ");
+	printf("	inputbind ...                 - ");
 	green(env);
 	printf("defines an input bind variable\n");
 	cyan(env);
+	printf("		inputbind [variable] = [stringvalue]\n");
+	printf("		inputbind [variable] = [integervalue]\n");
+	printf("		inputbind [variable] = [doublevalue]\n");
+	printf("		inputbind [variable] = [MM/DD/YYYY HH:MM:SS TZN]\n");
 	printf("	outputbind ...                 - ");
 	green(env);
 	printf("defines an output bind variable\n");

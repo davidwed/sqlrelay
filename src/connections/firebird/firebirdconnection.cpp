@@ -508,6 +508,51 @@ bool firebirdcursor::inputBindDouble(const char *variable,
 	return true;
 }
 
+bool firebirdcursor::inputBindDate(const char *variable,
+					uint16_t variablesize,
+					int64_t year,
+					int16_t month,
+					int16_t day,
+					int16_t hour,
+					int16_t minute,
+					int16_t second,
+					const char *tz,
+					char *buffer,
+					uint16_t buffersize,
+					int16_t *isnull) {
+
+	// build an ISC_TIMESTAMP
+	tm	t;
+	t.tm_sec=second;
+	t.tm_min=minute;
+	t.tm_hour=hour;
+	t.tm_mday=day;
+	t.tm_mon=month;
+	t.tm_year=year;
+	isc_encode_timestamp(&t,(ISC_TIMESTAMP *)buffer);
+
+	// make bind vars 1 based like all other db's
+	long	index=charstring::toInteger(variable+1)-1;
+	if (index<0) {
+		return false;
+	}
+	insqlda->sqlvar[index].sqltype=SQL_TIMESTAMP;
+	insqlda->sqlvar[index].sqlscale=0;
+	insqlda->sqlvar[index].sqlsubtype=0;
+	insqlda->sqlvar[index].sqllen=sizeof(ISC_TIMESTAMP);
+	insqlda->sqlvar[index].sqldata=buffer;
+	insqlda->sqlvar[index].sqlind=(short *)NULL;
+	insqlda->sqlvar[index].sqlname_length=0;
+	insqlda->sqlvar[index].sqlname[0]='\0';
+	insqlda->sqlvar[index].relname_length=0;
+	insqlda->sqlvar[index].relname[0]='\0';
+	insqlda->sqlvar[index].ownname_length=0;
+	insqlda->sqlvar[index].ownname[0]='\0';
+	insqlda->sqlvar[index].aliasname_length=0;
+	insqlda->sqlvar[index].aliasname[0]='\0';
+	return true;
+}
+
 bool firebirdcursor::outputBindString(const char *variable, 
 				uint16_t variablesize,
 				char *value, 
