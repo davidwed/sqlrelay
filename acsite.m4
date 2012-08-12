@@ -403,18 +403,26 @@ fi
 
 AC_DEFUN([FW_CHECK_OSX],
 [
-	PYTHONFRAMEWORK=""
-	TRIGGERPLUGINLIBS=""
-	TRANSLATIONPLUGINLIBS=""
-	if ( test "$UNAME" = "Darwin" )
-	then
+DARWIN=""
+PYTHONFRAMEWORK=""
+TRIGGERPLUGINLIBS=""
+TRANSLATIONPLUGINLIBS=""
+AC_MSG_CHECKING(for OSX)
+case $host_os in
+	*darwin* )
+		DARWIN="yes"
 		PYTHONFRAMEWORK="-framework Python"
 		TRIGGERPLUGINLIBS="-L./ -lsqlrconnection"
 		TRANSLATIONPLUGINLIBS="-L./ -lsqlrconnection"
-	fi
-	AC_SUBST(PYTHONFRAMEWORK)
-	AC_SUBST(TRIGGERPLUGINLIBS)
-	AC_SUBST(TRANSLATIONPLUGINLIBS)
+		AC_MSG_RESULT(yes)
+		;;
+	* )
+		AC_MSG_RESULT(no)
+		;;
+esac
+AC_SUBST(PYTHONFRAMEWORK)
+AC_SUBST(TRIGGERPLUGINLIBS)
+AC_SUBST(TRANSLATIONPLUGINLIBS)
 ])
 
 dnl Checks for minix and adds some macros if it is
@@ -454,16 +462,14 @@ dnl Determines what extension shared object files have
 AC_DEFUN([FW_CHECK_SO_EXT],
 [
 AC_MSG_CHECKING(for dynamic library extension)
+SOSUFFIX="so"
 if ( test -n "$CYGWIN" )
 then
 	SOSUFFIX="dll.a"
-else
-	if ( test "`uname -s`" = "Darwin" )
-	then
-		SOSUFFIX="dylib"
-	else
-		SOSUFFIX="so"
-	fi
+fi
+if ( test -n "$DARWIN" )
+then
+	SOSUFFIX="dylib"
 fi
 AC_MSG_RESULT($SOSUFFIX)
 ])
@@ -2180,7 +2186,7 @@ then
 		dnl for cygwin and mac os x add -lperl
 		if ( test -n "$PERL" )
 		then
-			if ( test -n "$CYGWIN" -o "$UNAME" = "Darwin" )
+			if ( test -n "$CYGWIN" -o -n "$DARWIN" )
 			then
 				DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
 				for dir in $DIRS
@@ -2310,7 +2316,7 @@ then
 							then
 								PYTHONDIR="$i"
 								PYTHONLIB="-L$PYTHONDIR/$k -lpython$j"
-							elif ( test "$UNAME" = "Darwin" )
+							elif ( test -n "$DARWIN" )
 							then
 								PYTHONDIR="$i"
 								PYTHONLIB="-lpython$j"
@@ -2503,7 +2509,7 @@ then
 			then
 				HAVE_RUBY="yes"
 				dnl for cygwin and OSX include -lruby
-				if ( test -n "$CYGWIN" -o "$UNAME" = "Darwin" )
+				if ( test -n "$CYGWIN" -o -n "$DARWIN" )
 				then
 					RUBYLIB="-lruby"
 				fi
@@ -2788,7 +2794,7 @@ then
 		dnl on os x add -lphp - this isn't necessary any more
 		dnl and I can't figure out what platforms it was required on
 		dnl any more either
-		dnl if ( test -n "$PHPCONFIG" -a "$UNAME" = "Darwin" )
+		dnl if ( test -n "$PHPCONFIG" -a -n "$DARWIN" )
 		dnl then
 			dnl PHPLIB="-lphp"
 		dnl fi

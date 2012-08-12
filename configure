@@ -14977,15 +14977,26 @@ $as_echo "no" >&6; }
 esac
 
 
-	PYTHONFRAMEWORK=""
-	TRIGGERPLUGINLIBS=""
-	TRANSLATIONPLUGINLIBS=""
-	if ( test "$UNAME" = "Darwin" )
-	then
+DARWIN=""
+PYTHONFRAMEWORK=""
+TRIGGERPLUGINLIBS=""
+TRANSLATIONPLUGINLIBS=""
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for OSX" >&5
+$as_echo_n "checking for OSX... " >&6; }
+case $host_os in
+	*darwin* )
+		DARWIN="yes"
 		PYTHONFRAMEWORK="-framework Python"
 		TRIGGERPLUGINLIBS="-L./ -lsqlrconnection"
 		TRANSLATIONPLUGINLIBS="-L./ -lsqlrconnection"
-	fi
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		;;
+	* )
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		;;
+esac
 
 
 
@@ -14993,16 +15004,14 @@ esac
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for dynamic library extension" >&5
 $as_echo_n "checking for dynamic library extension... " >&6; }
+SOSUFFIX="so"
 if ( test -n "$CYGWIN" )
 then
 	SOSUFFIX="dll.a"
-else
-	if ( test "`uname -s`" = "Darwin" )
-	then
-		SOSUFFIX="dylib"
-	else
-		SOSUFFIX="so"
-	fi
+fi
+if ( test -n "$DARWIN" )
+then
+	SOSUFFIX="dylib"
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $SOSUFFIX" >&5
 $as_echo "$SOSUFFIX" >&6; }
@@ -28515,7 +28524,7 @@ fi
 
 				if ( test -n "$PERL" )
 		then
-			if ( test -n "$CYGWIN" -o "$UNAME" = "Darwin" )
+			if ( test -n "$CYGWIN" -o -n "$DARWIN" )
 			then
 				DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
 				for dir in $DIRS
@@ -28649,7 +28658,7 @@ then
 							then
 								PYTHONDIR="$i"
 								PYTHONLIB="-L$PYTHONDIR/$k -lpython$j"
-							elif ( test "$UNAME" = "Darwin" )
+							elif ( test -n "$DARWIN" )
 							then
 								PYTHONDIR="$i"
 								PYTHONLIB="-lpython$j"
@@ -28942,7 +28951,7 @@ fi
 			if ( test -n "$RUBY" )
 			then
 				HAVE_RUBY="yes"
-								if ( test -n "$CYGWIN" -o "$UNAME" = "Darwin" )
+								if ( test -n "$CYGWIN" -o -n "$DARWIN" )
 				then
 					RUBYLIB="-lruby"
 				fi
