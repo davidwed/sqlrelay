@@ -821,7 +821,7 @@ void oracle8cursor::checkRePrepare() {
 void oracle8cursor::dateToString(char *buffer, uint16_t buffersize,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				int16_t microsecond, const char *tz) {
+				int32_t microsecond, const char *tz) {
 	// typically oracle just wants DD-MON-YYYY but if hour,
 	// minute and second are non-zero then use them too
 	if (hour && minute && second) {
@@ -957,7 +957,7 @@ bool oracle8cursor::inputBindDate(const char *variable,
 						int16_t hour,
 						int16_t minute,
 						int16_t second,
-						int16_t microsecond,
+						int32_t microsecond,
 						const char *tz,
 						char *buffer,
 						uint16_t buffersize,
@@ -1091,7 +1091,6 @@ bool oracle8cursor::outputBindDouble(const char *variable,
 						uint32_t *scale,
 						int16_t *isnull) {
 	checkRePrepare();
-printf("defining out bind date\n");
 
 	outintbindstring[oraoutbindcount]=NULL;
 	outdatebind[oraoutbindcount]=NULL;
@@ -1134,7 +1133,7 @@ bool oracle8cursor::outputBindDate(const char *variable,
 						int16_t *hour,
 						int16_t *minute,
 						int16_t *second,
-						int16_t *microsecond,
+						int32_t *microsecond,
 						const char **tz,
 						char *buffer,
 						uint16_t buffersize,
@@ -1679,7 +1678,6 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 	// convert date output binds
 	for (uint16_t i=0; i<oraoutbindcount; i++) {
 		if (outdatebind[i]) {
-printf("converting out bind date\n");
 			datebind	*db=outdatebind[i];
 			sb2	year;
 			ub1	month;

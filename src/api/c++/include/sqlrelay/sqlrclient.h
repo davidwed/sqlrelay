@@ -359,7 +359,7 @@ class SQLRCLIENT_DLLSPEC sqlrcursor {
 		void	inputBind(const char *variable,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				int16_t microsecond, const char *tz);
+				int32_t microsecond, const char *tz);
 
 		/** Defines a binary lob input bind variable. */
 		void	inputBindBlob(const char *variable,
@@ -465,7 +465,7 @@ class SQLRCLIENT_DLLSPEC sqlrcursor {
 							int16_t *hour,
 							int16_t *minute,
 							int16_t *second,
-							int16_t *microsecond,
+							int32_t *microsecond,
 							const char **tz);
 
 		/** Get the value stored in a previously

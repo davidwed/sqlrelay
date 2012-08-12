@@ -113,7 +113,7 @@ void sqlrconnection_svr::returnOutputBindValues(sqlrcursor_svr *cursor) {
 			clientsock->write((uint16_t)bv->value.dateval.hour);
 			clientsock->write((uint16_t)bv->value.dateval.minute);
 			clientsock->write((uint16_t)bv->value.dateval.second);
-			clientsock->write((uint16_t)bv->value.
+			clientsock->write((uint32_t)bv->value.
 							dateval.microsecond);
 			uint16_t	length=charstring::length(
 							bv->value.dateval.tz);

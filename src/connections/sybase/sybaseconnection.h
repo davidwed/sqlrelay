@@ -24,7 +24,7 @@ struct datebind {
         int16_t         *hour;
         int16_t         *minute;
         int16_t         *second;
-        int16_t         *microsecond;
+        int32_t         *microsecond;
         const char      **tz;
 };
 
@@ -60,7 +60,7 @@ class sybasecursor : public sqlrcursor_svr {
 						int16_t hour,
 						int16_t minute,
 						int16_t second,
-						int16_t microsecond,
+						int32_t microsecond,
 						const char *tz,
 						char *buffer,
 						uint16_t buffersize,
@@ -88,7 +88,7 @@ class sybasecursor : public sqlrcursor_svr {
 						int16_t *hour,
 						int16_t *minute,
 						int16_t *second,
-						int16_t *microsecond,
+						int32_t *microsecond,
 						const char **tz,
 						char *buffer,
 						uint16_t buffersize,

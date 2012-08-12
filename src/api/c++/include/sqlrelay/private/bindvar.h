@@ -36,7 +36,7 @@ class SQLRCLIENT_DLLSPEC bindvar {
 				int16_t	hour;
 				int16_t	minute;
 				int16_t	second;
-				int16_t	microsecond;
+				int32_t	microsecond;
 				char	*tz;
 			} dateval;
 			char		*lobval;

@@ -284,7 +284,7 @@ void sqlrcur_inputBindDouble(sqlrcur sqlrcurref, const char *variable,
 void sqlrcur_inputBindDate(sqlrcur sqlrcurref, const char *variable,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				int16_t microsecond, const char *tz) {
+				int32_t microsecond, const char *tz) {
 	sqlrcurref->inputBind(variable,year,month,day,
 				hour,minute,second,microsecond,tz);
 }
@@ -411,7 +411,7 @@ double sqlrcur_getOutputBindDouble(sqlrcur sqlrcurref,
 int sqlrcur_getOutputBindDate(sqlrcur sqlrcurref, const char *variable,
 				int16_t *year, int16_t *month, int16_t *day,
 				int16_t *hour, int16_t *minute, int16_t *second,
-				int16_t *microsecond, const char **tz) {
+				int32_t *microsecond, const char **tz) {
 	return sqlrcurref->getOutputBindDate(variable,year,month,day,
 					hour,minute,second,microsecond,tz);
 }

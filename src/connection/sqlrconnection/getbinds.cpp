@@ -380,12 +380,13 @@ bool sqlrconnection_svr::getDateBind(bindvar_svr *bv) {
 	bv->value.dateval.second=(int16_t)temp;
 
 	// get the microsecond
-	if (clientsock->read(&temp,idleclienttimeout,0)!=sizeof(uint16_t)) {
+	uint32_t	temp32;
+	if (clientsock->read(&temp32,idleclienttimeout,0)!=sizeof(uint16_t)) {
 		dbgfile.debugPrint("connection",2,
 				"getting binds failed: bad microsecond");
 		return false;
 	}
-	bv->value.dateval.microsecond=(int16_t)temp;
+	bv->value.dateval.microsecond=(int32_t)temp32;
 
 	// get the size of the time zone
 	uint16_t	length;

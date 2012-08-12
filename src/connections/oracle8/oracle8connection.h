@@ -101,7 +101,7 @@ class oracle8cursor : public sqlrcursor_svr {
 						int16_t hour,
 						int16_t minute,
 						int16_t second,
-						int16_t microsecond,
+						int32_t microsecond,
 						const char *tz,
 						char *buffer,
 						uint16_t buffersize,
@@ -129,7 +129,7 @@ class oracle8cursor : public sqlrcursor_svr {
 						int16_t *hour,
 						int16_t *minute,
 						int16_t *second,
-						int16_t *microsecond,
+						int32_t *microsecond,
 						const char **tz,
 						char *buffer,
 						uint16_t buffersize,
@@ -223,7 +223,7 @@ class oracle8cursor : public sqlrcursor_svr {
 						int16_t hour,
 						int16_t minute,
 						int16_t second,
-						int16_t microsecond,
+						int32_t microsecond,
 						const char *tz);
 
 		OCIStmt		*stmt;

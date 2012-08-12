@@ -250,7 +250,7 @@ void sqlrcursor::sendInputBinds() {
 					inbindvars[i].value.dateval.minute);
 			sqlrc->cs->write((uint16_t)
 					inbindvars[i].value.dateval.second);
-			sqlrc->cs->write((uint16_t)
+			sqlrc->cs->write((uint32_t)
 					inbindvars[i].value.
 							dateval.microsecond);
 			sqlrc->cs->write((uint16_t)

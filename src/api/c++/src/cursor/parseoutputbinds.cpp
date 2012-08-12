@@ -264,13 +264,14 @@ bool sqlrcursor::parseOutputBinds() {
 			outbindvars[count].value.dateval.second=(int16_t)temp;
 
 			// get the microsecond
-			if (getShort(&temp)!=sizeof(uint16_t)) {
+			uint32_t	temp32;
+			if (getLong(&temp32)!=sizeof(uint32_t)) {
 				setError("Failed to get long value.\n "
 					"A network error may have occurred.");
 				return false;
 			}
 			outbindvars[count].value.
-					dateval.microsecond=(int16_t)temp;
+					dateval.microsecond=(int32_t)temp32;
 
 			// get the timezone length
 			uint16_t	length;

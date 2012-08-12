@@ -29,7 +29,7 @@ class bindvar_svr {
 				int16_t		hour;
 				int16_t		minute;
 				int16_t		second;
-				int16_t		microsecond;
+				int32_t		microsecond;
 				char		*tz;
 				char		*buffer;
 				uint16_t	buffersize;
@@ -78,7 +78,7 @@ class sqlrcursor_svr {
 						int16_t hour,
 						int16_t minute,
 						int16_t second,
-						int16_t microsecond,
+						int32_t microsecond,
 						const char *tz);
 		virtual bool	inputBindDate(const char *variable,
 						uint16_t variablesize,
@@ -88,7 +88,7 @@ class sqlrcursor_svr {
 						int16_t hour,
 						int16_t minute,
 						int16_t second,
-						int16_t microsecond,
+						int32_t microsecond,
 						const char *tz,
 						char *buffer,
 						uint16_t buffersize,
@@ -126,7 +126,7 @@ class sqlrcursor_svr {
 						int16_t *hour,
 						int16_t *minute,
 						int16_t *second,
-						int16_t *microsecond,
+						int32_t *microsecond,
 						const char **tz,
 						char *buffer,
 						uint16_t buffersize,

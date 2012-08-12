@@ -58,7 +58,7 @@ class sqlrshbindvalue {
 				int16_t		hour;
 				int16_t		minute;
 				int16_t		second;
-				int16_t		microsecond;
+				int32_t		microsecond;
 				const char	*tz;
 			} dateval;
 		};
@@ -1051,7 +1051,8 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		bv->dateval.hour=dt.getHour();
 		bv->dateval.minute=dt.getMinutes();
 		bv->dateval.second=dt.getSeconds();
-		bv->dateval.microsecond=0;
+		bv->dateval.microsecond=charstring::toInteger(
+					charstring::findLast(value,":")+1);
 		bv->dateval.tz=dt.getTimeZoneString();
 		delete[] value;
 
@@ -1181,13 +1182,15 @@ void sqlrsh::printbinds(const char *type,
 						bv->doubleval.scale,
 						bv->doubleval.value);
 		} else if (bv->type==DATE_BIND) {
-			printf("(DATE) = %02d/%02d/%04d %02d:%02d:%02d %s\n",
+			printf("(DATE) = %02d/%02d/%04d "
+						"%02d:%02d:%02d:%03d %s\n",
 						bv->dateval.month,
 						bv->dateval.day,
 						bv->dateval.year,
 						bv->dateval.hour,
 						bv->dateval.minute,
 						bv->dateval.second,
+						bv->dateval.microsecond,
 						bv->dateval.tz);
 		} else if (bv->type==NULL_BIND) {
 			printf("NULL\n");
@@ -1271,7 +1274,7 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	printf("		inputbind [variable] = [stringvalue]\n");
 	printf("		inputbind [variable] = [integervalue]\n");
 	printf("		inputbind [variable] = [doublevalue]\n");
-	printf("		inputbind [variable] = [MM/DD/YYYY HH:MM:SS TZN]\n");
+	printf("		inputbind [variable] = [MM/DD/YYYY HH:MM:SS:uS TZN]\n");
 	printf("	outputbind ...                 - ");
 	green(env);
 	printf("defines an output bind variable\n");

@@ -296,7 +296,7 @@ void sqlrcursor::inputBind(const char *variable, double value,
 void sqlrcursor::inputBind(const char *variable,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				int16_t microsecond, const char *tz) {
+				int32_t microsecond, const char *tz) {
 	if (!variable || !variable[0]) {
 		return;
 	}
@@ -397,7 +397,7 @@ void sqlrcursor::doubleVar(bindvar *var, const char *variable, double value,
 void sqlrcursor::dateVar(bindvar *var, const char *variable,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				int16_t microsecond, const char *tz) {
+				int32_t microsecond, const char *tz) {
 	initVar(var,variable);
 	var->type=DATE_BIND;
 	var->value.dateval.year=year;
@@ -625,7 +625,7 @@ double sqlrcursor::getOutputBindDouble(const char *variable) {
 bool sqlrcursor::getOutputBindDate(const char *variable,
 			int16_t *year, int16_t *month, int16_t *day,
 			int16_t *hour, int16_t *minute, int16_t *second,
-			int16_t *microsecond, const char **tz) {
+			int32_t *microsecond, const char **tz) {
 
 	if (variable) {
 		for (int16_t i=0; i<outbindcount; i++) {
