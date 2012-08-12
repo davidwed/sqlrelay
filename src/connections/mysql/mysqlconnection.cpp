@@ -20,6 +20,10 @@
 #define TRUE (1)
 #endif
 
+#ifndef FALSE
+#define FALSE (0)
+#endif
+
 #ifdef HAVE_MYSQL_OPT_RECONNECT
 const my_bool	mysqlconnection::mytrue=TRUE;
 #endif
