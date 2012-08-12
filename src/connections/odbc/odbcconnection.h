@@ -13,16 +13,9 @@
 #ifdef HAVE_IODBC
 	#include <iodbcinst.h>
 #endif
-#ifdef __CYGWIN__
-	#include <windows.h>
-	#include <w32api/sql.h>
-	#include <w32api/sqlext.h>
-	#include <w32api/sqltypes.h>
-#else
-	#include <sql.h>
-	#include <sqlext.h>
-	#include <sqltypes.h>
-#endif
+#include <sql.h>
+#include <sqlext.h>
+#include <sqltypes.h>
 
 // note that sqlrconnection.h must be included after sqltypes.h to
 // get around a problem with CHAR/xmlChar in gnome-xml
