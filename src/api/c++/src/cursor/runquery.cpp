@@ -251,6 +251,9 @@ void sqlrcursor::sendInputBinds() {
 			sqlrc->cs->write((uint16_t)
 					inbindvars[i].value.dateval.second);
 			sqlrc->cs->write((uint16_t)
+					inbindvars[i].value.
+							dateval.microsecond);
+			sqlrc->cs->write((uint16_t)
 					charstring::length(
 					inbindvars[i].value.dateval.tz));
 			sqlrc->cs->write(inbindvars[i].value.dateval.tz);
@@ -274,6 +277,10 @@ void sqlrcursor::sendInputBinds() {
 				sqlrc->debugPrint(":");
 				sqlrc->debugPrint((int64_t)
 					inbindvars[i].value.dateval.second);
+				sqlrc->debugPrint(":");
+				sqlrc->debugPrint((int64_t)
+					inbindvars[i].value.
+						dateval.microsecond);
 				sqlrc->debugPrint(" ");
 				sqlrc->debugPrint(
 					inbindvars[i].value.dateval.tz);

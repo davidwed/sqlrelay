@@ -106,6 +106,7 @@ bool sqlrconnection_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 			bv->value.dateval.hour=0;
 			bv->value.dateval.minute=0;
 			bv->value.dateval.second=0;
+			bv->value.dateval.microsecond=0;
 			bv->value.dateval.tz=NULL;
 			// allocate enough space to store the date/time string
 			// or whatever buffer a child might need to store a
@@ -357,7 +358,7 @@ bool sqlrconnection_svr::getDateBind(bindvar_svr *bv) {
 	// get the hour
 	if (clientsock->read(&temp,idleclienttimeout,0)!=sizeof(uint16_t)) {
 		dbgfile.debugPrint("connection",2,
-					"getting binds failed: bad month");
+					"getting binds failed: bad hour");
 		return false;
 	}
 	bv->value.dateval.hour=(int16_t)temp;
@@ -365,7 +366,7 @@ bool sqlrconnection_svr::getDateBind(bindvar_svr *bv) {
 	// get the minute
 	if (clientsock->read(&temp,idleclienttimeout,0)!=sizeof(uint16_t)) {
 		dbgfile.debugPrint("connection",2,
-					"getting binds failed: bad month");
+					"getting binds failed: bad minute");
 		return false;
 	}
 	bv->value.dateval.minute=(int16_t)temp;
@@ -373,10 +374,18 @@ bool sqlrconnection_svr::getDateBind(bindvar_svr *bv) {
 	// get the second
 	if (clientsock->read(&temp,idleclienttimeout,0)!=sizeof(uint16_t)) {
 		dbgfile.debugPrint("connection",2,
-					"getting binds failed: bad month");
+					"getting binds failed: bad second");
 		return false;
 	}
 	bv->value.dateval.second=(int16_t)temp;
+
+	// get the microsecond
+	if (clientsock->read(&temp,idleclienttimeout,0)!=sizeof(uint16_t)) {
+		dbgfile.debugPrint("connection",2,
+				"getting binds failed: bad microsecond");
+		return false;
+	}
+	bv->value.dateval.microsecond=(int16_t)temp;
 
 	// get the size of the time zone
 	uint16_t	length;
@@ -409,7 +418,8 @@ bool sqlrconnection_svr::getDateBind(bindvar_svr *bv) {
 		str.append(bv->value.dateval.day)->append(" ");
 		str.append(bv->value.dateval.hour)->append(":");
 		str.append(bv->value.dateval.minute)->append(":");
-		str.append(bv->value.dateval.second)->append(" ");
+		str.append(bv->value.dateval.second)->append(":");
+		str.append(bv->value.dateval.microsecond)->append(" ");
 		str.append(bv->value.dateval.tz);
 		dbgfile.debugPrint("connection",4,str.getString());
 	}

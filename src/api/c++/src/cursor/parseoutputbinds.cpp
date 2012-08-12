@@ -82,6 +82,7 @@ bool sqlrcursor::parseOutputBinds() {
 				outbindvars[count].value.dateval.hour=0;
 				outbindvars[count].value.dateval.minute=0;
 				outbindvars[count].value.dateval.second=0;
+				outbindvars[count].value.dateval.microsecond=0;
 				if (returnnulls) {
 					outbindvars[count].
 						value.dateval.tz=NULL;
@@ -261,6 +262,15 @@ bool sqlrcursor::parseOutputBinds() {
 				return false;
 			}
 			outbindvars[count].value.dateval.second=(int16_t)temp;
+
+			// get the microsecond
+			if (getShort(&temp)!=sizeof(uint16_t)) {
+				setError("Failed to get long value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			outbindvars[count].value.
+					dateval.microsecond=(int16_t)temp;
 
 			// get the timezone length
 			uint16_t	length;

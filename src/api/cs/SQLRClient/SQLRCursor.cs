@@ -312,9 +312,9 @@ public class SQLRCursor : IDisposable
     /**  Defines a date input bind variable.  "day" should be
      *  1-31 and "month" should be 1-12.  "tz" may be left NULL.
      *  Most databases ignore "tz".  */
-    public void inputBind(String variable, Int16 year, Int16 month, Int16 day, Int16 hour, Int16 minute, Int16 second, String tz)
+    public void inputBind(String variable, Int16 year, Int16 month, Int16 day, Int16 hour, Int16 minute, Int16 second, Int16 microsecond, String tz)
     {
-        sqlrcur_inputBindDate(sqlrcurref, variable, year, month, day, hour, minute, second, tz);
+        sqlrcur_inputBindDate(sqlrcurref, variable, year, month, day, hour, minute, second, microsecond, tz);
     }
 
     /** Defines a binary lob input bind variable. */
@@ -443,7 +443,7 @@ public class SQLRCursor : IDisposable
 
     /** Get the value stored in a previously defined
      *  decimal output bind variable. */
-    public Boolean getOutputBindDate(String variable, out Int16 year, out Int16 month, out Int16 day, out Int16 hour, out Int16 minute, out Int16 second, out String tz)
+    public Boolean getOutputBindDate(String variable, out Int16 year, out Int16 month, out Int16 day, out Int16 hour, out Int16 minute, out Int16 second, out Int16 microsecond, out String tz)
     {
         year = -1;
         month = -1;
@@ -451,9 +451,10 @@ public class SQLRCursor : IDisposable
         hour = -1;
         minute = -1;
         second = -1;
+        microsecond = -1;
         tz = "";
         IntPtr tzptr = (IntPtr)0;
-        sqlrcur_getOutputBindDate(sqlrcurref, variable, ref year, ref month, ref day, ref hour, ref minute, ref second, ref tzptr);
+        sqlrcur_getOutputBindDate(sqlrcurref, variable, ref year, ref month, ref day, ref hour, ref minute, ref second, ref microsecond, ref tzptr);
         tz = Marshal.PtrToStringAnsi(tzptr);
         return false;
     }
@@ -1033,7 +1034,7 @@ public class SQLRCursor : IDisposable
     private static extern void sqlrcur_inputBindDouble(IntPtr sqlrcurref, String variable, Double val, UInt32 precision, UInt32 scale);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcur_inputBindDate(IntPtr sqlrcurref, String variable, Int16 year, Int16 month, Int16 day, Int16 hour, Int16 minute, Int16 second, String tz);
+    private static extern void sqlrcur_inputBindDate(IntPtr sqlrcurref, String variable, Int16 year, Int16 month, Int16 day, Int16 hour, Int16 minute, Int16 second, Int16 microsecond, String tz);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcur_inputBindBlob(IntPtr sqlrcurref, String variable, Byte[] val, UInt32 size);
@@ -1090,7 +1091,7 @@ public class SQLRCursor : IDisposable
     private static extern Double sqlrcur_getOutputBindDouble(IntPtr sqlrcurref, String variable);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern Int32 sqlrcur_getOutputBindDate(IntPtr sqlrcurref, String variable, ref Int16 year, ref Int16 month, ref Int16 day, ref Int16 hour, ref Int16 minute, ref Int16 second, ref IntPtr tz);
+    private static extern Int32 sqlrcur_getOutputBindDate(IntPtr sqlrcurref, String variable, ref Int16 year, ref Int16 month, ref Int16 day, ref Int16 hour, ref Int16 minute, ref Int16 second, ref Int16 microsecond, ref IntPtr tz);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern IntPtr sqlrcur_getOutputBindBlob(IntPtr sqlrcurref, String variable);

@@ -46,6 +46,7 @@ bool sqlrcursor_svr::handleBinds() {
 				inbindvars[i].value.dateval.hour,
 				inbindvars[i].value.dateval.minute,
 				inbindvars[i].value.dateval.second,
+				inbindvars[i].value.dateval.microsecond,
 				inbindvars[i].value.dateval.tz,
 				inbindvars[i].value.dateval.buffer,
 				inbindvars[i].value.dateval.buffersize,
@@ -106,6 +107,7 @@ bool sqlrcursor_svr::handleBinds() {
 				&outbindvars[i].value.dateval.hour,
 				&outbindvars[i].value.dateval.minute,
 				&outbindvars[i].value.dateval.second,
+				&outbindvars[i].value.dateval.microsecond,
 				(const char **)&outbindvars[i].value.dateval.tz,
 				outbindvars[i].value.dateval.buffer,
 				outbindvars[i].value.dateval.buffersize,
@@ -183,7 +185,7 @@ bool sqlrcursor_svr::inputBindDouble(const char *variable,
 void sqlrcursor_svr::dateToString(char *buffer, uint16_t buffersize,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				const char *tz) {
+				int16_t microsecond, const char *tz) {
 	snprintf(buffer,buffersize,"%04d-%02d-%02d %02d:%02d:%02d",
 					year,month,day,hour,minute,second);
 }
@@ -196,11 +198,13 @@ bool sqlrcursor_svr::inputBindDate(const char *variable,
 					int16_t hour,
 					int16_t minute,
 					int16_t second,
+					int16_t microsecond,
 					const char *tz,
 					char *buffer,
 					uint16_t buffersize,
 					int16_t *isnull) {
-	dateToString(buffer,buffersize,year,month,day,hour,minute,second,tz);
+	dateToString(buffer,buffersize,year,month,day,
+			hour,minute,second,microsecond,tz);
 	if (buffer[0]=='\0') {
 		*isnull=conn->nullBindValue();
 	}
@@ -261,6 +265,7 @@ bool sqlrcursor_svr::outputBindDate(const char *variable,
 					int16_t *hour,
 					int16_t *minute,
 					int16_t *second,
+					int16_t *microsecond,
 					const char **tz,
 					char *buffer,
 					uint16_t buffersize,

@@ -100,6 +100,8 @@ void sqlrconnection_svr::returnOutputBindValues(sqlrcursor_svr *cursor) {
 				debugstr->append(bv->value.dateval.minute);
 				debugstr->append(":");
 				debugstr->append(bv->value.dateval.second);
+				debugstr->append(":");
+				debugstr->append(bv->value.dateval.microsecond);
 				debugstr->append(" ");
 				debugstr->append(bv->value.dateval.tz);
 			}
@@ -111,8 +113,10 @@ void sqlrconnection_svr::returnOutputBindValues(sqlrcursor_svr *cursor) {
 			clientsock->write((uint16_t)bv->value.dateval.hour);
 			clientsock->write((uint16_t)bv->value.dateval.minute);
 			clientsock->write((uint16_t)bv->value.dateval.second);
+			clientsock->write((uint16_t)bv->value.
+							dateval.microsecond);
 			uint16_t	length=charstring::length(
-						bv->value.dateval.tz);
+							bv->value.dateval.tz);
 			clientsock->write(length);
 			clientsock->write(bv->value.dateval.tz,length);
 

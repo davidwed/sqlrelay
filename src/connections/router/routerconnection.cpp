@@ -436,11 +436,13 @@ bool routercursor::inputBindDate(const char *variable,
                                                 int16_t hour,
                                                 int16_t minute,
                                                 int16_t second,
+                                                int16_t microsecond,
                                                 const char *tz,
                                                 char *buffer,
                                                 uint16_t buffersize,
                                                 int16_t *isnull) {
-	cur->inputBind(variable+1,year,month,day,hour,minute,second,tz);
+	cur->inputBind(variable+1,year,month,day,
+			hour,minute,second,microsecond,tz);
 	return true;
 }
 
@@ -513,6 +515,7 @@ bool routercursor::outputBindDate(const char *variable,
                                                 int16_t *hour,
                                                 int16_t *minute,
                                                 int16_t *second,
+                                                int16_t *microsecond,
                                                 const char **tz,
                                                 char *buffer,
                                                 uint16_t buffersize,
@@ -526,6 +529,7 @@ bool routercursor::outputBindDate(const char *variable,
 	obv[obcount].value.datevalue.hour=hour;
 	obv[obcount].value.datevalue.minute=minute;
 	obv[obcount].value.datevalue.second=second;
+	obv[obcount].value.datevalue.microsecond=microsecond;
 	obv[obcount].value.datevalue.tz=tz;
 	obv[obcount].isnull=isnull;
 	obcount++;
@@ -641,6 +645,7 @@ bool routercursor::executeQuery(const char *query, uint32_t length,
 					obv[index].value.datevalue.hour,
 					obv[index].value.datevalue.minute,
 					obv[index].value.datevalue.second,
+					obv[index].value.datevalue.microsecond,
 					obv[index].value.datevalue.tz);
 		}
 	}

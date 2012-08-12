@@ -173,6 +173,7 @@ void sqlrcursor_svr::performSubstitution(stringbuffer *buffer, int16_t index) {
 				inbindvars[index].value.dateval.hour,
 				inbindvars[index].value.dateval.minute,
 				inbindvars[index].value.dateval.second,
+				inbindvars[index].value.dateval.microsecond,
 				inbindvars[index].value.dateval.tz);
 		buffer->append("'")->append(buf)->append("'");
 	} else if (inbindvars[index].type==NULL_BIND) {

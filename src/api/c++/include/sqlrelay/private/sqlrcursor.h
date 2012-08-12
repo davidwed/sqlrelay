@@ -48,6 +48,7 @@
 						int16_t hour,
 						int16_t minute,
 						int16_t second,
+						int16_t millisecond,
 						const char *tz);
 		void	lobVar(bindvar *var, const char *variable,
 					const char *value, uint32_t size,

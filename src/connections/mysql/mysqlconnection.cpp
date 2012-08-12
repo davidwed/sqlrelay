@@ -534,6 +534,7 @@ bool mysqlcursor::inputBindDate(const char *variable,
 					int16_t hour,
 					int16_t minute,
 					int16_t second,
+					int16_t microsecond,
 					const char *tz,
 					char *buffer,
 					uint16_t buffersize,
@@ -564,7 +565,7 @@ bool mysqlcursor::inputBindDate(const char *variable,
 		t->hour=hour;
 		t->minute=minute;
 		t->second=second;
-		t->second_part=0;
+		t->second_part=microsecond;
 		t->neg=FALSE;
 		t->time_type=MYSQL_TIMESTAMP_DATETIME;
 

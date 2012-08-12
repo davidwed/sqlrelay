@@ -58,6 +58,7 @@ class sqlrshbindvalue {
 				int16_t		hour;
 				int16_t		minute;
 				int16_t		second;
+				int16_t		microsecond;
 				const char	*tz;
 			} dateval;
 		};
@@ -352,14 +353,14 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"debug",5) ||
 		!charstring::compareIgnoringCase(ptr,"autocommit",10) ||
 		!charstring::compareIgnoringCase(ptr,"final",5) ||
-		!charstring::compareIgnoringCase(ptr,"help",4) ||
-		!charstring::compareIgnoringCase(ptr,"ping",4) ||
-		!charstring::compareIgnoringCase(ptr,"identify",8) ||
-		!charstring::compareIgnoringCase(ptr,"dbversion",9) ||
-		!charstring::compareIgnoringCase(ptr,"clientversion",13) ||
-		!charstring::compareIgnoringCase(ptr,"serverversion",13) ||
+		!charstring::compareIgnoringCase(ptr,"help") ||
+		!charstring::compareIgnoringCase(ptr,"ping") ||
+		!charstring::compareIgnoringCase(ptr,"identify") ||
+		!charstring::compareIgnoringCase(ptr,"dbversion") ||
+		!charstring::compareIgnoringCase(ptr,"clientversion") ||
+		!charstring::compareIgnoringCase(ptr,"serverversion") ||
 		!charstring::compareIgnoringCase(ptr,"use ",4) ||
-		!charstring::compareIgnoringCase(ptr,"currentdb",9) ||
+		!charstring::compareIgnoringCase(ptr,"currentdb") ||
 		!charstring::compareIgnoringCase(ptr,"run",3) ||
 		!charstring::compareIgnoringCase(ptr,"@",1) ||
 		!charstring::compareIgnoringCase(ptr,"delimiter",9) ||
@@ -368,11 +369,11 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"outputbind ",11) ||
 		!charstring::compareIgnoringCase(ptr,"printinputbind",14) ||
 		!charstring::compareIgnoringCase(ptr,"printoutputbind",15) ||
-		!charstring::compareIgnoringCase(ptr,"printbinds",10) ||
+		!charstring::compareIgnoringCase(ptr,"printbinds") ||
 		!charstring::compareIgnoringCase(ptr,"clearinputbind",14) ||
 		!charstring::compareIgnoringCase(ptr,"clearoutputbind",15) ||
-		!charstring::compareIgnoringCase(ptr,"clearbinds",10) ||
-		!charstring::compareIgnoringCase(ptr,"lastinsertid",12)) {
+		!charstring::compareIgnoringCase(ptr,"clearbinds") ||
+		!charstring::compareIgnoringCase(ptr,"lastinsertid")) {
 
 		// return value of 1 is internal command
 		return 1;
@@ -417,10 +418,10 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr,"final",5)) {	
 		ptr=ptr+5;
 		cmdtype=5;
-	} else if (!charstring::compareIgnoringCase(ptr,"help",4)) {	
+	} else if (!charstring::compareIgnoringCase(ptr,"help")) {	
 		displayHelp(env);
 		return;
-	} else if (!charstring::compareIgnoringCase(ptr,"ping",4)) {	
+	} else if (!charstring::compareIgnoringCase(ptr,"ping")) {	
 		ping(sqlrcon,env);
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"use ",4)) {	
@@ -430,7 +431,7 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 					sqlrcon->errorNumber());
 		}
 		return;
-	} else if (!charstring::compareIgnoringCase(ptr,"currentdb",9)) {	
+	} else if (!charstring::compareIgnoringCase(ptr,"currentdb")) {	
 		printf("%s\n",sqlrcon->getCurrentDatabase());
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"run",3)) {	
@@ -443,16 +444,16 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			!charstring::compareIgnoringCase(ptr,"delimeter",9)) {	
 		ptr=ptr+9;
 		cmdtype=7;
-	} else if (!charstring::compareIgnoringCase(ptr,"identify",8)) {	
+	} else if (!charstring::compareIgnoringCase(ptr,"identify")) {	
 		identify(sqlrcon,env);
 		return;
-	} else if (!charstring::compareIgnoringCase(ptr,"dbversion",9)) {	
+	} else if (!charstring::compareIgnoringCase(ptr,"dbversion")) {	
 		dbversion(sqlrcon,env);
 		return;
-	} else if (!charstring::compareIgnoringCase(ptr,"clientversion",13)) {	
+	} else if (!charstring::compareIgnoringCase(ptr,"clientversion")) {	
 		clientversion(sqlrcon,env);
 		return;
-	} else if (!charstring::compareIgnoringCase(ptr,"serverversion",13)) {	
+	} else if (!charstring::compareIgnoringCase(ptr,"serverversion")) {	
 		serverversion(sqlrcon,env);
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"inputbind ",10)) {	
@@ -461,7 +462,7 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr,"outputbind ",11)) {	
 		outputbind(sqlrcur,env,command);
 		return;
-	} else if (!charstring::compareIgnoringCase(ptr,"printbinds",10)) {	
+	} else if (!charstring::compareIgnoringCase(ptr,"printbinds")) {	
 		printbinds("Input",&env->inputbinds);
 		printf("\n");
 		printbinds("Output",&env->outputbinds);
@@ -473,11 +474,11 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 					ptr,"clearoutputbind",15)) {	
 		env->clearbinds(&env->outputbinds);
 		return;
-	} else if (!charstring::compareIgnoringCase(ptr,"clearbinds",10)) {	
+	} else if (!charstring::compareIgnoringCase(ptr,"clearbinds")) {	
 		env->clearbinds(&env->inputbinds);
 		env->clearbinds(&env->outputbinds);
 		return;
-	} else if (!charstring::compareIgnoringCase(ptr,"lastinsertid",12)) {	
+	} else if (!charstring::compareIgnoringCase(ptr,"lastinsertid")) {	
 		if (!lastinsertid(sqlrcon,env)) {
 			displayError(env,NULL,
 					sqlrcon->errorMessage(),
@@ -548,15 +549,15 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 	}
 
 	// handle begin, commit and rollback
-	if (!charstring::compareIgnoringCase(command,"begin",5)) {
+	if (!charstring::compareIgnoringCase(command,"begin")) {
 
 		sqlrcon->begin();
 
-	} else if (!charstring::compareIgnoringCase(command,"commit",6)) {
+	} else if (!charstring::compareIgnoringCase(command,"commit")) {
 
 		sqlrcon->commit();
 
-	} else if (!charstring::compareIgnoringCase(command,"rollback",8)) {
+	} else if (!charstring::compareIgnoringCase(command,"rollback")) {
 
 		sqlrcon->rollback();
 
@@ -590,7 +591,7 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			delete[] table;
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
-							"reexecute",9)) {	
+							"reexecute")) {	
 			executeQuery(sqlrcur,env);
 		} else {
 			sqlrcur->prepareQuery(command);
@@ -656,6 +657,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 						bv->dateval.hour,
 						bv->dateval.minute,
 						bv->dateval.second,
+						bv->dateval.microsecond,
 						bv->dateval.tz);
 			} else if (bv->type==NULL_BIND) {
 				sqlrcur->inputBind(name,(const char *)NULL);
@@ -711,13 +713,14 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 					sqlrcur->getOutputBindDouble(name);
 			} else if (bv->type==DATE_BIND) {
 				sqlrcur->getOutputBindDate(name,
-							&(bv->dateval.year),
-							&(bv->dateval.month),
-							&(bv->dateval.day),
-							&(bv->dateval.hour),
-							&(bv->dateval.minute),
-							&(bv->dateval.second),
-							&(bv->dateval.tz));
+						&(bv->dateval.year),
+						&(bv->dateval.month),
+						&(bv->dateval.day),
+						&(bv->dateval.hour),
+						&(bv->dateval.minute),
+						&(bv->dateval.second),
+						&(bv->dateval.microsecond),
+						&(bv->dateval.tz));
 			}
 		}
 	}
@@ -1048,6 +1051,7 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		bv->dateval.hour=dt.getHour();
 		bv->dateval.minute=dt.getMinutes();
 		bv->dateval.second=dt.getSeconds();
+		bv->dateval.microsecond=0;
 		bv->dateval.tz=dt.getTimeZoneString();
 		delete[] value;
 
@@ -1124,6 +1128,7 @@ void sqlrsh::outputbind(sqlrcursor *sqlrcur,
 			bv->dateval.hour=0;
 			bv->dateval.minute=0;
 			bv->dateval.second=0;
+			bv->dateval.microsecond=0;
 			bv->dateval.tz="";
 		} else {
 			sane=false;
@@ -1400,12 +1405,17 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			#endif
 		}
 
+		// trim the command
+		char	*cmd=command.detachString();
+		charstring::bothTrim(cmd);
+
 		// run the command
-		if (!runCommand(sqlrcon,sqlrcur,env,command.getString())) {	
+		if (!runCommand(sqlrcon,sqlrcur,env,cmd)) {	
 			exitprogram=1;
 		}
 
-		command.clear();
+		// clean up
+		delete[] cmd;
 	}
 }
 

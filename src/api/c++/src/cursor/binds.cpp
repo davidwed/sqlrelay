@@ -296,7 +296,7 @@ void sqlrcursor::inputBind(const char *variable, double value,
 void sqlrcursor::inputBind(const char *variable,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				const char *tz) {
+				int16_t microsecond, const char *tz) {
 	if (!variable || !variable[0]) {
 		return;
 	}
@@ -308,7 +308,7 @@ void sqlrcursor::inputBind(const char *variable,
 		bv=&inbindvars[inbindcount];
 		inbindcount++;
 	}
-	dateVar(bv,variable,year,month,day,hour,minute,second,tz);
+	dateVar(bv,variable,year,month,day,hour,minute,second,microsecond,tz);
 	bv->send=true;
 	dirtybinds=true;
 }
@@ -397,7 +397,7 @@ void sqlrcursor::doubleVar(bindvar *var, const char *variable, double value,
 void sqlrcursor::dateVar(bindvar *var, const char *variable,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
-				const char *tz) {
+				int16_t microsecond, const char *tz) {
 	initVar(var,variable);
 	var->type=DATE_BIND;
 	var->value.dateval.year=year;
@@ -406,6 +406,7 @@ void sqlrcursor::dateVar(bindvar *var, const char *variable,
 	var->value.dateval.hour=hour;
 	var->value.dateval.minute=minute;
 	var->value.dateval.second=second;
+	var->value.dateval.microsecond=microsecond;
 	if (copyrefs) {
 		var->value.dateval.tz=charstring::duplicate(tz);
 	} else {
@@ -624,7 +625,7 @@ double sqlrcursor::getOutputBindDouble(const char *variable) {
 bool sqlrcursor::getOutputBindDate(const char *variable,
 			int16_t *year, int16_t *month, int16_t *day,
 			int16_t *hour, int16_t *minute, int16_t *second,
-			const char **tz) {
+			int16_t *microsecond, const char **tz) {
 
 	if (variable) {
 		for (int16_t i=0; i<outbindcount; i++) {
@@ -637,6 +638,8 @@ bool sqlrcursor::getOutputBindDate(const char *variable,
 				*hour=outbindvars[i].value.dateval.hour;
 				*minute=outbindvars[i].value.dateval.minute;
 				*second=outbindvars[i].value.dateval.second;
+				*microsecond=outbindvars[i].
+						value.dateval.microsecond;
 				*tz=outbindvars[i].value.dateval.tz;
 				return true;
 			}

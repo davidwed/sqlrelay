@@ -28,6 +28,7 @@ struct datebind {
         int16_t         *hour;
         int16_t         *minute;
         int16_t         *second;
+        int16_t         *microsecond;
         const char      **tz;
 };
 
@@ -65,6 +66,7 @@ class freetdscursor : public sqlrcursor_svr {
 						int16_t hour,
 						int16_t minute,
 						int16_t second,
+						int16_t microsecond,
 						const char *tz,
 						char *buffer,
 						uint16_t buffersize,
@@ -83,6 +85,19 @@ class freetdscursor : public sqlrcursor_svr {
 						double *value,
 						uint32_t *precision,
 						uint32_t *scale,
+						int16_t *isnull);
+		bool		outputBindDate(const char *variable,
+						uint16_t variablesize,
+						int16_t *year,
+						int16_t *month,
+						int16_t *day,
+						int16_t *hour,
+						int16_t *minute,
+						int16_t *second,
+						int16_t *microsecond,
+						const char **tz,
+						char *buffer,
+						uint16_t buffersize,
 						int16_t *isnull);
 #endif
 		bool		executeQuery(const char *query,

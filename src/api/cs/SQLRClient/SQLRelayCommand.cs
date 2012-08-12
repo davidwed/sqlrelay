@@ -405,7 +405,7 @@ namespace SQLRClient
                         case DbType.DateTime2:
                         case DbType.DateTimeOffset:
                             DateTime dt = Convert.ToDateTime(param.Value);
-                            _sqlrcur.inputBind(param.ParameterName, Convert.ToInt16(dt.Year), Convert.ToInt16(dt.Month), Convert.ToInt16(dt.Day), Convert.ToInt16(dt.Hour), Convert.ToInt16(dt.Minute), Convert.ToInt16(dt.Second), null);
+                            _sqlrcur.inputBind(param.ParameterName, Convert.ToInt16(dt.Year), Convert.ToInt16(dt.Month), Convert.ToInt16(dt.Day), Convert.ToInt16(dt.Hour), Convert.ToInt16(dt.Minute), Convert.ToInt16(dt.Second), Convert.ToInt16(dt.Millisecond)*1000, null);
                             continue;
 
                         case DbType.Binary:
@@ -566,9 +566,10 @@ namespace SQLRClient
                             Int16 hour = 0;
                             Int16 minute = 0;
                             Int16 second = 0;
+                            Int16 microsecond = 0;
                             String tz = null;
-                            _sqlrcur.getOutputBindDate(param.ParameterName, out year, out month, out day, out hour, out minute, out second, out tz);
-                            param.Value = new DateTime(year, month, day, hour, minute, second);
+                            _sqlrcur.getOutputBindDate(param.ParameterName, out year, out month, out day, out hour, out minute, out second, out microsecond, out tz);
+                            param.Value = new DateTime(year, month, day, hour, minute, second, microsecond/1000);
                             break;
 
                         case DbType.Binary:

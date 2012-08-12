@@ -737,6 +737,12 @@ bool freetdscursor::inputBindDouble(const char *variable,
 	return true;
 }
 
+static const char *monthname[]={
+	"Jan","Feb","Mar","Apr","May","Jun",
+	"Jul","Aug","Sep","Oct","Nov","Dec",
+	NULL
+};
+
 bool freetdscursor::inputBindDate(const char *variable,
 					uint16_t variablesize,
 					int64_t year,
@@ -745,6 +751,7 @@ bool freetdscursor::inputBindDate(const char *variable,
 					int16_t hour,
 					int16_t minute,
 					int16_t second,
+					int16_t microsecond,
 					const char *tz,
 					char *buffer,
 					uint16_t buffersize,
@@ -779,7 +786,8 @@ bool freetdscursor::inputBindDate(const char *variable,
 	charstring::append(buffer,(int64_t)minute);
 	charstring::append(buffer,":");
 	charstring::append(buffer,(int64_t)second);
-	charstring::append(buffer,":000");
+	charstring::append(buffer,":");
+	charstring::append(buffer,(int64_t)microsecond);
 	charstring::append(buffer,ampm);
 	return inputBindString(variable,variablesize,
 				buffer,charstring::length(buffer),isnull);
@@ -896,6 +904,7 @@ bool freetdscursor::outputBindDate(const char *variable,
 						int16_t *hour,
 						int16_t *minute,
 						int16_t *second,
+						int16_t *microsecond,
 						const char **tz,
 						char *buffer,
 						uint16_t buffersize,
@@ -909,6 +918,7 @@ bool freetdscursor::outputBindDate(const char *variable,
 	outbinddates[outbindindex].hour=hour;
 	outbinddates[outbindindex].minute=minute;
 	outbinddates[outbindindex].second=second;
+	outbinddates[outbindindex].microsecond=microsecond;
 	outbinddates[outbindindex].tz=tz;
 	outbindindex++;
 
@@ -1195,6 +1205,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length,
 				*(db->hour)=dr.datehour;
 				*(db->minute)=dr.dateminute;
 				*(db->second)=dr.datesecond;
+				*(db->microsecond)=dr.datemsecond;
 				*(db->tz)=NULL;
 			}
 		}

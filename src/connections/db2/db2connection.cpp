@@ -386,6 +386,7 @@ bool db2cursor::inputBindDate(const char *variable,
 					int16_t hour,
 					int16_t minute,
 					int16_t second,
+					int16_t microsecond,
 					const char *tz,
 					char *buffer,
 					uint16_t buffersize,
@@ -398,7 +399,7 @@ bool db2cursor::inputBindDate(const char *variable,
 	ts->hour=hour;
 	ts->minute=minute;
 	ts->second=second;
-	ts->fraction=0;
+	ts->fraction=microsecond*1000;
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
@@ -496,6 +497,7 @@ bool db2cursor::outputBindDate(const char *variable,
 						int16_t *hour,
 						int16_t *minute,
 						int16_t *second,
+						int16_t *microsecond,
 						const char **tz,
 						char *buffer,
 						uint16_t buffersize,
@@ -508,6 +510,7 @@ bool db2cursor::outputBindDate(const char *variable,
 	db->hour=hour;
 	db->minute=minute;
 	db->second=second;
+	db->microsecond=microsecond;
 	db->tz=tz;
 	db->buffer=buffer;
 	outdatebind[outbindcount]=db;
@@ -657,6 +660,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length, bool execute) {
 			*(db->hour)=ts->hour;
 			*(db->minute)=ts->minute;
 			*(db->second)=ts->second;
+			*(db->microsecond)=ts->fraction/1000;
 			*(db->tz)=NULL;
 		}
 	}
