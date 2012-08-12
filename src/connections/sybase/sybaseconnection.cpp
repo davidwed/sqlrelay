@@ -1004,6 +1004,7 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 
 				// convert to a CS_DATEREC
 				CS_DATEREC	dr;
+				rawbuffer::zero(&dr,sizeof(CS_DATEREC));
 				cs_dt_crack(sybaseconn->context,
 						CS_DATETIME_TYPE,
 						(CS_VOID *)data[i][0],&dr);

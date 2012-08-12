@@ -381,7 +381,7 @@ bool sqlrconnection_svr::getDateBind(bindvar_svr *bv) {
 
 	// get the microsecond
 	uint32_t	temp32;
-	if (clientsock->read(&temp32,idleclienttimeout,0)!=sizeof(uint16_t)) {
+	if (clientsock->read(&temp32,idleclienttimeout,0)!=sizeof(uint32_t)) {
 		dbgfile.debugPrint("connection",2,
 				"getting binds failed: bad microsecond");
 		return false;

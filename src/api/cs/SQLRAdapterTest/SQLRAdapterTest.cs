@@ -178,7 +178,7 @@ namespace SQLRClientTest
             sqlrcom.Parameters.Add("1", 2);
             sqlrcom.Parameters.Add("2", "testchar2");
             sqlrcom.Parameters.Add("3", "testvarchar2");
-            sqlrcom.Parameters.Add("4", new DateTime(2001,1,1,0,0,0));
+            sqlrcom.Parameters.Add("4", new DateTime(2001,1,1,0,0,0,0));
             sqlrcom.Parameters.Add("5", "testlong2");
             SQLRelayParameter var6 = new SQLRelayParameter();
             var6.ParameterName = "6";
@@ -195,7 +195,7 @@ namespace SQLRClientTest
             sqlrcom.Parameters.Add("1", 3);
             sqlrcom.Parameters.Add("2", "testchar3");
             sqlrcom.Parameters.Add("3", "testvarchar3");
-            sqlrcom.Parameters.Add("4", new DateTime(2003,1,1,0,0,0));
+            sqlrcom.Parameters.Add("4", new DateTime(2003,1,1,0,0,0,0));
             sqlrcom.Parameters.Add("5", "testlong3");
             var6.Value = "testclob3";
             sqlrcom.Parameters.Add(var6);
@@ -211,7 +211,7 @@ namespace SQLRClientTest
             sqlrcom.Parameters.Add("var1", 4);
             sqlrcom.Parameters.Add("var2", "testchar4");
             sqlrcom.Parameters.Add("var3", "testvarchar4");
-            sqlrcom.Parameters.Add("var4", new DateTime(2004,1,1,0,0,0));
+            sqlrcom.Parameters.Add("var4", new DateTime(2004,1,1,0,0,0,0));
             sqlrcom.Parameters.Add("var5", "testlong4");
             var6.Value = "testclob4";
             sqlrcom.Parameters.Add(var6);
@@ -222,7 +222,7 @@ namespace SQLRClientTest
             sqlrcom.Parameters.Add("var1", 5);
             sqlrcom.Parameters.Add("var2", "testchar5");
             sqlrcom.Parameters.Add("var3", "testvarchar5");
-            sqlrcom.Parameters.Add("var4", new DateTime(2005,1,1,0,0,0));
+            sqlrcom.Parameters.Add("var4", new DateTime(2005,1,1,0,0,0,0));
             sqlrcom.Parameters.Add("var5", "testlong5");
             var6.Value = "testclob5";
             sqlrcom.Parameters.Add(var6);
