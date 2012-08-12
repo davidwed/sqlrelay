@@ -354,15 +354,26 @@ dnl sets the substitution variables MINGW32, CYGWIN and UWIN as appropriate
 dnl sets the enviroment variable MICROSOFT
 AC_DEFUN([FW_CHECK_MICROSOFT],
 [
+AC_MSG_CHECKING(for microsoft platform)
 CYGWIN=""
-CYGWINDEFINES=""
 MINGW32=""
 UWIN=""
-dnl AC_CANONICAL_HOST gets called when AC_PROG_LIBTOOL is called
 case $host_os in
-	*cygwin* ) CYGWIN="yes";;
-	*mingw32* ) MINGW32="yes";;
-	*uwin* ) UWIN="yes";;
+	*cygwin* )
+		CYGWIN="yes"
+		AC_MSG_RESULT(cygwin)
+		;;
+	*mingw32* )
+		MINGW32="yes"
+		AC_MSG_RESULT(mingw32)
+		;;
+	*uwin* )
+		UWIN="yes"
+		AC_MSG_RESULT(uwin)
+		;;
+	* )
+		AC_MSG_RESULT(no)
+		;;
 esac
 EXE=""
 AC_SUBST(MINGW32)
@@ -370,13 +381,13 @@ AC_SUBST(CYGWIN)
 AC_SUBST(UWIN)
 
 MICROSOFT=""
-EXE=""
 if ( test "$UWIN" = "yes" -o "$MINGW32" = "yes" -o "$CYGWIN" = "yes" )
 then
 	CPPFLAGS="$CPPFLAGS -mno-win32"
 	MICROSOFT="yes"
 	EXE=".exe"
 fi
+
 AC_SUBST(EXE)
 AC_SUBST(MICROSOFT)
 

@@ -14892,14 +14892,31 @@ UNAME=`uname -s`
 
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for microsoft platform" >&5
+$as_echo_n "checking for microsoft platform... " >&6; }
 CYGWIN=""
-CYGWINDEFINES=""
 MINGW32=""
 UWIN=""
 case $host_os in
-	*cygwin* ) CYGWIN="yes";;
-	*mingw32* ) MINGW32="yes";;
-	*uwin* ) UWIN="yes";;
+	*cygwin* )
+		CYGWIN="yes"
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: cygwin" >&5
+$as_echo "cygwin" >&6; }
+		;;
+	*mingw32* )
+		MINGW32="yes"
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: mingw32" >&5
+$as_echo "mingw32" >&6; }
+		;;
+	*uwin* )
+		UWIN="yes"
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: uwin" >&5
+$as_echo "uwin" >&6; }
+		;;
+	* )
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		;;
 esac
 EXE=""
 
@@ -14907,13 +14924,13 @@ EXE=""
 
 
 MICROSOFT=""
-EXE=""
 if ( test "$UWIN" = "yes" -o "$MINGW32" = "yes" -o "$CYGWIN" = "yes" )
 then
 	CPPFLAGS="$CPPFLAGS -mno-win32"
 	MICROSOFT="yes"
 	EXE=".exe"
 fi
+
 
 
 
