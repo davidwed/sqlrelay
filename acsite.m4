@@ -404,25 +404,16 @@ fi
 AC_DEFUN([FW_CHECK_OSX],
 [
 DARWIN=""
-PYTHONFRAMEWORK=""
-TRIGGERPLUGINLIBS=""
-TRANSLATIONPLUGINLIBS=""
 AC_MSG_CHECKING(for OSX)
 case $host_os in
 	*darwin* )
 		DARWIN="yes"
-		PYTHONFRAMEWORK="-framework Python"
-		TRIGGERPLUGINLIBS="-L./ -lsqlrconnection"
-		TRANSLATIONPLUGINLIBS="-L./ -lsqlrconnection"
 		AC_MSG_RESULT(yes)
 		;;
 	* )
 		AC_MSG_RESULT(no)
 		;;
 esac
-AC_SUBST(PYTHONFRAMEWORK)
-AC_SUBST(TRIGGERPLUGINLIBS)
-AC_SUBST(TRANSLATIONPLUGINLIBS)
 ])
 
 dnl Checks for minix and adds some macros if it is
@@ -474,6 +465,31 @@ fi
 AC_MSG_RESULT($SOSUFFIX)
 ])
 
+dnl Determines what extension shared object files have
+AC_DEFUN([FW_CHECK_PLUGIN_DEPENDENCIES],
+[
+AC_MSG_CHECKING(for plugin dependencies)
+PYTHONFRAMEWORK=""
+TRIGGERPLUGINLIBS=""
+TRANSLATIONPLUGINLIBS=""
+if ( test -n "$CYGWIN" )
+then
+	TRIGGERPLUGINLIBS="-L./ -lsqlrconnection"
+	TRANSLATIONPLUGINLIBS="-L./ -lsqlrconnection"
+	AC_MSG_RESULT(Cygwin style)
+elif (test -n "$DARWIN" )
+then
+	PYTHONFRAMEWORK="-framework Python"
+	TRIGGERPLUGINLIBS="-L./ -lsqlrconnection"
+	TRANSLATIONPLUGINLIBS="-L./ -lsqlrconnection"
+	AC_MSG_RESULT(OSX style)
+else
+	AC_MSG_RESULT(standard unix style)
+fi
+AC_SUBST(PYTHONFRAMEWORK)
+AC_SUBST(TRIGGERPLUGINLIBS)
+AC_SUBST(TRANSLATIONPLUGINLIBS)
+])
 
 dnl checks if the compiler supports the inline keyword
 dnl defines the macro INLINE

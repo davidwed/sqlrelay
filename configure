@@ -14978,17 +14978,11 @@ esac
 
 
 DARWIN=""
-PYTHONFRAMEWORK=""
-TRIGGERPLUGINLIBS=""
-TRANSLATIONPLUGINLIBS=""
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for OSX" >&5
 $as_echo_n "checking for OSX... " >&6; }
 case $host_os in
 	*darwin* )
 		DARWIN="yes"
-		PYTHONFRAMEWORK="-framework Python"
-		TRIGGERPLUGINLIBS="-L./ -lsqlrconnection"
-		TRANSLATIONPLUGINLIBS="-L./ -lsqlrconnection"
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 		;;
@@ -14997,9 +14991,6 @@ $as_echo "yes" >&6; }
 $as_echo "no" >&6; }
 		;;
 esac
-
-
-
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for dynamic library extension" >&5
@@ -15015,6 +15006,33 @@ then
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $SOSUFFIX" >&5
 $as_echo "$SOSUFFIX" >&6; }
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for plugin dependencies" >&5
+$as_echo_n "checking for plugin dependencies... " >&6; }
+PYTHONFRAMEWORK=""
+TRIGGERPLUGINLIBS=""
+TRANSLATIONPLUGINLIBS=""
+if ( test -n "$CYGWIN" )
+then
+	TRIGGERPLUGINLIBS="-L./ -lsqlrconnection"
+	TRANSLATIONPLUGINLIBS="-L./ -lsqlrconnection"
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: Cygwin style" >&5
+$as_echo "Cygwin style" >&6; }
+elif (test -n "$DARWIN" )
+then
+	PYTHONFRAMEWORK="-framework Python"
+	TRIGGERPLUGINLIBS="-L./ -lsqlrconnection"
+	TRANSLATIONPLUGINLIBS="-L./ -lsqlrconnection"
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: OSX style" >&5
+$as_echo "OSX style" >&6; }
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: standard unix style" >&5
+$as_echo "standard unix style" >&6; }
+fi
+
+
+
 
 
 
