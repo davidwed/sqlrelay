@@ -9,12 +9,28 @@ bool sqlparser::parseExpression(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
+	return parseExpression(currentnode,ptr,newptr,false);
+}
+
+bool sqlparser::parseExpression(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr,
+					bool ingroup) {
+	debugFunction();
 
 	// create the node
 	xmldomnode	*expressionnode=newNode(currentnode,_expression);
 
-	// any number of terms, separated by operators
+	// if we're in an expression group, then the expression could be an
+	// entire select query, check for that first
 	*newptr=ptr;
+	if (ingroup && parseSelect(expressionnode,*newptr,newptr)) {
+		return true;
+	}
+
+	// otherwise...
+
+	// the expression could be any number of terms, separated by operators
 	for (;;) {
 
 		// handle any unary operators
@@ -32,7 +48,7 @@ bool sqlparser::parseExpression(xmldomnode *currentnode,
 						_group,NULL);
 
 			// parse the expression inside the parens
-			if (!parseExpression(groupnode,*newptr,newptr)) {
+			if (!parseExpression(groupnode,*newptr,newptr,true)) {
 				return false;
 			}
 

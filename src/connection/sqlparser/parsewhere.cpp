@@ -118,40 +118,6 @@ bool sqlparser::orClause(const char *ptr, const char **newptr) {
 
 const char *sqlparser::_or="or";
 
-/*bool sqlparser::parseWhereClauseTerm(xmldomnode *currentnode,
-					const char *ptr,
-					const char **newptr) {
-	debugFunction();
-
-	// handle groups
-	*newptr=ptr;
-	if (leftParen(*newptr,newptr)) {
-
-		// create the node
-		xmldomnode	*groupnode=new xmldomnode(tree,
-						currentnode->getNullNode(),
-						TAG_XMLDOMNODETYPE,
-						_group,NULL);
-
-		// parse where clause terms and look for a right paren
-		if (parseWhereClauseTerms(groupnode,*newptr,newptr) &&
-						rightParen(*newptr,newptr)) {
-			currentnode->appendChild(groupnode);
-			return true;
-		}
-
-		// If this failed to parse then the paren we ran into might
-		// have been part of the first comparison or expression.
-		// Clean up and start over.
-		*newptr=ptr;
-		delete groupnode;
-		error=false;
-	}
-
-	// handle single comparisons
-	return parseComparison(currentnode,*newptr,newptr,true);
-}*/
-
 bool sqlparser::parseWhereClauseTerm(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {

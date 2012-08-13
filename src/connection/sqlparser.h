@@ -756,6 +756,10 @@ class sqlparser {
 		bool	parseExpression(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
+		bool	parseExpression(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr,
+						bool ingroup);
 		static const char	*_expression;
 		bool	parseUnaryOperator(xmldomnode *currentnode,
 						const char *ptr,
