@@ -269,7 +269,7 @@ AC_DEFUN([FW_CHECK_PS],
 AC_MSG_CHECKING(whether ps aux works)
 INVALID="`ps aux 2>&1 | grep illegal | grep -v grep`"
 DEPRECATED="`ps aux 2>&1 | grep deprecated | grep -v grep`"
-USAGE="`ps aux 2>&1 | grep usage | grep -v grep`"
+USAGE="`ps aux 2>&1 | grep -i usage | grep -v grep`"
 if ( test -n "$INVALID" -o -n "$DEPRECATED" -o -n "$USAGE" -o -n "$CYGWIN" )
 then
 	PS="ps\ \-efal"
