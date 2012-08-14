@@ -6,7 +6,6 @@
 #include <sqlrcursor.h>
 #include <debugprint.h>
 
-#include <rudiments/dynamiclib.h>
 #include <rudiments/xmldomnode.h>
 
 sqltriggers::sqltriggers() {
@@ -54,46 +53,51 @@ bool sqltriggers::loadTriggers(const char *triggers) {
 				(before)?"before":"after");
 
 		// determine which list to put the trigger in
-		linkedlist< sqltrigger * >	*list=
+		linkedlist< sqltriggerplugin * >	*list=
 				(before)?&beforetriggers:&aftertriggers;
 
 		// load trigger
-		sqltrigger	*tr=loadTrigger(trigger);
-		if (tr) {
-			list->append(tr);
-		}
+		loadTrigger(trigger,list);
 	}
 	return true;
 }
 
 void sqltriggers::unloadTriggers() {
 	debugFunction();
-	for (linkedlistnode< sqltrigger * > *node=
-			beforetriggers.getFirstNode();
-				node; node=node->getNext()) {
-		delete node->getData();
+	for (linkedlistnode< sqltriggerplugin * > *node=
+				beforetriggers.getFirstNode();
+					node; node=node->getNext()) {
+		sqltriggerplugin	*sqlt=node->getData();
+		delete sqlt->tr;
+		delete sqlt->dl;
+		delete sqlt;
 	}
 	beforetriggers.clear();
-	for (linkedlistnode< sqltrigger * > *node=
-			aftertriggers.getFirstNode();
-				node; node=node->getNext()) {
-		delete node->getData();
+	for (linkedlistnode< sqltriggerplugin * > *node=
+				aftertriggers.getFirstNode();
+					node; node=node->getNext()) {
+		sqltriggerplugin	*sqlt=node->getData();
+		delete sqlt->tr;
+		delete sqlt->dl;
+		delete sqlt;
 	}
 	aftertriggers.clear();
 }
 
-sqltrigger *sqltriggers::loadTrigger(xmldomnode *trigger) {
+void sqltriggers::loadTrigger(xmldomnode *trigger,
+				linkedlist< sqltriggerplugin * > *list) {
+
 	debugFunction();
 
 	// ignore non-triggers
 	if (charstring::compare(trigger->getName(),"trigger")) {
-		return NULL;
+		return;
 	}
 
 	// get the trigger name
 	const char	*file=trigger->getAttributeValue("file");
 	if (!charstring::length(file)) {
-		return NULL;
+		return;
 	}
 
 	debugPrintf("loading trigger: %s\n",file);
@@ -110,7 +114,7 @@ sqltrigger *sqltriggers::loadTrigger(xmldomnode *trigger) {
 		printf("%s\n",error);
 		delete[] error;
 		delete dl;
-		return NULL;
+		return;
 	}
 
 	// load the trigger itself
@@ -126,14 +130,15 @@ sqltrigger *sqltriggers::loadTrigger(xmldomnode *trigger) {
 		delete[] error;
 		dl->close();
 		delete dl;
-		return NULL;
+		return;
 	}
 	sqltrigger	*tr=(*newTrigger)(trigger);
 
-	// attach the module so deleting the trigger also closes the library
-	tr->attachModule(dl);
-
-	return tr;
+	// add the plugin to the list
+	sqltriggerplugin	*sqltp=new sqltriggerplugin;
+	sqltp->tr=tr;
+	sqltp->dl=dl;
+	list->append(sqltp);
 }
 
 void sqltriggers::runBeforeTriggers(sqlrconnection_svr *sqlrcon,
@@ -154,15 +159,16 @@ void sqltriggers::runAfterTriggers(sqlrconnection_svr *sqlrcon,
 void sqltriggers::runTriggers(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree,
-					linkedlist< sqltrigger * > *list,
+					linkedlist< sqltriggerplugin * > *list,
 					bool before,
 					bool success) {
 	debugFunction();
 	if (!querytree) {
 		return;
 	}
-	for (linkedlistnode< sqltrigger * > *node=list->getFirstNode();
+	for (linkedlistnode< sqltriggerplugin * > *node=list->getFirstNode();
 						node; node=node->getNext()) {
-		node->getData()->run(sqlrcon,sqlrcur,querytree,before,success);
+		node->getData()->tr->run(sqlrcon,sqlrcur,
+						querytree,before,success);
 	}
 }

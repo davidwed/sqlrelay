@@ -6,12 +6,19 @@
 
 #include <rudiments/xmldom.h>
 #include <rudiments/linkedlist.h>
+#include <rudiments/dynamiclib.h>
 #include <sqltrigger.h>
 
 using namespace rudiments;
 
 class sqlrconnection_svr;
 class sqlrcursor_svr;
+
+class sqltriggerplugin {
+	public:
+		sqltrigger	*tr;
+		dynamiclib	*dl;
+};
 
 class sqltriggers {
 	public:
@@ -28,17 +35,18 @@ class sqltriggers {
 						bool success);
 	private:
 		void		unloadTriggers();
-		sqltrigger	*loadTrigger(xmldomnode *trigger);
+		void		loadTrigger(xmldomnode *trigger,
+					linkedlist< sqltriggerplugin *> *list);
 		void		runTriggers(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree,
-					linkedlist< sqltrigger * > *list,
+					linkedlist< sqltriggerplugin * > *list,
 					bool before,
 					bool success);
 
 		xmldom				*xmld;
-		linkedlist< sqltrigger * >	beforetriggers;
-		linkedlist< sqltrigger * >	aftertriggers;
+		linkedlist< sqltriggerplugin * >	beforetriggers;
+		linkedlist< sqltriggerplugin * >	aftertriggers;
 };
 
 #endif

@@ -7,18 +7,6 @@
 
 sqltrigger::sqltrigger(xmldomnode *parameters) {
 	this->parameters=parameters;
-	dl=NULL;
-}
-
-sqltrigger::~sqltrigger() {
-	if (dl) {
-		dl->close();
-		delete dl;
-	}
-}
-
-void sqltrigger::attachModule(dynamiclib *dl) {
-	this->dl=dl;
 }
 
 bool sqltrigger::run(sqlrconnection_svr *sqlrcon,

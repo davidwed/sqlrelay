@@ -17,16 +17,6 @@
 #include <rudiments/process.h>
 #include <rudiments/character.h>
 
-bool databaseobject::operator==(const databaseobject &dbo) {
-printf("-------\n");
-printf("db: %s==%s\n",database,dbo.database);
-printf("sc: %s==%s\n",schema,dbo.schema);
-printf("tb: %s==%s\n\n",object,dbo.object);
-	return !charstring::compare(database,dbo.database) &&
-		!charstring::compare(schema,dbo.schema) &&
-		!charstring::compare(object,dbo.object);
-}
-
 sqltranslations::sqltranslations() {
 	debugFunction();
 	xmld=NULL;
@@ -70,10 +60,7 @@ bool sqltranslations::loadTranslations(const char *translations) {
 				translation=translation->getNextTagSibling()) {
 
 		// load translation
-		sqltranslation	*tr=loadTranslation(translation);
-		if (tr) {
-			tlist.append(tr);
-		}
+		loadTranslation(translation);
 	}
 
 	return true;
@@ -81,25 +68,29 @@ bool sqltranslations::loadTranslations(const char *translations) {
 
 void sqltranslations::unloadTranslations() {
 	debugFunction();
-	for (linkedlistnode< sqltranslation * > *node=tlist.getFirstNode();
+	for (linkedlistnode< sqltranslationplugin * > *node=
+						tlist.getFirstNode();
 						node; node=node->getNext()) {
-		delete node->getData();
+		sqltranslationplugin	*sqlt=node->getData();
+		delete sqlt->tr;
+		delete sqlt->dl;
+		delete sqlt;
 	}
 	tlist.clear();
 }
 
-sqltranslation *sqltranslations::loadTranslation(xmldomnode *translation) {
+void sqltranslations::loadTranslation(xmldomnode *translation) {
 	debugFunction();
 
 	// ignore non-translations
 	if (charstring::compare(translation->getName(),"translation")) {
-		return NULL;
+		return;
 	}
 
 	// get the translation name
 	const char	*file=translation->getAttributeValue("file");
 	if (!charstring::length(file)) {
-		return NULL;
+		return;
 	}
 
 	debugPrintf("loading translation: %s\n",file);
@@ -116,7 +107,7 @@ sqltranslation *sqltranslations::loadTranslation(xmldomnode *translation) {
 		printf("%s\n",error);
 		delete[] error;
 		delete dl;
-		return NULL;
+		return;
 	}
 
 	// load the translation itself
@@ -132,14 +123,15 @@ sqltranslation *sqltranslations::loadTranslation(xmldomnode *translation) {
 		delete[] error;
 		dl->close();
 		delete dl;
-		return NULL;
+		return;
 	}
 	sqltranslation	*tr=(*newTranslation)(this,translation);
 
-	// attach the module so deleting the translation also closes the library
-	tr->attachModule(dl);
-
-	return tr;
+	// add the plugin to the list
+	sqltranslationplugin	*sqltp=new sqltranslationplugin;
+	sqltp->tr=tr;
+	sqltp->dl=dl;
+	tlist.append(sqltp);
 }
 
 bool sqltranslations::runTranslations(sqlrconnection_svr *sqlrcon,
@@ -152,9 +144,10 @@ bool sqltranslations::runTranslations(sqlrconnection_svr *sqlrcon,
 
 	tree=querytree;
 
-	for (linkedlistnode< sqltranslation * > *node=tlist.getFirstNode();
+	for (linkedlistnode< sqltranslationplugin * > *node=
+						tlist.getFirstNode();
 						node; node=node->getNext()) {
-		if (!node->getData()->run(sqlrcon,sqlrcur,querytree)) {
+		if (!node->getData()->tr->run(sqlrcon,sqlrcur,querytree)) {
 			return false;
 		}
 	}
@@ -262,7 +255,6 @@ bool	sqltranslations::getReplacementTableName(const char *database,
 						const char *schema,
 						const char *oldname,
 						const char **newname) {
-printf("\nreplacement table:\n");
 		return getReplacementName(&temptablemap,
 						database,schema,
 						oldname,newname);
@@ -272,7 +264,6 @@ bool	sqltranslations::getReplacementIndexName(const char *database,
 						const char *schema,
 						const char *oldname,
 						const char **newname) {
-printf("\nreplacement index:\n");
 		return getReplacementName(&tempindexmap,
 						database,schema,
 						oldname,newname);
@@ -293,10 +284,6 @@ bool	sqltranslations::getReplacementName(
 							node->getNext()) {
 
 		databaseobject	*dbo=node->getData()->getKey();
-printf("=========\n");
-printf("%s=%s\n",database,dbo->database);
-printf("%s=%s\n",schema,dbo->schema);
-printf("%s=%s\n\n",oldname,dbo->object);
 		if (!charstring::compare(dbo->database,database) &&
 			!charstring::compare(dbo->schema,schema) &&
 			!charstring::compare(dbo->object,oldname)) {

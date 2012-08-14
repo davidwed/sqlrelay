@@ -8,6 +8,7 @@
 #include <rudiments/xmldomnode.h>
 #include <rudiments/memorypool.h>
 #include <rudiments/dictionary.h>
+#include <rudiments/dynamiclib.h>
 #include <sqltranslation.h>
 
 using namespace rudiments;
@@ -17,10 +18,15 @@ class sqlrcursor_svr;
 
 class databaseobject {
 	public:
-		bool	operator==(const databaseobject &dbo);
 		const char	*database;
 		const char	*schema;
 		const char	*object;
+};
+
+class sqltranslationplugin {
+	public:
+		sqltranslation	*tr;
+		dynamiclib	*dl;
 };
 
 class sqltranslations {
@@ -48,8 +54,8 @@ class sqltranslations {
 
 		void	endSession();
 	private:
-		void		unloadTranslations();
-		sqltranslation	*loadTranslation(xmldomnode *translation);
+		void	unloadTranslations();
+		void	loadTranslation(xmldomnode *translation);
 
 		bool	getReplacementName(
 				dictionary< databaseobject *, char *> *dict,
@@ -58,9 +64,10 @@ class sqltranslations {
 				const char *oldname,
 				const char **newname);
 		
-		xmldom				*xmld;
-		xmldom				*tree;
-		linkedlist< sqltranslation * >	tlist;
+		xmldom	*xmld;
+		xmldom	*tree;
+
+		linkedlist< sqltranslationplugin * >	tlist;
 
 
 	public:
