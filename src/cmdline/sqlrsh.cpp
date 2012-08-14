@@ -1384,6 +1384,9 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 				char	cmd[1024];
 				ssize_t	bytes=standardin.read(cmd,1024);
 				cmd[bytes-1]='\0';
+				#ifdef ADD_NEWLINE_AFTER_READ_FROM_STDI
+					printf("\n");
+				#endif
 			#endif
 			size_t	len=charstring::length(cmd);
 			done=false;
