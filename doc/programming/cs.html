@@ -1065,24 +1065,20 @@ cur.executeQuery();
 </pre>
 </blockquote>
 
-<p>MySQL 4.1.2 supports native input binds with its Statement API but the
-Statement API cannot be used to call stored procedures yet.  As a result,
-SQL Relay must fake input binds when calling MySQL stored procedures, so queries
-which call stored procedures must be written with colon-delimited bind
-variables rather than MySQL's native ?'s.</p>
-
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("call testproc(:in1,:in2,:in3)");
-cur.inputBind("in1", 1);
-cur.inputBind("in2", 1.1, 2, 1);
-cur.inputBind("in3", "hello");
+cur.prepareQuery("call testproc(?,?,?)");
+cur.inputBind("1", 1);
+cur.inputBind("2", 1.1, 2, 1);
+cur.inputBind("3", "hello");
 cur.executeQuery();
 </pre>
 </blockquote>
+
+<p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1707,27 +1703,23 @@ set of a MySQL procedure.</p>
 </pre>
 </blockquote>
 
-<p>MySQL 4.1.2 supports native input binds with its Statement API but the
-Statement API cannot be used to call stored procedures yet.  As a result,
-SQL Relay must fake input binds when calling MySQL stored procedures, so queries
-which call stored procedures must be written with colon-delimited bind
-variables rather than MySQL's native ?'s.</p>
-
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("call testproc(:in1,:in2,:in3)");
-cur.inputBind("in1", 1);
-cur.inputBind("in2", 1.1, 4, 2);
-cur.inputBind("in3", "hello");
+cur.prepareQuery("call testproc(?,?,?)");
+cur.inputBind("1", 1);
+cur.inputBind("2", 1.1, 4, 2);
+cur.inputBind("3", "hello");
 cur.executeQuery();
 String out1=cur.getField(0, 0);
 String out2=cur.getField(0, 1);
 String out3=cur.getField(0, 2);
 </pre>
 </blockquote>
+
+<p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -1933,8 +1925,6 @@ the following.</p>
 </pre>
 </blockquote>
 
-<p>MySQL 4.1.2 supports native input binds with its Statement API but the Statement API cannot be used to call stored procedures yet. As a result, SQL Relay must fake input binds when calling MySQL stored procedures, so queries which call stored procedures must be written with colon-delimited bind variables rather than MySQL's native ?'s.</p>
-
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
@@ -1950,6 +1940,8 @@ String field12=cur.getField(1, 2);
 ...
 </pre>
 </blockquote>
+
+<p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 

@@ -470,20 +470,16 @@ cur.execute('<font color="#ff00ff">select testfunc(:in1,:in2,:in3)</font>',{'<fo
 </pre>
 </blockquote>
 
-<p>MySQL 4.1.2 supports native input binds with its Statement API but the
-Statement API cannot be used to call stored procedures yet.  As a result,
-SQL Relay must fake input binds when calling MySQL stored procedures, so queries
-which call stored procedures must be written with colon-delimited bind
-variables rather than MySQL's native ?'s.</p>
-
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
 <pre>
-cur.execute('<font color="#ff00ff">call testproc(:in1,:in2,:in3)</font>',{'<font color="#ff00ff">in1</font>':1,'<font color="#ff00ff">in2</font>':1.1,'<font color="#ff00ff">in3</font>':'<font color="#ff00ff">hello</font>'})
+cur.execute('<font color="#ff00ff">call testproc(?,?,?)</font>',{'<font color="#ff00ff">1</font>':1,'<font color="#ff00ff">2</font>':1.1,'<font color="#ff00ff">3</font>':'<font color="#ff00ff">hello</font>'})
 </pre>
 </blockquote>
+
+<p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -822,23 +818,19 @@ set of a MySQL procedure.</p>
 </pre>
 </blockquote>
 
-<p>MySQL 4.1.2 supports native input binds with its Statement API but the
-Statement API cannot be used to call stored procedures yet.  As a result,
-SQL Relay must fake input binds when calling MySQL stored procedures, so queries
-which call stored procedures must be written with colon-delimited bind
-variables rather than MySQL's native ?'s.</p>
-
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
 <pre>
-cur.execute('<font color="#ff00ff">select testfunc(:in1,:in2,:in3)</font>',{'<font color="#ff00ff">in1</font>':1,'<font color="#ff00ff">in2</font>':1.1,'<font color="#ff00ff">in3</font>':'<font color="#ff00ff">hello</font>'})
+cur.execute('<font color="#ff00ff">select testfunc(?,?,?)</font>',{'<font color="#ff00ff">1</font>':1,'<font color="#ff00ff">2</font>':1.1,'<font color="#ff00ff">3</font>':'<font color="#ff00ff">hello</font>'})
 out1=cur.fetchone()[0]
 out2=cur.fetchone()[1]
 out3=cur.fetchone()[2]
 </pre>
 </blockquote>
+
+<p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
@@ -989,18 +981,12 @@ the following.</p>
 </pre>
 </blockquote>
 
-<p>MySQL 4.1.2 supports native input binds with its Statement API but the
-Statement API cannot be used to call stored procedures yet.  As a result,
-SQL Relay must fake input binds when calling MySQL stored procedures, so queries
-which call stored procedures must be written with colon-delimited bind
-variables rather than MySQL's native ?'s.</p>
-
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
 <pre>
-cur.execute('<font color="#ff00ff">call testfunc()</font>',{'<font color="#ff00ff">in1</font>':1,'<font color="#ff00ff">in2</font>':1.1,'<font color="#ff00ff">in3</font>':'<font color="#ff00ff">hello</font>'})
+cur.execute('<font color="#ff00ff">call testfunc()</font>',{'<font color="#ff00ff">1</font>':1,'<font color="#ff00ff">2</font>':1.1,'<font color="#ff00ff">3</font>':'<font color="#ff00ff">hello</font>'})
 result=cur.fetchall()
 </pre>
 </blockquote>
