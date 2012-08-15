@@ -332,8 +332,8 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	// connections.
 	// FIXME: when faking autocommit, a BEGIN on a db that supports them
 	// could get commit called immediately committed
-	if (success && fakeautocommit &&
-		isTransactional() && autocommit && commitorrollback) {
+	if (success && isTransactional() && commitorrollback &&
+					fakeautocommit && autocommit) {
 		dbgfile.debugPrint("connection",3,"commit necessary...");
 		success=commitInternal();
 	}

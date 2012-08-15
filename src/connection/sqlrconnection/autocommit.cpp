@@ -54,10 +54,12 @@ bool sqlrconnection_svr::autoCommitOffInternal() {
 
 bool sqlrconnection_svr::autoCommitOn() {
 	fakeautocommit=true;
+	autocommit=true;
 	return true;
 }
 
 bool sqlrconnection_svr::autoCommitOff() {
 	fakeautocommit=true;
+	autocommit=false;
 	return true;
 }
