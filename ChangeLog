@@ -31,6 +31,7 @@
 	fixed several bugs related to escaping quotes
 	refactored OS detection in configure script
 	added \n after reading from stdin on Haiku
+	updated docs to reflect that mysql supports ?-based bind vars
 
 0.45 - added trigger framework
 	added support for getting the native database error number
