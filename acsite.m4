@@ -1462,11 +1462,17 @@ fi
 AC_DEFUN([FW_CHECK_ICONV],
 [
 	FW_CHECK_HEADERS_AND_LIBS([/usr],[iconv],[iconv.h],[iconv],[$STATICFLAG],[$RPATHFLAG],[ICONVINCLUDES],[ICONVLIBS],[ICONVLIBPATH],[ICONVSTATIC])
-		
+
+	HAVE_ICONV=""
+	AC_MSG_CHECKING(for iconv)
+	FW_TRY_LINK([#include <iconv.h>
+#include <stdlib.h>],[iconv(0,NULL,NULL,NULL,NULL);],[$ICONVINCLUDES],[$ICONVLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); HAVE_ICONV="yes"],[AC_MSG_RESULT(no)])
+
 	AC_MSG_CHECKING(if iconv takes const char ** argument)
 	FW_TRY_LINK([#include <iconv.h>
 #include <stdlib.h>],[const char *t; iconv(0,&t,NULL,NULL,NULL);],[$ICONVINCLUDES],[$ICONVLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(ICONV_CONST_CHAR,1,Some iconv implementations use a const char ** parameter)],[AC_MSG_RESULT(no)])
 
+	AC_SUBST(HAVE_ICONV)
 	AC_SUBST(ICONVINCLUDES)
 	AC_SUBST(ICONVLIBS)
 ])
@@ -1703,6 +1709,10 @@ AC_DEFUN([FW_CHECK_ODBC],
 if ( test "$ENABLE_ODBC" = "yes" )
 then
 
+	ODBCINCLUDES=""
+	ODBCINSTLIBS=""
+	ODBCLIBS=""
+	ODBCLIBSPATH=""
 	ODBCSTATIC=""
 
 	if ( test "$cross_compiling" = "yes" )
@@ -1713,7 +1723,8 @@ then
 		if ( test -n "$ODBCPATH" )
 		then
 			ODBCINCLUDES="-I$ODBCPATH/include"
-			ODBCLIBS="-L$ODBCPATH/lib -lodbc"
+			ODBCINSTLIBS="-L$ODBCPATH/lib -lodbcinst"
+			ODBCLIBS="-L$ODBCPATH/lib -lodbc -lodbcinst"
 			ODBCLIBSPATH="$ODBCPATH/lib"
 		fi
 
@@ -1778,12 +1789,6 @@ then
 			ODBCSTATIC="$UNIXODBCSTATIC"
 		fi
 		
-		AC_SUBST(ODBCINCLUDES)
-		AC_SUBST(ODBCINSTLIBS)
-		AC_SUBST(ODBCLIBS)
-		AC_SUBST(ODBCLIBSPATH)
-		AC_SUBST(ODBCSTATIC)
-		
 		if ( test -n "$HAVE_UNIXODBC" )
 		then
 			AC_DEFINE(HAVE_UNIXODBC,1,UnixODBC)
@@ -1793,6 +1798,7 @@ then
 #include <sqltypes.h>
 #include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env); SQLAllocHandle(SQL_HANDLE_DBC,env,&dbc); SQLFreeHandle(SQL_HANDLE_DBC,dbc); SQLFreeHandle(SQL_HANDLE_ENV,env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCINCLUDES="$ODBCINCLUDES $PTHREADINCLUDES"; ODBCLIBS="$ODBCLIBS $PTHREADLIB"])
 		fi
+
 		if ( test -n "$HAVE_IODBC" )
 		then
 			AC_DEFINE(HAVE_IODBC,1,iODBC)
@@ -1802,11 +1808,6 @@ then
 #include <sqltypes.h>
 #include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocEnv(&env); SQLAllocConnect(env,&dbc); SQLFreeConnect(&dbc); SQLFreeEnv(&env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCINCLUDES="$ODBCINCLUDES $PTHREADINCLUDES"; ODBCLIBS="$ODBCLIBS $PTHREADLIB"])
 		fi
-		if ( test -z "$ODBCLIBS" )
-		then
-			AC_MSG_WARN(ODBC support will not be built.)
-		fi
-
 	fi
 
 	if ( test -n "$ODBCLIBS" )
@@ -1858,8 +1859,40 @@ extern "C" SQLRETURN SQL_API SQLRowCount(SQLHSTMT statementhandle,
 #include <stdlib.h>],[SQLConnectW(0,NULL,0,NULL,0,NULL,0);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLCONNECTW,1,Some systems have SQLConnectW)],[AC_MSG_RESULT(no); ODBCLIBS=""; OBBCINCLUDES=""])
 	fi
 
-	FW_INCLUDES(odbc,[$ODBCINCLUDES])
-	FW_LIBS(odbc,[$ODBCLIBS])
+	if ( test -z "$ODBCLIBS" )
+	then
+		AC_MSG_WARN(ODBC connection support will not be built.)
+	fi
+
+	if ( test -n "$ODBCLIBS" -a -z "$HAVE_ICONV" )
+	then
+		AC_MSG_WARN(iconv support missing... ODBC connection support will not be built.)
+		ODBCLIBS=""
+	fi
+
+	if ( test -z "$ODBCINSTLIBS" )
+	then
+		AC_MSG_WARN(ODBC driver will not be built.)
+	fi
+
+	if ( test -n "$ODBCLIBS" -o -n "$ODBCINSTLIBS" )
+	then
+		FW_INCLUDES(odbc,[$ODBCINCLUDES])
+	fi
+	if ( test -n "$ODBCLIBS" )
+	then
+		FW_LIBS(odbc,[$ODBCLIBS])
+	fi
+	if ( test -n "$ODBCINSTLIBS" )
+	then
+		FW_LIBS(odbcinst,[$ODBCINSTLIBS])
+	fi
+		
+	AC_SUBST(ODBCINCLUDES)
+	AC_SUBST(ODBCINSTLIBS)
+	AC_SUBST(ODBCLIBS)
+	AC_SUBST(ODBCLIBSPATH)
+	AC_SUBST(ODBCSTATIC)
 fi
 ])
 

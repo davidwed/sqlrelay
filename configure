@@ -701,6 +701,7 @@ RUDIMENTSINCLUDES
 RUDIMENTSPATH
 ICONVLIBS
 ICONVINCLUDES
+HAVE_ICONV
 AIOLIB
 DLLIB
 SOCKETLIBS
@@ -16804,6 +16805,44 @@ then
 fi
 
 
+	HAVE_ICONV=""
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for iconv" >&5
+$as_echo_n "checking for iconv... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$ICONVINCLUDES"
+LIBS="$ICONVLIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <iconv.h>
+#include <stdlib.h>
+int
+main ()
+{
+iconv(0,NULL,NULL,NULL,NULL);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }; HAVE_ICONV="yes"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if iconv takes const char ** argument" >&5
 $as_echo_n "checking if iconv takes const char ** argument... " >&6; }
 
@@ -16841,6 +16880,7 @@ CPPFLAGS="$SAVECPPFLAGS"
 LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
+
 
 
 
@@ -23179,6 +23219,10 @@ echo "***** ODBC *********************"
 if ( test "$ENABLE_ODBC" = "yes" )
 then
 
+	ODBCINCLUDES=""
+	ODBCINSTLIBS=""
+	ODBCLIBS=""
+	ODBCLIBSPATH=""
 	ODBCSTATIC=""
 
 	if ( test "$cross_compiling" = "yes" )
@@ -23188,7 +23232,8 @@ then
 		if ( test -n "$ODBCPATH" )
 		then
 			ODBCINCLUDES="-I$ODBCPATH/include"
-			ODBCLIBS="-L$ODBCPATH/lib -lodbc"
+			ODBCINSTLIBS="-L$ODBCPATH/lib -lodbcinst"
+			ODBCLIBS="-L$ODBCPATH/lib -lodbc -lodbcinst"
 			ODBCLIBSPATH="$ODBCPATH/lib"
 		fi
 
@@ -24587,12 +24632,6 @@ fi
 			ODBCSTATIC="$UNIXODBCSTATIC"
 		fi
 
-
-
-
-
-
-
 		if ( test -n "$HAVE_UNIXODBC" )
 		then
 
@@ -24637,6 +24676,7 @@ LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
 		fi
+
 		if ( test -n "$HAVE_IODBC" )
 		then
 
@@ -24681,12 +24721,6 @@ LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
 		fi
-		if ( test -z "$ODBCLIBS" )
-		then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: ODBC support will not be built." >&5
-$as_echo "$as_me: WARNING: ODBC support will not be built." >&2;}
-		fi
-
 	fi
 
 	if ( test -n "$ODBCLIBS" )
@@ -24912,17 +24946,57 @@ export LD_LIBRARY_PATH
 
 	fi
 
+	if ( test -z "$ODBCLIBS" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: ODBC connection support will not be built." >&5
+$as_echo "$as_me: WARNING: ODBC connection support will not be built." >&2;}
+	fi
+
+	if ( test -n "$ODBCLIBS" -a -z "$HAVE_ICONV" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: iconv support missing... ODBC connection support will not be built." >&5
+$as_echo "$as_me: WARNING: iconv support missing... ODBC connection support will not be built." >&2;}
+		ODBCLIBS=""
+	fi
+
+	if ( test -z "$ODBCINSTLIBS" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: ODBC driver will not be built." >&5
+$as_echo "$as_me: WARNING: ODBC driver will not be built." >&2;}
+	fi
+
+	if ( test -n "$ODBCLIBS" -o -n "$ODBCINSTLIBS" )
+	then
 
 if ( test -n "$ODBCINCLUDES" )
 then
 	echo "odbc includes... $ODBCINCLUDES"
 fi
 
+	fi
+	if ( test -n "$ODBCLIBS" )
+	then
 
 if ( test -n "$ODBCLIBS" )
 then
 	echo "odbc libs... $ODBCLIBS"
 fi
+
+	fi
+	if ( test -n "$ODBCINSTLIBS" )
+	then
+
+if ( test -n "$ODBCINSTLIBS" )
+then
+	echo "odbcinst libs... $ODBCINSTLIBS"
+fi
+
+	fi
+
+
+
+
+
 
 fi
 
