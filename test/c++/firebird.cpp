@@ -730,6 +730,7 @@ int	main(int argc, char **argv) {
 							"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
+	checkSuccess(secondcur->getField(0,(uint32_t)0),"0");
 	checkSuccess(con->commit(),1);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"8");
