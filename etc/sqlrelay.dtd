@@ -25,7 +25,7 @@
 	<!ATTLIST instance handoff (pass|reconnect) "reconnect">
 	<!ATTLIST instance deniedips CDATA "">
 	<!ATTLIST instance allowedips CDATA "">
-	<!ATTLIST instance debug (none|listener|connection|sqltranslation|listener_and_connection|listener_and_connection_and_sqltranslation|connection_and_sqltranslation) "none">
+	<!ATTLIST instance debug (none|listener|connection|translations|listener_and_connection|listener_and_connection_and_translations|listener_and_connection_and_translations_and_triggers|connection_and_translation|connection_and_translations_and_triggers|connection_and_triggers|translations_and_triggers) "none">
 	<!ATTLIST instance maxquerysize CDATA "65536">
 	<!ATTLIST instance maxstringbindvaluelength CDATA "4000">
 	<!ATTLIST instance maxlobbindvaluelength CDATA "71680">

@@ -11,8 +11,10 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element ref="users"/>
-        <xs:element minOccurs="0" ref="connections"/>
-        <xs:element minOccurs="0" ref="router"/>
+        <xs:choice>
+          <xs:element minOccurs="1" maxOccurs="1" ref="connections"/>
+          <xs:element minOccurs="1" maxOccurs="1" ref="router"/>
+        </xs:choice>
       </xs:sequence>
       <xs:attribute name="id" default="defaultid"/>
       <xs:attribute name="addresses" default="0.0.0.0"/>
@@ -84,10 +86,15 @@
             <xs:enumeration value="none"/>
             <xs:enumeration value="listener"/>
             <xs:enumeration value="connection"/>
-            <xs:enumeration value="sqltranslation"/>
+            <xs:enumeration value="translations"/>
+            <xs:enumeration value="triggers"/>
             <xs:enumeration value="listener_and_connection"/>
-            <xs:enumeration value="listener_and_connection_and_sqltranslation"/>
-            <xs:enumeration value="connection_and_sqltranslation"/>
+            <xs:enumeration value="listener_and_connection_and_translations"/>
+            <xs:enumeration value="listener_and_connection_and_translations_and_triggers"/>
+            <xs:enumeration value="connection_and_translations"/>
+            <xs:enumeration value="connection_and_translations_and_triggers"/>
+            <xs:enumeration value="connection_and_triggers"/>
+            <xs:enumeration value="translations_and_triggers"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
@@ -145,7 +152,7 @@
   <xs:element name="users">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="user"/>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="user"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -166,14 +173,14 @@
   <xs:element name="start">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="runquery"/>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="runquery"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="end">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="runquery"/>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="runquery"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -181,7 +188,7 @@
   <xs:element name="connections">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="connection"/>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="connection"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -202,16 +209,18 @@
   </xs:element>
   <xs:element name="router">
     <xs:complexType>
-      <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="route"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="filter"/>
-      </xs:choice>
+      <xs:sequence>
+        <xs:choice minOccurs="1" maxOccurs="unbounded">
+          <xs:element minOccurs="1" maxOccurs="1" ref="route"/>
+          <xs:element minOccurs="1" maxOccurs="1" ref="filter"/>
+        </xs:choice>
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="route">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="query"/>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="query"/>
       </xs:sequence>
       <xs:attribute name="host" default=""/>
       <xs:attribute name="port" default=""/>
@@ -223,7 +232,7 @@
   <xs:element name="filter">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="query"/>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="query"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
