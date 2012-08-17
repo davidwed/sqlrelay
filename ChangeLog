@@ -1,3 +1,5 @@
+0.47 -
+
 0.46 - refactored the translation framework to mimic the trigger framework
 	added make.batch file for building on windows
 	added C# API and ADO.NET adapter

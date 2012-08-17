@@ -27,7 +27,7 @@
 
 Summary: Persistent database connection system.
 Name: sqlrelay
-Version: 0.46
+Version: 0.47
 Release: 1
 License: GPL/LGPL and Others
 Group: System Environment/Daemons
