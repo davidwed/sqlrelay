@@ -2746,29 +2746,6 @@ then
 
 	if ( test -n "$HAVE_JAVA" )
 	then
-<<<<<<< acsite.m4
-		AC_MSG_CHECKING(whether $JAVAC works)
-		cat << EOF > conftest.java
-public class conftest {
-	public static void main(String[] args) {
-		System.out.println("hello world");
-	}
-}
-EOF
-		$(JAVAC) conftest.java
-		if ( test -r "conftest.class" )
-		then
-			AC_MSG_RESULT(yes)
-			rm -f conftest.class
-		else
-			AC_MSG_RESULT(no)
-			HAVE_JAVA=""
-		fi
-	fi
-
-	if ( test -n "$HAVE_JAVA" )
-	then
-=======
 		AC_MSG_CHECKING(whether $JAVAC works)
 		cat << EOF > conftest.java
 public class conftest {
@@ -2790,7 +2767,6 @@ EOF
 
 	if ( test -n "$HAVE_JAVA" )
 	then
->>>>>>> 1.183
 		FW_TRY_COMPILE([#ifdef __CYGWIN__
 #include <windows.h>
 #endif
