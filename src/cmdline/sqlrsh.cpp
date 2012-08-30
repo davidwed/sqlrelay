@@ -740,13 +740,11 @@ char *sqlrsh::getWild(const char *command) {
 	// unescape single quotes
 	stringbuffer	output;
 	for (const char *ch=wildptr; ch<endptr; ch++) {
-printf("%c\n",*ch);
 		if (*ch=='\'' && *(ch+1)=='\'') {
 			ch++;
 		}
 		output.append(*ch);
 	}
-printf("wild: %s\n",output.getString());
 
 	return output.detachString();
 }
