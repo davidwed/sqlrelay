@@ -411,8 +411,10 @@ bool sqlrimport::rowTagEnd() {
 			if (verbose) {
 				printf("  committed %lld rows",
 						(unsigned long long)rowcount);
-				if (committedcount%10) {
+				if (!(committedcount%10)) {
 					printf(" (to %s)...\n",table);
+				} else {
+					printf("\n");
 				}
 			}
 			sqlrcon->begin();
