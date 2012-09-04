@@ -178,7 +178,7 @@
 
 <p>Each <b>connection</b> tag defines a sqlr-connection daemon configuration.  In most cases, there will be only 1 of these tags.  In cases where clustered or replicated databases are used, the sqlr-connection daemons may need to be able to connect to multiple machines.  In that case, there would be more than 1 line here.  See <a href="loadbalfailover.html">SQL Relay Load Balancing and Failover</a> for more information.</p>
 
-<p>The <b>router</b> tag sets up the instance to route and filter queries to other SQL Relay instances.  If this tag is present, the instance should contain no <b>connections</b> tags.  See <a href="router.html">Routing and Filtering Queries with SQL Relay</a> for detailed information about configuring SQL Relay to route and filter quries.</p> 
+<p>The <b>router</b> tag sets up the instance to route and filter queries to other SQL Relay instances.  If this tag is present, the instance should contain no <b>connections</b> tags.  See <a href="router.html">Routing and Filtering Queries with SQL Relay</a> for detailed information about configuring SQL Relay to route and filter queries.</p> 
 
 <p>The <b>route</b> tag designates an instance of SQL Relay to route queries to.  It should contain a set of <b>query</b> tags defining which queries to route to the designated instance.  This tag is only valid inside a <b>router</b> tag.</p>
 
