@@ -382,7 +382,9 @@ bool sqlrimport::sequenceTagEnd() {
 }
 
 bool sqlrimport::columnsTagEnd() {
-	printf("  %ld columns.\n",(unsigned long)currentcol);
+	if (verbose) {
+		printf("  %ld columns.\n",(unsigned long)currentcol);
+	}
 	return true;
 }
 
