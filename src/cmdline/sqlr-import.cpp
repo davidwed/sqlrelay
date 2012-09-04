@@ -20,7 +20,9 @@ using namespace rudiments;
 class sqlrimport : public xmlsax {
 	public:
 			sqlrimport(sqlrconnection *sqlrcon,
-					sqlrcursor *sqlrcur);
+					sqlrcursor *sqlrcur,
+					uint64_t commitcount,
+					bool verbose);
 			~sqlrimport();
 	private:
 		bool	tagStart(const char *name);
@@ -64,6 +66,10 @@ class sqlrimport : public xmlsax {
 		uint32_t	currentcol;
 		bool		infield;
 		uint32_t	fieldcount;
+		uint64_t	rowcount;
+		uint64_t	commitcount;
+		uint64_t	committedcount;
+		bool		verbose;
 
 		static const unsigned short	NULLTAG;
 		static const unsigned short	TABLETAG;
@@ -115,7 +121,9 @@ const unsigned short sqlrimport::BINARYATTR=13;
 const unsigned short sqlrimport::AUTOINCREMENTATTR=14;
 
 sqlrimport::sqlrimport(sqlrconnection *sqlrcon,
-			sqlrcursor *sqlrcur) : xmlsax() {
+				sqlrcursor *sqlrcur,
+				uint64_t commitcount,
+				bool verbose) : xmlsax() {
 	this->sqlrcon=sqlrcon;
 	this->sqlrcur=sqlrcur;
 	currenttag=NULLTAG;
@@ -128,6 +136,13 @@ sqlrimport::sqlrimport(sqlrconnection *sqlrcon,
 	numbercolumn=NULL;
 	infield=false;
 	fieldcount=0;
+	rowcount=0;
+	this->verbose=verbose;
+	this->commitcount=commitcount;
+	if (!this->commitcount) {
+		this->commitcount=100;
+	}
+	committedcount=0;
 }
 
 sqlrimport::~sqlrimport() {
@@ -169,6 +184,9 @@ bool sqlrimport::attributeValue(const char *value) {
 			if (!charstring::compare(currentattribute,"name")) {
 				delete[] table;
 				table=charstring::duplicate(value);
+				if (verbose) {
+					printf("inserting into %s...\n",table);
+				}
 			}
 			break;
 		case SEQUENCETAG:
@@ -233,6 +251,8 @@ bool sqlrimport::tagEnd(const char *name) {
 
 bool sqlrimport::tableTagStart() {
 	currenttag=TABLETAG;
+	rowcount=0;
+	committedcount=0;
 	return true;
 }
 
@@ -274,6 +294,11 @@ bool sqlrimport::fieldTagStart() {
 
 
 bool sqlrimport::tableTagEnd() {
+	sqlrcon->commit();
+	if (verbose) {
+		printf("  committed %lld rows (to %s).\n\n",
+				(unsigned long long)rowcount,table);
+	}
 	return true;
 }
 
@@ -357,6 +382,7 @@ bool sqlrimport::sequenceTagEnd() {
 }
 
 bool sqlrimport::columnsTagEnd() {
+	printf("  %ld columns.\n",(unsigned long)currentcol);
 	return true;
 }
 
@@ -372,8 +398,24 @@ bool sqlrimport::rowsTagEnd() {
 bool sqlrimport::rowTagEnd() {
 	query.append(')');
 	if (fieldcount) {
+		if (rowcount==0) {
+			sqlrcon->begin();
+		}
 		if (!sqlrcur->sendQuery(query.getString())) {
 			printf("%s\n",sqlrcur->errorMessage());
+		}
+		rowcount++;
+		if (commitcount && !(rowcount%commitcount)) {
+			sqlrcon->commit();
+			committedcount++;
+			if (verbose) {
+				printf("  committed %lld rows",
+						(unsigned long long)rowcount);
+				if (committedcount%10) {
+					printf(" (to %s)...\n",table);
+				}
+			}
+			sqlrcon->begin();
 		}
 	}
 	return true;
@@ -435,76 +477,51 @@ int main(int argc, const char **argv) {
 	usercontainer	*currentnode=NULL;
 
 	commandline	cmdline(argc,argv);
-	const char	*host;
-	int16_t		port;
-	const char	*socket;
-	const char	*user;
-	const char	*password;
-	const char	*file="";
-	bool		debug=false;
 
 	const char	*config=cmdline.getValue("-config");
 	if (!(config && config[0])) {
 		config=DEFAULT_CONFIG_FILE;
 	}
 	const char	*id=cmdline.getValue("-id");
-	if (!(id && id[0])) {
+	const char	*file=cmdline.getValue("-file");
+	const char	*host=cmdline.getValue("-host");
+	uint16_t	port=charstring::toInteger(
+					cmdline.getValue("-port"));
+	const char	*socket=cmdline.getValue("-socket");
+	const char	*user=cmdline.getValue("-user");
+	const char	*password=cmdline.getValue("-password");
+	uint64_t	commitcount=charstring::toInteger(
+					cmdline.getValue("-commitcount"));
+	bool		debug=cmdline.found("-debug");
+	bool		verbose=cmdline.found("-verbose");
 
+	if (!(charstring::length(id) ||
+		(charstring::length(host) &&
+			charstring::length(user) &&
+			charstring::length(password))) ||
+		!charstring::length(file)) {
 
-		if (argc<7) {
-			printf("usage: sqlr-import  host port socket "
-				"user password file [debug] \n"
-				"  or   sqlr-import  [-config configfile] "
-				"-id id file [debug]\n");
-			process::exit(1);
-		}
-
-		host=argv[1];
-		port=charstring::toInteger(argv[2]);
-		socket=argv[3];
-		user=argv[4];
-		password=argv[5];
-		file=argv[6];
-		if (argv[7] && !charstring::compare(argv[7],"debug")) {
-			debug=true;
-		}
-
-	} else {
-
-		if (cfgfile.parse(config,id)) {
-
-			// get the host/port/socket/username/password
-			host="localhost";
-			port=cfgfile.getPort();
-			socket=cfgfile.getUnixPort();
-			// FIXME: this can return 0
-			cfgfile.getUserList()->getDataByIndex(0,&currentnode);
-			user=currentnode->getUser();
-			password=currentnode->getPassword();
-
-			// find the file and optional debug
-			if (cmdline.found("debug")) {
-				debug=true;
-			}
-
-			// find the file
-			for (int i=1; i<argc; i++) {
-				if (argv[i][0]=='-') {
-					i++;
-					continue;
-				}
-				file=argv[i];
-				break;
-			}
-			if (!charstring::compare(argv[argc-1],"debug") &&
-				charstring::compare(file,"debug")) {
-				debug=true;
-			}
-		} else {
-			process::exit(1);
-		}
+		printf("usage: \n"
+			"  sqlr-import -host host -port port -socket socket -user user -password password -file file [-commit rowcount] [-debug] [-verbose]\n"
+			"    or\n"
+			"  sqlr-import [-config configfile] -id id -file file [-commit rowcount] [-debug] [-verbose]\n");
+		process::exit(1);
 	}
 
+	if (charstring::length(id) && cfgfile.parse(config,id)) {
+
+		// get the host/port/socket/username/password
+		host="localhost";
+		port=cfgfile.getPort();
+		socket=cfgfile.getUnixPort();
+		// FIXME: this can return 0
+		cfgfile.getUserList()->getDataByIndex(0,&currentnode);
+		user=currentnode->getUser();
+		password=currentnode->getPassword();
+
+	} else {
+		process::exit(1);
+	}
 
 	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);
 	sqlrcursor	sqlrcur(&sqlrcon);
@@ -513,6 +530,6 @@ int main(int argc, const char **argv) {
 		sqlrcon.debugOn();
 	}
 
-	sqlrimport	sqlri(&sqlrcon,&sqlrcur);
+	sqlrimport	sqlri(&sqlrcon,&sqlrcur,commitcount,verbose);
 	process::exit(!sqlri.parseFile(file));
 }
