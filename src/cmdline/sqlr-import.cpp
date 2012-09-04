@@ -485,13 +485,13 @@ int main(int argc, const char **argv) {
 		config=DEFAULT_CONFIG_FILE;
 	}
 	const char	*id=cmdline.getValue("-id");
-	const char	*file=cmdline.getValue("-file");
 	const char	*host=cmdline.getValue("-host");
 	uint16_t	port=charstring::toInteger(
 					cmdline.getValue("-port"));
 	const char	*socket=cmdline.getValue("-socket");
 	const char	*user=cmdline.getValue("-user");
 	const char	*password=cmdline.getValue("-password");
+	const char	*file=cmdline.getValue("-file");
 	uint64_t	commitcount=charstring::toInteger(
 					cmdline.getValue("-commitcount"));
 	bool		debug=cmdline.found("-debug");
@@ -521,8 +521,6 @@ int main(int argc, const char **argv) {
 		user=currentnode->getUser();
 		password=currentnode->getPassword();
 
-	} else {
-		process::exit(1);
 	}
 
 	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);

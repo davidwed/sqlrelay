@@ -41,81 +41,53 @@ int main(int argc, const char **argv) {
 	usercontainer	*currentnode=NULL;
 
 	commandline	cmdline(argc,argv);
-	const char	*host;
-	int16_t		port;
-	const char	*socket;
-	const char	*user;
-	const char	*password;
-	const char	*objecttype="";
-	const char	*object="";
-	bool		debug=false;
 
 	const char	*config=cmdline.getValue("-config");
 	if (!(config && config[0])) {
 		config=DEFAULT_CONFIG_FILE;
 	}
 	const char	*id=cmdline.getValue("-id");
-	if (!(id && id[0])) {
+	const char	*host=cmdline.getValue("-host");
+	uint16_t	port=charstring::toInteger(
+					cmdline.getValue("-port"));
+	const char	*socket=cmdline.getValue("-socket");
+	const char	*user=cmdline.getValue("-user");
+	const char	*password=cmdline.getValue("-password");
+	const char	*table=cmdline.getValue("-table");
+	const char	*sequence=cmdline.getValue("-sequence");
+	uint64_t	rsbs=charstring::toInteger(
+				cmdline.getValue("-resultsetbuffersize"));
+	if (!rsbs) {
+		rsbs=100;
+	}
+	bool		debug=cmdline.found("-debug");
 
+	if (!(charstring::length(id) ||
+		(charstring::length(host) &&
+			charstring::length(user) &&
+			charstring::length(password))) ||
+		!(charstring::length(table) ||
+			charstring::length(sequence))) {
 
-		if (argc<7) {
-			printf("usage: sqlr-export  host port socket "
-				"user password (table|sequence) "
-				"tablename [debug] \n"
-				"  or   sqlr-export  [-config configfile] "
-				"-id id (table|sequence) tablename [debug]\n");
-			process::exit(1);
-		}
-
-		host=argv[1];
-		port=charstring::toInteger(argv[2]);
-		socket=argv[3];
-		user=argv[4];
-		password=argv[5];
-		objecttype=argv[6];
-		object=argv[7];
-		if (argv[8] && !charstring::compare(argv[8],"debug")) {
-			debug=true;
-		}
-
-	} else {
-
-		if (cfgfile.parse(config,id)) {
-
-			// get the host/port/socket/username/password
-			host="localhost";
-			port=cfgfile.getPort();
-			socket=cfgfile.getUnixPort();
-			// FIXME: this can return 0
-			cfgfile.getUserList()->getDataByIndex(0,&currentnode);
-			user=currentnode->getUser();
-			password=currentnode->getPassword();
-
-			// find the table and optional debug
-			if (cmdline.found("debug")) {
-				debug=true;
-			}
-
-			// find the table
-			for (int i=1; i<argc; i++) {
-				if (argv[i][0]=='-') {
-					i++;
-					continue;
-				}
-				objecttype=argv[i];
-				object=argv[i+1];
-				break;
-			}
-			if (!charstring::compare(argv[argc-1],"debug") &&
-				charstring::compare(object,"debug")) {
-				debug=true;
-			}
-		} else {
-			process::exit(1);
-		}
+		printf("usage: \n"
+			"  sqlr-export -host host -port port -socket socket -user user -password password (-table table | -sequence sequence) [-resultsetbuffersize rows] [-debug]\n"
+			"    or\n"
+			"  sqlr-export [-config configfile] -id id (-table table | -sequence sequence) [-resultsetbuffersize rows] [-debug]\n");
+		process::exit(1);
 	}
 
+	if (charstring::length(id) && cfgfile.parse(config,id)) {
 
+		// get the host/port/socket/username/password
+		host="localhost";
+		port=cfgfile.getPort();
+		socket=cfgfile.getUnixPort();
+		// FIXME: this can return 0
+		cfgfile.getUserList()->getDataByIndex(0,&currentnode);
+		user=currentnode->getUser();
+		password=currentnode->getPassword();
+
+	}
 
 	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);
 	sqlrcursor	sqlrcur(&sqlrcon);
@@ -124,13 +96,13 @@ int main(int argc, const char **argv) {
 		sqlrcon.debugOn();
 	}
 
-	sqlrcur.setResultSetBufferSize(100);
+	sqlrcur.setResultSetBufferSize(rsbs);
 
 	int	exitval=0;
-	if (!charstring::compare(objecttype,"table")) {
-		exitval=exportTable(&sqlrcur,object);
-	} else if (!charstring::compare(objecttype,"sequence")) {
-		exitval=exportSequence(&sqlrcon,&sqlrcur,object);
+	if (charstring::length(table)) {
+		exitval=exportTable(&sqlrcur,table);
+	} else if (charstring::length(sequence)) {
+		exitval=exportSequence(&sqlrcon,&sqlrcur,sequence);
 	}
 
 	sqlrcon.endSession();
