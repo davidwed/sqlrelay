@@ -22,7 +22,8 @@ class sqlrimport : public xmlsax {
 			sqlrimport(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur,
 					uint64_t commitcount,
-					bool verbose);
+					bool verbose,
+					const char *dbtype);
 			~sqlrimport();
 	private:
 		bool	tagStart(const char *name);
@@ -48,7 +49,7 @@ class sqlrimport : public xmlsax {
 
 		bool	text(const char *string);
 
-		void	unescapeField(stringbuffer *strb, const char *field);
+		void	massageField(stringbuffer *strb, const char *field);
 
 		sqlrconnection	*sqlrcon;
 		sqlrcursor	*sqlrcur;
@@ -70,6 +71,7 @@ class sqlrimport : public xmlsax {
 		uint64_t	commitcount;
 		uint64_t	committedcount;
 		bool		verbose;
+		const char	*dbtype;
 
 		static const unsigned short	NULLTAG;
 		static const unsigned short	TABLETAG;
@@ -123,7 +125,8 @@ const unsigned short sqlrimport::AUTOINCREMENTATTR=14;
 sqlrimport::sqlrimport(sqlrconnection *sqlrcon,
 				sqlrcursor *sqlrcur,
 				uint64_t commitcount,
-				bool verbose) : xmlsax() {
+				bool verbose,
+				const char *dbtype) : xmlsax() {
 	this->sqlrcon=sqlrcon;
 	this->sqlrcur=sqlrcur;
 	currenttag=NULLTAG;
@@ -143,6 +146,7 @@ sqlrimport::sqlrimport(sqlrconnection *sqlrcon,
 		this->commitcount=100;
 	}
 	committedcount=0;
+	this->dbtype=dbtype;
 }
 
 sqlrimport::~sqlrimport() {
@@ -304,7 +308,6 @@ bool sqlrimport::tableTagEnd() {
 
 bool sqlrimport::sequenceTagEnd() {
 
-	const char	*dbtype=sqlrcon->identify();
 	query.clear();
 
 	// sqlite, mysql, sybase/mssql have autoincrementing fields
@@ -438,7 +441,7 @@ bool sqlrimport::text(const char *string) {
 			if (!numbercolumn[currentcol]) {
 				query.append('\'');
 			}
-			unescapeField(&query,string);
+			massageField(&query,string);
 			if (!numbercolumn[currentcol]) {
 				query.append('\'');
 			}
@@ -452,10 +455,12 @@ bool sqlrimport::text(const char *string) {
 	return true;
 }
 
-void sqlrimport::unescapeField(stringbuffer *strb, const char *field) {
+void sqlrimport::massageField(stringbuffer *strb, const char *field) {
 
 	for (uint32_t index=0; field[index]; index++) {
 		if (field[index]=='&') {
+
+			// expand xml entities
 			index++;
 			strb->append((char)charstring::
 					toUnsignedInteger(field+index));
@@ -465,7 +470,17 @@ void sqlrimport::unescapeField(stringbuffer *strb, const char *field) {
 			if (!field[index]) {
 				break;
 			}
+
+		} else if (field[index]=='\\' &&
+				(!charstring::compare(dbtype,"postgresql") ||
+				!charstring::compare(dbtype,"mysql"))) {
+
+			// for postgres and mysql, escape \'s
+			strb->append("\\\\");
+
 		} else {
+
+			// just append the character
 			strb->append(field[index]);
 		}
 	}
@@ -532,6 +547,7 @@ int main(int argc, const char **argv) {
 		sqlrcon.debugOn();
 	}
 
-	sqlrimport	sqlri(&sqlrcon,&sqlrcur,commitcount,verbose);
+	sqlrimport	sqlri(&sqlrcon,&sqlrcur,commitcount,
+					verbose,sqlrcon.identify());
 	process::exit(!sqlri.parseFile(file));
 }
