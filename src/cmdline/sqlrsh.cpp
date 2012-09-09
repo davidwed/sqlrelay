@@ -1440,64 +1440,43 @@ void sqlrsh::execute(int argc, const char **argv) {
 
 	commandline	cmdline(argc,argv);
 	sqlrconfigfile	cfgfile;
-	usercontainer	*currentnode=NULL;
-	const char	*host;
-	uint16_t	port;
-	const char	*socket;
-	const char	*user;
-	const char	*password;
-	const char	*script=NULL;
 
 	const char	*config=cmdline.getValue("-config");
 	if (!(config && config[0])) {
 		config=DEFAULT_CONFIG_FILE;
 	}
 	const char	*id=cmdline.getValue("-id");
+	const char	*host=cmdline.getValue("-host");
+	uint16_t	port=charstring::toInteger(
+					cmdline.getValue("-port"));
+	const char	*socket=cmdline.getValue("-socket");
+	const char	*user=cmdline.getValue("-user");
+	const char	*password=cmdline.getValue("-password");
+	const char	*script=cmdline.getValue("-script");
+	const char	*query=cmdline.getValue("-query");
 
-	if (!(id && id[0])) {
+	if (!(charstring::length(id) ||
+		((charstring::length(host) ||
+			charstring::length(socket)) &&
+				charstring::length(user) &&
+				charstring::length(password)))) {
 
-		if (argc<6) {
-			printf("usage: sqlrsh  host port socket "
-				"user password [script]\n"
-				"  or   sqlrsh  [-config configfile] "
-				"-id id [script]\n");
-			process::exit(1);
-		}
+		printf("usage: sqlrsh -host host -port port -socket socket -user user -password password [-script script | -query query]\n"
+			"  or   sqlrsh [-config configfile] -id id [-script script | -query query]\n");
+		process::exit(1);
+	}
 
-		host=argv[1];
-		port=charstring::toInteger(argv[2]);
-		socket=argv[3];
-		user=argv[4];
-		password=argv[5];
-		if (argv[6]) {
-			script=argv[6];
-		}
+	if (charstring::length(id) && cfgfile.parse(config,id)) {
 
-	} else {
-
-		if (cfgfile.parse(config,id)) {
-
-			// get the host/port/socket/username/password
-			host="localhost";
-			port=cfgfile.getPort();
-			socket=cfgfile.getUnixPort();
-			// FIXME: this can return 0
-			cfgfile.getUserList()->getDataByIndex(0,&currentnode);
-			user=currentnode->getUser();
-			password=currentnode->getPassword();
-		} else {
-			return;
-		}
-
-		// find the script if there is one
-		for (int i=1; i<argc; i++) {
-			if (argv[i][0]=='-') {
-				i++;
-				continue;
-			}
-			script=(char *)argv[i];
-			break;
-		}
+		// get the host/port/socket/username/password
+		host="localhost";
+		port=cfgfile.getPort();
+		socket=cfgfile.getUnixPort();
+		// FIXME: this can return 0
+		usercontainer	*currentnode=NULL;
+		cfgfile.getUserList()->getDataByIndex(0,&currentnode);
+		user=currentnode->getUser();
+		password=currentnode->getPassword();
 	}
 
 	// connect to sql relay
@@ -1533,10 +1512,14 @@ void sqlrsh::execute(int argc, const char **argv) {
 		}
 	#endif
 
-	// if a script was specified, run it otherwise go into interactive mode
-	if (script) {
+	if (charstring::length(script)) {
+		// if a script was specified, run it
 		runScript(&sqlrcon,&sqlrcur,&env,script,true,false);
+	} else if (charstring::length(query)) {
+		// if a query was specified, run it
+		runCommand(&sqlrcon,&sqlrcur,&env,query);
 	} else {
+		// otherwise go into interactive mode
 		startupMessage(&env,host,port,user);
 		interactWithUser(&sqlrcon,&sqlrcur,&env);
 	}

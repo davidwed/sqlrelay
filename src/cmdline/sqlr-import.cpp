@@ -493,7 +493,6 @@ int main(int argc, const char **argv) {
 	#include <version.h>
 
 	sqlrconfigfile	cfgfile;
-	usercontainer	*currentnode=NULL;
 
 	commandline	cmdline(argc,argv);
 
@@ -515,9 +514,10 @@ int main(int argc, const char **argv) {
 	bool		verbose=cmdline.found("-verbose");
 
 	if (!(charstring::length(id) ||
-		(charstring::length(host) &&
-			charstring::length(user) &&
-			charstring::length(password))) ||
+		((charstring::length(host) ||
+			charstring::length(socket)) &&
+				charstring::length(user) &&
+				charstring::length(password))) ||
 		!charstring::length(file)) {
 
 		printf("usage: \n"
@@ -534,6 +534,7 @@ int main(int argc, const char **argv) {
 		port=cfgfile.getPort();
 		socket=cfgfile.getUnixPort();
 		// FIXME: this can return 0
+		usercontainer	*currentnode=NULL;
 		cfgfile.getUserList()->getDataByIndex(0,&currentnode);
 		user=currentnode->getUser();
 		password=currentnode->getPassword();
