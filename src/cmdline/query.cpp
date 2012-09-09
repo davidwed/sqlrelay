@@ -20,83 +20,52 @@ int main(int argc, const char **argv) {
 	#include <version.h>
 
 	sqlrconfigfile	cfgfile;
-	usercontainer	*currentnode=NULL;
 
 	commandline	cmdline(argc,argv);
-	const char	*host;
-	int16_t		port;
-	const char	*socket;
-	const char	*user;
-	const char	*password;
-	const char	*query="";
-	bool		debug=false;
-	int		exitval=0;
 
 	const char	*config=cmdline.getValue("-config");
 	if (!(config && config[0])) {
 		config=DEFAULT_CONFIG_FILE;
 	}
 	const char	*id=cmdline.getValue("-id");
-	if (!(id && id[0])) {
+	const char	*host=cmdline.getValue("-host");
+	uint16_t	port=charstring::toInteger(
+					cmdline.getValue("-port"));
+	const char	*socket=cmdline.getValue("-socket");
+	const char	*user=cmdline.getValue("-user");
+	const char	*password=cmdline.getValue("-password");
+	const char	*query=cmdline.getValue("-query");
+	uint64_t	rsbs=charstring::toInteger(
+				cmdline.getValue("-resultsetbuffersize"));
+	if (!rsbs) {
+		rsbs=100;
+	}
+	bool		debug=cmdline.found("-debug");
 
+	if (!(charstring::length(id) ||
+		((charstring::length(host) ||
+			charstring::length(socket)) &&
+				charstring::length(user) &&
+				charstring::length(password))) ||
+		!(charstring::length(query))) {
 
-		if (argc<7) {
-			printf("usage: query  host port socket "
-				"user password query [debug] \n"
-				"  or   query  [-config configfile] "
-				"-id id query [debug]\n");
-			process::exit(1);
-		}
-
-		host=argv[1];
-		port=charstring::toInteger(argv[2]);
-		socket=argv[3];
-		user=argv[4];
-		password=argv[5];
-		query=argv[6];
-		if (argc>7 && argv[7] &&
-			!charstring::compare(argv[7],"debug")) {
-			debug=true;
-		}
-
-	} else {
-
-		if (cfgfile.parse(config,id)) {
-
-			// get the host/port/socket/username/password
-			host="localhost";
-			port=cfgfile.getPort();
-			socket=cfgfile.getUnixPort();
-			// FIXME: this can return 0
-			cfgfile.getUserList()->getDataByIndex(0,&currentnode);
-			user=currentnode->getUser();
-			password=currentnode->getPassword();
-
-			// find the query
-			int	i=1;
-			for (; i<argc; i++) {
-				if (argv[i][0]=='-') {
-					i++;
-					continue;
-				}
-				if (!charstring::compare(argv[i],"debug")) {
-					continue;
-				}
-				query=argv[i];
-				break;
-			}
-
-			// find the optional debug flag
-			if (argc>(i+1) && argv[i+1] &&
-				!charstring::compare(argv[i+1],"debug")) {
-				debug=true;
-			}
-		} else {
-			process::exit(1);
-		}
+		printf("usage: query -host host -port port -socket socket -user user -password password -query query [-debug] [-resultsetbuffersize rows]\n"
+			"  or   query  [-config configfile] -id id -query query [-debug] [-resultsetbuffersize rows]\n");
+		process::exit(1);
 	}
 
+	if (charstring::length(id) && cfgfile.parse(config,id)) {
 
+		// get the host/port/socket/username/password
+		host="localhost";
+		port=cfgfile.getPort();
+		socket=cfgfile.getUnixPort();
+		// FIXME: this can return 0
+		usercontainer	*currentnode=NULL;
+		cfgfile.getUserList()->getDataByIndex(0,&currentnode);
+		user=currentnode->getUser();
+		password=currentnode->getPassword();
+	}
 
 	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);
 	sqlrcursor	sqlrcur(&sqlrcon);
@@ -105,8 +74,9 @@ int main(int argc, const char **argv) {
 		sqlrcon.debugOn();
 	}
 
+	int32_t	exitval=0;
 	sqlrcur.dontGetColumnInfo();
-	sqlrcur.setResultSetBufferSize(100);
+	sqlrcur.setResultSetBufferSize(rsbs);
 	if (sqlrcur.sendQuery(query)) {
 		uint64_t	i=0;
 		uint32_t	cols=sqlrcur.colCount();
