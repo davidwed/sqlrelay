@@ -5,6 +5,7 @@
 #include <sqlrconfigfile.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/environment.h>
+#include <rudiments/system.h>
 
 #include <stdlib.h>
 
@@ -46,7 +47,6 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	authonconnection=charstring::contains(authtier,"connection");
 	authondatabase=!charstring::compare(authtier,"database");
 	handoff=charstring::duplicate(DEFAULT_HANDOFF);
-	passdescriptor=!charstring::compare(handoff,"pass");
 	allowedips=charstring::duplicate(DEFAULT_DENIEDIPS);
 	deniedips=charstring::duplicate(DEFAULT_DENIEDIPS);
 	debug=charstring::duplicate(DEFAULT_DEBUG);
@@ -275,11 +275,25 @@ bool sqlrconfigfile::getAuthOnDatabase() {
 }
 
 const char *sqlrconfigfile::getHandOff() {
+
+	// on some OS'es, force reconnect, even if pass was specified...
+
+	// get the os and version
+	const char	*os=system::getOperatingSystemName();
+	double		ver=charstring::toFloat(
+				system::getOperatingSystemRelease());
+
+	// force reconnect for Cygwin and Linux < 2.2
+	if (!charstring::compare(os,"CYGWIN",6) ||
+		(!charstring::compare(os,"Linux",5) && ver<2.2)) {
+		return "reconnect";
+	}
+
 	return handoff;
 }
 
 bool sqlrconfigfile::getPassDescriptor() {
-	return passdescriptor;
+	return !charstring::compare(getHandOff(),"pass");
 }
 
 const char *sqlrconfigfile::getAllowedIps() {
@@ -1176,7 +1190,6 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			delete[] handoff;
 			handoff=charstring::duplicate((value)?value:
 							DEFAULT_HANDOFF);
-			passdescriptor=!charstring::compare(handoff,"pass");
 		} else if (currentattribute==DENIEDIPS_ATTRIBUTE) {
 			delete[] deniedips;
 			deniedips=charstring::duplicate((value)?value:

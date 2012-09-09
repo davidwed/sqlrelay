@@ -304,7 +304,6 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		bool		authonconnection;
 		bool		authondatabase;
 		char		*handoff;
-		bool		passdescriptor;
 		char		*allowedips;
 		char		*deniedips;
 		char		*debug;
