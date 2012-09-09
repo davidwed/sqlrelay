@@ -1,37 +1,36 @@
-.TH query 1 "2002-06-10" "execute a query" SQL\ Relay
+.TH sqlr-fields 1 "2002-06-10" "list fields in a table" SQL\ Relay
 
 .SH NAME
-query \- execute a query
+sqlr-fields \- list fields in a table
 
 .SH SYNOPSIS
-.B query
-\fIhost port socket user passwd query \fR[debug]
+.B sqlr-fields
+-host \fIhost\fR -port \fIport\fR -socket \fIsocket\fR -user \fIuser\fR -password \fIpasswd\fR -table \fItable\fR
 .br
-.B query
-[-config \fIconfigfile\fR] -id \fIid query \fR[debug]
+.B sqlr-fields
+[-config \fIconfigfile\fR] -id \fIid\fR -table \fItable\fR
 
 .SH DESCRIPTION
 The
-.B query
-command executes the query specified in the \fIquery\fR parameter and
-returns the result set as a quote/comma/return seperated value list to
-standard output.
+.B sqlr-fields
+command returns a comma seperated list of the fields in the table
+specified by the \fItable\fR argument to standard output.
 
 .SH OPTIONS
 .TP
-\fIhost\fR
+\fB-host\fR \fIhost\fR
 hostname of the machine running the listener daemon
 .TP
-\fIport\fR
+\fB-port\fR \fIport\fR
 port number the listener daemon is listening on, for local or remote connections
 .TP
-\fIsocket\fR
+\fB-socket\fR \fIsocket\fR
 socket the listener daemon is listening on, for local connections
 .TP
-\fIuser\fR
+\fB-user\fR \fIuser\fR
 SQL Relay user name (as per config file)
 .TP
-\fIpasswd\fR
+\fB-password\fR \fIpasswd\fR
 SQL Relay password (as per config file)
 .TP
 \fB-config\fR \fIconfigfile\fR
@@ -40,32 +39,29 @@ config file to use (default /etc/sqlrelay/sqlrelay.conf)
 \fB-id\fR \fIid\fR
 instance to use (as per config file)
 .TP
-\fIquery\fR
-query to be executed
-.TP
-\fBdebug\fR
-produce debugging output
+\fB-table\fR \fItable\fR
+table to be described
 
 .SH EXAMPLES
 .TP
-\fBquery "" "" /tmp/examplesocket fred secret "select * from tbl"\fR
+\fBsqlr-fields -socket /tmp/examplesocket -user fred -password secret -table tbl\fR
 Connect to the SQL Relay listener daemon running on the local
 machine, with socket \fB/tmp/examplesocket\fR, as user \fBfred\fR,
-with password \fBsecret\fR, and run a query.
+with password \fBsecret\fR, and return the fields in table \fBtbl\fR.
 .TP
-\fBquery dbsvr 9000 "" fred secret "select * from tbl" debug\fR
+\fBsqlr-fields -host dbsvr -port 9000 -user fred -password secret -table tbl\fR
 Connect to the SQL Relay listener daemon running on the remote
 machine \fBdbsvr\fR, on port \fB9000\fR, as user \fBfred\fR,
-with password \fBsecret\fR, and run a query, producing extra
-debugging output.
+with password \fBsecret\fR, and return the fields in table \fBtbl\fR.
 .TP
-\fBquery -id example "select * from tbl"\fR
+\fBsqlr-fields -id example -table tbl\fR
 Connect to the SQL Relay listener daemon for instance \fBexample\fR
-(as defined in /etc/sqlrelay/sqlrelay.config), and run a query.
+(as defined in /etc/sqlrelay/sqlrelay.config), and return the fields
+in table \fBtbl\fR.
 
 .SH SEE ALSO
-\fBfields\fP(1),
-\#\fBquery\fP(1),
+\#\fBsqlr-fields\fP(1),
+\fBsqlr-query\fP(1),
 \fBsqlrsh\fP(1),
 \fBsqlr-cachemanager\fP(8),
 \fBsqlr-connection\fP(8),
