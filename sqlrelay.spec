@@ -422,8 +422,8 @@ rm -rf %{buildroot}
 %files clients
 %defattr(-, root, root)
 %{_bindir}/backupschema
-%{_bindir}/fields
-%{_bindir}/query
+%{_bindir}/sqlr-fields
+%{_bindir}/sqlr-query
 %{_bindir}/sqlrsh
 %{_bindir}/sqlr-export
 %{_bindir}/sqlr-import

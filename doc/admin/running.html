@@ -171,33 +171,33 @@ sqlr-stop [id] [SIGKILL]
 <p>Several command line utilities are provided for use with SQL Relay.  The syntax for each is as follows:</p>
 
 <blockquote>
-query HOST PORT SOCKET USER PASSWORD QUERY<br>
-fields HOST PORT SOCKET USER PASSWORD TABLE<br>
-backupschema HOST SOCKET PORT USER PASSWORD<br>
-sqlrsh HOST PORT SOCKET USER PASSWORD<br>
-sqlr-export HOST PORT SOCKET USER PASSWORD (table|sequence) tablename &gt; exportfile.xml<br>
-sqlr-import HOST PORT SOCKET USER PASSWORD exportfile.xml<br>
+backupschema HOST PORT USER PASSWORD<br>
+sqlr-query -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD -query QUERY<br>
+sqlr-fields -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD -table TABLE<br>
+sqlrsh -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD<br>
+sqlr-export -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD (-table TABLE | -sequence SEQUENCE) &gt; exportfile.xml<br>
+sqlr-import -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD -file exportfile.xml<br>
 </blockquote>
 
 <p>or, if there's an sqlrelay.conf file that the client can read:</p>
 
 <blockquote>
-query -id ID QUERY<br>
-fields -id ID TABLE<br>
+sqlr-query -id ID -query QUERY<br>
+sqlr-fields -id ID -table TABLE<br>
 sqlrsh -id ID <br>
-sqlr-export -id ID (table|sequence) tablename &gt; exportfile.xml<br>
-sqlr-import -id ID exportfile.xml<br>
+sqlr-export -id ID (-table TABLE | -sequence SEQUENCE) &gt; exportfile.xml<br>
+sqlr-import -id ID -file exportfile.xml<br>
 </blockquote>
 
 <p>The HOST, PORT, SOCKET, USER and PASSWORD arguments specify which listener to connect to and what authentication to use.<p>
 
 <p>The ID argument refers to an entry in the sqlrelay.conf file from which host, port, socket, user and passwords can be read.</p>
 
-<p>The <b>query</b> command executes the query specified in the QUERY parameter and returns the result set as a quote/comma/return seperated value list to standard output.</p>
+<p>The <b>sqlr-query</b> command executes the query specified in the QUERY parameter and returns the result set as a quote/comma/return seperated value list to standard output.</p>
 
-<p>The <b>fields</b> command returns a comma seperated list of the fields in the table specified by the TABLE argument to standard output.</p>
+<p>The <b>sqlr-fields</b> command returns a comma seperated list of the fields in the table specified by the TABLE argument to standard output.</p>
 
-<p>The <b>backupschema</b> command only works against oracle databases and uses the "select table_name from user_tables" query in combination with the <b>query</b> and <b>fields</b> commands to generate Oracle SQL Loader control files for all tables owned by the user a particular connection is logged in as.  The command is useful for backing up an entire schema of data to a readily re-importable format.</p>
+<p>The <b>backupschema</b> command only works against oracle databases and uses the "select table_name from user_tables" query in combination with the <b>sqlr-query</b> and <b>sqlr-fields</b> commands to generate Oracle SQL Loader control files for all tables owned by the user a particular connection is logged in as.  The command is useful for backing up an entire schema of data to a readily re-importable format.</p>
 
 <p><b>sqlrsh</b> is an interactive query tool similar to (though not as powerful as) SQL Plus, mysql, psql, isql and the like.  Run it and type help; at the prompt for detailed usage instructions.  When sqlrsh starts up, it reads and executes two rc files, the system rc file (most likely /usr/local/firstworks/etc/sqlrshrc) and a personal rc file .sqlrshrc in your home directory.  These files should contain sqlrsh commands, ending in semicolons, seperated by carraige returns.  Any sqlrsh commands may be used in the rc files, even queries.</p>
 
