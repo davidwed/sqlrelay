@@ -1,6 +1,11 @@
 0.47 - fixed bug that caused sqlr-export to output negative xml-entity values
 	fixed single-quote-esacping in sqlr-export
 	forced handoff="reconnect" for Cygwin and Linux<2.2
+	updated all command line programs to use the same command line
+		argument structure
+	added a "fields" command to sqlrsh
+	added a -command argument to sqlrsh so commands and queries can be
+		run from the command line directly
 
 0.46 - refactored the translation framework to mimic the trigger framework
 	added make.batch file for building on windows
