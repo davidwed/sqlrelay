@@ -5,10 +5,10 @@ sqlrsh \- interactive query tool for SQL Relay
 
 .SH SYNOPSIS
 .B sqlrsh
-\fIhost port socket user passwd \fR[\fIscript\fR]
+-host \fIhost\fR -port \fIport\fR -socket \fIsocket\fR -user \fIuser\fR -password \fIpasswd\fR [-script \fIscript\fR]
 .br
 .B sqlrsh
-[-config \fIconfigfile\fR] -id \fIid \fR[\fIscript\fR]
+[-config \fIconfigfile\fR] -id \fIid\fR [-script \fIscript\fR]
 .br
 
 .SH DESCRIPTION
@@ -25,19 +25,19 @@ be used in the rc files, even queries.
 
 .SH OPTIONS
 .TP
-\fIhost\fR
+\fB-host\fR \fIhost\fR
 hostname of the machine running the listener daemon
 .TP
-\fIport\fR
+\fB-port\fR \fIport\fR
 port number the listener daemon is listening on, for local or remote connections
 .TP
-\fIsocket\fR
+\fB-socket\fR \fIsocket\fR
 socket the listener daemon is listening on, for local connections
 .TP
-\fIuser\fR
+\fB-user\fR \fIuser\fR
 SQL Relay user name (as per config file)
 .TP
-\fIpasswd\fR
+\fB-password\fR \fIpasswd\fR
 SQL Relay password (as per config file)
 .TP
 \fB-config\fR \fIconfigfile\fR
@@ -46,24 +46,24 @@ config file to use (default /etc/sqlrelay/sqlrelay.conf)
 \fB-id\fR \fIid\fR
 instance to use (as per config file)
 .TP
-\fIscript\fR
+\fB-script\fR \fIscript\fR
 script (containing sqlrsh commands and queries) to run (default ~/.sqlrshrc)
 
 .SH EXAMPLES
 .TP
-\fBsqlrsh "" "" /tmp/examplesocket fred secret\fR
+\fBsqlrsh -socket /tmp/examplesocket -user fred -password secret\fR
 Connect to the SQL Relay listener daemon running on the local
 machine, with socket \fB/tmp/examplesocket\fR, as user \fBfred\fR,
 with password \fBsecret\fR.
 .TP
-\fBsqlrsh dbsvr 9000 "" fred secret\fR
+\fBsqlrsh -host dbsvr -port 9000 -user fred -password secret\fR
 Connect to the SQL Relay listener daemon running on the remote
 machine \fBdbsvr\fR, on port \fB9000\fR, as user \fBfred\fR,
 with password \fBsecret\fR.
 .TP
 \fBsqlrsh -id example\fR
 Connect to the SQL Relay listener daemon for instance \fBexample\fR
-(as defined in /etc/sqlrelay/sqlrelay.config).
+(as defined in /etc/sqlrelay/sqlrelay.conf).
 
 .SH SEE ALSO
 \fBfields\fP(1),
