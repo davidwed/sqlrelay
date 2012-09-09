@@ -540,6 +540,8 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 				sqlrcursor *sqlrcur, sqlrshenv *env, 
 				const char *command) {
 
+	bool 	displaystats=true;
+
 	// init stats
 	initStats(env);
 
@@ -560,6 +562,26 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 	} else if (!charstring::compareIgnoringCase(command,"rollback")) {
 
 		sqlrcon->rollback();
+
+	} else if (!charstring::compareIgnoringCase(command,"fields ",7)) {
+
+		char	*table=getTable(DESCRIBE_QUERY,command);
+		sqlrcur->getColumnList(table,NULL);
+		delete[] table;
+
+		for (uint64_t j=0; j<sqlrcur->rowCount(); j++) {
+			if (j>0) {
+				printf(",");
+			}
+			printf("%s",sqlrcur->getField(j,(uint32_t)0));
+		}
+		printf("\n");
+
+		if (env->final) {
+			sqlrcon->endSession();
+		}
+
+		displaystats=false;
 
 	} else {
 
@@ -624,7 +646,9 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 	sqlrcon->debugOff();
 
 	// display statistics
-	displayStats(sqlrcur,env);
+	if (displaystats) {
+		displayStats(sqlrcur,env);
+	}
 }
 
 void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
@@ -1317,11 +1341,15 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	cyan(env);
 	printf("	show columns in table [like pattern]	-\n");
 	green(env);
-	printf("		returns a list of columns in the table \"table\"\n");
+	printf("		returns a list of column metadata for the table \"table\"\n");
 	cyan(env);
 	printf("	describe table				-\n");
 	green(env);
-	printf("		returns a list of columns in the table \"table\"\n\n");
+	printf("		returns a list of column metadata for the table \"table\"\n");
+	cyan(env);
+	printf("	fields table				-\n");
+	green(env);
+	printf("		returns a list of column names for the table \"table\"\n\n");
 	cyan(env);
 	printf("	exit/quit		- ");
 	green(env);
@@ -1453,7 +1481,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 	const char	*user=cmdline.getValue("-user");
 	const char	*password=cmdline.getValue("-password");
 	const char	*script=cmdline.getValue("-script");
-	const char	*query=cmdline.getValue("-query");
+	const char	*command=cmdline.getValue("-command");
 
 	if (!(charstring::length(id) ||
 		((charstring::length(host) ||
@@ -1461,8 +1489,8 @@ void sqlrsh::execute(int argc, const char **argv) {
 				charstring::length(user) &&
 				charstring::length(password)))) {
 
-		printf("usage: sqlrsh -host host -port port -socket socket -user user -password password [-script script | -query query]\n"
-			"  or   sqlrsh [-config configfile] -id id [-script script | -query query]\n");
+		printf("usage: sqlrsh -host host -port port -socket socket -user user -password password [-script script | -command command]\n"
+			"  or   sqlrsh [-config configfile] -id id [-script script | -command command]\n");
 		process::exit(1);
 	}
 
@@ -1515,9 +1543,9 @@ void sqlrsh::execute(int argc, const char **argv) {
 	if (charstring::length(script)) {
 		// if a script was specified, run it
 		runScript(&sqlrcon,&sqlrcur,&env,script,true,false);
-	} else if (charstring::length(query)) {
-		// if a query was specified, run it
-		runCommand(&sqlrcon,&sqlrcur,&env,query);
+	} else if (charstring::length(command)) {
+		// if a command was specified, run it
+		runCommand(&sqlrcon,&sqlrcur,&env,command);
 	} else {
 		// otherwise go into interactive mode
 		startupMessage(&env,host,port,user);
