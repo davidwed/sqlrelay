@@ -540,8 +540,6 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 				sqlrcursor *sqlrcur, sqlrshenv *env, 
 				const char *command) {
 
-	bool 	displaystats=true;
-
 	// init stats
 	initStats(env);
 
@@ -580,8 +578,6 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 		if (env->final) {
 			sqlrcon->endSession();
 		}
-
-		displaystats=false;
 
 	} else {
 
@@ -646,9 +642,7 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 	sqlrcon->debugOff();
 
 	// display statistics
-	if (displaystats) {
-		displayStats(sqlrcur,env);
-	}
+	displayStats(sqlrcur,env);
 }
 
 void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
