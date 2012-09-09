@@ -279,9 +279,9 @@ const char *sqlrconfigfile::getHandOff() {
 	// on some OS'es, force reconnect, even if pass was specified...
 
 	// get the os and version
-	const char	*os=system::getOperatingSystemName();
+	const char	*os=rudiments::system::getOperatingSystemName();
 	double		ver=charstring::toFloat(
-				system::getOperatingSystemRelease());
+				rudiments::system::getOperatingSystemRelease());
 
 	// force reconnect for Cygwin and Linux < 2.2
 	if (!charstring::compare(os,"CYGWIN",6) ||
