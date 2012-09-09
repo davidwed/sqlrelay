@@ -43,8 +43,8 @@ int main(int argc, const char **argv) {
 				charstring::length(password))) ||
 		!(charstring::length(table))) {
 
-		printf("usage: fields -host host -port port -socket socket -table table\n"
-			"  or   fields  [-config configfile] -id id -table table\n");
+		printf("usage: sqlr-fields -host host -port port -socket socket -table table\n"
+			"  or   sqlr-fields  [-config configfile] -id id -table table\n");
 		process::exit(1);
 	}
 

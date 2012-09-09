@@ -49,8 +49,8 @@ int main(int argc, const char **argv) {
 				charstring::length(password))) ||
 		!(charstring::length(query))) {
 
-		printf("usage: query -host host -port port -socket socket -user user -password password -query query [-debug] [-resultsetbuffersize rows]\n"
-			"  or   query  [-config configfile] -id id -query query [-debug] [-resultsetbuffersize rows]\n");
+		printf("usage: sqlr-query -host host -port port -socket socket -user user -password password -query query [-debug] [-resultsetbuffersize rows]\n"
+			"  or   sqlr-query  [-config configfile] -id id -query query [-debug] [-resultsetbuffersize rows]\n");
 		process::exit(1);
 	}
 
