@@ -515,6 +515,7 @@ AC_MSG_CHECKING(for readline)
 FW_CHECK_HEADERS_AND_LIBS([/usr],[readline],[readline/readline.h],[readline],[""],[""],[READLINEINCLUDES],[READLINELIBS],[READLINELIBPATH],[READLINESTATIC])
 if ( test -n "$READLINELIBS" )
 then
+	READLINEINCLUDES="$READLINEINCLUDES $HISTORYINCLUDES $TERMCAPINCLUDES"
 	READLINELIBS="$READLINELIBS $HISTORYLIBS $TERMCAPLIBS"
 	AC_MSG_RESULT(yes)
 else
@@ -522,7 +523,9 @@ else
 fi
 
 AC_MSG_CHECKING(whether termcap/history/readline work)
-FW_TRY_COMPILE([#include <stdlib.h>],[extern char *readline(char *prompt); extern void add_history(char *line); extern void read_history(char *file); extern void write_history(char *file); extern void history_truncate_file(char *file, int line); readline(NULL);],[$READLINELIBS],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); READLINELIBS=""])
+FW_TRY_LINK([#include <stdlib.h>
+extern "C" { extern char *readline(char *prompt); extern void add_history(char *line); extern void read_history(char *file); extern void write_history(char *file); extern void history_truncate_file(char *file, int line); }],[readline(NULL);],[$READLINEINCLUDES],[$READLINELIBS],[],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); READLINELIBS=""])
+AC_SUBST(READLINEINCLUDES)
 AC_SUBST(READLINELIBS)
 
 if ( test -n "$READLINELIBS" )
