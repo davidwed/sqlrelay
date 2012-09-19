@@ -502,6 +502,19 @@ else
 	AC_MSG_RESULT(no)
 fi
 
+dnl if there was no termcap, try curses instead
+if ( test -z "$TERMCAPLIBS" )
+then
+	AC_MSG_CHECKING(for curses)
+	FW_CHECK_HEADERS_AND_LIBS([/usr],[curses],[curses.h],[curses],[""],[""],[CURSESINCLUDES],[CURSESLIBS],[CURSESLIBPATH],[CURSESSTATIC])
+	if ( test -n "$CURSESLIBS" )
+	then
+		AC_MSG_RESULT(yes)
+	else
+		AC_MSG_RESULT(no)
+	fi
+fi
+
 AC_MSG_CHECKING(for history)
 FW_CHECK_HEADERS_AND_LIBS([/usr],[history],[readline/history.h],[history],[""],[""],[HISTORYINCLUDES],[HISTORYLIBS],[HISTORYLIBPATH],[HISTORYSTATIC])
 if ( test -n "$HISTORYLIBS" )
@@ -515,14 +528,14 @@ AC_MSG_CHECKING(for readline)
 FW_CHECK_HEADERS_AND_LIBS([/usr],[readline],[readline/readline.h],[readline],[""],[""],[READLINEINCLUDES],[READLINELIBS],[READLINELIBPATH],[READLINESTATIC])
 if ( test -n "$READLINELIBS" )
 then
-	READLINEINCLUDES="$READLINEINCLUDES $HISTORYINCLUDES $TERMCAPINCLUDES"
-	READLINELIBS="$READLINELIBS $HISTORYLIBS $TERMCAPLIBS"
+	READLINEINCLUDES="$READLINEINCLUDES $HISTORYINCLUDES $CURSESINCLUDES $TERMCAPINCLUDES"
+	READLINELIBS="$READLINELIBS $HISTORYLIBS $CURSESINCLUDES $TERMCAPLIBS"
 	AC_MSG_RESULT(yes)
 else
 	AC_MSG_RESULT(no)
 fi
 
-AC_MSG_CHECKING(whether termcap/history/readline work)
+AC_MSG_CHECKING(whether termcap/curses/history/readline work)
 FW_TRY_LINK([#include <stdlib.h>
 extern "C" { extern char *readline(char *prompt); extern void add_history(char *line); extern void read_history(char *file); extern void write_history(char *file); extern void history_truncate_file(char *file, int line); }],[readline(NULL);],[$READLINEINCLUDES],[$READLINELIBS],[],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); READLINELIBS=""])
 AC_SUBST(READLINEINCLUDES)
