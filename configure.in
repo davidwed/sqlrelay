@@ -493,27 +493,39 @@ dnl Checks for libraries.
 echo
 echo "***** Libraries **************"
 
-AC_CHECK_LIB(termcap,tgetnum,TERMCAPLIB="-ltermcap" ,TERMCAPLIB="")
-
-PRELIBS=$LIBS
-LIBS="$TERMCAPLIB"
-AC_CHECK_LIB(history,add_history,HISTORYLIB="-lhistory" ,HISTROYLIB="")
-LIBS=$PRELIBS
-
-PRELIBS=$LIBS
-LIBS="$HISTORYLIB $TERMCAPLIB"
-AC_CHECK_LIB(readline,readline,READLINELIB="-lreadline" ,READLINELIB="")
-LIBS=$PRELIBS
-
-if ( test -n "$READLINELIB" )
+AC_MSG_CHECKING(for termcap)
+FW_CHECK_HEADERS_AND_LIBS([/usr],[termcap],[termcap.h],[termcap],[""],[""],[TERMCAPINCLUDES],[TERMCAPLIBS],[TERMCAPLIBPATH],[TERMCAPSTATIC])
+if ( test -n "$TERMCAPLIBS" )
 then
-	READLINELIB="$READLINELIB $HISTORYLIB $TERMCAPLIB"
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
 fi
 
-FW_TRY_COMPILE([#include <stdlib.h>],[extern char *readline(char *prompt); extern void add_history(char *line); extern void read_history(char *file); extern void write_history(char *file); extern void history_truncate_file(char *file, int line); readline(NULL);],[$READLINELIB],[],[READLINELIB=""])
-AC_SUBST(READLINELIB)
+AC_MSG_CHECKING(for history)
+FW_CHECK_HEADERS_AND_LIBS([/usr],[history],[readline/history.h],[history],[""],[""],[HISTORYINCLUDES],[HISTORYLIBS],[HISTORYLIBPATH],[HISTORYSTATIC])
+if ( test -n "$HISTORYLIBS" )
+then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
 
-if ( test -n "$READLINELIB" )
+AC_MSG_CHECKING(for readline)
+FW_CHECK_HEADERS_AND_LIBS([/usr],[readline],[readline/readline.h],[readline],[""],[""],[READLINEINCLUDES],[READLINELIBS],[READLINELIBPATH],[READLINESTATIC])
+if ( test -n "$READLINELIBS" )
+then
+	READLINELIBS="$READLINELIBS $HISTORYLIBS $TERMCAPLIBS"
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+
+AC_MSG_CHECKING(whether termcap/history/readline work)
+FW_TRY_COMPILE([#include <stdlib.h>],[extern char *readline(char *prompt); extern void add_history(char *line); extern void read_history(char *file); extern void write_history(char *file); extern void history_truncate_file(char *file, int line); readline(NULL);],[$READLINELIBS],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); READLINELIBS=""])
+AC_SUBST(READLINELIBS)
+
+if ( test -n "$READLINELIBS" )
 then
 	AC_DEFINE_UNQUOTED(HAVE_READLINE,1,Do we have readline)
 fi
@@ -803,7 +815,7 @@ echo "***** Summary ***********************************************"
 echo " Version      : $SQLR_VERSION"
 
 READLINEBUILD="no "
-if ( test -n "$READLINELIB" ); then
+if ( test -n "$READLINELIBS" ); then
 	READLINEBUILD="yes"
 fi
 

@@ -43,7 +43,7 @@ sqlr-fields$(EXE): sqlr-fields.cpp sqlr-fields.lo
 	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-fields.lo $(LIBS) $(RPATH)
 
 sqlrsh$(EXE): sqlrsh.cpp sqlrsh.lo 
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.lo $(LIBS) $(READLINELIB) $(RPATH)
+	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.lo $(LIBS) $(READLINELIBS) $(RPATH)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
