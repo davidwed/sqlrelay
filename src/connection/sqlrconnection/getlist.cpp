@@ -221,8 +221,30 @@ bool sqlrconnection_svr::getListThroughApiCall(sqlrcursor_svr *cursor,
 		return false;
 	}
 
-	// FIXME: send data to the client...
+	// FIXME: detect an error somehow and return it
+	/*if (error) {
+		returnError(cursor,"error",999996,false);
+		return true;
+	}*/
 
+	// indicate that no error has occurred
+	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+
+	// send the client the id of the 
+	// cursor that it's going to use
+	clientsock->write(cursor->id);
+
+	// tell the client that this is not a
+	// suspended result set
+	clientsock->write((uint16_t)NO_SUSPENDED_RESULT_SET);
+
+	// if the query processed 
+	// ok then send a result set
+	// header and return...
+	returnResultSetHeader(cursor);
+	if (!returnResultSetData(cursor)) {
+		// error or something?
+	}
 	return true;
 }
 
