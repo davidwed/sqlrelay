@@ -283,35 +283,89 @@ const char *odbcconnection::dbVersion() {
 	return dbversion;
 }
 
-bool odbcconnection::getDatabaseList(sqlrcursor_svr *cursor,
-					const char *wild,
-					char ***cols,
-					uint32_t *colcount,
-					char ****rows,
-					uint64_t *rowcount) {
-	// FIXME: SQLTables might actually return this information, oddly enough
-	return false;
+bool odbcconnection::getListsByApiCalls() {
+	return true;
 }
 
-bool odbcconnection::getTableList(sqlrcursor_svr *cursor,
-					const char *wild,
-					char ***cols,
-					uint32_t *colcount,
-					char ****rows,
-					uint64_t *rowcount) {
-	// FIXME: call SQLTables
-	return false;
+bool odbcconnection::getDatabaseList(sqlrcursor_svr *cursor, const char *wild) {
+	return getDatabaseOrTableList(cursor,wild,false);
+}
+
+bool odbcconnection::getTableList(sqlrcursor_svr *cursor, const char *wild) {
+	return getDatabaseOrTableList(cursor,wild,true);
+}
+
+bool odbcconnection::getDatabaseOrTableList(sqlrcursor_svr *cursor,
+							const char *wild,
+							bool table) {
+
+	odbccursor	*odbccur=(odbccursor *)cursor;
+
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
+
+	// initialize row and column counts
+	odbccur->initializeRowAndColumnCounts();
+
+	// SQLTables takes non-const arguments, so we have to make
+	// copies of the various arguments that we want to pass in.
+	char	*allcatalogs=(table)?NULL:
+				charstring::duplicate(SQL_ALL_CATALOGS);
+	char	*wildcopy=charstring::duplicate(wild);
+	char	*empty=new char[1];
+	empty[0]='\0';
+
+	// get the table/database list
+	erg=SQLTables(odbccur->stmt,
+			(SQLCHAR *)((table)?empty:allcatalogs),SQL_NTS,
+			(SQLCHAR *)empty,SQL_NTS,
+			(SQLCHAR *)wildcopy,charstring::length(wildcopy),
+			(SQLCHAR *)empty,SQL_NTS);
+	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+	delete[] empty;
+	delete[] wildcopy;
+	delete[] allcatalogs;
+
+	// parse the column information
+	return (retval)?odbccur->handleColumns():false;
 }
 
 bool odbcconnection::getColumnList(sqlrcursor_svr *cursor,
 					const char *table,
-					const char *wild,
-					char ***cols,
-					uint32_t *colcount,
-					char ****rows,
-					uint64_t *rowcount) {
-	// FIXME: call SQLColumns
-	return false;
+					const char *wild) {
+
+	odbccursor	*odbccur=(odbccursor *)cursor;
+
+	// allocate the statement handle
+	if (!odbccur->allocateStatementHandle()) {
+		return false;
+	}
+
+	// initialize row and column counts
+	odbccur->initializeRowAndColumnCounts();
+
+	// SQLColumns takes non-const arguments, so we have to make
+	// copies of the various arguments that we want to pass in.
+	char	*wildcopy=charstring::duplicate(wild);
+	char	*tablecopy=charstring::duplicate(table);
+	char	*empty=new char[1];
+	empty[0]='\0';
+
+	// get the column list
+	erg=SQLColumns(odbccur->stmt,
+			(SQLCHAR *)empty,SQL_NTS,
+			(SQLCHAR *)empty,SQL_NTS,
+			(SQLCHAR *)table,charstring::length(tablecopy),
+			(SQLCHAR *)wildcopy,charstring::length(wildcopy));
+	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+	delete[] empty;
+	delete[] wildcopy;
+	delete[] tablecopy;
+
+	// parse the column information
+	return (retval)?odbccur->handleColumns():false;
 }
 
 #if (ODBCVER >= 0x0300)
@@ -358,21 +412,8 @@ odbccursor::~odbccursor() {
 
 bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 
-	if (stmt) {
-#if (ODBCVER >= 0x0300)
-		SQLFreeHandle(SQL_HANDLE_STMT,stmt);
-#else
-		SQLFreeStmt(stmt,SQL_DROP);
-#endif
-	}
-
-	// allocate the cursor
-#if (ODBCVER >= 0x0300)
-	erg=SQLAllocHandle(SQL_HANDLE_STMT,odbcconn->dbc,&stmt);
-#else
-	erg=SQLAllocStmt(odbcconn->dbc,&stmt);
-#endif
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+	// allocate the statement handle
+	if (!allocateStatementHandle()) {
 		return false;
 	}
 
@@ -388,7 +429,8 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 	}
 #endif*/
 
-	// prepare the query
+	// prepare the query...
+
 #ifdef HAVE_SQLCONNECTW
 	//free allocated buffers
 	while(nextbuf>0)
@@ -408,6 +450,23 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 	}
 
 	return true;
+}
+
+bool odbccursor::allocateStatementHandle() {
+
+	if (stmt) {
+#if (ODBCVER >= 0x0300)
+		SQLFreeHandle(SQL_HANDLE_STMT,stmt);
+#else
+		SQLFreeStmt(stmt,SQL_DROP);
+#endif
+	}
+#if (ODBCVER >= 0x0300)
+	erg=SQLAllocHandle(SQL_HANDLE_STMT,odbcconn->dbc,&stmt);
+#else
+	erg=SQLAllocStmt(odbcconn->dbc,&stmt);
+#endif
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
 bool odbccursor::inputBindString(const char *variable,
@@ -738,25 +797,65 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
 
 	// initialize counts
-	ncols=0;
-	row=0;
-	maxrow=0;
-	totalrows=0;
+	initializeRowAndColumnCounts();
 
 	// execute the query
 	erg=SQLExecute(stmt);
 	if (erg!=SQL_SUCCESS &&
-		erg!=SQL_SUCCESS_WITH_INFO
+			erg!=SQL_SUCCESS_WITH_INFO
 #if defined(SQL_NO_DATA)
-		&& erg!=SQL_NO_DATA
+			&& erg!=SQL_NO_DATA
 #elif defined(SQL_NO_DATA_FOUND)
-		&& erg!=SQL_NO_DATA_FOUND
+			&& erg!=SQL_NO_DATA_FOUND
 #endif
 		) {
 		return false;
 	}
 
 	checkForTempTable(query,length);
+
+	if (!handleColumns()) {
+		return false;
+	}
+
+	// get the row count
+#ifdef SQLROWCOUNT_SQLLEN
+	erg=SQLRowCount(stmt,(SQLLEN *)&affectedrows);
+#else
+	erg=SQLRowCount(stmt,&affectedrows);
+#endif
+	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		return false;
+	}
+
+	// convert date output binds
+	for (uint16_t i=0; i<MAXVAR; i++) {
+		if (outdatebind[i]) {
+			datebind	*db=outdatebind[i];
+			SQL_TIMESTAMP_STRUCT	*ts=
+				(SQL_TIMESTAMP_STRUCT *)db->buffer;
+			*(db->year)=ts->year;
+			*(db->month)=ts->month;
+			*(db->day)=ts->day;
+			*(db->hour)=ts->hour;
+			*(db->minute)=ts->minute;
+			*(db->second)=ts->second;
+			*(db->microsecond)=ts->fraction/1000;
+			*(db->tz)=NULL;
+		}
+	}
+
+	return true;
+}
+
+void odbccursor::initializeRowAndColumnCounts() {
+	ncols=0;
+	row=0;
+	maxrow=0;
+	totalrows=0;
+}
+
+bool odbccursor::handleColumns() {
 
 	// get the column count
 	erg=SQLNumResultCols(stmt,&ncols);
@@ -1032,33 +1131,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length,
 		
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			return false;
-		}
-	}
-
-	// get the row count
-#ifdef SQLROWCOUNT_SQLLEN
-	erg=SQLRowCount(stmt,(SQLLEN *)&affectedrows);
-#else
-	erg=SQLRowCount(stmt,&affectedrows);
-#endif
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
-	}
-
-	// convert date output binds
-	for (uint16_t i=0; i<MAXVAR; i++) {
-		if (outdatebind[i]) {
-			datebind	*db=outdatebind[i];
-			SQL_TIMESTAMP_STRUCT	*ts=
-				(SQL_TIMESTAMP_STRUCT *)db->buffer;
-			*(db->year)=ts->year;
-			*(db->month)=ts->month;
-			*(db->day)=ts->day;
-			*(db->hour)=ts->hour;
-			*(db->minute)=ts->minute;
-			*(db->second)=ts->second;
-			*(db->microsecond)=ts->fraction/1000;
-			*(db->tz)=NULL;
 		}
 	}
 

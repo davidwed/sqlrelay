@@ -82,31 +82,20 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual bool		ping();
 		virtual const char	*identify()=0;
 		virtual	const char	*dbVersion()=0;
-		virtual const char	*getDatabaseListQuery(bool wild);
-		virtual const char	*getTableListQuery(bool wild);
-		virtual const char	*getColumnListQuery(bool wild);
+		virtual bool		getListsByApiCalls();
 		virtual bool		getDatabaseList(
 						sqlrcursor_svr *cursor,
-						const char *wild,
-						char ***cols,
-						uint32_t *colcount,
-						char ****rows,
-						uint64_t *rowcount);
+						const char *wild);
 		virtual bool		getTableList(
 						sqlrcursor_svr *cursor,
-						const char *wild,
-						char ***cols,
-						uint32_t *colcount,
-						char ****rows,
-						uint64_t *rowcount);
+						const char *wild);
 		virtual bool		getColumnList(
 						sqlrcursor_svr *cursor,
 						const char *table,
-						const char *wild,
-						char ***cols,
-						uint32_t *colcount,
-						char ****rows,
-						uint64_t *rowcount);
+						const char *wild);
+		virtual const char	*getDatabaseListQuery(bool wild);
+		virtual const char	*getTableListQuery(bool wild);
+		virtual const char	*getColumnListQuery(bool wild);
 		virtual	const char	*bindFormat();
 		virtual sqlrcursor_svr	*initCursor()=0;
 		virtual void	deleteCursor(sqlrcursor_svr *curs)=0;
@@ -308,12 +297,16 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool	getColumnListCommand(sqlrcursor_svr *cursor);
 		bool	getListCommand(sqlrcursor_svr *cursor,
 						int which, bool gettable);
-		bool	buildListQuery(sqlrcursor_svr *cursor,
-							const char *query,
+		bool	getListByApiCall(sqlrcursor_svr *cursor,
+							int which,
 							const char *table,
 							const char *wild);
-		bool	getListThroughApiCall(sqlrcursor_svr *cursor,
+		bool	getListByQuery(sqlrcursor_svr *cursor,
 							int which,
+							const char *table,
+							const char *wild);
+		bool	buildListQuery(sqlrcursor_svr *cursor,
+							const char *query,
 							const char *table,
 							const char *wild);
 		void	escapeParameter(stringbuffer *buffer,

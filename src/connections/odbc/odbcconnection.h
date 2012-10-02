@@ -62,6 +62,8 @@ class odbccursor : public sqlrcursor_svr {
 				~odbccursor();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
+		bool		allocateStatementHandle();
+		void		initializeRowAndColumnCounts();
 		bool		inputBindString(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -122,6 +124,7 @@ class odbccursor : public sqlrcursor_svr {
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
+		bool		handleColumns();
 		void		errorMessage(const char **errorstring,
 						int64_t	*errorcode,
 						bool *liveconnection);
@@ -197,25 +200,18 @@ class odbcconnection : public sqlrconnection_svr {
 		bool		ping();
 		const char	*identify();
 		const char	*dbVersion();
+		bool		getListsByApiCalls();
 		bool		getDatabaseList(sqlrcursor_svr *cursor,
-						const char *wild,
-						char ***cols,
-						uint32_t *colcount,
-						char ****rows,
-						uint64_t *rowcount);
+						const char *wild);
 		bool		getTableList(sqlrcursor_svr *cursor,
+						const char *wild);
+		bool		getDatabaseOrTableList(
+						sqlrcursor_svr *cursor,
 						const char *wild,
-						char ***cols,
-						uint32_t *colcount,
-						char ****rows,
-						uint64_t *rowcount);
+						bool table);
 		bool		getColumnList(sqlrcursor_svr *cursor,
 						const char *table,
-						const char *wild,
-						char ***cols,
-						uint32_t *colcount,
-						char ****rows,
-						uint64_t *rowcount);
+						const char *wild);
 		bool		setIsolationLevel(const char *isolevel);
 
 		SQLRETURN	erg;

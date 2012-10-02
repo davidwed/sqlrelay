@@ -102,13 +102,96 @@ bool sqlrconnection_svr::getListCommand(sqlrcursor_svr *cursor,
 	cursor->outbindcount=0;
 	sendcolumninfo=SEND_COLUMN_INFO;
 
-	// check to see if we have to make an api call
-	// to get the list rather than run a query
-	if (getListThroughApiCall(cursor,which,table,wild)) {
-		delete[] wild;
-		delete[] table;
-		return true;
+	// get the list and return it
+	bool	result=true;
+	if (getListsByApiCalls()) {
+		result=getListByApiCall(cursor,which,table,wild);
+	} else {
+		result=getListByQuery(cursor,which,table,wild);
 	}
+	delete[] wild;
+	delete[] table;
+	return result;
+}
+
+bool sqlrconnection_svr::getListsByApiCalls() {
+	return false;
+}
+
+bool sqlrconnection_svr::getListByApiCall(sqlrcursor_svr *cursor,
+						int which,
+						const char *table,
+						const char *wild) {
+
+	// initialize flags andbuffers
+	bool	success=false;
+
+	// get the appropriate list
+	switch (which) {
+		case 0:
+			success=getDatabaseList(cursor,wild);
+			break;
+		case 1:
+			success=getTableList(cursor,wild);
+			break;
+		case 2:
+			success=getColumnList(cursor,table,wild);
+			break;
+	}
+
+	// if an error occurred...
+	if (!success) {
+		const char	*err=NULL;
+		int64_t		errnum=0;
+		bool		liveconnection;
+		cursor->errorMessage(&err,&errnum,&liveconnection);
+		returnError(cursor,err,errnum,false);
+		return false;
+	}
+
+	// force sid_egress status
+	cursor->sid_egress=false;
+
+	// indicate that no error has occurred
+	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+
+	// send the client the id of the 
+	// cursor that it's going to use
+	clientsock->write(cursor->id);
+
+	// tell the client that this is not a
+	// suspended result set
+	clientsock->write((uint16_t)NO_SUSPENDED_RESULT_SET);
+
+	// if the query processed ok then send a result set header and return...
+	returnResultSetHeader(cursor);
+	if (!returnResultSetData(cursor)) {
+		endSession();
+		return false;
+	}
+	return true;
+}
+
+bool sqlrconnection_svr::getDatabaseList(sqlrcursor_svr *cursor,
+						const char *wild) {
+	return false;
+}
+
+bool sqlrconnection_svr::getTableList(sqlrcursor_svr *cursor,
+						const char *wild) {
+	return false;
+}
+
+bool sqlrconnection_svr::getColumnList(sqlrcursor_svr *cursor,
+						const char *table,
+						const char *wild) {
+	return false;
+}
+
+bool sqlrconnection_svr::getListByQuery(sqlrcursor_svr *cursor,
+						int which,
+						const char *table,
+						const char *wild) {
 
 	// build the appropriate query
 	const char	*query=NULL;
@@ -124,12 +207,22 @@ bool sqlrconnection_svr::getListCommand(sqlrcursor_svr *cursor,
 			break;
 	}
 	buildListQuery(cursor,query,wild,table);
-	delete[] wild;
-	delete[] table;
 
 	// run it like a normal query, but don't request the query,
 	// binds or column info status from the client
 	return newQueryInternal(cursor,false);
+}
+
+const char *sqlrconnection_svr::getDatabaseListQuery(bool wild) {
+	return "select 1";
+}
+
+const char *sqlrconnection_svr::getTableListQuery(bool wild) {
+	return "select 1";
+}
+
+const char *sqlrconnection_svr::getColumnListQuery(bool wild) {
+	return "select 1";
 }
 
 bool sqlrconnection_svr::buildListQuery(sqlrcursor_svr *cursor,
@@ -177,101 +270,4 @@ void sqlrconnection_svr::escapeParameter(stringbuffer *buffer,
 		}
 		buffer->append(*ptr);
 	}
-}
-
-const char *sqlrconnection_svr::getDatabaseListQuery(bool wild) {
-	return "select 1";
-}
-
-const char *sqlrconnection_svr::getTableListQuery(bool wild) {
-	return "select 1";
-}
-
-const char *sqlrconnection_svr::getColumnListQuery(bool wild) {
-	return "select 1";
-}
-
-bool sqlrconnection_svr::getListThroughApiCall(sqlrcursor_svr *cursor,
-						int which,
-						const char *table,
-						const char *wild) {
-
-	// initialize flags andbuffers
-	bool		success=false;
-	char		**cols=NULL;
-	uint32_t	colcount=0;
-	char		***rows=NULL;
-	uint64_t	rowcount=0;
-
-	// get the appropriate list
-	switch (which) {
-		case 0:
-			success=getDatabaseList(cursor,wild,
-					&cols,&colcount,&rows,&rowcount);
-		case 1:
-			success=getTableList(cursor,wild,
-					&cols,&colcount,&rows,&rowcount);
-		case 2:
-			success=getColumnList(cursor,table,wild,
-					&cols,&colcount,&rows,&rowcount);
-	}
-
-	// bail if we didn't get anything
-	if (!success) {
-		return false;
-	}
-
-	// FIXME: detect an error somehow and return it
-	/*if (error) {
-		returnError(cursor,"error",999996,false);
-		return true;
-	}*/
-
-	// indicate that no error has occurred
-	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
-
-	// send the client the id of the 
-	// cursor that it's going to use
-	clientsock->write(cursor->id);
-
-	// tell the client that this is not a
-	// suspended result set
-	clientsock->write((uint16_t)NO_SUSPENDED_RESULT_SET);
-
-	// if the query processed 
-	// ok then send a result set
-	// header and return...
-	returnResultSetHeader(cursor);
-	if (!returnResultSetData(cursor)) {
-		// error or something?
-	}
-	return true;
-}
-
-bool sqlrconnection_svr::getDatabaseList(sqlrcursor_svr *cursor,
-						const char *wild,
-						char ***cols,
-						uint32_t *colcount,
-						char ****rows,
-						uint64_t *rowcount) {
-	return false;
-}
-
-bool sqlrconnection_svr::getTableList(sqlrcursor_svr *cursor,
-						const char *wild,
-						char ***cols,
-						uint32_t *colcount,
-						char ****rows,
-						uint64_t *rowcount) {
-	return false;
-}
-
-bool sqlrconnection_svr::getColumnList(sqlrcursor_svr *cursor,
-						const char *table,
-						const char *wild,
-						char ***cols,
-						uint32_t *colcount,
-						char ****rows,
-						uint64_t *rowcount) {
-	return false;
 }

@@ -7,6 +7,7 @@
 	added a -command argument to sqlrsh so commands and queries can be
 		run from the command line directly
 	improved readline detection in the configure script
+	added getDatabase/Table/ColumnList support to odbc connections
 
 0.46 - refactored the translation framework to mimic the trigger framework
 	added make.batch file for building on windows
