@@ -30488,12 +30488,15 @@ then
 	eval "JAVAPATH=\"$i\""
 fi
 
+				if ( test -z "$JAVAPATH" )
+				then
 
 if ( test -r ""$i/Commands/javac$EXE"" )
 then
 	eval "JAVAPATH=\"$i\""
 fi
 
+				fi
 				if ( test -n "$JAVAPATH" )
 				then
 					break
