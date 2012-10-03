@@ -34,6 +34,9 @@
 /* Define to 1 if you have the `z' library (-lz). */
 #undef HAVE_LIBZ
 
+/* Some versions of mdbtools have mdb_close() */
+#undef HAVE_MDB_CLOSE
+
 /* Some versions of mdbtools have 5 param mdb_col_to_string */
 #undef HAVE_MDB_COL_TO_STRING_5_PARAM
 
