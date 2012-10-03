@@ -17,6 +17,8 @@
 	extern "C" int yyparse();
 #endif
 
+extern void mdb_remove_backends();
+
 mdbtoolsconnection::mdbtoolsconnection() : sqlrconnection_svr() {
 }
 
@@ -153,9 +155,11 @@ bool mdbtoolscursor::closeCursor() {
 	}
 
 	mdb_sql_exit((MdbSQL *)mdbsql);
-	if (mdb) {
-		mdb_close(mdb);
-	}
+	#ifdef HAVE_MDB_CLOSE
+		if (mdb) {
+			mdb_close(mdb);
+		}
+	#endif
 	return true;
 }
 
@@ -200,16 +204,22 @@ bool mdbtoolscursor::getTableList(const char *wild) {
 	cursortype=TABLE_LIST_CURSORTYPE;
 
 	// open the database for non-sql access
-	if (mdb) {
-		mdb_close(mdb);
-	}
+	#ifdef HAVE_MDB_CLOSE
+		if (mdb) {
+			mdb_close(mdb);
+		}
+	#endif
 	const char	*dbval;
 	if (mdbtoolsconn->db && mdbtoolsconn->db[0]) {
 		dbval=mdbtoolsconn->db;
 	} else {
 		dbval="";
 	}
-	mdb=mdb_open(dbval,MDB_NOFLAGS);
+	#ifdef MDB_NOFLAGS
+		mdb=mdb_open(dbval,MDB_NOFLAGS);
+	#else
+		mdb=mdb_open(const_cast<char *>(dbval));
+	#endif
 	if (!mdb) {
 		return false;
 	}
@@ -230,16 +240,22 @@ bool mdbtoolscursor::getColumnList(const char *table, const char *wild) {
 	cursortype=COLUMN_LIST_CURSORTYPE;
 
 	// open the database for non-sql access
-	if (mdb) {
-		mdb_close(mdb);
-	}
+	#ifdef HAVE_MDB_CLOSE
+		if (mdb) {
+			mdb_close(mdb);
+		}
+	#endif
 	const char	*dbval;
 	if (mdbtoolsconn->db && mdbtoolsconn->db[0]) {
 		dbval=mdbtoolsconn->db;
 	} else {
 		dbval="";
 	}
-	mdb=mdb_open(dbval,MDB_NOFLAGS);
+	#ifdef MDB_NOFLAGS
+		mdb=mdb_open(dbval,MDB_NOFLAGS);
+	#else
+		mdb=mdb_open(const_cast<char *>(dbval));
+	#endif
 	if (!mdb) {
 		return false;
 	}

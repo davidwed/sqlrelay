@@ -7,12 +7,15 @@
 #define NUM_CONNECT_STRING_VARS 1
 
 #include <sqlrconnection.h>
+#ifndef MAIN
 extern "C" {
 	#include <mdbsql.h>
 }
+#endif
 
 class mdbtoolsconnection;
 
+#ifndef MAIN
 enum cursortype_t {
 	QUERY_CURSORTYPE=0,
 	DB_LIST_CURSORTYPE,
@@ -75,6 +78,7 @@ class mdbtoolscursor : public sqlrcursor_svr {
 
 		cursortype_t	cursortype;
 };
+#endif
 
 class mdbtoolsconnection : public sqlrconnection_svr {
 	friend class mdbtoolscursor;
