@@ -123,6 +123,7 @@ mdbtoolscursor::mdbtoolscursor(sqlrconnection_svr *conn) :
 	currenttable=NULL;
 	currenttabledef=NULL;
 	currentcolumn=NULL;
+	currentcolumnsize=NULL;
 	currentwild=NULL;
 	cursortype=QUERY_CURSORTYPE;
 }
@@ -190,11 +191,7 @@ bool mdbtoolscursor::executeQuery(const char *query, uint32_t length,
 
 bool mdbtoolscursor::getDatabaseList(const char *wild) {
 	cursortype=DB_LIST_CURSORTYPE;
-	currentlistindex=0;
-	currenttable=NULL;
-	currenttabledef=NULL;
-	currentcolumn=NULL;
-	currentwild=wild;
+	resetListValues(wild);
 	return true;
 }
 
@@ -222,12 +219,8 @@ bool mdbtoolscursor::getTableList(const char *wild) {
 		return false;
 	}
 
-	// reset current pointers
-	currentlistindex=0;
-	currenttable=NULL;
-	currenttabledef=NULL;
-	currentcolumn=NULL;
-	currentwild=wild;
+	// reset current list values
+	resetListValues(wild);
 
 	return true;
 }
@@ -256,12 +249,8 @@ bool mdbtoolscursor::getColumnList(const char *table, const char *wild) {
 		return false;
 	}
 
-	// reset current pointers
-	currentlistindex=0;
-	currenttable=NULL;
-	currenttabledef=NULL;
-	currentcolumn=NULL;
-	currentwild=wild;
+	// reset current list values
+	resetListValues(wild);
 
 	// find the specified table in the catalog
 	for (uint32_t i=0; i<mdb->num_catalog; i++) {
@@ -271,7 +260,6 @@ bool mdbtoolscursor::getColumnList(const char *table, const char *wild) {
 			!charstring::compare(currenttable->object_name,table)) {
 			currenttabledef=mdb_read_table(currenttable);
 			if (!currenttabledef) {
-printf("!currenttabledef\n");
 				return false;
 			}
 			mdb_read_columns(currenttabledef);
@@ -279,6 +267,17 @@ printf("!currenttabledef\n");
 		}
 	}
 	return false;
+}
+
+void mdbtoolscursor::resetListValues(const char *wild) {
+	currentlistindex=0;
+	currenttable=NULL;
+	currenttabledef=NULL;
+	currentcolumn=NULL;
+	currentcolumnsize=NULL;
+	currentcolumnprec=NULL;
+	currentcolumnscale=NULL;
+	currentwild=wild;
 }
 
 void mdbtoolscursor::errorMessage(const char **errorstring,
@@ -308,6 +307,8 @@ uint64_t mdbtoolscursor::affectedRows() {
 uint32_t mdbtoolscursor::colCount() {
 	if (cursortype==QUERY_CURSORTYPE) {
 		return ((MdbSQL *)mdbsql)->num_columns;
+	} else if (cursortype==COLUMN_LIST_CURSORTYPE) {
+		return 5;
 	}
 	return 1;
 }
@@ -322,17 +323,19 @@ const char * const *mdbtoolscursor::columnNames() {
 					((MdbSQL *)mdbsql)->columns,i);
 			columnnames[i]=col->name;
 		}
-		return columnnames;
-	} else {
+	} else if (cursortype==DB_LIST_CURSORTYPE) {
 		columnnames=new char*[1];
-	}
-
-	if (cursortype==DB_LIST_CURSORTYPE) {
 		columnnames[0]=(char *)"DATABASE";
 	} else if (cursortype==TABLE_LIST_CURSORTYPE) {
+		columnnames=new char*[1];
 		columnnames[0]=(char *)"TABLE";
 	} else if (cursortype==COLUMN_LIST_CURSORTYPE) {
-		columnnames[0]=(char *)"COLUMN_NAME";
+		columnnames=new char*[3];
+		columnnames[0]=(char *)"NAME";
+		columnnames[1]=(char *)"TYPE";
+		columnnames[2]=(char *)"SIZE";
+		columnnames[3]=(char *)"PRECISION";
+		columnnames[4]=(char *)"SCALE";
 	}
 	return columnnames;
 }
@@ -366,7 +369,15 @@ void mdbtoolscursor::returnColumnInfo() {
 		conn->sendColumnDefinition("TABLE",5,
 				UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
 	} else if (cursortype==COLUMN_LIST_CURSORTYPE) {
-		conn->sendColumnDefinition("COLUMN_NAME",11,
+		conn->sendColumnDefinition("NAME",4,
+				UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
+		conn->sendColumnDefinition("TYPE",4,
+				UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
+		conn->sendColumnDefinition("SIZE",4,
+				UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
+		conn->sendColumnDefinition("PRECISION",9,
+				UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
+		conn->sendColumnDefinition("SCALE",5,
 				UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
 	}
 }
@@ -489,16 +500,87 @@ void mdbtoolscursor::getField(uint32_t col,
 			*null=false;
 		}
 	} else if (cursortype==COLUMN_LIST_CURSORTYPE) {
+		*field=NULL;
 		if (col==0 && currentcolumn) {
 			*field=currentcolumn->name;
-			*fieldlength=charstring::length(*field);
-			*blob=false;
-			*null=false;
+		} else if (col==1 && currentcolumn) {
+			switch (currentcolumn->col_type) {
+				case MDB_BOOL:
+					*field="BOOL";
+					break;
+				case MDB_BYTE:
+					*field="BYTE";
+					break;
+				case MDB_INT:
+					*field="INT";
+					break;
+				case MDB_LONGINT:
+					*field="LONGINT";
+					break;
+				case MDB_MONEY:
+					*field="MONEY";
+					break;
+				case MDB_FLOAT:
+					*field="FLOAT";
+					break;
+				case MDB_DOUBLE:
+					*field="DOUBLE";
+					break;
+				case MDB_SDATETIME:
+					*field="SDATETIME";
+					break;
+				case MDB_TEXT:
+					*field="TEXT";
+					break;
+				case MDB_OLE:
+					*field="OLE";
+					break;
+				case MDB_MEMO:
+					*field="MEMO";
+					break;
+				case MDB_REPID:
+					*field="REPID";
+					break;
+				case MDB_NUMERIC:
+					*field="NUMERIC";
+					break;
+				default:
+					*field="UNKNOWN";
+					break;
+			}
+		} else if (col==2 && currentcolumn) {
+			delete[] currentcolumnsize;
+			currentcolumnsize=charstring::parseNumber(
+						currentcolumn->col_size);
+			*field=currentcolumnsize;
+		} else if (col==3 && currentcolumn) {
+			delete[] currentcolumnprec;
+			currentcolumnprec=charstring::parseNumber(
+						currentcolumn->col_prec);
+			*field=currentcolumnprec;
+		} else if (col==4 && currentcolumn) {
+			delete[] currentcolumnscale;
+			currentcolumnscale=charstring::parseNumber(
+						currentcolumn->col_scale);
+			*field=currentcolumnscale;
 		}
+		*fieldlength=charstring::length(*field);
+		*blob=false;
+		*null=false;
 	}
 }
 
 void mdbtoolscursor::cleanUpData(bool freeresult, bool freebinds) {
+
 	delete[] columnnames;
 	columnnames=NULL;
+
+	if (cursortype==COLUMN_LIST_CURSORTYPE) {
+		delete[] currentcolumnsize;
+		currentcolumnsize=NULL;
+		delete[] currentcolumnprec;
+		currentcolumnprec=NULL;
+		delete[] currentcolumnscale;
+		currentcolumnscale=NULL;
+	}
 }

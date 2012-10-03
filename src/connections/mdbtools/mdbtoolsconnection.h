@@ -55,6 +55,7 @@ class mdbtoolscursor : public sqlrcursor_svr {
 		bool		getTableList(const char *wild);
 		bool		getColumnList(const char *table,
 						const char *wild);
+		void		resetListValues(const char *wild);
 
 		mdbtoolsconnection	*mdbtoolsconn;
 
@@ -67,6 +68,9 @@ class mdbtoolscursor : public sqlrcursor_svr {
 		MdbCatalogEntry	*currenttable;
 		MdbTableDef	*currenttabledef;
 		MdbColumn	*currentcolumn;
+		char		*currentcolumnsize;
+		char		*currentcolumnprec;
+		char		*currentcolumnscale;
 		const char	*currentwild;
 
 		cursortype_t	cursortype;
