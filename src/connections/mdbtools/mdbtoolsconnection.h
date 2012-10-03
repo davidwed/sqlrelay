@@ -13,6 +13,8 @@ extern "C" {
 }
 #endif
 
+#include <rudiments/regularexpression.h>
+
 class mdbtoolsconnection;
 
 #ifndef MAIN
@@ -59,6 +61,7 @@ class mdbtoolscursor : public sqlrcursor_svr {
 		bool		getColumnList(const char *table,
 						const char *wild);
 		void		resetListValues(const char *wild);
+		bool		matchCurrentWild(const char *value);
 
 		mdbtoolsconnection	*mdbtoolsconn;
 
@@ -74,7 +77,7 @@ class mdbtoolscursor : public sqlrcursor_svr {
 		char		*currentcolumnsize;
 		char		*currentcolumnprec;
 		char		*currentcolumnscale;
-		const char	*currentwild;
+		regularexpression	*currentwild;
 
 		cursortype_t	cursortype;
 };

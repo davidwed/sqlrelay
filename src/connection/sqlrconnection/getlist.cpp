@@ -109,8 +109,12 @@ bool sqlrconnection_svr::getListCommand(sqlrcursor_svr *cursor,
 	} else {
 		result=getListByQuery(cursor,which,table,wild);
 	}
+
+	// clean up
 	delete[] wild;
 	delete[] table;
+	cursor->cleanUpData(true,false);
+
 	return result;
 }
 
@@ -206,6 +210,8 @@ bool sqlrconnection_svr::getListByQuery(sqlrcursor_svr *cursor,
 			query=getColumnListQuery(charstring::length(wild));
 			break;
 	}
+
+	// FIXME: this can fail
 	buildListQuery(cursor,query,wild,table);
 
 	// run it like a normal query, but don't request the query,

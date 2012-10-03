@@ -132,6 +132,7 @@ mdbtoolscursor::mdbtoolscursor(sqlrconnection_svr *conn) :
 
 mdbtoolscursor::~mdbtoolscursor() {
 	delete[] columnnames;
+	delete currentwild;
 	delete (MdbSQL *)mdbsql;
 }
 
@@ -293,7 +294,24 @@ void mdbtoolscursor::resetListValues(const char *wild) {
 	currentcolumnsize=NULL;
 	currentcolumnprec=NULL;
 	currentcolumnscale=NULL;
-	currentwild=wild;
+
+	// convert the wildcard to a regular expression
+	if (charstring::length(wild)) {
+		stringbuffer	retval;
+		for (const char *c=wild; *c; c++) {
+			if (*c=='%') {
+				retval.append(".*");
+			} else {
+				retval.append(*c);
+			}
+		}
+		currentwild=new regularexpression(retval.getString());
+		currentwild->study();
+	}
+}
+
+bool mdbtoolscursor::matchCurrentWild(const char *value) {
+	return (!currentwild || currentwild->match(value));
 }
 
 void mdbtoolscursor::errorMessage(const char **errorstring,
@@ -438,22 +456,30 @@ bool mdbtoolscursor::fetchRow() {
 				return false;
 			}
 			currenttable=(MdbCatalogEntry *)
-					g_ptr_array_index(mdb->catalog,
-							currentlistindex);
+					g_ptr_array_index(
+						mdb->catalog,
+						currentlistindex);
 			currentlistindex++;
-			if (currenttable->object_type==MDB_TABLE) {
+			if (currenttable->object_type==MDB_TABLE &&
+				matchCurrentWild(currenttable->object_name)) {
 				return true;
 			}
 		}
 	} else if (cursortype==COLUMN_LIST_CURSORTYPE) {
-		if (currentlistindex==currenttabledef->num_cols) {
-			return false;
-		}
-		currentcolumn=(MdbColumn *)g_ptr_array_index(
+		for (;;) {
+			if (currentlistindex==currenttabledef->num_cols) {
+				currentcolumn=NULL;
+				return false;
+			}
+			currentcolumn=(MdbColumn *)
+					g_ptr_array_index(
 						currenttabledef->columns,
 						currentlistindex);
-		currentlistindex++;
-		return true;
+			currentlistindex++;
+			if (matchCurrentWild(currentcolumn->name)) {
+				return true;
+			}
+		}
 	}
 	return false;
 }
@@ -495,6 +521,7 @@ void mdbtoolscursor::getField(uint32_t col,
 				if (data) {
 					*field=data;
 					*fieldlength=charstring::length(data);
+					return;
 				} else {
 					*null=true;
 				}
@@ -505,15 +532,11 @@ void mdbtoolscursor::getField(uint32_t col,
 		if (col==0) {
 			*field=mdbtoolsconn->db;
 			*fieldlength=charstring::length(*field);
-			*blob=false;
-			*null=false;
 		}
 	} else if (cursortype==TABLE_LIST_CURSORTYPE) {
 		if (col==0 && currenttable) {
 			*field=currenttable->object_name;
 			*fieldlength=charstring::length(*field);
-			*blob=false;
-			*null=false;
 		}
 	} else if (cursortype==COLUMN_LIST_CURSORTYPE) {
 		*field=NULL;
@@ -581,8 +604,6 @@ void mdbtoolscursor::getField(uint32_t col,
 			*field=currentcolumnscale;
 		}
 		*fieldlength=charstring::length(*field);
-		*blob=false;
-		*null=false;
 	}
 }
 
@@ -598,5 +619,9 @@ void mdbtoolscursor::cleanUpData(bool freeresult, bool freebinds) {
 		currentcolumnprec=NULL;
 		delete[] currentcolumnscale;
 		currentcolumnscale=NULL;
+	}
+	if (cursortype!=QUERY_CURSORTYPE) {
+		delete currentwild;
+		currentwild=NULL;
 	}
 }
