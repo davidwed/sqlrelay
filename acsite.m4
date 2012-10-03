@@ -2742,6 +2742,14 @@ then
 				JAVAC="$GCJ -C"
 				JAVAINCLUDES=""
 				HAVE_JAVA="yes"
+			else
+				AC_CHECK_PROG(GCJ,"javac","javac")
+				if ( test -n "$GCJ" )
+				then
+					JAVAC="$GCJ"
+					JAVAINCLUDES=""
+					HAVE_JAVA="yes"
+				fi
 			fi
 			AC_CHECK_PROG(FASTJAR,"fastjar","fastjar")
 			if ( test -n "$FASTJAR" )
