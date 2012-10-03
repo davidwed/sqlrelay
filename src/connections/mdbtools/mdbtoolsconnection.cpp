@@ -215,7 +215,7 @@ bool mdbtoolscursor::getTableList(const char *wild) {
 	} else {
 		dbval="";
 	}
-	#ifdef MDB_NOFLAGS
+	#ifdef HAVE_MDB_OPEN_2_PARAM
 		mdb=mdb_open(dbval,MDB_NOFLAGS);
 	#else
 		mdb=mdb_open(const_cast<char *>(dbval));
@@ -251,7 +251,7 @@ bool mdbtoolscursor::getColumnList(const char *table, const char *wild) {
 	} else {
 		dbval="";
 	}
-	#ifdef MDB_NOFLAGS
+	#ifdef HAVE_MDB_OPEN_2_PARAM
 		mdb=mdb_open(dbval,MDB_NOFLAGS);
 	#else
 		mdb=mdb_open(const_cast<char *>(dbval));
