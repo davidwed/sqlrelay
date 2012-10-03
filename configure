@@ -635,8 +635,6 @@ JAVAINCLUDES
 JAR
 JAVAC
 HAVE_JAVA
-FASTJAR
-GCJ
 RUBYLIB
 HAVE_RUBY
 RUBY
@@ -30482,23 +30480,23 @@ then
 
 		if ( test -z "$JAVAPATH" )
 		then
-			for i in `ls -d /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* /usr/java /usr/local/java /System/Library/Frameworks/JavaVM.framework/Versions/Current 2> /dev/null`
+			for i in `ls -d /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* /usr/java /usr/local/java /usr/local/openjdk* /usr/pkg/java/openjdk* /System/Library/Frameworks/JavaVM.framework/Versions/Current /usr /usr/local 2> /dev/null`
 			do
-				if ( test -z "$JAVAPATH" )
+echo "checking $i/bin/javac$EXE"
+
+if ( test -r ""$i/bin/javac$EXE"" )
+then
+	eval "JAVAPATH=\"$i\""
+fi
+
+
+if ( test -r ""$i/Commands/javac$EXE"" )
+then
+	eval "JAVAPATH=\"$i\""
+fi
+
+				if ( test -n "$JAVAPATH" )
 				then
-
-if ( test -r ""$i/include/jni.h"" )
-then
-	eval "JAVAPATH=\"$i\""
-fi
-
-
-if ( test -r ""$i/Headers/jni.h"" )
-then
-	eval "JAVAPATH=\"$i\""
-fi
-
-				else
 					break
 				fi
 			done
@@ -30552,146 +30550,9 @@ fi
 					fi
 				done
 			fi
-
-			if ( test -n "$JAVAC" -a -n "$JAVAINCLUDES" )
-			then
-				HAVE_JAVA="yes"
-			fi
 		fi
 
-				if ( test -z "$JAVAPATH" )
-		then
-			# Extract the first word of ""gcj"", so it can be a program name with args.
-set dummy "gcj"; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if test "${ac_cv_prog_GCJ+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$GCJ"; then
-  ac_cv_prog_GCJ="$GCJ" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_prog_GCJ=""gcj""
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-GCJ=$ac_cv_prog_GCJ
-if test -n "$GCJ"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $GCJ" >&5
-$as_echo "$GCJ" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-			if ( test -n "$GCJ" )
-			then
-				JAVAC="$GCJ -C"
-				JAVAINCLUDES=""
-				HAVE_JAVA="yes"
-			else
-				# Extract the first word of ""javac"", so it can be a program name with args.
-set dummy "javac"; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if test "${ac_cv_prog_GCJ+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$GCJ"; then
-  ac_cv_prog_GCJ="$GCJ" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_prog_GCJ=""javac""
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-GCJ=$ac_cv_prog_GCJ
-if test -n "$GCJ"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $GCJ" >&5
-$as_echo "$GCJ" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-				if ( test -n "$GCJ" )
-				then
-					JAVAC="$GCJ"
-					JAVAINCLUDES=""
-					HAVE_JAVA="yes"
-				fi
-			fi
-			# Extract the first word of ""fastjar"", so it can be a program name with args.
-set dummy "fastjar"; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if test "${ac_cv_prog_FASTJAR+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$FASTJAR"; then
-  ac_cv_prog_FASTJAR="$FASTJAR" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_prog_FASTJAR=""fastjar""
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-FASTJAR=$ac_cv_prog_FASTJAR
-if test -n "$FASTJAR"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $FASTJAR" >&5
-$as_echo "$FASTJAR" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-			if ( test -n "$FASTJAR" )
-			then
-				JAR="$FASTJAR"
-			fi
-		fi
-
-		if ( test -n "$JAVAC" -a -n "$JAVAINCLUDES" )
+		if ( test -n "$JAVAC" -a -n "$JAR" )
 		then
 			HAVE_JAVA="yes"
 		fi

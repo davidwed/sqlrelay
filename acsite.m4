@@ -2696,13 +2696,13 @@ then
 		
 		if ( test -z "$JAVAPATH" )
 		then
-			for i in `ls -d /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* /usr/java /usr/local/java /System/Library/Frameworks/JavaVM.framework/Versions/Current 2> /dev/null`
+			for i in `ls -d /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* /usr/java /usr/local/java /usr/local/openjdk* /usr/pkg/java/openjdk* /System/Library/Frameworks/JavaVM.framework/Versions/Current /usr /usr/local 2> /dev/null`
 			do
-				if ( test -z "$JAVAPATH" )
+echo "checking $i/bin/javac$EXE"
+				FW_CHECK_FILE("$i/bin/javac$EXE",[JAVAPATH=\"$i\"])
+				FW_CHECK_FILE("$i/Commands/javac$EXE",[JAVAPATH=\"$i\"])
+				if ( test -n "$JAVAPATH" )
 				then
-					FW_CHECK_FILE("$i/include/jni.h",[JAVAPATH=\"$i\"])
-					FW_CHECK_FILE("$i/Headers/jni.h",[JAVAPATH=\"$i\"])
-				else
 					break
 				fi
 			done
@@ -2726,39 +2726,9 @@ then
 					fi
 				done
 			fi
-		
-			if ( test -n "$JAVAC" -a -n "$JAVAINCLUDES" )
-			then
-				HAVE_JAVA="yes"
-			fi
 		fi
 
-		dnl check for gcj
-		if ( test -z "$JAVAPATH" )
-		then
-			AC_CHECK_PROG(GCJ,"gcj","gcj")
-			if ( test -n "$GCJ" )
-			then
-				JAVAC="$GCJ -C"
-				JAVAINCLUDES=""
-				HAVE_JAVA="yes"
-			else
-				AC_CHECK_PROG(GCJ,"javac","javac")
-				if ( test -n "$GCJ" )
-				then
-					JAVAC="$GCJ"
-					JAVAINCLUDES=""
-					HAVE_JAVA="yes"
-				fi
-			fi
-			AC_CHECK_PROG(FASTJAR,"fastjar","fastjar")
-			if ( test -n "$FASTJAR" )
-			then
-				JAR="$FASTJAR"
-			fi
-		fi
-		
-		if ( test -n "$JAVAC" -a -n "$JAVAINCLUDES" )
+		if ( test -n "$JAVAC" -a -n "$JAR" )
 		then
 			HAVE_JAVA="yes"
 		fi
