@@ -122,25 +122,15 @@ void sqlrconnection_svr::clientSession() {
 		}
 
 		if (command==NEW_QUERY) {
-			if (newQueryCommand(cursor)) {
-				continue;
+			if (!newQueryCommand(cursor)) {
+				break;
 			}
-			break;
 		} else if (command==GETDBLIST) {
-			if (getDatabaseListCommand(cursor)) {
-				continue;
-			}
-			break;
+			getDatabaseListCommand(cursor);
 		} else if (command==GETTABLELIST) {
-			if (getTableListCommand(cursor)) {
-				continue;
-			}
-			break;
+			getTableListCommand(cursor);
 		} else if (command==GETCOLUMNLIST) {
-			if (getColumnListCommand(cursor)) {
-				continue;
-			}
-			break;
+			getColumnListCommand(cursor);
 		} else if (command==REEXECUTE_QUERY) {
 			if (!reExecuteQueryCommand(cursor)) {
 				break;
