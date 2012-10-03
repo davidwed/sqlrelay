@@ -7,8 +7,18 @@
 #define NUM_CONNECT_STRING_VARS 1
 
 #include <sqlrconnection.h>
+extern "C" {
+	#include <mdbsql.h>
+}
 
 class mdbtoolsconnection;
+
+enum cursortype_t {
+	QUERY_CURSORTYPE=0,
+	DB_LIST_CURSORTYPE,
+	TABLE_LIST_CURSORTYPE,
+	COLUMN_LIST_CURSORTYPE
+};
 
 class mdbtoolscursor : public sqlrcursor_svr {
 	friend class mdbtoolsconnection;
@@ -36,17 +46,30 @@ class mdbtoolscursor : public sqlrcursor_svr {
 		bool		skipRow();
 		bool		fetchRow();
 		void		getField(uint32_t col,
-					const char **field,
-					uint64_t *fieldlength,
-					bool *blob,
-					bool *null);
+						const char **field,
+						uint64_t *fieldlength,
+						bool *blob,
+						bool *null);
 		void		cleanUpData(bool freeresult, bool freebinds);
+		bool		getDatabaseList(const char *wild);
+		bool		getTableList(const char *wild);
+		bool		getColumnList(const char *table,
+						const char *wild);
 
 		mdbtoolsconnection	*mdbtoolsconn;
 
 		char	**columnnames;
 
-		void	*mdbsql;
+		void		*mdbsql;
+
+		MdbHandle	*mdb;
+		uint32_t	currentlistindex;
+		MdbCatalogEntry	*currenttable;
+		MdbTableDef	*currenttabledef;
+		MdbColumn	*currentcolumn;
+		const char	*currentwild;
+
+		cursortype_t	cursortype;
 };
 
 class mdbtoolsconnection : public sqlrconnection_svr {
@@ -64,25 +87,14 @@ class mdbtoolsconnection : public sqlrconnection_svr {
 		bool	ping();
 		const char	*identify();
 		const char	*dbVersion();
-		bool		getDatabaseList(sqlrcursor_svr *cursor,
-						const char *wild,
-						char ***cols,
-						uint32_t *colcount,
-						char ****rows,
-						uint64_t *rowcount);
-		bool		getTableList(sqlrcursor_svr *cursor,
-						const char *wild,
-						char ***cols,
-						uint32_t *colcount,
-						char ****rows,
-						uint64_t *rowcount);
-		bool		getColumnList(sqlrcursor_svr *cursor,
+		bool	getListsByApiCalls();
+		bool	getDatabaseList(sqlrcursor_svr *cursor,
+						const char *wild);
+		bool	getTableList(sqlrcursor_svr *cursor,
+						const char *wild);
+		bool	getColumnList(sqlrcursor_svr *cursor,
 						const char *table,
-						const char *wild,
-						char ***cols,
-						uint32_t *colcount,
-						char ****rows,
-						uint64_t *rowcount);
+						const char *wild);
 		bool	setIsolationLevel(const char *isolevel);
 		bool	autoCommitOn();
 		bool	autoCommitOff();

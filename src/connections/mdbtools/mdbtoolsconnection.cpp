@@ -4,10 +4,6 @@
 #include <mdbtoolsconnection.h>
 #include <rudiments/rawbuffer.h>
 
-extern "C" {
-        #include <mdbsql.h>
-}
-
 #include <config.h>
 
 #include <datatypes.h>
@@ -67,38 +63,24 @@ const char *mdbtoolsconnection::dbVersion() {
 #endif
 }
 
+bool mdbtoolsconnection::getListsByApiCalls() {
+	return true;
+}
+
 bool mdbtoolsconnection::getDatabaseList(sqlrcursor_svr *cursor,
-					const char *wild,
-					char ***cols,
-					uint32_t *colcount,
-					char ****rows,
-					uint64_t *rowcount) {
-	// FIXME: I'm not sure there's any way to get this, or even if 
-	// a "database list" exists in an mdb file.  Send back something 
-	// though.
-	return false;
+						const char *wild) {
+	return ((mdbtoolscursor *)cursor)->getDatabaseList(wild);
 }
 
 bool mdbtoolsconnection::getTableList(sqlrcursor_svr *cursor,
-					const char *wild,
-					char ***cols,
-					uint32_t *colcount,
-					char ****rows,
-					uint64_t *rowcount) {
-	// FIXME: I'm not sure what to call to get this but mdb-tables
-	// does it somehow.
-	return false;
+						const char *wild) {
+	return ((mdbtoolscursor *)cursor)->getTableList(wild);
 }
 
 bool mdbtoolsconnection::getColumnList(sqlrcursor_svr *cursor,
-					const char *table,
-					const char *wild,
-					char ***cols,
-					uint32_t *colcount,
-					char ****rows,
-					uint64_t *rowcount) {
-	// FIXME: I'm not sure what to call to get this.
-	return false;
+						const char *table,
+						const char *wild) {
+	return ((mdbtoolscursor *)cursor)->getColumnList(table,wild);
 }
 
 bool mdbtoolsconnection::isTransactional() {
@@ -136,6 +118,13 @@ mdbtoolscursor::mdbtoolscursor(sqlrconnection_svr *conn) :
 	columnnames=NULL;
 	mdbsql=(void *)new MdbSQL;
 	rawbuffer::zero(mdbsql,sizeof(MdbSQL));
+	mdb=NULL;
+	currentlistindex=0;
+	currenttable=NULL;
+	currenttabledef=NULL;
+	currentcolumn=NULL;
+	currentwild=NULL;
+	cursortype=QUERY_CURSORTYPE;
 }
 
 mdbtoolscursor::~mdbtoolscursor() {
@@ -163,6 +152,9 @@ bool mdbtoolscursor::closeCursor() {
 	}
 
 	mdb_sql_exit((MdbSQL *)mdbsql);
+	if (mdb) {
+		mdb_close(mdb);
+	}
 	return true;
 }
 
@@ -172,6 +164,8 @@ bool mdbtoolscursor::supportsNativeBinds() {
 
 bool mdbtoolscursor::executeQuery(const char *query, uint32_t length,
 							bool execute) {
+
+	cursortype=QUERY_CURSORTYPE;
 
 	// execute the query
 	mdb_sql_reset((MdbSQL *)mdbsql);
@@ -192,6 +186,99 @@ bool mdbtoolscursor::executeQuery(const char *query, uint32_t length,
 #endif
 
 	return true;
+}
+
+bool mdbtoolscursor::getDatabaseList(const char *wild) {
+	cursortype=DB_LIST_CURSORTYPE;
+	currentlistindex=0;
+	currenttable=NULL;
+	currenttabledef=NULL;
+	currentcolumn=NULL;
+	currentwild=wild;
+	return true;
+}
+
+bool mdbtoolscursor::getTableList(const char *wild) {
+
+	cursortype=TABLE_LIST_CURSORTYPE;
+
+	// open the database for non-sql access
+	if (mdb) {
+		mdb_close(mdb);
+	}
+	const char	*dbval;
+	if (mdbtoolsconn->db && mdbtoolsconn->db[0]) {
+		dbval=mdbtoolsconn->db;
+	} else {
+		dbval="";
+	}
+	mdb=mdb_open(dbval,MDB_NOFLAGS);
+	if (!mdb) {
+		return false;
+	}
+
+	// read the catalog
+	if (!mdb_read_catalog(mdb,MDB_ANY)) {
+		return false;
+	}
+
+	// reset current pointers
+	currentlistindex=0;
+	currenttable=NULL;
+	currenttabledef=NULL;
+	currentcolumn=NULL;
+	currentwild=wild;
+
+	return true;
+}
+
+bool mdbtoolscursor::getColumnList(const char *table, const char *wild) {
+
+	cursortype=COLUMN_LIST_CURSORTYPE;
+
+	// open the database for non-sql access
+	if (mdb) {
+		mdb_close(mdb);
+	}
+	const char	*dbval;
+	if (mdbtoolsconn->db && mdbtoolsconn->db[0]) {
+		dbval=mdbtoolsconn->db;
+	} else {
+		dbval="";
+	}
+	mdb=mdb_open(dbval,MDB_NOFLAGS);
+	if (!mdb) {
+		return false;
+	}
+
+	// read the catalog
+	if (!mdb_read_catalog(mdb,MDB_ANY)) {
+		return false;
+	}
+
+	// reset current pointers
+	currentlistindex=0;
+	currenttable=NULL;
+	currenttabledef=NULL;
+	currentcolumn=NULL;
+	currentwild=wild;
+
+	// find the specified table in the catalog
+	for (uint32_t i=0; i<mdb->num_catalog; i++) {
+		currenttable=(MdbCatalogEntry *)
+				g_ptr_array_index(mdb->catalog,i);
+		if (currenttable->object_type==MDB_TABLE &&
+			!charstring::compare(currenttable->object_name,table)) {
+			currenttabledef=mdb_read_table(currenttable);
+			if (!currenttabledef) {
+printf("!currenttabledef\n");
+				return false;
+			}
+			mdb_read_columns(currenttabledef);
+			return true;
+		}
+	}
+	return false;
 }
 
 void mdbtoolscursor::errorMessage(const char **errorstring,
@@ -219,15 +306,33 @@ uint64_t mdbtoolscursor::affectedRows() {
 }
 
 uint32_t mdbtoolscursor::colCount() {
-	return ((MdbSQL *)mdbsql)->num_columns;
+	if (cursortype==QUERY_CURSORTYPE) {
+		return ((MdbSQL *)mdbsql)->num_columns;
+	}
+	return 1;
 }
 
 const char * const *mdbtoolscursor::columnNames() {
-	columnnames=new char *[((MdbSQL *)mdbsql)->num_columns];
-	for (unsigned int i=0; i<((MdbSQL *)mdbsql)->num_columns; i++) {
-		MdbSQLColumn	*col=(MdbSQLColumn *)
-			g_ptr_array_index(((MdbSQL *)mdbsql)->columns,i);
-		columnnames[i]=col->name;
+
+	if (cursortype==QUERY_CURSORTYPE) {
+		columnnames=new char *[((MdbSQL *)mdbsql)->num_columns];
+		for (unsigned int i=0; i<((MdbSQL *)mdbsql)->num_columns; i++) {
+			MdbSQLColumn	*col=(MdbSQLColumn *)
+				g_ptr_array_index(
+					((MdbSQL *)mdbsql)->columns,i);
+			columnnames[i]=col->name;
+		}
+		return columnnames;
+	} else {
+		columnnames=new char*[1];
+	}
+
+	if (cursortype==DB_LIST_CURSORTYPE) {
+		columnnames[0]=(char *)"DATABASE";
+	} else if (cursortype==TABLE_LIST_CURSORTYPE) {
+		columnnames[0]=(char *)"TABLE";
+	} else if (cursortype==COLUMN_LIST_CURSORTYPE) {
+		columnnames[0]=(char *)"COLUMN_NAME";
 	}
 	return columnnames;
 }
@@ -238,23 +343,47 @@ uint16_t mdbtoolscursor::columnTypeFormat() {
 
 void mdbtoolscursor::returnColumnInfo() {
 
-	// for each column...
-	for (unsigned int i=0; i<((MdbSQL *)mdbsql)->num_columns; i++) {
+	if (cursortype==QUERY_CURSORTYPE) {
 
-		// get the column
-		MdbSQLColumn	*col=(MdbSQLColumn *)
-			g_ptr_array_index(((MdbSQL *)mdbsql)->columns,i);
+		// for each column...
+		for (unsigned int i=0; i<((MdbSQL *)mdbsql)->num_columns; i++) {
 
-		// send the column definition
-		conn->sendColumnDefinition(col->name,
+			// get the column
+			MdbSQLColumn	*col=(MdbSQLColumn *)
+				g_ptr_array_index(
+					((MdbSQL *)mdbsql)->columns,i);
+
+			// send the column definition
+			conn->sendColumnDefinition(col->name,
 					charstring::length(col->name),
 					UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
+		}
+
+	} else if (cursortype==DB_LIST_CURSORTYPE) {
+		conn->sendColumnDefinition("DATABASE",8,
+				UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
+	} else if (cursortype==TABLE_LIST_CURSORTYPE) {
+		conn->sendColumnDefinition("TABLE",5,
+				UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
+	} else if (cursortype==COLUMN_LIST_CURSORTYPE) {
+		conn->sendColumnDefinition("COLUMN_NAME",11,
+				UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
 	}
 }
 
 bool mdbtoolscursor::noRowsToReturn() {
-	// if there were no columns then there can be no rows
-	return (((MdbSQL *)mdbsql)->num_columns==0);
+
+	if (cursortype==QUERY_CURSORTYPE) {
+		// if there were no columns then there can be no rows
+		return (((MdbSQL *)mdbsql)->num_columns==0);
+	} else if (cursortype==DB_LIST_CURSORTYPE) {
+		return false;
+	} else if (cursortype==TABLE_LIST_CURSORTYPE) {
+		return (mdb->num_catalog==0);
+	} else if (cursortype==COLUMN_LIST_CURSORTYPE) {
+		return (currenttabledef->num_cols==0);
+	}
+	return true;
 }
 
 bool mdbtoolscursor::skipRow() {
@@ -262,49 +391,109 @@ bool mdbtoolscursor::skipRow() {
 }
 
 bool mdbtoolscursor::fetchRow() {
-#ifdef HAVE_MDB_SQL_FETCH_ROW
-	return mdb_sql_fetch_row((MdbSQL *)mdbsql,
-				((MdbSQL *)mdbsql)->cur_table);
-#else
-	return mdb_fetch_row(((MdbSQL *)mdbsql)->cur_table);
-#endif
+	if (cursortype==QUERY_CURSORTYPE) {
+		#ifdef HAVE_MDB_SQL_FETCH_ROW
+			return mdb_sql_fetch_row((MdbSQL *)mdbsql,
+						((MdbSQL *)mdbsql)->cur_table);
+		#else
+			return mdb_fetch_row(((MdbSQL *)mdbsql)->cur_table);
+		#endif
+	} else if (cursortype==DB_LIST_CURSORTYPE) {
+		if (currentlistindex==0) {
+			currentlistindex++;
+			return true;
+		}
+		return false;
+	} else if (cursortype==TABLE_LIST_CURSORTYPE) {
+		for (;;) {
+			if (currentlistindex==mdb->num_catalog) {
+				currenttable=NULL;
+				return false;
+			}
+			currenttable=(MdbCatalogEntry *)
+					g_ptr_array_index(mdb->catalog,
+							currentlistindex);
+			currentlistindex++;
+			if (currenttable->object_type==MDB_TABLE) {
+				return true;
+			}
+		}
+	} else if (cursortype==COLUMN_LIST_CURSORTYPE) {
+		if (currentlistindex==currenttabledef->num_cols) {
+			return false;
+		}
+		currentcolumn=(MdbColumn *)g_ptr_array_index(
+						currenttabledef->columns,
+						currentlistindex);
+		currentlistindex++;
+		return true;
+	}
+	return false;
 }
 
 void mdbtoolscursor::getField(uint32_t col,
 				const char **field, uint64_t *fieldlength,
 				bool *blob, bool *null) {
 
-	// find the corresponding column in the current table
-	MdbTableDef	*table=((MdbSQL *)mdbsql)->cur_table;
-	MdbSQLColumn	*column=(MdbSQLColumn *)
+	if (cursortype==QUERY_CURSORTYPE) {
+
+		// find the corresponding column in the current table
+		MdbTableDef	*table=((MdbSQL *)mdbsql)->cur_table;
+		MdbSQLColumn	*column=(MdbSQLColumn *)
 			g_ptr_array_index(((MdbSQL *)mdbsql)->columns,col);
 
-	for (unsigned int tcol=0; tcol<table->num_cols; tcol++) {
-		MdbColumn	*tablecolumn=(MdbColumn *)
+		for (uint32_t tcol=0; tcol<table->num_cols; tcol++) {
+
+			MdbColumn	*tablecolumn=(MdbColumn *)
 				g_ptr_array_index(table->columns,tcol);
 
 			if (!charstring::compare(tablecolumn->name,
 							column->name)) {
-#ifdef HAVE_MDB_COL_TO_STRING_5_PARAM
-			char	*data=mdb_col_to_string(
-					((MdbSQL *)mdbsql)->mdb,
-					((MdbSQL *)mdbsql)->mdb->pg_buf,
-					tablecolumn->cur_value_start,
-					tablecolumn->col_type,
-					tablecolumn->cur_value_len);
-#else
-			char	*data=mdb_col_to_string(
-					((MdbSQL *)mdbsql)->mdb,
-					tablecolumn->cur_value_start,
-					tablecolumn->col_type,
-					tablecolumn->cur_value_len);
-#endif
-			if (data) {
-				*field=data;
-				*fieldlength=charstring::length(data);
-			} else {
-				*null=true;
+
+				#ifdef HAVE_MDB_COL_TO_STRING_5_PARAM
+					char	*data=mdb_col_to_string(
+						((MdbSQL *)mdbsql)->mdb,
+						((MdbSQL *)mdbsql)->mdb->pg_buf,
+						tablecolumn->cur_value_start,
+						tablecolumn->col_type,
+						tablecolumn->cur_value_len);
+				#else
+					char	*data=mdb_col_to_string(
+						((MdbSQL *)mdbsql)->mdb,
+						tablecolumn->cur_value_start,
+						tablecolumn->col_type,
+						tablecolumn->cur_value_len);
+				#endif
+
+				if (data) {
+					*field=data;
+					*fieldlength=charstring::length(data);
+				} else {
+					*null=true;
+				}
 			}
+		}
+
+	} else if (cursortype==DB_LIST_CURSORTYPE) {
+		if (col==0) {
+			*field=mdbtoolsconn->db;
+			*fieldlength=charstring::length(*field);
+			*blob=false;
+			*null=false;
+		}
+	} else if (cursortype==TABLE_LIST_CURSORTYPE) {
+		if (col==0 && currenttable) {
+			*field=currenttable->object_name;
+			*fieldlength=charstring::length(*field);
+			*blob=false;
+			*null=false;
+		}
+	} else if (cursortype==COLUMN_LIST_CURSORTYPE) {
+		if (col==0 && currentcolumn) {
+			*field=currentcolumn->name;
+			*fieldlength=charstring::length(*field);
+			*blob=false;
+			*null=false;
 		}
 	}
 }
