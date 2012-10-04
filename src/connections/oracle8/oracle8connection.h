@@ -287,8 +287,10 @@ class oracle8connection : public sqlrconnection_svr {
 	private:
 		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
+#ifdef HAVE_ORACLE_8i
 		void		dropTempTables(sqlrcursor_svr *cursor,
 						stringlist *tablelist);
+#endif
 		bool		logIn(bool printerrors);
 		void		logInError(const char *errmsg);
 		sqlrcursor_svr	*initCursor();

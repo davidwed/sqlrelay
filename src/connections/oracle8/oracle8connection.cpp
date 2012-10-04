@@ -83,6 +83,7 @@ void oracle8connection::handleConnectString() {
 		!charstring::compare(connectStringValue("fakebinds"),"yes");
 }
 
+#ifdef HAVE_ORACLE_8i
 void oracle8connection::dropTempTables(sqlrcursor_svr *cursor,
 					stringlist *tablelist) {
 
@@ -104,6 +105,7 @@ void oracle8connection::dropTempTables(sqlrcursor_svr *cursor,
 
 	sqlrconnection_svr::dropTempTables(cursor,tablelist);
 }
+#endif
 
 bool oracle8connection::logIn(bool printerrors) {
 
