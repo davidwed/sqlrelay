@@ -1292,6 +1292,12 @@ then
 		AC_MSG_CHECKING(if PostgreSQL has PQsetClientEncoding)
 		FW_TRY_LINK([#include <libpq-fe.h>
 #include <stdlib.h>],[PQsetClientEncoding(NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSETCLIENTENCODING,1,Some versions of postgresql have PQsetClientEncoding)],[AC_MSG_RESULT(no)])
+		AC_MSG_CHECKING(if PostgreSQL has PQoidValue)
+		FW_TRY_LINK([#include <libpq-fe.h>
+#include <stdlib.h>],[PQoidValue(NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQOIDVALUE,1,Some versions of postgresql have PQoidValue)],[AC_MSG_RESULT(no)])
+		AC_MSG_CHECKING(if PostgreSQL has PQbinaryTuples)
+		FW_TRY_LINK([#include <libpq-fe.h>
+#include <stdlib.h>],[PQbinaryTuples(NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQBINARYTUPLES,1,Some versions of postgresql have PQbinaryTuples)],[AC_MSG_RESULT(no)])
 	fi
 
 	FW_INCLUDES(postgresql,[$POSTGRESQLINCLUDES])

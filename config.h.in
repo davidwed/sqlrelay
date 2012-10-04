@@ -124,11 +124,17 @@
 /* Oracle 8i or greater */
 #undef HAVE_ORACLE_8i
 
+/* Some versions of postgresql have PQbinaryTuples */
+#undef HAVE_POSTGRESQL_PQBINARYTUPLES
+
 /* Some versions of postgresql have PQexecPrepared */
 #undef HAVE_POSTGRESQL_PQEXECPREPARED
 
 /* Some versions of postgresql have PQfmod */
 #undef HAVE_POSTGRESQL_PQFMOD
+
+/* Some versions of postgresql have PQoidValue */
+#undef HAVE_POSTGRESQL_PQOIDVALUE
 
 /* Some versions of postgresql have PQparameterStatus */
 #undef HAVE_POSTGRESQL_PQPARAMETERSTATUS
