@@ -2696,7 +2696,7 @@ then
 		
 		if ( test -z "$JAVAPATH" )
 		then
-			for i in `ls -d /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* 2> /dev/null` /usr/java /usr/local/java `ls -d /usr/local/openjdk* /usr/pkg/java/openjdk* 2> /dev/null` /System/Library/Frameworks/JavaVM.framework/Versions/Current /usr /usr/local
+			for i in `ls -d /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* 2> /dev/null` /usr/java /usr/local/java `ls -d /usr/local/openjdk* /usr/pkg/java/openjdk* 2> /dev/null` `ls -d /usr/lib/jvm/java 2> /dev/null` /System/Library/Frameworks/JavaVM.framework/Versions/Current /usr /usr/local
 			do
 				FW_CHECK_FILE("$i/bin/javac$EXE",[JAVAPATH=\"$i\"])
 				if ( test -z "$JAVAPATH" )
