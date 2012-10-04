@@ -398,19 +398,20 @@ bool oracle8connection::logIn(bool printerrors) {
 		return false;
 	}
 
-#ifdef OCI_ATTR_PROXY_CREDENTIALS
 	// figure out what version database we're connected to...
-	supportsproxycredentials=false;
+	#ifdef OCI_ATTR_PROXY_CREDENTIALS
+		supportsproxycredentials=false;
+	#endif
+	supportssyscontext=false;
 	if (OCIServerVersion((dvoid *)svc,err,
 				(text *)versionbuf,sizeof(versionbuf),
 				OCI_HTYPE_SVCCTX)==OCI_SUCCESS &&
-			(charstring::contains(versionbuf,"8i ") ||
-			charstring::contains(versionbuf,"9i ") ||
-			charstring::compare(versionbuf,"10g ") ||
-			charstring::compare(versionbuf,"11g "))) {
-		supportsproxycredentials=true;
+			!charstring::contains(versionbuf,"Release 8.0")) {
+		#ifdef OCI_ATTR_PROXY_CREDENTIALS
+			supportsproxycredentials=true;
+		#endif
+		supportssyscontext=true;
 	}
-#endif
 	return true;
 }
 
@@ -558,7 +559,9 @@ const char *oracle8connection::getDatabaseListQuery(bool wild) {
 }
 
 const char *oracle8connection::getTableListQuery(bool wild) {
-	return (wild)?"select "
+	if (supportssyscontext) {
+		return (wild)?
+			"select "
 			"	table_name "
 			"from "
 			"	all_tables "
@@ -577,10 +580,30 @@ const char *oracle8connection::getTableListQuery(bool wild) {
 			"	owner=sys_context('userenv','current_schema') "
 			"order by "
 			"	table_name";
+	} else {
+		return (wild)?
+			"select "
+			"	table_name "
+			"from "
+			"	user_tables "
+			"where "
+			"	table_name like upper('%s') "
+			"order by "
+			"	table_name":
+
+			"select "
+			"	table_name "
+			"from "
+			"	user_tables "
+			"order by "
+			"	table_name";
+	}
 }
 
 const char *oracle8connection::getColumnListQuery(bool wild) {
-	return (wild)? "select "
+	if (supportssyscontext) {
+		return (wild)?
+			"select "
 			"	column_name, "
 			"	data_type, "
 			"	data_length, "
@@ -627,6 +650,44 @@ const char *oracle8connection::getColumnListQuery(bool wild) {
 			"	owner='SYSTEM') "
 			"order by "
 			"	column_id";
+	} else {
+		return (wild)?
+			"select "
+			"	column_name, "
+			"	data_type, "
+			"	data_length, "
+			"	data_precision, "
+			"	data_scale, "
+			"	nullable, "
+			"	'' as key, "
+			"	data_default, "
+			"	'' as extra "
+			"from "
+			"	user_tab_columns "
+			"where "
+			"	table_name=upper('%s') "
+			"	and "
+			"	column_name like upper('%s') "
+			"order by "
+			"	column_id":
+
+			"select "
+			"	column_name, "
+			"	data_type, "
+			"	data_length, "
+			"	data_precision, "
+			"	data_scale, "
+			"	nullable, "
+			"	'' as key, "
+			"	data_default, "
+			"	'' as extra "
+			"from "
+			"	user_tab_columns "
+			"where "
+			"	table_name=upper('%s') "
+			"order by "
+			"	column_id";
+	}
 }
 
 const char *oracle8connection::selectDatabaseQuery() {
