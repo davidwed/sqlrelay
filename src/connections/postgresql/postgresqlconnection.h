@@ -139,7 +139,7 @@ class postgresqlconnection : public sqlrconnection_svr {
 		const char	*charset;
 		char		*dbversion;
 
-#ifndef HAVE_POSTGRESQL_PQOIDVALUE
+#ifdef HAVE_POSTGRESQL_PQOIDVALUE
 		Oid	currentoid;
 #endif
 		char	*lastinsertidquery;
