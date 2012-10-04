@@ -20,7 +20,9 @@ postgresqlconnection::postgresqlconnection() : sqlrconnection_svr() {
 	datatypeids=NULL;
 	datatypenames=NULL;
 	pgconn=(PGconn *)NULL;
+#ifdef HAVE_POSTGRESQL_PQOIDVALUE
 	currentoid=InvalidOid;
+#endif
 	lastinsertidquery=NULL;
 }
 
@@ -311,11 +313,15 @@ const char *postgresqlconnection::getCurrentDatabaseQuery() {
 }
 
 bool postgresqlconnection::getLastInsertId(uint64_t *id, char **error) {
+#ifdef HAVE_POSTGRESQL_PQOIDVALUE
 	if (lastinsertidquery) {
 		return sqlrconnection_svr::getLastInsertId(id,error);
 	}
 	*id=(currentoid!=InvalidOid)?currentoid:0;
 	return true;
+#else
+	return false;
+#endif
 }
 
 const char *postgresqlconnection::getLastInsertIdQuery() {
@@ -603,17 +609,19 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
 	nrows=PQntuples(pgresult);
 
 	// get the affected row count
-	char	*affrows=PQcmdTuples(pgresult);
+	const char	*affrows=PQcmdTuples(pgresult);
 	affectedrows=0;
 	if (affrows && affrows[0]) {
 		affectedrows=charstring::toInteger(affrows);
 	}
 
+#ifdef HAVE_POSTGRESQL_PQOIDVALUE
 	// get the oid of the inserted row (if this was an insert)
 	Oid	coid=PQoidValue(pgresult);
 	if (coid!=InvalidOid) {
 		postgresqlconn->currentoid=coid;
 	}
+#endif
 
 	return true;
 }
@@ -677,7 +685,10 @@ void postgresqlcursor::returnColumnInfo() {
 
 	// is this binary data (all columns will contain
 	// binary data if it is)
-	int16_t	binary=PQbinaryTuples(pgresult);
+	int16_t	binary=false;
+#ifdef HAVE_POSTGRESQL_PQBINARYTUPLES
+	binary=PQbinaryTuples(pgresult);
+#endif
 
 	// for each column...
 	for (int32_t i=0; i<ncols; i++) {
