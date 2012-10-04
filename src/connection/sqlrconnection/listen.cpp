@@ -176,6 +176,12 @@ int32_t sqlrconnection_svr::waitForClient() {
 		clientsock=new filedescriptor;
 		clientsock->setFileDescriptor(descriptor);
 
+		// For some reason, at least on OpenBSD 4.9,
+		// this filedescriptor is getting created in 
+		// non-blocking mode.  Force it into to
+		// blocking mode.
+		clientsock->useBlockingMode();
+
 		dbgfile.debugPrint("connection",1,"pass succeeded");
 		dbgfile.debugPrint("connection",0,"done waiting for client");
 
