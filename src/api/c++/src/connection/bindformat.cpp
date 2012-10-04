@@ -7,7 +7,7 @@
 const char *sqlrconnection::bindFormat() {
 
 	if (!openSession()) {
-		return false;
+		return NULL;
 	}
 
 	if (debug) {
