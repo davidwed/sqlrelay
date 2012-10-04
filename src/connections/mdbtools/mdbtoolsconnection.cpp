@@ -503,28 +503,38 @@ void mdbtoolscursor::getField(uint32_t col,
 			if (!charstring::compare(tablecolumn->name,
 							column->name)) {
 
-				#ifdef HAVE_MDB_COL_TO_STRING_5_PARAM
-					char	*data=mdb_col_to_string(
+				char	*data=NULL;
+
+				// mdb_col_to_string returns garbage for
+				// booleans where cur_value_start is 0, so
+				// for those, just leave data NULL.
+				if (tablecolumn->col_type!=MDB_BOOL ||
+						tablecolumn->cur_value_start) {
+
+					#ifdef HAVE_MDB_COL_TO_STRING_5_PARAM
+					data=mdb_col_to_string(
 						((MdbSQL *)mdbsql)->mdb,
 						((MdbSQL *)mdbsql)->mdb->pg_buf,
 						tablecolumn->cur_value_start,
 						tablecolumn->col_type,
 						tablecolumn->cur_value_len);
-				#else
-					char	*data=mdb_col_to_string(
+					#else
+					data=mdb_col_to_string(
 						((MdbSQL *)mdbsql)->mdb,
 						tablecolumn->cur_value_start,
 						tablecolumn->col_type,
 						tablecolumn->cur_value_len);
-				#endif
+					#endif
+
+				}
 
 				if (data) {
 					*field=data;
 					*fieldlength=charstring::length(data);
-					return;
 				} else {
 					*null=true;
 				}
+				return;
 			}
 		}
 
