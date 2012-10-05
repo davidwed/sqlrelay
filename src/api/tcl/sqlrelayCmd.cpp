@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.cpp,v 1.5 2012-08-09 03:35:54 mused Exp $
+ * $Id: sqlrelayCmd.cpp,v 1.6 2012-10-05 00:43:42 mused Exp $
  */
 
 #include <tcl.h>
@@ -9,17 +9,26 @@
 #include <rudiments/charstring.h>
 
 #include <config.h>
+
 #ifndef HAVE_TCL_GETSTRING
 	#define Tcl_GetString(a) Tcl_GetStringFromObj(a,NULL)
 #endif
+
 #ifdef HAVE_TCL_CONSTCHAR
 	#define CONSTCHAR const char
 #else
 	#define CONSTCHAR char
 #endif
+
 #ifndef HAVE_TCL_WIDEINT
 	#define Tcl_WideInt long
 	#define Tcl_GetWideIntFromObj(a,b,c) Tcl_GetLongFromObj(a,b,c)
+#endif
+
+#ifdef HAVE_TCL_NEWSTRINGOBJ_CONST_CHAR
+	#define _Tcl_NewStringObj(a,b) Tcl_NewStringObj(a,b)
+#else
+	#define _Tcl_NewStringObj(a,b) Tcl_NewStringObj((char *)a,b)
 #endif
 
 extern "C" {
@@ -36,7 +45,7 @@ Tcl_Obj *getCursorID(void) {
   Tcl_Obj *id;
   static int count = 0;
 
-  id = Tcl_NewStringObj("sqlrcur", -1);
+  id = _Tcl_NewStringObj("sqlrcur", -1);
   Tcl_AppendStringsToObj(id, Tcl_GetString(Tcl_NewIntObj(count++)),
 			(char *)NULL);
   return (id);
@@ -398,7 +407,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	    uint32_t length = cur->getFieldLength(row, col);
 	    if (field == (char *)NULL) { field = ""; }
 	    if (Tcl_ListObjAppendElement(interp, rowObj,
-					 Tcl_NewStringObj(field, length))
+					 _Tcl_NewStringObj(field, length))
 		!= TCL_OK) {
 	      return TCL_ERROR;
 	    }
@@ -976,7 +985,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	  Tcl_WrongNumArgs(interp, 2, objv, "variable");
 	  return TCL_ERROR;
 	}
-	result = Tcl_NewStringObj(cur->getOutputBindString(Tcl_GetString(objv[2])), cur->getOutputBindLength(Tcl_GetString(objv[2])));
+	result = _Tcl_NewStringObj(cur->getOutputBindString(Tcl_GetString(objv[2])), cur->getOutputBindLength(Tcl_GetString(objv[2])));
 	Tcl_SetObjResult(interp, result);
 	break;
       }
@@ -987,7 +996,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	  Tcl_WrongNumArgs(interp, 2, objv, "variable");
 	  return TCL_ERROR;
 	}
-	result = Tcl_NewStringObj(cur->getOutputBindBlob(Tcl_GetString(objv[2])), cur->getOutputBindLength(Tcl_GetString(objv[2])));
+	result = _Tcl_NewStringObj(cur->getOutputBindBlob(Tcl_GetString(objv[2])), cur->getOutputBindLength(Tcl_GetString(objv[2])));
 	Tcl_SetObjResult(interp, result);
 	break;
       }
@@ -998,7 +1007,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	  Tcl_WrongNumArgs(interp, 2, objv, "variable");
 	  return TCL_ERROR;
 	}
-	result = Tcl_NewStringObj(cur->getOutputBindClob(Tcl_GetString(objv[2])), cur->getOutputBindLength(Tcl_GetString(objv[2])));
+	result = _Tcl_NewStringObj(cur->getOutputBindClob(Tcl_GetString(objv[2])), cur->getOutputBindLength(Tcl_GetString(objv[2])));
 	Tcl_SetObjResult(interp, result);
 	break;
       }
@@ -1144,7 +1153,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	if ((msg = cur->errorMessage()) == NULL) {
 	  msg = "";
 	}
-	Tcl_SetObjResult(interp, Tcl_NewStringObj(msg, -1));
+	Tcl_SetObjResult(interp, _Tcl_NewStringObj(msg, -1));
 	break;
       }
     case SQLRCUR_errorNumber:
@@ -1175,7 +1184,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	if ((field = cur->getField(row, col)) == (const char *)NULL) {
 	  field = "";
 	}
-	Tcl_SetObjResult(interp, Tcl_NewStringObj(field, cur->getFieldLength(row,col)));
+	Tcl_SetObjResult(interp, _Tcl_NewStringObj(field, cur->getFieldLength(row,col)));
 	break;
       }
     case SQLRCUR_getFieldByName:
@@ -1192,7 +1201,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	if ((field = cur->getField(row, Tcl_GetString(objv[3]))) == (const char *)NULL) {
 	  field = "";
 	}
-	Tcl_SetObjResult(interp, Tcl_NewStringObj(field, cur->getFieldLength(row, Tcl_GetString(objv[3]))));
+	Tcl_SetObjResult(interp, _Tcl_NewStringObj(field, cur->getFieldLength(row, Tcl_GetString(objv[3]))));
 	break;
       }
     case SQLRCUR_getFieldAsIntegerByIndex:
@@ -1299,7 +1308,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	resultList = Tcl_NewObj();
 	for (col = 0; col < cur->colCount(); col++) {
 	  if (Tcl_ListObjAppendElement(interp, resultList,
-				       Tcl_NewStringObj((rowarray[col])?rowarray[col]:"", lengtharray[col])) != TCL_OK) {
+				       _Tcl_NewStringObj((rowarray[col])?rowarray[col]:"", lengtharray[col])) != TCL_OK) {
 	    return TCL_ERROR;
 	  }
 	}
@@ -1343,7 +1352,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	resultList = Tcl_NewObj();
 	while (namearray[i] != (const char *)NULL) {
 	  if (Tcl_ListObjAppendElement(interp, resultList,
-				       Tcl_NewStringObj(namearray[i++], -1)) != TCL_OK) {
+				       _Tcl_NewStringObj(namearray[i++], -1)) != TCL_OK) {
 	    return TCL_ERROR;
 	  }
 	}
@@ -1364,7 +1373,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	if ((name = cur->getColumnName(col)) == (const char *)NULL) {
 	  name = "";
 	}
-	Tcl_SetObjResult(interp, Tcl_NewStringObj(name, -1));
+	Tcl_SetObjResult(interp, _Tcl_NewStringObj(name, -1));
 	break;
       }
     case SQLRCUR_getColumnTypeByIndex:
@@ -1381,7 +1390,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	if ((name = cur->getColumnType(col)) == (const char *)NULL) {
 	  name = "";
 	}
-	Tcl_SetObjResult(interp, Tcl_NewStringObj(name, -1));
+	Tcl_SetObjResult(interp, _Tcl_NewStringObj(name, -1));
 	break;
       }
     case SQLRCUR_getColumnTypeByName:
@@ -1394,7 +1403,7 @@ int sqlrcurObjCmd(ClientData data, Tcl_Interp *interp,
 	if ((name = cur->getColumnType(Tcl_GetString(objv[2]))) == (const char *)NULL) {
 	  name = "";
 	}
-	Tcl_SetObjResult(interp, Tcl_NewStringObj(name, -1));
+	Tcl_SetObjResult(interp, _Tcl_NewStringObj(name, -1));
 	break;
       }
     case SQLRCUR_getColumnLengthByIndex:
@@ -1956,7 +1965,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       return TCL_ERROR;
     }
     Tcl_SetObjResult(interp,
-		     Tcl_NewStringObj(con->getConnectionSocket(),
+		     _Tcl_NewStringObj(con->getConnectionSocket(),
 				      -1));
     break;
   }
@@ -1992,7 +2001,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       return TCL_ERROR;
     }
     Tcl_SetObjResult(interp,
-		     Tcl_NewStringObj(con->identify(), -1));
+		     _Tcl_NewStringObj(con->identify(), -1));
     break;
   }
   case SQLR_DBVERSION: {
@@ -2001,7 +2010,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       return TCL_ERROR;
     }
     Tcl_SetObjResult(interp,
-		     Tcl_NewStringObj(con->dbVersion(), -1));
+		     _Tcl_NewStringObj(con->dbVersion(), -1));
     break;
   }
   case SQLR_CLIENTVERSION: {
@@ -2010,7 +2019,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       return TCL_ERROR;
     }
     Tcl_SetObjResult(interp,
-		     Tcl_NewStringObj(con->clientVersion(), -1));
+		     _Tcl_NewStringObj(con->clientVersion(), -1));
     break;
   }
   case SQLR_SERVERVERSION: {
@@ -2019,7 +2028,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       return TCL_ERROR;
     }
     Tcl_SetObjResult(interp,
-		     Tcl_NewStringObj(con->serverVersion(), -1));
+		     _Tcl_NewStringObj(con->serverVersion(), -1));
     break;
   }
   case SQLR_BINDFORMAT: {
@@ -2028,7 +2037,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       return TCL_ERROR;
     }
     Tcl_SetObjResult(interp,
-		     Tcl_NewStringObj(con->bindFormat(), -1));
+		     _Tcl_NewStringObj(con->bindFormat(), -1));
     break;
   }
   case SQLR_SELECTDATABASE: {
@@ -2045,7 +2054,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       return TCL_ERROR;
     }
     Tcl_SetObjResult(interp,
-		     Tcl_NewStringObj(con->getCurrentDatabase(), -1));
+		     _Tcl_NewStringObj(con->getCurrentDatabase(), -1));
     break;
   }
   case SQLR_GETLASTINSERTID: {
@@ -2100,7 +2109,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       Tcl_WrongNumArgs(interp, 2, objv, NULL);
       return TCL_ERROR;
     }
-    Tcl_SetObjResult(interp,Tcl_NewStringObj(con->errorMessage(), -1));
+    Tcl_SetObjResult(interp,_Tcl_NewStringObj(con->errorMessage(), -1));
     break;
   }
   case SQLR_ERRORNUMBER: {
@@ -2251,7 +2260,7 @@ int sqlrconCmd(ClientData dummy, Tcl_Interp *interp,
 		                retrytime, tries,true);
   
 
-  id = Tcl_NewStringObj("sqlrcon", -1);
+  id = _Tcl_NewStringObj("sqlrcon", -1);
   Tcl_AppendStringsToObj(id, Tcl_GetString(Tcl_NewIntObj(count++)),
 			(char *)NULL);
 

@@ -324,6 +324,9 @@
 /* Some versions of TCL don't have Tcl_GetString */
 #undef HAVE_TCL_GETSTRING
 
+/* Some versions of TCL don't use const char ** arguments */
+#undef HAVE_TCL_NEWSTRINGOBJ_CONST_CHAR
+
 /* Some versions of TCL don't have Tcl_WideInt */
 #undef HAVE_TCL_WIDEINT
 
