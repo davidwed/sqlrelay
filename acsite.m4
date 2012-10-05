@@ -751,7 +751,7 @@ then
 			then
 				for i in "/usr" "/usr/lib" "/usr/local" "/opt"
 				do
-					INSTCLNT=`ls -d $i/instantclient* 2> /dev/null | tail -n1`
+					INSTCLNT=`ls -d $i/instantclient* 2> /dev/null | tail -1`
 					if ( test -n "$INSTCLNT" )
 					then
 						ORACLE_INSTANTCLIENT_PREFIX=$INSTCLNT
@@ -763,7 +763,7 @@ then
 			dnl For some reason libclntsh.so is not included in the
 			dnl non-RPM versions, so we have to look for and use
 			dnl the file with a version number tacked on to the end.
-			if ( test -n "$ORACLE_INSTANTCLIENT_PREFIX" -a -r "`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX.* 2> /dev/null | tail -n1`" -a -r "$ORACLE_INSTANTCLIENT_PREFIX/sdk/include/oci.h" )
+			if ( test -n "$ORACLE_INSTANTCLIENT_PREFIX" -a -r "`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX.* 2> /dev/null | tail -1`" -a -r "$ORACLE_INSTANTCLIENT_PREFIX/sdk/include/oci.h" )
 			then
 				ORACLEVERSION="10g"
 				if ( test -n `echo $ORACLE_INSTANTCLIENT_PREFIX | grep 11` )
@@ -771,7 +771,7 @@ then
 					ORACLEVERSION="11g"
 				fi
 				ORACLELIBSPATH="$ORACLE_INSTANTCLIENT_PREFIX"
-				CLNTSH="`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX.* 2> /dev/null | tail -n1`"
+				CLNTSH="`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX.* 2> /dev/null | tail -1`"
 				NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
 				ORACLELIBS="$CLNTSH -L$ORACLE_INSTANTCLIENT_PREFIX -l$NNZ"
 				ORACLEINCLUDES="-I$ORACLE_INSTANTCLIENT_PREFIX/sdk/include"
