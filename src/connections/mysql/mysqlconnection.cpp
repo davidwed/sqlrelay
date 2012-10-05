@@ -333,11 +333,11 @@ void mysqlconnection::endSession() {
 
 mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	mysqlconn=(mysqlconnection *)conn;
-	stmt=NULL;
-	stmtfreeresult=false;
 	mysqlresult=NULL;
 	columnnames=NULL;
 #ifdef HAVE_MYSQL_STMT_PREPARE
+	stmt=NULL;
+	stmtfreeresult=false;
 	usestmtprepare=true;
 	unsupportedbystmt.compile(
 			"^\\s*((create|CREATE|drop|DROP|procedure|PROCEDURE|function|FUNCTION|use|USE|CALL|call|START|start)\\s+)|((begin|BEGIN)\\s*)");
