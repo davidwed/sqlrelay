@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.cpp,v 1.6 2012-10-05 00:43:42 mused Exp $
+ * $Id: sqlrelayCmd.cpp,v 1.7 2012-10-05 00:46:40 mused Exp $
  */
 
 #include <tcl.h>
@@ -28,7 +28,7 @@
 #ifdef HAVE_TCL_NEWSTRINGOBJ_CONST_CHAR
 	#define _Tcl_NewStringObj(a,b) Tcl_NewStringObj(a,b)
 #else
-	#define _Tcl_NewStringObj(a,b) Tcl_NewStringObj((char *)a,b)
+	#define _Tcl_NewStringObj(a,b) Tcl_NewStringObj((char *)(a),b)
 #endif
 
 extern "C" {
