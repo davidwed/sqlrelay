@@ -1174,7 +1174,7 @@ void sqlrlistener::errorClientSession(filedescriptor *clientsock,
 	getAuth(clientsock);
 	clientsock->write((uint16_t)ERROR_OCCURRED);
 	clientsock->write((uint64_t)0);
-	clientsock->write((uint16_t)strlen(err));
+	clientsock->write((uint16_t)charstring::length(err));
 	clientsock->write(err);
 	flushWriteBuffer(clientsock);
 	// FIXME: if we got -1 from getAuth, then the client may be
@@ -1285,7 +1285,7 @@ void sqlrlistener::sqlrelayClientSession(filedescriptor *clientsock) {
 		const char	err[]="Authentication Error.";
 		clientsock->write((uint16_t)ERROR_OCCURRED);
 		clientsock->write((uint64_t)0);
-		clientsock->write((uint16_t)strlen(err));
+		clientsock->write((uint16_t)charstring::length(err));
 		clientsock->write(err);
 		flushWriteBuffer(clientsock);
 		snooze::macrosnooze(2);
