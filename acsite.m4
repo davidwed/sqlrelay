@@ -335,6 +335,27 @@ AC_SUBST(WALL)
 ])
 
 
+
+dnl checks to see if -g3 option works or not
+AC_DEFUN([FW_CHECK_DEBUG],
+[
+if ( test "$DEBUG" = "yes" )
+then
+	AC_MSG_CHECKING(for -g3)
+	FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-g3],[],[],[DBG="-g3"],[DBG="-g"])
+	if ( test "$DBG" = "-g3" )
+	then
+		AC_MSG_RESULT(yes)
+	else
+		AC_MSG_RESULT(no)
+	fi
+	CFLAGS="$CFLAGS $DBG"
+	CXXFLAGS="$CXXFLAGS $DBG"
+fi
+])
+
+
+
 dnl checks to see if -pthread option works or not during compile
 AC_DEFUN([FW_CHECK_PTHREAD_COMPILE],
 [
