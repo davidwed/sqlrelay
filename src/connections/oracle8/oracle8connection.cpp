@@ -13,6 +13,13 @@
 
 #define MAX_BYTES_PER_CHAR	4
 
+#ifdef OCI_STMT_CACHE
+	// 9i calls OCI_STRLS_CACHE_DELETE something else
+	#ifndef OCI_STRLS_CACHE_DELETE
+		#define OCI_STRLS_CACHE_DELETE OCI_STMTCACHE_DELETE;
+	#endif
+#endif
+
 oracle8connection::oracle8connection() : sqlrconnection_svr() {
 	stmtmode=OCI_DEFAULT;
 
@@ -38,7 +45,9 @@ oracle8connection::oracle8connection() : sqlrconnection_svr() {
 	fetchatonce=FETCH_AT_ONCE;
 	maxselectlistsize=MAX_SELECT_LIST_SIZE;
 	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
+#ifdef OCI_STMT_CACHE
 	stmtcachesize=STMT_CACHE_SIZE;
+#endif
 
 #ifdef HAVE_ORACLE_8i
 	droptemptables=false;
@@ -84,11 +93,13 @@ void oracle8connection::handleConnectString() {
 		maxitembuffersize=MAX_BYTES_PER_CHAR;
 	}
 
+#ifdef OCI_STMT_CACHE
 	stmtcachesize=charstring::toUnsignedInteger(
 				connectStringValue("stmtcachesize"));
 	if (!stmtcachesize) {
 		stmtcachesize=STMT_CACHE_SIZE;
 	}
+#endif
 
 	setFakeTransactionBlocksBehavior(
 		!charstring::compare(
@@ -987,39 +998,45 @@ bool oracle8cursor::openCursor(uint16_t id) {
 
 	stmt=NULL;
 
+#ifdef OCI_STMT_CACHE
 	// If statement caching is available then we don't need to allocate
 	// a cursor handle here, as it will be allocated by the call to
 	// OCIStmtPrepare2 later.
 	//
 	// If statement caching isn't available then we need to allocate a
 	// cursor handle here and set the number of rows to prefetch.
-
-	if (!oracle8conn->stmtcachesize) {
-
-		// allocate a cursor handle
-		if (OCIHandleAlloc((dvoid *)oracle8conn->env,
-					(dvoid **)&stmt,
-					OCI_HTYPE_STMT,(size_t)0,
-					(dvoid **)0)!=OCI_SUCCESS) {
-			return false;
-		}
-
-		// set the number of rows to prefetch
-		if (OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
-					(dvoid *)&(oracle8conn->fetchatonce),
-					(ub4)0,OCI_ATTR_PREFETCH_ROWS,
-					(OCIError *)oracle8conn->err)!=
-					OCI_SUCCESS) {
-			return false;
-		}
+	stmtreleasemode=OCI_DEFAULT;
+	if (oracle8conn->stmtcachesize) {
+		return true;
 	}
-	return true;
+#endif
+
+	// allocate a cursor handle
+	if (OCIHandleAlloc((dvoid *)oracle8conn->env,
+				(dvoid **)&stmt,
+				OCI_HTYPE_STMT,(size_t)0,
+				(dvoid **)0)!=OCI_SUCCESS) {
+		return false;
+	}
+
+	// set the number of rows to prefetch
+	return OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
+				(dvoid *)&(oracle8conn->fetchatonce),
+				(ub4)0,OCI_ATTR_PREFETCH_ROWS,
+				(OCIError *)oracle8conn->err)==OCI_SUCCESS;
 }
 
 bool oracle8cursor::closeCursor() {
-	// Renat says that we should cleanUpData here.
-	// I'm not sure we need to though.
+
 	cleanUpData(true,true);
+
+#ifdef OCI_STMT_CACHE
+	if (oracle8conn->stmtcachesize && stmt) {
+		return OCIStmtRelease(stmt,oracle8conn->err,
+				NULL,0,OCI_STRLS_CACHE_DELETE)==OCI_SUCCESS;
+	}
+#endif
+
 	return (OCIHandleFree(stmt,OCI_HTYPE_STMT)==OCI_SUCCESS);
 }
 
@@ -1043,13 +1060,7 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 			if (stmttype==OCI_STMT_DROP ||
 					stmttype==OCI_STMT_CREATE ||
 					stmttype==OCI_STMT_ALTER) {
-				#if defined(OCI_STRLS_CACHE_DELETE)
-				// in 10g+ it's called this
 				stmtreleasemode=OCI_STRLS_CACHE_DELETE;
-				#elif defined(OCI_STMTCACHE_DELETE)
-				// in 9i it's called this
-				stmtreleasemode=OCI_STMTCACHE_DELETE;
-				#endif
 			}
 
 			if (OCIStmtRelease(stmt,oracle8conn->err,
@@ -2146,13 +2157,7 @@ void oracle8cursor::errorMessage(const char **errorstring,
 	// set the statement release mode such that this query will be
 	// removed from the statement cache on the next iteration
 	if (errormessage->getStringLength()) {
-		#if defined(OCI_STRLS_CACHE_DELETE)
-		// in 10g+ it's called this
 		stmtreleasemode=OCI_STRLS_CACHE_DELETE;
-		#elif defined(OCI_STMTCACHE_DELETE)
-		// in 9i it's called this
-		stmtreleasemode=OCI_STMTCACHE_DELETE;
-		#endif
 	}
 #endif
 }

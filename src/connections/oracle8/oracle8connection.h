@@ -348,7 +348,9 @@ class oracle8connection : public sqlrconnection_svr {
 		uint32_t	fetchatonce;
 		int32_t		maxselectlistsize;
 		int32_t		maxitembuffersize;
+#ifdef OCI_STMT_CACHE
 		uint32_t	stmtcachesize;
+#endif
 
 #ifdef HAVE_ORACLE_8i
 		bool		droptemptables;
