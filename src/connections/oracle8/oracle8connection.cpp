@@ -864,6 +864,7 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	ncols=0;
 	errormessage=NULL;
 
+	oracle8conn=(oracle8connection *)conn;
 	allocateResultSetBuffers(oracle8conn->fetchatonce,
 					oracle8conn->maxselectlistsize,
 					oracle8conn->maxitembuffersize);
@@ -900,8 +901,6 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	prepared=false;
 
 	resultfreed=true;
-
-	oracle8conn=(oracle8connection *)conn;
 
 #ifdef HAVE_ORACLE_8i
 	createtemp.compile("(create|CREATE)[ \\t\\n\\r]+(global|GLOBAL)[ \\t\\n\\r]+(temporary|TEMPORARY)[ \\t\\n\\r]+(table|TABLE)[ \\t\\n\\r]+");
@@ -1020,10 +1019,10 @@ bool oracle8cursor::openCursor(uint16_t id) {
 	}
 
 	// set the number of rows to prefetch
-	return OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
+	return (OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
 				(dvoid *)&(oracle8conn->fetchatonce),
 				(ub4)0,OCI_ATTR_PREFETCH_ROWS,
-				(OCIError *)oracle8conn->err)==OCI_SUCCESS;
+				(OCIError *)oracle8conn->err)==OCI_SUCCESS);
 }
 
 bool oracle8cursor::closeCursor() {
