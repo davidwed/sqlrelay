@@ -382,6 +382,7 @@ bool oracle8connection::logIn(bool printerrors) {
 		return false;
 	}
 
+#ifdef OCI_STMT_CACHE
 	// set the statement cache size
 	if (OCIAttrSet((dvoid *)svc,OCI_HTYPE_SVCCTX,
 				(dvoid *)&stmtcachesize,(ub4)0,
@@ -397,15 +398,16 @@ bool oracle8connection::logIn(bool printerrors) {
 		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
-#ifdef SERVER_DEBUG
-	if (OCIAttrGet((dvoid *)svc,OCI_HTYPE_SVCCTX,
+	if (dbgfile.debugEnabled()) {
+		if (OCIAttrGet((dvoid *)svc,OCI_HTYPE_SVCCTX,
 				(dvoid *)&stmtcachesize,(ub4)0,
 				(ub4)OCI_ATTR_STMTCACHESIZE,
 				(OCIError *)err)==OCI_SUCCESS) {
-		stringbuffer	debugstr;
-		debugstr.append("cache size ");
-		debugstr.append(stmtcache_size);
-		debugPrint("connection",1,debugstr.getString());
+			stringbuffer	debugstr;
+			debugstr.append("cache size ");
+			debugstr.append(stmtcachesize);
+			dbgfile.debugPrint("connection",1,debugstr.getString());
+		}
 	}
 #endif
 
