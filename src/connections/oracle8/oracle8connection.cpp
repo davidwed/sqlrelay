@@ -15,10 +15,34 @@
 
 oracle8connection::oracle8connection() : sqlrconnection_svr() {
 	stmtmode=OCI_DEFAULT;
+
+	env=NULL;
+	srv=NULL;
+	err=NULL;
+	svc=NULL;
+	session=NULL;
+	trans=NULL;
+
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
 	newsession=NULL;
+	supportsproxycredentials=false;
 #endif
+	supportssyscontext=false;
+
+	home=NULL;
+	sid=NULL;
+	nlslang=NULL;
+
 	lastinsertidquery=NULL;
+
+	fetchatonce=FETCH_AT_ONCE;
+	maxselectlistsize=MAX_SELECT_LIST_SIZE;
+	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
+	stmtcachesize=STMT_CACHE_SIZE;
+
+#ifdef HAVE_ORACLE_8i
+	droptemptables=false;
+#endif
 }
 
 oracle8connection::~oracle8connection() {
@@ -827,18 +851,12 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	stmtreleasemode=OCI_DEFAULT;
 #endif
 	ncols=0;
-
-	prepared=false;
-	resultfreed=true;
 	errormessage=NULL;
-	oracle8conn=(oracle8connection *)conn;
-#ifdef HAVE_ORACLE_8i
-	orainbindlobcount=0;
-	oraoutbindlobcount=0;
-#endif
-	orainbindcount=0;
-	oraoutbindcount=0;
-	oracurbindcount=0;
+
+	allocateResultSetBuffers(oracle8conn->fetchatonce,
+					oracle8conn->maxselectlistsize,
+					oracle8conn->maxitembuffersize);
+
 	for (uint16_t i=0; i<MAXVAR; i++) {
 		inbindpp[i]=NULL;
 		outbindpp[i]=NULL;
@@ -849,10 +867,30 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 		outdatebind[i]=NULL;
 		outintbind[i]=NULL;
 	}
+	orainbindcount=0;
+	oraoutbindcount=0;
+	oracurbindcount=0;
 
-	allocateResultSetBuffers(oracle8conn->fetchatonce,
-					oracle8conn->maxselectlistsize,
-					oracle8conn->maxitembuffersize);
+#ifdef HAVE_ORACLE_8i
+	for (uint16_t i=0; i<MAXVAR; i++) {
+		inbind_lob[i]=NULL;
+		outbind_lob[i]=NULL;
+	}
+	orainbindlobcount=0;
+	oraoutbindlobcount=0;
+#endif
+
+	row=0;
+	maxrow=0;
+	totalrows=0;
+
+	query=NULL;
+	length=0;
+	prepared=false;
+
+	resultfreed=true;
+
+	oracle8conn=(oracle8connection *)conn;
 
 #ifdef HAVE_ORACLE_8i
 	createtemp.compile("(create|CREATE)[ \\t\\n\\r]+(global|GLOBAL)[ \\t\\n\\r]+(temporary|TEMPORARY)[ \\t\\n\\r]+(table|TABLE)[ \\t\\n\\r]+");
