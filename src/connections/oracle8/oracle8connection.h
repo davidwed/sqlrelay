@@ -5,6 +5,7 @@
 #define ORACLECONNECTION_H
 
 #define FETCH_AT_ONCE		10
+#define STMT_CACHE_SIZE		0
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	32768
 
@@ -178,6 +179,7 @@ class oracle8cursor : public sqlrcursor_svr {
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
+		bool		validBinds();
 #ifdef HAVE_ORACLE_8i
 		void		checkForTempTable(const char *query,
 							uint32_t length);
@@ -228,6 +230,9 @@ class oracle8cursor : public sqlrcursor_svr {
 
 		OCIStmt		*stmt;
 		ub2		stmttype;
+#ifdef OCI_STMT_CACHE
+		ub4		stmtreleasemode;
+#endif
 		sword		ncols;
 		stringbuffer	*errormessage;
 
@@ -317,7 +322,7 @@ class oracle8connection : public sqlrconnection_svr {
 
 		sqlwriter	*getSqlWriter();
 
-		ub4		statementmode;
+		ub4		stmtmode;
 
 		OCIEnv		*env;
 		OCIServer	*srv;
@@ -343,6 +348,7 @@ class oracle8connection : public sqlrconnection_svr {
 		uint32_t	fetchatonce;
 		int32_t		maxselectlistsize;
 		int32_t		maxitembuffersize;
+		uint32_t	stmtcachesize;
 
 #ifdef HAVE_ORACLE_8i
 		bool		droptemptables;

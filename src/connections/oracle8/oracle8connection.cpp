@@ -14,7 +14,7 @@
 #define MAX_BYTES_PER_CHAR	4
 
 oracle8connection::oracle8connection() : sqlrconnection_svr() {
-	statementmode=OCI_DEFAULT;
+	stmtmode=OCI_DEFAULT;
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
 	newsession=NULL;
 #endif
@@ -58,6 +58,12 @@ void oracle8connection::handleConnectString() {
 	}
 	if (maxitembuffersize<MAX_BYTES_PER_CHAR) {
 		maxitembuffersize=MAX_BYTES_PER_CHAR;
+	}
+
+	stmtcachesize=charstring::toUnsignedInteger(
+				connectStringValue("stmtcachesize"));
+	if (!stmtcachesize) {
+		stmtcachesize=STMT_CACHE_SIZE;
 	}
 
 	setFakeTransactionBlocksBehavior(
@@ -331,13 +337,22 @@ bool oracle8connection::logIn(bool printerrors) {
 		return false;
 	}
 
-	// start a session
+	// decide what credentials to use
 	sword	cred=OCI_CRED_RDBMS;
 	if (!charstring::length(user) && !charstring::length(password)) {
 		cred=OCI_CRED_EXT;
 	}
-	if (OCISessionBegin(svc,err,session,
-				cred,(ub4)OCI_DEFAULT)!=OCI_SUCCESS) {
+
+	// use statement caching if available
+	ub4	mode=OCI_DEFAULT;
+#ifdef OCI_STMT_CACHE
+	if (stmtcachesize) {
+		mode=OCI_STMT_CACHE;
+	}
+#endif
+
+	// begin the session
+	if (OCISessionBegin(svc,err,session,cred,mode)!=OCI_SUCCESS) {
 		if (printerrors) {
 			logInError("OCISessionBegin() failed.\n");
 		}
@@ -367,6 +382,33 @@ bool oracle8connection::logIn(bool printerrors) {
 		return false;
 	}
 
+	// set the statement cache size
+	if (OCIAttrSet((dvoid *)svc,OCI_HTYPE_SVCCTX,
+				(dvoid *)&stmtcachesize,(ub4)0,
+				(ub4)OCI_ATTR_STMTCACHESIZE,
+				(OCIError *)err)!=OCI_SUCCESS) {
+		logInError("Set statement cache size failed.\n");
+		OCISessionEnd(svc,err,session,OCI_DEFAULT);
+		OCIHandleFree(err,OCI_HTYPE_SESSION);
+		OCIServerDetach(srv,err,OCI_DEFAULT);
+		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
+		OCIHandleFree(srv,OCI_HTYPE_SERVER);
+		OCIHandleFree(err,OCI_HTYPE_ERROR);
+		OCIHandleFree(env,OCI_HTYPE_ENV);
+		return false;
+	}
+#ifdef SERVER_DEBUG
+	if (OCIAttrGet((dvoid *)svc,OCI_HTYPE_SVCCTX,
+				(dvoid *)&stmtcachesize,(ub4)0,
+				(ub4)OCI_ATTR_STMTCACHESIZE,
+				(OCIError *)err)==OCI_SUCCESS) {
+		stringbuffer	debugstr;
+		debugstr.append("cache size ");
+		debugstr.append(stmtcache_size);
+		debugPrint("connection",1,debugstr.getString());
+	}
+#endif
+
 	// allocate a transaction handle
 	if (OCIHandleAlloc((dvoid *)env,(dvoid **)&trans,
 				OCI_HTYPE_TRANS,0,0)!=OCI_SUCCESS) {
@@ -387,6 +429,9 @@ bool oracle8connection::logIn(bool printerrors) {
 	if (OCIAttrSet((dvoid *)svc,OCI_HTYPE_SVCCTX,
 				(dvoid *)trans,(ub4)0,
 				(ub4)OCI_ATTR_TRANS,err)!=OCI_SUCCESS) {
+		if (printerrors) {
+			logInError("OCIAttrSet(OCI_ATTR_TRANS) failed.\n");
+		}
 		OCIHandleFree(err,OCI_HTYPE_TRANS);
 		OCISessionEnd(svc,err,session,OCI_DEFAULT);
 		OCIHandleFree(err,OCI_HTYPE_SESSION);
@@ -398,20 +443,82 @@ bool oracle8connection::logIn(bool printerrors) {
 		return false;
 	}
 
-	// figure out what version database we're connected to...
-	#ifdef OCI_ATTR_PROXY_CREDENTIALS
-		supportsproxycredentials=false;
-	#endif
+	// figure out what version of the database we're connected to...
+#ifdef OCI_ATTR_PROXY_CREDENTIALS
+	supportsproxycredentials=false;
+#endif
 	supportssyscontext=false;
 	if (OCIServerVersion((dvoid *)svc,err,
 				(text *)versionbuf,sizeof(versionbuf),
 				OCI_HTYPE_SVCCTX)==OCI_SUCCESS &&
 			!charstring::contains(versionbuf,"Release 8.0")) {
-		#ifdef OCI_ATTR_PROXY_CREDENTIALS
-			supportsproxycredentials=true;
-		#endif
+#ifdef OCI_ATTR_PROXY_CREDENTIALS
+		supportsproxycredentials=true;
+#endif
 		supportssyscontext=true;
 	}
+
+#ifdef OCI_STMT_CACHE
+	if (stmtcachesize) {
+
+		// disable cursor sharing when statement caching is used...
+
+		OCIStmt	*stmt=NULL;
+
+		const char	*alter="alter session set cursor_sharing=exact";
+		if (OCIStmtPrepare2(svc,&stmt,err,
+				(text *)alter,charstring::length(alter),
+				NULL,0,
+				(ub4)OCI_NTV_SYNTAX,
+				(ub4)OCI_DEFAULT)!=OCI_SUCCESS) {
+			if (printerrors) {
+				logInError("Prepare alter session failed.\n");
+			}
+			OCIHandleFree(err,OCI_HTYPE_TRANS);
+			OCISessionEnd(svc,err,session,OCI_DEFAULT);
+			OCIHandleFree(err,OCI_HTYPE_SESSION);
+			OCIServerDetach(srv,err,OCI_DEFAULT);
+			OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
+			OCIHandleFree(srv,OCI_HTYPE_SERVER);
+			OCIHandleFree(err,OCI_HTYPE_ERROR);
+			OCIHandleFree(env,OCI_HTYPE_ENV);
+			return false;
+		}
+
+		if (OCIStmtExecute(svc,stmt,err,1,(ub4)0,
+				NULL,NULL,stmtmode)!=OCI_SUCCESS) {
+			if (printerrors) {
+				logInError("Execute alter session failed.\n");
+			}
+			OCIHandleFree(err,OCI_HTYPE_TRANS);
+			OCISessionEnd(svc,err,session,OCI_DEFAULT);
+			OCIHandleFree(err,OCI_HTYPE_SESSION);
+			OCIServerDetach(srv,err,OCI_DEFAULT);
+			OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
+			OCIHandleFree(srv,OCI_HTYPE_SERVER);
+			OCIHandleFree(err,OCI_HTYPE_ERROR);
+			OCIHandleFree(env,OCI_HTYPE_ENV);
+			return false;
+		}
+
+		if (OCIStmtRelease(stmt,err,NULL,0,
+				OCI_STRLS_CACHE_DELETE)!=OCI_SUCCESS) {
+			if (printerrors) {
+				logInError("Statement release failed.\n");
+			}
+			OCIHandleFree(err,OCI_HTYPE_TRANS);
+			OCISessionEnd(svc,err,session,OCI_DEFAULT);
+			OCIHandleFree(err,OCI_HTYPE_SESSION);
+			OCIServerDetach(srv,err,OCI_DEFAULT);
+			OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
+			OCIHandleFree(srv,OCI_HTYPE_SERVER);
+			OCIHandleFree(err,OCI_HTYPE_ERROR);
+			OCIHandleFree(env,OCI_HTYPE_ENV);
+			return false;
+		}
+	}
+#endif
+
 	return true;
 }
 
@@ -493,9 +600,17 @@ bool oracle8connection::changeUser(const char *newuser,
 				(dvoid *)session,(ub4)0,
 				(ub4)OCI_ATTR_PROXY_CREDENTIALS,err);
 
+	// use statement caching if available
+	ub4	mode=OCI_DEFAULT;
+#ifdef OCI_STMT_CACHE
+	if (stmtcachesize) {
+		mode=OCI_STMT_CACHE;
+	}
+#endif
+
 	// start the session
 	if (OCISessionBegin(svc,err,newsession,
-			OCI_CRED_PROXY,(ub4)OCI_DEFAULT)!=OCI_SUCCESS) {
+				OCI_CRED_PROXY,mode)!=OCI_SUCCESS) {
 		return false;
 	}
 
@@ -510,12 +625,12 @@ bool oracle8connection::changeUser(const char *newuser,
 #endif
 
 bool oracle8connection::autoCommitOn() {
-	statementmode=OCI_COMMIT_ON_SUCCESS;
+	stmtmode=OCI_COMMIT_ON_SUCCESS;
 	return true;
 }
 
 bool oracle8connection::autoCommitOff() {
-	statementmode=OCI_DEFAULT;
+	stmtmode=OCI_DEFAULT;
 	return true;
 }
 
@@ -706,6 +821,9 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 	stmt=NULL;
 	stmttype=0;
+#ifdef OCI_STMT_CACHE
+	stmtreleasemode=OCI_DEFAULT;
+#endif
 	ncols=0;
 
 	prepared=false;
@@ -826,27 +944,40 @@ void oracle8cursor::deallocateResultSetBuffers() {
 
 bool oracle8cursor::openCursor(uint16_t id) {
 
-	// allocate a cursor handle
 	stmt=NULL;
-	if (OCIHandleAlloc((dvoid *)oracle8conn->env,(dvoid **)&stmt,
-				OCI_HTYPE_STMT,(size_t)0,
-				(dvoid **)0)!=OCI_SUCCESS) {
-		return false;
-	}
 
-	// set the number of rows to prefetch
-	if (OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
-				(dvoid *)&(oracle8conn->fetchatonce),(ub4)0,
-				OCI_ATTR_PREFETCH_ROWS,
-				(OCIError *)oracle8conn->err)!=OCI_SUCCESS) {
-		return false;
+	// If statement caching is available then we don't need to allocate
+	// a cursor handle here, as it will be allocated by the call to
+	// OCIStmtPrepare2 later.
+	//
+	// If statement caching isn't available then we need to allocate a
+	// cursor handle here and set the number of rows to prefetch.
+
+	if (!oracle8conn->stmtcachesize) {
+
+		// allocate a cursor handle
+		if (OCIHandleAlloc((dvoid *)oracle8conn->env,
+					(dvoid **)&stmt,
+					OCI_HTYPE_STMT,(size_t)0,
+					(dvoid **)0)!=OCI_SUCCESS) {
+			return false;
+		}
+
+		// set the number of rows to prefetch
+		if (OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
+					(dvoid *)&(oracle8conn->fetchatonce),
+					(ub4)0,OCI_ATTR_PREFETCH_ROWS,
+					(OCIError *)oracle8conn->err)!=
+					OCI_SUCCESS) {
+			return false;
+		}
 	}
 	return true;
 }
 
 bool oracle8cursor::closeCursor() {
-	// Renat says that we should do this here. I'm not sure we need
-	// to though.
+	// Renat says that we should cleanUpData here.
+	// I'm not sure we need to though.
 	cleanUpData(true,true);
 	return (OCIHandleFree(stmt,OCI_HTYPE_STMT)==OCI_SUCCESS);
 }
@@ -857,6 +988,85 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 	// reprepared later
 	this->query=(char *)query;
 	this->length=length;
+
+	// If statement caching is available then use OCIStmtPrepare2,
+	// otherwise just use OCIStmtPrepare.
+
+#ifdef OCI_STMT_CACHE
+	if (oracle8conn->stmtcachesize) {
+
+		// release any prior-allocated statement...
+		if (stmt) {
+
+			// delete DML statements from the cache
+			if (stmttype==OCI_STMT_DROP ||
+					stmttype==OCI_STMT_CREATE ||
+					stmttype==OCI_STMT_ALTER) {
+				#if defined(OCI_STRLS_CACHE_DELETE)
+				// in 10g+ it's called this
+				stmtreleasemode=OCI_STRLS_CACHE_DELETE;
+				#elif defined(OCI_STMTCACHE_DELETE)
+				// in 9i it's called this
+				stmtreleasemode=OCI_STMTCACHE_DELETE;
+				#endif
+			}
+
+			if (OCIStmtRelease(stmt,oracle8conn->err,
+					NULL,0,stmtreleasemode)!=OCI_SUCCESS) {
+				return false;
+			}
+
+			stmt=NULL;
+			stmtreleasemode=OCI_DEFAULT;
+		}
+
+		// reset the statement type
+		stmttype=0;
+
+		// prepare the query...
+		bool	prepare=true;
+		if (oracle8conn->dbgfile.debugEnabled()) {
+			// check for a statment cache hit
+			// and report our findings
+			if (OCIStmtPrepare2(oracle8conn->svc,&stmt,
+					oracle8conn->err,
+					(text *)query,(ub4)length,
+					NULL,0,
+					(ub4)OCI_NTV_SYNTAX,
+					(ub4)OCI_PREP2_CACHE_SEARCHONLY)==
+					OCI_SUCCESS) {
+				// we got a hit and don't
+				// need to do anything else
+				oracle8conn->dbgfile.debugPrint("connection",1,
+							"statement cache hit");
+				prepare=false;
+			} else {
+				// we didn't get a hit and
+				// need to prepare the query
+				oracle8conn->dbgfile.debugPrint("connection",1,
+							"statement cache miss");
+			}
+		}
+		if (prepare) {
+			// prepare the query
+			if (OCIStmtPrepare2(oracle8conn->svc,&stmt,
+					oracle8conn->err,
+					(text *)query,(ub4)length,
+					NULL,0,
+					(ub4)OCI_NTV_SYNTAX,
+					(ub4)OCI_DEFAULT)!=OCI_SUCCESS) {
+				return false;
+			}
+		}
+
+		// set the number of rows to prefetch
+		return (OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
+				(dvoid *)&(oracle8conn->fetchatonce),(ub4)0,
+				OCI_ATTR_PREFETCH_ROWS,
+				(OCIError *)oracle8conn->err)==OCI_SUCCESS);
+
+	}
+#endif
 
 	// reset the statement type
 	stmttype=0;
@@ -869,6 +1079,8 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 }
 
 void oracle8cursor::checkRePrepare() {
+
+	// FIXME: according to neowiz, this might be fixed in 9i
 
 	// Oracle8 appears to have a bug.
 	// You can prepare, bind, execute, rebind, re-execute, etc. with
@@ -1546,18 +1758,13 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 			OCI_ATTR_STMT_TYPE,oracle8conn->err)!=OCI_SUCCESS) {
 		return false;
 	}
+
 #ifdef HAVE_ORACLE_8i
+	// check for create temp table query
 	if (stmttype==OCI_STMT_CREATE) {
 		checkForTempTable(query,length);
 	}
 #endif
-
-	// set up how many times to iterate;
-	// 0 for selects, 1 for non-selects
-	ub4	iters=1;
-	if (stmttype==OCI_STMT_SELECT) {
-		iters=0;
-	}
 
 	// initialize row counters
 	row=0;
@@ -1566,10 +1773,16 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 
 	// execute the query
 	if (execute) {
+
+		if (!validBinds()) {
+			return false;
+		}
+
 		if (OCIStmtExecute(oracle8conn->svc,stmt,
-				oracle8conn->err,iters,
+				oracle8conn->err,
+				(stmttype==OCI_STMT_SELECT)?0:1,
 				(ub4)0,NULL,NULL,
-				oracle8conn->statementmode)!=OCI_SUCCESS) {
+				oracle8conn->stmtmode)!=OCI_SUCCESS) {
 			return false;
 		}
 
@@ -1597,8 +1810,13 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 		// indicate that the result needs to be freed
 		resultfreed=false;
 
+		// FIXME: neowiz checks to see if ncols > maxselectlistsize
+		// and calls setSqlrError if it is here
+
 		// run through the columns...
 		for (sword i=0; i<ncols; i++) {
+
+			// FIXME: neowiz bzero's desc[i] here
 
 			// get the entire column definition
 			if (OCIParamGet(stmt,OCI_HTYPE_STMT,
@@ -1763,6 +1981,67 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 	return true;
 }
 
+bool oracle8cursor::validBinds() {
+
+	// *Important*
+	//
+	// It's vital to verify that all variables are bound. 
+	//
+	// OCIStmtReleae() doesn't deallocate information about previous
+	// variable binding.  This can cause a segmentation fault during
+	// OCIStmtExecute when the statement is reused from the cache if
+	// the same set of variables aren't bound the next time.
+
+	text	*bvnp[MAXVAR];
+	text	*invp[MAXVAR];
+	ub1	inpl[MAXVAR];
+	ub1	dupl[MAXVAR];
+	ub1	bvnl[MAXVAR];
+	OCIBind	*hndl[MAXVAR];
+	sb4	found;
+	sword	ret;
+	char	bname[256];
+	ret=OCIStmtGetBindInfo(stmt,oracle8conn->err,MAXVAR,1,&found,bvnp,bvnl,invp,inpl,dupl,hndl);
+
+	// error
+	if (ret==OCI_ERROR) {
+		return false;
+	}
+
+	// no bind variable
+	if (ret==OCI_NO_DATA) {
+		return true;
+	}
+
+	if (found<0) {
+		//setSqlrError(SQLR_ERR_MAXBIND,"more than MAXVAR placeholders in the oracle8 environment of neowiz (%d > %d)",-found,MAXVAR);
+		return false;
+	}
+
+	for (int i=0; i<found; i++) {
+/*
+		// Duplicated bindname in PL/SQL with OCIBindByPos doesn't work correctly.  Therefore, explicitly preventing it can be simpler solution than always getting application developers to understand that context.  Moreover ,it makes overall logic of this function simpler.  --replica
+
+		if (dupl[i]) {
+			setSqlrError(SQLR_ERR_DUPLICATE_BINDNAME,"duplicated bindname is not allowed in the oracle8 environment of neowiz (%s)",bvnp[i]);
+			return false;
+		}
+		if (bindedpos[i]==1) {
+			continue;
+		}
+
+		strncpy(bname,(char *)bvnp[i],(size_t)bvnl[i]);
+		bname[bvnl[i]] =0;
+
+		if (!lookup_bindedname(bname)) { 
+			setSqlrError(SQLR_ERR_NOT_BOUND,"not bound (%s)",bname);
+			return false;
+		}
+*/
+	}
+	return true;
+}
+
 bool oracle8cursor::queryIsNotSelect() {
 	return (stmttype!=OCI_STMT_SELECT);
 }
@@ -1783,6 +2062,7 @@ void oracle8cursor::errorMessage(const char **errorstring,
 
 	// check for dead connection or shutdown in progress
 	// Might need: 1033 - oracle init/shutdown in progress
+	// FIXME: neowiz adds 2067 - transaction or savepoint rollback required
 	switch (errcode) {
 		case 22: // invalid session ID; access denied
 		case 28: // your session has been killed
@@ -1820,6 +2100,20 @@ void oracle8cursor::errorMessage(const char **errorstring,
 	// set return values
 	*errorstring=errormessage->getString();
 	*errorcode=errcode;
+
+#ifdef OCI_STMT_CACHE
+	// set the statement release mode such that this query will be
+	// removed from the statement cache on the next iteration
+	if (errormessage->getStringLength()) {
+		#if defined(OCI_STRLS_CACHE_DELETE)
+		// in 10g+ it's called this
+		stmtreleasemode=OCI_STRLS_CACHE_DELETE;
+		#elif defined(OCI_STMTCACHE_DELETE)
+		// in 9i it's called this
+		stmtreleasemode=OCI_STMTCACHE_DELETE;
+		#endif
+	}
+#endif
 }
 
 bool oracle8cursor::knowsRowCount() {
@@ -2070,6 +2364,8 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 			// leak detectors may complain, but ultimately the
 			// memory will be deallocated.
 			def[i]=NULL;
+
+			// FIXME: neowiz added a OCIDescriptorFree call here
 		}
 
 		// deallocate buffers, if necessary

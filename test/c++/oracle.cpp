@@ -866,7 +866,9 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table testtable1");
 	printf("\n");
 
+#if 0
 	printf("CURSOR BINDS: \n");
+	cur->clearBinds();
 	checkSuccess(cur->sendQuery("create or replace package types is type cursorType is ref cursor; end;"),1);
 	checkSuccess(cur->sendQuery("create or replace function sp_testtable(value in number) return types.cursortype is l_cursor    types.cursorType; begin open l_cursor for select * from testtable where testnumber>value; return l_cursor; end;"),1);
 	cur->prepareQuery("begin  :curs1:=sp_testtable(5);  :curs2:=sp_testtable(0); end;");
@@ -887,6 +889,7 @@ int	main(int argc, char **argv) {
 	delete bindcur2;
 	checkSuccess(cur->sendQuery("drop package types"),1);
 	printf("\n");
+#endif
 
 	printf("LONG CLOB: \n");
 	cur->sendQuery("drop table testtable2");
