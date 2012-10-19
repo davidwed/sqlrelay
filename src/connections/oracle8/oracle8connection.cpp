@@ -957,6 +957,7 @@ void oracle8cursor::allocateResultSetBuffers(uint32_t fetchatonce,
 			def_col_retlen[i]=new ub2[fetchatonce];
 			def_col_retcode[i]=new ub2[fetchatonce];
 			def[i]=NULL;
+			desc[i].paramd=NULL;
 		}
 	}
 }
@@ -2388,6 +2389,7 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 
 		for (int32_t i=0; i<selectlistsize; i++) {
 
+			// free lob resources
 			for (uint32_t j=0; j<oracle8conn->fetchatonce; j++) {
 				if (def_lob[i][j]) {
 					OCIDescriptorFree(
@@ -2405,7 +2407,13 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 			// memory will be deallocated.
 			def[i]=NULL;
 
-			// FIXME: neowiz added a OCIDescriptorFree call here
+			// free column resources
+			if (desc[i].paramd) {
+				OCIDescriptorFree(
+					(dvoid *)desc[i].paramd,
+					OCI_DTYPE_PARAM);
+				desc[i].paramd=NULL;
+			}
 		}
 
 		// deallocate buffers, if necessary
