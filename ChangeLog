@@ -15,6 +15,7 @@
 		using -g3 if available when --enable-debug is specified
 		support for using the oracle statement cache
 		fixing an oracle column-resource-related memory leak
+		eliminating sqlr-start delay
 
 0.46 - refactored the translation framework to mimic the trigger framework
 	added make.batch file for building on windows

@@ -49,7 +49,12 @@ bool startListener(const char *id, const char *config,
 		printf("\nsqlr-listener failed to start.\n");
 	}
 
-	snooze::macrosnooze(1);
+	// If debug is enabled then we need to wait a second for the shared
+	// memory to get created.  In non-debug mode the shared memory gets
+	// created after deamonize() is called and we don't have to wait.
+	if (listenerdebug) {
+		snooze::macrosnooze(1);
+	}
 
 	return success;
 }
@@ -156,7 +161,6 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 				// it's ok if at least 1 connection started up
 				return (totalstarted>0 || i>0);
 			}
-			snooze::macrosnooze(1);
 		}
 
 		// have we started enough connections?
@@ -274,11 +278,13 @@ int main(int argc, const char **argv) {
 			startCacheManager(localstatedir));
 
 	// many thanks...
-	printf("\n\nThanks to MP3.com for sponsoring: \n");
+	// these companies don't exist any more so it's
+	// probably ok not to display the attribution any more
+	/*printf("\n\nThanks to MP3.com for sponsoring: \n");
 	printf("	Clustered/Replicated database support.\n");
 	printf("	Perl API.\n");
 	printf("Thanks to FeedLounge for sponsoring: \n");
-	printf("	Query routing and filtering.\n");
+	printf("	Query routing and filtering.\n");*/
 	
 	// successful exit
 	process::exit(exitstatus);
