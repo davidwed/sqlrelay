@@ -275,7 +275,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool	handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 						bool *wasfaketransactionquery,
 						const char **error,
-						int64_t *errno);
+						int64_t *errnum);
 		bool	beginFakeTransactionBlock();
 		bool	endFakeTransactionBlock();
 		bool	isBeginTransactionQuery(sqlrcursor_svr *cursor);
@@ -376,7 +376,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool	handleError(sqlrcursor_svr *cursor);
 		void	returnError(sqlrcursor_svr *cursor,
 						const char *error,
-						int64_t errno,
+						int64_t errnum,
 						bool disconnect);
 		void	returnResultSet();
 		void	returnOutputBindValues(sqlrcursor_svr *cursor);

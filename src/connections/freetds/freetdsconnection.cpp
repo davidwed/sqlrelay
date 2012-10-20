@@ -510,9 +510,9 @@ bool freetdscursor::openCursor(uint16_t id) {
 		if (!(prepareQuery(query,len) &&
 				executeQuery(query,len,true))) {
 			const char	*err;
-			int64_t		errno;
+			int64_t		errnum;
 			bool		live;
-			errorMessage(&err,&errno,&live);
+			errorMessage(&err,&errnum,&live);
 			fprintf(stderr,"%s\n",err);
 			retval=false;
 		} else {

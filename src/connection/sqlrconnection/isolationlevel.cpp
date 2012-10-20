@@ -47,9 +47,9 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 	// later if we ever add an API call to set the isolation level
 	/* else {
 		const char	*err;
-		int64_t		errno;
+		int64_t		errnum;
 		bool	liveconnection;
-		silcur->errorMessage(&err,&errno,&liveconnection));
+		silcur->errorMessage(&err,&errnum,&liveconnection));
 		*error=charstring::duplicate(err);
 	} */
 

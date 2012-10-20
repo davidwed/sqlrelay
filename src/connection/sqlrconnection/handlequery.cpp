@@ -27,13 +27,13 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 
 	// loop here to handle down databases
 	const char	*error;
-	int64_t		errno;
+	int64_t		errnum;
 	bool		liveconnection;
 	for (;;) {
 
 		// init error
 		error=NULL;
-		errno=0;
+		errnum=0;
 		liveconnection=true;
 
 		// process the query
@@ -43,7 +43,7 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 			success=handleFakeTransactionQueries(cursor,
 						&wasfaketransactionquery,
 						&error,
-						&errno);
+						&errnum);
 		}
 		if (!wasfaketransactionquery) {
 			success=processQuery(cursor,reexecute,
@@ -88,7 +88,7 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 			// get the error message from the database
 			// (unless it was already set)
 			if (!error) {
-				cursor->errorMessage(&error,&errno,
+				cursor->errorMessage(&error,&errnum,
 							&liveconnection);
 			}
 
@@ -98,7 +98,7 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 				!cfgfl->getWaitForDownDatabase()) {
 
 				// return the error
-				returnError(cursor,error,errno,!liveconnection);
+				returnError(cursor,error,errnum,!liveconnection);
 			}
 
 			// if the error was a dead connection
@@ -373,7 +373,7 @@ void sqlrconnection_svr::setFakeInputBinds(bool fake) {
 }
 
 void sqlrconnection_svr::returnError(sqlrcursor_svr *cursor,
-					const char *error, int64_t errno,
+					const char *error, int64_t errnum,
 					bool disconnect) {
 
 	dbgfile.debugPrint("connection",2,"returning error...");
@@ -386,7 +386,7 @@ void sqlrconnection_svr::returnError(sqlrcursor_svr *cursor,
 	}
 
 	// send the error code
-	clientsock->write((uint64_t)errno);
+	clientsock->write((uint64_t)errnum);
 
 	// send the error string
 	size_t	errorlen=charstring::length(error);

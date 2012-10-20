@@ -14,7 +14,7 @@ bool sqlrconnection_svr::supportsTransactionBlocks() {
 bool sqlrconnection_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 						bool *wasfaketransactionquery,
 						const char **error,
-						int64_t *errno) {
+						int64_t *errnum) {
 
 	*wasfaketransactionquery=false;
 
@@ -29,7 +29,7 @@ bool sqlrconnection_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 		sendcolumninfo=DONT_SEND_COLUMN_INFO;
 		if (intransactionblock) {
 			*error="begin while already in transaction block";
-			*errno=999999;
+			*errnum=999999;
 			return false;
 		}
 		return beginFakeTransactionBlock();
@@ -41,7 +41,7 @@ bool sqlrconnection_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 		// FIXME: move this into commitInternal
 		if (!intransactionblock) {
 			*error="commit while not in transaction block";
-			*errno=999998;
+			*errnum=999998;
 			return false;
 		}
 		return commitInternal();
@@ -53,7 +53,7 @@ bool sqlrconnection_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 		// FIXME: move this into rollbackInternal
 		if (!intransactionblock) {
 			*error="rollback while not in transaction block";
-			*errno=999997;
+			*errnum=999997;
 			return false;
 		}
 		return rollbackInternal();

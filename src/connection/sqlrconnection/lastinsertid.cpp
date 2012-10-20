@@ -76,9 +76,9 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id, char **error) {
 	} else {
 		// get error message
 		const char	*err;
-		int64_t		errno;
+		int64_t		errnum;
 		bool		liveconnection;
-		liicur->errorMessage(&err,&errno,&liveconnection);
+		liicur->errorMessage(&err,&errnum,&liveconnection);
 		*error=charstring::duplicate(err);
 	}
 

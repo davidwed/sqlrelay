@@ -101,9 +101,9 @@ bool sqlrconnection_svr::selectDatabase(const char *database, char **error) {
 		dbselected=true;
 	} else {
 		const char	*err;
-		int64_t		errno;
+		int64_t		errnum;
 		bool		liveconnection;
-		sdcur->errorMessage(&err,&errno,&liveconnection);
+		sdcur->errorMessage(&err,&errnum,&liveconnection);
 		*error=charstring::duplicate(err);
 	}
 	delete[] sdquery;
