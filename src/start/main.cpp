@@ -5,7 +5,6 @@
 #include <defaults.h>
 #include <sqlrconfigfile.h>
 #include <cmdline.h>
-#include <rudiments/snooze.h>
 #include <rudiments/process.h>
 
 // for ceil()
@@ -47,13 +46,6 @@ bool startListener(const char *id, const char *config,
 
 	if (!success) {
 		printf("\nsqlr-listener failed to start.\n");
-	}
-
-	// If debug is enabled then we need to wait a second for the shared
-	// memory to get created.  In non-debug mode the shared memory gets
-	// created after deamonize() is called and we don't have to wait.
-	if (listenerdebug) {
-		snooze::macrosnooze(1);
 	}
 
 	return success;
