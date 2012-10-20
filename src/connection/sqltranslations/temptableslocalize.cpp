@@ -7,6 +7,10 @@
 #include <debugprint.h>
 #include <rudiments/process.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 extern "C" {
 	sqltranslation	*new_temptableslocalize(
 					sqltranslations *sqlts,

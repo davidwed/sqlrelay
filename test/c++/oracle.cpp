@@ -7,7 +7,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
+#endif
 
 sqlrconnection	*con;
 sqlrcursor	*cur;

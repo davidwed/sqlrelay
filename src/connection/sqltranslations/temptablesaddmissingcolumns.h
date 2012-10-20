@@ -6,16 +6,14 @@
 
 #include <sqltranslation.h>
 
-using namespace rudiments;
-
 class temptablesaddmissingcolumns : public sqltranslation {
 	public:
 			temptablesaddmissingcolumns(
-						sqltranslations *sqlts,
-						xmldomnode *parameters);
+					sqltranslations *sqlts,
+					rudiments::xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldom *querytree);
+					rudiments::xmldom *querytree);
 };
 
 #endif

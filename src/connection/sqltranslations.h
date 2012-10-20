@@ -11,8 +11,6 @@
 #include <rudiments/dynamiclib.h>
 #include <sqltranslation.h>
 
-using namespace rudiments;
-
 class sqlrconnection_svr;
 class sqlrcursor_svr;
 
@@ -25,8 +23,8 @@ class databaseobject {
 
 class sqltranslationplugin {
 	public:
-		sqltranslation	*tr;
-		dynamiclib	*dl;
+		sqltranslation		*tr;
+		rudiments::dynamiclib	*dl;
 };
 
 class sqltranslations {
@@ -37,7 +35,7 @@ class sqltranslations {
 		bool	loadTranslations(const char *translations);
 		bool	runTranslations(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
-						xmldom *querytree);
+						rudiments::xmldom *querytree);
 
 		bool	getReplacementTableName(const char *database,
 						const char *schema,
@@ -47,7 +45,7 @@ class sqltranslations {
 						const char *schema,
 						const char *oldname,
 						const char **newname);
-		databaseobject *createDatabaseObject(memorypool *pool,
+		databaseobject *createDatabaseObject(rudiments::memorypool *pool,
 						const char *database,
 						const char *schema,
 						const char *object);
@@ -55,51 +53,51 @@ class sqltranslations {
 		void	endSession();
 	private:
 		void	unloadTranslations();
-		void	loadTranslation(xmldomnode *translation);
+		void	loadTranslation(rudiments::xmldomnode *translation);
 
 		bool	getReplacementName(
-				dictionary< databaseobject *, char *> *dict,
+				rudiments::dictionary< databaseobject *, char *> *dict,
 				const char *database,
 				const char *schema,
 				const char *oldname,
 				const char **newname);
 		
-		xmldom	*xmld;
-		xmldom	*tree;
+		rudiments::xmldom	*xmld;
+		rudiments::xmldom	*tree;
 
-		linkedlist< sqltranslationplugin * >	tlist;
+		rudiments::linkedlist< sqltranslationplugin * >	tlist;
 
 
 	public:
 		// helper methods
-		xmldomnode	*newNode(xmldomnode *parentnode,
-						const char *type);
-		xmldomnode	*newNode(xmldomnode *parentnode,
-						const char *type,
-						const char *value);
-		xmldomnode	*newNodeAfter(xmldomnode *parentnode,
-						xmldomnode *node,
-						const char *type);
-		xmldomnode	*newNodeAfter(xmldomnode *parentnode,
-						xmldomnode *node,
-						const char *type,
-						const char *value);
-		xmldomnode	*newNodeBefore(xmldomnode *parentnode,
-						xmldomnode *node,
-						const char *type);
-		xmldomnode	*newNodeBefore(xmldomnode *parentnode,
-						xmldomnode *node,
-						const char *type,
-						const char *value);
-		void		setAttribute(xmldomnode *node,
-						const char *name,
-						const char *value);
+		rudiments::xmldomnode	*newNode(rudiments::xmldomnode *parentnode,
+							const char *type);
+		rudiments::xmldomnode	*newNode(rudiments::xmldomnode *parentnode,
+							const char *type,
+							const char *value);
+		rudiments::xmldomnode	*newNodeAfter(rudiments::xmldomnode *parentnode,
+							rudiments::xmldomnode *node,
+							const char *type);
+		rudiments::xmldomnode	*newNodeAfter(rudiments::xmldomnode *parentnode,
+							rudiments::xmldomnode *node,
+							const char *type,
+							const char *value);
+		rudiments::xmldomnode	*newNodeBefore(rudiments::xmldomnode *parentnode,
+							rudiments::xmldomnode *node,
+							const char *type);
+		rudiments::xmldomnode	*newNodeBefore(rudiments::xmldomnode *parentnode,
+							rudiments::xmldomnode *node,
+							const char *type,
+							const char *value);
+		void		setAttribute(rudiments::xmldomnode *node,
+							const char *name,
+							const char *value);
 		bool		isString(const char *value);
 
-		memorypool	*temptablepool;
-		memorypool	*tempindexpool;
-		dictionary< databaseobject *, char * >	temptablemap;
-		dictionary< databaseobject *, char * >	tempindexmap;
+		rudiments::memorypool	*temptablepool;
+		rudiments::memorypool	*tempindexpool;
+		rudiments::dictionary< databaseobject *, char * >	temptablemap;
+		rudiments::dictionary< databaseobject *, char * >	tempindexmap;
 };
 
 #endif

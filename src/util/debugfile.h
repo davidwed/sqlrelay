@@ -3,14 +3,10 @@
 
 #include <rudiments/logger.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class debugfile {
 	public:
-				debugfile();
-				~debugfile();
+			debugfile();
+			~debugfile();
 		void	init(const char *name, const char *localstatedir);
 		bool	openDebugFile();
 		void	closeDebugFile();
@@ -28,10 +24,11 @@ class debugfile {
 		void	debugPrintBlob(const char *blob, uint32_t length);
 		void	debugPrintClob(const char *clob, uint32_t length);
 	private:
-		filedestination	*dbgfile;
-		logger		*debuglogger;
-		char		*dbgfilename;
-		bool		enabled;
+		rudiments::filedestination	*dbgfile;
+		rudiments::logger		*debuglogger;
+
+		char	*dbgfilename;
+		bool	enabled;
 };
 
 #endif

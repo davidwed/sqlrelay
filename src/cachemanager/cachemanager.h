@@ -10,10 +10,6 @@
 #include <cmdline.h>
 #include <tempdir.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class dirnode {
 	friend class cachemanager;
 	private:
@@ -24,7 +20,7 @@ class dirnode {
 		dirnode	*next;
 };
 
-class cachemanager : public daemonprocess {
+class cachemanager : public rudiments::daemonprocess {
 	public:
 			cachemanager(int argc, const char **argv);
 			~cachemanager();

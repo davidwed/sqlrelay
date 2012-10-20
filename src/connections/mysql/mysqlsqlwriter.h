@@ -3,8 +3,6 @@
 
 #include <sqlwriter.h>
 
-using namespace rudiments;
-
 class mysqlsqlwriter : public sqlwriter {
 	public:
 			mysqlsqlwriter();

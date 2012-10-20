@@ -1,6 +1,8 @@
 #include <rudiments/inetclientsocket.h>
 
+#ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
+#endif
 
 int main() {
 	for (int i=0; i<16384; i++) {

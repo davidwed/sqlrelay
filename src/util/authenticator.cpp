@@ -7,6 +7,10 @@
 
 #include <authenticator.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 authenticator::authenticator(sqlrconfigfile *cfgfile) {
 
 	// get the list of users from the config file

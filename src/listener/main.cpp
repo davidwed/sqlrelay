@@ -4,6 +4,10 @@
 #include <sqlrlistener.h>
 #include <rudiments/process.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 sqlrlistener	*lsnr;
 
 void crash(int32_t signum) {

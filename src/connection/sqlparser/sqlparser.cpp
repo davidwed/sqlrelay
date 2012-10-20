@@ -7,6 +7,10 @@
 #include <sqlparser.h>
 #include <debugprint.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 sqlparser::sqlparser() {
 	tree=NULL;
 	error=false;

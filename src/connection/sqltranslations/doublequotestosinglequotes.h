@@ -6,17 +6,15 @@
 
 #include <sqltranslation.h>
 
-using namespace rudiments;
-
 class doublequotestosinglequotes : public sqltranslation {
 	public:
 			doublequotestosinglequotes(sqltranslations *sqlts,
-						xmldomnode *parameters);
+					rudiments::xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldom *querytree);
+					rudiments::xmldom *querytree);
 	private:
-		bool	replaceDoubleQuotes(xmldomnode *node);
+		bool	replaceDoubleQuotes(rudiments::xmldomnode *node);
 };
 
 #endif

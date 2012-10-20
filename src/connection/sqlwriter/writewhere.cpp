@@ -4,6 +4,10 @@
 #include <sqlwriter.h>
 #include <debugprint.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 bool sqlwriter::where(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("where");

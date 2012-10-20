@@ -6,42 +6,45 @@
 
 #include <sqltranslation.h>
 
-using namespace rudiments;
-
 class informixtooracledate : public sqltranslation {
 	public:
 			informixtooracledate(sqltranslations *sqlts,
-						xmldomnode *parameters);
+					rudiments::xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldom *querytree);
+					rudiments::xmldom *querytree);
 	private:
 		bool	translateFunctions(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldomnode *node);
+					rudiments::xmldomnode *node);
 		bool	translateExtend(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldomnode *node);
+					rudiments::xmldomnode *node);
 		bool	translateCurrentDate(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldomnode *node);
+					rudiments::xmldomnode *node);
 		bool	translateDateTime(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldomnode *node);
+					rudiments::xmldomnode *node);
 		bool	translateInterval(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldomnode *node);
+					rudiments::xmldomnode *node);
 
 		void	translateIntervalQualifier(
-					stringbuffer *formatstring,
-					xmldomnode *intervalqualifiernode);
-		xmldomnode	*wrapBoth(xmldomnode *functionnode,
+				rudiments::stringbuffer *formatstring,
+				rudiments::xmldomnode *intervalqualifiernode);
+
+		rudiments::xmldomnode	*wrapBoth(
+					rudiments::xmldomnode *functionnode,
 					const char *formatstring);
-		xmldomnode	*wrapToChar(xmldomnode *functionnode,
+		rudiments::xmldomnode	*wrapToChar(
+					rudiments::xmldomnode *functionnode,
 					const char *formatstring);
-		xmldomnode	*wrapToDate(xmldomnode *functionnode,
+		rudiments::xmldomnode	*wrapToDate(
+					rudiments::xmldomnode *functionnode,
 					const char *formatstring);
-		xmldomnode	*wrap(xmldomnode *functionnode,
+		rudiments::xmldomnode	*wrap(
+					rudiments::xmldomnode *functionnode,
 					const char *function,
 					const char *formatstring);
 };

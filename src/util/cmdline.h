@@ -1,15 +1,9 @@
 #ifndef SQLRUTIL_CMDLINE_H
 #define SQLRUTIL_CMDLINE_H
 
-#include <rudiments/logger.h>
-
 #include <rudiments/commandline.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
-class cmdline : public commandline {
+class cmdline : public rudiments::commandline {
 	public:
 			cmdline(int argc, const char **argv);
 

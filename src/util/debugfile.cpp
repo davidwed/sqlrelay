@@ -2,9 +2,14 @@
 // See the file COPYING for more information
 
 #include <debugfile.h>
+#include <rudiments/charstring.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/process.h>
 #include <config.h>
+
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
 
 debugfile::debugfile() {
 	dbgfile=NULL;

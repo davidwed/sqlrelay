@@ -5,6 +5,10 @@
 #include <debugprint.h>
 #include <rudiments/character.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 bool sqlparser::whiteSpace(const char *ptr, const char **newptr) {
 	while (*ptr && *ptr==' ') {
 		ptr++;

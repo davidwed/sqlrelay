@@ -6,6 +6,10 @@
 #include <sqlrcursor.h>
 #include <debugprint.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 extern "C" {
 	sqltranslation	*new_locksnowaitbydefault(
 					sqltranslations *sqlts,

@@ -7,16 +7,14 @@
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 
-using namespace rudiments;
-
 class sqlparser {
 	public:
 			sqlparser();
 			~sqlparser();
 
-		bool	parse(const char *query);
-		xmldom	*getTree();
-		xmldom	*detachTree();
+		bool			parse(const char *query);
+		rudiments::xmldom	*getTree();
+		rudiments::xmldom	*detachTree();
 
 	private:
 		bool	parseInternal(const char *query,
@@ -42,12 +40,14 @@ class sqlparser {
 					const char **newptr);
 
 
-		xmldomnode	*newNode(xmldomnode *parentnode,
-						const char *type);
-		xmldomnode	*newNode(xmldomnode *parentnode,
-						const char *type,
-						const char *value);
-		void		setAttribute(xmldomnode *node,
+		rudiments::xmldomnode	*newNode(
+					rudiments::xmldomnode *parentnode,
+					const char *type);
+		rudiments::xmldomnode	*newNode(
+					rudiments::xmldomnode *parentnode,
+					const char *type,
+					const char *value);
+		void	setAttribute(rudiments::xmldomnode *node,
 						const char *name,
 						const char *value);
 
@@ -85,63 +85,65 @@ class sqlparser {
 	// variable are all together.  Maybe I'll move them later.
 	public:
 		// generic...
-		bool	parseTableName(xmldomnode *currentnode,
-						const char *ptr,
-						const char **newptr);
+		bool	parseTableName(rudiments::xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr);
 		static const char	*_table_name_database;
 		static const char	*_table_name_schema;
 		static const char	*_table_name_table;
-		void	splitDatabaseObjectName(xmldomnode *currentnode,
+		void	splitDatabaseObjectName(
+					rudiments::xmldomnode *currentnode,
 						const char *name,
 						const char *databasetag,
 						const char *schematag,
 						const char *objecttag);
-		bool	parseName(xmldomnode *currentnode,
+		bool	parseName(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_name;
-		bool	parseType(xmldomnode *currentnode,
+		bool	parseType(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_type;
 		static const char	*_size;
-		bool	parseValues(xmldomnode *currentnode,
+		bool	parseValues(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_values;
 		static const char	*_value;
-		bool	parseLength(xmldomnode *currentnode,
+		bool	parseLength(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_length;
-		bool	parseScale(xmldomnode *currentnode,
+		bool	parseScale(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_scale;
-		bool	parseVerbatim(xmldomnode *currentnode,
+		bool	parseVerbatim(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_verbatim;
-		bool	parseRemainderVerbatim(xmldomnode *currentnode,
+		bool	parseRemainderVerbatim(
+					rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 
 
 
 		// create query...
-		bool	parseCreate(xmldomnode *currentnode,
+		bool	parseCreate(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	createClause(const char *ptr,
 						const char **newptr);
 		static const char	*_create;
-		bool	parseGlobal(xmldomnode *currentnode,
+		bool	parseGlobal(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	globalClause(const char *ptr,
 						const char **newptr);
 		static const char	*_global;
-		bool	parseTemporary(xmldomnode *currentnode,
+		bool	parseTemporary(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	temporaryClause(const char *ptr,
@@ -149,12 +151,12 @@ class sqlparser {
 		static const char	*_temporary;
 		bool	tableClause(const char *ptr,
 						const char **newptr);
-		bool	parseFulltext(xmldomnode *currentnode,
+		bool	parseFulltext(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	fulltext(const char *ptr, const char **newptr);
 		static const char	*_fulltext;
-		bool	parseSpatial(xmldomnode *currentnode,
+		bool	parseSpatial(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	spatial(const char *ptr, const char **newptr);
@@ -163,146 +165,148 @@ class sqlparser {
 
 
 		// create table...
-		bool	parseCreateTable(xmldomnode *currentnode,
+		bool	parseCreateTable(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_table;
-		bool	parseIfNotExists(xmldomnode *currentnode,
+		bool	parseIfNotExists(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	ifNotExistsClause(const char *ptr,
 						const char **newptr);
 		static const char	*_if_not_exists;
 		bool	parseColumnAndConstraintDefinitions(
-						xmldomnode *currentnode,
+					rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_columns;
 		static const char	*_column;
-		bool	parseColumnDefinition(xmldomnode *currentnode,
+		bool	parseColumnDefinition(
+					rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseConstraints(xmldomnode *currentnode,
+		bool	parseConstraints(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_constraints;
-		bool	parseUnsigned(xmldomnode *currentnode,
+		bool	parseUnsigned(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	unsignedClause(const char *ptr,
 						const char **newptr);
 		static const char	*_unsigned;
-		bool	parseZeroFill(xmldomnode *currentnode,
+		bool	parseZeroFill(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	zeroFillClause(const char *ptr,
 						const char **newptr);
 		static const char	*_zerofill;
-		bool	parseBinary(xmldomnode *currentnode,
+		bool	parseBinary(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	binaryClause(const char *ptr,
 						const char **newptr);
 		static const char	*_binary;
-		bool	parseCharacterSet(xmldomnode *currentnode,
+		bool	parseCharacterSet(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	characterSetClause(const char *ptr,
 						const char **newptr);
 		static const char	*_character_set;
-		bool	parseCollate(xmldomnode *currentnode,
+		bool	parseCollate(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	collateClause(const char *ptr,
 						const char **newptr);
 		static const char	*_collate;
-		bool	parseNull(xmldomnode *currentnode,
+		bool	parseNull(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	nullClause(const char *ptr,
 						const char **newptr);
 		static const char	*_null;
-		bool	parseNotNull(xmldomnode *currentnode,
+		bool	parseNotNull(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	notNullClause(const char *ptr,
 						const char **newptr);
 		static const char	*_not_null;
-		bool	parseDefault(xmldomnode *currentnode,
+		bool	parseDefault(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	defaultClause(const char *ptr,
 						const char **newptr);
 		static const char	*_default;
-		bool	parseAutoIncrement(xmldomnode *currentnode,
+		bool	parseAutoIncrement(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	autoIncrementClause(const char *ptr,
 						const char **newptr);
 		static const char	*_auto_increment;
-		bool	parseUniqueKey(xmldomnode *currentnode,
+		bool	parseUniqueKey(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	uniqueKeyClause(const char *ptr,
 						const char **newptr);
 		static const char	*_unique_key;
-		bool	parsePrimaryKey(xmldomnode *currentnode,
+		bool	parsePrimaryKey(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	primaryKeyClause(const char *ptr,
 						const char **newptr);
 		static const char	*_primary_key;
-		bool	parseKey(xmldomnode *currentnode,
+		bool	parseKey(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	keyClause(const char *ptr,
 						const char **newptr);
 		static const char	*_key;
-		bool	parseComment(xmldomnode *currentnode,
+		bool	parseComment(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	commentClause(const char *ptr,
 						const char **newptr);
 		static const char	*_comment;
-		bool	parseColumnFormat(xmldomnode *currentnode,
+		bool	parseColumnFormat(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	columnFormatClause(const char *ptr,
 						const char **newptr);
 		static const char	*_column_format;
-		bool	parseReferenceDefinition(xmldomnode *currentnode,
+		bool	parseReferenceDefinition(
+					rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	referencesClause(const char *ptr,
 						const char **newptr);
 		static const char	*_references;
-		bool	parseColumnNameList(xmldomnode *currentnode,
+		bool	parseColumnNameList(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseMatch(xmldomnode *currentnode,
+		bool	parseMatch(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	matchClause(const char *ptr,
 						const char **newptr);
 		static const char	*_match;
-		bool	parseOnDelete(xmldomnode *currentnode,
+		bool	parseOnDelete(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	onDeleteClause(const char *ptr,
 						const char **newptr);
 		static const char	*_on_delete;
-		bool	parseOnUpdate(xmldomnode *currentnode,
+		bool	parseOnUpdate(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	onUpdateClause(const char *ptr,
 						const char **newptr);
 		static const char	*_on_update;
-		bool	parseReferenceOption(xmldomnode *currentnode,
+		bool	parseReferenceOption(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	referenceOptionClause(const char *ptr,
 						const char **newptr);
-		bool	parseOnCommit(xmldomnode *currentnode,
+		bool	parseOnCommit(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	onCommitClause(const char *ptr,
@@ -310,65 +314,65 @@ class sqlparser {
 		bool	onCommitOptionClause(const char *ptr,
 						const char **newptr);
 		static const char	*_on_commit;
-		bool	parseAs(xmldomnode *currentnode,
+		bool	parseAs(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	asClause(const char *ptr,
 						const char **newptr);
 		static const char	*_as;
-		bool	parseWithNoLog(xmldomnode *currentnode,
+		bool	parseWithNoLog(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_with_no_log;
-		bool	parseConstraint(xmldomnode *currentnode,
+		bool	parseConstraint(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 
 
 
 		// create index
-		bool	parseCreateIndex(xmldomnode *currentnode,
+		bool	parseCreateIndex(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	indexClause(const char *ptr, const char **newptr);
 		static const char	*_index;
-		bool	parseIndexName(xmldomnode *currentnode,
+		bool	parseIndexName(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_index_name_database;
 		static const char	*_index_name_schema;
 		static const char	*_index_name_index;
-		bool	parseIndexType(xmldomnode *currentnode,
+		bool	parseIndexType(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseBtree(xmldomnode *currentnode,
+		bool	parseBtree(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	btree(const char *ptr, const char **newptr);
 		static const char	*_btree;
-		bool	parseHash(xmldomnode *currentnode,
+		bool	parseHash(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	hash(const char *ptr, const char **newptr);
 		static const char	*_hash;
-		bool	parseOnClause(xmldomnode *currentnode,
+		bool	parseOnClause(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 
 
 
 		// create synonym
-		bool	parseCreateSynonym(xmldomnode *currentnode,
+		bool	parseCreateSynonym(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	synonymClause(const char *ptr, const char **newptr);
 		static const char	*_synonym;
-		bool	parseFor(xmldomnode *currentnode,
+		bool	parseFor(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	forClause(const char *ptr, const char **newptr);
 		static const char	*_for;
-		bool	parseDatabaseObjectName(xmldomnode *currentnode,
+		bool	parseDatabaseObjectName(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_object_name_database;
@@ -377,80 +381,80 @@ class sqlparser {
 
 
 		// drop query...
-		bool	parseDrop(xmldomnode *currentnode,
+		bool	parseDrop(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	dropClause(const char *ptr,
 						const char **newptr);
 		static const char	*_drop;
-		bool	parseDropTemporary(xmldomnode *currentnode,
+		bool	parseDropTemporary(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_drop_temporary;
-		bool	parseDropTable(xmldomnode *currentnode,
+		bool	parseDropTable(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseIfExists(xmldomnode *currentnode,
+		bool	parseIfExists(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	ifExistsClause(const char *ptr,
 						const char **newptr);
 		static const char	*_if_exists;
-		bool	parseTableNameList(xmldomnode *currentnode,
+		bool	parseTableNameList(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_table_name_list;
 		static const char	*_table_name_list_item;
-		bool	parseRestrict(xmldomnode *currentnode,
+		bool	parseRestrict(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	restrictClause(const char *ptr,
 						const char **newptr);
 		static const char	*_restrict;
-		bool	parseCascade(xmldomnode *currentnode,
+		bool	parseCascade(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	cascadeClause(const char *ptr,
 						const char **newptr);
 		static const char	*_cascade;
-		bool	parseCascadeConstraintsClause(xmldomnode *currentnode,
+		bool	parseCascadeConstraintsClause(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	cascadeConstraintsClause(const char *ptr,
 						const char **newptr);
 		static const char	*_cascade_constraints_clause;
-		bool	parseDropIndex(xmldomnode *currentnode,
+		bool	parseDropIndex(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 
 
 
 		// insert query...
-		bool	parseInsert(xmldomnode *currentnode,
+		bool	parseInsert(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	insertClause(const char *ptr,
 						const char **newptr);
 		static const char	*_insert;
-		bool	parseInsertInto(xmldomnode *currentnode,
+		bool	parseInsertInto(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	insertIntoClause(const char *ptr,
 						const char **newptr);
 		static const char	*_insert_into;
-		bool	parseInsertValues(xmldomnode *currentnode,
+		bool	parseInsertValues(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	insertValuesClause(const char *ptr,
 						const char **newptr);
 		static const char	*_insert_values_clause;
-		bool	parseInsertValue(xmldomnode *currentnode,
+		bool	parseInsertValue(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	insertValueClause(const char *ptr,
 						const char **newptr);
 		static const char	*_insert_value_clause;
-		bool	parseInsertValuesList(xmldomnode *currentnode,
+		bool	parseInsertValuesList(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_insert_value;
@@ -458,13 +462,13 @@ class sqlparser {
 
 
 		// update query...
-		bool	parseUpdate(xmldomnode *currentnode,
+		bool	parseUpdate(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	updateClause(const char *ptr,
 						const char **newptr);
 		static const char	*_update;
-		bool	parseUpdateSet(xmldomnode *currentnode,
+		bool	parseUpdateSet(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr,
 						bool required);
@@ -477,19 +481,19 @@ class sqlparser {
 
 
 		// delete query...
-		bool	parseDelete(xmldomnode *currentnode,
+		bool	parseDelete(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	deleteClause(const char *ptr,
 						const char **newptr);
 		static const char	*_delete;
-		bool	parseDeleteFrom(xmldomnode *currentnode,
+		bool	parseDeleteFrom(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	deleteFromClause(const char *ptr,
 						const char **newptr);
 		static const char	*_delete_from;
-		bool	parseUsing(xmldomnode *currentnode,
+		bool	parseUsing(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	usingClause(const char *ptr,
@@ -499,7 +503,7 @@ class sqlparser {
 
 
 		// select query...
-		bool	parseSelect(xmldomnode *currentnode,
+		bool	parseSelect(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	selectClause(const char *ptr,
@@ -508,118 +512,118 @@ class sqlparser {
 		static const char	*_select_expressions;
 		static const char	*_select_expression;
 		bool	parseSelectExpressionAlias(
-						xmldomnode *currentnode,
+						rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseAlias(xmldomnode *currentnode,
+		bool	parseAlias(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr,
 						bool subselect);
-		bool	parseSubSelects(xmldomnode *currentnode,
+		bool	parseSubSelects(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_sub_select;
-		bool	parseSubSelectAlias(xmldomnode *currentnode,
+		bool	parseSubSelectAlias(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_alias;
-		bool	parseUnion(xmldomnode *currentnode,
+		bool	parseUnion(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	unionClause(const char *ptr,
 						const char **newptr);
 		static const char	*_union;
-		bool	parseAll(xmldomnode *currentnode,
+		bool	parseAll(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	allClause(const char *ptr,
 						const char **newptr);
 		static const char	*_all;
-		bool	parseUnique(xmldomnode *currentnode,
+		bool	parseUnique(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	uniqueClause(const char *ptr,
 						const char **newptr);
 		static const char	*_unique;
-		bool	parseNot(xmldomnode *currentnode,
+		bool	parseNot(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseDistinct(xmldomnode *currentnode,
+		bool	parseDistinct(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	distinctClause(const char *ptr,
 						const char **newptr);
 		static const char	*_distinct;
-		bool	parseDistinctRow(xmldomnode *currentnode,
+		bool	parseDistinctRow(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	distinctRowClause(const char *ptr,
 						const char **newptr);
 		static const char	*_distinct_row;
-		bool	parseHighPriority(xmldomnode *currentnode,
+		bool	parseHighPriority(rudiments::xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr);
 		bool	highPriorityClause(const char *ptr,
 						const char **newptr);
 		static const char	*_high_priority;
 		bool	parseStraightJoinSelectOption(
-					xmldomnode *currentnode,
+					rudiments::xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr);
 		bool	straightJoinSelectOptionClause(const char *ptr,
 						const char **newptr);
 		static const char	*_straight_join_select_option;
-		bool	parseSqlSmallResult(xmldomnode *currentnode,
+		bool	parseSqlSmallResult(rudiments::xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr);
 		bool	sqlSmallResultClause(const char *ptr,
 						const char **newptr);
 		static const char	*_sql_small_result;
-		bool	parseSqlBigResult(xmldomnode *currentnode,
+		bool	parseSqlBigResult(rudiments::xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr);
 		bool	sqlBigResultClause(const char *ptr,
 						const char **newptr);
 		static const char	*_sql_big_result;
-		bool	parseSqlBufferResult(xmldomnode *currentnode,
+		bool	parseSqlBufferResult(rudiments::xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr);
 		bool	sqlBufferResultClause(const char *ptr,
 						const char **newptr);
 		static const char	*_sql_buffer_result;
-		bool	parseSqlCache(xmldomnode *currentnode,
+		bool	parseSqlCache(rudiments::xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr);
 		bool	sqlCacheClause(const char *ptr,
 						const char **newptr);
 		static const char	*_sql_cache;
-		bool	parseSqlNoCache(xmldomnode *currentnode,
+		bool	parseSqlNoCache(rudiments::xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr);
 		bool	sqlNoCacheClause(const char *ptr,
 						const char **newptr);
 		static const char	*_sql_no_cache;
-		bool	parseSqlCalcFoundRows(xmldomnode *currentnode,
+		bool	parseSqlCalcFoundRows(rudiments::xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr);
 		bool	sqlCalcFoundRowsClause(const char *ptr,
 						const char **newptr);
 		static const char	*_sql_calc_found_rows;
-		bool	parseFrom(xmldomnode *currentnode,
+		bool	parseFrom(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	fromClause(const char *ptr,
 						const char **newptr);
 		static const char	*_from;
-		bool	parseTableReferences(xmldomnode *currentnode,
+		bool	parseTableReferences(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_table_references;
-		bool	parseTableReference(xmldomnode *currentnode,
+		bool	parseTableReference(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_table_reference;
-		bool	parseJoin(xmldomnode *currentnode,
+		bool	parseJoin(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_join_clause;
@@ -640,210 +644,210 @@ class sqlparser {
 		static const char	*_natural;
 		bool	joinClause(const char *ptr, const char **newptr);
 		static const char	*_join;
-		bool	parseOn(xmldomnode *currentnode,
+		bool	parseOn(rudiments::xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr);
 		bool	onClause(const char *ptr, const char **newptr);
 		static const char	*_on;
-		bool	parseJoinUsing(xmldomnode *currentnode,
+		bool	parseJoinUsing(rudiments::xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr);
 		bool	joinUsingClause(const char *ptr, const char **newptr);
 		static const char	*_join_using;
-		bool	parseWhere(xmldomnode *currentnode,
+		bool	parseWhere(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	whereClause(const char *ptr,
 						const char **newptr);
 		static const char	*_where;
-		bool	parseHaving(xmldomnode *currentnode,
+		bool	parseHaving(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	havingClause(const char *ptr,
 						const char **newptr);
 		static const char	*_having;
-		bool	parseWhereClauseTerms(xmldomnode *currentnode,
+		bool	parseWhereClauseTerms(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseAnd(xmldomnode *currentnode,
+		bool	parseAnd(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	andClause(const char *ptr, const char **newptr);
 		static const char	*_and;
-		bool	parseOr(xmldomnode *currentnode,
+		bool	parseOr(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	orClause(const char *ptr, const char **newptr);
 		static const char 	*_or;
-		bool	parseWhereClauseTerm(xmldomnode *currentnode,
+		bool	parseWhereClauseTerm(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_group;
-		bool	parseComparison(xmldomnode *currentnode,
+		bool	parseComparison(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr,
 						bool checkforgroup);
 		static const char	*_comparison;
 		bool	notClause(const char *ptr, const char **newptr);
 		static const char	*_not;
-		bool	parseBetween(xmldomnode *currentnode,
+		bool	parseBetween(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	betweenClause(const char *ptr, const char **newptr);
 		static const char	*_between;
-		bool	parseIn(xmldomnode *currentnode,
+		bool	parseIn(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	inClause(const char *ptr, const char **newptr);
 		static const char	*_in;
-		bool	parseInSet(xmldomnode *currentnode,
+		bool	parseInSet(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_in_set_item;
-		bool	parseExists(xmldomnode *currentnode,
+		bool	parseExists(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	existsClause(const char *ptr, const char **newptr);
 		static const char	*_exists;
-		bool	parseIs(xmldomnode *currentnode,
+		bool	parseIs(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	is(const char *ptr, const char **newptr);
 		static const char	*_is;
-		bool	parseLike(xmldomnode *currentnode,
+		bool	parseLike(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	like(const char *ptr, const char **newptr);
 		static const char	*_like;
-		bool	parseMatches(xmldomnode *currentnode,
+		bool	parseMatches(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	matches(const char *ptr, const char **newptr);
 		static const char	*_matches;
-		bool	parseNullSafeEquals(xmldomnode *currentnode,
+		bool	parseNullSafeEquals(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	nullSafeEquals(const char *ptr, const char **newptr);
 		static const char	*_null_safe_equals;
-		bool	parseEquals(xmldomnode *currentnode,
+		bool	parseEquals(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseNotEquals(xmldomnode *currentnode,
+		bool	parseNotEquals(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_not_equals;
-		bool	parseLessThan(xmldomnode *currentnode,
+		bool	parseLessThan(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_less_than;
-		bool	parseGreaterThan(xmldomnode *currentnode,
+		bool	parseGreaterThan(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_greater_than;
-		bool	parseLessThanOrEqualTo(xmldomnode *currentnode,
+		bool	parseLessThanOrEqualTo(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_less_than_or_equal_to;
-		bool	parseGreaterThanOrEqualTo(xmldomnode *currentnode,
+		bool	parseGreaterThanOrEqualTo(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_greater_than_or_equal_to;
-		bool	parseEscape(xmldomnode *currentnode,
+		bool	parseEscape(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	escape(const char *ptr, const char **newptr);
 		static const char	*_escape;
-		bool	parseExpression(xmldomnode *currentnode,
+		bool	parseExpression(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseExpression(xmldomnode *currentnode,
+		bool	parseExpression(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr,
 						bool ingroup);
 		static const char	*_expression;
-		bool	parseUnaryOperator(xmldomnode *currentnode,
+		bool	parseUnaryOperator(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseCompliment(xmldomnode *currentnode,
+		bool	parseCompliment(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_compliment;
-		bool	parseInverse(xmldomnode *currentnode,
+		bool	parseInverse(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_inverse;
-		bool	parseNegative(xmldomnode *currentnode,
+		bool	parseNegative(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_negative;
-		bool	parseBinaryOperator(xmldomnode *currentnode,
+		bool	parseBinaryOperator(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseTimes(xmldomnode *currentnode,
+		bool	parseTimes(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_times;
-		bool	parseDividedBy(xmldomnode *currentnode,
+		bool	parseDividedBy(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_divided_by;
-		bool	parseModulo(xmldomnode *currentnode,
+		bool	parseModulo(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_modulo;
-		bool	parsePlus(xmldomnode *currentnode,
+		bool	parsePlus(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_plus;
-		bool	parseMinus(xmldomnode *currentnode,
+		bool	parseMinus(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_minus;
-		bool	parseLogicalAnd(xmldomnode *currentnode,
+		bool	parseLogicalAnd(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_logical_and;
-		bool	parseLogicalOr(xmldomnode *currentnode,
+		bool	parseLogicalOr(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_logical_or;
-		bool	parseBitwiseAnd(xmldomnode *currentnode,
+		bool	parseBitwiseAnd(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_bitwise_and;
-		bool	parseBitwiseOr(xmldomnode *currentnode,
+		bool	parseBitwiseOr(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_bitwise_or;
-		bool	parseBitwiseXor(xmldomnode *currentnode,
+		bool	parseBitwiseXor(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_bitwise_xor;
-		bool	parseTerm(xmldomnode *currentnode,
+		bool	parseTerm(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_number;
 		static const char	*_string_literal;
 		static const char	*_bind_variable;
-		bool	parseIntervalQualifier(xmldomnode *currentnode,
+		bool	parseIntervalQualifier(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_interval_qualifier;
-		bool	parseTo(xmldomnode *currentnode,
+		bool	parseTo(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	toClause(const char *ptr, const char **newptr);
 		static const char	*_to;
-		bool	parseTimeComponent(xmldomnode *currentnode,
+		bool	parseTimeComponent(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr,
 						const char *timecomponent,
 						const char *precscale);
 		static const char	*_precision;
-		bool	parseUnquotedLiteral(xmldomnode *currentnode,
+		bool	parseUnquotedLiteral(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseColumnOrFunction(xmldomnode *currentnode,
+		bool	parseColumnOrFunction(rudiments::xmldomnode *currentnode,
 						const char *name,
 						const char *ptr,
 						const char **newptr);
@@ -852,68 +856,68 @@ class sqlparser {
 		static const char	*_parameters;
 		static const char	*_parameter;
 		bool	specialFunctionName(const char *name);
-		void	splitColumnName(xmldomnode *currentnode,
+		void	splitColumnName(rudiments::xmldomnode *currentnode,
 						const char *name);
 		static const char	*_column_name_database;
 		static const char	*_column_name_schema;
 		static const char	*_column_name_table;
 		static const char	*_column_name_column;
-		bool	parseOuterJoinOperator(xmldomnode *currentnode,
+		bool	parseOuterJoinOperator(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	outerJoinOperatorClause(const char *ptr,
 						const char **newptr);
 		static const char	*_outer_join_operator;
 
-		bool	parseGroupBy(xmldomnode *currentnode,
+		bool	parseGroupBy(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	groupByClause(const char *ptr,
 						const char **newptr);
 		static const char	*_group_by;
 		static const char	*_group_by_item;
-		bool	parseWithRollup(xmldomnode *currentnode,
+		bool	parseWithRollup(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	withRollupClause(const char *ptr,
 						const char **newptr);
 		static const char	*_with_rollup;
-		bool	parseOrderBy(xmldomnode *currentnode,
+		bool	parseOrderBy(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	orderByClause(const char *ptr,
 						const char **newptr);
 		static const char	*_order_by;
 		static const char	*_order_by_item;
-		bool	parseAsc(xmldomnode *currentnode,
+		bool	parseAsc(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	asc(const char *ptr, const char **newptr);
 		static const char	*_asc;
-		bool	parseDesc(xmldomnode *currentnode,
+		bool	parseDesc(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	desc(const char *ptr, const char **newptr);
 		static const char	*_desc;
-		bool	parseLimit(xmldomnode *currentnode,
+		bool	parseLimit(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	limitClause(const char *ptr,
 						const char **newptr);
 		static const char	*_limit;
-		bool	parseProcedure(xmldomnode *currentnode,
+		bool	parseProcedure(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	procedureClause(const char *ptr,
 						const char **newptr);
 		static const char	*_procedure;
-		bool	parseSelectInto(xmldomnode *currentnode,
+		bool	parseSelectInto(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	selectIntoClause(const char *ptr,
 						const char **newptr);
 		static const char	*_select_into;
-		bool	parseForUpdate(xmldomnode *currentnode,
+		bool	parseForUpdate(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	forUpdateClause(const char *ptr,
@@ -922,28 +926,28 @@ class sqlparser {
 
 
 		// set query...
-		bool	parseSet(xmldomnode *currentnode,
+		bool	parseSet(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool setClause(const char *ptr, const char **newptr);
 		static const char	*_set;
-		bool	parseSetGlobal(xmldomnode *currentnode,
+		bool	parseSetGlobal(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	setGlobalClause(const char *ptr, const char **newptr);
 		static const char	*_set_global;
-		bool	parseSetSession(xmldomnode *currentnode,
+		bool	parseSetSession(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	setSessionClause(const char *ptr, const char **newptr);
 		static const char	*_set_session;
-		bool	parseTransaction(xmldomnode *currentnode,
+		bool	parseTransaction(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	transactionClause(const char *ptr,
 						const char **newptr);
 		static const char	*_transaction;
-		bool	parseIsolationLevel(xmldomnode *currentnode,
+		bool	parseIsolationLevel(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	isolationLevelClause(const char *ptr,
@@ -951,7 +955,7 @@ class sqlparser {
 		static const char	*_isolation_level;
 		bool	isolationLevelOptionClause(const char *ptr,
 						const char **newptr);
-		bool	parseTransactionName(xmldomnode *currentnode,
+		bool	parseTransactionName(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	transactionNameClause(const char *ptr,
@@ -960,30 +964,30 @@ class sqlparser {
 
 
 		// lock query
-		bool	parseLock(xmldomnode *currentnode,
+		bool	parseLock(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	lockClause(const char *ptr, const char **newptr);
 		static const char	*_lock;
 		static const char	*_in_mode;
-		bool	parseLockMode(xmldomnode *currentnode,
+		bool	parseLockMode(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		bool	lockModeClause(const char *ptr, const char **newptr);
 		static const char	*_lock_mode;
-		bool	parseMode(xmldomnode *currentnode,
+		bool	parseMode(rudiments::xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr);
 		bool	modeClause(const char *ptr, const char **newptr);
 		static const char	*_mode;
-		bool	parseNoWait(xmldomnode *currentnode,
+		bool	parseNoWait(rudiments::xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr);
 		bool	noWaitClause(const char *ptr, const char **newptr);
 		static const char	*_nowait;
 
-		xmldom	*tree;
-		bool	error;
+		rudiments::xmldom	*tree;
+		bool			error;
 
 		bool	useescapecharacters;
 };

@@ -16,10 +16,6 @@
 
 #define MAX_ADDRESSES	32
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 typedef enum {
 	NO_ATTRIBUTE,
 	ID_ATTRIBUTE,
@@ -100,7 +96,7 @@ class SQLRUTIL_DLLSPEC usercontainer {
 		const char	*password;
 };
 
-typedef linkedlistnode< usercontainer * >	usernode;
+typedef rudiments::linkedlistnode< usercontainer * >	usernode;
 
 class SQLRUTIL_DLLSPEC connectstringcontainer {
 	public:
@@ -125,11 +121,12 @@ class SQLRUTIL_DLLSPEC connectstringcontainer {
 		bool		behindloadbalancer;
 
 		// connect string parameters
-		parameterstring	connectstring;
-		uint16_t	connectstringcount;
+		rudiments::parameterstring	connectstring;
+		uint16_t			connectstringcount;
 };
 
-typedef linkedlistnode< connectstringcontainer * >	connectstringnode;
+typedef rudiments::linkedlistnode< connectstringcontainer * >	
+						connectstringnode;
 
 class SQLRUTIL_DLLSPEC routecontainer {
 	friend class sqlrconfigfile;
@@ -150,20 +147,22 @@ class SQLRUTIL_DLLSPEC routecontainer {
 		const char	*getSocket();
 		const char	*getUser();
 		const char	*getPassword();
-		linkedlist< regularexpression * >	*getRegexList();
+		rudiments::linkedlist< rudiments::regularexpression * >	
+								*getRegexList();
 	private:
-		bool			isfilter;
-		char			*host;
-		uint16_t		port;
-		char			*socket;
-		char			*user;
-		char			*password;
-		linkedlist< regularexpression * >	regexlist;
+		bool		isfilter;
+		char		*host;
+		uint16_t	port;
+		char		*socket;
+		char		*user;
+		char		*password;
+		rudiments::linkedlist< rudiments::regularexpression * >
+								regexlist;
 };
 
-typedef linkedlistnode< routecontainer * >	routenode;
+typedef rudiments::linkedlistnode< routecontainer * >	routenode;
 
-class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
+class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 	public:
 			sqlrconfigfile();
 			~sqlrconfigfile();
@@ -226,8 +225,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		bool		getIgnoreSelectDatabase();
 		bool		getWaitForDownDatabase();
 
-		stringlist	*getSessionStartQueries();
-		stringlist	*getSessionEndQueries();
+		rudiments::stringlist	*getSessionStartQueries();
+		rudiments::stringlist	*getSessionEndQueries();
 
 		bool		getSidEnabled();
 		const char	*getSidHost();
@@ -240,15 +239,15 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 
 		const char	*getTriggers();
 
-		linkedlist< usercontainer * >	*getUserList();
-		linkedlist< connectstringcontainer * >
-					*getConnectStringList();
+		rudiments::linkedlist< usercontainer * >	*getUserList();
+		rudiments::linkedlist< connectstringcontainer * >
+							*getConnectStringList();
 		connectstringcontainer	*getConnectString(
 						const char *connectionid);
 		uint32_t		getConnectionCount();
 		uint32_t		getMetricTotal();
 
-		linkedlist< routecontainer * >	*getRouteList();
+		rudiments::linkedlist< routecontainer * >	*getRouteList();
 	private:
 		const char	*id;
 		bool		correctid;
@@ -328,8 +327,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 
 		bool		instart;
 		bool		inend;
-		stringlist	sessionstartqueries;
-		stringlist	sessionendqueries;
+		rudiments::stringlist	sessionstartqueries;
+		rudiments::stringlist	sessionendqueries;
 
 		bool		sidenabled;
 		char		*sidhost;
@@ -338,11 +337,11 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		char		*siduser;
 		char		*sidpassword;
 
-		stringbuffer	translations;
-		uint16_t	translationsdepth;
+		rudiments::stringbuffer	translations;
+		uint16_t		translationsdepth;
 
-		stringbuffer	triggers;
-		uint16_t	triggersdepth;
+		rudiments::stringbuffer	triggers;
+		uint16_t		triggersdepth;
 
 		usercontainer	*currentuser;
 
@@ -355,9 +354,10 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 
 		uint16_t	connectstringcount;
 
-		linkedlist< connectstringcontainer * >	connectstringlist;
-		linkedlist< usercontainer * >		userlist;
-		linkedlist< routecontainer *>		routelist;
+		rudiments::linkedlist< connectstringcontainer * >	
+							connectstringlist;
+		rudiments::linkedlist< usercontainer * >	userlist;
+		rudiments::linkedlist< routecontainer *>	routelist;
 		
 		typedef enum {
 			NO_TAG,

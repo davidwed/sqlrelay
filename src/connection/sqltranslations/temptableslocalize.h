@@ -6,27 +6,26 @@
 
 #include <sqltranslation.h>
 
-using namespace rudiments;
-
 class temptableslocalize : public sqltranslation {
 	public:
 			temptableslocalize(sqltranslations *sqlts,
-						xmldomnode *parameters);
+					rudiments::xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldom *querytree);
+					rudiments::xmldom *querytree);
 	private:
 		void		mapCreateTemporaryTableName(
 						sqlrconnection_svr *sqlrcon,
-						xmldomnode *query,
+						rudiments::xmldomnode *query,
 						const char *uniqueid);
 		void		mapCreateIndexOnTemporaryTableName(
-						xmldomnode *query,
+						rudiments::xmldomnode *query,
 						const char *uniqueid);
 		const char	*generateTempTableName(const char *oldtable,
 							const char *uniqueid);
-		bool		replaceTempNames(xmldomnode *node);
-		bool		verbatimTableReference(xmldomnode *node);
+		bool		replaceTempNames(rudiments::xmldomnode *node);
+		bool		verbatimTableReference(
+						rudiments::xmldomnode *node);
 };
 
 #endif

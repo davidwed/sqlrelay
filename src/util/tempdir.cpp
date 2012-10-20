@@ -1,8 +1,13 @@
 // Copyright (c) 2000-2005  David Muse
 // See the file COPYING for more information
 
+#include <rudiments/charstring.h>
 #include <tempdir.h>
 #include <stdio.h>
+
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
 
 tempdir::tempdir(cmdline *cmdl) {
 	if (cmdl->getLocalStateDir()[0]) {

@@ -5,6 +5,10 @@
 #include <debugprint.h>
 #include <rudiments/snooze.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 bool sqlparser::parseSelect(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {

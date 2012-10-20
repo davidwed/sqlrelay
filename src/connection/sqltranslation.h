@@ -7,8 +7,6 @@
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 
-using namespace rudiments;
-
 class sqlrconnection_svr;
 class sqlrcursor_svr;
 class sqltranslations;
@@ -16,14 +14,14 @@ class sqltranslations;
 class sqltranslation {
 	public:
 			sqltranslation(sqltranslations *sqlts,
-					xmldomnode *parameters);
+					rudiments::xmldomnode *parameters);
 
 		virtual bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldom *querytree);
+					rudiments::xmldom *querytree);
 	protected:
-		sqltranslations	*sqlts;
-		xmldomnode	*parameters;
+		sqltranslations		*sqlts;
+		rudiments::xmldomnode	*parameters;
 };
 
 #endif

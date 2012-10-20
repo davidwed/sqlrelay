@@ -14,16 +14,11 @@
 #include <rudiments/daemonprocess.h>
 #include <rudiments/semaphoreset.h>
 #include <rudiments/sharedmemory.h>
-#include <rudiments/randomnumber.h>
 
 // for pid_t
 #include <sys/types.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
-class scaler : public daemonprocess {
+class scaler : public rudiments::daemonprocess {
 
 	public:
 			scaler();
@@ -61,13 +56,14 @@ class scaler : public daemonprocess {
 
 		char		*idfilename;
 
-		semaphoreset	*semset;
+		rudiments::semaphoreset	*semset;
 
-		sharedmemory	*idmemory;
+		rudiments::sharedmemory	*idmemory;
 
-		linkedlist< connectstringcontainer * >	*connectstringlist;
-		const char		*connectionid;
-		int32_t			metrictotal;
+		rudiments::linkedlist< connectstringcontainer * >
+							*connectstringlist;
+		const char	*connectionid;
+		int32_t		metrictotal;
 
 		int		currentseed;
 

@@ -5,6 +5,10 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 sqltranslation::sqltranslation(sqltranslations *sqlts,
 				xmldomnode *parameters) {
 	this->sqlts=sqlts;

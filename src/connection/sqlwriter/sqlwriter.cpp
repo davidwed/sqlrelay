@@ -6,6 +6,10 @@
 #include <debugprint.h>
 #include <rudiments/character.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 sqlwriter::sqlwriter() {
 	debugFunction();
 	sqlrcon=NULL;

@@ -7,6 +7,10 @@
 #include <sqlparser.h>
 #include <debugprint.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 extern "C" {
 	sqltrigger	*new_droptableautoincrementoracle(
 					xmldomnode *parameters) {

@@ -3,8 +3,6 @@
 
 #include <sqlwriter.h>
 
-using namespace rudiments;
-
 class oracle8sqlwriter : public sqlwriter {
 	public:
 			oracle8sqlwriter();
@@ -13,20 +11,21 @@ class oracle8sqlwriter : public sqlwriter {
 	private:
 		virtual const char * const *unsupportedElements();
 
-		virtual bool	temporary(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	uniqueKey(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	cascade(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	selectQuery(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	as(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	isolationLevel(xmldomnode *node,
-						stringbuffer *output);
+		virtual bool	temporary(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	uniqueKey(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	cascade(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	selectQuery(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	as(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	isolationLevel(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
-		bool	convertDate(const char *date, stringbuffer *output);
+		bool	convertDate(const char *date,
+					rudiments::stringbuffer *output);
 };
 
 #endif

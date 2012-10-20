@@ -15,6 +15,7 @@
 #include <rudiments/datetime.h>
 #include <rudiments/error.h>
 #include <rudiments/process.h>
+#include <rudiments/randomnumber.h>
 
 // for waitpid()
 #include <sys/types.h>

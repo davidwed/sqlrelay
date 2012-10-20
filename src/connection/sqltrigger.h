@@ -7,22 +7,20 @@
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 
-using namespace rudiments;
-
 class sqlrconnection_svr;
 class sqlrcursor_svr;
 
 class sqltrigger {
 	public:
-			sqltrigger(xmldomnode *parameters);
+			sqltrigger(rudiments::xmldomnode *parameters);
 
 		virtual bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldom *querytree,
+					rudiments::xmldom *querytree,
 					bool before,
 					bool success);
 	protected:
-		xmldomnode	*parameters;
+		rudiments::xmldomnode	*parameters;
 };
 
 #endif

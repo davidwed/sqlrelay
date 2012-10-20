@@ -3,6 +3,10 @@
 #include <sqlparser.h>
 #include <debugprint.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments
+#endif
+
 oracle8sqlwriter::oracle8sqlwriter() : sqlwriter() {
 	debugFunction();
 }

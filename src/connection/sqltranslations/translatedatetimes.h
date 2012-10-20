@@ -6,28 +6,26 @@
 
 #include <sqltranslation.h>
 
-using namespace rudiments;
-
 class translatedatetimes : public sqltranslation {
 	public:
 			translatedatetimes(sqltranslations *sqlts,
-						xmldomnode *parameters);
+					rudiments::xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldom *querytree);
+					rudiments::xmldom *querytree);
 	private:
 		char *convertDateTime(const char *format,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second);
 		bool translateDateTimesInQuery(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
-						xmldomnode *querynode,
-						xmldomnode *parameters);
+					sqlrcursor_svr *sqlrcur,
+					rudiments::xmldomnode *querynode,
+					rudiments::xmldomnode *parameters);
 		bool translateDateTimesInBindVariables(
-						sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
-						xmldomnode *querynode,
-						xmldomnode *parameters);
+					sqlrconnection_svr *sqlrcon,
+					sqlrcursor_svr *sqlrcur,
+					rudiments::xmldomnode *querynode,
+					rudiments::xmldomnode *parameters);
 		const char * const *getShortMonths();
 		const char * const *getLongMonths();
 };

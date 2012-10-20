@@ -5,6 +5,10 @@
 #include <debugprint.h>
 #include <rudiments/character.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 bool sqlparser::parseUpdate(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {

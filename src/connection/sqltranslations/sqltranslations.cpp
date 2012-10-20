@@ -17,6 +17,10 @@
 #include <rudiments/process.h>
 #include <rudiments/character.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 sqltranslations::sqltranslations() {
 	debugFunction();
 	xmld=NULL;

@@ -5,6 +5,10 @@
 #include <sqlparser.h>
 #include <debugprint.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 bool sqlparser::parseExpression(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {

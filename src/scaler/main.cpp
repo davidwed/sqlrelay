@@ -3,6 +3,11 @@
 
 #include <scaler.h>
 #include <rudiments/process.h>
+#include <rudiments/charstring.h>
+
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
 
 scaler	*s;
 

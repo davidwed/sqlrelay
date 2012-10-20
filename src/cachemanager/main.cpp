@@ -9,6 +9,10 @@
 // for printf() in version.h
 #include <stdio.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 cachemanager	*cacheman;
 
 void shutDown(int32_t signum) {

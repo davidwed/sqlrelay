@@ -8,6 +8,10 @@
 // for fprintf()
 #include <stdio.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 cmdline::cmdline(int argc, const char **argv) : commandline(argc,argv) {
 	setId();
 	setConfig();

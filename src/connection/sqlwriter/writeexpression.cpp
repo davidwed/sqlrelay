@@ -5,6 +5,10 @@
 #include <sqlparser.h>
 #include <debugprint.h>
 
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
 bool sqlwriter::expression(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;

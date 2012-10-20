@@ -26,18 +26,15 @@
 
 #include <defines.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class handoffsocketnode {
 	friend class sqlrlistener;
 	private:
-		uint32_t		pid;
-		filedescriptor		*sock;
+		uint32_t				pid;
+		rudiments::filedescriptor		*sock;
 };
 
-class sqlrlistener : public daemonprocess, public listener {
+class sqlrlistener : public rudiments::daemonprocess,
+				public rudiments::listener {
 	public:
 			sqlrlistener();
 			~sqlrlistener();
@@ -61,19 +58,23 @@ class sqlrlistener : public daemonprocess, public listener {
 		bool	listenOnDeregistrationSocket(const char *id);
 		bool	listenOnFixupSocket(const char *id);
 		void	blockSignals();
-		filedescriptor	*waitForData();
-		bool	handleClientConnection(filedescriptor *fd);
-		bool	registerHandoff(filedescriptor *sock);
-		bool	deRegisterHandoff(filedescriptor *sock);
-		bool	fixup(filedescriptor *sock);
-		bool	deniedIp(filedescriptor *clientsock);
-		void	forkChild(filedescriptor *clientsock);
-		void	clientSession(filedescriptor *clientsock);
-		void	sqlrelayClientSession(filedescriptor *clientsock);
-		void	mysqlClientSession(filedescriptor *clientsock);
-		int32_t	getAuth(filedescriptor *clientsock);
-		int32_t	getMySQLAuth(filedescriptor *clientsock);
-		void    errorClientSession(filedescriptor *clientsock, const char *err);
+		rudiments::filedescriptor	*waitForData();
+		bool	handleClientConnection(rudiments::filedescriptor *fd);
+		bool	registerHandoff(rudiments::filedescriptor *sock);
+		bool	deRegisterHandoff(rudiments::filedescriptor *sock);
+		bool	fixup(rudiments::filedescriptor *sock);
+		bool	deniedIp(rudiments::filedescriptor *clientsock);
+		void	forkChild(rudiments::filedescriptor *clientsock);
+		void	clientSession(rudiments::filedescriptor *clientsock);
+		void	sqlrelayClientSession(
+				rudiments::filedescriptor *clientsock);
+		void	mysqlClientSession(
+				rudiments::filedescriptor *clientsock);
+		int32_t	getAuth(rudiments::filedescriptor *clientsock);
+		int32_t	getMySQLAuth(rudiments::filedescriptor *clientsock);
+		void    errorClientSession(
+				rudiments::filedescriptor *clientsock,
+				const char *err);
 		void	acquireSessionCountMutex();
 		void	releaseSessionCountMutex();
 		void	incrementSessionCount();
@@ -88,29 +89,34 @@ class sqlrlistener : public daemonprocess, public listener {
 		bool	acceptAvailableConnection(bool *alldbsdown);
 		bool	doneAcceptingAvailableConnection();
 		bool	isAlarmRang();
-		bool	handOffClient(filedescriptor *sock);
-		bool	getAConnection(uint32_t *connectionpid,
-					uint16_t *inetport,
-					char *unixportstr,
-					uint16_t *unixportstrlen,
-					filedescriptor *sock);
+		bool	handOffClient(rudiments::filedescriptor *sock);
+		bool	getAConnection(
+				uint32_t *connectionpid,
+				uint16_t *inetport,
+				char *unixportstr,
+				uint16_t *unixportstrlen,
+				rudiments::filedescriptor *sock);
 		bool	findMatchingSocket(uint32_t connectionpid,
-					filedescriptor *connectionsock);
+				rudiments::filedescriptor *connectionsock);
 		bool	requestFixup(uint32_t connectionpid,
-					filedescriptor *connectionsock);
+				rudiments::filedescriptor *connectionsock);
 		bool	connectionIsUp(const char *connectionid);
 		void	pingDatabase(uint32_t connectionpid,
 					const char *unixportstr,
 					uint16_t inetport);
-		filedescriptor	*connectToConnection(uint32_t connectionpid,
-						const char *unixportstr,
-						uint16_t inetport);
+		rudiments::filedescriptor
+				*connectToConnection(
+					uint32_t connectionpid,
+					const char *unixportstr,
+					uint16_t inetport);
 		bool	passClientFileDescriptorToConnection(
-					filedescriptor *connectionsock,
-					int fd);
-		void	waitForClientClose(int32_t authstatus, bool passstatus,
-						filedescriptor *clientsock);
-		void	flushWriteBuffer(filedescriptor *fd);
+				rudiments::filedescriptor *connectionsock,
+				int fd);
+		void	waitForClientClose(
+				int32_t authstatus,
+				bool passstatus,
+				rudiments::filedescriptor *clientsock);
+		void	flushWriteBuffer(rudiments::filedescriptor *fd);
 
 		static void	alarmHandler(int32_t signum);
 
@@ -130,33 +136,33 @@ class sqlrlistener : public daemonprocess, public listener {
 		// FIXME: these shouldn't have to be pointers, right, but
 		// it appears that they do have to be or their destructors don't
 		// get called.
-		semaphoreset	*semset;
-		sharedmemory	*idmemory;
+		rudiments::semaphoreset	*semset;
+		rudiments::sharedmemory	*idmemory;
 
 		bool		init;
 
-		unixserversocket	*clientsockun;
-		inetserversocket	**clientsockin;
-		uint64_t		clientsockincount;
+		rudiments::unixserversocket	*clientsockun;
+		rudiments::inetserversocket	**clientsockin;
+		uint64_t			clientsockincount;
 
-		unixserversocket	*mysqlclientsockun;
-		inetserversocket	**mysqlclientsockin;
-		uint64_t		mysqlclientsockincount;
+		rudiments::unixserversocket	*mysqlclientsockun;
+		rudiments::inetserversocket	**mysqlclientsockin;
+		uint64_t			mysqlclientsockincount;
 
 		char			*unixport;
 		char			*mysqlunixport;
 
 		clientsessiontype_t	sessiontype;
 
-		unixserversocket	*handoffsockun;
-		unixserversocket	*removehandoffsockun;
-		unixserversocket	*fixupsockun;
-		char			*fixupsockname;
+		rudiments::unixserversocket	*handoffsockun;
+		rudiments::unixserversocket	*removehandoffsockun;
+		rudiments::unixserversocket	*fixupsockun;
+		char				*fixupsockname;
 
 		handoffsocketnode	*handoffsocklist;
 
-		regularexpression	*allowed;
-		regularexpression	*denied;
+		rudiments::regularexpression	*allowed;
+		rudiments::regularexpression	*denied;
 
 		cmdline			*cmdl;
 
@@ -165,8 +171,8 @@ class sqlrlistener : public daemonprocess, public listener {
 
 		bool			isforkedchild;
 
-		static	signalhandler		alarmhandler;
-		static	volatile sig_atomic_t	alarmrang;
+		static	rudiments::signalhandler	alarmhandler;
+		static	volatile sig_atomic_t		alarmrang;
 
 		sqlrconfigfile		cfgfl;
 		uint32_t		runningconnections;

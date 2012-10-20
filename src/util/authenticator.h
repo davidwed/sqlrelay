@@ -6,10 +6,6 @@
 
 #include <sqlrconfigfile.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class authenticator {
 
 	public:
@@ -18,10 +14,11 @@ class authenticator {
 		bool	authenticate(const char *user, const char *password);
 
 	private:
-		linkedlist< usercontainer * >	userlist;
-		uint32_t			usercount;
-		char				**users;
-		char				**passwords;
+		rudiments::linkedlist< usercontainer * >	userlist;
+
+		uint32_t	usercount;
+		char		**users;
+		char		**passwords;
 };
 
 #endif

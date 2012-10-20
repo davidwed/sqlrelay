@@ -7,8 +7,6 @@
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 
-using namespace rudiments;
-
 class sqlrconnection_svr;
 class sqlrcursor_svr;
 
@@ -19,447 +17,449 @@ class sqlwriter {
 
 		virtual bool	write(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldom *tree,
-					stringbuffer *output);
+					rudiments::xmldom *tree,
+				rudiments::stringbuffer *output);
 		virtual bool	write(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldomnode *tree,
-					stringbuffer *output,
+					rudiments::xmldomnode *tree,
+					rudiments::stringbuffer *output,
 					bool omitsiblings);
 	protected:
-		virtual bool	write(xmldomnode *tree, stringbuffer *output);
+		virtual bool	write(rudiments::xmldomnode *tree, 
+					rudiments::stringbuffer *output);
 
 		virtual const char * const *supportedElements();
 		virtual const char * const *unsupportedElements();
 
 		virtual	bool	elementSupported(const char *element);
-		virtual bool	handleStart(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	handleEnd(xmldomnode *node,
-						stringbuffer *output);
+		virtual bool	handleStart(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	handleEnd(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 		// generic
-		virtual bool	tableNameDatabase(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	tableNameSchema(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	tableNameTable(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	name(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	type(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endType(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	size(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endSize(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	value(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	verbatim(xmldomnode *node,
-						stringbuffer *output);
+		virtual bool	tableNameDatabase(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	tableNameSchema(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	tableNameTable(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	name(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	type(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endType(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	size(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endSize(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	value(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	verbatim(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 		// create query...
-		virtual bool	createQuery(xmldomnode *node,
-						stringbuffer *output);
+		virtual bool	createQuery(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 		// table...
-		virtual bool	table(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	global(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	temporary(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	ifNotExists(xmldomnode *node,
-						stringbuffer *output);
+		virtual bool	table(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	global(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	temporary(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	ifNotExists(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 		// index...
-		virtual bool	fulltext(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	spatial(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	index(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	indexNameDatabase(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	indexNameSchema(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	indexNameIndex(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	btree(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	hash(xmldomnode *node,
-						stringbuffer *output);
+		virtual bool	fulltext(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	spatial(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	index(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	indexNameDatabase(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	indexNameSchema(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	indexNameIndex(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	btree(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	hash(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 
 		// synonym...
-		virtual bool	synonym(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	forClause(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	objectNameDatabase(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	objectNameSchema(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	objectNameObject(xmldomnode *node,
-						stringbuffer *output);
+		virtual bool	synonym(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	forClause(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	objectNameDatabase(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	objectNameSchema(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	objectNameObject(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 		
 
 		// column definitions...
-		virtual bool	columns(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endColumns(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	column(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endColumn(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	values(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endValues(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	length(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	scale(xmldomnode *node,
-						stringbuffer *output);
+		virtual bool	columns(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endColumns(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	column(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endColumn(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	values(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endValues(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	length(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	scale(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 		// constraints...
-		virtual bool	constraints(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	unsignedConstraint(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	zerofill(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	binary(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	characterSet(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	collate(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	nullable(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	notNull(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	defaultValue(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	autoIncrement(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	uniqueKey(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	primaryKey(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	key(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	comment(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	columnFormat(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	references(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endReferences(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	match(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	onDelete(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	onUpdate(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	onCommit(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	as(xmldomnode *node,
-						stringbuffer *output);
+		virtual bool	constraints(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	unsignedConstraint(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	zerofill(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	binary(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	characterSet(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	collate(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	nullable(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	notNull(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	defaultValue(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	autoIncrement(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	uniqueKey(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	primaryKey(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	key(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	comment(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	columnFormat(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	references(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endReferences(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	match(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	onDelete(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	onUpdate(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	onCommit(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	as(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 
 		// table creation qualifiers...
-		virtual bool	withNoLog(xmldomnode *node,
-						stringbuffer *output);
+		virtual bool	withNoLog(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 
 		// drop...
-		virtual bool	dropQuery(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	ifExists(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endTableNameListItem(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	restrictClause(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	cascade(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	cascadeConstraintsClause(xmldomnode *node,
-						stringbuffer *output);
+		virtual bool	dropQuery(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	ifExists(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endTableNameListItem(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	restrictClause(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	cascade(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	cascadeConstraintsClause(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 
 		// insert...
-		virtual bool	insertQuery(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	insertInto(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	insertValuesClause(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endInsertValuesClause(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	insertValueClause(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endInsertValueClause(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	insertValue(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endInsertValue(xmldomnode *node,
-						stringbuffer *output);
+		virtual bool	insertQuery(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	insertInto(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	insertValuesClause(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endInsertValuesClause(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	insertValueClause(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endInsertValueClause(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	insertValue(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endInsertValue(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 
 		// update...
-		virtual bool	updateQuery(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	updateSet(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	assignment(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endAssignment(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	equals(xmldomnode *node,
-						stringbuffer *output);
+		virtual bool	updateQuery(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	updateSet(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	assignment(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endAssignment(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	equals(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 
 		// delete...
-		virtual bool	deleteQuery(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	deleteFrom(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	usingClause(xmldomnode *node,
-						stringbuffer *output);
+		virtual bool	deleteQuery(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	deleteFrom(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	usingClause(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 
 		// select...
-		virtual bool	selectQuery(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	selectExpressions(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	selectExpression(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endSelectExpression(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	subSelect(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endSubSelect(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	unionClause(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	all(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	alias(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	unique(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	distinct(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	from(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	tableReferences(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	tableReference(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endTableReference(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	joinClause(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endJoinClause(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	inner(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	cross(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	straightJoin(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	left(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	right(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	outer(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	natural(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	join(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	on(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	joinUsing(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	where(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	andClause(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	orClause(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	group(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endGroup(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	comparison(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	notClause(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	between(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	in(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endIn(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	inSetItem(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endInSetItem(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	exists(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endExists(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	is(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	like(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	matches(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	nullSafeEquals(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	notEquals(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	lessThan(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	greaterThan(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	lessThanOrEqualTo(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	greaterThanOrEqualTo(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	escape(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	expression(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	intervalQualifier(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	outerJoinOperator(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	compliment(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	inverse(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	negative(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	plus(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	minus(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	times(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	dividedBy(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	modulo(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	bitwiseAnd(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	bitwiseOr(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	bitwiseXor(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	logicalAnd(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	logicalOr(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	number(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	stringLiteral(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	bindVariable(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	columnReference(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	columnNameDatabase(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	columnNameSchema(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	columnNameTable(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	columnNameColumn(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	function(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	parameters(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endParameters(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	parameter(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endParameter(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	groupBy(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	groupByItem(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endGroupByItem(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	withRollup(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	having(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	orderBy(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	orderByItem(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	endOrderByItem(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	asc(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	desc(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	limit(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	selectInto(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	procedure(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	forUpdate(xmldomnode *node,
-						stringbuffer *output);
+		virtual bool	selectQuery(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	selectExpressions(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	selectExpression(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endSelectExpression(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	subSelect(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endSubSelect(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	unionClause(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	all(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	alias(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	unique(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	distinct(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	from(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	tableReferences(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	tableReference(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endTableReference(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	joinClause(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endJoinClause(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	inner(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	cross(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	straightJoin(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	left(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	right(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	outer(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	natural(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	join(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	on(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	joinUsing(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	where(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	andClause(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	orClause(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	group(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endGroup(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	comparison(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	notClause(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	between(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	in(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endIn(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	inSetItem(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endInSetItem(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	exists(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endExists(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	is(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	like(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	matches(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	nullSafeEquals(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	notEquals(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	lessThan(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	greaterThan(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	lessThanOrEqualTo(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	greaterThanOrEqualTo(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	escape(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	expression(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	intervalQualifier(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	outerJoinOperator(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	compliment(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	inverse(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	negative(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	plus(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	minus(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	times(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	dividedBy(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	modulo(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	bitwiseAnd(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	bitwiseOr(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	bitwiseXor(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	logicalAnd(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	logicalOr(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	number(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	stringLiteral(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	bindVariable(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	columnReference(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	columnNameDatabase(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	columnNameSchema(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	columnNameTable(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	columnNameColumn(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	function(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	parameters(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endParameters(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	parameter(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endParameter(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	groupBy(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	groupByItem(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endGroupByItem(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	withRollup(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	having(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	orderBy(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	orderByItem(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	endOrderByItem(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	asc(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	desc(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	limit(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	selectInto(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	procedure(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	forUpdate(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 
 		// set...
-		virtual bool	setQuery(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	setSession(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	setGlobal(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	transaction(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	isolationLevel(xmldomnode *node,
-						stringbuffer *output);
+		virtual bool	setQuery(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	setSession(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	setGlobal(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	transaction(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	isolationLevel(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 
 		// lock...
-		virtual bool	lockQuery(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	inMode(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	lockMode(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	mode(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	noWait(xmldomnode *node,
-						stringbuffer *output);
+		virtual bool	lockQuery(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	inMode(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	lockMode(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	mode(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	noWait(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 
 
 		// helper methods
-		virtual bool	outputValue(xmldomnode *node,
-						stringbuffer *output);
-		virtual bool	space(stringbuffer *output);
-		virtual bool	comma(stringbuffer *output);
-		virtual bool	period(stringbuffer *output);
-		virtual bool	leftParen(stringbuffer *output);
-		virtual bool	rightParen(stringbuffer *output);
-		virtual bool	hasSibling(xmldomnode *node);
-		virtual bool	dontAppendSpace(stringbuffer *output);
+		virtual bool	outputValue(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	space(rudiments::stringbuffer *output);
+		virtual bool	comma(rudiments::stringbuffer *output);
+		virtual bool	period(rudiments::stringbuffer *output);
+		virtual bool	leftParen(rudiments::stringbuffer *output);
+		virtual bool	rightParen(rudiments::stringbuffer *output);
+		virtual bool	hasSibling(rudiments::xmldomnode *node);
+		virtual bool	dontAppendSpace(
+					rudiments::stringbuffer *output);
 
 		sqlrconnection_svr *sqlrcon;
 		sqlrcursor_svr *sqlrcur;

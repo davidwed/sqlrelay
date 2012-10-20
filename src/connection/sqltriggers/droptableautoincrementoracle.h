@@ -6,14 +6,13 @@
 
 #include <sqltrigger.h>
 
-using namespace rudiments;
-
 class droptableautoincrementoracle : public sqltrigger {
 	public:
-			droptableautoincrementoracle(xmldomnode *parameters);
+			droptableautoincrementoracle(
+					rudiments::xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldom *querytree,
+					rudiments::xmldom *querytree,
 					bool before,
 					bool success);
 	private:

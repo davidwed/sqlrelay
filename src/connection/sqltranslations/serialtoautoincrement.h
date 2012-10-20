@@ -6,15 +6,13 @@
 
 #include <sqltranslation.h>
 
-using namespace rudiments;
-
 class serialtoautoincrement : public sqltranslation {
 	public:
 			serialtoautoincrement(sqltranslations *sqlts,
-						xmldomnode *parameters);
+					rudiments::xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldom *querytree);
+					rudiments::xmldom *querytree);
 };
 
 #endif

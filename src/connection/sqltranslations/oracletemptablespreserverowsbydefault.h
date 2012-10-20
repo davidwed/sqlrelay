@@ -6,16 +6,14 @@
 
 #include <sqltranslation.h>
 
-using namespace rudiments;
-
 class oracletemptablespreserverowsbydefault : public sqltranslation {
 	public:
 			oracletemptablespreserverowsbydefault(
-						sqltranslations *sqlts,
-						xmldomnode *parameters);
+					sqltranslations *sqlts,
+					rudiments::xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldom *querytree);
+					rudiments::xmldom *querytree);
 };
 
 #endif
