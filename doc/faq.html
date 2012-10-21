@@ -538,6 +538,19 @@ chmod o+r tnsnames.ora
 
 <p>Another solution is to run SQL Relay as the oracle user and/or oinstall group, or to run it as a user that is in the oinstall group.</p>
 
+<p>A less common, but not terribly uncommon error is described below.</p>
+
+<br><a name="ocienvcreate"></a>
+<span class="heading3">SQL Relay fails to start against Oracle with error: OCIEnvCreate() failed.  How do I fix this?</span>
+
+<p>This error means that the Oracle OCI library, which SQL Relay uses, couldn't find something that it needed to set up the environment.</p>
+
+<p>The most common cause is an incomplete installation.  Try running sqlplus as the oracle user.  If it works, then the installation probably isn't incomplete.  If it doesn't, then you probably need to reinstall Oracle, or at least the client components, or Instant Client components if you're using that.</p>
+
+<p>The next most common cause of this is a permissions issue.  Something under the ORACLE_HOME (or Instant Client installation directory, if you're using Instant Client) isn't readable or executable by the user that SQL Relay is trying to run as.  Try running sqlplus as the same user and see if it works.  If it does then there probably isn't a permissions issue.  If it doesn't, then there could be a permissions issue.</p>
+
+<p>The next most common cause is an invalid ORACLE_HOME environment variable, or invalid oracle_home setting in the sqlrelay.conf file.  The ORACLE_SID environment variable, or sid setting in the sqlrelay.conf file, can either refer to an entry in the tnsnames.ora file or it can just be an fully qualified entry itself.  In the case of the former, the ORACLE_HOME must be set to a valid directory, under which network/admin/tnsnames.ora can be found.  In the case of the latter, when using Oracle 8 and 8i or any version of Oracle Instant Client, ORACLE_HOME can be set to anything at all or left empty, but when using Oracle 9i and up, ORACLE_HOME must be set to a valid location.</p>
+
 <br><a name="sqlserver"></a>
 <span class="heading3">Why can't I get SQL Relay to connect to Sybase/Microsoft SQL Server?</span>
 

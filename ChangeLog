@@ -17,6 +17,7 @@
 		fixing an oracle column-resource-related memory leak
 		eliminating sqlr-start delay
 		"using namespace rudiments" declaration fixes
+	added a faq entry about common OCIEnvCreate errors
 
 0.46 - refactored the translation framework to mimic the trigger framework
 	added make.batch file for building on windows
