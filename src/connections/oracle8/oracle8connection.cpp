@@ -1681,6 +1681,15 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 						uint16_t variablesize,
 						sqlrcursor_svr *cursor) {
 
+	// If the statement cache is in use then OCIStmtExecute will crash
+	// if the query includes cursor binds.  I'm not sure if this is an OCI
+	// bug or a problem caused by SQL Relay somehow, but until I discover
+	// a solution, we'll return an error here.  Ideally, I'd set an error
+	// message too...
+	if (oracle8conn->stmtcachesize) {
+		return false;
+	}
+
 	checkRePrepare();
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
