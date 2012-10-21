@@ -868,7 +868,6 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table testtable1");
 	printf("\n");
 
-#if 0
 	printf("CURSOR BINDS: \n");
 	cur->clearBinds();
 	checkSuccess(cur->sendQuery("create or replace package types is type cursorType is ref cursor; end;"),1);
@@ -891,7 +890,6 @@ int	main(int argc, char **argv) {
 	delete bindcur2;
 	checkSuccess(cur->sendQuery("drop package types"),1);
 	printf("\n");
-#endif
 
 	printf("LONG CLOB: \n");
 	cur->sendQuery("drop table testtable2");
