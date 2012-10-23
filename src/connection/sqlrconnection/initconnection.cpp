@@ -18,6 +18,11 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	// process command line
 	cmdl=new cmdline(argc,argv);
 
+	// default id warning
+	if (!charstring::compare(cmdl->getId(),DEFAULT_ID)) {
+		fprintf(stderr,"Warning: using default id.\n");
+	}
+
 	// get whether this connection was spawned by the scaler
 	scalerspawned=cmdl->found("-scaler");
 

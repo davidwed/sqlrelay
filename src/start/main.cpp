@@ -254,6 +254,11 @@ int main(int argc, const char **argv) {
 	const char	*id=cmdl.getId();
 	const char	*config=cmdl.getConfig();
 
+	// default id warning
+	if (!charstring::compare(cmdl.getId(),DEFAULT_ID)) {
+		fprintf(stderr,"Warning: using default id.\n");
+	}
+
 	// parse the config file(s)
 	sqlrconfigfile	cfgfile;
 	if (!cfgfile.parse(config,id)) {

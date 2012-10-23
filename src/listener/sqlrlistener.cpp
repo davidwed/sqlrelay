@@ -138,6 +138,10 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 
 	tmpdir=new tempdir(cmdl);
 
+	if (!charstring::compare(cmdl->getId(),DEFAULT_ID)) {
+		fprintf(stderr,"Warning: using default id.\n");
+	}
+
 	if (!cfgfl.parse(cmdl->getConfig(),cmdl->getId())) {
 		return false;
 	}

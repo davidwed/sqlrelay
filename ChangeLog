@@ -18,6 +18,7 @@
 		eliminating sqlr-start delay
 		"using namespace rudiments" declaration fixes
 	added a faq entry about common OCIEnvCreate errors
+	removed default id warning from sqlr-cachemanager
 
 0.46 - refactored the translation framework to mimic the trigger framework
 	added make.batch file for building on windows

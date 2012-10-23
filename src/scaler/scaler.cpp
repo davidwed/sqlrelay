@@ -69,7 +69,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	const char	*tmpid=cmdl->getValue("-id");
 	if (!(tmpid && tmpid[0])) {
 		tmpid=DEFAULT_ID;
-		fprintf(stderr,"Warning! using default id.\n");
+		fprintf(stderr,"Warning: using default id.\n");
 	}
 	id=charstring::duplicate(tmpid);
 

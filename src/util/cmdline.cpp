@@ -24,7 +24,6 @@ void cmdline::setId() {
 	id=getValue("-id");
 	if (!id[0]) {
 		id=DEFAULT_ID;
-		fprintf(stderr,"Warning: using default id.\n");
 	}
 }
 
