@@ -116,9 +116,13 @@ bool sqlrcursor::getCursorId() {
 		sqlrc->debugPreEnd();
 	}
 	if (sqlrc->cs->read(&cursorid)!=sizeof(uint16_t)) {
+		char	*err=error::getErrorString();
 		stringbuffer	errstr;
-		errstr.append("Failed to get a cursor id.\n A network error may have ocurred. ")->append(error::getErrorString());
+		errstr.append("Failed to get a cursor id.\n "
+				"A network error may have ocurred. ");
+		errstr.append(err);
 		setError(errstr.getString());
+		delete[] err;
 		return false;
 	}
 	havecursorid=true;

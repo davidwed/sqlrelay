@@ -89,8 +89,10 @@ bool statusconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
 	dbgfile.debugPrint("connection",0,idfilename);
 	idmemory=new sharedmemory();
 	if (!idmemory->attach(key)) {
+		char	*err=error::getErrorString();
 		fprintf(stderr,"Couldn't attach to shared memory segment: ");
-		fprintf(stderr,"%s\n",error::getErrorString());
+		fprintf(stderr,"%s\n",err);
+		delete[] err;
 		delete idmemory;
 		idmemory=NULL;
 		delete[] idfilename;
@@ -99,8 +101,10 @@ bool statusconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
 
 	statussemset=new semaphoreset();
 	if (!statussemset->attach(key,11)) {
+		char	*err=error::getErrorString();
 		fprintf(stderr,"Couldn't attach to semaphore set: ");
-		fprintf(stderr,"%s\n",error::getErrorString());
+		fprintf(stderr,"%s\n",err);
+		delete[] err;
 		delete statussemset;
 		delete idmemory;
 		statussemset=NULL;

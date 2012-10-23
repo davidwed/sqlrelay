@@ -26,8 +26,10 @@ bool sqlrconnection_svr::createSharedMemoryAndSemaphores(const char *tmpdir,
 	dbgfile.debugPrint("connection",1,"attaching to shared memory...");
 	idmemory=new sharedmemory();
 	if (!idmemory->attach(file::generateKey(idfilename,1))) {
+		char	*err=error::getErrorString();
 		fprintf(stderr,"Couldn't attach to shared memory segment: ");
-		fprintf(stderr,"%s\n",error::getErrorString());
+		fprintf(stderr,"%s\n",err);
+		delete[] err;
 		delete idmemory;
 		idmemory=NULL;
 		delete[] idfilename;
@@ -39,8 +41,10 @@ bool sqlrconnection_svr::createSharedMemoryAndSemaphores(const char *tmpdir,
 	dbgfile.debugPrint("connection",1,"attaching to semaphores...");
 	semset=new semaphoreset();
 	if (!semset->attach(file::generateKey(idfilename,1),11)) {
+		char	*err=error::getErrorString();
 		fprintf(stderr,"Couldn't attach to semaphore set: ");
-		fprintf(stderr,"%s\n",error::getErrorString());
+		fprintf(stderr,"%s\n",err);
+		delete[] err;
 		delete semset;
 		delete idmemory;
 		semset=NULL;

@@ -439,13 +439,16 @@ void sqlrlistener::ipcFileError(const char *idfilename) {
 }
 
 void sqlrlistener::keyError(const char *idfilename) {
+	char	*err=error::getErrorString();
 	fprintf(stderr,"\nsqlr-listener error:\n");
 	fprintf(stderr,"	Unable to generate a key from ");
 	fprintf(stderr,"%s\n",idfilename);
-	fprintf(stderr,"	Error was: %s\n\n",error::getErrorString());
+	fprintf(stderr,"	Error was: %s\n\n",err);
+	delete[] err;
 }
 
 void sqlrlistener::shmError(const char *id, int shmid) {
+	char	*err=error::getErrorString();
 	fprintf(stderr,"\nsqlr-listener error:\n");
 	fprintf(stderr,"	Unable to create a shared memory ");
 	fprintf(stderr,"segment.  This is usally because an \n");
@@ -458,10 +461,12 @@ void sqlrlistener::shmError(const char *id, int shmid) {
 	fprintf(stderr,"	segments and the ipcrm command to ");
 	fprintf(stderr,"remove the shared memory segment with ");
 	fprintf(stderr,"\n	id %d.\n\n",shmid);
-	fprintf(stderr,"	Error was: %s\n\n",error::getErrorString());
+	fprintf(stderr,"	Error was: %s\n\n",err);
+	delete[] err;
 }
 
 void sqlrlistener::semError(const char *id, int semid) {
+	char	*err=error::getErrorString();
 	fprintf(stderr,"\nsqlr-listener error:\n");
 	fprintf(stderr,"	Unable to create a semaphore ");
 	fprintf(stderr,"set.  This is usally because an \n");
@@ -478,7 +483,8 @@ void sqlrlistener::semError(const char *id, int semid) {
 	fprintf(stderr,"command to remove the semaphore set ");
 	fprintf(stderr,"with \n");
 	fprintf(stderr,"	id %d.\n\n",semid);
-	fprintf(stderr,"	Error was: %s\n\n",error::getErrorString());
+	fprintf(stderr,"	Error was: %s\n\n",err);
+	delete[] err;
 }
 
 bool sqlrlistener::listenOnClientSockets() {
@@ -511,6 +517,7 @@ bool sqlrlistener::listenOnClientSockets() {
 			if (listening) {
 				addFileDescriptor(clientsockin[index]);
 			} else {
+				char	*err=error::getErrorString();
 				fprintf(stderr,
 					"Could not listen "
 					"on: %s/%d\n"
@@ -518,8 +525,8 @@ bool sqlrlistener::listenOnClientSockets() {
 					"Make sure that no other "
 					"processes are listening "
 					"on that port.\n\n",
-					addresses[index],port,
-					error::getErrorString());
+					addresses[index],port,err);
+				delete[] err;
 				failed=true;
 			}
 		}
@@ -572,6 +579,7 @@ bool sqlrlistener::listenOnClientSockets() {
 			if (listening) {
 				addFileDescriptor(mysqlclientsockin[index]);
 			} else {
+				char	*err=error::getErrorString();
 				fprintf(stderr,
 					"Could not listen "
 					"on: %s/%d\n"
@@ -579,8 +587,8 @@ bool sqlrlistener::listenOnClientSockets() {
 					"Make sure that no other "
 					"processes are listening "
 					"on that port.\n\n",
-					mysqladdresses[index],mysqlport,
-					error::getErrorString());
+					mysqladdresses[index],mysqlport,err);
+				delete[] err;
 				failed=true;
 			}
 		}

@@ -134,12 +134,14 @@ bool sqlrconnection::openSession() {
 			}
 
 			if (debug && !connected) {
+				char	*err=error::getErrorString();
 				debugPreStart();
 				debugPrint("ERROR:\n");
 				debugPrint("connection to unix port failed: ");
-				debugPrint(error::getErrorString());
+				debugPrint(err);
 				debugPrint("\n");
 				debugPreEnd();
+				delete[] err;
 			}
 		}
 
@@ -168,12 +170,14 @@ bool sqlrconnection::openSession() {
 			}
 
 			if (debug && !connected) {
+				char	*err=error::getErrorString();
 				debugPreStart();
 				debugPrint("ERROR:\n");
 				debugPrint("connection to inet port failed: ");
-				debugPrint(error::getErrorString());
+				debugPrint(err);
 				debugPrint("\n");
 				debugPreEnd();
+				delete[] err;
 			}
 		}
 
