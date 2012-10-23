@@ -353,16 +353,6 @@ AC_ARG_ENABLE(efence,
 	LIBEFENCE="-lefence",
 	LIBEFENCE="")
 AC_SUBST(LIBEFENCE)
-AC_ARG_ENABLE(erlang,
-	[  --disable-sqlr-triggers       Disable trigger support],
-	ENABLE_SQLRTRIGGERS="",
-	ENABLE_SQLRTRIGGERS="yes")
-AC_SUBST(ENABLE_SQLRTRIGGERS)
-AC_ARG_ENABLE(erlang,
-	[  --disable-sqlr-translations   Disable translations support],
-	ENABLE_SQLRTRANSLATIONS="",
-	ENABLE_SQLRTRANSLATIONS="yes")
-AC_SUBST(ENABLE_SQLRTRANSLATIONS)
 
 
 dnl Rewrite supplied paths.

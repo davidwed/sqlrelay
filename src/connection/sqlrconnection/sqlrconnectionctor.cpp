@@ -66,6 +66,9 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 	sqlt=NULL;
 	sqlw=NULL;
 
+	debugsqltranslation=false;
+	debugtriggers=false;
+
 	cur=NULL;
 
 	sid_sqlrcon=NULL;
