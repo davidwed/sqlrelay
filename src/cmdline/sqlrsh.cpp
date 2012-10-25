@@ -7,6 +7,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/commandline.h>
 #include <rudiments/file.h>
+#include <rudiments/filesystem.h>
 #include <rudiments/filedescriptor.h>
 #include <rudiments/process.h>
 #include <rudiments/environment.h>
