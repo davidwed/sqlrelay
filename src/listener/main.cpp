@@ -10,11 +10,6 @@ using namespace rudiments;
 
 sqlrlistener	*lsnr;
 
-void crash(int32_t signum) {
-	delete lsnr;
-	process::exit(0);
-}
-
 void shutDown(int32_t signum) {
 	delete lsnr;
 	process::exit(0);
@@ -24,15 +19,12 @@ int	main(int argc, const char **argv) {
 
 	#include <version.h>
 
-	// launch the listener
 	lsnr=new sqlrlistener();
 	lsnr->handleShutDown(shutDown);
-	lsnr->handleCrash(crash);
+	lsnr->handleCrash(shutDown);
 	if (lsnr->initListener(argc,argv)) {
 		lsnr->listen();
 	}
-
-	// unsuccessful completion
 	delete lsnr;
 	process::exit(1);
 }
