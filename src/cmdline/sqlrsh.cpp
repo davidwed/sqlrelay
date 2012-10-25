@@ -241,6 +241,13 @@ void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	file	scriptfile;
 	if (scriptfile.open(trimmedfilename,O_RDONLY)) {
 
+		// optimize
+		filesystem	fs;
+		if (fs.initialize(trimmedfilename)) {
+			scriptfile.setReadBufferSize(
+				fs.getOptimumTransferBlockSize());
+		}
+
 		for (;;) {
 		
 			// get a command
