@@ -32,6 +32,8 @@
 using namespace rudiments;
 #endif
 
+bool	scaler::shutdown=false;
+
 scaler::scaler() : daemonprocess() {
 
 	init=false;
@@ -49,8 +51,6 @@ scaler::scaler() : daemonprocess() {
 	dbase=NULL;
 
 	debug=false;
-
-	shutdown=false;
 }
 
 scaler::~scaler() {
@@ -61,6 +61,9 @@ scaler::~scaler() {
 }
 
 bool scaler::initScaler(int argc, const char **argv) {
+
+	handleShutDown(shutDown);
+	handleCrash(shutDown);
 
 	init=true;
 
@@ -265,7 +268,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	return true;
 }
 
-void scaler::shutDown() {
+void scaler::shutDown(int32_t signum) {
 	shutdown=true;
 }
 
