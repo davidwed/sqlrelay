@@ -25,6 +25,7 @@ class scaler : public rudiments::daemonprocess {
 			~scaler();
 		bool	initScaler(int argc, const char **argv);
 		void	loop();
+		void	shutDown();
 
 	private:
 		void	cleanUp();
@@ -73,6 +74,8 @@ class scaler : public rudiments::daemonprocess {
 
 		tempdir		*tmpdir;
 		cmdline		*cmdl;
+
+		bool		shutdown;
 };
 
 #endif

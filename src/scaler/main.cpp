@@ -11,27 +11,20 @@ using namespace rudiments;
 
 scaler	*s;
 
-void cleanUp() {
-	delete s;
-}
-
 void shutDown(int32_t signum) {
-	cleanUp();
-	process::exit(0);
+	s->shutDown();
 }
 
 int main(int argc, const char **argv) {
 
 	#include <version.h>
 
-	// launch the scaler
 	s=new scaler();
 	s->handleShutDown(shutDown);
+	s->handleCrash(shutDown);
 	if (s->initScaler(argc,argv)) {
 		s->loop();
 	}
-
-	// unsuccessful completion
-	cleanUp();
+	delete s;
 	process::exit(1);
 }

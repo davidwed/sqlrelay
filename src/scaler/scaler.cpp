@@ -49,6 +49,8 @@ scaler::scaler() : daemonprocess() {
 	dbase=NULL;
 
 	debug=false;
+
+	shutdown=false;
 }
 
 scaler::~scaler() {
@@ -263,6 +265,10 @@ bool scaler::initScaler(int argc, const char **argv) {
 	return true;
 }
 
+void scaler::shutDown() {
+	shutdown=true;
+}
+
 void scaler::cleanUp() {
 
 	delete[] idfilename;
@@ -408,12 +414,17 @@ bool scaler::openMoreConnections() {
 		// If the wait returned false for some other reason than a
 		// timeout, then an error has occurred and the semaphore can't
 		// be accessed.  Most likely the sqlr-listener has been killed.
-		// Return failure.
+		// Shut down.
 		if (!waitresult && error::getErrorNumber()!=EAGAIN) {
-			return false;
+			shutdown=true;
 		}
 	} else {
 		snooze::microsnooze(0,100000);
+	}
+
+	// exit if a shutdown request has been made
+	if (shutdown) {
+		return false;
 	}
 
 	// reap children here, no matter what
