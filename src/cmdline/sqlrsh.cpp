@@ -276,6 +276,8 @@ void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 bool sqlrsh::getCommandFromFile(file *fl, stringbuffer *cmdbuffer,
 						sqlrshenv *env) {
 
+	bool	insinglequotes=false;
+	bool	indoublequotes=false;
 	char	character;
 	
 	for (;;) {
@@ -285,19 +287,39 @@ bool sqlrsh::getCommandFromFile(file *fl, stringbuffer *cmdbuffer,
 			return false;
 		}
 
-		// look for an escape character
-		if (character=='\\') {
-			if (fl->read(&character)!=sizeof(character)) {
-				return false;
+		// handle single-quoted strings, with escaping
+		if (character=='\'') {
+			if (insinglequotes) {
+				cmdbuffer->append(character);
+				if (fl->read(&character)!=sizeof(character)) {
+					return false;
+				}
+				if (character!='\'') {
+					insinglequotes=false;
+				}
+			} else {
+				insinglequotes=true;
 			}
-			cmdbuffer->append(character);
-			if (fl->read(&character)!=sizeof(character)) {
-				return false;
+		}
+
+		// handle double-quoted strings, with escaping
+		if (character=='"') {
+			if (indoublequotes) {
+				cmdbuffer->append(character);
+				if (fl->read(&character)!=sizeof(character)) {
+					return false;
+				}
+				if (character!='"') {
+					indoublequotes=false;
+				}
+			} else {
+				indoublequotes=true;
 			}
 		}
 
 		// look for an end of command delimiter
-		if (character==env->delimiter) {
+		if (!insinglequotes && !indoublequotes &&
+					character==env->delimiter) {
 			return true;
 		}
 
