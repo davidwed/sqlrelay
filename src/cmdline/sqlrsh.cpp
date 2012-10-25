@@ -193,16 +193,6 @@ class	sqlrsh {
 		void	prompt(unsigned long promptcount);
 		void	error(const char *errstring);
 
-		void	setColor(sqlrshenv *env, int value);
-		void	black(sqlrshenv *env);
-		void	red(sqlrshenv *env);
-		void	green(sqlrshenv *env);
-		void	yellow(sqlrshenv *env);
-		void	blue(sqlrshenv *env);
-		void	magenta(sqlrshenv *env);
-		void	cyan(sqlrshenv *env);
-		void	white(sqlrshenv *env);
-
 #ifndef HAVE_READLINE
 		filedescriptor	standardin;
 #endif
@@ -260,9 +250,7 @@ void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			}
 
 			if (displaycommand) {
-				cyan(env);
 				printf("%s\n",command.getString());
-				white(env);
 			}
 
 			// run the command
@@ -519,11 +507,8 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		env->final=toggle;
 	} else if (cmdtype==7) {
 		env->delimiter=ptr[0];
-		cyan(env);
 		printf("Delimiter set to %c\n",env->delimiter);
-		white(env);
 	} else if (cmdtype==8) {
-		cyan(env);
 		printf("Autocommit set ");
 		if (toggle) {
 			sqlrcon->autoCommitOn();
@@ -532,7 +517,6 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			sqlrcon->autoCommitOff();
 			printf("off\n");
 		}
-		white(env);
 	}
 }
 
@@ -804,7 +788,6 @@ void sqlrsh::displayError(sqlrshenv *env,
 				const char *message,
 				const char *error,
 				int64_t errornumber) {
-	cyan(env);
 	if (charstring::length(message)) {
 		printf("%s\n",message);
 	}
@@ -812,7 +795,6 @@ void sqlrsh::displayError(sqlrshenv *env,
 	if (charstring::length(error)) {
 		printf("%s\n\n",error);
 	}
-	white(env);
 }
 
 void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
@@ -836,14 +818,8 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	for (uint32_t i=0; i<sqlrcur->colCount(); i++) {
 
 		// write the column name
-		if (i%2==1) {
-			green(env);
-		} else {
-			yellow(env);
-		}
 		name=sqlrcur->getColumnName(i);
 		printf("%s",name);
-		white(env);
 
 		// which is longer, field name or longest field
 		namelen=charstring::length(name);
@@ -867,12 +843,10 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	printf("\n");
 
 	// display delimiter
-	red(env);
 	for (uint32_t i=0; i<charcount; i++) {
 		printf("=");
 	}
 	printf("\n");
-	white(env);
 }
 
 void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
@@ -896,13 +870,7 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			}
 
 			// write the column value
-			if (i%2==1) {
-				cyan(env);
-			} else {
-				white(env);
-			}
 			printf("%s",field);
-			white(env);
 
 			// which is longer, field name or longest field
 			longest=sqlrcur->getLongest(j);
@@ -939,63 +907,44 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	}
 
 	// call clock again, display results
-	red(env);
 	printf("	Rows Returned   : ");
-	magenta(env);
 	printf("%lld\n",sqlrcur->rowCount());
-	red(env);
 	printf("	Fields Returned : ");
-	magenta(env);
 	printf("%lld\n",sqlrcur->rowCount()*sqlrcur->colCount());
-	red(env);
 	printf("	System time     : ");
-	magenta(env);
 	printf("%ld\n",clock());
-	white(env);
 	printf("\n");
 }
 
 void sqlrsh::ping(sqlrconnection *sqlrcon, sqlrshenv *env) {
-	red(env);
 	printf((sqlrcon->ping())?"	The database is up.\n":
 				"	The database is down.\n");
-	white(env);
 }
 
 bool sqlrsh::lastinsertid(sqlrconnection *sqlrcon, sqlrshenv *env) {
-	red(env);
 	bool		retval=false;
 	uint64_t	id=sqlrcon->getLastInsertId();
 	if (id!=0 || !sqlrcon->errorMessage()) {
 		printf("%lld\n",id);
 		retval=true;
 	}
-	white(env);
 	return retval;
 }
 
 void sqlrsh::identify(sqlrconnection *sqlrcon, sqlrshenv *env) {
-	red(env);
 	printf("%s\n",sqlrcon->identify());
-	white(env);
 }
 
 void sqlrsh::dbversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
-	red(env);
 	printf("%s\n",sqlrcon->dbVersion());
-	white(env);
 }
 
 void sqlrsh::clientversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
-	red(env);
 	printf("%s\n",sqlrcon->clientVersion());
-	white(env);
 }
 
 void sqlrsh::serverversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
-	red(env);
 	printf("%s\n",sqlrcon->serverVersion());
-	white(env);
 }
 
 void sqlrsh::inputbind(sqlrcursor *sqlrcur,
@@ -1217,157 +1166,90 @@ void sqlrsh::printbinds(const char *type,
 void sqlrsh::displayHelp(sqlrshenv *env) {
 
 	printf("\n");
-	yellow(env);
 	printf("	To run a query, simply type it at the prompt,\n"
 		"	followed by a semicolon.  Queries may be \n"
 		"	split over multiple lines.\n\n");
-	cyan(env);
 	printf("	ping			- ");
-	green(env);
 	printf("pings the database\n");
-	cyan(env);
 	printf("	identify		- ");
-	green(env);
 	printf("returns the type of database\n");
-	cyan(env);
 	printf("	dbversion		- ");
-	green(env);
 	printf("returns the version of the database\n");
-	cyan(env);
 	printf("	clientversion		- ");
-	green(env);
 	printf("returns the version of the SQL Relay\n");
 	printf("\t\t\t\t  client library\n");
-	cyan(env);
 	printf("	serverversion		- ");
-	green(env);
 	printf("returns the version of the SQL Relay server\n");
-	cyan(env);
 	printf("	use [database]		- ");
-	green(env);
 	printf("change the current database/schema\n");
-	cyan(env);
 	printf("	currentdb		- ");
-	green(env);
 	printf("shows the current database/schema\n");
-	cyan(env);
 	printf("	run script		- ");
-	green(env);
 	printf("runs commands contained in file \"script\"\n");
-	cyan(env);
 	printf("	color on/off		- ");
-	green(env);
 	printf("toggles colorizing\n");
-	cyan(env);
 	printf("	headers on/off		- ");
-	green(env);
 	printf("toggles column descriptions before result set\n");
-	cyan(env);
 	printf("	stats on/off		- ");
-	green(env);
 	printf("toggles statistics after result set\n");
-	cyan(env);
 	printf("	debug on/off		- ");
-	green(env);
 	printf("toggles debug messages\n");
-	cyan(env);
 	printf("	autocommit on/off	- ");
-	green(env);
 	printf("toggles autocommit\n");
-	cyan(env);
 	printf("	final on/off		- ");
-	green(env);
 	printf("toggles use of one session per query\n");
-	cyan(env);
 	printf("	delimiter [character]	- ");
-	green(env);
 	printf("sets delimiter character to [character]\n\n");
-	cyan(env);
 	printf("	inputbind ...                 - ");
-	green(env);
 	printf("defines an input bind variable\n");
-	cyan(env);
 	printf("		inputbind [variable] = [stringvalue]\n");
 	printf("		inputbind [variable] = [integervalue]\n");
 	printf("		inputbind [variable] = [doublevalue]\n");
 	printf("		inputbind [variable] = [MM/DD/YYYY HH:MM:SS:uS TZN]\n");
 	printf("	outputbind ...                 - ");
-	green(env);
 	printf("defines an output bind variable\n");
-	cyan(env);
 	printf("		outputbind [variable] string [length]\n");
 	printf("		outputbind [variable] integer\n");
 	printf("		outputbind [variable] double [precision] [scale}\n");
 	printf("		outputbind [variable] date\n");
 	printf("	printbinds                     - ");
-	green(env);
 	printf("prints all bind variables\n");
-	cyan(env);
 	printf("	clearinputbind [variable]      - ");
-	green(env);
 	printf("clears an input bind variable\n");
-	cyan(env);
 	printf("	clearoutputbind [variable]     - ");
-	green(env);
 	printf("clears an output bind variable\n");
-	cyan(env);
 	printf("	clearbinds                     - ");
-	green(env);
 	printf("clears all bind variables\n");
-	cyan(env);
 	printf("	reexecute                      - ");
-	green(env);
 	printf("reexecutes the previous query\n\n");
-	cyan(env);
 	printf("	lastinsertid                   - ");
-	green(env);
 	printf("returns the value of the most recently\n");
 	printf("\t\t\t\t\t updated auto-increment or identity\n");
 	printf("\t\t\t\t\t column, if the database supports it\n\n");
-	cyan(env);
 	printf("	show databases [like pattern]		-\n");
-	green(env);
 	printf("		returns a list of known databases/schemas\n");
-	cyan(env);
 	printf("	show tables [like pattern]		-\n");
-	green(env);
 	printf("		returns a list of known tables\n");
-	cyan(env);
 	printf("	show columns in table [like pattern]	-\n");
-	green(env);
 	printf("		returns a list of column metadata for the table \"table\"\n");
-	cyan(env);
 	printf("	describe table				-\n");
-	green(env);
 	printf("		returns a list of column metadata for the table \"table\"\n");
-	cyan(env);
 	printf("	fields table				-\n");
-	green(env);
 	printf("		returns a list of column names for the table \"table\"\n\n");
-	cyan(env);
 	printf("	exit/quit		- ");
-	green(env);
 	printf("exits\n\n");
-	yellow(env);
 	printf("	All commands must be followed by the delimiter: %c\n",
 								env->delimiter);
-	white(env);
-}
+
 
 void sqlrsh::startupMessage(sqlrshenv *env, const char *host,
 					uint16_t port, const char *user) {
 
-	red(env);
 	printf("SQLRShell - ");
-	green(env);
 	printf("Version 0.22\n");
-	yellow(env);
 	printf("	Connected to: ");
-	blue(env);
 	printf("%s:%d as %s\n\n",host,port,user);
-	yellow(env);
 	printf("	type help; for a help.\n\n");
-	white(env);
 }
 
 void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
@@ -1555,46 +1437,6 @@ void sqlrsh::execute(int argc, const char **argv) {
 		}
 	#endif
 }
-
-void sqlrsh::setColor(sqlrshenv *env, int value) {
-	if (env->color) {
-		printf("\033[0;%dm",value);
-	}
-}
-
-void sqlrsh::black(sqlrshenv *env) {
-	setColor(env,30);
-}
-
-void sqlrsh::red(sqlrshenv *env) {
-	setColor(env,31);
-}
-
-void sqlrsh::green(sqlrshenv *env) {
-	setColor(env,32);
-}
-
-void sqlrsh::yellow(sqlrshenv *env) {
-	setColor(env,33);
-}
-
-void sqlrsh::blue(sqlrshenv *env) {
-	setColor(env,34);
-}
-
-void sqlrsh::magenta(sqlrshenv *env) {
-	setColor(env,35);
-}
-
-void sqlrsh::cyan(sqlrshenv *env) {
-	setColor(env,36);
-}
-
-void sqlrsh::white(sqlrshenv *env) {
-	setColor(env,37);
-}
-
-
 
 int main(int argc, const char **argv) {
 
