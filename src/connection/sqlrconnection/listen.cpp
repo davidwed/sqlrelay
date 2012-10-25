@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
+#include <rudiments/snooze.h>
 #include <unistd.h>
 
 bool sqlrconnection_svr::listen() {
@@ -140,9 +141,9 @@ int32_t sqlrconnection_svr::waitForClient() {
 
 	dbgfile.debugPrint("connection",0,"waiting for client...");
 
-	// FIXME: listen() checks for 1,-1 or 0 from this method, but this
-	// method only returns 1 or -1????  0 should indicate that a suspended
-	// session timed out...
+	// FIXME: listen() checks for 2,1,0 or -1 from this method, but this
+	// method only returns 2, 1 or -1.  0 should indicate that a suspended
+	// session timed out.
 
 	// Unless we're in the middle of a suspended session, if we're passing 
 	// file descriptors around, wait for one to be passed to us, otherwise,
@@ -152,8 +153,17 @@ int32_t sqlrconnection_svr::waitForClient() {
 		// get what we're supposed to do...
 		uint16_t	command;
 		if (handoffsockun.read(&command)!=sizeof(uint16_t)) {
-			dbgfile.debugPrint("connection",1,"pass failed");
-			dbgfile.debugPrint("connection",0,"done waiting for client");
+			dbgfile.debugPrint("connection",1,"read failed");
+			dbgfile.debugPrint("connection",0,
+						"done waiting for client");
+			// If this fails, then the listener most likely died
+			// because sqlr-stop was run.  Arguably this condition
+			// should initiate a shut down of this process as well,
+			// but for now we'll just wait to be shut down manually.
+			// Unfortunatley, that means looping over and over,
+			// with that read failing every time.  We'll sleep so
+			// as not to slam the machine while we loop.
+			snooze::microsnooze(0,100000);
 			return -1;
 		}
 
@@ -166,20 +176,25 @@ int32_t sqlrconnection_svr::waitForClient() {
 		// descriptor, delete the socket and return failure
 		int32_t	descriptor;
 		if (!receiveFileDescriptor(&descriptor)) {
-
 			dbgfile.debugPrint("connection",1,"pass failed");
-			dbgfile.debugPrint("connection",0,"done waiting for client");
-
+			dbgfile.debugPrint("connection",0,
+						"done waiting for client");
+			// If this fails, then the listener most likely died
+			// because sqlr-stop was run.  Arguably this condition
+			// should initiate a shut down of this process as well,
+			// but for now we'll just wait to be shut down manually.
+			// Unfortunatley, that means looping over and over,
+			// with that read above failing every time, thus the
+			//  sleep so as not to slam the machine while we loop.
 			return -1;
 		}
 
 		clientsock=new filedescriptor;
 		clientsock->setFileDescriptor(descriptor);
 
-		// For some reason, at least on OpenBSD 4.9,
-		// this filedescriptor is getting created in 
-		// non-blocking mode.  Force it into to
-		// blocking mode.
+		// For some reason, at least on OpenBSD 4.9, this
+		// filedescriptor is getting created in non-blocking mode.
+		// Force it into to blocking mode.
 		clientsock->useBlockingMode();
 
 		dbgfile.debugPrint("connection",1,"pass succeeded");
@@ -188,14 +203,18 @@ int32_t sqlrconnection_svr::waitForClient() {
 	} else {
 
 		if (waitForNonBlockingRead(accepttimeout,0)<1) {
-			dbgfile.debugPrint("connection",0,"wait for non blocking read failed");
+			dbgfile.debugPrint("connection",0,
+					"wait for non blocking read failed");
+			// FIXME: I think this should return 0
 			return -1;
 		}
 
 		// get the first socket that had data available...
 		filedescriptor	*fd=NULL;
 		if (!getReadyList()->getDataByIndex(0,&fd)) {
-			dbgfile.debugPrint("connection",0,"ready list was empty");
+			dbgfile.debugPrint("connection",0,
+						"ready list was empty");
+			// FIXME: I think this should return 0
 			return -1;
 		}
 
@@ -212,13 +231,16 @@ int32_t sqlrconnection_svr::waitForClient() {
 		}
 
 		if (fd) {
-			dbgfile.debugPrint("connection",1,"reconnect succeeded");
+			dbgfile.debugPrint("connection",1,
+						"reconnect succeeded");
 		} else {
-			dbgfile.debugPrint("connection",1,"reconnect failed");
+			dbgfile.debugPrint("connection",1,
+						"reconnect failed");
 		}
 		dbgfile.debugPrint("connection",0,"done waiting for client");
 
 		if (!fd) {
+			// FIXME: I think this should return 0
 			return -1;
 		}
 	}
