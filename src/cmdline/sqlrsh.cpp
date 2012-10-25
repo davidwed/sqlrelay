@@ -1240,7 +1240,7 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	printf("exits\n\n");
 	printf("	All commands must be followed by the delimiter: %c\n",
 								env->delimiter);
-
+}
 
 void sqlrsh::startupMessage(sqlrshenv *env, const char *host,
 					uint16_t port, const char *user) {
