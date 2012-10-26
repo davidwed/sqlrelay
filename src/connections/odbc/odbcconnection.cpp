@@ -388,6 +388,27 @@ bool odbcconnection::commit() {
 bool odbcconnection::rollback() {
 	return (SQLEndTran(SQL_HANDLE_ENV,env,SQL_ROLLBACK)==SQL_SUCCESS);
 }
+
+void odbcconnection::errorMessage(const char **errorstring,
+					int64_t *errornumber,
+					bool *liveconnection) {
+
+	SQLCHAR		error[501];
+	SQLCHAR		state[10];
+	SQLINTEGER	nativeerrnum;
+	SQLSMALLINT	errnum;
+
+	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,
+			1,state,&nativeerrnum,error,500,&errnum);
+	errormsg.clear();
+	errormsg.append((const char *)error);
+
+	*liveconnection=true;
+
+	// set return values
+	*errorstring=errormsg.getString();
+	*errornumber=errnum;
+}
 #endif
 
 bool odbcconnection::setIsolationLevel(const char *isolevel) {
@@ -396,17 +417,10 @@ bool odbcconnection::setIsolationLevel(const char *isolevel) {
 }
 
 odbccursor::odbccursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
-	errormsg=NULL;
 	odbcconn=(odbcconnection *)conn;
 	stmt=NULL;
 	for (uint16_t i=0; i<MAXVAR; i++) {
 		outdatebind[i]=NULL;
-	}
-}
-
-odbccursor::~odbccursor() {
-	if (errormsg) {
-		delete errormsg;
 	}
 }
 
@@ -1149,16 +1163,13 @@ void odbccursor::errorMessage(const char **errorstring,
 	// need to use SQLGetDiagRec and SQLGetDiagField here...
 	SQLError(odbcconn->env,odbcconn->dbc,stmt,state,&nativeerrnum,
 							error,500,&errnum);
-	if (errormsg) {
-		delete errormsg;
-	}
-	errormsg=new stringbuffer();
-	errormsg->append((const char *)error);
+	errormsg.clear();
+	errormsg.append((const char *)error);
 
 	*liveconnection=true;
 
 	// set return values
-	*errorstring=errormsg->getString();
+	*errorstring=errormsg.getString();
 	*errornumber=errnum;
 }
 

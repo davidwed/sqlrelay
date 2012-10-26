@@ -30,6 +30,9 @@ class statusconnection : public sqlrconnection_svr {
 		bool		autoCommitOn();
 		bool		autoCommitOff();
 		bool		commit();
+		void		errorMessage(const char **errorstring,
+						int64_t *errorcode,
+						bool *liveconnection);
 		bool		rollback();
 
 		bool		createSharedMemoryAndSemaphores(const char *tmpdir, const char *id);

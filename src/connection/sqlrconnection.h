@@ -66,6 +66,9 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual bool	begin();
 		virtual bool	commit();
 		virtual bool	rollback();
+		virtual	void	errorMessage(const char **errorstring,
+							int64_t *errorcode,
+							bool *liveconnection)=0;
 		virtual bool	supportsTransactionBlocks();
 		virtual bool		selectDatabase(const char *database,
 								char **error);

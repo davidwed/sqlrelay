@@ -176,6 +176,15 @@ bool statusconnection::rollback() {
 	return false;
 }
 
+
+void statusconnection::errorMessage(const char **errorstring,
+						int64_t *errorcode,
+						bool *liveconnection) {
+	*errorstring="";
+	*errorcode=0;
+	*liveconnection=true;
+}
+
 semaphoreset *statusconnection::getSemset() {
 	return statussemset;
 }

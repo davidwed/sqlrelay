@@ -128,6 +128,49 @@ bool db2connection::rollback() {
 	return (SQLEndTran(SQL_HANDLE_ENV,env,SQL_ROLLBACK)==SQL_SUCCESS);
 }
 
+void db2connection::errorMessage(const char **errorstring,
+					int64_t *errorcode,
+					bool *liveconnection) {
+
+	SQLCHAR		error[501];
+	SQLCHAR		state[10];
+	SQLINTEGER	nativeerrnum;
+	SQLSMALLINT	errnum;
+
+	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,
+			1,state,&nativeerrnum,error,500,&errnum);
+	errormsg.clear();
+	errormsg.append((const char *)error);
+
+	// set return values
+	*errorstring=errormsg.getString();
+	*errorcode=errnum;
+	*liveconnection=liveConnection(nativeerrnum,errnum);
+}
+
+bool db2connection::liveConnection(SQLINTEGER nativeerrnum,
+					SQLSMALLINT errnum) {
+
+	// When the DB goes down, DB2 first reports one error:
+	// 	[IBM][CLI Driver] SQL1224N  A database agent could not be
+	//	started to service a request, or was terminated as a result of
+	//	a database system shutdown or a force command.  SQLSTATE=55032
+	//	(in this case nativeerrnum==-1224 and errnum==184)
+	// then upon repeated attempts to run a query, it reports:
+	//	[IBM][CLI Driver] CLI0106E  Connection is closed. SQLSTATE=08003
+	//	(in this case nativeerrnum==-99999 and errnum==64)
+	// here's another one
+	//	[IBM][CLI Driver] SQL1224N  The database manager is not able to
+	//	 accept new requests, has terminated all requests in progress,
+	//	or has terminated your particular request due to a problem with
+	//	your request.  SQLSTATE=55032
+	// We need to catch both...
+	return !((nativeerrnum==-1224 && errnum==184) ||
+		(nativeerrnum==-99999 && errnum==64) ||
+		(nativeerrnum==-1224 && errnum==220));
+}
+
+
 const char *db2connection::pingQuery() {
 	return "values 1";
 }
@@ -252,16 +295,9 @@ const char *db2connection::setIsolationLevelQuery() {
 
 db2cursor::db2cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	db2conn=(db2connection *)conn;
-	errormsg=NULL;
 	stmt=0;
 	for (uint16_t i=0; i<MAXVAR; i++) {
 		outdatebind[i]=NULL;
-	}
-}
-
-db2cursor::~db2cursor() {
-	if (errormsg) {
-		delete errormsg;
 	}
 }
 
@@ -677,41 +713,17 @@ void db2cursor::errorMessage(const char **errorstring,
 	SQLINTEGER	nativeerrnum;
 	SQLSMALLINT	errnum;
 
-	// need to use SQLGetDiagRec and SQLGetDiagField here...
-	SQLError(db2conn->env,db2conn->dbc,
-			stmt,state,&nativeerrnum,error,500,&errnum);
-	if (errormsg) {
-		delete errormsg;
-	}
-	errormsg=new stringbuffer();
-	errormsg->append((const char *)error);
-
-	// When the DB goes down, DB2 first reports one error:
-	// 	[IBM][CLI Driver] SQL1224N  A database agent could not be
-	//	started to service a request, or was terminated as a result of
-	//	a database system shutdown or a force command.  SQLSTATE=55032
-	//	(in this case nativeerrnum==-1224 and errnum==184)
-	// then upon repeated attempts to run a query, it reports:
-	//	[IBM][CLI Driver] CLI0106E  Connection is closed. SQLSTATE=08003
-	//	(in this case nativeerrnum==-99999 and errnum==64)
-	// here's another one
-	//	[IBM][CLI Driver] SQL1224N  The database manager is not able to
-	//	 accept new requests, has terminated all requests in progress,
-	//	or has terminated your particular request due to a problem with
-	//	your request.  SQLSTATE=55032
-
-	// We need to catch both...
-	if ((nativeerrnum==-1224 && errnum==184) ||
-		(nativeerrnum==-99999 && errnum==64) ||
-		(nativeerrnum==-1224 && errnum==220)) {
-		*liveconnection=false;
-	} else {
-		*liveconnection=true;
-	}
+	/*SQLError(db2conn->env,db2conn->dbc,
+			stmt,state,&nativeerrnum,error,500,&errnum);*/
+	SQLGetDiagRec(SQL_HANDLE_STMT,stmt,
+			1,state,&nativeerrnum,error,500,&errnum);
+	errormsg.clear();
+	errormsg.append((const char *)error);
 
 	// set return values
-	*errorstring=errormsg->getString();
+	*errorstring=errormsg.getString();
 	*errorcode=errnum;
+	*liveconnection=db2conn->liveConnection(nativeerrnum,errnum);
 }
 
 bool db2cursor::knowsRowCount() {

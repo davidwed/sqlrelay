@@ -191,6 +191,9 @@ class routerconnection : public sqlrconnection_svr {
 		bool		autoCommitOff();
 		bool		commit();
 		bool		rollback();
+		void		errorMessage(const char **errorstring,
+						int64_t	*errorcode,
+						bool *liveconnection);
 		const char	*identify();
 		const char	*dbVersion();
 		bool		ping();

@@ -1045,15 +1045,6 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length,
 	return true;
 }
 
-void sybasecursor::errorMessage(const char **errorstring,
-				int64_t *errorcode,
-				bool *liveconnection) {
-	*liveconnection=sybaseconn->liveconnection;
-	*errorcode=sybaseconn->errorcode;
-	*errorstring=(sybaseconn->errorstring.getStringLength())?
-				sybaseconn->errorstring.getString():NULL;
-}
-
 bool sybasecursor::knowsRowCount() {
 	return false;
 }
@@ -1458,4 +1449,13 @@ bool sybaseconnection::commit() {
 bool sybaseconnection::rollback() {
 	cleanUpAllCursorData(true,true);
 	return sqlrconnection_svr::rollback();
+}
+
+void sybaseconnection::errorMessage(const char **errorstring,
+					int64_t *errorcode,
+					bool *liveconnection) {
+	*liveconnection=this->liveconnection;
+	*errorcode=this->errorcode;
+	*errorstring=(this->errorstring.getStringLength())?
+				this->errorstring.getString():NULL;
 }

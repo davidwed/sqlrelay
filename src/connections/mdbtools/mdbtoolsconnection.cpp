@@ -114,6 +114,14 @@ bool mdbtoolsconnection::rollback() {
 	return true;
 }
 
+void mdbtoolsconnection::errorMessage(const char **errorstring,
+					int64_t *errorcode,
+					bool *liveconnection) {
+	*errorstring="error";
+	*errorcode=0;
+	*liveconnection=true;
+}
+
 mdbtoolscursor::mdbtoolscursor(sqlrconnection_svr *conn) :
 					sqlrcursor_svr(conn) {
 	mdbtoolsconn=(mdbtoolsconnection *)conn;
@@ -312,14 +320,6 @@ void mdbtoolscursor::resetListValues(const char *wild) {
 
 bool mdbtoolscursor::matchCurrentWild(const char *value) {
 	return (!currentwild || currentwild->match(value));
-}
-
-void mdbtoolscursor::errorMessage(const char **errorstring,
-					int64_t *errorcode,
-					bool *liveconnection) {
-	*errorstring="error";
-	*errorcode=0;
-	*liveconnection=true;
 }
 
 bool mdbtoolscursor::knowsRowCount() {

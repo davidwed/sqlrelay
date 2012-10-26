@@ -227,6 +227,23 @@ bool routerconnection::rollback() {
 	return result;
 }
 
+void routerconnection::errorMessage(const char **errormessage,
+					int64_t *errorcode,
+					bool *liveconnection) {
+	for (uint16_t index=0; index<concount; index++) {
+		if (!cons[index]) {
+			continue;
+		}
+		*errormessage=cons[index]->errorMessage();
+		if (!charstring::length(*errormessage)) {
+			*errorcode=cons[index]->errorNumber();
+			break;
+		}
+	}
+	// FIXME: detect downed database or downed relay
+	*liveconnection=true;
+}
+
 void routerconnection::endSession() {
 	for (uint16_t index=0; index<concount; index++) {
 		if (!cons[index]) {
@@ -759,11 +776,10 @@ bool routercursor::begin(const char *query, uint32_t length) {
 void routercursor::errorMessage(const char **errormessage,
 				int64_t *errorcode,
 				bool *liveconnection) {
-	// FIXME: detect downed database or downed relay
-	*liveconnection=true;
 	*errormessage=(cur)?cur->errorMessage():"";
 	*errorcode=cur->errorNumber();
-	*errorcode=0;
+	// FIXME: detect downed database or downed relay
+	*liveconnection=true;
 }
 
 bool routercursor::knowsRowCount() {

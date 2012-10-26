@@ -173,6 +173,20 @@ bool sqliteconnection::rollback() {
 }
 #endif
 
+void sqliteconnection::errorMessage(const char **errorstring,
+					int64_t *errorcode,
+					bool *liveconnection) {
+	// set return values
+	*errorstring=errmesg;
+	*errorcode=errcode;
+	*liveconnection=true;
+	if (errmesg &&
+		(!charstring::compare(errmesg,"access permission denied",24) ||
+		!charstring::compare(errmesg,"not a directory",15))) {
+		*liveconnection=false;
+	}
+}
+
 sqlitecursor::sqlitecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 	result=NULL;
@@ -384,23 +398,6 @@ void sqlitecursor::selectLastInsertRowId() {
 	result[0]=charstring::duplicate("LASTINSERTROWID");
 	result[1]=charstring::parseNumber((int64_t)sqlite3_last_insert_rowid(
 							sqliteconn->sqliteptr));
-}
-
-void sqlitecursor::errorMessage(const char **errorstring,
-				int64_t *errorcode,
-				bool *liveconnection) {
-	*liveconnection=true;
-	if (sqliteconn->errmesg &&
-		(!charstring::compare(sqliteconn->errmesg,
-					"access permission denied",24) ||
-		!charstring::compare(sqliteconn->errmesg,
-					"not a directory",15))) {
-		*liveconnection=false;
-	}
-
-	// set return values
-	*errorstring=sqliteconn->errmesg;
-	*errorcode=sqliteconn->errcode;
 }
 
 bool sqlitecursor::knowsRowCount() {

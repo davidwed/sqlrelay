@@ -111,9 +111,6 @@ class firebirdcursor : public sqlrcursor_svr {
 						bool execute);
 		bool		queryIsNotSelect();
 		bool		queryIsCommitOrRollback();
-		void		errorMessage(const char **errorstring,
-						int64_t	*errorcode,
-						bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
 		bool		knowsAffectedRows();
@@ -147,8 +144,6 @@ class firebirdcursor : public sqlrcursor_svr {
 		fieldstruct	field[MAX_SELECT_LIST_SIZE];
 		stringbuffer	fieldbuffer;
 
-		stringbuffer	errormsg;
-
 		firebirdconnection	*firebirdconn;
 
 		bool		queryIsExecSP;
@@ -170,6 +165,9 @@ class firebirdconnection : public sqlrconnection_svr {
 		bool	commit();
 		bool	rollback();
 		bool	ping();
+		void	errorMessage(const char **errorstring,
+					int64_t	*errorcode,
+					bool *liveconnection);
 		const char	*identify();
 		const char	*dbVersion();
 		const char	*getDatabaseListQuery(bool wild);
@@ -193,6 +191,8 @@ class firebirdconnection : public sqlrconnection_svr {
 		char		*lastinsertidquery;
 
 		ISC_STATUS	error[20];
+
+		stringbuffer	errormsg;
 };
 
 #endif

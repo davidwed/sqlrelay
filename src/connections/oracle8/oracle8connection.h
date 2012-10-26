@@ -234,7 +234,7 @@ class oracle8cursor : public sqlrcursor_svr {
 		ub4		stmtreleasemode;
 #endif
 		sword		ncols;
-		stringbuffer	*errormessage;
+		stringbuffer	errormessage;
 
 		int32_t		resultsetbuffercount;
 		describe	*desc;
@@ -309,6 +309,9 @@ class oracle8connection : public sqlrconnection_svr {
 		bool		autoCommitOff();
 		bool		commit();
 		bool		rollback();
+		void		errorMessage(const char **errorstring,
+						int64_t	*errorcode,
+						bool *liveconnection);
 		const char	*pingQuery();
 		const char	*identify();
 		const char	*dbVersion();
@@ -343,6 +346,8 @@ class oracle8connection : public sqlrconnection_svr {
 		const char	*nlslang;
 
 		char		*lastinsertidquery;
+
+		stringbuffer	errormessage;
 
 		uint32_t	fetchatonce;
 		int32_t		maxselectlistsize;

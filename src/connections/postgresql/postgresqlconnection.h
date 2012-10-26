@@ -58,9 +58,6 @@ class postgresqlcursor : public sqlrcursor_svr {
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
-		void		errorMessage(const char **errorstring,
-						int64_t	*errorcode,
-						bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
 		bool		knowsAffectedRows();
@@ -114,6 +111,9 @@ class postgresqlconnection : public sqlrconnection_svr {
 		sqlrcursor_svr	*initCursor();
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
+		void		errorMessage(const char **errorstring,
+						int64_t	*errorcode,
+						bool *liveconnection);
 		const char	*identify();
 		const char	*dbVersion();
 		const char	*getDatabaseListQuery(bool wild);

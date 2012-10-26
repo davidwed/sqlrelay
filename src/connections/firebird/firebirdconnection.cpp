@@ -173,6 +173,37 @@ bool firebirdconnection::rollback() {
 	return (!isc_rollback_retaining(error,&tr));
 }
 
+void firebirdconnection::errorMessage(const char **errorstring,
+						int64_t *errorcode,
+						bool *liveconnection) {
+
+	// declare a buffer for the error
+	errormsg.clear();
+
+	char		msg[512];
+	ISC_STATUS	*pvector=error;
+
+	// get the status message
+	while (isc_interprete(msg,&pvector)) {
+		errormsg.append(msg)->append(" \n");
+	}
+
+	// get the error message
+	ISC_LONG	sqlcode=isc_sqlcode(error);
+	isc_sql_interprete(sqlcode,msg,512);
+	errormsg.append(msg);
+
+	// set return values
+	*errorstring=errormsg.getString();
+	*errorcode=sqlcode;
+	*liveconnection=!(charstring::contains(
+				errormsg.getString(),
+				"Error reading data from the connection") ||
+			charstring::contains(
+				errormsg.getString(),
+				"Error writing data to the connection"));
+}
+
 bool firebirdconnection::ping() {
 
 	// call isc_database_info to get page_size and num_buffers,
@@ -887,38 +918,6 @@ bool firebirdcursor::queryIsNotSelect() {
 bool firebirdcursor::queryIsCommitOrRollback() {
 	return (querytype==isc_info_sql_stmt_commit ||
 		querytype==isc_info_sql_stmt_rollback);
-}
-
-void firebirdcursor::errorMessage(const char **errorstring,
-					int64_t *errorcode,
-					bool *liveconnection) {
-
-	// declare a buffer for the error
-	errormsg.clear();
-
-	char		msg[512];
-	ISC_STATUS	*pvector=firebirdconn->error;
-
-	// get the status message
-	while (isc_interprete(msg,&pvector)) {
-		errormsg.append(msg)->append(" \n");
-	}
-
-	// get the error message
-	ISC_LONG	sqlcode=isc_sqlcode(firebirdconn->error);
-	isc_sql_interprete(sqlcode,msg,512);
-	errormsg.append(msg);
-
-	*liveconnection=!(charstring::contains(
-				errormsg.getString(),
-				"Error reading data from the connection") ||
-			charstring::contains(
-				errormsg.getString(),
-				"Error writing data to the connection"));
-
-	// set return values
-	*errorstring=errormsg.getString();
-	*errorcode=sqlcode;
 }
 
 bool firebirdcursor::knowsRowCount() {

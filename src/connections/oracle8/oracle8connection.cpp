@@ -687,6 +687,61 @@ sqlwriter *oracle8connection::getSqlWriter() {
 	return new oracle8sqlwriter;
 }
 
+void oracle8connection::errorMessage(const char **errorstring,
+						int64_t *errorcode,
+						bool *liveconnection) {
+
+	// get the message from oracle
+	text	message[1024];
+	rawbuffer::zero((void *)message,sizeof(message));
+	sb4	errcode=0;
+	OCIErrorGet((dvoid *)err,1,
+			(text *)0,&errcode,
+			message,sizeof(message),
+			OCI_HTYPE_ERROR);
+	message[1023]='\0';
+	errormessage.clear();
+	errormessage.append((const char *)message);
+
+	// set return values
+	*errorstring=errormessage.getString();
+	*errorcode=errcode;
+
+	// check for dead connection or shutdown in progress
+	// Might need: 1033 - oracle init/shutdown in progress
+	// FIXME: neowiz adds 2067 - transaction or savepoint rollback required
+	switch (errcode) {
+		case 22: // invalid session ID; access denied
+		case 28: // your session has been killed
+		case 604: // error occurred at recursive SQL level ...
+		case 1012: // not logged on
+		case 1041: // internal error. hostdef extension doesn't exist
+		case 1089: // immediate shutdown in progress -
+				// no operations are permitted
+		case 3114: // not connected to ORACLE
+		case 3113: // end-of-file on communication channel
+		case 3135: // connection lost contact
+		case 14452: // attempt to create, alter or drop an index on
+				// temporary table already in use
+				// (see note below)
+			*liveconnection=false;
+			break;
+		default:
+			*liveconnection=true;
+			break;
+	}
+
+	// Note:
+	// When dropping temporary tables, if any of those tables were created
+	// with "on commit preserve rows" then the session has to exit before
+	// the table can be dropped or oracle will return the following error:
+	// ORA-14452: attempt to create, alter or drop an index on temporary
+	// table already in use
+	// It's not really clear why, but that's the case.  If we encounter
+	// this error, then we'll declare the db down.  SQL Relay will then
+	// relogin and reexecute the query when it comes back up.
+}
+
 const char *oracle8connection::pingQuery() {
 	return "select 1 from dual";
 }
@@ -862,7 +917,6 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	stmtreleasemode=OCI_DEFAULT;
 #endif
 	ncols=0;
-	errormessage=NULL;
 
 	oracle8conn=(oracle8connection *)conn;
 	allocateResultSetBuffers(oracle8conn->fetchatonce,
@@ -913,8 +967,6 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 }
 
 oracle8cursor::~oracle8cursor() {
-
-	delete errormessage;
 
 	for (uint16_t i=0; i<orainbindcount; i++) {
 		delete[] inintbindstring[i];
@@ -2113,61 +2165,12 @@ void oracle8cursor::errorMessage(const char **errorstring,
 					int64_t *errorcode,
 					bool *liveconnection) {
 
-	// get the message from oracle
-	text	message[1024];
-	rawbuffer::zero((void *)message,sizeof(message));
-	sb4	errcode=0;
-	OCIErrorGet((dvoid *)oracle8conn->err,1,
-			(text *)0,&errcode,
-			message,sizeof(message),
-			OCI_HTYPE_ERROR);
-	message[1023]='\0';
-
-	// check for dead connection or shutdown in progress
-	// Might need: 1033 - oracle init/shutdown in progress
-	// FIXME: neowiz adds 2067 - transaction or savepoint rollback required
-	switch (errcode) {
-		case 22: // invalid session ID; access denied
-		case 28: // your session has been killed
-		case 604: // error occurred at recursive SQL level ...
-		case 1012: // not logged on
-		case 1041: // internal error. hostdef extension doesn't exist
-		case 1089: // immediate shutdown in progress -
-				// no operations are permitted
-		case 3114: // not connected to ORACLE
-		case 3113: // end-of-file on communication channel
-		case 3135: // connection lost contact
-			*liveconnection=false;
-			break;
-		default:
-			*liveconnection=true;
-	}
-
-	// When dropping temporary tables, if any of those tables were created
-	// with "on commit preserve rows" then the session has to exit before
-	// the table can be dropped or oracle will return the following error:
-	// ORA-14452: attempt to create, alter or drop an index on temporary
-	// table already in use
-	// It's not really clear why, but that's the case.  If we encounter
-	// this error, then we'll declare the db down.  SQL Relay will then
-	// relogin and reexecute the query when it comes back up.
-	if (errcode==14452) {
-		*liveconnection=false;
-	}
-
-	// only return an error message if the error wasn't a dead database
-	delete errormessage;
-	errormessage=new stringbuffer();
-	errormessage->append((const char *)message);
-
-	// set return values
-	*errorstring=errormessage->getString();
-	*errorcode=errcode;
+	oracle8conn->errorMessage(errorstring,errorcode,liveconnection);
 
 #ifdef OCI_STMT_CACHE
 	// set the statement release mode such that this query will be
 	// removed from the statement cache on the next iteration
-	if (errormessage->getStringLength()) {
+	if (errormessage.getStringLength()) {
 		stmtreleasemode=OCI_STRLS_CACHE_DELETE;
 	}
 #endif

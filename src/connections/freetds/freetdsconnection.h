@@ -103,9 +103,6 @@ class freetdscursor : public sqlrcursor_svr {
 		bool		executeQuery(const char *query,
 						uint32_t length,
 						bool execute);
-		void		errorMessage(const char **errorstring,
-						int64_t	*errorcode,
-						bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
 		bool		knowsAffectedRows();
@@ -213,6 +210,9 @@ class freetdsconnection : public sqlrconnection_svr {
 					const char *tablename);
 		bool		commit();
 		bool		rollback();
+		void		errorMessage(const char **errorstring,
+						int64_t	*errorcode,
+						bool *liveconnection);
 
 		CS_CONTEXT	*context;
 		CS_LOCALE	*locale;

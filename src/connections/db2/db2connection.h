@@ -50,7 +50,6 @@ class db2cursor : public sqlrcursor_svr {
 	friend class db2connection;
 	public:
 			db2cursor(sqlrconnection_svr *conn);
-			~db2cursor();
 	private:
 		bool		prepareQuery(const char *query,
 						uint32_t length);
@@ -155,7 +154,7 @@ class db2cursor : public sqlrcursor_svr {
 		uint64_t	totalrows;
 		uint64_t	rownumber;
 
-		stringbuffer	*errormsg;
+		stringbuffer	errormsg;
 
 		db2connection	*db2conn;
 };
@@ -176,6 +175,11 @@ class db2connection : public sqlrconnection_svr {
 		bool	supportsTransactionBlocks();
 		bool	commit();
 		bool	rollback();
+		void	errorMessage(const char **errorstring,
+					int64_t	*errorcode,
+					bool *liveconnection);
+		bool	liveConnection(SQLINTEGER nativeerror,
+					SQLSMALLINT errnum);
 		const char	*pingQuery();
 		const char	*identify();
 		const char	*dbVersion();
@@ -196,6 +200,8 @@ class db2connection : public sqlrconnection_svr {
 		const char	*lang;
 
 		char		dbversion[512];
+
+		stringbuffer	errormsg;
 };
 
 #endif

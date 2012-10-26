@@ -313,6 +313,20 @@ bool mysqlconnection::rollback() {
 #endif
 }
 
+void mysqlconnection::errorMessage(const char **errorstring,
+					int64_t *errorcode,
+					bool *liveconnection) {
+	*errorstring=mysql_error(&mysql);
+	*errorcode=mysql_errno(&mysql);
+	*liveconnection=(!charstring::compare(*errorstring,"") ||
+		!charstring::compareIgnoringCase(*errorstring,
+				"mysql server has gone away") ||
+		!charstring::compareIgnoringCase(*errorstring,
+				"Can't connect to local MySQL",28) /*||
+		!charstring::compareIgnoringCase(*errorstring,
+			"Lost connection to MySQL server during query")*/);
+}
+
 sqlwriter *mysqlconnection::getSqlWriter() {
 	return new mysqlsqlwriter;
 }

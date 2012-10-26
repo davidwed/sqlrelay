@@ -1237,15 +1237,6 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length,
 	return true;
 }
 
-void freetdscursor::errorMessage(const char **errorstring,
-					int64_t *errorcode,
-					bool *liveconnection) {
-	*liveconnection=freetdsconn->liveconnection;
-	*errorcode=freetdsconn->errorcode;
-	*errorstring=(freetdsconn->errorstring.getStringLength())?
-			freetdsconn->errorstring.getString():NULL;
-}
-
 bool freetdscursor::knowsRowCount() {
 	return false;
 }
@@ -1659,4 +1650,13 @@ bool freetdsconnection::commit() {
 bool freetdsconnection::rollback() {
 	cleanUpAllCursorData(true,true);
 	return sqlrconnection_svr::rollback();
+}
+
+void freetdsconnection::errorMessage(const char **errorstring,
+					int64_t *errorcode,
+					bool *liveconnection) {
+	*liveconnection=this->liveconnection;
+	*errorcode=this->errorcode;
+	*errorstring=(this->errorstring.getStringLength())?
+				this->errorstring.getString():NULL;
 }

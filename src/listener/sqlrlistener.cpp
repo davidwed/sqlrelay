@@ -30,12 +30,6 @@ using namespace rudiments;
 signalhandler		sqlrlistener::alarmhandler;
 volatile sig_atomic_t	sqlrlistener::alarmrang=0;
 
-// The signal handler just turn the flag on and re-enables itself.
-void sqlrlistener::alarmHandler(int32_t signum) {
-	alarmrang=1;
-	alarmhandler.handleSignal(SIGALRM);
-}
-
 sqlrlistener::sqlrlistener() : daemonprocess(), listener() {
 
 	cmdl=NULL;
@@ -861,6 +855,11 @@ void sqlrlistener::blockSignals() {
 
 	// set a handler for SIGALRM's
 	alarmhandler.setHandler(alarmHandler);
+	alarmhandler.handleSignal(SIGALRM);
+}
+
+void sqlrlistener::alarmHandler(int32_t signum) {
+	alarmrang=1;
 	alarmhandler.handleSignal(SIGALRM);
 }
 

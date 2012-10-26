@@ -172,6 +172,15 @@ void postgresqlconnection::logOut() {
 	}
 }
 
+void postgresqlconnection::errorMessage(const char **errorstring,
+						int64_t *errorcode,
+						bool *liveconnection) {
+	*errorstring=PQerrorMessage(pgconn);
+	// FIXME: set this
+	*errorcode=0;
+	*liveconnection=(PQstatus(pgconn)==CONNECTION_OK);
+}
+
 const char *postgresqlconnection::identify() {
 	return "postgresql";
 }
@@ -624,15 +633,6 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
 #endif
 
 	return true;
-}
-
-void postgresqlcursor::errorMessage(const char **errorstring,
-					int64_t *errorcode,
-					bool *liveconnection) {
-	*liveconnection=(PQstatus(postgresqlconn->pgconn)==CONNECTION_OK);
-	*errorstring=PQerrorMessage(postgresqlconn->pgconn);
-	// FIXME: set this
-	*errorcode=0;
 }
 
 bool postgresqlcursor::knowsRowCount() {

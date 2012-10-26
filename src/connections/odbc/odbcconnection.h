@@ -59,7 +59,6 @@ class odbccursor : public sqlrcursor_svr {
 	friend class odbcconnection;
 	private:
 				odbccursor(sqlrconnection_svr *conn);
-				~odbccursor();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 		bool		allocateStatementHandle();
@@ -177,7 +176,7 @@ class odbccursor : public sqlrcursor_svr {
 		uint32_t	totalrows;
 		uint32_t	rownumber;
 
-		stringbuffer	*errormsg;
+		stringbuffer	errormsg;
 
 		odbcconnection	*odbcconn;
 };
@@ -196,6 +195,9 @@ class odbcconnection : public sqlrconnection_svr {
 		bool		autoCommitOff();
 		bool		commit();
 		bool		rollback();
+		void		errorMessage(const char **errorstring,
+						int64_t	*errorcode,
+						bool *liveconnection);
 #endif
 		bool		ping();
 		const char	*identify();
@@ -221,6 +223,10 @@ class odbcconnection : public sqlrconnection_svr {
 		const char	*dsn;
 
 		char		dbversion[512];
+
+#if (ODBCVER>=0x0300)
+		stringbuffer	errormsg;
+#endif
 };
 
 #endif

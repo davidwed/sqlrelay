@@ -63,9 +63,6 @@ class sqlitecursor : public sqlrcursor_svr {
 						bool execute);
 		int		runQuery(const char *query);
 		void		selectLastInsertRowId();
-		void		errorMessage(const char **errorstring,
-						int64_t	*errorcode,
-						bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
 		bool		knowsAffectedRows();
@@ -129,6 +126,9 @@ class sqliteconnection : public sqlrconnection_svr {
 		bool		commit();
 		bool		rollback();
 #endif
+		void		errorMessage(const char **errorstring,
+						int64_t	*errorcode,
+						bool *liveconnection);
 
 		const char	*db;
 
