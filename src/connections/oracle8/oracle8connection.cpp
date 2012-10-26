@@ -695,10 +695,8 @@ void oracle8connection::errorMessage(const char **errorstring,
 	text	message[1024];
 	rawbuffer::zero((void *)message,sizeof(message));
 	sb4	errcode=0;
-	OCIErrorGet((dvoid *)err,1,
-			(text *)0,&errcode,
-			message,sizeof(message),
-			OCI_HTYPE_ERROR);
+	OCIErrorGet((dvoid *)err,1,(text *)0,&errcode,
+			message,sizeof(message),OCI_HTYPE_ERROR);
 	message[1023]='\0';
 	errormessage.clear();
 	errormessage.append((const char *)message);

@@ -15,6 +15,8 @@ sqlrconnection_svr::~sqlrconnection_svr() {
 	delete cmdl;
 	delete cfgfl;
 
+	delete[] txerror;
+
 	delete[] updown;
 
 	delete[] originaldb;

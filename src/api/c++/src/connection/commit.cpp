@@ -21,10 +21,24 @@ bool sqlrconnection::commit() {
 
 	flushWriteBuffer();
 
-	bool	response;
-	if (cs->read(&response)!=sizeof(bool)) {
-		setError("Failed to get commit status.\n A network error may have ocurred.");
+	uint16_t	status;
+	if (cs->read(&status)!=sizeof(uint16_t)) {
+		setError("Failed to get commit status.\n "
+				"A network error may have ocurred.");
 		return false;
 	}
-	return response;
+
+	if (status==NO_ERROR_OCCURRED) {
+		return true;
+	}
+
+	if (!getError()) {
+		setError("There was an error, but the connection"
+				" died trying to retrieve it.  Sorry.");
+	}
+
+	if (status==ERROR_OCCURRED_DISCONNECT) {
+		endSession();
+	}
+	return false;
 }

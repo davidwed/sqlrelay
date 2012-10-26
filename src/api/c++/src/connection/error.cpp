@@ -45,7 +45,6 @@ bool sqlrconnection::getError() {
 	}
 
 	// get the error size
-	bool		goterror=true;
 	uint16_t	size;
 	if (cs->read(&size)!=sizeof(uint16_t)) {
 		return false;

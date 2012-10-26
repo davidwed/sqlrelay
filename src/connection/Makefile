@@ -67,6 +67,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqlrconnection/handlesignals.cpp \
 	sqlrconnection/isolationlevel.cpp \
 	sqlrconnection/main.cpp \
+	sqlrconnection/error.cpp \
 	sqlrcursor/sqlrcursorctor.cpp \
 	sqlrcursor/sqlrcursordtor.cpp \
 	sqlrcursor/openclose.cpp \
@@ -171,6 +172,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/handlesignals.lo \
 	sqlrconnection/isolationlevel.lo \
 	sqlrconnection/main.lo \
+	sqlrconnection/error.lo \
 	sqlrcursor/sqlrcursorctor.lo \
 	sqlrcursor/sqlrcursordtor.lo \
 	sqlrcursor/openclose.lo \

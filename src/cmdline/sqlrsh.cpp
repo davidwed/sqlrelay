@@ -565,15 +565,27 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 	// handle begin, commit and rollback
 	if (!charstring::compareIgnoringCase(command,"begin")) {
 
-		sqlrcon->begin();
+		if (!sqlrcon->begin()) {
+			displayError(env,NULL,
+					sqlrcon->errorMessage(),
+					sqlrcon->errorNumber());
+		}
 
 	} else if (!charstring::compareIgnoringCase(command,"commit")) {
 
-		sqlrcon->commit();
+		if (!sqlrcon->commit()) {
+			displayError(env,NULL,
+					sqlrcon->errorMessage(),
+					sqlrcon->errorNumber());
+		}
 
 	} else if (!charstring::compareIgnoringCase(command,"rollback")) {
 
-		sqlrcon->rollback();
+		if (!sqlrcon->rollback()) {
+			displayError(env,NULL,
+					sqlrcon->errorMessage(),
+					sqlrcon->errorNumber());
+		}
 
 	} else if (!charstring::compareIgnoringCase(command,"fields ",7)) {
 

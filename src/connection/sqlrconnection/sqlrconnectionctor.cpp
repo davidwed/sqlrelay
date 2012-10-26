@@ -31,6 +31,10 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 
 	commitorrollback=false;
 
+	txerror=NULL;
+	txerrnum=0;
+	txliveconnection=false;
+
 	autocommit=false;
 	autocommitforthissession=false;
 	fakeautocommit=false;

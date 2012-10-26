@@ -5,7 +5,11 @@
 
 void sqlrconnection_svr::beginCommand() {
 	dbgfile.debugPrint("connection",1,"begin");
-	clientsock->write(beginInternal());
+	if (beginInternal()) {
+		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+	} else {
+		returnTransactionError();
+	}
 	flushWriteBuffer();
 }
 
@@ -28,13 +32,22 @@ bool sqlrconnection_svr::begin() {
 		return true;
 	}
 
+	// re-init error data
+	delete[] txerror;
+	txerror=NULL;
+	txerrnum=0;
+	txliveconnection=false;
+
 	// for db's that support begin queries, run one
 	dbgfile.debugPrint("connection",1,"begin...");
 
+	// init some variables
 	sqlrcursor_svr	*begincur=initCursorUpdateStats();
 	const char	*beginquery=beginTransactionQuery();
 	int		beginquerylen=charstring::length(beginquery);
 	bool		retval=false;
+
+	// run the query...
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	if (begincur->openCursorInternal(cursorcount+1) &&
@@ -42,14 +55,26 @@ bool sqlrconnection_svr::begin() {
 		retval=executeQueryUpdateStats(begincur,beginquery,
 						beginquerylen,true);
 	}
+
+	// If there was an error, copy it out.  We'll be destroying the
+	// cursor in a moment and the error will be lost otherwise.
+	if (!retval) {
+		const char	*err;
+		begincur->errorMessage(&err,&txerrnum,&txliveconnection);
+		txerror=charstring::duplicate(err);
+	}
+
+	// clean up
 	begincur->cleanUpData(true,true);
 	begincur->closeCursor();
 	deleteCursorUpdateStats(begincur);
 
+	// debug
 	char	string[38];
 	snprintf(string,38,"begin result: %d",retval);
 	dbgfile.debugPrint("connection",2,string);
 
+	// we will need to commit or rollback at the end of the session now
 	if (retval) {
 		commitorrollback=true;
 	}

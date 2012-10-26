@@ -149,7 +149,7 @@ bool sqlrconnection_svr::getListByApiCall(sqlrcursor_svr *cursor,
 		int64_t		errnum=0;
 		bool		liveconnection;
 		cursor->errorMessage(&err,&errnum,&liveconnection);
-		returnError(cursor,err,errnum,false);
+		returnQueryError(cursor,err,errnum,false);
 		return false;
 	}
 

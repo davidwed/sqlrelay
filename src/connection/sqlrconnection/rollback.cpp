@@ -5,7 +5,11 @@
 
 void sqlrconnection_svr::rollbackCommand() {
 	dbgfile.debugPrint("connection",1,"rollback");
-	clientsock->write(rollbackInternal());
+	if (rollbackInternal()) {
+		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+	} else {
+		returnTransactionError();
+	}
 	flushWriteBuffer();
 }
 
@@ -22,10 +26,19 @@ bool sqlrconnection_svr::rollback() {
 
 	dbgfile.debugPrint("connection",1,"rollback...");
 
+	// re-init error data
+	delete[] txerror;
+	txerror=NULL;
+	txerrnum=0;
+	txliveconnection=false;
+
+	// init some variables
 	sqlrcursor_svr	*rollbackcur=initCursorUpdateStats();
 	const char	*rollbackquery="rollback";
 	int		rollbackquerylen=8;
 	bool		retval=false;
+
+	// run the query...
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	if (rollbackcur->openCursorInternal(cursorcount+1) &&
@@ -33,14 +46,26 @@ bool sqlrconnection_svr::rollback() {
 		retval=executeQueryUpdateStats(rollbackcur,rollbackquery,
 						rollbackquerylen,true);
 	}
+
+	// If there was an error, copy it out.  We'll be destroying the
+	// cursor in a moment and the error will be lost otherwise.
+	if (!retval) {
+		const char	*err;
+		rollbackcur->errorMessage(&err,&txerrnum,&txliveconnection);
+		txerror=charstring::duplicate(err);
+	}
+
+	// clean up
 	rollbackcur->cleanUpData(true,true);
 	rollbackcur->closeCursor();
 	deleteCursorUpdateStats(rollbackcur);
 
+	// debug
 	char	string[38];
 	snprintf(string,38,"rollback result: %d",retval);
 	dbgfile.debugPrint("connection",2,string);
 
+	// we don't need to commit or rollback at the end of the session now
 	if (retval) {
 		commitorrollback=false;
 	}

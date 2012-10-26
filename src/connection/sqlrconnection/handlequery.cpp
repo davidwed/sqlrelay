@@ -98,7 +98,8 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 				!cfgfl->getWaitForDownDatabase()) {
 
 				// return the error
-				returnError(cursor,error,errnum,!liveconnection);
+				returnQueryError(cursor,error,
+						errnum,!liveconnection);
 			}
 
 			// if the error was a dead connection
@@ -370,50 +371,4 @@ void sqlrconnection_svr::commitOrRollback(sqlrcursor_svr *cursor) {
 
 void sqlrconnection_svr::setFakeInputBinds(bool fake) {
 	fakeinputbinds=fake;
-}
-
-void sqlrconnection_svr::returnError(sqlrcursor_svr *cursor,
-					const char *error, int64_t errnum,
-					bool disconnect) {
-
-	dbgfile.debugPrint("connection",2,"returning error...");
-
-	// indicate that an error has occurred
-	if (disconnect) {
-		clientsock->write((uint16_t)ERROR_OCCURRED_DISCONNECT);
-	} else {
-		clientsock->write((uint16_t)ERROR_OCCURRED);
-	}
-
-	// send the error code
-	clientsock->write((uint64_t)errnum);
-
-	// send the error string
-	size_t	errorlen=charstring::length(error);
-		
-	#ifdef RETURN_QUERY_WITH_ERROR
-		clientsock->write((uint16_t)(errorlen+
-			charstring::length(cursor->querybuffer)+18));
-		clientsock->write(error,errorlen);
-		// send the attempted query back too
-		clientsock->write("\nAttempted Query:\n");
-		clientsock->write(cursor->querybuffer);
-	#else
-		clientsock->write((uint16_t)(errorlen));
-		clientsock->write(error);
-	#endif
-
-	// client will be sending skip/fetch, better get
-	// it even though we're not going to use it
-	uint64_t	skipfetch;
-	clientsock->read(&skipfetch,idleclienttimeout,0);
-	clientsock->read(&skipfetch,idleclienttimeout,0);
-
-	// Even though there was an error, we still 
-	// need to send the client the id of the 
-	// cursor that it's going to use.
-	clientsock->write(cursor->id);
-	flushWriteBuffer();
-
-	dbgfile.debugPrint("connection",2,"done returning error");
 }

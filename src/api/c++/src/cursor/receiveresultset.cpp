@@ -204,9 +204,8 @@ void sqlrcursor::getErrorFromServer() {
 	}
 
 	if (networkerror) {
-		error=new char[77];
-		charstring::copy(error,"There was an error, but the connection"
-					" died trying to retrieve it.  Sorry.");
+		setError("There was an error, but the connection"
+				" died trying to retrieve it.  Sorry.");
 	}
 	
 	handleError();

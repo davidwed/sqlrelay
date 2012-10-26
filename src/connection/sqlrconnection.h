@@ -376,8 +376,9 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	translateBindVariablesFromMappings(
 						sqlrcursor_svr *cursor);
 		void	commitOrRollback(sqlrcursor_svr *cursor);
+		void	returnTransactionError();
 		bool	handleError(sqlrcursor_svr *cursor);
-		void	returnError(sqlrcursor_svr *cursor,
+		void	returnQueryError(sqlrcursor_svr *cursor,
 						const char *error,
 						int64_t errnum,
 						bool disconnect);
@@ -434,6 +435,10 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool		lastauthsuccess;
 
 		bool		commitorrollback;
+
+		char		*txerror;
+		int64_t		txerrnum;
+		bool		txliveconnection;
 
 		bool		autocommit;
 		bool		autocommitforthissession;
