@@ -909,8 +909,6 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	deleterows.study();
 	preserverows.compile("(on|ON)[ \\t\\n\\r]+(commit|COMMIT)[ \\t\\n\\r]+(preserve|PRESERVE)[ \\t\\n\\r]+(rows|ROWS)");
 	preserverows.study();
-	asselect.compile("(as|AS)[ \\t\\n\\r]+\\(?[ \\t\\n\\r]?(select|SELECT)[ \\t\\n\\r]+");
-	asselect.study();
 #endif
 }
 
@@ -1802,7 +1800,10 @@ void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 		// if "droptemptables" was specified...
 		conn->addSessionTempTableForDrop(tablename.getString());
 	} else if (preserverows.match(ptr)) {
-		// if "on commit preserve rows" was not specified...
+		// If "on commit preserve rows" was specified, then when
+		// the commit/rollback is executed at the end of the
+		// session, the data won't be truncated.  It needs to
+		// be though, so we'll set it up to be truncated manually.
 		conn->addSessionTempTableForTrunc(tablename.getString());
 	}
 }

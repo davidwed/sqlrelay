@@ -280,7 +280,6 @@ class oracle8cursor : public sqlrcursor_svr {
 #ifdef HAVE_ORACLE_8i
 		regularexpression	preserverows;
 		regularexpression	deleterows;
-		regularexpression	asselect;
 #endif
 };
 	
