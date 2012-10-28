@@ -146,10 +146,9 @@ database.</p>
 <a name="startingatboot"></a>
 <span class="heading2">Starting the Database at Boot Time</span><br>
 
-<p>The package distributions of PostgreSQL install a script which starts the 
-database at boot time and stops it at shutdown time.  If you compiled from
-source, you'll need to install a script like the following to start/stop the
-database at boot/shutdown time.</p>
+<p>The package distributions of PostgreSQL either install a script which starts the database at boot time and stops it at shutdown time or use systemd.</p>
+
+<p>If you compiled from source, you'll need to install a script like the following to start/stop the database at boot/shutdown time.</p>
 
 <blockquote>
 <PRE>
