@@ -157,6 +157,9 @@ const char * const *sqlwriter::supportedElements() {
 		sqlparser::_on_update,
 		sqlparser::_on_commit,
 		sqlparser::_as,
+		sqlparser::_constraint,
+		sqlparser::_foreign_key,
+		sqlparser::_check,
 
 
 		// table creation qualifiers...
@@ -458,6 +461,12 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return onCommit(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_as)) {
 		return as(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_constraint)) {
+		return constraint(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_foreign_key)) {
+		return foreignKey(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_check)) {
+		return check(node,output);
 
 
 	// drop...

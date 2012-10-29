@@ -168,6 +168,12 @@ class sqlwriter {
 					rudiments::stringbuffer *output);
 		virtual bool	as(rudiments::xmldomnode *node,
 					rudiments::stringbuffer *output);
+		virtual bool	constraint(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	foreignKey(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	check(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 
 		// table creation qualifiers...

@@ -298,21 +298,9 @@ bool sqlparser::parseJoinUsing(xmldomnode *currentnode,
 	// create the node
 	xmldomnode	*joinusingnode=newNode(currentnode,_join_using);
 
-	// left paren
-	if (!leftParen(*newptr,newptr)) {
-		debugPrintf("missing left paren\n");
-		error=true;
-		return false;
-	}
-
+	// get the column name list
 	if (!parseColumnNameList(joinusingnode,*newptr,newptr)) {
 		debugPrintf("missing column name list\n");
-		error=true;
-		return false;
-	}
-
-	if (!rightParen(*newptr,newptr)) {
-		debugPrintf("missing right paren\n");
 		error=true;
 		return false;
 	}

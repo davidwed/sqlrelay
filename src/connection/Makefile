@@ -284,15 +284,34 @@ libsqlrelay_sqltranslation_oracleize.la: sqltranslations/oracleize.cpp sqltransl
 libsqlrelay_sqltranslation_serialtoautoincrement.la: sqltranslations/serialtoautoincrement.cpp sqltranslations/serialtoautoincrement.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/serialtoautoincrement.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
 	
+install: install-connection install-triggers install-translations
 
-install:
+install-connection:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libsqlrconnection.la $(libdir)
+	$(LIBTOOL) --mode=finish $(libdir)
+	$(MKINSTALLDIRS) $(tmpdir)
+	chmod 777 $(tmpdir)
+	$(MKINSTALLDIRS) $(tmpdir)/sockets
+	chmod 777 $(tmpdir)/sockets
+	$(MKINSTALLDIRS) $(tmpdir)/pids
+	chmod 777 $(tmpdir)/pids
+	$(MKINSTALLDIRS) $(tmpdir)/ipc
+	chmod 777 $(tmpdir)/ipc
+	$(MKINSTALLDIRS) $(debugdir)
+	chmod 777 $(debugdir)
+
+install-triggers:
+	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libsqlrelay_sqltrigger_createtableautoincrementoracle.la $(libdir)
 	$(RM) $(libdir)/libsqlrelay_sqltrigger_createtableautoincrementoracle.a
 	$(LTINSTALL) libsqlrelay_sqltrigger_droptableautoincrementoracle.la $(libdir)
 	$(RM) $(libdir)/libsqlrelay_sqltrigger_droptableautoincrementoracle.a
 	$(LTINSTALL) libsqlrelay_sqltranslation_doublequotestosinglequotes.la $(libdir)
+	$(LIBTOOL) --mode=finish $(libdir)
+
+install-translations:
+	$(MKINSTALLDIRS) $(libdir)
 	$(RM) $(libdir)/libsqlrelay_sqltranslation_doublequotestosinglequotes.a
 	$(LTINSTALL) libsqlrelay_sqltranslation_informixtooracledate.la $(libdir)
 	$(RM) $(libdir)/libsqlrelay_sqltranslation_informixtooracledate.a
@@ -313,16 +332,6 @@ install:
 	$(LTINSTALL) libsqlrelay_sqltranslation_serialtoautoincrement.la $(libdir)
 	$(RM) $(libdir)/libsqlrelay_sqltranslation_serialtoautoincrement.a
 	$(LIBTOOL) --mode=finish $(libdir)
-	$(MKINSTALLDIRS) $(tmpdir)
-	chmod 777 $(tmpdir)
-	$(MKINSTALLDIRS) $(tmpdir)/sockets
-	chmod 777 $(tmpdir)/sockets
-	$(MKINSTALLDIRS) $(tmpdir)/pids
-	chmod 777 $(tmpdir)/pids
-	$(MKINSTALLDIRS) $(tmpdir)/ipc
-	chmod 777 $(tmpdir)/ipc
-	$(MKINSTALLDIRS) $(debugdir)
-	chmod 777 $(debugdir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection.la

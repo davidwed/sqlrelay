@@ -327,6 +327,52 @@ class sqlparser {
 		bool	parseConstraint(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
+		bool	parseKeyConstraint(rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseConstraintClause(
+					rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	constraintClause(const char *ptr, const char **newptr);
+		static const char	*_constraint;
+		bool	parsePrimaryKeyConstraint(
+					rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseUniqueConstraint(
+					rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseForeignKeyConstraint(
+					rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseForeignKey(rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	foreignKeyClause(const char *ptr, const char **newptr);
+		static const char	*_foreign_key;
+		bool	parseIndexOrKeyConstraint(
+					rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseFulltextOrSpatialConstraint(
+					rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseIndex(rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseIndexOption(rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseCheckConstraint(
+					rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	checkClause(const char *ptr, const char **newptr);
+		static const char	*_check;
 
 
 
@@ -358,6 +404,7 @@ class sqlparser {
 		bool	parseOnClause(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
+
 
 
 

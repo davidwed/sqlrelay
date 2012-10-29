@@ -228,6 +228,29 @@ bool sqlwriter::as(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::constraint(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	const char	*name=node->getAttributeValue("value");
+	if (name) {
+		output->append("constraint ")->append(name);
+	}
+	return true;
+}
+
+bool sqlwriter::foreignKey(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("foreign key ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::check(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("check ");
+	outputValue(node,output);
+	return true;
+}
+
 bool sqlwriter::withNoLog(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("with no log ");

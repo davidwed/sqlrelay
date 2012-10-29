@@ -80,18 +80,7 @@ bool sqlparser::parseInsertInto(xmldomnode *currentnode,
 	}
 
 	// columns (optional)
-	if (leftParen(*newptr,newptr)) {
-
-		// parse columns
-		if (!parseColumnNameList(intonode,*newptr,newptr)) {
-			return false;
-		}
-
-		// right paren
-		if (!rightParen(*newptr,newptr)) {
-			return false;
-		}
-	}
+	parseColumnNameList(intonode,*newptr,newptr);
 
 	return true;
 }

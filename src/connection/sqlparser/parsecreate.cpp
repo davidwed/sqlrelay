@@ -226,14 +226,10 @@ bool sqlparser::parseColumnAndConstraintDefinitions(
 	// column and constraint definitions
 	for (;;) {
 
-		// create column definition node
-		xmldomnode	*coldefnode=newNode(columnsnode,
-							_column);
-
 		// column definition or constraint
 		const char	*start=*newptr;
-		if (!parseColumnDefinition(coldefnode,start,newptr) &&
-			!parseConstraint(coldefnode,start,newptr)) {
+		if (!parseConstraint(columnsnode,start,newptr) &&
+			!parseColumnDefinition(columnsnode,start,newptr)) {
 			return false;
 		}
 
@@ -257,24 +253,33 @@ bool sqlparser::parseColumnDefinition(xmldomnode *currentnode,
 						const char **newptr) {
 	debugFunction();
 
+	// create column definition node
+	xmldomnode	*cnode=new xmldomnode(tree,
+						currentnode->getNullNode(),
+						TAG_XMLDOMNODETYPE,
+						_column,NULL);
+
 	// column name
-	if (!parseName(currentnode,ptr,newptr)) {
+	if (!parseName(cnode,ptr,newptr)) {
 		debugPrintf("missing column name\n");
 		error=true;
+		delete cnode;
 		return false;
 	}
 
 	// column type
-	if (!parseType(currentnode,*newptr,newptr)) {
+	if (!parseType(cnode,*newptr,newptr)) {
 		debugPrintf("missing column type\n");
 		error=true;
+		delete cnode;
 		return false;
 	}
 
 	// constraints
-	parseConstraints(currentnode,*newptr,newptr);
+	parseConstraints(cnode,*newptr,newptr);
 
 	// success
+	currentnode->appendChild(cnode);
 	return true;
 }
 
@@ -674,21 +679,9 @@ bool sqlparser::parseReferenceDefinition(xmldomnode *currentnode,
 		return false;
 	}
 
-	// left paren
-	if (!leftParen(*newptr,newptr)) {
-		debugPrintf("missing left paren\n");
-		error=true;
-		return false;
-	}
-
 	// column names
 	if (!parseColumnNameList(referencesnode,*newptr,newptr)) {
-		return false;
-	}
-
-	// right paren
-	if (!rightParen(*newptr,newptr)) {
-		debugPrintf("missing right paren\n");
+		debugPrintf("missing column name list\n");
 		error=true;
 		return false;
 	}
@@ -726,10 +719,14 @@ bool sqlparser::parseColumnNameList(xmldomnode *currentnode,
 						const char **newptr) {
 	debugFunction();
 
+	// left paren
+	if (!leftParen(ptr,newptr)) {
+		return false;
+	}
+
 	// create new node
 	xmldomnode	*columnsnode=newNode(currentnode,_columns);
 
-	*newptr=ptr;
 	for (;;) {
 
 		// get the column
@@ -773,12 +770,8 @@ bool sqlparser::parseColumnNameList(xmldomnode *currentnode,
 		parseAsc(columnnode,*newptr,newptr);
 		parseDesc(columnnode,*newptr,newptr);
 
-		// if we hit a right parentheses then we're done, but we need
-		// to stay on it, so we'll reset the pointer afterwards if we
-		// find one
-		const char	*before=*newptr;
+		// if we hit a right parentheses then we're done
 		if (rightParen(*newptr,newptr)) {
-			*newptr=before;
 			return true;
 		}
 	}
@@ -1019,23 +1012,9 @@ bool sqlparser::parseCreateIndex(xmldomnode *currentnode,
 		return false;
 	}
 
-	// columns
-	if (!leftParen(*newptr,newptr)) {
-		debugPrintf("missing left paren\n");
-		error=true;
-		return false;
-	}
-
 	// column list
 	if (!parseColumnNameList(indexnode,*newptr,newptr)) {
-		debugPrintf("missing column list\n");
-		error=true;
-		return false;
-	}
-
-	// right paren
-	if (!rightParen(*newptr,newptr)) {
-		debugPrintf("missing right paren\n");
+		debugPrintf("missing column name list\n");
 		error=true;
 		return false;
 	}
@@ -1057,14 +1036,27 @@ bool sqlparser::parseIndexName(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
+
+	const char	*start=ptr;
+
 	char	*indexname=getWord(ptr,newptr);
-	splitDatabaseObjectName(currentnode,
-				indexname,
-				_index_name_database,
-				_index_name_schema,
-				_index_name_index);
+
+	// if the name was the word "using" then it was the beginning of an
+	// index type rather than the name of the index itself
+	bool	retval=true;
+	if (!charstring::compareIgnoringCase(indexname,"using")) {
+		*newptr=start;
+		retval=false;
+	} else {
+		splitDatabaseObjectName(currentnode,
+					indexname,
+					_index_name_database,
+					_index_name_schema,
+					_index_name_index);
+	}
+
 	delete[] indexname;
-	return true;
+	return retval;
 }
 
 const char *sqlparser::_index_name_database="index_name_database";
@@ -1153,11 +1145,327 @@ bool sqlparser::parseConstraint(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
-
-	// FIXME: implement this...
-
-	return false;
+	return parseKeyConstraint(currentnode,ptr,newptr) ||
+		parseIndexOrKeyConstraint(currentnode,ptr,newptr) ||
+		parseFulltextOrSpatialConstraint(currentnode,ptr,newptr) ||
+		parseCheckConstraint(currentnode,ptr,newptr);
 }
+
+bool sqlparser::parseKeyConstraint(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+
+	// save the current position
+	const char	*start=ptr;
+
+	// create the node
+	xmldomnode	*cnode=new xmldomnode(tree,
+						currentnode->getNullNode(),
+						TAG_XMLDOMNODETYPE,
+						_constraint,NULL);
+
+	// get the constraint itself...
+	*newptr=ptr;
+	for (bool firsttry=true; ; firsttry=false) {
+
+		// look for key clause
+		if (parsePrimaryKeyConstraint(cnode,*newptr,newptr) ||
+			(!error &&
+			parseUniqueConstraint(cnode,*newptr,newptr)) ||
+			(!error &&
+			parseForeignKeyConstraint(cnode,*newptr,newptr))) {
+			currentnode->appendChild(cnode);
+			return true;
+		}
+
+		if (error) {
+			return false;
+		}
+
+		// look for a constraint clause, then try again for the key
+		if (!firsttry || !parseConstraintClause(cnode,*newptr,newptr)) {
+			*newptr=start;
+			delete cnode;
+			return false;
+		}
+	}
+}
+
+bool sqlparser::parseConstraintClause(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+
+	// constraint
+	if (!constraintClause(ptr,newptr)) {
+		return false;
+	}
+
+	// save our spot
+	const char	*start=*newptr;
+
+	// get the name
+	char	*name=getWord(*newptr,newptr);
+
+	// we would like to add the name as the value of the constraint tag
+	const char	*value=name;
+
+	// ...but, if the name turns out to be a
+	// key type then it wasn't a name at all
+	if (!charstring::compareIgnoringCase(name,"primary") ||
+		!charstring::compareIgnoringCase(name,"unique") ||
+		!charstring::compareIgnoringCase(name,"foreign")) {
+
+		// use an empty string instead, this will induce the writer
+		// to still write out the constraint keyword, but without a
+		// name following it
+		value="";
+
+		// go back to where we were before getting the name too
+		*newptr=start;
+	}
+
+	// add whatever we decided on as the value of the constraint tag
+	setAttribute(currentnode,_value,value);
+
+	// clean up
+	delete[] name;
+	return true;
+}
+
+bool sqlparser::constraintClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"constraint ");
+}
+
+const char *sqlparser::_constraint="constraint";
+
+bool sqlparser::parsePrimaryKeyConstraint(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+
+	// primary key
+	if (!parsePrimaryKey(currentnode,ptr,newptr)) {
+		return false;
+	}
+
+	// optional index type
+	parseIndexType(currentnode,*newptr,newptr);
+
+	// column list
+	if (!parseColumnNameList(currentnode,*newptr,newptr)) {
+		debugPrintf("missing column name list\n");
+		error=true;
+		return false;
+	}
+
+	// optional index option
+	parseIndexOption(currentnode,*newptr,newptr);
+	return true;
+}
+
+bool sqlparser::parseUniqueConstraint(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+
+	// unique (key)
+	if (!parseUnique(currentnode,ptr,newptr)) {
+		return false;
+	}
+
+	// optional index and key
+	if (!parseIndex(currentnode,*newptr,newptr)) {
+		parseKey(currentnode,*newptr,newptr);
+	}
+
+	// optional index name
+	parseIndexName(currentnode,*newptr,newptr);
+
+	// optional index type
+	parseIndexType(currentnode,*newptr,newptr);
+
+	// column list
+	if (!parseColumnNameList(currentnode,*newptr,newptr)) {
+		debugPrintf("missing column name list\n");
+		error=true;
+		return false;
+	}
+
+	// optinal index option
+	parseIndexOption(currentnode,*newptr,newptr);
+	return true;
+}
+
+bool sqlparser::parseForeignKeyConstraint(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+
+	// foreign key
+	if (!parseForeignKey(currentnode,ptr,newptr)) {
+		return false;
+	}
+
+	// optional index name
+	parseIndexName(currentnode,*newptr,newptr);
+
+	// column list
+	if (!parseColumnNameList(currentnode,*newptr,newptr)) {
+		debugPrintf("missing column name list\n");
+		error=true;
+		return false;
+	}
+
+	// reference definition
+	parseReferenceDefinition(currentnode,*newptr,newptr);
+	return true;
+}
+
+bool sqlparser::parseForeignKey(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+	if (!foreignKeyClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_foreign_key);
+	return true;
+}
+
+bool sqlparser::foreignKeyClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"foreign key");
+}
+
+const char *sqlparser::_foreign_key="foreign_key";
+
+bool sqlparser::parseIndexOrKeyConstraint(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+
+	// index or key
+	if (!parseIndex(currentnode,ptr,newptr) &&
+		!parseKey(currentnode,ptr,newptr)) {
+		return false;
+	}
+
+	// optional index name and type
+	parseIndexName(currentnode,*newptr,newptr);
+	parseIndexType(currentnode,*newptr,newptr);
+
+	// column list
+	if (!parseColumnNameList(currentnode,*newptr,newptr)) {
+		debugPrintf("missing column name list\n");
+		error=true;
+		return false;
+	}
+
+	// optional index option
+	parseIndexOption(currentnode,*newptr,newptr);
+	return true;
+}
+
+bool sqlparser::parseFulltextOrSpatialConstraint(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+
+	// fulltext or spatial
+	if (!parseFulltext(currentnode,ptr,newptr) &&
+		!parseSpatial(currentnode,ptr,newptr)) {
+		return false;
+	}
+
+	// optional index or key
+	if (!parseIndex(currentnode,*newptr,newptr)) {
+		parseKey(currentnode,*newptr,newptr);
+	}
+
+	// optional index name
+	parseIndexName(currentnode,*newptr,newptr);
+
+	// column list
+	if (!parseColumnNameList(currentnode,*newptr,newptr)) {
+		debugPrintf("missing column name list\n");
+		error=true;
+		return false;
+	}
+
+	// optional index option
+	parseIndexOption(currentnode,*newptr,newptr);
+	return true;
+}
+
+bool sqlparser::parseIndex(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+	if (!indexClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_index);
+	return true;
+}
+
+bool sqlparser::parseIndexOption(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+
+	// FIXME: implement this
+	//   KEY_BLOCK_SIZE [=] value
+	// | index_type
+	// | WITH PARSER parser_name
+
+	return true;
+}
+
+bool sqlparser::parseCheckConstraint(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+
+	// check
+	if (!checkClause(ptr,newptr)) {
+		return false;
+	}
+
+	// create the node
+	xmldomnode	*cnode=newNode(currentnode,_check);
+
+	// left paren
+	if (!leftParen(*newptr,newptr)) {
+		debugPrintf("missing left paren\n");
+		error=true;
+		return false;
+	}
+
+	// expression
+	if (!parseExpression(cnode,*newptr,newptr)) {
+		debugPrintf("missing expression\n");
+		error=true;
+		return false;
+	}
+
+	// right paren
+	if (!rightParen(*newptr,newptr)) {
+		debugPrintf("missing right paren\n");
+		error=true;
+		return false;
+	}
+	return true;
+}
+
+bool sqlparser::checkClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"check ");
+}
+
+const char *sqlparser::_check="check";
 
 bool sqlparser::parseCreateSynonym(xmldomnode *currentnode,
 					const char *ptr,
