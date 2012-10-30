@@ -178,6 +178,8 @@ class sqlwriter {
 					rudiments::stringbuffer *output);
 		virtual bool	check(rudiments::xmldomnode *node,
 					rudiments::stringbuffer *output);
+		virtual bool	endCheck(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 
 		// table creation qualifiers...

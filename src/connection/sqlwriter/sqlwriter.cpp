@@ -762,6 +762,8 @@ bool sqlwriter::handleEnd(xmldomnode *node, stringbuffer *output) {
 		return endColumn(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_values)) {
 		return endValues(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_check)) {
+		return endCheck(node,output);
 
 	// drop...
 	} else if (!charstring::compare(nodename,

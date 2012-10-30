@@ -285,7 +285,11 @@ void sqlrconnection_svr::setUnixSocketDirectory() {
 
 bool sqlrconnection_svr::handlePidFile() {
 
-	// check for listener pid file
+	// check for listener's pid file
+	// (Look a few times.  It might not be there right away.  The listener
+	// writes it out after forking and it's possible that the connection
+	// might start up after the sqlr-listener has forked, but before it
+	// writes out the pid file)
 	size_t	listenerpidfilelen=tmpdir->getLength()+20+
 				charstring::length(cmdl->getId())+1;
 	char	*listenerpidfile=new char[listenerpidfilelen];
@@ -294,7 +298,14 @@ bool sqlrconnection_svr::handlePidFile() {
 				tmpdir->getString(),cmdl->getId());
 
 	bool	retval=true;
-	if (checkForPidFile(listenerpidfile)==-1) {
+	bool	found=false;
+	for (uint8_t i=0; !found && i<10; i++) {
+		if (i) {
+			snooze::microsnooze(0,100000);
+		}
+		found=(checkForPidFile(listenerpidfile)!=-1);
+	}
+	if (!found) {
 		fprintf(stderr,"\nsqlr-connection error:\n");
 		fprintf(stderr,"	The pid file %s",listenerpidfile);
 		fprintf(stderr," was not found.\n");

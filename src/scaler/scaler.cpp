@@ -40,6 +40,7 @@ scaler::scaler() : daemonprocess() {
 
 	cmdl=NULL;
 
+	idfilename=NULL;
 	pidfile=NULL;
 	semset=NULL;
 	idmemory=NULL;
@@ -81,12 +82,23 @@ bool scaler::initScaler(int argc, const char **argv) {
 	tmpdir=new tempdir(cmdl);
 
 	// check for listener's pid file
+	// (Look a few times.  It might not be there right away.  The listener
+	// writes it out after forking and it's possible that the scaler might
+	// start up after the sqlr-listener has forked, but before it writes
+	// out the pid file)
 	size_t	listenerpidfilelen=tmpdir->getLength()+20+
 					charstring::length(id)+1;
 	char	*listenerpidfile=new char[listenerpidfilelen];
 	snprintf(listenerpidfile,listenerpidfilelen,
 			"%s/pids/sqlr-listener-%s",tmpdir->getString(),id);
-	if (checkForPidFile(listenerpidfile)==-1) {
+	bool	found=false;
+	for (uint8_t i=0; !found && i<5; i++) {
+		if (i) {
+			snooze::microsnooze(0,100000);
+		}
+		found=(checkForPidFile(listenerpidfile)!=-1);
+	}
+	if (!found) {
 		fprintf(stderr,"\nsqlr-scaler error: \n");
 		fprintf(stderr,"	The file %s",listenerpidfile);
 		fprintf(stderr," was not found.\n");

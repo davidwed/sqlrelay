@@ -246,8 +246,13 @@ bool sqlwriter::foreignKey(xmldomnode *node, stringbuffer *output) {
 
 bool sqlwriter::check(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
-	output->append("check ");
-	outputValue(node,output);
+	output->append("check (");
+	return true;
+}
+
+bool sqlwriter::endCheck(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append(")");
 	return true;
 }
 
