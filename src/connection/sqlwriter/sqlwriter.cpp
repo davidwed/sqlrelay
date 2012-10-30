@@ -123,6 +123,8 @@ const char * const *sqlwriter::supportedElements() {
 		sqlparser::_index_name_index,
 		sqlparser::_btree,
 		sqlparser::_hash,
+		sqlparser::_key_block_size,
+		sqlparser::_with_parser,
 
 		// synonym...
 		sqlparser::_synonym,
@@ -390,6 +392,10 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return btree(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_hash)) {
 		return hash(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_key_block_size)) {
+		return keyBlockSize(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_with_parser)) {
+		return withParser(node,output);
 
 	// synonym...
 	} else if (!charstring::compare(nodename,sqlparser::_synonym)) {

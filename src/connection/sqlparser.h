@@ -367,6 +367,16 @@ class sqlparser {
 		bool	parseIndexOption(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
+		bool	parseKeyBlockSize(rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	keyBlockSize(const char *ptr, const char **newptr);
+		static const char	*_key_block_size;
+		bool	parseWithParser(rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	withParser(const char *ptr, const char **newptr);
+		static const char	*_with_parser;
 		bool	parseCheckConstraint(
 					rudiments::xmldomnode *currentnode,
 						const char *ptr,

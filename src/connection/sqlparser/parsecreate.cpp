@@ -1068,15 +1068,8 @@ bool sqlparser::parseIndexType(xmldomnode *currentnode,
 					const char **newptr) {
 	debugFunction();
 
-	// bail right away if we find an on clause, which is
-	// the only thing that could follow the index type
-	if (onClause(ptr,newptr)) {
-		*newptr=ptr;
-		return false;
-	}
-
 	// using
-	if (!usingClause(*newptr,newptr)) {
+	if (!usingClause(ptr,newptr)) {
 		return false;
 	}
 
@@ -1089,8 +1082,8 @@ bool sqlparser::parseIndexType(xmldomnode *currentnode,
 		return true;
 	}
 
-	// some other, unrecognized index type
-	parseVerbatim(usingnode,*newptr,newptr);
+	debugPrintf("missing index type\n");
+	error=true;
 	return false;
 }
 
@@ -1107,7 +1100,7 @@ bool sqlparser::parseBtree(xmldomnode *currentnode,
 
 bool sqlparser::btree(const char *ptr, const char **newptr) {
 	debugFunction();
-	return comparePart(ptr,newptr,"btree ");
+	return comparePart(ptr,newptr,"btree");
 }
 
 const char *sqlparser::_btree="btree";
@@ -1125,7 +1118,7 @@ bool sqlparser::parseHash(xmldomnode *currentnode,
 
 bool sqlparser::hash(const char *ptr, const char **newptr) {
 	debugFunction();
-	return comparePart(ptr,newptr,"hash ");
+	return comparePart(ptr,newptr,"hash");
 }
 
 const char *sqlparser::_hash="hash";
@@ -1171,10 +1164,8 @@ bool sqlparser::parseKeyConstraint(xmldomnode *currentnode,
 
 		// look for key clause
 		if (parsePrimaryKeyConstraint(cnode,*newptr,newptr) ||
-			(!error &&
-			parseUniqueConstraint(cnode,*newptr,newptr)) ||
-			(!error &&
-			parseForeignKeyConstraint(cnode,*newptr,newptr))) {
+			parseUniqueConstraint(cnode,*newptr,newptr) ||
+			parseForeignKeyConstraint(cnode,*newptr,newptr)) {
 			currentnode->appendChild(cnode);
 			return true;
 		}
@@ -1294,7 +1285,7 @@ bool sqlparser::parseUniqueConstraint(xmldomnode *currentnode,
 		return false;
 	}
 
-	// optinal index option
+	// optional index option
 	parseIndexOption(currentnode,*newptr,newptr);
 	return true;
 }
@@ -1415,14 +1406,82 @@ bool sqlparser::parseIndexOption(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
+	return parseKeyBlockSize(currentnode,ptr,newptr) ||
+		parseIndexType(currentnode,ptr,newptr) ||
+		parseWithParser(currentnode,ptr,newptr);
+}
 
-	// FIXME: implement this
-	//   KEY_BLOCK_SIZE [=] value
-	// | index_type
-	// | WITH PARSER parser_name
+bool sqlparser::parseKeyBlockSize(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+	
+	// key_block_size
+	if (!keyBlockSize(ptr,newptr)) {
+		return false;
+	}
 
+	// create the node
+	xmldomnode	*kbsnode=newNode(currentnode,_key_block_size);
+
+	// optional equals
+	if (equals(*newptr,newptr)) {
+		kbsnode->setAttributeValue("equals","true");
+	}
+
+	// numeric value
+	bool	retval=true;
+	char	*number=getVerbatim(*newptr,newptr);
+	if (charstring::isNumber(number)) {
+		kbsnode->setAttributeValue("value",number);
+	} else {
+		debugPrintf("missing key block size value\n");
+		error=true;
+		retval=false;
+	}
+	delete[] number;
+	return retval;
+}
+
+bool sqlparser::keyBlockSize(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"key_block_size");
+}
+
+const char *sqlparser::_key_block_size="key_block_size";
+
+bool sqlparser::parseWithParser(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+	
+	// with parser
+	if (!withParser(ptr,newptr)) {
+		return false;
+	}
+
+	// get the parser name
+	char	*name=getWord(*newptr,newptr);
+	if (!name) {
+		debugPrintf("missing parser name\n");
+		error=true;
+		return false;
+	}
+
+	// create the node
+	newNode(currentnode,_with_parser,name);
+
+	// clean up
+	delete[] name;
 	return true;
 }
+
+bool sqlparser::withParser(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"with parser ");
+}
+
+const char *sqlparser::_with_parser="with_parser";
 
 bool sqlparser::parseCheckConstraint(xmldomnode *currentnode,
 						const char *ptr,

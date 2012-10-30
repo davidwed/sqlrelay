@@ -317,6 +317,25 @@ bool sqlwriter::hash(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
+bool sqlwriter::keyBlockSize(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("key_block_size");
+	if (!charstring::compare(node->getAttributeValue("equals"),"true")) {
+		output->append("=");
+	} else {
+		output->append(" ");
+	}
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::withParser(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("with parser ");
+	outputValue(node,output);
+	return true;
+}
+
 bool sqlwriter::synonym(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("synonym ");

@@ -90,6 +90,10 @@ class sqlwriter {
 					rudiments::stringbuffer *output);
 		virtual bool	hash(rudiments::xmldomnode *node,
 					rudiments::stringbuffer *output);
+		virtual bool	keyBlockSize(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+		virtual bool	withParser(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 
 
 		// synonym...
