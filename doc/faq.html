@@ -99,7 +99,8 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <li><a href="#dynamicscaling">If I set up SQL Relay to use dynamic scaling, it eventually spawns off as many connections as it can and they never die off.  What's going on?</a></li>
 <li><a href="#maxqueuelengthzero">If I set up SQL Relay to use dynamic scaling with a maxqueuelength=0, sometimes it spawns off new connections even when there should be enough to handle the clients.  What's going on?</a></li>
 <li><a href="#cursorgrowth">In sqlrelay.conf, I set the cursors parameter to a small number.  Why does sqlr-status show Opened Server Cursors growing and growing?</a></li>
-<li><a href="#cygwin">When using SQL Relay on Cygwin, I get an error like "child_info_fork::abort: ...xxx.dll: Loaded to different address: parent(xxx)!=child(yyy)" and nothing runs.  How do I fix that?</a></li>
+<li><a href="#cygwinstart">When using SQL Relay on Cygwin, sqlr-start never returns to a command prompt.  How do I fix that?</a></li>
+<li><a href="#cygwinfork">When using SQL Relay on Cygwin, I get an error like "child_info_fork::abort: ...xxx.dll: Loaded to different address: parent(xxx)!=child(yyy)" and nothing runs.  How do I fix that?</a></li>
 </ul>
 
 <hr>
@@ -1097,7 +1098,20 @@ additional resource consumption.</p>
 
 <p>Some database API's provide functions for doing commits and rollbacks.  Others do not.  For those that do not, SQL Relay allocates a new cursor and uses it to execute the commit or rollback as a query.  Each time this happens, the Opened Server Cursors count increases.  Aside from being confusing, this shouldn't cause any problems.</p>
 
-<br><a name="cygwin"></a>
+<br><a name="cygwinstart"></a>
+<span class="heading3">When using SQL Relay on Cygwin, sqlr-start never returns to a command prompt.  How do I fix that?</span><br>
+
+<p>For some reason, only under Cygwin, the exit() call at the end of sqlr-start waits for the various processes that were started to finish.  I'm not sure why exactly and I don't remember it happening prior to Cygwin 1.7.  It's possible that it doesn't happen on all platforms or all versions of Cygwin.</p>
+
+<p>You can sqlr-start into the background:</p>
+
+<blockquote><b>sqlr-start -id <i>instance></i></b></blockquote>
+
+<p>...to get the command prompt back, but doing that will return you to the command prompt before everything is started, so it's not a great solution.</p>
+
+<p>Ultimately I'll get to the bottom of the problem, but for now, that's the only solution.</p>
+
+<br><a name="cygwinfork"></a>
 <span class="heading3">When using SQL Relay on Cygwin, I get an error like "child_info_fork::abort: ...xxx.dll: Loaded to different address: parent(xxx)!=child(yyy)" and nothing runs.  How do I fix that?</span><br>
 
 <p>The various SQL Relay server processes "fork themselves into the background" on startup.  Windows doesn't have the same concept of fork() that unix has though.  Cygwin provides a reasonable facimile but the implementation is highy complex and can get fouled up in a number of ways.</p>
