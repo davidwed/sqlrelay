@@ -99,6 +99,7 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <li><a href="#dynamicscaling">If I set up SQL Relay to use dynamic scaling, it eventually spawns off as many connections as it can and they never die off.  What's going on?</a></li>
 <li><a href="#maxqueuelengthzero">If I set up SQL Relay to use dynamic scaling with a maxqueuelength=0, sometimes it spawns off new connections even when there should be enough to handle the clients.  What's going on?</a></li>
 <li><a href="#cursorgrowth">In sqlrelay.conf, I set the cursors parameter to a small number.  Why does sqlr-status show Opened Server Cursors growing and growing?</a></li>
+<li><a href="#cygwin">When using SQL Relay on Cygwin, I get an error like "child_info_fork::abort: ...xxx.dll: Loaded to different address: parent(xxx)!=child(yyy)" and nothing runs.  How do I fix that?</a></li>
 </ul>
 
 <hr>
@@ -1084,17 +1085,26 @@ additional resource consumption.</p>
 
 <p>In version 0.41, the default <i>maxsessioncount</i> value was 10.  This caused performance problems as most people just didn't set the value at all.  As of 0.42, the default has been 0, effectively disabling this feature by default.</p>
 
-<br><a name="maxqueuelengthzero">
+<br><a name="maxqueuelengthzero"></a>
 <span class="heading3">If I set up SQL Relay to use dynamic scaling with a maxqueuelength=0, sometimes it spawns off new connections even when there should be enough to handle the clients.  What's going on?</span><br>
 
 <p>This can happen if maxqueuelength=0, all connection daemons are occupied and a client calls endSession and immediately runs another query.  The connection daemon that the client was using has to loop back and tell the listener that it's ready for another client.  The client will attempt to reconnect to SQL Relay to run the next query, but depending on the exact timing, if the connetion daemon hasn't finished looping back, to the scaler daemon, it will appear that all connections are busy, but there's a new client attempting to connect and it will fork off a new connection daemon to service it.</p>
 
 <p>There is no easy fix for this.  Anything that might be done to guarantee that a new connection daemon won't be spawned would reduce overall performance.  So, if you're using maxqueuelength=0, then expect for this to happen.  It should not happen if maxqueuelenght is set to some value greater than 0.</p>
 
-<br><a name="cursorgrowth">
+<br><a name="cursorgrowth"></a>
 <span class="heading3">In sqlrelay.conf, I set the cursors parameter to a small number.  Why does sqlr-status show Opened Server Cursors growing and growing?</span><br>
 
 <p>Some database API's provide functions for doing commits and rollbacks.  Others do not.  For those that do not, SQL Relay allocates a new cursor and uses it to execute the commit or rollback as a query.  Each time this happens, the Opened Server Cursors count increases.  Aside from being confusing, this shouldn't cause any problems.</p>
+
+<br><a name="cygwin"></a>
+<span class="heading3">When using SQL Relay on Cygwin, I get an error like "child_info_fork::abort: ...xxx.dll: Loaded to different address: parent(xxx)!=child(yyy)" and nothing runs.  How do I fix that?</span><br>
+
+<p>The various SQL Relay server processes "fork themselves into the background" on startup.  Windows doesn't have the same concept of fork() that unix has though.  Cygwin provides a reasonable facimile but the implementation is highy complex and can get fouled up in a number of ways.</p>
+
+<p>I encountered this problem when building with g++ 4.x with Cygwin 1.7 on Windows 7 and switching to g++ 3.x solved it.</p>
+
+<p>However, there are more common causes and the <a href="http://cygwin.com/faq-nochunks.html#faq.using.fixing-fork-failures">Cygwin FAQ</a> provides a good explanation of them and provides potential solutions.</p>
 
 </body>
 </html>
