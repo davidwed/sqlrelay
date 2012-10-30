@@ -101,10 +101,19 @@ bool sqlparser::parseFulltext(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
+	xmldomnode	*newnode=NULL;
+	return parseFulltext(currentnode,ptr,newptr,&newnode);
+}
+
+bool sqlparser::parseFulltext(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr,
+					xmldomnode **newnode) {
+	debugFunction();
 	if (!fulltext(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,_fulltext);
+	*newnode=newNode(currentnode,_fulltext);
 	return true;
 }
 
@@ -119,10 +128,19 @@ bool sqlparser::parseSpatial(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
+	xmldomnode	*newnode=NULL;
+	return parseSpatial(currentnode,ptr,newptr,&newnode);
+}
+
+bool sqlparser::parseSpatial(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr,
+					xmldomnode **newnode) {
+	debugFunction();
 	if (!spatial(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,_spatial);
+	*newnode=newNode(currentnode,_spatial);
 	return true;
 }
 
@@ -577,10 +595,19 @@ bool sqlparser::parsePrimaryKey(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
+	xmldomnode	*newnode=NULL;
+	return parsePrimaryKey(currentnode,ptr,newptr,&newnode);
+}
+
+bool sqlparser::parsePrimaryKey(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr,
+						xmldomnode **newnode) {
+	debugFunction();
 	if (!primaryKeyClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,_primary_key);
+	*newnode=newNode(currentnode,_primary_key);
 	return true;
 }
 
@@ -595,10 +622,19 @@ bool sqlparser::parseKey(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
+	xmldomnode	*newnode=NULL;
+	return parseKey(currentnode,ptr,newptr,&newnode);
+}
+
+bool sqlparser::parseKey(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr,
+						xmldomnode **newnode) {
+	debugFunction();
 	if (!keyClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,_key);
+	*newnode=newNode(currentnode,_key);
 	return true;
 }
 
@@ -1238,22 +1274,23 @@ bool sqlparser::parsePrimaryKeyConstraint(xmldomnode *currentnode,
 	debugFunction();
 
 	// primary key
-	if (!parsePrimaryKey(currentnode,ptr,newptr)) {
+	xmldomnode	*pkeynode=NULL;
+	if (!parsePrimaryKey(currentnode,ptr,newptr,&pkeynode)) {
 		return false;
 	}
 
 	// optional index type
-	parseIndexType(currentnode,*newptr,newptr);
+	parseIndexType(pkeynode,*newptr,newptr);
 
 	// column list
-	if (!parseColumnNameList(currentnode,*newptr,newptr)) {
+	if (!parseColumnNameList(pkeynode,*newptr,newptr)) {
 		debugPrintf("missing column name list\n");
 		error=true;
 		return false;
 	}
 
 	// optional index option
-	parseIndexOption(currentnode,*newptr,newptr);
+	parseIndexOption(pkeynode,*newptr,newptr);
 	return true;
 }
 
@@ -1263,30 +1300,31 @@ bool sqlparser::parseUniqueConstraint(xmldomnode *currentnode,
 	debugFunction();
 
 	// unique (key)
-	if (!parseUnique(currentnode,ptr,newptr)) {
+	xmldomnode	*ukeynode=NULL;
+	if (!parseUnique(currentnode,ptr,newptr,&ukeynode)) {
 		return false;
 	}
 
 	// optional index and key
-	if (!parseIndex(currentnode,*newptr,newptr)) {
-		parseKey(currentnode,*newptr,newptr);
+	if (!parseIndex(ukeynode,*newptr,newptr)) {
+		parseKey(ukeynode,*newptr,newptr);
 	}
 
 	// optional index name
-	parseIndexName(currentnode,*newptr,newptr);
+	parseIndexName(ukeynode,*newptr,newptr);
 
 	// optional index type
-	parseIndexType(currentnode,*newptr,newptr);
+	parseIndexType(ukeynode,*newptr,newptr);
 
 	// column list
-	if (!parseColumnNameList(currentnode,*newptr,newptr)) {
+	if (!parseColumnNameList(ukeynode,*newptr,newptr)) {
 		debugPrintf("missing column name list\n");
 		error=true;
 		return false;
 	}
 
 	// optional index option
-	parseIndexOption(currentnode,*newptr,newptr);
+	parseIndexOption(ukeynode,*newptr,newptr);
 	return true;
 }
 
@@ -1296,33 +1334,35 @@ bool sqlparser::parseForeignKeyConstraint(xmldomnode *currentnode,
 	debugFunction();
 
 	// foreign key
-	if (!parseForeignKey(currentnode,ptr,newptr)) {
+	xmldomnode	*fkeynode=NULL;
+	if (!parseForeignKey(currentnode,ptr,newptr,&fkeynode)) {
 		return false;
 	}
 
 	// optional index name
-	parseIndexName(currentnode,*newptr,newptr);
+	parseIndexName(fkeynode,*newptr,newptr);
 
 	// column list
-	if (!parseColumnNameList(currentnode,*newptr,newptr)) {
+	if (!parseColumnNameList(fkeynode,*newptr,newptr)) {
 		debugPrintf("missing column name list\n");
 		error=true;
 		return false;
 	}
 
 	// reference definition
-	parseReferenceDefinition(currentnode,*newptr,newptr);
+	parseReferenceDefinition(fkeynode,*newptr,newptr);
 	return true;
 }
 
 bool sqlparser::parseForeignKey(xmldomnode *currentnode,
 						const char *ptr,
-						const char **newptr) {
+						const char **newptr,
+						xmldomnode **newnode) {
 	debugFunction();
 	if (!foreignKeyClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,_foreign_key);
+	*newnode=newNode(currentnode,_foreign_key);
 	return true;
 }
 
@@ -1339,24 +1379,25 @@ bool sqlparser::parseIndexOrKeyConstraint(xmldomnode *currentnode,
 	debugFunction();
 
 	// index or key
-	if (!parseIndex(currentnode,ptr,newptr) &&
-		!parseKey(currentnode,ptr,newptr)) {
+	xmldomnode	*iknode=NULL;
+	if (!parseIndex(currentnode,ptr,newptr,&iknode) &&
+		!parseKey(currentnode,ptr,newptr,&iknode)) {
 		return false;
 	}
 
 	// optional index name and type
-	parseIndexName(currentnode,*newptr,newptr);
-	parseIndexType(currentnode,*newptr,newptr);
+	parseIndexName(iknode,*newptr,newptr);
+	parseIndexType(iknode,*newptr,newptr);
 
 	// column list
-	if (!parseColumnNameList(currentnode,*newptr,newptr)) {
+	if (!parseColumnNameList(iknode,*newptr,newptr)) {
 		debugPrintf("missing column name list\n");
 		error=true;
 		return false;
 	}
 
 	// optional index option
-	parseIndexOption(currentnode,*newptr,newptr);
+	parseIndexOption(iknode,*newptr,newptr);
 	return true;
 }
 
@@ -1366,28 +1407,29 @@ bool sqlparser::parseFulltextOrSpatialConstraint(xmldomnode *currentnode,
 	debugFunction();
 
 	// fulltext or spatial
-	if (!parseFulltext(currentnode,ptr,newptr) &&
-		!parseSpatial(currentnode,ptr,newptr)) {
+	xmldomnode	*fsnode=NULL;
+	if (!parseFulltext(currentnode,ptr,newptr,&fsnode) &&
+		!parseSpatial(currentnode,ptr,newptr,&fsnode)) {
 		return false;
 	}
 
 	// optional index or key
-	if (!parseIndex(currentnode,*newptr,newptr)) {
-		parseKey(currentnode,*newptr,newptr);
+	if (!parseIndex(fsnode,*newptr,newptr)) {
+		parseKey(fsnode,*newptr,newptr);
 	}
 
 	// optional index name
-	parseIndexName(currentnode,*newptr,newptr);
+	parseIndexName(fsnode,*newptr,newptr);
 
 	// column list
-	if (!parseColumnNameList(currentnode,*newptr,newptr)) {
+	if (!parseColumnNameList(fsnode,*newptr,newptr)) {
 		debugPrintf("missing column name list\n");
 		error=true;
 		return false;
 	}
 
 	// optional index option
-	parseIndexOption(currentnode,*newptr,newptr);
+	parseIndexOption(fsnode,*newptr,newptr);
 	return true;
 }
 
@@ -1395,10 +1437,19 @@ bool sqlparser::parseIndex(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
+	xmldomnode	*newnode=NULL;
+	return parseIndex(currentnode,ptr,newptr,&newnode);
+}
+
+bool sqlparser::parseIndex(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr,
+						xmldomnode **newnode) {
+	debugFunction();
 	if (!indexClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,_index);
+	*newnode=newNode(currentnode,_index);
 	return true;
 }
 

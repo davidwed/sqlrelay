@@ -358,10 +358,19 @@ bool sqlparser::parseUnique(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
+	xmldomnode	*newnode=NULL;
+	return parseUnique(currentnode,ptr,newptr,&newnode);
+}
+
+bool sqlparser::parseUnique(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr,
+					xmldomnode **newnode) {
+	debugFunction();
 	if (!uniqueClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,_unique);
+	*newnode=newNode(currentnode,_unique);
 	return true;
 }
 

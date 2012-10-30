@@ -154,11 +154,19 @@ class sqlparser {
 		bool	parseFulltext(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
+		bool	parseFulltext(rudiments::xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr,
+					rudiments::xmldomnode **newnode);
 		bool	fulltext(const char *ptr, const char **newptr);
 		static const char	*_fulltext;
 		bool	parseSpatial(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
+		bool	parseSpatial(rudiments::xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr,
+					rudiments::xmldomnode **newnode);
 		bool	spatial(const char *ptr, const char **newptr);
 		static const char	*_spatial;
 
@@ -252,12 +260,20 @@ class sqlparser {
 		bool	parsePrimaryKey(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
+		bool	parsePrimaryKey(rudiments::xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr,
+					rudiments::xmldomnode **newnode);
 		bool	primaryKeyClause(const char *ptr,
 						const char **newptr);
 		static const char	*_primary_key;
 		bool	parseKey(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
+		bool	parseKey(rudiments::xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr,
+					rudiments::xmldomnode **newnode);
 		bool	keyClause(const char *ptr,
 						const char **newptr);
 		static const char	*_key;
@@ -349,8 +365,9 @@ class sqlparser {
 						const char *ptr,
 						const char **newptr);
 		bool	parseForeignKey(rudiments::xmldomnode *currentnode,
-						const char *ptr,
-						const char **newptr);
+					const char *ptr,
+					const char **newptr,
+					rudiments::xmldomnode **newnode);
 		bool	foreignKeyClause(const char *ptr, const char **newptr);
 		static const char	*_foreign_key;
 		bool	parseIndexOrKeyConstraint(
@@ -364,6 +381,10 @@ class sqlparser {
 		bool	parseIndex(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
+		bool	parseIndex(rudiments::xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr,
+					rudiments::xmldomnode **newnode);
 		bool	parseIndexOption(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
@@ -429,7 +450,8 @@ class sqlparser {
 						const char **newptr);
 		bool	forClause(const char *ptr, const char **newptr);
 		static const char	*_for;
-		bool	parseDatabaseObjectName(rudiments::xmldomnode *currentnode,
+		bool	parseDatabaseObjectName(
+					rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
 		static const char	*_object_name_database;
@@ -599,6 +621,10 @@ class sqlparser {
 		bool	parseUnique(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
+		bool	parseUnique(rudiments::xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr,
+					rudiments::xmldomnode **newnode);
 		bool	uniqueClause(const char *ptr,
 						const char **newptr);
 		static const char	*_unique;
