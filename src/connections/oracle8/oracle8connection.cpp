@@ -951,6 +951,7 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	query=NULL;
 	length=0;
 	prepared=false;
+	bound=false;
 
 	resultfreed=true;
 
@@ -1093,6 +1094,10 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 	// reprepared later
 	this->query=(char *)query;
 	this->length=length;
+
+	// if the query is being prepared then apparently this isn't an
+	// output bind cursor
+	bound=false;
 
 	// If statement caching is available then use OCIStmtPrepare2,
 	// otherwise just use OCIStmtPrepare.
@@ -1742,6 +1747,8 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 
 	checkRePrepare();
 
+	((oracle8cursor *)cursor)->bound=true;
+
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		if (!charstring::toInteger(variable+1)) {
 			return false;
@@ -1776,6 +1783,7 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 	((oracle8cursor *)cursor)->row=0;
 	((oracle8cursor *)cursor)->maxrow=0;
 	((oracle8cursor *)cursor)->totalrows=0;
+	((oracle8cursor *)cursor)->bound=true;
 	return true;
 }
 
@@ -1930,6 +1938,7 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 		for (sword i=0; i<ncols; i++) {
 
 			// FIXME: neowiz bzero's desc[i] here
+			//rawbuffer::zero(&desc[i],sizeof(describe));
 
 			// get the entire column definition
 			if (OCIParamGet(stmt,OCI_HTYPE_STMT,
@@ -2424,8 +2433,14 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 			// memory will be deallocated.
 			def[i]=NULL;
 
-			// free column resources
-			if (desc[i].paramd) {
+			// free column resources...
+			// For some reason, it's not always safe to do this for
+			// a cursor that was bound to a result set from a
+			// stored procedure.  Sometimes it works but other
+			// times it crashes.  This could be an OCI bug.
+			// I'm not sure.  It wish I knew more about exactly
+			// when it succeeds or fails, as this leaks memory.
+			if (desc[i].paramd && !bound) {
 				OCIDescriptorFree(
 					(dvoid *)desc[i].paramd,
 					OCI_DTYPE_PARAM);

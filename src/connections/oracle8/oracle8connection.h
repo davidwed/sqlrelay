@@ -272,6 +272,7 @@ class oracle8cursor : public sqlrcursor_svr {
 		char		*query;
 		uint32_t	length;
 		bool		prepared;
+		bool		bound;
 
 		bool		resultfreed;
 
