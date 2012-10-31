@@ -1071,6 +1071,7 @@ int	main(int argc, char **argv) {
 	printf("\n");*/
 
 
+
 	// rebinding
 	printf("REBINDING: \n");
 	cur->sendQuery("drop procedure testproc");
