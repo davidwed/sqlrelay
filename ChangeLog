@@ -1,3 +1,5 @@
+0.48 -
+
 0.47 - fixed bug that caused sqlr-export to output negative xml-entity values
 	fixed single-quote-escaping in sqlr-export
 	forced handoff="reconnect" for Cygwin and Linux<2.2
