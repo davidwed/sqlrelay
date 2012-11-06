@@ -1,4 +1,5 @@
 0.48 - added handling for oracle errors ora-01033, ora-02067 and ora-04068
+	added bind validation when using the statement cache
 
 0.47 - fixed bug that caused sqlr-export to output negative xml-entity values
 	fixed single-quote-escaping in sqlr-export

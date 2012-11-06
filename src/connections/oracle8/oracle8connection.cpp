@@ -930,10 +930,13 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 		outintbindstring[i]=NULL;
 		outdatebind[i]=NULL;
 		outintbind[i]=NULL;
+		bindvarname[i]=NULL;
+		boundbypos[i]=false;
 	}
 	orainbindcount=0;
 	oraoutbindcount=0;
 	oracurbindcount=0;
+	bindvarcount=0;
 
 #ifdef HAVE_ORACLE_8i
 	for (uint16_t i=0; i<MAXVAR; i++) {
@@ -1222,12 +1225,12 @@ bool oracle8cursor::inputBindString(const char *variable,
 
 	// the size of the value must include the terminating NULL
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toInteger(variable+1)) {
+		ub4	pos=charstring::toInteger(variable+1);
+		if (!pos) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
-				oracle8conn->err,
-				(ub4)charstring::toInteger(variable+1),
+				oracle8conn->err,pos,
 				(dvoid *)value,(sb4)valuesize+1,
 				SQLT_STR,
 				(dvoid *)isnull,(ub2 *)0,
@@ -1235,6 +1238,7 @@ bool oracle8cursor::inputBindString(const char *variable,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
 			return false;
 		}
+		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&inbindpp[orainbindcount],
 				oracle8conn->err,
@@ -1248,6 +1252,7 @@ bool oracle8cursor::inputBindString(const char *variable,
 		}
 	}
 	orainbindcount++;
+	bindvarname[bindvarcount++]=variable+1;
 	return true;
 }
 
@@ -1260,12 +1265,12 @@ bool oracle8cursor::inputBindInteger(const char *variable,
 	inintbindstring[orainbindcount]=charstring::parseNumber(*value);
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toInteger(variable+1)) {
+		ub4	pos=charstring::toInteger(variable+1);
+		if (!pos) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
-				oracle8conn->err,
-				(ub4)charstring::toInteger(variable+1),
+				oracle8conn->err,pos,
 				(dvoid *)inintbindstring[orainbindcount],
 				(sb4)charstring::length(
 					inintbindstring[orainbindcount])+1,
@@ -1274,6 +1279,7 @@ bool oracle8cursor::inputBindInteger(const char *variable,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
 			return false;
 		}
+		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&inbindpp[orainbindcount],
 				oracle8conn->err,
@@ -1288,6 +1294,7 @@ bool oracle8cursor::inputBindInteger(const char *variable,
 		}
 	}
 	orainbindcount++;
+	bindvarname[bindvarcount++]=variable+1;
 	return true;
 }
 
@@ -1300,18 +1307,19 @@ bool oracle8cursor::inputBindDouble(const char *variable,
 	checkRePrepare();
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toInteger(variable+1)) {
+		ub4	pos=charstring::toInteger(variable+1);
+		if (!pos) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
-				oracle8conn->err,
-				(ub4)charstring::toInteger(variable+1),
+				oracle8conn->err,pos,
 				(dvoid *)value,(sb4)sizeof(double),
 				SQLT_FLT,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
 			return false;
 		}
+		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&inbindpp[orainbindcount],
 				oracle8conn->err,
@@ -1324,6 +1332,7 @@ bool oracle8cursor::inputBindDouble(const char *variable,
 		}
 	}
 	orainbindcount++;
+	bindvarname[bindvarcount++]=variable+1;
 	return true;
 }
 
@@ -1348,12 +1357,12 @@ bool oracle8cursor::inputBindDate(const char *variable,
 	OCIDateSetTime(indatebind[orainbindcount],hour,minute,second);
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toInteger(variable+1)) {
+		ub4	pos=charstring::toInteger(variable+1);
+		if (!pos) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
-				oracle8conn->err,
-				(ub4)charstring::toInteger(variable+1),
+				oracle8conn->err,pos,
 				(dvoid *)indatebind[orainbindcount],
 				(sb4)sizeof(OCIDate),
 				SQLT_ODT,
@@ -1361,6 +1370,7 @@ bool oracle8cursor::inputBindDate(const char *variable,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
 			return false;
 		}
+		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&inbindpp[orainbindcount],
 				oracle8conn->err,
@@ -1374,6 +1384,7 @@ bool oracle8cursor::inputBindDate(const char *variable,
 		}
 	}
 	orainbindcount++;
+	bindvarname[bindvarcount++]=variable+1;
 	return true;
 }
 
@@ -1389,12 +1400,12 @@ bool oracle8cursor::outputBindString(const char *variable,
 	outdatebind[oraoutbindcount]=NULL;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toInteger(variable+1)) {
+		ub4	pos=charstring::toInteger(variable+1);
+		if (!pos) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&outbindpp[oraoutbindcount],
-				oracle8conn->err,
-				(ub4)charstring::toInteger(variable+1),
+				oracle8conn->err,pos,
 				(dvoid *)value,
 				(sb4)valuesize,
 				SQLT_STR,
@@ -1403,6 +1414,7 @@ bool oracle8cursor::outputBindString(const char *variable,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
 			return false;
 		}
+		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&outbindpp[oraoutbindcount],
 				oracle8conn->err,
@@ -1417,6 +1429,7 @@ bool oracle8cursor::outputBindString(const char *variable,
 		}
 	}
 	oraoutbindcount++;
+	bindvarname[bindvarcount++]=variable+1;
 	return true;
 }
 
@@ -1432,12 +1445,12 @@ bool oracle8cursor::outputBindInteger(const char *variable,
 	outdatebind[oraoutbindcount]=NULL;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toInteger(variable+1)) {
+		ub4	pos=charstring::toInteger(variable+1);
+		if (!pos) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&outbindpp[oraoutbindcount],
-				oracle8conn->err,
-				(ub4)charstring::toInteger(variable+1),
+				oracle8conn->err,pos,
 				(dvoid *)outintbindstring[oraoutbindcount],
 				(sb4)21,
 				SQLT_STR,
@@ -1446,6 +1459,7 @@ bool oracle8cursor::outputBindInteger(const char *variable,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
 			return false;
 		}
+		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&outbindpp[oraoutbindcount],
 				oracle8conn->err,
@@ -1460,6 +1474,7 @@ bool oracle8cursor::outputBindInteger(const char *variable,
 		}
 	}
 	oraoutbindcount++;
+	bindvarname[bindvarcount++]=variable+1;
 	return true;
 }
 
@@ -1475,12 +1490,12 @@ bool oracle8cursor::outputBindDouble(const char *variable,
 	outdatebind[oraoutbindcount]=NULL;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toInteger(variable+1)) {
+		ub4	pos=charstring::toInteger(variable+1);
+		if (!pos) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&outbindpp[oraoutbindcount],
-				oracle8conn->err,
-				(ub4)charstring::toInteger(variable+1),
+				oracle8conn->err,pos,
 				(dvoid *)value,(sb4)sizeof(double),
 				SQLT_FLT,
 				(dvoid *)isnull,(ub2 *)0,
@@ -1488,6 +1503,7 @@ bool oracle8cursor::outputBindDouble(const char *variable,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
 			return false;
 		}
+		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&outbindpp[oraoutbindcount],
 				oracle8conn->err,
@@ -1501,6 +1517,7 @@ bool oracle8cursor::outputBindDouble(const char *variable,
 		}
 	}
 	oraoutbindcount++;
+	bindvarname[bindvarcount++]=variable+1;
 	return true;
 }
 
@@ -1532,12 +1549,12 @@ bool oracle8cursor::outputBindDate(const char *variable,
 	outdatebind[oraoutbindcount]=db;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toInteger(variable+1)) {
+		ub4	pos=charstring::toInteger(variable+1);
+		if (!pos) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&outbindpp[oraoutbindcount],
-				oracle8conn->err,
-				(ub4)charstring::toInteger(variable+1),
+				oracle8conn->err,pos,
 				(dvoid *)db->ocidate,
 				(sb4)sizeof(OCIDate),
 				SQLT_ODT,
@@ -1546,6 +1563,7 @@ bool oracle8cursor::outputBindDate(const char *variable,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
 			return false;
 		}
+		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&outbindpp[oraoutbindcount],
 				oracle8conn->err,
@@ -1560,6 +1578,7 @@ bool oracle8cursor::outputBindDate(const char *variable,
 		}
 	}
 	oraoutbindcount++;
+	bindvarname[bindvarcount++]=variable+1;
 	return true;
 }
 
@@ -1639,18 +1658,19 @@ bool oracle8cursor::inputBindGenericLob(const char *variable,
 
 	// bind the temporary lob
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toInteger(variable+1)) {
+		ub4	pos=charstring::toInteger(variable+1);
+		if (!pos) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
-				oracle8conn->err,
-				(ub4)charstring::toInteger(variable+1),
+				oracle8conn->err,pos,
 				(dvoid *)&inbind_lob[orainbindlobcount],(sb4)0,
 				type,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
 			return false;
 		}
+		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&inbindpp[orainbindcount],
 				oracle8conn->err,
@@ -1664,6 +1684,7 @@ bool oracle8cursor::inputBindGenericLob(const char *variable,
 	}
 	orainbindlobcount++;
 	orainbindcount++;
+	bindvarname[bindvarcount++]=variable+1;
 	return true;
 }
 
@@ -1701,12 +1722,12 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 
 	// bind the lob descriptor
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toInteger(variable+1)) {
+		ub4	pos=charstring::toInteger(variable+1);
+		if (!pos) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&outbindpp[oraoutbindcount],
-			oracle8conn->err,
-			(ub4)charstring::toInteger(variable+1),
+			oracle8conn->err,pos,
 			(dvoid *)&outbind_lob[index],
 			(sb4)sizeof(OCILobLocator *),
 			type,
@@ -1714,6 +1735,7 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 			OCI_DEFAULT)!=OCI_SUCCESS) {
 				return false;
 		}
+		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&outbindpp[oraoutbindcount],
 				oracle8conn->err,
@@ -1727,6 +1749,7 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 		}
 	}
 	oraoutbindcount++;
+	bindvarname[bindvarcount++]=variable+1;
 	return true;
 }
 
@@ -1750,12 +1773,12 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 	((oracle8cursor *)cursor)->bound=true;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		if (!charstring::toInteger(variable+1)) {
+		ub4	pos=charstring::toInteger(variable+1);
+		if (!pos) {
 			return false;
 		}
 		if (OCIBindByPos(stmt,&curbindpp[oracurbindcount],
-				oracle8conn->err,
-				(ub4)charstring::toInteger(variable+1),
+				oracle8conn->err,pos,
 				(dvoid *)&(((oracle8cursor *)cursor)->stmt),
 				(sb4)0,
 				SQLT_RSET,
@@ -1763,6 +1786,7 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 				OCI_DEFAULT)!=OCI_SUCCESS) {
 			return false;
 		}
+		boundbypos[pos-1]=true;
 	} else {
 		if (OCIBindByName(stmt,&curbindpp[oracurbindcount],
 				oracle8conn->err,
@@ -1776,6 +1800,7 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 		}
 	}
 	oracurbindcount++;
+	bindvarname[bindvarcount++]=variable+1;
 
 	// initialize values as if a statement has been prepared and executed
 	((oracle8cursor *)cursor)->stmttype=0;
@@ -1895,6 +1920,7 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 	// execute the query
 	if (execute) {
 
+		// validate binds
 		if (!validBinds()) {
 			return false;
 		}
@@ -2122,61 +2148,74 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 
 bool oracle8cursor::validBinds() {
 
-	// *Important*
-	//
-	// It's vital to verify that all variables are bound. 
-	//
-	// OCIStmtReleae() doesn't deallocate information about previous
-	// variable binding.  This can cause a segmentation fault during
-	// OCIStmtExecute when the statement is reused from the cache if
-	// the same set of variables aren't bound the next time.
+	// NOTE: If we're using the statement cache, then it is vital to
+	// verify that all variables are bound.  Without the statement cache,
+	// OCIStmtExecute would just fail with "ORA-01008: not all variables
+	// bound", but when using the statement cache, it will segfault if we
+	// get a cache hit.
 
-	text	*bvnp[MAXVAR];
-	text	*invp[MAXVAR];
-	ub1	inpl[MAXVAR];
-	ub1	dupl[MAXVAR];
-	ub1	bvnl[MAXVAR];
-	OCIBind	*hndl[MAXVAR];
-	sb4	found;
-	sword	ret;
-	char	bname[256];
-	ret=OCIStmtGetBindInfo(stmt,oracle8conn->err,MAXVAR,1,&found,bvnp,bvnl,invp,inpl,dupl,hndl);
 
-	// error
-	if (ret==OCI_ERROR) {
-		return false;
+	// if we're not using the statement cache then we can just return
+	#ifdef OCI_STMT_CACHE
+	if (!oracle8conn->stmtcachesize) {
+		return true;
 	}
+	#else
+	return true;
+	#endif
 
-	// no bind variable
+	// otherwise we need to validate the binds...
+
+	// get the bind info from the query
+	sb4	found;
+	sword	ret=OCIStmtGetBindInfo(stmt,oracle8conn->err,MAXVAR,
+					1,&found,bvnp,bvnl,invp,inpl,dupl,hndl);
+
+	// there were no bind variables
 	if (ret==OCI_NO_DATA) {
 		return true;
 	}
 
+	// error of some kind
+	if (ret==OCI_ERROR) {
+		return false;
+	}
+
+	// too many variables were bound
 	if (found<0) {
+		// FIXME: set an error
 		//setSqlrError(SQLR_ERR_MAXBIND,"more than MAXVAR placeholders in the oracle8 environment of neowiz (%d > %d)",-found,MAXVAR);
 		return false;
 	}
 
-	for (int i=0; i<found; i++) {
-/*
-		// Duplicated bindname in PL/SQL with OCIBindByPos doesn't work correctly.  Therefore, explicitly preventing it can be simpler solution than always getting application developers to understand that context.  Moreover ,it makes overall logic of this function simpler.  --replica
+	// loop through the variables...
+	for (sb4 i=0; i<found; i++) {
 
+		// FIXME: make this optional
+		// Handle duplicates.  Duplicated bindname in PL/SQL with
+		// OCIBindByPos doesn't work correctly.  Therefore, explicitly
+		// preventing it can be simpler solution than always getting
+		// application developers to understand that context.  Moreover,
+		// it makes overall logic of this function simpler.  --replica
 		if (dupl[i]) {
-			setSqlrError(SQLR_ERR_DUPLICATE_BINDNAME,"duplicated bindname is not allowed in the oracle8 environment of neowiz (%s)",bvnp[i]);
+			// FIXME: set error
+			//setSqlrError(SQLR_ERR_DUPLICATE_BINDNAME,"duplicated bindname is not allowed in the oracle8 environment of neowiz (%s)",bvnp[i]);
 			return false;
 		}
-		if (bindedpos[i]==1) {
-			continue;
+
+		// verify that the variable was bound,
+		// first check by position, then by name
+		bool	foundvar=boundbypos[i];
+		for (uint16_t j=0; j<bindvarcount && !foundvar; j++) {
+			foundvar=!charstring::compareIgnoringCase(
+							bindvarname[j],
+							(char *)bvnp[i]);
 		}
-
-		strncpy(bname,(char *)bvnp[i],(size_t)bvnl[i]);
-		bname[bvnl[i]] =0;
-
-		if (!lookup_bindedname(bname)) { 
-			setSqlrError(SQLR_ERR_NOT_BOUND,"not bound (%s)",bname);
+		if (!foundvar) {
+			// FIXME: set error
+			//setSqlrError(SQLR_ERR_NOT_BOUND,"not bound (%s)",bvnp[i]);
 			return false;
 		}
-*/
 	}
 	return true;
 }
@@ -2521,6 +2560,10 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 		orainbindcount=0;
 		oraoutbindcount=0;
 		oracurbindcount=0;
+		for (uint16_t i=0; i<bindvarcount; i++) {
+			bindvarname[i]=NULL;
+			boundbypos[i]=false;
+		}
 	}
 }
 

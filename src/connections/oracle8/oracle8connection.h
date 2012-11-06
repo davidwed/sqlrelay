@@ -257,6 +257,15 @@ class oracle8cursor : public sqlrcursor_svr {
 		uint16_t	orainbindcount;
 		uint16_t	oraoutbindcount;
 		uint16_t	oracurbindcount;
+		const char	*bindvarname[MAXVAR];
+		bool		boundbypos[MAXVAR];
+		uint16_t	bindvarcount;
+		text		*bvnp[MAXVAR];
+		text		*invp[MAXVAR];
+		ub1		inpl[MAXVAR];
+		ub1		dupl[MAXVAR];
+		ub1		bvnl[MAXVAR];
+		OCIBind		*hndl[MAXVAR];
 
 #ifdef HAVE_ORACLE_8i
 		OCILobLocator	*inbind_lob[MAXVAR];
