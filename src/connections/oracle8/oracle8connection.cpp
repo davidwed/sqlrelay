@@ -1899,12 +1899,25 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 			return false;
 		}
 
-		if (OCIStmtExecute(oracle8conn->svc,stmt,
-				oracle8conn->err,
-				(stmttype==OCI_STMT_SELECT)?0:1,
-				(ub4)0,NULL,NULL,
-				oracle8conn->stmtmode)!=OCI_SUCCESS) {
-			return false;
+		// loop to handle retries...
+		for (;;) {
+			if (OCIStmtExecute(oracle8conn->svc,stmt,
+					oracle8conn->err,
+					(stmttype==OCI_STMT_SELECT)?0:1,
+					(ub4)0,NULL,NULL,
+					oracle8conn->stmtmode)==OCI_SUCCESS) {
+				break;
+			}
+
+			// If we got ora-04068 then we just need to
+			// retry the query.  If not, return error.
+			sb4	errcode=0;
+			OCIErrorGet((dvoid *)oracle8conn->err,
+					1,(text *)0,&errcode,
+					NULL,0,OCI_HTYPE_ERROR);
+			if (errcode!=4068) {
+				return false;
+			}
 		}
 
 		// reset the prepared flag
