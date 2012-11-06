@@ -235,7 +235,7 @@ public class SQLRConnection : IDisposable
      *  run by this instance of the client. */
     public void setClientInfo(String clientinfo)
     {
-        return sqlrcon_setClientInfo(sqlrconref,clientinfo);
+        sqlrcon_setClientInfo(sqlrconref,clientinfo);
     }
 
     /** Returns the string that was set by setClientInfo(). */
