@@ -171,6 +171,9 @@ Z
 <a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
 <dd>Returns the name of the file containing the
  cached result
+<dt><a href="sqlrconCmd.tcl-annot.html#getClientInfo">getClientInfo</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Returns the string that was set by
 <dt><a href="sqlrcurCmd.tcl-annot.html#getColumnInfo">getColumnInfo</a> {  } - 
 <a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
 <dd>Tells the server to send column
@@ -467,7 +470,7 @@ Z
 <dt><a href="sqlrcurCmd.tcl-annot.html#sendQuery">sendQuery</a> { query } - 
 <a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
 <dd>Sends "query" directly and gets a result
-<dt><a href="sqlrcurCmd.tcl-annot.html#sendQuery">sendQuery</a> { query length } - 
+<dt><a href="sqlrcurCmd.tcl-annot.html#sendQueryWithLength">sendQueryWithLength</a> { query length } - 
 <a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
 <dd>Sends "query" with length "length" directly
  and gets a result set.
@@ -478,6 +481,12 @@ Z
 <a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
 <dd>Sets the time-to-live for cached result
  sets.
+<dt><a href="sqlrconCmd.tcl-annot.html#setClientInfo">setClientInfo</a> { clientinfo } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Allows you to set a string that will be passed to the
+ server and ultimately included in server-side logging
+ along with queries that were run by this instance of
+ the
 <dt><a href="sqlrcurCmd.tcl-annot.html#setResultSetBufferSize">setResultSetBufferSize</a> { rows } - 
 <a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
 <dd>Sets the number of rows of the result set
@@ -556,7 +565,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2012-06-02 at 03:11.</cite>
+<cite>File generated 2012-11-07 at 05:14.</cite>
 </font>
 </body>
 </html>

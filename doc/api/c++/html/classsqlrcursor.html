@@ -78,7 +78,7 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#acf06451b48df06ef3f30e5a2931f0fc7">inputBind</a> (const char *variable, const char *value, uint32_t valuelength)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a5fe35a71c3f11b9a6f2505a5060e3447">inputBind</a> (const char *variable, int64_t value)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#ac8a0a9b4382955b0d39e6d2b33434a4c">inputBind</a> (const char *variable, double value, uint32_t precision, uint32_t scale)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#abd81584ad87456fb291a4163e937c0c5">inputBind</a> (const char *variable, int16_t year, int16_t month, int16_t day, int16_t hour, int16_t minute, int16_t second, const char *tz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a6bbfa9ef31cca9e492fad80dd07ca3dc">inputBind</a> (const char *variable, int16_t year, int16_t month, int16_t day, int16_t hour, int16_t minute, int16_t second, int32_t microsecond, const char *tz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a672d2c92314b991b53cddf052e32d748">inputBindBlob</a> (const char *variable, const char *value, uint32_t size)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a89e789eb0b9a1d5ab51926d3c028beee">inputBindClob</a> (const char *variable, const char *value, uint32_t size)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#aa9d7b7d76b169a432c9fd6d24c3ce7ca">inputBinds</a> (const char **variables, const char **values)</td></tr>
@@ -100,7 +100,7 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a715541b2b5fb5b26a7f6d9f175708f3d">getOutputBindString</a> (const char *variable)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#af50cc897b815d474a2cd8dfb69ceeac8">getOutputBindInteger</a> (const char *variable)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a05d54c3841d06f7e4e68515c61d1f2ec">getOutputBindDouble</a> (const char *variable)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#afa4431563dad1469d51c51a02c2632b7">getOutputBindDate</a> (const char *variable, int16_t *year, int16_t *month, int16_t *day, int16_t *hour, int16_t *minute, int16_t *second, const char **tz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a5ca31a9924ecc0355b4a5517b99c5760">getOutputBindDate</a> (const char *variable, int16_t *year, int16_t *month, int16_t *day, int16_t *hour, int16_t *minute, int16_t *second, int32_t *microsecond, const char **tz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#ae5a6134c0b390ff3652a0dab275c2bb7">getOutputBindBlob</a> (const char *variable)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#a78ffb95fe547da5582e0d208dcbf73d5">getOutputBindClob</a> (const char *variable)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrcursor.html#ad63727c1c955458fb542be80247cde63">getOutputBindLength</a> (const char *variable)</td></tr>
@@ -1469,7 +1469,7 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="afa4431563dad1469d51c51a02c2632b7"></a><!-- doxytag: member="sqlrcursor::getOutputBindDate" ref="afa4431563dad1469d51c51a02c2632b7" args="(const char *variable, int16_t *year, int16_t *month, int16_t *day, int16_t *hour, int16_t *minute, int16_t *second, const char **tz)" -->
+<a class="anchor" id="a5ca31a9924ecc0355b4a5517b99c5760"></a><!-- doxytag: member="sqlrcursor::getOutputBindDate" ref="a5ca31a9924ecc0355b4a5517b99c5760" args="(const char *variable, int16_t *year, int16_t *month, int16_t *day, int16_t *hour, int16_t *minute, int16_t *second, int32_t *microsecond, const char **tz)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1514,6 +1514,12 @@ Public Member Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">int16_t *&#160;</td>
           <td class="paramname"><em>second</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t *&#160;</td>
+          <td class="paramname"><em>microsecond</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1823,7 +1829,7 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="abd81584ad87456fb291a4163e937c0c5"></a><!-- doxytag: member="sqlrcursor::inputBind" ref="abd81584ad87456fb291a4163e937c0c5" args="(const char *variable, int16_t year, int16_t month, int16_t day, int16_t hour, int16_t minute, int16_t second, const char *tz)" -->
+<a class="anchor" id="a6bbfa9ef31cca9e492fad80dd07ca3dc"></a><!-- doxytag: member="sqlrcursor::inputBind" ref="a6bbfa9ef31cca9e492fad80dd07ca3dc" args="(const char *variable, int16_t year, int16_t month, int16_t day, int16_t hour, int16_t minute, int16_t second, int32_t microsecond, const char *tz)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1868,6 +1874,12 @@ Public Member Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">int16_t&#160;</td>
           <td class="paramname"><em>second</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&#160;</td>
+          <td class="paramname"><em>microsecond</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2629,7 +2641,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 2 2012 for SQL Relay C++ API by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Wed Nov 7 2012 for SQL Relay C++ API by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

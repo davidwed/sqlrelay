@@ -74,6 +74,9 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#gabffa368c1e181564631de39a1b12f1ba">sqlrcon_debugOff</a> (sqlrcon sqlrconref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga10ecdc3185f893f19e4d3fc4f6597633">sqlrcon_getDebug</a> (sqlrcon sqlrconref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#gafa20e4ff7d4cf3bba4101666d789474a">sqlrcon_debugPrintFunction</a> (sqlrcon sqlrconref, int(*printfunction)(const char *,...))</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga66c53edcb966837bf3c3123c099301c3">sqlrcon_setClientInfo</a> (sqlrcon sqlrconref, const char *clientinfo)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC <br class="typebreak"/>
+const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga9d23741e5bc031b9137ad58808b71251">sqlrcon_getClientInfo</a> (sqlrcon sqlrconref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC sqlrcur&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga14cfabdf3d035c655a3057f0e4646834">sqlrcur_alloc</a> (sqlrcon sqlrconref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#gac971138d54d3ae56bc0a859f50f95789">sqlrcur_free</a> (sqlrcur sqlrcurref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga7b29f1c19ae7f4ce764b219c03fa4981">sqlrcur_setResultSetBufferSize</a> (sqlrcur sqlrcurref, uint64_t rows)</td></tr>
@@ -129,7 +132,7 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga83a33bd45e6faa6473810e5f6bd729b2">sqlrcur_getOutputBindString</a> (sqlrcur sqlrcurref, const char *variable)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#gaa4e25d53725dc063618767955bd38e1b">sqlrcur_getOutputBindInteger</a> (sqlrcur sqlrcurref, const char *variable)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga7c23ea41ff1cf28cd366cbd18aff7d83">sqlrcur_getOutputBindDouble</a> (sqlrcur sqlrcurref, const char *variable)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga1b523b8813abb3e3fd277fb5c7029a18">sqlrcur_getOutputBindDate</a> (sqlrcur sqlrcurref, const char *variable, int16_t *year, int16_t *month, int16_t *day, int16_t *hour, int16_t *minute, int16_t *second, const char **tz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga9f71ed6c58fb3d532d6013f5bb0525ca">sqlrcur_getOutputBindDate</a> (sqlrcur sqlrcurref, const char *variable, int16_t *year, int16_t *month, int16_t *day, int16_t *hour, int16_t *minute, int16_t *second, int32_t *microsecond, const char **tz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC <br class="typebreak"/>
 const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga7f209a2e6ee84199215fac54648b4e70">sqlrcur_getOutputBindBlob</a> (sqlrcur sqlrcurref, const char *variable)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC <br class="typebreak"/>
@@ -521,6 +524,24 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 
 </div>
 </div>
+<a class="anchor" id="ga9d23741e5bc031b9137ad58808b71251"></a><!-- doxytag: member="sqlrclientwrapper.h::sqlrcon_getClientInfo" ref="ga9d23741e5bc031b9137ad58808b71251" args="(sqlrcon sqlrconref)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SQLRCLIENTWRAPPER_DLLSPEC const char* sqlrcon_getClientInfo </td>
+          <td>(</td>
+          <td class="paramtype">sqlrcon&#160;</td>
+          <td class="paramname"><em>sqlrconref</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Returns the string that was set by <a class="el" href="group__sqlrclientwrapper.html#ga66c53edcb966837bf3c3123c099301c3">sqlrcon_setClientInfo()</a>. </p>
+
+</div>
+</div>
 <a class="anchor" id="ga333971e95b82ce3e9e119609605a9ec6"></a><!-- doxytag: member="sqlrclientwrapper.h::sqlrcon_getConnectionPort" ref="ga333971e95b82ce3e9e119609605a9ec6" args="(sqlrcon sqlrconref)" -->
 <div class="memitem">
 <div class="memproto">
@@ -742,6 +763,34 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div>
 <div class="memdoc">
 <p>Returns the version of the sqlrelay server software. </p>
+
+</div>
+</div>
+<a class="anchor" id="ga66c53edcb966837bf3c3123c099301c3"></a><!-- doxytag: member="sqlrclientwrapper.h::sqlrcon_setClientInfo" ref="ga66c53edcb966837bf3c3123c099301c3" args="(sqlrcon sqlrconref, const char *clientinfo)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SQLRCLIENTWRAPPER_DLLSPEC void sqlrcon_setClientInfo </td>
+          <td>(</td>
+          <td class="paramtype">sqlrcon&#160;</td>
+          <td class="paramname"><em>sqlrconref</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>clientinfo</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Allows you to set a string that will be passed to the server and ultimately included in server-side logging along with queries that were run by this instance of the client. </p>
 
 </div>
 </div>
@@ -2563,7 +2612,7 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 
 </div>
 </div>
-<a class="anchor" id="ga1b523b8813abb3e3fd277fb5c7029a18"></a><!-- doxytag: member="sqlrclientwrapper.h::sqlrcur_getOutputBindDate" ref="ga1b523b8813abb3e3fd277fb5c7029a18" args="(sqlrcur sqlrcurref, const char *variable, int16_t *year, int16_t *month, int16_t *day, int16_t *hour, int16_t *minute, int16_t *second, const char **tz)" -->
+<a class="anchor" id="ga9f71ed6c58fb3d532d6013f5bb0525ca"></a><!-- doxytag: member="sqlrclientwrapper.h::sqlrcur_getOutputBindDate" ref="ga9f71ed6c58fb3d532d6013f5bb0525ca" args="(sqlrcur sqlrcurref, const char *variable, int16_t *year, int16_t *month, int16_t *day, int16_t *hour, int16_t *minute, int16_t *second, int32_t *microsecond, const char **tz)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -2614,6 +2663,12 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
           <td></td>
           <td class="paramtype">int16_t *&#160;</td>
           <td class="paramname"><em>second</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t *&#160;</td>
+          <td class="paramname"><em>microsecond</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -3934,7 +3989,7 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div>
 </div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 2 2012 for SQL Relay C API by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Wed Nov 7 2012 for SQL Relay C API by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

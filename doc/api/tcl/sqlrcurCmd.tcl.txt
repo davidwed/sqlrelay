@@ -98,7 +98,7 @@ proc sendQuery {query}
 # Sends "query" with length "length" directly
 # and gets a result set. This method must be used
 # if the query contains binary data.
-proc sendQuery {query length} 
+proc sendQueryWithLength {query length} 
 
 # Sends the query in file "path"/"filename" directly
 # and gets a result set.
@@ -492,5 +492,5 @@ proc resumeCachedResultSet {id filename}
 # Closes the current result set, if one is open.  Data
 # that has been fetched already is still available but
 # no more data may be fetched.  Server side resources
-# for the result set are freed as well. */
+# for the result set are freed as well.
 proc closeResultSet {}

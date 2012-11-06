@@ -255,10 +255,9 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <tr><td><code><a href="#sendFileQuery">sendFileQuery</a> { path filename }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sends the query in file "path"/"filename" directly
  and gets a result</td></tr>
-<tr><td><code><a href="#sendQuery">sendQuery</a> { query length }</code><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sends "query" with length "length" directly
- and gets a result set.</td></tr>
-<tr><td><code><a href="#sendQuery">sendQuery</a> { query length }</code><br>
+<tr><td><code><a href="#sendQuery">sendQuery</a> { query }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sends "query" directly and gets a result</td></tr>
+<tr><td><code><a href="#sendQueryWithLength">sendQueryWithLength</a> { query length }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sends "query" with length "length" directly
  and gets a result set.</td></tr>
 <tr><td><code><a href="#setCacheTtl">setCacheTtl</a> { ttl }</code><br>
@@ -360,7 +359,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 <dd>Closes the current result set, if one is open.  Data
  that has been fetched already is still available but
  no more data may be fetched.  Server side resources
- for the result set are freed as well. */<dl>
+ for the result set are freed as well.<dl>
 <dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#closeResultSet_496">sqlrcurCmd.tcl, line 496</a>
 </dl></dl>
 
@@ -1140,22 +1139,20 @@ Created from <strong><code>../../../src/api/tcl/sqlrcurCmd.tcl</strong></code>
 
 <hr>
 <h3><a name="sendQuery">sendQuery</a></h3>
-<pre>proc sendQuery { query length }</pre>
+<pre>proc sendQuery { query }</pre>
 <dl>
-<dd>Sends "query" with length "length" directly
- and gets a result set. This method must be used
- if the query contains binary data.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#sendQuery_101">sqlrcurCmd.tcl, line 101</a>
+<dd>Sends "query" directly and gets a result set.<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#sendQuery_96">sqlrcurCmd.tcl, line 96</a>
 </dl></dl>
 
 <hr>
-<h3><a name="sendQuery">sendQuery</a></h3>
-<pre>proc sendQuery { query length }</pre>
+<h3><a name="sendQueryWithLength">sendQueryWithLength</a></h3>
+<pre>proc sendQueryWithLength { query length }</pre>
 <dl>
 <dd>Sends "query" with length "length" directly
  and gets a result set. This method must be used
  if the query contains binary data.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#sendQuery_101">sqlrcurCmd.tcl, line 101</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrcurCmd.tcl.html#sendQueryWithLength_101">sqlrcurCmd.tcl, line 101</a>
 </dl></dl>
 
 <hr>
@@ -1275,7 +1272,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2012-06-02 at 03:11.</cite>
+<cite>File generated 2012-11-07 at 05:14.</cite>
 </font>
 </body>
 </html>

@@ -5,24 +5,14 @@
 
 <html>
 <head>
-  <title>fetch (DBI::DBD::SQLRelay::Statement)</title>
+  <title>finish (DBI::DBD::SQLRelay::Statement)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../../../../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre><span class="ruby-comment cmt"># File SQLRelay.rb, line 235</span>
-  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">fetch</span>
-
-    <span class="ruby-comment cmt"># if we're already at the end of the result set, return nil</span>
-    <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@row_index</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-ivar">@row_count</span> 
-      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span>
-    <span class="ruby-keyword kw">end</span>
-
-    <span class="ruby-comment cmt"># otherwise get the current row, increment</span>
-    <span class="ruby-comment cmt"># the row index and return the current row</span>
-    <span class="ruby-identifier">row</span> = <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">getRow</span>(<span class="ruby-ivar">@row_index</span>)
-    <span class="ruby-ivar">@row_index</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>
-    <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">row</span>
+  <pre><span class="ruby-comment cmt"># File SQLRelay.rb, line 236</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">finish</span>
+    <span class="ruby-ivar">@handle</span> = <span class="ruby-keyword kw">nil</span>
   <span class="ruby-keyword kw">end</span></pre>
 </body>
 </html>

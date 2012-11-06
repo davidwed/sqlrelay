@@ -88,6 +88,8 @@ error,&nbsp;the&nbsp;error&nbsp;number&nbsp;is&nbsp;available&nbsp;here.<br>
 If&nbsp;there&nbsp;is&nbsp;no&nbsp;error&nbsp;then&nbsp;this&nbsp;method&nbsp;<br>
 returns&nbsp;0.</tt></dd></dl>
 
+<dl><dt><a name="sqlrconnection-getClientInfo"><strong>getClientInfo</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;string&nbsp;that&nbsp;was&nbsp;set&nbsp;by&nbsp;<a href="#sqlrconnection-setClientInfo">setClientInfo</a>().</tt></dd></dl>
+
 <dl><dt><a name="sqlrconnection-getConnectionPort"><strong>getConnectionPort</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;inet&nbsp;port&nbsp;that&nbsp;the&nbsp;connection&nbsp;is&nbsp;<br>
 communicating&nbsp;over.&nbsp;This&nbsp;parameter&nbsp;may&nbsp;be&nbsp;<br>
 passed&nbsp;to&nbsp;another&nbsp;connection&nbsp;for&nbsp;use&nbsp;in<br>
@@ -124,6 +126,11 @@ succeeded,&nbsp;false&nbsp;if&nbsp;it&nbsp;failed.</tt></dd></dl>
 <dl><dt><a name="sqlrconnection-selectDatabase"><strong>selectDatabase</strong></a>(self, database)</dt><dd><tt>Sets&nbsp;the&nbsp;current&nbsp;database/schema&nbsp;to&nbsp;"database"</tt></dd></dl>
 
 <dl><dt><a name="sqlrconnection-serverVersion"><strong>serverVersion</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;version&nbsp;of&nbsp;the&nbsp;SQL&nbsp;Relay&nbsp;server&nbsp;version</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-setClientInfo"><strong>setClientInfo</strong></a>(self, clientinfo)</dt><dd><tt>Allows&nbsp;you&nbsp;to&nbsp;set&nbsp;a&nbsp;string&nbsp;that&nbsp;will&nbsp;be&nbsp;passed&nbsp;to&nbsp;the<br>
+server&nbsp;and&nbsp;ultimately&nbsp;included&nbsp;in&nbsp;server-side&nbsp;logging<br>
+along&nbsp;with&nbsp;queries&nbsp;that&nbsp;were&nbsp;run&nbsp;by&nbsp;this&nbsp;instance&nbsp;of<br>
+the&nbsp;client.</tt></dd></dl>
 
 <dl><dt><a name="sqlrconnection-setTimeout"><strong>setTimeout</strong></a>(self, timeoutsec, timeoutusec)</dt><dd><tt>Sets&nbsp;the&nbsp;server&nbsp;connect&nbsp;timeout&nbsp;in&nbsp;seconds<br>
 and&nbsp;milliseconds.&nbsp;&nbsp;Setting&nbsp;either&nbsp;parameter<br>

@@ -5,26 +5,37 @@
 
 <html>
 <head>
-  <title>execute (DBI::DBD::SQLRelay::Statement)</title>
+  <title>bind_param (DBI::DBD::SQLRelay::Statement)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../../../../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre><span class="ruby-comment cmt"># File SQLRelay.rb, line 211</span>
-  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">execute</span>
+  <pre><span class="ruby-comment cmt"># File SQLRelay.rb, line 188</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">bind_param</span>(<span class="ruby-identifier">param</span>, <span class="ruby-identifier">value</span>, <span class="ruby-identifier">attribs</span>)
 
-    <span class="ruby-comment cmt"># otherwise execute the already-prepared query, raising an error if it fails</span>
-    <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">executeQuery</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-keyword kw">then</span> 
-      <span class="ruby-identifier">raise</span> <span class="ruby-constant">DBI</span><span class="ruby-operator">::</span><span class="ruby-constant">ProgrammingError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">errorMessage</span>)
+    <span class="ruby-comment cmt"># in SQL Relay, bind variable names can be names or numbers and values</span>
+    <span class="ruby-comment cmt"># can be either strings, integers or floats.  Floats come with precision</span>
+    <span class="ruby-comment cmt"># and scale as well.</span>
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">kind_of?</span> <span class="ruby-constant">Float</span> <span class="ruby-keyword kw">then</span>
+
+      <span class="ruby-comment cmt"># for float binds, check attribs for precision and scale</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">attribs</span>
+        <span class="ruby-identifier">precision</span> = <span class="ruby-identifier">attribs</span>[<span class="ruby-value str">'precision'</span>].<span class="ruby-identifier">to_i</span>
+        <span class="ruby-identifier">scale</span>     = <span class="ruby-identifier">attribs</span>[<span class="ruby-value str">'scale'</span>].<span class="ruby-identifier">to_i</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-comment cmt"># if either of precision or scale is not passed in, extract them by</span>
+      <span class="ruby-comment cmt"># parsing the value around the decimal point or using defaults</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">precision</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">scale</span>.<span class="ruby-identifier">nil?</span>
+        <span class="ruby-identifier">pr</span>, <span class="ruby-identifier">sc</span> = <span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">split</span>(<span class="ruby-value str">&quot;.&quot;</span>)
+        <span class="ruby-identifier">precision</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">||</span> <span class="ruby-value">8</span>
+        <span class="ruby-identifier">scale</span>     <span class="ruby-operator">||=</span> <span class="ruby-identifier">sc</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">||</span> <span class="ruby-value">2</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">inputBind</span>(<span class="ruby-identifier">param</span>.<span class="ruby-identifier">to_s</span>, <span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_f</span>, <span class="ruby-identifier">precision</span>, <span class="ruby-identifier">scale</span>)
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">inputBind</span>(<span class="ruby-identifier">param</span>.<span class="ruby-identifier">to_s</span>, <span class="ruby-identifier">value</span>)
     <span class="ruby-keyword kw">end</span>
-
-    <span class="ruby-comment cmt"># initialize some values</span>
-    <span class="ruby-ivar">@row_index</span> = <span class="ruby-value">0</span>
-    <span class="ruby-ivar">@row_count</span> = <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">rowCount</span>
-    <span class="ruby-ivar">@affected_rows</span> = <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">affectedRows</span>
-
-    <span class="ruby-comment cmt"># clear bind values so the statement can be re-bound and re-executed</span>
-    <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">clearBinds</span>
   <span class="ruby-keyword kw">end</span></pre>
 </body>
 </html>

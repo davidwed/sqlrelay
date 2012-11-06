@@ -80,6 +80,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>Dispose</b> ()</td></
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_client_1_1_s_q_l_r_connection.html#a7a9681f506b5a284e93f76b164fc064a">debugOn</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_client_1_1_s_q_l_r_connection.html#a43955e10886586b58d617abcc1ebfd81">debugOff</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">Boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_client_1_1_s_q_l_r_connection.html#a96d743c679381394bb2d9082aaaaed1a">getDebug</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_client_1_1_s_q_l_r_connection.html#a7e361a7c97498c6a3c6b0f9194376ff2">setClientInfo</a> (String clientinfo)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_client_1_1_s_q_l_r_connection.html#a24fe19c148f354042c5d9781c4ee6958">getClientInfo</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">IntPtr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_client_1_1_s_q_l_r_connection.html#ad026559e8398b7b486c96451c12c0f7e">getInternalConnectionStructure</a> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -350,6 +352,23 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Dispose</b> (
 
 </div>
 </div>
+<a class="anchor" id="a24fe19c148f354042c5d9781c4ee6958"></a><!-- doxytag: member="SQLRClient::SQLRConnection::getClientInfo" ref="a24fe19c148f354042c5d9781c4ee6958" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String SQLRClient.SQLRConnection.getClientInfo </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Returns the string that was set by <a class="el" href="class_s_q_l_r_client_1_1_s_q_l_r_connection.html#a7e361a7c97498c6a3c6b0f9194376ff2">setClientInfo()</a>. </p>
+
+</div>
+</div>
 <a class="anchor" id="a70629cc641211b0c7adb4b9287307988"></a><!-- doxytag: member="SQLRClient::SQLRConnection::getConnectionPort" ref="a70629cc641211b0c7adb4b9287307988" args="()" -->
 <div class="memitem">
 <div class="memproto">
@@ -566,6 +585,24 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Dispose</b> (
 
 </div>
 </div>
+<a class="anchor" id="a7e361a7c97498c6a3c6b0f9194376ff2"></a><!-- doxytag: member="SQLRClient::SQLRConnection::setClientInfo" ref="a7e361a7c97498c6a3c6b0f9194376ff2" args="(String clientinfo)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SQLRClient.SQLRConnection.setClientInfo </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>clientinfo</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Allows you to set a string that will be passed to the server and ultimately included in server-side logging along with queries that were run by this instance of the client. </p>
+
+</div>
+</div>
 <a class="anchor" id="aa13f9d0b73fb93fb140e0398f89eac75"></a><!-- doxytag: member="SQLRClient::SQLRConnection::setTimeout" ref="aa13f9d0b73fb93fb140e0398f89eac75" args="(Int32 timeoutsec, Int32 timeoutusec)" -->
 <div class="memitem">
 <div class="memproto">
@@ -612,7 +649,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Dispose</b> (
 </div>
 </div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Mon Jul 2 2012 for SQL Relay C# API by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Wed Nov 7 2012 for SQL Relay C# API by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

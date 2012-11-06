@@ -5,22 +5,22 @@
 
 <html>
 <head>
-  <title>column_info (DBI::DBD::SQLRelay::Statement)</title>
+  <title>fetch_all (DBI::DBD::SQLRelay::Statement)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../../../../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre><span class="ruby-comment cmt"># File SQLRelay.rb, line 322</span>
-  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">column_info</span>
+  <pre><span class="ruby-comment cmt"># File SQLRelay.rb, line 314</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">fetch_all</span>
 
-    <span class="ruby-comment cmt"># build a column info hash</span>
-    (<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">colCount</span>).<span class="ruby-identifier">collect</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">nr</span><span class="ruby-operator">|</span>
-      {
-        <span class="ruby-value str">'name'</span>      =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">getColumnName</span>(<span class="ruby-identifier">nr</span>),
-        <span class="ruby-value str">'type_name'</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">getColumnType</span>(<span class="ruby-identifier">nr</span>),
-        <span class="ruby-value str">'precision'</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">getColumnLength</span>(<span class="ruby-identifier">nr</span>)
-      }
+    <span class="ruby-comment cmt"># otherwise, fetch the rest of the rows and return them</span>
+    <span class="ruby-operator">*</span><span class="ruby-identifier">rows</span> = []
+    <span class="ruby-identifier">index</span> = <span class="ruby-value">0</span>
+    <span class="ruby-keyword kw">while</span> <span class="ruby-ivar">@row_index</span> <span class="ruby-operator">&lt;</span> <span class="ruby-ivar">@row_count</span>
+      <span class="ruby-operator">*</span><span class="ruby-identifier">rows</span>[<span class="ruby-identifier">index</span>] = <span class="ruby-identifier">fetch</span>()
+      <span class="ruby-identifier">index</span> = <span class="ruby-identifier">index</span><span class="ruby-operator">+</span><span class="ruby-value">1</span>
     <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">return</span> <span class="ruby-operator">*</span><span class="ruby-identifier">rows</span>
   <span class="ruby-keyword kw">end</span></pre>
 </body>
 </html>

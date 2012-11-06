@@ -49,6 +49,8 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <tr><td><code><a href="#errorNumber">errorNumber</a> {  }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If an operation failed and generated an
  error, the error number is available here.</td></tr>
+<tr><td><code><a href="#getClientInfo">getClientInfo</a> {  }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the string that was set by</td></tr>
 <tr><td><code><a href="#getConnectionPort">getConnectionPort</a> {  }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the inet port that the connection is 
  communicating over.</td></tr>
@@ -78,6 +80,11 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the current database/schema to</td></tr>
 <tr><td><code><a href="#serverVersion">serverVersion</a> {  }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the version of the sqlrelay server</td></tr>
+<tr><td><code><a href="#setClientInfo">setClientInfo</a> { clientinfo }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Allows you to set a string that will be passed to the
+ server and ultimately included in server-side logging
+ along with queries that were run by this instance of
+ the</td></tr>
 <tr><td><code><a href="#setTimeout">setTimeout</a> { timeoutsec timeoutusec }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the server connect timeout in seconds
  and milliseconds.</td></tr>
@@ -216,6 +223,14 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 </dl></dl>
 
 <hr>
+<h3><a name="getClientInfo">getClientInfo</a></h3>
+<pre>proc getClientInfo {  }</pre>
+<dl>
+<dd>Returns the string that was set by setClientInfo().<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getClientInfo_164">sqlrconCmd.tcl, line 164</a>
+</dl></dl>
+
+<hr>
 <h3><a name="getConnectionPort">getConnectionPort</a></h3>
 <pre>proc getConnectionPort {  }</pre>
 <dl>
@@ -321,6 +336,17 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 </dl></dl>
 
 <hr>
+<h3><a name="setClientInfo">setClientInfo</a></h3>
+<pre>proc setClientInfo { clientinfo }</pre>
+<dl>
+<dd>Allows you to set a string that will be passed to the
+ server and ultimately included in server-side logging
+ along with queries that were run by this instance of
+ the client.<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setClientInfo_161">sqlrconCmd.tcl, line 161</a>
+</dl></dl>
+
+<hr>
 <h3><a name="setTimeout">setTimeout</a></h3>
 <pre>proc setTimeout { timeoutsec timeoutusec }</pre>
 <dl>
@@ -378,7 +404,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2012-06-02 at 03:11.</cite>
+<cite>File generated 2012-11-07 at 05:14.</cite>
 </font>
 </body>
 </html>

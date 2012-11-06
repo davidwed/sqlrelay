@@ -98,6 +98,7 @@
       <a href="#M000088">endSession</a>&nbsp;&nbsp;
       <a href="#M000107">errorMessage</a>&nbsp;&nbsp;
       <a href="#M000108">errorNumber</a>&nbsp;&nbsp;
+      <a href="#M000113">getClientInfo</a>&nbsp;&nbsp;
       <a href="#M000090">getConnectionPort</a>&nbsp;&nbsp;
       <a href="#M000091">getConnectionSocket</a>&nbsp;&nbsp;
       <a href="#M000100">getCurrentDatabase</a>&nbsp;&nbsp;
@@ -110,6 +111,7 @@
       <a href="#M000106">rollback</a>&nbsp;&nbsp;
       <a href="#M000099">selectDatabase</a>&nbsp;&nbsp;
       <a href="#M000096">serverVersion</a>&nbsp;&nbsp;
+      <a href="#M000112">setClientInfo</a>&nbsp;&nbsp;
       <a href="#M000087">setTimeout</a>&nbsp;&nbsp;
       <a href="#M000089">suspendSession</a>&nbsp;&nbsp;
       </div>
@@ -381,6 +383,24 @@ available here. If there is no error then this method returns 0.
         </div>
       </div>
 
+      <div id="method-M000113" class="method-detail">
+        <a name="M000113"></a>
+
+        <div class="method-heading">
+          <a href="SQLRConnection.src/M000113.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000113.html');return false;">
+          <span class="method-name">getClientInfo</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the string that was set by <a
+href="SQLRConnection.html#M000112">setClientInfo</a>().
+</p>
+        </div>
+      </div>
+
       <div id="method-M000090" class="method-detail">
         <a name="M000090"></a>
 
@@ -577,6 +597,26 @@ Sets the current database/schema to &quot;database&quot;
         <div class="method-description">
           <p>
 Returns the version of the sqlrelay server software.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000112" class="method-detail">
+        <a name="M000112"></a>
+
+        <div class="method-heading">
+          <a href="SQLRConnection.src/M000112.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000112.html');return false;">
+          <span class="method-name">setClientInfo(clientinfo)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Allows you to set a string that will be passed to the server and ultimately
+included in server-side logging along with queries that were run by this
+instance of the client.
 </p>
         </div>
       </div>

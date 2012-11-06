@@ -74,6 +74,8 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrconnection.html#ad6a7e0a8e1dddb177adf7dae4c1d093e">debugOff</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrconnection.html#a5fcfd9aea315d9aaaff62f40c56a7b88">getDebug</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrconnection.html#a5a63752058c56b80b12f47dc08fbb091">debugPrintFunction</a> (int(*printfunction)(const char *,...))</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrconnection.html#ab560b313daf6402af98f6a8bb9f08786">setClientInfo</a> (const char *clientinfo)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsqlrconnection.html#a3a8f9ae2f2fab2d4e637789b4111c60e">getClientInfo</a> () const </td></tr>
 </table>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a87078218c68d214deab2b21fbf90b113"></a><!-- doxytag: member="sqlrconnection::sqlrconnection" ref="a87078218c68d214deab2b21fbf90b113" args="(const char *server, uint16_t port, const char *socket, const char *user, const char *password, int32_t retrytime, int32_t tries)" -->
@@ -375,6 +377,23 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a3a8f9ae2f2fab2d4e637789b4111c60e"></a><!-- doxytag: member="sqlrconnection::getClientInfo" ref="a3a8f9ae2f2fab2d4e637789b4111c60e" args="() const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* sqlrconnection::getClientInfo </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Returns the string that was set by <a class="el" href="classsqlrconnection.html#ab560b313daf6402af98f6a8bb9f08786">setClientInfo()</a>. </p>
+
+</div>
+</div>
 <a class="anchor" id="ae023b04b5f46cc85f5a43e5eac3373cc"></a><!-- doxytag: member="sqlrconnection::getConnectionPort" ref="ae023b04b5f46cc85f5a43e5eac3373cc" args="()" -->
 <div class="memitem">
 <div class="memproto">
@@ -574,6 +593,24 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ab560b313daf6402af98f6a8bb9f08786"></a><!-- doxytag: member="sqlrconnection::setClientInfo" ref="ab560b313daf6402af98f6a8bb9f08786" args="(const char *clientinfo)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void sqlrconnection::setClientInfo </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>clientinfo</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Allows you to set a string that will be passed to the server and ultimately included in server-side logging along with queries that were run by this instance of the client. </p>
+
+</div>
+</div>
 <a class="anchor" id="af63b429e284e107c187453af5a592170"></a><!-- doxytag: member="sqlrconnection::setTimeout" ref="af63b429e284e107c187453af5a592170" args="(int32_t timeoutsec, int32_t timeoutusec)" -->
 <div class="memitem">
 <div class="memproto">
@@ -620,7 +657,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 2 2012 for SQL Relay C++ API by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Wed Nov 7 2012 for SQL Relay C++ API by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
