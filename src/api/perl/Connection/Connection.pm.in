@@ -178,6 +178,15 @@ __END__
             # Returns true if debugging is currently on and false
             # if debugging is currently off.
 
+        setClientInfo(clientinfo);
+            # Allows you to set a string that will be passed to the
+            # server and ultimately included in server-side logging
+            # along with queries that were run by this instance of
+            # the client.
+
+        getClientInfo();
+            # Returns the string that was set by setClientInfo().
+
 =head1 AUTHOR
 
     David Muse

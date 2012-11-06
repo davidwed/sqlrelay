@@ -228,6 +228,22 @@ class sqlrconnection:
         return CSQLRelay.getDebug(self.connection)
 
 
+    def setClientInfo(self,clientinfo):
+        """
+        Allows you to set a string that will be passed to the
+        server and ultimately included in server-side logging
+        along with queries that were run by this instance of
+        the client.
+        """
+        return CSQLRelay.setClientInfo(self.connection,clientinfo)
+
+    def getClientInfo(self):
+        """
+        Returns the string that was set by setClientInfo().
+        """
+        return CSQLRelay.getClientInfo(self.connection)
+
+
 
 
 class sqlrcursor:

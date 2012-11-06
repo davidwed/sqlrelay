@@ -497,13 +497,15 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		const char	*connectionid;
 		int32_t		ttl;
 
-	private:
 		sqlrstatistics	*statistics;
 		semaphoreset	*semset;
 
 		sqlrconnection	*sid_sqlrcon;
 
 		char		*pidfile;
+
+		char		clientinfo[MAXCLIENTINFOLEN];
+		uint64_t	clientinfolen;
 
 	protected:
 		bool		fakeinputbinds;

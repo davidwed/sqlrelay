@@ -85,6 +85,8 @@
 #define BINDVARLENGTH 64
 #define MAXVAR 256
 
+#define MAXCLIENTINFOLEN 512
+
 #define MAXCONNECTIONIDLEN 1024
 
 #define NOCURSORSERROR "No server-side cursors were available to process the query."

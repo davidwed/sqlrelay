@@ -153,3 +153,12 @@ proc debugOff {}
 # Returns false if debugging is off and true
 # if debugging is on.
 proc getDebug {} 
+
+# Allows you to set a string that will be passed to the
+# server and ultimately included in server-side logging
+# along with queries that were run by this instance of
+# the client.
+proc setClientInfo {clientinfo} 
+
+# Returns the string that was set by setClientInfo().
+proc getClientInfo {} 

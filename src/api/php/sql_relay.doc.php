@@ -146,6 +146,17 @@ function sqlrcon_debugOff($sqlrconref){}
  *  Returns 0 if debugging is off and 1 if debugging is on. */
 function sqlrcon_getDebug($sqlrconref){}
 
+/** Allows you to set a string that will be passed to the
+ *  server and ultimately included in server-side logging
+ *  along with queries that were run by this instance of
+ *  the client. */
+function sqlrcon_setClientInfo($sqlrconref, $clientinfo){}
+
+/** Returns the string that was set by setClientInfo(). */
+function sqlrcon_getClientInfo($sqlrconref){}
+
+
+
 
 
 /** 

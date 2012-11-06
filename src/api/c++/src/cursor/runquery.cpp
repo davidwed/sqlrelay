@@ -70,6 +70,11 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 		// tell the server whether we'll need a cursor or not
 		sendCursorStatus();
 
+		// send the client info
+		// FIXME: arguably this should be its own command
+		sqlrc->cs->write(sqlrc->clientinfolen);
+		sqlrc->cs->write(sqlrc->clientinfo,sqlrc->clientinfolen);
+
 		// send the query
 		sqlrc->cs->write(querylen);
 		sqlrc->cs->write(query,querylen);

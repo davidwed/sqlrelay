@@ -332,6 +332,28 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getDebug
 	return (jboolean)getSqlrConnection(env,self)->getDebug();
 }
 
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    setClientInfo
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setClientInfo
+  (JNIEnv *env, jobject self, jstring clientinfo) {
+	char	*clientinfostring=conGetStringUTFChars(env,clientinfo,0);
+	getSqlrConnection(env,self)->setClientInfo(clientinfostring);
+	conReleaseStringUTFChars(env,clientinfo,clientinfostring);
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    getClientInfo
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getClientInfo
+  (JNIEnv *env, jobject self) {
+	return env->NewStringUTF(getSqlrConnection(env,self)->getClientInfo());
+}
+
 #ifdef __cplusplus
 }
 #endif

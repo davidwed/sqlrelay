@@ -86,6 +86,10 @@
 		// bind format
 		char		*bindformat;
 
+		// client info
+		char		*clientinfo;
+		uint64_t	clientinfolen;
+
 		// debug
 		bool		debug;
 		int32_t		webdebug;

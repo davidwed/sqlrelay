@@ -230,6 +230,20 @@ public class SQLRConnection : IDisposable
         return sqlrcon_getDebug(sqlrconref)!=0;
     }
 
+    /** Allows you to set a string that will be passed to the server and
+     *  ultimately included in server-side logging along with queries that were
+     *  run by this instance of the client. */
+    public void setClientInfo(String clientinfo)
+    {
+        return sqlrcon_setClientInfo(sqlrconref,clientinfo);
+    }
+
+    /** Returns the string that was set by setClientInfo(). */
+    public String getClientInfo()
+    {
+        return sqlrcon_getClientInfo(sqlrconref);
+    }
+
     /** Returns a pointer to the internal connection structure */
     public IntPtr getInternalConnectionStructure()
     {
@@ -318,6 +332,12 @@ public class SQLRConnection : IDisposable
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern Int32 sqlrcon_getDebug(IntPtr sqlrconref);
+    
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern void sqlrcon_setClientInfo(IntPtr sqlrconref, String clientinfo);
+    
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern String sqlrcon_getClientInfo(IntPtr sqlrconref);
 }
 
 }

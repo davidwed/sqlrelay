@@ -525,6 +525,33 @@ int main() {
 				return ERR_ENCODING_ARGS;
 			}
 		}
+
+		if (strcmp("setClientInfo", command) == TRUE) {
+			char clientinfo[2000];
+
+			// check number of arguments
+		    	if (arity != 1) return ERR_NUMBER_OF_ARGS;
+
+			// get input parameters
+			if (ei_decode_string(buf, &index, &clientinfo[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+
+			// call function and encode result 
+			sqlrcon_setClientInfo(con, clientinfo); 	
+			ENCODE_VOID;   
+		}
+		
+		if (strcmp("getClientInfo", command) == TRUE) {
+			// check number of arguments
+		    	if (arity != 0) return ERR_NUMBER_OF_ARGS;
+
+			// encode result 
+			if (ei_x_encode_atom(&result, "ok") || 
+				ei_x_encode_string(&result, sqlrcon_getClientInfo(con))) {
+				return ERR_ENCODING_ARGS;
+			}
+		}
 		
 		if (strcmp("setResultSetBufferSize", command) == TRUE) {
                 	unsigned long rows; 			

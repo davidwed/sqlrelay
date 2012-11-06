@@ -177,6 +177,16 @@ class SQLRCLIENT_DLLSPEC sqlrconnection {
 		void	debugPrintFunction(int (*printfunction)
 							(const char *,...));
 
+
+		/** Allows you to set a string that will be passed to the
+		 *  server and ultimately included in server-side logging
+		 *  along with queries that were run by this instance of
+		 *  the client. */
+		void		setClientInfo(const char *clientinfo);
+
+		/** Returns the string that was set by setClientInfo(). */
+		const char	*getClientInfo() const;
+
 	#include <sqlrelay/private/sqlrconnection.h>
 };
 

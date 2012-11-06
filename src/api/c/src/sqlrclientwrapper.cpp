@@ -136,6 +136,14 @@ void sqlrcon_debugPrintFunction(sqlrcon sqlrconref,
 	sqlrconref->debugPrintFunction(printfunction);
 }
 
+void sqlrcon_setClientInfo(sqlrcon sqlrconref, const char *clientinfo) {
+	sqlrconref->setClientInfo(clientinfo);
+}
+
+const char *sqlrcon_getClientInfo(sqlrcon sqlrconref) {
+	return sqlrconref->getClientInfo();
+}
+
 
 sqlrcur sqlrcur_alloc(sqlrcon sqlrconref) {
 	return sqlrcur_alloc_copyrefs(sqlrconref,0);

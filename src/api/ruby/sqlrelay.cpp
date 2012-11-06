@@ -305,6 +305,32 @@ static VALUE sqlrcon_getDebug(VALUE self) {
 	return INT2NUM(sqlrcon->getDebug());
 }
 
+/**
+ *  call-seq:
+ *  setClientInfo(clientinfo)
+ * 
+ *  Allows you to set a string that will be passed to the server and ultimately
+ *  included in server-side logging along with queries that were run by this
+ *  instance of the client. */
+static VALUE sqlrcon_setClientInfo(VALUE self, VALUE clientinfo) {
+	sqlrconnection	*sqlrcon;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	sqlrcon->setClientInfo(STR2CSTR(clientinfo));
+	return Qnil;
+}
+
+/** Returns the string that was set by setClientInfo(). */
+static VALUE sqlrcon_getClientInfo(VALUE self) {
+	sqlrconnection	*sqlrcon;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	const char	*result=sqlrcon->getClientInfo();
+	if (result) {
+		return rb_str_new2(result);
+	} else {
+		return Qnil;
+	}
+}
+
 
 
 VALUE csqlrconnection;
@@ -364,6 +390,10 @@ void Init_SQLRConnection() {
 				(CAST)sqlrcon_debugOff,0);
 	rb_define_method(csqlrconnection,"getDebug",
 				(CAST)sqlrcon_getDebug,0);
+	rb_define_method(csqlrconnection,"setClientInfo",
+				(CAST)sqlrcon_setClientInfo,1);
+	rb_define_method(csqlrconnection,"getClientInfo",
+				(CAST)sqlrcon_getClientInfo,0);
 }
 
 

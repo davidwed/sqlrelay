@@ -13,6 +13,7 @@
 -export([getConnectionPort/0, getConnectionSocket/0]).
 -export([autoCommitOn/0, autoCommitOff/0, beginTransaction/0, commit/0, rollback/0]).
 -export([debugOn/0, debugOff/0, getDebug/0]).
+-export([setClientInfo/1, getClientInfo/0]).
 -export([setResultSetBufferSize/1, getResultSetBufferSize/0]).
 -export([dontGetColumnInfo/0, getColumnInfo/0]).
 -export([mixedCaseColumnNames/0, upperCaseColumnNames/0, lowerCaseColumnNames/0]).
@@ -134,6 +135,10 @@ debugOn() -> call_port({debugOn}).
 debugOff() -> call_port({debugOff}).
 
 getDebug() -> call_port({getDebug}).
+
+setClientInfo(ClientInfo) when is_list(ClientInfo) -> call_port({setClientInfo, ClientInfo}).
+
+getClientInfo() -> call_port({getClientInfo}).
 
 setResultSetBufferSize(Rows) when is_integer(Rows) -> call_port({setResultSetBufferSize, Rows}).
 

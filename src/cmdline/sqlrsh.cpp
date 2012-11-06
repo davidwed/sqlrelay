@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2001  David Muse
+// Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
 #include <config.h>
@@ -188,6 +188,9 @@ class	sqlrsh {
 								*binds);
 		void	clearbinds(stringdictionary< sqlrshbindvalue * >
 								*binds);
+		void	setclientinfo(sqlrconnection *sqlrcon,
+						const char *command);
+		void	getclientinfo(sqlrconnection *sqlrcon);
 		void	displayHelp(sqlrshenv *env);
 		void	interactWithUser(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur, sqlrshenv *env);
@@ -391,7 +394,9 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"clearinputbind",14) ||
 		!charstring::compareIgnoringCase(ptr,"clearoutputbind",15) ||
 		!charstring::compareIgnoringCase(ptr,"clearbinds") ||
-		!charstring::compareIgnoringCase(ptr,"lastinsertid")) {
+		!charstring::compareIgnoringCase(ptr,"lastinsertid") ||
+		!charstring::compareIgnoringCase(ptr,"setclientinfo ",14) ||
+		!charstring::compareIgnoringCase(ptr,"getclientinfo")) {
 
 		// return value of 1 is internal command
 		return 1;
@@ -502,6 +507,12 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 					sqlrcon->errorMessage(),
 					sqlrcon->errorNumber());
 		}
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"setclientinfo ",14)) {	
+		setclientinfo(sqlrcon,command);
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"getclientinfo")) {	
+		getclientinfo(sqlrcon);
 		return;
 	} else {
 		return;
@@ -1205,6 +1216,15 @@ void sqlrsh::printbinds(const char *type,
 	}
 }
 
+void sqlrsh::setclientinfo(sqlrconnection *sqlrcon, const char *command) {
+	sqlrcon->setClientInfo(command+14);
+}
+
+void sqlrsh::getclientinfo(sqlrconnection *sqlrcon) {
+	const char	*ci=sqlrcon->getClientInfo();
+	printf("%s\n",(ci)?ci:"");
+}
+
 void sqlrsh::displayHelp(sqlrshenv *env) {
 
 	printf("\n");
@@ -1278,6 +1298,8 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	printf("		returns a list of column metadata for the table \"table\"\n");
 	printf("	fields table				-\n");
 	printf("		returns a list of column names for the table \"table\"\n\n");
+	printf("	setclientinfo info	- sets the client info\n");
+	printf("	getclientinfo		- displays the client info\n\n");
 	printf("	exit/quit		- ");
 	printf("exits\n\n");
 	printf("	All commands must be followed by the delimiter: %c\n",

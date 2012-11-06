@@ -114,3 +114,10 @@ sqlrconnection::debugOff()
 
 bool
 sqlrconnection::getDebug()
+
+void
+sqlrconnection::setClientInfo(clientinfo)
+		const char	*clientinfo
+
+const char *
+sqlrconnection::getClientInfo()

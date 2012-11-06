@@ -332,6 +332,28 @@ static PyObject *getDebug(PyObject *self, PyObject *args) {
   return Py_BuildValue("h", (short)((sqlrconnection *)sqlrcon)->getDebug());
 }
 
+static PyObject *setClientInfo(PyObject *self, PyObject *args) {
+  char *db;
+  long sqlrcon;
+  if (!PyArg_ParseTuple(args, "ls", &sqlrcon, &db))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  ((sqlrconnection *)sqlrcon)->setClientInfo(db);
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("h", 0);
+}
+
+static PyObject *getClientInfo(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  const char *rc;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  rc=((sqlrconnection *)sqlrcon)->getClientInfo();
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("s", rc);
+}
+
 static PyObject *sqlrcur_alloc(PyObject *self, PyObject *args) {
   long	sqlrcon;
   sqlrcursor *sqlrcur;
@@ -1785,6 +1807,8 @@ static PyMethodDef SQLRMethods[] = {
   {"debugOn", debugOn, METH_VARARGS},
   {"debugOff", debugOff, METH_VARARGS},
   {"getDebug", getDebug, METH_VARARGS},
+  {"setClientInfo", setClientInfo, METH_VARARGS},
+  {"getClientInfo", getClientInfo, METH_VARARGS},
   {"sqlrcur_alloc",  sqlrcur_alloc, METH_VARARGS},
   {"sqlrcur_free",  sqlrcur_free, METH_VARARGS},
   {"setResultSetBufferSize", setResultSetBufferSize, METH_VARARGS},

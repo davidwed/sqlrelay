@@ -144,6 +144,15 @@ public class SQLRConnection {
 	 *  debugging is on. */
 	public native boolean	getDebug();
 
+	/** Allows you to set a string that will be passed to the
+	 *  server and ultimately included in server-side logging
+	 *  along with queries that were run by this instance of
+	 *  the client. */
+	public native boolean	setClientInfo(String clientinfo);
+
+	/** Returns the string that was set by setClientInfo(). */
+	public native String	getClientInfo();
+
 
 	/** connection is used internally, it's just
 	 *  public to make the JNI wrapper work faster.  */

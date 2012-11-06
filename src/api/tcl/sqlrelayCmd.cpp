@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.cpp,v 1.7 2012-10-05 00:46:40 mused Exp $
+ * $Id: sqlrelayCmd.cpp,v 1.8 2012-11-06 22:16:49 mused Exp $
  */
 
 #include <tcl.h>
@@ -1840,6 +1840,8 @@ void sqlrconDelete(ClientData data) {
  *  $con rollback
  *  $con errorMessage
  *  $con debug ?bool?
+ *  $con setClientInfo clientinfo
+ *  $con getClientInfo
  *  $con sqlrcur
  *     set cur [$con sqlrcur]
  */
@@ -1871,6 +1873,8 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     "errorMessage",
     "errorNumber",
     "debug",
+    "setClientInfo",
+    "getClientInfo",
     "sqlrcur",
   };
   enum options {
@@ -1897,6 +1901,8 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     SQLR_ERRORMESSAGE,
     SQLR_ERRORNUMBER,
     SQLR_DEBUG,
+    SQLR_SETCLIENTINFO,
+    SQLR_GETCLIENTINFO,
     SQLR_SQLRCUR,
   };
 
@@ -2139,6 +2145,22 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       Tcl_WrongNumArgs(interp, 2, objv, "debug ?bool?");
       return TCL_ERROR;
     }
+  }
+  case SQLR_SETCLIENTINFO: {
+    if (objc != 3) {
+      Tcl_WrongNumArgs(interp,2, objv, "clientinfo");
+      return TCL_ERROR;
+    }
+    con->setClientInfo(Tcl_GetString(objv[2]));
+    break;
+  }
+  case SQLR_GETCLIENTINFO: {
+    if (objc > 2) {
+      Tcl_WrongNumArgs(interp, 2, objv, NULL);
+      return TCL_ERROR;
+    }
+    Tcl_SetObjResult(interp,_Tcl_NewStringObj(con->getClientInfo(), -1));
+    break;
   }
   case SQLR_SQLRCUR: {
     if (objc > 2) {

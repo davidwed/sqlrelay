@@ -79,6 +79,8 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 
 	pidfile=NULL;
 
+	clientinfolen=0;
+
 	decrementonclose=false;
 	silent=false;
 }

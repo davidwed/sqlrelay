@@ -204,6 +204,18 @@ SQLRCLIENTWRAPPER_DLLSPEC
 void	sqlrcon_debugPrintFunction(sqlrcon sqlrconref, 
 					int (*printfunction)(const char *,...));
 
+/** @ingroup sqlrclientwrapper
+ *  Allows you to set a string that will be passed to the server and ultimately
+ *  included in server-side logging along with queries that were run by this
+ *  instance of the client. */
+SQLRCLIENTWRAPPER_DLLSPEC
+void	sqlrcon_setClientInfo(sqlrcon sqlrconref, const char *clientinfo);
+
+/** @ingroup sqlrclientwrapper
+ *  Returns the string that was set by sqlrcon_setClientInfo(). */
+SQLRCLIENTWRAPPER_DLLSPEC
+const char	*sqlrcon_getClientInfo(sqlrcon sqlrconref);
+
 
 
 /** @ingroup sqlrclientwrapper

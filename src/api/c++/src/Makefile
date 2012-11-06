@@ -36,6 +36,7 @@ SRCS = connection/connectionctor.cpp \
 	connection/clientversion.cpp \
 	connection/opensession.cpp \
 	connection/closeconnection.cpp \
+	connection/clientinfo.cpp \
 	cursor/cursorctor.cpp \
 	cursor/cursordtor.cpp \
 	cursor/columns.cpp \
@@ -94,6 +95,7 @@ LOBJS = connection/connectionctor.lo \
 	connection/clientversion.lo \
 	connection/opensession.lo \
 	connection/closeconnection.lo \
+	connection/clientinfo.lo \
 	cursor/cursorctor.lo \
 	cursor/cursordtor.lo \
 	cursor/columns.lo \

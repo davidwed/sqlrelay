@@ -73,6 +73,10 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	// bind format
 	bindformat=NULL;
 
+	// client info
+	clientinfo=NULL;
+	clientinfolen=0;
+
 	// session state
 	connected=false;
 	clearSessionFlags();
