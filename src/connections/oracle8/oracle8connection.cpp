@@ -1900,6 +1900,9 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 		}
 
 		// loop to handle retries...
+		// If the query fails with ora-04068 then we need to retry
+		// the query.  Only retry once though.
+		bool	first=true;
 		for (;;) {
 			if (OCIStmtExecute(oracle8conn->svc,stmt,
 					oracle8conn->err,
@@ -1908,16 +1911,17 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 					oracle8conn->stmtmode)==OCI_SUCCESS) {
 				break;
 			}
-
-			// If we got ora-04068 then we just need to
-			// retry the query.  If not, return error.
+			if (!first) {
+				return false;
+			}
 			sb4	errcode=0;
 			OCIErrorGet((dvoid *)oracle8conn->err,
 					1,(text *)0,&errcode,
 					NULL,0,OCI_HTYPE_ERROR);
-			if (errcode!=4068) {
+			if (!first || errcode!=4068) {
 				return false;
 			}
+			first=false;
 		}
 
 		// reset the prepared flag
