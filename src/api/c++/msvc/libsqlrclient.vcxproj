@@ -137,6 +137,7 @@ copy /Y ..\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sq
     <ClCompile Include="..\src\connection\selectdatabase.cpp" />
     <ClCompile Include="..\src\connection\serverversion.cpp" />
     <ClCompile Include="..\src\connection\suspendsession.cpp" />
+    <ClCompile Include="..\src\connection\clientinfo.cpp" />
     <ClCompile Include="..\src\cursor\abortresultset.cpp" />
     <ClCompile Include="..\src\cursor\binds.cpp" />
     <ClCompile Include="..\src\cursor\clearresultset.cpp" />
