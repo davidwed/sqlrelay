@@ -2197,11 +2197,11 @@ bool oracle8cursor::validBinds() {
 		// preventing it can be simpler solution than always getting
 		// application developers to understand that context.  Moreover,
 		// it makes overall logic of this function simpler.  --replica
-		if (dupl[i]) {
+		/*if (dupl[i]) {
 			// FIXME: set error
 			//setSqlrError(SQLR_ERR_DUPLICATE_BINDNAME,"duplicated bindname is not allowed in the oracle8 environment of neowiz (%s)",bvnp[i]);
 			return false;
-		}
+		}*/
 
 		// verify that the variable was bound,
 		// first check by position, then by name
