@@ -706,16 +706,16 @@ void oracle8connection::errorMessage(const char **errorstring,
 	*errorcode=errcode;
 
 	// check for dead connection or shutdown in progress
-	// Might need: 1033 - oracle init/shutdown in progress
-	// FIXME: neowiz adds 2067 - transaction or savepoint rollback required
 	switch (errcode) {
 		case 22: // invalid session ID; access denied
 		case 28: // your session has been killed
 		case 604: // error occurred at recursive SQL level ...
 		case 1012: // not logged on
+		case 1033: // oracle init/shutdown in progress
 		case 1041: // internal error. hostdef extension doesn't exist
 		case 1089: // immediate shutdown in progress -
 				// no operations are permitted
+		case 2067: // transaction or savepoint rollback required
 		case 3114: // not connected to ORACLE
 		case 3113: // end-of-file on communication channel
 		case 3135: // connection lost contact
