@@ -27,6 +27,7 @@ ifneq ($(strip $(MYSQLLIBS)),)
 endif
 ifneq ($(strip $(ORACLELIBS)),)
 	$(MAKE) oracle
+	$(MAKE) oracle8
 endif
 ifneq ($(strip $(POSTGRESQLLIBS)),)
 	$(MAKE) postgresql
@@ -56,6 +57,9 @@ mysql: mysql.cpp mysql.lo
 oracle: oracle.cpp oracle.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle.lo $(LIBS)
 
+oracle8: oracle8.cpp oracle8.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle8.lo $(LIBS)
+
 postgresql: postgresql.cpp postgresql.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ postgresql.lo $(LIBS)
 
@@ -84,6 +88,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) oracleclobfetch
 	$(LIBTOOL) --mode=clean $(RM) oracleclobinsert
 	$(LIBTOOL) --mode=clean $(RM) oracle
+	$(LIBTOOL) --mode=clean $(RM) oracle8
 	$(LIBTOOL) --mode=clean $(RM) postgresql
 	$(LIBTOOL) --mode=clean $(RM) sqlite
 	$(LIBTOOL) --mode=clean $(RM) sybase
