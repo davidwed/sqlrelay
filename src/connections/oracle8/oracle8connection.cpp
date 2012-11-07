@@ -505,7 +505,6 @@ bool oracle8connection::logIn(bool printerrors) {
 		}
 		int64_t	major=charstring::toInteger(majorstr);
 		int64_t	minor=charstring::toInteger(minorstr);
-printf("connected to server %lld.%lld\n",major,minor);
 	
 		// 8.1 and up supports proxy credentials and syscontext
 		if (major>=8 || (major==8 && minor>0)) {
@@ -1229,7 +1228,6 @@ void oracle8cursor::checkRePrepare() {
 
 	if (oracle8conn->requiresreprepare && !prepared &&
 			stmttype && stmttype!=OCI_STMT_SELECT) {
-printf("reprepare!\n");
 		cleanUpData(true,true);
 		prepareQuery(query,length);
 		prepared=true;
