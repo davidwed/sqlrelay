@@ -173,7 +173,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("BIND BY NAME: \n");
-	cur->prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)");
+	cur->prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5)");
 	cur->inputBind("var1",5);
 	cur->inputBind("var2","testchar5");
 	cur->inputBind("var3","testvarchar5");
@@ -297,7 +297,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COLUMN COUNT: \n");
-	checkSuccess(cur->colCount(),7);
+	checkSuccess(cur->colCount(),5);
 	printf("\n");
 
 	printf("COLUMN NAMES: \n");
@@ -306,16 +306,12 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnName(2),"TESTVARCHAR");
 	checkSuccess(cur->getColumnName(3),"TESTDATE");
 	checkSuccess(cur->getColumnName(4),"TESTLONG");
-	checkSuccess(cur->getColumnName(5),"TESTCLOB");
-	checkSuccess(cur->getColumnName(6),"TESTBLOB");
 	cols=cur->getColumnNames();
 	checkSuccess(cols[0],"TESTNUMBER");
 	checkSuccess(cols[1],"TESTCHAR");
 	checkSuccess(cols[2],"TESTVARCHAR");
 	checkSuccess(cols[3],"TESTDATE");
 	checkSuccess(cols[4],"TESTLONG");
-	checkSuccess(cols[5],"TESTCLOB");
-	checkSuccess(cols[6],"TESTBLOB");
 	printf("\n");
 
 	printf("COLUMN TYPES: \n");
@@ -379,8 +375,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,2),"testvarchar1");
 	checkSuccess(cur->getField(0,3),"01-JAN-01");
 	checkSuccess(cur->getField(0,4),"testlong1");
-	checkSuccess(cur->getField(0,5),"testclob1");
-	checkSuccess(cur->getField(0,6),"");
 	printf("\n");
 	checkSuccess(cur->getField(7,(uint32_t)0),"8");
 	checkSuccess(cur->getField(7,1),"testchar8                               ");
@@ -395,16 +389,12 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getFieldLength(0,2),12);
 	checkSuccess(cur->getFieldLength(0,3),9);
 	checkSuccess(cur->getFieldLength(0,4),9);
-	checkSuccess(cur->getFieldLength(0,5),9);
-	checkSuccess(cur->getFieldLength(0,6),0);
 	printf("\n");
 	checkSuccess(cur->getFieldLength(7,(uint32_t)0),1);
 	checkSuccess(cur->getFieldLength(7,1),40);
 	checkSuccess(cur->getFieldLength(7,2),12);
 	checkSuccess(cur->getFieldLength(7,3),9);
 	checkSuccess(cur->getFieldLength(7,4),9);
-	checkSuccess(cur->getFieldLength(7,5),9);
-	checkSuccess(cur->getFieldLength(7,6),9);
 	printf("\n");
 
 	printf("FIELDS BY NAME: \n");
@@ -442,8 +432,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(fields[2],"testvarchar1");
 	checkSuccess(fields[3],"01-JAN-01");
 	checkSuccess(fields[4],"testlong1");
-	checkSuccess(fields[5],"testclob1");
-	checkSuccess(fields[6],"");
 	printf("\n");
 
 	printf("FIELD LENGTHS BY ARRAY: \n");
@@ -453,8 +441,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(fieldlens[2],12);
 	checkSuccess(fieldlens[3],9);
 	checkSuccess(fieldlens[4],9);
-	checkSuccess(fieldlens[5],9);
-	checkSuccess(fieldlens[6],0);
 	printf("\n");
 
 	printf("INDIVIDUAL SUBSTITUTIONS: \n");
@@ -660,7 +646,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COLUMN COUNT FOR CACHED RESULT SET: \n");
-	checkSuccess(cur->colCount(),7);
+	checkSuccess(cur->colCount(),5);
 	printf("\n");
 
 	printf("COLUMN NAMES FOR CACHED RESULT SET: \n");
@@ -669,16 +655,12 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnName(2),"TESTVARCHAR");
 	checkSuccess(cur->getColumnName(3),"TESTDATE");
 	checkSuccess(cur->getColumnName(4),"TESTLONG");
-	checkSuccess(cur->getColumnName(5),"TESTCLOB");
-	checkSuccess(cur->getColumnName(6),"TESTBLOB");
 	cols=cur->getColumnNames();
 	checkSuccess(cols[0],"TESTNUMBER");
 	checkSuccess(cols[1],"TESTCHAR");
 	checkSuccess(cols[2],"TESTVARCHAR");
 	checkSuccess(cols[3],"TESTDATE");
 	checkSuccess(cols[4],"TESTLONG");
-	checkSuccess(cols[5],"TESTCLOB");
-	checkSuccess(cols[6],"TESTBLOB");
 	printf("\n");
 
 	printf("CACHED RESULT SET WITH RESULT SET BUFFER SIZE: \n");
@@ -765,7 +747,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"8");
 	checkSuccess(con->autoCommitOn(),1);
-	checkSuccess(cur->sendQuery("insert into testtable values (10,'testchar10','testvarchar10','01-JAN-2010','testlong10','testclob10',NULL)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (10,'testchar10','testvarchar10','01-JAN-2010','testlong10')"),1);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"9");
 	checkSuccess(con->autoCommitOff(),1);
