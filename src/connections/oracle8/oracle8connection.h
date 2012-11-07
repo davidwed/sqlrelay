@@ -278,9 +278,10 @@ class oracle8cursor : public sqlrcursor_svr {
 		uint64_t	maxrow;
 		uint64_t	totalrows;
 
-		char		*query;
-		uint32_t	length;
+		//char		*query;
+		//uint32_t	length;
 		//bool		prepared;
+
 		bool		bound;
 
 		bool		resultfreed;

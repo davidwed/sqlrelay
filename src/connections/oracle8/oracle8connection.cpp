@@ -951,8 +951,8 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	maxrow=0;
 	totalrows=0;
 
-	query=NULL;
-	length=0;
+	//query=NULL;
+	//length=0;
 	//prepared=false;
 	bound=false;
 
@@ -1095,8 +1095,8 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 
 	// keep a pointer to the query and length in case it needs to be 
 	// reprepared later
-	this->query=(char *)query;
-	this->length=length;
+	//this->query=(char *)query;
+	//this->length=length;
 
 	// if the query is being prepared then apparently this isn't an
 	// output bind cursor
