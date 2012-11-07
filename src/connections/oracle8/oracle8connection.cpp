@@ -35,6 +35,7 @@ oracle8connection::oracle8connection() : sqlrconnection_svr() {
 	supportsproxycredentials=false;
 #endif
 	supportssyscontext=false;
+	requiresreprepare=false;
 
 	home=NULL;
 	sid=NULL;
@@ -481,19 +482,49 @@ bool oracle8connection::logIn(bool printerrors) {
 	}
 
 	// figure out what version of the database we're connected to...
-#ifdef OCI_ATTR_PROXY_CREDENTIALS
+	#ifdef OCI_ATTR_PROXY_CREDENTIALS
 	supportsproxycredentials=false;
-#endif
+	#endif
 	supportssyscontext=false;
+	requiresreprepare=false;
 	if (OCIServerVersion((dvoid *)svc,err,
 				(text *)versionbuf,sizeof(versionbuf),
-				OCI_HTYPE_SVCCTX)==OCI_SUCCESS &&
-			!charstring::contains(versionbuf,"Release 8.0")) {
-#ifdef OCI_ATTR_PROXY_CREDENTIALS
-		supportsproxycredentials=true;
-#endif
-		supportssyscontext=true;
+				OCI_HTYPE_SVCCTX)==OCI_SUCCESS) {
+
+		// get the major and minor versions
+		const char	*release=
+				charstring::findFirst(versionbuf,"Release ");
+		const char	*majorstr=NULL;
+		const char	*minorstr=NULL;
+		if (release) {
+			majorstr=release+8;
+			minorstr=charstring::findFirst(majorstr,".");
+			if (minorstr) {
+				minorstr=minorstr+1;
+			}
+		}
+		int64_t	major=charstring::toInteger(majorstr);
+		int64_t	minor=charstring::toInteger(minorstr);
+printf("connected to server %lld.%lld\n",major,minor);
+	
+		// 8.1 and up supports proxy credentials and syscontext
+		if (major>=8 || (major==8 && minor>0)) {
+			#ifdef OCI_ATTR_PROXY_CREDENTIALS
+			supportsproxycredentials=true;
+			#endif
+			supportssyscontext=true;
+		}
+
+		// anything below 9 requires reprepare
+		if (major<9) {
+			requiresreprepare=true;
+		}
 	}
+
+	// reprepare is required when using OCI 8 (not 8i or higher)
+#ifndef HAVE_ORACLE_8i
+	requiresreprepare=true;
+#endif
 
 #ifdef OCI_STMT_CACHE
 	if (stmtcachesize) {
@@ -1186,7 +1217,19 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 }
 
 void oracle8cursor::checkRePrepare() {
-	if (!prepared && stmttype && stmttype!=OCI_STMT_SELECT) {
+
+	// I once thought that it was necessary to re-prepare every time we
+	// re-execute.  It turns out that actually, when using OCI lower than
+	// 8i or against DB's lower than 9i, if we bind one type (say, a date),
+	// execute, then re-bind a different type (say, a string representation
+	// of a date), then re-execute, then it will throw ORA-01475.  Keeping
+	// track of the type of each bind variable and deciding whether to
+	// reprepare or not is a bit of work.  Maybe I'll do that at some point.
+	// For now, with those versions, we'll reprepare if we rebind at all.
+
+	if (oracle8conn->requiresreprepare && !prepared &&
+			stmttype && stmttype!=OCI_STMT_SELECT) {
+printf("reprepare!\n");
 		cleanUpData(true,true);
 		prepareQuery(query,length);
 		prepared=true;

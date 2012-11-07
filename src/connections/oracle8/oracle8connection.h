@@ -351,6 +351,7 @@ class oracle8connection : public sqlrconnection_svr {
 		bool		supportsproxycredentials;
 #endif
 		bool		supportssyscontext;
+		bool		requiresreprepare;
 
 		const char	*home;
 		const char	*sid;
