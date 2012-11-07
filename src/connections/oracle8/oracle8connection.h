@@ -215,7 +215,7 @@ class oracle8cursor : public sqlrcursor_svr {
 		void		cleanUpData(bool freeresult, bool freebinds);
 		bool		getColumnNameList(stringbuffer *output);
 
-		void		checkRePrepare();
+		//void		checkRePrepare();
 
 		void		dateToString(char *buffer,
 						uint16_t buffersize,
@@ -280,7 +280,7 @@ class oracle8cursor : public sqlrcursor_svr {
 
 		char		*query;
 		uint32_t	length;
-		bool		prepared;
+		//bool		prepared;
 		bool		bound;
 
 		bool		resultfreed;

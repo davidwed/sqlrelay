@@ -953,7 +953,7 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 	query=NULL;
 	length=0;
-	prepared=false;
+	//prepared=false;
 	bound=false;
 
 	resultfreed=true;
@@ -1185,20 +1185,24 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 				(ub4)OCI_DEFAULT)==OCI_SUCCESS);
 }
 
-void oracle8cursor::checkRePrepare() {
-
-	// FIXME: according to neowiz, this might be fixed in 9i
+/*void oracle8cursor::checkRePrepare() {
 
 	// Oracle8 appears to have a bug.
 	// You can prepare, bind, execute, rebind, re-execute, etc. with
 	// selects, but not with DML, it has to be re-prepared.
 	// What a drag.
+
+	// Well, I would swear that this was once an issue.  It doesn't appear
+	// to happen on 8.0.5, 8.1.7, 9.1.0, 10.2.0 or 11.2.0 now though.  Maybe
+	// there was one version of OCI that had a problem or something.  I'm
+	// commenting it all out for now and I'll uncomment it later if it
+	// turns out that there really was an issue.
 	if (!prepared && stmttype && stmttype!=OCI_STMT_SELECT) {
 		cleanUpData(true,true);
 		prepareQuery(query,length);
 		prepared=true;
 	}
-}
+}*/
 
 void oracle8cursor::dateToString(char *buffer, uint16_t buffersize,
 				int16_t year, int16_t month, int16_t day,
@@ -1221,7 +1225,7 @@ bool oracle8cursor::inputBindString(const char *variable,
 						const char *value,
 						uint32_t valuesize,
 						int16_t *isnull) {
-	checkRePrepare();
+	//checkRePrepare();
 
 	// the size of the value must include the terminating NULL
 	if (charstring::isInteger(variable+1,variablesize-1)) {
@@ -1260,7 +1264,7 @@ bool oracle8cursor::inputBindString(const char *variable,
 bool oracle8cursor::inputBindInteger(const char *variable,
 						uint16_t variablesize,
 						int64_t *value) {
-	checkRePrepare();
+	//checkRePrepare();
 
 	inintbindstring[orainbindcount]=charstring::parseNumber(*value);
 
@@ -1304,7 +1308,7 @@ bool oracle8cursor::inputBindDouble(const char *variable,
 						double *value,
 						uint32_t precision,
 						uint32_t scale) {
-	checkRePrepare();
+	//checkRePrepare();
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		ub4	pos=charstring::toInteger(variable+1);
@@ -1350,7 +1354,7 @@ bool oracle8cursor::inputBindDate(const char *variable,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull) {
-	checkRePrepare();
+	//checkRePrepare();
 
 	indatebind[orainbindcount]=new OCIDate;
 	OCIDateSetDate(indatebind[orainbindcount],year,month,day);
@@ -1394,7 +1398,7 @@ bool oracle8cursor::outputBindString(const char *variable,
 						char *value,
 						uint16_t valuesize,
 						int16_t *isnull) {
-	checkRePrepare();
+	//checkRePrepare();
 
 	outintbindstring[oraoutbindcount]=NULL;
 	outdatebind[oraoutbindcount]=NULL;
@@ -1437,7 +1441,7 @@ bool oracle8cursor::outputBindInteger(const char *variable,
 						uint16_t variablesize,
 						int64_t *value,
 						int16_t *isnull) {
-	checkRePrepare();
+	//checkRePrepare();
 
 	outintbindstring[oraoutbindcount]=new char[21];
 	rawbuffer::zero(outintbindstring[oraoutbindcount],21);
@@ -1484,7 +1488,7 @@ bool oracle8cursor::outputBindDouble(const char *variable,
 						uint32_t *precision,
 						uint32_t *scale,
 						int16_t *isnull) {
-	checkRePrepare();
+	//checkRePrepare();
 
 	outintbindstring[oraoutbindcount]=NULL;
 	outdatebind[oraoutbindcount]=NULL;
@@ -1534,7 +1538,7 @@ bool oracle8cursor::outputBindDate(const char *variable,
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull) {
-	checkRePrepare();
+	//checkRePrepare();
 
 	outintbindstring[oraoutbindcount]=NULL;
 	datebind	*db=new datebind;
@@ -1611,7 +1615,7 @@ bool oracle8cursor::inputBindGenericLob(const char *variable,
 						ub1 temptype,
 						ub2 type) {
 
-	checkRePrepare();
+	//checkRePrepare();
 
 	// create a temporary lob, write the value to it
 	if (OCIDescriptorAlloc((dvoid *)oracle8conn->env,
@@ -1710,7 +1714,7 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 						int16_t *isnull,
 						ub2 type) {
 
-	checkRePrepare();
+	//checkRePrepare();
 
 	// allocate a lob descriptor
 	if (OCIDescriptorAlloc((dvoid *)oracle8conn->env,
@@ -1768,7 +1772,7 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 	}
 #endif
 
-	checkRePrepare();
+	//checkRePrepare();
 
 	((oracle8cursor *)cursor)->bound=true;
 
@@ -1951,7 +1955,7 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 		}
 
 		// reset the prepared flag
-		prepared=false;
+		//prepared=false;
 	}
 
 	// if the query is a select, describe/define it
