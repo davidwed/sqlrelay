@@ -216,7 +216,7 @@ bool sqlrconnection_svr::getListByQuery(sqlrcursor_svr *cursor,
 
 	// run it like a normal query, but don't request the query,
 	// binds or column info status from the client
-	return newQueryInternal(cursor,false);
+	return handleQuery(cursor,false,false,true,false);
 }
 
 const char *sqlrconnection_svr::getDatabaseListQuery(bool wild) {

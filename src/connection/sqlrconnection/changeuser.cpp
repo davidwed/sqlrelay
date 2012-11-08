@@ -10,10 +10,10 @@ bool sqlrconnection_svr::changeUser(const char *newuser,
 
 	int32_t	oldcursorcount=cursorcount;
 	closeCursors(false);
-	logOutUpdateStats();
+	logOut();
 	setUser(newuser);
 	setPassword(newpassword);
-	return (logInUpdateStats(false) && initCursors(cursorcount));
+	return (logIn(false) && initCursors(cursorcount));
 }
 
 void sqlrconnection_svr::setUser(const char *user) {

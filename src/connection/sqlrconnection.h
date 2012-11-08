@@ -294,7 +294,6 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	serverVersionCommand();
 		void	bindFormatCommand();
 		bool	newQueryCommand(sqlrcursor_svr *cursor);
-		bool	newQueryInternal(sqlrcursor_svr *cursor, bool getquery);
 		bool	getDatabaseListCommand(sqlrcursor_svr *cursor);
 		bool	getTableListCommand(sqlrcursor_svr *cursor);
 		bool	getColumnListCommand(sqlrcursor_svr *cursor);
@@ -329,16 +328,12 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 						const char *passwordbuffer);
 		bool	databaseBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
-		int32_t	handleQuery(sqlrcursor_svr *cursor,
+		bool	handleQuery(sqlrcursor_svr *cursor,
 					bool reexecute,
 					bool bindcursor,
 					bool reallyexecute,
 					bool getquery);
-		void	clearBindMappings();
-		bool	getQueryFromClient(sqlrcursor_svr *cursor,
-						bool reexecute,
-						bool bindcursor);
-		void	resumeResultSet(sqlrcursor_svr *cursor);
+		bool	resumeResultSet(sqlrcursor_svr *cursor);
 		void	suspendSession();
 		void	endSessionInternal();
 		bool	getCommand(uint16_t *command);

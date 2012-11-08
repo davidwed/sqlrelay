@@ -6,35 +6,6 @@
 // for gettimeofday()
 #include <sys/time.h>
 
-bool sqlrconnection_svr::logInUpdateStats(bool printerrors) {
-	if (loggedin) {
-		return true;
-	}
-	if (logIn(printerrors)) {
-		semset->waitWithUndo(9);
-		statistics->open_svr_connections++;
-		statistics->opened_svr_connections++;
-		semset->signalWithUndo(9);
-		loggedin=true;
-		return true;
-	}
-	return false;
-}
-
-void sqlrconnection_svr::logOutUpdateStats() {
-	if (!loggedin) {
-		return;
-	}
-	logOut();
-	semset->waitWithUndo(9);
-	statistics->open_svr_connections--;
-	if (statistics->open_svr_connections<0) {
-		statistics->open_svr_connections=0;
-	}
-	semset->signalWithUndo(9);
-	loggedin=false;
-}
-
 sqlrcursor_svr *sqlrconnection_svr::initCursorUpdateStats() {
 	sqlrcursor_svr	*cur=initCursor();
 	if (cur) {

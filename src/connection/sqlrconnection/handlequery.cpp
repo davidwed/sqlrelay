@@ -1,10 +1,9 @@
-// Copyright (c) 1999-2001  David Muse
+// Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <debugprint.h>
 #include <sqlrconnection.h>
 
-int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
+bool sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 					bool reexecute, bool bindcursor,
 					bool reallyexecute, bool getquery) {
 
@@ -13,15 +12,30 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 
 	// clear bind mappings and reset fakeinputbindsforthisquery flag
 	if (!reexecute && !bindcursor) {
-		clearBindMappings();
+		bindmappingspool->free();
+		inbindmappings->clear();
+		outbindmappings->clear();
 		cursor->fakeinputbindsforthisquery=fakeinputbinds;
 	}
 
+	// get the query and bind data from the client
 	if (getquery) {
-		if (!getQueryFromClient(cursor,reexecute,bindcursor)) {
+		bool	success=true;
+		if (!reexecute && !bindcursor) {
+			success=getQuery(cursor);
+		}
+		if (success && !bindcursor) {
+			success=getInputBinds(cursor) &&
+				getOutputBinds(cursor);
+		}
+		if (success) {
+			success=getSendColumnInfo();
+		}
+		if (!success) {
 			dbgfile.debugPrint("connection",1,
 						"failed to handle query");
-			return 0;
+			endSession();
+			return false;
 		}
 	}
 
@@ -81,7 +95,15 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 							cursor->querytree,true);
 			}
 
-			return 1;
+			// reinit lastrow
+			lastrowvalid=false;
+
+			// return the result set
+			if (!returnResultSetData(cursor)) {
+				endSession();
+				return false;
+			}
+			return true;
 
 		} else {
 
@@ -124,31 +146,9 @@ int32_t sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 					cursor->querytree,false);
 			}
 
-			return -1;
+			return true;
 		}
 	}
-}
-
-void sqlrconnection_svr::clearBindMappings() {
-
-	// delete the data from the nodes
-	bindmappingspool->free();
-
-	// delete the nodes themselves
-	inbindmappings->clear();
-	outbindmappings->clear();
-}
-
-bool sqlrconnection_svr::getQueryFromClient(sqlrcursor_svr *cursor,
-					bool reexecute, bool bindcursor) {
-
-	// if we're not reexecuting and not using a bound cursor, get the query,
-	// if we're not using a bound cursor, get the input/output binds,
-	// get whether to send column info or not
-	return (((reexecute || bindcursor)?true:getQuery(cursor)) &&
-		((bindcursor)?true:
-		(getInputBinds(cursor) && getOutputBinds(cursor))) &&
-		getSendColumnInfo());
 }
 
 bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
@@ -209,6 +209,27 @@ bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
 	dbgfile.debugPrint("connection",3,"query:");
 	dbgfile.debugPrint("connection",0,cursor->querybuffer);
 	dbgfile.debugPrint("connection",2,"getting query succeeded");
+
+	return true;
+}
+
+bool sqlrconnection_svr::getSendColumnInfo() {
+
+	dbgfile.debugPrint("connection",2,"getting send column info...");
+
+	if (clientsock->read(&sendcolumninfo,
+				idleclienttimeout,0)!=sizeof(uint16_t)) {
+		dbgfile.debugPrint("connection",2,
+					"getting send column info failed");
+		return false;
+	}
+
+	if (sendcolumninfo==SEND_COLUMN_INFO) {
+		dbgfile.debugPrint("connection",3,"send column info");
+	} else {
+		dbgfile.debugPrint("connection",3,"don't send column info");
+	}
+	dbgfile.debugPrint("connection",2,"done getting send column info...");
 
 	return true;
 }
@@ -313,8 +334,6 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 						newquery->getStringLength():
 						cursor->querylength;
 			}
-
-			debugPrintf("\nrunning: \"%s\"\n\n",queryptr);
 
 			// prepare
 			success=cursor->prepareQuery(queryptr,querylen);

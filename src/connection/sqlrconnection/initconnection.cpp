@@ -308,7 +308,7 @@ void sqlrconnection_svr::initDatabaseAvailableFileName() {
 bool sqlrconnection_svr::attemptLogIn(bool printerrors) {
 
 	dbgfile.debugPrint("connection",0,"logging in...");
-	if (!logInUpdateStats(printerrors)) {
+	if (!logIn(printerrors)) {
 		dbgfile.debugPrint("connection",0,"log in failed");
 		if (printerrors) {
 			fprintf(stderr,"Couldn't log into database.\n");
@@ -341,7 +341,7 @@ bool sqlrconnection_svr::initCursors(int32_t count) {
 			dbgfile.debugPrint("connection",1,
 					"cursor init failure...");
 
-			logOutUpdateStats();
+			logOut();
 			return false;
 		}
 	}

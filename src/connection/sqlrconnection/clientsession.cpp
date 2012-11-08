@@ -249,7 +249,7 @@ sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
 		if (!cur[cursorcount]->openCursorInternal(cursorcount)) {
 			dbgfile.debugPrint("connection",1,
 					"cursor init failure...");
-			logOutUpdateStats();
+			logOut();
 			return NULL;
 		}
 		cursorcount++;

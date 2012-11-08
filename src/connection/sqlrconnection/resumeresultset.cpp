@@ -5,21 +5,19 @@
 
 bool sqlrconnection_svr::resumeResultSetCommand(sqlrcursor_svr *cursor) {
 	dbgfile.debugPrint("connection",1,"resume result set");
-	resumeResultSet(cursor);
-	if (!returnResultSetData(cursor)) {
-		endSession();
-		return false;
-	}
-	return true;
+	return resumeResultSet(cursor);
 }
 
-void sqlrconnection_svr::resumeResultSet(sqlrcursor_svr *cursor) {
+bool sqlrconnection_svr::resumeResultSet(sqlrcursor_svr *cursor) {
 
 	dbgfile.debugPrint("connection",1,"resume result set...");
 
+	bool	retval=true;
+
 	if (cursor->suspendresultset) {
 
-		dbgfile.debugPrint("connection",2,"previous result set was suspended");
+		dbgfile.debugPrint("connection",2,
+				"previous result set was suspended");
 
 		// indicate that no error has occurred
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
@@ -34,6 +32,10 @@ void sqlrconnection_svr::resumeResultSet(sqlrcursor_svr *cursor) {
 		// then send the result set header
 		clientsock->write(lastrow);
 		returnResultSetHeader(cursor);
+		if (!returnResultSetData(cursor)) {
+			endSession();
+			retval=false;
+		}
 
 	} else {
 
@@ -48,9 +50,12 @@ void sqlrconnection_svr::resumeResultSet(sqlrcursor_svr *cursor) {
 
 		// send the error itself
 		clientsock->write((uint16_t)43);
-		clientsock->write("The requested result set was not suspended.",
-					43);
+		clientsock->write("The requested result set "
+					"was not suspended.",43);
+
+		retval=false;
 	}
 
 	dbgfile.debugPrint("connection",1,"done resuming result set");
+	return retval;
 }

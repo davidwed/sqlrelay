@@ -48,7 +48,7 @@ sqlrconnection_svr::~sqlrconnection_svr() {
 	dbgfile.debugPrint("connection",0,"done deleting bindpool");
 
 	dbgfile.debugPrint("connection",0,"deleting bindmappings...");
-	clearBindMappings();
+	delete bindmappingspool;
 	delete inbindmappings;
 	delete outbindmappings;
 	dbgfile.debugPrint("connection",0,"done deleting bindmappings");

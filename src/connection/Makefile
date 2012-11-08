@@ -37,7 +37,6 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqlrconnection/handlequery.cpp \
 	sqlrconnection/rewritequery.cpp \
 	sqlrconnection/getbinds.cpp \
-	sqlrconnection/getsendcolumninfo.cpp \
 	sqlrconnection/reexecutequery.cpp \
 	sqlrconnection/fetchfrombindcursor.cpp \
 	sqlrconnection/fetchresultset.cpp \
@@ -55,7 +54,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqlrconnection/closecursors.cpp \
 	sqlrconnection/temptables.cpp \
 	sqlrconnection/changeuser.cpp \
-	sqlrconnection/relogin.cpp \
+	sqlrconnection/login.cpp \
 	sqlrconnection/markdatabasedavailable.cpp \
 	sqlrconnection/getuser.cpp \
 	sqlrconnection/getpassword.cpp \
@@ -146,7 +145,6 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/handlequery.lo \
 	sqlrconnection/rewritequery.lo \
 	sqlrconnection/getbinds.lo \
-	sqlrconnection/getsendcolumninfo.lo \
 	sqlrconnection/reexecutequery.lo \
 	sqlrconnection/fetchfrombindcursor.lo \
 	sqlrconnection/fetchresultset.lo \
@@ -164,7 +162,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/closecursors.lo \
 	sqlrconnection/temptables.lo \
 	sqlrconnection/changeuser.lo \
-	sqlrconnection/relogin.lo \
+	sqlrconnection/login.lo \
 	sqlrconnection/markdatabasedavailable.lo \
 	sqlrconnection/getuser.lo \
 	sqlrconnection/getpassword.lo \
