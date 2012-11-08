@@ -111,7 +111,6 @@ struct sqlrstatistics {
 	int32_t	forked_listeners;
 };
 
-
 // This structure is used to pass data in shared memory between the listener
 // and connection daemons.  A struct is used instead of just stepping a pointer
 // through the shared memory segment to avoid alignment issues.

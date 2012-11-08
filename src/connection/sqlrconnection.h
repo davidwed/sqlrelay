@@ -26,7 +26,6 @@
 #include <tempdir.h>
 
 #include <sqlrcursor.h>
-#include <sqlrstatistics.h>
 #include <sqlparser.h>
 #include <sqltranslations.h>
 #include <sqlwriter.h>
