@@ -126,5 +126,5 @@ void sqlrconnection_svr::cleanUpAllCursorData(bool freeresult, bool freebinds) {
 			cur[i]->cleanUpData(freeresult,freebinds);
 		}
 	}
-	dbgfile.debugPrint("connection",2,"done aborting all busy cursors");
+	dbgfile.debugPrint("connection",2,"done cleaning up all busy cursors");
 }

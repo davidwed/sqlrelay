@@ -16,10 +16,13 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqlrconnection/listen.cpp \
 	sqlrconnection/listenercomm.cpp \
 	sqlrconnection/clientsession.cpp \
+	sqlrconnection/clientsessioncount.cpp \
+	sqlrconnection/sessionqueries.cpp \
 	sqlrconnection/authenticate.cpp \
 	sqlrconnection/suspendsession.cpp \
 	sqlrconnection/endsession.cpp \
 	sqlrconnection/selectdatabase.cpp \
+	sqlrconnection/getcurrentdatabase.cpp \
 	sqlrconnection/lastinsertid.cpp \
 	sqlrconnection/ping.cpp \
 	sqlrconnection/identify.cpp \
@@ -122,10 +125,13 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/listen.lo \
 	sqlrconnection/listenercomm.lo \
 	sqlrconnection/clientsession.lo \
+	sqlrconnection/clientsessioncount.lo \
+	sqlrconnection/sessionqueries.lo \
 	sqlrconnection/authenticate.lo \
 	sqlrconnection/suspendsession.lo \
 	sqlrconnection/endsession.lo \
 	sqlrconnection/selectdatabase.lo \
+	sqlrconnection/getcurrentdatabase.lo \
 	sqlrconnection/lastinsertid.lo \
 	sqlrconnection/ping.lo \
 	sqlrconnection/identify.lo \
