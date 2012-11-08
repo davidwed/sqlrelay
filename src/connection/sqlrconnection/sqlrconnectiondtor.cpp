@@ -9,6 +9,7 @@
 sqlrconnection_svr::~sqlrconnection_svr() {
 
 	querylog.flushWriteBuffer(-1,-1);
+	delete[] querylogname;
 
 	delete sid_sqlrcon;
 

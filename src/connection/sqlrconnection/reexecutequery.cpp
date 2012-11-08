@@ -16,7 +16,9 @@ bool sqlrconnection_svr::reExecuteQueryCommand(sqlrcursor_svr *cursor) {
 
 		// reinit lastrow
 		lastrowvalid=false;
-		if (!returnResultSetData(cursor)) {
+		bool	success=returnResultSetData(cursor);
+		writeQueryLog(cursor,true);
+		if (!success) {
 			endSession();
 			return false;
 		}
@@ -26,6 +28,7 @@ bool sqlrconnection_svr::reExecuteQueryCommand(sqlrcursor_svr *cursor) {
 		endSession();
 		return false;
 	} else {
+		writeQueryLog(cursor,false);
 		return true;
 	}
 }

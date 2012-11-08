@@ -83,4 +83,6 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 
 	decrementonclose=false;
 	silent=false;
+
+	querylogname=NULL;
 }

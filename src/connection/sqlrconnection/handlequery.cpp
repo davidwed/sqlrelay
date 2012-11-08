@@ -158,7 +158,7 @@ bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
 	// get the length of the client info
 	// FIXME: arguably this should be it's own command
 	if (clientsock->read(&clientinfolen)!=sizeof(uint64_t) ||
-					clientinfolen>MAXCLIENTINFOLEN) {
+					clientinfolen>sizeof(clientinfo)-1) {
 		dbgfile.debugPrint("connection",2,
 			"getting client info failed: "
 			"client sent bad client info size");

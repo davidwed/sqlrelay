@@ -217,22 +217,21 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 
 	// initialize query log
 	size_t	querylognamelen;
-	char	*querylogname;
 	if (charstring::length(cmdl->getLocalStateDir())) {
-		querylognamelen=charstring::length(cmdl->getLocalStateDir())+33+
+		querylognamelen=charstring::length(cmdl->getLocalStateDir())+30+
 				charstring::length(cmdl->getId())+10+20+1;
 		querylogname=new char[querylognamelen];
 		snprintf(querylogname,querylognamelen,
-				"%s/sqlrelay/debug/sqlr-connection-%s"
+				"%s/sqlrelay/log/sqlr-connection-%s"
 				"-querylog.%d",
 				cmdl->getLocalStateDir(),cmdl->getId(),pid);
 	} else {
-		querylognamelen=charstring::length(DEBUG_DIR)+17+
+		querylognamelen=charstring::length(LOG_DIR)+17+
 				charstring::length(cmdl->getId())+10+20+1;
 		querylogname=new char[querylognamelen];
 		snprintf(querylogname,querylognamelen,
 				"%s/sqlr-connection-%s-querylog.%d",
-				DEBUG_DIR,cmdl->getId(),pid);
+				LOG_DIR,cmdl->getId(),pid);
 	}
 	file::remove(querylogname);
 	if (querylog.create(querylogname,
@@ -241,7 +240,6 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 		fs.initialize(querylogname);
 		querylog.setWriteBufferSize(fs.getOptimumTransferBlockSize());
 	}
-	delete[] querylogname;
 	return true;
 }
 

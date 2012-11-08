@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2004  David Muse
+// Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
 #ifndef SQLRCONNECTION_H
@@ -401,6 +401,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	sessionEndQueries();
 		void	sessionQuery(const char *query);
 
+		bool	writeQueryLog(sqlrcursor_svr *cursor, bool success);
+
 		void	flushWriteBuffer();
 
 		static	sqlrconnection_svr	*conn;
@@ -504,7 +506,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 
 		char		*pidfile;
 
-		char		clientinfo[MAXCLIENTINFOLEN];
+		char		clientinfo[512];
 		uint64_t	clientinfolen;
 
 	protected:
@@ -524,7 +526,9 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool		decrementonclose;
 		bool		silent;
 
+		char		*querylogname;
 		file		querylog;
+		char		querylogbuf[102400];
 
 		stringbuffer	*debugstr;
 		debugfile	dbgfile;

@@ -4,7 +4,7 @@ include ../../config.mk
 
 .PHONY: all clean install uninstall
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) $(SIDINCLUDES) $(DEBUGDIRCPPFLAG) -DSERVER_VERSION=\"$(SQLR_VERSION)\" -DLIBDIR=\"$(libdir)\"
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) $(SIDINCLUDES) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPFLAG) -DSERVER_VERSION=\"$(SQLR_VERSION)\" -DLIBDIR=\"$(libdir)\"
 LIBS = -L$(top_builddir)/src/util -lsqlrutil $(SIDLIBS) $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS = sqlrconnection/sqlrconnectionctor.cpp \
@@ -68,6 +68,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqlrconnection/isolationlevel.cpp \
 	sqlrconnection/main.cpp \
 	sqlrconnection/error.cpp \
+	sqlrconnection/querylog.cpp \
 	sqlrcursor/sqlrcursorctor.cpp \
 	sqlrcursor/sqlrcursordtor.cpp \
 	sqlrcursor/openclose.cpp \
@@ -173,6 +174,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/isolationlevel.lo \
 	sqlrconnection/main.lo \
 	sqlrconnection/error.lo \
+	sqlrconnection/querylog.lo \
 	sqlrcursor/sqlrcursorctor.lo \
 	sqlrcursor/sqlrcursordtor.lo \
 	sqlrcursor/openclose.lo \
@@ -298,6 +300,8 @@ install-connection:
 	chmod 777 $(tmpdir)/pids
 	$(MKINSTALLDIRS) $(tmpdir)/ipc
 	chmod 777 $(tmpdir)/ipc
+	$(MKINSTALLDIRS) $(logdir)
+	chmod 777 $(logdir)
 	$(MKINSTALLDIRS) $(debugdir)
 	chmod 777 $(debugdir)
 

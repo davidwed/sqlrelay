@@ -23,6 +23,7 @@ EXAMPLEDIR = ${datadir}/examples
 tmpdir = ${localstatedir}/sqlrelay/tmp
 cachedir = ${localstatedir}/sqlrelay/cache
 debugdir = ${localstatedir}/sqlrelay/debug
+logdir = ${localstatedir}/sqlrelay/log
 initscript_prefix = @initscript_prefix@
 
 # compiler to use
@@ -33,6 +34,7 @@ CXX = @CXX@
 BASECPPFLAGS = @CPPFLAGS@ @PTHREADINCLUDES@
 TMPDIRCPPFLAG = -DTMP_DIR=\"$(tmpdir)\"
 DEBUGDIRCPPFLAG = -DDEBUG_DIR=\"$(debugdir)\"
+LOGDIRCPPFLAG = -DLOG_DIR=\"$(logdir)\"
 CONFIGFILECPPFLAG = -DDEFAULT_CONFIG_FILE=\"$(sysconfdir)/sqlrelay.conf\"
 
 # link flags (-s, -static, -melf, -belf, etc.)
