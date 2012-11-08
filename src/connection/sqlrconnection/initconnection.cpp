@@ -8,7 +8,6 @@
 #include <rudiments/process.h>
 #include <rudiments/permissions.h>
 #include <rudiments/snooze.h>
-#include <rudiments/filesystem.h>
 #include <rudiments/rawbuffer.h>
 
 bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
@@ -205,40 +204,15 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 
 	// if we're not passing descriptors around, listen on 
 	// inet and unix sockets for client connections
-	if (!cfgfl->getPassDescriptor()) {
-		return openSockets();
+	if (!cfgfl->getPassDescriptor() && !openSockets()) {
+		return false;
 	}
 
-	// bail here unless we're timing queries
-	if (cfgfl->getTimeQueriesSeconds()==-1 ||
-		cfgfl->getTimeQueriesMicroSeconds()==-1) {
-		return true;
-	}
-
-	// initialize query log
-	size_t	querylognamelen;
-	if (charstring::length(cmdl->getLocalStateDir())) {
-		querylognamelen=charstring::length(cmdl->getLocalStateDir())+30+
-				charstring::length(cmdl->getId())+10+20+1;
-		querylogname=new char[querylognamelen];
-		snprintf(querylogname,querylognamelen,
-				"%s/sqlrelay/log/sqlr-connection-%s"
-				"-querylog.%d",
-				cmdl->getLocalStateDir(),cmdl->getId(),pid);
-	} else {
-		querylognamelen=charstring::length(LOG_DIR)+17+
-				charstring::length(cmdl->getId())+10+20+1;
-		querylogname=new char[querylognamelen];
-		snprintf(querylogname,querylognamelen,
-				"%s/sqlr-connection-%s-querylog.%d",
-				LOG_DIR,cmdl->getId(),pid);
-	}
-	file::remove(querylogname);
-	if (querylog.create(querylogname,
-				permissions::evalPermString("rw-------"))) {
-		filesystem	fs;
-		fs.initialize(querylogname);
-		querylog.setWriteBufferSize(fs.getOptimumTransferBlockSize());
+	// initialize the query log, if we're timing queries
+	if (cfgfl->getTimeQueriesSeconds()!=-1 &&
+		cfgfl->getTimeQueriesMicroSeconds()!=-1 &&
+		!initQueryLog()) {
+		return false;
 	}
 	return true;
 }

@@ -26,6 +26,7 @@
 #include <tempdir.h>
 
 #include <sqlrcursor.h>
+#include <sqlrstatistics.h>
 #include <sqlparser.h>
 #include <sqltranslations.h>
 #include <sqlwriter.h>
@@ -401,7 +402,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	sessionEndQueries();
 		void	sessionQuery(const char *query);
 
-		bool	writeQueryLog(sqlrcursor_svr *cursor, bool success);
+		bool	initQueryLog();
+		bool	writeQueryLog(sqlrcursor_svr *cursor);
 
 		void	flushWriteBuffer();
 

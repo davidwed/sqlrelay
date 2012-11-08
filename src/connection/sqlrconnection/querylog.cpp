@@ -3,19 +3,19 @@
 
 #include <sqlrconnection.h>
 #include <rudiments/file.h>
+#include <rudiments/filesystem.h>
 #include <rudiments/directory.h>
 #include <rudiments/charstring.h>
 #include <rudiments/permissions.h>
 #include <rudiments/datetime.h>
+#include <rudiments/process.h>
 
-// for gettimeofday()
-#include <sys/time.h>
-
-int strescape(char *str, char *buf, int limit)
+int strescape(const char *str, char *buf, int limit)
 // from oracpool my_strescape()
 {
-  register char *p = NULL, *q = buf;
-  char *strend = str + charstring::length(str);
+  register const char *p = NULL;
+  register char *q = buf;
+  const char *strend = str + charstring::length(str);
 
   for (p = str; p < strend; p++)
   { 
@@ -54,7 +54,47 @@ int strescape(char *str, char *buf, int limit)
   return (q - buf);
 }
 
-bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor, bool success) {
+bool sqlrconnection_svr::initQueryLog() {
+
+	// get the pid
+	pid_t	pid=process::getProcessId();
+
+	// build up the query log name
+	size_t	querylognamelen;
+	if (charstring::length(cmdl->getLocalStateDir())) {
+		querylognamelen=charstring::length(cmdl->getLocalStateDir())+30+
+				charstring::length(cmdl->getId())+10+20+1;
+		querylogname=new char[querylognamelen];
+		snprintf(querylogname,querylognamelen,
+				"%s/sqlrelay/log/sqlr-connection-%s"
+				"-querylog.%d",
+				cmdl->getLocalStateDir(),cmdl->getId(),pid);
+	} else {
+		querylognamelen=charstring::length(LOG_DIR)+17+
+				charstring::length(cmdl->getId())+10+20+1;
+		querylogname=new char[querylognamelen];
+		snprintf(querylogname,querylognamelen,
+				"%s/sqlr-connection-%s-querylog.%d",
+				LOG_DIR,cmdl->getId(),pid);
+	}
+
+	// remove any old log file
+	file::remove(querylogname);
+
+	// create the new log file
+	if (!querylog.create(querylogname,
+				permissions::evalPermString("rw-------"))) {
+		return false;
+	}
+
+	// optimize
+	filesystem	fs;
+	fs.initialize(querylogname);
+	querylog.setWriteBufferSize(fs.getOptimumTransferBlockSize());
+	return true;
+}
+
+bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor) {
 
 	// reinit the log if the file was switched
 	ino_t	inode1=querylog.getInode();
@@ -64,29 +104,31 @@ bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor, bool success) {
 		//initQueryLog(NULL);
 	}
 
-	// get the number of seconds and microseconds since the epoch
-	struct timeval	tv;
-	gettimeofday(&tv,NULL);
+// Original stuff...
 
-	// from getcommand();
-	double	totaltimediff=0.0;
-	// FIXME: implement this...
-		//(tv.tv_sec-my_cs->processclient_tv.tv_sec)+
-		//(tv.tv_usec-my_cs->processclient_tv.tv_usec)/1000000.0;
+	stringbuffer	logentry;
+	logentry.append("query:\n")->append(cursor->stats.query)->append("\n");
+	logentry.append("time: ")->append((uint64_t)cursor->stats.sec);
+	logentry.append(".");
+	char	*usec=charstring::parseNumber((uint64_t)cursor->stats.usec,6);
+	logentry.append(usec);
+	delete[] usec;
+	logentry.append("\n");
+	if (querylog.write(logentry.getString(),
+				logentry.getStringLength())!=
+					logentry.getStringLength()) {
+		return false;
+	}
 
-	// from processQuery();
-	double	qptimediff=0.0;
-	// FIXME: implement this...
-		//(tv.tv_sec-my_cs->processquery_tv.tv_sec)+
-		//(tv.tv_usec-my_cs->processquery_tv.tv_usec)/1000000.0;
 
+// Neowiz stuff...
 
 	// get error, if there was one
 	// FIXME:  Errors should be handled in more structured way --replica
 	static char	errorcodebuf[100+1];
 	errorcodebuf[0]='\0';
 	// FIXME: implement this...
-	/*if (success) {
+	/*if (cursor->stats.result) {
 		charstring::copy(errorcodebuf,"0");
 	} else if (cursor->sqlr_error[0]) {
 		charstring::copy(errorcodebuf,cursor->sqlr_error,100);
@@ -98,7 +140,7 @@ bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor, bool success) {
 
 	// write the query into a buffer and escape it
 	static char	sqlbuf[7000+1];
-	strescape(cursor->querybuffer,sqlbuf,7000);
+	strescape(cursor->stats.query,sqlbuf,7000);
 
 	// write the client info into a buffer and escape it
 	static char	infobuf[1024+1];
@@ -133,15 +175,18 @@ bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor, bool success) {
 		// FIXME: implement this...
 		//my_index, 
 		0,
-		//totaltimediff,
-		qptimediff, // temporarily use qptime diff for totaltimediff
+		// FIXME: validate that this is really the time they
+		// intend to store here
+		cursor->stats.sec+cursor->stats.usec/1000000.0,
 		errorcodebuf,
 		// FIXME: implement this...
 		//cursor->returned_row,
 		0,
         	infobuf,
 		sqlbuf,
-		qptimediff,
+		// FIXME: validate that this is really the time they
+		// intend to store here
+		cursor->stats.sec+cursor->stats.usec/1000000.0,
 		clientaddrbuf,
 		bindbuf
 		);

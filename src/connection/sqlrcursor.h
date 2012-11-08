@@ -298,8 +298,13 @@ class sqlrcursor_svr {
 							int16_t index);
 		void	abort();
 
-		uint64_t	querysec;
-		uint64_t	queryusec;
+		// statistics
+		struct {
+			const char	*query;
+			bool		result;
+			uint64_t	sec;
+			uint64_t	usec;
+		} stats;
 
 		bool		suspendresultset;
 		bool		busy;

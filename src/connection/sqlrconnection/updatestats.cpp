@@ -60,10 +60,13 @@ bool sqlrconnection_svr::executeQueryUpdateStats(sqlrcursor_svr *curs,
 							const char *query,
 							uint32_t length,
 							bool execute) {
+
+	// update query count
 	semset->waitWithUndo(9);
 	statistics->total_queries++;
 	semset->signalWithUndo(9);
 
+	// variables for query timing
 	timeval		starttv;
 	struct timezone	starttz;
 	timeval		endtv;
@@ -71,39 +74,35 @@ bool sqlrconnection_svr::executeQueryUpdateStats(sqlrcursor_svr *curs,
 
 	if (cfgfl->getTimeQueriesSeconds()>-1 &&
 		cfgfl->getTimeQueriesMicroSeconds()>-1) {
+		// get the query start time
 		gettimeofday(&starttv,&starttz);
 	}
 
+	// execute the query
 	bool	result=curs->executeQuery(query,length,execute);
 
 	if (cfgfl->getTimeQueriesSeconds()>-1 &&
 		cfgfl->getTimeQueriesMicroSeconds()>-1) {
 
+		// get the query end time
 		gettimeofday(&endtv,&endtz);
 
-		curs->querysec=endtv.tv_sec-starttv.tv_sec;
-		curs->queryusec=endtv.tv_usec-starttv.tv_usec;
+		// update stats
+		curs->stats.query=query;
+		curs->stats.result=result;
+		curs->stats.sec=endtv.tv_sec-starttv.tv_sec;
+		curs->stats.usec=endtv.tv_usec-starttv.tv_usec;
 
-		if (curs->querysec>=
+		// write out a log entry
+		if (curs->stats.sec>=
 				(uint64_t)cfgfl->getTimeQueriesSeconds() &&
-			curs->queryusec>=
+			curs->stats.usec>=
 				(uint64_t)cfgfl->getTimeQueriesMicroSeconds()) {
-			stringbuffer	logentry;
-			logentry.append("query:\n")->append(query);
-			logentry.append("\n");
-			logentry.append("time: ");
-			logentry.append((uint64_t)curs->querysec);
-			logentry.append(".");
-			char	*usec=charstring::parseNumber(
-						(uint64_t)curs->queryusec,6);
-			logentry.append(usec);
-			delete[] usec;
-			logentry.append("\n");
-			querylog.write(logentry.getString(),
-					logentry.getStringLength());
+			writeQueryLog(curs);
 		}
 	}
 
+	// update error count
 	if (!result) {
 		semset->waitWithUndo(9);
 		statistics->total_errors++;
