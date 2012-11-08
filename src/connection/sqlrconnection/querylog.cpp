@@ -61,6 +61,7 @@ bool sqlrconnection_svr::initQueryLog() {
 
 	// build up the query log name
 	size_t	querylognamelen;
+	delete[] querylogname;
 	if (charstring::length(cmdl->getLocalStateDir())) {
 		querylognamelen=charstring::length(cmdl->getLocalStateDir())+30+
 				charstring::length(cmdl->getId())+10+20+1;
@@ -100,8 +101,9 @@ bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor) {
 	ino_t	inode1=querylog.getInode();
 	ino_t	inode2;
 	if (!file::getInode(querylogname,&inode2) || inode1!=inode2) {
-		// FIXME: implement this...
-		//initQueryLog(NULL);
+		querylog.flushWriteBuffer(-1,-1);
+		querylog.close();
+		initQueryLog();
 	}
 
 // Original stuff...
