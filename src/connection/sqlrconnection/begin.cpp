@@ -42,7 +42,7 @@ bool sqlrconnection_svr::begin() {
 	dbgfile.debugPrint("connection",1,"begin...");
 
 	// init some variables
-	sqlrcursor_svr	*begincur=initCursorUpdateStats();
+	sqlrcursor_svr	*begincur=initCursorInternal();
 	const char	*beginquery=beginTransactionQuery();
 	int		beginquerylen=charstring::length(beginquery);
 	bool		retval=false;
@@ -52,7 +52,7 @@ bool sqlrconnection_svr::begin() {
 	// have an ID that might already exist
 	if (begincur->openCursorInternal(cursorcount+1) &&
 		begincur->prepareQuery(beginquery,beginquerylen)) {
-		retval=executeQueryUpdateStats(begincur,beginquery,
+		retval=executeQueryInternal(begincur,beginquery,
 						beginquerylen,true);
 	}
 
@@ -67,7 +67,7 @@ bool sqlrconnection_svr::begin() {
 	// clean up
 	begincur->cleanUpData(true,true);
 	begincur->closeCursor();
-	deleteCursorUpdateStats(begincur);
+	deleteCursorInternal(begincur);
 
 	// debug
 	char	string[38];

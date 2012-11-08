@@ -26,15 +26,15 @@ void sqlrconnection_svr::sessionQuery(const char *query) {
 	// create the select database query
 	size_t	querylen=charstring::length(query);
 
-	sqlrcursor_svr	*cur=initCursorUpdateStats();
+	sqlrcursor_svr	*cur=initCursorInternal();
 
 	// since we're creating a new cursor for this, make sure it
 	// can't have an ID that might already exist
 	if (cur->openCursorInternal(cursorcount+1) &&
 		cur->prepareQuery(query,querylen) &&
-		executeQueryUpdateStats(cur,query,querylen,true)) {
+		executeQueryInternal(cur,query,querylen,true)) {
 		cur->cleanUpData(true,true);
 	}
 	cur->closeCursor();
-	deleteCursorUpdateStats(cur);
+	deleteCursorInternal(cur);
 }

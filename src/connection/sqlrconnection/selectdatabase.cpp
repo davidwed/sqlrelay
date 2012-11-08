@@ -86,13 +86,13 @@ bool sqlrconnection_svr::selectDatabase(const char *database, char **error) {
 	snprintf(sdquery,sdquerylen,sdquerybase,database);
 	sdquerylen=charstring::length(sdquery);
 
-	sqlrcursor_svr	*sdcur=initCursorUpdateStats();
+	sqlrcursor_svr	*sdcur=initCursorInternal();
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	bool	retval=false;
 	if (sdcur->openCursorInternal(cursorcount+1) &&
 		sdcur->prepareQuery(sdquery,sdquerylen) &&
-		executeQueryUpdateStats(sdcur,sdquery,sdquerylen,true)) {
+		executeQueryInternal(sdcur,sdquery,sdquerylen,true)) {
 		sdcur->cleanUpData(true,true);
 		retval=true;
 
@@ -108,7 +108,7 @@ bool sqlrconnection_svr::selectDatabase(const char *database, char **error) {
 	}
 	delete[] sdquery;
 	sdcur->closeCursor();
-	deleteCursorUpdateStats(sdcur);
+	deleteCursorInternal(sdcur);
 	return retval;
 }
 

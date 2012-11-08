@@ -82,7 +82,7 @@ void sqlrconnection_svr::endSessionInternal() {
 	// shrink the cursor array, if necessary
 	while (cursorcount>mincursorcount) {
 		cursorcount--;
-		deleteCursorUpdateStats(cur[cursorcount]);
+		deleteCursorInternal(cur[cursorcount]);
 		cur[cursorcount]=NULL;
 	}
 

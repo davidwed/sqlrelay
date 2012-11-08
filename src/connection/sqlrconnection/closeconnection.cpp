@@ -28,7 +28,7 @@ void sqlrconnection_svr::closeConnection() {
 
 	// try to log out
 	dbgfile.debugPrint("connection",0,"logging out...");
-	logOut();
+	logOutInternal();
 	dbgfile.debugPrint("connection",0,"done logging out");
 
 

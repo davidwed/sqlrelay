@@ -62,7 +62,6 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqlrconnection/istransactional.cpp \
 	sqlrconnection/bindparameters.cpp \
 	sqlrconnection/unixsocketseqfile.cpp \
-	sqlrconnection/updatestats.cpp \
 	sqlrconnection/bindformat.cpp \
 	sqlrconnection/dbversion.cpp \
 	sqlrconnection/serverversion.cpp \
@@ -170,7 +169,6 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/istransactional.lo \
 	sqlrconnection/bindparameters.lo \
 	sqlrconnection/unixsocketseqfile.lo \
-	sqlrconnection/updatestats.lo \
 	sqlrconnection/bindformat.lo \
 	sqlrconnection/dbversion.lo \
 	sqlrconnection/serverversion.lo \

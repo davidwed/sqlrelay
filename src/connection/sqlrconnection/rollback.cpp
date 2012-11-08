@@ -33,7 +33,7 @@ bool sqlrconnection_svr::rollback() {
 	txliveconnection=false;
 
 	// init some variables
-	sqlrcursor_svr	*rollbackcur=initCursorUpdateStats();
+	sqlrcursor_svr	*rollbackcur=initCursorInternal();
 	const char	*rollbackquery="rollback";
 	int		rollbackquerylen=8;
 	bool		retval=false;
@@ -43,7 +43,7 @@ bool sqlrconnection_svr::rollback() {
 	// have an ID that might already exist
 	if (rollbackcur->openCursorInternal(cursorcount+1) &&
 		rollbackcur->prepareQuery(rollbackquery,rollbackquerylen)) {
-		retval=executeQueryUpdateStats(rollbackcur,rollbackquery,
+		retval=executeQueryInternal(rollbackcur,rollbackquery,
 						rollbackquerylen,true);
 	}
 
@@ -58,7 +58,7 @@ bool sqlrconnection_svr::rollback() {
 	// clean up
 	rollbackcur->cleanUpData(true,true);
 	rollbackcur->closeCursor();
-	deleteCursorUpdateStats(rollbackcur);
+	deleteCursorInternal(rollbackcur);
 
 	// debug
 	char	string[38];

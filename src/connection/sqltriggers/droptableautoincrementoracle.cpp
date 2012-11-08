@@ -108,10 +108,10 @@ bool droptableautoincrementoracle::dropSequences(sqlrconnection_svr *sqlrcon,
 	if (sqlrcon->debugtriggers) {
 		printf("running trigger:\n%s\n",query.getString());
 	}
-	sqlrcursor_svr	*cur=sqlrcon->initCursorUpdateStats();
+	sqlrcursor_svr	*cur=sqlrcon->initCursorInternal();
 	if (cur->openCursorInternal(sqlrcon->cursorcount+1) &&
 		cur->prepareQuery(query.getString(),query.getStringLength()) &&
-		sqlrcon->executeQueryUpdateStats(cur,query.getString(),
+		sqlrcon->executeQueryInternal(cur,query.getString(),
 						query.getStringLength(),true)) {
 
 		// success...
@@ -154,7 +154,7 @@ bool droptableautoincrementoracle::dropSequences(sqlrconnection_svr *sqlrcon,
 	}
 	cur->cleanUpData(true,true);
 	cur->closeCursor();
-	sqlrcon->deleteCursorUpdateStats(cur);
+	sqlrcon->deleteCursorInternal(cur);
 
 	return true;
 }
@@ -172,10 +172,10 @@ bool droptableautoincrementoracle::dropSequence(sqlrconnection_svr *sqlrcon,
 	if (sqlrcon->debugtriggers) {
 		printf("running trigger:\n%s\n",query.getString());
 	}
-	sqlrcursor_svr	*cur=sqlrcon->initCursorUpdateStats();
+	sqlrcursor_svr	*cur=sqlrcon->initCursorInternal();
 	if (cur->openCursorInternal(sqlrcon->cursorcount+1) &&
 		cur->prepareQuery(query.getString(),query.getStringLength()) &&
-		sqlrcon->executeQueryUpdateStats(cur,query.getString(),
+		sqlrcon->executeQueryInternal(cur,query.getString(),
 						query.getStringLength(),true)) {
 		// success...
 		if (sqlrcon->debugtriggers) {
@@ -196,7 +196,7 @@ bool droptableautoincrementoracle::dropSequence(sqlrconnection_svr *sqlrcon,
 	}
 	cur->cleanUpData(true,true);
 	cur->closeCursor();
-	sqlrcon->deleteCursorUpdateStats(cur);
+	sqlrcon->deleteCursorInternal(cur);
 
 	return true;
 }
@@ -216,10 +216,10 @@ bool droptableautoincrementoracle::deleteSequence(sqlrconnection_svr *sqlrcon,
 	if (sqlrcon->debugtriggers) {
 		printf("running trigger:\n%s\n",query.getString());
 	}
-	sqlrcursor_svr	*cur=sqlrcon->initCursorUpdateStats();
+	sqlrcursor_svr	*cur=sqlrcon->initCursorInternal();
 	if (cur->openCursorInternal(sqlrcon->cursorcount+1) &&
 		cur->prepareQuery(query.getString(),query.getStringLength()) &&
-		sqlrcon->executeQueryUpdateStats(cur,query.getString(),
+		sqlrcon->executeQueryInternal(cur,query.getString(),
 						query.getStringLength(),true)) {
 		// success...
 		if (sqlrcon->debugtriggers) {
@@ -237,7 +237,7 @@ bool droptableautoincrementoracle::deleteSequence(sqlrconnection_svr *sqlrcon,
 	}
 	cur->cleanUpData(true,true);
 	cur->closeCursor();
-	sqlrcon->deleteCursorUpdateStats(cur);
+	sqlrcon->deleteCursorInternal(cur);
 
 	return true;
 }

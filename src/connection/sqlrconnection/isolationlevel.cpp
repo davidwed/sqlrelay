@@ -33,13 +33,13 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 	snprintf(silquery,silquerylen,silquerybase,isolevel);
 	silquerylen=charstring::length(silquery);
 
-	sqlrcursor_svr	*silcur=initCursorUpdateStats();
+	sqlrcursor_svr	*silcur=initCursorInternal();
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	bool	retval=false;
 	if (silcur->openCursorInternal(cursorcount+1) &&
 		silcur->prepareQuery(silquery,silquerylen) &&
-		executeQueryUpdateStats(silcur,silquery,silquerylen,true)) {
+		executeQueryInternal(silcur,silquery,silquerylen,true)) {
 		retval=true;
 	}
 
@@ -56,7 +56,7 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 	delete[] silquery;
 	silcur->cleanUpData(true,true);
 	silcur->closeCursor();
-	deleteCursorUpdateStats(silcur);
+	deleteCursorInternal(silcur);
 	return retval;
 }
 

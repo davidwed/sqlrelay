@@ -3,6 +3,9 @@
 
 #include <sqlrconnection.h>
 
+// for gettimeofday()
+#include <sys/time.h>
+
 bool sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 					bool reexecute, bool bindcursor,
 					bool reallyexecute, bool getquery) {
@@ -25,8 +28,8 @@ bool sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 			success=getQuery(cursor);
 		}
 		if (success && !bindcursor) {
-			success=getInputBinds(cursor) &&
-				getOutputBinds(cursor);
+			success=(getInputBinds(cursor) &&
+					getOutputBinds(cursor));
 		}
 		if (success) {
 			success=getSendColumnInfo();
@@ -270,7 +273,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 
 		dbgfile.debugPrint("connection",3,"re-executing...");
 		success=(cursor->handleBinds() && 
-			executeQueryUpdateStats(cursor,
+			executeQueryInternal(cursor,
 						cursor->querybuffer,
 						cursor->querylength,
 						reallyexecute));
@@ -283,7 +286,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 		dbgfile.debugPrint("connection",3,"bind cursor...");
 		// FIXME: should we be passing
 		// in the querybuffer and length here?
-		success=executeQueryUpdateStats(cursor,
+		success=executeQueryInternal(cursor,
 						cursor->querybuffer,
 						cursor->querylength,
 						reallyexecute);
@@ -348,7 +351,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 
 			// execute
 			if (success) {
-				success=executeQueryUpdateStats(
+				success=executeQueryInternal(
 					cursor,queryptr,querylen,true);
 			}
 
@@ -389,6 +392,62 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	dbgfile.debugPrint("connection",2,"done processing query");
 
 	return success;
+}
+
+bool sqlrconnection_svr::executeQueryInternal(sqlrcursor_svr *curs,
+							const char *query,
+							uint32_t length,
+							bool execute) {
+
+	// update query count
+	semset->waitWithUndo(9);
+	statistics->total_queries++;
+	semset->signalWithUndo(9);
+
+	// variables for query timing
+	timeval		starttv;
+	struct timezone	starttz;
+	timeval		endtv;
+	struct timezone	endtz;
+
+	if (cfgfl->getTimeQueriesSeconds()>-1 &&
+		cfgfl->getTimeQueriesMicroSeconds()>-1) {
+		// get the query start time
+		gettimeofday(&starttv,&starttz);
+	}
+
+	// execute the query
+	bool	result=curs->executeQuery(query,length,execute);
+
+	if (cfgfl->getTimeQueriesSeconds()>-1 &&
+		cfgfl->getTimeQueriesMicroSeconds()>-1) {
+
+		// get the query end time
+		gettimeofday(&endtv,&endtz);
+
+		// update stats
+		curs->stats.query=query;
+		curs->stats.result=result;
+		curs->stats.sec=endtv.tv_sec-starttv.tv_sec;
+		curs->stats.usec=endtv.tv_usec-starttv.tv_usec;
+
+		// write out a log entry
+		if (curs->stats.sec>=
+				(uint64_t)cfgfl->getTimeQueriesSeconds() &&
+			curs->stats.usec>=
+				(uint64_t)cfgfl->getTimeQueriesMicroSeconds()) {
+			writeQueryLog(curs);
+		}
+	}
+
+	// update error count
+	if (!result) {
+		semset->waitWithUndo(9);
+		statistics->total_errors++;
+		semset->signalWithUndo(9);
+		return false;
+	}
+	return true;
 }
 
 void sqlrconnection_svr::commitOrRollback(sqlrcursor_svr *cursor) {

@@ -48,13 +48,13 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id, char **error) {
 
 	size_t	liiquerylen=charstring::length(liiquery);
 
-	sqlrcursor_svr	*liicur=initCursorUpdateStats();
+	sqlrcursor_svr	*liicur=initCursorInternal();
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	bool	retval=false;
 	if (liicur->openCursorInternal(cursorcount+1) &&
 		liicur->prepareQuery(liiquery,liiquerylen) &&
-		executeQueryUpdateStats(liicur,liiquery,liiquerylen,true)) {
+		executeQueryInternal(liicur,liiquery,liiquerylen,true)) {
 
 		if (!liicur->noRowsToReturn() && liicur->fetchRow()) {
 
@@ -84,7 +84,7 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id, char **error) {
 
 	liicur->cleanUpData(true,true);
 	liicur->closeCursor();
-	deleteCursorUpdateStats(liicur);
+	deleteCursorInternal(liicur);
 	return retval;
 }
 

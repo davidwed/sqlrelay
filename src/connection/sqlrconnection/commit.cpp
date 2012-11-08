@@ -32,7 +32,7 @@ bool sqlrconnection_svr::commit() {
 	txliveconnection=false;
 
 	// init some variables
-	sqlrcursor_svr	*commitcur=initCursorUpdateStats();
+	sqlrcursor_svr	*commitcur=initCursorInternal();
 	const char	*commitquery="commit";
 	int		commitquerylen=6;
 	bool		retval=false;
@@ -42,7 +42,7 @@ bool sqlrconnection_svr::commit() {
 	// have an ID that might already exist
 	if (commitcur->openCursorInternal(cursorcount+1) &&
 		commitcur->prepareQuery(commitquery,commitquerylen)) {
-		retval=executeQueryUpdateStats(commitcur,commitquery,
+		retval=executeQueryInternal(commitcur,commitquery,
 						commitquerylen,true);
 	}
 
@@ -57,7 +57,7 @@ bool sqlrconnection_svr::commit() {
 	// clean up
 	commitcur->cleanUpData(true,true);
 	commitcur->closeCursor();
-	deleteCursorUpdateStats(commitcur);
+	deleteCursorInternal(commitcur);
 
 	// debug
 	char	string[36];

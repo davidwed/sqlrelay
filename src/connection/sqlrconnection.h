@@ -199,15 +199,15 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		static void	cleanUp();
 		static void	shutDown(int32_t signum);
 
-		bool	logInUpdateStats(bool printerrors);
-		void	logOutUpdateStats();
+		bool	logInInternal(bool printerrors);
+		void	logOutInternal();
 
 	// ideally these would be private but the
 	// translators and triggers need to access them (for now)
 	public:
-		sqlrcursor_svr	*initCursorUpdateStats();
-		void	deleteCursorUpdateStats(sqlrcursor_svr *curs);
-		bool	executeQueryUpdateStats(sqlrcursor_svr *curs,
+		sqlrcursor_svr	*initCursorInternal();
+		void	deleteCursorInternal(sqlrcursor_svr *curs);
+		bool	executeQueryInternal(sqlrcursor_svr *curs,
 							const char *query,
 							uint32_t length,
 							bool execute);

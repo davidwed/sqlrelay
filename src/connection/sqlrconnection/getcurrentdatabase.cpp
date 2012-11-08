@@ -35,13 +35,13 @@ char *sqlrconnection_svr::getCurrentDatabase() {
 
 	size_t		gcdquerylen=charstring::length(gcdquery);
 
-	sqlrcursor_svr	*gcdcur=initCursorUpdateStats();
+	sqlrcursor_svr	*gcdcur=initCursorInternal();
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	char	*retval=NULL;
 	if (gcdcur->openCursorInternal(cursorcount+1) &&
 		gcdcur->prepareQuery(gcdquery,gcdquerylen) &&
-		executeQueryUpdateStats(gcdcur,gcdquery,gcdquerylen,true)) {
+		executeQueryInternal(gcdcur,gcdquery,gcdquerylen,true)) {
 
 		if (!gcdcur->noRowsToReturn() && gcdcur->fetchRow()) {
 
@@ -56,7 +56,7 @@ char *sqlrconnection_svr::getCurrentDatabase() {
 	}
 	gcdcur->cleanUpData(true,true);
 	gcdcur->closeCursor();
-	deleteCursorUpdateStats(gcdcur);
+	deleteCursorInternal(gcdcur);
 	return retval;
 }
 
