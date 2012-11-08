@@ -1941,7 +1941,7 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 
 #ifdef HAVE_ORACLE_8i
 	// check for create temp table query
-	if (stmttype==OCI_STMT_CREATE) {
+	if (execute && stmttype==OCI_STMT_CREATE) {
 		checkForTempTable(query,length);
 	}
 #endif

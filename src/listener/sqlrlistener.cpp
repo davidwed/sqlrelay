@@ -1351,8 +1351,8 @@ int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 	// if there's a read error, just exit with an error code
 	uint32_t	size;
 	clientsock->read(&size,idleclienttimeout,0);
-	char		userbuffer[(uint32_t)USERSIZE+1];
-	if (size>(uint32_t)USERSIZE ||
+	char		userbuffer[USERSIZE];
+	if (size>sizeof(userbuffer)-1 ||
 		(uint32_t)(clientsock->read(userbuffer,size,
 						idleclienttimeout,0))!=size) {
 		dbgfile.debugPrint("listener",0,
@@ -1361,9 +1361,9 @@ int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 	}
 	userbuffer[size]='\0';
 
-	char		passwordbuffer[(uint32_t)USERSIZE+1];
+	char		passwordbuffer[USERSIZE];
 	clientsock->read(&size,idleclienttimeout,0);
-	if (size>(uint32_t)USERSIZE ||
+	if (size>sizeof(passwordbuffer)-1 ||
 		(uint32_t)(clientsock->read(passwordbuffer,size,
 						idleclienttimeout,0))!=size) {
 		dbgfile.debugPrint("listener",0,

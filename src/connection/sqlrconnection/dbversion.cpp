@@ -7,8 +7,11 @@ void sqlrconnection_svr::dbVersionCommand() {
 
 	dbgfile.debugPrint("connection",1,"db version");
 
+	// get the db version
 	const char	*dbversion=dbVersion();
-	uint16_t	dbvlen=(uint16_t)charstring::length(dbversion);
+
+	// send it to the client
+	uint16_t	dbvlen=charstring::length(dbversion);
 	clientsock->write(dbvlen);
 	clientsock->write(dbversion,dbvlen);
 	flushWriteBuffer();

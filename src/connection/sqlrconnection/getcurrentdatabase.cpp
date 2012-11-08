@@ -8,18 +8,16 @@ void sqlrconnection_svr::getCurrentDatabaseCommand() {
 	dbgfile.debugPrint("connection",1,"get current database");
 
 	// get the current database
-	char		*currentdb=getCurrentDatabase();
-	uint16_t	currentdbsize=charstring::length(currentdb);
+	char	*currentdb=getCurrentDatabase();
 
 	// send it to the client
+	uint16_t	currentdbsize=charstring::length(currentdb);
 	clientsock->write(currentdbsize);
 	clientsock->write(currentdb,currentdbsize);
 	flushWriteBuffer();
 
 	// clean up
 	delete[] currentdb;
-
-	return;
 }
 
 char *sqlrconnection_svr::getCurrentDatabase() {

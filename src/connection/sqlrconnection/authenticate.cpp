@@ -8,7 +8,11 @@ bool sqlrconnection_svr::authenticateCommand() {
 
 	dbgfile.debugPrint("connection",1,"authenticate");
 
-	if (!authenticate()) {
+	// get the user/password from the client and authenticate
+	if (!getUserFromClient() ||
+		!getPasswordFromClient() ||
+		!authenticate()) {
+
 		// indicate that an error has occurred
 		clientsock->write((uint16_t)ERROR_OCCURRED);
 		clientsock->write((uint64_t)0);
@@ -18,41 +22,17 @@ bool sqlrconnection_svr::authenticateCommand() {
 		endSession();
 		return false;
 	}
+
 	// indicate that no error has occurred
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	flushWriteBuffer();
 	return true;
 }
 
-bool sqlrconnection_svr::authenticate() {
-
-	dbgfile.debugPrint("connection",1,"authenticate...");
-
-	// get the user/password from the client
-	if (!getUserFromClient() || !getPasswordFromClient()) {
-		return false;
-	}
-
-	// authenticate on the approprite tier
-	bool	authondb=(cfgfl->getAuthOnDatabase() &&
-				supportsAuthOnDatabase());
-	bool	authonconnection=(cfgfl->getAuthOnConnection() ||
-					(cfgfl->getAuthOnDatabase() &&
-						!supportsAuthOnDatabase()));
-	if (authonconnection) {
-		return connectionBasedAuth(userbuffer,passwordbuffer);
-	} else if (authondb) {
-		return databaseBasedAuth(userbuffer,passwordbuffer);
-	}
-
-	dbgfile.debugPrint("connection",1,"authentication was done on listener");
-	return true;
-}
-
 bool sqlrconnection_svr::getUserFromClient() {
 	uint32_t	size=0;
 	if (clientsock->read(&size,idleclienttimeout,0)==sizeof(uint32_t) &&
-		size<=(uint32_t)USERSIZE &&
+		size<sizeof(userbuffer) &&
 		(uint32_t)(clientsock->read(userbuffer,size,
 						idleclienttimeout,0))==size) {
 		userbuffer[size]='\0';
@@ -66,7 +46,7 @@ bool sqlrconnection_svr::getUserFromClient() {
 bool sqlrconnection_svr::getPasswordFromClient() {
 	uint32_t size=0;
 	if (clientsock->read(&size,idleclienttimeout,0)==sizeof(uint32_t) &&
-		size<=(uint32_t)USERSIZE &&
+		size<sizeof(passwordbuffer) &&
 		(uint32_t)(clientsock->read(passwordbuffer,size,
 						idleclienttimeout,0))==size) {
 		passwordbuffer[size]='\0';
@@ -75,6 +55,27 @@ bool sqlrconnection_svr::getPasswordFromClient() {
 	dbgfile.debugPrint("connection",1,
 		"authentication failed: password size is wrong");
 	return false;
+}
+
+bool sqlrconnection_svr::authenticate() {
+
+	dbgfile.debugPrint("connection",1,"authenticate...");
+
+	// authenticate on the approprite tier
+	bool	authondb=(cfgfl->getAuthOnDatabase() &&
+				supportsAuthOnDatabase());
+	bool	authonconnection=(cfgfl->getAuthOnConnection() ||
+					(cfgfl->getAuthOnDatabase() &&
+						!supportsAuthOnDatabase()));
+	if (authonconnection) {
+		return connectionBasedAuth(userbuffer,passwordbuffer);
+	} else if (authondb) {
+		return databaseBasedAuth(userbuffer,passwordbuffer);
+	}
+
+	dbgfile.debugPrint("connection",1,
+				"authentication was done on listener");
+	return true;
 }
 
 bool sqlrconnection_svr::connectionBasedAuth(const char *userbuffer,

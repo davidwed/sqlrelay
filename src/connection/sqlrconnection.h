@@ -316,6 +316,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	abortResultSetCommand(sqlrcursor_svr *cursor);
 		void	suspendResultSetCommand(sqlrcursor_svr *cursor);
 		bool	resumeResultSetCommand(sqlrcursor_svr *cursor);
+		bool	resumeResultSet(sqlrcursor_svr *cursor);
 		void	waitForClientClose();
 		void	closeSuspendedSessionSockets();
 		bool	authenticate();
@@ -329,8 +330,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 						bool reexecute,
 						bool bindcursor,
 						bool getquery);
-		bool	resumeResultSet(sqlrcursor_svr *cursor);
-		void	suspendSession();
+		bool	suspendSession();
 		void	endSessionInternal();
 		bool	getCommand(uint16_t *command);
 		void	noAvailableCursors(uint16_t command);
@@ -423,11 +423,11 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 
 		authenticator	*authc;
 
-		char		userbuffer[USERSIZE+1];
-		char		passwordbuffer[USERSIZE+1];
+		char		userbuffer[USERSIZE];
+		char		passwordbuffer[USERSIZE];
 
-		char		lastuserbuffer[USERSIZE+1];
-		char		lastpasswordbuffer[USERSIZE+1];
+		char		lastuserbuffer[USERSIZE];
+		char		lastpasswordbuffer[USERSIZE];
 		bool		lastauthsuccess;
 
 		bool		commitorrollback;

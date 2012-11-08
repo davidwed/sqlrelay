@@ -5,12 +5,6 @@
 
 bool sqlrconnection_svr::resumeResultSetCommand(sqlrcursor_svr *cursor) {
 	dbgfile.debugPrint("connection",1,"resume result set");
-	return resumeResultSet(cursor);
-}
-
-bool sqlrconnection_svr::resumeResultSet(sqlrcursor_svr *cursor) {
-
-	dbgfile.debugPrint("connection",1,"resume result set...");
 
 	bool	retval=true;
 
@@ -29,13 +23,10 @@ bool sqlrconnection_svr::resumeResultSet(sqlrcursor_svr *cursor) {
 
 		// if the requested cursor really had a suspended
 		// result set, send the lastrow of it to the client
-		// then send the result set header
+		// then resume the result set
 		clientsock->write(lastrow);
-		returnResultSetHeader(cursor);
-		if (!returnResultSetData(cursor)) {
-			endSession();
-			retval=false;
-		}
+
+		retval=resumeResultSet(cursor);
 
 	} else {
 
@@ -58,4 +49,15 @@ bool sqlrconnection_svr::resumeResultSet(sqlrcursor_svr *cursor) {
 
 	dbgfile.debugPrint("connection",1,"done resuming result set");
 	return retval;
+}
+
+bool sqlrconnection_svr::resumeResultSet(sqlrcursor_svr *cursor) {
+
+	// return the header and start sending data
+	returnResultSetHeader(cursor);
+	if (!returnResultSetData(cursor)) {
+		endSession();
+		return false;
+	}
+	return true;
 }

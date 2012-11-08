@@ -7,8 +7,11 @@ void sqlrconnection_svr::bindFormatCommand() {
 
 	dbgfile.debugPrint("connection",1,"bind format");
 
+	// get the bind format
 	const char	*bf=bindFormat();
-	uint16_t	bflen=(uint16_t)charstring::length(bf);
+
+	// send it to the client
+	uint16_t	bflen=charstring::length(bf);
 	clientsock->write(bflen);
 	clientsock->write(bf,bflen);
 	flushWriteBuffer();

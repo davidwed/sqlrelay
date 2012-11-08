@@ -8,10 +8,6 @@ void sqlrconnection_svr::endSessionCommand() {
 	endSessionInternal();
 }
 
-void sqlrconnection_svr::endSession() {
-	// by default, do nothing
-}
-
 void sqlrconnection_svr::endSessionInternal() {
 
 	dbgfile.debugPrint("connection",2,"ending session...");
@@ -115,6 +111,10 @@ void sqlrconnection_svr::abortAllCursors() {
 	if (cfgfl->getSidEnabled()) {
 		sid_sqlrcon->endSession();
 	}
+}
+
+void sqlrconnection_svr::endSession() {
+	// by default, do nothing
 }
 
 void sqlrconnection_svr::cleanUpAllCursorData(bool freeresult, bool freebinds) {

@@ -154,12 +154,16 @@ bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor) {
 	// FIXME: implement this...
 	//descInputBinds(cursor,bindbuf,1000);
 
-	// write the client address into a buffer
-	static char	clientaddrbuf[100+1];
-        charstring::copy(clientaddrbuf,"0.0.0.0");
-	// FIXME: implement this...
-        //charstring::copy(clientaddrbuf,
-	//		nwzUtil::getClientAddr(&my_cs->clientaddr));
+	// get the client address
+	char	*clientaddrbuf=NULL;
+	if (clientsock) {
+		clientaddrbuf=clientsock->getPeerAddress();
+		if (!clientaddrbuf) {
+			clientaddrbuf=charstring::duplicate("UNIX");
+		}
+	} else {
+		clientaddrbuf=charstring::duplicate("internal");
+	}
 	
 	// get the current date/time
 	datetime	dt;
@@ -192,6 +196,8 @@ bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor) {
 		clientaddrbuf,
 		bindbuf
 		);
+
+	delete[] clientaddrbuf;
 
 	// write that buffer to the log file
 	return (querylog.write(querylogbuf)==charstring::length(querylogbuf));
