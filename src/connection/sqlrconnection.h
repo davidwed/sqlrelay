@@ -4,9 +4,6 @@
 #ifndef SQLRCONNECTION_H
 #define SQLRCONNECTION_H
 
-// Devananda vdv
-//#define RETURN_QUERY_WITH_ERROR
-
 #include <config.h>
 #include <defaults.h>
 #include <rudiments/signalclasses.h>
@@ -328,11 +325,10 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 						const char *passwordbuffer);
 		bool	databaseBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
-		bool	handleQuery(sqlrcursor_svr *cursor,
-					bool reexecute,
-					bool bindcursor,
-					bool reallyexecute,
-					bool getquery);
+		bool	handleQueryOrBindCursor(sqlrcursor_svr *cursor,
+						bool reexecute,
+						bool bindcursor,
+						bool getquery);
 		bool	resumeResultSet(sqlrcursor_svr *cursor);
 		void	suspendSession();
 		void	endSessionInternal();
@@ -355,7 +351,9 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool	processQuery(sqlrcursor_svr *cursor,
 						bool reexecute,
 						bool bindcursor,
-						bool reallyexecute);
+						const char **error,
+						int64_t *errnum,
+						bool *disconnect);
 		void	rewriteQuery(sqlrcursor_svr *cursor);
 		void	translateBindVariables(sqlrcursor_svr *cursor);
 		bool	matchesNativeBindFormat(const char *bind);

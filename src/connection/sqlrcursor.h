@@ -263,15 +263,11 @@ class sqlrcursor_svr {
 		bool	listen_mode;
 		bool	verification_mode;
 		bool	prevention_mode;	
-
 		char	sid_parsed_sql[BUFSIZ];
 		char	sid_parsed_results[BUFSIZ];
 		char	sid_query[BUFSIZ];
-
 		sqlrcursor	*sid_sqlrcur;
-
 		bool	sql_injection_detection;
-
 		bool	sid_egress;
 
 		char		*querybuffer;

@@ -6,20 +6,13 @@
 // for gettimeofday()
 #include <sys/time.h>
 
-bool sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
-					bool reexecute, bool bindcursor,
-					bool reallyexecute, bool getquery) {
+bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
+						bool reexecute,
+						bool bindcursor,
+						bool getquery) {
 
 
 	dbgfile.debugPrint("connection",1,"handling query...");
-
-	// clear bind mappings and reset fakeinputbindsforthisquery flag
-	if (!reexecute && !bindcursor) {
-		bindmappingspool->free();
-		inbindmappings->clear();
-		outbindmappings->clear();
-		cursor->fakeinputbindsforthisquery=fakeinputbinds;
-	}
 
 	// get the query and bind data from the client
 	if (getquery) {
@@ -42,6 +35,14 @@ bool sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 		}
 	}
 
+	// clear bind mappings and reset fakeinputbindsforthisquery flag
+	if (!reexecute && !bindcursor) {
+		bindmappingspool->free();
+		inbindmappings->clear();
+		outbindmappings->clear();
+		cursor->fakeinputbindsforthisquery=fakeinputbinds;
+	}
+
 	// loop here to handle down databases
 	const char	*error;
 	int64_t		errnum;
@@ -59,12 +60,13 @@ bool sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 		if (!reexecute && !bindcursor && faketransactionblocks) {
 			success=handleFakeTransactionQueries(cursor,
 						&wasfaketransactionquery,
-						&error,
-						&errnum);
+						&error,&errnum);
 		}
 		if (!wasfaketransactionquery) {
 			success=processQuery(cursor,reexecute,
-						bindcursor,reallyexecute);
+						bindcursor,
+						&error,&errnum,
+						&liveconnection);
 		}
 
 
@@ -95,7 +97,7 @@ bool sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 			// handle after-triggers
 			if (sqltr) {
 				sqltr->runAfterTriggers(this,cursor,
-							cursor->querytree,true);
+						cursor->querytree,true);
 			}
 
 			// reinit lastrow
@@ -106,16 +108,10 @@ bool sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 				endSession();
 				return false;
 			}
-			return true;
+
+			break;
 
 		} else {
-
-			// get the error message from the database
-			// (unless it was already set)
-			if (!error) {
-				cursor->errorMessage(&error,&errnum,
-							&liveconnection);
-			}
 
 			// if the db is still up, or if we're not waiting
 			// for them if they're down, then return the error
@@ -123,8 +119,8 @@ bool sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 				!cfgfl->getWaitForDownDatabase()) {
 
 				// return the error
-				returnQueryError(cursor,error,
-						errnum,!liveconnection);
+				returnQueryError(cursor,error,errnum,
+							!liveconnection);
 			}
 
 			// if the error was a dead connection
@@ -144,14 +140,17 @@ bool sqlrconnection_svr::handleQuery(sqlrcursor_svr *cursor,
 
 			// handle after-triggers
 			if (sqltr) {
-				sqltr->runAfterTriggers(
-					this,cursor,
-					cursor->querytree,false);
+				sqltr->runAfterTriggers(this,cursor,
+						cursor->querytree,false);
 			}
 
-			return true;
+			break;
 		}
 	}
+
+	// FIXME: this is where neowiz calls their log function
+	// but this won't log queries run by triggers
+	return true;
 }
 
 bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
@@ -239,7 +238,8 @@ bool sqlrconnection_svr::getSendColumnInfo() {
 
 bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 					bool reexecute, bool bindcursor,
-					bool reallyexecute) {
+					const char **error, int64_t *errnum,
+					bool *liveconnection) {
 
 	// Very important...
 	// Clean up data here instead of when aborting a result set, this
@@ -276,20 +276,15 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			executeQueryInternal(cursor,
 						cursor->querybuffer,
 						cursor->querylength,
-						reallyexecute));
+						true));
 
 	} else if (bindcursor) {
 
-		// if the cursor is a bind cursor then we just need to
-		// execute, we don't need to worry about binds...
+		// if we're handling a bind cursor
+		// then we just need to execute...
 
 		dbgfile.debugPrint("connection",3,"bind cursor...");
-		// FIXME: should we be passing
-		// in the querybuffer and length here?
-		success=executeQueryInternal(cursor,
-						cursor->querybuffer,
-						cursor->querylength,
-						reallyexecute);
+		success=executeQueryInternal(cursor,NULL,0,false);
 
 	} else {
 
@@ -383,6 +378,11 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 		dbgfile.debugPrint("connection",3,"commit necessary...");
 		success=commitInternal();
 	}
+	
+	// if the query failed, get the error
+	if (!success) {
+		cursor->errorMessage(error,errnum,liveconnection);
+	}
 
 	if (success) {
 		dbgfile.debugPrint("connection",2,"processing query succeeded");
@@ -390,6 +390,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 		dbgfile.debugPrint("connection",2,"processing query failed");
 	}
 	dbgfile.debugPrint("connection",2,"done processing query");
+
 
 	return success;
 }
@@ -436,6 +437,8 @@ bool sqlrconnection_svr::executeQueryInternal(sqlrcursor_svr *curs,
 				(uint64_t)cfgfl->getTimeQueriesSeconds() &&
 			curs->stats.usec>=
 				(uint64_t)cfgfl->getTimeQueriesMicroSeconds()) {
+
+			// FIXME: this won't log errors or result sets
 			writeQueryLog(curs);
 		}
 	}

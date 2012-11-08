@@ -5,5 +5,5 @@
 
 bool sqlrconnection_svr::newQueryCommand(sqlrcursor_svr *cursor) {
 	dbgfile.debugPrint("connection",1,"new query");
-	return handleQuery(cursor,false,false,true,true);
+	return handleQueryOrBindCursor(cursor,false,false,true);
 }

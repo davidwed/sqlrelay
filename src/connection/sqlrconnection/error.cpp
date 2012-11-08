@@ -22,18 +22,8 @@ void sqlrconnection_svr::returnQueryError(sqlrcursor_svr *cursor,
 
 	// send the error string
 	size_t	errorlen=charstring::length(error);
-		
-	#ifdef RETURN_QUERY_WITH_ERROR
-		clientsock->write((uint16_t)(errorlen+
-			charstring::length(cursor->querybuffer)+18));
-		clientsock->write(error,errorlen);
-		// send the attempted query back too
-		clientsock->write("\nAttempted Query:\n");
-		clientsock->write(cursor->querybuffer);
-	#else
-		clientsock->write((uint16_t)(errorlen));
-		clientsock->write(error,errorlen);
-	#endif
+	clientsock->write((uint16_t)errorlen);
+	clientsock->write(error,errorlen);
 
 	// client will be sending skip/fetch, better get
 	// it even though we're not going to use it
