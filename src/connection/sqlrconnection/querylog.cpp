@@ -138,18 +138,27 @@ bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor) {
 
 // Original stuff...
 
-	stringbuffer	logentry;
-	logentry.append("query:\n")->append(cursor->stats.query)->append("\n");
-	logentry.append("time: ")->append((uint64_t)cursor->stats.sec);
-	logentry.append(".");
-	char	*usec=charstring::parseNumber((uint64_t)cursor->stats.usec,6);
-	logentry.append(usec);
-	delete[] usec;
-	logentry.append("\n");
-	if (querylog.write(logentry.getString(),
-				logentry.getStringLength())!=
-					logentry.getStringLength()) {
-		return false;
+	int64_t	sec=cursor->queryendsec-cursor->querystartsec;
+	int64_t	usec=cursor->queryendusec-cursor->querystartusec;
+
+	if (sec>cfgfl->getTimeQueriesSeconds() ||
+		(sec==cfgfl->getTimeQueriesSeconds() &&
+		usec>=cfgfl->getTimeQueriesMicroSeconds())) {
+
+		stringbuffer	logentry;
+		logentry.append("query:\n")->append(cursor->querybuffer);
+		logentry.append("\n");
+		logentry.append("time: ")->append(sec);
+		logentry.append(".");
+		char	*usecstr=charstring::parseNumber(usec,6);
+		logentry.append(usecstr);
+		delete[] usecstr;
+		logentry.append("\n");
+		if (querylog.write(logentry.getString(),
+					logentry.getStringLength())!=
+						logentry.getStringLength()) {
+			return false;
+		}
 	}
 
 
@@ -158,15 +167,15 @@ bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor) {
 	// get error, if there was one
 	static char	errorcodebuf[100+1];
 	errorcodebuf[0]='\0';
-	if (cursor->stats.result) {
+	if (cursor->queryresult) {
 		charstring::copy(errorcodebuf,"0");
 	} else {
-		snprintf(errorcodebuf,100,cursor->stats.error);
+		snprintf(errorcodebuf,100,cursor->queryerror);
 	}
 
 	// escape the query
 	static char	sqlbuf[7000+1];
-	strescape(cursor->stats.query,sqlbuf,7000);
+	strescape(cursor->querybuffer,sqlbuf,7000);
 
 	// escape the client info
 	static char	infobuf[1024+1];
@@ -186,6 +195,10 @@ bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor) {
 	} else {
 		clientaddrbuf=charstring::duplicate("internal");
 	}
+
+	// get the execution time
+	sec=cursor->commandendsec-cursor->commandstartsec;
+	usec=cursor->commandendusec-cursor->commandstartusec;
 	
 	// get the current date/time
 	datetime	dt;
@@ -201,16 +214,12 @@ bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor) {
 		dt.getMinutes(),
 		dt.getSeconds(),
 		handoffindex, 
-		// FIXME: validate that this is really the time they
-		// intend to store here
-		cursor->stats.sec+cursor->stats.usec/1000000.0,
+		sec+usec/1000000.0,
 		errorcodebuf,
 		(cursor->lastrowvalid)?cursor->lastrow:0,
         	infobuf,
 		sqlbuf,
-		// FIXME: validate that this is really the time they
-		// intend to store here
-		cursor->stats.sec+cursor->stats.usec/1000000.0,
+		sec+usec/1000000.0,
 		clientaddrbuf,
 		bindbuf
 		);

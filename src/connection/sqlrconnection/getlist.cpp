@@ -150,7 +150,9 @@ bool sqlrconnection_svr::getListByApiCall(sqlrcursor_svr *cursor,
 		bool		liveconnection;
 		cursor->errorMessage(&err,&errnum,&liveconnection);
 		returnQueryError(cursor,err,errnum,false);
-		return false;
+
+		// this is actually OK, only return false on a network error
+		return true;
 	}
 
 	// force sid_egress status

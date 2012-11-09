@@ -102,7 +102,7 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 				return false;
 			}
 
-			break;
+			return true;
 
 		} else {
 
@@ -131,17 +131,9 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 				}
 			}
 
-			break;
+			return true;
 		}
 	}
-
-	// write out a log entry
-	// FIXME: queries run by triggers won't get logged here
-	if (cursor->stats.sec>=cfgfl->getTimeQueriesSeconds() &&
-		cursor->stats.usec>=cfgfl->getTimeQueriesMicroSeconds()) {
-		writeQueryLog(cursor);
-	}
-	return true;
 }
 
 bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
@@ -347,8 +339,8 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	if (!success) {
 		cursor->errorMessage(error,errnum,liveconnection);
 		// FIXME: errors for queries run by triggers won't be set here
-		cursor->stats.error=*error;
-		cursor->stats.errnum=*errnum;
+		cursor->queryerror=*error;
+		cursor->queryerrnum=*errnum;
 	}
 
 	if (success) {
@@ -377,36 +369,32 @@ bool sqlrconnection_svr::executeQueryInternal(sqlrcursor_svr *curs,
 	semset->signalWithUndo(9);
 
 	// variables for query timing
-	timeval		starttv;
-	struct timezone	starttz;
-	timeval		endtv;
-	struct timezone	endtz;
+	timeval		tv;
+	struct timezone	tz;
 
 	if (cfgfl->getTimeQueriesSeconds()>-1 &&
 		cfgfl->getTimeQueriesMicroSeconds()>-1) {
 
 		// get the query start time
-		gettimeofday(&starttv,&starttz);
+		gettimeofday(&tv,&tz);
+		curs->querystartsec=tv.tv_sec;
+		curs->querystartusec=tv.tv_usec;
 	}
 
 	// execute the query
-	bool	result=curs->executeQuery(query,length);
+	curs->queryresult=curs->executeQuery(query,length);
 
 	if (cfgfl->getTimeQueriesSeconds()>-1 &&
 		cfgfl->getTimeQueriesMicroSeconds()>-1) {
 
 		// get the query end time
-		gettimeofday(&endtv,&endtz);
-
-		// update stats
-		curs->stats.query=query;
-		curs->stats.result=result;
-		curs->stats.sec=endtv.tv_sec-starttv.tv_sec;
-		curs->stats.usec=endtv.tv_usec-starttv.tv_usec;
+		gettimeofday(&tv,&tz);
+		curs->queryendsec=tv.tv_sec;
+		curs->queryendusec=tv.tv_usec;
 	}
 
 	// update error count
-	if (!result) {
+	if (!curs->queryresult) {
 		semset->waitWithUndo(9);
 		statistics->total_errors++;
 		semset->signalWithUndo(9);
@@ -417,7 +405,7 @@ bool sqlrconnection_svr::executeQueryInternal(sqlrcursor_svr *curs,
 		sqltr->runAfterTriggers(this,curs,curs->querytree,true);
 	}
 
-	return result;
+	return curs->queryresult;
 }
 
 void sqlrconnection_svr::commitOrRollback(sqlrcursor_svr *cursor) {

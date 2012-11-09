@@ -240,7 +240,7 @@ class sqlrcursor_svr {
 		virtual bool	sql_injection_detection_check_db(
 							const char *sid_db);
 
-		void		setFakeInputBindsForThisQuery(bool fake);
+		void	setFakeInputBindsForThisQuery(bool fake);
 
 		void	printQueryTree(xmldom *tree);
 	
@@ -273,6 +273,18 @@ class sqlrcursor_svr {
 		char		*querybuffer;
 		uint32_t	querylength;
 		xmldom		*querytree;
+		bool		queryresult;
+		const char	*queryerror;
+		int64_t		queryerrnum;
+
+		int64_t		commandstartsec;
+		int64_t		commandstartusec;
+		int64_t		querystartsec;
+		int64_t		querystartusec;
+		int64_t		queryendsec;
+		int64_t		queryendusec;
+		int64_t		commandendsec;
+		int64_t		commandendusec;
 
 		bool	fakeinputbindsforthisquery;
 
@@ -293,16 +305,6 @@ class sqlrcursor_svr {
 		void	performSubstitution(stringbuffer *buffer,
 							int16_t index);
 		void	abort();
-
-		// statistics
-		struct {
-			const char	*query;
-			bool		result;
-			const char	*error;
-			int64_t		errnum;
-			int64_t		sec;
-			int64_t		usec;
-		} stats;
 
 		bool		lastrowvalid;
 		uint64_t	lastrow;

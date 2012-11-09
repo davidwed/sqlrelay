@@ -3,6 +3,9 @@
 
 #include <sqlrconnection.h>
 
+// for gettimeofday()
+#include <sys/time.h>
+
 void sqlrconnection_svr::clientSession() {
 
 	dbgfile.debugPrint("connection",0,"client session...");
@@ -12,7 +15,8 @@ void sqlrconnection_svr::clientSession() {
 	// During each session, the client will send a series of commands.
 	// The session ends when the client ends it or when certain commands
 	// fail.
-	for (;;) {
+	bool	loop=true;
+	do {
 
 		// get a command from the client
 		uint16_t	command;
@@ -20,6 +24,11 @@ void sqlrconnection_svr::clientSession() {
 			endSessionCommand();
 			break;
 		}
+
+		// get the command start time
+		timeval		tv;
+		struct timezone	tz;
+		gettimeofday(&tv,&tz);
 
 		// these commands are all handled at the connection level
 		if (command==AUTHENTICATE) {
@@ -80,42 +89,51 @@ void sqlrconnection_svr::clientSession() {
 			continue;
 		}
 
+		// keep track of the command start time
+		cursor->commandstartsec=tv.tv_sec;
+		cursor->commandstartusec=tv.tv_usec;
+
 		// these commands are all handled at the cursor level
 		if (command==NEW_QUERY) {
-			if (!newQueryCommand(cursor)) {
-				break;
-			}
+			loop=newQueryCommand(cursor);
 		} else if (command==REEXECUTE_QUERY) {
-			if (!reExecuteQueryCommand(cursor)) {
-				break;
-			}
+			loop=reExecuteQueryCommand(cursor);
 		} else if (command==FETCH_FROM_BIND_CURSOR) {
-			if (!fetchFromBindCursorCommand(cursor)) {
-				break;
-			}
+			loop=fetchFromBindCursorCommand(cursor);
 		} else if (command==FETCH_RESULT_SET) {
-			if (!fetchResultSetCommand(cursor)) {
-				break;
-			}
+			loop=fetchResultSetCommand(cursor);
 		} else if (command==ABORT_RESULT_SET) {
 			abortResultSetCommand(cursor);
 		} else if (command==SUSPEND_RESULT_SET) {
 			suspendResultSetCommand(cursor);
 		} else if (command==RESUME_RESULT_SET) {
-			if (!resumeResultSetCommand(cursor)) {
-				break;
-			}
+			loop=resumeResultSetCommand(cursor);
 		} else if (command==GETDBLIST) {
-			getDatabaseListCommand(cursor);
+			loop=getDatabaseListCommand(cursor);
 		} else if (command==GETTABLELIST) {
-			getTableListCommand(cursor);
+			loop=getTableListCommand(cursor);
 		} else if (command==GETCOLUMNLIST) {
-			getColumnListCommand(cursor);
+			loop=getColumnListCommand(cursor);
 		} else {
 			endSessionCommand();
-			break;
+			loop=false;
 		}
-	}
+
+		// get the command end-time
+		gettimeofday(&tv,&tz);
+		cursor->commandendsec=tv.tv_sec;
+		cursor->commandendusec=tv.tv_usec;
+
+		// log query-related commands
+		// FIXME: should we really log bind cursor fetches?
+		// FIXME: this won't log triggers
+		if (command==NEW_QUERY ||
+			command==REEXECUTE_QUERY ||
+			command==FETCH_FROM_BIND_CURSOR) {
+			writeQueryLog(cursor);
+		}
+
+	} while (loop);
 
 	waitForClientClose();
 

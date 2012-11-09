@@ -8,13 +8,6 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 	this->conn=conn;
 	inbindcount=0;
 	outbindcount=0;
-
-	stats.query=NULL;
-	stats.result=false;
-	stats.error=NULL;
-	stats.errnum=0;
-	stats.sec=0;
-	stats.usec=0;
 	
 	busy=false;
 
@@ -23,6 +16,19 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 	querybuffer=new char[conn->maxquerysize+1];
 	querylength=0;
 	querytree=NULL;
+	queryresult=false;
+	queryerror=NULL;
+	queryerrnum=0;
+
+	commandstartsec=0;
+	commandstartusec=0;
+	querystartsec=0;
+	querystartusec=0;
+	queryendsec=0;
+	queryendusec=0;
+	commandendsec=0;
+	commandendusec=0;
+
 	fakeinputbindsforthisquery=false;
 
 	sid_sqlrcur=NULL;
