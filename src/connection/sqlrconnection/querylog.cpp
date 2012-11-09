@@ -160,10 +160,6 @@ bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor) {
 	errorcodebuf[0]='\0';
 	if (cursor->stats.result) {
 		charstring::copy(errorcodebuf,"0");
-	/*} else if (cursor->sqlr_error[0]) {
-		snprintf(errorcodebuf,100,cursor->sqlr_error);
-	} else if (cursor->sqlrcmd_error[0]) {
-		snprintf(errorcodebuf,100,cursor->sqlrcmd_error);*/
 	} else {
 		snprintf(errorcodebuf,100,cursor->stats.error);
 	}
