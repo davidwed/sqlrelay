@@ -302,6 +302,9 @@ class sqlrcursor_svr {
 			uint64_t	usec;
 		} stats;
 
+		bool		lastrowvalid;
+		uint64_t	lastrow;
+
 		bool		suspendresultset;
 		bool		busy;
 		uint16_t	id;

@@ -101,7 +101,7 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 			}
 
 			// reinit lastrow
-			lastrowvalid=false;
+			cursor->lastrowvalid=false;
 
 			// return the result set
 			if (!returnResultSetData(cursor)) {

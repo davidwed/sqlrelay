@@ -10,14 +10,16 @@ bool sqlrconnection_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 	// get the number of rows to skip
 	uint64_t	skip;
 	if (clientsock->read(&skip,idleclienttimeout,0)!=sizeof(uint64_t)) {
-		dbgfile.debugPrint("connection",2,"returning result set data failed");
+		dbgfile.debugPrint("connection",2,
+				"returning result set data failed");
 		return false;
 	}
 
 	// get the number of rows to fetch
 	uint64_t	fetch;
 	if (clientsock->read(&fetch,idleclienttimeout,0)!=sizeof(uint64_t)) {
-		dbgfile.debugPrint("connection",2,"returning result set data failed");
+		dbgfile.debugPrint("connection",2,
+				"returning result set data failed");
 		return false;
 	}
 
@@ -26,7 +28,8 @@ bool sqlrconnection_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 	if (cursor->noRowsToReturn() || cursor->sid_egress) {
 		clientsock->write((uint16_t)END_RESULT_SET);
 		flushWriteBuffer();
-		dbgfile.debugPrint("connection",2,"done returning result set data");
+		dbgfile.debugPrint("connection",2,
+				"done returning result set data");
 		return true;
 	}
 
@@ -39,7 +42,8 @@ bool sqlrconnection_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 	if (!skipRows(cursor,skip)) {
 		clientsock->write((uint16_t)END_RESULT_SET);
 		flushWriteBuffer();
-		dbgfile.debugPrint("connection",2,"done returning result set data");
+		dbgfile.debugPrint("connection",2,
+				"done returning result set data");
 		return true;
 	}
 
@@ -76,11 +80,11 @@ bool sqlrconnection_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 			delete debugstr;
 		}
 
-		if (lastrowvalid) {
-			lastrow++;
+		if (cursor->lastrowvalid) {
+			cursor->lastrow++;
 		} else {
-			lastrowvalid=true;
-			lastrow=0;
+			cursor->lastrowvalid=true;
+			cursor->lastrow=0;
 		}
 	}
 	flushWriteBuffer();

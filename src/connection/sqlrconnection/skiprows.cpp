@@ -18,11 +18,11 @@ bool sqlrconnection_svr::skipRows(sqlrcursor_svr *cursor, uint64_t rows) {
 
 		dbgfile.debugPrint("connection",3,"skip...");
 
-		if (lastrowvalid) {
-			lastrow++;
+		if (cursor->lastrowvalid) {
+			cursor->lastrow++;
 		} else {
-			lastrowvalid=true;
-			lastrow=0;
+			cursor->lastrowvalid=true;
+			cursor->lastrow=0;
 		}
 
 		if (!cursor->skipRow()) {

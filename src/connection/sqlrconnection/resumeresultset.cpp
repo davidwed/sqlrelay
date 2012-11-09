@@ -24,7 +24,7 @@ bool sqlrconnection_svr::resumeResultSetCommand(sqlrcursor_svr *cursor) {
 		// if the requested cursor really had a suspended
 		// result set, send the lastrow of it to the client
 		// then resume the result set
-		clientsock->write(lastrow);
+		clientsock->write(cursor->lastrow);
 
 		retval=resumeResultSet(cursor);
 

@@ -452,8 +452,6 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 
 		int32_t		accepttimeout;
 		bool		suspendedsession;
-		bool		lastrowvalid;
-		uint64_t	lastrow;
 
 		inetserversocket	**serversockin;
 		uint64_t		serversockincount;

@@ -10,48 +10,78 @@
 #include <rudiments/datetime.h>
 #include <rudiments/process.h>
 
-int strescape(const char *str, char *buf, int limit)
-// from oracpool my_strescape()
-{
-  register const char *p = NULL;
-  register char *q = buf;
-  const char *strend = str + charstring::length(str);
+int strescape(const char *str, char *buf, int limit) {
+	// from oracpool my_strescape()
+	register char	*q=buf;
+	const char	*strend=str+charstring::length(str);
+	for (register const char *p=str; p<strend; p++) {
+		if (q-buf>=limit-1) {
+			break;
+		} else if (*p=='\n') { 
+			*(q++)='\\';
+			*(q++)='n';
+		} else if (*p=='\r') { 
+			*(q++)='\\';
+			*(q++)='r';
+		} else if (*p=='|') { 
+			*(q++)='\\';
+			*(q++)='|';
+		} else if (*p=='\\') { 
+			*(q++)='\\';
+			*(q++)='\\';
+		} else { 
+			*(q++)=*p;
+		}
+	}
+	*q='\0';
+	return (q-buf);
+}
 
-  for (p = str; p < strend; p++)
-  { 
+bool descInputBinds(sqlrcursor_svr *cursor, char *buf, int limit) {
 
-    if (q-buf >= limit-1)
-        break;
+	char		*c=buf;	
+	int		remain_len=limit;
+	int		write_len=0;
+	static char	bindstrbuf[512+1];
 
-    if (*p == '\n')
-    { 
-      *(q++) = '\\';
-      *(q++) = 'n';
-    }
-    else if (*p == '\r')
-    { 
-      *(q++) = '\\';
-      *(q++) = 'r';
-    }
-    else if (*p == '|')
-    { 
-      *(q++) = '\\';
-      *(q++) = '|';
-    }
-    else if (*p == '\\')
-    { 
-      *(q++) = '\\';
-      *(q++) = '\\';
-    }
-    else
-    { 
-      *(q++) = *p;
-    }
-  }
+	*c=0;
 
-  *q = '\0';
+	// fill the buffers
+	for (uint16_t i=0; i<cursor->inbindcount; i++) {
 
-  return (q - buf);
+		bindvar_svr	*bv=&(cursor->inbindvars[i]);
+	
+		write_len=snprintf(c,remain_len,"[%s => ",bv->variable);
+		c+=write_len;
+
+		remain_len-=write_len;
+		if (remain_len<=0) {
+			return false;
+		}
+
+		if (bv->type==NULL_BIND) {
+			write_len=snprintf(c,remain_len,"NULL]");
+		} else if (bv->type==STRING_BIND) {
+			strescape(bv->value.stringval,bindstrbuf,512);
+			write_len=snprintf(c,remain_len,"'%s']",bindstrbuf);
+		} else if (bv->type==INTEGER_BIND) {
+			write_len=snprintf(c,remain_len,"'%lld']",
+						bv->value.integerval);
+		} else if (bv->type==DOUBLE_BIND) {
+			write_len=snprintf(c,remain_len,"%lf]",
+						bv->value.doubleval.value);
+		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
+			write_len=snprintf(c,remain_len,"LOB]");
+		}
+
+		c+=write_len;
+		remain_len-=write_len;
+
+		if (remain_len<=0) {
+			return false;
+		}
+	}
+	return true;
 }
 
 bool sqlrconnection_svr::initQueryLog() {
@@ -140,19 +170,17 @@ bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor) {
 		cursor->errorCode(errorcodebuf,100);
 	}*/
 
-	// write the query into a buffer and escape it
+	// escape the query
 	static char	sqlbuf[7000+1];
 	strescape(cursor->stats.query,sqlbuf,7000);
 
-	// write the client info into a buffer and escape it
+	// escape the client info
 	static char	infobuf[1024+1];
 	strescape(clientinfo,infobuf,1024);
 
-	// write the input bind values into a buffer
-	char		bindbuf[1000+1];
-	bindbuf[0]='\0';
-	// FIXME: implement this...
-	//descInputBinds(cursor,bindbuf,1000);
+	// escape the input bind variables
+	char	bindbuf[1000+1];
+	descInputBinds(cursor,bindbuf,1000);
 
 	// get the client address
 	char	*clientaddrbuf=NULL;
@@ -171,7 +199,7 @@ bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor) {
 
 	// write everything into an output buffer, pipe-delimited
 	snprintf(querylogbuf,sizeof(querylogbuf)-1,
-		"%04d-%02d-%02d %02d:%02d:%02d|%d|%f|%s|%d|%s|%s|%f|%s|%s|\n",
+		"%04d-%02d-%02d %02d:%02d:%02d|%d|%f|%s|%lld|%s|%s|%f|%s|%s|\n",
 		dt.getYear(),
 		dt.getMonth(),
 		dt.getDayOfMonth(),
@@ -185,9 +213,7 @@ bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor) {
 		// intend to store here
 		cursor->stats.sec+cursor->stats.usec/1000000.0,
 		errorcodebuf,
-		// FIXME: implement this...
-		//cursor->returned_row,
-		0,
+		(cursor->lastrowvalid)?cursor->lastrow:0,
         	infobuf,
 		sqlbuf,
 		// FIXME: validate that this is really the time they
@@ -197,6 +223,7 @@ bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor) {
 		bindbuf
 		);
 
+	// clean up
 	delete[] clientaddrbuf;
 
 	// write that buffer to the log file

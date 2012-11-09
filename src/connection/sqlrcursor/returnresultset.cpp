@@ -37,9 +37,11 @@ void sqlrcursor_svr::returnRow() {
 void sqlrcursor_svr::getField(uint32_t col,
 				const char **field, uint64_t *fieldlength,
 				bool *blob, bool *null) {
+	// by default, do nothing
 }
 
 void sqlrcursor_svr::nextRow() {
+	// by default, do nothing
 }
 
 #define MAX_BYTES_PER_CHAR	4
@@ -115,5 +117,5 @@ bool sqlrcursor_svr::getLobFieldSegment(uint32_t col,
 }
 
 void sqlrcursor_svr::cleanUpLobField(uint32_t col) {
-	// do nothing by default
+	// by default, do nothing
 }
