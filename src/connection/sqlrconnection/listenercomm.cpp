@@ -129,6 +129,8 @@ void sqlrconnection_svr::registerForHandoff(const char *tmpdir) {
 							RESULT_SUCCESS) {
 			if (handoffsockun.write(
 				(uint32_t)process::getProcessId())==
+							sizeof(uint32_t) &&
+				handoffsockun.read(&handoffindex)==
 							sizeof(uint32_t)) {
 				connected=true;
 				break;

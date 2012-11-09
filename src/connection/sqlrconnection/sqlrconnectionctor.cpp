@@ -56,6 +56,8 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 	maxlobbindvaluelength=0;
 	idleclienttimeout=-1;
 
+	handoffindex=0;
+
 	connected=false;
 	inclientsession=false;
 	loggedin=false;

@@ -206,9 +206,7 @@ bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor) {
 		dt.getHour(),
 		dt.getMinutes(),
 		dt.getSeconds(),
-		// FIXME: implement this...
-		//my_index, 
-		0,
+		handoffindex, 
 		// FIXME: validate that this is really the time they
 		// intend to store here
 		cursor->stats.sec+cursor->stats.usec/1000000.0,

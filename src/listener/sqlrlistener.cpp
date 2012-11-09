@@ -107,7 +107,7 @@ void sqlrlistener::cleanUp() {
 	delete handoffsockun;
 
 	if (handoffsocklist) {
-		for (int32_t i=0; i<maxconnections; i++) {
+		for (uint32_t i=0; i<maxconnections; i++) {
 			delete handoffsocklist[i].sock;
 		}
 		delete[] handoffsocklist;
@@ -307,7 +307,7 @@ void sqlrlistener::setHandoffMethod() {
 
 		// create the list of handoff nodes
 		handoffsocklist=new handoffsocketnode[maxconnections];
-		for (int32_t i=0; i<maxconnections; i++) {
+		for (uint32_t i=0; i<maxconnections; i++) {
 			handoffsocklist[i].pid=0;
 			handoffsocklist[i].sock=NULL;
 		}
@@ -1027,15 +1027,16 @@ bool sqlrlistener::registerHandoff(filedescriptor *sock) {
 	// find a free node in the list, if we find another node with the
 	// same pid, then the old connection must have died off mysteriously,
 	// replace it
-	bool	inserted=false;
-	for (int32_t i=0; i<maxconnections; i++) {
-		if (!handoffsocklist[i].pid) {
-			handoffsocklist[i].pid=processid;
-			handoffsocklist[i].sock=sock;
+	bool		inserted=false;
+	uint32_t	index=0;
+	for (; index<maxconnections; index++) {
+		if (!handoffsocklist[index].pid) {
+			handoffsocklist[index].pid=processid;
+			handoffsocklist[index].sock=sock;
 			inserted=true;
 			break;
-		} else if (handoffsocklist[i].pid==processid) {
-			handoffsocklist[i].sock=sock;
+		} else if (handoffsocklist[index].pid==processid) {
+			handoffsocklist[index].sock=sock;
 			inserted=true;
 			break;
 		}
@@ -1048,7 +1049,7 @@ bool sqlrlistener::registerHandoff(filedescriptor *sock) {
 	if (inserted==false) {
 		handoffsocketnode	*newhandoffsocklist=
 				new handoffsocketnode[maxconnections+1];
-		for (int32_t i=0; i<maxconnections; i++) {
+		for (uint32_t i=0; i<maxconnections; i++) {
 			newhandoffsocklist[i].pid=handoffsocklist[i].pid;
 			newhandoffsocklist[i].sock=handoffsocklist[i].sock;
 		}
@@ -1057,6 +1058,13 @@ bool sqlrlistener::registerHandoff(filedescriptor *sock) {
 		newhandoffsocklist[maxconnections].sock=sock;
 		maxconnections++;
 		handoffsocklist=newhandoffsocklist;
+	}
+
+	// write the index back to the connection daemon
+	if (sock->write(index)!=sizeof(uint32_t)) {
+		dbgfile.debugPrint("listener",1,"failed to write index");
+		delete sock;
+		return false;
 	}
 
 	dbgfile.debugPrint("listener",0,"finished registering handoff...");
@@ -1076,7 +1084,7 @@ bool sqlrlistener::deRegisterHandoff(filedescriptor *sock) {
 	}
 
 	// remove the matching socket from the list
-	for (int32_t i=0; i<maxconnections; i++) {
+	for (uint32_t i=0; i<maxconnections; i++) {
 		if (handoffsocklist[i].pid==processid) {
 			handoffsocklist[i].pid=0;
 			delete handoffsocklist[i].sock;
@@ -1107,7 +1115,7 @@ bool sqlrlistener::fixup(filedescriptor *sock) {
 
 	// look through the handoffsocklist for the pid
 	bool	retval=false;
-	for (int32_t i=0; i<maxconnections; i++) {
+	for (uint32_t i=0; i<maxconnections; i++) {
 		if (handoffsocklist[i].pid==processid) {
 			retval=sock->passFileDescriptor(handoffsocklist[i].
 						sock->getFileDescriptor());
@@ -2037,7 +2045,7 @@ bool sqlrlistener::findMatchingSocket(uint32_t connectionpid,
 	// connection that we got during the call to getAConnection().
 	// When we find it, send the descriptor of the clientsock to the 
 	// connection over the handoff socket associated with that node.
-	for (int32_t i=0; i<maxconnections; i++) {
+	for (uint32_t i=0; i<maxconnections; i++) {
 		if (handoffsocklist[i].pid==connectionpid) {
 			connectionsock->setFileDescriptor(handoffsocklist[i].
 						sock->getFileDescriptor());

@@ -483,6 +483,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		sqlrcursor_svr	**cur;
 
 		unixclientsocket	handoffsockun;
+		uint32_t		handoffindex;
+
 		bool			connected;
 		bool			inclientsession;
 		bool			loggedin;

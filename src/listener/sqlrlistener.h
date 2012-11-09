@@ -122,7 +122,7 @@ class sqlrlistener : public rudiments::daemonprocess,
 
 		bool		passdescriptor;
 
-		int32_t		maxconnections;
+		uint32_t	maxconnections;
 		bool		dynamicscaling;
 
 		int64_t		maxlisteners;
