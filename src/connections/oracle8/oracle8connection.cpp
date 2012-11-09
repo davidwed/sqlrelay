@@ -728,6 +728,15 @@ void oracle8connection::errorMessage(const char **errorstring,
 	OCIErrorGet((dvoid *)err,1,(text *)0,&errcode,
 			message,sizeof(message),OCI_HTYPE_ERROR);
 	message[1023]='\0';
+
+	// truncate the trailing \n
+	size_t	errorlen=charstring::length((char *)message);
+	char	*last=(char *)message+errorlen-1;
+	if (*last=='\n') {
+		*last='\0';
+	}
+
+	// store the error
 	errormessage.clear();
 	errormessage.append((const char *)message);
 
