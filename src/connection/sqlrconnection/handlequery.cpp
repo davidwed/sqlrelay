@@ -7,9 +7,9 @@
 #include <sys/time.h>
 
 bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
-						bool reexecute,
-						bool bindcursor,
-						bool getquery) {
+							bool reexecute,
+							bool bindcursor,
+							bool getquery) {
 
 
 	dbgfile.debugPrint("connection",1,"handling query...");
@@ -259,7 +259,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 
 		dbgfile.debugPrint("connection",3,"re-executing...");
 		success=(cursor->handleBinds() && 
-			executeQueryInternal(cursor,
+				executeQueryInternal(cursor,
 						cursor->querybuffer,
 						cursor->querylength));
 
@@ -290,30 +290,17 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 
 		} else {
 
-			const char	*queryptr=cursor->querybuffer;
-			uint32_t	querylen=cursor->querylength;
-
 			// fake input binds if necessary
-			stringbuffer	*newquery=NULL;
 			if (cursor->fakeinputbindsforthisquery ||
-				!cursor->supportsNativeBinds()) {
-
+					!cursor->supportsNativeBinds()) {
 				dbgfile.debugPrint("connection",3,
 							"faking binds...");
-
-				newquery=cursor->fakeInputBinds(
-						cursor->querybuffer);
-
-				queryptr=(newquery)?
-						newquery->getString():
-						cursor->querybuffer;
-				querylen=(newquery)?
-						newquery->getStringLength():
-						cursor->querylength;
+				cursor->fakeInputBinds();
 			}
 
 			// prepare
-			success=cursor->prepareQuery(queryptr,querylen);
+			success=cursor->prepareQuery(cursor->querybuffer,
+							cursor->querylength);
 
 			// if we're not faking binds then
 			// handle the binds for real
@@ -325,12 +312,10 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 
 			// execute
 			if (success) {
-				success=executeQueryInternal(
-					cursor,queryptr,querylen);
+				success=executeQueryInternal(cursor,
+							cursor->querybuffer,
+							cursor->querylength);
 			}
-
-			// clean up
-			delete newquery;
 		}
 	}
 
@@ -399,6 +384,7 @@ bool sqlrconnection_svr::executeQueryInternal(sqlrcursor_svr *curs,
 
 	if (cfgfl->getTimeQueriesSeconds()>-1 &&
 		cfgfl->getTimeQueriesMicroSeconds()>-1) {
+
 		// get the query start time
 		gettimeofday(&starttv,&starttz);
 	}

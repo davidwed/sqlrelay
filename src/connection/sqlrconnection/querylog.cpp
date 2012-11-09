@@ -156,19 +156,17 @@ bool sqlrconnection_svr::writeQueryLog(sqlrcursor_svr *cursor) {
 // Neowiz stuff...
 
 	// get error, if there was one
-	// FIXME:  Errors should be handled in more structured way --replica
 	static char	errorcodebuf[100+1];
 	errorcodebuf[0]='\0';
-	// FIXME: implement this...
-	/*if (cursor->stats.result) {
+	if (cursor->stats.result) {
 		charstring::copy(errorcodebuf,"0");
-	} else if (cursor->sqlr_error[0]) {
-		charstring::copy(errorcodebuf,cursor->sqlr_error,100);
+	/*} else if (cursor->sqlr_error[0]) {
+		snprintf(errorcodebuf,100,cursor->sqlr_error);
 	} else if (cursor->sqlrcmd_error[0]) {
-		charstring::copy(errorcodebuf,cursor->sqlrcmd_error,100);
+		snprintf(errorcodebuf,100,cursor->sqlrcmd_error);*/
 	} else {
-		cursor->errorCode(errorcodebuf,100);
-	}*/
+		snprintf(errorcodebuf,100,cursor->stats.error);
+	}
 
 	// escape the query
 	static char	sqlbuf[7000+1];

@@ -8,6 +8,14 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 	this->conn=conn;
 	inbindcount=0;
 	outbindcount=0;
+
+	stats.query=NULL;
+	stats.result=false;
+	stats.error=NULL;
+	stats.errnum=0;
+	stats.sec=0;
+	stats.usec=0;
+	
 	busy=false;
 
 	createtemp.compile("(create|CREATE|declare|DECLARE)[ \\t\\r\\n]+((global|GLOBAL|local|LOCAL)?[ \\t\\r\\n]+)?(temp|TEMP|temporary|TEMPORARY)?[ \\t\\r\\n]+(table|TABLE)[ \\t\\r\\n]+");

@@ -249,7 +249,7 @@ class sqlrcursor_svr {
 		bool	skipComment(char **ptr, const char *endptr);
 		bool	skipWhitespace(char **ptr, const char *endptr);
 		char	*skipWhitespaceAndComments(const char *querybuffer);
-		stringbuffer	*fakeInputBinds(const char *query);
+		void	fakeInputBinds();
 
 		bool	advance(char **ptr, const char *endptr,
 						uint16_t steps);
