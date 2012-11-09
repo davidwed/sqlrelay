@@ -571,8 +571,7 @@ bool postgresqlcursor::supportsNativeBinds() {
 #endif
 }
 
-bool postgresqlcursor::executeQuery(const char *query, uint32_t length,
-							bool execute) {
+bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 
 	// initialize the counts
 	ncols=0;

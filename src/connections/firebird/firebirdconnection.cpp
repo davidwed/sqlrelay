@@ -738,8 +738,7 @@ bool firebirdcursor::outputBindDate(const char *variable,
 	return true;
 }
 
-bool firebirdcursor::executeQuery(const char *query, uint32_t length,
-							bool execute) {
+bool firebirdcursor::executeQuery(const char *query, uint32_t length) {
 
 	// for commit or rollback, execute the API call and return
 	if (querytype==isc_info_sql_stmt_commit) {

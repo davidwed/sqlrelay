@@ -52,8 +52,7 @@ bool sqlrconnection_svr::begin() {
 	// have an ID that might already exist
 	if (begincur->openCursorInternal(cursorcount+1) &&
 		begincur->prepareQuery(beginquery,beginquerylen)) {
-		retval=executeQueryInternal(begincur,beginquery,
-						beginquerylen,true);
+		retval=executeQueryInternal(begincur,beginquery,beginquerylen);
 	}
 
 	// If there was an error, copy it out.  We'll be destroying the

@@ -264,8 +264,7 @@ bool sqlitecursor::inputBindClob(const char *variable,
 }
 #endif*/
 
-bool sqlitecursor::executeQuery(const char *query, uint32_t length,
-							bool execute) {
+bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 
 	// execute the query
 	int	success=0;

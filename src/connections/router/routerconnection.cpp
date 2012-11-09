@@ -604,12 +604,7 @@ void routercursor::returnOutputBindClob(uint16_t index) {
 	conn->endSendingLong();
 }
 
-bool routercursor::executeQuery(const char *query, uint32_t length,
-							bool execute) {
-
-	if (!execute) {
-		return true;
-	}
+bool routercursor::executeQuery(const char *query, uint32_t length) {
 
 	if (beginquery) {
 		if (routerconn->anymustbegin) {
@@ -684,7 +679,6 @@ bool routercursor::executeQuery(const char *query, uint32_t length,
 	}
 	return true;
 }
-
 
 void routercursor::checkForTempTable(const char *query, uint32_t length) {
 

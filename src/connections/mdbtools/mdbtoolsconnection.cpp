@@ -176,8 +176,7 @@ bool mdbtoolscursor::supportsNativeBinds() {
 	return false;
 }
 
-bool mdbtoolscursor::executeQuery(const char *query, uint32_t length,
-							bool execute) {
+bool mdbtoolscursor::executeQuery(const char *query, uint32_t length) {
 
 	cursortype=QUERY_CURSORTYPE;
 

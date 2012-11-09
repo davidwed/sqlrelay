@@ -226,7 +226,7 @@ bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
 	sqlrcursor_svr	*cur=sqlrcon->initCursorInternal();
 	if (cur->openCursorInternal(sqlrcon->cursorcount+1) &&
 		cur->prepareQuery(query,length) &&
-		sqlrcon->executeQueryInternal(cur,query,length,true)) {
+		sqlrcon->executeQueryInternal(cur,query,length)) {
 		// success...
 		retval=true;
 		if (sqlrcon->debugtriggers) {

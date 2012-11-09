@@ -101,8 +101,7 @@ class freetdscursor : public sqlrcursor_svr {
 						int16_t *isnull);
 #endif
 		bool		executeQuery(const char *query,
-						uint32_t length,
-						bool execute);
+						uint32_t length);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
 		bool		knowsAffectedRows();

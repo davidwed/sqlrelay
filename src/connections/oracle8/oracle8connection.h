@@ -177,6 +177,10 @@ class oracle8cursor : public sqlrcursor_svr {
 					uint64_t *charsread);
 #endif
 		bool		executeQuery(const char *query,
+						uint32_t length);
+		bool		fetchFromBindCursor();
+		bool		executeQueryOrFetchFromBindCursor(
+						const char *query,
 						uint32_t length,
 						bool execute);
 		bool		validBinds();

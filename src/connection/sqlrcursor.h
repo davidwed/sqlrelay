@@ -157,8 +157,8 @@ class sqlrcursor_svr {
 		virtual void	checkForTempTable(const char *query,
 							uint32_t length);
 		virtual	bool	executeQuery(const char *query,
-							uint32_t length,
-							bool execute)=0;
+							uint32_t length)=0;
+		virtual bool	fetchFromBindCursor();
 		virtual	bool		queryIsNotSelect();
 		virtual	bool		queryIsCommitOrRollback();
 		virtual	void		errorMessage(const char **errorstring,
@@ -298,8 +298,10 @@ class sqlrcursor_svr {
 		struct {
 			const char	*query;
 			bool		result;
-			uint64_t	sec;
-			uint64_t	usec;
+			const char	*error;
+			int64_t		errnum;
+			int64_t		sec;
+			int64_t		usec;
 		} stats;
 
 		bool		lastrowvalid;

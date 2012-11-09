@@ -54,7 +54,7 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id, char **error) {
 	bool	retval=false;
 	if (liicur->openCursorInternal(cursorcount+1) &&
 		liicur->prepareQuery(liiquery,liiquerylen) &&
-		executeQueryInternal(liicur,liiquery,liiquerylen,true)) {
+		executeQueryInternal(liicur,liiquery,liiquerylen)) {
 
 		if (!liicur->noRowsToReturn() && liicur->fetchRow()) {
 

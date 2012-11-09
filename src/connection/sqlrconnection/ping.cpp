@@ -21,7 +21,7 @@ bool sqlrconnection_svr::ping() {
 	// have an ID that might already exist
 	if (pingcur->openCursorInternal(cursorcount+1) &&
 		pingcur->prepareQuery(pingquery,pingquerylen) &&
-		executeQueryInternal(pingcur,pingquery,pingquerylen,true)) {
+		executeQueryInternal(pingcur,pingquery,pingquerylen)) {
 		pingcur->cleanUpData(true,true);
 		pingcur->closeCursor();
 		deleteCursorInternal(pingcur);

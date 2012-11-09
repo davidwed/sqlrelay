@@ -31,7 +31,7 @@ void sqlrconnection_svr::dropTempTable(sqlrcursor_svr *cursor,
 	if (cursor->prepareQuery(dropquery.getString(),
 					dropquery.getStringLength())) {
 		executeQueryInternal(cursor,dropquery.getString(),
-					dropquery.getStringLength(),true);
+					dropquery.getStringLength());
 	}
 	cursor->cleanUpData(true,true);
 
@@ -61,7 +61,7 @@ void sqlrconnection_svr::truncateTempTable(sqlrcursor_svr *cursor,
 	if (cursor->prepareQuery(truncatequery.getString(),
 					truncatequery.getStringLength())) {
 		executeQueryInternal(cursor,truncatequery.getString(),
-					truncatequery.getStringLength(),true);
+					truncatequery.getStringLength());
 	}
 	cursor->cleanUpData(true,true);
 }

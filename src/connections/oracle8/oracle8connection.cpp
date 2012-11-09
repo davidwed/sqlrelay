@@ -1926,10 +1926,22 @@ void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 }
 #endif
 
-bool oracle8cursor::executeQuery(const char *query, uint32_t length,
+bool oracle8cursor::executeQuery(const char *query, uint32_t length) {
+	return executeQueryOrFetchFromBindCursor(query,length,true);
+}
+
+bool oracle8cursor::fetchFromBindCursor() {
+	return executeQueryOrFetchFromBindCursor(NULL,0,false);
+}
+
+bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
+							uint32_t length,
 							bool execute) {
 
-	// initialize the column count
+	// initialize the row and column counters
+	row=0;
+	maxrow=0;
+	totalrows=0;
 	ncols=0;
 
 	// get the type of the query (select, insert, update, etc...)
@@ -1939,20 +1951,15 @@ bool oracle8cursor::executeQuery(const char *query, uint32_t length,
 		return false;
 	}
 
-#ifdef HAVE_ORACLE_8i
-	// check for create temp table query
-	if (execute && stmttype==OCI_STMT_CREATE) {
-		checkForTempTable(query,length);
-	}
-#endif
-
-	// initialize row counters
-	row=0;
-	maxrow=0;
-	totalrows=0;
-
 	// execute the query
 	if (execute) {
+
+#ifdef HAVE_ORACLE_8i
+		// check for create temp table query
+		if (stmttype==OCI_STMT_CREATE) {
+			checkForTempTable(query,length);
+		}
+#endif
 
 		// validate binds
 		if (!validBinds()) {

@@ -567,7 +567,7 @@ bool db2cursor::outputBindDate(const char *variable,
 	return true;
 }
 
-bool db2cursor::executeQuery(const char *query, uint32_t length, bool execute) {
+bool db2cursor::executeQuery(const char *query, uint32_t length) {
 
 	// initialize counts
 	ncols=0;

@@ -43,7 +43,7 @@ bool sqlrconnection_svr::commit() {
 	if (commitcur->openCursorInternal(cursorcount+1) &&
 		commitcur->prepareQuery(commitquery,commitquerylen)) {
 		retval=executeQueryInternal(commitcur,commitquery,
-						commitquerylen,true);
+							commitquerylen);
 	}
 
 	// If there was an error, copy it out.  We'll be destroying the

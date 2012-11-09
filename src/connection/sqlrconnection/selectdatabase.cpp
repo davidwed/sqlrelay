@@ -92,7 +92,7 @@ bool sqlrconnection_svr::selectDatabase(const char *database, char **error) {
 	bool	retval=false;
 	if (sdcur->openCursorInternal(cursorcount+1) &&
 		sdcur->prepareQuery(sdquery,sdquerylen) &&
-		executeQueryInternal(sdcur,sdquery,sdquerylen,true)) {
+		executeQueryInternal(sdcur,sdquery,sdquerylen)) {
 		sdcur->cleanUpData(true,true);
 		retval=true;
 

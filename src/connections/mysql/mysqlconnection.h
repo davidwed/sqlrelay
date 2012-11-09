@@ -73,8 +73,7 @@ class mysqlcursor : public sqlrcursor_svr {
 						int16_t *isnull);
 #endif
 		bool		executeQuery(const char *query,
-						uint32_t length,
-						bool execute);
+						uint32_t length);
 		void		errorMessage(const char **errorstring,
 						int64_t	*errorcode,
 						bool *liveconnection);

@@ -112,7 +112,7 @@ bool droptableautoincrementoracle::dropSequences(sqlrconnection_svr *sqlrcon,
 	if (cur->openCursorInternal(sqlrcon->cursorcount+1) &&
 		cur->prepareQuery(query.getString(),query.getStringLength()) &&
 		sqlrcon->executeQueryInternal(cur,query.getString(),
-						query.getStringLength(),true)) {
+						query.getStringLength())) {
 
 		// success...
 		if (sqlrcon->debugtriggers) {
@@ -176,7 +176,7 @@ bool droptableautoincrementoracle::dropSequence(sqlrconnection_svr *sqlrcon,
 	if (cur->openCursorInternal(sqlrcon->cursorcount+1) &&
 		cur->prepareQuery(query.getString(),query.getStringLength()) &&
 		sqlrcon->executeQueryInternal(cur,query.getString(),
-						query.getStringLength(),true)) {
+						query.getStringLength())) {
 		// success...
 		if (sqlrcon->debugtriggers) {
 			printf("success\n\n");
@@ -220,7 +220,7 @@ bool droptableautoincrementoracle::deleteSequence(sqlrconnection_svr *sqlrcon,
 	if (cur->openCursorInternal(sqlrcon->cursorcount+1) &&
 		cur->prepareQuery(query.getString(),query.getStringLength()) &&
 		sqlrcon->executeQueryInternal(cur,query.getString(),
-						query.getStringLength(),true)) {
+						query.getStringLength())) {
 		// success...
 		if (sqlrcon->debugtriggers) {
 			printf("success\n\n");

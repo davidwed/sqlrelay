@@ -420,8 +420,7 @@ bool sybasecursor::openCursor(uint16_t id) {
 		int32_t	len=charstring::length(sybaseconn->db)+4;
 		char	query[len+1];
 		snprintf(query,len+1,"use %s",sybaseconn->db);
-		if (!(prepareQuery(query,len) &&
-				executeQuery(query,len,true))) {
+		if (!(prepareQuery(query,len) && executeQuery(query,len))) {
 			const char	*err;
 			int64_t		errnum;
 			bool		live;
@@ -438,7 +437,7 @@ bool sybasecursor::openCursor(uint16_t id) {
 		const char	*query="sp_version installmaster";
 		int32_t		len=charstring::length(query);
 		if (!(prepareQuery(query,len) &&
-				executeQuery(query,len,true) &&
+				executeQuery(query,len) &&
 				fetchRow())) {
 			sybaseconn->dbversion=
 				charstring::duplicate("unknown");
@@ -819,8 +818,7 @@ bool sybasecursor::outputBindDate(const char *variable,
 	return true;
 }
 
-bool sybasecursor::executeQuery(const char *query, uint32_t length,
-							bool execute) {
+bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 
 	// clear out any errors
 	sybaseconn->errorstring.clear();
@@ -1436,7 +1434,7 @@ void sybaseconnection::dropTempTable(sqlrcursor_svr *cursor,
 	if (cursor->prepareQuery(dropquery.getString(),
 					dropquery.getStringLength())) {
 		cursor->executeQuery(dropquery.getString(),
-					dropquery.getStringLength(),1);
+					dropquery.getStringLength());
 	}
 	cursor->cleanUpData(true,true);
 }

@@ -121,8 +121,7 @@ class odbccursor : public sqlrcursor_svr {
 		short		nullBindValue();
 		bool		bindValueIsNull(short isnull);
 		bool		executeQuery(const char *query,
-						uint32_t length,
-						bool execute);
+						uint32_t length);
 		bool		handleColumns();
 		void		errorMessage(const char **errorstring,
 						int64_t	*errorcode,

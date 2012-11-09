@@ -94,8 +94,7 @@ class sybasecursor : public sqlrcursor_svr {
 						uint16_t buffersize,
 						int16_t *isnull);
 		bool		executeQuery(const char *query,
-						uint32_t length,
-						bool execute);
+						uint32_t length);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
 		bool		knowsAffectedRows();

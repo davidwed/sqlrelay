@@ -642,8 +642,7 @@ bool mysqlcursor::inputBindClob(const char *variable,
 }
 #endif
 
-bool mysqlcursor::executeQuery(const char *query, uint32_t length,
-							bool execute) {
+bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 
 	// initialize counts
 	ncols=0;

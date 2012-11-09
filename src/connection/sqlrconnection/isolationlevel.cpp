@@ -39,7 +39,7 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 	bool	retval=false;
 	if (silcur->openCursorInternal(cursorcount+1) &&
 		silcur->prepareQuery(silquery,silquerylen) &&
-		executeQueryInternal(silcur,silquery,silquerylen,true)) {
+		executeQueryInternal(silcur,silquery,silquerylen)) {
 		retval=true;
 	}
 

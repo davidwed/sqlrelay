@@ -44,7 +44,7 @@ bool sqlrconnection_svr::rollback() {
 	if (rollbackcur->openCursorInternal(cursorcount+1) &&
 		rollbackcur->prepareQuery(rollbackquery,rollbackquerylen)) {
 		retval=executeQueryInternal(rollbackcur,rollbackquery,
-						rollbackquerylen,true);
+							rollbackquerylen);
 	}
 
 	// If there was an error, copy it out.  We'll be destroying the

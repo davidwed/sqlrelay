@@ -424,7 +424,7 @@ bool sqlrconnection_svr::getColumnNames(const char *query,
 	bool	retval=false;
 	if (gcncur->openCursorInternal(cursorcount+1) &&
 		gcncur->prepareQuery(query,querylen) &&
-		executeQueryInternal(gcncur,query,querylen,true)) {
+		executeQueryInternal(gcncur,query,querylen)) {
 
 		// build column list...
 		retval=gcncur->getColumnNameList(output);

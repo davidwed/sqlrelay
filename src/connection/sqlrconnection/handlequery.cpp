@@ -69,7 +69,6 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 						&liveconnection);
 		}
 
-
 		if (success) {
 
 			// indicate that no error has occurred
@@ -93,12 +92,6 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 
 			dbgfile.debugPrint("connection",1,
 						"handle query succeeded");
-
-			// handle after-triggers
-			if (sqltr) {
-				sqltr->runAfterTriggers(this,cursor,
-						cursor->querytree,true);
-			}
 
 			// reinit lastrow
 			cursor->lastrowvalid=false;
@@ -138,18 +131,16 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 				}
 			}
 
-			// handle after-triggers
-			if (sqltr) {
-				sqltr->runAfterTriggers(this,cursor,
-						cursor->querytree,false);
-			}
-
 			break;
 		}
 	}
 
-	// FIXME: this is where neowiz calls their log function
-	// but this won't log queries run by triggers
+	// write out a log entry
+	// FIXME: queries run by triggers won't get logged here
+	if (cursor->stats.sec>=cfgfl->getTimeQueriesSeconds() &&
+		cursor->stats.usec>=cfgfl->getTimeQueriesMicroSeconds()) {
+		writeQueryLog(cursor);
+	}
 	return true;
 }
 
@@ -263,20 +254,14 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 		cursor->supportsNativeBinds()) {
 
 		// if we're reexecuting and not faking binds then
-		// the statement doesn't need to be prepared again...
-
-		// handle before-triggers
-		if (sqltr) {
-			sqltr->runBeforeTriggers(this,cursor,
-						cursor->querytree);
-		}
+		// the statement doesn't need to be prepared again,
+		// just execute it...
 
 		dbgfile.debugPrint("connection",3,"re-executing...");
 		success=(cursor->handleBinds() && 
 			executeQueryInternal(cursor,
 						cursor->querybuffer,
-						cursor->querylength,
-						true));
+						cursor->querylength));
 
 	} else if (bindcursor) {
 
@@ -284,7 +269,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 		// then we just need to execute...
 
 		dbgfile.debugPrint("connection",3,"bind cursor...");
-		success=executeQueryInternal(cursor,NULL,0,false);
+		success=cursor->fetchFromBindCursor();
 
 	} else {
 
@@ -304,12 +289,6 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			success=true;
 
 		} else {
-
-			// handle before-triggers
-			if (sqltr) {
-				sqltr->runBeforeTriggers(this,cursor,
-							cursor->querytree);
-			}
 
 			const char	*queryptr=cursor->querybuffer;
 			uint32_t	querylen=cursor->querylength;
@@ -347,7 +326,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			// execute
 			if (success) {
 				success=executeQueryInternal(
-					cursor,queryptr,querylen,true);
+					cursor,queryptr,querylen);
 			}
 
 			// clean up
@@ -372,7 +351,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	// fakeautocommit, so this code won't get called at all for those 
 	// connections.
 	// FIXME: when faking autocommit, a BEGIN on a db that supports them
-	// could get commit called immediately committed
+	// could cause commit to be called immediately
 	if (success && isTransactional() && commitorrollback &&
 					fakeautocommit && autocommit) {
 		dbgfile.debugPrint("connection",3,"commit necessary...");
@@ -382,6 +361,9 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	// if the query failed, get the error
 	if (!success) {
 		cursor->errorMessage(error,errnum,liveconnection);
+		// FIXME: errors for queries run by triggers won't be set here
+		cursor->stats.error=*error;
+		cursor->stats.errnum=*errnum;
 	}
 
 	if (success) {
@@ -397,8 +379,12 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 
 bool sqlrconnection_svr::executeQueryInternal(sqlrcursor_svr *curs,
 							const char *query,
-							uint32_t length,
-							bool execute) {
+							uint32_t length) {
+
+	// handle before-triggers
+	if (sqltr) {
+		sqltr->runBeforeTriggers(this,curs,curs->querytree);
+	}
 
 	// update query count
 	semset->waitWithUndo(9);
@@ -418,7 +404,7 @@ bool sqlrconnection_svr::executeQueryInternal(sqlrcursor_svr *curs,
 	}
 
 	// execute the query
-	bool	result=curs->executeQuery(query,length,execute);
+	bool	result=curs->executeQuery(query,length);
 
 	if (cfgfl->getTimeQueriesSeconds()>-1 &&
 		cfgfl->getTimeQueriesMicroSeconds()>-1) {
@@ -431,16 +417,6 @@ bool sqlrconnection_svr::executeQueryInternal(sqlrcursor_svr *curs,
 		curs->stats.result=result;
 		curs->stats.sec=endtv.tv_sec-starttv.tv_sec;
 		curs->stats.usec=endtv.tv_usec-starttv.tv_usec;
-
-		// write out a log entry
-		if (curs->stats.sec>=
-				(uint64_t)cfgfl->getTimeQueriesSeconds() &&
-			curs->stats.usec>=
-				(uint64_t)cfgfl->getTimeQueriesMicroSeconds()) {
-
-			// FIXME: this won't log errors or result sets
-			writeQueryLog(curs);
-		}
 	}
 
 	// update error count
@@ -448,9 +424,14 @@ bool sqlrconnection_svr::executeQueryInternal(sqlrcursor_svr *curs,
 		semset->waitWithUndo(9);
 		statistics->total_errors++;
 		semset->signalWithUndo(9);
-		return false;
 	}
-	return true;
+
+	// handle after-triggers
+	if (sqltr) {
+		sqltr->runAfterTriggers(this,curs,curs->querytree,true);
+	}
+
+	return result;
 }
 
 void sqlrconnection_svr::commitOrRollback(sqlrcursor_svr *cursor) {

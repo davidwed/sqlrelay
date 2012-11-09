@@ -59,8 +59,7 @@ class sqlitecursor : public sqlrcursor_svr {
 						int16_t *isnull);
 #endif*/
 		bool		executeQuery(const char *query,
-						uint32_t length,
-						bool execute);
+						uint32_t length);
 		int		runQuery(const char *query);
 		void		selectLastInsertRowId();
 		bool		knowsRowCount();

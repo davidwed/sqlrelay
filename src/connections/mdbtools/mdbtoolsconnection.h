@@ -34,8 +34,7 @@ class mdbtoolscursor : public sqlrcursor_svr {
 		bool		closeCursor();
 		bool		supportsNativeBinds();
 		bool		executeQuery(const char *query,
-						uint32_t length,
-						bool execute);
+						uint32_t length);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
 		bool		knowsAffectedRows();

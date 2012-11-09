@@ -127,8 +127,7 @@ class routercursor : public sqlrcursor_svr {
 		void		returnOutputBindBlob(uint16_t index);
 		void		returnOutputBindClob(uint16_t index);
 		bool		executeQuery(const char *query,
-						uint32_t length,
-						bool execute);
+						uint32_t length);
 		void		checkForTempTable(const char *query,
 							uint32_t length);
 		void		errorMessage(const char **errorstring,

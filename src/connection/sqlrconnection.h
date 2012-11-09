@@ -206,8 +206,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	deleteCursorInternal(sqlrcursor_svr *curs);
 		bool	executeQueryInternal(sqlrcursor_svr *curs,
 							const char *query,
-							uint32_t length,
-							bool execute);
+							uint32_t length);
 
 	private:
 

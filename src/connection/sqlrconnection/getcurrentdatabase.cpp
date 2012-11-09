@@ -39,7 +39,7 @@ char *sqlrconnection_svr::getCurrentDatabase() {
 	char	*retval=NULL;
 	if (gcdcur->openCursorInternal(cursorcount+1) &&
 		gcdcur->prepareQuery(gcdquery,gcdquerylen) &&
-		executeQueryInternal(gcdcur,gcdquery,gcdquerylen,true)) {
+		executeQueryInternal(gcdcur,gcdquery,gcdquerylen)) {
 
 		if (!gcdcur->noRowsToReturn() && gcdcur->fetchRow()) {
 

@@ -507,8 +507,7 @@ bool freetdscursor::openCursor(uint16_t id) {
 		uint32_t	len=charstring::length(freetdsconn->db)+4;
 		char		query[len+1];
 		snprintf(query,len+1,"use %s",freetdsconn->db);
-		if (!(prepareQuery(query,len) &&
-				executeQuery(query,len,true))) {
+		if (!(prepareQuery(query,len) && executeQuery(query,len))) {
 			const char	*err;
 			int64_t		errnum;
 			bool		live;
@@ -525,7 +524,7 @@ bool freetdscursor::openCursor(uint16_t id) {
 		const char	*query="sp_version installmaster";
 		int32_t		len=charstring::length(query);
 		if (!(prepareQuery(query,len) &&
-				executeQuery(query,len,true) &&
+				executeQuery(query,len) &&
 				fetchRow())) {
 			freetdsconn->dbversion=
 				charstring::duplicate("unknown");
@@ -944,8 +943,7 @@ bool freetdscursor::outputBindDate(const char *variable,
 }
 #endif
 
-bool freetdscursor::executeQuery(const char *query, uint32_t length,
-							bool execute) {
+bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 
 	// clear out any errors
 	freetdsconn->errorstring.clear();
@@ -1637,7 +1635,7 @@ void freetdsconnection::dropTempTable(sqlrcursor_svr *cursor,
 	if (cursor->prepareQuery(dropquery.getString(),
 					dropquery.getStringLength())) {
 		cursor->executeQuery(dropquery.getString(),
-					dropquery.getStringLength(),1);
+					dropquery.getStringLength());
 	}
 	cursor->cleanUpData(true,true);
 }
