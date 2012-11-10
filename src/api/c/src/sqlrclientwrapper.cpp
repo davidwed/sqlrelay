@@ -29,9 +29,19 @@ void sqlrcon_free(sqlrcon sqlrconref) {
 	delete (sqlrconnection *)sqlrconref;
 }
 
-void sqlrcon_setTimeout(sqlrcon sqlrconref,
+void sqlrcon_setConnectTimeout(sqlrcon sqlrconref,
 			int32_t timeoutsec, int32_t timeoutusec) {
-	sqlrconref->setTimeout(timeoutsec,timeoutusec);
+	sqlrconref->setConnectTimeout(timeoutsec,timeoutusec);
+}
+
+void sqlrcon_setAuthenticationTimeout(sqlrcon sqlrconref,
+			int32_t timeoutsec, int32_t timeoutusec) {
+	sqlrconref->setAuthenticationTimeout(timeoutsec,timeoutusec);
+}
+
+void sqlrcon_setResponseTimeout(sqlrcon sqlrconref,
+			int32_t timeoutsec, int32_t timeoutusec) {
+	sqlrconref->setResponseTimeout(timeoutsec,timeoutusec);
 }
 
 void sqlrcon_endSession(sqlrcon sqlrconref) {

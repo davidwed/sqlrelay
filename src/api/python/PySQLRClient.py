@@ -40,13 +40,29 @@ class sqlrconnection:
     def __del__(self):
         CSQLRelay.sqlrcon_free(self.connection)
 
-    def setTimeout(self, timeoutsec, timeoutusec):
+    def setConnectTimeout(self, timeoutsec, timeoutusec):
         """
         Sets the server connect timeout in seconds
         and milliseconds.  Setting either parameter
         to -1 disables the timeout.
         """
-        return CSQLRelay.setTimeout(self.connection, timeoutsec, timeoutusec)
+        return CSQLRelay.setConnectTimeout(self.connection, timeoutsec, timeoutusec)
+
+    def setAuthenticationTimeout(self, timeoutsec, timeoutusec):
+        """
+        Sets the authentication timeout in seconds and
+        milliseconds.  Setting either parameter to -1 disables the
+        timeout.
+        """
+        return CSQLRelay.setAuthenticationTimeout(self.connection, timeoutsec, timeoutusec)
+
+    def setResponseTimeout(self, timeoutsec, timeoutusec):
+        """
+        Sets the response timeout (for queries, commits, rollbacks,
+        pings, etc.) in seconds and milliseconds.  Setting either
+        parameter to -1 disables the timeout.
+        """
+        return CSQLRelay.setResponseTimeout(self.connection, timeoutsec, timeoutusec)
 
     def endSession(self):
         """

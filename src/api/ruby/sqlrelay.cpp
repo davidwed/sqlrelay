@@ -52,15 +52,46 @@ static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
 
 /**
  *  call-seq:
- *  setTimeout(timeoutsec,timeoutusec)
+ *  setConnectTimeout(timeoutsec,timeoutusec)
  *
  *  Sets the server connect timeout in seconds and milliseconds.
  *  Setting either parameter to -1 disables the timeout. */
-static VALUE sqlrcon_setTimeout(VALUE self,
+static VALUE sqlrcon_setConnectTimeout(VALUE self,
 				VALUE timeoutsec, VALUE timeoutusec) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->setTimeout(NUM2INT(timeoutsec),NUM2INT(timeoutusec));
+	sqlrcon->setConnectTimeout(NUM2INT(timeoutsec),NUM2INT(timeoutusec));
+	return Qnil;
+}
+
+/**
+ *  call-seq:
+ *  setAuthenticationTimeout(timeoutsec,timeoutusec)
+ *
+ *  Sets the authentication timeout in seconds and
+ *  milliseconds.  Setting either parameter to -1 disables the
+ *  timeout. */
+static VALUE sqlrcon_setAuthenticationTimeout(VALUE self,
+				VALUE timeoutsec, VALUE timeoutusec) {
+	sqlrconnection	*sqlrcon;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	sqlrcon->setAuthenticationTimeout(NUM2INT(timeoutsec),
+						NUM2INT(timeoutusec));
+	return Qnil;
+}
+
+/**
+ *  call-seq:
+ *  setResponseTimeout(timeoutsec,timeoutusec)
+ *
+ *  Sets the response timeout (for queries, commits, rollbacks,
+ *  pings, etc.) in seconds and milliseconds.  Setting either
+ *  parameter to -1 disables the timeout. */
+static VALUE sqlrcon_setResponseTimeout(VALUE self,
+				VALUE timeoutsec, VALUE timeoutusec) {
+	sqlrconnection	*sqlrcon;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	sqlrcon->setResponseTimeout(NUM2INT(timeoutsec),NUM2INT(timeoutusec));
 	return Qnil;
 }
 
@@ -340,8 +371,8 @@ void Init_SQLRConnection() {
 	csqlrconnection=rb_define_class("SQLRConnection", rb_cObject);
 	rb_define_singleton_method(csqlrconnection,"new",
 				(CAST)sqlrcon_new,7);
-	rb_define_method(csqlrconnection,"setTimeout",
-				(CAST)sqlrcon_setTimeout,2);
+	rb_define_method(csqlrconnection,"setConnectTimeout",
+				(CAST)sqlrcon_setConnectTimeout,2);
 	rb_define_method(csqlrconnection,"endSession",
 				(CAST)sqlrcon_endSession,0);
 	rb_define_method(csqlrconnection,"suspendSession",

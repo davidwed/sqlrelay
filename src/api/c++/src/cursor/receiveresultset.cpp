@@ -85,7 +85,8 @@ uint16_t sqlrcursor::getErrorStatus() {
 
 	// get a flag indicating whether there's been an error or not
 	uint16_t	err;
-	if (getShort(&err)!=sizeof(uint16_t)) {
+	if (getShort(&err,sqlrc->responsetimeoutsec,
+				sqlrc->responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to determine whether an error occurred or not.\n A network error may have ocurred.");
 		return false;
 	}
@@ -282,6 +283,18 @@ bool sqlrcursor::fetchRowIntoBuffer(bool getallrows, uint64_t row,
 		return true;
 	}
 	return false;
+}
+
+int32_t sqlrcursor::getShort(uint16_t *integer,
+				int32_t timeoutsec, int32_t timeoutusec) {
+
+	// if the result set is coming from a cache file, read from
+	// the file, if not, read from the server
+	if (cachesource && cachesourceind) {
+		return cachesource->read(integer);
+	} else {
+		return sqlrc->cs->read(integer,timeoutsec,timeoutusec);
+	}
 }
 
 int32_t sqlrcursor::getShort(uint16_t *integer) {

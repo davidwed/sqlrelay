@@ -266,7 +266,7 @@ int main() {
 		}
 
 
-		if (strcmp("setTimeout", command) == TRUE) {
+		if (strcmp("setConnectTimeout", command) == TRUE) {
                 	long timeoutsec;
                 	long timeoutusec;
 
@@ -282,7 +282,49 @@ int main() {
 			}
 
 			// call function and encode result 
-			sqlrcon_setTimeout(con,timeoutsec,timeoutusec);
+			sqlrcon_setConnectTimeout(con,timeoutsec,timeoutusec);
+			ENCODE_VOID;   
+		}
+
+
+		if (strcmp("setAuthenticationTimeout", command) == TRUE) {
+                	long timeoutsec;
+                	long timeoutusec;
+
+			// check number of arguments
+		    	if (arity != 2) return ERR_NUMBER_OF_ARGS;
+
+			if (ei_decode_long(buf, &index, &timeoutsec)) { 
+				return ERR_DECODING_ARGS;
+			}
+
+			if (ei_decode_long(buf, &index, &timeoutusec)) { 
+				return ERR_DECODING_ARGS;
+			}
+
+			// call function and encode result 
+			sqlrcon_setAuthenticationTimeout(con,timeoutsec,timeoutusec);
+			ENCODE_VOID;   
+		}
+
+
+		if (strcmp("setResponseTimeout", command) == TRUE) {
+                	long timeoutsec;
+                	long timeoutusec;
+
+			// check number of arguments
+		    	if (arity != 2) return ERR_NUMBER_OF_ARGS;
+
+			if (ei_decode_long(buf, &index, &timeoutsec)) { 
+				return ERR_DECODING_ARGS;
+			}
+
+			if (ei_decode_long(buf, &index, &timeoutusec)) { 
+				return ERR_DECODING_ARGS;
+			}
+
+			// call function and encode result 
+			sqlrcon_setResponseTimeout(con,timeoutsec,timeoutusec);
 			ENCODE_VOID;   
 		}
 

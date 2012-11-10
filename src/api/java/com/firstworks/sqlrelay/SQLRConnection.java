@@ -36,7 +36,20 @@ public class SQLRConnection {
 	/** Sets the server connect timeout in seconds
 	 *  and milliseconds.  Setting either parameter
 	 *  to -1 disables the timeout. */
-	public native void	setTimeout(int timeoutsec, int timeoutusec);
+	public native void	setConnectTimeout(int timeoutsec,
+							int timeoutusec);
+
+	/** Sets the authentication timeout in seconds
+	 *  and milliseconds.  Setting either parameter
+	 *  to -1 disables the timeout. */
+	public native void	setAuthenticationTimeout(int timeoutsec,
+							int timeoutusec);
+
+	/** Sets the response timeout (for queries, commits, rollbacks,
+	 *  pings, etc.) in seconds and milliseconds.  Setting either
+	 *  parameter to -1 disables the timeout. */
+	public native void	setResponseTimeout(int timeoutsec,
+							int timeoutusec);
 
 	/** Ends the session. */
 	public native void	endSession();

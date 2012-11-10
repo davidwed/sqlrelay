@@ -21,7 +21,18 @@ function sqlrcon_free($sqlrconref){}
 /** 
  *  Sets the server connect timeout in seconds and milliseconds.
  *  Setting either parameter to -1 disables the timeout. */
-function sqlrcon_setTimeout($sqlrconref, $timeoutsec, $timeoutusec){}
+function sqlrcon_setConnectTimeout($sqlrconref, $timeoutsec, $timeoutusec){}
+
+/**
+ *  Sets the authentication timeout in seconds and milliseconds.
+ *  Setting either parameter to -1 disables the timeout. */
+function sqlrcon_setAuthenticationTimeout($sqlrconref, $timeoutsec, $timeoutusec){}
+
+/**
+ *  Sets the response timeout (for queries, commits, rollbacks,
+ *  pings, etc.) in seconds and milliseconds.  Setting either
+ *  parameter to -1 disables the timeout. */
+function sqlrcon_setResponseTimeout($sqlrconref, $timeoutsec, $timeoutusec){}
 
 /** 
  *  Ends the session. */

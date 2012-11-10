@@ -71,13 +71,33 @@ static PyObject *sqlrcon_free(PyObject *self, PyObject *args) {
   return Py_BuildValue("h", 0);
 }
 
-static PyObject *setTimeout(PyObject *self, PyObject *args) {
+static PyObject *setConnectTimeout(PyObject *self, PyObject *args) {
   long sqlrcon;
   int32_t timeoutsec;
   int32_t timeoutusec;
   if (!PyArg_ParseTuple(args, "lii", &sqlrcon, &timeoutsec, &timeoutusec))
     return NULL;
-  ((sqlrconnection *)sqlrcon)->setTimeout(timeoutsec,timeoutusec);
+  ((sqlrconnection *)sqlrcon)->setConnectTimeout(timeoutsec,timeoutusec);
+  return Py_BuildValue("h", 0);
+}
+
+static PyObject *setAuthenticationTimeout(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  int32_t timeoutsec;
+  int32_t timeoutusec;
+  if (!PyArg_ParseTuple(args, "lii", &sqlrcon, &timeoutsec, &timeoutusec))
+    return NULL;
+  ((sqlrconnection *)sqlrcon)->setAuthenticationTimeout(timeoutsec,timeoutusec);
+  return Py_BuildValue("h", 0);
+}
+
+static PyObject *setResponseTimeout(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  int32_t timeoutsec;
+  int32_t timeoutusec;
+  if (!PyArg_ParseTuple(args, "lii", &sqlrcon, &timeoutsec, &timeoutusec))
+    return NULL;
+  ((sqlrconnection *)sqlrcon)->setResponseTimeout(timeoutsec,timeoutusec);
   return Py_BuildValue("h", 0);
 }
 
@@ -1782,7 +1802,9 @@ static PyMethodDef SQLRMethods[] = {
   {"getNumericFieldsAsNumbers", getNumericFieldsAsNumbers, METH_VARARGS},
   {"sqlrcon_alloc",  sqlrcon_alloc, METH_VARARGS},
   {"sqlrcon_free", sqlrcon_free, METH_VARARGS},
-  {"setTimeout", setTimeout, METH_VARARGS},
+  {"setConnectTimeout", setConnectTimeout, METH_VARARGS},
+  {"setAuthenticationTimeout", setAuthenticationTimeout, METH_VARARGS},
+  {"setResponseTimeout", setResponseTimeout, METH_VARARGS},
   {"endSession", endSession, METH_VARARGS},
   {"suspendSession", suspendSession, METH_VARARGS},
   {"getConnectionPort", getConnectionPort, METH_VARARGS},

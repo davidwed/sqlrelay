@@ -39,10 +39,23 @@ class SQLRCLIENT_DLLSPEC sqlrconnection {
 
 
 
-		/** Sets the server connect timeout in seconds
-		 *  and milliseconds.  Setting either parameter
-		 *  to -1 disables the timeout. */
-		void	setTimeout(int32_t timeoutsec, int32_t timeoutusec);
+		/** Sets the server connect timeout in seconds and
+		 *  milliseconds.  Setting either parameter to -1 disables the
+		 *  timeout. */
+		void	setConnectTimeout(int32_t timeoutsec,
+						int32_t timeoutusec);
+
+		/** Sets the authentication timeout in seconds and
+		 *  milliseconds.  Setting either parameter to -1 disables the
+		 *  timeout. */
+		void	setAuthenticationTimeout(int32_t timeoutsec,
+							int32_t timeoutusec);
+
+		/** Sets the response timeout (for queries, commits, rollbacks,
+		 *  pings, etc.) in seconds and milliseconds.  Setting either
+		 *  parameter to -1 disables the timeout. */
+		void	setResponseTimeout(int32_t timeoutsec,
+						int32_t timeoutusec);
 
 		/** Ends the session. */
 		void	endSession();

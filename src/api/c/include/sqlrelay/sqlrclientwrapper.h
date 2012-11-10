@@ -39,8 +39,21 @@ void	sqlrcon_free(sqlrcon sqlrconref);
  *  Sets the server connect timeout in seconds and milliseconds.
  *  Setting either parameter to -1 disables the timeout. */
 SQLRCLIENTWRAPPER_DLLSPEC
-void	sqlrcon_setTimeout(sqlrcon sqlrconref,
-			int32_t timeoutsec, int32_t timeoutusec);
+void	sqlrcon_setConnectTimeout(sqlrcon sqlrconref,
+				int32_t timeoutsec, int32_t timeoutusec);
+
+/** @ingroup sqlrclientwrapper
+ *  Sets the authentication timeout in seconds and milliseconds.
+ *  Setting either parameter to -1 disables the timeout. */
+void	sqlrcon_setAuthenticationTimeout(sqlrcon sqlrconref,
+				int32_t timeoutsec, int32_t timeoutusec);
+
+/** @ingroup sqlrclientwrapper
+ *  Sets the response timeout (for queries, commits, rollbacks, pings, etc.) in
+ *  seconds and milliseconds.  Setting either parameter to -1 disables the
+ *  timeout. */
+void	sqlrcon_setResponseTimeout(sqlrcon sqlrconref,
+				int32_t timeoutsec, int32_t timeoutusec);
 
 /** @ingroup sqlrclientwrapper
  *  Ends the session. */

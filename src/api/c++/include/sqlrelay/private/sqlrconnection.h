@@ -55,8 +55,12 @@
 		char			*listenerunixport;
 		const char		*connectionunixport;
 		char			connectionunixportbuffer[MAXPATHLEN+1];
-		int32_t			timeoutsec;
-		int32_t			timeoutusec;
+		int32_t			connecttimeoutsec;
+		int32_t			connecttimeoutusec;
+		int32_t			authtimeoutsec;
+		int32_t			authtimeoutusec;
+		int32_t			responsetimeoutsec;
+		int32_t			responsetimeoutusec;
 		int32_t			retrytime;
 		int32_t			tries;
 

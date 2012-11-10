@@ -1253,7 +1253,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 	} else {
 		// error
 		decForkedListeners();
-		errorClientSession(clientsock, "Error forking listener");
+		errorClientSession(clientsock,"Error forking listener");
 	}
 }
 

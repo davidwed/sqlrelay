@@ -74,13 +74,35 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_delete
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
- * Method:    setTimeout
+ * Method:    setConnectTimeout
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setTimeout
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setConnectTimeout
   (JNIEnv *env, jobject self, jint timeoutsec, jint timeoutusec) {
 	getSqlrConnection(env,self)->
-		setTimeout((int32_t)timeoutsec,(int32_t)timeoutusec);
+		setConnectTimeout((int32_t)timeoutsec,(int32_t)timeoutusec);
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    setAuthenticationTimeout
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setAuthenticationTimeout
+  (JNIEnv *env, jobject self, jint timeoutsec, jint timeoutusec) {
+	getSqlrConnection(env,self)->
+		setAuthenticationTimeout((int32_t)timeoutsec,(int32_t)timeoutusec);
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    setResponseTimeout
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setResponseTimeout
+  (JNIEnv *env, jobject self, jint timeoutsec, jint timeoutusec) {
+	getSqlrConnection(env,self)->
+		setResponseTimeout((int32_t)timeoutsec,(int32_t)timeoutusec);
 }
 
 /*

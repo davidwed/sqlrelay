@@ -32,7 +32,8 @@ bool sqlrconnection::openSession() {
 		}
 
 		openresult=ucs.connect(listenerunixport,
-						timeoutsec,timeoutusec,
+						connecttimeoutsec,
+						connecttimeoutusec,
 						retrytime,tries);
 		if (openresult==RESULT_SUCCESS) {
 			cs=&ucs;
@@ -53,7 +54,8 @@ bool sqlrconnection::openSession() {
 		}
 
 		openresult=ics.connect(server,listenerinetport,
-						timeoutsec,timeoutusec,
+						connecttimeoutsec,
+						connecttimeoutusec,
 						retrytime,tries);
 		if (openresult==RESULT_SUCCESS) {
 			cs=&ics;
@@ -126,7 +128,8 @@ bool sqlrconnection::openSession() {
 			}
 
 			connected=(ucs.connect(connectionunixport,
-						timeoutsec,timeoutusec,
+						connecttimeoutsec,
+						connecttimeoutusec,
 						retrytime,tries)==
 							RESULT_SUCCESS);
 			if (connected) {
@@ -162,7 +165,8 @@ bool sqlrconnection::openSession() {
 
 			connected=(ics.connect(server,
 						connectioninetport,
-						timeoutsec,timeoutusec,
+						connecttimeoutsec,
+						connecttimeoutusec,
 						retrytime,tries)==
 							RESULT_SUCCESS);
 			if (connected) {

@@ -28,7 +28,9 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	copyrefs=copyreferences;
 
 	// initialize...
-	setTimeout(-1,-1);
+	setConnectTimeout(-1,-1);
+	setAuthenticationTimeout(-1,-1);
+	setResponseTimeout(-1,-1);
 
 	// retry reads if they get interrupted by signals
 	ucs.translateByteOrder();
@@ -103,7 +105,20 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	lastcursor=NULL;
 }
 
-void sqlrconnection::setTimeout(int32_t timeoutsec, int32_t timeoutusec) {
-	this->timeoutsec=timeoutsec;
-	this->timeoutusec=timeoutusec;
+void sqlrconnection::setConnectTimeout(int32_t timeoutsec,
+					int32_t timeoutusec) {
+	connecttimeoutsec=timeoutsec;
+	connecttimeoutusec=timeoutusec;
+}
+
+void sqlrconnection::setAuthenticationTimeout(int32_t timeoutsec,
+						int32_t timeoutusec) {
+	authtimeoutsec=timeoutsec;
+	authtimeoutusec=timeoutusec;
+}
+
+void sqlrconnection::setResponseTimeout(int32_t timeoutsec,
+						int32_t timeoutusec) {
+	responsetimeoutsec=timeoutsec;
+	responsetimeoutusec=timeoutusec;
 }

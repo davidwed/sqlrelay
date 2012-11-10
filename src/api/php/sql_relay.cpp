@@ -71,7 +71,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_free) {
 	zend_list_delete((*sqlrcon)->value.lval);
 }
 
-DLEXPORT ZEND_FUNCTION(sqlrcon_settimeout) {
+DLEXPORT ZEND_FUNCTION(sqlrcon_setconnecttimeout) {
 	zval **sqlrcur,**timeoutsec,**timeoutusec;
 	if (ZEND_NUM_ARGS() != 3 || 
 		zend_get_parameters_ex(3,&sqlrcur,&timeoutsec,&timeoutusec) == FAILURE) {
@@ -82,7 +82,37 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_settimeout) {
 	sqlrconnection *connection=NULL;
 	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcur,-1,"sqlrelay connection",sqlrelay_connection);
 	if (connection) {
-		connection->setTimeout((*timeoutsec)->value.lval,(*timeoutusec)->value.lval);
+		connection->setConnectTimeout((*timeoutsec)->value.lval,(*timeoutusec)->value.lval);
+	}
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcon_setauthenticationtimeout) {
+	zval **sqlrcur,**timeoutsec,**timeoutusec;
+	if (ZEND_NUM_ARGS() != 3 || 
+		zend_get_parameters_ex(3,&sqlrcur,&timeoutsec,&timeoutusec) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_long_ex(timeoutsec);
+	convert_to_long_ex(timeoutusec);
+	sqlrconnection *connection=NULL;
+	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcur,-1,"sqlrelay connection",sqlrelay_connection);
+	if (connection) {
+		connection->setAuthenticationTimeout((*timeoutsec)->value.lval,(*timeoutusec)->value.lval);
+	}
+}
+
+DLEXPORT ZEND_FUNCTION(sqlrcon_setresponsetimeout) {
+	zval **sqlrcur,**timeoutsec,**timeoutusec;
+	if (ZEND_NUM_ARGS() != 3 || 
+		zend_get_parameters_ex(3,&sqlrcur,&timeoutsec,&timeoutusec) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_long_ex(timeoutsec);
+	convert_to_long_ex(timeoutusec);
+	sqlrconnection *connection=NULL;
+	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcur,-1,"sqlrelay connection",sqlrelay_connection);
+	if (connection) {
+		connection->setResponseTimeout((*timeoutsec)->value.lval,(*timeoutusec)->value.lval);
 	}
 }
 
@@ -2199,7 +2229,9 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_clientversion) {
 zend_function_entry sql_relay_functions[] = {
 	ZEND_FE(sqlrcon_alloc,NULL)
 	ZEND_FE(sqlrcon_free,NULL)
-	ZEND_FE(sqlrcon_settimeout,NULL)
+	ZEND_FE(sqlrcon_setconnecttimeout,NULL)
+	ZEND_FE(sqlrcon_setauthenticationtimeout,NULL)
+	ZEND_FE(sqlrcon_setresponsetimeout,NULL)
 	ZEND_FE(sqlrcon_endsession,NULL)
 	ZEND_FE(sqlrcon_suspendsession,NULL)
 	ZEND_FE(sqlrcon_getconnectionport,NULL)

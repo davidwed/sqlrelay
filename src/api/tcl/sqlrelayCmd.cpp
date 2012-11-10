@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.cpp,v 1.8 2012-11-06 22:16:49 mused Exp $
+ * $Id: sqlrelayCmd.cpp,v 1.9 2012-11-10 20:10:44 mused Exp $
  */
 
 #include <tcl.h>
@@ -1819,7 +1819,9 @@ void sqlrconDelete(ClientData data) {
  *    sqlrcon object command.
  * Synopsis:
  *  $con free
- *  $con setTimeout
+ *  $con setConnectTimeout
+ *  $con setAuthenticationTimeout
+ *  $con setResponseTimeout
  *  $con endSession
  *  $con suspendSession
  *  $con getConnectionPort
@@ -1851,7 +1853,9 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
   int index;
   static CONSTCHAR *options[] = {
     "free",
-    "setTimeout",
+    "setConnectTimeout",
+    "setAuthenticationTimeout",
+    "setResponseTimeout",
     "endSession",
     "suspendSession",
     "getConnectionPort",
@@ -1879,7 +1883,9 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
   };
   enum options {
     SQLR_FREE,
-    SQLR_SETTIMEOUT,
+    SQLR_SETCONNECTTIMEOUT,
+    SQLR_SETAUTHENTICATIONTIMEOUT,
+    SQLR_SETRESPONSETIMEOUT,
     SQLR_ENDSESSION,
     SQLR_SUSPENDSESSION,
     SQLR_GETCONNECTIONPORT,
@@ -1925,7 +1931,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     sqlrconDelete(con);
     break;
   }
-  case SQLR_SETTIMEOUT: {
+  case SQLR_SETCONNECTTIMEOUT: {
     int timeoutsec;
     int timeoutusec;
     if (objc > 4) {
@@ -1938,7 +1944,39 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     if (Tcl_GetIntFromObj(interp, objv[3], &timeoutusec) != TCL_OK) {
       return TCL_ERROR;
     }
-    con->setTimeout(timeoutsec,timeoutusec);
+    con->setConnectTimeout(timeoutsec,timeoutusec);
+    break;
+  }
+  case SQLR_SETAUTHENTICATIONTIMEOUT: {
+    int timeoutsec;
+    int timeoutusec;
+    if (objc > 4) {
+      Tcl_WrongNumArgs(interp, 2, objv, "timeoutsec timeoutusec");
+      return TCL_ERROR;
+    }
+    if (Tcl_GetIntFromObj(interp, objv[2], &timeoutsec) != TCL_OK) {
+      return TCL_ERROR;
+    }
+    if (Tcl_GetIntFromObj(interp, objv[3], &timeoutusec) != TCL_OK) {
+      return TCL_ERROR;
+    }
+    con->setAuthenticationTimeout(timeoutsec,timeoutusec);
+    break;
+  }
+  case SQLR_SETRESPONSETIMEOUT: {
+    int timeoutsec;
+    int timeoutusec;
+    if (objc > 4) {
+      Tcl_WrongNumArgs(interp, 2, objv, "timeoutsec timeoutusec");
+      return TCL_ERROR;
+    }
+    if (Tcl_GetIntFromObj(interp, objv[2], &timeoutsec) != TCL_OK) {
+      return TCL_ERROR;
+    }
+    if (Tcl_GetIntFromObj(interp, objv[3], &timeoutusec) != TCL_OK) {
+      return TCL_ERROR;
+    }
+    con->setResponseTimeout(timeoutsec,timeoutusec);
     break;
   }
   case SQLR_ENDSESSION: {

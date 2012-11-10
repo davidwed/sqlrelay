@@ -17,10 +17,26 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_delete
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
- * Method:    setTimeout
+ * Method:    setConnectTimeout
  * Signature: (II)V
  */
-JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setTimeout
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setConnectTimeout
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    setAuthenticationTimeout
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setAuthenticationTimeout
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    setResponseTimeout
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setResponseTimeout
   (JNIEnv *, jobject, jint, jint);
 
 /*

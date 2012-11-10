@@ -64,6 +64,8 @@
 
 		int32_t	getString(char *string, int32_t size);
 		int32_t	getShort(uint16_t *integer);
+		int32_t	getShort(uint16_t *integer,
+				int32_t timeoutsec, int32_t timeoutusec);
 		int32_t	getLong(uint32_t *integer);
 		int32_t	getLongLong(uint64_t *integer);
 		int32_t	getDouble(double *value);

@@ -39,7 +39,17 @@ void
 sqlrconnection::DESTROY()
 
 void
-sqlrconnection::setTimeout(timeoutsec,timeoutusec)
+sqlrconnection::setConnectTimeout(timeoutsec,timeoutusec)
+		int32_t		timeoutsec
+		int32_t		timeoutusec
+
+void
+sqlrconnection::setAuthenticationTimeout(timeoutsec,timeoutusec)
+		int32_t		timeoutsec
+		int32_t		timeoutusec
+
+void
+sqlrconnection::setResponseTimeout(timeoutsec,timeoutusec)
 		int32_t		timeoutsec
 		int32_t		timeoutusec
 

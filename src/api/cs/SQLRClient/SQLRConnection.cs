@@ -48,9 +48,24 @@ public class SQLRConnection : IDisposable
     
     /** Sets the server connect timeout in seconds and milliseconds.
      *  Setting either parameter to -1 disables the timeout. */
-    public void setTimeout(Int32 timeoutsec, Int32 timeoutusec)
+    public void setConnectTimeout(Int32 timeoutsec, Int32 timeoutusec)
     {
-        sqlrcon_setTimeout(sqlrconref, timeoutsec, timeoutusec);
+        sqlrcon_setConnectTimeout(sqlrconref, timeoutsec, timeoutusec);
+    }
+    
+    /** Sets the authentication timeout in seconds and milliseconds.
+     *  Setting either parameter to -1 disables the timeout. */
+    public void setAuthenticationTimeout(Int32 timeoutsec, Int32 timeoutusec)
+    {
+        sqlrcon_setAuthenticationTimeout(sqlrconref, timeoutsec, timeoutusec);
+    }
+    
+    /** Sets the response timeout (for queries, commits, rollbacks, pings, etc.)
+     *  in seconds and milliseconds.  Setting either parameter to -1 disables
+     *  the timeout. */
+    public void setResponseTimeout(Int32 timeoutsec, Int32 timeoutusec)
+    {
+        sqlrcon_setResponseTimeout(sqlrconref, timeoutsec, timeoutusec);
     }
     
     /** Ends the session. */
@@ -259,7 +274,13 @@ public class SQLRConnection : IDisposable
     private static extern void sqlrcon_free(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcon_setTimeout(IntPtr sqlrconref, Int32 timeoutsec, Int32 timeoutusec);
+    private static extern void sqlrcon_setConnectTimeout(IntPtr sqlrconref, Int32 timeoutsec, Int32 timeoutusec);
+    
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern void sqlrcon_setAuthenticationTimeout(IntPtr sqlrconref, Int32 timeoutsec, Int32 timeoutusec);
+    
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern void sqlrcon_setResponseTimeout(IntPtr sqlrconref, Int32 timeoutsec, Int32 timeoutusec);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_endSession(IntPtr sqlrconref);

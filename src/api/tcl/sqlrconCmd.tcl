@@ -25,7 +25,17 @@ proc sqlrconDelete {}
 # Sets the server connect timeout in seconds
 # and milliseconds.  Setting either parameter
 # to -1 disables the timeout.
-proc setTimeout {timeoutsec timeoutusec} 
+proc setConnectTimeout {timeoutsec timeoutusec} 
+
+# Sets the authentication timeout in seconds and
+# milliseconds.  Setting either parameter to -1 disables the
+# timeout.
+proc setAuthenticationTimeout {timeoutsec timeoutusec} 
+
+# Sets the response timeout (for queries, commits, rollbacks,
+# pings, etc.) in seconds and milliseconds.  Setting either
+# parameter to -1 disables the timeout.
+proc setResponseTimeout {timeoutsec timeoutusec} 
 
 # Ends the session.
 proc endSession {} 

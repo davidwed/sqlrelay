@@ -22,7 +22,8 @@ bool sqlrconnection::commit() {
 	flushWriteBuffer();
 
 	uint16_t	status;
-	if (cs->read(&status)!=sizeof(uint16_t)) {
+	if (cs->read(&status,responsetimeoutsec,
+				responsetimeoutusec)!=sizeof(uint16_t)) {
 		setError("Failed to get commit status.\n "
 				"A network error may have ocurred.");
 		return false;
