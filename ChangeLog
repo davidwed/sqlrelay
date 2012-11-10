@@ -3,6 +3,8 @@
 		bind validation when using the statement cache
 		sqlrconnecton::setClientInfo/getClientInfo
 		query logging
+		authentication and response timeouts on the client-side
+		environment variables for setting timeouts
 	refactored Oracle re-prepare logic
 	created a query logging framework
 
