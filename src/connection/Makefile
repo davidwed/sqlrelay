@@ -113,7 +113,9 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqltranslations/sqltranslations.cpp \
 	sqltranslations/sqltranslation.cpp \
 	sqltriggers/sqltriggers.cpp \
-	sqltriggers/sqltrigger.cpp
+	sqltriggers/sqltrigger.cpp \
+	sqlrloggers/sqlrloggers.cpp \
+	sqlrloggers/sqlrlogger.cpp
 
 LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/sqlrconnectiondtor.lo \
@@ -221,7 +223,9 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqltranslations/sqltranslations.lo \
 	sqltranslations/sqltranslation.lo \
 	sqltriggers/sqltriggers.lo \
-	sqltriggers/sqltrigger.lo
+	sqltriggers/sqltrigger.lo \
+	sqlrloggers/sqlrloggers.lo \
+	sqlrloggers/sqlrlogger.lo
 
 .SUFFIXES: .lo
 

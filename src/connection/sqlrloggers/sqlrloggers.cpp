@@ -1,0 +1,144 @@
+// Copyright (c) 1999-2012  David Muse
+// See the file COPYING for more information
+
+#include <sqlrloggers.h>
+#include <sqlrconnection.h>
+#include <sqlrcursor.h>
+#include <debugprint.h>
+
+#include <rudiments/xmldomnode.h>
+
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
+sqlrloggers::sqlrloggers() {
+	debugFunction();
+	xmld=NULL;
+}
+
+sqlrloggers::~sqlrloggers() {
+	debugFunction();
+	unloadLoggers();
+	delete xmld;
+}
+
+bool sqlrloggers::loadLoggers(const char *loggers) {
+	debugFunction();
+
+	unloadLoggers();
+
+	// create the parser
+	delete xmld;
+	xmld=new xmldom();
+
+	// parse the loggers
+	if (!xmld->parseString(loggers)) {
+		return false;
+	}
+
+	// get the loggers tag
+	xmldomnode	*loggersnode=
+			xmld->getRootNode()->getFirstTagChild("loggers");
+	if (loggersnode->isNullNode()) {
+		return false;
+	}
+
+	// run through the logger list
+	for (xmldomnode *logger=loggersnode->getFirstTagChild();
+		!logger->isNullNode(); logger=logger->getNextTagSibling()) {
+
+		debugPrintf("loading logger ...\n");
+
+		// load logger
+		loadLogger(logger);
+	}
+	return true;
+}
+
+void sqlrloggers::unloadLoggers() {
+	debugFunction();
+	for (linkedlistnode< sqlrloggerplugin * > *node=
+				llist.getFirstNode();
+					node; node=node->getNext()) {
+		sqlrloggerplugin	*sqlrlp=node->getData();
+		delete sqlrlp->lg;
+		delete sqlrlp->dl;
+		delete sqlrlp;
+	}
+	llist.clear();
+}
+
+void sqlrloggers::loadLogger(xmldomnode *logger) {
+
+	debugFunction();
+
+	// ignore non-loggers
+	if (charstring::compare(logger->getName(),"logger")) {
+		return;
+	}
+
+	// get the logger name
+	const char	*file=logger->getAttributeValue("file");
+	if (!charstring::length(file)) {
+		return;
+	}
+
+	debugPrintf("loading logger: %s\n",file);
+
+	// load the logger module
+	stringbuffer	modulename;
+	modulename.append(LIBDIR);
+	modulename.append("/libsqlrelay_sqlrlogger_");
+	modulename.append(file)->append(".so");
+	dynamiclib	*dl=new dynamiclib();
+	if (!dl->open(modulename.getString(),true,true)) {
+		printf("failed to load logger module: %s\n",file);
+		char	*error=dl->getError();
+		printf("%s\n",error);
+		delete[] error;
+		delete dl;
+		return;
+	}
+
+	// load the logger itself
+	stringbuffer	functionname;
+	functionname.append("new_")->append(file);
+	sqlrlogger *(*newLogger)(xmldomnode *)=
+			(sqlrlogger *(*)(xmldomnode *))
+				dl->getSymbol(functionname.getString());
+	if (!newLogger) {
+		printf("failed to create logger: %s\n",file);
+		char	*error=dl->getError();
+		printf("%s\n",error);
+		delete[] error;
+		dl->close();
+		delete dl;
+		return;
+	}
+	sqlrlogger	*lg=(*newLogger)(logger);
+
+	// add the plugin to the list
+	sqlrloggerplugin	*sqlrlp=new sqlrloggerplugin;
+	sqlrlp->lg=lg;
+	sqlrlp->dl=dl;
+	llist.append(sqlrlp);
+}
+
+void sqlrloggers::initLoggers(sqlrconnection_svr *sqlrcon,
+					sqlrcursor_svr *sqlrcur) {
+	debugFunction();
+	for (linkedlistnode< sqlrloggerplugin * > *node=llist.getFirstNode();
+						node; node=node->getNext()) {
+		node->getData()->lg->init(sqlrcon,sqlrcur);
+	}
+}
+
+void sqlrloggers::runLoggers(sqlrconnection_svr *sqlrcon,
+					sqlrcursor_svr *sqlrcur) {
+	debugFunction();
+	for (linkedlistnode< sqlrloggerplugin * > *node=llist.getFirstNode();
+						node; node=node->getNext()) {
+		node->getData()->lg->run(sqlrcon,sqlrcur);
+	}
+}
