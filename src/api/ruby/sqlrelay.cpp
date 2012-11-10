@@ -54,8 +54,10 @@ static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
  *  call-seq:
  *  setConnectTimeout(timeoutsec,timeoutusec)
  *
- *  Sets the server connect timeout in seconds and milliseconds.
- *  Setting either parameter to -1 disables the timeout. */
+ *  Sets the server connect timeout in seconds and
+ *  milliseconds.  Setting either parameter to -1 disables the
+ *  timeout.  You can also set this timeout using the
+ *  SQLR_CLIENT_CONNECT_TIMEOUT environment variable. */
 static VALUE sqlrcon_setConnectTimeout(VALUE self,
 				VALUE timeoutsec, VALUE timeoutusec) {
 	sqlrconnection	*sqlrcon;
@@ -70,7 +72,8 @@ static VALUE sqlrcon_setConnectTimeout(VALUE self,
  *
  *  Sets the authentication timeout in seconds and
  *  milliseconds.  Setting either parameter to -1 disables the
- *  timeout. */
+ *  timeout.   You can also set this timeout using the
+ *  SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable. */
 static VALUE sqlrcon_setAuthenticationTimeout(VALUE self,
 				VALUE timeoutsec, VALUE timeoutusec) {
 	sqlrconnection	*sqlrcon;
@@ -86,7 +89,9 @@ static VALUE sqlrcon_setAuthenticationTimeout(VALUE self,
  *
  *  Sets the response timeout (for queries, commits, rollbacks,
  *  pings, etc.) in seconds and milliseconds.  Setting either
- *  parameter to -1 disables the timeout. */
+ *  parameter to -1 disables the timeout.  You can also set
+ *  this timeout using the SQLR_CLIENT_RESPONSE_TIMEOUT
+ *  environment variable. */
 static VALUE sqlrcon_setResponseTimeout(VALUE self,
 				VALUE timeoutsec, VALUE timeoutusec) {
 	sqlrconnection	*sqlrcon;
@@ -313,7 +318,8 @@ static VALUE sqlrcon_errorNumber(VALUE self) {
 
 /** Causes verbose debugging information to be sent to standard output.
  *  Another way to do this is to start a query with "-- debug\n".  Yet
- *  another way is to set the environment variable SQLRDEBUG to "ON" */
+ *  another way is to set the environment variable SQLR_CLIENT_DEBUG
+ *  to "ON" */
 static VALUE sqlrcon_debugOn(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);

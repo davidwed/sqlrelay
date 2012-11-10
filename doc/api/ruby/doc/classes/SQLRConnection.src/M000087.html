@@ -5,18 +5,20 @@
 
 <html>
 <head>
-  <title>setTimeout (SQLRConnection)</title>
+  <title>setConnectTimeout (SQLRConnection)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
   <pre>/**
  *  call-seq:
- *  setTimeout(timeoutsec,timeoutusec)
+ *  setConnectTimeout(timeoutsec,timeoutusec)
  *
- *  Sets the server connect timeout in seconds and milliseconds.
- *  Setting either parameter to -1 disables the timeout. */
-static VALUE sqlrcon_setTimeout(VALUE self,
+ *  Sets the server connect timeout in seconds and
+ *  milliseconds.  Setting either parameter to -1 disables the
+ *  timeout.  You can also set this timeout using the
+ *  SQLR_CLIENT_CONNECT_TIMEOUT environment variable. */
+static VALUE sqlrcon_setConnectTimeout(VALUE self,
                                 VALUE timeoutsec, VALUE timeoutusec) {
 </pre>
 </body>

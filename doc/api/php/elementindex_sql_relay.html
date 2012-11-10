@@ -200,6 +200,13 @@
 							<div class="index-item-description">Returns the version of the sqlrelay server software.</div>
 					</dd>
 			<dt class="field">
+						<span class="method-title">sqlrcon_setAuthenticationTimeout</span>
+					</dt>
+		<dd class="index-item-body">
+			<div class="index-item-details"><a href="sql_relay/_sql_relay.doc.php.html#functionsqlrcon_setAuthenticationTimeout">sqlrcon_setAuthenticationTimeout()</a> in sql_relay.doc.php</div>
+							<div class="index-item-description">Sets the authentication timeout in seconds and   milliseconds.  Setting either parameter to -1 disables the   timeout.   You can also set this timeout using the   SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable.</div>
+					</dd>
+			<dt class="field">
 						<span class="method-title">sqlrcon_setClientInfo</span>
 					</dt>
 		<dd class="index-item-body">
@@ -207,11 +214,18 @@
 							<div class="index-item-description">Allows you to set a string that will be passed to the   server and ultimately included in server-side logging   along with queries that were run by this instance of   the client.</div>
 					</dd>
 			<dt class="field">
-						<span class="method-title">sqlrcon_setTimeout</span>
+						<span class="method-title">sqlrcon_setConnectTimeout</span>
 					</dt>
 		<dd class="index-item-body">
-			<div class="index-item-details"><a href="sql_relay/_sql_relay.doc.php.html#functionsqlrcon_setTimeout">sqlrcon_setTimeout()</a> in sql_relay.doc.php</div>
-							<div class="index-item-description">Sets the server connect timeout in seconds and milliseconds.</div>
+			<div class="index-item-details"><a href="sql_relay/_sql_relay.doc.php.html#functionsqlrcon_setConnectTimeout">sqlrcon_setConnectTimeout()</a> in sql_relay.doc.php</div>
+							<div class="index-item-description">Sets the server connect timeout in seconds and   milliseconds.  Setting either parameter to -1 disables the   timeout.  You can also set this timeout using the   SQLR_CLIENT_CONNECT_TIMEOUT environment variable.</div>
+					</dd>
+			<dt class="field">
+						<span class="method-title">sqlrcon_setResponseTimeout</span>
+					</dt>
+		<dd class="index-item-body">
+			<div class="index-item-details"><a href="sql_relay/_sql_relay.doc.php.html#functionsqlrcon_setResponseTimeout">sqlrcon_setResponseTimeout()</a> in sql_relay.doc.php</div>
+							<div class="index-item-description">Sets the response timeout (for queries, commits, rollbacks,</div>
 					</dd>
 			<dt class="field">
 						<span class="method-title">sqlrcon_suspendSession</span>

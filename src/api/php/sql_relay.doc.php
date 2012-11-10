@@ -19,19 +19,25 @@ function sqlrcon_free($sqlrconref){}
 
 
 /** 
- *  Sets the server connect timeout in seconds and milliseconds.
- *  Setting either parameter to -1 disables the timeout. */
+ *  Sets the server connect timeout in seconds and
+ *  milliseconds.  Setting either parameter to -1 disables the
+ *  timeout.  You can also set this timeout using the
+ *  SQLR_CLIENT_CONNECT_TIMEOUT environment variable. */
 function sqlrcon_setConnectTimeout($sqlrconref, $timeoutsec, $timeoutusec){}
 
 /**
- *  Sets the authentication timeout in seconds and milliseconds.
- *  Setting either parameter to -1 disables the timeout. */
+ *  Sets the authentication timeout in seconds and
+ *  milliseconds.  Setting either parameter to -1 disables the
+ *  timeout.   You can also set this timeout using the
+ *  SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable. */
 function sqlrcon_setAuthenticationTimeout($sqlrconref, $timeoutsec, $timeoutusec){}
 
 /**
  *  Sets the response timeout (for queries, commits, rollbacks,
  *  pings, etc.) in seconds and milliseconds.  Setting either
- *  parameter to -1 disables the timeout. */
+ *  parameter to -1 disables the timeout.  You can also set
+ *  this timeout using the SQLR_CLIENT_RESPONSE_TIMEOUT
+ *  environment variable. */
 function sqlrcon_setResponseTimeout($sqlrconref, $timeoutsec, $timeoutusec){}
 
 /** 
@@ -146,7 +152,8 @@ function sqlrcon_errorNumber($sqlrconref){}
 /** 
  *  Causes verbose debugging information to be sent to standard output.
  *  Another way to do this is to start a query with "-- debug\n".
- *  Yet another way is to set the environment variable SQLRDEBUG to "ON" */
+ *  Yet another way is to set the environment variable SQLR_CLIENT_DEBUG
+ *  to "ON" */
 function sqlrcon_debugOn($sqlrconref){}
 
 /** 

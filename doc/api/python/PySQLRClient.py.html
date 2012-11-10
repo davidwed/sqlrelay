@@ -76,7 +76,8 @@ succeeded,&nbsp;false&nbsp;if&nbsp;it&nbsp;failed.</tt></dd></dl>
 <dl><dt><a name="sqlrconnection-debugOn"><strong>debugOn</strong></a>(self)</dt><dd><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Turn&nbsp;verbose&nbsp;debugging&nbsp;on.<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Another&nbsp;way&nbsp;to&nbsp;do&nbsp;this&nbsp;is&nbsp;to&nbsp;start&nbsp;a&nbsp;query&nbsp;with&nbsp;"--&nbsp;debug<br>
 ".<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Yet&nbsp;another&nbsp;way&nbsp;is&nbsp;to&nbsp;set&nbsp;the&nbsp;environment&nbsp;variable&nbsp;SQLRDEBUG&nbsp;to&nbsp;"ON"</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Yet&nbsp;another&nbsp;way&nbsp;is&nbsp;to&nbsp;set&nbsp;the&nbsp;environment&nbsp;variable&nbsp;SQLR_CLIENT_DEBUG<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;"ON"</tt></dd></dl>
 
 <dl><dt><a name="sqlrconnection-endSession"><strong>endSession</strong></a>(self)</dt><dd><tt>Ends&nbsp;the&nbsp;current&nbsp;session.</tt></dd></dl>
 
@@ -127,14 +128,26 @@ succeeded,&nbsp;false&nbsp;if&nbsp;it&nbsp;failed.</tt></dd></dl>
 
 <dl><dt><a name="sqlrconnection-serverVersion"><strong>serverVersion</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;version&nbsp;of&nbsp;the&nbsp;SQL&nbsp;Relay&nbsp;server&nbsp;version</tt></dd></dl>
 
+<dl><dt><a name="sqlrconnection-setAuthenticationTimeout"><strong>setAuthenticationTimeout</strong></a>(self, timeoutsec, timeoutusec)</dt><dd><tt>Sets&nbsp;the&nbsp;authentication&nbsp;timeout&nbsp;in&nbsp;seconds&nbsp;and<br>
+milliseconds.&nbsp;&nbsp;Setting&nbsp;either&nbsp;parameter&nbsp;to&nbsp;-1&nbsp;disables&nbsp;the<br>
+timeout.&nbsp;&nbsp;&nbsp;You&nbsp;can&nbsp;also&nbsp;set&nbsp;this&nbsp;timeout&nbsp;using&nbsp;the<br>
+SQLR_CLIENT_AUTHENTICATION_TIMEOUT&nbsp;environment&nbsp;variable.</tt></dd></dl>
+
 <dl><dt><a name="sqlrconnection-setClientInfo"><strong>setClientInfo</strong></a>(self, clientinfo)</dt><dd><tt>Allows&nbsp;you&nbsp;to&nbsp;set&nbsp;a&nbsp;string&nbsp;that&nbsp;will&nbsp;be&nbsp;passed&nbsp;to&nbsp;the<br>
 server&nbsp;and&nbsp;ultimately&nbsp;included&nbsp;in&nbsp;server-side&nbsp;logging<br>
 along&nbsp;with&nbsp;queries&nbsp;that&nbsp;were&nbsp;run&nbsp;by&nbsp;this&nbsp;instance&nbsp;of<br>
 the&nbsp;client.</tt></dd></dl>
 
-<dl><dt><a name="sqlrconnection-setTimeout"><strong>setTimeout</strong></a>(self, timeoutsec, timeoutusec)</dt><dd><tt>Sets&nbsp;the&nbsp;server&nbsp;connect&nbsp;timeout&nbsp;in&nbsp;seconds<br>
-and&nbsp;milliseconds.&nbsp;&nbsp;Setting&nbsp;either&nbsp;parameter<br>
-to&nbsp;-1&nbsp;disables&nbsp;the&nbsp;timeout.</tt></dd></dl>
+<dl><dt><a name="sqlrconnection-setConnectTimeout"><strong>setConnectTimeout</strong></a>(self, timeoutsec, timeoutusec)</dt><dd><tt>Sets&nbsp;the&nbsp;server&nbsp;connect&nbsp;timeout&nbsp;in&nbsp;seconds&nbsp;and<br>
+milliseconds.&nbsp;&nbsp;Setting&nbsp;either&nbsp;parameter&nbsp;to&nbsp;-1&nbsp;disables&nbsp;the<br>
+timeout.&nbsp;&nbsp;You&nbsp;can&nbsp;also&nbsp;set&nbsp;this&nbsp;timeout&nbsp;using&nbsp;the<br>
+SQLR_CLIENT_CONNECT_TIMEOUT&nbsp;environment&nbsp;variable.</tt></dd></dl>
+
+<dl><dt><a name="sqlrconnection-setResponseTimeout"><strong>setResponseTimeout</strong></a>(self, timeoutsec, timeoutusec)</dt><dd><tt>Sets&nbsp;the&nbsp;response&nbsp;timeout&nbsp;(for&nbsp;queries,&nbsp;commits,&nbsp;rollbacks,<br>
+pings,&nbsp;etc.)&nbsp;in&nbsp;seconds&nbsp;and&nbsp;milliseconds.&nbsp;&nbsp;Setting&nbsp;either<br>
+parameter&nbsp;to&nbsp;-1&nbsp;disables&nbsp;the&nbsp;timeout.&nbsp;&nbsp;You&nbsp;can&nbsp;also&nbsp;set<br>
+this&nbsp;timeout&nbsp;using&nbsp;the&nbsp;SQLR_CLIENT_RESPONSE_TIMEOUT<br>
+environment&nbsp;variable.</tt></dd></dl>
 
 <dl><dt><a name="sqlrconnection-suspendSession"><strong>suspendSession</strong></a>(self)</dt><dd><tt>Disconnects&nbsp;this&nbsp;connection&nbsp;from&nbsp;the&nbsp;current<br>
 session&nbsp;but&nbsp;leaves&nbsp;the&nbsp;session&nbsp;open&nbsp;so&nbsp;<br>

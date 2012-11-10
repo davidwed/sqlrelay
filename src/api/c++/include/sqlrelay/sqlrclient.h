@@ -41,19 +41,23 @@ class SQLRCLIENT_DLLSPEC sqlrconnection {
 
 		/** Sets the server connect timeout in seconds and
 		 *  milliseconds.  Setting either parameter to -1 disables the
-		 *  timeout. */
+		 *  timeout.  You can also set this timeout using the
+		 *  SQLR_CLIENT_CONNECT_TIMEOUT environment variable. */
 		void	setConnectTimeout(int32_t timeoutsec,
 						int32_t timeoutusec);
 
 		/** Sets the authentication timeout in seconds and
 		 *  milliseconds.  Setting either parameter to -1 disables the
-		 *  timeout. */
+		 *  timeout.   You can also set this timeout using the
+		 *  SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable. */
 		void	setAuthenticationTimeout(int32_t timeoutsec,
 							int32_t timeoutusec);
 
 		/** Sets the response timeout (for queries, commits, rollbacks,
 		 *  pings, etc.) in seconds and milliseconds.  Setting either
-		 *  parameter to -1 disables the timeout. */
+		 *  parameter to -1 disables the timeout.  You can also set
+		 *  this timeout using the SQLR_CLIENT_RESPONSE_TIMEOUT
+		 *  environment variable. */
 		void	setResponseTimeout(int32_t timeoutsec,
 						int32_t timeoutusec);
 
@@ -171,7 +175,7 @@ class SQLRCLIENT_DLLSPEC sqlrconnection {
 		 *  sent to standard output.  Another way to do
 		 *  this is to start a query with "-- debug\n".
 		 *  Yet another way is to set the environment
-		 *  variable SQLRDEBUG to "ON" */
+		 *  variable SQLR_CLIENT_DEBUG to "ON" */
 		void	debugOn();
 
 		/** Turns debugging off. */

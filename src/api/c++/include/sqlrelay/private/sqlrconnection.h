@@ -10,6 +10,9 @@
 				int32_t retrytime,
 				int32_t tries,
 				bool copyreferences);
+		void	setTimeoutFromEnv(const char *var,
+					int32_t *timeoutsec,
+					int32_t *timeoutusec);
 		bool	openSession();
 		void	closeConnection();
 

@@ -27,11 +27,6 @@ void sqlrconnection::init(const char *server, uint16_t port,
 
 	copyrefs=copyreferences;
 
-	// initialize...
-	setConnectTimeout(-1,-1);
-	setAuthenticationTimeout(-1,-1);
-	setResponseTimeout(-1,-1);
-
 	// retry reads if they get interrupted by signals
 	ucs.translateByteOrder();
 	ucs.retryInterruptedReads();
@@ -48,6 +43,14 @@ void sqlrconnection::init(const char *server, uint16_t port,
 				(char *)socket;
 	this->retrytime=retrytime;
 	this->tries=tries;
+
+	// initialize timeouts
+	setTimeoutFromEnv("SQLR_CLIENT_CONNECT_TIMEOUT",
+				&connecttimeoutsec,&connecttimeoutusec);
+	setTimeoutFromEnv("SQLR_CLIENT_AUTHENTICATION_TIMEOUT",
+				&authtimeoutsec,&authtimeoutusec);
+	setTimeoutFromEnv("SQLR_CLIENT_RESPONSE_TIMEOUT",
+				&responsetimeoutsec,&responsetimeoutusec);
 
 	// authentication
 	this->user=(copyrefs)?
@@ -88,9 +91,11 @@ void sqlrconnection::init(const char *server, uint16_t port,
 
 	// enable/disable debug
 	const char	*sqlrdebug=environment::getValue("SQLRDEBUG");
+	if (!charstring::length(sqlrdebug)) {
+		sqlrdebug=environment::getValue("SQLR_CLIENT_DEBUG");
+	}
 	debug=(charstring::length(sqlrdebug) &&
-			charstring::compareIgnoringCase(
-				environment::getValue("SQLRDEBUG"),"OFF"));
+			charstring::compareIgnoringCase(sqlrdebug,"OFF"));
 	webdebug=-1;
 
 	// copy references, delete cursors flags
@@ -121,4 +126,20 @@ void sqlrconnection::setResponseTimeout(int32_t timeoutsec,
 						int32_t timeoutusec) {
 	responsetimeoutsec=timeoutsec;
 	responsetimeoutusec=timeoutusec;
+}
+
+void sqlrconnection::setTimeoutFromEnv(const char *var,
+					int32_t *timeoutsec,
+					int32_t *timeoutusec) {
+	const char	*timeout=environment::getValue(var);
+	if (charstring::isNumber(timeout)) {
+		*timeoutsec=charstring::toInteger(timeout);
+		long double	dbl=charstring::toFloat(timeout);
+		dbl=dbl-(long double)(*timeoutsec);
+		*timeoutusec=(int32_t)(dbl*1000000.0);
+	} else {
+		*timeoutsec=-1;
+		*timeoutusec=-1;
+	}
+printf("%s: %d,%d\n",var,*timeoutsec,*timeoutusec);
 }

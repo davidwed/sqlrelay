@@ -112,7 +112,7 @@
       <a href="#M000099">selectDatabase</a>&nbsp;&nbsp;
       <a href="#M000096">serverVersion</a>&nbsp;&nbsp;
       <a href="#M000112">setClientInfo</a>&nbsp;&nbsp;
-      <a href="#M000087">setTimeout</a>&nbsp;&nbsp;
+      <a href="#M000087">setConnectTimeout</a>&nbsp;&nbsp;
       <a href="#M000089">suspendSession</a>&nbsp;&nbsp;
       </div>
     </div>
@@ -325,7 +325,8 @@ Turns debugging off.
           <p>
 Causes verbose debugging information to be sent to standard output. Another
 way to do this is to start a query with &quot;&#8212; debug\n&quot;. Yet
-another way is to set the environment variable SQLRDEBUG to &quot;ON&quot;
+another way is to set the environment variable SQLR_CLIENT_DEBUG to
+&quot;ON&quot;
 </p>
         </div>
       </div>
@@ -627,7 +628,7 @@ instance of the client.
         <div class="method-heading">
           <a href="SQLRConnection.src/M000087.html" target="Code" class="method-signature"
             onclick="popupCode('SQLRConnection.src/M000087.html');return false;">
-          <span class="method-name">setTimeout(timeoutsec,timeoutusec)<br />
+          <span class="method-name">setConnectTimeout(timeoutsec,timeoutusec)<br />
 </span>
           </a>
         </div>
@@ -635,7 +636,8 @@ instance of the client.
         <div class="method-description">
           <p>
 Sets the server connect timeout in seconds and milliseconds. Setting either
-parameter to -1 disables the timeout.
+parameter to -1 disables the timeout. You can also set this timeout using
+the SQLR_CLIENT_CONNECT_TIMEOUT environment variable.
 </p>
         </div>
       </div>

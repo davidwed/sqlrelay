@@ -40,7 +40,9 @@
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC sqlrcon&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga1d99d5cdaba0208041afcb6d55974188">sqlrcon_alloc</a> (const char *server, uint16_t port, const char *socket, const char *user, const char *password, int32_t retrytime, int32_t tries)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#gab685e1e293d1b738160a6059ef197aa3">sqlrcon_free</a> (sqlrcon sqlrconref)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#gaa056a730ec01e0a767303426c620e0ab">sqlrcon_setTimeout</a> (sqlrcon sqlrconref, int32_t timeoutsec, int32_t timeoutusec)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#gae2f508b6474c2a7de04bae732af051ac">sqlrcon_setConnectTimeout</a> (sqlrcon sqlrconref, int32_t timeoutsec, int32_t timeoutusec)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga8154aa762d31da0bcebc1764cfa3eda4">sqlrcon_setAuthenticationTimeout</a> (sqlrcon sqlrconref, int32_t timeoutsec, int32_t timeoutusec)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#gaf8e01b925771ddaa18bf754fcbd26633">sqlrcon_setResponseTimeout</a> (sqlrcon sqlrconref, int32_t timeoutsec, int32_t timeoutusec)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#gaab8cf0d429c4267f0f221ea7daf4d4ef">sqlrcon_endSession</a> (sqlrcon sqlrconref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga6a79b2621789fb6fe33ce7869e342519">sqlrcon_suspendSession</a> (sqlrcon sqlrconref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga333971e95b82ce3e9e119609605a9ec6">sqlrcon_getConnectionPort</a> (sqlrcon sqlrconref)</td></tr>
@@ -420,7 +422,7 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
       </table>
 </div>
 <div class="memdoc">
-<p>Causes verbose debugging information to be sent to standard output. Another way to do this is to start a query with "-- debug\n". Yet another way is to set the environment variable SQLRDEBUG to "ON" </p>
+<p>Causes verbose debugging information to be sent to standard output. Another way to do this is to start a query with "-- debug\n". Yet another way is to set the environment variable SQLR_CLIENT_DEBUG to "ON" </p>
 
 </div>
 </div>
@@ -766,6 +768,40 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 
 </div>
 </div>
+<a class="anchor" id="ga8154aa762d31da0bcebc1764cfa3eda4"></a><!-- doxytag: member="sqlrclientwrapper.h::sqlrcon_setAuthenticationTimeout" ref="ga8154aa762d31da0bcebc1764cfa3eda4" args="(sqlrcon sqlrconref, int32_t timeoutsec, int32_t timeoutusec)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void sqlrcon_setAuthenticationTimeout </td>
+          <td>(</td>
+          <td class="paramtype">sqlrcon&#160;</td>
+          <td class="paramname"><em>sqlrconref</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&#160;</td>
+          <td class="paramname"><em>timeoutsec</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&#160;</td>
+          <td class="paramname"><em>timeoutusec</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Sets the authentication timeout in seconds and milliseconds. Setting either parameter to -1 disables the timeout. You can also set this timeout using the SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable. </p>
+
+</div>
+</div>
 <a class="anchor" id="ga66c53edcb966837bf3c3123c099301c3"></a><!-- doxytag: member="sqlrclientwrapper.h::sqlrcon_setClientInfo" ref="ga66c53edcb966837bf3c3123c099301c3" args="(sqlrcon sqlrconref, const char *clientinfo)" -->
 <div class="memitem">
 <div class="memproto">
@@ -794,12 +830,12 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 
 </div>
 </div>
-<a class="anchor" id="gaa056a730ec01e0a767303426c620e0ab"></a><!-- doxytag: member="sqlrclientwrapper.h::sqlrcon_setTimeout" ref="gaa056a730ec01e0a767303426c620e0ab" args="(sqlrcon sqlrconref, int32_t timeoutsec, int32_t timeoutusec)" -->
+<a class="anchor" id="gae2f508b6474c2a7de04bae732af051ac"></a><!-- doxytag: member="sqlrclientwrapper.h::sqlrcon_setConnectTimeout" ref="gae2f508b6474c2a7de04bae732af051ac" args="(sqlrcon sqlrconref, int32_t timeoutsec, int32_t timeoutusec)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">SQLRCLIENTWRAPPER_DLLSPEC void sqlrcon_setTimeout </td>
+          <td class="memname">SQLRCLIENTWRAPPER_DLLSPEC void sqlrcon_setConnectTimeout </td>
           <td>(</td>
           <td class="paramtype">sqlrcon&#160;</td>
           <td class="paramname"><em>sqlrconref</em>, </td>
@@ -824,7 +860,41 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
       </table>
 </div>
 <div class="memdoc">
-<p>Sets the server connect timeout in seconds and milliseconds. Setting either parameter to -1 disables the timeout. </p>
+<p>Sets the server connect timeout in seconds and milliseconds. Setting either parameter to -1 disables the timeout. You can also set this timeout using the SQLR_CLIENT_CONNECT_TIMEOUT environment variable. </p>
+
+</div>
+</div>
+<a class="anchor" id="gaf8e01b925771ddaa18bf754fcbd26633"></a><!-- doxytag: member="sqlrclientwrapper.h::sqlrcon_setResponseTimeout" ref="gaf8e01b925771ddaa18bf754fcbd26633" args="(sqlrcon sqlrconref, int32_t timeoutsec, int32_t timeoutusec)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void sqlrcon_setResponseTimeout </td>
+          <td>(</td>
+          <td class="paramtype">sqlrcon&#160;</td>
+          <td class="paramname"><em>sqlrconref</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&#160;</td>
+          <td class="paramname"><em>timeoutsec</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&#160;</td>
+          <td class="paramname"><em>timeoutusec</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Sets the response timeout (for queries, commits, rollbacks, pings, etc.) in seconds and milliseconds. Setting either parameter to -1 disables the timeout. You can also set this timeout using the SQLR_CLIENT_RESPONSE_TIMEOUT environment variable. </p>
 
 </div>
 </div>
@@ -3989,7 +4059,7 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div>
 </div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Wed Nov 7 2012 for SQL Relay C API by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Sun Nov 11 2012 for SQL Relay C API by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

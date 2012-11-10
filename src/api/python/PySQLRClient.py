@@ -42,9 +42,10 @@ class sqlrconnection:
 
     def setConnectTimeout(self, timeoutsec, timeoutusec):
         """
-        Sets the server connect timeout in seconds
-        and milliseconds.  Setting either parameter
-        to -1 disables the timeout.
+        Sets the server connect timeout in seconds and
+        milliseconds.  Setting either parameter to -1 disables the
+        timeout.  You can also set this timeout using the
+        SQLR_CLIENT_CONNECT_TIMEOUT environment variable.
         """
         return CSQLRelay.setConnectTimeout(self.connection, timeoutsec, timeoutusec)
 
@@ -52,7 +53,8 @@ class sqlrconnection:
         """
         Sets the authentication timeout in seconds and
         milliseconds.  Setting either parameter to -1 disables the
-        timeout.
+        timeout.   You can also set this timeout using the
+        SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable.
         """
         return CSQLRelay.setAuthenticationTimeout(self.connection, timeoutsec, timeoutusec)
 
@@ -60,7 +62,9 @@ class sqlrconnection:
         """
         Sets the response timeout (for queries, commits, rollbacks,
         pings, etc.) in seconds and milliseconds.  Setting either
-        parameter to -1 disables the timeout.
+        parameter to -1 disables the timeout.  You can also set
+        this timeout using the SQLR_CLIENT_RESPONSE_TIMEOUT
+        environment variable.
         """
         return CSQLRelay.setResponseTimeout(self.connection, timeoutsec, timeoutusec)
 
@@ -227,7 +231,8 @@ class sqlrconnection:
         """
         Turn verbose debugging on.
 	Another way to do this is to start a query with "-- debug\n".
-	Yet another way is to set the environment variable SQLRDEBUG to "ON"
+	Yet another way is to set the environment variable SQLR_CLIENT_DEBUG
+        to "ON"
         """
         return CSQLRelay.debugOn(self.connection)
 

@@ -46,23 +46,27 @@ public class SQLRConnection : IDisposable
     
     
     
-    /** Sets the server connect timeout in seconds and milliseconds.
-     *  Setting either parameter to -1 disables the timeout. */
+    /** Sets the server connect timeout in seconds and milliseconds.  Setting
+     *  either parameter to -1 disables the timeout.  You can also set this
+     *  timeout using the SQLR_CLIENT_CONNECT_TIMEOUT environment variable. */
     public void setConnectTimeout(Int32 timeoutsec, Int32 timeoutusec)
     {
         sqlrcon_setConnectTimeout(sqlrconref, timeoutsec, timeoutusec);
     }
     
-    /** Sets the authentication timeout in seconds and milliseconds.
-     *  Setting either parameter to -1 disables the timeout. */
+    /** Sets the authentication timeout in seconds and milliseconds.  Setting
+     *  either parameter to -1 disables the timeout.   You can also set this
+     *  timeout using the SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment
+     *  variable. */
     public void setAuthenticationTimeout(Int32 timeoutsec, Int32 timeoutusec)
     {
         sqlrcon_setAuthenticationTimeout(sqlrconref, timeoutsec, timeoutusec);
     }
     
-    /** Sets the response timeout (for queries, commits, rollbacks, pings, etc.)
-     *  in seconds and milliseconds.  Setting either parameter to -1 disables
-     *  the timeout. */
+    /** Sets the response timeout (for queries, commits, rollbacks, pings,
+      * etc.) in seconds and milliseconds.  Setting either parameter to -1
+      * disables the timeout.  You can also set this timeout using the
+      * SQLR_CLIENT_RESPONSE_TIMEOUT environment variable. */
     public void setResponseTimeout(Int32 timeoutsec, Int32 timeoutusec)
     {
         sqlrcon_setResponseTimeout(sqlrconref, timeoutsec, timeoutusec);
@@ -227,7 +231,8 @@ public class SQLRConnection : IDisposable
     
     /** Causes verbose debugging information to be sent to standard output.
      *  Another way to do this is to start a query with "-- debug\n".
-     *  Yet another way is to set the environment variable SQLRDEBUG to "ON" */
+     *  Yet another way is to set the environment variable SQLR_CLIENT_DEBUG
+     *  to "ON" */
     public void debugOn()
     {
         sqlrcon_debugOn(sqlrconref);

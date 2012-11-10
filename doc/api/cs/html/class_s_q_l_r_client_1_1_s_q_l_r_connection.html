@@ -55,7 +55,9 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_client_1_1_s_q_l_r_connection.html#a24395053b0c698a8d2b22a90fc51ced6">SQLRConnection</a> (String server, UInt16 port, String socket, String user, String password, Int32 retrytime, Int32 tries)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a187299a99ef3dd0265ff9d8f79116b2c"></a><!-- doxytag: member="SQLRClient::SQLRConnection::Dispose" ref="a187299a99ef3dd0265ff9d8f79116b2c" args="()" -->
 void&#160;</td><td class="memItemRight" valign="bottom"><b>Dispose</b> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_client_1_1_s_q_l_r_connection.html#aa13f9d0b73fb93fb140e0398f89eac75">setTimeout</a> (Int32 timeoutsec, Int32 timeoutusec)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_client_1_1_s_q_l_r_connection.html#a732cb347f06df0a17f6ea7da3e4c4456">setConnectTimeout</a> (Int32 timeoutsec, Int32 timeoutusec)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_client_1_1_s_q_l_r_connection.html#a1c1b3a903fbde7051220cd8152eb7a34">setAuthenticationTimeout</a> (Int32 timeoutsec, Int32 timeoutusec)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_client_1_1_s_q_l_r_connection.html#a4105243e2e3429cbf11e37fa4baed022">setResponseTimeout</a> (Int32 timeoutsec, Int32 timeoutusec)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_client_1_1_s_q_l_r_connection.html#ad1d4873cf5cf6fb71f654c460804a492">endSession</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">Boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_client_1_1_s_q_l_r_connection.html#a45ed25468d19a01e48064c1e2a24a545">suspendSession</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">UInt16&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_q_l_r_client_1_1_s_q_l_r_connection.html#a70629cc641211b0c7adb4b9287307988">getConnectionPort</a> ()</td></tr>
@@ -297,7 +299,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Dispose</b> (
       </table>
 </div>
 <div class="memdoc">
-<p>Causes verbose debugging information to be sent to standard output. Another way to do this is to start a query with "-- debug\n". Yet another way is to set the environment variable SQLRDEBUG to "ON" </p>
+<p>Causes verbose debugging information to be sent to standard output. Another way to do this is to start a query with "-- debug\n". Yet another way is to set the environment variable SQLR_CLIENT_DEBUG to "ON" </p>
 
 </div>
 </div>
@@ -585,30 +587,12 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Dispose</b> (
 
 </div>
 </div>
-<a class="anchor" id="a7e361a7c97498c6a3c6b0f9194376ff2"></a><!-- doxytag: member="SQLRClient::SQLRConnection::setClientInfo" ref="a7e361a7c97498c6a3c6b0f9194376ff2" args="(String clientinfo)" -->
+<a class="anchor" id="a1c1b3a903fbde7051220cd8152eb7a34"></a><!-- doxytag: member="SQLRClient::SQLRConnection::setAuthenticationTimeout" ref="a1c1b3a903fbde7051220cd8152eb7a34" args="(Int32 timeoutsec, Int32 timeoutusec)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void SQLRClient.SQLRConnection.setClientInfo </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>clientinfo</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Allows you to set a string that will be passed to the server and ultimately included in server-side logging along with queries that were run by this instance of the client. </p>
-
-</div>
-</div>
-<a class="anchor" id="aa13f9d0b73fb93fb140e0398f89eac75"></a><!-- doxytag: member="SQLRClient::SQLRConnection::setTimeout" ref="aa13f9d0b73fb93fb140e0398f89eac75" args="(Int32 timeoutsec, Int32 timeoutusec)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void SQLRClient.SQLRConnection.setTimeout </td>
+          <td class="memname">void SQLRClient.SQLRConnection.setAuthenticationTimeout </td>
           <td>(</td>
           <td class="paramtype">Int32&#160;</td>
           <td class="paramname"><em>timeoutsec</em>, </td>
@@ -627,7 +611,81 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Dispose</b> (
       </table>
 </div>
 <div class="memdoc">
-<p>Sets the server connect timeout in seconds and milliseconds. Setting either parameter to -1 disables the timeout. </p>
+<p>Sets the authentication timeout in seconds and milliseconds. Setting either parameter to -1 disables the timeout. You can also set this timeout using the SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable. </p>
+
+</div>
+</div>
+<a class="anchor" id="a7e361a7c97498c6a3c6b0f9194376ff2"></a><!-- doxytag: member="SQLRClient::SQLRConnection::setClientInfo" ref="a7e361a7c97498c6a3c6b0f9194376ff2" args="(String clientinfo)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SQLRClient.SQLRConnection.setClientInfo </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>clientinfo</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Allows you to set a string that will be passed to the server and ultimately included in server-side logging along with queries that were run by this instance of the client. </p>
+
+</div>
+</div>
+<a class="anchor" id="a732cb347f06df0a17f6ea7da3e4c4456"></a><!-- doxytag: member="SQLRClient::SQLRConnection::setConnectTimeout" ref="a732cb347f06df0a17f6ea7da3e4c4456" args="(Int32 timeoutsec, Int32 timeoutusec)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SQLRClient.SQLRConnection.setConnectTimeout </td>
+          <td>(</td>
+          <td class="paramtype">Int32&#160;</td>
+          <td class="paramname"><em>timeoutsec</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Int32&#160;</td>
+          <td class="paramname"><em>timeoutusec</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Sets the server connect timeout in seconds and milliseconds. Setting either parameter to -1 disables the timeout. You can also set this timeout using the SQLR_CLIENT_CONNECT_TIMEOUT environment variable. </p>
+
+</div>
+</div>
+<a class="anchor" id="a4105243e2e3429cbf11e37fa4baed022"></a><!-- doxytag: member="SQLRClient::SQLRConnection::setResponseTimeout" ref="a4105243e2e3429cbf11e37fa4baed022" args="(Int32 timeoutsec, Int32 timeoutusec)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SQLRClient.SQLRConnection.setResponseTimeout </td>
+          <td>(</td>
+          <td class="paramtype">Int32&#160;</td>
+          <td class="paramname"><em>timeoutsec</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Int32&#160;</td>
+          <td class="paramname"><em>timeoutusec</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Sets the response timeout (for queries, commits, rollbacks, pings, etc.) in seconds and milliseconds. Setting either parameter to -1 disables the timeout. You can also set this timeout using the SQLR_CLIENT_RESPONSE_TIMEOUT environment variable. </p>
 
 </div>
 </div>
@@ -649,7 +707,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Dispose</b> (
 </div>
 </div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Wed Nov 7 2012 for SQL Relay C# API by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Sun Nov 11 2012 for SQL Relay C# API by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
