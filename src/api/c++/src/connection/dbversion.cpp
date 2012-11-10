@@ -22,7 +22,8 @@ const char *sqlrconnection::dbVersion() {
 
 	// get the dbversion
 	uint16_t	size;
-	if (cs->read(&size)==sizeof(uint16_t)) {
+	if (cs->read(&size,responsetimeoutsec,
+				responsetimeoutusec)==sizeof(uint16_t)) {
 		delete[] dbversion;
 		dbversion=new char[size+1];
 		if (cs->read(dbversion,size)!=size) {

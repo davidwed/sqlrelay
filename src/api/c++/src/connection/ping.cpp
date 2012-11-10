@@ -22,7 +22,8 @@ bool sqlrconnection::ping() {
 
 	// get the ping result
 	bool	result;
-	if (cs->read(&result)!=sizeof(bool)) {
+	if (cs->read(&result,responsetimeoutsec,
+				responsetimeoutusec)!=sizeof(bool)) {
 		setError("Failed to ping.\n A network error may have ocurred.");
 		return false;
 	}

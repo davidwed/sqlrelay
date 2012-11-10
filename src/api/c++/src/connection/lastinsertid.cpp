@@ -25,7 +25,8 @@ uint64_t sqlrconnection::getLastInsertId() {
 	// get the last insert id
 	uint64_t	id=0;
 	bool		success;
-	if (cs->read(&success)==sizeof(bool)) {
+	if (cs->read(&success,responsetimeoutsec,
+				responsetimeoutusec)==sizeof(bool)) {
 
 		if (success) {
 

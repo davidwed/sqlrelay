@@ -22,7 +22,8 @@ const char *sqlrconnection::bindFormat() {
 
 	// get the bindformat
 	uint16_t	size;
-	if (cs->read(&size)==sizeof(uint16_t)) {
+	if (cs->read(&size,responsetimeoutsec,
+				responsetimeoutusec)==sizeof(uint16_t)) {
 		delete[] bindformat;
 		bindformat=new char[size+1];
 		if (cs->read(bindformat,size)!=size) {

@@ -36,7 +36,8 @@ bool sqlrconnection::selectDatabase(const char *database) {
 
 	// get the result
 	bool	result;
-	if (cs->read(&result)!=sizeof(bool)) {
+	if (cs->read(&result,responsetimeoutsec,
+				responsetimeoutusec)!=sizeof(bool)) {
 		debugPrint("Error selecting database.\n");
 		setError("Failed to select database.\n "
 				"A network error may have ocurred.");
@@ -87,7 +88,8 @@ const char *sqlrconnection::getCurrentDatabase() {
 
 	// get the current db name
 	uint16_t	size;
-	if (cs->read(&size)==sizeof(uint16_t)) {
+	if (cs->read(&size,responsetimeoutsec,
+				responsetimeoutusec)==sizeof(uint16_t)) {
 		delete[] currentdbname;
 		currentdbname=new char[size+1];
 		if (cs->read(currentdbname,size)!=size) {

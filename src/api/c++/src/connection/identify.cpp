@@ -22,7 +22,8 @@ const char *sqlrconnection::identify() {
 
 	// get the id
 	uint16_t	size;
-	if (cs->read(&size)==sizeof(uint16_t)) {
+	if (cs->read(&size,responsetimeoutsec,
+				responsetimeoutusec)==sizeof(uint16_t)) {
 		delete[] id;
 		id=new char[size+1];
 		if (cs->read(id,size)!=size) {

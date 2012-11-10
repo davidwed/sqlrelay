@@ -22,7 +22,8 @@ const char *sqlrconnection::serverVersion() {
 
 	// get the server version
 	uint16_t	size;
-	if (cs->read(&size)==sizeof(uint16_t)) {
+	if (cs->read(&size,responsetimeoutsec,
+				responsetimeoutusec)==sizeof(uint16_t)) {
 		delete[] serverversion;
 		serverversion=new char[size+1];
 		if (cs->read(serverversion,size)!=size) {

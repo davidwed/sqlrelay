@@ -36,7 +36,8 @@ bool sqlrconnection::autoCommit(bool on) {
 	flushWriteBuffer();
 
 	bool	response;
-	if (cs->read(&response)!=sizeof(bool)) {
+	if (cs->read(&response,responsetimeoutsec,
+				responsetimeoutusec)!=sizeof(bool)) {
 		if (!on) {
 			setError("Failed to set autocommit off.\n A network error may have ocurred.");
 		} else {
