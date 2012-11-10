@@ -377,4 +377,5 @@ uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrlogger_custom_nw.la
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
+	$(RMTREE) $(logdir)
 	$(RMTREE) $(debugdir)
