@@ -1,7 +1,7 @@
 // Copyright (c) 2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrloggers/neowiz.h>
+#include <sqlrloggers/custom_nw.h>
 #include <sqlrconnection.h>
 #include <rudiments/charstring.h>
 #include <rudiments/directory.h>
@@ -16,16 +16,16 @@ using namespace rudiments;
 #endif
 
 extern "C" {
-	sqlrlogger	*new_neowiz(xmldomnode *parameters) {
-		return new neowiz(parameters);
+	sqlrlogger	*new_custom_nw(xmldomnode *parameters) {
+		return new custom_nw(parameters);
 	}
 }
 
-neowiz::neowiz(xmldomnode *parameters) : sqlrlogger(parameters) {
+custom_nw::custom_nw(xmldomnode *parameters) : sqlrlogger(parameters) {
 	querylogname=NULL;
 }
 
-bool neowiz::init(sqlrconnection_svr *sqlrcon) {
+bool custom_nw::init(sqlrconnection_svr *sqlrcon) {
 	debugFunction();
 
 	cmdline	*cmdl=sqlrcon->cmdl;
@@ -79,7 +79,7 @@ bool neowiz::init(sqlrconnection_svr *sqlrcon) {
 				permissions::evalPermString("rw-------"));
 }
 
-bool neowiz::run(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur) {
+bool custom_nw::run(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur) {
 	debugFunction();
 
 	// reinit the log if the file was switched
@@ -156,7 +156,7 @@ bool neowiz::run(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur) {
 	return (querylog.write(querylogbuf)==charstring::length(querylogbuf));
 }
 
-int neowiz::strescape(const char *str, char *buf, int limit) {
+int custom_nw::strescape(const char *str, char *buf, int limit) {
 	// from oracpool my_strescape()
 	register char	*q=buf;
 	const char	*strend=str+charstring::length(str);
@@ -183,7 +183,7 @@ int neowiz::strescape(const char *str, char *buf, int limit) {
 	return (q-buf);
 }
 
-bool neowiz::descInputBinds(sqlrcursor_svr *cursor, char *buf, int limit) {
+bool custom_nw::descInputBinds(sqlrcursor_svr *cursor, char *buf, int limit) {
 
 	char		*c=buf;	
 	int		remain_len=limit;

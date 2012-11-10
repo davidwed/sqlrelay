@@ -244,7 +244,7 @@ all: libsqlrconnection.la \
 	libsqlrelay_sqltranslation_oracleize.la \
 	libsqlrelay_sqltranslation_serialtoautoincrement.la \
 	libsqlrelay_sqlrlogger_slowqueries.la \
-	libsqlrelay_sqlrlogger_pipedelimited.la
+	libsqlrelay_sqlrlogger_custom_nw.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -297,8 +297,8 @@ libsqlrelay_sqltranslation_serialtoautoincrement.la: sqltranslations/serialtoaut
 libsqlrelay_sqlrlogger_slowqueries.la: sqlrloggers/slowqueries.cpp sqlrloggers/slowqueries.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrloggers/slowqueries.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
 
-libsqlrelay_sqlrlogger_pipedelimited.la: sqlrloggers/pipedelimited.cpp sqlrloggers/pipedelimited.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrloggers/pipedelimited.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+libsqlrelay_sqlrlogger_custom_nw.la: sqlrloggers/custom_nw.cpp sqlrloggers/custom_nw.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrloggers/custom_nw.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
 	
 install: install-connection install-triggers install-translations install-loggers
 
@@ -354,8 +354,8 @@ install-loggers:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libsqlrelay_sqlrlogger_slowqueries.la $(libdir)
 	$(RM) $(libdir)/libsqlrelay_sqlrlogger_slowqueries.a
-	$(LTINSTALL) libsqlrelay_sqlrlogger_pipedelimited.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqlrlogger_pipedelimited.a
+	$(LTINSTALL) libsqlrelay_sqlrlogger_custom_nw.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqlrlogger_custom_nw.a
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:
@@ -374,7 +374,7 @@ uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_oracleize.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_serialtoautoincrement.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrlogger_slowqueries.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrlogger_pipedelimited.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrlogger_custom_nw.la
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

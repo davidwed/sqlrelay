@@ -1,15 +1,15 @@
 // Copyright (c) 2012  David Muse
 // See the file COPYING for more information
 
-#ifndef NEOWIZ_H
-#define NEOWIZ_H
+#ifndef CUSTOM_NW_H
+#define CUSTOM_NW_H
 
 #include <sqlrlogger.h>
 #include <rudiments/file.h>
 
-class neowiz : public sqlrlogger {
+class custom_nw : public sqlrlogger {
 	public:
-			neowiz(rudiments::xmldomnode *parameters);
+			custom_nw(rudiments::xmldomnode *parameters);
 
 		bool	init(sqlrconnection_svr *sqlrcon);
 		bool	run(sqlrconnection_svr *sqlrcon,
