@@ -40,8 +40,7 @@ void sqlrconnection_svr::selectDatabaseCommand() {
 	
 	// Select the db and send back the result.  If we've been told to
 	// ignore these calls, skip the actual call but act like it succeeded.
-	char	*error=NULL;
-	bool	result=(ignoreselectdb)?true:selectDatabase(db,&error);
+	bool	result=(ignoreselectdb)?true:selectDatabase(db);
 	clientsock->write(result);
 
 	// if there was an error, send it back
@@ -56,7 +55,10 @@ void sqlrconnection_svr::selectDatabaseCommand() {
 	return;
 }
 
-bool sqlrconnection_svr::selectDatabase(const char *database, char **error) {
+bool sqlrconnection_svr::selectDatabase(const char *database) {
+
+	// re-init error data
+	clearError();
 
 	// handle the degenerate case
 	if (!database) {
@@ -100,11 +102,11 @@ bool sqlrconnection_svr::selectDatabase(const char *database, char **error) {
 		// so it can be reset at the end of the session
 		dbselected=true;
 	} else {
+		// If there was an error, copy it out.  We'l be destroying the
+		// cursor in a moment and the error will be lost otherwise.
 		const char	*err;
-		int64_t		errnum;
-		bool		liveconnection;
 		sdcur->errorMessage(&err,&errnum,&liveconnection);
-		*error=charstring::duplicate(err);
+		error=charstring::duplicate(err);
 	}
 	delete[] sdquery;
 	sdcur->closeCursor();

@@ -116,7 +116,7 @@ class sqliteconnection : public sqlrconnection_svr {
 #ifdef SQLITE_TRANSACTIONAL
 		const char	*setIsolationLevelQuery();
 #endif
-		bool		getLastInsertId(uint64_t *id, char **error);
+		bool		getLastInsertId(uint64_t *id);
 #ifdef SQLITE3
 		char		*duplicate(const char *str);
 #endif

@@ -196,7 +196,7 @@ class routerconnection : public sqlrconnection_svr {
 		const char	*identify();
 		const char	*dbVersion();
 		bool		ping();
-		bool		getLastInsertId(uint64_t *id, char **error);
+		bool		getLastInsertId(uint64_t *id);
 		void		endSession();
 
 		void	autoCommitOnFailed(uint16_t index);

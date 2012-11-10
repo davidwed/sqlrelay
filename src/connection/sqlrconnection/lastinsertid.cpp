@@ -9,8 +9,7 @@ void sqlrconnection_svr::getLastInsertIdCommand() {
 
 	// get the last insert id
 	uint64_t	id;
-	char		*error=NULL;
-	bool	success=getLastInsertId(&id,&error);
+	bool	success=getLastInsertId(&id);
 
 	// send success/failure
 	clientsock->write(success);
@@ -27,13 +26,13 @@ void sqlrconnection_svr::getLastInsertIdCommand() {
 		clientsock->write(error,errorlen);
 	}
 
-	// clean up
-	delete[] error;
-
 	flushWriteBuffer();
 }
 
-bool sqlrconnection_svr::getLastInsertId(uint64_t *id, char **error) {
+bool sqlrconnection_svr::getLastInsertId(uint64_t *id) {
+
+	// re-init error data
+	clearError();
 
 	// get the get current database query base
 	const char	*liiquery=getLastInsertIdQuery();
@@ -41,7 +40,7 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id, char **error) {
 	// If there is no query for this then the db we're using doesn't
 	// support switching.
 	if (!liiquery) {
-		*error=charstring::duplicate(
+		error=charstring::duplicate(
 				"get last insert id not supported");
 		return false;
 	}
@@ -69,17 +68,16 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id, char **error) {
 
 		}  else {
 
-			*error=charstring::duplicate("no values returned");
+			error=charstring::duplicate("no values returned");
 			retval=false;
 		}
 
 	} else {
-		// get error message
+		// If there was an error, copy it out.  We'l be destroying the
+		// cursor in a moment and the error will be lost otherwise.
 		const char	*err;
-		int64_t		errnum;
-		bool		liveconnection;
 		liicur->errorMessage(&err,&errnum,&liveconnection);
-		*error=charstring::duplicate(err);
+		error=charstring::duplicate(err);
 	}
 
 	liicur->cleanUpData(true,true);

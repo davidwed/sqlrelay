@@ -251,8 +251,8 @@ class sqlrcursor_svr {
 		char	*skipWhitespaceAndComments(const char *querybuffer);
 		void	fakeInputBinds();
 
-		bool	advance(char **ptr, const char *endptr,
-						uint16_t steps);
+		void	clearError();
+		void	setError(const char *err, int64_t errn, bool liveconn);
 
 		sqlrconnection_svr	*conn;
 		regularexpression	createtemp;
@@ -277,8 +277,10 @@ class sqlrcursor_svr {
 		uint32_t	querylength;
 		xmldom		*querytree;
 		bool		queryresult;
-		const char	*queryerror;
-		int64_t		queryerrnum;
+
+		const char	*error;
+		int64_t		errnum;
+		bool		liveconnection;
 
 		int64_t		commandstartsec;
 		int64_t		commandstartusec;

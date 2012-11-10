@@ -58,9 +58,7 @@ void sqlrconnection_svr::endSessionInternal() {
 	if (dbselected) {
 		// FIXME: we're ignoring the result and error,
 		// should we do something if there's an error?
-		char	*error=NULL;
-		selectDatabase(originaldb,&error);
-		delete[] error;
+		selectDatabase(originaldb);
 		dbselected=false;
 	}
 

@@ -145,11 +145,10 @@ bool sqlrconnection_svr::getListByApiCall(sqlrcursor_svr *cursor,
 
 	// if an error occurred...
 	if (!success) {
-		const char	*err=NULL;
-		int64_t		errnum=0;
-		bool		liveconnection;
-		cursor->errorMessage(&err,&errnum,&liveconnection);
-		returnQueryError(cursor,err,errnum,false);
+		cursor->errorMessage(&(cursor->error),
+					&(cursor->errnum),
+					&(cursor->liveconnection));
+		returnError(cursor);
 
 		// this is actually OK, only return false on a network error
 		return true;

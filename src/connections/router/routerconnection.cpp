@@ -278,7 +278,7 @@ bool routerconnection::ping() {
 	return result;
 }
 
-bool routerconnection::getLastInsertId(uint64_t *id, char **error) {
+bool routerconnection::getLastInsertId(uint64_t *id) {
 
 	// run it against the previously used connection,
 	// unless there wasn't one
@@ -287,12 +287,9 @@ bool routerconnection::getLastInsertId(uint64_t *id, char **error) {
 		return true;
 	}
 	*id=cur->getLastInsertId();
-	*error=NULL;
 	if (*id==0) {
-		*error=charstring::duplicate(cur->errorMessage());
-		if (*error) {
-			return false;
-		}
+		// FIXME: how can we report an error here?
+		return false;
 	}
 	return true;
 }

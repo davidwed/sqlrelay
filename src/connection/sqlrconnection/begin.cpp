@@ -8,7 +8,7 @@ void sqlrconnection_svr::beginCommand() {
 	if (beginInternal()) {
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	} else {
-		returnTransactionError();
+		returnError();
 	}
 	flushWriteBuffer();
 }
@@ -26,17 +26,14 @@ const char *sqlrconnection_svr::beginTransactionQuery() {
 
 bool sqlrconnection_svr::begin() {
 
+	// re-init error data
+	clearError();
+
 	// for db's that don't support begin queries,
 	// don't do anything, just return true
 	if (!supportsTransactionBlocks()) {
 		return true;
 	}
-
-	// re-init error data
-	delete[] txerror;
-	txerror=NULL;
-	txerrnum=0;
-	txliveconnection=false;
 
 	// for db's that support begin queries, run one
 	dbgfile.debugPrint("connection",1,"begin...");
@@ -59,8 +56,8 @@ bool sqlrconnection_svr::begin() {
 	// cursor in a moment and the error will be lost otherwise.
 	if (!retval) {
 		const char	*err;
-		begincur->errorMessage(&err,&txerrnum,&txliveconnection);
-		txerror=charstring::duplicate(err);
+		begincur->errorMessage(&err,&errnum,&liveconnection);
+		error=charstring::duplicate(err);
 	}
 
 	// clean up

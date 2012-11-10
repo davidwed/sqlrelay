@@ -154,7 +154,7 @@ const char *sqliteconnection::setIsolationLevelQuery() {
 }
 #endif
 
-bool sqliteconnection::getLastInsertId(uint64_t *id, char **error) {
+bool sqliteconnection::getLastInsertId(uint64_t *id) {
 	*id=sqlite3_last_insert_rowid(sqliteptr);
 	return true;
 }

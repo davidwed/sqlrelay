@@ -13,7 +13,7 @@ sqlrconnection_svr::~sqlrconnection_svr() {
 	delete cmdl;
 	delete cfgfl;
 
-	delete[] txerror;
+	delete[] error;
 
 	delete[] updown;
 

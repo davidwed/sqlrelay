@@ -8,7 +8,7 @@ void sqlrconnection_svr::rollbackCommand() {
 	if (rollbackInternal()) {
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	} else {
-		returnTransactionError();
+		returnError();
 	}
 	flushWriteBuffer();
 }
@@ -27,10 +27,7 @@ bool sqlrconnection_svr::rollback() {
 	dbgfile.debugPrint("connection",1,"rollback...");
 
 	// re-init error data
-	delete[] txerror;
-	txerror=NULL;
-	txerrnum=0;
-	txliveconnection=false;
+	clearError();
 
 	// init some variables
 	sqlrcursor_svr	*rollbackcur=initCursorInternal();
@@ -51,8 +48,8 @@ bool sqlrconnection_svr::rollback() {
 	// cursor in a moment and the error will be lost otherwise.
 	if (!retval) {
 		const char	*err;
-		rollbackcur->errorMessage(&err,&txerrnum,&txliveconnection);
-		txerror=charstring::duplicate(err);
+		rollbackcur->errorMessage(&err,&errnum,&liveconnection);
+		error=charstring::duplicate(err);
 	}
 
 	// clean up

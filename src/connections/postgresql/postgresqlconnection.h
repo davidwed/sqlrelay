@@ -120,7 +120,7 @@ class postgresqlconnection : public sqlrconnection_svr {
 		const char	*getColumnListQuery(bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
-		bool		getLastInsertId(uint64_t *id, char **error);
+		bool		getLastInsertId(uint64_t *id);
 		const char	*getLastInsertIdQuery();
 		const char	*bindFormat();
 

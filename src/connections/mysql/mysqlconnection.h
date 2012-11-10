@@ -156,7 +156,7 @@ class mysqlconnection : public sqlrconnection_svr {
 		const char	*getColumnListQuery(bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
-		bool		getLastInsertId(uint64_t *id, char **error);
+		bool		getLastInsertId(uint64_t *id);
 		bool		autoCommitOn();
 		bool		autoCommitOff();
 		bool		commit();

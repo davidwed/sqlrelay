@@ -8,7 +8,7 @@ void sqlrconnection_svr::commitCommand() {
 	if (commitInternal()) {
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	} else {
-		returnTransactionError();
+		returnError();
 	}
 	flushWriteBuffer();
 }
@@ -26,10 +26,7 @@ bool sqlrconnection_svr::commit() {
 	dbgfile.debugPrint("connection",1,"commit...");
 
 	// re-init error data
-	delete[] txerror;
-	txerror=NULL;
-	txerrnum=0;
-	txliveconnection=false;
+	clearError();
 
 	// init some variables
 	sqlrcursor_svr	*commitcur=initCursorInternal();
@@ -50,8 +47,8 @@ bool sqlrconnection_svr::commit() {
 	// cursor in a moment and the error will be lost otherwise.
 	if (!retval) {
 		const char	*err;
-		commitcur->errorMessage(&err,&txerrnum,&txliveconnection);
-		txerror=charstring::duplicate(err);
+		commitcur->errorMessage(&err,&errnum,&liveconnection);
+		error=charstring::duplicate(err);
 	}
 
 	// clean up

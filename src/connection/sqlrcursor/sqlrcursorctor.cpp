@@ -17,8 +17,10 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 	querylength=0;
 	querytree=NULL;
 	queryresult=false;
-	queryerror=NULL;
-	queryerrnum=0;
+
+	error=NULL;
+	errnum=0;
+	liveconnection=true;
 
 	commandstartsec=0;
 	commandstartusec=0;

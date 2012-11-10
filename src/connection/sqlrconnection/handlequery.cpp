@@ -44,29 +44,17 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 	}
 
 	// loop here to handle down databases
-	const char	*error;
-	int64_t		errnum;
-	bool		liveconnection;
 	for (;;) {
-
-		// init error
-		error=NULL;
-		errnum=0;
-		liveconnection=true;
 
 		// process the query
 		bool	success=false;
 		bool	wasfaketransactionquery=false;
 		if (!reexecute && !bindcursor && faketransactionblocks) {
 			success=handleFakeTransactionQueries(cursor,
-						&wasfaketransactionquery,
-						&error,&errnum);
+						&wasfaketransactionquery);
 		}
 		if (!wasfaketransactionquery) {
-			success=processQuery(cursor,reexecute,
-						bindcursor,
-						&error,&errnum,
-						&liveconnection);
+			success=processQuery(cursor,reexecute,bindcursor);
 		}
 
 		if (success) {
@@ -108,17 +96,16 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 
 			// if the db is still up, or if we're not waiting
 			// for them if they're down, then return the error
-			if (liveconnection ||
+			if (cursor->liveconnection ||
 				!cfgfl->getWaitForDownDatabase()) {
 
 				// return the error
-				returnQueryError(cursor,error,errnum,
-							!liveconnection);
+				returnError(cursor);
 			}
 
 			// if the error was a dead connection
 			// then re-establish the connection
-			if (!liveconnection) {
+			if (!cursor->liveconnection) {
 
 				dbgfile.debugPrint("connection",3,
 							"database is down...");
@@ -220,9 +207,7 @@ bool sqlrconnection_svr::getSendColumnInfo() {
 }
 
 bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
-					bool reexecute, bool bindcursor,
-					const char **error, int64_t *errnum,
-					bool *liveconnection) {
+					bool reexecute, bool bindcursor) {
 
 	// Very important...
 	// Clean up data here instead of when aborting a result set, this
@@ -230,6 +215,9 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	// result set was fetched to still be able to return column data
 	// when resumed.
 	cursor->cleanUpData(true,true);
+
+	// re-init error data
+	cursor->clearError();
 
 	dbgfile.debugPrint("connection",2,"processing query...");
 
@@ -337,10 +325,10 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	
 	// if the query failed, get the error
 	if (!success) {
-		cursor->errorMessage(error,errnum,liveconnection);
 		// FIXME: errors for queries run by triggers won't be set here
-		cursor->queryerror=*error;
-		cursor->queryerrnum=*errnum;
+		cursor->errorMessage(&(cursor->error),
+					&(cursor->errnum),
+					&(cursor->liveconnection));
 	}
 
 	if (success) {

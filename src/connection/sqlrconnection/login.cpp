@@ -85,9 +85,7 @@ void sqlrconnection_svr::reLogIn() {
 	sessionStartQueries();
 
 	// restore the db
-	char	*error=NULL;
-	selectDatabase(currentdb,&error);
-	delete[] error;
+	selectDatabase(currentdb);
 
 	// restore autocommit
 	if (autocommit) {

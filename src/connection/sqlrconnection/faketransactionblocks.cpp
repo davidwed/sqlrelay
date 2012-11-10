@@ -12,9 +12,10 @@ bool sqlrconnection_svr::supportsTransactionBlocks() {
 }
 
 bool sqlrconnection_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
-						bool *wasfaketransactionquery,
-						const char **error,
-						int64_t *errnum) {
+						bool *wasfaketransactionquery) {
+
+	// re-init error data
+	cursor->clearError();
 
 	*wasfaketransactionquery=false;
 
@@ -28,35 +29,45 @@ bool sqlrconnection_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 		cursor->outbindcount=0;
 		sendcolumninfo=DONT_SEND_COLUMN_INFO;
 		if (intransactionblock) {
-			*error="begin while already in transaction block";
-			*errnum=999999;
+			cursor->error="begin while in transaction block";
+			cursor->errnum=999999;
 			return false;
 		}
-		return beginFakeTransactionBlock();
+		return beginInternal();
+		// FIXME: if the begin fails and the db api doesn't support
+		// a begin command then the connection-level error needs to
+		// be copied to the cursor so handleQueryOrBindCursor can
+		// report it
 	} else if (isCommitQuery(cursor)) {
 		*wasfaketransactionquery=true;
 		cursor->inbindcount=0;
 		cursor->outbindcount=0;
 		sendcolumninfo=DONT_SEND_COLUMN_INFO;
-		// FIXME: move this into commitInternal
 		if (!intransactionblock) {
-			*error="commit while not in transaction block";
-			*errnum=999998;
+			cursor->error="commit while not in transaction block";
+			cursor->errnum=999998;
 			return false;
 		}
 		return commitInternal();
+		// FIXME: if the commit fails and the db api doesn't support
+		// a commit command then the connection-level error needs to
+		// be copied to the cursor so handleQueryOrBindCursor can
+		// report it
 	} else if (isRollbackQuery(cursor)) {
 		*wasfaketransactionquery=true;
 		cursor->inbindcount=0;
 		cursor->outbindcount=0;
 		sendcolumninfo=DONT_SEND_COLUMN_INFO;
-		// FIXME: move this into rollbackInternal
 		if (!intransactionblock) {
-			*error="rollback while not in transaction block";
-			*errnum=999997;
+			cursor->error="rollback while not in transaction block";
+			cursor->errnum=999997;
 			return false;
 		}
 		return rollbackInternal();
+		// FIXME: if the rollback fails and the db api doesn't support
+		// a rollback command then the connection-level error needs to
+		// be copied to the cursor so handleQueryOrBindCursor can
+		// report it
 	}
 	return false;
 }

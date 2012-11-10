@@ -95,7 +95,7 @@ bool custom_nw::run(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur) {
 	if (sqlrcur->queryresult) {
 		charstring::copy(errorcodebuf,"0");
 	} else {
-		snprintf(errorcodebuf,100,sqlrcur->queryerror);
+		snprintf(errorcodebuf,100,sqlrcur->error);
 	}
 
 	// escape the query

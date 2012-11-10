@@ -94,13 +94,6 @@ bool sqlrcursor_svr::skipWhitespace(char **ptr, const char *endptr) {
 	return *ptr!=endptr;
 }
 
-bool sqlrcursor_svr::advance(char **ptr, const char *endptr, uint16_t steps) {
-	for (uint16_t i=0; i<steps && *ptr<endptr; i++) {
-		(*ptr)++;
-	}
-	return *ptr!=endptr;
-}
-
 bool sqlrcursor_svr::getColumnNameList(stringbuffer *output) {
 	return true;
 }

@@ -321,10 +321,10 @@ const char *postgresqlconnection::getCurrentDatabaseQuery() {
 	return "select current_database()";
 }
 
-bool postgresqlconnection::getLastInsertId(uint64_t *id, char **error) {
+bool postgresqlconnection::getLastInsertId(uint64_t *id) {
 #ifdef HAVE_POSTGRESQL_PQOIDVALUE
 	if (lastinsertidquery) {
-		return sqlrconnection_svr::getLastInsertId(id,error);
+		return sqlrconnection_svr::getLastInsertId(id);
 	}
 	*id=(currentoid!=InvalidOid)?currentoid:0;
 	return true;

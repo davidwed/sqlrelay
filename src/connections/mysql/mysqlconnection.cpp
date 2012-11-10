@@ -268,7 +268,7 @@ const char *mysqlconnection::getCurrentDatabaseQuery() {
 	return "select database()";
 }
 
-bool mysqlconnection::getLastInsertId(uint64_t *id, char **error) {
+bool mysqlconnection::getLastInsertId(uint64_t *id) {
 	*id=mysql_insert_id(&mysql);
 	return true;
 }

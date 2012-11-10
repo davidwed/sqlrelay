@@ -68,13 +68,11 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 							int64_t *errorcode,
 							bool *liveconnection)=0;
 		virtual bool	supportsTransactionBlocks();
-		virtual bool		selectDatabase(const char *database,
-								char **error);
+		virtual bool		selectDatabase(const char *database);
 		virtual const char	*selectDatabaseQuery();
 		virtual char		*getCurrentDatabase();
 		virtual const char	*getCurrentDatabaseQuery();
-		virtual bool		getLastInsertId(uint64_t *id,
-								char **error);
+		virtual bool		getLastInsertId(uint64_t *id);
 		virtual const char	*getLastInsertIdQuery();
 		virtual bool		setIsolationLevel(const char *isolevel);
 		virtual const char	*setIsolationLevelQuery();
@@ -273,9 +271,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool	autoCommitOffInternal();
 		void	translateBeginTransaction(sqlrcursor_svr *cursor);
 		bool	handleFakeTransactionQueries(sqlrcursor_svr *cursor,
-						bool *wasfaketransactionquery,
-						const char **error,
-						int64_t *errnum);
+						bool *wasfaketransactionquery);
 		bool	beginFakeTransactionBlock();
 		bool	endFakeTransactionBlock();
 		bool	isBeginTransactionQuery(sqlrcursor_svr *cursor);
@@ -350,10 +346,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool	getSendColumnInfo();
 		bool	processQuery(sqlrcursor_svr *cursor,
 						bool reexecute,
-						bool bindcursor,
-						const char **error,
-						int64_t *errnum,
-						bool *disconnect);
+						bool bindcursor);
 		void	rewriteQuery(sqlrcursor_svr *cursor);
 		void	translateBindVariables(sqlrcursor_svr *cursor);
 		bool	matchesNativeBindFormat(const char *bind);
@@ -369,16 +362,15 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	translateBindVariablesFromMappings(
 						sqlrcursor_svr *cursor);
 		void	commitOrRollback(sqlrcursor_svr *cursor);
-		void	returnTransactionError();
-		bool	handleError(sqlrcursor_svr *cursor);
-		void	returnQueryError(sqlrcursor_svr *cursor,
-						const char *error,
-						int64_t errnum,
-						bool disconnect);
 		void	returnResultSet();
 		void	returnOutputBindValues(sqlrcursor_svr *cursor);
 		void	returnResultSetHeader(sqlrcursor_svr *cursor);
 		bool	returnResultSetData(sqlrcursor_svr *cursor);
+
+		void	clearError();
+		void	setError(const char *err, int64_t errn, bool liveconn);
+		void	returnError();
+		void	returnError(sqlrcursor_svr *cursor);
 
 		void	initDatabaseAvailableFileName();
 		void	waitForAvailableDatabase();
@@ -432,9 +424,9 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 
 		bool		commitorrollback;
 
-		char		*txerror;
-		int64_t		txerrnum;
-		bool		txliveconnection;
+		char		*error;
+		int64_t		errnum;
+		bool		liveconnection;
 
 		bool		autocommit;
 		bool		autocommitforthissession;
