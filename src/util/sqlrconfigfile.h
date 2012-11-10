@@ -76,6 +76,7 @@ typedef enum {
 	TRANSLATEBINDVARIABLES_ATTRIBUTE,
 	TRANSLATIONS_ATTRIBUTE,
 	TRIGGERS_ATTRIBUTE,
+	LOGGERS_ATTRIBUTE,
 	ISOLATIONLEVEL_ATTRIBUTE,
 	IGNORESELECTDB_ATTRIBUTE,
 	WAITFORDOWNDB_ATTRIBUTE
@@ -217,8 +218,6 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		int64_t		getMaxListeners();
 		uint32_t	getListenerTimeout();
 		bool		getReLoginAtStart();
-		int64_t		getTimeQueriesSeconds();
-		int64_t		getTimeQueriesMicroSeconds();
 		bool		getFakeInputBindVariables();
 		bool		getTranslateBindVariables();
 		const char	*getIsolationLevel();
@@ -238,6 +237,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		const char	*getTranslations();
 
 		const char	*getTriggers();
+
+		const char	*getLoggers();
 
 		rudiments::linkedlist< usercontainer * >	*getUserList();
 		rudiments::linkedlist< connectstringcontainer * >
@@ -317,8 +318,6 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		int64_t		maxlisteners;
 		uint32_t	listenertimeout;
 		bool		reloginatstart;
-		int64_t		timequeriessec;
-		int64_t		timequeriesusec;
 		bool		fakeinputbindvariables;
 		bool		translatebindvariables;
 		char		*isolationlevel;
@@ -342,6 +341,9 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 
 		rudiments::stringbuffer	triggers;
 		uint16_t		triggersdepth;
+
+		rudiments::stringbuffer	loggers;
+		uint16_t		loggersdepth;
 
 		usercontainer	*currentuser;
 
@@ -374,7 +376,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 			FILTER_TAG,
 			QUERY_TAG,
 	   		TRANSLATIONS_TAG,
-	   		TRIGGERS_TAG
+	   		TRIGGERS_TAG,
+	   		LOGGERS_TAG
 		} tag;
 		
 		tag currenttag;

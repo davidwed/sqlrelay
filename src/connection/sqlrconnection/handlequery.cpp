@@ -372,26 +372,18 @@ bool sqlrconnection_svr::executeQueryInternal(sqlrcursor_svr *curs,
 	timeval		tv;
 	struct timezone	tz;
 
-	if (cfgfl->getTimeQueriesSeconds()>-1 &&
-		cfgfl->getTimeQueriesMicroSeconds()>-1) {
-
-		// get the query start time
-		gettimeofday(&tv,&tz);
-		curs->querystartsec=tv.tv_sec;
-		curs->querystartusec=tv.tv_usec;
-	}
+	// get the query start time
+	gettimeofday(&tv,&tz);
+	curs->querystartsec=tv.tv_sec;
+	curs->querystartusec=tv.tv_usec;
 
 	// execute the query
 	curs->queryresult=curs->executeQuery(query,length);
 
-	if (cfgfl->getTimeQueriesSeconds()>-1 &&
-		cfgfl->getTimeQueriesMicroSeconds()>-1) {
-
-		// get the query end time
-		gettimeofday(&tv,&tz);
-		curs->queryendsec=tv.tv_sec;
-		curs->queryendusec=tv.tv_usec;
-	}
+	// get the query end time
+	gettimeofday(&tv,&tz);
+	curs->queryendsec=tv.tv_sec;
+	curs->queryendusec=tv.tv_usec;
 
 	// update error count
 	if (!curs->queryresult) {

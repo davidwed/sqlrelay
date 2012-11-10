@@ -14,8 +14,7 @@ class sqlrlogger {
 	public:
 			sqlrlogger(rudiments::xmldomnode *parameters);
 
-		virtual bool	init(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur);
+		virtual bool	init(sqlrconnection_svr *sqlrcon);
 		virtual bool	run(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur);
 	protected:

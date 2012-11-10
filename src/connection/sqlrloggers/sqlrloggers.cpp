@@ -125,12 +125,11 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 	llist.append(sqlrlp);
 }
 
-void sqlrloggers::initLoggers(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur) {
+void sqlrloggers::initLoggers(sqlrconnection_svr *sqlrcon) {
 	debugFunction();
 	for (linkedlistnode< sqlrloggerplugin * > *node=llist.getFirstNode();
 						node; node=node->getNext()) {
-		node->getData()->lg->init(sqlrcon,sqlrcur);
+		node->getData()->lg->init(sqlrcon);
 	}
 }
 

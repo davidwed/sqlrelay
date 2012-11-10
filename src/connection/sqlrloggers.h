@@ -24,8 +24,7 @@ class sqlrloggers {
 			~sqlrloggers();
 
 		bool	loadLoggers(const char *loggers);
-		void	initLoggers(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur);
+		void	initLoggers(sqlrconnection_svr *sqlrcon);
 		void	runLoggers(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur);
 	private:

@@ -270,6 +270,9 @@ class sqlrcursor_svr {
 		bool	sql_injection_detection;
 		bool	sid_egress;
 
+	// ideally these would be protected but the translators,
+	// triggers and loggers need to access them (for now)
+	public:
 		char		*querybuffer;
 		uint32_t	querylength;
 		xmldom		*querytree;
@@ -288,13 +291,13 @@ class sqlrcursor_svr {
 
 		bool	fakeinputbindsforthisquery;
 
-	// ideally these would be protected but the
-	// translators and triggers need to access them (for now)
-	public:
 		uint16_t	inbindcount;
 		bindvar_svr	inbindvars[MAXVAR];
 		uint16_t	outbindcount;
 		bindvar_svr	outbindvars[MAXVAR];
+
+		bool		lastrowvalid;
+		uint64_t	lastrow;
 
 		// this one too...
 		bool	openCursorInternal(uint16_t id);
@@ -305,9 +308,6 @@ class sqlrcursor_svr {
 		void	performSubstitution(stringbuffer *buffer,
 							int16_t index);
 		void	abort();
-
-		bool		lastrowvalid;
-		uint64_t	lastrow;
 
 		bool		suspendresultset;
 		bool		busy;

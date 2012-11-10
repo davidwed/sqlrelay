@@ -129,7 +129,7 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	}
 	debugsqltranslation=cfgfl->getDebugTranslations();
 
-	// Get the triggers
+	// get the triggers
 	const char	*triggers=cfgfl->getTriggers();
 	if (charstring::length(triggers)) {
 		// for triggers, we'll need an sqlparser as well
@@ -208,12 +208,14 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 		return false;
 	}
 
-	// initialize the query log, if we're timing queries
-	if (cfgfl->getTimeQueriesSeconds()!=-1 &&
-		cfgfl->getTimeQueriesMicroSeconds()!=-1 &&
-		!initQueryLog()) {
-		return false;
+	// get the loggers
+	const char	*loggers=cfgfl->getLoggers();
+	if (charstring::length(loggers)) {
+		sqlrlg=new sqlrloggers;
+		sqlrlg->loadLoggers(loggers);
+		sqlrlg->initLoggers(this);
 	}
+	
 	return true;
 }
 

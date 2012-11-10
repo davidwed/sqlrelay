@@ -69,7 +69,6 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqlrconnection/isolationlevel.cpp \
 	sqlrconnection/main.cpp \
 	sqlrconnection/error.cpp \
-	sqlrconnection/querylog.cpp \
 	sqlrcursor/sqlrcursorctor.cpp \
 	sqlrcursor/sqlrcursordtor.cpp \
 	sqlrcursor/openclose.cpp \
@@ -179,7 +178,6 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrconnection/isolationlevel.lo \
 	sqlrconnection/main.lo \
 	sqlrconnection/error.lo \
-	sqlrconnection/querylog.lo \
 	sqlrcursor/sqlrcursorctor.lo \
 	sqlrcursor/sqlrcursordtor.lo \
 	sqlrcursor/openclose.lo \
@@ -244,7 +242,9 @@ all: libsqlrconnection.la \
 	libsqlrelay_sqltranslation_translatedatetimes.la \
 	libsqlrelay_sqltranslation_matchestolike.la \
 	libsqlrelay_sqltranslation_oracleize.la \
-	libsqlrelay_sqltranslation_serialtoautoincrement.la
+	libsqlrelay_sqltranslation_serialtoautoincrement.la \
+	libsqlrelay_sqlrlogger_slowqueries.la \
+	libsqlrelay_sqlrlogger_neowiz.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -293,8 +293,14 @@ libsqlrelay_sqltranslation_oracleize.la: sqltranslations/oracleize.cpp sqltransl
 
 libsqlrelay_sqltranslation_serialtoautoincrement.la: sqltranslations/serialtoautoincrement.cpp sqltranslations/serialtoautoincrement.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/serialtoautoincrement.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+
+libsqlrelay_sqlrlogger_slowqueries.la: sqlrloggers/slowqueries.cpp sqlrloggers/slowqueries.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrloggers/slowqueries.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+
+libsqlrelay_sqlrlogger_neowiz.la: sqlrloggers/neowiz.cpp sqlrloggers/neowiz.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrloggers/neowiz.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
 	
-install: install-connection install-triggers install-translations
+install: install-connection install-triggers install-translations install-loggers
 
 install-connection:
 	$(MKINSTALLDIRS) $(libdir)
@@ -324,7 +330,6 @@ install-triggers:
 
 install-translations:
 	$(MKINSTALLDIRS) $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqltranslation_doublequotestosinglequotes.a
 	$(LTINSTALL) libsqlrelay_sqltranslation_informixtooracledate.la $(libdir)
 	$(RM) $(libdir)/libsqlrelay_sqltranslation_informixtooracledate.a
 	$(LTINSTALL) libsqlrelay_sqltranslation_locksnowaitbydefault.la $(libdir)
@@ -345,6 +350,14 @@ install-translations:
 	$(RM) $(libdir)/libsqlrelay_sqltranslation_serialtoautoincrement.a
 	$(LIBTOOL) --mode=finish $(libdir)
 
+install-loggers:
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) libsqlrelay_sqlrlogger_slowqueries.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqlrlogger_slowqueries.a
+	$(LTINSTALL) libsqlrelay_sqlrlogger_neowiz.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqlrlogger_neowiz.a
+	$(LIBTOOL) --mode=finish $(libdir)
+
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltrigger_createtableautoincrementoracle.la
@@ -360,6 +373,8 @@ uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_matchestolike.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_oracleize.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_serialtoautoincrement.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrlogger_slowqueries.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrlogger_neowiz.la
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(debugdir)

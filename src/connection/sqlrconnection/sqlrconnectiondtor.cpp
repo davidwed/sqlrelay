@@ -8,9 +8,6 @@
 
 sqlrconnection_svr::~sqlrconnection_svr() {
 
-	querylog.flushWriteBuffer(-1,-1);
-	delete[] querylogname;
-
 	delete sid_sqlrcon;
 
 	delete cmdl;
@@ -56,6 +53,7 @@ sqlrconnection_svr::~sqlrconnection_svr() {
 	delete sqlp;
 	delete sqlt;
 	delete sqlw;
+	delete sqlrlg;
 
 	if (pidfile) {
 		file::remove(pidfile);

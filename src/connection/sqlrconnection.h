@@ -27,6 +27,7 @@
 #include <sqltranslations.h>
 #include <sqlwriter.h>
 #include <sqltriggers.h>
+#include <sqlrloggers.h>
 
 #include <cmdline.h>
 
@@ -455,11 +456,14 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		inetserversocket	**serversockin;
 		uint64_t		serversockincount;
 		unixserversocket	*serversockun;
-		filedescriptor		*clientsock;
 
 	// ideally these would be private but the
 	// translators and triggers need to access them (for now)
 	public:
+		uint32_t	handoffindex;
+
+		filedescriptor	*clientsock;
+
 		memorypool	*bindpool;
 		memorypool	*bindmappingspool;
 		namevaluepairs	*inbindmappings;
@@ -478,11 +482,11 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		sqltranslations	*sqlt;
 		sqlwriter	*sqlw;
 		sqltriggers	*sqltr;
+		sqlrloggers	*sqlrlg;
 
 		sqlrcursor_svr	**cur;
 
 		unixclientsocket	handoffsockun;
-		uint32_t		handoffindex;
 
 		bool			connected;
 		bool			inclientsession;
@@ -499,16 +503,20 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 
 		char		*pidfile;
 
-		char		clientinfo[512];
-		uint64_t	clientinfolen;
-
 	protected:
 		bool		fakeinputbinds;
 
+	// ideally these would be protected or private
+	// but the loggers need to access them (for now)
+	public:
 		sharedmemory		*idmemory;
 		cmdline			*cmdl;
 		sqlrconfigfile		*cfgfl;
 
+		char		clientinfo[512];
+		uint64_t	clientinfolen;
+
+	protected:
 		stringlist	sessiontemptablesfordrop;
 		stringlist	sessiontemptablesfortrunc;
 		stringlist	transtemptablesfordrop;
@@ -518,10 +526,6 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 
 		bool		decrementonclose;
 		bool		silent;
-
-		char		*querylogname;
-		file		querylog;
-		char		querylogbuf[102400];
 
 		stringbuffer	*debugstr;
 		debugfile	dbgfile;

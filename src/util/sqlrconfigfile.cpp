@@ -78,8 +78,6 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	maxlisteners=charstring::toInteger(DEFAULT_MAXLISTENERS);
 	listenertimeout=charstring::toUnsignedInteger(DEFAULT_LISTENERTIMEOUT);
 	reloginatstart=!charstring::compare(DEFAULT_RELOGINATSTART,"yes");
-	timequeriessec=charstring::toInteger(DEFAULT_TIMEQUERIESSEC);
-	timequeriesusec=charstring::toInteger(DEFAULT_TIMEQUERIESUSEC);
 	fakeinputbindvariables=!charstring::compare(
 					DEFAULT_FAKEINPUTBINDVARIABLES,"yes");
 	translatebindvariables=!charstring::compare(
@@ -88,6 +86,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	currenttag=NO_TAG;
 	translationsdepth=0;
 	triggersdepth=0;
+	loggersdepth=0;
 	isolationlevel=NULL;
 	ignoreselectdb=false;
 	waitfordowndb=true;
@@ -356,14 +355,6 @@ bool sqlrconfigfile::getReLoginAtStart() {
 	return reloginatstart;
 }
 
-int64_t sqlrconfigfile::getTimeQueriesSeconds() {
-	return timequeriessec;
-}
-
-int64_t sqlrconfigfile::getTimeQueriesMicroSeconds() {
-	return timequeriesusec;
-}
-
 bool sqlrconfigfile::getFakeInputBindVariables() {
 	return fakeinputbindvariables;
 }
@@ -422,6 +413,10 @@ const char *sqlrconfigfile::getTranslations() {
 
 const char *sqlrconfigfile::getTriggers() {
 	return triggers.getString();
+}
+
+const char *sqlrconfigfile::getLoggers() {
+	return loggers.getString();
 }
 
 linkedlist< usercontainer * > *sqlrconfigfile::getUserList() {
@@ -506,6 +501,9 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			} else if (!charstring::compare(name,"triggers")) {
 				thistag=TRIGGERS_TAG;
 				triggers.clear();
+			} else if (!charstring::compare(name,"loggers")) {
+				thistag=LOGGERS_TAG;
+				loggers.clear();
 			} else {
 				ok=false;
 			}
@@ -679,6 +677,19 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			triggers.append(name);
 			currenttag=thistag;
 			break;
+		case LOGGERS_TAG:
+			if (!charstring::compare(name,"loggers")) {
+				loggersdepth=0;
+			} else {
+				loggersdepth++;
+			}
+			if (loggersdepth) {
+				loggers.append(">");
+			}
+			loggers.append("<");
+			loggers.append(name);
+			currenttag=thistag;
+			break;
 		case SESSION_TAG:
 		case START_TAG:
 		case END_TAG:
@@ -770,6 +781,17 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 				triggers.append(">");
 			}
 			triggersdepth--;
+			break;
+		case LOGGERS_TAG:
+			if (!charstring::compare(name,"loggers")) {
+				currenttag=NO_TAG;
+			}
+			loggers.append("></");
+			loggers.append(name);
+			if (!loggersdepth) {
+				loggers.append(">");
+			}
+			loggersdepth--;
 			break;
 		case SESSION_TAG:
 			currenttag=NO_TAG;
@@ -892,12 +914,6 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=LISTENERTIMEOUT_ATTRIBUTE;
 		} else if (!charstring::compare(name,"reloginatstart")) {
 			currentattribute=RELOGINATSTART_ATTRIBUTE;
-		} else if (!charstring::compare(name,"timequeries")) {
-			currentattribute=TIMEQUERIES_ATTRIBUTE;
-		} else if (!charstring::compare(name,"timequeriessec")) {
-			currentattribute=TIMEQUERIESSEC_ATTRIBUTE;
-		} else if (!charstring::compare(name,"timequeriesusec")) {
-			currentattribute=TIMEQUERIESUSEC_ATTRIBUTE;
 		} else if (!charstring::compare(name,
 						"fakeinputbindvariables")) {
 			currentattribute=FAKEINPUTBINDVARIABLES_ATTRIBUTE;
@@ -985,6 +1001,11 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		currentattribute=TRIGGERS_ATTRIBUTE;
 		break;
 
+	case LOGGERS_TAG:
+		loggers.append(" ")->append(name);
+		currentattribute=LOGGERS_ATTRIBUTE;
+		break;
+
 	// these tags have no attributes and there's nothing to do but the
 	// compiler will complain if they aren't in the switch statement
 	case SESSION_TAG:
@@ -1031,6 +1052,9 @@ bool sqlrconfigfile::attributeName(const char *name) {
 				break;
 			case TRIGGERS_TAG:
 				tagname="triggers";
+				break;
+			case LOGGERS_TAG:
+				tagname="loggers";
 				break;
 			case SESSION_TAG:
 				tagname="session";
@@ -1080,6 +1104,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currenttag==TRIGGERS_TAG) {
 			triggers.append("=\"");
 			triggers.append(value)->append("\"");
+		} else if (currenttag==LOGGERS_TAG) {
+			loggers.append("=\"");
+			loggers.append(value)->append("\"");
 		} else if (currentattribute==ADDRESSES_ATTRIBUTE) {
 			for (uint64_t index=0; index<addresscount; index++) {
 				delete[] addresses[index];
@@ -1313,46 +1340,6 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currentattribute==RELOGINATSTART_ATTRIBUTE) {
 			reloginatstart=
 				!charstring::compareIgnoringCase(value,"yes");
-		} else if (currentattribute==TIMEQUERIESSEC_ATTRIBUTE) {
-			timequeriessec=charstring::toInteger((value)?value:DEFAULT_TIMEQUERIESSEC);
-			if (timequeriesusec < 0) timequeriesusec=0;
-		} else if (currentattribute==TIMEQUERIESUSEC_ATTRIBUTE) {
-			timequeriesusec=charstring::toInteger((value)?value:DEFAULT_TIMEQUERIESUSEC);
-			if (timequeriessec < 0) timequeriessec=0;
-		} else if (currentattribute==TIMEQUERIES_ATTRIBUTE) {
-			if (charstring::toFloat(value)>0) {
-				char		**list;
-				uint64_t	listlength;
-				charstring::split(value,".",true,
-							&list,&listlength);
-				timequeriessec=
-					charstring::toInteger(list[0]);
-				if (timequeriessec < 0) {
-					timequeriesusec=-1;
-				} else {
-					if (listlength>1) {
-						char	buffer[7];
-						size_t	list1len=charstring::length(list[1]);
-						for (size_t i=0; i<6; i++) {
-							buffer[i]=list[1][i];
-							if (i>=list1len) {
-								buffer[i]='0';
-							}
-						}
-						buffer[6]='\0';
-						timequeriesusec=charstring::toInteger(buffer);
-					} else {
-						timequeriesusec=0;
-					}
-				}
-				for (uint64_t i=0; i<listlength; i++) {
-					delete[] list[i];
-				}
-				delete[] list;
-			} else {
-				timequeriessec=-1;
-				timequeriesusec=-1;
-			}
 		} else if (currentattribute==FAKEINPUTBINDVARIABLES_ATTRIBUTE) {
 			fakeinputbindvariables=
 				!charstring::compareIgnoringCase(value,"yes");

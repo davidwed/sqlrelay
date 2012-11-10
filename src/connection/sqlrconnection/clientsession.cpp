@@ -127,10 +127,11 @@ void sqlrconnection_svr::clientSession() {
 		// log query-related commands
 		// FIXME: should we really log bind cursor fetches?
 		// FIXME: this won't log triggers
-		if (command==NEW_QUERY ||
+		if (sqlrlg &&
+			(command==NEW_QUERY ||
 			command==REEXECUTE_QUERY ||
-			command==FETCH_FROM_BIND_CURSOR) {
-			writeQueryLog(cursor);
+			command==FETCH_FROM_BIND_CURSOR)) {
+			sqlrlg->runLoggers(this,cursor);
 		}
 
 	} while (loop);

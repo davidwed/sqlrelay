@@ -13,8 +13,7 @@ sqlrlogger::sqlrlogger(xmldomnode *parameters) {
 	this->parameters=parameters;
 }
 
-bool sqlrlogger::init(sqlrconnection_svr *sqlrcon,
-				sqlrcursor_svr *sqlrcur) {
+bool sqlrlogger::init(sqlrconnection_svr *sqlrcon) {
 	return true;
 }
 
