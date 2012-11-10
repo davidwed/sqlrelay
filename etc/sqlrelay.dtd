@@ -33,8 +33,6 @@
 	<!ATTLIST instance maxlisteners CDATA "-1">
 	<!ATTLIST instance listenertimeout CDATA "0">
 	<!ATTLIST instance reloginatstart (yes|no) "no">
-	<!ATTLIST instance timequeriessec CDATA "-1">
-	<!ATTLIST instance timequeriesusec CDATA "-1">
 	<!ATTLIST instance fakeinputbindvariables (yes|no) "no">
 	<!ATTLIST instance translatebindvariables (yes|no) "no">
 	<!ATTLIST instance isolationlevel CDATA "read committed">

@@ -112,8 +112,6 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="timequeriessec" default="-1"/>
-      <xs:attribute name="timequeriesusec" default="-1"/>
       <xs:attribute name="fakeinputbindvariables" default="no">
         <xs:simpleType>
           <xs:restriction base="xs:token">

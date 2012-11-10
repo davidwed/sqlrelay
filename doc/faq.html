@@ -95,7 +95,6 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <li><a href="#nobody">Whenever I set maxconnections&gt;connections, it doesn't ever start any new connections and I get "Couldn't parse config file ..." errors on the screen.  What's up with that?</a></li>
 <li><a href="#gui">Where'd the configuration GUI go?</a></li>
 <li><a href="#socketonly">How can I get SQL Relay to only listen on the unix socket and not the inet port?</a></li>
-<li><a href="#timequeries">How can I get SQL Relay to log queries?</a></li>
 <li><a href="#dynamicscaling">If I set up SQL Relay to use dynamic scaling, it eventually spawns off as many connections as it can and they never die off.  What's going on?</a></li>
 <li><a href="#maxqueuelengthzero">If I set up SQL Relay to use dynamic scaling with a maxqueuelength=0, sometimes it spawns off new connections even when there should be enough to handle the clients.  What's going on?</a></li>
 <li><a href="#cursorgrowth">In sqlrelay.conf, I set the cursors parameter to a small number.  Why does sqlr-status show Opened Server Cursors growing and growing?</a></li>
@@ -1069,11 +1068,6 @@ connection:
 <span class="heading3">How can I get SQL Relay to only listen on the unix socket and not the inet port?</span><br>
 
 <p>This was broken prior to version 0.40.  But in 0.40 or newer, you can just set port="" in the instance tag of the sqlrelay.conf file or leave the attribute out altogether.  However, in either case, you must supply a value for the socket attribute.  If neither are specified then SQL Relay will fall back to listening on the default port 9000 and not listening on the unix socket at all.</p> 
-
-<br><a name="timequeries"></a>
-<span class="heading3">How can I get SQL Relay to log queries?</span><br>
-
-<p>Version 0.40 introduced the <b>timequeriessec</b> and <b>timequeriesusec</b> parameters, though they were not documented until version 0.41.  They can be used to log queries which take longer than <b>timequeriessec</b> seconds and <b>timequeriesusec</b> milliseconds to complete.  See <a href="configuring.html">Configuring SQL Relay</a> for more information.</p>
 
 <br><a name="dynamicscaling"></a>
 <span class="heading3">If I set up SQL Relay to use dynamic scaling, it eventually spawns off as many connections as it can and they never die off.  What's up with that?</span><br>
