@@ -29,7 +29,6 @@ slowqueries::slowqueries(xmldomnode *parameters) : sqlrlogger(parameters) {
 }
 
 slowqueries::~slowqueries() {
-printf("slowqueries flushing write buffer...\n");
 	querylog.flushWriteBuffer(-1,-1);
 }
 

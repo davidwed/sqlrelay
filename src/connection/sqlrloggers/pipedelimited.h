@@ -10,7 +10,6 @@
 class neowiz : public sqlrlogger {
 	public:
 			neowiz(rudiments::xmldomnode *parameters);
-			~neowiz();
 
 		bool	init(sqlrconnection_svr *sqlrcon);
 		bool	run(sqlrconnection_svr *sqlrcon,

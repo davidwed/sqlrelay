@@ -15,6 +15,9 @@ sqltranslation::sqltranslation(sqltranslations *sqlts,
 	this->parameters=parameters;
 }
 
+sqltranslation::~sqltranslation() {
+}
+
 bool sqltranslation::run(sqlrconnection_svr *sqlrcon,
 				sqlrcursor_svr *sqlrcur,
 				xmldom *querytree) {

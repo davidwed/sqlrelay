@@ -13,6 +13,9 @@ sqltrigger::sqltrigger(xmldomnode *parameters) {
 	this->parameters=parameters;
 }
 
+sqltrigger::~sqltrigger() {
+}
+
 bool sqltrigger::run(sqlrconnection_svr *sqlrcon,
 				sqlrcursor_svr *sqlrcur,
 				xmldom *querytree,

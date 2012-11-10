@@ -13,6 +13,7 @@ class sqlrcursor_svr;
 class sqltrigger {
 	public:
 			sqltrigger(rudiments::xmldomnode *parameters);
+		virtual	~sqltrigger();
 
 		virtual bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,

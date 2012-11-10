@@ -25,14 +25,8 @@ neowiz::neowiz(xmldomnode *parameters) : sqlrlogger(parameters) {
 	querylogname=NULL;
 }
 
-neowiz::~neowiz() {
-printf("neowiz flushing write buffer\n");
-	querylog.flushWriteBuffer(-1,-1);
-}
-
 bool neowiz::init(sqlrconnection_svr *sqlrcon) {
 	debugFunction();
-printf("neowiz...\n");
 
 	cmdline	*cmdl=sqlrcon->cmdl;
 
@@ -69,7 +63,6 @@ printf("neowiz...\n");
 				"%s/%s",LOG_DIR,cmdl->getId());
 		directory::create(querylogname,
 				permissions::evalPermString("rwxrwxrwx"));
-printf("dir: %s\n",querylogname);
 
 		// create the log file name
 		querylognamelen=charstring::length(LOG_DIR)+1+
@@ -78,23 +71,12 @@ printf("dir: %s\n",querylogname);
 		querylogname=new char[querylognamelen];
 		snprintf(querylogname,querylognamelen,
 				"%s/%s/query.log",LOG_DIR,cmdl->getId());
-printf("file: %s\n",querylogname);
 	}
-
-	// remove any old log file
-	file::remove(querylogname);
 
 	// create the new log file
-	if (!querylog.create(querylogname,
-				permissions::evalPermString("rw-------"))) {
-		return false;
-	}
-
-	// optimize
-	filesystem	fs;
-	fs.initialize(querylogname);
-	querylog.setWriteBufferSize(fs.getOptimumTransferBlockSize());
-	return true;
+	querylog.close();
+	return querylog.open(querylogname,O_WRONLY|O_CREAT|O_APPEND,
+				permissions::evalPermString("rw-------"));
 }
 
 bool neowiz::run(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur) {
@@ -104,8 +86,6 @@ bool neowiz::run(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur) {
 	ino_t	inode1=querylog.getInode();
 	ino_t	inode2;
 	if (!file::getInode(querylogname,&inode2) || inode1!=inode2) {
-		querylog.flushWriteBuffer(-1,-1);
-		querylog.close();
 		init(sqlrcon);
 	}
 

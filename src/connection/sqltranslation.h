@@ -15,6 +15,7 @@ class sqltranslation {
 	public:
 			sqltranslation(sqltranslations *sqlts,
 					rudiments::xmldomnode *parameters);
+		virtual	~sqltranslation();
 
 		virtual bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
