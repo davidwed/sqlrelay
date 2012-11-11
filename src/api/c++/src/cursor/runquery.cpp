@@ -49,18 +49,6 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 	cached=false;
 	endofresultset=false;
 
-	if (sqlrc->debug) {
-		sqlrc->debugPreStart();
-		sqlrc->debugPrint("Sending Query:");
-		sqlrc->debugPrint("\n");
-		sqlrc->debugPrint(query);
-		sqlrc->debugPrint("\n");
-		sqlrc->debugPrint("Length: ");
-		sqlrc->debugPrint((int64_t)querylen);
-		sqlrc->debugPrint("\n");
-		sqlrc->debugPreEnd();
-	}
-
 	// send the query to the server.
 	if (!reexecute) {
 
@@ -70,10 +58,34 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 		// tell the server whether we'll need a cursor or not
 		sendCursorStatus();
 
+		if (sqlrc->debug) {
+			sqlrc->debugPreStart();
+			sqlrc->debugPrint("Sending Client Info:");
+			sqlrc->debugPrint("\n");
+			sqlrc->debugPrint("Length: ");
+			sqlrc->debugPrint((int64_t)sqlrc->clientinfolen);
+			sqlrc->debugPrint("\n");
+			sqlrc->debugPrint(sqlrc->clientinfo);
+			sqlrc->debugPrint("\n");
+			sqlrc->debugPreEnd();
+		}
+
 		// send the client info
 		// FIXME: arguably this should be its own command
 		sqlrc->cs->write(sqlrc->clientinfolen);
 		sqlrc->cs->write(sqlrc->clientinfo,sqlrc->clientinfolen);
+
+		if (sqlrc->debug) {
+			sqlrc->debugPreStart();
+			sqlrc->debugPrint("Sending Query:");
+			sqlrc->debugPrint("\n");
+			sqlrc->debugPrint("Length: ");
+			sqlrc->debugPrint((int64_t)querylen);
+			sqlrc->debugPrint("\n");
+			sqlrc->debugPrint(query);
+			sqlrc->debugPrint("\n");
+			sqlrc->debugPreEnd();
+		}
 
 		// send the query
 		sqlrc->cs->write(querylen);
@@ -338,7 +350,9 @@ void sqlrcursor::sendOutputBinds() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
-		sqlrc->debugPrint("Sending Output Bind Variables:\n");
+		sqlrc->debugPrint("Sending ");
+		sqlrc->debugPrint((int64_t)outbindcount);
+		sqlrc->debugPrint(" Output Bind Variables:\n");
 		sqlrc->debugPreEnd();
 	}
 

@@ -33,9 +33,9 @@ bool sqlrcursor::processResultSet(bool getallrows, uint64_t rowtoget) {
 
 			getErrorFromServer();
 
-			// Don't get the cursor if the error was that there
-			// were no cursors available.
-			if (errorno==SQLR_ERROR_NO_CURSORS) {
+			// don't get the cursor if the error was that there
+			// were no cursors available
+			if (errorno!=SQLR_ERROR_NO_CURSORS) {
 				getCursorId();
 			}
 
@@ -227,6 +227,8 @@ void sqlrcursor::handleError() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
+		sqlrc->debugPrint((int64_t)errorno);
+		sqlrc->debugPrint(":\n");
 		sqlrc->debugPrint(error);
 		sqlrc->debugPrint("\n");
 		sqlrc->debugPreEnd();

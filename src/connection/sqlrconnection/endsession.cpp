@@ -3,11 +3,6 @@
 
 #include <sqlrconnection.h>
 
-void sqlrconnection_svr::endSessionCommand() {
-	dbgfile.debugPrint("connection",1,"end session");
-	endSessionInternal();
-}
-
 void sqlrconnection_svr::endSessionInternal() {
 
 	dbgfile.debugPrint("connection",2,"ending session...");

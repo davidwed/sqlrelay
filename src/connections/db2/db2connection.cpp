@@ -295,9 +295,14 @@ const char *db2connection::setIsolationLevelQuery() {
 db2cursor::db2cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	db2conn=(db2connection *)conn;
 	stmt=0;
-	for (uint16_t i=0; i<MAXVAR; i++) {
+	outdatebind=new datebind *[conn->maxbindcount];
+	for (uint16_t i=0; i<conn->maxbindcount; i++) {
 		outdatebind[i]=NULL;
 	}
+}
+
+db2cursor::~db2cursor() {
+	delete[] outdatebind;
 }
 
 bool db2cursor::prepareQuery(const char *query, uint32_t length) {
@@ -684,7 +689,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	// convert date output binds
-	for (uint16_t i=0; i<MAXVAR; i++) {
+	for (uint16_t i=0; i<conn->maxbindcount; i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
 			SQL_TIMESTAMP_STRUCT	*ts=
@@ -927,7 +932,7 @@ void db2cursor::nextRow() {
 void db2cursor::cleanUpData(bool freeresult, bool freebinds) {
 
 	if (freebinds) {
-		for (uint16_t i=0; i<MAXVAR; i++) {
+		for (uint16_t i=0; i<conn->maxbindcount; i++) {
 			delete outdatebind[i];
 			outdatebind[i]=NULL;
 		}

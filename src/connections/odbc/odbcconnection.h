@@ -59,6 +59,7 @@ class odbccursor : public sqlrcursor_svr {
 	friend class odbcconnection;
 	private:
 				odbccursor(sqlrconnection_svr *conn);
+				~odbccursor();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 		bool		allocateStatementHandle();
@@ -170,7 +171,7 @@ class odbccursor : public sqlrcursor_svr {
 		odbccolumn 	col[MAX_SELECT_LIST_SIZE];
 		char		*columnnames[MAX_SELECT_LIST_SIZE];
 
-		datebind	*outdatebind[MAXVAR];
+		datebind	**outdatebind;
 
 		uint32_t	row;
 		uint32_t	maxrow;

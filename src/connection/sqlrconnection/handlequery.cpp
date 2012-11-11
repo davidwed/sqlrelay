@@ -17,7 +17,7 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 	// re-init error data
 	cursor->clearError();
 
-	// get the query and bind data from the client
+	// get the query and bind data from the client...
 	if (getquery) {
 		bool	success=true;
 		if (!reexecute && !bindcursor) {
@@ -31,15 +31,21 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 			success=getSendColumnInfo();
 		}
 		if (!success) {
+			// The client is apparently sending us something we
+			// can't handle.  Return an error if there was one,
+			// instruct the client to disconnect and return false
+			// to end the session on this side.
+			if (cursor->errnum) {
+				returnError(cursor,true);
+			}
 			dbgfile.debugPrint("connection",1,
 						"failed to handle query");
-			endSession();
 			return false;
 		}
 	}
 
-	// clear bind mappings and reset fakeinputbindsforthisquery flag
-	if (!reexecute && !bindcursor) {
+	// clear bind mappings and reset the fake input binds flag
+	if (!bindcursor && !reexecute) {
 		bindmappingspool->free();
 		inbindmappings->clear();
 		outbindmappings->clear();
@@ -88,12 +94,7 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 			cursor->lastrowvalid=false;
 
 			// return the result set
-			if (!returnResultSetData(cursor)) {
-				endSession();
-				return false;
-			}
-
-			return true;
+			return returnResultSetData(cursor);
 
 		} else {
 
@@ -103,7 +104,7 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 				!cfgfl->getWaitForDownDatabase()) {
 
 				// return the error
-				returnError(cursor);
+				returnError(cursor,!cursor->liveconnection);
 			}
 
 			// if the error was a dead connection
@@ -130,19 +131,37 @@ bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
 
 	dbgfile.debugPrint("connection",2,"getting query...");
 
+	// init
+	clientinfolen=0;
+	clientinfo[0]='\0';
+	cursor->querylength=0;
+	cursor->querybuffer[0]='\0';
+
 	// get the length of the client info
-	// FIXME: arguably this should be it's own command
-	if (clientsock->read(&clientinfolen)!=sizeof(uint64_t) ||
-					clientinfolen>sizeof(clientinfo)-1) {
+	if (clientsock->read(&clientinfolen)!=sizeof(uint64_t)) {
 		dbgfile.debugPrint("connection",2,
 			"getting client info failed: "
 			"client sent bad client info size");
+		clientinfolen=0;
 		return false;
 	}
+
+	// bounds checking
+	if (clientinfolen>sizeof(clientinfo)-1) {
+		dbgfile.debugPrint("connection",2,
+			"getting client info failed: "
+			"client sent bad client info size");
+		clientinfolen=0;
+		return false;
+	}
+
+	// read the client info into the buffer
 	if (clientsock->read(clientinfo,clientinfolen)!=clientinfolen) {
 		dbgfile.debugPrint("connection",2,
 			"getting client info failed: "
 			"client sent short client info");
+		clientinfolen=0;
+		clientinfo[0]='\0';
 		return false;
 	}
 	clientinfo[clientinfolen]='\0';
@@ -158,6 +177,7 @@ bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
 				idleclienttimeout,0)!=sizeof(uint32_t)) {
 		dbgfile.debugPrint("connection",2,
 			"getting query failed: client sent bad query size");
+		cursor->querylength=0;
 		return false;
 	}
 
@@ -165,16 +185,17 @@ bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
 	if (cursor->querylength>maxquerysize) {
 		dbgfile.debugPrint("connection",2,
 			"getting query failed: client sent bad query size");
+		cursor->querylength=0;
 		return false;
 	}
 
 	// read the query into the buffer
-	if ((uint32_t)(clientsock->read(cursor->querybuffer,
-						cursor->querylength,
-						idleclienttimeout,0))!=
-							cursor->querylength) {
+	if (clientsock->read(cursor->querybuffer,cursor->querylength,
+				idleclienttimeout,0)!=cursor->querylength) {
 		dbgfile.debugPrint("connection",2,
 			"getting query failed: client sent short query");
+		cursor->querylength=0;
+		cursor->querybuffer[0]='\0';
 		return false;
 	}
 	cursor->querybuffer[cursor->querylength]='\0';
@@ -213,10 +234,10 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 					bool reexecute, bool bindcursor) {
 
 	// Very important...
-	// Clean up data here instead of when aborting a result set, this
-	// allows for result sets that were suspended after the entire
-	// result set was fetched to still be able to return column data
-	// when resumed.
+	// Clean up result set data here instead of when aborting a result set,
+	// this allows for result sets that were suspended after the entire
+	// result set was fetched to still be able to return column data when
+	// resumed.
 	cursor->cleanUpData(true,true);
 
 	dbgfile.debugPrint("connection",2,"processing query...");

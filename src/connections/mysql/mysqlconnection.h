@@ -117,8 +117,8 @@ class mysqlcursor : public sqlrcursor_svr {
 
 		int		bindcount;
 		int		bindcounter;
-		MYSQL_BIND	bind[MAXVAR];
-		unsigned long	bindvaluesize[MAXVAR];
+		MYSQL_BIND	*bind;
+		unsigned long	*bindvaluesize;
 
 		bool		usestmtprepare;
 

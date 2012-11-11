@@ -4,11 +4,6 @@
 #include <sqlrconnection.h>
 
 bool sqlrconnection_svr::fetchResultSetCommand(sqlrcursor_svr *cursor) {
-
 	dbgfile.debugPrint("connection",1,"fetch result set");
-	if (!returnResultSetData(cursor)) {
-		endSession();
-		return false;
-	}
-	return true;
+	return returnResultSetData(cursor);
 }

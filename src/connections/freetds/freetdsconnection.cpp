@@ -457,6 +457,14 @@ freetdscursor::freetdscursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	cursorname=NULL;
 	cursornamelength=0;
 
+	parameter=new CS_DATAFMT[conn->maxbindcount];
+	outbindtype=new CS_INT[conn->maxbindcount];
+	outbindstrings=new char *[conn->maxbindcount];
+	outbindstringlengths=new uint16_t[conn->maxbindcount];
+	outbindints=new int64_t *[conn->maxbindcount];
+	outbinddoubles=new double *[conn->maxbindcount];
+	outbinddates=new datebind[conn->maxbindcount];
+
 	// replace the regular expressions used to detect creation of a
 	// temporary table
 	createtemp.compile("(create|CREATE)[ \\t\\r\\n]+(table|TABLE)[ \\t\\r\\n]+#");
@@ -472,6 +480,13 @@ freetdscursor::freetdscursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 freetdscursor::~freetdscursor() {
 	closeCursor();
 	delete[] cursorname;
+	delete[] parameter;
+	delete[] outbindtype;
+	delete[] outbindstrings;
+	delete[] outbindstringlengths;
+	delete[] outbindints;
+	delete[] outbinddoubles;
+	delete[] outbinddates;
 }
 
 bool freetdscursor::openCursor(uint16_t id) {

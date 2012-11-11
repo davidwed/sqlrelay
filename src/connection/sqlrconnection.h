@@ -262,7 +262,6 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	clientSession();
 		bool	authenticateCommand();
 		void	suspendSessionCommand();
-		void	endSessionCommand();
 		void	selectDatabaseCommand();
 		void	getCurrentDatabaseCommand();
 		void	getLastInsertIdCommand();
@@ -335,8 +334,10 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool	getQuery(sqlrcursor_svr *cursor);
 		bool	getInputBinds(sqlrcursor_svr *cursor);
 		bool	getOutputBinds(sqlrcursor_svr *cursor);
-		bool	getBindVarCount(uint16_t *count);
-		bool	getBindVarName(bindvar_svr *bv);
+		bool	getBindVarCount(sqlrcursor_svr *cursor,
+						uint16_t *count);
+		bool	getBindVarName(sqlrcursor_svr *cursor,
+						bindvar_svr *bv);
 		bool	getBindVarType(bindvar_svr *bv);
 		void	getNullBind(bindvar_svr *bv);
 		bool	getBindSize(bindvar_svr *bv, uint32_t maxsize);
@@ -371,8 +372,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 
 		void	clearError();
 		void	setError(const char *err, int64_t errn, bool liveconn);
-		void	returnError();
-		void	returnError(sqlrcursor_svr *cursor);
+		void	returnError(bool disconnect);
+		void	returnError(sqlrcursor_svr *cursor, bool disconnect);
 
 		void	initDatabaseAvailableFileName();
 		void	waitForAvailableDatabase();
@@ -528,6 +529,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 	public:
 		// derived cursor classes may need to access these
 		uint32_t	maxquerysize;
+		uint16_t	maxbindcount;
+		uint16_t	maxbindnamelength;
 		uint32_t	maxstringbindvaluelength;
 		uint32_t	maxlobbindvaluelength;
 		uint32_t	maxerrorlength;

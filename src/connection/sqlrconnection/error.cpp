@@ -19,19 +19,22 @@ void sqlrconnection_svr::setError(const char *err,
 	liveconnection=liveconn;
 }
 
-void sqlrconnection_svr::returnError() {
+void sqlrconnection_svr::returnError(bool disconnect) {
 
 	// Get the error data if none is set already
 	if (!error) {
 		errorMessage(error,maxerrorlength,
 				&errorlength,&errnum,&liveconnection);
+		if (!liveconnection) {
+			disconnect=true;
+		}
 	}
 
 	// send the appropriate error status
-	if (liveconnection) {
-		clientsock->write((uint16_t)ERROR_OCCURRED);
-	} else {
+	if (disconnect) {
 		clientsock->write((uint16_t)ERROR_OCCURRED_DISCONNECT);
+	} else {
+		clientsock->write((uint16_t)ERROR_OCCURRED);
 	}
 
 	// send the error code and error string
@@ -42,15 +45,15 @@ void sqlrconnection_svr::returnError() {
 	clientsock->write(error,errorlength);
 }
 
-void sqlrconnection_svr::returnError(sqlrcursor_svr *cursor) {
+void sqlrconnection_svr::returnError(sqlrcursor_svr *cursor, bool disconnect) {
 
 	dbgfile.debugPrint("connection",2,"returning error...");
 
 	// send the appropriate error status
-	if (cursor->liveconnection) {
-		clientsock->write((uint16_t)ERROR_OCCURRED);
-	} else {
+	if (disconnect) {
 		clientsock->write((uint16_t)ERROR_OCCURRED_DISCONNECT);
+	} else {
+		clientsock->write((uint16_t)ERROR_OCCURRED);
 	}
 
 	// send the error code

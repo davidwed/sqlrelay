@@ -8,7 +8,7 @@ void sqlrconnection_svr::rollbackCommand() {
 	if (rollbackInternal()) {
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	} else {
-		returnError();
+		returnError(!liveconnection);
 	}
 	flushWriteBuffer();
 }

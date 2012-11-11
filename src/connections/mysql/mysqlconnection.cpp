@@ -357,6 +357,8 @@ mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	stmt=NULL;
 	stmtfreeresult=false;
+	bind=new MYSQL_BIND[conn->maxbindcount];
+	bindvaluesize=new unsigned long[conn->maxbindcount];
 	usestmtprepare=true;
 	unsupportedbystmt.compile(
 			"^\\s*((create|CREATE|drop|DROP|procedure|PROCEDURE|function|FUNCTION|use|USE|CALL|call|START|start)\\s+)|((begin|BEGIN)\\s*)");
@@ -380,6 +382,8 @@ mysqlcursor::~mysqlcursor() {
 	if (mysqlresult) {
 		mysql_free_result(mysqlresult);
 	}
+	delete[] bind;
+	delete[] bindvaluesize;
 #endif
 }
 

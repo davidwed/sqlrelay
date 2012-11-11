@@ -7,7 +7,9 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 
 	this->conn=conn;
 	inbindcount=0;
+	inbindvars=new bindvar_svr[conn->maxbindcount];
 	outbindcount=0;
+	outbindvars=new bindvar_svr[conn->maxbindcount];
 	
 	busy=false;
 

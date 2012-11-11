@@ -316,7 +316,11 @@ routercursor::routercursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 		curs[index]->setResultSetBufferSize(FETCH_AT_ONCE);
 	}
 	beginquery=false;
+
+	obv=new outputbindvar[conn->maxbindcount];
 	obcount=0;
+
+	cbv=new cursorbindvar[conn->maxbindcount];
 	cbcount=0;
 
 	createoratemp.compile("(create|CREATE)[ \\t\\n\\r]+(global|GLOBAL)[ \\t\\n\\r]+(temporary|TEMPORARY)[ \\t\\n\\r]+(table|TABLE)[ \\t\\n\\r]+");
@@ -328,6 +332,8 @@ routercursor::~routercursor() {
 		delete curs[index];
 	}
 	delete[] curs;
+	delete[] obv;
+	delete[] cbv;
 }
 
 bool routercursor::prepareQuery(const char *query, uint32_t length) {

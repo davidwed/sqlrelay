@@ -146,14 +146,14 @@ class freetdscursor : public sqlrcursor_svr {
 		CS_INT		maxrow;
 		CS_INT		totalrows;
 
-		CS_DATAFMT	parameter[MAXVAR];
+		CS_DATAFMT	*parameter;
 		uint16_t	paramindex;
-		CS_INT		outbindtype[MAXVAR];
-		char		*outbindstrings[MAXVAR];
-		uint16_t	outbindstringlengths[MAXVAR];
-		int64_t		*outbindints[MAXVAR];
-		double		*outbinddoubles[MAXVAR];
-		datebind	outbinddates[MAXVAR];
+		CS_INT		*outbindtype;
+		char		**outbindstrings;
+		uint16_t	*outbindstringlengths;
+		int64_t		**outbindints;
+		double		**outbinddoubles;
+		datebind	*outbinddates;
 		uint16_t	outbindindex;
 
 		CS_DATAFMT	column[MAX_SELECT_LIST_SIZE];

@@ -59,6 +59,8 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	debugtranslations=charstring::contains(debug,"translations");
 	debugtriggers=charstring::contains(debug,"triggers");
 	maxquerysize=charstring::toInteger(DEFAULT_MAXQUERYSIZE);
+	maxbindcount=charstring::toInteger(DEFAULT_MAXBINDCOUNT);
+	maxbindnamelength=charstring::toInteger(DEFAULT_MAXBINDNAMELENGTH);
 	maxstringbindvaluelength=charstring::toInteger(
 					DEFAULT_MAXSTRINGBINDVALUELENGTH);
 	maxlobbindvaluelength=charstring::toInteger(
@@ -330,6 +332,14 @@ bool sqlrconfigfile::getDebugTriggers() {
 
 uint32_t sqlrconfigfile::getMaxQuerySize() {
 	return maxquerysize;
+}
+
+uint16_t sqlrconfigfile::getMaxBindCount() {
+	return maxbindcount;
+}
+
+uint16_t sqlrconfigfile::getMaxBindNameLength() {
+	return maxbindnamelength;
 }
 
 uint32_t sqlrconfigfile::getMaxStringBindValueLength() {
@@ -894,6 +904,10 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=DEBUG_ATTRIBUTE;
 		} else if (!charstring::compare(name,"maxquerysize")) {
 			currentattribute=MAXQUERYSIZE_ATTRIBUTE;
+		} else if (!charstring::compare(name,"maxbindcount")) {
+			currentattribute=MAXBINDCOUNT_ATTRIBUTE;
+		} else if (!charstring::compare(name,"maxbindnamelength")) {
+			currentattribute=MAXBINDNAMELENGTH_ATTRIBUTE;
 		} else if (!charstring::compare(name,
 						"maxstringbindvaluelength")) {
 			currentattribute=MAXSTRINGBINDVALUELENGTH_ATTRIBUTE;
@@ -1251,6 +1265,13 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currentattribute==MAXQUERYSIZE_ATTRIBUTE) {
 			maxquerysize=charstring::toInteger((value)?value:
 							DEFAULT_MAXQUERYSIZE);
+		} else if (currentattribute==MAXBINDCOUNT_ATTRIBUTE) {
+			maxbindcount=charstring::toInteger((value)?value:
+							DEFAULT_MAXBINDCOUNT);
+		} else if (currentattribute==MAXBINDNAMELENGTH_ATTRIBUTE) {
+			maxbindnamelength=
+				charstring::toInteger((value)?value:
+						DEFAULT_MAXBINDNAMELENGTH);
 		} else if (currentattribute==
 				MAXSTRINGBINDVALUELENGTH_ATTRIBUTE) {
 			maxstringbindvaluelength=

@@ -141,8 +141,10 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	}
 	debugtriggers=cfgfl->getDebugTriggers();
 
-	// update maximum query size, bind value lengths and idle client timeout
+	// update various configurable parameters
 	maxquerysize=cfgfl->getMaxQuerySize();
+	maxbindcount=cfgfl->getMaxBindCount();
+	maxbindnamelength=cfgfl->getMaxBindNameLength();
 	maxstringbindvaluelength=cfgfl->getMaxStringBindValueLength();
 	maxlobbindvaluelength=cfgfl->getMaxLobBindValueLength();
 	maxerrorlength=cfgfl->getMaxErrorLength();

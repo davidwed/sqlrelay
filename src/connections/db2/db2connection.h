@@ -50,6 +50,7 @@ class db2cursor : public sqlrcursor_svr {
 	friend class db2connection;
 	public:
 			db2cursor(sqlrconnection_svr *conn);
+			~db2cursor();
 	private:
 		bool		prepareQuery(const char *query,
 						uint32_t length);
@@ -148,7 +149,7 @@ class db2cursor : public sqlrcursor_svr {
 		db2column	col[MAX_SELECT_LIST_SIZE];
 		char		*columnnames[MAX_SELECT_LIST_SIZE];
 
-		datebind	*outdatebind[MAXVAR];
+		datebind	**outdatebind;
 
 		uint64_t	rowgroupindex;
 		uint64_t	totalinrowgroup;

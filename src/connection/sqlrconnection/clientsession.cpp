@@ -16,12 +16,12 @@ void sqlrconnection_svr::clientSession() {
 	// The session ends when the client ends it or when certain commands
 	// fail.
 	bool	loop=true;
+	bool	endsession=true;
 	do {
 
 		// get a command from the client
 		uint16_t	command;
 		if (!getCommand(&command)) {
-			endSessionCommand();
 			break;
 		}
 
@@ -36,12 +36,13 @@ void sqlrconnection_svr::clientSession() {
 				sessionStartQueries();
 				continue;
 			}
+			endsession=false;
 			break;
 		} else if (command==SUSPEND_SESSION) {
 			suspendSessionCommand();
+			endsession=false;
 			break;
 		} else if (command==END_SESSION) {
-			endSessionCommand();
 			break;
 		} else if (command==PING) {
 			pingCommand();
@@ -115,7 +116,6 @@ void sqlrconnection_svr::clientSession() {
 		} else if (command==GETCOLUMNLIST) {
 			loop=getColumnListCommand(cursor);
 		} else {
-			endSessionCommand();
 			loop=false;
 		}
 
@@ -135,6 +135,10 @@ void sqlrconnection_svr::clientSession() {
 		}
 
 	} while (loop);
+
+	if (endsession) {
+		endSessionInternal();
+	}
 
 	waitForClientClose();
 
@@ -294,11 +298,13 @@ void sqlrconnection_svr::noAvailableCursors(uint16_t command) {
 				// input bind var count
 				sizeof(uint16_t)+
 				// input bind vars
-				MAXVAR*(2*sizeof(uint16_t)+BINDVARLENGTH)+
+				maxbindcount*(2*sizeof(uint16_t)+
+						maxbindnamelength)+
 				// output bind var count
 				sizeof(uint16_t)+
 				// output bind vars
-				MAXVAR*(2*sizeof(uint16_t)+BINDVARLENGTH)+
+				maxbindcount*(2*sizeof(uint16_t)+
+						maxbindnamelength)+
 				// get column info
 				sizeof(uint16_t)+
 				// skip/fetch

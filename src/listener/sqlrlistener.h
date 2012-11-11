@@ -139,7 +139,7 @@ class sqlrlistener : public rudiments::daemonprocess,
 		rudiments::semaphoreset	*semset;
 		rudiments::sharedmemory	*idmemory;
 
-		bool		init;
+		bool	init;
 
 		rudiments::unixserversocket	*clientsockun;
 		rudiments::inetserversocket	**clientsockin;
@@ -149,8 +149,8 @@ class sqlrlistener : public rudiments::daemonprocess,
 		rudiments::inetserversocket	**mysqlclientsockin;
 		uint64_t			mysqlclientsockincount;
 
-		char			*unixport;
-		char			*mysqlunixport;
+		char	*unixport;
+		char	*mysqlunixport;
 
 		clientsessiontype_t	sessiontype;
 
@@ -164,20 +164,23 @@ class sqlrlistener : public rudiments::daemonprocess,
 		rudiments::regularexpression	*allowed;
 		rudiments::regularexpression	*denied;
 
-		cmdline			*cmdl;
+		cmdline		*cmdl;
 
-		uint32_t		maxquerysize;
-		int32_t			idleclienttimeout;
+		uint32_t	maxquerysize;
+		uint16_t	maxbindcount;
+		uint16_t	maxbindnamelength;
+		int32_t		idleclienttimeout;
 
-		bool			isforkedchild;
+		bool	isforkedchild;
 
 		static	rudiments::signalhandler	alarmhandler;
 		static	volatile sig_atomic_t		alarmrang;
 
 		sqlrconfigfile		cfgfl;
-		uint32_t		runningconnections;
 
-		debugfile		dbgfile;
+		uint32_t	runningconnections;
+
+		debugfile	dbgfile;
 };
 
 #endif

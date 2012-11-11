@@ -297,9 +297,9 @@ class sqlrcursor_svr {
 		bool	fakeinputbindsforthisquery;
 
 		uint16_t	inbindcount;
-		bindvar_svr	inbindvars[MAXVAR];
+		bindvar_svr	*inbindvars;
 		uint16_t	outbindcount;
-		bindvar_svr	outbindvars[MAXVAR];
+		bindvar_svr	*outbindvars;
 
 		bool		lastrowvalid;
 		uint64_t	lastrow;

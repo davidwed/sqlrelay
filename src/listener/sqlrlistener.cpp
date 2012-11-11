@@ -67,6 +67,8 @@ sqlrlistener::sqlrlistener() : daemonprocess(), listener() {
 	allowed=NULL;
 
 	maxquerysize=0;
+	maxbindcount=0;
+	maxbindnamelength=0;
 	idleclienttimeout=-1;
 
 	isforkedchild=false;
@@ -183,6 +185,8 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 
 	idleclienttimeout=cfgfl.getIdleClientTimeout();
 	maxquerysize=cfgfl.getMaxQuerySize();
+	maxbindcount=cfgfl.getMaxBindCount();
+	maxbindnamelength=cfgfl.getMaxBindNameLength();
 	maxlisteners=cfgfl.getMaxListeners();
 	listenertimeout=cfgfl.getListenerTimeout();
 
@@ -2150,11 +2154,13 @@ void sqlrlistener::waitForClientClose(int32_t authstatus, bool passstatus,
 				// input bind var count
 				sizeof(uint16_t)+
 				// input bind vars
-				MAXVAR*(2*sizeof(uint16_t)+BINDVARLENGTH)+
+				maxbindcount*(2*sizeof(uint16_t)+
+							maxbindnamelength)+
 				// output bind var count
 				sizeof(uint16_t)+
 				// output bind vars
-				MAXVAR*(2*sizeof(uint16_t)+BINDVARLENGTH)+
+				maxbindcount*(2*sizeof(uint16_t)+
+							maxbindnamelength)+
 				// get column info
 				sizeof(uint16_t)+
 				// skip/fetch

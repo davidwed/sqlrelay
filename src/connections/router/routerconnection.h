@@ -165,10 +165,10 @@ class routercursor : public sqlrcursor_svr {
 
 		bool		beginquery;
 
-		outputbindvar	obv[MAXVAR];
+		outputbindvar	*obv;
 		uint16_t	obcount;
 
-		cursorbindvar	cbv[MAXVAR];
+		cursorbindvar	*cbv;
 		uint16_t	cbcount;
 
 		regularexpression	createoratemp;

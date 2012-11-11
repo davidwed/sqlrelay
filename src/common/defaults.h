@@ -70,6 +70,12 @@
 #define DEFAULT_MAXQUERYSIZE "65536"
 	// default max query size
 
+#define DEFAULT_MAXBINDCOUNT "256"
+	// default max bind variable count
+
+#define DEFAULT_MAXBINDNAMELENGTH "64"
+	// default max bind variable length
+
 #define DEFAULT_MAXSTRINGBINDVALUELENGTH "32768"
 	// default max string bind value length
 

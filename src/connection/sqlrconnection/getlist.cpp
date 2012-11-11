@@ -150,7 +150,7 @@ bool sqlrconnection_svr::getListByApiCall(sqlrcursor_svr *cursor,
 					&(cursor->errorlength),
 					&(cursor->errnum),
 					&(cursor->liveconnection));
-		returnError(cursor);
+		returnError(cursor,!cursor->liveconnection);
 
 		// this is actually OK, only return false on a network error
 		return true;
@@ -173,7 +173,6 @@ bool sqlrconnection_svr::getListByApiCall(sqlrcursor_svr *cursor,
 	// if the query processed ok then send a result set header and return...
 	returnResultSetHeader(cursor);
 	if (!returnResultSetData(cursor)) {
-		endSession();
 		return false;
 	}
 	return true;

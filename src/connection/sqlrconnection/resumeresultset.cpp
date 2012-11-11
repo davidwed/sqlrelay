@@ -52,12 +52,7 @@ bool sqlrconnection_svr::resumeResultSetCommand(sqlrcursor_svr *cursor) {
 }
 
 bool sqlrconnection_svr::resumeResultSet(sqlrcursor_svr *cursor) {
-
 	// return the header and start sending data
 	returnResultSetHeader(cursor);
-	if (!returnResultSetData(cursor)) {
-		endSession();
-		return false;
-	}
-	return true;
+	return returnResultSetData(cursor);
 }

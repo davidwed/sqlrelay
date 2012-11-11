@@ -956,7 +956,23 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 					oracle8conn->maxselectlistsize,
 					oracle8conn->maxitembuffersize);
 
-	for (uint16_t i=0; i<MAXVAR; i++) {
+	inbindpp=new OCIBind *[conn->maxbindcount];
+	outbindpp=new OCIBind *[conn->maxbindcount];
+	curbindpp=new OCIBind *[conn->maxbindcount];
+	inintbindstring=new char *[conn->maxbindcount];
+	indatebind=new OCIDate *[conn->maxbindcount];
+	outintbindstring=new char *[conn->maxbindcount];
+	outdatebind=new datebind *[conn->maxbindcount];
+	outintbind=new int64_t *[conn->maxbindcount];
+	bindvarname=new const char *[conn->maxbindcount];
+	boundbypos=new bool[conn->maxbindcount];
+	bvnp=new text *[conn->maxbindcount];
+	invp=new text *[conn->maxbindcount];
+	inpl=new ub1[conn->maxbindcount];
+	dupl=new ub1[conn->maxbindcount];
+	bvnl=new ub1[conn->maxbindcount];
+	hndl=new OCIBind *[conn->maxbindcount];
+	for (uint16_t i=0; i<conn->maxbindcount; i++) {
 		inbindpp[i]=NULL;
 		outbindpp[i]=NULL;
 		curbindpp[i]=NULL;
@@ -974,7 +990,9 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	bindvarcount=0;
 
 #ifdef HAVE_ORACLE_8i
-	for (uint16_t i=0; i<MAXVAR; i++) {
+	inbind_lob=new OCILobLocator *[conn->maxbindcount];
+	outbind_lob=new OCILobLocator *[conn->maxbindcount];
+	for (uint16_t i=0; i<conn->maxbindcount; i++) {
 		inbind_lob[i]=NULL;
 		outbind_lob[i]=NULL;
 	}
@@ -1016,6 +1034,28 @@ oracle8cursor::~oracle8cursor() {
 		}
 		delete outdatebind[i];
 	}
+
+	delete[] inbindpp;
+	delete[] outbindpp;
+	delete[] curbindpp;
+	delete[] inintbindstring;
+	delete[] indatebind;
+	delete[] outintbindstring;
+	delete[] outdatebind;
+	delete[] outintbind;
+	delete[] bindvarname;
+	delete[] boundbypos;
+	delete[] bvnp;
+	delete[] invp;
+	delete[] inpl;
+	delete[] dupl;
+	delete[] bvnl;
+	delete[] hndl;
+
+#ifdef HAVE_ORACLE_8i
+	delete[] inbind_lob;
+	delete[] outbind_lob;
+#endif
 
 	deallocateResultSetBuffers();
 }
@@ -2222,7 +2262,7 @@ bool oracle8cursor::validBinds() {
 
 	// get the bind info from the query
 	sb4	found;
-	sword	ret=OCIStmtGetBindInfo(stmt,oracle8conn->err,MAXVAR,
+	sword	ret=OCIStmtGetBindInfo(stmt,oracle8conn->err,conn->maxbindcount,
 					1,&found,bvnp,bvnl,invp,inpl,dupl,hndl);
 
 	// there were no bind variables
@@ -2238,7 +2278,7 @@ bool oracle8cursor::validBinds() {
 	// too many variables were bound
 	if (found<0) {
 		// FIXME: set an error
-		//setSqlrError(SQLR_ERR_MAXBIND,"more than MAXVAR placeholders in the oracle8 environment of neowiz (%d > %d)",-found,MAXVAR);
+		//setSqlrError(SQLR_ERR_MAXBIND,"more than conn->maxbindcount placeholders in the oracle8 environment of neowiz (%d > %d)",-found,conn->maxbindcount);
 		return false;
 	}
 

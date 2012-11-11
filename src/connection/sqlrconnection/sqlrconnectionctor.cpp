@@ -53,6 +53,8 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 	ignoreselectdb=false;
 
 	maxquerysize=0;
+	maxbindcount=0;
+	maxbindnamelength=0;
 	maxstringbindvaluelength=0;
 	maxlobbindvaluelength=0;
 	maxerrorlength=0;

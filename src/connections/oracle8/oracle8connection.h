@@ -252,30 +252,30 @@ class oracle8cursor : public sqlrcursor_svr {
 		ub2		**def_col_retlen;
 		ub2		**def_col_retcode;
 
-		OCIBind		*inbindpp[MAXVAR];
-		OCIBind		*outbindpp[MAXVAR];
-		OCIBind		*curbindpp[MAXVAR];
-		char		*inintbindstring[MAXVAR];
-		OCIDate		*indatebind[MAXVAR];
-		char		*outintbindstring[MAXVAR];
-		datebind	*outdatebind[MAXVAR];
-		int64_t		*outintbind[MAXVAR];
+		OCIBind		**inbindpp;
+		OCIBind		**outbindpp;
+		OCIBind		**curbindpp;
+		char		**inintbindstring;
+		OCIDate		**indatebind;
+		char		**outintbindstring;
+		datebind	**outdatebind;
+		int64_t		**outintbind;
 		uint16_t	orainbindcount;
 		uint16_t	oraoutbindcount;
 		uint16_t	oracurbindcount;
-		const char	*bindvarname[MAXVAR];
-		bool		boundbypos[MAXVAR];
+		const char	**bindvarname;
+		bool		*boundbypos;
 		uint16_t	bindvarcount;
-		text		*bvnp[MAXVAR];
-		text		*invp[MAXVAR];
-		ub1		inpl[MAXVAR];
-		ub1		dupl[MAXVAR];
-		ub1		bvnl[MAXVAR];
-		OCIBind		*hndl[MAXVAR];
+		text		**bvnp;
+		text		**invp;
+		ub1		*inpl;
+		ub1		*dupl;
+		ub1		*bvnl;
+		OCIBind		**hndl;
 
 #ifdef HAVE_ORACLE_8i
-		OCILobLocator	*inbind_lob[MAXVAR];
-		OCILobLocator	*outbind_lob[MAXVAR];
+		OCILobLocator	**inbind_lob;
+		OCILobLocator	**outbind_lob;
 		uint16_t	orainbindlobcount;
 		uint16_t	oraoutbindlobcount;
 #endif

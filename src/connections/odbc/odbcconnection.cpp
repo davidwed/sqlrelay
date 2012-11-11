@@ -417,9 +417,14 @@ bool odbcconnection::setIsolationLevel(const char *isolevel) {
 odbccursor::odbccursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	odbcconn=(odbcconnection *)conn;
 	stmt=NULL;
-	for (uint16_t i=0; i<MAXVAR; i++) {
+	outdatebind=new datebind *[conn->maxbindcount];
+	for (uint16_t i=0; i<conn->maxbindcount; i++) {
 		outdatebind[i]=NULL;
 	}
+}
+
+odbccursor::~odbccursor() {
+	delete[] outdatebind;
 }
 
 bool odbccursor::prepareQuery(const char *query, uint32_t length) {
@@ -840,7 +845,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	// convert date output binds
-	for (uint16_t i=0; i<MAXVAR; i++) {
+	for (uint16_t i=0; i<conn->maxbindcount; i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
 			SQL_TIMESTAMP_STRUCT	*ts=
@@ -1373,7 +1378,7 @@ void odbccursor::nextRow() {
 void odbccursor::cleanUpData(bool freeresult, bool freebinds) {
 
 	if (freebinds) {
-		for (uint16_t i=0; i<MAXVAR; i++) {
+		for (uint16_t i=0; i<conn->maxbindcount; i++) {
 			delete outdatebind[i];
 			outdatebind[i]=NULL;
 		}

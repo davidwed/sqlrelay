@@ -190,7 +190,7 @@ bool custom_nw::descInputBinds(sqlrcursor_svr *cursor, char *buf, int limit) {
 	int		write_len=0;
 	static char	bindstrbuf[512+1];
 
-	*c=0;
+	*c='\0';
 
 	// fill the buffers
 	for (uint16_t i=0; i<cursor->inbindcount; i++) {
