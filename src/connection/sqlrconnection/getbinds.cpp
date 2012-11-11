@@ -147,14 +147,16 @@ bool sqlrconnection_svr::getBindVarCount(uint16_t *count) {
 	// get the number of input bind variable/values
 	if (clientsock->read(count,idleclienttimeout,0)!=sizeof(uint16_t)) {
 		dbgfile.debugPrint("connection",2,
-			"getting binds failed: client sent bad bind count size");
+			"getting binds failed: "
+			"client sent bad bind count size");
 		return false;
 	}
 
 	// bounds checking
 	if (*count>MAXVAR) {
 		dbgfile.debugPrint("connection",2,
-			"getting binds failed: client tried to send too many binds:");
+			"getting binds failed: "
+			"client tried to send too many binds:");
 		dbgfile.debugPrint("connection",3,(int32_t)*count);
 		return false;
 	}

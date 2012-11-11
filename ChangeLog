@@ -7,6 +7,8 @@
 		environment variables for setting timeouts
 	refactored Oracle re-prepare logic
 	created a query logging framework
+	implemented the current slow query log as a plugin
+	implemented the neowiz query log format as a plugin
 
 0.47 - fixed bug that caused sqlr-export to output negative xml-entity values
 	fixed single-quote-escaping in sqlr-export

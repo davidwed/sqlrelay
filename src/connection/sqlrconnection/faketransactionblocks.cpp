@@ -14,9 +14,6 @@ bool sqlrconnection_svr::supportsTransactionBlocks() {
 bool sqlrconnection_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 						bool *wasfaketransactionquery) {
 
-	// re-init error data
-	cursor->clearError();
-
 	*wasfaketransactionquery=false;
 
 	// Intercept begins and handle them.  If we're faking begins, commit

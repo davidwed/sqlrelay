@@ -14,6 +14,9 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 
 	dbgfile.debugPrint("connection",1,"handling query...");
 
+	// re-init error data
+	cursor->clearError();
+
 	// get the query and bind data from the client
 	if (getquery) {
 		bool	success=true;
@@ -215,9 +218,6 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	// result set was fetched to still be able to return column data
 	// when resumed.
 	cursor->cleanUpData(true,true);
-
-	// re-init error data
-	cursor->clearError();
 
 	dbgfile.debugPrint("connection",2,"processing query...");
 
