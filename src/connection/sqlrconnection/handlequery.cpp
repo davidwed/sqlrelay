@@ -323,8 +323,8 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 		success=commitInternal();
 	}
 	
-	// if the query failed, get the error
-	if (!success) {
+	// if the query failed, get the error (unless it's already been set)
+	if (!success && !cursor->errnum) {
 		// FIXME: errors for queries run by triggers won't be set here
 		cursor->errorMessage(cursor->error,
 					maxerrorlength,

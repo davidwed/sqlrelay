@@ -313,13 +313,13 @@ void sqlrconnection_svr::noAvailableCursors(uint16_t command) {
 	// indicate that an error has occurred
 	clientsock->write((uint16_t)ERROR_OCCURRED);
 
-	// send the error code (zero for now)
-	clientsock->write((uint64_t)0);
+	// send the error code
+	clientsock->write((uint64_t)SQLR_ERROR_NO_CURSORS);
 
 	// send the error itself
-	uint16_t	len=charstring::length(NOCURSORSERROR);
+	uint16_t	len=charstring::length(SQLR_ERROR_NO_CURSORS_STRING);
 	clientsock->write(len);
-	clientsock->write(NOCURSORSERROR,len);
+	clientsock->write(SQLR_ERROR_NO_CURSORS_STRING,len);
 	flushWriteBuffer();
 }
 

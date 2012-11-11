@@ -2011,6 +2011,17 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 			return false;
 		}
 
+		// validate column count
+		if (oracle8conn->maxselectlistsize!=-1 &&
+			ncols>oracle8conn->maxselectlistsize) {
+			// FIXME: maxselectlistsize should really be pushed
+			// up to the sqlrconnection_svr class and this error
+			// should be set there.
+			setError(SQLR_ERROR_MAXSELECTLIST_STRING,
+					SQLR_ERROR_MAXSELECTLIST,true);
+			return false;
+		}
+
 		// allocate buffers, if necessary
 		if (oracle8conn->maxselectlistsize==-1) {
 			allocateResultSetBuffers(oracle8conn->fetchatonce,
@@ -2019,9 +2030,6 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 
 		// indicate that the result needs to be freed
 		resultfreed=false;
-
-		// FIXME: neowiz checks to see if ncols > maxselectlistsize
-		// and calls setSqlrError if it is here
 
 		// run through the columns...
 		for (sword i=0; i<ncols; i++) {

@@ -4,15 +4,11 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-#define SUSPENDED_RESULT_SET 1
-#define NO_SUSPENDED_RESULT_SET 0
-
-#define SEND_COLUMN_INFO 1
-#define DONT_SEND_COLUMN_INFO 0
-
-#define HANDOFF_FD 0
+// listener-connection protocol
+#define HANDOFF_PASS 0
 #define HANDOFF_RECONNECT 1
 
+// client-server protocol
 #define NEW_QUERY 0
 #define FETCH_RESULT_SET 1
 #define ABORT_RESULT_SET 2
@@ -38,6 +34,12 @@
 #define GET_CURRENT_DATABASE 22
 #define GET_LAST_INSERT_ID 23
 #define BEGIN 24
+
+#define SUSPENDED_RESULT_SET 1
+#define NO_SUSPENDED_RESULT_SET 0
+
+#define SEND_COLUMN_INFO 1
+#define DONT_SEND_COLUMN_INFO 0
 
 #define ERROR_OCCURRED 0
 #define NO_ERROR_OCCURRED 1
@@ -76,6 +78,7 @@
 #define DONT_RE_EXECUTE 0
 #define RE_EXECUTE 1
 
+// sizes
 #ifndef MAXPATHLEN
 	#define MAXPATHLEN 256
 #endif
@@ -87,8 +90,28 @@
 
 #define MAXCONNECTIONIDLEN 1024
 
-#define NOCURSORSERROR "No server-side cursors were available to process the query."
+// errors
+// (hopefully the 900000+ range doesn't collide with anyone's native codes)
+#define SQLR_ERROR_NO_CURSORS 900000
+#define SQLR_ERROR_NO_CURSORS_STRING \
+	"No server-side cursors were available to process the query."
+#define SQLR_ERROR_MAXSELECTLIST 900001
+#define SQLR_ERROR_MAXSELECTLIST_STRING \
+	"Maximum column count exceeded."
+#define SQLR_ERROR_MAXVAR 900002
+#define SQLR_ERROR_MAXVAR_STRING \
+	"Bind variable count exceeded."
+#define SQLR_ERROR_DUPLICATE_BINDNAME 900003
+#define SQLR_ERROR_DUPLICATE_BINDNAME_STRING \
+	"Duplicate bind variable name."
+#define SQLR_ERROR_VARIABLE_NOT_BOUND 900004
+#define SQLR_ERROR_VARIABLE_NOT_BOUND_STRING \
+	"Variable present but not bound."
+#define SQLR_ERROR_MAXSTRINGBINDLEN 900005
+#define SQLR_ERROR_MAXSTRINGBINDLEN_STRING \
+	"String bind variable length exceeded."
 
+// structures
 struct sqlrstatistics {
 	int32_t	open_svr_connections;
 	int32_t	opened_svr_connections;
@@ -96,9 +119,6 @@ struct sqlrstatistics {
 	int32_t	open_cli_connections;
 	int32_t	opened_cli_connections;
 
-//	int32_t	timed_out_svr_connections;
-//	int32_t	timed_out_cli_connections;
-	
 	int32_t	open_svr_cursors;
 	int32_t	opened_svr_cursors;
 

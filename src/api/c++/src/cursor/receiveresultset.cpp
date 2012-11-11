@@ -35,7 +35,7 @@ bool sqlrcursor::processResultSet(bool getallrows, uint64_t rowtoget) {
 
 			// Don't get the cursor if the error was that there
 			// were no cursors available.
-			if (charstring::compare(error,NOCURSORSERROR)) {
+			if (errorno==SQLR_ERROR_NO_CURSORS) {
 				getCursorId();
 			}
 

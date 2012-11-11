@@ -2023,7 +2023,7 @@ bool sqlrlistener::passClientFileDescriptorToConnection(
 	dbgfile.debugPrint("listener",1,"passing descriptor...");
 
 	// tell the connection we're passing a file descriptor
-	if (connectionsock->write((uint16_t)HANDOFF_FD)!=sizeof(uint16_t)) {
+	if (connectionsock->write((uint16_t)HANDOFF_PASS)!=sizeof(uint16_t)) {
 		dbgfile.debugPrint("listener",0,"passing descriptor failed");
 		return false;
 	}
