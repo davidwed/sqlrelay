@@ -1313,7 +1313,7 @@ void sqlrsh::startupMessage(sqlrshenv *env, const char *host,
 	printf("Version 0.22\n");
 	printf("	Connected to: ");
 	printf("%s:%d as %s\n\n",host,port,user);
-	printf("	type help; for a help.\n\n");
+	printf("	type help; for help.\n\n");
 }
 
 void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
