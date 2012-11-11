@@ -63,6 +63,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 					DEFAULT_MAXSTRINGBINDVALUELENGTH);
 	maxlobbindvaluelength=charstring::toInteger(
 					DEFAULT_MAXLOBBINDVALUELENGTH);
+	maxerrorlength=charstring::toInteger(DEFAULT_MAXERRORLENGTH);
 	idleclienttimeout=charstring::toInteger(DEFAULT_IDLECLIENTTIMEOUT);
 	currentuser=NULL;
 	firstconnect=NULL;
@@ -337,6 +338,10 @@ uint32_t sqlrconfigfile::getMaxStringBindValueLength() {
 
 uint32_t sqlrconfigfile::getMaxLobBindValueLength() {
 	return maxlobbindvaluelength;
+}
+
+uint32_t sqlrconfigfile::getMaxErrorLength() {
+	return maxerrorlength;
 }
 
 int32_t sqlrconfigfile::getIdleClientTimeout() {
@@ -894,6 +899,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=MAXSTRINGBINDVALUELENGTH_ATTRIBUTE;
 		} else if (!charstring::compare(name,"maxlobbindvaluelength")) {
 			currentattribute=MAXLOBBINDVALUELENGTH_ATTRIBUTE;
+		} else if (!charstring::compare(name,"maxerrorlength")) {
+			currentattribute=MAXERRORLENGTH_ATTRIBUTE;
 		} else if (!charstring::compare(name,"idleclienttimeout")) {
 			currentattribute=IDLECLIENTTIMEOUT_ATTRIBUTE;
 		} else if (!charstring::compare(name,"sidenabled")) {
@@ -1253,6 +1260,10 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			maxlobbindvaluelength=
 				charstring::toUnsignedInteger((value)?value:
 						DEFAULT_MAXLOBBINDVALUELENGTH);
+		} else if (currentattribute==MAXERRORLENGTH_ATTRIBUTE) {
+			maxerrorlength=
+				charstring::toUnsignedInteger((value)?value:
+							DEFAULT_MAXERRORLENGTH);
 		} else if (currentattribute==IDLECLIENTTIMEOUT_ATTRIBUTE) {
 			idleclienttimeout=charstring::toInteger((value)?value:
 						DEFAULT_IDLECLIENTTIMEOUT);

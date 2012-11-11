@@ -128,46 +128,45 @@ bool db2connection::rollback() {
 	return (SQLEndTran(SQL_HANDLE_ENV,env,SQL_ROLLBACK)==SQL_SUCCESS);
 }
 
-void db2connection::errorMessage(const char **errorstring,
+void db2connection::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
-
-	SQLCHAR		error[501];
 	SQLCHAR		state[10];
 	SQLINTEGER	nativeerrnum;
-	SQLSMALLINT	errnum;
+	SQLSMALLINT	errlength;
 
-	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,
-			1,state,&nativeerrnum,error,500,&errnum);
-	errormsg.clear();
-	errormsg.append((const char *)error);
+	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,1,state,&nativeerrnum,
+				(SQLCHAR *)errorbuffer,errorbufferlength,
+				&errlength);
 
 	// set return values
-	*errorstring=errormsg.getString();
-	*errorcode=errnum;
-	*liveconnection=liveConnection(nativeerrnum,errnum);
+	*errorlength=errlength;
+	*errorcode=nativeerrnum;
+	*liveconnection=liveConnection(nativeerrnum,errlength);
 }
 
 bool db2connection::liveConnection(SQLINTEGER nativeerrnum,
-					SQLSMALLINT errnum) {
+					SQLSMALLINT errlength) {
 
 	// When the DB goes down, DB2 first reports one error:
 	// 	[IBM][CLI Driver] SQL1224N  A database agent could not be
 	//	started to service a request, or was terminated as a result of
 	//	a database system shutdown or a force command.  SQLSTATE=55032
-	//	(in this case nativeerrnum==-1224 and errnum==184)
+	//	(in this case nativeerrnum==-1224 and errlength==184)
 	// then upon repeated attempts to run a query, it reports:
 	//	[IBM][CLI Driver] CLI0106E  Connection is closed. SQLSTATE=08003
-	//	(in this case nativeerrnum==-99999 and errnum==64)
+	//	(in this case nativeerrnum==-99999 and errlength==64)
 	// here's another one
 	//	[IBM][CLI Driver] SQL1224N  The database manager is not able to
 	//	 accept new requests, has terminated all requests in progress,
 	//	or has terminated your particular request due to a problem with
 	//	your request.  SQLSTATE=55032
 	// We need to catch both...
-	return !((nativeerrnum==-1224 && errnum==184) ||
-		(nativeerrnum==-99999 && errnum==64) ||
-		(nativeerrnum==-1224 && errnum==220));
+	return !((nativeerrnum==-1224 && errlength==184) ||
+		(nativeerrnum==-99999 && errlength==64) ||
+		(nativeerrnum==-1224 && errlength==220));
 }
 
 
@@ -704,26 +703,23 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-void db2cursor::errorMessage(const char **errorstring,
-				int64_t *errorcode,
-				bool *liveconnection) {
-
-	SQLCHAR		error[501];
+void db2cursor::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
+					int64_t *errorcode,
+					bool *liveconnection) {
 	SQLCHAR		state[10];
 	SQLINTEGER	nativeerrnum;
-	SQLSMALLINT	errnum;
+	SQLSMALLINT	errlength;
 
-	/*SQLError(db2conn->env,db2conn->dbc,
-			stmt,state,&nativeerrnum,error,500,&errnum);*/
-	SQLGetDiagRec(SQL_HANDLE_STMT,stmt,
-			1,state,&nativeerrnum,error,500,&errnum);
-	errormsg.clear();
-	errormsg.append((const char *)error);
+	SQLGetDiagRec(SQL_HANDLE_STMT,stmt,1,state,&nativeerrnum,
+				(SQLCHAR *)errorbuffer,errorbufferlength,
+				&errlength);
 
 	// set return values
-	*errorstring=errormsg.getString();
-	*errorcode=errnum;
-	*liveconnection=db2conn->liveConnection(nativeerrnum,errnum);
+	*errorlength=errlength;
+	*errorcode=nativeerrnum;
+	*liveconnection=db2conn->liveConnection(nativeerrnum,errlength);
 }
 
 bool db2cursor::knowsRowCount() {

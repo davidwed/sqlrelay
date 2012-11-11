@@ -141,5 +141,4 @@ void sqlrconnection::setTimeoutFromEnv(const char *var,
 		*timeoutsec=-1;
 		*timeoutusec=-1;
 	}
-printf("%s: %d,%d\n",var,*timeoutsec,*timeoutusec);
 }

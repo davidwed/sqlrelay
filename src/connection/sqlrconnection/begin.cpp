@@ -55,9 +55,8 @@ bool sqlrconnection_svr::begin() {
 	// If there was an error, copy it out.  We'll be destroying the
 	// cursor in a moment and the error will be lost otherwise.
 	if (!retval) {
-		const char	*err;
-		begincur->errorMessage(&err,&errnum,&liveconnection);
-		error=charstring::duplicate(err);
+		begincur->errorMessage(error,maxerrorlength,
+					&errorlength,&errnum,&liveconnection);
 	}
 
 	// clean up

@@ -46,9 +46,8 @@ bool sqlrconnection_svr::commit() {
 	// If there was an error, copy it out.  We'll be destroying the
 	// cursor in a moment and the error will be lost otherwise.
 	if (!retval) {
-		const char	*err;
-		commitcur->errorMessage(&err,&errnum,&liveconnection);
-		error=charstring::duplicate(err);
+		commitcur->errorMessage(error,maxerrorlength,
+					&errorlength,&errnum,&liveconnection);
 	}
 
 	// clean up

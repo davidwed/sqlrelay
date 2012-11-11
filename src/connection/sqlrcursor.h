@@ -161,9 +161,11 @@ class sqlrcursor_svr {
 		virtual bool	fetchFromBindCursor();
 		virtual	bool		queryIsNotSelect();
 		virtual	bool		queryIsCommitOrRollback();
-		virtual	void		errorMessage(const char **errorstring,
-							int64_t *errorcode,
-							bool *liveconnection);
+		virtual	void		errorMessage(char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorlength,
+						int64_t *errorcode,
+						bool *liveconnection);
 		virtual bool		knowsRowCount()=0;
 		virtual uint64_t	rowCount()=0;
 		virtual bool		knowsAffectedRows()=0;
@@ -278,7 +280,8 @@ class sqlrcursor_svr {
 		xmldom		*querytree;
 		bool		queryresult;
 
-		const char	*error;
+		char		*error;
+		uint32_t	errorlength;
 		int64_t		errnum;
 		bool		liveconnection;
 

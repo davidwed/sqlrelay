@@ -47,6 +47,7 @@ typedef enum {
 	MAXQUERYSIZE_ATTRIBUTE,
 	MAXSTRINGBINDVALUELENGTH_ATTRIBUTE,
 	MAXLOBBINDVALUELENGTH_ATTRIBUTE,
+	MAXERRORLENGTH_ATTRIBUTE,
 	IDLECLIENTTIMEOUT_ATTRIBUTE,
 	USER_ATTRIBUTE,
 	PASSWORD_ATTRIBUTE,
@@ -214,6 +215,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		uint32_t	getMaxQuerySize();
 		uint32_t	getMaxStringBindValueLength();
 		uint32_t	getMaxLobBindValueLength();
+		uint32_t	getMaxErrorLength();
 		int32_t		getIdleClientTimeout();
 		int64_t		getMaxListeners();
 		uint32_t	getListenerTimeout();
@@ -314,6 +316,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		uint32_t	maxquerysize;
 		uint32_t	maxstringbindvaluelength;
 		uint32_t	maxlobbindvaluelength;
+		uint32_t	maxerrorlength;
 		int32_t		idleclienttimeout;
 		int64_t		maxlisteners;
 		uint32_t	listenertimeout;

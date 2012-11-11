@@ -10,8 +10,11 @@ void sqlrconnection_svr::clearError() {
 void sqlrconnection_svr::setError(const char *err,
 					int64_t errn,
 					bool liveconn) {
-	delete[] error;
-	error=charstring::duplicate(err);
+	errorlength=charstring::length(err);
+	if (errorlength>conn->maxerrorlength) {
+		errorlength=maxerrorlength;
+	}
+	charstring::copy(error,err,errorlength);
 	errnum=errn;
 	liveconnection=liveconn;
 }
@@ -20,9 +23,8 @@ void sqlrconnection_svr::returnError() {
 
 	// Get the error data if none is set already
 	if (!error) {
-		const char	*err=NULL;
-		errorMessage(&err,&errnum,&liveconnection);
-		error=charstring::duplicate(err);
+		errorMessage(error,maxerrorlength,
+				&errorlength,&errnum,&liveconnection);
 	}
 
 	// send the appropriate error status
@@ -36,9 +38,8 @@ void sqlrconnection_svr::returnError() {
 	clientsock->write((uint64_t)errnum);
 
 	// send the error string
-	size_t	errorlen=charstring::length(error);
-	clientsock->write((uint16_t)errorlen);
-	clientsock->write(error,errorlen);
+	clientsock->write((uint16_t)errorlength);
+	clientsock->write(error,errorlength);
 }
 
 void sqlrconnection_svr::returnError(sqlrcursor_svr *cursor) {
@@ -56,9 +57,8 @@ void sqlrconnection_svr::returnError(sqlrcursor_svr *cursor) {
 	clientsock->write((uint64_t)cursor->errnum);
 
 	// send the error string
-	size_t	errorlen=charstring::length(cursor->error);
-	clientsock->write((uint16_t)errorlen);
-	clientsock->write(cursor->error,errorlen);
+	clientsock->write((uint16_t)cursor->errorlength);
+	clientsock->write(cursor->error,cursor->errorlength);
 
 	// client will be sending skip/fetch, better get
 	// it even though we're not going to use it

@@ -109,7 +109,9 @@ class db2cursor : public sqlrcursor_svr {
 						int16_t *isnull);
 		bool		executeQuery(const char *query,
 						uint32_t length);
-		void		errorMessage(const char **errorstring,
+		void		errorMessage(char *errorbuffer,
+						uint32_t errorbufferlength,
+						uint32_t *errorlength,
 						int64_t	*errorcode,
 						bool *liveconnection);
 		bool		knowsRowCount();
@@ -174,7 +176,9 @@ class db2connection : public sqlrconnection_svr {
 		bool	supportsTransactionBlocks();
 		bool	commit();
 		bool	rollback();
-		void	errorMessage(const char **errorstring,
+		void	errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
 					int64_t	*errorcode,
 					bool *liveconnection);
 		bool	liveConnection(SQLINTEGER nativeerror,

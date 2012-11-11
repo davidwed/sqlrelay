@@ -31,7 +31,8 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 
 	commitorrollback=false;
 
-	error=NULL;
+	error=new char[maxerrorlength];
+	errorlength=0;
 	errnum=0;
 	liveconnection=false;
 
@@ -54,6 +55,7 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 	maxquerysize=0;
 	maxstringbindvaluelength=0;
 	maxlobbindvaluelength=0;
+	maxerrorlength=0;
 	idleclienttimeout=-1;
 
 	handoffindex=0;

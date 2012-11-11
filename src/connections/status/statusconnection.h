@@ -30,8 +30,10 @@ class statusconnection : public sqlrconnection_svr {
 		bool		autoCommitOn();
 		bool		autoCommitOff();
 		bool		commit();
-		void		errorMessage(const char **errorstring,
-						int64_t *errorcode,
+		void		errorMessage(char *errorbuffer,
+						uint32_t errorbufferlength,
+						uint32_t *errorlength,
+						int64_t	*errorcode,
 						bool *liveconnection);
 		bool		rollback();
 

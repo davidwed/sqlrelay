@@ -130,7 +130,9 @@ class routercursor : public sqlrcursor_svr {
 						uint32_t length);
 		void		checkForTempTable(const char *query,
 							uint32_t length);
-		void		errorMessage(const char **errorstring,
+		void		errorMessage(char *errorbuffer,
+						uint32_t errorbufferlength,
+						uint32_t *errorlength,
 						int64_t	*errorcode,
 						bool *liveconnection);
 		bool		knowsRowCount();
@@ -190,7 +192,9 @@ class routerconnection : public sqlrconnection_svr {
 		bool		autoCommitOff();
 		bool		commit();
 		bool		rollback();
-		void		errorMessage(const char **errorstring,
+		void		errorMessage(char *errorbuffer,
+						uint32_t errorbufferlength,
+						uint32_t *errorlength,
 						int64_t	*errorcode,
 						bool *liveconnection);
 		const char	*identify();

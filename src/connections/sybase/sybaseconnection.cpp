@@ -421,10 +421,11 @@ bool sybasecursor::openCursor(uint16_t id) {
 		char	query[len+1];
 		snprintf(query,len+1,"use %s",sybaseconn->db);
 		if (!(prepareQuery(query,len) && executeQuery(query,len))) {
-			const char	*err;
-			int64_t		errnum;
+			char		err[2048];
+			uint32_t	errlen;
+			int64_t		errn;
 			bool		live;
-			errorMessage(&err,&errnum,&live);
+			errorMessage(err,sizeof(err),&errlen,&errn,&live);
 			fprintf(stderr,"%s\n",err);
 			retval=false;
 		} else {
@@ -1449,11 +1450,14 @@ bool sybaseconnection::rollback() {
 	return sqlrconnection_svr::rollback();
 }
 
-void sybaseconnection::errorMessage(const char **errorstring,
+void sybaseconnection::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
+	*errorlength=this->errorstring.getStringLength();
+	charstring::safeCopy(errorbuffer,errorbufferlength,
+				this->errorstring.getString(),*errorlength);
 	*liveconnection=this->liveconnection;
 	*errorcode=this->errorcode;
-	*errorstring=(this->errorstring.getStringLength())?
-				this->errorstring.getString():NULL;
 }

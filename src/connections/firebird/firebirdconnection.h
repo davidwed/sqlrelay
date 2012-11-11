@@ -164,7 +164,9 @@ class firebirdconnection : public sqlrconnection_svr {
 		bool	commit();
 		bool	rollback();
 		bool	ping();
-		void	errorMessage(const char **errorstring,
+		void	errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
 					int64_t	*errorcode,
 					bool *liveconnection);
 		const char	*identify();

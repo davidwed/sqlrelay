@@ -173,9 +173,11 @@ bool firebirdconnection::rollback() {
 	return (!isc_rollback_retaining(error,&tr));
 }
 
-void firebirdconnection::errorMessage(const char **errorstring,
-						int64_t *errorcode,
-						bool *liveconnection) {
+void firebirdconnection::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
+					int64_t *errorcode,
+					bool *liveconnection) {
 
 	// declare a buffer for the error
 	errormsg.clear();
@@ -190,11 +192,10 @@ void firebirdconnection::errorMessage(const char **errorstring,
 
 	// get the error message
 	ISC_LONG	sqlcode=isc_sqlcode(error);
-	isc_sql_interprete(sqlcode,msg,512);
-	errormsg.append(msg);
+	isc_sql_interprete(sqlcode,errorbuffer,errorbufferlength);
 
 	// set return values
-	*errorstring=errormsg.getString();
+	*errorlength=charstring::length(errorbuffer);
 	*errorcode=sqlcode;
 	*liveconnection=!(charstring::contains(
 				errormsg.getString(),

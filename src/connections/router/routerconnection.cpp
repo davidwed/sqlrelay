@@ -227,15 +227,20 @@ bool routerconnection::rollback() {
 	return result;
 }
 
-void routerconnection::errorMessage(const char **errormessage,
+void routerconnection::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
 	for (uint16_t index=0; index<concount; index++) {
 		if (!cons[index]) {
 			continue;
 		}
-		*errormessage=cons[index]->errorMessage();
-		if (!charstring::length(*errormessage)) {
+		const char	*errormessage=cons[index]->errorMessage();
+		if (!charstring::length(errormessage)) {
+			*errorlength=charstring::length(errormessage);
+			charstring::safeCopy(errorbuffer,errorbufferlength,
+						errormessage,*errorlength);
 			*errorcode=cons[index]->errorNumber();
 			break;
 		}
@@ -764,10 +769,15 @@ bool routercursor::begin(const char *query, uint32_t length) {
 	return result;
 }
 
-void routercursor::errorMessage(const char **errormessage,
-				int64_t *errorcode,
-				bool *liveconnection) {
-	*errormessage=(cur)?cur->errorMessage():"";
+void routercursor::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
+					int64_t *errorcode,
+					bool *liveconnection) {
+	const char	*errormessage=(cur)?cur->errorMessage():"";
+	*errorlength=charstring::length(errormessage);
+	charstring::safeCopy(errorbuffer,errorbufferlength,
+					errormessage,*errorlength);
 	*errorcode=cur->errorNumber();
 	// FIXME: detect downed database or downed relay
 	*liveconnection=true;

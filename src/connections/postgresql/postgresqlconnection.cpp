@@ -172,10 +172,15 @@ void postgresqlconnection::logOut() {
 	}
 }
 
-void postgresqlconnection::errorMessage(const char **errorstring,
-						int64_t *errorcode,
-						bool *liveconnection) {
-	*errorstring=PQerrorMessage(pgconn);
+void postgresqlconnection::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
+					int64_t *errorcode,
+					bool *liveconnection) {
+	const char	*errorstring=PQerrorMessage(pgconn);
+	*errorlength=charstring::length(errorstring);
+	charstring::safeCopy(errorbuffer,errorbufferlength,
+					errorstring,*errorlength);
 	// FIXME: set this
 	*errorcode=0;
 	*liveconnection=(PQstatus(pgconn)==CONNECTION_OK);

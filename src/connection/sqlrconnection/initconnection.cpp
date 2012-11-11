@@ -145,6 +145,7 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	maxquerysize=cfgfl->getMaxQuerySize();
 	maxstringbindvaluelength=cfgfl->getMaxStringBindValueLength();
 	maxlobbindvaluelength=cfgfl->getMaxLobBindValueLength();
+	maxerrorlength=cfgfl->getMaxErrorLength();
 	idleclienttimeout=cfgfl->getIdleClientTimeout();
 
 	// set autocommit behavior

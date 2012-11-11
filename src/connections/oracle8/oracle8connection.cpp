@@ -717,31 +717,27 @@ sqlwriter *oracle8connection::getSqlWriter() {
 	return new oracle8sqlwriter;
 }
 
-void oracle8connection::errorMessage(const char **errorstring,
-						int64_t *errorcode,
-						bool *liveconnection) {
+void oracle8connection::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
+					int64_t *errorcode,
+					bool *liveconnection) {
 
 	// get the message from oracle
-	text	message[1024];
-	rawbuffer::zero((void *)message,sizeof(message));
+	rawbuffer::zero(errorbuffer,errorbufferlength);
 	sb4	errcode=0;
 	OCIErrorGet((dvoid *)err,1,(text *)0,&errcode,
-			message,sizeof(message),OCI_HTYPE_ERROR);
-	message[1023]='\0';
+			(text *)errorbuffer,errorbufferlength,OCI_HTYPE_ERROR);
+	errorbuffer[errorbufferlength-1]='\0';
 
 	// truncate the trailing \n
-	size_t	errorlen=charstring::length((char *)message);
-	char	*last=(char *)message+errorlen-1;
+	*errorlength=charstring::length((char *)errorbuffer);
+	char	*last=errorbuffer+(*errorlength)-1;
 	if (*last=='\n') {
 		*last='\0';
 	}
 
-	// store the error
-	errormessage.clear();
-	errormessage.append((const char *)message);
-
 	// set return values
-	*errorstring=errormessage.getString();
 	*errorcode=errcode;
 
 	// check for dead connection or shutdown in progress
@@ -2274,16 +2270,19 @@ bool oracle8cursor::queryIsNotSelect() {
 	return (stmttype!=OCI_STMT_SELECT);
 }
 
-void oracle8cursor::errorMessage(const char **errorstring,
+void oracle8cursor::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
 
-	oracle8conn->errorMessage(errorstring,errorcode,liveconnection);
+	oracle8conn->errorMessage(errorbuffer,errorbufferlength,
+					errorlength,errorcode,liveconnection);
 
 #ifdef OCI_STMT_CACHE
 	// set the statement release mode such that this query will be
 	// removed from the statement cache on the next iteration
-	if (errormessage.getStringLength()) {
+	if (charstring::length(errorbuffer)) {
 		stmtreleasemode=OCI_STRLS_CACHE_DELETE;
 	}
 #endif

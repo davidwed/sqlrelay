@@ -313,17 +313,22 @@ bool mysqlconnection::rollback() {
 #endif
 }
 
-void mysqlconnection::errorMessage(const char **errorstring,
+void mysqlconnection::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
-	*errorstring=mysql_error(&mysql);
+	const char	*errorstring=mysql_error(&mysql);
+	*errorlength=charstring::length(errorstring);
+	charstring::safeCopy(errorbuffer,errorbufferlength,
+					errorstring,*errorlength);
 	*errorcode=mysql_errno(&mysql);
-	*liveconnection=(!charstring::compare(*errorstring,"") ||
-		!charstring::compareIgnoringCase(*errorstring,
+	*liveconnection=(!charstring::compare(errorstring,"") ||
+		!charstring::compareIgnoringCase(errorstring,
 				"mysql server has gone away") ||
-		!charstring::compareIgnoringCase(*errorstring,
+		!charstring::compareIgnoringCase(errorstring,
 				"Can't connect to local MySQL",28) /*||
-		!charstring::compareIgnoringCase(*errorstring,
+		!charstring::compareIgnoringCase(errorstring,
 			"Lost connection to MySQL server during query")*/);
 }
 
@@ -744,9 +749,11 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-void mysqlcursor::errorMessage(const char **errorstring,
-				int64_t *errorcode,
-				bool *liveconnection) {
+void mysqlcursor::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
+					int64_t *errorcode,
+					bool *liveconnection) {
 
 	*liveconnection=true;
 
@@ -795,7 +802,8 @@ void mysqlcursor::errorMessage(const char **errorstring,
 	}
 
 	// set return values
-	*errorstring=err;
+	*errorlength=charstring::length(err);
+	charstring::safeCopy(errorbuffer,errorbufferlength,err,*errorlength);
 	*errorcode=errn;
 }
 

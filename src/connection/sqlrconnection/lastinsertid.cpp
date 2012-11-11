@@ -75,9 +75,8 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id) {
 	} else {
 		// If there was an error, copy it out.  We'l be destroying the
 		// cursor in a moment and the error will be lost otherwise.
-		const char	*err;
-		liicur->errorMessage(&err,&errnum,&liveconnection);
-		error=charstring::duplicate(err);
+		liicur->errorMessage(error,maxerrorlength,
+					&errorlength,&errnum,&liveconnection);
 	}
 
 	liicur->cleanUpData(true,true);

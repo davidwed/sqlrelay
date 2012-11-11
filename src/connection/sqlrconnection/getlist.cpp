@@ -145,7 +145,9 @@ bool sqlrconnection_svr::getListByApiCall(sqlrcursor_svr *cursor,
 
 	// if an error occurred...
 	if (!success) {
-		cursor->errorMessage(&(cursor->error),
+		cursor->errorMessage(cursor->error,
+					maxerrorlength,
+					&(cursor->errorlength),
 					&(cursor->errnum),
 					&(cursor->liveconnection));
 		returnError(cursor);

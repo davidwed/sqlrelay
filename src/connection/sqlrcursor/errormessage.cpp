@@ -8,13 +8,20 @@ void sqlrcursor_svr::clearError() {
 }
 
 void sqlrcursor_svr::setError(const char *err, int64_t errn, bool liveconn) {
-	error=err;
+	errorlength=charstring::length(err);
+	if (errorlength>conn->maxerrorlength) {
+		errorlength=conn->maxerrorlength;
+	}
+	charstring::copy(error,err,errorlength);
 	errnum=errn;
 	liveconnection=liveconn;
 }
 
-void sqlrcursor_svr::errorMessage(const char **errorstring,
+void sqlrcursor_svr::errorMessage(char *errorbuffer,
+					uint32_t errorbuffersize,
+					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
-	return conn->errorMessage(errorstring,errorcode,liveconnection);
+	return conn->errorMessage(errorbuffer,errorbuffersize,
+					errorlength,errorcode,liveconnection);
 }

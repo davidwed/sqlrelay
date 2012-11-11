@@ -74,7 +74,9 @@ class mysqlcursor : public sqlrcursor_svr {
 #endif
 		bool		executeQuery(const char *query,
 						uint32_t length);
-		void		errorMessage(const char **errorstring,
+		void		errorMessage(char *errorbuffer,
+						uint32_t errorbufferlength,
+						uint32_t *errorlength,
 						int64_t	*errorcode,
 						bool *liveconnection);
 		bool		knowsRowCount();
@@ -161,7 +163,9 @@ class mysqlconnection : public sqlrconnection_svr {
 		bool		autoCommitOff();
 		bool		commit();
 		bool		rollback();
-		void		errorMessage(const char **errorstring,
+		void		errorMessage(char *errorbuffer,
+						uint32_t errorbufferlength,
+						uint32_t *errorlength,
 						int64_t	*errorcode,
 						bool *liveconnection);
 		sqlwriter	*getSqlWriter();

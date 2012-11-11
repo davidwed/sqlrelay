@@ -389,25 +389,23 @@ bool odbcconnection::rollback() {
 	return (SQLEndTran(SQL_HANDLE_ENV,env,SQL_ROLLBACK)==SQL_SUCCESS);
 }
 
-void odbcconnection::errorMessage(const char **errorstring,
-					int64_t *errornumber,
+void odbcconnection::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
+					int64_t *errorcode,
 					bool *liveconnection) {
-
-	SQLCHAR		error[501];
 	SQLCHAR		state[10];
 	SQLINTEGER	nativeerrnum;
-	SQLSMALLINT	errnum;
+	SQLSMALLINT	errlength;
 
-	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,
-			1,state,&nativeerrnum,error,500,&errnum);
-	errormsg.clear();
-	errormsg.append((const char *)error);
-
-	*liveconnection=true;
+	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,1,state,&nativeerrnum,
+				(SQLCHAR *)errorbuffer,errorbufferlength,
+				&errlength);
 
 	// set return values
-	*errorstring=errormsg.getString();
-	*errornumber=errnum;
+	*errorlength=errlength;
+	*errorcode=nativeerrnum;
+	*liveconnection=true;
 }
 #endif
 
@@ -1150,26 +1148,23 @@ bool odbccursor::handleColumns() {
 	return true;
 }
 
-void odbccursor::errorMessage(const char **errorstring,
-				int64_t *errornumber,
-				bool *liveconnection) {
-
-	SQLCHAR		error[501];
+void odbccursor::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
+					int64_t *errorcode,
+					bool *liveconnection) {
 	SQLCHAR		state[10];
 	SQLINTEGER	nativeerrnum;
-	SQLSMALLINT	errnum;
+	SQLSMALLINT	errlength;
 
-	// need to use SQLGetDiagRec and SQLGetDiagField here...
-	SQLError(odbcconn->env,odbcconn->dbc,stmt,state,&nativeerrnum,
-							error,500,&errnum);
-	errormsg.clear();
-	errormsg.append((const char *)error);
-
-	*liveconnection=true;
+	SQLGetDiagRec(SQL_HANDLE_STMT,stmt,1,state,&nativeerrnum,
+				(SQLCHAR *)errorbuffer,errorbufferlength,
+				&errlength);
 
 	// set return values
-	*errorstring=errormsg.getString();
-	*errornumber=errnum;
+	*errorlength=errlength;
+	*errorcode=nativeerrnum;
+	*liveconnection=true;
 }
 
 bool odbccursor::knowsRowCount() {

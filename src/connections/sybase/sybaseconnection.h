@@ -196,7 +196,9 @@ class sybaseconnection : public sqlrconnection_svr {
 						const char *tablename);
 		bool		commit();
 		bool		rollback();
-		void		errorMessage(const char **errorstring,
+		void		errorMessage(char *errorbuffer,
+						uint32_t errorbufferlength,
+						uint32_t *errorlength,
 						int64_t	*errorcode,
 						bool *liveconnection);
 

@@ -123,7 +123,9 @@ class odbccursor : public sqlrcursor_svr {
 		bool		executeQuery(const char *query,
 						uint32_t length);
 		bool		handleColumns();
-		void		errorMessage(const char **errorstring,
+		void		errorMessage(char *errorbuffer,
+						uint32_t errorbufferlength,
+						uint32_t *errorlength,
 						int64_t	*errorcode,
 						bool *liveconnection);
 		bool		knowsRowCount();
@@ -194,7 +196,9 @@ class odbcconnection : public sqlrconnection_svr {
 		bool		autoCommitOff();
 		bool		commit();
 		bool		rollback();
-		void		errorMessage(const char **errorstring,
+		void		errorMessage(char *errorbuffer,
+						uint32_t errorbufferlength,
+						uint32_t *errorlength,
 						int64_t	*errorcode,
 						bool *liveconnection);
 #endif

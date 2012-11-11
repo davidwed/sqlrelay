@@ -177,10 +177,13 @@ bool statusconnection::rollback() {
 }
 
 
-void statusconnection::errorMessage(const char **errorstring,
-						int64_t *errorcode,
-						bool *liveconnection) {
-	*errorstring="";
+void statusconnection::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
+					int64_t *errorcode,
+					bool *liveconnection) {
+	errorbuffer[0]='\0';
+	*errorlength=0;
 	*errorcode=0;
 	*liveconnection=true;
 }

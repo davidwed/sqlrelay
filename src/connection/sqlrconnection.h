@@ -64,9 +64,11 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual bool	begin();
 		virtual bool	commit();
 		virtual bool	rollback();
-		virtual	void	errorMessage(const char **errorstring,
-							int64_t *errorcode,
-							bool *liveconnection)=0;
+		virtual	void	errorMessage(char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorlength,
+						int64_t *errorcode,
+						bool *liveconnection)=0;
 		virtual bool	supportsTransactionBlocks();
 		virtual bool		selectDatabase(const char *database);
 		virtual const char	*selectDatabaseQuery();
@@ -425,6 +427,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool		commitorrollback;
 
 		char		*error;
+		uint32_t	errorlength;
 		int64_t		errnum;
 		bool		liveconnection;
 
@@ -480,9 +483,9 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 
 		unixclientsocket	handoffsockun;
 
-		bool			connected;
-		bool			inclientsession;
-		bool			loggedin;
+		bool		connected;
+		bool		inclientsession;
+		bool		loggedin;
 
 		bool		scalerspawned;
 		const char	*connectionid;
@@ -523,10 +526,11 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		debugfile	dbgfile;
 
 	public:
-		// derived cursor classess may need to access these
+		// derived cursor classes may need to access these
 		uint32_t	maxquerysize;
 		uint32_t	maxstringbindvaluelength;
 		uint32_t	maxlobbindvaluelength;
+		uint32_t	maxerrorlength;
 };
 
 

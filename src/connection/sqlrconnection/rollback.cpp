@@ -47,9 +47,8 @@ bool sqlrconnection_svr::rollback() {
 	// If there was an error, copy it out.  We'll be destroying the
 	// cursor in a moment and the error will be lost otherwise.
 	if (!retval) {
-		const char	*err;
-		rollbackcur->errorMessage(&err,&errnum,&liveconnection);
-		error=charstring::duplicate(err);
+		rollbackcur->errorMessage(error,maxerrorlength,
+					&errorlength,&errnum,&liveconnection);
 	}
 
 	// clean up

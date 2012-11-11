@@ -326,7 +326,9 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	// if the query failed, get the error
 	if (!success) {
 		// FIXME: errors for queries run by triggers won't be set here
-		cursor->errorMessage(&(cursor->error),
+		cursor->errorMessage(cursor->error,
+					maxerrorlength,
+					&(cursor->errorlength),
 					&(cursor->errnum),
 					&(cursor->liveconnection));
 	}

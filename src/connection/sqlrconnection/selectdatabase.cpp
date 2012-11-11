@@ -45,9 +45,8 @@ void sqlrconnection_svr::selectDatabaseCommand() {
 
 	// if there was an error, send it back
 	if (!result) {
-		uint16_t	errorlen=charstring::length(error);
-		clientsock->write(errorlen);
-		clientsock->write(error,errorlen);
+		clientsock->write(errorlength);
+		clientsock->write(error,errorlength);
 	}
 
 	flushWriteBuffer();
@@ -104,9 +103,8 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 	} else {
 		// If there was an error, copy it out.  We'l be destroying the
 		// cursor in a moment and the error will be lost otherwise.
-		const char	*err;
-		sdcur->errorMessage(&err,&errnum,&liveconnection);
-		error=charstring::duplicate(err);
+		sdcur->errorMessage(error,maxerrorlength,
+					&errorlength,&errnum,&liveconnection);
 	}
 	delete[] sdquery;
 	sdcur->closeCursor();

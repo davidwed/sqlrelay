@@ -76,6 +76,9 @@
 #define DEFAULT_MAXLOBBINDVALUELENGTH "71680"
 	// default lob bind value length
 
+#define DEFAULT_MAXERRORLENGTH "2048"
+	// default error size
+
 #define DEFAULT_IDLECLIENTTIMEOUT "-1"
 	// default idle client timeout
 

@@ -173,11 +173,15 @@ bool sqliteconnection::rollback() {
 }
 #endif
 
-void sqliteconnection::errorMessage(const char **errorstring,
+void sqliteconnection::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
 	// set return values
-	*errorstring=errmesg;
+	*errorlength=charstring::length(errmesg);
+	charstring::safeCopy(errorbuffer,errorbufferlength,
+					errmesg,*errorlength);
 	*errorcode=errcode;
 	*liveconnection=true;
 	if (errmesg &&

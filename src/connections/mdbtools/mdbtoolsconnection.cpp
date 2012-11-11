@@ -114,10 +114,13 @@ bool mdbtoolsconnection::rollback() {
 	return true;
 }
 
-void mdbtoolsconnection::errorMessage(const char **errorstring,
+void mdbtoolsconnection::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
-	*errorstring="error";
+	charstring::safeCopy(errorbuffer,errorbufferlength,"error",5);
+	*errorlength=5;
 	*errorcode=0;
 	*liveconnection=true;
 }

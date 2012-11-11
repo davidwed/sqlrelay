@@ -235,11 +235,12 @@ bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
 	} else {
 		// error...
 		if (sqlrcon->debugtriggers) {
-			const char	*err;
-			int64_t		errnum;
-			bool		liveconn;
-			cur->errorMessage(&err,&errnum,&liveconn);
-			printf("error:\n%s\n",err);
+			cur->errorMessage(cur->error,
+						sqlrcon->maxerrorlength,
+						&(cur->errorlength),
+						&(cur->errnum),
+						&(cur->liveconnection));
+			printf("error:\n%s\n",cur->error);
 		}
 	}
 	if (sqlrcon->debugtriggers) {
