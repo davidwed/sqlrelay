@@ -31,7 +31,7 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 
 	commitorrollback=false;
 
-	error=new char[maxerrorlength];
+	error=NULL;
 	errorlength=0;
 	errnum=0;
 	liveconnection=false;
@@ -85,6 +85,7 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 
 	pidfile=NULL;
 
+	clientinfo=NULL;
 	clientinfolen=0;
 
 	decrementonclose=false;

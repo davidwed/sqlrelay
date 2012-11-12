@@ -55,6 +55,8 @@ sqlrconnection_svr::~sqlrconnection_svr() {
 	delete sqlw;
 	delete sqlrlg;
 
+	delete[] clientinfo;
+
 	if (pidfile) {
 		file::remove(pidfile);
 		delete[] pidfile;

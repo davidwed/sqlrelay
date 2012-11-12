@@ -58,6 +58,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	debugconnection=charstring::contains(debug,"connection");
 	debugtranslations=charstring::contains(debug,"translations");
 	debugtriggers=charstring::contains(debug,"triggers");
+	maxclientinfolength=charstring::toInteger(DEFAULT_MAXCLIENTINFOLENGTH);
 	maxquerysize=charstring::toInteger(DEFAULT_MAXQUERYSIZE);
 	maxbindcount=charstring::toInteger(DEFAULT_MAXBINDCOUNT);
 	maxbindnamelength=charstring::toInteger(DEFAULT_MAXBINDNAMELENGTH);
@@ -328,6 +329,10 @@ bool sqlrconfigfile::getDebugTranslations() {
 
 bool sqlrconfigfile::getDebugTriggers() {
 	return debugtriggers;
+}
+
+uint64_t sqlrconfigfile::getMaxClientInfoLength() {
+	return maxclientinfolength;
 }
 
 uint32_t sqlrconfigfile::getMaxQuerySize() {
@@ -902,6 +907,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=ALLOWEDIPS_ATTRIBUTE;
 		} else if (!charstring::compare(name,"debug")) {
 			currentattribute=DEBUG_ATTRIBUTE;
+		} else if (!charstring::compare(name,"maxclientinfolength")) {
+			currentattribute=MAXCLIENTINFOLENGTH_ATTRIBUTE;
 		} else if (!charstring::compare(name,"maxquerysize")) {
 			currentattribute=MAXQUERYSIZE_ATTRIBUTE;
 		} else if (!charstring::compare(name,"maxbindcount")) {
@@ -1262,6 +1269,10 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 							"translations");
 			debugtriggers=charstring::contains(debug,
 							"triggers");
+		} else if (currentattribute==MAXCLIENTINFOLENGTH_ATTRIBUTE) {
+			maxclientinfolength=
+				charstring::toInteger((value)?value:
+						DEFAULT_MAXCLIENTINFOLENGTH);
 		} else if (currentattribute==MAXQUERYSIZE_ATTRIBUTE) {
 			maxquerysize=charstring::toInteger((value)?value:
 							DEFAULT_MAXQUERYSIZE);

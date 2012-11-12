@@ -26,7 +26,7 @@ bool sqlrconnection_svr::getInputBinds(sqlrcursor_svr *cursor) {
 		if (bv->type==NULL_BIND) {
 			getNullBind(bv);
 		} else if (bv->type==STRING_BIND) {
-			if (!getStringBind(bv)) {
+			if (!getStringBind(cursor,bv)) {
 				return false;
 			}
 		} else if (bv->type==INTEGER_BIND) {
@@ -44,11 +44,11 @@ bool sqlrconnection_svr::getInputBinds(sqlrcursor_svr *cursor) {
 		} else if (bv->type==BLOB_BIND) {
 			// can't fake blob binds
 			cursor->fakeinputbindsforthisquery=false;
-			if (!getLobBind(bv)) {
+			if (!getLobBind(cursor,bv)) {
 				return false;
 			}
 		} else if (bv->type==CLOB_BIND) {
-			if (!getLobBind(bv)) {
+			if (!getLobBind(cursor,bv)) {
 				return false;
 			}
 		}		  
@@ -80,7 +80,7 @@ bool sqlrconnection_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 		// get the size of the value
 		if (bv->type==STRING_BIND) {
 			bv->value.stringval=NULL;
-			if (!getBindSize(bv,maxstringbindvaluelength)) {
+			if (!getBindSize(cursor,bv,&maxstringbindvaluelength)) {
 				return false;
 			}
 			// This must be a calloc because oracle8 gets angry if
@@ -116,7 +116,7 @@ bool sqlrconnection_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 			bv->value.dateval.buffer=(char *)bindpool->malloc(
 						bv->value.dateval.buffersize);
 		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
-			if (!getBindSize(bv,maxlobbindvaluelength)) {
+			if (!getBindSize(cursor,bv,&maxlobbindvaluelength)) {
 				return false;
 			}
 			if (bv->type==BLOB_BIND) {
@@ -231,7 +231,8 @@ bool sqlrconnection_svr::getBindVarType(bindvar_svr *bv) {
 	return true;
 }
 
-bool sqlrconnection_svr::getBindSize(bindvar_svr *bv, uint32_t maxsize) {
+bool sqlrconnection_svr::getBindSize(sqlrcursor_svr *cursor,
+					bindvar_svr *bv, uint32_t *maxsize) {
 
 	// init
 	bv->valuesize=0;
@@ -246,12 +247,21 @@ bool sqlrconnection_svr::getBindSize(bindvar_svr *bv, uint32_t maxsize) {
 	}
 
 	// bounds checking
-	/*if (bv->valuesize>maxsize) {
+	if (bv->valuesize>*maxsize) {
+		if (maxsize==&maxstringbindvaluelength) {
+			cursor->setError(
+				SQLR_ERROR_MAXSTRINGBINDVALUELENGTH_STRING,
+				SQLR_ERROR_MAXSTRINGBINDVALUELENGTH,true);
+		} else {
+			cursor->setError(
+				SQLR_ERROR_MAXLOBBINDVALUELENGTH_STRING,
+				SQLR_ERROR_MAXLOBBINDVALUELENGTH,true);
+		}
 		dbgfile.debugPrint("connection",2,
 				"getting binds failed: bad value length");
 		dbgfile.debugPrint("connection",3,bv->valuesize);
 		return false;
-	}*/
+	}
 
 	return true;
 }
@@ -266,7 +276,8 @@ void sqlrconnection_svr::getNullBind(bindvar_svr *bv) {
 	bv->isnull=nullBindValue();
 }
 
-bool sqlrconnection_svr::getStringBind(bindvar_svr *bv) {
+bool sqlrconnection_svr::getStringBind(sqlrcursor_svr *cursor,
+						bindvar_svr *bv) {
 
 	dbgfile.debugPrint("connection",4,"STRING");
 
@@ -274,7 +285,7 @@ bool sqlrconnection_svr::getStringBind(bindvar_svr *bv) {
 	bv->value.stringval=NULL;
 
 	// get the size of the value
-	if (!getBindSize(bv,maxstringbindvaluelength)) {
+	if (!getBindSize(cursor,bv,&maxstringbindvaluelength)) {
 		return false;
 	}
 
@@ -459,7 +470,7 @@ bool sqlrconnection_svr::getDateBind(bindvar_svr *bv) {
 	return true;
 }
 
-bool sqlrconnection_svr::getLobBind(bindvar_svr *bv) {
+bool sqlrconnection_svr::getLobBind(sqlrcursor_svr *cursor, bindvar_svr *bv) {
 
 	// init
 	bv->value.stringval=NULL;
@@ -472,7 +483,7 @@ bool sqlrconnection_svr::getLobBind(bindvar_svr *bv) {
 	}
 
 	// get the size of the value
-	if (!getBindSize(bv,maxlobbindvaluelength)) {
+	if (!getBindSize(cursor,bv,&maxlobbindvaluelength)) {
 		return false;
 	}
 

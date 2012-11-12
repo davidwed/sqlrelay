@@ -11,10 +11,11 @@ void sqlrconnection_svr::setError(const char *err,
 					int64_t errn,
 					bool liveconn) {
 	errorlength=charstring::length(err);
-	if (errorlength>conn->maxerrorlength) {
-		errorlength=maxerrorlength;
+	if (errorlength>conn->maxerrorlength-1) {
+		errorlength=maxerrorlength-1;
 	}
 	charstring::copy(error,err,errorlength);
+	error[errorlength]='\0';
 	errnum=errn;
 	liveconnection=liveconn;
 }

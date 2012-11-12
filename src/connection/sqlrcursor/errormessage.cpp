@@ -13,6 +13,7 @@ void sqlrcursor_svr::setError(const char *err, int64_t errn, bool liveconn) {
 		errorlength=conn->maxerrorlength;
 	}
 	charstring::copy(error,err,errorlength);
+	error[errorlength]='\0';
 	errnum=errn;
 	liveconnection=liveconn;
 }

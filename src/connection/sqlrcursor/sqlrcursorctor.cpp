@@ -20,7 +20,7 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 	querytree=NULL;
 	queryresult=false;
 
-	error=new char[conn->maxerrorlength];
+	error=new char[conn->maxerrorlength+1];
 	errorlength=0;
 	errnum=0;
 	liveconnection=true;

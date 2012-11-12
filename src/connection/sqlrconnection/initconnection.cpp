@@ -142,6 +142,7 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	debugtriggers=cfgfl->getDebugTriggers();
 
 	// update various configurable parameters
+	maxclientinfolength=cfgfl->getMaxClientInfoLength();
 	maxquerysize=cfgfl->getMaxQuerySize();
 	maxbindcount=cfgfl->getMaxBindCount();
 	maxbindnamelength=cfgfl->getMaxBindNameLength();
@@ -176,6 +177,12 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	snprintf(pidfile,pidfilelen,"%s/pids/sqlr-connection-%s.%d",
 				tmpdir->getString(),cmdl->getId(),pid);
 	createPidFile(pidfile,permissions::ownerReadWrite());
+
+	// create clientinfo buffer
+	clientinfo=new char[maxclientinfolength+1];
+
+	// create error buffer
+	error=new char[maxerrorlength+1];
 
 	// create sqlrconnection for sid database
 	if (cfgfl->getSidEnabled()) {

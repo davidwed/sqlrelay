@@ -140,7 +140,7 @@ void sqlrconnection_svr::clientSession() {
 		endSessionInternal();
 	}
 
-	waitForClientClose();
+	closeClientSocket();
 
 	closeSuspendedSessionSockets();
 
@@ -329,16 +329,16 @@ void sqlrconnection_svr::noAvailableCursors(uint16_t command) {
 	flushWriteBuffer();
 }
 
-void sqlrconnection_svr::waitForClientClose() {
+void sqlrconnection_svr::closeClientSocket() {
 
 	// Sometimes the server sends the result set and closes the socket
-	// while part of it is buffered but not yet transmitted.  This caused
+	// while part of it is buffered but not yet transmitted.  This causes
 	// the client to receive a partial result set or error.  Telling the
 	// socket to linger doesn't always fix it.  Doing a read here should 
-	// guarantee that the client will close it's end of the connection 
-	// before the server closes it's end; the server will wait for data 
+	// guarantee that the client will close its end of the connection 
+	// before the server closes its end; the server will wait for data 
 	// from the client (which it will never receive) and when the client 
-	// closes it's end (which it will only do after receiving the entire
+	// closes its end (which it will only do after receiving the entire
 	// result set) the read will fall through.  This should guarantee 
 	// that the client will get the the entire result set without
 	// requiring the client to send data back indicating so.
@@ -346,10 +346,16 @@ void sqlrconnection_svr::waitForClientClose() {
 			"waiting for client to close the connection...");
 	uint16_t	dummy;
 	clientsock->read(&dummy,idleclienttimeout,0);
+	dbgfile.debugPrint("connection",1,
+			"done waiting for client to close the connection");
+
+	// close the client socket
+	dbgfile.debugPrint("connection",1,
+			"closing the client socket...");
 	clientsock->close();
 	delete clientsock;
 	dbgfile.debugPrint("connection",1,
-			"done waiting for client to close the connection...");
+			"done closing the client socket");
 }
 
 void sqlrconnection_svr::closeSuspendedSessionSockets() {

@@ -44,6 +44,7 @@ typedef enum {
 	DENIEDIPS_ATTRIBUTE,
 	ALLOWEDIPS_ATTRIBUTE,
 	DEBUG_ATTRIBUTE,
+	MAXCLIENTINFOLENGTH_ATTRIBUTE,
 	MAXQUERYSIZE_ATTRIBUTE,
 	MAXBINDCOUNT_ATTRIBUTE,
 	MAXBINDNAMELENGTH_ATTRIBUTE,
@@ -214,6 +215,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		bool		getDebugConnection();
 		bool		getDebugTranslations();
 		bool		getDebugTriggers();
+		uint64_t	getMaxClientInfoLength();
 		uint32_t	getMaxQuerySize();
 		uint16_t	getMaxBindCount();
 		uint16_t	getMaxBindNameLength();
@@ -317,6 +319,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		bool		debugconnection;
 		bool		debugtranslations;
 		bool		debugtriggers;
+		uint64_t	maxclientinfolength;
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
 		uint16_t	maxbindnamelength;

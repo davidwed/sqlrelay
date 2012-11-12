@@ -92,24 +92,33 @@
 #define SQLR_ERROR_NO_CURSORS 900000
 #define SQLR_ERROR_NO_CURSORS_STRING \
 	"No server-side cursors were available to process the query."
-#define SQLR_ERROR_MAXSELECTLIST 900001
-#define SQLR_ERROR_MAXSELECTLIST_STRING \
-	"Maximum column count exceeded."
-#define SQLR_ERROR_MAXBINDCOUNT 900002
+#define SQLR_ERROR_MAXCLIENTINFOLENGTH 900001
+#define SQLR_ERROR_MAXCLIENTINFOLENGTH_STRING \
+	"Maximum client info length exceeded."
+#define SQLR_ERROR_MAXQUERYLENGTH 900002
+#define SQLR_ERROR_MAXQUERYLENGTH_STRING \
+	"Maximum query length exceeded."
+#define SQLR_ERROR_MAXBINDCOUNT 900003
 #define SQLR_ERROR_MAXBINDCOUNT_STRING \
-	"Bind variable count exceeded."
-#define SQLR_ERROR_MAXBINDNAMELENGTH 900003
+	"Maximum bind variable count exceeded."
+#define SQLR_ERROR_MAXBINDNAMELENGTH 900004
 #define SQLR_ERROR_MAXBINDNAMELENGTH_STRING \
-	"Bind variable name length exceeded."
-#define SQLR_ERROR_DUPLICATE_BINDNAME 900004
+	"Maximum bind variable name length exceeded."
+#define SQLR_ERROR_MAXSTRINGBINDVALUELENGTH 900005
+#define SQLR_ERROR_MAXSTRINGBINDVALUELENGTH_STRING \
+	"Maximum string bind value length exceeded."
+#define SQLR_ERROR_MAXLOBBINDVALUELENGTH 900006
+#define SQLR_ERROR_MAXLOBBINDVALUELENGTH_STRING \
+	"Maximum lob bind value length exceeded."
+#define SQLR_ERROR_DUPLICATE_BINDNAME 900007
 #define SQLR_ERROR_DUPLICATE_BINDNAME_STRING \
 	"Duplicate bind variable name."
-#define SQLR_ERROR_VARIABLE_NOT_BOUND 900005
+#define SQLR_ERROR_VARIABLE_NOT_BOUND 900008
 #define SQLR_ERROR_VARIABLE_NOT_BOUND_STRING \
 	"Variable present but not bound."
-#define SQLR_ERROR_MAXSTRINGBINDLEN 900006
-#define SQLR_ERROR_MAXSTRINGBINDLEN_STRING \
-	"String bind variable length exceeded."
+#define SQLR_ERROR_MAXSELECTLIST 900009
+#define SQLR_ERROR_MAXSELECTLIST_STRING \
+	"Maximum column count exceeded."
 
 // structures
 struct sqlrstatistics {

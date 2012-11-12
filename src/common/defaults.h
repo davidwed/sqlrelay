@@ -67,6 +67,9 @@
 #define DEFAULT_DEBUG "none"
 	// default tiers to debug on
 
+#define DEFAULT_MAXCLIENTINFOLENGTH "512"
+	// default max client info length
+
 #define DEFAULT_MAXQUERYSIZE "65536"
 	// default max query size
 

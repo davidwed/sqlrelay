@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrconnection.h>
+#include <rudiments/rawbuffer.h>
 
 // for gettimeofday()
 #include <sys/time.h>
@@ -17,11 +18,30 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 	// re-init error data
 	cursor->clearError();
 
+	// re-init buffers
+	if (!reexecute && !bindcursor) {
+		clientinfo[0]='\0';
+		clientinfolen=0;
+		cursor->querybuffer[0]='\0';
+		cursor->querylength=0;
+	}
+	if (!bindcursor) {
+		cursor->inbindcount=0;
+		cursor->outbindcount=0;
+		for (uint16_t i=0; i<maxbindcount; i++) {
+			rawbuffer::zero(&(cursor->inbindvars[i]),
+						sizeof(bindvar_svr));
+			rawbuffer::zero(&(cursor->outbindvars[i]),
+						sizeof(bindvar_svr));
+		}
+	}
+
 	// get the query and bind data from the client...
 	if (getquery) {
 		bool	success=true;
 		if (!reexecute && !bindcursor) {
-			success=getQuery(cursor);
+			success=(getClientInfo(cursor) &&
+					getQuery(cursor));
 		}
 		if (success && !bindcursor) {
 			success=(getInputBinds(cursor) &&
@@ -127,15 +147,13 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 	}
 }
 
-bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
+bool sqlrconnection_svr::getClientInfo(sqlrcursor_svr *cursor) {
 
-	dbgfile.debugPrint("connection",2,"getting query...");
+	dbgfile.debugPrint("connection",2,"getting client info...");
 
 	// init
 	clientinfolen=0;
 	clientinfo[0]='\0';
-	cursor->querylength=0;
-	cursor->querybuffer[0]='\0';
 
 	// get the length of the client info
 	if (clientsock->read(&clientinfolen)!=sizeof(uint64_t)) {
@@ -147,7 +165,9 @@ bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
 	}
 
 	// bounds checking
-	if (clientinfolen>sizeof(clientinfo)-1) {
+	if (clientinfolen>maxclientinfolength) {
+		cursor->setError(SQLR_ERROR_MAXCLIENTINFOLENGTH_STRING,
+					SQLR_ERROR_MAXCLIENTINFOLENGTH,true);
 		dbgfile.debugPrint("connection",2,
 			"getting client info failed: "
 			"client sent bad client info size");
@@ -172,6 +192,17 @@ bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
 	dbgfile.debugPrint("connection",0,clientinfo);
 	dbgfile.debugPrint("connection",2,"getting clientinfo succeeded");
 
+	return true;
+}
+
+bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
+
+	dbgfile.debugPrint("connection",2,"getting query...");
+
+	// init
+	cursor->querylength=0;
+	cursor->querybuffer[0]='\0';
+
 	// get the length of the query
 	if (clientsock->read(&cursor->querylength,
 				idleclienttimeout,0)!=sizeof(uint32_t)) {
@@ -183,6 +214,8 @@ bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
 
 	// bounds checking
 	if (cursor->querylength>maxquerysize) {
+		cursor->setError(SQLR_ERROR_MAXQUERYLENGTH_STRING,
+					SQLR_ERROR_MAXQUERYLENGTH,true);
 		dbgfile.debugPrint("connection",2,
 			"getting query failed: client sent bad query size");
 		cursor->querylength=0;

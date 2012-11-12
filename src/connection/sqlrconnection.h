@@ -314,7 +314,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	suspendResultSetCommand(sqlrcursor_svr *cursor);
 		bool	resumeResultSetCommand(sqlrcursor_svr *cursor);
 		bool	resumeResultSet(sqlrcursor_svr *cursor);
-		void	waitForClientClose();
+		void	closeClientSocket();
 		void	closeSuspendedSessionSockets();
 		bool	authenticate();
 		bool	getUserFromClient();
@@ -331,6 +331,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	endSessionInternal();
 		bool	getCommand(uint16_t *command);
 		void	noAvailableCursors(uint16_t command);
+		bool	getClientInfo(sqlrcursor_svr *cursor);
 		bool	getQuery(sqlrcursor_svr *cursor);
 		bool	getInputBinds(sqlrcursor_svr *cursor);
 		bool	getOutputBinds(sqlrcursor_svr *cursor);
@@ -340,12 +341,13 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 						bindvar_svr *bv);
 		bool	getBindVarType(bindvar_svr *bv);
 		void	getNullBind(bindvar_svr *bv);
-		bool	getBindSize(bindvar_svr *bv, uint32_t maxsize);
-		bool	getStringBind(bindvar_svr *bv);
+		bool	getBindSize(sqlrcursor_svr *cursor,
+					bindvar_svr *bv, uint32_t *maxsize);
+		bool	getStringBind(sqlrcursor_svr *cursor, bindvar_svr *bv);
 		bool	getIntegerBind(bindvar_svr *bv);
 		bool	getDoubleBind(bindvar_svr *bv);
 		bool	getDateBind(bindvar_svr *bv);
-		bool	getLobBind(bindvar_svr *bv);
+		bool	getLobBind(sqlrcursor_svr *cursor, bindvar_svr *bv);
 		bool	getSendColumnInfo();
 		bool	processQuery(sqlrcursor_svr *cursor,
 						bool reexecute,
@@ -509,7 +511,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		cmdline			*cmdl;
 		sqlrconfigfile		*cfgfl;
 
-		char		clientinfo[512];
+		char		*clientinfo;
 		uint64_t	clientinfolen;
 
 	protected:
@@ -528,6 +530,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 
 	public:
 		// derived cursor classes may need to access these
+		uint64_t	maxclientinfolength;
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
 		uint16_t	maxbindnamelength;

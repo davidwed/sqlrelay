@@ -117,6 +117,10 @@ void debugfile::debugPrint(const char *name, int32_t tabs, int32_t number) {
 	delete[] header;
 }
 
+void debugfile::debugPrint(const char *name, int32_t tabs, uint32_t number) {
+	debugPrint(name,tabs,(int32_t)number);
+}
+
 void debugfile::debugPrint(const char *name, int32_t tabs, double number) {
 	if (!enabled || (!debuglogger && !openDebugFile())) {
 		return;
