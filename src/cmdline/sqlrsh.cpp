@@ -12,6 +12,7 @@
 #include <rudiments/process.h>
 #include <rudiments/environment.h>
 #include <rudiments/datetime.h>
+#include <rudiments/signalclasses.h>
 #include <sqlrconfigfile.h>
 
 // for clock()
@@ -1505,6 +1506,12 @@ void sqlrsh::execute(int argc, const char **argv) {
 int main(int argc, const char **argv) {
 
 	#include <version.h>
+
+	// ignore SIGPIPE
+	signalset	set;
+	set.removeAllSignals();
+	set.addSignal(SIGPIPE);
+	signalmanager::ignoreSignals(&set);
 
 	sqlrsh	s;
 	s.execute(argc,argv);
