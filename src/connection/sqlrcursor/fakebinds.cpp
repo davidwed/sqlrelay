@@ -110,6 +110,7 @@ void sqlrcursor_svr::fakeInputBinds() {
 		querylength=conn->maxquerysize;
 	}
 	charstring::copy(querybuffer,outputquery.getString(),querylength);
+	querybuffer[querylength]='\0';
 
 	if (conn->debugsqltranslation) {
 		printf("after faking input binds:\n%s\n\n",querybuffer);
