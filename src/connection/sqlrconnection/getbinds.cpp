@@ -160,13 +160,19 @@ bool sqlrconnection_svr::getBindVarCount(sqlrcursor_svr *cursor,
 
 	// bounds checking
 	if (*count>maxbindcount) {
-		cursor->setError(SQLR_ERROR_MAXBINDCOUNT_STRING,
-					SQLR_ERROR_MAXBINDCOUNT,true);
+
+		stringbuffer	err;
+		err.append(SQLR_ERROR_MAXBINDCOUNT_STRING);
+		err.append(" (")->append(*count)->append('>');
+		err.append(maxbindcount)->append(')');
+		cursor->setError(err.getString(),SQLR_ERROR_MAXBINDCOUNT,true);
+
+		*count=0;
+
 		dbgfile.debugPrint("connection",2,
 			"getting binds failed: "
 			"client tried to send too many binds:");
 		dbgfile.debugPrint("connection",3,(int32_t)*count);
-		*count=0;
 		return false;
 	}
 
@@ -191,8 +197,14 @@ bool sqlrconnection_svr::getBindVarName(sqlrcursor_svr *cursor,
 
 	// bounds checking
 	if (bindnamesize>maxbindnamelength) {
-		cursor->setError(SQLR_ERROR_MAXBINDNAMELENGTH_STRING,
+
+		stringbuffer	err;
+		err.append(SQLR_ERROR_MAXBINDNAMELENGTH_STRING);
+		err.append(" (")->append(bindnamesize)->append('>');
+		err.append(maxbindnamelength)->append(')');
+		cursor->setError(err.getString(),
 					SQLR_ERROR_MAXBINDNAMELENGTH,true);
+
 		dbgfile.debugPrint("connection",2,
 			"getting binds failed: bad variable name length");
 		return false;
@@ -249,12 +261,18 @@ bool sqlrconnection_svr::getBindSize(sqlrcursor_svr *cursor,
 	// bounds checking
 	if (bv->valuesize>*maxsize) {
 		if (maxsize==&maxstringbindvaluelength) {
-			cursor->setError(
-				SQLR_ERROR_MAXSTRINGBINDVALUELENGTH_STRING,
+			stringbuffer	err;
+			err.append(SQLR_ERROR_MAXSTRINGBINDVALUELENGTH_STRING);
+			err.append(" (")->append(bv->valuesize)->append('>');
+			err.append(*maxsize)->append(')');
+			cursor->setError(err.getString(),
 				SQLR_ERROR_MAXSTRINGBINDVALUELENGTH,true);
 		} else {
-			cursor->setError(
-				SQLR_ERROR_MAXLOBBINDVALUELENGTH_STRING,
+			stringbuffer	err;
+			err.append(SQLR_ERROR_MAXLOBBINDVALUELENGTH_STRING);
+			err.append(" (")->append(bv->valuesize)->append('>');
+			err.append(*maxsize)->append(')');
+			cursor->setError(err.getString(),
 				SQLR_ERROR_MAXLOBBINDVALUELENGTH,true);
 		}
 		dbgfile.debugPrint("connection",2,

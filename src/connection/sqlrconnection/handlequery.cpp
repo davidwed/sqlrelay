@@ -166,12 +166,19 @@ bool sqlrconnection_svr::getClientInfo(sqlrcursor_svr *cursor) {
 
 	// bounds checking
 	if (clientinfolen>maxclientinfolength) {
-		cursor->setError(SQLR_ERROR_MAXCLIENTINFOLENGTH_STRING,
-					SQLR_ERROR_MAXCLIENTINFOLENGTH,true);
+
+		stringbuffer	err;
+		err.append(SQLR_ERROR_MAXCLIENTINFOLENGTH_STRING);
+		err.append(" (")->append(clientinfolen)->append('>');
+		err.append(maxclientinfolength)->append(')');
+		cursor->setError(err.getString(),
+				SQLR_ERROR_MAXCLIENTINFOLENGTH,true);
+
+		clientinfolen=0;
+
 		dbgfile.debugPrint("connection",2,
 			"getting client info failed: "
 			"client sent bad client info size");
-		clientinfolen=0;
 		return false;
 	}
 
@@ -214,11 +221,18 @@ bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
 
 	// bounds checking
 	if (cursor->querylength>maxquerysize) {
-		cursor->setError(SQLR_ERROR_MAXQUERYLENGTH_STRING,
-					SQLR_ERROR_MAXQUERYLENGTH,true);
+
+		stringbuffer	err;
+		err.append(SQLR_ERROR_MAXQUERYLENGTH_STRING);
+		err.append(" (")->append(cursor->querylength)->append('>');
+		err.append(maxquerysize)->append(')');
+		cursor->setError(err.getString(),
+				SQLR_ERROR_MAXQUERYLENGTH,true);
+
+		cursor->querylength=0;
+
 		dbgfile.debugPrint("connection",2,
 			"getting query failed: client sent bad query size");
-		cursor->querylength=0;
 		return false;
 	}
 

@@ -2058,10 +2058,11 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 		// validate column count
 		if (oracle8conn->maxselectlistsize!=-1 &&
 			ncols>oracle8conn->maxselectlistsize) {
-			// FIXME: maxselectlistsize should really be pushed
-			// up to the sqlrconnection_svr class and this error
-			// should be set there.
-			setError(SQLR_ERROR_MAXSELECTLIST_STRING,
+			stringbuffer	err;
+			err.append(SQLR_ERROR_MAXSELECTLIST_STRING);
+			err.append(" (")->append(ncols)->append('>');
+			err.append(oracle8conn->maxselectlistsize)->append(')');
+			setError(err.getString(),
 					SQLR_ERROR_MAXSELECTLIST,true);
 			return false;
 		}
@@ -2289,7 +2290,10 @@ bool oracle8cursor::validBinds() {
 		// variables, doesn't work correctly.  Detecting PL/SQL is
 		// tricky so we'll just prevent duplicate bind names outright.
 		if (oracle8conn->rejectduplicatebinds && dupl[i]) {
-			setError(SQLR_ERROR_DUPLICATE_BINDNAME_STRING,
+			stringbuffer	err;
+			err.append(SQLR_ERROR_DUPLICATE_BINDNAME_STRING);
+			err.append(" (")->append(bvnp[i])->append(')');
+			setError(err.getString(),
 					SQLR_ERROR_DUPLICATE_BINDNAME,true);
 			return false;
 		}
