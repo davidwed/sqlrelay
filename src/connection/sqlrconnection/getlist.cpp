@@ -97,7 +97,7 @@ bool sqlrconnection_svr::getListCommand(sqlrcursor_svr *cursor,
 		}
 	}
 
-	// set the values that we won'tget from the client
+	// set the values that we won't get from the client
 	cursor->inbindcount=0;
 	cursor->outbindcount=0;
 	sendcolumninfo=SEND_COLUMN_INFO;

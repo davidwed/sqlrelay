@@ -18,26 +18,28 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 	// re-init error data
 	cursor->clearError();
 
-	// re-init buffers
-	if (!reexecute && !bindcursor) {
-		clientinfo[0]='\0';
-		clientinfolen=0;
-		cursor->querybuffer[0]='\0';
-		cursor->querylength=0;
-	}
-	if (!bindcursor) {
-		cursor->inbindcount=0;
-		cursor->outbindcount=0;
-		for (uint16_t i=0; i<maxbindcount; i++) {
-			rawbuffer::zero(&(cursor->inbindvars[i]),
-						sizeof(bindvar_svr));
-			rawbuffer::zero(&(cursor->outbindvars[i]),
-						sizeof(bindvar_svr));
-		}
-	}
-
 	// get the query and bind data from the client...
 	if (getquery) {
+
+		// re-init buffers
+		if (!reexecute && !bindcursor) {
+			clientinfo[0]='\0';
+			clientinfolen=0;
+			cursor->querybuffer[0]='\0';
+			cursor->querylength=0;
+		}
+		if (!bindcursor) {
+			cursor->inbindcount=0;
+			cursor->outbindcount=0;
+			for (uint16_t i=0; i<maxbindcount; i++) {
+				rawbuffer::zero(&(cursor->inbindvars[i]),
+							sizeof(bindvar_svr));
+				rawbuffer::zero(&(cursor->outbindvars[i]),
+							sizeof(bindvar_svr));
+			}
+		}
+
+		// get the data
 		bool	success=true;
 		if (!reexecute && !bindcursor) {
 			success=(getClientInfo(cursor) &&
