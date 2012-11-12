@@ -49,10 +49,10 @@ oracle8connection::oracle8connection() : sqlrconnection_svr() {
 #ifdef OCI_STMT_CACHE
 	stmtcachesize=STMT_CACHE_SIZE;
 #endif
-
 #ifdef HAVE_ORACLE_8i
 	droptemptables=false;
 #endif
+	rejectduplicatebinds=false;
 }
 
 oracle8connection::~oracle8connection() {
@@ -110,6 +110,10 @@ void oracle8connection::handleConnectString() {
 	droptemptables=!charstring::compare(
 				connectStringValue("droptemptables"),"yes");
 #endif
+
+	rejectduplicatebinds=!charstring::compare(
+				connectStringValue("rejectduplicatebinds"),
+				"yes");
 
 	const char	*lastinsertidfunc=
 			connectStringValue("lastinsertidfunction");
@@ -2249,14 +2253,17 @@ bool oracle8cursor::validBinds() {
 	// get a cache hit.
 
 
-	// if we're not using the statement cache then we can just return
+	// if we're not using the statement cache and we're not rejecting
+	// duplicate binds then we can just return
+	bool	usingstmtcache=false;
 	#ifdef OCI_STMT_CACHE
-	if (!oracle8conn->stmtcachesize) {
+	if (oracle8conn->stmtcachesize) {
+		usingstmtcache=true;
+	}
+	#endif
+	if (!usingstmtcache && !oracle8conn->rejectduplicatebinds) {
 		return true;
 	}
-	#else
-	return true;
-	#endif
 
 	// otherwise we need to validate the binds...
 
@@ -2275,40 +2282,32 @@ bool oracle8cursor::validBinds() {
 		return false;
 	}
 
-	// too many variables were bound
-	if (found<0) {
-		// FIXME: set an error
-		//setSqlrError(SQLR_ERR_MAXBIND,"more than conn->maxbindcount placeholders in the oracle8 environment of neowiz (%d > %d)",-found,conn->maxbindcount);
-		return false;
-	}
-
 	// loop through the variables...
 	for (sb4 i=0; i<found; i++) {
 
-		// FIXME: make this optional
-		// Handle duplicates.  Duplicated bindname in PL/SQL with
-		// OCIBindByPos doesn't work correctly.  Therefore, explicitly
-		// preventing it can be simpler solution than always getting
-		// application developers to understand that context.  Moreover,
-		// it makes overall logic of this function simpler.  --replica
-		/*if (dupl[i]) {
-			// FIXME: set error
-			//setSqlrError(SQLR_ERR_DUPLICATE_BINDNAME,"duplicated bindname is not allowed in the oracle8 environment of neowiz (%s)",bvnp[i]);
+		// Using PL/SQL and binding by position with duplicate bind
+		// variables, doesn't work correctly.  Detecting PL/SQL is
+		// tricky so we'll just prevent duplicate bind names outright.
+		if (oracle8conn->rejectduplicatebinds && dupl[i]) {
+			setError(SQLR_ERROR_DUPLICATE_BINDNAME_STRING,
+					SQLR_ERROR_DUPLICATE_BINDNAME,true);
 			return false;
-		}*/
+		}
 
 		// verify that the variable was bound,
 		// first check by position, then by name
-		bool	foundvar=boundbypos[i];
-		for (uint16_t j=0; j<bindvarcount && !foundvar; j++) {
-			foundvar=!charstring::compareIgnoringCase(
+		if (usingstmtcache) {
+			bool	foundvar=boundbypos[i];
+			for (uint16_t j=0; j<bindvarcount && !foundvar; j++) {
+				foundvar=!charstring::compareIgnoringCase(
 							bindvarname[j],
 							(char *)bvnp[i]);
-		}
-		if (!foundvar) {
-			// FIXME: set error
-			//setSqlrError(SQLR_ERR_NOT_BOUND,"not bound (%s)",bvnp[i]);
-			return false;
+			}
+			if (!foundvar) {
+				setError("ORA-01008: not all variables bound",
+								1008,true);
+				return false;
+			}
 		}
 	}
 	return true;

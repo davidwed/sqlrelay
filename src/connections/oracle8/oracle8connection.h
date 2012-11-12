@@ -375,10 +375,10 @@ class oracle8connection : public sqlrconnection_svr {
 #ifdef OCI_STMT_CACHE
 		uint32_t	stmtcachesize;
 #endif
-
 #ifdef HAVE_ORACLE_8i
 		bool		droptemptables;
 #endif
+		bool		rejectduplicatebinds;
 };
 
 #endif
