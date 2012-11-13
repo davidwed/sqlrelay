@@ -18,6 +18,15 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 	// re-init error data
 	cursor->clearError();
 
+	// clear bind mappings and reset the fake input binds flag
+	// (do this here because getInput/OutputBinds uses the bindmappingspool)
+	if (!bindcursor && !reexecute) {
+		bindmappingspool->free();
+		inbindmappings->clear();
+		outbindmappings->clear();
+		cursor->fakeinputbindsforthisquery=fakeinputbinds;
+	}
+
 	// get the query and bind data from the client...
 	if (getquery) {
 
@@ -64,14 +73,6 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 						"failed to handle query");
 			return false;
 		}
-	}
-
-	// clear bind mappings and reset the fake input binds flag
-	if (!bindcursor && !reexecute) {
-		bindmappingspool->free();
-		inbindmappings->clear();
-		outbindmappings->clear();
-		cursor->fakeinputbindsforthisquery=fakeinputbinds;
 	}
 
 	// loop here to handle down databases
@@ -340,17 +341,27 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 
 		} else {
 
+			// buffers and pointers...
+			stringbuffer	outputquery;
+			const char	*query=cursor->querybuffer;
+			uint32_t	querylen=cursor->querylength;
+
 			// fake input binds if necessary
+			// NOTE: we can't just overwrite the querybuffer when
+			// faking binds or we'll lose the original query and
+			// end up rerunning the modified query when reexecuting
 			if (cursor->fakeinputbindsforthisquery ||
 					!cursor->supportsNativeBinds()) {
 				dbgfile.debugPrint("connection",3,
 							"faking binds...");
-				cursor->fakeInputBinds();
+				if (cursor->fakeInputBinds(&outputquery)) {
+					query=outputquery.getString();
+					querylen=outputquery.getStringLength();
+				}
 			}
 
 			// prepare
-			success=cursor->prepareQuery(cursor->querybuffer,
-							cursor->querylength);
+			success=cursor->prepareQuery(query,querylen);
 
 			// if we're not faking binds then
 			// handle the binds for real
@@ -362,9 +373,8 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 
 			// execute
 			if (success) {
-				success=executeQueryInternal(cursor,
-							cursor->querybuffer,
-							cursor->querylength);
+				success=executeQueryInternal(
+						cursor,query,querylen);
 			}
 		}
 	}

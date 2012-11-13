@@ -9,14 +9,12 @@ void sqlrcursor_svr::setFakeInputBindsForThisQuery(bool fake) {
 	fakeinputbindsforthisquery=fake;
 }
 
-void sqlrcursor_svr::fakeInputBinds() {
+bool sqlrcursor_svr::fakeInputBinds(stringbuffer *outputquery) {
 
-	// return NULL if there aren't any input binds
+	// return false if there aren't any input binds
 	if (!inbindcount) {
-		return;
+		return false;
 	}
-
-	stringbuffer	outputquery;
 
 	// loop through the query, performing substitutions
 	char	prefix=inbindvars[0].variable[0];
@@ -84,7 +82,7 @@ void sqlrcursor_svr::fakeInputBinds() {
 							'\0')
 					)) {
 
-					performSubstitution(&outputquery,i);
+					performSubstitution(outputquery,i);
 					if (*ptr=='?') {
 						ptr++;
 					} else {
@@ -99,22 +97,16 @@ void sqlrcursor_svr::fakeInputBinds() {
 
 		// write the input query to the output query
 		if (*ptr) {
-			outputquery.append(*ptr);
+			outputquery->append(*ptr);
 			ptr++;
 		}
 	}
 
-	// replace the current query buffer
-	querylength=outputquery.getStringLength();
-	if (querylength>conn->maxquerysize) {
-		querylength=conn->maxquerysize;
-	}
-	charstring::copy(querybuffer,outputquery.getString(),querylength);
-	querybuffer[querylength]='\0';
-
 	if (conn->debugsqltranslation) {
 		printf("after faking input binds:\n%s\n\n",querybuffer);
 	}
+
+	return true;
 }
 
 void sqlrcursor_svr::performSubstitution(stringbuffer *buffer, int16_t index) {

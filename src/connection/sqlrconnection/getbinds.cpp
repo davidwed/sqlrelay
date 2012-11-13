@@ -212,7 +212,7 @@ bool sqlrconnection_svr::getBindVarName(sqlrcursor_svr *cursor,
 
 	// get the variable name
 	bv->variablesize=bindnamesize+1;
-	bv->variable=(char *)bindmappingspool->malloc(bv->variablesize+2);
+	bv->variable=(char *)bindmappingspool->malloc(bindnamesize+2);
 	bv->variable[0]=bindVariablePrefix();
 	if (clientsock->read(bv->variable+1,bindnamesize,
 					idleclienttimeout,0)!=bindnamesize) {

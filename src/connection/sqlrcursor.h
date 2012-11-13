@@ -251,7 +251,7 @@ class sqlrcursor_svr {
 		bool	skipComment(char **ptr, const char *endptr);
 		bool	skipWhitespace(char **ptr, const char *endptr);
 		char	*skipWhitespaceAndComments(const char *querybuffer);
-		void	fakeInputBinds();
+		bool	fakeInputBinds(stringbuffer *outputquery);
 
 		void	clearError();
 		void	setError(const char *err, int64_t errn, bool liveconn);
