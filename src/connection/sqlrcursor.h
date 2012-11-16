@@ -6,6 +6,7 @@
 
 #include <defines.h>
 
+#include <sqlrquery.h>
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/regularexpression.h>
 #include <rudiments/xmldom.h>
@@ -196,10 +197,9 @@ class sqlrcursor_svr {
 		virtual void		cleanUpLobField(uint32_t col);
 		virtual	void		cleanUpData(bool freeresult,
 							bool freebinds);
+		virtual bool		getColumnNameList(stringbuffer *output);
 
 		virtual bool		translateQuery();
-
-		virtual bool		getColumnNameList(stringbuffer *output);
 
 
 		// SID virtual methods
@@ -271,6 +271,8 @@ class sqlrcursor_svr {
 		sqlrcursor	*sid_sqlrcur;
 		bool	sql_injection_detection;
 		bool	sid_egress;
+
+		sqlrquery	*customquery;
 
 	// ideally these would be protected but the translators,
 	// triggers and loggers need to access them (for now)

@@ -249,7 +249,8 @@ all: libsqlrconnection.la \
 	libsqlrelay_sqltranslation_serialtoautoincrement.la \
 	libsqlrelay_sqlrlogger_slowqueries.la \
 	libsqlrelay_sqlrlogger_custom_nw.la \
-	libsqlrelay_sqlrquery_sqlrcmd.la
+	libsqlrelay_sqlrquery_sqlrcmdgstat.la \
+	libsqlrelay_sqlrquery_sqlrcmdcstat.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -305,8 +306,11 @@ libsqlrelay_sqlrlogger_slowqueries.la: sqlrloggers/slowqueries.cpp sqlrloggers/s
 libsqlrelay_sqlrlogger_custom_nw.la: sqlrloggers/custom_nw.cpp sqlrloggers/custom_nw.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrloggers/custom_nw.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
 
-libsqlrelay_sqlrquery_sqlrcmd.la: sqlrqueries/sqlrcmd.cpp sqlrqueries/sqlrcmd.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrqueries/sqlrcmd.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+libsqlrelay_sqlrquery_sqlrcmdgstat.la: sqlrqueries/sqlrcmdgstat.cpp sqlrqueries/sqlrcmdgstat.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrqueries/sqlrcmdgstat.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+
+libsqlrelay_sqlrquery_sqlrcmdcstat.la: sqlrqueries/sqlrcmdcstat.cpp sqlrqueries/sqlrcmdcstat.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrqueries/sqlrcmdcstat.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
 	
 install: install-connection install-triggers install-translations install-loggers install-queries
 
@@ -368,8 +372,10 @@ install-loggers:
 
 install-queries:
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrelay_sqlrquery_sqlrcmd.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqlrquery_sqlrcmd.a
+	$(LTINSTALL) libsqlrelay_sqlrquery_sqlrcmdgstat.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqlrquery_sqlrcmdgstat.a
+	$(LTINSTALL) libsqlrelay_sqlrquery_sqlrcmdcstat.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqlrquery_sqlrcmdcstat.a
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:
@@ -389,7 +395,8 @@ uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_serialtoautoincrement.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrlogger_slowqueries.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrlogger_custom_nw.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrquery_sqlrcmd.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrquery_sqlrcmdgstat.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrquery_sqlrcmdcstat.la
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(logdir)

@@ -28,6 +28,7 @@
 #include <sqlwriter.h>
 #include <sqltriggers.h>
 #include <sqlrloggers.h>
+#include <sqlrqueries.h>
 
 #include <cmdline.h>
 
@@ -481,6 +482,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		sqlwriter	*sqlw;
 		sqltriggers	*sqltr;
 		sqlrloggers	*sqlrlg;
+		sqlrqueries	*sqlrq;
 
 		sqlrcursor_svr	**cur;
 

@@ -54,6 +54,7 @@ sqlrconnection_svr::~sqlrconnection_svr() {
 	delete sqlt;
 	delete sqlw;
 	delete sqlrlg;
+	delete sqlrq;
 
 	delete[] clientinfo;
 

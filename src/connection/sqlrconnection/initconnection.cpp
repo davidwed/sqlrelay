@@ -225,6 +225,14 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 		sqlrlg->loadLoggers(loggers);
 		sqlrlg->initLoggers(this);
 	}
+
+	// get the custom query handlers
+	const char	*queries=cfgfl->getQueries();
+	if (charstring::length(queries)) {
+		sqlrq=new sqlrqueries;
+		sqlrq->loadQueries(queries);
+		sqlrq->initQueries(this);
+	}
 	
 	return true;
 }

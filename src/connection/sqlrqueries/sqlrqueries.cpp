@@ -135,12 +135,13 @@ void sqlrqueries::initQueries(sqlrconnection_svr *sqlrcon) {
 
 sqlrquery *sqlrqueries::match(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					const char *querystring) {
+					const char *querystring,
+					uint32_t querylength) {
 	debugFunction();
 	for (linkedlistnode< sqlrqueryplugin * > *node=llist.getFirstNode();
 						node; node=node->getNext()) {
 		sqlrquery	*qr=node->getData()->qr;
-		if (qr->match(sqlrcon,sqlrcur,querystring)) {
+		if (qr->match(sqlrcon,sqlrcur,querystring,querylength)) {
 			return qr;
 		}
 	}

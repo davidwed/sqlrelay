@@ -27,7 +27,8 @@ class sqlrqueries {
 		void	initQueries(sqlrconnection_svr *sqlrcon);
 		sqlrquery	*match(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
-						const char *querystring);
+						const char *querystring,
+						uint32_t querylength);
 	private:
 		void		unloadQueries();
 		void		loadQuery(rudiments::xmldomnode *logger);
