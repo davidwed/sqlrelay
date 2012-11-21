@@ -76,7 +76,7 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 	}
 
 	// do we need to use a custom query handler for this query?
-	if (!reexecute && !bindcursor) {
+	if (!reexecute && !bindcursor && sqlrq) {
 		cursor->customquery=sqlrq->match(this,cursor,
 							cursor->querybuffer,
 							cursor->querylength);
