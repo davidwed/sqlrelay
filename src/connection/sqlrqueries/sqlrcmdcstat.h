@@ -18,11 +18,6 @@ class sqlrcmdcstat : public sqlrquery {
 
 		bool	executeQuery(const char *query,
 						uint32_t length);
-		bool	errorMessage(char *errorbuffer,
-						uint32_t errorbuffersize,
-						uint32_t *errorlength,
-						int64_t *errorcode,
-						bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
 		uint64_t	affectedRows();

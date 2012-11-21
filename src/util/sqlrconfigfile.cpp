@@ -91,6 +91,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	translationsdepth=0;
 	triggersdepth=0;
 	loggersdepth=0;
+	queriesdepth=0;
 	isolationlevel=NULL;
 	ignoreselectdb=false;
 	waitfordowndb=true;
@@ -439,6 +440,10 @@ const char *sqlrconfigfile::getLoggers() {
 	return loggers.getString();
 }
 
+const char *sqlrconfigfile::getQueries() {
+	return queries.getString();
+}
+
 linkedlist< usercontainer * > *sqlrconfigfile::getUserList() {
 	// if there are no users in the list, add a default user/password
 	if (!userlist.getLength()) {
@@ -524,6 +529,9 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			} else if (!charstring::compare(name,"loggers")) {
 				thistag=LOGGERS_TAG;
 				loggers.clear();
+			} else if (!charstring::compare(name,"queries")) {
+				thistag=QUERIES_TAG;
+				queries.clear();
 			} else {
 				ok=false;
 			}
@@ -710,6 +718,19 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			loggers.append(name);
 			currenttag=thistag;
 			break;
+		case QUERIES_TAG:
+			if (!charstring::compare(name,"queries")) {
+				queriesdepth=0;
+			} else {
+				queriesdepth++;
+			}
+			if (queriesdepth) {
+				queries.append(">");
+			}
+			queries.append("<");
+			queries.append(name);
+			currenttag=thistag;
+			break;
 		case SESSION_TAG:
 		case START_TAG:
 		case END_TAG:
@@ -812,6 +833,17 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 				loggers.append(">");
 			}
 			loggersdepth--;
+			break;
+		case QUERIES_TAG:
+			if (!charstring::compare(name,"queries")) {
+				currenttag=NO_TAG;
+			}
+			queries.append("></");
+			queries.append(name);
+			if (!queriesdepth) {
+				queries.append(">");
+			}
+			queriesdepth--;
 			break;
 		case SESSION_TAG:
 			currenttag=NO_TAG;
@@ -1034,6 +1066,11 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		currentattribute=LOGGERS_ATTRIBUTE;
 		break;
 
+	case QUERIES_TAG:
+		queries.append(" ")->append(name);
+		currentattribute=QUERIES_ATTRIBUTE;
+		break;
+
 	// these tags have no attributes and there's nothing to do but the
 	// compiler will complain if they aren't in the switch statement
 	case SESSION_TAG:
@@ -1083,6 +1120,9 @@ bool sqlrconfigfile::attributeName(const char *name) {
 				break;
 			case LOGGERS_TAG:
 				tagname="loggers";
+				break;
+			case QUERIES_TAG:
+				tagname="queries";
 				break;
 			case SESSION_TAG:
 				tagname="session";
@@ -1135,6 +1175,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currenttag==LOGGERS_TAG) {
 			loggers.append("=\"");
 			loggers.append(value)->append("\"");
+		} else if (currenttag==QUERIES_TAG) {
+			queries.append("=\"");
+			queries.append(value)->append("\"");
 		} else if (currentattribute==ADDRESSES_ATTRIBUTE) {
 			for (uint64_t index=0; index<addresscount; index++) {
 				delete[] addresses[index];

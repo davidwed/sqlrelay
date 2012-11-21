@@ -25,7 +25,6 @@ bool sqlrcmdgstat::match(sqlrconnection_svr *sqlrcon,
 				sqlrcursor_svr *sqlrcur,
 				const char *querystring,
 				uint32_t querylength) {
-printf("sqlrcmd gstat matching...\n");
 	return !charstring::compareIgnoringCase(querystring,"sqlrcmd gstat");
 }
 

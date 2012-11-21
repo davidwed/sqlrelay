@@ -306,10 +306,14 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 
 	bool	success=false;
 	bool	doegress=true;
+	bool	supportsnativebinds=
+			(!cursor->customquery)?
+				cursor->supportsNativeBinds():
+				cursor->customquery->supportsNativeBinds();
 
 	if (reexecute &&
 		!cursor->fakeinputbindsforthisquery &&
-		cursor->supportsNativeBinds()) {
+		supportsnativebinds) {
 
 		// if we're reexecuting and not faking binds then
 		// the statement doesn't need to be prepared again,
@@ -358,7 +362,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			// faking binds or we'll lose the original query and
 			// end up rerunning the modified query when reexecuting
 			if (cursor->fakeinputbindsforthisquery ||
-					!cursor->supportsNativeBinds()) {
+						!supportsnativebinds) {
 				dbgfile.debugPrint("connection",3,
 							"faking binds...");
 				if (cursor->fakeInputBinds(&outputquery)) {
@@ -368,7 +372,12 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 			}
 
 			// prepare
-			success=cursor->prepareQuery(query,querylen);
+			if (!cursor->customquery) {
+				success=cursor->prepareQuery(query,querylen);
+			} else {
+				success=cursor->customquery->
+						prepareQuery(query,querylen);
+			}
 
 			// if we're not faking binds then
 			// handle the binds for real
@@ -455,7 +464,11 @@ bool sqlrconnection_svr::executeQueryInternal(sqlrcursor_svr *curs,
 	curs->querystartusec=tv.tv_usec;
 
 	// execute the query
-	curs->queryresult=curs->executeQuery(query,length);
+	if (!curs->customquery) {
+		curs->queryresult=curs->executeQuery(query,length);
+	} else {
+		curs->queryresult=curs->customquery->executeQuery(query,length);
+	}
 
 	// get the query end time
 	gettimeofday(&tv,&tz);
