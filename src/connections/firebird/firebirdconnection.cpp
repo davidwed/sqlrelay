@@ -954,64 +954,69 @@ uint16_t firebirdcursor::columnTypeFormat() {
 	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
-void firebirdcursor::returnColumnInfo() {
+const char *firebirdcursor::getColumnName(uint32_t col) {
+	return outsqlda->sqlvar[col].aliasname;
+}
 
-	short	precision;
+uint16_t firebirdcursor::getColumnNameLength(uint32_t col) {
+	return outsqlda->sqlvar[col].aliasname_length;
+}
 
-	// for each column...
-	for (short i=0; i<outsqlda->sqld; i++) {
+uint16_t firebirdcursor::getColumnType(uint32_t col) {
+	return field[col].sqlrtype;
+}
 
-		if (field[i].sqlrtype==CHAR_DATATYPE) {
-			precision=outsqlda->sqlvar[i].sqllen;
-		} else if (field[i].sqlrtype==VARCHAR_DATATYPE) {
-			precision=outsqlda->sqlvar[i].sqllen;
-		} else if (field[i].sqlrtype==SMALLINT_DATATYPE) {
-			precision=5;
-		} else if (field[i].sqlrtype==INTEGER_DATATYPE) {
-			precision=11;
-		} else if (field[i].sqlrtype==NUMERIC_DATATYPE) {
+uint32_t firebirdcursor::getColumnLength(uint32_t col) {
+	return outsqlda->sqlvar[col].sqllen;
+}
+
+uint32_t firebirdcursor::getColumnPrecision(uint32_t col) {
+
+	switch (field[col].sqlrtype) {
+		case CHAR_DATATYPE:
+			return outsqlda->sqlvar[col].sqllen;
+		case VARCHAR_DATATYPE:
+			return outsqlda->sqlvar[col].sqllen;
+		case SMALLINT_DATATYPE:
+			return 5;
+		case INTEGER_DATATYPE:
+			return 11;
+		case NUMERIC_DATATYPE:
 			// FIXME: can be from 1 to 18
 			// (oddly, scale is given as a negative number)
-			precision=18+outsqlda->sqlvar[i].sqlscale;
-		} else if (field[i].sqlrtype==DECIMAL_DATATYPE) {
+			return 18+outsqlda->sqlvar[col].sqlscale;
+		case DECIMAL_DATATYPE:
 			// FIXME: can be from 1 to 18
 			// (oddly, scale is given as a negative number)
-			precision=18+outsqlda->sqlvar[i].sqlscale;
-		} else if (field[i].sqlrtype==FLOAT_DATATYPE) {
-			precision=0;
-		} else if (field[i].sqlrtype==DOUBLE_PRECISION_DATATYPE) {
-			precision=0;
-		} else if (field[i].sqlrtype==D_FLOAT_DATATYPE) {
-			precision=0;
-		} else if (field[i].sqlrtype==ARRAY_DATATYPE) {
+			return 18+outsqlda->sqlvar[col].sqlscale;
+		case FLOAT_DATATYPE:
+			return 0;
+		case DOUBLE_PRECISION_DATATYPE:
+			return 0;
+		case D_FLOAT_DATATYPE:
+			return 0;
+		case ARRAY_DATATYPE:
 			// not sure
-			precision=0;
-		} else if (field[i].sqlrtype==QUAD_DATATYPE) {
+			return 0;
+		case QUAD_DATATYPE:
 			// not sure
-			precision=0;
-		} else if (field[i].sqlrtype==TIMESTAMP_DATATYPE) {
+			return 0;
+		case TIMESTAMP_DATATYPE:
 			// not sure
-			precision=0;
-		} else if (field[i].sqlrtype==TIME_DATATYPE) {
-			precision=8;
-		} else if (field[i].sqlrtype==DATE_DATATYPE) {
-			precision=10;
-		} else if (field[i].sqlrtype==BLOB_DATATYPE) {
-			precision=outsqlda->sqlvar[i].sqllen;
-		} else if (field[i].sqlrtype==UNKNOWN_DATATYPE) {
-			precision=outsqlda->sqlvar[i].sqllen;
-		}
-
-		// send column definition
-		// (oddly, scale is given as a negative number)
-		conn->sendColumnDefinition(outsqlda->sqlvar[i].aliasname,
-					outsqlda->sqlvar[i].aliasname_length,
-					field[i].sqlrtype,
-					outsqlda->sqlvar[i].sqllen,
-					precision,
-					-outsqlda->sqlvar[i].sqlscale,0,0,0,
-					0,0,0,0,0);
+			return 0;
+		case TIME_DATATYPE:
+			return 8;
+		case DATE_DATATYPE:
+			return 10;
+		case BLOB_DATATYPE:
+			return outsqlda->sqlvar[col].sqllen;
+		default:
+			return outsqlda->sqlvar[col].sqllen;
 	}
+}
+
+uint32_t firebirdcursor::getColumnScale(uint32_t col) {
+	return -outsqlda->sqlvar[col].sqlscale;
 }
 
 bool firebirdcursor::noRowsToReturn() {

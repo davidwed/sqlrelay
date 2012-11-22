@@ -79,7 +79,6 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqlrcursor/fakebinds.cpp \
 	sqlrcursor/translatequery.cpp \
 	sqlrcursor/abort.cpp \
-	sqlrcursor/sid.cpp \
 	sqlrcursor/errormessage.cpp \
 	sqlrcursor/fetchfrombindcursor.cpp \
 	sqlparser/clauses.cpp \
@@ -190,7 +189,6 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrcursor/fakebinds.lo \
 	sqlrcursor/translatequery.lo \
 	sqlrcursor/abort.lo \
-	sqlrcursor/sid.lo \
 	sqlrcursor/errormessage.lo \
 	sqlrcursor/fetchfrombindcursor.lo \
 	sqlparser/clauses.lo \

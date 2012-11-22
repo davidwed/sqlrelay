@@ -173,8 +173,23 @@ class sqlrcursor_svr {
 		virtual uint64_t	affectedRows()=0;
 		virtual	uint32_t	colCount()=0;
 		virtual const char * const * columnNames()=0;
+		virtual const char	*getColumnName(uint32_t col);
+		virtual uint16_t	getColumnNameLength(uint32_t col);
+		virtual uint16_t	getColumnType(uint32_t col);
+		virtual const char	*getColumnTypeName(uint32_t col);
+		virtual uint16_t	getColumnTypeNameLength(uint32_t col);
+		virtual uint32_t	getColumnLength(uint32_t col);
+		virtual uint32_t	getColumnPrecision(uint32_t col);
+		virtual uint32_t	getColumnScale(uint32_t col);
+		virtual uint16_t	getColumnIsNullable(uint32_t col);
+		virtual uint16_t	getColumnIsPrimaryKey(uint32_t col);
+		virtual uint16_t	getColumnIsUnique(uint32_t col);
+		virtual uint16_t	getColumnIsPartOfKey(uint32_t col);
+		virtual uint16_t	getColumnIsUnsigned(uint32_t col);
+		virtual uint16_t	getColumnIsZeroFilled(uint32_t col);
+		virtual uint16_t	getColumnIsBinary(uint32_t col);
+		virtual uint16_t	getColumnIsAutoIncrement(uint32_t col);
 		virtual uint16_t	columnTypeFormat()=0;
-		virtual	void		returnColumnInfo()=0;
 		virtual	bool		noRowsToReturn()=0;
 		virtual	bool		skipRow()=0;
 		virtual	bool		fetchRow()=0;
@@ -201,47 +216,6 @@ class sqlrcursor_svr {
 
 		virtual bool		translateQuery();
 
-
-		// SID virtual methods
-
-		// method performs SQL Injection Detection
-		virtual bool	sql_injection_detection_ingress(
-							const char *query);
-		virtual bool	sql_injection_detection_egress();
-
-		// method maintains log for SQL Injection Detection
-		virtual void 	sql_injection_detection_log(const char *query,
-							const char *parsed_sql,
-							const char *log_buffer);
-
-		// method gets parameters for SQL Injection Detection
-		virtual void 	sql_injection_detection_parameters();
-
-		// method determines if SQL in black list
-		virtual bool	sql_injection_detection_ingress_bl(
-							const char *query);
-		virtual bool	sql_injection_detection_egress_bl();
-
-		// method determines if SQL in white list
-		virtual bool	sql_injection_detection_ingress_wl(
-							const char *query);
-		virtual bool	sql_injection_detection_egress_wl();
-
-		// method determines if SQL in learned database
-		virtual bool	sql_injection_detection_ingress_ldb();
-		virtual bool	sql_injection_detection_egress_ldb();
-
-		// method parses the sql query
-		virtual void 	sql_injection_detection_parse_sql(
-							const char *query);
-		virtual void 	sql_injection_detection_parse_results(
-					int32_t num_fields,
-					const char * const *field_names);
-
-		// method to check for a row in a sid db
-		virtual bool	sql_injection_detection_check_db(
-							const char *sid_db);
-
 		void	setFakeInputBindsForThisQuery(bool fake);
 
 		void	printQueryTree(xmldom *tree);
@@ -258,21 +232,6 @@ class sqlrcursor_svr {
 
 		sqlrconnection_svr	*conn;
 		regularexpression	createtemp;
-
-		// variables for SID
-		bool	ingress_mode;
-		bool	egress_mode;
-		bool	listen_mode;
-		bool	verification_mode;
-		bool	prevention_mode;	
-		char	sid_parsed_sql[BUFSIZ];
-		char	sid_parsed_results[BUFSIZ];
-		char	sid_query[BUFSIZ];
-		sqlrcursor	*sid_sqlrcur;
-		bool	sql_injection_detection;
-		bool	sid_egress;
-
-		sqlrquery	*customquery;
 
 	// ideally these would be protected but the translators,
 	// triggers and loggers need to access them (for now)

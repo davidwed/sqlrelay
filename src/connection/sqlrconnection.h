@@ -131,45 +131,6 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void		setFakeTransactionBlocksBehavior(bool ftb);
 		void		setFakeInputBinds(bool fake);
 		bool		sendColumnInfo();
-		void		sendRowCounts(bool knowsactual,
-						uint64_t actual,
-						bool knowsaffected,
-						uint64_t affected);
-		void		sendColumnDefinition(const char *name, 
-						uint16_t namelen, 
-						uint16_t type, 
-						uint32_t size,
-						uint32_t precision,
-						uint32_t scale,
-						uint16_t nullable,
-						uint16_t primarykey,
-						uint16_t unique,
-						uint16_t partofkey,
-						uint16_t unsignednumber,
-						uint16_t zerofill,
-						uint16_t binary,
-						uint16_t autoincrement);
-		void		sendColumnDefinitionString(const char *name, 
-						uint16_t namelen, 
-						const char *type, 
-						uint16_t typelen, 
-						uint32_t size,
-						uint32_t precision,
-						uint32_t scale,
-						uint16_t nullable,
-						uint16_t primarykey,
-						uint16_t unique,
-						uint16_t partofkey,
-						uint16_t unsignednumber,
-						uint16_t zerofill,
-						uint16_t binary,
-						uint16_t autoincrement);
-		void		sendField(const char *data, uint32_t size);
-		void		sendNullField();
-		void		startSendingLong(uint64_t longlength);
-		void		sendLongSegment(const char *data,
-						uint32_t size);
-		void		endSendingLong();
 		void		addSessionTempTableForDrop(
 						const char *tablename);
 		void		addSessionTempTableForTrunc(
@@ -178,20 +139,19 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 						const char *tablename);
 		void		addTransactionTempTableForTrunc(
 						const char *tablename);
-		void		abortAllCursors();
 		bool		createSharedMemoryAndSemaphores(
 							const char *tmpdir,
 							const char *id);
 		void		cleanUpAllCursorData(bool freeresult,
 							bool freebinds);
-		virtual signalhandler	*handleSignals(
-					void (*shutdownfunction)(int32_t));
 
-		virtual	bool		getColumnNames(const char *query,
+		bool		getColumnNames(const char *query,
 						stringbuffer *output);
 
 	private:
 		// methods used internally
+		signalhandler	*handleSignals(
+					void (*shutdownfunction)(int32_t));
 		bool	initConnection(int argc, const char **argv);
 		bool	listen();
 		void	closeConnection();
@@ -201,9 +161,9 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool	logInInternal(bool printerrors);
 		void	logOutInternal();
 
-	// ideally these would be private but the
-	// translators and triggers need to access them (for now)
 	public:
+		// ideally these would be private but the
+		// translators and triggers need to access them (for now)
 		sqlrcursor_svr	*initCursorInternal();
 		void	deleteCursorInternal(sqlrcursor_svr *curs);
 		bool	executeQueryInternal(sqlrcursor_svr *curs,
@@ -330,6 +290,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 						bool getquery);
 		bool	suspendSession();
 		void	endSessionInternal();
+		void	abortAllCursors();
 		bool	getCommand(uint16_t *command);
 		void	noAvailableCursors(uint16_t command);
 		bool	getClientInfo(sqlrcursor_svr *cursor);
@@ -371,8 +332,47 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	returnResultSet();
 		void	returnOutputBindValues(sqlrcursor_svr *cursor);
 		void	returnResultSetHeader(sqlrcursor_svr *cursor);
+		void	returnColumnInfo(sqlrcursor_svr *cursor,
+						uint16_t format);
 		bool	returnResultSetData(sqlrcursor_svr *cursor);
-
+		void	sendRowCounts(bool knowsactual,
+						uint64_t actual,
+						bool knowsaffected,
+						uint64_t affected);
+		void	sendColumnDefinition(const char *name, 
+						uint16_t namelen, 
+						uint16_t type, 
+						uint32_t size,
+						uint32_t precision,
+						uint32_t scale,
+						uint16_t nullable,
+						uint16_t primarykey,
+						uint16_t unique,
+						uint16_t partofkey,
+						uint16_t unsignednumber,
+						uint16_t zerofill,
+						uint16_t binary,
+						uint16_t autoincrement);
+		void	sendColumnDefinitionString(const char *name, 
+						uint16_t namelen, 
+						const char *type, 
+						uint16_t typelen, 
+						uint32_t size,
+						uint32_t precision,
+						uint32_t scale,
+						uint16_t nullable,
+						uint16_t primarykey,
+						uint16_t unique,
+						uint16_t partofkey,
+						uint16_t unsignednumber,
+						uint16_t zerofill,
+						uint16_t binary,
+						uint16_t autoincrement);
+		void	sendNullField();
+		void	sendField(const char *data, uint32_t size);
+		void	startSendingLong(uint64_t longlength);
+		void	sendLongSegment(const char *data, uint32_t size);
+		void	endSendingLong();
 		void	clearError();
 		void	setError(const char *err, int64_t errn, bool liveconn);
 		void	returnError(bool disconnect);
@@ -456,9 +456,9 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		uint64_t		serversockincount;
 		unixserversocket	*serversockun;
 
-	// ideally these would be private but the
-	// translators and triggers need to access them (for now)
 	public:
+		// ideally these would be private but the
+		// translators and triggers need to access them (for now)
 		uint32_t	handoffindex;
 
 		filedescriptor	*clientsock;
@@ -499,16 +499,14 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		sqlrstatistics	*statistics;
 		semaphoreset	*semset;
 
-		sqlrconnection	*sid_sqlrcon;
-
 		char		*pidfile;
 
 	protected:
 		bool		fakeinputbinds;
 
-	// ideally these would be protected or private
-	// but the loggers need to access them (for now)
 	public:
+		// ideally these would be protected or private
+		// but the loggers need to access them (for now)
 		sharedmemory		*idmemory;
 		cmdline			*cmdl;
 		sqlrconfigfile		*cfgfl;

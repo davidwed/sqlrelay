@@ -1203,70 +1203,88 @@ uint16_t odbccursor::columnTypeFormat() {
 	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
-void odbccursor::returnColumnInfo() {
+const char *odbccursor::getColumnName(uint32_t i) {
+	return col[i].name;
+}
 
-	// a useful variable
-	uint16_t	type;
+uint16_t odbccursor::getColumnNameLength(uint32_t i) {
+	return col[i].namelength;
+}
 
-	// for each column...
-	for (SQLSMALLINT i=0; i<ncols; i++) {
-
-		uint16_t	binary=0;
-		if (col[i].type==SQL_BIGINT) {
-			type=BIGINT_DATATYPE;
-		} else if (col[i].type==SQL_BINARY) {
-			type=BINARY_DATATYPE;
-			binary=1;
-		} else if (col[i].type==SQL_BIT) {
-			type=BIT_DATATYPE;
-		} else if (col[i].type==SQL_CHAR) {
-			type=CHAR_DATATYPE;
-		} else if (col[i].type==SQL_DATE) {
-			type=DATE_DATATYPE;
-		} else if (col[i].type==SQL_DECIMAL) {
-			type=DECIMAL_DATATYPE;
-		} else if (col[i].type==SQL_DOUBLE) {
-			type=DOUBLE_DATATYPE;
-		} else if (col[i].type==SQL_FLOAT) {
-			type=FLOAT_DATATYPE;
-		} else if (col[i].type==SQL_INTEGER) {
-			type=INTEGER_DATATYPE;
-		} else if (col[i].type==SQL_LONGVARBINARY) {
-			type=LONGVARBINARY_DATATYPE;
-			binary=1;
-		} else if (col[i].type==SQL_LONGVARCHAR) {
-			type=LONGVARCHAR_DATATYPE;
-		} else if (col[i].type==SQL_NUMERIC) {
-			type=NUMERIC_DATATYPE;
-		} else if (col[i].type==SQL_REAL) {
-			type=REAL_DATATYPE;
-		} else if (col[i].type==SQL_SMALLINT) {
-			type=SMALLINT_DATATYPE;
-		} else if (col[i].type==SQL_TIME) {
-			type=TIME_DATATYPE;
-		} else if (col[i].type==SQL_TIMESTAMP) {
-			type=TIMESTAMP_DATATYPE;
-		} else if (col[i].type==SQL_TINYINT) {
-			type=TINYINT_DATATYPE;
-		} else if (col[i].type==SQL_VARBINARY) {
-			type=VARBINARY_DATATYPE;
-			binary=1;
-		} else if (col[i].type==SQL_VARCHAR) {
-			type=VARCHAR_DATATYPE;
-		} else {
-			type=UNKNOWN_DATATYPE;
-		}
-
-		// send column definition
-		conn->sendColumnDefinition(col[i].name,col[i].namelength,type,
-						col[i].length,col[i].precision,
-						col[i].scale,col[i].nullable,
-						0,0,0,
-						col[i].unsignednumber,0,binary,
-						col[i].autoincrement);
-
-
+uint16_t odbccursor::getColumnType(uint32_t i) {
+	switch (col[i].type) {
+		case SQL_BIGINT:
+			return BIGINT_DATATYPE;
+		case SQL_BINARY:
+			return BINARY_DATATYPE;
+		case SQL_BIT:
+			return BIT_DATATYPE;
+		case SQL_CHAR:
+			return CHAR_DATATYPE;
+		case SQL_TYPE_DATE:
+			return DATE_DATATYPE;
+		case SQL_DECIMAL:
+			return DECIMAL_DATATYPE;
+		case SQL_DOUBLE:
+			return DOUBLE_DATATYPE;
+		case SQL_FLOAT:
+			return FLOAT_DATATYPE;
+		case SQL_INTEGER:
+			return INTEGER_DATATYPE;
+		case SQL_LONGVARBINARY:
+			return LONGVARBINARY_DATATYPE;
+		case SQL_LONGVARCHAR:
+			return LONGVARCHAR_DATATYPE;
+		case SQL_NUMERIC:
+			return NUMERIC_DATATYPE;
+		case SQL_REAL:
+			return REAL_DATATYPE;
+		case SQL_SMALLINT:
+			return SMALLINT_DATATYPE;
+		case SQL_TYPE_TIME:
+			return TIME_DATATYPE;
+		case SQL_TYPE_TIMESTAMP:
+			return TIMESTAMP_DATATYPE;
+		case SQL_TINYINT:
+			return TINYINT_DATATYPE;
+		case SQL_VARBINARY:
+			return VARBINARY_DATATYPE;
+		case SQL_VARCHAR:
+			return VARCHAR_DATATYPE;
+		default:
+			return UNKNOWN_DATATYPE;
 	}
+}
+
+uint32_t odbccursor::getColumnLength(uint32_t i) {
+	return col[i].length;
+}
+
+uint32_t odbccursor::getColumnPrecision(uint32_t i) {
+	return col[i].precision;
+}
+
+uint32_t odbccursor::getColumnScale(uint32_t i) {
+	return col[i].scale;
+}
+
+uint16_t odbccursor::getColumnIsNullable(uint32_t i) {
+	return col[i].nullable;
+}
+
+uint16_t odbccursor::getColumnIsUnsigned(uint32_t i) {
+	return col[i].unsignednumber;
+}
+
+uint16_t odbccursor::getColumnIsBinary(uint32_t i) {
+	uint16_t	type=getColumnType(i);
+	return (type==BINARY_DATATYPE ||
+		type==LONGVARBINARY_DATATYPE ||
+		type==VARBINARY_DATATYPE);
+}
+
+uint16_t odbccursor::getColumnIsAutoIncrement(uint32_t i) {
+	return col[i].autoincrement;
 }
 
 bool odbccursor::noRowsToReturn() {

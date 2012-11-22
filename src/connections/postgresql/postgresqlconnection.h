@@ -64,7 +64,11 @@ class postgresqlcursor : public sqlrcursor_svr {
 		uint32_t	colCount();
 		const char * const * columnNames();
 		uint16_t	columnTypeFormat();
-		void		returnColumnInfo();
+		const char	*getColumnName(uint32_t col);
+		uint16_t	getColumnType(uint32_t col);
+		const char	*getColumnTypeName(uint32_t col);
+		uint32_t	getColumnLength(uint32_t col);
+		uint16_t	getColumnIsBinary(uint32_t col);
 		bool		noRowsToReturn();
 		bool		skipRow();
 		bool		fetchRow();
@@ -81,6 +85,8 @@ class postgresqlcursor : public sqlrcursor_svr {
 		int		nrows;
 		uint64_t	affectedrows;
 		int		currentrow;
+
+		char		typenamebuffer[6];
 
 		postgresqlconnection	*postgresqlconn;
 

@@ -2378,57 +2378,70 @@ uint16_t oracle8cursor::columnTypeFormat() {
 	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
-void oracle8cursor::returnColumnInfo() {
+const char *oracle8cursor::getColumnName(uint32_t col) {
+	return (const char *)desc[col].buf;
+}
 
-	// a useful variable
-	uint16_t	type;
+uint16_t oracle8cursor::getColumnNameLength(uint32_t col) {
+	return (uint16_t)desc[col].buflen;
+}
 
-	// for each column...
-	for (sword i=0; i<ncols; i++) {
+uint16_t oracle8cursor::getColumnType(uint32_t col) {
+	switch (desc[col].dbtype) {
+		case VARCHAR2_TYPE:
+			return VARCHAR2_DATATYPE;
+		case NUMBER_TYPE:
+			return NUMBER_DATATYPE;
+		case LONG_TYPE:
+			return LONG_DATATYPE;
+		case ROWID_TYPE:
+			return ROWID_DATATYPE;
+		case DATE_TYPE:
+			return DATE_DATATYPE;
+		case RAW_TYPE:
+			return RAW_DATATYPE;
+		case LONG_RAW_TYPE:
+			return LONG_RAW_DATATYPE;
+		case CHAR_TYPE:
+			return CHAR_DATATYPE;
+		case MLSLABEL_TYPE:
+			return MLSLABEL_DATATYPE;
+		case BLOB_TYPE:
+			return BLOB_DATATYPE;
+		case CLOB_TYPE:
+			return CLOB_DATATYPE;
+		case BFILE_TYPE:
+			return BFILE_DATATYPE;
+		default:
+			return UNKNOWN_DATATYPE;
+	}
+}
 
-		// set column type
-		uint16_t	binary=0;
-		if (desc[i].dbtype==VARCHAR2_TYPE) {
-			type=VARCHAR2_DATATYPE;
-		} else if (desc[i].dbtype==NUMBER_TYPE) {
-			type=NUMBER_DATATYPE;
-		} else if (desc[i].dbtype==LONG_TYPE) {
-			type=LONG_DATATYPE;
-		} else if (desc[i].dbtype==ROWID_TYPE) {
-			type=ROWID_DATATYPE;
-		} else if (desc[i].dbtype==DATE_TYPE) {
-			type=DATE_DATATYPE;
-		} else if (desc[i].dbtype==RAW_TYPE) {
-			type=RAW_DATATYPE;
-			binary=1;
-		} else if (desc[i].dbtype==LONG_RAW_TYPE) {
-			type=LONG_RAW_DATATYPE;
-			binary=1;
-		} else if (desc[i].dbtype==CHAR_TYPE) {
-			type=CHAR_DATATYPE;
-		} else if (desc[i].dbtype==MLSLABEL_TYPE) {
-			type=MLSLABEL_DATATYPE;
-		} else if (desc[i].dbtype==BLOB_TYPE) {
-			type=BLOB_DATATYPE;
-			binary=1;
-		} else if (desc[i].dbtype==CLOB_TYPE) {
-			type=CLOB_DATATYPE;
-		} else if (desc[i].dbtype==BFILE_TYPE) {
-			type=BFILE_DATATYPE;
-			binary=1;
-		} else {
-			type=UNKNOWN_DATATYPE;
-		}
+uint32_t oracle8cursor::getColumnLength(uint32_t col) {
+	return (uint32_t)desc[col].dbsize;
+}
 
-		// send the column definition
-		conn->sendColumnDefinition((char *)desc[i].buf,
-					(uint16_t)desc[i].buflen,
-					type,
-					(uint32_t)desc[i].dbsize,
-					(uint32_t)desc[i].precision,
-					(uint32_t)desc[i].scale,
-					(uint16_t)desc[i].nullok,0,0,
-					0,0,0,binary,0);
+uint32_t oracle8cursor::getColumnPrecision(uint32_t col) {
+	return (uint32_t)desc[col].precision;
+}
+
+uint32_t oracle8cursor::getColumnScale(uint32_t col) {
+	return (uint32_t)desc[col].scale;
+}
+
+uint16_t oracle8cursor::getColumnIsNullable(uint32_t col) {
+	return (uint16_t)desc[col].nullok;
+}
+
+uint16_t oracle8cursor::getColumnIsBinary(uint32_t col) {
+	switch (getColumnType(col)) {
+		case RAW_DATATYPE:
+		case LONG_RAW_DATATYPE:
+		case BLOB_DATATYPE:
+		case BFILE_DATATYPE:
+			return 1;
+		default:
+			return 0;
 	}
 }
 

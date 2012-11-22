@@ -124,8 +124,14 @@ class routercursor : public sqlrcursor_svr {
 		bool		outputBindCursor(const char *variable,
 						uint16_t variablesize,
 						sqlrcursor_svr *cursor);
-		void		returnOutputBindBlob(uint16_t index);
-		void		returnOutputBindClob(uint16_t index);
+		bool		getLobOutputBindLength(uint16_t index,
+						uint64_t *length);
+		bool		getLobOutputBindSegment(uint16_t index,
+						char *buffer,
+						uint64_t buffersize,
+						uint64_t offset,
+						uint64_t charstoread,
+						uint64_t *charsread);
 		bool		executeQuery(const char *query,
 						uint32_t length);
 		void		checkForTempTable(const char *query,
@@ -142,7 +148,19 @@ class routercursor : public sqlrcursor_svr {
 		uint32_t	colCount();
 		const char * const * columnNames();
 		uint16_t	columnTypeFormat();
-		void		returnColumnInfo();
+		const char	*getColumnName(uint32_t col);
+		const char	*getColumnTypeName(uint32_t col);
+		uint32_t	getColumnLength(uint32_t col);
+		uint32_t	getColumnPrecision(uint32_t col);
+		uint32_t	getColumnScale(uint32_t col);
+		uint16_t	getColumnIsNullable(uint32_t col);
+		uint16_t	getColumnIsPrimaryKey(uint32_t col);
+		uint16_t	getColumnIsUnique(uint32_t col);
+		uint16_t	getColumnIsPartOfKey(uint32_t col);
+		uint16_t	getColumnIsUnsigned(uint32_t col);
+		uint16_t	getColumnIsZeroFilled(uint32_t col);
+		uint16_t	getColumnIsBinary(uint32_t col);
+		uint16_t	getColumnIsAutoIncrement(uint32_t col);
 		bool		noRowsToReturn();
 		bool		skipRow();
 		bool		fetchRow();

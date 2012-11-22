@@ -431,22 +431,8 @@ uint16_t sqlitecursor::columnTypeFormat() {
 	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
-void sqlitecursor::returnColumnInfo() {
-
-	if (!columnnames) {
-		return;
-	}
-
-	// sqlite is kind of strange, the row of 
-	// the result set is the column names
-	for (int32_t i=0; i<ncolumn; i++) {
-
-		// column type and size are unknown in sqlite
-		conn->sendColumnDefinition(columnnames[i],
-					charstring::length(columnnames[i]),
-					UNKNOWN_DATATYPE,0,0,0,0,0,0,
-					0,0,0,0,0);
-	}
+const char *sqlitecursor::getColumnName(uint32_t col) {
+	return columnnames[col];
 }
 
 bool sqlitecursor::noRowsToReturn() {

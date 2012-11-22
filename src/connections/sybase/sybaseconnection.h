@@ -102,7 +102,16 @@ class sybasecursor : public sqlrcursor_svr {
 		uint32_t	colCount();
 		const char * const * columnNames();
 		uint16_t	columnTypeFormat();
-		void		returnColumnInfo();
+		const char	*getColumnName(uint32_t col);
+		uint16_t	getColumnType(uint32_t col);
+		uint32_t	getColumnLength(uint32_t col);
+		uint32_t	getColumnPrecision(uint32_t col);
+		uint32_t	getColumnScale(uint32_t col);
+		uint16_t	getColumnIsNullable(uint32_t col);
+		uint16_t	getColumnIsPartOfKey(uint32_t col);
+		uint16_t	getColumnIsUnsigned(uint32_t col);
+		uint16_t	getColumnIsBinary(uint32_t col);
+		uint16_t	getColumnIsAutoIncrement(uint32_t col);
 		bool		noRowsToReturn();
 		bool		skipRow();
 		bool		fetchRow();

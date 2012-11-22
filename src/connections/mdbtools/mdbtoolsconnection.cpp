@@ -380,42 +380,33 @@ uint16_t mdbtoolscursor::columnTypeFormat() {
 	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
-void mdbtoolscursor::returnColumnInfo() {
-
+const char *mdbtoolscursor::getColumnName(uint32_t col) {
 	if (cursortype==QUERY_CURSORTYPE) {
-
-		// for each column...
-		for (unsigned int i=0; i<((MdbSQL *)mdbsql)->num_columns; i++) {
-
-			// get the column
-			MdbSQLColumn	*col=(MdbSQLColumn *)
-				g_ptr_array_index(
-					((MdbSQL *)mdbsql)->columns,i);
-
-			// send the column definition
-			conn->sendColumnDefinition(col->name,
-					charstring::length(col->name),
-					UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
-		}
-
+		return ((MdbSQLColumn *)g_ptr_array_index(
+				((MdbSQL *)mdbsql)->columns,col))->name;
 	} else if (cursortype==DB_LIST_CURSORTYPE) {
-		conn->sendColumnDefinition("DATABASE",8,
-				UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
+		if (col==0) {
+			return "DATABASE";
+		}
 	} else if (cursortype==TABLE_LIST_CURSORTYPE) {
-		conn->sendColumnDefinition("TABLE",5,
-				UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
+		if (col==0) {
+			return "TABLE";
+		}
 	} else if (cursortype==COLUMN_LIST_CURSORTYPE) {
-		conn->sendColumnDefinition("NAME",4,
-				UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
-		conn->sendColumnDefinition("TYPE",4,
-				UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
-		conn->sendColumnDefinition("SIZE",4,
-				UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
-		conn->sendColumnDefinition("PRECISION",9,
-				UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
-		conn->sendColumnDefinition("SCALE",5,
-				UNKNOWN_DATATYPE,0,0,0,0,0,0,0,0,0,0,0);
+		switch (col) {
+			case 0:
+				return "NAME";
+			case 1:
+				return "TYPE";
+			case 2:
+				return "SIZE";
+			case 3:
+				return "PRECISION";
+			case 4:
+				return "SCALE";
+		}
 	}
+	return NULL;
 }
 
 bool mdbtoolscursor::noRowsToReturn() {

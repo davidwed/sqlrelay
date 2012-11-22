@@ -675,425 +675,296 @@ uint16_t postgresqlcursor::columnTypeFormat() {
 	}
 }
 
-void postgresqlcursor::returnColumnInfo() {
+const char *postgresqlcursor::getColumnName(uint32_t col) {
+	return PQfname(pgresult,col);
+}
 
-	// some useful variables
-	Oid		pgfieldtype;
-	uint16_t	type;
-	char		*typestring;
-	if (!postgresqlconn->typemangling) {
-		typestring=new char[6];
+uint16_t postgresqlcursor::getColumnType(uint32_t col) {
+	// Types are strange in POSTGRESQL, there are no actual
+	// types, only internal numbers that correspond to 
+	// types which are defined in a database table 
+	// somewhere.
+	// If typemangling is turned on, translate to standard
+	// types, otherwise return the type number.
+	switch (PQftype(pgresult,col)) {
+		case 16: //bool
+			return BOOL_DATATYPE;
+		case 17: //bytea
+			return BYTEA_DATATYPE;
+		case 18: //char
+			return CHAR_DATATYPE;
+		case 19: //name
+			return NAME_DATATYPE;
+		case 20: //int8
+			return INT8_DATATYPE;
+		case 21: //int2
+			return INT2_DATATYPE;
+		case 22: //int2vector
+			return INT2VECTOR_DATATYPE;
+		case 23: //int4
+			return INT4_DATATYPE;
+		case 24: //regproc
+			return REGPROC_DATATYPE;
+		case 25: //text
+			return TEXT_DATATYPE;
+		case 26: //oid
+			return OID_DATATYPE;
+		case 27: //tid
+			return TID_DATATYPE;
+		case 28: //xid
+			return XID_DATATYPE;
+		case 29: //cid
+			return CID_DATATYPE;
+		case 30: //oidvector
+			return OIDVECTOR_DATATYPE;
+		case 71: //pg_type
+			return PG_TYPE_DATATYPE;
+		case 75: //pg_attribute
+			return PG_ATTRIBUTE_DATATYPE;
+		case 81: //pg_proc
+			return PG_PROC_DATATYPE;
+		case 83: //pg_class
+			return PG_CLASS_DATATYPE;
+		case 210: //smgr
+			return SMGR_DATATYPE;
+		case 600: //point
+			return POINT_DATATYPE;
+		case 601: //lseg
+			return LSEG_DATATYPE;
+		case 602: //path
+			return PATH_DATATYPE;
+		case 603: //box
+			return BOX_DATATYPE;
+		case 604: //polygon
+			return POLYGON_DATATYPE;
+		case 628: //line
+			return LINE_DATATYPE;
+		case 629: //_line
+			return _LINE_DATATYPE;
+		case 651: //_cidr
+			return _CIDR_DATATYPE;
+		case 700: //float4
+			return FLOAT4_DATATYPE;
+		case 701: //float8
+			return FLOAT8_DATATYPE;
+		case 702: //abstime
+			return ABSTIME_DATATYPE;
+		case 703: //reltime
+			return RELTIME_DATATYPE;
+		case 704: //tinterval
+			return TINTERVAL_DATATYPE;
+		case 718: //circle
+			return CIRCLE_DATATYPE;
+		case 719: //_circle
+			return _CIRCLE_DATATYPE;
+		case 790: //money
+			return MONEY_DATATYPE;
+		case 791: //_money
+			return _MONEY_DATATYPE;
+		case 829: //macaddr
+			return MACADDR_DATATYPE;
+		case 869: //inet
+			return INET_DATATYPE;
+		case 650: //cidr
+			return CIDR_DATATYPE;
+		case 1000: //_bool
+			return _BOOL_DATATYPE;
+		case 1001: //_bytea
+			return _BYTEA_DATATYPE;
+		case 1002: //_char
+			return _CHAR_DATATYPE;
+		case 1003: //_name
+			return _NAME_DATATYPE;
+		case 1005: //_int2
+			return _INT2_DATATYPE;
+		case 1006: //_int2vector
+			return _INT2VECTOR_DATATYPE;
+		case 1007: //_int4
+			return _INT4_DATATYPE;
+		case 1008: //_regproc
+			return _REGPROC_DATATYPE;
+		case 1009: //_text
+			return _TEXT_DATATYPE;
+		case 1010: //_tid
+			return _TID_DATATYPE;
+		case 1011: //_xid
+			return _XID_DATATYPE;
+		case 1012: //_cid
+			return _CID_DATATYPE;
+		case 1013: //_oidvector
+			return _OIDVECTOR_DATATYPE;
+		case 1014: //_bpchar
+			return _BPCHAR_DATATYPE;
+		case 1015: //_varchar
+			return _VARCHAR_DATATYPE;
+		case 1016: //_int8
+			return _INT8_DATATYPE;
+		case 1017: //_point
+			return _POINT_DATATYPE;
+		case 1018: //_lseg
+			return _LSEG_DATATYPE;
+		case 1019: //_path
+			return _PATH_DATATYPE;
+		case 1020: //_box
+			return _BOX_DATATYPE;
+		case 1021: //_float4
+			return _FLOAT4_DATATYPE;
+		case 1022: //_float8
+			return _FLOAT8_DATATYPE;
+		case 1023: //_abstime
+			return _ABSTIME_DATATYPE;
+		case 1024: //_reltime
+			return _RELTIME_DATATYPE;
+		case 1025: //_tinterval
+			return _TINTERVAL_DATATYPE;
+		case 1027: //_polygon
+			return _POLYGON_DATATYPE;
+		case 1028: //_oid
+			return _OID_DATATYPE;
+		case 1033: //aclitem
+			return ACLITEM_DATATYPE;
+		case 1034: //_aclitem
+			return _ACLITEM_DATATYPE;
+		case 1040: //_macaddr
+			return _MACADDR_DATATYPE;
+		case 1041: //_inet
+			return _INET_DATATYPE;
+		case 1042: //bpchar
+			return BPCHAR_DATATYPE;
+		case 1043: //varchar
+			return VARCHAR_DATATYPE;
+		case 1082: //date
+			return DATE_DATATYPE;
+		case 1083: //time
+			return TIME_DATATYPE;
+		case 1114: //timestamp
+		case 1296:
+			return TIMESTAMP_DATATYPE;
+		case 1115: //_timestamp
+			return _TIMESTAMP_DATATYPE;
+		case 1182: //_date
+			return _DATE_DATATYPE;
+		case 1183: //_time
+			return _TIME_DATATYPE;
+		case 1184: //timestamptz
+			return TIMESTAMPTZ_DATATYPE;
+		case 1185: //_timestamptz
+			return _TIMESTAMPTZ_DATATYPE;
+		case 1186: //interval
+			return INTERVAL_DATATYPE;
+		case 1187: //_interval
+			return _INTERVAL_DATATYPE;
+		case 1231: //_numeric
+			return _NUMERIC_DATATYPE;
+		case 1266: //timetz
+			return TIMETZ_DATATYPE;
+		case 1270: //_timetz
+			return _TIMETZ_DATATYPE;
+		case 1560: //bit
+			return BIT_DATATYPE;
+		case 1561: //_bit
+			return _BIT_DATATYPE;
+		case 1562: //varbit
+			return VARBIT_DATATYPE;
+		case 1563: //_varbit
+			return _VARBIT_DATATYPE;
+		case 1700: //numeric
+			return NUMERIC_DATATYPE;
+		case 1790: //refcursor
+			return REFCURSOR_DATATYPE;
+		case 2201: //_refcursor
+			return _REFCURSOR_DATATYPE;
+		case 2202: //regprocedure
+			return REGPROCEDURE_DATATYPE;
+		case 2203: //regoper
+			return REGOPER_DATATYPE;
+		case 2204: //regoperator
+			return REGOPERATOR_DATATYPE;
+		case 2205: //regclass
+			return REGCLASS_DATATYPE;
+		case 2206: //regtype
+			return REGTYPE_DATATYPE;
+		case 2207: //_regprocedure
+			return _REGPROCEDURE_DATATYPE;
+		case 2208: //_regoper
+			return _REGOPER_DATATYPE;
+		case 2209: //_regoperator
+			return _REGOPERATOR_DATATYPE;
+		case 2210: //_regclass
+			return _REGCLASS_DATATYPE;
+		case 2211: //_regtype
+			return _REGTYPE_DATATYPE;
+		case 2249: //record
+			return RECORD_DATATYPE;
+		case 2275: //cstring
+			return CSTRING_DATATYPE;
+		case 2276: //any
+			return ANY_DATATYPE;
+		case 2277: //anyarray
+			return ANYARRAY_DATATYPE;
+		case 2278: //void
+			return VOID_DATATYPE;
+		case 2279: //trigger
+			return TRIGGER_DATATYPE;
+		case 2280: //language_handler
+			return LANGUAGE_HANDLER_DATATYPE;
+		case 2281: //internal
+			return INTERNAL_DATATYPE;
+		case 2282: //opaque
+			return OPAQUE_DATATYPE;
+		case 2283: //anyelement
+			return ANYELEMENT_DATATYPE;
+		case 705: //unknown
+		default:
+			return UNKNOWN_DATATYPE;
 	}
-	char		*name;
-	int32_t		size;
+}
 
-	// is this binary data (all columns will contain
-	// binary data if it is)
+const char *postgresqlcursor::getColumnTypeName(uint32_t col) {
+	// Types are strange in POSTGRESQL, there are no actual
+	// types, only internal numbers that correspond to 
+	// types which are defined in a database table 
+	// somewhere.
+	// typemangling=0 means return the internal number as a string
+	// typemangling=1 means translate to a standard datatype
+	// 			(handled by getColumnType above)
+	// typemangling=2 means return the name as a string
+	Oid	pgfieldtype=PQftype(pgresult,col);
+	if (!postgresqlconn->typemangling) {
+		snprintf(typenamebuffer,sizeof(typenamebuffer),
+					"%d",(int32_t)pgfieldtype);
+		return typenamebuffer;
+	} else {
+		for (int i=0; i<postgresqlconn->datatypecount; i++) {
+			if ((int32_t)pgfieldtype==
+				postgresqlconn->datatypeids[i]) {
+				return postgresqlconn->datatypenames[i];
+			}
+		}
+	}
+	return NULL;
+}
+
+uint32_t postgresqlcursor::getColumnLength(uint32_t col) {
+	int32_t	size=PQfsize(pgresult,col);
+#ifdef HAVE_POSTGRESQL_PQFMOD
+	if (size<0) {
+		size=PQfmod(pgresult,col);
+	}
+#endif
+	if (size<0) {
+		size=0;
+	}
+	return size;
+}
+
+uint16_t postgresqlcursor::getColumnIsBinary(uint32_t col) {
+	// is this binary data (all columns will contain binary data if it is)
 	int16_t	binary=false;
 #ifdef HAVE_POSTGRESQL_PQBINARYTUPLES
 	binary=PQbinaryTuples(pgresult);
 #endif
-
-	// for each column...
-	for (int32_t i=0; i<ncols; i++) {
-
-		// Types are strange in POSTGRESQL, there are no actual
-		// types, only internal numbers that correspond to 
-		// types which are defined in a database table 
-		// somewhere.
-		// If typemangling is turned on, translate to standard
-		// types, otherwise return the type number.
-		pgfieldtype=PQftype(pgresult,i);
-		if (!postgresqlconn->typemangling) {
-			snprintf(typestring,6,"%d",(int32_t)pgfieldtype);
-		} else if (postgresqlconn->typemangling==1) {
-			switch ((int32_t)pgfieldtype) {
-				case 16: //bool
-					type=BOOL_DATATYPE;
-					break;
-				case 17: //bytea
-					type=BYTEA_DATATYPE;
-					break;
-				case 18: //char
-					type=CHAR_DATATYPE;
-					break;
-				case 19: //name
-					type=NAME_DATATYPE;
-					break;
-				case 20: //int8
-					type=INT8_DATATYPE;
-					break;
-				case 21: //int2
-					type=INT2_DATATYPE;
-					break;
-				case 22: //int2vector
-					type=INT2VECTOR_DATATYPE;
-					break;
-				case 23: //int4
-					type=INT4_DATATYPE;
-					break;
-				case 24: //regproc
-					type=REGPROC_DATATYPE;
-					break;
-				case 25: //text
-					type=TEXT_DATATYPE;
-					break;
-				case 26: //oid
-					type=OID_DATATYPE;
-					break;
-				case 27: //tid
-					type=TID_DATATYPE;
-					break;
-				case 28: //xid
-					type=XID_DATATYPE;
-					break;
-				case 29: //cid
-					type=CID_DATATYPE;
-					break;
-				case 30: //oidvector
-					type=OIDVECTOR_DATATYPE;
-					break;
-				case 71: //pg_type
-					type=PG_TYPE_DATATYPE;
-					break;
-				case 75: //pg_attribute
-					type=PG_ATTRIBUTE_DATATYPE;
-					break;
-				case 81: //pg_proc
-					type=PG_PROC_DATATYPE;
-					break;
-				case 83: //pg_class
-					type=PG_CLASS_DATATYPE;
-					break;
-				case 210: //smgr
-					type=SMGR_DATATYPE;
-					break;
-				case 600: //point
-					type=POINT_DATATYPE;
-					break;
-				case 601: //lseg
-					type=LSEG_DATATYPE;
-					break;
-				case 602: //path
-					type=PATH_DATATYPE;
-					break;
-				case 603: //box
-					type=BOX_DATATYPE;
-					break;
-				case 604: //polygon
-					type=POLYGON_DATATYPE;
-					break;
-				case 628: //line
-					type=LINE_DATATYPE;
-					break;
-				case 629: //_line
-					type=_LINE_DATATYPE;
-					break;
-				case 651: //_cidr
-					type=_CIDR_DATATYPE;
-					break;
-				case 700: //float4
-					type=FLOAT4_DATATYPE;
-					break;
-				case 701: //float8
-					type=FLOAT8_DATATYPE;
-					break;
-				case 702: //abstime
-					type=ABSTIME_DATATYPE;
-					break;
-				case 703: //reltime
-					type=RELTIME_DATATYPE;
-					break;
-				case 704: //tinterval
-					type=TINTERVAL_DATATYPE;
-					break;
-				case 718: //circle
-					type=CIRCLE_DATATYPE;
-					break;
-				case 719: //_circle
-					type=_CIRCLE_DATATYPE;
-					break;
-				case 790: //money
-					type=MONEY_DATATYPE;
-					break;
-				case 791: //_money
-					type=_MONEY_DATATYPE;
-					break;
-				case 829: //macaddr
-					type=MACADDR_DATATYPE;
-					break;
-				case 869: //inet
-					type=INET_DATATYPE;
-					break;
-				case 650: //cidr
-					type=CIDR_DATATYPE;
-					break;
-				case 1000: //_bool
-					type=_BOOL_DATATYPE;
-					break;
-				case 1001: //_bytea
-					type=_BYTEA_DATATYPE;
-					break;
-				case 1002: //_char
-					type=_CHAR_DATATYPE;
-					break;
-				case 1003: //_name
-					type=_NAME_DATATYPE;
-					break;
-				case 1005: //_int2
-					type=_INT2_DATATYPE;
-					break;
-				case 1006: //_int2vector
-					type=_INT2VECTOR_DATATYPE;
-					break;
-				case 1007: //_int4
-					type=_INT4_DATATYPE;
-					break;
-				case 1008: //_regproc
-					type=_REGPROC_DATATYPE;
-					break;
-				case 1009: //_text
-					type=_TEXT_DATATYPE;
-					break;
-				case 1010: //_tid
-					type=_TID_DATATYPE;
-					break;
-				case 1011: //_xid
-					type=_XID_DATATYPE;
-					break;
-				case 1012: //_cid
-					type=_CID_DATATYPE;
-					break;
-				case 1013: //_oidvector
-					type=_OIDVECTOR_DATATYPE;
-					break;
-				case 1014: //_bpchar
-					type=_BPCHAR_DATATYPE;
-					break;
-				case 1015: //_varchar
-					type=_VARCHAR_DATATYPE;
-					break;
-				case 1016: //_int8
-					type=_INT8_DATATYPE;
-					break;
-				case 1017: //_point
-					type=_POINT_DATATYPE;
-					break;
-				case 1018: //_lseg
-					type=_LSEG_DATATYPE;
-					break;
-				case 1019: //_path
-					type=_PATH_DATATYPE;
-					break;
-				case 1020: //_box
-					type=_BOX_DATATYPE;
-					break;
-				case 1021: //_float4
-					type=_FLOAT4_DATATYPE;
-					break;
-				case 1022: //_float8
-					type=_FLOAT8_DATATYPE;
-					break;
-				case 1023: //_abstime
-					type=_ABSTIME_DATATYPE;
-					break;
-				case 1024: //_reltime
-					type=_RELTIME_DATATYPE;
-					break;
-				case 1025: //_tinterval
-					type=_TINTERVAL_DATATYPE;
-					break;
-				case 1027: //_polygon
-					type=_POLYGON_DATATYPE;
-					break;
-				case 1028: //_oid
-					type=_OID_DATATYPE;
-					break;
-				case 1033: //aclitem
-					type=ACLITEM_DATATYPE;
-					break;
-				case 1034: //_aclitem
-					type=_ACLITEM_DATATYPE;
-					break;
-				case 1040: //_macaddr
-					type=_MACADDR_DATATYPE;
-					break;
-				case 1041: //_inet
-					type=_INET_DATATYPE;
-					break;
-				case 1042: //bpchar
-					type=BPCHAR_DATATYPE;
-					break;
-				case 1043: //varchar
-					type=VARCHAR_DATATYPE;
-					break;
-				case 1082: //date
-					type=DATE_DATATYPE;
-					break;
-				case 1083: //time
-					type=TIME_DATATYPE;
-					break;
-				case 1114: //timestamp
-				case 1296:
-					type=TIMESTAMP_DATATYPE;
-					break;
-				case 1115: //_timestamp
-					type=_TIMESTAMP_DATATYPE;
-					break;
-				case 1182: //_date
-					type=_DATE_DATATYPE;
-					break;
-				case 1183: //_time
-					type=_TIME_DATATYPE;
-					break;
-				case 1184: //timestamptz
-					type=TIMESTAMPTZ_DATATYPE;
-					break;
-				case 1185: //_timestamptz
-					type=_TIMESTAMPTZ_DATATYPE;
-					break;
-				case 1186: //interval
-					type=INTERVAL_DATATYPE;
-					break;
-				case 1187: //_interval
-					type=_INTERVAL_DATATYPE;
-					break;
-				case 1231: //_numeric
-					type=_NUMERIC_DATATYPE;
-					break;
-				case 1266: //timetz
-					type=TIMETZ_DATATYPE;
-					break;
-				case 1270: //_timetz
-					type=_TIMETZ_DATATYPE;
-					break;
-				case 1560: //bit
-					type=BIT_DATATYPE;
-					break;
-				case 1561: //_bit
-					type=_BIT_DATATYPE;
-					break;
-				case 1562: //varbit
-					type=VARBIT_DATATYPE;
-					break;
-				case 1563: //_varbit
-					type=_VARBIT_DATATYPE;
-					break;
-				case 1700: //numeric
-					type=NUMERIC_DATATYPE;
-					break;
-				case 1790: //refcursor
-					type=REFCURSOR_DATATYPE;
-					break;
-				case 2201: //_refcursor
-					type=_REFCURSOR_DATATYPE;
-					break;
-				case 2202: //regprocedure
-					type=REGPROCEDURE_DATATYPE;
-					break;
-				case 2203: //regoper
-					type=REGOPER_DATATYPE;
-					break;
-				case 2204: //regoperator
-					type=REGOPERATOR_DATATYPE;
-					break;
-				case 2205: //regclass
-					type=REGCLASS_DATATYPE;
-					break;
-				case 2206: //regtype
-					type=REGTYPE_DATATYPE;
-					break;
-				case 2207: //_regprocedure
-					type=_REGPROCEDURE_DATATYPE;
-					break;
-				case 2208: //_regoper
-					type=_REGOPER_DATATYPE;
-					break;
-				case 2209: //_regoperator
-					type=_REGOPERATOR_DATATYPE;
-					break;
-				case 2210: //_regclass
-					type=_REGCLASS_DATATYPE;
-					break;
-				case 2211: //_regtype
-					type=_REGTYPE_DATATYPE;
-					break;
-				case 2249: //record
-					type=RECORD_DATATYPE;
-					break;
-				case 2275: //cstring
-					type=CSTRING_DATATYPE;
-					break;
-				case 2276: //any
-					type=ANY_DATATYPE;
-					break;
-				case 2277: //anyarray
-					type=ANYARRAY_DATATYPE;
-					break;
-				case 2278: //void
-					type=VOID_DATATYPE;
-					break;
-				case 2279: //trigger
-					type=TRIGGER_DATATYPE;
-					break;
-				case 2280: //language_handler
-					type=LANGUAGE_HANDLER_DATATYPE;
-					break;
-				case 2281: //internal
-					type=INTERNAL_DATATYPE;
-					break;
-				case 2282: //opaque
-					type=OPAQUE_DATATYPE;
-					break;
-				case 2283: //anyelement
-					type=ANYELEMENT_DATATYPE;
-					break;
-				case 705: //unknown
-				default:
-					type=UNKNOWN_DATATYPE;
-					break;
-			}
-		} else if (postgresqlconn->typemangling==2) {
-			for (int i=0; i<postgresqlconn->datatypecount; i++) {
-
-				if ((int32_t)pgfieldtype==
-					postgresqlconn->datatypeids[i]) {
-					typestring=postgresqlconn->
-							datatypenames[i];
-				}
-			}
-		}
-
-		// send column definition
-		name=PQfname(pgresult,i);
-		size=PQfsize(pgresult,i);
-#ifdef HAVE_POSTGRESQL_PQFMOD
-		if (size<0) {
-			size=PQfmod(pgresult,i);
-		}
-#endif
-		if (size<0) {
-			size=0;
-		}
-
-		if (postgresqlconn->typemangling==1) {
-			conn->sendColumnDefinition(name,
-						charstring::length(name),
-						type,size,0,0,0,0,0,
-						0,0,0,binary,0);
-		} else {
-			conn->sendColumnDefinitionString(name,
-						charstring::length(name),
-						typestring,
-						charstring::length(typestring),
-						size,
-						0,0,0,0,0,
-						0,0,0,binary,0);
-		}
-	}
-	if (!postgresqlconn->typemangling) {
-		delete[] typestring;
-	}
+	return binary;
 }
 
 bool postgresqlcursor::noRowsToReturn() {

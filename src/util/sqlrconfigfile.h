@@ -58,12 +58,6 @@ typedef enum {
 	STRING_ATTRIBUTE,
 	METRIC_ATTRIBUTE,
 	BEHINDLOADBALANCER_ATTRIBUTE,
-	SID_ENABLED_ATTRIBUTE,
-	SID_HOST_ATTRIBUTE,
-	SID_PORT_ATTRIBUTE,
-	SID_SOCKET_ATTRIBUTE,
-	SID_USER_ATTRIBUTE,
-	SID_PASSWORD_ATTRIBUTE,
 	ROUTER_HOST_ATTRIBUTE,
 	ROUTER_PORT_ATTRIBUTE,
 	ROUTER_SOCKET_ATTRIBUTE,
@@ -236,13 +230,6 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		rudiments::stringlist	*getSessionStartQueries();
 		rudiments::stringlist	*getSessionEndQueries();
 
-		bool		getSidEnabled();
-		const char	*getSidHost();
-		uint16_t	getSidPort();
-		const char	*getSidUnixPort();
-		const char	*getSidUser();
-		const char	*getSidPassword();
-
 		const char	*getTranslations();
 
 		const char	*getTriggers();
@@ -343,13 +330,6 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		bool		inend;
 		rudiments::stringlist	sessionstartqueries;
 		rudiments::stringlist	sessionendqueries;
-
-		bool		sidenabled;
-		char		*sidhost;
-		uint16_t	sidport;
-		char		*sidsocket;
-		char		*siduser;
-		char		*sidpassword;
 
 		rudiments::stringbuffer	translations;
 		uint16_t		translationsdepth;

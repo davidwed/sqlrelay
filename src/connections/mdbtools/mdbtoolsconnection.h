@@ -42,7 +42,7 @@ class mdbtoolscursor : public sqlrcursor_svr {
 		uint32_t	colCount();
 		const char * const * columnNames();
 		uint16_t	columnTypeFormat();
-		void		returnColumnInfo();
+		const char	*getColumnName(uint32_t col);
 		bool		noRowsToReturn();
 		bool		skipRow();
 		bool		fetchRow();

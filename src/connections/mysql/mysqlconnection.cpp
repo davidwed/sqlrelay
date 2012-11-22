@@ -363,6 +363,7 @@ mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 			"^\\s*((create|CREATE|drop|DROP|procedure|PROCEDURE|function|FUNCTION|use|USE|CALL|call|START|start)\\s+)|((begin|BEGIN)\\s*)");
 	unsupportedbystmt.study();
 	for (unsigned short index=0; index<MAX_SELECT_LIST_SIZE; index++) {
+		mysqlfields[index]=NULL;
 		fieldbind[index].buffer_type=MYSQL_TYPE_STRING;
 		fieldbind[index].buffer=(char *)&field[index];
 		fieldbind[index].buffer_length=MAX_ITEM_BUFFER_SIZE;
@@ -737,6 +738,14 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 	}
 #endif
 
+	// grab the field info
+	if (mysqlresult) {
+		mysql_field_seek(mysqlresult,0);
+		for (unsigned int i=0; i<ncols; i++) {
+			mysqlfields[i]=mysql_fetch_field(mysqlresult);
+		}
+	}
+
 	return true;
 }
 
@@ -831,168 +840,210 @@ uint16_t mysqlcursor::columnTypeFormat() {
 	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
-void mysqlcursor::returnColumnInfo() {
+const char *mysqlcursor::getColumnName(uint32_t col) {
+	return mysqlfields[col]->name;
+}
 
-	// for DML or DDL queries, return no column info
-	if (!mysqlresult) {
-		return;
-	}
-
-	// some useful variables
-	uint16_t	type;
-	uint32_t	length;
-
-	// position ourselves at the first field
-	mysql_field_seek(mysqlresult,0);
-
-	// for each column...
-	for (unsigned int i=0; i<ncols; i++) {
-
-		// fetch the field
-		mysqlfield=mysql_fetch_field(mysqlresult);
-
-		// append column type to the header
-		if (mysqlfield->type==FIELD_TYPE_STRING) {
-			type=STRING_DATATYPE;
-			length=(uint32_t)mysqlfield->length;
-		} else if (mysqlfield->type==FIELD_TYPE_VAR_STRING) {
-			type=CHAR_DATATYPE;
-			length=(uint32_t)mysqlfield->length+1;
-		} else if (mysqlfield->type==FIELD_TYPE_DECIMAL
+uint16_t mysqlcursor::getColumnType(uint32_t col) {
+	if (mysqlfields[col]->type==FIELD_TYPE_STRING) {
+		return STRING_DATATYPE;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_VAR_STRING) {
+		return CHAR_DATATYPE;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_DECIMAL
 #ifdef HAVE_MYSQL_FIELD_TYPE_NEWDECIMAL
-			|| mysqlfield->type==FIELD_TYPE_NEWDECIMAL
+		|| mysqlfields[col]->type==FIELD_TYPE_NEWDECIMAL
 #endif
-			) {
-			type=DECIMAL_DATATYPE;
-			if (mysqlfield->decimals>0) {
-				length=(uint32_t)mysqlfield->length+2;
-			} else if (mysqlfield->decimals==0) {
-				length=(uint32_t)mysqlfield->length+1;
-			}
-			if (mysqlfield->length<mysqlfield->decimals) {
-				length=(uint32_t)mysqlfield->decimals+2;
-			}
-		} else if (mysqlfield->type==FIELD_TYPE_TINY) {
-			type=TINYINT_DATATYPE;
-			length=1;
-		} else if (mysqlfield->type==FIELD_TYPE_SHORT) {
-			type=SMALLINT_DATATYPE;
-			length=2;
-		} else if (mysqlfield->type==FIELD_TYPE_LONG) {
-			type=INT_DATATYPE;
-			length=4;
-		} else if (mysqlfield->type==FIELD_TYPE_FLOAT) {
-			type=FLOAT_DATATYPE;
-			if (mysqlfield->length<=24) {
-				length=4;
-			} else {
-				length=8;
-			}
-		} else if (mysqlfield->type==FIELD_TYPE_DOUBLE) {
-			type=REAL_DATATYPE;
-			length=8;
-		} else if (mysqlfield->type==FIELD_TYPE_LONGLONG) {
-			type=BIGINT_DATATYPE;
-			length=8;
-		} else if (mysqlfield->type==FIELD_TYPE_INT24) {
-			type=MEDIUMINT_DATATYPE;
-			length=3;
-		} else if (mysqlfield->type==FIELD_TYPE_TIMESTAMP) {
-			type=TIMESTAMP_DATATYPE;
-			length=4;
-		} else if (mysqlfield->type==FIELD_TYPE_DATE) {
-			type=DATE_DATATYPE;
-			length=3;
-		} else if (mysqlfield->type==FIELD_TYPE_TIME) {
-			type=TIME_DATATYPE;
-			length=3;
-		} else if (mysqlfield->type==FIELD_TYPE_DATETIME) {
-			type=DATETIME_DATATYPE;
-			length=8;
+		) {
+		return DECIMAL_DATATYPE;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_TINY) {
+		return TINYINT_DATATYPE;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_SHORT) {
+		return SMALLINT_DATATYPE;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_LONG) {
+		return INT_DATATYPE;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_FLOAT) {
+		return FLOAT_DATATYPE;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_DOUBLE) {
+		return REAL_DATATYPE;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_LONGLONG) {
+		return BIGINT_DATATYPE;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_INT24) {
+		return MEDIUMINT_DATATYPE;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_TIMESTAMP) {
+		return TIMESTAMP_DATATYPE;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_DATE) {
+		return DATE_DATATYPE;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_TIME) {
+		return TIME_DATATYPE;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_DATETIME) {
+		return DATETIME_DATATYPE;
 #ifdef HAVE_MYSQL_FIELD_TYPE_YEAR
-		} else if (mysqlfield->type==FIELD_TYPE_YEAR) {
-			type=YEAR_DATATYPE;
-			length=1;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_YEAR) {
+		return YEAR_DATATYPE;
 #endif
 #ifdef HAVE_MYSQL_FIELD_TYPE_NEWDATE
-		} else if (mysqlfield->type==FIELD_TYPE_NEWDATE) {
-			type=NEWDATE_DATATYPE;
-			length=1;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_NEWDATE) {
+		return NEWDATE_DATATYPE;
 #endif
-		} else if (mysqlfield->type==FIELD_TYPE_NULL) {
-			type=NULL_DATATYPE;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_NULL) {
+		return NULL_DATATYPE;
 #ifdef HAVE_MYSQL_FIELD_TYPE_ENUM
-		} else if (mysqlfield->type==FIELD_TYPE_ENUM) {
-			type=ENUM_DATATYPE;
-			// 1 or 2 bytes delepending on the # of enum values
-			// (65535 max)
-			length=2;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_ENUM) {
+		return ENUM_DATATYPE;
 #endif
 #ifdef HAVE_MYSQL_FIELD_TYPE_SET
-		} else if (mysqlfield->type==FIELD_TYPE_SET) {
-			type=SET_DATATYPE;
-			// 1,2,3,4 or 8 bytes depending on the # of
-			// members (64 max)
-			length=8;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_SET) {
+		return SET_DATATYPE;
 #endif
-		// For some versions of mysql, tinyblobs, mediumblobs and
-		// longblobs all show up as FIELD_TYPE_BLOB despite field types
-		// being defined for those types.  tinyblobs have a length
-		// of 255 though, so that can be used for something.  medium
-		// and long blobs both have the same length though.  Go
-		// figure.  Also, the word TEXT and BLOB appear to be
-		// interchangable.  We'll use BLOB because it appears to be
-		// more standard than TEXT.  I wonder if this will be
-		// changed in a future incarnation of mysql.  I also wonder
-		// what happens on a 64 bit machine.
-		} else if (mysqlfield->type==FIELD_TYPE_TINY_BLOB ||
-				(mysqlfield->type==FIELD_TYPE_BLOB &&
-						mysqlfield->length<256)) {
-			type=TINY_BLOB_DATATYPE;
-			length=255;
-		} else if (mysqlfield->type==FIELD_TYPE_BLOB &&
-						mysqlfield->length<65536) {
-			type=BLOB_DATATYPE;
-			length=65535;
-		} else if (mysqlfield->type==FIELD_TYPE_MEDIUM_BLOB ||
-				(mysqlfield->type==FIELD_TYPE_BLOB &&
-						mysqlfield->length<16777216)) {
-			type=MEDIUM_BLOB_DATATYPE;
-			length=16777215;
-		} else if (mysqlfield->type==FIELD_TYPE_LONG_BLOB ||
-					mysqlfield->type==FIELD_TYPE_BLOB) {
-			type=LONG_BLOB_DATATYPE;
-			length=2147483647;
-		} else {
-			type=UNKNOWN_DATATYPE;
-			length=(int)mysqlfield->length;
-		}
-
-		// send column definition
-		// for mysql, length is actually precision
-		conn->sendColumnDefinition(mysqlfield->name,
-				charstring::length(mysqlfield->name),
-				type,length,
-				mysqlfield->length,
-				mysqlfield->decimals,
-				!(IS_NOT_NULL(mysqlfield->flags)),
-				IS_PRI_KEY(mysqlfield->flags),
-				mysqlfield->flags&UNIQUE_KEY_FLAG,
-				mysqlfield->flags&MULTIPLE_KEY_FLAG,
-				mysqlfield->flags&UNSIGNED_FLAG,
-				mysqlfield->flags&ZEROFILL_FLAG,
-#ifdef BINARY_FLAG
-				mysqlfield->flags&BINARY_FLAG,
-#else
-				0,
-#endif
-#ifdef AUTO_INCREMENT_FLAG
-				mysqlfield->flags&AUTO_INCREMENT_FLAG
-#else
-				0
-#endif
-				);
+	// For some versions of mysql, tinyblobs, mediumblobs and
+	// longblobs all show up as FIELD_TYPE_BLOB despite field types
+	// being defined for those types.  tinyblobs have a length
+	// of 255 though, so that can be used for something.  medium
+	// and long blobs both have the same length though.  Go
+	// figure.  Also, the word TEXT and BLOB appear to be
+	// interchangable.  We'll use BLOB because it appears to be
+	// more standard than TEXT.  I wonder if this will be
+	// changed in a future incarnation of mysql.  I also wonder
+	// what happens on a 64 bit machine.
+	} else if (mysqlfields[col]->type==FIELD_TYPE_TINY_BLOB ||
+			(mysqlfields[col]->type==FIELD_TYPE_BLOB &&
+					mysqlfields[col]->length<256)) {
+		return TINY_BLOB_DATATYPE;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_BLOB &&
+					mysqlfields[col]->length<65536) {
+		return BLOB_DATATYPE;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_MEDIUM_BLOB ||
+			(mysqlfields[col]->type==FIELD_TYPE_BLOB &&
+					mysqlfields[col]->length<16777216)) {
+		return MEDIUM_BLOB_DATATYPE;
+	} else if (mysqlfields[col]->type==FIELD_TYPE_LONG_BLOB ||
+				mysqlfields[col]->type==FIELD_TYPE_BLOB) {
+		return LONG_BLOB_DATATYPE;
+	} else {
+		return UNKNOWN_DATATYPE;
 	}
+}
+
+uint32_t mysqlcursor::getColumnLength(uint32_t col) {
+
+	if (getColumnType(col)==STRING_DATATYPE) {
+		return (uint32_t)mysqlfields[col]->length;
+	} else if (getColumnType(col)==CHAR_DATATYPE) {
+		return (uint32_t)mysqlfields[col]->length+1;
+	} else if (getColumnType(col)==DECIMAL_DATATYPE) {
+		uint32_t	length=0;
+		if (mysqlfields[col]->decimals>0) {
+			length=mysqlfields[col]->length+2;
+		} else if (mysqlfields[col]->decimals==0) {
+			length=mysqlfields[col]->length+1;
+		}
+		if (mysqlfields[col]->length<mysqlfields[col]->decimals) {
+			length=mysqlfields[col]->decimals+2;
+		}
+		return length;
+	} else if (getColumnType(col)==TINYINT_DATATYPE) {
+		return 1;
+	} else if (getColumnType(col)==SMALLINT_DATATYPE) {
+		return 2;
+	} else if (getColumnType(col)==INT_DATATYPE) {
+		return 4;
+	} else if (getColumnType(col)==FLOAT_DATATYPE) {
+		if (mysqlfields[col]->length<=24) {
+			return 4;
+		} else {
+			return 8;
+		}
+	} else if (getColumnType(col)==REAL_DATATYPE) {
+		return 8;
+	} else if (getColumnType(col)==BIGINT_DATATYPE) {
+		return 8;
+	} else if (getColumnType(col)==MEDIUMINT_DATATYPE) {
+		return 3;
+	} else if (getColumnType(col)==TIMESTAMP_DATATYPE) {
+		return 4;
+	} else if (getColumnType(col)==DATE_DATATYPE) {
+		return 3;
+	} else if (getColumnType(col)==TIME_DATATYPE) {
+		return 3;
+	} else if (getColumnType(col)==DATETIME_DATATYPE) {
+		return 8;
+#ifdef HAVE_MYSQL_FIELD_TYPE_YEAR
+	} else if (getColumnType(col)==YEAR_DATATYPE) {
+		return 1;
+#endif
+#ifdef HAVE_MYSQL_FIELD_TYPE_NEWDATE
+	} else if (getColumnType(col)==NEWDATE_DATATYPE) {
+		return 1;
+#endif
+	} else if (getColumnType(col)==NULL_DATATYPE) {
+#ifdef HAVE_MYSQL_FIELD_TYPE_ENUM
+	} else if (getColumnType(col)==ENUM_DATATYPE) {
+		// 1 or 2 bytes delepending on the # of enum values (65535 max)
+		return 2;
+#endif
+#ifdef HAVE_MYSQL_FIELD_TYPE_SET
+	} else if (getColumnType(col)==SET_DATATYPE) {
+		// 1,2,3,4 or 8 bytes depending on the # of members (64 max)
+		return 8;
+#endif
+	} else if (getColumnType(col)==TINY_BLOB_DATATYPE) {
+		return 255;
+	} else if (getColumnType(col)==BLOB_DATATYPE) {
+		return 65535;
+	} else if (getColumnType(col)==MEDIUM_BLOB_DATATYPE) {
+		return 16777215;
+	} else if (getColumnType(col)==LONG_BLOB_DATATYPE) {
+		return 2147483647;
+	}
+	return (uint32_t)mysqlfields[col]->length;
+}
+
+uint32_t mysqlcursor::getColumnPrecision(uint32_t col) {
+	return mysqlfields[col]->length;
+}
+
+uint32_t mysqlcursor::getColumnScale(uint32_t col) {
+	return mysqlfields[col]->decimals;
+}
+
+uint16_t mysqlcursor::getColumnIsNullable(uint32_t col) {
+	return !(IS_NOT_NULL(mysqlfields[col]->flags));
+}
+
+uint16_t mysqlcursor::getColumnIsPrimaryKey(uint32_t col) {
+	return IS_PRI_KEY(mysqlfields[col]->flags);
+}
+
+uint16_t mysqlcursor::getColumnIsUnique(uint32_t col) {
+	return mysqlfields[col]->flags&UNIQUE_KEY_FLAG;
+}
+
+uint16_t mysqlcursor::getColumnIsPartOfKey(uint32_t col) {
+	return mysqlfields[col]->flags&MULTIPLE_KEY_FLAG;
+}
+
+uint16_t mysqlcursor::getColumnIsUnsigned(uint32_t col) {
+	return mysqlfields[col]->flags&UNSIGNED_FLAG;
+}
+
+uint16_t mysqlcursor::getColumnIsZeroFilled(uint32_t col) {
+	return mysqlfields[col]->flags&ZEROFILL_FLAG;
+}
+
+uint16_t mysqlcursor::getColumnIsBinary(uint32_t col) {
+	#ifdef BINARY_FLAG
+		return mysqlfields[col]->flags&BINARY_FLAG;
+	#else
+		return 0;
+	#endif
+}
+
+uint16_t mysqlcursor::getColumnIsAutoIncrement(uint32_t col) {
+	#ifdef AUTO_INCREMENT_FLAG
+		return mysqlfields[col]->flags&AUTO_INCREMENT_FLAG;
+	#else
+		return 0;
+	#endif
 }
 
 bool mysqlcursor::noRowsToReturn() {

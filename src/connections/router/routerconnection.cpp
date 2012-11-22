@@ -596,20 +596,27 @@ bool routercursor::outputBindCursor(const char *variable,
 	return true;
 }
 
-void routercursor::returnOutputBindBlob(uint16_t index) {
-	const char	*varname=obv[index].variable;
-	uint32_t	length=cur->getOutputBindLength(varname);
-	conn->startSendingLong(length);
-	conn->sendLongSegment(cur->getOutputBindBlob(varname),length);
-	conn->endSendingLong();
+bool routercursor::getLobOutputBindLength(uint16_t index, uint64_t *length) {
+	*length=cur->getOutputBindLength(obv[index].variable);
+	return true;
 }
 
-void routercursor::returnOutputBindClob(uint16_t index) {
+bool routercursor::getLobOutputBindSegment(uint16_t index,
+					char *buffer, uint64_t buffersize,
+					uint64_t offset, uint64_t charstoread,
+					uint64_t *charsread) {
 	const char	*varname=obv[index].variable;
+	const char	*var=cur->getOutputBindClob(varname);
+	if (!var) {
+		var=cur->getOutputBindBlob(varname);
+	}
 	uint32_t	length=cur->getOutputBindLength(varname);
-	conn->startSendingLong(length);
-	conn->sendLongSegment(cur->getOutputBindClob(varname),length);
-	conn->endSendingLong();
+	if (offset+charstoread>length) {
+		charstoread=length-offset;
+	}
+	rawbuffer::copy(buffer,var,charstoread);
+	*charsread=charstoread;
+	return true;
 }
 
 bool routercursor::executeQuery(const char *query, uint32_t length) {
@@ -817,29 +824,56 @@ uint16_t routercursor::columnTypeFormat() {
 	return (uint16_t)COLUMN_TYPE_NAMES;
 }
 
-void routercursor::returnColumnInfo() {
-	if (!cur) {
-		return;
-	}
-	for (uint32_t index=0; index<cur->colCount(); index++) {
-		const char	*name=cur->getColumnName(index);
-		const char	*typestring=cur->getColumnType(index);
-		conn->sendColumnDefinitionString(name,
-					charstring::length(name),
-					typestring,
-					charstring::length(typestring),
-					cur->getColumnLength(index),
-					cur->getColumnPrecision(index),
-					cur->getColumnScale(index),
-					cur->getColumnIsNullable(index),
-					cur->getColumnIsPrimaryKey(index),
-					cur->getColumnIsUnique(index),
-					cur->getColumnIsPartOfKey(index),
-					cur->getColumnIsUnsigned(index),
-					cur->getColumnIsZeroFilled(index),
-					cur->getColumnIsBinary(index),
-					cur->getColumnIsAutoIncrement(index));
-	}
+const char *routercursor::getColumnName(uint32_t col) {
+	return (cur)?cur->getColumnName(col):NULL;
+}
+
+const char *routercursor::getColumnTypeName(uint32_t col) {
+	return (cur)?cur->getColumnType(col):NULL;
+}
+
+uint32_t routercursor::getColumnLength(uint32_t col) {
+	return (cur)?cur->getColumnLength(col):0;
+}
+
+uint32_t routercursor::getColumnPrecision(uint32_t col) {
+	return (cur)?cur->getColumnPrecision(col):0;
+}
+
+uint32_t routercursor::getColumnScale(uint32_t col) {
+	return (cur)?cur->getColumnScale(col):0;
+}
+
+uint16_t routercursor::getColumnIsNullable(uint32_t col) {
+	return (cur)?cur->getColumnIsNullable(col):0;
+}
+
+uint16_t routercursor::getColumnIsPrimaryKey(uint32_t col) {
+	return (cur)?cur->getColumnIsPrimaryKey(col):0;
+}
+
+uint16_t routercursor::getColumnIsUnique(uint32_t col) {
+	return (cur)?cur->getColumnIsUnique(col):0;
+}
+
+uint16_t routercursor::getColumnIsPartOfKey(uint32_t col) {
+	return (cur)?cur->getColumnIsPartOfKey(col):0;
+}
+
+uint16_t routercursor::getColumnIsUnsigned(uint32_t col) {
+	return (cur)?cur->getColumnIsUnsigned(col):0;
+}
+
+uint16_t routercursor::getColumnIsZeroFilled(uint32_t col) {
+	return (cur)?cur->getColumnIsZeroFilled(col):0;
+}
+
+uint16_t routercursor::getColumnIsBinary(uint32_t col) {
+	return (cur)?cur->getColumnIsBinary(col):0;
+}
+
+uint16_t routercursor::getColumnIsAutoIncrement(uint32_t col) {
+	return (cur)?cur->getColumnIsAutoIncrement(col):0;
 }
 
 bool routercursor::noRowsToReturn() {

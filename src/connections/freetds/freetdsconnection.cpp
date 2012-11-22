@@ -500,8 +500,6 @@ bool freetdscursor::openCursor(uint16_t id) {
 		return true;
 	}
 
-	//freetdsconn->abortAllCursors();
-
 	clean=true;
 
 	cursornamelength=charstring::integerLength(id);
@@ -1152,6 +1150,14 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 				datalength[i],nullindicator[i])!=CS_SUCCEED) {
 				break;
 			}
+
+			// describe the columns
+			if (conn->sendColumnInfo()) {
+				if (ct_describe(cmd,i+1,&column[i])!=
+								CS_SUCCEED) {
+					break;
+				}
+			}
 		}
 
 	} else if (resultstype==CS_CMD_SUCCEED && knowsaffectedrows) {
@@ -1285,109 +1291,103 @@ uint16_t freetdscursor::columnTypeFormat() {
 	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
-void freetdscursor::returnColumnInfo() {
+const char *freetdscursor::getColumnName(uint32_t col) {
+	return column[col].name;
+}
 
-	// unless the query was a successful select, send no header
-	if (resultstype!=CS_ROW_RESULT &&
-#ifdef FREETDS_SUPPORTS_CURSORS
-			resultstype!=CS_CURSOR_RESULT &&
-#endif
-			resultstype!=CS_COMPUTE_RESULT) {
-		return;
+uint16_t freetdscursor::getColumnType(uint32_t col) {
+	switch (column[col].datatype) {
+		case CS_CHAR_TYPE:
+			return CHAR_DATATYPE;
+		case CS_INT_TYPE:
+			return INT_DATATYPE;
+		case CS_SMALLINT_TYPE:
+			return SMALLINT_DATATYPE;
+		case CS_TINYINT_TYPE:
+			return TINYINT_DATATYPE;
+		case CS_MONEY_TYPE:
+			return MONEY_DATATYPE;
+		case CS_DATETIME_TYPE:
+			return DATETIME_DATATYPE;
+		case CS_NUMERIC_TYPE:
+			return NUMERIC_DATATYPE;
+		case CS_DECIMAL_TYPE:
+			return DECIMAL_DATATYPE;
+		case CS_DATETIME4_TYPE:
+			return SMALLDATETIME_DATATYPE;
+		case CS_MONEY4_TYPE:
+			return SMALLMONEY_DATATYPE;
+		case CS_IMAGE_TYPE:
+			return IMAGE_DATATYPE;
+		case CS_BINARY_TYPE:
+			return BINARY_DATATYPE;
+		case CS_BIT_TYPE:
+			return BIT_DATATYPE;
+		case CS_REAL_TYPE:
+			return REAL_DATATYPE;
+		case CS_FLOAT_TYPE:
+			return FLOAT_DATATYPE;
+		case CS_TEXT_TYPE:
+			return TEXT_DATATYPE;
+		case CS_VARCHAR_TYPE:
+			return VARCHAR_DATATYPE;
+		case CS_VARBINARY_TYPE:
+			return VARBINARY_DATATYPE;
+		case CS_LONGCHAR_TYPE:
+			return LONGCHAR_DATATYPE;
+		case CS_LONGBINARY_TYPE:
+			return LONGBINARY_DATATYPE;
+		case CS_LONG_TYPE:
+			return LONG_DATATYPE;
+		case CS_ILLEGAL_TYPE:
+			return ILLEGAL_DATATYPE;
+		case CS_SENSITIVITY_TYPE:
+			return SENSITIVITY_DATATYPE;
+		case CS_BOUNDARY_TYPE:
+			return BOUNDARY_DATATYPE;
+		case CS_VOID_TYPE:
+			return VOID_DATATYPE;
+		case CS_USHORT_TYPE:
+			return USHORT_DATATYPE;
+		default:
+			return UNKNOWN_DATATYPE;
 	}
+}
 
-	// gonna need this later
-	int16_t	type;
-
-	// for each column...
-	for (CS_INT i=0; i<ncols; i++) {
-
-		// get the column description
-		if (ct_describe(cmd,i+1,&column[i])!=CS_SUCCEED) {
-			break;
-		}
-	
-		// set the datatype
-		uint16_t	binary=0;
-		if (column[i].datatype==CS_CHAR_TYPE) {
-			type=CHAR_DATATYPE;
-		} else if (column[i].datatype==CS_INT_TYPE) {
-			type=INT_DATATYPE;
-		} else if (column[i].datatype==CS_SMALLINT_TYPE) {
-			type=SMALLINT_DATATYPE;
-		} else if (column[i].datatype==CS_TINYINT_TYPE) {
-			type=TINYINT_DATATYPE;
-		} else if (column[i].datatype==CS_MONEY_TYPE) {
-			type=MONEY_DATATYPE;
-		} else if (column[i].datatype==CS_DATETIME_TYPE) {
-			type=DATETIME_DATATYPE;
-		} else if (column[i].datatype==CS_NUMERIC_TYPE) {
-			type=NUMERIC_DATATYPE;
-		} else if (column[i].datatype==CS_DECIMAL_TYPE) {
-			type=DECIMAL_DATATYPE;
-		} else if (column[i].datatype==CS_DATETIME4_TYPE) {
-			type=SMALLDATETIME_DATATYPE;
-		} else if (column[i].datatype==CS_MONEY4_TYPE) {
-			type=SMALLMONEY_DATATYPE;
-		} else if (column[i].datatype==CS_IMAGE_TYPE) {
-			type=IMAGE_DATATYPE;
-			binary=1;
-		} else if (column[i].datatype==CS_BINARY_TYPE) {
-			type=BINARY_DATATYPE;
-		} else if (column[i].datatype==CS_BIT_TYPE) {
-			type=BIT_DATATYPE;
-		} else if (column[i].datatype==CS_REAL_TYPE) {
-			type=REAL_DATATYPE;
-		} else if (column[i].datatype==CS_FLOAT_TYPE) {
-			type=FLOAT_DATATYPE;
-		} else if (column[i].datatype==CS_TEXT_TYPE) {
-			type=TEXT_DATATYPE;
-		} else if (column[i].datatype==CS_VARCHAR_TYPE) {
-			type=VARCHAR_DATATYPE;
-		} else if (column[i].datatype==CS_VARBINARY_TYPE) {
-			type=VARBINARY_DATATYPE;
-		} else if (column[i].datatype==CS_LONGCHAR_TYPE) {
-			type=LONGCHAR_DATATYPE;
-		} else if (column[i].datatype==CS_LONGBINARY_TYPE) {
-			type=LONGBINARY_DATATYPE;
-		} else if (column[i].datatype==CS_LONG_TYPE) {
-			type=LONG_DATATYPE;
-		} else if (column[i].datatype==CS_ILLEGAL_TYPE) {
-			type=ILLEGAL_DATATYPE;
-		} else if (column[i].datatype==CS_SENSITIVITY_TYPE) {
-			type=SENSITIVITY_DATATYPE;
-		} else if (column[i].datatype==CS_BOUNDARY_TYPE) {
-			type=BOUNDARY_DATATYPE;
-		} else if (column[i].datatype==CS_VOID_TYPE) {
-			type=VOID_DATATYPE;
-		} else if (column[i].datatype==CS_USHORT_TYPE) {
-			type=USHORT_DATATYPE;
-		} else {
-			type=UNKNOWN_DATATYPE;
-		}
-
-		// limit the column size
-		if (column[i].maxlength>MAX_ITEM_BUFFER_SIZE) {
-			column[i].maxlength=MAX_ITEM_BUFFER_SIZE;
-		}
-
-		// send the column definition
-		conn->sendColumnDefinition(column[i].name,
-					charstring::length(column[i].name),
-					type,
-					column[i].maxlength,
-					column[i].precision,
-					column[i].scale,
-					(column[i].status&CS_CANBENULL),
-					0,
-					0,
-					(column[i].status&
-						(CS_KEY|CS_VERSION_KEY)),
-					(type==USHORT_DATATYPE),
-					0,
-					binary,
-					(column[i].status&CS_IDENTITY));
+uint32_t freetdscursor::getColumnLength(uint32_t col) {
+	// limit the column size
+	if (column[col].maxlength>MAX_ITEM_BUFFER_SIZE) {
+		column[col].maxlength=MAX_ITEM_BUFFER_SIZE;
 	}
+	return column[col].maxlength;
+}
+
+uint32_t freetdscursor::getColumnPrecision(uint32_t col) {
+	return column[col].precision;
+}
+
+uint32_t freetdscursor::getColumnScale(uint32_t col) {
+	return column[col].scale;
+}
+
+uint16_t freetdscursor::getColumnIsNullable(uint32_t col) {
+	return (column[col].status&CS_CANBENULL);
+}
+
+uint16_t freetdscursor::getColumnIsPartOfKey(uint32_t col) {
+	return (column[col].status&(CS_KEY|CS_VERSION_KEY));
+}
+
+uint16_t freetdscursor::getColumnIsUnsigned(uint32_t col) {
+	return (getColumnType(col)==USHORT_DATATYPE);
+}
+
+uint16_t freetdscursor::getColumnIsBinary(uint32_t col) {
+	return (getColumnType(col)==IMAGE_DATATYPE);
+}
+
+uint16_t freetdscursor::getColumnIsAutoIncrement(uint32_t col) {
+	return (column[col].status&CS_IDENTITY);
 }
 
 bool freetdscursor::noRowsToReturn() {
