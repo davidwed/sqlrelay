@@ -32,10 +32,6 @@ firebirdconnection::~firebirdconnection() {
 	delete[] lastinsertidquery;
 }
 
-uint16_t firebirdconnection::getNumberOfConnectStringVars() {
-	return NUM_CONNECT_STRING_VARS;
-}
-
 void firebirdconnection::handleConnectString() {
 
 	// override legacy "database" parameter with modern "db" parameter

@@ -8,8 +8,6 @@
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	4096
 
-#define NUM_CONNECT_STRING_VARS 3
-
 #ifdef HAVE_IODBC
 	#include <iodbcinst.h>
 #endif
@@ -195,7 +193,6 @@ class odbccursor : public sqlrcursor_svr {
 class odbcconnection : public sqlrconnection_svr {
 	friend class odbccursor;
 	private:
-		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
 		bool		logIn(bool printerrors);
 		sqlrcursor_svr	*initCursor();

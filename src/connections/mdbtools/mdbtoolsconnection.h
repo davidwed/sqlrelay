@@ -4,8 +4,6 @@
 #ifndef MDBTOOLSCONNECTION_H
 #define MDBTOOLSCONNECTION_H
 
-#define NUM_CONNECT_STRING_VARS 1
-
 #include <sqlrconnection.h>
 #ifndef MAIN
 extern "C" {
@@ -84,7 +82,6 @@ class mdbtoolsconnection : public sqlrconnection_svr {
 	public:
 			mdbtoolsconnection();
 	private:
-		uint16_t	getNumberOfConnectStringVars();
 		void	handleConnectString();
 		bool	logIn(bool printerrors);
 		sqlrcursor_svr	*initCursor();

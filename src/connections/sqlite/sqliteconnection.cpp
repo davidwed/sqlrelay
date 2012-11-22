@@ -24,10 +24,6 @@ sqliteconnection::sqliteconnection() : sqlrconnection_svr() {
 	errcode=0;
 }
 
-uint16_t sqliteconnection::getNumberOfConnectStringVars() {
-	return NUM_CONNECT_STRING_VARS;
-}
-
 void sqliteconnection::handleConnectString() {
 	db=connectStringValue("db");
 }

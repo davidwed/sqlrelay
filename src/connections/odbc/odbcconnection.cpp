@@ -153,10 +153,6 @@ char *conv_to_ucs(char *inbuf)
 
 
 
-uint16_t odbcconnection::getNumberOfConnectStringVars() {
-	return NUM_CONNECT_STRING_VARS;
-}
-
 void odbcconnection::handleConnectString() {
 	dsn=connectStringValue("dsn");
 	setUser(connectStringValue("user"));

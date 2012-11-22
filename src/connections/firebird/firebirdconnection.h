@@ -4,8 +4,6 @@
 #ifndef FIREBIRDCONNECTION_H
 #define FIREBIRDCONNECTION_H
 
-#define NUM_CONNECT_STRING_VARS 6
-
 #include <rudiments/environment.h>
 #include <sqlrconnection.h>
 
@@ -159,7 +157,6 @@ class firebirdconnection : public sqlrconnection_svr {
 			firebirdconnection();
 			~firebirdconnection();
 	private:
-		uint16_t	getNumberOfConnectStringVars();
 		void	handleConnectString();
 		bool	logIn(bool printerrors);
 		sqlrcursor_svr	*initCursor();

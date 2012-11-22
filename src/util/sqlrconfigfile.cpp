@@ -71,7 +71,6 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	currentuser=NULL;
 	firstconnect=NULL;
 	currentconnect=NULL;
-	connectstringcount=0;
 	metrictotal=0;
 	maxlisteners=charstring::toInteger(DEFAULT_MAXLISTENERS);
 	listenertimeout=charstring::toUnsignedInteger(DEFAULT_LISTENERTIMEOUT);
@@ -623,13 +622,11 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			userlist.append(currentuser);
 			break;
 		case CONNECTION_TAG:
-			currentconnect=
-				new connectstringcontainer(connectstringcount);
+			currentconnect=new connectstringcontainer();
 			connectstringlist.append(currentconnect);
 			break;
 		case ROUTER_TAG:
-			currentconnect=
-				new connectstringcontainer(connectstringcount);
+			currentconnect=new connectstringcontainer();
 			connectstringlist.append(currentconnect);
 			currentconnect->setConnectionId(DEFAULT_CONNECTIONID);
 			currenttag=thistag;
@@ -1448,14 +1445,8 @@ void sqlrconfigfile::moveRegexList(routecontainer *cur,
 }
 
 bool sqlrconfigfile::parse(const char *config, const char *id) {
-	return parse(config,id,0);
-}
-
-bool sqlrconfigfile::parse(const char *config, const char *id,
-					uint16_t connectstringcount) {
 
 	// init some variables
-	this->connectstringcount=connectstringcount;
 	this->id=id;
 	correctid=false;
 	done=false;
@@ -1519,8 +1510,7 @@ const char *usercontainer::getPassword() {
 	return password;
 }
 
-connectstringcontainer::connectstringcontainer(uint16_t connectstringcount) {
-	this->connectstringcount=connectstringcount;
+connectstringcontainer::connectstringcontainer() {
 	connectionid=NULL;
 	string=NULL;
 	metric=charstring::toInteger(DEFAULT_METRIC);
@@ -1566,9 +1556,6 @@ bool connectstringcontainer::getBehindLoadBalancer() {
 }
 
 void connectstringcontainer::parseConnectString() {
-	if (!connectstringcount) {
-		return;
-	}
 	connectstring.parse(string);
 }
 

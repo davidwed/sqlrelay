@@ -59,10 +59,6 @@ oracle8connection::~oracle8connection() {
 	delete[] lastinsertidquery;
 }
 
-uint16_t oracle8connection::getNumberOfConnectStringVars() {
-	return NUM_CONNECT_STRING_VARS;
-}
-
 void oracle8connection::handleConnectString() {
 	setUser(connectStringValue("user"));
 	setPassword(connectStringValue("password"));
@@ -130,26 +126,14 @@ void oracle8connection::handleConnectString() {
 }
 
 #ifdef HAVE_ORACLE_8i
-void oracle8connection::dropTempTables(sqlrcursor_svr *cursor,
-					stringlist *tablelist) {
-
+bool oracle8connection::tempTableDropReLogIn() {
 	// When dropping temporary tables, if any of those tables were created
 	// with "on commit preserve rows" then the session has to exit before
 	// the table can be dropped or oracle will return the following error:
 	// ORA-14452: attempt to create, alter or drop an index on temporary
 	// table already in use
-	// It's not really clear why, but that's the case.  We'll accomplish
-	// this by re-logging in, then dropping the tables
-	if (tablelist==&sessiontemptablesfordrop &&
-					tablelist->getLength() &&
-					droptemptables) {
-		// FIXME: this is only necessary if a table was created with
-		// "on commit preserve rows", we should have a flag set for
-		// that.
-		reLogIn();
-	}
-
-	sqlrconnection_svr::dropTempTables(cursor,tablelist);
+	// It's not really clear why, but that's the case.
+	return true;
 }
 #endif
 

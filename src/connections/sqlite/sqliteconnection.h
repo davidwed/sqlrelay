@@ -4,8 +4,6 @@
 #ifndef SQLITECONNECTION_H
 #define SQLITECONNECTION_H
 
-#define NUM_CONNECT_STRING_VARS 1
-
 #include <sqlrconnection.h>
 #include <rudiments/regularexpression.h>
 
@@ -101,7 +99,6 @@ class sqliteconnection : public sqlrconnection_svr {
 	public:
 				sqliteconnection();
 	private:
-		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
 		bool		logIn(bool printerrors);
 		sqlrcursor_svr	*initCursor();

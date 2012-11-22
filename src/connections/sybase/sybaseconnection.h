@@ -8,8 +8,6 @@
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	4096
 
-#define NUM_CONNECT_STRING_VARS 10
-
 #include <rudiments/environment.h>
 #include <sqlrconnection.h>
 
@@ -183,7 +181,6 @@ class sybaseconnection : public sqlrconnection_svr {
 			sybaseconnection();
 			~sybaseconnection();
 	private:
-		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
 		bool		logIn(bool printerrors);
 		void		logInError(const char *error, uint16_t stage);
@@ -201,8 +198,7 @@ class sybaseconnection : public sqlrconnection_svr {
 		const char	*bindFormat();
 		const char	*beginTransactionQuery();
 		char		bindVariablePrefix();
-		void		dropTempTable(sqlrcursor_svr *cursor,
-						const char *tablename);
+		const char	*tempTableDropPrefix();
 		bool		commit();
 		bool		rollback();
 		void		errorMessage(char *errorbuffer,

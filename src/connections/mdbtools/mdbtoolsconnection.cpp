@@ -22,10 +22,6 @@ extern void mdb_remove_backends();
 mdbtoolsconnection::mdbtoolsconnection() : sqlrconnection_svr() {
 }
 
-uint16_t mdbtoolsconnection::getNumberOfConnectStringVars() {
-	return NUM_CONNECT_STRING_VARS;
-}
-
 void mdbtoolsconnection::handleConnectString() {
 	db=connectStringValue("db");
 }

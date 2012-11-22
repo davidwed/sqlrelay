@@ -4,8 +4,6 @@
 #ifndef POSTGRESQLCONNECTION_H
 #define POSTGRESQLCONNECTION_H
 
-#define NUM_CONNECT_STRING_VARS 8
-
 #include <sqlrconnection.h>
 
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
@@ -110,7 +108,6 @@ class postgresqlconnection : public sqlrconnection_svr {
 			postgresqlconnection();
 			~postgresqlconnection();
 	private:
-		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
 		bool		logIn(bool printerrors);
 		sqlrcursor_svr	*initCursor();

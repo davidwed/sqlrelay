@@ -7,68 +7,82 @@ include ../../config.mk
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) $(SIDINCLUDES) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPFLAG) -DSERVER_VERSION=\"$(SQLR_VERSION)\" -DLIBDIR=\"$(libdir)\"
 LIBS = -L$(top_builddir)/src/util -lsqlrutil $(SIDLIBS) $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
-SRCS = sqlrconnection/sqlrconnectionctor.cpp \
-	sqlrconnection/sqlrconnectiondtor.cpp \
-	sqlrconnection/flushwritebuffer.cpp \
-	sqlrconnection/initconnection.cpp \
-	sqlrconnection/ipc.cpp \
-	sqlrconnection/opensockets.cpp \
-	sqlrconnection/listen.cpp \
-	sqlrconnection/listenercomm.cpp \
-	sqlrconnection/clientsession.cpp \
-	sqlrconnection/clientsessioncount.cpp \
-	sqlrconnection/sessionqueries.cpp \
+SRCS = sqlrcontroller/sqlrconnectionctor.cpp \
+	sqlrcontroller/sqlrconnectiondtor.cpp \
+	sqlrcontroller/flushwritebuffer.cpp \
+	sqlrcontroller/initconnection.cpp \
+	sqlrcontroller/ipc.cpp \
+	sqlrcontroller/opensockets.cpp \
+	sqlrcontroller/listen.cpp \
+	sqlrcontroller/listenercomm.cpp \
+	sqlrcontroller/clientsession.cpp \
+	sqlrcontroller/clientsessioncount.cpp \
+	sqlrcontroller/sessionqueries.cpp \
+	sqlrcontroller/authenticate.cpp \
+	sqlrcontroller/suspendsession.cpp \
+	sqlrcontroller/endsession.cpp \
+	sqlrcontroller/selectdatabase.cpp \
+	sqlrcontroller/getcurrentdatabase.cpp \
+	sqlrcontroller/lastinsertid.cpp \
+	sqlrcontroller/ping.cpp \
+	sqlrcontroller/identify.cpp \
+	sqlrcontroller/begin.cpp \
+	sqlrcontroller/autocommit.cpp \
+	sqlrcontroller/commit.cpp \
+	sqlrcontroller/connectioncount.cpp \
+	sqlrcontroller/rollback.cpp \
+	sqlrcontroller/faketransactionblocks.cpp \
+	sqlrcontroller/newquery.cpp \
+	sqlrcontroller/getlist.cpp \
+	sqlrcontroller/handlequery.cpp \
+	sqlrcontroller/rewritequery.cpp \
+	sqlrcontroller/getbinds.cpp \
+	sqlrcontroller/reexecutequery.cpp \
+	sqlrcontroller/fetchfrombindcursor.cpp \
+	sqlrcontroller/fetchresultset.cpp \
+	sqlrcontroller/returnresultsetheader.cpp \
+	sqlrcontroller/sendrowcounts.cpp \
+	sqlrcontroller/returnoutputbindvalues.cpp \
+	sqlrcontroller/sendcolumns.cpp \
+	sqlrcontroller/returnresultsetdata.cpp \
+	sqlrcontroller/sendfield.cpp \
+	sqlrcontroller/abortresultset.cpp \
+	sqlrcontroller/suspendresultset.cpp \
+	sqlrcontroller/resumeresultset.cpp \
+	sqlrcontroller/closeconnection.cpp \
+	sqlrcontroller/closecursors.cpp \
+	sqlrcontroller/temptables.cpp \
+	sqlrcontroller/login.cpp \
+	sqlrcontroller/markdatabasedavailable.cpp \
+	sqlrcontroller/connectstringvalue.cpp \
+	sqlrcontroller/unixsocketseqfile.cpp \
+	sqlrcontroller/bindformat.cpp \
+	sqlrcontroller/dbversion.cpp \
+	sqlrcontroller/serverversion.cpp \
+	sqlrcontroller/handlesignals.cpp \
+	sqlrcontroller/main.cpp \
+	sqlrcontroller/error.cpp \
+	sqlrcontroller/user.cpp \
 	sqlrconnection/authenticate.cpp \
-	sqlrconnection/suspendsession.cpp \
-	sqlrconnection/endsession.cpp \
+	sqlrconnection/changeuser.cpp \
+	sqlrconnection/autocommit.cpp \
+	sqlrconnection/begin.cpp \
+	sqlrconnection/commit.cpp \
+	sqlrconnection/rollback.cpp \
+	sqlrconnection/faketransactionblocks.cpp \
 	sqlrconnection/selectdatabase.cpp \
 	sqlrconnection/getcurrentdatabase.cpp \
 	sqlrconnection/lastinsertid.cpp \
-	sqlrconnection/ping.cpp \
-	sqlrconnection/identify.cpp \
-	sqlrconnection/begin.cpp \
-	sqlrconnection/autocommit.cpp \
-	sqlrconnection/commit.cpp \
-	sqlrconnection/connectioncount.cpp \
-	sqlrconnection/rollback.cpp \
-	sqlrconnection/faketransactionblocks.cpp \
-	sqlrconnection/newquery.cpp \
-	sqlrconnection/getlist.cpp \
-	sqlrconnection/handlequery.cpp \
-	sqlrconnection/rewritequery.cpp \
-	sqlrconnection/getbinds.cpp \
-	sqlrconnection/reexecutequery.cpp \
-	sqlrconnection/fetchfrombindcursor.cpp \
-	sqlrconnection/fetchresultset.cpp \
-	sqlrconnection/returnresultsetheader.cpp \
-	sqlrconnection/sendrowcounts.cpp \
-	sqlrconnection/returnoutputbindvalues.cpp \
-	sqlrconnection/sendcolumns.cpp \
-	sqlrconnection/returnresultsetdata.cpp \
-	sqlrconnection/skiprows.cpp \
-	sqlrconnection/sendfield.cpp \
-	sqlrconnection/abortresultset.cpp \
-	sqlrconnection/suspendresultset.cpp \
-	sqlrconnection/resumeresultset.cpp \
-	sqlrconnection/closeconnection.cpp \
-	sqlrconnection/closecursors.cpp \
-	sqlrconnection/temptables.cpp \
-	sqlrconnection/changeuser.cpp \
-	sqlrconnection/login.cpp \
-	sqlrconnection/markdatabasedavailable.cpp \
-	sqlrconnection/getuser.cpp \
-	sqlrconnection/getpassword.cpp \
-	sqlrconnection/connectstringvalue.cpp \
-	sqlrconnection/istransactional.cpp \
-	sqlrconnection/bindparameters.cpp \
-	sqlrconnection/unixsocketseqfile.cpp \
-	sqlrconnection/bindformat.cpp \
-	sqlrconnection/dbversion.cpp \
-	sqlrconnection/serverversion.cpp \
-	sqlrconnection/handlesignals.cpp \
 	sqlrconnection/isolationlevel.cpp \
-	sqlrconnection/main.cpp \
-	sqlrconnection/error.cpp \
+	sqlrconnection/ping.cpp \
+	sqlrconnection/getlist.cpp \
+	sqlrconnection/bindformat.cpp \
+	sqlrconnection/bindparameters.cpp \
+	sqlrconnection/skiprows.cpp \
+	sqlrconnection/istransactional.cpp \
+	sqlrconnection/temptables.cpp \
+	sqlrconnection/endsession.cpp \
+	sqlrconnection/rewritequery.cpp \
 	sqlrcursor/sqlrcursorctor.cpp \
 	sqlrcursor/sqlrcursordtor.cpp \
 	sqlrcursor/openclose.cpp \
@@ -117,68 +131,82 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqlrqueries/sqlrqueries.cpp \
 	sqlrqueries/sqlrquery.cpp
 
-LOBJS = sqlrconnection/sqlrconnectionctor.lo \
-	sqlrconnection/sqlrconnectiondtor.lo \
-	sqlrconnection/flushwritebuffer.lo \
-	sqlrconnection/initconnection.lo \
-	sqlrconnection/ipc.lo \
-	sqlrconnection/opensockets.lo \
-	sqlrconnection/listen.lo \
-	sqlrconnection/listenercomm.lo \
-	sqlrconnection/clientsession.lo \
-	sqlrconnection/clientsessioncount.lo \
-	sqlrconnection/sessionqueries.lo \
+LOBJS = sqlrcontroller/sqlrconnectionctor.lo \
+	sqlrcontroller/sqlrconnectiondtor.lo \
+	sqlrcontroller/flushwritebuffer.lo \
+	sqlrcontroller/initconnection.lo \
+	sqlrcontroller/ipc.lo \
+	sqlrcontroller/opensockets.lo \
+	sqlrcontroller/listen.lo \
+	sqlrcontroller/listenercomm.lo \
+	sqlrcontroller/clientsession.lo \
+	sqlrcontroller/clientsessioncount.lo \
+	sqlrcontroller/sessionqueries.lo \
+	sqlrcontroller/authenticate.lo \
+	sqlrcontroller/suspendsession.lo \
+	sqlrcontroller/endsession.lo \
+	sqlrcontroller/selectdatabase.lo \
+	sqlrcontroller/getcurrentdatabase.lo \
+	sqlrcontroller/lastinsertid.lo \
+	sqlrcontroller/ping.lo \
+	sqlrcontroller/identify.lo \
+	sqlrcontroller/begin.lo \
+	sqlrcontroller/autocommit.lo \
+	sqlrcontroller/commit.lo \
+	sqlrcontroller/connectioncount.lo \
+	sqlrcontroller/rollback.lo \
+	sqlrcontroller/faketransactionblocks.lo \
+	sqlrcontroller/newquery.lo \
+	sqlrcontroller/getlist.lo \
+	sqlrcontroller/handlequery.lo \
+	sqlrcontroller/rewritequery.lo \
+	sqlrcontroller/getbinds.lo \
+	sqlrcontroller/reexecutequery.lo \
+	sqlrcontroller/fetchfrombindcursor.lo \
+	sqlrcontroller/fetchresultset.lo \
+	sqlrcontroller/returnresultsetheader.lo \
+	sqlrcontroller/sendrowcounts.lo \
+	sqlrcontroller/returnoutputbindvalues.lo \
+	sqlrcontroller/sendcolumns.lo \
+	sqlrcontroller/returnresultsetdata.lo \
+	sqlrcontroller/sendfield.lo \
+	sqlrcontroller/abortresultset.lo \
+	sqlrcontroller/suspendresultset.lo \
+	sqlrcontroller/resumeresultset.lo \
+	sqlrcontroller/closeconnection.lo \
+	sqlrcontroller/closecursors.lo \
+	sqlrcontroller/temptables.lo \
+	sqlrcontroller/login.lo \
+	sqlrcontroller/markdatabasedavailable.lo \
+	sqlrcontroller/connectstringvalue.lo \
+	sqlrcontroller/unixsocketseqfile.lo \
+	sqlrcontroller/bindformat.lo \
+	sqlrcontroller/dbversion.lo \
+	sqlrcontroller/serverversion.lo \
+	sqlrcontroller/handlesignals.lo \
+	sqlrcontroller/main.lo \
+	sqlrcontroller/error.lo \
+	sqlrcontroller/user.lo \
 	sqlrconnection/authenticate.lo \
-	sqlrconnection/suspendsession.lo \
-	sqlrconnection/endsession.lo \
+	sqlrconnection/changeuser.lo \
+	sqlrconnection/autocommit.lo \
+	sqlrconnection/begin.lo \
+	sqlrconnection/commit.lo \
+	sqlrconnection/rollback.lo \
+	sqlrconnection/faketransactionblocks.lo \
 	sqlrconnection/selectdatabase.lo \
 	sqlrconnection/getcurrentdatabase.lo \
 	sqlrconnection/lastinsertid.lo \
-	sqlrconnection/ping.lo \
-	sqlrconnection/identify.lo \
-	sqlrconnection/begin.lo \
-	sqlrconnection/autocommit.lo \
-	sqlrconnection/commit.lo \
-	sqlrconnection/connectioncount.lo \
-	sqlrconnection/rollback.lo \
-	sqlrconnection/faketransactionblocks.lo \
-	sqlrconnection/newquery.lo \
-	sqlrconnection/getlist.lo \
-	sqlrconnection/handlequery.lo \
-	sqlrconnection/rewritequery.lo \
-	sqlrconnection/getbinds.lo \
-	sqlrconnection/reexecutequery.lo \
-	sqlrconnection/fetchfrombindcursor.lo \
-	sqlrconnection/fetchresultset.lo \
-	sqlrconnection/returnresultsetheader.lo \
-	sqlrconnection/sendrowcounts.lo \
-	sqlrconnection/returnoutputbindvalues.lo \
-	sqlrconnection/sendcolumns.lo \
-	sqlrconnection/returnresultsetdata.lo \
-	sqlrconnection/skiprows.lo \
-	sqlrconnection/sendfield.lo \
-	sqlrconnection/abortresultset.lo \
-	sqlrconnection/suspendresultset.lo \
-	sqlrconnection/resumeresultset.lo \
-	sqlrconnection/closeconnection.lo \
-	sqlrconnection/closecursors.lo \
-	sqlrconnection/temptables.lo \
-	sqlrconnection/changeuser.lo \
-	sqlrconnection/login.lo \
-	sqlrconnection/markdatabasedavailable.lo \
-	sqlrconnection/getuser.lo \
-	sqlrconnection/getpassword.lo \
-	sqlrconnection/connectstringvalue.lo \
-	sqlrconnection/istransactional.lo \
-	sqlrconnection/bindparameters.lo \
-	sqlrconnection/unixsocketseqfile.lo \
-	sqlrconnection/bindformat.lo \
-	sqlrconnection/dbversion.lo \
-	sqlrconnection/serverversion.lo \
-	sqlrconnection/handlesignals.lo \
 	sqlrconnection/isolationlevel.lo \
-	sqlrconnection/main.lo \
-	sqlrconnection/error.lo \
+	sqlrconnection/ping.lo \
+	sqlrconnection/getlist.lo \
+	sqlrconnection/bindformat.lo \
+	sqlrconnection/bindparameters.lo \
+	sqlrconnection/skiprows.lo \
+	sqlrconnection/istransactional.lo \
+	sqlrconnection/temptables.lo \
+	sqlrconnection/endsession.lo \
+	sqlrconnection/rewritequery.lo \
 	sqlrcursor/sqlrcursorctor.lo \
 	sqlrcursor/sqlrcursordtor.lo \
 	sqlrcursor/openclose.lo \

@@ -40,10 +40,6 @@ mysqlconnection::~mysqlconnection() {
 	delete[] dbversion;
 }
 
-uint16_t mysqlconnection::getNumberOfConnectStringVars() {
-	return NUM_CONNECT_STRING_VARS;
-}
-
 void mysqlconnection::handleConnectString() {
 	setUser(connectStringValue("user"));
 	setPassword(connectStringValue("password"));

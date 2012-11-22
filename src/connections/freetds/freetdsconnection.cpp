@@ -41,10 +41,6 @@ freetdsconnection::~freetdsconnection() {
 	delete[] dbversion;
 }
 
-uint16_t freetdsconnection::getNumberOfConnectStringVars() {
-	return NUM_CONNECT_STRING_VARS;
-}
-
 void freetdsconnection::handleConnectString() {
 	sybase=connectStringValue("sybase");
 	lang=connectStringValue("lang");
@@ -1643,17 +1639,8 @@ CS_RETCODE freetdsconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 	return CS_SUCCEED;
 }
 
-
-void freetdsconnection::dropTempTable(sqlrcursor_svr *cursor,
-					const char *tablename) {
-	stringbuffer	dropquery;
-	dropquery.append("drop table #")->append(tablename);
-	if (cursor->prepareQuery(dropquery.getString(),
-					dropquery.getStringLength())) {
-		cursor->executeQuery(dropquery.getString(),
-					dropquery.getStringLength());
-	}
-	cursor->cleanUpData(true,true);
+const char *freetdsconnection::tempTableDropPrefix() {
+	return "#";
 }
 
 bool freetdsconnection::commit() {

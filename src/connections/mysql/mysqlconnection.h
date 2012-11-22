@@ -13,11 +13,8 @@
 #include <mysql.h>
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	#define NUM_CONNECT_STRING_VARS 7
 	#define MAX_SELECT_LIST_SIZE	256
 	#define MAX_ITEM_BUFFER_SIZE	32768
-#else
-	#define NUM_CONNECT_STRING_VARS 6
 #endif
 
 class mysqlconnection;
@@ -149,7 +146,6 @@ class mysqlconnection : public sqlrconnection_svr {
 				mysqlconnection();
 				~mysqlconnection();
 	private:
-		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
 		bool		logIn(bool printerrors);
 #ifdef HAVE_MYSQL_CHANGE_USER

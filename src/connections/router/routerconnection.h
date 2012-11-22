@@ -200,7 +200,6 @@ class routerconnection : public sqlrconnection_svr {
 			~routerconnection();
 	private:
 		bool		supportsAuthOnDatabase();
-		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
 		bool		logIn(bool printerrors);
 		sqlrcursor_svr	*initCursor();

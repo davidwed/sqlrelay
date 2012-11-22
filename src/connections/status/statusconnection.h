@@ -4,8 +4,6 @@
 #ifndef STATUSCONNECTION_H
 #define STATUSCONNECTION_H
 
-#define NUM_CONNECT_STRING_VARS 6
-
 #include <sqlrconnection.h>
 
 
@@ -18,7 +16,6 @@ class statusconnection : public sqlrconnection_svr {
 		bool			init(int argc, const char **argv);
 		semaphoreset		*getSemset();
 	private:
-		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
 		bool		logIn(bool printerrors);
 		sqlrcursor_svr	*initCursor();

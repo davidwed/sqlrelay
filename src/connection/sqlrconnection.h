@@ -54,35 +54,51 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		// interface definition
 		virtual bool	supportsAuthOnDatabase();
 		virtual	void	handleConnectString()=0;
+
 		virtual	bool	logIn(bool printerrors)=0;
 		virtual void	reLogIn();
 		virtual	void	logOut()=0;
+
 		virtual	bool	changeUser(const char *newuser,
 						const char *newpassword);
+
 		virtual bool	autoCommitOn();
 		virtual bool	autoCommitOff();
-		virtual bool	begin();
+
+		virtual bool	isTransactional();
+		virtual bool	supportsTransactionBlocks();
+
+		virtual bool		begin();
+		virtual const char	*beginTransactionQuery();
+
 		virtual bool	commit();
 		virtual bool	rollback();
+
 		virtual	void	errorMessage(char *errorbuffer,
 						uint32_t errorbuffersize,
 						uint32_t *errorlength,
 						int64_t *errorcode,
 						bool *liveconnection)=0;
-		virtual bool	supportsTransactionBlocks();
+
 		virtual bool		selectDatabase(const char *database);
 		virtual const char	*selectDatabaseQuery();
+
 		virtual char		*getCurrentDatabase();
 		virtual const char	*getCurrentDatabaseQuery();
+
 		virtual bool		getLastInsertId(uint64_t *id);
 		virtual const char	*getLastInsertIdQuery();
+
 		virtual bool		setIsolationLevel(const char *isolevel);
 		virtual const char	*setIsolationLevelQuery();
-		virtual const char	*pingQuery();
-		virtual const char	*beginTransactionQuery();
+
 		virtual bool		ping();
+		virtual const char	*pingQuery();
+
 		virtual const char	*identify()=0;
+
 		virtual	const char	*dbVersion()=0;
+
 		virtual bool		getListsByApiCalls();
 		virtual bool		getDatabaseList(
 						sqlrcursor_svr *cursor,
@@ -97,27 +113,21 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual const char	*getDatabaseListQuery(bool wild);
 		virtual const char	*getTableListQuery(bool wild);
 		virtual const char	*getColumnListQuery(bool wild);
-		virtual	const char	*bindFormat();
+
 		virtual sqlrcursor_svr	*initCursor()=0;
 		virtual void	deleteCursor(sqlrcursor_svr *curs)=0;
+
+		virtual	const char	*bindFormat();
 		virtual	int16_t	nonNullBindValue();
 		virtual	int16_t	nullBindValue();
 		virtual char	bindVariablePrefix();
 		virtual bool	bindValueIsNull(int16_t isnull);
+
 		virtual	bool	skipRows(sqlrcursor_svr *cursor, uint64_t rows);
-		virtual bool	isTransactional();
-		virtual void	setUser(const char *user);
-		virtual void	setPassword(const char *password);
-		virtual const char	*getUser();
-		virtual const char	*getPassword();
-		virtual void	dropTempTables(sqlrcursor_svr *cursor,
-						stringlist *tablelist);
-		virtual void	dropTempTable(sqlrcursor_svr *cursor,
-						const char *tablename);
-		virtual void	truncateTempTables(sqlrcursor_svr *cursor,
-						stringlist *tablelist);
-		virtual void	truncateTempTable(sqlrcursor_svr *cursor,
-						const char *tablename);
+
+		virtual const char	*tempTableDropPrefix();
+		virtual bool		tempTableDropReLogIn();
+
 		virtual void	endSession();
 
 		virtual sqltranslations	*getSqlTranslations();
@@ -129,6 +139,10 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void		setAutoCommitBehavior(bool ac);
 		void		setFakeTransactionBlocksBehavior(bool ftb);
 		void		setFakeInputBinds(bool fake);
+		void		setUser(const char *user);
+		void		setPassword(const char *password);
+		const char	*getUser();
+		const char	*getPassword();
 		bool		sendColumnInfo();
 		void		addSessionTempTableForDrop(
 						const char *tablename);
@@ -377,6 +391,15 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	returnError(bool disconnect);
 		void	returnError(sqlrcursor_svr *cursor, bool disconnect);
 
+		void	dropTempTables(sqlrcursor_svr *cursor,
+						stringlist *tablelist);
+		void	dropTempTable(sqlrcursor_svr *cursor,
+						const char *tablename);
+		void	truncateTempTables(sqlrcursor_svr *cursor,
+						stringlist *tablelist);
+		void	truncateTempTable(sqlrcursor_svr *cursor,
+						const char *tablename);
+
 		void	initDatabaseAvailableFileName();
 		void	waitForAvailableDatabase();
 		bool	availableDatabase();
@@ -400,8 +423,8 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		static	signalhandler		*sigh;
 		static volatile sig_atomic_t	shutdowninprogress;
 
-		char		*user;
-		char		*password;
+		const char	*user;
+		const char	*password;
 
 		bool		dbselected;
 		char		*originaldb;

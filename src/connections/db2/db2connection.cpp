@@ -11,10 +11,6 @@
 
 #include <stdlib.h>
 
-uint16_t db2connection::getNumberOfConnectStringVars() {
-	return NUM_CONNECT_STRING_VARS;
-}
-
 void db2connection::handleConnectString() {
 
 	// override legacy "server" parameter with modern "db" parameter

@@ -100,8 +100,7 @@ typedef rudiments::linkedlistnode< usercontainer * >	usernode;
 
 class SQLRUTIL_DLLSPEC connectstringcontainer {
 	public:
-				connectstringcontainer(
-						uint16_t connectstringcount);
+				connectstringcontainer();
 				~connectstringcontainer();
 		void		parseConnectString();
 		void		setConnectionId(const char *connectionid);
@@ -122,7 +121,6 @@ class SQLRUTIL_DLLSPEC connectstringcontainer {
 
 		// connect string parameters
 		rudiments::parameterstring	connectstring;
-		uint16_t			connectstringcount;
 };
 
 typedef rudiments::linkedlistnode< connectstringcontainer * >	
@@ -167,8 +165,6 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 			sqlrconfigfile();
 			~sqlrconfigfile();
 		bool	parse(const char *config, const char *id);
-		bool	parse(const char *config, const char *id,
-						uint16_t connectstringcount);
 		const char * const *getAddresses();
 		uint64_t	getAddressCount();
 		uint16_t	getPort();
@@ -351,8 +347,6 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		uint32_t		metrictotal;
 
 		routecontainer		*currentroute;
-
-		uint16_t	connectstringcount;
 
 		rudiments::linkedlist< connectstringcontainer * >	
 							connectstringlist;

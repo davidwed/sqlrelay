@@ -27,10 +27,6 @@ sybaseconnection::~sybaseconnection() {
 	delete[] dbversion;
 }
 
-uint16_t sybaseconnection::getNumberOfConnectStringVars() {
-	return NUM_CONNECT_STRING_VARS;
-}
-
 void sybaseconnection::handleConnectString() {
 	sybase=connectStringValue("sybase");
 	lang=connectStringValue("lang");
@@ -1446,17 +1442,8 @@ CS_RETCODE sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 	return CS_SUCCEED;
 }
 
-
-void sybaseconnection::dropTempTable(sqlrcursor_svr *cursor,
-					const char *tablename) {
-	stringbuffer	dropquery;
-	dropquery.append("drop table #")->append(tablename);
-	if (cursor->prepareQuery(dropquery.getString(),
-					dropquery.getStringLength())) {
-		cursor->executeQuery(dropquery.getString(),
-					dropquery.getStringLength());
-	}
-	cursor->cleanUpData(true,true);
+const char *sybaseconnection::tempTableDropPrefix() {
+	return "#";
 }
 
 bool sybaseconnection::commit() {

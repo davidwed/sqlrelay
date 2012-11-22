@@ -9,8 +9,6 @@
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	32768
 
-#define NUM_CONNECT_STRING_VARS 6
-
 #include <sqlrconnection.h>
 #include <sqlwriter.h>
 #ifdef HAVE_ORACLE_8i
@@ -313,11 +311,9 @@ class oracle8connection : public sqlrconnection_svr {
 				oracle8connection();
 				~oracle8connection();
 	private:
-		uint16_t	getNumberOfConnectStringVars();
 		void		handleConnectString();
 #ifdef HAVE_ORACLE_8i
-		void		dropTempTables(sqlrcursor_svr *cursor,
-						stringlist *tablelist);
+		bool		tempTableDropReLogIn();
 #endif
 		bool		logIn(bool printerrors);
 		void		logInError(const char *errmsg);

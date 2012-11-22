@@ -34,10 +34,6 @@ postgresqlconnection::~postgresqlconnection() {
 	delete[] lastinsertidquery;
 }
 
-uint16_t postgresqlconnection::getNumberOfConnectStringVars() {
-	return NUM_CONNECT_STRING_VARS;
-}
-
 void postgresqlconnection::handleConnectString() {
 	host=connectStringValue("host");
 	port=connectStringValue("port");

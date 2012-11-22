@@ -12,8 +12,6 @@
 
 //#define FREETDS_SUPPORTS_CURSORS
 
-#define NUM_CONNECT_STRING_VARS 10
-
 #include <rudiments/environment.h>
 #include <sqlrconnection.h>
 
@@ -196,7 +194,6 @@ class freetdsconnection : public sqlrconnection_svr {
 			freetdsconnection();
 			~freetdsconnection();
 	private:
-		uint16_t	getNumberOfConnectStringVars();
 		void	handleConnectString();
 		bool	logIn(bool printerrors);
 		void	logInError(const char *error, uint16_t stage);
@@ -214,8 +211,7 @@ class freetdsconnection : public sqlrconnection_svr {
 		const char	*bindFormat();
 		const char	*beginTransactionQuery();
 		char	bindVariablePrefix();
-		void	dropTempTable(sqlrcursor_svr *cursor,
-					const char *tablename);
+		const char	*tempTableDropPrefix();
 		bool		commit();
 		bool		rollback();
 		void		errorMessage(char *errorbuffer,

@@ -45,8 +45,7 @@ bool statusconnection::init(int argc, const char **argv) {
 	cfgfl=new sqlrconfigfile();
 	tmpdir=new tempdir(cmdl);
 
-	if (!cfgfl->parse(cmdl->getConfig(),cmdl->getId(),
-					getNumberOfConnectStringVars())) {
+	if (!cfgfl->parse(cmdl->getConfig(),cmdl->getId())) {
 		return false;
 	}
 
@@ -125,10 +124,6 @@ bool statusconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
 
 statusconnection::statusconnection() : sqlrconnection_svr() {
 	connected=false;
-}
-
-uint16_t statusconnection::getNumberOfConnectStringVars() {
-	return 0;
 }
 
 void statusconnection::handleConnectString() {

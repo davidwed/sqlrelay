@@ -8,8 +8,6 @@
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	4096
 
-#define NUM_CONNECT_STRING_VARS 5
-
 #include <sqlrconnection.h>
 
 #include <sqlcli1.h>
@@ -173,7 +171,6 @@ class db2cursor : public sqlrcursor_svr {
 class db2connection : public sqlrconnection_svr {
 	friend class db2cursor;
 	private:
-		uint16_t	getNumberOfConnectStringVars();
 		void	handleConnectString();
 		bool	logIn(bool printerrors);
 		sqlrcursor_svr	*initCursor();
