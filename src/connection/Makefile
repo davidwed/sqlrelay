@@ -74,7 +74,7 @@ SRCS = sqlrconnection/sqlrconnectionctor.cpp \
 	sqlrcursor/openclose.cpp \
 	sqlrcursor/preparequery.cpp \
 	sqlrcursor/queryparse.cpp \
-	sqlrcursor/returnresultset.cpp \
+	sqlrcursor/resultset.cpp \
 	sqlrcursor/binds.cpp \
 	sqlrcursor/fakebinds.cpp \
 	sqlrcursor/translatequery.cpp \
@@ -184,7 +184,7 @@ LOBJS = sqlrconnection/sqlrconnectionctor.lo \
 	sqlrcursor/openclose.lo \
 	sqlrcursor/preparequery.lo \
 	sqlrcursor/queryparse.lo \
-	sqlrcursor/returnresultset.lo \
+	sqlrcursor/resultset.lo \
 	sqlrcursor/binds.lo \
 	sqlrcursor/fakebinds.lo \
 	sqlrcursor/translatequery.lo \

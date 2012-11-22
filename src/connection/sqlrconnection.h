@@ -53,7 +53,6 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 	protected:
 		// interface definition
 		virtual bool	supportsAuthOnDatabase();
-		virtual	uint16_t	getNumberOfConnectStringVars()=0;
 		virtual	void	handleConnectString()=0;
 		virtual	bool	logIn(bool printerrors)=0;
 		virtual void	reLogIn();
