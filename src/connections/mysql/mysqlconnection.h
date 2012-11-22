@@ -186,9 +186,8 @@ class mysqlconnection : public sqlrconnection_svr {
 
 		char	*dbversion;
 
-#ifdef HAVE_MYSQL_OPT_RECONNECT
 		static const my_bool	mytrue;
-#endif
+		static const my_bool	myfalse;
 
 		bool		firstquery;
 };

@@ -24,9 +24,8 @@
 #define FALSE (0)
 #endif
 
-#ifdef HAVE_MYSQL_OPT_RECONNECT
 const my_bool	mysqlconnection::mytrue=TRUE;
-#endif
+const my_bool	mysqlconnection::myfalse=FALSE;
 
 mysqlconnection::mysqlconnection() : sqlrconnection_svr() {
 	connected=false;
@@ -430,7 +429,9 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	bindcounter=0;
 
 	// re-init bind buffers
-	rawbuffer::zero(&bind,sizeof(bind));
+	for (uint16_t i=0; i<conn->maxbindcount; i++) {
+		rawbuffer::zero(&bind[i],sizeof(MYSQL_BIND));
+	}
 
 	// prepare the statement
 	if (!mysql_stmt_prepare(stmt,query,length)) {
@@ -501,18 +502,11 @@ bool mysqlcursor::inputBindInteger(const char *variable,
 
 	bindvaluesize[bindcounter]=sizeof(int64_t);
 
-	if (*isnull) {
-		bind[bindcounter].buffer_type=MYSQL_TYPE_NULL;
-		bind[bindcounter].buffer=(void *)NULL;
-		bind[bindcounter].buffer_length=0;
-		bind[bindcounter].length=0;
-	} else {
-		bind[bindcounter].buffer_type=MYSQL_TYPE_LONGLONG;
-		bind[bindcounter].buffer=(void *)value;
-		bind[bindcounter].buffer_length=sizeof(int64_t);
-		bind[bindcounter].length=&bindvaluesize[bindcounter];
-	}
-	bind[bindcounter].is_null=(my_bool *)isnull;
+	bind[bindcounter].buffer_type=MYSQL_TYPE_LONGLONG;
+	bind[bindcounter].buffer=(void *)value;
+	bind[bindcounter].buffer_length=sizeof(int64_t);
+	bind[bindcounter].length=&bindvaluesize[bindcounter];
+	bind[bindcounter].is_null=(my_bool *)&(mysqlconn->myfalse);
 	bindcounter++;
 
 	return true;
@@ -536,18 +530,11 @@ bool mysqlcursor::inputBindDouble(const char *variable,
 
 	bindvaluesize[bindcounter]=sizeof(double);
 
-	if (*isnull) {
-		bind[bindcounter].buffer_type=MYSQL_TYPE_NULL;
-		bind[bindcounter].buffer=(void *)NULL;
-		bind[bindcounter].buffer_length=0;
-		bind[bindcounter].length=0;
-	} else {
-		bind[bindcounter].buffer_type=MYSQL_TYPE_DOUBLE;
-		bind[bindcounter].buffer=(void *)value;
-		bind[bindcounter].buffer_length=sizeof(double);
-		bind[bindcounter].length=&bindvaluesize[bindcounter];
-	}
-	bind[bindcounter].is_null=(my_bool *)isnull;
+	bind[bindcounter].buffer_type=MYSQL_TYPE_DOUBLE;
+	bind[bindcounter].buffer=(void *)value;
+	bind[bindcounter].buffer_length=sizeof(double);
+	bind[bindcounter].length=&bindvaluesize[bindcounter];
+	bind[bindcounter].is_null=(my_bool *)&(mysqlconn->myfalse);
 	bindcounter++;
 
 	return true;
@@ -1061,7 +1048,9 @@ void mysqlcursor::cleanUpData(bool freeresult, bool freebinds) {
 	if (usestmtprepare) {
 		if (freebinds) {
 			bindcounter=0;
-			rawbuffer::zero(&bind,sizeof(bind));
+			for (uint16_t i=0; i<conn->maxbindcount; i++) {
+				rawbuffer::zero(&bind[i],sizeof(MYSQL_BIND));
+			}
 			mysql_stmt_reset(stmt);
 		}
 		if (freeresult && stmtfreeresult) {
