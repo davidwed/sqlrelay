@@ -74,22 +74,23 @@ class sqlrshenv {
 			~sqlrshenv();
 		void	 clearbinds(
 			stringdictionary< sqlrshbindvalue * > *binds);
-		bool	color;
-		bool	headers;
-		bool	stats;
-		bool	debug;
-		bool	final;
-		bool	autocommit;
-		char	delimiter;
+
+		bool		headers;
+		bool		stats;
+		bool		debug;
+		uint64_t	rsbs;
+		bool		final;
+		bool		autocommit;
+		char		delimiter;
 		stringdictionary< sqlrshbindvalue * >	inputbinds;
 		stringdictionary< sqlrshbindvalue * >	outputbinds;
 };
 
 sqlrshenv::sqlrshenv() {
-	color=false;
 	headers=true;
 	stats=true;
 	debug=false;
+	rsbs=100;
 	final=false;
 	autocommit=false;
 	delimiter=';';
@@ -369,8 +370,7 @@ int sqlrsh::commandType(const char *command) {
 	}
 
 	// compare to known internal commands
-	if (!charstring::compareIgnoringCase(ptr,"color",5) ||
-		!charstring::compareIgnoringCase(ptr,"headers",7) ||
+	if (!charstring::compareIgnoringCase(ptr,"headers",7) ||
 		!charstring::compareIgnoringCase(ptr,"stats",5) ||
 		!charstring::compareIgnoringCase(ptr,"debug",5) ||
 		!charstring::compareIgnoringCase(ptr,"autocommit",10) ||
@@ -397,7 +397,11 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"clearbinds") ||
 		!charstring::compareIgnoringCase(ptr,"lastinsertid") ||
 		!charstring::compareIgnoringCase(ptr,"setclientinfo ",14) ||
-		!charstring::compareIgnoringCase(ptr,"getclientinfo")) {
+		!charstring::compareIgnoringCase(ptr,"getclientinfo") ||
+		!charstring::compareIgnoringCase(ptr,
+					"setresultsetbuffersize ",23) ||
+		!charstring::compareIgnoringCase(ptr,
+					"getresultsetbuffersize")) {
 
 		// return value of 1 is internal command
 		return 1;
@@ -424,10 +428,7 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 
 	// compare to known internal commands
 	int	cmdtype=0;
-	if (!charstring::compareIgnoringCase(ptr,"color",5)) {
-		ptr=ptr+5;
-		cmdtype=1;
-	} else if (!charstring::compareIgnoringCase(ptr,"headers",7)) {
+	if (!charstring::compareIgnoringCase(ptr,"headers",7)) {
 		ptr=ptr+7;
 		cmdtype=2;
 	} else if (!charstring::compareIgnoringCase(ptr,"stats",5)) {	
@@ -515,6 +516,18 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr,"getclientinfo")) {	
 		getclientinfo(sqlrcon);
 		return;
+	} else if (!charstring::compareIgnoringCase(
+					ptr,"setresultsetbuffersize ",23)) {	
+		ptr=ptr+23;
+		env->rsbs=charstring::toInteger(ptr);
+		if (!env->rsbs) {
+			env->rsbs=100;
+		}
+		return;
+	} else if (!charstring::compareIgnoringCase(
+					ptr,"getresultsetbuffersize")) {	
+		printf("%lld\n",env->rsbs);
+		return;
 	} else {
 		return;
 	}
@@ -537,9 +550,7 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	}
 
 	// set parameter
-	if (cmdtype==1) {
-		env->color=toggle;
-	} else if (cmdtype==2) {
+	if (cmdtype==2) {
 		env->headers=toggle;
 	} else if (cmdtype==3) {
 		env->stats=toggle;
@@ -619,7 +630,7 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 
 	} else {
 
-		sqlrcur->setResultSetBufferSize(100);
+		sqlrcur->setResultSetBufferSize(env->rsbs);
 
 		// send the query
 		if (!charstring::compareIgnoringCase(command,
@@ -1249,8 +1260,6 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	printf("shows the current database/schema\n");
 	printf("	run script		- ");
 	printf("runs commands contained in file \"script\"\n");
-	printf("	color on/off		- ");
-	printf("toggles colorizing\n");
 	printf("	headers on/off		- ");
 	printf("toggles column descriptions before result set\n");
 	printf("	stats on/off		- ");
@@ -1301,6 +1310,8 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	printf("		returns a list of column names for the table \"table\"\n\n");
 	printf("	setclientinfo info	- sets the client info\n");
 	printf("	getclientinfo		- displays the client info\n\n");
+	printf("	setresultsetbuffersize size	- fetch size rows at a time\n");
+	printf("	getresultsetbuffersize 		- shows rows fetched at a time\n\n");
 	printf("	exit/quit		- ");
 	printf("exits\n\n");
 	printf("	All commands must be followed by the delimiter: %c\n",
