@@ -474,7 +474,7 @@ freetdscursor::freetdscursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 }
 
 freetdscursor::~freetdscursor() {
-	closeCursor();
+	close();
 	delete[] cursorname;
 	delete[] parameter;
 	delete[] outbindtype;
@@ -485,7 +485,7 @@ freetdscursor::~freetdscursor() {
 	delete[] outbinddates;
 }
 
-bool freetdscursor::openCursor(uint16_t id) {
+bool freetdscursor::open(uint16_t id) {
 
 	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
 	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
@@ -550,7 +550,7 @@ bool freetdscursor::openCursor(uint16_t id) {
 	return retval;
 }
 
-bool freetdscursor::closeCursor() {
+bool freetdscursor::close() {
 
 	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
 	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
@@ -659,11 +659,11 @@ void freetdscursor::checkRePrepare() {
 }
 
 #ifdef FREETDS_SUPPORTS_CURSORS
-bool freetdscursor::inputBindString(const char *variable,
-						uint16_t variablesize,
-						const char *value,
-						uint32_t valuesize,
-						int16_t *isnull) {
+bool freetdscursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				const char *value,
+				uint32_t valuesize,
+				int16_t *isnull) {
 
 	checkRePrepare();
 
@@ -688,9 +688,9 @@ bool freetdscursor::inputBindString(const char *variable,
 	return true;
 }
 
-bool freetdscursor::inputBindInteger(const char *variable,
-						uint16_t variablesize,
-						int64_t *value) {
+bool freetdscursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				int64_t *value) {
 
 	checkRePrepare();
 
@@ -715,11 +715,11 @@ bool freetdscursor::inputBindInteger(const char *variable,
 	return true;
 }
 
-bool freetdscursor::inputBindDouble(const char *variable,
-						uint16_t variablesize,
-						double *value,
-						uint32_t precision,
-						uint32_t scale) {
+bool freetdscursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				double *value,
+				uint32_t precision,
+				uint32_t scale) {
 
 	checkRePrepare();
 
@@ -752,19 +752,19 @@ static const char *monthname[]={
 	NULL
 };
 
-bool freetdscursor::inputBindDate(const char *variable,
-					uint16_t variablesize,
-					int64_t year,
-					int16_t month,
-					int16_t day,
-					int16_t hour,
-					int16_t minute,
-					int16_t second,
-					int32_t microsecond,
-					const char *tz,
-					char *buffer,
-					uint16_t buffersize,
-					int16_t *isnull) {
+bool freetdscursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				int64_t year,
+				int16_t month,
+				int16_t day,
+				int16_t hour,
+				int16_t minute,
+				int16_t second,
+				int32_t microsecond,
+				const char *tz,
+				char *buffer,
+				uint16_t buffersize,
+				int16_t *isnull) {
 
 	checkRePrepare();
 
@@ -798,15 +798,15 @@ bool freetdscursor::inputBindDate(const char *variable,
 	charstring::append(buffer,":");
 	charstring::append(buffer,(int64_t)microsecond);
 	charstring::append(buffer,ampm);
-	return inputBindString(variable,variablesize,
+	return inputBind(variable,variablesize,
 				buffer,charstring::length(buffer),isnull);
 }
 
-bool freetdscursor::outputBindString(const char *variable, 
-					uint16_t variablesize,
-					char *value, 
-					uint16_t valuesize, 
-					int16_t *isnull) {
+bool freetdscursor::outputBind(const char *variable, 
+				uint16_t variablesize,
+				char *value, 
+				uint16_t valuesize, 
+				int16_t *isnull) {
 
 	checkRePrepare();
 
@@ -837,10 +837,10 @@ bool freetdscursor::outputBindString(const char *variable,
 	return true;
 }
 
-bool freetdscursor::outputBindInteger(const char *variable,
-						uint16_t variablesize,
-						int64_t *value,
-						int16_t *isnull) {
+bool freetdscursor::outputBind(const char *variable,
+				uint16_t variablesize,
+				int64_t *value,
+				int16_t *isnull) {
 
 	checkRePrepare();
 
@@ -870,12 +870,12 @@ bool freetdscursor::outputBindInteger(const char *variable,
 	return true;
 }
 
-bool freetdscursor::outputBindDouble(const char *variable,
-						uint16_t variablesize,
-						double *value,
-						uint32_t *precision,
-						uint32_t *scale,
-						int16_t *isnull) {
+bool freetdscursor::outputBind(const char *variable,
+				uint16_t variablesize,
+				double *value,
+				uint32_t *precision,
+				uint32_t *scale,
+				int16_t *isnull) {
 
 	checkRePrepare();
 
@@ -905,19 +905,19 @@ bool freetdscursor::outputBindDouble(const char *variable,
 	return true;
 }
 
-bool freetdscursor::outputBindDate(const char *variable,
-						uint16_t variablesize,
-						int16_t *year,
-						int16_t *month,
-						int16_t *day,
-						int16_t *hour,
-						int16_t *minute,
-						int16_t *second,
-						int32_t *microsecond,
-						const char **tz,
-						char *buffer,
-						uint16_t buffersize,
-						int16_t *isnull) {
+bool freetdscursor::outputBind(const char *variable,
+				uint16_t variablesize,
+				int16_t *year,
+				int16_t *month,
+				int16_t *day,
+				int16_t *hour,
+				int16_t *minute,
+				int16_t *second,
+				int32_t *microsecond,
+				const char **tz,
+				char *buffer,
+				uint16_t buffersize,
+				int16_t *isnull) {
 	checkRePrepare();
 
 	outbindtype[outbindindex]=CS_DATETIME_TYPE;
@@ -1253,14 +1253,6 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-bool freetdscursor::knowsRowCount() {
-	return false;
-}
-
-uint64_t freetdscursor::rowCount() {
-	return 0;
-}
-
 bool freetdscursor::knowsAffectedRows() {
 	return knowsaffectedrows;
 }
@@ -1281,10 +1273,6 @@ const char * const *freetdscursor::columnNames() {
 		columnnames[i]=column[i].name;
 	}
 	return columnnames;
-}
-
-uint16_t freetdscursor::columnTypeFormat() {
-	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 const char *freetdscursor::getColumnName(uint32_t col) {

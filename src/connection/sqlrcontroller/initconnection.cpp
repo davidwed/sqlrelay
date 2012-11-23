@@ -345,7 +345,7 @@ bool sqlrconnection_svr::initCursors(int32_t count) {
 		if (!cur[i]) {
 			cur[i]=initCursorInternal();
 		}
-		if (!cur[i]->openCursorInternal(i)) {
+		if (!cur[i]->openInternal(i)) {
 
 			dbgfile.debugPrint("connection",1,
 					"cursor init failure...");
@@ -361,12 +361,12 @@ bool sqlrconnection_svr::initCursors(int32_t count) {
 }
 
 sqlrcursor_svr *sqlrconnection_svr::initCursorInternal() {
-	sqlrcursor_svr	*cur=initCursor();
-	if (cur) {
+	sqlrcursor_svr	*cursor=initCursor();
+	if (cursor) {
 		semset->waitWithUndo(9);
 		statistics->open_svr_cursors++;
 		statistics->opened_svr_cursors++;
 		semset->signalWithUndo(9);
 	}
-	return cur;
+	return cursor;
 }

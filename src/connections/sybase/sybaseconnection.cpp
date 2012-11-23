@@ -398,7 +398,7 @@ sybasecursor::sybasecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 }
 
 sybasecursor::~sybasecursor() {
-	closeCursor();
+	close();
 	delete[] cursorname;
 	delete[] parameter;
 	delete[] outbindtype;
@@ -409,7 +409,7 @@ sybasecursor::~sybasecursor() {
 	delete[] outbinddates;
 }
 
-bool sybasecursor::openCursor(uint16_t id) {
+bool sybasecursor::open(uint16_t id) {
 
 	clean=true;
 
@@ -465,7 +465,7 @@ bool sybasecursor::openCursor(uint16_t id) {
 	return retval;
 }
 
-bool sybasecursor::closeCursor() {
+bool sybasecursor::close() {
 	bool	retval=true;
 	if (languagecmd) {
 		retval=(ct_cmd_drop(languagecmd)==CS_SUCCEED);
@@ -543,11 +543,11 @@ void sybasecursor::checkRePrepare() {
 	}
 }
 
-bool sybasecursor::inputBindString(const char *variable,
-						uint16_t variablesize,
-						const char *value,
-						uint32_t valuesize,
-						int16_t *isnull) {
+bool sybasecursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				const char *value,
+				uint32_t valuesize,
+				int16_t *isnull) {
 
 	checkRePrepare();
 
@@ -571,9 +571,9 @@ bool sybasecursor::inputBindString(const char *variable,
 	return true;
 }
 
-bool sybasecursor::inputBindInteger(const char *variable,
-						uint16_t variablesize,
-						int64_t *value) {
+bool sybasecursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				int64_t *value) {
 
 	checkRePrepare();
 
@@ -597,11 +597,11 @@ bool sybasecursor::inputBindInteger(const char *variable,
 	return true;
 }
 
-bool sybasecursor::inputBindDouble(const char *variable,
-						uint16_t variablesize,
-						double *value,
-						uint32_t precision,
-						uint32_t scale) {
+bool sybasecursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				double *value,
+				uint32_t precision,
+				uint32_t scale) {
 
 	checkRePrepare();
 
@@ -633,19 +633,19 @@ static const char *monthname[]={
 	NULL
 };
 
-bool sybasecursor::inputBindDate(const char *variable,
-					uint16_t variablesize,
-					int64_t year,
-					int16_t month,
-					int16_t day,
-					int16_t hour,
-					int16_t minute,
-					int16_t second,
-					int32_t microsecond,
-					const char *tz,
-					char *buffer,
-					uint16_t buffersize,
-					int16_t *isnull) {
+bool sybasecursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				int64_t year,
+				int16_t month,
+				int16_t day,
+				int16_t hour,
+				int16_t minute,
+				int16_t second,
+				int32_t microsecond,
+				const char *tz,
+				char *buffer,
+				uint16_t buffersize,
+				int16_t *isnull) {
 
 	checkRePrepare();
 
@@ -679,15 +679,15 @@ bool sybasecursor::inputBindDate(const char *variable,
 	charstring::append(buffer,":");
 	charstring::append(buffer,(int64_t)microsecond);
 	charstring::append(buffer,ampm);
-	return inputBindString(variable,variablesize,
+	return inputBind(variable,variablesize,
 				buffer,charstring::length(buffer),isnull);
 }
 
-bool sybasecursor::outputBindString(const char *variable, 
-					uint16_t variablesize,
-					char *value, 
-					uint16_t valuesize, 
-					int16_t *isnull) {
+bool sybasecursor::outputBind(const char *variable, 
+				uint16_t variablesize,
+				char *value, 
+				uint16_t valuesize, 
+				int16_t *isnull) {
 
 	checkRePrepare();
 
@@ -717,10 +717,10 @@ bool sybasecursor::outputBindString(const char *variable,
 	return true;
 }
 
-bool sybasecursor::outputBindInteger(const char *variable,
-						uint16_t variablesize,
-						int64_t *value,
-						int16_t *isnull) {
+bool sybasecursor::outputBind(const char *variable,
+				uint16_t variablesize,
+				int64_t *value,
+				int16_t *isnull) {
 
 	checkRePrepare();
 
@@ -749,12 +749,12 @@ bool sybasecursor::outputBindInteger(const char *variable,
 	return true;
 }
 
-bool sybasecursor::outputBindDouble(const char *variable,
-						uint16_t variablesize,
-						double *value,
-						uint32_t *precision,
-						uint32_t *scale,
-						int16_t *isnull) {
+bool sybasecursor::outputBind(const char *variable,
+				uint16_t variablesize,
+				double *value,
+				uint32_t *precision,
+				uint32_t *scale,
+				int16_t *isnull) {
 
 	checkRePrepare();
 
@@ -783,19 +783,19 @@ bool sybasecursor::outputBindDouble(const char *variable,
 	return true;
 }
 
-bool sybasecursor::outputBindDate(const char *variable,
-						uint16_t variablesize,
-						int16_t *year,
-						int16_t *month,
-						int16_t *day,
-						int16_t *hour,
-						int16_t *minute,
-						int16_t *second,
-						int32_t *microsecond,
-						const char **tz,
-						char *buffer,
-						uint16_t buffersize,
-						int16_t *isnull) {
+bool sybasecursor::outputBind(const char *variable,
+				uint16_t variablesize,
+				int16_t *year,
+				int16_t *month,
+				int16_t *day,
+				int16_t *hour,
+				int16_t *minute,
+				int16_t *second,
+				int32_t *microsecond,
+				const char **tz,
+				char *buffer,
+				uint16_t buffersize,
+				int16_t *isnull) {
 	checkRePrepare();
 
 	outbindtype[outbindindex]=CS_DATETIME_TYPE;
@@ -1063,18 +1063,6 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-bool sybasecursor::knowsRowCount() {
-	return false;
-}
-
-uint64_t sybasecursor::rowCount() {
-	return 0;
-}
-
-bool sybasecursor::knowsAffectedRows() {
-	return true;
-}
-
 uint64_t sybasecursor::affectedRows() {
 	return affectedrows;
 }
@@ -1091,10 +1079,6 @@ const char * const * sybasecursor::columnNames() {
 		columnnames[i]=column[i].name;
 	}
 	return columnnames;
-}
-
-uint16_t sybasecursor::columnTypeFormat() {
-	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 const char *sybasecursor::getColumnName(uint32_t col) {

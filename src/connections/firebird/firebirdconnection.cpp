@@ -454,7 +454,7 @@ bool firebirdcursor::prepareQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-bool firebirdcursor::inputBindString(const char *variable,
+bool firebirdcursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					const char *value,
 					uint32_t valuesize,
@@ -482,7 +482,7 @@ bool firebirdcursor::inputBindString(const char *variable,
 	return true;
 }
 
-bool firebirdcursor::inputBindInteger(const char *variable,
+bool firebirdcursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					int64_t *value) {
 
@@ -508,7 +508,7 @@ bool firebirdcursor::inputBindInteger(const char *variable,
 	return true;
 }
 
-bool firebirdcursor::inputBindDouble(const char *variable,
+bool firebirdcursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					double *value,
 					uint32_t precision,
@@ -536,7 +536,7 @@ bool firebirdcursor::inputBindDouble(const char *variable,
 	return true;
 }
 
-bool firebirdcursor::inputBindDate(const char *variable,
+bool firebirdcursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					int64_t year,
 					int16_t month,
@@ -582,7 +582,7 @@ bool firebirdcursor::inputBindDate(const char *variable,
 	return true;
 }
 
-bool firebirdcursor::outputBindString(const char *variable, 
+bool firebirdcursor::outputBind(const char *variable, 
 				uint16_t variablesize,
 				char *value, 
 				uint16_t valuesize, 
@@ -616,10 +616,10 @@ bool firebirdcursor::outputBindString(const char *variable,
 	return true;
 }
 
-bool firebirdcursor::outputBindInteger(const char *variable,
-						uint16_t variablesize,
-						int64_t *value,
-						int16_t *isnull) {
+bool firebirdcursor::outputBind(const char *variable,
+				uint16_t variablesize,
+				int64_t *value,
+				int16_t *isnull) {
 
 	outbindcount++;
 
@@ -649,12 +649,12 @@ bool firebirdcursor::outputBindInteger(const char *variable,
 	return true;
 }
 
-bool firebirdcursor::outputBindDouble(const char *variable,
-						uint16_t variablesize,
-						double *value,
-						uint32_t *precision,
-						uint32_t *scale,
-						int16_t *isnull) {
+bool firebirdcursor::outputBind(const char *variable,
+				uint16_t variablesize,
+				double *value,
+				uint32_t *precision,
+				uint32_t *scale,
+				int16_t *isnull) {
 
 	outbindcount++;
 
@@ -684,19 +684,19 @@ bool firebirdcursor::outputBindDouble(const char *variable,
 	return true;
 }
 
-bool firebirdcursor::outputBindDate(const char *variable,
-						uint16_t variablesize,
-						int16_t *year,
-						int16_t *month,
-						int16_t *day,
-						int16_t *hour,
-						int16_t *minute,
-						int16_t *second,
-						int32_t *microsecond,
-						const char **tz,
-						char *buffer,
-						uint16_t buffersize,
-						int16_t *isnull) {
+bool firebirdcursor::outputBind(const char *variable,
+				uint16_t variablesize,
+				int16_t *year,
+				int16_t *month,
+				int16_t *day,
+				int16_t *hour,
+				int16_t *minute,
+				int16_t *second,
+				int32_t *microsecond,
+				const char **tz,
+				char *buffer,
+				uint16_t buffersize,
+				int16_t *isnull) {
 
 	// store the pointers
 	outdatebind[outbindcount].year=year;
@@ -916,20 +916,8 @@ bool firebirdcursor::queryIsCommitOrRollback() {
 		querytype==isc_info_sql_stmt_rollback);
 }
 
-bool firebirdcursor::knowsRowCount() {
-	return false;
-}
-
-uint64_t firebirdcursor::rowCount() {
-	return 0;
-}
-
 bool firebirdcursor::knowsAffectedRows() {
 	return false;
-}
-
-uint64_t firebirdcursor::affectedRows() {
-	return 0;
 }
 
 uint32_t firebirdcursor::colCount() {
@@ -944,10 +932,6 @@ const char * const *firebirdcursor::columnNames() {
 		columnnames[i]=outsqlda->sqlvar[i].aliasname;
 	}
 	return columnnames;
-}
-
-uint16_t firebirdcursor::columnTypeFormat() {
-	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 const char *firebirdcursor::getColumnName(uint32_t col) {
@@ -1019,10 +1003,6 @@ bool firebirdcursor::noRowsToReturn() {
 	// for exec procedure queries, outsqlda contains output bind values
 	// rather than a result set and there is no result set
 	return (queryIsExecSP)?true:!outsqlda->sqld;
-}
-
-bool firebirdcursor::skipRow() {
-	return fetchRow();
 }
 
 bool firebirdcursor::fetchRow() {

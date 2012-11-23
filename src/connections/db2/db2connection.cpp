@@ -337,7 +337,7 @@ bool db2cursor::prepareQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-bool db2cursor::inputBindString(const char *variable,
+bool db2cursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					const char *value,
 					uint32_t valuesize,
@@ -372,7 +372,7 @@ bool db2cursor::inputBindString(const char *variable,
 	return true;
 }
 
-bool db2cursor::inputBindInteger(const char *variable,
+bool db2cursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					int64_t *value) {
 
@@ -392,7 +392,7 @@ bool db2cursor::inputBindInteger(const char *variable,
 	return true;
 }
 
-bool db2cursor::inputBindDouble(const char *variable,
+bool db2cursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					double *value,
 					uint32_t precision,
@@ -414,7 +414,7 @@ bool db2cursor::inputBindDouble(const char *variable,
 	return true;
 }
 
-bool db2cursor::inputBindDate(const char *variable,
+bool db2cursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					int64_t year,
 					int16_t month,
@@ -453,7 +453,7 @@ bool db2cursor::inputBindDate(const char *variable,
 	return true;
 }
 
-bool db2cursor::outputBindString(const char *variable, 
+bool db2cursor::outputBind(const char *variable, 
 					uint16_t variablesize,
 					char *value, 
 					uint16_t valuesize, 
@@ -477,10 +477,10 @@ bool db2cursor::outputBindString(const char *variable,
 	return true;
 }
 
-bool db2cursor::outputBindInteger(const char *variable,
-						uint16_t variablesize,
-						int64_t *value,
-						int16_t *isnull) {
+bool db2cursor::outputBind(const char *variable,
+					uint16_t variablesize,
+					int64_t *value,
+					int16_t *isnull) {
 
 	outdatebind[outbindcount]=NULL;
 
@@ -500,12 +500,12 @@ bool db2cursor::outputBindInteger(const char *variable,
 	return true;
 }
 
-bool db2cursor::outputBindDouble(const char *variable,
-						uint16_t variablesize,
-						double *value,
-						uint32_t *precision,
-						uint32_t *scale,
-						int16_t *isnull) {
+bool db2cursor::outputBind(const char *variable,
+					uint16_t variablesize,
+					double *value,
+					uint32_t *precision,
+					uint32_t *scale,
+					int16_t *isnull) {
 
 	outdatebind[outbindcount]=NULL;
 
@@ -525,19 +525,19 @@ bool db2cursor::outputBindDouble(const char *variable,
 	return true;
 }
 
-bool db2cursor::outputBindDate(const char *variable,
-						uint16_t variablesize,
-						int16_t *year,
-						int16_t *month,
-						int16_t *day,
-						int16_t *hour,
-						int16_t *minute,
-						int16_t *second,
-						int32_t *microsecond,
-						const char **tz,
-						char *buffer,
-						uint16_t buffersize,
-						int16_t *isnull) {
+bool db2cursor::outputBind(const char *variable,
+					uint16_t variablesize,
+					int16_t *year,
+					int16_t *month,
+					int16_t *day,
+					int16_t *hour,
+					int16_t *minute,
+					int16_t *second,
+					int32_t *microsecond,
+					const char **tz,
+					char *buffer,
+					uint16_t buffersize,
+					int16_t *isnull) {
 
 	datebind	*db=new datebind;
 	db->year=year;
@@ -723,18 +723,6 @@ void db2cursor::errorMessage(char *errorbuffer,
 	*liveconnection=db2conn->liveConnection(nativeerrnum,errlength);
 }
 
-bool db2cursor::knowsRowCount() {
-	return false;
-}
-
-uint64_t db2cursor::rowCount() {
-	return 0;
-}
-
-bool db2cursor::knowsAffectedRows() {
-	return true;
-}
-
 uint64_t db2cursor::affectedRows() {
 	return affectedrows;
 }
@@ -748,10 +736,6 @@ const char * const *db2cursor::columnNames() {
 		columnnames[i]=col[i].name;
 	}
 	return columnnames;
-}
-
-uint16_t db2cursor::columnTypeFormat() {
-	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 const char *db2cursor::getColumnName(uint32_t i) {

@@ -35,6 +35,7 @@ SRCS = sqlrcontroller/sqlrconnectionctor.cpp \
 	sqlrcontroller/newquery.cpp \
 	sqlrcontroller/getlist.cpp \
 	sqlrcontroller/handlequery.cpp \
+	sqlrcontroller/handlebinds.cpp \
 	sqlrcontroller/rewritequery.cpp \
 	sqlrcontroller/getbinds.cpp \
 	sqlrcontroller/reexecutequery.cpp \
@@ -63,38 +64,8 @@ SRCS = sqlrcontroller/sqlrconnectionctor.cpp \
 	sqlrcontroller/main.cpp \
 	sqlrcontroller/error.cpp \
 	sqlrcontroller/user.cpp \
-	sqlrconnection/authenticate.cpp \
-	sqlrconnection/changeuser.cpp \
-	sqlrconnection/autocommit.cpp \
-	sqlrconnection/begin.cpp \
-	sqlrconnection/commit.cpp \
-	sqlrconnection/rollback.cpp \
-	sqlrconnection/faketransactionblocks.cpp \
-	sqlrconnection/selectdatabase.cpp \
-	sqlrconnection/getcurrentdatabase.cpp \
-	sqlrconnection/lastinsertid.cpp \
-	sqlrconnection/isolationlevel.cpp \
-	sqlrconnection/ping.cpp \
-	sqlrconnection/getlist.cpp \
-	sqlrconnection/bindformat.cpp \
-	sqlrconnection/bindparameters.cpp \
-	sqlrconnection/skiprows.cpp \
-	sqlrconnection/istransactional.cpp \
-	sqlrconnection/temptables.cpp \
-	sqlrconnection/endsession.cpp \
-	sqlrconnection/rewritequery.cpp \
-	sqlrcursor/sqlrcursorctor.cpp \
-	sqlrcursor/sqlrcursordtor.cpp \
-	sqlrcursor/openclose.cpp \
-	sqlrcursor/preparequery.cpp \
-	sqlrcursor/queryparse.cpp \
-	sqlrcursor/resultset.cpp \
-	sqlrcursor/binds.cpp \
-	sqlrcursor/fakebinds.cpp \
-	sqlrcursor/translatequery.cpp \
-	sqlrcursor/abort.cpp \
-	sqlrcursor/errormessage.cpp \
-	sqlrcursor/fetchfrombindcursor.cpp \
+	sqlrconnection/sqlrconnection.cpp \
+	sqlrcursor/sqlrcursor.cpp \
 	sqlparser/clauses.cpp \
 	sqlparser/parse.cpp \
 	sqlparser/parsecreate.cpp \
@@ -159,6 +130,7 @@ LOBJS = sqlrcontroller/sqlrconnectionctor.lo \
 	sqlrcontroller/newquery.lo \
 	sqlrcontroller/getlist.lo \
 	sqlrcontroller/handlequery.lo \
+	sqlrcontroller/handlebinds.lo \
 	sqlrcontroller/rewritequery.lo \
 	sqlrcontroller/getbinds.lo \
 	sqlrcontroller/reexecutequery.lo \
@@ -187,38 +159,8 @@ LOBJS = sqlrcontroller/sqlrconnectionctor.lo \
 	sqlrcontroller/main.lo \
 	sqlrcontroller/error.lo \
 	sqlrcontroller/user.lo \
-	sqlrconnection/authenticate.lo \
-	sqlrconnection/changeuser.lo \
-	sqlrconnection/autocommit.lo \
-	sqlrconnection/begin.lo \
-	sqlrconnection/commit.lo \
-	sqlrconnection/rollback.lo \
-	sqlrconnection/faketransactionblocks.lo \
-	sqlrconnection/selectdatabase.lo \
-	sqlrconnection/getcurrentdatabase.lo \
-	sqlrconnection/lastinsertid.lo \
-	sqlrconnection/isolationlevel.lo \
-	sqlrconnection/ping.lo \
-	sqlrconnection/getlist.lo \
-	sqlrconnection/bindformat.lo \
-	sqlrconnection/bindparameters.lo \
-	sqlrconnection/skiprows.lo \
-	sqlrconnection/istransactional.lo \
-	sqlrconnection/temptables.lo \
-	sqlrconnection/endsession.lo \
-	sqlrconnection/rewritequery.lo \
-	sqlrcursor/sqlrcursorctor.lo \
-	sqlrcursor/sqlrcursordtor.lo \
-	sqlrcursor/openclose.lo \
-	sqlrcursor/preparequery.lo \
-	sqlrcursor/queryparse.lo \
-	sqlrcursor/resultset.lo \
-	sqlrcursor/binds.lo \
-	sqlrcursor/fakebinds.lo \
-	sqlrcursor/translatequery.lo \
-	sqlrcursor/abort.lo \
-	sqlrcursor/errormessage.lo \
-	sqlrcursor/fetchfrombindcursor.lo \
+	sqlrconnection/sqlrconnection.lo \
+	sqlrcursor/sqlrcursor.lo \
 	sqlparser/clauses.lo \
 	sqlparser/parse.lo \
 	sqlparser/parsecreate.lo \

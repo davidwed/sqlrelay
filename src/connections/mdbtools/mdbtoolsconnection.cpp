@@ -143,7 +143,7 @@ mdbtoolscursor::~mdbtoolscursor() {
 	delete (MdbSQL *)mdbsql;
 }
 
-bool mdbtoolscursor::openCursor(uint16_t id) {
+bool mdbtoolscursor::open(uint16_t id) {
 
 	// handle db
 	const char	*dbval;
@@ -156,9 +156,9 @@ bool mdbtoolscursor::openCursor(uint16_t id) {
 	return mdb_sql_open((MdbSQL *)mdbsql,const_cast<char *>(dbval));
 }
 
-bool mdbtoolscursor::closeCursor() {
+bool mdbtoolscursor::close() {
 
-	if (!sqlrcursor_svr::closeCursor()) {
+	if (!sqlrcursor_svr::close()) {
 		return false;
 	}
 
@@ -320,20 +320,8 @@ bool mdbtoolscursor::matchCurrentWild(const char *value) {
 	return (!currentwild || currentwild->match(value));
 }
 
-bool mdbtoolscursor::knowsRowCount() {
-	return false;
-}
-
-uint64_t mdbtoolscursor::rowCount() {
-	return 0;
-}
-
 bool mdbtoolscursor::knowsAffectedRows() {
 	return false;
-}
-
-uint64_t mdbtoolscursor::affectedRows() {
-	return 0;
 }
 
 uint32_t mdbtoolscursor::colCount() {
@@ -370,10 +358,6 @@ const char * const *mdbtoolscursor::columnNames() {
 		columnnames[4]=(char *)"SCALE";
 	}
 	return columnnames;
-}
-
-uint16_t mdbtoolscursor::columnTypeFormat() {
-	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 const char *mdbtoolscursor::getColumnName(uint32_t col) {
@@ -418,10 +402,6 @@ bool mdbtoolscursor::noRowsToReturn() {
 		return (currenttabledef->num_cols==0);
 	}
 	return true;
-}
-
-bool mdbtoolscursor::skipRow() {
-	return fetchRow();
 }
 
 bool mdbtoolscursor::fetchRow() {

@@ -50,20 +50,20 @@ class firebirdcursor : public sqlrcursor_svr {
 				~firebirdcursor();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
-		bool		inputBindString(const char *variable, 
+		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
 						uint32_t valuesize,
 						short *isnull);
-		bool		inputBindInteger(const char *variable, 
+		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						int64_t *value);
-		bool		inputBindDouble(const char *variable, 
+		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						double *value, 
 						uint32_t precision,
 						uint32_t scale);
-		bool		inputBindDate(const char *variable,
+		bool		inputBind(const char *variable,
                                         	uint16_t variablesize,
                                         	int64_t year,
                                         	int16_t month,
@@ -76,22 +76,22 @@ class firebirdcursor : public sqlrcursor_svr {
                                         	char *buffer,
                                         	uint16_t buffersize,
                                         	int16_t *isnull);
-		bool		outputBindString(const char *variable, 
+		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
 						char *value, 
 						uint16_t valuesize,
 						short *isnull);
-		bool		outputBindInteger(const char *variable,
+		bool		outputBind(const char *variable,
 						uint16_t variablesize,
 						int64_t *value,
 						int16_t *isnull);
-		bool		outputBindDouble(const char *variable,
+		bool		outputBind(const char *variable,
 						uint16_t variablesize,
 						double *value,
 						uint32_t *precision,
 						uint32_t *scale,
 						int16_t *isnull);
-		bool		outputBindDate(const char *variable,
+		bool		outputBind(const char *variable,
 						uint16_t variablesize,
 						int16_t *year,
 						int16_t *month,
@@ -108,13 +108,9 @@ class firebirdcursor : public sqlrcursor_svr {
 						uint32_t length);
 		bool		queryIsNotSelect();
 		bool		queryIsCommitOrRollback();
-		bool		knowsRowCount();
-		uint64_t	rowCount();
 		bool		knowsAffectedRows();
-		uint64_t	affectedRows();
 		uint32_t	colCount();
 		const char * const * columnNames();
-		uint16_t	columnTypeFormat();
 		const char	*getColumnName(uint32_t col);
 		uint16_t	getColumnNameLength(uint32_t col);
 		uint16_t	getColumnType(uint32_t col);
@@ -122,7 +118,6 @@ class firebirdcursor : public sqlrcursor_svr {
 		uint32_t	getColumnPrecision(uint32_t col);
 		uint32_t	getColumnScale(uint32_t col);
 		bool		noRowsToReturn();
-		bool		skipRow();
 		bool		fetchRow();
 		void		getField(uint32_t col,
 					const char **field,

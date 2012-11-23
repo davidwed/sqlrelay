@@ -104,6 +104,7 @@ bool sqlrconnection_svr::databaseBasedAuth(const char *userbuffer,
 		charstring::compare(lastpasswordbuffer,passwordbuffer)) {
 
 		// change authentication 
+		dbgfile.debugPrint("connection",2,"change user");
 		authsuccess=changeUser(userbuffer,passwordbuffer);
 
 		// keep a record of which user we're changing to

@@ -37,26 +37,26 @@ class freetdscursor : public sqlrcursor_svr {
 	private:
 				freetdscursor(sqlrconnection_svr *conn);
 				~freetdscursor();
-		bool		openCursor(uint16_t id);
-		bool		closeCursor();
+		bool		open(uint16_t id);
+		bool		close();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 		bool		supportsNativeBinds();
 #ifdef FREETDS_SUPPORTS_CURSORS
-		bool		inputBindString(const char *variable,
+		bool		inputBind(const char *variable,
 						uint16_t variablesize,
 						const char *value,
 						uint32_t valuesize,
 						int16_t *isnull);
-		bool		inputBindInteger(const char *variable, 
+		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						int64_t *value);
-		bool		inputBindDouble(const char *variable,
+		bool		inputBind(const char *variable,
 						uint16_t variablesize,
 						double *value,
 						uint32_t precision,
 						uint32_t scale);
-		bool		inputBindDate(const char *variable,
+		bool		inputBind(const char *variable,
 						uint16_t variablesize,
 						int64_t year,
 						int16_t month,
@@ -69,22 +69,22 @@ class freetdscursor : public sqlrcursor_svr {
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
-		bool		outputBindString(const char *variable, 
+		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
 						char *value, 
 						uint16_t valuesize, 
 						int16_t *isnull);
-		bool		outputBindInteger(const char *variable,
+		bool		outputBind(const char *variable,
 						uint16_t variablesize,
 						int64_t *value,
 						int16_t *isnull);
-		bool		outputBindDouble(const char *variable,
+		bool		outputBind(const char *variable,
 						uint16_t variablesize,
 						double *value,
 						uint32_t *precision,
 						uint32_t *scale,
 						int16_t *isnull);
-		bool		outputBindDate(const char *variable,
+		bool		outputBind(const char *variable,
 						uint16_t variablesize,
 						int16_t *year,
 						int16_t *month,
@@ -100,13 +100,10 @@ class freetdscursor : public sqlrcursor_svr {
 #endif
 		bool		executeQuery(const char *query,
 						uint32_t length);
-		bool		knowsRowCount();
-		uint64_t	rowCount();
 		bool		knowsAffectedRows();
 		uint64_t	affectedRows();
 		uint32_t	colCount();
 		const char * const * columnNames();
-		uint16_t	columnTypeFormat();
 		const char	*getColumnName(uint32_t col);
 		uint16_t	getColumnType(uint32_t col);
 		uint32_t	getColumnLength(uint32_t col);

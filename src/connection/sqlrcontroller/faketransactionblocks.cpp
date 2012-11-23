@@ -3,6 +3,10 @@
 
 #include <sqlrconnection.h>
 
+void sqlrconnection_svr::setFakeTransactionBlocksBehavior(bool ftb) {
+	faketransactionblocks=ftb;
+}
+
 bool sqlrconnection_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 						bool *wasfaketransactionquery) {
 

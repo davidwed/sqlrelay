@@ -14,7 +14,7 @@ enum queryparsestate_t {
 void sqlrconnection_svr::rewriteQuery(sqlrcursor_svr *cursor) {
 
 	if (sqlp && sqlt && sqlw) {
-		if (!cursor->translateQuery()) {
+		if (!translateQuery(cursor)) {
 			// FIXME: do something?
 		}
 	}
@@ -26,6 +26,100 @@ void sqlrconnection_svr::rewriteQuery(sqlrcursor_svr *cursor) {
 	if (supportsTransactionBlocks()) {
 		translateBeginTransaction(cursor);
 	}
+}
+
+bool sqlrconnection_svr::translateQuery(sqlrcursor_svr *cursor) {
+
+	if (debugsqltranslation) {
+		printf("original:\n\"%s\"\n\n",cursor->querybuffer);
+	}
+
+	// parse the query
+	bool	parsed=sqlp->parse(cursor->querybuffer);
+
+	// get the parsed tree
+	delete cursor->querytree;
+	cursor->querytree=sqlp->detachTree();
+	if (!cursor->querytree) {
+		return false;
+	}
+
+	if (debugsqltranslation) {
+		printf("before translation:\n");
+		printQueryTree(cursor->querytree);
+		printf("\n");
+	}
+
+	if (!parsed) {
+		if (debugsqltranslation) {
+			printf("parse failed, using original:\n\"%s\"\n\n",
+							cursor->querybuffer);
+		}
+		delete cursor->querytree;
+		cursor->querytree=NULL;
+		return false;
+	}
+
+	// apply translation rules
+	if (!sqlt->runTranslations(this,cursor,cursor->querytree)) {
+		return false;
+	}
+
+	if (debugsqltranslation) {
+		printf("after translation:\n");
+		printQueryTree(cursor->querytree);
+		printf("\n");
+	}
+
+	// write the query back out
+	stringbuffer	translatedquery;
+	if (!sqlw->write(this,cursor,cursor->querytree,&translatedquery)) {
+		return false;
+	}
+
+	if (debugsqltranslation) {
+		printf("translated:\n\"%s\"\n\n",
+				translatedquery.getString());
+	}
+
+	// copy the translated query into query buffer
+	if (translatedquery.getStringLength()>maxquerysize) {
+		// the translated query was too large
+		return false;
+	}
+	charstring::copy(cursor->querybuffer,
+			translatedquery.getString(),
+			translatedquery.getStringLength());
+	cursor->querylength=translatedquery.getStringLength();
+	cursor->querybuffer[cursor->querylength]='\0';
+	return true;
+}
+
+void sqlrconnection_svr::printQueryTree(xmldom *tree) {
+	stringbuffer	*xmlstr=tree->getRootNode()->xml();
+	const char	*xml=xmlstr->getString();
+	int16_t		indent=0;
+	bool		endtag=false;
+	for (const char *ptr=xml; *ptr; ptr++) {
+		if (*ptr=='<') {
+			if (*(ptr+1)=='/') {
+				indent=indent-2;
+				endtag=true;
+			}
+			for (uint16_t i=0; i<indent; i++) {
+				printf(" ");
+			}
+		}
+		printf("%c",*ptr);
+		if (*ptr=='>') {
+			printf("\n");
+			if (*(ptr-1)!='/' && !endtag) {
+				indent=indent+2;
+			}
+			endtag=false;
+		}
+	}
+	delete xmlstr;
 }
 
 void sqlrconnection_svr::translateBindVariables(sqlrcursor_svr *cursor) {
@@ -414,7 +508,7 @@ bool sqlrconnection_svr::getColumnNames(const char *query,
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	bool	retval=false;
-	if (gcncur->openCursorInternal(cursorcount+1) &&
+	if (gcncur->openInternal(cursorcount+1) &&
 		gcncur->prepareQuery(query,querylen) &&
 		executeQueryInternal(gcncur,query,querylen)) {
 
@@ -423,7 +517,7 @@ bool sqlrconnection_svr::getColumnNames(const char *query,
 
 	}
 	gcncur->cleanUpData(true,true);
-	gcncur->closeCursor();
+	gcncur->close();
 	deleteCursorInternal(gcncur);
 	return retval;
 }

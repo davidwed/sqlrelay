@@ -317,7 +317,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 		// just execute it...
 
 		dbgfile.debugPrint("connection",3,"re-executing...");
-		success=(cursor->handleBinds() && 
+		success=(handleBinds(cursor) && 
 				executeQueryInternal(cursor,
 						cursor->querybuffer,
 						cursor->querylength));
@@ -367,7 +367,7 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 		if (success &&
 			!cursor->fakeinputbindsforthisquery &&
 			cursor->supportsNativeBinds()) {
-			success=cursor->handleBinds();
+			success=handleBinds(cursor);
 		}
 
 		// execute

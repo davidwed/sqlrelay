@@ -4,10 +4,12 @@
 #include <sqlrconnection.h>
 
 void sqlrconnection_svr::rollbackCommand() {
-	dbgfile.debugPrint("connection",1,"rollback");
+	dbgfile.debugPrint("connection",1,"rollback...");
 	if (rollbackInternal()) {
+		dbgfile.debugPrint("connection",1,"rollback succeeded");
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	} else {
+		dbgfile.debugPrint("connection",1,"rollback failed");
 		returnError(!liveconnection);
 	}
 	flushWriteBuffer();

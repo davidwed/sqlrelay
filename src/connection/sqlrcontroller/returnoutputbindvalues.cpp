@@ -33,7 +33,7 @@ void sqlrconnection_svr::returnOutputBindValues(sqlrcursor_svr *cursor) {
 				debugstr->append("BLOB:\n");
 			}
 
-			cursor->returnOutputBindBlob(i);
+			returnOutputBindBlob(cursor,i);
 
 		} else if (bv->type==CLOB_BIND) {
 
@@ -41,7 +41,7 @@ void sqlrconnection_svr::returnOutputBindValues(sqlrcursor_svr *cursor) {
 				debugstr->append("CLOB:\n");
 			}
 
-			cursor->returnOutputBindClob(i);
+			returnOutputBindClob(cursor,i);
 
 		} else if (bv->type==STRING_BIND) {
 

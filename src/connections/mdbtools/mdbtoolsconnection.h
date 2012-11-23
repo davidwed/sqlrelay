@@ -28,21 +28,16 @@ class mdbtoolscursor : public sqlrcursor_svr {
 	private:
 				mdbtoolscursor(sqlrconnection_svr *conn);
 				~mdbtoolscursor();
-		bool		openCursor(uint16_t id);
-		bool		closeCursor();
+		bool		open(uint16_t id);
+		bool		close();
 		bool		supportsNativeBinds();
 		bool		executeQuery(const char *query,
 						uint32_t length);
-		bool		knowsRowCount();
-		uint64_t	rowCount();
 		bool		knowsAffectedRows();
-		uint64_t	affectedRows();
 		uint32_t	colCount();
 		const char * const * columnNames();
-		uint16_t	columnTypeFormat();
 		const char	*getColumnName(uint32_t col);
 		bool		noRowsToReturn();
-		bool		skipRow();
 		bool		fetchRow();
 		void		getField(uint32_t col,
 						const char **field,

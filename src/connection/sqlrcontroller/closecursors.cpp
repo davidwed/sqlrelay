@@ -15,9 +15,11 @@ void sqlrconnection_svr::closeCursors(bool destroy) {
 
 			if (cur[cursorcount]) {
 				cur[cursorcount]->cleanUpData(true,true);
-				cur[cursorcount]->closeCursor();
+				cur[cursorcount]->close();
 				if (destroy) {
-					deleteCursorInternal(cur[cursorcount]);
+					deleteCursorInternal(
+						cur[cursorcount]);
+					cur[cursorcount]=NULL;
 				}
 			}
 		}

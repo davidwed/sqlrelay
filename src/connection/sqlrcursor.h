@@ -52,21 +52,21 @@ class sqlrcursor_svr {
 		virtual	~sqlrcursor_svr();
 
 		// interface definition
-		virtual	bool	openCursor(uint16_t id);
-		virtual	bool	closeCursor();
+		virtual	bool	open(uint16_t id);
+		virtual	bool	close();
 
 		virtual	bool	prepareQuery(const char *query,
 						uint32_t length);
 		virtual	bool	supportsNativeBinds();
-		virtual	bool	inputBindString(const char *variable, 
+		virtual	bool	inputBind(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull);
-		virtual	bool	inputBindInteger(const char *variable, 
+		virtual	bool	inputBind(const char *variable, 
 						uint16_t variablesize,
 						int64_t *value);
-		virtual	bool	inputBindDouble(const char *variable, 
+		virtual	bool	inputBind(const char *variable, 
 						uint16_t variablesize,
 						double *value,
 						uint32_t precision,
@@ -81,7 +81,7 @@ class sqlrcursor_svr {
 						int16_t second,
 						int32_t microsecond,
 						const char *tz);
-		virtual bool	inputBindDate(const char *variable,
+		virtual bool	inputBind(const char *variable,
 						uint16_t variablesize,
 						int64_t year,
 						int16_t month,
@@ -104,22 +104,22 @@ class sqlrcursor_svr {
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull);
-		virtual	bool	outputBindString(const char *variable, 
+		virtual	bool	outputBind(const char *variable, 
 						uint16_t variablesize,
 						char *value,
 						uint16_t valuesize,
 						int16_t *isnull);
-		virtual	bool	outputBindInteger(const char *variable, 
+		virtual	bool	outputBind(const char *variable, 
 						uint16_t variablesize,
 						int64_t *value,
 						int16_t *isnull);
-		virtual	bool	outputBindDouble(const char *variable, 
+		virtual	bool	outputBind(const char *variable, 
 						uint16_t variablesize,
 						double *value,
 						uint32_t *precision,
 						uint32_t *scale,
 						int16_t *isnull);
-		virtual bool	outputBindDate(const char *variable,
+		virtual bool	outputBind(const char *variable,
 						uint16_t variablesize,
 						int16_t *year,
 						int16_t *month,
@@ -143,10 +143,6 @@ class sqlrcursor_svr {
 		virtual	bool	outputBindCursor(const char *variable,
 						uint16_t variablesize,
 						sqlrcursor_svr *cursor);
-		virtual	void	returnOutputBindBlob(uint16_t index);
-		virtual	void	returnOutputBindClob(uint16_t index);
-		virtual	void	returnOutputBindCursor(uint16_t index);
-		virtual void	sendLobOutputBind(uint16_t index);
 		virtual bool	getLobOutputBindLength(uint16_t index,
 							uint64_t *length);
 		virtual bool	getLobOutputBindSegment(uint16_t index,
@@ -158,7 +154,7 @@ class sqlrcursor_svr {
 		virtual void	checkForTempTable(const char *query,
 							uint32_t length);
 		virtual	bool	executeQuery(const char *query,
-							uint32_t length)=0;
+							uint32_t length);
 		virtual bool	fetchFromBindCursor();
 		virtual	bool		queryIsNotSelect();
 		virtual	bool		queryIsCommitOrRollback();
@@ -167,12 +163,13 @@ class sqlrcursor_svr {
 						uint32_t *errorlength,
 						int64_t *errorcode,
 						bool *liveconnection);
-		virtual bool		knowsRowCount()=0;
-		virtual uint64_t	rowCount()=0;
-		virtual bool		knowsAffectedRows()=0;
-		virtual uint64_t	affectedRows()=0;
-		virtual	uint32_t	colCount()=0;
-		virtual const char * const * columnNames()=0;
+		virtual bool		knowsRowCount();
+		virtual uint64_t	rowCount();
+		virtual bool		knowsAffectedRows();
+		virtual uint64_t	affectedRows();
+		virtual	uint32_t	colCount();
+		virtual uint16_t	columnTypeFormat();
+		virtual const char * const * columnNames();
 		virtual const char	*getColumnName(uint32_t col);
 		virtual uint16_t	getColumnNameLength(uint32_t col);
 		virtual uint16_t	getColumnType(uint32_t col);
@@ -189,18 +186,15 @@ class sqlrcursor_svr {
 		virtual uint16_t	getColumnIsZeroFilled(uint32_t col);
 		virtual uint16_t	getColumnIsBinary(uint32_t col);
 		virtual uint16_t	getColumnIsAutoIncrement(uint32_t col);
-		virtual uint16_t	columnTypeFormat()=0;
-		virtual	bool		noRowsToReturn()=0;
-		virtual	bool		skipRow()=0;
-		virtual	bool		fetchRow()=0;
-		virtual	void		returnRow();
+		virtual	bool		noRowsToReturn();
+		virtual	bool		skipRow();
+		virtual	bool		fetchRow();
 		virtual	void		nextRow();
 		virtual void		getField(uint32_t col,
 							const char **field,
 							uint64_t *fieldlength,
 							bool *blob,
 							bool *null);
-		virtual void		sendLobField(uint32_t col);
 		virtual bool		getLobFieldLength(uint32_t col,
 							uint64_t *length);
 		virtual bool		getLobFieldSegment(uint32_t col,
@@ -214,11 +208,7 @@ class sqlrcursor_svr {
 							bool freebinds);
 		virtual bool		getColumnNameList(stringbuffer *output);
 
-		virtual bool		translateQuery();
-
 		void	setFakeInputBindsForThisQuery(bool fake);
-
-		void	printQueryTree(xmldom *tree);
 	
 	protected:
 		// methods/variables used by derived classes
@@ -266,11 +256,10 @@ class sqlrcursor_svr {
 		uint64_t	lastrow;
 
 		// this one too...
-		bool	openCursorInternal(uint16_t id);
+		bool	openInternal(uint16_t id);
 
 	private:
 		// methods used internally
-		bool	handleBinds();
 		void	performSubstitution(stringbuffer *buffer,
 							int16_t index);
 		void	abort();

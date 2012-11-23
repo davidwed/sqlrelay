@@ -25,27 +25,27 @@ class mysqlcursor : public sqlrcursor_svr {
 				mysqlcursor(sqlrconnection_svr *conn);
 				~mysqlcursor();
 #ifdef HAVE_MYSQL_STMT_PREPARE
-		bool		openCursor(uint16_t id);
-		bool		closeCursor();
+		bool		open(uint16_t id);
+		bool		close();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 #endif
 		bool		supportsNativeBinds();
 #ifdef HAVE_MYSQL_STMT_PREPARE
-		bool		inputBindString(const char *variable, 
+		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull);
-		bool		inputBindInteger(const char *variable, 
+		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						int64_t *value);
-		bool		inputBindDouble(const char *variable, 
+		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						double *value,
 						uint32_t precision,
 						uint32_t scale);
-		bool		inputBindDate(const char *variable,
+		bool		inputBind(const char *variable,
 						uint16_t variablesize,
 						int64_t year,
 						int16_t month,
@@ -78,11 +78,9 @@ class mysqlcursor : public sqlrcursor_svr {
 						bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
-		bool		knowsAffectedRows();
 		uint64_t	affectedRows();
 		uint32_t	colCount();
 		const char * const * columnNames();
-		uint16_t	columnTypeFormat();
 		const char	*getColumnName(uint32_t col);
 		uint16_t	getColumnType(uint32_t col);
 		uint32_t	getColumnLength(uint32_t col);
@@ -97,7 +95,6 @@ class mysqlcursor : public sqlrcursor_svr {
 		uint16_t	getColumnIsBinary(uint32_t col);
 		uint16_t	getColumnIsAutoIncrement(uint32_t col);
 		bool		noRowsToReturn();
-		bool		skipRow();
 		bool		fetchRow();
 		void		getField(uint32_t col,
 					const char **field,

@@ -32,15 +32,15 @@ class sqlitecursor : public sqlrcursor_svr {
 		bool		supportsNativeBinds();
 
 /*#ifdef HAVE_SQLITE3_BIND_INT
-		bool		inputBindString(const char *variable, 
+		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull);
-		bool		inputBindInteger(const char *variable, 
+		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						int64_t *value);
-		bool		inputBindDouble(const char *variable, 
+		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						double *value,
 						uint32_t precision,
@@ -63,15 +63,12 @@ class sqlitecursor : public sqlrcursor_svr {
 		bool		knowsRowCount();
 		uint64_t	rowCount();
 		bool		knowsAffectedRows();
-		uint64_t	affectedRows();
 		uint32_t	colCount();
 		const char * const * columnNames();
-		uint16_t	columnTypeFormat();
 		const char	*getColumnName(uint32_t col);
 		bool		noRowsToReturn();
 		bool		skipRow();
 		bool		fetchRow();
-		void		returnRow();
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,

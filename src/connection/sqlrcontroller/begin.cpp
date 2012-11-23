@@ -4,10 +4,12 @@
 #include <sqlrconnection.h>
 
 void sqlrconnection_svr::beginCommand() {
-	dbgfile.debugPrint("connection",1,"begin");
+	dbgfile.debugPrint("connection",1,"begin...");
 	if (beginInternal()) {
+		dbgfile.debugPrint("connection",1,"begin succeeded");
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	} else {
+		dbgfile.debugPrint("connection",1,"begin failed");
 		returnError(!liveconnection);
 	}
 	flushWriteBuffer();

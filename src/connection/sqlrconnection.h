@@ -56,7 +56,6 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual	void	handleConnectString()=0;
 
 		virtual	bool	logIn(bool printerrors)=0;
-		virtual void	reLogIn();
 		virtual	void	logOut()=0;
 
 		virtual	bool	changeUser(const char *newuser,
@@ -123,8 +122,6 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		virtual char	bindVariablePrefix();
 		virtual bool	bindValueIsNull(int16_t isnull);
 
-		virtual	bool	skipRows(sqlrcursor_svr *cursor, uint64_t rows);
-
 		virtual const char	*tempTableDropPrefix();
 		virtual bool		tempTableDropReLogIn();
 
@@ -173,6 +170,7 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 
 		bool	logInInternal(bool printerrors);
 		void	logOutInternal();
+		void	reLogIn();
 
 	public:
 		// ideally these would be private but the
@@ -324,10 +322,13 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		bool	getDateBind(bindvar_svr *bv);
 		bool	getLobBind(sqlrcursor_svr *cursor, bindvar_svr *bv);
 		bool	getSendColumnInfo();
+		bool	handleBinds(sqlrcursor_svr *cursor);
 		bool	processQuery(sqlrcursor_svr *cursor,
 						bool reexecute,
 						bool bindcursor);
 		void	rewriteQuery(sqlrcursor_svr *cursor);
+		bool	translateQuery(sqlrcursor_svr *cursor);
+		void	printQueryTree(xmldom *tree);
 		void	translateBindVariables(sqlrcursor_svr *cursor);
 		bool	matchesNativeBindFormat(const char *bind);
 		void	translateBindVariableInStringAndArray(
@@ -344,6 +345,12 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 		void	commitOrRollback(sqlrcursor_svr *cursor);
 		void	returnResultSet();
 		void	returnOutputBindValues(sqlrcursor_svr *cursor);
+		void	returnOutputBindBlob(sqlrcursor_svr *cursor,
+							uint16_t index);
+		void	returnOutputBindClob(sqlrcursor_svr *cursor,
+							uint16_t index);
+		void	sendLobOutputBind(sqlrcursor_svr *cursor,
+							uint16_t index);
 		void	returnResultSetHeader(sqlrcursor_svr *cursor);
 		void	returnColumnInfo(sqlrcursor_svr *cursor,
 						uint16_t format);
@@ -381,8 +388,11 @@ class sqlrconnection_svr : public daemonprocess, public listener {
 						uint16_t zerofill,
 						uint16_t binary,
 						uint16_t autoincrement);
+		bool	skipRows(sqlrcursor_svr *cursor, uint64_t rows);
+		void	returnRow(sqlrcursor_svr *cursor);
 		void	sendNullField();
 		void	sendField(const char *data, uint32_t size);
+		void	sendLobField(sqlrcursor_svr *cursor, uint32_t col);
 		void	startSendingLong(uint64_t longlength);
 		void	sendLongSegment(const char *data, uint32_t size);
 		void	endSendingLong();

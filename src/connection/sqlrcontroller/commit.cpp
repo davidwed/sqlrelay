@@ -4,10 +4,12 @@
 #include <sqlrconnection.h>
 
 void sqlrconnection_svr::commitCommand() {
-	dbgfile.debugPrint("connection",1,"commit");
+	dbgfile.debugPrint("connection",1,"commit...");
 	if (commitInternal()) {
+		dbgfile.debugPrint("connection",1,"commit succeeded");
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	} else {
+		dbgfile.debugPrint("connection",1,"commit failed");
 		returnError(!liveconnection);
 	}
 	flushWriteBuffer();

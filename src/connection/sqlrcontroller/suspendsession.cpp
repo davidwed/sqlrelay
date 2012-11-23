@@ -46,16 +46,14 @@ bool sqlrconnection_svr::suspendSession() {
 
 	dbgfile.debugPrint("connection",1,"suspending session...");
 
-	// abort all cursors that aren't already suspended
-	dbgfile.debugPrint("connection",2,
-				"aborting busy, unsuspended cursors...");
 	suspendedsession=true;
 	accepttimeout=cfgfl->getSessionTimeout();
-	for (int32_t i=0; i<cfgfl->getCursors(); i++) {
+
+	// abort all cursors that aren't already suspended...
+	dbgfile.debugPrint("connection",2,
+				"aborting busy, unsuspended cursors...");
+	for (int32_t i=0; i<cursorcount; i++) {
 		if (!cur[i]->suspendresultset && cur[i]->busy) {
-
-			dbgfile.debugPrint("connection",3,i);
-
 			// Very important...
 			// Do not cleanUpData() here, otherwise result sets
 			// that were suspended after the entire result set was
@@ -64,7 +62,6 @@ bool sqlrconnection_svr::suspendSession() {
 			cur[i]->abort();
 		}
 	}
-
 	dbgfile.debugPrint("connection",2,
 				"done aborting busy, unsuspended cursors");
 

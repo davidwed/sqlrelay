@@ -1108,7 +1108,7 @@ void oracle8cursor::deallocateResultSetBuffers() {
 	}
 }
 
-bool oracle8cursor::openCursor(uint16_t id) {
+bool oracle8cursor::open(uint16_t id) {
 
 	stmt=NULL;
 
@@ -1140,7 +1140,7 @@ bool oracle8cursor::openCursor(uint16_t id) {
 				(OCIError *)oracle8conn->err)==OCI_SUCCESS);
 }
 
-bool oracle8cursor::closeCursor() {
+bool oracle8cursor::close() {
 
 	cleanUpData(true,true);
 
@@ -1283,11 +1283,11 @@ void oracle8cursor::dateToString(char *buffer, uint16_t buffersize,
 	}
 }
 
-bool oracle8cursor::inputBindString(const char *variable,
-						uint16_t variablesize,
-						const char *value,
-						uint32_t valuesize,
-						int16_t *isnull) {
+bool oracle8cursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				const char *value,
+				uint32_t valuesize,
+				int16_t *isnull) {
 	checkRePrepare();
 
 	// the size of the value must include the terminating NULL
@@ -1324,9 +1324,9 @@ bool oracle8cursor::inputBindString(const char *variable,
 }
 
 
-bool oracle8cursor::inputBindInteger(const char *variable,
-						uint16_t variablesize,
-						int64_t *value) {
+bool oracle8cursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				int64_t *value) {
 	checkRePrepare();
 
 	inintbindstring[orainbindcount]=charstring::parseNumber(*value);
@@ -1366,11 +1366,11 @@ bool oracle8cursor::inputBindInteger(const char *variable,
 }
 
 
-bool oracle8cursor::inputBindDouble(const char *variable,
-						uint16_t variablesize,
-						double *value,
-						uint32_t precision,
-						uint32_t scale) {
+bool oracle8cursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				double *value,
+				uint32_t precision,
+				uint32_t scale) {
 	checkRePrepare();
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
@@ -1404,19 +1404,19 @@ bool oracle8cursor::inputBindDouble(const char *variable,
 }
 
 
-bool oracle8cursor::inputBindDate(const char *variable,
-						uint16_t variablesize,
-						int64_t year,
-						int16_t month,
-						int16_t day,
-						int16_t hour,
-						int16_t minute,
-						int16_t second,
-						int32_t microsecond,
-						const char *tz,
-						char *buffer,
-						uint16_t buffersize,
-						int16_t *isnull) {
+bool oracle8cursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				int64_t year,
+				int16_t month,
+				int16_t day,
+				int16_t hour,
+				int16_t minute,
+				int16_t second,
+				int32_t microsecond,
+				const char *tz,
+				char *buffer,
+				uint16_t buffersize,
+				int16_t *isnull) {
 	checkRePrepare();
 
 	indatebind[orainbindcount]=new OCIDate;
@@ -1456,11 +1456,11 @@ bool oracle8cursor::inputBindDate(const char *variable,
 }
 
 
-bool oracle8cursor::outputBindString(const char *variable,
-						uint16_t variablesize,
-						char *value,
-						uint16_t valuesize,
-						int16_t *isnull) {
+bool oracle8cursor::outputBind(const char *variable,
+				uint16_t variablesize,
+				char *value,
+				uint16_t valuesize,
+				int16_t *isnull) {
 	checkRePrepare();
 
 	outintbindstring[oraoutbindcount]=NULL;
@@ -1500,10 +1500,10 @@ bool oracle8cursor::outputBindString(const char *variable,
 	return true;
 }
 
-bool oracle8cursor::outputBindInteger(const char *variable,
-						uint16_t variablesize,
-						int64_t *value,
-						int16_t *isnull) {
+bool oracle8cursor::outputBind(const char *variable,
+				uint16_t variablesize,
+				int64_t *value,
+				int16_t *isnull) {
 	checkRePrepare();
 
 	outintbindstring[oraoutbindcount]=new char[21];
@@ -1545,12 +1545,12 @@ bool oracle8cursor::outputBindInteger(const char *variable,
 	return true;
 }
 
-bool oracle8cursor::outputBindDouble(const char *variable,
-						uint16_t variablesize,
-						double *value,
-						uint32_t *precision,
-						uint32_t *scale,
-						int16_t *isnull) {
+bool oracle8cursor::outputBind(const char *variable,
+				uint16_t variablesize,
+				double *value,
+				uint32_t *precision,
+				uint32_t *scale,
+				int16_t *isnull) {
 	checkRePrepare();
 
 	outintbindstring[oraoutbindcount]=NULL;
@@ -1588,19 +1588,19 @@ bool oracle8cursor::outputBindDouble(const char *variable,
 	return true;
 }
 
-bool oracle8cursor::outputBindDate(const char *variable,
-						uint16_t variablesize,
-						int16_t *year,
-						int16_t *month,
-						int16_t *day,
-						int16_t *hour,
-						int16_t *minute,
-						int16_t *second,
-						int32_t *microsecond,
-						const char **tz,
-						char *buffer,
-						uint16_t buffersize,
-						int16_t *isnull) {
+bool oracle8cursor::outputBind(const char *variable,
+				uint16_t variablesize,
+				int16_t *year,
+				int16_t *month,
+				int16_t *day,
+				int16_t *hour,
+				int16_t *minute,
+				int16_t *second,
+				int32_t *microsecond,
+				const char **tz,
+				char *buffer,
+				uint16_t buffersize,
+				int16_t *isnull) {
 	checkRePrepare();
 
 	outintbindstring[oraoutbindcount]=NULL;
@@ -1651,32 +1651,32 @@ bool oracle8cursor::outputBindDate(const char *variable,
 
 #ifdef HAVE_ORACLE_8i
 bool oracle8cursor::inputBindBlob(const char *variable,
-						uint16_t variablesize,
-						const char *value,
-						uint32_t valuesize,
-						int16_t *isnull) {
+					uint16_t variablesize,
+					const char *value,
+					uint32_t valuesize,
+					int16_t *isnull) {
 	return inputBindGenericLob(variable,variablesize,
 					value,valuesize,isnull,
 					OCI_TEMP_BLOB,SQLT_BLOB);
 }
 
 bool oracle8cursor::inputBindClob(const char *variable,
-						uint16_t variablesize,
-						const char *value,
-						uint32_t valuesize,
-						int16_t *isnull) {
+					uint16_t variablesize,
+					const char *value,
+					uint32_t valuesize,
+					int16_t *isnull) {
 	return inputBindGenericLob(variable,variablesize,
 					value,valuesize,isnull,
 					OCI_TEMP_CLOB,SQLT_CLOB);
 }
 
 bool oracle8cursor::inputBindGenericLob(const char *variable,
-						uint16_t variablesize,
-						const char *value,
-						uint32_t valuesize,
-						int16_t *isnull,
-						ub1 temptype,
-						ub2 type) {
+					uint16_t variablesize,
+					const char *value,
+					uint32_t valuesize,
+					int16_t *isnull,
+					ub1 temptype,
+					ub2 type) {
 
 	checkRePrepare();
 
@@ -1756,26 +1756,26 @@ bool oracle8cursor::inputBindGenericLob(const char *variable,
 }
 
 bool oracle8cursor::outputBindBlob(const char *variable,
-						uint16_t variablesize,
-						uint16_t index,
-						int16_t *isnull) {
+					uint16_t variablesize,
+					uint16_t index,
+					int16_t *isnull) {
 	return outputBindGenericLob(variable,variablesize,index,
 						isnull,SQLT_BLOB);
 }
 
 bool oracle8cursor::outputBindClob(const char *variable,
-						uint16_t variablesize,
-						uint16_t index,
-						int16_t *isnull) {
+					uint16_t variablesize,
+					uint16_t index,
+					int16_t *isnull) {
 	return outputBindGenericLob(variable,variablesize,index,
 						isnull,SQLT_CLOB);
 }
 
 bool oracle8cursor::outputBindGenericLob(const char *variable,
-						uint16_t variablesize,
-						uint16_t index,
-						int16_t *isnull,
-						ub2 type) {
+					uint16_t variablesize,
+					uint16_t index,
+					int16_t *isnull,
+					ub2 type) {
 
 	checkRePrepare();
 
@@ -1821,8 +1821,8 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 }
 
 bool oracle8cursor::outputBindCursor(const char *variable,
-						uint16_t variablesize,
-						sqlrcursor_svr *cursor) {
+					uint16_t variablesize,
+					sqlrcursor_svr *cursor) {
 
 #ifdef OCI_STMT_CACHE
 	// If the statement cache is in use then OCIStmtExecute will crash
@@ -2323,18 +2323,6 @@ void oracle8cursor::errorMessage(char *errorbuffer,
 #endif
 }
 
-bool oracle8cursor::knowsRowCount() {
-	return false;
-}
-
-uint64_t oracle8cursor::rowCount() {
-	return 0;
-}
-
-bool oracle8cursor::knowsAffectedRows() {
-	return true;
-}
-
 uint64_t oracle8cursor::affectedRows() {
 
 	// get the affected row count
@@ -2356,10 +2344,6 @@ const char * const * oracle8cursor::columnNames() {
 		columnnames[i]=(char *)desc[i].buf;
 	}
 	return columnnames;
-}
-
-uint16_t oracle8cursor::columnTypeFormat() {
-	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 const char *oracle8cursor::getColumnName(uint32_t col) {

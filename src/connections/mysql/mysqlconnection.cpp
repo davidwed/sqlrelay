@@ -384,14 +384,14 @@ mysqlcursor::~mysqlcursor() {
 }
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
-bool mysqlcursor::openCursor(uint16_t id) {
+bool mysqlcursor::open(uint16_t id) {
 	stmt=mysql_stmt_init(&mysqlconn->mysql);
 	return true;
 }
 #endif
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
-bool mysqlcursor::closeCursor() {
+bool mysqlcursor::close() {
 	mysql_stmt_close(stmt);
 	return true;
 }
@@ -448,11 +448,11 @@ bool mysqlcursor::supportsNativeBinds() {
 }
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
-bool mysqlcursor::inputBindString(const char *variable, 
-						uint16_t variablesize,
-						const char *value, 
-						uint32_t valuesize,
-						int16_t *isnull) {
+bool mysqlcursor::inputBind(const char *variable, 
+				uint16_t variablesize,
+				const char *value, 
+				uint32_t valuesize,
+				int16_t *isnull) {
 
 	if (!usestmtprepare) {
 		return true;
@@ -483,9 +483,9 @@ bool mysqlcursor::inputBindString(const char *variable,
 	return true;
 }
 
-bool mysqlcursor::inputBindInteger(const char *variable, 
-						uint16_t variablesize,
-						int64_t *value) {
+bool mysqlcursor::inputBind(const char *variable, 
+				uint16_t variablesize,
+				int64_t *value) {
 
 	if (!usestmtprepare) {
 		return true;
@@ -509,11 +509,11 @@ bool mysqlcursor::inputBindInteger(const char *variable,
 	return true;
 }
 
-bool mysqlcursor::inputBindDouble(const char *variable, 
-						uint16_t variablesize,
-						double *value,
-						uint32_t precision,
-						uint32_t scale) {
+bool mysqlcursor::inputBind(const char *variable, 
+				uint16_t variablesize,
+				double *value,
+				uint32_t precision,
+				uint32_t scale) {
 
 	if (!usestmtprepare) {
 		return true;
@@ -537,19 +537,19 @@ bool mysqlcursor::inputBindDouble(const char *variable,
 	return true;
 }
 
-bool mysqlcursor::inputBindDate(const char *variable,
-					uint16_t variablesize,
-					int64_t year,
-					int16_t month,
-					int16_t day,
-					int16_t hour,
-					int16_t minute,
-					int16_t second,
-					int32_t microsecond,
-					const char *tz,
-					char *buffer,
-					uint16_t buffersize,
-					int16_t *isnull) {
+bool mysqlcursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				int64_t year,
+				int16_t month,
+				int16_t day,
+				int16_t hour,
+				int16_t minute,
+				int16_t second,
+				int32_t microsecond,
+				const char *tz,
+				char *buffer,
+				uint16_t buffersize,
+				int16_t *isnull) {
 
 	if (!usestmtprepare) {
 		return true;
@@ -592,10 +592,10 @@ bool mysqlcursor::inputBindDate(const char *variable,
 }
 
 bool mysqlcursor::inputBindBlob(const char *variable, 
-						uint16_t variablesize,
-						const char *value, 
-						uint32_t valuesize,
-						int16_t *isnull) {
+				uint16_t variablesize,
+				const char *value, 
+				uint32_t valuesize,
+				int16_t *isnull) {
 
 	if (!usestmtprepare) {
 		return true;
@@ -627,10 +627,10 @@ bool mysqlcursor::inputBindBlob(const char *variable,
 }
 
 bool mysqlcursor::inputBindClob(const char *variable, 
-						uint16_t variablesize,
-						const char *value, 
-						uint32_t valuesize,
-						int16_t *isnull) {
+				uint16_t variablesize,
+				const char *value, 
+				uint32_t valuesize,
+				int16_t *isnull) {
 	return inputBindBlob(variable,variablesize,value,valuesize,isnull);
 }
 #endif
@@ -824,16 +824,8 @@ uint64_t mysqlcursor::rowCount() {
 	return nrows;
 }
 
-bool mysqlcursor::knowsAffectedRows() {
-	return true;
-}
-
 uint64_t mysqlcursor::affectedRows() {
 	return affectedrows;
-}
-
-uint16_t mysqlcursor::columnTypeFormat() {
-	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 const char *mysqlcursor::getColumnName(uint32_t col) {
@@ -1045,10 +1037,6 @@ uint16_t mysqlcursor::getColumnIsAutoIncrement(uint32_t col) {
 bool mysqlcursor::noRowsToReturn() {
 	// for DML or DDL queries, return no data
 	return (!mysqlresult);
-}
-
-bool mysqlcursor::skipRow() {
-	return fetchRow();
 }
 
 bool mysqlcursor::fetchRow() {

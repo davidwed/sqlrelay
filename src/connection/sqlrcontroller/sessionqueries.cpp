@@ -30,11 +30,11 @@ void sqlrconnection_svr::sessionQuery(const char *query) {
 
 	// since we're creating a new cursor for this, make sure it
 	// can't have an ID that might already exist
-	if (cur->openCursorInternal(cursorcount+1) &&
+	if (cur->openInternal(cursorcount+1) &&
 		cur->prepareQuery(query,querylen) &&
 		executeQueryInternal(cur,query,querylen)) {
 		cur->cleanUpData(true,true);
 	}
-	cur->closeCursor();
+	cur->close();
 	deleteCursorInternal(cur);
 }

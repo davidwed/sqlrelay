@@ -383,7 +383,7 @@ postgresqlcursor::~postgresqlcursor() {
 
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
-bool postgresqlcursor::openCursor(uint16_t id) {
+bool postgresqlcursor::open(uint16_t id) {
 	size_t	cursornamelen=6+charstring::integerLength(id)+1;
 	cursorname=new char[cursornamelen];
 	snprintf(cursorname,cursornamelen,"cursor%d",id);
@@ -453,11 +453,11 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-bool postgresqlcursor::inputBindString(const char *variable, 
-						uint16_t variablesize,
-						const char *value, 
-						uint32_t valuesize,
-						int16_t *isnull) {
+bool postgresqlcursor::inputBind(const char *variable, 
+					uint16_t variablesize,
+					const char *value, 
+					uint32_t valuesize,
+					int16_t *isnull) {
 
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
@@ -477,9 +477,9 @@ bool postgresqlcursor::inputBindString(const char *variable,
 	return true;
 }
 
-bool postgresqlcursor::inputBindInteger(const char *variable, 
-						uint16_t variablesize,
-						int64_t *value) {
+bool postgresqlcursor::inputBind(const char *variable, 
+					uint16_t variablesize,
+					int64_t *value) {
 
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
@@ -494,11 +494,11 @@ bool postgresqlcursor::inputBindInteger(const char *variable,
 	return true;
 }
 
-bool postgresqlcursor::inputBindDouble(const char *variable, 
-						uint16_t variablesize,
-						double *value,
-						uint32_t precision,
-						uint32_t scale) {
+bool postgresqlcursor::inputBind(const char *variable, 
+					uint16_t variablesize,
+					double *value,
+					uint32_t precision,
+					uint32_t scale) {
 
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
@@ -514,10 +514,10 @@ bool postgresqlcursor::inputBindDouble(const char *variable,
 }
 
 bool postgresqlcursor::inputBindBlob(const char *variable, 
-						uint16_t variablesize,
-						const char *value, 
-						uint32_t valuesize,
-						int16_t *isnull) {
+					uint16_t variablesize,
+					const char *value, 
+					uint32_t valuesize,
+					int16_t *isnull) {
 
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
@@ -539,10 +539,10 @@ bool postgresqlcursor::inputBindBlob(const char *variable,
 }
 
 bool postgresqlcursor::inputBindClob(const char *variable, 
-						uint16_t variablesize,
-						const char *value, 
-						uint32_t valuesize,
-						int16_t *isnull) {
+					uint16_t variablesize,
+					const char *value, 
+					uint32_t valuesize,
+					int16_t *isnull) {
 
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
@@ -641,10 +641,6 @@ bool postgresqlcursor::knowsRowCount() {
 
 uint64_t postgresqlcursor::rowCount() {
 	return nrows;
-}
-
-bool postgresqlcursor::knowsAffectedRows() {
-	return true;
 }
 
 uint64_t postgresqlcursor::affectedRows() {
@@ -965,10 +961,6 @@ uint16_t postgresqlcursor::getColumnIsBinary(uint32_t col) {
 
 bool postgresqlcursor::noRowsToReturn() {
 	return (!nrows);
-}
-
-bool postgresqlcursor::skipRow() {
-	return fetchRow();
 }
 
 bool postgresqlcursor::fetchRow() {

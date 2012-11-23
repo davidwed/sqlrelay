@@ -424,72 +424,72 @@ bool routercursor::supportsNativeBinds() {
 	return true;
 }
 
-bool routercursor::inputBindString(const char *variable, 
-						uint16_t variablesize,
-						const char *value, 
-						uint32_t valuesize,
-						int16_t *isnull) {
+bool routercursor::inputBind(const char *variable, 
+				uint16_t variablesize,
+				const char *value, 
+				uint32_t valuesize,
+				int16_t *isnull) {
 	cur->inputBind(variable+1,value);
 	return true;
 }
 
-bool routercursor::inputBindInteger(const char *variable, 
-						uint16_t variablesize,
-						int64_t *value) {
+bool routercursor::inputBind(const char *variable, 
+				uint16_t variablesize,
+				int64_t *value) {
 	cur->inputBind(variable+1,*value);
 	return true;
 }
 
-bool routercursor::inputBindDouble(const char *variable, 
-						uint16_t variablesize,
-						double *value,
-						uint32_t precision,
-						uint32_t scale) {
+bool routercursor::inputBind(const char *variable, 
+				uint16_t variablesize,
+				double *value,
+				uint32_t precision,
+				uint32_t scale) {
 	cur->inputBind(variable+1,*value,precision,scale);
 	return true;
 }
 
-bool routercursor::inputBindDate(const char *variable,
-                                                uint16_t variablesize,
-                                                int64_t year,
-                                                int16_t month,
-                                                int16_t day,
-                                                int16_t hour,
-                                                int16_t minute,
-                                                int16_t second,
-                                                int32_t microsecond,
-                                                const char *tz,
-                                                char *buffer,
-                                                uint16_t buffersize,
-                                                int16_t *isnull) {
+bool routercursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				int64_t year,
+				int16_t month,
+				int16_t day,
+				int16_t hour,
+				int16_t minute,
+				int16_t second,
+				int32_t microsecond,
+				const char *tz,
+				char *buffer,
+				uint16_t buffersize,
+				int16_t *isnull) {
 	cur->inputBind(variable+1,year,month,day,
 			hour,minute,second,microsecond,tz);
 	return true;
 }
 
 bool routercursor::inputBindBlob(const char *variable, 
-						uint16_t variablesize,
-						const char *value, 
-						uint32_t valuesize,
-						int16_t *isnull) {
+					uint16_t variablesize,
+					const char *value, 
+					uint32_t valuesize,
+					int16_t *isnull) {
 	cur->inputBindBlob(variable+1,value,valuesize);
 	return true;
 }
 
 bool routercursor::inputBindClob(const char *variable, 
-						uint16_t variablesize,
-						const char *value, 
-						uint32_t valuesize,
-						int16_t *isnull) {
+					uint16_t variablesize,
+					const char *value, 
+					uint32_t valuesize,
+					int16_t *isnull) {
 	cur->inputBindClob(variable+1,value,valuesize);
 	return true;
 }
 
-bool routercursor::outputBindString(const char *variable, 
-						uint16_t variablesize,
-						char *value,
-						uint16_t valuesize,
-						int16_t *isnull) {
+bool routercursor::outputBind(const char *variable, 
+				uint16_t variablesize,
+				char *value,
+				uint16_t valuesize,
+				int16_t *isnull) {
 	cur->defineOutputBindString(variable+1,valuesize);
 	obv[obcount].variable=variable+1;
 	obv[obcount].type=STRING_BIND;
@@ -500,10 +500,10 @@ bool routercursor::outputBindString(const char *variable,
 	return true;
 }
 
-bool routercursor::outputBindInteger(const char *variable, 
-						uint16_t variablesize,
-						int64_t *value,
-						int16_t *isnull) {
+bool routercursor::outputBind(const char *variable, 
+				uint16_t variablesize,
+				int64_t *value,
+				int16_t *isnull) {
 	cur->defineOutputBindInteger(variable+1);
 	obv[obcount].variable=variable+1;
 	obv[obcount].type=INTEGER_BIND;
@@ -513,12 +513,12 @@ bool routercursor::outputBindInteger(const char *variable,
 	return true;
 }
 
-bool routercursor::outputBindDouble(const char *variable, 
-						uint16_t variablesize,
-						double *value,
-						uint32_t *precision,
-						uint32_t *scale,
-						int16_t *isnull) {
+bool routercursor::outputBind(const char *variable, 
+				uint16_t variablesize,
+				double *value,
+				uint32_t *precision,
+				uint32_t *scale,
+				int16_t *isnull) {
 	cur->defineOutputBindDouble(variable+1);
 	obv[obcount].variable=variable+1;
 	obv[obcount].type=DOUBLE_BIND;
@@ -528,19 +528,19 @@ bool routercursor::outputBindDouble(const char *variable,
 	return true;
 }
 
-bool routercursor::outputBindDate(const char *variable,
-                                                uint16_t variablesize,
-                                                int16_t *year,
-                                                int16_t *month,
-                                                int16_t *day,
-                                                int16_t *hour,
-                                                int16_t *minute,
-                                                int16_t *second,
-                                                int32_t *microsecond,
-                                                const char **tz,
-                                                char *buffer,
-                                                uint16_t buffersize,
-                                                int16_t *isnull) {
+bool routercursor::outputBind(const char *variable,
+				uint16_t variablesize,
+				int16_t *year,
+				int16_t *month,
+				int16_t *day,
+				int16_t *hour,
+				int16_t *minute,
+				int16_t *second,
+				int32_t *microsecond,
+				const char **tz,
+				char *buffer,
+				uint16_t buffersize,
+				int16_t *isnull) {
 	cur->defineOutputBindDouble(variable+1);
 	obv[obcount].variable=variable+1;
 	obv[obcount].type=DATE_BIND;
@@ -559,9 +559,9 @@ bool routercursor::outputBindDate(const char *variable,
 
 
 bool routercursor::outputBindBlob(const char *variable, 
-						uint16_t variablesize,
-						uint16_t index,
-						int16_t *isnull) {
+					uint16_t variablesize,
+					uint16_t index,
+					int16_t *isnull) {
 	cur->defineOutputBindBlob(variable+1);
 	obv[obcount].variable=variable+1;
 	obv[obcount].type=BLOB_BIND;
@@ -571,9 +571,9 @@ bool routercursor::outputBindBlob(const char *variable,
 }
 
 bool routercursor::outputBindClob(const char *variable, 
-						uint16_t variablesize,
-						uint16_t index,
-						int16_t *isnull) {
+					uint16_t variablesize,
+					uint16_t index,
+					int16_t *isnull) {
 	cur->defineOutputBindClob(variable+1);
 	obv[obcount].variable=variable+1;
 	obv[obcount].type=CLOB_BIND;
@@ -583,8 +583,8 @@ bool routercursor::outputBindClob(const char *variable,
 }
 
 bool routercursor::outputBindCursor(const char *variable,
-						uint16_t variablesize,
-						sqlrcursor_svr *cursor) {
+					uint16_t variablesize,
+					sqlrcursor_svr *cursor) {
 	cur->defineOutputBindCursor(variable+1);
 	cbv[cbcount].variable=variable+1;
 	cbv[cbcount].cursor=cursor;
@@ -800,10 +800,6 @@ uint64_t routercursor::rowCount() {
 	return (cur)?cur->rowCount():0;
 }
 
-bool routercursor::knowsAffectedRows() {
-	return true;
-}
-
 uint64_t routercursor::affectedRows() {
 	return (cur)?cur->affectedRows():0;
 }
@@ -874,10 +870,6 @@ uint16_t routercursor::getColumnIsAutoIncrement(uint32_t col) {
 
 bool routercursor::noRowsToReturn() {
 	return (((cur)?cur->rowCount():0)==0);
-}
-
-bool routercursor::skipRow() {
-	return fetchRow();
 }
 
 bool routercursor::fetchRow() {

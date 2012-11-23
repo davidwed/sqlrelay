@@ -225,41 +225,41 @@ bool sqlitecursor::prepareQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-bool sqlitecursor::inputBindString(const char *variable, 
-						uint16_t variablesize,
-						const char *value, 
-						uint32_t valuesize,
-						int16_t *isnull) {
+bool sqlitecursor::inputBind(const char *variable, 
+				uint16_t variablesize,
+				const char *value, 
+				uint32_t valuesize,
+				int16_t *isnull) {
 	return true;
 }
 
-bool sqlitecursor::inputBindInteger(const char *variable, 
-						uint16_t variablesize,
-						int64_t *value) {
+bool sqlitecursor::inputBind(const char *variable, 
+				uint16_t variablesize,
+				int64_t *value) {
 	return true;
 }
 
-bool sqlitecursor::inputBindDouble(const char *variable, 
-						uint16_t variablesize,
-						double *value,
-						uint32_t precision,
-						uint32_t scale) {
+bool sqlitecursor::inputBind(const char *variable, 
+				uint16_t variablesize,
+				double *value,
+				uint32_t precision,
+				uint32_t scale) {
 	return true;
 }
 
 bool sqlitecursor::inputBindBlob(const char *variable, 
-						uint16_t variablesize,
-						const char *value, 
-						uint32_t valuesize,
-						int16_t *isnull) {
+				uint16_t variablesize,
+				const char *value, 
+				uint32_t valuesize,
+				int16_t *isnull) {
 	return true;
 }
 
 bool sqlitecursor::inputBindClob(const char *variable, 
-						uint16_t variablesize,
-						const char *value, 
-						uint32_t valuesize,
-						int16_t *isnull) {
+				uint16_t variablesize,
+				const char *value, 
+				uint32_t valuesize,
+				int16_t *isnull) {
 	return true;
 }
 #endif*/
@@ -411,20 +411,12 @@ bool sqlitecursor::knowsAffectedRows() {
 	return false;
 }
 
-uint64_t sqlitecursor::affectedRows() {
-	return 0;
-}
-
 uint32_t sqlitecursor::colCount() {
 	return ncolumn;
 }
 
 const char * const * sqlitecursor::columnNames() {
 	return columnnames;
-}
-
-uint16_t sqlitecursor::columnTypeFormat() {
-	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 const char *sqlitecursor::getColumnName(uint32_t col) {
@@ -444,14 +436,6 @@ bool sqlitecursor::fetchRow() {
 	// have to check for nrow+1 because the 
 	// first row is actually the column names
 	return (rowindex<(ncolumn*(nrow+1)));
-}
-
-void sqlitecursor::returnRow() {
-
-	if (!result) {
-		return;
-	}
-	sqlrcursor_svr::returnRow();
 }
 
 void sqlitecursor::getField(uint32_t col,

@@ -482,11 +482,11 @@ bool odbccursor::allocateStatementHandle() {
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
-bool odbccursor::inputBindString(const char *variable,
-					uint16_t variablesize,
-					const char *value,
-					uint32_t valuesize,
-					short *isnull) {
+bool odbccursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				const char *value,
+				uint32_t valuesize,
+				short *isnull) {
 
 	#ifdef HAVE_SQLCONNECTW
 	char *value_ucs=conv_to_ucs((char*)value);
@@ -550,9 +550,9 @@ bool odbccursor::inputBindString(const char *variable,
 	return true;
 }
 
-bool odbccursor::inputBindInteger(const char *variable,
-					uint16_t variablesize,
-					int64_t *value) {
+bool odbccursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				int64_t *value) {
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
@@ -577,11 +577,11 @@ bool odbccursor::inputBindInteger(const char *variable,
 	return true;
 }
 
-bool odbccursor::inputBindDouble(const char *variable,
-					uint16_t variablesize,
-					double *value,
-					uint32_t precision,
-					uint32_t scale) {
+bool odbccursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				double *value,
+				uint32_t precision,
+				uint32_t scale) {
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
@@ -606,19 +606,19 @@ bool odbccursor::inputBindDouble(const char *variable,
 	return true;
 }
 
-bool odbccursor::inputBindDate(const char *variable,
-					uint16_t variablesize,
-					int64_t year,
-					int16_t month,
-					int16_t day,
-					int16_t hour,
-					int16_t minute,
-					int16_t second,
-					int32_t microsecond,
-					const char *tz,
-					char *buffer,
-					uint16_t buffersize,
-					int16_t *isnull) {
+bool odbccursor::inputBind(const char *variable,
+				uint16_t variablesize,
+				int64_t year,
+				int16_t month,
+				int16_t day,
+				int16_t hour,
+				int16_t minute,
+				int16_t second,
+				int32_t microsecond,
+				const char *tz,
+				char *buffer,
+				uint16_t buffersize,
+				int16_t *isnull) {
 
 	SQL_TIMESTAMP_STRUCT	*ts=(SQL_TIMESTAMP_STRUCT *)buffer;
 	ts->year=year;
@@ -652,11 +652,11 @@ bool odbccursor::inputBindDate(const char *variable,
 	return true;
 }
 
-bool odbccursor::outputBindString(const char *variable, 
-					uint16_t variablesize,
-					const char *value, 
-					uint16_t valuesize, 
-					short *isnull) {
+bool odbccursor::outputBind(const char *variable, 
+				uint16_t variablesize,
+				const char *value, 
+				uint16_t valuesize, 
+				short *isnull) {
 
 	outdatebind[outbindcount]=NULL;
 
@@ -683,10 +683,10 @@ bool odbccursor::outputBindString(const char *variable,
 	return true;
 }
 
-bool odbccursor::outputBindInteger(const char *variable,
-						uint16_t variablesize,
-						int64_t *value,
-						int16_t *isnull) {
+bool odbccursor::outputBind(const char *variable,
+				uint16_t variablesize,
+				int64_t *value,
+				int16_t *isnull) {
 
 	outdatebind[outbindcount]=NULL;
 
@@ -713,12 +713,12 @@ bool odbccursor::outputBindInteger(const char *variable,
 	return true;
 }
 
-bool odbccursor::outputBindDouble(const char *variable,
-						uint16_t variablesize,
-						double *value,
-						uint32_t *precision,
-						uint32_t *scale,
-						int16_t *isnull) {
+bool odbccursor::outputBind(const char *variable,
+				uint16_t variablesize,
+				double *value,
+				uint32_t *precision,
+				uint32_t *scale,
+				int16_t *isnull) {
 
 	outdatebind[outbindcount]=NULL;
 
@@ -745,19 +745,19 @@ bool odbccursor::outputBindDouble(const char *variable,
 	return true;
 }
 
-bool odbccursor::outputBindDate(const char *variable,
-						uint16_t variablesize,
-						int16_t *year,
-						int16_t *month,
-						int16_t *day,
-						int16_t *hour,
-						int16_t *minute,
-						int16_t *second,
-						int32_t *microsecond,
-						const char **tz,
-						char *buffer,
-						uint16_t buffersize,
-						int16_t *isnull) {
+bool odbccursor::outputBind(const char *variable,
+				uint16_t variablesize,
+				int16_t *year,
+				int16_t *month,
+				int16_t *day,
+				int16_t *hour,
+				int16_t *minute,
+				int16_t *second,
+				int32_t *microsecond,
+				const char **tz,
+				char *buffer,
+				uint16_t buffersize,
+				int16_t *isnull) {
 
 	datebind	*db=new datebind;
 	db->year=year;
@@ -1168,18 +1168,6 @@ void odbccursor::errorMessage(char *errorbuffer,
 	*liveconnection=true;
 }
 
-bool odbccursor::knowsRowCount() {
-	return false;
-}
-
-uint64_t odbccursor::rowCount() {
-	return 0;
-}
-
-bool odbccursor::knowsAffectedRows() {
-	return true;
-}
-
 uint64_t odbccursor::affectedRows() {
 	return affectedrows;
 }
@@ -1193,10 +1181,6 @@ const char * const * odbccursor::columnNames() {
 		columnnames[i]=col[i].name;
 	}
 	return columnnames;
-}
-
-uint16_t odbccursor::columnTypeFormat() {
-	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
 const char *odbccursor::getColumnName(uint32_t i) {
@@ -1286,10 +1270,6 @@ uint16_t odbccursor::getColumnIsAutoIncrement(uint32_t i) {
 bool odbccursor::noRowsToReturn() {
 	// if there are no columns, then there can't be any rows either
 	return (!ncols);
-}
-
-bool odbccursor::skipRow() {
-	return fetchRow();
 }
 
 bool odbccursor::fetchRow() {

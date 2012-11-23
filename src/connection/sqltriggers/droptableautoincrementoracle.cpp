@@ -109,7 +109,7 @@ bool droptableautoincrementoracle::dropSequences(sqlrconnection_svr *sqlrcon,
 		printf("running trigger:\n%s\n",query.getString());
 	}
 	sqlrcursor_svr	*cur=sqlrcon->initCursorInternal();
-	if (cur->openCursorInternal(sqlrcon->cursorcount+1) &&
+	if (cur->openInternal(sqlrcon->cursorcount+1) &&
 		cur->prepareQuery(query.getString(),query.getStringLength()) &&
 		sqlrcon->executeQueryInternal(cur,query.getString(),
 						query.getStringLength())) {
@@ -154,7 +154,7 @@ bool droptableautoincrementoracle::dropSequences(sqlrconnection_svr *sqlrcon,
 		}
 	}
 	cur->cleanUpData(true,true);
-	cur->closeCursor();
+	cur->close();
 	sqlrcon->deleteCursorInternal(cur);
 
 	return true;
@@ -174,7 +174,7 @@ bool droptableautoincrementoracle::dropSequence(sqlrconnection_svr *sqlrcon,
 		printf("running trigger:\n%s\n",query.getString());
 	}
 	sqlrcursor_svr	*cur=sqlrcon->initCursorInternal();
-	if (cur->openCursorInternal(sqlrcon->cursorcount+1) &&
+	if (cur->openInternal(sqlrcon->cursorcount+1) &&
 		cur->prepareQuery(query.getString(),query.getStringLength()) &&
 		sqlrcon->executeQueryInternal(cur,query.getString(),
 						query.getStringLength())) {
@@ -197,7 +197,7 @@ bool droptableautoincrementoracle::dropSequence(sqlrconnection_svr *sqlrcon,
 		}
 	}
 	cur->cleanUpData(true,true);
-	cur->closeCursor();
+	cur->close();
 	sqlrcon->deleteCursorInternal(cur);
 
 	return true;
@@ -219,7 +219,7 @@ bool droptableautoincrementoracle::deleteSequence(sqlrconnection_svr *sqlrcon,
 		printf("running trigger:\n%s\n",query.getString());
 	}
 	sqlrcursor_svr	*cur=sqlrcon->initCursorInternal();
-	if (cur->openCursorInternal(sqlrcon->cursorcount+1) &&
+	if (cur->openInternal(sqlrcon->cursorcount+1) &&
 		cur->prepareQuery(query.getString(),query.getStringLength()) &&
 		sqlrcon->executeQueryInternal(cur,query.getString(),
 						query.getStringLength())) {
@@ -239,7 +239,7 @@ bool droptableautoincrementoracle::deleteSequence(sqlrconnection_svr *sqlrcon,
 		}
 	}
 	cur->cleanUpData(true,true);
-	cur->closeCursor();
+	cur->close();
 	sqlrcon->deleteCursorInternal(cur);
 
 	return true;

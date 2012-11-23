@@ -21,7 +21,7 @@ class postgresqlcursor : public sqlrcursor_svr {
 				~postgresqlcursor();
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
-		bool		openCursor(uint16_t id);
+		bool		open(uint16_t id);
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 		bool		deallocateStatement();
@@ -29,15 +29,15 @@ class postgresqlcursor : public sqlrcursor_svr {
 		bool		supportsNativeBinds();
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
-		bool		inputBindString(const char *variable, 
+		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull);
-		bool		inputBindInteger(const char *variable, 
+		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						int64_t *value);
-		bool		inputBindDouble(const char *variable, 
+		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						double *value,
 						uint32_t precision,
@@ -57,7 +57,6 @@ class postgresqlcursor : public sqlrcursor_svr {
 						uint32_t length);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
-		bool		knowsAffectedRows();
 		uint64_t	affectedRows();
 		uint32_t	colCount();
 		const char * const * columnNames();
@@ -68,7 +67,6 @@ class postgresqlcursor : public sqlrcursor_svr {
 		uint32_t	getColumnLength(uint32_t col);
 		uint16_t	getColumnIsBinary(uint32_t col);
 		bool		noRowsToReturn();
-		bool		skipRow();
 		bool		fetchRow();
 		void		getField(uint32_t col,
 					const char **field,

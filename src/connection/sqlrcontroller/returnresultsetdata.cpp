@@ -71,7 +71,7 @@ bool sqlrconnection_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 			debugstr=new stringbuffer();
 		}
 
-		cursor->returnRow();
+		returnRow(cursor);
 
 		if (dbgfile.debugEnabled()) {
 			dbgfile.debugPrint("connection",3,
@@ -90,4 +90,66 @@ bool sqlrconnection_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 
 	dbgfile.debugPrint("connection",2,"done returning result set data");
 	return true;
+}
+
+bool sqlrconnection_svr::skipRows(sqlrcursor_svr *cursor, uint64_t rows) {
+
+	if (dbgfile.debugEnabled()) {
+		debugstr=new stringbuffer();
+		debugstr->append("skipping ");
+		debugstr->append(rows);
+		debugstr->append(" rows...");
+		dbgfile.debugPrint("connection",2,debugstr->getString());
+		delete debugstr;
+	}
+
+	for (uint64_t i=0; i<rows; i++) {
+
+		dbgfile.debugPrint("connection",3,"skip...");
+
+		if (cursor->lastrowvalid) {
+			cursor->lastrow++;
+		} else {
+			cursor->lastrowvalid=true;
+			cursor->lastrow=0;
+		}
+
+		if (!cursor->skipRow()) {
+			dbgfile.debugPrint("connection",2,
+				"skipping rows hit the end of the result set");
+			return false;
+		}
+	}
+
+	dbgfile.debugPrint("connection",2,"done skipping rows");
+	return true;
+}
+
+void sqlrconnection_svr::returnRow(sqlrcursor_svr *cursor) {
+
+	// run through the columns...
+	for (uint32_t i=0; i<cursor->colCount(); i++) {
+
+		// init variables
+		const char	*field=NULL;
+		uint64_t	fieldlength=0;
+		bool		blob=false;
+		bool		null=false;
+
+		// get the field
+		cursor->getField(i,&field,&fieldlength,&blob,&null);
+
+		// send data to the client
+		if (null) {
+			sendNullField();
+		} else if (blob) {
+			sendLobField(cursor,i);
+			cursor->cleanUpLobField(i);
+		} else {
+			sendField(field,fieldlength);
+		}
+	}
+
+	// get the next row
+	cursor->nextRow();
 }
