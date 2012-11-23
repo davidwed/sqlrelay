@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2004  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 #include <rudiments/snooze.h>
 #include <rudiments/process.h>
 #include <rudiments/signalclasses.h>
@@ -12,7 +12,7 @@
 
 #include <defines.h>
 
-void sqlrconnection_svr::announceAvailability(const char *tmpdir,
+void sqlrcontroller_svr::announceAvailability(const char *tmpdir,
 					bool passdescriptor,
 					const char *unixsocket,
 					unsigned short inetport,
@@ -100,7 +100,7 @@ void sqlrconnection_svr::announceAvailability(const char *tmpdir,
 	dbgfile.debugPrint("connection",0,"done announcing availability...");
 }
 
-void sqlrconnection_svr::registerForHandoff(const char *tmpdir) {
+void sqlrcontroller_svr::registerForHandoff(const char *tmpdir) {
 
 	dbgfile.debugPrint("connection",0,"registering for handoff...");
 
@@ -145,7 +145,7 @@ void sqlrconnection_svr::registerForHandoff(const char *tmpdir) {
 	delete[] handoffsockname;
 }
 
-bool sqlrconnection_svr::receiveFileDescriptor(int32_t *descriptor) {
+bool sqlrcontroller_svr::receiveFileDescriptor(int32_t *descriptor) {
 	bool	retval=handoffsockun.receiveFileDescriptor(descriptor);
 	if (!retval) {
 		// FIXME:? should we just close here, or re-connect?
@@ -155,7 +155,7 @@ bool sqlrconnection_svr::receiveFileDescriptor(int32_t *descriptor) {
 	return retval;
 }
 
-void sqlrconnection_svr::deRegisterForHandoff(const char *tmpdir) {
+void sqlrcontroller_svr::deRegisterForHandoff(const char *tmpdir) {
 	
 	dbgfile.debugPrint("connection",0,"de-registering for handoff...");
 

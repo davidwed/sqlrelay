@@ -1,8 +1,8 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-const char *sqlrconnection_svr::connectStringValue(const char *variable) {
+const char *sqlrcontroller_svr::connectStringValue(const char *variable) {
 	return constr->getConnectStringValue(variable);
 }

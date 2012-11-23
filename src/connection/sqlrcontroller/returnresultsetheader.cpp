@@ -1,11 +1,11 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
 #include <datatypes.h>
 
-void sqlrconnection_svr::returnResultSetHeader(sqlrcursor_svr *cursor) {
+void sqlrcontroller_svr::returnResultSetHeader(sqlrcursor_svr *cursor) {
 
 	dbgfile.debugPrint("connection",2,"returning result set header...");
 
@@ -69,7 +69,7 @@ void sqlrconnection_svr::returnResultSetHeader(sqlrcursor_svr *cursor) {
 	dbgfile.debugPrint("connection",2,"done returning result set header");
 }
 
-void sqlrconnection_svr::returnColumnInfo(sqlrcursor_svr *cursor,
+void sqlrcontroller_svr::returnColumnInfo(sqlrcursor_svr *cursor,
 							uint16_t format) {
 
 	for (uint32_t i=0; i<cursor->colCount(); i++) {

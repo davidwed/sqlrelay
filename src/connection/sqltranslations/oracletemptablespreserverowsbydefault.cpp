@@ -4,6 +4,7 @@
 #include <sqltranslations/oracletemptablespreserverowsbydefault.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
+#include <sqlparser.h>
 #include <debugprint.h>
 
 #ifdef RUDIMENTS_NAMESPACE

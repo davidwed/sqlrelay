@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-bool sqlrconnection_svr::getInputBinds(sqlrcursor_svr *cursor) {
+bool sqlrcontroller_svr::getInputBinds(sqlrcursor_svr *cursor) {
 
 	dbgfile.debugPrint("connection",2,"getting input binds...");
 
@@ -58,7 +58,7 @@ bool sqlrconnection_svr::getInputBinds(sqlrcursor_svr *cursor) {
 	return true;
 }
 
-bool sqlrconnection_svr::getOutputBinds(sqlrcursor_svr *cursor) {
+bool sqlrcontroller_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 
 	dbgfile.debugPrint("connection",2,"getting output binds...");
 
@@ -136,14 +136,14 @@ bool sqlrconnection_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 		}
 
 		// init the null indicator
-		bv->isnull=nonNullBindValue();
+		bv->isnull=conn->nonNullBindValue();
 	}
 
 	dbgfile.debugPrint("connection",2,"done getting output binds");
 	return true;
 }
 
-bool sqlrconnection_svr::getBindVarCount(sqlrcursor_svr *cursor,
+bool sqlrcontroller_svr::getBindVarCount(sqlrcursor_svr *cursor,
 						uint16_t *count) {
 
 	// init
@@ -179,7 +179,7 @@ bool sqlrconnection_svr::getBindVarCount(sqlrcursor_svr *cursor,
 	return true;
 }
 
-bool sqlrconnection_svr::getBindVarName(sqlrcursor_svr *cursor,
+bool sqlrcontroller_svr::getBindVarName(sqlrcursor_svr *cursor,
 						bindvar_svr *bv) {
 
 	// init
@@ -213,7 +213,7 @@ bool sqlrconnection_svr::getBindVarName(sqlrcursor_svr *cursor,
 	// get the variable name
 	bv->variablesize=bindnamesize+1;
 	bv->variable=(char *)bindmappingspool->malloc(bindnamesize+2);
-	bv->variable[0]=bindVariablePrefix();
+	bv->variable[0]=conn->bindVariablePrefix();
 	if (clientsock->read(bv->variable+1,bindnamesize,
 					idleclienttimeout,0)!=bindnamesize) {
 		dbgfile.debugPrint("connection",2,
@@ -229,7 +229,7 @@ bool sqlrconnection_svr::getBindVarName(sqlrcursor_svr *cursor,
 	return true;
 }
 
-bool sqlrconnection_svr::getBindVarType(bindvar_svr *bv) {
+bool sqlrcontroller_svr::getBindVarType(bindvar_svr *bv) {
 
 	// get the type
         uint16_t type;
@@ -243,7 +243,7 @@ bool sqlrconnection_svr::getBindVarType(bindvar_svr *bv) {
 	return true;
 }
 
-bool sqlrconnection_svr::getBindSize(sqlrcursor_svr *cursor,
+bool sqlrcontroller_svr::getBindSize(sqlrcursor_svr *cursor,
 					bindvar_svr *bv, uint32_t *maxsize) {
 
 	// init
@@ -284,17 +284,17 @@ bool sqlrconnection_svr::getBindSize(sqlrcursor_svr *cursor,
 	return true;
 }
 
-void sqlrconnection_svr::getNullBind(bindvar_svr *bv) {
+void sqlrcontroller_svr::getNullBind(bindvar_svr *bv) {
 
 	dbgfile.debugPrint("connection",4,"NULL");
 
 	bv->value.stringval=(char *)bindpool->malloc(1);
 	bv->value.stringval[0]='\0';
 	bv->valuesize=0;
-	bv->isnull=nullBindValue();
+	bv->isnull=conn->nullBindValue();
 }
 
-bool sqlrconnection_svr::getStringBind(sqlrcursor_svr *cursor,
+bool sqlrcontroller_svr::getStringBind(sqlrcursor_svr *cursor,
 						bindvar_svr *bv) {
 
 	dbgfile.debugPrint("connection",4,"STRING");
@@ -321,14 +321,14 @@ bool sqlrconnection_svr::getStringBind(sqlrcursor_svr *cursor,
 		return false;
 	}
 	bv->value.stringval[bv->valuesize]='\0';
-	bv->isnull=nonNullBindValue();
+	bv->isnull=conn->nonNullBindValue();
 
 	dbgfile.debugPrint("connection",4,bv->value.stringval);
 
 	return true;
 }
 
-bool sqlrconnection_svr::getIntegerBind(bindvar_svr *bv) {
+bool sqlrcontroller_svr::getIntegerBind(bindvar_svr *bv) {
 
 	dbgfile.debugPrint("connection",4,"INTEGER");
 
@@ -348,7 +348,7 @@ bool sqlrconnection_svr::getIntegerBind(bindvar_svr *bv) {
 	return true;
 }
 
-bool sqlrconnection_svr::getDoubleBind(bindvar_svr *bv) {
+bool sqlrcontroller_svr::getDoubleBind(bindvar_svr *bv) {
 
 	dbgfile.debugPrint("connection",4,"DOUBLE");
 
@@ -381,7 +381,7 @@ bool sqlrconnection_svr::getDoubleBind(bindvar_svr *bv) {
 	return true;
 }
 
-bool sqlrconnection_svr::getDateBind(bindvar_svr *bv) {
+bool sqlrcontroller_svr::getDateBind(bindvar_svr *bv) {
 
 	dbgfile.debugPrint("connection",4,"DATE");
 
@@ -488,7 +488,7 @@ bool sqlrconnection_svr::getDateBind(bindvar_svr *bv) {
 	return true;
 }
 
-bool sqlrconnection_svr::getLobBind(sqlrcursor_svr *cursor, bindvar_svr *bv) {
+bool sqlrcontroller_svr::getLobBind(sqlrcursor_svr *cursor, bindvar_svr *bv) {
 
 	// init
 	bv->value.stringval=NULL;
@@ -524,7 +524,7 @@ bool sqlrconnection_svr::getLobBind(sqlrcursor_svr *cursor, bindvar_svr *bv) {
 	// (which doesn't include the NULL terminator) should be used when
 	// binding.
 	bv->value.stringval[bv->valuesize]='\0';
-	bv->isnull=nonNullBindValue();
+	bv->isnull=conn->nonNullBindValue();
 
 	/*if (bv->type==BLOB_BIND) {
 		dbgfile.debugPrintBlob(bv->value.stringval,bv->valuesize);

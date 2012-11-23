@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-void sqlrconnection_svr::sendField(const char *data, uint32_t size) {
+void sqlrcontroller_svr::sendField(const char *data, uint32_t size) {
 
 	if (dbgfile.debugEnabled()) {
 		debugstr->append("\"");
@@ -16,7 +16,7 @@ void sqlrconnection_svr::sendField(const char *data, uint32_t size) {
 	clientsock->write(data,size);
 }
 
-void sqlrconnection_svr::sendNullField() {
+void sqlrcontroller_svr::sendNullField() {
 
 	if (dbgfile.debugEnabled()) {
 		debugstr->append("NULL");
@@ -27,7 +27,7 @@ void sqlrconnection_svr::sendNullField() {
 
 #define MAX_BYTES_PER_CHAR	4
 
-void sqlrconnection_svr::sendLobField(sqlrcursor_svr *cursor, uint32_t col) {
+void sqlrcontroller_svr::sendLobField(sqlrcursor_svr *cursor, uint32_t col) {
 
 	// Get lob length.  If this fails, send a NULL field.
 	uint64_t	loblength;
@@ -87,12 +87,12 @@ void sqlrconnection_svr::sendLobField(sqlrcursor_svr *cursor, uint32_t col) {
 	}
 }
 
-void sqlrconnection_svr::startSendingLong(uint64_t longlength) {
+void sqlrcontroller_svr::startSendingLong(uint64_t longlength) {
 	clientsock->write((uint16_t)START_LONG_DATA);
 	clientsock->write(longlength);
 }
 
-void sqlrconnection_svr::sendLongSegment(const char *data, uint32_t size) {
+void sqlrcontroller_svr::sendLongSegment(const char *data, uint32_t size) {
 
 	if (dbgfile.debugEnabled()) {
 		debugstr->append(data,size);
@@ -103,7 +103,7 @@ void sqlrconnection_svr::sendLongSegment(const char *data, uint32_t size) {
 	clientsock->write(data,size);
 }
 
-void sqlrconnection_svr::endSendingLong() {
+void sqlrcontroller_svr::endSendingLong() {
 
 	if (dbgfile.debugEnabled()) {
 		debugstr->append(",");

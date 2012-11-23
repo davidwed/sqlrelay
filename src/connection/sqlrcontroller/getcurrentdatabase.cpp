@@ -1,14 +1,14 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-void sqlrconnection_svr::getCurrentDatabaseCommand() {
+void sqlrcontroller_svr::getCurrentDatabaseCommand() {
 
 	dbgfile.debugPrint("connection",1,"get current database");
 
 	// get the current database
-	char	*currentdb=getCurrentDatabase();
+	char	*currentdb=conn->getCurrentDatabase();
 
 	// send it to the client
 	uint16_t	currentdbsize=charstring::length(currentdb);

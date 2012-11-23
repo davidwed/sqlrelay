@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-void sqlrconnection_svr::incrementClientSessionCount() {
+void sqlrcontroller_svr::incrementClientSessionCount() {
 
 	dbgfile.debugPrint("connection",0,"incrementing client session count...");
 
@@ -21,7 +21,7 @@ void sqlrconnection_svr::incrementClientSessionCount() {
 	dbgfile.debugPrint("connection",0,"done incrementing client session count...");
 }
 
-void sqlrconnection_svr::decrementClientSessionCount() {
+void sqlrcontroller_svr::decrementClientSessionCount() {
 
 	dbgfile.debugPrint("connection",0,"decrementing client session count...");
 

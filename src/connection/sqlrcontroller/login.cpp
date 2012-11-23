@@ -2,10 +2,10 @@
 // See the file COPYING for more information
 
 #include <config.h>
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 #include <rudiments/snooze.h>
 
-bool sqlrconnection_svr::logInInternal(bool printerrors) {
+bool sqlrcontroller_svr::logInInternal(bool printerrors) {
 
 	// don't do anything if we're already logged in
 	if (loggedin) {
@@ -13,7 +13,7 @@ bool sqlrconnection_svr::logInInternal(bool printerrors) {
 	}
 
 	// attempt to log in
-	if (!logIn(printerrors)) {
+	if (!conn->logIn(printerrors)) {
 		return false;
 	}
 
@@ -26,7 +26,7 @@ bool sqlrconnection_svr::logInInternal(bool printerrors) {
 	return true;
 }
 
-void sqlrconnection_svr::logOutInternal() {
+void sqlrcontroller_svr::logOutInternal() {
 
 	// don't do anything if we're already logged out
 	if (!loggedin) {
@@ -34,7 +34,7 @@ void sqlrconnection_svr::logOutInternal() {
 	}
 
 	// log out
-	logOut();
+	conn->logOut();
 
 	// update stats
 	semset->waitWithUndo(9);
@@ -46,7 +46,7 @@ void sqlrconnection_svr::logOutInternal() {
 	loggedin=false;
 }
 
-void sqlrconnection_svr::reLogIn() {
+void sqlrcontroller_svr::reLogIn() {
 
 	markDatabaseUnavailable();
 
@@ -54,7 +54,7 @@ void sqlrconnection_svr::reLogIn() {
 	sessionEndQueries();
 
 	// get the current db so we can restore it
-	char	*currentdb=getCurrentDatabase();
+	char	*currentdb=conn->getCurrentDatabase();
 
 	// FIXME: get the isolation level so we can restore it
 
@@ -85,13 +85,13 @@ void sqlrconnection_svr::reLogIn() {
 	sessionStartQueries();
 
 	// restore the db
-	selectDatabase(currentdb);
+	conn->selectDatabase(currentdb);
 
 	// restore autocommit
-	if (autocommit) {
-		autoCommitOn();
+	if (conn->autocommit) {
+		conn->autoCommitOn();
 	} else {
-		autoCommitOff();
+		conn->autoCommitOff();
 	}
 
 	// FIXME: restore the isolation level

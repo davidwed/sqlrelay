@@ -1,13 +1,13 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-void sqlrconnection_svr::setAutoCommitBehavior(bool ac) {
-	autocommit=ac;
+void sqlrcontroller_svr::setAutoCommitBehavior(bool ac) {
+	conn->autocommit=ac;
 }
 
-void sqlrconnection_svr::autoCommitCommand() {
+void sqlrcontroller_svr::autoCommitCommand() {
 	dbgfile.debugPrint("connection",1,"autocommit...");
 	bool	on;
 	if (clientsock->read(&on,idleclienttimeout,0)==sizeof(bool)) {
@@ -22,7 +22,7 @@ void sqlrconnection_svr::autoCommitCommand() {
 	flushWriteBuffer();
 }
 
-void sqlrconnection_svr::setAutoCommit(bool ac) {
+void sqlrcontroller_svr::setAutoCommit(bool ac) {
 	dbgfile.debugPrint("connection",0,"setting autocommit...");
 	if (ac) {
 		if (!autoCommitOnInternal()) {
@@ -42,12 +42,12 @@ void sqlrconnection_svr::setAutoCommit(bool ac) {
 	dbgfile.debugPrint("connection",0,"done setting autocommit");
 }
 
-bool sqlrconnection_svr::autoCommitOnInternal() {
+bool sqlrcontroller_svr::autoCommitOnInternal() {
 	autocommitforthissession=true;
-	return autoCommitOn();
+	return conn->autoCommitOn();
 }
 
-bool sqlrconnection_svr::autoCommitOffInternal() {
+bool sqlrcontroller_svr::autoCommitOffInternal() {
 	autocommitforthissession=false;
-	return autoCommitOff();
+	return conn->autoCommitOff();
 }

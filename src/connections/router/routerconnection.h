@@ -6,6 +6,7 @@
 
 #define FETCH_AT_ONCE	10
 
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 
 #include <sqlrelay/sqlrclient.h>
@@ -194,7 +195,7 @@ class routercursor : public sqlrcursor_svr {
 class routerconnection : public sqlrconnection_svr {
 	friend class routercursor;
 	public:
-			routerconnection();
+			routerconnection(sqlrcontroller_svr *cont);
 			~routerconnection();
 	private:
 		bool		supportsAuthOnDatabase();

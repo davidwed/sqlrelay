@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2011  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
+sqlrcontroller_svr::sqlrcontroller_svr() : daemonprocess(), listener() {
 
 	cmdl=NULL;
 	cfgfl=NULL;
@@ -31,14 +31,7 @@ sqlrconnection_svr::sqlrconnection_svr() : daemonprocess(), listener() {
 
 	commitorrollback=false;
 
-	error=NULL;
-	errorlength=0;
-	errnum=0;
-	liveconnection=false;
-
-	autocommit=false;
 	autocommitforthissession=false;
-	fakeautocommit=false;
 
 	translatebegins=true;
 	faketransactionblocks=false;

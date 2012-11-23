@@ -2,20 +2,20 @@
 // See the file COPYING for more information
 
 #include <config.h>
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 #include <rudiments/process.h>
 
-sqlrconnection_svr	*sqlrconnection_svr::conn=NULL;
-signalhandler		*sqlrconnection_svr::sigh=NULL;
-volatile sig_atomic_t	sqlrconnection_svr::shutdowninprogress=0;
+sqlrcontroller_svr	*sqlrcontroller_svr::staticcont=NULL;
+signalhandler		*sqlrcontroller_svr::sigh=NULL;
+volatile sig_atomic_t	sqlrcontroller_svr::shutdowninprogress=0;
 
-void sqlrconnection_svr::cleanUp() {
-	conn->closeConnection();
-	delete conn;
+void sqlrcontroller_svr::cleanUp() {
+	staticcont->closeConnection();
+	delete staticcont;
 	delete sigh;
 }
 
-void sqlrconnection_svr::shutDown(int32_t signum) {
+void sqlrcontroller_svr::shutDown(int32_t signum) {
 
 	if (!signalhandler::isSignalHandlerIntUsed()) {
 		cleanUp();
@@ -65,21 +65,21 @@ void sqlrconnection_svr::shutDown(int32_t signum) {
 	process::exit(exitcode);
 }
 
-int sqlrconnection_svr::main(int argc, const char **argv,
-					sqlrconnection_svr *c) {
+void sqlrcontroller_svr::main(int argc, const char **argv,
+					sqlrconnection_svr *conn) {
 
 	#include <version.h>
 
-	conn=c;
+	staticcont=conn->cont;
 
 	// handle signals
-	sigh=conn->handleSignals(sqlrconnection_svr::shutDown);
+	sigh=staticcont->handleSignals(sqlrcontroller_svr::shutDown);
 
 	// open the connection to the db
 	bool	result=false;
-	if ((result=conn->initConnection(argc,argv))) {
+	if ((result=staticcont->init(argc,argv,conn))) {
 		// wait for client connections
-		result=conn->listen();
+		result=staticcont->listen();
 	}
 
 	// If sqlr-stop has been run, we may be here because the sqlr-listener

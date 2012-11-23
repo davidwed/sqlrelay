@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-bool sqlrconnection_svr::openSockets() {
+bool sqlrcontroller_svr::openSockets() {
 
 	dbgfile.debugPrint("connection",0,"listening on sockets...");
 

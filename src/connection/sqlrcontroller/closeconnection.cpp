@@ -1,10 +1,10 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 #include <rudiments/process.h>
 
-void sqlrconnection_svr::closeConnection() {
+void sqlrcontroller_svr::closeConnection() {
 
 	if (inclientsession) {
 		endSessionInternal();

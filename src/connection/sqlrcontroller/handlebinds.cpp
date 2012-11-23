@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-bool sqlrconnection_svr::handleBinds(sqlrcursor_svr *cursor) {
+bool sqlrcontroller_svr::handleBinds(sqlrcursor_svr *cursor) {
 
 	bindvar_svr	*bind=NULL;
 	
@@ -169,19 +169,19 @@ bool sqlrconnection_svr::handleBinds(sqlrcursor_svr *cursor) {
 	return true;
 }
 
-void sqlrconnection_svr::returnOutputBindBlob(sqlrcursor_svr *cursor,
+void sqlrcontroller_svr::returnOutputBindBlob(sqlrcursor_svr *cursor,
 							uint16_t index) {
 	return sendLobOutputBind(cursor,index);
 }
 
-void sqlrconnection_svr::returnOutputBindClob(sqlrcursor_svr *cursor,
+void sqlrcontroller_svr::returnOutputBindClob(sqlrcursor_svr *cursor,
 							uint16_t index) {
 	return sendLobOutputBind(cursor,index);
 }
 
 #define MAX_BYTES_PER_CHAR	4
 
-void sqlrconnection_svr::sendLobOutputBind(sqlrcursor_svr *cursor,
+void sqlrcontroller_svr::sendLobOutputBind(sqlrcursor_svr *cursor,
 							uint16_t index) {
 
 	// Get lob length.  If this fails, send a NULL field.

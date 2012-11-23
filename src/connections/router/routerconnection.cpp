@@ -13,7 +13,8 @@
 
 #include <datatypes.h>
 
-routerconnection::routerconnection() : sqlrconnection_svr() {
+routerconnection::routerconnection(sqlrcontroller_svr *cont) :
+					sqlrconnection_svr(cont) {
 	cons=NULL;
 	cur=NULL;
 	beginquery=NULL;
@@ -44,9 +45,9 @@ bool routerconnection::supportsAuthOnDatabase() {
 
 void routerconnection::handleConnectString() {
 
-	cfgfile=cfgfl;
+	cfgfile=cont->cfgfl;
 
-	linkedlist< routecontainer * >	*routelist=cfgfl->getRouteList();
+	linkedlist< routecontainer * >	*routelist=cont->cfgfl->getRouteList();
 	concount=routelist->getLength();
 
 	cons=new sqlrconnection *[concount];
@@ -313,10 +314,10 @@ routercursor::routercursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	}
 	beginquery=false;
 
-	obv=new outputbindvar[conn->maxbindcount];
+	obv=new outputbindvar[conn->cont->maxbindcount];
 	obcount=0;
 
-	cbv=new cursorbindvar[conn->maxbindcount];
+	cbv=new cursorbindvar[conn->cont->maxbindcount];
 	cbcount=0;
 
 	createoratemp.compile("(create|CREATE)[ \\t\\n\\r]+(global|GLOBAL)[ \\t\\n\\r]+(temporary|TEMPORARY)[ \\t\\n\\r]+(table|TABLE)[ \\t\\n\\r]+");
@@ -729,7 +730,7 @@ void routercursor::checkForTempTable(const char *query, uint32_t length) {
 	// check for "on commit preserve rows" otherwise assume
 	// "on commit delete rows"
 	if (preserverows.match(ptr)) {
-		conn->addSessionTempTableForTrunc(tablename.getString());
+		conn->cont->addSessionTempTableForTrunc(tablename.getString());
 	}
 }
 

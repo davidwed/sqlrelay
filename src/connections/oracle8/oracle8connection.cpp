@@ -20,7 +20,8 @@
 	#endif
 #endif
 
-oracle8connection::oracle8connection() : sqlrconnection_svr() {
+oracle8connection::oracle8connection(sqlrcontroller_svr *cont) :
+						sqlrconnection_svr(cont) {
 	stmtmode=OCI_DEFAULT;
 
 	env=NULL;
@@ -60,29 +61,29 @@ oracle8connection::~oracle8connection() {
 }
 
 void oracle8connection::handleConnectString() {
-	setUser(connectStringValue("user"));
-	setPassword(connectStringValue("password"));
-	sid=connectStringValue("oracle_sid");
-	home=connectStringValue("oracle_home");
-	nlslang=connectStringValue("nls_lang");
-	const char	*autocom=connectStringValue("autocommit");
-	setAutoCommitBehavior((autocom &&
+	cont->setUser(cont->connectStringValue("user"));
+	cont->setPassword(cont->connectStringValue("password"));
+	sid=cont->connectStringValue("oracle_sid");
+	home=cont->connectStringValue("oracle_home");
+	nlslang=cont->connectStringValue("nls_lang");
+	const char	*autocom=cont->connectStringValue("autocommit");
+	cont->setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
 
 	fetchatonce=charstring::toUnsignedInteger(
-				connectStringValue("fetchatonce"));
+				cont->connectStringValue("fetchatonce"));
 	if (!fetchatonce) {
 		fetchatonce=FETCH_AT_ONCE;
 	}
 
 	maxselectlistsize=charstring::toInteger(
-				connectStringValue("maxselectlistsize"));
+				cont->connectStringValue("maxselectlistsize"));
 	if (!maxselectlistsize) {
 		maxselectlistsize=MAX_SELECT_LIST_SIZE;
 	}
 
 	maxitembuffersize=charstring::toInteger(
-				connectStringValue("maxitembuffersize"));
+				cont->connectStringValue("maxitembuffersize"));
 	if (!maxitembuffersize) {
 		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 	}
@@ -92,27 +93,28 @@ void oracle8connection::handleConnectString() {
 
 #ifdef OCI_STMT_CACHE
 	stmtcachesize=charstring::toUnsignedInteger(
-				connectStringValue("stmtcachesize"));
+				cont->connectStringValue("stmtcachesize"));
 	if (!stmtcachesize) {
 		stmtcachesize=STMT_CACHE_SIZE;
 	}
 #endif
 
-	setFakeTransactionBlocksBehavior(
+	cont->setFakeTransactionBlocksBehavior(
 		!charstring::compare(
-			connectStringValue("faketransactionblocks"),"yes"));
+			cont->connectStringValue("faketransactionblocks"),
+			"yes"));
 
 #ifdef HAVE_ORACLE_8i
 	droptemptables=!charstring::compare(
-				connectStringValue("droptemptables"),"yes");
+			cont->connectStringValue("droptemptables"),"yes");
 #endif
 
 	rejectduplicatebinds=!charstring::compare(
-				connectStringValue("rejectduplicatebinds"),
-				"yes");
+			cont->connectStringValue("rejectduplicatebinds"),
+			"yes");
 
 	const char	*lastinsertidfunc=
-			connectStringValue("lastinsertidfunction");
+			cont->connectStringValue("lastinsertidfunction");
 	if (lastinsertidfunc) {
 		stringbuffer	liiquery;
 		liiquery.append("select ");
@@ -121,8 +123,10 @@ void oracle8connection::handleConnectString() {
 		lastinsertidquery=liiquery.detachString();
 	}
 
-	fakeinputbinds=
-		!charstring::compare(connectStringValue("fakebinds"),"yes");
+	cont->fakeinputbinds=
+		!charstring::compare(
+			cont->connectStringValue("fakebinds"),
+			"yes");
 }
 
 #ifdef HAVE_ORACLE_8i
@@ -140,8 +144,8 @@ bool oracle8connection::tempTableDropReLogIn() {
 bool oracle8connection::logIn(bool printerrors) {
 
 	// get user/password
-	const char	*user=getUser();
-	const char	*password=getPassword();
+	const char	*user=cont->getUser();
+	const char	*password=cont->getPassword();
 
 	// handle ORACLE_SID
 	if (sid) {
@@ -212,7 +216,7 @@ bool oracle8connection::logIn(bool printerrors) {
 		charstring::copy(tnsnamesora,home);
 		charstring::append(tnsnamesora,"/network/admin/tnsnames.ora");
 		if (!file::readable(tnsnamesora)) {
-			fprintf(stderr,"Warning: %s/tnsnames.ora is not readable by %s:%s\n",home,cfgfl->getRunAsUser(),cfgfl->getRunAsGroup());
+			fprintf(stderr,"Warning: %s/tnsnames.ora is not readable by %s:%s\n",home,cont->cfgfl->getRunAsUser(),cont->cfgfl->getRunAsGroup());
 		}
 	}
 
@@ -422,7 +426,7 @@ bool oracle8connection::logIn(bool printerrors) {
 		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
-	if (dbgfile.debugEnabled()) {
+	if (cont->dbgfile.debugEnabled()) {
 		if (OCIAttrGet((dvoid *)svc,OCI_HTYPE_SVCCTX,
 				(dvoid *)&stmtcachesize,(ub4)0,
 				(ub4)OCI_ATTR_STMTCACHESIZE,
@@ -430,7 +434,8 @@ bool oracle8connection::logIn(bool printerrors) {
 			stringbuffer	debugstr;
 			debugstr.append("cache size ");
 			debugstr.append(stmtcachesize);
-			dbgfile.debugPrint("connection",1,debugstr.getString());
+			cont->dbgfile.debugPrint("connection",1,
+						debugstr.getString());
 		}
 	}
 #endif
@@ -944,23 +949,23 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 					oracle8conn->maxselectlistsize,
 					oracle8conn->maxitembuffersize);
 
-	inbindpp=new OCIBind *[conn->maxbindcount];
-	outbindpp=new OCIBind *[conn->maxbindcount];
-	curbindpp=new OCIBind *[conn->maxbindcount];
-	inintbindstring=new char *[conn->maxbindcount];
-	indatebind=new OCIDate *[conn->maxbindcount];
-	outintbindstring=new char *[conn->maxbindcount];
-	outdatebind=new datebind *[conn->maxbindcount];
-	outintbind=new int64_t *[conn->maxbindcount];
-	bindvarname=new const char *[conn->maxbindcount];
-	boundbypos=new bool[conn->maxbindcount];
-	bvnp=new text *[conn->maxbindcount];
-	invp=new text *[conn->maxbindcount];
-	inpl=new ub1[conn->maxbindcount];
-	dupl=new ub1[conn->maxbindcount];
-	bvnl=new ub1[conn->maxbindcount];
-	hndl=new OCIBind *[conn->maxbindcount];
-	for (uint16_t i=0; i<conn->maxbindcount; i++) {
+	inbindpp=new OCIBind *[conn->cont->maxbindcount];
+	outbindpp=new OCIBind *[conn->cont->maxbindcount];
+	curbindpp=new OCIBind *[conn->cont->maxbindcount];
+	inintbindstring=new char *[conn->cont->maxbindcount];
+	indatebind=new OCIDate *[conn->cont->maxbindcount];
+	outintbindstring=new char *[conn->cont->maxbindcount];
+	outdatebind=new datebind *[conn->cont->maxbindcount];
+	outintbind=new int64_t *[conn->cont->maxbindcount];
+	bindvarname=new const char *[conn->cont->maxbindcount];
+	boundbypos=new bool[conn->cont->maxbindcount];
+	bvnp=new text *[conn->cont->maxbindcount];
+	invp=new text *[conn->cont->maxbindcount];
+	inpl=new ub1[conn->cont->maxbindcount];
+	dupl=new ub1[conn->cont->maxbindcount];
+	bvnl=new ub1[conn->cont->maxbindcount];
+	hndl=new OCIBind *[conn->cont->maxbindcount];
+	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
 		inbindpp[i]=NULL;
 		outbindpp[i]=NULL;
 		curbindpp[i]=NULL;
@@ -978,9 +983,9 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	bindvarcount=0;
 
 #ifdef HAVE_ORACLE_8i
-	inbind_lob=new OCILobLocator *[conn->maxbindcount];
-	outbind_lob=new OCILobLocator *[conn->maxbindcount];
-	for (uint16_t i=0; i<conn->maxbindcount; i++) {
+	inbind_lob=new OCILobLocator *[conn->cont->maxbindcount];
+	outbind_lob=new OCILobLocator *[conn->cont->maxbindcount];
+	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
 		inbind_lob[i]=NULL;
 		outbind_lob[i]=NULL;
 	}
@@ -1195,7 +1200,7 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 
 		// prepare the query...
 		bool	prepare=true;
-		if (oracle8conn->dbgfile.debugEnabled()) {
+		if (oracle8conn->cont->dbgfile.debugEnabled()) {
 			// check for a statment cache hit
 			// and report our findings
 			if (OCIStmtPrepare2(oracle8conn->svc,&stmt,
@@ -1207,13 +1212,15 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 					OCI_SUCCESS) {
 				// we got a hit and don't
 				// need to do anything else
-				oracle8conn->dbgfile.debugPrint("connection",1,
+				oracle8conn->cont->dbgfile.debugPrint(
+							"connection",1,
 							"statement cache hit");
 				prepare=false;
 			} else {
 				// we didn't get a hit and
 				// need to prepare the query
-				oracle8conn->dbgfile.debugPrint("connection",1,
+				oracle8conn->cont->dbgfile.debugPrint(
+							"connection",1,
 							"statement cache miss");
 			}
 		}
@@ -1948,13 +1955,13 @@ void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 
 	if (oracle8conn->droptemptables) {
 		// if "droptemptables" was specified...
-		conn->addSessionTempTableForDrop(tablename.getString());
+		conn->cont->addSessionTempTableForDrop(tablename.getString());
 	} else if (preserverows.match(ptr)) {
 		// If "on commit preserve rows" was specified, then when
 		// the commit/rollback is executed at the end of the
 		// session, the data won't be truncated.  It needs to
 		// be though, so we'll set it up to be truncated manually.
-		conn->addSessionTempTableForTrunc(tablename.getString());
+		conn->cont->addSessionTempTableForTrunc(tablename.getString());
 	}
 }
 #endif
@@ -2254,7 +2261,8 @@ bool oracle8cursor::validBinds() {
 
 	// get the bind info from the query
 	sb4	found;
-	sword	ret=OCIStmtGetBindInfo(stmt,oracle8conn->err,conn->maxbindcount,
+	sword	ret=OCIStmtGetBindInfo(stmt,oracle8conn->err,
+					conn->cont->maxbindcount,
 					1,&found,bvnp,bvnl,invp,inpl,dupl,hndl);
 
 	// there were no bind variables

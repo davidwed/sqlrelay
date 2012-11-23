@@ -1,32 +1,16 @@
 // Copyright (c) 2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-void sqlrconnection_svr::clearError() {
-	setError(NULL,0,true);
-}
-
-void sqlrconnection_svr::setError(const char *err,
-					int64_t errn,
-					bool liveconn) {
-	errorlength=charstring::length(err);
-	if (errorlength>conn->maxerrorlength-1) {
-		errorlength=maxerrorlength-1;
-	}
-	charstring::copy(error,err,errorlength);
-	error[errorlength]='\0';
-	errnum=errn;
-	liveconnection=liveconn;
-}
-
-void sqlrconnection_svr::returnError(bool disconnect) {
+void sqlrcontroller_svr::returnError(bool disconnect) {
 
 	// Get the error data if none is set already
-	if (!error) {
-		errorMessage(error,maxerrorlength,
-				&errorlength,&errnum,&liveconnection);
-		if (!liveconnection) {
+	if (!conn->error) {
+		conn->errorMessage(conn->error,maxerrorlength,
+				&conn->errorlength,&conn->errnum,
+				&conn->liveconnection);
+		if (!conn->liveconnection) {
 			disconnect=true;
 		}
 	}
@@ -39,14 +23,14 @@ void sqlrconnection_svr::returnError(bool disconnect) {
 	}
 
 	// send the error code and error string
-	clientsock->write((uint64_t)errnum);
+	clientsock->write((uint64_t)conn->errnum);
 
 	// send the error string
-	clientsock->write((uint16_t)errorlength);
-	clientsock->write(error,errorlength);
+	clientsock->write((uint16_t)conn->errorlength);
+	clientsock->write(conn->error,conn->errorlength);
 }
 
-void sqlrconnection_svr::returnError(sqlrcursor_svr *cursor, bool disconnect) {
+void sqlrcontroller_svr::returnError(sqlrcursor_svr *cursor, bool disconnect) {
 
 	dbgfile.debugPrint("connection",2,"returning error...");
 

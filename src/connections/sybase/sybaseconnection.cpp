@@ -18,7 +18,8 @@ int64_t		sybaseconnection::errorcode;
 bool		sybaseconnection::liveconnection;
 
 
-sybaseconnection::sybaseconnection() : sqlrconnection_svr() {
+sybaseconnection::sybaseconnection(sqlrcontroller_svr *cont) :
+					sqlrconnection_svr(cont) {
 	dbused=false;
 	dbversion=NULL;
 }
@@ -28,18 +29,20 @@ sybaseconnection::~sybaseconnection() {
 }
 
 void sybaseconnection::handleConnectString() {
-	sybase=connectStringValue("sybase");
-	lang=connectStringValue("lang");
-	setUser(connectStringValue("user"));
-	setPassword(connectStringValue("password"));
-	server=connectStringValue("server");
-	db=connectStringValue("db");
-	charset=connectStringValue("charset");
-	language=connectStringValue("language");
-	hostname=connectStringValue("hostname");
-	packetsize=connectStringValue("packetsize");
-	fakeinputbinds=
-		!charstring::compare(connectStringValue("fakebinds"),"yes");
+	sybase=cont->connectStringValue("sybase");
+	lang=cont->connectStringValue("lang");
+	cont->setUser(cont->connectStringValue("user"));
+	cont->setPassword(cont->connectStringValue("password"));
+	server=cont->connectStringValue("server");
+	db=cont->connectStringValue("db");
+	charset=cont->connectStringValue("charset");
+	language=cont->connectStringValue("language");
+	hostname=cont->connectStringValue("hostname");
+	packetsize=cont->connectStringValue("packetsize");
+	cont->fakeinputbinds=
+		!charstring::compare(
+				cont->connectStringValue("fakebinds"),
+				"yes");
 }
 
 bool sybaseconnection::logIn(bool printerrors) {
@@ -105,7 +108,7 @@ bool sybaseconnection::logIn(bool printerrors) {
 
 
 	// set the user to use
-	const char	*user=getUser();
+	const char	*user=cont->getUser();
 	if (ct_con_props(dbconn,CS_SET,CS_USERNAME,
 			(CS_VOID *)((user && user[0])?user:""),
 			(CS_INT)charstring::length(user),
@@ -116,7 +119,7 @@ bool sybaseconnection::logIn(bool printerrors) {
 
 
 	// set the password to use
-	const char	*password=getPassword();
+	const char	*password=cont->getPassword();
 	if (ct_con_props(dbconn,CS_SET,CS_PASSWORD,
 			(CS_VOID *)((password && password[0])?password:""),
 			(CS_INT)charstring::length(password),
@@ -377,13 +380,13 @@ sybasecursor::sybasecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	cursorname=NULL;
 	cursornamelength=0;
 
-	parameter=new CS_DATAFMT[conn->maxbindcount];
-	outbindtype=new CS_INT[conn->maxbindcount];
-	outbindstrings=new char *[conn->maxbindcount];
-	outbindstringlengths=new uint16_t[conn->maxbindcount];
-	outbindints=new int64_t *[conn->maxbindcount];
-	outbinddoubles=new double *[conn->maxbindcount];
-	outbinddates=new datebind[conn->maxbindcount];
+	parameter=new CS_DATAFMT[conn->cont->maxbindcount];
+	outbindtype=new CS_INT[conn->cont->maxbindcount];
+	outbindstrings=new char *[conn->cont->maxbindcount];
+	outbindstringlengths=new uint16_t[conn->cont->maxbindcount];
+	outbindints=new int64_t *[conn->cont->maxbindcount];
+	outbinddoubles=new double *[conn->cont->maxbindcount];
+	outbinddates=new datebind[conn->cont->maxbindcount];
 
 	// replace the regular expression used to detect creation of a
 	// temporary table
@@ -973,7 +976,7 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 			}
 
 			// describe the columns
-			if (conn->sendColumnInfo()) {
+			if (conn->cont->sendColumnInfo()) {
 				if (ct_describe(cmd,i+1,&column[i])!=
 								CS_SUCCEED) {
 					break;
@@ -1431,12 +1434,12 @@ const char *sybaseconnection::tempTableDropPrefix() {
 }
 
 bool sybaseconnection::commit() {
-	cleanUpAllCursorData(true,true);
+	cont->cleanUpAllCursorData(true,true);
 	return sqlrconnection_svr::commit();
 }
 
 bool sybaseconnection::rollback() {
-	cleanUpAllCursorData(true,true);
+	cont->cleanUpAllCursorData(true,true);
 	return sqlrconnection_svr::rollback();
 }
 

@@ -24,7 +24,8 @@ int64_t		freetdsconnection::errorcode;
 bool		freetdsconnection::liveconnection;
 
 
-freetdsconnection::freetdsconnection() : sqlrconnection_svr() {
+freetdsconnection::freetdsconnection(sqlrcontroller_svr *cont) :
+						sqlrconnection_svr(cont) {
 	dbused=false;
 
 	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
@@ -42,18 +43,18 @@ freetdsconnection::~freetdsconnection() {
 }
 
 void freetdsconnection::handleConnectString() {
-	sybase=connectStringValue("sybase");
-	lang=connectStringValue("lang");
-	setUser(connectStringValue("user"));
-	setPassword(connectStringValue("password"));
-	server=connectStringValue("server");
-	db=connectStringValue("db");
-	charset=connectStringValue("charset");
-	language=connectStringValue("language");
-	hostname=connectStringValue("hostname");
-	packetsize=connectStringValue("packetsize");
-	fakeinputbinds=
-		!charstring::compare(connectStringValue("fakebinds"),"yes");
+	sybase=cont->connectStringValue("sybase");
+	lang=cont->connectStringValue("lang");
+	cont->setUser(cont->connectStringValue("user"));
+	cont->setPassword(cont->connectStringValue("password"));
+	server=cont->connectStringValue("server");
+	db=cont->connectStringValue("db");
+	charset=cont->connectStringValue("charset");
+	language=cont->connectStringValue("language");
+	hostname=cont->connectStringValue("hostname");
+	packetsize=cont->connectStringValue("packetsize");
+	cont->fakeinputbinds=!charstring::compare(
+				cont->connectStringValue("fakebinds"),"yes");
 }
 
 bool freetdsconnection::logIn(bool printerrors) {
@@ -119,7 +120,7 @@ bool freetdsconnection::logIn(bool printerrors) {
 
 
 	// set the user to use
-	const char	*user=getUser();
+	const char	*user=cont->getUser();
 	if (ct_con_props(dbconn,CS_SET,CS_USERNAME,
 			(CS_VOID *)((user && user[0])?user:""),
 			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
@@ -129,7 +130,7 @@ bool freetdsconnection::logIn(bool printerrors) {
 
 
 	// set the password to use
-	const char	*password=getPassword();
+	const char	*password=cont->getPassword();
 	if (ct_con_props(dbconn,CS_SET,CS_PASSWORD,
 			(CS_VOID *)((password && password[0])?password:""),
 			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
@@ -453,13 +454,13 @@ freetdscursor::freetdscursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	cursorname=NULL;
 	cursornamelength=0;
 
-	parameter=new CS_DATAFMT[conn->maxbindcount];
-	outbindtype=new CS_INT[conn->maxbindcount];
-	outbindstrings=new char *[conn->maxbindcount];
-	outbindstringlengths=new uint16_t[conn->maxbindcount];
-	outbindints=new int64_t *[conn->maxbindcount];
-	outbinddoubles=new double *[conn->maxbindcount];
-	outbinddates=new datebind[conn->maxbindcount];
+	parameter=new CS_DATAFMT[conn->cont->maxbindcount];
+	outbindtype=new CS_INT[conn->cont->maxbindcount];
+	outbindstrings=new char *[conn->cont->maxbindcount];
+	outbindstringlengths=new uint16_t[conn->cont->maxbindcount];
+	outbindints=new int64_t *[conn->cont->maxbindcount];
+	outbinddoubles=new double *[conn->cont->maxbindcount];
+	outbinddates=new datebind[conn->cont->maxbindcount];
 
 	// replace the regular expressions used to detect creation of a
 	// temporary table
@@ -1148,7 +1149,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 			}
 
 			// describe the columns
-			if (conn->sendColumnInfo()) {
+			if (conn->cont->sendColumnInfo()) {
 				if (ct_describe(cmd,i+1,&column[i])!=
 								CS_SUCCEED) {
 					break;
@@ -1632,12 +1633,12 @@ const char *freetdsconnection::tempTableDropPrefix() {
 }
 
 bool freetdsconnection::commit() {
-	cleanUpAllCursorData(true,true);
+	cont->cleanUpAllCursorData(true,true);
 	return sqlrconnection_svr::commit();
 }
 
 bool freetdsconnection::rollback() {
-	cleanUpAllCursorData(true,true);
+	cont->cleanUpAllCursorData(true,true);
 	return sqlrconnection_svr::rollback();
 }
 

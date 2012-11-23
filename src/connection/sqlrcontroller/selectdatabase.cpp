@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-void sqlrconnection_svr::selectDatabaseCommand() {
+void sqlrcontroller_svr::selectDatabaseCommand() {
 
 	dbgfile.debugPrint("connection",1,"select database");
 
@@ -40,13 +40,13 @@ void sqlrconnection_svr::selectDatabaseCommand() {
 	
 	// Select the db and send back the result.  If we've been told to
 	// ignore these calls, skip the actual call but act like it succeeded.
-	bool	result=(ignoreselectdb)?true:selectDatabase(db);
+	bool	result=(ignoreselectdb)?true:conn->selectDatabase(db);
 	clientsock->write(result);
 
 	// if there was an error, send it back
 	if (!result) {
-		clientsock->write(errorlength);
-		clientsock->write(error,errorlength);
+		clientsock->write(conn->errorlength);
+		clientsock->write(conn->error,conn->errorlength);
 	}
 
 	flushWriteBuffer();

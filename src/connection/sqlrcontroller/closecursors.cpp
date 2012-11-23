@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-void sqlrconnection_svr::closeCursors(bool destroy) {
+void sqlrcontroller_svr::closeCursors(bool destroy) {
 
 	dbgfile.debugPrint("connection",0,"closing cursors...");
 
@@ -32,8 +32,8 @@ void sqlrconnection_svr::closeCursors(bool destroy) {
 	dbgfile.debugPrint("connection",0,"done closing cursors...");
 }
 
-void sqlrconnection_svr::deleteCursorInternal(sqlrcursor_svr *curs) {
-	deleteCursor(curs);
+void sqlrcontroller_svr::deleteCursorInternal(sqlrcursor_svr *curs) {
+	conn->deleteCursor(curs);
 	semset->waitWithUndo(9);
 	statistics->open_svr_cursors--;
 	if (statistics->open_svr_cursors<0) {

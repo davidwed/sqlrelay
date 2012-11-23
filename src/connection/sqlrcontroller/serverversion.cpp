@@ -1,9 +1,9 @@
 // Copyright (c) 2007  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-void sqlrconnection_svr::serverVersionCommand() {
+void sqlrcontroller_svr::serverVersionCommand() {
 
 	dbgfile.debugPrint("connection",1,"server version");
 

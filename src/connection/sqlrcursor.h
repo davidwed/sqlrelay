@@ -46,6 +46,7 @@ class bindvar_svr {
 class sqlrconnection_svr;
 
 class sqlrcursor_svr {
+	friend class sqlrcontroller_svr;
 	friend class sqlrconnection_svr;
 	public:
 			sqlrcursor_svr(sqlrconnection_svr *conn);

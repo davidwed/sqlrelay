@@ -4,7 +4,7 @@
 #ifndef MYSQLCONNECTION_H
 #define MYSQLCONNECTION_H
 
-
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <sqlwriter.h>
 
@@ -140,7 +140,7 @@ class mysqlcursor : public sqlrcursor_svr {
 class mysqlconnection : public sqlrconnection_svr {
 	friend class mysqlcursor;
 	public:
-				mysqlconnection();
+				mysqlconnection(sqlrcontroller_svr *cont);
 				~mysqlconnection();
 	private:
 		void		handleConnectString();

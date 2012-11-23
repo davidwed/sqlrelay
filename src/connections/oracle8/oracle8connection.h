@@ -9,6 +9,7 @@
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	32768
 
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <sqlwriter.h>
 #ifdef HAVE_ORACLE_8i
@@ -304,7 +305,7 @@ class oracle8cursor : public sqlrcursor_svr {
 class oracle8connection : public sqlrconnection_svr {
 	friend class oracle8cursor;
 	public:
-				oracle8connection();
+				oracle8connection(sqlrcontroller_svr *cont);
 				~oracle8connection();
 	private:
 		void		handleConnectString();

@@ -151,17 +151,21 @@ char *conv_to_ucs(char *inbuf)
 }
 #endif
 
+odbcconnection::odbcconnection(sqlrcontroller_svr *cont) :
+					sqlrconnection_svr(cont) {
+}
 
 
 void odbcconnection::handleConnectString() {
-	dsn=connectStringValue("dsn");
-	setUser(connectStringValue("user"));
-	setPassword(connectStringValue("password"));
-	const char	*autocom=connectStringValue("autocommit");
-	setAutoCommitBehavior((autocom &&
+	dsn=cont->connectStringValue("dsn");
+	cont->setUser(cont->connectStringValue("user"));
+	cont->setPassword(cont->connectStringValue("password"));
+	const char	*autocom=cont->connectStringValue("autocommit");
+	cont->setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
-	fakeinputbinds=
-		!charstring::compare(connectStringValue("fakebinds"),"yes");
+	cont->fakeinputbinds=
+		!charstring::compare(
+			cont->connectStringValue("fakebinds"),"yes");
 }
 
 bool odbcconnection::logIn(bool printerrors) {
@@ -210,8 +214,8 @@ bool odbcconnection::logIn(bool printerrors) {
 #endif
 
 	// connect to the database
-	char *user_asc=(char*)getUser();
-	char *password_asc=(char*)getPassword();
+	char *user_asc=(char*)cont->getUser();
+	char *password_asc=(char*)cont->getPassword();
 	char *dsn_asc=(char*)dsn;
 #ifdef HAVE_SQLCONNECTW
 	char *user_ucs=(char*)conv_to_ucs(user_asc);
@@ -413,8 +417,8 @@ bool odbcconnection::setIsolationLevel(const char *isolevel) {
 odbccursor::odbccursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	odbcconn=(odbcconnection *)conn;
 	stmt=NULL;
-	outdatebind=new datebind *[conn->maxbindcount];
-	for (uint16_t i=0; i<conn->maxbindcount; i++) {
+	outdatebind=new datebind *[conn->cont->maxbindcount];
+	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
 		outdatebind[i]=NULL;
 	}
 }
@@ -841,7 +845,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	// convert date output binds
-	for (uint16_t i=0; i<conn->maxbindcount; i++) {
+	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
 			SQL_TIMESTAMP_STRUCT	*ts=
@@ -881,7 +885,7 @@ bool odbccursor::handleColumns() {
 	// run through the columns
 	for (SQLSMALLINT i=0; i<ncols; i++) {
 
-		if (conn->sendColumnInfo()) {
+		if (conn->cont->sendColumnInfo()) {
 #if (ODBCVER >= 0x0300)
 			// column name
 
@@ -1372,7 +1376,7 @@ void odbccursor::nextRow() {
 void odbccursor::cleanUpData(bool freeresult, bool freebinds) {
 
 	if (freebinds) {
-		for (uint16_t i=0; i<conn->maxbindcount; i++) {
+		for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
 			delete outdatebind[i];
 			outdatebind[i]=NULL;
 		}

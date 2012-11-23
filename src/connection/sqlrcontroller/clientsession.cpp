@@ -1,12 +1,12 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
 // for gettimeofday()
 #include <sys/time.h>
 
-void sqlrconnection_svr::clientSession() {
+void sqlrcontroller_svr::clientSession() {
 
 	dbgfile.debugPrint("connection",0,"client session...");
 
@@ -131,7 +131,7 @@ void sqlrconnection_svr::clientSession() {
 			(command==NEW_QUERY ||
 			command==REEXECUTE_QUERY ||
 			command==FETCH_FROM_BIND_CURSOR)) {
-			sqlrlg->runLoggers(this,cursor);
+			sqlrlg->runLoggers(conn,cursor);
 		}
 
 	} while (loop);
@@ -149,7 +149,7 @@ void sqlrconnection_svr::clientSession() {
 	dbgfile.debugPrint("connection",0,"done with client session");
 }
 
-bool sqlrconnection_svr::getCommand(uint16_t *command) {
+bool sqlrcontroller_svr::getCommand(uint16_t *command) {
 
 	dbgfile.debugPrint("connection",1,"getting command...");
 
@@ -164,7 +164,7 @@ bool sqlrconnection_svr::getCommand(uint16_t *command) {
 	return true;
 }
 
-sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
+sqlrcursor_svr *sqlrcontroller_svr::getCursor(uint16_t command) {
 
 	dbgfile.debugPrint("connection",1,"getting a cursor...");
 
@@ -241,7 +241,7 @@ sqlrcursor_svr *sqlrconnection_svr::getCursor(uint16_t command) {
 	return cursor;
 }
 
-sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
+sqlrcursor_svr *sqlrcontroller_svr::findAvailableCursor() {
 
 	// find an available cursor
 	for (uint16_t i=0; i<cursorcount; i++) {
@@ -282,7 +282,7 @@ sqlrcursor_svr *sqlrconnection_svr::findAvailableCursor() {
 	return cur[firstnewcursor];
 }
 
-void sqlrconnection_svr::noAvailableCursors(uint16_t command) {
+void sqlrcontroller_svr::noAvailableCursors(uint16_t command) {
 
 	// If no cursor was available, the client
 	// cound send an entire query and bind vars
@@ -329,7 +329,7 @@ void sqlrconnection_svr::noAvailableCursors(uint16_t command) {
 	flushWriteBuffer();
 }
 
-void sqlrconnection_svr::closeClientSocket() {
+void sqlrcontroller_svr::closeClientSocket() {
 
 	// Sometimes the server sends the result set and closes the socket
 	// while part of it is buffered but not yet transmitted.  This causes
@@ -358,7 +358,7 @@ void sqlrconnection_svr::closeClientSocket() {
 			"done closing the client socket");
 }
 
-void sqlrconnection_svr::closeSuspendedSessionSockets() {
+void sqlrcontroller_svr::closeSuspendedSessionSockets() {
 
 	// If we're no longer in a suspended session and we we're passing 
 	// around file descriptors but had to open a set of sockets to handle 

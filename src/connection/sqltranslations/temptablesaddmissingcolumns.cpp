@@ -2,8 +2,10 @@
 // See the file COPYING for more information
 
 #include <sqltranslations/temptablesaddmissingcolumns.h>
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
+#include <sqlparser.h>
 #include <debugprint.h>
 
 #ifdef RUDIMENTS_NAMESPACE
@@ -75,7 +77,7 @@ bool temptablesaddmissingcolumns::run(sqlrconnection_svr *sqlrcon,
 
 	// get the columns
 	stringbuffer	collist;
-	if (!sqlrcon->getColumnNames(selectclause.getString(),&collist)) {
+	if (!sqlrcon->cont->getColumnNames(selectclause.getString(),&collist)) {
 		debugPrintf("failed to get column list\n");
 	}
 

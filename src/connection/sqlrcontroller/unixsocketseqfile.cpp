@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2004  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 #include <stdio.h>
 
 // for umask
@@ -14,7 +14,7 @@
 
 #include <config.h>
 
-bool sqlrconnection_svr::getUnixSocket(const char *tmpdir, char *unixsocketptr) {
+bool sqlrcontroller_svr::getUnixSocket(const char *tmpdir, char *unixsocketptr) {
 
 	dbgfile.debugPrint("connection",0,"getting unix socket...");
 
@@ -41,7 +41,7 @@ bool sqlrconnection_svr::getUnixSocket(const char *tmpdir, char *unixsocketptr) 
 	return true;
 }
 
-bool sqlrconnection_svr::openSequenceFile(file *sockseq,
+bool sqlrcontroller_svr::openSequenceFile(file *sockseq,
 				const char *tmpdir, char *unixsocketptr) {
 
 	// open the sequence file and get the current port number
@@ -79,7 +79,7 @@ bool sqlrconnection_svr::openSequenceFile(file *sockseq,
 	return success;
 }
 
-bool sqlrconnection_svr::lockSequenceFile(file *sockseq) {
+bool sqlrcontroller_svr::lockSequenceFile(file *sockseq) {
 
 	dbgfile.debugPrint("connection",1,"locking...");
 
@@ -87,7 +87,7 @@ bool sqlrconnection_svr::lockSequenceFile(file *sockseq) {
 }
 
 
-bool sqlrconnection_svr::getAndIncrementSequenceNumber(file *sockseq,
+bool sqlrcontroller_svr::getAndIncrementSequenceNumber(file *sockseq,
 							char *unixsocketptr) {
 
 	// get the sequence number from the file
@@ -123,7 +123,7 @@ bool sqlrconnection_svr::getAndIncrementSequenceNumber(file *sockseq,
 	return (sockseq->write(buffer)==sizeof(int32_t));
 }
 
-bool sqlrconnection_svr::unLockSequenceFile(file *sockseq) {
+bool sqlrcontroller_svr::unLockSequenceFile(file *sockseq) {
 
 	// unlock and close the file in a platform-independent manner
 	dbgfile.debugPrint("connection",1,"unlocking...");

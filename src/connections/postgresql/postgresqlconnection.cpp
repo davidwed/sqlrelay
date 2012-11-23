@@ -14,7 +14,8 @@ static void nullNoticeProcessor(void *arg, const char *message) {
 }
 #endif
 
-postgresqlconnection::postgresqlconnection() : sqlrconnection_svr() {
+postgresqlconnection::postgresqlconnection(sqlrcontroller_svr *cont) :
+						sqlrconnection_svr(cont) {
 	dbversion=NULL;
 	datatypecount=0;
 	datatypeids=NULL;
@@ -35,13 +36,13 @@ postgresqlconnection::~postgresqlconnection() {
 }
 
 void postgresqlconnection::handleConnectString() {
-	host=connectStringValue("host");
-	port=connectStringValue("port");
-	options=connectStringValue("options");
-	db=connectStringValue("db");
-	setUser(connectStringValue("user"));
-	setPassword(connectStringValue("password"));
-	const char	*typemang=connectStringValue("typemangling");
+	host=cont->connectStringValue("host");
+	port=cont->connectStringValue("port");
+	options=cont->connectStringValue("options");
+	db=cont->connectStringValue("db");
+	cont->setUser(cont->connectStringValue("user"));
+	cont->setPassword(cont->connectStringValue("password"));
+	const char	*typemang=cont->connectStringValue("typemangling");
 	if (!typemang ||!charstring::compareIgnoringCase(typemang,"no")) {
 		typemangling=0;
 	} else if (!charstring::compareIgnoringCase(typemang,"yes")) {
@@ -49,17 +50,18 @@ void postgresqlconnection::handleConnectString() {
 	} else {
 		typemangling=2;
 	}
-	charset=connectStringValue("charset");
+	charset=cont->connectStringValue("charset");
 	const char	*lastinsertidfunc=
-			connectStringValue("lastinsertidfunction");
+			cont->connectStringValue("lastinsertidfunction");
 	if (lastinsertidfunc) {
 		stringbuffer	liiquery;
 		liiquery.append("select ");
 		liiquery.append(lastinsertidfunc);
 		lastinsertidquery=liiquery.detachString();
 	}
-	fakeinputbinds=
-		!charstring::compare(connectStringValue("fakebinds"),"yes");
+	cont->fakeinputbinds=
+		!charstring::compare(
+			cont->connectStringValue("fakebinds"),"yes");
 }
 
 bool postgresqlconnection::logIn(bool printerrors) {
@@ -72,7 +74,8 @@ bool postgresqlconnection::logIn(bool printerrors) {
 	}
 
 	// log in
-	pgconn=PQsetdbLogin(host,port,options,NULL,db,getUser(),getPassword());
+	pgconn=PQsetdbLogin(host,port,options,NULL,db,
+				cont->getUser(),cont->getPassword());
 
 	// check the status of the login
 	if (PQstatus(pgconn)==CONNECTION_BAD) {
@@ -125,7 +128,7 @@ bool postgresqlconnection::logIn(bool printerrors) {
 		defined(HAVE_POSTGRESQL_PQPREPARE)
 	// don't use bind variables against older servers
 	if (PQprotocolVersion(pgconn)<3) {
-		setFakeInputBinds(true);
+		cont->setFakeInputBinds(true);
 	}
 #endif
 

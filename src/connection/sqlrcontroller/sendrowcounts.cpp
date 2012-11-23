@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-void sqlrconnection_svr::sendRowCounts(bool knowsactual, uint64_t actual,
+void sqlrcontroller_svr::sendRowCounts(bool knowsactual, uint64_t actual,
 					bool knowsaffected, uint64_t affected) {
 
 	dbgfile.debugPrint("connection",2,"sending row counts...");

@@ -1,4 +1,4 @@
-// Copyright (c) 2000-2001  David Muse
+// Copyright (c) 2000-2012  David Muse
 // See the file COPYING for more information
 
 #ifndef DB2CCONNECTION_H
@@ -8,6 +8,7 @@
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	4096
 
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 
 #include <sqlcli1.h>
@@ -166,6 +167,8 @@ class db2cursor : public sqlrcursor_svr {
 
 class db2connection : public sqlrconnection_svr {
 	friend class db2cursor;
+	public:
+			db2connection(sqlrcontroller_svr *cont);
 	private:
 		void	handleConnectString();
 		bool	logIn(bool printerrors);

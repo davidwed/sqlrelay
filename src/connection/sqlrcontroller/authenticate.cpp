@@ -2,9 +2,9 @@
 // See the file COPYING for more information
 
 #include <config.h>
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-bool sqlrconnection_svr::authenticateCommand() {
+bool sqlrcontroller_svr::authenticateCommand() {
 
 	dbgfile.debugPrint("connection",1,"authenticate");
 
@@ -19,7 +19,7 @@ bool sqlrconnection_svr::authenticateCommand() {
 		clientsock->write((uint16_t)21);
 		clientsock->write("Authentication Error.");
 		flushWriteBuffer();
-		endSession();
+		conn->endSession();
 		return false;
 	}
 
@@ -29,7 +29,7 @@ bool sqlrconnection_svr::authenticateCommand() {
 	return true;
 }
 
-bool sqlrconnection_svr::getUserFromClient() {
+bool sqlrcontroller_svr::getUserFromClient() {
 	uint32_t	size=0;
 	if (clientsock->read(&size,idleclienttimeout,0)==sizeof(uint32_t) &&
 		size<sizeof(userbuffer) &&
@@ -43,7 +43,7 @@ bool sqlrconnection_svr::getUserFromClient() {
 	return false;
 }
 
-bool sqlrconnection_svr::getPasswordFromClient() {
+bool sqlrcontroller_svr::getPasswordFromClient() {
 	uint32_t size=0;
 	if (clientsock->read(&size,idleclienttimeout,0)==sizeof(uint32_t) &&
 		size<sizeof(passwordbuffer) &&
@@ -57,16 +57,16 @@ bool sqlrconnection_svr::getPasswordFromClient() {
 	return false;
 }
 
-bool sqlrconnection_svr::authenticate() {
+bool sqlrcontroller_svr::authenticate() {
 
 	dbgfile.debugPrint("connection",1,"authenticate...");
 
 	// authenticate on the approprite tier
 	bool	authondb=(cfgfl->getAuthOnDatabase() &&
-				supportsAuthOnDatabase());
+				conn->supportsAuthOnDatabase());
 	bool	authonconnection=(cfgfl->getAuthOnConnection() ||
 					(cfgfl->getAuthOnDatabase() &&
-						!supportsAuthOnDatabase()));
+					!conn->supportsAuthOnDatabase()));
 	if (authonconnection) {
 		return connectionBasedAuth(userbuffer,passwordbuffer);
 	} else if (authondb) {
@@ -78,7 +78,7 @@ bool sqlrconnection_svr::authenticate() {
 	return true;
 }
 
-bool sqlrconnection_svr::connectionBasedAuth(const char *userbuffer,
+bool sqlrcontroller_svr::connectionBasedAuth(const char *userbuffer,
 						const char *passwordbuffer) {
 
 	// handle connection-based authentication
@@ -93,7 +93,7 @@ bool sqlrconnection_svr::connectionBasedAuth(const char *userbuffer,
 	return retval;
 }
 
-bool sqlrconnection_svr::databaseBasedAuth(const char *userbuffer,
+bool sqlrcontroller_svr::databaseBasedAuth(const char *userbuffer,
 						const char *passwordbuffer) {
 
 	// if the user we want to change to is different from the
@@ -105,7 +105,7 @@ bool sqlrconnection_svr::databaseBasedAuth(const char *userbuffer,
 
 		// change authentication 
 		dbgfile.debugPrint("connection",2,"change user");
-		authsuccess=changeUser(userbuffer,passwordbuffer);
+		authsuccess=conn->changeUser(userbuffer,passwordbuffer);
 
 		// keep a record of which user we're changing to
 		// and whether that user was successful in 

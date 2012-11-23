@@ -2,8 +2,10 @@
 // See the file COPYING for more information
 
 #include <sqltranslations/temptableslocalize.h>
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
+#include <sqlparser.h>
 #include <debugprint.h>
 #include <rudiments/process.h>
 
@@ -108,7 +110,7 @@ void temptableslocalize::mapCreateTemporaryTableName(
 	}
 
 	// add table name to drop-at-session-end list
-	sqlrcon->addSessionTempTableForDrop(newtable);
+	sqlrcon->cont->addSessionTempTableForDrop(newtable);
 }
 
 const char *temptableslocalize::generateTempTableName(const char *oldtable,

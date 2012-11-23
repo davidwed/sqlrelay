@@ -1,32 +1,32 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
 
-void sqlrconnection_svr::addSessionTempTableForDrop(const char *table) {
+void sqlrcontroller_svr::addSessionTempTableForDrop(const char *table) {
 	sessiontemptablesfordrop.append(charstring::duplicate(table));
 }
 
-void sqlrconnection_svr::addTransactionTempTableForDrop(const char *table) {
+void sqlrcontroller_svr::addTransactionTempTableForDrop(const char *table) {
 	transtemptablesfordrop.append(charstring::duplicate(table));
 }
 
-void sqlrconnection_svr::addSessionTempTableForTrunc(const char *table) {
+void sqlrcontroller_svr::addSessionTempTableForTrunc(const char *table) {
 	sessiontemptablesfortrunc.append(charstring::duplicate(table));
 }
 
-void sqlrconnection_svr::addTransactionTempTableForTrunc(const char *table) {
+void sqlrcontroller_svr::addTransactionTempTableForTrunc(const char *table) {
 	transtemptablesfortrunc.append(charstring::duplicate(table));
 }
 
-void sqlrconnection_svr::dropTempTables(sqlrcursor_svr *cursor,
+void sqlrcontroller_svr::dropTempTables(sqlrcursor_svr *cursor,
 					stringlist *tablelist) {
 
 	// some databases require us to re-login before dropping temp tables
 	if (tablelist==&sessiontemptablesfordrop &&
 			tablelist->getLength() &&
-			tempTableDropReLogIn()) {
+			conn->tempTableDropReLogIn()) {
 		reLogIn();
 	}
 
@@ -39,11 +39,11 @@ void sqlrconnection_svr::dropTempTables(sqlrcursor_svr *cursor,
 	tablelist->clear();
 }
 
-void sqlrconnection_svr::dropTempTable(sqlrcursor_svr *cursor,
+void sqlrcontroller_svr::dropTempTable(sqlrcursor_svr *cursor,
 					const char *tablename) {
 	stringbuffer	dropquery;
 	dropquery.append("drop table ");
-	dropquery.append(tempTableDropPrefix());
+	dropquery.append(conn->tempTableDropPrefix());
 	dropquery.append(tablename);
 
 	// FIXME: I need to refactor all of this so that this just gets
@@ -51,7 +51,7 @@ void sqlrconnection_svr::dropTempTable(sqlrcursor_svr *cursor,
 	// FIXME: freetds/sybase override this method but don't do this
 	if (sqltr) {
 		if (sqlp->parse(dropquery.getString())) {
-			sqltr->runBeforeTriggers(this,cursor,sqlp->getTree());
+			sqltr->runBeforeTriggers(conn,cursor,sqlp->getTree());
 		}
 	}
 
@@ -66,11 +66,11 @@ void sqlrconnection_svr::dropTempTable(sqlrcursor_svr *cursor,
 	// run as a matter of course instead of explicitly getting run here
 	// FIXME: freetds/sybase override this method but don't do this
 	if (sqltr) {
-		sqltr->runAfterTriggers(this,cursor,sqlp->getTree(),true);
+		sqltr->runAfterTriggers(conn,cursor,sqlp->getTree(),true);
 	}
 }
 
-void sqlrconnection_svr::truncateTempTables(sqlrcursor_svr *cursor,
+void sqlrcontroller_svr::truncateTempTables(sqlrcursor_svr *cursor,
 						stringlist *tablelist) {
 
 	// run through the temp table list, truncateing tables
@@ -82,7 +82,7 @@ void sqlrconnection_svr::truncateTempTables(sqlrcursor_svr *cursor,
 	tablelist->clear();
 }
 
-void sqlrconnection_svr::truncateTempTable(sqlrcursor_svr *cursor,
+void sqlrcontroller_svr::truncateTempTable(sqlrcursor_svr *cursor,
 						const char *tablename) {
 	stringbuffer	truncatequery;
 	truncatequery.append("delete from ")->append(tablename);

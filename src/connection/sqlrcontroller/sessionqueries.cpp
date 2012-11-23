@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-void sqlrconnection_svr::sessionStartQueries() {
+void sqlrcontroller_svr::sessionStartQueries() {
 	// run a configurable set of queries at the start of each session
 	for (stringlistnode *node=
 		cfgfl->getSessionStartQueries()->getFirstNode();
@@ -12,7 +12,7 @@ void sqlrconnection_svr::sessionStartQueries() {
 	}
 }
 
-void sqlrconnection_svr::sessionEndQueries() {
+void sqlrcontroller_svr::sessionEndQueries() {
 	// run a configurable set of queries at the end of each session
 	for (stringlistnode *node=
 		cfgfl->getSessionEndQueries()->getFirstNode();
@@ -21,7 +21,7 @@ void sqlrconnection_svr::sessionEndQueries() {
 	}
 }
 
-void sqlrconnection_svr::sessionQuery(const char *query) {
+void sqlrcontroller_svr::sessionQuery(const char *query) {
 
 	// create the select database query
 	size_t	querylen=charstring::length(query);

@@ -13,6 +13,7 @@
 //#define FREETDS_SUPPORTS_CURSORS
 
 #include <rudiments/environment.h>
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 
 extern "C" {
@@ -188,7 +189,7 @@ class freetdscursor : public sqlrcursor_svr {
 class freetdsconnection : public sqlrconnection_svr {
 	friend class freetdscursor;
 	public:
-			freetdsconnection();
+			freetdsconnection(sqlrcontroller_svr *cont);
 			~freetdsconnection();
 	private:
 		void	handleConnectString();

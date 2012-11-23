@@ -2,16 +2,14 @@
 // See the file COPYING for more information
 
 #include <config.h>
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 #include <rudiments/file.h>
 #include <rudiments/process.h>
 
-sqlrconnection_svr::~sqlrconnection_svr() {
+sqlrcontroller_svr::~sqlrcontroller_svr() {
 
 	delete cmdl;
 	delete cfgfl;
-
-	delete[] error;
 
 	delete[] updown;
 

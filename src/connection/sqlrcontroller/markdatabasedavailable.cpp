@@ -2,12 +2,12 @@
 // See the file COPYING for more information
 
 #include <config.h>
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
 #include <rudiments/permissions.h>
 #include <rudiments/file.h>
 
-void sqlrconnection_svr::markDatabaseAvailable() {
+void sqlrcontroller_svr::markDatabaseAvailable() {
 
 	size_t	stringlen=9+charstring::length(updown)+1;
 	char	*string=new char[stringlen];
@@ -21,7 +21,7 @@ void sqlrconnection_svr::markDatabaseAvailable() {
 	fd.create(updown,permissions::ownerReadWrite());
 }
 
-void sqlrconnection_svr::markDatabaseUnavailable() {
+void sqlrcontroller_svr::markDatabaseUnavailable() {
 
 	// if the database is behind a load balancer, don't mark it unavailable
 	if (constr->getBehindLoadBalancer()) {

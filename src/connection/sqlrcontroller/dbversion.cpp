@@ -1,14 +1,14 @@
 // Copyright (c) 2007  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-void sqlrconnection_svr::dbVersionCommand() {
+void sqlrcontroller_svr::dbVersionCommand() {
 
 	dbgfile.debugPrint("connection",1,"db version");
 
 	// get the db version
-	const char	*dbversion=dbVersion();
+	const char	*dbversion=conn->dbVersion();
 
 	// send it to the client
 	uint16_t	dbvlen=charstring::length(dbversion);

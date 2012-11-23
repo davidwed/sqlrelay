@@ -6,9 +6,9 @@
  */
 
 #include <config.h>
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-signalhandler *sqlrconnection_svr::handleSignals(
+signalhandler *sqlrcontroller_svr::handleSignals(
 					void (*shutdownfunction)(int32_t)) {
 
 	// handle kill signals (SIGINT, SIGTERM)

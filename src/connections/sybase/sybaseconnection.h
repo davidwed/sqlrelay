@@ -9,6 +9,7 @@
 #define MAX_ITEM_BUFFER_SIZE	4096
 
 #include <rudiments/environment.h>
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 
 extern "C" {
@@ -174,7 +175,7 @@ class sybasecursor : public sqlrcursor_svr {
 class sybaseconnection : public sqlrconnection_svr {
 	friend class sybasecursor;
 	public:
-			sybaseconnection();
+			sybaseconnection(sqlrcontroller_svr *cont);
 			~sybaseconnection();
 	private:
 		void		handleConnectString();

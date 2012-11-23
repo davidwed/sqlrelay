@@ -1,11 +1,11 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 #include <rudiments/snooze.h>
 #include <unistd.h>
 
-bool sqlrconnection_svr::listen() {
+bool sqlrcontroller_svr::listen() {
 
 	uint16_t	sessioncount=0;
 	bool		clientconnectfailed=false;
@@ -65,7 +65,7 @@ bool sqlrconnection_svr::listen() {
 				// someone to pick up the suspended
 				// session, roll it back and kill it
 				if (suspendedsession) {
-					if (isTransactional()) {
+					if (conn->isTransactional()) {
 						rollbackInternal();
 					}
 					suspendedsession=false;
@@ -99,7 +99,7 @@ bool sqlrconnection_svr::listen() {
 	}
 }
 
-void sqlrconnection_svr::waitForAvailableDatabase() {
+void sqlrcontroller_svr::waitForAvailableDatabase() {
 
 	dbgfile.debugPrint("connection",0,"waiting for available database...");
 
@@ -111,7 +111,7 @@ void sqlrconnection_svr::waitForAvailableDatabase() {
 	dbgfile.debugPrint("connection",0,"database is available");
 }
 
-bool sqlrconnection_svr::availableDatabase() {
+bool sqlrcontroller_svr::availableDatabase() {
 
 	// return whether the file "updown" is there or not
 	if (file::exists(updown)) {
@@ -123,7 +123,7 @@ bool sqlrconnection_svr::availableDatabase() {
 	}
 }
 
-void sqlrconnection_svr::initSession() {
+void sqlrcontroller_svr::initSession() {
 
 	dbgfile.debugPrint("connection",0,"initializing session...");
 
@@ -137,7 +137,7 @@ void sqlrconnection_svr::initSession() {
 	dbgfile.debugPrint("connection",0,"done initializing session...");
 }
 
-int32_t sqlrconnection_svr::waitForClient() {
+int32_t sqlrcontroller_svr::waitForClient() {
 
 	dbgfile.debugPrint("connection",0,"waiting for client...");
 

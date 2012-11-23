@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2011  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 #include <rudiments/character.h>
 
 enum queryparsestate_t {
@@ -11,7 +11,7 @@ enum queryparsestate_t {
 	IN_BIND
 };
 
-void sqlrconnection_svr::rewriteQuery(sqlrcursor_svr *cursor) {
+void sqlrcontroller_svr::rewriteQuery(sqlrcursor_svr *cursor) {
 
 	if (sqlp && sqlt && sqlw) {
 		if (!translateQuery(cursor)) {
@@ -23,12 +23,12 @@ void sqlrconnection_svr::rewriteQuery(sqlrcursor_svr *cursor) {
 		translateBindVariables(cursor);
 	}
 
-	if (supportsTransactionBlocks()) {
+	if (conn->supportsTransactionBlocks()) {
 		translateBeginTransaction(cursor);
 	}
 }
 
-bool sqlrconnection_svr::translateQuery(sqlrcursor_svr *cursor) {
+bool sqlrcontroller_svr::translateQuery(sqlrcursor_svr *cursor) {
 
 	if (debugsqltranslation) {
 		printf("original:\n\"%s\"\n\n",cursor->querybuffer);
@@ -61,7 +61,7 @@ bool sqlrconnection_svr::translateQuery(sqlrcursor_svr *cursor) {
 	}
 
 	// apply translation rules
-	if (!sqlt->runTranslations(this,cursor,cursor->querytree)) {
+	if (!sqlt->runTranslations(conn,cursor,cursor->querytree)) {
 		return false;
 	}
 
@@ -73,7 +73,7 @@ bool sqlrconnection_svr::translateQuery(sqlrcursor_svr *cursor) {
 
 	// write the query back out
 	stringbuffer	translatedquery;
-	if (!sqlw->write(this,cursor,cursor->querytree,&translatedquery)) {
+	if (!sqlw->write(conn,cursor,cursor->querytree,&translatedquery)) {
 		return false;
 	}
 
@@ -95,7 +95,7 @@ bool sqlrconnection_svr::translateQuery(sqlrcursor_svr *cursor) {
 	return true;
 }
 
-void sqlrconnection_svr::printQueryTree(xmldom *tree) {
+void sqlrcontroller_svr::printQueryTree(xmldom *tree) {
 	stringbuffer	*xmlstr=tree->getRootNode()->xml();
 	const char	*xml=xmlstr->getString();
 	int16_t		indent=0;
@@ -122,7 +122,7 @@ void sqlrconnection_svr::printQueryTree(xmldom *tree) {
 	delete xmlstr;
 }
 
-void sqlrconnection_svr::translateBindVariables(sqlrcursor_svr *cursor) {
+void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 
 	// debug
 	dbgfile.debugPrint("connection",1,"translating bind variables...");
@@ -297,9 +297,9 @@ void sqlrconnection_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 	}
 }
 
-bool sqlrconnection_svr::matchesNativeBindFormat(const char *bind) {
+bool sqlrcontroller_svr::matchesNativeBindFormat(const char *bind) {
 
-	const char	*bindformat=bindFormat();
+	const char	*bindformat=conn->bindFormat();
 	size_t		bindformatlen=charstring::length(bindformat);
 
 	// the bind variable name matches the format if...
@@ -321,13 +321,13 @@ bool sqlrconnection_svr::matchesNativeBindFormat(const char *bind) {
 		(bindformat[1]=='*' && !character::isAlphanumeric(bind[1]))));
 }
 
-void sqlrconnection_svr::translateBindVariableInStringAndArray(
+void sqlrcontroller_svr::translateBindVariableInStringAndArray(
 						sqlrcursor_svr *cursor,
 						stringbuffer *currentbind,
 						uint16_t bindindex,
 						stringbuffer *newquery) {
 
-	const char	*bindformat=bindFormat();
+	const char	*bindformat=conn->bindFormat();
 	size_t		bindformatlen=charstring::length(bindformat);
 
 	// append the first character of the bind format to the new query
@@ -369,7 +369,7 @@ void sqlrconnection_svr::translateBindVariableInStringAndArray(
 	}
 }
 
-void sqlrconnection_svr::translateBindVariableInArray(sqlrcursor_svr *cursor,
+void sqlrcontroller_svr::translateBindVariableInArray(sqlrcursor_svr *cursor,
 						const char *currentbind,
 						uint16_t bindindex) {
 
@@ -414,7 +414,7 @@ void sqlrconnection_svr::translateBindVariableInArray(sqlrcursor_svr *cursor,
 							malloc(tempnumberlen+2);
 
 				// replace the existing bind var name and size
-				b->variable[0]=bindVariablePrefix();
+				b->variable[0]=conn->bindVariablePrefix();
 				charstring::copy(b->variable+1,tempnumber);
 				b->variable[tempnumberlen+1]='\0';
 				b->variablesize=tempnumberlen+1;
@@ -429,7 +429,7 @@ void sqlrconnection_svr::translateBindVariableInArray(sqlrcursor_svr *cursor,
 	}
 }
 
-void sqlrconnection_svr::translateBindVariablesFromMappings(
+void sqlrcontroller_svr::translateBindVariablesFromMappings(
 						sqlrcursor_svr *cursor) {
 
 	// run two passes
@@ -472,7 +472,7 @@ void sqlrconnection_svr::translateBindVariablesFromMappings(
 	}
 }
 
-void sqlrconnection_svr::translateBeginTransaction(sqlrcursor_svr *cursor) {
+void sqlrcontroller_svr::translateBeginTransaction(sqlrcursor_svr *cursor) {
 
 	if (!isBeginTransactionQuery(cursor)) {
 		return;
@@ -484,7 +484,7 @@ void sqlrconnection_svr::translateBeginTransaction(sqlrcursor_svr *cursor) {
 	dbgfile.debugPrint("connection",2,cursor->querybuffer);
 
 	// translate query
-	const char	*beginquery=beginTransactionQuery();
+	const char	*beginquery=conn->beginTransactionQuery();
 	cursor->querylength=charstring::length(beginquery);
 	charstring::copy(cursor->querybuffer,beginquery,cursor->querylength);
 	cursor->querybuffer[cursor->querylength]='\0';
@@ -494,7 +494,7 @@ void sqlrconnection_svr::translateBeginTransaction(sqlrcursor_svr *cursor) {
 	dbgfile.debugPrint("connection",2,cursor->querybuffer);
 }
 
-bool sqlrconnection_svr::getColumnNames(const char *query,
+bool sqlrcontroller_svr::getColumnNames(const char *query,
 					stringbuffer *output) {
 
 	// sanity check on the query

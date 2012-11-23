@@ -2,7 +2,9 @@
 // See the file COPYING for more information
 
 #include <sqlrloggers/custom_nw.h>
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
+#include <cmdline.h>
 #include <rudiments/charstring.h>
 #include <rudiments/directory.h>
 #include <rudiments/file.h>
@@ -28,7 +30,7 @@ custom_nw::custom_nw(xmldomnode *parameters) : sqlrlogger(parameters) {
 bool custom_nw::init(sqlrconnection_svr *sqlrcon) {
 	debugFunction();
 
-	cmdline	*cmdl=sqlrcon->cmdl;
+	cmdline	*cmdl=sqlrcon->cont->cmdl;
 
 	// build up the query log name
 	size_t	querylognamelen;
@@ -104,7 +106,7 @@ bool custom_nw::run(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur) {
 
 	// escape the client info
 	static char	infobuf[1024+1];
-	strescape(sqlrcon->clientinfo,infobuf,1024);
+	strescape(sqlrcon->cont->clientinfo,infobuf,1024);
 
 	// escape the input bind variables
 	char	bindbuf[1000+1];
@@ -112,8 +114,8 @@ bool custom_nw::run(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur) {
 
 	// get the client address
 	char	*clientaddrbuf=NULL;
-	if (sqlrcon->clientsock) {
-		clientaddrbuf=sqlrcon->clientsock->getPeerAddress();
+	if (sqlrcon->cont->clientsock) {
+		clientaddrbuf=sqlrcon->cont->clientsock->getPeerAddress();
 		if (!clientaddrbuf) {
 			clientaddrbuf=charstring::duplicate("UNIX");
 		}
@@ -138,7 +140,7 @@ bool custom_nw::run(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur) {
 		dt.getHour(),
 		dt.getMinutes(),
 		dt.getSeconds(),
-		sqlrcon->handoffindex, 
+		sqlrcon->cont->handoffindex, 
 		sec+usec/1000000.0,
 		errorcodebuf,
 		(sqlrcur->lastrowvalid)?sqlrcur->lastrow:0,

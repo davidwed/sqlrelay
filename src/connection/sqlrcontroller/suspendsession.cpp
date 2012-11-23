@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-void sqlrconnection_svr::suspendSessionCommand() {
+void sqlrcontroller_svr::suspendSessionCommand() {
 
 	dbgfile.debugPrint("connection",1,"suspend session");
 
@@ -42,7 +42,7 @@ void sqlrconnection_svr::suspendSessionCommand() {
 	flushWriteBuffer();
 }
 
-bool sqlrconnection_svr::suspendSession() {
+bool sqlrcontroller_svr::suspendSession() {
 
 	dbgfile.debugPrint("connection",1,"suspending session...");
 

@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqltriggers/createtableautoincrementoracle.h>
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
@@ -217,37 +218,37 @@ bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
 							uint32_t length) {
 	debugFunction();
 
-	if (sqlrcon->debugtriggers) {
+	if (sqlrcon->cont->debugtriggers) {
 		printf("running trigger:\n%s\n",query);
 	}
 
 	bool	retval=false;
 
-	sqlrcursor_svr	*cur=sqlrcon->initCursorInternal();
-	if (cur->openInternal(sqlrcon->cursorcount+1) &&
+	sqlrcursor_svr	*cur=sqlrcon->cont->initCursorInternal();
+	if (cur->openInternal(sqlrcon->cont->cursorcount+1) &&
 		cur->prepareQuery(query,length) &&
-		sqlrcon->executeQueryInternal(cur,query,length)) {
+		sqlrcon->cont->executeQueryInternal(cur,query,length)) {
 		// success...
 		retval=true;
-		if (sqlrcon->debugtriggers) {
+		if (sqlrcon->cont->debugtriggers) {
 			printf("success\n");
 		}
 	} else {
 		// error...
-		if (sqlrcon->debugtriggers) {
+		if (sqlrcon->cont->debugtriggers) {
 			cur->errorMessage(cur->error,
-						sqlrcon->maxerrorlength,
+						sqlrcon->cont->maxerrorlength,
 						&(cur->errorlength),
 						&(cur->errnum),
 						&(cur->liveconnection));
 			printf("error:\n%s\n",cur->error);
 		}
 	}
-	if (sqlrcon->debugtriggers) {
+	if (sqlrcon->cont->debugtriggers) {
 		printf("\n");
 	}
 	cur->cleanUpData(true,true);
 	cur->close();
-	sqlrcon->deleteCursorInternal(cur);
+	sqlrcon->cont->deleteCursorInternal(cur);
 	return retval;
 }

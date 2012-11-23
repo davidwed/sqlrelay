@@ -1,11 +1,11 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-void sqlrconnection_svr::pingCommand() {
+void sqlrcontroller_svr::pingCommand() {
 	dbgfile.debugPrint("connection",1,"ping");
-	bool	pingresult=ping();
+	bool	pingresult=conn->ping();
 	clientsock->write(pingresult);
 	flushWriteBuffer();
 	if (!pingresult) {

@@ -4,6 +4,7 @@
 #ifndef POSTGRESQLCONNECTION_H
 #define POSTGRESQLCONNECTION_H
 
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
@@ -103,7 +104,7 @@ class postgresqlcursor : public sqlrcursor_svr {
 class postgresqlconnection : public sqlrconnection_svr {
 	friend class postgresqlcursor;
 	public:
-			postgresqlconnection();
+			postgresqlconnection(sqlrcontroller_svr *cont);
 			~postgresqlconnection();
 	private:
 		void		handleConnectString();

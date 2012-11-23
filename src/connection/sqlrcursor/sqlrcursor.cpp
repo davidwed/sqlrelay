@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <config.h>
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <parsedatetime.h>
 
@@ -9,20 +10,20 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 
 	this->conn=conn;
 	inbindcount=0;
-	inbindvars=new bindvar_svr[conn->maxbindcount];
+	inbindvars=new bindvar_svr[conn->cont->maxbindcount];
 	outbindcount=0;
-	outbindvars=new bindvar_svr[conn->maxbindcount];
+	outbindvars=new bindvar_svr[conn->cont->maxbindcount];
 	
 	busy=false;
 
 	createtemp.compile("(create|CREATE|declare|DECLARE)[ \\t\\r\\n]+((global|GLOBAL|local|LOCAL)?[ \\t\\r\\n]+)?(temp|TEMP|temporary|TEMPORARY)?[ \\t\\r\\n]+(table|TABLE)[ \\t\\r\\n]+");
 
-	querybuffer=new char[conn->maxquerysize+1];
+	querybuffer=new char[conn->cont->maxquerysize+1];
 	querylength=0;
 	querytree=NULL;
 	queryresult=false;
 
-	error=new char[conn->maxerrorlength+1];
+	error=new char[conn->cont->maxerrorlength+1];
 	errorlength=0;
 	errnum=0;
 	liveconnection=true;
@@ -249,7 +250,7 @@ void sqlrcursor_svr::checkForTempTable(const char *query, uint32_t length) {
 	}
 
 	// append to list of temp tables
-	conn->addSessionTempTableForDrop(tablename.getString());
+	conn->cont->addSessionTempTableForDrop(tablename.getString());
 }
 
 bool sqlrcursor_svr::executeQuery(const char *query, uint32_t querylength) {
@@ -567,7 +568,7 @@ bool sqlrcursor_svr::fakeInputBinds(stringbuffer *outputquery) {
 		}
 	}
 
-	if (conn->debugsqltranslation) {
+	if (conn->cont->debugsqltranslation) {
 		printf("after faking input binds:\n%s\n\n",querybuffer);
 	}
 
@@ -649,8 +650,8 @@ void sqlrcursor_svr::clearError() {
 
 void sqlrcursor_svr::setError(const char *err, int64_t errn, bool liveconn) {
 	errorlength=charstring::length(err);
-	if (errorlength>conn->maxerrorlength) {
-		errorlength=conn->maxerrorlength;
+	if (errorlength>conn->cont->maxerrorlength) {
+		errorlength=conn->cont->maxerrorlength;
 	}
 	charstring::copy(error,err,errorlength);
 	error[errorlength]='\0';

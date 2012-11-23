@@ -1,8 +1,9 @@
-// Copyright (c) 1999-2010  David Muse
+// Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
 #include <firebirdconnection.h>
 
 int main(int argc, const char **argv) {
-	return sqlrconnection_svr::main(argc,argv,new firebirdconnection());
+	sqlrcontroller_svr::main(argc,argv,
+			new firebirdconnection(new sqlrcontroller_svr()));
 }

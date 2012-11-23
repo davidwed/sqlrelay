@@ -4,6 +4,7 @@
 #ifndef MDBTOOLSCONNECTION_H
 #define MDBTOOLSCONNECTION_H
 
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #ifndef MAIN
 extern "C" {
@@ -75,7 +76,7 @@ class mdbtoolscursor : public sqlrcursor_svr {
 class mdbtoolsconnection : public sqlrconnection_svr {
 	friend class mdbtoolscursor;
 	public:
-			mdbtoolsconnection();
+			mdbtoolsconnection(sqlrcontroller_svr *cont);
 	private:
 		void	handleConnectString();
 		bool	logIn(bool printerrors);

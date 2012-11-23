@@ -2,8 +2,10 @@
 // See the file COPYING for more information
 
 #include <sqltranslations/translatedatetimes.h>
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
+#include <sqlparser.h>
 #include <debugprint.h>
 
 #ifdef RUDIMENTS_NAMESPACE
@@ -26,7 +28,7 @@ translatedatetimes::translatedatetimes(sqltranslations *sqlts,
 bool translatedatetimes::run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree) {
-	if (sqlrcon->debugsqltranslation) {
+	if (sqlrcon->cont->debugsqltranslation) {
 		printf("date/time translation:\n");
 		printf("    ddmm: %s\n",
 			parameters->getAttributeValue("ddmm"));
@@ -43,7 +45,7 @@ bool translatedatetimes::run(sqlrconnection_svr *sqlrcon,
 						parameters)) {
 		return false;
 	}
-	if (sqlrcon->debugsqltranslation) {
+	if (sqlrcon->cont->debugsqltranslation) {
 		printf("  query:\n");
 	}
 	if (!translateDateTimesInQuery(sqlrcon,sqlrcur,
@@ -51,7 +53,7 @@ bool translatedatetimes::run(sqlrconnection_svr *sqlrcon,
 						parameters)) {
 		return false;
 	}
-	if (sqlrcon->debugsqltranslation) {
+	if (sqlrcon->cont->debugsqltranslation) {
 		printf("\n");
 	}
 	return true;
@@ -213,7 +215,7 @@ bool translatedatetimes::translateDateTimesInQuery(
 							hour,minute,second);
 				if (converted) {
 
-					if (sqlrcon->debugsqltranslation) {
+					if (sqlrcon->cont->debugsqltranslation) {
 						printf("    %s -> %s\n",
 							valuecopy,converted);
 					}
@@ -325,7 +327,7 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 			continue;
 		}
 
-		if (sqlrcon->debugsqltranslation) {
+		if (sqlrcon->cont->debugsqltranslation) {
 			printf("    %s -> %s\n",
 				bind->value.stringval,converted);
 		}
@@ -333,8 +335,8 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 		// replace the value with the converted string
 		bind->valuesize=charstring::length(converted);
 		bind->value.stringval=
-			(char *)sqlrcon->bindmappingspool->
-					calloc(bind->valuesize+1);
+			(char *)sqlrcon->cont->bindmappingspool->
+						calloc(bind->valuesize+1);
 		charstring::copy(bind->value.stringval,converted);
 		delete[] converted;
 	}

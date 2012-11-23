@@ -22,7 +22,8 @@ static char tpb[] = {
 	isc_tpb_wait
 };
 
-firebirdconnection::firebirdconnection() : sqlrconnection_svr() {
+firebirdconnection::firebirdconnection(sqlrcontroller_svr *cont) :
+						sqlrconnection_svr(cont) {
 	dbversion=NULL;
 	lastinsertidquery=NULL;
 }
@@ -35,13 +36,13 @@ firebirdconnection::~firebirdconnection() {
 void firebirdconnection::handleConnectString() {
 
 	// override legacy "database" parameter with modern "db" parameter
-	database=connectStringValue("database");
-	const char	*tmp=connectStringValue("db");
+	database=cont->connectStringValue("database");
+	const char	*tmp=cont->connectStringValue("db");
 	if (tmp && tmp[0]) {
 		database=tmp;
 	}
 
-	const char	*dialectstr=connectStringValue("dialect");
+	const char	*dialectstr=cont->connectStringValue("dialect");
 	if (dialectstr) {
 		dialect=charstring::toInteger(dialectstr);
 		if (dialect<1) {
@@ -53,20 +54,21 @@ void firebirdconnection::handleConnectString() {
 	} else {
 		dialect=3;
 	}
-	setUser(connectStringValue("user"));
-	setPassword(connectStringValue("password"));
-	const char	*autocom=connectStringValue("autocommit");
-	setAutoCommitBehavior((autocom &&
+	cont->setUser(cont->connectStringValue("user"));
+	cont->setPassword(cont->connectStringValue("password"));
+	const char	*autocom=cont->connectStringValue("autocommit");
+	cont->setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
 
-	charset=connectStringValue("charset");
+	charset=cont->connectStringValue("charset");
 
-	setFakeTransactionBlocksBehavior(
+	cont->setFakeTransactionBlocksBehavior(
 		!charstring::compare(
-			connectStringValue("faketransactionblocks"),"yes"));
+			cont->connectStringValue("faketransactionblocks"),
+			"yes"));
 
 	const char	*lastinsertidfunc=
-			connectStringValue("lastinsertidfunction");
+			cont->connectStringValue("lastinsertidfunction");
 	if (lastinsertidfunc) {
 		stringbuffer	liiquery;
 		liiquery.append("select id from ");
@@ -74,8 +76,9 @@ void firebirdconnection::handleConnectString() {
 		lastinsertidquery=liiquery.detachString();
 	}
 
-	fakeinputbinds=
-		!charstring::compare(connectStringValue("fakebinds"),"yes");
+	cont->fakeinputbinds=
+		!charstring::compare(
+			cont->connectStringValue("fakebinds"),"yes");
 }
 
 bool firebirdconnection::logIn(bool printerrors) {
@@ -109,11 +112,11 @@ bool firebirdconnection::logIn(bool printerrors) {
 	dpblength=dpbptr-dpb;
 
 	// handle user/password parameters
-	const char	*user=getUser();
+	const char	*user=cont->getUser();
 	if (user) {
 		environment::setValue("ISC_USER",user);
 	}
-	const char	*password=getPassword();
+	const char	*password=cont->getPassword();
 	if (password) {
 		environment::setValue("ISC_PASSWORD",password);
 	}

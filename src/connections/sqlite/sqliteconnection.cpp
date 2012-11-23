@@ -18,14 +18,15 @@
 #endif
 
 
-sqliteconnection::sqliteconnection() : sqlrconnection_svr() {
+sqliteconnection::sqliteconnection(sqlrcontroller_svr *cont) :
+					sqlrconnection_svr(cont) {
 	sqliteptr=NULL;
 	errmesg=NULL;
 	errcode=0;
 }
 
 void sqliteconnection::handleConnectString() {
-	db=connectStringValue("db");
+	db=cont->connectStringValue("db");
 }
 
 bool sqliteconnection::logIn(bool printerrors) {

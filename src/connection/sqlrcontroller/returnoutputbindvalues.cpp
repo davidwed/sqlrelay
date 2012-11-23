@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-void sqlrconnection_svr::returnOutputBindValues(sqlrcursor_svr *cursor) {
+void sqlrcontroller_svr::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
 	dbgfile.debugPrint("connection",2,"returning output bind values");
 	dbgfile.debugPrint("connection",3,(int32_t)cursor->outbindcount);
@@ -19,7 +19,7 @@ void sqlrconnection_svr::returnOutputBindValues(sqlrcursor_svr *cursor) {
 			debugstr->append(":");
 		}
 
-		if (bindValueIsNull(bv->isnull)) {
+		if (conn->bindValueIsNull(bv->isnull)) {
 
 			if (dbgfile.debugEnabled()) {
 				debugstr->append("NULL");

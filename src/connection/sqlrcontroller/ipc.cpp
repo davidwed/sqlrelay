@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 #include <rudiments/error.h>
 #include <rudiments/file.h>
 
@@ -10,7 +10,7 @@
 
 #include <config.h>
 
-bool sqlrconnection_svr::createSharedMemoryAndSemaphores(const char *tmpdir,
+bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(const char *tmpdir,
 							const char *id) {
 
 	size_t	idfilenamelen=charstring::length(tmpdir)+5+
@@ -61,36 +61,36 @@ bool sqlrconnection_svr::createSharedMemoryAndSemaphores(const char *tmpdir,
 	return true;
 }
 
-void sqlrconnection_svr::waitForListenerToRequireAConnection() {
+void sqlrcontroller_svr::waitForListenerToRequireAConnection() {
 	dbgfile.debugPrint("connection",1,"waiting for the listener to require a connection");
 	semset->wait(11);
 	//semset->waitWithUndo(11);
 	dbgfile.debugPrint("connection",1,"done waiting for the listener to require a connection");
 }
 
-void sqlrconnection_svr::acquireAnnounceMutex() {
+void sqlrcontroller_svr::acquireAnnounceMutex() {
 	dbgfile.debugPrint("connection",1,"acquiring announce mutex");
 	semset->waitWithUndo(0);
 	dbgfile.debugPrint("connection",1,"done acquiring announce mutex");
 }
 
-shmdata *sqlrconnection_svr::getAnnounceBuffer() {
+shmdata *sqlrcontroller_svr::getAnnounceBuffer() {
 	return (shmdata *)idmemory->getPointer();
 }
 
-void sqlrconnection_svr::releaseAnnounceMutex() {
+void sqlrcontroller_svr::releaseAnnounceMutex() {
 	dbgfile.debugPrint("connection",1,"releasing announce mutex");
 	semset->signalWithUndo(0);
 	dbgfile.debugPrint("connection",1,"done releasing announce mutex");
 }
 
-void sqlrconnection_svr::signalListenerToRead() {
+void sqlrcontroller_svr::signalListenerToRead() {
 	dbgfile.debugPrint("connection",1,"signalling listener to read");
 	semset->signal(2);
 	dbgfile.debugPrint("connection",1,"done signalling listener to read");
 }
 
-void sqlrconnection_svr::waitForListenerToFinishReading() {
+void sqlrcontroller_svr::waitForListenerToFinishReading() {
 	dbgfile.debugPrint("connection",1,"waiting for listener");
 	semset->wait(3);
 	// Reset this semaphore to 0.
@@ -103,39 +103,39 @@ void sqlrconnection_svr::waitForListenerToFinishReading() {
 	dbgfile.debugPrint("connection",1,"done waiting for listener");
 }
 
-void sqlrconnection_svr::acquireConnectionCountMutex() {
+void sqlrcontroller_svr::acquireConnectionCountMutex() {
 	dbgfile.debugPrint("connection",1,"acquiring connection count mutex");
 	semset->waitWithUndo(4);
 	dbgfile.debugPrint("connection",1,"done acquiring connection count mutex");
 }
 
-int32_t *sqlrconnection_svr::getConnectionCountBuffer() {
+int32_t *sqlrcontroller_svr::getConnectionCountBuffer() {
 	return &((shmdata *)idmemory->getPointer())->totalconnections;
 }
 
-void sqlrconnection_svr::releaseConnectionCountMutex() {
+void sqlrcontroller_svr::releaseConnectionCountMutex() {
 	dbgfile.debugPrint("connection",1,"releasing connection count mutex");
 	semset->signalWithUndo(4);
 	dbgfile.debugPrint("connection",1,"done releasing connection count mutex");
 }
 
-void sqlrconnection_svr::acquireSessionCountMutex() {
+void sqlrcontroller_svr::acquireSessionCountMutex() {
 	dbgfile.debugPrint("connection",1,"acquiring session count mutex");
 	semset->waitWithUndo(5);
 	dbgfile.debugPrint("connection",1,"done acquiring session count mutex");
 }
 
-int32_t *sqlrconnection_svr::getSessionCountBuffer() {
+int32_t *sqlrcontroller_svr::getSessionCountBuffer() {
 	return &((shmdata *)idmemory->getPointer())->connectionsinuse;
 }
 
-void sqlrconnection_svr::releaseSessionCountMutex() {
+void sqlrcontroller_svr::releaseSessionCountMutex() {
 	dbgfile.debugPrint("connection",1,"releasing session count mutex");
 	semset->signalWithUndo(5);
 	dbgfile.debugPrint("connection",1,"done releasing session count mutex");
 }
 
-void sqlrconnection_svr::signalScalerToRead() {
+void sqlrcontroller_svr::signalScalerToRead() {
 	dbgfile.debugPrint("connection",1,"signalling scaler to read");
 	semset->signal(8);
 	dbgfile.debugPrint("connection",1,"done signalling scaler to read");

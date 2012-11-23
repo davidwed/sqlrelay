@@ -19,11 +19,12 @@
 
 extern void mdb_remove_backends();
 
-mdbtoolsconnection::mdbtoolsconnection() : sqlrconnection_svr() {
+mdbtoolsconnection::mdbtoolsconnection(sqlrcontroller_svr *cont) :
+						sqlrconnection_svr(cont) {
 }
 
 void mdbtoolsconnection::handleConnectString() {
-	db=connectStringValue("db");
+	db=cont->connectStringValue("db");
 }
 
 bool mdbtoolsconnection::logIn(bool printerrors) {

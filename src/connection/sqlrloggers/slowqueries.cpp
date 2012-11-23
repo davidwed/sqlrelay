@@ -2,8 +2,10 @@
 // See the file COPYING for more information
 
 #include <sqlrloggers/slowqueries.h>
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
+#include <cmdline.h>
 #include <rudiments/process.h>
 #include <rudiments/charstring.h>
 #include <rudiments/file.h>
@@ -38,7 +40,7 @@ bool slowqueries::init(sqlrconnection_svr *sqlrcon) {
 	// get the pid
 	pid_t	pid=process::getProcessId();
 
-	cmdline	*cmdl=sqlrcon->cmdl;
+	cmdline	*cmdl=sqlrcon->cont->cmdl;
 
 	// build up the query log name
 	size_t	querylognamelen;

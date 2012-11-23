@@ -6,6 +6,8 @@
 
 #include <statusconnection.h>
 
+#include <cmdline.h>
+
 #include <datatypes.h>
 
 #include <config.h>
@@ -14,22 +16,30 @@
 
 #include <defines.h>
 
-sqlrstatistics *statusconnection::getStatistics() {
+status::status() : sqlrcontroller_svr() {
+	connected=false;
+}
+
+semaphoreset *status::getSemset() {
+	return statussemset;
+}
+
+sqlrstatistics *status::getStatistics() {
 	statussemset->waitWithUndo(9);
 	privatestatistics=*statistics;
 	statussemset->signalWithUndo(9);
 	return &privatestatistics;
 }
 
-int statusconnection::getConnectionCount() {
+int status::getConnectionCount() {
 	return ((shmdata *)idmemory->getPointer())->totalconnections;
 }
 
-int statusconnection::getSessionCount() {
+int status::getSessionCount() {
 	return ((shmdata *)idmemory->getPointer())->connectionsinuse;
 }
 
-bool statusconnection::init(int argc, const char **argv) {
+bool status::init(int argc, const char **argv) {
 
 	shmdata		*shm;
 	
@@ -73,8 +83,8 @@ bool statusconnection::init(int argc, const char **argv) {
 	return true;
 }
 
-bool statusconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
-		const char *id) {
+bool status::createSharedMemoryAndSemaphores(const char *tmpdir,
+							const char *id) {
 	
 	size_t  idfilenamelen=charstring::length(tmpdir)+5+
 		charstring::length(id)+1;
@@ -118,71 +128,4 @@ bool statusconnection::createSharedMemoryAndSemaphores(const char *tmpdir,
 	delete[] idfilename;
 
 	return true;
-}
-
-// all the other functions have been turned into stubs
-
-statusconnection::statusconnection() : sqlrconnection_svr() {
-	connected=false;
-}
-
-void statusconnection::handleConnectString() {
-}
-
-bool statusconnection::logIn(bool printerrors) {
-	return false;
-}
-
-sqlrcursor_svr *statusconnection::initCursor() {
-	return (sqlrcursor_svr *)false;
-}
-
-void statusconnection::deleteCursor(sqlrcursor_svr *curs) {
-}
-
-void statusconnection::logOut() {
-}
-
-const char *statusconnection::identify() {
-	return "status";
-}
-
-const char *statusconnection::dbVersion() {
-	return "";
-}
-
-bool statusconnection::isTransactional() {
-	return false;
-}
-
-bool statusconnection::autoCommitOn() {
-	return false;
-}
-
-bool statusconnection::autoCommitOff() {
-	return false;
-}
-
-bool statusconnection::commit() {
-	return false;
-}
-
-bool statusconnection::rollback() {
-	return false;
-}
-
-
-void statusconnection::errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
-					int64_t *errorcode,
-					bool *liveconnection) {
-	errorbuffer[0]='\0';
-	*errorlength=0;
-	*errorcode=0;
-	*liveconnection=true;
-}
-
-semaphoreset *statusconnection::getSemset() {
-	return statussemset;
 }

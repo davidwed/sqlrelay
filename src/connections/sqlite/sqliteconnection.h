@@ -4,6 +4,7 @@
 #ifndef SQLITECONNECTION_H
 #define SQLITECONNECTION_H
 
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <rudiments/regularexpression.h>
 
@@ -94,7 +95,7 @@ class sqlitecursor : public sqlrcursor_svr {
 class sqliteconnection : public sqlrconnection_svr {
 	friend class sqlitecursor;
 	public:
-				sqliteconnection();
+				sqliteconnection(sqlrcontroller_svr *cont);
 	private:
 		void		handleConnectString();
 		bool		logIn(bool printerrors);

@@ -1,8 +1,9 @@
-// Copyright (c) 1999-2010  David Muse
+// Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
 #include <routerconnection.h>
 
 int main(int argc, const char **argv) {
-	return sqlrconnection_svr::main(argc,argv,new routerconnection());
+	sqlrcontroller_svr::main(argc,argv,
+				new routerconnection(new sqlrcontroller_svr()));
 }

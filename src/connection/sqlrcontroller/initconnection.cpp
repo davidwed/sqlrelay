@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
 #include <rudiments/passwdentry.h>
 #include <rudiments/groupentry.h>
@@ -10,9 +10,10 @@
 #include <rudiments/snooze.h>
 #include <rudiments/rawbuffer.h>
 
-bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
+bool sqlrcontroller_svr::init(int argc, const char **argv,
+					sqlrconnection_svr *conn) {
 
-	shmdata	*shm;
+	this->conn=conn;
 
 	// process command line
 	cmdl=new cmdline(argc,argv);
@@ -69,7 +70,7 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 							connectionid);
 		return false;
 	}
-	handleConnectString();
+	conn->handleConnectString();
 
 	initDatabaseAvailableFileName();
 
@@ -88,7 +89,7 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 		return false;
 	}
 
-	shm=(shmdata *)idmemory->getPointer();
+	shmdata	*shm=(shmdata *)idmemory->getPointer();
 	if (!shm) {
 		fprintf(stderr,"failed to get pointer to shmdata\n");
 		return false;
@@ -122,9 +123,9 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	const char	*translations=cfgfl->getTranslations();
 	if (charstring::length(translations)) {
 		sqlp=new sqlparser;
-		sqlt=getSqlTranslations();
+		sqlt=conn->getSqlTranslations();
 		sqlt->loadTranslations(translations);
-		sqlw=getSqlWriter();
+		sqlw=conn->getSqlWriter();
 	}
 	debugsqltranslation=cfgfl->getDebugTranslations();
 
@@ -151,7 +152,7 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	idleclienttimeout=cfgfl->getIdleClientTimeout();
 
 	// set autocommit behavior
-	setAutoCommit(autocommit);
+	setAutoCommit(conn->autocommit);
 
 	// get fake input bind variable behavior
 	// (this may have already been set true by the connect string)
@@ -181,7 +182,8 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	clientinfo=new char[maxclientinfolength+1];
 
 	// create error buffer
-	error=new char[maxerrorlength+1];
+	// FIXME: this should definitely be dine inside the connection class
+	conn->error=new char[maxerrorlength+1];
 
 	// increment connection counter
 	if (cfgfl->getDynamicScaling()) {
@@ -190,14 +192,14 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 
 	// set the transaction isolation level
 	isolationlevel=cfgfl->getIsolationLevel();
-	setIsolationLevel(isolationlevel);
+	conn->setIsolationLevel(isolationlevel);
 
 	// ignore selectDatabase() calls?
 	ignoreselectdb=cfgfl->getIgnoreSelectDatabase();
 
 	// get the database/schema we're using so
 	// we can switch back to it at end of session
-	originaldb=getCurrentDatabase();
+	originaldb=conn->getCurrentDatabase();
 
 	markDatabaseAvailable();
 
@@ -212,7 +214,7 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	if (charstring::length(loggers)) {
 		sqlrlg=new sqlrloggers;
 		sqlrlg->loadLoggers(loggers);
-		sqlrlg->initLoggers(this);
+		sqlrlg->initLoggers(conn);
 	}
 
 	// get the custom query handlers
@@ -220,13 +222,13 @@ bool sqlrconnection_svr::initConnection(int argc, const char **argv) {
 	if (charstring::length(queries)) {
 		sqlrq=new sqlrqueries;
 		sqlrq->loadQueries(queries);
-		sqlrq->initQueries(this);
+		sqlrq->initQueries(conn);
 	}
 	
 	return true;
 }
 
-void sqlrconnection_svr::setUserAndGroup() {
+void sqlrcontroller_svr::setUserAndGroup() {
 
 	// get the user that we're currently running as
 	char	*currentuser=NULL;
@@ -257,14 +259,14 @@ void sqlrconnection_svr::setUserAndGroup() {
 	delete[] currentgroup;
 }
 
-void sqlrconnection_svr::setUnixSocketDirectory() {
+void sqlrcontroller_svr::setUnixSocketDirectory() {
 	size_t	unixsocketlen=tmpdir->getLength()+31;
 	unixsocket=new char[unixsocketlen];
 	snprintf(unixsocket,unixsocketlen,"%s/sockets/",tmpdir->getString());
 	unixsocketptr=unixsocket+tmpdir->getLength()+8+1;
 }
 
-bool sqlrconnection_svr::handlePidFile() {
+bool sqlrcontroller_svr::handlePidFile() {
 
 	// check for listener's pid file
 	// (Look a few times.  It might not be there right away.  The listener
@@ -303,7 +305,7 @@ bool sqlrconnection_svr::handlePidFile() {
 	return retval;
 }
 
-void sqlrconnection_svr::initDatabaseAvailableFileName() {
+void sqlrcontroller_svr::initDatabaseAvailableFileName() {
 
 	// initialize the database up/down filename
 	size_t	updownlen=charstring::length(tmpdir->getString())+5+
@@ -314,7 +316,7 @@ void sqlrconnection_svr::initDatabaseAvailableFileName() {
 			tmpdir->getString(),cmdl->getId(),connectionid);
 }
 
-bool sqlrconnection_svr::attemptLogIn(bool printerrors) {
+bool sqlrcontroller_svr::attemptLogIn(bool printerrors) {
 
 	dbgfile.debugPrint("connection",0,"logging in...");
 	if (!logInInternal(printerrors)) {
@@ -328,7 +330,7 @@ bool sqlrconnection_svr::attemptLogIn(bool printerrors) {
 	return true;
 }
 
-bool sqlrconnection_svr::initCursors(int32_t count) {
+bool sqlrcontroller_svr::initCursors(int32_t count) {
 
 	dbgfile.debugPrint("connection",0,"initializing cursors...");
 
@@ -360,8 +362,8 @@ bool sqlrconnection_svr::initCursors(int32_t count) {
 	return true;
 }
 
-sqlrcursor_svr *sqlrconnection_svr::initCursorInternal() {
-	sqlrcursor_svr	*cursor=initCursor();
+sqlrcursor_svr *sqlrcontroller_svr::initCursorInternal() {
+	sqlrcursor_svr	*cursor=conn->initCursor();
 	if (cursor) {
 		semset->waitWithUndo(9);
 		statistics->open_svr_cursors++;

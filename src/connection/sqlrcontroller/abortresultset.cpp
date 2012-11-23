@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-void sqlrconnection_svr::abortResultSetCommand(sqlrcursor_svr *cursor) {
+void sqlrcontroller_svr::abortResultSetCommand(sqlrcursor_svr *cursor) {
 
 	dbgfile.debugPrint("connection",1,"abort result set");
 

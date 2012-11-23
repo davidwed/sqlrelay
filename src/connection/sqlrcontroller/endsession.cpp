@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-void sqlrconnection_svr::endSessionInternal() {
+void sqlrcontroller_svr::endSessionInternal() {
 
 	dbgfile.debugPrint("connection",2,"ending session...");
 
@@ -31,7 +31,7 @@ void sqlrconnection_svr::endSessionInternal() {
 		rollbackInternal();
 		intransactionblock=false;
 
-	} else if (isTransactional() && commitorrollback) {
+	} else if (conn->isTransactional() && commitorrollback) {
 
 		// otherwise, commit or rollback as necessary
 		if (cfgfl->getEndOfSessionCommit()) {
@@ -53,15 +53,15 @@ void sqlrconnection_svr::endSessionInternal() {
 	if (dbselected) {
 		// FIXME: we're ignoring the result and error,
 		// should we do something if there's an error?
-		selectDatabase(originaldb);
+		conn->selectDatabase(originaldb);
 		dbselected=false;
 	}
 
 	// reset autocommit behavior
-	setAutoCommit(autocommit);
+	setAutoCommit(conn->autocommit);
 
 	// set isolation level
-	setIsolationLevel(isolationlevel);
+	conn->setIsolationLevel(isolationlevel);
 
 	// reset sql translation
 	if (sqlt) {
@@ -76,12 +76,12 @@ void sqlrconnection_svr::endSessionInternal() {
 	}
 
 	// end the session
-	endSession();
+	conn->endSession();
 
 	dbgfile.debugPrint("connection",1,"done ending session");
 }
 
-void sqlrconnection_svr::abortAllCursors() {
+void sqlrcontroller_svr::abortAllCursors() {
 	// abort all cursors
 	dbgfile.debugPrint("connection",2,"aborting all busy cursors...");
 	for (int32_t i=0; i<cursorcount; i++) {
@@ -101,7 +101,7 @@ void sqlrconnection_svr::abortAllCursors() {
 	dbgfile.debugPrint("connection",2,"done aborting all busy cursors");
 }
 
-void sqlrconnection_svr::cleanUpAllCursorData(bool freeresult, bool freebinds) {
+void sqlrcontroller_svr::cleanUpAllCursorData(bool freeresult, bool freebinds) {
 
 	// clean up all busy cursors
 	dbgfile.debugPrint("connection",2,"cleaning up all busy cursors...");

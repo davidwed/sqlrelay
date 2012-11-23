@@ -5,6 +5,7 @@
 #define FIREBIRDCONNECTION_H
 
 #include <rudiments/environment.h>
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 
 #include <ibase.h>
@@ -149,7 +150,7 @@ class firebirdcursor : public sqlrcursor_svr {
 class firebirdconnection : public sqlrconnection_svr {
 	friend class firebirdcursor;
 	public:
-			firebirdconnection();
+			firebirdconnection(sqlrcontroller_svr *cont);
 			~firebirdconnection();
 	private:
 		void	handleConnectString();

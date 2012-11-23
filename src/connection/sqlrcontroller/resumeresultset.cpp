@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-bool sqlrconnection_svr::resumeResultSetCommand(sqlrcursor_svr *cursor) {
+bool sqlrcontroller_svr::resumeResultSetCommand(sqlrcursor_svr *cursor) {
 	dbgfile.debugPrint("connection",1,"resume result set");
 
 	bool	retval=true;
@@ -51,7 +51,7 @@ bool sqlrconnection_svr::resumeResultSetCommand(sqlrcursor_svr *cursor) {
 	return retval;
 }
 
-bool sqlrconnection_svr::resumeResultSet(sqlrcursor_svr *cursor) {
+bool sqlrcontroller_svr::resumeResultSet(sqlrcursor_svr *cursor) {
 	// return the header and start sending data
 	returnResultSetHeader(cursor);
 	return returnResultSetData(cursor);

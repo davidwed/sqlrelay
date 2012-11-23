@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2001  David Muse
+// Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
 #include <db2connection.h>
@@ -11,26 +11,33 @@
 
 #include <stdlib.h>
 
+db2connection::db2connection(sqlrcontroller_svr *cont) :
+					sqlrconnection_svr(cont) {
+}
+
 void db2connection::handleConnectString() {
 
 	// override legacy "server" parameter with modern "db" parameter
-	server=connectStringValue("server");
-	const char	*tmp=connectStringValue("db");
+	server=cont->connectStringValue("server");
+	const char	*tmp=cont->connectStringValue("db");
 	if (tmp && tmp[0]) {
 		server=tmp;
 	}
 
-	setUser(connectStringValue("user"));
-	setPassword(connectStringValue("password"));
-	const char	*autocom=connectStringValue("autocommit");
-	setAutoCommitBehavior((autocom &&
+	cont->setUser(cont->connectStringValue("user"));
+	cont->setPassword(cont->connectStringValue("password"));
+	const char	*autocom=cont->connectStringValue("autocommit");
+	cont->setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
-	lang=connectStringValue("lang");
-	setFakeTransactionBlocksBehavior(
+	lang=cont->connectStringValue("lang");
+	cont->setFakeTransactionBlocksBehavior(
 		!charstring::compare(
-			connectStringValue("faketransactionblocks"),"yes"));
-	fakeinputbinds=
-		!charstring::compare(connectStringValue("fakebinds"),"yes");
+			cont->connectStringValue("faketransactionblocks"),
+			"yes"));
+	cont->fakeinputbinds=
+		!charstring::compare(
+			cont->connectStringValue("fakebinds"),
+			"yes");
 }
 
 bool db2connection::logIn(bool printerrors) {
@@ -65,8 +72,8 @@ bool db2connection::logIn(bool printerrors) {
 
 	// connect to the database
 	erg=SQLConnect(dbc,(SQLCHAR *)server,SQL_NTS,
-				(SQLCHAR *)getUser(),SQL_NTS,
-				(SQLCHAR *)getPassword(),SQL_NTS);
+				(SQLCHAR *)cont->getUser(),SQL_NTS,
+				(SQLCHAR *)cont->getPassword(),SQL_NTS);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		SQLFreeHandle(SQL_HANDLE_DBC,dbc);
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
@@ -291,8 +298,8 @@ const char *db2connection::setIsolationLevelQuery() {
 db2cursor::db2cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	db2conn=(db2connection *)conn;
 	stmt=0;
-	outdatebind=new datebind *[conn->maxbindcount];
-	for (uint16_t i=0; i<conn->maxbindcount; i++) {
+	outdatebind=new datebind *[conn->cont->maxbindcount];
+	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
 		outdatebind[i]=NULL;
 	}
 }
@@ -597,7 +604,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 	// run through the columns
 	for (SQLSMALLINT i=0; i<ncols; i++) {
 
-		if (conn->sendColumnInfo()) {
+		if (conn->cont->sendColumnInfo()) {
 
 			// column name
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_LABEL,
@@ -685,7 +692,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	// convert date output binds
-	for (uint16_t i=0; i<conn->maxbindcount; i++) {
+	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
 			SQL_TIMESTAMP_STRUCT	*ts=
@@ -933,7 +940,7 @@ void db2cursor::nextRow() {
 void db2cursor::cleanUpData(bool freeresult, bool freebinds) {
 
 	if (freebinds) {
-		for (uint16_t i=0; i<conn->maxbindcount; i++) {
+		for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
 			delete outdatebind[i];
 			outdatebind[i]=NULL;
 		}

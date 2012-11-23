@@ -21,13 +21,13 @@ int main(int argc, const char **argv) {
 
 	#include <version.h>
 
-	statusconnection	conn;
+	status	s;
 
 	// open the connection
 	// this will fail, just ignore it for now
-	conn.init(argc,argv);
+	s.init(argc,argv);
 	
-	sqlrstatistics      *statistics=conn.getStatistics();
+	sqlrstatistics      *statistics=s.getStatistics();
 
 	printf( 
 		"  Open   Server Connections:  %d\n" 
@@ -65,14 +65,14 @@ int main(int argc, const char **argv) {
 		"  Connections:                %d\n"
 		"  Sessions:                   %d\n"
 		"\n",
-		conn.getConnectionCount(),
-		conn.getSessionCount()
+		s.getConnectionCount(),
+		s.getSessionCount()
 		);
 
 	#define SEM_COUNT	11
 	int32_t	sem[SEM_COUNT];
 	for (uint16_t i=0; i<SEM_COUNT; i++) {
-		sem[i]=conn.getSemset()->getValue(i);
+		sem[i]=s.getSemset()->getValue(i);
 	}
 
 	printf("Mutexes:\n");

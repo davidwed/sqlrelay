@@ -1,13 +1,13 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 #include <rudiments/rawbuffer.h>
 
 // for gettimeofday()
 #include <sys/time.h>
 
-bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
+bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 							bool reexecute,
 							bool bindcursor,
 							bool getquery) {
@@ -78,7 +78,7 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 	// do we need to use a custom query handler for this query?
 	if (!reexecute && !bindcursor && sqlrq) {
 		// FIXME:
-		sqlrquery	*customquery=sqlrq->match(this,cursor,
+		sqlrquery	*customquery=sqlrq->match(conn,cursor,
 							cursor->querybuffer,
 							cursor->querylength);
 	}
@@ -158,7 +158,7 @@ bool sqlrconnection_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 	}
 }
 
-bool sqlrconnection_svr::getClientInfo(sqlrcursor_svr *cursor) {
+bool sqlrcontroller_svr::getClientInfo(sqlrcursor_svr *cursor) {
 
 	dbgfile.debugPrint("connection",2,"getting client info...");
 
@@ -213,7 +213,7 @@ bool sqlrconnection_svr::getClientInfo(sqlrcursor_svr *cursor) {
 	return true;
 }
 
-bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
+bool sqlrcontroller_svr::getQuery(sqlrcursor_svr *cursor) {
 
 	dbgfile.debugPrint("connection",2,"getting query...");
 
@@ -267,7 +267,7 @@ bool sqlrconnection_svr::getQuery(sqlrcursor_svr *cursor) {
 	return true;
 }
 
-bool sqlrconnection_svr::getSendColumnInfo() {
+bool sqlrcontroller_svr::getSendColumnInfo() {
 
 	dbgfile.debugPrint("connection",2,"getting send column info...");
 
@@ -288,7 +288,7 @@ bool sqlrconnection_svr::getSendColumnInfo() {
 	return true;
 }
 
-bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
+bool sqlrcontroller_svr::processQuery(sqlrcursor_svr *cursor,
 					bool reexecute, bool bindcursor) {
 
 	// Very important...
@@ -387,8 +387,8 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	// connections.
 	// FIXME: when faking autocommit, a BEGIN on a db that supports them
 	// could cause commit to be called immediately
-	if (success && isTransactional() && commitorrollback &&
-					fakeautocommit && autocommit) {
+	if (success && conn->isTransactional() && commitorrollback &&
+				conn->fakeautocommit && conn->autocommit) {
 		dbgfile.debugPrint("connection",3,"commit necessary...");
 		success=commitInternal();
 	}
@@ -414,13 +414,13 @@ bool sqlrconnection_svr::processQuery(sqlrcursor_svr *cursor,
 	return success;
 }
 
-bool sqlrconnection_svr::executeQueryInternal(sqlrcursor_svr *curs,
+bool sqlrcontroller_svr::executeQueryInternal(sqlrcursor_svr *curs,
 							const char *query,
 							uint32_t length) {
 
 	// handle before-triggers
 	if (sqltr) {
-		sqltr->runBeforeTriggers(this,curs,curs->querytree);
+		sqltr->runBeforeTriggers(conn,curs,curs->querytree);
 	}
 
 	// update query count
@@ -454,18 +454,18 @@ bool sqlrconnection_svr::executeQueryInternal(sqlrcursor_svr *curs,
 
 	// handle after-triggers
 	if (sqltr) {
-		sqltr->runAfterTriggers(this,curs,curs->querytree,true);
+		sqltr->runAfterTriggers(conn,curs,curs->querytree,true);
 	}
 
 	return curs->queryresult;
 }
 
-void sqlrconnection_svr::commitOrRollback(sqlrcursor_svr *cursor) {
+void sqlrcontroller_svr::commitOrRollback(sqlrcursor_svr *cursor) {
 
 	dbgfile.debugPrint("connection",2,"commit or rollback check...");
 
 	// if the query was a commit or rollback, set a flag indicating so
-	if (isTransactional()) {
+	if (conn->isTransactional()) {
 		if (cursor->queryIsCommitOrRollback()) {
 			dbgfile.debugPrint("connection",3,
 					"commit or rollback not needed");
@@ -480,6 +480,6 @@ void sqlrconnection_svr::commitOrRollback(sqlrcursor_svr *cursor) {
 	dbgfile.debugPrint("connection",2,"done with commit or rollback check");
 }
 
-void sqlrconnection_svr::setFakeInputBinds(bool fake) {
+void sqlrcontroller_svr::setFakeInputBinds(bool fake) {
 	fakeinputbinds=fake;
 }

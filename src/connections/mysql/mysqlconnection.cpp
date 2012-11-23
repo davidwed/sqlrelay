@@ -27,7 +27,8 @@
 const my_bool	mysqlconnection::mytrue=TRUE;
 const my_bool	mysqlconnection::myfalse=FALSE;
 
-mysqlconnection::mysqlconnection() : sqlrconnection_svr() {
+mysqlconnection::mysqlconnection(sqlrcontroller_svr *cont) :
+					sqlrconnection_svr(cont) {
 	connected=false;
 	dbversion=NULL;
 
@@ -41,15 +42,16 @@ mysqlconnection::~mysqlconnection() {
 }
 
 void mysqlconnection::handleConnectString() {
-	setUser(connectStringValue("user"));
-	setPassword(connectStringValue("password"));
-	db=connectStringValue("db");
-	host=connectStringValue("host");
-	port=connectStringValue("port");
-	socket=connectStringValue("socket");
-	charset=connectStringValue("charset");
-	fakeinputbinds=
-		!charstring::compare(connectStringValue("fakebinds"),"yes");
+	cont->setUser(cont->connectStringValue("user"));
+	cont->setPassword(cont->connectStringValue("password"));
+	db=cont->connectStringValue("db");
+	host=cont->connectStringValue("host");
+	port=cont->connectStringValue("port");
+	socket=cont->connectStringValue("socket");
+	charset=cont->connectStringValue("charset");
+	cont->fakeinputbinds=
+		!charstring::compare(
+			cont->connectStringValue("fakebinds"),"yes");
 }
 
 bool mysqlconnection::logIn(bool printerrors) {
@@ -71,8 +73,8 @@ bool mysqlconnection::logIn(bool printerrors) {
 	const char	*dbval=(db && db[0])?db:"";
 	
 	// log in
-	const char	*user=getUser();
-	const char	*password=getPassword();
+	const char	*user=cont->getUser();
+	const char	*password=cont->getPassword();
 #ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
 	// Handle port and socket.
 	int		portval=(port && port[0])?charstring::toInteger(port):0;
@@ -133,7 +135,7 @@ bool mysqlconnection::logIn(bool printerrors) {
 	// fake binds when connected to older servers
 #ifdef HAVE_MYSQL_GET_SERVER_VERSION
 	if (mysql_get_server_version(&mysql)<40102) {
-		setFakeInputBinds(true);
+		cont->setFakeInputBinds(true);
 	}
 #else
 	char		**list;
@@ -352,8 +354,8 @@ mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	stmt=NULL;
 	stmtfreeresult=false;
-	bind=new MYSQL_BIND[conn->maxbindcount];
-	bindvaluesize=new unsigned long[conn->maxbindcount];
+	bind=new MYSQL_BIND[conn->cont->maxbindcount];
+	bindvaluesize=new unsigned long[conn->cont->maxbindcount];
 	usestmtprepare=true;
 	unsupportedbystmt.compile(
 			"^\\s*((create|CREATE|drop|DROP|procedure|PROCEDURE|function|FUNCTION|use|USE|CALL|call|START|start)\\s+)|((begin|BEGIN)\\s*)");
@@ -426,7 +428,7 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	bindcounter=0;
 
 	// re-init bind buffers
-	for (uint16_t i=0; i<conn->maxbindcount; i++) {
+	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
 		rawbuffer::zero(&bind[i],sizeof(MYSQL_BIND));
 	}
 
@@ -1083,7 +1085,7 @@ void mysqlcursor::cleanUpData(bool freeresult, bool freebinds) {
 	if (usestmtprepare) {
 		if (freebinds) {
 			bindcounter=0;
-			for (uint16_t i=0; i<conn->maxbindcount; i++) {
+			for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
 				rawbuffer::zero(&bind[i],sizeof(MYSQL_BIND));
 			}
 			mysql_stmt_reset(stmt);

@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-bool sqlrconnection_svr::returnResultSetData(sqlrcursor_svr *cursor) {
+bool sqlrcontroller_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 
 	dbgfile.debugPrint("connection",2,"returning result set data...");
 
@@ -92,7 +92,7 @@ bool sqlrconnection_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 	return true;
 }
 
-bool sqlrconnection_svr::skipRows(sqlrcursor_svr *cursor, uint64_t rows) {
+bool sqlrcontroller_svr::skipRows(sqlrcursor_svr *cursor, uint64_t rows) {
 
 	if (dbgfile.debugEnabled()) {
 		debugstr=new stringbuffer();
@@ -125,7 +125,7 @@ bool sqlrconnection_svr::skipRows(sqlrcursor_svr *cursor, uint64_t rows) {
 	return true;
 }
 
-void sqlrconnection_svr::returnRow(sqlrcursor_svr *cursor) {
+void sqlrcontroller_svr::returnRow(sqlrcursor_svr *cursor) {
 
 	// run through the columns...
 	for (uint32_t i=0; i<cursor->colCount(); i++) {

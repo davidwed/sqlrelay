@@ -17,6 +17,7 @@
 
 // note that sqlrconnection.h must be included after sqltypes.h to
 // get around a problem with CHAR/xmlChar in gnome-xml
+#include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 
 #include <config.h>
@@ -187,6 +188,8 @@ class odbccursor : public sqlrcursor_svr {
 
 class odbcconnection : public sqlrconnection_svr {
 	friend class odbccursor;
+	public:
+			odbcconnection(sqlrcontroller_svr *cont);
 	private:
 		void		handleConnectString();
 		bool		logIn(bool printerrors);

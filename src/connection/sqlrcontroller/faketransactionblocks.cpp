@@ -1,13 +1,13 @@
 // Copyright (c) 1999-2011  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-void sqlrconnection_svr::setFakeTransactionBlocksBehavior(bool ftb) {
+void sqlrcontroller_svr::setFakeTransactionBlocksBehavior(bool ftb) {
 	faketransactionblocks=ftb;
 }
 
-bool sqlrconnection_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
+bool sqlrcontroller_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 						bool *wasfaketransactionquery) {
 
 	*wasfaketransactionquery=false;
@@ -71,7 +71,7 @@ bool sqlrconnection_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 	return false;
 }
 
-bool sqlrconnection_svr::isBeginTransactionQuery(sqlrcursor_svr *cursor) {
+bool sqlrcontroller_svr::isBeginTransactionQuery(sqlrcursor_svr *cursor) {
 
 	// find the start of the actual query
 	const char	*ptr=cursor->skipWhitespaceAndComments(
@@ -101,7 +101,7 @@ bool sqlrconnection_svr::isBeginTransactionQuery(sqlrcursor_svr *cursor) {
 	return false;
 }
 
-bool sqlrconnection_svr::beginFakeTransactionBlock() {
+bool sqlrcontroller_svr::beginFakeTransactionBlock() {
 
 	// save the current autocommit state
 	faketransactionblocksautocommiton=autocommitforthissession;
@@ -116,7 +116,7 @@ bool sqlrconnection_svr::beginFakeTransactionBlock() {
 	return true;
 }
 
-bool sqlrconnection_svr::endFakeTransactionBlock() {
+bool sqlrcontroller_svr::endFakeTransactionBlock() {
 
 	// if we're faking begins and autocommit is on,
 	// reset autocommit behavior
@@ -129,14 +129,14 @@ bool sqlrconnection_svr::endFakeTransactionBlock() {
 	return true;
 }
 
-bool sqlrconnection_svr::isCommitQuery(sqlrcursor_svr *cursor) {
+bool sqlrcontroller_svr::isCommitQuery(sqlrcursor_svr *cursor) {
 	return !charstring::compareIgnoringCase(
 			cursor->skipWhitespaceAndComments(
 						cursor->querybuffer),
 			"commit",6);
 }
 
-bool sqlrconnection_svr::isRollbackQuery(sqlrcursor_svr *cursor) {
+bool sqlrcontroller_svr::isRollbackQuery(sqlrcursor_svr *cursor) {
 	return !charstring::compareIgnoringCase(
 			cursor->skipWhitespaceAndComments(
 						cursor->querybuffer),

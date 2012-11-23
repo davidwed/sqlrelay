@@ -1,18 +1,18 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
 #include <datatypes.h>
 
-bool sqlrconnection_svr::sendColumnInfo() {
+bool sqlrcontroller_svr::sendColumnInfo() {
 	if (sendcolumninfo==SEND_COLUMN_INFO) {
 		return true;
 	}
 	return false;
 }
 
-void sqlrconnection_svr::sendColumnDefinition(const char *name,
+void sqlrcontroller_svr::sendColumnDefinition(const char *name,
 						uint16_t namelen,
 						uint16_t type, 
 						uint32_t size,
@@ -70,7 +70,7 @@ void sqlrconnection_svr::sendColumnDefinition(const char *name,
 	clientsock->write(autoincrement);
 }
 
-void sqlrconnection_svr::sendColumnDefinitionString(const char *name,
+void sqlrcontroller_svr::sendColumnDefinitionString(const char *name,
 						uint16_t namelen,
 						const char *type, 
 						uint16_t typelen,

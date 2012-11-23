@@ -1,21 +1,21 @@
 // Copyright (c) 1999-2011  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
+#include <sqlrcontroller.h>
 
-bool sqlrconnection_svr::getDatabaseListCommand(sqlrcursor_svr *cursor) {
+bool sqlrcontroller_svr::getDatabaseListCommand(sqlrcursor_svr *cursor) {
 	return getListCommand(cursor,0,false);
 }
 
-bool sqlrconnection_svr::getTableListCommand(sqlrcursor_svr *cursor) {
+bool sqlrcontroller_svr::getTableListCommand(sqlrcursor_svr *cursor) {
 	return getListCommand(cursor,1,false);
 }
 
-bool sqlrconnection_svr::getColumnListCommand(sqlrcursor_svr *cursor) {
+bool sqlrcontroller_svr::getColumnListCommand(sqlrcursor_svr *cursor) {
 	return getListCommand(cursor,2,true);
 }
 
-bool sqlrconnection_svr::getListCommand(sqlrcursor_svr *cursor,
+bool sqlrcontroller_svr::getListCommand(sqlrcursor_svr *cursor,
 						int which, bool gettable) {
 
  	dbgfile.debugPrint("connection",2,"getting list command");
@@ -104,7 +104,7 @@ bool sqlrconnection_svr::getListCommand(sqlrcursor_svr *cursor,
 
 	// get the list and return it
 	bool	result=true;
-	if (getListsByApiCalls()) {
+	if (conn->getListsByApiCalls()) {
 		result=getListByApiCall(cursor,which,table,wild);
 	} else {
 		result=getListByQuery(cursor,which,table,wild);
@@ -118,7 +118,7 @@ bool sqlrconnection_svr::getListCommand(sqlrcursor_svr *cursor,
 	return result;
 }
 
-bool sqlrconnection_svr::getListByApiCall(sqlrcursor_svr *cursor,
+bool sqlrcontroller_svr::getListByApiCall(sqlrcursor_svr *cursor,
 						int which,
 						const char *table,
 						const char *wild) {
@@ -129,13 +129,13 @@ bool sqlrconnection_svr::getListByApiCall(sqlrcursor_svr *cursor,
 	// get the appropriate list
 	switch (which) {
 		case 0:
-			success=getDatabaseList(cursor,wild);
+			success=conn->getDatabaseList(cursor,wild);
 			break;
 		case 1:
-			success=getTableList(cursor,wild);
+			success=conn->getTableList(cursor,wild);
 			break;
 		case 2:
-			success=getColumnList(cursor,table,wild);
+			success=conn->getColumnList(cursor,table,wild);
 			break;
 	}
 
@@ -171,22 +171,23 @@ bool sqlrconnection_svr::getListByApiCall(sqlrcursor_svr *cursor,
 	return true;
 }
 
-bool sqlrconnection_svr::getListByQuery(sqlrcursor_svr *cursor,
+bool sqlrcontroller_svr::getListByQuery(sqlrcursor_svr *cursor,
 						int which,
 						const char *table,
 						const char *wild) {
 
 	// build the appropriate query
 	const char	*query=NULL;
+	bool		havewild=charstring::length(wild);
 	switch (which) {
 		case 0:
-			query=getDatabaseListQuery(charstring::length(wild));
+			query=conn->getDatabaseListQuery(havewild);
 			break;
 		case 1:
-			query=getTableListQuery(charstring::length(wild));
+			query=conn->getTableListQuery(havewild);
 			break;
 		case 2:
-			query=getColumnListQuery(charstring::length(wild));
+			query=conn->getColumnListQuery(havewild);
 			break;
 	}
 
@@ -198,7 +199,7 @@ bool sqlrconnection_svr::getListByQuery(sqlrcursor_svr *cursor,
 	return handleQueryOrBindCursor(cursor,false,false,false);
 }
 
-bool sqlrconnection_svr::buildListQuery(sqlrcursor_svr *cursor,
+bool sqlrcontroller_svr::buildListQuery(sqlrcursor_svr *cursor,
 						const char *query,
 						const char *wild,
 						const char *table) {
@@ -229,7 +230,7 @@ bool sqlrconnection_svr::buildListQuery(sqlrcursor_svr *cursor,
 	return true;
 }
 
-void sqlrconnection_svr::escapeParameter(stringbuffer *buffer,
+void sqlrcontroller_svr::escapeParameter(stringbuffer *buffer,
 						const char *parameter) {
 
 	if (!parameter) {
