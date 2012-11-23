@@ -15,15 +15,10 @@ using namespace rudiments;
 class sqlrcontroller_svr;
 
 class sqlrconnection_svr {
-	friend class sqlrcontroller_svr;
-	friend class sqlrcursor_svr;
-	friend class statusconnection;
 	public:
 			sqlrconnection_svr(sqlrcontroller_svr *cont);
 		virtual	~sqlrconnection_svr();
 
-	protected:
-		// interface definition
 		virtual bool	supportsAuthOnDatabase();
 		virtual	void	handleConnectString()=0;
 
@@ -102,7 +97,6 @@ class sqlrconnection_svr {
 		virtual sqltranslations	*getSqlTranslations();
 		virtual sqlwriter	*getSqlWriter();
 
-	private:
 		void	clearError();
 		void	setError(const char *err, int64_t errn, bool liveconn);
 
@@ -114,7 +108,6 @@ class sqlrconnection_svr {
 		bool		autocommit;
 		bool		fakeautocommit;
 
-	public:
 		sqlrcontroller_svr	*cont;
 };
 

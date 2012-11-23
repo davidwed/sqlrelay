@@ -46,13 +46,10 @@ class bindvar_svr {
 class sqlrconnection_svr;
 
 class sqlrcursor_svr {
-	friend class sqlrcontroller_svr;
-	friend class sqlrconnection_svr;
 	public:
 			sqlrcursor_svr(sqlrconnection_svr *conn);
 		virtual	~sqlrcursor_svr();
 
-		// interface definition
 		virtual	bool	open(uint16_t id);
 		virtual	bool	close();
 
@@ -211,8 +208,6 @@ class sqlrcursor_svr {
 
 		void	setFakeInputBindsForThisQuery(bool fake);
 	
-	protected:
-		// methods/variables used by derived classes
 		bool	skipComment(char **ptr, const char *endptr);
 		bool	skipWhitespace(char **ptr, const char *endptr);
 		char	*skipWhitespaceAndComments(const char *querybuffer);
@@ -221,12 +216,14 @@ class sqlrcursor_svr {
 		void	clearError();
 		void	setError(const char *err, int64_t errn, bool liveconn);
 
+		bool	openInternal(uint16_t id);
+		void	performSubstitution(stringbuffer *buffer,
+							int16_t index);
+		void	abort();
+
 		sqlrconnection_svr	*conn;
 		regularexpression	createtemp;
 
-	// ideally these would be protected but the translators,
-	// triggers and loggers need to access them (for now)
-	public:
 		char		*querybuffer;
 		uint32_t	querylength;
 		xmldom		*querytree;
@@ -255,15 +252,6 @@ class sqlrcursor_svr {
 
 		bool		lastrowvalid;
 		uint64_t	lastrow;
-
-		// this one too...
-		bool	openInternal(uint16_t id);
-
-	private:
-		// methods used internally
-		void	performSubstitution(stringbuffer *buffer,
-							int16_t index);
-		void	abort();
 
 		bool		suspendresultset;
 		bool		busy;

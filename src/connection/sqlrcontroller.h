@@ -35,21 +35,15 @@
 
 #include <defines.h>
 
-#include <sqlrelay/sqlrclient.h>
-
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
 
 class sqlrcontroller_svr : public daemonprocess, public listener {
-	friend class sqlrconnection_svr;
-	friend class sqlrcursor_svr;
-	friend class statusconnection;
 	public:
 		static	void main(int argc, const char **argv,
 					sqlrconnection_svr *conn);
 
-	private:
 		static void	cleanUp();
 		static void	shutDown(int32_t signum);
 
@@ -57,12 +51,9 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		static	signalhandler		*sigh;
 		static volatile sig_atomic_t	shutdowninprogress;
 
-	public:
 			sqlrcontroller_svr();
 		virtual	~sqlrcontroller_svr();
 
-	public:
-		// methods used by derived classes
 		const char	*connectStringValue(const char *variable);
 		void		setAutoCommitBehavior(bool ac);
 		void		setFakeTransactionBlocksBehavior(bool ftb);
@@ -89,8 +80,6 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		bool		getColumnNames(const char *query,
 						stringbuffer *output);
 
-	private:
-		// methods used internally
 		signalhandler	*handleSignals(
 					void (*shutdownfunction)(int32_t));
 		bool	init(int argc, const char **argv,
@@ -102,16 +91,11 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void	logOutInternal();
 		void	reLogIn();
 
-	public:
-		// ideally these would be private but the
-		// translators and triggers need to access them (for now)
 		sqlrcursor_svr	*initCursorInternal();
 		void	deleteCursorInternal(sqlrcursor_svr *curs);
 		bool	executeQueryInternal(sqlrcursor_svr *curs,
 							const char *query,
 							uint32_t length);
-
-	private:
 
 		void	setUserAndGroup();
 		bool	initCursors(int32_t count);
@@ -405,9 +389,6 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		uint64_t		serversockincount;
 		unixserversocket	*serversockun;
 
-	public:
-		// ideally these would be private but the
-		// translators and triggers need to access them (for now)
 		uint32_t	handoffindex;
 
 		filedescriptor	*clientsock;
@@ -423,8 +404,6 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		uint16_t	cursorcount;
 		uint16_t	mincursorcount;
 		uint16_t	maxcursorcount;
-
-	private:
 
 		sqlrconnection_svr	*conn;
 		sqlrcursor_svr		**cur;
@@ -446,19 +425,13 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		const char	*connectionid;
 		int32_t		ttl;
 
-	protected:
 		sqlrstatistics	*statistics;
 		semaphoreset	*semset;
-	private:
 
 		char		*pidfile;
 
-	public:
 		bool		fakeinputbinds;
 
-	public:
-		// ideally these would be protected or private
-		// but the loggers need to access them (for now)
 		sharedmemory		*idmemory;
 		cmdline			*cmdl;
 		sqlrconfigfile		*cfgfl;
@@ -466,7 +439,6 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		char		*clientinfo;
 		uint64_t	clientinfolen;
 
-	protected:
 		stringlist	sessiontemptablesfordrop;
 		stringlist	sessiontemptablesfortrunc;
 		stringlist	transtemptablesfordrop;
@@ -479,8 +451,6 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 
 		stringbuffer	*debugstr;
 
-	public:
-		// derived cursor classes may need to access these
 		debugfile	dbgfile;
 		uint64_t	maxclientinfolength;
 		uint32_t	maxquerysize;
