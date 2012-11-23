@@ -4,6 +4,7 @@
 #include <sqlrquery.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
+#include <rudiments/xmldomnode.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
@@ -16,13 +17,22 @@ sqlrquery::sqlrquery(xmldomnode *parameters) {
 sqlrquery::~sqlrquery() {
 }
 
-bool sqlrquery::init(sqlrconnection_svr *sqlrcon) {
-	return true;
-}
-
 bool sqlrquery::match(sqlrconnection_svr *sqlrcon,
 				sqlrcursor_svr *sqlrcur,
 				const char *querystring,
 				uint32_t querylength) {
 	return false;
+}
+
+sqlrquerycursor *sqlrquery::getCursor() {
+	return NULL;
+}
+
+sqlrquerycursor::sqlrquerycursor(sqlrconnection_svr *conn,
+					xmldomnode *parameters) :
+						sqlrcursor_svr(conn) {
+	this->parameters=parameters;
+}
+
+sqlrquerycursor::~sqlrquerycursor() {
 }

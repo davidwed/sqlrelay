@@ -4,6 +4,8 @@
 #include <sqlrcontroller.h>
 
 bool sqlrcontroller_svr::fetchResultSetCommand(sqlrcursor_svr *cursor) {
-	dbgfile.debugPrint("connection",1,"fetch result set");
-	return returnResultSetData(cursor);
+	dbgfile.debugPrint("connection",1,"fetching result set...");
+	bool	retval=returnResultSetData(cursor);
+	dbgfile.debugPrint("connection",1,"done fetching result set");
+	return retval;
 }

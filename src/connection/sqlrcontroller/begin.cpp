@@ -5,7 +5,7 @@
 
 void sqlrcontroller_svr::beginCommand() {
 	dbgfile.debugPrint("connection",1,"begin...");
-	if (beginInternal()) {
+	if (begin()) {
 		dbgfile.debugPrint("connection",1,"begin succeeded");
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	} else {
@@ -15,8 +15,7 @@ void sqlrcontroller_svr::beginCommand() {
 	flushWriteBuffer();
 }
 
-bool sqlrcontroller_svr::beginInternal() {
-
+bool sqlrcontroller_svr::begin() {
 	// if we're faking transaction blocks, do that,
 	// otherwise run an actual begin query
 	return (faketransactionblocks)?

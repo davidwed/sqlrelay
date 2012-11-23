@@ -30,7 +30,7 @@ struct outputbindvar {
 		} datevalue;
 	} value;
 	uint16_t	valuesize;
-	bindtype	type;
+	uint16_t	type;
 	int16_t		*isnull;
 };
 

@@ -27,11 +27,10 @@ bool sqlrconnection_svr::supportsAuthOnDatabase() {
 bool sqlrconnection_svr::changeUser(const char *newuser,
 					const char *newpassword) {
 	cont->closeCursors(false);
-	cont->logOutInternal();
+	cont->logOut();
 	cont->setUser(newuser);
 	cont->setPassword(newpassword);
-	return (cont->logInInternal(false) &&
-		cont->initCursors(cont->cursorcount));
+	return (cont->logIn(false) && cont->initCursors(cont->cursorcount));
 }
 
 bool sqlrconnection_svr::autoCommitOn() {
@@ -68,7 +67,7 @@ bool sqlrconnection_svr::begin() {
 	// for db's that support begin queries, run one...
 
 	// init some variables
-	sqlrcursor_svr	*begincur=cont->initCursorInternal();
+	sqlrcursor_svr	*begincur=cont->initCursor();
 	const char	*beginquery=beginTransactionQuery();
 	int		beginquerylen=charstring::length(beginquery);
 	bool		retval=false;
@@ -91,7 +90,7 @@ bool sqlrconnection_svr::begin() {
 	// clean up
 	begincur->cleanUpData(true,true);
 	begincur->close();
-	cont->deleteCursorInternal(begincur);
+	cont->deleteCursor(begincur);
 
 	// we will need to commit or rollback at the end of the session now
 	if (retval) {
@@ -111,7 +110,7 @@ bool sqlrconnection_svr::commit() {
 	clearError();
 
 	// init some variables
-	sqlrcursor_svr	*commitcur=cont->initCursorInternal();
+	sqlrcursor_svr	*commitcur=cont->initCursor();
 	const char	*commitquery="commit";
 	int		commitquerylen=6;
 	bool		retval=false;
@@ -134,7 +133,7 @@ bool sqlrconnection_svr::commit() {
 	// clean up
 	commitcur->cleanUpData(true,true);
 	commitcur->close();
-	cont->deleteCursorInternal(commitcur);
+	cont->deleteCursor(commitcur);
 
 	// we don't need to commit or rollback at the end of the session now
 	if (retval) {
@@ -150,7 +149,7 @@ bool sqlrconnection_svr::rollback() {
 	clearError();
 
 	// init some variables
-	sqlrcursor_svr	*rbcur=cont->initCursorInternal();
+	sqlrcursor_svr	*rbcur=cont->initCursor();
 	const char	*rollbackquery="rollback";
 	int		rollbackquerylen=8;
 	bool		retval=false;
@@ -173,7 +172,7 @@ bool sqlrconnection_svr::rollback() {
 	// clean up
 	rbcur->cleanUpData(true,true);
 	rbcur->close();
-	cont->deleteCursorInternal(rbcur);
+	cont->deleteCursor(rbcur);
 
 	// we don't need to commit or rollback at the end of the session now
 	if (retval) {
@@ -214,7 +213,7 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 	snprintf(sdquery,sdquerylen,sdquerybase,database);
 	sdquerylen=charstring::length(sdquery);
 
-	sqlrcursor_svr	*sdcur=cont->initCursorInternal();
+	sqlrcursor_svr	*sdcur=cont->initCursor();
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	bool	retval=false;
@@ -235,7 +234,7 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 	}
 	delete[] sdquery;
 	sdcur->close();
-	cont->deleteCursorInternal(sdcur);
+	cont->deleteCursor(sdcur);
 	return retval;
 }
 
@@ -256,7 +255,7 @@ char *sqlrconnection_svr::getCurrentDatabase() {
 
 	size_t		gcdquerylen=charstring::length(gcdquery);
 
-	sqlrcursor_svr	*gcdcur=cont->initCursorInternal();
+	sqlrcursor_svr	*gcdcur=cont->initCursor();
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	char	*retval=NULL;
@@ -277,7 +276,7 @@ char *sqlrconnection_svr::getCurrentDatabase() {
 	}
 	gcdcur->cleanUpData(true,true);
 	gcdcur->close();
-	cont->deleteCursorInternal(gcdcur);
+	cont->deleteCursor(gcdcur);
 	return retval;
 }
 
@@ -303,7 +302,7 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id) {
 
 	size_t	liiquerylen=charstring::length(liiquery);
 
-	sqlrcursor_svr	*liicur=cont->initCursorInternal();
+	sqlrcursor_svr	*liicur=cont->initCursor();
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	bool	retval=false;
@@ -337,7 +336,7 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id) {
 
 	liicur->cleanUpData(true,true);
 	liicur->close();
-	cont->deleteCursorInternal(liicur);
+	cont->deleteCursor(liicur);
 	return retval;
 }
 
@@ -373,7 +372,7 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 	snprintf(silquery,silquerylen,silquerybase,isolevel);
 	silquerylen=charstring::length(silquery);
 
-	sqlrcursor_svr	*silcur=cont->initCursorInternal();
+	sqlrcursor_svr	*silcur=cont->initCursor();
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	bool	retval=false;
@@ -393,7 +392,7 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 	delete[] silquery;
 	silcur->cleanUpData(true,true);
 	silcur->close();
-	cont->deleteCursorInternal(silcur);
+	cont->deleteCursor(silcur);
 	return retval;
 }
 
@@ -402,7 +401,7 @@ const char *sqlrconnection_svr::setIsolationLevelQuery() {
 }
 
 bool sqlrconnection_svr::ping() {
-	sqlrcursor_svr	*pingcur=cont->initCursorInternal();
+	sqlrcursor_svr	*pingcur=cont->initCursor();
 	const char	*pingquery=pingQuery();
 	int		pingquerylen=charstring::length(pingquery);
 	// since we're creating a new cursor for this, make sure it can't
@@ -412,11 +411,11 @@ bool sqlrconnection_svr::ping() {
 		pingcur->executeQuery(pingquery,pingquerylen)) {
 		pingcur->cleanUpData(true,true);
 		pingcur->close();
-		cont->deleteCursorInternal(pingcur);
+		cont->deleteCursor(pingcur);
 		return true;
 	}
 	pingcur->close();
-	cont->deleteCursorInternal(pingcur);
+	cont->deleteCursor(pingcur);
 	return false;
 }
 

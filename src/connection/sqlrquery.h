@@ -4,26 +4,34 @@
 #ifndef SQLRQUERY_H
 #define SQLRQUERY_H
 
+#include <sqlrcursor.h>
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
-#include <rudiments/stringbuffer.h>
 
 // for return values of columnTypeFormat
 #include <datatypes.h>
 
-class sqlrconnection_svr;
-class sqlrcursor_svr;
+class sqlrquerycursor;
 
 class sqlrquery {
 	public:
 			sqlrquery(rudiments::xmldomnode *parameters);
 		virtual	~sqlrquery();
 
-		virtual bool	init(sqlrconnection_svr *sqlrcon);
 		virtual bool	match(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						const char *querystring,
 						uint32_t querylength);
+		virtual sqlrquerycursor	*getCursor();
+	protected:
+		rudiments::xmldomnode	*parameters;
+};
+
+class sqlrquerycursor : public sqlrcursor_svr {
+	public:
+			sqlrquerycursor(sqlrconnection_svr *conn,
+					rudiments::xmldomnode *parameters);
+		virtual	~sqlrquerycursor();
 	protected:
 		rudiments::xmldomnode	*parameters;
 };

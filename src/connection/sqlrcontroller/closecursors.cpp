@@ -17,8 +17,7 @@ void sqlrcontroller_svr::closeCursors(bool destroy) {
 				cur[cursorcount]->cleanUpData(true,true);
 				cur[cursorcount]->close();
 				if (destroy) {
-					deleteCursorInternal(
-						cur[cursorcount]);
+					deleteCursor(cur[cursorcount]);
 					cur[cursorcount]=NULL;
 				}
 			}
@@ -32,7 +31,7 @@ void sqlrcontroller_svr::closeCursors(bool destroy) {
 	dbgfile.debugPrint("connection",0,"done closing cursors...");
 }
 
-void sqlrcontroller_svr::deleteCursorInternal(sqlrcursor_svr *curs) {
+void sqlrcontroller_svr::deleteCursor(sqlrcursor_svr *curs) {
 	conn->deleteCursor(curs);
 	semset->waitWithUndo(9);
 	statistics->open_svr_cursors--;

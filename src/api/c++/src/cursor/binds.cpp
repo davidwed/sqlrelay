@@ -415,7 +415,7 @@ void sqlrcursor::dateVar(bindvar *var, const char *variable,
 }
 
 void sqlrcursor::lobVar(bindvar *var, const char *variable,
-			const char *value, uint32_t size, bindtype type) {
+			const char *value, uint32_t size, uint16_t type) {
 
 	initVar(var,variable);
 
@@ -501,7 +501,7 @@ void sqlrcursor::defineOutputBindCursor(const char *variable) {
 }
 
 void sqlrcursor::defineOutputBindGeneric(const char *variable,
-				bindtype type, uint32_t valuesize) {
+				uint16_t type, uint32_t valuesize) {
 
 	if (!variable || !variable[0]) {
 		return;

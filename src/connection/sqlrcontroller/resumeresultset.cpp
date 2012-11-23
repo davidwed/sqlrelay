@@ -4,11 +4,11 @@
 #include <sqlrcontroller.h>
 
 bool sqlrcontroller_svr::resumeResultSetCommand(sqlrcursor_svr *cursor) {
-	dbgfile.debugPrint("connection",1,"resume result set");
+	dbgfile.debugPrint("connection",1,"resume result set...");
 
 	bool	retval=true;
 
-	if (cursor->suspendresultset) {
+	if (cursor->state==SQLRCURSOR_STATE_SUSPENDED) {
 
 		dbgfile.debugPrint("connection",2,
 				"previous result set was suspended");
@@ -26,7 +26,8 @@ bool sqlrcontroller_svr::resumeResultSetCommand(sqlrcursor_svr *cursor) {
 		// then resume the result set
 		clientsock->write(cursor->lastrow);
 
-		retval=resumeResultSet(cursor);
+		returnResultSetHeader(cursor);
+		retval=returnResultSetData(cursor);
 
 	} else {
 
@@ -37,22 +38,17 @@ bool sqlrcontroller_svr::resumeResultSetCommand(sqlrcursor_svr *cursor) {
 		clientsock->write((uint16_t)ERROR_OCCURRED);
 
 		// send the error code (zero for now)
-		clientsock->write((uint64_t)0);
+		clientsock->write((uint64_t)SQLR_ERROR_RESULTSETNOTSUSPENDED);
 
 		// send the error itself
-		clientsock->write((uint16_t)43);
-		clientsock->write("The requested result set "
-					"was not suspended.",43);
+		uint16_t	len=charstring::length(
+				SQLR_ERROR_RESULTSETNOTSUSPENDED_STRING);
+		clientsock->write(len);
+		clientsock->write(SQLR_ERROR_RESULTSETNOTSUSPENDED_STRING,len);
 
 		retval=false;
 	}
 
 	dbgfile.debugPrint("connection",1,"done resuming result set");
 	return retval;
-}
-
-bool sqlrcontroller_svr::resumeResultSet(sqlrcursor_svr *cursor) {
-	// return the header and start sending data
-	returnResultSetHeader(cursor);
-	return returnResultSetData(cursor);
 }

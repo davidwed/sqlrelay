@@ -504,13 +504,13 @@ bool sqlrcontroller_svr::getColumnNames(const char *query,
 
 	size_t		querylen=charstring::length(query);
 
-	sqlrcursor_svr	*gcncur=initCursorInternal();
+	sqlrcursor_svr	*gcncur=initCursor();
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	bool	retval=false;
 	if (gcncur->openInternal(cursorcount+1) &&
 		gcncur->prepareQuery(query,querylen) &&
-		executeQueryInternal(gcncur,query,querylen)) {
+		executeQuery(gcncur,query,querylen)) {
 
 		// build column list...
 		retval=gcncur->getColumnNameList(output);
@@ -518,6 +518,6 @@ bool sqlrcontroller_svr::getColumnNames(const char *query,
 	}
 	gcncur->cleanUpData(true,true);
 	gcncur->close();
-	deleteCursorInternal(gcncur);
+	deleteCursor(gcncur);
 	return retval;
 }

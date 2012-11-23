@@ -4,12 +4,11 @@
 #ifndef SQLRCURSOR_H
 #define SQLRCURSOR_H
 
-#include <defines.h>
-
-#include <sqlrquery.h>
-#include <sqlrelay/sqlrclient.h>
+#include <rudiments/stringbuffer.h>
 #include <rudiments/regularexpression.h>
 #include <rudiments/xmldom.h>
+
+#include <defines.h>
 
 class bindvar_svr {
 	public:
@@ -39,11 +38,18 @@ class bindvar_svr {
 		} value;
 		uint32_t	valuesize;
 		uint32_t	resultvaluesize;
-		bindtype	type;
+		uint16_t	type;
 		int16_t		isnull;
 };
 
+enum sqlrcursor_state_t {
+	SQLRCURSOR_STATE_AVAILABLE=0,
+	SQLRCURSOR_STATE_BUSY,
+	SQLRCURSOR_STATE_SUSPENDED
+};
+
 class sqlrconnection_svr;
+class sqlrquerycursor;
 
 class sqlrcursor_svr {
 	public:
@@ -204,30 +210,31 @@ class sqlrcursor_svr {
 		virtual void		cleanUpLobField(uint32_t col);
 		virtual	void		cleanUpData(bool freeresult,
 							bool freebinds);
-		virtual bool		getColumnNameList(stringbuffer *output);
+		virtual bool		getColumnNameList(rudiments::stringbuffer *output);
 
 		void	setFakeInputBindsForThisQuery(bool fake);
 	
 		bool	skipComment(char **ptr, const char *endptr);
 		bool	skipWhitespace(char **ptr, const char *endptr);
 		char	*skipWhitespaceAndComments(const char *querybuffer);
-		bool	fakeInputBinds(stringbuffer *outputquery);
+		bool	fakeInputBinds(rudiments::stringbuffer *outputquery);
 
 		void	clearError();
 		void	setError(const char *err, int64_t errn, bool liveconn);
 
 		bool	openInternal(uint16_t id);
-		void	performSubstitution(stringbuffer *buffer,
+		void	performSubstitution(rudiments::stringbuffer *buffer,
 							int16_t index);
 		void	abort();
 
 		sqlrconnection_svr	*conn;
-		regularexpression	createtemp;
 
-		char		*querybuffer;
-		uint32_t	querylength;
-		xmldom		*querytree;
-		bool		queryresult;
+		rudiments::regularexpression	createtemp;
+
+		char			*querybuffer;
+		uint32_t		querylength;
+		rudiments::xmldom	*querytree;
+		bool			queryresult;
 
 		char		*error;
 		uint32_t	errorlength;
@@ -253,11 +260,13 @@ class sqlrcursor_svr {
 		bool		lastrowvalid;
 		uint64_t	lastrow;
 
-		bool		suspendresultset;
-		bool		busy;
+		sqlrcursor_state_t	state;
+
 		uint16_t	id;
 
 		char		lobbuffer[32768];
+
+		sqlrquerycursor	*customquerycursor;
 };
 
 #endif

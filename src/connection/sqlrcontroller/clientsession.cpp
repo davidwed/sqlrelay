@@ -137,7 +137,7 @@ void sqlrcontroller_svr::clientSession() {
 	} while (loop);
 
 	if (endsession) {
-		endSessionInternal();
+		endSession();
 	}
 
 	closeClientSocket();
@@ -196,7 +196,7 @@ sqlrcursor_svr *sqlrcontroller_svr::getCursor(uint16_t command) {
 			return NULL;
 		}
 
-		// set the current cursor to the one they requested.
+		// get the current cursor that they requested.
 		bool	found=false;
 		for (uint16_t i=0; i<cursorcount; i++) {
 			if (cur[i]->id==id) {
@@ -222,19 +222,15 @@ sqlrcursor_svr *sqlrcontroller_svr::getCursor(uint16_t command) {
 
 	} else {
 
-		semset->waitWithUndo(9);
- 		
- 		// mark this as a new cursor being used
-		statistics->times_new_cursor_used++;
-		
-		semset->signalWithUndo(9);
-
 		// find an available cursor
 		cursor=findAvailableCursor();
-	}
 
-	if (cursor) {
-		cursor->busy=true;
+ 		// mark this as a new cursor being used
+		if (cursor) {
+			semset->waitWithUndo(9);
+			statistics->times_new_cursor_used++;
+			semset->signalWithUndo(9);
+		}
 	}
 
 	dbgfile.debugPrint("connection",1,"done getting a cursor");
@@ -245,9 +241,10 @@ sqlrcursor_svr *sqlrcontroller_svr::findAvailableCursor() {
 
 	// find an available cursor
 	for (uint16_t i=0; i<cursorcount; i++) {
-		if (!cur[i]->busy) {
+		if (cur[i]->state==SQLRCURSOR_STATE_AVAILABLE) {
 			dbgfile.debugPrint("connection",2,"available cursor:");
 			dbgfile.debugPrint("connection",3,(int32_t)i);
+			cur[i]->state=SQLRCURSOR_STATE_BUSY;
 			return cur[i];
 		}
 	}
@@ -267,18 +264,19 @@ sqlrcursor_svr *sqlrcontroller_svr::findAvailableCursor() {
 	}
 	uint16_t	firstnewcursor=cursorcount;
 	do {
-		cur[cursorcount]=initCursorInternal();
-		cur[cursorcount]->suspendresultset=false;
+		cur[cursorcount]=initCursor();
+		cur[cursorcount]->state=SQLRCURSOR_STATE_AVAILABLE;
 		if (!cur[cursorcount]->openInternal(cursorcount)) {
 			dbgfile.debugPrint("connection",1,
 					"cursor init failure...");
-			logOutInternal();
+			logOut();
 			return NULL;
 		}
 		cursorcount++;
 	} while (cursorcount<expandto);
 	
 	// return the first new cursor that we created
+	cur[firstnewcursor]->state=SQLRCURSOR_STATE_BUSY;
 	return cur[firstnewcursor];
 }
 

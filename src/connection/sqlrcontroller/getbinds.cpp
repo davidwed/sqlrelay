@@ -131,7 +131,7 @@ bool sqlrcontroller_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 				// FIXME: set error here
 				return false;
 			}
-			curs->busy=true;
+			curs->state=SQLRCURSOR_STATE_BUSY;
 			bv->value.cursorid=curs->id;
 		}
 
@@ -232,14 +232,11 @@ bool sqlrcontroller_svr::getBindVarName(sqlrcursor_svr *cursor,
 bool sqlrcontroller_svr::getBindVarType(bindvar_svr *bv) {
 
 	// get the type
-        uint16_t type;
-	if (clientsock->read(&type,idleclienttimeout,0)!=sizeof(uint16_t)) {
+	if (clientsock->read(&bv->type,idleclienttimeout,0)!=sizeof(uint16_t)) {
 		dbgfile.debugPrint("connection",2,
 				"getting binds failed: bad type size");
 		return false;
 	}
-	bv->type=(bindtype)type;
-	
 	return true;
 }
 

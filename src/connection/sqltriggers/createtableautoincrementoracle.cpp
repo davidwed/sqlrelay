@@ -224,10 +224,10 @@ bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
 
 	bool	retval=false;
 
-	sqlrcursor_svr	*cur=sqlrcon->cont->initCursorInternal();
+	sqlrcursor_svr	*cur=sqlrcon->cont->initCursor();
 	if (cur->openInternal(sqlrcon->cont->cursorcount+1) &&
 		cur->prepareQuery(query,length) &&
-		sqlrcon->cont->executeQueryInternal(cur,query,length)) {
+		sqlrcon->cont->executeQuery(cur,query,length)) {
 		// success...
 		retval=true;
 		if (sqlrcon->cont->debugtriggers) {
@@ -249,6 +249,6 @@ bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
 	}
 	cur->cleanUpData(true,true);
 	cur->close();
-	sqlrcon->cont->deleteCursorInternal(cur);
+	sqlrcon->cont->deleteCursor(cur);
 	return retval;
 }

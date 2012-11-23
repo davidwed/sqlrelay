@@ -87,15 +87,15 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		bool	listen();
 		void	closeConnection();
 
-		bool	logInInternal(bool printerrors);
-		void	logOutInternal();
+		bool	logIn(bool printerrors);
+		void	logOut();
 		void	reLogIn();
 
-		sqlrcursor_svr	*initCursorInternal();
-		void	deleteCursorInternal(sqlrcursor_svr *curs);
-		bool	executeQueryInternal(sqlrcursor_svr *curs,
-							const char *query,
-							uint32_t length);
+		sqlrcursor_svr	*initCursor();
+		void	deleteCursor(sqlrcursor_svr *curs);
+		bool	executeQuery(sqlrcursor_svr *curs,
+						const char *query,
+						uint32_t length);
 
 		void	setUserAndGroup();
 		bool	initCursors(int32_t count);
@@ -154,8 +154,8 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void	pingCommand();
 		void	identifyCommand();
 		void	autoCommitCommand();
-		bool	autoCommitOnInternal();
-		bool	autoCommitOffInternal();
+		bool	autoCommitOn();
+		bool	autoCommitOff();
 		void	translateBeginTransaction(sqlrcursor_svr *cursor);
 		bool	handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 						bool *wasfaketransactionquery);
@@ -165,11 +165,11 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		bool	isCommitQuery(sqlrcursor_svr *cursor);
 		bool	isRollbackQuery(sqlrcursor_svr *cursor);
 		void	beginCommand();
-		bool	beginInternal();
+		bool	begin();
 		void	commitCommand();
-		bool	commitInternal();
+		bool	commit();
 		void	rollbackCommand();
-		bool	rollbackInternal();
+		bool	rollback();
 		void	dbVersionCommand();
 		void	serverVersionCommand();
 		void	bindFormatCommand();
@@ -199,7 +199,6 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void	abortResultSetCommand(sqlrcursor_svr *cursor);
 		void	suspendResultSetCommand(sqlrcursor_svr *cursor);
 		bool	resumeResultSetCommand(sqlrcursor_svr *cursor);
-		bool	resumeResultSet(sqlrcursor_svr *cursor);
 		void	closeClientSocket();
 		void	closeSuspendedSessionSockets();
 		bool	authenticate();
@@ -213,9 +212,7 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 						bool reexecute,
 						bool bindcursor,
 						bool getquery);
-		bool	suspendSession();
-		void	endSessionInternal();
-		void	abortAllCursors();
+		void	endSession();
 		bool	getCommand(uint16_t *command);
 		void	noAvailableCursors(uint16_t command);
 		bool	getClientInfo(sqlrcursor_svr *cursor);
@@ -401,12 +398,12 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		bool		debugsqltranslation;
 		bool		debugtriggers;
 
+		sqlrconnection_svr	*conn;
+
 		uint16_t	cursorcount;
 		uint16_t	mincursorcount;
 		uint16_t	maxcursorcount;
-
-		sqlrconnection_svr	*conn;
-		sqlrcursor_svr		**cur;
+		sqlrcursor_svr	**cur;
 
 		sqlparser	*sqlp;
 		sqltranslations	*sqlt;

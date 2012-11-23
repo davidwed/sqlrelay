@@ -66,7 +66,7 @@ bool sqlrcontroller_svr::listen() {
 				// session, roll it back and kill it
 				if (suspendedsession) {
 					if (conn->isTransactional()) {
-						rollbackInternal();
+						rollback();
 					}
 					suspendedsession=false;
 				}
@@ -130,7 +130,7 @@ void sqlrcontroller_svr::initSession() {
 	commitorrollback=false;
 	suspendedsession=false;
 	for (int32_t i=0; i<cursorcount; i++) {
-		cur[i]->suspendresultset=false;
+		cur[i]->state=SQLRCURSOR_STATE_AVAILABLE;
 	}
 	accepttimeout=5;
 

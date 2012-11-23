@@ -5,6 +5,8 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/charstring.h>
 
+#include <defines.h>
+
 bool sqlrcursor::executeQuery() {
 
 	if (!queryptr) {

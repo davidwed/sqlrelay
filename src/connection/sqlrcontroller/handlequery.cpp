@@ -15,6 +15,17 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 
 	dbgfile.debugPrint("connection",1,"handling query...");
 
+	// decide whether to use the cursor itself
+	// or an attached custom query cursor
+	if (cursor->customquerycursor) {
+		if (reexecute) {
+			cursor=cursor->customquerycursor;
+		} else {
+			delete cursor->customquerycursor;
+			cursor->customquerycursor=NULL;
+		}
+	}
+
 	// re-init error data
 	cursor->clearError();
 
@@ -26,6 +37,9 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 		outbindmappings->clear();
 		cursor->fakeinputbindsforthisquery=fakeinputbinds;
 	}
+
+	// clean up whatever result set the cursor might have been busy with
+	cursor->cleanUpData(true,true);
 
 	// get the query and bind data from the client...
 	if (getquery) {
@@ -53,6 +67,35 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 		if (!reexecute && !bindcursor) {
 			success=(getClientInfo(cursor) &&
 					getQuery(cursor));
+
+			// do we need to use a custom query
+			// handler for this query?
+			if (success && sqlrq) {
+				cursor->customquerycursor=
+					sqlrq->match(conn,cursor,
+							cursor->querybuffer,
+							cursor->querylength);
+				
+			}
+
+			if (cursor->customquerycursor) {
+
+				// copy the query that we just got into the
+				// custom query cursor
+				charstring::copy(
+					cursor->customquerycursor->querybuffer,
+					cursor->querybuffer);
+				cursor->customquerycursor->querylength=
+							cursor->querylength;
+
+				// set the cursor state
+				cursor->customquerycursor->state=
+						SQLRCURSOR_STATE_BUSY;
+
+				// reset the rest of this method to use
+				// the custom query cursor
+				cursor=cursor->customquerycursor;
+			}
 		}
 		if (success && !bindcursor) {
 			success=(getInputBinds(cursor) &&
@@ -73,14 +116,6 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 						"failed to handle query");
 			return false;
 		}
-	}
-
-	// do we need to use a custom query handler for this query?
-	if (!reexecute && !bindcursor && sqlrq) {
-		// FIXME:
-		sqlrquery	*customquery=sqlrq->match(conn,cursor,
-							cursor->querybuffer,
-							cursor->querylength);
 	}
 
 	// loop here to handle down databases
@@ -291,13 +326,6 @@ bool sqlrcontroller_svr::getSendColumnInfo() {
 bool sqlrcontroller_svr::processQuery(sqlrcursor_svr *cursor,
 					bool reexecute, bool bindcursor) {
 
-	// Very important...
-	// Clean up result set data here instead of when aborting a result set,
-	// this allows for result sets that were suspended after the entire
-	// result set was fetched to still be able to return column data when
-	// resumed.
-	cursor->cleanUpData(true,true);
-
 	dbgfile.debugPrint("connection",2,"processing query...");
 
 	// on reexecute, translate bind variables from mapping
@@ -317,16 +345,13 @@ bool sqlrcontroller_svr::processQuery(sqlrcursor_svr *cursor,
 		// just execute it...
 
 		dbgfile.debugPrint("connection",3,"re-executing...");
-		success=(handleBinds(cursor) && 
-				executeQueryInternal(cursor,
-						cursor->querybuffer,
-						cursor->querylength));
+		success=(handleBinds(cursor) && executeQuery(cursor,
+							cursor->querybuffer,
+							cursor->querylength));
 
 	} else if (bindcursor) {
 
-		// if we're handling a bind cursor
-		// then we just need to execute...
-
+		// if we're handling a bind cursor...
 		dbgfile.debugPrint("connection",3,"bind cursor...");
 		success=cursor->fetchFromBindCursor();
 
@@ -372,8 +397,7 @@ bool sqlrcontroller_svr::processQuery(sqlrcursor_svr *cursor,
 
 		// execute
 		if (success) {
-			success=executeQueryInternal(
-					cursor,query,querylen);
+			success=executeQuery(cursor,query,querylen);
 		}
 	}
 
@@ -390,7 +414,7 @@ bool sqlrcontroller_svr::processQuery(sqlrcursor_svr *cursor,
 	if (success && conn->isTransactional() && commitorrollback &&
 				conn->fakeautocommit && conn->autocommit) {
 		dbgfile.debugPrint("connection",3,"commit necessary...");
-		success=commitInternal();
+		success=commit();
 	}
 	
 	// if the query failed, get the error (unless it's already been set)
@@ -414,9 +438,9 @@ bool sqlrcontroller_svr::processQuery(sqlrcursor_svr *cursor,
 	return success;
 }
 
-bool sqlrcontroller_svr::executeQueryInternal(sqlrcursor_svr *curs,
-							const char *query,
-							uint32_t length) {
+bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *curs,
+						const char *query,
+						uint32_t length) {
 
 	// handle before-triggers
 	if (sqltr) {

@@ -15,6 +15,8 @@
 #include <rudiments/signalclasses.h>
 #include <sqlrconfigfile.h>
 
+#include <defines.h>
+
 // for clock()
 #include <time.h>
 
@@ -64,7 +66,7 @@ class sqlrshbindvalue {
 				const char	*tz;
 			} dateval;
 		};
-		bindtype	type;
+		uint16_t	type;
 		uint32_t	outputstringbindlength;
 };
 

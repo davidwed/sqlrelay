@@ -3,11 +3,17 @@
 
 #include <sqlrcontroller.h>
 
-void sqlrcontroller_svr::endSessionInternal() {
+void sqlrcontroller_svr::endSession() {
 
 	dbgfile.debugPrint("connection",2,"ending session...");
 
-	abortAllCursors();
+	dbgfile.debugPrint("connection",2,"aborting all cursors...");
+	for (int32_t i=0; i<cursorcount; i++) {
+		if (cur[i]) {
+			cur[i]->abort();
+		}
+	}
+	dbgfile.debugPrint("connection",2,"done aborting all cursors");
 
 	// truncate/drop temp tables
 	// (Do this before running the end-session queries becuase
@@ -28,7 +34,7 @@ void sqlrcontroller_svr::endSessionInternal() {
 	// end the block
 	if (intransactionblock) {
 
-		rollbackInternal();
+		rollback();
 		intransactionblock=false;
 
 	} else if (conn->isTransactional() && commitorrollback) {
@@ -37,13 +43,13 @@ void sqlrcontroller_svr::endSessionInternal() {
 		if (cfgfl->getEndOfSessionCommit()) {
 			dbgfile.debugPrint("connection",2,
 						"committing...");
-			commitInternal();
+			commit();
 			dbgfile.debugPrint("connection",2,
 						"done committing...");
 		} else {
 			dbgfile.debugPrint("connection",2,
 						"rolling back...");
-			rollbackInternal();
+			rollback();
 			dbgfile.debugPrint("connection",2,
 						"done rolling back...");
 		}
@@ -71,7 +77,7 @@ void sqlrcontroller_svr::endSessionInternal() {
 	// shrink the cursor array, if necessary
 	while (cursorcount>mincursorcount) {
 		cursorcount--;
-		deleteCursorInternal(cur[cursorcount]);
+		deleteCursor(cur[cursorcount]);
 		cur[cursorcount]=NULL;
 	}
 
@@ -81,34 +87,12 @@ void sqlrcontroller_svr::endSessionInternal() {
 	dbgfile.debugPrint("connection",1,"done ending session");
 }
 
-void sqlrcontroller_svr::abortAllCursors() {
-	// abort all cursors
-	dbgfile.debugPrint("connection",2,"aborting all busy cursors...");
-	for (int32_t i=0; i<cursorcount; i++) {
-		if (cur[i] && cur[i]->busy) {
-
-			dbgfile.debugPrint("connection",3,i);
-
-			// It's ok to call cleanUpData() here, ordinarily we
-			// wouldn't so that result sets that were suspended
-			// after the entire result set was fetched would be
-			// able to return column data when resumed, but since
-			// we're ending the session, we don't care...
-			cur[i]->cleanUpData(true,true);
-			cur[i]->abort();
-		}
-	}
-	dbgfile.debugPrint("connection",2,"done aborting all busy cursors");
-}
-
 void sqlrcontroller_svr::cleanUpAllCursorData(bool freeresult, bool freebinds) {
-
-	// clean up all busy cursors
-	dbgfile.debugPrint("connection",2,"cleaning up all busy cursors...");
+	dbgfile.debugPrint("connection",2,"cleaning up all cursors...");
 	for (int32_t i=0; i<cursorcount; i++) {
-		if (cur[i] && cur[i]->busy) {
+		if (cur[i]) {
 			cur[i]->cleanUpData(freeresult,freebinds);
 		}
 	}
-	dbgfile.debugPrint("connection",2,"done cleaning up all busy cursors");
+	dbgfile.debugPrint("connection",2,"done cleaning up all cursors");
 }

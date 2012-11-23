@@ -7,7 +7,7 @@
 void sqlrcontroller_svr::closeConnection() {
 
 	if (inclientsession) {
-		endSessionInternal();
+		endSession();
 		decrementClientSessionCount();
 	}
 
@@ -28,7 +28,7 @@ void sqlrcontroller_svr::closeConnection() {
 
 	// try to log out
 	dbgfile.debugPrint("connection",0,"logging out...");
-	logOutInternal();
+	logOut();
 	dbgfile.debugPrint("connection",0,"done logging out");
 
 

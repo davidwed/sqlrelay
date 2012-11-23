@@ -4,21 +4,37 @@
 #include <sqlrcontroller.h>
 
 bool sqlrcontroller_svr::getDatabaseListCommand(sqlrcursor_svr *cursor) {
-	return getListCommand(cursor,0,false);
+ 	dbgfile.debugPrint("connection",1,"get db list...");
+	bool	retval=getListCommand(cursor,0,false);
+ 	dbgfile.debugPrint("connection",1,"done getting db list");
+	return retval;
 }
 
 bool sqlrcontroller_svr::getTableListCommand(sqlrcursor_svr *cursor) {
-	return getListCommand(cursor,1,false);
+ 	dbgfile.debugPrint("connection",1,"get table list...");
+	bool	retval=getListCommand(cursor,1,false);
+ 	dbgfile.debugPrint("connection",1,"done getting table list");
+	return retval;
 }
 
 bool sqlrcontroller_svr::getColumnListCommand(sqlrcursor_svr *cursor) {
-	return getListCommand(cursor,2,true);
+ 	dbgfile.debugPrint("connection",1,"get column list...");
+	bool	retval=getListCommand(cursor,2,true);
+ 	dbgfile.debugPrint("connection",1,"done getting column list");
+	return retval;
 }
 
 bool sqlrcontroller_svr::getListCommand(sqlrcursor_svr *cursor,
 						int which, bool gettable) {
 
- 	dbgfile.debugPrint("connection",2,"getting list command");
+	// clean up any custom query cursors
+	if (cursor->customquerycursor) {
+		delete[] cursor->customquerycursor;
+		cursor->customquerycursor=NULL;
+	}
+
+	// clean up whatever result set the cursor might have been busy with
+	cursor->cleanUpData(true,true);
 
 	// get length of wild parameter
 	uint32_t	wildlen;
@@ -113,7 +129,6 @@ bool sqlrcontroller_svr::getListCommand(sqlrcursor_svr *cursor,
 	// clean up
 	delete[] wild;
 	delete[] table;
-	cursor->cleanUpData(true,false);
 
 	return result;
 }

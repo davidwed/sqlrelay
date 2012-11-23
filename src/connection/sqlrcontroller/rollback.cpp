@@ -5,7 +5,7 @@
 
 void sqlrcontroller_svr::rollbackCommand() {
 	dbgfile.debugPrint("connection",1,"rollback...");
-	if (rollbackInternal()) {
+	if (rollback()) {
 		dbgfile.debugPrint("connection",1,"rollback succeeded");
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	} else {
@@ -15,8 +15,7 @@ void sqlrcontroller_svr::rollbackCommand() {
 	flushWriteBuffer();
 }
 
-bool sqlrcontroller_svr::rollbackInternal() {
-
+bool sqlrcontroller_svr::rollback() {
 	if (conn->rollback()) {
 		endFakeTransactionBlock();
 		return true;

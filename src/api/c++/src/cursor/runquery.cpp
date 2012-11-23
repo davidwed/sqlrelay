@@ -187,7 +187,7 @@ void sqlrcursor::sendInputBinds() {
 		}
 
 		// send the type
-		sqlrc->cs->write((uint16_t)inbindvars[i].type);
+		sqlrc->cs->write(inbindvars[i].type);
 
 		// send the value
 		if (inbindvars[i].type==NULL_BIND) {
@@ -372,7 +372,7 @@ void sqlrcursor::sendOutputBinds() {
 		size=charstring::length(outbindvars[i].variable);
 		sqlrc->cs->write(size);
 		sqlrc->cs->write(outbindvars[i].variable,(size_t)size);
-		sqlrc->cs->write((uint16_t)outbindvars[i].type);
+		sqlrc->cs->write(outbindvars[i].type);
 		if (outbindvars[i].type==STRING_BIND ||
 			outbindvars[i].type==BLOB_BIND ||
 			outbindvars[i].type==CLOB_BIND ||

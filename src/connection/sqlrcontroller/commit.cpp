@@ -5,7 +5,7 @@
 
 void sqlrcontroller_svr::commitCommand() {
 	dbgfile.debugPrint("connection",1,"commit...");
-	if (commitInternal()) {
+	if (commit()) {
 		dbgfile.debugPrint("connection",1,"commit succeeded");
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	} else {
@@ -15,7 +15,7 @@ void sqlrcontroller_svr::commitCommand() {
 	flushWriteBuffer();
 }
 
-bool sqlrcontroller_svr::commitInternal() {
+bool sqlrcontroller_svr::commit() {
 	if (conn->commit()) {
 		endFakeTransactionBlock();
 		return true;

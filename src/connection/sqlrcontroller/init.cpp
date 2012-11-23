@@ -222,7 +222,6 @@ bool sqlrcontroller_svr::init(int argc, const char **argv,
 	if (charstring::length(queries)) {
 		sqlrq=new sqlrqueries;
 		sqlrq->loadQueries(queries);
-		sqlrq->initQueries(conn);
 	}
 	
 	return true;
@@ -319,7 +318,7 @@ void sqlrcontroller_svr::initDatabaseAvailableFileName() {
 bool sqlrcontroller_svr::attemptLogIn(bool printerrors) {
 
 	dbgfile.debugPrint("connection",0,"logging in...");
-	if (!logInInternal(printerrors)) {
+	if (!logIn(printerrors)) {
 		dbgfile.debugPrint("connection",0,"log in failed");
 		if (printerrors) {
 			fprintf(stderr,"Couldn't log into database.\n");
@@ -337,7 +336,7 @@ bool sqlrcontroller_svr::initCursors(int32_t count) {
 	cursorcount=count;
 	if (!cur) {
 		cur=new sqlrcursor_svr *[maxcursorcount];
-		rawbuffer::zero(cur,maxcursorcount*sizeof(sqlrcursor *));
+		rawbuffer::zero(cur,maxcursorcount*sizeof(sqlrcursor_svr *));
 	}
 
 	for (int32_t i=0; i<cursorcount; i++) {
@@ -345,14 +344,14 @@ bool sqlrcontroller_svr::initCursors(int32_t count) {
 		dbgfile.debugPrint("connection",1,i);
 
 		if (!cur[i]) {
-			cur[i]=initCursorInternal();
+			cur[i]=initCursor();
 		}
 		if (!cur[i]->openInternal(i)) {
 
 			dbgfile.debugPrint("connection",1,
 					"cursor init failure...");
 
-			logOutInternal();
+			logOut();
 			return false;
 		}
 	}
@@ -362,7 +361,7 @@ bool sqlrcontroller_svr::initCursors(int32_t count) {
 	return true;
 }
 
-sqlrcursor_svr *sqlrcontroller_svr::initCursorInternal() {
+sqlrcursor_svr *sqlrcontroller_svr::initCursor() {
 	sqlrcursor_svr	*cursor=conn->initCursor();
 	if (cursor) {
 		semset->waitWithUndo(9);

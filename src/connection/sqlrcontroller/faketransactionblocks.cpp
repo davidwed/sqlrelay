@@ -28,7 +28,7 @@ bool sqlrcontroller_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 			cursor->errnum=999999;
 			return false;
 		}
-		return beginInternal();
+		return begin();
 		// FIXME: if the begin fails and the db api doesn't support
 		// a begin command then the connection-level error needs to
 		// be copied to the cursor so handleQueryOrBindCursor can
@@ -45,7 +45,7 @@ bool sqlrcontroller_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 			cursor->errnum=999998;
 			return false;
 		}
-		return commitInternal();
+		return commit();
 		// FIXME: if the commit fails and the db api doesn't support
 		// a commit command then the connection-level error needs to
 		// be copied to the cursor so handleQueryOrBindCursor can
@@ -62,7 +62,7 @@ bool sqlrcontroller_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 			cursor->errnum=999997;
 			return false;
 		}
-		return rollbackInternal();
+		return rollback();
 		// FIXME: if the rollback fails and the db api doesn't support
 		// a rollback command then the connection-level error needs to
 		// be copied to the cursor so handleQueryOrBindCursor can
@@ -108,7 +108,7 @@ bool sqlrcontroller_svr::beginFakeTransactionBlock() {
 
 	// if autocommit is on, turn it off
 	if (autocommitforthissession) {
-		if (!autoCommitOffInternal()) {
+		if (!autoCommitOff()) {
 			return false;
 		}
 	}
@@ -121,7 +121,7 @@ bool sqlrcontroller_svr::endFakeTransactionBlock() {
 	// if we're faking begins and autocommit is on,
 	// reset autocommit behavior
 	if (faketransactionblocks && faketransactionblocksautocommiton) {
-		if (!autoCommitOnInternal()) {
+		if (!autoCommitOn()) {
 			return false;
 		}
 	}

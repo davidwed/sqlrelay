@@ -14,7 +14,7 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 	outbindcount=0;
 	outbindvars=new bindvar_svr[conn->cont->maxbindcount];
 	
-	busy=false;
+	state=SQLRCURSOR_STATE_AVAILABLE;
 
 	createtemp.compile("(create|CREATE|declare|DECLARE)[ \\t\\r\\n]+((global|GLOBAL|local|LOCAL)?[ \\t\\r\\n]+)?(temp|TEMP|temporary|TEMPORARY)?[ \\t\\r\\n]+(table|TABLE)[ \\t\\r\\n]+");
 
@@ -38,6 +38,8 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 	commandendusec=0;
 
 	fakeinputbindsforthisquery=false;
+
+	customquerycursor=NULL;
 }
 
 sqlrcursor_svr::~sqlrcursor_svr() {
@@ -45,6 +47,7 @@ sqlrcursor_svr::~sqlrcursor_svr() {
 	delete querytree;
 	delete[] inbindvars;
 	delete[] outbindvars;
+	delete customquerycursor;
 }
 
 bool sqlrcursor_svr::openInternal(uint16_t id) {
@@ -660,10 +663,12 @@ void sqlrcursor_svr::setError(const char *err, int64_t errn, bool liveconn) {
 }
 
 void sqlrcursor_svr::abort() {
-	// Very important...
-	// Do not cleanUpData() here, otherwise result sets that were suspended
-	// after the entire result set was fetched won't be able to return
-	// column data when resumed.
-	suspendresultset=false;
-	busy=false;
+	// I was once concerned that calling this here would prevent suspended
+	// result sets from being able to return column data upon resume if the
+	// entire result set had already been sent, but I don't think that's an
+	// issue any more.
+	cleanUpData(true,true);
+	state=SQLRCURSOR_STATE_AVAILABLE;
+	delete customquerycursor;
+	customquerycursor=NULL;
 }

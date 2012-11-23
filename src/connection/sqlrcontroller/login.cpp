@@ -5,7 +5,7 @@
 #include <sqlrcontroller.h>
 #include <rudiments/snooze.h>
 
-bool sqlrcontroller_svr::logInInternal(bool printerrors) {
+bool sqlrcontroller_svr::logIn(bool printerrors) {
 
 	// don't do anything if we're already logged in
 	if (loggedin) {
@@ -26,7 +26,7 @@ bool sqlrcontroller_svr::logInInternal(bool printerrors) {
 	return true;
 }
 
-void sqlrcontroller_svr::logOutInternal() {
+void sqlrcontroller_svr::logOut() {
 
 	// don't do anything if we're already logged out
 	if (!loggedin) {
@@ -63,15 +63,15 @@ void sqlrcontroller_svr::reLogIn() {
 	// attempt to log in over and over, once every 5 seconds
 	int32_t	oldcursorcount=cursorcount;
 	closeCursors(false);
-	logOutInternal();
+	logOut();
 	for (;;) {
 			
 		dbgfile.debugPrint("connection",5,"trying...");
 
-		if (logInInternal(false)) {
+		if (logIn(false)) {
 			if (!initCursors(oldcursorcount)) {
 				closeCursors(false);
-				logOutInternal();
+				logOut();
 			} else {
 				break;
 			}

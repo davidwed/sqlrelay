@@ -125,15 +125,7 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 	llist.append(sqlrlp);
 }
 
-void sqlrqueries::initQueries(sqlrconnection_svr *sqlrcon) {
-	debugFunction();
-	for (linkedlistnode< sqlrqueryplugin * > *node=llist.getFirstNode();
-						node; node=node->getNext()) {
-		node->getData()->qr->init(sqlrcon);
-	}
-}
-
-sqlrquery *sqlrqueries::match(sqlrconnection_svr *sqlrcon,
+sqlrquerycursor *sqlrqueries::match(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					const char *querystring,
 					uint32_t querylength) {
@@ -142,7 +134,7 @@ sqlrquery *sqlrqueries::match(sqlrconnection_svr *sqlrcon,
 						node; node=node->getNext()) {
 		sqlrquery	*qr=node->getData()->qr;
 		if (qr->match(sqlrcon,sqlrcur,querystring,querylength)) {
-			return qr;
+			return qr->getCursor();
 		}
 	}
 	return NULL;

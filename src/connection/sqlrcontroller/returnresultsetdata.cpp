@@ -7,6 +7,12 @@ bool sqlrcontroller_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 
 	dbgfile.debugPrint("connection",2,"returning result set data...");
 
+	// decide whether to use the cursor itself
+	// or an attached custom query cursor
+	if (cursor->customquerycursor) {
+		cursor=cursor->customquerycursor;
+	}
+
 	// get the number of rows to skip
 	uint64_t	skip;
 	if (clientsock->read(&skip,idleclienttimeout,0)!=sizeof(uint64_t)) {
@@ -23,6 +29,9 @@ bool sqlrcontroller_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 		return false;
 	}
 
+	// reinit cursor state (in case it was suspended)
+	cursor->state=SQLRCURSOR_STATE_BUSY;
+
 	// for some queries, there are no rows to return, 
 	if (cursor->noRowsToReturn()) {
 		clientsock->write((uint16_t)END_RESULT_SET);
@@ -31,11 +40,6 @@ bool sqlrcontroller_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 				"done returning result set data");
 		return true;
 	}
-
-
-	// reinit suspendresultset
-	cursor->suspendresultset=false;
-
 
 	// skip the specified number of rows
 	if (!skipRows(cursor,skip)) {

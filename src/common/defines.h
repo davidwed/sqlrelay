@@ -78,6 +78,15 @@
 #define DONT_RE_EXECUTE 0
 #define RE_EXECUTE 1
 
+#define NULL_BIND 0
+#define STRING_BIND 1
+#define INTEGER_BIND 2
+#define DOUBLE_BIND 3
+#define BLOB_BIND 4
+#define CLOB_BIND 5
+#define CURSOR_BIND 6
+#define DATE_BIND 7
+
 // sizes
 #ifndef MAXPATHLEN
 	#define MAXPATHLEN 256
@@ -116,6 +125,9 @@
 #define SQLR_ERROR_MAXSELECTLIST 900008
 #define SQLR_ERROR_MAXSELECTLIST_STRING \
 	"Maximum column count exceeded."
+#define SQLR_ERROR_RESULTSETNOTSUSPENDED 900009
+#define SQLR_ERROR_RESULTSETNOTSUSPENDED_STRING \
+	"The requested result set was not suspended."
 
 // structures
 struct sqlrstatistics {
