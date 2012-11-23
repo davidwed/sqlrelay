@@ -10,7 +10,7 @@ LIBS = -L$(top_builddir)/src/util -lsqlrutil $(SIDLIBS) $(RUDIMENTSLIBS) $(LIBDM
 SRCS = sqlrcontroller/sqlrconnectionctor.cpp \
 	sqlrcontroller/sqlrconnectiondtor.cpp \
 	sqlrcontroller/flushwritebuffer.cpp \
-	sqlrcontroller/initconnection.cpp \
+	sqlrcontroller/init.cpp \
 	sqlrcontroller/ipc.cpp \
 	sqlrcontroller/opensockets.cpp \
 	sqlrcontroller/listen.cpp \
@@ -105,7 +105,7 @@ SRCS = sqlrcontroller/sqlrconnectionctor.cpp \
 LOBJS = sqlrcontroller/sqlrconnectionctor.lo \
 	sqlrcontroller/sqlrconnectiondtor.lo \
 	sqlrcontroller/flushwritebuffer.lo \
-	sqlrcontroller/initconnection.lo \
+	sqlrcontroller/init.lo \
 	sqlrcontroller/ipc.lo \
 	sqlrcontroller/opensockets.lo \
 	sqlrcontroller/listen.lo \
