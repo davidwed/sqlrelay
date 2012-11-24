@@ -140,6 +140,11 @@ void sqlrcontroller_svr::registerForHandoff(const char *tmpdir) {
 		snooze::macrosnooze(1);
 	}
 
+	// get the per-connection statistics buffer
+	if (connected && handoffindex<STATMAXCONNECTIONS) {
+		connstats=&shm->connstats[handoffindex];
+	}
+
 	dbgfile.debugPrint("connection",0,"done registering for handoff");
 
 	delete[] handoffsockname;
@@ -148,7 +153,7 @@ void sqlrcontroller_svr::registerForHandoff(const char *tmpdir) {
 bool sqlrcontroller_svr::receiveFileDescriptor(int32_t *descriptor) {
 	bool	retval=handoffsockun.receiveFileDescriptor(descriptor);
 	if (!retval) {
-		// FIXME:? should we just close here, or re-connect?
+		// FIXME: should we just close here, or re-connect?
 		handoffsockun.close();
 		connected=false;
 	}

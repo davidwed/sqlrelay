@@ -20,8 +20,6 @@ class sqlrcmdcstatcursor : public sqlrquerycursor {
 
 		bool		executeQuery(const char *query,
 						uint32_t length);
-		bool		knowsRowCount();
-		uint64_t	rowCount();
 		uint32_t	colCount();
 		const char * const	*columnNames();
 		const char		*getColumnName(uint32_t col);

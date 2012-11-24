@@ -4,11 +4,11 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-// listener-connection protocol
+// listener-connection protocol...
 #define HANDOFF_PASS 0
 #define HANDOFF_RECONNECT 1
 
-// client-server protocol
+// client-server protocol...
 #define NEW_QUERY 0
 #define FETCH_RESULT_SET 1
 #define ABORT_RESULT_SET 2
@@ -87,16 +87,18 @@
 #define CURSOR_BIND 6
 #define DATE_BIND 7
 
-// sizes
+// sizes...
 #ifndef MAXPATHLEN
 	#define MAXPATHLEN 256
 #endif
-
 #define USERSIZE 128
-
 #define MAXCONNECTIONIDLEN 1024
+#define STATMAXCONNECTIONS 100
+#define STATQPSKEEP 900
+#define STATSQLTEXTLEN 300
+#define STATCLIENTINFOLEN 512
 
-// errors
+// errors...
 // (hopefully the 900000+ range doesn't collide with anyone's native codes)
 #define SQLR_ERROR_NO_CURSORS 900000
 #define SQLR_ERROR_NO_CURSORS_STRING \
@@ -129,7 +131,7 @@
 #define SQLR_ERROR_RESULTSETNOTSUSPENDED_STRING \
 	"The requested result set was not suspended."
 
-// structures
+// structures...
 struct sqlrstatistics {
 	int32_t	open_svr_connections;
 	int32_t	opened_svr_connections;
@@ -147,6 +149,90 @@ struct sqlrstatistics {
 	int32_t	total_errors;
 
 	int32_t	forked_listeners;
+
+	// below were added by neowiz...
+	uint32_t	accesslogfd;
+	uint32_t	connect;
+
+	/** executed command total */
+	uint32_t	total;
+
+	/** maximum number of the listeners allowed -- for debugging purpose */
+	uint32_t	max_listener;
+
+	/** number of listener errors excceding MAX_LISTENER */
+	uint32_t	max_listener_error;
+
+	/** highest count of listeners */
+	uint32_t	peak_listener;
+
+	/** highest count of connections in use */
+	uint32_t	peak_session;
+
+	/** highest count of listeners for 1 min */
+	uint32_t	peak_listener_1min;
+
+	/** highest count of session for 1 min */
+	uint32_t	peak_session_1min;
+
+	time_t		peak_listener_1min_time;
+	time_t		peak_session_1min_time;
+	//uint32_t	client_timeout_short;
+	//uint32_t	client_timeout_long;
+	time_t		starttime;
+	time_t		timestamp[STATQPSKEEP];
+	uint32_t	qps_select[STATQPSKEEP];
+	uint32_t	qps_insert[STATQPSKEEP];
+	uint32_t	qps_update[STATQPSKEEP];
+	uint32_t	qps_delete[STATQPSKEEP];
+	uint32_t	qps_etc[STATQPSKEEP];
+	uint32_t	qps_sqlrcmd[STATQPSKEEP];
+};
+
+enum sqlrconnectionstate {
+	NOT_AVAILABLE=0,
+	INIT,
+	WAIT_FOR_AVAIL_DB,
+	WAIT_CLIENT,
+	SESSION_START,
+	GET_COMMAND,
+	PROCESS_SQL,
+	PROCESS_SQLRCMD,
+	RETURN_RESULT_SET,
+	SESSION_END,
+	ANNOUNCE_AVAILABILITY,
+	WAIT_SEMAPHORE
+};
+
+struct sqlrconnstatistics {
+	uint32_t			processid;
+	enum sqlrconnectionstate	state;
+	uint32_t			index;
+	uint32_t			nconnect;
+	uint32_t			nauthenticate;
+	uint32_t			nsuspend_session;
+	uint32_t			nend_session;
+	uint32_t			nping;
+	uint32_t			nidentify;
+	uint32_t			nautocommit;
+	uint32_t			ncommit;
+	uint32_t			nrollback;;
+	uint64_t			nnew_query;
+	uint64_t			nreexecute_query;
+	uint32_t			nfetch_from_bind_cursor;
+	uint32_t			nfetch_result_set;
+	uint32_t			nsuspend_result_set;
+	uint32_t			nresume_result_set;
+	uint32_t			nabort_result_set;
+	uint32_t			nsqlrcmd;
+	uint64_t			nsql;
+	uint32_t			nrelogin;
+	struct timeval			state_start_tv;
+	struct timeval			processclient_tv;
+	struct timeval			processquery_tv;
+	struct sockaddr			clientaddr;
+	char				clientinfo[STATCLIENTINFOLEN+1];
+	char				sqltext[STATSQLTEXTLEN+1];
 };
 
 // This structure is used to pass data in shared memory between the listener
@@ -163,7 +249,8 @@ struct shmdata {
 		} sockets;
 		pid_t	connectionpid;
 	} connectioninfo;
-	sqlrstatistics	statistics;
+	sqlrstatistics		stats;
+	sqlrconnstatistics	connstats[STATMAXCONNECTIONS];
 };
 
 enum clientsessiontype_t {

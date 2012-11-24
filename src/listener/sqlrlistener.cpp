@@ -698,7 +698,7 @@ void sqlrlistener::listen() {
 	shmdata	*ptr=(shmdata *)idmemory->getPointer();
 	for (;;) {
 		semset->waitWithUndo(9);
-		int32_t	opensvrconnections=ptr->statistics.open_svr_connections;
+		int32_t	opensvrconnections=ptr->stats.open_svr_connections;
 		semset->signalWithUndo(9);
 
 		if (opensvrconnections<
@@ -1171,7 +1171,7 @@ int sqlrlistener::incForkedListeners() {
 
 	shmdata	*ptr=(shmdata *)idmemory->getPointer();
 	semset->waitWithUndo(9);
-	int	forkedlisteners=++(ptr->statistics.forked_listeners);
+	int	forkedlisteners=++(ptr->stats.forked_listeners);
 	semset->signalWithUndo(9);
 	return forkedlisteners;
 }
@@ -1183,10 +1183,10 @@ int sqlrlistener::decForkedListeners() {
 
 	shmdata	*ptr=(shmdata *)idmemory->getPointer();
 	semset->waitWithUndo(9);
-	if (--(ptr->statistics.forked_listeners)<0) {
-		ptr->statistics.forked_listeners=0;
+	if (--(ptr->stats.forked_listeners)<0) {
+		ptr->stats.forked_listeners=0;
 	}
-	int forkedlisteners=ptr->statistics.forked_listeners;
+	int forkedlisteners=ptr->stats.forked_listeners;
 	semset->signalWithUndo(9);
 	return forkedlisteners;
 }

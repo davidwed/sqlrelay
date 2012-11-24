@@ -40,14 +40,6 @@ bool sqlrcmdcstatcursor::executeQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-bool sqlrcmdcstatcursor::knowsRowCount() {
-	return true;
-}
-
-uint64_t sqlrcmdcstatcursor::rowCount() {
-	return 4;
-}
-
 uint32_t sqlrcmdcstatcursor::colCount() {
 	return 8;
 }
@@ -77,6 +69,7 @@ bool sqlrcmdcstatcursor::noRowsToReturn() {
 }
 
 bool sqlrcmdcstatcursor::fetchRow() {
+	// FIXME: return one row for each connection
 	if (currentrow<4) {
 		currentrow++;
 		return true;
@@ -89,6 +82,7 @@ void sqlrcmdcstatcursor::getField(uint32_t col,
 					uint64_t *fieldlength,
 					bool *blob,
 					bool *null) {
+	// FIXME: pull values from conn_svr_status in shared memory
 	*blob=false;
 
 	if (col>7) {

@@ -26,7 +26,7 @@ semaphoreset *status::getSemset() {
 
 sqlrstatistics *status::getStatistics() {
 	statussemset->waitWithUndo(9);
-	privatestatistics=*statistics;
+	privatestatistics=*stats;
 	statussemset->signalWithUndo(9);
 	return &privatestatistics;
 }
@@ -75,8 +75,8 @@ bool status::init(int argc, const char **argv) {
 		return false;
 	}
 
-	statistics=&shm->statistics;
-	if (!statistics) {
+	stats=&shm->stats;
+	if (!stats) {
 		fprintf(stderr,"failed to point statistics at idmemory\n");
 	}
 

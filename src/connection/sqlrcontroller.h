@@ -422,16 +422,18 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		const char	*connectionid;
 		int32_t		ttl;
 
-		sqlrstatistics	*statistics;
-		semaphoreset	*semset;
-
 		char		*pidfile;
 
 		bool		fakeinputbinds;
 
-		sharedmemory		*idmemory;
-		cmdline			*cmdl;
-		sqlrconfigfile		*cfgfl;
+		semaphoreset	*semset;
+		sharedmemory	*idmemory;
+		cmdline		*cmdl;
+		sqlrconfigfile	*cfgfl;
+
+		shmdata			*shm;
+		sqlrstatistics		*stats;
+		sqlrconnstatistics	*connstats;
 
 		char		*clientinfo;
 		uint64_t	clientinfolen;

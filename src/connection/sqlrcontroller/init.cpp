@@ -89,14 +89,14 @@ bool sqlrcontroller_svr::init(int argc, const char **argv,
 		return false;
 	}
 
-	shmdata	*shm=(shmdata *)idmemory->getPointer();
+	shm=(shmdata *)idmemory->getPointer();
 	if (!shm) {
 		fprintf(stderr,"failed to get pointer to shmdata\n");
 		return false;
 	}
 
-	statistics=&shm->statistics;
-	if (!statistics) {
+	stats=&shm->stats;
+	if (!stats) {
 		fprintf(stderr,"failed to point statistics at idmemory\n");
 	}
 
@@ -365,8 +365,8 @@ sqlrcursor_svr *sqlrcontroller_svr::initCursor() {
 	sqlrcursor_svr	*cursor=conn->initCursor();
 	if (cursor) {
 		semset->waitWithUndo(9);
-		statistics->open_svr_cursors++;
-		statistics->opened_svr_cursors++;
+		stats->open_svr_cursors++;
+		stats->opened_svr_cursors++;
 		semset->signalWithUndo(9);
 	}
 	return cursor;

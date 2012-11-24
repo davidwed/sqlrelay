@@ -13,9 +13,9 @@ void sqlrcontroller_svr::incrementClientSessionCount() {
 	}
 
 	semset->waitWithUndo(9);
-	statistics->open_cli_connections++;
+	stats->open_cli_connections++;
 	inclientsession=true;
-	statistics->opened_cli_connections++;
+	stats->opened_cli_connections++;
 	semset->signalWithUndo(9);
 
 	dbgfile.debugPrint("connection",0,"done incrementing client session count...");
@@ -31,10 +31,10 @@ void sqlrcontroller_svr::decrementClientSessionCount() {
 	}
 
 	semset->waitWithUndo(9);
-	statistics->open_cli_connections--;
+	stats->open_cli_connections--;
 	inclientsession=false;
-	if (statistics->open_cli_connections<0) {
-		statistics->open_cli_connections=0;
+	if (stats->open_cli_connections<0) {
+		stats->open_cli_connections=0;
 	}
 	semset->signalWithUndo(9);
 

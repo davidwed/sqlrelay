@@ -34,9 +34,9 @@ void sqlrcontroller_svr::closeCursors(bool destroy) {
 void sqlrcontroller_svr::deleteCursor(sqlrcursor_svr *curs) {
 	conn->deleteCursor(curs);
 	semset->waitWithUndo(9);
-	statistics->open_svr_cursors--;
-	if (statistics->open_svr_cursors<0) {
-		statistics->open_svr_cursors=0;
+	stats->open_svr_cursors--;
+	if (stats->open_svr_cursors<0) {
+		stats->open_svr_cursors=0;
 	}
 	semset->signalWithUndo(9);
 }

@@ -18,6 +18,20 @@ class sqlrcmdgstatcursor : public sqlrquerycursor {
 			sqlrcmdgstatcursor(sqlrconnection_svr *sqlrcon,
 					rudiments::xmldomnode *parameters);
 
+		bool		executeQuery(const char *query,
+						uint32_t length);
+		uint32_t	colCount();
+		const char * const	*columnNames();
+		const char		*getColumnName(uint32_t col);
+		bool		noRowsToReturn();
+		bool		fetchRow();
+		void		getField(uint32_t col,
+					const char **field,
+					uint64_t *fieldlength,
+					bool *blob, bool *null);
+	private:
+		uint64_t	currentrow;
+
 };
 
 #endif
