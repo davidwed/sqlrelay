@@ -10,7 +10,7 @@ void sqlrcontroller_svr::clientSession() {
 
 	dbgfile.debugPrint("connection",0,"client session...");
 
-	setState(SESSION_START);
+	updateState(SESSION_START);
 
 	incrementClientSessionCount();
 
@@ -154,7 +154,7 @@ bool sqlrcontroller_svr::getCommand(uint16_t *command) {
 
 	dbgfile.debugPrint("connection",1,"getting command...");
 
-	setState(GET_COMMAND);
+	updateState(GET_COMMAND);
 
 	// get the command
 	if (clientsock->read(command,idleclienttimeout,0)!=sizeof(uint16_t)) {

@@ -7,7 +7,7 @@ bool sqlrcontroller_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 
 	dbgfile.debugPrint("connection",2,"returning result set data...");
 
-	setState(RETURN_RESULT_SET);
+	updateState(RETURN_RESULT_SET);
 
 	// decide whether to use the cursor itself
 	// or an attached custom query cursor

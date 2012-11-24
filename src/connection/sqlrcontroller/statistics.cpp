@@ -14,7 +14,7 @@ void sqlrcontroller_svr::initConnStats() {
 		connstats=&shm->connstats[handoffindex];
 		clearConnStats();
 		connstats->processid=process::getProcessId();
-		setState(INIT);
+		updateState(INIT);
 		connstats->index=handoffindex;
 		connstats->logged_in_tv.tv_sec=loggedinsec;
 		connstats->logged_in_tv.tv_usec=loggedinusec;
@@ -28,7 +28,7 @@ void sqlrcontroller_svr::clearConnStats() {
 	rawbuffer::zero(connstats,sizeof(struct sqlrconnstatistics));
 }
 
-void sqlrcontroller_svr::setState(enum sqlrconnectionstate state) {
+void sqlrcontroller_svr::updateState(enum sqlrconnectionstate state) {
 	if (!connstats) {
 		return;
 	}
@@ -36,31 +36,32 @@ void sqlrcontroller_svr::setState(enum sqlrconnectionstate state) {
 	gettimeofday(&connstats->state_start_tv,NULL);
 }
 
-void sqlrcontroller_svr::setCurrentQuery(sqlrcursor_svr *cursor) {
+void sqlrcontroller_svr::updateCurrentQuery(const char *query,
+						uint32_t querylen) {
 	if (!connstats) {
 		return;
 	}
-	uint32_t	len=cursor->querylength;
+	uint32_t	len=querylen;
 	if (len>STATSQLTEXTLEN) {
 		len=STATSQLTEXTLEN;
 	}
-	charstring::copy(connstats->sqltext,cursor->querybuffer,len);
+	charstring::copy(connstats->sqltext,query,len);
 	connstats->sqltext[len]='\0';
 }
 
-void sqlrcontroller_svr::setClientInfo() {
+void sqlrcontroller_svr::updateClientInfo(const char *info, uint32_t infolen) {
 	if (!connstats) {
 		return;
 	}
-	uint64_t	len=clientinfolen;
+	uint64_t	len=infolen;
 	if (len>STATCLIENTINFOLEN) {
 		len=STATCLIENTINFOLEN;
 	}
-	charstring::copy(connstats->clientinfo,clientinfo,len);
+	charstring::copy(connstats->clientinfo,info,len);
 	connstats->clientinfo[len]='\0';
 }
 
-void sqlrcontroller_svr::setClientAddr() {
+void sqlrcontroller_svr::updateClientAddr() {
 	if (!connstats) {
 		return;
 	}

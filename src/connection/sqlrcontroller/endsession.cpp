@@ -7,7 +7,7 @@ void sqlrcontroller_svr::endSession() {
 
 	dbgfile.debugPrint("connection",2,"ending session...");
 
-	setState(SESSION_END);
+	updateState(SESSION_END);
 
 	dbgfile.debugPrint("connection",2,"aborting all cursors...");
 	for (int32_t i=0; i<cursorcount; i++) {

@@ -58,7 +58,7 @@ void sqlrcontroller_svr::announceAvailability(const char *tmpdir,
 		signalmanager::alarm(0);
 	}
 
-	setState(ANNOUNCE_AVAILABILITY);
+	updateState(ANNOUNCE_AVAILABILITY);
 
 	// get a pointer to the shared memory segment
 	shmdata	*idmemoryptr=getAnnounceBuffer();

@@ -208,7 +208,13 @@ void sqlrcmdcstatcursor::getField(uint32_t col,
 			*fieldlength=charstring::length(*field);
 			return;
 		case 7:
-			// sql_text
+			// client info -
+			// client info string
+			*field=cs->clientinfo;
+			*fieldlength=charstring::length(*field);
+			return;
+		case 8:
+			// sql_text -
 			// query currently being executed
 			*field=cs->sqltext;
 			*fieldlength=charstring::length(*field);

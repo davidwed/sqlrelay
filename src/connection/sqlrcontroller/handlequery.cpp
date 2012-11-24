@@ -126,7 +126,7 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 		}
 	}
 
-	setState((usingcustomquerycursor)?PROCESS_CUSTOM:PROCESS_SQL);
+	updateState((usingcustomquerycursor)?PROCESS_CUSTOM:PROCESS_SQL);
 
 	// loop here to handle down databases
 	for (;;) {
@@ -256,7 +256,7 @@ bool sqlrcontroller_svr::getClientInfo(sqlrcursor_svr *cursor) {
 	dbgfile.debugPrint("connection",2,"getting clientinfo succeeded");
 
 	// update the stats with the client info
-	setClientInfo();
+	updateClientInfo(clientinfo,clientinfolen);
 
 	return true;
 }
@@ -313,7 +313,7 @@ bool sqlrcontroller_svr::getQuery(sqlrcursor_svr *cursor) {
 	dbgfile.debugPrint("connection",2,"getting query succeeded");
 
 	// update the stats with the current query
-	setCurrentQuery(cursor);
+	updateCurrentQuery(cursor->querybuffer,cursor->querylength);
 
 	return true;
 }

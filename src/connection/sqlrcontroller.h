@@ -340,10 +340,12 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 
 		void	initConnStats();
 		void	clearConnStats();
-		void	setState(enum sqlrconnectionstate state);
-		void	setCurrentQuery(sqlrcursor_svr *cursor);
-		void	setClientInfo();
-		void	setClientAddr();
+		void	updateState(enum sqlrconnectionstate state);
+		void	updateCurrentQuery(const char *query,
+						uint32_t querylen);
+		void	updateClientInfo(const char *info,
+						uint32_t infolen);
+		void	updateClientAddr();
 		void	incrementOpenServerConnections();
 		void	decrementOpenServerConnections();
 		void	incrementOpenClientConnections();
