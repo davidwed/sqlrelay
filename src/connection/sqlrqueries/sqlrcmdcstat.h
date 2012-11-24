@@ -9,12 +9,31 @@
 class sqlrcmdcstat : public sqlrquery {
 	public:
 			sqlrcmdcstat(rudiments::xmldomnode *parameters);
+		bool	match(const char *querystring, uint32_t querylength);
+		sqlrquerycursor	*getCursor(sqlrconnection_svr *conn);
+};
 
-		bool	init(sqlrconnection_svr *sqlrcon);
-		bool	match(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
-						const char *querystring,
-						uint32_t querylength);
+class sqlrcmdcstatcursor : public sqlrquerycursor {
+	public:
+			sqlrcmdcstatcursor(sqlrconnection_svr *sqlrcon,
+					rudiments::xmldomnode *parameters);
+
+		bool		executeQuery(const char *query,
+						uint32_t length);
+		bool		knowsRowCount();
+		uint64_t	rowCount();
+		uint32_t	colCount();
+		const char * const	*columnNames();
+		const char		*getColumnName(uint32_t col);
+		bool		noRowsToReturn();
+		bool		fetchRow();
+		void		getField(uint32_t col,
+					const char **field,
+					uint64_t *fieldlength,
+					bool *blob, bool *null);
+	private:
+		uint64_t	currentrow;
+
 };
 
 #endif

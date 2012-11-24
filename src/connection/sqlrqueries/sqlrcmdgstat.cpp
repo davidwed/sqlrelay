@@ -3,6 +3,7 @@
 
 #include <sqlrqueries/sqlrcmdgstat.h>
 #include <rudiments/charstring.h>
+#include <debugprint.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
@@ -15,15 +16,21 @@ extern "C" {
 }
 
 sqlrcmdgstat::sqlrcmdgstat(xmldomnode *parameters) : sqlrquery(parameters) {
+	debugFunction();
 }
 
-bool sqlrcmdgstat::init(sqlrconnection_svr *sqlrcon) {
-	return true;
-}
-
-bool sqlrcmdgstat::match(sqlrconnection_svr *sqlrcon,
-				sqlrcursor_svr *sqlrcur,
-				const char *querystring,
+bool sqlrcmdgstat::match(const char *querystring,
 				uint32_t querylength) {
+	debugFunction();
 	return !charstring::compareIgnoringCase(querystring,"sqlrcmd gstat");
+}
+
+sqlrquerycursor *sqlrcmdgstat::getCursor(sqlrconnection_svr *sqlrcon) {
+	return new sqlrcmdgstatcursor(sqlrcon,parameters);
+}
+
+sqlrcmdgstatcursor::sqlrcmdgstatcursor(
+		sqlrconnection_svr *sqlrcon,xmldomnode *parameters) :
+					sqlrquerycursor(sqlrcon,parameters) {
+printf("sqlrcmd gstat!\n");
 }

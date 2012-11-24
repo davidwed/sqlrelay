@@ -25,7 +25,6 @@ class sqlrqueries {
 
 		bool		loadQueries(const char *queries);
 		sqlrquerycursor	*match(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
 						const char *querystring,
 						uint32_t querylength);
 	private:

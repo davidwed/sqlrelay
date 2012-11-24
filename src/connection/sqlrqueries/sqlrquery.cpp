@@ -17,14 +17,11 @@ sqlrquery::sqlrquery(xmldomnode *parameters) {
 sqlrquery::~sqlrquery() {
 }
 
-bool sqlrquery::match(sqlrconnection_svr *sqlrcon,
-				sqlrcursor_svr *sqlrcur,
-				const char *querystring,
-				uint32_t querylength) {
+bool sqlrquery::match(const char *querystring, uint32_t querylength) {
 	return false;
 }
 
-sqlrquerycursor *sqlrquery::getCursor() {
+sqlrquerycursor *sqlrquery::getCursor(sqlrconnection_svr *conn) {
 	return NULL;
 }
 

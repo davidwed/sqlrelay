@@ -126,15 +126,14 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 }
 
 sqlrquerycursor *sqlrqueries::match(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
 					const char *querystring,
 					uint32_t querylength) {
 	debugFunction();
 	for (linkedlistnode< sqlrqueryplugin * > *node=llist.getFirstNode();
 						node; node=node->getNext()) {
 		sqlrquery	*qr=node->getData()->qr;
-		if (qr->match(sqlrcon,sqlrcur,querystring,querylength)) {
-			return qr->getCursor();
+		if (qr->match(querystring,querylength)) {
+			return qr->getCursor(sqlrcon);
 		}
 	}
 	return NULL;

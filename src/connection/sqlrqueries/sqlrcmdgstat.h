@@ -9,12 +9,15 @@
 class sqlrcmdgstat : public sqlrquery {
 	public:
 			sqlrcmdgstat(rudiments::xmldomnode *parameters);
+		bool	match(const char *querystring, uint32_t querylength);
+		sqlrquerycursor	*getCursor(sqlrconnection_svr *conn);
+};
 
-		bool	init(sqlrconnection_svr *sqlrcon);
-		bool	match(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
-						const char *querystring,
-						uint32_t querylength);
+class sqlrcmdgstatcursor : public sqlrquerycursor {
+	public:
+			sqlrcmdgstatcursor(sqlrconnection_svr *sqlrcon,
+					rudiments::xmldomnode *parameters);
+
 };
 
 #endif

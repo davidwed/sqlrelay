@@ -438,6 +438,12 @@ void sqlrcursor_svr::cleanUpData(bool freeresult, bool freebinds) {
 }
 
 bool sqlrcursor_svr::getColumnNameList(stringbuffer *output) {
+	for (uint32_t i=0; i<colCount(); i++) {
+		if (i) {
+			output->append(',');
+		}
+		output->append(getColumnName(i),getColumnNameLength(i));
+	}
 	return true;
 }
 

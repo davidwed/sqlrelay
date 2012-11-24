@@ -72,9 +72,9 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 			// handler for this query?
 			if (success && sqlrq) {
 				cursor->customquerycursor=
-					sqlrq->match(conn,cursor,
-							cursor->querybuffer,
-							cursor->querylength);
+					sqlrq->match(conn,
+						cursor->querybuffer,
+						cursor->querylength);
 				
 			}
 

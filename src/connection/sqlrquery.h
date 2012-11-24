@@ -18,11 +18,9 @@ class sqlrquery {
 			sqlrquery(rudiments::xmldomnode *parameters);
 		virtual	~sqlrquery();
 
-		virtual bool	match(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
-						const char *querystring,
+		virtual bool	match(const char *querystring,
 						uint32_t querylength);
-		virtual sqlrquerycursor	*getCursor();
+		virtual sqlrquerycursor	*getCursor(sqlrconnection_svr *sqlrcon);
 	protected:
 		rudiments::xmldomnode	*parameters;
 };
