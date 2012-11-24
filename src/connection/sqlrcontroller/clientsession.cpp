@@ -10,6 +10,8 @@ void sqlrcontroller_svr::clientSession() {
 
 	dbgfile.debugPrint("connection",0,"client session...");
 
+	setState(SESSION_START);
+
 	incrementClientSessionCount();
 
 	// During each session, the client will send a series of commands.
@@ -27,8 +29,7 @@ void sqlrcontroller_svr::clientSession() {
 
 		// get the command start time
 		timeval		tv;
-		struct timezone	tz;
-		gettimeofday(&tv,&tz);
+		gettimeofday(&tv,NULL);
 
 		// these commands are all handled at the connection level
 		if (command==AUTHENTICATE) {
@@ -120,7 +121,7 @@ void sqlrcontroller_svr::clientSession() {
 		}
 
 		// get the command end-time
-		gettimeofday(&tv,&tz);
+		gettimeofday(&tv,NULL);
 		cursor->commandendsec=tv.tv_sec;
 		cursor->commandendusec=tv.tv_usec;
 
@@ -152,6 +153,8 @@ void sqlrcontroller_svr::clientSession() {
 bool sqlrcontroller_svr::getCommand(uint16_t *command) {
 
 	dbgfile.debugPrint("connection",1,"getting command...");
+
+	setState(GET_COMMAND);
 
 	// get the command
 	if (clientsock->read(command,idleclienttimeout,0)!=sizeof(uint16_t)) {

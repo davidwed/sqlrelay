@@ -65,7 +65,6 @@ class sqlitecursor : public sqlrcursor_svr {
 		uint64_t	rowCount();
 		bool		knowsAffectedRows();
 		uint32_t	colCount();
-		const char * const * columnNames();
 		const char	*getColumnName(uint32_t col);
 		bool		noRowsToReturn();
 		bool		skipRow();

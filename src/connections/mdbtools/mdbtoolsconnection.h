@@ -36,7 +36,6 @@ class mdbtoolscursor : public sqlrcursor_svr {
 						uint32_t length);
 		bool		knowsAffectedRows();
 		uint32_t	colCount();
-		const char * const * columnNames();
 		const char	*getColumnName(uint32_t col);
 		bool		noRowsToReturn();
 		bool		fetchRow();
@@ -54,8 +53,6 @@ class mdbtoolscursor : public sqlrcursor_svr {
 		bool		matchCurrentWild(const char *value);
 
 		mdbtoolsconnection	*mdbtoolsconn;
-
-		char	**columnnames;
 
 		void		*mdbsql;
 

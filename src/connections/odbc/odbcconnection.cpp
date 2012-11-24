@@ -1180,13 +1180,6 @@ uint32_t odbccursor::colCount() {
 	return ncols;
 }
 
-const char * const * odbccursor::columnNames() {
-	for (SQLSMALLINT i=0; i<ncols; i++) {
-		columnnames[i]=col[i].name;
-	}
-	return columnnames;
-}
-
 const char *odbccursor::getColumnName(uint32_t i) {
 	return col[i].name;
 }

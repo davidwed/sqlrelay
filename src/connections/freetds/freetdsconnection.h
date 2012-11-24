@@ -104,7 +104,6 @@ class freetdscursor : public sqlrcursor_svr {
 		bool		knowsAffectedRows();
 		uint64_t	affectedRows();
 		uint32_t	colCount();
-		const char * const * columnNames();
 		const char	*getColumnName(uint32_t col);
 		uint16_t	getColumnType(uint32_t col);
 		uint32_t	getColumnLength(uint32_t col);
@@ -162,7 +161,6 @@ class freetdscursor : public sqlrcursor_svr {
 		uint16_t	outbindindex;
 
 		CS_DATAFMT	column[MAX_SELECT_LIST_SIZE];
-		char		*columnnames[MAX_SELECT_LIST_SIZE];
 		char		data[MAX_SELECT_LIST_SIZE]
 					[FETCH_AT_ONCE]
 					[MAX_ITEM_BUFFER_SIZE];

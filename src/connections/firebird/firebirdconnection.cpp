@@ -930,13 +930,6 @@ uint32_t firebirdcursor::colCount() {
 	return outsqlda->sqld;
 }
 
-const char * const *firebirdcursor::columnNames() {
-	for (short i=0; i<outsqlda->sqld; i++) {
-		columnnames[i]=outsqlda->sqlvar[i].aliasname;
-	}
-	return columnnames;
-}
-
 const char *firebirdcursor::getColumnName(uint32_t col) {
 	return outsqlda->sqlvar[col].aliasname;
 }

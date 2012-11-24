@@ -146,7 +146,6 @@ class routercursor : public sqlrcursor_svr {
 		uint64_t	rowCount();
 		uint64_t	affectedRows();
 		uint32_t	colCount();
-		const char * const * columnNames();
 		uint16_t	columnTypeFormat();
 		const char	*getColumnName(uint32_t col);
 		const char	*getColumnTypeName(uint32_t col);

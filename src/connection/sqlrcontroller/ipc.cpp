@@ -70,6 +70,7 @@ void sqlrcontroller_svr::waitForListenerToRequireAConnection() {
 
 void sqlrcontroller_svr::acquireAnnounceMutex() {
 	dbgfile.debugPrint("connection",1,"acquiring announce mutex");
+	setState(WAIT_SEMAPHORE);
 	semset->waitWithUndo(0);
 	dbgfile.debugPrint("connection",1,"done acquiring announce mutex");
 }

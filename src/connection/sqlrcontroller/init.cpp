@@ -10,6 +10,9 @@
 #include <rudiments/snooze.h>
 #include <rudiments/rawbuffer.h>
 
+// for gettimeofday()
+#include <sys/time.h>
+
 bool sqlrcontroller_svr::init(int argc, const char **argv,
 					sqlrconnection_svr *conn) {
 
@@ -318,6 +321,8 @@ void sqlrcontroller_svr::initDatabaseAvailableFileName() {
 bool sqlrcontroller_svr::attemptLogIn(bool printerrors) {
 
 	dbgfile.debugPrint("connection",0,"logging in...");
+
+	// log in
 	if (!logIn(printerrors)) {
 		dbgfile.debugPrint("connection",0,"log in failed");
 		if (printerrors) {
@@ -325,6 +330,13 @@ bool sqlrcontroller_svr::attemptLogIn(bool printerrors) {
 		}
 		return false;
 	}
+
+	// get stats
+	struct timeval	tv;
+	gettimeofday(&tv,NULL);
+	loggedinsec=tv.tv_sec;
+	loggedinusec=tv.tv_usec;
+
 	dbgfile.debugPrint("connection",0,"done logging in");
 	return true;
 }

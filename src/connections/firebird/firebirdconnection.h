@@ -111,7 +111,6 @@ class firebirdcursor : public sqlrcursor_svr {
 		bool		queryIsCommitOrRollback();
 		bool		knowsAffectedRows();
 		uint32_t	colCount();
-		const char * const * columnNames();
 		const char	*getColumnName(uint32_t col);
 		uint16_t	getColumnNameLength(uint32_t col);
 		uint16_t	getColumnType(uint32_t col);
@@ -133,7 +132,6 @@ class firebirdcursor : public sqlrcursor_svr {
 		datebind	outdatebind[MAX_BIND_VARS];
 		
 		XSQLDA	ISC_FAR	*outsqlda;
-		char		*columnnames[MAX_SELECT_LIST_SIZE];
 		XSQLDA	ISC_FAR	*insqlda;
 		ISC_BLOB_DESC	to_desc;
 

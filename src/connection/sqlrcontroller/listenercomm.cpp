@@ -58,6 +58,8 @@ void sqlrcontroller_svr::announceAvailability(const char *tmpdir,
 		signalmanager::alarm(0);
 	}
 
+	setState(ANNOUNCE_AVAILABILITY);
+
 	// get a pointer to the shared memory segment
 	shmdata	*idmemoryptr=getAnnounceBuffer();
 
@@ -140,9 +142,9 @@ void sqlrcontroller_svr::registerForHandoff(const char *tmpdir) {
 		snooze::macrosnooze(1);
 	}
 
-	// get the per-connection statistics buffer
-	if (connected && handoffindex<STATMAXCONNECTIONS) {
-		connstats=&shm->connstats[handoffindex];
+	// initialize the per-connection statistics buffer
+	if (connected) {
+		initConnStats();
 	}
 
 	dbgfile.debugPrint("connection",0,"done registering for handoff");

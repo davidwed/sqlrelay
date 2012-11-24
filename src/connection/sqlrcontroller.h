@@ -338,6 +338,13 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 
 		void	flushWriteBuffer();
 
+		void	initConnStats();
+		void	clearConnStats();
+		void	setState(enum sqlrconnectionstate state);
+		void	setCurrentQuery(sqlrcursor_svr *cursor);
+		void	setClientInfo();
+		void	setClientAddr();
+
 		const char	*user;
 		const char	*password;
 
@@ -458,6 +465,9 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		uint32_t	maxstringbindvaluelength;
 		uint32_t	maxlobbindvaluelength;
 		uint32_t	maxerrorlength;
+
+		int64_t		loggedinsec;
+		int64_t		loggedinusec;
 };
 
 

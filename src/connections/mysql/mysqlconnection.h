@@ -80,7 +80,6 @@ class mysqlcursor : public sqlrcursor_svr {
 		uint64_t	rowCount();
 		uint64_t	affectedRows();
 		uint32_t	colCount();
-		const char * const * columnNames();
 		const char	*getColumnName(uint32_t col);
 		uint16_t	getColumnType(uint32_t col);
 		uint32_t	getColumnLength(uint32_t col);
@@ -110,7 +109,6 @@ class mysqlcursor : public sqlrcursor_svr {
 		my_ulonglong	nrows;
 		my_ulonglong	affectedrows;
 		int		queryresult;
-		char		**columnnames;
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		MYSQL_STMT	*stmt;

@@ -1060,7 +1060,6 @@ void oracle8cursor::allocateResultSetBuffers(uint32_t fetchatonce,
 	if (selectlistsize==-1) {
 		resultsetbuffercount=0;
 		desc=NULL;
-		columnnames=NULL;
 		def=NULL;
 		def_lob=NULL;
 		def_buf=NULL;
@@ -1070,7 +1069,6 @@ void oracle8cursor::allocateResultSetBuffers(uint32_t fetchatonce,
 	} else {
 		resultsetbuffercount=selectlistsize;
 		desc=new describe[resultsetbuffercount];
-		columnnames=new char *[resultsetbuffercount];
 		def=new OCIDefine *[resultsetbuffercount];
 		def_lob=new OCILobLocator **[resultsetbuffercount];
 		def_buf=new ub1 *[resultsetbuffercount];
@@ -1108,7 +1106,6 @@ void oracle8cursor::deallocateResultSetBuffers() {
 		delete[] def_buf;
 		delete[] def;
 		delete[] desc;
-		delete[] columnnames;
 		resultsetbuffercount=0;
 	}
 }
@@ -2345,13 +2342,6 @@ uint64_t oracle8cursor::affectedRows() {
 
 uint32_t oracle8cursor::colCount() {
 	return ncols;
-}
-
-const char * const * oracle8cursor::columnNames() {
-	for (sword i=0; i<ncols; i++) {
-		columnnames[i]=(char *)desc[i].buf;
-	}
-	return columnnames;
 }
 
 const char *oracle8cursor::getColumnName(uint32_t col) {

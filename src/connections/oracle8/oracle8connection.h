@@ -195,7 +195,6 @@ class oracle8cursor : public sqlrcursor_svr {
 						bool *liveconnection);
 		uint64_t	affectedRows();
 		uint32_t	colCount();
-		const char * const * columnNames();
 		const char	*getColumnName(uint32_t col);
 		uint16_t	getColumnNameLength(uint32_t col);
 		uint16_t	getColumnType(uint32_t col);
@@ -245,7 +244,6 @@ class oracle8cursor : public sqlrcursor_svr {
 
 		int32_t		resultsetbuffercount;
 		describe	*desc;
-		char		**columnnames;
 		OCIDefine	**def;
 		OCILobLocator	***def_lob;
 		ub1		**def_buf;

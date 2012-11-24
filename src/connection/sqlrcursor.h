@@ -173,7 +173,6 @@ class sqlrcursor_svr {
 		virtual uint64_t	affectedRows();
 		virtual	uint32_t	colCount();
 		virtual uint16_t	columnTypeFormat();
-		virtual const char * const * columnNames();
 		virtual const char	*getColumnName(uint32_t col);
 		virtual uint16_t	getColumnNameLength(uint32_t col);
 		virtual uint16_t	getColumnType(uint32_t col);

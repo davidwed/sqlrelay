@@ -21,8 +21,7 @@ class sqlrcmdgstatcursor : public sqlrquerycursor {
 		bool		executeQuery(const char *query,
 						uint32_t length);
 		uint32_t	colCount();
-		const char * const	*columnNames();
-		const char		*getColumnName(uint32_t col);
+		const char	*getColumnName(uint32_t col);
 		bool		noRowsToReturn();
 		bool		fetchRow();
 		void		getField(uint32_t col,

@@ -1074,16 +1074,6 @@ uint32_t sybasecursor::colCount() {
 	return ncols;
 }
 
-const char * const * sybasecursor::columnNames() {
-	for (CS_INT i=0; i<ncols; i++) {
-		if (ct_describe(cmd,i+1,&column[i])!=CS_SUCCEED) {
-			break;
-		}
-		columnnames[i]=column[i].name;
-	}
-	return columnnames;
-}
-
 const char *sybasecursor::getColumnName(uint32_t col) {
 	return column[col].name;
 }

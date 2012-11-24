@@ -197,7 +197,7 @@ enum sqlrconnectionstate {
 	SESSION_START,
 	GET_COMMAND,
 	PROCESS_SQL,
-	PROCESS_SQLRCMD,
+	PROCESS_CUSTOM,
 	RETURN_RESULT_SET,
 	SESSION_END,
 	ANNOUNCE_AVAILABILITY,
@@ -227,10 +227,11 @@ struct sqlrconnstatistics {
 	uint32_t			nsqlrcmd;
 	uint64_t			nsql;
 	uint32_t			nrelogin;
+	struct timeval			logged_in_tv;
 	struct timeval			state_start_tv;
 	struct timeval			processclient_tv;
 	struct timeval			processquery_tv;
-	struct sockaddr			clientaddr;
+	char				clientaddr[16];
 	char				clientinfo[STATCLIENTINFOLEN+1];
 	char				sqltext[STATSQLTEXTLEN+1];
 };

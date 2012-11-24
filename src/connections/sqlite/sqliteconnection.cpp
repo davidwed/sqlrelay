@@ -416,10 +416,6 @@ uint32_t sqlitecursor::colCount() {
 	return ncolumn;
 }
 
-const char * const * sqlitecursor::columnNames() {
-	return columnnames;
-}
-
 const char *sqlitecursor::getColumnName(uint32_t col) {
 	return columnnames[col];
 }

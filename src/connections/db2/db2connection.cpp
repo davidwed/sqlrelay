@@ -738,13 +738,6 @@ uint32_t db2cursor::colCount() {
 	return ncols;
 }
 
-const char * const *db2cursor::columnNames() {
-	for (SQLSMALLINT i=0; i<ncols; i++) {
-		columnnames[i]=col[i].name;
-	}
-	return columnnames;
-}
-
 const char *db2cursor::getColumnName(uint32_t i) {
 	return col[i].name;
 }

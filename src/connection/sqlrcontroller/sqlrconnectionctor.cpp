@@ -85,4 +85,7 @@ sqlrcontroller_svr::sqlrcontroller_svr() : daemonprocess(), listener() {
 
 	decrementonclose=false;
 	silent=false;
+
+	loggedinsec=0;
+	loggedinusec=0;
 }

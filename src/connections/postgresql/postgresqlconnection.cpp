@@ -364,7 +364,6 @@ postgresqlcursor::postgresqlcursor(sqlrconnection_svr *conn) :
 	bindlengths=NULL;
 	bindformats=NULL;
 #endif
-	columnnames=NULL;
 }
 
 postgresqlcursor::~postgresqlcursor() {
@@ -380,8 +379,6 @@ postgresqlcursor::~postgresqlcursor() {
 	delete[] bindlengths;
 	delete[] bindformats;
 #endif
-
-	delete[] columnnames;
 }
 
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
@@ -652,14 +649,6 @@ uint64_t postgresqlcursor::affectedRows() {
 
 uint32_t postgresqlcursor::colCount() {
 	return ncols;
-}
-
-const char * const * postgresqlcursor::columnNames() {
-	columnnames=new char *[ncols];
-	for (int32_t i=0; i<ncols; i++) {
-		columnnames[i]=PQfname(pgresult,i);
-	}
-	return columnnames;
 }
 
 uint16_t postgresqlcursor::columnTypeFormat() {
@@ -1005,6 +994,4 @@ void postgresqlcursor::cleanUpData(bool freeresult, bool freebinds) {
 		PQclear(pgresult);
 		pgresult=(PGresult *)NULL;
 	}
-	delete[] columnnames;
-	columnnames=NULL;
 }

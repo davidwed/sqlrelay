@@ -5,6 +5,9 @@
 #include <rudiments/charstring.h>
 #include <debugprint.h>
 
+// for gettimeofday
+#include <sys/time.h>
+
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
@@ -33,6 +36,12 @@ sqlrcmdcstatcursor::sqlrcmdcstatcursor(
 		sqlrconnection_svr *sqlrcon,xmldomnode *parameters) :
 					sqlrquerycursor(sqlrcon,parameters) {
 	currentrow=0;
+	fieldbuffer=NULL;
+	cs=NULL;
+}
+
+sqlrcmdcstatcursor::~sqlrcmdcstatcursor() {
+	delete[] fieldbuffer;
 }
 
 bool sqlrcmdcstatcursor::executeQuery(const char *query, uint32_t length) {
@@ -41,27 +50,47 @@ bool sqlrcmdcstatcursor::executeQuery(const char *query, uint32_t length) {
 }
 
 uint32_t sqlrcmdcstatcursor::colCount() {
-	return 8;
+	return 9;
 }
 
-static const char * const colnames[]={
-	"INDEX",
-	"MINE",
-	"PROCESSID",
-	"CONNECT",
-	"STATE",
-	"STATE_TIME",
-	"CLIENT_ADDR",
-	"SQL_TEXT",
-	NULL
+struct colinfo_t {
+	const char	*name;
+	uint16_t	type;
+	uint32_t	length;
+	uint32_t	precision;
+	uint32_t	scale;
 };
 
-const char * const * sqlrcmdcstatcursor::columnNames() {
-	return colnames;
-}
+static struct colinfo_t colinfo[]={
+	{"INDEX",NUMBER_DATATYPE,10,10,0},
+	{"MINE",VARCHAR2_DATATYPE,1,0,0},
+	{"PROCESSID",NUMBER_DATATYPE,10,10,0},
+	{"CONNECT",NUMBER_DATATYPE,12,12,2},
+	{"STATE",VARCHAR2_DATATYPE,25,0,0},
+	{"STATE_TIME",NUMBER_DATATYPE,12,12,2},
+	{"CLIENT_ADDR",VARCHAR2_DATATYPE,24,0,0},
+	{"CLIENT_INFO",VARCHAR2_DATATYPE,STATCLIENTINFOLEN,0,0},
+	{"SQL_TEXT",VARCHAR2_DATATYPE,STATSQLTEXTLEN,0,0}
+};
 
 const char *sqlrcmdcstatcursor::getColumnName(uint32_t col) {
-	return (col<8)?colnames[col]:NULL;
+	return (col<9)?colinfo[col].name:NULL;
+}
+
+uint16_t sqlrcmdcstatcursor::getColumnType(uint32_t col) {
+	return (col<9)?colinfo[col].type:NULL;
+}
+
+uint32_t sqlrcmdcstatcursor::getColumnLength(uint32_t col) {
+	return (col<9)?colinfo[col].length:NULL;
+}
+
+uint32_t sqlrcmdcstatcursor::getColumnPrecision(uint32_t col) {
+	return (col<9)?colinfo[col].precision:NULL;
+}
+
+uint32_t sqlrcmdcstatcursor::getColumnScale(uint32_t col) {
+	return (col<9)?colinfo[col].scale:NULL;
 }
 
 bool sqlrcmdcstatcursor::noRowsToReturn() {
@@ -69,29 +98,126 @@ bool sqlrcmdcstatcursor::noRowsToReturn() {
 }
 
 bool sqlrcmdcstatcursor::fetchRow() {
-	// FIXME: return one row for each connection
-	if (currentrow<4) {
+	while (currentrow<STATMAXCONNECTIONS) {
+		cs=&(conn->cont->shm->connstats[currentrow]);
 		currentrow++;
-		return true;
+		if (cs->processid) {
+			return true;
+		}
 	}
 	return false;
 }
+
+static const char * const statenames[]={
+	"NOT_AVAILABLE",
+	"INIT",
+	"WAIT_FOR_AVAIL_DB",
+	"WAIT_CLIENT",
+	"SESSION_START",
+	"GET_COMMAND",
+	"PROCESS_SQL",
+	"PROCESS_CUSTOM",
+	"RETURN_RESULT_SET",
+	"END_SESSION",
+	"ANNOUNCE_AVAILABILITY",
+	"WAIT_SEMAPHORE",
+	NULL
+};
 
 void sqlrcmdcstatcursor::getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
 					bool *blob,
 					bool *null) {
-	// FIXME: pull values from conn_svr_status in shared memory
+	*field=NULL;
+	*fieldlength=0;
 	*blob=false;
+	*null=false;
 
-	if (col>7) {
-		*null=true;
-		*field="";
-		*fieldlength=0;
+	delete[] fieldbuffer;
+	fieldbuffer=NULL;
+
+	switch (col) {
+		case 0:
+			// index -
+			// index assigned by listener
+			fieldbuffer=charstring::parseNumber(cs->index);
+			break;
+		case 1:
+			// mine -
+			// * if the connection is processing this command
+			if (cs->index==conn->cont->handoffindex) {
+				*field="*";
+				*fieldlength=1;
+			} else {
+				*null=true;
+			}
+			return;
+		case 2:
+			// processid -
+			// pid of the connection
+			fieldbuffer=charstring::parseNumber(cs->processid);
+			break;
+		case 3:
+			{
+			// connect -
+			// number of seconds since db connection established
+			double	conntime=0.0;
+			if (cs->logged_in_tv.tv_sec!=0) {
+				struct timeval	now;
+				gettimeofday(&now,NULL);
+				conntime=((double)(now.tv_sec-
+						cs->logged_in_tv.tv_sec))+
+					((double)(now.tv_usec-
+						cs->logged_in_tv.tv_usec))/
+						1000000.0;
+			}
+			fieldbuffer=charstring::parseNumber(conntime,
+					colinfo[3].precision,colinfo[3].scale);
+			}
+			break;
+		case 4:
+			// state -
+			// internally defined status
+			if (cs->state<=WAIT_SEMAPHORE) {
+				*field=statenames[cs->state];
+				*fieldlength=charstring::length(*field);
+				return;
+			}
+			*null=true;
+			return;
+		case 5:
+			{
+			// state_time -
+			// seconds the connection has been in its current state
+			struct timeval	now;
+			gettimeofday(&now,NULL);
+			double	statetime=
+				((double)(now.tv_sec-
+					cs->state_start_tv.tv_sec))+
+				((double)(now.tv_usec-
+					cs->state_start_tv.tv_usec))/1000000.0;
+			fieldbuffer=charstring::parseNumber(statetime,
+					colinfo[5].precision,colinfo[5].scale);
+			}
+			break;
+		case 6:
+			// client_addr -
+			// address of currently connected client
+			*field=cs->clientaddr;
+			*fieldlength=charstring::length(*field);
+			return;
+		case 7:
+			// sql_text
+			// query currently being executed
+			*field=cs->sqltext;
+			*fieldlength=charstring::length(*field);
+			return;
+		default:
+			*null=true;
+			return;
 	}
 
-	*field="test";
-	*fieldlength=4;
-	*null=false;
+	*field=fieldbuffer;
+	*fieldlength=charstring::length(fieldbuffer);
 }

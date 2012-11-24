@@ -28,6 +28,9 @@ bool sqlrcontroller_svr::listen() {
 
 			if (success==1) {
 
+				// update the stats with the client address
+				setClientAddr();
+
 				suspendedsession=false;
 
 				// have a session with the client
@@ -103,6 +106,8 @@ void sqlrcontroller_svr::waitForAvailableDatabase() {
 
 	dbgfile.debugPrint("connection",0,"waiting for available database...");
 
+	setState(WAIT_FOR_AVAIL_DB);
+
 	if (!availableDatabase()) {
 		reLogIn();
 		markDatabaseAvailable();
@@ -140,6 +145,8 @@ void sqlrcontroller_svr::initSession() {
 int32_t sqlrcontroller_svr::waitForClient() {
 
 	dbgfile.debugPrint("connection",0,"waiting for client...");
+
+	setState(WAIT_CLIENT);
 
 	// FIXME: listen() checks for 2,1,0 or -1 from this method, but this
 	// method only returns 2, 1 or -1.  0 should indicate that a suspended

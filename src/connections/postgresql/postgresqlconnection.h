@@ -60,7 +60,6 @@ class postgresqlcursor : public sqlrcursor_svr {
 		uint64_t	rowCount();
 		uint64_t	affectedRows();
 		uint32_t	colCount();
-		const char * const * columnNames();
 		uint16_t	columnTypeFormat();
 		const char	*getColumnName(uint32_t col);
 		uint16_t	getColumnType(uint32_t col);
@@ -97,8 +96,6 @@ class postgresqlcursor : public sqlrcursor_svr {
 		int		*bindformats;
 		char		*cursorname;
 #endif
-
-		char		**columnnames;
 };
 
 class postgresqlconnection : public sqlrconnection_svr {

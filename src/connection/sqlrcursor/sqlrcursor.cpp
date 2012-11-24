@@ -324,10 +324,6 @@ uint16_t sqlrcursor_svr::columnTypeFormat() {
 	return (uint16_t)COLUMN_TYPE_IDS;
 }
 
-const char * const *sqlrcursor_svr::columnNames() {
-	return NULL;
-}
-
 const char *sqlrcursor_svr::getColumnName(uint32_t col) {
 	return NULL;
 }

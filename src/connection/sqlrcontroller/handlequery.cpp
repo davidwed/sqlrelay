@@ -42,6 +42,7 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 	cursor->cleanUpData(true,true);
 
 	// get the query and bind data from the client...
+	bool	usingcustomquerycursor=false;
 	if (getquery) {
 
 		// re-init buffers
@@ -95,6 +96,8 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 				// reset the rest of this method to use
 				// the custom query cursor
 				cursor=cursor->customquerycursor;
+
+				usingcustomquerycursor=true;
 			}
 		}
 		if (success && !bindcursor) {
@@ -117,6 +120,8 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 			return false;
 		}
 	}
+
+	setState((usingcustomquerycursor)?PROCESS_CUSTOM:PROCESS_SQL);
 
 	// loop here to handle down databases
 	for (;;) {
@@ -245,6 +250,9 @@ bool sqlrcontroller_svr::getClientInfo(sqlrcursor_svr *cursor) {
 	dbgfile.debugPrint("connection",0,clientinfo);
 	dbgfile.debugPrint("connection",2,"getting clientinfo succeeded");
 
+	// update the stats with the client info
+	setClientInfo();
+
 	return true;
 }
 
@@ -298,6 +306,9 @@ bool sqlrcontroller_svr::getQuery(sqlrcursor_svr *cursor) {
 	dbgfile.debugPrint("connection",3,"query:");
 	dbgfile.debugPrint("connection",0,cursor->querybuffer);
 	dbgfile.debugPrint("connection",2,"getting query succeeded");
+
+	// update the stats with the current query
+	setCurrentQuery(cursor);
 
 	return true;
 }

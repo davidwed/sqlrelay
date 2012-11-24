@@ -50,10 +50,6 @@ static const char * const colnames[]={
 	NULL
 };
 
-const char * const * sqlrcmdgstatcursor::columnNames() {
-	return colnames;
-}
-
 const char *sqlrcmdgstatcursor::getColumnName(uint32_t col) {
 	return (col<2)?colnames[col]:NULL;
 }

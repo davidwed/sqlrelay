@@ -809,10 +809,6 @@ uint32_t routercursor::colCount() {
 	return (cur)?cur->colCount():0;
 }
 
-const char * const * routercursor::columnNames() {
-	return (cur)?cur->getColumnNames():0;
-}
-
 uint16_t routercursor::columnTypeFormat() {
 	return (uint16_t)COLUMN_TYPE_NAMES;
 }

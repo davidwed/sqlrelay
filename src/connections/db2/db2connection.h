@@ -116,7 +116,6 @@ class db2cursor : public sqlrcursor_svr {
 						bool *liveconnection);
 		uint64_t	affectedRows();
 		uint32_t	colCount();
-		const char * const * columnNames();
 		const char	*getColumnName(uint32_t i);
 		uint16_t	getColumnNameLength(uint32_t i);
 		uint16_t	getColumnType(uint32_t i);
@@ -151,7 +150,6 @@ class db2cursor : public sqlrcursor_svr {
 		SQLUSMALLINT	rowstat[FETCH_AT_ONCE];
 #endif
 		db2column	col[MAX_SELECT_LIST_SIZE];
-		char		*columnnames[MAX_SELECT_LIST_SIZE];
 
 		datebind	**outdatebind;
 

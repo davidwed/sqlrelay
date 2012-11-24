@@ -125,7 +125,6 @@ void mdbtoolsconnection::errorMessage(char *errorbuffer,
 mdbtoolscursor::mdbtoolscursor(sqlrconnection_svr *conn) :
 					sqlrcursor_svr(conn) {
 	mdbtoolsconn=(mdbtoolsconnection *)conn;
-	columnnames=NULL;
 	mdbsql=(void *)new MdbSQL;
 	rawbuffer::zero(mdbsql,sizeof(MdbSQL));
 	mdb=NULL;
@@ -139,7 +138,6 @@ mdbtoolscursor::mdbtoolscursor(sqlrconnection_svr *conn) :
 }
 
 mdbtoolscursor::~mdbtoolscursor() {
-	delete[] columnnames;
 	delete currentwild;
 	delete (MdbSQL *)mdbsql;
 }
@@ -332,33 +330,6 @@ uint32_t mdbtoolscursor::colCount() {
 		return 5;
 	}
 	return 1;
-}
-
-const char * const *mdbtoolscursor::columnNames() {
-
-	if (cursortype==QUERY_CURSORTYPE) {
-		columnnames=new char *[((MdbSQL *)mdbsql)->num_columns];
-		for (unsigned int i=0; i<((MdbSQL *)mdbsql)->num_columns; i++) {
-			MdbSQLColumn	*col=(MdbSQLColumn *)
-				g_ptr_array_index(
-					((MdbSQL *)mdbsql)->columns,i);
-			columnnames[i]=col->name;
-		}
-	} else if (cursortype==DB_LIST_CURSORTYPE) {
-		columnnames=new char*[1];
-		columnnames[0]=(char *)"DATABASE";
-	} else if (cursortype==TABLE_LIST_CURSORTYPE) {
-		columnnames=new char*[1];
-		columnnames[0]=(char *)"TABLE";
-	} else if (cursortype==COLUMN_LIST_CURSORTYPE) {
-		columnnames=new char*[3];
-		columnnames[0]=(char *)"NAME";
-		columnnames[1]=(char *)"TYPE";
-		columnnames[2]=(char *)"SIZE";
-		columnnames[3]=(char *)"PRECISION";
-		columnnames[4]=(char *)"SCALE";
-	}
-	return columnnames;
 }
 
 const char *mdbtoolscursor::getColumnName(uint32_t col) {
@@ -588,9 +559,6 @@ void mdbtoolscursor::getField(uint32_t col,
 }
 
 void mdbtoolscursor::cleanUpData(bool freeresult, bool freebinds) {
-
-	delete[] columnnames;
-	columnnames=NULL;
 
 	if (cursortype==COLUMN_LIST_CURSORTYPE) {
 		delete[] currentcolumnsize;
