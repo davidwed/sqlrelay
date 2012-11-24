@@ -16,9 +16,11 @@
 using namespace rudiments;
 #endif
 
-int32_t getConnections(sqlrconfigfile *cfgfile) {
+#define MAX_CONNECTIONS 200
+
+int32_t getConnections(sqlrconfigfile *cfgfile, bool override) {
 	int32_t	connections=cfgfile->getConnections();
-	if (connections>MAX_CONNECTIONS) {
+	if (!override && connections>MAX_CONNECTIONS) {
 		connections=MAX_CONNECTIONS;
 	}
 	return connections;
@@ -91,7 +93,8 @@ bool startConnection(bool strace, const char *dbase,
 bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 				const char *id, const char *config,
 				const char *localstatedir,
-				bool connectiondebug) {
+				bool connectiondebug,
+				bool overridemaxconn) {
 
 	// get the connection count and total metric
 	linkedlist< connectstringcontainer *>	*connectionlist=
@@ -110,7 +113,7 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 	}
 
 	// get number of connections
-	int32_t	connections=getConnections(cfgfile);
+	int32_t	connections=getConnections(cfgfile,overridemaxconn);
 
 	// start the connections
 	connectstringnode	*csn=connectionlist->getFirstNode();
@@ -253,6 +256,7 @@ int main(int argc, const char **argv) {
 	bool		strace=cmdl.found("-strace");
 	const char	*id=cmdl.getId();
 	const char	*config=cmdl.getConfig();
+	bool		overridemaxconn=cmdl.found("-overridemaxconnections");
 
 	// default id warning
 	if (!charstring::compare(cmdl.getId(),DEFAULT_ID)) {
@@ -269,7 +273,8 @@ int main(int argc, const char **argv) {
 	bool	exitstatus=!(startListener(id,config,
 				localstatedir,cfgfile.getDebugListener()) &&
 			startConnections(&cfgfile,strace,id,config,
-				localstatedir,cfgfile.getDebugConnection()) &&
+				localstatedir,cfgfile.getDebugConnection(),
+				overridemaxconn) &&
 			startScaler(&cfgfile,id,config,localstatedir,
 				cfgfile.getDebugConnection()) &&
 			startCacheManager(localstatedir));
