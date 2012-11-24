@@ -40,6 +40,8 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 	fakeinputbindsforthisquery=false;
 
 	customquerycursor=NULL;
+
+	id=0;
 }
 
 sqlrcursor_svr::~sqlrcursor_svr() {
