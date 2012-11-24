@@ -21,6 +21,7 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 		if (reexecute) {
 			cursor=cursor->customquerycursor;
 		} else {
+			cursor->customquerycursor->close();
 			delete cursor->customquerycursor;
 			cursor->customquerycursor=NULL;
 		}
@@ -80,6 +81,10 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 			}
 
 			if (cursor->customquerycursor) {
+
+				// open the cursor
+				cursor->customquerycursor->openInternal(
+								cursor->id);
 
 				// copy the query that we just got into the
 				// custom query cursor

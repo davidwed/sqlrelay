@@ -29,6 +29,7 @@ bool sqlrcontroller_svr::getListCommand(sqlrcursor_svr *cursor,
 
 	// clean up any custom query cursors
 	if (cursor->customquerycursor) {
+		cursor->customquerycursor->close();
 		delete cursor->customquerycursor;
 		cursor->customquerycursor=NULL;
 	}
