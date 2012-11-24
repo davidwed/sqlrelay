@@ -164,12 +164,5 @@
 #define	DEFAULT_TRANSLATEBINDVARIABLES "no"
 	// default translate bind variables attribute
 
-// cachemanager/sqlrclient parameters
 #define DEFAULT_INTERVAL 30
 	// default interval that the cachemanager will scan on
-
-
-
-// sqlr-start parameters
-#define MAX_CONNECTIONS 200
-	// maximum number of connections that may be started using sqlr-start
