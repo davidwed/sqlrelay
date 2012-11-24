@@ -135,55 +135,52 @@
 struct sqlrstatistics {
 	time_t	starttime;
 
-	int32_t	open_svr_connections;
-	int32_t	opened_svr_connections;
+	uint32_t	open_svr_connections;
+	uint32_t	opened_svr_connections;
 
-	int32_t	open_cli_connections;
-	int32_t	opened_cli_connections;
+	uint32_t	open_cli_connections;
+	uint32_t	opened_cli_connections;
 
-	int32_t	open_svr_cursors;
-	int32_t	opened_svr_cursors;
+	uint32_t	open_svr_cursors;
+	uint32_t	opened_svr_cursors;
 
-	int32_t	times_new_cursor_used;
-	int32_t	times_cursor_reused;
+	uint32_t	times_new_cursor_used;
+	uint32_t	times_cursor_reused;
 
-	int32_t	total_queries;
-	int32_t	total_errors;
+	uint32_t	total_queries;
+	uint32_t	total_errors;
 
-	int32_t	forked_listeners;
+	uint32_t	forked_listeners;
 
 	// below were added by neowiz...
 
-	/** maximum number of the listeners allowed -- for debugging purpose */
-	uint32_t	max_listener;
+	// maximum number of listeners allowed and
+	// number of times that limit was was hit
+	uint32_t	max_listeners;
+	uint32_t	max_listeners_errors;
 
-	/** number of listener errors excceding MAX_LISTENER */
-	uint32_t	max_listener_error;
+	// highest count of listeners
+	// (all-time and over previous minute)
+	uint32_t	peak_listeners;
+	uint32_t	peak_listeners_1min;
+	time_t		peak_listeners_1min_time;
 
-	/** highest count of listeners */
-	uint32_t	peak_listener;
+	// highest count of connections-in-use
+	// (all-time and over previous minute)
+	uint32_t	peak_connectionsinuse;
+	uint32_t	peak_connectionsinuse_1min;
+	time_t		peak_connectionsinuse_1min_time;
 
-	/** highest count of connections in use */
-	uint32_t	peak_session;
-
-	/** highest count of listeners for 1 min */
-	uint32_t	peak_listener_1min;
-
-	/** highest count of session for 1 min */
-	uint32_t	peak_session_1min;
-
-	time_t		peak_listener_1min_time;
-	time_t		peak_session_1min_time;
 	time_t		timestamp[STATQPSKEEP];
 	uint32_t	qps_select[STATQPSKEEP];
 	uint32_t	qps_insert[STATQPSKEEP];
 	uint32_t	qps_update[STATQPSKEEP];
 	uint32_t	qps_delete[STATQPSKEEP];
+	uint32_t	qps_custom[STATQPSKEEP];
 	uint32_t	qps_etc[STATQPSKEEP];
-	uint32_t	qps_sqlrcmd[STATQPSKEEP];
 };
 
-enum sqlrconnectionstate {
+enum sqlrconnectionstate_t {
 	NOT_AVAILABLE=0,
 	INIT,
 	WAIT_FOR_AVAIL_DB,
@@ -200,31 +197,31 @@ enum sqlrconnectionstate {
 
 struct sqlrconnstatistics {
 	uint32_t			processid;
-	enum sqlrconnectionstate	state;
+	enum sqlrconnectionstate_t	state;
 	uint32_t			index;
-	uint32_t			nconnect;
-	uint32_t			nauthenticate;
-	uint32_t			nsuspend_session;
-	uint32_t			nend_session;
-	uint32_t			nping;
-	uint32_t			nidentify;
-	uint32_t			nautocommit;
-	uint32_t			ncommit;
-	uint32_t			nrollback;;
-	uint64_t			nnew_query;
-	uint64_t			nreexecute_query;
-	uint32_t			nfetch_from_bind_cursor;
-	uint32_t			nfetch_result_set;
-	uint32_t			nsuspend_result_set;
-	uint32_t			nresume_result_set;
-	uint32_t			nabort_result_set;
-	uint32_t			nsqlrcmd;
-	uint64_t			nsql;
-	uint32_t			nrelogin;
+	uint32_t			nconnect; // FIXME
+	uint32_t			nauthenticate; // FIXME
+	uint32_t			nsuspend_session; // FIXME
+	uint32_t			nend_session; // FIXME
+	uint32_t			nping; // FIXME
+	uint32_t			nidentify; // FIXME
+	uint32_t			nautocommit; // FIXME
+	uint32_t			ncommit; // FIXME
+	uint32_t			nrollback;; // FIXME
+	uint64_t			nnew_query; // FIXME
+	uint64_t			nreexecute_query; // FIXME
+	uint32_t			nfetch_from_bind_cursor; // FIXME
+	uint32_t			nfetch_result_set; // FIXME
+	uint32_t			nsuspend_result_set; // FIXME
+	uint32_t			nresume_result_set; // FIXME
+	uint32_t			nabort_result_set; // FIXME
+	uint32_t			nsqlrcmd; // FIXME
+	uint64_t			nsql; // FIXME
+	uint32_t			nrelogin; // FIXME
 	struct timeval			logged_in_tv;
 	struct timeval			state_start_tv;
-	struct timeval			processclient_tv;
-	struct timeval			processquery_tv;
+	struct timeval			processclient_tv; // FIXME
+	struct timeval			processquery_tv; // FIXME
 	char				clientaddr[16];
 	char				clientinfo[STATCLIENTINFOLEN+1];
 	char				sqltext[STATSQLTEXTLEN+1];
@@ -234,8 +231,8 @@ struct sqlrconnstatistics {
 // and connection daemons.  A struct is used instead of just stepping a pointer
 // through the shared memory segment to avoid alignment issues.
 struct shmdata {
-	int32_t		totalconnections;
-	int32_t		connectionsinuse;
+	uint32_t	totalconnections;
+	uint32_t	connectionsinuse;
 	char		connectionid[MAXCONNECTIONIDLEN];
 	union {
 		struct {

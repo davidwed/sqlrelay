@@ -45,10 +45,10 @@ bool sqlrcmdgstatcursor::executeQuery(const char *query, uint32_t length) {
 
 	time_t	now=time(NULL);	
 
-	int32_t	*sessioncount=conn->cont->getSessionCountBuffer();
-	if (now/60>gs->peak_session_1min_time/60) {
-		gs->peak_session_1min_time=now;
-		gs->peak_session_1min=*sessioncount; 
+	uint32_t	sessioncount=conn->cont->shm->connectionsinuse;
+	if (now/60>gs->peak_connectionsinuse_1min_time/60) {
+		gs->peak_connectionsinuse_1min_time=now;
+		gs->peak_connectionsinuse_1min=sessioncount; 
 	}
 
 	int select_1=0, select_5=0, select_15=0;
@@ -64,7 +64,7 @@ bool sqlrcmdgstatcursor::executeQuery(const char *query, uint32_t length) {
 			update_1+=gs->qps_update[j];
 			delete_1+=gs->qps_delete[j];
 			etc_1+=gs->qps_etc[j];
-			sqlrcmd_1+=gs->qps_sqlrcmd[j];
+			sqlrcmd_1+=gs->qps_custom[j];
 		}
 		if (now-gs->timestamp[j]<60*5) {
 			select_5+=gs->qps_select[j];
@@ -72,7 +72,7 @@ bool sqlrcmdgstatcursor::executeQuery(const char *query, uint32_t length) {
 			update_5+=gs->qps_update[j];
 			delete_5+=gs->qps_delete[j];
 			etc_5+=gs->qps_etc[j];
-			sqlrcmd_5+=gs->qps_sqlrcmd[j];
+			sqlrcmd_5+=gs->qps_custom[j];
 		}
 		if (now-gs->timestamp[j]<60*15) {
 			select_15+= gs->qps_select[j];
@@ -80,7 +80,7 @@ bool sqlrcmdgstatcursor::executeQuery(const char *query, uint32_t length) {
 			update_15+= gs->qps_update[j];
 			delete_15+= gs->qps_delete[j];
 			etc_15+= gs->qps_etc[j];
-			sqlrcmd_15+= gs->qps_sqlrcmd[j];
+			sqlrcmd_15+= gs->qps_custom[j];
 
 		}
 	}
@@ -127,18 +127,18 @@ bool sqlrcmdgstatcursor::executeQuery(const char *query, uint32_t length) {
 	setGSResult("sqlrcmd_1",sqlrcmd_1,rowcount++);
 	setGSResult("sqlrcmd_5",sqlrcmd_5/5,rowcount++);
 	setGSResult("sqlrcmd_15",sqlrcmd_15/15,rowcount++);
-	setGSResult("max_listener",gs->max_listener,rowcount++);
-	setGSResult("max_listener_error",gs->max_listener_error,rowcount++);
+	setGSResult("max_listener",gs->max_listeners,rowcount++);
+	setGSResult("max_listener_error",gs->max_listeners_errors,rowcount++);
 	setGSResult("busy_listener",
 			conn->cont->semset->getValue(10),rowcount++);
-	setGSResult("peak_listener",gs->peak_listener,rowcount++);
-	setGSResult("connection",
-			*(conn->cont->getConnectionCountBuffer()),rowcount++);
-	setGSResult("session",*sessioncount,rowcount++);
-	setGSResult("peak_session",gs->peak_session,rowcount++);
-	setGSResult("peak_session_1min",gs->peak_session_1min,rowcount++);
+	setGSResult("peak_listener",gs->peak_listeners,rowcount++);
+	setGSResult("connection",conn->cont->shm->totalconnections,rowcount++);
+	setGSResult("session",sessioncount,rowcount++);
+	setGSResult("peak_session",gs->peak_connectionsinuse,rowcount++);
+	setGSResult("peak_session_1min",
+			gs->peak_connectionsinuse_1min,rowcount++);
 	strftime(tmpbuf,GSTAT_VALUE_LEN,"%Y/%m/%d %H:%M:%S",
-			localtime(&(gs->peak_session_1min_time)));
+			localtime(&(gs->peak_connectionsinuse_1min_time)));
 	setGSResult("peak_session_1min_time",tmpbuf,rowcount++);
 
 	currentrow=0;

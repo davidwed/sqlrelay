@@ -131,7 +131,7 @@ bool sqlrcontroller_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 				// FIXME: set error here
 				return false;
 			}
-			curs->state=SQLRCURSOR_STATE_BUSY;
+			curs->state=SQLRCURSORSTATE_BUSY;
 			bv->value.cursorid=curs->id;
 		}
 

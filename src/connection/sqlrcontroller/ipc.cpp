@@ -110,30 +110,10 @@ void sqlrcontroller_svr::acquireConnectionCountMutex() {
 	dbgfile.debugPrint("connection",1,"done acquiring connection count mutex");
 }
 
-int32_t *sqlrcontroller_svr::getConnectionCountBuffer() {
-	return &((shmdata *)idmemory->getPointer())->totalconnections;
-}
-
 void sqlrcontroller_svr::releaseConnectionCountMutex() {
 	dbgfile.debugPrint("connection",1,"releasing connection count mutex");
 	semset->signalWithUndo(4);
 	dbgfile.debugPrint("connection",1,"done releasing connection count mutex");
-}
-
-void sqlrcontroller_svr::acquireSessionCountMutex() {
-	dbgfile.debugPrint("connection",1,"acquiring session count mutex");
-	semset->waitWithUndo(5);
-	dbgfile.debugPrint("connection",1,"done acquiring session count mutex");
-}
-
-int32_t *sqlrcontroller_svr::getSessionCountBuffer() {
-	return &((shmdata *)idmemory->getPointer())->connectionsinuse;
-}
-
-void sqlrcontroller_svr::releaseSessionCountMutex() {
-	dbgfile.debugPrint("connection",1,"releasing session count mutex");
-	semset->signalWithUndo(5);
-	dbgfile.debugPrint("connection",1,"done releasing session count mutex");
 }
 
 void sqlrcontroller_svr::signalScalerToRead() {

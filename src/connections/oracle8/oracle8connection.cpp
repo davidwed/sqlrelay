@@ -1926,8 +1926,8 @@ bool oracle8cursor::getLobOutputBindSegment(uint16_t index,
 
 void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 
-	char	*ptr=(char *)query;
-	char	*endptr=(char *)query+length;
+	const char	*ptr=query;
+	const char	*endptr=query+length;
 
 	// skip any leading whitespace and comments
 	ptr=skipWhitespaceAndComments(query);

@@ -5,6 +5,7 @@
 #include <rudiments/process.h>
 #include <rudiments/charstring.h>
 #include <rudiments/rawbuffer.h>
+#include <rudiments/datetime.h>
 
 // for gettimeofday()
 #include <sys/time.h>
@@ -28,7 +29,7 @@ void sqlrcontroller_svr::clearConnStats() {
 	rawbuffer::zero(connstats,sizeof(struct sqlrconnstatistics));
 }
 
-void sqlrcontroller_svr::updateState(enum sqlrconnectionstate state) {
+void sqlrcontroller_svr::updateState(enum sqlrconnectionstate_t state) {
 	if (!connstats) {
 		return;
 	}
@@ -87,9 +88,8 @@ void sqlrcontroller_svr::incrementOpenServerConnections() {
 
 void sqlrcontroller_svr::decrementOpenServerConnections() {
 	semset->waitWithUndo(9);
-	stats->open_svr_connections--;
-	if (stats->open_svr_connections<0) {
-		stats->open_svr_connections=0;
+	if (stats->open_svr_connections) {
+		stats->open_svr_connections--;
 	}
 	semset->signalWithUndo(9);
 }
@@ -103,9 +103,8 @@ void sqlrcontroller_svr::incrementOpenClientConnections() {
 
 void sqlrcontroller_svr::decrementOpenClientConnections() {
 	semset->waitWithUndo(9);
-	stats->open_cli_connections--;
-	if (stats->open_cli_connections<0) {
-		stats->open_cli_connections=0;
+	if (stats->open_cli_connections) {
+		stats->open_cli_connections--;
 	}
 	semset->signalWithUndo(9);
 }
@@ -119,9 +118,8 @@ void sqlrcontroller_svr::incrementOpenServerCursors() {
 
 void sqlrcontroller_svr::decrementOpenServerCursors() {
 	semset->waitWithUndo(9);
-	stats->open_svr_cursors--;
-	if (stats->open_svr_cursors<0) {
-		stats->open_svr_cursors=0;
+	if (stats->open_svr_cursors) {
+		stats->open_svr_cursors--;
 	}
 	semset->signalWithUndo(9);
 }
@@ -138,9 +136,53 @@ void sqlrcontroller_svr::incrementTimesCursorReused() {
 	semset->signalWithUndo(9);
 }
 
-void sqlrcontroller_svr::incrementTotalQueries() {
+void sqlrcontroller_svr::incrementQueryCounts(sqlrquerytype_t querytype) {
+
 	semset->waitWithUndo(9);
+
+	// update total queries
 	stats->total_queries++;
+
+	// update queries-per-second stats...
+
+	// re-init stats if necessary
+	datetime	dt;
+	dt.getSystemDateAndTime();
+	time_t	now=dt.getEpoch();
+	int	index=now%STATQPSKEEP;
+	if (stats->timestamp[index]!=now) {
+		stats->timestamp[index]=now;
+		stats->qps_select[index]=0;
+		stats->qps_update[index]=0;
+		stats->qps_insert[index]=0;
+		stats->qps_delete[index]=0;
+		stats->qps_custom[index]=0;
+		stats->qps_etc[index]=0;
+	}
+
+	// increment per-query-type stats
+	switch (querytype) {
+		case SQLRQUERYTYPE_SELECT:
+			stats->qps_select[index]++;
+			break;
+		case SQLRQUERYTYPE_INSERT:
+			stats->qps_insert[index]++;
+			break;
+		case SQLRQUERYTYPE_UPDATE:
+			stats->qps_update[index]++;
+			break;
+		case SQLRQUERYTYPE_DELETE:
+			stats->qps_delete[index]++;
+			break;
+		case SQLRQUERYTYPE_CUSTOM:
+			stats->qps_custom[index]++;
+			break;
+		case SQLRQUERYTYPE_ETC:
+		default:
+			stats->qps_etc[index]++;
+			break;
+	}
+
 	semset->signalWithUndo(9);
 }
 

@@ -238,10 +238,10 @@ sqlrcursor_svr *sqlrcontroller_svr::findAvailableCursor() {
 
 	// find an available cursor
 	for (uint16_t i=0; i<cursorcount; i++) {
-		if (cur[i]->state==SQLRCURSOR_STATE_AVAILABLE) {
+		if (cur[i]->state==SQLRCURSORSTATE_AVAILABLE) {
 			dbgfile.debugPrint("connection",2,"available cursor:");
 			dbgfile.debugPrint("connection",3,(int32_t)i);
-			cur[i]->state=SQLRCURSOR_STATE_BUSY;
+			cur[i]->state=SQLRCURSORSTATE_BUSY;
 			return cur[i];
 		}
 	}
@@ -262,7 +262,7 @@ sqlrcursor_svr *sqlrcontroller_svr::findAvailableCursor() {
 	uint16_t	firstnewcursor=cursorcount;
 	do {
 		cur[cursorcount]=initCursor();
-		cur[cursorcount]->state=SQLRCURSOR_STATE_AVAILABLE;
+		cur[cursorcount]->state=SQLRCURSORSTATE_AVAILABLE;
 		if (!cur[cursorcount]->openInternal(cursorcount)) {
 			dbgfile.debugPrint("connection",1,
 					"cursor init failure...");
@@ -273,7 +273,7 @@ sqlrcursor_svr *sqlrcontroller_svr::findAvailableCursor() {
 	} while (cursorcount<expandto);
 	
 	// return the first new cursor that we created
-	cur[firstnewcursor]->state=SQLRCURSOR_STATE_BUSY;
+	cur[firstnewcursor]->state=SQLRCURSORSTATE_BUSY;
 	return cur[firstnewcursor];
 }
 

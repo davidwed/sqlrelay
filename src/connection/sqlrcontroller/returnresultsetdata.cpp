@@ -32,7 +32,7 @@ bool sqlrcontroller_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 	}
 
 	// reinit cursor state (in case it was suspended)
-	cursor->state=SQLRCURSOR_STATE_BUSY;
+	cursor->state=SQLRCURSORSTATE_BUSY;
 
 	// for some queries, there are no rows to return, 
 	if (cursor->noRowsToReturn()) {

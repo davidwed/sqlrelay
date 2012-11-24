@@ -623,8 +623,8 @@ void scaler::decConnections() {
 
 	// decrement connection counter
 	shmdata	*ptr=(shmdata *)idmemory->getPointer();
-	if (--ptr->totalconnections<0) {
-		ptr->totalconnections=0;
+	if (ptr->totalconnections) {
+		ptr->totalconnections--;
 	}
 
 	// signal that the connection counter may be accessed by someone else

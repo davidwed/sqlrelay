@@ -5,6 +5,7 @@
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <parsedatetime.h>
+#include <rudiments/character.h>
 
 sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 
@@ -14,7 +15,7 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 	outbindcount=0;
 	outbindvars=new bindvar_svr[conn->cont->maxbindcount];
 	
-	state=SQLRCURSOR_STATE_AVAILABLE;
+	state=SQLRCURSORSTATE_AVAILABLE;
 
 	createtemp.compile("(create|CREATE|declare|DECLARE)[ \\t\\r\\n]+((global|GLOBAL|local|LOCAL)?[ \\t\\r\\n]+)?(temp|TEMP|temporary|TEMPORARY)?[ \\t\\r\\n]+(table|TABLE)[ \\t\\r\\n]+");
 
@@ -64,6 +65,36 @@ bool sqlrcursor_svr::open(uint16_t id) {
 bool sqlrcursor_svr::close() {
 	// by default do nothing
 	return true;
+}
+
+sqlrquerytype_t sqlrcursor_svr::queryType(const char *query,
+						uint32_t querylength) {
+
+	// skip past leading garbage
+	const char	*ptr=skipWhitespaceAndComments(query);
+
+	// initialize to "etc"
+	sqlrquerytype_t	retval=SQLRQUERYTYPE_ETC;
+
+	// look for specific query types
+	if (!charstring::compare(ptr,"select",6)) {
+		retval=SQLRQUERYTYPE_SELECT;
+	} else if (!charstring::compare(ptr,"insert",6)) {
+		retval=SQLRQUERYTYPE_INSERT;
+	} else if (!charstring::compare(ptr,"update",6)) {
+		retval=SQLRQUERYTYPE_UPDATE;
+	} else if (!charstring::compare(ptr,"delete",6)) {
+		retval=SQLRQUERYTYPE_DELETE;
+	}
+
+	// verify that there's whitespace after the query type
+	if (retval!=SQLRQUERYTYPE_ETC) {
+		ptr=ptr+6;
+		if (!character::isWhitespace(*ptr)) {
+			retval=SQLRQUERYTYPE_ETC;
+		}
+	}
+	return retval;
 }
 
 bool sqlrcursor_svr::prepareQuery(const char *query, uint32_t querylength) {
@@ -229,8 +260,8 @@ bool sqlrcursor_svr::getLobOutputBindSegment(uint16_t index,
 
 void sqlrcursor_svr::checkForTempTable(const char *query, uint32_t length) {
 
-	char	*ptr=(char *)query;
-	char	*endptr=(char *)query+length;
+	const char	*ptr=query;
+	const char	*endptr=query+length;
 
 	// skip any leading comments
 	if (!skipWhitespace(&ptr,endptr) || !skipComment(&ptr,endptr) ||
@@ -271,7 +302,7 @@ bool sqlrcursor_svr::fetchFromBindCursor() {
 bool sqlrcursor_svr::queryIsNotSelect() {
 
 	// scan the query, bypassing whitespace and comments.
-	char	*ptr=skipWhitespaceAndComments(querybuffer);
+	const char	*ptr=skipWhitespaceAndComments(querybuffer);
 
 	// if the query is a select but not a select into then return false,
 	// otherwise return true
@@ -285,7 +316,7 @@ bool sqlrcursor_svr::queryIsNotSelect() {
 bool sqlrcursor_svr::queryIsCommitOrRollback() {
 
 	// scan the query, bypassing whitespace and comments.
-	char	*ptr=skipWhitespaceAndComments(querybuffer);
+	const char	*ptr=skipWhitespaceAndComments(querybuffer);
 
 	// if the query is a commit or rollback, return true
 	// otherwise return false
@@ -449,7 +480,7 @@ void sqlrcursor_svr::setFakeInputBindsForThisQuery(bool fake) {
 	fakeinputbindsforthisquery=fake;
 }
 
-bool sqlrcursor_svr::skipComment(char **ptr, const char *endptr) {
+bool sqlrcursor_svr::skipComment(const char **ptr, const char *endptr) {
 	while (*ptr<endptr && !charstring::compare(*ptr,"--",2)) {
 		while (**ptr && **ptr!='\n') {
 			(*ptr)++;
@@ -458,16 +489,16 @@ bool sqlrcursor_svr::skipComment(char **ptr, const char *endptr) {
 	return *ptr!=endptr;
 }
 
-bool sqlrcursor_svr::skipWhitespace(char **ptr, const char *endptr) {
+bool sqlrcursor_svr::skipWhitespace(const char **ptr, const char *endptr) {
 	while ((**ptr==' ' || **ptr=='\n' || **ptr=='	') && *ptr<endptr) {
 		(*ptr)++;
 	}
 	return *ptr!=endptr;
 }
 
-char *sqlrcursor_svr::skipWhitespaceAndComments(const char *querybuffer) {
+const char *sqlrcursor_svr::skipWhitespaceAndComments(const char *querybuffer) {
 	// scan the query, bypassing whitespace and comments.
-	char	*ptr=(char *)querybuffer;
+	const char	*ptr=querybuffer;
 	while (*ptr && 
 		(*ptr==' ' || *ptr=='\n' || *ptr=='	' || *ptr=='-')) {
 
@@ -672,7 +703,7 @@ void sqlrcursor_svr::abort() {
 	// entire result set had already been sent, but I don't think that's an
 	// issue any more.
 	cleanUpData(true,true);
-	state=SQLRCURSOR_STATE_AVAILABLE;
+	state=SQLRCURSORSTATE_AVAILABLE;
 	delete customquerycursor;
 	customquerycursor=NULL;
 }

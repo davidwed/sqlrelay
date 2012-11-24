@@ -41,6 +41,7 @@ sqlrlistener::sqlrlistener() : daemonprocess(), listener() {
 
 	semset=NULL;
 	idmemory=NULL;
+	shm=NULL;
 
 	pidfile=NULL;
 	tmpdir=NULL;
@@ -194,6 +195,8 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 	detach();
 
 	createPidFile(pidfile,permissions::ownerReadWrite());
+
+	setMaxListeners(maxlisteners);
 
 	return true;
 }
@@ -371,7 +374,8 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 		shmError(id,idmemory->getId());
 		return false;
 	}
-	rawbuffer::zero(idmemory->getPointer(),sizeof(shmdata));
+	shm=(shmdata *)idmemory->getPointer();
+	rawbuffer::zero(shm,sizeof(shmdata));
 
 	setStartTime();
 
@@ -486,13 +490,6 @@ void sqlrlistener::semError(const char *id, int semid) {
 	fprintf(stderr,"	id %d.\n\n",semid);
 	fprintf(stderr,"	Error was: %s\n\n",err);
 	delete[] err;
-}
-
-void sqlrlistener::setStartTime() {
-	shmdata	*ptr=(shmdata *)idmemory->getPointer();
-	datetime	dt;
-	dt.getSystemDateAndTime();
-	ptr->stats.starttime=dt.getEpoch();
 }
 
 bool sqlrlistener::listenOnClientSockets() {
@@ -705,10 +702,9 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 void sqlrlistener::listen() {
 
 	// wait until all of the connections have started
-	shmdata	*ptr=(shmdata *)idmemory->getPointer();
 	for (;;) {
 		semset->waitWithUndo(9);
-		int32_t	opensvrconnections=ptr->stats.open_svr_connections;
+		int32_t	opensvrconnections=shm->stats.open_svr_connections;
 		semset->signalWithUndo(9);
 
 		if (opensvrconnections<
@@ -898,28 +894,6 @@ filedescriptor *sqlrlistener::waitForData() {
 	return fd;
 }
 
-// increment the number of "busy listeners"
-void sqlrlistener::incBusyListeners() {
-	dbgfile.debugPrint("listener",0,"incrementing busy listeners");
-	if (!semset->signal(10)) {
-		// FIXME: bail somehow
-	}
-	dbgfile.debugPrint("listener",0,"finished incrementing busy listeners");
-}
-
-// decrement the number of "busy listeners"
-void sqlrlistener::decBusyListeners() {
-	dbgfile.debugPrint("listener",0,"decrementing busy listeners");
-	if (!semset->wait(10)) {
-		// FIXME: bail somehow
-	}
-	dbgfile.debugPrint("listener",0,"finished decrementing busy listeners");
-}
-
-// get number of "busy listeners"
-int sqlrlistener::getBusyListeners() {
-	return semset->getValue(10);
-}
 
 bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 
@@ -1017,9 +991,9 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 	if (dynamicscaling || getBusyListeners() || !semset->getValue(2)) {
 		forkChild(clientsock);
 	} else {
-		incBusyListeners();
+		incrementBusyListeners();
 		clientSession(clientsock);
-		decBusyListeners();
+		decrementBusyListeners();
 	}
 
 	return true;
@@ -1174,33 +1148,6 @@ bool sqlrlistener::deniedIp(filedescriptor *clientsock) {
 	return false;
 }
 
-// increment the number of forked listeners
-int sqlrlistener::incForkedListeners() {
-
-	incBusyListeners();
-
-	shmdata	*ptr=(shmdata *)idmemory->getPointer();
-	semset->waitWithUndo(9);
-	int	forkedlisteners=++(ptr->stats.forked_listeners);
-	semset->signalWithUndo(9);
-	return forkedlisteners;
-}
-
-// decrement the number of forked listeners
-int sqlrlistener::decForkedListeners() {
-
-	decBusyListeners();
-
-	shmdata	*ptr=(shmdata *)idmemory->getPointer();
-	semset->waitWithUndo(9);
-	if (--(ptr->stats.forked_listeners)<0) {
-		ptr->stats.forked_listeners=0;
-	}
-	int forkedlisteners=ptr->stats.forked_listeners;
-	semset->signalWithUndo(9);
-	return forkedlisteners;
-}
-
 void sqlrlistener::errorClientSession(filedescriptor *clientsock,
 							const char *err) {
 	// get auth and ignore the result
@@ -1222,7 +1169,8 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 	// do this before we actually fork to prevent a race condition where
 	// a bunch of children get forked off before any of them get a chance
 	// to increment this and prevent more from getting forked off
-	int	forkedlisteners=incForkedListeners();
+	incrementBusyListeners();
+	int32_t	forkedlisteners=incrementForkedListeners();
 
 	// if we already have too many listeners running,
 	// bail and return an error to the client
@@ -1230,7 +1178,9 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		forkedlisteners>maxlisteners) {
 
 		// since we've decided not to fork, decrement the counters
-		decForkedListeners();
+		decrementBusyListeners();
+		decrementForkedListeners();
+		incrementMaxListenersErrors();
 		errorClientSession(clientsock,"Too many listeners.");
 		return;
 	}
@@ -1252,7 +1202,8 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 
 		clientSession(clientsock);
 
-		decForkedListeners();
+		decrementBusyListeners();
+		decrementForkedListeners();
 
 		cleanUp();
 		process::exit(0);
@@ -1266,7 +1217,8 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		delete clientsock;
 	} else {
 		// error
-		decForkedListeners();
+		decrementBusyListeners();
+		decrementForkedListeners();
 		errorClientSession(clientsock,"Error forking listener");
 	}
 }
@@ -1501,80 +1453,6 @@ int32_t sqlrlistener::getMySQLAuth(filedescriptor *clientsock) {
 	return 0;
 }
 
-void sqlrlistener::acquireSessionCountMutex() {
-	if (!semset->waitWithUndo(5)) {
-		// FIXME: bail somehow
-	}
-}
-
-void sqlrlistener::releaseSessionCountMutex() {
-	if (!semset->signalWithUndo(5)) {
-		// FIXME: bail somehow
-	}
-}
-
-void sqlrlistener::incrementSessionCount() {
-
-	dbgfile.debugPrint("listener",0,"incrementing session count...");
-
-	acquireSessionCountMutex();
-
-	// increment the counter
-	shmdata	*ptr=(shmdata *)idmemory->getPointer();
-	ptr->connectionsinuse++;
-
-	dbgfile.debugPrint("listener",1,ptr->connectionsinuse);
-
-	// If the system supports timed semaphore ops then the scaler can be
-	// jogged into running on-demand, and we can do that here.  If the 
-	// sytem does not support timed semaphore ops then the scaler will
-	// just loop periodically on its own and we shouldn't attempt to
-	// jog it.
-	if (semset->supportsTimedSemaphoreOperations()) {
-
-		// signal the scaler to evaluate the connection count
-		// and start more connections if necessary
-		dbgfile.debugPrint("listener",1,"signalling the scaler...");
-		if (!semset->signal(6)) {
-			// FIXME: bail somehow
-		}
-		dbgfile.debugPrint("listener",1,
-					"finished signalling the scaler...");
-
-		// wait for the scaler
-		dbgfile.debugPrint("listener",1,"waiting for the scaler...");
-		if (!semset->wait(7)) {
-			// FIXME: bail somehow
-		}
-		dbgfile.debugPrint("listener",1,
-					"finished waiting for the scaler...");
-	}
-
-	releaseSessionCountMutex();
-
-	dbgfile.debugPrint("listener",0,"finished incrementing session count");
-}
-
-void sqlrlistener::decrementSessionCount() {
-
-	dbgfile.debugPrint("listener",0,"decrementing session count...");
- 
-	acquireSessionCountMutex();
-
-	// decrement the counter
-	shmdata	*ptr=(shmdata *)idmemory->getPointer();
-	ptr->connectionsinuse--;
-	if (ptr->connectionsinuse<0) {
-		ptr->connectionsinuse=0;
-	}
-
-	dbgfile.debugPrint("listener",1,ptr->connectionsinuse);
-
-	releaseSessionCountMutex();
-
-	dbgfile.debugPrint("listener",0,"finished decrementing session count");
-}
-
 bool sqlrlistener::handOffClient(filedescriptor *sock) {
 
 	uint32_t	connectionpid;
@@ -1803,9 +1681,6 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					uint16_t *unixportstrlen,
 					filedescriptor *sock) {
 
-	// get a pointer to the shared memory segment
-	shmdata *ptr=(shmdata *)idmemory->getPointer();
-
 	// use an alarm, if we're a forked child and a timeout is set
 	bool	usealarm=(isforkedchild && listenertimeout);
 
@@ -1856,7 +1731,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 							"handoff=pass");
 
 					// get the pid
-					*connectionpid=ptr->connectioninfo.
+					*connectionpid=shm->connectioninfo.
 								connectionpid;
 
 				} else {
@@ -1865,12 +1740,12 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 							"handoff=reconnect");
 
 					// get the inet port
-					*inetport=ptr->connectioninfo.
+					*inetport=shm->connectioninfo.
 							sockets.inetport;
 
 					// get the unix port
 					charstring::copy(unixportstr,
-							ptr->connectioninfo.
+							shm->connectioninfo.
 							sockets.unixsocket,
 							MAXPATHLEN);
 					*unixportstrlen=charstring::length(
@@ -1906,7 +1781,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		if (ok) {
 
 			// make sure the connection is actually up...
-			if (connectionIsUp(ptr->connectionid)) {
+			if (connectionIsUp(shm->connectionid)) {
 				dbgfile.debugPrint("listener",1,
 					"finished getting a connection");
 				return true;
@@ -2070,7 +1945,6 @@ bool sqlrlistener::findMatchingSocket(uint32_t connectionpid,
 	// if the available connection wasn't in our list then it must have
 	// fired up after we forked, so we'll need to connect back to the main
 	// listener process and ask it for the pid
-	//return requestFixup(connectionpid,connectionsock);
 	return requestFixup(connectionpid,connectionsock);
 }
 
@@ -2186,4 +2060,156 @@ void sqlrlistener::waitForClientClose(int32_t authstatus, bool passstatus,
 
 void sqlrlistener::flushWriteBuffer(filedescriptor *fd) {
 	fd->flushWriteBuffer(-1,-1);
+}
+
+void sqlrlistener::setStartTime() {
+	datetime	dt;
+	dt.getSystemDateAndTime();
+	shm->stats.starttime=dt.getEpoch();
+}
+
+void sqlrlistener::setMaxListeners(uint32_t maxlisteners) {
+	shm->stats.max_listeners=maxlisteners;
+}
+
+void sqlrlistener::incrementMaxListenersErrors() {
+	shm->stats.max_listeners_errors++;
+}
+
+void sqlrlistener::incrementSessionCount() {
+
+	dbgfile.debugPrint("listener",0,"incrementing session count...");
+
+	if (!semset->waitWithUndo(5)) {
+		// FIXME: bail somehow
+	}
+
+	// increment the connections-in-use counter
+	shm->connectionsinuse++;
+
+	// update the peak connections-in-use count
+	if (shm->connectionsinuse>shm->stats.peak_connectionsinuse) {
+		shm->stats.peak_connectionsinuse=shm->connectionsinuse;
+	}
+
+	// update the peak connections-in-use over the previous minute count
+	datetime	dt;
+	dt.getSystemDateAndTime();
+	if (shm->connectionsinuse>
+			shm->stats.peak_connectionsinuse_1min ||
+		dt.getEpoch()/60>
+			shm->stats.peak_connectionsinuse_1min_time/60) {
+		shm->stats.peak_connectionsinuse_1min=shm->connectionsinuse;
+		shm->stats.peak_connectionsinuse_1min_time=dt.getEpoch();
+	}
+
+	dbgfile.debugPrint("listener",1,shm->connectionsinuse);
+
+	// If the system supports timed semaphore ops then the scaler can be
+	// jogged into running on-demand, and we can do that here.  If the 
+	// sytem does not support timed semaphore ops then the scaler will
+	// just loop periodically on its own and we shouldn't attempt to
+	// jog it.
+	if (semset->supportsTimedSemaphoreOperations()) {
+
+		// signal the scaler to evaluate the connection count
+		// and start more connections if necessary
+		dbgfile.debugPrint("listener",1,"signalling the scaler...");
+		if (!semset->signal(6)) {
+			// FIXME: bail somehow
+		}
+		dbgfile.debugPrint("listener",1,
+					"finished signalling the scaler...");
+
+		// wait for the scaler
+		dbgfile.debugPrint("listener",1,"waiting for the scaler...");
+		if (!semset->wait(7)) {
+			// FIXME: bail somehow
+		}
+		dbgfile.debugPrint("listener",1,
+					"finished waiting for the scaler...");
+	}
+
+	if (!semset->signalWithUndo(5)) {
+		// FIXME: bail somehow
+	}
+
+	dbgfile.debugPrint("listener",0,"finished incrementing session count");
+}
+
+void sqlrlistener::decrementSessionCount() {
+
+	dbgfile.debugPrint("listener",0,"decrementing session count...");
+ 
+	if (!semset->waitWithUndo(5)) {
+		// FIXME: bail somehow
+	}
+
+	if (shm->connectionsinuse) {
+		shm->connectionsinuse--;
+	}
+
+	dbgfile.debugPrint("listener",1,shm->connectionsinuse);
+
+	if (!semset->signalWithUndo(5)) {
+		// FIXME: bail somehow
+	}
+
+	dbgfile.debugPrint("listener",0,"finished decrementing session count");
+}
+
+uint32_t sqlrlistener::incrementForkedListeners() {
+
+	semset->waitWithUndo(9);
+	uint32_t	forkedlisteners=++(shm->stats.forked_listeners);
+	semset->signalWithUndo(9);
+	return forkedlisteners;
+}
+
+uint32_t sqlrlistener::decrementForkedListeners() {
+
+	semset->waitWithUndo(9);
+	if (shm->stats.forked_listeners) {
+		shm->stats.forked_listeners--;
+	}
+	uint32_t	forkedlisteners=shm->stats.forked_listeners;
+	semset->signalWithUndo(9);
+	return forkedlisteners;
+}
+
+void sqlrlistener::incrementBusyListeners() {
+	dbgfile.debugPrint("listener",0,"incrementing busy listeners");
+
+	if (!semset->signal(10)) {
+		// FIXME: bail somehow
+	}
+
+	// update the peak listeners count
+	uint32_t	busylisteners=semset->getValue(10);
+	if (shm->stats.peak_listeners<busylisteners) {
+		shm->stats.peak_listeners=busylisteners;
+	}
+
+	// update the peak listeners over the previous minute count
+	datetime	dt;
+	dt.getSystemDateAndTime();
+	if (busylisteners>shm->stats.peak_listeners_1min ||
+		dt.getEpoch()/60>shm->stats.peak_listeners_1min_time/60) {
+		shm->stats.peak_listeners_1min=busylisteners;
+		shm->stats.peak_listeners_1min_time=dt.getEpoch();
+	}
+
+	dbgfile.debugPrint("listener",0,"finished incrementing busy listeners");
+}
+
+void sqlrlistener::decrementBusyListeners() {
+	dbgfile.debugPrint("listener",0,"decrementing busy listeners");
+	if (!semset->wait(10)) {
+		// FIXME: bail somehow
+	}
+	dbgfile.debugPrint("listener",0,"finished decrementing busy listeners");
+}
+
+int32_t sqlrlistener::getBusyListeners() {
+	return semset->getValue(10);
 }

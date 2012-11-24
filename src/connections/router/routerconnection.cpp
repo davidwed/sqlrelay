@@ -702,8 +702,8 @@ void routercursor::checkForTempTable(const char *query, uint32_t length) {
 
 	// for oracle db's...
 
-	char	*ptr=(char *)query;
-	char	*endptr=(char *)query+length;
+	const char	*ptr=query;
+	const char	*endptr=query+length;
 
 	// skip any leading comments
 	if (!skipWhitespace(&ptr,endptr) || !skipComment(&ptr,endptr) ||

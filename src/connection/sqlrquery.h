@@ -30,6 +30,8 @@ class sqlrquerycursor : public sqlrcursor_svr {
 			sqlrquerycursor(sqlrconnection_svr *conn,
 					rudiments::xmldomnode *parameters);
 		virtual	~sqlrquerycursor();
+		virtual sqlrquerytype_t	queryType(const char *query,
+							uint32_t length);
 	protected:
 		rudiments::xmldomnode	*parameters;
 };

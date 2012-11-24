@@ -130,12 +130,8 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void		waitForListenerToFinishReading();
 		void		releaseAnnounceMutex();
 		void		acquireConnectionCountMutex();
-		int32_t		*getConnectionCountBuffer();
 		void		signalScalerToRead();
 		void		releaseConnectionCountMutex();
-		void		acquireSessionCountMutex();
-		int32_t		*getSessionCountBuffer();
-		void		releaseSessionCountMutex();
 
 
 		sqlrcursor_svr	*getCursor(uint16_t command);
@@ -340,7 +336,7 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 
 		void	initConnStats();
 		void	clearConnStats();
-		void	updateState(enum sqlrconnectionstate state);
+		void	updateState(enum sqlrconnectionstate_t state);
 		void	updateCurrentQuery(const char *query,
 						uint32_t querylen);
 		void	updateClientInfo(const char *info,
@@ -354,7 +350,7 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void	decrementOpenServerCursors();
 		void	incrementTimesNewCursorUsed();
 		void	incrementTimesCursorReused();
-		void	incrementTotalQueries();
+		void	incrementQueryCounts(sqlrquerytype_t querytype);
 		void	incrementTotalErrors();
 
 		const char	*user;

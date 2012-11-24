@@ -96,7 +96,7 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 
 				// set the cursor state
 				cursor->customquerycursor->state=
-						SQLRCURSOR_STATE_BUSY;
+						SQLRCURSORSTATE_BUSY;
 
 				// reset the rest of this method to use
 				// the custom query cursor
@@ -463,9 +463,6 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *curs,
 		sqltr->runBeforeTriggers(conn,curs,curs->querytree);
 	}
 
-	// update query count
-	incrementTotalQueries();
-
 	// variables for query timing
 	timeval		tv;
 	struct timezone	tz;
@@ -483,7 +480,8 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *curs,
 	curs->queryendsec=tv.tv_sec;
 	curs->queryendusec=tv.tv_usec;
 
-	// update error count
+	// update query and error counts
+	incrementQueryCounts(curs->queryType(query,length));
 	if (!curs->queryresult) {
 		incrementTotalErrors();
 	}

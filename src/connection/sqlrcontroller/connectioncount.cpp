@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrcontroller.h>
+#include <rudiments/datetime.h>
 
 void sqlrcontroller_svr::incrementConnectionCount() {
 
@@ -17,11 +18,10 @@ void sqlrcontroller_svr::incrementConnectionCount() {
 		acquireConnectionCountMutex();
 
 		// increment the counter
-		int32_t	*connectioncount=getConnectionCountBuffer();
-		(*connectioncount)++;
+		shm->totalconnections++;
 		decrementonclose=true;
 
-		dbgfile.debugPrint("connection",1,(*connectioncount));
+		dbgfile.debugPrint("connection",1,shm->totalconnections);
 
 		releaseConnectionCountMutex();
 	}
@@ -41,14 +41,12 @@ void sqlrcontroller_svr::decrementConnectionCount() {
 
 		acquireConnectionCountMutex();
 
-		// decrement the counter
-		int32_t	*connectioncount=getConnectionCountBuffer();
-		if (--(*connectioncount)<0) {
-			(*connectioncount)=0;
+		if (shm->totalconnections) {
+			shm->totalconnections--;
 		}
 		decrementonclose=false;
 
-		dbgfile.debugPrint("connection",1,(*connectioncount));
+		dbgfile.debugPrint("connection",1,shm->totalconnections);
 
 		releaseConnectionCountMutex();
 	}
@@ -60,17 +58,36 @@ void sqlrcontroller_svr::decrementSessionCount() {
 
 	dbgfile.debugPrint("connection",0,"decrementing session count...");
 
-	acquireSessionCountMutex();
-
-	// decrement the counter
-	int32_t	*sessioncount=getSessionCountBuffer();
-	if (--(*sessioncount)<0) {
-		(*sessioncount)=0;
+	if (!semset->waitWithUndo(5)) {
+		// FIXME: bail somehow
 	}
 
-	dbgfile.debugPrint("connection",1,(*sessioncount));
+	// increment the connections-in-use count
+	if (shm->connectionsinuse) {
+		shm->connectionsinuse--;
+	}
 
-	releaseSessionCountMutex();
+	// update the peak connections-in-use count
+	if (shm->connectionsinuse>shm->stats.peak_connectionsinuse) {
+		shm->stats.peak_connectionsinuse=shm->connectionsinuse;
+	}
+
+	// update the peak connections-in-use over the previous minute count
+	datetime	dt;
+	dt.getSystemDateAndTime();
+	if (shm->connectionsinuse>
+			shm->stats.peak_connectionsinuse_1min ||
+		dt.getEpoch()/60>
+			shm->stats.peak_connectionsinuse_1min_time/60) {
+		shm->stats.peak_connectionsinuse_1min=shm->connectionsinuse;
+		shm->stats.peak_connectionsinuse_1min_time=dt.getEpoch();
+	}
+
+	dbgfile.debugPrint("connection",1,shm->connectionsinuse);
+
+	if (!semset->signalWithUndo(5)) {
+		// FIXME: bail somehow
+	}
 
 	dbgfile.debugPrint("connection",0,"done decrementing session count");
 }

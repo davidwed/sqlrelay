@@ -8,7 +8,7 @@ bool sqlrcontroller_svr::resumeResultSetCommand(sqlrcursor_svr *cursor) {
 
 	bool	retval=true;
 
-	if (cursor->state==SQLRCURSOR_STATE_SUSPENDED) {
+	if (cursor->state==SQLRCURSORSTATE_SUSPENDED) {
 
 		dbgfile.debugPrint("connection",2,
 				"previous result set was suspended");

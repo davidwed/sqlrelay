@@ -16,7 +16,7 @@ void sqlrcontroller_svr::suspendSessionCommand() {
 	// abort all cursors that aren't suspended...
 	dbgfile.debugPrint("connection",2,"aborting busy cursors...");
 	for (int32_t i=0; i<cursorcount; i++) {
-		if (cur[i]->state==SQLRCURSOR_STATE_BUSY) {
+		if (cur[i]->state==SQLRCURSORSTATE_BUSY) {
 			cur[i]->abort();
 		}
 	}

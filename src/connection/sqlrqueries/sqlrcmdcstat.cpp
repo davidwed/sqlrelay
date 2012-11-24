@@ -78,19 +78,19 @@ const char *sqlrcmdcstatcursor::getColumnName(uint32_t col) {
 }
 
 uint16_t sqlrcmdcstatcursor::getColumnType(uint32_t col) {
-	return (col<9)?colinfo[col].type:NULL;
+	return (col<9)?colinfo[col].type:0;
 }
 
 uint32_t sqlrcmdcstatcursor::getColumnLength(uint32_t col) {
-	return (col<9)?colinfo[col].length:NULL;
+	return (col<9)?colinfo[col].length:0;
 }
 
 uint32_t sqlrcmdcstatcursor::getColumnPrecision(uint32_t col) {
-	return (col<9)?colinfo[col].precision:NULL;
+	return (col<9)?colinfo[col].precision:0;
 }
 
 uint32_t sqlrcmdcstatcursor::getColumnScale(uint32_t col) {
-	return (col<9)?colinfo[col].scale:NULL;
+	return (col<9)?colinfo[col].scale:0;
 }
 
 bool sqlrcmdcstatcursor::noRowsToReturn() {
@@ -116,12 +116,11 @@ static const char * const statenames[]={
 	"SESSION_START",
 	"GET_COMMAND",
 	"PROCESS_SQL",
-	"PROCESS_CUSTOM",
+	"PROCESS_SQLCMD",
 	"RETURN_RESULT_SET",
 	"END_SESSION",
 	"ANNOUNCE_AVAILABILITY",
-	"WAIT_SEMAPHORE",
-	NULL
+	"WAIT_SEMAPHORE"
 };
 
 void sqlrcmdcstatcursor::getField(uint32_t col,

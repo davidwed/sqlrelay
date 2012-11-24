@@ -76,15 +76,6 @@ class sqlrlistener : public rudiments::daemonprocess,
 		void    errorClientSession(
 				rudiments::filedescriptor *clientsock,
 				const char *err);
-		void	acquireSessionCountMutex();
-		void	releaseSessionCountMutex();
-		void	incrementSessionCount();
-		void	decrementSessionCount();
-		int     incForkedListeners();
-		int     decForkedListeners();
-		void	incBusyListeners();
-		void	decBusyListeners();
-		int     getBusyListeners();
 		bool	acquireShmAccess();
 		bool	releaseShmAccess();
 		bool	acceptAvailableConnection(bool *alldbsdown);
@@ -121,6 +112,18 @@ class sqlrlistener : public rudiments::daemonprocess,
 
 		static void	alarmHandler(int32_t signum);
 
+
+		void		setMaxListeners(uint32_t maxlisteners);
+		void		incrementMaxListenersErrors();
+		void		incrementSessionCount();
+		void		decrementSessionCount();
+		uint32_t	incrementForkedListeners();
+		uint32_t	decrementForkedListeners();
+		void		incrementBusyListeners();
+		void		decrementBusyListeners();
+		int32_t		getBusyListeners();
+
+
 		bool		passdescriptor;
 
 		uint32_t	maxconnections;
@@ -136,9 +139,10 @@ class sqlrlistener : public rudiments::daemonprocess,
 
 		// FIXME: these shouldn't have to be pointers, right, but
 		// it appears that they do have to be or their destructors don't
-		// get called.
+		// get called for some reason.
 		rudiments::semaphoreset	*semset;
 		rudiments::sharedmemory	*idmemory;
+		shmdata			*shm;
 
 		bool	init;
 

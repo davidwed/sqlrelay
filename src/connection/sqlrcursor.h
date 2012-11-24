@@ -42,10 +42,19 @@ class bindvar_svr {
 		int16_t		isnull;
 };
 
-enum sqlrcursor_state_t {
-	SQLRCURSOR_STATE_AVAILABLE=0,
-	SQLRCURSOR_STATE_BUSY,
-	SQLRCURSOR_STATE_SUSPENDED
+enum sqlrcursorstate_t {
+	SQLRCURSORSTATE_AVAILABLE=0,
+	SQLRCURSORSTATE_BUSY,
+	SQLRCURSORSTATE_SUSPENDED
+};
+
+enum sqlrquerytype_t {
+	SQLRQUERYTYPE_SELECT=0,
+	SQLRQUERYTYPE_INSERT,
+	SQLRQUERYTYPE_UPDATE,
+	SQLRQUERYTYPE_DELETE,
+	SQLRQUERYTYPE_CUSTOM,
+	SQLRQUERYTYPE_ETC
 };
 
 class sqlrconnection_svr;
@@ -59,6 +68,8 @@ class sqlrcursor_svr {
 		virtual	bool	open(uint16_t id);
 		virtual	bool	close();
 
+		virtual sqlrquerytype_t	queryType(const char *query,
+						uint32_t length);
 		virtual	bool	prepareQuery(const char *query,
 						uint32_t length);
 		virtual	bool	supportsNativeBinds();
@@ -213,9 +224,12 @@ class sqlrcursor_svr {
 
 		void	setFakeInputBindsForThisQuery(bool fake);
 	
-		bool	skipComment(char **ptr, const char *endptr);
-		bool	skipWhitespace(char **ptr, const char *endptr);
-		char	*skipWhitespaceAndComments(const char *querybuffer);
+		bool		skipComment(const char **ptr,
+						const char *endptr);
+		bool		skipWhitespace(const char **ptr,
+						const char *endptr);
+		const char	*skipWhitespaceAndComments(
+						const char *querybuffer);
 		bool	fakeInputBinds(rudiments::stringbuffer *outputquery);
 
 		void	clearError();
@@ -259,7 +273,7 @@ class sqlrcursor_svr {
 		bool		lastrowvalid;
 		uint64_t	lastrow;
 
-		sqlrcursor_state_t	state;
+		sqlrcursorstate_t	state;
 
 		uint16_t	id;
 

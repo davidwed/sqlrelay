@@ -33,3 +33,7 @@ sqlrquerycursor::sqlrquerycursor(sqlrconnection_svr *conn,
 
 sqlrquerycursor::~sqlrquerycursor() {
 }
+
+sqlrquerytype_t	sqlrquerycursor::queryType(const char *query, uint32_t length) {
+	return SQLRQUERYTYPE_CUSTOM;
+}

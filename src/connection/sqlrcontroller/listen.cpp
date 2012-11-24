@@ -135,7 +135,7 @@ void sqlrcontroller_svr::initSession() {
 	commitorrollback=false;
 	suspendedsession=false;
 	for (int32_t i=0; i<cursorcount; i++) {
-		cur[i]->state=SQLRCURSOR_STATE_AVAILABLE;
+		cur[i]->state=SQLRCURSORSTATE_AVAILABLE;
 	}
 	accepttimeout=5;
 
