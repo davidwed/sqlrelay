@@ -10,8 +10,10 @@ void sqlrcontroller_svr::clientSession() {
 
 	dbgfile.debugPrint("connection",0,"client session...");
 
+	// update various stats
 	updateState(SESSION_START);
-
+	updateClientAddr();
+	updateClientSessionStartTime();
 	incrementClientSessionCount();
 
 	// During each session, the client will send a series of commands.
@@ -33,6 +35,7 @@ void sqlrcontroller_svr::clientSession() {
 
 		// these commands are all handled at the connection level
 		if (command==AUTHENTICATE) {
+			incrementAuthenticateCount();
 			if (authenticateCommand()) {
 				sessionStartQueries();
 				continue;
@@ -40,45 +43,59 @@ void sqlrcontroller_svr::clientSession() {
 			endsession=false;
 			break;
 		} else if (command==SUSPEND_SESSION) {
+			incrementSuspendSessionCount();
 			suspendSessionCommand();
 			endsession=false;
 			break;
 		} else if (command==END_SESSION) {
+			incrementEndSessionCount();
 			break;
 		} else if (command==PING) {
+			incrementPingCount();
 			pingCommand();
 			continue;
 		} else if (command==IDENTIFY) {
+			incrementIdentifyCount();
 			identifyCommand();
 			continue;
 		} else if (command==AUTOCOMMIT) {
+			incrementAutocommitCount();
 			autoCommitCommand();
 			continue;
 		} else if (command==BEGIN) {
+			incrementBeginCount();
 			beginCommand();
 			continue;
 		} else if (command==COMMIT) {
+			incrementCommitCount();
 			commitCommand();
 			continue;
 		} else if (command==ROLLBACK) {
+			incrementRollbackCount();
 			rollbackCommand();
 			continue;
 		} else if (command==DBVERSION) {
+			incrementDbVersionCount();
 			dbVersionCommand();
 			continue;
 		} else if (command==BINDFORMAT) {
+			incrementBindFormatCount();
 			bindFormatCommand();
 			continue;
 		} else if (command==SERVERVERSION) {
+			incrementServerVersionCount();
 			serverVersionCommand();
 			continue;
 		} else if (command==SELECT_DATABASE) {
+			incrementSelectDatabaseCount();
 			selectDatabaseCommand();
 			continue;
 		} else if (command==GET_CURRENT_DATABASE) {
+			incrementGetCurrentDatabaseCount();
 			getCurrentDatabaseCommand();
 			continue;
 		} else if (command==GET_LAST_INSERT_ID) {
+			incrementGetLastInsertIdCount();
 			getLastInsertIdCommand();
 			continue;
 		}
@@ -97,24 +114,34 @@ void sqlrcontroller_svr::clientSession() {
 
 		// these commands are all handled at the cursor level
 		if (command==NEW_QUERY) {
+			incrementNewQueryCount();
 			loop=newQueryCommand(cursor);
 		} else if (command==REEXECUTE_QUERY) {
+			incrementReexecuteQueryCount();
 			loop=reExecuteQueryCommand(cursor);
 		} else if (command==FETCH_FROM_BIND_CURSOR) {
+			incrementFetchFromBindCursorCount();
 			loop=fetchFromBindCursorCommand(cursor);
 		} else if (command==FETCH_RESULT_SET) {
+			incrementFetchResultSetCount();
 			loop=fetchResultSetCommand(cursor);
 		} else if (command==ABORT_RESULT_SET) {
+			incrementAbortResultSetCount();
 			abortResultSetCommand(cursor);
 		} else if (command==SUSPEND_RESULT_SET) {
+			incrementSuspendResultSetCount();
 			suspendResultSetCommand(cursor);
 		} else if (command==RESUME_RESULT_SET) {
+			incrementResumeResultSetCount();
 			loop=resumeResultSetCommand(cursor);
 		} else if (command==GETDBLIST) {
+			incrementGetDbListCount();
 			loop=getDatabaseListCommand(cursor);
 		} else if (command==GETTABLELIST) {
+			incrementGetTableListCount();
 			loop=getTableListCommand(cursor);
 		} else if (command==GETCOLUMNLIST) {
+			incrementGetColumnListCount();
 			loop=getColumnListCommand(cursor);
 		} else {
 			loop=false;

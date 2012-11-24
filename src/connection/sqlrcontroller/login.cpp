@@ -62,6 +62,8 @@ void sqlrcontroller_svr::reLogIn() {
 			
 		dbgfile.debugPrint("connection",5,"trying...");
 
+		incrementReLogInCount();
+
 		if (logIn(false)) {
 			if (!initCursors(oldcursorcount)) {
 				closeCursors(false);

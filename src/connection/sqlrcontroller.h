@@ -337,6 +337,7 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void	initConnStats();
 		void	clearConnStats();
 		void	updateState(enum sqlrconnectionstate_t state);
+		void	updateClientSessionStartTime();
 		void	updateCurrentQuery(const char *query,
 						uint32_t querylen);
 		void	updateClientInfo(const char *info,
@@ -352,6 +353,32 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void	incrementTimesCursorReused();
 		void	incrementQueryCounts(sqlrquerytype_t querytype);
 		void	incrementTotalErrors();
+		void	incrementAuthenticateCount();
+		void	incrementSuspendSessionCount();
+		void	incrementEndSessionCount();
+		void	incrementPingCount();
+		void	incrementIdentifyCount();
+		void	incrementAutocommitCount();
+		void	incrementBeginCount();
+		void	incrementCommitCount();
+		void	incrementRollbackCount();
+		void	incrementDbVersionCount();
+		void	incrementBindFormatCount();
+		void	incrementServerVersionCount();
+		void	incrementSelectDatabaseCount();
+		void	incrementGetCurrentDatabaseCount();
+		void	incrementGetLastInsertIdCount();
+		void	incrementNewQueryCount();
+		void	incrementReexecuteQueryCount();
+		void	incrementFetchFromBindCursorCount();
+		void	incrementFetchResultSetCount();
+		void	incrementAbortResultSetCount();
+		void	incrementSuspendResultSetCount();
+		void	incrementResumeResultSetCount();
+		void	incrementGetDbListCount();
+		void	incrementGetTableListCount();
+		void	incrementGetColumnListCount();
+		void	incrementReLogInCount();
 
 		const char	*user;
 		const char	*password;

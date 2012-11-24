@@ -199,29 +199,38 @@ struct sqlrconnstatistics {
 	uint32_t			processid;
 	enum sqlrconnectionstate_t	state;
 	uint32_t			index;
-	uint32_t			nconnect; // FIXME
-	uint32_t			nauthenticate; // FIXME
-	uint32_t			nsuspend_session; // FIXME
-	uint32_t			nend_session; // FIXME
-	uint32_t			nping; // FIXME
-	uint32_t			nidentify; // FIXME
-	uint32_t			nautocommit; // FIXME
-	uint32_t			ncommit; // FIXME
-	uint32_t			nrollback;; // FIXME
-	uint64_t			nnew_query; // FIXME
-	uint64_t			nreexecute_query; // FIXME
-	uint32_t			nfetch_from_bind_cursor; // FIXME
-	uint32_t			nfetch_result_set; // FIXME
-	uint32_t			nsuspend_result_set; // FIXME
-	uint32_t			nresume_result_set; // FIXME
-	uint32_t			nabort_result_set; // FIXME
-	uint32_t			nsqlrcmd; // FIXME
-	uint64_t			nsql; // FIXME
-	uint32_t			nrelogin; // FIXME
+	uint32_t			nconnect;
+	uint32_t			nauthenticate;
+	uint32_t			nsuspend_session;
+	uint32_t			nend_session;
+	uint32_t			nping;
+	uint32_t			nidentify;
+	uint32_t			nautocommit;
+	uint32_t			nbegin;
+	uint32_t			ncommit;
+	uint32_t			nrollback;;
+	uint32_t			ndbversion;
+	uint32_t			nbindformat;
+	uint32_t			nserverversion;
+	uint32_t			nselectdatabase;
+	uint32_t			ngetcurrentdatabase;
+	uint32_t			ngetlastinsertid;
+	uint64_t			nnewquery;
+	uint64_t			nreexecutequery;
+	uint32_t			nfetchfrombindcursor;
+	uint32_t			nfetchresultset;
+	uint32_t			nabortresultset;
+	uint32_t			nsuspendresultset;
+	uint32_t			nresumeresultset;
+	uint32_t			ngetdblist;
+	uint32_t			ngettablelist;
+	uint32_t			ngetcolumnlist;
+	uint64_t			nsql;
+	uint32_t			ncustomsql;
+	uint32_t			nrelogin;
 	struct timeval			logged_in_tv;
 	struct timeval			state_start_tv;
-	struct timeval			processclient_tv; // FIXME
-	struct timeval			processquery_tv; // FIXME
+	struct timeval			clientsession_tv;
 	char				clientaddr[16];
 	char				clientinfo[STATCLIENTINFOLEN+1];
 	char				sqltext[STATSQLTEXTLEN+1];

@@ -3,7 +3,7 @@
 
 #include <sqlrcontroller.h>
 #include <rudiments/snooze.h>
-#include <unistd.h>
+//#include <unistd.h>
 
 bool sqlrcontroller_svr::listen() {
 
@@ -27,9 +27,6 @@ bool sqlrcontroller_svr::listen() {
 			int	success=waitForClient();
 
 			if (success==1) {
-
-				// update the stats with the client address
-				updateClientAddr();
 
 				suspendedsession=false;
 
