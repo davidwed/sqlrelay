@@ -8,10 +8,13 @@
 		separate authentication and response timeouts on the client-side
 		environment variables for setting timeouts
 		sqlrelay-level errors for exceeding various bounds
+		improved statistics gathering
 	refactored Oracle re-prepare logic
 	created a query logging framework
 	implemented the current slow query log as a plugin
 	implemented the neowiz query log format as a plugin
+	created a custom query framework
+	implemented the neowiz statistics gathering commands as custom queries
 
 0.47 - fixed bug that caused sqlr-export to output negative xml-entity values
 	fixed single-quote-escaping in sqlr-export
