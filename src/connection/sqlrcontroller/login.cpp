@@ -18,10 +18,8 @@ bool sqlrcontroller_svr::logIn(bool printerrors) {
 	}
 
 	// success... update stats
-	semset->waitWithUndo(9);
-	stats->open_svr_connections++;
-	stats->opened_svr_connections++;
-	semset->signalWithUndo(9);
+	incrementOpenServerConnections();
+
 	loggedin=true;
 	return true;
 }
@@ -37,12 +35,8 @@ void sqlrcontroller_svr::logOut() {
 	conn->logOut();
 
 	// update stats
-	semset->waitWithUndo(9);
-	stats->open_svr_connections--;
-	if (stats->open_svr_connections<0) {
-		stats->open_svr_connections=0;
-	}
-	semset->signalWithUndo(9);
+	decrementOpenServerConnections();
+
 	loggedin=false;
 }
 

@@ -344,6 +344,16 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void	setCurrentQuery(sqlrcursor_svr *cursor);
 		void	setClientInfo();
 		void	setClientAddr();
+		void	incrementOpenServerConnections();
+		void	decrementOpenServerConnections();
+		void	incrementOpenClientConnections();
+		void	decrementOpenClientConnections();
+		void	incrementOpenServerCursors();
+		void	decrementOpenServerCursors();
+		void	incrementTimesNewCursorUsed();
+		void	incrementTimesCursorReused();
+		void	incrementTotalQueries();
+		void	incrementTotalErrors();
 
 		const char	*user;
 		const char	*password;

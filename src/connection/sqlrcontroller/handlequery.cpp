@@ -464,9 +464,7 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *curs,
 	}
 
 	// update query count
-	semset->waitWithUndo(9);
-	stats->total_queries++;
-	semset->signalWithUndo(9);
+	incrementTotalQueries();
 
 	// variables for query timing
 	timeval		tv;
@@ -487,9 +485,7 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *curs,
 
 	// update error count
 	if (!curs->queryresult) {
-		semset->waitWithUndo(9);
-		stats->total_errors++;
-		semset->signalWithUndo(9);
+		incrementTotalErrors();
 	}
 
 	// handle after-triggers

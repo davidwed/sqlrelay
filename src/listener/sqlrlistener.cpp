@@ -16,6 +16,7 @@
 #include <rudiments/process.h>
 #include <rudiments/file.h>
 #include <rudiments/error.h>
+#include <rudiments/datetime.h>
 
 // for printf
 #include <stdio.h>
@@ -372,6 +373,8 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	}
 	rawbuffer::zero(idmemory->getPointer(),sizeof(shmdata));
 
+	setStartTime();
+
 	// create (or connect) to the semaphore set
 	// FIXME: if it already exists, attempt to remove and re-create it
 	dbgfile.debugPrint("listener",1,"creating semaphores...");
@@ -483,6 +486,13 @@ void sqlrlistener::semError(const char *id, int semid) {
 	fprintf(stderr,"	id %d.\n\n",semid);
 	fprintf(stderr,"	Error was: %s\n\n",err);
 	delete[] err;
+}
+
+void sqlrlistener::setStartTime() {
+	shmdata	*ptr=(shmdata *)idmemory->getPointer();
+	datetime	dt;
+	dt.getSystemDateAndTime();
+	ptr->stats.starttime=dt.getEpoch();
 }
 
 bool sqlrlistener::listenOnClientSockets() {

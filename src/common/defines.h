@@ -133,6 +133,8 @@
 
 // structures...
 struct sqlrstatistics {
+	time_t	starttime;
+
 	int32_t	open_svr_connections;
 	int32_t	opened_svr_connections;
 
@@ -151,11 +153,6 @@ struct sqlrstatistics {
 	int32_t	forked_listeners;
 
 	// below were added by neowiz...
-	uint32_t	accesslogfd;
-	uint32_t	connect;
-
-	/** executed command total */
-	uint32_t	total;
 
 	/** maximum number of the listeners allowed -- for debugging purpose */
 	uint32_t	max_listener;
@@ -177,9 +174,6 @@ struct sqlrstatistics {
 
 	time_t		peak_listener_1min_time;
 	time_t		peak_session_1min_time;
-	//uint32_t	client_timeout_short;
-	//uint32_t	client_timeout_long;
-	time_t		starttime;
 	time_t		timestamp[STATQPSKEEP];
 	uint32_t	qps_select[STATQPSKEEP];
 	uint32_t	qps_insert[STATQPSKEEP];

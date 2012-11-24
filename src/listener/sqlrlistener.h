@@ -53,6 +53,7 @@ class sqlrlistener : public rudiments::daemonprocess,
 		void	keyError(const char *idfilename);
 		void	shmError(const char *id, int shmid);
 		void	semError(const char *id, int semid);
+		void	setStartTime();
 		bool	listenOnClientSockets();
 		bool	listenOnHandoffSocket(const char *id);
 		bool	listenOnDeregistrationSocket(const char *id);

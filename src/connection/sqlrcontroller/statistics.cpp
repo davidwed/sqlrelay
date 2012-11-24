@@ -76,3 +76,75 @@ void sqlrcontroller_svr::setClientAddr() {
 		charstring::copy(connstats->clientaddr,"internal");
 	}
 }
+
+void sqlrcontroller_svr::incrementOpenServerConnections() {
+	semset->waitWithUndo(9);
+	stats->open_svr_connections++;
+	stats->opened_svr_connections++;
+	semset->signalWithUndo(9);
+}
+
+void sqlrcontroller_svr::decrementOpenServerConnections() {
+	semset->waitWithUndo(9);
+	stats->open_svr_connections--;
+	if (stats->open_svr_connections<0) {
+		stats->open_svr_connections=0;
+	}
+	semset->signalWithUndo(9);
+}
+
+void sqlrcontroller_svr::incrementOpenClientConnections() {
+	semset->waitWithUndo(9);
+	stats->open_cli_connections++;
+	stats->opened_cli_connections++;
+	semset->signalWithUndo(9);
+}
+
+void sqlrcontroller_svr::decrementOpenClientConnections() {
+	semset->waitWithUndo(9);
+	stats->open_cli_connections--;
+	if (stats->open_cli_connections<0) {
+		stats->open_cli_connections=0;
+	}
+	semset->signalWithUndo(9);
+}
+
+void sqlrcontroller_svr::incrementOpenServerCursors() {
+	semset->waitWithUndo(9);
+	stats->open_svr_cursors++;
+	stats->opened_svr_cursors++;
+	semset->signalWithUndo(9);
+}
+
+void sqlrcontroller_svr::decrementOpenServerCursors() {
+	semset->waitWithUndo(9);
+	stats->open_svr_cursors--;
+	if (stats->open_svr_cursors<0) {
+		stats->open_svr_cursors=0;
+	}
+	semset->signalWithUndo(9);
+}
+
+void sqlrcontroller_svr::incrementTimesNewCursorUsed() {
+	semset->waitWithUndo(9);
+	stats->times_new_cursor_used++;
+	semset->signalWithUndo(9);
+}
+
+void sqlrcontroller_svr::incrementTimesCursorReused() {
+	semset->waitWithUndo(9);
+	stats->times_cursor_reused++;
+	semset->signalWithUndo(9);
+}
+
+void sqlrcontroller_svr::incrementTotalQueries() {
+	semset->waitWithUndo(9);
+	stats->total_queries++;
+	semset->signalWithUndo(9);
+}
+
+void sqlrcontroller_svr::incrementTotalErrors() {
+	semset->waitWithUndo(9);
+	stats->total_errors++;
+	semset->signalWithUndo(9);
+}

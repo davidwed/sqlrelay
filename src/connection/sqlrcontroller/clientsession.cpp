@@ -204,11 +204,7 @@ sqlrcursor_svr *sqlrcontroller_svr::getCursor(uint16_t command) {
 		for (uint16_t i=0; i<cursorcount; i++) {
 			if (cur[i]->id==id) {
 				cursor=cur[i];
-
-				semset->waitWithUndo(9);
-				stats->times_cursor_reused++;
-				semset->signalWithUndo(9);
-
+				incrementTimesCursorReused();
 				found=true;
 				break;
 			}
@@ -230,9 +226,7 @@ sqlrcursor_svr *sqlrcontroller_svr::getCursor(uint16_t command) {
 
  		// mark this as a new cursor being used
 		if (cursor) {
-			semset->waitWithUndo(9);
-			stats->times_new_cursor_used++;
-			semset->signalWithUndo(9);
+			incrementTimesNewCursorUsed();
 		}
 	}
 

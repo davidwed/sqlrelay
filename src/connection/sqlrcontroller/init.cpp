@@ -376,10 +376,7 @@ bool sqlrcontroller_svr::initCursors(int32_t count) {
 sqlrcursor_svr *sqlrcontroller_svr::initCursor() {
 	sqlrcursor_svr	*cursor=conn->initCursor();
 	if (cursor) {
-		semset->waitWithUndo(9);
-		stats->open_svr_cursors++;
-		stats->opened_svr_cursors++;
-		semset->signalWithUndo(9);
+		incrementOpenServerCursors();
 	}
 	return cursor;
 }

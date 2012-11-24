@@ -103,9 +103,9 @@ bool sqlrcmdgstatcursor::executeQuery(const char *query, uint32_t length) {
 	setGSResult("uptime",uptime,rowcount++);
 	strftime(tmpbuf,GSTAT_VALUE_LEN,"%Y/%m/%d %H:%M:%S",localtime(&now));
 	setGSResult("now",tmpbuf,rowcount++);
-	setGSResult("access_count",gs->connect,rowcount++);
-	setGSResult("query_total",gs->total,rowcount++);
-	setGSResult("qpm",gs->total*60/uptime,rowcount++);
+	setGSResult("access_count",gs->opened_cli_connections,rowcount++);
+	setGSResult("query_total",gs->total_queries,rowcount++);
+	setGSResult("qpm",gs->total_queries*60/uptime,rowcount++);
 	setGSResult("qpm_1",qpm_1,rowcount++);
 	setGSResult("qpm_5",qpm_5/5,rowcount++);
 	setGSResult("qpm_15",qpm_15/15,rowcount++);
