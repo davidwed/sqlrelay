@@ -280,7 +280,6 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_getdebug) {
 
 DLEXPORT ZEND_FUNCTION(sqlrcon_setclientinfo) {
 	zval **sqlrcon,**clientinfo;
-	bool r;
 	if (ZEND_NUM_ARGS() != 2 || 
 		zend_get_parameters_ex(2,&sqlrcon,&clientinfo) == FAILURE) {
 		WRONG_PARAM_COUNT;
