@@ -4,6 +4,9 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
+// for struct timeval
+#include <sys/time.h>
+
 // listener-connection protocol...
 #define HANDOFF_PASS 0
 #define HANDOFF_RECONNECT 1

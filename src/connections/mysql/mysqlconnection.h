@@ -12,8 +12,8 @@
 
 #include <mysql.h>
 
+#define MAX_SELECT_LIST_SIZE	256
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	#define MAX_SELECT_LIST_SIZE	256
 	#define MAX_ITEM_BUFFER_SIZE	32768
 #endif
 
