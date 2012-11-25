@@ -9,7 +9,7 @@
 class status : public sqlrcontroller_svr {
 	public:
 		status();
-		sqlrstatistics 		*getStatistics();
+		shmdata 		*getStatistics();
 		int			getConnectionCount();
 		int			getSessionCount();
 		bool			init(int argc, const char **argv);
@@ -25,7 +25,7 @@ class status : public sqlrcontroller_svr {
 
 		semaphoreset	*statussemset;
 
-		sqlrstatistics	privatestatistics;
+		shmdata		privateshm;
 };
 
 #endif

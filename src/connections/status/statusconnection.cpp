@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <rudiments/charstring.h>
+#include <rudiments/rawbuffer.h>
 #include <rudiments/error.h>
 
 #include <statusconnection.h>
@@ -24,11 +25,11 @@ semaphoreset *status::getSemset() {
 	return statussemset;
 }
 
-sqlrstatistics *status::getStatistics() {
+shmdata *status::getStatistics() {
 	statussemset->waitWithUndo(9);
-	privatestatistics=*stats;
+	rawbuffer::copy(&privateshm,shm,sizeof(shmdata));
 	statussemset->signalWithUndo(9);
-	return &privatestatistics;
+	return &privateshm;
 }
 
 int status::getConnectionCount() {
@@ -73,11 +74,6 @@ bool status::init(int argc, const char **argv) {
 	if (!shm) {
 		fprintf(stderr,"failed to get pointer to shmdata\n");
 		return false;
-	}
-
-	stats=&shm->stats;
-	if (!stats) {
-		fprintf(stderr,"failed to point statistics at idmemory\n");
 	}
 
 	return true;

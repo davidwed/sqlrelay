@@ -27,7 +27,7 @@ int main(int argc, const char **argv) {
 	// this will fail, just ignore it for now
 	s.init(argc,argv);
 	
-	sqlrstatistics      *statistics=s.getStatistics();
+	shmdata	*statistics=s.getStatistics();
 
 	printf( 
 		"  Open   Server Connections:  %d\n" 
@@ -112,7 +112,8 @@ int main(int argc, const char **argv) {
 		"  +---+---+---+---+---+---+---+---+---+---+-----+\n"
 		"  | %d | %d | %d | %d | %d | %d | %d | %d | %d | %d | %3d |\n"
 		"  +---------------------------------------------+\n",
-		sem[0],sem[1],sem[2],sem[3],sem[4],sem[5],sem[6],sem[7],sem[8],sem[9],sem[10]
+		sem[0],sem[1],sem[2],sem[3],sem[4],
+		sem[5],sem[6],sem[7],sem[8],sem[9],sem[10]
 		);
 
 
