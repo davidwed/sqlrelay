@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <rudiments/charstring.h>
-#include <rudiments/rawbuffer.h>
 #include <rudiments/error.h>
 
 #include <statusconnection.h>
@@ -27,7 +26,7 @@ semaphoreset *status::getSemset() {
 
 shmdata *status::getStatistics() {
 	statussemset->waitWithUndo(9);
-	rawbuffer::copy(&privateshm,shm,sizeof(shmdata));
+	privateshm=*shm;
 	statussemset->signalWithUndo(9);
 	return &privateshm;
 }
