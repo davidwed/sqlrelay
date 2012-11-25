@@ -197,7 +197,6 @@ struct sqlrconnstatistics {
 struct shmdata {
 
 	uint32_t	totalconnections;
-	uint32_t	connectionsinuse;
 	char		connectionid[MAXCONNECTIONIDLEN];
 	union {
 		struct {
@@ -206,6 +205,8 @@ struct shmdata {
 		} sockets;
 		pid_t	connectionpid;
 	} connectioninfo;
+
+	uint32_t	connectedclients;
 
 	time_t		starttime;
 

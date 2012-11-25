@@ -386,7 +386,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	// semaphores are:
 	//
 	// "connection count" - number of open database connections
-	// "session count" - number of clients currently connected
+	// "connected client count" - number of clients currently connected
 	//
 	// 0 - connection: connection registration mutex
 	// 1 - listener:   connection registration mutex
@@ -403,14 +403,16 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	//
 	// connection/lisetner/scaler interlocks:
 	// 6 - scaler/listener: used to decide whether to scale or not
-	//       listener signals after incrementing session count
+	//       listener signals after incrementing connected client count
 	//       scaler waits before counting sessions/connections
 	// 4 - connection/scaler: connection count mutex
 	//       connection increases/decreases connection count
 	//       scalar reads connection count
-	// 5 - connection/listener: session count mutex
-	//       listener increases session count when a client connects
-	//       connection decreases session count when a client disconnects
+	// 5 - connection/listener: connected client count mutex
+	//       listener increases connected client count when
+	//       	a client connects
+	//       connection decreases connected client count when
+	//       	a client disconnects
 	// 7 - scaler/listener: used to decide whether to scale or not
 	//       scaler signals after counting sessions/connections
 	//       listener waits for scaler to count sessions/connections
@@ -1245,15 +1247,15 @@ void sqlrlistener::sqlrelayClientSession(filedescriptor *clientsock) {
 	if (authstatus==1) {
 
 		if (dynamicscaling) {
-			incrementSessionCount();
+			incrementConnectedClientCount();
 		}
 		passstatus=handOffClient(clientsock);
 
-		// If the handoff failed, decrement the session count.
+		// If the handoff failed, decrement the connected client count.
 		// If it had succeeded then the connection daemon would
 		// decrement it later.
 		if (dynamicscaling && !passstatus) {
-			decrementSessionCount();
+			decrementConnectedClientCount();
 		}
 
 	} else if (authstatus==0) {
@@ -1289,7 +1291,7 @@ void sqlrlistener::mysqlClientSession(filedescriptor *clientsock) {
 	if (authstatus==1) {
 
 		if (dynamicscaling) {
-			incrementSessionCount();
+			incrementConnectedClientCount();
 		}
 		passstatus=handOffClient(clientsock);
 
@@ -2073,32 +2075,33 @@ void sqlrlistener::incrementMaxListenersErrors() {
 	shm->max_listeners_errors++;
 }
 
-void sqlrlistener::incrementSessionCount() {
+void sqlrlistener::incrementConnectedClientCount() {
 
-	dbgfile.debugPrint("listener",0,"incrementing session count...");
+	dbgfile.debugPrint("listener",0,
+				"incrementing connected client count...");
 
 	if (!semset->waitWithUndo(5)) {
 		// FIXME: bail somehow
 	}
 
 	// increment the connections-in-use counter
-	shm->connectionsinuse++;
+	shm->connectedclients++;
 
 	// update the peak connections-in-use count
-	if (shm->connectionsinuse>shm->peak_connectionsinuse) {
-		shm->peak_connectionsinuse=shm->connectionsinuse;
+	if (shm->connectedclients>shm->peak_connectionsinuse) {
+		shm->peak_connectionsinuse=shm->connectedclients;
 	}
 
 	// update the peak connections-in-use over the previous minute count
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	if (shm->connectionsinuse>shm->peak_connectionsinuse_1min ||
+	if (shm->connectedclients>shm->peak_connectionsinuse_1min ||
 		dt.getEpoch()/60>shm->peak_connectionsinuse_1min_time/60) {
-		shm->peak_connectionsinuse_1min=shm->connectionsinuse;
+		shm->peak_connectionsinuse_1min=shm->connectedclients;
 		shm->peak_connectionsinuse_1min_time=dt.getEpoch();
 	}
 
-	dbgfile.debugPrint("listener",1,shm->connectionsinuse);
+	dbgfile.debugPrint("listener",1,shm->connectedclients);
 
 	// If the system supports timed semaphore ops then the scaler can be
 	// jogged into running on-demand, and we can do that here.  If the 
@@ -2129,28 +2132,31 @@ void sqlrlistener::incrementSessionCount() {
 		// FIXME: bail somehow
 	}
 
-	dbgfile.debugPrint("listener",0,"finished incrementing session count");
+	dbgfile.debugPrint("listener",0,
+				"finished incrementing connected client count");
 }
 
-void sqlrlistener::decrementSessionCount() {
+void sqlrlistener::decrementConnectedClientCount() {
 
-	dbgfile.debugPrint("listener",0,"decrementing session count...");
+	dbgfile.debugPrint("listener",0,
+				"decrementing connected client count...");
  
 	if (!semset->waitWithUndo(5)) {
 		// FIXME: bail somehow
 	}
 
-	if (shm->connectionsinuse) {
-		shm->connectionsinuse--;
+	if (shm->connectedclients) {
+		shm->connectedclients--;
 	}
 
-	dbgfile.debugPrint("listener",1,shm->connectionsinuse);
+	dbgfile.debugPrint("listener",1,shm->connectedclients);
 
 	if (!semset->signalWithUndo(5)) {
 		// FIXME: bail somehow
 	}
 
-	dbgfile.debugPrint("listener",0,"finished decrementing session count");
+	dbgfile.debugPrint("listener",0,
+				"finished decrementing connected client count");
 }
 
 uint32_t sqlrlistener::incrementForkedListeners() {

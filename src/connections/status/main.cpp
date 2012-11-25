@@ -63,10 +63,10 @@ int main(int argc, const char **argv) {
 	printf(
 		"Scaler's view:\n"
 		"  Connections:                  %d\n"
-		"  Sessions:                     %d\n"
+		"  Connected Clients:            %d\n"
 		"\n",
 		s.getConnectionCount(),
-		s.getSessionCount()
+		s.getConnectedClientCount()
 		);
 
 	#define SEM_COUNT	11

@@ -45,10 +45,10 @@ bool sqlrcmdgstatcursor::executeQuery(const char *query, uint32_t length) {
 
 	time_t	now=time(NULL);	
 
-	uint32_t	sessioncount=conn->cont->shm->connectionsinuse;
+	uint32_t	connectedclients=conn->cont->shm->connectedclients;
 	if (now/60>gs->peak_connectionsinuse_1min_time/60) {
 		gs->peak_connectionsinuse_1min_time=now;
-		gs->peak_connectionsinuse_1min=sessioncount; 
+		gs->peak_connectionsinuse_1min=connectedclients;
 	}
 
 	int select_1=0, select_5=0, select_15=0;
@@ -133,7 +133,7 @@ bool sqlrcmdgstatcursor::executeQuery(const char *query, uint32_t length) {
 			conn->cont->semset->getValue(10),rowcount++);
 	setGSResult("peak_listener",gs->peak_listeners,rowcount++);
 	setGSResult("connection",conn->cont->shm->totalconnections,rowcount++);
-	setGSResult("session",sessioncount,rowcount++);
+	setGSResult("session",connectedclients,rowcount++);
 	setGSResult("peak_session",gs->peak_connectionsinuse,rowcount++);
 	setGSResult("peak_session_1min",
 			gs->peak_connectionsinuse_1min,rowcount++);

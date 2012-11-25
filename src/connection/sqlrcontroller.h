@@ -101,7 +101,7 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		bool	initCursors(int32_t count);
 		void	incrementConnectionCount();
 		void	decrementConnectionCount();
-		void	decrementSessionCount();
+		void	decrementConnectedClientCount();
 		void	announceAvailability(const char *tmpdir,
 					bool passdescriptor,
 					const char *unixsocket,

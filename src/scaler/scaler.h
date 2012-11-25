@@ -39,7 +39,7 @@ class scaler : public rudiments::daemonprocess {
 		void	getRandomConnectionId();
 		bool	availableDatabase();
 
-		uint32_t	getSessionCount();
+		uint32_t	getConnectedClientCount();
 		uint32_t	getConnectionCount();
 		void		incrementConnectionCount();
 		void		decrementConnectionCount();

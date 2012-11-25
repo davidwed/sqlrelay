@@ -445,8 +445,8 @@ bool scaler::openMoreConnections() {
 	// reap children here, no matter what
 	reapChildren(-1);
 		
-	// get session and connection counts
-	uint32_t	sessions=getSessionCount();
+	// get connected client and connection counts
+	uint32_t	connectedclients=getConnectedClientCount();
 	uint32_t	currentconnections=getConnectionCount();
 
 	// if we were signalled by the listener, signal
@@ -456,8 +456,8 @@ bool scaler::openMoreConnections() {
 	}
 
 	// do we need to open more connections?
-	if (sessions<currentconnections ||
-		(sessions-currentconnections)<=maxqueuelength) {
+	if (connectedclients<currentconnections ||
+		(connectedclients-currentconnections)<=maxqueuelength) {
 		return true;
 	}
 
@@ -597,11 +597,11 @@ bool scaler::availableDatabase() {
 	return retval;
 }
 
-uint32_t scaler::getSessionCount() {
+uint32_t scaler::getConnectedClientCount() {
 
-	// get the number of open sessions
+	// get the number of connected clients
 	shmdata	*ptr=(shmdata *)idmemory->getPointer();
-	return ptr->connectionsinuse;
+	return ptr->connectedclients;
 }
 
 uint32_t scaler::getConnectionCount() {

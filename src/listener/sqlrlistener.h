@@ -115,8 +115,8 @@ class sqlrlistener : public rudiments::daemonprocess,
 
 		void		setMaxListeners(uint32_t maxlisteners);
 		void		incrementMaxListenersErrors();
-		void		incrementSessionCount();
-		void		decrementSessionCount();
+		void		incrementConnectedClientCount();
+		void		decrementConnectedClientCount();
 		uint32_t	incrementForkedListeners();
 		uint32_t	decrementForkedListeners();
 		void		incrementBusyListeners();

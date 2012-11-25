@@ -31,12 +31,12 @@ shmdata *status::getStatistics() {
 	return &privateshm;
 }
 
-int status::getConnectionCount() {
-	return ((shmdata *)idmemory->getPointer())->totalconnections;
+uint32_t status::getConnectionCount() {
+	return shm->totalconnections;
 }
 
-int status::getSessionCount() {
-	return ((shmdata *)idmemory->getPointer())->connectionsinuse;
+uint32_t status::getConnectedClientCount() {
+	return shm->connectedclients;
 }
 
 bool status::init(int argc, const char **argv) {

@@ -54,7 +54,7 @@ void sqlrcontroller_svr::decrementConnectionCount() {
 	dbgfile.debugPrint("connection",0,"done decrementing connection count");
 }
 
-void sqlrcontroller_svr::decrementSessionCount() {
+void sqlrcontroller_svr::decrementConnectedClientCount() {
 
 	dbgfile.debugPrint("connection",0,"decrementing session count...");
 
@@ -63,25 +63,25 @@ void sqlrcontroller_svr::decrementSessionCount() {
 	}
 
 	// increment the connections-in-use count
-	if (shm->connectionsinuse) {
-		shm->connectionsinuse--;
+	if (shm->connectedclients) {
+		shm->connectedclients--;
 	}
 
 	// update the peak connections-in-use count
-	if (shm->connectionsinuse>shm->peak_connectionsinuse) {
-		shm->peak_connectionsinuse=shm->connectionsinuse;
+	if (shm->connectedclients>shm->peak_connectionsinuse) {
+		shm->peak_connectionsinuse=shm->connectedclients;
 	}
 
 	// update the peak connections-in-use over the previous minute count
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	if (shm->connectionsinuse>shm->peak_connectionsinuse_1min ||
+	if (shm->connectedclients>shm->peak_connectionsinuse_1min ||
 		dt.getEpoch()/60>shm->peak_connectionsinuse_1min_time/60) {
-		shm->peak_connectionsinuse_1min=shm->connectionsinuse;
+		shm->peak_connectionsinuse_1min=shm->connectedclients;
 		shm->peak_connectionsinuse_1min_time=dt.getEpoch();
 	}
 
-	dbgfile.debugPrint("connection",1,shm->connectionsinuse);
+	dbgfile.debugPrint("connection",1,shm->connectedclients);
 
 	if (!semset->signalWithUndo(5)) {
 		// FIXME: bail somehow

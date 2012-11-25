@@ -10,8 +10,8 @@ class status : public sqlrcontroller_svr {
 	public:
 		status();
 		shmdata 		*getStatistics();
-		int			getConnectionCount();
-		int			getSessionCount();
+		uint32_t		getConnectionCount();
+		uint32_t		getConnectedClientCount();
 		bool			init(int argc, const char **argv);
 		semaphoreset		*getSemset();
 	private:

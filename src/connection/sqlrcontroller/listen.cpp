@@ -78,7 +78,7 @@ bool sqlrcontroller_svr::listen() {
 
 		if (!loopback && cfgfl->getDynamicScaling()) {
 
-			decrementSessionCount();
+			decrementConnectedClientCount();
 
 			if (scalerspawned) {
 
