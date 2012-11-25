@@ -1018,12 +1018,9 @@ bool sqlrlistener::registerHandoff(filedescriptor *sock) {
 	bool		inserted=false;
 	uint32_t	index=0;
 	for (; index<maxconnections; index++) {
-		if (!handoffsocklist[index].pid) {
+		if (!handoffsocklist[index].pid ||
+			handoffsocklist[index].pid==processid) {
 			handoffsocklist[index].pid=processid;
-			handoffsocklist[index].sock=sock;
-			inserted=true;
-			break;
-		} else if (handoffsocklist[index].pid==processid) {
 			handoffsocklist[index].sock=sock;
 			inserted=true;
 			break;

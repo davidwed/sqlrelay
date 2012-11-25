@@ -29,8 +29,8 @@
 class handoffsocketnode {
 	friend class sqlrlistener;
 	private:
-		uint32_t				pid;
-		rudiments::filedescriptor		*sock;
+		uint32_t			pid;
+		rudiments::filedescriptor	*sock;
 };
 
 class sqlrlistener : public rudiments::daemonprocess,
