@@ -242,9 +242,9 @@ struct shmdata {
 
 	// highest count of connections-in-use
 	// (all-time and over previous minute)
-	uint32_t	peak_connectionsinuse;
-	uint32_t	peak_connectionsinuse_1min;
-	time_t		peak_connectionsinuse_1min_time;
+	uint32_t	peak_connectedclients;
+	uint32_t	peak_connectedclients_1min;
+	time_t		peak_connectedclients_1min_time;
 
 	time_t		timestamp[STATQPSKEEP];
 	uint32_t	qps_select[STATQPSKEEP];

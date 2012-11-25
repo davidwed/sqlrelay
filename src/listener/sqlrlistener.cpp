@@ -2085,17 +2085,17 @@ void sqlrlistener::incrementConnectedClientCount() {
 	shm->connectedclients++;
 
 	// update the peak connections-in-use count
-	if (shm->connectedclients>shm->peak_connectionsinuse) {
-		shm->peak_connectionsinuse=shm->connectedclients;
+	if (shm->connectedclients>shm->peak_connectedclients) {
+		shm->peak_connectedclients=shm->connectedclients;
 	}
 
 	// update the peak connections-in-use over the previous minute count
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	if (shm->connectedclients>shm->peak_connectionsinuse_1min ||
-		dt.getEpoch()/60>shm->peak_connectionsinuse_1min_time/60) {
-		shm->peak_connectionsinuse_1min=shm->connectedclients;
-		shm->peak_connectionsinuse_1min_time=dt.getEpoch();
+	if (shm->connectedclients>shm->peak_connectedclients_1min ||
+		dt.getEpoch()/60>shm->peak_connectedclients_1min_time/60) {
+		shm->peak_connectedclients_1min=shm->connectedclients;
+		shm->peak_connectedclients_1min_time=dt.getEpoch();
 	}
 
 	dbgfile.debugPrint("listener",1,shm->connectedclients);
