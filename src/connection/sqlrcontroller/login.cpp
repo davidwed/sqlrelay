@@ -18,7 +18,7 @@ bool sqlrcontroller_svr::logIn(bool printerrors) {
 	}
 
 	// success... update stats
-	incrementOpenServerConnections();
+	incrementOpenDatabaseConnections();
 
 	loggedin=true;
 	return true;
@@ -35,7 +35,7 @@ void sqlrcontroller_svr::logOut() {
 	conn->logOut();
 
 	// update stats
-	decrementOpenServerConnections();
+	decrementOpenDatabaseConnections();
 
 	loggedin=false;
 }

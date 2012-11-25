@@ -33,5 +33,5 @@ void sqlrcontroller_svr::closeCursors(bool destroy) {
 
 void sqlrcontroller_svr::deleteCursor(sqlrcursor_svr *curs) {
 	conn->deleteCursor(curs);
-	decrementOpenServerCursors();
+	decrementOpenDatabaseCursors();
 }

@@ -9,7 +9,6 @@ sqlrcontroller_svr::sqlrcontroller_svr() : daemonprocess(), listener() {
 	cfgfl=NULL;
 	semset=NULL;
 	idmemory=NULL;
-	stats=NULL;
 	connstats=NULL;
 
 	updown=NULL;

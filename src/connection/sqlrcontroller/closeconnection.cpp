@@ -8,7 +8,8 @@ void sqlrcontroller_svr::closeConnection() {
 
 	if (inclientsession) {
 		endSession();
-		decrementClientSessionCount();
+		decrementOpenClientConnections();
+		inclientsession=false;
 	}
 
 	// decrement the connection counter

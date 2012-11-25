@@ -1180,11 +1180,17 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 							DEFAULT_DBASE);
 		} else if (currentattribute==CONNECTIONS_ATTRIBUTE) {
 			connections=atouint32_t(value,DEFAULT_CONNECTIONS,0);
+			if (connections>MAXCONNECTIONS) {
+				connections=MAXCONNECTIONS;
+			}
 			if (maxconnections<connections) {
 				maxconnections=connections;
 			}
 		} else if (currentattribute==MAXCONNECTIONS_ATTRIBUTE) {
 			maxconnections=atouint32_t(value,DEFAULT_CONNECTIONS,1);
+			if (maxconnections>MAXCONNECTIONS) {
+				maxconnections=MAXCONNECTIONS;
+			}
 			if (maxconnections<connections) {
 				maxconnections=connections;
 			}

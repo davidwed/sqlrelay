@@ -41,7 +41,7 @@ sqlrcmdgstatcursor::sqlrcmdgstatcursor(
 
 bool sqlrcmdgstatcursor::executeQuery(const char *query, uint32_t length) {
 
-	sqlrstatistics	*gs=&conn->cont->shm->stats;
+	shmdata	*gs=conn->cont->shm;
 
 	time_t	now=time(NULL);	
 

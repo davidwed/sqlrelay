@@ -68,19 +68,17 @@ void sqlrcontroller_svr::decrementSessionCount() {
 	}
 
 	// update the peak connections-in-use count
-	if (shm->connectionsinuse>shm->stats.peak_connectionsinuse) {
-		shm->stats.peak_connectionsinuse=shm->connectionsinuse;
+	if (shm->connectionsinuse>shm->peak_connectionsinuse) {
+		shm->peak_connectionsinuse=shm->connectionsinuse;
 	}
 
 	// update the peak connections-in-use over the previous minute count
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	if (shm->connectionsinuse>
-			shm->stats.peak_connectionsinuse_1min ||
-		dt.getEpoch()/60>
-			shm->stats.peak_connectionsinuse_1min_time/60) {
-		shm->stats.peak_connectionsinuse_1min=shm->connectionsinuse;
-		shm->stats.peak_connectionsinuse_1min_time=dt.getEpoch();
+	if (shm->connectionsinuse>shm->peak_connectionsinuse_1min ||
+		dt.getEpoch()/60>shm->peak_connectionsinuse_1min_time/60) {
+		shm->peak_connectionsinuse_1min=shm->connectionsinuse;
+		shm->peak_connectionsinuse_1min_time=dt.getEpoch();
 	}
 
 	dbgfile.debugPrint("connection",1,shm->connectionsinuse);

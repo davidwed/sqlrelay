@@ -95,10 +95,10 @@
 	#define MAXPATHLEN 256
 #endif
 #define USERSIZE 128
-#define MAXCONNECTIONIDLEN 1024
-#define STATMAXCONNECTIONS 100
+#define MAXCONNECTIONIDLEN 256
+#define MAXCONNECTIONS 256
 #define STATQPSKEEP 900
-#define STATSQLTEXTLEN 300
+#define STATSQLTEXTLEN 512
 #define STATCLIENTINFOLEN 512
 
 // errors...
@@ -135,54 +135,6 @@
 	"The requested result set was not suspended."
 
 // structures...
-struct sqlrstatistics {
-	time_t	starttime;
-
-	uint32_t	open_svr_connections;
-	uint32_t	opened_svr_connections;
-
-	uint32_t	open_cli_connections;
-	uint32_t	opened_cli_connections;
-
-	uint32_t	open_svr_cursors;
-	uint32_t	opened_svr_cursors;
-
-	uint32_t	times_new_cursor_used;
-	uint32_t	times_cursor_reused;
-
-	uint32_t	total_queries;
-	uint32_t	total_errors;
-
-	uint32_t	forked_listeners;
-
-	// below were added by neowiz...
-
-	// maximum number of listeners allowed and
-	// number of times that limit was was hit
-	uint32_t	max_listeners;
-	uint32_t	max_listeners_errors;
-
-	// highest count of listeners
-	// (all-time and over previous minute)
-	uint32_t	peak_listeners;
-	uint32_t	peak_listeners_1min;
-	time_t		peak_listeners_1min_time;
-
-	// highest count of connections-in-use
-	// (all-time and over previous minute)
-	uint32_t	peak_connectionsinuse;
-	uint32_t	peak_connectionsinuse_1min;
-	time_t		peak_connectionsinuse_1min_time;
-
-	time_t		timestamp[STATQPSKEEP];
-	uint32_t	qps_select[STATQPSKEEP];
-	uint32_t	qps_insert[STATQPSKEEP];
-	uint32_t	qps_update[STATQPSKEEP];
-	uint32_t	qps_delete[STATQPSKEEP];
-	uint32_t	qps_custom[STATQPSKEEP];
-	uint32_t	qps_etc[STATQPSKEEP];
-};
-
 enum sqlrconnectionstate_t {
 	NOT_AVAILABLE=0,
 	INIT,
@@ -235,14 +187,15 @@ struct sqlrconnstatistics {
 	struct timeval			state_start_tv;
 	struct timeval			clientsession_tv;
 	char				clientaddr[16];
-	char				clientinfo[STATCLIENTINFOLEN+1];
-	char				sqltext[STATSQLTEXTLEN+1];
+	char				clientinfo[STATCLIENTINFOLEN];
+	char				sqltext[STATSQLTEXTLEN];
 };
 
 // This structure is used to pass data in shared memory between the listener
 // and connection daemons.  A struct is used instead of just stepping a pointer
 // through the shared memory segment to avoid alignment issues.
 struct shmdata {
+
 	uint32_t	totalconnections;
 	uint32_t	connectionsinuse;
 	char		connectionid[MAXCONNECTIONIDLEN];
@@ -253,8 +206,54 @@ struct shmdata {
 		} sockets;
 		pid_t	connectionpid;
 	} connectioninfo;
-	sqlrstatistics		stats;
-	sqlrconnstatistics	connstats[STATMAXCONNECTIONS];
+
+	time_t		starttime;
+
+	uint32_t	open_db_connections;
+	uint32_t	opened_db_connections;
+
+	uint32_t	open_db_cursors;
+	uint32_t	opened_db_cursors;
+
+	uint32_t	open_cli_connections;
+	uint32_t	opened_cli_connections;
+
+	uint32_t	times_new_cursor_used;
+	uint32_t	times_cursor_reused;
+
+	uint32_t	total_queries;
+	uint32_t	total_errors;
+
+	uint32_t	forked_listeners;
+
+	// below were added by neowiz...
+
+	// maximum number of listeners allowed and
+	// number of times that limit was was hit
+	uint32_t	max_listeners;
+	uint32_t	max_listeners_errors;
+
+	// highest count of listeners
+	// (all-time and over previous minute)
+	uint32_t	peak_listeners;
+	uint32_t	peak_listeners_1min;
+	time_t		peak_listeners_1min_time;
+
+	// highest count of connections-in-use
+	// (all-time and over previous minute)
+	uint32_t	peak_connectionsinuse;
+	uint32_t	peak_connectionsinuse_1min;
+	time_t		peak_connectionsinuse_1min_time;
+
+	time_t		timestamp[STATQPSKEEP];
+	uint32_t	qps_select[STATQPSKEEP];
+	uint32_t	qps_insert[STATQPSKEEP];
+	uint32_t	qps_update[STATQPSKEEP];
+	uint32_t	qps_delete[STATQPSKEEP];
+	uint32_t	qps_custom[STATQPSKEEP];
+	uint32_t	qps_etc[STATQPSKEEP];
+
+	sqlrconnstatistics	connstats[MAXCONNECTIONS];
 };
 
 enum clientsessiontype_t {

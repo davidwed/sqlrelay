@@ -30,29 +30,29 @@ int main(int argc, const char **argv) {
 	shmdata	*statistics=s.getStatistics();
 
 	printf( 
-		"  Open   Server Connections:  %d\n" 
-		"  Opened Server Connections:  %d\n" 
+		"  Open   Database Connections:  %d\n" 
+		"  Opened Database Connections:  %d\n" 
 		"\n"
-		"  Open   Client Connections:  %d\n"
-		"  Opened Client Connections:  %d\n"
+		"  Open   Database Cursors:      %d\n"
+		"  Opened Database Cursors:      %d\n"
 		"\n"
-		"  Open   Server Cursors:      %d\n"
-		"  Opened Server Cursors:      %d\n"
+		"  Open   Client Connections:    %d\n"
+		"  Opened Client Connections:    %d\n"
 		"\n"
-		"  Times  New Cursor Used:     %d\n"
-		"  Times  Cursor Reused:       %d\n"
+		"  Times  New Cursor Used:       %d\n"
+		"  Times  Cursor Reused:         %d\n"
 		"\n"
-		"  Total  Queries:             %d\n" 
-		"  Total  Errors:              %d\n"
+		"  Total  Queries:               %d\n" 
+		"  Total  Errors:                %d\n"
 		"\n"
-		"  Forked Listeners:           %d\n"
+		"  Forked Listeners:             %d\n"
 		"\n",
-		statistics->open_svr_connections, 
-		statistics->opened_svr_connections,
+		statistics->open_db_connections, 
+		statistics->opened_db_connections,
+		statistics->open_db_cursors,
+		statistics->opened_db_cursors,
 		statistics->open_cli_connections, 
 		statistics->opened_cli_connections,
-		statistics->open_svr_cursors,
-		statistics->opened_svr_cursors,
 		statistics->times_new_cursor_used,
 		statistics->times_cursor_reused,
 		statistics->total_queries,
@@ -62,8 +62,8 @@ int main(int argc, const char **argv) {
 	
 	printf(
 		"Scaler's view:\n"
-		"  Connections:                %d\n"
-		"  Sessions:                   %d\n"
+		"  Connections:                  %d\n"
+		"  Sessions:                     %d\n"
 		"\n",
 		s.getConnectionCount(),
 		s.getSessionCount()

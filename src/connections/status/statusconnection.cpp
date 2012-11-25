@@ -41,28 +41,14 @@ int status::getSessionCount() {
 }
 
 bool status::init(int argc, const char **argv) {
-
-	shmdata		*shm;
 	
 	cmdl=new cmdline(argc,argv);
-
-	// get the connection id from the command line
-	connectionid=cmdl->getValue("-connectionid");
-	if (!connectionid[0]) {
-		connectionid=DEFAULT_CONNECTIONID;
-		fprintf(stderr,"Warning: using default connectionid.\n");
-	}
 
 	cfgfl=new sqlrconfigfile();
 	tmpdir=new tempdir(cmdl);
 
 	if (!cfgfl->parse(cmdl->getConfig(),cmdl->getId())) {
 		return false;
-	}
-
-	dbgfile.init("connection",cmdl->getLocalStateDir());
-	if (cmdl->found("-debug")) {
-		dbgfile.enable();
 	}
 
 	if (!createSharedMemoryAndSemaphores(tmpdir->getString(),
@@ -89,9 +75,6 @@ bool status::createSharedMemoryAndSemaphores(const char *tmpdir,
 
 	key_t	key=file::generateKey(idfilename,1);
 
-	dbgfile.debugPrint("connection",0,"attaching to shared memory and semaphores");
-	dbgfile.debugPrint("connection",0,"id filename: ");
-	dbgfile.debugPrint("connection",0,idfilename);
 	idmemory=new sharedmemory();
 	if (!idmemory->attach(key)) {
 		char	*err=error::getErrorString();
@@ -117,9 +100,6 @@ bool status::createSharedMemoryAndSemaphores(const char *tmpdir,
 		delete[] idfilename;
 		return false;
 	}
-
-	dbgfile.debugPrint("connection",0,
-			"done attaching to shared memory and semaphores");
 
 	delete[] idfilename;
 

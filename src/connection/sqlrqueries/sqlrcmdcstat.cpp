@@ -69,8 +69,8 @@ static struct colinfo_t colinfo[]={
 	{"STATE",VARCHAR2_DATATYPE,25,0,0},
 	{"STATE_TIME",NUMBER_DATATYPE,12,12,2},
 	{"CLIENT_ADDR",VARCHAR2_DATATYPE,24,0,0},
-	{"CLIENT_INFO",VARCHAR2_DATATYPE,STATCLIENTINFOLEN,0,0},
-	{"SQL_TEXT",VARCHAR2_DATATYPE,STATSQLTEXTLEN,0,0}
+	{"CLIENT_INFO",VARCHAR2_DATATYPE,STATCLIENTINFOLEN-1,0,0},
+	{"SQL_TEXT",VARCHAR2_DATATYPE,STATSQLTEXTLEN-1,0,0}
 };
 
 const char *sqlrcmdcstatcursor::getColumnName(uint32_t col) {
@@ -98,7 +98,7 @@ bool sqlrcmdcstatcursor::noRowsToReturn() {
 }
 
 bool sqlrcmdcstatcursor::fetchRow() {
-	while (currentrow<STATMAXCONNECTIONS) {
+	while (currentrow<MAXCONNECTIONS) {
 		cs=&(conn->cont->shm->connstats[currentrow]);
 		currentrow++;
 		if (cs->processid) {

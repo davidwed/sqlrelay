@@ -38,10 +38,11 @@ class scaler : public rudiments::daemonprocess {
 		bool	reapChildren(pid_t connpid);
 		void	getRandomConnectionId();
 		bool	availableDatabase();
-		int32_t	countSessions();
-		int32_t	countConnections();
-		void	incConnections();
-		void	decConnections();
+
+		uint32_t	getSessionCount();
+		uint32_t	getConnectionCount();
+		void		incrementConnectionCount();
+		void		decrementConnectionCount();
 
 		char		*pidfile;
 
@@ -51,9 +52,9 @@ class scaler : public rudiments::daemonprocess {
 
 		sqlrconfigfile	*cfgfile;
 
-		int32_t		maxconnections;
-		int32_t		maxqueuelength;
-		int32_t		growby;
+		uint32_t	maxconnections;
+		uint32_t	maxqueuelength;
+		uint32_t	growby;
 		int32_t		ttl;
 
 		char		*idfilename;

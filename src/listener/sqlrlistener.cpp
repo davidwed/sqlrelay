@@ -703,11 +703,9 @@ void sqlrlistener::listen() {
 
 	// wait until all of the connections have started
 	for (;;) {
-		semset->waitWithUndo(9);
-		int32_t	opensvrconnections=shm->stats.open_svr_connections;
-		semset->signalWithUndo(9);
+		int32_t	opendbconnections=shm->open_db_connections;
 
-		if (opensvrconnections<
+		if (opendbconnections<
 			static_cast<int32_t>(cfgfl.getConnections())) {
 			dbgfile.debugPrint("listener",0,
 				"waiting for server connections (sleeping 1s)");
@@ -1174,8 +1172,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 
 	// if we already have too many listeners running,
 	// bail and return an error to the client
-	if (maxlisteners>-1 &&
-		forkedlisteners>maxlisteners) {
+	if (maxlisteners>-1 && forkedlisteners>maxlisteners) {
 
 		// since we've decided not to fork, decrement the counters
 		decrementBusyListeners();
@@ -2065,15 +2062,15 @@ void sqlrlistener::flushWriteBuffer(filedescriptor *fd) {
 void sqlrlistener::setStartTime() {
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	shm->stats.starttime=dt.getEpoch();
+	shm->starttime=dt.getEpoch();
 }
 
 void sqlrlistener::setMaxListeners(uint32_t maxlisteners) {
-	shm->stats.max_listeners=maxlisteners;
+	shm->max_listeners=maxlisteners;
 }
 
 void sqlrlistener::incrementMaxListenersErrors() {
-	shm->stats.max_listeners_errors++;
+	shm->max_listeners_errors++;
 }
 
 void sqlrlistener::incrementSessionCount() {
@@ -2088,19 +2085,17 @@ void sqlrlistener::incrementSessionCount() {
 	shm->connectionsinuse++;
 
 	// update the peak connections-in-use count
-	if (shm->connectionsinuse>shm->stats.peak_connectionsinuse) {
-		shm->stats.peak_connectionsinuse=shm->connectionsinuse;
+	if (shm->connectionsinuse>shm->peak_connectionsinuse) {
+		shm->peak_connectionsinuse=shm->connectionsinuse;
 	}
 
 	// update the peak connections-in-use over the previous minute count
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	if (shm->connectionsinuse>
-			shm->stats.peak_connectionsinuse_1min ||
-		dt.getEpoch()/60>
-			shm->stats.peak_connectionsinuse_1min_time/60) {
-		shm->stats.peak_connectionsinuse_1min=shm->connectionsinuse;
-		shm->stats.peak_connectionsinuse_1min_time=dt.getEpoch();
+	if (shm->connectionsinuse>shm->peak_connectionsinuse_1min ||
+		dt.getEpoch()/60>shm->peak_connectionsinuse_1min_time/60) {
+		shm->peak_connectionsinuse_1min=shm->connectionsinuse;
+		shm->peak_connectionsinuse_1min_time=dt.getEpoch();
 	}
 
 	dbgfile.debugPrint("listener",1,shm->connectionsinuse);
@@ -2161,7 +2156,7 @@ void sqlrlistener::decrementSessionCount() {
 uint32_t sqlrlistener::incrementForkedListeners() {
 
 	semset->waitWithUndo(9);
-	uint32_t	forkedlisteners=++(shm->stats.forked_listeners);
+	uint32_t	forkedlisteners=++(shm->forked_listeners);
 	semset->signalWithUndo(9);
 	return forkedlisteners;
 }
@@ -2169,10 +2164,10 @@ uint32_t sqlrlistener::incrementForkedListeners() {
 uint32_t sqlrlistener::decrementForkedListeners() {
 
 	semset->waitWithUndo(9);
-	if (shm->stats.forked_listeners) {
-		shm->stats.forked_listeners--;
+	if (shm->forked_listeners) {
+		shm->forked_listeners--;
 	}
-	uint32_t	forkedlisteners=shm->stats.forked_listeners;
+	uint32_t	forkedlisteners=shm->forked_listeners;
 	semset->signalWithUndo(9);
 	return forkedlisteners;
 }
@@ -2186,17 +2181,17 @@ void sqlrlistener::incrementBusyListeners() {
 
 	// update the peak listeners count
 	uint32_t	busylisteners=semset->getValue(10);
-	if (shm->stats.peak_listeners<busylisteners) {
-		shm->stats.peak_listeners=busylisteners;
+	if (shm->peak_listeners<busylisteners) {
+		shm->peak_listeners=busylisteners;
 	}
 
 	// update the peak listeners over the previous minute count
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	if (busylisteners>shm->stats.peak_listeners_1min ||
-		dt.getEpoch()/60>shm->stats.peak_listeners_1min_time/60) {
-		shm->stats.peak_listeners_1min=busylisteners;
-		shm->stats.peak_listeners_1min_time=dt.getEpoch();
+	if (busylisteners>shm->peak_listeners_1min ||
+		dt.getEpoch()/60>shm->peak_listeners_1min_time/60) {
+		shm->peak_listeners_1min=busylisteners;
+		shm->peak_listeners_1min_time=dt.getEpoch();
 	}
 
 	dbgfile.debugPrint("listener",0,"finished incrementing busy listeners");

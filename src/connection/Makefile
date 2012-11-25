@@ -7,8 +7,8 @@ include ../../config.mk
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) $(SIDINCLUDES) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPFLAG) -DSERVER_VERSION=\"$(SQLR_VERSION)\" -DLIBDIR=\"$(libdir)\"
 LIBS = -L$(top_builddir)/src/util -lsqlrutil $(SIDLIBS) $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
-SRCS = sqlrcontroller/sqlrconnectionctor.cpp \
-	sqlrcontroller/sqlrconnectiondtor.cpp \
+SRCS = sqlrcontroller/sqlrcontrollerctor.cpp \
+	sqlrcontroller/sqlrcontrollerdtor.cpp \
 	sqlrcontroller/flushwritebuffer.cpp \
 	sqlrcontroller/init.cpp \
 	sqlrcontroller/ipc.cpp \
@@ -16,7 +16,6 @@ SRCS = sqlrcontroller/sqlrconnectionctor.cpp \
 	sqlrcontroller/listen.cpp \
 	sqlrcontroller/listenercomm.cpp \
 	sqlrcontroller/clientsession.cpp \
-	sqlrcontroller/clientsessioncount.cpp \
 	sqlrcontroller/sessionqueries.cpp \
 	sqlrcontroller/authenticate.cpp \
 	sqlrcontroller/suspendsession.cpp \
@@ -103,8 +102,8 @@ SRCS = sqlrcontroller/sqlrconnectionctor.cpp \
 	sqlrqueries/sqlrqueries.cpp \
 	sqlrqueries/sqlrquery.cpp
 
-LOBJS = sqlrcontroller/sqlrconnectionctor.lo \
-	sqlrcontroller/sqlrconnectiondtor.lo \
+LOBJS = sqlrcontroller/sqlrcontrollerctor.lo \
+	sqlrcontroller/sqlrcontrollerdtor.lo \
 	sqlrcontroller/flushwritebuffer.lo \
 	sqlrcontroller/init.lo \
 	sqlrcontroller/ipc.lo \
@@ -112,7 +111,6 @@ LOBJS = sqlrcontroller/sqlrconnectionctor.lo \
 	sqlrcontroller/listen.lo \
 	sqlrcontroller/listenercomm.lo \
 	sqlrcontroller/clientsession.lo \
-	sqlrcontroller/clientsessioncount.lo \
 	sqlrcontroller/sessionqueries.lo \
 	sqlrcontroller/authenticate.lo \
 	sqlrcontroller/suspendsession.lo \

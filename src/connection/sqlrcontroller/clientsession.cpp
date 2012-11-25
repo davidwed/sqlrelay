@@ -10,11 +10,13 @@ void sqlrcontroller_svr::clientSession() {
 
 	dbgfile.debugPrint("connection",0,"client session...");
 
+	inclientsession=true;
+
 	// update various stats
 	updateState(SESSION_START);
 	updateClientAddr();
 	updateClientSessionStartTime();
-	incrementClientSessionCount();
+	incrementOpenClientConnections();
 
 	// During each session, the client will send a series of commands.
 	// The session ends when the client ends it or when certain commands
@@ -172,7 +174,8 @@ void sqlrcontroller_svr::clientSession() {
 
 	closeSuspendedSessionSockets();
 
-	decrementClientSessionCount();
+	decrementOpenClientConnections();
+	inclientsession=false;
 
 	dbgfile.debugPrint("connection",0,"done with client session");
 }

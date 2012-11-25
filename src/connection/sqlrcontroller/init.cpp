@@ -98,11 +98,6 @@ bool sqlrcontroller_svr::init(int argc, const char **argv,
 		return false;
 	}
 
-	stats=&shm->stats;
-	if (!stats) {
-		fprintf(stderr,"failed to point statistics at idmemory\n");
-	}
-
 	if (!reloginatstart) {
 		if (!attemptLogIn(!silent)) {
 			return false;
@@ -376,7 +371,7 @@ bool sqlrcontroller_svr::initCursors(int32_t count) {
 sqlrcursor_svr *sqlrcontroller_svr::initCursor() {
 	sqlrcursor_svr	*cursor=conn->initCursor();
 	if (cursor) {
-		incrementOpenServerCursors();
+		incrementOpenDatabaseCursors();
 	}
 	return cursor;
 }

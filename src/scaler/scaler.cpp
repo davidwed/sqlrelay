@@ -325,7 +325,7 @@ bool scaler::reapChildren(pid_t connpid) {
 		}
 
 		reaped=true;
-		decConnections();
+		decrementConnectionCount();
 
 		if (WIFEXITED(childstatus)) {
 			int	exitstatus=WEXITSTATUS(childstatus);
@@ -446,8 +446,8 @@ bool scaler::openMoreConnections() {
 	reapChildren(-1);
 		
 	// get session and connection counts
-	int	sessions=countSessions();
-	int32_t	currentconnections=countConnections();
+	uint32_t	sessions=getSessionCount();
+	uint32_t	currentconnections=getConnectionCount();
 
 	// if we were signalled by the listener, signal
 	// the listener back so that it can keep going
@@ -456,7 +456,8 @@ bool scaler::openMoreConnections() {
 	}
 
 	// do we need to open more connections?
-	if ((sessions-currentconnections)<=maxqueuelength) {
+	if (sessions<currentconnections ||
+		(sessions-currentconnections)<=maxqueuelength) {
 		return true;
 	}
 
@@ -466,7 +467,7 @@ bool scaler::openMoreConnections() {
 	}
 
 	// open "growby" connections
-	for (int32_t i=0; i<growby; i++) {
+	for (uint32_t i=0; i<growby; i++) {
 
 		// loop until a connection is successfully started
 		pid_t	connpid=0;
@@ -497,7 +498,7 @@ bool scaler::openMoreConnections() {
 			connpid=openOneConnection();
 
 			if (connpid) {
-				incConnections();
+				incrementConnectionCount();
 				if (!connectionStarted()) {
 					// There is a race condition
 					// here.  connectionStarted()
@@ -596,14 +597,29 @@ bool scaler::availableDatabase() {
 	return retval;
 }
 
-int32_t scaler::countSessions() {
+uint32_t scaler::getSessionCount() {
 
 	// get the number of open sessions
 	shmdata	*ptr=(shmdata *)idmemory->getPointer();
 	return ptr->connectionsinuse;
 }
 
-void scaler::incConnections() {
+uint32_t scaler::getConnectionCount() {
+
+	// wait for access to the connection counter
+	semset->waitWithUndo(4);
+
+	// get the number of connections
+	shmdata	*ptr=(shmdata *)idmemory->getPointer();
+	uint32_t	connections=ptr->totalconnections;
+
+	// signal that the connection counter may be accessed by someone else
+	semset->signalWithUndo(4);
+
+	return connections;
+}
+
+void scaler::incrementConnectionCount() {
 
 	// wait for access to the connection counter
 	semset->waitWithUndo(4);
@@ -616,7 +632,7 @@ void scaler::incConnections() {
 	semset->signalWithUndo(4);
 }
 
-void scaler::decConnections() {
+void scaler::decrementConnectionCount() {
 
 	// wait for access to the connection counter
 	semset->waitWithUndo(4);
@@ -629,21 +645,6 @@ void scaler::decConnections() {
 
 	// signal that the connection counter may be accessed by someone else
 	semset->signalWithUndo(4);
-}
-
-int32_t scaler::countConnections() {
-
-	// wait for access to the connection counter
-	semset->waitWithUndo(4);
-
-	// get the number of connections
-	shmdata	*ptr=(shmdata *)idmemory->getPointer();
-	int32_t	connections=ptr->totalconnections;
-
-	// signal that the connection counter may be accessed by someone else
-	semset->signalWithUndo(4);
-
-	return connections;
 }
 
 void scaler::loop() {

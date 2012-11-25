@@ -102,8 +102,6 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void	incrementConnectionCount();
 		void	decrementConnectionCount();
 		void	decrementSessionCount();
-		void	incrementClientSessionCount();
-		void	decrementClientSessionCount();
 		void	announceAvailability(const char *tmpdir,
 					bool passdescriptor,
 					const char *unixsocket,
@@ -343,12 +341,12 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void	updateClientInfo(const char *info,
 						uint32_t infolen);
 		void	updateClientAddr();
-		void	incrementOpenServerConnections();
-		void	decrementOpenServerConnections();
+		void	incrementOpenDatabaseConnections();
+		void	decrementOpenDatabaseConnections();
+		void	incrementOpenDatabaseCursors();
+		void	decrementOpenDatabaseCursors();
 		void	incrementOpenClientConnections();
 		void	decrementOpenClientConnections();
-		void	incrementOpenServerCursors();
-		void	decrementOpenServerCursors();
 		void	incrementTimesNewCursorUsed();
 		void	incrementTimesCursorReused();
 		void	incrementQueryCounts(sqlrquerytype_t querytype);
@@ -474,7 +472,6 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		sqlrconfigfile	*cfgfl;
 
 		shmdata			*shm;
-		sqlrstatistics		*stats;
 		sqlrconnstatistics	*connstats;
 
 		char		*clientinfo;
