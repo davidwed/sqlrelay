@@ -89,7 +89,8 @@ void sqlrcontroller_svr::announceAvailability(const char *tmpdir,
 		if (unixsocket && unixsocket[0]) {
 			charstring::copy(idmemoryptr->connectioninfo.
 							sockets.unixsocket,
-							unixsocket,MAXPATHLEN);
+							unixsocket,
+							MAXUNIXSOCKETLEN);
 		}
 	}
 

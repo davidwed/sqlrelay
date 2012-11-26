@@ -22,7 +22,7 @@ bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(const char *tmpdir,
 	dbgfile.debugPrint("connection",0,"id filename: ");
 	dbgfile.debugPrint("connection",0,idfilename);
 
-	// initialize shared memory segment for passing port
+	// connect to the shared memory
 	dbgfile.debugPrint("connection",1,"attaching to shared memory...");
 	idmemory=new sharedmemory();
 	if (!idmemory->attach(file::generateKey(idfilename,1))) {
@@ -35,9 +35,16 @@ bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(const char *tmpdir,
 		delete[] idfilename;
 		return false;
 	}
+	shm=(shmdata *)idmemory->getPointer();
+	if (!shm) {
+		fprintf(stderr,"failed to get pointer to shmdata\n");
+		delete idmemory;
+		idmemory=NULL;
+		delete[] idfilename;
+		return false;
+	}
 
-
-	// initialize the announce semaphore
+	// connect to the semaphore set
 	dbgfile.debugPrint("connection",1,"attaching to semaphores...");
 	semset=new semaphoreset();
 	if (!semset->attach(file::generateKey(idfilename,1),11)) {

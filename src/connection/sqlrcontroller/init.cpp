@@ -92,12 +92,6 @@ bool sqlrcontroller_svr::init(int argc, const char **argv,
 		return false;
 	}
 
-	shm=(shmdata *)idmemory->getPointer();
-	if (!shm) {
-		fprintf(stderr,"failed to get pointer to shmdata\n");
-		return false;
-	}
-
 	if (!reloginatstart) {
 		if (!attemptLogIn(!silent)) {
 			return false;

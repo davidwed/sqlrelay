@@ -40,10 +40,11 @@ scaler::scaler() : daemonprocess() {
 
 	cmdl=NULL;
 
-	idfilename=NULL;
 	pidfile=NULL;
 	semset=NULL;
 	idmemory=NULL;
+	shm=0;
+
 	cfgfile=NULL;
 	tmpdir=NULL;
 
@@ -254,17 +255,43 @@ bool scaler::initScaler(int argc, const char **argv) {
 
 	// initialize the shared memory segment filename
 	size_t	idfilenamelen=tmpdir->getLength()+5+charstring::length(id)+1;
-	idfilename=new char[idfilenamelen];
+	char	*idfilename=new char[idfilenamelen];
 	snprintf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir->getString(),id);
 	key_t	key=file::generateKey(idfilename,1);
-
-	// connect to the semaphore set
-	semset=new semaphoreset;
-	semset->attach(key,11);
+	delete[] idfilename;
 
 	// connect to the shared memory segment
 	idmemory=new sharedmemory;
-	idmemory->attach(key);
+	if (!idmemory->attach(key)) {
+		char	*err=error::getErrorString();
+		fprintf(stderr,"Couldn't attach to shared memory segment: ");
+		fprintf(stderr,"%s\n",err);
+		delete[] err;
+		delete idmemory;
+		idmemory=NULL;
+		return false;
+	}
+	shm=(shmdata *)idmemory->getPointer();
+	if (!shm) {
+		fprintf(stderr,"failed to get pointer to shmdata\n");
+		delete idmemory;
+		idmemory=NULL;
+		return false;
+	}
+
+	// connect to the semaphore set
+	semset=new semaphoreset;
+	if (!semset->attach(key,11)) {
+		char	*err=error::getErrorString();
+		fprintf(stderr,"Couldn't attach to semaphore set: ");
+		fprintf(stderr,"%s\n",err);
+		delete[] err;
+		delete semset;
+		delete idmemory;
+		semset=NULL;
+		idmemory=NULL;
+		return false;
+	}
 
 	// set up random number generator
 	datetime	dt;
@@ -285,8 +312,6 @@ void scaler::shutDown(int32_t signum) {
 }
 
 void scaler::cleanUp() {
-
-	delete[] idfilename;
 
 	delete semset;
 	delete idmemory;
@@ -598,10 +623,7 @@ bool scaler::availableDatabase() {
 }
 
 uint32_t scaler::getConnectedClientCount() {
-
-	// get the number of connected clients
-	shmdata	*ptr=(shmdata *)idmemory->getPointer();
-	return ptr->connectedclients;
+	return shm->connectedclients;
 }
 
 uint32_t scaler::getConnectionCount() {
@@ -610,8 +632,7 @@ uint32_t scaler::getConnectionCount() {
 	semset->waitWithUndo(4);
 
 	// get the number of connections
-	shmdata	*ptr=(shmdata *)idmemory->getPointer();
-	uint32_t	connections=ptr->totalconnections;
+	uint32_t	connections=shm->totalconnections;
 
 	// signal that the connection counter may be accessed by someone else
 	semset->signalWithUndo(4);
@@ -625,8 +646,7 @@ void scaler::incrementConnectionCount() {
 	semset->waitWithUndo(4);
 
 	// increment connection counter
-	shmdata	*ptr=(shmdata *)idmemory->getPointer();
-	ptr->totalconnections++;
+	shm->totalconnections++;
 
 	// signal that the connection counter may be accessed by someone else
 	semset->signalWithUndo(4);
@@ -638,9 +658,8 @@ void scaler::decrementConnectionCount() {
 	semset->waitWithUndo(4);
 
 	// decrement connection counter
-	shmdata	*ptr=(shmdata *)idmemory->getPointer();
-	if (ptr->totalconnections) {
-		ptr->totalconnections--;
+	if (shm->totalconnections) {
+		shm->totalconnections--;
 	}
 
 	// signal that the connection counter may be accessed by someone else
