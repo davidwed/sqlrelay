@@ -91,11 +91,9 @@
 #define DATE_BIND 7
 
 // sizes...
-#ifndef MAXPATHLEN
-	#define MAXPATHLEN 256
-#endif
 #define USERSIZE 128
 #define MAXCONNECTIONIDLEN 256
+#define MAXUNIXSOCKETLEN 1024
 #define MAXCONNECTIONS 256
 #define STATQPSKEEP 900
 #define STATSQLTEXTLEN 512
@@ -201,7 +199,7 @@ struct shmdata {
 	union {
 		struct {
 			uint16_t	inetport;
-			char		unixsocket[MAXPATHLEN];
+			char		unixsocket[MAXUNIXSOCKETLEN];
 		} sockets;
 		pid_t	connectionpid;
 	} connectioninfo;
