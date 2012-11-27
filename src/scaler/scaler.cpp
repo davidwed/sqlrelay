@@ -498,6 +498,11 @@ bool scaler::openMoreConnections() {
 		pid_t	connpid=0;
 		while (!connpid) {
 
+			// exit if a shutdown request has been made
+			if (shutdown) {
+				return false;
+			}
+
 			getRandomConnectionId();
 
 			// if the database associated with the
