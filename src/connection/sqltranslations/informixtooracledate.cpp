@@ -27,7 +27,6 @@ informixtooracledate::informixtooracledate(sqltranslations *sqlts,
 bool informixtooracledate::run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree) {
-
 	return translateFunctions(sqlrcon,sqlrcur,querytree->getRootNode());
 }
 
@@ -42,30 +41,22 @@ bool informixtooracledate::translateFunctions(sqlrconnection_svr *sqlrcon,
 
 		// look for and translate extend, current, datetime
 		// and interval functions
-		if (!charstring::compareIgnoringCase(
-				node->getAttributeValue(sqlparser::_value),
-				"extend")) {
+		const char	*value=
+				node->getAttributeValue(sqlparser::_value);
+		if (!charstring::compareIgnoringCase(value,"extend")) {
 			if (!translateExtend(sqlrcon,sqlrcur,node)) {
 				return false;
 			}
-		} else if (!charstring::compareIgnoringCase(
-				node->getAttributeValue(sqlparser::_value),
-				"current") ||
-			!charstring::compareIgnoringCase(
-				node->getAttributeValue(sqlparser::_value),
-				"call_dtime")) {
+		} else if (!charstring::compareIgnoringCase(value,"current") ||
+			!charstring::compareIgnoringCase(value,"call_dtime")) {
 			if (!translateCurrentDate(sqlrcon,sqlrcur,node)) {
 				return false;
 			}
-		} else if (!charstring::compareIgnoringCase(
-			node->getAttributeValue(sqlparser::_value),
-			"datetime")) {
+		} else if (!charstring::compareIgnoringCase(value,"datetime")) {
 			if (!translateDateTime(sqlrcon,sqlrcur,node)) {
 				return false;
 			}
-		} else if (!charstring::compareIgnoringCase(
-			node->getAttributeValue(sqlparser::_value),
-			"interval")) {
+		} else if (!charstring::compareIgnoringCase(value,"interval")) {
 			if (!translateInterval(sqlrcon,sqlrcur,node)) {
 				return false;
 			}
@@ -152,33 +143,28 @@ bool informixtooracledate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 
 	debugFunction();
 
-	// get the function node
-	xmldomnode	*functionnode=node;
-
 	// translate the current-date function to systimestamp
-	functionnode->setAttributeValue(sqlparser::_value,"systimestamp");
+	node->setAttributeValue(sqlparser::_value,"systimestamp");
 
 	// get the interval qualifier node, if there is one...
-	xmldomnode	*intervalqualifiernode=
-				functionnode->getNextTagSibling(
-					sqlparser::_interval_qualifier);
-	if (intervalqualifiernode->isNullNode()) {
+	xmldomnode	*nextnode=node->getNextTagSibling();
+	if (nextnode->isNullNode() ||
+		charstring::compare(nextnode->getName(),
+					sqlparser::_interval_qualifier)) {
 		return true;
 	}
 
 	// translate the interval qualifier to a string format...
 	stringbuffer	formatstring;
 	bool		containsfraction;
-	translateIntervalQualifier(&formatstring,
-					intervalqualifiernode,
-					&containsfraction);
+	translateIntervalQualifier(&formatstring,nextnode,&containsfraction);
 
 	// delete the interval_qualifier node
-	functionnode->getParent()->deleteChild(intervalqualifiernode);
+	node->getParent()->deleteChild(nextnode);
 
 	// wrap the whole thing in a
 	// to_date(to_char(..., formatstring), formatstring)
-	wrapBoth(functionnode,formatstring.getString(),containsfraction);
+	wrapBoth(node,formatstring.getString(),containsfraction);
 
 	return true;
 }
