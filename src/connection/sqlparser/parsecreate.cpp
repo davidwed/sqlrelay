@@ -40,12 +40,18 @@ bool sqlparser::parseCreate(xmldomnode *currentnode,
 	// table, index, etc..
 	if (parseCreateTable(createnode,*newptr,newptr) ||
 		parseCreateIndex(createnode,*newptr,newptr) ||
-		parseCreateSynonym(createnode,*newptr,newptr)) {
+		parseCreateSynonym(createnode,*newptr,newptr) ||
+		parseCreatePackage(createnode,*newptr,newptr) ||
+		parseCreateProcedure(createnode,*newptr,newptr) ||
+		parseCreateFunction(createnode,*newptr,newptr)) {
 		return true;
 	}
 
+
 	// for now we only support tables
-	parseRemainderVerbatim(createnode,*newptr,newptr);
+	if (!error) {
+		parseRemainderVerbatim(createnode,*newptr,newptr);
+	}
 	return true;
 }
 
@@ -1656,3 +1662,57 @@ bool sqlparser::forClause(const char *ptr, const char **newptr) {
 }
 
 const char *sqlparser::_for="for";
+
+bool sqlparser::parseCreatePackage(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+
+	// we specifically don't want to parse these yet...
+
+	// package
+	if (packageClause(ptr,newptr)) {
+		error=true;
+	}
+	return false;
+}
+
+bool sqlparser::packageClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"package ");
+}
+
+const char *sqlparser::_package="package";
+
+bool sqlparser::parseCreateProcedure(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+
+	// we specifically don't want to parse these yet...
+
+	// procedure
+	if (procedureClause(ptr,newptr)) {
+		error=true;
+	}
+	return false;
+}
+
+bool sqlparser::parseCreateFunction(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+
+	// we specifically don't want to parse these yet...
+
+	// function
+	if (functionClause(ptr,newptr)) {
+		error=true;
+	}
+	return false;
+}
+
+bool sqlparser::functionClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"function ");
+}

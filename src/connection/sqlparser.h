@@ -459,6 +459,21 @@ class sqlparser {
 		static const char	*_object_name_object;
 
 
+		// create package, procedure and function
+		bool	parseCreatePackage(rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	packageClause(const char *ptr, const char **newptr);
+		static const char	*_package;
+		bool	parseCreateProcedure(rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	parseCreateFunction(rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	functionClause(const char *ptr, const char **newptr);
+
+
 		// drop query...
 		bool	parseDrop(rudiments::xmldomnode *currentnode,
 						const char *ptr,
