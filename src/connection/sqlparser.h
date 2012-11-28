@@ -925,8 +925,12 @@ class sqlparser {
 						const char *ptr,
 						const char **newptr,
 						const char *timecomponent,
-						const char *precscale);
-		static const char	*_precision;
+						const char *precision,
+						const char *scale);
+		static const char	*_from_precision;
+		static const char	*_from_scale;
+		static const char	*_to_precision;
+		static const char	*_to_scale;
 		bool	parseUnquotedLiteral(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);

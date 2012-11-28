@@ -18,20 +18,32 @@ bool sqlwriter::intervalQualifier(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append(node->getAttributeValue(sqlparser::_from));
 	const char	*precision=
-			node->getAttributeValue(sqlparser::_precision);
+			node->getAttributeValue(sqlparser::_from_precision);
+	const char	*scale=
+			node->getAttributeValue(sqlparser::_from_scale);
 	if (precision) {
 		leftParen(output);
 		output->append(precision);
+		if (scale) {
+			comma(output);
+			output->append(scale);
+		}
 		rightParen(output);
 	}
-	output->append(" to ");
-	output->append(node->getAttributeValue(sqlparser::_to));
-	const char	*scale=
-			node->getAttributeValue(sqlparser::_scale);
-	if (scale) {
-		leftParen(output);
-		output->append(scale);
-		rightParen(output);
+	if (charstring::length(node->getAttributeValue(sqlparser::_to))) {
+		output->append(" to ");
+		output->append(node->getAttributeValue(sqlparser::_to));
+		precision=node->getAttributeValue(sqlparser::_to_precision);
+		scale=node->getAttributeValue(sqlparser::_to_scale);
+		if (precision) {
+			leftParen(output);
+			output->append(precision);
+			if (scale) {
+				comma(output);
+				output->append(scale);
+			}
+			rightParen(output);
+		}
 	}
 	return true;
 }

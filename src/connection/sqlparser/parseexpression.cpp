@@ -370,9 +370,12 @@ bool sqlparser::parseIntervalQualifier(xmldomnode *currentnode,
 					_interval_qualifier,NULL);
 
 	// look for a time component, to, and another time component
-	bool	retval=parseTimeComponent(iqnode,ptr,newptr,_from,_precision) &&
+	bool	retval=parseTimeComponent(iqnode,ptr,newptr,
+						_from,_from_precision,
+						_from_scale) &&
 			parseTo(iqnode,*newptr,newptr) &&
-			parseTimeComponent(iqnode,*newptr,newptr,_to,_scale);
+			parseTimeComponent(iqnode,*newptr,newptr,
+						_to,_to_precision,_to_scale);
 
 	// if everything went well, attach the node,
 	// otherwise reset the string pointer and delete it
@@ -411,7 +414,8 @@ bool sqlparser::parseTimeComponent(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr,
 					const char *timecomponent,
-					const char *precscale) {
+					const char *precision,
+					const char *scale) {
 	debugFunction();
 
 	// verify the time component
@@ -439,18 +443,35 @@ bool sqlparser::parseTimeComponent(xmldomnode *currentnode,
 	if (!leftParen(*newptr,newptr)) {
 		return true;
 	}
+
+	// precision
 	char	*number=getVerbatim(*newptr,newptr);
 	if (charstring::isNumber(number)) {
-		currentnode->setAttributeValue(precscale,number);
+		currentnode->setAttributeValue(precision,number);
 		delete[] number;
 	} else {
 		delete[] number;
 		return false;
 	}
+
+	// scale
+	if (comma(*newptr,newptr)) {
+		number=getVerbatim(*newptr,newptr);
+		if (charstring::isNumber(number)) {
+			currentnode->setAttributeValue(scale,number);
+			delete[] number;
+		} else {
+			delete[] number;
+			return false;
+		}
+	}
 	return rightParen(*newptr,newptr);
 }
 
-const char *sqlparser::_precision="precision";
+const char *sqlparser::_from_precision="fromprecision";
+const char *sqlparser::_from_scale="fromscale";
+const char *sqlparser::_to_precision="toprecision";
+const char *sqlparser::_to_scale="toscale";
 
 bool sqlparser::parseUnquotedLiteral(xmldomnode *currentnode,
 						const char *ptr,

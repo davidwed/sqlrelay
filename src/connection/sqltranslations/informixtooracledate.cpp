@@ -96,19 +96,16 @@ bool informixtooracledate::translateExtend(sqlrconnection_svr *sqlrcon,
 	}
 
 	// get the interval qualifier node
-	xmldomnode	*intervalqualifiernode=
-				secondexpressionnode->getFirstTagChild(
+	xmldomnode	*iqnode=secondexpressionnode->getFirstTagChild(
 						sqlparser::_interval_qualifier);
-	if (intervalqualifiernode->isNullNode()) {
+	if (iqnode->isNullNode()) {
 		return true;
 	}
 
 	// translate the interval qualifier to a string format...
 	stringbuffer	formatstring;
 	bool		containsfraction;
-	translateIntervalQualifier(&formatstring,
-					intervalqualifiernode,
-					&containsfraction);
+	translateIntervalQualifier(&formatstring,iqnode,&containsfraction);
 
 	// If we've gotten this far then we have an extend() function with
 	// a second parameter expression of type interval_qualifier with
@@ -118,7 +115,7 @@ bool informixtooracledate::translateExtend(sqlrconnection_svr *sqlrcon,
 	functionnode->setAttributeValue(sqlparser::_value,"to_char");
 
 	// delete the interval_qualifier node
-	secondexpressionnode->deleteChild(intervalqualifiernode);
+	secondexpressionnode->deleteChild(iqnode);
 
 	// create a new string_literal node with the replacement format string
 	sqlts->newNode(secondexpressionnode,
@@ -206,10 +203,9 @@ bool informixtooracledate::translateDateTime(sqlrconnection_svr *sqlrcon,
 	}
 
 	// get the interval qualifier node, if there is one...
-	xmldomnode	*intervalqualifiernode=
-				functionnode->getNextTagSibling(
+	xmldomnode	*iqnode=functionnode->getNextTagSibling(
 					sqlparser::_interval_qualifier);
-	if (intervalqualifiernode->isNullNode()) {
+	if (iqnode->isNullNode()) {
 		return true;
 	}
 
@@ -228,12 +224,10 @@ bool informixtooracledate::translateDateTime(sqlrconnection_svr *sqlrcon,
 	// translate the interval qualifier to a string format...
 	stringbuffer	formatstring;
 	bool		containsfraction;
-	translateIntervalQualifier(&formatstring,
-					intervalqualifiernode,
-					&containsfraction);
+	translateIntervalQualifier(&formatstring,iqnode,&containsfraction);
 
 	// delete the interval_qualifier node
-	functionnode->getParent()->deleteChild(intervalqualifiernode);
+	functionnode->getParent()->deleteChild(iqnode);
 
 	// add a format string parameter
 	xmldomnode	*newparameternode=sqlts->newNodeAfter(
@@ -256,20 +250,19 @@ bool informixtooracledate::translateInterval(sqlrconnection_svr *sqlrcon,
 	// interval(...) interval_qualifier -> interval '...' interval_qualifier
 	debugFunction();
 
-	// get the function node
-	xmldomnode	*functionnode=node;
-
 	// get the interval value
 	const char	*interval=
 				node->getFirstTagChild(sqlparser::_parameters)->
 				getFirstTagChild(sqlparser::_parameter)->
 				getFirstTagChild(sqlparser::_string_literal)->
 				getAttributeValue(sqlparser::_value);
-
-	// bail if there was no single-number interval value
 	if (!charstring::length(interval)) {
 		return true;
 	}
+
+	// get the next node, it could be an interval qualifier and since
+	// we'll be modifying the current node we need to get it now
+	xmldomnode	*iqnode=node->getNextTagSibling();
 
 	// put quotes around the interval value
 	stringbuffer	quotedinterval;
@@ -277,15 +270,34 @@ bool informixtooracledate::translateInterval(sqlrconnection_svr *sqlrcon,
 
 	// create a string literal containing the expression,
 	// after the function, before the interval qualifier
-	sqlts->newNodeAfter(functionnode->getParent(),functionnode,
+	sqlts->newNodeAfter(node->getParent(),node,
 				sqlparser::_string_literal,
 				quotedinterval.getString());
 
 	// delete the parameters
-	functionnode->deleteChild(
-			functionnode->getFirstTagChild(sqlparser::_parameters));
+	node->deleteChild(node->getFirstTagChild(sqlparser::_parameters));
+
+	// compress the interval qualifier, if there was one
+	if (!charstring::compare(iqnode->getName(),
+					sqlparser::_interval_qualifier)) {
+		compressIntervalQualifier(iqnode);
+	}
 
 	return true;
+}
+
+void informixtooracledate::compressIntervalQualifier(xmldomnode *iqnode) {
+	const char	*from=iqnode->getAttributeValue("from");
+	const char	*to=iqnode->getAttributeValue("to");
+	if (!charstring::compare(from,to)) {
+printf("delete _to\n");
+		iqnode->deleteAttribute(sqlparser::_to);
+printf("delete _to_precision\n");
+		iqnode->deleteAttribute(sqlparser::_to_precision);
+printf("delete _to_scale\n");
+		iqnode->deleteAttribute(sqlparser::_to_scale);
+printf("done\n");
+	}
 }
 
 enum timeparts_t {
@@ -312,14 +324,13 @@ static const char *timeparts[]={
 
 void informixtooracledate::translateIntervalQualifier(
 					stringbuffer *formatstring,
-					xmldomnode *intervalqualifiernode,
+					xmldomnode *iqnode,
 					bool *containsfraction) {
 
 	*containsfraction=false;
 
 	// get the start index
-	const char	*startstr=intervalqualifiernode->
-					getAttributeValue(sqlparser::_from);
+	const char	*startstr=iqnode->getAttributeValue(sqlparser::_from);
 	timeparts_t	start=TIMEPARTS_YEAR;
 	while (start!=TIMEPARTS_NULL &&
 		charstring::compareIgnoringCase(startstr,timeparts[start])) {
@@ -327,8 +338,7 @@ void informixtooracledate::translateIntervalQualifier(
 	}
 
 	// get the end index
-	const char	*endstr=intervalqualifiernode->
-					getAttributeValue(sqlparser::_to);
+	const char	*endstr=iqnode->getAttributeValue(sqlparser::_to);
 	timeparts_t	end=TIMEPARTS_YEAR;
 	while (end!=TIMEPARTS_NULL &&
 		charstring::compareIgnoringCase(endstr,timeparts[end])) {
@@ -380,8 +390,8 @@ void informixtooracledate::translateIntervalQualifier(
 	}
 	if (start<=TIMEPARTS_FRACTION && end>=TIMEPARTS_FRACTION) {
 		formatstring->append("FF");
-		formatstring->append(intervalqualifiernode->
-					getAttributeValue(sqlparser::_scale));
+		formatstring->append(
+				iqnode->getAttributeValue(sqlparser::_scale));
 		*containsfraction=true;
 	}
 	formatstring->append("'");
