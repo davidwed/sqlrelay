@@ -1584,7 +1584,7 @@ bool sqlparser::parseCreateSynonym(xmldomnode *currentnode,
 
 	// synonym
 	if (!synonymClause(ptr,newptr)) {
-		return true;
+		return false;
 	}
 
 	// create new node
