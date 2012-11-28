@@ -15,6 +15,10 @@
 	implemented the neowiz query log format as a plugin
 	created a custom query framework
 	implemented the neowiz statistics gathering commands as custom queries
+	added a test program for triggers, translations and other extensions
+		and obscure features
+	fixed several bugs in the informixtooracledates translation
+	added a droplocalizedtemptables trigger
 
 0.47 - fixed bug that caused sqlr-export to output negative xml-entity values
 	fixed single-quote-escaping in sqlr-export

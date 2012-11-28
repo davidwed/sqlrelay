@@ -331,7 +331,6 @@ bool sqltranslations::removeReplacementTable(const char *database,
 						const char *table) {
 
 	// remove the table
-printf("removing table: %s\n",table);
 	if (!removeReplacement(&temptablemap,database,schema,table)) {
 		return false;
 	}
@@ -348,7 +347,6 @@ printf("removing table: %s\n",table);
 			!charstring::compare(dbo->schema,schema) &&
 			!charstring::compare(dbo->dependency,table)) {
 
-printf("    removing index: %s\n",node->getData()->getData());
 			tempindexmap.removeData(dbo);
 		}
 	}
