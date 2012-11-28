@@ -19,6 +19,7 @@
 		and obscure features
 	fixed several bugs in the informixtooracledates translation
 	added a droplocalizedtemptables trigger
+	added support for "global temporary" to temptableslocalize translation
 
 0.47 - fixed bug that caused sqlr-export to output negative xml-entity values
 	fixed single-quote-escaping in sqlr-export
