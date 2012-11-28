@@ -299,6 +299,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,(uint32_t)0),"TRG_TESTTABLE_COL1");
 	checkSuccess(cur->getField(0,1),"BEFORE EACH ROW");
 	checkSuccess(cur->getField(0,2),"ENABLED");
+	// FIXME: insert rows and verify
 	printf("\n\n");
 
 
@@ -464,6 +465,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("select datetime(2012-06-15 12:30:30) year to second - interval (1) month from dual"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"2012-15-05 12:30:30");
 
+	// FIXME: fraction
+	//checkSuccess(cur->sendQuery("select datetime(2012-06-15 12:30:30) year to second - interval (1 1:1:1.1) day to fraction from dual"),1);
+	//checkSuccess(cur->getField(0,(uint32_t)0),"2012-14-06 11:29:29");
 	checkSuccess(cur->sendQuery("select datetime(2012-06-15 12:30:30) year to second - interval (1 1:1:1) day to second from dual"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"2012-14-06 11:29:29");
 	checkSuccess(cur->sendQuery("select datetime(2012-06-15 12:30:30) year to second - interval (1 1:1) day to minute from dual"),1);

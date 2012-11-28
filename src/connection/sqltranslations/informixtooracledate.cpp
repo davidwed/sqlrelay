@@ -290,13 +290,9 @@ void informixtooracledate::compressIntervalQualifier(xmldomnode *iqnode) {
 	const char	*from=iqnode->getAttributeValue("from");
 	const char	*to=iqnode->getAttributeValue("to");
 	if (!charstring::compare(from,to)) {
-printf("delete _to\n");
 		iqnode->deleteAttribute(sqlparser::_to);
-printf("delete _to_precision\n");
 		iqnode->deleteAttribute(sqlparser::_to_precision);
-printf("delete _to_scale\n");
 		iqnode->deleteAttribute(sqlparser::_to_scale);
-printf("done\n");
 	}
 }
 

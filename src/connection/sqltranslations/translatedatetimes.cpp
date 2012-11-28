@@ -175,6 +175,13 @@ bool translatedatetimes::translateDateTimesInQuery(
 							sqlparser::_value);
 
 		// leave it alone unless it's a string
+		// NOTE: This is important to do... In particular, the informix
+		// datetime() function takes a non-quoted date string that must
+		// be YYYY-MM-DD HH24-MI-SS.FF and must not be translated into
+		// a different format but gets stored in a string_literal node,
+		// at least for now.  Verifying that anything that will be
+		// translated starts and ends with quotes prevents these from
+		// being translated.
 		if (sqlts->isString(value)) {
 
 			// copy it and strip off the quotes
