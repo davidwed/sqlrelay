@@ -57,21 +57,28 @@ void temptableslocalize::mapCreateTemporaryTableName(
 	debugFunction();
 
 	// create...
-	node=node->getFirstTagChild(sqlparser::_create);
-	if (node->isNullNode()) {
+	xmldomnode	*createnode=
+			node->getFirstTagChild(sqlparser::_create);
+	if (createnode->isNullNode()) {
 		return;
 	}
-	xmldomnode	*createnode=node;
+
+	// global...
+	// (might not exist if we're translating queries
+	// originally meant for a non-oracle db)
+	xmldomnode	*globalnode=
+			createnode->getFirstTagChild(sqlparser::_global);
 
 	// temporary...
-	node=node->getFirstTagChild(sqlparser::_temporary);
-	if (node->isNullNode()) {
+	xmldomnode	*temporarynode=
+			createnode->getFirstTagChild(sqlparser::_temporary);
+	if (temporarynode->isNullNode()) {
 		return;
 	}
-	xmldomnode	*temporarynode=node;
 
 	// table...
-	xmldomnode	*tablenode=node->getNextTagSibling(sqlparser::_table);
+	xmldomnode	*tablenode=
+			temporarynode->getNextTagSibling(sqlparser::_table);
 	if (tablenode->isNullNode()) {
 		return;
 	}
@@ -97,6 +104,11 @@ void temptableslocalize::mapCreateTemporaryTableName(
 						database,schema,oldtable,NULL);
 	const char	*newtable=generateTempTableName(oldtable,uniqueid);
 	sqlts->temptablemap.setData(oldtabledbo,(char *)newtable);
+
+	// remove the global qualifier, if it was found
+	if (globalnode) {
+		createnode->deleteChild(globalnode);
+	}
 
 	// remove the temporary qualifier
 	createnode->deleteChild(temporarynode);
