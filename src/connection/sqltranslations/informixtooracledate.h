@@ -32,17 +32,20 @@ class informixtooracledate : public sqltranslation {
 
 		void	translateIntervalQualifier(
 				rudiments::stringbuffer *formatstring,
-				rudiments::xmldomnode *intervalqualifiernode);
+				rudiments::xmldomnode *intervalqualifiernode,
+				bool *containsfraction);
 
 		rudiments::xmldomnode	*wrapBoth(
 					rudiments::xmldomnode *functionnode,
-					const char *formatstring);
+					const char *formatstring,
+					bool containsfraction);
 		rudiments::xmldomnode	*wrapToChar(
 					rudiments::xmldomnode *functionnode,
 					const char *formatstring);
 		rudiments::xmldomnode	*wrapToDate(
 					rudiments::xmldomnode *functionnode,
-					const char *formatstring);
+					const char *formatstring,
+					bool containsfraction);
 		rudiments::xmldomnode	*wrap(
 					rudiments::xmldomnode *functionnode,
 					const char *function,

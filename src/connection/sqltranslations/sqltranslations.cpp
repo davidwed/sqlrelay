@@ -181,18 +181,6 @@ xmldomnode *sqltranslations::newNode(xmldomnode *parentnode,
 xmldomnode *sqltranslations::newNodeAfter(xmldomnode *parentnode,
 						xmldomnode *node,
 						const char *type) {
-
-	// find the position after "node"
-	/*uint64_t	position=1;
-	for (xmldomnode *child=parentnode->getChild((uint64_t)0);
-		!child->isNullNode(); child=child->getNextSibling()) {
-		if (child==node) {
-			break;
-		}
-		position++;
-	}*/
-
-	// create a new node and insert it at that position
 	xmldomnode	*retval=new xmldomnode(tree,parentnode->getNullNode(),
 						TAG_XMLDOMNODETYPE,type,NULL);
 	parentnode->insertChild(retval,node->getPosition()+1);
@@ -211,18 +199,6 @@ xmldomnode *sqltranslations::newNodeAfter(xmldomnode *parentnode,
 xmldomnode *sqltranslations::newNodeBefore(xmldomnode *parentnode,
 						xmldomnode *node,
 						const char *type) {
-
-	// find the position before "node"
-	/*uint64_t	position=0;
-	for (xmldomnode *child=parentnode->getChild((uint64_t)0);
-		!child->isNullNode(); child=child->getNextSibling()) {
-		if (child==node) {
-			break;
-		}
-		position++;
-	}*/
-
-	// create a new node and insert it at that position
 	xmldomnode	*retval=new xmldomnode(tree,parentnode->getNullNode(),
 						TAG_XMLDOMNODETYPE,type,NULL);
 	parentnode->insertChild(retval,node->getPosition());
@@ -301,12 +277,14 @@ bool	sqltranslations::getReplacementName(
 databaseobject *sqltranslations::createDatabaseObject(memorypool *pool,
 						const char *database,
 						const char *schema,
-						const char *object) {
+						const char *object,
+						const char *dependency) {
 
 	// initialize copy pointers
 	char	*databasecopy=NULL;
 	char	*schemacopy=NULL;
 	char	*objectcopy=NULL;
+	char	*dependencycopy=NULL;
 
 	// create buffers and copy data into them
 	if (database) {
@@ -324,6 +302,11 @@ databaseobject *sqltranslations::createDatabaseObject(memorypool *pool,
 				charstring::length(object)+1);
 		charstring::copy(objectcopy,object);
 	}
+	if (dependency) {
+		dependencycopy=(char *)pool->malloc(
+				charstring::length(dependency)+1);
+		charstring::copy(dependencycopy,dependency);
+	}
 
 	// create the databaseobject
 	databaseobject	*dbo=
@@ -337,7 +320,68 @@ databaseobject *sqltranslations::createDatabaseObject(memorypool *pool,
 	dbo->database=databasecopy;
 	dbo->schema=schemacopy;
 	dbo->object=objectcopy;
+	dbo->dependency=dependencycopy;
 
 	// return it
 	return dbo;
+}
+
+bool sqltranslations::removeReplacementTable(const char *database,
+						const char *schema,
+						const char *table) {
+
+	// remove the table
+printf("removing table: %s\n",table);
+	if (!removeReplacement(&temptablemap,database,schema,table)) {
+		return false;
+	}
+
+	// remove any indices that depend on the table
+	for (dictionarylistnode< databaseobject *, char * > *node=
+					tempindexmap.getList()->getFirstNode();
+		node;
+		node=(dictionarylistnode< databaseobject *, char *> *)
+							node->getNext()) {
+
+		databaseobject	*dbo=node->getData()->getKey();
+		if (!charstring::compare(dbo->database,database) &&
+			!charstring::compare(dbo->schema,schema) &&
+			!charstring::compare(dbo->dependency,table)) {
+
+printf("    removing index: %s\n",node->getData()->getData());
+			tempindexmap.removeData(dbo);
+		}
+	}
+	return true;
+}
+
+bool sqltranslations::removeReplacementIndex(const char *database,
+						const char *schema,
+						const char *index) {
+	return removeReplacement(&tempindexmap,database,schema,index);
+}
+
+bool sqltranslations::removeReplacement(
+				dictionary< databaseobject *, char *> *dict,
+				const char *database,
+				const char *schema,
+				const char *name) {
+
+	for (dictionarylistnode< databaseobject *, char * > *node=
+					dict->getList()->getFirstNode();
+		node;
+		node=(dictionarylistnode< databaseobject *, char *> *)
+							node->getNext()) {
+
+		databaseobject	*dbo=node->getData()->getKey();
+		const char	*replacementname=node->getData()->getData();
+		if (!charstring::compare(dbo->database,database) &&
+			!charstring::compare(dbo->schema,schema) &&
+			!charstring::compare(replacementname,name)) {
+
+			dict->removeData(dbo);
+			return true;
+		}
+	}
+	return false;
 }

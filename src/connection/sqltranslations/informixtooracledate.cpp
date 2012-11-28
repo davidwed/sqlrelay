@@ -114,7 +114,10 @@ bool informixtooracledate::translateExtend(sqlrconnection_svr *sqlrcon,
 
 	// translate the interval qualifier to a string format...
 	stringbuffer	formatstring;
-	translateIntervalQualifier(&formatstring,intervalqualifiernode);
+	bool		containsfraction;
+	translateIntervalQualifier(&formatstring,
+					intervalqualifiernode,
+					&containsfraction);
 
 	// If we've gotten this far then we have an extend() function with
 	// a second parameter expression of type interval_qualifier with
@@ -132,7 +135,7 @@ bool informixtooracledate::translateExtend(sqlrconnection_svr *sqlrcon,
 			formatstring.getString());
 
 	// now wrap the whole thing in a to_date with the same format string
-	wrapToDate(functionnode,formatstring.getString());
+	wrapToDate(functionnode,formatstring.getString(),containsfraction);
 
 	return true;
 }
@@ -165,14 +168,17 @@ bool informixtooracledate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 
 	// translate the interval qualifier to a string format...
 	stringbuffer	formatstring;
-	translateIntervalQualifier(&formatstring,intervalqualifiernode);
+	bool		containsfraction;
+	translateIntervalQualifier(&formatstring,
+					intervalqualifiernode,
+					&containsfraction);
 
 	// delete the interval_qualifier node
 	functionnode->getParent()->deleteChild(intervalqualifiernode);
 
 	// wrap the whole thing in a
 	// to_date(to_char(..., formatstring), formatstring)
-	wrapBoth(functionnode,formatstring.getString());
+	wrapBoth(functionnode,formatstring.getString(),containsfraction);
 
 	return true;
 }
@@ -235,7 +241,10 @@ bool informixtooracledate::translateDateTime(sqlrconnection_svr *sqlrcon,
 
 	// translate the interval qualifier to a string format...
 	stringbuffer	formatstring;
-	translateIntervalQualifier(&formatstring,intervalqualifiernode);
+	bool		containsfraction;
+	translateIntervalQualifier(&formatstring,
+					intervalqualifiernode,
+					&containsfraction);
 
 	// delete the interval_qualifier node
 	functionnode->getParent()->deleteChild(intervalqualifiernode);
@@ -317,7 +326,10 @@ static const char *timeparts[]={
 
 void informixtooracledate::translateIntervalQualifier(
 					stringbuffer *formatstring,
-					xmldomnode *intervalqualifiernode) {
+					xmldomnode *intervalqualifiernode,
+					bool *containsfraction) {
+
+	*containsfraction=false;
 
 	// get the start index
 	const char	*startstr=intervalqualifiernode->
@@ -384,14 +396,16 @@ void informixtooracledate::translateIntervalQualifier(
 		formatstring->append("FF");
 		formatstring->append(intervalqualifiernode->
 					getAttributeValue(sqlparser::_scale));
+		*containsfraction=true;
 	}
 	formatstring->append("'");
 }
 
 xmldomnode *informixtooracledate::wrapBoth(xmldomnode *functionnode,
-						const char *formatstring) {
+						const char *formatstring,
+						bool containsfraction) {
 	xmldomnode	*tocharnode=wrapToChar(functionnode,formatstring);
-	return wrapToDate(tocharnode,formatstring);
+	return wrapToDate(tocharnode,formatstring,containsfraction);
 }
 
 xmldomnode *informixtooracledate::wrapToChar(xmldomnode *functionnode,
@@ -400,8 +414,11 @@ xmldomnode *informixtooracledate::wrapToChar(xmldomnode *functionnode,
 }
 
 xmldomnode *informixtooracledate::wrapToDate(xmldomnode *functionnode,
-						const char *formatstring) {
-	return wrap(functionnode,"to_date",formatstring);
+						const char *formatstring,
+						bool containsfraction) {
+	return wrap(functionnode,
+			(containsfraction)?"to_timestamp":"to_date",
+			formatstring);
 }
 
 xmldomnode *informixtooracledate::wrap(xmldomnode *functionnode,

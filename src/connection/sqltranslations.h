@@ -19,6 +19,7 @@ class databaseobject {
 		const char	*database;
 		const char	*schema;
 		const char	*object;
+		const char	*dependency;
 };
 
 class sqltranslationplugin {
@@ -45,10 +46,18 @@ class sqltranslations {
 						const char *schema,
 						const char *oldname,
 						const char **newname);
-		databaseobject *createDatabaseObject(rudiments::memorypool *pool,
+		databaseobject *createDatabaseObject(
+						rudiments::memorypool *pool,
 						const char *database,
 						const char *schema,
-						const char *object);
+						const char *object,
+						const char *dependency);
+		bool	removeReplacementTable(const char *database,
+						const char *schema,
+						const char *table);
+		bool	removeReplacementIndex(const char *database,
+						const char *schema,
+						const char *index);
 
 		void	endSession();
 	private:
@@ -61,6 +70,11 @@ class sqltranslations {
 				const char *schema,
 				const char *oldname,
 				const char **newname);
+		bool	removeReplacement(
+				rudiments::dictionary< databaseobject *, char *> *dict,
+				const char *database,
+				const char *schema,
+				const char *oldname);
 		
 		rudiments::xmldom	*xmld;
 		rudiments::xmldom	*tree;

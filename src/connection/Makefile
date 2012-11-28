@@ -205,6 +205,7 @@ LOBJS = sqlrcontroller/sqlrcontrollerctor.lo \
 all: libsqlrconnection.la \
 	libsqlrelay_sqltrigger_createtableautoincrementoracle.la \
 	libsqlrelay_sqltrigger_droptableautoincrementoracle.la \
+	libsqlrelay_sqltrigger_droplocalizedtemptables.la \
 	libsqlrelay_sqltranslation_doublequotestosinglequotes.la \
 	libsqlrelay_sqltranslation_informixtooracledate.la \
 	libsqlrelay_sqltranslation_locksnowaitbydefault.la \
@@ -237,6 +238,9 @@ libsqlrelay_sqltrigger_createtableautoincrementoracle.la: sqltriggers/createtabl
 
 libsqlrelay_sqltrigger_droptableautoincrementoracle.la: sqltriggers/droptableautoincrementoracle.cpp sqltriggers/droptableautoincrementoracle.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltriggers/droptableautoincrementoracle.lo $(LDFLAGS) $(TRIGGERPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+
+libsqlrelay_sqltrigger_droplocalizedtemptables.la: sqltriggers/droplocalizedtemptables.cpp sqltriggers/droplocalizedtemptables.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltriggers/droplocalizedtemptables.lo $(LDFLAGS) $(TRIGGERPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
 
 libsqlrelay_sqltranslation_doublequotestosinglequotes.la: sqltranslations/doublequotestosinglequotes.cpp sqltranslations/doublequotestosinglequotes.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/doublequotestosinglequotes.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
@@ -305,11 +309,14 @@ install-triggers:
 	$(RM) $(libdir)/libsqlrelay_sqltrigger_createtableautoincrementoracle.a
 	$(LTINSTALL) libsqlrelay_sqltrigger_droptableautoincrementoracle.la $(libdir)
 	$(RM) $(libdir)/libsqlrelay_sqltrigger_droptableautoincrementoracle.a
-	$(LTINSTALL) libsqlrelay_sqltranslation_doublequotestosinglequotes.la $(libdir)
+	$(LTINSTALL) libsqlrelay_sqltrigger_droplocalizedtemptables.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqltrigger_droplocalizedtemptables.a
 	$(LIBTOOL) --mode=finish $(libdir)
 
 install-translations:
 	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) libsqlrelay_sqltranslation_doublequotestosinglequotes.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqltranslation_doublequotestosinglequotes.a
 	$(LTINSTALL) libsqlrelay_sqltranslation_informixtooracledate.la $(libdir)
 	$(RM) $(libdir)/libsqlrelay_sqltranslation_informixtooracledate.a
 	$(LTINSTALL) libsqlrelay_sqltranslation_locksnowaitbydefault.la $(libdir)

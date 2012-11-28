@@ -24,8 +24,6 @@ class temptableslocalize : public sqltranslation {
 		const char	*generateTempTableName(const char *oldtable,
 							const char *uniqueid);
 		bool		replaceTempNames(rudiments::xmldomnode *node);
-		bool		verbatimTableReference(
-						rudiments::xmldomnode *node);
 };
 
 #endif

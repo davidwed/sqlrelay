@@ -28,6 +28,7 @@ endif
 ifneq ($(strip $(ORACLELIBS)),)
 	$(MAKE) oracle
 	$(MAKE) oracle8
+	$(MAKE) extensions
 endif
 ifneq ($(strip $(POSTGRESQLLIBS)),)
 	$(MAKE) postgresql
@@ -60,6 +61,9 @@ oracle: oracle.cpp oracle.lo
 oracle8: oracle8.cpp oracle8.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle8.lo $(LIBS)
 
+extensions: extensions.cpp extensions.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ extensions.lo $(LIBS)
+
 postgresql: postgresql.cpp postgresql.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ postgresql.lo $(LIBS)
 
@@ -82,6 +86,7 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(LIBTOOL) --mode=clean $(RM) db2
+	$(LIBTOOL) --mode=clean $(RM) extensions
 	$(LIBTOOL) --mode=clean $(RM) freetds
 	$(LIBTOOL) --mode=clean $(RM) firebird
 	$(LIBTOOL) --mode=clean $(RM) mysql

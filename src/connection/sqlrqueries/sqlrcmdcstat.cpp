@@ -65,7 +65,7 @@ static struct colinfo_t colinfo[]={
 	{"INDEX",NUMBER_DATATYPE,10,10,0},
 	{"MINE",VARCHAR2_DATATYPE,1,0,0},
 	{"PROCESSID",NUMBER_DATATYPE,10,10,0},
-	{"CONNECT",NUMBER_DATATYPE,12,12,2},
+	{"CONNECT",NUMBER_DATATYPE,12,12,0},
 	{"STATE",VARCHAR2_DATATYPE,25,0,0},
 	{"STATE_TIME",NUMBER_DATATYPE,12,12,2},
 	{"CLIENT_ADDR",VARCHAR2_DATATYPE,24,0,0},
@@ -158,22 +158,9 @@ void sqlrcmdcstatcursor::getField(uint32_t col,
 			fieldbuffer=charstring::parseNumber(cs->processid);
 			break;
 		case 3:
-			{
 			// connect -
-			// number of seconds since db connection established
-			double	conntime=0.0;
-			if (cs->logged_in_tv.tv_sec!=0) {
-				struct timeval	now;
-				gettimeofday(&now,NULL);
-				conntime=((double)(now.tv_sec-
-						cs->logged_in_tv.tv_sec))+
-					((double)(now.tv_usec-
-						cs->logged_in_tv.tv_usec))/
-						1000000.0;
-			}
-			fieldbuffer=charstring::parseNumber(conntime,
-					colinfo[3].precision,colinfo[3].scale);
-			}
+			// number of client connections
+			fieldbuffer=charstring::parseNumber(cs->nconnect);
 			break;
 		case 4:
 			// state -
