@@ -108,7 +108,6 @@ int	main(int argc, char **argv) {
 	// sqlrcmd cstat/gstat
 	printf("SQLRCMD CSTAT: \n");
 	checkSuccess(cur->sendQuery("sqlrcmd cstat"),1);
-
 	checkSuccess(cur->colCount(),9);
 	printf("\n");
 
@@ -288,6 +287,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->rowCount(),2);
 	checkSuccess(cur->getField(0,(uint32_t)0),"PACKAGE");
 	checkSuccess(cur->getField(1,(uint32_t)0),"PACKAGE BODY");
+	checkSuccess(cur->sendQuery("select object_type from user_objects where object_name='LAST_INSERT_ID'"),1);
+	checkSuccess(cur->rowCount(),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"FUNCTION");
 	printf("\n\n");
 
 
@@ -313,7 +315,9 @@ int	main(int argc, char **argv) {
 
 	// insert and verify that auto increment is working
 	checkSuccess(cur->sendQuery("insert into testtable (col2) values (1)"),1);
+	checkSuccess(con->getLastInsertId(),1);
 	checkSuccess(cur->sendQuery("insert into testtable (col2) values (2)"),1);
+	checkSuccess(con->getLastInsertId(),2);
 	checkSuccess(cur->sendQuery("select * from testtable"),1);
 	checkSuccess(cur->rowCount(),2);
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
@@ -407,13 +411,15 @@ int	main(int argc, char **argv) {
 
 	printf("TRANSLATIONS: locksnowaitbydefault\n");
 	checkSuccess(cur->sendQuery("create table testtable (col1 int)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values (1)"),1);
-	checkSuccess(cur->sendQuery("lock table testtable"),1);
+	checkSuccess(con->begin(),1);
+	checkSuccess(cur->sendQuery("lock table testtable in exclusive mode"),1);
 	secondcon=new sqlrconnection("localhost",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
-	checkSuccess(secondcur->sendQuery("select * from testtable"),0);
-printf("%d\n",secondcur->errorCode());
+	checkSuccess(secondcur->sendQuery("lock table testtable in exclusive mode"),0);
+	checkSuccess(secondcur->errorNumber(),54);
+	checkSuccess(con->commit(),1);
+	checkSuccess(secondcur->sendQuery("lock table testtable in exclusive mode"),1);
 	delete secondcur;
 	delete secondcon;
 	checkSuccess(cur->sendQuery("drop table testtable"),1);
@@ -530,11 +536,6 @@ printf("%d\n",secondcur->errorCode());
 	printf("TRANSLATIONS: serialautoincrement\n");
 	checkSuccess(cur->sendQuery("create table testtable (col1 serial)"),1);
 	checkSuccess(cur->sendQuery("drop table testtable"),1);
-	printf("\n\n");
-
-
-	printf("LAST INSERT ID:\n");
-	// FIXME: check for function last_insert_id()
 	printf("\n\n");
 
 	delete cur;
