@@ -261,14 +261,14 @@ int	main(int argc, char **argv) {
 	datetime	dt;
 	dt.getSystemDateAndTime();
 	const char	*field=cur->getField(0,(uint32_t)0);
-	char	*year=charstring::subString(field,0,3);
-	char	*day=charstring::subString(field,5,6);
-	char	*month=charstring::subString(field,8,9);
+	char	*day=charstring::subString(field,0,1);
+	char	*month=charstring::subString(field,3,4);
+	char	*year=charstring::subString(field,6,9);
 	char	*hour=charstring::subString(field,11,12);
 	char	*minute=charstring::subString(field,14,15);
-	checkSuccess((int)charstring::toInteger(year),(int)dt.getYear());
 	checkSuccess((int)charstring::toInteger(day),(int)dt.getDayOfMonth());
 	checkSuccess((int)charstring::toInteger(month),(int)dt.getMonth());
+	checkSuccess((int)charstring::toInteger(year),(int)dt.getYear());
 	checkSuccess((int)charstring::toInteger(hour),(int)dt.getHour());
 	int	dbmin=(int)charstring::toInteger(minute);
 	int	min=(int)dt.getMinutes();
@@ -496,31 +496,31 @@ int	main(int argc, char **argv) {
 
 	// intervals
 	checkSuccess(cur->sendQuery("select datetime(2012-06-15 12:30:30) year to second - interval (1-1) year to month from dual"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"2011-15-05 12:30:30");
+	checkSuccess(cur->getField(0,(uint32_t)0),"15/05/2011 12:30:30");
 
 	checkSuccess(cur->sendQuery("select datetime(2012-06-15 12:30:30) year to second - interval (1) year to year from dual"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"2011-15-06 12:30:30");
+	checkSuccess(cur->getField(0,(uint32_t)0),"15/06/2011 12:30:30");
 	checkSuccess(cur->sendQuery("select datetime(2012-06-15 12:30:30) year to second - interval (1) year from dual"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"2011-15-06 12:30:30");
+	checkSuccess(cur->getField(0,(uint32_t)0),"15/06/2011 12:30:30");
 
 	checkSuccess(cur->sendQuery("select datetime(2012-06-15 12:30:30) year to second - interval (1) month to month from dual"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"2012-15-05 12:30:30");
+	checkSuccess(cur->getField(0,(uint32_t)0),"15/05/2012 12:30:30");
 	checkSuccess(cur->sendQuery("select datetime(2012-06-15 12:30:30) year to second - interval (1) month from dual"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"2012-15-05 12:30:30");
+	checkSuccess(cur->getField(0,(uint32_t)0),"15/05/2012 12:30:30");
 
 	// FIXME: fraction
 	//checkSuccess(cur->sendQuery("select datetime(2012-06-15 12:30:30) year to second - interval (1 1:1:1.1) day to fraction from dual"),1);
 	//checkSuccess(cur->getField(0,(uint32_t)0),"2012-14-06 11:29:29");
 	checkSuccess(cur->sendQuery("select datetime(2012-06-15 12:30:30) year to second - interval (1 1:1:1) day to second from dual"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"2012-14-06 11:29:29");
+	checkSuccess(cur->getField(0,(uint32_t)0),"14/06/2012 11:29:29");
 	checkSuccess(cur->sendQuery("select datetime(2012-06-15 12:30:30) year to second - interval (1 1:1) day to minute from dual"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"2012-14-06 11:29:30");
+	checkSuccess(cur->getField(0,(uint32_t)0),"14/06/2012 11:29:30");
 	checkSuccess(cur->sendQuery("select datetime(2012-06-15 12:30:30) year to second - interval (1 1) day to hour from dual"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"2012-14-06 11:30:30");
+	checkSuccess(cur->getField(0,(uint32_t)0),"14/06/2012 11:30:30");
 	checkSuccess(cur->sendQuery("select datetime(2012-06-15 12:30:30) year to second - interval (1) day to day from dual"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"2012-14-06 12:30:30");
+	checkSuccess(cur->getField(0,(uint32_t)0),"14/06/2012 12:30:30");
 	checkSuccess(cur->sendQuery("select datetime(2012-06-15 12:30:30) year to second - interval (1) day from dual"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"2012-14-06 12:30:30");
+	checkSuccess(cur->getField(0,(uint32_t)0),"14/06/2012 12:30:30");
 
 	printf("\n\n");
 
