@@ -4,9 +4,13 @@
 #include <config.h>
 #include <sqlrcontroller.h>
 #include <rudiments/file.h>
-#include <rudiments/process.h>
+#include <rudiments/rawbuffer.h>
 
 sqlrcontroller_svr::~sqlrcontroller_svr() {
+
+	if (connstats) {
+		rawbuffer::zero(connstats,sizeof(sqlrconnstatistics));
+	}
 
 	delete cmdl;
 	delete cfgfl;
