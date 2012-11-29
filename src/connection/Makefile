@@ -209,7 +209,6 @@ all: libsqlrconnection.la \
 	libsqlrelay_sqltranslation_doublequotestosinglequotes.la \
 	libsqlrelay_sqltranslation_informixtooracledate.la \
 	libsqlrelay_sqltranslation_locksnowaitbydefault.la \
-	libsqlrelay_sqltranslation_oracletemptablespreserverowsbydefault.la \
 	libsqlrelay_sqltranslation_temptablesaddmissingcolumns.la \
 	libsqlrelay_sqltranslation_temptableslocalize.la \
 	libsqlrelay_sqltranslation_translatedatetimes.la \
@@ -250,9 +249,6 @@ libsqlrelay_sqltranslation_informixtooracledate.la: sqltranslations/informixtoor
 
 libsqlrelay_sqltranslation_locksnowaitbydefault.la: sqltranslations/locksnowaitbydefault.cpp sqltranslations/locksnowaitbydefault.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/locksnowaitbydefault.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
-
-libsqlrelay_sqltranslation_oracletemptablespreserverowsbydefault.la: sqltranslations/oracletemptablespreserverowsbydefault.cpp sqltranslations/oracletemptablespreserverowsbydefault.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/oracletemptablespreserverowsbydefault.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
 
 libsqlrelay_sqltranslation_temptablesaddmissingcolumns.la: sqltranslations/temptablesaddmissingcolumns.cpp sqltranslations/temptablesaddmissingcolumns.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/temptablesaddmissingcolumns.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
@@ -321,8 +317,6 @@ install-translations:
 	$(RM) $(libdir)/libsqlrelay_sqltranslation_informixtooracledate.a
 	$(LTINSTALL) libsqlrelay_sqltranslation_locksnowaitbydefault.la $(libdir)
 	$(RM) $(libdir)/libsqlrelay_sqltranslation_locksnowaitbydefault.a
-	$(LTINSTALL) libsqlrelay_sqltranslation_oracletemptablespreserverowsbydefault.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqltranslation_oracletemptablespreserverowsbydefault.a
 	$(LTINSTALL) libsqlrelay_sqltranslation_temptablesaddmissingcolumns.la $(libdir)
 	$(RM) $(libdir)/libsqlrelay_sqltranslation_temptablesaddmissingcolumns.a
 	$(LTINSTALL) libsqlrelay_sqltranslation_temptableslocalize.la $(libdir)
@@ -361,7 +355,6 @@ uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_doublequotestosinglequotes.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_informixtooracledate.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_locksnowaitbydefault.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_oracletemptablespreserverowsbydefault.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_temptablesaddmissingcolumns.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_temptableslocalize.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_translatedatetimes.la
