@@ -406,12 +406,17 @@ int	main(int argc, char **argv) {
 
 
 	printf("TRANSLATIONS: locksnowaitbydefault\n");
-	// FIXME: how to test this?
+	checkSuccess(cur->sendQuery("create table testtable (col1 int)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (1)"),1);
+	checkSuccess(cur->sendQuery("lock table testtable"),1);
 	secondcon=new sqlrconnection("localhost",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
+	checkSuccess(secondcur->sendQuery("select * from testtable"),0);
+printf("%d\n",secondcur->errorCode());
 	delete secondcur;
 	delete secondcon;
+	checkSuccess(cur->sendQuery("drop table testtable"),1);
 	printf("\n\n");
 
 

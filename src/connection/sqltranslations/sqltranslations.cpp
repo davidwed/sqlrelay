@@ -5,13 +5,6 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslations/translatedatetimes.h>
-#include <sqltranslations/temptableslocalize.h>
-#include <sqltranslations/locksnowaitbydefault.h>
-#include <sqltranslations/oracletemptablespreserverowsbydefault.h>
-#include <sqltranslations/temptablesaddmissingcolumns.h>
-#include <sqltranslations/doublequotestosinglequotes.h>
-#include <sqltranslations/informixtooracledate.h>
 #include <debugprint.h>
 
 #include <rudiments/process.h>
