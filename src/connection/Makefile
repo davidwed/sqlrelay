@@ -359,6 +359,7 @@ uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_temptableslocalize.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_translatedatetimes.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_matchestolike.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_oracletemptablespreserverowsbydefault.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_oracleize.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_serialtoautoincrement.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrlogger_slowqueries.la

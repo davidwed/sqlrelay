@@ -284,22 +284,54 @@ int	main(int argc, char **argv) {
 
 
 	printf("SERIALPKG:\n");
-	// FIXME: check for package serialpkg
+	checkSuccess(cur->sendQuery("select object_type from user_objects where object_name='SERIALPKG'"),1);
+	checkSuccess(cur->rowCount(),2);
+	checkSuccess(cur->getField(0,(uint32_t)0),"PACKAGE");
+	checkSuccess(cur->getField(1,(uint32_t)0),"PACKAGE BODY");
 	printf("\n\n");
 
 
 	printf("TRIGGERS: createtableautoincrementoracle\n");
+
+	// drop any existing stuff
 	cur->sendQuery("drop table testtable");
 	cur->sendQuery("drop trigger trg_testtable_col1");
-	checkSuccess(cur->sendQuery("create table testtable (col1 int auto_increment)"),1);
+
+	// create the table
+	checkSuccess(cur->sendQuery("create table testtable (col1 int auto_increment, col2 int)"),1);
+
+	// verify that entries were put in the autoincrement_sequences table
 	checkSuccess(cur->sendQuery("select table_name from user_tables where table_name='AUTOINCREMENT_SEQUENCES'"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"AUTOINCREMENT_SEQUENCES");
 
+	// verify that the trigger got created
 	checkSuccess(cur->sendQuery("select trigger_name, trigger_type, status from dba_triggers where table_name='TESTTABLE'"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"TRG_TESTTABLE_COL1");
 	checkSuccess(cur->getField(0,1),"BEFORE EACH ROW");
 	checkSuccess(cur->getField(0,2),"ENABLED");
-	// FIXME: insert rows and verify
+	printf("\n");
+
+	// insert and verify that auto increment is working
+	checkSuccess(cur->sendQuery("insert into testtable (col2) values (1)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable (col2) values (2)"),1);
+	checkSuccess(cur->sendQuery("select * from testtable"),1);
+	checkSuccess(cur->rowCount(),2);
+	checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	checkSuccess(cur->getField(0,(uint32_t)1),"1");
+	checkSuccess(cur->getField(1,(uint32_t)0),"2");
+	checkSuccess(cur->getField(1,(uint32_t)1),"2");
+	printf("\n");
+
+	// delete and verify again
+	checkSuccess(cur->sendQuery("delete from testtable"),1);
+	checkSuccess(cur->sendQuery("insert into testtable (col2) values (1)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable (col2) values (2)"),1);
+	checkSuccess(cur->sendQuery("select * from testtable"),1);
+	checkSuccess(cur->rowCount(),2);
+	checkSuccess(cur->getField(0,(uint32_t)0),"3");
+	checkSuccess(cur->getField(0,(uint32_t)1),"1");
+	checkSuccess(cur->getField(1,(uint32_t)0),"4");
+	checkSuccess(cur->getField(1,(uint32_t)1),"2");
 	printf("\n\n");
 
 
@@ -363,11 +395,6 @@ int	main(int argc, char **argv) {
 	printf("\n\n");
 
 
-	printf("TRANSLATIONS: oracletemptablespreserverowsbydefault\n");
-	// FIXME: how to test this?
-	printf("\n\n");
-
-
 	printf("TRANSLATIONS: translatedatetimes\n");
 	cur->prepareQuery("select :1,'2001-02-03' from dual");
 	cur->inputBind("1","2000-01-02");
@@ -380,6 +407,11 @@ int	main(int argc, char **argv) {
 
 	printf("TRANSLATIONS: locksnowaitbydefault\n");
 	// FIXME: how to test this?
+	secondcon=new sqlrconnection("localhost",9000,"/tmp/test.socket",
+							"test","test",0,1);
+	secondcur=new sqlrcursor(secondcon);
+	delete secondcur;
+	delete secondcon;
 	printf("\n\n");
 
 
