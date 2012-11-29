@@ -105,7 +105,52 @@ int	main(int argc, char **argv) {
 
 	con->setClientInfo("extensionstest");
 
-	// sqlrcmd cstat/gstat
+
+	printf("IGNORE SELECT DATABASE:\n");
+	const char	*originaldb=con->getCurrentDatabase();
+	checkSuccess((originaldb!=NULL),true);
+	checkSuccess(con->selectDatabase("nonexistentdb"),true);
+	checkSuccess(con->getCurrentDatabase(),originaldb);
+	printf("\n\n");
+
+
+	printf("TRANSLATE BIND VARIABLES:\n");
+	cur->prepareQuery("select :1 from dual");
+	cur->inputBind("1","hello");
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"hello");
+	cur->clearBinds();
+
+	cur->prepareQuery("select @1 from dual");
+	cur->inputBind("1","hello");
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"hello");
+	cur->clearBinds();
+
+	cur->prepareQuery("select $1 from dual");
+	cur->inputBind("1","hello");
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"hello");
+	cur->clearBinds();
+
+	cur->prepareQuery("select ? from dual");
+	cur->inputBind("1","hello");
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"hello");
+	cur->clearBinds();
+	printf("\n\n");
+
+
+	printf("FAKE INPUT BIND VARIABLES:\n");
+	// FIXME: how to test this?
+	printf("\n\n");
+
+
+	printf("ISOLATION LEVELS: \n");
+	// FIXME: how to test this?
+	printf("\n\n");
+
+
 	printf("SQLRCMD CSTAT: \n");
 	checkSuccess(cur->sendQuery("sqlrcmd cstat"),1);
 	checkSuccess(cur->colCount(),9);
@@ -226,33 +271,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(33,(uint32_t)0),"peak_session");
 	checkSuccess(cur->getField(34,(uint32_t)0),"peak_session_1min");
 	checkSuccess(cur->getField(35,(uint32_t)0),"peak_session_1min_time");
-	printf("\n\n");
-
-
-	printf("TRANSLATE BIND VARIABLES:\n");
-	cur->prepareQuery("select :1 from dual");
-	cur->inputBind("1","hello");
-	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"hello");
-	cur->clearBinds();
-
-	cur->prepareQuery("select @1 from dual");
-	cur->inputBind("1","hello");
-	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"hello");
-	cur->clearBinds();
-
-	cur->prepareQuery("select $1 from dual");
-	cur->inputBind("1","hello");
-	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"hello");
-	cur->clearBinds();
-
-	cur->prepareQuery("select ? from dual");
-	cur->inputBind("1","hello");
-	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"hello");
-	cur->clearBinds();
 	printf("\n\n");
 
 
