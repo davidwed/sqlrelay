@@ -607,7 +607,8 @@ bool sqlrcursor_svr::fakeInputBinds(stringbuffer *outputquery) {
 	}
 
 	if (conn->cont->debugsqltranslation) {
-		printf("after faking input binds:\n%s\n\n",querybuffer);
+		printf("after faking input binds:\n%s\n\n",
+					outputquery->getString());
 	}
 
 	return true;
