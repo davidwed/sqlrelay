@@ -104,6 +104,7 @@ sqlrconfigfile::~sqlrconfigfile() {
 		delete[] mysqladdresses[index];
 	}
 	delete[] mysqladdresses;
+	delete[] mysqlunixport;
 
 	delete[] dbase;
 	delete[] unixport;
@@ -275,17 +276,21 @@ const char *sqlrconfigfile::getHandOff() {
 	// on some OS'es, force reconnect, even if pass was specified...
 
 	// get the os and version
-	const char	*os=rudiments::system::getOperatingSystemName();
-	double		ver=charstring::toFloat(
-				rudiments::system::getOperatingSystemRelease());
+	char	*os=rudiments::system::getOperatingSystemName();
+	char	*rel=rudiments::system::getOperatingSystemRelease();
+	double	ver=charstring::toFloat(rel);
 
 	// force reconnect for Cygwin and Linux < 2.2
+	const char	*retval=handoff;
 	if (!charstring::compare(os,"CYGWIN",6) ||
 		(!charstring::compare(os,"Linux",5) && ver<2.2)) {
-		return "reconnect";
+		retval="reconnect";
 	}
 
-	return handoff;
+	// clean up
+	delete[] os;
+	delete[] rel;
+	return retval;
 }
 
 bool sqlrconfigfile::getPassDescriptor() {

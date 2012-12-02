@@ -53,6 +53,7 @@ sqlrcontroller_svr::~sqlrcontroller_svr() {
 	delete sqlp;
 	delete sqlt;
 	delete sqlw;
+	delete sqltr;
 	delete sqlrlg;
 	delete sqlrq;
 

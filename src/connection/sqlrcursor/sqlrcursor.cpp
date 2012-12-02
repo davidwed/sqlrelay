@@ -51,6 +51,7 @@ sqlrcursor_svr::~sqlrcursor_svr() {
 	delete[] inbindvars;
 	delete[] outbindvars;
 	delete customquerycursor;
+	delete[] error;
 }
 
 bool sqlrcursor_svr::openInternal(uint16_t id) {

@@ -153,6 +153,7 @@ bool sqltranslations::runTranslations(sqlrconnection_svr *sqlrcon,
 
 void sqltranslations::endSession() {
 	temptablepool->free();
+	tempindexpool->free();
 	temptablemap.clear();
 	tempindexmap.clear();
 }

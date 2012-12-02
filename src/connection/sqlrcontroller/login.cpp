@@ -82,6 +82,7 @@ void sqlrcontroller_svr::reLogIn() {
 
 	// restore the db
 	conn->selectDatabase(currentdb);
+	delete[] currentdb;
 
 	// restore autocommit
 	if (conn->autocommit) {

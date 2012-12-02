@@ -92,8 +92,8 @@ class SQLRUTIL_DLLSPEC usercontainer {
 		const char	*getUser();
 		const char	*getPassword();
 	private:
-		const char	*user;
-		const char	*password;
+		char	*user;
+		char	*password;
 };
 
 typedef rudiments::linkedlistnode< usercontainer * >	usernode;
@@ -114,8 +114,8 @@ class SQLRUTIL_DLLSPEC connectstringcontainer {
 		const char	*getConnectStringValue(const char *variable);
 	private:
 
-		const char	*connectionid;
-		const char	*string;
+		char		*connectionid;
+		char		*string;
 		uint32_t	metric;
 		bool		behindloadbalancer;
 

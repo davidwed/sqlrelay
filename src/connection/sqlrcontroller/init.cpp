@@ -174,7 +174,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv,
 	clientinfo=new char[maxclientinfolength+1];
 
 	// create error buffer
-	// FIXME: this should definitely be dine inside the connection class
+	// FIXME: this should definitely be done inside the connection class
 	conn->error=new char[maxerrorlength+1];
 
 	// increment connection counter

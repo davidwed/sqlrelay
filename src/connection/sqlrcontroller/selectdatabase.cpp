@@ -33,6 +33,8 @@ void sqlrcontroller_svr::selectDatabaseCommand() {
 				"get list failed: "
 				"client sent short db parameter");
 			clientsock->write(false);
+			flushWriteBuffer();
+			delete[] db;
 			return;
 		}
 	}
@@ -50,6 +52,7 @@ void sqlrcontroller_svr::selectDatabaseCommand() {
 	}
 
 	flushWriteBuffer();
+	delete[] db;
 
 	return;
 }

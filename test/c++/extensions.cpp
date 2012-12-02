@@ -320,6 +320,7 @@ int	main(int argc, char **argv) {
 	// create the table
 	checkSuccess(cur->sendQuery("create table testtable (col1 int auto_increment, col2 int)"),1);
 
+
 	// verify that entries were put in the autoincrement_sequences table
 	checkSuccess(cur->sendQuery("select table_name from user_tables where table_name='AUTOINCREMENT_SEQUENCES'"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"AUTOINCREMENT_SEQUENCES");
@@ -428,7 +429,7 @@ int	main(int argc, char **argv) {
 
 
 	printf("TRANSLATIONS: locksnowaitbydefault\n");
-	checkSuccess(cur->sendQuery("create table testtable (col1 int)"),1);
+	/*checkSuccess(cur->sendQuery("create table testtable (col1 int)"),1);
 	checkSuccess(con->begin(),1);
 	checkSuccess(cur->sendQuery("lock table testtable in exclusive mode"),1);
 	secondcon=new sqlrconnection("localhost",9000,"/tmp/test.socket",
@@ -440,7 +441,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(secondcur->sendQuery("lock table testtable in exclusive mode"),1);
 	delete secondcur;
 	delete secondcon;
-	checkSuccess(cur->sendQuery("drop table testtable"),1);
+	checkSuccess(cur->sendQuery("drop table testtable"),1);*/
 	printf("\n\n");
 
 
