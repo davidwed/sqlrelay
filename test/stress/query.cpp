@@ -4,6 +4,8 @@
 #include <stdio.h>
 
 main() {
+	//sqlrconnection	sqlrcon("localhost",9000,"","test","test",0,1);
+	//sqlrcursor	sqlrcur(&sqlrcon);
 
 	//datetime	dt;
 	//dt.getSystemDateAndTime();
