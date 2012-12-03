@@ -131,6 +131,21 @@
 #define SQLR_ERROR_RESULTSETNOTSUSPENDED 900009
 #define SQLR_ERROR_RESULTSETNOTSUSPENDED_STRING \
 	"The requested result set was not suspended."
+#define SQLR_ERROR_TOOMANYLISTENERS 900010
+#define SQLR_ERROR_TOOMANYLISTENERS_STRING \
+	"Too many listeners."
+#define SQLR_ERROR_ERRORFORKINGLISTENER 900011
+#define SQLR_ERROR_ERRORFORKINGLISTENER_STRING \
+	"Too many listeners."
+#define SQLR_ERROR_AUTHENTICATIONERROR 900012
+#define SQLR_ERROR_AUTHENTICATIONERROR_STRING \
+	"Authentication Error."
+#define SQLR_ERROR_HANDOFFFAILED 900013
+#define SQLR_ERROR_HANDOFFFAILED_STRING \
+	"The listener failed to hand the client off to the database connection."
+#define SQLR_ERROR_DBSDOWN 900014
+#define SQLR_ERROR_DBSDOWN_STRING \
+	"All databases are currently down."
 
 // structures...
 enum sqlrconnectionstate_t {

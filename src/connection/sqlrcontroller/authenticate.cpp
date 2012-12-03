@@ -15,9 +15,10 @@ bool sqlrcontroller_svr::authenticateCommand() {
 
 		// indicate that an error has occurred
 		clientsock->write((uint16_t)ERROR_OCCURRED);
-		clientsock->write((uint64_t)0);
-		clientsock->write((uint16_t)21);
-		clientsock->write("Authentication Error.");
+		clientsock->write((uint64_t)SQLR_ERROR_AUTHENTICATIONERROR);
+		clientsock->write((uint16_t)charstring::length(
+					SQLR_ERROR_AUTHENTICATIONERROR_STRING));
+		clientsock->write(SQLR_ERROR_AUTHENTICATIONERROR_STRING);
 		flushWriteBuffer();
 		conn->endSession();
 		return false;

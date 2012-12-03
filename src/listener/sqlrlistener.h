@@ -75,7 +75,7 @@ class sqlrlistener : public rudiments::daemonprocess,
 		int32_t	getMySQLAuth(rudiments::filedescriptor *clientsock);
 		void    errorClientSession(
 				rudiments::filedescriptor *clientsock,
-				const char *err);
+				int64_t errnum, const char *err);
 		bool	acquireShmAccess();
 		bool	releaseShmAccess();
 		bool	acceptAvailableConnection(bool *alldbsdown);

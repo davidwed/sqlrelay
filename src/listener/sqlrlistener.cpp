@@ -1146,11 +1146,12 @@ bool sqlrlistener::deniedIp(filedescriptor *clientsock) {
 }
 
 void sqlrlistener::errorClientSession(filedescriptor *clientsock,
+							int64_t errnum,
 							const char *err) {
 	// get auth and ignore the result
 	getAuth(clientsock);
 	clientsock->write((uint16_t)ERROR_OCCURRED);
-	clientsock->write((uint64_t)0);
+	clientsock->write((uint64_t)errnum);
 	clientsock->write((uint16_t)charstring::length(err));
 	clientsock->write(err);
 	flushWriteBuffer(clientsock);
@@ -1177,7 +1178,9 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		decrementBusyListeners();
 		decrementForkedListeners();
 		incrementMaxListenersErrors();
-		errorClientSession(clientsock,"Too many listeners.");
+		errorClientSession(clientsock,
+				SQLR_ERROR_TOOMANYLISTENERS,
+				SQLR_ERROR_TOOMANYLISTENERS_STRING);
 		return;
 	}
 
@@ -1215,7 +1218,9 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		// error
 		decrementBusyListeners();
 		decrementForkedListeners();
-		errorClientSession(clientsock,"Error forking listener");
+		errorClientSession(clientsock,
+				SQLR_ERROR_ERRORFORKINGLISTENER,
+				SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
 	}
 }
 
@@ -1263,11 +1268,11 @@ void sqlrlistener::sqlrelayClientSession(filedescriptor *clientsock) {
 		// authentication error to discourage
 		// brute-force password attacks
 		snooze::macrosnooze(2);
-		const char	err[]="Authentication Error.";
 		clientsock->write((uint16_t)ERROR_OCCURRED);
-		clientsock->write((uint64_t)0);
-		clientsock->write((uint16_t)charstring::length(err));
-		clientsock->write(err);
+		clientsock->write((uint64_t)SQLR_ERROR_AUTHENTICATIONERROR);
+		clientsock->write((uint16_t)charstring::length(
+				SQLR_ERROR_AUTHENTICATIONERROR_STRING));
+		clientsock->write(SQLR_ERROR_AUTHENTICATIONERROR_STRING);
 		flushWriteBuffer(clientsock);
 		snooze::macrosnooze(2);
 	}
@@ -1488,15 +1493,7 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 						sock->getFileDescriptor())) {
 
 				// FIXME: should there be a limit to the number
-				// of times we retry?  If so, should we return
-				// this error
-				/*sock->write((uint16_t)ERROR_OCCURRED);
-				sock->write((uint64_t)0);
-				sock->write((uint16_t)70);
-				sock->write("The listener failed to hand the client off to the database connection.");
-				flushWriteBuffer(sock);
-				retval=false;
-				break;*/
+				// of times we retry?
 				continue;
 			}
 
@@ -1792,10 +1789,10 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		// return an error if the timeout was reached
 		if (alarmrang) {
 			sock->write((uint16_t)ERROR_OCCURRED);
-			sock->write((uint64_t)0);
-			sock->write((uint16_t)70);
-			sock->write("The listener failed to hand the client "
-					"off to the database connection.");
+			sock->write((uint64_t)SQLR_ERROR_HANDOFFFAILED);
+			sock->write((uint16_t)charstring::length(
+					SQLR_ERROR_HANDOFFFAILED_STRING));
+			sock->write(SQLR_ERROR_HANDOFFFAILED_STRING);
 			flushWriteBuffer(sock);
 			return false;
 		}
@@ -1803,9 +1800,10 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		// return an error if all db's were down
 		if (alldbsdown) {
 			sock->write((uint16_t)ERROR_OCCURRED);
-			sock->write((uint64_t)0);
-			sock->write((uint16_t)33);
-			sock->write("All databases are currently down.");
+			sock->write((uint64_t)SQLR_ERROR_DBSDOWN);
+			sock->write((uint16_t)charstring::length(
+						SQLR_ERROR_DBSDOWN_STRING));
+			sock->write(SQLR_ERROR_DBSDOWN_STRING);
 			flushWriteBuffer(sock);
 			return false;
 		}
