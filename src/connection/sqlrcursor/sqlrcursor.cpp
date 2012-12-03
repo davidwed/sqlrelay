@@ -80,17 +80,29 @@ sqlrquerytype_t sqlrcursor_svr::queryType(const char *query,
 	// look for specific query types
 	if (!charstring::compare(ptr,"select",6)) {
 		retval=SQLRQUERYTYPE_SELECT;
+		ptr=ptr+6;
 	} else if (!charstring::compare(ptr,"insert",6)) {
 		retval=SQLRQUERYTYPE_INSERT;
+		ptr=ptr+6;
 	} else if (!charstring::compare(ptr,"update",6)) {
 		retval=SQLRQUERYTYPE_UPDATE;
+		ptr=ptr+6;
 	} else if (!charstring::compare(ptr,"delete",6)) {
 		retval=SQLRQUERYTYPE_DELETE;
+		ptr=ptr+6;
+	} else if (!charstring::compare(ptr,"create",6)) {
+		retval=SQLRQUERYTYPE_CREATE;
+		ptr=ptr+6;
+	} else if (!charstring::compare(ptr,"drop",4)) {
+		retval=SQLRQUERYTYPE_DROP;
+		ptr=ptr+4;
+	} else if (!charstring::compare(ptr,"alter",5)) {
+		retval=SQLRQUERYTYPE_ALTER;
+		ptr=ptr+5;
 	}
 
 	// verify that there's whitespace after the query type
 	if (retval!=SQLRQUERYTYPE_ETC) {
-		ptr=ptr+6;
 		if (!character::isWhitespace(*ptr)) {
 			retval=SQLRQUERYTYPE_ETC;
 		}

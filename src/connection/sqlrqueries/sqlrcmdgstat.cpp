@@ -63,7 +63,10 @@ bool sqlrcmdgstatcursor::executeQuery(const char *query, uint32_t length) {
 			insert_1+=gs->qps_insert[j];
 			update_1+=gs->qps_update[j];
 			delete_1+=gs->qps_delete[j];
-			etc_1+=gs->qps_etc[j];
+			etc_1+=gs->qps_create[j]+
+				gs->qps_drop[j]+
+				gs->qps_alter[j]+
+				gs->qps_etc[j];
 			sqlrcmd_1+=gs->qps_custom[j];
 		}
 		if (now-gs->timestamp[j]<60*5) {
@@ -71,7 +74,10 @@ bool sqlrcmdgstatcursor::executeQuery(const char *query, uint32_t length) {
 			insert_5+=gs->qps_insert[j];
 			update_5+=gs->qps_update[j];
 			delete_5+=gs->qps_delete[j];
-			etc_5+=gs->qps_etc[j];
+			etc_5+=gs->qps_create[j]+
+				gs->qps_drop[j]+
+				gs->qps_alter[j]+
+				gs->qps_etc[j];
 			sqlrcmd_5+=gs->qps_custom[j];
 		}
 		if (now-gs->timestamp[j]<60*15) {
@@ -79,7 +85,10 @@ bool sqlrcmdgstatcursor::executeQuery(const char *query, uint32_t length) {
 			insert_15+= gs->qps_insert[j];
 			update_15+= gs->qps_update[j];
 			delete_15+= gs->qps_delete[j];
-			etc_15+= gs->qps_etc[j];
+			etc_15+=gs->qps_create[j]+
+				gs->qps_drop[j]+
+				gs->qps_alter[j]+
+				gs->qps_etc[j];
 			sqlrcmd_15+= gs->qps_custom[j];
 
 		}

@@ -249,6 +249,9 @@ struct shmdata {
 	uint32_t	qps_insert[STATQPSKEEP];
 	uint32_t	qps_update[STATQPSKEEP];
 	uint32_t	qps_delete[STATQPSKEEP];
+	uint32_t	qps_create[STATQPSKEEP];
+	uint32_t	qps_drop[STATQPSKEEP];
+	uint32_t	qps_alter[STATQPSKEEP];
 	uint32_t	qps_custom[STATQPSKEEP];
 	uint32_t	qps_etc[STATQPSKEEP];
 

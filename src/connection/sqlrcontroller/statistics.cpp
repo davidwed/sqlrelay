@@ -147,6 +147,9 @@ void sqlrcontroller_svr::incrementQueryCounts(sqlrquerytype_t querytype) {
 		shm->qps_update[index]=0;
 		shm->qps_insert[index]=0;
 		shm->qps_delete[index]=0;
+		shm->qps_create[index]=0;
+		shm->qps_drop[index]=0;
+		shm->qps_alter[index]=0;
 		shm->qps_custom[index]=0;
 		shm->qps_etc[index]=0;
 	}
@@ -164,6 +167,15 @@ void sqlrcontroller_svr::incrementQueryCounts(sqlrquerytype_t querytype) {
 			break;
 		case SQLRQUERYTYPE_DELETE:
 			shm->qps_delete[index]++;
+			break;
+		case SQLRQUERYTYPE_CREATE:
+			shm->qps_create[index]++;
+			break;
+		case SQLRQUERYTYPE_DROP:
+			shm->qps_drop[index]++;
+			break;
+		case SQLRQUERYTYPE_ALTER:
+			shm->qps_alter[index]++;
 			break;
 		case SQLRQUERYTYPE_CUSTOM:
 			shm->qps_custom[index]++;
