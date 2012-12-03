@@ -402,7 +402,8 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,
 					"setresultsetbuffersize ",23) ||
 		!charstring::compareIgnoringCase(ptr,
-					"getresultsetbuffersize")) {
+					"getresultsetbuffersize") ||
+		!charstring::compareIgnoringCase(ptr,"endsession")) {
 
 		// return value of 1 is internal command
 		return 1;
@@ -528,6 +529,9 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(
 					ptr,"getresultsetbuffersize")) {	
 		printf("%lld\n",env->rsbs);
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"endsession")) {	
+		sqlrcon->endSession();
 		return;
 	} else {
 		return;
@@ -1313,6 +1317,7 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	printf("	getclientinfo		- displays the client info\n\n");
 	printf("	setresultsetbuffersize size	- fetch size rows at a time\n");
 	printf("	getresultsetbuffersize 		- shows rows fetched at a time\n\n");
+	printf("	endsession		- ends the current session\n\n");
 	printf("	exit/quit		- ");
 	printf("exits\n\n");
 	printf("	All commands must be followed by the delimiter: %c\n",
