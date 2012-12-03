@@ -116,7 +116,6 @@ void sqlrshenv::clearbinds(stringdictionary< sqlrshbindvalue * > *binds) {
 		if (bv->type==STRING_BIND) {
 			delete[] bv->stringval;
 		}
-		delete node->getData();
 	}
 	binds->clear();
 }

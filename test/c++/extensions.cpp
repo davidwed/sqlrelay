@@ -142,12 +142,71 @@ int	main(int argc, char **argv) {
 
 
 	printf("FAKE INPUT BIND VARIABLES:\n");
-	// FIXME: how to test this?
+	cur->prepareQuery("select 1 from dual");
+	cur->inputBind("nonexistentvar","nonexistentval");
+	checkSuccess(cur->executeQuery(),1);
 	printf("\n\n");
 
 
 	printf("ISOLATION LEVELS: \n");
-	// FIXME: how to test this?
+
+	// set autocommit off
+	checkSuccess(con->autoCommitOff(),1);
+
+	// create a table
+	cur->sendQuery("drop table testtable");
+	checkSuccess(cur->sendQuery("create table testtable (col1 int)"),1);
+
+	// open a second connection and set autocommit off there too
+	secondcon=new sqlrconnection("localhost",9000,"/tmp/test.socket",
+							"test","test",0,1);
+	secondcur=new sqlrcursor(secondcon);
+	checkSuccess(secondcon->autoCommitOff(),1);
+
+	// change the isolation level
+	checkSuccess(secondcur->sendQuery("alter session set isolation_level=serializable"),1);
+	printf("\n");
+
+	// in the second connection, select from the table, it should be empty
+	checkSuccess(secondcur->sendQuery("select * from testtable"),1);
+	checkSuccess(secondcur->rowCount(),0);
+
+	// in the first connection, insert a row into the table
+	checkSuccess(cur->sendQuery("insert into testtable values (1)"),1);
+
+	// in the second connection, select again, it should still be empty
+	checkSuccess(secondcur->sendQuery("select * from testtable"),1);
+	checkSuccess(secondcur->rowCount(),0);
+
+	// in the first connecton, commit
+	checkSuccess(con->commit(),1);
+	printf("\n");
+
+	// in the second connection, select again, it should STILL be empty
+	checkSuccess(secondcur->sendQuery("select * from testtable"),1);
+	checkSuccess(secondcur->rowCount(),0);
+
+	// end the second connections sesssion and select again,
+	// finally it should see the row
+	//secondcon->endSession();
+	delete secondcur;
+	delete secondcon;
+	secondcon=new sqlrconnection("localhost",9000,"/tmp/test.socket",
+							"test","test",0,1);
+	secondcur=new sqlrcursor(secondcon);
+	checkSuccess(secondcur->sendQuery("select * from testtable"),1);
+	checkSuccess(secondcur->rowCount(),1);
+
+	// clean up
+	delete secondcur;
+	delete secondcon;
+	delete cur;
+	delete con;
+	con=new sqlrconnection("localhost",9000,"/tmp/test.socket",
+							"test","test",0,1);
+	cur=new sqlrcursor(con);
+	checkSuccess(cur->sendQuery("drop table testtable"),1);
+	con->setClientInfo("extensionstest");
 	printf("\n\n");
 
 
@@ -429,7 +488,7 @@ int	main(int argc, char **argv) {
 
 
 	printf("TRANSLATIONS: locksnowaitbydefault\n");
-	/*checkSuccess(cur->sendQuery("create table testtable (col1 int)"),1);
+	checkSuccess(cur->sendQuery("create table testtable (col1 int)"),1);
 	checkSuccess(con->begin(),1);
 	checkSuccess(cur->sendQuery("lock table testtable in exclusive mode"),1);
 	secondcon=new sqlrconnection("localhost",9000,"/tmp/test.socket",
@@ -441,7 +500,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(secondcur->sendQuery("lock table testtable in exclusive mode"),1);
 	delete secondcur;
 	delete secondcon;
-	checkSuccess(cur->sendQuery("drop table testtable"),1);*/
+	checkSuccess(cur->sendQuery("drop table testtable"),1);
 	printf("\n\n");
 
 
