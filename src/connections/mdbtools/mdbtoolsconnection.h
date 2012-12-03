@@ -44,7 +44,7 @@ class mdbtoolscursor : public sqlrcursor_svr {
 						uint64_t *fieldlength,
 						bool *blob,
 						bool *null);
-		void		cleanUpData(bool freeresult, bool freebinds);
+		void		cleanUpData();
 		bool		getDatabaseList(const char *wild);
 		bool		getTableList(const char *wild);
 		bool		getColumnList(const char *table,

@@ -1366,12 +1366,10 @@ void odbccursor::nextRow() {
 	//row++;
 }
 
-void odbccursor::cleanUpData(bool freeresult, bool freebinds) {
+void odbccursor::cleanUpData() {
 
-	if (freebinds) {
-		for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
-			delete outdatebind[i];
-			outdatebind[i]=NULL;
-		}
+	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
+		delete outdatebind[i];
+		outdatebind[i]=NULL;
 	}
 }

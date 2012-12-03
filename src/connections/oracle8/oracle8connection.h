@@ -219,7 +219,7 @@ class oracle8cursor : public sqlrcursor_svr {
 					uint64_t offset, uint64_t charstoread,
 					uint64_t *charsread);
 		void		cleanUpLobField(uint32_t col);
-		void		cleanUpData(bool freeresult, bool freebinds);
+		void		cleanUpData();
 
 		void		checkRePrepare();
 

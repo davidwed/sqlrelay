@@ -558,7 +558,7 @@ void mdbtoolscursor::getField(uint32_t col,
 	}
 }
 
-void mdbtoolscursor::cleanUpData(bool freeresult, bool freebinds) {
+void mdbtoolscursor::cleanUpData() {
 
 	if (cursortype==COLUMN_LIST_CURSORTYPE) {
 		delete[] currentcolumnsize;

@@ -74,8 +74,7 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		virtual bool	createSharedMemoryAndSemaphores(
 							const char *tmpdir,
 							const char *id);
-		void		cleanUpAllCursorData(bool freeresult,
-							bool freebinds);
+		void		cleanUpAllCursorData();
 
 		bool		getColumnNames(const char *query,
 						stringbuffer *output);

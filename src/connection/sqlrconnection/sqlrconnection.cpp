@@ -88,7 +88,7 @@ bool sqlrconnection_svr::begin() {
 	}
 
 	// clean up
-	begincur->cleanUpData(true,true);
+	begincur->cleanUpData();
 	begincur->close();
 	cont->deleteCursor(begincur);
 
@@ -131,7 +131,7 @@ bool sqlrconnection_svr::commit() {
 	}
 
 	// clean up
-	commitcur->cleanUpData(true,true);
+	commitcur->cleanUpData();
 	commitcur->close();
 	cont->deleteCursor(commitcur);
 
@@ -170,7 +170,7 @@ bool sqlrconnection_svr::rollback() {
 	}
 
 	// clean up
-	rbcur->cleanUpData(true,true);
+	rbcur->cleanUpData();
 	rbcur->close();
 	cont->deleteCursor(rbcur);
 
@@ -220,7 +220,7 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 	if (sdcur->openInternal(cont->cursorcount+1) &&
 		sdcur->prepareQuery(sdquery,sdquerylen) &&
 		sdcur->executeQuery(sdquery,sdquerylen)) {
-		sdcur->cleanUpData(true,true);
+		sdcur->cleanUpData();
 		retval=true;
 
 		// set a flag indicating that the db has been changed
@@ -274,7 +274,7 @@ char *sqlrconnection_svr::getCurrentDatabase() {
 			retval=charstring::duplicate(field);
 		} 
 	}
-	gcdcur->cleanUpData(true,true);
+	gcdcur->cleanUpData();
 	gcdcur->close();
 	cont->deleteCursor(gcdcur);
 	return retval;
@@ -334,7 +334,7 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id) {
 					&errorlength,&errnum,&liveconnection);
 	}
 
-	liicur->cleanUpData(true,true);
+	liicur->cleanUpData();
 	liicur->close();
 	cont->deleteCursor(liicur);
 	return retval;
@@ -390,7 +390,7 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 	} */
 
 	delete[] silquery;
-	silcur->cleanUpData(true,true);
+	silcur->cleanUpData();
 	silcur->close();
 	cont->deleteCursor(silcur);
 	return retval;
@@ -409,7 +409,7 @@ bool sqlrconnection_svr::ping() {
 	if (pingcur->openInternal(cont->cursorcount+1) &&
 		pingcur->prepareQuery(pingquery,pingquerylen) &&
 		pingcur->executeQuery(pingquery,pingquerylen)) {
-		pingcur->cleanUpData(true,true);
+		pingcur->cleanUpData();
 		pingcur->close();
 		cont->deleteCursor(pingcur);
 		return true;

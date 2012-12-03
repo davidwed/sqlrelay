@@ -60,7 +60,7 @@ void sqlrcontroller_svr::dropTempTable(sqlrcursor_svr *cursor,
 		executeQuery(cursor,dropquery.getString(),
 					dropquery.getStringLength());
 	}
-	cursor->cleanUpData(true,true);
+	cursor->cleanUpData();
 
 	// FIXME: I need to refactor all of this so that this just gets
 	// run as a matter of course instead of explicitly getting run here
@@ -91,5 +91,5 @@ void sqlrcontroller_svr::truncateTempTable(sqlrcursor_svr *cursor,
 		executeQuery(cursor,truncatequery.getString(),
 					truncatequery.getStringLength());
 	}
-	cursor->cleanUpData(true,true);
+	cursor->cleanUpData();
 }

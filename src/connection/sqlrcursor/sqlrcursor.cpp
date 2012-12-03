@@ -462,7 +462,7 @@ void sqlrcursor_svr::cleanUpLobField(uint32_t col) {
 	// by default, do nothing
 }
 
-void sqlrcursor_svr::cleanUpData(bool freeresult, bool freebinds) {
+void sqlrcursor_svr::cleanUpData() {
 	// by default, do nothing...
 	return;
 }
@@ -704,7 +704,7 @@ void sqlrcursor_svr::abort() {
 	// result sets from being able to return column data upon resume if the
 	// entire result set had already been sent, but I don't think that's an
 	// issue any more.
-	cleanUpData(true,true);
+	cleanUpData();
 	state=SQLRCURSORSTATE_AVAILABLE;
 	delete customquerycursor;
 	customquerycursor=NULL;

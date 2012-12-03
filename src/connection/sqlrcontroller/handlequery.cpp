@@ -40,7 +40,7 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 	}
 
 	// clean up whatever result set the cursor might have been busy with
-	cursor->cleanUpData(true,true);
+	cursor->cleanUpData();
 
 	// get the query and bind data from the client...
 	bool	usingcustomquerycursor=false;

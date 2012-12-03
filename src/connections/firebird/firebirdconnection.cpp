@@ -1194,8 +1194,6 @@ void firebirdcursor::getField(uint32_t col,
 	*fldlength=fieldbuffer.getStringLength();
 }
 
-void firebirdcursor::cleanUpData(bool freeresult, bool freebinds) {
-	if (freebinds) {
-		outbindcount=0;
-	}
+void firebirdcursor::cleanUpData() {
+	outbindcount=0;
 }

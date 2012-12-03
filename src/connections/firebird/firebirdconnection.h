@@ -124,7 +124,7 @@ class firebirdcursor : public sqlrcursor_svr {
 					uint64_t *fieldlength,
 					bool *blob,
 					bool *null);
-		void		cleanUpData(bool freeresult, bool freebinds);
+		void		cleanUpData();
 
 
 		isc_stmt_handle	stmt;

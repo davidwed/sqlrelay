@@ -89,11 +89,11 @@ void sqlrcontroller_svr::endSession() {
 	dbgfile.debugPrint("connection",1,"done ending session");
 }
 
-void sqlrcontroller_svr::cleanUpAllCursorData(bool freeresult, bool freebinds) {
+void sqlrcontroller_svr::cleanUpAllCursorData() {
 	dbgfile.debugPrint("connection",2,"cleaning up all cursors...");
 	for (int32_t i=0; i<cursorcount; i++) {
 		if (cur[i]) {
-			cur[i]->cleanUpData(freeresult,freebinds);
+			cur[i]->cleanUpData();
 		}
 	}
 	dbgfile.debugPrint("connection",2,"done cleaning up all cursors");

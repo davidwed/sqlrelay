@@ -978,19 +978,17 @@ void postgresqlcursor::getField(uint32_t col,
 	*fieldlength=PQgetlength(pgresult,currentrow,col);
 }
 
-void postgresqlcursor::cleanUpData(bool freeresult, bool freebinds) {
+void postgresqlcursor::cleanUpData() {
 
-	if (freebinds) {
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
-		for (uint16_t i=0; i<bindcounter; i++) {
-			delete[] bindvalues[i];
-			bindvalues[i]=NULL;
-		}
-#endif
+	for (uint16_t i=0; i<bindcounter; i++) {
+		delete[] bindvalues[i];
+		bindvalues[i]=NULL;
 	}
+#endif
 
-	if (freeresult && pgresult) {
+	if (pgresult) {
 		PQclear(pgresult);
 		pgresult=(PGresult *)NULL;
 	}

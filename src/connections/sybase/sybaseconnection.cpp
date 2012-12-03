@@ -445,7 +445,7 @@ bool sybasecursor::open(uint16_t id) {
 		} else {
 			sybaseconn->dbused=true;
 		}
-		cleanUpData(true,true);
+		cleanUpData();
 	}
 
 	if (!sybaseconn->dbversion) {
@@ -463,7 +463,7 @@ bool sybasecursor::open(uint16_t id) {
 				charstring::duplicate(data[1][0],
 							space-data[1][0]);
 		}
-		cleanUpData(true,true);
+		cleanUpData();
 	}
 	return retval;
 }
@@ -863,7 +863,7 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	if (ct_send(cmd)!=CS_SUCCEED) {
-		cleanUpData(true,true);
+		cleanUpData();
 		return false;
 	}
 
@@ -872,7 +872,7 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 		results=ct_results(cmd,&resultstype);
 
 		if (results==CS_FAIL || resultstype==CS_CMD_FAIL) {
-			cleanUpData(true,true);
+			cleanUpData();
 			return false;
 		}
 
@@ -1225,16 +1225,14 @@ void sybasecursor::nextRow() {
 	row++;
 }
 
-void sybasecursor::cleanUpData(bool freeresult, bool freebinds) {
+void sybasecursor::cleanUpData() {
 
 	if (clean) {
 		return;
 	}
 
-	if (freeresult) {
-		discardResults();
-		discardCursor();
-	}
+	discardResults();
+	discardCursor();
 
 	clean=true;
 }
@@ -1424,12 +1422,12 @@ const char *sybaseconnection::tempTableDropPrefix() {
 }
 
 bool sybaseconnection::commit() {
-	cont->cleanUpAllCursorData(true,true);
+	cont->cleanUpAllCursorData();
 	return sqlrconnection_svr::commit();
 }
 
 bool sybaseconnection::rollback() {
-	cont->cleanUpAllCursorData(true,true);
+	cont->cleanUpAllCursorData();
 	return sqlrconnection_svr::rollback();
 }
 

@@ -206,7 +206,7 @@ sqlitecursor::sqlitecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 }
 
 sqlitecursor::~sqlitecursor() {
-	cleanUpData(true,true);
+	cleanUpData();
 }
 
 bool sqlitecursor::supportsNativeBinds() {
@@ -292,13 +292,13 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 				!charstring::compare(sqliteconn->errmesg,
 							"no such table:",14)) {
 
-			cleanUpData(true,true);
+			cleanUpData();
 			// If for some reason, querying sqlite_master doesn't
 			// return SQLITE_SCHEMA, rerun the original query and
 			// jump out of the loop.
 			if (runQuery("select * from sqlite_master")
 							!=SQLITE_SCHEMA) {
-				cleanUpData(true,true);
+				cleanUpData();
 				success=runQuery(query);
 				break;
 			}
@@ -452,9 +452,9 @@ void sqlitecursor::getField(uint32_t col,
 	rowindex++;
 }
 
-void sqlitecursor::cleanUpData(bool freeresult, bool freebinds) {
+void sqlitecursor::cleanUpData() {
 
-	if (freeresult && result) {
+	if (result) {
 		if (lastinsertrowid) {
 			delete[] result[0];
 			delete[] result[1];

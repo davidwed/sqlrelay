@@ -154,7 +154,7 @@ bool droptableautoincrementoracle::dropSequences(sqlrconnection_svr *sqlrcon,
 			printf("error:\n%s\n",cur->error);
 		}
 	}
-	cur->cleanUpData(true,true);
+	cur->cleanUpData();
 	cur->close();
 	sqlrcon->cont->deleteCursor(cur);
 
@@ -197,7 +197,7 @@ bool droptableautoincrementoracle::dropSequence(sqlrconnection_svr *sqlrcon,
 			printf("error:\n%s\n",cur->error);
 		}
 	}
-	cur->cleanUpData(true,true);
+	cur->cleanUpData();
 	cur->close();
 	sqlrcon->cont->deleteCursor(cur);
 
@@ -239,7 +239,7 @@ bool droptableautoincrementoracle::deleteSequence(sqlrconnection_svr *sqlrcon,
 			printf("error:\n%s\n",cur->error);
 		}
 	}
-	cur->cleanUpData(true,true);
+	cur->cleanUpData();
 	cur->close();
 	sqlrcon->cont->deleteCursor(cur);
 

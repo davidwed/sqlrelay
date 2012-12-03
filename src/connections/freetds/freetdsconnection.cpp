@@ -528,7 +528,7 @@ bool freetdscursor::open(uint16_t id) {
 		} else {
 			freetdsconn->dbused=true;
 		}
-		cleanUpData(true,true);
+		cleanUpData();
 	}
 
 	if (!freetdsconn->dbversion) {
@@ -546,7 +546,7 @@ bool freetdscursor::open(uint16_t id) {
 				charstring::duplicate(data[1][0],
 							space-data[1][0]);
 		}
-		cleanUpData(true,true);
+		cleanUpData();
 	}
 	return retval;
 }
@@ -582,7 +582,7 @@ bool freetdscursor::prepareQuery(const char *query, uint32_t length) {
 	// is called and, since we're really only using 1 cursor, it will fail
 	// unless cleanUpData gets called, so just to make sure, we'll call it
 	// here
-	cleanUpData(true,true);
+	cleanUpData();
 
 	clean=true;
 
@@ -994,7 +994,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 #endif
 
 	if (ct_send(cmd)!=CS_SUCCEED) {
-		cleanUpData(true,true);
+		cleanUpData();
 		return false;
 	}
 
@@ -1004,7 +1004,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 
 		if (results==CS_FAIL ||
 			resultstype==CS_CMD_FAIL || resultstype==CS_CMD_DONE) {
-			cleanUpData(true,true);
+			cleanUpData();
 			return false;
 		}
 
@@ -1419,16 +1419,14 @@ void freetdscursor::nextRow() {
 	row++;
 }
 
-void freetdscursor::cleanUpData(bool freeresult, bool freebinds) {
+void freetdscursor::cleanUpData() {
 
 	if (clean) {
 		return;
 	}
 
-	if (freeresult) {
-		discardResults();
-		discardCursor();
-	}
+	discardResults();
+	discardCursor();
 
 	clean=true;
 }
@@ -1623,12 +1621,12 @@ const char *freetdsconnection::tempTableDropPrefix() {
 }
 
 bool freetdsconnection::commit() {
-	cont->cleanUpAllCursorData(true,true);
+	cont->cleanUpAllCursorData();
 	return sqlrconnection_svr::commit();
 }
 
 bool freetdsconnection::rollback() {
-	cont->cleanUpAllCursorData(true,true);
+	cont->cleanUpAllCursorData();
 	return sqlrconnection_svr::rollback();
 }
 

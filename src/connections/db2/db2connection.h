@@ -135,7 +135,7 @@ class db2cursor : public sqlrcursor_svr {
 					bool *blob,
 					bool *null);
 		void		nextRow();
-		void		cleanUpData(bool freeresult, bool freebinds);
+		void		cleanUpData();
 
 		SQLRETURN	erg;
 		SQLHSTMT	stmt;

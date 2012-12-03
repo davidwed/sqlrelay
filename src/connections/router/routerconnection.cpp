@@ -893,14 +893,12 @@ void routercursor::getField(uint32_t col,
 	}
 }
 
-void routercursor::cleanUpData(bool freeresult, bool freebinds) {
-	if (freebinds) {
-		if (cur) {
-			cur->clearBinds();
-		}
-		obcount=0;
-		cbcount=0;
+void routercursor::cleanUpData() {
+	if (cur) {
+		cur->clearBinds();
 	}
+	obcount=0;
+	cbcount=0;
 }
 
 // FIXME: "do something" when these failures occur

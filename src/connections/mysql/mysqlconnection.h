@@ -100,7 +100,7 @@ class mysqlcursor : public sqlrcursor_svr {
 					uint64_t *fieldlength,
 					bool *blob,
 					bool *null);
-		void		cleanUpData(bool freeresult, bool freebinds);
+		void		cleanUpData();
 
 		MYSQL_RES	*mysqlresult;
 		MYSQL_FIELD	*mysqlfields[MAX_SELECT_LIST_SIZE];

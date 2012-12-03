@@ -115,7 +115,7 @@ class sybasecursor : public sqlrcursor_svr {
 					bool *blob,
 					bool *null);
 		void		nextRow();
-		void		cleanUpData(bool freeresult, bool freebinds);
+		void		cleanUpData();
 		void		discardResults();
 		void		discardCursor();
 

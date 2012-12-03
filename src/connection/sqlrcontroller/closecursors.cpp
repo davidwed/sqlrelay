@@ -14,7 +14,7 @@ void sqlrcontroller_svr::closeCursors(bool destroy) {
 			dbgfile.debugPrint("connection",1,(int32_t)cursorcount);
 
 			if (cur[cursorcount]) {
-				cur[cursorcount]->cleanUpData(true,true);
+				cur[cursorcount]->cleanUpData();
 				cur[cursorcount]->close();
 				if (destroy) {
 					deleteCursor(cur[cursorcount]);

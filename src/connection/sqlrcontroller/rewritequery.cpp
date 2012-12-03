@@ -516,7 +516,7 @@ bool sqlrcontroller_svr::getColumnNames(const char *query,
 		retval=gcncur->getColumnNameList(output);
 
 	}
-	gcncur->cleanUpData(true,true);
+	gcncur->cleanUpData();
 	gcncur->close();
 	deleteCursor(gcncur);
 	return retval;

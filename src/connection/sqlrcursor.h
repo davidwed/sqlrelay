@@ -218,8 +218,7 @@ class sqlrcursor_svr {
 							uint64_t charstoread,
 							uint64_t *charsread);
 		virtual void		cleanUpLobField(uint32_t col);
-		virtual	void		cleanUpData(bool freeresult,
-							bool freebinds);
+		virtual	void		cleanUpData();
 		virtual bool		getColumnNameList(rudiments::stringbuffer *output);
 
 		void	setFakeInputBindsForThisQuery(bool fake);

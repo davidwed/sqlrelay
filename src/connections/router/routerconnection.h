@@ -167,7 +167,7 @@ class routercursor : public sqlrcursor_svr {
 					uint64_t *fieldlength,
 					bool *blob,
 					bool *null);
-		void		cleanUpData(bool freeresult, bool freebinds);
+		void		cleanUpData();
 
 		routerconnection	*routerconn;
 

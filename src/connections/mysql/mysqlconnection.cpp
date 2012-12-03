@@ -1069,23 +1069,21 @@ void mysqlcursor::getField(uint32_t col,
 #endif
 }
 
-void mysqlcursor::cleanUpData(bool freeresult, bool freebinds) {
+void mysqlcursor::cleanUpData() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
-		if (freebinds) {
-			bindcounter=0;
-			for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
-				rawbuffer::zero(&bind[i],sizeof(MYSQL_BIND));
-			}
-			mysql_stmt_reset(stmt);
+		bindcounter=0;
+		for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
+			rawbuffer::zero(&bind[i],sizeof(MYSQL_BIND));
 		}
-		if (freeresult && stmtfreeresult) {
+		mysql_stmt_reset(stmt);
+		if (stmtfreeresult) {
 			mysql_stmt_free_result(stmt);
 			stmtfreeresult=false;
 		}
 	}
 #endif
-	if (freeresult && mysqlresult!=(MYSQL_RES *)NULL) {
+	if (mysqlresult!=(MYSQL_RES *)NULL) {
 		mysql_free_result(mysqlresult);
 		mysqlresult=NULL;
 #ifdef HAVE_MYSQL_NEXT_RESULT

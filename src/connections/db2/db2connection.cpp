@@ -930,12 +930,9 @@ void db2cursor::nextRow() {
 	rowgroupindex++;
 }
 
-void db2cursor::cleanUpData(bool freeresult, bool freebinds) {
-
-	if (freebinds) {
-		for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
-			delete outdatebind[i];
-			outdatebind[i]=NULL;
-		}
+void db2cursor::cleanUpData() {
+	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
+		delete outdatebind[i];
+		outdatebind[i]=NULL;
 	}
 }

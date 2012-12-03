@@ -35,7 +35,7 @@ bool sqlrcontroller_svr::getListCommand(sqlrcursor_svr *cursor,
 	}
 
 	// clean up whatever result set the cursor might have been busy with
-	cursor->cleanUpData(true,true);
+	cursor->cleanUpData();
 
 	// get length of wild parameter
 	uint32_t	wildlen;

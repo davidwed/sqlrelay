@@ -247,7 +247,7 @@ bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
 	if (sqlrcon->cont->debugtriggers) {
 		printf("\n");
 	}
-	cur->cleanUpData(true,true);
+	cur->cleanUpData();
 	cur->close();
 	sqlrcon->cont->deleteCursor(cur);
 	return retval;

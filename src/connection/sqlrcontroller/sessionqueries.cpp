@@ -33,7 +33,7 @@ void sqlrcontroller_svr::sessionQuery(const char *query) {
 	if (cur->openInternal(cursorcount+1) &&
 		cur->prepareQuery(query,querylen) &&
 		executeQuery(cur,query,querylen)) {
-		cur->cleanUpData(true,true);
+		cur->cleanUpData();
 	}
 	cur->close();
 	deleteCursor(cur);

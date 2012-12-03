@@ -1144,7 +1144,7 @@ bool oracle8cursor::open(uint16_t id) {
 
 bool oracle8cursor::close() {
 
-	cleanUpData(true,true);
+	cleanUpData();
 
 #ifdef OCI_STMT_CACHE
 	if (oracle8conn->stmtcachesize && stmt) {
@@ -1265,7 +1265,7 @@ void oracle8cursor::checkRePrepare() {
 
 	if (oracle8conn->requiresreprepare && !prepared &&
 			stmttype && stmttype!=OCI_STMT_SELECT) {
-		cleanUpData(true,true);
+		cleanUpData();
 		prepareQuery(query,length);
 		prepared=true;
 	}
@@ -2533,17 +2533,17 @@ void oracle8cursor::cleanUpLobField(uint32_t col) {
 #endif
 }
 
-void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
+void oracle8cursor::cleanUpData() {
 
 	// OCI8 version of ocan(), but since it uses OCIStmtFetch we
 	// only want to run it if the statement was a select
-	if (freeresult && stmttype==OCI_STMT_SELECT) {
+	if (stmttype==OCI_STMT_SELECT) {
 		OCIStmtFetch(stmt,oracle8conn->err,0,
 				OCI_FETCH_NEXT,OCI_DEFAULT);
 	}
 
 	// free row/column resources
-	if (freeresult && !resultfreed) {
+	if (!resultfreed) {
 
 		int32_t	selectlistsize=(oracle8conn->maxselectlistsize==-1)?
 					ncols:oracle8conn->maxselectlistsize;
@@ -2592,56 +2592,54 @@ void oracle8cursor::cleanUpData(bool freeresult, bool freebinds) {
 		resultfreed=true;
 	}
 
-	if (freebinds) {
-		// free lob bind resources
 #ifdef HAVE_ORACLE_8i
-		for (uint16_t i=0; i<orainbindlobcount; i++) {
+	// free lob bind resources
+	for (uint16_t i=0; i<orainbindlobcount; i++) {
+		OCILobFreeTemporary(oracle8conn->svc,
+						oracle8conn->err,
+						inbind_lob[i]);
+		OCILobClose(oracle8conn->svc,oracle8conn->err,
+						inbind_lob[i]);
+		OCIDescriptorFree(inbind_lob[i],OCI_DTYPE_LOB);
+	}
+	for (uint16_t i=0; i<oraoutbindlobcount; i++) {
+		if (outbind_lob[i]) {
 			OCILobFreeTemporary(oracle8conn->svc,
-							oracle8conn->err,
-							inbind_lob[i]);
-			OCILobClose(oracle8conn->svc,oracle8conn->err,
-							inbind_lob[i]);
-			OCIDescriptorFree(inbind_lob[i],OCI_DTYPE_LOB);
+						oracle8conn->err,
+						outbind_lob[i]);
+			OCILobClose(oracle8conn->svc,
+						oracle8conn->err,
+						outbind_lob[i]);
+			OCIDescriptorFree(outbind_lob[i],
+						OCI_DTYPE_LOB);
 		}
-		for (uint16_t i=0; i<oraoutbindlobcount; i++) {
-			if (outbind_lob[i]) {
-				OCILobFreeTemporary(oracle8conn->svc,
-							oracle8conn->err,
-							outbind_lob[i]);
-				OCILobClose(oracle8conn->svc,
-							oracle8conn->err,
-							outbind_lob[i]);
-				OCIDescriptorFree(outbind_lob[i],
-							OCI_DTYPE_LOB);
-			}
-		}
-		orainbindlobcount=0;
-		oraoutbindlobcount=0;
+	}
+	orainbindlobcount=0;
+	oraoutbindlobcount=0;
 #endif
 
-		// free regular bind resources
-		for (uint16_t i=0; i<orainbindcount; i++) {
-			delete[] inintbindstring[i];
-			inintbindstring[i]=NULL;
-			delete indatebind[i];
-			indatebind[i]=NULL;
+	// free regular bind resources
+	for (uint16_t i=0; i<orainbindcount; i++) {
+		delete[] inintbindstring[i];
+		inintbindstring[i]=NULL;
+		delete indatebind[i];
+		indatebind[i]=NULL;
+	}
+	for (uint16_t i=0; i<oraoutbindcount; i++) {
+		delete[] outintbindstring[i];
+		outintbindstring[i]=NULL;
+		outintbind[i]=NULL;
+		if (outdatebind[i]) {
+			delete outdatebind[i]->ocidate;
 		}
-		for (uint16_t i=0; i<oraoutbindcount; i++) {
-			delete[] outintbindstring[i];
-			outintbindstring[i]=NULL;
-			outintbind[i]=NULL;
-			if (outdatebind[i]) {
-				delete outdatebind[i]->ocidate;
-			}
-			delete outdatebind[i];
-			outdatebind[i]=NULL;
-		}
-		orainbindcount=0;
-		oraoutbindcount=0;
-		oracurbindcount=0;
-		for (uint16_t i=0; i<bindvarcount; i++) {
-			bindvarname[i]=NULL;
-			boundbypos[i]=false;
-		}
+		delete outdatebind[i];
+		outdatebind[i]=NULL;
+	}
+	orainbindcount=0;
+	oraoutbindcount=0;
+	oracurbindcount=0;
+	for (uint16_t i=0; i<bindvarcount; i++) {
+		bindvarname[i]=NULL;
+		boundbypos[i]=false;
 	}
 }
