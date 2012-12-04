@@ -345,12 +345,12 @@ void sqlrcontroller_svr::noAvailableCursors(uint16_t command) {
 	clientsock->write((uint16_t)ERROR_OCCURRED);
 
 	// send the error code
-	clientsock->write((uint64_t)SQLR_ERROR_NO_CURSORS);
+	clientsock->write((uint64_t)SQLR_ERROR_NOCURSORS);
 
 	// send the error itself
-	uint16_t	len=charstring::length(SQLR_ERROR_NO_CURSORS_STRING);
+	uint16_t	len=charstring::length(SQLR_ERROR_NOCURSORS_STRING);
 	clientsock->write(len);
-	clientsock->write(SQLR_ERROR_NO_CURSORS_STRING,len);
+	clientsock->write(SQLR_ERROR_NOCURSORS_STRING,len);
 	flushWriteBuffer();
 }
 

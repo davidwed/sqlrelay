@@ -101,8 +101,8 @@
 
 // errors...
 // (hopefully the 900000+ range doesn't collide with anyone's native codes)
-#define SQLR_ERROR_NO_CURSORS 900000
-#define SQLR_ERROR_NO_CURSORS_STRING \
+#define SQLR_ERROR_NOCURSORS 900000
+#define SQLR_ERROR_NOCURSORS_STRING \
 	"No server-side cursors were available to process the query."
 #define SQLR_ERROR_MAXCLIENTINFOLENGTH 900001
 #define SQLR_ERROR_MAXCLIENTINFOLENGTH_STRING \
@@ -122,8 +122,8 @@
 #define SQLR_ERROR_MAXLOBBINDVALUELENGTH 900006
 #define SQLR_ERROR_MAXLOBBINDVALUELENGTH_STRING \
 	"Maximum lob bind value length exceeded."
-#define SQLR_ERROR_DUPLICATE_BINDNAME 900007
-#define SQLR_ERROR_DUPLICATE_BINDNAME_STRING \
+#define SQLR_ERROR_DUPLICATEBINDNAME 900007
+#define SQLR_ERROR_DUPLICATEBINDNAME_STRING \
 	"Duplicate bind variable name."
 #define SQLR_ERROR_MAXSELECTLIST 900008
 #define SQLR_ERROR_MAXSELECTLIST_STRING \

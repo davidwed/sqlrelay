@@ -2280,10 +2280,10 @@ bool oracle8cursor::validBinds() {
 		// tricky so we'll just prevent duplicate bind names outright.
 		if (oracle8conn->rejectduplicatebinds && dupl[i]) {
 			stringbuffer	err;
-			err.append(SQLR_ERROR_DUPLICATE_BINDNAME_STRING);
+			err.append(SQLR_ERROR_DUPLICATEBINDNAME_STRING);
 			err.append(" (")->append(bvnp[i])->append(')');
 			setError(err.getString(),
-					SQLR_ERROR_DUPLICATE_BINDNAME,true);
+					SQLR_ERROR_DUPLICATEBINDNAME,true);
 			return false;
 		}
 
