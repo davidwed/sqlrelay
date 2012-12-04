@@ -188,12 +188,7 @@ int	main(int argc, char **argv) {
 
 	// end the second connections sesssion and select again,
 	// finally it should see the row
-	//secondcon->endSession();
-	delete secondcur;
-	delete secondcon;
-	secondcon=new sqlrconnection("localhost",9000,"/tmp/test.socket",
-							"test","test",0,1);
-	secondcur=new sqlrcursor(secondcon);
+	secondcon->endSession();
 	checkSuccess(secondcur->sendQuery("select * from testtable"),1);
 	checkSuccess(secondcur->rowCount(),1);
 
