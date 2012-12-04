@@ -425,8 +425,6 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		uint64_t		serversockincount;
 		unixserversocket	*serversockun;
 
-		uint32_t	handoffindex;
-
 		filedescriptor	*clientsock;
 
 		memorypool	*bindpool;

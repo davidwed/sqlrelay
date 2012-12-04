@@ -1045,13 +1045,6 @@ bool sqlrlistener::registerHandoff(filedescriptor *sock) {
 		handoffsocklist=newhandoffsocklist;
 	}
 
-	// write the index back to the connection daemon
-	if (sock->write(index)!=sizeof(uint32_t)) {
-		dbgfile.debugPrint("listener",1,"failed to write index");
-		delete sock;
-		return false;
-	}
-
 	dbgfile.debugPrint("listener",0,"finished registering handoff...");
 	return true;
 }

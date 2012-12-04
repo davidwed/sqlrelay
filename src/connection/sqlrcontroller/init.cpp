@@ -82,32 +82,26 @@ bool sqlrcontroller_svr::init(int argc, const char **argv,
 		return false;
 	}
 
-	// get from config file
-	bool	reloginatstart=cfgfl->getReLoginAtStart();
-
-	bool	nodetach=cmdl->found("-nodetach");
-
 	if (!createSharedMemoryAndSemaphores(tmpdir->getString(),
 							cmdl->getId())) {
 		return false;
 	}
 
+	bool	reloginatstart=cfgfl->getReLoginAtStart();
 	if (!reloginatstart) {
 		if (!attemptLogIn(!silent)) {
 			return false;
 		}
 	}
-
-	if (!nodetach) {
-		// detach from the controlling tty
+	if (!cmdl->found("-nodetach")) {
 		detach();
 	}
-
 	if (reloginatstart) {
 		while (!attemptLogIn(false)) {
 			snooze::macrosnooze(5);
 		}
 	}
+	initConnStats();
 
 	// Get the query translators.  Do it after logging in, as
 	// getSqlTranslator might return a different class depending on what

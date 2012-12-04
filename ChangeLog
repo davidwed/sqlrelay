@@ -22,6 +22,8 @@
 	added support for "global temporary" to temptableslocalize translation
 	removed oracletemptablespreserverowsbydefault translation -
 		temptableslocalize is much more effective
+	fixed a bug that caused a "no server-side cursors" error to occur if
+		when a new session is started if cursors="0" in sqlrelay.conf
 
 0.47 - fixed bug that caused sqlr-export to output negative xml-entity values
 	fixed single-quote-escaping in sqlr-export

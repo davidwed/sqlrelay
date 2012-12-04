@@ -54,8 +54,6 @@ sqlrcontroller_svr::sqlrcontroller_svr() : daemonprocess(), listener() {
 	maxerrorlength=0;
 	idleclienttimeout=-1;
 
-	handoffindex=0;
-
 	connected=false;
 	inclientsession=false;
 	loggedin=false;

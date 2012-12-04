@@ -11,16 +11,41 @@
 #include <sys/time.h>
 
 void sqlrcontroller_svr::initConnStats() {
-	connstats=&shm->connstats[handoffindex];
-	clearConnStats();
-	connstats->processid=process::getProcessId();
-	updateState(INIT);
-	connstats->index=handoffindex;
-	connstats->logged_in_tv.tv_sec=loggedinsec;
-	connstats->logged_in_tv.tv_usec=loggedinusec;
+
+	semset->waitWithUndo(9);
+
+	// Find an available location in the connstats array.
+	// It shouldn't be possible for sqlr-start or sqlr-scaler to start
+	// more than MAXCONNECTIONS, so unless someone started one manually,
+	// it should always be possible to find an open one.
+	for (uint32_t i=0; i<MAXCONNECTIONS; i++) {
+		connstats=&shm->connstats[i];
+		if (!connstats->processid) {
+
+			semset->signalWithUndo(9);
+
+			// initialize the connection stats
+			clearConnStats();
+			updateState(INIT);
+			connstats->index=i;
+			connstats->processid=process::getProcessId();
+			connstats->logged_in_tv.tv_sec=loggedinsec;
+			connstats->logged_in_tv.tv_usec=loggedinusec;
+			return;
+		}
+	}
+
+	semset->signalWithUndo(9);
+
+	// in case someone started a connection manually and
+	// exceeded MAXCONNECTIONS, set this NULL here
+	connstats=NULL;
 }
 
 void sqlrcontroller_svr::clearConnStats() {
+	if (!connstats) {
+		return;
+	}
 	rawbuffer::zero(connstats,sizeof(struct sqlrconnstatistics));
 }
 
@@ -33,11 +58,17 @@ void sqlrcontroller_svr::updateState(enum sqlrconnectionstate_t state) {
 }
 
 void sqlrcontroller_svr::updateClientSessionStartTime() {
+	if (!connstats) {
+		return;
+	}
 	gettimeofday(&connstats->clientsession_tv,NULL);
 }
 
 void sqlrcontroller_svr::updateCurrentQuery(const char *query,
 						uint32_t querylen) {
+	if (!connstats) {
+		return;
+	}
 	uint32_t	len=querylen;
 	if (len>STATSQLTEXTLEN-1) {
 		len=STATSQLTEXTLEN-1;
@@ -47,6 +78,9 @@ void sqlrcontroller_svr::updateCurrentQuery(const char *query,
 }
 
 void sqlrcontroller_svr::updateClientInfo(const char *info, uint32_t infolen) {
+	if (!connstats) {
+		return;
+	}
 	uint64_t	len=infolen;
 	if (len>STATCLIENTINFOLEN-1) {
 		len=STATCLIENTINFOLEN-1;
@@ -56,6 +90,9 @@ void sqlrcontroller_svr::updateClientInfo(const char *info, uint32_t infolen) {
 }
 
 void sqlrcontroller_svr::updateClientAddr() {
+	if (!connstats) {
+		return;
+	}
 	if (clientsock) {
 		char	*clientaddrbuf=clientsock->getPeerAddress();
 		if (clientaddrbuf) {
@@ -89,6 +126,9 @@ void sqlrcontroller_svr::incrementOpenClientConnections() {
 	shm->open_cli_connections++;
 	shm->opened_cli_connections++;
 	semset->signalWithUndo(9);
+	if (!connstats) {
+		return;
+	}
 	connstats->nconnect++;
 }
 
@@ -188,6 +228,9 @@ void sqlrcontroller_svr::incrementQueryCounts(sqlrquerytype_t querytype) {
 
 	semset->signalWithUndo(9);
 
+	if (!connstats) {
+		return;
+	}
 	if (querytype==SQLRQUERYTYPE_CUSTOM) {
 		connstats->ncustomsql++;
 	} else {
@@ -202,105 +245,183 @@ void sqlrcontroller_svr::incrementTotalErrors() {
 }
 
 void sqlrcontroller_svr::incrementAuthenticateCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nauthenticate++;
 }
 
 void sqlrcontroller_svr::incrementSuspendSessionCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nsuspend_session++;
 }
 
 void sqlrcontroller_svr::incrementEndSessionCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nend_session++;
 }
 
 void sqlrcontroller_svr::incrementPingCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nping++;
 }
 
 void sqlrcontroller_svr::incrementIdentifyCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nidentify++;
 }
 
 void sqlrcontroller_svr::incrementAutocommitCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nautocommit++;
 }
 
 void sqlrcontroller_svr::incrementBeginCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nbegin++;
 }
 
 void sqlrcontroller_svr::incrementCommitCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->ncommit++;
 }
 
 void sqlrcontroller_svr::incrementRollbackCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nrollback++;
 }
 
 void sqlrcontroller_svr::incrementDbVersionCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->ndbversion++;
 }
 
 void sqlrcontroller_svr::incrementBindFormatCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nbindformat++;
 }
 
 void sqlrcontroller_svr::incrementServerVersionCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nserverversion++;
 }
 
 void sqlrcontroller_svr::incrementSelectDatabaseCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nselectdatabase++;
 }
 
 void sqlrcontroller_svr::incrementGetCurrentDatabaseCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->ngetcurrentdatabase++;
 }
 
 void sqlrcontroller_svr::incrementGetLastInsertIdCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->ngetlastinsertid++;
 }
 
 void sqlrcontroller_svr::incrementNewQueryCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nnewquery++;
 }
 
 void sqlrcontroller_svr::incrementReexecuteQueryCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nreexecutequery++;
 }
 
 void sqlrcontroller_svr::incrementFetchFromBindCursorCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nfetchfrombindcursor++;
 }
 
 void sqlrcontroller_svr::incrementFetchResultSetCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nfetchresultset++;
 }
 
 void sqlrcontroller_svr::incrementAbortResultSetCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nabortresultset++;
 }
 
 void sqlrcontroller_svr::incrementSuspendResultSetCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nsuspendresultset++;
 }
 
 void sqlrcontroller_svr::incrementResumeResultSetCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nresumeresultset++;
 }
 
 void sqlrcontroller_svr::incrementGetDbListCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->ngetdblist++;
 }
 
 void sqlrcontroller_svr::incrementGetTableListCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->ngettablelist++;
 }
 
 void sqlrcontroller_svr::incrementGetColumnListCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->ngetcolumnlist++;
 }
 
 void sqlrcontroller_svr::incrementReLogInCount() {
+	if (!connstats) {
+		return;
+	}
 	connstats->nrelogin++;
 }

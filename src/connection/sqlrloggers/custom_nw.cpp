@@ -140,7 +140,7 @@ bool custom_nw::run(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur) {
 		dt.getHour(),
 		dt.getMinutes(),
 		dt.getSeconds(),
-		sqlrcon->cont->handoffindex, 
+		sqlrcon->cont->connstats->index,
 		sec+usec/1000000.0,
 		errorcodebuf,
 		(sqlrcur->lastrowvalid)?sqlrcur->lastrow:0,

@@ -3,6 +3,7 @@
 
 #include <sqlrqueries/sqlrcmdcstat.h>
 #include <rudiments/charstring.h>
+#include <rudiments/process.h>
 #include <debugprint.h>
 
 // for gettimeofday
@@ -139,13 +140,13 @@ void sqlrcmdcstatcursor::getField(uint32_t col,
 	switch (col) {
 		case 0:
 			// index -
-			// index assigned by listener
-			fieldbuffer=charstring::parseNumber(cs->index);
+			// index in shmdata.connstats array
+			fieldbuffer=charstring::parseNumber(currentrow-1);
 			break;
 		case 1:
 			// mine -
 			// * if the connection is processing this command
-			if (cs->index==conn->cont->handoffindex) {
+			if (cs->processid==process::getProcessId()) {
 				*field="*";
 				*fieldlength=1;
 			} else {

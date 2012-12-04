@@ -132,8 +132,6 @@ void sqlrcontroller_svr::registerForHandoff(const char *tmpdir) {
 							RESULT_SUCCESS) {
 			if (handoffsockun.write(
 				(uint32_t)process::getProcessId())==
-							sizeof(uint32_t) &&
-				handoffsockun.read(&handoffindex)==
 							sizeof(uint32_t)) {
 				connected=true;
 				break;
@@ -141,11 +139,6 @@ void sqlrcontroller_svr::registerForHandoff(const char *tmpdir) {
 			deRegisterForHandoff(tmpdir);
 		}
 		snooze::macrosnooze(1);
-	}
-
-	// initialize the per-connection statistics buffer
-	if (connected) {
-		initConnStats();
 	}
 
 	dbgfile.debugPrint("connection",0,"done registering for handoff");
