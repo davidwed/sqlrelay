@@ -6,6 +6,10 @@
 #include <defines.h>
 
 void sqlrcursor::closeResultSet() {
+	return closeResultSet(true);
+}
+
+void sqlrcursor::closeResultSet(bool closeremote) {
 
 	// If the end of the previous result set was never reached, abort it.
 	// If we're caching data to a local file, get the rest of the data; we
@@ -46,7 +50,7 @@ void sqlrcursor::closeResultSet() {
 					return;
 				}
 			}
-		} else {
+		} else if (closeremote) {
 			sqlrc->cs->write((uint16_t)ABORT_RESULT_SET);
 			sqlrc->cs->write((uint16_t)DONT_NEED_NEW_CURSOR);
 			sqlrc->cs->write(cursorid);

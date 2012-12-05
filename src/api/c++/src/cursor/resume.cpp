@@ -12,7 +12,7 @@ bool sqlrcursor::resumeResultSet(uint16_t id) {
 bool sqlrcursor::resumeCachedResultSet(uint16_t id, const char *filename) {
 
 	if (!endofresultset && !suspendresultsetsent) {
-		closeResultSet();
+		closeResultSet(false);
 	}
 	clearResultSet();
 

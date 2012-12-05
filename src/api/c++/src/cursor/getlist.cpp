@@ -26,7 +26,7 @@ bool sqlrcursor::getList(uint16_t command,
 	clearVariables();
 
 	if (!endofresultset) {
-		closeResultSet();
+		closeResultSet(false);
 	}
 	clearResultSet();
 

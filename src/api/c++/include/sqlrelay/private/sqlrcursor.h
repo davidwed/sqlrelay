@@ -114,6 +114,7 @@
 		char	*getColStorage(int32_t length);
 		void	createColumnBuffers();
 
+		void	closeResultSet(bool closeremote);
 
 		bool		resumed;
 		bool		cached;
