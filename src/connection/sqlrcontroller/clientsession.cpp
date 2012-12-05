@@ -145,6 +145,9 @@ void sqlrcontroller_svr::clientSession() {
 		} else if (command==GETCOLUMNLIST) {
 			incrementGetColumnListCount();
 			loop=getColumnListCommand(cursor);
+		} else if (command==GET_QUERY_TREE) {
+			incrementGetQueryTreeCount();
+			loop=getQueryTreeCommand(cursor);
 		} else {
 			loop=false;
 		}
@@ -207,7 +210,8 @@ sqlrcursor_svr *sqlrcontroller_svr::getCursor(uint16_t command) {
 		command==GETDBLIST ||
 		command==GETTABLELIST ||
 		command==GETCOLUMNLIST ||
-		command==ABORT_RESULT_SET) &&
+		command==ABORT_RESULT_SET ||
+		command==GET_QUERY_TREE) &&
 		clientsock->read(&neednewcursor,
 				idleclienttimeout,0)!=sizeof(uint16_t)) {
 		dbgfile.debugPrint("connection",2,

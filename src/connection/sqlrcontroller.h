@@ -192,6 +192,7 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void	abortResultSetCommand(sqlrcursor_svr *cursor);
 		void	suspendResultSetCommand(sqlrcursor_svr *cursor);
 		bool	resumeResultSetCommand(sqlrcursor_svr *cursor);
+		bool	getQueryTreeCommand(sqlrcursor_svr *cursor);
 		void	closeClientSocket();
 		void	closeSuspendedSessionSockets();
 		bool	authenticate();
@@ -232,7 +233,6 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 						bool bindcursor);
 		void	rewriteQuery(sqlrcursor_svr *cursor);
 		bool	translateQuery(sqlrcursor_svr *cursor);
-		void	printQueryTree(xmldom *tree);
 		void	translateBindVariables(sqlrcursor_svr *cursor);
 		bool	matchesNativeBindFormat(const char *bind);
 		void	translateBindVariableInStringAndArray(
@@ -375,6 +375,7 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void	incrementGetDbListCount();
 		void	incrementGetTableListCount();
 		void	incrementGetColumnListCount();
+		void	incrementGetQueryTreeCount();
 		void	incrementReLogInCount();
 
 		const char	*user;

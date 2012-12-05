@@ -37,6 +37,7 @@
 #define GET_CURRENT_DATABASE 22
 #define GET_LAST_INSERT_ID 23
 #define BEGIN 24
+#define GET_QUERY_TREE 25
 
 #define SUSPENDED_RESULT_SET 1
 #define NO_SUSPENDED_RESULT_SET 0
@@ -193,6 +194,7 @@ struct sqlrconnstatistics {
 	uint32_t			ngetdblist;
 	uint32_t			ngettablelist;
 	uint32_t			ngetcolumnlist;
+	uint32_t			ngetquerytree;
 	uint64_t			nsql;
 	uint32_t			ncustomsql;
 	uint32_t			nrelogin;

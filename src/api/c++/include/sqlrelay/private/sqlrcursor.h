@@ -210,5 +210,6 @@
 								bool copyrefs);
 		uint16_t	getOutputBindCursorId(const char *variable);
 		void		attachToBindCursor(uint16_t bindcursorid);
+		char		*getQueryTree();
 
 	friend class sqlrconnection;

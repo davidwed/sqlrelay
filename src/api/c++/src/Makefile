@@ -66,6 +66,7 @@ SRCS = connection/connectionctor.cpp \
 	cursor/skipandfetch.cpp \
 	cursor/abortresultset.cpp \
 	cursor/getlist.cpp \
+	cursor/getquerytree.cpp \
 	row/row.cpp
 LOBJS = connection/connectionctor.lo \
 	connection/connectiondtor.lo \
@@ -125,6 +126,7 @@ LOBJS = connection/connectionctor.lo \
 	cursor/skipandfetch.lo \
 	cursor/abortresultset.lo \
 	cursor/getlist.lo \
+	cursor/getquerytree.lo \
 	row/row.lo
 
 .SUFFIXES: .lo

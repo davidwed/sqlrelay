@@ -419,6 +419,13 @@ void sqlrcontroller_svr::incrementGetColumnListCount() {
 	connstats->ngetcolumnlist++;
 }
 
+void sqlrcontroller_svr::incrementGetQueryTreeCount() {
+	if (!connstats) {
+		return;
+	}
+	connstats->ngetquerytree++;
+}
+
 void sqlrcontroller_svr::incrementReLogInCount() {
 	if (!connstats) {
 		return;

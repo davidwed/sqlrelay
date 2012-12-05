@@ -13,6 +13,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/datetime.h>
 #include <rudiments/signalclasses.h>
+#include <rudiments/xmldom.h>
 #include <sqlrconfigfile.h>
 
 #include <defines.h>
@@ -403,7 +404,8 @@ int sqlrsh::commandType(const char *command) {
 					"setresultsetbuffersize ",23) ||
 		!charstring::compareIgnoringCase(ptr,
 					"getresultsetbuffersize") ||
-		!charstring::compareIgnoringCase(ptr,"endsession")) {
+		!charstring::compareIgnoringCase(ptr,"endsession") ||
+		!charstring::compareIgnoringCase(ptr,"querytree")) {
 
 		// return value of 1 is internal command
 		return 1;
@@ -532,6 +534,12 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"endsession")) {	
 		sqlrcon->endSession();
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"querytree")) {	
+		xmldom	xmld;
+		if (xmld.parseString(sqlrcur->getQueryTree())) {
+			xmldomnode::print(xmld.getRootNode());
+		}
 		return;
 	} else {
 		return;

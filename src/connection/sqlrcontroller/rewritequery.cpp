@@ -46,7 +46,7 @@ bool sqlrcontroller_svr::translateQuery(sqlrcursor_svr *cursor) {
 
 	if (debugsqltranslation) {
 		printf("before translation:\n");
-		printQueryTree(cursor->querytree);
+		xmldomnode::print(cursor->querytree->getRootNode());
 		printf("\n");
 	}
 
@@ -67,7 +67,7 @@ bool sqlrcontroller_svr::translateQuery(sqlrcursor_svr *cursor) {
 
 	if (debugsqltranslation) {
 		printf("after translation:\n");
-		printQueryTree(cursor->querytree);
+		xmldomnode::print(cursor->querytree->getRootNode());
 		printf("\n");
 	}
 
@@ -93,33 +93,6 @@ bool sqlrcontroller_svr::translateQuery(sqlrcursor_svr *cursor) {
 	cursor->querylength=translatedquery.getStringLength();
 	cursor->querybuffer[cursor->querylength]='\0';
 	return true;
-}
-
-void sqlrcontroller_svr::printQueryTree(xmldom *tree) {
-	stringbuffer	*xmlstr=tree->getRootNode()->xml();
-	const char	*xml=xmlstr->getString();
-	int16_t		indent=0;
-	bool		endtag=false;
-	for (const char *ptr=xml; *ptr; ptr++) {
-		if (*ptr=='<') {
-			if (*(ptr+1)=='/') {
-				indent=indent-2;
-				endtag=true;
-			}
-			for (uint16_t i=0; i<indent; i++) {
-				printf(" ");
-			}
-		}
-		printf("%c",*ptr);
-		if (*ptr=='>') {
-			printf("\n");
-			if (*(ptr-1)!='/' && !endtag) {
-				indent=indent+2;
-			}
-			endtag=false;
-		}
-	}
-	delete xmlstr;
 }
 
 void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {

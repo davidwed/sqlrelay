@@ -64,6 +64,7 @@ SRCS = sqlrcontroller/sqlrcontrollerctor.cpp \
 	sqlrcontroller/error.cpp \
 	sqlrcontroller/user.cpp \
 	sqlrcontroller/statistics.cpp \
+	sqlrcontroller/getquerytree.cpp \
 	sqlrconnection/sqlrconnection.cpp \
 	sqlrcursor/sqlrcursor.cpp \
 	sqlparser/clauses.cpp \
@@ -159,6 +160,7 @@ LOBJS = sqlrcontroller/sqlrcontrollerctor.lo \
 	sqlrcontroller/error.lo \
 	sqlrcontroller/user.lo \
 	sqlrcontroller/statistics.lo \
+	sqlrcontroller/getquerytree.lo \
 	sqlrconnection/sqlrconnection.lo \
 	sqlrcursor/sqlrcursor.lo \
 	sqlparser/clauses.lo \
