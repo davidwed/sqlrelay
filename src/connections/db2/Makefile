@@ -11,34 +11,29 @@ ifeq ($(DB2USERPATH),yes)
 	RPATH = -R $(DB2LIBSPATH)
 endif
 endif
-ifneq ($(strip $(libdir)),)
-ifeq ($(SERVERUSERPATH),yes)
-	RPATH += -R $(libdir)
-endif
-endif
 
-SRCS= db2connection.cpp main.cpp
-LOBJS= db2connection.lo main.lo
+SRCS= db2connection.cpp
+LOBJS= db2connection.lo
 
 .SUFFIXES: .lo
 
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-connection-db2$(EXE)
+all: libsqlrelay_sqlrconnection_db2.la
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-db2$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
+	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
-sqlr-connection-db2$(EXE): $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(DB2STATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
+libsqlrelay_sqlrconnection_db2.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
 
 install:
-	$(MKINSTALLDIRS) $(bindir)
-	$(LTINSTALL) sqlr-connection-db2$(EXE) $(bindir)
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) libsqlrelay_sqlrconnection_db2.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqlrconnection_db2.a
 
 uninstall:
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrconnection_db2.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-db2$(EXE)

@@ -44,6 +44,7 @@ libpqsqlrelay.la: $(SRCS) $(LOBJS)
 install:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libpqsqlrelay.la $(libdir)
+	$(RM) $(libdir)/libpqsqlrelay.a
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:

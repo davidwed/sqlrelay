@@ -30,7 +30,7 @@ clean:
 	$(RMTREE) .libs
 
 sqlr-cachemanager$(EXE): $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)

@@ -389,12 +389,7 @@ bool scaler::reapChildren(pid_t connpid) {
 
 pid_t scaler::openOneConnection() {
 
-	char	commandstub[]="sqlr-connection-";
-	int	commandlen=charstring::length(commandstub)+
-					charstring::length(dbase)+1;
-	char	*command=new char[commandlen];
-	snprintf(command,commandlen,"%s%s",commandstub,dbase);
-	command[commandlen-1]='\0';
+	char	command[]="sqlr-connection";
 
 	char	ttlstr[20];
 	snprintf(ttlstr,20,"%d",ttl);
@@ -403,7 +398,7 @@ pid_t scaler::openOneConnection() {
 	int	p=0;
 	char	*argv[20];
 	// execvp wants char* (arghh!)
-	argv[p++]=command;
+	argv[p++]=(char *)"sqlr-connection";
 	argv[p++]=(char *)"-silent";
 	argv[p++]=(char *)"-nodetach";
 	argv[p++]=(char *)"-ttl";
@@ -436,8 +431,6 @@ pid_t scaler::openOneConnection() {
 		fprintf(stderr,"fork() returned %d [%d]\n",
 					pid,error::getErrorNumber());
 	}
-
-	delete[] command;
 
 	return (pid>0)?pid:0;
 }

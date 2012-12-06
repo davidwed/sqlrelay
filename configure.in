@@ -33,10 +33,6 @@ AC_ARG_ENABLE(server-rpath,
 	SERVERUSERPATH="yes",
 	SERVERUSERPATH="")
 AC_SUBST(SERVERUSERPATH)
-AC_ARG_ENABLE(static,
-	[  --enable-static               Enable static linking],
-	STATICLINK="-static",
-	STATICLINK="")
 AC_ARG_WITH(rudiments-prefix,
 	[  --with-rudiments-prefix       Location of rudiments],
 	RUDIMENTSPATH="$withval",

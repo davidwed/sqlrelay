@@ -19,10 +19,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+extern "C" {
+	sqlrconnection_svr *new_freetdsconnection(sqlrcontroller_svr *cont) {
+		return new freetdsconnection(cont);
+	}
+}
+
 stringbuffer	freetdsconnection::errorstring;
 int64_t		freetdsconnection::errorcode;
 bool		freetdsconnection::liveconnection;
-
 
 freetdsconnection::freetdsconnection(sqlrcontroller_svr *cont) :
 						sqlrconnection_svr(cont) {

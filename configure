@@ -841,7 +841,6 @@ enable_profiling
 with_initscript_prefix
 enable_client_rpath
 enable_server_rpath
-enable_static
 with_rudiments_prefix
 with_libgdbm_prefix
 with_glib_prefix
@@ -916,6 +915,7 @@ with_system_libtool
 enable_dmalloc
 enable_efence
 enable_shared
+enable_static
 with_pic
 enable_fast_install
 with_gnu_ld
@@ -1554,7 +1554,6 @@ Optional Features:
   --enable-profiling            compile with -pg options
   --enable-client-rpath         Use -rpath when linking SQL Relay client programs against SQL Relay libraries
   --enable-server-rpath         Use -rpath when linking SQL Relay server programs against SQL Relay libraries
-  --enable-static               Enable static linking
   --disable-oracle              Don't build Oracle connection
   --disable-oracle-rpath        Don't use -rpath when building Oracle connection
   --disable-mysql               Don't build MySQL connection
@@ -2704,13 +2703,6 @@ else
   SERVERUSERPATH=""
 fi
 
-
-# Check whether --enable-static was given.
-if test "${enable_static+set}" = set; then :
-  enableval=$enable_static; STATICLINK="-static"
-else
-  STATICLINK=""
-fi
 
 
 # Check whether --with-rudiments-prefix was given.

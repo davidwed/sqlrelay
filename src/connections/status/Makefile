@@ -11,11 +11,6 @@ ifeq ($(STATUSUSERPATH),yes)
 	RPATH = -R $(STATUSLIBSPATH)
 endif
 endif
-ifneq ($(strip $(libdir)),)
-ifeq ($(SERVERUSERPATH),yes)
-	RPATH += -R $(libdir)
-endif
-endif
 
 SRCS= statusconnection.cpp main.cpp
 LOBJS= statusconnection.lo main.lo
@@ -29,12 +24,11 @@ all: sqlr-status$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-status$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
+	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
 sqlr-status$(EXE): $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(STATUSSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)

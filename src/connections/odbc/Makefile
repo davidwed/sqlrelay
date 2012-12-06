@@ -16,34 +16,29 @@ ifeq ($(ICONVUSERPATH),yes)
 	RPATH += -R $(ICONVLIBSPATH)
 endif
 endif
-ifneq ($(strip $(libdir)),)
-ifeq ($(SERVERUSERPATH),yes)
-	RPATH += -R $(libdir)
-endif
-endif
 
-SRCS= odbcconnection.cpp main.cpp
-LOBJS= odbcconnection.lo main.lo
+SRCS= odbcconnection.cpp
+LOBJS= odbcconnection.lo
 
 .SUFFIXES: .lo
 
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-connection-odbc$(EXE)
+all: libsqlrelay_sqlrconnection_odbc.la
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-odbc$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
+	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
-sqlr-connection-odbc$(EXE): $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(ODBCSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
+libsqlrelay_sqlrconnection_odbc.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
 
 install:
-	$(MKINSTALLDIRS) $(bindir)
-	$(LTINSTALL) sqlr-connection-odbc$(EXE) $(bindir)
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) libsqlrelay_sqlrconnection_odbc.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqlrconnection_odbc.a
 
 uninstall:
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrconnection_odbc.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-odbc$(EXE)

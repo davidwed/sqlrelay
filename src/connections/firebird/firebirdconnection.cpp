@@ -13,6 +13,12 @@
 
 #include <stdlib.h>
 
+extern "C" {
+	sqlrconnection_svr *new_firebirdconnection(sqlrcontroller_svr *cont) {
+		return new firebirdconnection(cont);
+	}
+}
+
 static char tpb[] = {
 	isc_tpb_version3,
 	isc_tpb_write,

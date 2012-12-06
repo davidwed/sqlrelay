@@ -37,6 +37,7 @@ libsqlrodbc.la: sqlrodbc.cpp sqlrodbc.lo
 install:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libsqlrodbc.la $(libdir)
+	$(RM) $(libdir)/libsqlrodbc.a
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:

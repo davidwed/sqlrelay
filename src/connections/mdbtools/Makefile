@@ -11,34 +11,29 @@ ifeq ($(MDBTOOLSUSERPATH),yes)
 	RPATH = -R $(MDBTOOLSLIBSPATH)
 endif
 endif
-ifneq ($(strip $(libdir)),)
-ifeq ($(SERVERUSERPATH),yes)
-	RPATH += -R $(libdir)
-endif
-endif
 
-SRCS= mdbtoolsconnection.cpp main.cpp
-LOBJS= mdbtoolsconnection.lo main.lo
+SRCS= mdbtoolsconnection.cpp
+LOBJS= mdbtoolsconnection.lo
 
 .SUFFIXES: .lo .d.lo
 
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-connection-mdbtools$(EXE)
+all: libsqlrelay_sqlrconnection_mdbtools.la
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-mdbtools$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
+	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
-sqlr-connection-mdbtools$(EXE): $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(MDBTOOLSSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
+libsqlrelay_sqlrconnection_mdbtools.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
 
 install:
-	$(MKINSTALLDIRS) $(bindir)
-	$(LTINSTALL) sqlr-connection-mdbtools$(EXE) $(bindir)
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) libsqlrelay_sqlrconnection_mdbtools.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqlrconnection_mdbtools.a
 
 uninstall:
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrconnection_mdbtools.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-mdbtools$(EXE)

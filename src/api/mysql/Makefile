@@ -63,10 +63,15 @@ install:
 	$(INSTALL) -m 644 sample-oracle-mysql-errors.map $(EXAMPLEDIR)
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libmysql3sqlrelay.la $(libdir)
+	$(RM) $(libdir)/libmysql3sqlrelay.a
 	$(LTINSTALL) libmysql40sqlrelay.la $(libdir)
+	$(RM) $(libdir)/libmysql40sqlrelay.a
 	$(LTINSTALL) libmysql41sqlrelay.la $(libdir)
+	$(RM) $(libdir)/libmysql41sqlrelay.a
 	$(LTINSTALL) libmysql50sqlrelay.la $(libdir)
+	$(RM) $(libdir)/libmysql50sqlrelay.a
 	$(LTINSTALL) libmysql51sqlrelay.la $(libdir)
+	$(RM) $(libdir)/libmysql51sqlrelay.a
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:

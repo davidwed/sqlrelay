@@ -27,6 +27,8 @@
 	the client no longer aborts a result set before sending a new command,
 		it just sends the new command, eliminating a client/server
 		round-trip
+	replaced sqlr-connection-"dbase" with a single sqlr-connection program
+		that loads plugins for each database
 
 0.47 - fixed bug that caused sqlr-export to output negative xml-entity values
 	fixed single-quote-escaping in sqlr-export

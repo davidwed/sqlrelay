@@ -2,14 +2,16 @@
 // See the file COPYING for more information
 
 #include <db2connection.h>
-
 #include <rudiments/environment.h>
-
 #include <datatypes.h>
-
 #include <config.h>
-
 #include <stdlib.h>
+
+extern "C" {
+	sqlrconnection_svr *new_db2connection(sqlrcontroller_svr *cont) {
+		return new db2connection(cont);
+	}
+}
 
 db2connection::db2connection(sqlrcontroller_svr *cont) :
 					sqlrconnection_svr(cont) {

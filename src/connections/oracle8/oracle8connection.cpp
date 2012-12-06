@@ -20,6 +20,12 @@
 	#endif
 #endif
 
+extern "C" {
+	sqlrconnection_svr *new_oracle8connection(sqlrcontroller_svr *cont) {
+		return new oracle8connection(cont);
+	}
+}
+
 oracle8connection::oracle8connection(sqlrcontroller_svr *cont) :
 						sqlrconnection_svr(cont) {
 	stmtmode=OCI_DEFAULT;

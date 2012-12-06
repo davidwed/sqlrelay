@@ -13,6 +13,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+extern "C" {
+	sqlrconnection_svr *new_sybaseconnection(sqlrcontroller_svr *cont) {
+		return new sybaseconnection(cont);
+	}
+}
+
 stringbuffer	sybaseconnection::errorstring;
 int64_t		sybaseconnection::errorcode;
 bool		sybaseconnection::liveconnection;

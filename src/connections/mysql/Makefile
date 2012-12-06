@@ -11,34 +11,29 @@ ifeq ($(MYSQLUSERPATH),yes)
 	RPATH = -R $(MYSQLLIBSPATH)
 endif
 endif
-ifneq ($(strip $(libdir)),)
-ifeq ($(SERVERUSERPATH),yes)
-	RPATH += -R $(libdir)
-endif
-endif
 
-SRCS= mysqlconnection.cpp mysqlsqlwriter.cpp main.cpp
-LOBJS= mysqlconnection.lo mysqlsqlwriter.lo main.lo
+SRCS= mysqlconnection.cpp mysqlsqlwriter.cpp
+LOBJS= mysqlconnection.lo mysqlsqlwriter.lo
 
 .SUFFIXES: .lo
 
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-connection-mysql$(EXE)
+all: libsqlrelay_sqlrconnection_mysql.la
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-mysql$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
+	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
-sqlr-connection-mysql$(EXE): $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(MYSQLSTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
+libsqlrelay_sqlrconnection_mysql.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
 
 install:
-	$(MKINSTALLDIRS) $(bindir)
-	$(LTINSTALL) sqlr-connection-mysql$(EXE) $(bindir)
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) libsqlrelay_sqlrconnection_mysql.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqlrconnection_mysql.a
 
 uninstall:
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrconnection_mysql.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-mysql$(EXE)

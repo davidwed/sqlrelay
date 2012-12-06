@@ -38,7 +38,7 @@ sqlrelay.beam: sqlrelay.erl
 	$(ERLC) $(ERLCFLAGS) -W $<
 
 sqlrelay: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CC) $(STATICLINK) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
+	$(LIBTOOL) --mode=link $(CC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
 
 install:
 	$(MKINSTALLDIRS) $(DESTDIR)$(ERLANG_ROOT_DIR)/lib/sqlrelay-$(SQLR_VERSION)/src

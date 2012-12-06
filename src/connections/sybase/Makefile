@@ -11,34 +11,29 @@ ifeq ($(SYBASEUSERPATH),yes)
 	RPATH = -R $(SYBASELIBSPATH)
 endif
 endif
-ifneq ($(strip $(libdir)),)
-ifeq ($(SERVERUSERPATH),yes)
-	RPATH += -R $(libdir)
-endif
-endif
 
-SRCS= sybaseconnection.cpp main.cpp
-LOBJS= sybaseconnection.lo main.lo
+SRCS= sybaseconnection.cpp
+LOBJS= sybaseconnection.lo
 
 .SUFFIXES: .lo
 
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-connection-sybase$(EXE)
+all: libsqlrelay_sqlrconnection_sybase.la
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection-sybase$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
+	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
-sqlr-connection-sybase$(EXE): $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(SYBASESTATIC) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
+libsqlrelay_sqlrconnection_sybase.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
 
 install:
-	$(MKINSTALLDIRS) $(bindir)
-	$(LTINSTALL) sqlr-connection-sybase$(EXE) $(bindir)
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) libsqlrelay_sqlrconnection_sybase.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqlrconnection_sybase.a
 
 uninstall:
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrconnection_sybase.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sybase$(EXE)

@@ -9,6 +9,12 @@
 
 #include <datatypes.h>
 
+extern "C" {
+	sqlrconnection_svr *new_postgresqlconnection(sqlrcontroller_svr *cont) {
+		return new postgresqlconnection(cont);
+	}
+}
+
 #ifdef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 static void nullNoticeProcessor(void *arg, const char *message) {
 }

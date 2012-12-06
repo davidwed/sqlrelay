@@ -8,10 +8,9 @@ CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common 
 LIBS = $(ORACLELIBS) -L$(top_builddir)/src/connection -lsqlrconnection -L$(top_builddir)/src/util -lsqlrutil $(SIDLIBS) $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(ORACLELIBSPATH)),)
 ifeq ($(ORACLEUSERPATH),yes)
-	RPATH = $(ORACLELIBSPATH)
+	RPATH = -R $(ORACLELIBSPATH)
 endif
 endif
-RPATH += $(libdir)
 
 SRCS= oracle8connection.cpp oracle8sqlwriter.cpp
 LOBJS= oracle8connection.lo oracle8sqlwriter.lo
@@ -28,11 +27,12 @@ clean:
 	$(RMTREE) .libs
 
 libsqlrelay_sqlrconnection_oracle8.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
 
 install:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libsqlrelay_sqlrconnection_oracle8.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqlrconnection_oracle8.a
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrconnection_oracle8.la

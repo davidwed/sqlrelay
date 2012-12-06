@@ -24,6 +24,12 @@
 #define FALSE (0)
 #endif
 
+extern "C" {
+	sqlrconnection_svr *new_mysqlconnection(sqlrcontroller_svr *cont) {
+		return new mysqlconnection(cont);
+	}
+}
+
 const my_bool	mysqlconnection::mytrue=TRUE;
 const my_bool	mysqlconnection::myfalse=FALSE;
 

@@ -17,6 +17,11 @@
 	#define sqlite3_free(mem)		sqlite_free((char *)mem)
 #endif
 
+extern "C" {
+	sqlrconnection_svr *new_sqliteconnection(sqlrcontroller_svr *cont) {
+		return new sqliteconnection(cont);
+	}
+}
 
 sqliteconnection::sqliteconnection(sqlrcontroller_svr *cont) :
 					sqlrconnection_svr(cont) {

@@ -8,10 +8,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// debug getpid()
-#include <unistd.h>
-
 #include <datatypes.h>
+
+extern "C" {
+	sqlrconnection_svr *new_routerconnection(sqlrcontroller_svr *cont) {
+		return new routerconnection(cont);
+	}
+}
 
 routerconnection::routerconnection(sqlrcontroller_svr *cont) :
 					sqlrconnection_svr(cont) {

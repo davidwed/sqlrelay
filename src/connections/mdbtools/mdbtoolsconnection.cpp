@@ -17,6 +17,12 @@
 	extern "C" int yyparse();
 #endif
 
+extern "C" {
+	sqlrconnection_svr *new_mdbtoolsconnection(sqlrcontroller_svr *cont) {
+		return new mdbtoolsconnection(cont);
+	}
+}
+
 extern void mdb_remove_backends();
 
 mdbtoolsconnection::mdbtoolsconnection(sqlrcontroller_svr *cont) :

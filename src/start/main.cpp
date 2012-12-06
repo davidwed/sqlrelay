@@ -54,8 +54,7 @@ bool startListener(const char *id, const char *config,
 }
 
 
-bool startConnection(bool strace, const char *dbase,
-				const char *id, const char *connectionid,
+bool startConnection(bool strace, const char *id, const char *connectionid,
 				const char *config, const char *localstatedir,
 				bool connectiondebug) {
 
@@ -63,8 +62,7 @@ bool startConnection(bool strace, const char *dbase,
 	if (strace) {
 		command.append("strace -ff -o sqlr-connection-strace ");
 	}
-	command.append("sqlr-connection-")->append(dbase);
-	command.append(" -id ")->append(id);
+	command.append("sqlr-connection -id ")->append(id);
 	if (connectionid) {
 		command.append(" -connectionid ")->append(connectionid);
 	}
@@ -84,7 +82,7 @@ bool startConnection(bool strace, const char *dbase,
 	bool	success=!system(command.getString());
 
 	if (!success) {
-		printf("\nsqlr-connection-%s failed to start.\n",dbase);
+		printf("\nsqlr-connection failed to start.\n");
 	}
 
 	return success;
@@ -108,7 +106,7 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 	// if no connections were defined in the config file,
 	// start 1 default one
 	if (!cfgfile->getConnectionCount()) {
-		return !startConnection(strace,cfgfile->getDbase(),id,config,
+		return !startConnection(strace,id,config,
 					localstatedir,NULL,connectiondebug);
 	}
 
@@ -150,8 +148,7 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 
 		// fire them up
 		for (int32_t i=0; i<startup; i++) {
-			if (!startConnection(strace,cfgfile->getDbase(),
-					id,csc->getConnectionId(),
+			if (!startConnection(strace,id,csc->getConnectionId(),
 					config,localstatedir,connectiondebug)) {
 				// it's ok if at least 1 connection started up
 				return (totalstarted>0 || i>0);

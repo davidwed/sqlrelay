@@ -10,6 +10,12 @@
 
 #include <stdlib.h>
 
+extern "C" {
+	sqlrconnection_svr *new_odbcconnection(sqlrcontroller_svr *cont) {
+		return new odbcconnection(cont);
+	}
+}
+
 
 #ifdef HAVE_SQLCONNECTW
 #include <iconv.h>
