@@ -5,6 +5,8 @@
 
 sqlrcontroller_svr::sqlrcontroller_svr() : daemonprocess(), listener() {
 
+	conn=NULL;
+
 	cmdl=NULL;
 	cfgfl=NULL;
 	semset=NULL;

@@ -60,7 +60,6 @@ SRCS = sqlrcontroller/sqlrcontrollerctor.cpp \
 	sqlrcontroller/dbversion.cpp \
 	sqlrcontroller/serverversion.cpp \
 	sqlrcontroller/handlesignals.cpp \
-	sqlrcontroller/main.cpp \
 	sqlrcontroller/error.cpp \
 	sqlrcontroller/user.cpp \
 	sqlrcontroller/statistics.cpp \
@@ -156,7 +155,6 @@ LOBJS = sqlrcontroller/sqlrcontrollerctor.lo \
 	sqlrcontroller/dbversion.lo \
 	sqlrcontroller/serverversion.lo \
 	sqlrcontroller/handlesignals.lo \
-	sqlrcontroller/main.lo \
 	sqlrcontroller/error.lo \
 	sqlrcontroller/user.lo \
 	sqlrcontroller/statistics.lo \
@@ -220,7 +218,8 @@ all: libsqlrconnection.la \
 	libsqlrelay_sqlrlogger_slowqueries.la \
 	libsqlrelay_sqlrlogger_custom_nw.la \
 	libsqlrelay_sqlrquery_sqlrcmdgstat.la \
-	libsqlrelay_sqlrquery_sqlrcmdcstat.la
+	libsqlrelay_sqlrquery_sqlrcmdcstat.la \
+	sqlr-connection$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -281,6 +280,10 @@ libsqlrelay_sqlrquery_sqlrcmdgstat.la: sqlrqueries/sqlrcmdgstat.cpp sqlrqueries/
 
 libsqlrelay_sqlrquery_sqlrcmdcstat.la: sqlrqueries/sqlrcmdcstat.cpp sqlrqueries/sqlrcmdcstat.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrqueries/sqlrcmdcstat.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+
+sqlr-connection$(EXE): sqlrcontroller/main.cpp sqlrcontroller/main.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrcontroller/main.lo $(LDFLAGS) libsqlrconnection.la $(LIBS) $(RPATH)
+	
 	
 install: install-connection install-triggers install-translations install-loggers install-queries
 
@@ -288,6 +291,8 @@ install-connection:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libsqlrconnection.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
+	$(MKINSTALLDIRS) $(bindir)
+	$(LTINSTALL) sqlr-connection$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(tmpdir)/sockets

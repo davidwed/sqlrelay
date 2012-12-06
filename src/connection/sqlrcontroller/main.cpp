@@ -5,17 +5,17 @@
 #include <sqlrcontroller.h>
 #include <rudiments/process.h>
 
-sqlrcontroller_svr	*sqlrcontroller_svr::staticcont=NULL;
-signalhandler		*sqlrcontroller_svr::sigh=NULL;
-volatile sig_atomic_t	sqlrcontroller_svr::shutdowninprogress=0;
+sqlrcontroller_svr	*cont=NULL;
+signalhandler		*sigh=NULL;
+volatile sig_atomic_t	shutdowninprogress=0;
 
-void sqlrcontroller_svr::cleanUp() {
-	staticcont->closeConnection();
-	delete staticcont;
+void cleanUp() {
+	cont->closeConnection();
+	delete cont;
 	delete sigh;
 }
 
-void sqlrcontroller_svr::shutDown(int32_t signum) {
+void shutDown(int32_t signum) {
 
 	if (!signalhandler::isSignalHandlerIntUsed()) {
 		cleanUp();
@@ -52,11 +52,11 @@ void sqlrcontroller_svr::shutDown(int32_t signum) {
 			// Other signals are bugs
 			fprintf(stderr,"(pid=%d) Abnormal termination: signal %d received\n",process::getProcessId(),signum);
 			cleanUp();
-			/* Now reraise the signal.  We reactivate the signal's
-		   	default handling, which is to terminate the process.
-		   	We could just call exit or abort,
-		   	but reraising the signal sets the return status
-		   	from the process correctly. */
+			// Now reraise the signal.  We reactivate the signal's
+		   	// default handling, which is to terminate the process.
+		   	// We could just call exit or abort,
+		   	// but reraising the signal sets the return status
+		   	// from the process correctly.
 			signal(signum,SIG_DFL);
 			raise(signum);
 	}
@@ -65,21 +65,20 @@ void sqlrcontroller_svr::shutDown(int32_t signum) {
 	process::exit(exitcode);
 }
 
-void sqlrcontroller_svr::main(int argc, const char **argv,
-					sqlrconnection_svr *conn) {
+int main(int argc, const char **argv) {
 
 	#include <version.h>
 
-	staticcont=conn->cont;
+	cont=new sqlrcontroller_svr;
 
 	// handle signals
-	sigh=staticcont->handleSignals(sqlrcontroller_svr::shutDown);
+	sigh=cont->handleSignals(shutDown);
 
 	// open the connection to the db
 	bool	result=false;
-	if ((result=staticcont->init(argc,argv,conn))) {
+	if ((result=cont->init(argc,argv))) {
 		// wait for client connections
-		result=staticcont->listen();
+		result=cont->listen();
 	}
 
 	// If sqlr-stop has been run, we may be here because the sqlr-listener

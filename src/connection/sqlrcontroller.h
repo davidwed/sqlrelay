@@ -41,16 +41,6 @@ using namespace rudiments;
 
 class sqlrcontroller_svr : public daemonprocess, public listener {
 	public:
-		static	void main(int argc, const char **argv,
-					sqlrconnection_svr *conn);
-
-		static void	cleanUp();
-		static void	shutDown(int32_t signum);
-
-		static	sqlrcontroller_svr	*staticcont;
-		static	signalhandler		*sigh;
-		static volatile sig_atomic_t	shutdowninprogress;
-
 			sqlrcontroller_svr();
 		virtual	~sqlrcontroller_svr();
 
@@ -81,8 +71,8 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 
 		signalhandler	*handleSignals(
 					void (*shutdownfunction)(int32_t));
-		bool	init(int argc, const char **argv,
-					sqlrconnection_svr *conn);
+		bool	init(int argc, const char **argv);
+		sqlrconnection_svr	*initConnection(const char *dbase);
 		bool	listen();
 		void	closeConnection();
 
@@ -436,6 +426,7 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		bool		debugsqltranslation;
 		bool		debugtriggers;
 
+		dynamiclib		dl;
 		sqlrconnection_svr	*conn;
 
 		uint16_t	cursorcount;

@@ -13,10 +13,7 @@
 // for gettimeofday()
 #include <sys/time.h>
 
-bool sqlrcontroller_svr::init(int argc, const char **argv,
-					sqlrconnection_svr *conn) {
-
-	this->conn=conn;
+bool sqlrcontroller_svr::init(int argc, const char **argv) {
 
 	// process command line
 	cmdl=new cmdline(argc,argv);
@@ -51,6 +48,12 @@ bool sqlrcontroller_svr::init(int argc, const char **argv,
 	}
 
 	setUserAndGroup();
+
+	// load database plugin
+	conn=initConnection(cfgfl->getDbase());
+	if (!conn) {
+		return false;
+	}
 
 	dbgfile.init("connection",cmdl->getLocalStateDir());
 	if (cmdl->found("-debug")) {
@@ -211,6 +214,45 @@ bool sqlrcontroller_svr::init(int argc, const char **argv,
 	}
 	
 	return true;
+}
+
+sqlrconnection_svr *sqlrcontroller_svr::initConnection(const char *dbase) {
+
+	// load the connection module
+	stringbuffer	modulename;
+	modulename.append(LIBDIR);
+	modulename.append("/libsqlrelay_sqlrconnection_");
+	modulename.append(dbase)->append(".so");
+	if (!dl.open(modulename.getString(),true,true)) {
+		fprintf(stderr,"failed to load connection module: %s\n",dbase);
+		char	*error=dl.getError();
+		fprintf(stderr,"%s\n",error);
+		delete[] error;
+		return NULL;
+	}
+
+	// load the connection itself
+	stringbuffer	functionname;
+	functionname.append("new_")->append(dbase)->append("connection");
+	sqlrconnection_svr	*(*newConn)(sqlrcontroller_svr *)=
+				(sqlrconnection_svr *(*)(sqlrcontroller_svr *))
+					dl.getSymbol(functionname.getString());
+	if (!newConn) {
+		fprintf(stderr,"failed to load connection: %s\n",dbase);
+		char	*error=dl.getError();
+		fprintf(stderr,"%s\n",error);
+		delete[] error;
+		return NULL;
+	}
+
+	sqlrconnection_svr	*conn=(*newConn)(this);
+	if (!conn) {
+		fprintf(stderr,"failed to create connection: %s\n",dbase);
+		char	*error=dl.getError();
+		fprintf(stderr,"%s\n",error);
+		delete[] error;
+	}
+	return conn;
 }
 
 void sqlrcontroller_svr::setUserAndGroup() {

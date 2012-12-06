@@ -63,4 +63,6 @@ sqlrcontroller_svr::~sqlrcontroller_svr() {
 		file::remove(pidfile);
 		delete[] pidfile;
 	}
+
+	delete conn;
 }
