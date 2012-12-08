@@ -134,6 +134,9 @@ class oracle8cursor : public sqlrcursor_svr {
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
+		bool		outputBindCursor(const char *variable,
+						uint16_t variablesize,
+						sqlrcursor_svr *cursor);
 #ifdef HAVE_ORACLE_8i
 		bool		inputBindBlob(const char *variable, 
 						uint16_t variablesize,
@@ -165,9 +168,6 @@ class oracle8cursor : public sqlrcursor_svr {
 						uint16_t index,
 						int16_t *isnull,
 						ub2 type);
-		bool		outputBindCursor(const char *variable,
-						uint16_t variablesize,
-						sqlrcursor_svr *cursor);
 		bool		getLobOutputBindLength(uint16_t index,
 							uint64_t *length);
 		bool		getLobOutputBindSegment(uint16_t index,

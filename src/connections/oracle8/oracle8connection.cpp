@@ -1670,6 +1670,65 @@ bool oracle8cursor::outputBind(const char *variable,
 	return true;
 }
 
+bool oracle8cursor::outputBindCursor(const char *variable,
+					uint16_t variablesize,
+					sqlrcursor_svr *cursor) {
+
+#ifdef OCI_STMT_CACHE
+	// If the statement cache is in use then OCIStmtExecute will crash
+	// if the query includes cursor binds.  I'm not sure if this is an OCI
+	// bug or a problem caused by SQL Relay somehow, but until I discover
+	// a solution, we'll return an error here.  Ideally, I'd set an error
+	// message too...
+	if (oracle8conn->stmtcachesize) {
+		return false;
+	}
+#endif
+
+	checkRePrepare();
+
+	((oracle8cursor *)cursor)->bound=true;
+
+	if (charstring::isInteger(variable+1,variablesize-1)) {
+		ub4	pos=charstring::toInteger(variable+1);
+		if (!pos) {
+			return false;
+		}
+		if (OCIBindByPos(stmt,&curbindpp[oracurbindcount],
+				oracle8conn->err,pos,
+				(dvoid *)&(((oracle8cursor *)cursor)->stmt),
+				(sb4)0,
+				SQLT_RSET,
+				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
+				OCI_DEFAULT)!=OCI_SUCCESS) {
+			return false;
+		}
+		boundbypos[pos-1]=true;
+	} else {
+		if (OCIBindByName(stmt,&curbindpp[oracurbindcount],
+				oracle8conn->err,
+				(text *)variable,(sb4)variablesize,
+				(dvoid *)&(((oracle8cursor *)cursor)->stmt),
+				(sb4)0,
+				SQLT_RSET,
+				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
+				OCI_DEFAULT)!=OCI_SUCCESS) {
+			return false;
+		}
+	}
+	oracurbindcount++;
+	bindvarname[bindvarcount++]=variable+1;
+
+	// initialize values as if a statement has been prepared and executed
+	((oracle8cursor *)cursor)->stmttype=0;
+	((oracle8cursor *)cursor)->ncols=0;
+	((oracle8cursor *)cursor)->row=0;
+	((oracle8cursor *)cursor)->maxrow=0;
+	((oracle8cursor *)cursor)->totalrows=0;
+	((oracle8cursor *)cursor)->bound=true;
+	return true;
+}
+
 #ifdef HAVE_ORACLE_8i
 bool oracle8cursor::inputBindBlob(const char *variable,
 					uint16_t variablesize,
@@ -1838,65 +1897,6 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 	}
 	oraoutbindcount++;
 	bindvarname[bindvarcount++]=variable+1;
-	return true;
-}
-
-bool oracle8cursor::outputBindCursor(const char *variable,
-					uint16_t variablesize,
-					sqlrcursor_svr *cursor) {
-
-#ifdef OCI_STMT_CACHE
-	// If the statement cache is in use then OCIStmtExecute will crash
-	// if the query includes cursor binds.  I'm not sure if this is an OCI
-	// bug or a problem caused by SQL Relay somehow, but until I discover
-	// a solution, we'll return an error here.  Ideally, I'd set an error
-	// message too...
-	if (oracle8conn->stmtcachesize) {
-		return false;
-	}
-#endif
-
-	checkRePrepare();
-
-	((oracle8cursor *)cursor)->bound=true;
-
-	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
-		if (!pos) {
-			return false;
-		}
-		if (OCIBindByPos(stmt,&curbindpp[oracurbindcount],
-				oracle8conn->err,pos,
-				(dvoid *)&(((oracle8cursor *)cursor)->stmt),
-				(sb4)0,
-				SQLT_RSET,
-				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
-				OCI_DEFAULT)!=OCI_SUCCESS) {
-			return false;
-		}
-		boundbypos[pos-1]=true;
-	} else {
-		if (OCIBindByName(stmt,&curbindpp[oracurbindcount],
-				oracle8conn->err,
-				(text *)variable,(sb4)variablesize,
-				(dvoid *)&(((oracle8cursor *)cursor)->stmt),
-				(sb4)0,
-				SQLT_RSET,
-				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
-				OCI_DEFAULT)!=OCI_SUCCESS) {
-			return false;
-		}
-	}
-	oracurbindcount++;
-	bindvarname[bindvarcount++]=variable+1;
-
-	// initialize values as if a statement has been prepared and executed
-	((oracle8cursor *)cursor)->stmttype=0;
-	((oracle8cursor *)cursor)->ncols=0;
-	((oracle8cursor *)cursor)->row=0;
-	((oracle8cursor *)cursor)->maxrow=0;
-	((oracle8cursor *)cursor)->totalrows=0;
-	((oracle8cursor *)cursor)->bound=true;
 	return true;
 }
 
