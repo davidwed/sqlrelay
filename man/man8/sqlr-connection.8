@@ -5,30 +5,18 @@
 .TH sqlr-connection 8 "11 17, 2001" "Setting Up a Connection"
 
 .SH NAME
-sqlr-connection-postgresql \- Setting up a connection to PostgreSQL server
-.br
-sqlr-connection-mysql \- Setting up a connection to MySQL server
-.br
-sqlr-connection-odbc \- Setting up an ODBC connection
-.br
-sqlr-connection-freetds \- Setting up a connection to MS-SQL or Sybase
-server via freetds
-.br
-sqlr-connection-sqlite \- Setting up a connection to an SQLite database
+sqlr-connection \- Setting up a connection to a database server
 
 .SH SYNOPSIS
-.B sqlr-connection-"database" 
+.B sqlr-connection
 [\fB\-id\fP \fIID\fP]
 [\fB\-config\fP \fICONFIGFILE\fP]
 [\fB\-connectionid\fP  \fIONNECTIONID\fP]
 
 .SH DESCRIPTION
 To estabish a connection, run one of the 
-.B sqlr-connection-"database"
+.B sqlr-connection
 daemons.
-
-Where \fB"database"\fP is one of \fBmysql\fP, \fBpostgresql\fP,
-\fBodbc\fP, \fBfreetds\fP.
 
 .SH OPTIONS
 \fICONFIGFILE\fP is the configuration file to use when starting the
