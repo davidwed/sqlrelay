@@ -97,6 +97,17 @@ void oracle8connection::handleConnectString() {
 		maxitembuffersize=MAX_BYTES_PER_CHAR;
 	}
 
+	// When using OCI from 8.0, if the fetch buffer is bigger than 32767,
+	// and you fetch a date, OCIStmtFetch will fail with
+	// ORA-01801: date format is too long for internal buffer
+	// at least with 8.0.5 on Redhat 5.2.
+	#ifndef HAVE_ORACLE_8i
+		if (maxitembuffersize>32767) {
+			maxitembuffersize=32767;
+		}
+	#endif
+
+
 #ifdef OCI_STMT_CACHE
 	stmtcachesize=charstring::toUnsignedInteger(
 				cont->connectStringValue("stmtcachesize"));
