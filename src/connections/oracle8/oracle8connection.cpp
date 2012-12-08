@@ -2648,4 +2648,5 @@ void oracle8cursor::cleanUpData() {
 		bindvarname[i]=NULL;
 		boundbypos[i]=false;
 	}
+	bindvarcount=0;
 }
