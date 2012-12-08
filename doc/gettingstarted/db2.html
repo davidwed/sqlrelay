@@ -498,7 +498,7 @@ receives the following error:
 
 <p>SQL Relay is configured to re-login when it sees this error and afterward,
 everything works well.  It's very strange, and prior to SQL Relay version 0.39,
-SQL Relay got around this by having the sqlr-connection-db2 daemon detach from
+SQL Relay got around this by having the sqlr-connection daemon detach from
 the controlling tty afer logging into the database.  Somehow that avoided the
 problem.  But adding the "reloginatstart" parameter made it necessary to detach
 before logging into the database.</p>

@@ -379,15 +379,15 @@ or a tnsnames-style expression such as:
 
 <p>The client will send a user and password to the sqlr-listener and sqlr-connection daemons when it connects to them.  The <b>authtier</b> attribute indicates which daemon will actually pay attention to that user and password.</p>
 
-<p>If the <b>authtier</b> attribute is set to "listener", the sqlr-listener will compare the user/password to the list of user/passwords in the sqlrelay.conf file defined in the <b>users</b> tag and accept or reject the client connection.  If the client is accepted, it is handed off to the sqlr-connection-database daemon which assumes that it has already been authenticated and does not perform its own authentication.</p>
+<p>If the <b>authtier</b> attribute is set to "listener", the sqlr-listener will compare the user/password to the list of user/passwords in the sqlrelay.conf file defined in the <b>users</b> tag and accept or reject the client connection.  If the client is accepted, it is handed off to the sqlr-connection daemon which assumes that it has already been authenticated and does not perform its own authentication.</p>
 
-<p>If the <b>authtier</b> attribute is set to "connection", the sqlr-listener will ignore the user/password and just hand off the client to the sqlr-connection-database daemon which will compare the user/password to the list of user/passwords in the sqlrelay.conf file and accept or reject the client connection.</p>
+<p>If the <b>authtier</b> attribute is set to "connection", the sqlr-listener will ignore the user/password and just hand off the client to the sqlr-connection daemon which will compare the user/password to the list of user/passwords in the sqlrelay.conf file and accept or reject the client connection.</p>
 
 <p>If the <b>authtier</b> attribute is set to "listener_and_connection" then both daemons will perform the authentication.  This is the most secure method and the default but is slower than "listener" or "connection" alone.</p>
 
-<p>If the <b>authtier</b> attribute is set to "database", the sqlr-listener daemon will ignore the user/password and the sqlr-connection-database daemon may use database-specific methods for authenticating and proxying the user.</p>
+<p>If the <b>authtier</b> attribute is set to "database", the sqlr-listener daemon will ignore the user/password and the sqlr-connection daemon may use database-specific methods for authenticating and proxying the user.</p>
 
-<p>When SQL Relay is used with Oracle 8i or higher, the sqlr-connection-database daemon switches users without logging out.  The sqlr-connection-database daemon must be configured to log into the database as a user that can proxy other users and the client must attempt to log in to <b>SQL Relay</b> as one of the users that can be proxied.  See <a href="oraclentier.html">this document</a> for more information including instructions for configuring Oracle.</p>
+<p>When SQL Relay is used with Oracle 8i or higher, the sqlr-connection daemon switches users without logging out.  The sqlr-connection daemon must be configured to log into the database as a user that can proxy other users and the client must attempt to log in to <b>SQL Relay</b> as one of the users that can be proxied.  See <a href="oraclentier.html">this document</a> for more information including instructions for configuring Oracle.</p>
 
 <p>When SQL Relay is used with any other database, it simply logs out and logs back in as a different user.  This is quite ineffecient and defeats the value of keeping persistent database connections.</p>
 

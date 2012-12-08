@@ -572,9 +572,9 @@ chmod o+r tnsnames.ora
 <br><a name="sybasefreetdsdiff"></a>
 <span class="heading3">What's the difference between the Sybase and FreeTDS connections?</span>
 
-<p>The sqlr-connection-sybase program is compiled against Sybase ctlib; the libraries that come with Sybase Adaptive Server Enterprise.  They use a protocol called TDS (Tabular Data Stream) to talk to the database.</p>
+<p>The libsqlrelay_sqlrconnection_sybase.so plugin is compiled against Sybase ctlib; the libraries that come with Sybase Adaptive Server Enterprise.  They use a protocol called TDS (Tabular Data Stream) to talk to the database.</p>
 
-<p>The sqlr-connection-freetds program is compiled against FreeTDS, an open-source implementation of the TDS protocol and ctlib.</p>
+<p>The libsqlrelay_sqlrconnection_freetds.so program is compiled against FreeTDS, an open-source implementation of the TDS protocol and ctlib.</p>
 
 <p>Older versions of Microsoft SQL Server are compatible with Sybase ctlib, but newer versions are not.  FreeTDS is compatible with all versions of Sybase Adaptive Server Enterprise and Microsoft SQL Server.</p>
 

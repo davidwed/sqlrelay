@@ -59,7 +59,7 @@ sqlr-start  -id ID  -config CONFIGFILE  [-localstatedir LOCALSTATEDIR]
 
 <span class="heading2">Debugging and Tracing</span>
 
-<p>The instance tag of the CONFIGFILE contains an optional debug attribute.  When it is set, the <b>sqlr-start</b> program starts up debugging versions of the <b>sqlr-listener</b> and/or <b>sqlr-connection</b> daemons.  These daemons output debugging information to files in /usr/local/firstworks/var/sqlrelay/debug.  See <a href="configuring.html">Configuring SQL Relay</a> for more information on the debug attribute.</p>
+<p>The instance tag of the CONFIGFILE contains an optional debug attribute.  When it is set, the <b>sqlr-listener</b> and/or <b>sqlr-connection</b> daemons output debugging information to files in /usr/local/firstworks/var/sqlrelay/debug.  See <a href="configuring.html">Configuring SQL Relay</a> for more information on the debug attribute.</p>
 
 <p>The <b>sqlr-start</b> program also takes an optional <b>-strace</b> parameter.  When run as root, if the <b>-strace</b> parameter is used, <b>sqlr-start</b> starts the <b>sqlr-connection</b> daemons using <i>strace -ff -o sqlr-connection-strace</i> causing <i>sqlr-connection-strace.pid</i> files to be written to the root directory.  See the <i>strace</i> man page for more information.</p>
 
@@ -96,7 +96,7 @@ sqlr-listener  -id ID  -config CONFIGFILE  [-localstatedir LOCALSTATEDIR]
 <p>Connecting to a database is the next step.  To estabish a connection, run one or more of the <b>sqlr-connection</b> daemons.</p>
 
 <blockquote>
-<p>sqlr-connection-"dbase"  -id ID  -config CONFIGFILE  -connectionid CONNECTIONID  [-localstatedir LOCALSTATEDIR]</p>
+<p>sqlr-connection -id ID -config CONFIGFILE -connectionid CONNECTIONID [-localstatedir LOCALSTATEDIR]</p>
 </blockquote>
 
 <p>Where "dbase" is one of oracle8, mysql, postgresql, sqlite, odbc, db2, firebird, sybase, freetds or mdbtools.</p>
@@ -150,7 +150,7 @@ sqlr-cachemanager [-scaninterval INTERVAL] [-cachedirs CACHEDIRS]
 <a name="extending"></a>
 <span class="heading2">Extending, Killing and Restarting</span>
 
-<p>Once the daemons are up and running, clients can use them.  In the event that more connections are required, additional <b>sqlr-connection-"dbase"</b> daemons may be started from the command line using the same ID and CONFIGFILE and will be immediately available to clients.</p>
+<p>Once the daemons are up and running, clients can use them.  In the event that more connections are required, additional <b>sqlr-connection</b> daemons may be started from the command line using the same ID and CONFIGFILE and will be immediately available to clients.</p>
 
 <p>Connection daemons should not be killed once they have been started without restarting everything with that ID.</p>
 
@@ -272,7 +272,7 @@ instance.</li>
 <li>Some Linux Distributions set the LANG environment variable to a value that is not supported by older versions of Sybase ASE.  For example, LANG=en_US.iso885915 on Redhat 7.3.  If SQL Relay fails to start, try setting LANG to something that is defined in /opt/sybase-11.9.2/locales/locales.dat such as en_US for english.  The LC_ALL environment variable needs to be set to something that is defined in /opt/sybase-11.9.2/locales/locales.dat as well.  SQL Relay version 0.35 and higher have a connectstring parameter for sybase connections called "lang" which does the same thing.</li>
 <li><p>Sybase and FreeTDS both provide the libct.so library and the ctpublic.h header file.  If FreeTDS is installed from an RPM or other package, it is possible for its libct.so to be installed in /usr/lib and its header file to be installed in /usr/include.  This can cause the Sybase connection to be compiled against ctpublic.h and linked against libct.so from FreeTDS rather than from Sybase.</p>
 <p>Alternatively, if the Sybase header and library end up in those locations (ie. if they were manually copied there) then the FreeTDS connection could be compiled or linked against them.</p>
-<p>Generally, the solution is to install FreeTDS somewhere other than /usr and omit the FreeTDS and Sybase library paths from /etc/ld.so.conf, /etc/ld.so.conf.d and LD_LIBRARY_PATH.  By default, the build uses rpath's to cause the connections to look for libraries in the exact place that they were found at compile time, causing each connection to find the right library.  This option can be turned off though.  In that case, LD_LIBRARY_PATH should be set before running sqlr-start to assure that the connection dynamically links against the proper library.  To see which libraries the connection will link against, run "ldd `which sqlr-connection-freetds`" or "ldd `which sqlr-connection-sybase`"</p>
+<p>Generally, the solution is to install FreeTDS somewhere other than /usr and omit the FreeTDS and Sybase library paths from /etc/ld.so.conf, /etc/ld.so.conf.d and LD_LIBRARY_PATH.  By default, the build uses rpath's to cause the connections to look for libraries in the exact place that they were found at compile time, causing each connection to find the right library.  This option can be turned off though.  In that case, LD_LIBRARY_PATH should be set before running sqlr-start to assure that the connection dynamically links against the proper library.  To see which libraries the connection will link against, run "ldd /usr/local/firstworks/lib/libsqlrelay_sqlrconnection_freetds.so" or "ldd /usr/local/firstworks/lib/libsqlrelay_sqlrconnection_sybase.so"</p>
 <p>The configure script displays a warning that should encourage people to exercise care when compiling FreeTDS and Sybase connections.  However, even if each connection is compiled against the proper header file, it's possible for either connection to dynamically link against the wrong library at run time.</p>
 <p>Hopefully, one day, FreeTDS will support everything that the native Sybase libraries support and there will simply be an option to link the Sybase connection against one or the other.</p>
 </li>
