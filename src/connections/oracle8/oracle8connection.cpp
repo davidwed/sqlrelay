@@ -506,7 +506,7 @@ bool oracle8connection::logIn(bool printerrors) {
 		int64_t	minor=charstring::toInteger(minorstr);
 	
 		// 8.1 and up supports proxy credentials and syscontext
-		if (major>=8 || (major==8 && minor>0)) {
+		if (major>8 || (major==8 && minor>0)) {
 			#ifdef OCI_ATTR_PROXY_CREDENTIALS
 			supportsproxycredentials=true;
 			#endif
