@@ -143,83 +143,83 @@ ODBC driver
 
 
 %package db2
-Summary: SQL Relay connection daemon for IBM DB2.
+Summary: SQL Relay connection plugin for IBM DB2.
 Group: Applications/Databases
 
 %description db2
-SQL Relay connection daemon for IBM DB2.
+SQL Relay connection plugin for IBM DB2.
 
 
 %package freetds
-Summary: SQL Relay connection daemon for FreeTDS (Sybase and MS SQL Server).
+Summary: SQL Relay connection plugin for FreeTDS (Sybase and MS SQL Server).
 Group: Applications/Databases
 
 %description freetds
-SQL Relay connection daemon for FreeTDS (Sybase and MS SQL Server).
+SQL Relay connection plugin for FreeTDS (Sybase and MS SQL Server).
 
 
 %package firebird
-Summary: SQL Relay connection daemon for Firebird.
+Summary: SQL Relay connection plugin for Firebird.
 Group: Applications/Databases
 
 %description firebird
-SQL Relay connection daemon for Firebird.
+SQL Relay connection plugin for Firebird.
 
 
 %package mdbtools
-Summary: SQL Relay connection daemon for MDB Tools (Microsoft Access).
+Summary: SQL Relay connection plugin for MDB Tools (Microsoft Access).
 Group: Applications/Databases
 
 %description mdbtools
-SQL Relay connection daemon for MDB Tools (Microsoft Access).
+SQL Relay connection plugin for MDB Tools (Microsoft Access).
 
 
 %package mysql
-Summary: SQL Relay connection daemon for MySQL.
+Summary: SQL Relay connection plugin for MySQL.
 Group: Applications/Databases
 
 %description mysql
-SQL Relay connection daemon for MySQL.
+SQL Relay connection plugin for MySQL.
 
 
 %package odbc
-Summary: SQL Relay connection daemon for ODBC.
+Summary: SQL Relay connection plugin for ODBC.
 Group: Applications/Databases
 
 %description odbc
-SQL Relay connection daemon for ODBC.
+SQL Relay connection plugin for ODBC.
 
 
 %package oracle8
-Summary: SQL Relay connection daemon for Oracle 8.
+Summary: SQL Relay connection plugin for Oracle 8.
 Group: Applications/Databases
 
 %description oracle8
-SQL Relay connection daemon for Oracle 8.
+SQL Relay connection plugin for Oracle 8.
 
 
 %package postgresql
-Summary: SQL Relay connection daemon for PostgreSQL.
+Summary: SQL Relay connection plugin for PostgreSQL.
 Group: Applications/Databases
 
 %description postgresql
-SQL Relay connection daemon for PostgreSQL.
+SQL Relay connection plugin for PostgreSQL.
 
 
 %package sqlite
-Summary: SQL Relay connection daemon for SQLite.
+Summary: SQL Relay connection plugin for SQLite.
 Group: Applications/Databases
 
 %description sqlite
-SQL Relay connection daemon for SQLite.
+SQL Relay connection plugin for SQLite.
 
 
 %package sybase
-Summary: SQL Relay connection daemon for Sybase.
+Summary: SQL Relay connection plugin for Sybase.
 Group: Applications/Databases
 
 %description sybase
-SQL Relay connection daemon for Sybase.
+SQL Relay connection plugin for Sybase.
 
 
 %package router
@@ -410,6 +410,7 @@ rm -rf %{buildroot}
 %{initscript}
 %{_bindir}/sqlr-cachemanager*
 %{_bindir}/sqlr-listener*
+%{_bindir}/sqlr-connection*
 %{_bindir}/sqlr-scaler*
 %{_bindir}/sqlr-start*
 %{_bindir}/sqlr-stop
@@ -480,47 +481,47 @@ rm -rf %{buildroot}
 
 %{!?_without_db2:%files db2}
 %{!?_without_db2:%defattr(-, root, root)}
-%{!?_without_db2:%{_bindir}/sqlr-connection-db2*}
+%{!?_without_db2:%{_bindir}/libsqlrelay_connection_db2*}
 
 %{!?_without_freetds:%files freetds}
 %{!?_without_freetds:%defattr(-, root, root)}
-%{!?_without_freetds:%{_bindir}/sqlr-connection-freetds*}
+%{!?_without_freetds:%{_bindir}/libsqlrelay_connection_freetds*}
 
 %{!?_without_firebird:%files firebird}
 %{!?_without_firebird:%defattr(-, root, root)}
-%{!?_without_firebird:%{_bindir}/sqlr-connection-firebird*}
+%{!?_without_firebird:%{_bindir}/libsqlrelay_connection_firebird*}
 
 %{!?_without_mdbtools:%files mdbtools}
 %{!?_without_mdbtools:%defattr(-, root, root)}
-%{!?_without_mdbtools:%{_bindir}/sqlr-connection-mdbtools*}
+%{!?_without_mdbtools:%{_bindir}/libsqlrelay_connection_mdbtools*}
 
 %{!?_without_mysql:%files mysql}
 %{!?_without_mysql:%defattr(-, root, root)}
-%{!?_without_mysql:%{_bindir}/sqlr-connection-mysql*}
+%{!?_without_mysql:%{_bindir}/libsqlrelay_connection_mysql*}
 
 %{!?_without_odbc:%files odbc}
 %{!?_without_odbc:%defattr(-, root, root)}
-%{!?_without_odbc:%{_bindir}/sqlr-connection-odbc*}
+%{!?_without_odbc:%{_bindir}/libsqlrelay_connection_odbc*}
 
 %{!?_without_oracle:%files oracle8}
 %{!?_without_oracle:%defattr(-, root, root)}
-%{!?_without_oracle:%{_bindir}/sqlr-connection-oracle8*}
+%{!?_without_oracle:%{_bindir}/libsqlrelay_connection_oracle8*}
 
 %{!?_without_postgresql:%files postgresql}
 %{!?_without_postgresql:%defattr(-, root, root)}
-%{!?_without_postgresql:%{_bindir}/sqlr-connection-postgresql*}
+%{!?_without_postgresql:%{_bindir}/libsqlrelay_connection_postgresql*}
 
 %{!?_without_sqlite:%files sqlite}
 %{!?_without_sqlite:%defattr(-, root, root)}
-%{!?_without_sqlite:%{_bindir}/sqlr-connection-sqlite*}
+%{!?_without_sqlite:%{_bindir}/libsqlrelay_connection_sqlite*}
 
 %{!?_without_sybase:%files sybase}
 %{!?_without_sybase:%defattr(-, root, root)}
-%{!?_without_sybase:%{_bindir}/sqlr-connection-sybase*}
+%{!?_without_sybase:%{_bindir}/libsqlrelay_connection_sybase*}
 
 %{!?_without_router:%files router}
 %{!?_without_router:%defattr(-, root, root)}
-%{!?_without_router:%{_bindir}/sqlr-connection-router*}
+%{!?_without_router:%{_bindir}/libsqlrelay_connection_router*}
 
 %{!?_without_java:%files java}
 %{!?_without_java:%defattr(-, root, root)}
