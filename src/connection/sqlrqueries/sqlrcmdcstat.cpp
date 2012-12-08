@@ -94,6 +94,10 @@ uint32_t sqlrcmdcstatcursor::getColumnScale(uint32_t col) {
 	return (col<9)?colinfo[col].scale:0;
 }
 
+uint16_t sqlrcmdcstatcursor::getColumnIsNullable(uint32_t col) {
+	return (col==7 || col==8)?1:0;
+}
+
 bool sqlrcmdcstatcursor::noRowsToReturn() {
 	return false;
 }
