@@ -222,6 +222,7 @@ all: libsqlrconnection.la \
 	sqlr-connection$(EXE)
 
 clean:
+	$(LIBTOOL) --mode=clean $(RM) sqlr-connection
 	$(LIBTOOL) --mode=clean $(RM) *.la
 	$(LIBTOOL) --mode=clean $(RM) *.lo
 	$(LIBTOOL) --mode=clean $(RM) */*.lo
