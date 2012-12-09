@@ -355,6 +355,7 @@ install-queries:
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltrigger_createtableautoincrementoracle.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltrigger_droptableautoincrementoracle.la
