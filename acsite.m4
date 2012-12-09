@@ -1098,13 +1098,13 @@ then
 		then
 			MYSQLINCLUDES=""
 		fi
+	fi
 
-		if ( test -z "$MYSQLLIBS" )
-		then
-			AC_MSG_WARN(MySQL support will not be built.)
-		else
-			FW_CHECK_MYSQL_FUNCTIONS()
-		fi
+	if ( test -z "$MYSQLLIBS" )
+	then
+		AC_MSG_WARN(MySQL support will not be built.)
+	else
+		FW_CHECK_MYSQL_FUNCTIONS()
 	fi
 
 	FW_INCLUDES(mysql,[$MYSQLINCLUDES])
@@ -1410,7 +1410,7 @@ then
 		if ( test -n "$SQLITEPATH" )
 		then
 			SQLITEINCLUDES="-I$SQLITEPATH/include"
-			SQLITELIBS="-L$SQLITEPATH/lib -lsqlite"
+			SQLITELIBS="-L$SQLITEPATH/lib -lsqlite3"
 			SQLITELIBSPATH="$SQLITEPATH/lib"
 		fi
 	else
