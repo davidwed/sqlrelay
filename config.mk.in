@@ -41,6 +41,7 @@ LDFLAGS = @LDFLAGS@
 # debug and optimization flags (-g, -O2, etc.)
 CXXFLAGS = @CXXFLAGS@ @WALL@ @PIPE@ @WNOLONGDOUBLE@
 CFLAGS = @CFLAGS@ @WALL@ @PIPE@ @WNOLONGDOUBLE@
+WERROR = @WERROR@
 
 # libtool command
 LIBTOOL = @LIBTOOL@

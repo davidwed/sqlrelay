@@ -335,6 +335,21 @@ AC_SUBST(WALL)
 ])
 
 
+dnl checks to see if -Werror option works or not
+AC_DEFUN([FW_CHECK_WERROR],
+[
+AC_MSG_CHECKING(for -Werror)
+FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Werror],[],[],[WERROR="-Werror"],[WERROR=""])
+if ( test -n "$WERROR" )
+then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+AC_SUBST(WERROR)
+])
+
+
 
 dnl checks to see if -g3 option works or not
 AC_DEFUN([FW_CHECK_DEBUG],
