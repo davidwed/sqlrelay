@@ -15291,30 +15291,14 @@ $as_echo "no" >&6; }
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if gcc -pthread works during compile phase" >&5
-$as_echo_n "checking if gcc -pthread works during compile phase... " >&6; }
-
-SAVECPPFLAGS="$CPPFLAGS"
-CPPFLAGS="-pthread"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <stdio.h>
-int
-main ()
-{
-printf("hello");
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  PTHREAD_COMPILE="-pthread"
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if $CXX -pthread works during compile phase" >&5
+$as_echo_n "checking if $CXX -pthread works during compile phase... " >&6; }
+if ( test -n "`$CXX -pthread 2>&1 | grep 'unrecognized option' | grep pthread`" )
+then
+	PTHREAD_COMPILE=""
 else
-  PTHREAD_COMPILE=""
+	PTHREAD_COMPILE="-pthread"
 fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-CPPFLAGS="$SAVECPPFLAGS"
-
 if ( test -n "$PTHREAD_COMPILE" )
 then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5

@@ -374,8 +374,13 @@ fi
 dnl checks to see if -pthread option works or not during compile
 AC_DEFUN([FW_CHECK_PTHREAD_COMPILE],
 [
-AC_MSG_CHECKING(if gcc -pthread works during compile phase)
-FW_TRY_COMPILE([#include <stdio.h>],[printf("hello");],[-pthread],[PTHREAD_COMPILE="-pthread"],[PTHREAD_COMPILE=""])
+AC_MSG_CHECKING(if $CXX -pthread works during compile phase)
+if ( test -n "`$CXX -pthread 2>&1 | grep 'unrecognized option' | grep pthread`" )
+then
+	PTHREAD_COMPILE=""
+else
+	PTHREAD_COMPILE="-pthread"
+fi
 if ( test -n "$PTHREAD_COMPILE" )
 then
 	AC_MSG_RESULT(yes)
