@@ -44,7 +44,7 @@ void sqlrcursor::performSubstitutions() {
 	bool		inquotes=false;
 	bool		inbraces=false;
 	int		len=0;
-	stringbuffer	*braces;
+	stringbuffer	*braces=NULL;
 
 	// iterate through the string
 	while (*ptr) {
