@@ -59,9 +59,7 @@ char *sqlparser::cleanQuery(const char *query) {
 
 	// remove comments and convert all whitespace into spaces
 	stringbuffer	cleanquery;
-	bool		whitespace=false;
 	const char	*ptr=query;
-	char		prevchar='\0';
 	for (;;) {
 
 		// skip comments
@@ -99,8 +97,6 @@ char *sqlparser::cleanQuery(const char *query) {
 			break;
 		} else {
 			cleanquery.append(*ptr);
-			prevchar=*ptr;
-			whitespace=false;
 		}
 
 		// move on to the next character

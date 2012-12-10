@@ -143,7 +143,7 @@ bool custom_nw::run(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur) {
 		sqlrcon->cont->connstats->index,
 		sec+usec/1000000.0,
 		errorcodebuf,
-		(sqlrcur->lastrowvalid)?sqlrcur->lastrow:0,
+		(long long)((sqlrcur->lastrowvalid)?sqlrcur->lastrow:0),
         	infobuf,
 		sqlbuf,
 		sec+usec/1000000.0,
@@ -215,10 +215,10 @@ bool custom_nw::descInputBinds(sqlrcursor_svr *cursor, char *buf, int limit) {
 			write_len=snprintf(c,remain_len,"'%s']",bindstrbuf);
 		} else if (bv->type==INTEGER_BIND) {
 			write_len=snprintf(c,remain_len,"'%lld']",
-						bv->value.integerval);
+					(long long)bv->value.integerval);
 		} else if (bv->type==DOUBLE_BIND) {
 			write_len=snprintf(c,remain_len,"%lf]",
-						bv->value.doubleval.value);
+					bv->value.doubleval.value);
 		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
 			write_len=snprintf(c,remain_len,"LOB]");
 		}

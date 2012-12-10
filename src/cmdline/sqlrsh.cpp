@@ -530,7 +530,7 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		return;
 	} else if (!charstring::compareIgnoringCase(
 					ptr,"getresultsetbuffersize")) {	
-		printf("%lld\n",env->rsbs);
+		printf("%lld\n",(long long)env->rsbs);
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"endsession")) {	
 		sqlrcon->endSession();
@@ -869,7 +869,7 @@ void sqlrsh::displayError(sqlrshenv *env,
 	if (charstring::length(message)) {
 		printf("%s\n",message);
 	}
-	printf("%lld:\n",errornumber);
+	printf("%lld:\n",(long long)errornumber);
 	if (charstring::length(error)) {
 		printf("%s\n\n",error);
 	}
@@ -986,9 +986,9 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	// call clock again, display results
 	printf("	Rows Returned   : ");
-	printf("%lld\n",sqlrcur->rowCount());
+	printf("%lld\n",(long long)sqlrcur->rowCount());
 	printf("	Fields Returned : ");
-	printf("%lld\n",sqlrcur->rowCount()*sqlrcur->colCount());
+	printf("%lld\n",(long long)sqlrcur->rowCount()*sqlrcur->colCount());
 	printf("	System time     : ");
 	printf("%ld\n",clock());
 	printf("\n");
@@ -1003,7 +1003,7 @@ bool sqlrsh::lastinsertid(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	bool		retval=false;
 	uint64_t	id=sqlrcon->getLastInsertId();
 	if (id!=0 || !sqlrcon->errorMessage()) {
-		printf("%lld\n",id);
+		printf("%lld\n",(long long)id);
 		retval=true;
 	}
 	return retval;
@@ -1216,7 +1216,7 @@ void sqlrsh::printbinds(const char *type,
 		if (bv->type==STRING_BIND) {
 			printf("(STRING) = %s\n",bv->stringval);
 		} else if (bv->type==INTEGER_BIND) {
-			printf("(INTEGER) = %lld\n",bv->integerval);
+			printf("(INTEGER) = %lld\n",(long long)bv->integerval);
 		} else if (bv->type==DOUBLE_BIND) {
 			printf("(DOUBLE %d,%d) = %*.*f\n",
 						bv->doubleval.precision,

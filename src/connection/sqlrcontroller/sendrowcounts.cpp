@@ -12,7 +12,7 @@ void sqlrcontroller_svr::sendRowCounts(bool knowsactual, uint64_t actual,
 	if (knowsactual) {
 
 		char	string[30];
-		snprintf(string,30,"actual rows: %lld",actual);
+		snprintf(string,30,"actual rows: %lld",(long long)actual);
 		dbgfile.debugPrint("connection",3,string);
 
 		clientsock->write((uint16_t)ACTUAL_ROWS);
@@ -30,7 +30,7 @@ void sqlrcontroller_svr::sendRowCounts(bool knowsactual, uint64_t actual,
 	if (knowsaffected) {
 
 		char	string[46];
-		snprintf(string,46,"affected rows: %lld",affected);
+		snprintf(string,46,"affected rows: %lld",(long long)affected);
 		dbgfile.debugPrint("connection",3,string);
 
 		clientsock->write((uint16_t)AFFECTED_ROWS);

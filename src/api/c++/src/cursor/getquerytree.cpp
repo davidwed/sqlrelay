@@ -18,7 +18,7 @@ char *sqlrcursor::getQueryTree() {
 	clearResultSet();
 
 	if (!sqlrc->openSession()) {
-		return false;
+		return NULL;
 	}
 
 	cached=false;
