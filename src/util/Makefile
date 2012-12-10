@@ -4,7 +4,7 @@ include ../../config.mk
 
 .PHONY: all clean install uninstall
 
-CPPFLAGS = $(BASECPPFLAGS) $(TMPDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
+CPPFLAGS = -Werror $(BASECPPFLAGS) $(TMPDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
 LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS = cmdline.cpp debugfile.cpp tempdir.cpp sqlrconfigfile.cpp authenticator.cpp

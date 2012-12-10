@@ -155,7 +155,8 @@ bool custom_nw::run(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur) {
 	delete[] clientaddrbuf;
 
 	// write that buffer to the log file
-	return (querylog.write(querylogbuf)==charstring::length(querylogbuf));
+	return ((size_t)querylog.write(querylogbuf)==
+				charstring::length(querylogbuf));
 }
 
 int custom_nw::strescape(const char *str, char *buf, int limit) {

@@ -4,7 +4,7 @@ include ../../../config.mk
 
 .PHONY: all clean java install uninstall
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
+CPPFLAGS = -Werror $(BASECPPFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
 RPATH =
 ifneq ($(strip $(libdir)),)
 ifeq ($(JAVAUSERPATH),yes)

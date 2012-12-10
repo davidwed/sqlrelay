@@ -4,7 +4,6 @@
 #include <config.h>
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
-#include <parsedatetime.h>
 #include <rudiments/character.h>
 
 sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {

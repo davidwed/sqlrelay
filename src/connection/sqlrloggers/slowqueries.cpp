@@ -90,8 +90,8 @@ bool slowqueries::run(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur) {
 		init(sqlrcon);
 	}
 
-	int64_t	querysec=sqlrcur->queryendsec-sqlrcur->querystartsec;
-	int64_t	queryusec=sqlrcur->queryendusec-sqlrcur->querystartusec;
+	uint64_t	querysec=sqlrcur->queryendsec-sqlrcur->querystartsec;
+	uint64_t	queryusec=sqlrcur->queryendusec-sqlrcur->querystartusec;
 
 	if (querysec>sec || (querysec==sec && queryusec>=usec)) {
 
@@ -104,7 +104,7 @@ bool slowqueries::run(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur) {
 		logentry.append(usecstr);
 		delete[] usecstr;
 		logentry.append("\n");
-		if (querylog.write(logentry.getString(),
+		if ((size_t)querylog.write(logentry.getString(),
 					logentry.getStringLength())!=
 						logentry.getStringLength()) {
 			return false;

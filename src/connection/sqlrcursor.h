@@ -256,14 +256,14 @@ class sqlrcursor_svr {
 		int64_t		errnum;
 		bool		liveconnection;
 
-		int64_t		commandstartsec;
-		int64_t		commandstartusec;
-		int64_t		querystartsec;
-		int64_t		querystartusec;
-		int64_t		queryendsec;
-		int64_t		queryendusec;
-		int64_t		commandendsec;
-		int64_t		commandendusec;
+		uint64_t	commandstartsec;
+		uint64_t	commandstartusec;
+		uint64_t	querystartsec;
+		uint64_t	querystartusec;
+		uint64_t	queryendsec;
+		uint64_t	queryendusec;
+		uint64_t	commandendsec;
+		uint64_t	commandendusec;
 
 		bool	fakeinputbindsforthisquery;
 

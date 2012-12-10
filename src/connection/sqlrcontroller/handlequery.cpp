@@ -239,7 +239,8 @@ bool sqlrcontroller_svr::getClientInfo(sqlrcursor_svr *cursor) {
 	}
 
 	// read the client info into the buffer
-	if (clientsock->read(clientinfo,clientinfolen)!=clientinfolen) {
+	if ((uint64_t)clientsock->read(clientinfo,clientinfolen)!=
+							clientinfolen) {
 		dbgfile.debugPrint("connection",2,
 			"getting client info failed: "
 			"client sent short client info");
@@ -296,7 +297,9 @@ bool sqlrcontroller_svr::getQuery(sqlrcursor_svr *cursor) {
 	}
 
 	// read the query into the buffer
-	if (clientsock->read(cursor->querybuffer,cursor->querylength,
+	if ((uint32_t)clientsock->read(
+				cursor->querybuffer,
+				cursor->querylength,
 				idleclienttimeout,0)!=cursor->querylength) {
 		dbgfile.debugPrint("connection",2,
 			"getting query failed: client sent short query");

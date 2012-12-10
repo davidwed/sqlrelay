@@ -150,7 +150,7 @@ void sqlrcmdcstatcursor::getField(uint32_t col,
 		case 1:
 			// mine -
 			// * if the connection is processing this command
-			if (cs->processid==process::getProcessId()) {
+			if (cs->processid==(uint32_t)process::getProcessId()) {
 				*field="*";
 				*fieldlength=1;
 			} else {

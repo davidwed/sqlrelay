@@ -40,7 +40,7 @@ char *sqlrcursor::getQueryTree() {
 
 	// get the tree itself
 	char	*querytree=new char[querytreelen+1];
-	if (sqlrc->cs->read(querytree,querytreelen)!=querytreelen) {
+	if ((uint64_t)sqlrc->cs->read(querytree,querytreelen)!=querytreelen) {
 		delete[] querytree;
 		return NULL;
 	}
