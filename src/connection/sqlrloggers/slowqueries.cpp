@@ -51,15 +51,16 @@ bool slowqueries::init(sqlrconnection_svr *sqlrcon) {
 		querylogname=new char[querylognamelen];
 		snprintf(querylogname,querylognamelen,
 				"%s/sqlrelay/log/sqlr-connection-%s"
-				"-querylog.%d",
-				cmdl->getLocalStateDir(),cmdl->getId(),pid);
+				"-querylog.%ld",
+				cmdl->getLocalStateDir(),
+				cmdl->getId(),(long)pid);
 	} else {
 		querylognamelen=charstring::length(LOG_DIR)+17+
 				charstring::length(cmdl->getId())+10+20+1;
 		querylogname=new char[querylognamelen];
 		snprintf(querylogname,querylognamelen,
-				"%s/sqlr-connection-%s-querylog.%d",
-				LOG_DIR,cmdl->getId(),pid);
+				"%s/sqlr-connection-%s-querylog.%ld",
+				LOG_DIR,cmdl->getId(),(long)pid);
 	}
 
 	// remove any old log file

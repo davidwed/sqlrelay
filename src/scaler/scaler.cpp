@@ -428,8 +428,8 @@ pid_t scaler::openOneConnection() {
 		process::exit(ret);
 	} else if (pid==-1) {
 		// error
-		fprintf(stderr,"fork() returned %d [%d]\n",
-					pid,error::getErrorNumber());
+		fprintf(stderr,"fork() returned %ld [%d]\n",
+					(long)pid,error::getErrorNumber());
 	}
 
 	return (pid>0)?pid:0;
@@ -565,8 +565,8 @@ void scaler::killConnection(pid_t connpid) {
 
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	fprintf(stderr,"%s Connection (pid=%d) failed to get ready\n",
-						dt.getString(),connpid);
+	fprintf(stderr,"%s Connection (pid=%ld) failed to get ready\n",
+						dt.getString(),(long)connpid);
 
 	// try 3 times - in the first check whether it is already dead,
 	// then use SIGTERM and at last use SIGKILL
@@ -574,9 +574,10 @@ void scaler::killConnection(pid_t connpid) {
 	for (int tries=0; tries<3 && !dead; tries++) {
 		if (tries) {
 			dt.getSystemDateAndTime();
-			fprintf(stderr,"%s %s connection (pid=%d)\n",
+			fprintf(stderr,"%s %s connection (pid=%ld)\n",
 				dt.getString(),
-				(tries==1)?"Terminating":"Killing",connpid);
+				(tries==1)?"Terminating":"Killing",
+				(long)connpid);
 
 			signalmanager::sendSignal(connpid,
 					(tries==1)?SIGTERM:SIGKILL);

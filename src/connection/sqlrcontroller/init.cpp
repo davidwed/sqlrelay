@@ -163,8 +163,8 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 				charstring::length(cmdl->getId())+1+
 				charstring::integerLength((uint64_t)pid)+1;
 	pidfile=new char[pidfilelen];
-	snprintf(pidfile,pidfilelen,"%s/pids/sqlr-connection-%s.%d",
-				tmpdir->getString(),cmdl->getId(),pid);
+	snprintf(pidfile,pidfilelen,"%s/pids/sqlr-connection-%s.%ld",
+				tmpdir->getString(),cmdl->getId(),(long)pid);
 	createPidFile(pidfile,permissions::ownerReadWrite());
 
 	// create clientinfo buffer

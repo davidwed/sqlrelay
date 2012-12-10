@@ -80,8 +80,8 @@ void cachemanager::scan() {
 	size_t	pidfilelen=tmpdir->getLength()+24+
 				charstring::integerLength((uint64_t)pid)+1;
 	pidfile=new char[pidfilelen];
-	snprintf(pidfile,pidfilelen,"%s/pids/sqlr-cachemanager.%d",
-						tmpdir->getString(),pid);
+	snprintf(pidfile,pidfilelen,"%s/pids/sqlr-cachemanager.%ld",
+						tmpdir->getString(),(long)pid);
 
 	createPidFile(pidfile,permissions::ownerReadWrite());
 

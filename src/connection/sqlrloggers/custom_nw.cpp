@@ -217,7 +217,7 @@ bool custom_nw::descInputBinds(sqlrcursor_svr *cursor, char *buf, int limit) {
 			write_len=snprintf(c,remain_len,"'%lld']",
 					(long long)bv->value.integerval);
 		} else if (bv->type==DOUBLE_BIND) {
-			write_len=snprintf(c,remain_len,"%lf]",
+			write_len=snprintf(c,remain_len,"%f]",
 					bv->value.doubleval.value);
 		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
 			write_len=snprintf(c,remain_len,"LOB]");

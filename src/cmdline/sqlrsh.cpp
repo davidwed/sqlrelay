@@ -1221,8 +1221,8 @@ void sqlrsh::printbinds(const char *type,
 			printf("(DOUBLE %d,%d) = %*.*f\n",
 						bv->doubleval.precision,
 						bv->doubleval.scale,
-						bv->doubleval.precision,
-						bv->doubleval.scale,
+						(int)bv->doubleval.precision,
+						(int)bv->doubleval.scale,
 						bv->doubleval.value);
 		} else if (bv->type==DATE_BIND) {
 			printf("(DATE) = %02d/%02d/%04d "

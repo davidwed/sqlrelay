@@ -37,20 +37,20 @@ void shutDown(int32_t signum) {
 		case SIGQUIT:
 #endif
 			// These signals indicate normal termination
-			fprintf(stderr,"(pid=%d) Process terminated with signal %d\n",process::getProcessId(),signum);
+			fprintf(stderr,"(pid=%ld) Process terminated with signal %d\n",(long)process::getProcessId(),signum);
 			break;
 
 		case SIGTERM:
 			// Shutdown
 		case SIGALRM:
 			// Timeout
-			fprintf(stderr,"(pid=%d) Process terminated with signal %d\n",process::getProcessId(),signum);
+			fprintf(stderr,"(pid=%ld) Process terminated with signal %d\n",(long)process::getProcessId(),signum);
 			exitcode=0;
 			break;
 
 		default:
 			// Other signals are bugs
-			fprintf(stderr,"(pid=%d) Abnormal termination: signal %d received\n",process::getProcessId(),signum);
+			fprintf(stderr,"(pid=%ld) Abnormal termination: signal %d received\n",(long)process::getProcessId(),signum);
 			cleanUp();
 			// Now reraise the signal.  We reactivate the signal's
 		   	// default handling, which is to terminate the process.

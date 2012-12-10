@@ -1202,7 +1202,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 	} else if (childpid>0) {
 		// parent
 		char	debugstring[22];
-		snprintf(debugstring,22,"forked a child: %d",childpid);
+		snprintf(debugstring,22,"forked a child: %ld",(long)childpid);
 		dbgfile.debugPrint("listener",0,debugstring);
 		// the main process doesn't need to stay connected
 		// to the client, only the forked process
