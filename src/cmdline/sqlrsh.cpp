@@ -990,7 +990,7 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	printf("	Fields Returned : ");
 	printf("%lld\n",(long long)sqlrcur->rowCount()*sqlrcur->colCount());
 	printf("	System time     : ");
-	printf("%ld\n",clock());
+	printf("%ld\n",(long)clock());
 	printf("\n");
 }
 
