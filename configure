@@ -3368,7 +3368,7 @@ $as_echo "yes" >&6; }
 	else
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-		as_fn_error $? "GNU Make no not found.  SQL-Relay requires GNU make." "$LINENO" 5
+		as_fn_error $? "GNU make not found.  SQL-Relay requires GNU make." "$LINENO" 5
 	fi
 fi
 
@@ -15360,7 +15360,7 @@ then
 	if ( test -n "$PTHREADPATH" )
 	then
 		PTHREADINCLUDES="$PTHREAD_COMPILE -I$PTHREADPATH/include"
-		PTHREADLIB="-L$PTHREADPATH/lib -lpthread -phtread"
+		PTHREADLIB="-L$PTHREADPATH/lib -lpthread -pthread"
 	else
 		PTHREADINCLUDES="$PTHREAD_COMPILE"
 		PTHREADLIB="-lpthread -pthread"
@@ -15369,7 +15369,7 @@ then
 
 else
 
-	for i in "pthread" "c_r" "thread" "pthreads"
+		for i in "pthread" "c_r" "thread" "pthreads"
 	do
 
 
@@ -16035,7 +16035,7 @@ fi
 
 	fi
 
-	if ( test -z "$PTHREADLIB" )
+							if ( test -z "$PTHREADLIB" -o "$MICROSOFT" = "yes")
 	then
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -16068,7 +16068,7 @@ export LD_LIBRARY_PATH
 
 	fi
 
-	if ( test -z "$PTHREADLIB" )
+			if ( test -z "$PTHREADLIB" )
 	then
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -16125,17 +16125,6 @@ then
 	echo "pthreads libs... $PTHREADLIB"
 fi
 
-
-if ( test -z "$HAVE_PTHREAD" )
-then
-	as_fn_error $? "pthread library not found.  Rudiments requires this package." "$LINENO" 5
-	exit
-
-else
-
-$as_echo "#define RUDIMENTS_HAS_THREADS 1" >>confdefs.h
-
-fi
 
 
 

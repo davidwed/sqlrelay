@@ -12,7 +12,7 @@ else
 		AC_MSG_RESULT(yes)
 	else
 		AC_MSG_RESULT(no)
-		AC_MSG_ERROR(GNU Make no not found.  SQL-Relay requires GNU make.)
+		AC_MSG_ERROR(GNU make not found.  SQL-Relay requires GNU make.)
 	fi
 fi
 ])
@@ -594,7 +594,7 @@ then
 	if ( test -n "$PTHREADPATH" )
 	then
 		PTHREADINCLUDES="$PTHREAD_COMPILE -I$PTHREADPATH/include"
-		PTHREADLIB="-L$PTHREADPATH/lib -lpthread -phtread"
+		PTHREADLIB="-L$PTHREADPATH/lib -lpthread -pthread"
 	else
 		PTHREADINCLUDES="$PTHREAD_COMPILE"
 		PTHREADLIB="-lpthread -pthread"
@@ -603,6 +603,7 @@ then
 
 else
 
+	dnl check pthread.h and standard thread libraries
 	for i in "pthread" "c_r" "thread" "pthreads"
 	do
 		FW_CHECK_HEADERS_AND_LIBS([$PTHREADPATH],[pthread],[pthread.h],[$i],[""],[""],[PTHREADINCLUDES],[PTHREADLIB],[PTHREADLIBPATH],[PTHREADSTATIC])
@@ -616,24 +617,27 @@ else
 		fi
 	done
 
-	dnl FSU pthreads check
+	dnl check for FSU pthreads
 	if ( test -z "$PTHREADLIB" )
 	then
 		FW_CHECK_HEADERS_AND_LIBS([$PTHREADPATH],[FSU],[pthread.h],[gthreads],[""],[""],[PTHREADINCLUDES],[PTHREADLIB],[PTHREADLIBPATH],[PTHREADSTATIC])
 	fi
 
-	if ( test -z "$PTHREADLIB" )
+	dnl If we couldn't find the appropriate libraries, just try
+	dnl including pthread.h and using -lpthread, it works on some
+	dnl systems.  Also try this for microsoft systems.  I don't
+	dnl remember exactly which, but some old version of either
+	dnl Cygwin, UWIN or mingw32 required -pthread in place of
+	dnl -lpthread even though libpthread was present.
+	if ( test -z "$PTHREADLIB" -o "$MICROSOFT" = "yes")
 	then
-		dnl if we couldn't find the appropriate libraries, just
-		dnl try including pthread.h and using -lpthread, it
-		dnl works on some systems
 		FW_TRY_LINK([#include <pthread.h>],[pthread_create(NULL,NULL,NULL,NULL);],[$CPPFLAGS],[-pthread],[],[PTHREADLIB="-pthread"],[])
 	fi
 
+	dnl try that last test again, some older thread
+	dnl implementations have non-pointer 2nd parameters
 	if ( test -z "$PTHREADLIB" )
 	then
-		dnl try that last test again, some older thread
-		dnl implementations have non-pointer 2nd parameters
 		FW_TRY_LINK([#include <pthread.h>],[pthread_create(NULL,pthread_attr_default,NULL,NULL);],[$CPPFLAGS],[-pthread],[],[PTHREADLIB="-pthread"],[])
 	fi
 
@@ -652,15 +656,6 @@ fi
 
 FW_INCLUDES(pthreads,[$PTHREADINCLUDES])
 FW_LIBS(pthreads,[$PTHREADLIB])
-
-if ( test -z "$HAVE_PTHREAD" )
-then
-	AC_MSG_ERROR(pthread library not found.  Rudiments requires this package.)
-	exit
-
-else
-	AC_DEFINE(RUDIMENTS_HAS_THREADS,1,Rudiments supports threads)
-fi
 
 AC_SUBST(PTHREADINCLUDES)
 AC_SUBST(PTHREADLIB)
