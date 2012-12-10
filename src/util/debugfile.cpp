@@ -36,16 +36,16 @@ void debugfile::init(const char *name, const char *localstatedir) {
 					16+5+charstring::length(name)+20+1;
 		dbgfilename=new char[dbgfilenamelen];
 		snprintf(dbgfilename,dbgfilenamelen,
-					"%s/sqlrelay/debug/sqlr-%s.%d",
+					"%s/sqlrelay/debug/sqlr-%s.%ld",
 						localstatedir,name,
-						process::getProcessId());
+						(long)process::getProcessId());
 	} else {
 		dbgfilenamelen=charstring::length(DEBUG_DIR)+5+
 					charstring::length(name)+20+1;
 		dbgfilename=new char[dbgfilenamelen];
 		snprintf(dbgfilename,dbgfilenamelen,
-					"%s/sqlr-%s.%d",DEBUG_DIR,name,
-						process::getProcessId());
+					"%s/sqlr-%s.%ld",DEBUG_DIR,name,
+						(long)process::getProcessId());
 	}
 }
 
