@@ -22333,7 +22333,7 @@ fi
 			STATICFLAG="-static"
 		fi
 
-		if ( test -n "$PTHREADLIB" )
+		if ( test -n "$HAVE_PTHREAD" )
 		then
 
 

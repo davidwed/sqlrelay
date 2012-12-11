@@ -1488,7 +1488,7 @@ then
 			STATICFLAG="-static"
 		fi
 		
-		if ( test -n "$PTHREADLIB" )
+		if ( test -n "$HAVE_PTHREAD" )
 		then
 			FW_CHECK_HEADERS_AND_LIBS([$SQLITEPATH],[sqlite],[sqlite.h],[sqlite],[$STATICFLAG],[$RPATHFLAG],[SQLITEINCLUDES],[SQLITELIBS],[SQLITELIBSPATH],[SQLITESTATIC])
 			if ( test -z "$SQLITELIBS" )
