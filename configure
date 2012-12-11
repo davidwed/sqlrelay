@@ -15290,24 +15290,6 @@ $as_echo "no" >&6; }
 	CXXFLAGS="$CXXFLAGS $DBG"
 fi
 
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if $CXX -pthread works during compile phase" >&5
-$as_echo_n "checking if $CXX -pthread works during compile phase... " >&6; }
-if ( test -n "`$CXX -pthread 2>&1 | grep 'unrecognized option' | grep pthread`" )
-then
-	PTHREAD_COMPILE=""
-else
-	PTHREAD_COMPILE="-pthread"
-fi
-if ( test -n "$PTHREAD_COMPILE" )
-then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
 echo "******************************"
 
 
@@ -15348,6 +15330,24 @@ echo "******************************"
 echo
 echo "***** threads ****************"
 
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if -pthread works during compile phase" >&5
+$as_echo_n "checking if -pthread works during compile phase... " >&6; }
+if ( test -n "`$CXX -pthread 2>&1 | grep 'unrecognized option' | grep pthread`" )
+then
+	PTHREAD_COMPILE=""
+else
+	PTHREAD_COMPILE="-pthread"
+fi
+if ( test -n "$PTHREAD_COMPILE" )
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
 HAVE_PTHREAD=""
 PTHREADINCLUDES=""
 PTHREADLIB=""
@@ -15369,12 +15369,21 @@ then
 
 else
 
-		for i in "pthread" "c_r" "thread" "pthreads"
+		for i in "pthread" "c_r" "thread" "pthreads" "gthreads"
 	do
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for lib$i" >&5
+$as_echo_n "checking for lib$i... " >&6; }
+
+		INCLUDEDIR="pthread"
+		if ( test "$i" = "gthreads" )
+		then
+			INCLUDEDIR="FSU"
+		fi
+
 
 
 SEARCHPATH=$PTHREADPATH
-NAME=pthread
+NAME=$INCLUDEDIR
 HEADER=pthread.h
 LIBNAME=$i
 LINKSTATIC=""
@@ -15698,351 +15707,49 @@ fi
 
 		if ( test -n "$PTHREADLIB" )
 		then
-			if ( test "$i" = "c_r" )
-			then
-				PTHREADLIB="$PTHREADLIB -pthread"
-			fi
-			break
-		fi
-	done
 
-		if ( test -z "$PTHREADLIB" )
-	then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
 
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether lib$i works" >&5
+$as_echo_n "checking whether lib$i works... " >&6; }
 
-SEARCHPATH=$PTHREADPATH
-NAME=FSU
-HEADER=pthread.h
-LIBNAME=gthreads
-LINKSTATIC=""
-LINKRPATH=""
-USEFULLLIBPATH=
-INCLUDESTRING=""
-LIBSTRING=""
-LIBPATH=""
-STATIC=""
-HEADERSANDLIBSPATH=""
-
-eval "PTHREADINCLUDES=\"\""
-eval "PTHREADLIB=\"\""
-eval "PTHREADLIBPATH=\"\""
-eval "PTHREADSTATIC=\"\""
-if ( test -n "" )
-then
-	eval "=\"\""
-fi
-
-
-for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/usr/pkg/$NAME" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/opt/csw" "/sw" "/boot/common" "/Library/$NAME" "/usr/local/firstworks"
-do
-	if ( test -n "$path" -a -d "$path" )
-	then
-
-		if ( test "$path" = "/" )
-		then
-						if ( test "$USEFULLLIBPATH" = "yes" )
-			then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib\"; LIBSTRING=\"/lib/lib$LIBNAME.$SOSUFFIX\""
-	fi
-else
-	if ( test -n "/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib\"; LIBSTRING=\"-l$LIBNAME\""
-	fi
-else
-	if ( test -n "/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			fi
-
-			if ( test "$USEFULLLIBPATH" = "yes" )
-			then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib64/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib64\"; LIBSTRING=\"/lib64/lib$LIBNAME.$SOSUFFIX\""
-	fi
-else
-	if ( test -n "/lib64/lib$LIBNAME.a" -a -n "LIBSTRING=\"/lib64/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib64/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"/lib64/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib64/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib64\"; LIBSTRING=\"-l$LIBNAME\""
-	fi
-else
-	if ( test -n "/lib64/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib64/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			fi
-
-
-						path=""
-		fi
-
-
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
-		do
-
-			if ( test -n "$LIBSTRING" )
-			then
-				break
-			fi
-
-			for includepath in "$path/include" "$path/include/$NAME"
+																					for try in 1 2 3 4 5 6
 			do
 
-				if ( test -n "$LIBSTRING" )
+				if ( test "$try" = "1" )
 				then
-					break
+					TESTINCLUDES="$PTHREADINCLUDES"
+					TESTLIB="$PTHREADLIB"
+				elif ( test "$try" = "2" )
+				then
+					TESTINCLUDES="$PTHREADINCLUDES"
+					TESTLIB="$PTHREADLIB -pthread"
+				elif ( test "$try" = "3" )
+				then
+					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
+					TESTLIB="$PTHREADLIB"
+				elif ( test "$try" = "4" )
+				then
+					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDESS"
+					TESTLIB="$PTHREADLIB -pthread"
+				elif ( test "$try" = "5" )
+				then
+					TESTINCLUDES="$PTHREADINCLUDESS"
+					TESTLIB="-pthread"
+				elif ( test "$try" = "6" )
+				then
+					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDESS"
+					TESTLIB="-pthread"
 				fi
 
-				if ( test "$USEFULLLIBPATH" = "yes" )
-				then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "$includepath/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$libpath/lib$LIBNAME.$SOSUFFIX\""
-	fi
-else
-	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "$libpath/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval "INCLUDESTRING=\"-I$includepath\""
-			eval "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-				else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "$includepath/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-L$libpath -l$LIBNAME\""
-	fi
-else
-	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "$libpath/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval "INCLUDESTRING=\"-I$includepath\""
-			eval "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-				fi
-			done
-		done
-
-		if ( test -n "$LIBSTRING" )
-		then
-			HEADERSANDLIBSPATH="$path"
-			break
-		fi
-	fi
-done
-
-INCLUDESTRING=`echo $INCLUDESTRING | sed -e "s|-I/usr/include$||g" -e "s|-I/usr/include ||g"`
-LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib$||g" -e "s|-L/lib$||g" -e "s|-L/usr/lib ||g" -e "s|-L/lib ||g"`
-LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib64$||g" -e "s|-L/lib64$||g" -e "s|-L/usr/lib64 ||g" -e "s|-L/lib64 ||g"`
-
-eval "PTHREADINCLUDES=\"$INCLUDESTRING\""
-eval "PTHREADLIB=\"$LIBSTRING\""
-eval "PTHREADLIBPATH=\"$LIBPATH\""
-eval "PTHREADSTATIC=\"$STATIC\""
-if ( test -n "" )
-then
-	eval "=\"$HEADERSANDLIBSPATH\""
-fi
-
-	fi
-
-							if ( test -z "$PTHREADLIB" -o "$MICROSOFT" = "yes")
-	then
+				LINKED=""
 
 SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$CPPFLAGS"
-LIBS="-pthread"
+CPPFLAGS="$PTHREAD_COMPILE $CPPFLAGS $PTHREADINCLUDES"
+LIBS="$PTHREADLIB"
 LD_LIBRARY_PATH=""
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -16057,7 +15764,7 @@ pthread_create(NULL,NULL,NULL,NULL);
 }
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
-  PTHREADLIB="-pthread"
+  LINKED="yes"
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -16066,15 +15773,13 @@ LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
-	fi
-
-			if ( test -z "$PTHREADLIB" )
-	then
+				if ( test -z "$LINKED" )
+				then
 
 SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$PTHREAD_COMPILE $CPPFLAGS"
 LIBS="-pthread"
 LD_LIBRARY_PATH=""
 export LD_LIBRARY_PATH
@@ -16090,7 +15795,7 @@ pthread_create(NULL,pthread_attr_default,NULL,NULL);
 }
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
-  PTHREADLIB="-pthread"
+  LINKED="yes"
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -16099,18 +15804,40 @@ LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
-	fi
+				fi
+
+												if ( test -n "$LINKED" )
+				then
+					PTHREADINCLUDES="$TESTINCLUDES"
+					PTHREADLIB="$TESTLIB"
+					break
+				fi
+
+								PTHREADINCLUDES=""
+				PTHREADLIB=""
+			done
+
+			if ( test -n "$PTHREADLIB" )
+			then
+				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+				break
+			else
+				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+			fi
+
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		fi
+	done
 
 	if ( test -n "$PTHREADLIB" )
 	then
-		PTHREADINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
 		HAVE_PTHREAD="yes"
 	fi
 
-		if ( test -n "$PTHREADINCLUDES" -a "$MICROSOFT" = "yes" )
-	then
-		PTHREADLIB="-pthread"
-	fi
 fi
 
 
