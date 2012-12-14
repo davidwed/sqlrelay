@@ -1,9 +1,11 @@
 /* Copyright (c) 2000  Adam Kropielnicki
    See the file COPYING for more information */
 
-#include "sqlrelay/sqlrclient.h"
+#include <sqlrelay/sqlrclient.h>
 
-#include "phpincludes.h"
+#include <phpincludes.h>
+
+#include <config.h>
 
 extern "C" {
 
@@ -2365,7 +2367,7 @@ zend_module_entry sql_relay_module_entry = {
 	NULL,
 	NULL,
 	#if ZEND_MODULE_API_NO >= 20010901
-		"0.30",	
+		SQLR_VERSION,
 	#endif	
 	STANDARD_MODULE_PROPERTIES
 };
