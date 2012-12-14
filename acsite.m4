@@ -1094,7 +1094,7 @@ then
 		if ( test -n "$MYSQLPATH" )
 		then
 			MYSQLINCLUDES="-I$MYSQLPATH/include/mysql"
-			MYSQLLIBS="$MYSQLPATH/lib/mysql/libmysqlclient.$SOSUFFIX"
+			MYSQLLIBS="-L$MYSQLPATH/lib -lmysqlclient"
 			MYSQLLIBSPATH="$MYSQLPATH/lib/mysql"
 		fi
 
