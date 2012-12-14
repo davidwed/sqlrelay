@@ -18784,7 +18784,7 @@ then
 		if ( test -n "$MYSQLPATH" )
 		then
 			MYSQLINCLUDES="-I$MYSQLPATH/include/mysql"
-			MYSQLLIBS="-L$MYSQLPATH/lib -lmysqlclient"
+			MYSQLLIBS="-L$MYSQLPATH/lib/mysql -lmysqlclient"
 			MYSQLLIBSPATH="$MYSQLPATH/lib/mysql"
 		fi
 
