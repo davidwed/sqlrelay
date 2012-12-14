@@ -208,8 +208,11 @@ bool startCacheManager(const char *localstatedir) {
 	command.clear();
 	
 	// get the result
+	// (Important to use a signed character here.  On arm platforms,
+	// and possibly others, char is unsigned by default, causing it to
+	// always be greater than -1.)
+	signed char	character;
 	stringbuffer	contents;
-	char		character;
 	while (!feof(cmd) && (character=fgetc(cmd))>-1) {
 		contents.append(character);
 	}
