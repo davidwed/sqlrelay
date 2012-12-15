@@ -40,12 +40,11 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	silent=cmdl->found("-silent");
 
 	cfgfl=new sqlrconfigfile();
-	authc=new authenticator(cfgfl);
-	tmpdir=new tempdir(cmdl);
-
 	if (!cfgfl->parse(cmdl->getConfig(),cmdl->getId())) {
 		return false;
 	}
+	authc=new authenticator(cfgfl);
+	tmpdir=new tempdir(cmdl);
 
 	setUserAndGroup();
 

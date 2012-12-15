@@ -507,7 +507,7 @@ bool sqlrconfigfile::tagStart(const char *name) {
 				thistag=QUERIES_TAG;
 				queries.clear();
 			} else if (!charstring::compare(name,
-						"passwordencrpytions")) {
+						"passwordencryptions")) {
 				thistag=PASSWORDENCRYPTIONS_TAG;
 				passwordencryptions.clear();
 			} else {

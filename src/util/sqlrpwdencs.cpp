@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrpwdencs.h>
+
 #include <debugprint.h>
 
 #include <rudiments/xmldomnode.h>
@@ -71,7 +72,7 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 
 	debugFunction();
 
-	// ignore non-queries
+	// ignore non-pssword encryptions
 	if (charstring::compare(pwdenc->getName(),"passwordencryption")) {
 		return;
 	}
