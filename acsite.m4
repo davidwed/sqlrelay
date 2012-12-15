@@ -2140,7 +2140,7 @@ then
 
 		if ( test -z "$FIREBIRDLIBS" )
 		then
-			FW_CHECK_HEADER_LIB([/Library/Frameworks/Firebird.framework/Versions/Current/Headers/ibase.h],[FIREBIRDINCLUDES=\"-I/Library/Frameworks/Firebird.framework/Versions/Current/Headers\"],[/Library/Frameworks/Firebird.framework/Versions/Current/Firebird],[FIREBIRDLIBSPATH=\"/Library/Frameworks/Firebird.framework/Versions/Current\"; FIREBIRDLIBS=\"/Library/Frameworks/Firebird.framework/Versions/Current/Firebird\"],[],[])
+			FW_CHECK_HEADER_LIB([/Library/Frameworks/Firebird.framework/Versions/Current/Headers/ibase.h],[FIREBIRDINCLUDES=\"-I/Library/Frameworks/Firebird.framework/Versions/Current/Headers\"],[/Library/Frameworks/Firebird.framework/Versions/Current/Firebird],[FIREBIRDLIBS=\"-framework Firebird\"],[],[])
 		fi
 		
 		LINKFAIL=""

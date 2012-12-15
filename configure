@@ -28112,7 +28112,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "FIREBIRDINCLUDES=\"-I/Library/Frameworks/Firebird.framework/Versions/Current/Headers\""
-		eval "FIREBIRDLIBSPATH=\"/Library/Frameworks/Firebird.framework/Versions/Current\"; FIREBIRDLIBS=\"/Library/Frameworks/Firebird.framework/Versions/Current/Firebird\""
+		eval "FIREBIRDLIBS=\"-framework Firebird\""
 	fi
 else
 	if ( test -n "" -a -n "" )
