@@ -443,6 +443,8 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		sqlrqueries	*sqlrq;
 		sqlrpwdencs	*sqlrpe;
 
+		char		*decrypteddbpassword;
+
 		unixclientsocket	handoffsockun;
 
 		bool		connected;

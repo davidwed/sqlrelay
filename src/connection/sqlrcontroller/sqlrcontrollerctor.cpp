@@ -73,6 +73,8 @@ sqlrcontroller_svr::sqlrcontroller_svr() : daemonprocess(), listener() {
 	sqlrq=NULL;
 	sqlrpe=NULL;
 
+	decrypteddbpassword=NULL;
+
 	debugsqltranslation=false;
 	debugtriggers=false;
 

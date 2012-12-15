@@ -58,8 +58,6 @@ bool authenticator::authenticate(const char *user, const char *password) {
 		// if the user matches...
 		if (!charstring::compare(user,users[i])) {
 
-printf("sqlrpe=%08x\n",(unsigned int)sqlrpe);
-printf("pwdenc=%s\n",passwordencryptions[i]);
 			if (sqlrpe &&
 				charstring::length(passwordencryptions[i])) {
 

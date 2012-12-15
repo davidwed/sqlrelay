@@ -58,6 +58,8 @@ sqlrcontroller_svr::~sqlrcontroller_svr() {
 	delete sqlrq;
 	delete sqlrpe;
 
+	delete[] decrypteddbpassword;
+
 	delete[] clientinfo;
 
 	if (pidfile) {
