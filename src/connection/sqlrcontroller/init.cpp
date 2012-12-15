@@ -43,7 +43,12 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	if (!cfgfl->parse(cmdl->getConfig(),cmdl->getId())) {
 		return false;
 	}
-	authc=new authenticator(cfgfl);
+	const char	*pwdencs=cfgfl->getPasswordEncryptions();
+	if (charstring::length(pwdencs)) {
+		sqlrpe=new sqlrpwdencs;
+		sqlrpe->loadPasswordEncryptions(pwdencs);
+	}	
+	authc=new authenticator(cfgfl,sqlrpe);
 	tmpdir=new tempdir(cmdl);
 
 	setUserAndGroup();

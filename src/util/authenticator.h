@@ -10,7 +10,8 @@
 class authenticator {
 
 	public:
-			authenticator(sqlrconfigfile *cfgfile);
+			authenticator(sqlrconfigfile *cfgfile,
+						sqlrpwdencs *sqlrpe);
 			~authenticator();
 		bool	authenticate(const char *user, const char *password);
 

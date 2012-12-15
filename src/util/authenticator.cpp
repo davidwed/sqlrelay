@@ -12,7 +12,7 @@
 using namespace rudiments;
 #endif
 
-authenticator::authenticator(sqlrconfigfile *cfgfile) {
+authenticator::authenticator(sqlrconfigfile *cfgfile, sqlrpwdencs *sqlrpe) {
 
 	// get the list of users from the config file
 	linkedlist< usercontainer * >	*userlist=cfgfile->getUserList();
@@ -35,12 +35,7 @@ authenticator::authenticator(sqlrconfigfile *cfgfile) {
 		current=current->getNext();
 	}
 
-	sqlrpe=NULL;
-	const char	*pwdencs=cfgfile->getPasswordEncryptions();
-	if (charstring::length(pwdencs)) {
-		sqlrpe=new sqlrpwdencs;
-		sqlrpe->loadPasswordEncryptions(pwdencs);
-	}
+	this->sqlrpe=sqlrpe;
 }
 
 authenticator::~authenticator() {
@@ -63,6 +58,8 @@ bool authenticator::authenticate(const char *user, const char *password) {
 		// if the user matches...
 		if (!charstring::compare(user,users[i])) {
 
+printf("sqlrpe=%08x\n",(unsigned int)sqlrpe);
+printf("pwdenc=%s\n",passwordencryptions[i]);
 			if (sqlrpe &&
 				charstring::length(passwordencryptions[i])) {
 

@@ -53,7 +53,6 @@ char *rot::rotate(const char *value, int64_t count) {
 			retval[i]=value[i];
 		}
 	}
-
 	return retval;
 }
 

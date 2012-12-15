@@ -56,6 +56,7 @@ sqlrcontroller_svr::~sqlrcontroller_svr() {
 	delete sqltr;
 	delete sqlrlg;
 	delete sqlrq;
+	delete sqlrpe;
 
 	delete[] clientinfo;
 

@@ -38,6 +38,7 @@ sqlrlistener::sqlrlistener() : daemonprocess(), listener() {
 	init=false;
 
 	authc=NULL;
+	sqlrpe=NULL;
 
 	semset=NULL;
 	idmemory=NULL;
@@ -95,6 +96,7 @@ sqlrlistener::~sqlrlistener() {
 
 void sqlrlistener::cleanUp() {
 
+	delete sqlrpe;
 	delete authc;
 	delete[] unixport;
 	delete[] pidfile;
@@ -163,8 +165,14 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 
 	setHandoffMethod();
 
+	sqlrpe=NULL;
 	if (cfgfl.getAuthOnListener()) {
-		authc=new authenticator(&cfgfl);
+		const char	*pwdencs=cfgfl.getPasswordEncryptions();
+		if (charstring::length(pwdencs)) {
+			sqlrpe=new sqlrpwdencs;
+			sqlrpe->loadPasswordEncryptions(pwdencs);
+		}
+		authc=new authenticator(&cfgfl,sqlrpe);
 	}
 
 	setIpPermissions();

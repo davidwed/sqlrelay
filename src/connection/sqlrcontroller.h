@@ -30,6 +30,7 @@
 #include <sqltriggers.h>
 #include <sqlrloggers.h>
 #include <sqlrqueries.h>
+#include <sqlrpwdencs.h>
 
 #include <cmdline.h>
 
@@ -440,6 +441,7 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		sqltriggers	*sqltr;
 		sqlrloggers	*sqlrlg;
 		sqlrqueries	*sqlrq;
+		sqlrpwdencs	*sqlrpe;
 
 		unixclientsocket	handoffsockun;
 

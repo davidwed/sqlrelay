@@ -21,6 +21,7 @@
 #include <debugfile.h>
 #include <tempdir.h>
 #include <sqlrconfigfile.h>
+#include <sqlrpwdencs.h>
 
 #include <rudiments/logger.h>
 
@@ -136,6 +137,7 @@ class sqlrlistener : public rudiments::daemonprocess,
 		tempdir		*tmpdir;
 
 		authenticator	*authc;
+		sqlrpwdencs	*sqlrpe;
 
 		// FIXME: these shouldn't have to be pointers, right, but
 		// it appears that they do have to be or their destructors don't

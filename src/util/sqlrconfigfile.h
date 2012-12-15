@@ -112,17 +112,20 @@ class SQLRUTIL_DLLSPEC connectstringcontainer {
 		void		setString(const char *string);
 		void		setMetric(uint32_t metric);
 		void		setBehindLoadBalancer(bool behindloadbalancer);
+		void		setPasswordEncryption(const char *pwdenc);
 		const char	*getConnectionId();
 		const char	*getString();
 		uint32_t	getMetric();
 		bool		getBehindLoadBalancer();
 		const char	*getConnectStringValue(const char *variable);
+		const char	*getPasswordEncryption();
 	private:
 
 		char		*connectionid;
 		char		*string;
 		uint32_t	metric;
 		bool		behindloadbalancer;
+		char		*pwdenc;
 
 		// connect string parameters
 		rudiments::parameterstring	connectstring;

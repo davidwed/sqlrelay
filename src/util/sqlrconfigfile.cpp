@@ -1005,6 +1005,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		} else if (!charstring::compare(name,"socket") ||
 			!charstring::compare(name,"unixport")) {
 			currentattribute=SOCKET_ATTRIBUTE;
+		} else if (!charstring::compare(name,"passwordencryption")) {
+			currentattribute=PASSWORDENCRYPTION_ATTRIBUTE;
 		}
 		break;
 
@@ -1355,7 +1357,14 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			currentuser->setPassword((value)?value:
 							DEFAULT_PASSWORD);
 		} else if (currentattribute==PASSWORDENCRYPTION_ATTRIBUTE) {
-			currentuser->setPasswordEncryption((value)?value:NULL);
+			if (currenttag==USERS_TAG) {
+				currentuser->setPasswordEncryption(
+							(value)?value:NULL);
+			} else if (currenttag==CONNECTIONS_TAG &&
+							currentconnect) {
+				currentconnect->setPasswordEncryption(
+							(value)?value:NULL);
+			}
 		} else if (currentattribute==CONNECTIONID_ATTRIBUTE) {
 			if (currentconnect) {
 				if (charstring::length(value)>
@@ -1585,11 +1594,13 @@ connectstringcontainer::connectstringcontainer() {
 	metric=charstring::toInteger(DEFAULT_METRIC);
 	behindloadbalancer=!charstring::compareIgnoringCase(
 					DEFAULT_BEHINDLOADBALANCER,"yes");
+	pwdenc=NULL;
 }
 
 connectstringcontainer::~connectstringcontainer() {
 	delete[] string;
 	delete[] connectionid;
+	delete[] pwdenc;
 }
 
 void connectstringcontainer::setConnectionId(const char *connectionid) {
@@ -1608,6 +1619,10 @@ void connectstringcontainer::setBehindLoadBalancer(bool behindloadbalancer) {
 	this->behindloadbalancer=behindloadbalancer;
 }
 
+void connectstringcontainer::setPasswordEncryption(const char *pwdenc) {
+	this->pwdenc=charstring::duplicate(pwdenc);
+}
+
 const char *connectstringcontainer::getConnectionId() {
 	return connectionid;
 }
@@ -1622,6 +1637,10 @@ uint32_t connectstringcontainer::getMetric() {
 
 bool connectstringcontainer::getBehindLoadBalancer() {
 	return behindloadbalancer;
+}
+
+const char *connectstringcontainer::getPasswordEncryption() {
+	return pwdenc;
 }
 
 void connectstringcontainer::parseConnectString() {
