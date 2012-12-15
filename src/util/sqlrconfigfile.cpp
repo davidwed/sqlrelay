@@ -85,6 +85,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	triggersdepth=0;
 	loggersdepth=0;
 	queriesdepth=0;
+	passwordencryptionsdepth=0;
 	isolationlevel=NULL;
 	ignoreselectdb=false;
 	waitfordowndb=true;
@@ -413,6 +414,10 @@ const char *sqlrconfigfile::getQueries() {
 	return queries.getString();
 }
 
+const char *sqlrconfigfile::getPasswordEncryptions() {
+	return passwordencryptions.getString();
+}
+
 linkedlist< usercontainer * > *sqlrconfigfile::getUserList() {
 	// if there are no users in the list, add a default user/password
 	if (!userlist.getLength()) {
@@ -501,6 +506,10 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			} else if (!charstring::compare(name,"queries")) {
 				thistag=QUERIES_TAG;
 				queries.clear();
+			} else if (!charstring::compare(name,
+						"passwordencrpytions")) {
+				thistag=PASSWORDENCRYPTIONS_TAG;
+				passwordencryptions.clear();
 			} else {
 				ok=false;
 			}
@@ -698,6 +707,19 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			queries.append(name);
 			currenttag=thistag;
 			break;
+		case PASSWORDENCRYPTIONS_TAG:
+			if (!charstring::compare(name,"passwordencryptions")) {
+				passwordencryptionsdepth=0;
+			} else {
+				passwordencryptionsdepth++;
+			}
+			if (passwordencryptionsdepth) {
+				passwordencryptions.append(">");
+			}
+			passwordencryptions.append("<");
+			passwordencryptions.append(name);
+			currenttag=thistag;
+			break;
 		case SESSION_TAG:
 		case START_TAG:
 		case END_TAG:
@@ -811,6 +833,17 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 				queries.append(">");
 			}
 			queriesdepth--;
+			break;
+		case PASSWORDENCRYPTIONS_TAG:
+			if (!charstring::compare(name,"passwordencryptions")) {
+				currenttag=NO_TAG;
+			}
+			passwordencryptions.append("></");
+			passwordencryptions.append(name);
+			if (!passwordencryptionsdepth) {
+				passwordencryptions.append(">");
+			}
+			passwordencryptionsdepth--;
 			break;
 		case SESSION_TAG:
 			currenttag=NO_TAG;
@@ -1026,6 +1059,11 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		currentattribute=QUERIES_ATTRIBUTE;
 		break;
 
+	case PASSWORDENCRYPTIONS_TAG:
+		passwordencryptions.append(" ")->append(name);
+		currentattribute=PASSWORDENCRYPTIONS_ATTRIBUTE;
+		break;
+
 	// these tags have no attributes and there's nothing to do but the
 	// compiler will complain if they aren't in the switch statement
 	case SESSION_TAG:
@@ -1078,6 +1116,9 @@ bool sqlrconfigfile::attributeName(const char *name) {
 				break;
 			case QUERIES_TAG:
 				tagname="queries";
+				break;
+			case PASSWORDENCRYPTIONS_TAG:
+				tagname="passwordencryptions";
 				break;
 			case SESSION_TAG:
 				tagname="session";
@@ -1133,6 +1174,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currenttag==QUERIES_TAG) {
 			queries.append("=\"");
 			queries.append(value)->append("\"");
+		} else if (currenttag==PASSWORDENCRYPTIONS_TAG) {
+			passwordencryptions.append("=\"");
+			passwordencryptions.append(value)->append("\"");
 		} else if (currentattribute==ADDRESSES_ATTRIBUTE) {
 			for (uint64_t index=0; index<addresscount; index++) {
 				delete[] addresses[index];

@@ -76,6 +76,7 @@ typedef enum {
 	TRIGGERS_ATTRIBUTE,
 	LOGGERS_ATTRIBUTE,
 	QUERIES_ATTRIBUTE,
+	PASSWORDENCRYPTIONS_ATTRIBUTE,
 	ISOLATIONLEVEL_ATTRIBUTE,
 	IGNORESELECTDB_ATTRIBUTE,
 	WAITFORDOWNDB_ATTRIBUTE
@@ -234,6 +235,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 
 		const char	*getQueries();
 
+		const char	*getPasswordEncryptions();
+
 		rudiments::linkedlist< usercontainer * >	*getUserList();
 		rudiments::linkedlist< connectstringcontainer * >
 							*getConnectStringList();
@@ -339,6 +342,9 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		rudiments::stringbuffer	queries;
 		uint16_t		queriesdepth;
 
+		rudiments::stringbuffer	passwordencryptions;
+		uint16_t		passwordencryptionsdepth;
+
 		usercontainer	*currentuser;
 
 		connectstringcontainer	*firstconnect;
@@ -370,7 +376,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 	   		TRANSLATIONS_TAG,
 	   		TRIGGERS_TAG,
 	   		LOGGERS_TAG,
-	   		QUERIES_TAG
+	   		QUERIES_TAG,
+	   		PASSWORDENCRYPTIONS_TAG
 		} tag;
 		
 		tag currenttag;
