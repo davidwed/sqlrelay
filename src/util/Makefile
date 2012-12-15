@@ -35,8 +35,11 @@ install:
 	$(LTINSTALL) libsqlrelay_sqlrpwdenc_rot.la $(libdir)
 	$(RM) $(libdir)/libsqlrelay_sqlrpwdenc_rot.a
 	$(LIBTOOL) --mode=finish $(libdir)
+	$(MKINSTALLDIRS) $(includedir)/sqlrelay
+	$(INSTALL) -m 644 sqlrpwdenc.h $(includedir)/sqlrelay
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrutil.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrutil_p.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrpwdenc_rot.la
+	$(RM) $(includedir)/sqlrelay/sqlrpwdenc.h
