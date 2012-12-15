@@ -8,16 +8,14 @@
 
 class sqlrpwdenc {
 	public:
-			sqlrpwdenc(const char *id);
+			sqlrpwdenc(rudiments::xmldomnode *parameters);
 		virtual	~sqlrpwdenc();
 		virtual const char	*getId();
 		virtual	bool	oneWay();
-		virtual	char	*encrypt(const char *value,
-					rudiments::xmldomnode *parameters);
-		virtual	char	*decrypt(const char *value,
-					rudiments::xmldomnode *parameters);
+		virtual	char	*encrypt(const char *value);
+		virtual	char	*decrypt(const char *value);
 	protected:
-		char	*id;
+		rudiments::xmldomnode	*parameters;
 };
 
 #endif

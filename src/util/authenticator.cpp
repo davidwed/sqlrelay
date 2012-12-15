@@ -4,6 +4,7 @@
 #include <defaults.h>
 
 #include <sqlrconfigfile.h>
+#include <sqlrpwdencs.h>
 
 #include <authenticator.h>
 
@@ -21,14 +22,24 @@ authenticator::authenticator(sqlrconfigfile *cfgfile) {
 	// users and passwords from the config file in them
 	users=new char *[usercount];
 	passwords=new char *[usercount];
+	passwordencryptions=new char *[usercount];
 
 	usernode	*current=userlist->getFirstNode();
 	for (uint32_t i=0; i<usercount; i++) {
-		users[i]=charstring::duplicate(current->
-						getData()->getUser());
-		passwords[i]=charstring::duplicate(current->
-						getData()->getPassword());
+		users[i]=charstring::duplicate(
+				current->getData()->getUser());
+		passwords[i]=charstring::duplicate(
+				current->getData()->getPassword());
+		passwordencryptions[i]=charstring::duplicate(
+				current->getData()->getPasswordEncryption());
 		current=current->getNext();
+	}
+
+	sqlrpe=NULL;
+	const char	*pwdencs=cfgfile->getPasswordEncryptions();
+	if (charstring::length(pwdencs)) {
+		sqlrpe=new sqlrpwdencs;
+		sqlrpe->loadPasswordEncryptions(pwdencs);
 	}
 }
 
@@ -36,19 +47,55 @@ authenticator::~authenticator() {
 	for (uint32_t i=0; i<usercount; i++) {
 		delete[] users[i];
 		delete[] passwords[i];
+		delete[] passwordencryptions[i];
 	}
 	delete[] users;
 	delete[] passwords;
+	delete[] passwordencryptions;
+	delete sqlrpe;
 }
 
 bool authenticator::authenticate(const char *user, const char *password) {
 
-	// Return true if what the client sent matches one of the 
-	// user/password sets and false if no match is found.
+	// run through the user/password arrays...
 	for (uint32_t i=0; i<usercount; i++) {
-		if (!charstring::compare(user,users[i]) &&
-			!charstring::compare(password,passwords[i])) {
-			return true;
+
+		// if the user matches...
+		if (!charstring::compare(user,users[i])) {
+
+			if (sqlrpe &&
+				charstring::length(passwordencryptions[i])) {
+
+				// if password encryption is being used...
+
+				// get the module
+				sqlrpwdenc	*pe=
+					sqlrpe->getPasswordEncryptionById(
+							passwordencryptions[i]);
+				if (!pe) {
+					return false;
+				}
+
+				// decrypt the password
+				char	*pwd=pe->decrypt(passwords[i]);
+
+				// compare it to the password that was passed in
+				bool	retval=!charstring::compare(
+								password,pwd);
+
+				// clean up
+				delete[] pwd;
+
+				// return true/false
+				return retval;
+
+			} else {
+
+				// if password encryption isn't being used,
+				// return true if the passwords match
+				return !charstring::compare(password,
+								passwords[i]);
+			}
 		}
 	}
 	return false;

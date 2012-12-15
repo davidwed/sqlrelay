@@ -15,7 +15,7 @@ LOBJS = cmdline.lo debugfile.lo tempdir.lo sqlrconfigfile.lo authenticator.lo sq
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: libsqlrutil.la
+all: libsqlrutil.la libsqlrelay_sqlrpwdenc_rot.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la
@@ -26,11 +26,17 @@ clean:
 libsqlrutil.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
+libsqlrelay_sqlrpwdenc_rot.la: rot.cpp rot.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ rot.lo $(LDFLAGS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+
 install:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libsqlrutil.la $(libdir)
+	$(LTINSTALL) libsqlrelay_sqlrpwdenc_rot.la $(libdir)
+	$(RM) $(libdir)/libsqlrelay_sqlrpwdenc_rot.a
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrutil.la
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrutil_p.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrpwdenc_rot.la

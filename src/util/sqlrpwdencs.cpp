@@ -82,9 +82,8 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 		return;
 	}
 
-	// get the password encryption id
-	const char	*id=pwdenc->getAttributeValue("id");
-	if (!charstring::length(id)) {
+	// make sure it has an id
+	if (!charstring::length(pwdenc->getAttributeValue("id"))) {
 		return;
 	}
 
@@ -108,8 +107,8 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 	// load the password encryption itself
 	stringbuffer	functionname;
 	functionname.append("new_")->append(file);
-	sqlrpwdenc *(*newPasswordEncryption)(const char *)=
-			(sqlrpwdenc *(*)(const char *))
+	sqlrpwdenc *(*newPasswordEncryption)(xmldomnode *)=
+			(sqlrpwdenc *(*)(xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newPasswordEncryption) {
 		printf("failed to create password encryption: %s\n",file);
@@ -120,7 +119,7 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 		delete dl;
 		return;
 	}
-	sqlrpwdenc	*pe=(*newPasswordEncryption)(id);
+	sqlrpwdenc	*pe=(*newPasswordEncryption)(pwdenc);
 
 	// add the plugin to the list
 	sqlrpwdencplugin	*sqlrlp=new sqlrpwdencplugin;

@@ -5,6 +5,7 @@
 #define AUTHENTICATOR_H
 
 #include <sqlrconfigfile.h>
+#include <sqlrpwdencs.h>
 
 class authenticator {
 
@@ -19,6 +20,9 @@ class authenticator {
 		uint32_t	usercount;
 		char		**users;
 		char		**passwords;
+		char		**passwordencryptions;
+
+		sqlrpwdencs	*sqlrpe;
 };
 
 #endif

@@ -54,6 +54,7 @@ typedef enum {
 	IDLECLIENTTIMEOUT_ATTRIBUTE,
 	USER_ATTRIBUTE,
 	PASSWORD_ATTRIBUTE,
+	PASSWORDENCRYPTION_ATTRIBUTE,
 	CONNECTIONID_ATTRIBUTE,
 	STRING_ATTRIBUTE,
 	METRIC_ATTRIBUTE,
@@ -90,11 +91,14 @@ class SQLRUTIL_DLLSPEC usercontainer {
 
 		void		setUser(const char *user);
 		void		setPassword(const char *password);
+		void		setPasswordEncryption(const char *pwdenc);
 		const char	*getUser();
 		const char	*getPassword();
+		const char	*getPasswordEncryption();
 	private:
 		char	*user;
 		char	*password;
+		char	*pwdenc;
 };
 
 typedef rudiments::linkedlistnode< usercontainer * >	usernode;

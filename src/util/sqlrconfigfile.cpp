@@ -984,6 +984,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=USER_ATTRIBUTE;
 		} else if (!charstring::compare(name,"password")) {
 			currentattribute=PASSWORD_ATTRIBUTE;
+		} else if (!charstring::compare(name,"passwordencryption")) {
+			currentattribute=PASSWORDENCRYPTION_ATTRIBUTE;
 		}
 		break;
 
@@ -1352,6 +1354,8 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currentattribute==PASSWORD_ATTRIBUTE) {
 			currentuser->setPassword((value)?value:
 							DEFAULT_PASSWORD);
+		} else if (currentattribute==PASSWORDENCRYPTION_ATTRIBUTE) {
+			currentuser->setPasswordEncryption((value)?value:NULL);
 		} else if (currentattribute==CONNECTIONID_ATTRIBUTE) {
 			if (currentconnect) {
 				if (charstring::length(value)>
@@ -1542,11 +1546,13 @@ bool sqlrconfigfile::parse(const char *config, const char *id) {
 usercontainer::usercontainer() {
 	user=NULL;
 	password=NULL;
+	pwdenc=NULL;
 }
 
 usercontainer::~usercontainer() {
 	delete[] user;
 	delete[] password;
+	delete[] pwdenc;
 }
 
 void usercontainer::setUser(const char *user) {
@@ -1557,12 +1563,20 @@ void usercontainer::setPassword(const char *password) {
 	this->password=charstring::duplicate(password);
 }
 
+void usercontainer::setPasswordEncryption(const char *pwdenc) {
+	this->pwdenc=charstring::duplicate(pwdenc);
+}
+
 const char *usercontainer::getUser() {
 	return user;
 }
 
 const char *usercontainer::getPassword() {
 	return password;
+}
+
+const char *usercontainer::getPasswordEncryption() {
+	return pwdenc;
 }
 
 connectstringcontainer::connectstringcontainer() {

@@ -8,26 +8,25 @@
 using namespace rudiments;
 #endif
 
-sqlrpwdenc::sqlrpwdenc(const char *id) {
-	id=charstring::duplicate(id);
+sqlrpwdenc::sqlrpwdenc(xmldomnode *parameters) {
+	this->parameters=parameters;
 }
 
 sqlrpwdenc::~sqlrpwdenc() {
-	delete[] id;
 }
 
 const char *sqlrpwdenc::getId() {
-	return id;
+	return parameters->getAttributeValue("id");
 }
 
 bool sqlrpwdenc::oneWay() {
 	return false;
 }
 
-char *sqlrpwdenc::encrypt(const char *value, xmldomnode *parameters) {
+char *sqlrpwdenc::encrypt(const char *value) {
 	return NULL;
 }
 
-char *sqlrpwdenc::decrypt(const char *value, xmldomnode *parameters) {
+char *sqlrpwdenc::decrypt(const char *value) {
 	return NULL;
 }
