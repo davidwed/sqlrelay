@@ -4,7 +4,7 @@ include ../config.mk
 
 all:
 	$(MAKE) -C util all
-	$(MAKE) -C listener all
+	$(MAKE) -C server all
 	$(MAKE) -C api all
 	$(MAKE) -C cmdline all
 	$(MAKE) -C connection all
@@ -14,14 +14,11 @@ all:
 	$(MAKE) -C loggers all
 	$(MAKE) -C pwdencs all
 	$(MAKE) -C connections all
-	$(MAKE) -C start all
-	$(MAKE) -C cachemanager all
-	$(MAKE) -C scaler all
 	$(MAKE) -C status all
 
 clean:
 	$(MAKE) -C util clean
-	$(MAKE) -C listener clean
+	$(MAKE) -C server clean
 	$(MAKE) -C api clean
 	$(MAKE) -C cmdline clean
 	$(MAKE) -C connection clean
@@ -31,14 +28,12 @@ clean:
 	$(MAKE) -C loggers clean
 	$(MAKE) -C pwdencs clean
 	$(MAKE) -C connections clean
-	$(MAKE) -C start clean
-	$(MAKE) -C cachemanager clean
 	$(MAKE) -C scaler clean
 	$(MAKE) -C status clean
 
 install:
 	$(MAKE) -C util install
-	$(MAKE) -C listener install
+	$(MAKE) -C server install
 	$(MAKE) -C api install
 	$(MAKE) -C cmdline install
 	$(MAKE) -C connection install
@@ -48,14 +43,12 @@ install:
 	$(MAKE) -C loggers install
 	$(MAKE) -C pwdencs install
 	$(MAKE) -C connections install
-	$(MAKE) -C start install
-	$(MAKE) -C cachemanager install
 	$(MAKE) -C scaler install
 	$(MAKE) -C status install
 
 uninstall:
 	$(MAKE) -C util uninstall
-	$(MAKE) -C listener uninstall
+	$(MAKE) -C server uninstall
 	$(MAKE) -C api uninstall
 	$(MAKE) -C cmdline uninstall
 	$(MAKE) -C connection uninstall
@@ -65,7 +58,5 @@ uninstall:
 	$(MAKE) -C loggers uninstall
 	$(MAKE) -C pwdencs uninstall
 	$(MAKE) -C connections uninstall
-	$(MAKE) -C start uninstall
-	$(MAKE) -C cachemanager uninstall
 	$(MAKE) -C scaler uninstall
 	$(MAKE) -C status uninstall
