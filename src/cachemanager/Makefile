@@ -13,9 +13,6 @@ ifeq ($(SERVERUSERPATH),yes)
 endif
 endif
 
-SRCS = cachemanager.cpp main.cpp
-LOBJS = cachemanager.lo main.lo
-
 .SUFFIXES: .lo
 
 .cpp.lo:
@@ -25,12 +22,11 @@ all: sqlr-cachemanager$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-cachemanager$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
+	$(LIBTOOL) --mode=clean $(RM) *.lo *.o
 	$(RMTREE) .libs
 
-sqlr-cachemanager$(EXE): $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
+sqlr-cachemanager$(EXE): sqlr-cachemanager.cpp sqlr-cachemanager.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-cachemanager.lo $(LIBS) $(RPATH)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)

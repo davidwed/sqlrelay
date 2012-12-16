@@ -1,7 +1,8 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <cachemanager.h>
+#include <cmdline.h>
+#include <tempdir.h>
 #include <rudiments/snooze.h>
 #include <rudiments/charstring.h>
 #include <rudiments/datetime.h>
@@ -9,13 +10,45 @@
 #include <rudiments/directory.h>
 #include <rudiments/process.h>
 #include <rudiments/permissions.h>
+#include <rudiments/daemonprocess.h>
+
+#include <config.h>
+#include <defaults.h>
+
+#include <stdio.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
 
-#include <stdio.h>
-#include <config.h>
+class dirnode {
+	friend class cachemanager;
+	private:
+			dirnode(const char *dirname);
+			dirnode(const char *start, const char *end);
+			~dirnode();
+		char	*dirname;
+		dirnode	*next;
+};
+
+class cachemanager : public daemonprocess {
+	public:
+			cachemanager(int argc, const char **argv);
+			~cachemanager();
+		void	scan();
+	private:
+		void	erase(const char *dirname, const char *filename);
+		void	parseCacheDirs(const char *cachedirs);
+
+		int	scaninterval;
+		dirnode	*firstdir;
+		dirnode	*currentdir;
+
+		cmdline	*cmdl;
+		tempdir	*tmpdir;
+
+		char	*pidfile;
+};
 
 dirnode::dirnode(const char *dirname) {
 	this->dirname=charstring::duplicate(dirname);
@@ -201,4 +234,20 @@ void cachemanager::parseCacheDirs(const char *cachedirs) {
 		firstdir=new dirnode(CACHE_DIR);
 		currentdir=firstdir;
 	}
+}
+
+cachemanager	*cacheman;
+
+void shutDown(int32_t signum) {
+	delete cacheman;
+	process::exit(0);
+}
+
+int main(int argc, const char **argv) {
+
+	#include <version.h>
+
+	cacheman=new cachemanager(argc,argv);
+	cacheman->handleShutDown(shutDown);
+	cacheman->scan();
 }
