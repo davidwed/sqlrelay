@@ -406,7 +406,8 @@ sqlrconnection_svr *sqlrcontroller_svr::initConnection(const char *dbase) {
 	modulename.append("/sqlrconnection_");
 	modulename.append(dbase)->append(".so");
 	if (!dl.open(modulename.getString(),true,true)) {
-		fprintf(stderr,"failed to load connection module: %s\n",dbase);
+		fprintf(stderr,"failed to load connection module: %s\n",
+							modulename.getString());
 		char	*error=dl.getError();
 		fprintf(stderr,"%s\n",error);
 		delete[] error;
