@@ -4,7 +4,7 @@ include ../../config.mk
 
 .PHONY: all clean install uninstall
 
-CPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) $(SIDINCLUDES) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPFLAG) -DSERVER_VERSION=\"$(SQLR_VERSION)\" -DLIBDIR=\"$(libdir)\"
+CPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) $(SIDINCLUDES) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPFLAG) -DSERVER_VERSION=\"$(SQLR_VERSION)\" -DLIBEXECDIR=\"$(libexecdir)\"
 LIBS = -L$(top_builddir)/src/util -lsqlrutil $(SIDLIBS) $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 
 SRCS = sqlrcontroller/sqlrcontrollerctor.cpp \
@@ -203,22 +203,22 @@ LOBJS = sqlrcontroller/sqlrcontrollerctor.lo \
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: libsqlrconnection.la \
-	libsqlrelay_sqltrigger_createtableautoincrementoracle.la \
-	libsqlrelay_sqltrigger_droptableautoincrementoracle.la \
-	libsqlrelay_sqltrigger_droplocalizedtemptables.la \
-	libsqlrelay_sqltranslation_doublequotestosinglequotes.la \
-	libsqlrelay_sqltranslation_informixtooracledate.la \
-	libsqlrelay_sqltranslation_locksnowaitbydefault.la \
-	libsqlrelay_sqltranslation_temptablesaddmissingcolumns.la \
-	libsqlrelay_sqltranslation_temptableslocalize.la \
-	libsqlrelay_sqltranslation_translatedatetimes.la \
-	libsqlrelay_sqltranslation_matchestolike.la \
-	libsqlrelay_sqltranslation_oracleize.la \
-	libsqlrelay_sqltranslation_serialtoautoincrement.la \
-	libsqlrelay_sqlrlogger_slowqueries.la \
-	libsqlrelay_sqlrlogger_custom_nw.la \
-	libsqlrelay_sqlrquery_sqlrcmdgstat.la \
-	libsqlrelay_sqlrquery_sqlrcmdcstat.la \
+	sqltrigger_createtableautoincrementoracle.la \
+	sqltrigger_droptableautoincrementoracle.la \
+	sqltrigger_droplocalizedtemptables.la \
+	sqltranslation_doublequotestosinglequotes.la \
+	sqltranslation_informixtooracledate.la \
+	sqltranslation_locksnowaitbydefault.la \
+	sqltranslation_temptablesaddmissingcolumns.la \
+	sqltranslation_temptableslocalize.la \
+	sqltranslation_translatedatetimes.la \
+	sqltranslation_matchestolike.la \
+	sqltranslation_oracleize.la \
+	sqltranslation_serialtoautoincrement.la \
+	sqlrlogger_slowqueries.la \
+	sqlrlogger_custom_nw.la \
+	sqlrquery_sqlrcmdgstat.la \
+	sqlrquery_sqlrcmdcstat.la \
 	sqlr-connection$(EXE)
 
 clean:
@@ -234,53 +234,53 @@ clean:
 libsqlrconnection.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
-libsqlrelay_sqltrigger_createtableautoincrementoracle.la: sqltriggers/createtableautoincrementoracle.cpp sqltriggers/createtableautoincrementoracle.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltriggers/createtableautoincrementoracle.lo $(LDFLAGS) $(TRIGGERPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqltrigger_createtableautoincrementoracle.la: sqltriggers/createtableautoincrementoracle.cpp sqltriggers/createtableautoincrementoracle.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltriggers/createtableautoincrementoracle.lo $(LDFLAGS) $(TRIGGERPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-libsqlrelay_sqltrigger_droptableautoincrementoracle.la: sqltriggers/droptableautoincrementoracle.cpp sqltriggers/droptableautoincrementoracle.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltriggers/droptableautoincrementoracle.lo $(LDFLAGS) $(TRIGGERPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqltrigger_droptableautoincrementoracle.la: sqltriggers/droptableautoincrementoracle.cpp sqltriggers/droptableautoincrementoracle.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltriggers/droptableautoincrementoracle.lo $(LDFLAGS) $(TRIGGERPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-libsqlrelay_sqltrigger_droplocalizedtemptables.la: sqltriggers/droplocalizedtemptables.cpp sqltriggers/droplocalizedtemptables.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltriggers/droplocalizedtemptables.lo $(LDFLAGS) $(TRIGGERPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqltrigger_droplocalizedtemptables.la: sqltriggers/droplocalizedtemptables.cpp sqltriggers/droplocalizedtemptables.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltriggers/droplocalizedtemptables.lo $(LDFLAGS) $(TRIGGERPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-libsqlrelay_sqltranslation_doublequotestosinglequotes.la: sqltranslations/doublequotestosinglequotes.cpp sqltranslations/doublequotestosinglequotes.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/doublequotestosinglequotes.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqltranslation_doublequotestosinglequotes.la: sqltranslations/doublequotestosinglequotes.cpp sqltranslations/doublequotestosinglequotes.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/doublequotestosinglequotes.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-libsqlrelay_sqltranslation_informixtooracledate.la: sqltranslations/informixtooracledate.cpp sqltranslations/informixtooracledate.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/informixtooracledate.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqltranslation_informixtooracledate.la: sqltranslations/informixtooracledate.cpp sqltranslations/informixtooracledate.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/informixtooracledate.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-libsqlrelay_sqltranslation_locksnowaitbydefault.la: sqltranslations/locksnowaitbydefault.cpp sqltranslations/locksnowaitbydefault.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/locksnowaitbydefault.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqltranslation_locksnowaitbydefault.la: sqltranslations/locksnowaitbydefault.cpp sqltranslations/locksnowaitbydefault.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/locksnowaitbydefault.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-libsqlrelay_sqltranslation_temptablesaddmissingcolumns.la: sqltranslations/temptablesaddmissingcolumns.cpp sqltranslations/temptablesaddmissingcolumns.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/temptablesaddmissingcolumns.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqltranslation_temptablesaddmissingcolumns.la: sqltranslations/temptablesaddmissingcolumns.cpp sqltranslations/temptablesaddmissingcolumns.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/temptablesaddmissingcolumns.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-libsqlrelay_sqltranslation_temptableslocalize.la: sqltranslations/temptableslocalize.cpp sqltranslations/temptableslocalize.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/temptableslocalize.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqltranslation_temptableslocalize.la: sqltranslations/temptableslocalize.cpp sqltranslations/temptableslocalize.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/temptableslocalize.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-libsqlrelay_sqltranslation_translatedatetimes.la: sqltranslations/translatedatetimes.cpp sqltranslations/translatedatetimes.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/translatedatetimes.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqltranslation_translatedatetimes.la: sqltranslations/translatedatetimes.cpp sqltranslations/translatedatetimes.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/translatedatetimes.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-libsqlrelay_sqltranslation_matchestolike.la: sqltranslations/matchestolike.cpp sqltranslations/matchestolike.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/matchestolike.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqltranslation_matchestolike.la: sqltranslations/matchestolike.cpp sqltranslations/matchestolike.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/matchestolike.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-libsqlrelay_sqltranslation_oracleize.la: sqltranslations/oracleize.cpp sqltranslations/oracleize.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/oracleize.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqltranslation_oracleize.la: sqltranslations/oracleize.cpp sqltranslations/oracleize.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/oracleize.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-libsqlrelay_sqltranslation_serialtoautoincrement.la: sqltranslations/serialtoautoincrement.cpp sqltranslations/serialtoautoincrement.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/serialtoautoincrement.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqltranslation_serialtoautoincrement.la: sqltranslations/serialtoautoincrement.cpp sqltranslations/serialtoautoincrement.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/serialtoautoincrement.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-libsqlrelay_sqlrlogger_slowqueries.la: sqlrloggers/slowqueries.cpp sqlrloggers/slowqueries.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrloggers/slowqueries.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqlrlogger_slowqueries.la: sqlrloggers/slowqueries.cpp sqlrloggers/slowqueries.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrloggers/slowqueries.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-libsqlrelay_sqlrlogger_custom_nw.la: sqlrloggers/custom_nw.cpp sqlrloggers/custom_nw.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrloggers/custom_nw.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqlrlogger_custom_nw.la: sqlrloggers/custom_nw.cpp sqlrloggers/custom_nw.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrloggers/custom_nw.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-libsqlrelay_sqlrquery_sqlrcmdgstat.la: sqlrqueries/sqlrcmdgstat.cpp sqlrqueries/sqlrcmdgstat.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrqueries/sqlrcmdgstat.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqlrquery_sqlrcmdgstat.la: sqlrqueries/sqlrcmdgstat.cpp sqlrqueries/sqlrcmdgstat.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrqueries/sqlrcmdgstat.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-libsqlrelay_sqlrquery_sqlrcmdcstat.la: sqlrqueries/sqlrcmdcstat.cpp sqlrqueries/sqlrcmdcstat.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrqueries/sqlrcmdcstat.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqlrquery_sqlrcmdcstat.la: sqlrqueries/sqlrcmdcstat.cpp sqlrqueries/sqlrcmdcstat.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrqueries/sqlrcmdcstat.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqlr-connection$(EXE): sqlrcontroller/main.cpp sqlrcontroller/main.lo 
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrcontroller/main.lo $(LDFLAGS) libsqlrconnection.la $(LIBS) $(RPATH)
@@ -308,75 +308,80 @@ install-connection:
 	chmod 777 $(debugdir)
 
 install-triggers:
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrelay_sqltrigger_createtableautoincrementoracle.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqltrigger_createtableautoincrementoracle.a
-	$(LTINSTALL) libsqlrelay_sqltrigger_droptableautoincrementoracle.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqltrigger_droptableautoincrementoracle.a
-	$(LTINSTALL) libsqlrelay_sqltrigger_droplocalizedtemptables.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqltrigger_droplocalizedtemptables.a
-	$(LIBTOOL) --mode=finish $(libdir)
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) sqltrigger_createtableautoincrementoracle.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltrigger_createtableautoincrementoracle.a
+	$(RM) $(libexecdir)/sqltrigger_createtableautoincrementoracle.la
+	$(LTINSTALL) sqltrigger_droptableautoincrementoracle.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltrigger_droptableautoincrementoracle.a
+	$(RM) $(libexecdir)/sqltrigger_droptableautoincrementoracle.la
+	$(LTINSTALL) sqltrigger_droplocalizedtemptables.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltrigger_droplocalizedtemptables.a
+	$(RM) $(libexecdir)/sqltrigger_droplocalizedtemptables.la
+	$(LIBTOOL) --mode=finish $(libexecdir)
 
 install-translations:
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrelay_sqltranslation_doublequotestosinglequotes.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqltranslation_doublequotestosinglequotes.a
-	$(LTINSTALL) libsqlrelay_sqltranslation_informixtooracledate.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqltranslation_informixtooracledate.a
-	$(LTINSTALL) libsqlrelay_sqltranslation_locksnowaitbydefault.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqltranslation_locksnowaitbydefault.a
-	$(LTINSTALL) libsqlrelay_sqltranslation_temptablesaddmissingcolumns.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqltranslation_temptablesaddmissingcolumns.a
-	$(LTINSTALL) libsqlrelay_sqltranslation_temptableslocalize.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqltranslation_temptableslocalize.a
-	$(LTINSTALL) libsqlrelay_sqltranslation_translatedatetimes.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqltranslation_translatedatetimes.a
-	$(LTINSTALL) libsqlrelay_sqltranslation_matchestolike.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqltranslation_matchestolike.a
-	$(LTINSTALL) libsqlrelay_sqltranslation_oracleize.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqltranslation_oracleize.a
-	$(LTINSTALL) libsqlrelay_sqltranslation_serialtoautoincrement.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqltranslation_serialtoautoincrement.a
-	$(LIBTOOL) --mode=finish $(libdir)
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) sqltranslation_doublequotestosinglequotes.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_doublequotestosinglequotes.a
+	$(RM) $(libexecdir)/sqltranslation_doublequotestosinglequotes.la
+	$(LTINSTALL) sqltranslation_informixtooracledate.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_informixtooracledate.a
+	$(RM) $(libexecdir)/sqltranslation_informixtooracledate.la
+	$(LTINSTALL) sqltranslation_locksnowaitbydefault.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_locksnowaitbydefault.a
+	$(RM) $(libexecdir)/sqltranslation_locksnowaitbydefault.la
+	$(LTINSTALL) sqltranslation_temptablesaddmissingcolumns.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_temptablesaddmissingcolumns.a
+	$(RM) $(libexecdir)/sqltranslation_temptablesaddmissingcolumns.la
+	$(LTINSTALL) sqltranslation_temptableslocalize.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_temptableslocalize.a
+	$(RM) $(libexecdir)/sqltranslation_temptableslocalize.la
+	$(LTINSTALL) sqltranslation_translatedatetimes.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.a
+	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.la
+	$(LTINSTALL) sqltranslation_matchestolike.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_matchestolike.a
+	$(RM) $(libexecdir)/sqltranslation_matchestolike.la
+	$(LTINSTALL) sqltranslation_oracleize.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_oracleize.a
+	$(RM) $(libexecdir)/sqltranslation_oracleize.la
+	$(LTINSTALL) sqltranslation_serialtoautoincrement.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_serialtoautoincrement.a
+	$(RM) $(libexecdir)/sqltranslation_serialtoautoincrement.la
+	$(LIBTOOL) --mode=finish $(libexecdir)
 
 install-loggers:
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrelay_sqlrlogger_slowqueries.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqlrlogger_slowqueries.a
-	$(LTINSTALL) libsqlrelay_sqlrlogger_custom_nw.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqlrlogger_custom_nw.a
-	$(LIBTOOL) --mode=finish $(libdir)
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) sqlrlogger_slowqueries.la $(libexecdir)
+	$(RM) $(libexecdir)/sqlrlogger_slowqueries.a
+	$(RM) $(libexecdir)/sqlrlogger_slowqueries.la
+	$(LTINSTALL) sqlrlogger_custom_nw.la $(libexecdir)
+	$(RM) $(libexecdir)/sqlrlogger_custom_nw.a
+	$(RM) $(libexecdir)/sqlrlogger_custom_nw.la
+	$(LIBTOOL) --mode=finish $(libexecdir)
 
 install-queries:
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrelay_sqlrquery_sqlrcmdgstat.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqlrquery_sqlrcmdgstat.a
-	$(LTINSTALL) libsqlrelay_sqlrquery_sqlrcmdcstat.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqlrquery_sqlrcmdcstat.a
-	$(LIBTOOL) --mode=finish $(libdir)
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) sqlrquery_sqlrcmdgstat.la $(libexecdir)
+	$(RM) $(libexecdir)/sqlrquery_sqlrcmdgstat.a
+	$(RM) $(libexecdir)/sqlrquery_sqlrcmdgstat.la
+	$(LTINSTALL) sqlrquery_sqlrcmdcstat.la $(libexecdir)
+	$(RM) $(libexecdir)/sqlrquery_sqlrcmdcstat.a
+	$(RM) $(libexecdir)/sqlrquery_sqlrcmdcstat.la
+	$(LIBTOOL) --mode=finish $(libexecdir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltrigger_createtableautoincrementoracle.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltrigger_droptableautoincrementoracle.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltrigger_droplocalizedtemptables.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection_p.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_doublequotestosinglequotes.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_informixtooracledate.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_locksnowaitbydefault.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_temptablesaddmissingcolumns.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_temptableslocalize.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_translatedatetimes.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_matchestolike.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_oracletemptablespreserverowsbydefault.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_oracleize.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqltranslation_serialtoautoincrement.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrlogger_slowqueries.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrlogger_custom_nw.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrquery_sqlrcmdgstat.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrquery_sqlrcmdcstat.la
+	$(RM) $(libexecdir)/sqltrigger_*
+	$(RM) $(libexecdir)/sqltranslation_*
+	$(RM) $(libexecdir)/sqlrlogger_*
+	$(RM) $(libexecdir)/sqlrquery_*
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(logdir)
 	$(RMTREE) $(debugdir)
+	$(RM) $(libdir)/libsqlrelay_*
+	$(RM) $(libexecdir)/libsqlrelay_*
+	$(RM) $(libdir)/libsqlrconnection_p.*
+	$(RM) $(bindir)/sqlr-connection

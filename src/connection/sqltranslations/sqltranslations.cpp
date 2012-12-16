@@ -85,21 +85,21 @@ void sqltranslations::loadTranslation(xmldomnode *translation) {
 	}
 
 	// get the translation name
-	const char	*file=translation->getAttributeValue("file");
-	if (!charstring::length(file)) {
+	const char	*module=translation->getAttributeValue("module");
+	if (!charstring::length(module)) {
 		return;
 	}
 
-	debugPrintf("loading translation: %s\n",file);
+	debugPrintf("loading translation: %s\n",module);
 
 	// load the translation module
 	stringbuffer	modulename;
-	modulename.append(LIBDIR);
-	modulename.append("/libsqlrelay_sqltranslation_");
-	modulename.append(file)->append(".so");
+	modulename.append(LIBEXECDIR);
+	modulename.append("/sqltranslation_");
+	modulename.append(module)->append(".so");
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
-		printf("failed to load translation module: %s\n",file);
+		printf("failed to load translation module: %s\n",module);
 		char	*error=dl->getError();
 		printf("%s\n",error);
 		delete[] error;
@@ -109,12 +109,12 @@ void sqltranslations::loadTranslation(xmldomnode *translation) {
 
 	// load the translation itself
 	stringbuffer	functionname;
-	functionname.append("new_")->append(file);
+	functionname.append("new_")->append(module);
 	sqltranslation *(*newTranslation)(sqltranslations *, xmldomnode *)=
 			(sqltranslation *(*)(sqltranslations *, xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newTranslation) {
-		printf("failed to create translation: %s\n",file);
+		printf("failed to create translation: %s\n",module);
 		char	*error=dl->getError();
 		printf("%s\n",error);
 		delete[] error;

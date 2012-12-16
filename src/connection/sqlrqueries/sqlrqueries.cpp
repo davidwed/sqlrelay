@@ -79,21 +79,21 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 	}
 
 	// get the query name
-	const char	*file=query->getAttributeValue("file");
-	if (!charstring::length(file)) {
+	const char	*module=query->getAttributeValue("module");
+	if (!charstring::length(module)) {
 		return;
 	}
 
-	debugPrintf("loading query: %s\n",file);
+	debugPrintf("loading query: %s\n",module);
 
 	// load the query module
 	stringbuffer	modulename;
-	modulename.append(LIBDIR);
-	modulename.append("/libsqlrelay_sqlrquery_");
-	modulename.append(file)->append(".so");
+	modulename.append(LIBEXECDIR);
+	modulename.append("/sqlrquery_");
+	modulename.append(module)->append(".so");
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
-		printf("failed to load query module: %s\n",file);
+		printf("failed to load query module: %s\n",module);
 		char	*error=dl->getError();
 		printf("%s\n",error);
 		delete[] error;
@@ -103,12 +103,12 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 
 	// load the query itself
 	stringbuffer	functionname;
-	functionname.append("new_")->append(file);
+	functionname.append("new_")->append(module);
 	sqlrquery *(*newQuery)(xmldomnode *)=
 			(sqlrquery *(*)(xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newQuery) {
-		printf("failed to create query: %s\n",file);
+		printf("failed to create query: %s\n",module);
 		char	*error=dl->getError();
 		printf("%s\n",error);
 		delete[] error;

@@ -79,21 +79,21 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 	}
 
 	// get the logger name
-	const char	*file=logger->getAttributeValue("file");
-	if (!charstring::length(file)) {
+	const char	*module=logger->getAttributeValue("module");
+	if (!charstring::length(module)) {
 		return;
 	}
 
-	debugPrintf("loading logger: %s\n",file);
+	debugPrintf("loading logger: %s\n",module);
 
 	// load the logger module
 	stringbuffer	modulename;
-	modulename.append(LIBDIR);
-	modulename.append("/libsqlrelay_sqlrlogger_");
-	modulename.append(file)->append(".so");
+	modulename.append(LIBEXECDIR);
+	modulename.append("/sqlrlogger_");
+	modulename.append(module)->append(".so");
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
-		printf("failed to load logger module: %s\n",file);
+		printf("failed to load logger module: %s\n",module);
 		char	*error=dl->getError();
 		printf("%s\n",error);
 		delete[] error;
@@ -103,12 +103,12 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 
 	// load the logger itself
 	stringbuffer	functionname;
-	functionname.append("new_")->append(file);
+	functionname.append("new_")->append(module);
 	sqlrlogger *(*newLogger)(xmldomnode *)=
 			(sqlrlogger *(*)(xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newLogger) {
-		printf("failed to create logger: %s\n",file);
+		printf("failed to create logger: %s\n",module);
 		char	*error=dl->getError();
 		printf("%s\n",error);
 		delete[] error;

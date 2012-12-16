@@ -92,8 +92,8 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 
 	// load the password encryption module
 	stringbuffer	modulename;
-	modulename.append(LIBDIR);
-	modulename.append("/libsqlrelay_sqlrpwdenc_");
+	modulename.append(LIBEXECDIR);
+	modulename.append("/sqlrpwdenc_");
 	modulename.append(file)->append(".so");
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {

@@ -12,6 +12,7 @@ all:
 	$(MAKE) -C start all
 	$(MAKE) -C cachemanager all
 	$(MAKE) -C scaler all
+	$(MAKE) -C status all
 
 clean:
 	$(MAKE) -C util clean
@@ -23,6 +24,7 @@ clean:
 	$(MAKE) -C start clean
 	$(MAKE) -C cachemanager clean
 	$(MAKE) -C scaler clean
+	$(MAKE) -C status clean
 
 install:
 	$(MAKE) -C util install
@@ -34,6 +36,7 @@ install:
 	$(MAKE) -C start install
 	$(MAKE) -C cachemanager install
 	$(MAKE) -C scaler install
+	$(MAKE) -C status install
 
 uninstall:
 	$(MAKE) -C util uninstall
@@ -45,3 +48,4 @@ uninstall:
 	$(MAKE) -C start uninstall
 	$(MAKE) -C cachemanager uninstall
 	$(MAKE) -C scaler uninstall
+	$(MAKE) -C status uninstall

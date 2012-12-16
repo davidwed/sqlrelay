@@ -1,6 +1,6 @@
-top_builddir = ../../..
+top_builddir = ../..
 
-include ../../../config.mk
+include ../../config.mk
 
 .PHONY: all clean install uninstall
 

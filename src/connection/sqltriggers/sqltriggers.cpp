@@ -99,21 +99,21 @@ void sqltriggers::loadTrigger(xmldomnode *trigger,
 	}
 
 	// get the trigger name
-	const char	*file=trigger->getAttributeValue("file");
-	if (!charstring::length(file)) {
+	const char	*module=trigger->getAttributeValue("module");
+	if (!charstring::length(module)) {
 		return;
 	}
 
-	debugPrintf("loading trigger: %s\n",file);
+	debugPrintf("loading trigger: %s\n",module);
 
 	// load the trigger module
 	stringbuffer	modulename;
-	modulename.append(LIBDIR);
-	modulename.append("/libsqlrelay_sqltrigger_");
-	modulename.append(file)->append(".so");
+	modulename.append(LIBEXECDIR);
+	modulename.append("/sqltrigger_");
+	modulename.append(module)->append(".so");
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
-		printf("failed to load trigger module: %s\n",file);
+		printf("failed to load trigger module: %s\n",module);
 		char	*error=dl->getError();
 		printf("%s\n",error);
 		delete[] error;
@@ -123,12 +123,12 @@ void sqltriggers::loadTrigger(xmldomnode *trigger,
 
 	// load the trigger itself
 	stringbuffer	functionname;
-	functionname.append("new_")->append(file);
+	functionname.append("new_")->append(module);
 	sqltrigger *(*newTrigger)(xmldomnode *)=
 			(sqltrigger *(*)(xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newTrigger) {
-		printf("failed to create trigger: %s\n",file);
+		printf("failed to create trigger: %s\n",module);
 		char	*error=dl->getError();
 		printf("%s\n",error);
 		delete[] error;
