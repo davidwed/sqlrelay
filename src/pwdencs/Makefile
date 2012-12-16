@@ -25,7 +25,7 @@ install:
 	$(LTINSTALL) sqlrpwdenc_rot.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrpwdenc_rot.a
 	$(RM) $(libexecdir)/sqlrpwdenc_rot.la
-	$(MODULERENAME) $(libexecdir)/sqlrpwdenc_rot.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqlrpwdenc_rot.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrpwdenc_*

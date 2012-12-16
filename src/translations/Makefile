@@ -57,39 +57,39 @@ install:
 	$(LTINSTALL) sqltranslation_doublequotestosinglequotes.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_doublequotestosinglequotes.a
 	$(RM) $(libexecdir)/sqltranslation_doublequotestosinglequotes.la
-	$(MODULERENAME) $(libexecdir)/sqltranslation_doublequotestosinglequotes.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqltranslation_doublequotestosinglequotes.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_informixtooracledate.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_informixtooracledate.a
 	$(RM) $(libexecdir)/sqltranslation_informixtooracledate.la
-	$(MODULERENAME) $(libexecdir)/sqltranslation_informixtooracledate.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqltranslation_informixtooracledate.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_locksnowaitbydefault.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_locksnowaitbydefault.a
 	$(RM) $(libexecdir)/sqltranslation_locksnowaitbydefault.la
-	$(MODULERENAME) $(libexecdir)/sqltranslation_locksnowaitbydefault.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqltranslation_locksnowaitbydefault.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_temptablesaddmissingcolumns.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_temptablesaddmissingcolumns.a
 	$(RM) $(libexecdir)/sqltranslation_temptablesaddmissingcolumns.la
-	$(MODULERENAME) $(libexecdir)/sqltranslation_temptablesaddmissingcolumns.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqltranslation_temptablesaddmissingcolumns.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_temptableslocalize.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_temptableslocalize.a
 	$(RM) $(libexecdir)/sqltranslation_temptableslocalize.la
-	$(MODULERENAME) $(libexecdir)/sqltranslation_temptableslocalize.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqltranslation_temptableslocalize.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_translatedatetimes.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.a
 	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.la
-	$(MODULERENAME) $(libexecdir)/sqltranslation_translatedatetimes.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqltranslation_translatedatetimes.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_matchestolike.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_matchestolike.a
 	$(RM) $(libexecdir)/sqltranslation_matchestolike.la
-	$(MODULERENAME) $(libexecdir)/sqltranslation_matchestolike.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqltranslation_matchestolike.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_oracleize.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_oracleize.a
 	$(RM) $(libexecdir)/sqltranslation_oracleize.la
-	$(MODULERENAME) $(libexecdir)/sqltranslation_oraclize.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqltranslation_oraclize.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_serialtoautoincrement.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_serialtoautoincrement.a
 	$(RM) $(libexecdir)/sqltranslation_serialtoautoincrement.la
-	$(MODULERENAME) $(libexecdir)/sqltranslation_serialtoautoincrement.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqltranslation_serialtoautoincrement.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqltranslation_*

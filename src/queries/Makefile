@@ -29,11 +29,11 @@ install:
 	$(LTINSTALL) sqlrquery_sqlrcmdgstat.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrquery_sqlrcmdgstat.a
 	$(RM) $(libexecdir)/sqlrquery_sqlrcmdgstat.la
-	$(MODULERENAME) $(libexecdir)/sqlrquery_sqlrcmdgstat.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqlrquery_sqlrcmdgstat.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqlrquery_sqlrcmdcstat.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrquery_sqlrcmdcstat.a
 	$(RM) $(libexecdir)/sqlrquery_sqlrcmdcstat.la
-	$(MODULERENAME) $(libexecdir)/sqlrquery_sqlrcmdcstat.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqlrquery_sqlrcmdcstat.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrquery_*
