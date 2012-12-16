@@ -13,9 +13,6 @@ ifeq ($(CLIENTUSERPATH),yes)
 endif
 endif
 
-SRCS = scaler.cpp main.cpp
-LOBJS = scaler.lo main.lo
-
 .SUFFIXES: .lo
 
 .cpp.lo:
@@ -29,8 +26,8 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.o
 	$(RMTREE) .libs
 
-sqlr-scaler$(EXE): $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
+sqlr-scaler$(EXE): sqlr-scaler.cpp sqlr-scaler.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-scaler.lo $(LIBS) $(RPATH)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)

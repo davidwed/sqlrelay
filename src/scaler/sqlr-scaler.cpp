@@ -1,12 +1,11 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <config.h>
-#include <defaults.h>
+#include <sqlrconfigfile.h>
+#include <cmdline.h>
+#include <tempdir.h>
 #include <rudiments/commandline.h>
 #include <rudiments/snooze.h>
-#include <scaler.h>
-
 #include <rudiments/permissions.h>
 #include <rudiments/file.h>
 #include <rudiments/passwdentry.h>
@@ -14,8 +13,15 @@
 #include <rudiments/process.h>
 #include <rudiments/datetime.h>
 #include <rudiments/error.h>
-#include <rudiments/process.h>
 #include <rudiments/randomnumber.h>
+#include <rudiments/charstring.h>
+#include <rudiments/daemonprocess.h>
+#include <rudiments/semaphoreset.h>
+#include <rudiments/sharedmemory.h>
+
+#include <config.h>
+#include <defines.h>
+#include <defaults.h>
 
 // for waitpid()
 #include <sys/types.h>
@@ -26,11 +32,72 @@
 	#include <unistd.h>
 #endif
 
-#include <defines.h>
+// for pid_t
+#include <sys/types.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
+
+class scaler : public daemonprocess {
+
+	public:
+			scaler();
+			~scaler();
+		bool	initScaler(int argc, const char **argv);
+		void	loop();
+
+		static	void	shutDown(int32_t signum);
+
+	private:
+		void	cleanUp();
+
+		pid_t	openOneConnection();
+		bool	connectionStarted();
+		void	killConnection(pid_t connpid);
+		bool	openMoreConnections();
+		bool	reapChildren(pid_t connpid);
+		void	getRandomConnectionId();
+		bool	availableDatabase();
+
+		uint32_t	getConnectedClientCount();
+		uint32_t	getConnectionCount();
+		void		incrementConnectionCount();
+		void		decrementConnectionCount();
+
+		char		*pidfile;
+
+		const char	*id;
+		char		*config;
+		const char	*dbase;
+
+		sqlrconfigfile	*cfgfile;
+
+		uint32_t	maxconnections;
+		uint32_t	maxqueuelength;
+		uint32_t	growby;
+		int32_t		ttl;
+
+		semaphoreset	*semset;
+
+		sharedmemory	*idmemory;
+		shmdata		*shm;
+
+		linkedlist< connectstringcontainer * > *connectstringlist;
+		const char	*connectionid;
+		int32_t		metrictotal;
+
+		int		currentseed;
+
+		bool		init;
+
+		bool		debug;
+
+		tempdir		*tmpdir;
+		cmdline		*cmdl;
+
+		static	bool	shutdown;
+};
 
 bool	scaler::shutdown=false;
 
@@ -667,4 +734,16 @@ void scaler::decrementConnectionCount() {
 
 void scaler::loop() {
 	while (openMoreConnections()) {}
+}
+
+int main(int argc, const char **argv) {
+
+	#include <version.h>
+	{
+		scaler	s;
+		if (s.initScaler(argc,argv)) {
+			s.loop();
+		}
+	}
+	process::exit(1);
 }
