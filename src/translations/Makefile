@@ -4,13 +4,10 @@ include ../../config.mk
 
 .PHONY: all clean install uninstall
 
-CPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/connection -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) $(SIDINCLUDES) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPFLAG) -DSERVER_VERSION=\"$(SQLR_VERSION)\" -DLIBEXECDIR=\"$(libexecdir)\"
-LIBS = -L$(top_builddir)/src/util -lsqlrutil $(SIDLIBS) $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
-
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/connection -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -c $< -o $@
 
 all: sqltranslation_doublequotestosinglequotes.la \
 	sqltranslation_informixtooracledate.la \
@@ -27,31 +24,31 @@ clean:
 	$(RMTREE) .libs
 
 sqltranslation_doublequotestosinglequotes.la: doublequotestosinglequotes.cpp doublequotestosinglequotes.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ doublequotestosinglequotes.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ doublequotestosinglequotes.lo $(LDFLAGS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_informixtooracledate.la: informixtooracledate.cpp informixtooracledate.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ informixtooracledate.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ informixtooracledate.lo $(LDFLAGS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_locksnowaitbydefault.la: locksnowaitbydefault.cpp locksnowaitbydefault.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ locksnowaitbydefault.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ locksnowaitbydefault.lo $(LDFLAGS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_temptablesaddmissingcolumns.la: temptablesaddmissingcolumns.cpp temptablesaddmissingcolumns.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ temptablesaddmissingcolumns.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ temptablesaddmissingcolumns.lo $(LDFLAGS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_temptableslocalize.la: temptableslocalize.cpp temptableslocalize.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ temptableslocalize.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ temptableslocalize.lo $(LDFLAGS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_translatedatetimes.la: translatedatetimes.cpp translatedatetimes.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ translatedatetimes.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ translatedatetimes.lo $(LDFLAGS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_matchestolike.la: matchestolike.cpp matchestolike.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ matchestolike.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ matchestolike.lo $(LDFLAGS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_oracleize.la: oracleize.cpp oracleize.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ oracleize.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ oracleize.lo $(LDFLAGS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_serialtoautoincrement.la: serialtoautoincrement.cpp serialtoautoincrement.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ serialtoautoincrement.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ serialtoautoincrement.lo $(LDFLAGS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
 	$(MKINSTALLDIRS) $(libexecdir)

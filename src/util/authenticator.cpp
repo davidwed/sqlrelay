@@ -47,7 +47,6 @@ authenticator::~authenticator() {
 	delete[] users;
 	delete[] passwords;
 	delete[] passwordencryptions;
-	delete sqlrpe;
 }
 
 bool authenticator::authenticate(const char *user, const char *password) {

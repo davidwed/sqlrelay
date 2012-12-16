@@ -4,13 +4,10 @@ include ../../config.mk
 
 .PHONY: all clean install uninstall
 
-CPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I$(top_builddir)/ -I$(top_builddir)/src/connection -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) $(SIDINCLUDES) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPFLAG) -DSERVER_VERSION=\"$(SQLR_VERSION)\" -DLIBEXECDIR=\"$(libexecdir)\"
-LIBS = -L$(top_builddir)/src/util -lsqlrutil $(SIDLIBS) $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
-
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) -I$(top_builddir)/ -I$(top_builddir)/src/connection -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -c $< -o $@
 
 all: sqltrigger_createtableautoincrementoracle.la \
 	sqltrigger_droptableautoincrementoracle.la \
@@ -21,13 +18,13 @@ clean:
 	$(RMTREE) .libs
 
 sqltrigger_createtableautoincrementoracle.la: createtableautoincrementoracle.cpp createtableautoincrementoracle.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ createtableautoincrementoracle.lo $(LDFLAGS) $(TRIGGERPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ createtableautoincrementoracle.lo $(LDFLAGS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltrigger_droptableautoincrementoracle.la: droptableautoincrementoracle.cpp droptableautoincrementoracle.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ droptableautoincrementoracle.lo $(LDFLAGS) $(TRIGGERPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ droptableautoincrementoracle.lo $(LDFLAGS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltrigger_droplocalizedtemptables.la: droplocalizedtemptables.cpp droplocalizedtemptables.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ droplocalizedtemptables.lo $(LDFLAGS) $(TRIGGERPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ droplocalizedtemptables.lo $(LDFLAGS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
 	$(MKINSTALLDIRS) $(libexecdir)

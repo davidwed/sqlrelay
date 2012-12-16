@@ -4,13 +4,10 @@ include ../../config.mk
 
 .PHONY: all clean install uninstall
 
-CPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(TMPDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/util -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
-LIBS = $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
-
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) -I$(top_builddir)/ -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -c $< -o $@
 
 all: sqlrpwdenc_rot.la
 

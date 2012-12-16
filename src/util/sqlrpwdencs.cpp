@@ -6,6 +6,7 @@
 #include <debugprint.h>
 
 #include <rudiments/xmldomnode.h>
+#include <rudiments/process.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
