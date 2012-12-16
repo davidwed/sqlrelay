@@ -34,6 +34,7 @@ install:
 	$(LTINSTALL) sqlrconnection_firebird.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_firebird.a
 	$(RM) $(libexecdir)/sqlrconnection_firebird.la
+	$(MODULERENAME) $(libexecdir)/sqlrconnection_firebird.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_firebird.*

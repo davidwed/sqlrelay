@@ -391,6 +391,9 @@
 /* Some versions of sqlite are transactional */
 #undef SQLITE_TRANSACTIONAL
 
+/* Suffix for loadable modules */
+#undef SQLRELAY_MODULESUFFIX
+
 /* Compiler supports namespaces */
 #undef SQLRELAY_NAMESPACE
 

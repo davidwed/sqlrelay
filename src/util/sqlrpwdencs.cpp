@@ -8,6 +8,8 @@
 #include <rudiments/xmldomnode.h>
 #include <rudiments/process.h>
 
+#include <config.h>
+
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
@@ -95,7 +97,7 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 	stringbuffer	modulename;
 	modulename.append(LIBEXECDIR);
 	modulename.append("/sqlrpwdenc_");
-	modulename.append(module)->append(".so");
+	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
 		printf("failed to load password encryption module: %s\n",

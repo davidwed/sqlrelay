@@ -43,7 +43,6 @@ install:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libpqsqlrelay.la $(libdir)
 	$(RM) $(libdir)/libpqsqlrelay.a
-	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libpqsqlrelay.la

@@ -46,7 +46,6 @@ WERROR = @WERROR@
 
 # libtool command
 LIBTOOL = @LIBTOOL@
-#LIBTOOLGCC = @LIBTOOLGCC@
 LIBTOOLGCC = @LIBTOOL@
 
 # install command
@@ -260,3 +259,8 @@ LIBEFENCE = @LIBEFENCE@
 
 # Microsoft-specific stuff
 EXE = @EXE@
+
+# Shared object and module stuff
+SOSUFFIX = @SOSUFFIX@
+MODULESUFFIX = @MODULESUFFIX@
+MODULERENAME = $(top_builddir)/modulerename.sh

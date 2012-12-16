@@ -715,6 +715,8 @@ PS
 TRANSLATIONPLUGINLIBS
 TRIGGERPLUGINLIBS
 PYTHONFRAMEWORK
+MODULESUFFIX
+SOSUFFIX
 MICROSOFT
 EXE
 UWIN
@@ -14991,16 +14993,26 @@ esac
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for dynamic library extension" >&5
 $as_echo_n "checking for dynamic library extension... " >&6; }
 SOSUFFIX="so"
+MODULESUFFIX="so"
 if ( test -n "$CYGWIN" )
 then
 	SOSUFFIX="dll.a"
+	MODULESUFFIX="dll"
 fi
 if ( test -n "$DARWIN" )
 then
 	SOSUFFIX="dylib"
+	MODULESUFFIX="bundle"
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $SOSUFFIX" >&5
-$as_echo "$SOSUFFIX" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $SOSUFFIX and $MODULESUFFIX" >&5
+$as_echo "$SOSUFFIX and $MODULESUFFIX" >&6; }
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define SQLRELAY_MODULESUFFIX "$MODULESUFFIX"
+_ACEOF
+
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for plugin dependencies" >&5

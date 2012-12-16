@@ -37,7 +37,6 @@ install:
 	$(LTINSTALL) libsqlrodbc.la $(libdir)
 	$(RM) $(libdir)/libsqlrodbc.a
 	$(RM) $(libdir)/libsqlrodbc.la
-	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:
 	$(RM) $(libdir)/libsqlrodbc*

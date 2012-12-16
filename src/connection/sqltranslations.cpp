@@ -10,6 +10,8 @@
 #include <rudiments/process.h>
 #include <rudiments/character.h>
 
+#include <config.h>
+
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
@@ -96,7 +98,7 @@ void sqltranslations::loadTranslation(xmldomnode *translation) {
 	stringbuffer	modulename;
 	modulename.append(LIBEXECDIR);
 	modulename.append("/sqltranslation_");
-	modulename.append(module)->append(".so");
+	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
 		printf("failed to load translation module: %s\n",module);

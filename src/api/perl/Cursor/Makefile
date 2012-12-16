@@ -95,8 +95,8 @@ install:
 	$(LTINSTALL) -m 755 Cursor.la $(PERLSITEARCH)/auto/SQLRelay/Cursor
 	$(RM) $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.a
 	$(RM) $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.la
+	$(MODULERENAME) $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
 	touch $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs
-	$(RM) Cursor.so
 ifneq ($(POD2MAN),)
 ifneq ($(PERLINSTALLMAN3DIR),)
 	$(POD2MAN) Cursor.pm > SQLRelay::Cursor.$(PERLMAN3EXT)
@@ -106,7 +106,7 @@ ifneq ($(PERLINSTALLMAN3DIR),)
 	echo $(PERLINSTALLMAN3DIR)/SQLRelay::Cursor.$(PERLMAN3EXT) > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
 endif
 endif
-	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.so > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
+	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.$(MODULESUFFIX) > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
 	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs >> $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
 
 uninstall:

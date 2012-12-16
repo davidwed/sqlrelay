@@ -8,6 +8,8 @@
 
 #include <rudiments/xmldomnode.h>
 
+#include <config.h>
+
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
@@ -110,7 +112,7 @@ void sqltriggers::loadTrigger(xmldomnode *trigger,
 	stringbuffer	modulename;
 	modulename.append(LIBEXECDIR);
 	modulename.append("/sqltrigger_");
-	modulename.append(module)->append(".so");
+	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
 		printf("failed to load trigger module: %s\n",module);

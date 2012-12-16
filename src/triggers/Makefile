@@ -33,13 +33,15 @@ install:
 	$(LTINSTALL) sqltrigger_createtableautoincrementoracle.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltrigger_createtableautoincrementoracle.a
 	$(RM) $(libexecdir)/sqltrigger_createtableautoincrementoracle.la
+	$(MODULERENAME) $(libexecdir)/sqltrigger_createtableautoincrementoracle.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
 	$(LTINSTALL) sqltrigger_droptableautoincrementoracle.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltrigger_droptableautoincrementoracle.a
 	$(RM) $(libexecdir)/sqltrigger_droptableautoincrementoracle.la
+	$(MODULERENAME) $(libexecdir)/sqltrigger_droptableautoincrementoracle.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
 	$(LTINSTALL) sqltrigger_droplocalizedtemptables.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltrigger_droplocalizedtemptables.a
 	$(RM) $(libexecdir)/sqltrigger_droplocalizedtemptables.la
-	$(LIBTOOL) --mode=finish $(libexecdir)
+	$(MODULERENAME) $(libexecdir)/sqltrigger_droplocalizedtemptables.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqltrigger_*

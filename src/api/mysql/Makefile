@@ -75,7 +75,6 @@ install:
 	$(LTINSTALL) libmysql51sqlrelay.la $(libdir)
 	$(RM) $(libdir)/libmysql51sqlrelay.a
 	$(RM) $(libdir)/libmysql51sqlrelay.la
-	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:
 	$(RM) $(EXAMPLEDIR)/sample-oracle-mysql-errors.map

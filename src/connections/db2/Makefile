@@ -34,6 +34,7 @@ install:
 	$(LTINSTALL) sqlrconnection_db2.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_db2.a
 	$(RM) $(libexecdir)/sqlrconnection_db2.la
+	$(MODULERENAME) $(libexecdir)/sqlrconnection_db2.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_db2.*

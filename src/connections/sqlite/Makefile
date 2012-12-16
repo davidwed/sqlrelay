@@ -34,6 +34,7 @@ install:
 	$(LTINSTALL) sqlrconnection_sqlite.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_sqlite.a
 	$(RM) $(libexecdir)/sqlrconnection_sqlite.la
+	$(MODULERENAME) $(libexecdir)/sqlrconnection_sqlite.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_sqlite.*

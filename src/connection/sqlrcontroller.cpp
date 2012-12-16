@@ -404,7 +404,7 @@ sqlrconnection_svr *sqlrcontroller_svr::initConnection(const char *dbase) {
 	stringbuffer	modulename;
 	modulename.append(LIBEXECDIR);
 	modulename.append("/sqlrconnection_");
-	modulename.append(dbase)->append(".so");
+	modulename.append(dbase)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	if (!dl.open(modulename.getString(),true,true)) {
 		fprintf(stderr,"failed to load connection module: %s\n",
 							modulename.getString());

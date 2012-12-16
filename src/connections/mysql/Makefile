@@ -34,6 +34,7 @@ install:
 	$(LTINSTALL) sqlrconnection_mysql.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_mysql.a
 	$(RM) $(libexecdir)/sqlrconnection_mysql.la
+	$(MODULERENAME) $(libexecdir)/sqlrconnection_mysql.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_mysql.*

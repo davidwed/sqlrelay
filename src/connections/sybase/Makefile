@@ -34,6 +34,7 @@ install:
 	$(LTINSTALL) sqlrconnection_sybase.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_sybase.a
 	$(RM) $(libexecdir)/sqlrconnection_sybase.la
+	$(MODULERENAME) $(libexecdir)/sqlrconnection_sybase.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_sybase.*

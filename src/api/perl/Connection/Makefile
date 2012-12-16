@@ -95,6 +95,7 @@ install:
 	$(LTINSTALL) -m 755 Connection.la $(PERLSITEARCH)/auto/SQLRelay/Connection
 	$(RM) $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.a
 	$(RM) $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.la
+	$(MODULERENAME) $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
 	touch $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs
 ifneq ($(POD2MAN),)
 ifneq ($(PERLINSTALLMAN3DIR),)
@@ -105,7 +106,7 @@ ifneq ($(PERLINSTALLMAN3DIR),)
 	echo $(PERLINSTALLMAN3DIR)/SQLRelay::Connection.$(PERLMAN3EXT) > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
 endif
 endif
-	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.so > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
+	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.$(MODULESUFFIX) > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
 	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs >> $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
 
 uninstall:

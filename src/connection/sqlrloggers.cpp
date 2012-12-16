@@ -8,6 +8,8 @@
 
 #include <rudiments/xmldomnode.h>
 
+#include <config.h>
+
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
@@ -90,7 +92,7 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 	stringbuffer	modulename;
 	modulename.append(LIBEXECDIR);
 	modulename.append("/sqlrlogger_");
-	modulename.append(module)->append(".so");
+	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
 		printf("failed to load logger module: %s\n",module);

@@ -29,10 +29,10 @@ install:
 	$(LTINSTALL) sqlrlogger_slowqueries.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrlogger_slowqueries.a
 	$(RM) $(libexecdir)/sqlrlogger_slowqueries.la
+	$(MODULERENAME) $(libexecdir)/sqlrlogger_slowqueries.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
 	$(LTINSTALL) sqlrlogger_custom_nw.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrlogger_custom_nw.a
 	$(RM) $(libexecdir)/sqlrlogger_custom_nw.la
-	$(LIBTOOL) --mode=finish $(libexecdir)
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrlogger_*

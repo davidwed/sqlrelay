@@ -475,15 +475,21 @@ AC_DEFUN([FW_CHECK_SO_EXT],
 [
 AC_MSG_CHECKING(for dynamic library extension)
 SOSUFFIX="so"
+MODULESUFFIX="so"
 if ( test -n "$CYGWIN" )
 then
 	SOSUFFIX="dll.a"
+	MODULESUFFIX="dll"
 fi
 if ( test -n "$DARWIN" )
 then
 	SOSUFFIX="dylib"
+	MODULESUFFIX="bundle"
 fi
-AC_MSG_RESULT($SOSUFFIX)
+AC_MSG_RESULT($SOSUFFIX and $MODULESUFFIX)
+AC_SUBST(SOSUFFIX)
+AC_SUBST(MODULESUFFIX)
+AC_DEFINE_UNQUOTED(SQLRELAY_MODULESUFFIX,"$MODULESUFFIX",Suffix for loadable modules)
 ])
 
 dnl Determines what extension shared object files have

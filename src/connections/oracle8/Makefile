@@ -34,6 +34,7 @@ install:
 	$(LTINSTALL) sqlrconnection_oracle8.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_oracle8.a
 	$(RM) $(libexecdir)/sqlrconnection_oracle8.la
+	$(MODULERENAME) $(libexecdir)/sqlrconnection_oracle8.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_oracle8.*
