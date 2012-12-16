@@ -78,8 +78,8 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 	}
 
 	// get the password encryption name
-	const char	*file=pwdenc->getAttributeValue("file");
-	if (!charstring::length(file)) {
+	const char	*module=pwdenc->getAttributeValue("module");
+	if (!charstring::length(module)) {
 		return;
 	}
 
@@ -88,16 +88,17 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 		return;
 	}
 
-	debugPrintf("loading password encryption: %s\n",file);
+	debugPrintf("loading password encryption: %s\n",module);
 
 	// load the password encryption module
 	stringbuffer	modulename;
 	modulename.append(LIBEXECDIR);
 	modulename.append("/sqlrpwdenc_");
-	modulename.append(file)->append(".so");
+	modulename.append(module)->append(".so");
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
-		printf("failed to load password encryption module: %s\n",file);
+		printf("failed to load password encryption module: %s\n",
+								module);
 		char	*error=dl->getError();
 		printf("%s\n",error);
 		delete[] error;
@@ -107,12 +108,12 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 
 	// load the password encryption itself
 	stringbuffer	functionname;
-	functionname.append("new_")->append(file);
+	functionname.append("new_")->append(module);
 	sqlrpwdenc *(*newPasswordEncryption)(xmldomnode *)=
 			(sqlrpwdenc *(*)(xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newPasswordEncryption) {
-		printf("failed to create password encryption: %s\n",file);
+		printf("failed to create password encryption: %s\n",module);
 		char	*error=dl->getError();
 		printf("%s\n",error);
 		delete[] error;
