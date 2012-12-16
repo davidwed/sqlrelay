@@ -20,14 +20,14 @@ endif
 
 all:
 	cp phpincludes1.h phpincludes.h; \
-	$(MAKE) libsql_relay.la 2> errors1; \
-	if ( test ! -r libsql_relay.la ); then \
+	$(MAKE) sql_relay.la 2> errors1; \
+	if ( test ! -r sql_relay.la ); then \
 		cp phpincludes2.h phpincludes.h; \
-		$(MAKE) libsql_relay.la 2> errors2; \
-		if ( test ! -r libsql_relay.la ); then \
+		$(MAKE) sql_relay.la 2> errors2; \
+		if ( test ! -r sql_relay.la ); then \
 			cp phpincludes3.h phpincludes.h; \
-			$(MAKE) libsql_relay.la 2> errors3; \
-			if ( test ! -r libsql_relay.la ); then \
+			$(MAKE) sql_relay.la 2> errors3; \
+			if ( test ! -r sql_relay.la ); then \
 				if ( test -s errors1 ); then \
 					echo "first try errors : "; cat errors1; echo; \
 				fi; \
@@ -55,47 +55,14 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o *.so phpincludes.h errors1 errors2 errors3
 	$(RMTREE) .libs
 
-libsql_relay.la: sql_relay.cpp sql_relay.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sql_relay.lo $(LDFLAGS) $(LIBS) -rpath $(PHPEXTDIR) $(RPATH) -module
+sql_relay.la: sql_relay.cpp sql_relay.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sql_relay.lo $(LDFLAGS) $(LIBS) -rpath $(PHPEXTDIR) $(RPATH) -avoid-version -module -no-undefined
 
-sql_relay.so:
-	if ( test -r .libs/libsql_relay.0.0.0 ); \
-	then \
-		cp .libs/libsql_relay.0.0.0 sql_relay.so; \
-	fi
-	if ( test -r .libs/libsql_relay.0.0 ); \
-	then \
-		cp .libs/libsql_relay.0.0 sql_relay.so; \
-	fi
-	if ( test -r .libs/libsql_relay.0 ); \
-	then \
-		cp .libs/libsql_relay.0 sql_relay.so; \
-	fi
-	if ( test -r .libs/libsql_relay ); \
-	then \
-		cp .libs/libsql_relay sql_relay.so; \
-	fi
-	if ( test -r .libs/libsql_relay.so.0.0.0 ); \
-	then \
-		cp .libs/libsql_relay.so.0.0.0 sql_relay.so; \
-	fi
-	if ( test -r .libs/libsql_relay.so.0.0 ); \
-	then \
-		cp .libs/libsql_relay.so.0.0 sql_relay.so; \
-	fi
-	if ( test -r .libs/libsql_relay.so.0 ); \
-	then \
-		cp .libs/libsql_relay.so.0 sql_relay.so; \
-	fi
-	if ( test -r .libs/libsql_relay.so ); \
-	then \
-		cp .libs/libsql_relay.so sql_relay.so; \
-	fi
-
-install: sql_relay.so
+install: sql_relay.la
 	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
-	$(LTINSTALL) sql_relay.so $(DESTDIR)$(PHPEXTDIR)
-	$(RM) sql_relay.so
+	$(LTINSTALL) sql_relay.la $(DESTDIR)$(PHPEXTDIR)
+	$(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.la
+	$(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.a
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.so
+	$(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.so

@@ -16,7 +16,7 @@ endif
 SRCS = sqlrelayCmd.cpp
 LOBJS = sqlrelayCmd.lo
 
-all: libsqlrelay.la
+all: sqlrelay.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o *.so
@@ -27,62 +27,15 @@ clean:
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-libsqlrelay.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(TCLLIBSPATH)/sqlrelay $(RPATH) -module -no-undefined
+sqlrelay.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(TCLLIBSPATH)/sqlrelay $(RPATH) -avoid-version -module -no-undefined
 
-sqlrelay.so:
-	if ( test -r .libs/libsqlrelay.0.0.0 ); \
-	then \
-		cp .libs/libsqlrelay.0.0.0 sqlrelay.so; \
-	fi
-	if ( test -r .libs/libsqlrelay.0.0 ); \
-	then \
-		cp .libs/libsqlrelay.0.0 sqlrelay.so; \
-	fi
-	if ( test -r .libs/libsqlrelay.0 ); \
-	then \
-		cp .libs/libsqlrelay.0 sqlrelay.so; \
-	fi
-	if ( test -r .libs/libsqlrelay ); \
-	then \
-		cp .libs/libsqlrelay sqlrelay.so; \
-	fi
-	if ( test -r .libs/libsqlrelay.so.0.0.0 ); \
-	then \
-		cp .libs/libsqlrelay.so.0.0.0 sqlrelay.so; \
-	fi
-	if ( test -r .libs/libsqlrelay.so.0.0 ); \
-	then \
-		cp .libs/libsqlrelay.so.0.0 sqlrelay.so; \
-	fi
-	if ( test -r .libs/libsqlrelay.so.0 ); \
-	then \
-		cp .libs/libsqlrelay.so.0 sqlrelay.so; \
-	fi
-	if ( test -r .libs/libsqlrelay.so ); \
-	then \
-		cp .libs/libsqlrelay.so sqlrelay.so; \
-	fi
-
-sqlrelay.dll:
-	if ( test -r .libs/cygsqlrelay-0.dll ); \
-	then \
-		cp .libs/cygsqlrelay-0.dll sqlrelay.dll; \
-	fi
-
-ifeq ($(CYGWIN),)
-install: sqlrelay.so
+install: sqlrelay.la
 	$(MKINSTALLDIRS) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
-	$(LTINSTALL) sqlrelay.so $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(LTINSTALL) sqlrelay.la $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(RM) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay/sqlrelay.la
+	$(RM) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay/sqlrelay.a
 	$(INSTALL) -m 644 pkgIndex.tcl $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
-	$(RM) sqlrelay.so
-else
-install: sqlrelay.dll
-	$(MKINSTALLDIRS) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
-	$(LTINSTALL) sqlrelay.dll $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
-	$(INSTALL) -m 644 pkgIndex.tcl $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
-	$(RM) sqlrelay.dll
-endif
 
 uninstall:
 	$(RMTREE) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay

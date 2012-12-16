@@ -79,63 +79,23 @@ endif
 	$(RM) errors1 errors2 errors3 errors4 perlincludes.h
 
 
-all: libConnection.la
+all: Connection.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.cpp *.la *.lo* *.o *.so *.$(PERLMAN3EXT) errors* perlincludes.h
 	$(RMTREE) .libs
 
-libConnection.la: Connection.xs Connection.cpp Connection.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ Connection.lo $(LDFLAGS) $(LIBS) -rpath $(PERLSITEARCH)/auto/SQLRelay/Connection $(RPATH) -module -no-undefined
+Connection.la: Connection.xs Connection.cpp Connection.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ Connection.lo $(LDFLAGS) $(LIBS) -rpath $(PERLSITEARCH)/auto/SQLRelay/Connection $(RPATH) -avoid-version -module -no-undefined
 
-Connection.so:
-	if ( test -r .libs/libConnection.0.0.0 ); \
-	then \
-		cp .libs/libConnection.0.0.0 Connection.so; \
-	fi
-	if ( test -r .libs/libConnection.0.0 ); \
-	then \
-		cp .libs/libConnection.0.0 Connection.so; \
-	fi
-	if ( test -r .libs/libConnection.0 ); \
-	then \
-		cp .libs/libConnection.0 Connection.so; \
-	fi
-	if ( test -r .libs/libConnection ); \
-	then \
-		cp .libs/libConnection Connection.so; \
-	fi
-	if ( test -r .libs/libConnection.so.0.0.0 ); \
-	then \
-		cp .libs/libConnection.so.0.0.0 Connection.so; \
-	fi
-	if ( test -r .libs/libConnection.so.0.0 ); \
-	then \
-		cp .libs/libConnection.so.0.0 Connection.so; \
-	fi
-	if ( test -r .libs/libConnection.so.0 ); \
-	then \
-		cp .libs/libConnection.so.0 Connection.so; \
-	fi
-	if ( test -r .libs/libConnection.so ); \
-	then \
-		cp .libs/libConnection.so Connection.so; \
-	fi
-
-Connection.dll:
-	if ( test -r .libs/cygConnection-0.dll ); \
-	then \
-		cp .libs/cygConnection-0.dll Connection.dll; \
-	fi
-
-ifeq ($(CYGWIN),)
-install: Connection.so
+install:
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/SQLRelay
 	$(INSTALL) -m 644 Connection.pm $(PERLSITEARCH)/SQLRelay
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/SQLRelay/Connection
-	$(LTINSTALL) -m 755 Connection.so $(PERLSITEARCH)/auto/SQLRelay/Connection
+	$(LTINSTALL) -m 755 Connection.la $(PERLSITEARCH)/auto/SQLRelay/Connection
+	$(RM) $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.a
+	$(RM) $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.la
 	touch $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs
-	$(RM) Connection.so
 ifneq ($(POD2MAN),)
 ifneq ($(PERLINSTALLMAN3DIR),)
 	$(POD2MAN) Connection.pm > SQLRelay::Connection.$(PERLMAN3EXT)
@@ -146,18 +106,7 @@ ifneq ($(PERLINSTALLMAN3DIR),)
 endif
 endif
 	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.so > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
-	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
-else
-install: Connection.dll
-	$(MKINSTALLDIRS) $(PERLSITEARCH)/SQLRelay
-	$(INSTALL) -m 644 Connection.pm $(PERLSITEARCH)/SQLRelay
-	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/SQLRelay/Connection
-	$(LTINSTALL) -m 755 Connection.dll $(PERLSITEARCH)/auto/SQLRelay/Connection
-	touch $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs
-	$(RM) Connection.dll
-	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.dll > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
-	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
-endif
+	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs >> $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
 
 uninstall:
 	$(RM) `cat $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist`

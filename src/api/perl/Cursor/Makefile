@@ -79,61 +79,22 @@ endif
 	$(RM) errors1 errors2 errors3 errors4 perlincludes.h
 
 
-all: libCursor.la
+all: Cursor.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.cpp *.la *.lo* *.o *.so *.$(PERLMAN3EXT) errors* perlincludes.h
 	$(RMTREE) .libs
 
-libCursor.la: Cursor.xs Cursor.cpp Cursor.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ Cursor.lo $(LDFLAGS) $(LIBS) -rpath $(PERLSITEARCH)/auto/SQLRelay/Cursor $(RPATH) -module -no-undefined
+Cursor.la: Cursor.xs Cursor.cpp Cursor.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ Cursor.lo $(LDFLAGS) $(LIBS) -rpath $(PERLSITEARCH)/auto/SQLRelay/Cursor $(RPATH) -avoid-version -module -no-undefined
 
-Cursor.so:
-	if ( test -r .libs/libCursor.0.0.0 ); \
-	then \
-		cp .libs/libCursor.0.0.0 Cursor.so; \
-	fi
-	if ( test -r .libs/libCursor.0.0 ); \
-	then \
-		cp .libs/libCursor.0.0 Cursor.so; \
-	fi
-	if ( test -r .libs/libCursor.0 ); \
-	then \
-		cp .libs/libCursor.0 Cursor.so; \
-	fi
-	if ( test -r .libs/libCursor ); \
-	then \
-		cp .libs/libCursor Cursor.so; \
-	fi
-	if ( test -r .libs/libCursor.so.0.0.0 ); \
-	then \
-		cp .libs/libCursor.so.0.0.0 Cursor.so; \
-	fi
-	if ( test -r .libs/libCursor.so.0.0 ); \
-	then \
-		cp .libs/libCursor.so.0.0 Cursor.so; \
-	fi
-	if ( test -r .libs/libCursor.so.0 ); \
-	then \
-		cp .libs/libCursor.so.0 Cursor.so; \
-	fi
-	if ( test -r .libs/libCursor.so ); \
-	then \
-		cp .libs/libCursor.so Cursor.so; \
-	fi
-
-Cursor.dll:
-	if ( test -r .libs/cygCursor-0.dll ); \
-	then \
-		cp .libs/cygCursor-0.dll Cursor.dll; \
-	fi
-
-ifeq ($(CYGWIN),)
-install: Cursor.so
+install:
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/SQLRelay
 	$(INSTALL) -m 644 Cursor.pm $(PERLSITEARCH)/SQLRelay
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/SQLRelay/Cursor
-	$(LTINSTALL) -m 755 Cursor.so $(PERLSITEARCH)/auto/SQLRelay/Cursor
+	$(LTINSTALL) -m 755 Cursor.la $(PERLSITEARCH)/auto/SQLRelay/Cursor
+	$(RM) $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.a
+	$(RM) $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.la
 	touch $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs
 	$(RM) Cursor.so
 ifneq ($(POD2MAN),)
@@ -146,18 +107,7 @@ ifneq ($(PERLINSTALLMAN3DIR),)
 endif
 endif
 	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.so > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
-	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
-else
-install: Cursor.dll
-	$(MKINSTALLDIRS) $(PERLSITEARCH)/SQLRelay
-	$(INSTALL) -m 644 Cursor.pm $(PERLSITEARCH)/SQLRelay
-	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/SQLRelay/Cursor
-	$(LTINSTALL) -m 755 Cursor.dll $(PERLSITEARCH)/auto/SQLRelay/Cursor
-	touch $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs
-	$(RM) Cursor.dll
-	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.dll > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
-	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
-endif
+	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs >> $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
 
 uninstall:
 	$(RM) `cat $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist`

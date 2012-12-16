@@ -62,20 +62,21 @@ install:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libmysql3sqlrelay.la $(libdir)
 	$(RM) $(libdir)/libmysql3sqlrelay.a
+	$(RM) $(libdir)/libmysql3sqlrelay.la
 	$(LTINSTALL) libmysql40sqlrelay.la $(libdir)
 	$(RM) $(libdir)/libmysql40sqlrelay.a
+	$(RM) $(libdir)/libmysql40sqlrelay.la
 	$(LTINSTALL) libmysql41sqlrelay.la $(libdir)
 	$(RM) $(libdir)/libmysql41sqlrelay.a
+	$(RM) $(libdir)/libmysql41sqlrelay.la
 	$(LTINSTALL) libmysql50sqlrelay.la $(libdir)
 	$(RM) $(libdir)/libmysql50sqlrelay.a
+	$(RM) $(libdir)/libmysql50sqlrelay.la
 	$(LTINSTALL) libmysql51sqlrelay.la $(libdir)
 	$(RM) $(libdir)/libmysql51sqlrelay.a
+	$(RM) $(libdir)/libmysql51sqlrelay.la
 	$(LIBTOOL) --mode=finish $(libdir)
 
 uninstall:
 	$(RM) $(EXAMPLEDIR)/sample-oracle-mysql-errors.map
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libmysql3sqlrelay.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libmysql40sqlrelay.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libmysql41sqlrelay.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libmysql50sqlrelay.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libmysql51sqlrelay.la
+	$(RM) $(libdir)/libmysql*sqlrelay*

@@ -55,81 +55,26 @@ LOBJS = sqlrelay.lo
 	$(RM) errors1 errors2 rubyincludes.h
 
 
-all: libsqlrelay.la
+all: sqlrelay.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o *.so
 	$(RMTREE) .libs
 
-libsqlrelay.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(RUBYDIR)/site-packages/SQLRelay $(RPATH) -module -no-undefined
+sqlrelay.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(RUBYSITEARCHDIR) $(RPATH) -avoid-version -module -no-undefined
 
-sqlrelay.so:
-	if ( test -r .libs/libsqlrelay.0.0.0 ); \
-	then \
-		cp .libs/libsqlrelay.0.0.0 sqlrelay.so; \
-	fi
-	if ( test -r .libs/libsqlrelay.0.0 ); \
-	then \
-		cp .libs/libsqlrelay.0.0 sqlrelay.so; \
-	fi
-	if ( test -r .libs/libsqlrelay.0 ); \
-	then \
-		cp .libs/libsqlrelay.0 sqlrelay.so; \
-	fi
-	if ( test -r .libs/libsqlrelay ); \
-	then \
-		cp .libs/libsqlrelay sqlrelay.so; \
-	fi
-	if ( test -r .libs/libsqlrelay.so.0.0.0 ); \
-	then \
-		cp .libs/libsqlrelay.so.0.0.0 sqlrelay.so; \
-	fi
-	if ( test -r .libs/libsqlrelay.so.0.0 ); \
-	then \
-		cp .libs/libsqlrelay.so.0.0 sqlrelay.so; \
-	fi
-	if ( test -r .libs/libsqlrelay.so.0 ); \
-	then \
-		cp .libs/libsqlrelay.so.0 sqlrelay.so; \
-	fi
-	if ( test -r .libs/libsqlrelay.so ); \
-	then \
-		cp .libs/libsqlrelay.so sqlrelay.so; \
-	fi
-
-sqlrelay.dll:
-	if ( test -r .libs/cygsqlrelay-0.dll ); \
-	then \
-		cp .libs/cygsqlrelay-0.dll sqlrelay.dll; \
-	fi
-
-ifeq ($(CYGWIN),)
-install: sqlrelay.so
+install: sqlrelay.la
 	$(MKINSTALLDIRS) $(DESTDIR)$(RUBYSITEARCHDIR)
-	$(LTINSTALL) sqlrelay.so $(DESTDIR)$(RUBYSITEARCHDIR)
+	$(LTINSTALL) sqlrelay.la $(DESTDIR)$(RUBYSITEARCHDIR)
+	$(RM) $(DESTDIR)$(RUBYSITEARCHDIR)/sqlrelay.la
+	$(RM) $(DESTDIR)$(RUBYSITEARCHDIR)/sqlrelay.a
 	$(MKINSTALLDIRS) $(DESTDIR)$(RUBYSITELIBDIR)/DBD/SQLRelay
 	$(MKINSTALLDIRS) $(DESTDIR)$(RUBYSITELIBDIR)/dbd
 	$(INSTALL) -m 644 SQLRelay.rb $(DESTDIR)$(RUBYSITELIBDIR)/DBD/SQLRelay
 	$(INSTALL) -m 644 SQLRelay.rb $(DESTDIR)$(RUBYSITELIBDIR)/dbd
-	$(RM) sqlrelay.so
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(RUBYSITEARCHDIR)/sqlrelay.so
+	$(RM) $(DESTDIR)$(RUBYSITEARCHDIR)/sqlrelay.so
 	$(RMTREE) $(DESTDIR)$(RUBYSITELIBDIR)/DBD/SQLRelay
 	$(RM) $(DESTDIR)$(RUBYSITELIBDIR)/dbd/SQLRelay.rb
-else
-install: sqlrelay.dll
-	$(MKINSTALLDIRS) $(DESTDIR)$(RUBYSITEARCHDIR)
-	$(LTINSTALL) sqlrelay.dll $(DESTDIR)$(RUBYSITEARCHDIR)
-	$(MKINSTALLDIRS) $(DESTDIR)$(RUBYSITELIBDIR)/DBD/SQLRelay
-	$(MKINSTALLDIRS) $(DESTDIR)$(RUBYSITELIBDIR)/dbd
-	$(INSTALL) -m 644 SQLRelay.rb $(DESTDIR)$(RUBYSITELIBDIR)/DBD/SQLRelay
-	$(INSTALL) -m 644 SQLRelay.rb $(DESTDIR)$(RUBYSITELIBDIR)/dbd
-	$(RM) sqlrelay.dll
-
-uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(DESTDIR)$(RUBYSITEARCHDIR)/sqlrelay.dll
-	$(RMTREE) $(DESTDIR)$(RUBYSITELIBDIR)/DBD/SQLRelay
-	$(RM) $(DESTDIR)$(RUBYSITELIBDIR)/dbd/SQLRelay.rb
-endif
