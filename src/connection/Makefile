@@ -95,8 +95,8 @@ SRCS = sqlrcontroller/sqlrcontrollerctor.cpp \
 	sqlwriter/writelock.cpp \
 	sqltranslations/sqltranslations.cpp \
 	sqltranslations/sqltranslation.cpp \
-	sqltriggers/sqltriggers.cpp \
-	sqltriggers/sqltrigger.cpp \
+	sqlrcontroller/sqltriggers.cpp \
+	sqlrcontroller/sqltrigger.cpp \
 	sqlrloggers/sqlrloggers.cpp \
 	sqlrloggers/sqlrlogger.cpp \
 	sqlrqueries/sqlrqueries.cpp \
