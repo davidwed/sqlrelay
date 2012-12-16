@@ -66,21 +66,7 @@ SRCS = sqlrcontroller/sqlrcontrollerctor.cpp \
 	sqlrcontroller/getquerytree.cpp \
 	sqlrconnection/sqlrconnection.cpp \
 	sqlrcursor/sqlrcursor.cpp \
-	sqlparser/clauses.cpp \
-	sqlparser/parse.cpp \
-	sqlparser/parsecreate.cpp \
-	sqlparser/parsedelete.cpp \
-	sqlparser/parsedrop.cpp \
-	sqlparser/parseinsert.cpp \
-	sqlparser/parseselect.cpp \
-	sqlparser/parseupdate.cpp \
-	sqlparser/parseset.cpp \
-	sqlparser/parsefrom.cpp \
-	sqlparser/parsewhere.cpp \
-	sqlparser/parsecomparison.cpp \
-	sqlparser/parseexpression.cpp \
-	sqlparser/parselock.cpp \
-	sqlparser/sqlparser.cpp \
+	sqlrcontroller/sqlparser.cpp \
 	sqlrcontroller/sqlwriter.cpp \
 	sqlrcontroller/sqltranslations.cpp \
 	sqlrcontroller/sqltranslation.cpp \
@@ -150,21 +136,7 @@ LOBJS = sqlrcontroller/sqlrcontrollerctor.lo \
 	sqlrcontroller/getquerytree.lo \
 	sqlrconnection/sqlrconnection.lo \
 	sqlrcursor/sqlrcursor.lo \
-	sqlparser/clauses.lo \
-	sqlparser/parse.lo \
-	sqlparser/parsecreate.lo \
-	sqlparser/parsedelete.lo \
-	sqlparser/parsedrop.lo \
-	sqlparser/parseinsert.lo \
-	sqlparser/parseselect.lo \
-	sqlparser/parseupdate.lo \
-	sqlparser/parseset.lo \
-	sqlparser/parsefrom.lo \
-	sqlparser/parsewhere.lo \
-	sqlparser/parsecomparison.lo \
-	sqlparser/parseexpression.lo \
-	sqlparser/parselock.lo \
-	sqlparser/sqlparser.lo \
+	sqlrcontroller/sqlparser.lo \
 	sqlrcontroller/sqlwriter.lo \
 	sqlrcontroller/sqltranslations.lo \
 	sqlrcontroller/sqltranslation.lo \
