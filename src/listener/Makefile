@@ -13,9 +13,6 @@ ifeq ($(SERVERUSERPATH),yes)
 endif
 endif
 
-SRCS = sqlrlistener.cpp main.cpp
-LOBJS = sqlrlistener.lo main.lo
-
 .SUFFIXES: .lo
 
 .cpp.lo:
@@ -25,12 +22,11 @@ all: sqlr-listener$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-listener$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
+	$(LIBTOOL) --mode=clean $(RM) *.lo *.o
 	$(RMTREE) .libs
 
-sqlr-listener$(EXE): $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
+sqlr-listener$(EXE): sqlr-listener.cpp sqlr-listener.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-listener.lo $(LIBS) $(RPATH)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)

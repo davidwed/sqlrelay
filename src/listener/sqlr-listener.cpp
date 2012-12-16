@@ -3,8 +3,6 @@
 
 #include <config.h>
 
-#include <sqlrlistener.h>
-
 #include <rudiments/signalclasses.h>
 #include <rudiments/permissions.h>
 #include <rudiments/unixclientsocket.h>
@@ -17,16 +15,188 @@
 #include <rudiments/file.h>
 #include <rudiments/error.h>
 #include <rudiments/datetime.h>
+#include <rudiments/logger.h>
+#include <rudiments/daemonprocess.h>
+#include <rudiments/listener.h>
+#include <rudiments/unixserversocket.h>
+#include <rudiments/inetserversocket.h>
+#include <rudiments/filedescriptor.h>
+#include <rudiments/semaphoreset.h>
+#include <rudiments/sharedmemory.h>
+#include <rudiments/regularexpression.h>
+
+#include <authenticator.h>
+#include <cmdline.h>
+#include <debugfile.h>
+#include <tempdir.h>
+#include <sqlrconfigfile.h>
+#include <sqlrpwdencs.h>
+
+#include <defaults.h>
+#include <defines.h>
 
 // for printf
 #include <stdio.h>
 
-#include <defines.h>
-#include <defaults.h>
-
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
+
+class handoffsocketnode {
+	friend class sqlrlistener;
+	private:
+		uint32_t	pid;
+		filedescriptor	*sock;
+};
+
+class sqlrlistener : public daemonprocess, public listener {
+	public:
+			sqlrlistener();
+			~sqlrlistener();
+		bool	initListener(int argc, const char **argv);
+		void	listen();
+	private:
+		void	cleanUp();
+		void	setUserAndGroup();
+		bool	verifyAccessToConfigFile(const char *configfile);
+		bool	handlePidFile(const char *id);
+		void	handleDynamicScaling();
+		void	setHandoffMethod();
+		void	setIpPermissions();
+		bool	createSharedMemoryAndSemaphores(const char *id);
+		void	ipcFileError(const char *idfilename);
+		void	keyError(const char *idfilename);
+		void	shmError(const char *id, int shmid);
+		void	semError(const char *id, int semid);
+		void	setStartTime();
+		bool	listenOnClientSockets();
+		bool	listenOnHandoffSocket(const char *id);
+		bool	listenOnDeregistrationSocket(const char *id);
+		bool	listenOnFixupSocket(const char *id);
+		void	blockSignals();
+		filedescriptor	*waitForData();
+		bool	handleClientConnection(filedescriptor *fd);
+		bool	registerHandoff(filedescriptor *sock);
+		bool	deRegisterHandoff(filedescriptor *sock);
+		bool	fixup(filedescriptor *sock);
+		bool	deniedIp(filedescriptor *clientsock);
+		void	forkChild(filedescriptor *clientsock);
+		void	clientSession(filedescriptor *clientsock);
+		void	sqlrelayClientSession(filedescriptor *clientsock);
+		void	mysqlClientSession(filedescriptor *clientsock);
+		int32_t	getAuth(filedescriptor *clientsock);
+		int32_t	getMySQLAuth(filedescriptor *clientsock);
+		void    errorClientSession(filedescriptor *clientsock,
+					int64_t errnum, const char *err);
+		bool	acquireShmAccess();
+		bool	releaseShmAccess();
+		bool	acceptAvailableConnection(bool *alldbsdown);
+		bool	doneAcceptingAvailableConnection();
+		bool	isAlarmRang();
+		bool	handOffClient(filedescriptor *sock);
+		bool	getAConnection(uint32_t *connectionpid,
+					uint16_t *inetport,
+					char *unixportstr,
+					uint16_t *unixportstrlen,
+					filedescriptor *sock);
+		bool	findMatchingSocket(uint32_t connectionpid,
+					filedescriptor *connectionsock);
+		bool	requestFixup(uint32_t connectionpid,
+					filedescriptor *connectionsock);
+		bool	connectionIsUp(const char *connectionid);
+		void	pingDatabase(uint32_t connectionpid,
+					const char *unixportstr,
+					uint16_t inetport);
+		filedescriptor *connectToConnection(
+					uint32_t connectionpid,
+					const char *unixportstr,
+					uint16_t inetport);
+		bool	passClientFileDescriptorToConnection(
+					filedescriptor *connectionsock,
+					int fd);
+		void	waitForClientClose(int32_t authstatus,
+					bool passstatus,
+					filedescriptor *clientsock);
+		void	flushWriteBuffer(filedescriptor *fd);
+
+		static void	alarmHandler(int32_t signum);
+
+
+		void		setMaxListeners(uint32_t maxlisteners);
+		void		incrementMaxListenersErrors();
+		void		incrementConnectedClientCount();
+		void		decrementConnectedClientCount();
+		uint32_t	incrementForkedListeners();
+		uint32_t	decrementForkedListeners();
+		void		incrementBusyListeners();
+		void		decrementBusyListeners();
+		int32_t		getBusyListeners();
+
+
+		bool		passdescriptor;
+
+		uint32_t	maxconnections;
+		bool		dynamicscaling;
+
+		int64_t		maxlisteners;
+		uint64_t	listenertimeout;
+
+		char		*pidfile;
+		tempdir		*tmpdir;
+
+		authenticator	*authc;
+		sqlrpwdencs	*sqlrpe;
+
+		// FIXME: these shouldn't have to be pointers, right, but
+		// it appears that they do have to be or their destructors don't
+		// get called for some reason.
+		semaphoreset	*semset;
+		sharedmemory	*idmemory;
+		shmdata			*shm;
+
+		bool	init;
+
+		unixserversocket	*clientsockun;
+		inetserversocket	**clientsockin;
+		uint64_t		clientsockincount;
+
+		unixserversocket	*mysqlclientsockun;
+		inetserversocket	**mysqlclientsockin;
+		uint64_t		mysqlclientsockincount;
+
+		char	*unixport;
+		char	*mysqlunixport;
+
+		clientsessiontype_t	sessiontype;
+
+		unixserversocket	*handoffsockun;
+		unixserversocket	*removehandoffsockun;
+		unixserversocket	*fixupsockun;
+		char			*fixupsockname;
+
+		handoffsocketnode	*handoffsocklist;
+
+		regularexpression	*allowed;
+		regularexpression	*denied;
+
+		cmdline		*cmdl;
+
+		uint32_t	maxquerysize;
+		uint16_t	maxbindcount;
+		uint16_t	maxbindnamelength;
+		int32_t		idleclienttimeout;
+
+		bool	isforkedchild;
+
+		static	signalhandler		alarmhandler;
+		static	volatile sig_atomic_t	alarmrang;
+
+		sqlrconfigfile		cfgfl;
+
+		uint32_t	runningconnections;
+
+		debugfile	dbgfile;
+};
 
 signalhandler		sqlrlistener::alarmhandler;
 volatile sig_atomic_t	sqlrlistener::alarmrang=0;
@@ -2209,4 +2379,25 @@ void sqlrlistener::decrementBusyListeners() {
 
 int32_t sqlrlistener::getBusyListeners() {
 	return semset->getValue(10);
+}
+
+sqlrlistener	*lsnr;
+
+void shutDown(int32_t signum) {
+	delete lsnr;
+	process::exit(0);
+}
+
+int	main(int argc, const char **argv) {
+
+	#include <version.h>
+
+	lsnr=new sqlrlistener();
+	lsnr->handleShutDown(shutDown);
+	lsnr->handleCrash(shutDown);
+	if (lsnr->initListener(argc,argv)) {
+		lsnr->listen();
+	}
+	delete lsnr;
+	process::exit(1);
 }
