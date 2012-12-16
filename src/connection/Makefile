@@ -99,8 +99,8 @@ SRCS = sqlrcontroller/sqlrcontrollerctor.cpp \
 	sqlrcontroller/sqltrigger.cpp \
 	sqlrloggers/sqlrloggers.cpp \
 	sqlrloggers/sqlrlogger.cpp \
-	sqlrqueries/sqlrqueries.cpp \
-	sqlrqueries/sqlrquery.cpp
+	sqlrcontroller/sqlrqueries.cpp \
+	sqlrcontroller/sqlrquery.cpp
 
 LOBJS = sqlrcontroller/sqlrcontrollerctor.lo \
 	sqlrcontroller/sqlrcontrollerdtor.lo \
@@ -194,8 +194,8 @@ LOBJS = sqlrcontroller/sqlrcontrollerctor.lo \
 	sqlrcontroller/sqltrigger.lo \
 	sqlrloggers/sqlrloggers.lo \
 	sqlrloggers/sqlrlogger.lo \
-	sqlrqueries/sqlrqueries.lo \
-	sqlrqueries/sqlrquery.lo
+	sqlrcontroller/sqlrqueries.lo \
+	sqlrcontroller/sqlrquery.lo
 
 .SUFFIXES: .lo
 
@@ -203,19 +203,8 @@ LOBJS = sqlrcontroller/sqlrcontrollerctor.lo \
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: libsqlrconnection.la \
-	sqltranslation_doublequotestosinglequotes.la \
-	sqltranslation_informixtooracledate.la \
-	sqltranslation_locksnowaitbydefault.la \
-	sqltranslation_temptablesaddmissingcolumns.la \
-	sqltranslation_temptableslocalize.la \
-	sqltranslation_translatedatetimes.la \
-	sqltranslation_matchestolike.la \
-	sqltranslation_oracleize.la \
-	sqltranslation_serialtoautoincrement.la \
 	sqlrlogger_slowqueries.la \
 	sqlrlogger_custom_nw.la \
-	sqlrquery_sqlrcmdgstat.la \
-	sqlrquery_sqlrcmdcstat.la \
 	sqlr-connection$(EXE)
 
 clean:
@@ -231,50 +220,17 @@ clean:
 libsqlrconnection.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
-sqltranslation_doublequotestosinglequotes.la: sqltranslations/doublequotestosinglequotes.cpp sqltranslations/doublequotestosinglequotes.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/doublequotestosinglequotes.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
-
-sqltranslation_informixtooracledate.la: sqltranslations/informixtooracledate.cpp sqltranslations/informixtooracledate.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/informixtooracledate.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
-
-sqltranslation_locksnowaitbydefault.la: sqltranslations/locksnowaitbydefault.cpp sqltranslations/locksnowaitbydefault.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/locksnowaitbydefault.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
-
-sqltranslation_temptablesaddmissingcolumns.la: sqltranslations/temptablesaddmissingcolumns.cpp sqltranslations/temptablesaddmissingcolumns.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/temptablesaddmissingcolumns.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
-
-sqltranslation_temptableslocalize.la: sqltranslations/temptableslocalize.cpp sqltranslations/temptableslocalize.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/temptableslocalize.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
-
-sqltranslation_translatedatetimes.la: sqltranslations/translatedatetimes.cpp sqltranslations/translatedatetimes.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/translatedatetimes.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
-
-sqltranslation_matchestolike.la: sqltranslations/matchestolike.cpp sqltranslations/matchestolike.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/matchestolike.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
-
-sqltranslation_oracleize.la: sqltranslations/oracleize.cpp sqltranslations/oracleize.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/oracleize.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
-
-sqltranslation_serialtoautoincrement.la: sqltranslations/serialtoautoincrement.cpp sqltranslations/serialtoautoincrement.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/serialtoautoincrement.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
-
 sqlrlogger_slowqueries.la: sqlrloggers/slowqueries.cpp sqlrloggers/slowqueries.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrloggers/slowqueries.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqlrlogger_custom_nw.la: sqlrloggers/custom_nw.cpp sqlrloggers/custom_nw.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrloggers/custom_nw.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-sqlrquery_sqlrcmdgstat.la: sqlrqueries/sqlrcmdgstat.cpp sqlrqueries/sqlrcmdgstat.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrqueries/sqlrcmdgstat.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
-
-sqlrquery_sqlrcmdcstat.la: sqlrqueries/sqlrcmdcstat.cpp sqlrqueries/sqlrcmdcstat.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrqueries/sqlrcmdcstat.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
-
 sqlr-connection$(EXE): sqlrcontroller/main.cpp sqlrcontroller/main.lo 
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrcontroller/main.lo $(LDFLAGS) libsqlrconnection.la $(LIBS) $(RPATH)
 	
 	
-install: install-connection install-translations install-loggers install-queries
+install: install-connection install-loggers
 
 install-connection:
 	$(MKINSTALLDIRS) $(libdir)
@@ -295,37 +251,6 @@ install-connection:
 	$(MKINSTALLDIRS) $(debugdir)
 	chmod 777 $(debugdir)
 
-install-translations:
-	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqltranslation_doublequotestosinglequotes.la $(libexecdir)
-	$(RM) $(libexecdir)/sqltranslation_doublequotestosinglequotes.a
-	$(RM) $(libexecdir)/sqltranslation_doublequotestosinglequotes.la
-	$(LTINSTALL) sqltranslation_informixtooracledate.la $(libexecdir)
-	$(RM) $(libexecdir)/sqltranslation_informixtooracledate.a
-	$(RM) $(libexecdir)/sqltranslation_informixtooracledate.la
-	$(LTINSTALL) sqltranslation_locksnowaitbydefault.la $(libexecdir)
-	$(RM) $(libexecdir)/sqltranslation_locksnowaitbydefault.a
-	$(RM) $(libexecdir)/sqltranslation_locksnowaitbydefault.la
-	$(LTINSTALL) sqltranslation_temptablesaddmissingcolumns.la $(libexecdir)
-	$(RM) $(libexecdir)/sqltranslation_temptablesaddmissingcolumns.a
-	$(RM) $(libexecdir)/sqltranslation_temptablesaddmissingcolumns.la
-	$(LTINSTALL) sqltranslation_temptableslocalize.la $(libexecdir)
-	$(RM) $(libexecdir)/sqltranslation_temptableslocalize.a
-	$(RM) $(libexecdir)/sqltranslation_temptableslocalize.la
-	$(LTINSTALL) sqltranslation_translatedatetimes.la $(libexecdir)
-	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.a
-	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.la
-	$(LTINSTALL) sqltranslation_matchestolike.la $(libexecdir)
-	$(RM) $(libexecdir)/sqltranslation_matchestolike.a
-	$(RM) $(libexecdir)/sqltranslation_matchestolike.la
-	$(LTINSTALL) sqltranslation_oracleize.la $(libexecdir)
-	$(RM) $(libexecdir)/sqltranslation_oracleize.a
-	$(RM) $(libexecdir)/sqltranslation_oracleize.la
-	$(LTINSTALL) sqltranslation_serialtoautoincrement.la $(libexecdir)
-	$(RM) $(libexecdir)/sqltranslation_serialtoautoincrement.a
-	$(RM) $(libexecdir)/sqltranslation_serialtoautoincrement.la
-	$(LIBTOOL) --mode=finish $(libexecdir)
-
 install-loggers:
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) sqlrlogger_slowqueries.la $(libexecdir)
@@ -336,21 +261,9 @@ install-loggers:
 	$(RM) $(libexecdir)/sqlrlogger_custom_nw.la
 	$(LIBTOOL) --mode=finish $(libexecdir)
 
-install-queries:
-	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrquery_sqlrcmdgstat.la $(libexecdir)
-	$(RM) $(libexecdir)/sqlrquery_sqlrcmdgstat.a
-	$(RM) $(libexecdir)/sqlrquery_sqlrcmdgstat.la
-	$(LTINSTALL) sqlrquery_sqlrcmdcstat.la $(libexecdir)
-	$(RM) $(libexecdir)/sqlrquery_sqlrcmdcstat.a
-	$(RM) $(libexecdir)/sqlrquery_sqlrcmdcstat.la
-	$(LIBTOOL) --mode=finish $(libexecdir)
-
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection.la
-	$(RM) $(libexecdir)/sqltranslation_*
 	$(RM) $(libexecdir)/sqlrlogger_*
-	$(RM) $(libexecdir)/sqlrquery_*
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(logdir)
