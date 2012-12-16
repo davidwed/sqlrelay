@@ -93,8 +93,8 @@ SRCS = sqlrcontroller/sqlrcontrollerctor.cpp \
 	sqlwriter/writeupdate.cpp \
 	sqlwriter/writeset.cpp \
 	sqlwriter/writelock.cpp \
-	sqltranslations/sqltranslations.cpp \
-	sqltranslations/sqltranslation.cpp \
+	sqlrcontroller/sqltranslations.cpp \
+	sqlrcontroller/sqltranslation.cpp \
 	sqlrcontroller/sqltriggers.cpp \
 	sqlrcontroller/sqltrigger.cpp \
 	sqlrloggers/sqlrloggers.cpp \
@@ -188,8 +188,8 @@ LOBJS = sqlrcontroller/sqlrcontrollerctor.lo \
 	sqlwriter/writeupdate.lo \
 	sqlwriter/writeset.lo \
 	sqlwriter/writelock.lo \
-	sqltranslations/sqltranslations.lo \
-	sqltranslations/sqltranslation.lo \
+	sqlrcontroller/sqltranslations.lo \
+	sqlrcontroller/sqltranslation.lo \
 	sqlrcontroller/sqltriggers.lo \
 	sqlrcontroller/sqltrigger.lo \
 	sqlrloggers/sqlrloggers.lo \
