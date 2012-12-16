@@ -38,6 +38,7 @@ uninstall:
 	$(MAKE) -C doc uninstall
 	$(RM) $(libdir)/pkgconfig/sqlrelay-c.pc
 	$(RM) $(libdir)/pkgconfig/sqlrelay-c++.pc
+	$(RMTREE) $(libexecdir)
 
 distclean: clean
 	$(RM) config.cache

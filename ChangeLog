@@ -5,6 +5,7 @@
 	fixed various issues revealed by -Werror
 	added password encryption framework
 	added rot password encryption plugin
+	moved modules to libexec and removed the libsqlrelay_ prefix
 
 0.48 - integrated patches from Neowiz for:
 		handling for oracle errors ora-01033, ora-02067 and ora-04068
