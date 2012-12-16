@@ -9,6 +9,7 @@ all:
 	$(MAKE) -C cmdline all
 	$(MAKE) -C connection all
 	$(MAKE) -C triggers all
+	$(MAKE) -C translations all
 	$(MAKE) -C connections all
 	$(MAKE) -C start all
 	$(MAKE) -C cachemanager all
@@ -22,6 +23,7 @@ clean:
 	$(MAKE) -C cmdline clean
 	$(MAKE) -C connection clean
 	$(MAKE) -C triggers clean
+	$(MAKE) -C translations clean
 	$(MAKE) -C connections clean
 	$(MAKE) -C start clean
 	$(MAKE) -C cachemanager clean
@@ -35,6 +37,7 @@ install:
 	$(MAKE) -C cmdline install
 	$(MAKE) -C connection install
 	$(MAKE) -C triggers install
+	$(MAKE) -C translations install
 	$(MAKE) -C connections install
 	$(MAKE) -C start install
 	$(MAKE) -C cachemanager install
@@ -48,6 +51,7 @@ uninstall:
 	$(MAKE) -C cmdline uninstall
 	$(MAKE) -C connection uninstall
 	$(MAKE) -C triggers uninstall
+	$(MAKE) -C translations uninstall
 	$(MAKE) -C connections uninstall
 	$(MAKE) -C start uninstall
 	$(MAKE) -C cachemanager uninstall
