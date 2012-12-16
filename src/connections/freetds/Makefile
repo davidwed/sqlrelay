@@ -34,7 +34,7 @@ install:
 	$(LTINSTALL) sqlrconnection_freetds.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_freetds.a
 	$(RM) $(libexecdir)/sqlrconnection_freetds.la
-	$(MODULERENAME) $(libexecdir)/sqlrconnection_freetds.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqlrconnection_freetds.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_freetds.*

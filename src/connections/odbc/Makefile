@@ -39,7 +39,7 @@ install:
 	$(LTINSTALL) sqlrconnection_odbc.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_odbc.a
 	$(RM) $(libexecdir)/sqlrconnection_odbc.la
-	$(MODULERENAME) $(libexecdir)/sqlrconnection_odbc.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqlrconnection_odbc.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_odbc.*

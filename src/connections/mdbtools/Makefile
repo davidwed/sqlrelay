@@ -34,7 +34,7 @@ install:
 	$(LTINSTALL) sqlrconnection_mdbtools.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_mdbtools.a
 	$(RM) $(libexecdir)/sqlrconnection_mdbtools.la
-	$(MODULERENAME) $(libexecdir)/sqlrconnection_mdbtools.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqlrconnection_mdbtools.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_mdbtools.*

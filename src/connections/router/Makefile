@@ -34,7 +34,7 @@ install:
 	$(LTINSTALL) sqlrconnection_router.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_router.a
 	$(RM) $(libexecdir)/sqlrconnection_router.la
-	$(MODULERENAME) $(libexecdir)/sqlrconnection_router.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqlrconnection_router.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_router.*

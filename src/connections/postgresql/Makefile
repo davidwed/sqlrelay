@@ -34,7 +34,7 @@ install:
 	$(LTINSTALL) sqlrconnection_postgresql.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_postgresql.a
 	$(RM) $(libexecdir)/sqlrconnection_postgresql.la
-	$(MODULERENAME) $(libexecdir)/sqlrconnection_postgresql.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqlrconnection_postgresql.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_postgresql.*
