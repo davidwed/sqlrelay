@@ -35,6 +35,16 @@ char *rot::rotate(const char *value, int64_t count) {
 	size_t	len=charstring::length(value);
 	char	*retval=new char[len+1];
 
+	// normalize the counts
+	int64_t	alphacount=count%26;
+	if (alphacount<0) {
+		alphacount=26+alphacount;
+	}
+	int64_t	digicount=count%10;
+	if (digicount<0) {
+		digicount=10+digicount;
+	}
+
 	// for each character in the value...
 	// (by using <= len, we'll catch the NULL terminator)
 	for (size_t i=0; i<=len; i++) {
@@ -46,9 +56,9 @@ char *rot::rotate(const char *value, int64_t count) {
 			if (character::isUpperCase(value[i])) {
 				start='A';
 			}
-			retval[i]=((value[i]-start+count)%26)+start;
+			retval[i]=((value[i]-start+alphacount)%26)+start;
 		} else if (character::isDigit(value[i])) {
-			retval[i]=((value[i]-'0'+count)%10)+'0';
+			retval[i]=((value[i]-'0'+digicount)%10)+'0';
 		} else {
 			retval[i]=value[i];
 		}
