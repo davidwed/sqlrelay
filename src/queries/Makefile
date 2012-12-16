@@ -2,6 +2,8 @@ top_builddir = ../..
 
 include ../../config.mk
 
+LIBS = -L$(top_builddir)/src/connection -lsqlrconnection -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS)
+
 .PHONY: all clean install uninstall
 
 .SUFFIXES: .lo
@@ -17,10 +19,10 @@ clean:
 	$(RMTREE) .libs
 
 sqlrquery_sqlrcmdgstat.la: sqlrcmdgstat.cpp sqlrcmdgstat.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrcmdgstat.lo $(LDFLAGS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrcmdgstat.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module
 
 sqlrquery_sqlrcmdcstat.la: sqlrcmdcstat.cpp sqlrcmdcstat.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrcmdcstat.lo $(LDFLAGS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrcmdcstat.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
 	$(MKINSTALLDIRS) $(libexecdir)

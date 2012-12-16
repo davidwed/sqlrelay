@@ -2,12 +2,14 @@ top_builddir = ../..
 
 include ../../config.mk
 
+LIBS = -L$(top_builddir)/src/connection -lsqlrconnection -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS)
+
 .PHONY: all clean install uninstall
 
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) -I$(top_builddir)/ -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -c $< -o $@
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -c $< -o $@
 
 all: sqlrpwdenc_rot.la
 
@@ -16,7 +18,7 @@ clean:
 	$(RMTREE) .libs
 
 sqlrpwdenc_rot.la: rot.cpp rot.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ rot.lo $(LDFLAGS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ rot.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
 	$(MKINSTALLDIRS) $(libexecdir)

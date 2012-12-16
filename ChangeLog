@@ -6,6 +6,8 @@
 	added password encryption framework
 	added rot password encryption plugin
 	moved modules to libexec and removed the libsqlrelay_ prefix
+	moved modules out of the connection directory and into their own
+		directories under src
 
 0.48 - integrated patches from Neowiz for:
 		handling for oracle errors ora-01033, ora-02067 and ora-04068

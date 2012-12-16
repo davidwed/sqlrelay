@@ -2,6 +2,8 @@ top_builddir = ../..
 
 include ../../config.mk
 
+LIBS = -L$(top_builddir)/src/connection -lsqlrconnection -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS)
+
 .PHONY: all clean install uninstall
 
 .SUFFIXES: .lo
@@ -17,10 +19,10 @@ clean:
 	$(RMTREE) .libs
 
 sqlrlogger_slowqueries.la: slowqueries.cpp slowqueries.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ slowqueries.lo $(LDFLAGS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ slowqueries.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqlrlogger_custom_nw.la: custom_nw.cpp custom_nw.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ custom_nw.lo $(LDFLAGS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ custom_nw.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
 	$(MKINSTALLDIRS) $(libexecdir)
