@@ -24,11 +24,7 @@ LOBJS = CSQLRelay.lo
 all: libCSQLRelay.la
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o	
-	$(LIBTOOL) --mode=clean $(RM) *.so
-	$(LIBTOOL) --mode=clean $(RM) *.pyc
+	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o *.so *.pyc
 	$(RMTREE) .libs
 
 libCSQLRelay.la: $(SRCS) $(LOBJS)

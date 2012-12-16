@@ -52,14 +52,7 @@ all:
 	$(RM) errors3
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
-	$(LIBTOOL) --mode=clean $(RM) *.so
-	$(LIBTOOL) --mode=clean $(RM) phpincludes.h
-	$(LIBTOOL) --mode=clean $(RM) errors1
-	$(LIBTOOL) --mode=clean $(RM) errors2
-	$(LIBTOOL) --mode=clean $(RM) errors3
+	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o *.so phpincludes.h errors1 errors2 errors3
 	$(RMTREE) .libs
 
 libsql_relay.la: sql_relay.cpp sql_relay.lo

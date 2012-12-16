@@ -5,9 +5,7 @@ include ../../config.mk
 all: ora8test ora8clobtest inserttest
 
 clean:
-	$(RM) ora8test
-	$(RM) ora8clobtest
-	$(RM) inserttest
+	$(RM) ora8test ora8clobtest inserttest
 
 ora8test: ora8test.cpp
 	$(CXX) $(LDFLAGS) $(CXXFLAGS) $(ORACLEINCLUDES) $(RUDIMENTSINCLUDES) $? -s -o $@ $(ORACLELIBS) $(RUDIMENTSLIBS) $(EXTRALIBS) $(SOCKETLIBS)

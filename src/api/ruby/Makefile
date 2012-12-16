@@ -58,10 +58,7 @@ LOBJS = sqlrelay.lo
 all: libsqlrelay.la
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o	
-	$(LIBTOOL) --mode=clean $(RM) *.so
+	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o *.so
 	$(RMTREE) .libs
 
 libsqlrelay.la: $(SRCS) $(LOBJS)

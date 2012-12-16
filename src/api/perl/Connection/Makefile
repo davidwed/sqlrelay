@@ -82,14 +82,7 @@ endif
 all: libConnection.la
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.cpp
-	$(LIBTOOL) --mode=clean $(RM) *.la
-	$(LIBTOOL) --mode=clean $(RM) *.lo*
-	$(LIBTOOL) --mode=clean $(RM) *.o	
-	$(LIBTOOL) --mode=clean $(RM) *.so
-	$(LIBTOOL) --mode=clean $(RM) *.$(PERLMAN3EXT)
-	$(LIBTOOL) --mode=clean $(RM) errors*
-	$(LIBTOOL) --mode=clean $(RM) perlincludes.h
+	$(LIBTOOL) --mode=clean $(RM) *.cpp *.la *.lo* *.o *.so *.$(PERLMAN3EXT) errors* perlincludes.h
 	$(RMTREE) .libs
 
 libConnection.la: Connection.xs Connection.cpp Connection.lo

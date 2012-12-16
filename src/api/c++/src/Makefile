@@ -137,9 +137,7 @@ LOBJS = connection/connectionctor.lo \
 all: libsqlrclient.la
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la
-	$(LIBTOOL) --mode=clean $(RM) */*.lo
-	$(LIBTOOL) --mode=clean $(RM) */*.o
+	$(LIBTOOL) --mode=clean $(RM) *.la */*.lo */*.o
 	$(RMTREE) */.libs
 
 libsqlrclient.la: $(SRCS) $(LOBJS)

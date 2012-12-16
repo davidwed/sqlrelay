@@ -7,5 +7,4 @@ include ../../config.mk
 all:
 
 clean:
-	$(RM) cachefile*
-	$(RM) sqlnet.log
+	$(RM) cachefile* sqlnet.log

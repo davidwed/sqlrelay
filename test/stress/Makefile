@@ -39,14 +39,5 @@ timeouttest: timeouttest.cpp timeouttest.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ timeouttest.lo $(LIBS)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
-	$(LIBTOOL) --mode=clean $(RM) cursortest
-	$(LIBTOOL) --mode=clean $(RM) forktest
-	$(LIBTOOL) --mode=clean $(RM) query
-	$(LIBTOOL) --mode=clean $(RM) querytest
-	$(LIBTOOL) --mode=clean $(RM) random
-	$(LIBTOOL) --mode=clean $(RM) socketeater
-	$(LIBTOOL) --mode=clean $(RM) threadtest
-	$(LIBTOOL) --mode=clean $(RM) timeouttest
+	$(LIBTOOL) --mode=clean $(RM) *.lo *.o cursortest forktest query querytest random socketeater threadtest timeouttest
 	$(RMTREE) .libs

@@ -21,14 +21,7 @@ endif
 all: sqlr-query$(EXE) sqlr-fields$(EXE) sqlrsh$(EXE) sqlr-export$(EXE) sqlr-import$(EXE) sqlr-pwdenc$(EXE)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
-	$(LIBTOOL) --mode=clean $(RM) sqlr-fields$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) sqlr-query$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) sqlr-export$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) sqlr-import$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) sqlr-pwdenc$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) sqlrsh$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) *.lo *.o sqlr-fields$(EXE) sqlr-query$(EXE) sqlr-export$(EXE) sqlr-import$(EXE) sqlr-pwdenc$(EXE) sqlrsh$(EXE)
 	$(RMTREE) .libs
 
 sqlr-fields$(EXE): sqlr-fields.cpp sqlr-fields.lo

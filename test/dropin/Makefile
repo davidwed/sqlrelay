@@ -27,7 +27,4 @@ postgresql: postgresql.cpp postgresql.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ postgresql.lo $(POSTGRESQLLIBS)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
-	$(LIBTOOL) --mode=clean $(RM) mysql
-	$(LIBTOOL) --mode=clean $(RM) postgresql
+	$(LIBTOOL) --mode=clean $(RM) *.lo *.o mysql postgresql

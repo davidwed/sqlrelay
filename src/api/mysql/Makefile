@@ -38,9 +38,7 @@ mysql51.lo: mysql.cpp
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_5_1=1 -c $< -o $@
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
+	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
 libmysql3sqlrelay.la: mysql.cpp mysql3.lo

@@ -28,7 +28,6 @@ clean:
 	$(MAKE) -C loggers clean
 	$(MAKE) -C pwdencs clean
 	$(MAKE) -C connections clean
-	$(MAKE) -C scaler clean
 	$(MAKE) -C status clean
 
 install:
@@ -43,7 +42,6 @@ install:
 	$(MAKE) -C loggers install
 	$(MAKE) -C pwdencs install
 	$(MAKE) -C connections install
-	$(MAKE) -C scaler install
 	$(MAKE) -C status install
 
 uninstall:
@@ -58,5 +56,4 @@ uninstall:
 	$(MAKE) -C loggers uninstall
 	$(MAKE) -C pwdencs uninstall
 	$(MAKE) -C connections uninstall
-	$(MAKE) -C scaler uninstall
 	$(MAKE) -C status uninstall

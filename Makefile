@@ -10,12 +10,7 @@ all:
 clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C bench clean
-	$(RMTREE) .pics
-	$(RMTREE) */.pics
-	$(RMTREE) */*/.pics
-	$(RMTREE) */*/*/.pics
-	$(RMTREE) */*/*/*/.pics
-	$(RMTREE) */*/*/*/*/.pics
+	$(RMTREE) .pics */.pics */*/.pics */*/*/.pics */*/*/*/.pics */*/*/*/*/.pics
 	$(MAKE) -C test clean
 
 install:
@@ -41,53 +36,53 @@ uninstall:
 	$(RMTREE) $(libexecdir)
 
 distclean: clean
-	$(RM) config.cache
-	$(RM) config.h
-	$(RM) config.h~
-	$(RM) config.h.in~
-	$(RM) config.log
-	$(RM) config.status
-	$(RM) config.mk
-	$(RMTREE) autom4te.cache
-	$(RMTREE) autom4te-*.cache
-	$(RM) src/api/perl/Connection/Connection.pm
-	$(RM) src/api/perl/Cursor/Cursor.pm
-	$(RM) src/api/perl/DBD/Makefile.PL
-	$(RM) src/api/perl/DBD/SQLRelay.pm
-	$(RM) bin/sqlr-stop
-	$(RM) bin/sqlrclient-config
-	$(RM) bin/sqlrclientwrapper-config
-	$(RM) init/openserver/init.d/sqlrelay
-	$(RM) init/redhat/init.d/sqlrelay
-	$(RM) init/slackware/rc.d/rc.sqlrelay
-	$(RM) init/debian/init.d/sqlrelay
-	$(RM) init/netbsd/rc.d/sqlrelay
-	$(RM) init/freebsd/rc.d/sqlrelay
-	$(RM) test/test
-	$(RM) libtool
-	$(RM) libtool.gcc
-	$(RM) sqlrelay-c.pc
-	$(RM) sqlrelay-c++.pc
-	$(RM) src/api/c++/msvc/libsqlrclient.opensdf
-	$(RM) src/api/c++/msvc/libsqlrclient.sdf
-	$(RM) src/api/c++/msvc/libsqlrclient.suo
-	$(RMTREE) src/api/c++/msvc/Debug
-	$(RMTREE) src/api/c++/msvc/Release
-	$(RM) src/api/c/msvc/libsqlrclientwrapper.opensdf
-	$(RM) src/api/c/msvc/libsqlrclientwrapper.sdf
-	$(RM) src/api/c/msvc/libsqlrclientwrapper.suo
-	$(RMTREE) src/api/c++/msvc/Debug
-	$(RMTREE) src/api/c++/msvc/Release
-	$(RM) src/cmdline/msvc/sqlrsh.opensdf
-	$(RM) src/cmdline/msvc/sqlrsh.sdf
-	$(RM) src/cmdline/msvc/sqlrsh.suo
-	$(RMTREE) src/cmdline/msvc/Debug
-	$(RMTREE) src/cmdline/msvc/Release
-	$(RM) src/util/msvc/libsqlrutil.opensdf
-	$(RM) src/util/msvc/libsqlrutil.sdf
-	$(RM) src/util/msvc/libsqlrutil.suo
-	$(RMTREE) src/util/msvc/Debug
-	$(RMTREE) src/util/msvc/Release
-	$(RM) src/api/cs/SQLRClient/SQLRClient.suo
-	$(RMTREE) src/api/cs/SQLRClient/bin
-	$(RMTREE) src/api/cs/SQLRClient/obj
+	$(RM) config.cache \
+		config.h \
+		config.h~ \
+		config.h.in~ \
+		config.log \
+		config.status \
+		config.mk \
+		src/api/perl/Connection/Connection.pm \
+		src/api/perl/Cursor/Cursor.pm \
+		src/api/perl/DBD/Makefile.PL \
+		src/api/perl/DBD/SQLRelay.pm \
+		bin/sqlr-stop \
+		bin/sqlrclient-config \
+		bin/sqlrclientwrapper-config \
+		init/openserver/init.d/sqlrelay \
+		init/redhat/init.d/sqlrelay \
+		init/slackware/rc.d/rc.sqlrelay \
+		init/debian/init.d/sqlrelay \
+		init/netbsd/rc.d/sqlrelay \
+		init/freebsd/rc.d/sqlrelay \
+		test/test \
+		libtool \
+		libtool.gcc \
+		sqlrelay-c.pc \
+		sqlrelay-c++.pc \
+		src/api/c++/msvc/libsqlrclient.opensdf \
+		src/api/c++/msvc/libsqlrclient.sdf \
+		src/api/c++/msvc/libsqlrclient.suo \
+		src/api/c/msvc/libsqlrclientwrapper.opensdf \
+		src/api/c/msvc/libsqlrclientwrapper.sdf \
+		src/api/c/msvc/libsqlrclientwrapper.suo \
+		src/cmdline/msvc/sqlrsh.opensdf \
+		src/cmdline/msvc/sqlrsh.sdf \
+		src/cmdline/msvc/sqlrsh.suo \
+		src/util/msvc/libsqlrutil.opensdf \
+		src/util/msvc/libsqlrutil.sdf \
+		src/util/msvc/libsqlrutil.suo \
+		src/api/cs/SQLRClient/SQLRClient.suo
+	$(RMTREE) autom4te.cache \
+		autom4te-*.cache \
+		src/api/c++/msvc/Debug \
+		src/api/c++/msvc/Release \
+		src/api/c++/msvc/Debug \
+		src/api/c++/msvc/Release \
+		src/cmdline/msvc/Debug \
+		src/cmdline/msvc/Release \
+		src/util/msvc/Debug \
+		src/util/msvc/Release \
+		src/api/cs/SQLRClient/bin \
+		src/api/cs/SQLRClient/obj

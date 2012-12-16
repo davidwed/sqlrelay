@@ -20,12 +20,8 @@ endif
 all: java libSQLRConnection.la libSQLRCursor.la sqlrelay.jar
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
-	$(LIBTOOL) --mode=clean $(RM) *.so
-	$(RM) com/firstworks/sqlrelay/*.class
-	$(RM) sqlrelay.jar
+	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o *.so
+	$(RM) com/firstworks/sqlrelay/*.class sqlrelay.jar
 	$(RMTREE) .libs
 
 java:

@@ -63,16 +63,6 @@ sybase: sybase.c sybase.lo
 	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ sybase.lo $(LIBS)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
-	$(LIBTOOL) --mode=clean $(RM) db2
-	$(LIBTOOL) --mode=clean $(RM) freetds
-	$(LIBTOOL) --mode=clean $(RM) firebird
-	$(LIBTOOL) --mode=clean $(RM) mysql
-	$(LIBTOOL) --mode=clean $(RM) oracle
-	$(LIBTOOL) --mode=clean $(RM) postgresql
-	$(LIBTOOL) --mode=clean $(RM) sqlite
-	$(LIBTOOL) --mode=clean $(RM) sybase
-	$(RM) cachefile*
-	$(RM) sqlnet.log
+	$(LIBTOOL) --mode=clean $(RM) *.lo *.o db2 freetds firebird mysql oracle postgresql sqlite sybase
+	$(RM) cachefile* sqlnet.log
 	$(RMTREE) .libs

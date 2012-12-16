@@ -34,6 +34,7 @@ TMPDIRCPPFLAG = -DTMP_DIR=\"$(tmpdir)\"
 DEBUGDIRCPPFLAG = -DDEBUG_DIR=\"$(debugdir)\"
 LOGDIRCPPFLAG = -DLOG_DIR=\"$(logdir)\"
 CONFIGFILECPPFLAG = -DDEFAULT_CONFIG_FILE=\"$(sysconfdir)/sqlrelay.conf\"
+CACHEDIRCPPFLAG = -DCACHE_DIR=\"$(cachedir)\"
 
 # link flags (-s, -static, -melf, -belf, etc.)
 LDFLAGS = @LDFLAGS@

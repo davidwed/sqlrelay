@@ -33,9 +33,7 @@ LOBJS = pqasync.lo pqconndefaults.lo pqconnection.lo pqcopy.lo \
 all: libpqsqlrelay.la
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
+	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
 libpqsqlrelay.la: $(SRCS) $(LOBJS)

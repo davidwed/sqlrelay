@@ -83,21 +83,6 @@ router: router.cpp router.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ router.lo $(LIBS)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
-	$(LIBTOOL) --mode=clean $(RM) db2
-	$(LIBTOOL) --mode=clean $(RM) extensions
-	$(LIBTOOL) --mode=clean $(RM) freetds
-	$(LIBTOOL) --mode=clean $(RM) firebird
-	$(LIBTOOL) --mode=clean $(RM) mysql
-	$(LIBTOOL) --mode=clean $(RM) oracleclobfetch
-	$(LIBTOOL) --mode=clean $(RM) oracleclobinsert
-	$(LIBTOOL) --mode=clean $(RM) oracle
-	$(LIBTOOL) --mode=clean $(RM) oracle8
-	$(LIBTOOL) --mode=clean $(RM) postgresql
-	$(LIBTOOL) --mode=clean $(RM) sqlite
-	$(LIBTOOL) --mode=clean $(RM) sybase
-	$(LIBTOOL) --mode=clean $(RM) router
-	$(RM) cachefile*
-	$(RM) sqlnet.log
+	$(LIBTOOL) --mode=clean $(RM) *.lo *.o db2 extensions freetds firebird mysql oracleclobfetch oracleclobinsert oracle oracle8 postgresql sqlite sybase router
+	$(RM) cachefile* sqlnet.log
 	$(RMTREE) .libs

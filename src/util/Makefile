@@ -18,9 +18,7 @@ LOBJS = cmdline.lo debugfile.lo tempdir.lo sqlrconfigfile.lo authenticator.lo sq
 all: libsqlrutil.la
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
+	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
 libsqlrutil.la: $(SRCS) $(LOBJS)

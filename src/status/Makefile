@@ -18,8 +18,7 @@ LOBJS= sqlr-status.lo
 all: sqlr-status$(EXE)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-status$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
+	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o sqlr-status$(EXE)
 	$(RMTREE) .libs
 
 sqlr-status$(EXE): $(SRCS) $(LOBJS)

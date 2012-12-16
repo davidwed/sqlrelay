@@ -16,7 +16,5 @@ test: test.cpp test.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ test.lo $(LIBS)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
-	$(LIBTOOL) --mode=clean $(RM) test
+	$(LIBTOOL) --mode=clean $(RM) *.lo *.o test
 	$(RMTREE) .libs

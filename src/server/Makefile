@@ -24,11 +24,7 @@ all: sqlr-listener$(EXE) \
 	sqlr-start$(EXE)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-listener$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) sqlr-scaler$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) sqlr-cachemanager$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) sqlr-start$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) *.lo *.o
+	$(LIBTOOL) --mode=clean $(RM) *.lo *.o sqlr-listener$(EXE) sqlr-scaler$(EXE) sqlr-cachemanager$(EXE) sqlr-start$(EXE)
 	$(RMTREE) .libs
 
 sqlr-listener$(EXE): sqlr-listener.cpp sqlr-listener.lo

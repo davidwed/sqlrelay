@@ -206,14 +206,8 @@ all: libsqlrconnection.la \
 	sqlr-connection$(EXE)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) sqlr-connection
-	$(LIBTOOL) --mode=clean $(RM) *.la
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) */*.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
-	$(LIBTOOL) --mode=clean $(RM) */*.o
-	$(RMTREE) */.libs
-	$(RMTREE) .libs
+	$(LIBTOOL) --mode=clean $(RM) *.la *.lo */*.lo *.o */*.o sqlr-connection$(EXE)
+	$(RMTREE) */.libs .libs
 
 libsqlrconnection.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined

@@ -31,9 +31,7 @@ ifneq ($(strip $(SYBASELIBS)),)
 endif
 
 clean:
-	$(RM) *.class
-	$(RM) cachefile*
-	$(RM) sqlnet.log
+	$(RM) *.class cachefile* sqlnet.log
 
 db2.class: db2.java
 	$(JAVAC) -classpath $$CLASSPATH:$(javadir)/sqlrelay.jar db2.java
