@@ -190,8 +190,8 @@ LOBJS = sqlrcontroller/sqlrcontrollerctor.lo \
 	sqlwriter/writelock.lo \
 	sqltranslations/sqltranslations.lo \
 	sqltranslations/sqltranslation.lo \
-	sqltriggers/sqltriggers.lo \
-	sqltriggers/sqltrigger.lo \
+	sqlrcontroller/sqltriggers.lo \
+	sqlrcontroller/sqltrigger.lo \
 	sqlrloggers/sqlrloggers.lo \
 	sqlrloggers/sqlrlogger.lo \
 	sqlrqueries/sqlrqueries.lo \
@@ -203,9 +203,6 @@ LOBJS = sqlrcontroller/sqlrcontrollerctor.lo \
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: libsqlrconnection.la \
-	sqltrigger_createtableautoincrementoracle.la \
-	sqltrigger_droptableautoincrementoracle.la \
-	sqltrigger_droplocalizedtemptables.la \
 	sqltranslation_doublequotestosinglequotes.la \
 	sqltranslation_informixtooracledate.la \
 	sqltranslation_locksnowaitbydefault.la \
@@ -233,15 +230,6 @@ clean:
 
 libsqlrconnection.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
-
-sqltrigger_createtableautoincrementoracle.la: sqltriggers/createtableautoincrementoracle.cpp sqltriggers/createtableautoincrementoracle.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltriggers/createtableautoincrementoracle.lo $(LDFLAGS) $(TRIGGERPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
-
-sqltrigger_droptableautoincrementoracle.la: sqltriggers/droptableautoincrementoracle.cpp sqltriggers/droptableautoincrementoracle.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltriggers/droptableautoincrementoracle.lo $(LDFLAGS) $(TRIGGERPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
-
-sqltrigger_droplocalizedtemptables.la: sqltriggers/droplocalizedtemptables.cpp sqltriggers/droplocalizedtemptables.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltriggers/droplocalizedtemptables.lo $(LDFLAGS) $(TRIGGERPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_doublequotestosinglequotes.la: sqltranslations/doublequotestosinglequotes.cpp sqltranslations/doublequotestosinglequotes.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqltranslations/doublequotestosinglequotes.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
@@ -286,7 +274,7 @@ sqlr-connection$(EXE): sqlrcontroller/main.cpp sqlrcontroller/main.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrcontroller/main.lo $(LDFLAGS) libsqlrconnection.la $(LIBS) $(RPATH)
 	
 	
-install: install-connection install-triggers install-translations install-loggers install-queries
+install: install-connection install-translations install-loggers install-queries
 
 install-connection:
 	$(MKINSTALLDIRS) $(libdir)
@@ -306,19 +294,6 @@ install-connection:
 	chmod 777 $(logdir)
 	$(MKINSTALLDIRS) $(debugdir)
 	chmod 777 $(debugdir)
-
-install-triggers:
-	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqltrigger_createtableautoincrementoracle.la $(libexecdir)
-	$(RM) $(libexecdir)/sqltrigger_createtableautoincrementoracle.a
-	$(RM) $(libexecdir)/sqltrigger_createtableautoincrementoracle.la
-	$(LTINSTALL) sqltrigger_droptableautoincrementoracle.la $(libexecdir)
-	$(RM) $(libexecdir)/sqltrigger_droptableautoincrementoracle.a
-	$(RM) $(libexecdir)/sqltrigger_droptableautoincrementoracle.la
-	$(LTINSTALL) sqltrigger_droplocalizedtemptables.la $(libexecdir)
-	$(RM) $(libexecdir)/sqltrigger_droplocalizedtemptables.a
-	$(RM) $(libexecdir)/sqltrigger_droplocalizedtemptables.la
-	$(LIBTOOL) --mode=finish $(libexecdir)
 
 install-translations:
 	$(MKINSTALLDIRS) $(libexecdir)
@@ -373,7 +348,6 @@ install-queries:
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection.la
-	$(RM) $(libexecdir)/sqltrigger_*
 	$(RM) $(libexecdir)/sqltranslation_*
 	$(RM) $(libexecdir)/sqlrlogger_*
 	$(RM) $(libexecdir)/sqlrquery_*
