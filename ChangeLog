@@ -8,6 +8,8 @@
 	moved modules to libexec and removed the libsqlrelay_ prefix
 	moved modules out of the connection directory and into their own
 		directories under src
+	reorganized code tree to compile faster
+	updated clean targets in Makefiles to run faster
 
 0.48 - integrated patches from Neowiz for:
 		handling for oracle errors ora-01033, ora-02067 and ora-04068
