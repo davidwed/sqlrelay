@@ -97,8 +97,8 @@ SRCS = sqlrcontroller/sqlrcontrollerctor.cpp \
 	sqlrcontroller/sqltranslation.cpp \
 	sqlrcontroller/sqltriggers.cpp \
 	sqlrcontroller/sqltrigger.cpp \
-	sqlrloggers/sqlrloggers.cpp \
-	sqlrloggers/sqlrlogger.cpp \
+	sqlrcontroller/sqlrloggers.cpp \
+	sqlrcontroller/sqlrlogger.cpp \
 	sqlrcontroller/sqlrqueries.cpp \
 	sqlrcontroller/sqlrquery.cpp
 
@@ -192,8 +192,8 @@ LOBJS = sqlrcontroller/sqlrcontrollerctor.lo \
 	sqlrcontroller/sqltranslation.lo \
 	sqlrcontroller/sqltriggers.lo \
 	sqlrcontroller/sqltrigger.lo \
-	sqlrloggers/sqlrloggers.lo \
-	sqlrloggers/sqlrlogger.lo \
+	sqlrcontroller/sqlrloggers.lo \
+	sqlrcontroller/sqlrlogger.lo \
 	sqlrcontroller/sqlrqueries.lo \
 	sqlrcontroller/sqlrquery.lo
 
@@ -203,8 +203,6 @@ LOBJS = sqlrcontroller/sqlrcontrollerctor.lo \
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: libsqlrconnection.la \
-	sqlrlogger_slowqueries.la \
-	sqlrlogger_custom_nw.la \
 	sqlr-connection$(EXE)
 
 clean:
@@ -219,12 +217,6 @@ clean:
 
 libsqlrconnection.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
-
-sqlrlogger_slowqueries.la: sqlrloggers/slowqueries.cpp sqlrloggers/slowqueries.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrloggers/slowqueries.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
-
-sqlrlogger_custom_nw.la: sqlrloggers/custom_nw.cpp sqlrloggers/custom_nw.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrloggers/custom_nw.lo $(LDFLAGS) $(TRANSLATIONPLUGINLIBS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqlr-connection$(EXE): sqlrcontroller/main.cpp sqlrcontroller/main.lo 
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrcontroller/main.lo $(LDFLAGS) libsqlrconnection.la $(LIBS) $(RPATH)
@@ -253,17 +245,10 @@ install-connection:
 
 install-loggers:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqlrlogger_slowqueries.la $(libexecdir)
-	$(RM) $(libexecdir)/sqlrlogger_slowqueries.a
-	$(RM) $(libexecdir)/sqlrlogger_slowqueries.la
-	$(LTINSTALL) sqlrlogger_custom_nw.la $(libexecdir)
-	$(RM) $(libexecdir)/sqlrlogger_custom_nw.a
-	$(RM) $(libexecdir)/sqlrlogger_custom_nw.la
 	$(LIBTOOL) --mode=finish $(libexecdir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection.la
-	$(RM) $(libexecdir)/sqlrlogger_*
 	$(RMTREE) $(tmpdir)
 	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
 	$(RMTREE) $(logdir)

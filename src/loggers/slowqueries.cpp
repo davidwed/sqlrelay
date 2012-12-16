@@ -1,10 +1,10 @@
 // Copyright (c) 2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrloggers/slowqueries.h>
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
+#include <sqlrlogger.h>
 #include <cmdline.h>
 #include <rudiments/process.h>
 #include <rudiments/charstring.h>
@@ -18,11 +18,21 @@
 using namespace rudiments;
 #endif
 
-extern "C" {
-	sqlrlogger	*new_slowqueries(xmldomnode *parameters) {
-		return new slowqueries(parameters);
-	}
-}
+class slowqueries : public sqlrlogger {
+	public:
+			slowqueries(xmldomnode *parameters);
+			~slowqueries();
+
+		bool	init(sqlrconnection_svr *sqlrcon);
+		bool	run(sqlrconnection_svr *sqlrcon,
+						sqlrcursor_svr *sqlrcur);
+
+	private:
+		char		*querylogname;
+		file		querylog;
+		uint64_t	sec;
+		uint64_t	usec;
+};
 
 slowqueries::slowqueries(xmldomnode *parameters) : sqlrlogger(parameters) {
 	querylogname=NULL;
@@ -112,4 +122,10 @@ bool slowqueries::run(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur) {
 		}
 	}
 	return true;
+}
+
+extern "C" {
+	sqlrlogger	*new_slowqueries(xmldomnode *parameters) {
+		return new slowqueries(parameters);
+	}
 }

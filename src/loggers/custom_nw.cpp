@@ -1,9 +1,9 @@
 // Copyright (c) 2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrloggers/custom_nw.h>
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
+#include <sqlrlogger.h>
 #include <cmdline.h>
 #include <rudiments/charstring.h>
 #include <rudiments/directory.h>
@@ -17,11 +17,21 @@
 using namespace rudiments;
 #endif
 
-extern "C" {
-	sqlrlogger	*new_custom_nw(xmldomnode *parameters) {
-		return new custom_nw(parameters);
-	}
-}
+class custom_nw : public sqlrlogger {
+	public:
+			custom_nw(xmldomnode *parameters);
+
+		bool	init(sqlrconnection_svr *sqlrcon);
+		bool	run(sqlrconnection_svr *sqlrcon,
+						sqlrcursor_svr *sqlrcur);
+	private:
+		int	strescape(const char *str, char *buf, int limit);
+		bool	descInputBinds(sqlrcursor_svr *cursor,
+						char *buf, int limit);
+		file	querylog;
+		char	*querylogname;
+		char	querylogbuf[102400];
+};
 
 custom_nw::custom_nw(xmldomnode *parameters) : sqlrlogger(parameters) {
 	querylogname=NULL;
@@ -231,4 +241,10 @@ bool custom_nw::descInputBinds(sqlrcursor_svr *cursor, char *buf, int limit) {
 		}
 	}
 	return true;
+}
+
+extern "C" {
+	sqlrlogger	*new_custom_nw(xmldomnode *parameters) {
+		return new custom_nw(parameters);
+	}
 }
