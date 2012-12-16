@@ -64,18 +64,18 @@ SRCS = sqlrcontroller/sqlrcontrollerctor.cpp \
 	sqlrcontroller/user.cpp \
 	sqlrcontroller/statistics.cpp \
 	sqlrcontroller/getquerytree.cpp \
-	sqlrcontroller/sqlrconnection.cpp \
-	sqlrcontroller/sqlrcursor.cpp \
-	sqlrcontroller/sqlparser.cpp \
-	sqlrcontroller/sqlwriter.cpp \
-	sqlrcontroller/sqltranslations.cpp \
-	sqlrcontroller/sqltranslation.cpp \
-	sqlrcontroller/sqltriggers.cpp \
-	sqlrcontroller/sqltrigger.cpp \
-	sqlrcontroller/sqlrloggers.cpp \
-	sqlrcontroller/sqlrlogger.cpp \
-	sqlrcontroller/sqlrqueries.cpp \
-	sqlrcontroller/sqlrquery.cpp
+	sqlrconnection.cpp \
+	sqlrcursor.cpp \
+	sqlparser.cpp \
+	sqlwriter.cpp \
+	sqltranslations.cpp \
+	sqltranslation.cpp \
+	sqltriggers.cpp \
+	sqltrigger.cpp \
+	sqlrloggers.cpp \
+	sqlrlogger.cpp \
+	sqlrqueries.cpp \
+	sqlrquery.cpp
 
 LOBJS = sqlrcontroller/sqlrcontrollerctor.lo \
 	sqlrcontroller/sqlrcontrollerdtor.lo \
@@ -134,18 +134,18 @@ LOBJS = sqlrcontroller/sqlrcontrollerctor.lo \
 	sqlrcontroller/user.lo \
 	sqlrcontroller/statistics.lo \
 	sqlrcontroller/getquerytree.lo \
-	sqlrcontroller/sqlrconnection.lo \
-	sqlrcontroller/sqlrcursor.lo \
-	sqlrcontroller/sqlparser.lo \
-	sqlrcontroller/sqlwriter.lo \
-	sqlrcontroller/sqltranslations.lo \
-	sqlrcontroller/sqltranslation.lo \
-	sqlrcontroller/sqltriggers.lo \
-	sqlrcontroller/sqltrigger.lo \
-	sqlrcontroller/sqlrloggers.lo \
-	sqlrcontroller/sqlrlogger.lo \
-	sqlrcontroller/sqlrqueries.lo \
-	sqlrcontroller/sqlrquery.lo
+	sqlrconnection.lo \
+	sqlrcursor.lo \
+	sqlparser.lo \
+	sqlwriter.lo \
+	sqltranslations.lo \
+	sqltranslation.lo \
+	sqltriggers.lo \
+	sqltrigger.lo \
+	sqlrloggers.lo \
+	sqlrlogger.lo \
+	sqlrqueries.lo \
+	sqlrquery.lo
 
 .SUFFIXES: .lo
 
