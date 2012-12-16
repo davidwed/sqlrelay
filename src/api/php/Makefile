@@ -56,7 +56,7 @@ clean:
 	$(RMTREE) .libs
 
 sql_relay.la: sql_relay.cpp sql_relay.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sql_relay.lo $(LDFLAGS) $(LIBS) -rpath $(PHPEXTDIR) $(RPATH) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sql_relay.lo $(LDFLAGS) $(LIBS) -rpath $(PHPEXTDIR) $(RPATH) -avoid-version -module
 
 install: sql_relay.la
 	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
