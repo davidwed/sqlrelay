@@ -13,9 +13,6 @@ ifeq ($(CLIENTUSERPATH),yes)
 endif
 endif
 
-SRCS = main.cpp
-LOBJS = main.lo
-
 .SUFFIXES: .lo
 
 .cpp.lo:
@@ -25,12 +22,11 @@ all: sqlr-start$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) sqlr-start$(EXE)
-	$(LIBTOOL) --mode=clean $(RM) *.lo
-	$(LIBTOOL) --mode=clean $(RM) *.o
+	$(LIBTOOL) --mode=clean $(RM) *.lo *.o
 	$(RMTREE) .libs
 
-sqlr-start$(EXE): $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ $(LOBJS) $(LIBS) $(RPATH)
+sqlr-start$(EXE): sqlr-start.cpp sqlr-start.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-start.lo $(LIBS) $(RPATH)
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
