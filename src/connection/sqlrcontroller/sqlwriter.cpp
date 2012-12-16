@@ -861,3 +861,1253 @@ bool sqlwriter::dontAppendSpace(stringbuffer *output) {
 	return (length &&
 		character::inSet(output->getString()[length-1]," .(,"));
 }
+
+bool sqlwriter::createQuery(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("create");
+	return true;
+}
+
+bool sqlwriter::table(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("table");
+	return true;
+}
+
+bool sqlwriter::global(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("global");
+	return true;
+}
+
+bool sqlwriter::temporary(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("temporary");
+	return true;
+}
+
+bool sqlwriter::ifNotExists(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("if not exists");
+	return true;
+}
+
+bool sqlwriter::columns(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	leftParen(output);
+	return true;
+}
+
+bool sqlwriter::endColumns(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	rightParen(output);
+	return true;
+}
+
+bool sqlwriter::column(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::endColumn(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	if (hasSibling(node)) {
+		comma(output);
+	}
+	return true;
+}
+
+bool sqlwriter::values(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	leftParen(output);
+	return true;
+}
+
+bool sqlwriter::endValues(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	rightParen(output);
+	return true;
+}
+
+bool sqlwriter::length(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::scale(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	comma(output);
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::constraints(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::unsignedConstraint(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("unsigned");
+	return true;
+}
+
+bool sqlwriter::zerofill(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("zerofill");
+	return true;
+}
+
+bool sqlwriter::binary(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("binary");
+	return true;
+}
+
+bool sqlwriter::characterSet(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("character set ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::collate(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("collate ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::nullable(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("null");
+	return true;
+}
+
+bool sqlwriter::notNull(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("not null");
+	return true;
+}
+
+bool sqlwriter::defaultValue(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("default ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::autoIncrement(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("auto_increment");
+	return true;
+}
+
+bool sqlwriter::uniqueKey(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("unique key");
+	return true;
+}
+
+bool sqlwriter::primaryKey(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("primary key");
+	return true;
+}
+
+bool sqlwriter::key(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("key");
+	return true;
+}
+
+bool sqlwriter::comment(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("comment ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::columnFormat(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("column_format ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::references(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("references ");
+	return true;
+}
+
+bool sqlwriter::endReferences(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::match(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("match ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::onDelete(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("on delete ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::onUpdate(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("on update ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::onCommit(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("on commit ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::as(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("as ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::constraint(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	const char	*name=node->getAttributeValue("value");
+	if (name) {
+		output->append("constraint ")->append(name);
+	}
+	return true;
+}
+
+bool sqlwriter::foreignKey(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("foreign key ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::check(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("check (");
+	return true;
+}
+
+bool sqlwriter::endCheck(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append(")");
+	return true;
+}
+
+bool sqlwriter::withNoLog(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("with no log ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::fulltext(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("fulltext ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::spatial(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("spatial ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::index(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("index ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::indexNameDatabase(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		period(output);
+	}
+	return true;
+}
+
+bool sqlwriter::indexNameSchema(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		period(output);
+	}
+	return true;
+}
+
+bool sqlwriter::indexNameIndex(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::btree(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("btree ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::hash(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("hash ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::keyBlockSize(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("key_block_size");
+	if (!charstring::compare(node->getAttributeValue("equals"),"true")) {
+		output->append("=");
+	} else {
+		output->append(" ");
+	}
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::withParser(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("with parser ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::synonym(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("synonym ");
+	return true;
+}
+
+bool sqlwriter::forClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("for ");
+	return true;
+}
+
+bool sqlwriter::objectNameDatabase(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		period(output);
+	}
+	return true;
+}
+
+bool sqlwriter::objectNameSchema(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		period(output);
+	}
+	return true;
+}
+
+bool sqlwriter::objectNameObject(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::deleteQuery(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("delete");
+	return true;
+}
+
+bool sqlwriter::deleteFrom(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("from");
+	return true;
+}
+
+bool sqlwriter::usingClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("using");
+	return true;
+}
+
+bool sqlwriter::dropQuery(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("drop");
+	return true;
+}
+
+bool sqlwriter::ifExists(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("if exists");
+	return true;
+}
+
+bool sqlwriter::endTableNameListItem(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	if (!node->getNextSibling()->isNullNode()) {
+		comma(output);
+	}
+	return true;
+}
+
+bool sqlwriter::restrictClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("restrict");
+	return true;
+}
+
+bool sqlwriter::cascade(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("cascade");
+	return true;
+}
+
+bool sqlwriter::cascadeConstraintsClause(xmldomnode *node,
+						stringbuffer *output) {
+	debugFunction();
+	output->append("constraints");
+	return true;
+}
+
+bool sqlwriter::tableNameDatabase(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		period(output);
+	}
+	return true;
+}
+
+bool sqlwriter::tableNameSchema(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		period(output);
+	}
+	return true;
+}
+
+bool sqlwriter::tableNameTable(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::name(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::type(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::endType(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::size(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	leftParen(output);
+	return true;
+}
+
+bool sqlwriter::endSize(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	rightParen(output);
+	return true;
+}
+
+bool sqlwriter::value(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		comma(output);
+	}
+	return true;
+}
+
+bool sqlwriter::verbatim(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::insertQuery(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("insert");
+	return true;
+}
+
+bool sqlwriter::insertInto(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("into");
+	return true;
+}
+
+bool sqlwriter::insertValuesClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("values (");
+	return true;
+}
+
+bool sqlwriter::insertValueClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("value (");
+	return true;
+}
+
+bool sqlwriter::insertValue(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::endInsertValuesClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append(")");
+	return true;
+}
+
+bool sqlwriter::endInsertValueClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append(")");
+	return true;
+}
+
+bool sqlwriter::endInsertValue(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	if (hasSibling(node)) {
+		comma(output);
+	}
+	return true;
+}
+
+bool sqlwriter::selectQuery(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("select");
+	return true;
+}
+
+bool sqlwriter::selectExpressions(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::selectExpression(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::endSelectExpression(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	if (hasSibling(node)) {
+		comma(output);
+	}
+	return true;
+}
+
+bool sqlwriter::subSelect(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	leftParen(output);
+	return true;
+}
+
+bool sqlwriter::endSubSelect(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	rightParen(output);
+	return true;
+}
+
+bool sqlwriter::unionClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("union");
+	return true;
+}
+
+bool sqlwriter::all(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("all");
+	return true;
+}
+
+bool sqlwriter::alias(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::unique(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("unique");
+	return true;
+}
+
+bool sqlwriter::distinct(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("distinct");
+	return true;
+}
+
+bool sqlwriter::from(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("from");
+	return true;
+}
+
+bool sqlwriter::tableReferences(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::tableReference(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::endTableReference(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	// write a comma if the next node isn't a join clause
+	xmldomnode	*next=node->getNextTagSibling();
+	if (!next->isNullNode() &&
+		charstring::compare(next->getName(),sqlparser::_join_clause)) {
+		comma(output);
+	}
+	return true;
+}
+
+bool sqlwriter::joinClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::endJoinClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	// write a comma if the next node isn't a join clause
+	xmldomnode	*next=node->getNextTagSibling();
+	if (!next->isNullNode() &&
+		charstring::compare(next->getName(),sqlparser::_join_clause)) {
+		comma(output);
+	}
+	return true;
+}
+
+bool sqlwriter::inner(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("inner");
+	return true;
+}
+
+bool sqlwriter::cross(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("cross");
+	return true;
+}
+
+bool sqlwriter::straightJoin(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("straight_join");
+	return true;
+}
+
+bool sqlwriter::left(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("left");
+	return true;
+}
+
+bool sqlwriter::right(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("right");
+	return true;
+}
+
+bool sqlwriter::outer(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("outer");
+	return true;
+}
+
+bool sqlwriter::natural(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("natural");
+	return true;
+}
+
+bool sqlwriter::join(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("join");
+	return true;
+}
+
+bool sqlwriter::on(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("on");
+	return true;
+}
+
+bool sqlwriter::joinUsing(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("using");
+	return true;
+}
+
+bool sqlwriter::groupBy(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("group by");
+	return true;
+}
+
+bool sqlwriter::groupByItem(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::endGroupByItem(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	// write a comma if the next node is another group-by-item
+	xmldomnode	*next=node->getNextTagSibling();
+	if (!next->isNullNode() &&
+		!charstring::compare(next->getName(),
+					sqlparser::_group_by_item)) {
+		comma(output);
+	}
+	return true;
+}
+
+bool sqlwriter::withRollup(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("with rollup");
+	return true;
+}
+
+bool sqlwriter::having(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("having");
+	return true;
+}
+
+bool sqlwriter::orderBy(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("order by");
+	return true;
+}
+
+bool sqlwriter::orderByItem(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::endOrderByItem(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	if (hasSibling(node)) {
+		comma(output);
+	}
+	return true;
+}
+
+bool sqlwriter::asc(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("asc");
+	return true;
+}
+
+bool sqlwriter::desc(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("desc");
+	return true;
+}
+
+bool sqlwriter::limit(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("limit");
+	return true;
+}
+
+bool sqlwriter::selectInto(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("into");
+	return true;
+}
+
+bool sqlwriter::procedure(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("procedure");
+	return true;
+}
+
+bool sqlwriter::forUpdate(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("for update");
+	return true;
+}
+
+bool sqlwriter::where(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("where");
+	return true;
+}
+
+bool sqlwriter::andClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("and");
+	return true;
+}
+
+bool sqlwriter::orClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("or");
+	return true;
+}
+
+bool sqlwriter::comparison(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::notClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("not");
+	return true;
+}
+
+bool sqlwriter::group(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("(");
+	return true;
+}
+
+bool sqlwriter::endGroup(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append(")");
+	return true;
+}
+
+bool sqlwriter::between(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("between");
+	return true;
+}
+
+bool sqlwriter::in(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("in ");
+	leftParen(output);
+	return true;
+}
+
+bool sqlwriter::endIn(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	rightParen(output);
+	return true;
+}
+
+bool sqlwriter::inSetItem(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::endInSetItem(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	if (hasSibling(node)) {
+		comma(output);
+	}
+	return true;
+}
+
+bool sqlwriter::exists(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("exists ");
+	leftParen(output);
+	return true;
+}
+
+bool sqlwriter::endExists(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	rightParen(output);
+	return true;
+}
+
+bool sqlwriter::is(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("is");
+	return true;
+}
+
+bool sqlwriter::like(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("like");
+	return true;
+}
+
+bool sqlwriter::matches(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("matches");
+	return true;
+}
+
+bool sqlwriter::nullSafeEquals(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("<=>");
+	return true;
+}
+
+bool sqlwriter::notEquals(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("!=");
+	return true;
+}
+
+bool sqlwriter::lessThan(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("<");
+	return true;
+}
+
+bool sqlwriter::greaterThan(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append(">");
+	return true;
+}
+
+bool sqlwriter::lessThanOrEqualTo(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("<=");
+	return true;
+}
+
+bool sqlwriter::greaterThanOrEqualTo(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append(">=");
+	return true;
+}
+
+bool sqlwriter::escape(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("escape");
+	return true;
+}
+
+bool sqlwriter::expression(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::intervalQualifier(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append(node->getAttributeValue(sqlparser::_from));
+	const char	*precision=
+			node->getAttributeValue(sqlparser::_from_precision);
+	const char	*scale=
+			node->getAttributeValue(sqlparser::_from_scale);
+	if (precision) {
+		leftParen(output);
+		output->append(precision);
+		if (scale) {
+			comma(output);
+			output->append(scale);
+		}
+		rightParen(output);
+	}
+	if (charstring::length(node->getAttributeValue(sqlparser::_to))) {
+		output->append(" to ");
+		output->append(node->getAttributeValue(sqlparser::_to));
+		precision=node->getAttributeValue(sqlparser::_to_precision);
+		scale=node->getAttributeValue(sqlparser::_to_scale);
+		if (precision) {
+			leftParen(output);
+			output->append(precision);
+			if (scale) {
+				comma(output);
+				output->append(scale);
+			}
+			rightParen(output);
+		}
+	}
+	return true;
+}
+
+bool sqlwriter::outerJoinOperator(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("(+)");
+	return true;
+}
+
+bool sqlwriter::compliment(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("~");
+	return true;
+}
+
+bool sqlwriter::inverse(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("!");
+	return true;
+}
+
+bool sqlwriter::negative(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("-");
+	return true;
+}
+
+bool sqlwriter::plus(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("+");
+	return true;
+}
+
+bool sqlwriter::minus(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("-");
+	return true;
+}
+
+bool sqlwriter::times(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("*");
+	return true;
+}
+
+bool sqlwriter::dividedBy(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("/");
+	return true;
+}
+
+bool sqlwriter::modulo(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("%");
+	return true;
+}
+
+bool sqlwriter::bitwiseAnd(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("&");
+	return true;
+}
+
+bool sqlwriter::bitwiseOr(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("|");
+	return true;
+}
+
+bool sqlwriter::bitwiseXor(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("^");
+	return true;
+}
+
+bool sqlwriter::logicalAnd(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("&&");
+	return true;
+}
+
+bool sqlwriter::logicalOr(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("||");
+	return true;
+}
+
+bool sqlwriter::number(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::stringLiteral(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::bindVariable(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::columnReference(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::columnNameDatabase(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		period(output);
+	}
+	return true;
+}
+
+bool sqlwriter::columnNameSchema(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		period(output);
+	}
+	return true;
+}
+
+bool sqlwriter::columnNameTable(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		period(output);
+	}
+	return true;
+}
+
+bool sqlwriter::columnNameColumn(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::function(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::parameters(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	leftParen(output);
+	return true;
+}
+
+bool sqlwriter::endParameters(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	rightParen(output);
+	return true;
+}
+
+bool sqlwriter::parameter(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::endParameter(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	if (hasSibling(node)) {
+		comma(output);
+	}
+	return true;
+}
+
+bool sqlwriter::updateQuery(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("update");
+	return true;
+}
+
+bool sqlwriter::updateSet(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("set");
+	return true;
+}
+
+bool sqlwriter::assignment(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlwriter::endAssignment(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	if (hasSibling(node)) {
+		output->append(",");
+	}
+	return true;
+}
+
+bool sqlwriter::equals(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("=");
+	return true;
+}
+
+bool sqlwriter::setQuery(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("set");
+	return true;
+}
+
+bool sqlwriter::setSession(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("session");
+	return true;
+}
+
+bool sqlwriter::setGlobal(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("global");
+	return true;
+}
+
+bool sqlwriter::transaction(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("transaction ");
+	return true;
+}
+
+bool sqlwriter::isolationLevel(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("isolation level ");
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::lockQuery(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("lock");
+	return true;
+}
+
+bool sqlwriter::inMode(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("in");
+	return true;
+}
+
+bool sqlwriter::lockMode(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	return true;
+}
+
+bool sqlwriter::mode(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("mode");
+	return true;
+}
+
+bool sqlwriter::noWait(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("nowait");
+	return true;
+}

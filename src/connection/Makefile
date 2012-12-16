@@ -81,18 +81,7 @@ SRCS = sqlrcontroller/sqlrcontrollerctor.cpp \
 	sqlparser/parseexpression.cpp \
 	sqlparser/parselock.cpp \
 	sqlparser/sqlparser.cpp \
-	sqlwriter/sqlwriter.cpp \
-	sqlwriter/writecreate.cpp \
-	sqlwriter/writedelete.cpp \
-	sqlwriter/writedrop.cpp \
-	sqlwriter/writegeneric.cpp \
-	sqlwriter/writeinsert.cpp \
-	sqlwriter/writeselect.cpp \
-	sqlwriter/writewhere.cpp \
-	sqlwriter/writeexpression.cpp \
-	sqlwriter/writeupdate.cpp \
-	sqlwriter/writeset.cpp \
-	sqlwriter/writelock.cpp \
+	sqlrcontroller/sqlwriter.cpp \
 	sqlrcontroller/sqltranslations.cpp \
 	sqlrcontroller/sqltranslation.cpp \
 	sqlrcontroller/sqltriggers.cpp \
@@ -176,18 +165,7 @@ LOBJS = sqlrcontroller/sqlrcontrollerctor.lo \
 	sqlparser/parseexpression.lo \
 	sqlparser/parselock.lo \
 	sqlparser/sqlparser.lo \
-	sqlwriter/sqlwriter.lo \
-	sqlwriter/writecreate.lo \
-	sqlwriter/writedelete.lo \
-	sqlwriter/writedrop.lo \
-	sqlwriter/writegeneric.lo \
-	sqlwriter/writeinsert.lo \
-	sqlwriter/writeselect.lo \
-	sqlwriter/writewhere.lo \
-	sqlwriter/writeexpression.lo \
-	sqlwriter/writeupdate.lo \
-	sqlwriter/writeset.lo \
-	sqlwriter/writelock.lo \
+	sqlrcontroller/sqlwriter.lo \
 	sqlrcontroller/sqltranslations.lo \
 	sqlrcontroller/sqltranslation.lo \
 	sqlrcontroller/sqltriggers.lo \
