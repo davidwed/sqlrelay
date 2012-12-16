@@ -20,20 +20,22 @@ LOBJS= routerconnection.lo
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: libsqlrelay_sqlrconnection_router.la
+all: sqlrconnection_router.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
-libsqlrelay_sqlrconnection_router.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqlrconnection_router.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrelay_sqlrconnection_router.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqlrconnection_router.a
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) sqlrconnection_router.la $(libexecdir)
+	$(RM) $(libexecdir)/sqlrconnection_router.a
+	$(RM) $(libexecdir)/sqlrconnection_router.la
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrconnection_router.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-router$(EXE)
+	$(RM) $(libexecdir)/sqlrconnection_router.*
+	$(RM) $(libdir)/libsqlrelay_sqlrconnection_router*
+	$(RM) $(bindir)/sqlr-connection-router$(EXE)

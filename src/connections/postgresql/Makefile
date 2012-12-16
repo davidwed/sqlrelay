@@ -20,20 +20,22 @@ LOBJS= postgresqlconnection.lo
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: libsqlrelay_sqlrconnection_postgresql.la
+all: sqlrconnection_postgresql.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
-libsqlrelay_sqlrconnection_postgresql.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqlrconnection_postgresql.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrelay_sqlrconnection_postgresql.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqlrconnection_postgresql.a
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) sqlrconnection_postgresql.la $(libexecdir)
+	$(RM) $(libexecdir)/sqlrconnection_postgresql.a
+	$(RM) $(libexecdir)/sqlrconnection_postgresql.la
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrconnection_postgresql.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-postgresql$(EXE)
+	$(RM) $(libexecdir)/sqlrconnection_postgresql.*
+	$(RM) $(libdir)/libsqlrelay_sqlrconnection_postgresql*
+	$(RM) $(bindir)/sqlr-connection-postgresql$(EXE)

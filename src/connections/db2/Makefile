@@ -20,20 +20,22 @@ LOBJS= db2connection.lo
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: libsqlrelay_sqlrconnection_db2.la
+all: sqlrconnection_db2.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
-libsqlrelay_sqlrconnection_db2.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqlrconnection_db2.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrelay_sqlrconnection_db2.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqlrconnection_db2.a
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) sqlrconnection_db2.la $(libexecdir)
+	$(RM) $(libexecdir)/sqlrconnection_db2.a
+	$(RM) $(libexecdir)/sqlrconnection_db2.la
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrconnection_db2.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-db2$(EXE)
+	$(RM) $(libexecdir)/sqlrconnection_db2.*
+	$(RM) $(libdir)/libsqlrelay_sqlrconnection_db2*
+	$(RM) $(bindir)/sqlr-connection-db2$(EXE)

@@ -20,20 +20,22 @@ LOBJS= sqliteconnection.lo
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: libsqlrelay_sqlrconnection_sqlite.la
+all: sqlrconnection_sqlite.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
-libsqlrelay_sqlrconnection_sqlite.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqlrconnection_sqlite.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrelay_sqlrconnection_sqlite.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqlrconnection_sqlite.a
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) sqlrconnection_sqlite.la $(libexecdir)
+	$(RM) $(libexecdir)/sqlrconnection_sqlite.a
+	$(RM) $(libexecdir)/sqlrconnection_sqlite.la
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrconnection_sqlite.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sqlite$(EXE)
+	$(RM) $(libexecdir)/sqlrconnection_sqlite.*
+	$(RM) $(libdir)/libsqlrelay_sqlrconnection_sqlite*
+	$(RM) $(bindir)/sqlr-connection-sqlite$(EXE)

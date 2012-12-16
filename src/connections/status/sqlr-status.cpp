@@ -1,13 +1,128 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <statusconnection.h>
+#include <sqlrcontroller.h>
 #include <rudiments/signalclasses.h>
 #include <rudiments/process.h>
+#include <rudiments/charstring.h>
+#include <rudiments/error.h>
+#include <cmdline.h>
+#include <datatypes.h>
 #include <defines.h>
-
+#include <config.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+class status : public sqlrcontroller_svr {
+	public:
+		status();
+		shmdata 		*getStatistics();
+		uint32_t		getConnectionCount();
+		uint32_t		getConnectedClientCount();
+		bool			init(int argc, const char **argv);
+		semaphoreset		*getSemset();
+	private:
+		bool	createSharedMemoryAndSemaphores(const char *tmpdir,
+								const char *id);
+
+		bool	connected;
+
+		const char	*connectionid;
+		tempdir		*tmpdir;
+
+		semaphoreset	*statussemset;
+
+		shmdata		privateshm;
+};
+
+status::status() : sqlrcontroller_svr() {
+	connected=false;
+}
+
+semaphoreset *status::getSemset() {
+	return statussemset;
+}
+
+shmdata *status::getStatistics() {
+	statussemset->waitWithUndo(9);
+	privateshm=*shm;
+	statussemset->signalWithUndo(9);
+	return &privateshm;
+}
+
+uint32_t status::getConnectionCount() {
+	return shm->totalconnections;
+}
+
+uint32_t status::getConnectedClientCount() {
+	return shm->connectedclients;
+}
+
+bool status::init(int argc, const char **argv) {
+	
+	cmdl=new cmdline(argc,argv);
+
+	cfgfl=new sqlrconfigfile();
+	tmpdir=new tempdir(cmdl);
+
+	if (!cfgfl->parse(cmdl->getConfig(),cmdl->getId())) {
+		return false;
+	}
+
+	if (!createSharedMemoryAndSemaphores(tmpdir->getString(),
+							cmdl->getId())) {
+		return false;
+	}
+
+	shm=(shmdata *)idmemory->getPointer();
+	if (!shm) {
+		fprintf(stderr,"failed to get pointer to shmdata\n");
+		return false;
+	}
+
+	return true;
+}
+
+bool status::createSharedMemoryAndSemaphores(const char *tmpdir,
+							const char *id) {
+	
+	size_t  idfilenamelen=charstring::length(tmpdir)+5+
+		charstring::length(id)+1;
+	char	*idfilename=new char[idfilenamelen];
+	snprintf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir,id);
+
+	key_t	key=file::generateKey(idfilename,1);
+
+	idmemory=new sharedmemory();
+	if (!idmemory->attach(key)) {
+		char	*err=error::getErrorString();
+		fprintf(stderr,"Couldn't attach to shared memory segment: ");
+		fprintf(stderr,"%s\n",err);
+		delete[] err;
+		delete idmemory;
+		idmemory=NULL;
+		delete[] idfilename;
+		return false;
+	}
+
+	statussemset=new semaphoreset();
+	if (!statussemset->attach(key,11)) {
+		char	*err=error::getErrorString();
+		fprintf(stderr,"Couldn't attach to semaphore set: ");
+		fprintf(stderr,"%s\n",err);
+		delete[] err;
+		delete statussemset;
+		delete idmemory;
+		statussemset=NULL;
+		idmemory=NULL;
+		delete[] idfilename;
+		return false;
+	}
+
+	delete[] idfilename;
+
+	return true;
+}
 
 void printAcquisitionStatus(int32_t sem) {
 	printf("%s (%d)\n",(sem)?"acquired    ":"not acquired",sem);

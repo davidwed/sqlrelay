@@ -20,20 +20,22 @@ LOBJS= mysqlconnection.lo mysqlsqlwriter.lo
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: libsqlrelay_sqlrconnection_mysql.la
+all: sqlrconnection_mysql.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
-libsqlrelay_sqlrconnection_mysql.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqlrconnection_mysql.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrelay_sqlrconnection_mysql.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqlrconnection_mysql.a
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) sqlrconnection_mysql.la $(libexecdir)
+	$(RM) $(libexecdir)/sqlrconnection_mysql.a
+	$(RM) $(libexecdir)/sqlrconnection_mysql.la
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrconnection_mysql.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-mysql$(EXE)
+	$(RM) $(libexecdir)/sqlrconnection_mysql.*
+	$(RM) $(libdir)/libsqlrelay_sqlrconnection_mysql*
+	$(RM) $(bindir)/sqlr-connection-mysql$(EXE)

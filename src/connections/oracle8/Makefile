@@ -20,20 +20,22 @@ LOBJS= oracle8connection.lo oracle8sqlwriter.lo
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: libsqlrelay_sqlrconnection_oracle8.la
+all: sqlrconnection_oracle8.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
-libsqlrelay_sqlrconnection_oracle8.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqlrconnection_oracle8.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrelay_sqlrconnection_oracle8.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqlrconnection_oracle8.a
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) sqlrconnection_oracle8.la $(libexecdir)
+	$(RM) $(libexecdir)/sqlrconnection_oracle8.a
+	$(RM) $(libexecdir)/sqlrconnection_oracle8.la
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrconnection_oracle8.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-oracle8$(EXE)
+	$(RM) $(libexecdir)/sqlrconnection_oracle8.*
+	$(RM) $(libdir)/libsqlrelay_sqlrconnection_oracle8*
+	$(RM) $(bindir)/sqlr-connection-oracle8$(EXE)

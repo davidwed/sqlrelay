@@ -20,20 +20,22 @@ LOBJS= sybaseconnection.lo
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: libsqlrelay_sqlrconnection_sybase.la
+all: sqlrconnection_sybase.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
-libsqlrelay_sqlrconnection_sybase.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqlrconnection_sybase.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrelay_sqlrconnection_sybase.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqlrconnection_sybase.a
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) sqlrconnection_sybase.la $(libexecdir)
+	$(RM) $(libexecdir)/sqlrconnection_sybase.a
+	$(RM) $(libexecdir)/sqlrconnection_sybase.la
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrconnection_sybase.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-sybase$(EXE)
+	$(RM) $(libexecdir)/sqlrconnection_sybase.*
+	$(RM) $(libdir)/libsqlrelay_sqlrconnection_sybase*
+	$(RM) $(bindir)/sqlr-connection-sybase$(EXE)

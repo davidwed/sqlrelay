@@ -12,8 +12,8 @@ ifeq ($(STATUSUSERPATH),yes)
 endif
 endif
 
-SRCS= statusconnection.cpp main.cpp
-LOBJS= statusconnection.lo main.lo
+SRCS= sqlr-status.cpp
+LOBJS= sqlr-status.lo
 
 .SUFFIXES: .lo
 

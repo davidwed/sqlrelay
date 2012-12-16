@@ -20,20 +20,22 @@ LOBJS= firebirdconnection.lo
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: libsqlrelay_sqlrconnection_firebird.la
+all: sqlrconnection_firebird.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
-libsqlrelay_sqlrconnection_firebird.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqlrconnection_firebird.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrelay_sqlrconnection_firebird.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqlrconnection_firebird.a
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) sqlrconnection_firebird.la $(libexecdir)
+	$(RM) $(libexecdir)/sqlrconnection_firebird.a
+	$(RM) $(libexecdir)/sqlrconnection_firebird.la
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrconnection_firebird.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-firebird$(EXE)
+	$(RM) $(libexecdir)/sqlrconnection_firebird.*
+	$(RM) $(libdir)/libsqlrelay_sqlrconnection_firebird*
+	$(RM) $(bindir)/sqlr-connection-firebird$(EXE)

@@ -20,20 +20,22 @@ LOBJS= freetdsconnection.lo
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: libsqlrelay_sqlrconnection_freetds.la
+all: sqlrconnection_freetds.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
-libsqlrelay_sqlrconnection_freetds.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -module -no-undefined
+sqlrconnection_freetds.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrelay_sqlrconnection_freetds.la $(libdir)
-	$(RM) $(libdir)/libsqlrelay_sqlrconnection_freetds.a
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) sqlrconnection_freetds.la $(libexecdir)
+	$(RM) $(libexecdir)/sqlrconnection_freetds.a
+	$(RM) $(libexecdir)/sqlrconnection_freetds.la
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrelay_sqlrconnection_freetds.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-connection-freetds$(EXE)
+	$(RM) $(libexecdir)/sqlrconnection_freetds.*
+	$(RM) $(libdir)/libsqlrelay_sqlrconnection_freetds*
+	$(RM) $(bindir)/sqlr-connection-freetds$(EXE)
