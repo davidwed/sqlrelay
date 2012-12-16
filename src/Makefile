@@ -11,6 +11,8 @@ all:
 	$(MAKE) -C triggers all
 	$(MAKE) -C translations all
 	$(MAKE) -C queries all
+	$(MAKE) -C loggers all
+	$(MAKE) -C pwdencs all
 	$(MAKE) -C connections all
 	$(MAKE) -C start all
 	$(MAKE) -C cachemanager all
@@ -26,6 +28,8 @@ clean:
 	$(MAKE) -C triggers clean
 	$(MAKE) -C translations clean
 	$(MAKE) -C queries clean
+	$(MAKE) -C loggers clean
+	$(MAKE) -C pwdencs clean
 	$(MAKE) -C connections clean
 	$(MAKE) -C start clean
 	$(MAKE) -C cachemanager clean
@@ -41,6 +45,8 @@ install:
 	$(MAKE) -C triggers install
 	$(MAKE) -C translations install
 	$(MAKE) -C queries install
+	$(MAKE) -C loggers install
+	$(MAKE) -C pwdencs install
 	$(MAKE) -C connections install
 	$(MAKE) -C start install
 	$(MAKE) -C cachemanager install
@@ -56,6 +62,8 @@ uninstall:
 	$(MAKE) -C triggers uninstall
 	$(MAKE) -C translations uninstall
 	$(MAKE) -C queries uninstall
+	$(MAKE) -C loggers uninstall
+	$(MAKE) -C pwdencs uninstall
 	$(MAKE) -C connections uninstall
 	$(MAKE) -C start uninstall
 	$(MAKE) -C cachemanager uninstall
