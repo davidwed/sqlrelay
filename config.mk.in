@@ -243,10 +243,6 @@ FIREBIRDUSERPATH = @FIREBIRDUSERPATH@
 ROUTERLIBSPATH =
 ROUTERUSERPATH =
 
-# stuff for SID
-SIDINCLUDES = -I$(top_builddir)/src/api/c++/include
-SIDLIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient
-
 # client/server rpath flags
 CLIENTUSERPATH = @CLIENTUSERPATH@
 SERVERUSERPATH = @SERVERUSERPATH@

@@ -8,7 +8,7 @@ void sqlrcontroller_svr::serverVersionCommand() {
 	dbgfile.debugPrint("connection",1,"server version");
 
 	// get the server version
-	const char	*svrversion=SERVER_VERSION;
+	const char	*svrversion=SQLR_VERSION;
 
 	// send it to the client
 	uint16_t	svrvlen=charstring::length(svrversion);
