@@ -29955,16 +29955,16 @@ then
 					done
 					if ( test -n "$PYTHONDIR" )
 					then
-												if ( test -d "/Library/Python/$i/site-packages" )
-						then
-							PYTHONDIR="/Library/Python/$i"
-						fi
 						break
 					fi
 				done
 
 				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 				then
+										if ( test -d "/Library/Python/$i/site-packages" )
+					then
+						PYTHONDIR="/Library/Python/$i"
+					fi
 					break
 				fi
 			done

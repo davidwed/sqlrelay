@@ -2491,17 +2491,17 @@ then
 					done
 					if ( test -n "$PYTHONDIR" )
 					then
-						dnl override PYTHONDIR on osx in some cases
-						if ( test -d "/Library/Python/$i/site-packages" )
-						then
-							PYTHONDIR="/Library/Python/$i"
-						fi
 						break
 					fi
 				done
 
 				if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 				then
+					dnl override PYTHONDIR on osx in some cases
+					if ( test -d "/Library/Python/$i/site-packages" )
+					then
+						PYTHONDIR="/Library/Python/$i"
+					fi
 					break
 				fi
 			done
