@@ -85,7 +85,7 @@ install:
 	$(LTINSTALL) sqltranslation_oracleize.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_oracleize.a
 	$(RM) $(libexecdir)/sqltranslation_oracleize.la
-	$(MODULERENAME) $(libexecdir)/sqltranslation_oraclize.so so $(MODULESUFFIX)
+	$(MODULERENAME) $(libexecdir)/sqltranslation_oracleize.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_serialtoautoincrement.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_serialtoautoincrement.a
 	$(RM) $(libexecdir)/sqltranslation_serialtoautoincrement.la

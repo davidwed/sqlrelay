@@ -478,8 +478,7 @@ SOSUFFIX="so"
 MODULESUFFIX="so"
 if ( test -n "$CYGWIN" )
 then
-	SOSUFFIX="dll"
-	MODULESUFFIX="dll"
+	SOSUFFIX="dll.a"
 fi
 if ( test -n "$DARWIN" )
 then

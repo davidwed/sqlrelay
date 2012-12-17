@@ -95,7 +95,7 @@ install:
 	$(LTINSTALL) -m 755 Cursor.la $(PERLSITEARCH)/auto/SQLRelay/Cursor
 	$(RM) $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.a
 	$(RM) $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.la
-	$(MODULERENAME) $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.$(SOSUFFIX) $(SOSUFFIX) $(MODULESUFFIX)
+	$(MODULERENAME) $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.so so $(MODULESUFFIX)
 	touch $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs
 ifneq ($(POD2MAN),)
 ifneq ($(PERLINSTALLMAN3DIR),)

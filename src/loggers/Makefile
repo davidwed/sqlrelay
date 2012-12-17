@@ -33,6 +33,7 @@ install:
 	$(LTINSTALL) sqlrlogger_custom_nw.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrlogger_custom_nw.a
 	$(RM) $(libexecdir)/sqlrlogger_custom_nw.la
+	$(MODULERENAME) $(libexecdir)/sqlrlogger_custom_nw.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrlogger_*
