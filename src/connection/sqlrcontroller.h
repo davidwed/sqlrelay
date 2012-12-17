@@ -111,7 +111,6 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		bool	unLockSequenceFile(file *sockseq);
 
 
-		void		waitForListenerToRequireAConnection();
 		void		acquireAnnounceMutex();
 		shmdata		*getAnnounceBuffer();
 		void		signalListenerToRead();
@@ -305,7 +304,6 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 
 		void	initDatabaseAvailableFileName();
 		void	waitForAvailableDatabase();
-		bool	availableDatabase();
 		void	markDatabaseUnavailable();
 		void	markDatabaseAvailable();
 
