@@ -715,6 +715,7 @@ PS
 TRANSLATIONPLUGINLIBS
 TRIGGERPLUGINLIBS
 PYTHONFRAMEWORK
+JNISUFFIX
 MODULESUFFIX
 SOSUFFIX
 MICROSOFT
@@ -14990,10 +14991,11 @@ $as_echo "no" >&6; }
 esac
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for dynamic library extension" >&5
-$as_echo_n "checking for dynamic library extension... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for dynamic library extensions" >&5
+$as_echo_n "checking for dynamic library extensions... " >&6; }
 SOSUFFIX="so"
 MODULESUFFIX="so"
+JNISUFFIX="so"
 if ( test -n "$CYGWIN" )
 then
 	SOSUFFIX="dll.a"
@@ -15002,9 +15004,11 @@ if ( test -n "$DARWIN" )
 then
 	SOSUFFIX="dylib"
 	MODULESUFFIX="bundle"
+	JNISUFFIX="jnilib"
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $SOSUFFIX and $MODULESUFFIX" >&5
-$as_echo "$SOSUFFIX and $MODULESUFFIX" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: so=>$SOSUFFIX module=>$MODULESUFFIX jni=>$JNISUFFIX" >&5
+$as_echo "so=>$SOSUFFIX module=>$MODULESUFFIX jni=>$JNISUFFIX" >&6; }
+
 
 
 

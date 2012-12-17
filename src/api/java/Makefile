@@ -45,9 +45,11 @@ install:
 	$(LTINSTALL) libSQLRConnection.la $(javadir)/com/firstworks/sqlrelay
 	$(RM) $(javadir)/com/firstworks/sqlrelay/libSQLRConnection.a
 	$(RM) $(javadir)/com/firstworks/sqlrelay/libSQLRConnection.la
+	$(MODULERENAME) $(javadir)/com/firstworks/sqlrelay/libSQLRConnection.so so $(JNISUFFIX)
 	$(LTINSTALL) libSQLRCursor.la $(javadir)/com/firstworks/sqlrelay
 	$(RM) $(javadir)/com/firstworks/sqlrelay/libSQLRCursor.a
 	$(RM) $(javadir)/com/firstworks/sqlrelay/libSQLRCursor.la
+	$(MODULERENAME) $(javadir)/com/firstworks/sqlrelay/libSQLRCursor.so so $(JNISUFFIX)
 	if ( test -n "$(JAR)" ); \
 	then \
 		$(INSTALL) -m 644 sqlrelay.jar $(javadir); \

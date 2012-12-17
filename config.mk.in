@@ -263,4 +263,5 @@ EXE = @EXE@
 # Shared object and module stuff
 SOSUFFIX = @SOSUFFIX@
 MODULESUFFIX = @MODULESUFFIX@
+JNISUFFIX = @JNISUFFIX@
 MODULERENAME = $(top_builddir)/modulerename.sh

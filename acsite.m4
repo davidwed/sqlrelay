@@ -473,9 +473,10 @@ esac
 dnl Determines what extension shared object files have
 AC_DEFUN([FW_CHECK_SO_EXT],
 [
-AC_MSG_CHECKING(for dynamic library extension)
+AC_MSG_CHECKING(for dynamic library extensions)
 SOSUFFIX="so"
 MODULESUFFIX="so"
+JNISUFFIX="so"
 if ( test -n "$CYGWIN" )
 then
 	SOSUFFIX="dll.a"
@@ -484,10 +485,12 @@ if ( test -n "$DARWIN" )
 then
 	SOSUFFIX="dylib"
 	MODULESUFFIX="bundle"
+	JNISUFFIX="jnilib"
 fi
-AC_MSG_RESULT($SOSUFFIX and $MODULESUFFIX)
+AC_MSG_RESULT(so=>$SOSUFFIX module=>$MODULESUFFIX jni=>$JNISUFFIX)
 AC_SUBST(SOSUFFIX)
 AC_SUBST(MODULESUFFIX)
+AC_SUBST(JNISUFFIX)
 AC_DEFINE_UNQUOTED(SQLRELAY_MODULESUFFIX,"$MODULESUFFIX",Suffix for loadable modules)
 ])
 
