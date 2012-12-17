@@ -18,13 +18,6 @@ ifeq ($(PSQLUSERPATH),yes)
 endif
 endif
 
-SRCS = pqasync.cpp pqconndefaults.cpp pqconnection.cpp pqcopy.cpp \
-	pqencoding.cpp pqescape.cpp pqfastpath.cpp pqlob.cpp \
-	pqnotifies.cpp pqprint.cpp pqresult.cpp pqtrace.cpp
-LOBJS = pqasync.lo pqconndefaults.lo pqconnection.lo pqcopy.lo \
-	pqencoding.lo pqescape.lo pqfastpath.lo pqlob.lo \
-	pqnotifies.lo pqprint.lo pqresult.lo pqtrace.lo
-
 .SUFFIXES: .lo
 
 .cpp.lo:
@@ -36,14 +29,14 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
-libpqsqlrelay.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+libpqsqlrelay.la: pqsqlrelay.cpp pqsqlrelay.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ pqsqlrelay.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
 install:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libpqsqlrelay.la $(libdir)
 	$(RM) $(libdir)/libpqsqlrelay.a
+	$(RM) $(libdir)/libpqsqlrelay.la
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libpqsqlrelay.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libpqsqlrelay_p.la
+	$(RM) $(libdir)/libpqsqlrelay*
