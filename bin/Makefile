@@ -10,6 +10,7 @@ install:
 	$(INSTALL) sqlr-stop $(bindir)
 	$(INSTALL) sqlrclient-config $(bindir)
 	$(INSTALL) sqlrclientwrapper-config $(bindir)
+	$(INSTALL) sqlrconnection-config $(bindir)
 
 uninstall:
 	$(RM) $(bindir)/backupschema
@@ -18,3 +19,4 @@ uninstall:
 	$(RM) $(bindir)/killsqlr
 	$(RM) $(bindir)/sqlrclient-config
 	$(RM) $(bindir)/sqlrclientwrapper-config
+	$(RM) $(bindir)/sqlrconnection-config

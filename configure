@@ -32686,7 +32686,7 @@ then
 fi
 
 
-MAKELIST="config.mk src/api/perl/Connection/Connection.pm src/api/perl/Cursor/Cursor.pm src/api/perl/DBD/SQLRelay.pm bin/sqlr-stop bin/sqlrclient-config bin/sqlrclientwrapper-config init/openserver/init.d/sqlrelay init/redhat/init.d/sqlrelay init/slackware/rc.d/rc.sqlrelay init/debian/init.d/sqlrelay init/netbsd/rc.d/sqlrelay init/freebsd/rc.d/sqlrelay test/test sqlrelay-c++.pc sqlrelay-c.pc"
+MAKELIST="config.mk src/api/perl/Connection/Connection.pm src/api/perl/Cursor/Cursor.pm src/api/perl/DBD/SQLRelay.pm bin/sqlr-stop bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrconnection-config init/openserver/init.d/sqlrelay init/redhat/init.d/sqlrelay init/slackware/rc.d/rc.sqlrelay init/debian/init.d/sqlrelay init/netbsd/rc.d/sqlrelay init/freebsd/rc.d/sqlrelay test/test sqlrelay-c++.pc sqlrelay-c.pc"
 ac_config_files="$ac_config_files $MAKELIST"
 
 cat >confcache <<\_ACEOF
@@ -35159,6 +35159,7 @@ fi
 chmod 755 bin/sqlr-stop
 chmod 755 bin/sqlrclient-config
 chmod 755 bin/sqlrclientwrapper-config
+chmod 755 bin/sqlrconnection-config
 chmod 755 init/openserver/init.d/sqlrelay
 chmod 755 init/redhat/init.d/sqlrelay
 chmod 755 init/slackware/rc.d/rc.sqlrelay

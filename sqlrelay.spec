@@ -76,6 +76,14 @@ BuildRequires: rudiments-devel >= 0.34
 SQL Relay is a persistent database connection pooling, proxying, throttling, load balancing and query routing/filtering system for Unix and Linux supporting ODBC, Oracle, MySQL, PostgreSQL, Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and MS Access (minimally) with APIs for C, C++, .NET, Perl, Perl-DBI, Python, Python-DB, Zope, PHP, PHP PearDB, Ruby, Ruby-DBI, Java, TCL and Erlang, drop-in replacement libraries for MySQL and PostgreSQL, command line clients and extensive documentation.  The APIs support advanced database operations such as bind variables, multi-row fetches, client-side result set caching and suspended transactions.  It is ideal for speeding up database-driven web-based applications, accessing databases from unsupported platforms, migrating between databases, distributing access to replicated or clustered databases and throttling database access.
 
 
+%package server-devel
+Summary: Development files for developing modules for the SQL Relay server.
+Group: Development/Libraries
+
+%description server-devel
+Development files for developing modules for the SQL Relay server.
+
+
 %package clients
 Summary: Command line applications for accessing databases through SQL Relay.
 Group: Applications/Database
@@ -101,7 +109,7 @@ Runtime libraries for SQL Relay clients written in C.
 
 
 %package client-devel-c++
-Summary: Development files for developing programs C++ that use SQL Relay.
+Summary: Development files for developing programs in C++ that use SQL Relay.
 Group: Development/Libraries
 
 %description client-devel-c++
@@ -414,15 +422,26 @@ rm -rf %{buildroot}
 %{_bindir}/sqlr-scaler*
 %{_bindir}/sqlr-start*
 %{_bindir}/sqlr-stop
-%{_libdir}/libsqlrconnection*
-%{_libdir}/libsqlrutil*
-%{_libdir}/libsqlrelay*
+%{_libdir}/libsqlrconnection-*.so.*
+%{_libdir}/libsqlrutil-*.so.*
 %{_libexecdir}/sqlrlogger_*
 %{_libexecdir}/sqlrquery_*
 %{_libexecdir}/sqltranslation_*
 %{_libexecdir}/sqltrigger_*
+%{_libexecdir}/sqlpwdenc_*
 %{_localstatedir}/sqlrelay/tmp
 %{_localstatedir}/sqlrelay/debug
+
+%files server-devel
+%defattr(-, root, root)
+%{_bindir}/sqlrconnection-config
+%{_includedir}/sqlrelay/sqlrpwdenc.h
+%{_libdir}/libsqlrconnection.a
+%{_libdir}/libsqlrconnection.la
+%{_libdir}/libsqlrconnection.so
+%{_libdir}/libsqlrutil.a
+%{_libdir}/libsqlrutil.la
+%{_libdir}/libsqlrutil.so
 
 %files clients
 %defattr(-, root, root)
