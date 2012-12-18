@@ -107,12 +107,11 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 	logbuffer.clear();
 
 	// append the date to the log buffer
-	logbuffer.append(dt.getYear())->append('-');
-	logbuffer.append(dt.getMonth())->append('-');
-	logbuffer.append(dt.getDayOfMonth())->append(' ');
-	logbuffer.append(dt.getHour())->append(':');
-	logbuffer.append(dt.getMinutes())->append(':');
-	logbuffer.append(dt.getSeconds())->append(' ');
+	char	datebuffer[20];
+	snprintf(datebuffer,20,"%04d-%02d-%02d %02d:%02d:%02d",
+			dt.getYear(),dt.getMonth(),dt.getDayOfMonth(),
+			dt.getHour(),dt.getMinutes(),dt.getSeconds());
+	logbuffer.append(datebuffer);
 
 	// for all events except db-errors, append a string
 	// representation of the event type and log level
@@ -159,6 +158,7 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 			// ignore all other events
 			return true;
 	}
+	logbuffer.append("\n");
 
 	// write the buffer to the log file
 	return ((size_t)querylog.write(logbuffer.getString(),

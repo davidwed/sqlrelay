@@ -380,6 +380,15 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 		return false;
 	}
 
+	// get the loggers
+	const char	*loggers=cfgfl->getLoggers();
+	if (charstring::length(loggers)) {
+		sqlrlg=new sqlrloggers;
+		sqlrlg->loadLoggers(loggers);
+		sqlrlg->initLoggers(conn);
+	}
+
+	// log in and detach
 	bool	reloginatstart=cfgfl->getReLoginAtStart();
 	if (!reloginatstart) {
 		if (!attemptLogIn(!silent)) {
@@ -486,14 +495,6 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	// inet and unix sockets for client connections
 	if (!cfgfl->getPassDescriptor() && !openSockets()) {
 		return false;
-	}
-
-	// get the loggers
-	const char	*loggers=cfgfl->getLoggers();
-	if (charstring::length(loggers)) {
-		sqlrlg=new sqlrloggers;
-		sqlrlg->loadLoggers(loggers);
-		sqlrlg->initLoggers(conn);
 	}
 
 	// get the custom query handlers
@@ -791,6 +792,13 @@ bool sqlrcontroller_svr::logIn(bool printerrors) {
 	incrementOpenDatabaseConnections();
 
 	loggedin=true;
+
+	// log login success
+	if (sqlrlg) {
+		sqlrlg->runLoggers(conn,NULL,
+				SQLRLOGGER_LOGLEVEL_INFO,
+				SQLRLOGGER_EVENTTYPE_DB_CONNECTED);
+	}
 	return true;
 }
 
@@ -1157,6 +1165,8 @@ void sqlrcontroller_svr::reLogIn() {
 	markDatabaseUnavailable();
 
 	// run the session end queries
+	// FIXME: only run these if a dead connection prompted
+	// a relogin, not if we couldn't login at startup
 	sessionEndQueries();
 
 	// get the current db so we can restore it
@@ -1190,6 +1200,8 @@ void sqlrcontroller_svr::reLogIn() {
 	dbgfile.debugPrint("connection",4,"done relogging in");
 
 	// run the session-start queries
+	// FIXME: only run these if a dead connection prompted
+	// a relogin, not if we couldn't login at startup
 	sessionStartQueries();
 
 	// restore the db
@@ -1686,6 +1698,15 @@ void sqlrcontroller_svr::clientSession() {
 
 	closeClientSocket();
 
+	// log client disconnect
+	// FIXME: we need to differentiate between a client
+	// disappearing and intentionally disconnecting
+	if (sqlrlg) {
+		sqlrlg->runLoggers(conn,NULL,
+				SQLRLOGGER_LOGLEVEL_INFO,
+				SQLRLOGGER_EVENTTYPE_CLI_DISCONNECTED);
+	}
+
 	closeSuspendedSessionSockets();
 
 	decrementOpenClientConnections();
@@ -1890,12 +1911,26 @@ bool sqlrcontroller_svr::authenticateCommand() {
 		clientsock->write(SQLR_ERROR_AUTHENTICATIONERROR_STRING);
 		flushWriteBuffer();
 		conn->endSession();
+
+		// log connection refused
+		if (sqlrlg) {
+			sqlrlg->runLoggers(conn,NULL,
+				SQLRLOGGER_LOGLEVEL_WARNING,
+				SQLRLOGGER_EVENTTYPE_CLI_CONNECTION_REFUSED);
+		}
 		return false;
 	}
 
 	// indicate that no error has occurred
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	flushWriteBuffer();
+
+	// log connection
+	if (sqlrlg) {
+		sqlrlg->runLoggers(conn,NULL,
+				SQLRLOGGER_LOGLEVEL_INFO,
+				SQLRLOGGER_EVENTTYPE_CLI_CONNECTED);
+	}
 	return true;
 }
 
@@ -2520,6 +2555,13 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 			// if the error was a dead connection
 			// then re-establish the connection
 			if (!cursor->liveconnection) {
+
+				// log db disconnect
+				if (sqlrlg) {
+					sqlrlg->runLoggers(conn,cursor,
+					SQLRLOGGER_LOGLEVEL_INFO,
+					SQLRLOGGER_EVENTTYPE_DB_DISCONNECTED);
+				}
 
 				dbgfile.debugPrint("connection",3,
 							"database is down...");
@@ -4898,6 +4940,13 @@ void sqlrcontroller_svr::returnError(bool disconnect) {
 	// send the error string
 	clientsock->write((uint16_t)conn->errorlength);
 	clientsock->write(conn->error,conn->errorlength);
+
+	// log the error
+	if (sqlrlg) {
+		sqlrlg->runLoggers(conn,NULL,
+				SQLRLOGGER_LOGLEVEL_ERROR,
+				SQLRLOGGER_EVENTTYPE_DB_ERROR);
+	}
 }
 
 void sqlrcontroller_svr::returnError(sqlrcursor_svr *cursor, bool disconnect) {
@@ -4931,6 +4980,13 @@ void sqlrcontroller_svr::returnError(sqlrcursor_svr *cursor, bool disconnect) {
 	flushWriteBuffer();
 
 	dbgfile.debugPrint("connection",2,"done returning error");
+
+	// log the error
+	if (sqlrlg) {
+		sqlrlg->runLoggers(conn,cursor,
+				SQLRLOGGER_LOGLEVEL_ERROR,
+				SQLRLOGGER_EVENTTYPE_DB_ERROR);
+	}
 }
 
 bool sqlrcontroller_svr::fetchResultSetCommand(sqlrcursor_svr *cursor) {
