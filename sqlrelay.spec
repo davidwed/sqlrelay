@@ -424,11 +424,11 @@ rm -rf %{buildroot}
 %{_bindir}/sqlr-stop
 %{_libdir}/libsqlrconnection-*.so.*
 %{_libdir}/libsqlrutil-*.so.*
-%{_libexecdir}/sqlrlogger_*
-%{_libexecdir}/sqlrquery_*
-%{_libexecdir}/sqltranslation_*
-%{_libexecdir}/sqltrigger_*
-%{_libexecdir}/sqlpwdenc_*
+%{_libexecdir}/sqlrelay/sqlrlogger_*
+%{_libexecdir}/sqlrelay/sqlrquery_*
+%{_libexecdir}/sqlrelay/sqltranslation_*
+%{_libexecdir}/sqlrelay/sqltrigger_*
+%{_libexecdir}/sqlrelay/sqlpwdenc_*
 %{_localstatedir}/sqlrelay/tmp
 %{_localstatedir}/sqlrelay/debug
 
@@ -504,47 +504,47 @@ rm -rf %{buildroot}
 
 %{!?_without_db2:%files db2}
 %{!?_without_db2:%defattr(-, root, root)}
-%{!?_without_db2:%{_libexecdir}/sqlrconnection_db2*}
+%{!?_without_db2:%{_libexecdir}/sqlrelay/sqlrconnection_db2*}
 
 %{!?_without_freetds:%files freetds}
 %{!?_without_freetds:%defattr(-, root, root)}
-%{!?_without_freetds:%{_libexecdir}/sqlrconnection_freetds*}
+%{!?_without_freetds:%{_libexecdir}/sqlrelay/sqlrconnection_freetds*}
 
 %{!?_without_firebird:%files firebird}
 %{!?_without_firebird:%defattr(-, root, root)}
-%{!?_without_firebird:%{_libexecdir}/sqlrconnection_firebird*}
+%{!?_without_firebird:%{_libexecdir}/sqlrelay/sqlrconnection_firebird*}
 
 %{!?_without_mdbtools:%files mdbtools}
 %{!?_without_mdbtools:%defattr(-, root, root)}
-%{!?_without_mdbtools:%{_libexecdir}/sqlrconnection_mdbtools*}
+%{!?_without_mdbtools:%{_libexecdir}/sqlrelay/sqlrconnection_mdbtools*}
 
 %{!?_without_mysql:%files mysql}
 %{!?_without_mysql:%defattr(-, root, root)}
-%{!?_without_mysql:%{_libexecdir}/sqlrconnection_mysql*}
+%{!?_without_mysql:%{_libexecdir}/sqlrelay/sqlrconnection_mysql*}
 
 %{!?_without_odbc:%files odbc}
 %{!?_without_odbc:%defattr(-, root, root)}
-%{!?_without_odbc:%{_libexecdir}/sqlrconnection_odbc*}
+%{!?_without_odbc:%{_libexecdir}/sqlrelay/sqlrconnection_odbc*}
 
 %{!?_without_oracle:%files oracle8}
 %{!?_without_oracle:%defattr(-, root, root)}
-%{!?_without_oracle:%{_libexecdir}/sqlrconnection_oracle8*}
+%{!?_without_oracle:%{_libexecdir}/sqlrelay/sqlrconnection_oracle8*}
 
 %{!?_without_postgresql:%files postgresql}
 %{!?_without_postgresql:%defattr(-, root, root)}
-%{!?_without_postgresql:%{_libexecdir}/sqlrconnection_postgresql*}
+%{!?_without_postgresql:%{_libexecdir}/sqlrelay/sqlrconnection_postgresql*}
 
 %{!?_without_sqlite:%files sqlite}
 %{!?_without_sqlite:%defattr(-, root, root)}
-%{!?_without_sqlite:%{_libexecdir}/sqlrconnection_sqlite*}
+%{!?_without_sqlite:%{_libexecdir}/sqlrelay/sqlrconnection_sqlite*}
 
 %{!?_without_sybase:%files sybase}
 %{!?_without_sybase:%defattr(-, root, root)}
-%{!?_without_sybase:%{_libexecdir}/sqlrconnection_sybase*}
+%{!?_without_sybase:%{_libexecdir}/sqlrelay/sqlrconnection_sybase*}
 
 %{!?_without_router:%files router}
 %{!?_without_router:%defattr(-, root, root)}
-%{!?_without_router:%{_libexecdir}/sqlrconnection_router*}
+%{!?_without_router:%{_libexecdir}/sqlrelay/sqlrconnection_router*}
 
 %{!?_without_java:%files java}
 %{!?_without_java:%defattr(-, root, root)}
