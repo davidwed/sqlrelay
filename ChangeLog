@@ -1,3 +1,6 @@
+0.48.1 - fixed a bug that could cause problems when fetching from an output
+		bind cursor under a very specific set of circumstances
+
 0.48 - integrated patches from Neowiz for:
 		handling for oracle errors ora-01033, ora-02067 and ora-04068
 		bind validation when using the statement cache
