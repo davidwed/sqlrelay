@@ -83,7 +83,11 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 	// get the password encryption name
 	const char	*module=pwdenc->getAttributeValue("module");
 	if (!charstring::length(module)) {
-		return;
+		// try "file", that's what it used to be called
+		module=pwdenc->getAttributeValue("file");
+		if (!charstring::length(module)) {
+			return;
+		}
 	}
 
 	// make sure it has an id

@@ -23,7 +23,9 @@ class custom_nw : public sqlrlogger {
 
 		bool	init(sqlrconnection_svr *sqlrcon);
 		bool	run(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur);
+						sqlrcursor_svr *sqlrcur,
+						sqlrlogger_loglevel_t level,
+						sqlrlogger_eventtype_t event);
 	private:
 		int	strescape(const char *str, char *buf, int limit);
 		bool	descInputBinds(sqlrcursor_svr *cursor,
@@ -91,8 +93,17 @@ bool custom_nw::init(sqlrconnection_svr *sqlrcon) {
 				permissions::evalPermString("rw-------"));
 }
 
-bool custom_nw::run(sqlrconnection_svr *sqlrcon, sqlrcursor_svr *sqlrcur) {
+bool custom_nw::run(sqlrconnection_svr *sqlrcon,
+			sqlrcursor_svr *sqlrcur,
+			sqlrlogger_loglevel_t level,
+			sqlrlogger_eventtype_t event) {
 	debugFunction();
+
+	// don't do anything unless we got INFO/SQLR_COMMAND_COMPLETED
+	if (level!=SQLRLOGGER_LOGLEVEL_INFO ||
+		event!=SQLRLOGGER_EVENTTYPE_SQLR_COMMAND_COMPLETED) {
+		return true;
+	}
 
 	// reinit the log if the file was switched
 	ino_t	inode1=querylog.getInode();

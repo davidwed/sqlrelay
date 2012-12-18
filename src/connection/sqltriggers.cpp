@@ -103,7 +103,11 @@ void sqltriggers::loadTrigger(xmldomnode *trigger,
 	// get the trigger name
 	const char	*module=trigger->getAttributeValue("module");
 	if (!charstring::length(module)) {
-		return;
+		// try "file", that's what it used to be called
+		module=trigger->getAttributeValue("file");
+		if (!charstring::length(module)) {
+			return;
+		}
 	}
 
 	debugPrintf("loading trigger: %s\n",module);

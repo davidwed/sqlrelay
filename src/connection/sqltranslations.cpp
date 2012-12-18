@@ -89,7 +89,11 @@ void sqltranslations::loadTranslation(xmldomnode *translation) {
 	// get the translation name
 	const char	*module=translation->getAttributeValue("module");
 	if (!charstring::length(module)) {
-		return;
+		// try "file", that's what it used to be called
+		module=translation->getAttributeValue("file");
+		if (!charstring::length(module)) {
+			return;
+		}
 	}
 
 	debugPrintf("loading translation: %s\n",module);

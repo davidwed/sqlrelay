@@ -83,7 +83,11 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 	// get the logger name
 	const char	*module=logger->getAttributeValue("module");
 	if (!charstring::length(module)) {
-		return;
+		// try "file", that's what it used to be called
+		module=logger->getAttributeValue("file");
+		if (!charstring::length(module)) {
+			return;
+		}
 	}
 
 	debugPrintf("loading logger: %s\n",module);
@@ -136,10 +140,12 @@ void sqlrloggers::initLoggers(sqlrconnection_svr *sqlrcon) {
 }
 
 void sqlrloggers::runLoggers(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur) {
+					sqlrcursor_svr *sqlrcur,
+					sqlrlogger_loglevel_t level,
+					sqlrlogger_eventtype_t event) {
 	debugFunction();
 	for (linkedlistnode< sqlrloggerplugin * > *node=llist.getFirstNode();
 						node; node=node->getNext()) {
-		node->getData()->lg->run(sqlrcon,sqlrcur);
+		node->getData()->lg->run(sqlrcon,sqlrcur,level,event);
 	}
 }

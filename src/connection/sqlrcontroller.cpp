@@ -1673,7 +1673,9 @@ void sqlrcontroller_svr::clientSession() {
 			(command==NEW_QUERY ||
 			command==REEXECUTE_QUERY ||
 			command==FETCH_FROM_BIND_CURSOR)) {
-			sqlrlg->runLoggers(conn,cursor);
+			sqlrlg->runLoggers(conn,cursor,
+				SQLRLOGGER_LOGLEVEL_INFO,
+				SQLRLOGGER_EVENTTYPE_SQLR_COMMAND_COMPLETED);
 		}
 
 	} while (loop);
