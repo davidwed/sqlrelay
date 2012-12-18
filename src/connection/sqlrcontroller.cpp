@@ -2382,18 +2382,18 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 		if (!reexecute && !bindcursor) {
 			clientinfo[0]='\0';
 			clientinfolen=0;
+		}
+		if (!reexecute) {
 			cursor->querybuffer[0]='\0';
 			cursor->querylength=0;
 		}
-		if (!bindcursor) {
-			cursor->inbindcount=0;
-			cursor->outbindcount=0;
-			for (uint16_t i=0; i<maxbindcount; i++) {
-				rawbuffer::zero(&(cursor->inbindvars[i]),
-							sizeof(bindvar_svr));
-				rawbuffer::zero(&(cursor->outbindvars[i]),
-							sizeof(bindvar_svr));
-			}
+		cursor->inbindcount=0;
+		cursor->outbindcount=0;
+		for (uint16_t i=0; i<maxbindcount; i++) {
+			rawbuffer::zero(&(cursor->inbindvars[i]),
+						sizeof(bindvar_svr));
+			rawbuffer::zero(&(cursor->outbindvars[i]),
+						sizeof(bindvar_svr));
 		}
 
 		// get the data
