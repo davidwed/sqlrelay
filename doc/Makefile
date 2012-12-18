@@ -30,6 +30,7 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/images
 	$(MKINSTALLDIRS) $(docdir)/js
 	$(MKINSTALLDIRS) $(docdir)/css
+	$(MKINSTALLDIRS) $(docdir)/modules
 	$(MKINSTALLDIRS) $(docdir)/programming
 	$(MKINSTALLDIRS) $(docdir)/programming/zope
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted
@@ -188,6 +189,7 @@ install:
 		$(INSTALL) -m 644 $$file $(docdir)/images; \
 	done
 	$(INSTALL) -m 644 js/rotate.js $(docdir)/js
+	$(INSTALL) -m 644 modules/passwordencryption.html $(docdir)/modules
 	$(INSTALL) -m 644 programming/binds.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/odbc.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/jdbc.html $(docdir)/programming
