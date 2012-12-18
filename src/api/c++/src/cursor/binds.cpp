@@ -520,9 +520,10 @@ void sqlrcursor::defineOutputBindGeneric(const char *variable,
 	// clean up old values
 	if (bv->type==STRING_BIND) {
 		delete[] bv->value.stringval;
-	} else if (bv->type==BLOB_BIND ||
-		bv->type==CLOB_BIND) {
+		bv->value.stringval=NULL;
+	} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
 		delete[] bv->value.lobval;
+		bv->value.lobval=NULL;
 	}
 	if (copyrefs) {
 		// clean up old variable and set new variable
@@ -532,8 +533,6 @@ void sqlrcursor::defineOutputBindGeneric(const char *variable,
 		bv->variable=(char *)variable;
 	}
 	bv->type=type;
-	bv->value.stringval=NULL;
-	bv->value.lobval=NULL;
 	bv->valuesize=valuesize;
 	bv->resultvaluesize=0;
 	bv->send=true;
