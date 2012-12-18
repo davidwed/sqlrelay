@@ -8,9 +8,9 @@ exec_prefix=@exec_prefix@
 version=@SQLR_VERSION@
 
 if ( test "@libdir@" = "/usr/lib" ); then
-	sqlrconnection_libs="-lsqlrconnecton -lsqlrutil"
+	sqlrconnection_libs="-lsqlrconnection -lsqlrutil"
 else
-	sqlrconnection_libs="-L@libdir@ -lsqlrconnecton -lsqlrutil"
+	sqlrconnection_libs="-L@libdir@ -lsqlrconnection -lsqlrutil"
 fi
 sqlrconnection_cflags="-I@includedir@"
 
