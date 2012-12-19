@@ -160,10 +160,21 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 	}
 	logbuffer.append("\n");
 
+	// since all connection daemons are writing to the same file,
+	// we must lock it prior to the write
+	if (!querylog.lockFile(F_WRLCK)) {
+		return false;
+	}
+
 	// write the buffer to the log file
-	return ((size_t)querylog.write(logbuffer.getString(),
-					logbuffer.getStringLength())==
-					logbuffer.getStringLength());
+	bool	retval=((size_t)querylog.write(logbuffer.getString(),
+						logbuffer.getStringLength())==
+						logbuffer.getStringLength());
+
+	// unlock the log file
+	querylog.unlockFile();
+	
+	return retval;
 }
 
 extern "C" {
