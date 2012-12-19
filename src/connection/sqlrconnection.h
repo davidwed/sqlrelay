@@ -65,6 +65,8 @@ class sqlrconnection_svr {
 
 		virtual	const char	*dbVersion()=0;
 
+		virtual const char	*dbHostNameQuery();
+		virtual const char	*dbIpAddressQuery();
 		virtual const char	*dbHostName();
 		virtual const char	*dbIpAddress();
 
@@ -84,18 +86,18 @@ class sqlrconnection_svr {
 		virtual const char	*getColumnListQuery(bool wild);
 
 		virtual sqlrcursor_svr	*initCursor()=0;
-		virtual void	deleteCursor(sqlrcursor_svr *curs)=0;
+		virtual void		deleteCursor(sqlrcursor_svr *curs)=0;
 
 		virtual	const char	*bindFormat();
-		virtual	int16_t	nonNullBindValue();
-		virtual	int16_t	nullBindValue();
-		virtual char	bindVariablePrefix();
-		virtual bool	bindValueIsNull(int16_t isnull);
+		virtual	int16_t		nonNullBindValue();
+		virtual	int16_t		nullBindValue();
+		virtual char		bindVariablePrefix();
+		virtual bool		bindValueIsNull(int16_t isnull);
 
 		virtual const char	*tempTableDropPrefix();
 		virtual bool		tempTableDropReLogIn();
 
-		virtual void	endSession();
+		virtual void		endSession();
 
 		virtual sqltranslations	*getSqlTranslations();
 		virtual sqlwriter	*getSqlWriter();
@@ -110,6 +112,9 @@ class sqlrconnection_svr {
 
 		bool		autocommit;
 		bool		fakeautocommit;
+
+		char		*dbhostname;
+		char		*dbipaddress;
 
 		sqlrcontroller_svr	*cont;
 };

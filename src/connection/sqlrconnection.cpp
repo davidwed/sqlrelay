@@ -3,6 +3,9 @@
 
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
+#include <rudiments/hostentry.h>
+
+using namespace rudiments;
 
 sqlrconnection_svr::sqlrconnection_svr(sqlrcontroller_svr *cont) {
 	this->cont=cont;
@@ -14,10 +17,15 @@ sqlrconnection_svr::sqlrconnection_svr(sqlrcontroller_svr *cont) {
 
 	autocommit=false;
 	fakeautocommit=false;
+
+	dbhostname=NULL;
+	dbipaddress=NULL;
 }
 
 sqlrconnection_svr::~sqlrconnection_svr() {
 	delete[] error;
+	delete[] dbhostname;
+	delete[] dbipaddress;
 }
 
 bool sqlrconnection_svr::supportsAuthOnDatabase() {
@@ -423,12 +431,49 @@ const char *sqlrconnection_svr::pingQuery() {
 	return "select 1";
 }
 
-const char *sqlrconnection_svr::dbHostName() {
+const char *sqlrconnection_svr::dbHostNameQuery() {
 	return NULL;
 }
 
-const char *sqlrconnection_svr::dbIpAddress() {
+const char *sqlrconnection_svr::dbIpAddressQuery() {
 	return NULL;
+}
+
+const char *sqlrconnection_svr::dbHostName() {
+	delete[] dbhostname;
+	dbhostname=NULL;
+	sqlrcursor_svr	*dbhncur=cont->initCursor();
+	const char	*dbhnquery=dbHostNameQuery();
+	int		dbhnquerylen=charstring::length(dbhnquery);
+	// since we're creating a new cursor for this, make sure it can't
+	// have an ID that might already exist
+	if (dbhncur->openInternal(cont->cursorcount+1) &&
+		dbhncur->prepareQuery(dbhnquery,dbhnquerylen) &&
+		dbhncur->executeQuery(dbhnquery,dbhnquerylen)) {
+
+		if (!dbhncur->noRowsToReturn() && dbhncur->fetchRow()) {
+
+			// get the first field of the row and return it
+			const char	*field=NULL;
+			uint64_t	fieldlength=0;
+			bool		blob=false;
+			bool		null=false;
+			dbhncur->getField(0,&field,&fieldlength,&blob,&null);
+			dbhostname=charstring::duplicate(field);
+		} 
+		
+		dbhncur->cleanUpData();
+	}
+	dbhncur->close();
+	cont->deleteCursor(dbhncur);
+	return dbhostname;
+}
+
+const char *sqlrconnection_svr::dbIpAddress() {
+	delete[] dbipaddress;
+	dbipaddress=NULL;
+	hostentry::getAddressString(dbHostName(),0,&dbipaddress);
+	return dbipaddress;
 }
 
 bool sqlrconnection_svr::getListsByApiCalls() {

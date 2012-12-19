@@ -166,10 +166,13 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 			}
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_CONNECTED:
-			logbuffer.append("SQLRelay connected to DB <IP>");
+			logbuffer.append("SQLRelay connected to DB ");
+			logbuffer.append(sqlrcon->cont->dbipaddress);
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_DISCONNECTED:
-			logbuffer.append("DB <IP> connection reset by "
+			logbuffer.append("DB ");
+			logbuffer.append(sqlrcon->cont->dbipaddress);
+			logbuffer.append(" connection reset by "
 					"remote host");
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_SOCKET_ERROR:

@@ -491,6 +491,9 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 
 		int64_t		loggedinsec;
 		int64_t		loggedinusec;
+
+		const char	*dbhostname;
+		const char	*dbipaddress;
 };
 
 

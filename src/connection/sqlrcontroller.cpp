@@ -121,6 +121,9 @@ sqlrcontroller_svr::sqlrcontroller_svr() : daemonprocess(), listener() {
 
 	loggedinsec=0;
 	loggedinusec=0;
+
+	dbhostname=NULL;
+	dbipaddress=NULL;
 }
 
 sqlrcontroller_svr::~sqlrcontroller_svr() {
@@ -790,6 +793,10 @@ bool sqlrcontroller_svr::logIn(bool printerrors) {
 
 	// success... update stats
 	incrementOpenDatabaseConnections();
+
+	// update db host name and ip address
+	dbhostname=conn->dbHostName();
+	dbipaddress=conn->dbIpAddress();
 
 	loggedin=true;
 
