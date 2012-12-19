@@ -22,9 +22,10 @@ class custom_sc : public sqlrlogger {
 
 		bool	init(sqlrconnection_svr *sqlrcon);
 		bool	run(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
-						sqlrlogger_loglevel_t level,
-						sqlrlogger_eventtype_t event);
+					sqlrcursor_svr *sqlrcur,
+					sqlrlogger_loglevel_t level,
+					sqlrlogger_eventtype_t event,
+					const char *info);
 	private:
 		file	querylog;
 		char	*querylogname;
@@ -82,9 +83,10 @@ bool custom_sc::init(sqlrconnection_svr *sqlrcon) {
 }
 
 bool custom_sc::run(sqlrconnection_svr *sqlrcon,
-			sqlrcursor_svr *sqlrcur,
-			sqlrlogger_loglevel_t level,
-			sqlrlogger_eventtype_t event) {
+				sqlrcursor_svr *sqlrcur,
+				sqlrlogger_loglevel_t level,
+				sqlrlogger_eventtype_t event,
+				const char *info) {
 	debugFunction();
 
 	// bail if log level is too low
@@ -111,7 +113,7 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 	snprintf(datebuffer,20,"%04d-%02d-%02d %02d:%02d:%02d",
 			dt.getYear(),dt.getMonth(),dt.getDayOfMonth(),
 			dt.getHour(),dt.getMinutes(),dt.getSeconds());
-	logbuffer.append(datebuffer);
+	logbuffer.append(datebuffer)->append(' ');
 
 	// for all events except db-errors, append a string
 	// representation of the event type and log level
@@ -120,22 +122,48 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 		logbuffer.append(logLevel(level))->append(": ");
 	}
 
+	// for the some of the events, get the client IP
+	// (or UNIX if it's connected via unix socket)
+	char	*clientaddrbuf=NULL;
+	if (event==SQLRLOGGER_EVENTTYPE_CLI_CONNECTED ||
+		event==SQLRLOGGER_EVENTTYPE_CLI_CONNECTION_REFUSED ||
+		event==SQLRLOGGER_EVENTTYPE_CLI_DISCONNECTED) {
+		if (sqlrcon->cont->clientsock) {
+			clientaddrbuf=sqlrcon->cont->
+					clientsock->getPeerAddress();
+			if (!clientaddrbuf) {
+				clientaddrbuf=charstring::duplicate("UNIX");
+			}
+		} else {
+			clientaddrbuf=charstring::duplicate("unknown");
+		}
+	}
+
 	// handle each event differently...
 	switch (event) {
 		case SQLRLOGGER_EVENTTYPE_CLI_CONNECTED:
-			logbuffer.append("Client <IP> connected.");
+			logbuffer.append("Client ");
+			logbuffer.append(clientaddrbuf);
+			logbuffer.append(" connected.");
 			break;
 		case SQLRLOGGER_EVENTTYPE_CLI_CONNECTION_REFUSED:
-			logbuffer.append("Client <IP> attempt to connect.  "
-					"Connecton refused: Wrong user or "
+			logbuffer.append("Client ");
+			logbuffer.append(clientaddrbuf);
+			logbuffer.append(" attempt to connect.  ");
+			logbuffer.append("Connecton refused: Wrong user or "
 					"wrong password");
 			break;
 		case SQLRLOGGER_EVENTTYPE_CLI_DISCONNECTED:
-			logbuffer.append("Client <IP> connection reset "
-					"by remote host.");
+			logbuffer.append("Client ");
+			logbuffer.append(clientaddrbuf);
+			logbuffer.append(" connection reset by remote host.");
 			break;
 		case SQLRLOGGER_EVENTTYPE_CLI_SOCKET_ERROR:
-			logbuffer.append(error::getErrorString());
+			{
+			char	*err=error::getErrorString();
+			logbuffer.append(err);
+			delete[] err;
+			}
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_CONNECTED:
 			logbuffer.append("SQLRelay connected to DB <IP>");
@@ -148,17 +176,30 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 			logbuffer.append(error::getErrorString());
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_ERROR:
-			logbuffer.append("OCI-????? ");
-			logbuffer.append(logLevel(level))->append(": <error>");
+			{
+			const char	*colon=charstring::findFirst(info,':');
+			if (colon) {
+				logbuffer.append(info,colon-info)->append(' ');
+				logbuffer.append(logLevel(level))->append(": ");
+				logbuffer.append(colon+2);
+			} else {
+				logbuffer.append(eventType(event))->append(' ');
+				logbuffer.append(logLevel(level))->append(": ");
+				logbuffer.append(info);
+			}
+			}
 			break;
 		case SQLRLOGGER_EVENTTYPE_SQLR_INTERNAL:
-			logbuffer.append("<internal error>");
+			logbuffer.append(info);
 			break;
 		default:
 			// ignore all other events
 			return true;
 	}
 	logbuffer.append("\n");
+
+	// clean up
+	delete[] clientaddrbuf;
 
 	// since all connection daemons are writing to the same file,
 	// we must lock it prior to the write

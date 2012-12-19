@@ -142,10 +142,11 @@ void sqlrloggers::initLoggers(sqlrconnection_svr *sqlrcon) {
 void sqlrloggers::runLoggers(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					sqlrlogger_loglevel_t level,
-					sqlrlogger_eventtype_t event) {
+					sqlrlogger_eventtype_t event,
+					const char *info) {
 	debugFunction();
 	for (linkedlistnode< sqlrloggerplugin * > *node=llist.getFirstNode();
 						node; node=node->getNext()) {
-		node->getData()->lg->run(sqlrcon,sqlrcur,level,event);
+		node->getData()->lg->run(sqlrcon,sqlrcur,level,event,info);
 	}
 }

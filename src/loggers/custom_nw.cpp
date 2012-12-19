@@ -23,9 +23,10 @@ class custom_nw : public sqlrlogger {
 
 		bool	init(sqlrconnection_svr *sqlrcon);
 		bool	run(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
-						sqlrlogger_loglevel_t level,
-						sqlrlogger_eventtype_t event);
+					sqlrcursor_svr *sqlrcur,
+					sqlrlogger_loglevel_t level,
+					sqlrlogger_eventtype_t event,
+					const char *info);
 	private:
 		int	strescape(const char *str, char *buf, int limit);
 		bool	descInputBinds(sqlrcursor_svr *cursor,
@@ -94,9 +95,10 @@ bool custom_nw::init(sqlrconnection_svr *sqlrcon) {
 }
 
 bool custom_nw::run(sqlrconnection_svr *sqlrcon,
-			sqlrcursor_svr *sqlrcur,
-			sqlrlogger_loglevel_t level,
-			sqlrlogger_eventtype_t event) {
+				sqlrcursor_svr *sqlrcur,
+				sqlrlogger_loglevel_t level,
+				sqlrlogger_eventtype_t event,
+				const char *info) {
 	debugFunction();
 
 	// don't do anything unless we got INFO/SQLR_COMMAND_COMPLETED

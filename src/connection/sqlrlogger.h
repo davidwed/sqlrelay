@@ -38,7 +38,8 @@ class sqlrlogger {
 		virtual bool	run(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						sqlrlogger_loglevel_t level,
-						sqlrlogger_eventtype_t event);
+						sqlrlogger_eventtype_t event,
+						const char *info);
 	protected:
 		const char	*logLevel(sqlrlogger_loglevel_t level);
 		const char	*eventType(sqlrlogger_eventtype_t event);

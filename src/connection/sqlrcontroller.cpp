@@ -797,7 +797,8 @@ bool sqlrcontroller_svr::logIn(bool printerrors) {
 	if (sqlrlg) {
 		sqlrlg->runLoggers(conn,NULL,
 				SQLRLOGGER_LOGLEVEL_INFO,
-				SQLRLOGGER_EVENTTYPE_DB_CONNECTED);
+				SQLRLOGGER_EVENTTYPE_DB_CONNECTED,
+				NULL);
 	}
 	return true;
 }
@@ -1687,7 +1688,8 @@ void sqlrcontroller_svr::clientSession() {
 			command==FETCH_FROM_BIND_CURSOR)) {
 			sqlrlg->runLoggers(conn,cursor,
 				SQLRLOGGER_LOGLEVEL_INFO,
-				SQLRLOGGER_EVENTTYPE_SQLR_COMMAND_COMPLETED);
+				SQLRLOGGER_EVENTTYPE_SQLR_COMMAND_COMPLETED,
+				NULL);
 		}
 
 	} while (loop);
@@ -1704,7 +1706,8 @@ void sqlrcontroller_svr::clientSession() {
 	if (sqlrlg) {
 		sqlrlg->runLoggers(conn,NULL,
 				SQLRLOGGER_LOGLEVEL_INFO,
-				SQLRLOGGER_EVENTTYPE_CLI_DISCONNECTED);
+				SQLRLOGGER_EVENTTYPE_CLI_DISCONNECTED,
+				NULL);
 	}
 
 	closeSuspendedSessionSockets();
@@ -1916,7 +1919,8 @@ bool sqlrcontroller_svr::authenticateCommand() {
 		if (sqlrlg) {
 			sqlrlg->runLoggers(conn,NULL,
 				SQLRLOGGER_LOGLEVEL_WARNING,
-				SQLRLOGGER_EVENTTYPE_CLI_CONNECTION_REFUSED);
+				SQLRLOGGER_EVENTTYPE_CLI_CONNECTION_REFUSED,
+				NULL);
 		}
 		return false;
 	}
@@ -1929,7 +1933,8 @@ bool sqlrcontroller_svr::authenticateCommand() {
 	if (sqlrlg) {
 		sqlrlg->runLoggers(conn,NULL,
 				SQLRLOGGER_LOGLEVEL_INFO,
-				SQLRLOGGER_EVENTTYPE_CLI_CONNECTED);
+				SQLRLOGGER_EVENTTYPE_CLI_CONNECTED,
+				NULL);
 	}
 	return true;
 }
@@ -2560,7 +2565,8 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 				if (sqlrlg) {
 					sqlrlg->runLoggers(conn,cursor,
 					SQLRLOGGER_LOGLEVEL_INFO,
-					SQLRLOGGER_EVENTTYPE_DB_DISCONNECTED);
+					SQLRLOGGER_EVENTTYPE_DB_DISCONNECTED,
+					NULL);
 				}
 
 				dbgfile.debugPrint("connection",3,
@@ -4945,7 +4951,8 @@ void sqlrcontroller_svr::returnError(bool disconnect) {
 	if (sqlrlg) {
 		sqlrlg->runLoggers(conn,NULL,
 				SQLRLOGGER_LOGLEVEL_ERROR,
-				SQLRLOGGER_EVENTTYPE_DB_ERROR);
+				SQLRLOGGER_EVENTTYPE_DB_ERROR,
+				conn->error);
 	}
 }
 
@@ -4985,7 +4992,8 @@ void sqlrcontroller_svr::returnError(sqlrcursor_svr *cursor, bool disconnect) {
 	if (sqlrlg) {
 		sqlrlg->runLoggers(conn,cursor,
 				SQLRLOGGER_LOGLEVEL_ERROR,
-				SQLRLOGGER_EVENTTYPE_DB_ERROR);
+				SQLRLOGGER_EVENTTYPE_DB_ERROR,
+				cursor->error);
 	}
 }
 

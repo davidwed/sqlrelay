@@ -28,7 +28,8 @@ class sqlrloggers {
 		void	runLoggers(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						sqlrlogger_loglevel_t level,
-						sqlrlogger_eventtype_t event);
+						sqlrlogger_eventtype_t event,
+						const char *info);
 	private:
 		void		unloadLoggers();
 		void		loadLogger(rudiments::xmldomnode *logger);

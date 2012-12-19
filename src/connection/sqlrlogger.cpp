@@ -23,7 +23,8 @@ bool sqlrlogger::init(sqlrconnection_svr *sqlrcon) {
 bool sqlrlogger::run(sqlrconnection_svr *sqlrcon,
 				sqlrcursor_svr *sqlrcur,
 				sqlrlogger_loglevel_t level,
-				sqlrlogger_eventtype_t event) {
+				sqlrlogger_eventtype_t event,
+				const char *info) {
 	return true;
 }
 

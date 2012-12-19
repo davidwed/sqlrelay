@@ -25,10 +25,10 @@ class slowqueries : public sqlrlogger {
 
 		bool	init(sqlrconnection_svr *sqlrcon);
 		bool	run(sqlrconnection_svr *sqlrcon,
-				sqlrcursor_svr *sqlrcur,
-				sqlrlogger_loglevel_t level,
-				sqlrlogger_eventtype_t event);
-
+					sqlrcursor_svr *sqlrcur,
+					sqlrlogger_loglevel_t level,
+					sqlrlogger_eventtype_t event,
+					const char *info);
 	private:
 		char		*querylogname;
 		file		querylog;
@@ -94,7 +94,8 @@ bool slowqueries::init(sqlrconnection_svr *sqlrcon) {
 bool slowqueries::run(sqlrconnection_svr *sqlrcon,
 				sqlrcursor_svr *sqlrcur,
 				sqlrlogger_loglevel_t level,
-				sqlrlogger_eventtype_t event) {
+				sqlrlogger_eventtype_t event,
+				const char *info) {
 	debugFunction();
 
 	// don't do anything unless we got INFO/SQLR_COMMAND_COMPLETED
