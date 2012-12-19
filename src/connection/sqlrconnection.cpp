@@ -423,6 +423,14 @@ const char *sqlrconnection_svr::pingQuery() {
 	return "select 1";
 }
 
+const char *sqlrconnection_svr::dbHostName() {
+	return NULL;
+}
+
+const char *sqlrconnection_svr::dbIpAddress() {
+	return NULL;
+}
+
 bool sqlrconnection_svr::getListsByApiCalls() {
 	return false;
 }

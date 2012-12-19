@@ -65,6 +65,9 @@ class sqlrconnection_svr {
 
 		virtual	const char	*dbVersion()=0;
 
+		virtual const char	*dbHostName();
+		virtual const char	*dbIpAddress();
+
 		virtual bool		getListsByApiCalls();
 		virtual bool		getDatabaseList(
 						sqlrcursor_svr *cursor,
