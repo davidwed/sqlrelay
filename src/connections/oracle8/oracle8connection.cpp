@@ -11,6 +11,7 @@
 #include <rudiments/rawbuffer.h>
 #include <rudiments/character.h>
 #include <rudiments/environment.h>
+#include <rudiments/hostentry.h>
 #include <parsedatetime.h>
 
 #include <datatypes.h>
@@ -110,6 +111,7 @@ class oracle8connection : public sqlrconnection_svr {
 		const char	*pingQuery();
 		const char	*identify();
 		const char	*dbVersion();
+		const char	*dbHostName();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(bool wild);
@@ -155,6 +157,9 @@ class oracle8connection : public sqlrconnection_svr {
 		bool		droptemptables;
 #endif
 		bool		rejectduplicatebinds;
+
+		char		*dbhostname;
+		char		*dbipaddress;
 };
 
 class oracle8cursor : public sqlrcursor_svr {
@@ -423,10 +428,15 @@ oracle8connection::oracle8connection(sqlrcontroller_svr *cont) :
 	droptemptables=false;
 #endif
 	rejectduplicatebinds=false;
+
+	dbhostname=NULL;
+	dbipaddress=NULL;
 }
 
 oracle8connection::~oracle8connection() {
 	delete[] lastinsertidquery;
+	delete[] dbhostname;
+	delete[] dbipaddress;
 }
 
 void oracle8connection::handleConnectString() {
@@ -959,6 +969,29 @@ bool oracle8connection::logIn(bool printerrors) {
 	}
 #endif
 
+	// FIXME: get the db host name
+	if (supportssyscontext) {
+
+		// get the host name
+		delete[] dbhostname;
+		dbhostname=charstring::duplicate("db");
+
+		// get the ip address from the host name
+		delete[] dbipaddress;
+		dbipaddress=NULL;
+		char	**addresslist=NULL;
+		if (hostentry::getAddressList(dbhostname,&addresslist)) {
+			if (addresslist && addresslist[0]) {
+				dbipaddress=charstring::duplicate(
+							addresslist[0]);
+			}
+			for (char *addr=addresslist; *addr; addr++) {
+				delete[] addr;
+			}
+			delete[] addresslist;
+		}
+	}
+
 	return true;
 }
 
@@ -1163,6 +1196,14 @@ const char *oracle8connection::dbVersion() {
 		return versionbuf;
 	}
 	return NULL;
+}
+
+const char *oracle8connection::dbHostName() {
+	return dbhostname;
+}
+
+const char *oracle8connection::dbIpAddress() {
+	return dbipaddress;
 }
 
 const char *oracle8connection::getDatabaseListQuery(bool wild) {
