@@ -367,6 +367,18 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void	incrementGetQueryTreeCount();
 		void	incrementReLogInCount();
 
+		void	logClientConnected();
+		void	logClientConnectionRefused(const char *info);
+		void	logClientDisconnect(const char *info);
+		void	logClientSocketError(sqlrcursor_svr *cursor,
+							const char *info);
+		void	logDbConnected();
+		void	logDbDisconnected();
+		void	logDbError(sqlrcursor_svr *cursor, const char *info);
+		void	logSqlrQuery(sqlrcursor_svr *cursor);
+		void	logSqlrInternalError(sqlrcursor_svr *cursor,
+							const char *info);
+
 		const char	*user;
 		const char	*password;
 

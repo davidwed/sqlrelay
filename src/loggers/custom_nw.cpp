@@ -101,9 +101,9 @@ bool custom_nw::run(sqlrconnection_svr *sqlrcon,
 				const char *info) {
 	debugFunction();
 
-	// don't do anything unless we got INFO/SQLR_COMMAND_COMPLETED
+	// don't do anything unless we got INFO/SQLR_QUERY
 	if (level!=SQLRLOGGER_LOGLEVEL_INFO ||
-		event!=SQLRLOGGER_EVENTTYPE_SQLR_COMMAND_COMPLETED) {
+		event!=SQLRLOGGER_EVENTTYPE_SQLR_QUERY) {
 		return true;
 	}
 

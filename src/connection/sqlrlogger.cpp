@@ -43,7 +43,7 @@ static const char *eventtypes[]={
 	"DB_DISCONNECTED",
 	"DB_SOCKET_ERROR",
 	"DB_ERROR",
-	"SQLR_COMMAND_COMPLETED",
+	"SQLR_QUERY",
 	"SQLR_INTERNAL"
 };
 

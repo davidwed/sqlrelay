@@ -137,7 +137,7 @@
 	"Too many listeners."
 #define SQLR_ERROR_ERRORFORKINGLISTENER 900011
 #define SQLR_ERROR_ERRORFORKINGLISTENER_STRING \
-	"Too many listeners."
+	"Error forking listener."
 #define SQLR_ERROR_AUTHENTICATIONERROR 900012
 #define SQLR_ERROR_AUTHENTICATIONERROR_STRING \
 	"Authentication Error."

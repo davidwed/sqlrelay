@@ -115,13 +115,6 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 			dt.getHour(),dt.getMinutes(),dt.getSeconds());
 	logbuffer.append(datebuffer)->append(' ');
 
-	// for all events except db-errors, append a string
-	// representation of the event type and log level
-	if (event!=SQLRLOGGER_EVENTTYPE_DB_ERROR) {
-		logbuffer.append(eventType(event))->append(' ');
-		logbuffer.append(logLevel(level))->append(": ");
-	}
-
 	// for the some of the events, get the client IP
 	// (or UNIX if it's connected via unix socket)
 	char	*clientaddrbuf=NULL;
@@ -142,44 +135,59 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 	// handle each event differently...
 	switch (event) {
 		case SQLRLOGGER_EVENTTYPE_CLI_CONNECTED:
+			logbuffer.append(eventType(event))->append(' ');
+			logbuffer.append(logLevel(level))->append(": ");
 			logbuffer.append("Client ");
 			logbuffer.append(clientaddrbuf);
-			logbuffer.append(" connected.");
+			logbuffer.append(" connected");
 			break;
 		case SQLRLOGGER_EVENTTYPE_CLI_CONNECTION_REFUSED:
+			logbuffer.append(eventType(event))->append(' ');
+			logbuffer.append(logLevel(level))->append(": ");
 			logbuffer.append("Client ");
 			logbuffer.append(clientaddrbuf);
-			logbuffer.append(" attempt to connect.  ");
-			logbuffer.append("Connecton refused: Wrong user or "
-					"wrong password");
+			logbuffer.append(" connection refused:  ");
+			logbuffer.append(info);
 			break;
 		case SQLRLOGGER_EVENTTYPE_CLI_DISCONNECTED:
+			logbuffer.append(eventType(event))->append(' ');
+			logbuffer.append(logLevel(level))->append(": ");
 			logbuffer.append("Client ");
 			logbuffer.append(clientaddrbuf);
-			logbuffer.append(" connection reset by remote host.");
+			logbuffer.append(" disconnected: ");
+			logbuffer.append(info);
 			break;
 		case SQLRLOGGER_EVENTTYPE_CLI_SOCKET_ERROR:
-			{
-			char	*err=error::getErrorString();
-			logbuffer.append(err);
-			delete[] err;
-			}
+			logbuffer.append(eventType(event))->append(' ');
+			logbuffer.append(logLevel(level))->append(": ");
+			logbuffer.append("Client ");
+			logbuffer.append(clientaddrbuf);
+			logbuffer.append(" socket error: ");
+			logbuffer.append(info);
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_CONNECTED:
+			logbuffer.append(eventType(event))->append(' ');
+			logbuffer.append(logLevel(level))->append(": ");
 			logbuffer.append("SQLRelay connected to DB ");
 			logbuffer.append(sqlrcon->cont->dbipaddress);
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_DISCONNECTED:
-			logbuffer.append("DB ");
+			logbuffer.append(eventType(event))->append(' ');
+			logbuffer.append(logLevel(level))->append(": ");
+			logbuffer.append("SQLRelay disconnected from DB ");
 			logbuffer.append(sqlrcon->cont->dbipaddress);
-			logbuffer.append(" connection reset by "
-					"remote host");
+			logbuffer.append(": ");
+			logbuffer.append(info);
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_SOCKET_ERROR:
+			logbuffer.append(eventType(event))->append(' ');
+			logbuffer.append(logLevel(level))->append(": ");
 			logbuffer.append(error::getErrorString());
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_ERROR:
 			{
+			logbuffer.append(eventType(event))->append(' ');
+			logbuffer.append(logLevel(level))->append(": ");
 			const char	*colon=charstring::findFirst(info,':');
 			if (colon) {
 				logbuffer.append(info,colon-info)->append(' ');
@@ -193,6 +201,9 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 			}
 			break;
 		case SQLRLOGGER_EVENTTYPE_SQLR_INTERNAL:
+			logbuffer.append(eventType(event))->append(' ');
+			logbuffer.append(logLevel(level))->append(": ");
+			logbuffer.append("SQLRelay internal error: ");
 			logbuffer.append(info);
 			break;
 		default:
