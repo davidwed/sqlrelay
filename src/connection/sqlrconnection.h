@@ -115,6 +115,7 @@ class sqlrconnection_svr {
 
 		char		*dbhostname;
 		char		*dbipaddress;
+		uint32_t	dbhostiploop;
 
 		sqlrcontroller_svr	*cont;
 };

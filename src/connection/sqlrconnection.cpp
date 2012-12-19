@@ -20,6 +20,7 @@ sqlrconnection_svr::sqlrconnection_svr(sqlrcontroller_svr *cont) {
 
 	dbhostname=NULL;
 	dbipaddress=NULL;
+	dbhostiploop=0;
 }
 
 sqlrconnection_svr::~sqlrconnection_svr() {
@@ -440,39 +441,108 @@ const char *sqlrconnection_svr::dbIpAddressQuery() {
 }
 
 const char *sqlrconnection_svr::dbHostName() {
+
+	// don't get looped up...
+	if (dbhostiploop==2) {
+		return NULL;
+	}
+	dbhostiploop++;
+
+	// re-init buffer
 	delete[] dbhostname;
 	dbhostname=NULL;
-	sqlrcursor_svr	*dbhncur=cont->initCursor();
+
+	// if we have a host name query then use it, otherwise get the
+	// ip address and convert it to a host name...
+
 	const char	*dbhnquery=dbHostNameQuery();
-	int		dbhnquerylen=charstring::length(dbhnquery);
-	// since we're creating a new cursor for this, make sure it can't
-	// have an ID that might already exist
-	if (dbhncur->openInternal(cont->cursorcount+1) &&
-		dbhncur->prepareQuery(dbhnquery,dbhnquerylen) &&
-		dbhncur->executeQuery(dbhnquery,dbhnquerylen)) {
+	if (dbhnquery) {
 
-		if (!dbhncur->noRowsToReturn() && dbhncur->fetchRow()) {
+		sqlrcursor_svr	*dbhncur=cont->initCursor();
+		int		dbhnquerylen=charstring::length(dbhnquery);
+		// since we're creating a new cursor for this, make
+		// sure it can't have an ID that might already exist
+		if (dbhncur->openInternal(cont->cursorcount+1) &&
+			dbhncur->prepareQuery(dbhnquery,dbhnquerylen) &&
+			dbhncur->executeQuery(dbhnquery,dbhnquerylen)) {
 
-			// get the first field of the row and return it
-			const char	*field=NULL;
-			uint64_t	fieldlength=0;
-			bool		blob=false;
-			bool		null=false;
-			dbhncur->getField(0,&field,&fieldlength,&blob,&null);
-			dbhostname=charstring::duplicate(field);
-		} 
+			if (!dbhncur->noRowsToReturn() && dbhncur->fetchRow()) {
+				const char	*field=NULL;
+				uint64_t	fieldlength=0;
+				bool		blob=false;
+				bool		null=false;
+				dbhncur->getField(0,&field,&fieldlength,
+								&blob,&null);
+				dbhostname=charstring::duplicate(field);
+			} 
 		
-		dbhncur->cleanUpData();
+			dbhncur->cleanUpData();
+		}
+		dbhncur->close();
+		cont->deleteCursor(dbhncur);
+
+	} else {
+
+		const char	*ipaddr=dbIpAddress();
+		char		ip[4];
+		for (uint8_t i=0; i<4; i++) {
+			ip[i]=charstring::toInteger(ipaddr);
+			ipaddr=charstring::findFirst(ipaddr,'.');
+			if (ipaddr) {
+				ipaddr++;
+			}
+		}
+		hostentry::getName(ip,4,AF_INET,&dbhostname);
 	}
-	dbhncur->close();
-	cont->deleteCursor(dbhncur);
+	dbhostiploop=0;
 	return dbhostname;
 }
 
 const char *sqlrconnection_svr::dbIpAddress() {
+
+	// don't get looped up...
+	if (dbhostiploop==2) {
+		return NULL;
+	}
+	dbhostiploop++;
+
+	// re-init buffer
 	delete[] dbipaddress;
 	dbipaddress=NULL;
-	hostentry::getAddressString(dbHostName(),0,&dbipaddress);
+
+	// if we have an ip address query then use it, otherwise get the
+	// host name and convert it to an ip address...
+
+	const char	*dbiaquery=dbIpAddressQuery();
+	if (dbiaquery) {
+
+		sqlrcursor_svr	*dbiacur=cont->initCursor();
+		int		dbiaquerylen=charstring::length(dbiaquery);
+		// since we're creating a new cursor for this, make
+		// sure it can't have an ID that might already exist
+		if (dbiacur->openInternal(cont->cursorcount+1) &&
+			dbiacur->prepareQuery(dbiaquery,dbiaquerylen) &&
+			dbiacur->executeQuery(dbiaquery,dbiaquerylen)) {
+
+			if (!dbiacur->noRowsToReturn() && dbiacur->fetchRow()) {
+				const char	*field=NULL;
+				uint64_t	fieldlength=0;
+				bool		blob=false;
+				bool		null=false;
+				dbiacur->getField(0,&field,&fieldlength,
+								&blob,&null);
+				dbipaddress=charstring::duplicate(field);
+			} 
+		
+			dbiacur->cleanUpData();
+		}
+		dbiacur->close();
+		cont->deleteCursor(dbiacur);
+
+	} else {
+		hostentry::getAddressString(dbHostName(),0,&dbipaddress);
+	}
+	dbhostiploop=0;
 	return dbipaddress;
 }
 
