@@ -27,6 +27,8 @@ SRCS = sqlrlistener.cpp \
 	sqlrlogger.cpp \
 	sqlrqueries.cpp \
 	sqlrquery.cpp \
+	sqlrpwdencs.cpp \
+	sqlrpwdenc.cpp \
 	sqlrscaler.cpp
 
 LOBJS = sqlrlistener.lo \
@@ -43,6 +45,8 @@ LOBJS = sqlrlistener.lo \
 	sqlrlogger.lo \
 	sqlrqueries.lo \
 	sqlrquery.lo \
+	sqlrpwdencs.lo \
+	sqlrpwdenc.lo \
 	sqlrscaler.lo
 
 .SUFFIXES: .lo
@@ -83,6 +87,8 @@ install:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libsqlrserver.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
+	$(MKINSTALLDIRS) $(includedir)
+	$(INSTALL) -m 644 sqlrpwdenc.h $(includedir)/sqlrelay
 	$(MKINSTALLDIRS) $(bindir)
 	$(LTINSTALL) sqlr-start$(EXE) $(bindir)
 	$(LTINSTALL) sqlr-listener$(EXE) $(bindir)
@@ -104,6 +110,7 @@ install:
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrserver.la
+	$(RM) $(includedir)/sqlrelay/sqlrpwdenc.h
 	$(RM) $(bindir)/sqlr-start$(EXE)
 	$(RM) $(bindir)/sqlr-listener$(EXE)
 	$(RM) $(bindir)/sqlr-connection$(EXE)
