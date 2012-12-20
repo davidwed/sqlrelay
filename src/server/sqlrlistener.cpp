@@ -170,6 +170,13 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 		authc=new sqlrauthenticator(&cfgfl,sqlrpe);
 	}
 
+	const char	*loggers=cfgfl.getLoggers();
+	if (charstring::length(loggers)) {
+		sqlrlg=new sqlrloggers;
+		sqlrlg->loadLoggers(loggers);
+		sqlrlg->initLoggers(this,NULL);
+	}
+
 	setIpPermissions();
 
 	if (!createSharedMemoryAndSemaphores(cmdl->getId())) {
@@ -527,6 +534,12 @@ bool sqlrlistener::listenOnClientSockets() {
 			if (listening) {
 				addFileDescriptor(clientsockin[index]);
 			} else {
+				stringbuffer	info;
+				info.append("failed to listen "
+						"on client port: ");
+				info.append(port);
+				logInternalError(info.getString());
+
 				char	*err=error::getErrorString();
 				fprintf(stderr,
 					"Could not listen "
@@ -548,6 +561,11 @@ bool sqlrlistener::listenOnClientSockets() {
 		if (listening) {
 			addFileDescriptor(clientsockun);
 		} else {
+			stringbuffer	info;
+			info.append("failed to listen on client socket: ");
+			info.append(unixport);
+			logInternalError(info.getString());
+
 			fprintf(stderr,"Could not listen on unix socket: ");
 			fprintf(stderr,"%s\n",unixport);
 			fprintf(stderr,"Make sure that the file and ");
@@ -589,6 +607,12 @@ bool sqlrlistener::listenOnClientSockets() {
 			if (listening) {
 				addFileDescriptor(mysqlclientsockin[index]);
 			} else {
+				stringbuffer	info;
+				info.append("failed to listen "
+						"on client port: ");
+				info.append(mysqlport);
+				logInternalError(info.getString());
+
 				char	*err=error::getErrorString();
 				fprintf(stderr,
 					"Could not listen "
@@ -610,6 +634,11 @@ bool sqlrlistener::listenOnClientSockets() {
 		if (listening) {
 			addFileDescriptor(mysqlclientsockun);
 		} else {
+			stringbuffer	info;
+			info.append("failed to listen on client socket: ");
+			info.append(mysqlunixport);
+			logInternalError(info.getString());
+
 			fprintf(stderr,"Could not listen on unix socket: ");
 			fprintf(stderr,"%s\n",mysqlunixport);
 			fprintf(stderr,"Make sure that the file and ");
@@ -640,6 +669,11 @@ bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 	if (success) {
 		addFileDescriptor(handoffsockun);
 	} else {
+		stringbuffer	info;
+		info.append("failed to listen on handoff socket: ");
+		info.append(handoffsockname);
+		logInternalError(info.getString());
+
 		fprintf(stderr,"Could not listen on unix socket: ");
 		fprintf(stderr,"%s\n",handoffsockname);
 		fprintf(stderr,"Make sure that the file and ");
@@ -667,6 +701,11 @@ bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 	if (success) {
 		addFileDescriptor(removehandoffsockun);
 	} else {
+		stringbuffer	info;
+		info.append("failed to listen on deregistration socket: ");
+		info.append(removehandoffsockname);
+		logInternalError(info.getString());
+
 		fprintf(stderr,"Could not listen on unix socket: ");
 		fprintf(stderr,"%s\n",removehandoffsockname);
 		fprintf(stderr,"Make sure that the file and ");
@@ -694,6 +733,11 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 	if (success) {
 		addFileDescriptor(fixupsockun);
 	} else {
+		stringbuffer	info;
+		info.append("failed to listen on fixup socket: ");
+		info.append(fixupsockname);
+		logInternalError(info.getString());
+
 		fprintf(stderr,"Could not listen on unix socket: ");
 		fprintf(stderr,"%s\n",fixupsockname);
 		fprintf(stderr,"Make sure that the file and ");
@@ -1010,7 +1054,10 @@ bool sqlrlistener::registerHandoff(filedescriptor *sock) {
 	// get the connection daemon's pid
 	uint32_t processid;
 	if (sock->read(&processid)!=sizeof(uint32_t)) {
-		dbgfile.debugPrint("listener",1,"failed to read process id");
+		const char	*info="failed to read process "
+					"id during registration";
+		logInternalError(info);
+		dbgfile.debugPrint("listener",1,info);
 		delete sock;
 		return false;
 	}
@@ -1059,7 +1106,10 @@ bool sqlrlistener::deRegisterHandoff(filedescriptor *sock) {
 	// get the connection daemon's pid
 	uint32_t	processid;
 	if (sock->read(&processid)!=sizeof(uint32_t)) {
-		dbgfile.debugPrint("listener",1,"failed to read process id");
+		const char	*info="failed to read process "
+					"id during deregistration";
+		logInternalError(info);
+		dbgfile.debugPrint("listener",1,info);
 		delete sock;
 		return false;
 	}
@@ -1089,7 +1139,10 @@ bool sqlrlistener::fixup(filedescriptor *sock) {
 	// get the pid of the connection daemon the child listener needs
 	uint32_t	processid;
 	if (sock->read(&processid)!=sizeof(uint32_t)) {
-		dbgfile.debugPrint("listener",1,"failed to read process id");
+		const char	*info="failed to read process "
+						"id during fixup";
+		logInternalError(info);
+		dbgfile.debugPrint("listener",1,info);
 		delete sock;
 		return false;
 	}
@@ -1129,7 +1182,10 @@ bool sqlrlistener::deniedIp(filedescriptor *clientsock) {
 	if (ip && denied->match(ip) &&
 			(!allowed || (allowed && !allowed->match(ip)))) {
 
-		dbgfile.debugPrint("listener",0,"invalid ip...");
+		stringbuffer	info;
+		info.append("rejected IP address: ")->append(ip);
+		logClientConnectionRefused(info.getString());
+		dbgfile.debugPrint("listener",0,info.getString());
 
 		delete[] ip;
 		return true;
@@ -1217,6 +1273,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		errorClientSession(clientsock,
 				SQLR_ERROR_ERRORFORKINGLISTENER,
 				SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
+		logInternalError(SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
 	}
 }
 
@@ -1318,27 +1375,57 @@ int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 
 	dbgfile.debugPrint("listener",0,"getting authentication...");
 
-	// Get the user/password. For either one, if they are too big or
-	// if there's a read error, just exit with an error code
-	uint32_t	size;
-	clientsock->read(&size,idleclienttimeout,0);
-	char		userbuffer[USERSIZE];
-	if (size>sizeof(userbuffer)-1 ||
-		(uint32_t)(clientsock->read(userbuffer,size,
-						idleclienttimeout,0))!=size) {
-		dbgfile.debugPrint("listener",0,
-			"authentication failed: user size is wrong");
+	// get the user...
+	uint32_t	size=0;
+	ssize_t		result=clientsock->read(&size,idleclienttimeout,0);
+	if (result!=sizeof(uint32_t)) {
+		const char *info="authentication failed: "
+					"failed to get user size";
+		dbgfile.debugPrint("listener",1,info);
+		logClientProtocolError(info,result);
+		return -1;
+	}
+	char	userbuffer[USERSIZE];
+	if (size>=sizeof(userbuffer)) {
+		stringbuffer	info;
+		info.append("authentication failed: user size too long: ");
+		info.append(size);
+		dbgfile.debugPrint("listener",1,info.getString());
+		logClientConnectionRefused(info.getString());
+		return -1;
+	}
+	result=clientsock->read(userbuffer,size,idleclienttimeout,0);
+	if ((uint32_t)result!=size) {
+		const char *info="authentication failed failed to get user";
+		dbgfile.debugPrint("connection",1,info);
+		logClientProtocolError(info,result);
 		return -1;
 	}
 	userbuffer[size]='\0';
 
-	char		passwordbuffer[USERSIZE];
-	clientsock->read(&size,idleclienttimeout,0);
-	if (size>sizeof(passwordbuffer)-1 ||
-		(uint32_t)(clientsock->read(passwordbuffer,size,
-						idleclienttimeout,0))!=size) {
-		dbgfile.debugPrint("listener",0,
-			"authentication failed: password size is wrong");
+	// get the password...
+	result=clientsock->read(&size,idleclienttimeout,0);
+	if (result!=sizeof(uint32_t)) {
+		const char *info="authentication failed: "
+					"failed to get password size";
+		dbgfile.debugPrint("listener",1,info);
+		logClientProtocolError(info,result);
+		return -1;
+	}
+	char	passwordbuffer[USERSIZE];
+	if (size>=sizeof(passwordbuffer)) {
+		stringbuffer	info;
+		info.append("authentication failed: password size too long: ");
+		info.append(size);
+		dbgfile.debugPrint("listener",1,info.getString());
+		logClientConnectionRefused(info.getString());
+		return -1;
+	}
+	result=clientsock->read(passwordbuffer,size,idleclienttimeout,0);
+	if ((uint32_t)result!=size) {
+		const char *info="authentication failed failed to get password";
+		dbgfile.debugPrint("connection",1,info);
+		logClientProtocolError(info,result);
 		return -1;
 	}
 	passwordbuffer[size]='\0';
@@ -1352,11 +1439,13 @@ int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 		bool	retval=authc->authenticate(userbuffer,passwordbuffer);
 		if (retval) {
 			dbgfile.debugPrint("listener",1,
-				"listener-based authentication succeeded");
+				"auth succeeded on listener");
 		} else {
-			dbgfile.debugPrint("listener",1,
-				"listener-based authentication failed: "
-				"invalid user/password");
+			const char	*info=
+					"auth failed on listener: "
+					"invalid user/password";
+			logClientConnectionRefused(info);
+			dbgfile.debugPrint("listener",1,info);
 		}
 		return (retval)?1:0;
 	}
@@ -1627,8 +1716,10 @@ bool sqlrlistener::acceptAvailableConnection(bool *alldbsdown) {
 
 	// handle general failure...
 	if (!result) {
-		dbgfile.debugPrint("listener",0,
-			"failed to wait for an available connection");
+		const char	*info="general failure waiting "
+					"for available connection";
+		logInternalError(info);
+		dbgfile.debugPrint("listener",0,info);
 		return false;
 	}
 
@@ -1903,13 +1994,17 @@ bool sqlrlistener::passClientFileDescriptorToConnection(
 
 	// tell the connection we're passing a file descriptor
 	if (connectionsock->write((uint16_t)HANDOFF_PASS)!=sizeof(uint16_t)) {
-		dbgfile.debugPrint("listener",0,"passing descriptor failed");
+		const char	*info="handoff failed to pass command";
+		logInternalError(info);
+		dbgfile.debugPrint("listener",0,info);
 		return false;
 	}
 
 	// pass the file descriptor
 	if (!connectionsock->passFileDescriptor(fd)) {
-		dbgfile.debugPrint("listener",0,"passing descriptor failed");
+		const char	*info="handoff failed to pass file descriptor";
+		logInternalError(info);
+		dbgfile.debugPrint("listener",0,info);
 		return false;
 	}
 
@@ -1948,21 +2043,26 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 	unixclientsocket	fixupclientsockun;
 	if (fixupclientsockun.connect(fixupsockname,-1,-1,0,1)
 						!=RESULT_SUCCESS) {
-		dbgfile.debugPrint("listener",0,
-			"failed to connect to parent listener process");
+		const char	*info="fixup failed to connect";
+		logInternalError(info);
+		dbgfile.debugPrint("listener",0,info);
 		return false;
 	}
 
 	// send the pid of the connection that we need
 	if (fixupclientsockun.write(connectionpid)!=sizeof(uint32_t)) {
-		dbgfile.debugPrint("listener",0,"failed to send the pid");
+		const char	*info="fixup failed to write pid";
+		logInternalError(info);
+		dbgfile.debugPrint("listener",0,info);
 		return false;
 	}
 
 	// get the file descriptor of the socket
 	int32_t	fd;
 	if (!fixupclientsockun.receiveFileDescriptor(&fd)) {
-		dbgfile.debugPrint("listener",0,"failed to receive the socket");
+		const char	*info="fixup failed to receive socket";
+		logInternalError(info);
+		dbgfile.debugPrint("listener",0,info);
 		return false;
 	}
 	connectionsock->setFileDescriptor(fd);
@@ -2204,4 +2304,57 @@ void sqlrlistener::decrementBusyListeners() {
 
 int32_t sqlrlistener::getBusyListeners() {
 	return semset->getValue(10);
+}
+
+void sqlrlistener::logClientProtocolError(const char *info, ssize_t result) {
+	if (!sqlrlg) {
+		return;
+	}
+	stringbuffer	errorbuffer;
+	errorbuffer.append(info);
+	if (result==0) {
+		errorbuffer.append(": client closed connection");
+	} else if (result==RESULT_ERROR) {
+		errorbuffer.append(": error");
+	} else if (result==RESULT_TIMEOUT) {
+		errorbuffer.append(": timeout");
+	} else if (result==RESULT_ABORT) {
+		errorbuffer.append(": abort");
+	}
+	if (error::getErrorNumber()) {
+		char	*error=error::getErrorString();
+		errorbuffer.append(": ")->append(error);
+		delete[] error;
+	}
+	sqlrlg->runLoggers(this,NULL,NULL,
+			SQLRLOGGER_LOGLEVEL_ERROR,
+			SQLRLOGGER_EVENTTYPE_CLIENT_PROTOCOL_ERROR,
+			errorbuffer.getString());
+}
+
+void sqlrlistener::logClientConnectionRefused(const char *info) {
+	if (!sqlrlg) {
+		return;
+	}
+	sqlrlg->runLoggers(this,NULL,NULL,
+			SQLRLOGGER_LOGLEVEL_WARNING,
+			SQLRLOGGER_EVENTTYPE_CLIENT_CONNECTION_REFUSED,
+			info);
+}
+
+void sqlrlistener::logInternalError(const char *info) {
+	if (!sqlrlg) {
+		return;
+	}
+	stringbuffer	errorbuffer;
+	errorbuffer.append(info);
+	if (error::getErrorNumber()) {
+		char	*error=error::getErrorString();
+		errorbuffer.append(": ")->append(error);
+		delete[] error;
+	}
+	sqlrlg->runLoggers(this,NULL,NULL,
+			SQLRLOGGER_LOGLEVEL_ERROR,
+			SQLRLOGGER_EVENTTYPE_INTERNAL_ERROR,
+			errorbuffer.getString());
 }

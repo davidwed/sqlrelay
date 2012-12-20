@@ -21,8 +21,9 @@ class custom_nw : public sqlrlogger {
 	public:
 			custom_nw(xmldomnode *parameters);
 
-		bool	init(sqlrconnection_svr *sqlrcon);
-		bool	run(sqlrconnection_svr *sqlrcon,
+		bool	init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon);
+		bool	run(sqlrlistener *sqlrl,
+					sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					sqlrlogger_loglevel_t level,
 					sqlrlogger_eventtype_t event,
@@ -40,7 +41,7 @@ custom_nw::custom_nw(xmldomnode *parameters) : sqlrlogger(parameters) {
 	querylogname=NULL;
 }
 
-bool custom_nw::init(sqlrconnection_svr *sqlrcon) {
+bool custom_nw::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 	debugFunction();
 
 	cmdline	*cmdl=sqlrcon->cont->cmdl;
@@ -94,7 +95,8 @@ bool custom_nw::init(sqlrconnection_svr *sqlrcon) {
 				permissions::evalPermString("rw-------"));
 }
 
-bool custom_nw::run(sqlrconnection_svr *sqlrcon,
+bool custom_nw::run(sqlrlistener *sqlrl,
+				sqlrconnection_svr *sqlrcon,
 				sqlrcursor_svr *sqlrcur,
 				sqlrlogger_loglevel_t level,
 				sqlrlogger_eventtype_t event,
@@ -111,7 +113,7 @@ bool custom_nw::run(sqlrconnection_svr *sqlrcon,
 	ino_t	inode1=querylog.getInode();
 	ino_t	inode2;
 	if (!file::getInode(querylogname,&inode2) || inode1!=inode2) {
-		init(sqlrcon);
+		init(sqlrl,sqlrcon);
 	}
 
 	// get error, if there was one

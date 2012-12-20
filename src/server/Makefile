@@ -64,7 +64,7 @@ all: libsqlrserver.la \
 	sqlr-cachemanager$(EXE)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.lo *.o sqlr-listener$(EXE) sqlr-scaler$(EXE) sqlr-cachemanager$(EXE) sqlr-start$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o sqlr-start$(EXE) sqlr-listener$(EXE) sqlr-connection$(EXE) sqlr-scaler$(EXE) sqlr-cachemanager$(EXE)
 	$(RMTREE) .libs
 
 libsqlrserver.la: $(SRCS) $(LOBJS)

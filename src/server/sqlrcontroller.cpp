@@ -348,7 +348,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	if (charstring::length(loggers)) {
 		sqlrlg=new sqlrloggers;
 		sqlrlg->loadLoggers(loggers);
-		sqlrlg->initLoggers(conn);
+		sqlrlg->initLoggers(NULL,conn);
 	}
 
 	// init debug file
@@ -1001,8 +1001,7 @@ bool sqlrcontroller_svr::openSockets() {
 
 			} else {
 				stringbuffer	info;
-				info.append("failed to listen "
-						"on unix socket: ");
+				info.append("failed to listen on socket: ");
 				info.append(unixsocket);
 				logInternalError(NULL,info.getString());
 
@@ -2067,10 +2066,10 @@ bool sqlrcontroller_svr::connectionBasedAuth(const char *userbuffer,
 	int	retval=authc->authenticate(userbuffer,passwordbuffer);
 	if (retval) {
 		dbgfile.debugPrint("connection",1,
-			"connection-based authentication succeeded");
+				"auth succeeded on connection");
 	} else {
-		const char	*info="connection-based authentication failed: "
-							"invalid user/password";
+		const char	*info="auth failed on connection: "
+					"invalid user/password";
 		logClientConnectionRefused(info);
 		dbgfile.debugPrint("connection",1,info);
 	}
@@ -2101,10 +2100,10 @@ bool sqlrcontroller_svr::databaseBasedAuth(const char *userbuffer,
 
 	if (lastauthsuccess) {
 		dbgfile.debugPrint("connection",1,
-			"database-based authentication succeeded");
+				"auth succeeded on database");
 	} else {
-		const char	*info="database-based authentication failed: "
-							"invalid user/password";
+		const char	*info="auth failed on database: "
+					"invalid user/password";
 		logClientConnectionRefused(info);
 		dbgfile.debugPrint("connection",1,info);
 	}
@@ -6528,7 +6527,7 @@ void sqlrcontroller_svr::logClientConnected() {
 	if (!sqlrlg) {
 		return;
 	}
-	sqlrlg->runLoggers(conn,NULL,
+	sqlrlg->runLoggers(NULL,conn,NULL,
 			SQLRLOGGER_LOGLEVEL_INFO,
 			SQLRLOGGER_EVENTTYPE_CLIENT_CONNECTED,
 			NULL);
@@ -6538,17 +6537,17 @@ void sqlrcontroller_svr::logClientConnectionRefused(const char *info) {
 	if (!sqlrlg) {
 		return;
 	}
-	sqlrlg->runLoggers(conn,NULL,
+	sqlrlg->runLoggers(NULL,conn,NULL,
 			SQLRLOGGER_LOGLEVEL_WARNING,
 			SQLRLOGGER_EVENTTYPE_CLIENT_CONNECTION_REFUSED,
-			SQLR_ERROR_AUTHENTICATIONERROR_STRING);
+			info);
 }
 
 void sqlrcontroller_svr::logClientDisconnected(const char *info) {
 	if (!sqlrlg) {
 		return;
 	}
-	sqlrlg->runLoggers(conn,NULL,
+	sqlrlg->runLoggers(NULL,conn,NULL,
 			SQLRLOGGER_LOGLEVEL_INFO,
 			SQLRLOGGER_EVENTTYPE_CLIENT_DISCONNECTED,
 			info);
@@ -6576,7 +6575,7 @@ void sqlrcontroller_svr::logClientProtocolError(sqlrcursor_svr *cursor,
 		errorbuffer.append(": ")->append(error);
 		delete[] error;
 	}
-	sqlrlg->runLoggers(conn,cursor,
+	sqlrlg->runLoggers(NULL,conn,cursor,
 			SQLRLOGGER_LOGLEVEL_ERROR,
 			SQLRLOGGER_EVENTTYPE_CLIENT_PROTOCOL_ERROR,
 			errorbuffer.getString());
@@ -6586,7 +6585,7 @@ void sqlrcontroller_svr::logDbLogIn() {
 	if (!sqlrlg) {
 		return;
 	}
-	sqlrlg->runLoggers(conn,NULL,
+	sqlrlg->runLoggers(NULL,conn,NULL,
 			SQLRLOGGER_LOGLEVEL_INFO,
 			SQLRLOGGER_EVENTTYPE_DB_LOGIN,
 			NULL);
@@ -6596,7 +6595,7 @@ void sqlrcontroller_svr::logDbLogOut() {
 	if (!sqlrlg) {
 		return;
 	}
-	sqlrlg->runLoggers(conn,NULL,
+	sqlrlg->runLoggers(NULL,conn,NULL,
 			SQLRLOGGER_LOGLEVEL_INFO,
 			SQLRLOGGER_EVENTTYPE_DB_LOGOUT,
 			NULL);
@@ -6606,7 +6605,7 @@ void sqlrcontroller_svr::logDbError(sqlrcursor_svr *cursor, const char *info) {
 	if (!sqlrlg) {
 		return;
 	}
-	sqlrlg->runLoggers(conn,cursor,
+	sqlrlg->runLoggers(NULL,conn,cursor,
 			SQLRLOGGER_LOGLEVEL_ERROR,
 			SQLRLOGGER_EVENTTYPE_DB_ERROR,
 			cursor->error);
@@ -6616,7 +6615,7 @@ void sqlrcontroller_svr::logQuery(sqlrcursor_svr *cursor) {
 	if (!sqlrlg) {
 		return;
 	}
-	sqlrlg->runLoggers(conn,cursor,
+	sqlrlg->runLoggers(NULL,conn,cursor,
 			SQLRLOGGER_LOGLEVEL_INFO,
 			SQLRLOGGER_EVENTTYPE_QUERY,
 			NULL);
@@ -6634,7 +6633,7 @@ void sqlrcontroller_svr::logInternalError(sqlrcursor_svr *cursor,
 		errorbuffer.append(": ")->append(error);
 		delete[] error;
 	}
-	sqlrlg->runLoggers(conn,cursor,
+	sqlrlg->runLoggers(NULL,conn,cursor,
 			SQLRLOGGER_LOGLEVEL_ERROR,
 			SQLRLOGGER_EVENTTYPE_INTERNAL_ERROR,
 			errorbuffer.getString());

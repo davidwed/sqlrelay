@@ -2,8 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlrlogger.h>
-#include <sqlrconnection.h>
-#include <sqlrcursor.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
@@ -16,15 +14,16 @@ sqlrlogger::sqlrlogger(xmldomnode *parameters) {
 sqlrlogger::~sqlrlogger() {
 }
 
-bool sqlrlogger::init(sqlrconnection_svr *sqlrcon) {
+bool sqlrlogger::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 	return true;
 }
 
-bool sqlrlogger::run(sqlrconnection_svr *sqlrcon,
-				sqlrcursor_svr *sqlrcur,
-				sqlrlogger_loglevel_t level,
-				sqlrlogger_eventtype_t event,
-				const char *info) {
+bool sqlrlogger::run(sqlrlistener *sqlrl,
+			sqlrconnection_svr *sqlrcon,
+			sqlrcursor_svr *sqlrcur,
+			sqlrlogger_loglevel_t level,
+			sqlrlogger_eventtype_t event,
+			const char *info) {
 	return true;
 }
 

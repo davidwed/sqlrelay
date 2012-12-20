@@ -7,6 +7,7 @@
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 
+class sqlrlistener;
 class sqlrconnection_svr;
 class sqlrcursor_svr;
 
@@ -33,12 +34,14 @@ class sqlrlogger {
 			sqlrlogger(rudiments::xmldomnode *parameters);
 		virtual	~sqlrlogger();
 
-		virtual bool	init(sqlrconnection_svr *sqlrcon);
-		virtual bool	run(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
-						sqlrlogger_loglevel_t level,
-						sqlrlogger_eventtype_t event,
-						const char *info);
+		virtual bool	init(sqlrlistener *sqlrl,
+					sqlrconnection_svr *sqlrcon);
+		virtual bool	run(sqlrlistener *sqlrl,
+					sqlrconnection_svr *sqlrcon,
+					sqlrcursor_svr *sqlrcur,
+					sqlrlogger_loglevel_t level,
+					sqlrlogger_eventtype_t event,
+					const char *info);
 	protected:
 		const char	*logLevel(sqlrlogger_loglevel_t level);
 		const char	*eventType(sqlrlogger_eventtype_t event);

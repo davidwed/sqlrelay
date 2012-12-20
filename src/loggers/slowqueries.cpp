@@ -23,8 +23,9 @@ class slowqueries : public sqlrlogger {
 			slowqueries(xmldomnode *parameters);
 			~slowqueries();
 
-		bool	init(sqlrconnection_svr *sqlrcon);
-		bool	run(sqlrconnection_svr *sqlrcon,
+		bool	init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon);
+		bool	run(sqlrlistener *sqlrl,
+					sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					sqlrlogger_loglevel_t level,
 					sqlrlogger_eventtype_t event,
@@ -46,7 +47,7 @@ slowqueries::~slowqueries() {
 	querylog.flushWriteBuffer(-1,-1);
 }
 
-bool slowqueries::init(sqlrconnection_svr *sqlrcon) {
+bool slowqueries::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 	debugFunction();
 
 	// get the pid
@@ -91,7 +92,8 @@ bool slowqueries::init(sqlrconnection_svr *sqlrcon) {
 	return true;
 }
 
-bool slowqueries::run(sqlrconnection_svr *sqlrcon,
+bool slowqueries::run(sqlrlistener *sqlrl,
+				sqlrconnection_svr *sqlrcon,
 				sqlrcursor_svr *sqlrcur,
 				sqlrlogger_loglevel_t level,
 				sqlrlogger_eventtype_t event,
@@ -110,7 +112,7 @@ bool slowqueries::run(sqlrconnection_svr *sqlrcon,
 	if (!file::getInode(querylogname,&inode2) || inode1!=inode2) {
 		querylog.flushWriteBuffer(-1,-1);
 		querylog.close();
-		init(sqlrcon);
+		init(sqlrl,sqlrcon);
 	}
 
 	uint64_t	querysec=sqlrcur->queryendsec-sqlrcur->querystartsec;

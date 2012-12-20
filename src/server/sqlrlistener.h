@@ -12,6 +12,7 @@
 #include <sqlrconfigfile.h>
 #include <sqlrauthenticator.h>
 #include <sqlrpwdencs.h>
+#include <sqlrloggers.h>
 
 #include <rudiments/signalclasses.h>
 #include <rudiments/daemonprocess.h>
@@ -120,7 +121,12 @@ class sqlrlistener : public rudiments::daemonprocess,
 		void		decrementBusyListeners();
 		int32_t		getBusyListeners();
 
+		void	logClientProtocolError(const char *info,
+						ssize_t result);
+		void	logClientConnectionRefused(const char *info);
+		void	logInternalError(const char *info);
 
+	public:
 		bool		passdescriptor;
 
 		uint32_t	maxconnections;
@@ -134,6 +140,7 @@ class sqlrlistener : public rudiments::daemonprocess,
 
 		sqlrauthenticator	*authc;
 		sqlrpwdencs		*sqlrpe;
+		sqlrloggers		*sqlrlg;
 
 		// FIXME: these shouldn't have to be pointers, right, but
 		// it appears that they do have to be or their destructors don't

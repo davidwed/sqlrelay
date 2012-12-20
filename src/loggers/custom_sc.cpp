@@ -1,6 +1,7 @@
 // Copyright (c) 2012  David Muse
 // See the file COPYING for more information
 
+#include <sqlrlistener.h>
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <sqlrlogger.h>
@@ -19,8 +20,9 @@ class custom_sc : public sqlrlogger {
 	public:
 			custom_sc(xmldomnode *parameters);
 
-		bool	init(sqlrconnection_svr *sqlrcon);
-		bool	run(sqlrconnection_svr *sqlrcon,
+		bool	init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon);
+		bool	run(sqlrlistener *sqlrl,
+					sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					sqlrlogger_loglevel_t level,
 					sqlrlogger_eventtype_t event,
@@ -38,7 +40,7 @@ custom_sc::custom_sc(xmldomnode *parameters) : sqlrlogger(parameters) {
 	loglevel=SQLRLOGGER_LOGLEVEL_ERROR;
 }
 
-bool custom_sc::init(sqlrconnection_svr *sqlrcon) {
+bool custom_sc::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 	debugFunction();
 
 	// get log level
@@ -54,7 +56,7 @@ bool custom_sc::init(sqlrconnection_svr *sqlrcon) {
 	// get log path and name
 	const char	*path=parameters->getAttributeValue("path");
 	if (!charstring::length(path)) {
-		cmdline	*cmdl=sqlrcon->cont->cmdl;
+		cmdline	*cmdl=(sqlrcon)?sqlrcon->cont->cmdl:sqlrl->cmdl;
 		defaultquerylogpath.clear();
 		const char	*logdir=LOG_DIR;
 		if (charstring::length(cmdl->getLocalStateDir())) {
@@ -81,7 +83,8 @@ bool custom_sc::init(sqlrconnection_svr *sqlrcon) {
 				permissions::evalPermString("rw-------"));
 }
 
-bool custom_sc::run(sqlrconnection_svr *sqlrcon,
+bool custom_sc::run(sqlrlistener *sqlrl,
+				sqlrconnection_svr *sqlrcon,
 				sqlrcursor_svr *sqlrcur,
 				sqlrlogger_loglevel_t level,
 				sqlrlogger_eventtype_t event,
@@ -97,7 +100,7 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 	ino_t	inode1=querylog.getInode();
 	ino_t	inode2;
 	if (!file::getInode(querylogname,&inode2) || inode1!=inode2) {
-		init(sqlrcon);
+		init(sqlrl,sqlrcon);
 	}
 
 	// get the current date
@@ -123,7 +126,7 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 
 	// get the client IP, it's needed for some events
 	const char	*clientaddr="unknown";
-	if (sqlrcon->cont->connstats->clientaddr) {
+	if (sqlrcon && sqlrcon->cont->connstats->clientaddr) {
 		clientaddr=sqlrcon->cont->connstats->clientaddr;
 	}
 
