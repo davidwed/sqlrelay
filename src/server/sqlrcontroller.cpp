@@ -772,7 +772,9 @@ bool sqlrcontroller_svr::attemptLogIn(bool printerrors) {
 
 	// log in
 	if (!logIn(printerrors)) {
-		dbgfile.debugPrint("connection",0,"log in failed");
+		const char	*info="database login failed";
+		logInternalError(NULL,info);
+		dbgfile.debugPrint("connection",0,info);
 		if (printerrors) {
 			fprintf(stderr,"Couldn't log into database.\n");
 		}
