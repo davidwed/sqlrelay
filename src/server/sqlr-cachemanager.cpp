@@ -22,7 +22,7 @@ using namespace rudiments;
 #endif
 
 class dirnode {
-	friend class cachemanager;
+	friend class sqlrcachemanager;
 	private:
 			dirnode(const char *dirname);
 			dirnode(const char *start, const char *end);
@@ -31,10 +31,10 @@ class dirnode {
 		dirnode	*next;
 };
 
-class cachemanager : public daemonprocess {
+class sqlrcachemanager : public daemonprocess {
 	public:
-			cachemanager(int argc, const char **argv);
-			~cachemanager();
+			sqlrcachemanager(int argc, const char **argv);
+			~sqlrcachemanager();
 		void	scan();
 	private:
 		void	erase(const char *dirname, const char *filename);
@@ -65,7 +65,7 @@ dirnode::~dirnode() {
 }
 
 
-cachemanager::cachemanager(int argc, const char **argv) {
+sqlrcachemanager::sqlrcachemanager(int argc, const char **argv) {
 
 	cmdl=new cmdline(argc,argv);
 	tmpdir=new tempdir(cmdl);
@@ -84,7 +84,7 @@ cachemanager::cachemanager(int argc, const char **argv) {
 	parseCacheDirs(cachedirs);
 }
 
-cachemanager::~cachemanager() {
+sqlrcachemanager::~sqlrcachemanager() {
 
 	// delete the list of dirnames
 	currentdir=firstdir;
@@ -103,7 +103,7 @@ cachemanager::~cachemanager() {
 	}
 }
 
-void cachemanager::scan() {
+void sqlrcachemanager::scan() {
 
 	// detach from the controlling tty
 	detach();
@@ -162,7 +162,7 @@ void cachemanager::scan() {
 
 }
 
-void cachemanager::erase(const char *dirname, const char *filename) {
+void sqlrcachemanager::erase(const char *dirname, const char *filename) {
 
 	// derive the full pathname
 	size_t	fullpathnamelen=charstring::length(dirname)+1+
@@ -198,7 +198,7 @@ void cachemanager::erase(const char *dirname, const char *filename) {
 	delete[] fullpathname;
 }
 
-void cachemanager::parseCacheDirs(const char *cachedirs) {
+void sqlrcachemanager::parseCacheDirs(const char *cachedirs) {
 
 	if (cachedirs && cachedirs[0]) {
 
@@ -236,7 +236,7 @@ void cachemanager::parseCacheDirs(const char *cachedirs) {
 	}
 }
 
-cachemanager	*cacheman;
+sqlrcachemanager	*cacheman;
 
 void shutDown(int32_t signum) {
 	delete cacheman;
@@ -247,7 +247,7 @@ int main(int argc, const char **argv) {
 
 	#include <version.h>
 
-	cacheman=new cachemanager(argc,argv);
+	cacheman=new sqlrcachemanager(argc,argv);
 	cacheman->handleShutDown(shutDown);
 	cacheman->scan();
 }

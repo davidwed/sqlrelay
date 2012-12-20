@@ -27,11 +27,11 @@ clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo *.o sqlr-listener$(EXE) sqlr-scaler$(EXE) sqlr-cachemanager$(EXE) sqlr-start$(EXE)
 	$(RMTREE) .libs
 
-sqlr-listener$(EXE): sqlr-listener.cpp sqlr-listener.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-listener.lo $(LIBS) $(RPATH)
+sqlr-listener$(EXE): sqlrlistener.cpp sqlrlistener.lo sqlr-listener.cpp sqlr-listener.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlrlistener.lo sqlr-listener.lo $(LIBS) $(RPATH)
 
-sqlr-scaler$(EXE): sqlr-scaler.cpp sqlr-scaler.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-scaler.lo $(LIBS) $(RPATH)
+sqlr-scaler$(EXE): sqlrscaler.cpp sqlrscaler.lo sqlr-scaler.cpp sqlr-scaler.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlrscaler.lo sqlr-scaler.lo $(LIBS) $(RPATH)
 
 sqlr-cachemanager$(EXE): sqlr-cachemanager.cpp sqlr-cachemanager.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-cachemanager.lo $(LIBS) $(RPATH)
