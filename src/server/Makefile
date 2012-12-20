@@ -4,7 +4,7 @@ include ../../config.mk
 
 .PHONY: all clean install uninstall
 
-CPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) $(CACHEDIRCPPFLAG) $(PSDEFINE) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES)
+CPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) $(CACHEDIRCPPFLAG) $(PSDEFINE) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
 LIBS = -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 RPATH =
 ifneq ($(strip $(libdir)),)
@@ -13,38 +13,82 @@ ifeq ($(SERVERUSERPATH),yes)
 endif
 endif
 
+SRCS = sqlrlistener.cpp \
+	sqlrcontroller.cpp \
+	sqlrconnection.cpp \
+	sqlrcursor.cpp \
+	sqlparser.cpp \
+	sqlwriter.cpp \
+	sqltranslations.cpp \
+	sqltranslation.cpp \
+	sqltriggers.cpp \
+	sqltrigger.cpp \
+	sqlrloggers.cpp \
+	sqlrlogger.cpp \
+	sqlrqueries.cpp \
+	sqlrquery.cpp \
+	sqlrscaler.cpp
+
+LOBJS = sqlrlistener.lo \
+	sqlrcontroller.lo \
+	sqlrconnection.lo \
+	sqlrcursor.lo \
+	sqlparser.lo \
+	sqlwriter.lo \
+	sqltranslations.lo \
+	sqltranslation.lo \
+	sqltriggers.lo \
+	sqltrigger.lo \
+	sqlrloggers.lo \
+	sqlrlogger.lo \
+	sqlrqueries.lo \
+	sqlrquery.lo \
+	sqlrscaler.lo
+
 .SUFFIXES: .lo
 
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-listener$(EXE) \
+all: libsqlrserver.la \
+	sqlr-start$(EXE) \
+	sqlr-listener$(EXE) \
+	sqlr-connection$(EXE) \
 	sqlr-scaler$(EXE) \
-	sqlr-cachemanager$(EXE) \
-	sqlr-start$(EXE)
+	sqlr-cachemanager$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo *.o sqlr-listener$(EXE) sqlr-scaler$(EXE) sqlr-cachemanager$(EXE) sqlr-start$(EXE)
 	$(RMTREE) .libs
 
-sqlr-listener$(EXE): sqlrlistener.cpp sqlrlistener.lo sqlr-listener.cpp sqlr-listener.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlrlistener.lo sqlr-listener.lo $(LIBS) $(RPATH)
-
-sqlr-scaler$(EXE): sqlrscaler.cpp sqlrscaler.lo sqlr-scaler.cpp sqlr-scaler.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlrscaler.lo sqlr-scaler.lo $(LIBS) $(RPATH)
-
-sqlr-cachemanager$(EXE): sqlr-cachemanager.cpp sqlr-cachemanager.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-cachemanager.lo $(LIBS) $(RPATH)
+libsqlrserver.la: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
 sqlr-start$(EXE): sqlr-start.cpp sqlr-start.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-start.lo $(LIBS) $(RPATH)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-start.lo -L./ -lsqlrserver $(LIBS) $(RPATH)
+
+sqlr-listener$(EXE): sqlr-listener.cpp sqlr-listener.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-listener.lo -L./ -lsqlrserver $(LIBS) $(RPATH)
+
+sqlr-connection$(EXE): sqlr-connection.cpp sqlr-connection.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-connection.lo -L./ -lsqlrserver $(LIBS) $(RPATH)
+
+sqlr-scaler$(EXE): sqlr-scaler.cpp sqlr-scaler.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-scaler.lo -L./ -lsqlrserver $(LIBS) $(RPATH)
+
+sqlr-cachemanager$(EXE): sqlr-cachemanager.cpp sqlr-cachemanager.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-cachemanager.lo -L./ -lsqlrserver $(LIBS) $(RPATH)
 
 install:
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) libsqlrserver.la $(libdir)
+	$(LIBTOOL) --mode=finish $(libdir)
 	$(MKINSTALLDIRS) $(bindir)
+	$(LTINSTALL) sqlr-start$(EXE) $(bindir)
 	$(LTINSTALL) sqlr-listener$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection$(EXE) $(bindir)
 	$(LTINSTALL) sqlr-scaler$(EXE) $(bindir)
 	$(LTINSTALL) sqlr-cachemanager$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-start$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(tmpdir)
 	chmod 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(tmpdir)/sockets
@@ -53,9 +97,22 @@ install:
 	chmod 777 $(tmpdir)/pids
 	$(MKINSTALLDIRS) $(tmpdir)/ipc
 	chmod 777 $(tmpdir)/ipc
+	$(MKINSTALLDIRS) $(logdir)
+	chmod 777 $(logdir)
+	$(MKINSTALLDIRS) $(debugdir)
+	chmod 777 $(debugdir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-listener$(EXE)
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-scaler$(EXE)
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-cachemanager$(EXE)
-	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-start$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection.la
+	$(RM) $(bindir)/sqlr-start$(EXE)
+	$(RM) $(bindir)/sqlr-listener$(EXE)
+	$(RM) $(bindir)/sqlr-connection$(EXE)
+	$(RM) $(bindir)/sqlr-scaler$(EXE)
+	$(RM) $(bindir)/sqlr-cachemanager$(EXE)
+	$(RMTREE) $(tmpdir)
+	$(RMTREE) $(prefix)/lib/sqlrelay/tmp
+	$(RMTREE) $(logdir)
+	$(RMTREE) $(debugdir)
+	$(RM) $(libdir)/libsqlrelay_*
+	$(RM) $(libexecdir)/libsqlrelay_*
+	$(RM) $(libdir)/libsqlrconnection_p.*
