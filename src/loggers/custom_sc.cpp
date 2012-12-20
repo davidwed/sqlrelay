@@ -116,19 +116,13 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 	logbuffer.append(datebuffer)->append(' ');
 
 	// for the some of the events, get the client IP
-	// (or UNIX if it's connected via unix socket)
-	char	*clientaddrbuf=NULL;
+	const char	*clientaddr="unknown";
 	if (event==SQLRLOGGER_EVENTTYPE_CLI_CONNECTED ||
 		event==SQLRLOGGER_EVENTTYPE_CLI_CONNECTION_REFUSED ||
-		event==SQLRLOGGER_EVENTTYPE_CLI_DISCONNECTED) {
-		if (sqlrcon->cont->clientsock) {
-			clientaddrbuf=sqlrcon->cont->
-					clientsock->getPeerAddress();
-			if (!clientaddrbuf) {
-				clientaddrbuf=charstring::duplicate("UNIX");
-			}
-		} else {
-			clientaddrbuf=charstring::duplicate("unknown");
+		event==SQLRLOGGER_EVENTTYPE_CLI_DISCONNECTED ||
+		event==SQLRLOGGER_EVENTTYPE_CLI_SOCKET_ERROR) {
+		if (sqlrcon->cont->connstats->clientaddr) {
+			clientaddr=sqlrcon->cont->connstats->clientaddr;
 		}
 	}
 
@@ -138,14 +132,14 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 			logbuffer.append(eventType(event))->append(' ');
 			logbuffer.append(logLevel(level))->append(": ");
 			logbuffer.append("Client ");
-			logbuffer.append(clientaddrbuf);
+			logbuffer.append(clientaddr);
 			logbuffer.append(" connected");
 			break;
 		case SQLRLOGGER_EVENTTYPE_CLI_CONNECTION_REFUSED:
 			logbuffer.append(eventType(event))->append(' ');
 			logbuffer.append(logLevel(level))->append(": ");
 			logbuffer.append("Client ");
-			logbuffer.append(clientaddrbuf);
+			logbuffer.append(clientaddr);
 			logbuffer.append(" connection refused:  ");
 			logbuffer.append(info);
 			break;
@@ -153,7 +147,7 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 			logbuffer.append(eventType(event))->append(' ');
 			logbuffer.append(logLevel(level))->append(": ");
 			logbuffer.append("Client ");
-			logbuffer.append(clientaddrbuf);
+			logbuffer.append(clientaddr);
 			logbuffer.append(" disconnected: ");
 			logbuffer.append(info);
 			break;
@@ -161,7 +155,7 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 			logbuffer.append(eventType(event))->append(' ');
 			logbuffer.append(logLevel(level))->append(": ");
 			logbuffer.append("Client ");
-			logbuffer.append(clientaddrbuf);
+			logbuffer.append(clientaddr);
 			logbuffer.append(" socket error: ");
 			logbuffer.append(info);
 			break;
@@ -186,8 +180,6 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_ERROR:
 			{
-			logbuffer.append(eventType(event))->append(' ');
-			logbuffer.append(logLevel(level))->append(": ");
 			const char	*colon=charstring::findFirst(info,':');
 			if (colon) {
 				logbuffer.append(info,colon-info)->append(' ');
@@ -211,9 +203,6 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 			return true;
 	}
 	logbuffer.append("\n");
-
-	// clean up
-	delete[] clientaddrbuf;
 
 	// since all connection daemons are writing to the same file,
 	// we must lock it prior to the write

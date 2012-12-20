@@ -371,7 +371,8 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void	logClientConnectionRefused(const char *info);
 		void	logClientDisconnect(const char *info);
 		void	logClientSocketError(sqlrcursor_svr *cursor,
-							const char *info);
+							const char *info,
+							ssize_t result);
 		void	logDbConnected();
 		void	logDbDisconnected();
 		void	logDbError(sqlrcursor_svr *cursor, const char *info);
