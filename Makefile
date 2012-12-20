@@ -50,6 +50,7 @@ distclean: clean
 		bin/sqlr-stop \
 		bin/sqlrclient-config \
 		bin/sqlrclientwrapper-config \
+		bin/sqlrserver-config \
 		init/openserver/init.d/sqlrelay \
 		init/redhat/init.d/sqlrelay \
 		init/slackware/rc.d/rc.sqlrelay \

@@ -422,7 +422,7 @@ rm -rf %{buildroot}
 %{_bindir}/sqlr-scaler*
 %{_bindir}/sqlr-start*
 %{_bindir}/sqlr-stop
-%{_libdir}/libsqlrconnection-*.so.*
+%{_libdir}/libsqlrserver-*.so.*
 %{_libdir}/libsqlrutil-*.so.*
 %{_libexecdir}/sqlrelay/sqlrlogger_*
 %{_libexecdir}/sqlrelay/sqlrquery_*
@@ -434,11 +434,11 @@ rm -rf %{buildroot}
 
 %files server-devel
 %defattr(-, root, root)
-%{_bindir}/sqlrconnection-config
+%{_bindir}/sqlrserver-config
 %{_includedir}/sqlrelay/sqlrpwdenc.h
-%{_libdir}/libsqlrconnection.a
-%{_libdir}/libsqlrconnection.la
-%{_libdir}/libsqlrconnection.so
+%{_libdir}/libsqlrserver.a
+%{_libdir}/libsqlrserver.la
+%{_libdir}/libsqlrserver.so
 %{_libdir}/libsqlrutil.a
 %{_libdir}/libsqlrutil.la
 %{_libdir}/libsqlrutil.so

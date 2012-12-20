@@ -103,7 +103,7 @@ install:
 	chmod 777 $(debugdir)
 
 uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrconnection.la
+	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrserver.la
 	$(RM) $(bindir)/sqlr-start$(EXE)
 	$(RM) $(bindir)/sqlr-listener$(EXE)
 	$(RM) $(bindir)/sqlr-connection$(EXE)
@@ -115,4 +115,5 @@ uninstall:
 	$(RMTREE) $(debugdir)
 	$(RM) $(libdir)/libsqlrelay_*
 	$(RM) $(libexecdir)/libsqlrelay_*
-	$(RM) $(libdir)/libsqlrconnection_p.*
+	$(RM) $(libdir)/libsqlrconnection*
+	$(RM) $(libdir)/libsqlrconnection_p*

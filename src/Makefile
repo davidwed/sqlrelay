@@ -7,7 +7,6 @@ all:
 	$(MAKE) -C server all
 	$(MAKE) -C api all
 	$(MAKE) -C cmdline all
-	$(MAKE) -C connection all
 	$(MAKE) -C triggers all
 	$(MAKE) -C translations all
 	$(MAKE) -C queries all
@@ -21,7 +20,6 @@ clean:
 	$(MAKE) -C server clean
 	$(MAKE) -C api clean
 	$(MAKE) -C cmdline clean
-	$(MAKE) -C connection clean
 	$(MAKE) -C triggers clean
 	$(MAKE) -C translations clean
 	$(MAKE) -C queries clean
@@ -35,7 +33,6 @@ install:
 	$(MAKE) -C server install
 	$(MAKE) -C api install
 	$(MAKE) -C cmdline install
-	$(MAKE) -C connection install
 	$(MAKE) -C triggers install
 	$(MAKE) -C translations install
 	$(MAKE) -C queries install
@@ -49,7 +46,6 @@ uninstall:
 	$(MAKE) -C server uninstall
 	$(MAKE) -C api uninstall
 	$(MAKE) -C cmdline uninstall
-	$(MAKE) -C connection uninstall
 	$(MAKE) -C triggers uninstall
 	$(MAKE) -C translations uninstall
 	$(MAKE) -C queries uninstall
