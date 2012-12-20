@@ -89,7 +89,7 @@ install:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libsqlrserver.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
-	$(MKINSTALLDIRS) $(includedir)
+	$(MKINSTALLDIRS) $(includedir)/sqlrelay
 	$(INSTALL) -m 644 sqlrpwdenc.h $(includedir)/sqlrelay
 	$(MKINSTALLDIRS) $(bindir)
 	$(LTINSTALL) sqlr-start$(EXE) $(bindir)
