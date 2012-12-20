@@ -35,16 +35,15 @@ const char *sqlrlogger::logLevel(sqlrlogger_loglevel_t level) {
 }
 
 static const char *eventtypes[]={
-	"CLI_CONNECTED",
-	"CLI_CONNECTION_REFUSED",
-	"CLI_DISCONNECTED",
-	"CLI_SOCKET_ERROR",
-	"DB_CONNECTED",
-	"DB_DISCONNECTED",
-	"DB_SOCKET_ERROR",
+	"CLIENT_CONNECTED",
+	"CLIENT_CONNECTION_REFUSED",
+	"CLIENT_DISCONNECTED",
+	"CLIENT_PROTOCOL_ERROR",
+	"DB_LOGIN",
+	"DB_LOGOUT",
 	"DB_ERROR",
-	"SQLR_QUERY",
-	"SQLR_INTERNAL"
+	"QUERY",
+	"INTERNAL_ERROR"
 };
 
 const char *sqlrlogger::eventType(sqlrlogger_eventtype_t event) {

@@ -141,34 +141,22 @@ sqlrcontroller_svr::~sqlrcontroller_svr() {
 
 	delete tmpdir;
 
-	dbgfile.debugPrint("connection",0,"deleting authc...");
 	delete authc;
-	dbgfile.debugPrint("connection",0,"done deleting authc");
 
-	dbgfile.debugPrint("connection",0,"deleting idmemory...");
 	delete idmemory;
-	dbgfile.debugPrint("connection",0,"done deleting idmemory");
 
-	dbgfile.debugPrint("connection",0,"deleting semset...");
 	delete semset;
-	dbgfile.debugPrint("connection",0,"done deleting semset");
 
-	dbgfile.debugPrint("connection",0,"deleting unixsocket...");
 	if (unixsocket) {
 		file::remove(unixsocket);
 		delete[] unixsocket;
 	}
-	dbgfile.debugPrint("connection",0,"done deleting unixsocket");
 
-	dbgfile.debugPrint("connection",0,"deleting bindpool...");
 	delete bindpool;
-	dbgfile.debugPrint("connection",0,"done deleting bindpool");
 
-	dbgfile.debugPrint("connection",0,"deleting bindmappings...");
 	delete bindmappingspool;
 	delete inbindmappings;
 	delete outbindmappings;
-	dbgfile.debugPrint("connection",0,"done deleting bindmappings");
 
 	delete sqlp;
 	delete sqlt;
@@ -307,6 +295,9 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	// process command line
 	cmdl=new cmdline(argc,argv);
 
+	// set the tmpdir
+	tmpdir=new tempdir(cmdl);
+
 	// default id warning
 	if (!charstring::compare(cmdl->getId(),DEFAULT_ID)) {
 		fprintf(stderr,"Warning: using default id.\n");
@@ -328,17 +319,21 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 
 	silent=cmdl->found("-silent");
 
+	// parse the config file
 	cfgfl=new sqlrconfigfile();
 	if (!cfgfl->parse(cmdl->getConfig(),cmdl->getId())) {
 		return false;
 	}
+
+	// get password encryptions
 	const char	*pwdencs=cfgfl->getPasswordEncryptions();
 	if (charstring::length(pwdencs)) {
 		sqlrpe=new sqlrpwdencs;
 		sqlrpe->loadPasswordEncryptions(pwdencs);
 	}	
+
+	// load the authenticator
 	authc=new authenticator(cfgfl,sqlrpe);
-	tmpdir=new tempdir(cmdl);
 
 	setUserAndGroup();
 
@@ -348,6 +343,15 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 		return false;
 	}
 
+	// get loggers
+	const char	*loggers=cfgfl->getLoggers();
+	if (charstring::length(loggers)) {
+		sqlrlg=new sqlrloggers;
+		sqlrlg->loadLoggers(loggers);
+		sqlrlg->initLoggers(conn);
+	}
+
+	// init debug file
 	dbgfile.init("connection",cmdl->getLocalStateDir());
 	if (cmdl->found("-debug")) {
 		dbgfile.enable();
@@ -363,6 +367,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 		return false;
 	}
 
+	// handle the connect string
 	constr=cfgfl->getConnectString(connectionid);
 	if (!constr) {
 		fprintf(stderr,"Error: invalid connectionid \"%s\".\n",
@@ -381,14 +386,6 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	if (!createSharedMemoryAndSemaphores(tmpdir->getString(),
 							cmdl->getId())) {
 		return false;
-	}
-
-	// get the loggers
-	const char	*loggers=cfgfl->getLoggers();
-	if (charstring::length(loggers)) {
-		sqlrlg=new sqlrloggers;
-		sqlrlg->loadLoggers(loggers);
-		sqlrlg->initLoggers(conn);
 	}
 
 	// log in and detach
@@ -456,6 +453,8 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	mincursorcount=cfgfl->getCursors();
 	maxcursorcount=cfgfl->getMaxCursors();
 	if (!initCursors(mincursorcount)) {
+		closeCursors(false);
+		logOut();
 		return false;
 	}
 
@@ -666,14 +665,6 @@ bool sqlrcontroller_svr::getUnixSocket(const char *tmpdir,
 	return true;
 }
 
-bool sqlrcontroller_svr::unLockSequenceFile(file *sockseq) {
-
-	// unlock and close the file in a platform-independent manner
-	dbgfile.debugPrint("connection",1,"unlocking...");
-
-	return sockseq->unlockFile();
-}
-
 bool sqlrcontroller_svr::openSequenceFile(file *sockseq,
 				const char *tmpdir, char *unixsocketptr) {
 
@@ -695,15 +686,17 @@ bool sqlrcontroller_svr::openSequenceFile(file *sockseq,
 
 	// handle error
 	if (!success) {
+
 		fprintf(stderr,"Could not open: %s\n",sockseqname);
 		fprintf(stderr,"Make sure that the file and directory are \n");
 		fprintf(stderr,"readable and writable.\n\n");
 		unixsocketptr[0]='\0';
 
-		stringlen=14+charstring::length(sockseqname)+1;
-		string=new char[stringlen];
-		snprintf(string,stringlen,"couldn't open %s",sockseqname);
-		dbgfile.debugPrint("connection",1,string);
+		stringbuffer	info;
+		info.append("failed to open socket sequence file: ");
+		info.append(sockseqname);
+		logInternalError(NULL,info.getString());
+		dbgfile.debugPrint("connection",1,info.getString());
 		delete[] string;
 	}
 
@@ -716,9 +709,24 @@ bool sqlrcontroller_svr::lockSequenceFile(file *sockseq) {
 
 	dbgfile.debugPrint("connection",1,"locking...");
 
-	return sockseq->lockFile(F_WRLCK);
+	if (!sockseq->lockFile(F_WRLCK)) {
+		logInternalError(NULL,"failed to lock socket sequence file");
+		return false;
+	}
+	return true;
 }
 
+bool sqlrcontroller_svr::unLockSequenceFile(file *sockseq) {
+
+	// unlock and close the file in a platform-independent manner
+	dbgfile.debugPrint("connection",1,"unlocking...");
+
+	if (!sockseq->unlockFile()) {
+		logInternalError(NULL,"failed to unlock socket sequence file");
+		return false;
+	}
+	return true;
+}
 
 bool sqlrcontroller_svr::getAndIncrementSequenceNumber(file *sockseq,
 							char *unixsocketptr) {
@@ -750,10 +758,12 @@ bool sqlrcontroller_svr::getAndIncrementSequenceNumber(file *sockseq,
 	delete[] string;
 
 	// write the sequence number back to the file
-	if (sockseq->setPositionRelativeToBeginning(0)==-1) {
+	if (sockseq->setPositionRelativeToBeginning(0)==-1 ||
+			sockseq->write(buffer)!=sizeof(int32_t)) {
+		logInternalError(NULL,"failed to update socket sequence file");
 		return false;
 	}
-	return (sockseq->write(buffer)==sizeof(int32_t));
+	return true;
 }
 
 bool sqlrcontroller_svr::attemptLogIn(bool printerrors) {
@@ -800,7 +810,7 @@ bool sqlrcontroller_svr::logIn(bool printerrors) {
 
 	loggedin=true;
 
-	logDbConnected();
+	logDbLogIn();
 
 	return true;
 }
@@ -812,13 +822,19 @@ void sqlrcontroller_svr::logOut() {
 		return;
 	}
 
+	dbgfile.debugPrint("connection",0,"logging out...");
+
 	// log out
 	conn->logOut();
 
 	// update stats
 	decrementOpenDatabaseConnections();
 
+	logDbLogOut();
+
 	loggedin=false;
+
+	dbgfile.debugPrint("connection",0,"done logging out");
 }
 
 void sqlrcontroller_svr::setAutoCommit(bool ac) {
@@ -859,11 +875,10 @@ bool sqlrcontroller_svr::initCursors(int32_t count) {
 			cur[i]=initCursor();
 		}
 		if (!cur[i]->openInternal(i)) {
-
-			dbgfile.debugPrint("connection",1,
-					"cursor init failure...");
-
-			logOut();
+			stringbuffer	info;
+			info.append("cursor init failed: ")->append(i);
+			logInternalError(NULL,info.getString());
+			dbgfile.debugPrint("connection",1,info.getString());
 			return false;
 		}
 	}
@@ -985,6 +1000,12 @@ bool sqlrcontroller_svr::openSockets() {
 				addFileDescriptor(serversockun);
 
 			} else {
+				stringbuffer	info;
+				info.append("failed to listen "
+						"on unix socket: ");
+				info.append(unixsocket);
+				logInternalError(NULL,info.getString());
+
 				fprintf(stderr,"Could not listen on ");
 				fprintf(stderr,"unix socket: ");
 				fprintf(stderr,"%s\n",unixsocket);
@@ -1025,11 +1046,18 @@ bool sqlrcontroller_svr::openSockets() {
 					snprintf(string,33,
 						"listening on inet socket: %d",
 						inetport);
-					dbgfile.debugPrint("connection",1,string);
+					dbgfile.debugPrint("connection",1,
+								string);
 	
 					addFileDescriptor(serversockin[index]);
 
 				} else {
+					stringbuffer	info;
+					info.append("failed to listen "
+							"on port: ");
+					info.append(inetport);
+					logInternalError(NULL,info.getString());
+
 					fprintf(stderr,"Could not listen on ");
 					fprintf(stderr,"inet socket: ");
 					fprintf(stderr,"%d\n\n",inetport);
@@ -1417,7 +1445,9 @@ int32_t sqlrcontroller_svr::waitForClient() {
 		// get what we're supposed to do...
 		uint16_t	command;
 		if (handoffsockun.read(&command)!=sizeof(uint16_t)) {
-			dbgfile.debugPrint("connection",1,"read failed");
+			const char	*info="read handoff command failed";
+			logInternalError(NULL,info);
+			dbgfile.debugPrint("connection",1,info);
 			dbgfile.debugPrint("connection",0,
 						"done waiting for client");
 			// If this fails, then the listener most likely died
@@ -1440,7 +1470,10 @@ int32_t sqlrcontroller_svr::waitForClient() {
 		// descriptor, delete the socket and return failure
 		int32_t	descriptor;
 		if (!receiveFileDescriptor(&descriptor)) {
-			dbgfile.debugPrint("connection",1,"pass failed");
+			const char	*info="failed to receive "
+						"client file descriptor";
+			logInternalError(NULL,info);
+			dbgfile.debugPrint("connection",1,info);
 			dbgfile.debugPrint("connection",0,
 						"done waiting for client");
 			// If this fails, then the listener most likely died
@@ -1467,8 +1500,9 @@ int32_t sqlrcontroller_svr::waitForClient() {
 	} else {
 
 		if (waitForNonBlockingRead(accepttimeout,0)<1) {
-			dbgfile.debugPrint("connection",0,
-					"wait for non blocking read failed");
+			const char	*info="wait for client connect failed";
+			logInternalError(NULL,info);
+			dbgfile.debugPrint("connection",0,info);
 			// FIXME: I think this should return 0
 			return -1;
 		}
@@ -1476,8 +1510,10 @@ int32_t sqlrcontroller_svr::waitForClient() {
 		// get the first socket that had data available...
 		filedescriptor	*fd=NULL;
 		if (!getReadyList()->getDataByIndex(0,&fd)) {
-			dbgfile.debugPrint("connection",0,
-						"ready list was empty");
+			const char	*info="client connect "
+						"ready list was empty";
+			logInternalError(NULL,info);
+			dbgfile.debugPrint("connection",0,info);
 			// FIXME: I think this should return 0
 			return -1;
 		}
@@ -1496,10 +1532,11 @@ int32_t sqlrcontroller_svr::waitForClient() {
 
 		if (fd) {
 			dbgfile.debugPrint("connection",1,
-						"reconnect succeeded");
+						"client reconnect succeeded");
 		} else {
-			dbgfile.debugPrint("connection",1,
-						"reconnect failed");
+			const char	*info="client reconnect failed";
+			logInternalError(NULL,info);
+			dbgfile.debugPrint("connection",1,info);
 		}
 		dbgfile.debugPrint("connection",0,"done waiting for client");
 
@@ -1688,7 +1725,7 @@ void sqlrcontroller_svr::clientSession() {
 		if (command==NEW_QUERY ||
 			command==REEXECUTE_QUERY ||
 			command==FETCH_FROM_BIND_CURSOR) {
-			logSqlrQuery(cursor);
+			logQuery(cursor);
 		}
 
 	} while (loop);
@@ -1701,12 +1738,14 @@ void sqlrcontroller_svr::clientSession() {
 	closeSuspendedSessionSockets();
 
 	const char	*info="an error occurred";
-	if (command==END_SESSION) {
+	if (command==NO_COMMAND) {
+		info="client closed connection";
+	} else if (command==END_SESSION) {
 		info="client ended the session";
 	} else if (command==SUSPEND_SESSION) {
 		info="client suspended the session";
 	}
-	logClientDisconnect(info);
+	logClientDisconnected(info);
 
 	decrementOpenClientConnections();
 	inclientsession=false;
@@ -1723,9 +1762,17 @@ bool sqlrcontroller_svr::getCommand(uint16_t *command) {
 	// get the command
 	ssize_t	result=clientsock->read(command,idleclienttimeout,0);
 	if (result!=sizeof(uint16_t)) {
-		const char	*info="get command failed";
-		dbgfile.debugPrint("connection",1,info);
-		logClientSocketError(NULL,info,result);
+
+		// Return false but don't consider it an error if we get a
+		// timeout or a 0 (meaning that the client closed the socket)
+		// as either would be natural to do here.
+		if (result!=RESULT_TIMEOUT && result!=0) {
+			const char	*info="get command failed";
+			dbgfile.debugPrint("connection",1,info);
+			logClientProtocolError(NULL,info,result);
+		}
+
+		*command=NO_COMMAND;
 		return false;
 	}
 
@@ -1752,7 +1799,7 @@ sqlrcursor_svr *sqlrcontroller_svr::getCursor(uint16_t command) {
 					"failed to get whether client "
 					"needs  new cursor or not";
 			dbgfile.debugPrint("connection",2,info);
-			logClientSocketError(NULL,info,result);
+			logClientProtocolError(NULL,info,result);
 			return NULL;
 		}
 	}
@@ -1769,7 +1816,7 @@ sqlrcursor_svr *sqlrcontroller_svr::getCursor(uint16_t command) {
 			const char *info="get cursor failed: "
 						"failed to get cursor id";
 			dbgfile.debugPrint("connection",2,info);
-			logClientSocketError(NULL,info,result);
+			logClientProtocolError(NULL,info,result);
 			return NULL;
 		}
 
@@ -1792,7 +1839,7 @@ sqlrcursor_svr *sqlrcontroller_svr::getCursor(uint16_t command) {
 					"client requested an invalid cursor: ");
 			info.append(id);
 			dbgfile.debugPrint("connection",2,info.getString());
-			logSqlrInternalError(NULL,info.getString());
+			logClientProtocolError(NULL,info.getString(),1);
 			return NULL;
 		}
 
@@ -1841,9 +1888,11 @@ sqlrcursor_svr *sqlrcontroller_svr::findAvailableCursor() {
 		cur[cursorcount]=initCursor();
 		cur[cursorcount]->state=SQLRCURSORSTATE_AVAILABLE;
 		if (!cur[cursorcount]->openInternal(cursorcount)) {
-			dbgfile.debugPrint("connection",1,
-					"cursor init failure...");
-			logOut();
+			stringbuffer	info;
+			info.append("cursor init failure: ");
+			info.append(cursorcount);
+			logInternalError(NULL,info.getString());
+			dbgfile.debugPrint("connection",1,info.getString());
 			return NULL;
 		}
 		cursorcount++;
@@ -1938,7 +1987,7 @@ bool sqlrcontroller_svr::getUserFromClient() {
 		const char *info="authentication failed: "
 					"failed to get user size";
 		dbgfile.debugPrint("connection",1,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 	if (size>=sizeof(userbuffer)) {
@@ -1953,7 +2002,7 @@ bool sqlrcontroller_svr::getUserFromClient() {
 	if ((uint32_t)result!=size) {
 		const char *info="authentication failed failed to get user";
 		dbgfile.debugPrint("connection",1,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 	userbuffer[size]='\0';
@@ -1967,7 +2016,7 @@ bool sqlrcontroller_svr::getPasswordFromClient() {
 		const char *info="authentication failed: "
 					"failed to get password size";
 		dbgfile.debugPrint("connection",1,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 	if (size>=sizeof(passwordbuffer)) {
@@ -1983,7 +2032,7 @@ bool sqlrcontroller_svr::getPasswordFromClient() {
 		const char *info="authentication failed: "
 					"failed to get password";
 		dbgfile.debugPrint("connection",1,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 	passwordbuffer[size]='\0';
@@ -2150,7 +2199,7 @@ void sqlrcontroller_svr::autoCommitCommand() {
 		const char	*info="get autocommit failed: "
 					"failed to get autocommit setting";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return;
 	}
 	if (on) {
@@ -2314,7 +2363,7 @@ void sqlrcontroller_svr::selectDatabaseCommand() {
 		const char	*info="select database failed: "
 					"failed to get db length";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return;
 	}
 
@@ -2326,7 +2375,7 @@ void sqlrcontroller_svr::selectDatabaseCommand() {
 				"client sent bad db length: ");
 		info.append(dblen);
 		dbgfile.debugPrint("connection",2,info.getString());
-		logSqlrInternalError(NULL,info.getString());
+		logClientProtocolError(NULL,info.getString(),1);
 		return;
 	}
 
@@ -2341,7 +2390,7 @@ void sqlrcontroller_svr::selectDatabaseCommand() {
 			const char	*info="select database failed: "
 						"failed to get database name";
 			dbgfile.debugPrint("connection",2,info);
-			logClientSocketError(NULL,info,result);
+			logClientProtocolError(NULL,info,result);
 			return;
 		}
 	}
@@ -2602,10 +2651,11 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 			// then re-establish the connection
 			if (!cursor->liveconnection) {
 
-				logDbDisconnected();
-
 				dbgfile.debugPrint("connection",3,
 							"database is down...");
+
+				logDbError(cursor,cursor->error);
+
 				reLogIn();
 
 				// if we're waiting for down databases then
@@ -2635,7 +2685,7 @@ bool sqlrcontroller_svr::getClientInfo(sqlrcursor_svr *cursor) {
 		const char	*info="get client info failed: "
 					"failed to get clientinfo length";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(cursor,info,result);
+		logClientProtocolError(cursor,info,result);
 		return false;
 	}
 
@@ -2654,7 +2704,7 @@ bool sqlrcontroller_svr::getClientInfo(sqlrcursor_svr *cursor) {
 				"client sent bad client info size: ");
 		info.append(clientinfolen);
 		dbgfile.debugPrint("connection",2,info.getString());
-		logSqlrInternalError(cursor,info.getString());
+		logClientProtocolError(cursor,info.getString(),1);
 
 		clientinfolen=0;
 		return false;
@@ -2668,7 +2718,7 @@ bool sqlrcontroller_svr::getClientInfo(sqlrcursor_svr *cursor) {
 		const char	*info="get client info failed: "
 					"failed to get client info";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(cursor,info,result);
+		logClientProtocolError(cursor,info,result);
 		return false;
 	}
 	clientinfo[clientinfolen]='\0';
@@ -2701,7 +2751,7 @@ bool sqlrcontroller_svr::getQuery(sqlrcursor_svr *cursor) {
 		const char	*info="get query failed: "
 					"failed to get query length";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(cursor,info,result);
+		logClientProtocolError(cursor,info,result);
 		return false;
 	}
 
@@ -2720,7 +2770,7 @@ bool sqlrcontroller_svr::getQuery(sqlrcursor_svr *cursor) {
 				"client sent bad query length: ");
 		info.append(cursor->querylength);
 		dbgfile.debugPrint("connection",2,info.getString());
-		logSqlrInternalError(cursor,info.getString());
+		logClientProtocolError(cursor,info.getString(),1);
 
 		cursor->querylength=0;
 		return false;
@@ -2737,7 +2787,7 @@ bool sqlrcontroller_svr::getQuery(sqlrcursor_svr *cursor) {
 
 		const char	*info="get query failed: failed to get query";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(cursor,info,result);
+		logClientProtocolError(cursor,info,result);
 		return false;
 	}
 	cursor->querybuffer[cursor->querylength]='\0';
@@ -2906,7 +2956,7 @@ bool sqlrcontroller_svr::getBindVarCount(sqlrcursor_svr *cursor,
 		const char	*info="get binds failed: "
 					"failed to get bind count";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(cursor,info,result);
+		logClientProtocolError(cursor,info,result);
 		*count=0;
 		return false;
 	}
@@ -2925,7 +2975,7 @@ bool sqlrcontroller_svr::getBindVarCount(sqlrcursor_svr *cursor,
 				"client tried to send too many binds: ");
 		info.append(*count);
 		dbgfile.debugPrint("connection",2,info.getString());
-		logSqlrInternalError(cursor,info.getString());
+		logClientProtocolError(cursor,info.getString(),1);
 
 		*count=0;
 		return false;
@@ -2949,7 +2999,7 @@ bool sqlrcontroller_svr::getBindVarName(sqlrcursor_svr *cursor,
 		const char	*info="get binds failed: "
 					"failed to get variable name length";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(cursor,info,result);
+		logClientProtocolError(cursor,info,result);
 		return false;
 	}
 
@@ -2967,7 +3017,7 @@ bool sqlrcontroller_svr::getBindVarName(sqlrcursor_svr *cursor,
 		info.append("get binds failed: bad variable name length: ");
 		info.append(bindnamesize);
 		dbgfile.debugPrint("connection",2,info.getString());
-		logSqlrInternalError(cursor,info.getString());
+		logClientProtocolError(cursor,info.getString(),1);
 		return false;
 	}
 
@@ -2983,7 +3033,7 @@ bool sqlrcontroller_svr::getBindVarName(sqlrcursor_svr *cursor,
 		const char	*info="get binds failed: "
 					"failed to get variable name";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(cursor,info,result);
+		logClientProtocolError(cursor,info,result);
 		return false;
 	}
 	bv->variable[bindnamesize+1]='\0';
@@ -3000,7 +3050,7 @@ bool sqlrcontroller_svr::getBindVarType(bindvar_svr *bv) {
 	if (result!=sizeof(uint16_t)) {
 		const char	*info="get binds failed: failed to get type";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 	return true;
@@ -3019,7 +3069,7 @@ bool sqlrcontroller_svr::getBindSize(sqlrcursor_svr *cursor,
 		const char	*info="get binds failed: "
 					"failed to get bind value length";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(cursor,info,result);
+		logClientProtocolError(cursor,info,result);
 		return false;
 	}
 
@@ -3044,7 +3094,7 @@ bool sqlrcontroller_svr::getBindSize(sqlrcursor_svr *cursor,
 		info.append("get binds failed: bad value length: ");
 		info.append(bv->valuesize);
 		dbgfile.debugPrint("connection",2,info.getString());
-		logSqlrInternalError(cursor,info.getString());
+		logClientProtocolError(cursor,info.getString(),1);
 		return false;
 	}
 
@@ -3086,7 +3136,7 @@ bool sqlrcontroller_svr::getStringBind(sqlrcursor_svr *cursor,
 		const char	*info="get binds failed: "
 					"failed to get bind value";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(cursor,info,result);
+		logClientProtocolError(cursor,info,result);
 		return false;
 	}
 	bv->value.stringval[bv->valuesize]='\0';
@@ -3108,7 +3158,7 @@ bool sqlrcontroller_svr::getIntegerBind(bindvar_svr *bv) {
 		const char	*info="get binds failed: "
 					"failed to get bind value";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 
@@ -3131,7 +3181,7 @@ bool sqlrcontroller_svr::getDoubleBind(bindvar_svr *bv) {
 		const char	*info="get binds failed: "
 					"failed to get bind value";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 
@@ -3142,7 +3192,7 @@ bool sqlrcontroller_svr::getDoubleBind(bindvar_svr *bv) {
 		const char	*info="get binds failed: "
 					"failed to get precision";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 
@@ -3153,7 +3203,7 @@ bool sqlrcontroller_svr::getDoubleBind(bindvar_svr *bv) {
 		const char	*info="get binds failed: "
 					"failed to get scale";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 
@@ -3176,7 +3226,7 @@ bool sqlrcontroller_svr::getDateBind(bindvar_svr *bv) {
 	if (result!=sizeof(uint16_t)) {
 		const char	*info="get binds failed: failed to get year";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 	bv->value.dateval.year=(int16_t)temp;
@@ -3186,7 +3236,7 @@ bool sqlrcontroller_svr::getDateBind(bindvar_svr *bv) {
 	if (result!=sizeof(uint16_t)) {
 		const char	*info="get binds failed: failed to get month";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 	bv->value.dateval.month=(int16_t)temp;
@@ -3196,7 +3246,7 @@ bool sqlrcontroller_svr::getDateBind(bindvar_svr *bv) {
 	if (result!=sizeof(uint16_t)) {
 		const char	*info="get binds failed: failed to get day";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 	bv->value.dateval.day=(int16_t)temp;
@@ -3206,7 +3256,7 @@ bool sqlrcontroller_svr::getDateBind(bindvar_svr *bv) {
 	if (result!=sizeof(uint16_t)) {
 		const char	*info="get binds failed: failed to get hour";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 	bv->value.dateval.hour=(int16_t)temp;
@@ -3216,7 +3266,7 @@ bool sqlrcontroller_svr::getDateBind(bindvar_svr *bv) {
 	if (result!=sizeof(uint16_t)) {
 		const char	*info="get binds failed: failed to get minute";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 	bv->value.dateval.minute=(int16_t)temp;
@@ -3226,7 +3276,7 @@ bool sqlrcontroller_svr::getDateBind(bindvar_svr *bv) {
 	if (result!=sizeof(uint16_t)) {
 		const char	*info="get binds failed: failed to get second";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 	bv->value.dateval.second=(int16_t)temp;
@@ -3238,7 +3288,7 @@ bool sqlrcontroller_svr::getDateBind(bindvar_svr *bv) {
 		const char	*info="get binds failed: "
 					"failed to get microsecond";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 	bv->value.dateval.microsecond=(int32_t)temp32;
@@ -3250,7 +3300,7 @@ bool sqlrcontroller_svr::getDateBind(bindvar_svr *bv) {
 		const char	*info="get binds failed: "
 					"failed to get timezone size";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 
@@ -3267,7 +3317,7 @@ bool sqlrcontroller_svr::getDateBind(bindvar_svr *bv) {
 		const char	*info="get binds failed: "
 					"failed to get timezone";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 	bv->value.dateval.tz[length]='\0';
@@ -3323,7 +3373,7 @@ bool sqlrcontroller_svr::getLobBind(sqlrcursor_svr *cursor, bindvar_svr *bv) {
 		bv->value.stringval[0]='\0';
 		const char	*info="get binds failed: bad value";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(cursor,info,result);
+		logClientProtocolError(cursor,info,result);
 		return false;
 	}
 
@@ -3351,7 +3401,7 @@ bool sqlrcontroller_svr::getSendColumnInfo() {
 	if (result!=sizeof(uint16_t)) {
 		const char	*info="get send column info failed";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(NULL,info,result);
+		logClientProtocolError(NULL,info,result);
 		return false;
 	}
 
@@ -4785,7 +4835,7 @@ bool sqlrcontroller_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 		const char	*info="return result set data failed: "
 					"failed to get rows to skip";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(cursor,info,result);
+		logClientProtocolError(cursor,info,result);
 		return false;
 	}
 
@@ -4796,7 +4846,7 @@ bool sqlrcontroller_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 		const char	*info="return result set data failed: "
 					"failed to get rows to fetch";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(cursor,info,result);
+		logClientProtocolError(cursor,info,result);
 		return false;
 	}
 
@@ -5221,7 +5271,7 @@ bool sqlrcontroller_svr::getListCommand(sqlrcursor_svr *cursor,
 		const char	*info="get list failed: "
 					"failed to get wild length";
 		dbgfile.debugPrint("connection",2,info);
-		logClientSocketError(cursor,info,result);
+		logClientProtocolError(cursor,info,result);
 		return false;
 	}
 
@@ -5231,7 +5281,7 @@ bool sqlrcontroller_svr::getListCommand(sqlrcursor_svr *cursor,
 		info.append("get list failed: wild length too large: ");
 		info.append(wildlen);
 		dbgfile.debugPrint("connection",2,info.getString());
-		logSqlrInternalError(cursor,info.getString());
+		logClientProtocolError(cursor,info.getString(),1);
 		return false;
 	}
 
@@ -5243,7 +5293,7 @@ bool sqlrcontroller_svr::getListCommand(sqlrcursor_svr *cursor,
 			const char	*info="get list failed: "
 						"failed to get wild parameter";
 			dbgfile.debugPrint("connection",2,info);
-			logClientSocketError(cursor,info,result);
+			logClientProtocolError(cursor,info,result);
 			return false;
 		}
 	}
@@ -5260,7 +5310,7 @@ bool sqlrcontroller_svr::getListCommand(sqlrcursor_svr *cursor,
 			const char	*info="get list failed: "
 						"failed to get table length";
 			dbgfile.debugPrint("connection",2,info);
-			logClientSocketError(cursor,info,result);
+			logClientProtocolError(cursor,info,result);
 			return false;
 		}
 
@@ -5271,7 +5321,7 @@ bool sqlrcontroller_svr::getListCommand(sqlrcursor_svr *cursor,
 					"table length too large: ");
 			info.append(tablelen);
 			dbgfile.debugPrint("connection",2,info.getString());
-			logSqlrInternalError(cursor,info.getString());
+			logClientProtocolError(cursor,info.getString(),1);
 			return false;
 		}
 
@@ -5284,7 +5334,7 @@ bool sqlrcontroller_svr::getListCommand(sqlrcursor_svr *cursor,
 				const char	*info="get list failed: "
 						"failed to get table parameter";
 				dbgfile.debugPrint("connection",2,info);
-				logClientSocketError(cursor,info,result);
+				logClientProtocolError(cursor,info,result);
 				return false;
 			}
 		}
@@ -5697,6 +5747,8 @@ void sqlrcontroller_svr::closeSuspendedSessionSockets() {
 
 void sqlrcontroller_svr::closeConnection() {
 
+	dbgfile.debugPrint("connection",0,"closing connection...");
+
 	if (inclientsession) {
 		endSession();
 		decrementOpenClientConnections();
@@ -5719,29 +5771,22 @@ void sqlrcontroller_svr::closeConnection() {
 
 
 	// try to log out
-	dbgfile.debugPrint("connection",0,"logging out...");
 	logOut();
-	dbgfile.debugPrint("connection",0,"done logging out");
-
 
 	// clear the pool
-	dbgfile.debugPrint("connection",0,"removing all sockets...");
 	removeAllFileDescriptors();
-	dbgfile.debugPrint("connection",0,"done removing all sockets");
 
 
 	// close, clean up all sockets
-	dbgfile.debugPrint("connection",0,"deleting unix socket...");
 	delete serversockun;
-	dbgfile.debugPrint("connection",0,"done deleting unix socket");
 
 
-	dbgfile.debugPrint("connection",0,"deleting inetsockets...");
 	for (uint64_t index=0; index<serversockincount; index++) {
 		delete serversockin[index];
 	}
 	delete[] serversockin;
-	dbgfile.debugPrint("connection",0,"done deleting inet socket");
+
+	dbgfile.debugPrint("connection",0,"done closing connection");
 }
 
 void sqlrcontroller_svr::closeCursors(bool destroy) {
@@ -5777,7 +5822,6 @@ void sqlrcontroller_svr::deleteCursor(sqlrcursor_svr *curs) {
 	decrementOpenDatabaseCursors();
 }
 
-// ipc here
 bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(
 					const char *tmpdir, const char *id) {
 
@@ -5786,7 +5830,8 @@ bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(
 	char	*idfilename=new char[idfilenamelen];
 	snprintf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir,id);
 
-	dbgfile.debugPrint("connection",0,"attaching to shared memory and semaphores");
+	dbgfile.debugPrint("connection",0,"attaching to "
+					"shared memory and semaphores");
 	dbgfile.debugPrint("connection",0,"id filename: ");
 	dbgfile.debugPrint("connection",0,idfilename);
 
@@ -6485,7 +6530,7 @@ void sqlrcontroller_svr::logClientConnected() {
 	}
 	sqlrlg->runLoggers(conn,NULL,
 			SQLRLOGGER_LOGLEVEL_INFO,
-			SQLRLOGGER_EVENTTYPE_CLI_CONNECTED,
+			SQLRLOGGER_EVENTTYPE_CLIENT_CONNECTED,
 			NULL);
 }
 
@@ -6495,21 +6540,21 @@ void sqlrcontroller_svr::logClientConnectionRefused(const char *info) {
 	}
 	sqlrlg->runLoggers(conn,NULL,
 			SQLRLOGGER_LOGLEVEL_WARNING,
-			SQLRLOGGER_EVENTTYPE_CLI_CONNECTION_REFUSED,
+			SQLRLOGGER_EVENTTYPE_CLIENT_CONNECTION_REFUSED,
 			SQLR_ERROR_AUTHENTICATIONERROR_STRING);
 }
 
-void sqlrcontroller_svr::logClientDisconnect(const char *info) {
+void sqlrcontroller_svr::logClientDisconnected(const char *info) {
 	if (!sqlrlg) {
 		return;
 	}
 	sqlrlg->runLoggers(conn,NULL,
 			SQLRLOGGER_LOGLEVEL_INFO,
-			SQLRLOGGER_EVENTTYPE_CLI_DISCONNECTED,
+			SQLRLOGGER_EVENTTYPE_CLIENT_DISCONNECTED,
 			info);
 }
 
-void sqlrcontroller_svr::logClientSocketError(sqlrcursor_svr *cursor,
+void sqlrcontroller_svr::logClientProtocolError(sqlrcursor_svr *cursor,
 							const char *info,
 							ssize_t result) {
 	if (!sqlrlg) {
@@ -6525,8 +6570,6 @@ void sqlrcontroller_svr::logClientSocketError(sqlrcursor_svr *cursor,
 		errorbuffer.append(": timeout");
 	} else if (result==RESULT_ABORT) {
 		errorbuffer.append(": abort");
-	} else if (result>0) {
-		errorbuffer.append(": invalid data");
 	}
 	if (error::getErrorNumber()) {
 		char	*error=error::getErrorString();
@@ -6535,27 +6578,27 @@ void sqlrcontroller_svr::logClientSocketError(sqlrcursor_svr *cursor,
 	}
 	sqlrlg->runLoggers(conn,cursor,
 			SQLRLOGGER_LOGLEVEL_ERROR,
-			SQLRLOGGER_EVENTTYPE_CLI_SOCKET_ERROR,
+			SQLRLOGGER_EVENTTYPE_CLIENT_PROTOCOL_ERROR,
 			errorbuffer.getString());
 }
 
-void sqlrcontroller_svr::logDbConnected() {
+void sqlrcontroller_svr::logDbLogIn() {
 	if (!sqlrlg) {
 		return;
 	}
 	sqlrlg->runLoggers(conn,NULL,
 			SQLRLOGGER_LOGLEVEL_INFO,
-			SQLRLOGGER_EVENTTYPE_DB_CONNECTED,
+			SQLRLOGGER_EVENTTYPE_DB_LOGIN,
 			NULL);
 }
 
-void sqlrcontroller_svr::logDbDisconnected() {
+void sqlrcontroller_svr::logDbLogOut() {
 	if (!sqlrlg) {
 		return;
 	}
 	sqlrlg->runLoggers(conn,NULL,
 			SQLRLOGGER_LOGLEVEL_INFO,
-			SQLRLOGGER_EVENTTYPE_DB_DISCONNECTED,
+			SQLRLOGGER_EVENTTYPE_DB_LOGOUT,
 			NULL);
 }
 
@@ -6569,17 +6612,17 @@ void sqlrcontroller_svr::logDbError(sqlrcursor_svr *cursor, const char *info) {
 			cursor->error);
 }
 
-void sqlrcontroller_svr::logSqlrQuery(sqlrcursor_svr *cursor) {
+void sqlrcontroller_svr::logQuery(sqlrcursor_svr *cursor) {
 	if (!sqlrlg) {
 		return;
 	}
 	sqlrlg->runLoggers(conn,cursor,
 			SQLRLOGGER_LOGLEVEL_INFO,
-			SQLRLOGGER_EVENTTYPE_SQLR_QUERY,
+			SQLRLOGGER_EVENTTYPE_QUERY,
 			NULL);
 }
 
-void sqlrcontroller_svr::logSqlrInternalError(sqlrcursor_svr *cursor,
+void sqlrcontroller_svr::logInternalError(sqlrcursor_svr *cursor,
 							const char *info) {
 	if (!sqlrlg) {
 		return;
@@ -6593,6 +6636,6 @@ void sqlrcontroller_svr::logSqlrInternalError(sqlrcursor_svr *cursor,
 	}
 	sqlrlg->runLoggers(conn,cursor,
 			SQLRLOGGER_LOGLEVEL_ERROR,
-			SQLRLOGGER_EVENTTYPE_SQLR_INTERNAL,
+			SQLRLOGGER_EVENTTYPE_INTERNAL_ERROR,
 			errorbuffer.getString());
 }

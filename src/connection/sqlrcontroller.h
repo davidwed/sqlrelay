@@ -369,15 +369,15 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 
 		void	logClientConnected();
 		void	logClientConnectionRefused(const char *info);
-		void	logClientDisconnect(const char *info);
-		void	logClientSocketError(sqlrcursor_svr *cursor,
+		void	logClientDisconnected(const char *info);
+		void	logClientProtocolError(sqlrcursor_svr *cursor,
 							const char *info,
 							ssize_t result);
-		void	logDbConnected();
-		void	logDbDisconnected();
+		void	logDbLogIn();
+		void	logDbLogOut();
 		void	logDbError(sqlrcursor_svr *cursor, const char *info);
-		void	logSqlrQuery(sqlrcursor_svr *cursor);
-		void	logSqlrInternalError(sqlrcursor_svr *cursor,
+		void	logQuery(sqlrcursor_svr *cursor);
+		void	logInternalError(sqlrcursor_svr *cursor,
 							const char *info);
 
 		const char	*user;

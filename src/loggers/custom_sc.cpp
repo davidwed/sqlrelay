@@ -9,7 +9,6 @@
 #include <rudiments/file.h>
 #include <rudiments/permissions.h>
 #include <rudiments/datetime.h>
-#include <rudiments/error.h>
 #include <debugprint.h>
 
 #ifdef RUDIMENTS_NAMESPACE
@@ -108,75 +107,55 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 	// clear log buffer
 	logbuffer.clear();
 
-	// append the date to the log buffer
+	// append the date
 	char	datebuffer[20];
 	snprintf(datebuffer,20,"%04d-%02d-%02d %02d:%02d:%02d",
 			dt.getYear(),dt.getMonth(),dt.getDayOfMonth(),
 			dt.getHour(),dt.getMinutes(),dt.getSeconds());
 	logbuffer.append(datebuffer)->append(' ');
 
-	// for the some of the events, get the client IP
+	// append the event type and log level
+	// (except for db errors which are handled specially)
+	if (event!=SQLRLOGGER_EVENTTYPE_DB_ERROR) {
+		logbuffer.append(eventType(event))->append(' ');
+		logbuffer.append(logLevel(level))->append(": ");
+	}
+
+	// get the client IP, it's needed for some events
 	const char	*clientaddr="unknown";
-	if (event==SQLRLOGGER_EVENTTYPE_CLI_CONNECTED ||
-		event==SQLRLOGGER_EVENTTYPE_CLI_CONNECTION_REFUSED ||
-		event==SQLRLOGGER_EVENTTYPE_CLI_DISCONNECTED ||
-		event==SQLRLOGGER_EVENTTYPE_CLI_SOCKET_ERROR) {
-		if (sqlrcon->cont->connstats->clientaddr) {
-			clientaddr=sqlrcon->cont->connstats->clientaddr;
-		}
+	if (sqlrcon->cont->connstats->clientaddr) {
+		clientaddr=sqlrcon->cont->connstats->clientaddr;
 	}
 
 	// handle each event differently...
 	switch (event) {
-		case SQLRLOGGER_EVENTTYPE_CLI_CONNECTED:
-			logbuffer.append(eventType(event))->append(' ');
-			logbuffer.append(logLevel(level))->append(": ");
+		case SQLRLOGGER_EVENTTYPE_CLIENT_CONNECTED:
 			logbuffer.append("Client ");
 			logbuffer.append(clientaddr);
 			logbuffer.append(" connected");
 			break;
-		case SQLRLOGGER_EVENTTYPE_CLI_CONNECTION_REFUSED:
-			logbuffer.append(eventType(event))->append(' ');
-			logbuffer.append(logLevel(level))->append(": ");
+		case SQLRLOGGER_EVENTTYPE_CLIENT_CONNECTION_REFUSED:
 			logbuffer.append("Client ");
 			logbuffer.append(clientaddr);
-			logbuffer.append(" connection refused:  ");
-			logbuffer.append(info);
+			logbuffer.append(" connection refused");
 			break;
-		case SQLRLOGGER_EVENTTYPE_CLI_DISCONNECTED:
-			logbuffer.append(eventType(event))->append(' ');
-			logbuffer.append(logLevel(level))->append(": ");
+		case SQLRLOGGER_EVENTTYPE_CLIENT_DISCONNECTED:
 			logbuffer.append("Client ");
 			logbuffer.append(clientaddr);
-			logbuffer.append(" disconnected: ");
-			logbuffer.append(info);
+			logbuffer.append(" disconnected");
 			break;
-		case SQLRLOGGER_EVENTTYPE_CLI_SOCKET_ERROR:
-			logbuffer.append(eventType(event))->append(' ');
-			logbuffer.append(logLevel(level))->append(": ");
+		case SQLRLOGGER_EVENTTYPE_CLIENT_PROTOCOL_ERROR:
 			logbuffer.append("Client ");
 			logbuffer.append(clientaddr);
-			logbuffer.append(" socket error: ");
-			logbuffer.append(info);
+			logbuffer.append(" protocol error");
 			break;
-		case SQLRLOGGER_EVENTTYPE_DB_CONNECTED:
-			logbuffer.append(eventType(event))->append(' ');
-			logbuffer.append(logLevel(level))->append(": ");
-			logbuffer.append("SQLRelay connected to DB ");
+		case SQLRLOGGER_EVENTTYPE_DB_LOGIN:
+			logbuffer.append("SQL Relay logged in to DB ");
 			logbuffer.append(sqlrcon->cont->dbipaddress);
 			break;
-		case SQLRLOGGER_EVENTTYPE_DB_DISCONNECTED:
-			logbuffer.append(eventType(event))->append(' ');
-			logbuffer.append(logLevel(level))->append(": ");
-			logbuffer.append("SQLRelay disconnected from DB ");
+		case SQLRLOGGER_EVENTTYPE_DB_LOGOUT:
+			logbuffer.append("SQL Relay logged out of DB ");
 			logbuffer.append(sqlrcon->cont->dbipaddress);
-			logbuffer.append(": ");
-			logbuffer.append(info);
-			break;
-		case SQLRLOGGER_EVENTTYPE_DB_SOCKET_ERROR:
-			logbuffer.append(eventType(event))->append(' ');
-			logbuffer.append(logLevel(level))->append(": ");
-			logbuffer.append(error::getErrorString());
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_ERROR:
 			{
@@ -192,16 +171,22 @@ bool custom_sc::run(sqlrconnection_svr *sqlrcon,
 			}
 			}
 			break;
-		case SQLRLOGGER_EVENTTYPE_SQLR_INTERNAL:
-			logbuffer.append(eventType(event))->append(' ');
-			logbuffer.append(logLevel(level))->append(": ");
-			logbuffer.append("SQLRelay internal error: ");
-			logbuffer.append(info);
+		case SQLRLOGGER_EVENTTYPE_INTERNAL_ERROR:
+			logbuffer.append("SQL Relay internal error");
 			break;
 		default:
 			// ignore all other events
 			return true;
 	}
+
+	// append info, if there was any
+	// (except for db errors which are handled specially)
+	if (charstring::length(info) && event!=SQLRLOGGER_EVENTTYPE_DB_ERROR) {
+		logbuffer.append(": ");
+		logbuffer.append(info);
+	}
+
+	// carriage return
 	logbuffer.append("\n");
 
 	// since all connection daemons are writing to the same file,
