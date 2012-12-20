@@ -333,7 +333,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	}	
 
 	// load the authenticator
-	authc=new authenticator(cfgfl,sqlrpe);
+	authc=new sqlrauthenticator(cfgfl,sqlrpe);
 
 	setUserAndGroup();
 

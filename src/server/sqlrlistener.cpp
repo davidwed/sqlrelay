@@ -167,7 +167,7 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 			sqlrpe=new sqlrpwdencs;
 			sqlrpe->loadPasswordEncryptions(pwdencs);
 		}
-		authc=new authenticator(&cfgfl,sqlrpe);
+		authc=new sqlrauthenticator(&cfgfl,sqlrpe);
 	}
 
 	setIpPermissions();

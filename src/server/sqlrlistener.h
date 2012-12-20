@@ -6,11 +6,11 @@
 
 #include <config.h>
 
-#include <authenticator.h>
 #include <cmdline.h>
 #include <debugfile.h>
 #include <tempdir.h>
 #include <sqlrconfigfile.h>
+#include <sqlrauthenticator.h>
 #include <sqlrpwdencs.h>
 
 #include <rudiments/signalclasses.h>
@@ -132,8 +132,8 @@ class sqlrlistener : public rudiments::daemonprocess,
 		char		*pidfile;
 		tempdir		*tmpdir;
 
-		authenticator	*authc;
-		sqlrpwdencs	*sqlrpe;
+		sqlrauthenticator	*authc;
+		sqlrpwdencs		*sqlrpe;
 
 		// FIXME: these shouldn't have to be pointers, right, but
 		// it appears that they do have to be or their destructors don't

@@ -7,8 +7,8 @@ include ../../config.mk
 CPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(TMPDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
 LIBS = $(RUDIMENTSLIBS)
 
-SRCS = cmdline.cpp debugfile.cpp tempdir.cpp sqlrconfigfile.cpp authenticator.cpp
-LOBJS = cmdline.lo debugfile.lo tempdir.lo sqlrconfigfile.lo authenticator.lo
+SRCS = cmdline.cpp debugfile.cpp tempdir.cpp sqlrconfigfile.cpp
+LOBJS = cmdline.lo debugfile.lo tempdir.lo sqlrconfigfile.lo
 
 .SUFFIXES: .lo
 

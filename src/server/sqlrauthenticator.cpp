@@ -6,13 +6,14 @@
 #include <sqlrconfigfile.h>
 #include <sqlrpwdencs.h>
 
-#include <authenticator.h>
+#include <sqlrauthenticator.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
 
-authenticator::authenticator(sqlrconfigfile *cfgfile, sqlrpwdencs *sqlrpe) {
+sqlrauthenticator::sqlrauthenticator(sqlrconfigfile *cfgfile,
+						sqlrpwdencs *sqlrpe) {
 
 	// get the list of users from the config file
 	linkedlist< usercontainer * >	*userlist=cfgfile->getUserList();
@@ -38,7 +39,7 @@ authenticator::authenticator(sqlrconfigfile *cfgfile, sqlrpwdencs *sqlrpe) {
 	this->sqlrpe=sqlrpe;
 }
 
-authenticator::~authenticator() {
+sqlrauthenticator::~sqlrauthenticator() {
 	for (uint32_t i=0; i<usercount; i++) {
 		delete[] users[i];
 		delete[] passwords[i];
@@ -49,7 +50,7 @@ authenticator::~authenticator() {
 	delete[] passwordencryptions;
 }
 
-bool authenticator::authenticate(const char *user, const char *password) {
+bool sqlrauthenticator::authenticate(const char *user, const char *password) {
 
 	// run through the user/password arrays...
 	for (uint32_t i=0; i<usercount; i++) {

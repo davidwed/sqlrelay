@@ -18,12 +18,12 @@
 #include <rudiments/sharedmemory.h>
 #include <rudiments/semaphoreset.h>
 
-#include <authenticator.h>
 #include <debugfile.h>
 #include <tempdir.h>
 
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
+#include <sqlrauthenticator.h>
 #include <sqlparser.h>
 #include <sqltranslations.h>
 #include <sqlwriter.h>
@@ -398,7 +398,7 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 
 		uint16_t	sendcolumninfo;
 
-		authenticator	*authc;
+		sqlrauthenticator	*authc;
 
 		char		userbuffer[USERSIZE];
 		char		passwordbuffer[USERSIZE];

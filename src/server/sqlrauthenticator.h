@@ -1,18 +1,18 @@
 // Copyright (c) 2001  David Muse
 // See the file COPYING for more information
 
-#ifndef AUTHENTICATOR_H
-#define AUTHENTICATOR_H
+#ifndef SQLRAUTHENTICATOR_H
+#define SQLRAUTHENTICATOR_H
 
 #include <sqlrconfigfile.h>
 #include <sqlrpwdencs.h>
 
-class authenticator {
+class sqlrauthenticator {
 
 	public:
-			authenticator(sqlrconfigfile *cfgfile,
+			sqlrauthenticator(sqlrconfigfile *cfgfile,
 						sqlrpwdencs *sqlrpe);
-			~authenticator();
+			~sqlrauthenticator();
 		bool	authenticate(const char *user, const char *password);
 
 	private:
