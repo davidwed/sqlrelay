@@ -66,6 +66,8 @@ class routerconnection : public sqlrconnection_svr {
 						bool *liveconnection);
 		const char	*identify();
 		const char	*dbVersion();
+		const char	*dbHostName();
+		const char	*dbIpAddress();
 		bool		ping();
 		bool		getLastInsertId(uint64_t *id);
 		void		endSession();
@@ -494,6 +496,20 @@ const char *routerconnection::identify() {
 const char *routerconnection::dbVersion() {
 	// FIXME: return SQL Relay version?
 	return "";
+}
+
+const char *routerconnection::dbHostName() {
+	if (!cur) {
+		cur=cons[0];
+	}
+	return cur->dbHostName();
+}
+
+const char *routerconnection::dbIpAddress() {
+	if (!cur) {
+		cur=cons[0];
+	}
+	return cur->dbIpAddress();
 }
 
 bool routerconnection::ping() {
