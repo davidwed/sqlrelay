@@ -1,0 +1,358 @@
+<html>
+<body>
+<pre>
+query:
+drop table testtable
+time: 0.000000
+query:
+create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date, testlong long, testclob clob, testblob blob)
+time: 0.000000
+query:
+insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1','testclob1',empty_blob())
+time: 0.000000
+query:
+insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)
+time: 0.000000
+query:
+insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)
+time: 0.000000
+query:
+insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)
+time: 0.000000
+query:
+insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)
+time: 0.000000
+query:
+insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)
+time: 0.000000
+query:
+insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)
+time: 0.000000
+query:
+insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6,:var7)
+time: 0.000000
+query:
+begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; :datevar:='03-FEB-2001'; end;
+time: 0.000000
+query:
+begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; :datevar:='03-FEB-2001'; end;
+time: 0.000000
+query:
+begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; :datevar:='03-FEB-2001'; end;
+time: 0.000000
+query:
+select * from testtable order by testnumber
+time: 0.000000
+query:
+select 1,'hello',10.5556 from dual
+time: 0.000000
+query:
+begin :var1:='hello'; end;
+time: 0.000000
+query:
+select 1,2,3 from dual
+time: 0.000000
+query:
+select 'hi','hello','bye' from dual
+time: 0.000000
+query:
+select 10.55,10.556,10.5556 from dual
+time: 0.000000
+query:
+select NULL,1,NULL from dual
+time: 0.000000
+query:
+select NULL,1,NULL from dual
+time: 0.000000
+query:
+select * from testtable order by testnumber
+time: 0.000000
+query:
+select * from testtable order by testnumber
+time: 0.000000
+query:
+select * from testtable order by testnumber
+time: 0.000000
+query:
+select * from testtable order by testnumber
+time: 0.000000
+query:
+select * from testtable order by testnumber
+time: 0.000000
+query:
+select * from testtable order by testnumber
+time: 0.000000
+query:
+select * from testtable order by testnumber
+time: 0.000000
+query:
+select * from testtable order by testnumber
+time: 0.000000
+query:
+select * from testtable order by testnumber
+time: 0.000000
+query:
+select * from testtable order by testnumber
+time: 0.000000
+query:
+insert into testtable values (10,'testchar10','testvarchar10','01-JAN-2010','testlong10','testclob10',NULL)
+time: 0.000000
+query:
+select * from testtable order by testnumber
+time: 0.000000
+query:
+drop table testtable1
+time: 0.000000
+query:
+create table testtable1 (testclob clob, testblob blob)
+time: 0.000000
+query:
+insert into testtable1 values ('hello',:var1)
+time: 0.000000
+query:
+begin select testclob into :clobvar from testtable1;  select testblob into :blobvar from testtable1; end;
+time: 0.000000
+query:
+drop table testtable1
+time: 0.000000
+query:
+create table testtable1 (testclob1 clob, testclob2 clob, testblob1 blob, testblob2 blob)
+time: 0.000000
+query:
+insert into testtable1 values (:var1,:var2,:var3,:var4)
+time: 0.000000
+query:
+select * from testtable1
+time: 0.000000
+query:
+drop table testtable1
+time: 0.000000
+query:
+create or replace package types is type cursorType is ref cursor; end;
+time: 0.000000
+query:
+create or replace function sp_testtable(value in number) return types.cursortype is l_cursor    types.cursorType; begin open l_cursor for select * from testtable where testnumber>value; return l_cursor; end;
+time: 0.000000
+query:
+begin  :curs1:=sp_testtable(5);  :curs2:=sp_testtable(0); end;
+time: 0.000000
+query:
+
+time: 0.000000
+query:
+
+time: 0.000000
+query:
+drop package types
+time: 0.000000
+query:
+drop table testtable2
+time: 0.000000
+query:
+create table testtable2 (testclob clob)
+time: 0.000000
+query:
+insert into testtable2 values (:clobval)
+time: 0.000000
+query:
+select testclob from testtable2
+time: 0.000000
+query:
+begin select testclob into :clobbindval from testtable2; end;
+time: 0.000000
+query:
+drop table testtable2
+time: 0.000000
+query:
+drop table testtable2
+time: 0.000000
+query:
+create table testtable2 (testval varchar2(4000))
+time: 0.000000
+query:
+insert into testtable2 values (:testval)
+time: 0.000000
+query:
+select testval from testtable2
+time: 0.000000
+query:
+begin :bindval:='CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC'; end;
+time: 0.000000
+query:
+drop table testtable2
+time: 0.000000
+query:
+drop table testtable2
+time: 0.000000
+query:
+create table testtable2 (testval number)
+time: 0.000000
+query:
+insert into testtable2 values (:testval)
+time: 0.000000
+query:
+select testval from testtable2
+time: 0.000000
+query:
+drop table testtable2
+time: 0.000000
+query:
+drop table testtable1
+time: 0.000000
+query:
+create table testtable1 (col1 varchar2(20), col2 varchar2(20), col3 varchar2(20))
+time: 0.000000
+query:
+insert into testtable1 values (:var1,:var2,:var3)
+time: 0.000000
+query:
+drop table testtable1
+time: 0.000000
+query:
+drop table testtable
+time: 0.000000
+query:
+drop table temptabledelete
+
+time: 0.000000
+query:
+create global temporary table temptabledelete (col1 number) on commit delete rows
+time: 0.000000
+query:
+insert into temptabledelete values (1)
+time: 0.000000
+query:
+select count(*) from temptabledelete
+time: 0.000000
+query:
+select count(*) from temptabledelete
+time: 0.000000
+query:
+drop table temptabledelete
+
+time: 0.000000
+query:
+drop table temptablepreserve
+
+time: 0.000000
+query:
+create global temporary table temptablepreserve (col1 number) on commit preserve rows
+time: 0.000000
+query:
+insert into temptablepreserve values (1)
+time: 0.000000
+query:
+select count(*) from temptablepreserve
+time: 0.000000
+query:
+select count(*) from temptablepreserve
+time: 0.000000
+query:
+select count(*) from temptablepreserve
+time: 0.000000
+query:
+drop table temptablepreserve
+
+time: 0.000000
+query:
+drop function testproc
+time: 0.000000
+query:
+drop procedure testproc
+time: 0.000000
+query:
+create or replace procedure testproc(in1 in number, in2 in number, in3 in varchar2) is begin return; end;
+time: 0.000000
+query:
+begin testproc(:in1,:in2,:in3); end;
+time: 0.000000
+query:
+drop function testproc
+time: 0.000000
+query:
+drop procedure testproc
+time: 0.000000
+query:
+create or replace function testproc(in1 in number, in2 in number, in3 in varchar2) return number is begin return in1; end;
+time: 0.000000
+query:
+select testproc(:in1,:in2,:in3) from dual
+time: 0.000000
+query:
+begin  :out1:=testproc(:in1,:in2,:in3); end;
+time: 0.000000
+query:
+drop function testproc
+time: 0.000000
+query:
+drop procedure testproc
+time: 0.000000
+query:
+create or replace procedure testproc(in1 in number, in2 in number, in3 in varchar2, out1 out number, out2 out number, out3 out varchar2) is begin out1:=in1; out2:=in2; out3:=in3; end;
+time: 0.000000
+query:
+begin testproc(:in1,:in2,:in3,:out1,:out2,:out3); end;
+time: 0.000000
+query:
+drop function testproc
+time: 0.000000
+query:
+drop procedure testproc
+time: 0.000000
+query:
+drop procedure testproc
+time: 0.000000
+query:
+create or replace procedure testproc(in1 in number, out1 out number) is begin out1:=in1; return; end;
+time: 0.000000
+query:
+begin testproc(:in,:out); end;
+time: 0.000000
+query:
+begin testproc(:in,:out); end;
+time: 0.000000
+query:
+begin testproc(:in,:out); end;
+time: 0.000000
+query:
+drop procedure testproc
+time: 0.000000
+query:
+select * from testtable order by testnumber
+time: 0.000000
+query:
+select * from testtable order by testnumber
+time: 0.000000
+query:
+select * from testtable order by testnumber
+time: 0.000000
+query:
+select * from testtable order by testnumber
+time: 0.000000
+query:
+insert into testtable values (1,2,3,4)
+time: 0.000000
+query:
+insert into testtable values (1,2,3,4)
+time: 0.000000
+query:
+insert into testtable values (1,2,3,4)
+time: 0.000000
+query:
+insert into testtable values (1,2,3,4)
+time: 0.000000
+query:
+create table testtable
+time: 0.000000
+query:
+create table testtable
+time: 0.000000
+query:
+create table testtable
+time: 0.000000
+query:
+create table testtable
+time: 0.000000
+</pre>
+</body>
+</html>
