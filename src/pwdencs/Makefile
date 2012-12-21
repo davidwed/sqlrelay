@@ -2,7 +2,7 @@ top_builddir = ../..
 
 include ../../config.mk
 
-LIBS = $(RUDIMENTSLIBS) $(EXTRALIBS)
+LIBS = -L$(top_builddir)/src/server -lsqlrserver $(RUDIMENTSLIBS) $(EXTRALIBS)
 
 .PHONY: all clean install uninstall
 
