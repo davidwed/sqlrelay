@@ -13,6 +13,7 @@ SRCS = connection/connectionctor.cpp \
 	connection/ping.cpp \
 	connection/identify.cpp \
 	connection/dbversion.cpp \
+	connection/dbhostname.cpp \
 	connection/selectdatabase.cpp \
 	connection/lastinsertid.cpp \
 	connection/bindformat.cpp \
@@ -73,6 +74,7 @@ LOBJS = connection/connectionctor.lo \
 	connection/ping.lo \
 	connection/identify.lo \
 	connection/dbversion.lo \
+	connection/dbhostname.lo \
 	connection/selectdatabase.lo \
 	connection/lastinsertid.lo \
 	connection/bindformat.lo \

@@ -170,6 +170,7 @@ class mysqlconnection : public sqlrconnection_svr {
 #endif
 		const char	*identify();
 		const char	*dbVersion();
+		const char	*dbHostName();
 		const char	*bindFormat();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
@@ -203,6 +204,7 @@ class mysqlconnection : public sqlrconnection_svr {
 		const char	*charset;
 
 		char	*dbversion;
+		char	*dbhostname;
 
 		static const my_bool	mytrue;
 		static const my_bool	myfalse;
@@ -223,6 +225,7 @@ mysqlconnection::mysqlconnection(sqlrcontroller_svr *cont) :
 					sqlrconnection_svr(cont) {
 	connected=false;
 	dbversion=NULL;
+	dbhostname=NULL;
 
 	// start this at false because we don't need to do a commit before
 	// the first query when we very first start up
@@ -231,6 +234,7 @@ mysqlconnection::mysqlconnection(sqlrcontroller_svr *cont) :
 
 mysqlconnection::~mysqlconnection() {
 	delete[] dbversion;
+	delete[] dbhostname;
 }
 
 void mysqlconnection::handleConnectString() {
@@ -350,6 +354,15 @@ bool mysqlconnection::logIn(bool printerrors) {
 	}
 #endif
 
+	// get the db host name
+	const char	*hostinfo=mysql_get_host_info(&mysql);
+	const char	*space=charstring::findFirst(hostinfo,' ');
+	if (space) {
+		dbhostname=charstring::duplicate(hostinfo,space-hostinfo);
+	} else {
+		dbhostname=charstring::duplicate(hostinfo);
+	}
+
 #endif
 
 #ifdef HAVE_MYSQL_SET_CHARACTER_SET
@@ -397,6 +410,10 @@ const char *mysqlconnection::dbVersion() {
 	delete[] dbversion;
 	dbversion=charstring::duplicate(mysql_get_server_info(&mysql));
 	return dbversion;
+}
+
+const char *mysqlconnection::dbHostName() {
+	return dbhostname;
 }
 
 const char *mysqlconnection::bindFormat() {

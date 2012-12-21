@@ -1664,6 +1664,14 @@ void sqlrcontroller_svr::clientSession() {
 			incrementGetLastInsertIdCount();
 			getLastInsertIdCommand();
 			continue;
+		} else if (command==DBHOSTNAME) {
+			incrementDbHostNameCount();
+			dbHostNameCommand();
+			continue;
+		} else if (command==DBIPADDRESS) {
+			incrementDbIpAddressCount();
+			dbIpAddressCommand();
+			continue;
 		}
 
 		// For the rest of the commands,
@@ -2454,6 +2462,28 @@ void sqlrcontroller_svr::getLastInsertIdCommand() {
 		clientsock->write(conn->error,errorlen);
 	}
 
+	flushWriteBuffer();
+}
+
+void sqlrcontroller_svr::dbHostNameCommand() {
+
+	dbgfile.debugPrint("connection",1,"getting db host name");
+
+	const char	*hostname=conn->dbHostName();
+	uint16_t	hostnamelen=charstring::length(hostname);
+	clientsock->write(hostnamelen);
+	clientsock->write(hostname,hostnamelen);
+	flushWriteBuffer();
+}
+
+void sqlrcontroller_svr::dbIpAddressCommand() {
+
+	dbgfile.debugPrint("connection",1,"getting db host name");
+
+	const char	*ipaddress=conn->dbIpAddress();
+	uint16_t	ipaddresslen=charstring::length(ipaddress);
+	clientsock->write(ipaddresslen);
+	clientsock->write(ipaddress,ipaddresslen);
 	flushWriteBuffer();
 }
 
@@ -6309,6 +6339,20 @@ void sqlrcontroller_svr::incrementGetLastInsertIdCount() {
 		return;
 	}
 	connstats->ngetlastinsertid++;
+}
+
+void sqlrcontroller_svr::incrementDbHostNameCount() {
+	if (!connstats) {
+		return;
+	}
+	connstats->ndbhostname++;
+}
+
+void sqlrcontroller_svr::incrementDbIpAddressCount() {
+	if (!connstats) {
+		return;
+	}
+	connstats->ndbipaddress++;
 }
 
 void sqlrcontroller_svr::incrementNewQueryCount() {

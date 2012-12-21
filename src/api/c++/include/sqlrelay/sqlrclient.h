@@ -104,6 +104,12 @@ class SQLRCLIENT_DLLSPEC sqlrconnection {
 		/** Returns the version of the database */
 		const char	*dbVersion();
 
+		/** Returns the host name of the database */
+		const char	*dbHostName();
+
+		/** Returns the ip address of the database */
+		const char	*dbIpAddress();
+
 		/** Returns the version of the sqlrelay server software. */
 		const char	*serverVersion();
 

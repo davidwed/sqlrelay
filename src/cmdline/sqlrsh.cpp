@@ -176,6 +176,8 @@ class	sqlrsh {
 		void	ping(sqlrconnection *sqlrcon, sqlrshenv *env);
 		void	identify(sqlrconnection *sqlrcon, sqlrshenv *env);
 		void	dbversion(sqlrconnection *sqlrcon, sqlrshenv *env);
+		void	dbhostname(sqlrconnection *sqlrcon, sqlrshenv *env);
+		void	dbipaddress(sqlrconnection *sqlrcon, sqlrshenv *env);
 		void	clientversion(sqlrconnection *sqlrcon,
 						sqlrshenv *env);
 		void	serverversion(sqlrconnection *sqlrcon,
@@ -381,6 +383,8 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"ping") ||
 		!charstring::compareIgnoringCase(ptr,"identify") ||
 		!charstring::compareIgnoringCase(ptr,"dbversion") ||
+		!charstring::compareIgnoringCase(ptr,"dbhostname") ||
+		!charstring::compareIgnoringCase(ptr,"dbipaddress") ||
 		!charstring::compareIgnoringCase(ptr,"clientversion") ||
 		!charstring::compareIgnoringCase(ptr,"serverversion") ||
 		!charstring::compareIgnoringCase(ptr,"use ",4) ||
@@ -478,6 +482,12 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"dbversion")) {	
 		dbversion(sqlrcon,env);
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"dbhostname")) {	
+		dbhostname(sqlrcon,env);
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"dbipaddress")) {	
+		dbipaddress(sqlrcon,env);
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"clientversion")) {	
 		clientversion(sqlrcon,env);
@@ -1017,6 +1027,14 @@ void sqlrsh::dbversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	printf("%s\n",sqlrcon->dbVersion());
 }
 
+void sqlrsh::dbhostname(sqlrconnection *sqlrcon, sqlrshenv *env) {
+	printf("%s\n",sqlrcon->dbHostName());
+}
+
+void sqlrsh::dbipaddress(sqlrconnection *sqlrcon, sqlrshenv *env) {
+	printf("%s\n",sqlrcon->dbIpAddress());
+}
+
 void sqlrsh::clientversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	printf("%s\n",sqlrcon->clientVersion());
 }
@@ -1262,6 +1280,10 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	printf("returns the type of database\n");
 	printf("	dbversion		- ");
 	printf("returns the version of the database\n");
+	printf("	dbhostname		- ");
+	printf("returns the host name of the database\n");
+	printf("	dbipaddress		- ");
+	printf("returns the ip address of the database\n");
 	printf("	clientversion		- ");
 	printf("returns the version of the SQL Relay\n");
 	printf("\t\t\t\t  client library\n");

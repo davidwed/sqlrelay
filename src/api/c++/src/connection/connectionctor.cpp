@@ -69,6 +69,12 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	// db version
 	dbversion=NULL;
 
+	// db host name
+	dbhostname=NULL;
+
+	// db ip address
+	dbipaddress=NULL;
+
 	// server version
 	serverversion=NULL;
 

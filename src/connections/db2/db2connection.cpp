@@ -192,6 +192,7 @@ class db2connection : public sqlrconnection_svr {
 		const char	*pingQuery();
 		const char	*identify();
 		const char	*dbVersion();
+		const char	*dbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(bool wild);
@@ -390,6 +391,13 @@ const char *db2connection::dbVersion() {
 			(SQLSMALLINT)sizeof(dbversion),
 			&dbversionlen);
 	return dbversion;
+}
+
+const char *db2connection::dbHostNameQuery() {
+	return "select "
+		"	host_name "
+		"from "
+		"	table(sysproc.env_get_sys_info())";
 }
 
 const char *db2connection::getDatabaseListQuery(bool wild) {

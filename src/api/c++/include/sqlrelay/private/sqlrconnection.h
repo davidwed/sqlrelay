@@ -84,6 +84,12 @@
 		// db version
 		char		*dbversion;
 
+		// db host name
+		char		*dbhostname;
+
+		// db ip address
+		char		*dbipaddress;
+
 		// server version
 		char		*serverversion;
 

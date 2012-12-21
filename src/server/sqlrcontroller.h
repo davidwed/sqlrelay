@@ -134,6 +134,8 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void	selectDatabaseCommand();
 		void	getCurrentDatabaseCommand();
 		void	getLastInsertIdCommand();
+		void	dbHostNameCommand();
+		void	dbIpAddressCommand();
 		void	pingCommand();
 		void	identifyCommand();
 		void	autoCommitCommand();
@@ -354,6 +356,8 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void	incrementSelectDatabaseCount();
 		void	incrementGetCurrentDatabaseCount();
 		void	incrementGetLastInsertIdCount();
+		void	incrementDbHostNameCount();
+		void	incrementDbIpAddressCount();
 		void	incrementNewQueryCount();
 		void	incrementReexecuteQueryCount();
 		void	incrementFetchFromBindCursorCount();

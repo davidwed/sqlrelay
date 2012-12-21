@@ -12,6 +12,7 @@
 #define HANDOFF_RECONNECT 1
 
 // client-server protocol...
+#define NO_COMMAND 26
 #define NEW_QUERY 0
 #define FETCH_RESULT_SET 1
 #define ABORT_RESULT_SET 2
@@ -38,7 +39,8 @@
 #define GET_LAST_INSERT_ID 23
 #define BEGIN 24
 #define GET_QUERY_TREE 25
-#define NO_COMMAND 26
+#define DBHOSTNAME 27
+#define DBIPADDRESS 28
 
 #define SUSPENDED_RESULT_SET 1
 #define NO_SUSPENDED_RESULT_SET 0
@@ -185,6 +187,8 @@ struct sqlrconnstatistics {
 	uint32_t			nselectdatabase;
 	uint32_t			ngetcurrentdatabase;
 	uint32_t			ngetlastinsertid;
+	uint32_t			ndbhostname;
+	uint32_t			ndbipaddress;
 	uint64_t			nnewquery;
 	uint64_t			nreexecutequery;
 	uint32_t			nfetchfrombindcursor;

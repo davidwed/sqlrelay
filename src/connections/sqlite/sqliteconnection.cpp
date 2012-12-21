@@ -4,6 +4,7 @@
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <rudiments/regularexpression.h>
+#include <rudiments/system.h>
 
 #include <datatypes.h>
 #include <config.h>
@@ -41,6 +42,7 @@ class sqliteconnection : public sqlrconnection_svr {
 		bool		ping();
 		const char	*identify();
 		const char	*dbVersion();
+		const char	*dbHostName();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(bool wild);
@@ -207,6 +209,10 @@ const char *sqliteconnection::dbVersion() {
 #else
 	return "unknown";
 #endif
+}
+
+const char *sqliteconnection::dbHostName() {
+	return system::getHostName();
 }
 
 const char *sqliteconnection::getDatabaseListQuery(bool wild) {

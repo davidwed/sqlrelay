@@ -6,6 +6,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/snooze.h>
+#include <rudiments/system.h>
 
 #include <datatypes.h>
 #include <config.h>
@@ -173,6 +174,7 @@ class firebirdconnection : public sqlrconnection_svr {
 					bool *liveconnection);
 		const char	*identify();
 		const char	*dbVersion();
+		const char	*dbHostName();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(bool wild);
@@ -185,6 +187,7 @@ class firebirdconnection : public sqlrconnection_svr {
 		isc_tr_handle	tr;
 
 		const char	*database;
+		char		*host;
 		unsigned short	dialect;
 
 		const char	*charset;
@@ -211,11 +214,13 @@ firebirdconnection::firebirdconnection(sqlrcontroller_svr *cont) :
 						sqlrconnection_svr(cont) {
 	dbversion=NULL;
 	lastinsertidquery=NULL;
+	host=NULL;
 }
 
 firebirdconnection::~firebirdconnection() {
 	delete dbversion;
 	delete[] lastinsertidquery;
+	delete[] host;
 }
 
 void firebirdconnection::handleConnectString() {
@@ -225,6 +230,14 @@ void firebirdconnection::handleConnectString() {
 	const char	*tmp=cont->connectStringValue("db");
 	if (tmp && tmp[0]) {
 		database=tmp;
+	}
+
+	// parse the host name from the database
+	const char	*colon=charstring::findFirst(database,':');
+	if (colon) {
+		host=charstring::duplicate(database,colon-database);
+	} else {
+		host=charstring::duplicate(system::getHostName());
 	}
 
 	const char	*dialectstr=cont->connectStringValue("dialect");
@@ -450,6 +463,10 @@ const char *firebirdconnection::dbVersion() {
 		return dbversion;
 	} 
 	return "";
+}
+
+const char *firebirdconnection::dbHostName() {
+	return host;
 }
 
 const char *firebirdconnection::getDatabaseListQuery(bool wild) {

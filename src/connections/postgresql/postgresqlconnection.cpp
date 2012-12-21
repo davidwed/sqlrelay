@@ -7,6 +7,7 @@
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 	#include <rudiments/file.h>
 #endif
+#include <rudiments/system.h>
 
 #include <datatypes.h>
 
@@ -33,6 +34,8 @@ class postgresqlconnection : public sqlrconnection_svr {
 						bool *liveconnection);
 		const char	*identify();
 		const char	*dbVersion();
+		const char	*dbHostName();
+		const char	*dbIpAddressQuery();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(bool wild);
@@ -375,6 +378,15 @@ const char *postgresqlconnection::dbVersion() {
 	delete[] parts;
 #endif
 	return dbversion;
+}
+
+const char *postgresqlconnection::dbHostName() {
+	const char	*hostname=sqlrconnection_svr::dbHostName();
+	return (charstring::length(hostname))?hostname:system::getHostName();
+}
+
+const char *postgresqlconnection::dbIpAddressQuery() {
+	return "select inet_server_addr()";
 }
 
 const char *postgresqlconnection::getDatabaseListQuery(bool wild) {

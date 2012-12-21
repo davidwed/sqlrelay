@@ -16,6 +16,12 @@ sqlrconnection::~sqlrconnection() {
 	// deallocate dbversion
 	delete[] dbversion;
 
+	// deallocate db host name
+	delete[] dbhostname;
+
+	// deallocate db ip address
+	delete[] dbipaddress;
+
 	// deallocate bindformat
 	delete[] bindformat;
 

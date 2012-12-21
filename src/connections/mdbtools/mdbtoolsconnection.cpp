@@ -5,6 +5,7 @@
 #include <sqlrconnection.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/regularexpression.h>
+#include <rudiments/system.h>
 
 #include <datatypes.h>
 #include <config.h>
@@ -38,6 +39,7 @@ class mdbtoolsconnection : public sqlrconnection_svr {
 		bool	ping();
 		const char	*identify();
 		const char	*dbVersion();
+		const char	*dbHostName();
 		bool	getListsByApiCalls();
 		bool	getDatabaseList(sqlrcursor_svr *cursor,
 						const char *wild);
@@ -153,6 +155,10 @@ const char *mdbtoolsconnection::dbVersion() {
 #else
 	return "unknown";
 #endif
+}
+
+const char *mdbtoolsconnection::dbHostName() {
+	return system::getHostName();
 }
 
 bool mdbtoolsconnection::getListsByApiCalls() {
