@@ -54,8 +54,6 @@
 
 <p>Additional standard modules will be available in the future.</p>
 
-<p>Custom modules that log very specific information in very specific formats are also available in the general SQL Relay distribution but they are not intended for general use.</p>
-
 <span class="heading3">debug</span><br>
 
 <p>The <b>debug</b> module logs a great deal of information to about the internal operation of the SQL Relay server to log files in the "debug directory", usually /usr/local/firstworks/var/sqlrelay/debug.  It creates files named sqlr-listener."pid" and sqlr-connection."pid" where "pid" is replaced with the process id of the process that is being logged.  As new processes are forked, new files are created with debug information about those processes.</p>
@@ -87,6 +85,13 @@ time: 0.000000
 </pre></blockquote>
 
 <p>Sample log: <a href="sqlr-connection-oracletest-querylog.2899.html">sqlr-connection-oracletest-querylog.2899</a></p>
+
+<br><a name="available"></a>
+<span class="heading2">Custom Modules</span><br>
+
+<p>Custom modules that log very specific information in very specific formats are also available in the general SQL Relay distribution but they are not intended for general use.</p>
+
+<p>Ultimately it will be possible to develop custom modules from outside of the SQL Relay source tree but it isn't possible at present.</p>
 
 </body>
 </html>
