@@ -34,6 +34,10 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the version of the sqlrelay client</td></tr>
 <tr><td><code><a href="#commit">commit</a> {  }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Issues a commit.</td></tr>
+<tr><td><code><a href="#dbHostName">dbHostName</a> {  }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the host name of the</td></tr>
+<tr><td><code><a href="#dbIpAddress">dbIpAddress</a> {  }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the ip address of the</td></tr>
 <tr><td><code><a href="#dbVersion">dbVersion</a> {  }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the version of the</td></tr>
 <tr><td><code><a href="#debugOff">debugOff</a> {  }</code><br>
@@ -119,7 +123,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Instructs the database to wait for the 
  client to tell it when to commit.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#autoCommitOff_119">sqlrconCmd.tcl, line 119</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#autoCommitOff_125">sqlrconCmd.tcl, line 125</a>
 </dl></dl>
 
 <hr>
@@ -128,7 +132,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Instructs the database to perform a commit
  after every successful query.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#autoCommitOn_115">sqlrconCmd.tcl, line 115</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#autoCommitOn_121">sqlrconCmd.tcl, line 121</a>
 </dl></dl>
 
 <hr>
@@ -141,7 +145,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  commit or rollback is issued then this doesn't
  do anything unless SQL Relay is faking transaction
  blocks.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#begin_129">sqlrconCmd.tcl, line 129</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#begin_135">sqlrconCmd.tcl, line 135</a>
 </dl></dl>
 
 <hr>
@@ -150,7 +154,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Returns a string representing the format
  of the bind variables used in the db.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#bindFormat_95">sqlrconCmd.tcl, line 95</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#bindFormat_101">sqlrconCmd.tcl, line 101</a>
 </dl></dl>
 
 <hr>
@@ -158,7 +162,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc clientVersion {  }</pre>
 <dl>
 <dd>Returns the version of the sqlrelay client software.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#clientVersion_91">sqlrconCmd.tcl, line 91</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#clientVersion_97">sqlrconCmd.tcl, line 97</a>
 </dl></dl>
 
 <hr>
@@ -167,7 +171,23 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Issues a commit.  Returns true if the commit
  succeeded false if it failed.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#commit_133">sqlrconCmd.tcl, line 133</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#commit_139">sqlrconCmd.tcl, line 139</a>
+</dl></dl>
+
+<hr>
+<h3><a name="dbHostName">dbHostName</a></h3>
+<pre>proc dbHostName {  }</pre>
+<dl>
+<dd>Returns the host name of the database<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#dbHostName_88">sqlrconCmd.tcl, line 88</a>
+</dl></dl>
+
+<hr>
+<h3><a name="dbIpAddress">dbIpAddress</a></h3>
+<pre>proc dbIpAddress {  }</pre>
+<dl>
+<dd>Returns the ip address of the database<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#dbIpAddress_91">sqlrconCmd.tcl, line 91</a>
 </dl></dl>
 
 <hr>
@@ -183,7 +203,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc debugOff {  }</pre>
 <dl>
 <dd>Turns debugging off.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOff_165">sqlrconCmd.tcl, line 165</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOff_171">sqlrconCmd.tcl, line 171</a>
 </dl></dl>
 
 <hr>
@@ -195,7 +215,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  this is to start a query with "-- debug\n".
  Another way is to set the environment variable
  SQLR_CLIENT_DEBUG to "ON"<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOn_162">sqlrconCmd.tcl, line 162</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOn_168">sqlrconCmd.tcl, line 168</a>
 </dl></dl>
 
 <hr>
@@ -214,7 +234,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  error the error message is available here.
  If there is no error then this method 
  returns NULL.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorMessage_145">sqlrconCmd.tcl, line 145</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorMessage_151">sqlrconCmd.tcl, line 151</a>
 </dl></dl>
 
 <hr>
@@ -225,7 +245,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  error, the error number is available here.
  If there is no error then this method 
  returns 0.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorNumber_153">sqlrconCmd.tcl, line 153</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorNumber_159">sqlrconCmd.tcl, line 159</a>
 </dl></dl>
 
 <hr>
@@ -233,7 +253,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc getClientInfo {  }</pre>
 <dl>
 <dd>Returns the string that was set by setClientInfo().<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getClientInfo_178">sqlrconCmd.tcl, line 178</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getClientInfo_184">sqlrconCmd.tcl, line 184</a>
 </dl></dl>
 
 <hr>
@@ -267,7 +287,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc getCurrentDatabase {  }</pre>
 <dl>
 <dd>Returns the database/schema that is currently in use.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getCurrentDatabase_103">sqlrconCmd.tcl, line 103</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getCurrentDatabase_109">sqlrconCmd.tcl, line 109</a>
 </dl></dl>
 
 <hr>
@@ -276,7 +296,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Returns false if debugging is off and true
  if debugging is on.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getDebug_169">sqlrconCmd.tcl, line 169</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getDebug_175">sqlrconCmd.tcl, line 175</a>
 </dl></dl>
 
 <hr>
@@ -285,7 +305,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Returns the value of the autoincrement
  column for the last insert<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getLastInsertId_109">sqlrconCmd.tcl, line 109</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getLastInsertId_115">sqlrconCmd.tcl, line 115</a>
 </dl></dl>
 
 <hr>
@@ -322,7 +342,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Issues a rollback.  Returns true if the rollback
  succeeded false if it failed.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#rollback_137">sqlrconCmd.tcl, line 137</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#rollback_143">sqlrconCmd.tcl, line 143</a>
 </dl></dl>
 
 <hr>
@@ -330,7 +350,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc selectDatabase { database }</pre>
 <dl>
 <dd>Sets the current database/schema to "database"<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#selectDatabase_100">sqlrconCmd.tcl, line 100</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#selectDatabase_106">sqlrconCmd.tcl, line 106</a>
 </dl></dl>
 
 <hr>
@@ -338,7 +358,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc serverVersion {  }</pre>
 <dl>
 <dd>Returns the version of the sqlrelay server software.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#serverVersion_88">sqlrconCmd.tcl, line 88</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#serverVersion_94">sqlrconCmd.tcl, line 94</a>
 </dl></dl>
 
 <hr>
@@ -360,7 +380,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  server and ultimately included in server-side logging
  along with queries that were run by this instance of
  the client.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setClientInfo_175">sqlrconCmd.tcl, line 175</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setClientInfo_181">sqlrconCmd.tcl, line 181</a>
 </dl></dl>
 
 <hr>
@@ -434,7 +454,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2012-11-11 at 04:02.</cite>
+<cite>File generated 2012-12-21 at 13:28.</cite>
 </font>
 </body>
 </html>

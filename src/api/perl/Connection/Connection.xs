@@ -102,6 +102,12 @@ const char *
 sqlrconnection::dbVersion()
 
 const char *
+sqlrconnection::dbHostName()
+
+const char *
+sqlrconnection::dbIpAddress()
+
+const char *
 sqlrconnection::serverVersion()
 
 const char *

@@ -77,6 +77,14 @@ const char *sqlrcon_dbVersion(sqlrcon sqlrconref) {
 	return sqlrconref->dbVersion();
 }
 
+const char *sqlrcon_dbHostName(sqlrcon sqlrconref) {
+	return sqlrconref->dbHostName();
+}
+
+const char *sqlrcon_dbIpAddress(sqlrcon sqlrconref) {
+	return sqlrconref->dbIpAddress();
+}
+
 const char *sqlrcon_serverVersion(sqlrcon sqlrconref) {
 	return sqlrconref->serverVersion();
 }

@@ -84,6 +84,12 @@ proc identify {}
 # Returns the version of the database
 proc dbVersion {} 
 
+# Returns the host name of the database
+proc dbHostName {} 
+
+# Returns the ip address of the database
+proc dbIpAddress {} 
+
 # Returns the version of the sqlrelay server software.
 proc serverVersion {} 
 

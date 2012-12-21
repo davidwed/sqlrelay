@@ -117,6 +117,12 @@ __END__
         dbVersion();
             # Returns the version of the database
 
+        dbHostName();
+            # Returns the host name of the database
+
+        dbIpAddress();
+            # Returns the ip address of the database
+
         serverVersion();
             # Returns the version of the SQL Relay server software
 

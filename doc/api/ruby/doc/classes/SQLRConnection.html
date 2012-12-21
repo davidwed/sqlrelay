@@ -86,32 +86,34 @@
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000103">autoCommitOff</a>&nbsp;&nbsp;
-      <a href="#M000102">autoCommitOn</a>&nbsp;&nbsp;
-      <a href="#M000104">begin</a>&nbsp;&nbsp;
-      <a href="#M000098">bindFormat</a>&nbsp;&nbsp;
-      <a href="#M000097">clientVersion</a>&nbsp;&nbsp;
-      <a href="#M000105">commit</a>&nbsp;&nbsp;
+      <a href="#M000105">autoCommitOff</a>&nbsp;&nbsp;
+      <a href="#M000104">autoCommitOn</a>&nbsp;&nbsp;
+      <a href="#M000106">begin</a>&nbsp;&nbsp;
+      <a href="#M000100">bindFormat</a>&nbsp;&nbsp;
+      <a href="#M000099">clientVersion</a>&nbsp;&nbsp;
+      <a href="#M000107">commit</a>&nbsp;&nbsp;
+      <a href="#M000096">dbHostName</a>&nbsp;&nbsp;
+      <a href="#M000097">dbIpAddress</a>&nbsp;&nbsp;
       <a href="#M000095">dbVersion</a>&nbsp;&nbsp;
-      <a href="#M000110">debugOff</a>&nbsp;&nbsp;
-      <a href="#M000109">debugOn</a>&nbsp;&nbsp;
+      <a href="#M000112">debugOff</a>&nbsp;&nbsp;
+      <a href="#M000111">debugOn</a>&nbsp;&nbsp;
       <a href="#M000088">endSession</a>&nbsp;&nbsp;
-      <a href="#M000107">errorMessage</a>&nbsp;&nbsp;
-      <a href="#M000108">errorNumber</a>&nbsp;&nbsp;
-      <a href="#M000113">getClientInfo</a>&nbsp;&nbsp;
+      <a href="#M000109">errorMessage</a>&nbsp;&nbsp;
+      <a href="#M000110">errorNumber</a>&nbsp;&nbsp;
+      <a href="#M000115">getClientInfo</a>&nbsp;&nbsp;
       <a href="#M000090">getConnectionPort</a>&nbsp;&nbsp;
       <a href="#M000091">getConnectionSocket</a>&nbsp;&nbsp;
-      <a href="#M000100">getCurrentDatabase</a>&nbsp;&nbsp;
-      <a href="#M000111">getDebug</a>&nbsp;&nbsp;
-      <a href="#M000101">getLastInsertId</a>&nbsp;&nbsp;
+      <a href="#M000102">getCurrentDatabase</a>&nbsp;&nbsp;
+      <a href="#M000113">getDebug</a>&nbsp;&nbsp;
+      <a href="#M000103">getLastInsertId</a>&nbsp;&nbsp;
       <a href="#M000094">identify</a>&nbsp;&nbsp;
       <a href="#M000086">new</a>&nbsp;&nbsp;
       <a href="#M000093">ping</a>&nbsp;&nbsp;
       <a href="#M000092">resumeSession</a>&nbsp;&nbsp;
-      <a href="#M000106">rollback</a>&nbsp;&nbsp;
-      <a href="#M000099">selectDatabase</a>&nbsp;&nbsp;
-      <a href="#M000096">serverVersion</a>&nbsp;&nbsp;
-      <a href="#M000112">setClientInfo</a>&nbsp;&nbsp;
+      <a href="#M000108">rollback</a>&nbsp;&nbsp;
+      <a href="#M000101">selectDatabase</a>&nbsp;&nbsp;
+      <a href="#M000098">serverVersion</a>&nbsp;&nbsp;
+      <a href="#M000114">setClientInfo</a>&nbsp;&nbsp;
       <a href="#M000087">setConnectTimeout</a>&nbsp;&nbsp;
       <a href="#M000089">suspendSession</a>&nbsp;&nbsp;
       </div>
@@ -164,12 +166,12 @@ or &quot;&quot; then no attempt will be made to connect through the socket.
 
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000103" class="method-detail">
-        <a name="M000103"></a>
+      <div id="method-M000105" class="method-detail">
+        <a name="M000105"></a>
 
         <div class="method-heading">
-          <a href="SQLRConnection.src/M000103.html" target="Code" class="method-signature"
-            onclick="popupCode('SQLRConnection.src/M000103.html');return false;">
+          <a href="SQLRConnection.src/M000105.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000105.html');return false;">
           <span class="method-name">autoCommitOff</span><span class="method-args">()</span>
           </a>
         </div>
@@ -177,25 +179,7 @@ or &quot;&quot; then no attempt will be made to connect through the socket.
         <div class="method-description">
           <p>
 Instructs the database to wait for the client to tell it when to <a
-href="SQLRConnection.html#M000105">commit</a>.
-</p>
-        </div>
-      </div>
-
-      <div id="method-M000102" class="method-detail">
-        <a name="M000102"></a>
-
-        <div class="method-heading">
-          <a href="SQLRConnection.src/M000102.html" target="Code" class="method-signature"
-            onclick="popupCode('SQLRConnection.src/M000102.html');return false;">
-          <span class="method-name">autoCommitOn</span><span class="method-args">()</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p>
-Instructs the database to perform a <a
-href="SQLRConnection.html#M000105">commit</a> after every successful query.
+href="SQLRConnection.html#M000107">commit</a>.
 </p>
         </div>
       </div>
@@ -206,6 +190,24 @@ href="SQLRConnection.html#M000105">commit</a> after every successful query.
         <div class="method-heading">
           <a href="SQLRConnection.src/M000104.html" target="Code" class="method-signature"
             onclick="popupCode('SQLRConnection.src/M000104.html');return false;">
+          <span class="method-name">autoCommitOn</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Instructs the database to perform a <a
+href="SQLRConnection.html#M000107">commit</a> after every successful query.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000106" class="method-detail">
+        <a name="M000106"></a>
+
+        <div class="method-heading">
+          <a href="SQLRConnection.src/M000106.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000106.html');return false;">
           <span class="method-name">begin</span><span class="method-args">()</span>
           </a>
         </div>
@@ -213,22 +215,22 @@ href="SQLRConnection.html#M000105">commit</a> after every successful query.
         <div class="method-description">
           <p>
 Begins a transaction. Returns true if the <a
-href="SQLRConnection.html#M000104">begin</a> succeeded, false if it failed.
+href="SQLRConnection.html#M000106">begin</a> succeeded, false if it failed.
 If the database automatically begins a <a
 href="SQLRConnection.html#M000086">new</a> transaction when a <a
-href="SQLRConnection.html#M000105">commit</a> or <a
-href="SQLRConnection.html#M000106">rollback</a> is issued then this
+href="SQLRConnection.html#M000107">commit</a> or <a
+href="SQLRConnection.html#M000108">rollback</a> is issued then this
 doesn&#8216;t do anything unless SQL Relay is faking transaction blocks.
 </p>
         </div>
       </div>
 
-      <div id="method-M000098" class="method-detail">
-        <a name="M000098"></a>
+      <div id="method-M000100" class="method-detail">
+        <a name="M000100"></a>
 
         <div class="method-heading">
-          <a href="SQLRConnection.src/M000098.html" target="Code" class="method-signature"
-            onclick="popupCode('SQLRConnection.src/M000098.html');return false;">
+          <a href="SQLRConnection.src/M000100.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000100.html');return false;">
           <span class="method-name">bindFormat</span><span class="method-args">()</span>
           </a>
         </div>
@@ -241,12 +243,12 @@ db.
         </div>
       </div>
 
-      <div id="method-M000097" class="method-detail">
-        <a name="M000097"></a>
+      <div id="method-M000099" class="method-detail">
+        <a name="M000099"></a>
 
         <div class="method-heading">
-          <a href="SQLRConnection.src/M000097.html" target="Code" class="method-signature"
-            onclick="popupCode('SQLRConnection.src/M000097.html');return false;">
+          <a href="SQLRConnection.src/M000099.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000099.html');return false;">
           <span class="method-name">clientVersion</span><span class="method-args">()</span>
           </a>
         </div>
@@ -258,21 +260,55 @@ Returns the version of the sqlrelay client software.
         </div>
       </div>
 
-      <div id="method-M000105" class="method-detail">
-        <a name="M000105"></a>
+      <div id="method-M000107" class="method-detail">
+        <a name="M000107"></a>
 
         <div class="method-heading">
-          <a href="SQLRConnection.src/M000105.html" target="Code" class="method-signature"
-            onclick="popupCode('SQLRConnection.src/M000105.html');return false;">
+          <a href="SQLRConnection.src/M000107.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000107.html');return false;">
           <span class="method-name">commit</span><span class="method-args">()</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-Issues a <a href="SQLRConnection.html#M000105">commit</a>. Returns true if
-the <a href="SQLRConnection.html#M000105">commit</a> succeeded, false if it
+Issues a <a href="SQLRConnection.html#M000107">commit</a>. Returns true if
+the <a href="SQLRConnection.html#M000107">commit</a> succeeded, false if it
 failed.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000096" class="method-detail">
+        <a name="M000096"></a>
+
+        <div class="method-heading">
+          <a href="SQLRConnection.src/M000096.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000096.html');return false;">
+          <span class="method-name">dbHostName</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the host name of the database
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000097" class="method-detail">
+        <a name="M000097"></a>
+
+        <div class="method-heading">
+          <a href="SQLRConnection.src/M000097.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000097.html');return false;">
+          <span class="method-name">dbIpAddress</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the ip address of the database
 </p>
         </div>
       </div>
@@ -294,12 +330,12 @@ Returns the version of the database
         </div>
       </div>
 
-      <div id="method-M000110" class="method-detail">
-        <a name="M000110"></a>
+      <div id="method-M000112" class="method-detail">
+        <a name="M000112"></a>
 
         <div class="method-heading">
-          <a href="SQLRConnection.src/M000110.html" target="Code" class="method-signature"
-            onclick="popupCode('SQLRConnection.src/M000110.html');return false;">
+          <a href="SQLRConnection.src/M000112.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000112.html');return false;">
           <span class="method-name">debugOff</span><span class="method-args">()</span>
           </a>
         </div>
@@ -311,12 +347,12 @@ Turns debugging off.
         </div>
       </div>
 
-      <div id="method-M000109" class="method-detail">
-        <a name="M000109"></a>
+      <div id="method-M000111" class="method-detail">
+        <a name="M000111"></a>
 
         <div class="method-heading">
-          <a href="SQLRConnection.src/M000109.html" target="Code" class="method-signature"
-            onclick="popupCode('SQLRConnection.src/M000109.html');return false;">
+          <a href="SQLRConnection.src/M000111.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000111.html');return false;">
           <span class="method-name">debugOn</span><span class="method-args">()</span>
           </a>
         </div>
@@ -348,12 +384,12 @@ Ends the session.
         </div>
       </div>
 
-      <div id="method-M000107" class="method-detail">
-        <a name="M000107"></a>
+      <div id="method-M000109" class="method-detail">
+        <a name="M000109"></a>
 
         <div class="method-heading">
-          <a href="SQLRConnection.src/M000107.html" target="Code" class="method-signature"
-            onclick="popupCode('SQLRConnection.src/M000107.html');return false;">
+          <a href="SQLRConnection.src/M000109.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000109.html');return false;">
           <span class="method-name">errorMessage</span><span class="method-args">()</span>
           </a>
         </div>
@@ -366,12 +402,12 @@ available here. If there is no error then this method returns nil
         </div>
       </div>
 
-      <div id="method-M000108" class="method-detail">
-        <a name="M000108"></a>
+      <div id="method-M000110" class="method-detail">
+        <a name="M000110"></a>
 
         <div class="method-heading">
-          <a href="SQLRConnection.src/M000108.html" target="Code" class="method-signature"
-            onclick="popupCode('SQLRConnection.src/M000108.html');return false;">
+          <a href="SQLRConnection.src/M000110.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000110.html');return false;">
           <span class="method-name">errorNumber</span><span class="method-args">()</span>
           </a>
         </div>
@@ -384,12 +420,12 @@ available here. If there is no error then this method returns 0.
         </div>
       </div>
 
-      <div id="method-M000113" class="method-detail">
-        <a name="M000113"></a>
+      <div id="method-M000115" class="method-detail">
+        <a name="M000115"></a>
 
         <div class="method-heading">
-          <a href="SQLRConnection.src/M000113.html" target="Code" class="method-signature"
-            onclick="popupCode('SQLRConnection.src/M000113.html');return false;">
+          <a href="SQLRConnection.src/M000115.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000115.html');return false;">
           <span class="method-name">getClientInfo</span><span class="method-args">()</span>
           </a>
         </div>
@@ -397,7 +433,7 @@ available here. If there is no error then this method returns 0.
         <div class="method-description">
           <p>
 Returns the string that was set by <a
-href="SQLRConnection.html#M000112">setClientInfo</a>().
+href="SQLRConnection.html#M000114">setClientInfo</a>().
 </p>
         </div>
       </div>
@@ -444,12 +480,12 @@ href="SQLRConnection.html#M000089">suspendSession</a>().
         </div>
       </div>
 
-      <div id="method-M000100" class="method-detail">
-        <a name="M000100"></a>
+      <div id="method-M000102" class="method-detail">
+        <a name="M000102"></a>
 
         <div class="method-heading">
-          <a href="SQLRConnection.src/M000100.html" target="Code" class="method-signature"
-            onclick="popupCode('SQLRConnection.src/M000100.html');return false;">
+          <a href="SQLRConnection.src/M000102.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000102.html');return false;">
           <span class="method-name">getCurrentDatabase</span><span class="method-args">()</span>
           </a>
         </div>
@@ -461,12 +497,12 @@ Returns the database/schema that is currently in use.
         </div>
       </div>
 
-      <div id="method-M000111" class="method-detail">
-        <a name="M000111"></a>
+      <div id="method-M000113" class="method-detail">
+        <a name="M000113"></a>
 
         <div class="method-heading">
-          <a href="SQLRConnection.src/M000111.html" target="Code" class="method-signature"
-            onclick="popupCode('SQLRConnection.src/M000111.html');return false;">
+          <a href="SQLRConnection.src/M000113.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000113.html');return false;">
           <span class="method-name">getDebug</span><span class="method-args">()</span>
           </a>
         </div>
@@ -478,12 +514,12 @@ Returns 0 if debugging is off and 1 if debugging is on.
         </div>
       </div>
 
-      <div id="method-M000101" class="method-detail">
-        <a name="M000101"></a>
+      <div id="method-M000103" class="method-detail">
+        <a name="M000103"></a>
 
         <div class="method-heading">
-          <a href="SQLRConnection.src/M000101.html" target="Code" class="method-signature"
-            onclick="popupCode('SQLRConnection.src/M000101.html');return false;">
+          <a href="SQLRConnection.src/M000103.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000103.html');return false;">
           <span class="method-name">getLastInsertId</span><span class="method-args">()</span>
           </a>
         </div>
@@ -548,31 +584,31 @@ Returns 1 on success and 0 on failure.
         </div>
       </div>
 
-      <div id="method-M000106" class="method-detail">
-        <a name="M000106"></a>
+      <div id="method-M000108" class="method-detail">
+        <a name="M000108"></a>
 
         <div class="method-heading">
-          <a href="SQLRConnection.src/M000106.html" target="Code" class="method-signature"
-            onclick="popupCode('SQLRConnection.src/M000106.html');return false;">
+          <a href="SQLRConnection.src/M000108.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000108.html');return false;">
           <span class="method-name">rollback</span><span class="method-args">()</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-Issues a <a href="SQLRConnection.html#M000106">rollback</a>. Returns true
-if the <a href="SQLRConnection.html#M000106">rollback</a> succeeded, false
+Issues a <a href="SQLRConnection.html#M000108">rollback</a>. Returns true
+if the <a href="SQLRConnection.html#M000108">rollback</a> succeeded, false
 if it failed.
 </p>
         </div>
       </div>
 
-      <div id="method-M000099" class="method-detail">
-        <a name="M000099"></a>
+      <div id="method-M000101" class="method-detail">
+        <a name="M000101"></a>
 
         <div class="method-heading">
-          <a href="SQLRConnection.src/M000099.html" target="Code" class="method-signature"
-            onclick="popupCode('SQLRConnection.src/M000099.html');return false;">
+          <a href="SQLRConnection.src/M000101.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000101.html');return false;">
           <span class="method-name">selectDatabase(database)<br />
 </span>
           </a>
@@ -585,12 +621,12 @@ Sets the current database/schema to &quot;database&quot;
         </div>
       </div>
 
-      <div id="method-M000096" class="method-detail">
-        <a name="M000096"></a>
+      <div id="method-M000098" class="method-detail">
+        <a name="M000098"></a>
 
         <div class="method-heading">
-          <a href="SQLRConnection.src/M000096.html" target="Code" class="method-signature"
-            onclick="popupCode('SQLRConnection.src/M000096.html');return false;">
+          <a href="SQLRConnection.src/M000098.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000098.html');return false;">
           <span class="method-name">serverVersion</span><span class="method-args">()</span>
           </a>
         </div>
@@ -602,12 +638,12 @@ Returns the version of the sqlrelay server software.
         </div>
       </div>
 
-      <div id="method-M000112" class="method-detail">
-        <a name="M000112"></a>
+      <div id="method-M000114" class="method-detail">
+        <a name="M000114"></a>
 
         <div class="method-heading">
-          <a href="SQLRConnection.src/M000112.html" target="Code" class="method-signature"
-            onclick="popupCode('SQLRConnection.src/M000112.html');return false;">
+          <a href="SQLRConnection.src/M000114.html" target="Code" class="method-signature"
+            onclick="popupCode('SQLRConnection.src/M000114.html');return false;">
           <span class="method-name">setClientInfo(clientinfo)<br />
 </span>
           </a>

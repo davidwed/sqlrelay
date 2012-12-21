@@ -133,6 +133,18 @@ class sqlrconnection:
         """
         return CSQLRelay.dbVersion(self.connection)
 
+    def dbHostName(self):
+        """
+        Returns the host name of the database
+        """
+        return CSQLRelay.dbHostName(self.connection)
+
+    def dbIpAddress(self):
+        """
+        Returns the ip address of the database
+        """
+        return CSQLRelay.dbIpAddress(self.connection)
+
 
     def serverVersion(self):
         """

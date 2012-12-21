@@ -114,6 +114,16 @@ SQLRCLIENTWRAPPER_DLLSPEC
 const char	*sqlrcon_dbVersion(sqlrcon sqlrconref);
 
 /** @ingroup sqlrclientwrapper
+ *  Returns the host name of the database */
+SQLRCLIENTWRAPPER_DLLSPEC
+const char	*sqlrcon_dbHostName(sqlrcon sqlrconref);
+
+/** @ingroup sqlrclientwrapper
+ *  Returns the ip address of the database */
+SQLRCLIENTWRAPPER_DLLSPEC
+const char	*sqlrcon_dbIpAddress(sqlrcon sqlrconref);
+
+/** @ingroup sqlrclientwrapper
  *  Returns the version of the sqlrelay server software. */
 SQLRCLIENTWRAPPER_DLLSPEC
 const char	*sqlrcon_serverVersion(sqlrcon sqlrconref);

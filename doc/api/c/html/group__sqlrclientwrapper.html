@@ -55,6 +55,10 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC <br class="typebreak"/>
 const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#gad1bcb07b6803c2a6ee5f94ec8de6f99e">sqlrcon_dbVersion</a> (sqlrcon sqlrconref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC <br class="typebreak"/>
+const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga7acb384f8f7c5db9945aad4cdb8bd964">sqlrcon_dbHostName</a> (sqlrcon sqlrconref)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC <br class="typebreak"/>
+const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#ga17de14b645ac1e77ba29781f1dfd1ecf">sqlrcon_dbIpAddress</a> (sqlrcon sqlrconref)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC <br class="typebreak"/>
 const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#gab5705f68eef036cde3c1508720343691">sqlrcon_serverVersion</a> (sqlrcon sqlrconref)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">SQLRCLIENTWRAPPER_DLLSPEC <br class="typebreak"/>
 const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sqlrclientwrapper.html#gac44675b990211eab388cadeedca496e0">sqlrcon_clientVersion</a> (sqlrcon sqlrconref)</td></tr>
@@ -369,6 +373,42 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div>
 <div class="memdoc">
 <p>Issues a commit. Returns 1 if the commit succeeded, 0 if it failed. </p>
+
+</div>
+</div>
+<a class="anchor" id="ga7acb384f8f7c5db9945aad4cdb8bd964"></a><!-- doxytag: member="sqlrclientwrapper.h::sqlrcon_dbHostName" ref="ga7acb384f8f7c5db9945aad4cdb8bd964" args="(sqlrcon sqlrconref)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SQLRCLIENTWRAPPER_DLLSPEC const char* sqlrcon_dbHostName </td>
+          <td>(</td>
+          <td class="paramtype">sqlrcon&#160;</td>
+          <td class="paramname"><em>sqlrconref</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Returns the host name of the database </p>
+
+</div>
+</div>
+<a class="anchor" id="ga17de14b645ac1e77ba29781f1dfd1ecf"></a><!-- doxytag: member="sqlrclientwrapper.h::sqlrcon_dbIpAddress" ref="ga17de14b645ac1e77ba29781f1dfd1ecf" args="(sqlrcon sqlrconref)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SQLRCLIENTWRAPPER_DLLSPEC const char* sqlrcon_dbIpAddress </td>
+          <td>(</td>
+          <td class="paramtype">sqlrcon&#160;</td>
+          <td class="paramname"><em>sqlrconref</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Returns the ip address of the database </p>
 
 </div>
 </div>
@@ -4059,7 +4099,7 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div>
 </div>
 </div>
-<hr class="footer"/><address class="footer"><small>Generated on Sun Nov 11 2012 for SQL Relay C API by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Dec 21 2012 for SQL Relay C API by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

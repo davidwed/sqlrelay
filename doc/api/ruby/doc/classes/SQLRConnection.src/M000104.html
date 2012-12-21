@@ -5,18 +5,13 @@
 
 <html>
 <head>
-  <title>begin (SQLRConnection)</title>
+  <title>autoCommitOn (SQLRConnection)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
 </head>
 <body class="standalone-code">
-  <pre>/** Begins a transaction.  Returns true if the begin
- *  succeeded, false if it failed.  If the database
- *  automatically begins a new transaction when a
- *  commit or rollback is issued then this doesn't
- *  do anything unless SQL Relay is faking transaction
- *  blocks. */
-static VALUE sqlrcon_begin(VALUE self) {
+  <pre>/** Instructs the database to perform a commit after every successful query. */
+static VALUE sqlrcon_autoCommitOn(VALUE self) {
 </pre>
 </body>
 </html>

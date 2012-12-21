@@ -94,6 +94,10 @@ public class SQLRConnection {
 	public native String	identify();
 	/** Returns the version of the database */
 	public native String	dbVersion();
+	/** Returns the host name of the database */
+	public native String	dbHostName();
+	/** Returns the ip address of the database */
+	public native String	dbIpAddress();
 	/** Returns the version of the sqlrelay server software */
 	public native String	serverVersion();
 	/** Returns the version of the sqlrelay client software */

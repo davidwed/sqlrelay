@@ -2191,6 +2191,44 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_dbversion) {
 	RETURN_FALSE;
 }
 
+
+DLEXPORT ZEND_FUNCTION(sqlrcon_dbhostname) {
+	zval **sqlrcon;
+	const char *r;
+	if (ZEND_NUM_ARGS() != 1 || 
+		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	sqlrconnection *connection=NULL;
+	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
+	if (connection) {
+		r=connection->dbHostName();
+		if (r) {
+			RETURN_STRING(const_cast<char *>(r),1);
+		}
+	}
+	RETURN_FALSE;
+}
+
+
+DLEXPORT ZEND_FUNCTION(sqlrcon_dbipaddress) {
+	zval **sqlrcon;
+	const char *r;
+	if (ZEND_NUM_ARGS() != 1 || 
+		zend_get_parameters_ex(1,&sqlrcon) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	sqlrconnection *connection=NULL;
+	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
+	if (connection) {
+		r=connection->dbIpAddress();
+		if (r) {
+			RETURN_STRING(const_cast<char *>(r),1);
+		}
+	}
+	RETURN_FALSE;
+}
+
 DLEXPORT ZEND_FUNCTION(sqlrcon_serverversion) {
 	zval **sqlrcon;
 	const char *r;
@@ -2342,6 +2380,8 @@ zend_function_entry sql_relay_functions[] = {
 	ZEND_FE(sqlrcon_rollback,NULL)
 	ZEND_FE(sqlrcon_bindformat,NULL)
 	ZEND_FE(sqlrcon_dbversion,NULL)
+	ZEND_FE(sqlrcon_dbhostname,NULL)
+	ZEND_FE(sqlrcon_dbipaddress,NULL)
 	ZEND_FE(sqlrcon_serverversion,NULL)
 	ZEND_FE(sqlrcon_clientversion,NULL)
 	{NULL,NULL,NULL}

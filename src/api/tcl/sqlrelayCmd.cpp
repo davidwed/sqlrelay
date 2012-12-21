@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.cpp,v 1.9 2012-11-10 20:10:44 mused Exp $
+ * $Id: sqlrelayCmd.cpp,v 1.10 2012-12-21 06:34:40 mused Exp $
  */
 
 #include <tcl.h>
@@ -1830,6 +1830,8 @@ void sqlrconDelete(ClientData data) {
  *  $con ping
  *  $con identify
  *  $con dbVersion
+ *  $con dbHostName
+ *  $con dbIpAddress
  *  $con serverVersion
  *  $con clientVersion
  *  $con bindFormat
@@ -1864,6 +1866,8 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     "ping",
     "identify",
     "dbVersion",
+    "dbHostName",
+    "dbIpAddress",
     "serverVersion",
     "clientVersion",
     "bindFormat",
@@ -1894,6 +1898,8 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     SQLR_PING,
     SQLR_IDENTIFY,
     SQLR_DBVERSION,
+    SQLR_DBHOSTNAME,
+    SQLR_DBIPADDRESS,
     SQLR_SERVERVERSION,
     SQLR_CLIENTVERSION,
     SQLR_BINDFORMAT,
@@ -2055,6 +2061,24 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     }
     Tcl_SetObjResult(interp,
 		     _Tcl_NewStringObj(con->dbVersion(), -1));
+    break;
+  }
+  case SQLR_DBHOSTNAME: {
+    if (objc > 2) {
+      Tcl_WrongNumArgs(interp, 2, objv, NULL);
+      return TCL_ERROR;
+    }
+    Tcl_SetObjResult(interp,
+		     _Tcl_NewStringObj(con->dbHostName(), -1));
+    break;
+  }
+  case SQLR_DBIPADDRESS: {
+    if (objc > 2) {
+      Tcl_WrongNumArgs(interp, 2, objv, NULL);
+      return TCL_ERROR;
+    }
+    Tcl_SetObjResult(interp,
+		     _Tcl_NewStringObj(con->dbIpAddress(), -1));
     break;
   }
   case SQLR_CLIENTVERSION: {

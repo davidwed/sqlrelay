@@ -8,7 +8,7 @@
 -export([start/0, start/1, stop/0]).
 
 -export([alloc/7, connectionFree/0, cursorFree/0, endSession/0, suspendSession/0, resumeSession/2]).
--export([ping/0, identify/0, dbVersion/0, bindFormat/0, connectionErrorMessage/0, connectionErrorNumber/0, errorMessage/0, errorNumber/0]).
+-export([ping/0, identify/0, dbVersion/0, dbHostName/0, dbIpAddress/0, bindFormat/0, connectionErrorMessage/0, connectionErrorNumber/0, errorMessage/0, errorNumber/0]).
 -export([selectDatabase/1, getCurrentDatabase/0]).
 -export([getConnectionPort/0, getConnectionSocket/0]).
 -export([autoCommitOn/0, autoCommitOff/0, beginTransaction/0, commit/0, rollback/0]).
@@ -113,6 +113,10 @@ resumeSession(Port, Socket) when is_integer(Port), is_list(Socket) -> call_port(
 identify() -> call_port({identify}).
 
 dbVersion() -> call_port({dbVersion}).
+
+dbHostName() -> call_port({dbHostName}).
+
+dbIpAddress() -> call_port({dbIpAddress}).
 
 bindFormat() -> call_port({bindFormat}).
 

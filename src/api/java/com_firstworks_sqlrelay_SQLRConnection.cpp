@@ -276,6 +276,26 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_dbVersion
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    dbHostName
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_dbHostName
+  (JNIEnv *env, jobject self) {
+	return env->NewStringUTF(getSqlrConnection(env,self)->dbHostName());
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    dbIpAddress
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_dbIpAddress
+  (JNIEnv *env, jobject self) {
+	return env->NewStringUTF(getSqlrConnection(env,self)->dbIpAddress());
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    serverVersion
  * Signature: ()Ljava/lang/String;
  */

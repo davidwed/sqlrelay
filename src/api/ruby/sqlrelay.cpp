@@ -186,6 +186,30 @@ static VALUE sqlrcon_dbVersion(VALUE self) {
 	}
 }
 
+/** Returns the host name of the database */
+static VALUE sqlrcon_dbHostName(VALUE self) {
+	sqlrconnection	*sqlrcon;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	const char	*result=sqlrcon->dbHostName();
+	if (result) {
+		return rb_str_new2(result);
+	} else {
+		return Qnil;
+	}
+}
+
+/** Returns the ip address of the database */
+static VALUE sqlrcon_dbIpAddress(VALUE self) {
+	sqlrconnection	*sqlrcon;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	const char	*result=sqlrcon->dbIpAddress();
+	if (result) {
+		return rb_str_new2(result);
+	} else {
+		return Qnil;
+	}
+}
+
 /** Returns the version of the sqlrelay server software. */
 static VALUE sqlrcon_serverVersion(VALUE self) {
 	sqlrconnection	*sqlrcon;
@@ -395,6 +419,10 @@ void Init_SQLRConnection() {
 				(CAST)sqlrcon_identify,0);
 	rb_define_method(csqlrconnection,"dbVersion",
 				(CAST)sqlrcon_dbVersion,0);
+	rb_define_method(csqlrconnection,"dbHostName",
+				(CAST)sqlrcon_dbHostName,0);
+	rb_define_method(csqlrconnection,"dbIpAddress",
+				(CAST)sqlrcon_dbIpAddress,0);
 	rb_define_method(csqlrconnection,"serverVersion",
 				(CAST)sqlrcon_serverVersion,0);
 	rb_define_method(csqlrconnection,"clientVersion",

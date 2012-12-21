@@ -84,6 +84,14 @@ function sqlrcon_identify($sqlrconref){}
 function sqlrcon_dbVersion($sqlrconref){}
 
 /** 
+ *  Returns the host name of the database */
+function sqlrcon_dbHostName($sqlrconref){}
+
+/** 
+ *  Returns the ip address of the database */
+function sqlrcon_dbIpAddress($sqlrconref){}
+
+/** 
  *  Returns the version of the sqlrelay server software. */
 function sqlrcon_serverVersion($sqlrconref){}
 

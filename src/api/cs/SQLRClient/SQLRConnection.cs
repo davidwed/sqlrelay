@@ -131,6 +131,18 @@ public class SQLRConnection : IDisposable
     	return sqlrcon_dbVersion(sqlrconref);
     }
     
+    /** Returns the host name of the database */
+    public String dbHostName()
+    {
+    	return sqlrcon_dbHostName(sqlrconref);
+    }
+    
+    /** Returns the ip address of the database */
+    public String dbIpAddress()
+    {
+    	return sqlrcon_dbIpAddress(sqlrconref);
+    }
+    
     /** Returns the version of the sqlrelay server software. */
     public String serverVersion()
     {
@@ -310,6 +322,12 @@ public class SQLRConnection : IDisposable
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern String sqlrcon_dbVersion(IntPtr sqlrconref);
+    
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern String sqlrcon_dbHostName(IntPtr sqlrconref);
+    
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern String sqlrcon_dbIpAddress(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern String sqlrcon_serverVersion(IntPtr sqlrconref);
