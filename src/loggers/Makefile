@@ -9,15 +9,19 @@ LIBS = -L$(top_builddir)/src/server -lsqlrserver -L$(top_builddir)/src/util -lsq
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server $(RUDIMENTSINCLUDES) $(LOGDIRCPPFLAG) -c $< -o $@
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) $(DEBUGDIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server $(RUDIMENTSINCLUDES) $(LOGDIRCPPFLAG) -c $< -o $@
 
-all: sqlrlogger_slowqueries.la \
+all: sqlrlogger_debug.la \
+	sqlrlogger_slowqueries.la \
 	sqlrlogger_custom_nw.la \
 	sqlrlogger_custom_sc.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
+
+sqlrlogger_debug.la: debug.cpp debug.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ debug.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqlrlogger_slowqueries.la: slowqueries.cpp slowqueries.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ slowqueries.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
@@ -30,6 +34,10 @@ sqlrlogger_custom_sc.la: custom_sc.cpp custom_sc.lo
 
 install:
 	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) sqlrlogger_debug.la $(libexecdir)
+	$(RM) $(libexecdir)/sqlrlogger_debug.a
+	$(RM) $(libexecdir)/sqlrlogger_debug.la
+	$(MODULERENAME) $(libexecdir)/sqlrlogger_debug.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqlrlogger_slowqueries.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrlogger_slowqueries.a
 	$(RM) $(libexecdir)/sqlrlogger_slowqueries.la

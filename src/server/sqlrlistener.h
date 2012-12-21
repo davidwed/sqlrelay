@@ -7,7 +7,6 @@
 #include <config.h>
 
 #include <cmdline.h>
-#include <debugfile.h>
 #include <tempdir.h>
 #include <sqlrconfigfile.h>
 #include <sqlrauthenticator.h>
@@ -121,6 +120,7 @@ class sqlrlistener : public rudiments::daemonprocess,
 		void		decrementBusyListeners();
 		int32_t		getBusyListeners();
 
+		void	logDebugMessage(const char *info);
 		void	logClientProtocolError(const char *info,
 						ssize_t result);
 		void	logClientConnectionRefused(const char *info);
@@ -189,8 +189,6 @@ class sqlrlistener : public rudiments::daemonprocess,
 		sqlrconfigfile		cfgfl;
 
 		uint32_t	runningconnections;
-
-		debugfile	dbgfile;
 };
 
 #endif

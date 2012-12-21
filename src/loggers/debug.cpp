@@ -1,0 +1,139 @@
+// Copyright (c) 2012  David Muse
+// See the file COPYING for more information
+
+#include <sqlrlistener.h>
+#include <sqlrcontroller.h>
+#include <sqlrconnection.h>
+#include <sqlrlogger.h>
+#include <cmdline.h>
+#include <rudiments/charstring.h>
+#include <rudiments/logger.h>
+#include <rudiments/process.h>
+#include <stdio.h>
+
+#ifdef RUDIMENTS_NAMESPACE
+using namespace rudiments;
+#endif
+
+class debug : public sqlrlogger {
+	public:
+			debug(xmldomnode *parameters);
+			~debug();
+
+		bool	init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon);
+		bool	run(sqlrlistener *sqlrl,
+					sqlrconnection_svr *sqlrcon,
+					sqlrcursor_svr *sqlrcur,
+					sqlrlogger_loglevel_t level,
+					sqlrlogger_eventtype_t event,
+					const char *info);
+	private:
+		bool	openDebugFile();
+		void	closeDebugFile();
+
+		filedestination		*dbgfile;
+		logger			*debuglogger;
+		char			*dbgfilename;
+		const char		*name;
+};
+
+debug::debug(xmldomnode *parameters) : sqlrlogger(parameters) {
+	dbgfile=NULL;
+	debuglogger=NULL;
+	dbgfilename=NULL;
+	name=NULL;
+}
+
+debug::~debug() {
+	closeDebugFile();
+	delete[] dbgfilename;
+}
+
+bool debug::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
+
+	closeDebugFile();
+	delete[] dbgfilename;
+
+	// set the debug file name
+	name=(sqlrl)?"listener":"connection";
+	cmdline		*cmdl=(sqlrcon)?sqlrcon->cont->cmdl:sqlrl->cmdl;
+	const char	*localstatedir=cmdl->getLocalStateDir();
+	size_t	dbgfilenamelen;
+	if (localstatedir[0]) {
+		dbgfilenamelen=charstring::length(localstatedir)+
+					16+5+charstring::length(name)+20+1;
+		dbgfilename=new char[dbgfilenamelen];
+		snprintf(dbgfilename,dbgfilenamelen,
+					"%s/sqlrelay/debug/sqlr-%s.%ld",
+						localstatedir,name,
+						(long)process::getProcessId());
+	} else {
+		dbgfilenamelen=charstring::length(DEBUG_DIR)+5+
+					charstring::length(name)+20+1;
+		dbgfilename=new char[dbgfilenamelen];
+		snprintf(dbgfilename,dbgfilenamelen,
+					"%s/sqlr-%s.%ld",DEBUG_DIR,name,
+						(long)process::getProcessId());
+	}
+
+	return true;
+}
+
+bool debug::run(sqlrlistener *sqlrl,
+				sqlrconnection_svr *sqlrcon,
+				sqlrcursor_svr *sqlrcur,
+				sqlrlogger_loglevel_t level,
+				sqlrlogger_eventtype_t event,
+				const char *info) {
+	if (!debuglogger && !openDebugFile()) {
+		return false;
+	}
+	char	*header=debuglogger->logHeader(name);
+	debuglogger->write(header,0,info);
+	delete[] header;
+	return true;
+}
+
+bool debug::openDebugFile() {
+
+	// create the debug file
+	mode_t	oldumask=process::setFileCreationMask(066);
+	dbgfile=new filedestination();
+	process::setFileCreationMask(oldumask);
+
+	// open the file
+	bool	retval=false;
+	if (dbgfile->open(dbgfilename)) {
+		printf("Debugging to: %s\n",dbgfilename);
+		debuglogger=new logger();
+		debuglogger->addLogDestination(dbgfile);
+		retval=true;
+	} else {
+		fprintf(stderr,"Couldn't open debug file: %s\n",dbgfilename);
+		if (dbgfile) {
+			dbgfile->close();
+			delete dbgfile;
+			dbgfile=NULL;
+		}
+	}
+
+	delete[] dbgfilename;
+	dbgfilename=NULL;
+	return retval;
+}
+
+void debug::closeDebugFile() {
+	if (dbgfile) {
+		dbgfile->close();
+		delete dbgfile;
+		dbgfile=NULL;
+		delete debuglogger;
+		debuglogger=NULL;
+	}
+}
+
+extern "C" {
+	sqlrlogger	*new_debug(xmldomnode *parameters) {
+		return new debug(parameters);
+	}
+}

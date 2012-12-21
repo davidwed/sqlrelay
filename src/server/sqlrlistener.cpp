@@ -120,8 +120,6 @@ void sqlrlistener::cleanUp() {
 	delete denied;
 	delete allowed;
 
-	dbgfile.closeDebugFile();
-
 	delete tmpdir;
 }
 
@@ -145,11 +143,6 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 
 	if (!verifyAccessToConfigFile(cmdl->getConfig())) {
 		return false;
-	}
-
-	dbgfile.init("listener",cmdl->getLocalStateDir());
-	if (cmdl->found("-debug")) {
-		dbgfile.enable();
 	}
 
 	if (!handlePidFile(cmdl->getId())) {
@@ -352,10 +345,10 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	char	*idfilename=new char[idfilenamelen];
 	snprintf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir->getString(),id);
 
-	dbgfile.debugPrint("listener",0,
-			"creating shared memory and semaphores");
-	dbgfile.debugPrint("listener",0,"id filename: ");
-	dbgfile.debugPrint("listener",0,idfilename);
+	stringbuffer	info;
+	info.append("creating shared memory and semaphores: id filename: ");
+	info.append(idfilename);
+	logDebugMessage(info.getString());
 
 	// make sure that the file exists and is read/writeable
 	if (!file::createFile(idfilename,permissions::ownerReadWrite())) {
@@ -375,7 +368,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 
 	// create the shared memory segment
 	// FIXME: if it already exists, attempt to remove and re-create it
-	dbgfile.debugPrint("listener",1,"creating shared memory...");
+	logDebugMessage("creating shared memory...");
 
 	idmemory=new sharedmemory;
 	if (!idmemory->create(key,sizeof(shmdata),
@@ -391,7 +384,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 
 	// create (or connect) to the semaphore set
 	// FIXME: if it already exists, attempt to remove and re-create it
-	dbgfile.debugPrint("listener",1,"creating semaphores...");
+	logDebugMessage("creating semaphores...");
 
 	// semaphores are:
 	//
@@ -756,12 +749,12 @@ void sqlrlistener::listen() {
 
 		if (opendbconnections<
 			static_cast<int32_t>(cfgfl.getConnections())) {
-			dbgfile.debugPrint("listener",0,
-				"waiting for server connections (sleeping 1s)");
+			logDebugMessage("waiting for server "
+					"connections (sleeping 1s)");
 			snooze::macrosnooze(1);
 		} else {
-			dbgfile.debugPrint("listener",0,
-				"finished waiting for server connections");
+			logDebugMessage("finished waiting for "
+					"server connections");
 			break;
 		}
 	}
@@ -922,7 +915,7 @@ void sqlrlistener::alarmHandler(int32_t signum) {
 
 filedescriptor *sqlrlistener::waitForData() {
 
-	dbgfile.debugPrint("listener",0,"waiting for client connection...");
+	logDebugMessage("waiting for client connection...");
 
 	// wait for data on one of the sockets...
 	// if something bad happened, return an invalid file descriptor
@@ -935,8 +928,7 @@ filedescriptor *sqlrlistener::waitForData() {
 	filedescriptor	*fd=NULL;
 	listener::getReadyList()->getDataByIndex(0,&fd);
 
-	dbgfile.debugPrint("listener",0,
-			"finished waiting for client connection");
+	logDebugMessage("finished waiting for client connection");
 
 	return fd;
 }
@@ -1049,15 +1041,13 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 
 bool sqlrlistener::registerHandoff(filedescriptor *sock) {
 
-	dbgfile.debugPrint("listener",0,"registering handoff...");
+	logDebugMessage("registering handoff...");
 
 	// get the connection daemon's pid
 	uint32_t processid;
 	if (sock->read(&processid)!=sizeof(uint32_t)) {
-		const char	*info="failed to read process "
-					"id during registration";
-		logInternalError(info);
-		dbgfile.debugPrint("listener",1,info);
+		logInternalError("failed to read process "
+					"id during registration");
 		delete sock;
 		return false;
 	}
@@ -1095,21 +1085,19 @@ bool sqlrlistener::registerHandoff(filedescriptor *sock) {
 		handoffsocklist=newhandoffsocklist;
 	}
 
-	dbgfile.debugPrint("listener",0,"finished registering handoff...");
+	logDebugMessage("finished registering handoff...");
 	return true;
 }
 
 bool sqlrlistener::deRegisterHandoff(filedescriptor *sock) {
 
-	dbgfile.debugPrint("listener",0,"de-registering handoff...");
+	logDebugMessage("de-registering handoff...");
 
 	// get the connection daemon's pid
 	uint32_t	processid;
 	if (sock->read(&processid)!=sizeof(uint32_t)) {
-		const char	*info="failed to read process "
-					"id during deregistration";
-		logInternalError(info);
-		dbgfile.debugPrint("listener",1,info);
+		logInternalError("failed to read process "
+				"id during deregistration");
 		delete sock;
 		return false;
 	}
@@ -1127,22 +1115,18 @@ bool sqlrlistener::deRegisterHandoff(filedescriptor *sock) {
 	// clean up
 	delete sock;
 
-	dbgfile.debugPrint("listener",0,"finished de-registering handoff...");
+	logDebugMessage("finished de-registering handoff...");
 	return true;
 }
 
 bool sqlrlistener::fixup(filedescriptor *sock) {
 
-	dbgfile.debugPrint("listener",0,
-			"passing socket of newly spawned connection...");
+	logDebugMessage("passing socket of newly spawned connection...");
 
 	// get the pid of the connection daemon the child listener needs
 	uint32_t	processid;
 	if (sock->read(&processid)!=sizeof(uint32_t)) {
-		const char	*info="failed to read process "
-						"id during fixup";
-		logInternalError(info);
-		dbgfile.debugPrint("listener",1,info);
+		logInternalError("failed to read process id during fixup");
 		delete sock;
 		return false;
 	}
@@ -1153,13 +1137,11 @@ bool sqlrlistener::fixup(filedescriptor *sock) {
 		if (handoffsocklist[i].pid==processid) {
 			retval=sock->passFileDescriptor(handoffsocklist[i].
 						sock->getFileDescriptor());
-			dbgfile.debugPrint("listener",1,
-					"found socket for requested pid ");
+			logDebugMessage("found socket for requested pid ");
 			if (retval) {
-				dbgfile.debugPrint("listener",1,
-						"passed it successfully");
+				logDebugMessage("passed it successfully");
 			} else {
-				dbgfile.debugPrint("listener",1,"failed to pass it");
+				logDebugMessage("failed to pass it");
 			}
 			break;
 		}
@@ -1168,15 +1150,14 @@ bool sqlrlistener::fixup(filedescriptor *sock) {
 	// clean up
 	delete sock;
 
-	dbgfile.debugPrint("listener",0,
-			"finished passing socket of newly spawned connection");
+	logDebugMessage("finished passing socket of newly spawned connection");
 
 	return retval;
 }
 
 bool sqlrlistener::deniedIp(filedescriptor *clientsock) {
 
-	dbgfile.debugPrint("listener",0,"checking for valid ip...");
+	logDebugMessage("checking for valid ip...");
 
 	char	*ip=clientsock->getPeerAddress();
 	if (ip && denied->match(ip) &&
@@ -1185,13 +1166,12 @@ bool sqlrlistener::deniedIp(filedescriptor *clientsock) {
 		stringbuffer	info;
 		info.append("rejected IP address: ")->append(ip);
 		logClientConnectionRefused(info.getString());
-		dbgfile.debugPrint("listener",0,info.getString());
 
 		delete[] ip;
 		return true;
 	}
 
-	dbgfile.debugPrint("listener",0,"valid ip...");
+	logDebugMessage("valid ip...");
 
 	delete[] ip;
 	return false;
@@ -1249,7 +1229,8 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		idmemory->dontRemove();
 		semset->dontRemove();
 
-		dbgfile.init("listener",cmdl->getLocalStateDir());
+		// re-init loggers
+		sqlrlg->initLoggers(this,NULL);
 
 		clientSession(clientsock);
 
@@ -1262,7 +1243,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		// parent
 		char	debugstring[22];
 		snprintf(debugstring,22,"forked a child: %ld",(long)childpid);
-		dbgfile.debugPrint("listener",0,debugstring);
+		logDebugMessage(debugstring);
 		// the main process doesn't need to stay connected
 		// to the client, only the forked process
 		delete clientsock;
@@ -1315,7 +1296,7 @@ void sqlrlistener::sqlrelayClientSession(filedescriptor *clientsock) {
 
 	} else if (authstatus==0) {
 
-		dbgfile.debugPrint("listener",1,"sending client auth error");
+		logDebugMessage("sending client auth error");
 
 		// snooze before and after returning an
 		// authentication error to discourage
@@ -1352,7 +1333,7 @@ void sqlrlistener::mysqlClientSession(filedescriptor *clientsock) {
 
 	} else if (authstatus==0) {
 
-		dbgfile.debugPrint("listener",1,"sending client auth error");
+		logDebugMessage("sending client auth error");
 
 		// snooze before and after returning an
 		// authentication error to discourage
@@ -1373,16 +1354,14 @@ void sqlrlistener::mysqlClientSession(filedescriptor *clientsock) {
 
 int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 
-	dbgfile.debugPrint("listener",0,"getting authentication...");
+	logDebugMessage("getting authentication...");
 
 	// get the user...
 	uint32_t	size=0;
 	ssize_t		result=clientsock->read(&size,idleclienttimeout,0);
 	if (result!=sizeof(uint32_t)) {
-		const char *info="authentication failed: "
-					"failed to get user size";
-		dbgfile.debugPrint("listener",1,info);
-		logClientProtocolError(info,result);
+		logClientProtocolError("authentication failed: "
+					"failed to get user size",result);
 		return -1;
 	}
 	char	userbuffer[USERSIZE];
@@ -1390,15 +1369,13 @@ int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 		stringbuffer	info;
 		info.append("authentication failed: user size too long: ");
 		info.append(size);
-		dbgfile.debugPrint("listener",1,info.getString());
 		logClientConnectionRefused(info.getString());
 		return -1;
 	}
 	result=clientsock->read(userbuffer,size,idleclienttimeout,0);
 	if ((uint32_t)result!=size) {
-		const char *info="authentication failed failed to get user";
-		dbgfile.debugPrint("connection",1,info);
-		logClientProtocolError(info,result);
+		logClientProtocolError("authentication failed: "
+					"failed to get user",result);
 		return -1;
 	}
 	userbuffer[size]='\0';
@@ -1406,10 +1383,8 @@ int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 	// get the password...
 	result=clientsock->read(&size,idleclienttimeout,0);
 	if (result!=sizeof(uint32_t)) {
-		const char *info="authentication failed: "
-					"failed to get password size";
-		dbgfile.debugPrint("listener",1,info);
-		logClientProtocolError(info,result);
+		logClientProtocolError("authentication failed: "
+					"failed to get password size",result);
 		return -1;
 	}
 	char	passwordbuffer[USERSIZE];
@@ -1417,15 +1392,13 @@ int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 		stringbuffer	info;
 		info.append("authentication failed: password size too long: ");
 		info.append(size);
-		dbgfile.debugPrint("listener",1,info.getString());
 		logClientConnectionRefused(info.getString());
 		return -1;
 	}
 	result=clientsock->read(passwordbuffer,size,idleclienttimeout,0);
 	if ((uint32_t)result!=size) {
-		const char *info="authentication failed failed to get password";
-		dbgfile.debugPrint("connection",1,info);
-		logClientProtocolError(info,result);
+		logClientProtocolError("authentication failed: "
+					"failed to get password",result);
 		return -1;
 	}
 	passwordbuffer[size]='\0';
@@ -1438,19 +1411,16 @@ int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
 		// user/password sets and 0 if no match is found.
 		bool	retval=authc->authenticate(userbuffer,passwordbuffer);
 		if (retval) {
-			dbgfile.debugPrint("listener",1,
-				"auth succeeded on listener");
+			logDebugMessage("auth succeeded on listener");
 		} else {
-			const char	*info=
+			logClientConnectionRefused(
 					"auth failed on listener: "
-					"invalid user/password";
-			logClientConnectionRefused(info);
-			dbgfile.debugPrint("listener",1,info);
+					"invalid user/password");
 		}
 		return (retval)?1:0;
 	}
 
-	dbgfile.debugPrint("listener",0,"finished getting authentication");
+	logDebugMessage("finished getting authentication");
 
 	return 1;
 }
@@ -1618,11 +1588,11 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 
 bool sqlrlistener::acquireShmAccess() {
 
-	dbgfile.debugPrint("listener",0,"acquiring exclusive shm access");
+	logDebugMessage("acquiring exclusive shm access");
 
 	// don't even begin to wait if the alarm already rang
 	if (alarmrang) {
-		dbgfile.debugPrint("listener",0,"timeout occured");
+		logDebugMessage("timeout occured");
 		return false;
 	}
 
@@ -1637,34 +1607,31 @@ bool sqlrlistener::acquireShmAccess() {
 
 	// handle alarm...
 	if (alarmrang) {
-		dbgfile.debugPrint("listener",0,"timeout occured");
+		logDebugMessage("timeout occured");
 		return false;
 	}
 
 	// handle general failure...
 	if (!result) {
-		dbgfile.debugPrint("listener",0,
-			"failed to acquire exclusive shm access");
+		logDebugMessage("failed to acquire exclusive shm access");
 		return false;
 	}
 
 	// success...
-	dbgfile.debugPrint("listener",0,"acquired exclusive shm access");
+	logDebugMessage("acquired exclusive shm access");
 	return true;
 }
 
 bool sqlrlistener::releaseShmAccess() {
 
-	dbgfile.debugPrint("listener",-1,"releasing exclusive shm access");
+	logDebugMessage("releasing exclusive shm access");
 
 	if (!semset->signalWithUndo(1)) {
-		dbgfile.debugPrint("listener",0,
-			"failed to release exclusive shm access");
+		logDebugMessage("failed to release exclusive shm access");
 		return false;
 	}
 
-	dbgfile.debugPrint("listener",0,
-			"finished releasing exclusive shm access");
+	logDebugMessage("finished releasing exclusive shm access");
 	return true;
 }
 
@@ -1691,11 +1658,11 @@ bool sqlrlistener::acceptAvailableConnection(bool *alldbsdown) {
 		}
 	}
 
-	dbgfile.debugPrint("listener",0,"waiting for an available connection");
+	logDebugMessage("waiting for an available connection");
 
 	// don't even begin to wait if the alarm already rang
 	if (alarmrang) {
-		dbgfile.debugPrint("listener",0,"timeout occured");
+		logDebugMessage("timeout occured");
 		return false;
 	}
 
@@ -1710,16 +1677,14 @@ bool sqlrlistener::acceptAvailableConnection(bool *alldbsdown) {
 
 	// handle alarm...
 	if (alarmrang) {
-		dbgfile.debugPrint("listener",0,"timeout occured");
+		logDebugMessage("timeout occured");
 		return false;
 	}
 
 	// handle general failure...
 	if (!result) {
-		const char	*info="general failure waiting "
-					"for available connection";
-		logInternalError(info);
-		dbgfile.debugPrint("listener",0,info);
+		logInternalError("general failure waiting "
+					"for available connection");
 		return false;
 	}
 
@@ -1733,25 +1698,20 @@ bool sqlrlistener::acceptAvailableConnection(bool *alldbsdown) {
 	// because of the lock on semaphore 1.
 	semset->setValue(2,0);
 
-	dbgfile.debugPrint("listener",0,
-			"succeeded in waiting for an available connection");
+	logDebugMessage("succeeded in waiting for an available connection");
 	return true;
 }
 
 bool sqlrlistener::doneAcceptingAvailableConnection() {
 
-	dbgfile.debugPrint("listener",0,
-		"signalling accepted connection");
+	logDebugMessage("signalling accepted connection");
 
 	if (!semset->signal(3)) {
-		dbgfile.debugPrint("listener",0,
-		"failed to signal accapted connection");
+		logDebugMessage("failed to signal accapted connection");
 		return false;
 	}
 
-	dbgfile.debugPrint("listener",0,
-		"succeeded signalling accepted connection");
-
+	logDebugMessage("succeeded signalling accepted connection");
 	return true;
 }
 
@@ -1766,7 +1726,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 	for (;;) {
 
-		dbgfile.debugPrint("listener",0,"getting a connection...");
+		logDebugMessage("getting a connection...");
 
 		// set an alarm
 		if (usealarm) {
@@ -1807,8 +1767,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 				// ports
 				if (passdescriptor) {
 
-					dbgfile.debugPrint("listener",1,
-							"handoff=pass");
+					logDebugMessage("handoff=pass");
 
 					// get the pid
 					*connectionpid=shm->connectioninfo.
@@ -1816,8 +1775,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 				} else {
 
-					dbgfile.debugPrint("listener",1,
-							"handoff=reconnect");
+					logDebugMessage("handoff=reconnect");
 
 					// get the inet port
 					*inetport=shm->connectioninfo.
@@ -1839,8 +1797,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					snprintf(debugstring,debugstringlen,
 							"socket=%s  port=%d",
 							unixportstr,*inetport);
-					dbgfile.debugPrint("listener",1,
-								debugstring);
+					logDebugMessage(debugstring);
 					delete[] debugstring;
 				}
 
@@ -1862,14 +1819,14 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 			// make sure the connection is actually up...
 			if (connectionIsUp(shm->connectionid)) {
-				dbgfile.debugPrint("listener",1,
-					"finished getting a connection");
+				logDebugMessage("finished getting "
+						"a connection");
 				return true;
 			}
 
 			// if the connection wasn't up, fork a child to jog it,
 			// spin back and get another connection
-			dbgfile.debugPrint("listener",1,"connection was down");
+			logDebugMessage("connection was down");
 			pingDatabase(*connectionpid,unixportstr,*inetport);
 		}
 
@@ -1990,25 +1947,21 @@ bool sqlrlistener::passClientFileDescriptorToConnection(
 					filedescriptor *connectionsock,
 					int fd) {
 
-	dbgfile.debugPrint("listener",1,"passing descriptor...");
+	logDebugMessage("passing descriptor...");
 
 	// tell the connection we're passing a file descriptor
 	if (connectionsock->write((uint16_t)HANDOFF_PASS)!=sizeof(uint16_t)) {
-		const char	*info="handoff failed to pass command";
-		logInternalError(info);
-		dbgfile.debugPrint("listener",0,info);
+		logInternalError("handoff failed to pass command");
 		return false;
 	}
 
 	// pass the file descriptor
 	if (!connectionsock->passFileDescriptor(fd)) {
-		const char	*info="handoff failed to pass file descriptor";
-		logInternalError(info);
-		dbgfile.debugPrint("listener",0,info);
+		logInternalError("handoff failed to pass file descriptor");
 		return false;
 	}
 
-	dbgfile.debugPrint("listener",0,"finished passing descriptor");
+	logDebugMessage("finished passing descriptor");
 	return true;
 }
 
@@ -2036,39 +1989,31 @@ bool sqlrlistener::findMatchingSocket(uint32_t connectionpid,
 bool sqlrlistener::requestFixup(uint32_t connectionpid,
 					filedescriptor *connectionsock) {
 
-	dbgfile.debugPrint("listener",0,
-			"requesting socket of newly spawned connection...");
+	logDebugMessage("requesting socket of newly spawned connection...");
 
 	// connect to the fixup socket of the parent listener
 	unixclientsocket	fixupclientsockun;
 	if (fixupclientsockun.connect(fixupsockname,-1,-1,0,1)
 						!=RESULT_SUCCESS) {
-		const char	*info="fixup failed to connect";
-		logInternalError(info);
-		dbgfile.debugPrint("listener",0,info);
+		logInternalError("fixup failed to connect");
 		return false;
 	}
 
 	// send the pid of the connection that we need
 	if (fixupclientsockun.write(connectionpid)!=sizeof(uint32_t)) {
-		const char	*info="fixup failed to write pid";
-		logInternalError(info);
-		dbgfile.debugPrint("listener",0,info);
+		logInternalError("fixup failed to write pid");
 		return false;
 	}
 
 	// get the file descriptor of the socket
 	int32_t	fd;
 	if (!fixupclientsockun.receiveFileDescriptor(&fd)) {
-		const char	*info="fixup failed to receive socket";
-		logInternalError(info);
-		dbgfile.debugPrint("listener",0,info);
+		logInternalError("fixup failed to receive socket");
 		return false;
 	}
 	connectionsock->setFileDescriptor(fd);
 
-	dbgfile.debugPrint("listener",0,
-			"received socket of newly spawned connection");
+	logDebugMessage("received socket of newly spawned connection");
 	return true;
 }
 
@@ -2168,8 +2113,7 @@ void sqlrlistener::incrementMaxListenersErrors() {
 
 void sqlrlistener::incrementConnectedClientCount() {
 
-	dbgfile.debugPrint("listener",0,
-				"incrementing connected client count...");
+	logDebugMessage("incrementing connected client count...");
 
 	if (!semset->waitWithUndo(5)) {
 		// FIXME: bail somehow
@@ -2192,8 +2136,6 @@ void sqlrlistener::incrementConnectedClientCount() {
 		shm->peak_connectedclients_1min_time=dt.getEpoch();
 	}
 
-	dbgfile.debugPrint("listener",1,shm->connectedclients);
-
 	// If the system supports timed semaphore ops then the scaler can be
 	// jogged into running on-demand, and we can do that here.  If the 
 	// sytem does not support timed semaphore ops then the scaler will
@@ -2203,34 +2145,30 @@ void sqlrlistener::incrementConnectedClientCount() {
 
 		// signal the scaler to evaluate the connection count
 		// and start more connections if necessary
-		dbgfile.debugPrint("listener",1,"signalling the scaler...");
+		logDebugMessage("signalling the scaler...");
 		if (!semset->signal(6)) {
 			// FIXME: bail somehow
 		}
-		dbgfile.debugPrint("listener",1,
-					"finished signalling the scaler...");
+		logDebugMessage("finished signalling the scaler...");
 
 		// wait for the scaler
-		dbgfile.debugPrint("listener",1,"waiting for the scaler...");
+		logDebugMessage("waiting for the scaler...");
 		if (!semset->wait(7)) {
 			// FIXME: bail somehow
 		}
-		dbgfile.debugPrint("listener",1,
-					"finished waiting for the scaler...");
+		logDebugMessage("finished waiting for the scaler...");
 	}
 
 	if (!semset->signalWithUndo(5)) {
 		// FIXME: bail somehow
 	}
 
-	dbgfile.debugPrint("listener",0,
-				"finished incrementing connected client count");
+	logDebugMessage("finished incrementing connected client count");
 }
 
 void sqlrlistener::decrementConnectedClientCount() {
 
-	dbgfile.debugPrint("listener",0,
-				"decrementing connected client count...");
+	logDebugMessage("decrementing connected client count...");
  
 	if (!semset->waitWithUndo(5)) {
 		// FIXME: bail somehow
@@ -2240,14 +2178,11 @@ void sqlrlistener::decrementConnectedClientCount() {
 		shm->connectedclients--;
 	}
 
-	dbgfile.debugPrint("listener",1,shm->connectedclients);
-
 	if (!semset->signalWithUndo(5)) {
 		// FIXME: bail somehow
 	}
 
-	dbgfile.debugPrint("listener",0,
-				"finished decrementing connected client count");
+	logDebugMessage("finished decrementing connected client count");
 }
 
 uint32_t sqlrlistener::incrementForkedListeners() {
@@ -2270,7 +2205,8 @@ uint32_t sqlrlistener::decrementForkedListeners() {
 }
 
 void sqlrlistener::incrementBusyListeners() {
-	dbgfile.debugPrint("listener",0,"incrementing busy listeners");
+
+	logDebugMessage("incrementing busy listeners");
 
 	if (!semset->signal(10)) {
 		// FIXME: bail somehow
@@ -2291,19 +2227,26 @@ void sqlrlistener::incrementBusyListeners() {
 		shm->peak_listeners_1min_time=dt.getEpoch();
 	}
 
-	dbgfile.debugPrint("listener",0,"finished incrementing busy listeners");
+	logDebugMessage("finished incrementing busy listeners");
 }
 
 void sqlrlistener::decrementBusyListeners() {
-	dbgfile.debugPrint("listener",0,"decrementing busy listeners");
+	logDebugMessage("decrementing busy listeners");
 	if (!semset->wait(10)) {
 		// FIXME: bail somehow
 	}
-	dbgfile.debugPrint("listener",0,"finished decrementing busy listeners");
+	logDebugMessage("finished decrementing busy listeners");
 }
 
 int32_t sqlrlistener::getBusyListeners() {
 	return semset->getValue(10);
+}
+
+void sqlrlistener::logDebugMessage(const char *info) {
+	sqlrlg->runLoggers(this,NULL,NULL,
+			SQLRLOGGER_LOGLEVEL_DEBUG,
+			SQLRLOGGER_EVENTTYPE_DEBUG_MESSAGE,
+			info);
 }
 
 void sqlrlistener::logClientProtocolError(const char *info, ssize_t result) {

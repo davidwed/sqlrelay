@@ -27,7 +27,7 @@ bool sqlrlogger::run(sqlrlistener *sqlrl,
 	return true;
 }
 
-static const char *loglevels[]={"INFO","WARNING","ERROR"};
+static const char *loglevels[]={"DEBUG","INFO","WARNING","ERROR"};
 
 const char *sqlrlogger::logLevel(sqlrlogger_loglevel_t level) {
 	return loglevels[(uint8_t)level];
@@ -42,7 +42,8 @@ static const char *eventtypes[]={
 	"DB_LOGOUT",
 	"DB_ERROR",
 	"QUERY",
-	"INTERNAL_ERROR"
+	"INTERNAL_ERROR",
+	"DEBUG_MESSAGE"
 };
 
 const char *sqlrlogger::eventType(sqlrlogger_eventtype_t event) {
