@@ -1230,7 +1230,9 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		semset->dontRemove();
 
 		// re-init loggers
-		sqlrlg->initLoggers(this,NULL);
+		if (sqlrlg) {
+			sqlrlg->initLoggers(this,NULL);
+		}
 
 		clientSession(clientsock);
 
@@ -2243,6 +2245,9 @@ int32_t sqlrlistener::getBusyListeners() {
 }
 
 void sqlrlistener::logDebugMessage(const char *info) {
+	if (!sqlrlg) {
+		return;
+	}
 	sqlrlg->runLoggers(this,NULL,NULL,
 			SQLRLOGGER_LOGLEVEL_DEBUG,
 			SQLRLOGGER_EVENTTYPE_DEBUG_MESSAGE,
