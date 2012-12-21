@@ -243,6 +243,7 @@ class freetdsconnection : public sqlrconnection_svr {
 		void	logOut();
 		const char	*identify();
 		const char	*dbVersion();
+		const char	*dbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(bool wild);
@@ -561,6 +562,10 @@ const char *freetdsconnection::identify() {
 
 const char *freetdsconnection::dbVersion() {
 	return dbversion;
+}
+
+const char *freetdsconnection::dbHostNameQuery() {
+	return "select asehostname()";
 }
 
 const char *freetdsconnection::getDatabaseListQuery(bool wild) {
