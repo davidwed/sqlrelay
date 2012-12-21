@@ -36,6 +36,7 @@ class postgresqlconnection : public sqlrconnection_svr {
 		const char	*dbVersion();
 		const char	*dbHostName();
 		const char	*dbIpAddressQuery();
+		const char	*dbIpAddress();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(bool wild);
@@ -387,6 +388,11 @@ const char *postgresqlconnection::dbHostName() {
 
 const char *postgresqlconnection::dbIpAddressQuery() {
 	return "select inet_server_addr()";
+}
+
+const char *postgresqlconnection::dbIpAddress() {
+	const char	*ipaddress=sqlrconnection_svr::dbIpAddress();
+	return (charstring::length(ipaddress))?ipaddress:"127.0.0.1";
 }
 
 const char *postgresqlconnection::getDatabaseListQuery(bool wild) {
