@@ -35,6 +35,8 @@ class debug : public sqlrlogger {
 		logger			*debuglogger;
 		char			*dbgfilename;
 		const char		*name;
+		bool			loglistener;
+		bool			logconnection;
 };
 
 debug::debug(xmldomnode *parameters) : sqlrlogger(parameters) {
@@ -53,6 +55,19 @@ bool debug::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 
 	closeDebugFile();
 	delete[] dbgfilename;
+
+	// Log listener or connection.
+	// Log both by default, but either can be disabled.
+	loglistener=charstring::compareIgnoringCase(
+			parameters->getAttributeValue("listener"),"no");
+	logconnection=charstring::compareIgnoringCase(
+			parameters->getAttributeValue("connection"),"no");
+	if (sqlrl && !loglistener) {
+		return true;
+	}
+	if (sqlrcon && !logconnection) {
+		return true;
+	}
 
 	// set the debug file name
 	name=(sqlrl)?"listener":"connection";
@@ -85,6 +100,12 @@ bool debug::run(sqlrlistener *sqlrl,
 				sqlrlogger_loglevel_t level,
 				sqlrlogger_eventtype_t event,
 				const char *info) {
+	if (sqlrl && !loglistener) {
+		return true;
+	}
+	if (sqlrcon && !logconnection) {
+		return true;
+	}
 	if (!debuglogger && !openDebugFile()) {
 		return false;
 	}

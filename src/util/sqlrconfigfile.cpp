@@ -54,8 +54,6 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	allowedips=charstring::duplicate(DEFAULT_DENIEDIPS);
 	deniedips=charstring::duplicate(DEFAULT_DENIEDIPS);
 	debug=charstring::duplicate(DEFAULT_DEBUG);
-	debuglistener=charstring::contains(debug,"listener");
-	debugconnection=charstring::contains(debug,"connection");
 	debugtranslations=charstring::contains(debug,"translations");
 	debugtriggers=charstring::contains(debug,"triggers");
 	maxclientinfolength=charstring::toInteger(DEFAULT_MAXCLIENTINFOLENGTH);
@@ -308,14 +306,6 @@ const char *sqlrconfigfile::getDeniedIps() {
 
 const char *sqlrconfigfile::getDebug() {
 	return debug;
-}
-
-bool sqlrconfigfile::getDebugListener() {
-	return debuglistener;
-}
-
-bool sqlrconfigfile::getDebugConnection() {
-	return debugconnection;
 }
 
 bool sqlrconfigfile::getDebugTranslations() {
@@ -1313,10 +1303,6 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			delete[] debug;
 			debug=charstring::duplicate((value)?value:
 							DEFAULT_DEBUG);
-			debuglistener=charstring::contains(debug,
-							"listener");
-			debugconnection=charstring::contains(debug,
-							"connection");
 			debugtranslations=charstring::contains(debug,
 							"translations");
 			debugtriggers=charstring::contains(debug,

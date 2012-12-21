@@ -27,7 +27,7 @@ int32_t getConnections(sqlrconfigfile *cfgfile, bool override) {
 }
 
 bool startListener(const char *id, const char *config,
-			const char *localstatedir, bool listenerdebug) {
+					const char *localstatedir) {
 
 	// start the listener
 	printf("\nStarting listener:\n");
@@ -38,9 +38,6 @@ bool startListener(const char *id, const char *config,
 	command.append(" -config ")->append(config);
 	if (charstring::length(localstatedir)) {
 		command.append(" -localstatedir ")->append(localstatedir);
-	}
-	if (listenerdebug) {
-		command.append(" -debug");
 	}
 	printf("  %s\n",command.getString());
 
@@ -55,8 +52,7 @@ bool startListener(const char *id, const char *config,
 
 
 bool startConnection(bool strace, const char *id, const char *connectionid,
-				const char *config, const char *localstatedir,
-				bool connectiondebug) {
+				const char *config, const char *localstatedir) {
 
 	stringbuffer	command;
 	if (strace) {
@@ -69,9 +65,6 @@ bool startConnection(bool strace, const char *id, const char *connectionid,
 	command.append(" -config ")->append(config);
 	if (charstring::length(localstatedir)) {
 		command.append(" -localstatedir ")->append(localstatedir);
-	}
-	if (connectiondebug) {
-		command.append(" -debug");
 	}
 	if (strace) {
 		command.append(" &");
@@ -91,7 +84,6 @@ bool startConnection(bool strace, const char *id, const char *connectionid,
 bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 				const char *id, const char *config,
 				const char *localstatedir,
-				bool connectiondebug,
 				bool overridemaxconn) {
 
 	// get the connection count and total metric
@@ -106,8 +98,7 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 	// if no connections were defined in the config file,
 	// start 1 default one
 	if (!cfgfile->getConnectionCount()) {
-		return !startConnection(strace,id,config,
-					localstatedir,NULL,connectiondebug);
+		return !startConnection(strace,id,config,localstatedir,NULL);
 	}
 
 	// get number of connections
@@ -148,8 +139,9 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 
 		// fire them up
 		for (int32_t i=0; i<startup; i++) {
-			if (!startConnection(strace,id,csc->getConnectionId(),
-					config,localstatedir,connectiondebug)) {
+			if (!startConnection(strace,id,
+						csc->getConnectionId(),
+						config,localstatedir)) {
 				// it's ok if at least 1 connection started up
 				return (totalstarted>0 || i>0);
 			}
@@ -167,8 +159,8 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 	return true;
 }
 
-bool startScaler(sqlrconfigfile *cfgfile, const char *id, const char *config,
-			const char *localstatedir, bool connectiondebug) {
+bool startScaler(sqlrconfigfile *cfgfile, const char *id,
+			const char *config, const char *localstatedir) {
 
 	// don't start the scalar if unless dynamic scaling is enabled
 	if (!cfgfile->getDynamicScaling()) {
@@ -179,9 +171,6 @@ bool startScaler(sqlrconfigfile *cfgfile, const char *id, const char *config,
 	
 	stringbuffer	command;
 	command.append("sqlr-scaler")->append(" -id ")->append(id);
-	if (connectiondebug) {
-		command.append(" -debug ");
-	}
 	command.append(" -config ")->append(config);
 	if (charstring::length(localstatedir)) {
 		command.append(" -localstatedir ")->append(localstatedir);
@@ -270,13 +259,10 @@ int main(int argc, const char **argv) {
 	}
 
 	// start listener, connections, scaler, cachemanager
-	bool	exitstatus=!(startListener(id,config,
-				localstatedir,cfgfile.getDebugListener()) &&
+	bool	exitstatus=!(startListener(id,config,localstatedir) &&
 			startConnections(&cfgfile,strace,id,config,
-				localstatedir,cfgfile.getDebugConnection(),
-				overridemaxconn) &&
-			startScaler(&cfgfile,id,config,localstatedir,
-				cfgfile.getDebugConnection()) &&
+					localstatedir,overridemaxconn) &&
+			startScaler(&cfgfile,id,config,localstatedir) &&
 			startCacheManager(localstatedir));
 
 	// many thanks...

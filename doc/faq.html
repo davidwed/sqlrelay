@@ -100,6 +100,7 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <li><a href="#cursorgrowth">In sqlrelay.conf, I set the cursors parameter to a small number.  Why does sqlr-status show Opened Server Cursors growing and growing?</a></li>
 <li><a href="#cygwinstart">When using SQL Relay on Cygwin, sqlr-start never returns to a command prompt.  How do I fix that?</a></li>
 <li><a href="#cygwinfork">When using SQL Relay on Cygwin, I get an error like "child_info_fork::abort: ...xxx.dll: Loaded to different address: parent(xxx)!=child(yyy)" and nothing runs.  How do I fix that?</a></li>
+<li><a href="#debug">What happened to the "debug" option?  How do I enable the debug logs?</a></li>
 </ul>
 
 <hr>
@@ -1113,6 +1114,31 @@ additional resource consumption.</p>
 <p>I encountered this problem when building with g++ 4.x with Cygwin 1.7 on Windows 7 and switching to g++ 3.x solved it.</p>
 
 <p>However, there are more common causes and the <a href="http://cygwin.com/faq-nochunks.html#faq.using.fixing-fork-failures">Cygwin FAQ</a> provides a good explanation of them and provides potential solutions.</p>
+
+<br><a name="debug"></a>
+<span class="heading3">What happened to the debug option?  How do I enable the debug logs?</span><br>
+
+<p>Prior to version 0.49, the instance tag of the sqlrelay.conf file had a debug attribute that made it possible to enable debug logs for the listeners and connections.</p>
+
+<p>As of 0.49, this has been replaced by an modular logging framework and the classic debug has been reimplemented as a module.</p>
+
+<p>The modern equivalent configuration to the classic <b>debug="listener and connection"</b> configuration is:</p>
+
+<blockquote>
+<font face="monospace">
+<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;...&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">loggers</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">logger</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;debug&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>listener</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connection</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/logger&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+<font color="#008b8b">&lt;/intstance&gt;</font><br>
+</font>
+</blockquote>
+
+<p>You can disable logging of either listener or connection daemons by setting "no" to "yes".</p>
+
+<p>See <a href="../modules/logger.html">Logger Modules</a> for more information.</p>
 
 </body>
 </html>

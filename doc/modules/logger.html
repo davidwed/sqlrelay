@@ -1,0 +1,75 @@
+<html>
+<head>
+<title>SQL Relay - Extension Modules - Logger</title>
+<link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">Logger Modules</span><br><br>
+
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#available">Available Modules</a></li>
+<li><a href="#custom">Custom Modules</a></li>
+</ul>
+
+<hr>
+
+<br><a name="introduction"></a>
+<span class="heading2">Introduction</span><br>
+
+<p>Logger modules allow the SQL Relay server programs to log various bits of information as they run.</p>
+
+<p>The logging itself is handled via loadable modules.  A section of the sqlrelay.conf file indicates which modules to load and what parameters to use when logging.</p>
+
+<p>For example, to use the <i>debug</i> module, which logs detailed information for debugging purposes, you would include a section in the sqlrelay.conf file like:</p>
+
+<blockquote>
+<font face="monospace">
+<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;...&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">loggers</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">logger</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>module</b></font>=<font color="#ff00ff">&quot;debug&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>listener</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connection</b></font>=<font color="#ff00ff">&quot;yes&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/logger&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+<font color="#008b8b">&lt;/intstance&gt;</font><br>
+</font>
+</blockquote>
+
+<p>The <i>module</i> attribute specifies which module to load.  The <i>listener</i> and <i>connection</i> attributes are parameters for the module.  Different modules may have different parameters, or may have no parameters.  In this case, listener="yes" tells the module to log debug info for the sqlr-listener processes and connection="yes" tells the module to log debug info for the sqlr-connection processes.</p>
+
+<br><a name="available"></a>
+<span class="heading2">Available Modules</span><br>
+
+<p>Currently, the following logger modules are available:</p>
+
+<ul>
+<li>debug</li>
+<li>slowqueries</li>
+<li>custom_nw</li>
+<li>custom_sc</li>
+</ul>
+
+<span class="heading3">debug</span><br>
+
+<p>...</p>
+
+<span class="heading3">slowqueries</span><br>
+
+<p>...</p>
+
+<span class="heading3">custom_nw</span><br>
+
+<p>...</p>
+
+<span class="heading3">custom_sc</span><br>
+
+<p>...</p>
+
+<br><a name="custom"></a>
+<span class="heading2">Custom Modules</span><br>
+
+<p>...</p>
+
+</body>
+</html>

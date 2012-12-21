@@ -210,8 +210,6 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		const char	*getAllowedIps();
 		const char	*getDeniedIps();
 		const char	*getDebug();
-		bool		getDebugListener();
-		bool		getDebugConnection();
 		bool		getDebugTranslations();
 		bool		getDebugTriggers();
 		uint64_t	getMaxClientInfoLength();
@@ -311,8 +309,6 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		char		*allowedips;
 		char		*deniedips;
 		char		*debug;
-		bool		debuglistener;
-		bool		debugconnection;
 		bool		debugtranslations;
 		bool		debugtriggers;
 		uint64_t	maxclientinfolength;

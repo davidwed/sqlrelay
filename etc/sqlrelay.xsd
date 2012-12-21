@@ -80,24 +80,6 @@
       </xs:attribute>
       <xs:attribute name="deniedips" default=""/>
       <xs:attribute name="allowedips" default=""/>
-      <xs:attribute name="debug" default="none">
-        <xs:simpleType>
-          <xs:restriction base="xs:token">
-            <xs:enumeration value="none"/>
-            <xs:enumeration value="listener"/>
-            <xs:enumeration value="connection"/>
-            <xs:enumeration value="translations"/>
-            <xs:enumeration value="triggers"/>
-            <xs:enumeration value="listener_and_connection"/>
-            <xs:enumeration value="listener_and_connection_and_translations"/>
-            <xs:enumeration value="listener_and_connection_and_translations_and_triggers"/>
-            <xs:enumeration value="connection_and_translations"/>
-            <xs:enumeration value="connection_and_translations_and_triggers"/>
-            <xs:enumeration value="connection_and_triggers"/>
-            <xs:enumeration value="translations_and_triggers"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
       <xs:attribute name="maxquerysize" default="65536"/>
       <xs:attribute name="maxstringbindvaluelength" default="4000"/>
       <xs:attribute name="maxlobbindvaluelength" default="71680"/>
