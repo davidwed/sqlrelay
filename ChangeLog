@@ -14,6 +14,7 @@
 		bind cursor under a very specific set of circumstances
 	reorganized server code into libsqlrserver
 	implemented the swisscomm log format as a plugin
+	added dbHostName and dbIpAddress methods to the client API
 
 0.48 - integrated patches from Neowiz for:
 		handling for oracle errors ora-01033, ora-02067 and ora-04068
