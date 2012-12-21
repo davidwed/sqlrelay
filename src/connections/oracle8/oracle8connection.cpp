@@ -807,7 +807,7 @@ bool oracle8connection::logIn(bool printerrors) {
 		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
-	if (cont->dbgfile.debugEnabled()) {
+	if (cont->sqlrlg) {
 		if (OCIAttrGet((dvoid *)svc,OCI_HTYPE_SVCCTX,
 				(dvoid *)&stmtcachesize,(ub4)0,
 				(ub4)OCI_ATTR_STMTCACHESIZE,
@@ -815,8 +815,7 @@ bool oracle8connection::logIn(bool printerrors) {
 			stringbuffer	debugstr;
 			debugstr.append("cache size ");
 			debugstr.append(stmtcachesize);
-			cont->dbgfile.debugPrint("connection",1,
-						debugstr.getString());
+			cont->logDebugMessage(debugstr.getString());
 		}
 	}
 #endif
@@ -1584,7 +1583,7 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 
 		// prepare the query...
 		bool	prepare=true;
-		if (oracle8conn->cont->dbgfile.debugEnabled()) {
+		if (oracle8conn->cont->sqlrlg) {
 			// check for a statment cache hit
 			// and report our findings
 			if (OCIStmtPrepare2(oracle8conn->svc,&stmt,
@@ -1596,15 +1595,13 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 					OCI_SUCCESS) {
 				// we got a hit and don't
 				// need to do anything else
-				oracle8conn->cont->dbgfile.debugPrint(
-							"connection",1,
+				oracle8conn->cont->logDebugMessage(
 							"statement cache hit");
 				prepare=false;
 			} else {
 				// we didn't get a hit and
 				// need to prepare the query
-				oracle8conn->cont->dbgfile.debugPrint(
-							"connection",1,
+				oracle8conn->cont->logDebugMessage(
 							"statement cache miss");
 			}
 		}

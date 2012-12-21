@@ -18,7 +18,6 @@
 #include <rudiments/sharedmemory.h>
 #include <rudiments/semaphoreset.h>
 
-#include <debugfile.h>
 #include <tempdir.h>
 
 #include <sqlrconnection.h>
@@ -371,6 +370,7 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void	incrementGetQueryTreeCount();
 		void	incrementReLogInCount();
 
+		void	logDebugMessage(const char *info);
 		void	logClientConnected();
 		void	logClientConnectionRefused(const char *info);
 		void	logClientDisconnected(const char *info);
@@ -495,9 +495,8 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		bool		decrementonclose;
 		bool		silent;
 
-		stringbuffer	*debugstr;
+		stringbuffer	debugstr;
 
-		debugfile	dbgfile;
 		uint64_t	maxclientinfolength;
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
