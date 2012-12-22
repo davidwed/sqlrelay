@@ -158,7 +158,7 @@ const char *mdbtoolsconnection::dbVersion() {
 }
 
 const char *mdbtoolsconnection::dbHostName() {
-	return system::getHostName();
+	return rudiments::system::getHostName();
 }
 
 bool mdbtoolsconnection::getListsByApiCalls() {
