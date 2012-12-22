@@ -101,6 +101,7 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <li><a href="#cygwinstart">When using SQL Relay on Cygwin, sqlr-start never returns to a command prompt.  How do I fix that?</a></li>
 <li><a href="#cygwinfork">When using SQL Relay on Cygwin, I get an error like "child_info_fork::abort: ...xxx.dll: Loaded to different address: parent(xxx)!=child(yyy)" and nothing runs.  How do I fix that?</a></li>
 <li><a href="#debug">What happened to the "debug" option?  How do I enable the debug logs?</a></li>
+<li><a href="#handoff">Why am I getting "WARNING: unrecognized attribute "handoff" within &gt;instance&lt; tag or section"?</a></li>
 </ul>
 
 <hr>
@@ -1139,6 +1140,11 @@ additional resource consumption.</p>
 <p>You can disable logging of either listener or connection daemons by setting "no" to "yes".</p>
 
 <p>See <a href="../modules/logger.html">Logger Modules</a> for more information.</p>
+
+<br><a name="handoff"></a>
+<span class="heading3">Why am I getting "WARNING: unrecognized attribute "handoff" within &gt;instance&lt; tag or section"?</span><br>
+
+<p>As of version 0.49, SQL Relay does not support the handoff parameter.  In the past, it could be set to either "pass" or "reconnect", "pass" being the preferred option.  To improve performance by reducing client-server round trips, the SQL Relay listener now attempts to pass the file descriptor and if that fails, falls back to proxying the client, ferrying data back and forth between it and the connection daemon.</p>
 
 </body>
 </html>
