@@ -288,26 +288,11 @@ host/port.</p>
 <a name="handoff"></a>
 <span class="heading2">Use File Descriptor Passing</span><br>
 
-<p>SQL Relay has a listener process that waits for incoming clients, then hands
-them off to a seperate process that is already logged into the database when one
-of those processes is available.  The handoff can be done using file descriptor
-passing or by causing the client to disconnect from the listener and reconnect
-to the other process.  File descriptor passing is much faster and uses fewer
-system resources.</p>
+<p>SQL Relay has a listener process that waits for incoming clients, then attempts to hand them off via file descriptor passing to a seperate process that is already logged into the database when one of those processes is available.  If the file descriptor pass fails, then the listener proxys the incoming client, ferrying data back and forth between it and the database connecton process.</p>
 
-<p>In the sqlrelay.conf file, for the instance that is talking to mysql, make
-sure the handoff attribute is set to "pass":
+<p>File descriptor passing is much faster and uses fewer system resources than proxying but it is not supported on all platforms.  Linux kernels prior to 2.2 and the Cygwin environment under Windows, for example, do not support file descriptor passing.  It is likely that other platforms don't as well, especially older platforms.</p>
 
-<blockquote>
-<font color="#008a8c">&lt;</font><font color="#008a8c">instance</font><font color="#008a8c"> </font><font color="#298a52"><b>id</b></font>=<font color="#ff00ff">&quot;mysqltest&quot;</font><font color="#008a8c"> </font><font color="#298a52"><b>port</b></font>=<font color="#ff00ff">&quot;8006&quot;</font><font color="#008a8c"> ... </font><font color="#298a52"><b>handoff</b></font>=<font color="#ff00ff">&quot;pass&quot;</font><font color="#008a8c"> ... &gt;</font>
-</blockquote>
-
-<p>as opposed to:</p>
-
-<blockquote>
-<font color="#008a8c">&lt;</font><font color="#008a8c">instance</font><font color="#008a8c"> </font><font color="#298a52"><b>id</b></font>=<font color="#ff00ff">&quot;mysqltest&quot;</font><font color="#008a8c"> </font><font color="#298a52"><b>port</b></font>=<font color="#ff00ff">&quot;8006&quot;</font><font color="#008a8c"> ... </font><font color="#298a52"><b>handoff</b></font>=<font color="#ff00ff">&quot;reconnect&quot;</font><font color="#008a8c"> ... &gt;</font>
-</blockquote>
-
+<p>If you want the best performance, you must use a platform that supports file descriptor passing.</p>
 
 <br>
 <a name="systemparameters"></a>
