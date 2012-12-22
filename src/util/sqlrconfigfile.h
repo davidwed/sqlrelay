@@ -40,7 +40,6 @@ typedef enum {
 	MAXCURSORS_ATTRIBUTE,
 	CURSORS_GROWBY_ATTRIBUTE,
 	AUTHTIER_ATTRIBUTE,
-	HANDOFF_ATTRIBUTE,
 	DENIEDIPS_ATTRIBUTE,
 	ALLOWEDIPS_ATTRIBUTE,
 	DEBUG_ATTRIBUTE,
@@ -202,11 +201,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		uint16_t	getMaxCursors();
 		uint16_t	getCursorsGrowBy();
 		const char	*getAuthTier();
-		bool		getAuthOnListener();
 		bool		getAuthOnConnection();
 		bool		getAuthOnDatabase();
-		const char	*getHandOff();
-		bool		getPassDescriptor();
 		const char	*getAllowedIps();
 		const char	*getDeniedIps();
 		const char	*getDebug();
@@ -305,7 +301,6 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		bool		authonlistener;
 		bool		authonconnection;
 		bool		authondatabase;
-		char		*handoff;
 		char		*allowedips;
 		char		*deniedips;
 		char		*debug;

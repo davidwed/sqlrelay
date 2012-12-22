@@ -162,16 +162,14 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 		return false;
 	}
 
-	if ((passdescriptor=cfgfl.getPassDescriptor())) {
-		if (!listenOnHandoffSocket(cmdl->getId())) {
-			return false;
-		}
-		if (!listenOnDeregistrationSocket(cmdl->getId())) {
-			return false;
-		}
-		if (!listenOnFixupSocket(cmdl->getId())) {
-			return false;
-		}
+	if (!listenOnHandoffSocket(cmdl->getId())) {
+		return false;
+	}
+	if (!listenOnDeregistrationSocket(cmdl->getId())) {
+		return false;
+	}
+	if (!listenOnFixupSocket(cmdl->getId())) {
+		return false;
 	}
 
 	idleclienttimeout=cfgfl.getIdleClientTimeout();
@@ -299,15 +297,11 @@ void sqlrlistener::handleDynamicScaling() {
 
 void sqlrlistener::setHandoffMethod() {
 
-	// get handoff method
-	if (cfgfl.getPassDescriptor()) {
-
-		// create the list of handoff nodes
-		handoffsocklist=new handoffsocketnode[maxconnections];
-		for (uint32_t i=0; i<maxconnections; i++) {
-			handoffsocklist[i].pid=0;
-			handoffsocklist[i].sock=NULL;
-		}
+	// create the list of handoff nodes
+	handoffsocklist=new handoffsocketnode[maxconnections];
+	for (uint32_t i=0; i<maxconnections; i++) {
+		handoffsocklist[i].pid=0;
+		handoffsocklist[i].sock=NULL;
 	}
 }
 
@@ -935,17 +929,15 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 	//
 	// Either way, handle it and loop back.
 	filedescriptor	*clientsock;
-	if (passdescriptor) {
-		if (fd==handoffsockun) {
-			clientsock=handoffsockun->accept();
-			return registerHandoff(clientsock);
-		} else if (fd==removehandoffsockun) {
-			clientsock=removehandoffsockun->accept();
-			return deRegisterHandoff(clientsock);
-		} else if (fd==fixupsockun) {
-			clientsock=fixupsockun->accept();
-			return fixup(clientsock);
-		}
+	if (fd==handoffsockun) {
+		clientsock=handoffsockun->accept();
+		return registerHandoff(clientsock);
+	} else if (fd==removehandoffsockun) {
+		clientsock=removehandoffsockun->accept();
+		return deRegisterHandoff(clientsock);
+	} else if (fd==fixupsockun) {
+		clientsock=fixupsockun->accept();
+		return fixup(clientsock);
 	}
 
 	// handle connections to the client sockets
@@ -1499,45 +1491,9 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 				// signalAcceptedConnection will get called at
 				// the end, no matter what...
 
-				// if we're passing descriptors around, the
-				// connection will pass its pid to us,
-				// otherwise it will pass its inet and unix
-				// ports
-				if (passdescriptor) {
-
-					logDebugMessage("handoff=pass");
-
-					// get the pid
-					*connectionpid=shm->connectioninfo.
-								connectionpid;
-
-				} else {
-
-					logDebugMessage("handoff=reconnect");
-
-					// get the inet port
-					*inetport=shm->connectioninfo.
-							sockets.inetport;
-
-					// get the unix port
-					charstring::copy(unixportstr,
-							shm->connectioninfo.
-							sockets.unixsocket,
-							MAXPATHLEN);
-					*unixportstrlen=charstring::length(
-								unixportstr);
-
-					// debug...
-					size_t  debugstringlen=
-						15+*unixportstrlen+21;
-					char	*debugstring=
-						new char[debugstringlen];
-					snprintf(debugstring,debugstringlen,
-							"socket=%s  port=%d",
-							unixportstr,*inetport);
-					logDebugMessage(debugstring);
-					delete[] debugstring;
-				}
+				// get the pid
+				*connectionpid=
+					shm->connectioninfo.connectionpid;
 
 				// signal the connection that we waited for
 				ok=doneAcceptingAvailableConnection();
@@ -1610,48 +1566,17 @@ void sqlrlistener::pingDatabase(uint32_t connectionpid,
 					const char *unixportstr,
 					uint16_t inetport) {
 
-	// fork off and cause the connection to ping the database,
-	// this should cause it to reconnect
+	// fork off and tell the connection to reconnect to the database
 	if (process::fork()) {
 		return;
 	}
 
 	isforkedchild=true;
 
-	if (passdescriptor) {
-
-		// send file descriptor 0 to the connection,
-		// it will interpret this as a ping
-		filedescriptor	connectionsock;
-		if (findMatchingSocket(connectionpid,&connectionsock)) {
-			connectionsock.write((uint16_t)HANDOFF_RECONNECT);
-			snooze::macrosnooze(1);
-		}
-
-	} else {
-
-		// connect to the database connection daemon
-		filedescriptor	*connsock=connectToConnection(connectionpid,
-								unixportstr,
-								inetport);
-		if (connsock) {
-
-			// send it a ping command
-			connsock->write((uint16_t)PING);
-			flushWriteBuffer(connsock);
-
-			// get the ping result
-			uint16_t	result=1;
-			if (connsock->read(&result)!=sizeof(uint16_t)) {
-				result=0;
-			}
-
-			// disconnect
-			connsock->close();
-
-			// clean up
-			delete connsock;
-		}
+	filedescriptor	connectionsock;
+	if (findMatchingSocket(connectionpid,&connectionsock)) {
+		connectionsock.write((uint16_t)HANDOFF_RECONNECT);
+		snooze::macrosnooze(1);
 	}
 
 	cleanUp();

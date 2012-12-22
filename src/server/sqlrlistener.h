@@ -117,8 +117,6 @@ class sqlrlistener : public rudiments::daemonprocess,
 		void	logInternalError(const char *info);
 
 	public:
-		bool		passdescriptor;
-
 		uint32_t	maxconnections;
 		bool		dynamicscaling;
 

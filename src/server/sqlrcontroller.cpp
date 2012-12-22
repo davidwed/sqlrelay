@@ -487,12 +487,6 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 
 	markDatabaseAvailable();
 
-	// if we're not passing descriptors around, listen on 
-	// inet and unix sockets for client connections
-	if (!cfgfl->getPassDescriptor() && !openSockets()) {
-		return false;
-	}
-
 	// get the custom query handlers
 	const char	*queries=cfgfl->getQueries();
 	if (charstring::length(queries)) {
@@ -1075,7 +1069,6 @@ bool sqlrcontroller_svr::listen() {
 		waitForAvailableDatabase();
 		initSession();
 		announceAvailability(tmpdir->getString(),
-						cfgfl->getPassDescriptor(),
 						unixsocket,
 						inetport,
 						connectionid);
@@ -1249,16 +1242,15 @@ void sqlrcontroller_svr::initSession() {
 }
 
 void sqlrcontroller_svr::announceAvailability(const char *tmpdir,
-					bool passdescriptor,
 					const char *unixsocket,
 					unsigned short inetport,
 					const char *connectionid) {
 
 	logDebugMessage("announcing availability...");
 
-	// if we're passing around file descriptors, connect to listener 
-	// if we haven't already and pass it this process's pid
-	if (passdescriptor && !connected) {
+	// connect to listener if we haven't already
+	// and pass it this process's pid
+	if (!connected) {
 		registerForHandoff(tmpdir);
 	}
 
@@ -1303,32 +1295,8 @@ void sqlrcontroller_svr::announceAvailability(const char *tmpdir,
 	charstring::copy(idmemoryptr->connectionid,
 				connectionid,MAXCONNECTIONIDLEN);
 
-	// if we're passing descriptors around, write the 
-	// pid to the segment otherwise write ports
-	if (passdescriptor) {
-
-		logDebugMessage("handoff=pass");
-
-		// write the pid into the segment
-		idmemoryptr->connectioninfo.connectionpid=
-						process::getProcessId();
-
-	} else {
-
-		logDebugMessage("handoff=reconnect");
-
-		// convert the port to network byte order and write it into
-		// the segment.
-		idmemoryptr->connectioninfo.sockets.inetport=inetport;
-
-		// write the unix socket name into the segment
-		if (unixsocket && unixsocket[0]) {
-			charstring::copy(idmemoryptr->connectioninfo.
-							sockets.unixsocket,
-							unixsocket,
-							MAXUNIXSOCKETLEN);
-		}
-	}
+	// write the pid into the segment
+	idmemoryptr->connectioninfo.connectionpid=process::getProcessId();
 
 	signalListenerToRead();
 
@@ -1423,7 +1391,7 @@ int32_t sqlrcontroller_svr::waitForClient() {
 	// Unless we're in the middle of a suspended session, if we're passing 
 	// file descriptors around, wait for one to be passed to us, otherwise,
 	// accept on the unix/inet sockets. 
-	if (!suspendedsession && cfgfl->getPassDescriptor()) {
+	if (!suspendedsession) {
 
 		// get what we're supposed to do...
 		uint16_t	command;
@@ -5652,7 +5620,7 @@ void sqlrcontroller_svr::closeSuspendedSessionSockets() {
 	// If we're no longer in a suspended session and we we're passing 
 	// around file descriptors but had to open a set of sockets to handle 
 	// a suspended session, close those sockets here.
-	if (!suspendedsession && cfgfl->getPassDescriptor()) {
+	if (!suspendedsession) {
 		logDebugMessage("closing sockets from a previously "
 						"suspended session...");
 		if (serversockun) {
@@ -5694,9 +5662,7 @@ void sqlrcontroller_svr::closeConnection() {
 	}
 
 	// deregister and close the handoff socket if necessary
-	if (cfgfl->getPassDescriptor()) {
-		deRegisterForHandoff(tmpdir->getString());
-	}
+	deRegisterForHandoff(tmpdir->getString());
 
 	// close the cursors
 	closeCursors(true);

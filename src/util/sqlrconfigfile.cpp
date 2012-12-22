@@ -47,10 +47,8 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	maxcursors=0;
 	cursorsgrowby=charstring::toInteger(DEFAULT_CURSORS_GROWBY);
 	authtier=charstring::duplicate(DEFAULT_AUTHTIER);
-	authonlistener=charstring::contains(authtier,"listener");
-	authonconnection=charstring::contains(authtier,"connection");
+	authonconnection=charstring::compare(authtier,"database");
 	authondatabase=!charstring::compare(authtier,"database");
-	handoff=charstring::duplicate(DEFAULT_HANDOFF);
 	allowedips=charstring::duplicate(DEFAULT_DENIEDIPS);
 	deniedips=charstring::duplicate(DEFAULT_DENIEDIPS);
 	debug=charstring::duplicate(DEFAULT_DEBUG);
@@ -111,7 +109,6 @@ sqlrconfigfile::~sqlrconfigfile() {
 	delete[] runasuser;
 	delete[] runasgroup;
 	delete[] authtier;
-	delete[] handoff;
 	delete[] allowedips;
 	delete[] deniedips;
 	delete[] debug;
@@ -258,42 +255,12 @@ const char *sqlrconfigfile::getAuthTier() {
 	return authtier;
 }
 
-bool sqlrconfigfile::getAuthOnListener() {
-	return authonlistener;
-}
-
 bool sqlrconfigfile::getAuthOnConnection() {
 	return authonconnection;
 }
 
 bool sqlrconfigfile::getAuthOnDatabase() {
 	return authondatabase;
-}
-
-const char *sqlrconfigfile::getHandOff() {
-
-	// on some OS'es, force reconnect, even if pass was specified...
-
-	// get the os and version
-	char	*os=rudiments::system::getOperatingSystemName();
-	char	*rel=rudiments::system::getOperatingSystemRelease();
-	double	ver=charstring::toFloat(rel);
-
-	// force reconnect for Cygwin and Linux < 2.2
-	const char	*retval=handoff;
-	if (!charstring::compare(os,"CYGWIN",6) ||
-		(!charstring::compare(os,"Linux",5) && ver<2.2)) {
-		retval="reconnect";
-	}
-
-	// clean up
-	delete[] os;
-	delete[] rel;
-	return retval;
-}
-
-bool sqlrconfigfile::getPassDescriptor() {
-	return !charstring::compare(getHandOff(),"pass");
 }
 
 const char *sqlrconfigfile::getAllowedIps() {
@@ -921,8 +888,6 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		} else if (!charstring::compare(name,"authtier") ||
 				!charstring::compare(name,"authentication")) {
 			currentattribute=AUTHTIER_ATTRIBUTE;
-		} else if (!charstring::compare(name,"handoff")) {
-			currentattribute=HANDOFF_ATTRIBUTE;
 		} else if (!charstring::compare(name,"deniedips")) {
 			currentattribute=DENIEDIPS_ATTRIBUTE;
 		} else if (!charstring::compare(name,"allowedips")) {
@@ -1281,16 +1246,10 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			delete[] authtier;
 			authtier=charstring::duplicate((value)?value:
 							DEFAULT_AUTHTIER);
-			authonlistener=charstring::contains(authtier,
-								"listener");
-			authonconnection=charstring::contains(authtier,
-								"connection");
 			authondatabase=
 				!charstring::compare(authtier,"database");
-		} else if (currentattribute==HANDOFF_ATTRIBUTE) {
-			delete[] handoff;
-			handoff=charstring::duplicate((value)?value:
-							DEFAULT_HANDOFF);
+			authonconnection=
+				charstring::compare(authtier,"database");
 		} else if (currentattribute==DENIEDIPS_ATTRIBUTE) {
 			delete[] deniedips;
 			deniedips=charstring::duplicate((value)?value:

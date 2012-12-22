@@ -51,7 +51,7 @@
 #define DEFAULT_CURSORS_GROWBY "5"
 	// when we need more cursors, allocate this many more in one shot
 
-#define DEFAULT_AUTHTIER "listener"
+#define DEFAULT_AUTHTIER "connection"
 	// default tier to authenticate users on
 
 #define DEFAULT_HANDOFF "reconnect"

@@ -60,21 +60,11 @@
       <xs:attribute name="cursors" default="5"/>
       <xs:attribute name="maxcursors" default="1300"/>
       <xs:attribute name="cursors_growby" default="5"/>
-      <xs:attribute name="authtier" default="listener">
+      <xs:attribute name="authtier" default="connection">
         <xs:simpleType>
           <xs:restriction base="xs:token">
-            <xs:enumeration value="listener"/>
             <xs:enumeration value="connection"/>
-            <xs:enumeration value="listener_and_connection"/>
             <xs:enumeration value="database"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
-      <xs:attribute name="handoff" default="reconnect">
-        <xs:simpleType>
-          <xs:restriction base="xs:token">
-            <xs:enumeration value="pass"/>
-            <xs:enumeration value="reconnect"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
