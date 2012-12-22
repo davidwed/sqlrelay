@@ -12,7 +12,6 @@
 #define HANDOFF_RECONNECT 1
 
 // client-server protocol...
-#define NO_COMMAND 26
 #define NEW_QUERY 0
 #define FETCH_RESULT_SET 1
 #define ABORT_RESULT_SET 2
@@ -39,6 +38,7 @@
 #define GET_LAST_INSERT_ID 23
 #define BEGIN 24
 #define GET_QUERY_TREE 25
+#define NO_COMMAND 26
 #define DBHOSTNAME 27
 #define DBIPADDRESS 28
 
@@ -150,6 +150,9 @@
 #define SQLR_ERROR_DBSDOWN 900014
 #define SQLR_ERROR_DBSDOWN_STRING \
 	"All databases are currently down."
+#define SQLR_ERROR_LASTINSERTIDNOTSUPPORTED 900015
+#define SQLR_ERROR_LASTINSERTIDNOTSUPPORTED_STRING \
+	"Get last insert id not supported."
 
 // structures...
 enum sqlrconnectionstate_t {

@@ -80,7 +80,6 @@ class sqlrshenv {
 
 		bool		headers;
 		bool		stats;
-		bool		debug;
 		uint64_t	rsbs;
 		bool		final;
 		bool		autocommit;
@@ -92,7 +91,6 @@ class sqlrshenv {
 sqlrshenv::sqlrshenv() {
 	headers=true;
 	stats=true;
-	debug=false;
 	rsbs=100;
 	final=false;
 	autocommit=false;
@@ -201,7 +199,6 @@ class	sqlrsh {
 		void	interactWithUser(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur, sqlrshenv *env);
 		void	prompt(unsigned long promptcount);
-		void	error(const char *errstring);
 
 #ifndef HAVE_READLINE
 		filedescriptor	standardin;
@@ -280,10 +277,7 @@ void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 
 		// error message
 		if (returnerror) {
-			stringbuffer	errmesg;
-			errmesg.append("Couldn't open file: ");
-			errmesg.append(trimmedfilename);
-			error(errmesg.getString());
+			printf("Couldn't open file: %s\n\n",trimmedfilename);
 		}
 	}
 
@@ -465,7 +459,16 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		}
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"currentdb")) {	
-		printf("%s\n",sqlrcon->getCurrentDatabase());
+		const char	*currentdb=sqlrcon->getCurrentDatabase();
+		if (currentdb) {
+			printf("%s\n",currentdb);
+		} else if (sqlrcon->errorMessage()) {
+			displayError(env,NULL,
+					sqlrcon->errorMessage(),
+					sqlrcon->errorNumber());
+		} else {
+			printf("\n");
+		}
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"run",3)) {	
 		ptr=ptr+3;
@@ -578,20 +581,33 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (cmdtype==3) {
 		env->stats=toggle;
 	} else if (cmdtype==4) {
-		env->debug=toggle;
+		if (toggle) {
+			sqlrcon->debugOn();
+		} else {
+			sqlrcon->debugOff();
+		}
 	} else if (cmdtype==5) {
 		env->final=toggle;
 	} else if (cmdtype==7) {
 		env->delimiter=ptr[0];
 		printf("Delimiter set to %c\n",env->delimiter);
 	} else if (cmdtype==8) {
-		printf("Autocommit set ");
 		if (toggle) {
-			sqlrcon->autoCommitOn();
-			printf("on\n");
+			if (sqlrcon->autoCommitOn()) {
+				printf("Autocommit set on\n");
+			} else {
+				displayError(env,NULL,
+					sqlrcon->errorMessage(),
+					sqlrcon->errorNumber());
+			}
 		} else {
-			sqlrcon->autoCommitOff();
-			printf("off\n");
+			if (sqlrcon->autoCommitOff()) {
+				printf("Autocommit set off\n");
+			} else {
+				displayError(env,NULL,
+					sqlrcon->errorMessage(),
+					sqlrcon->errorNumber());
+			}
 		}
 	}
 }
@@ -602,11 +618,6 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 
 	// init stats
 	initStats(env);
-
-	// handle debug
-	if (env->debug) {
-		sqlrcon->debugOn();
-	}
 
 	// handle begin, commit and rollback
 	if (!charstring::compareIgnoringCase(command,"begin")) {
@@ -709,9 +720,6 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			sqlrcon->endSession();
 		}
 	}
-
-	// set debug back off
-	sqlrcon->debugOff();
 
 	// display statistics
 	displayStats(sqlrcur,env);
@@ -1005,8 +1013,16 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, sqlrshenv *env) {
 }
 
 void sqlrsh::ping(sqlrconnection *sqlrcon, sqlrshenv *env) {
-	printf((sqlrcon->ping())?"	The database is up.\n":
-				"	The database is down.\n");
+	bool	result=sqlrcon->ping();
+	if (result) {
+		printf("	The database is up.\n");
+	} else if (sqlrcon->errorMessage()) {
+		displayError(env,NULL,
+				sqlrcon->errorMessage(),
+				sqlrcon->errorNumber());
+	} else {
+		printf("	The database is down.\n");
+	}
 }
 
 bool sqlrsh::lastinsertid(sqlrconnection *sqlrcon, sqlrshenv *env) {
@@ -1020,19 +1036,55 @@ bool sqlrsh::lastinsertid(sqlrconnection *sqlrcon, sqlrshenv *env) {
 }
 
 void sqlrsh::identify(sqlrconnection *sqlrcon, sqlrshenv *env) {
-	printf("%s\n",sqlrcon->identify());
+	const char	*value=sqlrcon->identify();
+	if (value) {
+		printf("%s\n",value);
+	} else if (sqlrcon->errorMessage()) {
+		displayError(env,NULL,
+				sqlrcon->errorMessage(),
+				sqlrcon->errorNumber());
+	} else {
+		printf("\n");
+	}
 }
 
 void sqlrsh::dbversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
-	printf("%s\n",sqlrcon->dbVersion());
+	const char	*value=sqlrcon->dbVersion();
+	if (value) {
+		printf("%s\n",value);
+	} else if (sqlrcon->errorMessage()) {
+		displayError(env,NULL,
+				sqlrcon->errorMessage(),
+				sqlrcon->errorNumber());
+	} else {
+		printf("\n");
+	}
 }
 
 void sqlrsh::dbhostname(sqlrconnection *sqlrcon, sqlrshenv *env) {
-	printf("%s\n",sqlrcon->dbHostName());
+	const char	*value=sqlrcon->dbHostName();
+	if (value) {
+		printf("%s\n",value);
+	} else if (sqlrcon->errorMessage()) {
+		displayError(env,NULL,
+				sqlrcon->errorMessage(),
+				sqlrcon->errorNumber());
+	} else {
+		printf("\n");
+	}
 }
 
 void sqlrsh::dbipaddress(sqlrconnection *sqlrcon, sqlrshenv *env) {
-	printf("%s\n",sqlrcon->dbIpAddress());
+	const char	*value=sqlrcon->dbIpAddress();
+	if (value) {
+		printf("%s\n",value);
+	} else if (sqlrcon->errorMessage()) {
+		displayError(env,NULL,
+				sqlrcon->errorMessage(),
+				sqlrcon->errorNumber());
+	} else {
+		printf("\n");
+	}
 }
 
 void sqlrsh::clientversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
@@ -1040,7 +1092,16 @@ void sqlrsh::clientversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
 }
 
 void sqlrsh::serverversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
-	printf("%s\n",sqlrcon->serverVersion());
+	const char	*value=sqlrcon->serverVersion();
+	if (value) {
+		printf("%s\n",value);
+	} else if (sqlrcon->errorMessage()) {
+		displayError(env,NULL,
+				sqlrcon->errorMessage(),
+				sqlrcon->errorNumber());
+	} else {
+		printf("\n");
+	}
 }
 
 void sqlrsh::inputbind(sqlrcursor *sqlrcur,
@@ -1443,12 +1504,6 @@ void sqlrsh::prompt(unsigned long promptcount) {
 
 	printf("%ld> ",promptcount);
 	fflush(stdout);
-}
-
-void sqlrsh::error(const char *errstring) {
-
-	// print the error
-	printf("%s\n\n",errstring);
 }
 
 void sqlrsh::execute(int argc, const char **argv) {

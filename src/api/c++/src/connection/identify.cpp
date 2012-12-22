@@ -10,39 +10,48 @@ const char *sqlrconnection::identify() {
 		return NULL;
 	}
 
+	clearError();
+
 	if (debug) {
 		debugPreStart();
-		debugPrint("Identifying...");
-		debugPrint("\n");
+		debugPrint("Identifying...\n");
 		debugPreEnd();
 	}
 
+	// tell the server we want the identity of the db
 	cs->write((uint16_t)IDENTIFY);
 	flushWriteBuffer();
 
-	// get the id
+	if (gotError()) {
+		return NULL;
+	}
+
+	// get the identity size
 	uint16_t	size;
 	if (cs->read(&size,responsetimeoutsec,
-				responsetimeoutusec)==sizeof(uint16_t)) {
-		delete[] id;
-		id=new char[size+1];
-		if (cs->read(id,size)!=size) {
-			setError("Failed to identify.\n A network error may have ocurred.");
-			delete[] id;
-			id=NULL;
-			return NULL;
-		}
-		id[size]='\0';
-
-		if (debug) {
-			debugPreStart();
-			debugPrint(id);
-			debugPrint("\n");
-			debugPreEnd();
-		}
-	} else {
-		setError("Failed to identify.\n A network error may have ocurred.");
+				responsetimeoutusec)!=sizeof(uint16_t)) {
+		setError("Failed to identify.\n "
+			"A network error may have ocurred.");
 		return NULL;
+	}
+
+	// get the identity
+	delete[] id;
+	id=new char[size+1];
+	if (cs->read(id,size)!=size) {
+		setError("Failed to identify.\n "
+			"A network error may have ocurred.");
+		delete[] id;
+		id=NULL;
+		return NULL;
+	}
+	id[size]='\0';
+
+	if (debug) {
+		debugPreStart();
+		debugPrint(id);
+		debugPrint("\n");
+		debugPreEnd();
 	}
 	return id;
 }

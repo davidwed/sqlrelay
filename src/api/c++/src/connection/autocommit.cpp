@@ -18,41 +18,18 @@ bool sqlrconnection::autoCommit(bool on) {
 		return false;
 	}
 
+	clearError();
+
 	if (debug) {
 		debugPreStart();
-		debugPrint("Setting AutoCommit");
-		if (on) {
-			debugPrint("on");
-		} else {
-			debugPrint("off");
-		}
-		debugPrint("...\n");
+		debugPrint((on)?"Setting autocommit on\n":
+				"Setting autocommit off\n");
 		debugPreEnd();
 	}
 
 	cs->write((uint16_t)AUTOCOMMIT);
 	cs->write(on);
-
 	flushWriteBuffer();
 
-	bool	response;
-	if (cs->read(&response,responsetimeoutsec,
-				responsetimeoutusec)!=sizeof(bool)) {
-		if (!on) {
-			setError("Failed to set autocommit off.\n A network error may have ocurred.");
-		} else {
-			setError("Failed to set autocommit on.\n A network error may have ocurred.");
-		}
-		return false;
-	}
-
-	if (!response) {
-		if (!on) {
-			setError("Failed to set autocommit off.");
-		} else {
-			setError("Failed to set autocommit on.");
-		}
-	}
-
-	return response;
+	return !gotError();
 }

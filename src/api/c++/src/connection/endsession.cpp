@@ -15,6 +15,7 @@ void sqlrconnection::endSession() {
 	// abort each cursor's result set
 	sqlrcursor	*currentcursor=firstcursor;
 	while (currentcursor) {
+		// FIXME: do we need to clearResultSet() here too?
 		if (!currentcursor->endofresultset) {
 			currentcursor->closeResultSet(false);
 		}

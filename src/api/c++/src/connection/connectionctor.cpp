@@ -61,7 +61,6 @@ void sqlrconnection::init(const char *server, uint16_t port,
 			(char *)password;
 	userlen=charstring::length(user);
 	passwordlen=charstring::length(password);
-	reconnect=false;
 
 	// database id
 	id=NULL;

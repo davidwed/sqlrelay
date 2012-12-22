@@ -1,6 +1,7 @@
 // Copyright (c) 2012  David Muse
 // See the file COPYING for more information
 
+#include <sqlrlistener.h>
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
@@ -12,7 +13,6 @@
 #include <rudiments/permissions.h>
 #include <rudiments/filesystem.h>
 #include <rudiments/stringbuffer.h>
-#include <debugprint.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
@@ -48,7 +48,11 @@ slowqueries::~slowqueries() {
 }
 
 bool slowqueries::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
-	debugFunction();
+
+	// don't log anything for the listener
+	if (!sqlrcon) {
+		return true;
+	}
 
 	// get the pid
 	pid_t	pid=process::getProcessId();
@@ -98,7 +102,11 @@ bool slowqueries::run(sqlrlistener *sqlrl,
 				sqlrlogger_loglevel_t level,
 				sqlrlogger_eventtype_t event,
 				const char *info) {
-	debugFunction();
+
+	// don't log anything for the listener
+	if (!sqlrcon) {
+		return true;
+	}
 
 	// don't do anything unless we got INFO/QUERY
 	if (level!=SQLRLOGGER_LOGLEVEL_INFO ||

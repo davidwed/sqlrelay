@@ -10,6 +10,8 @@ const char *sqlrconnection::dbVersion() {
 		return NULL;
 	}
 
+	clearError();
+
 	if (debug) {
 		debugPreStart();
 		debugPrint("DB Version...");
@@ -17,32 +19,40 @@ const char *sqlrconnection::dbVersion() {
 		debugPreEnd();
 	}
 
+	// tell the server we want the db version
 	cs->write((uint16_t)DBVERSION);
 	flushWriteBuffer();
 
-	// get the dbversion
+	if (gotError()) {
+		return NULL;
+	}
+
+	// get the db version size
 	uint16_t	size;
 	if (cs->read(&size,responsetimeoutsec,
-				responsetimeoutusec)==sizeof(uint16_t)) {
-		delete[] dbversion;
-		dbversion=new char[size+1];
-		if (cs->read(dbversion,size)!=size) {
-			setError("Failed to get DB version.\n A network error may have ocurred.");
-			delete[] dbversion;
-			dbversion=NULL;
-			return NULL;
-		}
-		dbversion[size]='\0';
-
-		if (debug) {
-			debugPreStart();
-			debugPrint(dbversion);
-			debugPrint("\n");
-			debugPreEnd();
-		}
-	} else {
-		setError("Failed to get DB version.\n A network error may have ocurred.");
+				responsetimeoutusec)!=sizeof(uint16_t)) {
+		setError("Failed to get DB version.\n "
+			"A network error may have ocurred.");
 		return NULL;
+	} 
+
+	// get the db version
+	delete[] dbversion;
+	dbversion=new char[size+1];
+	if (cs->read(dbversion,size)!=size) {
+		setError("Failed to get DB version.\n "
+			"A network error may have ocurred.");
+		delete[] dbversion;
+		dbversion=NULL;
+		return NULL;
+	}
+	dbversion[size]='\0';
+
+	if (debug) {
+		debugPreStart();
+		debugPrint(dbversion);
+		debugPrint("\n");
+		debugPreEnd();
 	}
 	return dbversion;
 }

@@ -10,6 +10,8 @@ bool sqlrconnection::selectDatabase(const char *database) {
 		return true;
 	}
 
+	clearError();
+
 	if (!openSession()) {
 		return 0;
 	}
@@ -31,41 +33,9 @@ bool sqlrconnection::selectDatabase(const char *database) {
 	if (len) {
 		cs->write(database,len);
 	}
-
 	flushWriteBuffer();
 
-	// get the result
-	bool	result;
-	if (cs->read(&result,responsetimeoutsec,
-				responsetimeoutusec)!=sizeof(bool)) {
-		debugPrint("Error selecting database.\n");
-		setError("Failed to select database.\n "
-				"A network error may have ocurred.");
-		return false;
-	}
-
-	// if there was an error, get the error
-	if (!result) {
-
-		uint16_t	errorlength;
-		cs->read(&errorlength);
-
-		delete[] error;
-		error=new char[errorlength+1];
-		cs->read(error,errorlength);
-		error[errorlength]='\0';
-
-		if (debug) {
-			debugPrint("Selecting database failed: ");
-			debugPrint(error);
-			debugPrint("\n");
-		}
-
-	} else if (debug) {
-		debugPrint("Selecting database succeeded\n");
-	}
-
-	return result;
+	return !gotError();
 }
 
 const char *sqlrconnection::getCurrentDatabase() {
@@ -73,6 +43,8 @@ const char *sqlrconnection::getCurrentDatabase() {
 	if (!openSession()) {
 		return NULL;
 	}
+
+	clearError();
 
 	if (debug) {
 		debugPreStart();
@@ -86,29 +58,36 @@ const char *sqlrconnection::getCurrentDatabase() {
 	cs->write((uint16_t)GET_CURRENT_DATABASE);
 	flushWriteBuffer();
 
-	// get the current db name
+	if (gotError()) {
+		return NULL;
+	}
+
+	// get the current db name size
 	uint16_t	size;
 	if (cs->read(&size,responsetimeoutsec,
-				responsetimeoutusec)==sizeof(uint16_t)) {
-		delete[] currentdbname;
-		currentdbname=new char[size+1];
-		if (cs->read(currentdbname,size)!=size) {
-			setError("Failed to get the current database.\n A network error may have ocurred.");
-			delete[] currentdbname;
-			currentdbname=NULL;
-			return NULL;
-		}
-		currentdbname[size]='\0';
-
-		if (debug) {
-			debugPreStart();
-			debugPrint(currentdbname);
-			debugPrint("\n");
-			debugPreEnd();
-		}
-	} else {
-		setError("Failed to get the current database.\n A network error may have ocurred.");
+				responsetimeoutusec)!=sizeof(uint16_t)) {
+		setError("Failed to get the current database.\n "
+				"A network error may have ocurred.");
 		return NULL;
+	}
+
+	// get the current db name
+	delete[] currentdbname;
+	currentdbname=new char[size+1];
+	if (cs->read(currentdbname,size)!=size) {
+		setError("Failed to get the current database.\n "
+				"A network error may have ocurred.");
+		delete[] currentdbname;
+		currentdbname=NULL;
+		return NULL;
+	}
+	currentdbname[size]='\0';
+
+	if (debug) {
+		debugPreStart();
+		debugPrint(currentdbname);
+		debugPrint("\n");
+		debugPreEnd();
 	}
 	return currentdbname;
 }

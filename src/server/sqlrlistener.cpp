@@ -33,7 +33,6 @@ sqlrlistener::sqlrlistener() : daemonprocess(), listener() {
 	init=false;
 
 	authc=NULL;
-	sqlrpe=NULL;
 
 	semset=NULL;
 	idmemory=NULL;
@@ -51,8 +50,6 @@ sqlrlistener::sqlrlistener() : daemonprocess(), listener() {
 	mysqlclientsockincount=0;
 	mysqlclientsockun=NULL;
 	mysqlunixport=NULL;
-
-	sessiontype=SQLRELAY_CLIENT_SESSION_TYPE;
 
 	handoffsockun=NULL;
 	removehandoffsockun=NULL;
@@ -91,7 +88,6 @@ sqlrlistener::~sqlrlistener() {
 
 void sqlrlistener::cleanUp() {
 
-	delete sqlrpe;
 	delete authc;
 	delete[] unixport;
 	delete[] pidfile;
@@ -152,16 +148,6 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 	handleDynamicScaling();
 
 	setHandoffMethod();
-
-	sqlrpe=NULL;
-	if (cfgfl.getAuthOnListener()) {
-		const char	*pwdencs=cfgfl.getPasswordEncryptions();
-		if (charstring::length(pwdencs)) {
-			sqlrpe=new sqlrpwdencs;
-			sqlrpe->loadPasswordEncryptions(pwdencs);
-		}
-		authc=new sqlrauthenticator(&cfgfl,sqlrpe);
-	}
 
 	const char	*loggers=cfgfl.getLoggers();
 	if (charstring::length(loggers)) {
@@ -962,9 +948,6 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 		}
 	}
 
-	// init session type
-	sessiontype=SQLRELAY_CLIENT_SESSION_TYPE;
-
 	// handle connections to the client sockets
 	inetserversocket	*iss=NULL;
 	for (uint64_t index=0; index<clientsockincount; index++) {
@@ -975,7 +958,6 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 	for (uint64_t index=0; index<mysqlclientsockincount; index++) {
 		if (fd==mysqlclientsockin[index]) {
 			iss=mysqlclientsockin[index];
-			sessiontype=MYSQL_CLIENT_SESSION_TYPE;
 		}
 	}
 	if (iss) {
@@ -997,13 +979,12 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 	} else if (fd==mysqlclientsockun) {
 		clientsock=mysqlclientsockun->accept();
 		clientsock->translateByteOrder();
-		sessiontype=MYSQL_CLIENT_SESSION_TYPE;
 	} else {
 		return true;
 	}
 
 	clientsock->dontUseNaglesAlgorithm();
-	// FIXME: use bandwidth delay product to tune these
+	// FIXME: make these buffer sizes configurable
 	// SO_SNDBUF=0 causes no data to ever be sent on openbsd
 	//clientsock->setTcpReadBufferSize(8192);
 	//clientsock->setTcpWriteBufferSize(0);
@@ -1181,15 +1162,14 @@ void sqlrlistener::errorClientSession(filedescriptor *clientsock,
 							int64_t errnum,
 							const char *err) {
 	// get auth and ignore the result
-	getAuth(clientsock);
 	clientsock->write((uint16_t)ERROR_OCCURRED);
 	clientsock->write((uint64_t)errnum);
 	clientsock->write((uint16_t)charstring::length(err));
 	clientsock->write(err);
 	flushWriteBuffer(clientsock);
-	// FIXME: if we got -1 from getAuth, then the client may be
-	// spewing garbage and we should close the connection...
-	waitForClientClose(0,false,clientsock);
+	// FIXME: hmm, if the client is just spewing
+	// garbage then we should close the connection...
+	waitForClientClose(false,clientsock);
 	delete clientsock;
 }
 
@@ -1262,256 +1242,25 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 
 void sqlrlistener::clientSession(filedescriptor *clientsock) {
 
-	switch (sessiontype) {
-		case SQLRELAY_CLIENT_SESSION_TYPE:
-			sqlrelayClientSession(clientsock);
-			break;
-		case MYSQL_CLIENT_SESSION_TYPE:
-			mysqlClientSession(clientsock);
-			break;
+	if (dynamicscaling) {
+		incrementConnectedClientCount();
 	}
 
-	delete clientsock;
+	bool	passstatus=handOffOrProxyClient(clientsock);
+
+	// If the handoff failed, decrement the connected client count.
+	// If it had succeeded then the connection daemon would
+	// decrement it later.
+	if (dynamicscaling && !passstatus) {
+		decrementConnectedClientCount();
+	}
+
+	// FIXME: hmm, if the client is just spewing
+	// garbage then we should close the connection...
+	waitForClientClose(passstatus,clientsock);
 }
 
-void sqlrlistener::sqlrelayClientSession(filedescriptor *clientsock) {
-
-	bool	passstatus=false;
-
-	// handle authentication
-	int32_t	authstatus=getAuth(clientsock);
-
-	// 3 possible outcomes: 1=pass 0=fail -1=bad data
-	if (authstatus==1) {
-
-		if (dynamicscaling) {
-			incrementConnectedClientCount();
-		}
-		passstatus=handOffClient(clientsock);
-
-		// If the handoff failed, decrement the connected client count.
-		// If it had succeeded then the connection daemon would
-		// decrement it later.
-		if (dynamicscaling && !passstatus) {
-			decrementConnectedClientCount();
-		}
-
-	} else if (authstatus==0) {
-
-		logDebugMessage("sending client auth error");
-
-		// snooze before and after returning an
-		// authentication error to discourage
-		// brute-force password attacks
-		snooze::macrosnooze(2);
-		clientsock->write((uint16_t)ERROR_OCCURRED);
-		clientsock->write((uint64_t)SQLR_ERROR_AUTHENTICATIONERROR);
-		clientsock->write((uint16_t)charstring::length(
-				SQLR_ERROR_AUTHENTICATIONERROR_STRING));
-		clientsock->write(SQLR_ERROR_AUTHENTICATIONERROR_STRING);
-		flushWriteBuffer(clientsock);
-		snooze::macrosnooze(2);
-	}
-
-	// FIXME: if we got -1 from getAuth, then the client may be spewing
-	// garbage and we should close the connection...
-	waitForClientClose(authstatus,passstatus,clientsock);
-}
-
-void sqlrlistener::mysqlClientSession(filedescriptor *clientsock) {
-
-	bool	passstatus=false;
-
-	// handle authentication
-	int32_t	authstatus=getMySQLAuth(clientsock);
-
-	// 3 possible outcomes: 1=pass 0=fail -1=bad data
-	if (authstatus==1) {
-
-		if (dynamicscaling) {
-			incrementConnectedClientCount();
-		}
-		passstatus=handOffClient(clientsock);
-
-	} else if (authstatus==0) {
-
-		logDebugMessage("sending client auth error");
-
-		// snooze before and after returning an
-		// authentication error to discourage
-		// brute-force password attacks
-		snooze::macrosnooze(2);
-		// FIXME: send error using mysql protocol
-		//clientsock->write(...);
-		flushWriteBuffer(clientsock);
-		snooze::macrosnooze(2);
-	}
-
-	// FIXME: if we got -1 from getAuth, then the client may be spewing
-	// garbage and we should close the connection...
-
-	// FIXME: waitForClientClose probably isn't right for mysql
-	waitForClientClose(authstatus,passstatus,clientsock);
-}
-
-int32_t sqlrlistener::getAuth(filedescriptor *clientsock) {
-
-	logDebugMessage("getting authentication...");
-
-	// get the user...
-	uint32_t	size=0;
-	ssize_t		result=clientsock->read(&size,idleclienttimeout,0);
-	if (result!=sizeof(uint32_t)) {
-		logClientProtocolError("authentication failed: "
-					"failed to get user size",result);
-		return -1;
-	}
-	char	userbuffer[USERSIZE];
-	if (size>=sizeof(userbuffer)) {
-		stringbuffer	info;
-		info.append("authentication failed: user size too long: ");
-		info.append(size);
-		logClientConnectionRefused(info.getString());
-		return -1;
-	}
-	result=clientsock->read(userbuffer,size,idleclienttimeout,0);
-	if ((uint32_t)result!=size) {
-		logClientProtocolError("authentication failed: "
-					"failed to get user",result);
-		return -1;
-	}
-	userbuffer[size]='\0';
-
-	// get the password...
-	result=clientsock->read(&size,idleclienttimeout,0);
-	if (result!=sizeof(uint32_t)) {
-		logClientProtocolError("authentication failed: "
-					"failed to get password size",result);
-		return -1;
-	}
-	char	passwordbuffer[USERSIZE];
-	if (size>=sizeof(passwordbuffer)) {
-		stringbuffer	info;
-		info.append("authentication failed: password size too long: ");
-		info.append(size);
-		logClientConnectionRefused(info.getString());
-		return -1;
-	}
-	result=clientsock->read(passwordbuffer,size,idleclienttimeout,0);
-	if ((uint32_t)result!=size) {
-		logClientProtocolError("authentication failed: "
-					"failed to get password",result);
-		return -1;
-	}
-	passwordbuffer[size]='\0';
-
-	// If the listener is supposed to authenticate, then do so, otherwise
-	// just return 1 as if authentication succeeded.
-	if (authc) {
-
-		// Return 1 if what the client sent matches one of the
-		// user/password sets and 0 if no match is found.
-		bool	retval=authc->authenticate(userbuffer,passwordbuffer);
-		if (retval) {
-			logDebugMessage("auth succeeded on listener");
-		} else {
-			logClientConnectionRefused(
-					"auth failed on listener: "
-					"invalid user/password");
-		}
-		return (retval)?1:0;
-	}
-
-	logDebugMessage("finished getting authentication");
-
-	return 1;
-}
-
-// MySQL server/client capabilities
-#define CLIENT_LONG_PASSWORD	1	/* new more secure passwords */
-#define CLIENT_FOUND_ROWS	2	/* Found instead of affected rows */
-#define CLIENT_LONG_FLAG	4	/* Get all column flags */
-#define CLIENT_CONNECT_WITH_DB	8	/* One can specify db on connect */
-#define CLIENT_NO_SCHEMA	16	/* Don't allow database.table.column */
-#define CLIENT_COMPRESS		32	/* Can use compression protocol */
-#define CLIENT_ODBC		64	/* Odbc client */
-#define CLIENT_LOCAL_FILES	128	/* Can use LOAD DATA LOCAL */
-#define CLIENT_IGNORE_SPACE	256	/* Ignore spaces before '(' */
-#define CLIENT_PROTOCOL_41	512	/* New 4.1 protocol */
-#define CLIENT_INTERACTIVE	1024	/* This is an interactive client */
-#define CLIENT_SSL		2048	/* Switch to SSL after handshake */
-#define CLIENT_IGNORE_SIGPIPE	4096	/* IGNORE sigpipes */
-#define CLIENT_TRANSACTIONS	8192	/* Client knows about transactions */
-#define CLIENT_RESERVED		16384	/* Old flag for 4.1 protocol  */
-#define CLIENT_SECURE_CONNECTION	32768	/* New 4.1 authentication */
-#define CLIENT_MULTI_STATEMENTS	65536	/* Enable/disable multi-stmt support */
-#define CLIENT_MULTI_RESULTS	131072	/* Enable/disable multi-results */
-
-int32_t sqlrlistener::getMySQLAuth(filedescriptor *clientsock) {
-
-	// send handshake initialization packet...
-
-	// protocol version
-	clientsock->write((char)10);
-
-	// server version
-	clientsock->write("5.1.0",6);
-
-	// thread id
-	clientsock->write((uint32_t)0);
-
-	// scramble buf (part 1)
-	clientsock->write("00000000",8);
-	
-	// filler
-	clientsock->write((char)0);
-	
-	// define the server capabilities
-	union servercap_t {
-		uint32_t	together;
-		struct {
-			uint16_t	lower;
-			uint16_t	upper;
-		} split;
-	};
-	union servercap_t	servercap;
-	servercap.together=0;
-
-	// server capabilities (two lower bytes)
-	clientsock->write(servercap.split.lower);
-	
-	// server language
-	clientsock->write((char)1);
-	
-	// server status
-	clientsock->write((uint16_t)0);
-	
-	// server capabilities (two upper bytes)
-	clientsock->write(servercap.split.upper);
-	
-	// length of scramble buf part 2
-	clientsock->write((char)8);
-	
-	// filler
-	clientsock->write("\0\0\0\0\0\0\0\0\0\0",10);
-	
-	// scramble buf (part 2)
-	clientsock->write("00000000",8);
-	
-	// null terminator
-	clientsock->write((char)0);
-
-	// get client authentication packet...
-	uint16_t	clientflags1;
-	clientsock->read(&clientflags1);
-	
-
-	// send ok/error packet...
-
-	return 0;
-}
-
-bool sqlrlistener::handOffClient(filedescriptor *sock) {
+bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock) {
 
 	uint32_t	connectionpid;
 	uint16_t	inetport;
@@ -1530,59 +1279,46 @@ bool sqlrlistener::handOffClient(filedescriptor *sock) {
 			break;
 		}
 
-		// if we're passing file descriptors around,
-		// tell the client not to reconnect and pass
-		// the descriptor to the appropriate database
-		// connection daemon, otherwise tell the client
-		// to reconnect and which ports to do it on
-		if (passdescriptor) {
+		// Get the socket associated with the pid of the
+		// available connection.
+		filedescriptor	connectionsock;
+		if (!findMatchingSocket(connectionpid,&connectionsock)) {
+			// FIXME: should there be a limit to the number
+			// of times we retry?
+			continue;
+		}
 
-			// Get the socket associated with the pid of the
-			// available connection and pass the client to the
-			// connection.  If any of this fails, the connection
-			// may have crashed or been killed.  Loop back and get
-			// another connection.
-			filedescriptor	connectionsock;
-			if (!findMatchingSocket(connectionpid,
-						&connectionsock) ||
-				!passClientFileDescriptorToConnection(
-						&connectionsock,
-						sock->getFileDescriptor())) {
+		// Pass the client to the connection.  If any of this
+		// fails, the connection may have crashed or been
+		// killed.  Loop back and get another connection...
 
+		// tell the connection we're passing it a file descriptor
+		connectionsock.write((uint16_t)HANDOFF_PASS);
+
+		// pass the file descriptor
+		retval=connectionsock.passFileDescriptor(
+					sock->getFileDescriptor());
+		if (!retval) {
+			logInternalError("failed to pass file descriptor, "
+							"attempting proxy");
+			retval=proxyClient(&connectionsock,sock);
+			if (!retval) {
+				logInternalError("failed to proxy client");
 				// FIXME: should there be a limit to the number
 				// of times we retry?
 				continue;
 			}
-
-			// Set the file descriptor to -1 here, otherwise it
-			// will get closed when connectionsock is freed.  If
-			// the file descriptor gets closed, the next time we
-			// try to pass a file descriptor to the same connection,
-			// it will fail.
-			connectionsock.setFileDescriptor(-1);
-
-			// if we got this far, everything has worked,
-			// inform the client...
-			sock->write((uint16_t)NO_ERROR_OCCURRED);
-			sock->write((uint16_t)DONT_RECONNECT);
-			flushWriteBuffer(sock);
-			retval=true;
-			break;
-
-		} else {
-
-			// FIXME: if we're not passing around file descriptors,
-			// how can we deterimine if a connection has crashed
-			// or been killed?
-			sock->write((uint16_t)NO_ERROR_OCCURRED);
-			sock->write((uint16_t)RECONNECT);
-			sock->write(unixportstrlen);
-			sock->write(unixportstr);
-			sock->write((uint16_t)inetport);
-			flushWriteBuffer(sock);
-			retval=true;
-			break;
 		}
+
+		// If we got this far, everything worked.
+		retval=true;
+		
+		// Set the file descriptor to -1, otherwise it will get closed
+		// when connectionsock is freed.  If the file descriptor gets
+		// closed, the next time we try to pass a file descriptor to
+		// the same connection, it will fail.
+		connectionsock.setFileDescriptor(-1);
+		break;
 	}
 
 	return retval;
@@ -1764,8 +1500,8 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 				// the end, no matter what...
 
 				// if we're passing descriptors around, the
-				// connection will pass it's pid to us,
-				// otherwise it will pass it's inet and unix
+				// connection will pass its pid to us,
+				// otherwise it will pass its inet and unix
 				// ports
 				if (passdescriptor) {
 
@@ -1945,28 +1681,6 @@ filedescriptor *sqlrlistener::connectToConnection(uint32_t connectionpid,
 	return NULL;
 }
 
-bool sqlrlistener::passClientFileDescriptorToConnection(
-					filedescriptor *connectionsock,
-					int fd) {
-
-	logDebugMessage("passing descriptor...");
-
-	// tell the connection we're passing a file descriptor
-	if (connectionsock->write((uint16_t)HANDOFF_PASS)!=sizeof(uint16_t)) {
-		logInternalError("handoff failed to pass command");
-		return false;
-	}
-
-	// pass the file descriptor
-	if (!connectionsock->passFileDescriptor(fd)) {
-		logInternalError("handoff failed to pass file descriptor");
-		return false;
-	}
-
-	logDebugMessage("finished passing descriptor");
-	return true;
-}
-
 bool sqlrlistener::findMatchingSocket(uint32_t connectionpid,
 					filedescriptor *connectionsock) {
 
@@ -2019,33 +1733,30 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 	return true;
 }
 
-void sqlrlistener::waitForClientClose(int32_t authstatus, bool passstatus,
-						filedescriptor *clientsock) {
+bool sqlrlistener::proxyClient(filedescriptor *serversock,
+				filedescriptor *clientsock) {
+	return false;
+}
+
+void sqlrlistener::waitForClientClose(bool passstatus,
+					filedescriptor *clientsock) {
 
 	// Sometimes the listener sends the ports and closes
 	// the socket while they are still buffered but not
 	// yet transmitted.  This causes the client to receive
 	// partial data or an error.  Telling the socket to
 	// linger doesn't always fix it.  Doing a read here
-	// should guarantee that the client will close it's end
-	// of the connection before the server closes it's end;
+	// should guarantee that the client will close its end
+	// of the connection before the server closes its end;
 	// the server will wait for data from the client
 	// (which it will never receive) and when the client
-	// closes it's end (which it will only do after getting
+	// closes its end (which it will only do after getting
 	// the ports), the read will fall through.  This should
 	// guarantee that the client will get the ports without
 	// requiring the client to send data back indicating so.
 
 	uint16_t	dummy;
-	if (!passdescriptor || (passdescriptor && authstatus<1)) {
-
-		// If we're not passing descriptors or if
-		// we are but authentication failed, the client
-		// shouldn't be sending any data, so a single
-		// read should suffice.
-		clientsock->read(&dummy,idleclienttimeout,0);
-
-	} else if (!passstatus) {
+	if (!passstatus) {
 
 		// If the descriptor pass failed, the client
 		// cound send an entire query and bind vars
@@ -2059,36 +1770,36 @@ void sqlrlistener::waitForClientClose(int32_t authstatus, bool passstatus,
 		uint32_t	counter=0;
 		clientsock->useNonBlockingMode();
 		while (clientsock->read(&dummy,idleclienttimeout,0)>0 &&
-				counter<
-				// sending auth
-				(sizeof(uint16_t)+
-				// user/password
-				2*(sizeof(uint32_t)+USERSIZE)+
-				// sending query
-				sizeof(uint16_t)+
-				// need a cursor
-				sizeof(uint16_t)+
-				// executing new query
-				sizeof(uint16_t)+
-				// query size and query
-				sizeof(uint32_t)+maxquerysize+
-				// input bind var count
-				sizeof(uint16_t)+
-				// input bind vars
-				maxbindcount*(2*sizeof(uint16_t)+
+					counter<
+					// sending auth
+					(sizeof(uint16_t)+
+					// user/password
+					2*(sizeof(uint32_t)+USERSIZE)+
+					// sending query
+					sizeof(uint16_t)+
+					// need a cursor
+					sizeof(uint16_t)+
+					// executing new query
+					sizeof(uint16_t)+
+					// query size and query
+					sizeof(uint32_t)+maxquerysize+
+					// input bind var count
+					sizeof(uint16_t)+
+					// input bind vars
+					maxbindcount*(2*sizeof(uint16_t)+
 							maxbindnamelength)+
-				// output bind var count
-				sizeof(uint16_t)+
-				// output bind vars
-				maxbindcount*(2*sizeof(uint16_t)+
+					// output bind var count
+					sizeof(uint16_t)+
+					// output bind vars
+					maxbindcount*(2*sizeof(uint16_t)+
 							maxbindnamelength)+
-				// get column info
-				sizeof(uint16_t)+
-				// skip/fetch
-				2*sizeof(uint32_t)
-				// divide by two because we're
-				// reading 2 bytes at a time
-				)/2) {
+					// get column info
+					sizeof(uint16_t)+
+					// skip/fetch
+					2*sizeof(uint32_t)
+					// divide by two because we're
+					// reading 2 bytes at a time
+					)/2) {
 			counter++;
 		}
 		clientsock->useBlockingMode();

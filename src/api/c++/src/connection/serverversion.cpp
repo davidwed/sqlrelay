@@ -10,6 +10,8 @@ const char *sqlrconnection::serverVersion() {
 		return NULL;
 	}
 
+	clearError();
+
 	if (debug) {
 		debugPreStart();
 		debugPrint("Server Version...");
@@ -17,32 +19,40 @@ const char *sqlrconnection::serverVersion() {
 		debugPreEnd();
 	}
 
+	// tell the server we want the server version
 	cs->write((uint16_t)SERVERVERSION);
 	flushWriteBuffer();
 
-	// get the server version
+	if (gotError()) {
+		return NULL;
+	}
+
+	// get the server version size
 	uint16_t	size;
 	if (cs->read(&size,responsetimeoutsec,
-				responsetimeoutusec)==sizeof(uint16_t)) {
-		delete[] serverversion;
-		serverversion=new char[size+1];
-		if (cs->read(serverversion,size)!=size) {
-			setError("Failed to get Server version.\n A network error may have ocurred.");
-			delete[] serverversion;
-			serverversion=NULL;
-			return NULL;
-		}
-		serverversion[size]='\0';
-
-		if (debug) {
-			debugPreStart();
-			debugPrint(serverversion);
-			debugPrint("\n");
-			debugPreEnd();
-		}
-	} else {
-		setError("Failed to get Server version.\n A network error may have ocurred.");
+				responsetimeoutusec)!=sizeof(uint16_t)) {
+		setError("Failed to get Server version.\n "
+			"A network error may have ocurred.");
 		return NULL;
+	}
+
+	// get the server version
+	delete[] serverversion;
+	serverversion=new char[size+1];
+	if (cs->read(serverversion,size)!=size) {
+		setError("Failed to get Server version.\n "
+			"A network error may have ocurred.");
+		delete[] serverversion;
+		serverversion=NULL;
+		return NULL;
+	}
+	serverversion[size]='\0';
+
+	if (debug) {
+		debugPreStart();
+		debugPrint(serverversion);
+		debugPrint("\n");
+		debugPreEnd();
 	}
 	return serverversion;
 }

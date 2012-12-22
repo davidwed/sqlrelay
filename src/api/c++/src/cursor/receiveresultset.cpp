@@ -28,7 +28,6 @@ bool sqlrcursor::processResultSet(bool getallrows, uint64_t rowtoget) {
 	if (success) {
 
 		uint16_t	err=getErrorStatus();
-
 		if (err!=NO_ERROR_OCCURRED) {
 
 			getErrorFromServer();
@@ -87,7 +86,9 @@ uint16_t sqlrcursor::getErrorStatus() {
 	uint16_t	err;
 	if (getShort(&err,sqlrc->responsetimeoutsec,
 				sqlrc->responsetimeoutusec)!=sizeof(uint16_t)) {
-		setError("Failed to determine whether an error occurred or not.\n A network error may have ocurred.");
+		setError("Failed to determine whether an "
+				"error occurred or not.\n "
+				"A network error may have ocurred.");
 		return false;
 	}
 
@@ -117,13 +118,15 @@ bool sqlrcursor::getCursorId() {
 		sqlrc->debugPreEnd();
 	}
 	if (sqlrc->cs->read(&cursorid)!=sizeof(uint16_t)) {
-		char	*err=error::getErrorString();
-		stringbuffer	errstr;
-		errstr.append("Failed to get a cursor id.\n "
-				"A network error may have ocurred. ");
-		errstr.append(err);
-		setError(errstr.getString());
-		delete[] err;
+		if (!error) {
+			char	*err=error::getErrorString();
+			stringbuffer	errstr;
+			errstr.append("Failed to get a cursor id.\n "
+					"A network error may have ocurred. ");
+			errstr.append(err);
+			setError(errstr.getString());
+			delete[] err;
+		}
 		return false;
 	}
 	havecursorid=true;
@@ -142,7 +145,9 @@ bool sqlrcursor::getSuspended() {
 	// see if the result set of that cursor is actually suspended
 	uint16_t	suspendedresultset;
 	if (sqlrc->cs->read(&suspendedresultset)!=sizeof(uint16_t)) {
-		setError("Failed to determine whether the session was suspended or not.\n A network error may have ocurred.");
+		setError("Failed to determine whether "
+			"the session was suspended or not.\n "
+			"A network error may have ocurred.");
 		return false;
 	}
 
@@ -152,7 +157,9 @@ bool sqlrcursor::getSuspended() {
 		// last row from the previous result set.
 		// Initialize firstrowindex and rowcount from this index.
 		if (sqlrc->cs->read(&firstrowindex)!=sizeof(uint64_t)) {
-			setError("Failed to get the index of the last row of a previously suspended result set.\n A network error may have ocurred.");
+			setError("Failed to get the index of the "
+				"last row of a previously suspended result "
+				"set.\n A network error may have ocurred.");
 			return false;
 		}
 		rowcount=firstrowindex+1;

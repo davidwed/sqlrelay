@@ -10,7 +10,6 @@
 #include <tempdir.h>
 #include <sqlrconfigfile.h>
 #include <sqlrauthenticator.h>
-#include <sqlrpwdencs.h>
 #include <sqlrloggers.h>
 
 #include <rudiments/signalclasses.h>
@@ -67,12 +66,6 @@ class sqlrlistener : public rudiments::daemonprocess,
 		bool	deniedIp(rudiments::filedescriptor *clientsock);
 		void	forkChild(rudiments::filedescriptor *clientsock);
 		void	clientSession(rudiments::filedescriptor *clientsock);
-		void	sqlrelayClientSession(
-				rudiments::filedescriptor *clientsock);
-		void	mysqlClientSession(
-				rudiments::filedescriptor *clientsock);
-		int32_t	getAuth(rudiments::filedescriptor *clientsock);
-		int32_t	getMySQLAuth(rudiments::filedescriptor *clientsock);
 		void    errorClientSession(
 				rudiments::filedescriptor *clientsock,
 				int64_t errnum, const char *err);
@@ -80,8 +73,7 @@ class sqlrlistener : public rudiments::daemonprocess,
 		bool	releaseShmAccess();
 		bool	acceptAvailableConnection(bool *alldbsdown);
 		bool	doneAcceptingAvailableConnection();
-		bool	isAlarmRang();
-		bool	handOffClient(rudiments::filedescriptor *sock);
+		bool	handOffOrProxyClient(rudiments::filedescriptor *sock);
 		bool	getAConnection(uint32_t *connectionpid,
 					uint16_t *inetport,
 					char *unixportstr,
@@ -91,6 +83,8 @@ class sqlrlistener : public rudiments::daemonprocess,
 				rudiments::filedescriptor *connectionsock);
 		bool	requestFixup(uint32_t connectionpid,
 				rudiments::filedescriptor *connectionsock);
+		bool	proxyClient(rudiments::filedescriptor *connectionsock,
+					rudiments::filedescriptor *clientsock);
 		bool	connectionIsUp(const char *connectionid);
 		void	pingDatabase(uint32_t connectionpid,
 					const char *unixportstr,
@@ -99,12 +93,8 @@ class sqlrlistener : public rudiments::daemonprocess,
 					uint32_t connectionpid,
 					const char *unixportstr,
 					uint16_t inetport);
-		bool	passClientFileDescriptorToConnection(
-				rudiments::filedescriptor *connectionsock,
-				int fd);
-		void	waitForClientClose(int32_t authstatus,
-				bool passstatus,
-				rudiments::filedescriptor *clientsock);
+		void	waitForClientClose(bool passstatus,
+					rudiments::filedescriptor *clientsock);
 		void	flushWriteBuffer(rudiments::filedescriptor *fd);
 
 		static void	alarmHandler(int32_t signum);
@@ -139,7 +129,6 @@ class sqlrlistener : public rudiments::daemonprocess,
 		tempdir		*tmpdir;
 
 		sqlrauthenticator	*authc;
-		sqlrpwdencs		*sqlrpe;
 		sqlrloggers		*sqlrlg;
 
 		// FIXME: these shouldn't have to be pointers, right, but
@@ -161,8 +150,6 @@ class sqlrlistener : public rudiments::daemonprocess,
 
 		char	*unixport;
 		char	*mysqlunixport;
-
-		clientsessiontype_t	sessiontype;
 
 		rudiments::unixserversocket	*handoffsockun;
 		rudiments::unixserversocket	*removehandoffsockun;

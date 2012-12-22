@@ -190,6 +190,11 @@ install:
 	done
 	$(INSTALL) -m 644 js/rotate.js $(docdir)/js
 	$(INSTALL) -m 644 modules/passwordencryption.html $(docdir)/modules
+	$(INSTALL) -m 644 modules/logger.html $(docdir)/modules
+	$(INSTALL) -m 644 modules/sqlr-connection.1871.html $(docdir)/modules
+	$(INSTALL) -m 644 modules/sqlr-listener.1869.html $(docdir)/modules
+	$(INSTALL) -m 644 modules/sqlr-listener.1886.html $(docdir)/modules
+	$(INSTALL) -m 644 modules/sqlr-connection-oracletest-querylog.2899.html $(docdir)/modules
 	$(INSTALL) -m 644 programming/binds.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/odbc.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/jdbc.html $(docdir)/programming

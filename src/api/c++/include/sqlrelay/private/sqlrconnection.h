@@ -16,10 +16,7 @@
 		bool	openSession();
 		void	closeConnection();
 
-		bool	authenticateWithListener();
-		bool	authenticateWithConnection();
-		bool	genericAuthentication();
-		bool	getReconnect();
+		void	authenticate();
 		bool	getNewPort();
 
 		void	clearSessionFlags();
@@ -35,9 +32,10 @@
 
 		bool	autoCommit(bool on);
 
-		void	clearError();
-		void	setError(const char *err);
-		bool	getError();
+		void		clearError();
+		void		setError(const char *err);
+		uint16_t	getError();
+		bool		gotError();
 
 		void	flushWriteBuffer();
 
@@ -72,7 +70,6 @@
 		uint32_t	userlen;
 		const char	*password;
 		uint32_t	passwordlen;
-		bool		reconnect;
 
 		// error
 		int64_t		errorno;

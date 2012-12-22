@@ -32,6 +32,15 @@ char *sqlrcursor::getQueryTree() {
 
 	sqlrc->flushWriteBuffer();
 
+	uint16_t	err=getErrorStatus();
+	if (err!=NO_ERROR_OCCURRED) {
+		getErrorFromServer();
+		if (err==ERROR_OCCURRED_DISCONNECT) {
+			sqlrc->endSession();
+		}
+		return NULL;
+	}
+
 	// get the size of the tree
 	uint64_t	querytreelen;
 	if (sqlrc->cs->read(&querytreelen)!=sizeof(uint64_t)) {

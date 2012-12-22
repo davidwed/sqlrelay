@@ -44,6 +44,10 @@ debug::debug(xmldomnode *parameters) : sqlrlogger(parameters) {
 	debuglogger=NULL;
 	dbgfilename=NULL;
 	name=NULL;
+	loglistener=charstring::compareIgnoringCase(
+			parameters->getAttributeValue("listener"),"no");
+	logconnection=charstring::compareIgnoringCase(
+			parameters->getAttributeValue("connection"),"no");
 }
 
 debug::~debug() {
@@ -58,10 +62,6 @@ bool debug::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 
 	// Log listener or connection.
 	// Log both by default, but either can be disabled.
-	loglistener=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("listener"),"no");
-	logconnection=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("connection"),"no");
 	if (sqlrl && !loglistener) {
 		return true;
 	}

@@ -1933,25 +1933,19 @@ bool sqlrcontroller_svr::authenticateCommand() {
 	logDebugMessage("authenticate");
 
 	// get the user/password from the client and authenticate
-	if (!getUserFromClient() ||
-		!getPasswordFromClient() ||
-		!authenticate()) {
-
-		// indicate that an error has occurred
-		clientsock->write((uint16_t)ERROR_OCCURRED);
-		clientsock->write((uint64_t)SQLR_ERROR_AUTHENTICATIONERROR);
-		clientsock->write((uint16_t)charstring::length(
-					SQLR_ERROR_AUTHENTICATIONERROR_STRING));
-		clientsock->write(SQLR_ERROR_AUTHENTICATIONERROR_STRING);
-		flushWriteBuffer();
-		conn->endSession();
-		return false;
+	if (getUserFromClient() && getPasswordFromClient() && authenticate()) {
+		return true;
 	}
 
-	// indicate that no error has occurred
-	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+	// indicate that an error has occurred
+	clientsock->write((uint16_t)ERROR_OCCURRED_DISCONNECT);
+	clientsock->write((uint64_t)SQLR_ERROR_AUTHENTICATIONERROR);
+	clientsock->write((uint16_t)charstring::length(
+				SQLR_ERROR_AUTHENTICATIONERROR_STRING));
+	clientsock->write(SQLR_ERROR_AUTHENTICATIONERROR_STRING);
 	flushWriteBuffer();
-	return true;
+	conn->endSession();
+	return false;
 }
 
 bool sqlrcontroller_svr::getUserFromClient() {
@@ -2014,26 +2008,17 @@ bool sqlrcontroller_svr::authenticate() {
 	logDebugMessage("authenticate...");
 
 	// authenticate on the approprite tier
-	bool	authondb=(cfgfl->getAuthOnDatabase() &&
-				conn->supportsAuthOnDatabase());
-	bool	authonconnection=(cfgfl->getAuthOnConnection() ||
-					(cfgfl->getAuthOnDatabase() &&
-					!conn->supportsAuthOnDatabase()));
-	if (authonconnection) {
-		return connectionBasedAuth(userbuffer,passwordbuffer);
-	} else if (authondb) {
+	if (cfgfl->getAuthOnDatabase() && conn->supportsAuthOnDatabase()) {
 		return databaseBasedAuth(userbuffer,passwordbuffer);
 	}
-
-	logDebugMessage("authentication was done on listener");
-	return true;
+	return connectionBasedAuth(userbuffer,passwordbuffer);
 }
 
 bool sqlrcontroller_svr::connectionBasedAuth(const char *userbuffer,
 						const char *passwordbuffer) {
 
 	// handle connection-based authentication
-	int	retval=authc->authenticate(userbuffer,passwordbuffer);
+	bool	retval=authc->authenticate(userbuffer,passwordbuffer);
 	if (retval) {
 		logDebugMessage("auth succeeded on connection");
 	} else {
@@ -2093,35 +2078,28 @@ void sqlrcontroller_svr::suspendSessionCommand() {
 	}
 	logDebugMessage("done aborting busy cursors");
 
-	// If we're passing file descriptors around, we'll have to listen on a 
-	// set of ports so the suspended client has something to resume to.
-	// It's possible that the current session is just a resumed session
-	// though.  In that case, no new sockets will be opened by the call to
-	// openSockets(), the old ones will just be reused.
-	if (cfgfl->getPassDescriptor()) {
-
-		// open sockets to resume on
-		logDebugMessage("opening sockets to resume on...");
-		uint16_t	unixsocketsize=0;
-		uint16_t	inetportnumber=0;
-		if (openSockets()) {
-			if (serversockun) {
-				unixsocketsize=charstring::length(unixsocket);
-			}
-			inetportnumber=inetport;
+	// open sockets to resume on
+	logDebugMessage("opening sockets to resume on...");
+	uint16_t	unixsocketsize=0;
+	uint16_t	inetportnumber=0;
+	if (openSockets()) {
+		if (serversockun) {
+			unixsocketsize=charstring::length(unixsocket);
 		}
-		logDebugMessage("done opening sockets to resume on");
-
-		// pass the socket info to the client
-		logDebugMessage("passing socket info to client...");
-		clientsock->write(unixsocketsize);
-		if (unixsocketsize) {
-			clientsock->write(unixsocket,unixsocketsize);
-		}
-		clientsock->write(inetportnumber);
-		flushWriteBuffer();
-		logDebugMessage("done passing socket info to client");
+		inetportnumber=inetport;
 	}
+	logDebugMessage("done opening sockets to resume on");
+
+	// pass the socket info to the client
+	logDebugMessage("passing socket info to client...");
+	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+	clientsock->write(unixsocketsize);
+	if (unixsocketsize) {
+		clientsock->write(unixsocket,unixsocketsize);
+	}
+	clientsock->write(inetportnumber);
+	flushWriteBuffer();
+	logDebugMessage("done passing socket info to client");
 
 	logDebugMessage("done suspending session");
 }
@@ -2129,7 +2107,13 @@ void sqlrcontroller_svr::suspendSessionCommand() {
 void sqlrcontroller_svr::pingCommand() {
 	logDebugMessage("ping");
 	bool	pingresult=conn->ping();
-	clientsock->write(pingresult);
+	if (pingresult) {
+		logDebugMessage("ping succeeded");
+		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+	} else {
+		logDebugMessage("ping failed");
+		returnError(!conn->liveconnection);
+	}
 	flushWriteBuffer();
 	if (!pingresult) {
 		reLogIn();
@@ -2144,6 +2128,7 @@ void sqlrcontroller_svr::identifyCommand() {
 	const char	*ident=conn->identify();
 
 	// send it to the client
+	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	uint16_t	idlen=charstring::length(ident);
 	clientsock->write(idlen);
 	clientsock->write(ident,idlen);
@@ -2160,12 +2145,20 @@ void sqlrcontroller_svr::autoCommitCommand() {
 				"failed to get autocommit setting",result);
 		return;
 	}
+	bool	success=false;
 	if (on) {
 		logDebugMessage("autocommit on");
-		clientsock->write(autoCommitOn());
+		success=autoCommitOn();
 	} else {
 		logDebugMessage("autocommit off");
-		clientsock->write(autoCommitOff());
+		success=autoCommitOff();
+	}
+	if (success) {
+		logDebugMessage("succeeded");
+		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+	} else {
+		logDebugMessage("failed");
+		returnError(!conn->liveconnection);
 	}
 	flushWriteBuffer();
 }
@@ -2183,10 +2176,10 @@ bool sqlrcontroller_svr::autoCommitOff() {
 void sqlrcontroller_svr::beginCommand() {
 	logDebugMessage("begin...");
 	if (begin()) {
-		logDebugMessage("begin succeeded");
+		logDebugMessage("succeeded");
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	} else {
-		logDebugMessage("begin failed");
+		logDebugMessage("failed");
 		returnError(!conn->liveconnection);
 	}
 	flushWriteBuffer();
@@ -2217,10 +2210,10 @@ bool sqlrcontroller_svr::beginFakeTransactionBlock() {
 void sqlrcontroller_svr::commitCommand() {
 	logDebugMessage("commit...");
 	if (commit()) {
-		logDebugMessage("commit succeeded");
+		logDebugMessage("succeeded");
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	} else {
-		logDebugMessage("commit failed");
+		logDebugMessage("failed");
 		returnError(!conn->liveconnection);
 	}
 	flushWriteBuffer();
@@ -2250,10 +2243,10 @@ bool sqlrcontroller_svr::endFakeTransactionBlock() {
 void sqlrcontroller_svr::rollbackCommand() {
 	logDebugMessage("rollback...");
 	if (rollback()) {
-		logDebugMessage("rollback succeeded");
+		logDebugMessage("succeeded");
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	} else {
-		logDebugMessage("rollback failed");
+		logDebugMessage("failed");
 		returnError(!conn->liveconnection);
 	}
 	flushWriteBuffer();
@@ -2275,6 +2268,7 @@ void sqlrcontroller_svr::dbVersionCommand() {
 	const char	*dbversion=conn->dbVersion();
 
 	// send it to the client
+	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	uint16_t	dbvlen=charstring::length(dbversion);
 	clientsock->write(dbvlen);
 	clientsock->write(dbversion,dbvlen);
@@ -2289,6 +2283,7 @@ void sqlrcontroller_svr::bindFormatCommand() {
 	const char	*bf=conn->bindFormat();
 
 	// send it to the client
+	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	uint16_t	bflen=charstring::length(bf);
 	clientsock->write(bflen);
 	clientsock->write(bf,bflen);
@@ -2303,6 +2298,7 @@ void sqlrcontroller_svr::serverVersionCommand() {
 	const char	*svrversion=SQLR_VERSION;
 
 	// send it to the client
+	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	uint16_t	svrvlen=charstring::length(svrversion);
 	clientsock->write(svrvlen);
 	clientsock->write(svrversion,svrvlen);
@@ -2353,13 +2349,10 @@ void sqlrcontroller_svr::selectDatabaseCommand() {
 	
 	// Select the db and send back the result.  If we've been told to
 	// ignore these calls, skip the actual call but act like it succeeded.
-	bool	success=(ignoreselectdb)?true:conn->selectDatabase(db);
-	clientsock->write(success);
-
-	// if there was an error, send it back
-	if (!success) {
-		clientsock->write(conn->errorlength);
-		clientsock->write(conn->error,conn->errorlength);
+	if ((ignoreselectdb)?true:conn->selectDatabase(db)) {
+		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+	} else {
+		returnError(!conn->liveconnection);
 	}
 
 	flushWriteBuffer();
@@ -2376,6 +2369,7 @@ void sqlrcontroller_svr::getCurrentDatabaseCommand() {
 	char	*currentdb=conn->getCurrentDatabase();
 
 	// send it to the client
+	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	uint16_t	currentdbsize=charstring::length(currentdb);
 	clientsock->write(currentdbsize);
 	clientsock->write(currentdb,currentdbsize);
@@ -2386,28 +2380,16 @@ void sqlrcontroller_svr::getCurrentDatabaseCommand() {
 }
 
 void sqlrcontroller_svr::getLastInsertIdCommand() {
-
-	logDebugMessage("getting last insert id");
-
-	// get the last insert id
+	logDebugMessage("getting last insert id...");
 	uint64_t	id;
-	bool	success=conn->getLastInsertId(&id);
-
-	// send success/failure
-	clientsock->write(success);
-	if (success) {
-
-		// return the id
+	if (conn->getLastInsertId(&id)) {
+		logDebugMessage("get last insert id succeeded");
+		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 		clientsock->write(id);
-
 	} else {
-
-		// return the error
-		uint16_t	errorlen=charstring::length(conn->error);
-		clientsock->write(errorlen);
-		clientsock->write(conn->error,errorlen);
+		logDebugMessage("get last insert id failed");
+		returnError(!conn->liveconnection);
 	}
-
 	flushWriteBuffer();
 }
 
@@ -2416,6 +2398,7 @@ void sqlrcontroller_svr::dbHostNameCommand() {
 	logDebugMessage("getting db host name");
 
 	const char	*hostname=conn->dbHostName();
+	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	uint16_t	hostnamelen=charstring::length(hostname);
 	clientsock->write(hostnamelen);
 	clientsock->write(hostname,hostnamelen);
@@ -2427,6 +2410,7 @@ void sqlrcontroller_svr::dbIpAddressCommand() {
 	logDebugMessage("getting db host name");
 
 	const char	*ipaddress=conn->dbIpAddress();
+	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	uint16_t	ipaddresslen=charstring::length(ipaddress);
 	clientsock->write(ipaddresslen);
 	clientsock->write(ipaddress,ipaddresslen);
@@ -5429,6 +5413,7 @@ bool sqlrcontroller_svr::getQueryTreeCommand(sqlrcursor_svr *cursor) {
 	uint64_t	xmlstringlen=(xml)?xml->getStringLength():0;
 
 	// send the tree
+	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	clientsock->write(xmlstringlen);
 	clientsock->write(xmlstring,xmlstringlen);
 	flushWriteBuffer();
@@ -5608,9 +5593,51 @@ void sqlrcontroller_svr::closeClientSocket() {
 	// result set) the read will fall through.  This should guarantee 
 	// that the client will get the the entire result set without
 	// requiring the client to send data back indicating so.
+	//
+	// Also, if authentication fails, the client could send an entire query
+	// and bind vars before it reads the error and closes the socket.
+	// We have to absorb all of that data.  We shouldn't just loop forever
+	// though, that would provide a point of entry for a DOS attack.  We'll
+	// read the maximum number of bytes that could be sent.
 	logDebugMessage("waiting for client to close the connection...");
 	uint16_t	dummy;
-	clientsock->read(&dummy,idleclienttimeout,0);
+	uint32_t	counter=0;
+	clientsock->useNonBlockingMode();
+	while (clientsock->read(&dummy,idleclienttimeout,0)>0 &&
+				counter<
+				// sending auth
+				(sizeof(uint16_t)+
+				// user/password
+				2*(sizeof(uint32_t)+USERSIZE)+
+				// sending query
+				sizeof(uint16_t)+
+				// need a cursor
+				sizeof(uint16_t)+
+				// executing new query
+				sizeof(uint16_t)+
+				// query size and query
+				sizeof(uint32_t)+maxquerysize+
+				// input bind var count
+				sizeof(uint16_t)+
+				// input bind vars
+				maxbindcount*(2*sizeof(uint16_t)+
+							maxbindnamelength)+
+				// output bind var count
+				sizeof(uint16_t)+
+				// output bind vars
+				maxbindcount*(2*sizeof(uint16_t)+
+							maxbindnamelength)+
+				// get column info
+				sizeof(uint16_t)+
+				// skip/fetch
+				2*sizeof(uint32_t)
+				// divide by two because we're
+				// reading 2 bytes at a time
+				)/2) {
+		counter++;
+	}
+	clientsock->useBlockingMode();
+	
 	logDebugMessage("done waiting for client to close the connection");
 
 	// close the client socket

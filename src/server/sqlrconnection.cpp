@@ -304,8 +304,8 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id) {
 	// If there is no query for this then the db we're using doesn't
 	// support switching.
 	if (!liiquery) {
-		error=charstring::duplicate(
-				"get last insert id not supported");
+		setError(SQLR_ERROR_LASTINSERTIDNOTSUPPORTED_STRING,
+				SQLR_ERROR_LASTINSERTIDNOTSUPPORTED,true);
 		return false;
 	}
 
@@ -332,7 +332,8 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id) {
 
 		}  else {
 
-			error=charstring::duplicate("no values returned");
+			setError(SQLR_ERROR_LASTINSERTIDNOTSUPPORTED_STRING,
+				SQLR_ERROR_LASTINSERTIDNOTSUPPORTED,true);
 			retval=false;
 		}
 

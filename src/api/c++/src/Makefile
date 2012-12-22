@@ -28,7 +28,6 @@ SRCS = connection/connectionctor.cpp \
 	connection/debug.cpp \
 	connection/error.cpp \
 	connection/flushwritebuffer.cpp \
-	connection/getreconnect.cpp \
 	connection/getconnectionport.cpp \
 	connection/getconnectionsocket.cpp \
 	connection/authentication.cpp \
@@ -89,7 +88,6 @@ LOBJS = connection/connectionctor.lo \
 	connection/debug.lo \
 	connection/error.lo \
 	connection/flushwritebuffer.lo \
-	connection/getreconnect.lo \
 	connection/getconnectionport.lo \
 	connection/getconnectionsocket.lo \
 	connection/authentication.lo \

@@ -10,22 +10,16 @@ bool sqlrconnection::ping() {
 		return 0;
 	}
 
+	clearError();
+
 	if (debug) {
 		debugPreStart();
-		debugPrint("Pinging...");
-		debugPrint("\n");
+		debugPrint("Pinging...\n");
 		debugPreEnd();
 	}
 
 	cs->write((uint16_t)PING);
 	flushWriteBuffer();
 
-	// get the ping result
-	bool	result;
-	if (cs->read(&result,responsetimeoutsec,
-				responsetimeoutusec)!=sizeof(bool)) {
-		setError("Failed to ping.\n A network error may have ocurred.");
-		return false;
-	}
-	return result;
+	return !gotError();
 }

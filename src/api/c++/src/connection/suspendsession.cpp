@@ -10,6 +10,8 @@ bool sqlrconnection::suspendSession() {
 		return 0;
 	}
 
+	clearError();
+
 	if (debug) {
 		debugPreStart();
 		debugPrint("Suspending Session\n");
@@ -17,19 +19,17 @@ bool sqlrconnection::suspendSession() {
 	}
 
 	// suspend the session
-	bool	retval=false;
 	cs->write((uint16_t)SUSPEND_SESSION);
 	flushWriteBuffer();
 	suspendsessionsent=true;
-	retval=true;
 
-	// If the server is passing around file descriptors to handoff clients
-	// from listener to connection, then it will have to open a socket and
-	// port to enable suspend/resume.   It will pass that socket/port to
-	// us here.
-	if (!reconnect) {
-		retval=getNewPort();
+	// check for error
+	if (gotError()) {
+		return false;
 	}
+
+	// get port to resume on
+	bool	retval=getNewPort();
 
 	closeConnection();
 

@@ -10,6 +10,8 @@ const char *sqlrconnection::dbHostName() {
 		return NULL;
 	}
 
+	clearError();
+
 	if (debug) {
 		debugPreStart();
 		debugPrint("DB Host Name...");
@@ -17,32 +19,40 @@ const char *sqlrconnection::dbHostName() {
 		debugPreEnd();
 	}
 
+	// tell the server we want the db host name
 	cs->write((uint16_t)DBHOSTNAME);
 	flushWriteBuffer();
 
-	// get the db host name
+	if (gotError()) {
+		return NULL;
+	}
+
+	// get the db host name size
 	uint16_t	size;
 	if (cs->read(&size,responsetimeoutsec,
-				responsetimeoutusec)==sizeof(uint16_t)) {
-		delete[] dbhostname;
-		dbhostname=new char[size+1];
-		if (cs->read(dbhostname,size)!=size) {
-			setError("Failed to get DB host name.\n A network error may have ocurred.");
-			delete[] dbhostname;
-			dbhostname=NULL;
-			return NULL;
-		}
-		dbhostname[size]='\0';
-
-		if (debug) {
-			debugPreStart();
-			debugPrint(dbhostname);
-			debugPrint("\n");
-			debugPreEnd();
-		}
-	} else {
-		setError("Failed to get DB host name.\n A network error may have ocurred.");
+				responsetimeoutusec)!=sizeof(uint16_t)) {
+		setError("Failed to get DB host name.\n "
+				"A network error may have ocurred.");
 		return NULL;
+	}
+
+	// get the db host name
+	delete[] dbhostname;
+	dbhostname=new char[size+1];
+	if (cs->read(dbhostname,size)!=size) {
+		setError("Failed to get DB host name.\n "
+				"A network error may have ocurred.");
+		delete[] dbhostname;
+		dbhostname=NULL;
+		return NULL;
+	}
+	dbhostname[size]='\0';
+
+	if (debug) {
+		debugPreStart();
+		debugPrint(dbhostname);
+		debugPrint("\n");
+		debugPreEnd();
 	}
 	return dbhostname;
 }
@@ -53,6 +63,8 @@ const char *sqlrconnection::dbIpAddress() {
 		return NULL;
 	}
 
+	clearError();
+
 	if (debug) {
 		debugPreStart();
 		debugPrint("DB Ip Address...");
@@ -60,32 +72,40 @@ const char *sqlrconnection::dbIpAddress() {
 		debugPreEnd();
 	}
 
+	// tell the server we want the db ip address
 	cs->write((uint16_t)DBIPADDRESS);
 	flushWriteBuffer();
 
-	// get the db ip address
+	if (gotError()) {
+		return NULL;
+	}
+
+	// get the db ip address size
 	uint16_t	size;
 	if (cs->read(&size,responsetimeoutsec,
-				responsetimeoutusec)==sizeof(uint16_t)) {
-		delete[] dbipaddress;
-		dbipaddress=new char[size+1];
-		if (cs->read(dbipaddress,size)!=size) {
-			setError("Failed to get DB ip address.\n A network error may have ocurred.");
-			delete[] dbipaddress;
-			dbipaddress=NULL;
-			return NULL;
-		}
-		dbipaddress[size]='\0';
-
-		if (debug) {
-			debugPreStart();
-			debugPrint(dbipaddress);
-			debugPrint("\n");
-			debugPreEnd();
-		}
-	} else {
-		setError("Failed to get DB ip address.\n A network error may have ocurred.");
+				responsetimeoutusec)!=sizeof(uint16_t)) {
+		setError("Failed to get DB ip address.\n "
+				"A network error may have ocurred.");
 		return NULL;
+	}
+
+	// get the db ip address
+	delete[] dbipaddress;
+	dbipaddress=new char[size+1];
+	if (cs->read(dbipaddress,size)!=size) {
+		setError("Failed to get DB ip address.\n "
+				"A network error may have ocurred.");
+		delete[] dbipaddress;
+		dbipaddress=NULL;
+		return NULL;
+	}
+	dbipaddress[size]='\0';
+
+	if (debug) {
+		debugPreStart();
+		debugPrint(dbipaddress);
+		debugPrint("\n");
+		debugPreEnd();
 	}
 	return dbipaddress;
 }
