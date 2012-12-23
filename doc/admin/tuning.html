@@ -10,7 +10,7 @@
 <ul>
 <li><a href="#localdbconnection">Connect To The Database Using a Local Connection</a></li>
 <li><a href="#unixsocket">Connect To SQL Relay Using a Unix Socket</a></li>
-<li><a href="#handoff">Use File Descriptor Passing</a></li>
+<li><a href="#handoff">Use a Platform That Supports File Descriptor Passing</a></li>
 <li><a href="#systemparameters">Tweak Various System Parameters</a></li>
 <li><a href="#dontgetcolumninfo">Don't Get Unnecessary Column Info</a></li>
 <li><a href="#resultsetbuffersize">Use Result Set Buffer Size</a></li>
@@ -286,13 +286,19 @@ host/port.</p>
 
 <br>
 <a name="handoff"></a>
-<span class="heading2">Use File Descriptor Passing</span><br>
+<span class="heading2">Use a Platform That Supports File Descriptor Passing</span><br>
 
-<p>SQL Relay has a listener process that waits for incoming clients, then attempts to hand them off via file descriptor passing to a seperate process that is already logged into the database when one of those processes is available.  If the file descriptor pass fails, then the listener proxys the incoming client, ferrying data back and forth between it and the database connecton process.</p>
+<p>When a client connects to the SQL Relay listener process, it waits for an available database connection, then either hands the client off to that process via file descriptor passing or proxys the incoming client, ferrying data back and forth between it and the database connecton process.</p>
 
-<p>File descriptor passing is much faster and uses fewer system resources than proxying but it is not supported on all platforms.  Linux kernels prior to 2.2 and the Cygwin environment under Windows, for example, do not support file descriptor passing.  It is likely that other platforms don't as well, especially older platforms.</p>
+<p>File descriptor passing is much faster and uses fewer system resources than proxying but it is not supported on all platforms.  For example, Linux kernels prior to 2.2 and the Cygwin environment under Windows, do not support file descriptor passing and it is likely that other platforms don't as well, especially older platforms.</p>
 
 <p>If you want the best performance, you must use a platform that supports file descriptor passing.</p>
+
+<p>During startup, the main sqlr-listener process performs a test to verify whether file descriptor passing is supported or not.  If it is not, a warning is displayed on the screen like:</p>
+
+<blockquote><b>
+Warning: file descriptor passing is not supported on this platform
+</b></blockquote>
 
 <br>
 <a name="systemparameters"></a>

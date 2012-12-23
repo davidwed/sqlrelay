@@ -332,7 +332,7 @@ void sqlrlistener::setHandoffMethod(const char *id) {
 
 	// warn if the test failed
 	if (handoffmode==HANDOFF_PROXY) {
-		fprintf(stderr,"Warning: file descriptor passing "
+		fprintf(stderr,"Warning: file descriptor passing is "
 				"not supported on this platform\n");
 	}
 
