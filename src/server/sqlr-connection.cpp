@@ -6,13 +6,11 @@
 #include <rudiments/process.h>
 
 sqlrcontroller_svr	*cont=NULL;
-signalhandler		*sigh=NULL;
 volatile sig_atomic_t	shutdowninprogress=0;
 
 void cleanUp() {
 	cont->closeConnection();
 	delete cont;
-	delete sigh;
 }
 
 void shutDown(int32_t signum) {
@@ -65,6 +63,11 @@ void shutDown(int32_t signum) {
 	process::exit(exitcode);
 }
 
+// FIXME: move this into sqlrcontroller
+void sigUsr1(int32_t signum) {
+	cont->proxymode=true;
+}
+
 int main(int argc, const char **argv) {
 
 	#include <version.h>
@@ -72,7 +75,7 @@ int main(int argc, const char **argv) {
 	cont=new sqlrcontroller_svr;
 
 	// handle signals
-	sigh=cont->handleSignals(shutDown);
+	cont->handleSignals(shutDown,sigUsr1);
 
 	// open the connection to the db
 	bool	result=false;

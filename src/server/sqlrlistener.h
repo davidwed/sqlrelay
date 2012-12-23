@@ -83,8 +83,9 @@ class sqlrlistener : public rudiments::daemonprocess,
 				rudiments::filedescriptor *connectionsock);
 		bool	requestFixup(uint32_t connectionpid,
 				rudiments::filedescriptor *connectionsock);
-		bool	proxyClient(rudiments::filedescriptor *connectionsock,
-					rudiments::filedescriptor *clientsock);
+		bool	proxyClient(pid_t connectionpid,
+				rudiments::filedescriptor *connectionsock,
+				rudiments::filedescriptor *clientsock);
 		bool	connectionIsUp(const char *connectionid);
 		void	pingDatabase(uint32_t connectionpid,
 					const char *unixportstr,

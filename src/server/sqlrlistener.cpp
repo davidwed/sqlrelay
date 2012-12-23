@@ -784,9 +784,6 @@ void sqlrlistener::blockSignals() {
 	#ifdef HAVE_SIGFPE
 		set.addSignal(SIGFPE);
 	#endif
-	#ifdef HAVE_SIGUSR1
-		set.addSignal(SIGUSR1);
-	#endif
 	#ifdef HAVE_SIGSEGV
 		set.addSignal(SIGSEGV);
 	#endif
@@ -1289,11 +1286,12 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock) {
 
 		// pass the file descriptor
 		retval=connectionsock.passFileDescriptor(
-					sock->getFileDescriptor());
+					//sock->getFileDescriptor());
+					-1);
 		if (!retval) {
 			logInternalError("failed to pass file descriptor, "
 							"attempting proxy");
-			retval=proxyClient(&connectionsock,sock);
+			retval=proxyClient(connectionpid,&connectionsock,sock);
 			if (!retval) {
 				logInternalError("failed to proxy client");
 				// FIXME: should there be a limit to the number
@@ -1658,9 +1656,53 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 	return true;
 }
 
-bool sqlrlistener::proxyClient(filedescriptor *serversock,
+bool sqlrlistener::proxyClient(pid_t connectionpid,
+				filedescriptor *serversock,
 				filedescriptor *clientsock) {
-	return false;
+
+	signalmanager::sendSignal(connectionpid,SIGUSR1);
+
+	serversock->allowShortReads();
+	serversock->useNonBlockingMode();
+	clientsock->allowShortReads();
+	clientsock->useNonBlockingMode();
+
+	listener	proxy;
+	proxy.addFileDescriptor(serversock);
+	proxy.addFileDescriptor(clientsock);
+
+	unsigned char	readbuffer[8192];
+
+	for (;;) {
+
+		int32_t	waitcount=proxy.waitForNonBlockingRead(-1,-1);
+		if (waitcount<1) {
+			break;
+		}
+
+		filedescriptor	*fd=NULL;
+		proxy.getReadyList()->getDataByIndex(0,&fd);
+
+		ssize_t	readcount=fd->read(readbuffer,sizeof(readbuffer));
+		if (readcount<1) {
+			break;
+		}
+
+		if (fd==serversock) {
+			clientsock->write(readbuffer,readcount);
+			clientsock->flushWriteBuffer(-1,-1);
+		} else if (fd==clientsock) {
+			serversock->write(readbuffer,readcount);
+			serversock->flushWriteBuffer(-1,-1);
+		}
+	}
+
+	serversock->dontAllowShortReads();
+	serversock->useBlockingMode();
+	clientsock->dontAllowShortReads();
+	clientsock->useBlockingMode();
+
+	return true;
 }
 
 void sqlrlistener::waitForClientClose(bool passstatus,

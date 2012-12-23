@@ -69,8 +69,9 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		bool		getColumnNames(const char *query,
 						stringbuffer *output);
 
-		signalhandler	*handleSignals(
-					void (*shutdownfunction)(int32_t));
+		void	handleSignals(void (*shutdownfunction)(int32_t),
+					void (*sigusr1function)(int32_t));
+		void	handleSigUsr1(int32_t signal);
 		bool	init(int argc, const char **argv);
 		sqlrconnection_svr	*initConnection(const char *dbase);
 		bool	listen();
@@ -96,7 +97,6 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 					uint16_t inetport,
 					const char *connectionid);
 		void	registerForHandoff(const char *tmpdir);
-		bool	receiveFileDescriptor(int32_t *descriptor);
 		void	deRegisterForHandoff(const char *tmpdir);
 		bool	getUnixSocket(const char *tmpdir,
 						char *unixsocketptr);
@@ -460,6 +460,8 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		char		*decrypteddbpassword;
 
 		unixclientsocket	handoffsockun;
+		bool			proxymode;
+		bool			sigusr1;
 
 		bool		connected;
 		bool		inclientsession;
@@ -509,6 +511,9 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 
 		const char	*dbhostname;
 		const char	*dbipaddress;
+
+		signalhandler	shutdownhandler;
+		signalhandler	sigusr1handler;
 };
 
 
