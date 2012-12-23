@@ -329,7 +329,7 @@ void sqlrlistener::setHandoffMethod(const char *id) {
 		bool	result=false;
 		if (uc.connect(testsockname.getString(),-1,-1,1,5) &&
 					uc.passFileDescriptor(0) &&
-					uc.read(&result,1,0)==sizeof(bool) &&
+					uc.read(&result,5,0)==sizeof(bool) &&
 					result==true) {
 			handoffmode=HANDOFF_PASS;
 		} else {
