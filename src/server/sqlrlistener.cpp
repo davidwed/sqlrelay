@@ -316,14 +316,21 @@ void sqlrlistener::setHandoffMethod(const char *id) {
 		filedescriptor	*fd=us.accept();
 		int32_t	desc;
 		fd->receiveFileDescriptor(&desc);
+		filedescriptor	test;
+		test.setFileDescriptor(desc);
+		bool	result=(test.write(' ')==sizeof(char));
+		fd->write(result);
 		delete fd;
 		process::exit(0);
 	} else if (childpid>0) {
 		unixclientsocket	uc;
 		// the child process might take a bit to get fired up,
 		// retry 5 times, waiting 1 second in between each
+		bool	result=false;
 		if (uc.connect(testsockname.getString(),-1,-1,1,5) &&
-					uc.passFileDescriptor(0)) {
+					uc.passFileDescriptor(0) &&
+					uc.read(&result,1,0)==sizeof(bool) &&
+					result==true) {
 			handoffmode=HANDOFF_PASS;
 		} else {
 			signalmanager::sendSignal(childpid,SIGTERM);
