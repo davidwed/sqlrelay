@@ -321,6 +321,7 @@ void sqlrlistener::setHandoffMethod(const char *id) {
 		test.setFileDescriptor(desc);
 		bool	result=(test.write(' ')==sizeof(char));
 		fd->write(result);
+		fd->flushWriteBuffer(-1,-1);
 		delete fd;
 		process::exit(0);
 	} else if (childpid>0) {
@@ -1204,7 +1205,7 @@ void sqlrlistener::errorClientSession(filedescriptor *clientsock,
 	clientsock->write((uint64_t)errnum);
 	clientsock->write((uint16_t)charstring::length(err));
 	clientsock->write(err);
-	flushWriteBuffer(clientsock);
+	clientsock->flushWriteBuffer(-1,-1);
 	// FIXME: hmm, if the client is just spewing
 	// garbage then we should close the connection...
 	waitForClientClose(false,clientsock);
@@ -1588,7 +1589,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			sock->write((uint16_t)charstring::length(
 					SQLR_ERROR_HANDOFFFAILED_STRING));
 			sock->write(SQLR_ERROR_HANDOFFFAILED_STRING);
-			flushWriteBuffer(sock);
+			sock->flushWriteBuffer(-1,-1);
 			return false;
 		}
 
@@ -1601,7 +1602,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			sock->write((uint16_t)charstring::length(
 						SQLR_ERROR_DBSDOWN_STRING));
 			sock->write(SQLR_ERROR_DBSDOWN_STRING);
-			flushWriteBuffer(sock);
+			sock->flushWriteBuffer(-1,-1);
 			return false;
 		}
 	}
@@ -1635,6 +1636,7 @@ void sqlrlistener::pingDatabase(uint32_t connectionpid,
 	filedescriptor	connectionsock;
 	if (findMatchingSocket(connectionpid,&connectionsock)) {
 		connectionsock.write((uint16_t)HANDOFF_RECONNECT);
+		connectionsock.flushWriteBuffer(-1,-1);
 		snooze::macrosnooze(1);
 	}
 
@@ -1683,6 +1685,7 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 		logInternalError("fixup failed to write pid");
 		return false;
 	}
+	fixupclientsockun.flushWriteBuffer(-1,-1);
 
 	// get the file descriptor of the socket
 	int32_t	fd;
@@ -1897,10 +1900,6 @@ void sqlrlistener::waitForClientClose(bool passstatus,
 		}
 		clientsock->useBlockingMode();
 	}
-}
-
-void sqlrlistener::flushWriteBuffer(filedescriptor *fd) {
-	fd->flushWriteBuffer(-1,-1);
 }
 
 void sqlrlistener::setStartTime() {

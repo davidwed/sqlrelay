@@ -313,8 +313,6 @@ class sqlrcontroller_svr : public rudiments::daemonprocess,
 		bool	initQueryLog();
 		bool	writeQueryLog(sqlrcursor_svr *cursor);
 
-		void	flushWriteBuffer();
-
 		void	initConnStats();
 		void	clearConnStats();
 		void	updateState(enum sqlrconnectionstate_t state);

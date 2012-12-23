@@ -1329,6 +1329,7 @@ void sqlrcontroller_svr::registerForHandoff(const char *tmpdir) {
 				connected=true;
 				break;
 			}
+			handoffsockun.flushWriteBuffer(-1,-1);
 			deRegisterForHandoff(tmpdir);
 		}
 		snooze::macrosnooze(1);
@@ -1362,6 +1363,7 @@ void sqlrcontroller_svr::deRegisterForHandoff(const char *tmpdir) {
 	removehandoffsockun.connect(removehandoffsockname,-1,-1,0,1);
 	removehandoffsockun.dontUseNaglesAlgorithm();
 	removehandoffsockun.write((uint32_t)process::getProcessId());
+	removehandoffsockun.flushWriteBuffer(-1,-1);
 
 	logDebugMessage("done de-registering for handoff");
 
@@ -1909,10 +1911,6 @@ void sqlrcontroller_svr::noAvailableCursors(uint16_t command) {
 	uint16_t	len=charstring::length(SQLR_ERROR_NOCURSORS_STRING);
 	clientsock->write(len);
 	clientsock->write(SQLR_ERROR_NOCURSORS_STRING,len);
-	flushWriteBuffer();
-}
-
-void sqlrcontroller_svr::flushWriteBuffer() {
 	clientsock->flushWriteBuffer(-1,-1);
 }
 
@@ -1931,7 +1929,7 @@ bool sqlrcontroller_svr::authenticateCommand() {
 	clientsock->write((uint16_t)charstring::length(
 				SQLR_ERROR_AUTHENTICATIONERROR_STRING));
 	clientsock->write(SQLR_ERROR_AUTHENTICATIONERROR_STRING);
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 	conn->endSession();
 	return false;
 }
@@ -2086,7 +2084,7 @@ void sqlrcontroller_svr::suspendSessionCommand() {
 		clientsock->write(unixsocket,unixsocketsize);
 	}
 	clientsock->write(inetportnumber);
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 	logDebugMessage("done passing socket info to client");
 
 	logDebugMessage("done suspending session");
@@ -2102,7 +2100,7 @@ void sqlrcontroller_svr::pingCommand() {
 		logDebugMessage("ping failed");
 		returnError(!conn->liveconnection);
 	}
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 	if (!pingresult) {
 		reLogIn();
 	}
@@ -2120,7 +2118,7 @@ void sqlrcontroller_svr::identifyCommand() {
 	uint16_t	idlen=charstring::length(ident);
 	clientsock->write(idlen);
 	clientsock->write(ident,idlen);
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 }
 
 void sqlrcontroller_svr::autoCommitCommand() {
@@ -2148,7 +2146,7 @@ void sqlrcontroller_svr::autoCommitCommand() {
 		logDebugMessage("failed");
 		returnError(!conn->liveconnection);
 	}
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 }
 
 bool sqlrcontroller_svr::autoCommitOn() {
@@ -2170,7 +2168,7 @@ void sqlrcontroller_svr::beginCommand() {
 		logDebugMessage("failed");
 		returnError(!conn->liveconnection);
 	}
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 }
 
 bool sqlrcontroller_svr::begin() {
@@ -2204,7 +2202,7 @@ void sqlrcontroller_svr::commitCommand() {
 		logDebugMessage("failed");
 		returnError(!conn->liveconnection);
 	}
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 }
 
 bool sqlrcontroller_svr::commit() {
@@ -2237,7 +2235,7 @@ void sqlrcontroller_svr::rollbackCommand() {
 		logDebugMessage("failed");
 		returnError(!conn->liveconnection);
 	}
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 }
 
 bool sqlrcontroller_svr::rollback() {
@@ -2260,7 +2258,7 @@ void sqlrcontroller_svr::dbVersionCommand() {
 	uint16_t	dbvlen=charstring::length(dbversion);
 	clientsock->write(dbvlen);
 	clientsock->write(dbversion,dbvlen);
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 }
 
 void sqlrcontroller_svr::bindFormatCommand() {
@@ -2275,7 +2273,7 @@ void sqlrcontroller_svr::bindFormatCommand() {
 	uint16_t	bflen=charstring::length(bf);
 	clientsock->write(bflen);
 	clientsock->write(bf,bflen);
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 }
 
 void sqlrcontroller_svr::serverVersionCommand() {
@@ -2290,7 +2288,7 @@ void sqlrcontroller_svr::serverVersionCommand() {
 	uint16_t	svrvlen=charstring::length(svrversion);
 	clientsock->write(svrvlen);
 	clientsock->write(svrversion,svrvlen);
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 }
 
 void sqlrcontroller_svr::selectDatabaseCommand() {
@@ -2325,7 +2323,7 @@ void sqlrcontroller_svr::selectDatabaseCommand() {
 		result=clientsock->read(db,dblen,idleclienttimeout,0);
 		if ((uint32_t)result!=dblen) {
 			clientsock->write(false);
-			flushWriteBuffer();
+			clientsock->flushWriteBuffer(-1,-1);
 			delete[] db;
 			logClientProtocolError(NULL,
 				"select database failed: "
@@ -2343,7 +2341,7 @@ void sqlrcontroller_svr::selectDatabaseCommand() {
 		returnError(!conn->liveconnection);
 	}
 
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 	delete[] db;
 
 	return;
@@ -2361,7 +2359,7 @@ void sqlrcontroller_svr::getCurrentDatabaseCommand() {
 	uint16_t	currentdbsize=charstring::length(currentdb);
 	clientsock->write(currentdbsize);
 	clientsock->write(currentdb,currentdbsize);
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 
 	// clean up
 	delete[] currentdb;
@@ -2378,7 +2376,7 @@ void sqlrcontroller_svr::getLastInsertIdCommand() {
 		logDebugMessage("get last insert id failed");
 		returnError(!conn->liveconnection);
 	}
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 }
 
 void sqlrcontroller_svr::dbHostNameCommand() {
@@ -2390,7 +2388,7 @@ void sqlrcontroller_svr::dbHostNameCommand() {
 	uint16_t	hostnamelen=charstring::length(hostname);
 	clientsock->write(hostnamelen);
 	clientsock->write(hostname,hostnamelen);
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 }
 
 void sqlrcontroller_svr::dbIpAddressCommand() {
@@ -2402,7 +2400,7 @@ void sqlrcontroller_svr::dbIpAddressCommand() {
 	uint16_t	ipaddresslen=charstring::length(ipaddress);
 	clientsock->write(ipaddresslen);
 	clientsock->write(ipaddress,ipaddresslen);
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 }
 
 bool sqlrcontroller_svr::newQueryCommand(sqlrcursor_svr *cursor) {
@@ -4292,8 +4290,7 @@ void sqlrcontroller_svr::returnResultSetHeader(sqlrcursor_svr *cursor) {
 
 	// terminate the bind vars
 	clientsock->write((uint16_t)END_BIND_VARS);
-
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 
 	logDebugMessage("done returning result set header");
 }
@@ -4758,7 +4755,7 @@ bool sqlrcontroller_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 	// for some queries, there are no rows to return, 
 	if (cursor->noRowsToReturn()) {
 		clientsock->write((uint16_t)END_RESULT_SET);
-		flushWriteBuffer();
+		clientsock->flushWriteBuffer(-1,-1);
 		logDebugMessage("done returning result set data");
 		return true;
 	}
@@ -4766,7 +4763,7 @@ bool sqlrcontroller_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 	// skip the specified number of rows
 	if (!skipRows(cursor,skip)) {
 		clientsock->write((uint16_t)END_RESULT_SET);
-		flushWriteBuffer();
+		clientsock->flushWriteBuffer(-1,-1);
 		logDebugMessage("done returning result set data");
 		return true;
 	}
@@ -4785,7 +4782,7 @@ bool sqlrcontroller_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 
 		if (!cursor->fetchRow()) {
 			clientsock->write((uint16_t)END_RESULT_SET);
-			flushWriteBuffer();
+			clientsock->flushWriteBuffer(-1,-1);
 			logDebugMessage("done returning result set data");
 			return true;
 		}
@@ -4807,7 +4804,7 @@ bool sqlrcontroller_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 			cursor->lastrow=0;
 		}
 	}
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 
 	logDebugMessage("done returning result set data");
 	return true;
@@ -5040,7 +5037,7 @@ void sqlrcontroller_svr::returnError(sqlrcursor_svr *cursor, bool disconnect) {
 	// need to send the client the id of the 
 	// cursor that it's going to use.
 	clientsock->write(cursor->id);
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 
 	logDebugMessage("done returning error");
 
@@ -5404,7 +5401,7 @@ bool sqlrcontroller_svr::getQueryTreeCommand(sqlrcursor_svr *cursor) {
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	clientsock->write(xmlstringlen);
 	clientsock->write(xmlstring,xmlstringlen);
-	flushWriteBuffer();
+	clientsock->flushWriteBuffer(-1,-1);
 
 	// clean up
 	delete xml;
@@ -5699,11 +5696,12 @@ void sqlrcontroller_svr::closeConnection() {
 	}
 
 	// deregister and close the handoff socket if necessary
-	deRegisterForHandoff(tmpdir->getString());
+	if (connected) {
+		deRegisterForHandoff(tmpdir->getString());
+	}
 
 	// close the cursors
 	closeCursors(true);
-
 
 	// try to log out
 	logOut();
@@ -5711,10 +5709,8 @@ void sqlrcontroller_svr::closeConnection() {
 	// clear the pool
 	removeAllFileDescriptors();
 
-
 	// close, clean up all sockets
 	delete serversockun;
-
 
 	for (uint64_t index=0; index<serversockincount; index++) {
 		delete serversockin[index];

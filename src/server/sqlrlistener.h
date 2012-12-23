@@ -92,7 +92,6 @@ class sqlrlistener : public rudiments::daemonprocess,
 					uint16_t inetport);
 		void	waitForClientClose(bool passstatus,
 					rudiments::filedescriptor *clientsock);
-		void	flushWriteBuffer(rudiments::filedescriptor *fd);
 
 		void		setMaxListeners(uint32_t maxlisteners);
 		void		incrementMaxListenersErrors();
