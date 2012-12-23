@@ -1441,6 +1441,10 @@ int32_t sqlrcontroller_svr::waitForClient() {
 				return -1;
 			}
 
+			debugstr.clear();
+			debugstr.append("listener pid: ")->append(proxypid);
+			logDebugMessage(debugstr.getString());
+
 			// acknowledge
 			#define ACK	6
 			handoffsockun.write((unsigned char)ACK);
@@ -1732,6 +1736,10 @@ bool sqlrcontroller_svr::getCommand(uint16_t *command) {
 		*command=NO_COMMAND;
 		return false;
 	}
+
+	debugstr.clear();
+	debugstr.append("command: ")->append(*command);
+	logDebugMessage(debugstr.getString());
 
 	logDebugMessage("done getting command");
 	return true;
@@ -5623,6 +5631,9 @@ void sqlrcontroller_svr::closeClientSocket() {
 	// close the client socket
 	logDebugMessage("closing the client socket...");
 	if (proxymode) {
+
+		logDebugMessage("(actually just signalling the listener)");
+
 		// in proxy mode, the client socket is pointed at the
 		// handoff socket which we don't want to actually close
 		clientsock->setFileDescriptor(-1);
@@ -5638,31 +5649,36 @@ void sqlrcontroller_svr::closeClientSocket() {
 
 void sqlrcontroller_svr::closeSuspendedSessionSockets() {
 
-	// If we're no longer in a suspended session and we we're passing 
-	// around file descriptors but had to open a set of sockets to handle 
-	// a suspended session, close those sockets here.
-	if (!suspendedsession) {
-		logDebugMessage("closing sockets from a previously "
-						"suspended session...");
-		if (serversockun) {
-			removeFileDescriptor(serversockun);
-			delete serversockun;
-			serversockun=NULL;
+	if (suspendedsession) {
+		return;
+	}
+
+	// If we're no longer in a suspended session but had to open a set of
+	// sockets to handle a suspended session, close those sockets here.
+	if (serversockun || serversockin) {
+		logDebugMessage("closing sockets from "
+				"a previously suspended session...");
+	}
+	if (serversockun) {
+		removeFileDescriptor(serversockun);
+		delete serversockun;
+		serversockun=NULL;
+	}
+	if (serversockin) {
+		for (uint64_t index=0;
+				index<serversockincount;
+				index++) {
+			removeFileDescriptor(serversockin[index]);
+			delete serversockin[index];
+			serversockin[index]=NULL;
 		}
-		if (serversockin) {
-			for (uint64_t index=0;
-					index<serversockincount;
-					index++) {
-				removeFileDescriptor(serversockin[index]);
-				delete serversockin[index];
-				serversockin[index]=NULL;
-			}
-			delete[] serversockin;
-			serversockin=NULL;
-			serversockincount=0;
-		}
-		logDebugMessage("done closing sockets from a previously "
-						"suspended session...");
+		delete[] serversockin;
+		serversockin=NULL;
+		serversockincount=0;
+	}
+	if (serversockun || serversockin) {
+		logDebugMessage("done closing sockets from "
+				"a previously suspended session...");
 	}
 }
 

@@ -36,6 +36,7 @@ sqlrlistener::sqlrlistener() : daemonprocess(), listener() {
 	init=false;
 
 	authc=NULL;
+	sqlrlg=NULL;
 
 	semset=NULL;
 	idmemory=NULL;
@@ -119,8 +120,8 @@ void sqlrlistener::cleanUp() {
 	delete fixupsockun;
 	delete denied;
 	delete allowed;
-
 	delete tmpdir;
+	delete sqlrlg;
 }
 
 bool sqlrlistener::initListener(int argc, const char **argv) {
@@ -371,10 +372,13 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	char	*idfilename=new char[idfilenamelen];
 	snprintf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir->getString(),id);
 
-	stringbuffer	info;
-	info.append("creating shared memory and semaphores: id filename: ");
-	info.append(idfilename);
-	logDebugMessage(info.getString());
+	if (sqlrlg) {
+		debugstr.clear();
+		debugstr.append("creating shared memory "
+				"and semaphores: id filename: ");
+		debugstr.append(idfilename);
+		logDebugMessage(debugstr.getString());
+	}
 
 	// make sure that the file exists and is read/writeable
 	if (!file::createFile(idfilename,permissions::ownerReadWrite())) {
@@ -791,7 +795,7 @@ void sqlrlistener::listen() {
 	for(;;) {
 		// FIXME: this can return true/false, should we do anything
 		// with that?
-		handleClientConnection(waitForData());
+		handleTraffic(waitForTraffic());
 	}
 }
 
@@ -936,9 +940,9 @@ void sqlrlistener::handleSignals(void (*shutdownfunction)(int32_t)) {
 	signalmanager::ignoreSignals(&set);
 }
 
-filedescriptor *sqlrlistener::waitForData() {
+filedescriptor *sqlrlistener::waitForTraffic() {
 
-	logDebugMessage("waiting for client connection...");
+	logDebugMessage("waiting for traffic...");
 
 	// wait for data on one of the sockets...
 	// if something bad happened, return an invalid file descriptor
@@ -951,13 +955,13 @@ filedescriptor *sqlrlistener::waitForData() {
 	filedescriptor	*fd=NULL;
 	listener::getReadyList()->getDataByIndex(0,&fd);
 
-	logDebugMessage("finished waiting for client connection");
+	logDebugMessage("finished waiting for traffic");
 
 	return fd;
 }
 
 
-bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
+bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 
 	if (!fd) {
 		return false;
@@ -1186,7 +1190,7 @@ bool sqlrlistener::deniedIp(filedescriptor *clientsock) {
 		return true;
 	}
 
-	logDebugMessage("valid ip...");
+	logDebugMessage("valid ip");
 
 	delete[] ip;
 	return false;
@@ -1257,9 +1261,11 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		process::exit(0);
 	} else if (childpid>0) {
 		// parent
-		char	debugstring[22];
-		snprintf(debugstring,22,"forked a child: %ld",(long)childpid);
-		logDebugMessage(debugstring);
+		if (sqlrlg) {
+			debugstr.clear();
+			debugstr.append("forked a child: ")->append(childpid);
+			logDebugMessage(debugstr.getString());
+		}
 		// the main process doesn't need to stay connected
 		// to the client, only the forked process
 		delete clientsock;
@@ -1345,7 +1351,6 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock) {
 
 			// proxy the client
 			if (!proxyClient(connectionpid,&connectionsock,sock)) {
-				logInternalError("failed to proxy client");
 				// FIXME: should there be a limit to the number
 				// of times we retry?
 				continue;
@@ -1576,6 +1581,8 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 		// return an error if the timeout was reached
 		if (alarmrang) {
+			logDebugMessage("failed to get "
+					"a connection: timeout");
 			sock->write((uint16_t)ERROR_OCCURRED);
 			sock->write((uint64_t)SQLR_ERROR_HANDOFFFAILED);
 			sock->write((uint16_t)charstring::length(
@@ -1587,6 +1594,8 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 		// return an error if all db's were down
 		if (alldbsdown) {
+			logDebugMessage("failed to get "
+					"a connection: all dbs were down");
 			sock->write((uint16_t)ERROR_OCCURRED);
 			sock->write((uint64_t)SQLR_ERROR_DBSDOWN);
 			sock->write((uint16_t)charstring::length(
@@ -1691,6 +1700,8 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 				filedescriptor *serversock,
 				filedescriptor *clientsock) {
 
+	logDebugMessage("proxying client...");
+
 	// send the connection our PID
 	serversock->write((uint32_t)process::getProcessId());
 	serversock->flushWriteBuffer(-1,-1);
@@ -1699,6 +1710,8 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	#define ACK	6
 	unsigned char	ack=0;
 	if (serversock->read(&ack,5,0)!=sizeof(unsigned char) || ack!=ACK) {
+		logDebugMessage("proxying client failed: "
+				"connection failed to ack");
 		return false;
 	}
 
@@ -1732,8 +1745,11 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		// were we interrupted?
 		if (error::getErrorNumber()==EINTR) {
 
+			logDebugMessage("interrupted");
+
 			// if it was a SIGUSR1 then bail
 			if (gotsigusr1) {
+				logDebugMessage("received SIGUSR1");
 				break;
 			}
 
@@ -1746,6 +1762,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		// One of the sockets must have gotten closed.
 		// Most likely the client disconnected.
 		if (waitcount<1) {
+			logDebugMessage("wait exited with no data");
 			endsession=true;
 			break;
 		}
@@ -1757,15 +1774,37 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		// read whatever data was available
 		ssize_t	readcount=fd->read(readbuffer,sizeof(readbuffer));
 		if (readcount<1) {
+			if (sqlrlg) {
+				debugstr.clear();
+				debugstr.append("read failed: ");
+				debugstr.append(readcount);
+				debugstr.append(" : ");
+				char	*err=error::getErrorString();
+				debugstr.append(err);
+				delete[] err;
+				logDebugMessage(debugstr.getString());
+			}
 			endsession=(fd==clientsock);
 			break;
 		}
 
 		// write the data to the other side
 		if (fd==serversock) {
+			if (sqlrlg) {
+				debugstr.clear();
+				debugstr.append("read ")->append(readcount);
+				debugstr.append(" bytes from server");
+				logDebugMessage(debugstr.getString());
+			}
 			clientsock->write(readbuffer,readcount);
 			clientsock->flushWriteBuffer(-1,-1);
 		} else if (fd==clientsock) {
+			if (sqlrlg) {
+				debugstr.clear();
+				debugstr.append("read ")->append(readcount);
+				debugstr.append(" bytes from client");
+				logDebugMessage(debugstr.getString());
+			}
 			serversock->write(readbuffer,readcount);
 			serversock->flushWriteBuffer(-1,-1);
 		}
@@ -1773,6 +1812,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 
 	// send the server an end session command, if neccessary
 	if (endsession) {
+		logDebugMessage("ending the session");
 		// translate byte order for this, as the client would
 		serversock->translateByteOrder();
 		serversock->write((uint16_t)END_SESSION);
@@ -1785,6 +1825,8 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	serversock->useBlockingMode();
 	clientsock->dontAllowShortReads();
 	clientsock->useBlockingMode();
+
+	logDebugMessage("finished proxying client");
 
 	return true;
 }

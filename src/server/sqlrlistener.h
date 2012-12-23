@@ -58,8 +58,8 @@ class sqlrlistener : public rudiments::daemonprocess,
 		bool	listenOnHandoffSocket(const char *id);
 		bool	listenOnDeregistrationSocket(const char *id);
 		bool	listenOnFixupSocket(const char *id);
-		rudiments::filedescriptor	*waitForData();
-		bool	handleClientConnection(rudiments::filedescriptor *fd);
+		rudiments::filedescriptor	*waitForTraffic();
+		bool	handleTraffic(rudiments::filedescriptor *fd);
 		bool	registerHandoff(rudiments::filedescriptor *sock);
 		bool	deRegisterHandoff(rudiments::filedescriptor *sock);
 		bool	fixup(rudiments::filedescriptor *sock);
@@ -125,6 +125,8 @@ class sqlrlistener : public rudiments::daemonprocess,
 
 		sqlrauthenticator	*authc;
 		sqlrloggers		*sqlrlg;
+
+		rudiments::stringbuffer	debugstr;
 
 		// FIXME: these shouldn't have to be pointers, right, but
 		// it appears that they do have to be or their destructors don't
