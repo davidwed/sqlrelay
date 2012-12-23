@@ -35,11 +35,8 @@
 
 #include <defines.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
-class sqlrcontroller_svr : public daemonprocess, public listener {
+class sqlrcontroller_svr : public rudiments::daemonprocess,
+				public rudiments::listener {
 	public:
 			sqlrcontroller_svr();
 		virtual	~sqlrcontroller_svr();
@@ -67,11 +64,9 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void		cleanUpAllCursorData();
 
 		bool		getColumnNames(const char *query,
-						stringbuffer *output);
+					rudiments::stringbuffer *output);
 
-		void	handleSignals(void (*shutdownfunction)(int32_t),
-					void (*sigusr1function)(int32_t));
-		void	handleSigUsr1(int32_t signal);
+		void	handleSignals(void (*shutdownfunction)(int32_t));
 		bool	init(int argc, const char **argv);
 		sqlrconnection_svr	*initConnection(const char *dbase);
 		bool	listen();
@@ -174,7 +169,7 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 							const char *query,
 							const char *table,
 							const char *wild);
-		void	escapeParameter(stringbuffer *buffer,
+		void	escapeParameter(rudiments::stringbuffer *buffer,
 							const char *parameter);
 		bool	reExecuteQueryCommand(sqlrcursor_svr *cursor);
 		bool	fetchFromBindCursorCommand(sqlrcursor_svr *cursor);
@@ -226,10 +221,10 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		void	translateBindVariables(sqlrcursor_svr *cursor);
 		bool	matchesNativeBindFormat(const char *bind);
 		void	translateBindVariableInStringAndArray(
-						sqlrcursor_svr *cursor,
-						stringbuffer *currentbind,
-						uint16_t bindindex,
-						stringbuffer *newquery);
+					sqlrcursor_svr *cursor,
+					rudiments::stringbuffer *currentbind,
+					uint16_t bindindex,
+					rudiments::stringbuffer *newquery);
 		void	translateBindVariableInArray(
 						sqlrcursor_svr *cursor,
 						const char *currentbind,
@@ -461,7 +456,7 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 
 		unixclientsocket	handoffsockun;
 		bool			proxymode;
-		bool			sigusr1;
+		uint32_t		proxypid;
 
 		bool		connected;
 		bool		inclientsession;
@@ -496,7 +491,7 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		bool		decrementonclose;
 		bool		silent;
 
-		stringbuffer	debugstr;
+		rudiments::stringbuffer	debugstr;
 
 		uint64_t	maxclientinfolength;
 		uint32_t	maxquerysize;
@@ -512,9 +507,7 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		const char	*dbhostname;
 		const char	*dbipaddress;
 
-		signalhandler	shutdownhandler;
-		signalhandler	sigusr1handler;
+		rudiments::signalhandler	shutdownhandler;
 };
-
 
 #endif

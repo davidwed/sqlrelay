@@ -37,6 +37,7 @@ class sqlrlistener : public rudiments::daemonprocess,
 	public:
 			sqlrlistener();
 			~sqlrlistener();
+		void	handleSignals(void (*shutdownfunction)(int32_t));
 		bool	initListener(int argc, const char **argv);
 		void	listen();
 	private:
@@ -45,7 +46,7 @@ class sqlrlistener : public rudiments::daemonprocess,
 		bool	verifyAccessToConfigFile(const char *configfile);
 		bool	handlePidFile(const char *id);
 		void	handleDynamicScaling();
-		void	setHandoffMethod();
+		void	setHandoffMethod(const char *id);
 		void	setIpPermissions();
 		bool	createSharedMemoryAndSemaphores(const char *id);
 		void	ipcFileError(const char *idfilename);
@@ -57,7 +58,6 @@ class sqlrlistener : public rudiments::daemonprocess,
 		bool	listenOnHandoffSocket(const char *id);
 		bool	listenOnDeregistrationSocket(const char *id);
 		bool	listenOnFixupSocket(const char *id);
-		void	blockSignals();
 		rudiments::filedescriptor	*waitForData();
 		bool	handleClientConnection(rudiments::filedescriptor *fd);
 		bool	registerHandoff(rudiments::filedescriptor *sock);
@@ -90,16 +90,9 @@ class sqlrlistener : public rudiments::daemonprocess,
 		void	pingDatabase(uint32_t connectionpid,
 					const char *unixportstr,
 					uint16_t inetport);
-		rudiments::filedescriptor *connectToConnection(
-					uint32_t connectionpid,
-					const char *unixportstr,
-					uint16_t inetport);
 		void	waitForClientClose(bool passstatus,
 					rudiments::filedescriptor *clientsock);
 		void	flushWriteBuffer(rudiments::filedescriptor *fd);
-
-		static void	alarmHandler(int32_t signum);
-
 
 		void		setMaxListeners(uint32_t maxlisteners);
 		void		incrementMaxListenersErrors();
@@ -116,6 +109,9 @@ class sqlrlistener : public rudiments::daemonprocess,
 						ssize_t result);
 		void	logClientConnectionRefused(const char *info);
 		void	logInternalError(const char *info);
+
+		static void	alarmHandler(int32_t signum);
+		static void	sigUsr1Handler(int32_t signum);
 
 	public:
 		uint32_t	maxconnections;
@@ -155,6 +151,7 @@ class sqlrlistener : public rudiments::daemonprocess,
 		rudiments::unixserversocket	*fixupsockun;
 		char				*fixupsockname;
 
+		uint16_t		handoffmode;
 		handoffsocketnode	*handoffsocklist;
 
 		rudiments::regularexpression	*allowed;
@@ -169,12 +166,15 @@ class sqlrlistener : public rudiments::daemonprocess,
 
 		bool	isforkedchild;
 
-		static	rudiments::signalhandler	alarmhandler;
-		static	volatile sig_atomic_t		alarmrang;
-
 		sqlrconfigfile		cfgfl;
 
 		uint32_t	runningconnections;
+
+		static	rudiments::signalhandler	alarmhandler;
+		static	volatile sig_atomic_t		alarmrang;
+
+		static	rudiments::signalhandler	sigusr1handler;
+		static	volatile sig_atomic_t		gotsigusr1;
 };
 
 #endif

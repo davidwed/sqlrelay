@@ -126,6 +126,7 @@ sqlrcontroller_svr::sqlrcontroller_svr() : daemonprocess(), listener() {
 	dbipaddress=NULL;
 
 	proxymode=false;
+	proxypid=0;
 }
 
 sqlrcontroller_svr::~sqlrcontroller_svr() {
@@ -180,12 +181,7 @@ sqlrcontroller_svr::~sqlrcontroller_svr() {
 	delete conn;
 }
 
-void sqlrcontroller_svr::handleSignals(void (*shutdownfunction)(int32_t),
-					void (*sigusr1function)(int32_t)) {
-
-	// handle SIGUSR1
-	sigusr1handler.setHandler(sigusr1function);
-	sigusr1handler.handleSignal(SIGUSR1);
+void sqlrcontroller_svr::handleSignals(void (*shutdownfunction)(int32_t)) {
 
 	// handle kill signals (SIGINT, SIGTERM)
 	handleShutDown(shutdownfunction);
@@ -1326,6 +1322,7 @@ void sqlrcontroller_svr::registerForHandoff(const char *tmpdir) {
 
 		if (handoffsockun.connect(handoffsockname,-1,-1,1,0)==
 							RESULT_SUCCESS) {
+			handoffsockun.dontUseNaglesAlgorithm();
 			if (handoffsockun.write(
 				(uint32_t)process::getProcessId())==
 							sizeof(uint32_t)) {
@@ -1363,6 +1360,7 @@ void sqlrcontroller_svr::deRegisterForHandoff(const char *tmpdir) {
 	// attach to the socket and write the process id
 	unixclientsocket	removehandoffsockun;
 	removehandoffsockun.connect(removehandoffsockname,-1,-1,0,1);
+	removehandoffsockun.dontUseNaglesAlgorithm();
 	removehandoffsockun.write((uint32_t)process::getProcessId());
 
 	logDebugMessage("done de-registering for handoff");
@@ -1376,6 +1374,9 @@ int32_t sqlrcontroller_svr::waitForClient() {
 
 	updateState(WAIT_CLIENT);
 
+	// reset proxy mode flag
+	proxymode=false;
+
 	// FIXME: listen() checks for 2,1,0 or -1 from this method, but this
 	// method only returns 2, 1 or -1.  0 should indicate that a suspended
 	// session timed out.
@@ -1384,6 +1385,9 @@ int32_t sqlrcontroller_svr::waitForClient() {
 	// file descriptors around, wait for one to be passed to us, otherwise,
 	// accept on the unix/inet sockets. 
 	if (!suspendedsession) {
+
+		// the client file descriptor
+		int32_t	descriptor;
 
 		// get what we're supposed to do...
 		uint16_t	command;
@@ -1401,30 +1405,58 @@ int32_t sqlrcontroller_svr::waitForClient() {
 			return -1;
 		}
 
-		// if we're supposed to reconnect, then just do that...
 		if (command==HANDOFF_RECONNECT) {
+
+			// if we're supposed to reconnect, then just do that...
 			return 2;
+
+		} else if (command==HANDOFF_PASS) {
+
+			// Receive the client file descriptor and use it.
+			if (!handoffsockun.receiveFileDescriptor(&descriptor)) {
+				logInternalError(NULL,"failed to receive "
+						"client file descriptor");
+				logDebugMessage("done waiting for client");
+				// If this fails, then the listener most likely
+				// died because sqlr-stop was run.  Arguably
+				// this condition should initiate a shut down
+				// of this process as well, but for now we'll
+				// just wait to be shut down manually.
+				// Unfortunatley, that means looping over and
+				// over, with that read above failing every
+				// time, thus the  sleep so as not to slam the
+				// machine while we loop.
+				return -1;
+			}
+
+		} else if (command==HANDOFF_PROXY) {
+
+			logDebugMessage("listener is proxying the client");
+
+			// get the listener's pid
+			if (handoffsockun.read(&proxypid)!=sizeof(uint32_t)) {
+				logInternalError(NULL,
+						"failed to read process "
+						"id during proxy handoff");
+				return -1;
+			}
+
+			// acknowledge
+			#define ACK	6
+			handoffsockun.write((unsigned char)ACK);
+			handoffsockun.flushWriteBuffer(-1,-1);
+
+			descriptor=handoffsockun.getFileDescriptor();
+
+			proxymode=true;
+
+		} else {
+
+			logInternalError(NULL,"received invalid handoff mode");
+			return -1;
 		}
 
-		// Receive the descriptor and use it.  If we failed to get the
-		// descriptor, the listener will attempt to proxy the client
-		// connection.
-		int32_t	descriptor;
-		proxymode=false;
-		handoffsockun.dontRetryInterruptedReads();
-		if (!handoffsockun.receiveFileDescriptor(&descriptor)) {
-			if (!proxymode) {
-				// FIXME: error!!!
-			}
-		}
-		handoffsockun.retryInterruptedReads();
-		if (!proxymode) {
-			logDebugMessage("pass succeeded");
-		} else {
-			logDebugMessage("pass failed, "
-					"falling back to proxy mode");
-			descriptor=handoffsockun.getFileDescriptor();
-		}
+		// set up the client socket
 		clientsock=new filedescriptor;
 		clientsock->setFileDescriptor(descriptor);
 
@@ -1477,12 +1509,9 @@ int32_t sqlrcontroller_svr::waitForClient() {
 		}
 	}
 
+	// set up the socket
 	clientsock->translateByteOrder();
 	clientsock->dontUseNaglesAlgorithm();
-	// FIXME: use bandwidth delay product to tune these
-	// SO_SNDBUF=0 causes no data to ever be sent on openbsd
-	//clientsock->setTcpReadBufferSize(8192);
-	//clientsock->setTcpWriteBufferSize(0);
 	clientsock->setReadBufferSize(8192);
 	clientsock->setWriteBufferSize(8192);
 	return 1;
@@ -5594,9 +5623,13 @@ void sqlrcontroller_svr::closeClientSocket() {
 	// close the client socket
 	logDebugMessage("closing the client socket...");
 	if (proxymode) {
-		// in proxy mode, the client socket is actually pointed
-		// at the handoff socket which we don't want to close
+		// in proxy mode, the client socket is pointed at the
+		// handoff socket which we don't want to actually close
 		clientsock->setFileDescriptor(-1);
+
+		// we do need to signal the proxy that it
+		// needs to close the connection though
+		signalmanager::sendSignal(proxypid,SIGUSR1);
 	}
 	clientsock->close();
 	delete clientsock;

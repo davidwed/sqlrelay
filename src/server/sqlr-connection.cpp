@@ -63,11 +63,6 @@ void shutDown(int32_t signum) {
 	process::exit(exitcode);
 }
 
-// FIXME: move this into sqlrcontroller
-void sigUsr1(int32_t signum) {
-	cont->proxymode=true;
-}
-
 int main(int argc, const char **argv) {
 
 	#include <version.h>
@@ -75,7 +70,7 @@ int main(int argc, const char **argv) {
 	cont=new sqlrcontroller_svr;
 
 	// handle signals
-	cont->handleSignals(shutDown,sigUsr1);
+	cont->handleSignals(shutDown);
 
 	// open the connection to the db
 	bool	result=false;

@@ -21,8 +21,7 @@ int	main(int argc, const char **argv) {
 	#include <version.h>
 
 	lsnr=new sqlrlistener();
-	lsnr->handleShutDown(shutDown);
-	lsnr->handleCrash(shutDown);
+	lsnr->handleSignals(shutDown);
 	if (lsnr->initListener(argc,argv)) {
 		lsnr->listen();
 	}

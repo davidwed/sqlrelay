@@ -10,6 +10,7 @@
 // listener-connection protocol...
 #define HANDOFF_PASS 0
 #define HANDOFF_RECONNECT 1
+#define HANDOFF_PROXY 2
 
 // client-server protocol...
 #define NEW_QUERY 0

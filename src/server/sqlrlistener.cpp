@@ -26,6 +26,9 @@ using namespace rudiments;
 signalhandler		sqlrlistener::alarmhandler;
 volatile sig_atomic_t	sqlrlistener::alarmrang=0;
 
+signalhandler		sqlrlistener::sigusr1handler;
+volatile sig_atomic_t	sqlrlistener::gotsigusr1=0;
+
 sqlrlistener::sqlrlistener() : daemonprocess(), listener() {
 
 	cmdl=NULL;
@@ -67,6 +70,7 @@ sqlrlistener::sqlrlistener() : daemonprocess(), listener() {
 	idleclienttimeout=-1;
 
 	isforkedchild=false;
+	handoffmode=HANDOFF_PASS;
 }
 
 sqlrlistener::~sqlrlistener() {
@@ -147,14 +151,14 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 
 	handleDynamicScaling();
 
-	setHandoffMethod();
-
 	const char	*loggers=cfgfl.getLoggers();
 	if (charstring::length(loggers)) {
 		sqlrlg=new sqlrloggers;
 		sqlrlg->loadLoggers(loggers);
 		sqlrlg->initLoggers(this,NULL);
 	}
+
+	setHandoffMethod(cmdl->getId());
 
 	setIpPermissions();
 
@@ -295,7 +299,42 @@ void sqlrlistener::handleDynamicScaling() {
 	dynamicscaling=cfgfl.getDynamicScaling();
 }
 
-void sqlrlistener::setHandoffMethod() {
+void sqlrlistener::setHandoffMethod(const char *id) {
+
+	// Fork a child which will listen on a unix socket while the main
+	// process attempts to send it a file descriptor.  If this succeeds
+	// then we support file descriptor passing, if it fails, we do not.
+	stringbuffer	testsockname;
+	testsockname.append(tmpdir->getString());
+	testsockname.append("/sockets/")->append(id)->append("-test");
+	handoffmode=HANDOFF_PROXY;
+	pid_t	childpid;
+	if (!(childpid=process::fork())) {
+		// the child process...
+		unixserversocket	us;
+		us.listen(testsockname.getString(),0000,15);
+		filedescriptor	*fd=us.accept();
+		int32_t	desc;
+		fd->receiveFileDescriptor(&desc);
+		delete fd;
+		process::exit(0);
+	} else if (childpid>0) {
+		unixclientsocket	uc;
+		// the child process might take a bit to get fired up,
+		// retry 5 times, waiting 1 second in between each
+		if (uc.connect(testsockname.getString(),-1,-1,1,5) &&
+					uc.passFileDescriptor(0)) {
+			handoffmode=HANDOFF_PASS;
+		} else {
+			signalmanager::sendSignal(childpid,SIGTERM);
+		}
+	}
+
+	// warn if the test failed
+	if (handoffmode==HANDOFF_PROXY) {
+		fprintf(stderr,"Warning: file descriptor passing "
+				"not supported on this platform\n");
+	}
 
 	// create the list of handoff nodes
 	handoffsocklist=new handoffsocketnode[maxconnections];
@@ -487,8 +526,7 @@ bool sqlrlistener::listenOnClientSockets() {
 	if (!port) {
 		clientsockincount=0;
 	}
-	const char	*uport=cfgfl.getUnixPort();
-	unixport=charstring::duplicate(uport);
+	unixport=charstring::duplicate(cfgfl.getUnixPort());
 
 	// attempt to listen on the SQL Relay inet ports
 	// (on each specified address), if necessary
@@ -559,8 +597,7 @@ bool sqlrlistener::listenOnClientSockets() {
 	if (!mysqlport) {
 		mysqlclientsockincount=0;
 	}
-	const char	*mysqluport=cfgfl.getMySQLUnixPort();
-	mysqlunixport=charstring::duplicate(mysqluport);
+	mysqlunixport=charstring::duplicate(cfgfl.getMySQLUnixPort());
 
 	// attempt to listen on the MySQL inet ports
 	// (on each specified address), if necessary
@@ -744,7 +781,6 @@ void sqlrlistener::listen() {
 		return;
 	}
 
-	blockSignals();
 	for(;;) {
 		// FIXME: this can return true/false, should we do anything
 		// with that?
@@ -752,11 +788,23 @@ void sqlrlistener::listen() {
 	}
 }
 
-void sqlrlistener::blockSignals() {
+void sqlrlistener::handleSignals(void (*shutdownfunction)(int32_t)) {
+
+	// handle SIGUSR1
+	sigusr1handler.setHandler(sigUsr1Handler);
+	sigusr1handler.handleSignal(SIGUSR1);
+
+	// handle kill (SIGINT, SIGTERM) and crash (SIGSEGV) signals
+	handleShutDown(shutdownfunction);
+	handleCrash(shutdownfunction);
+
+	// set a handler for SIGALRM's
+	alarmhandler.setHandler(alarmHandler);
+	alarmhandler.handleSignal(SIGALRM);
 
 	// the daemon class handles SIGTERM's and SIGINT's and SIGCHLDS
-	// and we need to catch SIGALRM's for timeouts
-	// but we're going to block all other signals
+	// and we catch SIGALRM's for timeouts but we're going to block
+	// all other signals
 	signalset	set;
 	set.removeAllSignals();
 
@@ -879,15 +927,6 @@ void sqlrlistener::blockSignals() {
 	#endif
 
 	signalmanager::ignoreSignals(&set);
-
-	// set a handler for SIGALRM's
-	alarmhandler.setHandler(alarmHandler);
-	alarmhandler.handleSignal(SIGALRM);
-}
-
-void sqlrlistener::alarmHandler(int32_t signum) {
-	alarmrang=1;
-	alarmhandler.handleSignal(SIGALRM);
 }
 
 filedescriptor *sqlrlistener::waitForData() {
@@ -928,12 +967,15 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 	filedescriptor	*clientsock;
 	if (fd==handoffsockun) {
 		clientsock=handoffsockun->accept();
+		clientsock->dontUseNaglesAlgorithm();
 		return registerHandoff(clientsock);
 	} else if (fd==removehandoffsockun) {
 		clientsock=removehandoffsockun->accept();
+		clientsock->dontUseNaglesAlgorithm();
 		return deRegisterHandoff(clientsock);
 	} else if (fd==fixupsockun) {
 		clientsock=fixupsockun->accept();
+		clientsock->dontUseNaglesAlgorithm();
 		return fixup(clientsock);
 	}
 
@@ -973,10 +1015,6 @@ bool sqlrlistener::handleClientConnection(filedescriptor *fd) {
 	}
 
 	clientsock->dontUseNaglesAlgorithm();
-	// FIXME: make these buffer sizes configurable
-	// SO_SNDBUF=0 causes no data to ever be sent on openbsd
-	//clientsock->setTcpReadBufferSize(8192);
-	//clientsock->setTcpWriteBufferSize(0);
 	clientsock->setReadBufferSize(8192);
 	clientsock->setWriteBufferSize(8192);
 
@@ -1277,22 +1315,29 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock) {
 			continue;
 		}
 
-		// Pass the client to the connection.  If any of this
-		// fails, the connection may have crashed or been
-		// killed.  Loop back and get another connection...
+		// Pass the client to the connection or proxy it.
+		// If any of this fails, the connection may have crashed or
+		// been killed.  Loop back and get another connection...
 
-		// tell the connection we're passing it a file descriptor
-		connectionsock.write((uint16_t)HANDOFF_PASS);
+		// tell the connection what handoff mode to expect
+		connectionsock.write(handoffmode);
 
-		// pass the file descriptor
-		retval=connectionsock.passFileDescriptor(
-					//sock->getFileDescriptor());
-					-1);
-		if (!retval) {
-			logInternalError("failed to pass file descriptor, "
-							"attempting proxy");
-			retval=proxyClient(connectionpid,&connectionsock,sock);
-			if (!retval) {
+		if (handoffmode==HANDOFF_PASS) {
+
+			// pass the file descriptor
+			if (!connectionsock.passFileDescriptor(
+					sock->getFileDescriptor())) {
+				logInternalError("failed to pass "
+						"file descriptor");
+				// FIXME: should there be a limit to the number
+				// of times we retry?
+				continue;
+			}
+
+		} else {
+
+			// proxy the client
+			if (!proxyClient(connectionpid,&connectionsock,sock)) {
 				logInternalError("failed to proxy client");
 				// FIXME: should there be a limit to the number
 				// of times we retry?
@@ -1581,29 +1626,6 @@ void sqlrlistener::pingDatabase(uint32_t connectionpid,
 	process::exit(0);
 }
 
-filedescriptor *sqlrlistener::connectToConnection(uint32_t connectionpid,
-						const char *unixportstr,
-						uint16_t inetport) {
-
-	// first, try for the unix port
-	if (unixportstr && unixportstr[0]) {
-		unixclientsocket	*unixsock=new unixclientsocket();
-		if (unixsock->connect(unixportstr,-1,-1,0,1)==RESULT_SUCCESS) {
-			return unixsock;
-		}
-		delete unixsock;
-	}
-
-	// then try for the inet port
-	inetclientsocket	*inetsock=new inetclientsocket();
-	if (inetsock->connect("127.0.0.1",inetport,-1,-1,0,1)==RESULT_SUCCESS) {
-		return inetsock;
-	}
-	delete inetsock;
-
-	return NULL;
-}
-
 bool sqlrlistener::findMatchingSocket(uint32_t connectionpid,
 					filedescriptor *connectionsock) {
 
@@ -1638,6 +1660,8 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 		return false;
 	}
 
+	fixupclientsockun.dontUseNaglesAlgorithm();
+
 	// send the pid of the connection that we need
 	if (fixupclientsockun.write(connectionpid)!=sizeof(uint32_t)) {
 		logInternalError("fixup failed to write pid");
@@ -1660,34 +1684,77 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 				filedescriptor *serversock,
 				filedescriptor *clientsock) {
 
-	signalmanager::sendSignal(connectionpid,SIGUSR1);
+	// send the connection our PID
+	serversock->write((uint32_t)process::getProcessId());
+	serversock->flushWriteBuffer(-1,-1);
 
+	// wait up to 5 seconds for a response
+	#define ACK	6
+	unsigned char	ack=0;
+	if (serversock->read(&ack,5,0)!=sizeof(unsigned char) || ack!=ACK) {
+		return false;
+	}
+
+	// allow short reads and use non blocking mode
 	serversock->allowShortReads();
 	serversock->useNonBlockingMode();
 	clientsock->allowShortReads();
 	clientsock->useNonBlockingMode();
 
+	// Set up a listener to listen on both client and server sockets.
+	// Allow waits to be interrupted because the connecton daemon will
+	// send us a SIGUSR1 when it's done talking to the client.
 	listener	proxy;
 	proxy.addFileDescriptor(serversock);
 	proxy.addFileDescriptor(clientsock);
+	proxy.dontRetryInterruptedWaits();
 
+	// set up a read buffer
 	unsigned char	readbuffer[8192];
+
+	// should we send an end session command to the connection?
+	bool	endsession=false;
 
 	for (;;) {
 
+		// wait for data to be available from the client or server
+		// or for the server to signal that we should bail
+		error::clearError();
 		int32_t	waitcount=proxy.waitForNonBlockingRead(-1,-1);
+
+		// were we interrupted?
+		if (error::getErrorNumber()==EINTR) {
+
+			// if it was a SIGUSR1 then bail
+			if (gotsigusr1) {
+				break;
+			}
+
+			// must have been some other signal,
+			// loop back and wait again
+			continue;
+		}
+
+		// No interrupt, but nobody had data...
+		// One of the sockets must have gotten closed.
+		// Most likely the client disconnected.
 		if (waitcount<1) {
+			endsession=true;
 			break;
 		}
 
+		// get the file descriptor that data was available from
 		filedescriptor	*fd=NULL;
 		proxy.getReadyList()->getDataByIndex(0,&fd);
 
+		// read whatever data was available
 		ssize_t	readcount=fd->read(readbuffer,sizeof(readbuffer));
 		if (readcount<1) {
+			endsession=(fd==clientsock);
 			break;
 		}
 
+		// write the data to the other side
 		if (fd==serversock) {
 			clientsock->write(readbuffer,readcount);
 			clientsock->flushWriteBuffer(-1,-1);
@@ -1697,6 +1764,16 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		}
 	}
 
+	// send the server an end session command, if neccessary
+	if (endsession) {
+		// translate byte order for this, as the client would
+		serversock->translateByteOrder();
+		serversock->write((uint16_t)END_SESSION);
+		serversock->dontTranslateByteOrder();
+		serversock->flushWriteBuffer(-1,-1);
+	}
+
+	// set everything back to normal
 	serversock->dontAllowShortReads();
 	serversock->useBlockingMode();
 	clientsock->dontAllowShortReads();
@@ -1983,4 +2060,14 @@ void sqlrlistener::logInternalError(const char *info) {
 			SQLRLOGGER_LOGLEVEL_ERROR,
 			SQLRLOGGER_EVENTTYPE_INTERNAL_ERROR,
 			errorbuffer.getString());
+}
+
+void sqlrlistener::alarmHandler(int32_t signum) {
+	alarmrang=1;
+	alarmhandler.handleSignal(SIGALRM);
+}
+
+void sqlrlistener::sigUsr1Handler(int32_t signum) {
+	gotsigusr1=1;
+	sigusr1handler.handleSignal(SIGUSR1);
 }
