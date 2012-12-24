@@ -1250,7 +1250,8 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		// parent
 		if (sqlrlg) {
 			debugstr.clear();
-			debugstr.append("forked a child: ")->append(childpid);
+			debugstr.append("forked a child: ");
+			debugstr.append((int32_t)childpid);
 			logDebugMessage(debugstr.getString());
 		}
 		// the main process doesn't need to stay connected
@@ -1559,7 +1560,8 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					debugstr.clear();
 					debugstr.append("finished getting "
 							"a connection: ");
-					debugstr.append(*connectionpid);
+					debugstr.append(
+						(int32_t)*connectionpid);
 					logDebugMessage(debugstr.getString());
 				}
 				return true;
@@ -1776,7 +1778,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 			if (sqlrlg) {
 				debugstr.clear();
 				debugstr.append("read failed: ");
-				debugstr.append(readcount);
+				debugstr.append((uint32_t)readcount);
 				debugstr.append(" : ");
 				char	*err=error::getErrorString();
 				debugstr.append(err);
@@ -1791,7 +1793,8 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		if (fd==serversock) {
 			if (sqlrlg) {
 				debugstr.clear();
-				debugstr.append("read ")->append(readcount);
+				debugstr.append("read ");
+				debugstr.append((uint32_t)readcount);
 				debugstr.append(" bytes from server");
 				logDebugMessage(debugstr.getString());
 			}
@@ -1800,7 +1803,8 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		} else if (fd==clientsock) {
 			if (sqlrlg) {
 				debugstr.clear();
-				debugstr.append("read ")->append(readcount);
+				debugstr.append("read ");
+				debugstr.append((uint32_t)readcount);
 				debugstr.append(" bytes from client");
 				logDebugMessage(debugstr.getString());
 			}
