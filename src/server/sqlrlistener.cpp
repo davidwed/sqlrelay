@@ -1555,8 +1555,13 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 			// make sure the connection is actually up...
 			if (connectionIsUp(shm->connectionid)) {
-				logDebugMessage("finished getting "
-						"a connection");
+				if (sqlrlg) {
+					debugstr.clear();
+					debugstr.append("finished getting "
+							"a connection: ");
+					debugstr.append(*connectionpid);
+					logDebugMessage(debugstr.getString());
+				}
 				return true;
 			}
 
