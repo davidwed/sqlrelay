@@ -303,8 +303,7 @@ void sqlrlistener::handleDynamicScaling() {
 
 void sqlrlistener::setHandoffMethod(const char *id) {
 
-	const char	*handoff=cfgfl.getHandoff();
-	if (!charstring::compare(handoff,"pass")) {
+	if (!charstring::compare(cfgfl.getHandoff(),"pass")) {
 
         	// on some OS'es, force proxy, even if pass was specified...
 
@@ -317,6 +316,9 @@ void sqlrlistener::setHandoffMethod(const char *id) {
         	if (!charstring::compare(os,"CYGWIN",6) ||
                 	(!charstring::compare(os,"Linux",5) && ver<2.2)) {
 			handoffmode=HANDOFF_PROXY;
+			fprintf(stderr,"Warning: handoff=\"pass\" not "
+					"supported, falling back to "
+					"handoff=\"proxy\"\n");
         	} else {
 			handoffmode=HANDOFF_PASS;
 		}
@@ -325,53 +327,8 @@ void sqlrlistener::setHandoffMethod(const char *id) {
         	delete[] os;
         	delete[] rel;
 
-	} else if (!charstring::compare(handoff,"proxy")) {
-		handoffmode=HANDOFF_PROXY;
 	} else {
-
-		// Fork a child which will listen on a unix socket while the
-		// main process attempts to send it a file descriptor.  If this
-		// succeeds then we support file descriptor passing, if it
-		// fails, we do not.
-		stringbuffer	testsockname;
-		testsockname.append(tmpdir->getString());
-		testsockname.append("/sockets/")->append(id)->append("-test");
 		handoffmode=HANDOFF_PROXY;
-		pid_t	childpid;
-		if (!(childpid=process::fork())) {
-			// the child process...
-			unixserversocket	us;
-			us.listen(testsockname.getString(),0000,15);
-			filedescriptor	*fd=us.accept();
-			int32_t	desc;
-			fd->receiveFileDescriptor(&desc);
-			filedescriptor	test;
-			test.setFileDescriptor(desc);
-			bool	result=(test.write(' ')==sizeof(char));
-			fd->write(result);
-			fd->flushWriteBuffer(-1,-1);
-			delete fd;
-			process::exit(0);
-		} else if (childpid>0) {
-			unixclientsocket	uc;
-			// the child process might take a bit to get fired up,
-			// retry 5 times, waiting 1 second in between each
-			bool	result=false;
-			if (uc.connect(testsockname.getString(),-1,-1,1,5) &&
-					uc.passFileDescriptor(0) &&
-					uc.read(&result,5,0)==sizeof(bool) &&
-					result==true) {
-				handoffmode=HANDOFF_PASS;
-			} else {
-				signalmanager::sendSignal(childpid,SIGTERM);
-			}
-		}
-
-		// warn if the test failed
-		if (handoffmode==HANDOFF_PROXY) {
-			fprintf(stderr,"Warning: file descriptor passing is "
-					"not supported on this platform\n");
-		}
 	}
 
 	// create the list of handoff nodes

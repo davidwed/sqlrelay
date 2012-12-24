@@ -68,12 +68,11 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="handoff" default="test">
+      <xs:attribute name="handoff" default="pass">
         <xs:simpleType>
           <xs:restriction base="xs:token">
             <xs:enumeration value="pass"/>
             <xs:enumeration value="proxy"/>
-            <xs:enumeration value="test"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>

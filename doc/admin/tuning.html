@@ -290,15 +290,11 @@ host/port.</p>
 
 <p>When a client connects to the SQL Relay listener process, it waits for an available database connection, then either hands the client off to that process via file descriptor passing or proxys the incoming client, ferrying data back and forth between it and the database connecton process.</p>
 
-<p>File descriptor passing is much faster and uses fewer system resources than proxying but it is not supported on all platforms.  For example, Linux kernels prior to 2.2 and the Cygwin environment under Windows, do not support file descriptor passing and it is likely that other platforms don't as well, especially older platforms.</p>
+<p>The method to use can be specified by the "handoff" parameter in ths sqlrelay.conf file.  If you set handoff="pass" then file descriptor passing will be used.  If you set handoff="proxy" then proxying will be used.</p>
+
+<p>File descriptor passing is faster and lighter than proxying but it is not supported on all platforms.  For example, Linux kernels prior to 2.2 and the Cygwin environment under Windows, do not support file descriptor passing and it is likely that other platforms don't as well, especially older platforms.</p>
 
 <p>If you want the best performance, you must use a platform that supports file descriptor passing.</p>
-
-<p>The method to use can be specified by the "handoff" parameter in ths sqlrelay.conf file.  If you set handoff="pass" then file descriptor passing will be used.  If you set handoff="proxy" then proxying will be used.  If you omit the parameter or set handoff="test" then during startup, the main sqlr-listener process will perform a test to verify whether file descriptor passing is supported or not.  If it is not, a warning is displayed on the screen like:</p>
-
-<blockquote><b>
-Warning: file descriptor passing is not supported on this platform
-</b></blockquote>
 
 <br>
 <a name="systemparameters"></a>
