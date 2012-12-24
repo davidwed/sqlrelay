@@ -5,7 +5,6 @@
 #include <sqlrconfigfile.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/environment.h>
-#include <rudiments/system.h>
 
 #include <stdlib.h>
 
@@ -49,6 +48,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	authtier=charstring::duplicate(DEFAULT_AUTHTIER);
 	authonconnection=charstring::compare(authtier,"database");
 	authondatabase=!charstring::compare(authtier,"database");
+	handoff=charstring::duplicate(DEFAULT_HANDOFF);
 	allowedips=charstring::duplicate(DEFAULT_DENIEDIPS);
 	deniedips=charstring::duplicate(DEFAULT_DENIEDIPS);
 	debug=charstring::duplicate(DEFAULT_DEBUG);
@@ -109,6 +109,7 @@ sqlrconfigfile::~sqlrconfigfile() {
 	delete[] runasuser;
 	delete[] runasgroup;
 	delete[] authtier;
+	delete[] handoff;
 	delete[] allowedips;
 	delete[] deniedips;
 	delete[] debug;
@@ -253,6 +254,10 @@ uint16_t sqlrconfigfile::getCursorsGrowBy() {
 
 const char *sqlrconfigfile::getAuthTier() {
 	return authtier;
+}
+
+const char *sqlrconfigfile::getHandoff() {
+	return handoff;
 }
 
 bool sqlrconfigfile::getAuthOnConnection() {
@@ -888,6 +893,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		} else if (!charstring::compare(name,"authtier") ||
 				!charstring::compare(name,"authentication")) {
 			currentattribute=AUTHTIER_ATTRIBUTE;
+		} else if (!charstring::compare(name,"handoff")) {
+			currentattribute=HANDOFF_ATTRIBUTE;
 		} else if (!charstring::compare(name,"deniedips")) {
 			currentattribute=DENIEDIPS_ATTRIBUTE;
 		} else if (!charstring::compare(name,"allowedips")) {
@@ -1250,6 +1257,10 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 				!charstring::compare(authtier,"database");
 			authonconnection=
 				charstring::compare(authtier,"database");
+		} else if (currentattribute==HANDOFF_ATTRIBUTE) {
+			delete[] handoff;
+			handoff=charstring::duplicate((value)?value:
+							DEFAULT_HANDOFF);
 		} else if (currentattribute==DENIEDIPS_ATTRIBUTE) {
 			delete[] deniedips;
 			deniedips=charstring::duplicate((value)?value:

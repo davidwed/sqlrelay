@@ -54,7 +54,7 @@
 #define DEFAULT_AUTHTIER "connection"
 	// default tier to authenticate users on
 
-#define DEFAULT_HANDOFF "reconnect"
+#define DEFAULT_HANDOFF "test"
 	// default method to use for handing off
 	// clients from listener to connection
 

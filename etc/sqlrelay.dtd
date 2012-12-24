@@ -22,6 +22,7 @@
 	<!ATTLIST instance maxcursors CDATA "1300">
 	<!ATTLIST instance cursors_growby CDATA "5">
 	<!ATTLIST instance authtier (connection|database) "connecton">
+	<!ATTLIST instance handoff (pass|proxy|test) "test">
 	<!ATTLIST instance deniedips CDATA "">
 	<!ATTLIST instance allowedips CDATA "">
 	<!ATTLIST instance maxquerysize CDATA "65536">
