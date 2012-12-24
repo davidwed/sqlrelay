@@ -1701,11 +1701,16 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	serversock->flushWriteBuffer(-1,-1);
 
 	// wait up to 5 seconds for a response
-	#define ACK	6
 	unsigned char	ack=0;
-	if (serversock->read(&ack,5,0)!=sizeof(unsigned char) || ack!=ACK) {
+	if (serversock->read(&ack,5,0)!=sizeof(unsigned char)) {
 		logDebugMessage("proxying client failed: "
-				"connection failed to ack");
+				"failed to receive ack");
+		return false;
+	}
+	#define ACK	6
+	if (ack!=ACK) {
+		logDebugMessage("proxying client failed: "
+				"received bad ack");
 		return false;
 	}
 
