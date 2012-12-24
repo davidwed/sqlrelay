@@ -16,8 +16,8 @@
 	implemented the swisscomm log format as a plugin
 	added dbHostName and dbIpAddress methods to the client API
 	refactored authentication to remove a client-server round-trip
-	removed handoff="reconnect" and replaced it with listener-proxying
-		to remove a client-server round-trip
+	replaced handoff="reconnect" with handoff="proxy" which uses
+		listener-proxying to remove a client-server round-trip
 	disabled nagle's algorithm for all sockets
 	fixed a bug that could cause a hang if the db login failed
 
