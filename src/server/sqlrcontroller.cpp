@@ -2553,6 +2553,13 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 		}
 
 		if (success) {
+			// get skip and fetch parameters here so everything
+			// can be done in one round trip without relying on
+			// buffering
+			success=getSkipAndFetch(cursor);
+		}
+
+		if (success) {
 
 			// indicate that no error has occurred
 			clientsock->write((uint16_t)NO_ERROR_OCCURRED);
@@ -2579,7 +2586,7 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 			cursor->lastrowvalid=false;
 
 			// return the result set
-			return returnResultSetData(cursor);
+			return returnResultSetData(cursor,false);
 
 		} else {
 
@@ -4236,6 +4243,28 @@ void sqlrcontroller_svr::setFakeInputBinds(bool fake) {
 	fakeinputbinds=fake;
 }
 
+bool sqlrcontroller_svr::getSkipAndFetch(sqlrcursor_svr *cursor) {
+
+	// get the number of rows to skip
+	ssize_t		result=clientsock->read(&skip,idleclienttimeout,0);
+	if (result!=sizeof(uint64_t)) {
+		logClientProtocolError(cursor,
+				"return result set data failed: "
+				"failed to get rows to skip",result);
+		return false;
+	}
+
+	// get the number of rows to fetch
+	result=clientsock->read(&fetch,idleclienttimeout,0);
+	if (result!=sizeof(uint64_t)) {
+		logClientProtocolError(cursor,
+				"return result set data failed: "
+				"failed to get rows to fetch",result);
+		return false;
+	}
+	return true;
+}
+
 void sqlrcontroller_svr::returnResultSetHeader(sqlrcursor_svr *cursor) {
 
 	logDebugMessage("returning result set header...");
@@ -4717,7 +4746,8 @@ void sqlrcontroller_svr::sendColumnDefinitionString(const char *name,
 	clientsock->write(autoincrement);
 }
 
-bool sqlrcontroller_svr::returnResultSetData(sqlrcursor_svr *cursor) {
+bool sqlrcontroller_svr::returnResultSetData(sqlrcursor_svr *cursor,
+						bool getskipandfetch) {
 
 	logDebugMessage("returning result set data...");
 
@@ -4729,24 +4759,11 @@ bool sqlrcontroller_svr::returnResultSetData(sqlrcursor_svr *cursor) {
 		cursor=cursor->customquerycursor;
 	}
 
-	// get the number of rows to skip
-	uint64_t	skip;
-	ssize_t		result=clientsock->read(&skip,idleclienttimeout,0);
-	if (result!=sizeof(uint64_t)) {
-		logClientProtocolError(cursor,
-				"return result set data failed: "
-				"failed to get rows to skip",result);
-		return false;
-	}
-
-	// get the number of rows to fetch
-	uint64_t	fetch;
-	result=clientsock->read(&fetch,idleclienttimeout,0);
-	if (result!=sizeof(uint64_t)) {
-		logClientProtocolError(cursor,
-				"return result set data failed: "
-				"failed to get rows to fetch",result);
-		return false;
+	// get the number of rows to skip and fetch
+	if (getskipandfetch) {
+		if (!getSkipAndFetch(cursor)) {
+			return false;
+		}
 	}
 
 	// reinit cursor state (in case it was suspended)
@@ -5046,7 +5063,7 @@ void sqlrcontroller_svr::returnError(sqlrcursor_svr *cursor, bool disconnect) {
 
 bool sqlrcontroller_svr::fetchResultSetCommand(sqlrcursor_svr *cursor) {
 	logDebugMessage("fetching result set...");
-	bool	retval=returnResultSetData(cursor);
+	bool	retval=returnResultSetData(cursor,true);
 	logDebugMessage("done fetching result set");
 	return retval;
 }
@@ -5096,7 +5113,7 @@ bool sqlrcontroller_svr::resumeResultSetCommand(sqlrcursor_svr *cursor) {
 		clientsock->write(cursor->lastrow);
 
 		returnResultSetHeader(cursor);
-		retval=returnResultSetData(cursor);
+		retval=returnResultSetData(cursor,true);
 
 	} else {
 
@@ -5279,6 +5296,10 @@ bool sqlrcontroller_svr::getListByApiCall(sqlrcursor_svr *cursor,
 			break;
 	}
 
+	if (success) {
+		success=getSkipAndFetch(cursor);
+	}
+
 	// if an error occurred...
 	if (!success) {
 		cursor->errorMessage(cursor->error,
@@ -5305,7 +5326,7 @@ bool sqlrcontroller_svr::getListByApiCall(sqlrcursor_svr *cursor,
 
 	// if the query processed ok then send a result set header and return...
 	returnResultSetHeader(cursor);
-	if (!returnResultSetData(cursor)) {
+	if (!returnResultSetData(cursor,false)) {
 		return false;
 	}
 	return true;

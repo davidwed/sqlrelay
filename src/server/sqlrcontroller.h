@@ -212,6 +212,7 @@ class sqlrcontroller_svr : public rudiments::daemonprocess,
 		bool	getDateBind(bindvar_svr *bv);
 		bool	getLobBind(sqlrcursor_svr *cursor, bindvar_svr *bv);
 		bool	getSendColumnInfo();
+		bool	getSkipAndFetch(sqlrcursor_svr *cursor);
 		bool	handleBinds(sqlrcursor_svr *cursor);
 		bool	processQuery(sqlrcursor_svr *cursor,
 						bool reexecute,
@@ -243,7 +244,8 @@ class sqlrcontroller_svr : public rudiments::daemonprocess,
 		void	returnResultSetHeader(sqlrcursor_svr *cursor);
 		void	returnColumnInfo(sqlrcursor_svr *cursor,
 						uint16_t format);
-		bool	returnResultSetData(sqlrcursor_svr *cursor);
+		bool	returnResultSetData(sqlrcursor_svr *cursor,
+						bool getskipandfetch);
 		void	sendRowCounts(bool knowsactual,
 						uint64_t actual,
 						bool knowsaffected,
@@ -467,6 +469,9 @@ class sqlrcontroller_svr : public rudiments::daemonprocess,
 		char		*pidfile;
 
 		bool		fakeinputbinds;
+
+		uint64_t	skip;
+		uint64_t	fetch;
 
 		semaphoreset	*semset;
 		sharedmemory	*idmemory;
