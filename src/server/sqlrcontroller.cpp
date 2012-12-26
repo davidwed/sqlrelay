@@ -952,6 +952,7 @@ bool sqlrcontroller_svr::openSockets() {
 
 		if (!serversockun) {
 			serversockun=new unixserversocket();
+			serversockun->useBlockingMode();
 			if (serversockun->listen(unixsocket,0000,5)) {
 
 				size_t	stringlen=26+
@@ -999,6 +1000,7 @@ bool sqlrcontroller_svr::openSockets() {
 					continue;
 				}
 				serversockin[index]=new inetserversocket();
+				serversockin[index]->useBlockingMode();
 				if (serversockin[index]->
 					listen(addresses[index],inetport,5)) {
 
@@ -1320,8 +1322,10 @@ void sqlrcontroller_svr::registerForHandoff(const char *tmpdir) {
 
 		logDebugMessage("trying...");
 
+		handoffsockun.useBlockingMode();
 		if (handoffsockun.connect(handoffsockname,-1,-1,1,0)==
 							RESULT_SUCCESS) {
+			handoffsockun.useBlockingMode();
 			handoffsockun.dontUseNaglesAlgorithm();
 			if (handoffsockun.write(
 				(uint32_t)process::getProcessId())==
@@ -1360,7 +1364,9 @@ void sqlrcontroller_svr::deRegisterForHandoff(const char *tmpdir) {
 
 	// attach to the socket and write the process id
 	unixclientsocket	removehandoffsockun;
+	removehandoffsockun.useBlockingMode();
 	removehandoffsockun.connect(removehandoffsockname,-1,-1,0,1);
+	removehandoffsockun.useBlockingMode();
 	removehandoffsockun.dontUseNaglesAlgorithm();
 	removehandoffsockun.write((uint32_t)process::getProcessId());
 	removehandoffsockun.flushWriteBuffer(-1,-1);
@@ -1465,10 +1471,6 @@ int32_t sqlrcontroller_svr::waitForClient() {
 		// set up the client socket
 		clientsock=new filedescriptor;
 		clientsock->setFileDescriptor(descriptor);
-
-		// For some reason, at least on OpenBSD 4.9, this
-		// filedescriptor is getting created in non-blocking
-		// mode.  Force it into to blocking mode.
 		clientsock->useBlockingMode();
 
 		logDebugMessage("done waiting for client");
@@ -2096,11 +2098,11 @@ void sqlrcontroller_svr::pingCommand() {
 	if (pingresult) {
 		logDebugMessage("ping succeeded");
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		logDebugMessage("ping failed");
 		returnError(!conn->liveconnection);
 	}
-	clientsock->flushWriteBuffer(-1,-1);
 	if (!pingresult) {
 		reLogIn();
 	}
@@ -2142,11 +2144,11 @@ void sqlrcontroller_svr::autoCommitCommand() {
 	if (success) {
 		logDebugMessage("succeeded");
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		logDebugMessage("failed");
 		returnError(!conn->liveconnection);
 	}
-	clientsock->flushWriteBuffer(-1,-1);
 }
 
 bool sqlrcontroller_svr::autoCommitOn() {
@@ -2164,11 +2166,11 @@ void sqlrcontroller_svr::beginCommand() {
 	if (begin()) {
 		logDebugMessage("succeeded");
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		logDebugMessage("failed");
 		returnError(!conn->liveconnection);
 	}
-	clientsock->flushWriteBuffer(-1,-1);
 }
 
 bool sqlrcontroller_svr::begin() {
@@ -2198,11 +2200,11 @@ void sqlrcontroller_svr::commitCommand() {
 	if (commit()) {
 		logDebugMessage("succeeded");
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		logDebugMessage("failed");
 		returnError(!conn->liveconnection);
 	}
-	clientsock->flushWriteBuffer(-1,-1);
 }
 
 bool sqlrcontroller_svr::commit() {
@@ -2231,11 +2233,11 @@ void sqlrcontroller_svr::rollbackCommand() {
 	if (rollback()) {
 		logDebugMessage("succeeded");
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		logDebugMessage("failed");
 		returnError(!conn->liveconnection);
 	}
-	clientsock->flushWriteBuffer(-1,-1);
 }
 
 bool sqlrcontroller_svr::rollback() {
@@ -2337,11 +2339,11 @@ void sqlrcontroller_svr::selectDatabaseCommand() {
 	// ignore these calls, skip the actual call but act like it succeeded.
 	if ((ignoreselectdb)?true:conn->selectDatabase(db)) {
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		returnError(!conn->liveconnection);
 	}
 
-	clientsock->flushWriteBuffer(-1,-1);
 	delete[] db;
 
 	return;
@@ -2372,11 +2374,11 @@ void sqlrcontroller_svr::getLastInsertIdCommand() {
 		logDebugMessage("get last insert id succeeded");
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 		clientsock->write(id);
+		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		logDebugMessage("get last insert id failed");
 		returnError(!conn->liveconnection);
 	}
-	clientsock->flushWriteBuffer(-1,-1);
 }
 
 void sqlrcontroller_svr::dbHostNameCommand() {
@@ -4319,7 +4321,6 @@ void sqlrcontroller_svr::returnResultSetHeader(sqlrcursor_svr *cursor) {
 
 	// terminate the bind vars
 	clientsock->write((uint16_t)END_BIND_VARS);
-	clientsock->flushWriteBuffer(-1,-1);
 
 	logDebugMessage("done returning result set header");
 }
@@ -5022,6 +5023,7 @@ void sqlrcontroller_svr::returnError(bool disconnect) {
 	// send the error string
 	clientsock->write((uint16_t)conn->errorlength);
 	clientsock->write(conn->error,conn->errorlength);
+	clientsock->flushWriteBuffer(-1,-1);
 
 	logDbError(NULL,conn->error);
 }

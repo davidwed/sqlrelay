@@ -78,7 +78,7 @@ uint16_t sqlrcursor::getErrorStatus() {
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
-		sqlrc->debugPrint("Checking For An Error... ");
+		sqlrc->debugPrint("Checking For An Error...\n");
 		sqlrc->debugPreEnd();
 	}
 

@@ -31,6 +31,7 @@ bool sqlrconnection::openSession() {
 			debugPreEnd();
 		}
 
+		ucs.useBlockingMode();
 		openresult=ucs.connect(listenerunixport,
 						connecttimeoutsec,
 						connecttimeoutusec,
@@ -53,6 +54,7 @@ bool sqlrconnection::openSession() {
 			debugPreEnd();
 		}
 
+		ics.useBlockingMode();
 		openresult=ics.connect(server,listenerinetport,
 						connecttimeoutsec,
 						connecttimeoutusec,
@@ -76,6 +78,7 @@ bool sqlrconnection::openSession() {
 	//cs->setTcpWriteBufferSize(0);
 	cs->setReadBufferSize(8192);
 	cs->setWriteBufferSize(8192);
+	cs->useBlockingMode();
 
 	// authenticate
 	authenticate();
