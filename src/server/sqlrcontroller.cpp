@@ -952,7 +952,6 @@ bool sqlrcontroller_svr::openSockets() {
 
 		if (!serversockun) {
 			serversockun=new unixserversocket();
-			serversockun->useBlockingMode();
 			if (serversockun->listen(unixsocket,0000,5)) {
 
 				size_t	stringlen=26+
@@ -1000,7 +999,6 @@ bool sqlrcontroller_svr::openSockets() {
 					continue;
 				}
 				serversockin[index]=new inetserversocket();
-				serversockin[index]->useBlockingMode();
 				if (serversockin[index]->
 					listen(addresses[index],inetport,5)) {
 
@@ -1322,10 +1320,8 @@ void sqlrcontroller_svr::registerForHandoff(const char *tmpdir) {
 
 		logDebugMessage("trying...");
 
-		handoffsockun.useBlockingMode();
 		if (handoffsockun.connect(handoffsockname,-1,-1,1,0)==
 							RESULT_SUCCESS) {
-			handoffsockun.useBlockingMode();
 			handoffsockun.dontUseNaglesAlgorithm();
 			if (handoffsockun.write(
 				(uint32_t)process::getProcessId())==
@@ -1364,9 +1360,7 @@ void sqlrcontroller_svr::deRegisterForHandoff(const char *tmpdir) {
 
 	// attach to the socket and write the process id
 	unixclientsocket	removehandoffsockun;
-	removehandoffsockun.useBlockingMode();
 	removehandoffsockun.connect(removehandoffsockname,-1,-1,0,1);
-	removehandoffsockun.useBlockingMode();
 	removehandoffsockun.dontUseNaglesAlgorithm();
 	removehandoffsockun.write((uint32_t)process::getProcessId());
 	removehandoffsockun.flushWriteBuffer(-1,-1);
@@ -1471,7 +1465,6 @@ int32_t sqlrcontroller_svr::waitForClient() {
 		// set up the client socket
 		clientsock=new filedescriptor;
 		clientsock->setFileDescriptor(descriptor);
-		clientsock->useBlockingMode();
 
 		logDebugMessage("done waiting for client");
 

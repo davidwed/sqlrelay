@@ -538,7 +538,6 @@ bool sqlrlistener::listenOnClientSockets() {
 				continue;
 			}
 			clientsockin[index]=new inetserversocket();
-			clientsockin[index]->useBlockingMode();
 			listening=clientsockin[index]->
 					listen(addresses[index],port,15);
 			if (listening) {
@@ -567,7 +566,6 @@ bool sqlrlistener::listenOnClientSockets() {
 
 	if (charstring::length(unixport)) {
 		clientsockun=new unixserversocket();
-		clientsockun->useBlockingMode();
 		listening=clientsockun->listen(unixport,0000,15);
 		if (listening) {
 			addFileDescriptor(clientsockun);
@@ -611,7 +609,6 @@ bool sqlrlistener::listenOnClientSockets() {
 				continue;
 			}
 			mysqlclientsockin[index]=new inetserversocket();
-			mysqlclientsockin[index]->useBlockingMode();
 			listening=mysqlclientsockin[index]->listen(
 							mysqladdresses[index],
 							mysqlport,15);
@@ -641,7 +638,6 @@ bool sqlrlistener::listenOnClientSockets() {
 
 	if (charstring::length(mysqlunixport)) {
 		mysqlclientsockun=new unixserversocket();
-		mysqlclientsockun->useBlockingMode();
 		listening=mysqlclientsockun->listen(mysqlunixport,0000,15);
 		if (listening) {
 			addFileDescriptor(mysqlclientsockun);
@@ -676,7 +672,6 @@ bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 			"%s/sockets/%s-handoff",tmpdir->getString(),id);
 
 	handoffsockun=new unixserversocket();
-	handoffsockun->useBlockingMode();
 	bool	success=handoffsockun->listen(handoffsockname,0066,15);
 
 	if (success) {
@@ -708,7 +703,6 @@ bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 			"%s/sockets/%s-removehandoff",tmpdir->getString(),id);
 
 	removehandoffsockun=new unixserversocket();
-	removehandoffsockun->useBlockingMode();
 	bool	success=removehandoffsockun->listen(
 						removehandoffsockname,0066,15);
 
@@ -742,7 +736,6 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 			"%s/sockets/%s-fixup",tmpdir->getString(),id);
 
 	fixupsockun=new unixserversocket();
-	fixupsockun->useBlockingMode();
 	bool	success=fixupsockun->listen(fixupsockname,0066,15);
 
 	if (success) {
@@ -1672,14 +1665,12 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 
 	// connect to the fixup socket of the parent listener
 	unixclientsocket	fixupclientsockun;
-	fixupclientsockun.useBlockingMode();
 	if (fixupclientsockun.connect(fixupsockname,-1,-1,0,1)
 						!=RESULT_SUCCESS) {
 		logInternalError("fixup failed to connect");
 		return false;
 	}
 
-	fixupclientsockun.useBlockingMode();
 	fixupclientsockun.dontUseNaglesAlgorithm();
 
 	// send the pid of the connection that we need
