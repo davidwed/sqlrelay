@@ -603,17 +603,17 @@ bool oracle8connection::logIn(const char **error) {
 				(dvoid *(*)(dvoid *, dvoid *, size_t))0,
 				(void (*)(dvoid *, dvoid *))0,
 				(size_t)0,(dvoid **)0)!=OCI_SUCCESS) {
-		*error=logInError("OCIEnvCreate() failed.");
+		*error=logInError("OCIEnvCreate() failed");
 		return false;
 	}
 #else
 	if (OCIInitialize(OCI_DEFAULT,NULL,NULL,NULL,NULL)!=OCI_SUCCESS) {
-		*error=logInError("OCIInitialize() failed.");
+		*error=logInError("OCIInitialize() failed");
 		return false;
 	}
 	if (OCIEnvInit((OCIEnv **)&env,OCI_DEFAULT,
 					0,(dvoid **)0)!=OCI_SUCCESS) {
-		*error=logInError("OCIEnvInit() failed.");
+		*error=logInError("OCIEnvInit() failed");
 		return false;
 	}
 #endif
@@ -621,7 +621,7 @@ bool oracle8connection::logIn(const char **error) {
 	// allocate an error handle
 	if (OCIHandleAlloc((dvoid *)env,(dvoid **)&err,
 				OCI_HTYPE_ERROR,0,NULL)!=OCI_SUCCESS) {
-		*error=logInError("OCIHandleAlloc(OCI_HTYPE_ERROR) failed.");
+		*error=logInError("OCIHandleAlloc(OCI_HTYPE_ERROR) failed");
 		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
@@ -629,7 +629,7 @@ bool oracle8connection::logIn(const char **error) {
 	// allocate a server handle
 	if (OCIHandleAlloc((dvoid *)env,(dvoid **)&srv,
 				OCI_HTYPE_SERVER,0,NULL)!=OCI_SUCCESS) {
-		*error=logInError("OCIHandleAlloc(OCI_HTYPE_SERVER) failed.");
+		*error=logInError("OCIHandleAlloc(OCI_HTYPE_SERVER) failed");
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
 		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
@@ -638,7 +638,7 @@ bool oracle8connection::logIn(const char **error) {
 	// allocate a service context handle
 	if (OCIHandleAlloc((dvoid *)env,(dvoid **)&svc,
 				OCI_HTYPE_SVCCTX,0,NULL)!=OCI_SUCCESS) {
-		*error=logInError("OCIHandleAlloc(OCI_HTYPE_SVCCTX) failed.");
+		*error=logInError("OCIHandleAlloc(OCI_HTYPE_SVCCTX) failed");
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
 		OCIHandleFree(env,OCI_HTYPE_ENV);
@@ -648,7 +648,7 @@ bool oracle8connection::logIn(const char **error) {
 	// attach to the server
 	if (OCIServerAttach(srv,err,(text *)sid,
 				charstring::length(sid),0)!=OCI_SUCCESS) {
-		*error=logInError("OCIServerAttach() failed.");
+		*error=logInError("OCIServerAttach() failed");
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
@@ -660,7 +660,7 @@ bool oracle8connection::logIn(const char **error) {
 	if (OCIAttrSet((dvoid *)svc,OCI_HTYPE_SVCCTX,
 				(dvoid *)srv,(ub4)0,
 				OCI_ATTR_SERVER,(OCIError *)err)!=OCI_SUCCESS) {
-		*error=logInError("Attach server to service failed.");
+		*error=logInError("Attach server to service failed");
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
@@ -671,7 +671,7 @@ bool oracle8connection::logIn(const char **error) {
 	// allocate a session handle
 	if (OCIHandleAlloc((dvoid *)env,(dvoid **)&session,
 				(ub4)OCI_HTYPE_SESSION,0,NULL)!=OCI_SUCCESS) {
-		*error=logInError("OCIHandleAlloc(OCI_HTYPE_SESSION) failed.");
+		*error=logInError("OCIHandleAlloc(OCI_HTYPE_SESSION) failed");
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
 		OCIHandleFree(err,OCI_HTYPE_ERROR);
@@ -685,7 +685,7 @@ bool oracle8connection::logIn(const char **error) {
 				(dvoid *)user,
 				(ub4)charstring::length(user),
 				(ub4)OCI_ATTR_USERNAME,err)!=OCI_SUCCESS) {
-		*error=logInError("Set username failed.");
+		*error=logInError("Set username failed");
 		OCIHandleFree(err,OCI_HTYPE_SESSION);
 		OCIServerDetach(srv,err,OCI_DEFAULT);
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
@@ -699,7 +699,7 @@ bool oracle8connection::logIn(const char **error) {
 				(dvoid *)password,
 				(ub4)charstring::length(password),
 				(ub4)OCI_ATTR_PASSWORD,err)!=OCI_SUCCESS) {
-		*error=logInError("Set password failed.");
+		*error=logInError("Set password failed");
 		OCIHandleFree(err,OCI_HTYPE_SESSION);
 		OCIServerDetach(srv,err,OCI_DEFAULT);
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
@@ -725,7 +725,7 @@ bool oracle8connection::logIn(const char **error) {
 
 	// begin the session
 	if (OCISessionBegin(svc,err,session,cred,mode)!=OCI_SUCCESS) {
-		*error=logInError("OCISessionBegin() failed.");
+		*error=logInError("OCISessionBegin() failed");
 		OCIHandleFree(err,OCI_HTYPE_SESSION);
 		OCIServerDetach(srv,err,OCI_DEFAULT);
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
@@ -739,7 +739,7 @@ bool oracle8connection::logIn(const char **error) {
 	if (OCIAttrSet((dvoid *)svc,(ub4)OCI_HTYPE_SVCCTX,
 				(dvoid *)session,(ub4)0,
 				(ub4)OCI_ATTR_SESSION,err)!=OCI_SUCCESS) {
-		*error=logInError("Attach session to service failed.");
+		*error=logInError("Attach session to service failed");
 		OCISessionEnd(svc,err,session,OCI_DEFAULT);
 		OCIHandleFree(err,OCI_HTYPE_SESSION);
 		OCIServerDetach(srv,err,OCI_DEFAULT);
@@ -756,7 +756,7 @@ bool oracle8connection::logIn(const char **error) {
 				(dvoid *)&stmtcachesize,(ub4)0,
 				(ub4)OCI_ATTR_STMTCACHESIZE,
 				(OCIError *)err)!=OCI_SUCCESS) {
-		*error=logInError("Set statement cache size failed.");
+		*error=logInError("Set statement cache size failed");
 		OCISessionEnd(svc,err,session,OCI_DEFAULT);
 		OCIHandleFree(err,OCI_HTYPE_SESSION);
 		OCIServerDetach(srv,err,OCI_DEFAULT);
@@ -782,7 +782,7 @@ bool oracle8connection::logIn(const char **error) {
 	// allocate a transaction handle
 	if (OCIHandleAlloc((dvoid *)env,(dvoid **)&trans,
 				OCI_HTYPE_TRANS,0,0)!=OCI_SUCCESS) {
-		*error=logInError("OCIHandleAlloc(OCI_HTYPE_TRANS) failed.");
+		*error=logInError("OCIHandleAlloc(OCI_HTYPE_TRANS) failed");
 		OCISessionEnd(svc,err,session,OCI_DEFAULT);
 		OCIHandleFree(err,OCI_HTYPE_SESSION);
 		OCIServerDetach(srv,err,OCI_DEFAULT);
@@ -797,7 +797,7 @@ bool oracle8connection::logIn(const char **error) {
 	if (OCIAttrSet((dvoid *)svc,OCI_HTYPE_SVCCTX,
 				(dvoid *)trans,(ub4)0,
 				(ub4)OCI_ATTR_TRANS,err)!=OCI_SUCCESS) {
-		*error=logInError("OCIAttrSet(OCI_ATTR_TRANS) failed.");
+		*error=logInError("OCIAttrSet(OCI_ATTR_TRANS) failed");
 		OCIHandleFree(err,OCI_HTYPE_TRANS);
 		OCISessionEnd(svc,err,session,OCI_DEFAULT);
 		OCIHandleFree(err,OCI_HTYPE_SESSION);
@@ -913,7 +913,7 @@ bool oracle8connection::logIn(const char **error) {
 const char *oracle8connection::logInError(const char *errmsg) {
 
 	errormessage.clear();
-	errormessage.append(errmsg)->append("\n\n");
+	errormessage.append(errmsg)->append(": ");
 
 	// get the error message from oracle
 	text	message[1024];
@@ -922,7 +922,7 @@ const char *oracle8connection::logInError(const char *errmsg) {
 	OCIErrorGet((dvoid *)err,1,(text *)0,&errcode,
 			message,sizeof(message),OCI_HTYPE_ERROR);
 	message[1023]='\0';
-	errormessage.append("error: ")->append(message)->append('\n');
+	errormessage.append(message);
 	return errormessage.getString();
 }
 

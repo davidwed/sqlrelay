@@ -336,8 +336,13 @@ bool firebirdconnection::logIn(const char **err) {
 
 		char		msg[512];
 		ISC_STATUS	*errstatus=error;
+		bool		first=false;
 		while (isc_interprete(msg,&errstatus)) {
-			errormsg.append(msg)->append('\n');
+			if (first) {
+				errormsg.append(": ");
+			}
+			errormsg.append(msg);
+			first=true;
 		}
 		*err=errormsg.getString();
 		return false;

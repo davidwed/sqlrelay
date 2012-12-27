@@ -299,13 +299,13 @@ bool sybaseconnection::logIn(const char **error) {
 	context=(CS_CONTEXT *)NULL;
 	if (cs_ctx_alloc(CS_VERSION_100,&context)!=CS_SUCCEED) {
 		*error=logInError(
-			"failed to allocate a context structure",2);
+			"Failed to allocate a context structure",2);
 		return false;
 	}
 	// init the context
 	if (ct_init(context,CS_VERSION_100)!=CS_SUCCEED) {
 		*error=logInError(
-			"failed to initialize a context structure",3);
+			"Failed to initialize a context structure",3);
 		return false;
 	}
 
@@ -316,21 +316,21 @@ bool sybaseconnection::logIn(const char **error) {
 			(CS_INT *)NULL)
 			!=CS_SUCCEED) {
 		*error=logInError(
-			"failed to set a cslib error message callback",4);
+			"Failed to set a cslib error message callback",4);
 		return false;
 	}
 	if (ct_callback(context,NULL,CS_SET,CS_CLIENTMSG_CB,
 		(CS_VOID *)sybaseconnection::clientMessageCallback)
 			!=CS_SUCCEED) {
 		*error=logInError(
-			"failed to set a client error message callback",4);
+			"Failed to set a client error message callback",4);
 		return false;
 	}
 	if (ct_callback(context,NULL,CS_SET,CS_SERVERMSG_CB,
 		(CS_VOID *)sybaseconnection::serverMessageCallback)
 			!=CS_SUCCEED) {
 		*error=logInError(
-			"failed to set a server error message callback",4);
+			"Failed to set a server error message callback",4);
 		return false;
 	}
 
@@ -338,7 +338,7 @@ bool sybaseconnection::logIn(const char **error) {
 	// allocate a connection
 	if (ct_con_alloc(context,&dbconn)!=CS_SUCCEED) {
 		*error=logInError(
-			"failed to allocate a connection structure",4);
+			"Failed to allocate a connection structure",4);
 		return false;
 	}
 
@@ -349,7 +349,7 @@ bool sybaseconnection::logIn(const char **error) {
 			(CS_VOID *)((user && user[0])?user:""),
 			(CS_INT)charstring::length(user),
 			(CS_INT *)NULL)!=CS_SUCCEED) {
-		*error=logInError("failed to set the user",5);
+		*error=logInError("Failed to set the user",5);
 		return false;
 	}
 
@@ -360,14 +360,14 @@ bool sybaseconnection::logIn(const char **error) {
 			(CS_VOID *)((password && password[0])?password:""),
 			(CS_INT)charstring::length(password),
 			(CS_INT *)NULL)!=CS_SUCCEED) {
-		*error=logInError("failed to set the password",5);
+		*error=logInError("Failed to set the password",5);
 		return false;
 	}
 
 	// set application name
 	if (ct_con_props(dbconn,CS_SET,CS_APPNAME,(CS_VOID *)"sqlrelay",8,
 			(CS_INT *)NULL)!=CS_SUCCEED) {
-		*error=logInError("failed to set the application name",5);
+		*error=logInError("Failed to set the application name",5);
 		return false;
 	}
 
@@ -376,7 +376,7 @@ bool sybaseconnection::logIn(const char **error) {
 		ct_con_props(dbconn,CS_SET,CS_HOSTNAME,(CS_VOID *)hostname,
 				(CS_INT)charstring::length(hostname),
 				(CS_INT *)NULL)!=CS_SUCCEED) {
-		*error=logInError("failed to set the hostname",5);
+		*error=logInError("Failed to set the hostname",5);
 		return false;
 	}
 
@@ -386,7 +386,7 @@ bool sybaseconnection::logIn(const char **error) {
 		ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
 				(CS_VOID *)&ps,sizeof(ps),
 				(CS_INT *)NULL)!=CS_SUCCEED) {
-		*error=logInError("failed to set the packetsize",5);
+		*error=logInError("Failed to set the packetsize",5);
 		return false;
 	}
 
@@ -399,7 +399,7 @@ bool sybaseconnection::logIn(const char **error) {
 		if (ct_con_props(dbconn,CS_SET,CS_SEC_ENCRYPTION,
 			(CS_VOID *)&enc,
 			CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
-			*error=logInError("failed to set the encryption",5);
+			*error=logInError("Failed to set the encryption",5);
 			return false;
 		}
 	}*/
@@ -407,12 +407,12 @@ bool sybaseconnection::logIn(const char **error) {
 	// init locale
 	locale=NULL;
 	if (cs_loc_alloc(context,&locale)!=CS_SUCCEED) {
-		*error=logInError("failed to allocate a locale structure",5);
+		*error=logInError("Failed to allocate a locale structure",5);
 		return false;
 	}
 	if (cs_locale(context,CS_SET,locale,CS_LC_ALL,(CS_CHAR *)NULL,
 			CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
-		*error=logInError("failed to initialize a locale structure",6);
+		*error=logInError("Failed to initialize a locale structure",6);
 		return false;
 	}
 
@@ -422,7 +422,7 @@ bool sybaseconnection::logIn(const char **error) {
 			(CS_CHAR *)language,
 			(CS_INT)charstring::length(language),
 			(CS_INT *)NULL)!=CS_SUCCEED) {
-		*error=logInError("failed to set the language",6);
+		*error=logInError("Failed to set the language",6);
 		return false;
 	}
 
@@ -432,20 +432,20 @@ bool sybaseconnection::logIn(const char **error) {
 			(CS_CHAR *)charset,
 			(CS_INT)charstring::length(charset),
 			(CS_INT *)NULL)!=CS_SUCCEED) {
-		*error=logInError("failed to set the charset",6);
+		*error=logInError("Failed to set the charset",6);
 		return false;
 	}
 
 	// set locale
 	if (ct_con_props(dbconn,CS_SET,CS_LOC_PROP,(CS_VOID *)locale,
 				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
-		*error=logInError("failed to set the locale",6);
+		*error=logInError("Failed to set the locale",6);
 		return false;
 	}
 
 	// connect to the database
 	if (ct_connect(dbconn,(CS_CHAR *)NULL,(CS_INT)0)!=CS_SUCCEED) {
-		*error=logInError("failed to connect to the database",6);
+		*error=logInError("Failed to connect to the database",6);
 		return false;
 	}
 	return true;
@@ -454,9 +454,9 @@ bool sybaseconnection::logIn(const char **error) {
 const char *sybaseconnection::logInError(const char *error, uint16_t stage) {
 
 	loginerror.clear();
-	loginerror.append(error)->append('\n');
+	loginerror.append(error);
 	if (errorstring.getStringLength()) {
-		loginerror.append(errorstring.getString())->append('\n');
+		loginerror.append(": ")->append(errorstring.getString());
 	}
 
 	if (stage>5) {
@@ -1524,26 +1524,19 @@ CS_RETCODE sybaseconnection::csMessageCallback(CS_CONTEXT *ctxt,
 
 	errorcode=msgp->msgnumber;
 
-	errorstring.append("Client Library error:\n");
-	errorstring.append("	severity(")->
-				append((int32_t)CS_SEVERITY(msgp->msgnumber))->
-				append(")\n");
-	errorstring.append("	layer(")->
-				append((int32_t)CS_LAYER(msgp->msgnumber))->
-				append(")\n");
-	errorstring.append("	origin(")->
-				append((int32_t)CS_ORIGIN(msgp->msgnumber))->
-				append(")\n");
-	errorstring.append("	number(")->
-				append((int32_t)CS_NUMBER(msgp->msgnumber))->
-				append(")\n");
-	errorstring.append("Error:	")->append(msgp->msgstring)->
-				append("\n");
+	errorstring.append("Client Library error: ")->append(msgp->msgstring);
+	errorstring.append(" severity(")->
+		append((int32_t)CS_SEVERITY(msgp->msgnumber))->append(")");
+	errorstring.append(" layer(")->
+		append((int32_t)CS_LAYER(msgp->msgnumber))->append(")");
+	errorstring.append(" origin(")->
+		append((int32_t)CS_ORIGIN(msgp->msgnumber))->append(")");
+	errorstring.append(" number(")->
+		append((int32_t)CS_NUMBER(msgp->msgnumber))->append(")");
 
 	if (msgp->osstringlen>0) {
-		errorstring.append("Operating System Error:\n");
-		errorstring.append("\n	")->append(msgp->osstring)->
-							append("\n");
+		errorstring.append("  Operating System Error: ");
+		errorstring.append(msgp->osstring);
 	}
 
 	// for a timeout message,
@@ -1576,26 +1569,18 @@ CS_RETCODE sybaseconnection::clientMessageCallback(CS_CONTEXT *ctxt,
 
 	errorcode=msgp->msgnumber;
 
-	errorstring.append("Client Library error:\n");
-	errorstring.append("	severity(")->
-				append((int32_t)CS_SEVERITY(msgp->msgnumber))->
-				append(")\n");
-	errorstring.append("	layer(")->
-				append((int32_t)CS_LAYER(msgp->msgnumber))->
-				append(")\n");
-	errorstring.append("	origin(")->
-				append((int32_t)CS_ORIGIN(msgp->msgnumber))->
-				append(")\n");
-	errorstring.append("	number(")->
-				append((int32_t)CS_NUMBER(msgp->msgnumber))->
-				append(")\n");
-	errorstring.append("Error:	")->append(msgp->msgstring)->
-				append("\n");
-
+	errorstring.append("Client Library error: ")->append(msgp->msgstring);
+	errorstring.append(" severity(")->
+		append((int32_t)CS_SEVERITY(msgp->msgnumber))->append(")");
+	errorstring.append(" layer(")->
+		append((int32_t)CS_LAYER(msgp->msgnumber))->append(")");
+	errorstring.append(" origin(")->
+		append((int32_t)CS_ORIGIN(msgp->msgnumber))->append(")");
+	errorstring.append(" number(")->
+		append((int32_t)CS_NUMBER(msgp->msgnumber))->append(")");
 	if (msgp->osstringlen>0) {
-		errorstring.append("Operating System Error:\n");
-		errorstring.append("\n	")->append(msgp->osstring)->
-							append("\n");
+		errorstring.append("  Operating System Error: ");
+		errorstring.append(msgp->osstring);
 	}
 
 	// for a timeout message,
@@ -1638,23 +1623,17 @@ CS_RETCODE sybaseconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 
 	errorcode=msgp->msgnumber;
 
-	errorstring.append("Server message:\n");
-	errorstring.append("	severity(")->
-				append((int32_t)CS_SEVERITY(msgp->msgnumber))->
-				append(")\n");
-	errorstring.append("	number(")->
-				append((int32_t)CS_NUMBER(msgp->msgnumber))->
-				append(")\n");
-	errorstring.append("	state(")->
-				append((int32_t)msgp->state)->append(")\n");
-	errorstring.append("	line(")->
-				append((int32_t)msgp->line)->append(")\n");
-	errorstring.append("Server Name:\n")->
-				append(msgp->svrname)->append("\n");
-	errorstring.append("Procedure Name:\n")->
-				append(msgp->proc)->append("\n");
-	errorstring.append("Error:	")->
-				append(msgp->text)->append("\n");
+	errorstring.append("Server message: ")->append(msgp->text);
+	errorstring.append(" severity(")->
+		append((int32_t)CS_SEVERITY(msgp->msgnumber))->append(")");
+	errorstring.append(" number(")->
+		append((int32_t)CS_NUMBER(msgp->msgnumber))->append(")");
+	errorstring.append(" state(")->
+		append((int32_t)msgp->state)->append(")");
+	errorstring.append(" line(")->
+		append((int32_t)msgp->line)->append(")");
+	errorstring.append("  Server Name: ")->append(msgp->svrname);
+	errorstring.append("  Procedure Name: ")->append(msgp->proc);
 
 	return CS_SUCCEED;
 }

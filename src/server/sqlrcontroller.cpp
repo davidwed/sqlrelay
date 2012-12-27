@@ -747,10 +747,6 @@ bool sqlrcontroller_svr::attemptLogIn(bool printerrors) {
 
 	// log in
 	if (!logIn(printerrors)) {
-		logInternalError(NULL,"database login failed");
-		if (printerrors) {
-			fprintf(stderr,"Couldn't log into database.\n");
-		}
 		return false;
 	}
 
@@ -774,9 +770,19 @@ bool sqlrcontroller_svr::logIn(bool printerrors) {
 	// attempt to log in
 	const char	*err=NULL;
 	if (!conn->logIn(&err)) {
-		if (printerrors && err) {
-			fprintf(stderr,err);
-			fprintf(stderr,"\n");
+		if (printerrors) {
+			fprintf(stderr,"Couldn't log into database.\n");
+			if (err) {
+				fprintf(stderr,"%s\n",err);
+			}
+		}
+		if (sqlrlg) {
+			debugstr.clear();
+			debugstr.append("database login failed");
+			if (err) {
+				debugstr.append(": ")->append(err);
+			}
+			logInternalError(NULL,debugstr.getString());
 		}
 		return false;
 	}
