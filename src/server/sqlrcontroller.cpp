@@ -772,7 +772,12 @@ bool sqlrcontroller_svr::logIn(bool printerrors) {
 	}
 
 	// attempt to log in
-	if (!conn->logIn(printerrors)) {
+	const char	*err=NULL;
+	if (!conn->logIn(&err)) {
+		if (printerrors && err) {
+			fprintf(stderr,err);
+			fprintf(stderr,"\n");
+		}
 		return false;
 	}
 

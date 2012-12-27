@@ -31,7 +31,7 @@ class mdbtoolsconnection : public sqlrconnection_svr {
 			mdbtoolsconnection(sqlrcontroller_svr *cont);
 	private:
 		void	handleConnectString();
-		bool	logIn(bool printerrors);
+		bool	logIn(const char **error);
 		sqlrcursor_svr	*initCursor();
 		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
@@ -122,7 +122,7 @@ void mdbtoolsconnection::handleConnectString() {
 	db=cont->connectStringValue("db");
 }
 
-bool mdbtoolsconnection::logIn(bool printerrors) {
+bool mdbtoolsconnection::logIn(const char **error) {
 	mdb_init_backends();
 	return true;
 }

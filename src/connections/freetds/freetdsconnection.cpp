@@ -236,8 +236,8 @@ class freetdsconnection : public sqlrconnection_svr {
 			~freetdsconnection();
 	private:
 		void	handleConnectString();
-		bool	logIn(bool printerrors);
-		void	logInError(const char *error, uint16_t stage);
+		bool	logIn(const char **error);
+		const char	*logInError(const char *error, uint16_t stage);
 		sqlrcursor_svr	*initCursor();
 		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
@@ -294,6 +294,8 @@ class freetdsconnection : public sqlrconnection_svr {
 
 		freetdscursor	*singlecursor;
 		unsigned short	singlecursorrefcount;
+
+		stringbuffer	loginerror;
 };
 
 stringbuffer	freetdsconnection::errorstring;
@@ -333,35 +335,40 @@ void freetdsconnection::handleConnectString() {
 				cont->connectStringValue("fakebinds"),"yes");
 }
 
-bool freetdsconnection::logIn(bool printerrors) {
+bool freetdsconnection::logIn(const char **error) {
 
 	// set sybase
 	if (sybase && sybase[0] && !environment::setValue("SYBASE",sybase)) {
-		logInError("Failed to set SYBASE environment variable.",1);
+		*error=logInError(
+			"Failed to set SYBASE environment variable.",1);
 		return false;
 	}
 
 	// set lang
 	if (lang && lang[0] && !environment::setValue("LANG",lang)) {
-		logInError("Failed to set LANG environment variable.",1);
+		*error=logInError(
+			"Failed to set LANG environment variable.",1);
 		return false;
 	}
 
 	// set server
 	if (server && server[0] && !environment::setValue("DSQUERY",server)) {
-		logInError("Failed to set DSQUERY environment variable.",2);
+		*error=logInError(
+			"Failed to set DSQUERY environment variable.",2);
 		return false;
 	}
 
 	// allocate a context
 	context=(CS_CONTEXT *)NULL;
 	if (cs_ctx_alloc(CS_VERSION_100,&context)!=CS_SUCCEED) {
-		logInError("failed to allocate a context structure",2);
+		*error=logInError(
+			"failed to allocate a context structure",2);
 		return false;
 	}
 	// init the context
 	if (ct_init(context,CS_VERSION_100)!=CS_SUCCEED) {
-		logInError("failed to initialize a context structure",3);
+		*error=logInError(
+			"failed to initialize a context structure",3);
 		return false;
 	}
 
@@ -371,26 +378,30 @@ bool freetdsconnection::logIn(bool printerrors) {
 		(CS_VOID *)freetdsconnection::csMessageCallback,CS_UNUSED,
 			(CS_INT *)NULL)
 			!=CS_SUCCEED) {
-		logInError("failed to set a cslib error message callback",4);
+		*error=logInError(
+			"failed to set a cslib error message callback",4);
 		return false;
 	}
 	if (ct_callback(context,NULL,CS_SET,CS_CLIENTMSG_CB,
 		(CS_VOID *)freetdsconnection::clientMessageCallback)
 			!=CS_SUCCEED) {
-		logInError("failed to set a client error message callback",4);
+		*error=logInError(
+			"failed to set a client error message callback",4);
 		return false;
 	}
 	if (ct_callback(context,NULL,CS_SET,CS_SERVERMSG_CB,
 		(CS_VOID *)freetdsconnection::serverMessageCallback)
 			!=CS_SUCCEED) {
-		logInError("failed to set a server error message callback",4);
+		*error=logInError(
+			"failed to set a server error message callback",4);
 		return false;
 	}
 
 
 	// allocate a connection
 	if (ct_con_alloc(context,&dbconn)!=CS_SUCCEED) {
-		logInError("failed to allocate a connection structure",4);
+		*error=logInError(
+			"failed to allocate a connection structure",4);
 		return false;
 	}
 
@@ -400,7 +411,7 @@ bool freetdsconnection::logIn(bool printerrors) {
 	if (ct_con_props(dbconn,CS_SET,CS_USERNAME,
 			(CS_VOID *)((user && user[0])?user:""),
 			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-		logInError("failed to set the user",5);
+		*error=logInError("failed to set the user",5);
 		return false;
 	}
 
@@ -410,14 +421,14 @@ bool freetdsconnection::logIn(bool printerrors) {
 	if (ct_con_props(dbconn,CS_SET,CS_PASSWORD,
 			(CS_VOID *)((password && password[0])?password:""),
 			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-		logInError("failed to set the password",5);
+		*error=logInError("failed to set the password",5);
 		return false;
 	}
 
 	// set application name
 	if (ct_con_props(dbconn,CS_SET,CS_APPNAME,(CS_VOID *)"sqlrelay",
 			CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-		logInError("failed to set the application name",5);
+		*error=logInError("failed to set the application name",5);
 		return false;
 	}
 
@@ -425,7 +436,7 @@ bool freetdsconnection::logIn(bool printerrors) {
 	if (hostname && hostname[0] &&
 		ct_con_props(dbconn,CS_SET,CS_HOSTNAME,(CS_VOID *)hostname,
 				CS_NULLTERM,(CS_INT *)NULL)!=CS_SUCCEED) {
-			logInError("failed to set the hostname",5);
+		*error=logInError("failed to set the hostname",5);
 		return false;
 	}
 
@@ -435,7 +446,7 @@ bool freetdsconnection::logIn(bool printerrors) {
 		ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
 				(CS_VOID *)&ps,sizeof(ps),
 				(CS_INT *)NULL)!=CS_SUCCEED) {
-		logInError("failed to set the packetsize",5);
+		*error=logInError("failed to set the packetsize",5);
 		return false;
 	}
 
@@ -448,7 +459,7 @@ bool freetdsconnection::logIn(bool printerrors) {
 		if (ct_con_props(dbconn,CS_SET,CS_SEC_ENCRYPTION,
 			(CS_VOID *)&enc,
 			CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
-			logInError("failed to set the encryption",5);
+			*error=logInError("failed to set the encryption",5);
 			return false;
 		}
 	}*/
@@ -456,12 +467,12 @@ bool freetdsconnection::logIn(bool printerrors) {
 	// init locale
 	locale=NULL;
 	if (cs_loc_alloc(context,&locale)!=CS_SUCCEED) {
-		logInError("failed to allocate a locale structure",5);
+		*error=logInError("failed to allocate a locale structure",5);
 		return false;
 	}
 	if (cs_locale(context,CS_SET,locale,CS_LC_ALL,(CS_CHAR *)NULL,
 			CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
-		logInError("failed to initialize a locale structure",6);
+		*error=logInError("failed to initialize a locale structure",6);
 		return false;
 	}
 
@@ -470,7 +481,7 @@ bool freetdsconnection::logIn(bool printerrors) {
 		cs_locale(context,CS_SET,locale,CS_SYB_LANG,
 			(CS_CHAR *)language,CS_NULLTERM,(CS_INT *)NULL)!=
 				CS_SUCCEED) {
-		logInError("failed to set the language",6);
+		*error=logInError("failed to set the language",6);
 		return false;
 	}
 
@@ -479,31 +490,31 @@ bool freetdsconnection::logIn(bool printerrors) {
 		cs_locale(context,CS_SET,locale,CS_SYB_CHARSET,
 			(CS_CHAR *)charset,CS_NULLTERM,(CS_INT *)NULL)!=
 				CS_SUCCEED) {
-		logInError("failed to set the charset",6);
+		*error=logInError("failed to set the charset",6);
 		return false;
 	}
 
 	// set locale
 	if (ct_con_props(dbconn,CS_SET,CS_LOC_PROP,(CS_VOID *)locale,
 				CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
-		logInError("failed to set the locale",6);
+		*error=logInError("failed to set the locale",6);
 		return false;
 	}
 
 	// connect to the database
 	if (ct_connect(dbconn,(CS_CHAR *)NULL,(CS_INT)0)!=CS_SUCCEED) {
-		logInError("failed to connect to the database",6);
+		*error=logInError("failed to connect to the database",6);
 		return false;
 	}
 	return true;
 }
 
-void freetdsconnection::logInError(const char *error, uint16_t stage) {
+const char *freetdsconnection::logInError(const char *error, uint16_t stage) {
 
-	fprintf(stderr,"%s\n",error);
-
+	loginerror.clear();
+	loginerror.append(error)->append('\n');
 	if (errorstring.getStringLength()) {
-		fprintf(stderr,"%s\n",errorstring.getString());
+		loginerror.append(errorstring.getString())->append('\n');
 	}
 
 	if (stage>5) {
@@ -518,6 +529,8 @@ void freetdsconnection::logInError(const char *error, uint16_t stage) {
 	if (stage>2) {
 		cs_ctx_drop(context);
 	}
+
+	return loginerror.getString();
 }
 
 sqlrcursor_svr *freetdsconnection::initCursor() {

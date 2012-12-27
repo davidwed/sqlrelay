@@ -22,7 +22,7 @@ class sqlrconnection_svr {
 		virtual bool	supportsAuthOnDatabase();
 		virtual	void	handleConnectString()=0;
 
-		virtual	bool	logIn(bool printerrors)=0;
+		virtual	bool	logIn(const char **error)=0;
 		virtual	void	logOut()=0;
 
 		virtual	bool	changeUser(const char *newuser,

@@ -23,7 +23,7 @@ class postgresqlconnection : public sqlrconnection_svr {
 			~postgresqlconnection();
 	private:
 		void		handleConnectString();
-		bool		logIn(bool printerrors);
+		bool		logIn(const char **error);
 		sqlrcursor_svr	*initCursor();
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
@@ -209,7 +209,7 @@ void postgresqlconnection::handleConnectString() {
 			cont->connectStringValue("fakebinds"),"yes");
 }
 
-bool postgresqlconnection::logIn(bool printerrors) {
+bool postgresqlconnection::logIn(const char **error) {
 
 	// initialize the datatype storage buffers
 	if (typemangling==2) {

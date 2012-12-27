@@ -156,7 +156,7 @@ class mysqlconnection : public sqlrconnection_svr {
 				~mysqlconnection();
 	private:
 		void		handleConnectString();
-		bool		logIn(bool printerrors);
+		bool		logIn(const char **error);
 #ifdef HAVE_MYSQL_CHANGE_USER
 		bool		changeUser(const char *newuser,
 						const char *newpassword);
@@ -210,6 +210,8 @@ class mysqlconnection : public sqlrconnection_svr {
 		static const my_bool	myfalse;
 
 		bool		firstquery;
+
+		stringbuffer	loginerror;
 };
 
 extern "C" {
@@ -245,12 +247,11 @@ void mysqlconnection::handleConnectString() {
 	port=cont->connectStringValue("port");
 	socket=cont->connectStringValue("socket");
 	charset=cont->connectStringValue("charset");
-	cont->fakeinputbinds=
-		!charstring::compare(
-			cont->connectStringValue("fakebinds"),"yes");
+	cont->fakeinputbinds=!charstring::compare(
+				cont->connectStringValue("fakebinds"),"yes");
 }
 
-bool mysqlconnection::logIn(bool printerrors) {
+bool mysqlconnection::logIn(const char **error) {
 
 	// Handle host.
 	// For really old versions of mysql, a NULL host indicates that the
@@ -282,9 +283,7 @@ bool mysqlconnection::logIn(bool printerrors) {
 	#if MYSQL_VERSION_ID>=32200
 	// initialize database connection structure
 	if (!mysql_init(&mysql)) {
-		if (printerrors) {
-			fprintf(stderr,"mysql_init failed\n");
-		}
+		*error="mysql_init failed";
 		return false;
 	}
 	if (!mysql_real_connect(&mysql,hostval,user,password,dbval,
@@ -293,16 +292,16 @@ bool mysqlconnection::logIn(bool printerrors) {
 	if (!mysql_real_connect(&mysql,hostval,user,password,
 					portval,socketval,clientflag)) {
 	#endif
-		if (printerrors) {
-			fprintf(stderr,"mysql_real_connect failed: %s\n",
-							mysql_error(&mysql));
-		}
+		loginerror.clear();
+		loginerror.append("mysql_real_connect failed: ");
+		loginerror.append(mysql_error(&mysql));
+		*error=loginerror.getString();
 #else
 	if (!mysql_connect(&mysql,hostval,user,password)) {
-		if (printerrors) {
-			fprintf(stderr,"mysql_connect failed: %s\n",
-						mysql_error(&mysql));
-		}
+		loginerror.clear();
+		loginerror.append("mysql_connect failed: ");
+		loginerror.append(mysql_error(&mysql));
+		*error=loginerror.getString();
 #endif
 		logOut();
 		return false;
@@ -317,10 +316,10 @@ bool mysqlconnection::logIn(bool printerrors) {
 
 #ifdef MYSQL_SELECT_DB
 	if (mysql_select_db(&mysql,dbval)) {
-		if (printerrors) {
-			fprintf(stderr,"mysql_select_db failed: %s\n",
-						mysql_error(&mysql));
-		}
+		loginerror.clear();
+		loginerror.append("mysql_select_db failed: ");
+		loginerror.append(mysql_error(&mysql));
+		*error=loginerror.getString();
 		logOut();
 		return false;
 	}

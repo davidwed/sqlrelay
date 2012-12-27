@@ -21,6 +21,7 @@
 	disabled nagle's algorithm for all sockets
 	fixed a bug that could cause a hang if the db login failed
 	updated reading of skip and fetch parameters not to rely on buffering
+	refactored login error reporting
 
 0.48 - integrated patches from Neowiz for:
 		handling for oracle errors ora-01033, ora-02067 and ora-04068

@@ -159,7 +159,7 @@ class firebirdconnection : public sqlrconnection_svr {
 			~firebirdconnection();
 	private:
 		void	handleConnectString();
-		bool	logIn(bool printerrors);
+		bool	logIn(const char **error);
 		sqlrcursor_svr	*initCursor();
 		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
@@ -279,7 +279,7 @@ void firebirdconnection::handleConnectString() {
 			cont->connectStringValue("fakebinds"),"yes");
 }
 
-bool firebirdconnection::logIn(bool printerrors) {
+bool firebirdconnection::logIn(const char **err) {
 
 	// initialize a parameter buffer
 	char	*dpbptr=dpb;
@@ -332,13 +332,14 @@ bool firebirdconnection::logIn(bool printerrors) {
 	// start a transaction
 	if (isc_start_transaction(error,&tr,1,&db,(uint16_t)sizeof(tpb),&tpb)) {
 
-		// print the error message
+		errormsg.clear();
+
 		char		msg[512];
-		ISC_STATUS	*err=error;
-		while (isc_interprete(msg,&err)) {
-			fprintf(stderr,"%s\n",msg);
+		ISC_STATUS	*errstatus=error;
+		while (isc_interprete(msg,&errstatus)) {
+			errormsg.append(msg)->append('\n');
 		}
-		fprintf(stderr,"\n");
+		*err=errormsg.getString();
 		return false;
 	}
 

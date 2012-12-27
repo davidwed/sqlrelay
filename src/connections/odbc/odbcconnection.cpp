@@ -194,7 +194,7 @@ class odbcconnection : public sqlrconnection_svr {
 			odbcconnection(sqlrcontroller_svr *cont);
 	private:
 		void		handleConnectString();
-		bool		logIn(bool printerrors);
+		bool		logIn(const char **error);
 		sqlrcursor_svr	*initCursor();
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
@@ -396,7 +396,7 @@ void odbcconnection::handleConnectString() {
 			cont->connectStringValue("fakebinds"),"yes");
 }
 
-bool odbcconnection::logIn(bool printerrors) {
+bool odbcconnection::logIn(const char **error) {
 
 	// allocate environment handle
 #if (ODBCVER >= 0x0300)

@@ -171,7 +171,7 @@ class db2connection : public sqlrconnection_svr {
 			db2connection(sqlrcontroller_svr *cont);
 	private:
 		void	handleConnectString();
-		bool	logIn(bool printerrors);
+		bool	logIn(const char **error);
 		sqlrcursor_svr	*initCursor();
 		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
@@ -243,14 +243,12 @@ void db2connection::handleConnectString() {
 			"yes");
 }
 
-bool db2connection::logIn(bool printerrors) {
+bool db2connection::logIn(const char **error) {
 
 	// set the LANG environment variable
 	if (charstring::length(lang)) {
 		if (!environment::setValue("LANG",lang)) {
-			if (printerrors) {
-				fprintf(stderr,"Failed to set LANG environment variable.\n");
-			}
+			*error="Failed to set LANG environment variable.";
 			return false;
 		}
 	}
