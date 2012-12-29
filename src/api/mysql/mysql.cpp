@@ -1160,18 +1160,16 @@ my_ulonglong mysql_affected_rows(MYSQL *mysql) {
 }
 
 
-// FIXME: MYSQL_ROW_OFFSET is (or could be) smaller than my_ulonglong
 MYSQL_ROW_OFFSET mysql_row_seek(MYSQL_RES *result, MYSQL_ROW_OFFSET offset) {
 	debugFunction();
 	result->previousrow=result->currentrow;
-	result->currentrow=(my_ulonglong)offset;
-	return (MYSQL_ROW_OFFSET)result->previousrow;
+	result->currentrow=*offset;
+	return (MYSQL_ROW_OFFSET)&result->previousrow;
 }
 
-// FIXME: MYSQL_ROW_OFFSET is (or could be) smaller than my_ulonglong
 MYSQL_ROW_OFFSET mysql_row_tell(MYSQL_RES *result) {
 	debugFunction();
-	return (MYSQL_ROW_OFFSET)result->currentrow;
+	return (MYSQL_ROW_OFFSET)&result->currentrow;
 }
 
 void mysql_data_seek(MYSQL_RES *result, my_ulonglong offset) {
