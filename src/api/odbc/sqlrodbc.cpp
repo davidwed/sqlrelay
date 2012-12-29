@@ -1439,6 +1439,7 @@ SQLRETURN SQL_API SQLError(SQLHENV environmenthandle,
 
 static void SQLR_ParseNumeric(SQL_NUMERIC_STRUCT *ns,
 				const char *value, uint32_t valuesize) {
+	debugFunction();
 
 	// find the negative sign and decimal, if there are any
 	const char	*negative=charstring::findFirst(value,'-');
@@ -1483,6 +1484,8 @@ static void SQLR_ParseNumeric(SQL_NUMERIC_STRUCT *ns,
 
 static void SQLR_ParseInterval(SQL_INTERVAL_STRUCT *is,
 				const char *value, uint32_t valuesize) {
+	debugFunction();
+
 	// FIXME: implement
 	is->interval_type=(SQLINTERVAL)0;
 	is->interval_sign=0;
@@ -1491,6 +1494,7 @@ static void SQLR_ParseInterval(SQL_INTERVAL_STRUCT *is,
 	is->intval.day_second.minute=0;
 	is->intval.day_second.second=0;
 	is->intval.day_second.fraction=0;
+
 	//typedef struct tagSQL_INTERVAL_STRUCT
 	//   {
 	//   SQLINTERVAL interval_type;
@@ -1536,6 +1540,7 @@ static void SQLR_ParseInterval(SQL_INTERVAL_STRUCT *is,
 }
 
 static char SQLR_CharToHex(const char input) {
+	debugFunction();
 	char	ch=input;
 	character::toUpperCase(ch);
 	if (ch>='0' && ch<='9') {
@@ -1550,6 +1555,7 @@ static char SQLR_CharToHex(const char input) {
 
 static void SQLR_ParseGuid(SQLGUID *guid,
 				const char *value, uint32_t valuesize) {
+	debugFunction();
 
 	// GUID:
 	// 8 digits - 4 digits - 4 digits - 4 digits - 12 digits
@@ -4376,6 +4382,7 @@ SQLRETURN SQL_API SQLDrivers(SQLHENV environmenthandle,
 static const char *SQLR_BuildNumeric(STMT *stmt,
 					int32_t parameternumber,
 					SQL_NUMERIC_STRUCT *ns) {
+	debugFunction();
 
 	// Get the numeric array as a base-10 number. It should be OK to
 	// convert it to a 64-bit integer as SQL_MAX_NUMERIC_LEN should be 16
@@ -4428,7 +4435,74 @@ static const char *SQLR_BuildNumeric(STMT *stmt,
 	return string;
 }
 
+static const char *SQLR_BuildInterval(STMT *stmt,
+				int32_t parameternumber,
+				SQL_INTERVAL_STRUCT *is) {
+	debugFunction();
+
+	// create a string to store the built-up interval
+	char	*string=new char[1];
+
+	// FIXME: implement
+	string[0]='\0';
+
+	//typedef struct tagSQL_INTERVAL_STRUCT
+	//   {
+	//   SQLINTERVAL interval_type;
+	//   SQLSMALLINT   interval_sign;
+	//   union
+	//      {
+	//      SQL_YEAR_MONTH_STRUCT year_month;
+	//      SQL_DAY_SECOND_STRUCT day_second;
+	//      } intval;
+	//   }SQLINTERVAL_STRUCT;
+	//
+	//typedef enum
+	//   {
+	//   SQL_IS_YEAR=1,
+	//   SQL_IS_MONTH=2,
+	//   SQL_IS_DAY=3,
+	//   SQL_IS_HOUR=4,
+	//   SQL_IS_MINUTE=5,
+	//   SQL_IS_SECOND=6,
+	//   SQL_IS_YEAR_TO_MONTH=7,
+	//   SQL_IS_DAY_TO_HOUR=8,
+	//   SQL_IS_DAY_TO_MINUTE=9,
+	//   SQL_IS_DAY_TO_SECOND=10,
+	//   SQL_IS_HOUR_TO_MINUTE=11,
+	//   SQL_IS_HOUR_TO_SECOND=12,
+	//   SQL_IS_MINUTE_TO_SECOND=13,
+	//   }SQLINTERVAL;
+	//
+	//typedef struct tagSQL_YEAR_MONTH
+	//   {
+	//   SQLUINTEGER year;
+	//   SQLUINTEGER month;
+	//   }SQL_YEAR_MOHTH_STRUCT;
+	//
+	//typedef struct tagSQL_DAY_SECOND
+	//   {
+	//   SQLUINTEGER day;
+	//   SQLUNINTEGER hour;
+	//   SQLUINTEGER minute;
+	//   SQLUINTEGER second;
+	//   SQLUINTEGER fraction;
+	//   }SQL_DAY_SECOND_STRUCT;
+
+	// hang on to that string
+	char	*data=NULL;
+	if (stmt->inputbindstrings.getData(parameternumber,&data)) {
+		stmt->inputbindstrings.removeData(parameternumber);
+		delete[] data;
+	}
+	stmt->inputbindstrings.setData(parameternumber,string);
+
+	// return the string
+	return string;
+}
+
 static char SQLR_HexToChar(const char input) {
+	debugFunction();
 	char	ch=input;
 	if (ch>=0 && ch<=9) {
 		ch=ch+'0';
@@ -4442,6 +4516,7 @@ static char SQLR_HexToChar(const char input) {
 
 static const char *SQLR_BuildGuid(STMT *stmt,
 				int32_t parameternumber, SQLGUID *guid) {
+	debugFunction();
 
 	// create a string to store the built-up guid
 	char	*string=new char[37];
@@ -4541,11 +4616,9 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 			break;
 		case SQL_C_NUMERIC:
 			debugPrintf("valuetype: SQL_C_NUMERIC\n");
-			{
 			stmt->cur->inputBind(parametername,
 				SQLR_BuildNumeric(stmt,parameternumber,
 					(SQL_NUMERIC_STRUCT *)parametervalue));
-			}
 			break;
 		case SQL_C_DATE:
 		case SQL_C_TYPE_DATE:
@@ -4595,49 +4668,9 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 		case SQL_C_INTERVAL_HOUR_TO_SECOND:
 		case SQL_C_INTERVAL_MINUTE_TO_SECOND:
 			debugPrintf("valuetype: SQL_C_INTERVAL_XXX\n");
-			// FIXME: implement
-			//typedef struct tagSQL_INTERVAL_STRUCT
-			//   {
-			//   SQLINTERVAL interval_type;
-			//   SQLSMALLINT   interval_sign;
-			//   union
-			//      {
-			//      SQL_YEAR_MONTH_STRUCT year_month;
-			//      SQL_DAY_SECOND_STRUCT day_second;
-			//      } intval;
-			//   }SQLINTERVAL_STRUCT;
-			//
-			//typedef enum
-			//   {
-			//   SQL_IS_YEAR=1,
-			//   SQL_IS_MONTH=2,
-			//   SQL_IS_DAY=3,
-			//   SQL_IS_HOUR=4,
-			//   SQL_IS_MINUTE=5,
-			//   SQL_IS_SECOND=6,
-			//   SQL_IS_YEAR_TO_MONTH=7,
-			//   SQL_IS_DAY_TO_HOUR=8,
-			//   SQL_IS_DAY_TO_MINUTE=9,
-			//   SQL_IS_DAY_TO_SECOND=10,
-			//   SQL_IS_HOUR_TO_MINUTE=11,
-			//   SQL_IS_HOUR_TO_SECOND=12,
-			//   SQL_IS_MINUTE_TO_SECOND=13,
-			//   }SQLINTERVAL;
-			//
-			//typedef struct tagSQL_YEAR_MONTH
-			//   {
-			//   SQLUINTEGER year;
-			//   SQLUINTEGER month;
-			//   }SQL_YEAR_MOHTH_STRUCT;
-			//
-			//typedef struct tagSQL_DAY_SECOND
-			//   {
-			//   SQLUINTEGER day;
-			//   SQLUNINTEGER hour;
-			//   SQLUINTEGER minute;
-			//   SQLUINTEGER second;
-			//   SQLUINTEGER fraction;
-			//   }SQL_DAY_SECOND_STRUCT;
+			stmt->cur->inputBind(parametername,
+				SQLR_BuildInterval(stmt,parameternumber,
+					(SQL_INTERVAL_STRUCT *)parametervalue));
 			break;
 		//case SQL_C_VARBOOKMARK: (dup of SQL_C_BINARY)
 		case SQL_C_BINARY:
