@@ -1223,16 +1223,16 @@ SQLRETURN SQL_API SQLConnect(SQLHDBC connectionhandle,
 					conn->socket,sizeof(conn->socket),
 					ODBC_INI);
 	if (charstring::length(user)) {
-		snprintf(conn->user,sizeof(conn->user),
-					(const char *)user);
+		charstring::safeCopy(conn->user,sizeof(conn->user),
+						(const char *)user);
 	} else {
 		SQLGetPrivateProfileString((const char *)dsn,"User","",
 					conn->user,sizeof(conn->user),
 					ODBC_INI);
 	}
 	if (charstring::length(password)) {
-		snprintf(conn->password,sizeof(conn->password),
-					(const char *)password);
+		charstring::safeCopy(conn->password,sizeof(conn->password),
+						(const char *)password);
 	} else {
 		SQLGetPrivateProfileString((const char *)dsn,"Password","",
 					conn->password,sizeof(conn->password),
@@ -2223,7 +2223,8 @@ SQLRETURN SQL_API SQLGetCursorName(SQLHSTMT statementhandle,
 		stmtid++;
 	}
 	if (cursorname) {
-		snprintf((char *)cursorname,bufferlength,stmt->name);
+		charstring::safeCopy((char *)cursorname,
+					bufferlength,stmt->name);
 	}
 	if (namelength) {
 		*namelength=charstring::length(stmt->name);
@@ -4162,7 +4163,8 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 		*pcbConnStrOut=cbConnStrIn;
 	}
 	*pcbConnStrOut=cbConnStrIn;
-	snprintf((char *)szConnStrOut,*pcbConnStrOut,nulltermconnstr);
+	charstring::safeCopy((char *)szConnStrOut,
+				*pcbConnStrOut,nulltermconnstr);
 
 	// connect
 	SQLRETURN	retval=SQLConnect(hdbc,
