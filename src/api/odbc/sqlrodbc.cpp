@@ -784,10 +784,12 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 	if (columnnumber<1 || columnnumber>colcount) {
 		// for some reason, if columnnumber==0 then we're supposed to
 		// return "a value" for SQL_DESC_TYPE and SQL_DESC_OCTET_LENGTH
-		if (columnnumber==0 && (
-			fieldidentifier==SQL_DESC_TYPE || 
-			fieldidentifier==SQL_DESC_OCTET_LENGTH)) {
-			*numericattribute=0;
+		if (columnnumber==0) {
+			if (fieldidentifier==SQL_DESC_TYPE) {
+				*(SQLSMALLINT *)numericattribute=0;
+			} else if (fieldidentifier==SQL_DESC_OCTET_LENGTH) {
+				*(SQLINTEGER *)numericattribute=0;
+			}
 		}
 		return SQL_ERROR;
 	}
