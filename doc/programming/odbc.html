@@ -7,26 +7,37 @@
 
 <span class="heading1">Programming with SQL Relay using ODBC</span><br><br>
 
-<p>The SQL Relay distribution provides an <b>experimental</b> ODBC driver.  The
-driver is incomplete, may only be used with iODBC or unixODBC, and is
-<b>NOT</b> supported on Windows, but may be experimented with and may be useful
-for some simple programs.</p>
+<p>The SQL Relay distribution provides a basic ODBC driver, enabling applications which use ODBC on Unix or Linux to access SQL Relay.  The driver lacks some ODBC features and is not currently supported on Windows, but still may be useful for many applications.</p>
 
-<p>With iODBC or unixODBC, you can create a DSN for SQL Relay just like you
-would for any other database by editing /etc/odbc.ini and adding an entry 
-like the following:</p>
+<p>With iODBC or unixODBC, you can create an instance for the SQL Relay driver just like you would for any other database by editing /etc/odbcinst.ini and adding an entry like the following:</p>
+
+<blockquote>
+<pre>
+<font color="#6a5acd">[SQLRelay]</font>
+<font color="#2e8b57"><b>Description=</b></font>ODBC for SQL Relay
+<font color="#2e8b57"><b>Driver=</b></font>/usr/local/firstworks/lib/libsqlrodbc.so
+<font color="#2e8b57"><b>FileUsage=</b></font>1
+</pre>
+</blockquote>
+
+<p>In odbcinst.ini, the Driver attribute must bet set to the full pathname of the libsqlrodbc.so driver.</p>
+
+<p>Once the instance is defined you can add a DSN for SQL Relay by editing /etc/odbc.ini and adding an entry like the following:</p>
 
 <blockquote>
 <pre>
 <font color="#6a5acd">[sqlrtest]</font>
-<font color="#2e8b57"><b>Driver=</b></font>/usr/local/firstworks/lib/libsqlrodbc.so
-<font color="#2e8b57"><b>SERVER=</b></font>localhost
-<font color="#2e8b57"><b>PORT=</b></font>8006
-<font color="#2e8b57"><b>DATABASE=</b></font>testdb
-<font color="#2e8b57"><b>USER=</b></font>testuser
-<font color="#2e8b57"><b>PASSWORD=</b></font>testpass
+<font color="#2e8b57"><b>Description=</b></font>Connection to SQL Relay
+<font color="#2e8b57"><b>Driver=</b></font>SQLRelay
+<font color="#2e8b57"><b>Server=</b></font>localhost
+<font color="#2e8b57"><b>Port=</b></font>8006
+<font color="#2e8b57"><b>Socket=</b></font>/tmp/test.socket
+<font color="#2e8b57"><b>User=</b></font>testuser
+<font color="#2e8b57"><b>Password=</b></font>testpass
 </pre>
 </blockquote>
+
+<p>In odbc.ini, the Driver attribute refers to the instance in odbcinst.ini.</p>
 
 <p>Now you can use the <i>isql</i> command line utility that comes with iODBC
 or unixODBC to access the database through SQL Relay as follows:</p>

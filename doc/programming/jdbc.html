@@ -7,10 +7,9 @@
 
 <span class="heading1">Programming with SQL Relay using JDBC</span><br><br>
 
-<p>The SQL Relay distribution does not provide a native JBCD driver, but by
-using the ODBC-to-JDBC bridge provided by most Java distributions, applications
-which use JDBC on Unix or Linux may access databases through SQL Relay via the
-<b>experimental</b> ODBC driver.</p>
+<p>The SQL Relay distribution does not provide a native JBCD driver, but by using the ODBC-to-JDBC bridge provided by most Java distributions, applications which use JDBC on Unix or Linux may access databases through SQL Relay via the ODBC driver.</p>
+
+<p>This is not currently supported on Windows.</p>
 
 <p>See <a href="odbc.html">Programming with SQL Relay using ODBC</a> for 
 instructions detailing how to access SQL Relay through ODBC.  Once that is 
@@ -25,7 +24,21 @@ follows:</p>
 <b>henplus jdbc:odbc:sqlrtest</b>
 </blockquote>
 
-<p>Here is a sample session:</p>
+<p>When you run it, you might get an error like:</p>
+
+<blockquote>
+/usr/java/jdk1.7.0_10/bin/java: symbol lookup error: /usr/java/jdk1.7.0_10/jre/lib/i386/libJdbcOdbc.so: undefined symbol: SQLAllocEnv
+</blockquote>
+
+<p>If so, this is because the JDBC-ODBC library wasn't linked properly, a common problem.  It can be fixed by preloading the ODBC driver manager library as follows:</p>
+
+<blockquote>
+export LD_PRELOAD=/usr/lib/libodbc.so
+</blockquote>
+
+<p>(Replacing /usr/lib with the path to libodbc.so on your system)</p>
+
+<p>Here is a sample henplus session:</p>
 
 <blockquote>
 <pre>
