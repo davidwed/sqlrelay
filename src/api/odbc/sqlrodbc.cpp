@@ -28,7 +28,7 @@ typedef SQLPOINTER NUMERICATTRIBUTETYPE;
 
 #define ODBC_INI "odbc.ini"
 
-#define DEBUG_MESSAGES 1
+//#define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
 	#define debugFunction() printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
 	#define debugPrintf(format, ...) printf(format, ## __VA_ARGS__); fflush(stdout);
