@@ -6,6 +6,7 @@
 
 #include <sql.h>
 #include <sqlext.h>
+#include <sqlucode.h>
 #include <sqltypes.h>
 
 // note that sqlrconnection.h must be included after sqltypes.h to
