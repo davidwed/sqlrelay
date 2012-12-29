@@ -13,9 +13,10 @@ extern "C" {
 #endif
 
 static sqlrconnection *getSqlrConnection(JNIEnv *env, jobject self) {
-	return (sqlrconnection *)env->GetLongField(self,
+	return reinterpret_cast<sqlrconnection *>(
+			env->GetLongField(self,
 				env->GetFieldID(env->GetObjectClass(self),
-				"connection","J"));
+				"connection","J")));
 }
 
 static char *conGetStringUTFChars(JNIEnv *env, jstring string, jboolean *modifier) {
@@ -47,8 +48,7 @@ JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_alloc(JNIEnv
 	char	*userstring=conGetStringUTFChars(env,user,0);
 	char	*passwordstring=conGetStringUTFChars(env,password,0);
 
-	sqlrconnection	*con=(sqlrconnection *)
-				new sqlrconnection(hoststring,(uint16_t)port,
+	sqlrconnection	*con=new sqlrconnection(hoststring,(uint16_t)port,
 						socketstring,
 						userstring,passwordstring,
 						(int32_t)retrytime,
@@ -59,7 +59,7 @@ JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_alloc(JNIEnv
 	conReleaseStringUTFChars(env,socket,socketstring);
 	conReleaseStringUTFChars(env,user,userstring);
 	conReleaseStringUTFChars(env,password,passwordstring);
-	return (jlong)con;
+	return reinterpret_cast<jlong>(con);
 }
 
 /*

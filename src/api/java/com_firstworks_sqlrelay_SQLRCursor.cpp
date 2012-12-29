@@ -14,9 +14,10 @@ extern "C" {
 #endif
 
 static sqlrcursor *getSqlrCursor(JNIEnv *env, jobject self) {
-	return (sqlrcursor *)env->GetLongField(self,
+	return reinterpret_cast<sqlrcursor *>(
+			env->GetLongField(self,
 				env->GetFieldID(env->GetObjectClass(self),
-				"cursor","J"));
+				"cursor","J")));
 }
 
 static char *curGetStringUTFChars(JNIEnv *env, jstring string,
@@ -41,8 +42,9 @@ static void curReleaseStringUTFChars(JNIEnv *env, jstring string,
  */
 JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_alloc
   (JNIEnv *env, jobject self, jlong con) {
-	sqlrcursor	*cur=new sqlrcursor((sqlrconnection *)con,true);
-	return (jlong)cur;
+	sqlrconnection	*conn=reinterpret_cast<sqlrconnection *>(con);
+	sqlrcursor	*cur=new sqlrcursor(conn,true);
+	return reinterpret_cast<jlong>(cur);
 }
 
 /*
@@ -820,7 +822,7 @@ JNIEXPORT jlong JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getOutputBindCur
 	sqlrcursor	*bindcur=getSqlrCursor(env,self)->
 				getOutputBindCursor(variablestring,true);
 	curReleaseStringUTFChars(env,variable,variablestring);
-	return (jlong)bindcur;
+	return reinterpret_cast<jlong>(bindcur);
 }
 
 /*
