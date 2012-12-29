@@ -662,10 +662,10 @@ DB2STATIC
 DB2LIBSPATH
 DB2LIBS
 DB2INCLUDES
+ODBCUNICODE
 ODBCSTATIC
 ODBCLIBSPATH
 ODBCLIBS
-ODBCINSTLIBS
 ODBCINCLUDES
 SYBASESTATIC
 SYBASELIBSPATH
@@ -24329,10 +24329,10 @@ if ( test "$ENABLE_ODBC" = "yes" )
 then
 
 	ODBCINCLUDES=""
-	ODBCINSTLIBS=""
 	ODBCLIBS=""
 	ODBCLIBSPATH=""
 	ODBCSTATIC=""
+	ODBCUNICODE=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -24341,9 +24341,9 @@ then
 		if ( test -n "$ODBCPATH" )
 		then
 			ODBCINCLUDES="-I$ODBCPATH/include"
-			ODBCINSTLIBS="-L$ODBCPATH/lib -lodbcinst"
 			ODBCLIBS="-L$ODBCPATH/lib -lodbc -lodbcinst"
 			ODBCLIBSPATH="$ODBCPATH/lib"
+			ODBCUNICODE="yes"
 		fi
 
 	else
@@ -25728,14 +25728,12 @@ fi
 		if ( test -n "$HAVE_IODBC" )
 		then
 			ODBCLIBS="$IODBCLIBS $IODBCINSTLIBS"
-			ODBCINSTLIBS="$IODBCINSTLIBS"
 			ODBCINCLUDES="$IODBCINCLUDES $IODBCINSTINCLUDES"
 			ODBCLIBSPATH="$IODBCLIBSPATH"
 			ODBCSTATIC="$IODBCSTATIC"
 		elif ( test -n "$HAVE_UNIXODBC" )
 		then
 			ODBCLIBS="$UNIXODBCLIBS $UNIXODBCINSTLIBS"
-			ODBCINSTLIBS="$UNIXODBCINSTLIBS"
 			ODBCINCLUDES="$UNIXODBCINCLUDES $UNIXODBCINSTINCLUDES"
 			ODBCLIBSPATH="$UNIXODBCLIBSPATH"
 			ODBCSTATIC="$UNIXODBCSTATIC"
@@ -26013,7 +26011,7 @@ LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
 
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for SQLConnectW" >&5
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for SQLConnectW" >&5
 $as_echo_n "checking for SQLConnectW... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -26041,10 +26039,10 @@ if ac_fn_cxx_try_link "$LINENO"; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; };
 $as_echo "#define HAVE_SQLCONNECTW 1" >>confdefs.h
-
+ ODBCUNICODE="yes"
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }; ODBCLIBS=""; OBBCINCLUDES=""
+$as_echo "no" >&6; }
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -26055,26 +26053,26 @@ export LD_LIBRARY_PATH
 
 	fi
 
-	if ( test -z "$ODBCLIBS" )
+	if ( test -z "$ODBCLIBS" -o -z "$ODBCUNICODE" )
 	then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: ODBC connection support will not be built." >&5
 $as_echo "$as_me: WARNING: ODBC connection support will not be built." >&2;}
 	fi
 
-	if ( test -n "$ODBCLIBS" -a -z "$HAVE_ICONV" )
+	if ( test -n "$ODBCLIBS" -a -n "$OBCUNICODE" -a -z "$HAVE_ICONV" )
 	then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: iconv support missing... ODBC connection support will not be built." >&5
 $as_echo "$as_me: WARNING: iconv support missing... ODBC connection support will not be built." >&2;}
 		ODBCLIBS=""
 	fi
 
-	if ( test -z "$ODBCINSTLIBS" )
+	if ( test -z "$ODBCLIBS" )
 	then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: ODBC driver will not be built." >&5
 $as_echo "$as_me: WARNING: ODBC driver will not be built." >&2;}
 	fi
 
-	if ( test -n "$ODBCLIBS" -o -n "$ODBCINSTLIBS" )
+	if ( test -n "$ODBCLIBS" )
 	then
 
 if ( test -n "$ODBCINCLUDES" )
@@ -26089,15 +26087,6 @@ fi
 if ( test -n "$ODBCLIBS" )
 then
 	echo "odbc libs... $ODBCLIBS"
-fi
-
-	fi
-	if ( test -n "$ODBCINSTLIBS" )
-	then
-
-if ( test -n "$ODBCINSTLIBS" )
-then
-	echo "odbcinst libs... $ODBCINSTLIBS"
 fi
 
 	fi
@@ -35192,6 +35181,7 @@ PHPBUILD="no "
 JAVABUILD="no "
 TCLBUILD="no "
 ERLANGBUILD="no "
+ODBCBUILD="no "
 if ( test -n "$HAVE_PERL" ); then
 	PERLBUILD="yes"
 fi
@@ -35216,12 +35206,15 @@ fi
 if ( test -n "$HAVE_ERLANG" ); then
 	ERLANGBUILD="yes"
 fi
+if ( test -n "$ODBCLIBS" ); then
+	ODBCBUILD="yes"
+fi
 echo "$APIS"
 echo " APIs         : C/C++       yes           Perl       $PERLBUILD"
 echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
 echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
 echo "                TCL         $TCLBUILD           Zope       $ZOPEBUILD"
-echo "                Erlang      $ERLANGBUILD"
+echo "                Erlang      $ERLANGBUILD           ODBC       $ODBCBUILD"
 echo ""
 
 ORACLE8BUILD="no     "

@@ -19,7 +19,9 @@ ifneq ($(strip $(MYSQLLIBS)),)
 	$(MAKE) -C mysql all
 endif
 ifneq ($(strip $(ODBCLIBS)),)
+ifneq ($(strip $(ODBCUNICODE)),)
 	$(MAKE) -C odbc all
+endif
 endif
 ifneq ($(strip $(ORACLELIBS)),)
 	$(MAKE) -C oracle8 all
@@ -65,7 +67,9 @@ ifneq ($(strip $(MYSQLLIBS)),)
 	$(MAKE) -C mysql install
 endif
 ifneq ($(strip $(ODBCLIBS)),)
+ifneq ($(strip $(ODBCUNICODE)),)
 	$(MAKE) -C odbc install
+endif
 endif
 ifneq ($(strip $(ORACLELIBS)),)
 	$(MAKE) -C oracle8 install

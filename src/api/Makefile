@@ -7,7 +7,7 @@ all:
 	$(MAKE) -C c all
 	$(MAKE) -C postgresql all
 	$(MAKE) -C mysql all
-ifneq ($(ODBCINSTLIBS),)
+ifneq ($(ODBCLIBS),)
 	$(MAKE) -C odbc all
 endif
 ifneq ($(HAVE_PYTHON),)
@@ -40,7 +40,7 @@ clean:
 	$(MAKE) -C c clean
 	$(MAKE) -C postgresql clean
 	$(MAKE) -C mysql clean
-ifneq ($(ODBCINSTLIBS),)
+ifneq ($(ODBCLIBS),)
 	$(MAKE) -C odbc clean
 endif
 ifneq ($(HAVE_PYTHON),)
@@ -73,7 +73,7 @@ install:
 	$(MAKE) -C c install
 	$(MAKE) -C postgresql install
 	$(MAKE) -C mysql install
-ifneq ($(ODBCINSTLIBS),)
+ifneq ($(ODBCLIBS),)
 	$(MAKE) -C odbc install
 endif
 ifneq ($(HAVE_PYTHON),)
@@ -109,7 +109,7 @@ uninstall:
 	$(MAKE) -C c uninstall
 	$(MAKE) -C postgresql uninstall
 	$(MAKE) -C mysql uninstall
-ifneq ($(ODBCINSTLIBS),)
+ifneq ($(ODBCLIBS),)
 	$(MAKE) -C odbc uninstall
 endif
 ifneq ($(HAVE_PYTHON),)

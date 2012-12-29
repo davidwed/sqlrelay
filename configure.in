@@ -845,6 +845,7 @@ PHPBUILD="no "
 JAVABUILD="no "
 TCLBUILD="no "
 ERLANGBUILD="no "
+ODBCBUILD="no "
 if ( test -n "$HAVE_PERL" ); then
 	PERLBUILD="yes"
 fi
@@ -869,12 +870,15 @@ fi
 if ( test -n "$HAVE_ERLANG" ); then
 	ERLANGBUILD="yes"
 fi
+if ( test -n "$ODBCLIBS" ); then
+	ODBCBUILD="yes"
+fi
 echo "$APIS"
 echo " APIs         : C/C++       yes           Perl       $PERLBUILD"
 echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
 echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
 echo "                TCL         $TCLBUILD           Zope       $ZOPEBUILD"
-echo "                Erlang      $ERLANGBUILD"
+echo "                Erlang      $ERLANGBUILD           ODBC       $ODBCBUILD"
 echo ""
 
 ORACLE8BUILD="no     "

@@ -1811,10 +1811,10 @@ if ( test "$ENABLE_ODBC" = "yes" )
 then
 
 	ODBCINCLUDES=""
-	ODBCINSTLIBS=""
 	ODBCLIBS=""
 	ODBCLIBSPATH=""
 	ODBCSTATIC=""
+	ODBCUNICODE=""
 
 	if ( test "$cross_compiling" = "yes" )
 	then
@@ -1824,9 +1824,9 @@ then
 		if ( test -n "$ODBCPATH" )
 		then
 			ODBCINCLUDES="-I$ODBCPATH/include"
-			ODBCINSTLIBS="-L$ODBCPATH/lib -lodbcinst"
 			ODBCLIBS="-L$ODBCPATH/lib -lodbc -lodbcinst"
 			ODBCLIBSPATH="$ODBCPATH/lib"
+			ODBCUNICODE="yes"
 		fi
 
 	else
@@ -1877,14 +1877,12 @@ then
 		if ( test -n "$HAVE_IODBC" )
 		then
 			ODBCLIBS="$IODBCLIBS $IODBCINSTLIBS"
-			ODBCINSTLIBS="$IODBCINSTLIBS"
 			ODBCINCLUDES="$IODBCINCLUDES $IODBCINSTINCLUDES"
 			ODBCLIBSPATH="$IODBCLIBSPATH"
 			ODBCSTATIC="$IODBCSTATIC"
 		elif ( test -n "$HAVE_UNIXODBC" )
 		then
 			ODBCLIBS="$UNIXODBCLIBS $UNIXODBCINSTLIBS"
-			ODBCINSTLIBS="$UNIXODBCINSTLIBS"
 			ODBCINCLUDES="$UNIXODBCINCLUDES $UNIXODBCINSTINCLUDES"
 			ODBCLIBSPATH="$UNIXODBCLIBSPATH"
 			ODBCSTATIC="$UNIXODBCSTATIC"
@@ -1952,31 +1950,30 @@ extern "C" SQLRETURN SQL_API SQLRowCount(SQLHSTMT statementhandle,
 #include <sqltypes.h>
 #include <stdlib.h>],[SQLBindCol(0,0,0,0,0,(SQLLEN *)0);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(SQLBINDCOL_SQLLEN,1,Some systems use SQLLEN * in SQLBindCol)],[AC_MSG_RESULT(no)])
 		
-		dnl is SQLConnectW supported?
 		AC_MSG_CHECKING(for SQLConnectW)
 		FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <stdlib.h>],[SQLConnectW(0,NULL,0,NULL,0,NULL,0);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLCONNECTW,1,Some systems have SQLConnectW)],[AC_MSG_RESULT(no); ODBCLIBS=""; OBBCINCLUDES=""])
+#include <stdlib.h>],[SQLConnectW(0,NULL,0,NULL,0,NULL,0);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLCONNECTW,1,Some systems have SQLConnectW) ODBCUNICODE="yes"],[AC_MSG_RESULT(no)])
 	fi
 
-	if ( test -z "$ODBCLIBS" )
+	if ( test -z "$ODBCLIBS" -o -z "$ODBCUNICODE" )
 	then
 		AC_MSG_WARN(ODBC connection support will not be built.)
 	fi
 
-	if ( test -n "$ODBCLIBS" -a -z "$HAVE_ICONV" )
+	if ( test -n "$ODBCLIBS" -a -n "$OBCUNICODE" -a -z "$HAVE_ICONV" )
 	then
 		AC_MSG_WARN(iconv support missing... ODBC connection support will not be built.)
 		ODBCLIBS=""
 	fi
 
-	if ( test -z "$ODBCINSTLIBS" )
+	if ( test -z "$ODBCLIBS" )
 	then
 		AC_MSG_WARN(ODBC driver will not be built.)
 	fi
 
-	if ( test -n "$ODBCLIBS" -o -n "$ODBCINSTLIBS" )
+	if ( test -n "$ODBCLIBS" )
 	then
 		FW_INCLUDES(odbc,[$ODBCINCLUDES])
 	fi
@@ -1984,16 +1981,12 @@ extern "C" SQLRETURN SQL_API SQLRowCount(SQLHSTMT statementhandle,
 	then
 		FW_LIBS(odbc,[$ODBCLIBS])
 	fi
-	if ( test -n "$ODBCINSTLIBS" )
-	then
-		FW_LIBS(odbcinst,[$ODBCINSTLIBS])
-	fi
 		
 	AC_SUBST(ODBCINCLUDES)
-	AC_SUBST(ODBCINSTLIBS)
 	AC_SUBST(ODBCLIBS)
 	AC_SUBST(ODBCLIBSPATH)
 	AC_SUBST(ODBCSTATIC)
+	AC_SUBST(ODBCUNICODE)
 fi
 ])
 

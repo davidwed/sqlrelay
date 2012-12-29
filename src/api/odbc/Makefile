@@ -11,7 +11,7 @@ else
 endif
 
 CPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(ODBCINCLUDES) $(ICONVINCLUDES) -DSQLR_VERSION=\"$(SQLR_VERSION)\"
-LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(ODBCINSTLIBS)
+LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(ODBCLIBS)
 ifneq ($(strip $(libdir)),)
 ifeq ($(PSQLUSERPATH),yes)
 	RPATH = -R $(libdir)
