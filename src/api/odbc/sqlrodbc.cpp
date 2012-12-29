@@ -28,7 +28,7 @@ typedef SQLPOINTER NUMERICATTRIBUTETYPE;
 
 #define ODBC_INI "odbc.ini"
 
-//#define DEBUG_MESSAGES 1
+#define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
 	#define debugFunction() printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
 	#define debugPrintf(format, ...) printf(format, ## __VA_ARGS__); fflush(stdout);
@@ -783,18 +783,22 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
+	// initialize the stringlength and buffer to safe return values
+	// in case the app uses the result without checking the error code
+	charstring::safeCopy((char *)characterattribute,bufferlength,"");
+	if (stringlength) {
+		*stringlength=0;
+	}
+	if (numericattribute) {
+		// this will cause a problem if something smaller than 
+		// SQLSMALLINT is passed in but nobody should be doing that
+		*(SQLSMALLINT *)numericattribute=0;
+	}
+
 	// make sure we're attempting to get a valid column
 	uint32_t	colcount=stmt->cur->colCount();
+	debugPrintf("colcount: %d\n",(int)colcount);
 	if (columnnumber<1 || columnnumber>colcount) {
-		// for some reason, if columnnumber==0 then we're supposed to
-		// return "a value" for SQL_DESC_TYPE and SQL_DESC_OCTET_LENGTH
-		if (columnnumber==0) {
-			if (fieldidentifier==SQL_DESC_TYPE) {
-				*(SQLSMALLINT *)numericattribute=0;
-			} else if (fieldidentifier==SQL_DESC_OCTET_LENGTH) {
-				*(SQLINTEGER *)numericattribute=0;
-			}
-		}
 		return SQL_ERROR;
 	}
 
@@ -1198,20 +1202,32 @@ static void SQLR_BuildTableName(stringbuffer *table,
 				SQLCHAR *tablename,
 				SQLSMALLINT namelength3) {
 	debugFunction();
-	if (namelength1>0) {
-		table->append(catalogname,namelength1);
+	if (namelength1) {
+		if (namelength1==SQL_NTS) {
+			table->append(catalogname);
+		} else {
+			table->append(catalogname,namelength1);
+		}
 	}
-	if (namelength2>0) {
+	if (namelength2) {
 		if (table->getStringLength()) {
 			table->append('.');
 		}
-		table->append(schemaname,namelength2);
+		if (namelength2==SQL_NTS) {
+			table->append(schemaname);
+		} else {
+			table->append(schemaname,namelength2);
+		}
 	}
-	if (namelength3>0) {
+	if (namelength3) {
 		if (table->getStringLength()) {
 			table->append('.');
 		}
-		table->append(tablename,namelength3);
+		if (namelength3==SQL_NTS) {
+			table->append(tablename);
+		} else {
+			table->append(tablename,namelength3);
+		}
 	}
 }
 
@@ -1235,8 +1251,14 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 	stringbuffer	table;
 	SQLR_BuildTableName(&table,catalogname,namelength1,
 				schemaname,namelength2,tablename,namelength3);
-	char	*wild=charstring::duplicate((const char *)columnname,
+
+	char	*wild=NULL;
+	if (namelength4==SQL_NTS) {
+		wild=charstring::duplicate((const char *)columnname);
+	} else {
+		wild=charstring::duplicate((const char *)columnname,
 							namelength4);
+	}
 
 	debugPrintf("table: %s\n",table.getString());
 	debugPrintf("wild: %s\n",(wild)?wild:"");
@@ -1940,7 +1962,7 @@ uint32_t SQLR_TrimQuery(SQLCHAR *statementtext, SQLINTEGER textlength) {
 
 	// find the length of the string
 	uint32_t	length=0;
-	if (textlength==SQL_NTS || textlength==SQL_NTSL) {
+	if (textlength==SQL_NTS) {
 		length=charstring::length((const char *)statementtext);
 	} else {
 		length=textlength;
@@ -4199,8 +4221,13 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	char	*wild=charstring::duplicate((const char *)tablename,
+	char	*wild=NULL;
+	if (namelength3==SQL_NTS) {
+		wild=charstring::duplicate((const char *)tablename);
+	} else {
+		wild=charstring::duplicate((const char *)tablename,
 							namelength3);
+	}
 	debugPrintf("wild: %s\n",(wild)?wild:"");
 
 	SQLRETURN	retval=(stmt->cur->getTableList(wild))?
