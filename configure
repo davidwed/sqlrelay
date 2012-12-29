@@ -35263,7 +35263,7 @@ if ( test -n "$SYBASELIBS" ); then
 		SYBASEBUILD="static "
 	fi
 fi
-if ( test -n "$ODBCLIBS" ); then
+if ( test -n "$ODBCLIBS" -a "$ODBCUNICODE" ); then
 	ODBCBUILD="dynamic"
 	if ( test -n "$ODBCSTATIC" ); then
 		ODBCBUILD="static "
