@@ -1298,16 +1298,32 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					conn->socket,sizeof(conn->socket),
 					ODBC_INI);
 	if (charstring::length(user)) {
-		charstring::safeCopy(conn->user,sizeof(conn->user),
+		if (userlength==SQL_NTS) {
+			charstring::safeCopy(conn->user,
+						sizeof(conn->user),
 						(const char *)user);
+		} else {
+			charstring::safeCopy(conn->user,
+						sizeof(conn->user),
+						(const char *)user,
+						userlength);
+		}
 	} else {
 		SQLGetPrivateProfileString((const char *)dsn,"User","",
 					conn->user,sizeof(conn->user),
 					ODBC_INI);
 	}
 	if (charstring::length(password)) {
-		charstring::safeCopy(conn->password,sizeof(conn->password),
+		if (passwordlength==SQL_NTS) {
+			charstring::safeCopy(conn->password,
+						sizeof(conn->password),
+						(const char *)password,
+						passwordlength);
+		} else {
+			charstring::safeCopy(conn->password,
+						sizeof(conn->password),
 						(const char *)password);
+		}
 	} else {
 		SQLGetPrivateProfileString((const char *)dsn,"Password","",
 					conn->password,sizeof(conn->password),
@@ -1412,11 +1428,21 @@ SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT statementhandle,
 
 	charstring::safeCopy((char *)columnname,bufferlength,
 				stmt->cur->getColumnName(col));
-	*namelength=charstring::length(columnname);
-	*datatype=SQLR_MapColumnType(stmt->cur,col);
-	*columnsize=(SQLSMALLINT)stmt->cur->getColumnPrecision(col);
-	*decimaldigits=(SQLSMALLINT)stmt->cur->getColumnScale(col);
-	*nullable=(SQLSMALLINT)stmt->cur->getColumnIsNullable(col);
+	if (namelength) {
+		*namelength=charstring::length(columnname);
+	}
+	if (datatype) {
+		*datatype=SQLR_MapColumnType(stmt->cur,col);
+	}
+	if (columnsize) {
+		*columnsize=(SQLSMALLINT)stmt->cur->getColumnPrecision(col);
+	}
+	if (decimaldigits) {
+		*decimaldigits=(SQLSMALLINT)stmt->cur->getColumnScale(col);
+	}
+	if (nullable) {
+		*nullable=(SQLSMALLINT)stmt->cur->getColumnIsNullable(col);
+	}
 
 	return SQL_SUCCESS;
 }
@@ -3847,7 +3873,12 @@ SQLRETURN SQL_API SQLSetCursorName(SQLHSTMT statementhandle,
 	}
 
 	delete[] stmt->name;
-	stmt->name=charstring::duplicate((const char *)cursorname,namelength);
+	if (namelength==SQL_NTS) {
+		stmt->name=charstring::duplicate((const char *)cursorname);
+	} else {
+		stmt->name=charstring::duplicate((const char *)cursorname,
+								namelength);
+	}
 
 	return SQL_SUCCESS;
 }
