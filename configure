@@ -24373,6 +24373,7 @@ then
 
 
 
+
 SEARCHPATH=$ODBCPATH
 NAME=unixodbc
 HEADER=sql.h
@@ -25684,6 +25685,10 @@ fi
 
 		if ( test -n "$MICROSOFT" -a -z "$ODBCLIBS" )
 		then
+			ODBC32LIBS=""
+			ODBC32LIBSPATH=""
+			ODBCCP32LIBS=""
+			ODBCCP32LIBSPATH=""
 
 FOUNDHEADER=""
 FOUNDLIB=""
@@ -25704,10 +25709,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "ODBCLIBSPATH=\"/usr/lib/w32api\"; ODBCLIBS=\"-L/usr/lib/w32api -lodbc32\""
+		eval "ODBC32LIBSPATH=\"/usr/lib/w32api\"; ODBC32LIBS=\"-L/usr/lib/w32api -lodbc32\""
 	fi
 else
-	if ( test -n "/usr/lib/w32api/libodbc32.a" -a -n "ODBCLIBSPATH=\"/usr/lib/w32api\"; ODBCLIBS=\"-L/usr/lib/w32api -lodbc32\"; STATIC=\"$STATICFLAG\"" )
+	if ( test -n "/usr/lib/w32api/libodbc32.a" -a -n "ODBC32LIBSPATH=\"/usr/lib/w32api\"; ODBC32LIBS=\"-L/usr/lib/w32api -lodbc32\"; STATIC=\"$STATICFLAG\"" )
 	then
 
 if ( test -r "/usr/lib/w32api/libodbc32.a" )
@@ -25718,11 +25723,52 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval ""
-			eval "ODBCLIBSPATH=\"/usr/lib/w32api\"; ODBCLIBS=\"-L/usr/lib/w32api -lodbc32\"; STATIC=\"$STATICFLAG\""
+			eval "ODBC32LIBSPATH=\"/usr/lib/w32api\"; ODBC32LIBS=\"-L/usr/lib/w32api -lodbc32\"; STATIC=\"$STATICFLAG\""
 		fi
 	fi
 fi
 
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/usr/include/w32api/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/usr/lib/w32api/libodbccp32.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval ""
+		eval "ODBCCP32LIBSPATH=\"/usr/lib/w32api\"; ODBCCP32LIBS=\"-L/usr/lib/w32api -lodbccp32\""
+	fi
+else
+	if ( test -n "/usr/lib/w32api/libodbccp32.a" -a -n "ODBCCP32LIBSPATH=\"/usr/lib/w32api\"; ODBCCP32LIBS=\"-L/usr/lib/w32api -lodbccp32\"; STATIC=\"$STATICFLAG\"" )
+	then
+
+if ( test -r "/usr/lib/w32api/libodbccp32.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval ""
+			eval "ODBCCP32LIBSPATH=\"/usr/lib/w32api\"; ODBCCP32LIBS=\"-L/usr/lib/w32api -lodbccp32\"; STATIC=\"$STATICFLAG\""
+		fi
+	fi
+fi
+
+			ODBCLIBS="$ODBC32LIBS $ODBCCP32LIBS"
+			ODBCLIBSPATH="$ODBC32LIBSPATH $ODBCCP32LIBSPATH"
 		fi
 
 		if ( test -n "$HAVE_IODBC" )

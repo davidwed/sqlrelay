@@ -1854,6 +1854,7 @@ then
 		IODBCINSTSTATIC=""
 		IODBCINSTINCLUDES=""
 
+
 		FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[unixodbc],[sql.h],[odbc],[$STATICFLAG],[$RPATHFLAG],[UNIXODBCINCLUDES],[UNIXODBCLIBS],[UNIXODBCLIBSPATH],[UNIXODBCSTATIC])
 
 		if ( test -n "$UNIXODBCLIBS" )
@@ -1871,7 +1872,14 @@ then
 
 		if ( test -n "$MICROSOFT" -a -z "$ODBCLIBS" )
 		then
-			FW_CHECK_HEADER_LIB([/usr/include/w32api/sql.h],[],[/usr/lib/w32api/libodbc32.$SOSUFFIX],[ODBCLIBSPATH=\"/usr/lib/w32api\"; ODBCLIBS=\"-L/usr/lib/w32api -lodbc32\"],[/usr/lib/w32api/libodbc32.a],[ODBCLIBSPATH=\"/usr/lib/w32api\"; ODBCLIBS=\"-L/usr/lib/w32api -lodbc32\"; STATIC=\"$STATICFLAG\"])
+			ODBC32LIBS=""
+			ODBC32LIBSPATH=""
+			ODBCCP32LIBS=""
+			ODBCCP32LIBSPATH=""
+			FW_CHECK_HEADER_LIB([/usr/include/w32api/sql.h],[],[/usr/lib/w32api/libodbc32.$SOSUFFIX],[ODBC32LIBSPATH=\"/usr/lib/w32api\"; ODBC32LIBS=\"-L/usr/lib/w32api -lodbc32\"],[/usr/lib/w32api/libodbc32.a],[ODBC32LIBSPATH=\"/usr/lib/w32api\"; ODBC32LIBS=\"-L/usr/lib/w32api -lodbc32\"; STATIC=\"$STATICFLAG\"])
+			FW_CHECK_HEADER_LIB([/usr/include/w32api/sql.h],[],[/usr/lib/w32api/libodbccp32.$SOSUFFIX],[ODBCCP32LIBSPATH=\"/usr/lib/w32api\"; ODBCCP32LIBS=\"-L/usr/lib/w32api -lodbccp32\"],[/usr/lib/w32api/libodbccp32.a],[ODBCCP32LIBSPATH=\"/usr/lib/w32api\"; ODBCCP32LIBS=\"-L/usr/lib/w32api -lodbccp32\"; STATIC=\"$STATICFLAG\"])
+			ODBCLIBS="$ODBC32LIBS $ODBCCP32LIBS"
+			ODBCLIBSPATH="$ODBC32LIBSPATH $ODBCCP32LIBSPATH"
 		fi
 
 		if ( test -n "$HAVE_IODBC" )
