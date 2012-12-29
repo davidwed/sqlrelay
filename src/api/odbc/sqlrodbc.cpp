@@ -24,7 +24,7 @@ typedef SQLPOINTER NUMERICATTRIBUTETYPE;
 
 #define ODBC_INI "odbc.ini"
 
-#define DEBUG_MESSAGES 1
+//#define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
 	#define debugFunction() printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
 	#define debugPrintf(format, ...) printf(format, ## __VA_ARGS__); fflush(stdout);
@@ -37,47 +37,17 @@ extern "C" {
 
 static	uint16_t	stmtid=0;
 
-struct FIELD {
-	SQLSMALLINT	targettype;
-	SQLPOINTER	targetvalue;
-	SQLLEN		bufferlength;
-	SQLLEN		*strlen_or_ind;
+class CONN;
+
+struct ENV {
+	SQLINTEGER		odbcversion;
+	linkedlist< CONN * >	connlist;
+	char			*error;
+	int64_t			errno;
+	const char		*sqlstate;
 };
 
-
-struct outputbind {
-	SQLUSMALLINT	parameternumber;
-	SQLSMALLINT	valuetype;
-	SQLULEN		lengthprecision;
-	SQLSMALLINT	parameterscale;
-	SQLPOINTER	parametervalue;
-	SQLLEN		bufferlength;
-	SQLLEN		*strlen_or_ind;
-};
-
-struct CONN;
-
-struct STMT {
-	sqlrcursor				*cur;
-	uint64_t				currentfetchrow;
-	uint64_t				currentgetdatarow;
-	CONN					*conn;
-	char					*name;
-	char					*error;
-	int64_t					errno;
-	const char				*sqlstate;
-	numericdictionary< FIELD * >		fieldlist;
-	SQLHANDLE				rowdesc;
-	SQLHANDLE				paramdesc;
-	SQLHANDLE				improwdesc;
-	SQLHANDLE				impparamdesc;
-	numericdictionary< char * >		inputbindstrings;
-	numericdictionary< outputbind * >	outputbinds;
-	SQLROWSETSIZE				*rowsfetchedptr;
-	SQLUSMALLINT				*rowstatusptr;
-};
-
-struct ENV;
+class STMT;
 
 struct CONN {
 	sqlrconnection		*con;
@@ -95,12 +65,49 @@ struct CONN {
 	int32_t			tries;
 };
 
-struct ENV {
-	SQLINTEGER		odbcversion;
-	linkedlist< CONN * >	connlist;
-	char			*error;
-	int64_t			errno;
-	const char		*sqlstate;
+struct rowdesc {
+	STMT	*stmt;
+};
+
+struct paramdesc {
+	STMT	*stmt;
+};
+
+struct FIELD {
+	SQLSMALLINT	targettype;
+	SQLPOINTER	targetvalue;
+	SQLLEN		bufferlength;
+	SQLLEN		*strlen_or_ind;
+};
+
+struct outputbind {
+	SQLUSMALLINT	parameternumber;
+	SQLSMALLINT	valuetype;
+	SQLULEN		lengthprecision;
+	SQLSMALLINT	parameterscale;
+	SQLPOINTER	parametervalue;
+	SQLLEN		bufferlength;
+	SQLLEN		*strlen_or_ind;
+};
+
+struct STMT {
+	sqlrcursor				*cur;
+	uint64_t				currentfetchrow;
+	uint64_t				currentgetdatarow;
+	CONN					*conn;
+	char					*name;
+	char					*error;
+	int64_t					errno;
+	const char				*sqlstate;
+	numericdictionary< FIELD * >		fieldlist;
+	rowdesc					*approwdesc;
+	paramdesc				*appparamdesc;
+	rowdesc					*improwdesc;
+	paramdesc				*impparamdesc;
+	numericdictionary< char * >		inputbindstrings;
+	numericdictionary< outputbind * >	outputbinds;
+	SQLROWSETSIZE				*rowsfetchedptr;
+	SQLUSMALLINT				*rowstatusptr;
 };
 
 static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
@@ -176,10 +183,12 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 			stmt->error=NULL;
 			stmt->errno=0;
 			stmt->sqlstate=NULL;
-			stmt->rowdesc=(SQLHANDLE)stmt;
-			stmt->paramdesc=(SQLHANDLE)stmt;
-			stmt->improwdesc=(SQLHANDLE)stmt;
-			stmt->impparamdesc=(SQLHANDLE)stmt;
+			stmt->improwdesc=new rowdesc;
+			stmt->improwdesc->stmt=stmt;
+			stmt->impparamdesc=new paramdesc;
+			stmt->impparamdesc->stmt=stmt;
+			stmt->approwdesc=stmt->improwdesc;
+			stmt->appparamdesc=stmt->impparamdesc;
 			stmt->rowsfetchedptr=NULL;
 			stmt->rowstatusptr=NULL;
 			return SQL_SUCCESS;
@@ -307,7 +316,7 @@ static void SQLR_ResetParams(STMT *stmt) {
 	oblist->clear();
 }
 
-SQLRETURN SQL_API SQLCloseCursor(SQLHSTMT statementhandle) {
+static SQLRETURN SQLR_SQLCloseCursor(SQLHSTMT statementhandle) {
 	debugFunction();
 
 	STMT	*stmt=(STMT *)statementhandle;
@@ -320,6 +329,11 @@ SQLRETURN SQL_API SQLCloseCursor(SQLHSTMT statementhandle) {
 	stmt->cur->closeResultSet();
 
 	return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLCloseCursor(SQLHSTMT statementhandle) {
+	debugFunction();
+	return SQLR_SQLCloseCursor(statementhandle);
 }
 
 static SQLSMALLINT SQLR_MapColumnType(sqlrcursor *cur, uint32_t col) {
@@ -1968,7 +1982,7 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 	// run the query
 	#ifdef DEBUG_MESSAGES
 	stringbuffer	debugstr;
-	debugstr.append(statementtext,textlength);
+	debugstr.append(statementtext,statementtextlength);
 	debugPrintf("statement: \"%s\",%d)\n",
 			debugstr.getString(),(int)statementtextlength);
 	#endif
@@ -2178,6 +2192,8 @@ static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 				return SQL_INVALID_HANDLE;
 			}
 			stmt->conn->stmtlist.removeAllByData(stmt);
+			delete stmt->improwdesc;
+			delete stmt->impparamdesc;
 			delete stmt->cur;
 			delete stmt;
 			return SQL_SUCCESS;
@@ -2195,7 +2211,7 @@ static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 
 SQLRETURN SQL_API SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 	debugFunction();
-	return SQLFreeHandle(handletype,handle);
+	return SQLR_SQLFreeHandle(handletype,handle);
 }
 
 SQLRETURN SQL_API SQLFreeStmt(SQLHSTMT statementhandle, SQLUSMALLINT option) {
@@ -2210,10 +2226,10 @@ SQLRETURN SQL_API SQLFreeStmt(SQLHSTMT statementhandle, SQLUSMALLINT option) {
 	switch (option) {
 		case SQL_CLOSE:
 			debugPrintf("option: SQL_CLOSE\n");
-			return SQLCloseCursor(statementhandle);
+			return SQLR_SQLCloseCursor(statementhandle);
 		case SQL_DROP:
 			debugPrintf("option: SQL_DROP\n");
-			return SQLFreeHandle(SQL_HANDLE_STMT,
+			return SQLR_SQLFreeHandle(SQL_HANDLE_STMT,
 						(SQLHANDLE)statementhandle);
 		case SQL_UNBIND:
 			debugPrintf("option: SQL_UNBIND\n");
@@ -3050,8 +3066,8 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLGETTYPEINFO:
 			debugPrintf("functionid: "
 				"SQL_API_SQLGETTYPEINFO "
-				"- false\n");
-			*supported=SQL_FALSE;
+				"- true\n");
+			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLNUMRESULTCOLS:
 			debugPrintf("functionid: "
@@ -3425,43 +3441,19 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 		#if (ODBCVER >= 0x0300)
 		case SQL_ATTR_APP_ROW_DESC:
 			debugPrintf("attribute: SQL_ATTR_APP_ROW_DESC\n");
-			rawbuffer::copy((void *)value,
-					(const void *)stmt->rowdesc,
-					sizeof(stmt->rowdesc));
-			if (stringlength) {
-				*stringlength=
-					(SQLSMALLINT)sizeof(stmt->rowdesc);
-			}
+			*(rowdesc **)value=stmt->approwdesc;
 			break;
 		case SQL_ATTR_APP_PARAM_DESC:
 			debugPrintf("attribute: SQL_ATTR_APP_PARAM_DESC\n");
-			rawbuffer::copy((void *)value,
-					(const void *)stmt->paramdesc,
-					sizeof(stmt->paramdesc));
-			if (stringlength) {
-				*stringlength=
-					(SQLSMALLINT)sizeof(stmt->paramdesc);
-			}
+			*(paramdesc **)value=stmt->appparamdesc;
 			break;
 		case SQL_ATTR_IMP_ROW_DESC:
 			debugPrintf("attribute: SQL_ATTR_IMP_ROW_DESC\n");
-			rawbuffer::copy((void *)value,
-					(const void *)stmt->improwdesc,
-					sizeof(stmt->improwdesc));
-			if (stringlength) {
-				*stringlength=
-					(SQLSMALLINT)sizeof(stmt->improwdesc);
-			}
+			*(rowdesc **)value=stmt->improwdesc;
 			break;
 		case SQL_ATTR_IMP_PARAM_DESC:
 			debugPrintf("attribute: SQL_ATTR_IMP_PARAM_DESC\n");
-			rawbuffer::copy((void *)value,
-					(const void *)stmt->impparamdesc,
-					sizeof(stmt->impparamdesc));
-			if (stringlength) {
-				*stringlength=
-					(SQLSMALLINT)sizeof(stmt->impparamdesc);
-			}
+			*(paramdesc **)value=stmt->impparamdesc;
 			break;
 		case SQL_ATTR_CURSOR_SCROLLABLE:
 			debugPrintf("attribute: SQL_ATTR_CURSOR_SCROLLABLE\n");
@@ -3665,8 +3657,10 @@ SQLRETURN SQL_API SQLGetStmtOption(SQLHSTMT statementhandle,
 SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
 					SQLSMALLINT DataType) {
 	debugFunction();
-	// not supported
-	return SQL_ERROR;
+	// not supported, return success though, JDBC-ODBC bridge really
+	// wants this function to work and it will fail gracefully when
+	// attempts to fetch the result set result in no data
+	return SQL_SUCCESS;
 }
 
 SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT statementhandle,
@@ -3710,7 +3704,7 @@ SQLRETURN SQL_API SQLPrepare(SQLHSTMT statementhandle,
 	// prepare the query
 	#ifdef DEBUG_MESSAGES
 	stringbuffer	debugstr;
-	debugstr.append(statementtext,textlength);
+	debugstr.append(statementtext,statementtextlength);
 	debugPrintf("statement: \"%s\",%d)\n",
 			debugstr.getString(),(int)statementtextlength);
 	#endif
@@ -3934,21 +3928,28 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 
 	switch (attribute) {
 		#if (ODBCVER >= 0x0300)
-		// these are read-only
 		case SQL_ATTR_APP_ROW_DESC:
 			debugPrintf("attribute: SQL_ATTR_APP_ROW_DESC\n");
-			return SQL_ERROR;
+			stmt->approwdesc=(rowdesc *)value;
+			if (stmt->approwdesc==SQL_NULL_DESC) {
+				stmt->approwdesc=stmt->improwdesc;
+			}
+			return SQL_SUCCESS;
 		case SQL_ATTR_APP_PARAM_DESC:
 			debugPrintf("attribute: SQL_ATTR_APP_PARAM_DESC\n");
-			return SQL_ERROR;
+			stmt->appparamdesc=(paramdesc *)value;
+			if (stmt->appparamdesc==SQL_NULL_DESC) {
+				stmt->appparamdesc=stmt->impparamdesc;
+			}
+			return SQL_SUCCESS;
 		case SQL_ATTR_IMP_ROW_DESC:
 			debugPrintf("attribute: SQL_ATTR_IMP_ROW_DESC\n");
+			// read-only
 			return SQL_ERROR;
 		case SQL_ATTR_IMP_PARAM_DESC:
 			debugPrintf("attribute: SQL_ATTR_IMP_PARAM_DESC\n");
+			// read-only
 			return SQL_ERROR;
-
-		// these are read-write
 		case SQL_ATTR_CURSOR_SCROLLABLE:
 			debugPrintf("attribute: SQL_ATTR_CURSOR_SCROLLABLE\n");
 			// FIXME: implement
