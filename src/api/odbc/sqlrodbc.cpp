@@ -16,6 +16,10 @@
 
 #include <parsedatetime.h>
 
+#ifndef SQL_NULL_DESC
+	#define SQL_NULL_DESC 0
+#endif
+
 #ifdef SQLCOLATTRIBUTE_SQLLEN
 typedef SQLLEN * NUMERICATTRIBUTETYPE;
 #else
@@ -43,7 +47,7 @@ struct ENV {
 	SQLINTEGER		odbcversion;
 	linkedlist< CONN * >	connlist;
 	char			*error;
-	int64_t			errno;
+	int64_t			errn;
 	const char		*sqlstate;
 };
 
@@ -54,7 +58,7 @@ struct CONN {
 	ENV			*env;
 	linkedlist< STMT * >	stmtlist;
 	char			*error;
-	int64_t			errno;
+	int64_t			errn;
 	const char		*sqlstate;
 	char			server[1024];
 	uint16_t		port;
@@ -97,7 +101,7 @@ struct STMT {
 	CONN					*conn;
 	char					*name;
 	char					*error;
-	int64_t					errno;
+	int64_t					errn;
 	const char				*sqlstate;
 	numericdictionary< FIELD * >		fieldlist;
 	rowdesc					*approwdesc;
@@ -141,7 +145,7 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 			env->odbcversion=0;
 			*outputhandle=(SQLHANDLE)env;
 			env->error=NULL;
-			env->errno=0;
+			env->errn=0;
 			env->sqlstate=NULL;
 			return SQL_SUCCESS;
 			}
@@ -157,7 +161,7 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 			conn->con=NULL;
 			*outputhandle=(SQLHANDLE)conn;
 			conn->error=NULL;
-			conn->errno=0;
+			conn->errn=0;
 			conn->sqlstate=NULL;
 			env->connlist.append(conn);
 			conn->env=env;
@@ -181,7 +185,7 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 			conn->stmtlist.append(stmt);
 			stmt->name=NULL;
 			stmt->error=NULL;
-			stmt->errno=0;
+			stmt->errn=0;
 			stmt->sqlstate=NULL;
 			stmt->improwdesc=new rowdesc;
 			stmt->improwdesc->stmt=stmt;
@@ -1974,7 +1978,7 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 	// clear the error
 	delete[] stmt->error;
 	stmt->error=NULL;
-	stmt->errno=0;
+	stmt->errn=0;
 	stmt->sqlstate=NULL;
 
 	// trim query
@@ -1999,8 +2003,8 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 
 	// handle error
 	stmt->error=charstring::duplicate(stmt->cur->errorMessage());
-	stmt->errno=stmt->cur->errorNumber();
-	debugPrintf("error is %lld: %s\n",(long long)stmt->errno,stmt->error);
+	stmt->errn=stmt->cur->errorNumber();
+	debugPrintf("error is %lld: %s\n",(long long)stmt->errn,stmt->error);
 	return SQL_ERROR;
 }
 
@@ -2020,7 +2024,7 @@ SQLRETURN SQL_API SQLExecute(SQLHSTMT statementhandle) {
 	// clear the error
 	delete[] stmt->error;
 	stmt->error=NULL;
-	stmt->errno=0;
+	stmt->errn=0;
 	stmt->sqlstate=NULL;
 
 	// run the query
@@ -2034,8 +2038,8 @@ SQLRETURN SQL_API SQLExecute(SQLHSTMT statementhandle) {
 
 	// handle error
 	stmt->error=charstring::duplicate(stmt->cur->errorMessage());
-	stmt->errno=stmt->cur->errorNumber();
-	debugPrintf("error is %lld: %s\n",(long long)stmt->errno,stmt->error);
+	stmt->errn=stmt->cur->errorNumber();
+	debugPrintf("error is %lld: %s\n",(long long)stmt->errn,stmt->error);
 	return SQL_ERROR;
 }
 
@@ -2721,7 +2725,7 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 	// initialize error and sqlstate
 	const char	*error=NULL;
 	const char	*sqlst=NULL;
-	SQLINTEGER	errno=0;
+	SQLINTEGER	errn=0;
 
 	switch (handletype) {
 		case SQL_HANDLE_ENV:
@@ -2733,7 +2737,7 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 				return SQL_INVALID_HANDLE;
 			}
 			error=env->error;
-			errno=env->errno;
+			errn=env->errn;
 			sqlst=env->sqlstate;
 			}
 			break;
@@ -2746,7 +2750,7 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 				return SQL_INVALID_HANDLE;
 			}
 			error=conn->error;
-			errno=conn->errno;
+			errn=conn->errn;
 			sqlst=conn->sqlstate;
 			}
 			break;
@@ -2759,7 +2763,7 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 				return SQL_INVALID_HANDLE;
 			}
 			error=stmt->error;
-			errno=stmt->errno;
+			errn=stmt->errn;
 			sqlst=stmt->sqlstate;
 			}
 			break;
@@ -2773,13 +2777,13 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 	}
 
 	debugPrintf("messagetext: %s\n",(error)?error:"");
-	debugPrintf("nativeerror: %lld\n",(int64_t)errno);
+	debugPrintf("nativeerror: %lld\n",(int64_t)errn);
 	debugPrintf("sqlstate: %s\n",(sqlst)?sqlst:"");
 
 	// copy out the error and sqlstate
 	charstring::safeCopy((char *)messagetext,(size_t)bufferlength,error);
 	if (nativeerror) {
-		*nativeerror=errno;
+		*nativeerror=errn;
 	}
 	charstring::copy((char *)sqlstate,(sqlst)?sqlst:"HYOOO");
 
