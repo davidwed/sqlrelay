@@ -24,7 +24,7 @@ typedef SQLPOINTER NUMERICATTRIBUTETYPE;
 
 #define ODBC_INI "odbc.ini"
 
-//#define DEBUG_MESSAGES 1
+#define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
 	#define debugFunction() printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
 	#define debugPrintf(format, ...) printf(format, ## __VA_ARGS__); fflush(stdout);
@@ -103,23 +103,25 @@ struct ENV {
 	const char		*sqlstate;
 };
 
-#if (ODBCVER < 0x0300)
+static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
+					SQLHANDLE inputhandle,
+					SQLHANDLE *outputhandle);
+
 SQLRETURN SQL_API SQLAllocConnect(SQLHENV environmenthandle,
 					SQLHDBC *connectionhandle) {
 	debugFunction();
-	return SQLAllocHandle(SQL_HANDLE_DBC,
+	return SQLR_SQLAllocHandle(SQL_HANDLE_DBC,
 				(SQLHANDLE)environmenthandle,
 				(SQLHANDLE *)connectionhandle);
 }
 
 SQLRETURN SQL_API SQLAllocEnv(SQLHENV *environmenthandle) {
 	debugFunction();
-	return SQLAllocHandle(SQL_HANDLE_ENV,NULL,
+	return SQLR_SQLAllocHandle(SQL_HANDLE_ENV,NULL,
 				(SQLHANDLE *)environmenthandle);
 }
-#endif
 
-SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT handletype,
+static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 					SQLHANDLE inputhandle,
 					SQLHANDLE *outputhandle) {
 	debugFunction();
@@ -193,15 +195,20 @@ SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT handletype,
 	return SQL_ERROR;
 }
 
-#if (ODBCVER < 0x0300)
+SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT handletype,
+					SQLHANDLE inputhandle,
+					SQLHANDLE *outputhandle) {
+	debugFunction();
+	return SQLR_SQLAllocHandle(handletype,inputhandle,outputhandle);
+}
+
 SQLRETURN SQL_API SQLAllocStmt(SQLHDBC connectionhandle,
 					SQLHSTMT *statementhandle) {
 	debugFunction();
-	return SQLAllocHandle(SQL_HANDLE_STMT,
+	return SQLR_SQLAllocHandle(SQL_HANDLE_STMT,
 				(SQLHANDLE)connectionhandle,
 				(SQLHANDLE *)statementhandle);
 }
-#endif
 
 SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementhandle,
 					SQLUSMALLINT columnnumber,
@@ -233,7 +240,17 @@ SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementhandle,
 	return SQL_SUCCESS;
 }
 
-#if (ODBCVER < 0x0300)
+static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
+					SQLUSMALLINT parameternumber,
+					SQLSMALLINT inputoutputtype,
+					SQLSMALLINT valuetype,
+					SQLSMALLINT parametertype,
+					SQLULEN lengthprecision,
+					SQLSMALLINT parameterscale,
+					SQLPOINTER parametervalue,
+					SQLLEN bufferlength,
+					SQLLEN *strlen_or_ind);
+
 SQLRETURN SQL_API SQLBindParam(SQLHSTMT statementhandle,
 					SQLUSMALLINT parameternumber,
 					SQLSMALLINT valuetype,
@@ -243,18 +260,17 @@ SQLRETURN SQL_API SQLBindParam(SQLHSTMT statementhandle,
 					SQLPOINTER parametervalue,
 					SQLLEN *strlen_or_ind) {
 	debugFunction();
-	return SQLBindParameter(statementhandle,
-				parameternumber,
-				SQL_PARAM_INPUT,
-				valuetype,
-				parametertype,
-				lengthprecision,
-				parameterscale,
-				parametervalue,
-				0,
-				strlen_or_ind);
+	return SQLR_SQLBindParameter(statementhandle,
+					parameternumber,
+					SQL_PARAM_INPUT,
+					valuetype,
+					parametertype,
+					lengthprecision,
+					parameterscale,
+					parametervalue,
+					0,
+					strlen_or_ind);
 }
-#endif
 
 SQLRETURN SQL_API SQLCancel(SQLHSTMT statementhandle) {
 	debugFunction();
@@ -732,7 +748,7 @@ static SQLSMALLINT SQLR_MapCColumnType(sqlrcursor *cur, uint32_t col) {
 	return SQL_C_CHAR;
 }
 
-SQLRETURN SQL_API SQLColAttribute(SQLHSTMT statementhandle,
+static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 					SQLUSMALLINT columnnumber,
 					SQLUSMALLINT fieldidentifier,
 					SQLPOINTER characterattribute,
@@ -1137,6 +1153,23 @@ SQLRETURN SQL_API SQLColAttribute(SQLHSTMT statementhandle,
 	return SQL_SUCCESS;
 }
 
+SQLRETURN SQL_API SQLColAttribute(SQLHSTMT statementhandle,
+					SQLUSMALLINT columnnumber,
+					SQLUSMALLINT fieldidentifier,
+					SQLPOINTER characterattribute,
+					SQLSMALLINT bufferlength,
+					SQLSMALLINT *stringlength,
+					NUMERICATTRIBUTETYPE numericattribute) {
+	debugFunction();
+	return SQLR_SQLColAttribute(statementhandle,
+					columnnumber,
+					fieldidentifier,
+					characterattribute,
+					bufferlength,
+					stringlength,
+					numericattribute);
+}
+
 static void SQLR_BuildTableName(stringbuffer *table,
 				SQLCHAR *catalogname,
 				SQLSMALLINT namelength1,
@@ -1348,7 +1381,7 @@ SQLRETURN SQL_API SQLDisconnect(SQLHDBC connectionhandle) {
 	return SQL_SUCCESS;
 }
 
-SQLRETURN SQL_API SQLEndTran(SQLSMALLINT handletype,
+static SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
 					SQLHANDLE handle,
 					SQLSMALLINT completiontype) {
 	debugFunction();
@@ -1402,7 +1435,22 @@ SQLRETURN SQL_API SQLEndTran(SQLSMALLINT handletype,
 	}
 }
 
-#if (ODBCVER < 0x0300)
+SQLRETURN SQL_API SQLEndTran(SQLSMALLINT handletype,
+					SQLHANDLE handle,
+					SQLSMALLINT completiontype) {
+	debugFunction();
+	return SQLR_SQLEndTran(handletype,handle,completiontype);
+}
+
+static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
+					SQLHANDLE handle,
+					SQLSMALLINT recnumber,
+					SQLCHAR *sqlstate,
+					SQLINTEGER *nativeerror,
+					SQLCHAR *messagetext,
+					SQLSMALLINT bufferlength,
+					SQLSMALLINT *textlength);
+
 SQLRETURN SQL_API SQLError(SQLHENV environmenthandle,
 					SQLHDBC connectionhandle,
 					SQLHSTMT statementhandle,
@@ -1414,19 +1462,19 @@ SQLRETURN SQL_API SQLError(SQLHENV environmenthandle,
 	debugFunction();
 
 	if (environmenthandle && environmenthandle!=SQL_NULL_HENV) {
-		return SQLGetDiagRec(SQL_HANDLE_ENV,
+		return SQLR_SQLGetDiagRec(SQL_HANDLE_ENV,
 					(SQLHANDLE)environmenthandle,
 					1,sqlstate,
 					nativeerror,messagetext,
 					bufferlength,textlength);
 	} else if (connectionhandle && connectionhandle!=SQL_NULL_HANDLE) {
-		return SQLGetDiagRec(SQL_HANDLE_DBC,
+		return SQLR_SQLGetDiagRec(SQL_HANDLE_DBC,
 					(SQLHANDLE)connectionhandle,
 					1,sqlstate,
 					nativeerror,messagetext,
 					bufferlength,textlength);
 	} else if (statementhandle && statementhandle!=SQL_NULL_HSTMT) {
-		return SQLGetDiagRec(SQL_HANDLE_STMT,
+		return SQLR_SQLGetDiagRec(SQL_HANDLE_STMT,
 					(SQLHANDLE)statementhandle,
 					1,sqlstate,
 					nativeerror,messagetext,
@@ -1435,7 +1483,6 @@ SQLRETURN SQL_API SQLError(SQLHENV environmenthandle,
 	debugPrintf("no valid handle\n");
 	return SQL_INVALID_HANDLE;
 }
-#endif
 
 static void SQLR_ParseNumeric(SQL_NUMERIC_STRUCT *ns,
 				const char *value, uint32_t valuesize) {
@@ -2059,19 +2106,19 @@ SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT statementhandle,
 	return SQLR_Fetch(statementhandle,NULL,NULL);
 }
 
-#if (ODBCVER < 0x0300)
+static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle);
+
 SQLRETURN SQL_API SQLFreeConnect(SQLHDBC connectionhandle) {
 	debugFunction();
-	return SQLFreeHandle(SQL_HANDLE_DBC,connectionhandle);
+	return SQLR_SQLFreeHandle(SQL_HANDLE_DBC,connectionhandle);
 }
 
 SQLRETURN SQL_API SQLFreeEnv(SQLHENV environmenthandle) {
 	debugFunction();
-	return SQLFreeHandle(SQL_HANDLE_ENV,environmenthandle);
+	return SQLR_SQLFreeHandle(SQL_HANDLE_ENV,environmenthandle);
 }
-#endif
 
-SQLRETURN SQL_API SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
+static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 	debugFunction();
 
 	switch (handletype) {
@@ -2127,6 +2174,11 @@ SQLRETURN SQL_API SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 	}
 }
 
+SQLRETURN SQL_API SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
+	debugFunction();
+	return SQLFreeHandle(handletype,handle);
+}
+
 SQLRETURN SQL_API SQLFreeStmt(SQLHSTMT statementhandle, SQLUSMALLINT option) {
 	debugFunction();
 
@@ -2158,7 +2210,7 @@ SQLRETURN SQL_API SQLFreeStmt(SQLHSTMT statementhandle, SQLUSMALLINT option) {
 	}
 }
 
-SQLRETURN SQL_API SQLGetConnectAttr(SQLHDBC connectionhandle,
+static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 					SQLINTEGER attribute,
 					SQLPOINTER value,
 					SQLINTEGER bufferlength,
@@ -2196,14 +2248,22 @@ SQLRETURN SQL_API SQLGetConnectAttr(SQLHDBC connectionhandle,
 	return SQL_ERROR;
 }
 
-#if (ODBCVER < 0x0300)
+SQLRETURN SQL_API SQLGetConnectAttr(SQLHDBC connectionhandle,
+					SQLINTEGER attribute,
+					SQLPOINTER value,
+					SQLINTEGER bufferlength,
+					SQLINTEGER *stringlength) {
+	debugFunction();
+	return SQLR_SQLGetConnectAttr(connectionhandle,attribute,
+					value,bufferlength,stringlength);
+}
+
 SQLRETURN SQL_API SQLGetConnectOption(SQLHDBC connectionhandle,
 					SQLUSMALLINT option,
 					SQLPOINTER value) {
 	debugFunction();
-	return SQLGetConnectAttr(connectionhandle,option,value,256,NULL);
+	return SQLR_SQLGetConnectAttr(connectionhandle,option,value,256,NULL);
 }
-#endif
 
 SQLRETURN SQL_API SQLGetCursorName(SQLHSTMT statementhandle,
 					SQLCHAR *cursorname,
@@ -2592,7 +2652,7 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 	return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLGetDiagRec(SQLSMALLINT handletype,
+static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 					SQLHANDLE handle,
 					SQLSMALLINT recnumber,
 					SQLCHAR *sqlstate,
@@ -2677,6 +2737,20 @@ SQLRETURN SQL_API SQLGetDiagRec(SQLSMALLINT handletype,
 	return SQL_SUCCESS;
 }
 
+SQLRETURN SQL_API SQLGetDiagRec(SQLSMALLINT handletype,
+					SQLHANDLE handle,
+					SQLSMALLINT recnumber,
+					SQLCHAR *sqlstate,
+					SQLINTEGER *nativeerror,
+					SQLCHAR *messagetext,
+					SQLSMALLINT bufferlength,
+					SQLSMALLINT *textlength) {
+	debugFunction();
+	return SQLR_SQLGetDiagRec(handletype,handle,recnumber,sqlstate,
+					nativeerror,messagetext,bufferlength,
+					textlength);
+}
+
 SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV environmenthandle,
 					SQLINTEGER attribute,
 					SQLPOINTER value,
@@ -2699,12 +2773,8 @@ SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV environmenthandle,
 			break;
 		case SQL_ATTR_ODBC_VERSION:
 			debugPrintf("attribute: SQL_ATTR_ODBC_VERSION\n");
-			if (value) {
-				*((SQLINTEGER *)value)=env->odbcversion;
-			}
-			if (stringlength) {
-				*stringlength=sizeof(SQLINTEGER);
-			}
+			*((SQLINTEGER *)value)=env->odbcversion;
+			debugPrintf("odbcversion: %d\n",(int)env->odbcversion);
 			break;
 		case SQL_ATTR_CONNECTION_POOLING:
 			debugPrintf("attribute: SQL_ATTR_CONNECTION_POOLING\n");
@@ -3307,7 +3377,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 	return SQL_SUCCESS;
 }
 
-SQLRETURN SQL_API SQLGetStmtAttr(SQLHSTMT statementhandle,
+static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 					SQLINTEGER attribute,
 					SQLPOINTER value,
 					SQLINTEGER bufferlength,
@@ -3544,14 +3614,22 @@ SQLRETURN SQL_API SQLGetStmtAttr(SQLHSTMT statementhandle,
 	return SQL_SUCCESS;
 }
 
-#if (ODBCVER < 0x0300)
+SQLRETURN SQL_API SQLGetStmtAttr(SQLHSTMT statementhandle,
+					SQLINTEGER attribute,
+					SQLPOINTER value,
+					SQLINTEGER bufferlength,
+					SQLINTEGER *stringlength) {
+	debugFunction();
+	return SQLR_SQLGetStmtAttr(statementhandle,attribute,
+					value,bufferlength,stringlength);
+}
+
 SQLRETURN SQL_API SQLGetStmtOption(SQLHSTMT statementhandle,
 					SQLUSMALLINT option,
 					SQLPOINTER value) {
 	debugFunction();
-	return SQLGetStmtAttr(statementhandle,option,value,-1,NULL);
+	return SQLR_SQLGetStmtAttr(statementhandle,option,value,-1,NULL);
 }
-#endif
 
 SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
 					SQLSMALLINT DataType) {
@@ -3634,7 +3712,7 @@ SQLRETURN SQL_API SQLRowCount(SQLHSTMT statementhandle,
 	return SQL_SUCCESS;
 }
 
-SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC connectionhandle,
+static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 					SQLINTEGER attribute,
 					SQLPOINTER value,
 					SQLINTEGER stringlength) {
@@ -3685,14 +3763,22 @@ SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC connectionhandle,
 	return SQL_SUCCESS;
 }
 
-#if (ODBCVER < 0x0300)
+SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC connectionhandle,
+					SQLINTEGER attribute,
+					SQLPOINTER value,
+					SQLINTEGER stringlength) {
+	debugFunction();
+	return SQLR_SQLSetConnectAttr(connectionhandle,attribute,
+						value,stringlength);
+}
+
 SQLRETURN SQL_API SQLSetConnectOption(SQLHDBC connectionhandle,
 					SQLUSMALLINT option,
 					SQLULEN value) {
 	debugFunction();
-	return SQLSetConnectAttr(connectionhandle,option,(SQLPOINTER)value,0);
+	return SQLR_SQLSetConnectAttr(connectionhandle,option,
+						(SQLPOINTER)value,0);
 }
-#endif
 
 SQLRETURN SQL_API SQLSetCursorName(SQLHSTMT statementhandle,
 					SQLCHAR *cursorname,
@@ -3764,6 +3850,7 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV environmenthandle,
 					env->odbcversion=SQL_OV_ODBC3;
 					break;
 			}
+			debugPrintf("odbcversion: %d\n",(int)env->odbcversion);
 			return SQL_SUCCESS;
 		case SQL_ATTR_CONNECTION_POOLING:
 			debugPrintf("attribute: SQL_ATTR_CONNECTION_POOLING\n");
@@ -3781,7 +3868,6 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV environmenthandle,
 	}
 }
 
-#if (ODBCVER < 0x0300)
 SQLRETURN SQL_API SQLSetParam(SQLHSTMT statementhandle,
 					SQLUSMALLINT parameternumber,
 					SQLSMALLINT valuetype,
@@ -3791,18 +3877,19 @@ SQLRETURN SQL_API SQLSetParam(SQLHSTMT statementhandle,
 					SQLPOINTER parametervalue,
 					SQLLEN *strlen_or_ind) {
 	debugFunction();
-	return SQLBindParam(statementhandle,
+	return SQLR_SQLBindParameter(statementhandle,
 					parameternumber,
+					SQL_PARAM_INPUT,
 					valuetype,
 					parametertype,
 					lengthprecision,
 					parameterscale,
 					parametervalue,
+					0,
 					strlen_or_ind);
 }
-#endif
 
-SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT statementhandle,
+static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 					SQLINTEGER attribute,
 					SQLPOINTER value,
 					SQLINTEGER stringlength) {
@@ -4008,6 +4095,15 @@ SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT statementhandle,
 	}
 }
 
+SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT statementhandle,
+					SQLINTEGER attribute,
+					SQLPOINTER value,
+					SQLINTEGER stringlength) {
+	debugFunction();
+	return SQLR_SQLSetStmtAttr(statementhandle,attribute,
+						value,stringlength);
+}
+
 SQLRETURN SQL_API SQLSetStmtOption(SQLHSTMT statementhandle,
 					SQLUSMALLINT option,
 					SQLULEN value) {
@@ -4071,17 +4167,20 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 	return retval;
 }
 
-#if (ODBCVER < 0x0300)
+static SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
+					SQLHANDLE handle,
+					SQLSMALLINT completiontype);
+
 SQLRETURN SQL_API SQLTransact(SQLHENV environmenthandle,
 					SQLHDBC connectionhandle,
 					SQLUSMALLINT completiontype) {
 	debugFunction();
 	if (connectionhandle) {
-		return SQLEndTran(SQL_HANDLE_DBC,
+		return SQLR_SQLEndTran(SQL_HANDLE_DBC,
 					connectionhandle,
 					completiontype);
 	} else if (environmenthandle) {
-		return SQLEndTran(SQL_HANDLE_ENV,
+		return SQLR_SQLEndTran(SQL_HANDLE_ENV,
 					environmenthandle,
 					completiontype);
 	} else {
@@ -4089,7 +4188,6 @@ SQLRETURN SQL_API SQLTransact(SQLHENV environmenthandle,
 		return SQL_INVALID_HANDLE;
 	}
 }
-#endif
 
 SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 					SQLHWND hwnd,
@@ -4188,7 +4286,6 @@ SQLRETURN SQL_API SQLBulkOperations(SQLHSTMT statementhandle,
 	return SQL_ERROR;
 }
 
-#if (ODBCVER < 0x0300)
 SQLRETURN SQL_API SQLColAttributes(SQLHSTMT statementhandle,
 					SQLUSMALLINT icol,
 					SQLUSMALLINT fdesctype,
@@ -4197,7 +4294,7 @@ SQLRETURN SQL_API SQLColAttributes(SQLHSTMT statementhandle,
 					SQLSMALLINT *pcbdesc,
 					SQLLEN *pfdesc) {
 	debugFunction();
-	return SQLColAttribute(statementhandle,
+	return SQLR_SQLColAttribute(statementhandle,
 					icol,
 					fdesctype,
 					rgbdesc,
@@ -4205,7 +4302,6 @@ SQLRETURN SQL_API SQLColAttributes(SQLHSTMT statementhandle,
 					pcbdesc,
 					(NUMERICATTRIBUTETYPE)pfdesc);
 }
-#endif
 
 SQLRETURN SQL_API SQLColumnPrivileges(SQLHSTMT statementhandle,
 					SQLCHAR *szCatalogName,
@@ -4291,20 +4387,23 @@ SQLRETURN SQL_API SQLNumParams(SQLHSTMT statementhandle,
 	return SQL_SUCCESS;
 }
 
-#if (ODBCVER < 0x0300)
+static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
+					SQLINTEGER attribute,
+					SQLPOINTER value,
+					SQLINTEGER stringlength);
+
 SQLRETURN SQL_API SQLParamOptions(SQLHSTMT statementhandle,
 					SQLULEN crow,
 					SQLULEN *pirow) {
 	debugFunction();
-	return (SQLSetStmtAttr(statementhandle,
-			SQL_ATTR_PARAMSET_SIZE,
-			(SQLPOINTER)crow,0)==SQL_SUCCESS &&
-		SQLSetStmtAttr(statementhandle,
-			SQL_ATTR_PARAMS_PROCESSED_PTR,
-			(SQLPOINTER)pirow,0)==SQL_SUCCESS)?
-			SQL_SUCCESS:SQL_ERROR;
+	return (SQLR_SQLSetStmtAttr(statementhandle,
+				SQL_ATTR_PARAMSET_SIZE,
+				(SQLPOINTER)crow,0)==SQL_SUCCESS &&
+		SQLR_SQLSetStmtAttr(statementhandle,
+				SQL_ATTR_PARAMS_PROCESSED_PTR,
+				(SQLPOINTER)pirow,0)==SQL_SUCCESS)?
+				SQL_SUCCESS:SQL_ERROR;
 }
-#endif
 
 SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT statementhandle,
 					SQLCHAR *szCatalogName,
@@ -4871,7 +4970,7 @@ static SQLRETURN SQLR_OutputBindParameter(SQLHSTMT statementhandle,
 	return retval;
 }
 
-SQLRETURN SQL_API SQLBindParameter(SQLHSTMT statementhandle,
+static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
 					SQLUSMALLINT parameternumber,
 					SQLSMALLINT inputoutputtype,
 					SQLSMALLINT valuetype,
@@ -4917,6 +5016,29 @@ SQLRETURN SQL_API SQLBindParameter(SQLHSTMT statementhandle,
 			debugPrintf("invalid parametertype\n");
 			return SQL_ERROR;
 	}
+}
+
+SQLRETURN SQL_API SQLBindParameter(SQLHSTMT statementhandle,
+					SQLUSMALLINT parameternumber,
+					SQLSMALLINT inputoutputtype,
+					SQLSMALLINT valuetype,
+					SQLSMALLINT parametertype,
+					SQLULEN lengthprecision,
+					SQLSMALLINT parameterscale,
+					SQLPOINTER parametervalue,
+					SQLLEN bufferlength,
+					SQLLEN *strlen_or_ind) {
+	debugFunction();
+	return SQLR_SQLBindParameter(statementhandle,
+					parameternumber,
+					inputoutputtype,
+					valuetype,
+					parametertype,
+					lengthprecision,
+					parameterscale,
+					parametervalue,
+					bufferlength,
+					strlen_or_ind);
 }
 
 }
