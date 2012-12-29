@@ -4006,15 +4006,18 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV environmenthandle,
 		return SQL_INVALID_HANDLE;
 	}
 
+	// use reinterpret_cast and assignment to smaller
+	// sized value to avoid compiler warnings
+	SQLUINTEGER	val=reinterpret_cast<uint64_t>(value);
+
 	switch (attribute) {
 		case SQL_ATTR_OUTPUT_NTS:
 			debugPrintf("attribute: SQL_ATTR_OUTPUT_NTS\n");
 			// this can't be set to false
-			return ((uint32_t)value==SQL_TRUE)?
-						SQL_SUCCESS:SQL_ERROR;
+			return (val==SQL_TRUE)?SQL_SUCCESS:SQL_ERROR;
 		case SQL_ATTR_ODBC_VERSION:
 			debugPrintf("attribute: SQL_ATTR_ODBC_VERSION\n");
-			switch ((uint32_t)value) {
+			switch (val) {
 				case SQL_OV_ODBC2:
 					env->odbcversion=SQL_OV_ODBC2;
 					break;
@@ -4027,12 +4030,11 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV environmenthandle,
 		case SQL_ATTR_CONNECTION_POOLING:
 			debugPrintf("attribute: SQL_ATTR_CONNECTION_POOLING\n");
 			// this can't be set on
-			return ((uint32_t)value==SQL_CP_OFF)?
-						SQL_SUCCESS:SQL_ERROR;
+			return (val==SQL_CP_OFF)?SQL_SUCCESS:SQL_ERROR;
 		case SQL_ATTR_CP_MATCH:
 			debugPrintf("attribute: SQL_ATTR_CP_MATCH\n");
 			// this can't be set to anything but default
-			return ((uint32_t)value==SQL_CP_MATCH_DEFAULT)?
+			return (val==SQL_CP_MATCH_DEFAULT)?
 						SQL_SUCCESS:SQL_ERROR;
 		default:
 			debugPrintf("unsupported attribute\n");
