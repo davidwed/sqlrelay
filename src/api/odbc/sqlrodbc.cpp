@@ -3757,11 +3757,13 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 
 	if (attribute==SQL_AUTOCOMMIT) {
 		debugPrintf("attribute: SQL_AUTOCOMMIT\n");
-		if ((uint64_t)value==(uint64_t)SQL_AUTOCOMMIT_ON) {
+		// use reinterpret_cast to avoid compiler warnings
+		uint64_t	val=reinterpret_cast<uint64_t>(value);
+		if (val==SQL_AUTOCOMMIT_ON) {
 			if (conn->con->autoCommitOn()) {
 				return SQL_SUCCESS;
 			}
-		} else if ((uint64_t)value==(uint64_t)SQL_AUTOCOMMIT_OFF) {
+		} else if (val==SQL_AUTOCOMMIT_OFF) {
 			if (conn->con->autoCommitOff()) {
 				return SQL_SUCCESS;
 			}
@@ -3869,11 +3871,11 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV environmenthandle,
 		case SQL_ATTR_OUTPUT_NTS:
 			debugPrintf("attribute: SQL_ATTR_OUTPUT_NTS\n");
 			// this can't be set to false
-			return ((uint64_t)value==SQL_TRUE)?
+			return ((uint32_t)value==SQL_TRUE)?
 						SQL_SUCCESS:SQL_ERROR;
 		case SQL_ATTR_ODBC_VERSION:
 			debugPrintf("attribute: SQL_ATTR_ODBC_VERSION\n");
-			switch ((uint64_t)value) {
+			switch ((uint32_t)value) {
 				case SQL_OV_ODBC2:
 					env->odbcversion=SQL_OV_ODBC2;
 					break;
@@ -3886,12 +3888,12 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV environmenthandle,
 		case SQL_ATTR_CONNECTION_POOLING:
 			debugPrintf("attribute: SQL_ATTR_CONNECTION_POOLING\n");
 			// this can't be set on
-			return ((uint64_t)value==SQL_CP_OFF)?
+			return ((uint32_t)value==SQL_CP_OFF)?
 						SQL_SUCCESS:SQL_ERROR;
 		case SQL_ATTR_CP_MATCH:
 			debugPrintf("attribute: SQL_ATTR_CP_MATCH\n");
 			// this can't be set to anything but default
-			return ((uint64_t)value==SQL_CP_MATCH_DEFAULT)?
+			return ((uint32_t)value==SQL_CP_MATCH_DEFAULT)?
 						SQL_SUCCESS:SQL_ERROR;
 		default:
 			debugPrintf("unsupported attribute\n");
@@ -4115,7 +4117,9 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			return SQL_SUCCESS;
 		case SQL_ATTR_ROW_ARRAY_SIZE:
 			debugPrintf("attribute: SQL_ATTR_ROW_ARRAY_SIZE\n");
-			stmt->cur->setResultSetBufferSize((uint64_t)value);
+			// use reinterpret_cast to avoid compiler warnings
+			stmt->cur->setResultSetBufferSize(
+					reinterpret_cast<uint64_t>(value));
 			return SQL_SUCCESS;
 		#endif
 		#if (ODBCVER < 0x0300)
