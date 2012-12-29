@@ -1229,7 +1229,7 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 }
 
 
-SQLRETURN SQL_API SQLConnect(SQLHDBC connectionhandle,
+static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					SQLCHAR *dsn,
 					SQLSMALLINT dsnlength,
 					SQLCHAR *user,
@@ -1304,6 +1304,18 @@ SQLRETURN SQL_API SQLConnect(SQLHDBC connectionhandle,
 	#endif
 
 	return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLConnect(SQLHDBC connectionhandle,
+					SQLCHAR *dsn,
+					SQLSMALLINT dsnlength,
+					SQLCHAR *user,
+					SQLSMALLINT userlength,
+					SQLCHAR *password,
+					SQLSMALLINT passwordlength) {
+	debugFunction();
+	return SQLR_SQLConnect(connectionhandle,dsn,dsnlength,
+				user,userlength,password,passwordlength);
 }
 
 SQLRETURN SQL_API SQLCopyDesc(SQLHDESC SourceDescHandle,
@@ -2011,6 +2023,13 @@ SQLRETURN SQL_API SQLExecute(SQLHSTMT statementhandle) {
 	return SQL_ERROR;
 }
 
+static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
+					SQLUSMALLINT columnnumber,
+					SQLSMALLINT targettype,
+					SQLPOINTER targetvalue,
+					SQLLEN bufferlength,
+					SQLLEN *strlen_or_ind);
+
 static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 						SQLUSMALLINT *rgfrowstatus) {
 	debugFunction();
@@ -2067,7 +2086,7 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 		}
 
 		// get the data into the bound column
-		SQLRETURN	result=SQLGetData(statementhandle,
+		SQLRETURN	result=SQLR_SQLGetData(statementhandle,
 							index+1,
 							field->targettype,
 							field->targetvalue,
@@ -2375,7 +2394,7 @@ static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
 	tss->fraction=0;
 }
 
-SQLRETURN SQL_API SQLGetData(SQLHSTMT statementhandle,
+static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 					SQLUSMALLINT columnnumber,
 					SQLSMALLINT targettype,
 					SQLPOINTER targetvalue,
@@ -2562,6 +2581,18 @@ SQLRETURN SQL_API SQLGetData(SQLHSTMT statementhandle,
 			return SQL_ERROR;
 	}
 	return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLGetData(SQLHSTMT statementhandle,
+					SQLUSMALLINT columnnumber,
+					SQLSMALLINT targettype,
+					SQLPOINTER targetvalue,
+					SQLLEN bufferlength,
+					SQLLEN *strlen_or_ind) {
+	debugFunction();
+	return SQLR_SQLGetData(statementhandle,columnnumber,
+				targettype,targetvalue,bufferlength,
+				strlen_or_ind);
 }
 
 SQLRETURN SQL_API SQLGetDescField(SQLHDESC DescriptorHandle,
@@ -2870,8 +2901,8 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLCOPYDESC:
 			debugPrintf("functionid: "
 				"SQL_API_SQLCOPYDESC "
-				"- true\n");
-			*supported=SQL_TRUE;
+				"- false\n");
+			*supported=SQL_FALSE;
 			break;
 		#endif
 		case SQL_API_SQLDESCRIBECOL:
@@ -3019,8 +3050,8 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLGETTYPEINFO:
 			debugPrintf("functionid: "
 				"SQL_API_SQLGETTYPEINFO "
-				"- true\n");
-			*supported=SQL_TRUE;
+				"- false\n");
+			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLNUMRESULTCOLS:
 			debugPrintf("functionid: "
@@ -3111,8 +3142,8 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLBROWSECONNECT:
 			debugPrintf("functionid: "
 				"SQL_API_SQLBROWSECONNECT "
-				"- true\n");
-			*supported=SQL_TRUE;
+				"- false\n");
+			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLDRIVERCONNECT:
 			debugPrintf("functionid: "
@@ -3147,14 +3178,14 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLSETPOS:
 			debugPrintf("functionid: "
 				"SQL_API_SQLSETPOS "
-				"- true\n");
-			*supported=SQL_TRUE;
+				"- false\n");
+			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLSETSCROLLOPTIONS:
 			debugPrintf("functionid: "
 				"SQL_API_SQLSETSCROLLOPTIONS "
-				"- true\n");
-			*supported=SQL_TRUE;
+				"- false\n");
+			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLCANCEL:
 			debugPrintf("functionid: "
@@ -3165,8 +3196,8 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLCOLUMNS:
 			debugPrintf("functionid: "
 				"SQL_API_SQLCOLUMNS "
-				"- false\n");
-			*supported=SQL_FALSE;
+				"- true\n");
+			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLDATASOURCES:
 			debugPrintf("functionid: "
@@ -3190,8 +3221,8 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLGETCONNECTATTR:
 			debugPrintf("functionid: "
 				"SQL_API_SQLGETCONNECTATTR "
-				"- false\n");
-			*supported=SQL_FALSE;
+				"- true\n");
+			*supported=SQL_TRUE;
 			break;
 		#endif
 		case SQL_API_SQLSPECIALCOLUMNS:
@@ -3209,8 +3240,8 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLTABLES:
 			debugPrintf("functionid: "
 				"SQL_API_SQLTABLES "
-				"- false\n");
-			*supported=SQL_FALSE;
+				"- true\n");
+			*supported=SQL_TRUE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLBULKOPERATIONS:
@@ -4191,12 +4222,12 @@ SQLRETURN SQL_API SQLTransact(SQLHENV environmenthandle,
 
 SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 					SQLHWND hwnd,
-					SQLCHAR *szConnStrIn,
-					SQLSMALLINT cbConnStrIn,
-					SQLCHAR *szConnStrOut,
-					SQLSMALLINT cbConnStrOutMax,
-					SQLSMALLINT *pcbConnStrOut,
-					SQLUSMALLINT fDriverCompletion) {
+					SQLCHAR *szconnstrin,
+					SQLSMALLINT cbconnstrin,
+					SQLCHAR *szconnstrout,
+					SQLSMALLINT cbconnstroutmax,
+					SQLSMALLINT *pcbconnstrout,
+					SQLUSMALLINT fdrivercompletion) {
 	debugFunction();
 
 	CONN	*conn=(CONN *)hdbc;
@@ -4206,17 +4237,16 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 	}
 
 	// the connect string may not be null terminated, so make a copy that is
-	debugPrintf("%s\n",szConnStrIn);
-	debugPrintf("%d\n",(int)cbConnStrIn);
 	char	*nulltermconnstr;
-	if (cbConnStrIn==SQL_NTS) {
+	if (cbconnstrin==SQL_NTS) {
 		nulltermconnstr=charstring::duplicate(
-					(const char *)szConnStrIn);
+					(const char *)szconnstrin);
 	} else {
 		nulltermconnstr=charstring::duplicate(
-					(const char *)szConnStrIn,
-					cbConnStrIn);
+					(const char *)szconnstrin,
+					cbconnstrin);
 	}
+	debugPrintf("connectstring: %s\n",nulltermconnstr);
 
 	// parse out DSN, UID and PWD from the connect string
 	parameterstring	pstr;
@@ -4234,20 +4264,27 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 		authentication=pstr.getValue("pwd");
 	}
 
+	debugPrintf("servername: %s\n",servername);
+	debugPrintf("username: %s\n",username);
+	debugPrintf("authentication: %s\n",authentication);
 
 	// just support SQL_DRIVER_NOPROMPT for now
-	switch (fDriverCompletion) {
+	switch (fdrivercompletion) {
 		case SQL_DRIVER_PROMPT:
-			debugPrintf("SQL_DRIVER_PROMPT\n");
+			debugPrintf("fbdrivercompletion: "
+					"SQL_DRIVER_PROMPT\n");
 			return SQL_ERROR;
 		case SQL_DRIVER_COMPLETE:
-			debugPrintf("SQL_DRIVER_COMPLETE\n");
+			debugPrintf("fbdrivercompletion: "
+					"SQL_DRIVER_COMPLETE\n");
 			return SQL_ERROR;
 		case SQL_DRIVER_COMPLETE_REQUIRED:
-			debugPrintf("SQL_DRIVER_COMPLETE_REQUIRED\n");
+			debugPrintf("fbdrivercompletion: "
+					"SQL_DRIVER_COMPLETE_REQUIRED\n");
 			return SQL_ERROR;
 		case SQL_DRIVER_NOPROMPT:
-			debugPrintf("SQL_DRIVER_NOPROMPT\n");
+			debugPrintf("fbdrivercompletion: "
+					"SQL_DRIVER_NOPROMPT\n");
 			if (!charstring::length(servername)) {
 				return SQL_ERROR;
 			}
@@ -4255,17 +4292,17 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 	}
 
 	// since we don't support prompting and updating the connect string...
-	if (cbConnStrIn==SQL_NTS) {
-		*pcbConnStrOut=charstring::length(szConnStrIn);
+	if (cbconnstrin==SQL_NTS) {
+		*pcbconnstrout=charstring::length(szconnstrin);
 	} else {
-		*pcbConnStrOut=cbConnStrIn;
+		*pcbconnstrout=cbconnstrin;
 	}
-	*pcbConnStrOut=cbConnStrIn;
-	charstring::safeCopy((char *)szConnStrOut,
-				*pcbConnStrOut,nulltermconnstr);
+	*pcbconnstrout=cbconnstrin;
+	charstring::safeCopy((char *)szconnstrout,
+				*pcbconnstrout,nulltermconnstr);
 
 	// connect
-	SQLRETURN	retval=SQLConnect(hdbc,
+	SQLRETURN	retval=SQLR_SQLConnect(hdbc,
 					(SQLCHAR *)servername,
 					charstring::length(servername),
 					(SQLCHAR *)username,
