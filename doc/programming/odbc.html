@@ -9,7 +9,7 @@
 
 <p>The SQL Relay distribution provides a basic ODBC driver, enabling applications which use ODBC on Unix or Linux to access SQL Relay.  The driver lacks some ODBC features and is not currently supported on Windows, but still may be useful for many applications.</p>
 
-<p>With iODBC or unixODBC, you can create an instance for the SQL Relay driver just like you would for any other database by editing /etc/odbcinst.ini and adding an entry like the following:</p>
+<p>With unixODBC or iODBC, you can create an instance for the SQL Relay driver by adding an entry like the following to /etc/odbcinst.ini</p>
 
 <blockquote>
 <pre>
@@ -20,9 +20,9 @@
 </pre>
 </blockquote>
 
-<p>In odbcinst.ini, the Driver attribute must bet set to the full pathname of the libsqlrodbc.so driver.</p>
+<p>Note that the Driver attribute must bet set to the full pathname of the libsqlrodbc.so driver.  Note also that on Mac OS X you'll need to replace the <b>.so</b> suffix with <b>.dylib</b><p>
 
-<p>Once the instance is defined you can add a DSN for SQL Relay by editing /etc/odbc.ini and adding an entry like the following:</p>
+<p>Once the instance is defined you can add a DSN for SQL Relay by adding an entry like the following to /etc/odbc.ini</p>
 
 <blockquote>
 <pre>
@@ -37,7 +37,23 @@
 </pre>
 </blockquote>
 
-<p>In odbc.ini, the Driver attribute refers to the instance in odbcinst.ini.</p>
+<p>Here the Driver attribute refers to the instance in odbcinst.ini.</p>
+
+<p>Alternatively, you could create a combined instance/DSN by adding an entry like the following to /etc/odbc.ini</p>
+
+<blockquote>
+<pre>
+<font color="#6a5acd">[sqlrtest]</font>
+<font color="#2e8b57"><b>Description=</b></font>Connection to SQL Relay
+<font color="#2e8b57"><b>Driver=</b></font>/usr/local/firstworks/lib/libsqlrodbc.so
+<font color="#2e8b57"><b>FileUsage=</b></font>1
+<font color="#2e8b57"><b>Server=</b></font>localhost
+<font color="#2e8b57"><b>Port=</b></font>8006
+<font color="#2e8b57"><b>Socket=</b></font>/tmp/test.socket
+<font color="#2e8b57"><b>User=</b></font>testuser
+<font color="#2e8b57"><b>Password=</b></font>testpass
+</pre>
+</blockquote>
 
 <p>Now you can use the <i>isql</i> command line utility that comes with iODBC
 or unixODBC to access the database through SQL Relay as follows:</p>
