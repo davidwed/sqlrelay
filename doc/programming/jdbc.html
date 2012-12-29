@@ -42,37 +42,62 @@ export LD_PRELOAD=/usr/lib/libodbc.so
 
 <blockquote>
 <pre>
-<font color="#a52a2a"><b>[</b></font>mused@localhost bin<font color="#a52a2a"><b>]</b></font>$ ./henplus jdbc:odbc:sqlrtest
-no readline found <font color="#a52a2a"><b>(</b></font>no JavaReadline in java.library.path<font color="#a52a2a"><b>)</b></font>. Using simple stdin.
-using GNU readline <font color="#a52a2a"><b>(</b></font>Brian Fox, Chet Ramey<font color="#a52a2a"><b>)</b></font>, Java wrapper by Bernhard Bablok
-henplus config at /home/mused/.henplus
----------------------------------------------------------------------------
-&nbsp;HenPlus II <font color="#ff00ff">0</font>.<font color="#ff00ff">9</font>.<font color="#ff00ff">7</font>&nbsp;Copyright<font color="#a52a2a"><b>(</b></font>C<font color="#a52a2a"><b>)</b></font>&nbsp;<font color="#ff00ff">1997</font>..<font color="#ff00ff">2006</font>&nbsp;Henner Zeller <font color="#a52a2a"><b>&lt;</b></font>H.Zeller@acm.org<font color="#a52a2a"><b>&gt;</b></font>
-&nbsp;HenPlus is provided AS IS and comes with ABSOLUTELY NO WARRANTY
-&nbsp;This is free software, and you are welcome to redistribute it under the
-&nbsp;conditions of the GNU Public License <font color="#a52a2a"><b>&lt;</b></font><a href="http://www.gnu.org/licenses/gpl.txt">http://www.gnu.org/licenses/gpl.txt</a><font color="#a52a2a"><b>&gt;</b></font>
----------------------------------------------------------------------------
-HenPlus II connecting 
-&nbsp;url <font color="#a52a2a"><b>'</b></font><font color="#ff00ff">jdbc:odbc:sqlrtest</font><font color="#a52a2a"><b>'</b></font>
-&nbsp;driver version <font color="#ff00ff">2</font>.<font color="#ff00ff">1</font>
-&nbsp;SQL Relay - <font color="#ff00ff">0</font>.<font color="#ff00ff">40</font>
-&nbsp;<font color="#a52a2a"><b>read</b></font>&nbsp;committed 
-sqlrtest@odbc<font color="#a52a2a"><b>&gt;</b></font>&nbsp;create table <font color="#a52a2a"><b>test</b></font>&nbsp;<font color="#a52a2a"><b>(</b></font>col1 varchar<font color="#a52a2a"><b>(</b></font><font color="#ff00ff">100</font><font color="#a52a2a"><b>))</b></font><font color="#a52a2a"><b>;</b></font>
-affected <font color="#ff00ff">0</font>&nbsp;rows <font color="#a52a2a"><b>(</b></font><font color="#ff00ff">43</font>&nbsp;msec<font color="#a52a2a"><b>)</b></font>
-sqlrtest@odbc<font color="#a52a2a"><b>&gt;</b></font>&nbsp;insert into <font color="#a52a2a"><b>test</b></font>&nbsp;values <font color="#a52a2a"><b>(</b></font><font color="#a52a2a"><b>'</b></font><font color="#ff00ff">hello</font><font color="#a52a2a"><b>'</b></font><font color="#a52a2a"><b>)</b></font><font color="#a52a2a"><b>;</b></font>
-affected <font color="#ff00ff">1</font>&nbsp;rows <font color="#a52a2a"><b>(</b></font><font color="#ff00ff">14</font>&nbsp;msec<font color="#a52a2a"><b>)</b></font>
-sqlrtest@odbc<font color="#a52a2a"><b>&gt;</b></font>&nbsp;insert into <font color="#a52a2a"><b>test</b></font>&nbsp;values <font color="#a52a2a"><b>(</b></font><font color="#a52a2a"><b>'</b></font><font color="#ff00ff">bye</font><font color="#a52a2a"><b>'</b></font><font color="#a52a2a"><b>)</b></font><font color="#a52a2a"><b>;</b></font>
-affected <font color="#ff00ff">1</font>&nbsp;rows <font color="#a52a2a"><b>(</b></font><font color="#ff00ff">5</font>&nbsp;msec<font color="#a52a2a"><b>)</b></font>
-sqlrtest@odbc<font color="#a52a2a"><b>&gt;</b></font>&nbsp;select * from <font color="#a52a2a"><b>test</b></font><font color="#a52a2a"><b>;</b></font>
--------+
-&nbsp;col1&nbsp;&nbsp;<font color="#a52a2a"><b>|</b></font>
--------+
-&nbsp;hello <font color="#a52a2a"><b>|</b></font>
-&nbsp;bye&nbsp;&nbsp; <font color="#a52a2a"><b>|</b></font>
--------+
-<font color="#ff00ff">2</font>&nbsp;rows in result <font color="#a52a2a"><b>(</b></font>first row: <font color="#ff00ff">91</font>&nbsp;msec<font color="#a52a2a"><b>;</b></font>&nbsp;total: <font color="#ff00ff">160</font>&nbsp;msec<font color="#a52a2a"><b>)</b></font>
-sqlrtest@odbc<font color="#a52a2a"><b>&gt;</b></font>&nbsp;quit
-storing settings..
+<font face="monospace">
+[dmuse@fedora bin]$ ./henplus jdbc:odbc:sqlrodbc<br>
+no readline found (no JavaReadline&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;java.library.path).&nbsp;<font color="#6a5acd">Using</font>&nbsp;simple stdin.<br>
+<font color="#6a5acd">using</font>&nbsp;GNU readline (Brian Fox, Chet Ramey), Java wrapper&nbsp;<font color="#6a5acd">by</font>&nbsp;Bernhard Bablok<br>
+henplus config at /home/dmuse/.henplus<br>
+<font color="#0000ff">----------------------------------------------------------------------------</font><br>
+&nbsp;HenPlus II&nbsp;<font color="#ff00ff">0.9</font>.<font color="#ff00ff">8</font>&nbsp;<font color="#ff00ff">&quot;Yay Labor Day&quot;</font><br>
+&nbsp;Copyright(C)&nbsp;<font color="#ff00ff">1997</font>..<font color="#ff00ff">2009</font>&nbsp;Henner Zeller &lt;H.Zeller@acm.org&gt;<br>
+&nbsp;HenPlus&nbsp;<font color="#6a5acd">is</font>&nbsp;provided&nbsp;<font color="#6a5acd">AS</font>&nbsp;<font color="#6a5acd">IS</font>&nbsp;<font color="#a52a2a"><b>and</b></font>&nbsp;comes&nbsp;<font color="#6a5acd">with</font>&nbsp;ABSOLUTELY NO WARRANTY<br>
+&nbsp;This&nbsp;<font color="#6a5acd">is</font>&nbsp;free software,&nbsp;<font color="#a52a2a"><b>and</b></font>&nbsp;you are welcome&nbsp;<font color="#6a5acd">to</font>&nbsp;redistribute it under the<br>
+&nbsp;conditions&nbsp;<font color="#6a5acd">of</font>&nbsp;the GNU&nbsp;<font color="#6a5acd">Public</font>&nbsp;License &lt;<a href="http://www.gnu.org/licenses/gpl2.txt">http://www.gnu.org/licenses/gpl2.txt</a>&gt;<br>
+<font color="#0000ff">----------------------------------------------------------------------------</font><br>
+HenPlus II connecting&nbsp;<br>
+&nbsp;url&nbsp;<font color="#ff00ff">'jdbc:odbc:sqlrodbc'</font><br>
+&nbsp;driver version&nbsp;<font color="#ff00ff">2.1</font><br>
+&nbsp;oracle8 - Oracle Database 11g Enterprise Edition Release&nbsp;<font color="#ff00ff">11.2</font>.<font color="#ff00ff">0.1</font>.<font color="#ff00ff">0</font>&nbsp;- Production<br>
+<font color="#6a5acd">With</font>&nbsp;the Partitioning, OLAP, Data Mining&nbsp;<font color="#a52a2a"><b>and</b></font>&nbsp;Real Application Testing options<br>
+@odbc&gt;&nbsp;<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">table</font>&nbsp;testtable (col1 int, col2&nbsp;<font color="#2e8b57"><b>varchar2</b></font>(<font color="#ff00ff">20</font>));<br>
+affected&nbsp;<font color="#ff00ff">0</font>&nbsp;<font color="#6a5acd">rows</font>&nbsp;(<font color="#ff00ff">301</font>&nbsp;msec)<br>
+@odbc&gt;&nbsp;<font color="#a52a2a"><b>insert</b></font>&nbsp;<font color="#6a5acd">into</font>&nbsp;testtable&nbsp;<font color="#6a5acd">values</font>&nbsp;(<font color="#ff00ff">1</font>,<font color="#ff00ff">'hello'</font>);<br>
+affected&nbsp;<font color="#ff00ff">1</font>&nbsp;<font color="#6a5acd">rows</font>&nbsp;(<font color="#ff00ff">71</font>&nbsp;msec)<br>
+@odbc&gt;&nbsp;<font color="#a52a2a"><b>insert</b></font>&nbsp;<font color="#6a5acd">into</font>&nbsp;testtable&nbsp;<font color="#6a5acd">values</font>&nbsp;(<font color="#ff00ff">2</font>,<font color="#ff00ff">'goodbye'</font>);<br>
+affected&nbsp;<font color="#ff00ff">1</font>&nbsp;<font color="#6a5acd">rows</font>&nbsp;(<font color="#ff00ff">1</font>&nbsp;msec)<br>
+@odbc&gt;&nbsp;<font color="#a52a2a"><b>select</b></font>&nbsp;*&nbsp;<font color="#6a5acd">from</font>&nbsp;testtable;<br>
+<font color="#0000ff">------+---------+</font><br>
+&nbsp;COL1 |&nbsp;&nbsp;COL2&nbsp;&nbsp; |<br>
+<font color="#0000ff">------+---------+</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">1</font>&nbsp;| hello&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">2</font>&nbsp;| goodbye |<br>
+<font color="#0000ff">------+---------+</font><br>
+<font color="#ff00ff">2</font>&nbsp;<font color="#6a5acd">rows</font>&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;result (first&nbsp;<font color="#6a5acd">row</font>:&nbsp;<font color="#ff00ff">56</font>&nbsp;msec; total:&nbsp;<font color="#ff00ff">57</font>&nbsp;msec)<br>
+@odbc&gt;&nbsp;<font color="#a52a2a"><b>update</b></font>&nbsp;testtable&nbsp;<font color="#a52a2a"><b>set</b></font>&nbsp;col2=<font color="#ff00ff">'bye'</font>&nbsp;<font color="#6a5acd">where</font>&nbsp;col1=<font color="#ff00ff">2</font>;<br>
+affected&nbsp;<font color="#ff00ff">1</font>&nbsp;<font color="#6a5acd">rows</font>&nbsp;(<font color="#ff00ff">2</font>&nbsp;msec)<br>
+@odbc&gt;&nbsp;<font color="#a52a2a"><b>select</b></font>&nbsp;*&nbsp;<font color="#6a5acd">from</font>&nbsp;testtable;<br>
+<font color="#0000ff">------+-------+</font><br>
+&nbsp;COL1 | COL2&nbsp;&nbsp;|<br>
+<font color="#0000ff">------+-------+</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">1</font>&nbsp;| hello |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">2</font>&nbsp;| bye&nbsp;&nbsp; |<br>
+<font color="#0000ff">------+-------+</font><br>
+<font color="#ff00ff">2</font>&nbsp;<font color="#6a5acd">rows</font>&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;result (first&nbsp;<font color="#6a5acd">row</font>:&nbsp;<font color="#ff00ff">1</font>&nbsp;msec; total:&nbsp;<font color="#ff00ff">2</font>&nbsp;msec)<br>
+@odbc&gt;&nbsp;<font color="#a52a2a"><b>delete</b></font>&nbsp;<font color="#6a5acd">from</font>&nbsp;testtable&nbsp;<font color="#6a5acd">where</font>&nbsp;col1=<font color="#ff00ff">1</font>;<br>
+affected&nbsp;<font color="#ff00ff">1</font>&nbsp;<font color="#6a5acd">rows</font>&nbsp;(<font color="#ff00ff">2</font>&nbsp;msec)<br>
+@odbc&gt;&nbsp;<font color="#a52a2a"><b>select</b></font>&nbsp;*&nbsp;<font color="#6a5acd">from</font>&nbsp;testtable;<br>
+<font color="#0000ff">------+------+</font><br>
+&nbsp;COL1 | COL2 |<br>
+<font color="#0000ff">------+------+</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<font color="#ff00ff">2</font>&nbsp;| bye&nbsp;&nbsp;|<br>
+<font color="#0000ff">------+------+</font><br>
+<font color="#ff00ff">1</font>&nbsp;<font color="#6a5acd">row</font>&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;result (first&nbsp;<font color="#6a5acd">row</font>:&nbsp;<font color="#ff00ff">1</font>&nbsp;msec; total:&nbsp;<font color="#ff00ff">1</font>&nbsp;msec)<br>
+@odbc&gt;&nbsp;<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">table</font>&nbsp;testtable;<br>
+affected&nbsp;<font color="#ff00ff">0</font>&nbsp;<font color="#6a5acd">rows</font>&nbsp;(<font color="#ff00ff">3</font>.<font color="#ff00ff">637</font>&nbsp;sec)<br>
+@odbc&gt; quit<br>
+storing settings..<br>
+[dmuse@fedora bin]$<br>
+</font>
 </pre>
 </blockquote>
 

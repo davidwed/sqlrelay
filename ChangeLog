@@ -22,6 +22,8 @@
 	fixed a bug that could cause a hang if the db login failed
 	updated reading of skip and fetch parameters not to rely on buffering
 	refactored login error reporting
+	fleshed out the ODBC driver significantly
+	added docs for using SQL Relay from ODBC and JDBC
 
 0.48 - integrated patches from Neowiz for:
 		handling for oracle errors ora-01033, ora-02067 and ora-04068
