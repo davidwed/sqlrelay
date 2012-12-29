@@ -132,6 +132,66 @@ SQLRETURN SQL_API SQLAllocEnv(SQLHENV *environmenthandle) {
 				(SQLHANDLE *)environmenthandle);
 }
 
+static void SQLR_ENVSetError(ENV *env, const char *error,
+				int64_t errn, const char *sqlstate) {
+	debugFunction();
+
+	// set the error, convert NULL's to empty strings,
+	// some apps have trouble with NULLS
+	delete[] env->error;
+	env->error=charstring::duplicate((error)?error:"");
+	env->errn=errn;
+	env->sqlstate=(sqlstate)?sqlstate:"";
+	debugPrintf("error: %s\n",env->error);
+	debugPrintf("errn: %lld\n",env->errn);
+	debugPrintf("sqlstate: %s\n",env->sqlstate);
+}
+
+/*static void SQLR_ENVClearError(ENV *env) {
+	debugFunction();
+	SQLR_ENVSetError(env,NULL,0,NULL);
+}*/
+
+static void SQLR_CONNSetError(CONN *conn, const char *error,
+				int64_t errn, const char *sqlstate) {
+	debugFunction();
+
+	// set the error, convert NULL's to empty strings,
+	// some apps have trouble with NULLS
+	delete[] conn->error;
+	conn->error=charstring::duplicate((error)?error:"");
+	conn->errn=errn;
+	conn->sqlstate=(sqlstate)?sqlstate:"";
+	debugPrintf("error: %s\n",conn->error);
+	debugPrintf("errn: %lld\n",conn->errn);
+	debugPrintf("sqlstate: %s\n",conn->sqlstate);
+}
+
+/*static void SQLR_CONNClearError(CONN *conn) {
+	debugFunction();
+	SQLR_CONNSetError(conn,NULL,0,NULL);
+}*/
+
+static void SQLR_STMTSetError(STMT *stmt, const char *error,
+				int64_t errn, const char *sqlstate) {
+	debugFunction();
+
+	// set the error, convert NULL's to empty strings,
+	// some apps have trouble with NULLS
+	delete[] stmt->error;
+	stmt->error=charstring::duplicate((error)?error:"");
+	stmt->errn=errn;
+	stmt->sqlstate=(sqlstate)?sqlstate:"";
+	debugPrintf("error: %s\n",stmt->error);
+	debugPrintf("errn: %lld\n",stmt->errn);
+	debugPrintf("sqlstate: %s\n",stmt->sqlstate);
+}
+
+static void SQLR_STMTClearError(STMT *stmt) {
+	debugFunction();
+	SQLR_STMTSetError(stmt,NULL,0,NULL);
+}
+
 static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 					SQLHANDLE inputhandle,
 					SQLHANDLE *outputhandle) {
@@ -239,6 +299,7 @@ SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementhandle,
 	}
 
 	if (columnnumber<1) {
+		SQLR_STMTSetError(stmt,NULL,0,"07009");
 		return SQL_ERROR;
 	}
 
@@ -287,7 +348,15 @@ SQLRETURN SQL_API SQLBindParam(SQLHSTMT statementhandle,
 
 SQLRETURN SQL_API SQLCancel(SQLHSTMT statementhandle) {
 	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
 	// not supported
+	SQLR_STMTSetError(stmt,NULL,0,"IM001");
 	return SQL_ERROR;
 }
 
@@ -799,6 +868,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 	uint32_t	colcount=stmt->cur->colCount();
 	debugPrintf("colcount: %d\n",(int)colcount);
 	if (columnnumber<1 || columnnumber>colcount) {
+		SQLR_STMTSetError(stmt,NULL,0,"07009");
 		return SQL_ERROR;
 	}
 
@@ -1420,6 +1490,7 @@ SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT statementhandle,
 	// make sure we're attempting to get a valid column
 	uint32_t	colcount=stmt->cur->colCount();
 	if (columnnumber<1 || columnnumber>colcount) {
+		SQLR_STMTSetError(stmt,NULL,0,"07009");
 		return SQL_ERROR;
 	}
 
@@ -2024,10 +2095,7 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 	stmt->currentgetdatarow=0;
 
 	// clear the error
-	delete[] stmt->error;
-	stmt->error=NULL;
-	stmt->errn=0;
-	stmt->sqlstate=NULL;
+	SQLR_STMTClearError(stmt);
 
 	// trim query
 	uint32_t	statementtextlength=SQLR_TrimQuery(
@@ -2050,9 +2118,8 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 	}
 
 	// handle error
-	stmt->error=charstring::duplicate(stmt->cur->errorMessage());
-	stmt->errn=stmt->cur->errorNumber();
-	debugPrintf("error is %lld: %s\n",(long long)stmt->errn,stmt->error);
+	SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
+				stmt->cur->errorNumber(),NULL);
 	return SQL_ERROR;
 }
 
@@ -2070,10 +2137,7 @@ SQLRETURN SQL_API SQLExecute(SQLHSTMT statementhandle) {
 	stmt->currentgetdatarow=0;
 
 	// clear the error
-	delete[] stmt->error;
-	stmt->error=NULL;
-	stmt->errn=0;
-	stmt->sqlstate=NULL;
+	SQLR_STMTClearError(stmt);
 
 	// run the query
 	bool	result=stmt->cur->executeQuery();
@@ -2085,9 +2149,8 @@ SQLRETURN SQL_API SQLExecute(SQLHSTMT statementhandle) {
 	}
 
 	// handle error
-	stmt->error=charstring::duplicate(stmt->cur->errorMessage());
-	stmt->errn=stmt->cur->errorNumber();
-	debugPrintf("error is %lld: %s\n",(long long)stmt->errn,stmt->error);
+	SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
+				stmt->cur->errorNumber(),NULL);
 	return SQL_ERROR;
 }
 
@@ -2483,6 +2546,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	// make sure we're attempting to get a valid column
 	uint32_t	colcount=stmt->cur->colCount();
 	if (columnnumber<1 || columnnumber>colcount) {
+		SQLR_STMTSetError(stmt,NULL,0,"07009");
 		return SQL_ERROR;
 	}
 
@@ -2716,6 +2780,7 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 				return SQL_INVALID_HANDLE;
 			}
 			// not supported
+			SQLR_ENVSetError(env,NULL,0,"IM001");
 			return SQL_ERROR;
 			}
 		case SQL_HANDLE_DBC:
@@ -2727,6 +2792,7 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 			}
 			debugPrintf("handletype: SQL_HANDLE_DBC\n");
 			// not supported
+			SQLR_CONNSetError(conn,NULL,0,"IM001");
 			return SQL_ERROR;
 			}
 		case SQL_HANDLE_STMT:
@@ -2742,6 +2808,8 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 				*(SQLLEN *)diaginfo=stmt->cur->affectedRows();
 				return SQL_SUCCESS;
 			}
+			// anything else is not supported
+			SQLR_STMTSetError(stmt,NULL,0,"IM001");
 			return SQL_ERROR;
 			}
 		case SQL_HANDLE_DESC:
@@ -3736,7 +3804,16 @@ SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT statementhandle,
 SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 					SQLPOINTER *Value) {
 	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
 	// not supported
+	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+
 	return SQL_ERROR;
 }
 
@@ -3772,7 +3849,16 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT statementhandle,
 					SQLPOINTER Data,
 					SQLLEN StrLen_or_Ind) {
 	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
 	// not supported
+	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+
 	return SQL_ERROR;
 }
 
@@ -4217,7 +4303,16 @@ SQLRETURN SQL_API SQLSpecialColumns(SQLHSTMT statementhandle,
 					SQLUSMALLINT Scope,
 					SQLUSMALLINT Nullable) {
 	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
 	// not supported
+	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+
 	return SQL_ERROR;
 }
 
@@ -4231,7 +4326,16 @@ SQLRETURN SQL_API SQLStatistics(SQLHSTMT statementhandle,
 					SQLUSMALLINT Unique,
 					SQLUSMALLINT Reserved) {
 	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
 	// not supported
+	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+
 	return SQL_ERROR;
 }
 
@@ -4388,7 +4492,16 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 SQLRETURN SQL_API SQLBulkOperations(SQLHSTMT statementhandle,
 					SQLSMALLINT Operation) {
 	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
 	// not supported
+	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+
 	return SQL_ERROR;
 }
 
@@ -4419,7 +4532,16 @@ SQLRETURN SQL_API SQLColumnPrivileges(SQLHSTMT statementhandle,
 					SQLCHAR *szColumnName,
 					SQLSMALLINT cbColumnName) {
 	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
 	// not supported
+	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+
 	return SQL_ERROR;
 }
 
@@ -4430,7 +4552,16 @@ SQLRETURN SQL_API SQLDescribeParam(SQLHSTMT statementhandle,
 					SQLSMALLINT *pibScale,
 					SQLSMALLINT *pfNullable) {
 	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
 	// not supported
+	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+
 	return SQL_ERROR;
 }
 
@@ -4457,7 +4588,16 @@ SQLRETURN SQL_API SQLForeignKeys(SQLHSTMT statementhandle,
 					SQLCHAR *szFkTableName,
 					SQLSMALLINT cbFkTableName) {
 	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
 	// not supported
+	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+
 	return SQL_ERROR;
 }
 
@@ -4519,7 +4659,16 @@ SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT statementhandle,
 					SQLCHAR *szTableName,
 					SQLSMALLINT cbTableName) {
 	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
 	// not supported
+	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+
 	return SQL_ERROR;
 }
 
@@ -4533,7 +4682,16 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 					SQLCHAR *szColumnName,
 					SQLSMALLINT cbColumnName) {
 	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
 	// not supported
+	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+
 	return SQL_ERROR;
 }
 
@@ -4545,7 +4703,16 @@ SQLRETURN SQL_API SQLProcedures(SQLHSTMT statementhandle,
 					SQLCHAR *szProcName,
 					SQLSMALLINT cbProcName) {
 	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
 	// not supported
+	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+
 	return SQL_ERROR;
 }
 
@@ -4554,7 +4721,16 @@ SQLRETURN SQL_API SQLSetPos(SQLHSTMT statementhandle,
 					SQLUSMALLINT foption,
 					SQLUSMALLINT flock) {
 	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
 	// not supported
+	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+
 	return SQL_ERROR;
 }
 
@@ -4566,7 +4742,16 @@ SQLRETURN SQL_API SQLTablePrivileges(SQLHSTMT statementhandle,
 					SQLCHAR *szTableName,
 					SQLSMALLINT cbTableName) {
 	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
 	// not supported
+	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+
 	return SQL_ERROR;
 }
 
@@ -4580,8 +4765,18 @@ SQLRETURN SQL_API SQLDrivers(SQLHENV environmenthandle,
 					SQLSMALLINT cbDrvrAttrMax,
 					SQLSMALLINT *pcbDrvrAttr) {
 	debugFunction();
+
 	// FIXME: this is allegedly mapped in ODBC3 but I can't tell what to
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
 	// not supported
+	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+
 	return SQL_ERROR;
 }
 #endif
