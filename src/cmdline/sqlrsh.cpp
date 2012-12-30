@@ -1609,11 +1609,13 @@ int main(int argc, const char **argv) {
 
 	#include <version.h>
 
+	#ifdef SIGPIPE
 	// ignore SIGPIPE
 	signalset	set;
 	set.removeAllSignals();
 	set.addSignal(SIGPIPE);
 	signalmanager::ignoreSignals(&set);
+	#endif
 
 	sqlrsh	s;
 	s.execute(argc,argv);
