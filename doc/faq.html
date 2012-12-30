@@ -160,7 +160,7 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <br><a name="dbabstraction"></a>
 <span class="heading3">What database abstraction layers does SQL Relay support?</span>
 
-<p>SQL Relay currently supports ADO.NET, Perl-DBI, Python-DB, PHP PearDB and Ruby-DBI.</p>
+<p>SQL Relay currently supports ODBC, ADO.NET, Perl-DBI, Python-DB, PHP PearDB and Ruby-DBI.</p>
 
 <p>The native SQL Relay Client API's are database abstraction layers as well, as the SQL Relay server can be connected to a variety of database and applications written using an SQL Relay Client API can talk to any SQL Relay server.</p>
 
@@ -219,7 +219,7 @@ through the session maintained by that daemon.</p>
 
 <p>SQL Relay is both a connection pool and database abstraction layer.  Lets say that your app currently connects directly to a database which has an insignificant connection delay but you want to migrate it to a database that has features that you want, but also has a significant connection delay.  If you first set up instances of SQL Relay to talk to both databases, and then put SQL Relay between your app and the database, you can switch between the databases by changing the connection parameters in your app to point to different instances of SQL Relay, as you would with any other database abstraction layer.  However, since SQL Relay is also a connection pool, you don't incur the connection delay associated with the new database.</p>
 
-<p>If your app was written using a database abstraction API supported by SQL Relay such as Perl DBI or Python DB, then this is straightforward.  You can just change the connect string to point to the appropriate intance of SQL Relay.</p>
+<p>If your app was written using a database abstraction API supported by SQL Relay such as ODBC, ADO.NET, Perl DBI, etc. then this is straightforward.  You can just change the connect string to point to the appropriate intance of SQL Relay.</p>
 
 <p>If your app was written using a database specific API then you might have to port your app to use the SQL Relay API, or a supported DB abstraction layer first.</p>
 
