@@ -73,10 +73,10 @@ mkdir C:\"Program Files"\Firstworks\lib
 mkdir C:\"Program Files"\Firstworks\include\sqlrelay\private
 mkdir C:\"Program Files"\Firstworks\bin
 
-copy /Y src\api\c++\msvc\Release\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\api\c++\msvc\Release\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
-copy /Y src\api\c++\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
-copy /Y src\api\c++\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
+copy /Y src\api\"c++"\msvc\Release\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\api\"c++"\msvc\Release\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\api\"c++"\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
+copy /Y src\api\"c++"\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
 
 copy /Y src\api\c\msvc\Release\libsqlrclientwrapper.dll C:\"Program Files"\Firstworks\bin
 copy /Y src\api\c\msvc\Release\libsqlrclientwrapper.lib C:\"Program Files"\Firstworks\lib
@@ -97,10 +97,10 @@ mkdir C:\"Program Files"\Firstworks\lib
 mkdir C:\"Program Files"\Firstworks\include\sqlrelay\private
 mkdir C:\"Program Files"\Firstworks\bin
 
-copy /Y src\api\c++\msvc\ReleaseCLR\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\api\c++\msvc\ReleaseCLR\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
-copy /Y src\api\c++\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
-copy /Y src\api\c++\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
+copy /Y src\api\"c++"\msvc\ReleaseCLR\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\api\"c++"\msvc\ReleaseCLR\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\api\"c++"\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
+copy /Y src\api\"c++"\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
 
 copy /Y src\api\c\msvc\ReleaseCLR\libsqlrclientwrapper.dll C:\"Program Files"\Firstworks\bin
 copy /Y src\api\c\msvc\ReleaseCLR\libsqlrclientwrapper.lib C:\"Program Files"\Firstworks\lib
