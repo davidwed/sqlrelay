@@ -29,7 +29,7 @@ msbuild.exe /property:Configuration=ReleaseCLR
 cd ..\..\c\msvc
 msbuild.exe /property:Configuration=ReleaseCLR
 cd ..\..\cs\SQLRClient
-msbuild.exe /property:Configuration=ReleaseCLR
+msbuild.exe /property:Configuration=Release
 cd ..\..\..\util\msvc
 msbuild.exe /property:Configuration=ReleaseCLR
 cd ..\..\cmdline\msvc
@@ -52,8 +52,6 @@ msbuild.exe /target:Clean /property:Configuration=ReleaseCLR
 cd ..\..\cs\SQLRClient
 msbuild.exe /target:Clean /property:Configuration=Debug
 msbuild.exe /target:Clean /property:Configuration=Release
-msbuild.exe /target:Clean /property:Configuration=DebugCLR
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR
 cd ..\..\..\util\msvc
 msbuild.exe /target:Clean /property:Configuration=Debug
 msbuild.exe /target:Clean /property:Configuration=Release

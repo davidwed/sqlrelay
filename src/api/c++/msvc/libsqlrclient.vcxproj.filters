@@ -69,9 +69,6 @@
     <ClCompile Include="..\src\connection\getnewport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\connection\getreconnect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\connection\identify.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -187,6 +184,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\connection\begin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\connection\clientinfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\connection\dbhostname.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\cursor\getquerytree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
