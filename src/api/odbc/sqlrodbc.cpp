@@ -11,12 +11,20 @@
 #include <rudiments/character.h>
 #include <rudiments/environment.h>
 
-#if WIN32|WINNT
-	#include <windows.>
+
+// windows needs these
+#if defined(_WIN32)
+	#include <windows.h>
 	#define DLLEXPORT __declspec(dllexport)
 #else
 	#define DLLEXPORT
 #endif
+
+// cygwin piggypacks off of the w32api so this is necessary for it too
+#if defined(__CYGWIN__)
+	#include <windows.h>
+#endif
+
 #include <sql.h>
 #include <sqlext.h>
 #include <odbcinst.h>
