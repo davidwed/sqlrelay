@@ -15,7 +15,8 @@
 // windows needs these
 #if defined(_WIN32)
 	#include <windows.h>
-	#define DLLEXPORT __declspec(dllexport)
+	//#define DLLEXPORT __declspec(dllexport)
+	#define DLLEXPORT
 #else
 	#define DLLEXPORT
 #endif
@@ -56,7 +57,7 @@ extern "C" {
 
 static	uint16_t	stmtid=0;
 
-class CONN;
+struct CONN;
 
 struct ENV {
 	SQLINTEGER		odbcversion;
@@ -66,7 +67,7 @@ struct ENV {
 	const char		*sqlstate;
 };
 
-class STMT;
+struct STMT;
 
 struct CONN {
 	sqlrconnection		*con;
@@ -436,367 +437,543 @@ static SQLSMALLINT SQLR_MapColumnType(sqlrcursor *cur, uint32_t col) {
 	const char	*ctype=cur->getColumnType(col);
 	if (!charstring::compare(ctype,"UNKNOWN")) {
 		return SQL_UNKNOWN_TYPE;
-	} else if (!charstring::compare(ctype,"CHAR")) {
+	}
+	if (!charstring::compare(ctype,"CHAR")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"INT")) {
+	}
+	if (!charstring::compare(ctype,"INT")) {
 		return SQL_INTEGER;
-	} else if (!charstring::compare(ctype,"SMALLINT")) {
+	}
+	if (!charstring::compare(ctype,"SMALLINT")) {
 		return SQL_SMALLINT;
-	} else if (!charstring::compare(ctype,"TINYINT")) {
+	}
+	if (!charstring::compare(ctype,"TINYINT")) {
 		return SQL_TINYINT;
-	} else if (!charstring::compare(ctype,"MONEY")) {
+	}
+	if (!charstring::compare(ctype,"MONEY")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"DATETIME")) {
+	}
+	if (!charstring::compare(ctype,"DATETIME")) {
 		return SQL_DATETIME;
-	} else if (!charstring::compare(ctype,"NUMERIC")) {
+	}
+	if (!charstring::compare(ctype,"NUMERIC")) {
 		return SQL_NUMERIC;
-	} else if (!charstring::compare(ctype,"DECIMAL")) {
+	}
+	if (!charstring::compare(ctype,"DECIMAL")) {
 		return SQL_DECIMAL;
-	} else if (!charstring::compare(ctype,"SMALLDATETIME")) {
+	}
+	if (!charstring::compare(ctype,"SMALLDATETIME")) {
 		return SQL_TIMESTAMP;
-	} else if (!charstring::compare(ctype,"SMALLMONEY")) {
+	}
+	if (!charstring::compare(ctype,"SMALLMONEY")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"IMAGE")) {
+	}
+	if (!charstring::compare(ctype,"IMAGE")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"BINARY")) {
+	}
+	if (!charstring::compare(ctype,"BINARY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"BIT")) {
+	}
+	if (!charstring::compare(ctype,"BIT")) {
 		return SQL_BIT;
-	} else if (!charstring::compare(ctype,"REAL")) {
+	}
+	if (!charstring::compare(ctype,"REAL")) {
 		return SQL_REAL;
-	} else if (!charstring::compare(ctype,"FLOAT")) {
+	}
+	if (!charstring::compare(ctype,"FLOAT")) {
 		return SQL_FLOAT;
-	} else if (!charstring::compare(ctype,"TEXT")) {
+	}
+	if (!charstring::compare(ctype,"TEXT")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"VARCHAR")) {
+	}
+	if (!charstring::compare(ctype,"VARCHAR")) {
 		return SQL_VARCHAR;
-	} else if (!charstring::compare(ctype,"VARBINARY")) {
+	}
+	if (!charstring::compare(ctype,"VARBINARY")) {
 		return SQL_VARBINARY;
-	} else if (!charstring::compare(ctype,"LONGCHAR")) {
+	}
+	if (!charstring::compare(ctype,"LONGCHAR")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"LONGBINARY")) {
+	}
+	if (!charstring::compare(ctype,"LONGBINARY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"LONG")) {
+	}
+	if (!charstring::compare(ctype,"LONG")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"ILLEGAL")) {
+	}
+	if (!charstring::compare(ctype,"ILLEGAL")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"SENSITIVITY")) {
+	}
+	if (!charstring::compare(ctype,"SENSITIVITY")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"BOUNDARY")) {
+	}
+	if (!charstring::compare(ctype,"BOUNDARY")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"VOID")) {
+	}
+	if (!charstring::compare(ctype,"VOID")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"USHORT")) {
+	}
+	if (!charstring::compare(ctype,"USHORT")) {
 		return SQL_SMALLINT;
+	}
 
 	// added by lago
-	} else if (!charstring::compare(ctype,"UNDEFINED")) {
+	if (!charstring::compare(ctype,"UNDEFINED")) {
 		return SQL_UNKNOWN_TYPE;
-	} else if (!charstring::compare(ctype,"DOUBLE")) {
+	}
+	if (!charstring::compare(ctype,"DOUBLE")) {
 		return SQL_DOUBLE;
-	} else if (!charstring::compare(ctype,"DATE")) {
+	}
+	if (!charstring::compare(ctype,"DATE")) {
 		return SQL_DATETIME;
-	} else if (!charstring::compare(ctype,"TIME")) {
+	}
+	if (!charstring::compare(ctype,"TIME")) {
 		return SQL_TIME;
-	} else if (!charstring::compare(ctype,"TIMESTAMP")) {
+	}
+	if (!charstring::compare(ctype,"TIMESTAMP")) {
 		return SQL_TIMESTAMP;
+	}
+
 	// added by msql
-	} else if (!charstring::compare(ctype,"UINT")) {
+	if (!charstring::compare(ctype,"UINT")) {
 		return SQL_INTEGER;
-	} else if (!charstring::compare(ctype,"LASTREAL")) {
+	}
+	if (!charstring::compare(ctype,"LASTREAL")) {
 		return SQL_REAL;
+	}
+
 	// added by mysql
-	} else if (!charstring::compare(ctype,"STRING")) {
+	if (!charstring::compare(ctype,"STRING")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"VARSTRING")) {
+	}
+	if (!charstring::compare(ctype,"VARSTRING")) {
 		return SQL_VARCHAR;
-	} else if (!charstring::compare(ctype,"LONGLONG")) {
+	}
+	if (!charstring::compare(ctype,"LONGLONG")) {
 		return SQL_BIGINT;
-	} else if (!charstring::compare(ctype,"MEDIUMINT")) {
+	}
+	if (!charstring::compare(ctype,"MEDIUMINT")) {
 		return SQL_INTEGER;
-	} else if (!charstring::compare(ctype,"YEAR")) {
+	}
+	if (!charstring::compare(ctype,"YEAR")) {
 		return SQL_SMALLINT;
-	} else if (!charstring::compare(ctype,"NEWDATE")) {
+	}
+	if (!charstring::compare(ctype,"NEWDATE")) {
 		return SQL_DATETIME;
-	} else if (!charstring::compare(ctype,"NULL")) {
+	}
+	if (!charstring::compare(ctype,"NULL")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"ENUM")) {
+	}
+	if (!charstring::compare(ctype,"ENUM")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"SET")) {
+	}
+	if (!charstring::compare(ctype,"SET")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"TINYBLOB")) {
+	}
+	if (!charstring::compare(ctype,"TINYBLOB")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"MEDIUMBLOB")) {
+	}
+	if (!charstring::compare(ctype,"MEDIUMBLOB")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"LONGBLOB")) {
+	}
+	if (!charstring::compare(ctype,"LONGBLOB")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"BLOB")) {
+	}
+	if (!charstring::compare(ctype,"BLOB")) {
 		return SQL_BINARY;
+	}
 
 	// added by oracle
-	} else if (!charstring::compare(ctype,"VARCHAR2")) {
+	if (!charstring::compare(ctype,"VARCHAR2")) {
 		return SQL_VARCHAR;
-	} else if (!charstring::compare(ctype,"NUMBER")) {
+	}
+	if (!charstring::compare(ctype,"NUMBER")) {
 		return SQL_NUMERIC;
-	} else if (!charstring::compare(ctype,"ROWID")) {
+	}
+	if (!charstring::compare(ctype,"ROWID")) {
 		return SQL_BIGINT;
-	} else if (!charstring::compare(ctype,"RAW")) {
+	}
+	if (!charstring::compare(ctype,"RAW")) {
 		return SQL_VARBINARY;
-	} else if (!charstring::compare(ctype,"LONG_RAW")) {
+	}
+	if (!charstring::compare(ctype,"LONG_RAW")) {
 		return SQL_LONGVARBINARY;
-	} else if (!charstring::compare(ctype,"MLSLABEL")) {
+	}
+	if (!charstring::compare(ctype,"MLSLABEL")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"CLOB")) {
+	}
+	if (!charstring::compare(ctype,"CLOB")) {
 		return SQL_LONGVARCHAR;
-	} else if (!charstring::compare(ctype,"BFILE")) {
+	}
+	if (!charstring::compare(ctype,"BFILE")) {
 		return SQL_LONGVARBINARY;
+	}
 
 	// added by odbc
-	} else if (!charstring::compare(ctype,"BIGINT")) {
+	if (!charstring::compare(ctype,"BIGINT")) {
 		return SQL_BIGINT;
-	} else if (!charstring::compare(ctype,"INTEGER")) {
+	}
+	if (!charstring::compare(ctype,"INTEGER")) {
 		return SQL_INTEGER;
-	} else if (!charstring::compare(ctype,"LONGVARBINARY")) {
+	}
+	if (!charstring::compare(ctype,"LONGVARBINARY")) {
 		return SQL_LONGVARBINARY;
-	} else if (!charstring::compare(ctype,"LONGVARCHAR")) {
+	}
+	if (!charstring::compare(ctype,"LONGVARCHAR")) {
 		return SQL_LONGVARCHAR;
+	}
 
 	// added by db2
-	} else if (!charstring::compare(ctype,"GRAPHIC")) {
+	if (!charstring::compare(ctype,"GRAPHIC")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"VARGRAPHIC")) {
+	}
+	if (!charstring::compare(ctype,"VARGRAPHIC")) {
 		return SQL_VARBINARY;
-	} else if (!charstring::compare(ctype,"LONGVARGRAPHIC")) {
+	}
+	if (!charstring::compare(ctype,"LONGVARGRAPHIC")) {
 		return SQL_LONGVARBINARY;
-	} else if (!charstring::compare(ctype,"DBCLOB")) {
+	}
+	if (!charstring::compare(ctype,"DBCLOB")) {
 		return SQL_LONGVARCHAR;
-	} else if (!charstring::compare(ctype,"DATALINK")) {
+	}
+	if (!charstring::compare(ctype,"DATALINK")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"USER_DEFINED_TYPE")) {
+	}
+	if (!charstring::compare(ctype,"USER_DEFINED_TYPE")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"SHORT_DATATYPE")) {
+	}
+	if (!charstring::compare(ctype,"SHORT_DATATYPE")) {
 		return SQL_SMALLINT;
-	} else if (!charstring::compare(ctype,"TINY_DATATYPE")) {
+	}
+	if (!charstring::compare(ctype,"TINY_DATATYPE")) {
 		return SQL_TINYINT;
+	}
 
 	// added by firebird
-	} else if (!charstring::compare(ctype,"D_FLOAT")) {
+	if (!charstring::compare(ctype,"D_FLOAT")) {
 		return SQL_DOUBLE;
-	} else if (!charstring::compare(ctype,"ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"QUAD")) {
+	}
+	if (!charstring::compare(ctype,"QUAD")) {
 		return SQL_BIGINT;
-	} else if (!charstring::compare(ctype,"INT64")) {
+	}
+	if (!charstring::compare(ctype,"INT64")) {
 		return SQL_BIGINT;
-	} else if (!charstring::compare(ctype,"DOUBLE PRECISION")) {
+	}
+	if (!charstring::compare(ctype,"DOUBLE PRECISION")) {
 		return SQL_DOUBLE;
+	}
 
 	// added by postgresql
-	} else if (!charstring::compare(ctype,"BOOL")) {
+	if (!charstring::compare(ctype,"BOOL")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"BYTEA")) {
+	}
+	if (!charstring::compare(ctype,"BYTEA")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"NAME")) {
+	}
+	if (!charstring::compare(ctype,"NAME")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"INT8")) {
+	}
+	if (!charstring::compare(ctype,"INT8")) {
 		return SQL_BIGINT;
-	} else if (!charstring::compare(ctype,"INT2")) {
+	}
+	if (!charstring::compare(ctype,"INT2")) {
 		return SQL_SMALLINT;
-	} else if (!charstring::compare(ctype,"INT2VECTOR")) {
+	}
+	if (!charstring::compare(ctype,"INT2VECTOR")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"INT4")) {
+	}
+	if (!charstring::compare(ctype,"INT4")) {
 		return SQL_INTEGER;
-	} else if (!charstring::compare(ctype,"REGPROC")) {
+	}
+	if (!charstring::compare(ctype,"REGPROC")) {
 		return SQL_BIGINT;
-	} else if (!charstring::compare(ctype,"OID")) {
+	}
+	if (!charstring::compare(ctype,"OID")) {
 		return SQL_BIGINT;
-	} else if (!charstring::compare(ctype,"TID")) {
+	}
+	if (!charstring::compare(ctype,"TID")) {
 		return SQL_BIGINT;
-	} else if (!charstring::compare(ctype,"XID")) {
+	}
+	if (!charstring::compare(ctype,"XID")) {
 		return SQL_BIGINT;
-	} else if (!charstring::compare(ctype,"CID")) {
+	}
+	if (!charstring::compare(ctype,"CID")) {
 		return SQL_BIGINT;
-	} else if (!charstring::compare(ctype,"OIDVECTOR")) {
+	}
+	if (!charstring::compare(ctype,"OIDVECTOR")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"SMGR")) {
+	}
+	if (!charstring::compare(ctype,"SMGR")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"POINT")) {
+	}
+	if (!charstring::compare(ctype,"POINT")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"LSEG")) {
+	}
+	if (!charstring::compare(ctype,"LSEG")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"PATH")) {
+	}
+	if (!charstring::compare(ctype,"PATH")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"BOX")) {
+	}
+	if (!charstring::compare(ctype,"BOX")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"POLYGON")) {
+	}
+	if (!charstring::compare(ctype,"POLYGON")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"LINE")) {
+	}
+	if (!charstring::compare(ctype,"LINE")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"LINE_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"LINE_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"FLOAT4")) {
+	}
+	if (!charstring::compare(ctype,"FLOAT4")) {
 		return SQL_FLOAT;
-	} else if (!charstring::compare(ctype,"FLOAT8")) {
+	}
+	if (!charstring::compare(ctype,"FLOAT8")) {
 		return SQL_DOUBLE;
-	} else if (!charstring::compare(ctype,"ABSTIME")) {
+	}
+	if (!charstring::compare(ctype,"ABSTIME")) {
 		return SQL_INTEGER;
-	} else if (!charstring::compare(ctype,"RELTIME")) {
+	}
+	if (!charstring::compare(ctype,"RELTIME")) {
 		return SQL_INTEGER;
-	} else if (!charstring::compare(ctype,"TINTERVAL")) {
+	}
+	if (!charstring::compare(ctype,"TINTERVAL")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"CIRCLE")) {
+	}
+	if (!charstring::compare(ctype,"CIRCLE")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"CIRCLE_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"CIRCLE_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"MONEY_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"MONEY_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"MACADDR")) {
+	}
+	if (!charstring::compare(ctype,"MACADDR")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"INET")) {
+	}
+	if (!charstring::compare(ctype,"INET")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"CIDR")) {
+	}
+	if (!charstring::compare(ctype,"CIDR")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"BOOL_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"BOOL_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"BYTEA_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"BYTEA_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"CHAR_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"CHAR_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"NAME_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"NAME_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"INT2_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"INT2_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"INT2VECTOR_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"INT2VECTOR_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"INT4_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"INT4_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"REGPROC_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"REGPROC_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"TEXT_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"TEXT_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"OID_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"OID_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"TID_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"TID_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"XID_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"XID_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"CID_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"CID_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"OIDVECTOR_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"OIDVECTOR_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"BPCHAR_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"BPCHAR_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"VARCHAR_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"VARCHAR_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"INT8_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"INT8_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"POINT_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"POINT_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"LSEG_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"LSEG_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"PATH_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"PATH_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"BOX_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"BOX_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"FLOAT4_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"FLOAT4_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"FLOAT8_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"FLOAT8_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"ABSTIME_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"ABSTIME_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"RELTIME_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"RELTIME_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"TINTERVAL_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"TINTERVAL_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"POLYGON_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"POLYGON_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"ACLITEM")) {
+	}
+	if (!charstring::compare(ctype,"ACLITEM")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"ACLITEM_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"ACLITEM_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"MACADDR_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"MACADDR_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"INET_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"INET_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"CIDR_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"CIDR_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"BPCHAR")) {
+	}
+	if (!charstring::compare(ctype,"BPCHAR")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"TIMESTAMP_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"TIMESTAMP_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"DATE_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"DATE_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"TIME_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"TIME_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"TIMESTAMPTZ")) {
+	}
+	if (!charstring::compare(ctype,"TIMESTAMPTZ")) {
 		return SQL_TIMESTAMP;
-	} else if (!charstring::compare(ctype,"TIMESTAMPTZ_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"TIMESTAMPTZ_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"INTERVAL")) {
+	}
+	if (!charstring::compare(ctype,"INTERVAL")) {
 		return SQL_INTERVAL;
-	} else if (!charstring::compare(ctype,"INTERVAL_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"INTERVAL_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"NUMERIC_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"NUMERIC_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"TIMETZ")) {
+	}
+	if (!charstring::compare(ctype,"TIMETZ")) {
 		return SQL_TIME;
-	} else if (!charstring::compare(ctype,"TIMETZ_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"TIMETZ_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"BIT_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"BIT_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"VARBIT")) {
+	}
+	if (!charstring::compare(ctype,"VARBIT")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"VARBIT_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"VARBIT_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"REFCURSOR")) {
+	}
+	if (!charstring::compare(ctype,"REFCURSOR")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"REFCURSOR_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"REFCURSOR_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"REGPROCEDURE")) {
+	}
+	if (!charstring::compare(ctype,"REGPROCEDURE")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"REGOPER")) {
+	}
+	if (!charstring::compare(ctype,"REGOPER")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"REGOPERATOR")) {
+	}
+	if (!charstring::compare(ctype,"REGOPERATOR")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"REGCLASS")) {
+	}
+	if (!charstring::compare(ctype,"REGCLASS")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"REGTYPE")) {
+	}
+	if (!charstring::compare(ctype,"REGTYPE")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"REGPROCEDURE_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"REGPROCEDURE_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"REGOPER_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"REGOPER_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"REGOPERATOR_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"REGOPERATOR_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"REGCLASS_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"REGCLASS_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"REGTYPE_ARRAY")) {
+	}
+	if (!charstring::compare(ctype,"REGTYPE_ARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"RECORD")) {
+	}
+	if (!charstring::compare(ctype,"RECORD")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"CSTRING")) {
+	}
+	if (!charstring::compare(ctype,"CSTRING")) {
 		return SQL_CHAR;
-	} else if (!charstring::compare(ctype,"ANY")) {
+	}
+	if (!charstring::compare(ctype,"ANY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"ANYARRAY")) {
+	}
+	if (!charstring::compare(ctype,"ANYARRAY")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"TRIGGER")) {
+	}
+	if (!charstring::compare(ctype,"TRIGGER")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"LANGUAGE_HANDLER")) {
+	}
+	if (!charstring::compare(ctype,"LANGUAGE_HANDLER")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"INTERNAL")) {
+	}
+	if (!charstring::compare(ctype,"INTERNAL")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"OPAQUE")) {
+	}
+	if (!charstring::compare(ctype,"OPAQUE")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"ANYELEMENT")) {
+	}
+	if (!charstring::compare(ctype,"ANYELEMENT")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"PG_TYPE")) {
+	}
+	if (!charstring::compare(ctype,"PG_TYPE")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"PG_ATTRIBUTE")) {
+	}
+	if (!charstring::compare(ctype,"PG_ATTRIBUTE")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"PG_PROC")) {
+	}
+	if (!charstring::compare(ctype,"PG_PROC")) {
 		return SQL_BINARY;
-	} else if (!charstring::compare(ctype,"PG_CLASS")) {
+	}
+	if (!charstring::compare(ctype,"PG_CLASS")) {
 		return SQL_BINARY;
 	}
 	return SQL_CHAR;
@@ -2474,8 +2651,7 @@ SQLRETURN SQL_API SQLGetCursorName(SQLHSTMT statementhandle,
 	}
 
 	if (!stmt->name) {
-		stmt->name=new char[charstring::integerLength(stmtid)+1];
-		sprintf(stmt->name,"%d",(int)stmtid);
+		stmt->name=charstring::parseNumber(stmtid);
 		stmtid++;
 	}
 	if (cursorname) {

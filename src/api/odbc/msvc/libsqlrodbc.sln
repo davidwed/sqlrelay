@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libsqlrodbc", "libsqlrodbc.vcxproj", "{651848FF-AB44-3959-5DC6-347B0660BA6F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		DebugCLR|Win32 = DebugCLR|Win32
+		Release|Win32 = Release|Win32
+		ReleaseCLR|Win32 = ReleaseCLR|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{651848FF-AB44-3959-5DC6-347B0660BA6F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{651848FF-AB44-3959-5DC6-347B0660BA6F}.Debug|Win32.Build.0 = Debug|Win32
+		{651848FF-AB44-3959-5DC6-347B0660BA6F}.DebugCLR|Win32.ActiveCfg = DebugCLR|Win32
+		{651848FF-AB44-3959-5DC6-347B0660BA6F}.DebugCLR|Win32.Build.0 = DebugCLR|Win32
+		{651848FF-AB44-3959-5DC6-347B0660BA6F}.Release|Win32.ActiveCfg = Release|Win32
+		{651848FF-AB44-3959-5DC6-347B0660BA6F}.Release|Win32.Build.0 = Release|Win32
+		{651848FF-AB44-3959-5DC6-347B0660BA6F}.ReleaseCLR|Win32.ActiveCfg = ReleaseCLR|Win32
+		{651848FF-AB44-3959-5DC6-347B0660BA6F}.ReleaseCLR|Win32.Build.0 = ReleaseCLR|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
