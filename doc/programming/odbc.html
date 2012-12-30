@@ -9,7 +9,7 @@
 
 <p>The SQL Relay distribution provides a basic ODBC driver, enabling applications which use ODBC on Unix or Linux to access SQL Relay.  The driver lacks some ODBC features and is not currently supported on Windows, but still may be useful for many applications.</p>
 
-<p>With unixODBC or iODBC, you can create an instance for the SQL Relay driver by adding an entry like the following to /etc/odbcinst.ini</p>
+<p>With unixODBC or iODBC, you can create an instance for the SQL Relay driver by adding an entry like the following to your ODBC instances file (usually /etc/odbcinst.ini)</p>
 
 <blockquote>
 <pre>
@@ -22,7 +22,7 @@
 
 <p>Note that the Driver attribute must bet set to the full pathname of the libsqlrodbc.so driver.  Note also that on Mac OS X you'll need to replace the <b>.so</b> suffix with <b>.dylib</b><p>
 
-<p>Once the instance is defined you can add a DSN for SQL Relay by adding an entry like the following to /etc/odbc.ini</p>
+<p>Once the instance is defined you can add a DSN for SQL Relay by adding an entry like the following to your ODBC INI file (usually /etc/odbc.ini)</p>
 
 <blockquote>
 <pre>
@@ -39,7 +39,7 @@
 
 <p>Here the Driver attribute refers to the instance in odbcinst.ini.</p>
 
-<p>Alternatively, you could create a combined instance/DSN by adding an entry like the following to /etc/odbc.ini</p>
+<p>Alternatively, you could create a combined instance/DSN by adding an entry like the following to your ODBC INI file (usually /etc/odbc.ini)</p>
 
 <blockquote>
 <pre>
@@ -66,39 +66,68 @@ or unixODBC to access the database through SQL Relay as follows:</p>
 
 <blockquote>
 <pre>
-<font color="#a52a2a"><b>[</b></font>mused@localhost /home/mused<font color="#a52a2a"><b>]</b></font>$ isql sqlrtest
-+---------------------------------------+
-<font color="#a52a2a"><b>|</b></font>&nbsp;Connected<font color="#a52a2a"><b>!</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>|</b></font>
-<font color="#a52a2a"><b>|</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font color="#a52a2a"><b>|</b></font>
-<font color="#a52a2a"><b>|</b></font>&nbsp;sql-statement&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font color="#a52a2a"><b>|</b></font>
-<font color="#a52a2a"><b>|</b></font>&nbsp;help <font color="#a52a2a"><b>[</b></font>tablename<font color="#a52a2a"><b>]</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>|</b></font>
-<font color="#a52a2a"><b>|</b></font>&nbsp;quit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>|</b></font>
-<font color="#a52a2a"><b>|</b></font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font color="#a52a2a"><b>|</b></font>
-+---------------------------------------+
-SQL<font color="#a52a2a"><b>&gt;</b></font>&nbsp;create table <font color="#a52a2a"><b>test</b></font>&nbsp;<font color="#a52a2a"><b>(</b></font>col1 varchar<font color="#a52a2a"><b>(</b></font><font color="#ff00ff">20</font><font color="#a52a2a"><b>))</b></font><font color="#a52a2a"><b>;</b></font>
-SQLRowCount returns <font color="#ff00ff">0</font>
-SQL<font color="#a52a2a"><b>&gt;</b></font>&nbsp;insert into <font color="#a52a2a"><b>test</b></font>&nbsp;values <font color="#a52a2a"><b>(</b></font><font color="#a52a2a"><b>'</b></font><font color="#ff00ff">hello</font><font color="#a52a2a"><b>'</b></font><font color="#a52a2a"><b>)</b></font><font color="#a52a2a"><b>;</b></font>
-SQLRowCount returns <font color="#ff00ff">1</font>
-SQL<font color="#a52a2a"><b>&gt;</b></font>&nbsp;insert into <font color="#a52a2a"><b>test</b></font>&nbsp;values <font color="#a52a2a"><b>(</b></font><font color="#a52a2a"><b>'</b></font><font color="#ff00ff">bye</font><font color="#a52a2a"><b>'</b></font><font color="#a52a2a"><b>)</b></font><font color="#a52a2a"><b>;</b></font>
-SQLRowCount returns <font color="#ff00ff">1</font>
-SQL<font color="#a52a2a"><b>&gt;</b></font>&nbsp;select * from <font color="#a52a2a"><b>test</b></font><font color="#a52a2a"><b>;</b></font>
-+-----------+
-<font color="#a52a2a"><b>|</b></font>&nbsp;col1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#a52a2a"><b>|</b></font>
-+-----------+
-<font color="#a52a2a"><b>|</b></font>&nbsp;hello&nbsp;&nbsp;&nbsp;&nbsp; <font color="#a52a2a"><b>|</b></font>
-<font color="#a52a2a"><b>|</b></font>&nbsp;bye&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font color="#a52a2a"><b>|</b></font>
-+-----------+
-SQLRowCount returns <font color="#ff00ff">0</font>
-<font color="#ff00ff">2</font>&nbsp;rows fetched
-SQL<font color="#a52a2a"><b>&gt;</b></font>&nbsp;quit<font color="#a52a2a"><b>;</b></font>
+<font face="monospace">
+[dmuse@fedora ~]$ isql sqlrodbc<br>
++<font color="#0000ff">---------------------------------------+</font><br>
+| Connected!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+| sql-statement&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+| help [tablename]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+| quit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
++<font color="#0000ff">---------------------------------------+</font><br>
+SQL&gt;&nbsp;<font color="#a52a2a"><b>create</b></font>&nbsp;<font color="#6a5acd">table</font>&nbsp;test (col1 int, col2&nbsp;<font color="#2e8b57"><b>varchar2</b></font>(<font color="#ff00ff">20</font>))<br>
+SQLRowCount returns&nbsp;<font color="#ff00ff">0</font><br>
+SQL&gt;&nbsp;<font color="#a52a2a"><b>insert</b></font>&nbsp;<font color="#6a5acd">into</font>&nbsp;test&nbsp;<font color="#6a5acd">values</font>&nbsp;(<font color="#ff00ff">1</font>,<font color="#ff00ff">'hello'</font>)<br>
+SQLRowCount returns&nbsp;<font color="#ff00ff">1</font><br>
+SQL&gt;&nbsp;<font color="#a52a2a"><b>insert</b></font>&nbsp;<font color="#6a5acd">into</font>&nbsp;test&nbsp;<font color="#6a5acd">values</font>&nbsp;(<font color="#ff00ff">2</font>,<font color="#ff00ff">'goodbye'</font>)<br>
+SQLRowCount returns&nbsp;<font color="#ff00ff">1</font><br>
+SQL&gt;&nbsp;<font color="#a52a2a"><b>select</b></font>&nbsp;*&nbsp;<font color="#6a5acd">from</font>&nbsp;test<br>
++<font color="#0000ff">-----+--------+</font><br>
+| COL1| COL2&nbsp;&nbsp; |<br>
++<font color="#0000ff">-----+--------+</font><br>
+|&nbsp;<font color="#ff00ff">1</font>&nbsp;&nbsp; | hello&nbsp;&nbsp;|<br>
+|&nbsp;<font color="#ff00ff">2</font>&nbsp;&nbsp; | goodbye|<br>
++<font color="#0000ff">-----+--------+</font><br>
+SQLRowCount returns&nbsp;<font color="#ff00ff">0</font><br>
+<font color="#ff00ff">2</font>&nbsp;<font color="#6a5acd">rows</font>&nbsp;fetched<br>
+SQL&gt;&nbsp;<font color="#a52a2a"><b>update</b></font>&nbsp;test&nbsp;<font color="#a52a2a"><b>set</b></font>&nbsp;col2=<font color="#ff00ff">'bye'</font>&nbsp;<font color="#6a5acd">where</font>&nbsp;col1=<font color="#ff00ff">2</font><br>
+SQLRowCount returns&nbsp;<font color="#ff00ff">1</font><br>
+SQL&gt;&nbsp;<font color="#a52a2a"><b>select</b></font>&nbsp;*&nbsp;<font color="#6a5acd">from</font>&nbsp;test<br>
++<font color="#0000ff">-----+------+</font><br>
+| COL1| COL2 |<br>
++<font color="#0000ff">-----+------+</font><br>
+|&nbsp;<font color="#ff00ff">1</font>&nbsp;&nbsp; | hello|<br>
+|&nbsp;<font color="#ff00ff">2</font>&nbsp;&nbsp; | bye&nbsp;&nbsp;|<br>
++<font color="#0000ff">-----+------+</font><br>
+SQLRowCount returns&nbsp;<font color="#ff00ff">0</font><br>
+<font color="#ff00ff">2</font>&nbsp;<font color="#6a5acd">rows</font>&nbsp;fetched<br>
+SQL&gt;&nbsp;<font color="#a52a2a"><b>delete</b></font>&nbsp;<font color="#6a5acd">from</font>&nbsp;test<br>
+SQLRowCount returns&nbsp;<font color="#ff00ff">2</font><br>
+SQL&gt;&nbsp;<font color="#a52a2a"><b>select</b></font>&nbsp;*&nbsp;<font color="#6a5acd">from</font>&nbsp;test<br>
++<font color="#0000ff">-----+-----+</font><br>
+| COL1| COL2|<br>
++<font color="#0000ff">-----+-----+</font><br>
++<font color="#0000ff">-----+-----+</font><br>
+SQLRowCount returns&nbsp;<font color="#ff00ff">0</font><br>
+SQL&gt;&nbsp;<font color="#a52a2a"><b>drop</b></font>&nbsp;<font color="#6a5acd">table</font>&nbsp;test<br>
+SQLRowCount returns&nbsp;<font color="#ff00ff">0</font><br>
+SQL&gt; quit<br>
+[dmuse@fedora ~]$&nbsp;<br>
+</font>
 </pre>
 </blockquote>
 
-<p>Similarly, any program that uses ODBC can be configured to use SQL Relay via
-ODBC by setting its DSN to the SQL Relay DSN defined in /etc/odbc.ini.</p>
+<p>If you get an error like <b>[ISQL]ERROR: Could not SQLConnect</b> when you run isql then it's possible that it can't find your ODBC INI file.  Some versions of unixODBC, when compiled and installed with non-standard prefixes, still look for odbc.ini in /etc rather than under their prefix.  For example, I discovered that on Mac OS X, unixODBC 2.2.12 installed under /sw should look for /sw/etc/odbc.ini but instead it looks for /etc/odbc.ini, even though <i>odbcinst -j</i> looks under /sw.  You can set environment variables to override whatever default search path unixODBC uses.  For example, to force it to look under /sw/etc, use:</p>
 
-<p>Developing applications which use ODBC is beyond the scope if this document
-but many examples and tutorials may be found on the web.</p>
+<blockquote><pre>
+export ODBCINST=/sw/etc/odbcinst.ini
+export ODBCINI=/sw/etc/odbc.ini
+</pre</blockquote>
+
+<p>Any program that uses ODBC can be configured to use SQL Relay via ODBC by setting its DSN to the SQL Relay DSN defined in /etc/odbc.ini.</p>
+
+<p>Developing applications which use ODBC is beyond the scope if this document but many examples and tutorials can be found on the web.</p>
 
 </body>
 </html>
