@@ -114,11 +114,13 @@ copy /Y ..\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sq
     <ClCompile Include="..\src\connection\begin.cpp" />
     <ClCompile Include="..\src\connection\bindformat.cpp" />
     <ClCompile Include="..\src\connection\clearsessionflags.cpp" />
+    <ClCompile Include="..\src\connection\clientinfo.cpp" />
     <ClCompile Include="..\src\connection\clientversion.cpp" />
     <ClCompile Include="..\src\connection\closeconnection.cpp" />
     <ClCompile Include="..\src\connection\commit.cpp" />
     <ClCompile Include="..\src\connection\connectionctor.cpp" />
     <ClCompile Include="..\src\connection\connectiondtor.cpp" />
+    <ClCompile Include="..\src\connection\dbhostname.cpp" />
     <ClCompile Include="..\src\connection\dbversion.cpp" />
     <ClCompile Include="..\src\connection\debug.cpp" />
     <ClCompile Include="..\src\connection\endsession.cpp" />
@@ -127,7 +129,6 @@ copy /Y ..\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sq
     <ClCompile Include="..\src\connection\getconnectionport.cpp" />
     <ClCompile Include="..\src\connection\getconnectionsocket.cpp" />
     <ClCompile Include="..\src\connection\getnewport.cpp" />
-    <ClCompile Include="..\src\connection\getreconnect.cpp" />
     <ClCompile Include="..\src\connection\identify.cpp" />
     <ClCompile Include="..\src\connection\lastinsertid.cpp" />
     <ClCompile Include="..\src\connection\opensession.cpp" />
@@ -137,7 +138,6 @@ copy /Y ..\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sq
     <ClCompile Include="..\src\connection\selectdatabase.cpp" />
     <ClCompile Include="..\src\connection\serverversion.cpp" />
     <ClCompile Include="..\src\connection\suspendsession.cpp" />
-    <ClCompile Include="..\src\connection\clientinfo.cpp" />
     <ClCompile Include="..\src\cursor\abortresultset.cpp" />
     <ClCompile Include="..\src\cursor\binds.cpp" />
     <ClCompile Include="..\src\cursor\clearresultset.cpp" />
@@ -151,6 +151,7 @@ copy /Y ..\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sq
     <ClCompile Include="..\src\cursor\fields.cpp" />
     <ClCompile Include="..\src\cursor\getcolumninfo.cpp" />
     <ClCompile Include="..\src\cursor\getlist.cpp" />
+    <ClCompile Include="..\src\cursor\getquerytree.cpp" />
     <ClCompile Include="..\src\cursor\getresultsetid.cpp" />
     <ClCompile Include="..\src\cursor\nulls.cpp" />
     <ClCompile Include="..\src\cursor\parsecolumninfo.cpp" />
