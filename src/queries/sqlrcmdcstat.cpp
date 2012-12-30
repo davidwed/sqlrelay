@@ -217,9 +217,9 @@ void sqlrcmdcstatcursor::getField(uint32_t col,
 			gettimeofday(&now,NULL);
 			double	statetime=
 				((double)(now.tv_sec-
-					cs->state_start_tv.tv_sec))+
+					cs->statestartsec))+
 				((double)(now.tv_usec-
-					cs->state_start_tv.tv_usec))/1000000.0;
+					cs->statestartusec))/1000000.0;
 			fieldbuffer=charstring::parseNumber(statetime,
 					colinfo[5].precision,colinfo[5].scale);
 			}

@@ -4,9 +4,6 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-// for struct timeval
-#include <sys/time.h>
-
 // listener-connection protocol...
 #define HANDOFF_PASS 0
 #define HANDOFF_RECONNECT 1
@@ -207,9 +204,12 @@ struct sqlrconnstatistics {
 	uint64_t			nsql;
 	uint32_t			ncustomsql;
 	uint32_t			nrelogin;
-	struct timeval			logged_in_tv;
-	struct timeval			state_start_tv;
-	struct timeval			clientsession_tv;
+	uint64_t			loggedinsec;
+	uint64_t			loggedinusec;
+	uint64_t			statestartsec;
+	uint64_t			statestartusec;
+	uint64_t			clientsessionsec;
+	uint64_t			clientsessionusec;
 	char				clientaddr[16];
 	char				clientinfo[STATCLIENTINFOLEN];
 	char				sqltext[STATSQLTEXTLEN];

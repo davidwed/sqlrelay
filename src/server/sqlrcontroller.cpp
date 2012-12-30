@@ -5943,8 +5943,8 @@ void sqlrcontroller_svr::initConnStats() {
 			updateState(INIT);
 			connstats->index=i;
 			connstats->processid=process::getProcessId();
-			connstats->logged_in_tv.tv_sec=loggedinsec;
-			connstats->logged_in_tv.tv_usec=loggedinusec;
+			connstats->loggedinsec=loggedinsec;
+			connstats->loggedinusec=loggedinusec;
 			return;
 		}
 	}
@@ -5968,14 +5968,20 @@ void sqlrcontroller_svr::updateState(enum sqlrconnectionstate_t state) {
 		return;
 	}
 	connstats->state=state;
-	gettimeofday(&connstats->state_start_tv,NULL);
+	timeval		tv;
+	gettimeofday(&tv,NULL);
+	connstats->statestartsec=tv.tv_sec;
+	connstats->statestartusec=tv.tv_usec;
 }
 
 void sqlrcontroller_svr::updateClientSessionStartTime() {
 	if (!connstats) {
 		return;
 	}
-	gettimeofday(&connstats->clientsession_tv,NULL);
+	timeval		tv;
+	gettimeofday(&tv,NULL);
+	connstats->clientsessionsec=tv.tv_sec;
+	connstats->clientsessionusec=tv.tv_usec;
 }
 
 void sqlrcontroller_svr::updateCurrentQuery(const char *query,
