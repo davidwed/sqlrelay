@@ -233,8 +233,8 @@ rpm -i --nodeps sqlrelay-*
 <p>There should be a file named <i>make.batch</i> in that directory.  Rename this file to <i>make.bat</i>.  It is named with the .batch extension because various mail services don't allow .bat files to be emailed around, even if they are inside of an archive.  To get around this, the file must manually be renamed.  Now run:</p>
 
 <blockquote><pre><b>
-make.bat
-make.bat install
+make
+make install
 </b></pre></blockquote>
 
 <p>This should build and install SQL Relay.  Various components will be installed under C:\Program Files\Firstworks.  If SQL Relay is already installed there, the installation process will first remove it, then build it, then re-install it.</p>
