@@ -1,28 +1,27 @@
 mkdir C:\"Program Files"\Firstworks\lib
 mkdir C:\"Program Files"\Firstworks\include\sqlrelay\private
 mkdir C:\"Program Files"\Firstworks\bin
-cd src\api\c++\msvc
-copy /Y Debug\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
-copy /Y Debug\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
-copy /Y Release\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
-copy /Y Release\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
-copy /Y ..\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
-copy /Y ..\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
-cd ..\..\c\msvc
-copy /Y Debug\libsqlrclientwrapper.dll C:\"Program Files"\Firstworks\bin
-copy /Y Debug\libsqlrclientwrapper.lib C:\"Program Files"\Firstworks\lib
-copy /Y Release\libsqlrclientwrapper.dll C:\"Program Files"\Firstworks\bin
-copy /Y Release\libsqlrclientwrapper.lib C:\"Program Files"\Firstworks\lib
-copy /Y ..\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
-copy /Y ..\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
-cd ..\..\cs\SQLRClient
-copy /Y SQLRClient.dll C:\"Program Files"\Firstworks\bin
-cd ..\..\..\util\msvc
-copy /Y Debug\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
-copy /Y Debug\libsqlrutil.lib C:\"Program Files"\Firstworks\lib
-copy /Y Release\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
-copy /Y Release\libsqlrutil.lib C:\"Program Files"\Firstworks\lib
-cd ..\..\cmdline\msvc
-copy /Y Debug\sqlrsh.exe C:\"Program Files"\Firstworks\bin
-copy /Y Release\sqlrsh.exe C:\"Program Files"\Firstworks\bin
-cd ..\..\..
+
+copy /Y src\api\c++\msvc\Debug\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\api\c++\msvc\Debug\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\api\c++\msvc\Release\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\api\c++\msvc\Release\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\api\c++\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
+copy /Y src\api\c++\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
+
+copy /Y src\api\c\msvc\Debug\libsqlrclientwrapper.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\api\c\msvc\Debug\libsqlrclientwrapper.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\api\c\msvc\Release\libsqlrclientwrapper.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\api\c\msvc\Release\libsqlrclientwrapper.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\api\c\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
+copy /Y src\api\c\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
+
+copy /Y src\api\cs\SQLRCLient\SQLRClient.dll C:\"Program Files"\Firstworks\bin
+
+copy /Y src\util\msvc\Debug\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\util\msvc\Debug\libsqlrutil.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\util\msvc\Release\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\util\msvc\Release\libsqlrutil.lib C:\"Program Files"\Firstworks\lib
+
+copy /Y src\cmdline\msvc\Debug\sqlrsh.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\cmdline\msvc\Release\sqlrsh.exe C:\"Program Files"\Firstworks\bin
