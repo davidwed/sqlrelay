@@ -79,11 +79,19 @@ distclean: clean
 		autom4te-*.cache \
 		src/api/c++/msvc/Debug \
 		src/api/c++/msvc/Release \
-		src/api/c++/msvc/Debug \
-		src/api/c++/msvc/Release \
+		src/api/c++/msvc/DebugCLR \
+		src/api/c++/msvc/ReleaseCLR \
+		src/api/c/msvc/Debug \
+		src/api/c/msvc/Release \
+		src/api/c/msvc/DebugCLR \
+		src/api/c/msvc/ReleaseCLR \
 		src/cmdline/msvc/Debug \
 		src/cmdline/msvc/Release \
+		src/cmdline/msvc/DebugCLR \
+		src/cmdline/msvc/ReleaseCLR \
 		src/util/msvc/Debug \
 		src/util/msvc/Release \
+		src/util/msvc/DebugCLR \
+		src/util/msvc/ReleaseCLR \
 		src/api/cs/SQLRClient/bin \
 		src/api/cs/SQLRClient/obj
