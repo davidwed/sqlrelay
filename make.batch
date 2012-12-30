@@ -1,6 +1,12 @@
+if "%1"=="" goto all
+if "%1"=="all" goto all
+if "%1"=="clr" goto clr
 if "%1"=="clean" goto clean
 if "%1"=="install" goto install
+if "%1"=="installclr" goto installclr
 if "%1"=="uninstall" goto uninstall
+goto end
+
 
 :all
 cd src\api\c++\msvc
@@ -16,39 +22,62 @@ msbuild.exe /property:Configuration=Release
 cd ..\..\..
 goto end
 
+
+:clr
+cd src\api\c++\msvc
+msbuild.exe /property:Configuration=ReleaseCLR
+cd ..\..\c\msvc
+msbuild.exe /property:Configuration=ReleaseCLR
+cd ..\..\cs\SQLRClient
+msbuild.exe /property:Configuration=ReleaseCLR
+cd ..\..\..\util\msvc
+msbuild.exe /property:Configuration=ReleaseCLR
+cd ..\..\cmdline\msvc
+msbuild.exe /property:Configuration=ReleaseCLR
+cd ..\..\..
+goto end
+
+
 :clean
 cd src\api\c++\msvc
 msbuild.exe /target:Clean /property:Configuration=Debug
 msbuild.exe /target:Clean /property:Configuration=Release
+msbuild.exe /target:Clean /property:Configuration=DebugCLR
+msbuild.exe /target:Clean /property:Configuration=ReleaseCLR
 cd ..\..\c\msvc
 msbuild.exe /target:Clean /property:Configuration=Debug
 msbuild.exe /target:Clean /property:Configuration=Release
+msbuild.exe /target:Clean /property:Configuration=DebugCLR
+msbuild.exe /target:Clean /property:Configuration=ReleaseCLR
 cd ..\..\cs\SQLRClient
 msbuild.exe /target:Clean /property:Configuration=Debug
 msbuild.exe /target:Clean /property:Configuration=Release
+msbuild.exe /target:Clean /property:Configuration=DebugCLR
+msbuild.exe /target:Clean /property:Configuration=ReleaseCLR
 cd ..\..\..\util\msvc
 msbuild.exe /target:Clean /property:Configuration=Debug
 msbuild.exe /target:Clean /property:Configuration=Release
+msbuild.exe /target:Clean /property:Configuration=DebugCLR
+msbuild.exe /target:Clean /property:Configuration=ReleaseCLR
 cd ..\..\cmdline\msvc
 msbuild.exe /target:Clean /property:Configuration=Debug
 msbuild.exe /target:Clean /property:Configuration=Release
+msbuild.exe /target:Clean /property:Configuration=DebugCLR
+msbuild.exe /target:Clean /property:Configuration=ReleaseCLR
 cd ..\..\..
 goto end
+
 
 :install
 mkdir C:\"Program Files"\Firstworks\lib
 mkdir C:\"Program Files"\Firstworks\include\sqlrelay\private
 mkdir C:\"Program Files"\Firstworks\bin
 
-copy /Y src\api\c++\msvc\Debug\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\api\c++\msvc\Debug\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
 copy /Y src\api\c++\msvc\Release\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
 copy /Y src\api\c++\msvc\Release\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
 copy /Y src\api\c++\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
 copy /Y src\api\c++\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
 
-copy /Y src\api\c\msvc\Debug\libsqlrclientwrapper.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\api\c\msvc\Debug\libsqlrclientwrapper.lib C:\"Program Files"\Firstworks\lib
 copy /Y src\api\c\msvc\Release\libsqlrclientwrapper.dll C:\"Program Files"\Firstworks\bin
 copy /Y src\api\c\msvc\Release\libsqlrclientwrapper.lib C:\"Program Files"\Firstworks\lib
 copy /Y src\api\c\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
@@ -56,14 +85,36 @@ copy /Y src\api\c\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\inc
 
 copy /Y src\api\cs\SQLRCLient\SQLRClient.dll C:\"Program Files"\Firstworks\bin
 
-copy /Y src\util\msvc\Debug\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\util\msvc\Debug\libsqlrutil.lib C:\"Program Files"\Firstworks\lib
 copy /Y src\util\msvc\Release\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
 copy /Y src\util\msvc\Release\libsqlrutil.lib C:\"Program Files"\Firstworks\lib
 
-copy /Y src\cmdline\msvc\Debug\sqlrsh.exe C:\"Program Files"\Firstworks\bin
 copy /Y src\cmdline\msvc\Release\sqlrsh.exe C:\"Program Files"\Firstworks\bin
 goto end
+
+
+:installclr
+mkdir C:\"Program Files"\Firstworks\lib
+mkdir C:\"Program Files"\Firstworks\include\sqlrelay\private
+mkdir C:\"Program Files"\Firstworks\bin
+
+copy /Y src\api\c++\msvc\ReleaseCLR\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\api\c++\msvc\ReleaseCLR\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\api\c++\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
+copy /Y src\api\c++\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
+
+copy /Y src\api\c\msvc\ReleaseCLR\libsqlrclientwrapper.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\api\c\msvc\ReleaseCLR\libsqlrclientwrapper.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\api\c\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
+copy /Y src\api\c\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
+
+copy /Y src\api\cs\SQLRCLient\SQLRClient.dll C:\"Program Files"\Firstworks\bin
+
+copy /Y src\util\msvc\ReleaseCLR\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\util\msvc\ReleaseCLR\libsqlrutil.lib C:\"Program Files"\Firstworks\lib
+
+copy /Y src\cmdline\msvc\ReleaseCLR\sqlrsh.exe C:\"Program Files"\Firstworks\bin
+goto end
+
 
 :uninstall
 rmdir /s /q "C:\Program Files\Firstworks\include\sqlrelay"
@@ -72,5 +123,6 @@ del "C:\Program Files\Firstworks\bin\libsqlr*.dll"
 del "C:\Program Files\Firstworks\bin\SQLR*.dll"
 del "C:\Program Files\Firstworks\bin\sqlrsh.exe"
 goto end
+
 
 :end
