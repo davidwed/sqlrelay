@@ -1,3 +1,8 @@
+if %1==clean goto clean
+if %1==install goto install
+if %1==uninstall goto uninstall
+
+:all
 cd src\api\c++\msvc
 msbuild.exe /property:Configuration=Release
 cd ..\..\c\msvc
@@ -9,3 +14,63 @@ msbuild.exe /property:Configuration=Release
 cd ..\..\cmdline\msvc
 msbuild.exe /property:Configuration=Release
 cd ..\..\..
+goto end
+
+:clean
+cd src\api\c++\msvc
+msbuild.exe /target:Clean /property:Configuration=Debug
+msbuild.exe /target:Clean /property:Configuration=Release
+cd ..\..\c\msvc
+msbuild.exe /target:Clean /property:Configuration=Debug
+msbuild.exe /target:Clean /property:Configuration=Release
+cd ..\..\cs\SQLRClient
+msbuild.exe /target:Clean /property:Configuration=Debug
+msbuild.exe /target:Clean /property:Configuration=Release
+cd ..\..\..\util\msvc
+msbuild.exe /target:Clean /property:Configuration=Debug
+msbuild.exe /target:Clean /property:Configuration=Release
+cd ..\..\cmdline\msvc
+msbuild.exe /target:Clean /property:Configuration=Debug
+msbuild.exe /target:Clean /property:Configuration=Release
+cd ..\..\..
+goto end
+
+:install
+mkdir C:\"Program Files"\Firstworks\lib
+mkdir C:\"Program Files"\Firstworks\include\sqlrelay\private
+mkdir C:\"Program Files"\Firstworks\bin
+
+copy /Y src\api\c++\msvc\Debug\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\api\c++\msvc\Debug\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\api\c++\msvc\Release\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\api\c++\msvc\Release\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\api\c++\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
+copy /Y src\api\c++\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
+
+copy /Y src\api\c\msvc\Debug\libsqlrclientwrapper.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\api\c\msvc\Debug\libsqlrclientwrapper.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\api\c\msvc\Release\libsqlrclientwrapper.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\api\c\msvc\Release\libsqlrclientwrapper.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\api\c\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
+copy /Y src\api\c\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
+
+copy /Y src\api\cs\SQLRCLient\SQLRClient.dll C:\"Program Files"\Firstworks\bin
+
+copy /Y src\util\msvc\Debug\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\util\msvc\Debug\libsqlrutil.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\util\msvc\Release\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\util\msvc\Release\libsqlrutil.lib C:\"Program Files"\Firstworks\lib
+
+copy /Y src\cmdline\msvc\Debug\sqlrsh.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\cmdline\msvc\Release\sqlrsh.exe C:\"Program Files"\Firstworks\bin
+goto end
+
+:uninstall
+rmdir /s /q "C:\Program Files\Firstworks\include\sqlrelay"
+del "C:\Program Files\Firstworks\lib\libsqlr*.lib"
+del "C:\Program Files\Firstworks\bin\libsqlr*.dll"
+del "C:\Program Files\Firstworks\bin\SQLR*.dll"
+del "C:\Program Files\Firstworks\bin\sqlrsh.exe"
+goto end
+
+:end
