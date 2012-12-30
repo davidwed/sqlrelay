@@ -1,26 +1,11 @@
-rmdir /s /q "C:\Program Files\Firstworks\include\sqlrelay"
-del "C:\Program Files\Firstworks\lib\libsqlr*.lib"
-del "C:\Program Files\Firstworks\bin\libsqlr*.dll"
-del "C:\Program Files\Firstworks\bin\SQLR*.dll"
-del "C:\Program Files\Firstworks\bin\sqlrsh.exe"
 cd src\api\c++\msvc
-msbuild.exe /target:Clean
-msbuild.exe /target:Clean /property:Configuration=Release
 msbuild.exe /property:Configuration=Release
 cd ..\..\c\msvc
-msbuild.exe /target:Clean
-msbuild.exe /target:Clean /property:Configuration=Release
 msbuild.exe /property:Configuration=Release
 cd ..\..\cs\SQLRClient
-msbuild.exe /target:Clean
-msbuild.exe /target:Clean /property:Configuration=Release
 msbuild.exe /property:Configuration=Release
 cd ..\..\..\util\msvc
-msbuild.exe /target:Clean
-msbuild.exe /target:Clean /property:Configuration=Release
 msbuild.exe /property:Configuration=Release
 cd ..\..\cmdline\msvc
-msbuild.exe /target:Clean
-msbuild.exe /target:Clean /property:Configuration=Release
 msbuild.exe /property:Configuration=Release
 cd ..\..\..

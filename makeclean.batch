@@ -1,0 +1,16 @@
+cd src\api\c++\msvc
+msbuild.exe /target:Clean
+msbuild.exe /target:Clean /property:Configuration=Release
+cd ..\..\c\msvc
+msbuild.exe /target:Clean
+msbuild.exe /target:Clean /property:Configuration=Release
+cd ..\..\cs\SQLRClient
+msbuild.exe /target:Clean
+msbuild.exe /target:Clean /property:Configuration=Release
+cd ..\..\..\util\msvc
+msbuild.exe /target:Clean
+msbuild.exe /target:Clean /property:Configuration=Release
+cd ..\..\cmdline\msvc
+msbuild.exe /target:Clean
+msbuild.exe /target:Clean /property:Configuration=Release
+cd ..\..\..
