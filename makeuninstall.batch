@@ -1,5 +1,0 @@
-rmdir /s /q "C:\Program Files\Firstworks\include\sqlrelay"
-del "C:\Program Files\Firstworks\lib\libsqlr*.lib"
-del "C:\Program Files\Firstworks\bin\libsqlr*.dll"
-del "C:\Program Files\Firstworks\bin\SQLR*.dll"
-del "C:\Program Files\Firstworks\bin\sqlrsh.exe"
