@@ -60,19 +60,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>..\..\c++\msvc\Release;..\..\c++\msvc\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\c++\msvc\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>..\..\c++\msvc\Release;..\..\c++\msvc\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\c++\msvc\DebugCLR;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>..\..\c++\msvc\Release;..\..\c++\msvc\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\c++\msvc\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>..\..\c++\msvc\Release;..\..\c++\msvc\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\c++\msvc\ReleaseCLR;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

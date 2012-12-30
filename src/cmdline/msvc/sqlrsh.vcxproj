@@ -60,19 +60,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>..\..\api\c++\msvc\Release;..\..\api\c++\msvc\Debug;..\..\util\msvc\Release;..\..\util\msvc\Debug;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\api\c++\msvc\Debug;..\..\util\msvc\Debug;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>..\..\api\c++\msvc\Release;..\..\api\c++\msvc\Debug;..\..\util\msvc\Release;..\..\util\msvc\Debug;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\api\c++\msvc\DebugCLR;..\..\util\msvc\DebugCLR;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>..\..\api\c++\msvc\Release;..\..\api\c++\msvc\Debug;..\..\util\msvc\Release;..\..\util\msvc\Debug;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\api\c++\msvc\Release;..\..\util\msvc\Release;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>..\..\api\c++\msvc\Release;..\..\api\c++\msvc\Debug;..\..\util\msvc\Release;..\..\util\msvc\Debug;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\api\c++\msvc\ReleaseCLR;..\..\util\msvc\ReleaseCLR;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
