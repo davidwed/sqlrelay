@@ -1435,6 +1435,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					ODBC_INI);
 	conn->tries=(int32_t)charstring::toInteger(triesbuf);
 
+	debugPrintf("DSN: %s\n",dsn);
 	debugPrintf("Server: %s\n",conn->server);
 	debugPrintf("Port: %d\n",(int)conn->port);
 	debugPrintf("Socket: %s\n",conn->socket);
