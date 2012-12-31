@@ -12,6 +12,8 @@ cd src\api\c++\msvc
 msbuild.exe /property:Configuration=Release
 cd ..\..\c\msvc
 msbuild.exe /property:Configuration=Release
+cd ..\..\odbc\msvc
+msbuild.exe /property:Configuration=Release
 cd ..\..\cs\SQLRClient
 msbuild.exe /property:Configuration=Release
 cd ..\..\..\util\msvc
@@ -26,6 +28,8 @@ goto end
 cd src\api\c++\msvc
 msbuild.exe /property:Configuration=ReleaseCLR
 cd ..\..\c\msvc
+msbuild.exe /property:Configuration=ReleaseCLR
+cd ..\..\odbc\msvc
 msbuild.exe /property:Configuration=ReleaseCLR
 cd ..\..\cs\SQLRClient
 msbuild.exe /property:Configuration=Release
@@ -44,6 +48,11 @@ msbuild.exe /target:Clean /property:Configuration=Release
 msbuild.exe /target:Clean /property:Configuration=DebugCLR
 msbuild.exe /target:Clean /property:Configuration=ReleaseCLR
 cd ..\..\c\msvc
+msbuild.exe /target:Clean /property:Configuration=Debug
+msbuild.exe /target:Clean /property:Configuration=Release
+msbuild.exe /target:Clean /property:Configuration=DebugCLR
+msbuild.exe /target:Clean /property:Configuration=ReleaseCLR
+cd ..\..\odbc\msvc
 msbuild.exe /target:Clean /property:Configuration=Debug
 msbuild.exe /target:Clean /property:Configuration=Release
 msbuild.exe /target:Clean /property:Configuration=DebugCLR
@@ -83,6 +92,8 @@ copy /Y src\api\c\msvc\ReleaseCLR\libsqlrclientwrapper.dll C:\"Program Files"\Fi
 copy /Y src\api\c\msvc\ReleaseCLR\libsqlrclientwrapper.lib C:\"Program Files"\Firstworks\lib
 copy /Y src\api\c\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
 copy /Y src\api\c\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
+
+copy /Y src\api\odbc\msvc\ReleaseCLR\libsqlrodbc.dll C:\"Program Files"\Firstworks\bin
 
 copy /Y src\api\cs\SQLRCLient\SQLRClient.dll C:\"Program Files"\Firstworks\bin
 
