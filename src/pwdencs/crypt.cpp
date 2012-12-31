@@ -22,7 +22,17 @@ bool crypt_pwdenc::oneWay() {
 }
 
 char *crypt_pwdenc::encrypt(const char *value) {
-	return crypt::encrypt(value,parameters->getAttributeValue("salt"));
+
+	// the first two characters of the result string
+	// are the salt, so don't include them, if possible
+	char	*encrypted=crypt::encrypt(value,
+				parameters->getAttributeValue("salt"));
+	if (charstring::length(encrypted)<2) {
+		return encrypted;
+	}
+	char	*retval=charstring::duplicate(encrypted+2);
+	delete[] encrypted;
+	return retval;
 }
 
 extern "C" {

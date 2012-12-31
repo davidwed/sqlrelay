@@ -24,7 +24,7 @@
 	refactored login error reporting
 	fleshed out the ODBC driver significantly
 	added docs for using SQL Relay from ODBC and JDBC
-	split up windows make scripts
+	refactored windows make.bat script
 
 0.48 - integrated patches from Neowiz for:
 		handling for oracle errors ora-01033, ora-02067 and ora-04068
