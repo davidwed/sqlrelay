@@ -230,10 +230,20 @@ rpm -i --nodeps sqlrelay-*
 
 <p>To build SQL Relay natively on Windows, open the Visual Studio Command Prompt and navigate to the directory that was created when SQL Relay was extracted.</p>
 
-<p>There should be a file named <i>make.batch</i> in that directory.  Rename this file to <i>make.bat</i>.  It is named with the .batch extension because various mail services don't allow .bat files to be emailed around, even if they are inside of an archive.  To get around this, the file must manually be renamed.  After renaming the file, run:</p>
+<p>There should be a file named <i>make.batch</i> in that directory.  Rename this file to <i>make.bat</i>.  It is named with the .batch extension because various mail services don't allow .bat files to be emailed around, even if they are inside of an archive.  To get around this, the file must manually be renamed.</p>
+
+<p>There are two build options.  SQL Relay can be built with or without Common Language Runtime (CLR) support.  There are advantages and disadvantages to building either way but you must build SQL Relay with the same option that you built Rudiments with.</p>
+
+<p>To build without CLR support, run:</p>
 
 <blockquote><b>
 make
+</b></blockquote>
+
+<p>To build with CLR support, run:</p>
+
+<blockquote><b>
+make clr
 </b></blockquote>
 
 
