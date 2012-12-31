@@ -7,7 +7,7 @@
 
 <span class="heading1">Programming with SQL Relay using ODBC</span><br><br>
 
-<p>The SQL Relay distribution provides a basic ODBC driver, enabling applications which use ODBC on Unix or Linux to access SQL Relay.  The driver lacks some ODBC features and is not currently supported on Windows, but still may be useful for many applications.</p>
+<p>The SQL Relay distribution provides a basic ODBC driver, enabling applications which use ODBC on Unix or Linux to access SQL Relay.  The driver lacks some features and is not currently supported on Windows, but still may be useful for many applications.</p>
 
 <p>With unixODBC or iODBC, you can create an instance for the SQL Relay driver by adding an entry like the following to your ODBC instances file (usually /etc/odbcinst.ini)</p>
 
@@ -65,7 +65,6 @@ or unixODBC to access the database through SQL Relay as follows:</p>
 <p>Here is a sample session:</p>
 
 <blockquote>
-<pre>
 <font face="monospace">
 [dmuse@fedora ~]$ isql sqlrodbc<br>
 +<font color="#0000ff">---------------------------------------+</font><br>
@@ -115,17 +114,26 @@ SQLRowCount returns&nbsp;<font color="#ff00ff">0</font><br>
 SQL&gt; quit<br>
 [dmuse@fedora ~]$&nbsp;<br>
 </font>
-</pre>
 </blockquote>
 
-<p>If you get an error like <b>[ISQL]ERROR: Could not SQLConnect</b> when you run isql then it's possible that it can't find your ODBC INI file.  Some versions of unixODBC, when compiled and installed with non-standard prefixes, still look for odbc.ini in /etc rather than under their prefix.  For example, I discovered that on Mac OS X, unixODBC 2.2.12 installed under /sw should look for /sw/etc/odbc.ini but instead it looks for /etc/odbc.ini, even though <i>odbcinst -j</i> looks under /sw.  You can set environment variables to override whatever default search path unixODBC uses.  For example, to force it to look under /sw/etc, use:</p>
+<p>If you get an error like <b>[ISQL]ERROR: Could not SQLConnect</b> when you run isql then it's possible that it can't find your ODBC INI file.  Some versions of unixODBC, when compiled and installed with non-standard prefixes, still look for odbc.ini in /etc rather than under their prefix.  For example, I discovered that on Mac OS X, unixODBC 2.2.12 installed under /sw should look for /sw/etc/odbc.ini but instead it looks for /etc/odbc.ini, even though <i>odbcinst -j</i> looks under /sw.</p>
+
+<p>You can work around this by setting environment variables to override whatever default search path unixODBC uses.  For example, to force it to look under /sw/etc, use:</p>
 
 <blockquote><pre>
 export ODBCINST=/sw/etc/odbcinst.ini
 export ODBCINI=/sw/etc/odbc.ini
-</pre</blockquote>
+</pre></blockquote>
 
-<p>Any program that uses ODBC can be configured to use SQL Relay via ODBC by setting its DSN to the SQL Relay DSN defined in /etc/odbc.ini.</p>
+<p>Any program that uses ODBC can be configured to use SQL Relay via ODBC by setting its DSN to the SQL Relay DSN defined in /etc/odbc.ini.</p> 
+
+<p>You can also use SQL Relay with any language that supports ODBC directly or has a database abstraction layer that supports ODBC.  For example, lets say you have an existing PHP app that uses MDB2 to connect to Oracle and you want to use SQL Relay with it.  There is no PHP MDB2 driver for SQL Relay, but since MDB2 suppots ODBC, you could use:</p>
+
+<blockquote><b>
+PHP -&gt; MDB2 -&gt; ODBC -&gt; SQL Relay -&gt; Oracle
+</b></blockquote>
+
+<p>Similarly, you could use SQL Relay via ODBC with PHP/PDO, PHP/ADODB, Java/JDBC (<a href="jdbc.html">using the JDBC-ODBC bridge</a>), with the ODBC Adapter for Ruby on Rails, and so on.</p>
 
 <p>Developing applications which use ODBC is beyond the scope if this document but many examples and tutorials can be found on the web.</p>
 

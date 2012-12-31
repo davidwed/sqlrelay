@@ -11,14 +11,9 @@
 
 <p>This is not currently supported on Windows.</p>
 
-<p>See <a href="odbc.html">Programming with SQL Relay using ODBC</a> for 
-instructions detailing how to access SQL Relay through ODBC.  Once that is 
-working, you can access databases through SQL Relay via JDBC as well.</p>
+<p>See <a href="odbc.html">Programming with SQL Relay using ODBC</a> for instructions detailing how to access SQL Relay through ODBC.  Once that is working, you can access databases through SQL Relay via JDBC as well.</p>
 
-<p>A good program to test this with is
-<a href="http://henplus.sourceforge.net/">HenPlus</a>, a JDBC command line
-client.  After downloading and installing HenPlus, you can run it as
-follows:</p>
+<p>A good program to test this with is <a href="http://henplus.sourceforge.net/">HenPlus</a>, a JDBC command line client.  After downloading and installing HenPlus, you can run it as follows:</p>
 
 <blockquote>
 <b>henplus jdbc:odbc:sqlrtest</b>
@@ -41,7 +36,6 @@ export LD_PRELOAD=/usr/lib/libodbc.so
 <p>Here is a sample henplus session:</p>
 
 <blockquote>
-<pre>
 <font face="monospace">
 [dmuse@fedora bin]$ ./henplus jdbc:odbc:sqlrtest<br>
 no readline found (no JavaReadline&nbsp;<font color="#a52a2a"><b>in</b></font>&nbsp;java.library.path).&nbsp;<font color="#6a5acd">Using</font>&nbsp;simple stdin.<br>
@@ -98,15 +92,11 @@ affected&nbsp;<font color="#ff00ff">0</font>&nbsp;<font color="#6a5acd">rows</fo
 storing settings..<br>
 [dmuse@fedora bin]$<br>
 </font>
-</pre>
 </blockquote>
 
-<p>Similarly, any program that uses JDBC can be configured to use SQL Relay via
-JDBC by setting its database url to jdbc:odbc:<i>DSN</i> where DSN is replaced
-with the ODBC DSN defined in /etc/odbc.ini.</p>
+<p>Similarly, any program that uses JDBC can be configured to use SQL Relay via JDBC by setting its database url to jdbc:odbc:<i>DSN</i> where <i>DSN</i> is replaced with the ODBC DSN defined in /etc/odbc.ini.</p>
 
-<p>Developing applications which use JDBC is beyond the scope if this document
-but many examples and tutorials may be found on the web.</p>
+<p>Developing applications which use JDBC is beyond the scope if this document but many examples and tutorials may be found on the web.</p>
 
 </body>
 </html>
