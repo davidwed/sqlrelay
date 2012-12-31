@@ -71,12 +71,37 @@ bool sqlrauthenticator::authenticate(const char *user, const char *password) {
 					return false;
 				}
 
-				// decrypt the password
-				char	*pwd=pe->decrypt(passwords[i]);
+				// For one-way encryption, encrypt the password
+				// that was passed in and compare it to the
+				// encrypted password in the config file.
+				// For two-way encryption, decrypt the password
+				// from the config file and compare ot to the
+				// password that was passed in...
 
-				// compare it to the password that was passed in
-				bool	retval=!charstring::compare(
-								password,pwd);
+				bool	retval=false;
+				char	*pwd=NULL;
+				if (pe->oneWay()) {
+
+					// encrypt the password
+					// that was passed in
+					pwd=pe->encrypt(password);
+
+					// compare it to the encrypted
+					// password from the config file
+					retval=!charstring::compare(
+							pwd,passwords[i]);
+
+				} else {
+
+					// decrypt the password
+					// from the config file
+					pwd=pe->decrypt(passwords[i]);
+
+					// compare it to the password
+					// that was passed in
+					retval=!charstring::compare(
+							password,pwd);
+				}
 
 				// clean up
 				delete[] pwd;
