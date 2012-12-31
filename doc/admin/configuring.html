@@ -15,7 +15,7 @@
 <li><a href="#modules">Extension Modules</a></li>
 </ul>
 
-<a name="example"></a>
+<br><a name="example"></a>
 <span class="heading2">Example</span><br>
 
 <p>The SQL Relay configuration file (usually /usr/local/firstworks/etc/sqlrelay.conf) is complex and is best explained with an example:</p>
@@ -164,7 +164,7 @@
 </font>
 </blockquote>
 
-<a name="tags"></a>
+<br><a name="tags"></a>
 <span class="heading2">Tags</span><br>
 
 <p>So what do all these tags do?</p>
@@ -195,7 +195,7 @@
 
 <p>The <b>query</b> tag defines a regular expression which the <b>route</b> and <b>filter</b> tags use to match queries.</p>
 
-<a name="attributes"></a>
+<br><a name="attributes"></a>
 <span class="heading2">Attributes</span><br>
 
 <p>Below is a description of the attributes for each tag.</p>
@@ -382,16 +382,16 @@ or a tnsnames-style expression such as:
 </ul>
 </ul>
 
-<a name="complex"></a>
+<br><a name="complex"></a>
 <span class="heading2">Complex Attributes</span><br>
 
 <p>Most of the tag attributes are straightforward.  The most complex one are the <b>metric</b> attribute of the <b>connection</b> tag and the <b>authtier</b> and <b>handoff</b> attributes of the <b>instance</b> tag.</p>
 
-<span class="heading3">Metric</span><br>
+<br><span class="heading3">Metric</span><br>
 
 <p>The <b>metric</b> attribute doesn't define how many connections are started, the <b>connections</b> attribute of the <b>instance</b> tag defines that.  The <b>metric</b> attribute influences how many of the total connections will be of that connection type.  The higher the metric relative to the other metrics, the more of that connection type will be started.</p>
 
-<span class="heading3">Authtier</span><br>
+<br><span class="heading3">Authtier</span><br>
 
 <p>The client will send a user and password to the sqlr-connection daemon when it connects to it.</p>
 
@@ -405,11 +405,11 @@ or a tnsnames-style expression such as:
 
 <p><b>NOTE:</b> authtier="database" can't be used in an instance where dbase="router".  It's OK for the instances that the router uses to use authtier="database" but not the router instance itself.  If authtier="database" is set on that instance, it will be overridden to authier="connection".</p>
 
-<span class="heading3">Handoff</span><br>
+<br><span class="heading3">Handoff</span><br>
 
 <p>When an <b>SQL Relay</b> client needs to talk to the database, it connects to a listener process which queues it up until a database connection daemon is available.  When a daemon is available, the client is "handed off" to it.  This "handoff" can be done in one of two ways.  The file descriptor of the connected client can be passed from the listener to the connection daemon, or the listener can proxy the client, ferrying data back and forth between it and the connection daemon.  These two methods are referred to as "pass" and "proxy".  "proxy" works on every platform.  "pass" works on most platforms but not all.  "pass" is faster and lighter than "proxy" and should be used if possible.  Cygwin and Linux kernels prior to 2.2 don't support "pass" though, and on those platforms, even if you specify "pass", "proxy" will be used instead and a warning will be displayed.  Other platforms may not support "pass" as well but those are the only known ones and the only ones where "proxy" is forced.</p>
 
-<a name="modules"></a>
+<br><a name="modules"></a>
 <span class="heading2">Extension Modules</span><br>
 
 <p>SQL Relay can be extended via modules.  To load and enable a module, you must add additional tags and attributes to the config file and each module has its own tags and attributes.  Currently <a href="../modules/passwordencryption.html">Password Encryption</a> and <a href="../modules/logger.html">Logger</a> modules are supported.</p>

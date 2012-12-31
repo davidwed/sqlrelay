@@ -101,6 +101,7 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <li><a href="#cygwinstart">When using SQL Relay on Cygwin, sqlr-start never returns to a command prompt.  How do I fix that?</a></li>
 <li><a href="#cygwinfork">When using SQL Relay on Cygwin, I get an error like "child_info_fork::abort: ...xxx.dll: Loaded to different address: parent(xxx)!=child(yyy)" and nothing runs.  How do I fix that?</a></li>
 <li><a href="#debug">What happened to the "debug" option?  How do I enable the debug logs?</a></li>
+<li><a href="#passwordencryption">I don't like storing plaintext passwords in my sqlrelay.conf file.  Can I encrypt them somehow?</a></li>
 </ul>
 
 <hr>
@@ -1139,6 +1140,13 @@ additional resource consumption.</p>
 <p>You can disable logging of either listener or connection daemons by setting "no" to "yes".</p>
 
 <p>See <a href="../modules/logger.html">Logger Modules</a> for more information.</p>
+
+<br><a name="passwordencryption"></a>
+<span class="heading3">I don't like storing plaintext passwords in my sqlrelay.conf file.  Can I encrypt them somehow?</span><br>
+
+<p>Yes.  Both database passwords and passwords for accessing SQL Relay itself can be encrypted via extension modules.  You can use one of the provided modules or develop your own.</p>
+
+<p>See <a href="modules/passwordencryption.html">Password Encryption Modules</a> for more information.</p>
 
 </body>
 </html>
