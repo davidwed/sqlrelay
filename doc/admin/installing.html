@@ -22,7 +22,7 @@
 <ul>
 <li><a href="#windownloading">Downloading SQL Relay</a></li>
 <li><a href="#winextracting">Extracting SQL Relay</a></li>
-<li><a href="#wincompiling">Building and Installing SQL Relay</a></li>
+<li><a href="#wincompiling">Building SQL Relay</a></li>
 <li><a href="#wininstalling">Installing SQL Relay</a></li>
 </ul>
 </ul>
@@ -35,7 +35,7 @@
 
 <p>x86 and x86_64 platforms are supported, as are non-x86 architectures such as ARM, Sparc, Mips, PPC and others.</p>
 
-<p>uClib/Linux-based systems should also be supported.</p>
+<p>uClib/Linux-based systems are also supported.</p>
 
 <p>The command line clients and C, C++ and .NET API's should build and run natively on Windows using Visual Studio but the server components do not yet build and run natively on Windows.</p>
 
@@ -93,7 +93,7 @@ Note that the database connection components are not supported natively under Wi
 <a name="extracting"></a>
 <span class="heading2">Extracting SQL Relay</span>
 
-<p>To extract the source distribution, copy the file to a location on your machine that you have read/write access and execute the following commands:</p>
+<p>To extract the source distribution, move the file to a location on your machine that you have read/write access and execute the following commands:</p>
 
 <blockquote><b>
 gunzip sqlrelay-X.XX.tar.gz<br>
@@ -108,14 +108,14 @@ tar xf sqlrelay-X.XX.tar
 <a name="compiling"></a>
 <span class="heading2">Building SQL Relay</span>
 
-<p>To build SQL Relay, change directories to the one that was created by the extraction, make sure your ORACLE_HOME environment variable is set if you want to include support for Oracle, and run:</p>
+<p>To build SQL Relay, navigate to the directory that was created by the extraction, make sure your ORACLE_HOME environment variable is set if you want to include support for Oracle, and run:</p>
 
 <blockquote><b>
 configure<br>
 make
 </b></blockquote>
 
-<p>The configure script takes lots of command line options, most of which tell it where to find prerequisite software in case any of it is installed in non-standard locations.  It also takes the --prefix option in case you want to install SQL Relay somewhere other than /usr/local/firstworks.  For example:</p>
+<p>The configure script takes lots of command line options, most of which tell it where to find prerequisite software in case any of it is installed in non-standard locations.  It also takes the --prefix option in case you want to install it somewhere other than /usr/local/firstworks.  For example:</p>
 
 <blockquote><b>
 configure --prefix=/usr/local
@@ -129,14 +129,20 @@ configure --prefix=/usr/local
 configure --help
 </b></blockquote>
 
-<p>Note that when using Cygwin, SQL Relay cannot be built against non-Cygwin dll's.  You can't, for instance, build against the Oracle, Sybase, the native Windows version of MySQL or the native Windows versions of Perl, Python, PHP, etc.  Many languages and a few databases come with Cygwin though and others can be compiled from source under Cygwin.</p>
+<p>There are several things to note when using Cygwin.</p>
 
-<p>Also note, that when using Cygwin, you must use the Cygwin shell to build SQL Relay, rather than the Windows Command Line or DOS prompt.</p>
+<ul>
+<li>You must use the Cygwin shell to build SQL Relay, rather than the Windows Command Line or DOS prompt.</li>
+<li>The <b>file</b> command must be present.  If it is not, the build will fail and you will get a very cryptic error.</li>
+<li>SQL Relay cannot be built against non-Cygwin dll's.  You can't, for instance, build against the Oracle, Sybase, the native Windows version of MySQL or the native Windows versions of Perl, Python, PHP, etc.  Many languages and a few databases come with Cygwin though and others can be compiled from source under Cygwin. when using Cygwin.</li>
+</ul>
 
 <a name="installing"></a>
 <span class="heading2">Installing SQL Relay</span>
 
-<p>To install SQL Relay become superuser and run:</p>
+<p>By default, on Unix or Linux, everything is installed under /usr/local/firstworks by default.  You should either create that directory and give yourself full access permissions or install as root.</p>
+
+<p>To install SQL Relay run:</p>
 
 <blockquote><b>
 make install
@@ -146,7 +152,7 @@ make install
 	
 <p>If you install SQL Relay as root, init scripts and files will be installed in the appropriate places under /etc for your system.  If you install SQL Relay as a non-root user, the init scripts and files will be installed in similar places under /usr/local/firstworks/etc.</p>
 
-<p>To uninstall SQL Relay become superuser and run:</p>
+<p>To uninstall SQL Relay run:</p>
 
 <blockquote><b>
 make uninstall
@@ -159,8 +165,8 @@ make uninstall
 <p>If your system supports RedHat Package Manager version 4.0.3 or greater then you can build RPMS by running the following command against the source distribution tarball:</p>
 
 <blockquote><b>
-<p>rpm -ta sqlrelay-X.XX.tar.gz</p>
-<p>(where X.XX is replaced with the version number)</p>
+rpm -ta sqlrelay-X.XX.tar.gz<br>
+(where X.XX is replaced with the version number)<br>
 </b></blockquote>
 
 <p>You can instruct the build process not to build certain modules by giving it one of the following flags:</p>
@@ -187,8 +193,8 @@ make uninstall
 <p>For example, if you want to build everything but the oracle and zope modules, then you would run the following command:</p>
 
 <blockquote><b>
-<p>rpm -ta -without oracle -without zope sqlrelay-X.XX.tar.gz</p>
-<p>(where X.XX is replaced with the version number)</p>
+rpm -ta -without oracle -without zope sqlrelay-X.XX.tar.gz<br>
+(where X.XX is replaced with the version number)<br>
 </b></blockquote>
 
 <p>This will generate RPM's in the system-wide RPM directory (usually /usr/src/redhat/RPMS or /usr/local/rpm/RPMS) under the subdirectory corresponding to your system architecture.  You can install them by changing directories into that directory and executing the following command as root:</p>
@@ -208,7 +214,7 @@ rpm -i --nodeps sqlrelay-*
 
 <p>You can download the most current source distribution of SQL Relay from <a href="http://sqlrelay.sourceforge.net">sqlrelay.sourceforge.net</a>.</p>
 
-<p>For native Windows installations, download the .zip file.</p>
+<p>For a native Windows installation, download the .zip file.</p>
 
 
 <a name="winextracting"></a>
@@ -216,32 +222,39 @@ rpm -i --nodeps sqlrelay-*
 
 <p>To extract the source distribution, move the file to your desktop or a location on your machine that you have read/write access, right-click on the file and select "Extract All".</p>
 
-<p>This will create a sqlrelay-X.XX folder.</p>
-
-<p>(Where X.XX is replaced with the version of SQL Relay that you downloaded.)</p>
+<p>This will create a sqlrelay-X.XX directory.</p>
 
 
 <a name="wincompiling"></a>
-<span class="heading2">Building and Installing SQL Relay</span>
+<span class="heading2">Building SQL Relay</span>
 
-<p>The native Windows build process for SQL Relay is currently somewhat primitive.</p>
+<p>To build SQL Relay natively on Windows, open the Visual Studio Command Prompt and navigate to the directory that was created when SQL Relay was extracted.</p>
 
-<p>If you are running Windows Vista or higher, as a non-Administrator users, you must first create the folder C:\Program Files\Firstworks and give yourself full access permissions.  This step is necessary if you are running as the Administrator or if you're running an older version of Windows.</p>
+<p>There should be a file named <i>make.batch</i> in that directory.  Rename this file to <i>make.bat</i>.  It is named with the .batch extension because various mail services don't allow .bat files to be emailed around, even if they are inside of an archive.  To get around this, the file must manually be renamed.  After renaming the file, run:</p>
 
-<p>Now, to build and install SQL Relay, open the Visual Studio Command Prompt and navigate to the base directory that was created when SQL Relay was extracted.</p>
-
-<p>There should be a file named <i>make.batch</i> in that directory.  Rename this file to <i>make.bat</i>.  It is named with the .batch extension because various mail services don't allow .bat files to be emailed around, even if they are inside of an archive.  To get around this, the file must manually be renamed.  Now run:</p>
-
-<blockquote><pre><b>
+<blockquote><b>
 make
-make install
-</b></pre></blockquote>
+</b></blockquote>
 
-<p>This should build and install SQL Relay.  Various components will be installed under C:\Program Files\Firstworks.  If SQL Relay is already installed there, the installation process will first remove it, then build it, then re-install it.</p>
+
+<a name="wininstalling"></a>
+<span class="heading2">Installing SQL Relay</span>
+
+<p>By default, on Windows, everything is installed under C:\Program Files\Firstworks.  You should either create that directory and give yourself full access permissions or install as Administrator.</p>
+
+<p>To install SQL Relay run:</p>
+
+<blockquote><b>
+make install
+</b></blockquote>
+
+<p>To uninstall SQL Relay run:</p>
+
+<blockquote><b>
+make uninstall
+</b></blockquote>
 
 <p>To run the command line programs, it is helpful to add C:\Program Files\Firstworks\bin to your PATH but not strictly necessary.  Alternatively, you could just navigate to C:\Program Files\Firstworks\bin and run them from there.</p>
-
-<p>If you need to uninstall everything, just trash the C:\Program Files\Firstworks folder.  Note though that this will uninstall Rudiments as well.</p>
 
 </body>
 </html>
