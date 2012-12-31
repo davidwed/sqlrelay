@@ -1394,29 +1394,44 @@ int32_t sqlrcontroller_svr::waitForClient() {
 	// method only returns 2, 1 or -1.  0 should indicate that a suspended
 	// session timed out.
 
-	// Unless we're in the middle of a suspended session, if we're passing 
-	// file descriptors around, wait for one to be passed to us, otherwise,
-	// accept on the unix/inet sockets. 
 	if (!suspendedsession) {
+
+		// If we're not in the middle of a suspended session,
+		// talk to the listener...
+
 
 		// the client file descriptor
 		int32_t	descriptor;
 
-		// get what we're supposed to do...
+		// What is this loop all aboout?
+		// If the listener is proxying clients, it can't tell whether
+		// the client succeeded in transmitting an END_SESSION or
+		// whether it even tried, so it sends one when the client
+		// disconnects no matter what.  If the client did send one then
+		// we'll receive a second END_SESSION here.  Depending on the
+		// byte order of the host, we'll receive either a 1536 or 6.
+		// If we got an END_SESION then just loop back and read again,
+		// the command will follow.
 		uint16_t	command;
-		if (handoffsockun.read(&command)!=sizeof(uint16_t)) {
-			logInternalError(NULL,"read handoff command failed");
-			logDebugMessage("done waiting for client");
-			// If this fails, then the listener most likely died
-			// because sqlr-stop was run.  Arguably this condition
-			// should initiate a shut down of this process as well,
-			// but for now we'll just wait to be shut down manually.
-			// Unfortunatley, that means looping over and over,
-			// with that read failing every time.  We'll sleep so
-			// as not to slam the machine while we loop.
-			snooze::microsnooze(0,100000);
-			return -1;
-		}
+		do {
+			// get the command
+			if (handoffsockun.read(&command)!=sizeof(uint16_t)) {
+				logInternalError(NULL,
+					"read handoff command failed");
+				logDebugMessage("done waiting for client");
+				// If this fails, then the listener most likely
+				// died because sqlr-stop was run.  Arguably
+				// this condition should initiate a shut down
+				// of this process as well, but for now we'll
+				// just wait to be shut down manually.
+				// Unfortunatley, that means looping over and
+				// over, with that read failing every time.
+				// We'll sleep so as not to slam the machine
+				// while we loop.
+				snooze::microsnooze(0,100000);
+				return -1;
+			}
+		} while (command==1536 || command==6);
 
 		if (command==HANDOFF_RECONNECT) {
 
@@ -1480,6 +1495,10 @@ int32_t sqlrcontroller_svr::waitForClient() {
 		logDebugMessage("done waiting for client");
 
 	} else {
+
+		// If we're in the middle of a suspended session, wait for
+		// a client to reconnect...
+
 
 		if (waitForNonBlockingRead(accepttimeout,0)<1) {
 			logInternalError(NULL,"wait for client connect failed");
@@ -5658,13 +5677,13 @@ void sqlrcontroller_svr::closeClientSocket() {
 
 		logDebugMessage("(actually just signalling the listener)");
 
-		// in proxy mode, the client socket is pointed at the
-		// handoff socket which we don't want to actually close
-		clientsock->setFileDescriptor(-1);
-
 		// we do need to signal the proxy that it
 		// needs to close the connection though
 		signalmanager::sendSignal(proxypid,SIGUSR1);
+
+		// in proxy mode, the client socket is pointed at the
+		// handoff socket which we don't want to actually close
+		clientsock->setFileDescriptor(-1);
 	}
 	clientsock->close();
 	delete clientsock;

@@ -1813,14 +1813,19 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		}
 	}
 
-	// send the server an end session command, if neccessary
+	// If the client closed the socket then we can't be sure whether it
+	// succeeded in transmitting an END_SESSION command or whether it even
+	// tried.  The connection daemon would usually detect the socket close
+	// and end the session but since we're not closing any socket, we'll
+	// send an END_SESSION ourselves.  Worst case, the server will receive
+	// a second END_SESSION, but we'll kludge it to tolerate that.
 	if (endsession) {
 		logDebugMessage("ending the session");
 		// translate byte order for this, as the client would
 		serversock->translateByteOrder();
 		serversock->write((uint16_t)END_SESSION);
-		serversock->dontTranslateByteOrder();
 		serversock->flushWriteBuffer(-1,-1);
+		serversock->dontTranslateByteOrder();
 	}
 
 	// set everything back to normal
