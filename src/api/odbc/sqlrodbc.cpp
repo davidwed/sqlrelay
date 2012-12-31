@@ -12,13 +12,9 @@
 #include <rudiments/environment.h>
 
 
-// windows needs these
+// windows needs this
 #if defined(_WIN32)
 	#include <windows.h>
-	//#define DLLEXPORT __declspec(dllexport)
-	#define DLLEXPORT
-#else
-	#define DLLEXPORT
 #endif
 
 // cygwin piggypacks off of the w32api so this is necessary for it too
@@ -134,7 +130,6 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 					SQLHANDLE inputhandle,
 					SQLHANDLE *outputhandle);
 
-DLLEXPORT
 SQLRETURN SQL_API SQLAllocConnect(SQLHENV environmenthandle,
 					SQLHDBC *connectionhandle) {
 	debugFunction();
@@ -143,7 +138,6 @@ SQLRETURN SQL_API SQLAllocConnect(SQLHENV environmenthandle,
 				(SQLHANDLE *)connectionhandle);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLAllocEnv(SQLHENV *environmenthandle) {
 	debugFunction();
 	return SQLR_SQLAllocHandle(SQL_HANDLE_ENV,NULL,
@@ -286,7 +280,6 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT handletype,
 					SQLHANDLE inputhandle,
 					SQLHANDLE *outputhandle) {
@@ -294,7 +287,6 @@ SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT handletype,
 	return SQLR_SQLAllocHandle(handletype,inputhandle,outputhandle);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLAllocStmt(SQLHDBC connectionhandle,
 					SQLHSTMT *statementhandle) {
 	debugFunction();
@@ -303,7 +295,6 @@ SQLRETURN SQL_API SQLAllocStmt(SQLHDBC connectionhandle,
 				(SQLHANDLE *)statementhandle);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementhandle,
 					SQLUSMALLINT columnnumber,
 					SQLSMALLINT targettype,
@@ -346,7 +337,6 @@ static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
 					SQLLEN bufferlength,
 					SQLLEN *strlen_or_ind);
 
-DLLEXPORT
 SQLRETURN SQL_API SQLBindParam(SQLHSTMT statementhandle,
 					SQLUSMALLINT parameternumber,
 					SQLSMALLINT valuetype,
@@ -368,7 +358,6 @@ SQLRETURN SQL_API SQLBindParam(SQLHSTMT statementhandle,
 					strlen_or_ind);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLCancel(SQLHSTMT statementhandle) {
 	debugFunction();
 
@@ -427,7 +416,6 @@ static SQLRETURN SQLR_SQLCloseCursor(SQLHSTMT statementhandle) {
 	return SQL_SUCCESS;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLCloseCursor(SQLHSTMT statementhandle) {
 	debugFunction();
 	return SQLR_SQLCloseCursor(statementhandle);
@@ -1447,7 +1435,6 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 	return SQL_SUCCESS;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLColAttribute(SQLHSTMT statementhandle,
 					SQLUSMALLINT columnnumber,
 					SQLUSMALLINT fieldidentifier,
@@ -1502,7 +1489,6 @@ static void SQLR_BuildTableName(stringbuffer *table,
 	}
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 					SQLCHAR *catalogname,
 					SQLSMALLINT namelength1,
@@ -1637,7 +1623,6 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	return SQL_SUCCESS;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLConnect(SQLHDBC connectionhandle,
 					SQLCHAR *dsn,
 					SQLSMALLINT dsnlength,
@@ -1650,7 +1635,6 @@ SQLRETURN SQL_API SQLConnect(SQLHDBC connectionhandle,
 				user,userlength,password,passwordlength);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLCopyDesc(SQLHDESC SourceDescHandle,
 					SQLHDESC TargetDescHandle) {
 	debugFunction();
@@ -1660,7 +1644,6 @@ SQLRETURN SQL_API SQLCopyDesc(SQLHDESC SourceDescHandle,
 }
 
 #if (ODBCVER < 0x0300)
-DLLEXPORT
 SQLRETURN SQL_API SQLDataSources(SQLHENV environmenthandle,
 					SQLUSMALLINT Direction,
 					SQLCHAR *ServerName,
@@ -1675,7 +1658,6 @@ SQLRETURN SQL_API SQLDataSources(SQLHENV environmenthandle,
 }
 #endif
 
-DLLEXPORT
 SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT statementhandle,
 					SQLUSMALLINT columnnumber,
 					SQLCHAR *columnname,
@@ -1725,7 +1707,6 @@ SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT statementhandle,
 	return SQL_SUCCESS;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLDisconnect(SQLHDBC connectionhandle) {
 	debugFunction();
 
@@ -1794,7 +1775,6 @@ static SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
 	}
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLEndTran(SQLSMALLINT handletype,
 					SQLHANDLE handle,
 					SQLSMALLINT completiontype) {
@@ -1811,7 +1791,6 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 					SQLSMALLINT bufferlength,
 					SQLSMALLINT *textlength);
 
-DLLEXPORT
 SQLRETURN SQL_API SQLError(SQLHENV environmenthandle,
 					SQLHDBC connectionhandle,
 					SQLHSTMT statementhandle,
@@ -2289,7 +2268,6 @@ uint32_t SQLR_TrimQuery(SQLCHAR *statementtext, SQLINTEGER textlength) {
 	}
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 					SQLCHAR *statementtext,
 					SQLINTEGER textlength) {
@@ -2334,7 +2312,6 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLExecute(SQLHSTMT statementhandle) {
 	debugFunction();
 
@@ -2442,13 +2419,11 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 	return SQL_SUCCESS;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLFetch(SQLHSTMT statementhandle) {
 	debugFunction();
 	return SQLR_Fetch(statementhandle,NULL,NULL);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT statementhandle,
 					SQLSMALLINT fetchorientation,
 					SQLLEN fetchoffset) {
@@ -2472,13 +2447,11 @@ SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT statementhandle,
 
 static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle);
 
-DLLEXPORT
 SQLRETURN SQL_API SQLFreeConnect(SQLHDBC connectionhandle) {
 	debugFunction();
 	return SQLR_SQLFreeHandle(SQL_HANDLE_DBC,connectionhandle);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLFreeEnv(SQLHENV environmenthandle) {
 	debugFunction();
 	return SQLR_SQLFreeHandle(SQL_HANDLE_ENV,environmenthandle);
@@ -2542,13 +2515,11 @@ static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 	}
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 	debugFunction();
 	return SQLR_SQLFreeHandle(handletype,handle);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLFreeStmt(SQLHSTMT statementhandle, SQLUSMALLINT option) {
 	debugFunction();
 
@@ -2618,7 +2589,6 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLGetConnectAttr(SQLHDBC connectionhandle,
 					SQLINTEGER attribute,
 					SQLPOINTER value,
@@ -2629,7 +2599,6 @@ SQLRETURN SQL_API SQLGetConnectAttr(SQLHDBC connectionhandle,
 					value,bufferlength,stringlength);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLGetConnectOption(SQLHDBC connectionhandle,
 					SQLUSMALLINT option,
 					SQLPOINTER value) {
@@ -2637,7 +2606,6 @@ SQLRETURN SQL_API SQLGetConnectOption(SQLHDBC connectionhandle,
 	return SQLR_SQLGetConnectAttr(connectionhandle,option,value,256,NULL);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLGetCursorName(SQLHSTMT statementhandle,
 					SQLCHAR *cursorname,
 					SQLSMALLINT bufferlength,
@@ -2937,7 +2905,6 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	return SQL_SUCCESS;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLGetData(SQLHSTMT statementhandle,
 					SQLUSMALLINT columnnumber,
 					SQLSMALLINT targettype,
@@ -2950,7 +2917,6 @@ SQLRETURN SQL_API SQLGetData(SQLHSTMT statementhandle,
 				strlen_or_ind);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLGetDescField(SQLHDESC DescriptorHandle,
 					SQLSMALLINT RecNumber,
 					SQLSMALLINT FieldIdentifier,
@@ -2962,7 +2928,6 @@ SQLRETURN SQL_API SQLGetDescField(SQLHDESC DescriptorHandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLGetDescRec(SQLHDESC DescriptorHandle,
 					SQLSMALLINT RecNumber,
 					SQLCHAR *Name,
@@ -2979,7 +2944,6 @@ SQLRETURN SQL_API SQLGetDescRec(SQLHDESC DescriptorHandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 					SQLHANDLE handle,
 					SQLSMALLINT recnumber,
@@ -3130,7 +3094,6 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 	return SQL_SUCCESS;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLGetDiagRec(SQLSMALLINT handletype,
 					SQLHANDLE handle,
 					SQLSMALLINT recnumber,
@@ -3145,7 +3108,6 @@ SQLRETURN SQL_API SQLGetDiagRec(SQLSMALLINT handletype,
 					textlength);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV environmenthandle,
 					SQLINTEGER attribute,
 					SQLPOINTER value,
@@ -3190,7 +3152,6 @@ SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV environmenthandle,
 	return SQL_SUCCESS;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 					SQLUSMALLINT functionid,
 					SQLUSMALLINT *supported) {
@@ -3704,7 +3665,6 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 	return SQL_SUCCESS;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQLUSMALLINT infotype,
 					SQLPOINTER infovalue,
@@ -3987,7 +3947,6 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 	return SQL_SUCCESS;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLGetStmtAttr(SQLHSTMT statementhandle,
 					SQLINTEGER attribute,
 					SQLPOINTER value,
@@ -3998,7 +3957,6 @@ SQLRETURN SQL_API SQLGetStmtAttr(SQLHSTMT statementhandle,
 					value,bufferlength,stringlength);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLGetStmtOption(SQLHSTMT statementhandle,
 					SQLUSMALLINT option,
 					SQLPOINTER value) {
@@ -4006,7 +3964,6 @@ SQLRETURN SQL_API SQLGetStmtOption(SQLHSTMT statementhandle,
 	return SQLR_SQLGetStmtAttr(statementhandle,option,value,-1,NULL);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
 					SQLSMALLINT DataType) {
 	debugFunction();
@@ -4016,7 +3973,6 @@ SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementhandle,
 	return SQL_SUCCESS;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT statementhandle,
 					SQLSMALLINT *columncount) {
 	debugFunction();
@@ -4033,7 +3989,6 @@ SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT statementhandle,
 	return SQL_SUCCESS;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 					SQLPOINTER *Value) {
 	debugFunction();
@@ -4050,7 +4005,6 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLPrepare(SQLHSTMT statementhandle,
 					SQLCHAR *statementtext,
 					SQLINTEGER textlength) {
@@ -4079,7 +4033,6 @@ SQLRETURN SQL_API SQLPrepare(SQLHSTMT statementhandle,
 	return SQL_SUCCESS;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLPutData(SQLHSTMT statementhandle,
 					SQLPOINTER Data,
 					SQLLEN StrLen_or_Ind) {
@@ -4097,7 +4050,6 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT statementhandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLRowCount(SQLHSTMT statementhandle,
 					SQLLEN *rowcount) {
 	debugFunction();
@@ -4166,7 +4118,6 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 	return SQL_SUCCESS;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC connectionhandle,
 					SQLINTEGER attribute,
 					SQLPOINTER value,
@@ -4176,7 +4127,6 @@ SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC connectionhandle,
 						value,stringlength);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLSetConnectOption(SQLHDBC connectionhandle,
 					SQLUSMALLINT option,
 					SQLULEN value) {
@@ -4185,7 +4135,6 @@ SQLRETURN SQL_API SQLSetConnectOption(SQLHDBC connectionhandle,
 						(SQLPOINTER)value,0);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLSetCursorName(SQLHSTMT statementhandle,
 					SQLCHAR *cursorname,
 					SQLSMALLINT namelength) {
@@ -4208,7 +4157,6 @@ SQLRETURN SQL_API SQLSetCursorName(SQLHSTMT statementhandle,
 	return SQL_SUCCESS;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLSetDescField(SQLHDESC DescriptorHandle,
 					SQLSMALLINT RecNumber,
 					SQLSMALLINT FieldIdentifier,
@@ -4219,7 +4167,6 @@ SQLRETURN SQL_API SQLSetDescField(SQLHDESC DescriptorHandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLSetDescRec(SQLHDESC DescriptorHandle,
 					SQLSMALLINT RecNumber,
 					SQLSMALLINT Type,
@@ -4235,7 +4182,6 @@ SQLRETURN SQL_API SQLSetDescRec(SQLHDESC DescriptorHandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV environmenthandle,
 					SQLINTEGER attribute,
 					SQLPOINTER value,
@@ -4284,7 +4230,6 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV environmenthandle,
 	}
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLSetParam(SQLHSTMT statementhandle,
 					SQLUSMALLINT parameternumber,
 					SQLSMALLINT valuetype,
@@ -4521,7 +4466,6 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 	}
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT statementhandle,
 					SQLINTEGER attribute,
 					SQLPOINTER value,
@@ -4531,7 +4475,6 @@ SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT statementhandle,
 						value,stringlength);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLSetStmtOption(SQLHSTMT statementhandle,
 					SQLUSMALLINT option,
 					SQLULEN value) {
@@ -4539,7 +4482,6 @@ SQLRETURN SQL_API SQLSetStmtOption(SQLHSTMT statementhandle,
 	return SQLSetStmtAttr(statementhandle,option,(SQLPOINTER)value,0);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLSpecialColumns(SQLHSTMT statementhandle,
 					SQLUSMALLINT IdentifierType,
 					SQLCHAR *CatalogName,
@@ -4564,7 +4506,6 @@ SQLRETURN SQL_API SQLSpecialColumns(SQLHSTMT statementhandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLStatistics(SQLHSTMT statementhandle,
 					SQLCHAR *CatalogName,
 					SQLSMALLINT NameLength1,
@@ -4588,7 +4529,6 @@ SQLRETURN SQL_API SQLStatistics(SQLHSTMT statementhandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 					SQLCHAR *catalogname,
 					SQLSMALLINT namelength1,
@@ -4625,7 +4565,6 @@ static SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
 					SQLHANDLE handle,
 					SQLSMALLINT completiontype);
 
-DLLEXPORT
 SQLRETURN SQL_API SQLTransact(SQLHENV environmenthandle,
 					SQLHDBC connectionhandle,
 					SQLUSMALLINT completiontype) {
@@ -4644,7 +4583,6 @@ SQLRETURN SQL_API SQLTransact(SQLHENV environmenthandle,
 	}
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 					SQLHWND hwnd,
 					SQLCHAR *szconnstrin,
@@ -4741,7 +4679,6 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 	return retval;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLBulkOperations(SQLHSTMT statementhandle,
 					SQLSMALLINT Operation) {
 	debugFunction();
@@ -4758,7 +4695,6 @@ SQLRETURN SQL_API SQLBulkOperations(SQLHSTMT statementhandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLColAttributes(SQLHSTMT statementhandle,
 					SQLUSMALLINT icol,
 					SQLUSMALLINT fdesctype,
@@ -4776,7 +4712,6 @@ SQLRETURN SQL_API SQLColAttributes(SQLHSTMT statementhandle,
 					(NUMERICATTRIBUTETYPE)pfdesc);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLColumnPrivileges(SQLHSTMT statementhandle,
 					SQLCHAR *szCatalogName,
 					SQLSMALLINT cbCatalogName,
@@ -4800,7 +4735,6 @@ SQLRETURN SQL_API SQLColumnPrivileges(SQLHSTMT statementhandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLDescribeParam(SQLHSTMT statementhandle,
 					SQLUSMALLINT ipar,
 					SQLSMALLINT *pfSqlType,
@@ -4821,7 +4755,6 @@ SQLRETURN SQL_API SQLDescribeParam(SQLHSTMT statementhandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT statementhandle,
 					SQLUSMALLINT fetchorientation,
 					SQLLEN fetchoffset,
@@ -4831,7 +4764,6 @@ SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT statementhandle,
 	return SQLR_Fetch(statementhandle,NULL,NULL);
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLForeignKeys(SQLHSTMT statementhandle,
 					SQLCHAR *szPkCatalogName,
 					SQLSMALLINT cbPkCatalogName,
@@ -4859,14 +4791,12 @@ SQLRETURN SQL_API SQLForeignKeys(SQLHSTMT statementhandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLMoreResults(SQLHSTMT statementhandle) {
 	debugFunction();
 	// only supports fetching the first result set of a query
 	return SQL_NO_DATA_FOUND;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLNativeSql(SQLHDBC hdbc,
 					SQLCHAR *szSqlStrIn,
 					SQLINTEGER cbSqlStrIn,
@@ -4878,7 +4808,6 @@ SQLRETURN SQL_API SQLNativeSql(SQLHDBC hdbc,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLNumParams(SQLHSTMT statementhandle,
 					SQLSMALLINT *pcpar) {
 	debugFunction();
@@ -4899,7 +4828,6 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 					SQLPOINTER value,
 					SQLINTEGER stringlength);
 
-DLLEXPORT
 SQLRETURN SQL_API SQLParamOptions(SQLHSTMT statementhandle,
 					SQLULEN crow,
 					SQLULEN *pirow) {
@@ -4913,7 +4841,6 @@ SQLRETURN SQL_API SQLParamOptions(SQLHSTMT statementhandle,
 				SQL_SUCCESS:SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT statementhandle,
 					SQLCHAR *szCatalogName,
 					SQLSMALLINT cbCatalogName,
@@ -4935,7 +4862,6 @@ SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT statementhandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 					SQLCHAR *szCatalogName,
 					SQLSMALLINT cbCatalogName,
@@ -4959,7 +4885,6 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLProcedures(SQLHSTMT statementhandle,
 					SQLCHAR *szCatalogName,
 					SQLSMALLINT cbCatalogName,
@@ -4981,7 +4906,6 @@ SQLRETURN SQL_API SQLProcedures(SQLHSTMT statementhandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLSetPos(SQLHSTMT statementhandle,
 					SQLSETPOSIROW irow,
 					SQLUSMALLINT foption,
@@ -5000,7 +4924,6 @@ SQLRETURN SQL_API SQLSetPos(SQLHSTMT statementhandle,
 	return SQL_ERROR;
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLTablePrivileges(SQLHSTMT statementhandle,
 					SQLCHAR *szCatalogName,
 					SQLSMALLINT cbCatalogName,
@@ -5023,7 +4946,6 @@ SQLRETURN SQL_API SQLTablePrivileges(SQLHSTMT statementhandle,
 }
 
 #if (ODBCVER < 0x0300)
-DLLEXPORT
 SQLRETURN SQL_API SQLDrivers(SQLHENV environmenthandle,
 					SQLUSMALLINT fDirection,
 					SQLCHAR *szDriverDesc,
@@ -5587,7 +5509,6 @@ static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
 	}
 }
 
-DLLEXPORT
 SQLRETURN SQL_API SQLBindParameter(SQLHSTMT statementhandle,
 					SQLUSMALLINT parameternumber,
 					SQLSMALLINT inputoutputtype,
