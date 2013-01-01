@@ -31,7 +31,7 @@
  * documentation and/or software.
  */
 
-#include <stdint.h>
+#include <rudiments/private/inttypes.h>
 
 //---------------------------------------------------------------------- 
 //typedefs
