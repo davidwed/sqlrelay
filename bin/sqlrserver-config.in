@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# sqlrconnection-config provides various informations about the sqlrconnection
+# sqlrserver-config provides various informations about the sqlrserver
 # libraries.
 
 prefix=@prefix@
@@ -8,16 +8,16 @@ exec_prefix=@exec_prefix@
 version=@SQLR_VERSION@
 
 if ( test "@libdir@" = "/usr/lib" ); then
-	sqlrconnection_libs="-lsqlrconnection -lsqlrutil"
+	sqlrserver_libs="-lsqlrserver -lsqlrutil"
 else
-	sqlrconnection_libs="-L@libdir@ -lsqlrconnection -lsqlrutil"
+	sqlrserver_libs="-L@libdir@ -lsqlrserver -lsqlrutil"
 fi
-sqlrconnection_cflags="-I@includedir@"
+sqlrserver_cflags="-I@includedir@"
 
 usage()
 {
 	cat <<EOF
-Usage: sqlrconnection-config [OPTIONS]
+Usage: sqlrserver-config [OPTIONS]
 Options:
 	[--prefix]
 	[--exec-prefix]
@@ -70,10 +70,10 @@ if ( test "$echo_exec_prefix" = "yes" ); then
 fi
 
 if ( test "$echo_cflags" = "yes" ); then
-      echo $sqlrconnection_cflags
+      echo $sqlrserver_cflags
 fi
 
 if ( test "$echo_libs" = "yes" ); then
-      echo $sqlrconnection_libs
+      echo $sqlrserver_libs
 fi      
 
