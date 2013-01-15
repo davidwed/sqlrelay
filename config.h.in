@@ -292,6 +292,9 @@
 /* SQLite supports sqlite3_bind_int */
 #undef HAVE_SQLITE3_BIND_INT
 
+/* Some systems have SQLROWSETSIZE */
+#undef HAVE_SQLROWSETSIZE
+
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 
