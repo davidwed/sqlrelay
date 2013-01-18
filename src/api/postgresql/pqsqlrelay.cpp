@@ -446,7 +446,16 @@ PQnoticeProcessor PQsetNoticeProcessor(PGconn *conn,
 
 const char *PQparameterStatus(const PGconn *conn, const char *paramName) {
 	debugFunction();
-	// FIXME: Return sensible values for this func.
+	// psycopg2 needs these.  Ideally we'd return the correct values but
+	// for now, just return safe-ish values
+	if (!charstring::compare(paramName,"client_encoding")) {
+		return "UTF8";
+	} else if (!charstring::compare(paramName,"DateStyle")) {
+		// psycopg2 will run "SET DATETYPE TO 'ISO'" if this
+		// doesn't return ISO, which causes problems for
+		// non-postgresql databases
+		return "ISO";
+	}
 	return NULL;
 }
 
@@ -770,7 +779,7 @@ static Oid postgresqltypemap[]={
 	// "VARCHAR2"
 	1043,
 	// "NUMBER"
-	1022,
+	1700,
 	// "ROWID"
 	20,
 	// "RAW"
@@ -2294,6 +2303,12 @@ int PQsendSome(PGconn *conn) {
 	debugFunction();
 	// Have no idea what should be returned here
 	return 0;
+}
+
+int PQprotocolVersion(PGconn *conn) {
+	debugFunction();
+	// psycopg2 needs this to be 3
+	return 3;
 }
 
 }
