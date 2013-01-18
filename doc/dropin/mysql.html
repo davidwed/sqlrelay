@@ -38,12 +38,9 @@ MySQL versions 3.xx, 4.0, 4.1, 5.0 and 5.1.  MySQL's native data structures
 changed a bit between the different versions.  If you use the wrong library your
 program will most likely crash.</p>
 
-<p>You can find out which library your program uses by running the following
-command.</p>
+<p>You can find out which library is installed on your system  by running the following command.</p>
 
-<blockquote><pre><b>
-/usr/bin/mysql --version
-</b></pre></blockquote>
+<blockquote><pre><b>/usr/bin/mysql --version</b></pre></blockquote>
 
 <p>It should return something like the following:</p>
 
@@ -63,8 +60,8 @@ mysql  Ver 14.14 Distrib <b>5.1.60</b>, for redhat-linux-gnu (i386) using readli
 <li>5.1 or higher - libmysql51sqlrelay.so</li>
 </ul>
 
-<p>Once you've figured out which version of MySQL your program was compiled
-against, you can load the appropriate drop in library and run your program.</p>
+<p>Once you've figured out which version of MySQL is installed on your system,
+you can load the appropriate drop in library and run your program.</p>
 
 <p>The parameters that would ordinarily indicate which host, port, socket,
 username and password to use to connect to MySQL will be used as parameters to
@@ -106,6 +103,8 @@ will need to replace libmysql3sqlrelay.so with the appropriate library.</p>
 <p>Below is a sample session using the mysql command line client against an
 Oracle database through SQL Relay.</p>
 
+<p>(NOTE: As of version 5.5, the mysql command line client appears to have been statically linked, at least in some distributions.  As a result, the LD_PRELOAD trick doesn't work with it, but should still work with any program that is dynamically linked against libmysqlclient.)</p>
+
 <blockquote>
 <pre>
 Welcome <font color="#6b59ce">to</font> the MySQL monitor.  Commands <font color="#6b59ce">end</font> <font color="#6b59ce">with</font> ; <font color="#a52829"><b>or</b></font> \g.
@@ -138,8 +137,6 @@ mysql&gt; quit;
 
 </pre>
 </blockquote>
-
-<p>There is one caveat.  As of version 5.5, the mysql client program appears to have been statically linked against libmysqlclient, at least in some distributions.  As a result, the LD_PRELOAD trick doesn't work with it, but should still work with any program that is dynamically linked against libmysqlclient.</p>
 
 <br>
 <a name="daemons"></a>
