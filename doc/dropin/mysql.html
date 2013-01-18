@@ -39,42 +39,29 @@ changed a bit between the different versions.  If you use the wrong library your
 program will most likely crash.</p>
 
 <p>You can find out which library your program uses by running the following
-command.  In this example, the command checks the "mysql" program; the command
-line client that comes with the MySQL distribution.</p>
+command.</p>
 
 <blockquote><pre><b>
-ldd /usr/bin/mysql
+/usr/bin/mysql --version
 </b></pre></blockquote>
 
 <p>It should return something like the following:</p>
 
 <blockquote><pre>
-libreadline.so.4 =&gt; /usr/lib/libreadline.so.4 (0x00625000)
-libncurses.so.5 =&gt; /usr/lib/libncurses.so.5 (0x00976000)
-<b>libmysqlclient.so.10 =&gt; /usr/lib/mysql/libmysqlclient.so.10 (0x009b8000)</b>
-libz.so.1 =&gt; /usr/lib/libz.so.1 (0x00963000)
-libcrypt.so.1 =&gt; /lib/libcrypt.so.1 (0x003dc000)
-libnsl.so.1 =&gt; /lib/libnsl.so.1 (0x003c5000)
-libstdc++.so.5 =&gt; /usr/lib/libstdc++.so.5 (0x002ff000)
-libm.so.6 =&gt; /lib/tls/libm.so.6 (0x008ba000)
-libgcc_s.so.1 =&gt; /lib/libgcc_s.so.1 (0x003bb000)
-libc.so.6 =&gt; /lib/tls/libc.so.6 (0x0077f000)
-libgpm.so.1 =&gt; /usr/lib/libgpm.so.1 (0x006d1000)
-/lib/ld-linux.so.2 =&gt; /lib/ld-linux.so.2 (0x00767000)
+mysql  Ver 14.14 Distrib <b>5.1.60</b>, for redhat-linux-gnu (i386) using readline 5.1
 </pre></blockquote>
 
-<p>The line in bold above is the important line.</p>
+<p>The section in bold above is the important section.</p>
 
-<p>The 10 at the end of libmysqlclient.so.10 means MySQL protocol version 10.
-If your application links against version 10 or lower then you can use the
-MySQL 3.xx version of the drop-in library.  If it links against version 11 or
-12 then you need to use the MySQL 4.0 version of the drop-in library.  If it
-links against version 13 then you need to use the MySQL 4.1 version of the
-drop-in library.  If it links against version 14 then you may need to use the
-MySQL 4.1 or 5.0 version of the drop-in library.  MySQL 4.1 and 5.0 both use
-the same protocol version (so far) but there are differences in the data
-structures, so you'll have to figure out which version it uses some other
-way.</p>
+<p>Below is a chart mapping version numbers and which library to use:</p>
+
+<ul>
+<li>3.X - libmysql3sqlrelay.so</li>
+<li>4.0 - libmysql40sqlrelay.so</li>
+<li>4.1 - libmysql41sqlrelay.so</li>
+<li>5.0 - libmysql50sqlrelay.so</li>
+<li>5.1 or higher - libmysql51sqlrelay.so</li>
+</ul>
 
 <p>Once you've figured out which version of MySQL your program was compiled
 against, you can load the appropriate drop in library and run your program.</p>
@@ -114,18 +101,7 @@ that would normally be fulfilled by the native MySQL client library are
 fulfilled by the SQL Relay drop-in replacement library instead.</p>
 
 <p>If your application was compiled against a different version of MySQL, you
-will need to replace libmysql3sqlrelay.so with a different library.
-The following table indicates which library is required for each version of
-MySQL.</p>
-
-<table border="1">
-<tr><th>Version of MySQL</th><th>Library</th></tr>
-<tr><td align="center">3.x</td><td>libmysql3sqlrelay.so</td></tr>
-<tr><td align="center">4.0.x</td><td>libmysql40sqlrelay.so</td></tr>
-<tr><td align="center">4.1.x</td><td>libmysql41sqlrelay.so</td></tr>
-<tr><td align="center">5.0.x</td><td>libmysql50sqlrelay.so</td></tr>
-<tr><td align="center">5.1.x</td><td>libmysql51sqlrelay.so</td></tr>
-</table>
+will need to replace libmysql3sqlrelay.so with the appropriate library.</p>
 
 <p>Below is a sample session using the mysql command line client against an
 Oracle database through SQL Relay.</p>
@@ -162,6 +138,8 @@ mysql&gt; quit;
 
 </pre>
 </blockquote>
+
+<p>There is one caveat.  As of version 5.5, the mysql client program appears to have been statically linked against libmysqlclient, at least in some distributions.  As a result, the LD_PRELOAD trick doesn't work with it, but should still work with any program that is dynamically linked against libmysqlclient.</p>
 
 <br>
 <a name="daemons"></a>
