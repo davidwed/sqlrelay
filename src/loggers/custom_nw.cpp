@@ -1,6 +1,7 @@
 // Copyright (c) 2012  David Muse
 // See the file COPYING for more information
 
+#include <sqlrlistener.h>
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <sqlrlogger.h>
@@ -44,7 +45,7 @@ custom_nw::custom_nw(xmldomnode *parameters) : sqlrlogger(parameters) {
 bool custom_nw::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 	debugFunction();
 
-	cmdline	*cmdl=sqlrcon->cont->cmdl;
+	cmdline	*cmdl=(sqlrcon)?sqlrcon->cont->cmdl:sqlrl->cmdl;
 
 	// build up the query log name
 	size_t	querylognamelen;
