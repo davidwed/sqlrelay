@@ -459,6 +459,9 @@ class sqlwriter {
 		virtual bool	noWait(rudiments::xmldomnode *node,
 					rudiments::stringbuffer *output);
 
+		virtual bool	show(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
+
 
 
 		// helper methods

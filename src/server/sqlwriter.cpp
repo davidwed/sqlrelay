@@ -298,6 +298,9 @@ const char * const *sqlwriter::supportedElements() {
 		sqlparser::_mode,
 		sqlparser::_nowait,
 
+		// show...
+		sqlparser::_show,
+
 		NULL
 	};
 	return baseelements;
@@ -740,6 +743,8 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return mode(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_nowait)) {
 		return noWait(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_show)) {
+		return show(node,output);
 	}
 	return true;
 }
@@ -2109,5 +2114,12 @@ bool sqlwriter::mode(xmldomnode *node, stringbuffer *output) {
 bool sqlwriter::noWait(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("nowait");
+	return true;
+}
+
+bool sqlwriter::show(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("show ");
+	outputValue(node,output);
 	return true;
 }

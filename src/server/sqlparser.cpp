@@ -13,11 +13,19 @@ using namespace rudiments;
 
 sqlparser::sqlparser() {
 	tree=NULL;
+	foreigntree=false;
 	error=false;
 }
 
 sqlparser::~sqlparser() {
-	delete tree;
+	if (!foreigntree) {
+		delete tree;
+	}
+}
+
+void sqlparser::useTree(xmldom *tree) {
+	this->tree=tree;
+	foreigntree=(tree!=NULL);
 }
 
 xmldom *sqlparser::getTree() {
@@ -408,9 +416,11 @@ bool sqlparser::parseInternal(const char *query, bool useescapecharacters) {
 	error=false;
 
 	// create the tree
-	delete tree;
-	tree=new xmldom();
-	tree->createRootNode();
+	if (!foreigntree) {
+		delete tree;
+		tree=new xmldom();
+		tree->createRootNode();
+	}
 	xmldomnode	*currentnode=tree->getRootNode();
 
 	// parse the query
@@ -423,7 +433,8 @@ bool sqlparser::parseInternal(const char *query, bool useescapecharacters) {
 		!parseDelete(currentnode,ptr,&newptr) &&
 		!parseSelect(currentnode,ptr,&newptr) &&
 		!parseSet(currentnode,ptr,&newptr) &&
-		!parseLock(currentnode,ptr,&newptr)) {
+		!parseLock(currentnode,ptr,&newptr) &&
+		!parseShow(currentnode,ptr,&newptr)) {
 		debugPrintf("unrecognized query\n");
 		error=true;
 	}
@@ -5800,3 +5811,35 @@ bool sqlparser::noWaitClause(const char *ptr, const char **newptr) {
 }
 
 const char *sqlparser::_nowait="nowait";
+
+bool sqlparser::parseShow(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+
+	debugFunction();
+
+	// look for a show clause
+	if (!showClause(ptr,newptr)) {
+		return false;
+	}
+
+	// create the node
+	xmldomnode	*shownode=newNode(currentnode,_show);
+
+	// get the thing we're showing
+	char	*value=getWord(*newptr,newptr);
+	if (value) {
+		setAttribute(shownode,_value,value);
+		delete[] value;
+	}
+
+	parseRemainderVerbatim(shownode,*newptr,newptr);
+	return true;
+}
+
+bool sqlparser::showClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"show ");
+}
+
+const char *sqlparser::_show="show";

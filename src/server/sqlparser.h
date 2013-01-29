@@ -13,6 +13,7 @@ class sqlparser {
 			~sqlparser();
 
 		bool			parse(const char *query);
+		void			useTree(rudiments::xmldom *tree);
 		rudiments::xmldom	*getTree();
 		rudiments::xmldom	*detachTree();
 
@@ -1088,7 +1089,15 @@ class sqlparser {
 		bool	noWaitClause(const char *ptr, const char **newptr);
 		static const char	*_nowait;
 
+		// show query
+		bool	parseShow(rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	showClause(const char *ptr, const char **newptr);
+		static const char	*_show;
+
 		rudiments::xmldom	*tree;
+		bool			foreigntree;
 		bool			error;
 
 		bool	useescapecharacters;
