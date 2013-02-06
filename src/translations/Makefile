@@ -20,6 +20,7 @@ all: sqltranslation_doublequotestosinglequotes.la \
 	sqltranslation_matchestolike.la \
 	sqltranslation_oracleize.la \
 	sqltranslation_serialtoautoincrement.la \
+	sqltranslation_serialtoidentity.la \
 	sqltranslation_show.la
 
 clean:
@@ -52,6 +53,9 @@ sqltranslation_oracleize.la: oracleize.cpp oracleize.lo
 
 sqltranslation_serialtoautoincrement.la: serialtoautoincrement.cpp serialtoautoincrement.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ serialtoautoincrement.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+
+sqltranslation_serialtoidentity.la: serialtoidentity.cpp serialtoidentity.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ serialtoidentity.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_show.la: show.cpp show.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ show.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
@@ -94,6 +98,10 @@ install:
 	$(RM) $(libexecdir)/sqltranslation_serialtoautoincrement.a
 	$(RM) $(libexecdir)/sqltranslation_serialtoautoincrement.la
 	$(MODULERENAME) $(libexecdir)/sqltranslation_serialtoautoincrement.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqltranslation_serialtoidentity.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_serialtoidentity.a
+	$(RM) $(libexecdir)/sqltranslation_serialtoidentity.la
+	$(MODULERENAME) $(libexecdir)/sqltranslation_serialtoidentity.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_show.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_show.a
 	$(RM) $(libexecdir)/sqltranslation_show.la
