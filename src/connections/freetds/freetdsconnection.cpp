@@ -279,6 +279,8 @@ class freetdsconnection : public sqlrconnection_svr {
 
 		char		*dbversion;
 
+		bool		sybasedb;
+
 		static	stringbuffer	errorstring;
 		static	int64_t		errorcode;
 		static	bool		liveconnection;
@@ -314,6 +316,7 @@ freetdsconnection::freetdsconnection(sqlrcontroller_svr *cont) :
 	singlecursorrefcount=0;
 
 	dbversion=NULL;
+	sybasedb=true;
 }
 
 freetdsconnection::~freetdsconnection() {
@@ -582,89 +585,156 @@ const char *freetdsconnection::dbHostNameQuery() {
 }
 
 const char *freetdsconnection::getDatabaseListQuery(bool wild) {
-	return "select '' as db";
+	if (sybasedb) {
+		return "select '' as db";
+	} else {
+		return "select "
+			"	distinct catalog_name "
+			"from "
+			"	information_schema.schemata "
+			"order by "
+			"	catalog_name";
+	}
 }
 
 const char *freetdsconnection::getTableListQuery(bool wild) {
-	return (wild)?
-		"select "
-		"	name "
-		"from "
-		"	sysobjects "
-		"where "
-		"	loginame is not NULL "
-		"	and "
-		"	type in ('U','V') "
-		"	and "
-		"	name like '%s' "
-		"order by "
-		"	name":
-
-		"select "
-		"	name "
-		"from "
-		"	sysobjects "
-		"where "
-		"	loginame is not NULL "
-		"	and "
-		"	type in ('U','V') "
-		"order by "
-		"	name";
+	if (sybasedb) {
+		return (wild)?
+			"select "
+			"	name "
+			"from "
+			"	sysobjects "
+			"where "
+			"	loginame is not NULL "
+			"	and "
+			"	type in ('U','V') "
+			"	and "
+			"	name like '%s' "
+			"order by "
+			"	name":
+	
+			"select "
+			"	name "
+			"from "
+			"	sysobjects "
+			"where "
+			"	loginame is not NULL "
+			"	and "
+			"	type in ('U','V') "
+			"order by "
+			"	name";
+	} else {
+		return (wild)?
+			"select "
+			"	table_name "
+			"from "
+			"	information_schema.tables "
+			"where "
+			"	table_name like '%s' "
+			"order by "
+			"	table_name":
+	
+			"select "
+			"	table_name "
+			"from "
+			"	information_schema.tables "
+			"order by "
+			"	table_name";
+	}
 }
 
 const char *freetdsconnection::getColumnListQuery(bool wild) {
-	return (wild)?
-		"select "
-		"	syscolumns.name, "
-		"	systypes.name as type, "
-		"	syscolumns.length, "
-		"	syscolumns.prec, "
-		"	syscolumns.scale, "
-		"	(syscolumns.status&8)/8 as nullable, "
-		"	'' as primarykey, "
-		"	'' column_default, "
-		"	'' as extra "
-		"from "
-		"	sysobjects, "
-		"	syscolumns, "
-		"	systypes "
-		"where "
-		"	sysobjects.type in ('S','U','V') "
-		"	and "
-		"	sysobjects.name='%s' "
-		"	and "
-		"	syscolumns.id=sysobjects.id "
-		"	and "
-		"	syscolumns.name like '%s' "
-		"	and "
-		"	systypes.usertype=syscolumns.usertype "
-		"order by "
-		"	syscolumns.colid":
+	if (sybasedb) {
+		return (wild)?
+			"select "
+			"	syscolumns.name, "
+			"	systypes.name as type, "
+			"	syscolumns.length, "
+			"	syscolumns.prec, "
+			"	syscolumns.scale, "
+			"	(syscolumns.status&8)/8 as nullable, "
+			"	'' as primarykey, "
+			"	'' column_default, "
+			"	'' as extra "
+			"from "
+			"	sysobjects, "
+			"	syscolumns, "
+			"	systypes "
+			"where "
+			"	sysobjects.type in ('S','U','V') "
+			"	and "
+			"	sysobjects.name='%s' "
+			"	and "
+			"	syscolumns.id=sysobjects.id "
+			"	and "
+			"	syscolumns.name like '%s' "
+			"	and "
+			"	systypes.usertype=syscolumns.usertype "
+			"order by "
+			"	syscolumns.colid":
 
-		"select "
-		"	syscolumns.name, "
-		"	systypes.name as type, "
-		"	syscolumns.length, "
-		"	syscolumns.prec, "
-		"	syscolumns.scale, "
-		"	(syscolumns.status&8)/8 as nullable, "
-		"	'' as primarykey, "
-		"	'' column_default, "
-		"	'' as extra "
-		"from "
-		"	sysobjects, "
-		"	syscolumns, "
-		"	systypes "
-		"where "
-		"	sysobjects.type in ('S','U','V') "
-		"	and "
-		"	sysobjects.name='%s' "
-		"	and "
-		"	syscolumns.id=sysobjects.id "
-		"	and "
-		"	systypes.usertype=syscolumns.usertype "
-		"order by "
-		"	syscolumns.colid";
+			"select "
+			"	syscolumns.name, "
+			"	systypes.name as type, "
+			"	syscolumns.length, "
+			"	syscolumns.prec, "
+			"	syscolumns.scale, "
+			"	(syscolumns.status&8)/8 as nullable, "
+			"	'' as primarykey, "
+			"	'' column_default, "
+			"	'' as extra "
+			"from "
+			"	sysobjects, "
+			"	syscolumns, "
+			"	systypes "
+			"where "
+			"	sysobjects.type in ('S','U','V') "
+			"	and "
+			"	sysobjects.name='%s' "
+			"	and "
+			"	syscolumns.id=sysobjects.id "
+			"	and "
+			"	systypes.usertype=syscolumns.usertype "
+			"order by "
+			"	syscolumns.colid";
+	} else {
+		return (wild)?
+			"select "
+			"	column_name, "
+			"	data_type, "
+			"	character_maximum_length, "
+			"	numeric_precision, "
+			"	numeric_scale, "
+			"	is_nullable, "
+			"	'' as primarykey, "
+			"	column_default, "
+			"	'' as extra "
+			"from "
+			"	information_schema.columns "
+			"where "
+			"	table_name='%s' "
+			"	and "
+			"	column_name like '%s' "
+			"order by "
+			"	column_name":
+
+			"select "
+			"	column_name, "
+			"	data_type, "
+			"	character_maximum_length, "
+			"	numeric_precision, "
+			"	numeric_scale, "
+			"	is_nullable, "
+			"	'' as primarykey, "
+			"	column_default, "
+			"	'' as extra "
+			"from "
+			"	information_schema.columns "
+			"where "
+			"	table_name='%s' "
+			"order by "
+			"	column_name";
+	}
 }
 
 const char *freetdsconnection::selectDatabaseQuery() {
@@ -825,21 +895,56 @@ bool freetdscursor::open(uint16_t id) {
 	}
 
 	if (!freetdsconn->dbversion) {
+
+		bool	success=false;
+
+		// first try the sybase query
 		const char	*query="sp_version installmaster";
 		int32_t		len=charstring::length(query);
-		if (!(prepareQuery(query,len) &&
+		if (prepareQuery(query,len) &&
 				executeQuery(query,len) &&
-				fetchRow())) {
-			freetdsconn->dbversion=
-				charstring::duplicate("unknown");
-		} else {
+				fetchRow()) {
 			const char	*space=
 				charstring::findFirst(data[1][0],' ');
 			freetdsconn->dbversion=
 				charstring::duplicate(data[1][0],
 							space-data[1][0]);
+			success=true;
 		}
 		cleanUpData();
+		if (success) {
+			return retval;
+		}
+
+		// if that fails, try the sql server query
+		query="select @@version";
+		len=charstring::length(query);
+		if (prepareQuery(query,len) &&
+				executeQuery(query,len) &&
+				fetchRow()) {
+			// parse out the version
+			freetdsconn->sybasedb=false;
+			const char	*dash=
+				charstring::findFirst(data[0][0]," - ");
+			if (dash) {
+				dash=dash+3;
+				const char	*space=
+					charstring::findFirst(dash,' ');
+				if (space) {
+					freetdsconn->dbversion=
+						charstring::duplicate(
+							dash,space-dash);
+					success=true;
+				}
+			}
+		}
+		cleanUpData();
+		if (success) {
+			return retval;
+		}
+
+		// hmm, it would appear that neither worked
+		freetdsconn->dbversion=charstring::duplicate("unknown");
 	}
 	return retval;
 }
