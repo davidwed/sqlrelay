@@ -148,6 +148,8 @@ class sqlwriter {
 					rudiments::stringbuffer *output);
 		virtual bool	autoIncrement(rudiments::xmldomnode *node,
 					rudiments::stringbuffer *output);
+		virtual bool	identity(rudiments::xmldomnode *node,
+					rudiments::stringbuffer *output);
 		virtual bool	uniqueKey(rudiments::xmldomnode *node,
 					rudiments::stringbuffer *output);
 		virtual bool	primaryKey(rudiments::xmldomnode *node,

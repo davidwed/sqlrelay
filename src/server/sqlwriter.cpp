@@ -148,6 +148,7 @@ const char * const *sqlwriter::supportedElements() {
 		sqlparser::_not_null,
 		sqlparser::_default,
 		sqlparser::_auto_increment,
+		sqlparser::_identity,
 		sqlparser::_unique_key,
 		sqlparser::_primary_key,
 		sqlparser::_key,
@@ -448,6 +449,8 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 		return defaultValue(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_auto_increment)) {
 		return autoIncrement(node,output);
+	} else if (!charstring::compare(nodename,sqlparser::_identity)) {
+		return identity(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_unique_key)) {
 		return uniqueKey(node,output);
 	} else if (!charstring::compare(nodename,sqlparser::_primary_key)) {
@@ -1006,6 +1009,12 @@ bool sqlwriter::defaultValue(xmldomnode *node, stringbuffer *output) {
 bool sqlwriter::autoIncrement(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("auto_increment");
+	return true;
+}
+
+bool sqlwriter::identity(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append("identity");
 	return true;
 }
 

@@ -13,6 +13,7 @@ LIBS = -L$(top_builddir)/src/server -lsqlrserver -L$(top_builddir)/src/util -lsq
 
 all: sqltranslation_doublequotestosinglequotes.la \
 	sqltranslation_informixtooracledate.la \
+	sqltranslation_informixtomssqldate.la \
 	sqltranslation_locksnowaitbydefault.la \
 	sqltranslation_temptablesaddmissingcolumns.la \
 	sqltranslation_temptableslocalize.la \
@@ -32,6 +33,9 @@ sqltranslation_doublequotestosinglequotes.la: doublequotestosinglequotes.cpp dou
 
 sqltranslation_informixtooracledate.la: informixtooracledate.cpp informixtooracledate.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ informixtooracledate.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+
+sqltranslation_informixtomssqldate.la: informixtomssqldate.cpp informixtomssqldate.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ informixtomssqldate.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_locksnowaitbydefault.la: locksnowaitbydefault.cpp locksnowaitbydefault.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ locksnowaitbydefault.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
@@ -70,6 +74,10 @@ install:
 	$(RM) $(libexecdir)/sqltranslation_informixtooracledate.a
 	$(RM) $(libexecdir)/sqltranslation_informixtooracledate.la
 	$(MODULERENAME) $(libexecdir)/sqltranslation_informixtooracledate.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqltranslation_informixtomssqldate.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_informixtomssqldate.a
+	$(RM) $(libexecdir)/sqltranslation_informixtomssqldate.la
+	$(MODULERENAME) $(libexecdir)/sqltranslation_informixtomssqldate.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_locksnowaitbydefault.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_locksnowaitbydefault.a
 	$(RM) $(libexecdir)/sqltranslation_locksnowaitbydefault.la

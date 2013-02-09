@@ -252,6 +252,12 @@ class sqlparser {
 		bool	autoIncrementClause(const char *ptr,
 						const char **newptr);
 		static const char	*_auto_increment;
+		bool	parseIdentity(rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
+		bool	identityClause(const char *ptr,
+						const char **newptr);
+		static const char	*_identity;
 		bool	parseUniqueKey(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);

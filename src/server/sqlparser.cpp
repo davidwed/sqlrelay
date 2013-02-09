@@ -1278,6 +1278,24 @@ bool sqlparser::autoIncrementClause(const char *ptr, const char **newptr) {
 
 const char *sqlparser::_auto_increment="auto_increment";
 
+bool sqlparser::parseIdentity(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
+	debugFunction();
+	if (!identityClause(ptr,newptr)) {
+		return false;
+	}
+	newNode(currentnode,_identity);
+	return true;
+}
+
+bool sqlparser::identityClause(const char *ptr, const char **newptr) {
+	debugFunction();
+	return comparePart(ptr,newptr,"identity");
+}
+
+const char *sqlparser::_identity="identity";
+
 bool sqlparser::parseUniqueKey(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
