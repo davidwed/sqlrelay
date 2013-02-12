@@ -109,7 +109,6 @@ bool createtableautoincrementoracle::run(sqlrconnection_svr *sqlrcon,
 		createSequenceAndTrigger(sqlrcon,sqlrcur,
 					database,schema,table,columnname);
 	}
-
 	return true;
 }
 

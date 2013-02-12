@@ -440,10 +440,6 @@ bool sqlparser::parseInternal(const char *query, bool useescapecharacters) {
 	}
 	delete[] ptr;
 
-	printf("parse %susing escape characters %s\n\n",
-				(useescapecharacters)?"":"without ",
-				(error)?"failed":"succeeded");
-
 	// return result
 	return !error;
 }

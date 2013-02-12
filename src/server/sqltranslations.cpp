@@ -337,12 +337,16 @@ bool sqltranslations::removeReplacementTable(const char *database,
 
 	// remove any indices that depend on the table
 	for (dictionarylistnode< databaseobject *, char * > *node=
-					tempindexmap.getList()->getFirstNode();
-		node;
-		node=(dictionarylistnode< databaseobject *, char *> *)
-							node->getNext()) {
+				tempindexmap.getList()->getFirstNode(); node;) {
 
 		databaseobject	*dbo=node->getData()->getKey();
+
+		// make sure to move on to the next node here rather than
+		// after calling removeData, otherwise it could cause a
+		// reference-after-free condition
+		node=(dictionarylistnode< databaseobject *, char *> *)
+							node->getNext();
+
 		if (!charstring::compare(dbo->database,database) &&
 			!charstring::compare(dbo->schema,schema) &&
 			!charstring::compare(dbo->dependency,table)) {

@@ -98,6 +98,7 @@ bool droptableautoincrementoracle::run(sqlrconnection_svr *sqlrcon,
 		// drop the sequences
 		dropSequences(sqlrcon,sqlrcur,database,schema,table);
 	}
+
 	return true;
 }
 

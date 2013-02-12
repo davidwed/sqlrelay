@@ -2611,7 +2611,9 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 			cursor->lastrowvalid=false;
 
 			// return the result set
-			return returnResultSetData(cursor,false);
+			//return returnResultSetData(cursor,false);
+			bool	retval=returnResultSetData(cursor,false);
+			return retval;
 
 		} else {
 
@@ -3590,7 +3592,6 @@ bool sqlrcontroller_svr::processQuery(sqlrcursor_svr *cursor,
 		logDebugMessage("processing query failed");
 	}
 	logDebugMessage("done processing query");
-
 
 	return success;
 }
@@ -5474,8 +5475,8 @@ void sqlrcontroller_svr::endSession() {
 	// with oracle, it may be necessary to log out and log back in to
 	// drop a temp table.  With each log-out the session end queries
 	// are run and with each log-in the session start queries are run.)
-	truncateTempTables(cur[0],&sessiontemptablesfortrunc);
-	dropTempTables(cur[0],&sessiontemptablesfordrop);
+	truncateTempTables(cur[0]);
+	dropTempTables(cur[0]);
 
 	sessionEndQueries();
 
@@ -5537,27 +5538,26 @@ void sqlrcontroller_svr::endSession() {
 	logDebugMessage("done ending session");
 }
 
-void sqlrcontroller_svr::dropTempTables(sqlrcursor_svr *cursor,
-					stringlist *tablelist) {
+void sqlrcontroller_svr::dropTempTables(sqlrcursor_svr *cursor) {
 
 	// some databases require us to re-login before dropping temp tables
-	if (tablelist==&sessiontemptablesfordrop &&
-			tablelist->getLength() &&
+	if (sessiontemptablesfordrop.getLength() &&
 			conn->tempTableDropReLogIn()) {
 		reLogIn();
 	}
 
 	// run through the temp table list, dropping tables
-	for (stringlistnode *sln=tablelist->getFirstNode();
-			sln; sln=(stringlistnode *)sln->getNext()) {
+	for (stringlistnode *sln=sessiontemptablesfordrop.getFirstNode();
+				sln; sln=(stringlistnode *)sln->getNext()) {
 		dropTempTable(cursor,sln->getData());
 		delete[] sln->getData();
 	}
-	tablelist->clear();
+	sessiontemptablesfordrop.clear();
 }
 
 void sqlrcontroller_svr::dropTempTable(sqlrcursor_svr *cursor,
 					const char *tablename) {
+
 	stringbuffer	dropquery;
 	dropquery.append("drop table ");
 	dropquery.append(conn->tempTableDropPrefix());
@@ -5571,6 +5571,14 @@ void sqlrcontroller_svr::dropTempTable(sqlrcursor_svr *cursor,
 			sqltr->runBeforeTriggers(conn,cursor,sqlp->getTree());
 		}
 	}
+
+	// kind of a kluge...
+	// The cursor might already have a querytree associated with it and
+	// if it does then executeQuery below might cause some triggers to
+	// be run on that tree rather than on the tree for the drop query
+	// we intend to run.
+	delete cursor->querytree;
+	cursor->querytree=NULL;
 
 	if (cursor->prepareQuery(dropquery.getString(),
 					dropquery.getStringLength())) {
@@ -5587,16 +5595,15 @@ void sqlrcontroller_svr::dropTempTable(sqlrcursor_svr *cursor,
 	}
 }
 
-void sqlrcontroller_svr::truncateTempTables(sqlrcursor_svr *cursor,
-						stringlist *tablelist) {
+void sqlrcontroller_svr::truncateTempTables(sqlrcursor_svr *cursor) {
 
-	// run through the temp table list, truncateing tables
-	for (stringlistnode *sln=tablelist->getFirstNode();
-			sln; sln=(stringlistnode *)sln->getNext()) {
+	// run through the temp table list, truncating tables
+	for (stringlistnode *sln=sessiontemptablesfortrunc.getFirstNode();
+				sln; sln=(stringlistnode *)sln->getNext()) {
 		truncateTempTable(cursor,sln->getData());
 		delete[] sln->getData();
 	}
-	tablelist->clear();
+	sessiontemptablesfortrunc.clear();
 }
 
 void sqlrcontroller_svr::truncateTempTable(sqlrcursor_svr *cursor,

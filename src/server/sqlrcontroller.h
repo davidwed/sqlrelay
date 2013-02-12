@@ -290,12 +290,10 @@ class sqlrcontroller_svr : public rudiments::daemonprocess,
 		void	returnError(bool disconnect);
 		void	returnError(sqlrcursor_svr *cursor, bool disconnect);
 
-		void	dropTempTables(sqlrcursor_svr *cursor,
-						stringlist *tablelist);
+		void	dropTempTables(sqlrcursor_svr *cursor);
 		void	dropTempTable(sqlrcursor_svr *cursor,
 						const char *tablename);
-		void	truncateTempTables(sqlrcursor_svr *cursor,
-						stringlist *tablelist);
+		void	truncateTempTables(sqlrcursor_svr *cursor);
 		void	truncateTempTable(sqlrcursor_svr *cursor,
 						const char *tablename);
 
