@@ -35,14 +35,14 @@ bool lockssqlserverize::run(sqlrconnection_svr *sqlrcon,
 	xmldomnode	*locknode=query->getFirstTagChild(
 						sqlparser::_lock);
 	if (locknode->isNullNode()) {
-		return false;
+		return true;
 	}
 
 	// table
 	xmldomnode	*tablenode=locknode->getFirstTagChild(
 						sqlparser::_table);
 	if (tablenode->isNullNode()) {
-		return false;
+		return true;
 	}
 
 	// table name
@@ -56,7 +56,7 @@ bool lockssqlserverize::run(sqlrconnection_svr *sqlrcon,
 				tablenode->getFirstTagChild(
 					sqlparser::_table_name_table);
 	if (tablenametablenode->isNullNode()) {
-		return false;
+		return true;
 	}
 	const char	*tablenamedb=
 			tablenamedbnode->getAttributeValue("value");
@@ -65,34 +65,34 @@ bool lockssqlserverize::run(sqlrconnection_svr *sqlrcon,
 	const char	*tablenametable=
 			tablenametablenode->getAttributeValue("value");
 	if (!charstring::length(tablenametable)) {
-		return false;
+		return true;
 	}
 
 	// in
 	xmldomnode	*innode=tablenametablenode->getNextTagSibling(
 							sqlparser::_in_mode);
 	if (innode->isNullNode()) {
-		return false;
+		return true;
 	}
 
 	// lock mode
 	xmldomnode	*lockmodenode=tablenode->getNextTagSibling(
 						sqlparser::_lock_mode);
 	if (lockmodenode->isNullNode()) {
-		return false;
+		return true;
 	}
 	const char	*value=lockmodenode->getAttributeValue("value");
 	bool	exclusive=!charstring::compareIgnoringCase(value,"exclusive");
 	bool	share=!charstring::compareIgnoringCase(value,"share");
 	if (!exclusive && !share) {
-		return false;
+		return true;
 	}
 
 	// mode
 	xmldomnode	*modenode=tablenode->getNextTagSibling(
 						sqlparser::_mode);
 	if (modenode->isNullNode()) {
-		return false;
+		return true;
 	}
 
 	// build a new query using tablockx for exclusive and tablock for share

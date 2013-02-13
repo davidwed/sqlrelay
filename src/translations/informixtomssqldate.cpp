@@ -166,16 +166,22 @@ bool informixtomssqldate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldomnode *node) {
 
-	// "function" -> systimestamp
+	// "function" -> sysdatetime()
 	// or
 	// "function" interval_qualifier ->
-	// 	to_date(to_char(systimestamp, format_string), format_string)
+	// 	to_date(to_char(sysdatetime, format_string), format_string)
 	// ...
 
 	debugFunction();
 
-	// translate the current-date function to systimestamp
-	node->setAttributeValue(sqlparser::_value,"systimestamp");
+	// translate the current-date function to sysdatetime
+	node->setAttributeValue(sqlparser::_value,"sysdatetime");
+
+	// add an empty parameter set
+	node->appendChild(new xmldomnode(node->getTree(),
+					node->getNullNode(),
+					TAG_XMLDOMNODETYPE,
+					sqlparser::_parameters,NULL));
 
 	// get the interval qualifier node, if there is one...
 	xmldomnode	*nextnode=node->getNextTagSibling();
@@ -185,7 +191,7 @@ bool informixtomssqldate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 		return true;
 	}
 
-	// translate the interval qualifier to a string format...
+	// translate the interval qualifier to a format string...
 	stringbuffer	formatstring;
 	bool		containsfraction;
 	translateIntervalQualifier(&formatstring,nextnode,&containsfraction);

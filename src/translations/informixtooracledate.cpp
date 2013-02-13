@@ -136,7 +136,7 @@ bool informixtooracledate::translateExtend(sqlrconnection_svr *sqlrcon,
 		return true;
 	}
 
-	// translate the interval qualifier to a string format...
+	// translate the interval qualifier to a format string...
 	stringbuffer	formatstring;
 	bool		containsfraction;
 	translateIntervalQualifier(&formatstring,iqnode,&containsfraction);
@@ -185,7 +185,7 @@ bool informixtooracledate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 		return true;
 	}
 
-	// translate the interval qualifier to a string format...
+	// translate the interval qualifier to a format string...
 	stringbuffer	formatstring;
 	bool		containsfraction;
 	translateIntervalQualifier(&formatstring,nextnode,&containsfraction);
@@ -255,7 +255,7 @@ bool informixtooracledate::translateDateTime(sqlrconnection_svr *sqlrcon,
 	stringliteralnode->setAttributeValue(sqlparser::_value,
 						newdatetimeparam.getString());
 
-	// translate the interval qualifier to a string format...
+	// translate the interval qualifier to a format string...
 	stringbuffer	formatstring;
 	bool		containsfraction;
 	translateIntervalQualifier(&formatstring,iqnode,&containsfraction);
