@@ -15,6 +15,7 @@ all: sqltranslation_doublequotestosinglequotes.la \
 	sqltranslation_informixtooracledate.la \
 	sqltranslation_informixtomssqldate.la \
 	sqltranslation_locksnowaitbydefault.la \
+	sqltranslation_lockssqlserverize.la \
 	sqltranslation_temptablesaddmissingcolumns.la \
 	sqltranslation_temptableslocalize.la \
 	sqltranslation_temptablessybaseize.la \
@@ -40,6 +41,9 @@ sqltranslation_informixtomssqldate.la: informixtomssqldate.cpp informixtomssqlda
 
 sqltranslation_locksnowaitbydefault.la: locksnowaitbydefault.cpp locksnowaitbydefault.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ locksnowaitbydefault.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+
+sqltranslation_lockssqlserverize.la: lockssqlserverize.cpp lockssqlserverize.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ lockssqlserverize.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_temptablesaddmissingcolumns.la: temptablesaddmissingcolumns.cpp temptablesaddmissingcolumns.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ temptablesaddmissingcolumns.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
@@ -86,6 +90,10 @@ install:
 	$(RM) $(libexecdir)/sqltranslation_locksnowaitbydefault.a
 	$(RM) $(libexecdir)/sqltranslation_locksnowaitbydefault.la
 	$(MODULERENAME) $(libexecdir)/sqltranslation_locksnowaitbydefault.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqltranslation_lockssqlserverize.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_lockssqlserverize.a
+	$(RM) $(libexecdir)/sqltranslation_lockssqlserverize.la
+	$(MODULERENAME) $(libexecdir)/sqltranslation_lockssqlserverize.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_temptablesaddmissingcolumns.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_temptablesaddmissingcolumns.a
 	$(RM) $(libexecdir)/sqltranslation_temptablesaddmissingcolumns.la
