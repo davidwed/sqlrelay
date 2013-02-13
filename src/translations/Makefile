@@ -17,6 +17,7 @@ all: sqltranslation_doublequotestosinglequotes.la \
 	sqltranslation_locksnowaitbydefault.la \
 	sqltranslation_temptablesaddmissingcolumns.la \
 	sqltranslation_temptableslocalize.la \
+	sqltranslation_temptablessybaseize.la \
 	sqltranslation_translatedatetimes.la \
 	sqltranslation_matchestolike.la \
 	sqltranslation_oracleize.la \
@@ -45,6 +46,9 @@ sqltranslation_temptablesaddmissingcolumns.la: temptablesaddmissingcolumns.cpp t
 
 sqltranslation_temptableslocalize.la: temptableslocalize.cpp temptableslocalize.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ temptableslocalize.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+
+sqltranslation_temptablessybaseize.la: temptablessybaseize.cpp temptablessybaseize.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ temptablessybaseize.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_translatedatetimes.la: translatedatetimes.cpp translatedatetimes.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ translatedatetimes.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
@@ -90,6 +94,10 @@ install:
 	$(RM) $(libexecdir)/sqltranslation_temptableslocalize.a
 	$(RM) $(libexecdir)/sqltranslation_temptableslocalize.la
 	$(MODULERENAME) $(libexecdir)/sqltranslation_temptableslocalize.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqltranslation_temptablessybaseize.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_temptablessybaseize.a
+	$(RM) $(libexecdir)/sqltranslation_temptablessybaseize.la
+	$(MODULERENAME) $(libexecdir)/sqltranslation_temptablessybaseize.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_translatedatetimes.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.a
 	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.la
