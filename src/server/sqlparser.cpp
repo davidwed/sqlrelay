@@ -2948,6 +2948,7 @@ bool sqlparser::parseSelect(xmldomnode *currentnode,
 
 		// look for a select clause
 		if (!selectClause(*newptr,newptr)) {
+printf("no select clause\n");
 			return false;
 		}
 
@@ -2993,6 +2994,15 @@ bool sqlparser::parseSelect(xmldomnode *currentnode,
 
 			// there should be a comma after each expression
 			if (!first) {
+
+				// well, actually...
+				// check for the end of the query, some db's
+				// allow selects without a from clause
+				if (!**newptr) {
+					return true;
+				}
+
+				// check for the comma
 				if (!comma(*newptr,newptr)) {
 					debugPrintf("missing comma\n");
 					error=true;
@@ -3018,8 +3028,9 @@ bool sqlparser::parseSelect(xmldomnode *currentnode,
 				continue;
 			}
 
-			// if we got here then there was no from clause
-			debugPrintf("missing from clause\n");
+			// if we got here then there was something weird where
+			// we'd expect a from clause 
+			debugPrintf("something weird instead of from clause\n");
 			error=true;
 			return false;
 		}
