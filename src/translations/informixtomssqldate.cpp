@@ -5,6 +5,7 @@
 #include <sqlrcursor.h>
 #include <sqlparser.h>
 #include <sqltranslation.h>
+#include <rudiments/datetime.h>
 #include <debugprint.h>
 
 #ifdef RUDIMENTS_NAMESPACE
@@ -396,8 +397,33 @@ void informixtomssqldate::translateDateTimeString(
 		return;
 	}
 
+	// get the current date/time, we might need it
+	datetime	dt;
+	dt.getSystemDateAndTime();
+
 	// start building the string, it needs to be quoted
-	outdtstring->append('\'')->append(indtstring);
+	outdtstring->append('\'');
+
+	// if we started with the month or day then
+	// prepend the current year or month
+	if (start==TIMEPARTS_MONTH) {
+		outdtstring->append(dt.getYear())->append('-');
+	} else if (start==TIMEPARTS_DAY) {
+		outdtstring->append(dt.getYear())->append('-');
+		outdtstring->append(dt.getMonth())->append('-');
+	} else if (start==TIMEPARTS_MINUTE) {
+		outdtstring->append(dt.getHour())->append(':');
+	} else if (start==TIMEPARTS_SECOND) {
+		outdtstring->append(dt.getHour())->append(':');
+		outdtstring->append(dt.getMinutes())->append(':');
+	} else if (start==TIMEPARTS_FRACTION) {
+		outdtstring->append(dt.getHour())->append(':');
+		outdtstring->append(dt.getMinutes())->append(':');
+		outdtstring->append(dt.getSeconds())->append('.');
+	}
+
+	// append the string that was passed in
+	outdtstring->append(indtstring);
 
 	// figure out what kind of date format we've got
 	// FIXME: presumably it starts with either a year or hour, but that's
@@ -478,13 +504,12 @@ void informixtomssqldate::translateIntervalQualifier(
 		return;
 	}
 
-	// anything starting with a year uses format 21 or 20
-	// anything starting with an hour uses format 14
-	// FIXME: I'm not sure what to do with anything else
-	if (start==TIMEPARTS_YEAR) {
-		formatstring->append((end==TIMEPARTS_FRACTION)?"21":"20");
-	} else if (start==TIMEPARTS_HOUR) {
+	// anything starting with an hour (or smaller) uses format 14
+	// anything else uses format 21 or 20
+	if (start>=TIMEPARTS_HOUR) {
 		formatstring->append("14");
+	} else {
+		formatstring->append((end==TIMEPARTS_FRACTION)?"21":"20");
 	}
 }
 
