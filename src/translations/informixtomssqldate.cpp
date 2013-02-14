@@ -12,6 +12,28 @@
 using namespace rudiments;
 #endif
 
+enum timeparts_t {
+	TIMEPARTS_YEAR=0,
+	TIMEPARTS_MONTH,
+	TIMEPARTS_DAY,
+	TIMEPARTS_HOUR,
+	TIMEPARTS_MINUTE,
+	TIMEPARTS_SECOND,
+	TIMEPARTS_FRACTION,
+	TIMEPARTS_NULL
+};
+
+static const char *timeparts[]={
+	"year",
+	"month",
+	"day",
+	"hour",
+	"minute",
+	"second",
+	"fraction",
+	NULL
+};
+
 class informixtomssqldate : public sqltranslation {
 	public:
 			informixtomssqldate(sqltranslations *sqlts,
@@ -26,6 +48,15 @@ class informixtomssqldate : public sqltranslation {
 		bool	translateExtend(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldomnode *node);
+		void	evaluateIntervalQualifier(timeparts_t start,
+						timeparts_t end,
+						uint16_t *substringstart,
+						uint16_t *substringend,
+						const char **prepend,
+						const char **append);
+		void	tweakDateString(xmldomnode *functionnode,
+						const char *prepend,
+						const char *append);
 		bool	translateCurrentDate(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldomnode *node);
@@ -102,28 +133,6 @@ bool informixtomssqldate::translateFunctions(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-enum timeparts_t {
-	TIMEPARTS_YEAR=0,
-	TIMEPARTS_MONTH,
-	TIMEPARTS_DAY,
-	TIMEPARTS_HOUR,
-	TIMEPARTS_MINUTE,
-	TIMEPARTS_SECOND,
-	TIMEPARTS_FRACTION,
-	TIMEPARTS_NULL
-};
-
-static const char *timeparts[]={
-	"year",
-	"month",
-	"day",
-	"hour",
-	"minute",
-	"second",
-	"fraction",
-	NULL
-};
-
 bool informixtomssqldate::translateExtend(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldomnode *node) {
@@ -174,20 +183,20 @@ bool informixtomssqldate::translateExtend(sqlrconnection_svr *sqlrcon,
 		return true;
 	}
 
-	// get the interval qualifier end index
-	const char	*endstr=iqnode->getAttributeValue(sqlparser::_to);
-	timeparts_t	end=TIMEPARTS_YEAR;
-	while (end!=TIMEPARTS_NULL &&
-		charstring::compareIgnoringCase(endstr,timeparts[end])) {
-		end=(timeparts_t)((uint16_t)end+1);
-	}
-
 	// get the interval qualifier start index
 	const char	*startstr=iqnode->getAttributeValue(sqlparser::_from);
 	timeparts_t	start=TIMEPARTS_YEAR;
 	while (start!=TIMEPARTS_NULL &&
 		charstring::compareIgnoringCase(startstr,timeparts[start])) {
 		start=(timeparts_t)((uint16_t)start+1);
+	}
+
+	// get the interval qualifier end index
+	const char	*endstr=iqnode->getAttributeValue(sqlparser::_to);
+	timeparts_t	end=TIMEPARTS_YEAR;
+	while (end!=TIMEPARTS_NULL &&
+		charstring::compareIgnoringCase(endstr,timeparts[end])) {
+		end=(timeparts_t)((uint16_t)end+1);
 	}
 
 	// validate start and end
@@ -220,63 +229,13 @@ bool informixtomssqldate::translateExtend(sqlrconnection_svr *sqlrcon,
 	// we have to truncate the date/time based on the
 	// start and end index so wrap everything in a substring call
 	uint16_t	substringstart=0;
-	const char	*prepend=NULL;
-	switch (start) {
-		case TIMEPARTS_YEAR:
-			substringstart=0;
-			break;
-		case TIMEPARTS_MONTH:
-			substringstart=6;
-			prepend="'1900-'";
-			break;
-		case TIMEPARTS_DAY:
-			substringstart=9;
-			prepend="'1900-01-'";
-			break;
-		case TIMEPARTS_HOUR:
-			substringstart=12;
-			break;
-		case TIMEPARTS_MINUTE:
-			substringstart=15;
-			prepend="'00:'";
-			break;
-		case TIMEPARTS_SECOND:
-			substringstart=18;
-			prepend="'00:00:'";
-			break;
-		default:
-			substringstart=21;
-			prepend="'00:00:00.'";
-			break;
-	}
 	uint16_t	substringend=0;
-	bool		appendday=false;
-	bool		appendminute=false;
-	switch (end) {
-		case TIMEPARTS_YEAR:
-			substringend=5;
-			break;
-		case TIMEPARTS_MONTH:
-			substringend=8;
-			appendday=true;
-			break;
-		case TIMEPARTS_DAY:
-			substringend=11;
-			break;
-		case TIMEPARTS_HOUR:
-			substringend=14;
-			appendminute=true;
-			break;
-		case TIMEPARTS_MINUTE:
-			substringend=17;
-			break;
-		case TIMEPARTS_SECOND:
-			substringend=20;
-			break;
-		default:
-			substringend=24;
-			break;
-	}
+	const char	*prepend=NULL;
+	const char	*append=NULL;
+	evaluateIntervalQualifier(start,end,
+				&substringstart,
+				&substringend,
+				&prepend,&append);
 	functionnode=wrapSubstring(functionnode,
 				substringstart,substringend-substringstart);
 
@@ -287,6 +246,75 @@ bool informixtomssqldate::translateExtend(sqlrconnection_svr *sqlrcon,
 	// missing leading parts or trailing days or minutes, so go back and
 	// tweak those here.
 	// (don't move this above the wrapConvert() or it will cause problems)
+	tweakDateString(functionnode,prepend,append);
+
+	return true;
+}
+
+void informixtomssqldate::evaluateIntervalQualifier(timeparts_t start,
+						timeparts_t end,
+						uint16_t *substringstart,
+						uint16_t *substringend,
+						const char **prepend,
+						const char **append) {
+	switch (start) {
+		case TIMEPARTS_YEAR:
+			*substringstart=0;
+			break;
+		case TIMEPARTS_MONTH:
+			*substringstart=6;
+			*prepend="'1900-'";
+			break;
+		case TIMEPARTS_DAY:
+			*substringstart=9;
+			*prepend="'1900-01-'";
+			break;
+		case TIMEPARTS_HOUR:
+			*substringstart=12;
+			break;
+		case TIMEPARTS_MINUTE:
+			*substringstart=15;
+			*prepend="'00:'";
+			break;
+		case TIMEPARTS_SECOND:
+			*substringstart=18;
+			*prepend="'00:00:'";
+			break;
+		default:
+			*substringstart=21;
+			*prepend="'00:00:00.'";
+			break;
+	}
+	switch (end) {
+		case TIMEPARTS_YEAR:
+			*substringend=5;
+			break;
+		case TIMEPARTS_MONTH:
+			*substringend=8;
+			*append="'-01'";
+			break;
+		case TIMEPARTS_DAY:
+			*substringend=11;
+			break;
+		case TIMEPARTS_HOUR:
+			*substringend=14;
+			*append="':00'";
+			break;
+		case TIMEPARTS_MINUTE:
+			*substringend=17;
+			break;
+		case TIMEPARTS_SECOND:
+			*substringend=20;
+			break;
+		default:
+			*substringend=24;
+			break;
+	}
+}
+
+void informixtomssqldate::tweakDateString(xmldomnode *functionnode,
+						const char *prepend,
+						const char *append) {
 	if (prepend) {
 		xmldomnode	*prependliteral=
 			sqlts->newNodeBefore(functionnode->getParent(),
@@ -294,26 +322,19 @@ bool informixtomssqldate::translateExtend(sqlrconnection_svr *sqlrcon,
 						sqlparser::_string_literal,
 						prepend);
 		sqlts->newNodeAfter(functionnode->getParent(),
-					prependliteral,sqlparser::_plus);
+						prependliteral,
+						sqlparser::_plus);
 	}
-	if (appendday) {
+	if (append) {
 		xmldomnode	*plus=
 			sqlts->newNodeAfter(functionnode->getParent(),
-					functionnode,sqlparser::_plus);
-		sqlts->newNodeAfter(functionnode->getParent(),plus,
-					sqlparser::_string_literal,"'-01'");
-	} else if (appendminute) {
-		xmldomnode	*plus=
-			sqlts->newNodeAfter(functionnode->getParent(),
-					functionnode,sqlparser::_plus);
-		sqlts->newNodeAfter(functionnode->getParent(),plus,
-					sqlparser::_string_literal,"':00'");
+						functionnode,
+						sqlparser::_plus);
+		sqlts->newNodeAfter(functionnode->getParent(),
+						plus,
+						sqlparser::_string_literal,
+						append);
 	}
-
-	// FIXME: zero-out the parts of the date string
-	// that aren't required by the interval qualifier
-
-	return true;
 }
 
 bool informixtomssqldate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
@@ -323,6 +344,7 @@ bool informixtomssqldate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 	// "function" -> sysdatetime()
 	// or
 	// "function" interval_qualifier -> sysdatetime()
+	// ...
 
 	debugFunction();
 
@@ -333,20 +355,67 @@ bool informixtomssqldate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 	sqlts->newNode(node,sqlparser::_parameters);
 
 	// get the interval qualifier node, if there is one...
-	xmldomnode	*nextnode=node->getNextTagSibling();
-	if (nextnode->isNullNode() ||
-		charstring::compare(nextnode->getName(),
+	xmldomnode	*iqnode=node->getNextTagSibling();
+	if (iqnode->isNullNode() ||
+		charstring::compare(iqnode->getName(),
 					sqlparser::_interval_qualifier)) {
 		return true;
 	}
 
+	// get the interval qualifier start index
+	const char	*startstr=iqnode->getAttributeValue(sqlparser::_from);
+	timeparts_t	start=TIMEPARTS_YEAR;
+	while (start!=TIMEPARTS_NULL &&
+		charstring::compareIgnoringCase(startstr,timeparts[start])) {
+		start=(timeparts_t)((uint16_t)start+1);
+	}
+
+	// get the interval qualifier end index
+	const char	*endstr=iqnode->getAttributeValue(sqlparser::_to);
+	timeparts_t	end=TIMEPARTS_YEAR;
+	while (end!=TIMEPARTS_NULL &&
+		charstring::compareIgnoringCase(endstr,timeparts[end])) {
+		end=(timeparts_t)((uint16_t)end+1);
+	}
+
+	// validate start and end
+	if (start==TIMEPARTS_NULL || end==TIMEPARTS_NULL || end<start) {
+		return true;
+	}
+
+	// If we've gotten this far then we have a function with a
+	// second parameter expression of type interval_qualifier with
+	// valid attributes.  Perform the translation...
+
 	// delete the interval_qualifier node
-	node->getParent()->deleteChild(nextnode);
+	node->getParent()->deleteChild(iqnode);
 
-	// FIXME: wrap with a function to zero-out the parts of the date string
-	// that aren't required by the interval qualifier
+	// wrap everything in a convert function
+	xmldomnode	*convertnode=wrapConvert(node,"varchar","21");
 
-	// FIXME: wrap with a function to convert back to datetime
+	// we have to truncate the date/time based on the
+	// start and end index so wrap everything in a substring call
+	uint16_t	substringstart=0;
+	uint16_t	substringend=0;
+	const char	*prepend=NULL;
+	const char	*append=NULL;
+	evaluateIntervalQualifier(start,end,
+				&substringstart,
+				&substringend,
+				&prepend,&append);
+	xmldomnode	*substringnode=wrapSubstring(convertnode,
+							substringstart,
+							substringend-
+							substringstart);
+
+	// wrap everything with a function to convert back to a datetime
+	wrapConvert(substringnode,"datetime","21");
+
+	// Handle some special cases.  SQL Server doesn't like dates that are
+	// missing leading parts or trailing days or minutes, so go back and
+	// tweak those here.
+	// (don't move this above the wrapConvert() or it will cause problems)
+	tweakDateString(substringnode,prepend,append);
 
 	return true;
 }
@@ -551,10 +620,10 @@ void informixtomssqldate::translateDateTimeString(
 	// if we ended with anything short of a full date then append the rest
 	switch (end) {
 		case TIMEPARTS_YEAR:
-			outdtstring->append(":01:01 00:00:00.000");
+			outdtstring->append("-01-01 00:00:00.000");
 			break;
 		case TIMEPARTS_MONTH:
-			outdtstring->append(":01 00:00:00.000");
+			outdtstring->append("-01 00:00:00.000");
 			break;
 		case TIMEPARTS_DAY:
 			outdtstring->append(" 00:00:00.000");
