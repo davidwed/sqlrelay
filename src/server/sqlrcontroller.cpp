@@ -100,6 +100,7 @@ sqlrcontroller_svr::sqlrcontroller_svr() : daemonprocess(), listener() {
 	sqlp=NULL;
 	sqlt=NULL;
 	sqlw=NULL;
+	sqltr=NULL;
 	sqlrlg=NULL;
 	sqlrq=NULL;
 	sqlrpe=NULL;
