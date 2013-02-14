@@ -84,6 +84,7 @@ class freetdscursor : public sqlrcursor_svr {
 				freetdscursor(sqlrconnection_svr *conn);
 				~freetdscursor();
 		bool		open(uint16_t id);
+		bool		idMatches(uint16_t id);
 		bool		close();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
@@ -308,10 +309,10 @@ freetdsconnection::freetdsconnection(sqlrcontroller_svr *cont) :
 						sqlrconnection_svr(cont) {
 	dbused=false;
 
-	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
-	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
-	// more than 1 cursor, but really we're only using one, so some things
-	// won't work but there'll be no hard errors
+	// LAME: Freetds only supports 1 cursor, but sqlrelay uses a
+	// multi-cursor paradigm.  We'll allow sqlrelay to think we're using
+	// more than 1 cursor, but really we're only using one.  This is no
+	// problem if the client doesn't use a result set buffer size.
 	singlecursor=NULL;
 	singlecursorrefcount=0;
 
@@ -537,10 +538,10 @@ const char *freetdsconnection::logInError(const char *error, uint16_t stage) {
 }
 
 sqlrcursor_svr *freetdsconnection::initCursor() {
-	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
-	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
-	// more than 1 cursor, but really we're only using one, so some things
-	// won't work but there'll be no hard errors
+	// LAME: Freetds only supports 1 cursor, but sqlrelay uses a
+	// multi-cursor paradigm.  We'll allow sqlrelay to think we're using
+	// more than 1 cursor, but really we're only using one.  This is no
+	// problem if the client doesn't use a result set buffer size.
 	singlecursorrefcount++;
 	if (singlecursor) {
 		return singlecursor;
@@ -551,10 +552,10 @@ sqlrcursor_svr *freetdsconnection::initCursor() {
 }
 
 void freetdsconnection::deleteCursor(sqlrcursor_svr *curs) {
-	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
-	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
-	// more than 1 cursor, but really we're only using one, so some things
-	// won't work but there'll be no hard errors
+	// LAME: Freetds only supports 1 cursor, but sqlrelay uses a
+	// multi-cursor paradigm.  We'll allow sqlrelay to think we're using
+	// more than 1 cursor, but really we're only using one.  This is no
+	// problem if the client doesn't use a result set buffer size.
 	singlecursorrefcount--;
 	if (!singlecursorrefcount) {
 		delete singlecursor;
@@ -763,10 +764,10 @@ char freetdsconnection::bindVariablePrefix() {
 
 freetdscursor::freetdscursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
-	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
-	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
-	// more than 1 cursor, but really we're only using one, so some things
-	// won't work but there'll be no hard errors
+	// LAME: Freetds only supports 1 cursor, but sqlrelay uses a
+	// multi-cursor paradigm.  We'll allow sqlrelay to think we're using
+	// more than 1 cursor, but really we're only using one.  This is no
+	// problem if the client doesn't use a result set buffer size.
 	opencount=0;
 
 	#if defined(VERSION_NO)
@@ -851,10 +852,10 @@ freetdscursor::~freetdscursor() {
 
 bool freetdscursor::open(uint16_t id) {
 
-	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
-	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
-	// more than 1 cursor, but really we're only using one, so some things
-	// won't work but there'll be no hard errors
+	// LAME: Freetds only supports 1 cursor, but sqlrelay uses a
+	// multi-cursor paradigm.  We'll allow sqlrelay to think we're using
+	// more than 1 cursor, but really we're only using one.  This is no
+	// problem if the client doesn't use a result set buffer size.
 	opencount++;
 	if (opencount>1) {
 		return true;
@@ -949,12 +950,27 @@ bool freetdscursor::open(uint16_t id) {
 	return retval;
 }
 
+bool freetdscursor::idMatches(uint16_t id) {
+	// LAME: Freetds only supports 1 cursor, but sqlrelay uses a
+	// multi-cursor paradigm.  We'll allow sqlrelay to think we're using
+	// more than 1 cursor, but really we're only using one.  This is no
+	// problem if the client doesn't use a result set buffer size.
+	//
+	// This particular bit of code handles a semi-problematic situation.
+	// Since all cursors are actually the same cursor, the cursor id
+	// gets overwritten and from sqlrelay's perspective, all cursors end
+	// up having the same id, the id of the most recently opened cursor.
+	//
+	// This manages that by making all cursors match all id's.
+	return true;
+}
+
 bool freetdscursor::close() {
 
-	// LAME: freetds only supports 1 cursor, but sqlrelay uses a
-	// multi-cursor paradigm, so we'll allow sqlrelay to think we're using
-	// more than 1 cursor, but really we're only using one, so some things
-	// won't work but there'll be no hard errors
+	// LAME: Freetds only supports 1 cursor, but sqlrelay uses a
+	// multi-cursor paradigm.  We'll allow sqlrelay to think we're using
+	// more than 1 cursor, but really we're only using one.  This is no
+	// problem if the client doesn't use a result set buffer size.
 	if (opencount>1) {
 		return true;
 	}
