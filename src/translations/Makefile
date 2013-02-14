@@ -13,9 +13,9 @@ LIBS = -L$(top_builddir)/src/server -lsqlrserver -L$(top_builddir)/src/util -lsq
 
 all: sqltranslation_doublequotestosinglequotes.la \
 	sqltranslation_informixtooracledate.la \
-	sqltranslation_informixtomssqldate.la \
+	sqltranslation_informixtomssqlserverdate.la \
 	sqltranslation_locksnowaitbydefault.la \
-	sqltranslation_lockssqlserverize.la \
+	sqltranslation_locksmssqlserverize.la \
 	sqltranslation_temptablesaddmissingcolumns.la \
 	sqltranslation_temptableslocalize.la \
 	sqltranslation_temptablessybaseize.la \
@@ -36,14 +36,14 @@ sqltranslation_doublequotestosinglequotes.la: doublequotestosinglequotes.cpp dou
 sqltranslation_informixtooracledate.la: informixtooracledate.cpp informixtooracledate.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ informixtooracledate.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-sqltranslation_informixtomssqldate.la: informixtomssqldate.cpp informixtomssqldate.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ informixtomssqldate.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+sqltranslation_informixtomssqlserverdate.la: informixtomssqlserverdate.cpp informixtomssqlserverdate.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ informixtomssqlserverdate.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_locksnowaitbydefault.la: locksnowaitbydefault.cpp locksnowaitbydefault.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ locksnowaitbydefault.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-sqltranslation_lockssqlserverize.la: lockssqlserverize.cpp lockssqlserverize.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ lockssqlserverize.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+sqltranslation_locksmssqlserverize.la: locksmssqlserverize.cpp locksmssqlserverize.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ locksmssqlserverize.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_temptablesaddmissingcolumns.la: temptablesaddmissingcolumns.cpp temptablesaddmissingcolumns.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ temptablesaddmissingcolumns.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
@@ -82,18 +82,18 @@ install:
 	$(RM) $(libexecdir)/sqltranslation_informixtooracledate.a
 	$(RM) $(libexecdir)/sqltranslation_informixtooracledate.la
 	$(MODULERENAME) $(libexecdir)/sqltranslation_informixtooracledate.so so $(MODULESUFFIX)
-	$(LTINSTALL) sqltranslation_informixtomssqldate.la $(libexecdir)
-	$(RM) $(libexecdir)/sqltranslation_informixtomssqldate.a
-	$(RM) $(libexecdir)/sqltranslation_informixtomssqldate.la
-	$(MODULERENAME) $(libexecdir)/sqltranslation_informixtomssqldate.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqltranslation_informixtomssqlserverdate.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_informixtomssqlserverdate.a
+	$(RM) $(libexecdir)/sqltranslation_informixtomssqlserverdate.la
+	$(MODULERENAME) $(libexecdir)/sqltranslation_informixtomssqlserverdate.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_locksnowaitbydefault.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_locksnowaitbydefault.a
 	$(RM) $(libexecdir)/sqltranslation_locksnowaitbydefault.la
 	$(MODULERENAME) $(libexecdir)/sqltranslation_locksnowaitbydefault.so so $(MODULESUFFIX)
-	$(LTINSTALL) sqltranslation_lockssqlserverize.la $(libexecdir)
-	$(RM) $(libexecdir)/sqltranslation_lockssqlserverize.a
-	$(RM) $(libexecdir)/sqltranslation_lockssqlserverize.la
-	$(MODULERENAME) $(libexecdir)/sqltranslation_lockssqlserverize.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqltranslation_locksmssqlserverize.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_locksmssqlserverize.a
+	$(RM) $(libexecdir)/sqltranslation_locksmssqlserverize.la
+	$(MODULERENAME) $(libexecdir)/sqltranslation_locksmssqlserverize.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_temptablesaddmissingcolumns.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_temptablesaddmissingcolumns.a
 	$(RM) $(libexecdir)/sqltranslation_temptablesaddmissingcolumns.la

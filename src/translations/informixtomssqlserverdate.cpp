@@ -34,20 +34,21 @@ static const char *timeparts[]={
 	NULL
 };
 
-class informixtomssqldate : public sqltranslation {
+class informixtomssqlserverdate : public sqltranslation {
 	public:
-			informixtomssqldate(sqltranslations *sqlts,
+			informixtomssqlserverdate(sqltranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
 	private:
 		bool	translateFunctions(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
-					xmldomnode *node);
+						sqlrcursor_svr *sqlrcur,
+						xmldomnode *node,
+						bool *found);
 		bool	translateExtend(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
-					xmldomnode *node);
+						sqlrcursor_svr *sqlrcur,
+						xmldomnode *node);
 		void	evaluateIntervalQualifier(timeparts_t start,
 						timeparts_t end,
 						uint16_t *substringstart,
@@ -58,19 +59,18 @@ class informixtomssqldate : public sqltranslation {
 						const char *prepend,
 						const char *append);
 		bool	translateCurrentDate(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
-					xmldomnode *node);
+						sqlrcursor_svr *sqlrcur,
+						xmldomnode *node);
 		bool	translateDateTime(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
-					xmldomnode *node);
+						sqlrcursor_svr *sqlrcur,
+						xmldomnode *node);
 		bool	translateInterval(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
-					xmldomnode *node);
+						sqlrcursor_svr *sqlrcur,
+						xmldomnode *node);
 		void	compressIntervalQualifier(xmldomnode *iqnode);
-		void	translateDateTimeString(
-					const char *indtstring,
-					stringbuffer *outdtstring,
-					xmldomnode *iqnode);
+		void	translateDateTimeString(const char *indtstring,
+						stringbuffer *outdtstring,
+						xmldomnode *iqnode);
 		xmldomnode	*wrapSubstring(xmldomnode *functionnode,
 						uint16_t start,
 						uint16_t length);
@@ -79,21 +79,35 @@ class informixtomssqldate : public sqltranslation {
 						const char *formatstring);
 };
 
-informixtomssqldate::informixtomssqldate(sqltranslations *sqlts,
+informixtomssqlserverdate::informixtomssqlserverdate(sqltranslations *sqlts,
 					xmldomnode *parameters) :
 					sqltranslation(sqlts,parameters) {
 }
 
-bool informixtomssqldate::run(sqlrconnection_svr *sqlrcon,
+bool informixtomssqlserverdate::run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree) {
-	return translateFunctions(sqlrcon,sqlrcur,querytree->getRootNode());
+
+	// The methods called inside of here rebuild the tree torrentially and
+	// it's easy for a "current node" pointer to get lost entirely, so we
+	// have to re-search the tree after each translation.  For now at least.
+	bool	found=true;
+	while (found) {
+		if (!translateFunctions(sqlrcon,sqlrcur,
+				querytree->getRootNode(),&found)) {
+			return false;
+		}
+	}
+	return true;
 }
 
-bool informixtomssqldate::translateFunctions(sqlrconnection_svr *sqlrcon,
+bool informixtomssqlserverdate::translateFunctions(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
-						xmldomnode *node) {
+						xmldomnode *node,
+						bool *found) {
 	debugFunction();
+
+	*found=false;
 
 	// look for a function
 	if (!charstring::compare(
@@ -104,36 +118,32 @@ bool informixtomssqldate::translateFunctions(sqlrconnection_svr *sqlrcon,
 		const char	*value=
 				node->getAttributeValue(sqlparser::_value);
 		if (!charstring::compareIgnoringCase(value,"extend")) {
-			if (!translateExtend(sqlrcon,sqlrcur,node)) {
-				return false;
-			}
+			*found=true;
+			return translateExtend(sqlrcon,sqlrcur,node);
 		} else if (!charstring::compareIgnoringCase(value,"current") ||
 			!charstring::compareIgnoringCase(value,"call_dtime")) {
-			if (!translateCurrentDate(sqlrcon,sqlrcur,node)) {
-				return false;
-			}
+			*found=true;
+			return translateCurrentDate(sqlrcon,sqlrcur,node);
 		} else if (!charstring::compareIgnoringCase(value,"datetime")) {
-			if (!translateDateTime(sqlrcon,sqlrcur,node)) {
-				return false;
-			}
+			*found=true;
+			return translateDateTime(sqlrcon,sqlrcur,node);
 		} else if (!charstring::compareIgnoringCase(value,"interval")) {
-			if (!translateInterval(sqlrcon,sqlrcur,node)) {
-				return false;
-			}
+			*found=true;
+			return translateInterval(sqlrcon,sqlrcur,node);
 		}
 	}
 
 	// convert child nodes...
 	for (node=node->getFirstTagChild();
 			!node->isNullNode(); node=node->getNextTagSibling()) {
-		if (!translateFunctions(sqlrcon,sqlrcur,node)) {
+		if (!translateFunctions(sqlrcon,sqlrcur,node,found)) {
 			return false;
 		}
 	}
 	return true;
 }
 
-bool informixtomssqldate::translateExtend(sqlrconnection_svr *sqlrcon,
+bool informixtomssqlserverdate::translateExtend(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldomnode *node) {
 	debugFunction();
@@ -251,7 +261,7 @@ bool informixtomssqldate::translateExtend(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-void informixtomssqldate::evaluateIntervalQualifier(timeparts_t start,
+void informixtomssqlserverdate::evaluateIntervalQualifier(timeparts_t start,
 						timeparts_t end,
 						uint16_t *substringstart,
 						uint16_t *substringend,
@@ -312,7 +322,7 @@ void informixtomssqldate::evaluateIntervalQualifier(timeparts_t start,
 	}
 }
 
-void informixtomssqldate::tweakDateString(xmldomnode *functionnode,
+void informixtomssqlserverdate::tweakDateString(xmldomnode *functionnode,
 						const char *prepend,
 						const char *append) {
 	if (prepend) {
@@ -337,7 +347,7 @@ void informixtomssqldate::tweakDateString(xmldomnode *functionnode,
 	}
 }
 
-bool informixtomssqldate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
+bool informixtomssqlserverdate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldomnode *node) {
 
@@ -359,6 +369,11 @@ bool informixtomssqldate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 	if (iqnode->isNullNode() ||
 		charstring::compare(iqnode->getName(),
 					sqlparser::_interval_qualifier)) {
+
+		// if there was no interval qualifier then just wrap
+		// everything with a function to convert to a datetime
+		// (as opposed to datetime2 which no math can be done on)
+		wrapConvert(node,"datetime","21");
 		return true;
 	}
 
@@ -420,7 +435,7 @@ bool informixtomssqldate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool informixtomssqldate::translateDateTime(sqlrconnection_svr *sqlrcon,
+bool informixtomssqlserverdate::translateDateTime(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldomnode *node) {
 
@@ -501,7 +516,7 @@ bool informixtomssqldate::translateDateTime(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool informixtomssqldate::translateInterval(sqlrconnection_svr *sqlrcon,
+bool informixtomssqlserverdate::translateInterval(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldomnode *node) {
 
@@ -544,7 +559,7 @@ bool informixtomssqldate::translateInterval(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-void informixtomssqldate::compressIntervalQualifier(xmldomnode *iqnode) {
+void informixtomssqlserverdate::compressIntervalQualifier(xmldomnode *iqnode) {
 	const char	*from=iqnode->getAttributeValue("from");
 	const char	*to=iqnode->getAttributeValue("to");
 	if (!charstring::compare(from,to)) {
@@ -554,7 +569,7 @@ void informixtomssqldate::compressIntervalQualifier(xmldomnode *iqnode) {
 	}
 }
 
-void informixtomssqldate::translateDateTimeString(
+void informixtomssqlserverdate::translateDateTimeString(
 					const char *indtstring,
 					stringbuffer *outdtstring,
 					xmldomnode *iqnode) {
@@ -644,12 +659,13 @@ void informixtomssqldate::translateDateTimeString(
 	outdtstring->append('\'');
 }
 
-xmldomnode *informixtomssqldate::wrapSubstring(xmldomnode *functionnode,
+xmldomnode *informixtomssqlserverdate::wrapSubstring(xmldomnode *functionnode,
 							uint16_t start,
 							uint16_t length) {
 
-	xmldomnode	*substringnode=sqlts->newNode(
+	xmldomnode	*substringnode=sqlts->newNodeBefore(
 						functionnode->getParent(),
+						functionnode,
 						sqlparser::_function,
 						"substring");
 	xmldomnode	*substringparameters=sqlts->newNode(
@@ -671,7 +687,7 @@ xmldomnode *informixtomssqldate::wrapSubstring(xmldomnode *functionnode,
 						sqlparser::_expression);
 	char	*startstr=charstring::parseNumber(start);
 	sqlts->newNode(substringexpression2,
-			sqlparser::_string_literal,startstr);
+				sqlparser::_string_literal,startstr);
 	delete[] startstr;
 	xmldomnode	*substringparameter3=sqlts->newNode(
 						substringparameters,
@@ -681,44 +697,53 @@ xmldomnode *informixtomssqldate::wrapSubstring(xmldomnode *functionnode,
 						sqlparser::_expression);
 	char	*lengthstr=charstring::parseNumber(length);
 	sqlts->newNode(substringexpression3,
-			sqlparser::_string_literal,lengthstr);
+				sqlparser::_string_literal,lengthstr);
 	delete[] lengthstr;
 	return substringnode;
 }
 
-xmldomnode *informixtomssqldate::wrapConvert(xmldomnode *functionnode,
+xmldomnode *informixtomssqlserverdate::wrapConvert(xmldomnode *functionnode,
 						const char *datatype,
 						const char *formatstring) {
 
-	xmldomnode	*convertnode=sqlts->newNode(functionnode->getParent(),
-							sqlparser::_function,
-							"convert");
-	xmldomnode	*convertparameters=sqlts->newNode(convertnode,
-							sqlparser::_parameters);
-	xmldomnode	*convertparameter1=sqlts->newNode(convertparameters,
-							sqlparser::_parameter);
-	xmldomnode	*convertexpression1=sqlts->newNode(convertparameter1,
-							sqlparser::_expression);
+	xmldomnode	*convertnode=sqlts->newNodeBefore(
+						functionnode->getParent(),
+						functionnode,
+						sqlparser::_function,
+						"convert");
+	xmldomnode	*convertparameters=sqlts->newNode(
+						convertnode,
+						sqlparser::_parameters);
+	xmldomnode	*convertparameter1=sqlts->newNode(
+						convertparameters,
+						sqlparser::_parameter);
+	xmldomnode	*convertexpression1=sqlts->newNode(
+						convertparameter1,
+						sqlparser::_expression);
 	sqlts->newNode(convertexpression1,
 				sqlparser::_string_literal,datatype);
-	xmldomnode	*convertparameter2=sqlts->newNode(convertparameters,
-							sqlparser::_parameter);
-	xmldomnode	*convertexpression2=sqlts->newNode(convertparameter2,
-							sqlparser::_expression);
+	xmldomnode	*convertparameter2=sqlts->newNode(
+						convertparameters,
+						sqlparser::_parameter);
+	xmldomnode	*convertexpression2=sqlts->newNode(
+						convertparameter2,
+						sqlparser::_expression);
 	functionnode->getParent()->moveChild(functionnode,convertexpression2,0);
-	xmldomnode	*convertparameter3=sqlts->newNode(convertparameters,
-							sqlparser::_parameter);
-	xmldomnode	*convertexpression3=sqlts->newNode(convertparameter3,
-							sqlparser::_expression);
+	xmldomnode	*convertparameter3=sqlts->newNode(
+						convertparameters,
+						sqlparser::_parameter);
+	xmldomnode	*convertexpression3=sqlts->newNode(
+						convertparameter3,
+						sqlparser::_expression);
 	sqlts->newNode(convertexpression3,
 				sqlparser::_string_literal,formatstring);
 	return convertnode;
 }
 
 extern "C" {
-	sqltranslation	*new_informixtomssqldate(
+	sqltranslation	*new_informixtomssqlserverdate(
 					sqltranslations *sqlts,
 					xmldomnode *parameters) {
-		return new informixtomssqldate(sqlts,parameters);
+		return new informixtomssqlserverdate(sqlts,parameters);
 	}
 }

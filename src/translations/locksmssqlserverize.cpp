@@ -11,21 +11,21 @@
 using namespace rudiments;
 #endif
 
-class lockssqlserverize : public sqltranslation {
+class locksmssqlserverize : public sqltranslation {
 	public:
-			lockssqlserverize(sqltranslations *sqlts,
+			locksmssqlserverize(sqltranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
 };
 
-lockssqlserverize::lockssqlserverize(sqltranslations *sqlts,
+locksmssqlserverize::locksmssqlserverize(sqltranslations *sqlts,
 					xmldomnode *parameters) :
 					sqltranslation(sqlts,parameters) {
 }
 
-bool lockssqlserverize::run(sqlrconnection_svr *sqlrcon,
+bool locksmssqlserverize::run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree) {
 
@@ -120,9 +120,9 @@ bool lockssqlserverize::run(sqlrconnection_svr *sqlrcon,
 }
 
 extern "C" {
-	sqltranslation	*new_lockssqlserverize(
+	sqltranslation	*new_locksmssqlserverize(
 					sqltranslations *sqlts,
 					xmldomnode *parameters) {
-		return new lockssqlserverize(sqlts,parameters);
+		return new locksmssqlserverize(sqlts,parameters);
 	}
 }
