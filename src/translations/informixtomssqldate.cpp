@@ -40,22 +40,12 @@ class informixtomssqldate : public sqltranslation {
 					const char *indtstring,
 					stringbuffer *outdtstring,
 					xmldomnode *iqnode);
-		void	translateIntervalQualifier(
-					stringbuffer *formatstring,
-					xmldomnode *iqnode,
-					bool *containsfraction);
-
-		xmldomnode	*wrapBoth(xmldomnode *functionnode,
-					const char *formatstring,
-					bool containsfraction);
-		xmldomnode	*wrapToChar(xmldomnode *functionnode,
-					const char *formatstring);
-		xmldomnode	*wrapToDate(xmldomnode *functionnode,
-					const char *formatstring,
-					bool containsfraction);
-		xmldomnode	*wrap(xmldomnode *functionnode,
-					const char *function,
-					const char *formatstring);
+		xmldomnode	*wrapSubstring(xmldomnode *functionnode,
+						uint16_t start,
+						uint16_t length);
+		xmldomnode	*wrapConvert(xmldomnode *functionnode,
+						const char *datatype,
+						const char *formatstring);
 };
 
 informixtomssqldate::informixtomssqldate(sqltranslations *sqlts,
@@ -112,6 +102,28 @@ bool informixtomssqldate::translateFunctions(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
+enum timeparts_t {
+	TIMEPARTS_YEAR=0,
+	TIMEPARTS_MONTH,
+	TIMEPARTS_DAY,
+	TIMEPARTS_HOUR,
+	TIMEPARTS_MINUTE,
+	TIMEPARTS_SECOND,
+	TIMEPARTS_FRACTION,
+	TIMEPARTS_NULL
+};
+
+static const char *timeparts[]={
+	"year",
+	"month",
+	"day",
+	"hour",
+	"minute",
+	"second",
+	"fraction",
+	NULL
+};
+
 bool informixtomssqldate::translateExtend(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldomnode *node) {
@@ -124,10 +136,31 @@ bool informixtomssqldate::translateExtend(sqlrconnection_svr *sqlrcon,
 	// get the function node
 	xmldomnode	*functionnode=node;
 
+	// get the parameters node
+	xmldomnode	*parametersnode=
+			node->getFirstTagChild(sqlparser::_parameters);
+	if (parametersnode->isNullNode()) {
+		return true;
+	}
+
+	// get the first parameter node
+	xmldomnode	*firstparameternode=
+			parametersnode->getFirstTagChild(sqlparser::_parameter);
+	if (firstparameternode->isNullNode()) {
+		return true;
+	}
+
+	// get the first expression node
+	xmldomnode	*firstexpressionnode=
+				firstparameternode->
+				getFirstTagChild(sqlparser::_expression);
+	if (firstexpressionnode->isNullNode()) {
+		return true;
+	}
+
 	// get the second expression node
 	xmldomnode	*secondexpressionnode=
-			node->getFirstTagChild(sqlparser::_parameters)->
-				getFirstTagChild(sqlparser::_parameter)->
+				firstparameternode->
 				getNextTagSibling(sqlparser::_parameter)->
 				getFirstTagChild(sqlparser::_expression);
 	if (secondexpressionnode->isNullNode()) {
@@ -141,28 +174,144 @@ bool informixtomssqldate::translateExtend(sqlrconnection_svr *sqlrcon,
 		return true;
 	}
 
-	// translate the interval qualifier to a string format...
-	stringbuffer	formatstring;
-	bool		containsfraction;
-	translateIntervalQualifier(&formatstring,iqnode,&containsfraction);
+	// get the interval qualifier end index
+	const char	*endstr=iqnode->getAttributeValue(sqlparser::_to);
+	timeparts_t	end=TIMEPARTS_YEAR;
+	while (end!=TIMEPARTS_NULL &&
+		charstring::compareIgnoringCase(endstr,timeparts[end])) {
+		end=(timeparts_t)((uint16_t)end+1);
+	}
+
+	// get the interval qualifier start index
+	const char	*startstr=iqnode->getAttributeValue(sqlparser::_from);
+	timeparts_t	start=TIMEPARTS_YEAR;
+	while (start!=TIMEPARTS_NULL &&
+		charstring::compareIgnoringCase(startstr,timeparts[start])) {
+		start=(timeparts_t)((uint16_t)start+1);
+	}
+
+	// validate start and end
+	if (start==TIMEPARTS_NULL || end==TIMEPARTS_NULL || end<start) {
+		return true;
+	}
 
 	// If we've gotten this far then we have an extend() function with
 	// a second parameter expression of type interval_qualifier with
 	// valid attributes.  Perform the translation...
 
-	// translate extend() to to_char()
-	functionnode->setAttributeValue(sqlparser::_value,"to_char");
+	// translate extend() to convert()
+	functionnode->setAttributeValue(sqlparser::_value,"convert");
 
-	// delete the interval_qualifier node
+	// insert a varchar parameter
+	xmldomnode	*newparameternode=sqlts->newNodeBefore(
+						parametersnode,
+						firstparameternode,
+						sqlparser::_parameter);
+	xmldomnode	*newexpressionnode=sqlts->newNode(
+						newparameternode,
+						sqlparser::_expression);
+	sqlts->newNode(newexpressionnode,sqlparser::_string_literal,"varchar");
+
+	// delete the interval_qualifier node and replace it with a new
+	// string_literal node with the replacement format string
 	secondexpressionnode->deleteChild(iqnode);
+	sqlts->newNode(secondexpressionnode,sqlparser::_string_literal,"21");
 
-	// create a new string_literal node with the replacement format string
-	sqlts->newNode(secondexpressionnode,
-			sqlparser::_string_literal,
-			formatstring.getString());
+	// we have to truncate the date/time based on the
+	// start and end index so wrap everything in a substring call
+	uint16_t	substringstart=0;
+	const char	*prepend=NULL;
+	switch (start) {
+		case TIMEPARTS_YEAR:
+			substringstart=0;
+			break;
+		case TIMEPARTS_MONTH:
+			substringstart=6;
+			prepend="'1900-'";
+			break;
+		case TIMEPARTS_DAY:
+			substringstart=9;
+			prepend="'1900-01-'";
+			break;
+		case TIMEPARTS_HOUR:
+			substringstart=12;
+			break;
+		case TIMEPARTS_MINUTE:
+			substringstart=15;
+			prepend="'00:'";
+			break;
+		case TIMEPARTS_SECOND:
+			substringstart=18;
+			prepend="'00:00:'";
+			break;
+		default:
+			substringstart=21;
+			prepend="'00:00:00.'";
+			break;
+	}
+	uint16_t	substringend=0;
+	bool		appendday=false;
+	bool		appendminute=false;
+	switch (end) {
+		case TIMEPARTS_YEAR:
+			substringend=5;
+			break;
+		case TIMEPARTS_MONTH:
+			substringend=8;
+			appendday=true;
+			break;
+		case TIMEPARTS_DAY:
+			substringend=11;
+			break;
+		case TIMEPARTS_HOUR:
+			substringend=14;
+			appendminute=true;
+			break;
+		case TIMEPARTS_MINUTE:
+			substringend=17;
+			break;
+		case TIMEPARTS_SECOND:
+			substringend=20;
+			break;
+		default:
+			substringend=24;
+			break;
+	}
+	functionnode=wrapSubstring(functionnode,
+				substringstart,substringend-substringstart);
 
-	// now wrap the whole thing in a to_date with the same format string
-	wrapToDate(functionnode,formatstring.getString(),containsfraction);
+	// wrap everything with a function to convert back to a datetime
+	wrapConvert(functionnode,"datetime","21");
+
+	// Handle some special cases.  SQL Server doesn't like dates that are
+	// missing leading parts or trailing days or minutes, so go back and
+	// tweak those here.
+	// (don't move this above the wrapConvert() or it will cause problems)
+	if (prepend) {
+		xmldomnode	*prependliteral=
+			sqlts->newNodeBefore(functionnode->getParent(),
+						functionnode,
+						sqlparser::_string_literal,
+						prepend);
+		sqlts->newNodeAfter(functionnode->getParent(),
+					prependliteral,sqlparser::_plus);
+	}
+	if (appendday) {
+		xmldomnode	*plus=
+			sqlts->newNodeAfter(functionnode->getParent(),
+					functionnode,sqlparser::_plus);
+		sqlts->newNodeAfter(functionnode->getParent(),plus,
+					sqlparser::_string_literal,"'-01'");
+	} else if (appendminute) {
+		xmldomnode	*plus=
+			sqlts->newNodeAfter(functionnode->getParent(),
+					functionnode,sqlparser::_plus);
+		sqlts->newNodeAfter(functionnode->getParent(),plus,
+					sqlparser::_string_literal,"':00'");
+	}
+
+	// FIXME: zero-out the parts of the date string
+	// that aren't required by the interval qualifier
 
 	return true;
 }
@@ -173,9 +322,7 @@ bool informixtomssqldate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 
 	// "function" -> sysdatetime()
 	// or
-	// "function" interval_qualifier ->
-	// 	to_date(to_char(sysdatetime, format_string), format_string)
-	// ...
+	// "function" interval_qualifier -> sysdatetime()
 
 	debugFunction();
 
@@ -183,12 +330,8 @@ bool informixtomssqldate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 	node->setAttributeValue(sqlparser::_value,"sysdatetime");
 
 	// add an empty parameter set
-	node->appendChild(new xmldomnode(node->getTree(),
-					node->getNullNode(),
-					TAG_XMLDOMNODETYPE,
-					sqlparser::_parameters,NULL));
+	sqlts->newNode(node,sqlparser::_parameters);
 
-// FIXME: handle interval qualifiers...
 	// get the interval qualifier node, if there is one...
 	xmldomnode	*nextnode=node->getNextTagSibling();
 	if (nextnode->isNullNode() ||
@@ -197,17 +340,13 @@ bool informixtomssqldate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 		return true;
 	}
 
-	// translate the interval qualifier to a format string...
-	stringbuffer	formatstring;
-	bool		containsfraction;
-	translateIntervalQualifier(&formatstring,nextnode,&containsfraction);
-
 	// delete the interval_qualifier node
 	node->getParent()->deleteChild(nextnode);
 
-	// wrap the whole thing in a
-	// to_date(to_char(..., formatstring), formatstring)
-	wrapBoth(node,formatstring.getString(),containsfraction);
+	// FIXME: wrap with a function to zero-out the parts of the date string
+	// that aren't required by the interval qualifier
+
+	// FIXME: wrap with a function to convert back to datetime
 
 	return true;
 }
@@ -269,17 +408,15 @@ bool informixtomssqldate::translateDateTime(sqlrconnection_svr *sqlrcon,
 	sqlts->newNode(newexpressionnode,sqlparser::_string_literal,"datetime");
 
 	// update the date/time string
+	// (we'll use sql server's format "21" (yyyy-mm-dd hh:mm:ss.fff) to
+	// parse the datetime but we need to reformat it to match that as
+	// closely as possible first)
 	stringbuffer	datetimestring;
 	translateDateTimeString(stringliteralnode->
 				getAttributeValue(sqlparser::_value),
 				&datetimestring,iqnode);
 	stringliteralnode->setAttributeValue(sqlparser::_value,
 						datetimestring.getString());
-
-	// translate the interval qualifier to a string format...
-	stringbuffer	formatstring;
-	bool		containsfraction;
-	translateIntervalQualifier(&formatstring,iqnode,&containsfraction);
 
 	// delete the interval_qualifier node
 	functionnode->getParent()->deleteChild(iqnode);
@@ -290,8 +427,7 @@ bool informixtomssqldate::translateDateTime(sqlrconnection_svr *sqlrcon,
 						sqlparser::_parameter);
 	newexpressionnode=sqlts->newNode(newparameternode,
 						sqlparser::_expression);
-	sqlts->newNode(newexpressionnode,sqlparser::_string_literal,
-						formatstring.getString());
+	sqlts->newNode(newexpressionnode,sqlparser::_string_literal,"21");
 
 	return true;
 }
@@ -349,34 +485,12 @@ void informixtomssqldate::compressIntervalQualifier(xmldomnode *iqnode) {
 	}
 }
 
-enum timeparts_t {
-	TIMEPARTS_YEAR=0,
-	TIMEPARTS_MONTH,
-	TIMEPARTS_DAY,
-	TIMEPARTS_HOUR,
-	TIMEPARTS_MINUTE,
-	TIMEPARTS_SECOND,
-	TIMEPARTS_FRACTION,
-	TIMEPARTS_NULL
-};
-
-static const char *timeparts[]={
-	"year",
-	"month",
-	"day",
-	"hour",
-	"minute",
-	"second",
-	"fraction",
-	NULL
-};
-
 void informixtomssqldate::translateDateTimeString(
 					const char *indtstring,
 					stringbuffer *outdtstring,
 					xmldomnode *iqnode) {
 
-	// get the start index
+	// get the interval qualifier start index
 	const char	*startstr=iqnode->getAttributeValue(sqlparser::_from);
 	timeparts_t	start=TIMEPARTS_YEAR;
 	while (start!=TIMEPARTS_NULL &&
@@ -384,7 +498,7 @@ void informixtomssqldate::translateDateTimeString(
 		start=(timeparts_t)((uint16_t)start+1);
 	}
 
-	// get the end index
+	// get the interval qualifier end index
 	const char	*endstr=iqnode->getAttributeValue(sqlparser::_to);
 	timeparts_t	end=TIMEPARTS_YEAR;
 	while (end!=TIMEPARTS_NULL &&
@@ -397,164 +511,139 @@ void informixtomssqldate::translateDateTimeString(
 		return;
 	}
 
-	// get the current date/time, we might need it
-	datetime	dt;
-	dt.getSystemDateAndTime();
-
 	// start building the string, it needs to be quoted
 	outdtstring->append('\'');
 
-	// if we started with the month or day then
-	// prepend the current year or month
-	if (start==TIMEPARTS_MONTH) {
-		outdtstring->append(dt.getYear())->append('-');
-	} else if (start==TIMEPARTS_DAY) {
-		outdtstring->append(dt.getYear())->append('-');
-		outdtstring->append(dt.getMonth())->append('-');
-	} else if (start==TIMEPARTS_MINUTE) {
-		outdtstring->append(dt.getHour())->append(':');
-	} else if (start==TIMEPARTS_SECOND) {
-		outdtstring->append(dt.getHour())->append(':');
-		outdtstring->append(dt.getMinutes())->append(':');
-	} else if (start==TIMEPARTS_FRACTION) {
-		outdtstring->append(dt.getHour())->append(':');
-		outdtstring->append(dt.getMinutes())->append(':');
-		outdtstring->append(dt.getSeconds())->append('.');
+	// if we started with something other than the year or day then
+	// prepend the rest from the current date/time
+	datetime	dt;
+	dt.getSystemDateAndTime();
+	switch (start) {
+		case TIMEPARTS_MONTH:
+			outdtstring->append(dt.getYear())->append('-');
+			break;
+		case TIMEPARTS_DAY:
+			outdtstring->append(dt.getYear())->append('-');
+			outdtstring->append(dt.getMonth())->append('-');
+			break;
+		case TIMEPARTS_MINUTE:
+			outdtstring->append(dt.getHour())->append(':');
+			break;
+		case TIMEPARTS_SECOND:
+			outdtstring->append(dt.getHour())->append(':');
+			outdtstring->append(dt.getMinutes());
+			outdtstring->append(':');
+			break;
+		case TIMEPARTS_FRACTION:
+			outdtstring->append(dt.getHour())->append(':');
+			outdtstring->append(dt.getMinutes());
+			outdtstring->append(':');
+			outdtstring->append(dt.getSeconds());
+			outdtstring->append('.');
+			break;
+		default:
+			break;
 	}
 
 	// append the string that was passed in
 	outdtstring->append(indtstring);
 
-	// figure out what kind of date format we've got
-	// FIXME: presumably it starts with either a year or hour, but that's
-	// not guaranteed.  I'm not sure what to do in other cases yet.
-	const char	*firstdash=NULL;
-	const char	*seconddash=NULL;
-	const char	*space=NULL;
-	const char	*firstcolon=NULL;
-	const char	*secondcolon=NULL;
-	const char	*dot=NULL;
-	firstdash=charstring::findFirst(indtstring,'-');
-	if (firstdash) {
-		seconddash=charstring::findFirst(firstdash+1,'-');
-	}
-	if (seconddash) {
-		space=charstring::findFirst(seconddash+1,' ');
-	}
-	if (space) {
-		firstcolon=charstring::findFirst(space+1,':');
-	} else {
-		firstcolon=charstring::findFirst(indtstring,':');
-	}
-	if (firstcolon) {
-		secondcolon=charstring::findFirst(firstcolon+1,':');
-	}
-	if (secondcolon) {
-		dot=charstring::findFirst(secondcolon+1,'.');
-	}
-
-	// There are a few problematic cases
-	// that need to be extended.
-	// YYYY-MM -> YYYY-MM-01
-	// YYYY-MM-DD HH -> YYYY-MM-DD HH:00
-	// HH -> HH:00
-	if (start==TIMEPARTS_YEAR) {
-		if (firstdash && !seconddash) {
-			// handle: YYYY-MM -> YYYY-MM-01
-			outdtstring->append("-01");
-		} else if (firstdash && space && !firstcolon) {
-			// handle: YYYY-MM-DD HH -> YYYY-MM-DD HH:00
-			outdtstring->append(":00");
-		}
-	} else if (start==TIMEPARTS_HOUR) {
-		if (!firstcolon) {
-			// handle: HH -> HH:00
-			outdtstring->append(":00");
-		}
+	// if we ended with anything short of a full date then append the rest
+	switch (end) {
+		case TIMEPARTS_YEAR:
+			outdtstring->append(":01:01 00:00:00.000");
+			break;
+		case TIMEPARTS_MONTH:
+			outdtstring->append(":01 00:00:00.000");
+			break;
+		case TIMEPARTS_DAY:
+			outdtstring->append(" 00:00:00.000");
+			break;
+		case TIMEPARTS_HOUR:
+			outdtstring->append(":00:00.000");
+			break;
+		case TIMEPARTS_MINUTE:
+			outdtstring->append(":00.000");
+			break;
+		case TIMEPARTS_SECOND:
+			outdtstring->append(".000");
+			break;
+		default:
+			break;
 	}
 
 	outdtstring->append('\'');
 }
 
-void informixtomssqldate::translateIntervalQualifier(
-					stringbuffer *formatstring,
-					xmldomnode *iqnode,
-					bool *containsfraction) {
+xmldomnode *informixtomssqldate::wrapSubstring(xmldomnode *functionnode,
+							uint16_t start,
+							uint16_t length) {
 
-	*containsfraction=false;
-
-	// get the start index
-	const char	*startstr=iqnode->getAttributeValue(sqlparser::_from);
-	timeparts_t	start=TIMEPARTS_YEAR;
-	while (start!=TIMEPARTS_NULL &&
-		charstring::compareIgnoringCase(startstr,timeparts[start])) {
-		start=(timeparts_t)((uint16_t)start+1);
-	}
-
-	// get the end index
-	const char	*endstr=iqnode->getAttributeValue(sqlparser::_to);
-	timeparts_t	end=TIMEPARTS_YEAR;
-	while (end!=TIMEPARTS_NULL &&
-		charstring::compareIgnoringCase(endstr,timeparts[end])) {
-		end=(timeparts_t)((uint16_t)end+1);
-	}
-
-	// validate start and end
-	if (start==TIMEPARTS_NULL || end==TIMEPARTS_NULL || end<start) {
-		return;
-	}
-
-	// anything starting with an hour (or smaller) uses format 14
-	// anything else uses format 21 or 20
-	if (start>=TIMEPARTS_HOUR) {
-		formatstring->append("14");
-	} else {
-		formatstring->append((end==TIMEPARTS_FRACTION)?"21":"20");
-	}
+	xmldomnode	*substringnode=sqlts->newNode(
+						functionnode->getParent(),
+						sqlparser::_function,
+						"substring");
+	xmldomnode	*substringparameters=sqlts->newNode(
+						substringnode,
+						sqlparser::_parameters);
+	xmldomnode	*substringparameter1=sqlts->newNode(
+						substringparameters,
+						sqlparser::_parameter);
+	xmldomnode	*substringexpression1=sqlts->newNode(
+						substringparameter1,
+						sqlparser::_expression);
+	functionnode->getParent()->moveChild(functionnode,
+						substringexpression1,0);
+	xmldomnode	*substringparameter2=sqlts->newNode(
+						substringparameters,
+						sqlparser::_parameter);
+	xmldomnode	*substringexpression2=sqlts->newNode(
+						substringparameter2,
+						sqlparser::_expression);
+	char	*startstr=charstring::parseNumber(start);
+	sqlts->newNode(substringexpression2,
+			sqlparser::_string_literal,startstr);
+	delete[] startstr;
+	xmldomnode	*substringparameter3=sqlts->newNode(
+						substringparameters,
+						sqlparser::_parameter);
+	xmldomnode	*substringexpression3=sqlts->newNode(
+						substringparameter3,
+						sqlparser::_expression);
+	char	*lengthstr=charstring::parseNumber(length);
+	sqlts->newNode(substringexpression3,
+			sqlparser::_string_literal,lengthstr);
+	delete[] lengthstr;
+	return substringnode;
 }
 
-xmldomnode *informixtomssqldate::wrapBoth(xmldomnode *functionnode,
-						const char *formatstring,
-						bool containsfraction) {
-	xmldomnode	*tocharnode=wrapToChar(functionnode,formatstring);
-	return wrapToDate(tocharnode,formatstring,containsfraction);
-}
-
-xmldomnode *informixtomssqldate::wrapToChar(xmldomnode *functionnode,
+xmldomnode *informixtomssqldate::wrapConvert(xmldomnode *functionnode,
+						const char *datatype,
 						const char *formatstring) {
-	return wrap(functionnode,"to_char",formatstring);
-}
 
-xmldomnode *informixtomssqldate::wrapToDate(xmldomnode *functionnode,
-						const char *formatstring,
-						bool containsfraction) {
-	return wrap(functionnode,
-			(containsfraction)?"to_timestamp":"to_date",
-			formatstring);
-}
-
-xmldomnode *informixtomssqldate::wrap(xmldomnode *functionnode,
-					const char *function,
-					const char *formatstring) {
-
-	xmldomnode	*toxxxnode=sqlts->newNode(functionnode->getParent(),
+	xmldomnode	*convertnode=sqlts->newNode(functionnode->getParent(),
 							sqlparser::_function,
-							function);
-	xmldomnode	*toxxxparameters=sqlts->newNode(toxxxnode,
+							"convert");
+	xmldomnode	*convertparameters=sqlts->newNode(convertnode,
 							sqlparser::_parameters);
-	xmldomnode	*toxxxparameter1=sqlts->newNode(toxxxparameters,
+	xmldomnode	*convertparameter1=sqlts->newNode(convertparameters,
 							sqlparser::_parameter);
-	xmldomnode	*toxxxexpression1=sqlts->newNode(toxxxparameter1,
+	xmldomnode	*convertexpression1=sqlts->newNode(convertparameter1,
 							sqlparser::_expression);
-	functionnode->getParent()->moveChild(functionnode,toxxxexpression1,0);
-	xmldomnode	*toxxxparameter2=sqlts->newNode(toxxxparameters,
+	sqlts->newNode(convertexpression1,
+				sqlparser::_string_literal,datatype);
+	xmldomnode	*convertparameter2=sqlts->newNode(convertparameters,
 							sqlparser::_parameter);
-	xmldomnode	*toxxxexpression2=sqlts->newNode(toxxxparameter2,
+	xmldomnode	*convertexpression2=sqlts->newNode(convertparameter2,
 							sqlparser::_expression);
-	sqlts->newNode(toxxxexpression2,
-				sqlparser::_string_literal,
-				formatstring);
-	return toxxxnode;
+	functionnode->getParent()->moveChild(functionnode,convertexpression2,0);
+	xmldomnode	*convertparameter3=sqlts->newNode(convertparameters,
+							sqlparser::_parameter);
+	xmldomnode	*convertexpression3=sqlts->newNode(convertparameter3,
+							sqlparser::_expression);
+	sqlts->newNode(convertexpression3,
+				sqlparser::_string_literal,formatstring);
+	return convertnode;
 }
 
 extern "C" {
