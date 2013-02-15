@@ -1814,7 +1814,7 @@ sqlrcursor_svr *sqlrcontroller_svr::getCursor(uint16_t command) {
 		// get the current cursor that they requested.
 		bool	found=false;
 		for (uint16_t i=0; i<cursorcount; i++) {
-			if (cur[i]->idMatches(id)) {
+			if (cur[i]->id==id) {
 				cursor=cur[i];
 				incrementTimesCursorReused();
 				found=true;
@@ -4185,7 +4185,7 @@ bool sqlrcontroller_svr::handleBinds(sqlrcursor_svr *cursor) {
 			// find the cursor that we acquird earlier...
 			for (uint16_t j=0; j<cursorcount; j++) {
 
-				if (cur[i]->idMatches(bind->value.cursorid)) {
+				if (cur[i]->id==bind->value.cursorid) {
 					found=true;
 
 					// bind the cursor

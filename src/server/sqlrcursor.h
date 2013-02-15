@@ -69,7 +69,6 @@ class sqlrcursor_svr {
 		virtual	~sqlrcursor_svr();
 
 		virtual	bool	open(uint16_t id);
-		virtual bool	idMatches(uint16_t id);
 		virtual	bool	close();
 
 		virtual sqlrquerytype_t	queryType(const char *query,

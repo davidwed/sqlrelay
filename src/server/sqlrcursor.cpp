@@ -62,12 +62,6 @@ bool sqlrcursor_svr::open(uint16_t id) {
 	return true;
 }
 
-bool sqlrcursor_svr::idMatches(uint16_t id) {
-	// This method may seem silly and redundant and it actually is.
-	// The freetds code overrides this method.  See there for more info.
-	return this->id==id;
-}
-
 bool sqlrcursor_svr::close() {
 	// by default do nothing
 	return true;

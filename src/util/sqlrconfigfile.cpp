@@ -43,7 +43,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	runasuser=charstring::duplicate(DEFAULT_RUNASUSER);
 	runasgroup=charstring::duplicate(DEFAULT_RUNASGROUP);
 	cursors=charstring::toInteger(DEFAULT_CURSORS);
-	maxcursors=0;
+	maxcursors=charstring::toInteger(DEFAULT_CURSORS);
 	cursorsgrowby=charstring::toInteger(DEFAULT_CURSORS_GROWBY);
 	authtier=charstring::duplicate(DEFAULT_AUTHTIER);
 	authonconnection=charstring::compare(authtier,"database");

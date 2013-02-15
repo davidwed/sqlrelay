@@ -84,7 +84,6 @@ class freetdscursor : public sqlrcursor_svr {
 				freetdscursor(sqlrconnection_svr *conn);
 				~freetdscursor();
 		bool		open(uint16_t id);
-		bool		idMatches(uint16_t id);
 		bool		close();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
@@ -225,8 +224,6 @@ class freetdscursor : public sqlrcursor_svr {
 		bool			isrpcquery;
 
 		freetdsconnection	*freetdsconn;
-
-		unsigned short		opencount;
 };
 
 
@@ -295,9 +292,6 @@ class freetdsconnection : public sqlrconnection_svr {
 						CS_CONNECTION *cnn,
 						CS_SERVERMSG *msgp);
 
-		freetdscursor	*singlecursor;
-		unsigned short	singlecursorrefcount;
-
 		stringbuffer	loginerror;
 };
 
@@ -308,14 +302,6 @@ bool		freetdsconnection::liveconnection;
 freetdsconnection::freetdsconnection(sqlrcontroller_svr *cont) :
 						sqlrconnection_svr(cont) {
 	dbused=false;
-
-	// LAME: Freetds only supports 1 cursor, but sqlrelay uses a
-	// multi-cursor paradigm.  We'll allow sqlrelay to think we're using
-	// more than 1 cursor, but really we're only using one.  This is no
-	// problem if the client doesn't use a result set buffer size.
-	singlecursor=NULL;
-	singlecursorrefcount=0;
-
 	dbversion=NULL;
 	sybasedb=true;
 }
@@ -538,30 +524,11 @@ const char *freetdsconnection::logInError(const char *error, uint16_t stage) {
 }
 
 sqlrcursor_svr *freetdsconnection::initCursor() {
-	// LAME: Freetds only supports 1 cursor, but sqlrelay uses a
-	// multi-cursor paradigm.  We'll allow sqlrelay to think we're using
-	// more than 1 cursor, but really we're only using one.  This is no
-	// problem if the client doesn't use a result set buffer size.
-	singlecursorrefcount++;
-	if (singlecursor) {
-		return singlecursor;
-	}
-	singlecursor=new freetdscursor((sqlrconnection_svr *)this);
-	return singlecursor;
-	//return (sqlrcursor_svr *)new freetdscursor((sqlrconnection_svr *)this);
+	return (sqlrcursor_svr *)new freetdscursor((sqlrconnection_svr *)this);
 }
 
 void freetdsconnection::deleteCursor(sqlrcursor_svr *curs) {
-	// LAME: Freetds only supports 1 cursor, but sqlrelay uses a
-	// multi-cursor paradigm.  We'll allow sqlrelay to think we're using
-	// more than 1 cursor, but really we're only using one.  This is no
-	// problem if the client doesn't use a result set buffer size.
-	singlecursorrefcount--;
-	if (!singlecursorrefcount) {
-		delete singlecursor;
-		singlecursor=NULL;
-	}
-	//delete (freetdscursor *)curs;
+	delete (freetdscursor *)curs;
 }
 
 void freetdsconnection::logOut() {
@@ -764,12 +731,6 @@ char freetdsconnection::bindVariablePrefix() {
 
 freetdscursor::freetdscursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
-	// LAME: Freetds only supports 1 cursor, but sqlrelay uses a
-	// multi-cursor paradigm.  We'll allow sqlrelay to think we're using
-	// more than 1 cursor, but really we're only using one.  This is no
-	// problem if the client doesn't use a result set buffer size.
-	opencount=0;
-
 	#if defined(VERSION_NO)
 	char	*versionstring=charstring::duplicate(VERSION_NO);
 	#elif defined(TDS_VERSION_NO)
@@ -777,7 +738,8 @@ freetdscursor::freetdscursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	#else
 	char	*versionstring=new char[1024];
 	CS_INT	outlen;
-	if (ct_config(NULL,CS_GET,CS_VER_STRING,(void *)versionstring,1023,&outlen)==CS_SUCCEED) {
+	if (ct_config(NULL,CS_GET,CS_VER_STRING,
+			(void *)versionstring,1023,&outlen)==CS_SUCCEED) {
 		versionstring[outlen]='\0';
 	} else {
 		versionstring=charstring::copy(versionstring,"freetds v0.00.0");
@@ -851,15 +813,6 @@ freetdscursor::~freetdscursor() {
 }
 
 bool freetdscursor::open(uint16_t id) {
-
-	// LAME: Freetds only supports 1 cursor, but sqlrelay uses a
-	// multi-cursor paradigm.  We'll allow sqlrelay to think we're using
-	// more than 1 cursor, but really we're only using one.  This is no
-	// problem if the client doesn't use a result set buffer size.
-	opencount++;
-	if (opencount>1) {
-		return true;
-	}
 
 	clean=true;
 
@@ -950,31 +903,7 @@ bool freetdscursor::open(uint16_t id) {
 	return retval;
 }
 
-bool freetdscursor::idMatches(uint16_t id) {
-	// LAME: Freetds only supports 1 cursor, but sqlrelay uses a
-	// multi-cursor paradigm.  We'll allow sqlrelay to think we're using
-	// more than 1 cursor, but really we're only using one.  This is no
-	// problem if the client doesn't use a result set buffer size.
-	//
-	// This particular bit of code handles a semi-problematic situation.
-	// Since all cursors are actually the same cursor, the cursor id
-	// gets overwritten and from sqlrelay's perspective, all cursors end
-	// up having the same id, the id of the most recently opened cursor.
-	//
-	// This manages that by making all cursors match all id's.
-	return true;
-}
-
 bool freetdscursor::close() {
-
-	// LAME: Freetds only supports 1 cursor, but sqlrelay uses a
-	// multi-cursor paradigm.  We'll allow sqlrelay to think we're using
-	// more than 1 cursor, but really we're only using one.  This is no
-	// problem if the client doesn't use a result set buffer size.
-	if (opencount>1) {
-		return true;
-	}
-	opencount--;
 
 	bool	retval=true;
 	if (languagecmd) {
@@ -1369,6 +1298,11 @@ bool freetdscursor::outputBind(const char *variable,
 #endif
 
 bool freetdscursor::executeQuery(const char *query, uint32_t length) {
+
+	// initialize results (We use CS_UNSUPPORTED so that if the query
+	// fails to execute, discardResults won't attempt to cancel any
+	// non-existent result sets.  Doing that crashes FreeTDS.)
+	results=CS_UNSUPPORTED;
 
 	// clear out any errors
 	freetdsconn->errorstring.clear();
@@ -1804,8 +1738,32 @@ bool freetdscursor::fetchRow() {
 		return false;
 	}
 	if (!row) {
-		if (ct_fetch(cmd,CS_UNUSED,CS_UNUSED,CS_UNUSED,
-				&rowsread)!=CS_SUCCEED && !rowsread) {
+		CS_RETCODE	fetchresult=ct_fetch(cmd,CS_UNUSED,
+						CS_UNUSED,CS_UNUSED,&rowsread);
+
+		// This is essential with freetds.
+		// http://www.freetds.org/faq.html#pending
+		//
+		// Basically the TDS protocol doesn't handle multiple
+		// simultaneous queries per connection.  You can open multiple
+		// cursors but you can't use them at the same time.  Somehow
+		// Sybase gets around this but FreeTDS doesn't.  In particular,
+		// unless all rows and all results sets have been fetched or
+		// cancelled for all cursors, another cursor cannot run another
+		// query.  Since TDS supports multiple result sets per query,
+		// it's not enough to just fetch all of the rows, all result
+		// sets must be fetched or cancelled as well until ct_results
+		// returns CS_END_RESULTS or CS_CANCELLED.  Since SQL Relay only
+		// supports one result set per query, we can go ahead and cancel
+		// any remaining result sets here.  cleanUpData would do this
+		// for us but not before another query gets run on the same
+		// cursor, so we must explicitly call it here too in case
+		// someone wants to do something with another cursor.
+		if (fetchresult==CS_END_DATA) {
+			discardResults();
+		}
+
+		if (fetchresult!=CS_SUCCEED && !rowsread) {
 			return false;
 		}
 		maxrow=rowsread;

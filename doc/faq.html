@@ -580,7 +580,7 @@ chmod o+r tnsnames.ora
 
 <p>Older versions of Microsoft SQL Server are compatible with Sybase ctlib, but newer versions are not.  FreeTDS is compatible with all versions of Sybase Adaptive Server Enterprise and Microsoft SQL Server.</p>
 
-<p>Unfortunately, FreeTDS is an incomplete implementation of TDS.  Several features are buggy, inconsistent or non-existent.  For example...</p>
+<p>Unfortunately, FreeTDS is an incomplete implementation of TDS.  Depending on the version of FreeTDS you're using, features may be buggy, inconsistent or non-existent.  For example...</p>
 
 <ul>
 <li>Programs compiled against FreeTDS&lt;0.53 crash when fetching MONEY and SMALLMONEY datatypes.  SQL Relay handles this by preventing queries which fetch MONEY or SMALLMONEY datatypes from running if it's compiled against FreeTDS&lt;0.53.</li>
