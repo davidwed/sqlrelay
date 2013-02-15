@@ -21,6 +21,8 @@
 
 #include <defines.h>
 #include <datatypes.h>
+#define NEED_CONVERT_DATE_TIME
+#include <parsedatetime.h>
 
 // for sprintf
 #include <stdio.h>
@@ -4906,12 +4908,52 @@ void sqlrcontroller_svr::returnRow(sqlrcursor_svr *cursor) {
 			sendLobField(cursor,i);
 			cursor->cleanUpLobField(i);
 		} else {
-			sendField(field,fieldlength);
+			sendField(cursor,i,field,fieldlength);
 		}
 	}
 
 	// get the next row
 	cursor->nextRow();
+}
+
+void sqlrcontroller_svr::sendField(sqlrcursor_svr *cursor,
+					uint32_t index,
+					const char *data,
+					uint32_t size) {
+
+	// convert date/time values, if configured to do so
+	if (cfgfl->getDateTimeFormat() || cfgfl->getDateFormat()) {
+
+		int16_t	year=-1;
+		int16_t	month=-1;
+		int16_t	day=-1;
+		int16_t	hour=-1;
+		int16_t	minute=-1;
+		int16_t	second=-1;
+		int16_t	fraction=-1;
+		if (parseDateTime(data,cfgfl->getDateDdMm(),true,
+						&year,&month,&day,
+						&hour,&minute,&second,
+						&fraction)) {
+printf("converting: %s\n",data);
+	
+			const char	*format=(hour>-1)?
+						cfgfl->getDateTimeFormat():
+						cfgfl->getDateFormat();
+			char	*newdata=convertDateTime(format,
+							year,month,day,
+							hour,minute,second,
+							fraction);
+
+			sendField(newdata,charstring::length(newdata));
+			delete[] newdata;
+			return;
+		} else {
+printf("parse date/time failed for: %s\n",data);
+		}
+	}
+
+	sendField(data,size);
 }
 
 void sqlrcontroller_svr::sendField(const char *data, uint32_t size) {

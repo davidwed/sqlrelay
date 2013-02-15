@@ -85,6 +85,9 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	isolationlevel=NULL;
 	ignoreselectdb=false;
 	waitfordowndb=true;
+	datetimeformat=NULL;
+	dateformat=NULL;
+	dateddmm=false;
 	instart=false;
 	inend=false;
 }
@@ -114,6 +117,8 @@ sqlrconfigfile::~sqlrconfigfile() {
 	delete[] deniedips;
 	delete[] debug;
 	delete[] isolationlevel;
+	delete[] datetimeformat;
+	delete[] dateformat;
 
 	for (usernode *un=userlist.getFirstNode();
 				un; un=un->getNext()) {
@@ -350,6 +355,18 @@ bool sqlrconfigfile::getIgnoreSelectDatabase() {
 
 bool sqlrconfigfile::getWaitForDownDatabase() {
 	return waitfordowndb;
+}
+
+const char *sqlrconfigfile::getDateTimeFormat() {
+	return datetimeformat;
+}
+
+const char *sqlrconfigfile::getDateFormat() {
+	return dateformat;
+}
+
+bool sqlrconfigfile::getDateDdMm() {
+	return dateddmm;
 }
 
 stringlist *sqlrconfigfile::getSessionStartQueries() {
@@ -936,6 +953,12 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=IGNORESELECTDB_ATTRIBUTE;
 		} else if (!charstring::compare(name,"waitfordowndatabase")) {
 			currentattribute=WAITFORDOWNDB_ATTRIBUTE;
+		} else if (!charstring::compare(name,"datetimeformat")) {
+			currentattribute=DATETIMEFORMAT_ATTRIBUTE;
+		} else if (!charstring::compare(name,"dateformat")) {
+			currentattribute=DATEFORMAT_ATTRIBUTE;
+		} else if (!charstring::compare(name,"dateddmm")) {
+			currentattribute=DATEDDMM_ATTRIBUTE;
 		}
 		break;
 	
@@ -1396,6 +1419,20 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 		} else if (currentattribute==WAITFORDOWNDB_ATTRIBUTE) {
 			waitfordowndb=
 				!charstring::compareIgnoringCase(value,"yes");
+		} else if (currentattribute==DATETIMEFORMAT_ATTRIBUTE) {
+			delete[] datetimeformat;
+			datetimeformat=charstring::duplicate(value);
+			if (!dateformat) {
+				dateformat=charstring::duplicate(value);
+			}
+		} else if (currentattribute==DATEFORMAT_ATTRIBUTE) {
+			delete[] dateformat;
+			dateformat=charstring::duplicate(value);
+			if (!datetimeformat) {
+				datetimeformat=charstring::duplicate(value);
+			}
+		} else if (currentattribute==DATEDDMM_ATTRIBUTE) {
+			dateddmm=!charstring::compareIgnoringCase(value,"yes");
 		}
 	}
 	return true;

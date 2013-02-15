@@ -20,9 +20,6 @@ class translatedatetimes : public sqltranslation {
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
 	private:
-		char *convertDateTime(const char *format,
-				int16_t year, int16_t month, int16_t day,
-				int16_t hour, int16_t minute, int16_t second);
 		bool translateDateTimesInQuery(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldomnode *querynode,
@@ -75,79 +72,8 @@ bool translatedatetimes::run(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
+#define NEED_CONVERT_DATE_TIME
 #include <parsedatetime.h>
-char *translatedatetimes::convertDateTime(const char *format,
-			int16_t year, int16_t month, int16_t day,
-			int16_t hour, int16_t minute, int16_t second) {
-
-	// if no format was passed in
-	if (!format) {
-		return NULL;
-	}
-
-	// output buffer
-	stringbuffer	output;
-
-	// work buffer
-	char		buf[5];
-
-	// run through the format string
-	const char	*ptr=format;
-	while (*ptr) {
-
-		if (!charstring::compare(ptr,"DD",2)) {
-			snprintf(buf,5,"%02d",day);
-			output.append(buf);
-			ptr=ptr+2;
-		} else if (!charstring::compare(ptr,"MM",2)) {
-			snprintf(buf,5,"%02d",month);
-			output.append(buf);
-			ptr=ptr+2;
-		} else if (!charstring::compare(ptr,"MON",3)) {
-			if (month>0) {
-				output.append(shortmonths[month-1]);
-			}
-			ptr=ptr+3;
-		} else if (!charstring::compare(ptr,"Month",5)) {
-			if (month>0) {
-				output.append(longmonths[month-1]);
-			}
-			ptr=ptr+3;
-		} else if (!charstring::compare(ptr,"YYYY",4)) {
-			snprintf(buf,5,"%04d",year);
-			output.append(buf);
-			ptr=ptr+4;
-		} else if (!charstring::compare(ptr,"YY",2)) {
-			snprintf(buf,5,"%04d",year);
-			output.append(buf+2);
-			ptr=ptr+2;
-		} else if (!charstring::compare(ptr,"HH24",4)) {
-			snprintf(buf,5,"%02d",hour);
-			output.append(buf);
-			ptr=ptr+4;
-		} else if (!charstring::compare(ptr,"HH",2)) {
-			snprintf(buf,5,"%02d",(hour<13)?hour:hour-12);
-			output.append(buf);
-			ptr=ptr+2;
-		} else if (!charstring::compare(ptr,"MI",2)) {
-			snprintf(buf,5,"%02d",minute);
-			output.append(buf);
-			ptr=ptr+2;
-		} else if (!charstring::compare(ptr,"SS",2)) {
-			snprintf(buf,5,"%02d",second);
-			output.append(buf);
-			ptr=ptr+2;
-		} else if (!charstring::compare(ptr,"AM",2)) {
-			output.append((hour<13)?"AM":"PM");
-			ptr=ptr+2;
-		} else {
-			output.append(*ptr);
-			ptr=ptr+1;
-		}
-	}
-
-	return output.detachString();
-}
 
 bool translatedatetimes::translateDateTimesInQuery(
 					sqlrconnection_svr *sqlrcon,
@@ -211,11 +137,13 @@ bool translatedatetimes::translateDateTimesInQuery(
 			int16_t	hour=-1;
 			int16_t	minute=-1;
 			int16_t	second=-1;
+			int16_t	fraction=-1;
 	
 			// parse the date/time
 			if (parseDateTime(valuecopy,ddmm,false,
 						&year,&month,&day,
-						&hour,&minute,&second)) {
+						&hour,&minute,&second,
+						&fraction)) {
 
 				// decide which format to use
 				bool	validdate=(year!=-1 &&
@@ -235,7 +163,8 @@ bool translatedatetimes::translateDateTimesInQuery(
 				char	*converted=convertDateTime(
 							format,
 							year,month,day,
-							hour,minute,second);
+							hour,minute,second,
+							fraction);
 				if (converted) {
 
 					if (sqlrcon->cont->debugsqltranslation) {
@@ -322,11 +251,13 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 		int16_t	hour=-1;
 		int16_t	minute=-1;
 		int16_t	second=-1;
+		int16_t fraction=-1;
 	
 		// parse the date/time
 		if (!parseDateTime(bind->value.stringval,ddmm,false,
 						&year,&month,&day,
-						&hour,&minute,&second)) {
+						&hour,&minute,&second,
+						&fraction)) {
 			continue;
 		}
 
@@ -345,7 +276,8 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 		// attempt to convert the value
 		char	*converted=convertDateTime(format,
 							year,month,day,
-							hour,minute,second);
+							hour,minute,second,
+							fraction);
 		if (!converted) {
 			continue;
 		}

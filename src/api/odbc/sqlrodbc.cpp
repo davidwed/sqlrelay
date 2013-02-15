@@ -2646,6 +2646,7 @@ static void SQLR_ParseDate(DATE_STRUCT *ds, const char *value) {
 	int16_t	hour=-1;
 	int16_t	minute=-1;
 	int16_t	second=-1;
+	int16_t	fraction=-1;
 
 	// get day/month format
 	bool	ddmm=!charstring::compareIgnoringCase(
@@ -2655,7 +2656,7 @@ static void SQLR_ParseDate(DATE_STRUCT *ds, const char *value) {
 
 	// parse
 	parseDateTime(value,ddmm,false,&year,&month,&day,
-					&hour,&minute,&second);
+				&hour,&minute,&second,&fraction);
 
 	// copy data out
 	ds->year=(year!=-1)?year:0;
@@ -2672,6 +2673,7 @@ static void SQLR_ParseTime(TIME_STRUCT *ts, const char *value) {
 	int16_t	hour=-1;
 	int16_t	minute=-1;
 	int16_t	second=-1;
+	int16_t	fraction=-1;
 
 	// get day/month format
 	bool	ddmm=!charstring::compareIgnoringCase(
@@ -2681,7 +2683,7 @@ static void SQLR_ParseTime(TIME_STRUCT *ts, const char *value) {
 
 	// parse
 	parseDateTime(value,ddmm,false,&year,&month,&day,
-					&hour,&minute,&second);
+				&hour,&minute,&second,&fraction);
 
 	// copy data out
 	ts->hour=(hour!=-1)?hour:0;
@@ -2698,6 +2700,7 @@ static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
 	int16_t	hour=-1;
 	int16_t	minute=-1;
 	int16_t	second=-1;
+	int16_t	fraction=-1;
 
 	// get day/month format
 	bool	ddmm=!charstring::compareIgnoringCase(
@@ -2707,7 +2710,7 @@ static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
 
 	// parse
 	parseDateTime(value,ddmm,false,&year,&month,&day,
-					&hour,&minute,&second);
+				&hour,&minute,&second,&fraction);
 
 	// copy data out
 	tss->year=(year!=-1)?year:0;
@@ -2716,7 +2719,7 @@ static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
 	tss->hour=(hour!=-1)?hour:0;
 	tss->minute=(minute!=-1)?minute:0;
 	tss->second=(second!=-1)?second:0;
-	tss->fraction=0;
+	tss->fraction=(fraction!=-1)?fraction:0;
 }
 
 static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,

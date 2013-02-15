@@ -41,7 +41,8 @@ static const char *longmonths[]={
 static bool parseDateTime(const char *datetime, bool ddmm,
 			bool supportdotdelimiteddate,
 			int16_t *year, int16_t *month, int16_t *day,
-			int16_t *hour, int16_t *minute, int16_t *second) {
+			int16_t *hour, int16_t *minute, int16_t *second,
+			int16_t *fraction) {
 
 	// initialize date/time parts
 	*year=-1;
@@ -50,6 +51,7 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 	*hour=-1;
 	*minute=-1;
 	*second=-1;
+	*fraction=-1;
 
 	// different db's format dates very differently
 
@@ -58,8 +60,11 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 	uint64_t	partcount;
 	charstring::split(datetime," ",1,true,&parts,&partcount);
 
-	// there should only be one or two parts
-	if (partcount>2) {
+	// there should one (date/time only),
+	// two (date and time),
+	// three (eg. Feb 02 2012) parts,
+	// or four (eg. Feb 02 2012 01:03:04:000AM) parts
+	if (partcount>4) {
 		for (uint64_t i=0; i<partcount; i++) {
 			delete[] parts[i];
 		}
@@ -67,8 +72,38 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 		return false;
 	}
 
+	// initialize the return value;
+	bool	retval=true;
+
+	// 4-part dates are very different than the rest
+	// sybase and ms sql server return these
+	if (partcount==3 || partcount==4) {
+
+		// part 1 is the month
+		*month=0;
+		for (int i=0; shortmonths[i]; i++) {
+			if (!charstring::compareIgnoringCase(
+						parts[0],shortmonths[i]) ||
+				!charstring::compareIgnoringCase(
+						parts[0],longmonths[i])) {
+				*month=i+1;
+			}
+		}
+		if (!*month) {
+			retval=false;
+		}
+
+		// part 2 is the day
+		*day=charstring::toInteger(parts[1]);
+
+		// part 3 is the year
+		*year=charstring::toInteger(parts[2]);
+
+		// part 4 could be the time, we'll split it below...
+	}
+
 	// parse the parts
-	for (uint64_t i=0; i<partcount; i++) {
+	for (uint64_t i=(partcount>2)?3:0; i<partcount && retval; i++) {
 
 		if (charstring::contains(parts[i],':')) {
 
@@ -80,7 +115,17 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 			charstring::split(parts[i],":",1,true,
 						&timeparts,&timepartcount);
 	
-			// there must be three parts, all numbers
+			// there could be:
+			// 3 parts, all numbers,
+			//     (02:03:04)
+			// 3 parts with a decimal fraction and AM/PM in part 3,
+			//     (02:03:04.123AM)
+			// 3 parts with a decimal fraction and no AM/PM,
+			//     (14:03:04.123)
+			// 4 parts with a fractional part 4 and AM/PM,
+			//     (02:03:04:123AM)
+			// 4 parts with a fractional part 4 and no AM/PM
+			//     (14:03:04:123)
 			if (timepartcount==3 &&
 				charstring::isNumber(timeparts[0]) &&
 				charstring::isNumber(timeparts[1]) &&
@@ -126,6 +171,69 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 					*second=charstring::toInteger(
 								timeparts[2]);
 				}
+			} else if (timepartcount==3 &&
+				charstring::isNumber(timeparts[0]) &&
+				charstring::isNumber(timeparts[1]) &&
+				charstring::contains(timeparts[2],'.') &&
+				((charstring::contains(timeparts[2],"AM") &&
+				!*(charstring::findFirst(timeparts[2],"AM")+2))
+				||
+				(charstring::contains(timeparts[2],"PM") &&
+				!*(charstring::findFirst(timeparts[2],"PM")+2)))
+				) {
+
+				*hour=charstring::toInteger(timeparts[0]);
+				*minute=charstring::toInteger(timeparts[1]);
+				*second=charstring::toInteger(timeparts[2]);
+				const char	*dot=
+					charstring::findFirst(timeparts[2],'.');
+				*fraction=charstring::toInteger(dot+1);
+				*hour=*hour+(12*charstring::contains(
+							timeparts[2],"PM"));
+
+			} else if (timepartcount==3 &&
+				charstring::isNumber(timeparts[0]) &&
+				charstring::isNumber(timeparts[1]) &&
+				charstring::contains(timeparts[2],'.')) {
+
+				*hour=charstring::toInteger(timeparts[0]);
+				*minute=charstring::toInteger(timeparts[1]);
+				*second=charstring::toInteger(timeparts[2]);
+				const char	*dot=
+					charstring::findFirst(timeparts[2],'.');
+				*fraction=charstring::toInteger(dot+1);
+
+			} else if (timepartcount==4 &&
+				charstring::isNumber(timeparts[0]) &&
+				charstring::isNumber(timeparts[1]) &&
+				charstring::isNumber(timeparts[2]) &&
+				((charstring::contains(timeparts[3],"AM") &&
+				!*(charstring::findFirst(timeparts[3],"AM")+2))
+				||
+				(charstring::contains(timeparts[3],"PM") &&
+				!*(charstring::findFirst(timeparts[3],"PM")+2)))
+				) {
+
+				*hour=charstring::toInteger(timeparts[0]);
+				*minute=charstring::toInteger(timeparts[1]);
+				*second=charstring::toInteger(timeparts[2]);
+				*fraction=charstring::toInteger(timeparts[3]);
+				*hour=*hour+(12*charstring::contains(
+							timeparts[3],"PM"));
+
+			} else if (timepartcount==4 &&
+				charstring::isNumber(timeparts[0]) &&
+				charstring::isNumber(timeparts[1]) &&
+				charstring::isNumber(timeparts[2]) &&
+				charstring::isNumber(timeparts[3])) {
+
+				*hour=charstring::toInteger(timeparts[0]);
+				*minute=charstring::toInteger(timeparts[1]);
+				*second=charstring::toInteger(timeparts[2]);
+				*fraction=charstring::toInteger(timeparts[3]);
+
+			} else {
+				retval=false;
 			}
 
 			// clean up
@@ -184,6 +292,8 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 					*year=charstring::toInteger(
 								dateparts[2]);
 				}
+			} else {
+				retval=false;
 			}
 
 			// clean up
@@ -270,6 +380,8 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 								dateparts[2]);
 					}
 				}
+			} else {
+				retval=false;
 			}
 
 			// clean up
@@ -357,6 +469,8 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 								dateparts[2]);
 					}
 				}
+			} else {
+				retval=false;
 			}
 
 			// clean up
@@ -364,6 +478,8 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 				delete[] dateparts[i];
 			}
 			delete[] dateparts;
+		} else {
+			retval=false;
 		}
 	}
 
@@ -373,27 +489,115 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 	}
 	delete[] parts;
 
-	// manage bad years
-	if (*year!=-1) {
-		if (*year<50) {
-			*year=*year+2000;
-		} else if (*year<100) {
-			*year=*year+1900;
-		} else if (*year>9999) {
-			*year=9999;
+	if (retval) {
+
+		// manage bad years
+		if (*year!=-1) {
+			if (*year<50) {
+				*year=*year+2000;
+			} else if (*year<100) {
+				*year=*year+1900;
+			} else if (*year>9999) {
+				*year=9999;
+			}
+		}
+
+		// manage bad months
+		if (*month!=-1) {
+			if (*month<1) {
+				*month=1;
+			} else if (*month>12) {
+				*month=12;
+			}
 		}
 	}
 
-	// manage bad months
-	if (*month!=-1) {
-		if (*month<1) {
-			*month=1;
-		} else if (*month>12) {
-			*month=12;
-		}
-	}
-
-	return true;
+	return retval;
 }
+
+#ifdef NEED_CONVERT_DATE_TIME
+char *convertDateTime(const char *format,
+			int16_t year, int16_t month, int16_t day,
+			int16_t hour, int16_t minute, int16_t second,
+			int16_t fraction) {
+
+	// if no format was passed in
+	if (!format) {
+		return NULL;
+	}
+
+	// normalize times
+	day=(day>0)?day:1;
+	month=(month>0)?month:1;
+	year=(year>0)?year:1;
+	hour=(hour>0)?hour:0;
+	minute=(minute>0)?minute:0;
+	second=(second>0)?second:0;
+	fraction=(fraction>0)?fraction:0;
+
+	// output buffer
+	stringbuffer	output;
+
+	// work buffer
+	char		buf[5];
+
+	// run through the format string
+	const char	*ptr=format;
+	while (*ptr) {
+
+		if (!charstring::compare(ptr,"DD",2)) {
+			snprintf(buf,5,"%02d",day);
+			output.append(buf);
+			ptr=ptr+2;
+		} else if (!charstring::compare(ptr,"MM",2)) {
+			snprintf(buf,5,"%02d",month);
+			output.append(buf);
+			ptr=ptr+2;
+		} else if (!charstring::compare(ptr,"MON",3)) {
+			output.append(shortmonths[month-1]);
+			ptr=ptr+3;
+		} else if (!charstring::compare(ptr,"Month",5)) {
+			output.append(longmonths[month-1]);
+			ptr=ptr+3;
+		} else if (!charstring::compare(ptr,"YYYY",4)) {
+			snprintf(buf,5,"%04d",year);
+			output.append(buf);
+			ptr=ptr+4;
+		} else if (!charstring::compare(ptr,"YY",2)) {
+			snprintf(buf,5,"%04d",year);
+			output.append(buf+2);
+			ptr=ptr+2;
+		} else if (!charstring::compare(ptr,"HH24",4)) {
+			snprintf(buf,5,"%02d",hour);
+			output.append(buf);
+			ptr=ptr+4;
+		} else if (!charstring::compare(ptr,"HH",2)) {
+			snprintf(buf,5,"%02d",(hour<13)?hour:hour-12);
+			output.append(buf);
+			ptr=ptr+2;
+		} else if (!charstring::compare(ptr,"MI",2)) {
+			snprintf(buf,5,"%02d",minute);
+			output.append(buf);
+			ptr=ptr+2;
+		} else if (!charstring::compare(ptr,"SS",2)) {
+			snprintf(buf,5,"%02d",second);
+			output.append(buf);
+			ptr=ptr+2;
+		} else if (!charstring::compare(ptr,"FFF",3)) {
+			snprintf(buf,5,"%03d",fraction);
+			output.append(buf);
+			ptr=ptr+3;
+		} else if (!charstring::compare(ptr,"AM",2)) {
+			output.append((hour<13)?"AM":"PM");
+			ptr=ptr+2;
+		} else {
+			output.append(*ptr);
+			ptr=ptr+1;
+		}
+	}
+
+	return output.detachString();
+}
+#endif
 
 #endif

@@ -80,7 +80,10 @@ typedef enum {
 	PASSWORDENCRYPTIONS_ATTRIBUTE,
 	ISOLATIONLEVEL_ATTRIBUTE,
 	IGNORESELECTDB_ATTRIBUTE,
-	WAITFORDOWNDB_ATTRIBUTE
+	WAITFORDOWNDB_ATTRIBUTE,
+	DATETIMEFORMAT_ATTRIBUTE,
+	DATEFORMAT_ATTRIBUTE,
+	DATEDDMM_ATTRIBUTE
 } attribute;
 
 class SQLRUTIL_DLLSPEC usercontainer {
@@ -226,6 +229,9 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		const char	*getIsolationLevel();
 		bool		getIgnoreSelectDatabase();
 		bool		getWaitForDownDatabase();
+		const char	*getDateTimeFormat();
+		const char	*getDateFormat();
+		bool		getDateDdMm();
 
 		rudiments::stringlist	*getSessionStartQueries();
 		rudiments::stringlist	*getSessionEndQueries();
@@ -325,6 +331,9 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		char		*isolationlevel;
 		bool		ignoreselectdb;
 		bool		waitfordowndb;
+		const char	*datetimeformat;
+		const char	*dateformat;
+		bool		dateddmm;
 
 		bool		instart;
 		bool		inend;

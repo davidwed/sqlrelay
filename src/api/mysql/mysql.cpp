@@ -1684,6 +1684,7 @@ static void getDate(const char *field, uint32_t length, MYSQL_BIND *bind) {
 	int16_t	hour=-1;
 	int16_t	minute=-1;
 	int16_t	second=-1;
+	int16_t	fraction=-1;
 
 	// copy into a buffer (to make sure it's null-terminated)
 	char	*buffer=new char[length+1];
@@ -1696,7 +1697,8 @@ static void getDate(const char *field, uint32_t length, MYSQL_BIND *bind) {
 					"SQLR_MYSQL_DATE_DDMM"),
 					"yes");
 	parseDateTime(buffer,ddmm,false,&year,&month,&day,
-					&hour,&minute,&second);
+					&hour,&minute,&second,
+					&fraction);
 
 	// copy back data
 	tm->year=(year!=-1)?year:0;

@@ -534,6 +534,15 @@ static bool isBinaryTypeChar(const char *type) {
 }
 #endif
 
+#ifdef NEED_IS_DATETIME_TYPE_CHAR
+static bool isDateTimeTypeChar(const char *type) {
+	return (!charstring::compareIgnoringCase(type,"DATE") ||
+		!charstring::compareIgnoringCase(type,"DATETIME") ||
+		!charstring::compareIgnoringCase(type,"SMALLDATETIME") ||
+		!charstring::compareIgnoringCase(type,"NEWDATE"));
+}
+#endif
+
 #ifdef NEED_IS_NUMBER_TYPE_INT
 static bool isNumberTypeInt(int32_t type) {
 	return (type==NUMBER_DATATYPE || type==INT_DATATYPE ||

@@ -10,6 +10,7 @@
 		sqltranslations::removeReplacementTable
 	fixed an uninitialized variable (sqltr) in sqlrcontroller class
 	updated the freetds connection to support multiple cursors correctly
+	added config parameters for reformatting dates in the result set
 
 0.49 - fixed various issues that came up when cross-compiling
 	fixed make uninstall to remove a few things that it missed

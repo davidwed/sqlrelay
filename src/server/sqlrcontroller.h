@@ -282,6 +282,10 @@ class sqlrcontroller_svr : public rudiments::daemonprocess,
 		bool	skipRows(sqlrcursor_svr *cursor, uint64_t rows);
 		void	returnRow(sqlrcursor_svr *cursor);
 		void	sendNullField();
+		void	sendField(sqlrcursor_svr *cursor,
+						uint32_t index,
+						const char *data,
+						uint32_t size);
 		void	sendField(const char *data, uint32_t size);
 		void	sendLobField(sqlrcursor_svr *cursor, uint32_t col);
 		void	startSendingLong(uint64_t longlength);
