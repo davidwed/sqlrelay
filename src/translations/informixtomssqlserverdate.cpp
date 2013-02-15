@@ -474,9 +474,6 @@ bool informixtomssqlserverdate::translateDateTime(sqlrconnection_svr *sqlrcon,
 	// get the interval qualifier node, if there is one...
 	xmldomnode	*iqnode=functionnode->getNextTagSibling(
 					sqlparser::_interval_qualifier);
-	if (iqnode->isNullNode()) {
-		return true;
-	}
 
 	// translate datetime function to convert
 	functionnode->setAttributeValue(sqlparser::_value,"convert");
@@ -573,6 +570,14 @@ void informixtomssqlserverdate::translateDateTimeString(
 					const char *indtstring,
 					stringbuffer *outdtstring,
 					xmldomnode *iqnode) {
+
+	// if there was no interval qualifier then just quote the string
+	if (iqnode->isNullNode()) {
+		outdtstring->append('\'');
+		outdtstring->append(indtstring);
+		outdtstring->append('\'');
+		return;
+	}
 
 	// get the interval qualifier start index
 	const char	*startstr=iqnode->getAttributeValue(sqlparser::_from);
