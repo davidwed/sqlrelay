@@ -4935,7 +4935,6 @@ void sqlrcontroller_svr::sendField(sqlrcursor_svr *cursor,
 						&year,&month,&day,
 						&hour,&minute,&second,
 						&fraction)) {
-printf("converting: %s\n",data);
 	
 			const char	*format=(hour>-1)?
 						cfgfl->getDateTimeFormat():
@@ -4946,10 +4945,14 @@ printf("converting: %s\n",data);
 							fraction);
 
 			sendField(newdata,charstring::length(newdata));
+
+			if (debugsqltranslation) {
+				printf("converted date: \"%s\" to \"%s\"\n",
+								data,newdata);
+			}
+
 			delete[] newdata;
 			return;
-		} else {
-printf("parse date/time failed for: %s\n",data);
 		}
 	}
 

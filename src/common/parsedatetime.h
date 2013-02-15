@@ -64,7 +64,7 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 	// two (date and time),
 	// three (eg. Feb 02 2012) parts,
 	// or four (eg. Feb 02 2012 01:03:04:000AM) parts
-	if (partcount>4) {
+	if (!partcount || partcount>4) {
 		for (uint64_t i=0; i<partcount; i++) {
 			delete[] parts[i];
 		}

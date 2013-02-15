@@ -120,7 +120,8 @@ bool informixtomssqlserverdate::translateFunctions(sqlrconnection_svr *sqlrcon,
 		if (!charstring::compareIgnoringCase(value,"extend")) {
 			*found=true;
 			return translateExtend(sqlrcon,sqlrcur,node);
-		} else if (!charstring::compareIgnoringCase(value,"current") ||
+		} else if (!charstring::compareIgnoringCase(value,"today") ||
+			!charstring::compareIgnoringCase(value,"current") ||
 			!charstring::compareIgnoringCase(value,"call_dtime")) {
 			*found=true;
 			return translateCurrentDate(sqlrcon,sqlrcur,node);
@@ -516,6 +517,8 @@ bool informixtomssqlserverdate::translateDateTime(sqlrconnection_svr *sqlrcon,
 bool informixtomssqlserverdate::translateInterval(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldomnode *node) {
+
+	// FIXME... sqlserver doesn't support intervals, use DATEADD?
 
 	// interval(...) interval_qualifier -> interval '...' interval_qualifier
 	debugFunction();

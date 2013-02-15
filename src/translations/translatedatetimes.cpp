@@ -29,8 +29,6 @@ class translatedatetimes : public sqltranslation {
 					sqlrcursor_svr *sqlrcur,
 					xmldomnode *querynode,
 					xmldomnode *parameters);
-		const char * const *getShortMonths();
-		const char * const *getLongMonths();
 };
 
 translatedatetimes::translatedatetimes(sqltranslations *sqlts,
@@ -297,14 +295,6 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 	}
 
 	return true;
-}
-
-const char * const *translatedatetimes::getShortMonths() {
-	return shortmonths;
-}
-
-const char * const *translatedatetimes::getLongMonths() {
-	return longmonths;
 }
 
 extern "C" {

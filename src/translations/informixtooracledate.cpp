@@ -81,7 +81,8 @@ bool informixtooracledate::translateFunctions(sqlrconnection_svr *sqlrcon,
 			if (!translateExtend(sqlrcon,sqlrcur,node)) {
 				return false;
 			}
-		} else if (!charstring::compareIgnoringCase(value,"current") ||
+		} else if (!charstring::compareIgnoringCase(value,"today") ||
+			!charstring::compareIgnoringCase(value,"current") ||
 			!charstring::compareIgnoringCase(value,"call_dtime")) {
 			if (!translateCurrentDate(sqlrcon,sqlrcur,node)) {
 				return false;

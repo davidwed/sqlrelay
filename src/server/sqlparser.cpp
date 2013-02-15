@@ -2948,7 +2948,6 @@ bool sqlparser::parseSelect(xmldomnode *currentnode,
 
 		// look for a select clause
 		if (!selectClause(*newptr,newptr)) {
-printf("no select clause\n");
 			return false;
 		}
 
@@ -5595,6 +5594,7 @@ static const char *defaultspecialfunctionnames[]={
 	"current_date",
 	"current",
 	"call_dtime",
+	"today",
 	// other functions...
 	NULL
 };
