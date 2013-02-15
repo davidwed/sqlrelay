@@ -120,9 +120,14 @@ bool informixtomssqlserverdate::translateFunctions(sqlrconnection_svr *sqlrcon,
 		if (!charstring::compareIgnoringCase(value,"extend")) {
 			*found=true;
 			return translateExtend(sqlrcon,sqlrcur,node);
-		} else if (!charstring::compareIgnoringCase(value,"today") ||
+		} else if (!charstring::compareIgnoringCase(value,"sysdate") ||
+			!charstring::compareIgnoringCase(value,
+							"systimestamp") ||
+			!charstring::compareIgnoringCase(value,
+							"current_date") ||
 			!charstring::compareIgnoringCase(value,"current") ||
-			!charstring::compareIgnoringCase(value,"call_dtime")) {
+			!charstring::compareIgnoringCase(value,"call_dtime") ||
+			!charstring::compareIgnoringCase(value,"today")) {
 			*found=true;
 			return translateCurrentDate(sqlrcon,sqlrcur,node);
 		} else if (!charstring::compareIgnoringCase(value,"datetime")) {
