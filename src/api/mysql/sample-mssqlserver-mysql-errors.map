@@ -1,0 +1,42 @@
+# sample oracle to mysql error mappings...
+# format: <oracle error number>:<mysql error number>
+
+# Inforrect syntax near 'xxx'. -> ER_PARSE_ERROR
+102:1064
+
+# Unclosed quotation mark after the character string 'xxx'. -> ER_PARSE_ERROR
+105:1064
+
+# Invalid object name 'xxx'. -> ER_NO_SUCH_TABLE
+208:1146
+
+# Invalid column name 'xxx'. -> ER_BAD_FIELD_ERROR
+207:1054
+
+# Column name or number of supplied values does not match table definition. -> ER_WRONG_VALUE_COUNT_ON_ROW
+213:1136
+
+# Violation of PRIMARY KEY constraint ... -> ER_DUP_ENTRY
+# Violation of UNIQUE KEY constraint ... -> ER_DUP_ENTRY
+2627:1062
+
+# There is already an object named 'xxx' in the database. -> ER_TABLE_EXISTS_ERROR
+2714:1050
+
+# cannot insert the values NULL into column 'xxx', table 'yyy'... -> ER_BAD_NULL_ERROR
+515:1048
+
+# Lock request time out period exceeded. -> aubit error
+1222:244
+
+# (SQL Relay META-ERROR) begin while already in transaction block -> aubit error
+#
+999999:535
+
+# (SQL Relay META-ERROR) commit while not in transaction block -> aubit error
+#
+999998:255
+
+# (SQL Relay META-ERROR) rollback while not in transaction block -> aubit error
+#
+999997:255
