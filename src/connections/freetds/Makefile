@@ -12,8 +12,8 @@ ifeq ($(FREETDSUSERPATH),yes)
 endif
 endif
 
-SRCS= freetdsconnection.cpp
-LOBJS= freetdsconnection.lo
+SRCS= freetdsconnection.cpp freetdssqlwriter.cpp
+LOBJS= freetdsconnection.lo freetdssqlwriter.lo
 
 .SUFFIXES: .lo
 
