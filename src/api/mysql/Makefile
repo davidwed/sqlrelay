@@ -59,6 +59,7 @@ libmysql51sqlrelay.la: mysql.cpp mysql51.lo
 install:
 	$(MKINSTALLDIRS) $(EXAMPLEDIR)
 	$(INSTALL) -m 644 sample-oracle-mysql-errors.map $(EXAMPLEDIR)
+	$(INSTALL) -m 644 sample-mssqlserver-mysql-errors.map $(EXAMPLEDIR)
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libmysql3sqlrelay.la $(libdir)
 	$(RM) $(libdir)/libmysql3sqlrelay.a
@@ -78,4 +79,5 @@ install:
 
 uninstall:
 	$(RM) $(EXAMPLEDIR)/sample-oracle-mysql-errors.map
+	$(RM) $(EXAMPLEDIR)/sample-mssqlserver-mysql-errors.map
 	$(RM) $(libdir)/libmysql*sqlrelay*
