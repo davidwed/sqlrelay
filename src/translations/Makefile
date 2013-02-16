@@ -16,6 +16,7 @@ all: sqltranslation_doublequotestosinglequotes.la \
 	sqltranslation_informixtomssqlserverdate.la \
 	sqltranslation_locksnowaitbydefault.la \
 	sqltranslation_locksmssqlserverize.la \
+	sqltranslation_forupdatemssqlserverize.la \
 	sqltranslation_temptablesaddmissingcolumns.la \
 	sqltranslation_temptableslocalize.la \
 	sqltranslation_temptablessybaseize.la \
@@ -44,6 +45,9 @@ sqltranslation_locksnowaitbydefault.la: locksnowaitbydefault.cpp locksnowaitbyde
 
 sqltranslation_locksmssqlserverize.la: locksmssqlserverize.cpp locksmssqlserverize.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ locksmssqlserverize.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+
+sqltranslation_forupdatemssqlserverize.la: forupdatemssqlserverize.cpp forupdatemssqlserverize.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ forupdatemssqlserverize.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_temptablesaddmissingcolumns.la: temptablesaddmissingcolumns.cpp temptablesaddmissingcolumns.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ temptablesaddmissingcolumns.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
@@ -94,6 +98,10 @@ install:
 	$(RM) $(libexecdir)/sqltranslation_locksmssqlserverize.a
 	$(RM) $(libexecdir)/sqltranslation_locksmssqlserverize.la
 	$(MODULERENAME) $(libexecdir)/sqltranslation_locksmssqlserverize.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqltranslation_forupdatemssqlserverize.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_forupdatemssqlserverize.a
+	$(RM) $(libexecdir)/sqltranslation_forupdatemssqlserverize.la
+	$(MODULERENAME) $(libexecdir)/sqltranslation_forupdatemssqlserverize.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_temptablesaddmissingcolumns.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_temptablesaddmissingcolumns.a
 	$(RM) $(libexecdir)/sqltranslation_temptablesaddmissingcolumns.la
