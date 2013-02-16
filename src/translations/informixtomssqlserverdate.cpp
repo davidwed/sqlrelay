@@ -67,7 +67,6 @@ class informixtomssqlserverdate : public sqltranslation {
 		bool	translateInterval(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldomnode *node);
-		void	compressIntervalQualifier(xmldomnode *iqnode);
 		void	translateDateTimeString(const char *indtstring,
 						stringbuffer *outdtstring,
 						xmldomnode *iqnode);
@@ -522,56 +521,10 @@ bool informixtomssqlserverdate::translateDateTime(sqlrconnection_svr *sqlrcon,
 bool informixtomssqlserverdate::translateInterval(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldomnode *node) {
-
 	// FIXME... sqlserver doesn't support intervals, use DATEADD?
-
-	// interval(...) interval_qualifier -> interval '...' interval_qualifier
+	// for now, don't do anything here
 	debugFunction();
-
-	// get the interval value
-	const char	*interval=
-				node->getFirstTagChild(sqlparser::_parameters)->
-				getFirstTagChild(sqlparser::_parameter)->
-				getFirstTagChild(sqlparser::_string_literal)->
-				getAttributeValue(sqlparser::_value);
-	if (!charstring::length(interval)) {
-		return true;
-	}
-
-	// get the next node, it could be an interval qualifier and since
-	// we'll be modifying the current node we need to get it now
-	xmldomnode	*iqnode=node->getNextTagSibling();
-
-	// put quotes around the interval value
-	stringbuffer	quotedinterval;
-	quotedinterval.append('\'')->append(interval)->append('\'');
-
-	// create a string literal containing the expression,
-	// after the function, before the interval qualifier
-	sqlts->newNodeAfter(node->getParent(),node,
-				sqlparser::_string_literal,
-				quotedinterval.getString());
-
-	// delete the parameters
-	node->deleteChild(node->getFirstTagChild(sqlparser::_parameters));
-
-	// compress the interval qualifier, if there was one
-	if (!charstring::compare(iqnode->getName(),
-					sqlparser::_interval_qualifier)) {
-		compressIntervalQualifier(iqnode);
-	}
-
 	return true;
-}
-
-void informixtomssqlserverdate::compressIntervalQualifier(xmldomnode *iqnode) {
-	const char	*from=iqnode->getAttributeValue("from");
-	const char	*to=iqnode->getAttributeValue("to");
-	if (!charstring::compare(from,to)) {
-		iqnode->deleteAttribute(sqlparser::_to);
-		iqnode->deleteAttribute(sqlparser::_to_precision);
-		iqnode->deleteAttribute(sqlparser::_to_scale);
-	}
 }
 
 void informixtomssqlserverdate::translateDateTimeString(
