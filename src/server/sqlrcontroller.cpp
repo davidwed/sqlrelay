@@ -128,6 +128,8 @@ sqlrcontroller_svr::sqlrcontroller_svr() : daemonprocess(), listener() {
 	dbhostname=NULL;
 	dbipaddress=NULL;
 
+	reformatdatetimes=false;
+
 	proxymode=false;
 	proxypid=0;
 }
@@ -423,6 +425,9 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	maxlobbindvaluelength=cfgfl->getMaxLobBindValueLength();
 	maxerrorlength=cfgfl->getMaxErrorLength();
 	idleclienttimeout=cfgfl->getIdleClientTimeout();
+	reformatdatetimes=(cfgfl->getDateTimeFormat() ||
+				cfgfl->getDateFormat() ||
+				cfgfl->getTimeFormat());
 
 	// set autocommit behavior
 	setAutoCommit(conn->autocommit);
@@ -4922,7 +4927,15 @@ void sqlrcontroller_svr::sendField(sqlrcursor_svr *cursor,
 					uint32_t size) {
 
 	// convert date/time values, if configured to do so
-	if (cfgfl->getDateTimeFormat() || cfgfl->getDateFormat()) {
+	if (reformatdatetimes) {
+
+		// are dates going to be in MM/DD or DD/MM format?
+		bool		ddmm=cfgfl->getDateDdMm();
+		// FIXME: MSSQL stores dates in MM/DD format but an app might
+		// pass in a date literal in DD/MM format
+		// (eg. select '15/04/2012') We need to translate both.  
+		// Arguably we need two parameters but how can we tell whether
+		// the date is coming from the db or a literal?
 
 		int16_t	year=-1;
 		int16_t	month=-1;
@@ -4931,31 +4944,42 @@ void sqlrcontroller_svr::sendField(sqlrcursor_svr *cursor,
 		int16_t	minute=-1;
 		int16_t	second=-1;
 		int16_t	fraction=-1;
-		if (parseDateTime(data,cfgfl->getDateDdMm(),true,
-						&year,&month,&day,
-						&hour,&minute,&second,
-						&fraction)) {
-	
-			const char	*format=(hour>-1)?
-						cfgfl->getDateTimeFormat():
-						cfgfl->getDateFormat();
+		if (parseDateTime(data,ddmm,true,
+					&year,&month,&day,
+					&hour,&minute,&second,
+					&fraction)) {
+
+			// decide which format to use based on what parts
+			// were detected in the date/time
+			const char	*format=cfgfl->getDateTimeFormat();
+			if (hour==-1) {
+				format=cfgfl->getDateFormat();
+			} else if (day==-1) {
+				format=cfgfl->getTimeFormat();
+			}
+
+			// convert to the specified format
 			char	*newdata=convertDateTime(format,
 							year,month,day,
 							hour,minute,second,
 							fraction);
 
+			// send the field
 			sendField(newdata,charstring::length(newdata));
 
 			if (debugsqltranslation) {
-				printf("converted date: \"%s\" to \"%s\"\n",
-								data,newdata);
+				printf("converted date: "
+					"\"%s\" to \"%s\" using ddmm=%d\n",
+					data,newdata,ddmm);
 			}
 
+			// clean up
 			delete[] newdata;
 			return;
 		}
 	}
 
+	// send the field normally
 	sendField(data,size);
 }
 

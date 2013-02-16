@@ -512,6 +512,8 @@ class sqlrcontroller_svr : public rudiments::daemonprocess,
 		const char	*dbhostname;
 		const char	*dbipaddress;
 
+		bool		reformatdatetimes;
+
 		rudiments::signalhandler	shutdownhandler;
 };
 

@@ -536,15 +536,17 @@ static bool isBinaryTypeChar(const char *type) {
 
 #ifdef NEED_IS_DATETIME_TYPE_CHAR
 static bool isDateTimeTypeChar(const char *type) {
-	return (!charstring::compareIgnoringCase(type,"DATE") ||
-		!charstring::compareIgnoringCase(type,"DATETIME") ||
+	return (!charstring::compareIgnoringCase(type,"DATETIME") ||
 		!charstring::compareIgnoringCase(type,"SMALLDATETIME") ||
+		!charstring::compareIgnoringCase(type,"DATE") ||
+		!charstring::compareIgnoringCase(type,"TIME") ||
+		!charstring::compareIgnoringCase(type,"TIMESTAMP") ||
 		!charstring::compareIgnoringCase(type,"NEWDATE"));
 }
 #endif
 
 #ifdef NEED_IS_NUMBER_TYPE_INT
-static bool isNumberTypeInt(int32_t type) {
+static bool isNumberTypeInt(int16_t type) {
 	return (type==NUMBER_DATATYPE || type==INT_DATATYPE ||
 		type==SMALLINT_DATATYPE || type==TINYINT_DATATYPE ||
 		type==BIT_DATATYPE ||
@@ -569,6 +571,17 @@ static bool isNumberTypeInt(int32_t type) {
 		type==_INT8_DATATYPE || type==_FLOAT4_DATATYPE ||
 		type==_FLOAT8_DATATYPE || type==_TINTERVAL_DATATYPE ||
 		type==INTERVAL_DATATYPE || type==_INTERVAL_DATATYPE);
+}
+#endif
+
+#ifdef NEED_IS_DATETIME_TYPE_INT
+static bool isDateTimeTypeInt(int16_t type) {
+	return (type==DATETIME_DATATYPE ||
+		type==SMALLDATETIME_DATATYPE ||
+		type==DATE_DATATYPE ||
+		type==TIME_DATATYPE ||
+		type==TIMESTAMP_DATATYPE ||
+		type==NEWDATE_DATATYPE);
 }
 #endif
 

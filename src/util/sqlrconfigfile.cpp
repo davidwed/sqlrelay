@@ -87,6 +87,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	waitfordowndb=true;
 	datetimeformat=NULL;
 	dateformat=NULL;
+	timeformat=NULL;
 	dateddmm=false;
 	instart=false;
 	inend=false;
@@ -119,6 +120,7 @@ sqlrconfigfile::~sqlrconfigfile() {
 	delete[] isolationlevel;
 	delete[] datetimeformat;
 	delete[] dateformat;
+	delete[] timeformat;
 
 	for (usernode *un=userlist.getFirstNode();
 				un; un=un->getNext()) {
@@ -363,6 +365,10 @@ const char *sqlrconfigfile::getDateTimeFormat() {
 
 const char *sqlrconfigfile::getDateFormat() {
 	return dateformat;
+}
+
+const char *sqlrconfigfile::getTimeFormat() {
+	return timeformat;
 }
 
 bool sqlrconfigfile::getDateDdMm() {
@@ -957,6 +963,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=DATETIMEFORMAT_ATTRIBUTE;
 		} else if (!charstring::compare(name,"dateformat")) {
 			currentattribute=DATEFORMAT_ATTRIBUTE;
+		} else if (!charstring::compare(name,"timeformat")) {
+			currentattribute=TIMEFORMAT_ATTRIBUTE;
 		} else if (!charstring::compare(name,"dateddmm")) {
 			currentattribute=DATEDDMM_ATTRIBUTE;
 		}
@@ -1425,11 +1433,26 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			if (!dateformat) {
 				dateformat=charstring::duplicate(value);
 			}
+			if (!timeformat) {
+				timeformat=charstring::duplicate(value);
+			}
 		} else if (currentattribute==DATEFORMAT_ATTRIBUTE) {
 			delete[] dateformat;
 			dateformat=charstring::duplicate(value);
 			if (!datetimeformat) {
 				datetimeformat=charstring::duplicate(value);
+			}
+			if (!timeformat) {
+				timeformat=charstring::duplicate(value);
+			}
+		} else if (currentattribute==TIMEFORMAT_ATTRIBUTE) {
+			delete[] timeformat;
+			timeformat=charstring::duplicate(value);
+			if (!datetimeformat) {
+				datetimeformat=charstring::duplicate(value);
+			}
+			if (!dateformat) {
+				dateformat=charstring::duplicate(value);
 			}
 		} else if (currentattribute==DATEDDMM_ATTRIBUTE) {
 			dateddmm=!charstring::compareIgnoringCase(value,"yes");

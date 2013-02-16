@@ -83,6 +83,7 @@ typedef enum {
 	WAITFORDOWNDB_ATTRIBUTE,
 	DATETIMEFORMAT_ATTRIBUTE,
 	DATEFORMAT_ATTRIBUTE,
+	TIMEFORMAT_ATTRIBUTE,
 	DATEDDMM_ATTRIBUTE
 } attribute;
 
@@ -231,6 +232,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		bool		getWaitForDownDatabase();
 		const char	*getDateTimeFormat();
 		const char	*getDateFormat();
+		const char	*getTimeFormat();
 		bool		getDateDdMm();
 
 		rudiments::stringlist	*getSessionStartQueries();
@@ -333,6 +335,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		bool		waitfordowndb;
 		const char	*datetimeformat;
 		const char	*dateformat;
+		const char	*timeformat;
 		bool		dateddmm;
 
 		bool		instart;

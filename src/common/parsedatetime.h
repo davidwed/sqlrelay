@@ -343,23 +343,24 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 					// it could be yyyy-xx-xx or xx-xx-yyyy
 					if (charstring::length(
 							dateparts[0])==4) {
+
+						// It's a bit of a gamble, but
+						// we'll presume that if it
+						// starts with a year then
+						// it's yyyy-mm-dd rather than
+						// yyyy-dd-mm.  I've never seen
+						// anyone use yyyy-dd-mm.
+						// MS SQL Server in particular
+						// always formats date columns
+						// as yyyy-dd-mm and it'll help
+						// to presume this when dealing
+						// with those.
 						*year=charstring::toInteger(
 								dateparts[0]);
-						if (ddmm) {
-							*day=
-							charstring::toInteger(
+						*month=charstring::toInteger(
 								dateparts[1]);
-							*month=
-							charstring::toInteger(
+						*day=charstring::toInteger(
 								dateparts[2]);
-						} else {
-							*month=
-							charstring::toInteger(
-								dateparts[1]);
-							*day=
-							charstring::toInteger(
-								dateparts[2]);
-						}
 					} else {
 						if (ddmm) {
 							*day=
