@@ -774,6 +774,7 @@ freetdscursor::freetdscursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 		minorversion=0;
 		patchlevel=0;
 	}
+	delete[] versionstring;
 
 	prepared=false;
 	freetdsconn=(freetdsconnection *)conn;
