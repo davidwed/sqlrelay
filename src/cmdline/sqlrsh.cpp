@@ -208,6 +208,9 @@ class	sqlrsh {
 #ifndef HAVE_READLINE
 sqlrsh::sqlrsh() {
 	standardin.setFileDescriptor(0);
+	// Critical on some systems (Syllable for sure, maybe others)
+	// or prompts just roll up the screen forever.
+	standardin.useBlockingMode();
 	standardin.allowShortReads();
 }
 #endif
