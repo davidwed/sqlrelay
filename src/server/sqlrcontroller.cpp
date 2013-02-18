@@ -4192,7 +4192,7 @@ bool sqlrcontroller_svr::handleBinds(sqlrcursor_svr *cursor) {
 			// find the cursor that we acquird earlier...
 			for (uint16_t j=0; j<cursorcount; j++) {
 
-				if (cur[i]->id==bind->value.cursorid) {
+				if (cur[j]->id==bind->value.cursorid) {
 					found=true;
 
 					// bind the cursor
