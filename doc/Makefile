@@ -220,7 +220,7 @@ install:
 	$(INSTALL) -m 644 programming/zope/zsqlmethodresultset.gif $(docdir)/programming/zope
 	$(INSTALL) -m 644 gettingstarted/db2.html $(docdir)/gettingstarted
 	$(INSTALL) -m 644 gettingstarted/firebird.html $(docdir)/gettingstarted
-	$(INSTALL) -m 644 gettingstarted/mssqlserver.html $(docdir)/gettingstarted
+	$(INSTALL) -m 644 gettingstarted/msde.html $(docdir)/gettingstarted
 	$(INSTALL) -m 644 gettingstarted/mysql.html $(docdir)/gettingstarted
 	$(INSTALL) -m 644 gettingstarted/oracle.html $(docdir)/gettingstarted
 	$(INSTALL) -m 644 gettingstarted/postgresql.html $(docdir)/gettingstarted
