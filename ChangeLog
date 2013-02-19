@@ -18,6 +18,7 @@
 	added support for null-terminated result bind lists to the mysql
 		drop-in library so apps can optionally bind fewer columns than
 		come back in the result set
+	added configure tests for php-config-<version>
 
 0.49 - fixed various issues that came up when cross-compiling
 	fixed make uninstall to remove a few things that it missed

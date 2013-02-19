@@ -1135,7 +1135,7 @@ then
 
 		if ( test -z "$MYSQLLIBS" )
 		then
-			for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin"
+			for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin"
 			do
 				if ( test -d "$i" )
 				then
@@ -2336,7 +2336,7 @@ then
 			AC_CHECK_PROG(PERL,perl,"perl")
 			if ( test -z "$PERL" )
 			then
-				for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/perl/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin"
+				for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/perl/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin"
 				do
 					if ( test -d "$i" )
 					then
@@ -2667,7 +2667,7 @@ then
 				AC_CHECK_PROG(RUBY,"$ruby","$ruby")
 				if ( test -z "$RUBY" )
 				then
-					for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin"
+					for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin"
 					do
 						FW_CHECK_FILE("$i/$ruby",[RUBY=\"$i/$ruby\"])
 						if ( test -n "$RUBY" )
@@ -2910,23 +2910,22 @@ then
 	else
 
 		PHPCONFIG=""
-		if ( test -n "$PHPPATH" )
-		then
-			FW_CHECK_FILE("$PHPPATH/bin/php-config",[PHPCONFIG=\"$PHPPATH/bin/php-config\"])
-		else
-			AC_CHECK_PROG(PHPCONFIG,"php-config","php-config")
-			if ( test -z "$PHPCONFIG" )
+		for file in "php-config" "php-config-5" "php-config-5.1" "php-config-5.2" "php-config-5.3" "php-config-5.3" "php-config-5.4"
+		do
+			if ( test -n "$PHPPATH" )
 			then
-				for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/opt/csw/php4/bin" "/opt/csw/php5/bin" "/sw/bin"
+				FW_CHECK_FILE("$PHPPATH/bin/$file",[PHPCONFIG=\"$PHPPATH/bin/$file\"])
+			else
+				for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/opt/csw/php4/bin" "/opt/csw/php5/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin"
 				do
-					FW_CHECK_FILE("$i/php-config",[PHPCONFIG=\"$i/php-config\"])
+					FW_CHECK_FILE("$i/$file",[PHPCONFIG=\"$i/$file\"])
 					if ( test -n "$PHPCONFIG" )
 					then
 						break
 					fi
 				done
 			fi
-		fi
+                done
 		
 		if ( test -n "$PHPCONFIG" )
 		then

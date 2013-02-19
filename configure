@@ -626,7 +626,6 @@ PHPVERSION
 PHPEXTDIR
 PHPINCLUDES
 HAVE_PHP
-PHPCONFIG
 TCLLIBSPATH
 TCLLIB
 TCLINCLUDE
@@ -18862,7 +18861,7 @@ export LD_LIBRARY_PATH
 
 		if ( test -z "$MYSQLLIBS" )
 		then
-			for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin"
+			for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin"
 			do
 				if ( test -d "$i" )
 				then
@@ -29857,7 +29856,7 @@ fi
 
 			if ( test -z "$PERL" )
 			then
-				for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/perl/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin"
+				for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/perl/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin"
 				do
 					if ( test -d "$i" )
 					then
@@ -30296,7 +30295,7 @@ fi
 
 				if ( test -z "$RUBY" )
 				then
-					for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin"
+					for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin"
 					do
 
 if ( test -r ""$i/$ruby"" )
@@ -30902,60 +30901,23 @@ then
 	else
 
 		PHPCONFIG=""
-		if ( test -n "$PHPPATH" )
-		then
-
-if ( test -r ""$PHPPATH/bin/php-config"" )
-then
-	eval "PHPCONFIG=\"$PHPPATH/bin/php-config\""
-fi
-
-		else
-			# Extract the first word of ""php-config"", so it can be a program name with args.
-set dummy "php-config"; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if test "${ac_cv_prog_PHPCONFIG+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-  if test -n "$PHPCONFIG"; then
-  ac_cv_prog_PHPCONFIG="$PHPCONFIG" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_prog_PHPCONFIG=""php-config""
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-PHPCONFIG=$ac_cv_prog_PHPCONFIG
-if test -n "$PHPCONFIG"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PHPCONFIG" >&5
-$as_echo "$PHPCONFIG" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-			if ( test -z "$PHPCONFIG" )
+		for file in "php-config" "php-config-5" "php-config-5.1" "php-config-5.2" "php-config-5.3" "php-config-5.3" "php-config-5.4"
+		do
+			if ( test -n "$PHPPATH" )
 			then
-				for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/opt/csw/php4/bin" "/opt/csw/php5/bin" "/sw/bin"
+
+if ( test -r ""$PHPPATH/bin/$file"" )
+then
+	eval "PHPCONFIG=\"$PHPPATH/bin/$file\""
+fi
+
+			else
+				for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/opt/csw/php4/bin" "/opt/csw/php5/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin"
 				do
 
-if ( test -r ""$i/php-config"" )
+if ( test -r ""$i/$file"" )
 then
-	eval "PHPCONFIG=\"$i/php-config\""
+	eval "PHPCONFIG=\"$i/$file\""
 fi
 
 					if ( test -n "$PHPCONFIG" )
@@ -30964,7 +30926,7 @@ fi
 					fi
 				done
 			fi
-		fi
+                done
 
 		if ( test -n "$PHPCONFIG" )
 		then
