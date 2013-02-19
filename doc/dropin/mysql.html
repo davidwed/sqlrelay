@@ -356,6 +356,8 @@ functions return safe values or a failure condition.</p>
 
 <p>When fetching a date into a MYSQL_TIME struct, the drop-in library attempts to interpret whatever it got back from the database as a date.  It can parse the native formats of all the databases that SQL Relay currently supports, but it cannot tell by examination whether a date like 2011-02-05 is in YYYY-MM-DD format or YYYY-DD-MM format.  By default, it assumes MMDD, but if you want it to assume DDMM instead, set the environment variable SQLR_MYSQL_DATE_DDMM="yes".</p>
 
+<p>When using mysql_stmt_bind_result, it's possible to bind fewer buffers than there are columns in the result set.  For example you might run "select col1, col2, col3 from mytable" but only bind a single value, expecting col1 to be fetched and the others ignored.  The native MySQL library doesn't support this but some apps do it anyway and it's just fortune that they don't crash.  Some apps try a little harder and "NULL-terminate" the bind array with a zeroed-out bind buffer.  This doesn't appear to have any effect with the native MySQL library but with the drop-in replacement library if you set the environment variable SQLR_MYSQL_NULL_TERMINATED_BIND_RESULT="yes" then mysql_stmt_fetch() and mysql_fetch() will stop populating bind buffers when they find one containing NULL's for the buffer, length and is_null pointers.</p>
+
 <br>
 <a name="mappingerrorcodes"></a>
 <span class="heading2">Mapping Error Codes</span><br>
