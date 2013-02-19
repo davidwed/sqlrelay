@@ -59,6 +59,8 @@
 <li><a href="#sqlserver">Why can't I get SQL Relay to connect to Sybase/Microsoft SQL Server?</a></li>
 <li><a href="#freetds">I know that Sybase and MS SQL Server support affected row counts, so why does the FreeTDS connection return -1's for affected rows?</a></li>
 <li><a href="#money">Why are money types crashing my FreeTDS connections?</a>
+<li><a href="#pending">How can I keep from getting "Attempt to initiate a new Adaptive Server operation with results pending" errors when using FreeTDS?</a>
+
 <li><a href="#sybasefreetdsdiff">What's the difference between the Sybase and FreeTDS connections?</a></li>
 <li><a href="#postgresql">Postgresql's native API uses numbers for types but
 SQL Relay mangles them.  How do I get the numbers?</a>
@@ -570,6 +572,19 @@ chmod o+r tnsnames.ora
 <span class="heading3">Why are money types crashing my FreeTDS connections?</span>
 
 <p>Before version 0.53, calling the FreeTDS function ct_fetch when a result set had a MONEY or SMALLMONEY column in it would cause a segmentation fault.  As of version 0.32, SQL Relay figures out what version of FreeTDS is installed at compile time and only enables queries selecting MONEY or SMALLMONEY columns if the FreeTDS version is greater than 0.52.  If you compile against an earlier version of FreeTDS, any attempt to run a query selecting MONEY or SMALLMONEY column will fail with an error indicating that you should recompile SQL Relay against a newer version of FreeTDS.</p>
+
+<br><a name="pending"></a>
+<span class="heading3">How can I keep from getting "Attempt to initiate a new Adaptive Server operation with results pending" errors when using FreeTDS?</span>
+
+<p>The short answer... If you're doing nested selects, don't use setResultSetBufferSize() with a non-0 argument on the client when using FreeTDS on the server.</p>
+
+<p>The longer answer is that the TDS protocol doesn't support fetching mulitple result sets simultaneously through the same connection.  Somehow the Sybase client API works around this but FreeTDS does not.</p>
+
+<p>SQL Relay can work around it by fetching the entire result set and caching it on the client, which is SQL Relay's default behavior, but using setResultSetBufferSize() with a non-0 argument defeats this behavior, causing the result set to be fetched in chunks rather than all-at-once.  If you do this and then run nested selects then the result set from the outer select will still be pending when the inner select is run and FreeTDS will return this error.</p>
+
+<p>So, when using FreeTDS on the server and nested selects on the client, don't use setResultSetBufferSize() with a non-0 argument and everything will work (though it might work slowly and consume inordinate amounts of memory with very large result sets), otherwise you'll get that error.</p>
+
+<p>See the <a href="http://www.freetds.org/faq.html#pending">FreeTDS FAQ</a> for more info.</p>
 
 <br><a name="sybasefreetdsdiff"></a>
 <span class="heading3">What's the difference between the Sybase and FreeTDS connections?</span>
