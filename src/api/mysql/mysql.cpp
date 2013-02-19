@@ -1747,8 +1747,8 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 		// is_null components are all settable.  If we find bind
 		// buffer with those values NULL then assume we've hit the
 		// NULL terminator.
-		if (!charstring::compare(environment::getValue(
-			"SQLR_MYSQL_NULL_TERMINATED_BIND_RESULT"),"yes") &&
+		if (!charstring::compareIgnoringCase(environment::getValue(
+			"SQLR_MYSQL_NULL_TERMINATED_RESULT_BINDS"),"yes") &&
 			!stmt->resultbinds[i].buffer &&
 			!stmt->resultbinds[i].length &&
 			!stmt->resultbinds[i].is_null) {
