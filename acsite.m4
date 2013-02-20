@@ -150,7 +150,7 @@ then
 fi
 
 
-for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/usr/pkg/$NAME" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/Library/$NAME" "/usr/local/firstworks"
+for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/usr/pkg/$NAME" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources/firstworks" "/Library/$NAME" "/usr/local/firstworks"
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -470,6 +470,24 @@ case $host_os in
 esac
 ])
 
+dnl Checks for syllable
+AC_DEFUN([FW_CHECK_SYLLABLE],
+[
+AC_MSG_CHECKING(for syllable)
+case $host_os in
+	*syllable* )
+		if ( test "$prefix" = "NONE" )
+		then
+			prefix="/resources/firstworks"
+		fi
+		AC_MSG_RESULT(yes)
+		;;
+	* )
+		AC_MSG_RESULT(no)
+		;;
+esac
+])
+
 dnl Determines what extension shared object files have
 AC_DEFUN([FW_CHECK_SO_EXT],
 [
@@ -753,7 +771,7 @@ then
 
 else
 
-	for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/sfw" "/opt/csw" "/usr/pkg" "/sw" "/usr/local/firstworks" "/boot/common" "/resources/index"
+	for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/sfw" "/opt/csw" "/usr/pkg" "/sw" "/usr/local/firstworks" "/boot/common" "/resources/index" "/resources/firstworks"
 	do
 		if ( test -n "$i" -a -d "$i" )
 		then

@@ -14,7 +14,7 @@
 	added various query translations for mssqlserver
 	added an mssqlserver error map for the mysql drop-in library
 	fixed a memory leak in the freetds version-checking code
-	added /resources/index as a search path for syllable
+	added new search paths and default prefix for syllable
 	added support for null-terminated result bind lists to the mysql
 		drop-in library so apps can optionally bind fewer columns than
 		come back in the result set
