@@ -37,6 +37,10 @@
 	<!ATTLIST instance isolationlevel CDATA "read committed">
 	<!ATTLIST instance ignoreselectdatabase (yes|no) "no">
 	<!ATTLIST instance waitfordowndatabase (yes|no) "yes">
+	<!ATTLIST instance datetimeformat CDATA "">
+	<!ATTLIST instance dateformat CDATA "">
+	<!ATTLIST instance timeformat CDATA "">
+	<!ATTLIST instance dateddmm (yes|no) "no">
 
 <!ELEMENT users (user*)>
 <!ELEMENT user EMPTY>
