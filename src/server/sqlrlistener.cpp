@@ -20,6 +20,10 @@
 // for printf
 #include <stdio.h>
 
+#ifndef MAXPATHLEN
+	#define MAXPATHLEN	256
+#endif
+
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
