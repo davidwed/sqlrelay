@@ -66,6 +66,11 @@ extern	CS_INT	ct_dynamic(CS_COMMAND *,CS_INT,CS_CHAR *,CS_INT,CS_CHAR *,CS_INT);
 #define MAX_ITEM_BUFFER_SIZE	4096
 //#define FREETDS_SUPPORTS_CURSORS
 
+// some versions of freetds don't define this
+#ifndef CS_UNSUPPORTED
+	#define CS_UNSUPPORTED -10
+#endif
+
 struct datebind {
         int16_t         *year;
         int16_t         *month;
