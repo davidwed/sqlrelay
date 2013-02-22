@@ -1,7 +1,8 @@
 0.50 - fixed sqlrserver-config script to return data for libsqlrserver
 		rather than libsqlrconnection
 	added test for SQLROWSETSIZE for odbc that doesn't define it
-	updated postgresql drop-in library enough to work with psycopg2
+	updated postgresql drop-in library enough to work with psycopg2-2.4
+		with various caveats and tweaks
 	fixed NULL dereference in custom_nw logger
 	added support for dbversion, show tables/databases and describe for
 		SQL Server via freetds
