@@ -532,6 +532,8 @@ my $dbh = DBI -> connect ('dbi:SQLRelay:$dsn', $login, $password);
 This module is a pure-Perl DBI binding to SQL Relay's native API. 
 Connection string consists of following parts:
 
+=over
+
 =item B<host=...>      default: I<localhost> --- hostname of SQL Relay server;
 
 =item B<port=...>      default: I<9000>      --- port number that SQL Relay server listens on;
@@ -541,6 +543,8 @@ Connection string consists of following parts:
 =item B<retrytime=...> default: I<0>         --- time (in seconds) between connect attempts;
 
 =item B<debug=...>     default: I<0>         --- set it to 1 if you want to get some debug messages in stdout;
+
+=back
 
 =head1 USAGE
 
