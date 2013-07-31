@@ -13,7 +13,7 @@
 <li><a href="#installation">Installation</a></li>
 <ul>
 <li><a href="#rpm">RPM-based Linux</a></li>
-<li><a href="#debian">Debian Linux</a></li>
+<li><a href="#debian">Debian and Ubuntu Linux</a></li>
 <li><a href="#freebsd">FreeBSD</a></li>
 <li><a href="#openbsd">OpenBSD</a></li>
 <li><a href="#netbsd">NetBSD</a></li>
@@ -42,23 +42,20 @@ below.</p>
 <a name="rpm"></a>
 <span class="heading2">RPM-based Linux</span><br>
 
-<p>To install MySQL on an RPM-based Linux distribution like RedHat, 
-Mandrake or TurboLinux, acquire the mysql, mysql-server and mysql-devel
-RPMS from <a href="http://rpmfind.net">RPMFind</a> or possibly from the CD's 
-that came with your distribution and install them using <i>rpm -i</i>.</p>
+<p>To install MySQL on an RPM-based Linux distribution, install the mysql,
+mysql-server and mysql-devel RPMS using yum or install them from the CD/DVD's
+that came with your distribution using <i>rpm -i</i>.</p>
 
 <a name="debian"></a>
-<span class="heading2">Debian Linux</span><br>
+<span class="heading2">Debian and Ubuntu Linux</span><br>
 
-<p>If you have configured <i>apt</i> as illustrated in 
-<a href="http://www.debian.org/doc/manuals/apt-howto/index.en.html">the 
-APT-HOWTO</a>, run <i>apt-get install mysql-server</i> and <i>apt-get install 
-libmysqlclientclient6-dev</i>.  If your distribution came with MySQL, you may 
-be promted to enter a CD.  If not, it will be downloaded from the internet.  
-When the commands complete, MySQL will be installed.  MySQL packages don't 
-appear to be available for older Debian releases, so for those releases, I've 
-always compiled it from source.  Alternatively, you can download a binary 
-distribution in tar.gz format from 
+<p>To install on MySQL on Debian and Ubuntu Linux, run
+<i>apt-get install mysql-server</i> and
+<i>apt-get install libmysqlclientclient6-dev</i>.
+
+MySQL packages don't appear to be available for older Debian releases, so for
+those releases, I've always compiled it from source.  Alternatively, you can
+download a binary distribution in tar.gz format from
 <a href="http://www.mysql.com/downloads">the MySQL site</a>.</p>
 
 <a name="freebsd"></a>
