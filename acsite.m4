@@ -1100,7 +1100,7 @@ $GLIBC23HACKCODE],[olog(NULL,NULL,NULL,-1,NULL,-1,NULL,-1,OCI_LM_DEF);],[$ORACLE
 		fi
 	fi
 		
-	if ( test "$ORACLEVERSION" = "8i" -o "$ORACLEVERSION" = "9i" -o "$ORACLEVERSION" = "10g" -o "$ORACLEVERSION" = "11g" )
+	if ( test "$ORACLEVERSION" != "8.0" )
 	then
 		AC_DEFINE(HAVE_ORACLE_8i,1,Oracle 8i or greater)
 	fi

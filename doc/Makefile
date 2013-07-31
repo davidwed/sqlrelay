@@ -46,7 +46,6 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/fedoracore/2
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/fedoracore/3
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/fedoracore/5
-	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/suse/9.0
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/sybase
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/db2
 	$(INSTALL) -m 644 index.html $(docdir)
@@ -234,7 +233,6 @@ install:
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/fedoracore/2/10g.html $(docdir)/gettingstarted/oracle/linux/fedoracore/2
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/fedoracore/3/10g.html $(docdir)/gettingstarted/oracle/linux/fedoracore/3
 	$(INSTALL) -m 644 gettingstarted/oracle/linux/fedoracore/5/10g.html $(docdir)/gettingstarted/oracle/linux/fedoracore/5
-	$(INSTALL) -m 644 gettingstarted/oracle/linux/suse/9.0/9iR2.html $(docdir)/gettingstarted/oracle/linux/suse/9.0
 	$(INSTALL) -m 644 gettingstarted/sybase/11.0.3.3.html $(docdir)/gettingstarted/sybase/11.0.3.3.html
 	$(INSTALL) -m 644 gettingstarted/sybase/11.9.2.html $(docdir)/gettingstarted/sybase/11.9.2.html
 	$(INSTALL) -m 644 gettingstarted/sybase/12.5.1.html $(docdir)/gettingstarted/sybase/12.5.1.html

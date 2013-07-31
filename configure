@@ -19709,7 +19709,7 @@ $as_echo "#define HAVE_OCI_H 1" >>confdefs.h
 		fi
 	fi
 
-	if ( test "$ORACLEVERSION" = "8i" -o "$ORACLEVERSION" = "9i" -o "$ORACLEVERSION" = "10g" -o "$ORACLEVERSION" = "11g" )
+	if ( test "$ORACLEVERSION" != "8.0" )
 	then
 
 $as_echo "#define HAVE_ORACLE_8i 1" >>confdefs.h
