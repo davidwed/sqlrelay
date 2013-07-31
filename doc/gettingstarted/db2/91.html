@@ -87,18 +87,19 @@ go away.</p>
 
 <p>Should you need to create additional DB2 instances, follow this procedure 
 again using a different user name and skipping the steps pertaining
-to the Administration Server.  The <i>/opt/ibm/db2/V9.1/instance/db2ilist</i> 
-command lists all of the DB2 instances on the local computer.</p>
+to the Administration Server.  The command <i>instance/db2ilist</i>
+(under the installation directory) lists all of the DB2 instances on the local
+computer.</p>
 
-<p>If you need to drop an instance, run 
-<i>/opt/ibm/db2/V9.1/instance/db2idrop instancename</i>, substituting the name
-of the instance you want to drop for instancename.</p>
+<p>If you need to drop an instance, go into the installation directory and run 
+<i>instance/db2idrop instancename</i>, substituting the name of the instance
+you want to drop for instancename.</p>
 
-<p>The <i>/opt/ibm/db2/V9.1/instance/daslist</i> command lists all of the DB2 
-administration servers on the local computer.</p>
+<p>The <i>instance/daslist</i> command (under the installation directory) lists
+all of the DB2 administration servers on the local computer.</p>
 
-<p>If you need to drop an administration server, run 
-<i>/opt/ibm/db2/V9.1/instance/dasdrop servername</i>, substituting the name of
+<p>If you need to drop an administration server, go into the installation
+directory and run <i>instance/dasdrop servername</i>, substituting the name of
 the administration server you want to drop for servername.</p>
 
 <span class="heading2">Starting the Database at Boot Time</span><br>
@@ -126,42 +127,32 @@ boot/shutdown time.</p>
 </pre>
 </blockquote>
 
+<p>Be sure to replace all instances of /opt/ibm/db2/V9.1 with your
+installation directory.</p>
+
 <p>Install this script and run it with the "start" option to start up the
 database.  Running it with the "stop" option shuts the database down.  To
 access a database, it must be running.</p>
 
 <p>During instance configuration, there's a check box indicating whether the
 instance will be configured to start at boot time.  If you didn't check it, to
-get each instance to start at boot time, you need to run the following command
-as root for each instance.</p>
+get each instance to start at boot time, you need to go into the installation
+directory and run the following command as root for each instance.</p>
 
 <blockquote>
-<b>/opt/ibm/db2/V9.1/instance/db2iauto -on INSTANCE_USER</b>
+<b>instance/db2iauto -on INSTANCE_USER</b>
 </blockquote>
 
 <p>Where INSTANCE_USER is replaced by the username of the user associated with
 the instance you want to start at boot time.</p>
 
 <p>If you want to disable instances from starting at boot time, you need to
-run the following command as root for each instance:</p>
+go into the installation directory and run the following command as root for
+each instance:</p>
 
 <blockquote>
-<b>/opt/ibm/db2/V9.1/instance/db2iauto -off INSTANCE_USER</b>
+<b>instance/db2iauto -off INSTANCE_USER</b>
 </blockquote>
-
-<span class="heading2">Making the Libraries Available</span><br>
-
-<p>The DB2 client libraries should be installed in /opt/ibm/db2/V9.1/lib.
-DB2 client programs (including SQL Relay) need to be able to access these
-libraries at runtime.  The dynamic loader searches for libraries in /lib,
-/usr/lib and in directories specified in /etc/ld.so.conf or /etc/ld.so.conf.d.
-Append the following line to /etc/ld.so.conf or create a file in
-/etc/ld.so.conf.d with the following line's contents (if your system supports
-ld.so.conf.d) and run /sbin/ldconfig (as root).</p>
-
-<blockquote><b>
-/opt/ibm/db2/V9.1/lib
-</b></blockquote>
 
 </body>
 
