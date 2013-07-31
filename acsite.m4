@@ -893,7 +893,8 @@ then
 				ORACLELIBS="-Wl,$CLNTSH -L$ORACLE_INSTANTCLIENT_PREFIX -l$NNZ"
 				if ( test "$ORACLEVERSION" = "12c" )
 				then
-					ORACLELIBS="$ORACLELIBS -lons -lclntshcore"
+					CLNTSHCORE="`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntshcore.$SOSUFFIX.* 2> /dev/null | tail -1`"
+					ORACLELIBS="$ORACLELIBS -lons -Wl,$CLNTSHCORE"
 				fi
 				ORACLEINCLUDES="-I$ORACLE_INSTANTCLIENT_PREFIX/sdk/include"
 			fi

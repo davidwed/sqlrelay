@@ -1,4 +1,5 @@
 0.51 - fixed minor perl DBI driver documentation issue
+	added support for oracle 12c
 
 0.50 - fixed sqlrserver-config script to return data for libsqlrserver
 		rather than libsqlrconnection
