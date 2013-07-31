@@ -136,13 +136,40 @@ If you opt for the latter, you can do so using the following command:</p>
 chmod o+r /u01/app/oracle/product/11.2.0/network/admin/tnsnames.ora
 </b></blockquote>
 
-<p><b>IMPORTANT!!!...</b>
+<p><b>IMPORTANT!!!...</b></p>
 
 <p>The tnsnames.ora file was probably also created with an entry for connecting
 to the container database <b>cdbora1</b> but probably does not have an entry
 for connecting to the pluggable database <b>ora1</b>.  Copy and paste the entry
 for <b>cdbora1</b> and replace references to <b>cdbora1</b> with <b>ora1</b> in
 the copy.  Failure to add this entry will cause the instructions for creating a test schema on the previous page to fail.</p>
+
+<p><b>ALSO IMPORTANT!!!...</b></p>
+
+<p>Oracle 12c introduces a new paradigm of container and pluggable databases.  In this installation, cdbora1 is the container and ora1 is one of the pluggable databases.  By default, pluggable databases are not started when the container is started though and there's no option to enable that.  However, you can create a trigger in the container database to start all of the pluggable databases as follows:</p>
+
+<p>Run sqlplus with:</p>
+
+<b>sqlplus sys/<i>password</i>@cdbora1 as sysdba</b>
+
+<p>(replacing <i>password</i> with the password you entered during installation)</p>
+
+<p>Then run the following script:</p>
+
+<blockquote>
+<pre>
+SET CMDSEP /
+CREATE TRIGGER open_all_pdbs
+AFTER STARTUP
+ON DATABASE
+BEGIN
+EXECUTE IMMEDIATE 'alter pluggable database all open';
+END open_all_pdbs;
+/
+</pre>
+</blockquote>
+
+<p>Now the ora1 pluggable database and any other databases you create will be started when the cdbora1 database is started.</p>
 
 </body>
 
