@@ -19142,10 +19142,18 @@ fi
 				then
 					ORACLEVERSION="11g"
 				fi
+				if ( test -n `echo $ORACLE_INSTANTCLIENT_PREFIX | grep 12` )
+				then
+					ORACLEVERSION="12c"
+				fi
 				ORACLELIBSPATH="$ORACLE_INSTANTCLIENT_PREFIX"
 				CLNTSH="`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX.* 2> /dev/null | tail -1`"
 				NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
 				ORACLELIBS="-Wl,$CLNTSH -L$ORACLE_INSTANTCLIENT_PREFIX -l$NNZ"
+				if ( test "$ORACLEVERSION" = "12c" )
+				then
+					ORACLELIBS="$ORACLELIBS -lons -lclntshcore"
+				fi
 				ORACLEINCLUDES="-I$ORACLE_INSTANTCLIENT_PREFIX/sdk/include"
 			fi
 		fi
