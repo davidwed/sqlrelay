@@ -374,7 +374,16 @@ dnl Checks for host architecture
 AC_DEFUN([FW_CHECK_ARCH],
 [
 AC_MSG_CHECKING(for host architecture)
-AC_MSG_RESULT($host_cpu)
+ARCH=$host_cpu
+case $host_cpu in
+	i[[3456]]86)
+		ARCH="x86"
+		;;
+	x86_64 | amd64)
+		ARCH="x64"
+		;;
+esac
+AC_MSG_RESULT($host_cpu $ARCH)
 ])
 
 

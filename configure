@@ -15794,8 +15794,17 @@ UNAME=`uname -s`
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for host architecture" >&5
 $as_echo_n "checking for host architecture... " >&6; }
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $host_cpu" >&5
-$as_echo "$host_cpu" >&6; }
+ARCH=$host_cpu
+case $host_cpu in
+	i[3456]86)
+		ARCH="x86"
+		;;
+	x86_64 | amd64)
+		ARCH="x64"
+		;;
+esac
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $host_cpu $ARCH" >&5
+$as_echo "$host_cpu $ARCH" >&6; }
 
 
 
