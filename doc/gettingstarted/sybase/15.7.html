@@ -1,30 +1,20 @@
 <html>
 
 <head>
-<title>SQL Relay - Getting Started With Sybase - Initializing an 15.5 Server</title>
+<title>SQL Relay - Getting Started With Sybase - Initializing an 15.7 Server</title>
 <link rel="stylesheet" href="../../css/styles.css">
 </head>
 
 <body>
 
-<span class="heading1">Installing and Initializing an 15.5 Server</span><br>
+<span class="heading1">Installing and Initializing an 15.7 Server</span><br>
 
 <p>To install and initialize Sybase Adaptive Server Enterprise, follow these
 instructions.</p>
 
-<span class="heading2">Note</span><br>
-<p>I've never been able to get the Monitor Server to start.  During
-installation it fails with a series of messages like:</p>
-
-<blockquote>
-Warning: Attempt to create shared memory at addr=0xfe000000 failed
-</blockquote>
-
-<p>These instructions disable installation of the Monitor Server.</p>
-
 <span class="heading2">Install Required Packages</span><br>
 
-<p>Sybase ASE version 15.5 requires libaio, which may or may not be installed
+<p>Sybase ASE version 15.7 requires libaio, which may or may not be installed
 by default.</p>
 
 <p>This packages is available from <a href="http://rpmfind.net">rpmfind</a>
@@ -46,9 +36,9 @@ echo 268435456 > /proc/sys/kernel/shmmax
 
 <blockquote><b>
 mkdir sybase<br>
-mv ase155_linuxx86.tgz sybase<br>
+mv ase157_linuxx86-64.tgz sybase<br>
 cd sybase<br>
-tar xfz ase155_linuxx86.tgz<br>
+tar xfz ase157_linuxx86-64.tgz<br>
 </b></blockquote>
 
 <span class="heading2">Install The Software Distribution</span><br>
@@ -60,26 +50,26 @@ into and, as root, run the following command:</p>
 
 <p>A java-based installer should run.</p>
 
-<p>On the <b>Introduction</b> screen, Click Next.</p>
+<p>On the <b>Introduction</b> screen, click Next.</p>
 
 <p>When prompted <b>Where Would You Like to Install?</b>, accept the default
-(/opt/sybase) and Click Next.</p>
+(/opt/sybase) and click Next.</p>
 
 <p>If prompted <b>The directory /opt/sybase does not exist. Do you want to
-create it?</b>, Click Yes.</p>
+create it?</b>, click Yes.</p>
 
 <p>On the <b>Choose Install Set</b> screen, accept the default (Typical) and
-Click Next.</p>
+click Next.</p>
 
 <p>On the <b>Software License Type Selection</b> screen, select <b>Install
 Free Developer Edition of Sybae Adaptive Server Enterprise Suite</b> and
-Click Next.</p>
+click Next.</p>
 
 <P>When prompted for the <b>End-user license agreement</b> select All regions
 from the <b>Please Select</b> pulldown.<br>
 Read the license and click the <b>I agree to the terms of the Sybase license,
 for the install location specified.</b> check box.<br>
-Click Next.</p>
+click Next.</p>
 
 <p>An installation summary page will appear, indicating what will be installed,
 what directory, and the total size of the installation.<br>
@@ -89,54 +79,48 @@ Click Install.</p>
 Please wait...</b> will appear with a progress bar indicating how much of
 the installation has been completed.  When that is finished, click Next.</p>
 
-<p>On the screen titled <b>Remember ASE Password</b>, accept the default of
-<b>Enable</b> and Click Next.</p>
-
-<!--<p>A screen will pop up asking <b>Do you want to configure email alerts?</b>
-Click No and click Next.</p>-->
-
 <p>On the screen titled <b>Please deselect any servers that you do not want to
 configure now</b><br>
-Uncheck the box marked <b>Configure new Monitor Server</b>.
-Leave all other checkboxes checked and Click Next.</p>
+Leave all checkboxes checked and click Next.</p>
 
-<p>On the screen titled <b>Configure New Adaptive Server</b>
-accept all defaults and Click Next.</p>
+<p>On the screen titled <b>Configure New Adaptive Server</b> enter a
+System Administartor password and confirm it, then accept all other defaults
+and click Next.</p>
 
 <p>If you get a warning about page size, just click <b>OK</b>.</p>
 
-<p>On the screen titled <b>Configure New Backup Server</b>
-accept all defaults and Click Next.</p>
+<p>Another screen titled <b>Configure New Adaptive Server</b> should appear.
+Accept all defaults and click Next.</p>
 
-<p>On the screen titled <b>Configure New Monitor Server</b>
-accept all defaults and Click Next.</p>
+<p>On the screen titled <b>Configure New Backup Server</b>
+accept all defaults and click Next.</p>
 
 <p>On the screen titled <b>Configure New XP Server</b>
-accept all defaults and Click Next.</p>
+accept all defaults and click Next.</p>
 
 <p>On the screen titled <b>Configure New Job Scheduler</b>
-accept all defaults and Click Next.</p>
+accept all defaults and click Next.</p>
 
 <p>On the screen titled <b>Configure Self Management</b>
-accept all defaults and Click Next.</p>
+accept all defaults and click Next.</p>
 
-<p>On the screen titled <b>Configure Web Services</b>
-accept all defaults and Click Next.</p>
+<p>On the screen titled <b>Configure Self Discovery Service Adaptor</b>
+accept all defaults and click Next.</p>
 
-<p>On the screen titled <b>Unified Agent - Self Discovery Service Adaptor</b>
-accept all defaults and Click Next.</p>
+<p>On the screen titled <b>Configure RMI Port</b>
+accept all defaults and click Next.</p>
 
-<p>On the screen titled <b>Unified Agent - Security Login Modules</b>
-accept all defaults and Click Next.</p>
+<p>On the screen titled <b>Configure Administration Passwords</b> enter and
+confirm an SCC agent password and click Next.</p>
 
-<p>On the screen titled <b>Configure New Servers Summary</b> Click Next.</p>
+<p>On the screen titled <b>New Server Configuratin Summary</b> click Next.</p>
 
 <p>Screens will appear with progress messages indicating what step is currently
 being executed.  One of these stages will fail at "Starting server" if shmmax
 wasn't configured properly.</p>
 
 <p>A screen will appear titled <b>Installation Completed</b><br>
-Click Done.</p>
+click Done.</p>
 
 <span class="heading2">Starting the Database at Boot Time</span><br>
 

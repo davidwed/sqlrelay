@@ -15,7 +15,6 @@
 <li><a href="#rpmversions">RPM-based Installations</a>
 <ul>
 <li><a href="#debian">Debian Linux</a></li>
-<li><a href="#slackware">Slackware Linux</a></li>
 <li><a href="#rpm">RPM-based Linux</a></li>
 </ul>
 <li><a href="#nonrpmversions">Non RPM-based Installations</a>
@@ -28,7 +27,7 @@
 <span class="heading1">Installation</span><br>
 
 <p>I've successfully installed and used Sybase Adaptive Server Enterprise 
-versions 15.5, 15.0.2, 12.5.2, 12.5.1, 11.9.2 and 11.0.3.3 on Linux.</p>
+versions 11.0.3.3 - 15.7 on Linux.</p>
 
 <p>You can download Sybase ASE from the 
 <a href="http://www.sybase.com/downloads">downloads section</a> of the Sybase 
@@ -37,7 +36,7 @@ site.</p>
 <a name="rpmversions"></a>
 <span class="heading2">RPM-based Installations</span><br>
 
-<p>Versions 12.5, 11.9.2 and 11.0.3.3 come as a set of RPM's for Linux.</p>
+<p>Versions 11.0.3.3 - 12.5 come as a set of RPM's for Linux.</p>
 
 <a name="debian"></a>
 <span class="heading3">Debian Linux</span><br>
@@ -82,17 +81,6 @@ dpkg -i sybase-ase-11_0_3_3-6_i386.deb<br>
 dpkg -i sybase-ocsd-11_0_3_3-6_i386.deb<br>
 dpkg -i sybase-doc-11_0_4-6_i386.deb<br>
 </blockquote>
-
-<a name="slackware"></a>
-<span class="heading3">Slackware Linux</span><br>
-
-<p>The easiest way to install RPM-based versions Sybase ASE on Slackware Linux
-is to install RPM and then use it to install the RPM's.  The RPM package is
-available from <a href="ftp://ftp.slackware.com">ftp.slackware.com</a>.  You
-can install it using <i>installpkg</i>.  Once RPM is installed, log in as root
-and run <i>rpm --initdb</i> as root.  Then, you can follow the directions below
-for installing on RPM Based Linux.  The only difference is that you must use 
-<i>rpm -i --nodeps</i> instead of <i>rpm -i</i> to install the RPM's.</p>
 
 <a name="rpm"></a>
 <span class="heading3">RPM-based Linux</span><br>
@@ -148,7 +136,7 @@ prompt you for a password.</p>
 <a name="nonrpmversions"></a>
 <span class="heading2">Non RPM-based Installations</span><br>
 
-<p>Sybase provides tarballs for versions 15.5, 15.0.2, 12.5.2 and 12.5.1 for Linux.
+<p>Sybase provides tarballs for versions 12.5.1 - 15.7 for Linux.
 In versions 12.5.2 and 12.5.1, installation and database creation are done in a
 single step.  For instructions for installing versions 12.5.2 and 12.5.1, see
 the instructions below for creating a database.</p>
@@ -156,17 +144,17 @@ the instructions below for creating a database.</p>
 <a name="creating"></a>
 <span class="heading1">Creating a Database</span><br>
 
-<p>Some newer Linux Distributions set the LANG environment variable to a value
-that is not supported by Sybase ASE prior to 15.0.2.  For example,
-LANG=en_US.iso885915 on
-Redhat 7.3.  Check the value of the LANG environment variable, and if necessary,
-set it to something that is defined in the locales.dat file
-(/opt/sybase-11.9.2/locales/locales.dat for sybase-11.9.2) such as en_US for
-US-english.</p>
+<p>Some Linux distributions set the LANG environment variable to a value
+that is not supported by Sybase ASE prior to 15.0.2.  For example, by default
+LANG=en_US.iso885915 on Redhat 7.3.  Check the value of the LANG environment
+variable, and if necessary, set it to something that is defined in the
+locales.dat file (/opt/sybase-11.9.2/locales/locales.dat for sybase-11.9.2)
+such as en_US for US-english.</p>
 
 <p>The instructions for initializing each version are very different.</p>
 
 <p>See
+<a href="sybase/15.7.html">Initializing a 15.7 server</a>,
 <a href="sybase/15.5.html">Initializing a 15.5 server</a>,
 <a href="sybase/15.0.2.html">Initializing a 15.0.2 server</a>,
 <a href="sybase/12.5.2.html">Initializing a 12.5.2 server</a>,
@@ -217,10 +205,13 @@ elsewhere.</p>
 
 <p>The initialization process should have created a server named 
 <i>LOCALHOST</i> (or <i>localhost</i> for version 11.9.2 or earlier) with an
-administrative user named <i>sa</i> which has no password.</p>
+administrative user named <i>sa</i>.  In versions 15.5 and earlier, the
+<i>sa</i> user is created with no password.  Versions 15.7 and later allow you
+to set the password during installation.
 
-<p>To set the administrative user's password, log into the database with the
-following command.  When it prompts you for a password, just press return.</p>
+<p>If you need to set the administrative user's password, log into the database
+with the following command.  When it prompts you for a password, just press
+return.</p>
 
 <blockquote>
 For Sybase 12.5 or later:
@@ -405,7 +396,7 @@ configurations, consult the Sybase ASE documentation.</p>
 <a name="accessing"></a>
 <span class="heading1">Accessing a Database</span><br>
 
-<p>Some newer Linux Distributions set the LANG environment variable to a value
+<p>Some Linux distributions set the LANG environment variable to a value
 that is not supported by Sybase ASE.  For example, LANG=en_US.iso885915 on
 Redhat 7.3.  If isql fails to start, and complains about the LANG environment variable, set it to something that is defined in the locales.dat file
 (/opt/sybase-11.9.2/locales/locales.dat for sybase-11.9.2) such as en_US for
