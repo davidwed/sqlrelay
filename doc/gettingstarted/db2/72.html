@@ -27,10 +27,6 @@ APT-HOWTO</a>, run <i>apt-get install pdksh</i>.  If your distribution came with
 pdksh, you may be prompted to enter a CD.  If not, it will be downloaded from 
 the internet.<p>
 
-<p>For Slackware Linux, the pdksh package is available from 
-<a href="ftp://ftp.slackware.com">ftp.slackware.com</a>.  You can install it 
-using <i>installpkg</i>.</p>
-
 <span class="heading2">Install libncurses.so.4</span><br>
 
 <p>DB2 7.2 requires libncurses.so.4.  Many older distributions come with 
@@ -50,10 +46,8 @@ ln -s libncurses.so.5.2 libncurses.so.4</b>
 
 <span class="heading2">Install Compatibility Packages</span><br>
 
-<p>DB2 V7.2 for Linux requires glibc 2.1.  Distributions that come with glibc
-2.1 include RedHat 6, Debian 2.2, Mandrake 7 and Slackware 7.  Newer
-distributions come with newer versions of glibc.  On these distributions it is
-necessary to install some compatibility packages.</p>
+<p>DB2 V7.2 for Linux requires glibc 2.1.  On distributions that come with newer
+versions of glibc it is necessary to install some compatibility packages.</p>
 
 <p>RedHat provides compatability RPM's for RedHat 7 that can actually be used
 on any Linux distribution.  These RPM's can be downloaded from
@@ -75,8 +69,7 @@ on any Linux distribution.  These RPM's can be downloaded from
 a tarball.  Extracting the tarball using <i>tar xf</i> creates a directory
 called 018_EEE_LNX_NLV.  Change directories into that directory.</p>
 
-<p>On Debian Linux and Slackware Linux, edit the db2_install script and
-comment out the line:</p>
+<p>On Debian Linux edit the db2_install script and comment out the line:</p>
 
 <blockquote>
 <b>rpm -qa | grep rpm 1>/dev/null 2>/dev/null</b>
