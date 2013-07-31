@@ -19093,6 +19093,33 @@ fi
 
 FOUNDLIB=""
 
+if ( test -r "$ORACLE_HOME/lib/libcore12.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	eval "ORACLEVERSION=\"12c\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\""
+else
+	if ( test -n "" )
+	then
+
+if ( test -r "" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDLIB" )
+		then
+			eval ""
+		fi
+	fi
+fi
+
+
+FOUNDLIB=""
+
 if ( test -r "$ORACLE_HOME/lib/libclntsh.a" )
 then
 	eval "FOUNDLIB=\"yes\""
