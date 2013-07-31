@@ -1,5 +1,8 @@
 0.51 - fixed minor perl DBI driver documentation issue
 	added support for oracle 12c
+	added support for db2 10.1 and 10.5
+	updated docs for oracle 12c, db2 10.1 and 10.5 and sybase 15.7
+	modernized database installation docs a little
 
 0.50 - fixed sqlrserver-config script to return data for libsqlrserver
 		rather than libsqlrconnection
