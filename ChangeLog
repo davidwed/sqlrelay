@@ -1,3 +1,5 @@
+0.51 - fixed minor perl DBI driver documentation issue
+
 0.50 - fixed sqlrserver-config script to return data for libsqlrserver
 		rather than libsqlrconnection
 	added test for SQLROWSETSIZE for odbc that doesn't define it

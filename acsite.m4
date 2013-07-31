@@ -905,9 +905,17 @@ then
 					then
 						ORACLEVERSION="11g"
 					fi
+					if ( test -n `echo $version | grep 12` )
+					then
+						ORACLEVERSION="12c"
+					fi
 					ORACLELIBSPATH="/usr/lib/oracle/$version/client/lib"
 					NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
 					ORACLELIBS="-L/usr/lib/oracle/$version/client/lib -lclntsh -l$NNZ"
+					if ( test "$ORACLEVERSION" = "12c" )
+					then
+						ORACLELIBS="$ORACLELIBS -lons -lclntshcore"
+					fi
 					ORACLEINCLUDES="-I/usr/include/oracle/$version/client"
 				fi
 
@@ -919,9 +927,17 @@ then
 					then
 						ORACLEVERSION="11g"
 					fi
+					if ( test -n `echo $version | grep 12` )
+					then
+						ORACLEVERSION="12c"
+					fi
 					ORACLELIBSPATH="/usr/lib/oracle/$version/client64/lib"
 					NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
 					ORACLELIBS="-L/usr/lib/oracle/$version/client64/lib -lclntsh -l$NNZ"
+					if ( test "$ORACLEVERSION" = "12c" )
+					then
+						ORACLELIBS="$ORACLELIBS -lons -lclntshcore"
+					fi
 					ORACLEINCLUDES="-I/usr/include/oracle/$version/client64"
 				fi
 			done
