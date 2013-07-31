@@ -15792,6 +15792,12 @@ UNAME=`uname -s`
 
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for host architecture" >&5
+$as_echo_n "checking for host architecture... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $host_cpu" >&5
+$as_echo "$host_cpu" >&6; }
+
+
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for microsoft platform" >&5
 $as_echo_n "checking for microsoft platform... " >&6; }

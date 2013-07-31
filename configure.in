@@ -452,6 +452,7 @@ dnl Checks for platform-specific stuff
 echo
 echo "***** Platform ***************"
 FW_CHECK_UNAME
+FW_CHECK_ARCH
 
 FW_CHECK_MICROSOFT
 FW_CHECK_MINIX

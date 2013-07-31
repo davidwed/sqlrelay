@@ -370,6 +370,14 @@ fi
 ])
 
 
+dnl Checks for host architecture
+AC_DEFUN([FW_CHECK_ARCH],
+[
+AC_MSG_CHECKING(for host architecture)
+AC_MSG_RESULT($host_cpu)
+])
+
+
 dnl Checks for microsoft platform.
 dnl sets the substitution variables MINGW32, CYGWIN and UWIN as appropriate
 dnl sets the enviroment variable MICROSOFT
