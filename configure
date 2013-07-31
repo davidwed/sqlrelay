@@ -27988,6 +27988,241 @@ fi
 	fi
 fi
 
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/ibm/db2/V10.5/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/ibm/db2/V10.5/lib/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/ibm/db2/V10.5/include\"; DB2VERSION=\"10\""
+		eval "DB2LIBSPATH=\"/opt/ibm/db2/V10.5/lib\"; DB2LIBS=\"-L/opt/ibm/db2/V10.5/lib -ldb2\"; DB2VERSION=\"10\""
+	fi
+else
+	if ( test -n "/opt/ibm/db2/V10.5/lib/libdb2.a" -a -n "DB2LIBS=\"-L/opt/ibm/db2/V10.5/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\"" )
+	then
+
+if ( test -r "/opt/ibm/db2/V10.5/lib/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/ibm/db2/V10.5/include\"; DB2VERSION=\"10\""
+			eval "DB2LIBS=\"-L/opt/ibm/db2/V10.5/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\""
+		fi
+	fi
+fi
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/IBM/db2/V10.5/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/IBM/db2/V10.5/lib/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/IBM/db2/V10.5/include\"; DB2VERSION=\"10\""
+		eval "DB2LIBSPATH=\"/opt/IBM/db2/V10.5/lib\"; DB2LIBS=\"-L/opt/IBM/db2/V10.5/lib -ldb2\"; DB2VERSION=\"10\""
+	fi
+else
+	if ( test -n "/opt/IBM/db2/V10.5/lib/libdb2.a" -a -n "DB2LIBS=\"-L/opt/IBM/db2/V10.5/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\"" )
+	then
+
+if ( test -r "/opt/IBM/db2/V10.5/lib/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/IBM/db2/V10.5/include\"; DB2VERSION=\"10\""
+			eval "DB2LIBS=\"-L/opt/IBM/db2/V10.5/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\""
+		fi
+	fi
+fi
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/ibm/db2/V10.5/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/ibm/db2/V10.5/lib32/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/ibm/db2/V10.5/include\"; DB2VERSION=\"10\""
+		eval "DB2LIBSPATH32=\"/opt/ibm/db2/V10.5/lib32\"; DB2LIBS32=\"-L/opt/ibm/db2/V10.5/lib32 -ldb2\"; DB2VERSION=\"10\""
+	fi
+else
+	if ( test -n "/opt/ibm/db2/V10.5/lib32/libdb2.a" -a -n "DB2LIBS32=\"-L/opt/ibm/db2/V10.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\"" )
+	then
+
+if ( test -r "/opt/ibm/db2/V10.5/lib32/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/ibm/db2/V10.5/include\"; DB2VERSION=\"10\""
+			eval "DB2LIBS32=\"-L/opt/ibm/db2/V10.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\""
+		fi
+	fi
+fi
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/IBM/db2/V10.5/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/IBM/db2/V10.5/lib32/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/IBM/db2/V10.5/include\"; DB2VERSION=\"10\""
+		eval "DB2LIBSPATH32=\"/opt/IBM/db2/V10.5/lib32\"; DB2LIBS32=\"-L/opt/IBM/db2/V10.5/lib32 -ldb2\"; DB2VERSION=\"10\""
+	fi
+else
+	if ( test -n "/opt/IBM/db2/V10.5/lib32/libdb2.a" -a -n "DB2LIBS32=\"-L/opt/IBM/db2/V10.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\"" )
+	then
+
+if ( test -r "/opt/IBM/db2/V10.5/lib32/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/IBM/db2/V10.5/include\"; DB2VERSION=\"10\""
+			eval "DB2LIBS32=\"-L/opt/IBM/db2/V10.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\""
+		fi
+	fi
+fi
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/ibm/db2/V10.5/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/ibm/db2/V10.5/lib64/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/ibm/db2/V10.5/include\"; DB2VERSION=\"10\""
+		eval "DB2LIBSPATH64=\"/opt/ibm/db2/V10.5/lib64\"; DB2LIBS64=\"-L/opt/ibm/db2/V10.5/lib64 -ldb2\"; DB2VERSION=\"10\""
+	fi
+else
+	if ( test -n "/opt/ibm/db2/V10.5/lib64/libdb2.a" -a -n "DB2LIBS64=\"-L/opt/ibm/db2/V10.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\"" )
+	then
+
+if ( test -r "/opt/ibm/db2/V10.5/lib64/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/ibm/db2/V10.5/include\"; DB2VERSION=\"10\""
+			eval "DB2LIBS64=\"-L/opt/ibm/db2/V10.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\""
+		fi
+	fi
+fi
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/IBM/db2/V10.5/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/IBM/db2/V10.5/lib64/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/IBM/db2/V10.5/include\"; DB2VERSION=\"10\""
+		eval "DB2LIBSPATH64=\"/opt/IBM/db2/V10.5/lib64\"; DB2LIBS64=\"-L/opt/IBM/db2/V10.5/lib64 -ldb2\"; DB2VERSION=\"10\""
+	fi
+else
+	if ( test -n "/opt/IBM/db2/V10.5/lib64/libdb2.a" -a -n "DB2LIBS64=\"-L/opt/IBM/db2/V10.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\"" )
+	then
+
+if ( test -r "/opt/IBM/db2/V10.5/lib64/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/IBM/db2/V10.5/include\"; DB2VERSION=\"10\""
+			eval "DB2LIBS64=\"-L/opt/IBM/db2/V10.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\""
+		fi
+	fi
+fi
+
 		fi
 
 				if ( test -n "$DB2LIBS64" )
