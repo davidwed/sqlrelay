@@ -1065,6 +1065,7 @@ void oracle8connection::errorMessage(char *errorbuffer,
 
 	// check for dead connection or shutdown in progress
 	switch (errcode) {
+		case 20: // maximum number of processes is exceeded
 		case 22: // invalid session ID; access denied
 		case 28: // your session has been killed
 		case 604: // error occurred at recursive SQL level ...
