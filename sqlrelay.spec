@@ -27,7 +27,7 @@
 
 Summary: Persistent database connection system.
 Name: sqlrelay
-Version: 0.50
+Version: 0.51
 Release: 1
 License: GPL/LGPL and Others
 Group: System Environment/Daemons
@@ -422,6 +422,7 @@ rm -rf %{buildroot}
 %{_bindir}/sqlr-scaler*
 %{_bindir}/sqlr-start*
 %{_bindir}/sqlr-stop
+%{_bindir}/sqlr-pwdenc
 %{_libdir}/libsqlrserver-*.so.*
 %{_libdir}/libsqlrutil-*.so.*
 %{_libexecdir}/sqlrelay/sqlrlogger_*
@@ -485,22 +486,16 @@ rm -rf %{buildroot}
 %defattr(-, root, root)
 %{_libdir}/libpqsqlrelay-*.so.*
 %{_libdir}/libpqsqlrelay.so
-%{_libdir}/libpqsqlrelay.a
-%{_libdir}/libpqsqlrelay.la
 
 %files client-mysql
 %defattr(-, root, root)
 %{_libdir}/libmysql*sqlrelay-*.so.*
 %{_libdir}/libmysql*sqlrelay.so
-%{_libdir}/libmysql*sqlrelay.a
-%{_libdir}/libmysql*sqlrelay.la
 
 %{!?_without_odbc:%files client-odbc}
 %{!?_without_odbc:%defattr(-, root, root)}
 %{!?_without_odbc:%{_libdir}/libsqlrodbc-*.so.*}
 %{!?_without_odbc:%{_libdir}/libsqlrodbc.so}
-%{!?_without_odbc:%{_libdir}/libsqlrodbc.a}
-%{!?_without_odbc:%{_libdir}/libsqlrodbc.la}
 
 %{!?_without_db2:%files db2}
 %{!?_without_db2:%defattr(-, root, root)}
@@ -573,6 +568,7 @@ rm -rf %{buildroot}
 %{!?_without_ruby:%defattr(-, root, root)}
 %{!?_without_ruby:%{ruby_sitearchdir}/sqlrelay.so}
 %{!?_without_ruby:%{ruby_sitelibdir}/DBD/SQLRelay}
+%{!?_without_ruby:%{ruby_sitelibdir}/dbd/SQLRelay.rb}
 
 %{!?_without_zope:%files zope}
 %{!?_without_zope:%defattr(-, root, root)}
