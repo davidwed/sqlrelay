@@ -428,7 +428,7 @@ rm -rf %{buildroot}
 %{_libexecdir}/sqlrelay/sqlrquery_*
 %{_libexecdir}/sqlrelay/sqltranslation_*
 %{_libexecdir}/sqlrelay/sqltrigger_*
-%{_libexecdir}/sqlrelay/sqlpwdenc_*
+%{_libexecdir}/sqlrelay/sqlrpwdenc_*
 %{_localstatedir}/sqlrelay/tmp
 %{_localstatedir}/sqlrelay/debug
 

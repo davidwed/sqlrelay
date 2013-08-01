@@ -5,6 +5,7 @@
 	modernized database installation docs a little
 	fixed db2/sybase detection to take the system architecture into
 		account when searching for libs
+	applied various build-related patches from Ville Silventoinen
 
 0.50 - fixed sqlrserver-config script to return data for libsqlrserver
 		rather than libsqlrconnection

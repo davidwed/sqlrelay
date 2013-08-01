@@ -1568,12 +1568,10 @@ void sqlrsh::execute(int argc, const char **argv) {
 	#ifdef HAVE_READLINE
 
 		// handle the history file
-		size_t		filenamelen;
-		char		*filename;
+		char		*filename=NULL;
 		const char	*home=environment::getValue("HOME");
 		if (home && home[0]) {
-			filenamelen=charstring::length(home)+16+1;
-			filename=new char[filenamelen];
+			filename=new char[charstring::length(home)+16+1];
 			charstring::copy(filename,home);
 			charstring::append(filename,"/.sqlrsh_history");
 

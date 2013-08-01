@@ -305,21 +305,6 @@ AC_SUBST(PIPE)
 ])
 
 
-dnl checks to see if -Wno-long-double option to gcc works or not
-AC_DEFUN([FW_CHECK_WNOLONGDOUBLE],
-[
-AC_MSG_CHECKING(for -Wno-long-double option)
-FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Wno-long-double],[],[],[WNOLONGDOUBLE="-Wno-long-double"],[WNOLONGDOUBLE=""])
-if ( test -n "$WNOLONGDOUBLE" )
-then
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
-AC_SUBST(WNOLONGDOUBLE)
-])
-
-
 dnl checks to see if -Wall option works or not
 AC_DEFUN([FW_CHECK_WALL],
 [
@@ -455,11 +440,27 @@ case $host_os in
 	*darwin* )
 		DARWIN="yes"
 		AC_MSG_RESULT(yes)
+		FW_CHECK_WNOLONGDOUBLE
 		;;
 	* )
 		AC_MSG_RESULT(no)
 		;;
 esac
+])
+
+
+dnl checks to see if -Wno-long-double option to gcc works or not
+AC_DEFUN([FW_CHECK_WNOLONGDOUBLE],
+[
+AC_MSG_CHECKING(for -Wno-long-double option)
+FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Wall -Wno-long-double -Werror],[],[],[WNOLONGDOUBLE="-Wno-long-double"],[WNOLONGDOUBLE=""])
+if ( test -n "$WNOLONGDOUBLE" )
+then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+AC_SUBST(WNOLONGDOUBLE)
 ])
 
 dnl Checks for minix and adds some macros if it is
