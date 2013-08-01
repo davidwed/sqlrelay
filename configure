@@ -28685,12 +28685,15 @@ $as_echo "$as_me: WARNING: DB2 support will not be built." >&2;}
 		fi
 	fi
 
+	if ( test -n "$DB2LIBS" )
+	then
 
 if ( test -n "$DB2VERSION" )
 then
 	echo "db2 version... $DB2VERSION"
 fi
 
+	fi
 
 if ( test -n "$DB2INCLUDES" )
 then

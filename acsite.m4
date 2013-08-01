@@ -2218,7 +2218,10 @@ then
 		fi
 	fi
 
-	FW_VERSION(db2,[$DB2VERSION])
+	if ( test -n "$DB2LIBS" )
+	then
+		FW_VERSION(db2,[$DB2VERSION])
+	fi
 	FW_INCLUDES(db2,[$DB2INCLUDES])
 	FW_LIBS(db2,[$DB2LIBS])
 		
