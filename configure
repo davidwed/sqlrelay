@@ -24773,6 +24773,8 @@ fi
 fi
 
 
+			if ( test "$ARCH" = "x64" )
+			then
 
 FOUNDHEADER=""
 FOUNDLIB=""
@@ -24812,6 +24814,7 @@ fi
 	fi
 fi
 
+			fi
 		else
 
 
@@ -25014,6 +25017,8 @@ fi
 fi
 
 
+			if ( test "$ARCH" = "x64" )
+			then
 
 FOUNDHEADER=""
 FOUNDLIB=""
@@ -25053,6 +25058,7 @@ fi
 	fi
 fi
 
+			fi
 
 			if ( test -z "$SYBASELIBS" )
 			then
@@ -27493,6 +27499,8 @@ fi
 	fi
 fi
 
+			if ( test "$ARCH" = "x64" )
+			then
 
 FOUNDHEADER=""
 FOUNDLIB=""
@@ -27532,6 +27540,7 @@ fi
 	fi
 fi
 
+			fi
 
 
 FOUNDHEADER=""
@@ -27690,6 +27699,8 @@ fi
 	fi
 fi
 
+			if ( test "$ARCH" = "x64" )
+			then
 
 FOUNDHEADER=""
 FOUNDLIB=""
@@ -27768,6 +27779,7 @@ fi
 	fi
 fi
 
+			fi
 
 
 FOUNDHEADER=""
@@ -27925,6 +27937,8 @@ fi
 	fi
 fi
 
+			if ( test "$ARCH" = "x64" )
+			then
 
 FOUNDHEADER=""
 FOUNDLIB=""
@@ -28003,6 +28017,7 @@ fi
 	fi
 fi
 
+			fi
 
 
 FOUNDHEADER=""
@@ -28160,6 +28175,8 @@ fi
 	fi
 fi
 
+			if ( test "$ARCH" = "x64" )
+			then
 
 FOUNDHEADER=""
 FOUNDLIB=""
@@ -28238,6 +28255,7 @@ fi
 	fi
 fi
 
+			fi
 
 
 FOUNDHEADER=""
@@ -28395,6 +28413,8 @@ fi
 	fi
 fi
 
+			if ( test "$ARCH" = "x64" )
+			then
 
 FOUNDHEADER=""
 FOUNDLIB=""
@@ -28473,6 +28493,7 @@ fi
 	fi
 fi
 
+			fi
 		fi
 
 				if ( test -n "$DB2LIBS64" )
