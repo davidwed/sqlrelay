@@ -13,12 +13,8 @@
 
 
 // windows needs this
+// (don't include for __CYGWIN__ though)
 #if defined(_WIN32)
-	#include <windows.h>
-#endif
-
-// cygwin piggypacks off of the w32api so this is necessary for it too
-#if defined(__CYGWIN__)
 	#include <windows.h>
 #endif
 
