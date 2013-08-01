@@ -6,6 +6,7 @@
 	fixed db2/sybase detection to take the system architecture into
 		account when searching for libs
 	applied various build-related patches from Ville Silventoinen
+	fixed rpm->rpmbuild in installation docs
 
 0.50 - fixed sqlrserver-config script to return data for libsqlrserver
 		rather than libsqlrconnection
