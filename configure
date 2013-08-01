@@ -25017,6 +25017,37 @@ fi
 fi
 
 
+						if ( test -n "$SYBASELIBS" )
+			then
+
+FOUNDLIB=""
+
+if ( test -r "/opt/sybase/OCS-15_0/lib/libsybunic.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	eval "SYBASELIBS=\"$SYBASELIBS -lsybunic\""
+else
+	if ( test -n "" )
+	then
+
+if ( test -r "" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDLIB" )
+		then
+			eval ""
+		fi
+	fi
+fi
+
+			fi
+
 			if ( test "$ARCH" = "x64" )
 			then
 
@@ -25058,6 +25089,36 @@ fi
 	fi
 fi
 
+								if ( test -n "$SYBASELIBS" )
+				then
+
+FOUNDLIB=""
+
+if ( test -r "/opt/sybase/OCS-15_0/lib/libsybunic64.so" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	eval "SYBASELIBS=\"$SYBASELIBS -lsybunic64\""
+else
+	if ( test -n "" )
+	then
+
+if ( test -r "" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDLIB" )
+		then
+			eval ""
+		fi
+	fi
+fi
+
+				fi
 			fi
 
 			if ( test -z "$SYBASELIBS" )
