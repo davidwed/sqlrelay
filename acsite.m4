@@ -387,6 +387,15 @@ AC_MSG_RESULT($host_cpu $ARCH)
 ])
 
 
+dnl Checks for multilib name
+AC_DEFUN([FW_CHECK_MULTILIB_SIGNATURE],
+[
+AC_MSG_CHECKING(for multilib signature)
+MULTILIBSIGNATURE="$host_cpu-$host_os"
+AC_MSG_RESULT($MULTILIBSIGNATURE)
+])
+
+
 dnl Checks for microsoft platform.
 dnl sets the substitution variables MINGW32, CYGWIN and UWIN as appropriate
 dnl sets the enviroment variable MICROSOFT

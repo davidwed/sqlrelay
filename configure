@@ -15807,6 +15807,13 @@ esac
 $as_echo "$host_cpu $ARCH" >&6; }
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for multilib signature" >&5
+$as_echo_n "checking for multilib signature... " >&6; }
+MULTILIBSIGNATURE="$host_cpu-$host_os"
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $MULTILIBSIGNATURE" >&5
+$as_echo "$MULTILIBSIGNATURE" >&6; }
+
+
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for microsoft platform" >&5
 $as_echo_n "checking for microsoft platform... " >&6; }
