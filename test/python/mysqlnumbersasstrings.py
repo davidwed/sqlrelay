@@ -917,6 +917,7 @@ def main():
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 	checkSuccess(secondcur.getField(0,0),9)
 	checkSuccess(con.autoCommitOff(),1)
+	secondcon.commit()
 	print
 
 	print "ROW RANGE:"

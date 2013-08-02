@@ -802,19 +802,24 @@ $cur setResultSetBufferSize 0
 puts ""
 
 puts "COMMIT AND ROLLBACK: "
+# Note: Mysql's default isolation level is repeatable-read,
+# not read-committed like most other db's.  Both sessions must
+# commit to see the changes that each other has made.
 set secondcon [sqlrcon -server "localhost" -port 9000 -socket "/tmp/test.socket" -user "test" -password "test" -retrytime 0 -tries 1]
 set secondcur [$secondcon sqlrcur]
 checkSuccess [$secondcur sendQuery "select count(*) from testtable"] 1
-checkSuccess [$secondcur getFieldByIndex 0 0] "8"
+checkSuccess [$secondcur getFieldByIndex 0 0] "0"
 checkSuccess [$con commit] 1
 checkSuccess [$secondcon commit] 1
 checkSuccess [$secondcur sendQuery "select count(*) from testtable"] 1
 checkSuccess [$secondcur getFieldByIndex 0 0] "8"
 checkSuccess [$con autoCommit 1] 1
 checkSuccess [$cur sendQuery "insert into testdb.testtable values (10,10,10,10,10,10.1,10.1,10.1,'2010-01-01','10:00:00','2010-01-01,10:00:00','2010','char10','text10','varchar10','tinytext10','mediumtext10','longtext10',NULL)"] 1
+checkSuccess [$secondcon commit] 1
 checkSuccess [$secondcur sendQuery "select count(*) from testtable"] 1
 checkSuccess [$secondcur getFieldByIndex 0 0] "9"
 checkSuccess [$con autoCommit 0] 1
+$secondcon commit
 puts ""
 
 puts "FINISHED SUSPENDED SESSION: "

@@ -998,20 +998,25 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COMMIT AND ROLLBACK: \n");
+	// Note: Mysql's default isolation level is repeatable-read,
+	// not read-committed like most other db's.  Both sessions must
+	// commit to see the changes that each other has made.
 	secondcon=new sqlrconnection("localhost",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
-	checkSuccess(secondcur->getField(0,(uint32_t)0),"8");
+	checkSuccess(secondcur->getField(0,(uint32_t)0),"0");
 	checkSuccess(con->commit(),1);
 	checkSuccess(secondcon->commit(),1);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"8");
 	checkSuccess(con->autoCommitOn(),1);
 	checkSuccess(cur->sendQuery("insert into testdb.testtable values (10,10,10,10,10,10.1,10.1,10.1,'2010-01-01','10:00:00','2010-01-01 10:00:00','2010','char10','varchar10','text10','tinytext10','mediumtext10','longtext10','blob10','tinyblob10','mediumblob10','longblob10',NULL)"),1);
+	checkSuccess(secondcon->commit(),1);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"9");
 	checkSuccess(con->autoCommitOff(),1);
+	secondcon->commit();
 	printf("\n");
 
 	printf("FINISHED SUSPENDED SESSION: \n");

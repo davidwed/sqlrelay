@@ -909,15 +909,18 @@ dl("sql_relay.so");
 					$socket,$user,$password,0,1);
 	$secondcur=sqlrcur_alloc($secondcon);
 	checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
-	checkSuccess(sqlrcur_getField($secondcur,0,0),"8");
+	checkSuccess(sqlrcur_getField($secondcur,0,0),"0");
 	checkSuccess(sqlrcon_commit($con),1);
+	checkSuccess(sqlrcon_commit($secondcon),1);
 	checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
 	checkSuccess(sqlrcur_getField($secondcur,0,0),"8");
 	checkSuccess(sqlrcon_autoCommitOn($con),1);
 	checkSuccess(sqlrcur_sendQuery($cur,"insert into testdb.testtable values (10,10,10,10,10,10.1,10.1,10.1,'2010-01-01','10:00:00','2010-01-01 10:00:00','2010','char10','text10','varchar10','tinytext10','mediumtext10','longtext10',NULL)"),1);
+	checkSuccess(sqlrcon_commit($secondcon),1);
 	checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
 	checkSuccess(sqlrcur_getField($secondcur,0,0),"9");
 	checkSuccess(sqlrcon_autoCommitOff($con),1);
+	sqlrcon_commit($secondcon);
 	echo("\n");
 
 	# drop existing table
