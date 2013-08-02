@@ -4261,6 +4261,9 @@ void sqlrcontroller_svr::commitOrRollback(sqlrcursor_svr *cursor) {
 
 	// if the query was a commit or rollback, set a flag indicating so
 	if (conn->isTransactional()) {
+		// FIXME: if db has been put in the repeatable-read isolation
+		// level then commitorrollback=true needs to be set no
+		// matter what the query was
 		if (cursor->queryIsCommitOrRollback()) {
 			logDebugMessage("commit or rollback not needed");
 			commitorrollback=false;
