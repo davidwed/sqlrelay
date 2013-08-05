@@ -2,7 +2,7 @@
 #include <rudiments/randomnumber.h>
 #include <stdio.h>
 
-main() {
+int main(int argc, char **argv) {
 
 	sqlrconnection	sqlrcon("localhost",9000,"","test","test",0,1);
 	sqlrcursor	sqlrcur(&sqlrcon);
@@ -55,7 +55,7 @@ main() {
 		// select those rows a random number of times,
 		// use a new cursor for each time
 		seed=randomnumber::generateNumber(seed);
-		times=randomnumber::scaleNumber(seed,1,20);
+		times=randomnumber::scaleNumber(seed,1,5);
 		sqlrcursor	**cursors=new sqlrcursor *[times];
 		for (int32_t i=0; i<times; i++) {
 			cursors[i]=new sqlrcursor(&sqlrcon);
