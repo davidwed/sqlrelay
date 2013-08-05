@@ -368,8 +368,8 @@ int	main(int argc, char **argv) {
 	printf("SERIALPKG:\n");
 	checkSuccess(cur->sendQuery("select object_type from user_objects where object_name='SERIALPKG'"),1);
 	checkSuccess(cur->rowCount(),2);
-	checkSuccess(cur->getField(0,(uint32_t)0),"PACKAGE");
-	checkSuccess(cur->getField(1,(uint32_t)0),"PACKAGE BODY");
+	checkSuccess(cur->getField(0,(uint32_t)0),"PACKAGE BODY");
+	checkSuccess(cur->getField(1,(uint32_t)0),"PACKAGE");
 	checkSuccess(cur->sendQuery("select object_type from user_objects where object_name='LAST_INSERT_ID'"),1);
 	checkSuccess(cur->rowCount(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"FUNCTION");
@@ -486,6 +486,12 @@ int	main(int argc, char **argv) {
 	printf("TRANSLATIONS: translatedatetimes\n");
 	cur->prepareQuery("select :1,'02-MAR-2001' from dual");
 	cur->inputBind("1","01-FEB-2000");
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"01/02/2000");
+	checkSuccess(cur->getField(0,1),"02/03/2001");
+	cur->clearBinds();
+	cur->prepareQuery("select :1,'2001-02-03' from dual");
+	cur->inputBind("1","2000-01-02");
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"01/02/2000");
 	checkSuccess(cur->getField(0,1),"02/03/2001");
