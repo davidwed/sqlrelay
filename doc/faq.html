@@ -69,6 +69,7 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <li><a href="#oracleosauth">How do I use Oracle's OS-Authentication (users identified externally)?</a></li>
 <li><a href="#mysqltrans">Why aren't commit's working in MySQL?</a></li>
 <li><a href="#db2login">Why does the first DB2 query causes SQL Relay to reconnect to the DB?</a></li>
+<li><a href="#mssqldates">What's the deal with date columns in MS SQL Server?</a></li>
 </ul>
 
 <br><span class="heading2">Programming Questions</span><br>
@@ -735,6 +736,41 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 <span class="heading3">Why does the first DB2 query causes SQL Relay to reconnect to the DB?</span>
 
 <p>This started in SQL Relay 0.39, see <a href="gettingstarted/db2.html#caveat">SQL Relay - Getting Started With IBM DB2</a> for information about this.</p>
+
+<br><a name="mssqldates"></a>
+<span class="heading3">What's the deal with date columns in MS SQL Server?</span>
+
+<p>SQL Relay uses FreeTDS to connect to MS SQL Server.  SQL Relay can also use FreeTDS to connect to Sybase.</p>
+
+<p>FreeTDS recognizes Sybase DATE/DATETIME columns and MS SQL Server DATETIME columns as DATETIME types and formats them according to the rules defined in FreeTDS's locales.conf file for the locale of the SQL Relay server.</p>
+
+<p>However, FreeTDS doesn't recognizes MS SQL Server DATE columns as DATETIME types.  Rather it recognizes them as CHAR types and formats them in YYYY-MM-DD format universally.</p>
+
+<p>So when using MS SQL Server, if you select a DATE and DATETIME column you might get results like:</p>
+
+<blockquote>
+<b>DATE:</b> 2013-08-05<br>
+<b>DATETIME:</b> Aug  5 2013 09:25:25:917PM<br>
+</blockquote>
+
+<p>instead of what you'd get with Sybase:</p>
+
+<blockquote>
+<b>DATE:</b> Aug  5 2013 12:00:00:000AM<br>
+<b>DATETIME:</b> Aug  5 2013 09:25:25:917PM<br>
+</blockquote>
+
+<p>The <b>dateformat</b> parameter in the sqlrelay.conf file can be used to normalize these DATE fields but there is an interesting potential issue.</p>
+
+<p>The date/time conversion routines take any fields in the result set that appear to be a date, time or date/time combination and translate them to the format specified by the <b>dateformat</b>, <b>timeformat</b> and <b>datetimeformat</b> parameters.  However the routines must also use the <b>dateddmm</b> parameter to determine whether the month or day comes first.  For example, the date 03/04/2005 could be recognized as either March 4, 2005 or April 3, 2005.  If <b>dateddmm="yes"</b> is set then it will be recognized as the latter.</p>
+
+<p>Without a special exception though, setting <b>dateddmm="yes"</b> would cause problems when fetching DATE columns from MS SQL Server because they are always in YYYY-MM-DD format.  To resolve this, for MS SQL Server, when a date in the result set appears to be in the YYYY-XX-XX format, the <b>dateddmm</b> parameter is ignored and it is presumed to be in YYYY-MM-DD format.</p>
+
+<p>Ideally we'd only ignore <b>dateddmm</b> for MS SQL Server, on DATE type columns that appeared to be in the YYYY-XX-XX format.  But, since DATE columns are returned as CHAR type and we can't tell whether a column was fetched from the database or just a literal in the original queriy then we can't be that selective.  We just have to ignore <b>dateddmm</b> for everything in YYYY-XX-XX format, whether fetched from a DATE column or from a CHAR column or from a string literal in the original query.</p>
+
+<p>What all of this means is that when using date/time conversion with MS SQL Server and <b>dateddmm="yes"</b> is set, dates stored in CHAR fields in YYYY-XX-XX format must be stored in YYYY-MM-DD format and that string literals in the original query that are in YYYY-XX-XX format must also be in YYYY-MM-DD format.</p>
+
+<p>Of course, if you're not using MS SQL Server and date/time conversion and setting <b>dateddmm="yes"</b> then you don't have to worry about any of this.</p>
 
 <hr>
 

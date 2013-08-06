@@ -60,10 +60,12 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 	uint64_t	partcount;
 	charstring::split(datetime," ",1,true,&parts,&partcount);
 
-	// there should one (date/time only),
+	// there should be:
+	// one (date/time only),
 	// two (date and time),
 	// three (eg. Feb 02 2012) parts,
-	// or four (eg. Feb 02 2012 01:03:04:000AM) parts
+	// or four (eg. Feb 02 2012 01:03:04:000AM)
+	// parts
 	if (!partcount || partcount>4) {
 		for (uint64_t i=0; i<partcount; i++) {
 			delete[] parts[i];
@@ -343,24 +345,23 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 					// it could be yyyy-xx-xx or xx-xx-yyyy
 					if (charstring::length(
 							dateparts[0])==4) {
-
-						// It's a bit of a gamble, but
-						// we'll presume that if it
-						// starts with a year then
-						// it's yyyy-mm-dd rather than
-						// yyyy-dd-mm.  I've never seen
-						// anyone use yyyy-dd-mm.
-						// MS SQL Server in particular
-						// always formats date columns
-						// as yyyy-dd-mm and it'll help
-						// to presume this when dealing
-						// with those.
 						*year=charstring::toInteger(
 								dateparts[0]);
-						*month=charstring::toInteger(
+						if (ddmm) {
+							*day=
+							charstring::toInteger(
 								dateparts[1]);
-						*day=charstring::toInteger(
+							*month=
+							charstring::toInteger(
 								dateparts[2]);
+						} else {
+							*month=
+							charstring::toInteger(
+								dateparts[1]);
+							*day=
+							charstring::toInteger(
+								dateparts[2]);
+						}
 					} else {
 						if (ddmm) {
 							*day=

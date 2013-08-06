@@ -433,6 +433,11 @@ uint16_t sqlrcursor_svr::getColumnIsAutoIncrement(uint32_t col) {
 	return 0;
 }
 
+bool sqlrcursor_svr::ignoreDateDdMmParameter(uint32_t col,
+					const char *data, uint32_t size) {
+	return false;
+}
+
 bool sqlrcursor_svr::noRowsToReturn() {
 	return true;
 }

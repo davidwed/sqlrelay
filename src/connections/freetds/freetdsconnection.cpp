@@ -165,6 +165,9 @@ class freetdscursor : public sqlrcursor_svr {
 		uint16_t	getColumnIsUnsigned(uint32_t col);
 		uint16_t	getColumnIsBinary(uint32_t col);
 		uint16_t	getColumnIsAutoIncrement(uint32_t col);
+		bool		ignoreDateDdMmParameter(uint32_t col,
+						const char *data,
+						uint32_t size);
 		bool		noRowsToReturn();
 		bool		skipRow();
 		bool		fetchRow();
@@ -1720,6 +1723,55 @@ uint16_t freetdscursor::getColumnIsBinary(uint32_t col) {
 
 uint16_t freetdscursor::getColumnIsAutoIncrement(uint32_t col) {
 	return (column[col].status&CS_IDENTITY);
+}
+
+bool freetdscursor::ignoreDateDdMmParameter(uint32_t col,
+					const char *data, uint32_t size) {
+
+	// This is for a very FreeTDS/MSSQL Server-specific issue...
+	//
+	// If we're translating dates in the result set then we have to be
+	// careful about dates in the yyyy-xx-xx format.
+	//
+	// FreeTDS recognizes Sybase date/datetime columns and MSSQL datetime
+	// columns as type CS_DATETIME_TYPE and formats them according to the
+	// rules defined in locales.conf for the locale of the SQL Relay server.
+	//
+	// However, FreeTDS recognizes MSSQL date columns as type CS_CHAR_TYPE
+	// and formats them in yyyy-mm-dd format universally.
+	//
+	// The date conversion routines take any fields that look like a date
+	// and translate them to the specified format.  Unfortunately if you're
+	// in a region where dates are formatted dd/mm/yyyy (for example) then
+	// dateddmm="yes" needs to be set so string literals like "03/04/2005"
+	// will be recognized as April 3, 2005.  This would cause problems when
+	// fetching date columns from MSSQL so we have to ignore dateddmm in
+	// that case.
+	//
+	// Ideally we'd only ignore dateddmm for MSSQL, on CS_DATETIME_TYPE
+	// columns that appeared to be in the yyyy-xx-xx format.  But, since
+	// date columns are returned as CS_CHAR_TYPE then we can't.  So, we
+	// end up ignoring dateddmm for everything in yyyy-xx-xx format, whether
+	// fetched from a date column or from a string column or from a
+	// string literal in the original query.
+	//
+	// That means that if date translation is in effect, if dates are stored
+	// in string fields in yyyy-xx-xx format, then they must be stored in
+	// yyyy-mm-dd format.
+	//
+	// It also means that if date translation in in effect then unless the
+	// translatedatetimes translation module is being used to normalize
+	// string literals in the original query to some other format, then
+	// they have to be in yyyy-mm-dd format as well.
+
+	// Override the dateddmm parameter if we're using MSSQL Server and the
+	// fields is in yyyy-xx-xx format and appears to be a date.
+	return (!freetdsconn->sybasedb &&
+			size==10 &&
+			data[4]=='-' && data[7]=='-' &&
+			charstring::isNumber(data,4) &&
+			charstring::isNumber(data+5,2) &&
+			charstring::isNumber(data+8,2));
 }
 
 bool freetdscursor::noRowsToReturn() {

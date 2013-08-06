@@ -9,6 +9,8 @@
 	fixed rpm->rpmbuild in installation docs
 	added ora-00020 to list of errors that will cause the oracle
 		connection to attempt to re-login, per Ville Silventoinen
+	fixed some MS SQL Server/dateddmm parameter issues and updated docs
+		to explain the remaining issues
 
 0.50 - fixed sqlrserver-config script to return data for libsqlrserver
 		rather than libsqlrconnection

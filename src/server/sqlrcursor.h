@@ -203,6 +203,9 @@ class sqlrcursor_svr {
 		virtual uint16_t	getColumnIsZeroFilled(uint32_t col);
 		virtual uint16_t	getColumnIsBinary(uint32_t col);
 		virtual uint16_t	getColumnIsAutoIncrement(uint32_t col);
+		virtual bool		ignoreDateDdMmParameter(uint32_t col,
+							const char *data,
+							uint32_t size);
 		virtual	bool		noRowsToReturn();
 		virtual	bool		skipRow();
 		virtual	bool		fetchRow();

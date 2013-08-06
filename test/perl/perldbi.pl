@@ -61,10 +61,11 @@ $sth->execute() or die DBI->errstr;
 print "\n\n";
 
 
-print "BIND FUNCTIONS\n";
-my $sth=$dbh->prepare("select ?,?,? from dual") or die DBI->errstr;
-$sth->execute("hello",1,5.5) or die DBI->errstr;
-print "\n\n";
+# translatebindvariables="yes" must be set for this to work
+#print "BIND FUNCTIONS\n";
+#my $sth=$dbh->prepare("select ?,?,? from dual") or die DBI->errstr;
+#$sth->execute("hello",1,5.5) or die DBI->errstr;
+#print "\n\n";
 
 
 print "OUTPUT BIND FUNCTIONS\n";

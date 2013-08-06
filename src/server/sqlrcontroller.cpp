@@ -4934,11 +4934,13 @@ void sqlrcontroller_svr::sendField(sqlrcursor_svr *cursor,
 
 		// are dates going to be in MM/DD or DD/MM format?
 		bool		ddmm=cfgfl->getDateDdMm();
-		// FIXME: MSSQL stores dates in MM/DD format but an app might
-		// pass in a date literal in DD/MM format
-		// (eg. select '15/04/2012') We need to translate both.  
-		// Arguably we need two parameters but how can we tell whether
-		// the date is coming from the db or a literal?
+
+		// This weirdness is mainly to address a FreeTDS/MSSQL
+		// issue.  See the code for the method
+		// freetdscursor::ignoreDataDdMmParameter() for more info.
+		if (cursor->ignoreDateDdMmParameter(index,data,size)) {
+			ddmm=false;
+		}
 
 		int16_t	year=-1;
 		int16_t	month=-1;
