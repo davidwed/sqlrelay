@@ -1,3 +1,5 @@
+0.52 - 
+
 0.51 - fixed minor perl DBI driver documentation issue
 	added support for oracle 12c
 	added support for db2 10.1 and 10.5
