@@ -200,7 +200,7 @@ rpmbuild -ta -without oracle -without zope sqlrelay-X.XX.tar.gz<br>
 <p>This will generate RPM's in the system-wide RPM directory (usually /usr/src/redhat/RPMS or /usr/local/rpm/RPMS) under the subdirectory corresponding to your system architecture.  You can install them by changing directories into that directory and executing the following command as root:</p>
 
 <blockquote><b>
-rpmbuild -i --nodeps sqlrelay-*
+rpm -i --nodeps sqlrelay-*
 </b></blockquote>
 
 

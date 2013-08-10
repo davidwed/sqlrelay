@@ -15,11 +15,17 @@
 using namespace rudiments;
 #endif
 
-int exportTable(sqlrcursor *sqlrcur, const char *table);
-int exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
-						const char *sequence);
+bool exportTable(sqlrcursor *sqlrcur,
+			const char *table, const char *format);
+void exportTableXml(sqlrcursor *sqlrcur, const char *table);
+void exportTableCsv(sqlrcursor *sqlrcur);
 
-void escapeField(const char *field, uint32_t length) {
+bool exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
+			const char *sequence, const char *format);
+void exportSequenceXml(sqlrcursor *sqlrcur, const char *sequence);
+void exportSequenceCsv(sqlrcursor *sqlrcur, const char *sequence);
+
+void xmlEscapeField(const char *field, uint32_t length) {
 	for (uint32_t index=0; index<length; index++) {
 		if (field[index]=='\'') {
 			printf("''");
@@ -28,6 +34,18 @@ void escapeField(const char *field, uint32_t length) {
 				field[index]=='>') {
 			printf("&%d;",(uint8_t)field[index]);
 		} else {
+			printf("%c",field[index]);
+		}
+	}
+}
+
+void csvEscapeField(const char *field, uint32_t length) {
+	for (uint32_t index=0; index<length; index++) {
+		// backslash-escape double quotes and ignore non-ascii
+		// characters
+		if (field[index]=='"') {
+			printf("\\\"");
+		} else if (field[index]>=' ' || field[index]<='~') {
 			printf("%c",field[index]);
 		}
 	}
@@ -54,6 +72,10 @@ int main(int argc, const char **argv) {
 	const char	*password=cmdline.getValue("-password");
 	const char	*table=cmdline.getValue("-table");
 	const char	*sequence=cmdline.getValue("-sequence");
+	const char	*format=cmdline.getValue("-format");
+	if (!charstring::length(format)) {
+		format="xml";
+	}
 	uint64_t	rsbs=charstring::toInteger(
 				cmdline.getValue("-resultsetbuffersize"));
 	if (!rsbs) {
@@ -70,9 +92,9 @@ int main(int argc, const char **argv) {
 			charstring::length(sequence))) {
 
 		printf("usage: \n"
-			"  sqlr-export -host host -port port -socket socket -user user -password password (-table table | -sequence sequence) [-resultsetbuffersize rows] [-debug]\n"
+			"  sqlr-export -host host -port port -socket socket -user user -password password (-table table | -sequence sequence) [-format (xml | csv)] [-resultsetbuffersize rows] [-debug]\n"
 			"    or\n"
-			"  sqlr-export [-config configfile] -id id (-table table | -sequence sequence) [-resultsetbuffersize rows] [-debug]\n");
+			"  sqlr-export [-config configfile] -id id (-table table | -sequence sequence) [-format (xml | csv)] [-resultsetbuffersize rows] [-debug]\n");
 		process::exit(1);
 	}
 
@@ -99,76 +121,115 @@ int main(int argc, const char **argv) {
 
 	sqlrcur.setResultSetBufferSize(rsbs);
 
-	int	exitval=0;
+	bool	result;
 	if (charstring::length(table)) {
-		exitval=exportTable(&sqlrcur,table);
+		result=exportTable(&sqlrcur,table,format);
 	} else if (charstring::length(sequence)) {
-		exitval=exportSequence(&sqlrcon,&sqlrcur,sequence);
+		result=exportSequence(&sqlrcon,&sqlrcur,sequence,format);
 	}
 
 	sqlrcon.endSession();
 
-	process::exit(exitval);
+	process::exit((result)?0:1);
 }
 
-int exportTable(sqlrcursor *sqlrcur, const char *table) {
+bool exportTable(sqlrcursor *sqlrcur, const char *table, const char *format) {
 
 	stringbuffer	query;
 	query.append("select * from ")->append(table);
 	if (sqlrcur->sendQuery(query.getString())) {
 
-		// print header
-		printf("<?xml version=\"1.0\"?>\n");
-		printf("<!DOCTYPE table SYSTEM \"sqlr-export.dtd\">\n");
-
-		// print table name
-		printf("<table name=\"%s\">\n",table);
-
-		// print columns
-		uint32_t	cols=sqlrcur->colCount();
-		printf("<columns count=\"%d\">\n",cols);
-		for (uint32_t j=0; j<cols; j++) {
-			printf("	"
-				"<column name=\"%s\" type=\"%s\"/>\n",
-				sqlrcur->getColumnName(j),
-				sqlrcur->getColumnType(j));
+		if (!charstring::compareIgnoringCase(format,"csv")) {
+			exportTableCsv(sqlrcur);
+		} else {
+			exportTableXml(sqlrcur,table);
 		}
-		printf("</columns>\n");
-
-		// print rows
-		printf("<rows>\n");
-		uint64_t	row=0;
-		for (;;) {
-			printf("	<row>\n");
-			for (uint32_t col=0; col<cols; col++) {
-				const char	*field=
-						sqlrcur->getField(row,col);
-				if (!field) {
-					break;
-				}
-				printf("	<field>");
-				escapeField(field,
-					sqlrcur->getFieldLength(row,col));
-				printf("</field>\n");
-			}
-			printf("	</row>\n");
-			row++;
-			if (sqlrcur->endOfResultSet() &&
-					row>=sqlrcur->rowCount()) {
-				break;
-			}
-		}
-		printf("</rows>\n");
-		printf("</table>\n");
-		return 0;
+		return true;
 	}
 
 	printf("%s\n",sqlrcur->errorMessage());
-	return 1;
+	return false;
 }
 
-int exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
-						const char *sequence) {
+void exportTableXml(sqlrcursor *sqlrcur, const char *table) {
+
+	// print header
+	printf("<?xml version=\"1.0\"?>\n");
+	printf("<!DOCTYPE table SYSTEM \"sqlr-export.dtd\">\n");
+
+	// print table name
+	printf("<table name=\"%s\">\n",table);
+
+	// print columns
+	uint32_t	cols=sqlrcur->colCount();
+	printf("<columns count=\"%d\">\n",cols);
+	for (uint32_t j=0; j<cols; j++) {
+		printf("	<column name=\"%s\" type=\"%s\"/>\n",
+			sqlrcur->getColumnName(j),sqlrcur->getColumnType(j));
+	}
+	printf("</columns>\n");
+
+	// print rows
+	printf("<rows>\n");
+	uint64_t	row=0;
+	for (;;) {
+		printf("	<row>\n");
+		for (uint32_t col=0; col<cols; col++) {
+			const char	*field=sqlrcur->getField(row,col);
+			if (!field) {
+				break;
+			}
+			printf("	<field>");
+			xmlEscapeField(field,sqlrcur->getFieldLength(row,col));
+			printf("</field>\n");
+		}
+		printf("	</row>\n");
+		row++;
+		if (sqlrcur->endOfResultSet() && row>=sqlrcur->rowCount()) {
+			break;
+		}
+	}
+	printf("</rows>\n");
+	printf("</table>\n");
+}
+
+void exportTableCsv(sqlrcursor *sqlrcur) {
+
+	// print header
+	uint32_t	cols=sqlrcur->colCount();
+	for (uint32_t j=0; j<cols; j++) {
+		if (j) {
+			printf(",");
+		}
+		printf("%s",sqlrcur->getColumnName(j));
+	}
+	printf("\n");
+
+	// print rows
+	uint64_t	row=0;
+	for (;;) {
+		for (uint32_t col=0; col<cols; col++) {
+			const char	*field=sqlrcur->getField(row,col);
+			if (!field) {
+				break;
+			}
+			if (col) {
+				printf(",");
+			}
+			printf("\"");
+			csvEscapeField(field,sqlrcur->getFieldLength(row,col));
+			printf("\"");
+		}
+		printf("\n");
+		row++;
+		if (sqlrcur->endOfResultSet() && row>=sqlrcur->rowCount()) {
+			break;
+		}
+	}
+}
+
+bool exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
+				const char *sequence, const char *format) {
 
 	// the query we'll use to get the sequence depends on the database type
 	const char	*dbtype=sqlrcon->identify();
@@ -189,21 +250,39 @@ int exportSequence(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		query.append("values nextval for ")->append(sequence);
 	} else {
 		printf("%s doesn't support sequences.\n",dbtype);
-		return 1;
+		return false;
 	}
 
 	if (sqlrcur->sendQuery(query.getString())) {
 
-		// print header
-		printf("<?xml version=\"1.0\"?>\n");
-		printf("<!DOCTYPE sequence SYSTEM \"sqlr-export.dtd\">\n");
-
-		// print table name
-		printf("<sequence name=\"%s\" value=\"%s\"/>\n",
-				sequence,sqlrcur->getField(0,(uint32_t)0));
-		return 0;
+		if (!charstring::compareIgnoringCase(format,"csv")) {
+			exportSequenceCsv(sqlrcur,sequence);
+		} else {
+			exportSequenceXml(sqlrcur,sequence);
+		}
+		return true;
 	}
 
 	printf("%s\n",sqlrcur->errorMessage());
-	return 1;
+	return false;
+}
+
+void exportSequenceXml(sqlrcursor *sqlrcur, const char *sequence) {
+
+	// print header
+	printf("<?xml version=\"1.0\"?>\n");
+	printf("<!DOCTYPE sequence SYSTEM \"sqlr-export.dtd\">\n");
+
+	// print sequence value
+	printf("<sequence name=\"%s\" value=\"%s\"/>\n",
+			sequence,sqlrcur->getField(0,(uint32_t)0));
+}
+
+void exportSequenceCsv(sqlrcursor *sqlrcur, const char *sequence) {
+
+	// print header
+	printf("%s\n",sequence);
+
+	// print sequence value
+	printf("\"%s\"\n",sqlrcur->getField(0,(uint32_t)0));
 }
