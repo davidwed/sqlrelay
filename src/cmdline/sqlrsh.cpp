@@ -1422,7 +1422,7 @@ void sqlrsh::startupMessage(sqlrshenv *env, const char *host,
 					uint16_t port, const char *user) {
 
 	printf("SQLRShell - ");
-	printf("Version 0.22\n");
+	printf("Version %s\n",SQLR_VERSION);
 	printf("	Connected to: ");
 	printf("%s:%d as %s\n\n",host,port,user);
 	printf("	type help; for help.\n\n");
