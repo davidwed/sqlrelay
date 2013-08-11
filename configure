@@ -15870,7 +15870,7 @@ fi
 $as_echo_n "checking for minix... " >&6; }
 case $host_os in
 	*minix* )
-		CPPFLAGS="$CPPFLAGS -D_MINIX -D_POSIX_SOURCE"
+		CPPFLAGS="$CPPFLAGS -D_MINIX -D_POSIX_SOURCE -D_NETBSD_SOURCE -D_XOPEN_SOURCE -D_XOPEN_SOURCE_EXTENDED"
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 		;;
