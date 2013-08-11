@@ -515,6 +515,24 @@ case $host_os in
 esac
 ])
 
+AC_DEFUN([FW_CHECK_SCO_OSR6],
+[
+AC_MSG_CHECKING(for SCO OSR = 6.0.0)
+if ( test "`uname -s`" = "SCO_SV" )
+then
+	if ( test "`uname -v | tr -d '.'`" -eq "600" )
+	then
+		CPPFLAGS="$CPPFLAGS -D__STDC__=0"
+		AC_MSG_RESULT(yes)
+	else
+		AC_MSG_RESULT(no)
+	fi
+else
+	AC_MSG_RESULT(no)
+fi
+])
+
+
 dnl Determines what extension shared object files have
 AC_DEFUN([FW_CHECK_SO_EXT],
 [
