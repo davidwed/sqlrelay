@@ -1614,12 +1614,14 @@ void oracle8cursor::dateToString(char *buffer, uint16_t buffersize,
 	// typically oracle just wants DD-MON-YYYY but if hour,
 	// minute and second are non-zero then use them too
 	if (hour && minute && second) {
-		snprintf(buffer,buffersize,"%02d-%s-%04d %02d:%02d:%02d",
-				day,shortmonths[month-1],year,
-				hour,minute,second);
+		charstring::printTo(buffer,buffersize,
+					"%02d-%s-%04d %02d:%02d:%02d",
+					day,shortmonths[month-1],year,
+					hour,minute,second);
 	} else {
-		snprintf(buffer,buffersize,"%02d-%s-%04d",
-				day,shortmonths[month-1],year);
+		charstring::printTo(buffer,buffersize,
+					"%02d-%s-%04d",
+					day,shortmonths[month-1],year);
 	}
 }
 

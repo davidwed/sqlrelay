@@ -86,8 +86,9 @@ bool scaler::initScaler(int argc, const char **argv) {
 	size_t	listenerpidfilelen=tmpdir->getLength()+20+
 					charstring::length(id)+1;
 	char	*listenerpidfile=new char[listenerpidfilelen];
-	snprintf(listenerpidfile,listenerpidfilelen,
-			"%s/pids/sqlr-listener-%s",tmpdir->getString(),id);
+	charstring::printTo(listenerpidfile,listenerpidfilelen,
+				"%s/pids/sqlr-listener-%s",
+				tmpdir->getString(),id);
 	bool	found=false;
 	for (uint8_t i=0; !found && i<5; i++) {
 		if (i) {
@@ -111,8 +112,9 @@ bool scaler::initScaler(int argc, const char **argv) {
 	// check/set pid file
 	size_t	pidfilelen=tmpdir->getLength()+18+charstring::length(id)+1;
 	pidfile=new char[pidfilelen];
-	snprintf(pidfile,pidfilelen,
-			"%s/pids/sqlr-scaler-%s",tmpdir->getString(),id);
+	charstring::printTo(pidfile,pidfilelen,
+				"%s/pids/sqlr-scaler-%s",
+				tmpdir->getString(),id);
 	if (checkForPidFile(pidfile)!=-1) {
 		fprintf(stderr,"\nsqlr-scaler error:\n");
 		fprintf(stderr,"	The pid file %s",pidfile);
@@ -252,7 +254,8 @@ bool scaler::initScaler(int argc, const char **argv) {
 	// initialize the shared memory segment filename
 	size_t	idfilenamelen=tmpdir->getLength()+5+charstring::length(id)+1;
 	char	*idfilename=new char[idfilenamelen];
-	snprintf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir->getString(),id);
+	charstring::printTo(idfilename,idfilenamelen,
+				"%s/ipc/%s",tmpdir->getString(),id);
 	key_t	key=file::generateKey(idfilename,1);
 	delete[] idfilename;
 
@@ -388,7 +391,7 @@ pid_t scaler::openOneConnection() {
 	char	command[]="sqlr-connection";
 
 	char	ttlstr[20];
-	snprintf(ttlstr,20,"%d",ttl);
+	charstring::printTo(ttlstr,20,"%d",ttl);
 	ttlstr[19]='\0';
 
 	int	p=0;
@@ -610,8 +613,8 @@ bool scaler::availableDatabase() {
 	size_t	updownlen=tmpdir->getLength()+5+charstring::length(id)+1+
 					charstring::length(connectionid)+1;
 	char	*updown=new char[updownlen];
-	snprintf(updown,updownlen,"%s/ipc/%s-%s",
-			tmpdir->getString(),id,connectionid);
+	charstring::printTo(updown,updownlen,"%s/ipc/%s-%s",
+				tmpdir->getString(),id,connectionid);
 	bool	retval=file::exists(updown);
 	delete[] updown;
 	return retval;

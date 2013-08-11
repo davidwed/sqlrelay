@@ -56,9 +56,9 @@ bool custom_nw::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 		querylognamelen=charstring::length(cmdl->getLocalStateDir())+14+
 				charstring::length(cmdl->getId())+1+1;
 		querylogname=new char[querylognamelen];
-		snprintf(querylogname,querylognamelen,
-				"%s/sqlrelay/log/%s",
-				cmdl->getLocalStateDir(),cmdl->getId());
+		charstring::printTo(querylogname,querylognamelen,
+					"%s/sqlrelay/log/%s",
+					cmdl->getLocalStateDir(),cmdl->getId());
 		directory::create(querylogname,
 				permissions::evalPermString("rwxrwxrwx"));
 
@@ -67,17 +67,17 @@ bool custom_nw::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 				charstring::length(cmdl->getId())+10+1;
 		delete[] querylogname;
 		querylogname=new char[querylognamelen];
-		snprintf(querylogname,querylognamelen,
-				"%s/sqlrelay/log/%s/query.log",
-				cmdl->getLocalStateDir(),cmdl->getId());
+		charstring::printTo(querylogname,querylognamelen,
+					"%s/sqlrelay/log/%s/query.log",
+					cmdl->getLocalStateDir(),cmdl->getId());
 	} else {
 
 		// create the directory
 		querylognamelen=charstring::length(LOG_DIR)+1+
 				charstring::length(cmdl->getId())+1+1;
 		querylogname=new char[querylognamelen];
-		snprintf(querylogname,querylognamelen,
-				"%s/%s",LOG_DIR,cmdl->getId());
+		charstring::printTo(querylogname,querylognamelen,
+					"%s/%s",LOG_DIR,cmdl->getId());
 		directory::create(querylogname,
 				permissions::evalPermString("rwxrwxrwx"));
 
@@ -86,8 +86,9 @@ bool custom_nw::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 				charstring::length(cmdl->getId())+10+1;
 		delete[] querylogname;
 		querylogname=new char[querylognamelen];
-		snprintf(querylogname,querylognamelen,
-				"%s/%s/query.log",LOG_DIR,cmdl->getId());
+		charstring::printTo(querylogname,querylognamelen,
+					"%s/%s/query.log",
+					LOG_DIR,cmdl->getId());
 	}
 
 	// create the new log file
@@ -123,7 +124,7 @@ bool custom_nw::run(sqlrlistener *sqlrl,
 	if (sqlrcur->queryresult) {
 		charstring::copy(errorcodebuf,"0");
 	} else {
-		snprintf(errorcodebuf,100,"%s",sqlrcur->error);
+		charstring::printTo(errorcodebuf,100,"%s",sqlrcur->error);
 	}
 
 	// escape the query
@@ -158,7 +159,7 @@ bool custom_nw::run(sqlrlistener *sqlrl,
 	dt.getSystemDateAndTime();
 
 	// write everything into an output buffer, pipe-delimited
-	snprintf(querylogbuf,sizeof(querylogbuf)-1,
+	charstring::printTo(querylogbuf,sizeof(querylogbuf)-1,
 		"%04d-%02d-%02d %02d:%02d:%02d|%d|%f|%s|%lld|%s|%s|%f|%s|%s|\n",
 		dt.getYear(),
 		dt.getMonth(),
@@ -226,7 +227,8 @@ bool custom_nw::descInputBinds(sqlrcursor_svr *cursor, char *buf, int limit) {
 
 		bindvar_svr	*bv=&(cursor->inbindvars[i]);
 	
-		write_len=snprintf(c,remain_len,"[%s => ",bv->variable);
+		write_len=charstring::printTo(
+				c,remain_len,"[%s => ",bv->variable);
 		c+=write_len;
 
 		remain_len-=write_len;
@@ -235,18 +237,22 @@ bool custom_nw::descInputBinds(sqlrcursor_svr *cursor, char *buf, int limit) {
 		}
 
 		if (bv->type==NULL_BIND) {
-			write_len=snprintf(c,remain_len,"NULL]");
+			write_len=charstring::printTo(c,remain_len,"NULL]");
 		} else if (bv->type==STRING_BIND) {
 			strescape(bv->value.stringval,bindstrbuf,512);
-			write_len=snprintf(c,remain_len,"'%s']",bindstrbuf);
+			write_len=charstring::printTo(
+					c,remain_len,"'%s']",bindstrbuf);
 		} else if (bv->type==INTEGER_BIND) {
-			write_len=snprintf(c,remain_len,"'%lld']",
+			write_len=charstring::printTo(
+					c,remain_len,"'%lld']",
 					(long long)bv->value.integerval);
 		} else if (bv->type==DOUBLE_BIND) {
-			write_len=snprintf(c,remain_len,"%f]",
+			write_len=charstring::printTo(
+					c,remain_len,"%f]",
 					bv->value.doubleval.value);
 		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
-			write_len=snprintf(c,remain_len,"LOB]");
+			write_len=charstring::printTo(
+					c,remain_len,"LOB]");
 		}
 
 		c+=write_len;

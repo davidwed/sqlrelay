@@ -556,7 +556,8 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 					charstring::length(result->sqlrcur->
 							errorMessage())+2;
 				conn->error=new char[errorlen];
-				snprintf(conn->error,errorlen,"%s\n",
+				charstring::printTo(
+					conn->error,errorlen,"%s\n",
 					result->sqlrcur->errorMessage());
 				PQclear(result);
 				return NULL;
@@ -591,8 +592,8 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 				charstring::length(result->
 						sqlrcur->errorMessage())+2;
 			conn->error=new char[errorlen];
-			snprintf(conn->error,errorlen,
-					"%s\n",result->sqlrcur->errorMessage());
+			charstring::printTo(conn->error,errorlen,"%s\n",
+					result->sqlrcur->errorMessage());
 			PQclear(result);
 			result=NULL;
 		}

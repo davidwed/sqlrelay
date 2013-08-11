@@ -113,8 +113,9 @@ void sqlrcachemanager::scan() {
 	size_t	pidfilelen=tmpdir->getLength()+24+
 				charstring::integerLength((uint64_t)pid)+1;
 	pidfile=new char[pidfilelen];
-	snprintf(pidfile,pidfilelen,"%s/pids/sqlr-cachemanager.%ld",
-						tmpdir->getString(),(long)pid);
+	charstring::printTo(pidfile,pidfilelen,
+				"%s/pids/sqlr-cachemanager.%ld",
+				tmpdir->getString(),(long)pid);
 
 	createPidFile(pidfile,permissions::ownerReadWrite());
 
@@ -168,7 +169,8 @@ void sqlrcachemanager::erase(const char *dirname, const char *filename) {
 	size_t	fullpathnamelen=charstring::length(dirname)+1+
 					charstring::length(filename)+1;
 	char	*fullpathname=new char[fullpathnamelen];
-	snprintf(fullpathname,fullpathnamelen,"%s/%s",dirname,filename);
+	charstring::printTo(fullpathname,fullpathnamelen,
+				"%s/%s",dirname,filename);
 
 	// open the file
 	file	fl;

@@ -147,8 +147,9 @@ void sqlrcursor_svr::dateToString(char *buffer, uint16_t buffersize,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
 				int32_t microsecond, const char *tz) {
-	snprintf(buffer,buffersize,"%04d-%02d-%02d %02d:%02d:%02d",
-					year,month,day,hour,minute,second);
+	charstring::printTo(buffer,buffersize,
+				"%04d-%02d-%02d %02d:%02d:%02d",
+				year,month,day,hour,minute,second);
 }
 
 bool sqlrcursor_svr::inputBind(const char *variable,

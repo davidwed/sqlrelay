@@ -1,5 +1,6 @@
 0.52 - sqlrsh has long reported the wrong version, fixed that
 	added csv support to sqlr-export and a -format xml|csv option
+	replaced snprintf calls with charstring::printTo calls
 
 0.51 - fixed minor perl DBI driver documentation issue
 	added support for oracle 12c

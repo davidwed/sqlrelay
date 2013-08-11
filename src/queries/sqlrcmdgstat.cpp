@@ -201,7 +201,7 @@ void sqlrcmdgstatcursor::setGSResult(const char *key,
 					int32_t value, uint16_t i) {
 	charstring::copy(gs_resultset[i].key,key,GSTAT_KEY_LEN);
 	gs_resultset[i].key[GSTAT_KEY_LEN]='\0';
-	snprintf(gs_resultset[i].value,GSTAT_VALUE_LEN,"%d",value);
+	charstring::printTo(gs_resultset[i].value,GSTAT_VALUE_LEN,"%d",value);
 	gs_resultset[i].value[GSTAT_VALUE_LEN]='\0';
 }
 

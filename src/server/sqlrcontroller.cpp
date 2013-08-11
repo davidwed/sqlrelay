@@ -454,7 +454,8 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 				charstring::length(cmdl->getId())+1+
 				charstring::integerLength((uint64_t)pid)+1;
 	pidfile=new char[pidfilelen];
-	snprintf(pidfile,pidfilelen,"%s/pids/sqlr-connection-%s.%ld",
+	charstring::printTo(pidfile,pidfilelen,
+				"%s/pids/sqlr-connection-%s.%ld",
 				tmpdir->getString(),cmdl->getId(),(long)pid);
 	createPidFile(pidfile,permissions::ownerReadWrite());
 
@@ -567,7 +568,8 @@ sqlrconnection_svr *sqlrcontroller_svr::initConnection(const char *dbase) {
 void sqlrcontroller_svr::setUnixSocketDirectory() {
 	size_t	unixsocketlen=tmpdir->getLength()+31;
 	unixsocket=new char[unixsocketlen];
-	snprintf(unixsocket,unixsocketlen,"%s/sockets/",tmpdir->getString());
+	charstring::printTo(unixsocket,unixsocketlen,
+				"%s/sockets/",tmpdir->getString());
 	unixsocketptr=unixsocket+tmpdir->getLength()+8+1;
 }
 
@@ -581,7 +583,7 @@ bool sqlrcontroller_svr::handlePidFile() {
 	size_t	listenerpidfilelen=tmpdir->getLength()+20+
 				charstring::length(cmdl->getId())+1;
 	char	*listenerpidfile=new char[listenerpidfilelen];
-	snprintf(listenerpidfile,listenerpidfilelen,
+	charstring::printTo(listenerpidfile,listenerpidfilelen,
 				"%s/pids/sqlr-listener-%s",
 				tmpdir->getString(),cmdl->getId());
 
@@ -617,7 +619,7 @@ void sqlrcontroller_svr::initDatabaseAvailableFileName() {
 					charstring::length(cmdl->getId())+1+
 					charstring::length(connectionid)+1;
 	updown=new char[updownlen];
-	snprintf(updown,updownlen,"%s/ipc/%s-%s",
+	charstring::printTo(updown,updownlen,"%s/ipc/%s-%s",
 			tmpdir->getString(),cmdl->getId(),connectionid);
 }
 
@@ -655,11 +657,11 @@ bool sqlrcontroller_svr::openSequenceFile(file *sockseq,
 	// open the sequence file and get the current port number
 	size_t	sockseqnamelen=charstring::length(tmpdir)+9;
 	char	*sockseqname=new char[sockseqnamelen];
-	snprintf(sockseqname,sockseqnamelen,"%s/sockseq",tmpdir);
+	charstring::printTo(sockseqname,sockseqnamelen,"%s/sockseq",tmpdir);
 
 	size_t	stringlen=8+charstring::length(sockseqname)+1;
 	char	*string=new char[stringlen];
-	snprintf(string,stringlen,"opening %s",sockseqname);
+	charstring::printTo(string,stringlen,"opening %s",sockseqname);
 	logDebugMessage(string);
 	delete[] string;
 
@@ -723,7 +725,8 @@ bool sqlrcontroller_svr::getAndIncrementSequenceNumber(file *sockseq,
 
 	size_t	stringlen=21+charstring::length(unixsocketptr)+1;
 	char	*string=new char[stringlen];
-	snprintf(string,stringlen,"got sequence number: %s",unixsocketptr);
+	charstring::printTo(string,stringlen,
+			"got sequence number: %s",unixsocketptr);
 	logDebugMessage(string);
 	delete[] string;
 
@@ -736,7 +739,7 @@ bool sqlrcontroller_svr::getAndIncrementSequenceNumber(file *sockseq,
 	}
 
 	string=new char[50];
-	snprintf(string,50,"writing new sequence number: %d",buffer);
+	charstring::printTo(string,50,"writing new sequence number: %d",buffer);
 	logDebugMessage(string);
 	delete[] string;
 
@@ -935,7 +938,7 @@ void sqlrcontroller_svr::markDatabaseAvailable() {
 
 	size_t	stringlen=9+charstring::length(updown)+1;
 	char	*string=new char[stringlen];
-	snprintf(string,stringlen,"creating %s",updown);
+	charstring::printTo(string,stringlen,"creating %s",updown);
 	logDebugMessage(string);
 	delete[] string;
 
@@ -954,7 +957,7 @@ void sqlrcontroller_svr::markDatabaseUnavailable() {
 
 	size_t	stringlen=10+charstring::length(updown)+1;
 	char	*string=new char[stringlen];
-	snprintf(string,stringlen,"unlinking %s",updown);
+	charstring::printTo(string,stringlen,"unlinking %s",updown);
 	logDebugMessage(string);
 	delete[] string;
 
@@ -976,9 +979,9 @@ bool sqlrcontroller_svr::openSockets() {
 				size_t	stringlen=26+
 					charstring::length(unixsocket)+1;
 				char	*string=new char[stringlen];
-				snprintf(string,stringlen,
-					"listening on unix socket: %s",
-								unixsocket);
+				charstring::printTo(string,stringlen,
+						"listening on unix socket: %s",
+						unixsocket);
 				logDebugMessage(string);
 				delete[] string;
 
@@ -1027,7 +1030,7 @@ bool sqlrcontroller_svr::openSockets() {
 					}
 
 					char	string[33];
-					snprintf(string,33,
+					charstring::printTo(string,33,
 						"listening on inet socket: %d",
 						inetport);
 					logDebugMessage(string);
@@ -1322,12 +1325,13 @@ void sqlrcontroller_svr::registerForHandoff(const char *tmpdir) {
 	size_t	handoffsocknamelen=charstring::length(tmpdir)+9+
 				charstring::length(cmdl->getId())+8+1;
 	char	*handoffsockname=new char[handoffsocknamelen];
-	snprintf(handoffsockname,handoffsocknamelen,
-			"%s/sockets/%s-handoff",tmpdir,cmdl->getId());
+	charstring::printTo(handoffsockname,handoffsocknamelen,
+				"%s/sockets/%s-handoff",tmpdir,cmdl->getId());
 
 	size_t	stringlen=17+charstring::length(handoffsockname)+1;
 	char	*string=new char[stringlen];
-	snprintf(string,stringlen,"handoffsockname: %s",handoffsockname);
+	charstring::printTo(string,stringlen,
+				"handoffsockname: %s",handoffsockname);
 	logDebugMessage(string);
 	delete[] string;
 
@@ -1367,13 +1371,16 @@ void sqlrcontroller_svr::deRegisterForHandoff(const char *tmpdir) {
 	size_t	removehandoffsocknamelen=charstring::length(tmpdir)+9+
 					charstring::length(cmdl->getId())+14+1;
 	char	*removehandoffsockname=new char[removehandoffsocknamelen];
-	snprintf(removehandoffsockname,removehandoffsocknamelen,
-			"%s/sockets/%s-removehandoff",tmpdir,cmdl->getId());
+	charstring::printTo(removehandoffsockname,
+				removehandoffsocknamelen,
+				"%s/sockets/%s-removehandoff",
+				tmpdir,cmdl->getId());
 
 	size_t	stringlen=23+charstring::length(removehandoffsockname)+1;
 	char	*string=new char[stringlen];
-	snprintf(string,stringlen,
-			"removehandoffsockname: %s",removehandoffsockname);
+	charstring::printTo(string,stringlen,
+				"removehandoffsockname: %s",
+				removehandoffsockname);
 	logDebugMessage(string);
 	delete[] string;
 
@@ -4408,7 +4415,9 @@ void sqlrcontroller_svr::sendRowCounts(bool knowsactual, uint64_t actual,
 	if (knowsactual) {
 
 		char	string[30];
-		snprintf(string,30,"actual rows: %lld",(long long)actual);
+		charstring::printTo(string,30,	
+				"actual rows: %lld",	
+				(long long)actual);
 		logDebugMessage(string);
 
 		clientsock->write((uint16_t)ACTUAL_ROWS);
@@ -4426,7 +4435,9 @@ void sqlrcontroller_svr::sendRowCounts(bool knowsactual, uint64_t actual,
 	if (knowsaffected) {
 
 		char	string[46];
-		snprintf(string,46,"affected rows: %lld",(long long)affected);
+		charstring::printTo(string,46,
+				"affected rows: %lld",
+				(long long)affected);
 		logDebugMessage(string);
 
 		clientsock->write((uint16_t)AFFECTED_ROWS);
@@ -5482,11 +5493,12 @@ bool sqlrcontroller_svr::buildListQuery(sqlrcursor_svr *cursor,
 
 	// fill the query buffer and update the length
 	if (tablebuf.getStringLength()) {
-		snprintf(cursor->querybuffer,maxquerysize+1,
-			query,tablebuf.getString(),wildbuf.getString());
+		charstring::printTo(cursor->querybuffer,maxquerysize+1,
+						query,tablebuf.getString(),
+						wildbuf.getString());
 	} else {
-		snprintf(cursor->querybuffer,maxquerysize+1,
-					query,wildbuf.getString());
+		charstring::printTo(cursor->querybuffer,maxquerysize+1,
+						query,wildbuf.getString());
 	}
 	cursor->querylength=charstring::length(cursor->querybuffer);
 	return true;
@@ -5885,7 +5897,7 @@ bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(
 	size_t	idfilenamelen=charstring::length(tmpdir)+5+
 					charstring::length(id)+1;
 	char	*idfilename=new char[idfilenamelen];
-	snprintf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir,id);
+	charstring::printTo(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir,id);
 
 	debugstr.clear();
 	debugstr.append("attaching to shared memory and semaphores ");

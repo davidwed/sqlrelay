@@ -78,7 +78,7 @@ bool debug::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 		dbgfilenamelen=charstring::length(localstatedir)+
 					16+5+charstring::length(name)+20+1;
 		dbgfilename=new char[dbgfilenamelen];
-		snprintf(dbgfilename,dbgfilenamelen,
+		charstring::printTo(dbgfilename,dbgfilenamelen,
 					"%s/sqlrelay/debug/sqlr-%s.%ld",
 						localstatedir,name,
 						(long)process::getProcessId());
@@ -86,7 +86,7 @@ bool debug::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 		dbgfilenamelen=charstring::length(DEBUG_DIR)+5+
 					charstring::length(name)+20+1;
 		dbgfilename=new char[dbgfilenamelen];
-		snprintf(dbgfilename,dbgfilenamelen,
+		charstring::printTo(dbgfilename,dbgfilenamelen,
 					"%s/sqlr-%s.%ld",DEBUG_DIR,name,
 						(long)process::getProcessId());
 	}

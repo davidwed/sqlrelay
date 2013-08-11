@@ -675,7 +675,7 @@ bool sybasecursor::open(uint16_t id) {
 	if (sybaseconn->db && sybaseconn->db[0] && !sybaseconn->dbused) {
 		int32_t	len=charstring::length(sybaseconn->db)+4;
 		char	query[len+1];
-		snprintf(query,len+1,"use %s",sybaseconn->db);
+		charstring::printTo(query,len+1,"use %s",sybaseconn->db);
 		if (!(prepareQuery(query,len) && executeQuery(query,len))) {
 			char		err[2048];
 			uint32_t	errlen;

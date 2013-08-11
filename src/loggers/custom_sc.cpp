@@ -75,7 +75,7 @@ bool custom_sc::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 	delete[] querylogname;
 	querylognamelen=charstring::length(path)+1+charstring::length(name)+1;
 	querylogname=new char[querylognamelen];
-	snprintf(querylogname,querylognamelen,"%s/%s",path,name);
+	charstring::printTo(querylogname,querylognamelen,"%s/%s",path,name);
 
 	// create the new log file
 	querylog.close();
@@ -112,9 +112,9 @@ bool custom_sc::run(sqlrlistener *sqlrl,
 
 	// append the date
 	char	datebuffer[20];
-	snprintf(datebuffer,20,"%04d-%02d-%02d %02d:%02d:%02d",
-			dt.getYear(),dt.getMonth(),dt.getDayOfMonth(),
-			dt.getHour(),dt.getMinutes(),dt.getSeconds());
+	charstring::printTo(datebuffer,20,"%04d-%02d-%02d %02d:%02d:%02d",
+				dt.getYear(),dt.getMonth(),dt.getDayOfMonth(),
+				dt.getHour(),dt.getMinutes(),dt.getSeconds());
 	logbuffer.append(datebuffer)->append(' ');
 
 	// append the event type and log level

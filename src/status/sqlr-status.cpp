@@ -89,7 +89,7 @@ bool status::createSharedMemoryAndSemaphores(const char *tmpdir,
 	size_t  idfilenamelen=charstring::length(tmpdir)+5+
 		charstring::length(id)+1;
 	char	*idfilename=new char[idfilenamelen];
-	snprintf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir,id);
+	charstring::printTo(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir,id);
 
 	key_t	key=file::generateKey(idfilename,1);
 

@@ -369,9 +369,11 @@ const char *postgresqlconnection::dbVersion() {
 	if (partslength==3) {
 		int64_t	minor=charstring::toInteger(parts[1]);
 		int64_t	patch=charstring::toInteger(parts[2]);
-		snprintf(dbversion,charstring::length(dbversion)+1,
-				"%s%02lld%02lld",
-				parts[0],(long long)minor,(long long)patch);
+		charstring::printTo(dbversion,
+					charstring::length(dbversion)+1,
+					"%s%02lld%02lld",
+					parts[0],
+					(long long)minor,(long long)patch);
 	}
 	for (uint64_t i=0; i<partslength; i++) {
 		delete[] parts[i];
@@ -546,7 +548,7 @@ postgresqlcursor::~postgresqlcursor() {
 bool postgresqlcursor::open(uint16_t id) {
 	size_t	cursornamelen=6+charstring::integerLength(id)+1;
 	cursorname=new char[cursornamelen];
-	snprintf(cursorname,cursornamelen,"cursor%d",id);
+	charstring::printTo(cursorname,cursornamelen,"cursor%d",id);
 	return true;
 }
 
@@ -1075,8 +1077,8 @@ const char *postgresqlcursor::getColumnTypeName(uint32_t col) {
 	// typemangling=2 means return the name as a string
 	Oid	pgfieldtype=PQftype(pgresult,col);
 	if (!postgresqlconn->typemangling) {
-		snprintf(typenamebuffer,sizeof(typenamebuffer),
-					"%d",(int32_t)pgfieldtype);
+		charstring::printTo(typenamebuffer,sizeof(typenamebuffer),
+						"%d",(int32_t)pgfieldtype);
 		return typenamebuffer;
 	} else {
 		for (int i=0; i<postgresqlconn->datatypecount; i++) {
