@@ -4,7 +4,6 @@
 #define PARSE_DATE_H
 
 #include <rudiments/charstring.h>
-#include <stdio.h>
 
 static const char *shortmonths[]={
 	"JAN",
@@ -548,11 +547,11 @@ char *convertDateTime(const char *format,
 	while (*ptr) {
 
 		if (!charstring::compare(ptr,"DD",2)) {
-			snprintf(buf,5,"%02d",day);
+			charstring::printTo(buf,5,"%02d",day);
 			output.append(buf);
 			ptr=ptr+2;
 		} else if (!charstring::compare(ptr,"MM",2)) {
-			snprintf(buf,5,"%02d",month);
+			charstring::printTo(buf,5,"%02d",month);
 			output.append(buf);
 			ptr=ptr+2;
 		} else if (!charstring::compare(ptr,"MON",3)) {
@@ -562,31 +561,32 @@ char *convertDateTime(const char *format,
 			output.append(longmonths[month-1]);
 			ptr=ptr+3;
 		} else if (!charstring::compare(ptr,"YYYY",4)) {
-			snprintf(buf,5,"%04d",year);
+			charstring::printTo(buf,5,"%04d",year);
 			output.append(buf);
 			ptr=ptr+4;
 		} else if (!charstring::compare(ptr,"YY",2)) {
-			snprintf(buf,5,"%04d",year);
+			charstring::printTo(buf,5,"%04d",year);
 			output.append(buf+2);
 			ptr=ptr+2;
 		} else if (!charstring::compare(ptr,"HH24",4)) {
-			snprintf(buf,5,"%02d",hour);
+			charstring::printTo(buf,5,"%02d",hour);
 			output.append(buf);
 			ptr=ptr+4;
 		} else if (!charstring::compare(ptr,"HH",2)) {
-			snprintf(buf,5,"%02d",(hour<13)?hour:hour-12);
+			charstring::printTo(buf,5,"%02d",
+						(hour<13)?hour:hour-12);
 			output.append(buf);
 			ptr=ptr+2;
 		} else if (!charstring::compare(ptr,"MI",2)) {
-			snprintf(buf,5,"%02d",minute);
+			charstring::printTo(buf,5,"%02d",minute);
 			output.append(buf);
 			ptr=ptr+2;
 		} else if (!charstring::compare(ptr,"SS",2)) {
-			snprintf(buf,5,"%02d",second);
+			charstring::printTo(buf,5,"%02d",second);
 			output.append(buf);
 			ptr=ptr+2;
 		} else if (!charstring::compare(ptr,"FFF",3)) {
-			snprintf(buf,5,"%03d",fraction);
+			charstring::printTo(buf,5,"%03d",fraction);
 			output.append(buf);
 			ptr=ptr+3;
 		} else if (!charstring::compare(ptr,"AM",2)) {
