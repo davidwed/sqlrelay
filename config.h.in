@@ -394,6 +394,9 @@
 /* Some versions of sqlite are transactional */
 #undef SQLITE_TRANSACTIONAL
 
+/* Some systems have sys/vnode.h */
+#undef SQLRELAY_HAVE_SYS_VNODE_H
+
 /* Suffix for loadable modules */
 #undef SQLRELAY_MODULESUFFIX
 

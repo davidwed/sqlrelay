@@ -3,6 +3,11 @@
 
 #include <config.h>
 
+// SCO OSR6 requires this
+#ifdef SQLRELAY_HAVE_SYS_VNODE_H
+	#include <sys/vnode.h>
+#endif
+
 #include "perlincludes.h"
 
 /* xsubpp outputs __attribute__((noreturn)) this isn't
