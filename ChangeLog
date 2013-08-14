@@ -3,6 +3,11 @@
 	replaced snprintf calls with charstring::printTo calls
 	added a test for sys/vnode.h to work around an issue with perl on
 		SCO OSR6
+	added workarounds for old versions of sqlite without sqlite3_malloc
+		and sqlite3_free with char * argument
+	fixed error with sqlserver where "describe <table>" would return
+		columns in alphabetical order rather than the order they
+		are in the table
 
 0.51 - fixed minor perl DBI driver documentation issue
 	added support for oracle 12c

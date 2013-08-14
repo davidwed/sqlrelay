@@ -29,6 +29,10 @@ extern "C" {
 	#define sqlite3_free(mem)		sqlite_free((char *)mem)
 #endif
 
+#ifndef HAVE_SQLITE3_MALLOC
+	#define sqlite3_malloc			malloc
+#endif
+
 class sqliteconnection : public sqlrconnection_svr {
 	friend class sqlitecursor;
 	public:
@@ -483,7 +487,11 @@ int sqlitecursor::runQuery(const char *query) {
 
 	// clear any errors
 	if (sqliteconn->errmesg) {
-		sqlite3_free((void *)sqliteconn->errmesg);
+		#ifdef HAVE_SQLITE3_FREE_WITH_CHAR
+			sqlite3_free(sqliteconn->errmesg);
+		#else
+			sqlite3_free((void *)sqliteconn->errmesg);
+		#endif
 		sqliteconn->errmesg=NULL;
 		sqliteconn->errcode=0;
 	}

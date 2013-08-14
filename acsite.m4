@@ -1635,6 +1635,18 @@ then
 		AC_DEFINE_UNQUOTED(SQLITE_TRANSACTIONAL,1,Some versions of sqlite are transactional)
 	fi
 
+	AC_MSG_CHECKING(for sqlite3_bind_int)
+	FW_TRY_LINK([#include <sqlite3.h>
+#include <stdlib.h>],[sqlite3_bind_int(NULL,0,0);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_BIND_INT,1,SQLite supports sqlite3_bind_int)],[AC_MSG_RESULT(no)])
+
+	AC_MSG_CHECKING(for sqlite3_malloc)
+	FW_TRY_LINK([#include <sqlite3.h>
+#include <stdlib.h>],[sqlite3_malloc(0);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_MALLOC,1,SQLite supports sqlite3_malloc)],[AC_MSG_RESULT(no)])
+
+	AC_MSG_CHECKING(for sqlite3_free with char * argument)
+	FW_TRY_LINK([#include <sqlite3.h>
+#include <stdlib.h>],[char *a=0; sqlite3_free(a);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_FREE_WITH_CHAR,1,SQLite supports sqlite3_malloc)],[AC_MSG_RESULT(no)])
+
 	FW_INCLUDES(sqlite,[$SQLITEINCLUDES])
 	FW_LIBS(sqlite,[$SQLITELIBS])
 		
@@ -1642,10 +1654,6 @@ then
 	AC_SUBST(SQLITELIBS)
 	AC_SUBST(SQLITELIBSPATH)
 	AC_SUBST(SQLITESTATIC)
-
-	AC_MSG_CHECKING(for sqlite3_bind_int)
-	FW_TRY_LINK([#include <sqlite3.h>
-#include <stdlib.h>],[sqlite3_bind_int(NULL,0,0);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_BIND_INT,1,SQLite supports sqlite3_bind_int)],[AC_MSG_RESULT(no)])
 fi
 ])
 

@@ -695,7 +695,7 @@ const char *freetdsconnection::getColumnListQuery(bool wild) {
 			"	and "
 			"	column_name like '%s' "
 			"order by "
-			"	column_name":
+			"	ordinal_position":
 
 			"select "
 			"	column_name, "
@@ -712,7 +712,7 @@ const char *freetdsconnection::getColumnListQuery(bool wild) {
 			"where "
 			"	table_name='%s' "
 			"order by "
-			"	column_name";
+			"	ordinal_position";
 	}
 }
 

@@ -24106,24 +24106,6 @@ _ACEOF
 
 	fi
 
-
-if ( test -n "$SQLITEINCLUDES" )
-then
-	echo "sqlite includes... $SQLITEINCLUDES"
-fi
-
-
-if ( test -n "$SQLITELIBS" )
-then
-	echo "sqlite libs... $SQLITELIBS"
-fi
-
-
-
-
-
-
-
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqlite3_bind_int" >&5
 $as_echo_n "checking for sqlite3_bind_int... " >&6; }
 
@@ -24161,6 +24143,102 @@ CPPFLAGS="$SAVECPPFLAGS"
 LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
+
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqlite3_malloc" >&5
+$as_echo_n "checking for sqlite3_malloc... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$SQLITESTATIC $SQLITEINCLUDES"
+LIBS="$SQLITELIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <sqlite3.h>
+#include <stdlib.h>
+int
+main ()
+{
+sqlite3_malloc(0);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; };
+$as_echo "#define HAVE_SQLITE3_MALLOC 1" >>confdefs.h
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqlite3_free with char * argument" >&5
+$as_echo_n "checking for sqlite3_free with char * argument... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$SQLITESTATIC $SQLITEINCLUDES"
+LIBS="$SQLITELIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <sqlite3.h>
+#include <stdlib.h>
+int
+main ()
+{
+char *a=0; sqlite3_free(a);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; };
+$as_echo "#define HAVE_SQLITE3_FREE_WITH_CHAR 1" >>confdefs.h
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+
+
+if ( test -n "$SQLITEINCLUDES" )
+then
+	echo "sqlite includes... $SQLITEINCLUDES"
+fi
+
+
+if ( test -n "$SQLITELIBS" )
+then
+	echo "sqlite libs... $SQLITELIBS"
+fi
+
+
+
+
+
 
 fi
 

@@ -292,6 +292,12 @@
 /* SQLite supports sqlite3_bind_int */
 #undef HAVE_SQLITE3_BIND_INT
 
+/* SQLite supports sqlite3_malloc */
+#undef HAVE_SQLITE3_FREE_WITH_CHAR
+
+/* SQLite supports sqlite3_malloc */
+#undef HAVE_SQLITE3_MALLOC
+
 /* Some systems have SQLROWSETSIZE */
 #undef HAVE_SQLROWSETSIZE
 
