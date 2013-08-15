@@ -43,8 +43,8 @@ typedef SQLULEN SQLROWSETSIZE;
 
 //#define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
-	#define debugFunction() stdoutput.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
-	#define debugPrintf(format, ...) stdoutput.printf(format, ## __VA_ARGS__); fflush(stdout);
+	#define debugFunction() stdoutput.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__);
+	#define debugPrintf(format, ...) stdoutput.printf(format, ## __VA_ARGS__);
 #else
 	#define debugFunction() /* */
 	#define debugPrintf(format, ...) /* */

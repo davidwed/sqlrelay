@@ -22,9 +22,6 @@
 // for clock()
 #include <time.h>
 
-// for fflush
-#include <stdio.h>
-
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
@@ -1509,9 +1506,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 }
 
 void sqlrsh::prompt(unsigned long promptcount) {
-
 	stdoutput.printf("%ld> ",promptcount);
-	fflush(stdout);
 }
 
 void sqlrsh::execute(int argc, const char **argv) {

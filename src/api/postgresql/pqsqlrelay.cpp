@@ -30,8 +30,8 @@ extern "C" {
 
 //#define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
-	#define debugFunction() stdoutput.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
-	#define debugPrintf(args...) stdoutput.printf(args); fflush(stdout);
+	#define debugFunction() stdoutput.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__);
+	#define debugPrintf(args...) stdoutput.printf(args);
 #else
 	#define debugFunction() /* */
 	#define debugPrintf(args...) /* */
