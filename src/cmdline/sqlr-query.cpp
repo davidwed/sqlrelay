@@ -7,9 +7,8 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/commandline.h>
 #include <rudiments/process.h>
+#include <rudiments/stdio.h>
 #include <sqlrconfigfile.h>
-
-#include <stdio.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
@@ -49,7 +48,7 @@ int main(int argc, const char **argv) {
 				charstring::length(password))) ||
 		!(charstring::length(query))) {
 
-		printf("usage: sqlr-query -host host -port port -socket socket -user user -password password -query query [-debug] [-resultsetbuffersize rows]\n"
+		stdoutput.printf("usage: sqlr-query -host host -port port -socket socket -user user -password password -query query [-debug] [-resultsetbuffersize rows]\n"
 			"  or   sqlr-query  [-config configfile] -id id -query query [-debug] [-resultsetbuffersize rows]\n");
 		process::exit(1);
 	}
@@ -84,18 +83,18 @@ int main(int argc, const char **argv) {
 		while (cols && field) {
 			for (uint32_t j=0; j<cols; j++) {
 				if ((field=sqlrcur.getField(i,j))) {
-					printf("\"%s\"",field);
+					stdoutput.printf("\"%s\"",field);
 					if (j<cols-1) {
-						printf(",");
+						stdoutput.printf(",");
 					} else {
-						printf("\n");
+						stdoutput.printf("\n");
 					}
 				}
 			}
 			i++;
 		}
 	} else {
-		printf("%s\n",sqlrcur.errorMessage());
+		stdoutput.printf("%s\n",sqlrcur.errorMessage());
 		exitval=1;
 	}
 	sqlrcon.endSession();

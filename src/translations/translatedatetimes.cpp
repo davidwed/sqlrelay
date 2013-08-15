@@ -40,16 +40,16 @@ bool translatedatetimes::run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree) {
 	if (sqlrcon->cont->debugsqltranslation) {
-		printf("date/time translation:\n");
-		printf("    ddmm: %s\n",
+		stdoutput.printf("date/time translation:\n");
+		stdoutput.printf("    ddmm: %s\n",
 			parameters->getAttributeValue("ddmm"));
-		printf("    datetime: %s\n",
+		stdoutput.printf("    datetime: %s\n",
 			parameters->getAttributeValue("datetime"));
-		printf("    date: %s\n",
+		stdoutput.printf("    date: %s\n",
 			parameters->getAttributeValue("date"));
-		printf("    time: %s\n",
+		stdoutput.printf("    time: %s\n",
 			parameters->getAttributeValue("time"));
-		printf("  binds:\n");
+		stdoutput.printf("  binds:\n");
 	}
 	if (!translateDateTimesInBindVariables(sqlrcon,sqlrcur,
 						querytree->getRootNode(),
@@ -57,7 +57,7 @@ bool translatedatetimes::run(sqlrconnection_svr *sqlrcon,
 		return false;
 	}
 	if (sqlrcon->cont->debugsqltranslation) {
-		printf("  query:\n");
+		stdoutput.printf("  query:\n");
 	}
 	if (!translateDateTimesInQuery(sqlrcon,sqlrcur,
 						querytree->getRootNode(),
@@ -65,7 +65,7 @@ bool translatedatetimes::run(sqlrconnection_svr *sqlrcon,
 		return false;
 	}
 	if (sqlrcon->cont->debugsqltranslation) {
-		printf("\n");
+		stdoutput.printf("\n");
 	}
 	return true;
 }
@@ -166,7 +166,8 @@ bool translatedatetimes::translateDateTimesInQuery(
 				if (converted) {
 
 					if (sqlrcon->cont->debugsqltranslation) {
-						printf("    %s -> %s\n",
+						stdoutput.printf(
+							"    %s -> %s\n",
 							valuecopy,converted);
 					}
 
@@ -281,8 +282,8 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 		}
 
 		if (sqlrcon->cont->debugsqltranslation) {
-			printf("    %s -> %s\n",
-				bind->value.stringval,converted);
+			stdoutput.printf("    %s -> %s\n",
+					bind->value.stringval,converted);
 		}
 
 		// replace the value with the converted string

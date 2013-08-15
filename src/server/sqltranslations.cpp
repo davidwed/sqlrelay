@@ -9,6 +9,7 @@
 
 #include <rudiments/process.h>
 #include <rudiments/character.h>
+#include <rudiments/stdio.h>
 
 #include <config.h>
 
@@ -105,9 +106,10 @@ void sqltranslations::loadTranslation(xmldomnode *translation) {
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
-		printf("failed to load translation module: %s\n",module);
+		stdoutput.printf("failed to load "
+				"translation module: %s\n",module);
 		char	*error=dl->getError();
-		printf("%s\n",error);
+		stdoutput.printf("%s\n",error);
 		delete[] error;
 		delete dl;
 		return;
@@ -120,9 +122,9 @@ void sqltranslations::loadTranslation(xmldomnode *translation) {
 			(sqltranslation *(*)(sqltranslations *, xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newTranslation) {
-		printf("failed to create translation: %s\n",module);
+		stdoutput.printf("failed to create translation: %s\n",module);
 		char	*error=dl->getError();
-		printf("%s\n",error);
+		stdoutput.printf("%s\n",error);
 		delete[] error;
 		dl->close();
 		delete dl;

@@ -5,9 +5,6 @@
 #include <cmdline.h>
 #include <config.h>
 
-// for fprintf()
-#include <stdio.h>
-
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif

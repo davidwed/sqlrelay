@@ -10,6 +10,7 @@
 #include <rudiments/dictionary.h>
 #include <rudiments/file.h>
 #include <rudiments/memorypool.h>
+#include <rudiments/stdio.h>
 #include <locale.h>
 
 #define NEED_DATATYPESTRING 1
@@ -22,8 +23,8 @@ extern "C" {
 
 //#define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
-	#define debugFunction() printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
-	#define debugPrintf(args...) printf(args); fflush(stdout);
+	#define debugFunction() stdoutput.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
+	#define debugPrintf(args...) stdoutput.printf(args); fflush(stdout);
 #else
 	#define debugFunction() /* */
 	#define debugPrintf(args...) /* */
@@ -2280,7 +2281,7 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 		size_t	buffersize=charstring::integerLength((uint32_t)i+1)+1;
 		char	*variable=
 			(char *)stmt->bindvarnames->malloc(buffersize);
-		charstring::printTo(variable,buffersize,"%ld",i+1);
+		charstring::printf(variable,buffersize,"%ld",i+1);
 
 		// get the cursor
 		sqlrcursor	*cursor=stmt->result->sqlrcur;
@@ -2325,7 +2326,7 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 				}
 
 				char	buffer[20];
-				charstring::printTo(buffer,20,
+				charstring::printf(buffer,20,
 						"%04d/%02d/%02d %02d:%02d:%02d",
 						tm->year,first,second,
 						tm->hour,tm->minute,tm->second);

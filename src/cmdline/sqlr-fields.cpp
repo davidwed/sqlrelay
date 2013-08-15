@@ -8,9 +8,8 @@
 #include <rudiments/commandline.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/process.h>
+#include <rudiments/stdio.h>
 #include <sqlrconfigfile.h>
-
-#include <stdio.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
@@ -43,7 +42,7 @@ int main(int argc, const char **argv) {
 				charstring::length(password))) ||
 		!(charstring::length(table))) {
 
-		printf("usage: sqlr-fields -host host -port port -socket socket -table table\n"
+		stdoutput.printf("usage: sqlr-fields -host host -port port -socket socket -table table\n"
 			"  or   sqlr-fields  [-config configfile] -id id -table table\n");
 		process::exit(1);
 	}
@@ -66,11 +65,11 @@ int main(int argc, const char **argv) {
 	if (sqlrcur.getColumnList(table,NULL)) {
 		for (uint64_t j=0; j<sqlrcur.rowCount(); j++) {
 			if (j>0) {
-				printf(",");
+				stdoutput.printf(",");
 			}
-			printf("%s",sqlrcur.getField(j,(uint32_t)0));
+			stdoutput.printf("%s",sqlrcur.getField(j,(uint32_t)0));
 		}
-		printf("\n");
+		stdoutput.printf("\n");
 	}
 
 	process::exit(0);

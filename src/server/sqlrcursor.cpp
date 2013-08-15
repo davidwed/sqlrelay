@@ -5,6 +5,7 @@
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <rudiments/character.h>
+#include <rudiments/stdio.h>
 
 sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 
@@ -147,7 +148,7 @@ void sqlrcursor_svr::dateToString(char *buffer, uint16_t buffersize,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
 				int32_t microsecond, const char *tz) {
-	charstring::printTo(buffer,buffersize,
+	charstring::printf(buffer,buffersize,
 				"%04d-%02d-%02d %02d:%02d:%02d",
 				year,month,day,hour,minute,second);
 }
@@ -625,8 +626,8 @@ bool sqlrcursor_svr::fakeInputBinds(stringbuffer *outputquery) {
 	}
 
 	if (conn->cont->debugsqltranslation) {
-		printf("after faking input binds:\n%s\n\n",
-					outputquery->getString());
+		stdoutput.printf("after faking input binds:\n%s\n\n",
+						outputquery->getString());
 	}
 
 	return true;
@@ -674,9 +675,10 @@ void sqlrcursor_svr::performSubstitution(stringbuffer *buffer, int16_t index) {
 				inbindvars[index].value.doubleval.scale);
 		}
 		// In some regions a comma is used rather than a period for
-		// the decimal and the i8n settings will cause snprintf to use
-		// a comma as the separator.  Databases don't like commas in
-		// their numbers.  Convert commas to periods here. */
+		// the decimal and the i8n settings will cause the vsnprintf 
+		// that ultimately gets called by charstring::parseNumber above
+		// to use a comma as the separator.  Databases don't like
+		// commas in their numbers.  Convert commas to periods here.
 		for (char *ptr=dbuf; *ptr; ptr++) {
 			if (*ptr==',') {
 				*ptr='.';

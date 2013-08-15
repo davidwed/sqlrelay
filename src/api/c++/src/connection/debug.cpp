@@ -3,6 +3,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/environment.h>
+#include <rudiments/stdio.h>
 
 void sqlrconnection::debugOn() {
 	debug=true;
@@ -45,7 +46,7 @@ void sqlrconnection::debugPrint(const char *string) {
 	if (printfunction) {
 		(*printfunction)("%s",string);
 	} else {
-		printf("%s",string);
+		stdoutput.printf("%s",string);
 	}
 }
 
@@ -53,7 +54,7 @@ void sqlrconnection::debugPrint(int64_t number) {
 	if (printfunction) {
 		(*printfunction)("%lld",(long long)number);
 	} else {
-		printf("%lld",(long long)number);
+		stdoutput.printf("%lld",(long long)number);
 	}
 }
 
@@ -61,7 +62,7 @@ void sqlrconnection::debugPrint(double number) {
 	if (printfunction) {
 		(*printfunction)("%f",number);
 	} else {
-		printf("%f",number);
+		stdoutput.printf("%f",number);
 	}
 }
 
@@ -69,7 +70,7 @@ void sqlrconnection::debugPrint(char character) {
 	if (printfunction) {
 		(*printfunction)("%c",character);
 	} else {
-		printf("%c",character);
+		stdoutput.printf("%c",character);
 	}
 }
 

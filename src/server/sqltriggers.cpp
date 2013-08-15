@@ -7,6 +7,7 @@
 #include <debugprint.h>
 
 #include <rudiments/xmldomnode.h>
+#include <rudiments/stdio.h>
 
 #include <config.h>
 
@@ -119,9 +120,9 @@ void sqltriggers::loadTrigger(xmldomnode *trigger,
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
-		printf("failed to load trigger module: %s\n",module);
+		stdoutput.printf("failed to load trigger module: %s\n",module);
 		char	*error=dl->getError();
-		printf("%s\n",error);
+		stdoutput.printf("%s\n",error);
 		delete[] error;
 		delete dl;
 		return;
@@ -134,9 +135,9 @@ void sqltriggers::loadTrigger(xmldomnode *trigger,
 			(sqltrigger *(*)(xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newTrigger) {
-		printf("failed to create trigger: %s\n",module);
+		stdoutput.printf("failed to create trigger: %s\n",module);
 		char	*error=dl->getError();
-		printf("%s\n",error);
+		stdoutput.printf("%s\n",error);
 		delete[] error;
 		dl->close();
 		delete dl;

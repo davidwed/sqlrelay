@@ -1,6 +1,6 @@
 0.52 - sqlrsh has long reported the wrong version, fixed that
 	added csv support to sqlr-export and a -format xml|csv option
-	replaced snprintf calls with charstring::printTo calls
+	replaced snprintf calls with charstring::printf calls
 	added a test for sys/vnode.h to work around an issue with perl on
 		SCO OSR6
 	added workarounds for old versions of sqlite without sqlite3_malloc

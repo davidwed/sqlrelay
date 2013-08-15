@@ -219,7 +219,7 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 
 	// create the select database query
 	char	*sdquery=new char[sdquerylen];
-	charstring::printTo(sdquery,sdquerylen,sdquerybase,database);
+	charstring::printf(sdquery,sdquerylen,sdquerybase,database);
 	sdquerylen=charstring::length(sdquery);
 
 	sqlrcursor_svr	*sdcur=cont->initCursor();
@@ -379,7 +379,7 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 
 	// create the set isolation level query
 	char	*silquery=new char[silquerylen];
-	charstring::printTo(silquery,silquerylen,silquerybase,isolevel);
+	charstring::printf(silquery,silquerylen,silquerybase,isolevel);
 	silquerylen=charstring::length(silquery);
 
 	sqlrcursor_svr	*silcur=cont->initCursor();

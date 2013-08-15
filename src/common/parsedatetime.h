@@ -547,11 +547,11 @@ char *convertDateTime(const char *format,
 	while (*ptr) {
 
 		if (!charstring::compare(ptr,"DD",2)) {
-			charstring::printTo(buf,5,"%02d",day);
+			charstring::printf(buf,5,"%02d",day);
 			output.append(buf);
 			ptr=ptr+2;
 		} else if (!charstring::compare(ptr,"MM",2)) {
-			charstring::printTo(buf,5,"%02d",month);
+			charstring::printf(buf,5,"%02d",month);
 			output.append(buf);
 			ptr=ptr+2;
 		} else if (!charstring::compare(ptr,"MON",3)) {
@@ -561,32 +561,32 @@ char *convertDateTime(const char *format,
 			output.append(longmonths[month-1]);
 			ptr=ptr+3;
 		} else if (!charstring::compare(ptr,"YYYY",4)) {
-			charstring::printTo(buf,5,"%04d",year);
+			charstring::printf(buf,5,"%04d",year);
 			output.append(buf);
 			ptr=ptr+4;
 		} else if (!charstring::compare(ptr,"YY",2)) {
-			charstring::printTo(buf,5,"%04d",year);
+			charstring::printf(buf,5,"%04d",year);
 			output.append(buf+2);
 			ptr=ptr+2;
 		} else if (!charstring::compare(ptr,"HH24",4)) {
-			charstring::printTo(buf,5,"%02d",hour);
+			charstring::printf(buf,5,"%02d",hour);
 			output.append(buf);
 			ptr=ptr+4;
 		} else if (!charstring::compare(ptr,"HH",2)) {
-			charstring::printTo(buf,5,"%02d",
+			charstring::printf(buf,5,"%02d",
 						(hour<13)?hour:hour-12);
 			output.append(buf);
 			ptr=ptr+2;
 		} else if (!charstring::compare(ptr,"MI",2)) {
-			charstring::printTo(buf,5,"%02d",minute);
+			charstring::printf(buf,5,"%02d",minute);
 			output.append(buf);
 			ptr=ptr+2;
 		} else if (!charstring::compare(ptr,"SS",2)) {
-			charstring::printTo(buf,5,"%02d",second);
+			charstring::printf(buf,5,"%02d",second);
 			output.append(buf);
 			ptr=ptr+2;
 		} else if (!charstring::compare(ptr,"FFF",3)) {
-			charstring::printTo(buf,5,"%03d",fraction);
+			charstring::printf(buf,5,"%03d",fraction);
 			output.append(buf);
 			ptr=ptr+3;
 		} else if (!charstring::compare(ptr,"AM",2)) {

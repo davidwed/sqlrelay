@@ -11,6 +11,7 @@
 #include <rudiments/rawbuffer.h>
 #include <rudiments/character.h>
 #include <rudiments/environment.h>
+#include <rudiments/stdio.h>
 #include <parsedatetime.h>
 
 #include <datatypes.h>
@@ -584,7 +585,7 @@ bool oracle8connection::logIn(const char **error) {
 		charstring::copy(tnsnamesora,home);
 		charstring::append(tnsnamesora,"/network/admin/tnsnames.ora");
 		if (!file::readable(tnsnamesora)) {
-			fprintf(stderr,"Warning: %s/tnsnames.ora is not readable by %s:%s\n",home,cont->cfgfl->getRunAsUser(),cont->cfgfl->getRunAsGroup());
+			stderror.printf("Warning: %s/tnsnames.ora is not readable by %s:%s\n",home,cont->cfgfl->getRunAsUser(),cont->cfgfl->getRunAsGroup());
 		}
 	}
 
@@ -1614,12 +1615,12 @@ void oracle8cursor::dateToString(char *buffer, uint16_t buffersize,
 	// typically oracle just wants DD-MON-YYYY but if hour,
 	// minute and second are non-zero then use them too
 	if (hour && minute && second) {
-		charstring::printTo(buffer,buffersize,
+		charstring::printf(buffer,buffersize,
 					"%02d-%s-%04d %02d:%02d:%02d",
 					day,shortmonths[month-1],year,
 					hour,minute,second);
 	} else {
-		charstring::printTo(buffer,buffersize,
+		charstring::printf(buffer,buffersize,
 					"%02d-%s-%04d",
 					day,shortmonths[month-1],year);
 	}

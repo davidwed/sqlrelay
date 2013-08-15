@@ -66,7 +66,7 @@ bool slowqueries::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 		querylognamelen=charstring::length(cmdl->getLocalStateDir())+30+
 				charstring::length(cmdl->getId())+10+20+1;
 		querylogname=new char[querylognamelen];
-		charstring::printTo(querylogname,querylognamelen,
+		charstring::printf(querylogname,querylognamelen,
 					"%s/sqlrelay/log/sqlr-connection-%s"
 					"-querylog.%ld",
 					cmdl->getLocalStateDir(),
@@ -75,7 +75,7 @@ bool slowqueries::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 		querylognamelen=charstring::length(LOG_DIR)+17+
 				charstring::length(cmdl->getId())+10+20+1;
 		querylogname=new char[querylognamelen];
-		charstring::printTo(querylogname,querylognamelen,
+		charstring::printf(querylogname,querylognamelen,
 					"%s/sqlr-connection-%s-querylog.%ld",
 					LOG_DIR,cmdl->getId(),(long)pid);
 	}

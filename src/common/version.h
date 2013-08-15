@@ -4,6 +4,6 @@
 // handle -version
 if (argc==2 && (!rudiments::charstring::compare(argv[1],"-version") ||
 			!rudiments::charstring::compare(argv[1],"--version"))) {
-	printf("SQL Relay version: %s\n",SQLR_VERSION);
+	stdoutput.printf("SQL Relay version: %s\n",SQLR_VERSION);
 	process::exit(0);
 }

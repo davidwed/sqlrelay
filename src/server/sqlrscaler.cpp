@@ -14,6 +14,7 @@
 #include <rudiments/error.h>
 #include <rudiments/randomnumber.h>
 #include <rudiments/charstring.h>
+#include <rudiments/stdio.h>
 
 // for waitpid()
 #include <sys/types.h>
@@ -72,7 +73,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	const char	*tmpid=cmdl->getValue("-id");
 	if (!(tmpid && tmpid[0])) {
 		tmpid=DEFAULT_ID;
-		fprintf(stderr,"Warning: using default id.\n");
+		stderror.printf("Warning: using default id.\n");
 	}
 	id=charstring::duplicate(tmpid);
 
@@ -86,7 +87,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	size_t	listenerpidfilelen=tmpdir->getLength()+20+
 					charstring::length(id)+1;
 	char	*listenerpidfile=new char[listenerpidfilelen];
-	charstring::printTo(listenerpidfile,listenerpidfilelen,
+	charstring::printf(listenerpidfile,listenerpidfilelen,
 				"%s/pids/sqlr-listener-%s",
 				tmpdir->getString(),id);
 	bool	found=false;
@@ -97,13 +98,13 @@ bool scaler::initScaler(int argc, const char **argv) {
 		found=(checkForPidFile(listenerpidfile)!=-1);
 	}
 	if (!found) {
-		fprintf(stderr,"\nsqlr-scaler error: \n");
-		fprintf(stderr,"	The file %s",listenerpidfile);
-		fprintf(stderr," was not found.\n");
-		fprintf(stderr,"	This usually means that the ");
-		fprintf(stderr,"sqlr-listener is not running.\n");
-		fprintf(stderr,"	The sqlr-listener must be running ");
-		fprintf(stderr,"for the sqlr-scaler to start.\n\n");
+		stderror.printf("\nsqlr-scaler error: \n");
+		stderror.printf("	The file %s",listenerpidfile);
+		stderror.printf(" was not found.\n");
+		stderror.printf("	This usually means that the ");
+		stderror.printf("sqlr-listener is not running.\n");
+		stderror.printf("	The sqlr-listener must be running ");
+		stderror.printf("for the sqlr-scaler to start.\n\n");
 		delete[] listenerpidfile;
 		return false;
 	}
@@ -112,18 +113,18 @@ bool scaler::initScaler(int argc, const char **argv) {
 	// check/set pid file
 	size_t	pidfilelen=tmpdir->getLength()+18+charstring::length(id)+1;
 	pidfile=new char[pidfilelen];
-	charstring::printTo(pidfile,pidfilelen,
+	charstring::printf(pidfile,pidfilelen,
 				"%s/pids/sqlr-scaler-%s",
 				tmpdir->getString(),id);
 	if (checkForPidFile(pidfile)!=-1) {
-		fprintf(stderr,"\nsqlr-scaler error:\n");
-		fprintf(stderr,"	The pid file %s",pidfile);
-		fprintf(stderr," exists.\n");
-		fprintf(stderr,"	This usually means that the ");
-		fprintf(stderr,"sqlr-scaler is already running for the \n");
-		fprintf(stderr,"	%s instance.\n",id);
-		fprintf(stderr,"	If it is not running, please remove ");
-		fprintf(stderr,"the file and restart.\n");
+		stderror.printf("\nsqlr-scaler error:\n");
+		stderror.printf("	The pid file %s",pidfile);
+		stderror.printf(" exists.\n");
+		stderror.printf("	This usually means that the ");
+		stderror.printf("sqlr-scaler is already running for the \n");
+		stderror.printf("	%s instance.\n",id);
+		stderror.printf("	If it is not running, please remove ");
+		stderror.printf("the file and restart.\n");
 		delete[] pidfile;
 		pidfile=NULL;
 		return false;
@@ -172,8 +173,8 @@ bool scaler::initScaler(int argc, const char **argv) {
 			if (charstring::compare(currentgroup,
 						cfgfile->getRunAsGroup()) &&
 					!runAsGroup(cfgfile->getRunAsGroup())) {
-				fprintf(stderr,"Warning: could not change ");
-				fprintf(stderr,"group to %s\n",
+				stderror.printf("Warning: could not change ");
+				stderror.printf("group to %s\n",
 						cfgfile->getRunAsGroup());
 			}
 
@@ -182,8 +183,8 @@ bool scaler::initScaler(int argc, const char **argv) {
 			if (charstring::compare(currentuser,
 						cfgfile->getRunAsUser()) &&
 					!runAsUser(cfgfile->getRunAsUser())) {
-				fprintf(stderr,"Warning: could not change ");
-				fprintf(stderr,"user to %s\n",
+				stderror.printf("Warning: could not change ");
+				stderror.printf("user to %s\n",
 						cfgfile->getRunAsUser());
 			}
 
@@ -200,36 +201,36 @@ bool scaler::initScaler(int argc, const char **argv) {
 		// we'll do this check just to make sure)
 		file	test;
 		if (!test.open(config,O_RDONLY)) {
-			fprintf(stderr,"\nsqlr-scaler error:\n");
-			fprintf(stderr,"	This instance of ");
-			fprintf(stderr,"SQL Relay is ");
-			fprintf(stderr,"configured to run as:\n");
-			fprintf(stderr,"		user: %s\n",
+			stderror.printf("\nsqlr-scaler error:\n");
+			stderror.printf("	This instance of ");
+			stderror.printf("SQL Relay is ");
+			stderror.printf("configured to run as:\n");
+			stderror.printf("		user: %s\n",
 						cfgfile->getRunAsUser());
-			fprintf(stderr,"		group: %s\n\n",
+			stderror.printf("		group: %s\n\n",
 						cfgfile->getRunAsGroup());
-			fprintf(stderr,"	However, the config file %s\n",
+			stderror.printf("	However, the config file %s\n",
 								config);
-			fprintf(stderr,"	cannot be read by that user ");
-			fprintf(stderr,"or group.\n\n");
-			fprintf(stderr,"	Since you're using ");
-			fprintf(stderr,"dynamic scaling ");
-			fprintf(stderr,"(ie. maxconnections>connections),\n");
-			fprintf(stderr,"	new connections would be ");
-			fprintf(stderr,"started as\n");
-			fprintf(stderr,"		user: %s\n",
+			stderror.printf("	cannot be read by that user ");
+			stderror.printf("or group.\n\n");
+			stderror.printf("	Since you're using ");
+			stderror.printf("dynamic scaling ");
+			stderror.printf("(ie. maxconnections>connections),\n");
+			stderror.printf("	new connections would be ");
+			stderror.printf("started as\n");
+			stderror.printf("		user: %s\n",
 						cfgfile->getRunAsUser());
-			fprintf(stderr,"		group: %s\n\n",
+			stderror.printf("		group: %s\n\n",
 						cfgfile->getRunAsGroup());
-			fprintf(stderr,"	They would not be able to ");
-			fprintf(stderr,"read the");
-			fprintf(stderr,"config file and would shut down.\n\n");
-			fprintf(stderr,"	To remedy this problem, ");
-			fprintf(stderr,"make %s\n",config);
-			fprintf(stderr,"	readable by\n");
-			fprintf(stderr,"		user: %s\n",
+			stderror.printf("	They would not be able to ");
+			stderror.printf("read the");
+			stderror.printf("config file and would shut down.\n\n");
+			stderror.printf("	To remedy this problem, ");
+			stderror.printf("make %s\n",config);
+			stderror.printf("	readable by\n");
+			stderror.printf("		user: %s\n",
 						cfgfile->getRunAsUser());
-			fprintf(stderr,"		group: %s\n",
+			stderror.printf("		group: %s\n",
 						cfgfile->getRunAsGroup());
 			return false;
 		}
@@ -254,7 +255,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	// initialize the shared memory segment filename
 	size_t	idfilenamelen=tmpdir->getLength()+5+charstring::length(id)+1;
 	char	*idfilename=new char[idfilenamelen];
-	charstring::printTo(idfilename,idfilenamelen,
+	charstring::printf(idfilename,idfilenamelen,
 				"%s/ipc/%s",tmpdir->getString(),id);
 	key_t	key=file::generateKey(idfilename,1);
 	delete[] idfilename;
@@ -263,8 +264,8 @@ bool scaler::initScaler(int argc, const char **argv) {
 	idmemory=new sharedmemory;
 	if (!idmemory->attach(key)) {
 		char	*err=error::getErrorString();
-		fprintf(stderr,"Couldn't attach to shared memory segment: ");
-		fprintf(stderr,"%s\n",err);
+		stderror.printf("Couldn't attach to shared memory segment: ");
+		stderror.printf("%s\n",err);
 		delete[] err;
 		delete idmemory;
 		idmemory=NULL;
@@ -272,7 +273,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	}
 	shm=(shmdata *)idmemory->getPointer();
 	if (!shm) {
-		fprintf(stderr,"failed to get pointer to shmdata\n");
+		stderror.printf("failed to get pointer to shmdata\n");
 		delete idmemory;
 		idmemory=NULL;
 		return false;
@@ -282,8 +283,8 @@ bool scaler::initScaler(int argc, const char **argv) {
 	semset=new semaphoreset;
 	if (!semset->attach(key,11)) {
 		char	*err=error::getErrorString();
-		fprintf(stderr,"Couldn't attach to semaphore set: ");
-		fprintf(stderr,"%s\n",err);
+		stderror.printf("Couldn't attach to semaphore set: ");
+		stderror.printf("%s\n",err);
 		delete[] err;
 		delete semset;
 		delete idmemory;
@@ -354,7 +355,7 @@ bool scaler::reapChildren(pid_t connpid) {
 		if (WIFEXITED(childstatus)) {
 			int	exitstatus=WEXITSTATUS(childstatus);
 			if (exitstatus) {
-				fprintf(stderr,
+				stderror.printf(
 					"Connection (pid=%d) exited "
 					"with code %d\n",
 					pid,exitstatus);
@@ -362,13 +363,13 @@ bool scaler::reapChildren(pid_t connpid) {
 		} else if (WIFSIGNALED(childstatus)) {
 #ifdef WCOREDUMP
 			if (WCOREDUMP(childstatus)) {
-				fprintf(stderr,
+				stderror.printf(
 					"Connection (pid=%d) terminated "
 					"by signal %d, with coredump\n",
 					pid,WTERMSIG(childstatus));
 			} else {
 #endif
-				fprintf(stderr,
+				stderror.printf(
 					"Connection (pid=%d) terminated "
 					"by signal %d\n",
 					pid,WTERMSIG(childstatus));
@@ -377,7 +378,7 @@ bool scaler::reapChildren(pid_t connpid) {
 #endif
 		} else {
 			// something strange happened, we shouldn't be here
-			fprintf(stderr,"Connection (pid=%d) exited, "
+			stderror.printf("Connection (pid=%d) exited, "
 					"childstatus is %d\n",
 					pid,childstatus);
 		}
@@ -391,7 +392,7 @@ pid_t scaler::openOneConnection() {
 	char	command[]="sqlr-connection";
 
 	char	ttlstr[20];
-	charstring::printTo(ttlstr,20,"%d",ttl);
+	charstring::printf(ttlstr,20,"%d",ttl);
 	ttlstr[19]='\0';
 
 	int	p=0;
@@ -423,11 +424,11 @@ pid_t scaler::openOneConnection() {
 	if (pid==0) {
 		// child
 		int	ret=execvp(command,argv);
-		fprintf(stderr,"Bad command %s\n",command);
+		stderror.printf("Bad command %s\n",command);
 		process::exit(ret);
 	} else if (pid==-1) {
 		// error
-		fprintf(stderr,"fork() returned %ld [%d]\n",
+		stderror.printf("fork() returned %ld [%d]\n",
 					(long)pid,error::getErrorNumber());
 	}
 
@@ -564,7 +565,7 @@ void scaler::killConnection(pid_t connpid) {
 
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	fprintf(stderr,"%s Connection (pid=%ld) failed to get ready\n",
+	stderror.printf("%s Connection (pid=%ld) failed to get ready\n",
 						dt.getString(),(long)connpid);
 
 	// try 3 times - in the first check whether it is already dead,
@@ -573,7 +574,7 @@ void scaler::killConnection(pid_t connpid) {
 	for (int tries=0; tries<3 && !dead; tries++) {
 		if (tries) {
 			dt.getSystemDateAndTime();
-			fprintf(stderr,"%s %s connection (pid=%ld)\n",
+			stderror.printf("%s %s connection (pid=%ld)\n",
 				dt.getString(),
 				(tries==1)?"Terminating":"Killing",
 				(long)connpid);
@@ -613,7 +614,7 @@ bool scaler::availableDatabase() {
 	size_t	updownlen=tmpdir->getLength()+5+charstring::length(id)+1+
 					charstring::length(connectionid)+1;
 	char	*updown=new char[updownlen];
-	charstring::printTo(updown,updownlen,"%s/ipc/%s-%s",
+	charstring::printf(updown,updownlen,"%s/ipc/%s-%s",
 				tmpdir->getString(),id,connectionid);
 	bool	retval=file::exists(updown);
 	delete[] updown;

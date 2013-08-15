@@ -7,6 +7,7 @@
 #include <debugprint.h>
 
 #include <rudiments/xmldomnode.h>
+#include <rudiments/stdio.h>
 
 #include <config.h>
 
@@ -99,9 +100,9 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
-		printf("failed to load logger module: %s\n",module);
+		stdoutput.printf("failed to load logger module: %s\n",module);
 		char	*error=dl->getError();
-		printf("%s\n",error);
+		stdoutput.printf("%s\n",error);
 		delete[] error;
 		delete dl;
 		return;
@@ -114,9 +115,9 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 			(sqlrlogger *(*)(xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newLogger) {
-		printf("failed to create logger: %s\n",module);
+		stdoutput.printf("failed to create logger: %s\n",module);
 		char	*error=dl->getError();
-		printf("%s\n",error);
+		stdoutput.printf("%s\n",error);
 		delete[] error;
 		dl->close();
 		delete dl;

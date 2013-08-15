@@ -5,6 +5,7 @@
 #include <sqlrconfigfile.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/environment.h>
+#include <rudiments/stdio.h>
 
 #include <stdlib.h>
 
@@ -609,7 +610,7 @@ bool sqlrconfigfile::tagStart(const char *name) {
 	}
 	
 	if (!ok) {
-		fprintf(stderr,"unexpected tag <%s> within <%s>\n",
+		stderror.printf("unexpected tag <%s> within <%s>\n",
 							name,currentname);
 		return false;
 	}
@@ -1130,7 +1131,7 @@ bool sqlrconfigfile::attributeName(const char *name) {
 				tagname="runquery";
 				break;
 		}
-		fprintf(stderr,"WARNING: unrecognized attribute "
+		stderror.printf("WARNING: unrecognized attribute "
 				"\"%s\" within <%s> tag or section\n",
 				name,tagname);
 	}
@@ -1356,7 +1357,7 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			if (currentconnect) {
 				if (charstring::length(value)>
 						MAXCONNECTIONIDLEN) {
-					fprintf(stderr,"error: connectionid \"%s\" is too long, must be %d characters or fewer.\n",value,MAXCONNECTIONIDLEN);
+					stderror.printf("error: connectionid \"%s\" is too long, must be %d characters or fewer.\n",value,MAXCONNECTIONIDLEN);
 					return false;
 				}
 				currentconnect->setConnectionId((value)?value:
@@ -1538,7 +1539,7 @@ bool sqlrconfigfile::parse(const char *config, const char *id) {
 	// parse the file
 	bool	retval=true;
 	if (!parseFile(config)) {
-		fprintf(stderr,"Couldn't parse config file %s.\n",config);
+		stderror.printf("Couldn't parse config file %s.\n",config);
 		retval=false;
 	}
 
@@ -1561,7 +1562,7 @@ bool sqlrconfigfile::parse(const char *config, const char *id) {
 
 	// if the specified instance wasn't found, warn the user
 	if (!done) {
-		fprintf(stderr,"Couldn't find id %s.\n",id);
+		stderror.printf("Couldn't find id %s.\n",id);
 		retval=false;
 	}
 

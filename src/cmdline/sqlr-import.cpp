@@ -9,9 +9,8 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/commandline.h>
 #include <rudiments/process.h>
+#include <rudiments/stdio.h>
 #include <sqlrconfigfile.h>
-
-#include <stdio.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
@@ -189,7 +188,8 @@ bool sqlrimport::attributeValue(const char *value) {
 				delete[] table;
 				table=charstring::duplicate(value);
 				if (verbose) {
-					printf("inserting into %s...\n",table);
+					stdoutput.printf(
+						"inserting into %s...\n",table);
 				}
 			}
 			break;
@@ -300,8 +300,8 @@ bool sqlrimport::fieldTagStart() {
 bool sqlrimport::tableTagEnd() {
 	sqlrcon->commit();
 	if (verbose) {
-		printf("  committed %lld rows (to %s).\n\n",
-				(unsigned long long)rowcount,table);
+		stdoutput.printf("  committed %lld rows (to %s).\n\n",
+					(unsigned long long)rowcount,table);
 	}
 	return true;
 }
@@ -318,7 +318,7 @@ bool sqlrimport::sequenceTagEnd() {
 		query.append("set generator ")->append(sequence);
 		query.append(" to ")->append(sequencevalue);
 		if (!sqlrcur->sendQuery(query.getString())) {
-			printf("%s\n",sqlrcur->errorMessage());
+			stdoutput.printf("%s\n",sqlrcur->errorMessage());
 		}
 		return true;
 	} else if (!charstring::compare(dbtype,"oracle7") ||
@@ -331,13 +331,13 @@ bool sqlrimport::sequenceTagEnd() {
 		query.append(uppersequence)->append("'");
 		delete[] uppersequence;
 		if (!sqlrcur2.sendQuery(query.getString())) {
-			printf("%s\n",sqlrcur->errorMessage());
+			stdoutput.printf("%s\n",sqlrcur->errorMessage());
 			return true;
 		}
 		query.clear();
 		query.append("drop sequence ")->append(sequence);
 		if (!sqlrcur->sendQuery(query.getString())) {
-			printf("%s\n",sqlrcur->errorMessage());
+			stdoutput.printf("%s\n",sqlrcur->errorMessage());
 			return true;
 		}
 		query.clear();
@@ -367,7 +367,7 @@ bool sqlrimport::sequenceTagEnd() {
 			query.append(sqlrcur2.getField(0,"CACHE_SIZE"));
 		}
 		if (!sqlrcur->sendQuery(query.getString())) {
-			printf("%s\n",sqlrcur->errorMessage());
+			stdoutput.printf("%s\n",sqlrcur->errorMessage());
 		}
 		return true;
 	} else if (!charstring::compare(dbtype,"postgresql") ||
@@ -375,18 +375,18 @@ bool sqlrimport::sequenceTagEnd() {
 		query.append("alter sequence ")->append(sequence);
 		query.append(" restart with ")->append(sequencevalue);
 		if (!sqlrcur->sendQuery(query.getString())) {
-			printf("%s\n",sqlrcur->errorMessage());
+			stdoutput.printf("%s\n",sqlrcur->errorMessage());
 		}
 		return true;
 	}
 
-	printf("%s doesn't support sequences.\n",dbtype);
+	stdoutput.printf("%s doesn't support sequences.\n",dbtype);
 	return true;
 }
 
 bool sqlrimport::columnsTagEnd() {
 	if (verbose) {
-		printf("  %ld columns.\n",(unsigned long)currentcol);
+		stdoutput.printf("  %ld columns.\n",(unsigned long)currentcol);
 	}
 	return true;
 }
@@ -407,19 +407,19 @@ bool sqlrimport::rowTagEnd() {
 			sqlrcon->begin();
 		}
 		if (!sqlrcur->sendQuery(query.getString())) {
-			printf("%s\n",sqlrcur->errorMessage());
+			stdoutput.printf("%s\n",sqlrcur->errorMessage());
 		}
 		rowcount++;
 		if (commitcount && !(rowcount%commitcount)) {
 			sqlrcon->commit();
 			committedcount++;
 			if (verbose) {
-				printf("  committed %lld rows",
+				stdoutput.printf("  committed %lld rows",
 						(unsigned long long)rowcount);
 				if (!(committedcount%10)) {
-					printf(" (to %s)...\n",table);
+					stdoutput.printf(" (to %s)...\n",table);
 				} else {
-					printf("\n");
+					stdoutput.printf("\n");
 				}
 			}
 			sqlrcon->begin();
@@ -520,7 +520,7 @@ int main(int argc, const char **argv) {
 				charstring::length(password))) ||
 		!charstring::length(file)) {
 
-		printf("usage: \n"
+		stdoutput.printf("usage: \n"
 			"  sqlr-import -host host -port port -socket socket -user user -password password -file file [-commit rowcount] [-debug] [-verbose]\n"
 			"    or\n"
 			"  sqlr-import [-config configfile] -id id -file file [-commit rowcount] [-debug] [-verbose]\n");

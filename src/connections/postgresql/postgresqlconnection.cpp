@@ -13,7 +13,6 @@
 
 #include <libpq-fe.h>
 
-#include <stdio.h>
 #include <stdlib.h>
 
 class postgresqlconnection : public sqlrconnection_svr {
@@ -369,7 +368,7 @@ const char *postgresqlconnection::dbVersion() {
 	if (partslength==3) {
 		int64_t	minor=charstring::toInteger(parts[1]);
 		int64_t	patch=charstring::toInteger(parts[2]);
-		charstring::printTo(dbversion,
+		charstring::printf(dbversion,
 					charstring::length(dbversion)+1,
 					"%s%02lld%02lld",
 					parts[0],
@@ -548,7 +547,7 @@ postgresqlcursor::~postgresqlcursor() {
 bool postgresqlcursor::open(uint16_t id) {
 	size_t	cursornamelen=6+charstring::integerLength(id)+1;
 	cursorname=new char[cursornamelen];
-	charstring::printTo(cursorname,cursornamelen,"cursor%d",id);
+	charstring::printf(cursorname,cursornamelen,"cursor%d",id);
 	return true;
 }
 
@@ -1077,7 +1076,7 @@ const char *postgresqlcursor::getColumnTypeName(uint32_t col) {
 	// typemangling=2 means return the name as a string
 	Oid	pgfieldtype=PQftype(pgresult,col);
 	if (!postgresqlconn->typemangling) {
-		charstring::printTo(typenamebuffer,sizeof(typenamebuffer),
+		charstring::printf(typenamebuffer,sizeof(typenamebuffer),
 						"%d",(int32_t)pgfieldtype);
 		return typenamebuffer;
 	} else {

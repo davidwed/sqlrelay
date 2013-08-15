@@ -6,12 +6,12 @@
 #include <rudiments/process.h>
 #include <rudiments/charstring.h>
 #include <rudiments/error.h>
+#include <rudiments/stdio.h>
 #include <cmdline.h>
 #include <datatypes.h>
 #include <defines.h>
 #include <config.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 class status : public sqlrcontroller_svr {
 	public:
@@ -76,7 +76,7 @@ bool status::init(int argc, const char **argv) {
 
 	shm=(shmdata *)idmemory->getPointer();
 	if (!shm) {
-		fprintf(stderr,"failed to get pointer to shmdata\n");
+		stderror.printf("failed to get pointer to shmdata\n");
 		return false;
 	}
 
@@ -89,15 +89,15 @@ bool status::createSharedMemoryAndSemaphores(const char *tmpdir,
 	size_t  idfilenamelen=charstring::length(tmpdir)+5+
 		charstring::length(id)+1;
 	char	*idfilename=new char[idfilenamelen];
-	charstring::printTo(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir,id);
+	charstring::printf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir,id);
 
 	key_t	key=file::generateKey(idfilename,1);
 
 	idmemory=new sharedmemory();
 	if (!idmemory->attach(key)) {
 		char	*err=error::getErrorString();
-		fprintf(stderr,"Couldn't attach to shared memory segment: ");
-		fprintf(stderr,"%s\n",err);
+		stderror.printf("Couldn't attach to shared memory segment: ");
+		stderror.printf("%s\n",err);
 		delete[] err;
 		delete idmemory;
 		idmemory=NULL;
@@ -108,8 +108,8 @@ bool status::createSharedMemoryAndSemaphores(const char *tmpdir,
 	statussemset=new semaphoreset();
 	if (!statussemset->attach(key,11)) {
 		char	*err=error::getErrorString();
-		fprintf(stderr,"Couldn't attach to semaphore set: ");
-		fprintf(stderr,"%s\n",err);
+		stderror.printf("Couldn't attach to semaphore set: ");
+		stderror.printf("%s\n",err);
 		delete[] err;
 		delete statussemset;
 		delete idmemory;
@@ -125,11 +125,11 @@ bool status::createSharedMemoryAndSemaphores(const char *tmpdir,
 }
 
 void printAcquisitionStatus(int32_t sem) {
-	printf("%s (%d)\n",(sem)?"acquired    ":"not acquired",sem);
+	stdoutput.printf("%s (%d)\n",(sem)?"acquired    ":"not acquired",sem);
 }
 
 void printTriggeredStatus(int32_t sem) {
-	printf("%s (%d)\n",(sem)?"triggered    ":"not triggered",sem);
+	stdoutput.printf("%s (%d)\n",(sem)?"triggered    ":"not triggered",sem);
 }
 
 int main(int argc, const char **argv) {
@@ -144,7 +144,7 @@ int main(int argc, const char **argv) {
 	
 	shmdata	*statistics=s.getStatistics();
 
-	printf( 
+	stdoutput.printf( 
 		"  Open   Database Connections:  %d\n" 
 		"  Opened Database Connections:  %d\n" 
 		"\n"
@@ -175,7 +175,7 @@ int main(int argc, const char **argv) {
 		statistics->forked_listeners
 		);
 	
-	printf(
+	stdoutput.printf(
 		"Scaler's view:\n"
 		"  Connections:                  %d\n"
 		"  Connected Clients:            %d\n"
@@ -190,38 +190,38 @@ int main(int argc, const char **argv) {
 		sem[i]=s.getSemset()->getValue(i);
 	}
 
-	printf("Mutexes:\n");
-	printf("  Connection Announce               : ");
+	stdoutput.printf("Mutexes:\n");
+	stdoutput.printf("  Connection Announce               : ");
 	printAcquisitionStatus(sem[0]);
-	printf("  Shared Memory Access              : ");
+	stdoutput.printf("  Shared Memory Access              : ");
 	printAcquisitionStatus(sem[1]);
-	printf("  Connection Count                  : ");
+	stdoutput.printf("  Connection Count                  : ");
 	printAcquisitionStatus(sem[4]);
-	printf("  Session Count                     : ");
+	stdoutput.printf("  Session Count                     : ");
 	printAcquisitionStatus(sem[5]);
-	printf("  Open Connections/Forked Listeners : ");
+	stdoutput.printf("  Open Connections/Forked Listeners : ");
 	printAcquisitionStatus(sem[9]);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("Triggers:\n");
-	printf("  Accept Available Connection (l-w, c-s)         : ");
+	stdoutput.printf("Triggers:\n");
+	stdoutput.printf("  Accept Available Connection (l-w, c-s)         : ");
 	printTriggeredStatus(sem[2]);
-	printf("  Done Accepting Available Connection (c-w, l-s) : ");
+	stdoutput.printf("  Done Accepting Available Connection (c-w, l-s) : ");
 	printTriggeredStatus(sem[3]);
-	printf("  Evaluate Connection Count (s-w, l-s)           : ");
+	stdoutput.printf("  Evaluate Connection Count (s-w, l-s)           : ");
 	printTriggeredStatus(sem[6]);
-	printf("  Done Evaluating Connection Count (l-w, s-s)    : ");
+	stdoutput.printf("  Done Evaluating Connection Count (l-w, s-s)    : ");
 	printTriggeredStatus(sem[7]);
-	printf("  Connection Has Started (s-w, c-s)              : ");
+	stdoutput.printf("  Connection Has Started (s-w, c-s)              : ");
 	printTriggeredStatus(sem[8]);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("Counts:\n");
-	printf("  Busy Listener Count : %d\n",sem[10]);
+	stdoutput.printf("Counts:\n");
+	stdoutput.printf("  Busy Listener Count : %d\n",sem[10]);
 
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("Raw Semaphores:\n"
+	stdoutput.printf("Raw Semaphores:\n"
 		"  +---------------------------------------------+\n"
 		"  | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |  10 |\n"
 		"  +---+---+---+---+---+---+---+---+---+---+-----+\n"

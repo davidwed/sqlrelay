@@ -15,13 +15,14 @@
 #include <rudiments/signalclasses.h>
 #include <rudiments/xmldom.h>
 #include <sqlrconfigfile.h>
+#include <rudiments/stdio.h>
 
 #include <defines.h>
 
 // for clock()
 #include <time.h>
 
-// for printf, fflush
+// for fflush
 #include <stdio.h>
 
 #ifdef RUDIMENTS_NAMESPACE
@@ -267,7 +268,7 @@ void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			}
 
 			if (displaycommand) {
-				printf("%s\n",command.getString());
+				stdoutput.printf("%s\n",command.getString());
 			}
 
 			// run the command
@@ -280,7 +281,8 @@ void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 
 		// error message
 		if (returnerror) {
-			printf("Couldn't open file: %s\n\n",trimmedfilename);
+			stdoutput.printf("Couldn't open file: %s\n\n",
+							trimmedfilename);
 		}
 	}
 
@@ -464,13 +466,13 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr,"currentdb")) {	
 		const char	*currentdb=sqlrcon->getCurrentDatabase();
 		if (currentdb) {
-			printf("%s\n",currentdb);
+			stdoutput.printf("%s\n",currentdb);
 		} else if (sqlrcon->errorMessage()) {
 			displayError(env,NULL,
 					sqlrcon->errorMessage(),
 					sqlrcon->errorNumber());
 		} else {
-			printf("\n");
+			stdoutput.printf("\n");
 		}
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"run",3)) {	
@@ -509,7 +511,7 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"printbinds")) {	
 		printbinds("Input",&env->inputbinds);
-		printf("\n");
+		stdoutput.printf("\n");
 		printbinds("Output",&env->outputbinds);
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"clearinputbind",14)) {	
@@ -546,7 +548,7 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		return;
 	} else if (!charstring::compareIgnoringCase(
 					ptr,"getresultsetbuffersize")) {	
-		printf("%lld\n",(long long)env->rsbs);
+		stdoutput.printf("%lld\n",(long long)env->rsbs);
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"endsession")) {	
 		sqlrcon->endSession();
@@ -593,11 +595,11 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		env->final=toggle;
 	} else if (cmdtype==7) {
 		env->delimiter=ptr[0];
-		printf("Delimiter set to %c\n",env->delimiter);
+		stdoutput.printf("Delimiter set to %c\n",env->delimiter);
 	} else if (cmdtype==8) {
 		if (toggle) {
 			if (sqlrcon->autoCommitOn()) {
-				printf("Autocommit set on\n");
+				stdoutput.printf("Autocommit set on\n");
 			} else {
 				displayError(env,NULL,
 					sqlrcon->errorMessage(),
@@ -605,7 +607,7 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			}
 		} else {
 			if (sqlrcon->autoCommitOff()) {
-				printf("Autocommit set off\n");
+				stdoutput.printf("Autocommit set off\n");
 			} else {
 				displayError(env,NULL,
 					sqlrcon->errorMessage(),
@@ -655,11 +657,11 @@ void sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 
 		for (uint64_t j=0; j<sqlrcur->rowCount(); j++) {
 			if (j>0) {
-				printf(",");
+				stdoutput.printf(",");
 			}
-			printf("%s",sqlrcur->getField(j,(uint32_t)0));
+			stdoutput.printf("%s",sqlrcur->getField(j,(uint32_t)0));
 		}
-		printf("\n");
+		stdoutput.printf("\n");
 
 		if (env->final) {
 			sqlrcon->endSession();
@@ -888,11 +890,11 @@ void sqlrsh::displayError(sqlrshenv *env,
 				const char *error,
 				int64_t errornumber) {
 	if (charstring::length(message)) {
-		printf("%s\n",message);
+		stdoutput.printf("%s\n",message);
 	}
-	printf("%lld:\n",(long long)errornumber);
+	stdoutput.printf("%lld:\n",(long long)errornumber);
 	if (charstring::length(error)) {
-		printf("%s\n\n",error);
+		stdoutput.printf("%s\n\n",error);
 	}
 }
 
@@ -918,7 +920,7 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 		// write the column name
 		name=sqlrcur->getColumnName(i);
-		printf("%s",name);
+		stdoutput.printf("%s",name);
 
 		// which is longer, field name or longest field
 		namelen=charstring::length(name);
@@ -930,22 +932,22 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 		// pad after the name with spaces
 		for (uint32_t j=namelen; j<longest; j++) {
-			printf(" ");
+			stdoutput.printf(" ");
 		}
 
 		// put an extra space between names
 		if (i<colcount-1) {
-			printf(" ");
+			stdoutput.printf(" ");
 			charcount=charcount+1;
 		}
 	}
-	printf("\n");
+	stdoutput.printf("\n");
 
 	// display delimiter
 	for (uint32_t i=0; i<charcount; i++) {
-		printf("=");
+		stdoutput.printf("=");
 	}
-	printf("\n");
+	stdoutput.printf("\n");
 }
 
 void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
@@ -969,7 +971,7 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			}
 
 			// write the column value
-			printf("%s",field);
+			stdoutput.printf("%s",field);
 
 			// which is longer, field name or longest field
 			longest=sqlrcur->getLongest(j);
@@ -984,16 +986,16 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			// pad after the name with spaces
 			for (uint32_t k=sqlrcur->getFieldLength(i,j); 
 							k<longest; k++) {
-				printf(" ");
+				stdoutput.printf(" ");
 			}
 
 			// put an extra space between names
 			if (j<colcount-1) {
-				printf(" ");
+				stdoutput.printf(" ");
 			}
 		}
 		if (field) {
-			printf("\n");
+			stdoutput.printf("\n");
 		}
 		i++;
 	}
@@ -1006,25 +1008,26 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	}
 
 	// call clock again, display results
-	printf("	Rows Returned   : ");
-	printf("%lld\n",(long long)sqlrcur->rowCount());
-	printf("	Fields Returned : ");
-	printf("%lld\n",(long long)sqlrcur->rowCount()*sqlrcur->colCount());
-	printf("	System time     : ");
-	printf("%ld\n",(long)clock());
-	printf("\n");
+	stdoutput.printf("	Rows Returned   : ");
+	stdoutput.printf("%lld\n",(long long)sqlrcur->rowCount());
+	stdoutput.printf("	Fields Returned : ");
+	stdoutput.printf("%lld\n",
+			(long long)sqlrcur->rowCount()*sqlrcur->colCount());
+	stdoutput.printf("	System time     : ");
+	stdoutput.printf("%ld\n",(long)clock());
+	stdoutput.printf("\n");
 }
 
 void sqlrsh::ping(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	bool	result=sqlrcon->ping();
 	if (result) {
-		printf("	The database is up.\n");
+		stdoutput.printf("	The database is up.\n");
 	} else if (sqlrcon->errorMessage()) {
 		displayError(env,NULL,
 				sqlrcon->errorMessage(),
 				sqlrcon->errorNumber());
 	} else {
-		printf("	The database is down.\n");
+		stdoutput.printf("	The database is down.\n");
 	}
 }
 
@@ -1032,7 +1035,7 @@ bool sqlrsh::lastinsertid(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	bool		retval=false;
 	uint64_t	id=sqlrcon->getLastInsertId();
 	if (id!=0 || !sqlrcon->errorMessage()) {
-		printf("%lld\n",(long long)id);
+		stdoutput.printf("%lld\n",(long long)id);
 		retval=true;
 	}
 	return retval;
@@ -1041,69 +1044,69 @@ bool sqlrsh::lastinsertid(sqlrconnection *sqlrcon, sqlrshenv *env) {
 void sqlrsh::identify(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	const char	*value=sqlrcon->identify();
 	if (value) {
-		printf("%s\n",value);
+		stdoutput.printf("%s\n",value);
 	} else if (sqlrcon->errorMessage()) {
 		displayError(env,NULL,
 				sqlrcon->errorMessage(),
 				sqlrcon->errorNumber());
 	} else {
-		printf("\n");
+		stdoutput.printf("\n");
 	}
 }
 
 void sqlrsh::dbversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	const char	*value=sqlrcon->dbVersion();
 	if (value) {
-		printf("%s\n",value);
+		stdoutput.printf("%s\n",value);
 	} else if (sqlrcon->errorMessage()) {
 		displayError(env,NULL,
 				sqlrcon->errorMessage(),
 				sqlrcon->errorNumber());
 	} else {
-		printf("\n");
+		stdoutput.printf("\n");
 	}
 }
 
 void sqlrsh::dbhostname(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	const char	*value=sqlrcon->dbHostName();
 	if (value) {
-		printf("%s\n",value);
+		stdoutput.printf("%s\n",value);
 	} else if (sqlrcon->errorMessage()) {
 		displayError(env,NULL,
 				sqlrcon->errorMessage(),
 				sqlrcon->errorNumber());
 	} else {
-		printf("\n");
+		stdoutput.printf("\n");
 	}
 }
 
 void sqlrsh::dbipaddress(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	const char	*value=sqlrcon->dbIpAddress();
 	if (value) {
-		printf("%s\n",value);
+		stdoutput.printf("%s\n",value);
 	} else if (sqlrcon->errorMessage()) {
 		displayError(env,NULL,
 				sqlrcon->errorMessage(),
 				sqlrcon->errorNumber());
 	} else {
-		printf("\n");
+		stdoutput.printf("\n");
 	}
 }
 
 void sqlrsh::clientversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
-	printf("%s\n",sqlrcon->clientVersion());
+	stdoutput.printf("%s\n",sqlrcon->clientVersion());
 }
 
 void sqlrsh::serverversion(sqlrconnection *sqlrcon, sqlrshenv *env) {
 	const char	*value=sqlrcon->serverVersion();
 	if (value) {
-		printf("%s\n",value);
+		stdoutput.printf("%s\n",value);
 	} else if (sqlrcon->errorMessage()) {
 		displayError(env,NULL,
 				sqlrcon->errorMessage(),
 				sqlrcon->errorNumber());
 	} else {
-		printf("\n");
+		stdoutput.printf("\n");
 	}
 }
 
@@ -1114,7 +1117,7 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 	const char	*ptr=command+10;
 	const char	*space=charstring::findFirst(ptr,' ');
 	if (!space) {
-		printf("usage: inputbind [variable] = [value]\n");
+		stdoutput.printf("usage: inputbind [variable] = [value]\n");
 		return;
 	}
 
@@ -1126,7 +1129,7 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 	if (*(ptr+1)=='=' && *(ptr+2)==' ') {
 		ptr=ptr+3;
 	} else {
-		printf("usage: inputbind [variable] = [value]\n");
+		stdoutput.printf("usage: inputbind [variable] = [value]\n");
 		return;
 	}
 		
@@ -1273,7 +1276,8 @@ void sqlrsh::outputbind(sqlrcursor *sqlrcur,
 	if (sane) {
 		delete[] parts[0];
 	} else {
-		printf("usage: outputbind [variable] [type] [length] [scale]\n");
+		stdoutput.printf("usage: outputbind "
+				"[variable] [type] [length] [scale]\n");
 		for (uint64_t i=0; i<partcount; i++) {
 			delete[] parts[i];
 		}
@@ -1284,7 +1288,7 @@ void sqlrsh::outputbind(sqlrcursor *sqlrcur,
 void sqlrsh::printbinds(const char *type,
 			stringdictionary< sqlrshbindvalue * > *binds) {
 
-	printf("%s bind variables:\n",type);
+	stdoutput.printf("%s bind variables:\n",type);
 
 	for (stringdictionarylistnode< sqlrshbindvalue * > *node=
 		(stringdictionarylistnode< sqlrshbindvalue *> *)
@@ -1293,21 +1297,22 @@ void sqlrsh::printbinds(const char *type,
 		node=(stringdictionarylistnode< sqlrshbindvalue *> *)
 						node->getNext()) {
 
-		printf("    %s ",node->getData()->getKey());
+		stdoutput.printf("    %s ",node->getData()->getKey());
 		sqlrshbindvalue	*bv=node->getData()->getData();
 		if (bv->type==STRING_BIND) {
-			printf("(STRING) = %s\n",bv->stringval);
+			stdoutput.printf("(STRING) = %s\n",bv->stringval);
 		} else if (bv->type==INTEGER_BIND) {
-			printf("(INTEGER) = %lld\n",(long long)bv->integerval);
+			stdoutput.printf("(INTEGER) = %lld\n",
+						(long long)bv->integerval);
 		} else if (bv->type==DOUBLE_BIND) {
-			printf("(DOUBLE %d,%d) = %*.*f\n",
+			stdoutput.printf("(DOUBLE %d,%d) = %*.*f\n",
 						bv->doubleval.precision,
 						bv->doubleval.scale,
 						(int)bv->doubleval.precision,
 						(int)bv->doubleval.scale,
 						bv->doubleval.value);
 		} else if (bv->type==DATE_BIND) {
-			printf("(DATE) = %02d/%02d/%04d "
+			stdoutput.printf("(DATE) = %02d/%02d/%04d "
 						"%02d:%02d:%02d:%03d %s\n",
 						bv->dateval.month,
 						bv->dateval.day,
@@ -1318,7 +1323,7 @@ void sqlrsh::printbinds(const char *type,
 						bv->dateval.microsecond,
 						bv->dateval.tz);
 		} else if (bv->type==NULL_BIND) {
-			printf("NULL\n");
+			stdoutput.printf("NULL\n");
 		}
 	}
 }
@@ -1329,103 +1334,103 @@ void sqlrsh::setclientinfo(sqlrconnection *sqlrcon, const char *command) {
 
 void sqlrsh::getclientinfo(sqlrconnection *sqlrcon) {
 	const char	*ci=sqlrcon->getClientInfo();
-	printf("%s\n",(ci)?ci:"");
+	stdoutput.printf("%s\n",(ci)?ci:"");
 }
 
 void sqlrsh::displayHelp(sqlrshenv *env) {
 
-	printf("\n");
-	printf("	To run a query, simply type it at the prompt,\n"
-		"	followed by a semicolon.  Queries may be \n"
-		"	split over multiple lines.\n\n");
-	printf("	ping			- ");
-	printf("pings the database\n");
-	printf("	identify		- ");
-	printf("returns the type of database\n");
-	printf("	dbversion		- ");
-	printf("returns the version of the database\n");
-	printf("	dbhostname		- ");
-	printf("returns the host name of the database\n");
-	printf("	dbipaddress		- ");
-	printf("returns the ip address of the database\n");
-	printf("	clientversion		- ");
-	printf("returns the version of the SQL Relay\n");
-	printf("\t\t\t\t  client library\n");
-	printf("	serverversion		- ");
-	printf("returns the version of the SQL Relay server\n");
-	printf("	use [database]		- ");
-	printf("change the current database/schema\n");
-	printf("	currentdb		- ");
-	printf("shows the current database/schema\n");
-	printf("	run script		- ");
-	printf("runs commands contained in file \"script\"\n");
-	printf("	headers on/off		- ");
-	printf("toggles column descriptions before result set\n");
-	printf("	stats on/off		- ");
-	printf("toggles statistics after result set\n");
-	printf("	debug on/off		- ");
-	printf("toggles debug messages\n");
-	printf("	autocommit on/off	- ");
-	printf("toggles autocommit\n");
-	printf("	final on/off		- ");
-	printf("toggles use of one session per query\n");
-	printf("	delimiter [character]	- ");
-	printf("sets delimiter character to [character]\n\n");
-	printf("	inputbind ...                 - ");
-	printf("defines an input bind variable\n");
-	printf("		inputbind [variable] = [stringvalue]\n");
-	printf("		inputbind [variable] = [integervalue]\n");
-	printf("		inputbind [variable] = [doublevalue]\n");
-	printf("		inputbind [variable] = [MM/DD/YYYY HH:MM:SS:uS TZN]\n");
-	printf("	outputbind ...                 - ");
-	printf("defines an output bind variable\n");
-	printf("		outputbind [variable] string [length]\n");
-	printf("		outputbind [variable] integer\n");
-	printf("		outputbind [variable] double [precision] [scale}\n");
-	printf("		outputbind [variable] date\n");
-	printf("	printbinds                     - ");
-	printf("prints all bind variables\n");
-	printf("	clearinputbind [variable]      - ");
-	printf("clears an input bind variable\n");
-	printf("	clearoutputbind [variable]     - ");
-	printf("clears an output bind variable\n");
-	printf("	clearbinds                     - ");
-	printf("clears all bind variables\n");
-	printf("	reexecute                      - ");
-	printf("reexecutes the previous query\n\n");
-	printf("	lastinsertid                   - ");
-	printf("returns the value of the most recently\n");
-	printf("\t\t\t\t\t updated auto-increment or identity\n");
-	printf("\t\t\t\t\t column, if the database supports it\n\n");
-	printf("	show databases [like pattern]		-\n");
-	printf("		returns a list of known databases/schemas\n");
-	printf("	show tables [like pattern]		-\n");
-	printf("		returns a list of known tables\n");
-	printf("	show columns in table [like pattern]	-\n");
-	printf("		returns a list of column metadata for the table \"table\"\n");
-	printf("	describe table				-\n");
-	printf("		returns a list of column metadata for the table \"table\"\n");
-	printf("	fields table				-\n");
-	printf("		returns a list of column names for the table \"table\"\n\n");
-	printf("	setclientinfo info	- sets the client info\n");
-	printf("	getclientinfo		- displays the client info\n\n");
-	printf("	setresultsetbuffersize size	- fetch size rows at a time\n");
-	printf("	getresultsetbuffersize 		- shows rows fetched at a time\n\n");
-	printf("	endsession		- ends the current session\n\n");
-	printf("	exit/quit		- ");
-	printf("exits\n\n");
-	printf("	All commands must be followed by the delimiter: %c\n",
+	stdoutput.printf("\n");
+	stdoutput.printf("	To run a query, simply type it at the prompt,\n"
+			"	followed by a semicolon.  Queries may be \n"
+			"	split over multiple lines.\n\n");
+	stdoutput.printf("	ping			- ");
+	stdoutput.printf("pings the database\n");
+	stdoutput.printf("	identify		- ");
+	stdoutput.printf("returns the type of database\n");
+	stdoutput.printf("	dbversion		- ");
+	stdoutput.printf("returns the version of the database\n");
+	stdoutput.printf("	dbhostname		- ");
+	stdoutput.printf("returns the host name of the database\n");
+	stdoutput.printf("	dbipaddress		- ");
+	stdoutput.printf("returns the ip address of the database\n");
+	stdoutput.printf("	clientversion		- ");
+	stdoutput.printf("returns the version of the SQL Relay\n");
+	stdoutput.printf("\t\t\t\t  client library\n");
+	stdoutput.printf("	serverversion		- ");
+	stdoutput.printf("returns the version of the SQL Relay server\n");
+	stdoutput.printf("	use [database]		- ");
+	stdoutput.printf("change the current database/schema\n");
+	stdoutput.printf("	currentdb		- ");
+	stdoutput.printf("shows the current database/schema\n");
+	stdoutput.printf("	run script		- ");
+	stdoutput.printf("runs commands contained in file \"script\"\n");
+	stdoutput.printf("	headers on/off		- ");
+	stdoutput.printf("toggles column descriptions before result set\n");
+	stdoutput.printf("	stats on/off		- ");
+	stdoutput.printf("toggles statistics after result set\n");
+	stdoutput.printf("	debug on/off		- ");
+	stdoutput.printf("toggles debug messages\n");
+	stdoutput.printf("	autocommit on/off	- ");
+	stdoutput.printf("toggles autocommit\n");
+	stdoutput.printf("	final on/off		- ");
+	stdoutput.printf("toggles use of one session per query\n");
+	stdoutput.printf("	delimiter [character]	- ");
+	stdoutput.printf("sets delimiter character to [character]\n\n");
+	stdoutput.printf("	inputbind ...                 - ");
+	stdoutput.printf("defines an input bind variable\n");
+	stdoutput.printf("		inputbind [variable] = [stringvalue]\n");
+	stdoutput.printf("		inputbind [variable] = [integervalue]\n");
+	stdoutput.printf("		inputbind [variable] = [doublevalue]\n");
+	stdoutput.printf("		inputbind [variable] = [MM/DD/YYYY HH:MM:SS:uS TZN]\n");
+	stdoutput.printf("	outputbind ...                 - ");
+	stdoutput.printf("defines an output bind variable\n");
+	stdoutput.printf("		outputbind [variable] string [length]\n");
+	stdoutput.printf("		outputbind [variable] integer\n");
+	stdoutput.printf("		outputbind [variable] double [precision] [scale}\n");
+	stdoutput.printf("		outputbind [variable] date\n");
+	stdoutput.printf("	printbinds                     - ");
+	stdoutput.printf("prints all bind variables\n");
+	stdoutput.printf("	clearinputbind [variable]      - ");
+	stdoutput.printf("clears an input bind variable\n");
+	stdoutput.printf("	clearoutputbind [variable]     - ");
+	stdoutput.printf("clears an output bind variable\n");
+	stdoutput.printf("	clearbinds                     - ");
+	stdoutput.printf("clears all bind variables\n");
+	stdoutput.printf("	reexecute                      - ");
+	stdoutput.printf("reexecutes the previous query\n\n");
+	stdoutput.printf("	lastinsertid                   - ");
+	stdoutput.printf("returns the value of the most recently\n");
+	stdoutput.printf("\t\t\t\t\t updated auto-increment or identity\n");
+	stdoutput.printf("\t\t\t\t\t column, if the database supports it\n\n");
+	stdoutput.printf("	show databases [like pattern]		-\n");
+	stdoutput.printf("		returns a list of known databases/schemas\n");
+	stdoutput.printf("	show tables [like pattern]		-\n");
+	stdoutput.printf("		returns a list of known tables\n");
+	stdoutput.printf("	show columns in table [like pattern]	-\n");
+	stdoutput.printf("		returns a list of column metadata for the table \"table\"\n");
+	stdoutput.printf("	describe table				-\n");
+	stdoutput.printf("		returns a list of column metadata for the table \"table\"\n");
+	stdoutput.printf("	fields table				-\n");
+	stdoutput.printf("		returns a list of column names for the table \"table\"\n\n");
+	stdoutput.printf("	setclientinfo info	- sets the client info\n");
+	stdoutput.printf("	getclientinfo		- displays the client info\n\n");
+	stdoutput.printf("	setresultsetbuffersize size	- fetch size rows at a time\n");
+	stdoutput.printf("	getresultsetbuffersize 		- shows rows fetched at a time\n\n");
+	stdoutput.printf("	endsession		- ends the current session\n\n");
+	stdoutput.printf("	exit/quit		- ");
+	stdoutput.printf("exits\n\n");
+	stdoutput.printf("	All commands must be followed by the delimiter: %c\n",
 								env->delimiter);
 }
 
 void sqlrsh::startupMessage(sqlrshenv *env, const char *host,
 					uint16_t port, const char *user) {
 
-	printf("SQLRShell - ");
-	printf("Version %s\n",SQLR_VERSION);
-	printf("	Connected to: ");
-	printf("%s:%d as %s\n\n",host,port,user);
-	printf("	type help; for help.\n\n");
+	stdoutput.printf("SQLRShell - ");
+	stdoutput.printf("Version %s\n",SQLR_VERSION);
+	stdoutput.printf("	Connected to: ");
+	stdoutput.printf("%s:%d as %s\n\n",host,port,user);
+	stdoutput.printf("	type help; for help.\n\n");
 }
 
 void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
@@ -1455,7 +1460,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 					charstring::rightTrim(cmd);
 					add_history(cmd);
 				} else {
-					printf("\n");
+					stdoutput.printf("\n");
 				}
 			#else
 				prompt(promptcount);
@@ -1463,7 +1468,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 				ssize_t	bytes=standardin.read(cmd,1024);
 				cmd[bytes-1]='\0';
 				#ifdef ADD_NEWLINE_AFTER_READ_FROM_STDIN
-					printf("\n");
+					stdoutput.printf("\n");
 				#endif
 			#endif
 			size_t	len=charstring::length(cmd);
@@ -1505,7 +1510,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 
 void sqlrsh::prompt(unsigned long promptcount) {
 
-	printf("%ld> ",promptcount);
+	stdoutput.printf("%ld> ",promptcount);
 	fflush(stdout);
 }
 
@@ -1535,7 +1540,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 				charstring::length(user) &&
 				charstring::length(password)))) {
 
-		printf("usage: sqlrsh -host host -port port -socket socket -user user -password password [-script script | -command command]\n"
+		stdoutput.printf("usage: sqlrsh -host host -port port -socket socket -user user -password password [-script script | -command command]\n"
 			"  or   sqlrsh [-config configfile] -id id [-script script | -command command]\n");
 		process::exit(1);
 	}

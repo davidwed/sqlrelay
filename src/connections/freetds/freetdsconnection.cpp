@@ -20,7 +20,6 @@ extern "C" {
 	#include <tdsver.h>
 #endif
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #ifndef HAVE_FREETDS_FUNCTION_DEFINITIONS
@@ -845,7 +844,7 @@ bool freetdscursor::open(uint16_t id) {
 	if (freetdsconn->db && freetdsconn->db[0] && !freetdsconn->dbused) {
 		uint32_t	len=charstring::length(freetdsconn->db)+4;
 		char		query[len+1];
-		charstring::printTo(query,len+1,"use %s",freetdsconn->db);
+		charstring::printf(query,len+1,"use %s",freetdsconn->db);
 		if (!(prepareQuery(query,len) && executeQuery(query,len))) {
 			char		err[2048];
 			uint32_t	errlen;

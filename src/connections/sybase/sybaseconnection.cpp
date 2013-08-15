@@ -7,6 +7,7 @@
 #include <rudiments/stringbuffer.h>
 #include <rudiments/charstring.h>
 #include <rudiments/rawbuffer.h>
+#include <rudiments/stdio.h>
 
 #include <config.h>
 #include <datatypes.h>
@@ -15,7 +16,6 @@ extern "C" {
 	#include <ctpublic.h>
 }
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #define FETCH_AT_ONCE		10
@@ -675,14 +675,14 @@ bool sybasecursor::open(uint16_t id) {
 	if (sybaseconn->db && sybaseconn->db[0] && !sybaseconn->dbused) {
 		int32_t	len=charstring::length(sybaseconn->db)+4;
 		char	query[len+1];
-		charstring::printTo(query,len+1,"use %s",sybaseconn->db);
+		charstring::printf(query,len+1,"use %s",sybaseconn->db);
 		if (!(prepareQuery(query,len) && executeQuery(query,len))) {
 			char		err[2048];
 			uint32_t	errlen;
 			int64_t		errn;
 			bool		live;
 			errorMessage(err,sizeof(err),&errlen,&errn,&live);
-			fprintf(stderr,"%s\n",err);
+			stderror.printf("%s\n",err);
 			retval=false;
 		} else {
 			sybaseconn->dbused=true;

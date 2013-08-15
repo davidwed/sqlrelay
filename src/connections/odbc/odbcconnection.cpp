@@ -14,6 +14,7 @@
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <rudiments/charstring.h>
+#include <rudiments/stdio.h>
 
 #include <datatypes.h>
 
@@ -298,7 +299,7 @@ char *conv_to_user_coding(char *inbuf)
 #endif
       if (nconv == (size_t) -1)
         {
-					printf("conv_to_user_coding: error in iconv\n");					
+					stdoutput.printf("conv_to_user_coding: error in iconv\n");					
         }		
 	
 				/* Terminate the output string.  */
@@ -306,7 +307,7 @@ char *conv_to_user_coding(char *inbuf)
 				
 				if (nconv == (size_t) -1)
 				{
-					printf("wrptr='%s'\n",wrptr);
+					stdoutput.printf("wrptr='%s'\n",wrptr);
 				}
 
 				
@@ -354,7 +355,7 @@ char *conv_to_ucs(char *inbuf)
 #endif
   if (nconv == (size_t) -1)
   {
-		printf("conv_to_ucs: error in iconv\n");					
+		stdoutput.printf("conv_to_ucs: error in iconv\n");					
   }		
 	
 			/* Terminate the output string.  */
@@ -362,7 +363,7 @@ char *conv_to_ucs(char *inbuf)
 	
 	if (nconv == (size_t) -1)
 	{
-		printf("inbuf='%s'\n",inbuf);
+		stdoutput.printf("inbuf='%s'\n",inbuf);
 	}
 
 				
@@ -371,7 +372,7 @@ char *conv_to_ucs(char *inbuf)
 	
 //		FILE *ff;
 //		char fname[200];
-//		sprintf(fname,"/home/orbb/temp/result_conv_to_ucs.txt_%d",charstring::length(inbuf));
+//		charstring::printf(fname,200,"/home/orbb/temp/result_conv_to_ucs.txt_%d",charstring::length(inbuf));
 //		ff=fopen(fname,"wb");
 //		fwrite(outbuf,1,wrptr-outbuf,ff);
 //		fclose(ff);

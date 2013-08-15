@@ -1351,7 +1351,7 @@ void firebirdcursor::getField(uint32_t col,
 	#endif
 		// build a string of "yyyy-mm-dd hh:mm:ss" format
 		char	buffer[20];
-		charstring::printTo(buffer,20,
+		charstring::printf(buffer,20,
 					"%d-%02d-%02d %02d:%02d:%02d",
 					entry_timestamp.tm_year+1900,
 					entry_timestamp.tm_mon+1,
@@ -1370,7 +1370,7 @@ void firebirdcursor::getField(uint32_t col,
 						&entry_time);
 		// build a string of "hh:mm:ss" format
 		char	buffer[9];
-		charstring::printTo(buffer,9,
+		charstring::printf(buffer,9,
 					"%02d:%02d:%02d",
 					entry_time.tm_hour,
 					entry_time.tm_min,
@@ -1385,7 +1385,7 @@ void firebirdcursor::getField(uint32_t col,
 						&entry_date);
 		// build a string of "yyyy-mm-dd" format
 		char	buffer[11];
-		charstring::printTo(buffer,11,
+		charstring::printf(buffer,11,
 					"%d:%02d:%02d",
 					entry_date.tm_year+1900,
 					entry_date.tm_mon+1,

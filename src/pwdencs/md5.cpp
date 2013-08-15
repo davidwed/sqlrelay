@@ -32,6 +32,9 @@
  */
 
 #include <rudiments/private/inttypes.h>
+#include <rudiments/charstring.h>
+
+using namespace rudiments;
 
 //---------------------------------------------------------------------- 
 //typedefs
@@ -370,7 +373,7 @@ char *MD5::MD5ConvertToAscii(const unsigned char *digest)
 
 	uint16_t	p=0;
 	for(uint16_t i=0; i<16; i++) {
-		sprintf(&asciihash[p],"%02x",digest[i]);
+		charstring::printf(&asciihash[p],2,"%02x",digest[i]);
 		p+=2;
 	}	
 	asciihash[32]='\0';

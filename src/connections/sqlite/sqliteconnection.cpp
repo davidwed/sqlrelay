@@ -17,8 +17,6 @@ extern "C" {
 #endif
 }
 
-#include <stdio.h>
-
 #ifndef SQLITE3
 	#define	sqlite3_open			sqlite_open
 	#define	sqlite3_close			sqlite_close

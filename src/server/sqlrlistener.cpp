@@ -16,9 +16,7 @@
 #include <rudiments/datetime.h>
 #include <rudiments/logger.h>
 #include <rudiments/system.h>
-
-// for printf
-#include <stdio.h>
+#include <rudiments/stdio.h>
 
 #ifndef MAXPATHLEN
 	#define MAXPATHLEN	256
@@ -138,7 +136,7 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 	tmpdir=new tempdir(cmdl);
 
 	if (!charstring::compare(cmdl->getId(),DEFAULT_ID)) {
-		fprintf(stderr,"Warning: using default id.\n");
+		stderror.printf("Warning: using default id.\n");
 	}
 
 	if (!cfgfl.parse(cmdl->getConfig(),cmdl->getId())) {
@@ -212,7 +210,7 @@ void sqlrlistener::setUserAndGroup() {
 	// group that we should switch to
 	if (charstring::compare(currentgroup,cfgfl.getRunAsGroup()) &&
 					!runAsGroup(cfgfl.getRunAsGroup())) {
-		fprintf(stderr,"Warning: could not change group to %s\n",
+		stderror.printf("Warning: could not change group to %s\n",
 						cfgfl.getRunAsGroup());
 	}
 
@@ -220,7 +218,7 @@ void sqlrlistener::setUserAndGroup() {
 	// user that we should switch to
 	if (charstring::compare(currentuser,cfgfl.getRunAsUser()) &&
 					!runAsUser(cfgfl.getRunAsUser())) {
-		fprintf(stderr,"Warning: could not change user to %s\n",
+		stderror.printf("Warning: could not change user to %s\n",
 						cfgfl.getRunAsUser());
 	}
 
@@ -237,32 +235,32 @@ bool sqlrlistener::verifyAccessToConfigFile(const char *configfile) {
 
 	file	test;
 	if (!test.open(configfile,O_RDONLY)) {
-		fprintf(stderr,"\nsqlr-listener error:\n");
-		fprintf(stderr,"	This instance of SQL Relay is ");
-		fprintf(stderr,"configured to run as:\n");
-		fprintf(stderr,"		user: %s\n",
+		stderror.printf("\nsqlr-listener error:\n");
+		stderror.printf("	This instance of SQL Relay is ");
+		stderror.printf("configured to run as:\n");
+		stderror.printf("		user: %s\n",
 						cfgfl.getRunAsUser());
-		fprintf(stderr,"		group: %s\n\n",
+		stderror.printf("		group: %s\n\n",
 						cfgfl.getRunAsGroup());
-		fprintf(stderr,"	However, the config file %s\n",
+		stderror.printf("	However, the config file %s\n",
 								configfile);
-		fprintf(stderr,"	cannot be read by that user ");
-		fprintf(stderr,"or group.\n\n");
-		fprintf(stderr,"	Since you're using dynamic scaling ");
-		fprintf(stderr,"(ie. maxconnections>connections),\n");
-		fprintf(stderr,"	new connections would be started as\n");
-		fprintf(stderr,"		user: %s\n",
+		stderror.printf("	cannot be read by that user ");
+		stderror.printf("or group.\n\n");
+		stderror.printf("	Since you're using dynamic scaling ");
+		stderror.printf("(ie. maxconnections>connections),\n");
+		stderror.printf("	new connections would be started as\n");
+		stderror.printf("		user: %s\n",
 						cfgfl.getRunAsUser());
-		fprintf(stderr,"		group: %s\n\n",
+		stderror.printf("		group: %s\n\n",
 						cfgfl.getRunAsGroup());
-		fprintf(stderr,"	They would not be able to read the");
-		fprintf(stderr,"config file and would shut down.\n\n");
-		fprintf(stderr,"	To remedy this problem, make %s\n",
+		stderror.printf("	They would not be able to read the");
+		stderror.printf("config file and would shut down.\n\n");
+		stderror.printf("	To remedy this problem, make %s\n",
 								configfile);
-		fprintf(stderr,"	readable by\n");
-		fprintf(stderr,"		user: %s\n",
+		stderror.printf("	readable by\n");
+		stderror.printf("		user: %s\n",
 						cfgfl.getRunAsUser());
-		fprintf(stderr,"		group: %s\n",
+		stderror.printf("		group: %s\n",
 						cfgfl.getRunAsGroup());
 		return false;
 	}
@@ -275,21 +273,21 @@ bool sqlrlistener::handlePidFile(const char *id) {
 	// check/set pid file
 	size_t	pidfilelen=tmpdir->getLength()+20+charstring::length(id)+1;
 	pidfile=new char[pidfilelen];
-	charstring::printTo(pidfile,pidfilelen,
+	charstring::printf(pidfile,pidfilelen,
 				"%s/pids/sqlr-listener-%s",
 				tmpdir->getString(),id);
 
 	if (checkForPidFile(pidfile)!=-1) {
-		fprintf(stderr,"\nsqlr-listener error:\n");
-		fprintf(stderr,"	The pid file %s",pidfile);
-		fprintf(stderr," exists.\n");
-		fprintf(stderr,"	This usually means that the ");
-		fprintf(stderr,"sqlr-listener is already running for ");
-		fprintf(stderr,"the \n");
-		fprintf(stderr,"	%s",id);
-		fprintf(stderr," instance.\n");
-		fprintf(stderr,"	If it is not running, please remove ");
-		fprintf(stderr,"the file and restart.\n");
+		stderror.printf("\nsqlr-listener error:\n");
+		stderror.printf("	The pid file %s",pidfile);
+		stderror.printf(" exists.\n");
+		stderror.printf("	This usually means that the ");
+		stderror.printf("sqlr-listener is already running for ");
+		stderror.printf("the \n");
+		stderror.printf("	%s",id);
+		stderror.printf(" instance.\n");
+		stderror.printf("	If it is not running, please remove ");
+		stderror.printf("the file and restart.\n");
 		delete[] pidfile;
 		pidfile=NULL;
 		return false;
@@ -321,7 +319,7 @@ void sqlrlistener::setHandoffMethod(const char *id) {
         	if (!charstring::compare(os,"CYGWIN",6) ||
                 	(!charstring::compare(os,"Linux",5) && ver<2.2)) {
 			handoffmode=HANDOFF_PROXY;
-			fprintf(stderr,"Warning: handoff=\"pass\" not "
+			stderror.printf("Warning: handoff=\"pass\" not "
 					"supported, falling back to "
 					"handoff=\"proxy\"\n");
         	} else {
@@ -362,7 +360,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	// initialize the ipc filename
 	size_t	idfilenamelen=tmpdir->getLength()+5+charstring::length(id)+1;
 	char	*idfilename=new char[idfilenamelen];
-	charstring::printTo(idfilename,idfilenamelen,
+	charstring::printf(idfilename,idfilenamelen,
 				"%s/ipc/%s",tmpdir->getString(),id);
 
 	if (sqlrlg) {
@@ -466,57 +464,57 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 }
 
 void sqlrlistener::ipcFileError(const char *idfilename) {
-	fprintf(stderr,"Could not open: %s\n",idfilename);
-	fprintf(stderr,"Make sure that the file and directory are ");
-	fprintf(stderr,"readable and writable.\n\n");
+	stderror.printf("Could not open: %s\n",idfilename);
+	stderror.printf("Make sure that the file and directory are ");
+	stderror.printf("readable and writable.\n\n");
 }
 
 void sqlrlistener::keyError(const char *idfilename) {
 	char	*err=error::getErrorString();
-	fprintf(stderr,"\nsqlr-listener error:\n");
-	fprintf(stderr,"	Unable to generate a key from ");
-	fprintf(stderr,"%s\n",idfilename);
-	fprintf(stderr,"	Error was: %s\n\n",err);
+	stderror.printf("\nsqlr-listener error:\n");
+	stderror.printf("	Unable to generate a key from ");
+	stderror.printf("%s\n",idfilename);
+	stderror.printf("	Error was: %s\n\n",err);
 	delete[] err;
 }
 
 void sqlrlistener::shmError(const char *id, int shmid) {
 	char	*err=error::getErrorString();
-	fprintf(stderr,"\nsqlr-listener error:\n");
-	fprintf(stderr,"	Unable to create a shared memory ");
-	fprintf(stderr,"segment.  This is usally because an \n");
-	fprintf(stderr,"	sqlr-listener is already running for ");
-	fprintf(stderr,"the %s instance.\n\n",id);
-	fprintf(stderr,"	If it is not running, something may ");
-	fprintf(stderr,"have crashed and left an old segment\n");
-	fprintf(stderr,"	lying around.  Use the ipcs command ");
-	fprintf(stderr,"to inspect existing shared memory \n");
-	fprintf(stderr,"	segments and the ipcrm command to ");
-	fprintf(stderr,"remove the shared memory segment with ");
-	fprintf(stderr,"\n	id %d.\n\n",shmid);
-	fprintf(stderr,"	Error was: %s\n\n",err);
+	stderror.printf("\nsqlr-listener error:\n");
+	stderror.printf("	Unable to create a shared memory ");
+	stderror.printf("segment.  This is usally because an \n");
+	stderror.printf("	sqlr-listener is already running for ");
+	stderror.printf("the %s instance.\n\n",id);
+	stderror.printf("	If it is not running, something may ");
+	stderror.printf("have crashed and left an old segment\n");
+	stderror.printf("	lying around.  Use the ipcs command ");
+	stderror.printf("to inspect existing shared memory \n");
+	stderror.printf("	segments and the ipcrm command to ");
+	stderror.printf("remove the shared memory segment with ");
+	stderror.printf("\n	id %d.\n\n",shmid);
+	stderror.printf("	Error was: %s\n\n",err);
 	delete[] err;
 }
 
 void sqlrlistener::semError(const char *id, int semid) {
 	char	*err=error::getErrorString();
-	fprintf(stderr,"\nsqlr-listener error:\n");
-	fprintf(stderr,"	Unable to create a semaphore ");
-	fprintf(stderr,"set.  This is usally because an \n");
-	fprintf(stderr,"	sqlr-listener is already ");
-	fprintf(stderr,"running for the %s",id);
-	fprintf(stderr," instance.\n\n");
-	fprintf(stderr,"	If it is not running, ");
-	fprintf(stderr,"something may have crashed and left ");
-	fprintf(stderr,"an old semaphore set\n");
-	fprintf(stderr,"	lying around.  Use the ipcs ");
-	fprintf(stderr,"command to inspect existing ");
-	fprintf(stderr,"semaphore sets \n");
-	fprintf(stderr,"	and the ipcrm ");
-	fprintf(stderr,"command to remove the semaphore set ");
-	fprintf(stderr,"with \n");
-	fprintf(stderr,"	id %d.\n\n",semid);
-	fprintf(stderr,"	Error was: %s\n\n",err);
+	stderror.printf("\nsqlr-listener error:\n");
+	stderror.printf("	Unable to create a semaphore ");
+	stderror.printf("set.  This is usally because an \n");
+	stderror.printf("	sqlr-listener is already ");
+	stderror.printf("running for the %s",id);
+	stderror.printf(" instance.\n\n");
+	stderror.printf("	If it is not running, ");
+	stderror.printf("something may have crashed and left ");
+	stderror.printf("an old semaphore set\n");
+	stderror.printf("	lying around.  Use the ipcs ");
+	stderror.printf("command to inspect existing ");
+	stderror.printf("semaphore sets \n");
+	stderror.printf("	and the ipcrm ");
+	stderror.printf("command to remove the semaphore set ");
+	stderror.printf("with \n");
+	stderror.printf("	id %d.\n\n",semid);
+	stderror.printf("	Error was: %s\n\n",err);
 	delete[] err;
 }
 
@@ -556,7 +554,7 @@ bool sqlrlistener::listenOnClientSockets() {
 				logInternalError(info.getString());
 
 				char	*err=error::getErrorString();
-				fprintf(stderr,
+				stderror.printf(
 					"Could not listen "
 					"on: %s/%d\n"
 					"Error was: %s\n"
@@ -581,11 +579,11 @@ bool sqlrlistener::listenOnClientSockets() {
 			info.append(unixport);
 			logInternalError(info.getString());
 
-			fprintf(stderr,"Could not listen on unix socket: ");
-			fprintf(stderr,"%s\n",unixport);
-			fprintf(stderr,"Make sure that the file and ");
-			fprintf(stderr,"directory are readable and writable.");
-			fprintf(stderr,"\n\n");
+			stderror.printf("Could not listen on unix socket: ");
+			stderror.printf("%s\n",unixport);
+			stderror.printf("Make sure that the file and ");
+			stderror.printf("directory are readable and writable.");
+			stderror.printf("\n\n");
 			delete clientsockun;
 			clientsockun=NULL;
 			delete[] unixport;
@@ -628,7 +626,7 @@ bool sqlrlistener::listenOnClientSockets() {
 				logInternalError(info.getString());
 
 				char	*err=error::getErrorString();
-				fprintf(stderr,
+				stderror.printf(
 					"Could not listen "
 					"on: %s/%d\n"
 					"Error was: %s\n"
@@ -653,11 +651,11 @@ bool sqlrlistener::listenOnClientSockets() {
 			info.append(mysqlunixport);
 			logInternalError(info.getString());
 
-			fprintf(stderr,"Could not listen on unix socket: ");
-			fprintf(stderr,"%s\n",mysqlunixport);
-			fprintf(stderr,"Make sure that the file and ");
-			fprintf(stderr,"directory are readable and writable.");
-			fprintf(stderr,"\n\n");
+			stderror.printf("Could not listen on unix socket: ");
+			stderror.printf("%s\n",mysqlunixport);
+			stderror.printf("Make sure that the file and ");
+			stderror.printf("directory are readable and writable.");
+			stderror.printf("\n\n");
 			delete mysqlclientsockun;
 			mysqlclientsockun=NULL;
 			delete[] mysqlunixport;
@@ -674,7 +672,7 @@ bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 	size_t	handoffsocknamelen=tmpdir->getLength()+9+
 					charstring::length(id)+8+1;
 	char	*handoffsockname=new char[handoffsocknamelen];
-	charstring::printTo(handoffsockname,handoffsocknamelen,
+	charstring::printf(handoffsockname,handoffsocknamelen,
 				"%s/sockets/%s-handoff",
 				tmpdir->getString(),id);
 
@@ -689,11 +687,11 @@ bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 		info.append(handoffsockname);
 		logInternalError(info.getString());
 
-		fprintf(stderr,"Could not listen on unix socket: ");
-		fprintf(stderr,"%s\n",handoffsockname);
-		fprintf(stderr,"Make sure that the file and ");
-		fprintf(stderr,"directory are readable and writable.");
-		fprintf(stderr,"\n\n");
+		stderror.printf("Could not listen on unix socket: ");
+		stderror.printf("%s\n",handoffsockname);
+		stderror.printf("Make sure that the file and ");
+		stderror.printf("directory are readable and writable.");
+		stderror.printf("\n\n");
 	}
 
 	delete[] handoffsockname;
@@ -706,7 +704,7 @@ bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 	size_t	removehandoffsocknamelen=tmpdir->getLength()+9+
 						charstring::length(id)+14+1;
 	char	*removehandoffsockname=new char[removehandoffsocknamelen];
-	charstring::printTo(removehandoffsockname,
+	charstring::printf(removehandoffsockname,
 				removehandoffsocknamelen,
 				"%s/sockets/%s-removehandoff",
 				tmpdir->getString(),id);
@@ -723,11 +721,11 @@ bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 		info.append(removehandoffsockname);
 		logInternalError(info.getString());
 
-		fprintf(stderr,"Could not listen on unix socket: ");
-		fprintf(stderr,"%s\n",removehandoffsockname);
-		fprintf(stderr,"Make sure that the file and ");
-		fprintf(stderr,"directory are readable and writable.");
-		fprintf(stderr,"\n\n");
+		stderror.printf("Could not listen on unix socket: ");
+		stderror.printf("%s\n",removehandoffsockname);
+		stderror.printf("Make sure that the file and ");
+		stderror.printf("directory are readable and writable.");
+		stderror.printf("\n\n");
 	}
 
 	delete[] removehandoffsockname;
@@ -741,7 +739,7 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 	size_t	fixupsocknamelen=tmpdir->getLength()+9+
 					charstring::length(id)+6+1;
 	fixupsockname=new char[fixupsocknamelen];
-	charstring::printTo(fixupsockname,fixupsocknamelen,
+	charstring::printf(fixupsockname,fixupsocknamelen,
 				"%s/sockets/%s-fixup",
 				tmpdir->getString(),id);
 
@@ -756,11 +754,11 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 		info.append(fixupsockname);
 		logInternalError(info.getString());
 
-		fprintf(stderr,"Could not listen on unix socket: ");
-		fprintf(stderr,"%s\n",fixupsockname);
-		fprintf(stderr,"Make sure that the file and ");
-		fprintf(stderr,"directory are readable and writable.");
-		fprintf(stderr,"\n\n");
+		stderror.printf("Could not listen on unix socket: ");
+		stderror.printf("%s\n",fixupsockname);
+		stderror.printf("Make sure that the file and ");
+		stderror.printf("directory are readable and writable.");
+		stderror.printf("\n\n");
 	}
 
 	return success;
@@ -1618,7 +1616,7 @@ bool sqlrlistener::connectionIsUp(const char *connectionid) {
 			charstring::length(cmdl->getId())+1+
 			charstring::length(connectionid)+1;
 	char	*updown=new char[updownlen];
-	charstring::printTo(updown,updownlen,
+	charstring::printf(updown,updownlen,
 				"%s/ipc/%s-%s",
 				tmpdir->getString(),
 				cmdl->getId(),connectionid);

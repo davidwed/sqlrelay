@@ -15,8 +15,6 @@
 #include <config.h>
 #include <defaults.h>
 
-#include <stdio.h>
-
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
@@ -113,7 +111,7 @@ void sqlrcachemanager::scan() {
 	size_t	pidfilelen=tmpdir->getLength()+24+
 				charstring::integerLength((uint64_t)pid)+1;
 	pidfile=new char[pidfilelen];
-	charstring::printTo(pidfile,pidfilelen,
+	charstring::printf(pidfile,pidfilelen,
 				"%s/pids/sqlr-cachemanager.%ld",
 				tmpdir->getString(),(long)pid);
 
@@ -169,7 +167,7 @@ void sqlrcachemanager::erase(const char *dirname, const char *filename) {
 	size_t	fullpathnamelen=charstring::length(dirname)+1+
 					charstring::length(filename)+1;
 	char	*fullpathname=new char[fullpathnamelen];
-	charstring::printTo(fullpathname,fullpathnamelen,
+	charstring::printf(fullpathname,fullpathnamelen,
 				"%s/%s",dirname,filename);
 
 	// open the file

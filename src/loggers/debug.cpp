@@ -9,7 +9,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/logger.h>
 #include <rudiments/process.h>
-#include <stdio.h>
+#include <rudiments/stdio.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
@@ -78,7 +78,7 @@ bool debug::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 		dbgfilenamelen=charstring::length(localstatedir)+
 					16+5+charstring::length(name)+20+1;
 		dbgfilename=new char[dbgfilenamelen];
-		charstring::printTo(dbgfilename,dbgfilenamelen,
+		charstring::printf(dbgfilename,dbgfilenamelen,
 					"%s/sqlrelay/debug/sqlr-%s.%ld",
 						localstatedir,name,
 						(long)process::getProcessId());
@@ -86,7 +86,7 @@ bool debug::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 		dbgfilenamelen=charstring::length(DEBUG_DIR)+5+
 					charstring::length(name)+20+1;
 		dbgfilename=new char[dbgfilenamelen];
-		charstring::printTo(dbgfilename,dbgfilenamelen,
+		charstring::printf(dbgfilename,dbgfilenamelen,
 					"%s/sqlr-%s.%ld",DEBUG_DIR,name,
 						(long)process::getProcessId());
 	}
@@ -125,12 +125,12 @@ bool debug::openDebugFile() {
 	// open the file
 	bool	retval=false;
 	if (dbgfile->open(dbgfilename)) {
-		printf("Debugging to: %s\n",dbgfilename);
+		stdoutput.printf("Debugging to: %s\n",dbgfilename);
 		debuglogger=new logger();
 		debuglogger->addLogDestination(dbgfile);
 		retval=true;
 	} else {
-		fprintf(stderr,"Couldn't open debug file: %s\n",dbgfilename);
+		stderror.printf("Couldn't open debug file: %s\n",dbgfilename);
 		if (dbgfile) {
 			dbgfile->close();
 			delete dbgfile;

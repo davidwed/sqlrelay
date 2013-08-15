@@ -7,6 +7,7 @@
 
 #include <rudiments/xmldomnode.h>
 #include <rudiments/process.h>
+#include <rudiments/stdio.h>
 
 #include <config.h>
 
@@ -104,10 +105,10 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
-		printf("failed to load password encryption module: %s\n",
-								module);
+		stdoutput.printf("failed to load password "
+				"encryption module: %s\n",module);
 		char	*error=dl->getError();
-		printf("%s\n",error);
+		stdoutput.printf("%s\n",error);
 		delete[] error;
 		delete dl;
 		return;
@@ -120,9 +121,10 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 			(sqlrpwdenc *(*)(xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newPasswordEncryption) {
-		printf("failed to create password encryption: %s\n",module);
+		stdoutput.printf("failed to create password "
+				"encryption: %s\n",module);
 		char	*error=dl->getError();
-		printf("%s\n",error);
+		stdoutput.printf("%s\n",error);
 		delete[] error;
 		dl->close();
 		delete dl;

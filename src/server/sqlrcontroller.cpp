@@ -15,6 +15,7 @@
 #include <rudiments/datetime.h>
 #include <rudiments/character.h>
 #include <rudiments/charstring.h>
+#include <rudiments/stdio.h>
 
 // for gettimeofday()
 #include <sys/time.h>
@@ -23,9 +24,6 @@
 #include <datatypes.h>
 #define NEED_CONVERT_DATE_TIME
 #include <parsedatetime.h>
-
-// for sprintf
-#include <stdio.h>
 
 // for gettimeofday()
 #include <sys/time.h>
@@ -293,7 +291,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 
 	// default id warning
 	if (!charstring::compare(cmdl->getId(),DEFAULT_ID)) {
-		fprintf(stderr,"Warning: using default id.\n");
+		stderror.printf("Warning: using default id.\n");
 	}
 
 	// get whether this connection was spawned by the scaler
@@ -303,7 +301,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	connectionid=cmdl->getValue("-connectionid");
 	if (!connectionid[0]) {
 		connectionid=DEFAULT_CONNECTIONID;
-		fprintf(stderr,"Warning: using default connectionid.\n");
+		stderror.printf("Warning: using default connectionid.\n");
 	}
 
 	// get the time to live from the command line
@@ -357,7 +355,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	// handle the connect string
 	constr=cfgfl->getConnectString(connectionid);
 	if (!constr) {
-		fprintf(stderr,"Error: invalid connectionid \"%s\".\n",
+		stderror.printf("Error: invalid connectionid \"%s\".\n",
 							connectionid);
 		return false;
 	}
@@ -454,7 +452,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 				charstring::length(cmdl->getId())+1+
 				charstring::integerLength((uint64_t)pid)+1;
 	pidfile=new char[pidfilelen];
-	charstring::printTo(pidfile,pidfilelen,
+	charstring::printf(pidfile,pidfilelen,
 				"%s/pids/sqlr-connection-%s.%ld",
 				tmpdir->getString(),cmdl->getId(),(long)pid);
 	createPidFile(pidfile,permissions::ownerReadWrite());
@@ -508,7 +506,7 @@ void sqlrcontroller_svr::setUserAndGroup() {
 	// group that we should switch to
 	if (charstring::compare(currentgroup,cfgfl->getRunAsGroup()) &&
 					!runAsGroup(cfgfl->getRunAsGroup())) {
-		fprintf(stderr,"Warning: could not change group to %s\n",
+		stderror.printf("Warning: could not change group to %s\n",
 						cfgfl->getRunAsGroup());
 	}
 
@@ -516,7 +514,7 @@ void sqlrcontroller_svr::setUserAndGroup() {
 	// user that we should switch to
 	if (charstring::compare(currentuser,cfgfl->getRunAsUser()) &&
 					!runAsUser(cfgfl->getRunAsUser())) {
-		fprintf(stderr,"Warning: could not change user to %s\n",
+		stderror.printf("Warning: could not change user to %s\n",
 						cfgfl->getRunAsUser());
 	}
 
@@ -533,10 +531,10 @@ sqlrconnection_svr *sqlrcontroller_svr::initConnection(const char *dbase) {
 	modulename.append("/sqlrconnection_");
 	modulename.append(dbase)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	if (!dl.open(modulename.getString(),true,true)) {
-		fprintf(stderr,"failed to load connection module: %s\n",
+		stderror.printf("failed to load connection module: %s\n",
 							modulename.getString());
 		char	*error=dl.getError();
-		fprintf(stderr,"%s\n",error);
+		stderror.printf("%s\n",error);
 		delete[] error;
 		return NULL;
 	}
@@ -548,18 +546,18 @@ sqlrconnection_svr *sqlrcontroller_svr::initConnection(const char *dbase) {
 				(sqlrconnection_svr *(*)(sqlrcontroller_svr *))
 					dl.getSymbol(functionname.getString());
 	if (!newConn) {
-		fprintf(stderr,"failed to load connection: %s\n",dbase);
+		stderror.printf("failed to load connection: %s\n",dbase);
 		char	*error=dl.getError();
-		fprintf(stderr,"%s\n",error);
+		stderror.printf("%s\n",error);
 		delete[] error;
 		return NULL;
 	}
 
 	sqlrconnection_svr	*conn=(*newConn)(this);
 	if (!conn) {
-		fprintf(stderr,"failed to create connection: %s\n",dbase);
+		stderror.printf("failed to create connection: %s\n",dbase);
 		char	*error=dl.getError();
-		fprintf(stderr,"%s\n",error);
+		stderror.printf("%s\n",error);
 		delete[] error;
 	}
 	return conn;
@@ -568,7 +566,7 @@ sqlrconnection_svr *sqlrcontroller_svr::initConnection(const char *dbase) {
 void sqlrcontroller_svr::setUnixSocketDirectory() {
 	size_t	unixsocketlen=tmpdir->getLength()+31;
 	unixsocket=new char[unixsocketlen];
-	charstring::printTo(unixsocket,unixsocketlen,
+	charstring::printf(unixsocket,unixsocketlen,
 				"%s/sockets/",tmpdir->getString());
 	unixsocketptr=unixsocket+tmpdir->getLength()+8+1;
 }
@@ -583,7 +581,7 @@ bool sqlrcontroller_svr::handlePidFile() {
 	size_t	listenerpidfilelen=tmpdir->getLength()+20+
 				charstring::length(cmdl->getId())+1;
 	char	*listenerpidfile=new char[listenerpidfilelen];
-	charstring::printTo(listenerpidfile,listenerpidfilelen,
+	charstring::printf(listenerpidfile,listenerpidfilelen,
 				"%s/pids/sqlr-listener-%s",
 				tmpdir->getString(),cmdl->getId());
 
@@ -596,14 +594,14 @@ bool sqlrcontroller_svr::handlePidFile() {
 		found=(checkForPidFile(listenerpidfile)!=-1);
 	}
 	if (!found) {
-		fprintf(stderr,"\nsqlr-connection error:\n");
-		fprintf(stderr,"	The pid file %s",listenerpidfile);
-		fprintf(stderr," was not found.\n");
-		fprintf(stderr,"	This usually means "
+		stderror.printf("\nsqlr-connection error:\n");
+		stderror.printf("	The pid file %s",listenerpidfile);
+		stderror.printf(" was not found.\n");
+		stderror.printf("	This usually means "
 					"that the sqlr-listener \n");
-		fprintf(stderr,"is not running.\n");
-		fprintf(stderr,"	The sqlr-listener must be running ");
-		fprintf(stderr,"for the sqlr-connection to start.\n\n");
+		stderror.printf("is not running.\n");
+		stderror.printf("	The sqlr-listener must be running ");
+		stderror.printf("for the sqlr-connection to start.\n\n");
 		retval=false;
 	}
 
@@ -619,7 +617,7 @@ void sqlrcontroller_svr::initDatabaseAvailableFileName() {
 					charstring::length(cmdl->getId())+1+
 					charstring::length(connectionid)+1;
 	updown=new char[updownlen];
-	charstring::printTo(updown,updownlen,"%s/ipc/%s-%s",
+	charstring::printf(updown,updownlen,"%s/ipc/%s-%s",
 			tmpdir->getString(),cmdl->getId(),connectionid);
 }
 
@@ -657,11 +655,11 @@ bool sqlrcontroller_svr::openSequenceFile(file *sockseq,
 	// open the sequence file and get the current port number
 	size_t	sockseqnamelen=charstring::length(tmpdir)+9;
 	char	*sockseqname=new char[sockseqnamelen];
-	charstring::printTo(sockseqname,sockseqnamelen,"%s/sockseq",tmpdir);
+	charstring::printf(sockseqname,sockseqnamelen,"%s/sockseq",tmpdir);
 
 	size_t	stringlen=8+charstring::length(sockseqname)+1;
 	char	*string=new char[stringlen];
-	charstring::printTo(string,stringlen,"opening %s",sockseqname);
+	charstring::printf(string,stringlen,"opening %s",sockseqname);
 	logDebugMessage(string);
 	delete[] string;
 
@@ -673,9 +671,9 @@ bool sqlrcontroller_svr::openSequenceFile(file *sockseq,
 	// handle error
 	if (!success) {
 
-		fprintf(stderr,"Could not open: %s\n",sockseqname);
-		fprintf(stderr,"Make sure that the file and directory are \n");
-		fprintf(stderr,"readable and writable.\n\n");
+		stderror.printf("Could not open: %s\n",sockseqname);
+		stderror.printf("Make sure that the file and directory are \n");
+		stderror.printf("readable and writable.\n\n");
 		unixsocketptr[0]='\0';
 
 		debugstr.clear();
@@ -725,7 +723,7 @@ bool sqlrcontroller_svr::getAndIncrementSequenceNumber(file *sockseq,
 
 	size_t	stringlen=21+charstring::length(unixsocketptr)+1;
 	char	*string=new char[stringlen];
-	charstring::printTo(string,stringlen,
+	charstring::printf(string,stringlen,
 			"got sequence number: %s",unixsocketptr);
 	logDebugMessage(string);
 	delete[] string;
@@ -739,7 +737,7 @@ bool sqlrcontroller_svr::getAndIncrementSequenceNumber(file *sockseq,
 	}
 
 	string=new char[50];
-	charstring::printTo(string,50,"writing new sequence number: %d",buffer);
+	charstring::printf(string,50,"writing new sequence number: %d",buffer);
 	logDebugMessage(string);
 	delete[] string;
 
@@ -782,9 +780,9 @@ bool sqlrcontroller_svr::logIn(bool printerrors) {
 	const char	*err=NULL;
 	if (!conn->logIn(&err)) {
 		if (printerrors) {
-			fprintf(stderr,"Couldn't log into database.\n");
+			stderror.printf("Couldn't log into database.\n");
 			if (err) {
-				fprintf(stderr,"%s\n",err);
+				stderror.printf("%s\n",err);
 			}
 		}
 		if (sqlrlg) {
@@ -839,13 +837,13 @@ void sqlrcontroller_svr::setAutoCommit(bool ac) {
 	if (ac) {
 		if (!autoCommitOn()) {
 			logDebugMessage("setting autocommit on failed");
-			fprintf(stderr,"Couldn't set autocommit on.\n");
+			stderror.printf("Couldn't set autocommit on.\n");
 			return;
 		}
 	} else {
 		if (!autoCommitOff()) {
 			logDebugMessage("setting autocommit off failed");
-			fprintf(stderr,"Couldn't set autocommit off.\n");
+			stderror.printf("Couldn't set autocommit off.\n");
 			return;
 		}
 	}
@@ -938,7 +936,7 @@ void sqlrcontroller_svr::markDatabaseAvailable() {
 
 	size_t	stringlen=9+charstring::length(updown)+1;
 	char	*string=new char[stringlen];
-	charstring::printTo(string,stringlen,"creating %s",updown);
+	charstring::printf(string,stringlen,"creating %s",updown);
 	logDebugMessage(string);
 	delete[] string;
 
@@ -957,7 +955,7 @@ void sqlrcontroller_svr::markDatabaseUnavailable() {
 
 	size_t	stringlen=10+charstring::length(updown)+1;
 	char	*string=new char[stringlen];
-	charstring::printTo(string,stringlen,"unlinking %s",updown);
+	charstring::printf(string,stringlen,"unlinking %s",updown);
 	logDebugMessage(string);
 	delete[] string;
 
@@ -979,7 +977,7 @@ bool sqlrcontroller_svr::openSockets() {
 				size_t	stringlen=26+
 					charstring::length(unixsocket)+1;
 				char	*string=new char[stringlen];
-				charstring::printTo(string,stringlen,
+				charstring::printf(string,stringlen,
 						"listening on unix socket: %s",
 						unixsocket);
 				logDebugMessage(string);
@@ -993,12 +991,12 @@ bool sqlrcontroller_svr::openSockets() {
 				debugstr.append(unixsocket);
 				logInternalError(NULL,debugstr.getString());
 
-				fprintf(stderr,"Could not listen on ");
-				fprintf(stderr,"unix socket: ");
-				fprintf(stderr,"%s\n",unixsocket);
-				fprintf(stderr,"Make sure that the file and ");
-				fprintf(stderr,"directory are readable ");
-				fprintf(stderr,"and writable.\n\n");
+				stderror.printf("Could not listen on ");
+				stderror.printf("unix socket: ");
+				stderror.printf("%s\n",unixsocket);
+				stderror.printf("Make sure that the file and ");
+				stderror.printf("directory are readable ");
+				stderror.printf("and writable.\n\n");
 				delete serversockun;
 				return false;
 			}
@@ -1030,7 +1028,7 @@ bool sqlrcontroller_svr::openSockets() {
 					}
 
 					char	string[33];
-					charstring::printTo(string,33,
+					charstring::printf(string,33,
 						"listening on inet socket: %d",
 						inetport);
 					logDebugMessage(string);
@@ -1045,9 +1043,9 @@ bool sqlrcontroller_svr::openSockets() {
 					logInternalError(NULL,
 							debugstr.getString());
 
-					fprintf(stderr,"Could not listen on ");
-					fprintf(stderr,"inet socket: ");
-					fprintf(stderr,"%d\n\n",inetport);
+					stderror.printf("Could not listen on ");
+					stderror.printf("inet socket: ");
+					stderror.printf("%d\n\n",inetport);
 					failed=true;
 				}
 			}
@@ -1325,12 +1323,12 @@ void sqlrcontroller_svr::registerForHandoff(const char *tmpdir) {
 	size_t	handoffsocknamelen=charstring::length(tmpdir)+9+
 				charstring::length(cmdl->getId())+8+1;
 	char	*handoffsockname=new char[handoffsocknamelen];
-	charstring::printTo(handoffsockname,handoffsocknamelen,
+	charstring::printf(handoffsockname,handoffsocknamelen,
 				"%s/sockets/%s-handoff",tmpdir,cmdl->getId());
 
 	size_t	stringlen=17+charstring::length(handoffsockname)+1;
 	char	*string=new char[stringlen];
-	charstring::printTo(string,stringlen,
+	charstring::printf(string,stringlen,
 				"handoffsockname: %s",handoffsockname);
 	logDebugMessage(string);
 	delete[] string;
@@ -1371,14 +1369,14 @@ void sqlrcontroller_svr::deRegisterForHandoff(const char *tmpdir) {
 	size_t	removehandoffsocknamelen=charstring::length(tmpdir)+9+
 					charstring::length(cmdl->getId())+14+1;
 	char	*removehandoffsockname=new char[removehandoffsocknamelen];
-	charstring::printTo(removehandoffsockname,
+	charstring::printf(removehandoffsockname,
 				removehandoffsocknamelen,
 				"%s/sockets/%s-removehandoff",
 				tmpdir,cmdl->getId());
 
 	size_t	stringlen=23+charstring::length(removehandoffsockname)+1;
 	char	*string=new char[stringlen];
-	charstring::printTo(string,stringlen,
+	charstring::printf(string,stringlen,
 				"removehandoffsockname: %s",
 				removehandoffsockname);
 	logDebugMessage(string);
@@ -3668,7 +3666,7 @@ void sqlrcontroller_svr::rewriteQuery(sqlrcursor_svr *cursor) {
 bool sqlrcontroller_svr::translateQuery(sqlrcursor_svr *cursor) {
 
 	if (debugsqltranslation) {
-		printf("original:\n\"%s\"\n\n",cursor->querybuffer);
+		stdoutput.printf("original:\n\"%s\"\n\n",cursor->querybuffer);
 	}
 
 	// parse the query
@@ -3682,14 +3680,15 @@ bool sqlrcontroller_svr::translateQuery(sqlrcursor_svr *cursor) {
 	}
 
 	if (debugsqltranslation) {
-		printf("before translation:\n");
+		stdoutput.printf("before translation:\n");
 		xmldomnode::print(cursor->querytree->getRootNode());
-		printf("\n");
+		stdoutput.printf("\n");
 	}
 
 	if (!parsed) {
 		if (debugsqltranslation) {
-			printf("parse failed, using original:\n\"%s\"\n\n",
+			stdoutput.printf(
+				"parse failed, using original:\n\"%s\"\n\n",
 							cursor->querybuffer);
 		}
 		delete cursor->querytree;
@@ -3703,9 +3702,9 @@ bool sqlrcontroller_svr::translateQuery(sqlrcursor_svr *cursor) {
 	}
 
 	if (debugsqltranslation) {
-		printf("after translation:\n");
+		stdoutput.printf("after translation:\n");
 		xmldomnode::print(cursor->querytree->getRootNode());
-		printf("\n");
+		stdoutput.printf("\n");
 	}
 
 	// write the query back out
@@ -3715,7 +3714,7 @@ bool sqlrcontroller_svr::translateQuery(sqlrcursor_svr *cursor) {
 	}
 
 	if (debugsqltranslation) {
-		printf("translated:\n\"%s\"\n\n",
+		stdoutput.printf("translated:\n\"%s\"\n\n",
 				translatedquery.getString());
 	}
 
@@ -3879,16 +3878,17 @@ void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 
 	// debug
 	if (debugsqltranslation) {
-		printf("bind translation:\n\"%s\"\n",cursor->querybuffer);
+		stdoutput.printf("bind translation:\n\"%s\"\n",
+						cursor->querybuffer);
 		for (uint16_t i=0; i<cursor->inbindcount; i++) {
-			printf("  inbind: \"%s\"\n",
+			stdoutput.printf("  inbind: \"%s\"\n",
 					cursor->inbindvars[i].variable);
 		}
 		for (uint16_t i=0; i<cursor->outbindcount; i++) {
-			printf("  outbind: \"%s\"\n",
+			stdoutput.printf("  outbind: \"%s\"\n",
 					cursor->outbindvars[i].variable);
 		}
-		printf("\n");
+		stdoutput.printf("\n");
 	}
 	logDebugMessage("converted:");
 	logDebugMessage(cursor->querybuffer);
@@ -4415,7 +4415,7 @@ void sqlrcontroller_svr::sendRowCounts(bool knowsactual, uint64_t actual,
 	if (knowsactual) {
 
 		char	string[30];
-		charstring::printTo(string,30,	
+		charstring::printf(string,30,	
 				"actual rows: %lld",	
 				(long long)actual);
 		logDebugMessage(string);
@@ -4435,7 +4435,7 @@ void sqlrcontroller_svr::sendRowCounts(bool knowsactual, uint64_t actual,
 	if (knowsaffected) {
 
 		char	string[46];
-		charstring::printTo(string,46,
+		charstring::printf(string,46,
 				"affected rows: %lld",
 				(long long)affected);
 		logDebugMessage(string);
@@ -4984,7 +4984,7 @@ void sqlrcontroller_svr::sendField(sqlrcursor_svr *cursor,
 			sendField(newdata,charstring::length(newdata));
 
 			if (debugsqltranslation) {
-				printf("converted date: "
+				stdoutput.printf("converted date: "
 					"\"%s\" to \"%s\" using ddmm=%d\n",
 					data,newdata,ddmm);
 			}
@@ -5493,11 +5493,11 @@ bool sqlrcontroller_svr::buildListQuery(sqlrcursor_svr *cursor,
 
 	// fill the query buffer and update the length
 	if (tablebuf.getStringLength()) {
-		charstring::printTo(cursor->querybuffer,maxquerysize+1,
+		charstring::printf(cursor->querybuffer,maxquerysize+1,
 						query,tablebuf.getString(),
 						wildbuf.getString());
 	} else {
-		charstring::printTo(cursor->querybuffer,maxquerysize+1,
+		charstring::printf(cursor->querybuffer,maxquerysize+1,
 						query,wildbuf.getString());
 	}
 	cursor->querylength=charstring::length(cursor->querybuffer);
@@ -5897,7 +5897,7 @@ bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(
 	size_t	idfilenamelen=charstring::length(tmpdir)+5+
 					charstring::length(id)+1;
 	char	*idfilename=new char[idfilenamelen];
-	charstring::printTo(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir,id);
+	charstring::printf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir,id);
 
 	debugstr.clear();
 	debugstr.append("attaching to shared memory and semaphores ");
@@ -5909,8 +5909,8 @@ bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(
 	idmemory=new sharedmemory();
 	if (!idmemory->attach(file::generateKey(idfilename,1))) {
 		char	*err=error::getErrorString();
-		fprintf(stderr,"Couldn't attach to shared memory segment: ");
-		fprintf(stderr,"%s\n",err);
+		stderror.printf("Couldn't attach to shared memory segment: ");
+		stderror.printf("%s\n",err);
 		delete[] err;
 		delete idmemory;
 		idmemory=NULL;
@@ -5919,7 +5919,7 @@ bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(
 	}
 	shm=(shmdata *)idmemory->getPointer();
 	if (!shm) {
-		fprintf(stderr,"failed to get pointer to shmdata\n");
+		stderror.printf("failed to get pointer to shmdata\n");
 		delete idmemory;
 		idmemory=NULL;
 		delete[] idfilename;
@@ -5931,8 +5931,8 @@ bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(
 	semset=new semaphoreset();
 	if (!semset->attach(file::generateKey(idfilename,1),11)) {
 		char	*err=error::getErrorString();
-		fprintf(stderr,"Couldn't attach to semaphore set: ");
-		fprintf(stderr,"%s\n",err);
+		stderror.printf("Couldn't attach to semaphore set: ");
+		stderror.printf("%s\n",err);
 		delete[] err;
 		delete semset;
 		delete idmemory;

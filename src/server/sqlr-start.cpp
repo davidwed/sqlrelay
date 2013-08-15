@@ -6,11 +6,10 @@
 #include <sqlrconfigfile.h>
 #include <cmdline.h>
 #include <rudiments/process.h>
+#include <rudiments/stdio.h>
 
 // for ceil()
 #include <math.h>
-
-#include <stdio.h>
 
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
@@ -30,7 +29,7 @@ bool startListener(const char *id, const char *config,
 					const char *localstatedir) {
 
 	// start the listener
-	printf("\nStarting listener:\n");
+	stdoutput.printf("\nStarting listener:\n");
 	
 	stringbuffer	command;
 	command.append("sqlr-listener");
@@ -39,12 +38,12 @@ bool startListener(const char *id, const char *config,
 	if (charstring::length(localstatedir)) {
 		command.append(" -localstatedir ")->append(localstatedir);
 	}
-	printf("  %s\n",command.getString());
+	stdoutput.printf("  %s\n",command.getString());
 
 	bool	success=!system(command.getString());
 
 	if (!success) {
-		printf("\nsqlr-listener failed to start.\n");
+		stdoutput.printf("\nsqlr-listener failed to start.\n");
 	}
 
 	return success;
@@ -70,12 +69,12 @@ bool startConnection(bool strace, const char *id, const char *connectionid,
 		command.append(" &");
 	}
 
-	printf("  %s\n",command.getString());
+	stdoutput.printf("  %s\n",command.getString());
 
 	bool	success=!system(command.getString());
 
 	if (!success) {
-		printf("\nsqlr-connection failed to start.\n");
+		stdoutput.printf("\nsqlr-connection failed to start.\n");
 	}
 
 	return success;
@@ -134,8 +133,8 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 			done=true;
 		}
 
-		printf("\nStarting %d connections to ",startup);
-		printf("%s :\n",csc->getConnectionId());
+		stdoutput.printf("\nStarting %d connections to ",startup);
+		stdoutput.printf("%s :\n",csc->getConnectionId());
 
 		// fire them up
 		for (int32_t i=0; i<startup; i++) {
@@ -167,7 +166,7 @@ bool startScaler(sqlrconfigfile *cfgfile, const char *id,
 		return true;
 	}
 
-	printf("\nStarting scaler:\n");
+	stdoutput.printf("\nStarting scaler:\n");
 	
 	stringbuffer	command;
 	command.append("sqlr-scaler")->append(" -id ")->append(id);
@@ -175,12 +174,12 @@ bool startScaler(sqlrconfigfile *cfgfile, const char *id,
 	if (charstring::length(localstatedir)) {
 		command.append(" -localstatedir ")->append(localstatedir);
 	}
-	printf("  %s\n",command.getString());
+	stdoutput.printf("  %s\n",command.getString());
 
 	bool	success=!system(command.getString());
 
 	if (!success) {
-		printf("\nsqlr-scaler failed to start.\n");
+		stdoutput.printf("\nsqlr-scaler failed to start.\n");
 	}
 
 	return success;
@@ -210,7 +209,7 @@ bool startCacheManager(const char *localstatedir) {
 	// if the cachemanger isn't running, start it
 	if (!charstring::length(contents.getString())) {
 	
-		printf("\nStarting cache manager:\n");
+		stdoutput.printf("\nStarting cache manager:\n");
 	
 		command.append("sqlr-cachemanager");
 		if (charstring::length(localstatedir)) {
@@ -219,17 +218,18 @@ bool startCacheManager(const char *localstatedir) {
 			command.append(" -localstatedir ");
 			command.append(localstatedir);
 		}
-		printf("  %s\n",command.getString());
+		stdoutput.printf("  %s\n",command.getString());
 
 		bool	success=!system(command.getString());
 
 		if (!success) {
-			printf("\nsqlr-cachemanager failed to start.\n");
+			stdoutput.printf("\nsqlr-cachemanager "
+						"failed to start.\n");
 			return false;
 		}
 	
 	} else {
-		printf("\ncache manager already running.\n");
+		stdoutput.printf("\ncache manager already running.\n");
 	}
 
 	return true;
@@ -249,7 +249,7 @@ int main(int argc, const char **argv) {
 
 	// default id warning
 	if (!charstring::compare(cmdl.getId(),DEFAULT_ID)) {
-		fprintf(stderr,"Warning: using default id.\n");
+		stderror.printf("Warning: using default id.\n");
 	}
 
 	// parse the config file(s)
@@ -268,11 +268,11 @@ int main(int argc, const char **argv) {
 	// many thanks...
 	// these companies don't exist any more so it's
 	// probably ok not to display the attribution any more
-	/*printf("\n\nThanks to MP3.com for sponsoring: \n");
-	printf("	Clustered/Replicated database support.\n");
-	printf("	Perl API.\n");
-	printf("Thanks to FeedLounge for sponsoring: \n");
-	printf("	Query routing and filtering.\n");*/
+	/*stdoutput.printf("\n\nThanks to MP3.com for sponsoring: \n");
+	stdoutput.printf("	Clustered/Replicated database support.\n");
+	stdoutput.printf("	Perl API.\n");
+	stdoutput.printf("Thanks to FeedLounge for sponsoring: \n");
+	stdoutput.printf("	Query routing and filtering.\n");*/
 	
 	// successful exit
 	process::exit(exitstatus);

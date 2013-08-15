@@ -10,6 +10,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/character.h>
 #include <rudiments/environment.h>
+#include <rudiments/stdio.h>
 
 
 // windows needs this
@@ -42,8 +43,8 @@ typedef SQLULEN SQLROWSETSIZE;
 
 //#define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
-	#define debugFunction() printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
-	#define debugPrintf(format, ...) printf(format, ## __VA_ARGS__); fflush(stdout);
+	#define debugFunction() stdoutput.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
+	#define debugPrintf(format, ...) stdoutput.printf(format, ## __VA_ARGS__); fflush(stdout);
 #else
 	#define debugFunction() /* */
 	#define debugPrintf(format, ...) /* */

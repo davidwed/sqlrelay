@@ -18,18 +18,20 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 #include <rudiments/environment.h>
 #include <rudiments/character.h>
 #include <rudiments/process.h>
+#include <rudiments/stdio.h>
 
 #define NEED_DATATYPESTRING	1
 #include <datatypes.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 
 extern "C" {
 
 //#define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
-	#define debugFunction() printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
-	#define debugPrintf(args...) printf(args); fflush(stdout);
+	#define debugFunction() stdoutput.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
+	#define debugPrintf(args...) stdoutput.printf(args); fflush(stdout);
 #else
 	#define debugFunction() /* */
 	#define debugPrintf(args...) /* */
@@ -307,7 +309,7 @@ PGconn *PQconnectdbParams(const char **keywords,
 	const char *password=NULL;
 
 	for (uint16_t i=0; keywords[i]; i++) {
-		printf("%s=%s\n",keywords[i],values[i]);
+		stdoutput.printf("%s=%s\n",keywords[i],values[i]);
 		if (!charstring::compare(keywords[i],"host")) {
 			host=values[i];
 		} else if (!charstring::compare(keywords[i],"hostaddr")) {
@@ -556,7 +558,7 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 					charstring::length(result->sqlrcur->
 							errorMessage())+2;
 				conn->error=new char[errorlen];
-				charstring::printTo(
+				charstring::printf(
 					conn->error,errorlen,"%s\n",
 					result->sqlrcur->errorMessage());
 				PQclear(result);
@@ -592,7 +594,7 @@ PGresult *PQexec(PGconn *conn, const char *query) {
 				charstring::length(result->
 						sqlrcur->errorMessage())+2;
 			conn->error=new char[errorlen];
-			charstring::printTo(conn->error,errorlen,"%s\n",
+			charstring::printf(conn->error,errorlen,"%s\n",
 					result->sqlrcur->errorMessage());
 			PQclear(result);
 			result=NULL;
@@ -1225,7 +1227,7 @@ unsigned char *PQescapeBytea(unsigned char *bintext, size_t binlen,
 
 	for (i=binlen; i>0; i--, vp++) {
 		if (*vp==0 || *vp>=0x80) {
-			(void)sprintf((char *)rp,"\\\\%03o",*vp);
+			(void)charstring::printf((char *)rp,len,"\\\\%03o",*vp);
 			rp+=5;
 		} else if (*vp=='\'') {
 			rp[0]='\\';
@@ -2104,9 +2106,10 @@ PQprintTuples(const PGresult *res,
 	nTups = PQntuples(res);
 
 	if (colWidth > 0)
-		sprintf(formatString, "%%s %%-%ds", colWidth);
+		charstring::printf(formatString,sizeof(formatString),
+						"%%s %%-%ds", colWidth);
 	else
-		sprintf(formatString, "%%s %%s");
+		charstring::printf(formatString,sizeof(formatString),"%%s %%s");
 
 	if (nFields > 0)
 	{							/* only print rows with at least 1 field.  */

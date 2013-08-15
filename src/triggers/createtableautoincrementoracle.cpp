@@ -231,7 +231,7 @@ bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
 	debugFunction();
 
 	if (sqlrcon->cont->debugtriggers) {
-		printf("running trigger:\n%s\n",query);
+		stdoutput.printf("running trigger:\n%s\n",query);
 	}
 
 	bool	retval=false;
@@ -243,7 +243,7 @@ bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
 		// success...
 		retval=true;
 		if (sqlrcon->cont->debugtriggers) {
-			printf("success\n");
+			stdoutput.printf("success\n");
 		}
 	} else {
 		// error...
@@ -253,11 +253,11 @@ bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
 						&(cur->errorlength),
 						&(cur->errnum),
 						&(cur->liveconnection));
-			printf("error:\n%s\n",cur->error);
+			stdoutput.printf("error:\n%s\n",cur->error);
 		}
 	}
 	if (sqlrcon->cont->debugtriggers) {
-		printf("\n");
+		stdoutput.printf("\n");
 	}
 	cur->cleanUpData();
 	cur->close();
