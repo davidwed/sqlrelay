@@ -162,7 +162,7 @@ typedef enum {
 
 static void defaultNoticeProcessor(void *arg, const char *message) {
 	debugFunction();
-	fprintf(stderr,"%s",message);
+	stderror.printf("%s",message);
 }
 
 PGconn *allocatePGconn(const char *conninfo,
