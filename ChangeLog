@@ -11,7 +11,7 @@
 	the code freetds uses to get column names from MS SQL Server works
 		for temp tables now
 	added informix->mssqlserver translation for select into queries
-	added translation to convert ||'s to concat() calls
+	added translation to convert ||'s to concat() calls or +'s
 
 0.51 - fixed minor perl DBI driver documentation issue
 	added support for oracle 12c

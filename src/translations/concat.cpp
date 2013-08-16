@@ -24,30 +24,103 @@ class concat : public sqltranslation {
 					sqlrcursor_svr *sqlrcur,
 					xmldomnode *querynode,
 					bool *found);
+		bool translatePlus(sqlrconnection_svr *sqlrcon,
+					sqlrcursor_svr *sqlrcur,
+					xmldomnode *querynode,
+					bool *found);
+		xmldomnode	*parameters;
 };
 
 concat::concat(sqltranslations *sqlts,xmldomnode *parameters) :
 					sqltranslation(sqlts,parameters) {
+	this->parameters=parameters;
 }
 
 bool concat::run(sqlrconnection_svr *sqlrcon,
 				sqlrcursor_svr *sqlrcur,
 				xmldom *querytree) {
 
-	// The methods called inside of here rebuild the tree torrentially and
-	// it's easy for a "current node" pointer to get lost entirely, so we
-	// have to re-search the tree after each translation.  For now at least.
-	bool	found=true;
-	while (found) {
-		if (!translateConcat(sqlrcon,sqlrcur,
-				querytree->getRootNode(),&found)) {
-			return false;
+	if (!charstring::compareIgnoringCase(
+			parameters->getAttributeValue("operator"),"concat")) {
+
+		// The methods called inside of here rebuild the tree
+		// torrentially and it's easy for a "current node" pointer to
+		// get lost entirely, so we have to re-search the tree after
+		// each translation.  For now at least.
+		bool	found=true;
+		while (found) {
+			if (!translateConcat(sqlrcon,sqlrcur,
+					querytree->getRootNode(),&found)) {
+				return false;
+			}
+		}
+
+	} else {
+
+		// The methods called inside of here rebuild the tree
+		// torrentially and it's easy for a "current node" pointer to
+		// get lost entirely, so we have to re-search the tree after
+		// each translation.  For now at least.
+		bool	found=true;
+		while (found) {
+			if (!translatePlus(sqlrcon,sqlrcur,
+					querytree->getRootNode(),&found)) {
+				return false;
+			}
 		}
 	}
 	return true;
 }
 
 bool concat::translateConcat(sqlrconnection_svr *sqlrcon,
+					sqlrcursor_svr *sqlrcur,
+					xmldomnode *querynode,
+					bool *found) {
+	debugFunction();
+
+	// initialize found flag
+	*found=false;
+
+	// look for an expression
+	if (!charstring::compare(querynode->getName(),sqlparser::_expression)) {
+
+		// work backwards through the expression, replacing 
+		// pipe-concatenated terms with concat()...
+
+		// loop through the children...
+		int64_t	i=querynode->getChildCount()-1;
+		while (i>=1) {
+
+			// get the child
+			xmldomnode	*childnode=querynode->getChild(i);
+
+			// convert || (logical or) to plus
+			if (!charstring::compare(childnode->getName(),
+						sqlparser::_logical_or)) {
+				childnode->setName(sqlparser::_plus);
+			}
+
+			// move back through the children
+			i--;
+		}
+	}
+
+	// if we found and converted a || then return
+	if (*found) {
+		return true;
+	}
+
+	// otherwise attempt to convert child nodes...
+	for (xmldomnode *node=querynode->getFirstTagChild();
+			!node->isNullNode(); node=node->getNextTagSibling()) {
+		if (!translateConcat(sqlrcon,sqlrcur,node,found)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool concat::translatePlus(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldomnode *querynode,
 					bool *found) {
