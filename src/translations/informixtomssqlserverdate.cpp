@@ -109,8 +109,7 @@ bool informixtomssqlserverdate::translateFunctions(sqlrconnection_svr *sqlrcon,
 	*found=false;
 
 	// look for a function
-	if (!charstring::compare(
-			node->getName(),sqlparser::_function)) {
+	if (!charstring::compare(node->getName(),sqlparser::_function)) {
 
 		// look for and translate extend, current, datetime
 		// and interval functions

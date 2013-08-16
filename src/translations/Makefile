@@ -26,7 +26,8 @@ all: sqltranslation_doublequotestosinglequotes.la \
 	sqltranslation_serialtoautoincrement.la \
 	sqltranslation_serialtoidentity.la \
 	sqltranslation_show.la \
-	sqltranslation_informixtomssqlserverselectinto.la
+	sqltranslation_informixtomssqlserverselectinto.la \
+	sqltranslation_concat.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
@@ -79,6 +80,9 @@ sqltranslation_show.la: show.cpp show.lo
 
 sqltranslation_informixtomssqlserverselectinto.la: informixtomssqlserverselectinto.cpp informixtomssqlserverselectinto.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ informixtomssqlserverselectinto.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+
+sqltranslation_concat.la: concat.cpp concat.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ concat.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
 	$(MKINSTALLDIRS) $(libexecdir)
@@ -146,6 +150,10 @@ install:
 	$(RM) $(libexecdir)/sqltranslation_informixtomssqlserverselectinto.a
 	$(RM) $(libexecdir)/sqltranslation_informixtomssqlserverselectinto.la
 	$(MODULERENAME) $(libexecdir)/sqltranslation_informixtomssqlserverselectinto.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqltranslation_concat.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_concat.a
+	$(RM) $(libexecdir)/sqltranslation_concat.la
+	$(MODULERENAME) $(libexecdir)/sqltranslation_concat.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqltranslation_*
