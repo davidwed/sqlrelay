@@ -24,6 +24,9 @@ class temptablessybaseize : public sqltranslation {
 		void		mapCreateTemporaryTableName(
 						sqlrconnection_svr *sqlrcon,
 						xmldomnode *query);
+		void		mapSelectIntoTableName(
+						sqlrconnection_svr *sqlrcon,
+						xmldomnode *query);
 		const char	*generateTempTableName(const char *oldtable);
 		bool		replaceTempNames(xmldomnode *node);
 };
@@ -41,6 +44,10 @@ bool temptablessybaseize::run(sqlrconnection_svr *sqlrcon,
 	// for "create temporary table" queries, find the table name,
 	// come up with a session-local name for it and put it in the map...
 	mapCreateTemporaryTableName(sqlrcon,querytree->getRootNode());
+
+	// for "select ... into table ..." queries, find the table name,
+	// come up with a session-local name for it and put it in the map...
+	mapSelectIntoTableName(sqlrcon,querytree->getRootNode());
 
 	// for all queries, look for table name nodes and apply the mapping
 	return replaceTempNames(querytree->getRootNode());
@@ -114,6 +121,52 @@ void temptablessybaseize::mapCreateTemporaryTableName(
 	if (!oncommitnode->isNullNode()) {
 		tablenode->deleteChild(oncommitnode);
 	}
+
+	// add table name to drop-at-session-end list
+	// (skip the leading #, it will be added by the
+	// sqlrcontroller during the drop)
+	sqlrcon->cont->addSessionTempTableForDrop(newtable+1);
+}
+
+void temptablessybaseize::mapSelectIntoTableName(sqlrconnection_svr *sqlrcon,
+						xmldomnode *node) {
+	debugFunction();
+
+	// select query
+	xmldomnode	*selectnode=
+			node->getFirstTagChild(sqlparser::_select);
+	if (selectnode->isNullNode()) {
+		return;
+	}
+
+	// select into
+	xmldomnode	*selectintonode=
+			selectnode->getFirstTagChild(sqlparser::_select_into);
+	if (selectintonode->isNullNode()) {
+		return;
+	}
+
+	// table database...
+	node=selectintonode->getFirstTagChild(sqlparser::_table_name_database);
+	const char	*database=node->getAttributeValue(sqlparser::_value);
+
+	// table schema...
+	node=selectintonode->getFirstTagChild(sqlparser::_table_name_schema);
+	const char	*schema=node->getAttributeValue(sqlparser::_value);
+
+	// table name...
+	node=selectintonode->getFirstTagChild(sqlparser::_table_name_table);
+	if (node->isNullNode()) {
+		return;
+	}
+	const char	*oldtable=node->getAttributeValue(sqlparser::_value);
+
+	// create a sybase-ized name and put it in the map...
+	databaseobject	*oldtabledbo=sqlts->createDatabaseObject(
+						sqlts->temptablepool,
+						database,schema,oldtable,NULL);
+	const char	*newtable=generateTempTableName(oldtable);
+	sqlts->temptablemap.setData(oldtabledbo,(char *)newtable);
 
 	// add table name to drop-at-session-end list
 	// (skip the leading #, it will be added by the

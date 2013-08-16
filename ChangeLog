@@ -10,6 +10,7 @@
 		are in the table
 	the code freetds uses to get column names from MS SQL Server works
 		for temp tables now
+	added informix->mssqlserver translation for select into queries
 
 0.51 - fixed minor perl DBI driver documentation issue
 	added support for oracle 12c

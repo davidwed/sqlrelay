@@ -2977,11 +2977,12 @@ bool sqlparser::parseSelect(xmldomnode *currentnode,
 		bool	first=true;
 		for (;;) {
 
-			// look for a from clause
-			// (do this first so the word "from" doesn't get
-			// mistaken for a term in an expression
+			// look for from and into clauses
+			// (do this first so the words "from" and "into"
+			// don't get mistaken for a term in an expression
 			const char	*beforefrom=*newptr;
-			if (fromClause(*newptr,newptr)) {
+			if (fromClause(*newptr,newptr) ||
+				insertIntoClause(*newptr,newptr)) {
 				*newptr=beforefrom;
 				if (first) {
 					debugPrintf("no select expressions\n");
@@ -3047,6 +3048,8 @@ bool sqlparser::parseSelect(xmldomnode *currentnode,
 				parseOrderBy(selectnode,*newptr,newptr) ||
 				parseLimit(selectnode,*newptr,newptr) ||
 				parseProcedure(selectnode,*newptr,newptr) ||
+				parseSelectIntoTable(
+						selectnode,*newptr,newptr) ||
 				parseSelectInto(selectnode,*newptr,newptr) ||
 				parseForUpdate(selectnode,*newptr,newptr) ||
 				parseNoWait(selectnode,*newptr,newptr)) {
@@ -3140,8 +3143,10 @@ bool sqlparser::parseAlias(xmldomnode *currentnode,
 		!charstring::compareIgnoringCase(word,"for") ||
 		// order by clause
 		!charstring::compareIgnoringCase(word,"order") ||
-		// grop by clause
+		// group by clause
 		!charstring::compareIgnoringCase(word,"group") ||
+		// into clause
+		!charstring::compareIgnoringCase(word,"into") ||
 		(subselect &&
 		// where clause
 		(!charstring::compareIgnoringCase(word,sqlparser::_where) ||
@@ -3683,6 +3688,39 @@ bool sqlparser::procedureClause(const char *ptr, const char **newptr) {
 }
 
 const char *sqlparser::_procedure="procedure";
+
+bool sqlparser::parseSelectIntoTable(xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr) {
+	debugFunction();
+
+	// into
+	if (!selectIntoClause(ptr,newptr)) {
+		return false;
+	}
+
+	// create the node
+	xmldomnode	*intonode=newNode(currentnode,_select_into);
+
+	// FIXME: Most db's don't require the temp qualifier here and it's
+	// not impossible someone could name their temp table "temp".
+	// Currently this code doesn't handle that.
+
+	// temp (optional)
+	parseTemporary(intonode,*newptr,newptr);
+
+	// table name
+	if (!parseTableName(intonode,*newptr,newptr)) {
+		debugPrintf("missing table name\n");
+		error=true;
+		return false;
+	}
+
+	// columns (optional)
+	parseColumnNameList(intonode,*newptr,newptr);
+
+	return true;
+}
 
 bool sqlparser::parseSelectInto(xmldomnode *currentnode,
 					const char *ptr,

@@ -25,7 +25,8 @@ all: sqltranslation_doublequotestosinglequotes.la \
 	sqltranslation_oracleize.la \
 	sqltranslation_serialtoautoincrement.la \
 	sqltranslation_serialtoidentity.la \
-	sqltranslation_show.la
+	sqltranslation_show.la \
+	sqltranslation_informixtomssqlserverselectinto.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
@@ -75,6 +76,9 @@ sqltranslation_serialtoidentity.la: serialtoidentity.cpp serialtoidentity.lo
 
 sqltranslation_show.la: show.cpp show.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ show.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+
+sqltranslation_informixtomssqlserverselectinto.la: informixtomssqlserverselectinto.cpp informixtomssqlserverselectinto.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ informixtomssqlserverselectinto.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
 	$(MKINSTALLDIRS) $(libexecdir)
@@ -138,6 +142,10 @@ install:
 	$(RM) $(libexecdir)/sqltranslation_show.a
 	$(RM) $(libexecdir)/sqltranslation_show.la
 	$(MODULERENAME) $(libexecdir)/sqltranslation_show.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqltranslation_informixtomssqlserverselectinto.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_informixtomssqlserverselectinto.a
+	$(RM) $(libexecdir)/sqltranslation_informixtomssqlserverselectinto.la
+	$(MODULERENAME) $(libexecdir)/sqltranslation_informixtomssqlserverselectinto.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqltranslation_*

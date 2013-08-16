@@ -1020,6 +1020,9 @@ class sqlparser {
 		bool	procedureClause(const char *ptr,
 						const char **newptr);
 		static const char	*_procedure;
+		bool	parseSelectIntoTable(rudiments::xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr);
 		bool	parseSelectInto(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
