@@ -114,7 +114,8 @@ class oracle8connection : public sqlrconnection_svr {
 		const char	*dbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
-		const char	*getColumnListQuery(bool wild);
+		const char	*getColumnListQuery(const char *table,
+								bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
@@ -1172,7 +1173,8 @@ const char *oracle8connection::getTableListQuery(bool wild) {
 	}
 }
 
-const char *oracle8connection::getColumnListQuery(bool wild) {
+const char *oracle8connection::getColumnListQuery(const char *table,
+								bool wild) {
 	if (supportssyscontext) {
 		return (wild)?
 			"select "

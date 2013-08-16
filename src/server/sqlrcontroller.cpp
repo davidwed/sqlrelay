@@ -5460,7 +5460,7 @@ bool sqlrcontroller_svr::getListByQuery(sqlrcursor_svr *cursor,
 			query=conn->getTableListQuery(havewild);
 			break;
 		case 2:
-			query=conn->getColumnListQuery(havewild);
+			query=conn->getColumnListQuery(table,havewild);
 			break;
 	}
 

@@ -83,7 +83,9 @@ class sqlrconnection_svr {
 						const char *wild);
 		virtual const char	*getDatabaseListQuery(bool wild);
 		virtual const char	*getTableListQuery(bool wild);
-		virtual const char	*getColumnListQuery(bool wild);
+		virtual const char	*getColumnListQuery(
+						const char *table,
+						bool wild);
 
 		virtual sqlrcursor_svr	*initCursor()=0;
 		virtual void		deleteCursor(sqlrcursor_svr *curs)=0;

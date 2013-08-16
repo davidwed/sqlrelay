@@ -39,7 +39,8 @@ class sybaseconnection : public sqlrconnection_svr {
 		const char	*dbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
-		const char	*getColumnListQuery(bool wild);
+		const char	*getColumnListQuery(const char *table,
+								bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
@@ -534,7 +535,8 @@ const char *sybaseconnection::getTableListQuery(bool wild) {
 		"	name";
 }
 
-const char *sybaseconnection::getColumnListQuery(bool wild) {
+const char *sybaseconnection::getColumnListQuery(const char *table,
+								bool wild) {
 	return (wild)?
 		"select "
 		"	syscolumns.name, "

@@ -195,7 +195,8 @@ class db2connection : public sqlrconnection_svr {
 		const char	*dbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
-		const char	*getColumnListQuery(bool wild);
+		const char	*getColumnListQuery(const char *table,
+								bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
@@ -444,7 +445,7 @@ const char *db2connection::getTableListQuery(bool wild) {
 		"	tabname";
 }
 
-const char *db2connection::getColumnListQuery(bool wild) {
+const char *db2connection::getColumnListQuery(const char *table, bool wild) {
 	return (wild)?
 		"select "
 		"	colname, "

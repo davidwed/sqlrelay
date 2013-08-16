@@ -177,7 +177,8 @@ class firebirdconnection : public sqlrconnection_svr {
 		const char	*dbHostName();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
-		const char	*getColumnListQuery(bool wild);
+		const char	*getColumnListQuery(const char *table,
+								bool wild);
 		const char	*bindFormat();
 		const char	*getLastInsertIdQuery();
 
@@ -502,7 +503,8 @@ const char *firebirdconnection::getTableListQuery(bool wild) {
 		"	rdb$relation_name";
 }
 
-const char *firebirdconnection::getColumnListQuery(bool wild) {
+const char *firebirdconnection::getColumnListQuery(const char *table,
+								bool wild) {
 	return (wild)?
 		"select "
 		"	r.rdb$field_name, "

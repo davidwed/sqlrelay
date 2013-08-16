@@ -8,6 +8,8 @@
 	fixed error with sqlserver where "describe <table>" would return
 		columns in alphabetical order rather than the order they
 		are in the table
+	the code freetds uses to get column names from MS SQL Server works
+		for temp tables now
 
 0.51 - fixed minor perl DBI driver documentation issue
 	added support for oracle 12c

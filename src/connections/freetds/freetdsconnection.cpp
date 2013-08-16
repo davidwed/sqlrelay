@@ -252,7 +252,8 @@ class freetdsconnection : public sqlrconnection_svr {
 		const char	*dbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
-		const char	*getColumnListQuery(bool wild);
+		const char	*getColumnListQuery(const char *table,
+								bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
@@ -621,7 +622,8 @@ const char *freetdsconnection::getTableListQuery(bool wild) {
 	}
 }
 
-const char *freetdsconnection::getColumnListQuery(bool wild) {
+const char *freetdsconnection::getColumnListQuery(const char *table,
+								bool wild) {
 	if (sybasedb) {
 		return (wild)?
 			"select "
@@ -676,42 +678,87 @@ const char *freetdsconnection::getColumnListQuery(bool wild) {
 			"order by "
 			"	syscolumns.colid";
 	} else {
-		return (wild)?
-			"select "
-			"	column_name, "
-			"	data_type, "
-			"	character_maximum_length, "
-			"	numeric_precision, "
-			"	numeric_scale, "
-			"	is_nullable, "
-			"	'' as primarykey, "
-			"	column_default, "
-			"	'' as extra "
-			"from "
-			"	information_schema.columns "
-			"where "
-			"	table_name='%s' "
-			"	and "
-			"	column_name like '%s' "
-			"order by "
-			"	ordinal_position":
-
-			"select "
-			"	column_name, "
-			"	data_type, "
-			"	character_maximum_length, "
-			"	numeric_precision, "
-			"	numeric_scale, "
-			"	is_nullable, "
-			"	'' as primarykey, "
-			"	column_default, "
-			"	'' as extra "
-			"from "
-			"	information_schema.columns "
-			"where "
-			"	table_name='%s' "
-			"order by "
-			"	ordinal_position";
+		if (table && table[0]=='#') {
+			if (wild) {
+				return
+				"select "
+				"	column_name, "
+				"	data_type, "
+				"	character_maximum_length, "
+				"	numeric_precision, "
+				"	numeric_scale, "
+				"	is_nullable, "
+				"	'' as primarykey, "
+				"	column_default, "
+				"	'' as extra "
+				"from "
+				"	tempdb.information_schema.columns "
+				"where "
+				"	table_name like '%s____%%' "
+				"	and "
+				"	column_name like '%s' "
+				"order by "
+				"	ordinal_position";
+			} else {
+				return
+				"select "
+				"	column_name, "
+				"	data_type, "
+				"	character_maximum_length, "
+				"	numeric_precision, "
+				"	numeric_scale, "
+				"	is_nullable, "
+				"	'' as primarykey, "
+				"	column_default, "
+				"	'' as extra "
+				"from "
+				"	tempdb.information_schema.columns "
+				"where "
+				"	table_name like '%s____%%' "
+				"order by "
+				"	ordinal_position";
+			}
+		} else {
+			if (wild) {
+				return
+				"select "
+				"	column_name, "
+				"	data_type, "
+				"	character_maximum_length, "
+				"	numeric_precision, "
+				"	numeric_scale, "
+				"	is_nullable, "
+				"	'' as primarykey, "
+				"	column_default, "
+				"	'' as extra "
+				"from "
+				"	information_schema.columns "
+				"where "
+				"	table_name='%s' "
+				"	and "
+				"	column_name like '%s' "
+				"order by "
+				"	ordinal_position";
+			} else {
+				return
+				"select "
+				"	column_name, "
+				"	data_type, "
+				"	character_maximum_length, "
+				"	numeric_precision, "
+				"	numeric_scale, "
+				"	is_nullable, "
+				"	'' as primarykey, "
+				"	column_default, "
+				"	'' as extra "
+				"from "
+				"	information_schema.columns "
+				"where "
+				"	table_name='%s' "
+				"order by "
+				"	ordinal_position";
+			}
+		}
 	}
 }
 

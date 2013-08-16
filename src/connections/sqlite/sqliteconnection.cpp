@@ -47,7 +47,8 @@ class sqliteconnection : public sqlrconnection_svr {
 		const char	*dbHostName();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
-		const char	*getColumnListQuery(bool wild);
+		const char	*getColumnListQuery(const char *table,
+								bool wild);
 #ifdef SQLITE_TRANSACTIONAL
 		const char	*setIsolationLevelQuery();
 #endif
@@ -266,7 +267,8 @@ const char *sqliteconnection::getTableListQuery(bool wild) {
 		"	tbl_name";
 }
 
-const char *sqliteconnection::getColumnListQuery(bool wild) {
+const char *sqliteconnection::getColumnListQuery(const char *table,
+								bool wild) {
 	return "select "
 		"	'' as column_name, "
 		"	'' as data_type, "
