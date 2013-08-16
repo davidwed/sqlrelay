@@ -448,12 +448,32 @@ bool sqlparser::parseTableName(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
+
+	// save the starting point, in case this fails
+	const char	*startptr=ptr;
+
+	// get the table name
 	char	*tablename=getWord(ptr,newptr);
+
+	// Check to see if the table name started with a bind variable prefix.
+	// If it does then it can't be a table name.  This is important because
+	// select-into queries can select into either variables or tables,
+	// this method gets called from parseSelectIntoTable and parseSelectInto
+	char	c=tablename[0];
+	if (c=='?' || c==':' || c=='@' || c=='$') {
+		delete[] tablename;
+		*newptr=startptr;
+		return false;
+	}
+
+	// split the table name into db, schema and table components
 	splitDatabaseObjectName(currentnode,
 				tablename,
 				_table_name_database,
 				_table_name_schema,
 				_table_name_table);
+
+	// clean up
 	delete[] tablename;
 	return true;
 }
@@ -3050,7 +3070,8 @@ bool sqlparser::parseSelect(xmldomnode *currentnode,
 				parseProcedure(selectnode,*newptr,newptr) ||
 				parseSelectIntoTable(
 						selectnode,*newptr,newptr) ||
-				parseSelectInto(selectnode,*newptr,newptr) ||
+				parseSelectIntoVariables(
+						selectnode,*newptr,newptr) ||
 				parseForUpdate(selectnode,*newptr,newptr) ||
 				parseNoWait(selectnode,*newptr,newptr)) {
 				continue;
@@ -3722,9 +3743,9 @@ bool sqlparser::parseSelectIntoTable(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::parseSelectInto(xmldomnode *currentnode,
-					const char *ptr,
-					const char **newptr) {
+bool sqlparser::parseSelectIntoVariables(xmldomnode *currentnode,
+						const char *ptr,
+						const char **newptr) {
 	debugFunction();
 	if (!selectIntoClause(ptr,newptr)) {
 		return false;

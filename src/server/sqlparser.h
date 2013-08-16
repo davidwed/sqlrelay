@@ -1023,9 +1023,10 @@ class sqlparser {
 		bool	parseSelectIntoTable(rudiments::xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);
-		bool	parseSelectInto(rudiments::xmldomnode *currentnode,
-						const char *ptr,
-						const char **newptr);
+		bool	parseSelectIntoVariables(
+					rudiments::xmldomnode *currentnode,
+					const char *ptr,
+					const char **newptr);
 		bool	selectIntoClause(const char *ptr,
 						const char **newptr);
 		static const char	*_select_into;
