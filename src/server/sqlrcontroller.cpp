@@ -25,12 +25,12 @@
 #define NEED_CONVERT_DATE_TIME
 #include <parsedatetime.h>
 
-// for gettimeofday()
-#include <sys/time.h>
-
 // for umask
 #include <sys/types.h>
 #include <sys/stat.h>
+
+// for sprintf
+#include <stdio.h>
 
 #include <math.h>
 

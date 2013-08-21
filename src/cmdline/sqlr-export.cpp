@@ -120,7 +120,7 @@ int main(int argc, const char **argv) {
 
 	sqlrcur.setResultSetBufferSize(rsbs);
 
-	bool	result;
+	bool	result=false;
 	if (charstring::length(table)) {
 		result=exportTable(&sqlrcur,table,format);
 	} else if (charstring::length(sequence)) {

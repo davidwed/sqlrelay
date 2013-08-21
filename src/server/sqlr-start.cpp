@@ -11,6 +11,9 @@
 // for ceil()
 #include <math.h>
 
+// for FILE, popen, feof, fgetc, pclose
+#include <stdio.h>
+
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
