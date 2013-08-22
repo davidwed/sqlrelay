@@ -16,7 +16,8 @@
 	#include <errmsg.h>
 #endif
 
-#include <stdlib.h>
+// for NULL
+#include <stddef.h>
 
 #ifndef TRUE
 #define TRUE (1)

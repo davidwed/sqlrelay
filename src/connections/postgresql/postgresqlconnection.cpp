@@ -13,7 +13,8 @@
 
 #include <libpq-fe.h>
 
-#include <stdlib.h>
+// for NULL
+#include <stddef.h>
 
 class postgresqlconnection : public sqlrconnection_svr {
 	friend class postgresqlcursor;

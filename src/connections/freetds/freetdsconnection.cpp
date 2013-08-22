@@ -21,7 +21,8 @@ extern "C" {
 	#include <tdsver.h>
 #endif
 
-#include <stdlib.h>
+// for NULL
+#include <stddef.h>
 
 #ifndef HAVE_FREETDS_FUNCTION_DEFINITIONS
 // in freetds prior to 0.61, the cs_ functions are not defined in any header

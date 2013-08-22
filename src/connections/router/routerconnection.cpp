@@ -11,7 +11,8 @@
 
 #include <sqlrelay/sqlrclient.h>
 
-#include <stdlib.h>
+// for NULL
+#include <stddef.h>
 
 #define FETCH_AT_ONCE	10
 

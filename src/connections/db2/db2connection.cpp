@@ -9,7 +9,9 @@
 #include <config.h>
 
 #include <sqlcli1.h>
-#include <stdlib.h>
+
+// for NULL
+#include <stddef.h>
 
 #define FETCH_AT_ONCE		10
 #define MAX_SELECT_LIST_SIZE	256

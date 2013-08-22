@@ -23,8 +23,11 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 #define NEED_DATATYPESTRING	1
 #include <datatypes.h>
 
+// for fprintf
 #include <stdio.h>
-#include <stdlib.h>
+
+// for NULL
+#include <stddef.h>
 
 extern "C" {
 

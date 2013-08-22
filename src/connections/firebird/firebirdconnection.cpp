@@ -15,7 +15,9 @@
 
 // for pow()
 #include <math.h>
-#include <stdlib.h>
+
+// for NULL
+#include <stddef.h>
 
 // for struct tm
 #include <time.h>

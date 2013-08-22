@@ -22,7 +22,8 @@
 	#include <iodbcinst.h>
 #endif
 
-#include <stdlib.h>
+// for NULL
+#include <stddef.h>
 
 // for perror
 #include <stdio.h>

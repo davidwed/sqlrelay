@@ -11,7 +11,9 @@
 #include <datatypes.h>
 #include <defines.h>
 #include <config.h>
-#include <stdlib.h>
+
+// for NULL
+#include <stddef.h>
 
 class status : public sqlrcontroller_svr {
 	public:
