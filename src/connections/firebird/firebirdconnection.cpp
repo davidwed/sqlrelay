@@ -17,6 +17,9 @@
 #include <math.h>
 #include <stdlib.h>
 
+// for struct tm
+#include <time.h>
+
 #define MAX_ITEM_BUFFER_SIZE 4096
 #define MAX_SELECT_LIST_SIZE 256
 #define MAX_BIND_VARS 512

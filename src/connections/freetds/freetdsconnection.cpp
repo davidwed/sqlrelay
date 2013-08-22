@@ -8,6 +8,7 @@
 #include <rudiments/stringbuffer.h>
 #include <rudiments/charstring.h>
 #include <rudiments/rawbuffer.h>
+#include <rudiments/stdio.h>
 
 #include <datatypes.h>
 #include <config.h>
@@ -898,7 +899,7 @@ bool freetdscursor::open(uint16_t id) {
 			int64_t		errn;
 			bool		live;
 			errorMessage(err,sizeof(err),&errlen,&errn,&live);
-			fprintf(stderr,"%s\n",err);
+			stderror.printf("%s\n",err);
 			retval=false;
 		} else {
 			freetdsconn->dbused=true;

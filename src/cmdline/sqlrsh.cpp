@@ -7,6 +7,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/commandline.h>
 #include <rudiments/file.h>
+#include <rudiments/permissions.h>
 #include <rudiments/filesystem.h>
 #include <rudiments/filedescriptor.h>
 #include <rudiments/process.h>
@@ -1576,9 +1577,11 @@ void sqlrsh::execute(int argc, const char **argv) {
 			charstring::append(filename,"/.sqlrsh_history");
 
 			// create the history file if it doesn't exist now
-			FILE	*historyfile=fopen(filename,"a");
-			if (historyfile) {
-				fclose(historyfile);
+			file	historyfile;
+			if (historyfile.open(filename,
+				O_WRONLY|O_CREAT|O_APPEND,
+				permissions::evalPermString("rw-rw-r--"))) {
+				historyfile.close();
 				read_history(filename);
 			}
 		}

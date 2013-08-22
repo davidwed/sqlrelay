@@ -24,6 +24,9 @@
 
 #include <stdlib.h>
 
+// for perror
+#include <stdio.h>
+
 #define FETCH_AT_ONCE		10
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	4096
