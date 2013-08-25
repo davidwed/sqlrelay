@@ -25,7 +25,7 @@ char *crypt_pwdenc::encrypt(const char *value) {
 
 	// the first two characters of the result string
 	// are the salt, so don't include them, if possible
-	char	*encrypted=rudiments::crypt::encrypt(value,
+	char	*encrypted=crypt::encrypt(value,
 					parameters->getAttributeValue("salt"));
 	if (charstring::length(encrypted)<2) {
 		return encrypted;
