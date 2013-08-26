@@ -12,6 +12,8 @@
 		for temp tables now
 	added informix->mssqlserver translation for select into queries
 	added translation to convert ||'s to concat() calls or +'s
+	added a long-missing "delete clientsock" to sqlrlistener that could
+		cause a crash after enough time
 
 0.51 - fixed minor perl DBI driver documentation issue
 	added support for oracle 12c
