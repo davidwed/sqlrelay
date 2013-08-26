@@ -973,14 +973,23 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 	filedescriptor	*clientsock;
 	if (fd==handoffsockun) {
 		clientsock=handoffsockun->accept();
+		if (!clientsock) {
+			return false;
+		}
 		clientsock->dontUseNaglesAlgorithm();
 		return registerHandoff(clientsock);
 	} else if (fd==removehandoffsockun) {
 		clientsock=removehandoffsockun->accept();
+		if (!clientsock) {
+			return false;
+		}
 		clientsock->dontUseNaglesAlgorithm();
 		return deRegisterHandoff(clientsock);
 	} else if (fd==fixupsockun) {
 		clientsock=fixupsockun->accept();
+		if (!clientsock) {
+			return false;
+		}
 		clientsock->dontUseNaglesAlgorithm();
 		return fixup(clientsock);
 	}
@@ -1000,6 +1009,9 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 	if (iss) {
 
 		clientsock=iss->accept();
+		if (!clientsock) {
+			return false;
+		}
 		clientsock->translateByteOrder();
 
 		// For inet clients, make sure that the ip address is
@@ -1012,9 +1024,15 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 
 	} else if (fd==clientsockun) {
 		clientsock=clientsockun->accept();
+		if (!clientsock) {
+			return false;
+		}
 		clientsock->translateByteOrder();
 	} else if (fd==mysqlclientsockun) {
 		clientsock=mysqlclientsockun->accept();
+		if (!clientsock) {
+			return false;
+		}
 		clientsock->translateByteOrder();
 	} else {
 		return true;
@@ -1294,6 +1312,8 @@ void sqlrlistener::clientSession(filedescriptor *clientsock) {
 	// FIXME: hmm, if the client is just spewing
 	// garbage then we should close the connection...
 	waitForClientClose(passstatus,clientsock);
+
+	delete clientsock;
 }
 
 bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock) {
