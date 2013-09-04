@@ -119,7 +119,7 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <br><a name="connectionpooling"></a>
 <span class="heading3">What is "persistent database connection pooling"?</span><br>
 
-<p>See <a href="features/connectionpooling.html">Persistend Database Connection Pooling</a>.</p>
+<p>See <a href="features/connectionpooling.html">Persistent Database Connection Pooling</a>.</p>
 
 <br><a name="proxying"></a>
 <span class="heading3">What is "proxying"?</span><br>
@@ -154,7 +154,7 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <br><a name="platforms"></a>
 <span class="heading3">What platforms does SQL Relay run on?</span>
 
-<p>See the <a href="installing.html#platforms">Supported Platforms</a> section of the installation document.</p>
+<p>See the <a href="admin/installing.html#platforms">Supported Platforms</a> section of the installation document.</p>
 
 <br><a name="languages"></a>
 <span class="heading3">What languages does SQL Relay support?</span>
@@ -211,7 +211,7 @@ through the session maintained by that daemon.</p>
 
 <p>Many websites run a combination of PHP's and Perl modules.  Perl modules can use Apache::DBI and PHP's have a persistent database connection system, but a PHP cannot use an Apache::DBI connection and a Perl module cannot use a PHP persistent connection.  Thus in order to make sure that there are enough database connections for each platform, many more web-server processes have to be run, perhaps twice as many.  If the PHP's and Perl modules used SQL Relay instead, they could share databse connections and reduce the number of web-server processes and database connections.</p>
 
-<p>SQL Relay makes it easy to distribute load over replicated servers.  A common scaling solution when using MySQL or PostgreSQL in a read-only web environment is to run several web servers with a dedicated database server for each web server or group of web servers and update all the databases simultaneously at scheduled intervals.  This usually works pretty well, but sometimes database or web servers get runs of heavy load while others are idle.  In other cases, an uneven number of machines is required.  For example, your application may need 3 web servers but only 2 database servers or vice-versa.  People usually just by 3 of each, wasting money.  Moreover, in most cases, the servers have to be equivalently powerful machines.  You can't usually just add another cheap machine that you have lying around into the pool.   SQL Relay can connect to multiple, replicated or clustered database servers, providing web-based applications access to whichever server isn't busy.  SQL Relay can also be configured to maintain more connections to more powerful machines and fewer connections to less powerful machines, enabling unevenly matched machines to be used in the same database pool.  Collectively, these features allow you to save money by using only the exact number of servers that you need and by enabling you to use spare hardware in your database pools.</p>
+<p>SQL Relay makes it easy to distribute load over replicated servers.  A common scaling solution when using MySQL or PostgreSQL in a read-only web environment is to run several web servers with a dedicated database server for each web server or group of web servers and update all the databases simultaneously at scheduled intervals.  This usually works pretty well, but sometimes database or web servers get runs of heavy load while others are idle.  In other cases, an uneven number of machines is required.  For example, your application may need 3 web servers but only 2 database servers or vice-versa and buying 3 of each would be wasteful.  Moreover, in most cases, the servers have to be equivalently powerful machines.  You can't usually just add another cheap machine that you have lying around into the pool.   SQL Relay can connect to multiple, replicated or clustered database servers, providing web-based applications access to whichever server isn't busy.  SQL Relay can also be configured to maintain more connections to more powerful machines and fewer connections to less powerful machines, enabling unevenly matched machines to be used in the same database pool.  Collectively, these features allow you to save money by using only the exact number of servers that you need and by enabling you to use spare hardware in your database pools.</p>
 
 <br><a name="unsupported"></a>
 <span class="heading3">How does SQL Relay allow me to access a database from a platform not supported by the database vendor?</span>
@@ -274,13 +274,15 @@ databases?</span>
 
 <p>Yes.  However, there are two potential issues.</p>
 
-<p>First, if you installed from a non-RPM distribution of instantclient, then you must use the --with-oracle-instantclient-prefix option of the configure script.  For example, if you unzipped the instantclient distro in /usr/local and it created a directory called /usr/local/instantclient_11_2, then you should use:</p>
+<p>The configure script looks hard for the instantclient installation but if you installed from a non-RPM distribution of instantclient, then you might have to use use the --with-oracle-instantclient-prefix option of the configure script.  For example, if you unzipped the instantclient distro in /usr/local and it created a directory called /usr/local/instantclient_11_2, then you should use:</p>
 
 <blockquote>
 ./configure --with-oracle-instantclient-prefix=/usr/local/instantclient_11_2
 </blockquote>
 
-<p>Second, some releases of the instantclient software have omitted the libclntsh.so symlink.  I noticed it in the zip distribution of the 11.2 version.  As a result the -lclntsh argument to the linker fails to find the library and the configure script fails to detect the instantclient installation.  Even if you manually tweak the config.mk file, the build will still fail.  This can be remedied though, by adding the libclntsh.so symlink manually.</p>
+<p>Also older releases of SQL Relay have the following issue...</p>
+
+<p>Some releases of the instantclient software have omitted the libclntsh.so symlink.  I noticed it in the zip distribution of the 11.2 version.  As a result the -lclntsh argument to the linker fails to find the library and the configure script fails to detect the instantclient installation.  Even if you manually tweak the config.mk file, the build will still fail.  This can be remedied though, by adding the libclntsh.so symlink manually.</p>
 
 <p>Go to the directory that contains libclntsh.so.11.1 (or whatever version you installed) and, as root, or whatever user you used to install the instantclient software, run the following command:</p>
 
@@ -293,15 +295,17 @@ ln -s libclntsh.so.11.1 libclntsh.so
 <br><a name="ubuntu"></a>
 <span class="heading3">Why won't SQL Relay build properly on Ubuntu?</span><br>
 
-<p>This is actually a problem for lots of software, not just SQL Relay.</p>
+<p>This isn't an issue for recent releases of SQL Relay, but it was a problem for lots of software, for a while, not just SQL Relay.</p>
 
-<p>On modern Ubuntu distros, /bin/sh is a symlink to /bin/dash as opposed to /bin/bash.  Apparently libtool generates code that requires more complete support of sh than is provided by dash.  The best solution that I have found is to remove the /bin/sh symlink and create a new one between /bin/bash and /bin/sh, as follows (as root).</p>
+<p>On modern Ubuntu distros, /bin/sh is a symlink to /bin/dash as opposed to /bin/bash.  Apparently, older versions of libtool generated code that required more complete support of sh than is provided by dash.  The best solution that I have found is to remove the /bin/sh symlink and create a new one between /bin/bash and /bin/sh, as follows (as root).</p>
 
 <blockquote>
 cd /bin
 rm sh
 ln -s bash sh
 </blockquote>
+
+<p>This doesn't appear to be an issue these days.</p>
 
 <hr>
 

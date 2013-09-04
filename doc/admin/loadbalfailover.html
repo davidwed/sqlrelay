@@ -17,7 +17,7 @@
 <a name="backendloadbalancing"></a>
 <span class="heading1">Distributing Load Over a Pool of Database Servers</span><br><br>
 
-<p>There are probably dozens of commercial and Open Source Load Balancers
+<p>There are probably a dozen commercial and Open Source Load Balancers
 available today.  They are often implemented differently, and some have
 unique features, but they all provide a single IP address for a pool of servers
 and distribute incoming connections over the pool.</p>
@@ -148,7 +148,7 @@ a different database server.</p>
 you might want to set up a pool of SQL Relay servers between them rather than
 just a single server.</p>
 
-<p>You can use a Load Balancer to make a pool of SQL Relay servers appear to be a single server.  If you don't have a Load Balancer or would rather not use one, you can still set up a pool of SQL Relay servers and distribute client connections over them using <a href="http://hacks.oreilly.com/pub/h/79">Round Robin DNS</a>.</p>
+<p>You can use a Load Balancer to make a pool of SQL Relay servers appear to be a single server.  If you don't have a Load Balancer or would rather not use one, you can still set up a pool of SQL Relay servers and distribute client connections over them using <a href="http://en.wikipedia.org/wiki/Round-robin_DNS">Round Robin DNS</a>.</p>
 
 <a name="frontendfailover"></a>
 <span class="heading1">SQL Relay Server Failover</span><br><br>
@@ -184,7 +184,7 @@ sqlrconnection  sqlrcon(<font color="#ff00ff">&quot;sqlrserver&quot;</font>,<fon
 
 <p>If you don't have a Load Balancer or would rather not use one, you can
 still implement SQL Relay server failover using
-<a href="http://hacks.oreilly.com/pub/h/79">Round Robin DNS</a>.</p>
+<a href="http://en.wikipedia.org/wiki/Round-robin_DNS">Round Robin DNS</a>.</p>
 
 <p>The SQL Relay client has a minimal built-in failover facility.  If Round
 Robin DNS is set up, when the SQL Relay client looks up the IP address of the

@@ -46,14 +46,16 @@
 process.</p>
 
 <blockquote>
-sqlr-start  -id ID  -config CONFIGFILE  [-localstatedir LOCALSTATEDIR]
+sqlr-start -id ID [-config CONFIGFILE] [-localstatedir LOCALSTATEDIR]
 </blockquote>
 
-<p>The <b>sqlr-start</b> program starts up one instance of <b>sqlr-listener</b>, one instance of <b>sqlr-scaler</b> and the number of <b>sqlr-connection</b> daemons specified in the config file for the given id.</p>
+<p>The <b>sqlr-start</b> program starts up one instance of <b>sqlr-listener</b>, one instance of <b>sqlr-scaler</b> and the number of <b>sqlr-connection</b> daemons specified in the config file for the given ID.</p>
 
 <p>The <b>sqlr-start</b> program also checks to see if a <b>sqlr-cachemanager</b> is running.  If one is then it leaves it running.  If not then it starts one.</p>
 
 <p>See the section about <b>sqlr-cachemanager</b> below for an important note about it.</p>
+
+<p>CONFIGFILE is the filename of the configuration file to use.  The default configuration file is /usr/local/firstworks/etc/sqlrelay.conf</p>
 
 <p>If the optional LOCALSTATEDIR argument is used, it is passed to the programs started by <b>sqlr-start</b> as appropriate.</p>
 
@@ -78,14 +80,14 @@ sqlr-start  -id ID  -config CONFIGFILE  [-localstatedir LOCALSTATEDIR]
 <p>Run the <b>sqlr-listener</b> daemon to establish a listener.</p>
 
 <blockquote>
-sqlr-listener  -id ID  -config CONFIGFILE  [-localstatedir LOCALSTATEDIR]
+sqlr-listener -id ID [-config CONFIGFILE] [-localstatedir LOCALSTATEDIR]
 </blockquote>
-
-<p>CONFIGFILE is the filename of the configuration file to use.  The default configuration file is /usr/local/firstworks/etc/sqlrelay.conf</p>
 
 <p>ID is an identifier that associates a listener with a pool of connections.</p>
 
 <p>Only one listener needs to be established for a given ID.</p>
+
+<p>CONFIGFILE is the filename of the configuration file to use.  The default configuration file is /usr/local/firstworks/etc/sqlrelay.conf</p>
 
 <p>LOCALSTATEDIR is the base directory for temporary files and debug logs.  By default, this is /usr/local/firstworks/var, PREFIX/var if you compiled SQL Relay with a prefix other than /usr/local/firstworks or possibly another directory if you specified a different localstatedir when compiling SQL Relay.  Under the localstatedir, temporary files go in sqlrelay/tmp and debug logs go in sqlrelay/debug.</p>
 
@@ -96,14 +98,14 @@ sqlr-listener  -id ID  -config CONFIGFILE  [-localstatedir LOCALSTATEDIR]
 <p>Connecting to a database is the next step.  To estabish a connection, run one or more of the <b>sqlr-connection</b> daemons.</p>
 
 <blockquote>
-<p>sqlr-connection -id ID -config CONFIGFILE -connectionid CONNECTIONID [-localstatedir LOCALSTATEDIR]</p>
+<p>sqlr-connection -id ID [-config CONFIGFILE] -connectionid CONNECTIONID [-localstatedir LOCALSTATEDIR]</p>
 </blockquote>
 
 <p>Where "dbase" is one of oracle8, mysql, postgresql, sqlite, odbc, db2, firebird, sybase, freetds or mdbtools.</p>
 
-<p>CONFIGFILE is the configuration file to use when starting the daemon.  The default configuration file is /usr/local/firstworks/etc/sqlrelay.conf</p>
-
 <p>ID is just an identifier.  Starting multiple connections with the same ID make them available as a pool of connections.  The more connections you start, the more queries can be executed in parallel.  In addition, the ID argument specifies which config file entry to use.</p>
+
+<p>CONFIGFILE is the configuration file to use when starting the daemon.  The default configuration file is /usr/local/firstworks/etc/sqlrelay.conf</p>
 
 <p>CONNECTIONID is another identifier.  When using replicated or clustered databases, within a pool of connections, some connections will connected to 1 machine and some will connect to another.  This argument tells the connection daemon which machine to connect to.  When not using clustered or replicated databases, this id will be the same for every connection in the pool.</p>
 
@@ -117,15 +119,14 @@ sqlr-listener  -id ID  -config CONFIGFILE  [-localstatedir LOCALSTATEDIR]
 <p>Run the <b>sqlr-scaler</b> daemon to establish a scaler.</p>
 
 <blockquote>
-sqlr-scaler -id ID -config CONFIGFILE
+sqlr-scaler -id ID [-config CONFIGFILE]
 </blockquote>
-
-<p>CONFIGFILE is the filename of the configuration file to use.  The default configuration file is /usr/local/firstworks/etc/sqlrelay.conf</p>
 
 <p>ID is the same as the ID argument in the <b>sqlr-connection</b> daemon and associates a scaler with a pool of connections.</p>
 
 <p>Only one scaler needs to be established for a given ID.</p>
 
+<p>CONFIGFILE is the filename of the configuration file to use.  The default configuration file is /usr/local/firstworks/etc/sqlrelay.conf</p>
 
 <a name="cachemanager"></a>
 <span class="heading2">Setting Up the Cache Manager</span>
