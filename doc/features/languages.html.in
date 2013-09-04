@@ -1,0 +1,132 @@
+<html>
+<head>
+<title>firstworks   SQL Relay - Supported Languages</title>
+<link href="../css/styles.css" rel="stylesheet">
+<script language="Javascript" src="../js/rotate.js"></script>
+</head>
+<body onload="rotate();">
+
+<span class="heading1">Supported Languages</span><br><br>
+
+<p>SQL Relay currently supports C, C++, .NET-capable languages, Java, Perl, Python, Zope, PHP, Ruby, TCL and Erlang.</p>
+
+<p>Adapters could also be written for any language that can call functions from one of the above-listed languages.</p>
+
+<p>Programming guides with sample code and API references are available for each language:</p>
+
+<blockquote>
+<b>Guides:</b>
+<a href="../programming/c++.html">C++</a>, 
+<a href="../programming/c.html">C</a>,
+<a href="../programming/cs.html">C#</a>,
+<a href="../programming/perl.html">Perl</a>,
+<a href="../programming/php.html">PHP</a>,
+<a href="../programming/python.html">Python</a>,
+<a href="../programming/ruby.html">Ruby</a>,
+<a href="../programming/java.html">Java</a>,
+<a href="../programming/tcl.html">TCL</a>,
+<a href="../programming/erlang.html">Erlang</a>
+
+<br>
+
+<b>References:</b>
+<a href="../api/c++/html/annotated.html">C++</a>,
+<a href="../api/c/html/group__sqlrclientwrapper.html">C</a>,
+<a href="../api/cs/html/annotated.html">C#</a>,
+<a href="../api/perl/perl.html">Perl</a>,
+<a href="../api/php/index.html">PHP</a>,
+<a href="../api/python/PySQLRClient.py.html">Python</a>,
+<a href="../api/ruby/doc/index.html">Ruby</a>,
+<a href="../api/java/index.html">Java</a>,
+<a href="../api/tcl/index.html">TCL</a>
+</blockquote>
+
+<div class="slide">
+
+<div style="display: block; float: left;"/>
+<span class="heading2">C++</span>
+<p class="code" style="height: 300px;">
+@example.cpp.html@
+</p>
+</div>
+
+<div style="display: block; float: left;"/>
+<span class="heading2">C</span>
+<p class="code" style="height: 300px;">
+@example.c.html@
+</p>
+</div>
+
+</div>
+
+
+<div class="slide hidden">
+
+<div style="display: block; float: left;"/>
+<span class="heading2">C#</span>
+<p class="code" style="height: 350px;">
+@example.cs.html@
+</p>
+</div>
+
+<div style="display: block; float: left;"/>
+<span class="heading2">Java</span>
+<p class="code" style="height: 350px;">
+@example.java.html@
+</p>
+</div>
+
+</div>
+
+
+<div class="slide hidden">
+
+<div style="display: block; float: left;"/>
+<span class="heading2">Perl</span>
+<p class="code" style="height: 300px;">
+@example.pl.html@
+</p>
+</div>
+
+<div style="display: block; float: left;"/>
+<span class="heading2">Python</span>
+<p class="code" style="height: 300px;">
+@example.py.html@
+</p>
+</div>
+
+</div>
+
+
+<div class="slide hidden">
+
+<div style="display: block; float: left;"/>
+<span class="heading2">PHP</span>
+<p class="code" style="height: 300px;">
+@example.php.html@
+</p>
+</div>
+
+<div style="display: block; float: left;"/>
+<span class="heading2">Ruby</span>
+<p class="code" style="height: 300px;">
+@example.rb.html@
+</p>
+</div>
+
+</div>
+
+
+<div class="slide hidden">
+
+<div style="display: block; float: left;"/>
+<span class="heading2">TCL</span>
+<p class="code" style="height: 300px;">
+@example.tcl.html@
+</p>
+</div>
+
+</div>
+
+</body>
+</html>
