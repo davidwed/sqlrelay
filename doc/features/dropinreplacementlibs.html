@@ -9,7 +9,15 @@
 
 <p>The SQL Relay Drop-In Replacement Libraries are shared-object libraries that can be LD_PRELOAD'ed to take the place of the native MySQL or PostgreSQL client libraries.</p>
 
-<p>An app that was written to use MySQL or PostgreSQL directly can immediately take advantage of SQL Relay features such as connection pooling, load balancing, query routing and throttling without modification.  It can also be used to aim an app that was written to use MySQL or PostgreSQL at a different database.</p>
+<p>Many apps that were written to use MySQL or PostgreSQL dynamically load a client library to talk to the database.</p>
+
+<img src="../images/mysql-chain.png"> <img style="margin-left: 50px;" src="../images/postgresql-chain.png">
+
+<p>The SQL Relay Drop-In Replacement Libraries intercept the native client library calls, map them to the SQL Relay equivalents and aim the client at an SQL Relay server.</p>
+
+<img src="../images/mysql-sqlr-chain.png"> <img style="margin-left: 50px;" src="../images/postgresql-sqlr-chain.png">
+
+<p>This can be used to aim an app that was written to use MySQL or PostgreSQL at a different database or just allow an app to continue to use the MySQL or PostgreSQL database but take advantage of SQL Relay features such as connection pooling, load balancing, query routing and throttling without modification.</p>
 
 </body>
 </html>
