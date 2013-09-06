@@ -386,8 +386,7 @@ const char *postgresqlconnection::dbVersion() {
 
 const char *postgresqlconnection::dbHostName() {
 	const char	*hostname=sqlrconnection_svr::dbHostName();
-	return (charstring::length(hostname))?
-			hostname:rudiments::system::getHostName();
+	return (charstring::length(hostname))?hostname:system::getHostName();
 }
 
 const char *postgresqlconnection::dbIpAddressQuery() {

@@ -243,7 +243,7 @@ void firebirdconnection::handleConnectString() {
 	if (colon) {
 		host=charstring::duplicate(database,colon-database);
 	} else {
-		host=charstring::duplicate(rudiments::system::getHostName());
+		host=charstring::duplicate(system::getHostName());
 	}
 
 	const char	*dialectstr=cont->connectStringValue("dialect");

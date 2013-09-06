@@ -215,7 +215,7 @@ const char *sqliteconnection::dbVersion() {
 }
 
 const char *sqliteconnection::dbHostName() {
-	return rudiments::system::getHostName();
+	return system::getHostName();
 }
 
 const char *sqliteconnection::getDatabaseListQuery(bool wild) {

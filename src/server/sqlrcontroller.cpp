@@ -25,13 +25,7 @@
 #define NEED_CONVERT_DATE_TIME
 #include <parsedatetime.h>
 
-// for umask
-#include <sys/types.h>
-#include <sys/stat.h>
-
-// for sprintf
-#include <stdio.h>
-
+// for pow()
 #include <math.h>
 
 sqlrcontroller_svr::sqlrcontroller_svr() : daemonprocess(), listener() {
@@ -53,6 +47,7 @@ sqlrcontroller_svr::sqlrcontroller_svr() : daemonprocess(), listener() {
 
 	unixsocket=NULL;
 	unixsocketptr=NULL;
+	unixsocketptrlen=0;
 	serversockun=NULL;
 	serversockin=NULL;
 	serversockincount=0;
@@ -363,13 +358,11 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 
 	initDatabaseAvailableFileName();
 
-	if (cfgfl->getListenOnUnix() &&
-		!getUnixSocket(tmpdir->getString(),unixsocketptr)) {
+	if (cfgfl->getListenOnUnix() && !getUnixSocket()) {
 		return false;
 	}
 
-	if (!createSharedMemoryAndSemaphores(tmpdir->getString(),
-							cmdl->getId())) {
+	if (!createSharedMemoryAndSemaphores(cmdl->getId())) {
 		return false;
 	}
 
@@ -569,6 +562,7 @@ void sqlrcontroller_svr::setUnixSocketDirectory() {
 	charstring::printf(unixsocket,unixsocketlen,
 				"%s/sockets/",tmpdir->getString());
 	unixsocketptr=unixsocket+tmpdir->getLength()+8+1;
+	unixsocketptrlen=unixsocketlen-(unixsocketptr-unixsocket);
 }
 
 bool sqlrcontroller_svr::handlePidFile() {
@@ -621,17 +615,15 @@ void sqlrcontroller_svr::initDatabaseAvailableFileName() {
 			tmpdir->getString(),cmdl->getId(),connectionid);
 }
 
-bool sqlrcontroller_svr::getUnixSocket(const char *tmpdir,
-						char *unixsocketptr) {
+bool sqlrcontroller_svr::getUnixSocket() {
 
 	logDebugMessage("getting unix socket...");
 
 	file	sockseq;
-	if (!openSequenceFile(&sockseq,tmpdir,unixsocketptr) ||
-						!lockSequenceFile(&sockseq)) {
+	if (!openSequenceFile(&sockseq) || !lockSequenceFile(&sockseq)) {
 		return false;
 	}
-	if (!getAndIncrementSequenceNumber(&sockseq,unixsocketptr)) {
+	if (!getAndIncrementSequenceNumber(&sockseq)) {
 		unLockSequenceFile(&sockseq);
 		sockseq.close();
 		return false;
@@ -649,13 +641,13 @@ bool sqlrcontroller_svr::getUnixSocket(const char *tmpdir,
 	return true;
 }
 
-bool sqlrcontroller_svr::openSequenceFile(file *sockseq,
-				const char *tmpdir, char *unixsocketptr) {
+bool sqlrcontroller_svr::openSequenceFile(file *sockseq) {
 
 	// open the sequence file and get the current port number
-	size_t	sockseqnamelen=charstring::length(tmpdir)+9;
+	size_t	sockseqnamelen=tmpdir->getLength()+9;
 	char	*sockseqname=new char[sockseqnamelen];
-	charstring::printf(sockseqname,sockseqnamelen,"%s/sockseq",tmpdir);
+	charstring::printf(sockseqname,sockseqnamelen,
+				"%s/sockseq",tmpdir->getString());
 
 	size_t	stringlen=8+charstring::length(sockseqname)+1;
 	char	*string=new char[stringlen];
@@ -663,10 +655,10 @@ bool sqlrcontroller_svr::openSequenceFile(file *sockseq,
 	logDebugMessage(string);
 	delete[] string;
 
-	mode_t	oldumask=umask(011);
+	mode_t	oldumask=process::setFileCreationMask(011);
 	bool	success=sockseq->open(sockseqname,O_RDWR|O_CREAT,
-				permissions::everyoneReadWrite());
-	umask(oldumask);
+					permissions::everyoneReadWrite());
+	process::setFileCreationMask(oldumask);
 
 	// handle error
 	if (!success) {
@@ -711,15 +703,14 @@ bool sqlrcontroller_svr::unLockSequenceFile(file *sockseq) {
 	return true;
 }
 
-bool sqlrcontroller_svr::getAndIncrementSequenceNumber(file *sockseq,
-							char *unixsocketptr) {
+bool sqlrcontroller_svr::getAndIncrementSequenceNumber(file *sockseq) {
 
 	// get the sequence number from the file
 	int32_t	buffer;
 	if (sockseq->read(&buffer)!=sizeof(int32_t)) {
 		buffer=0;
 	}
-	sprintf(unixsocketptr,"%d",buffer);
+	charstring::printf(unixsocketptr,unixsocketptrlen,"%d",buffer);
 
 	size_t	stringlen=21+charstring::length(unixsocketptr)+1;
 	char	*string=new char[stringlen];
@@ -1076,10 +1067,7 @@ bool sqlrcontroller_svr::listen() {
 
 		waitForAvailableDatabase();
 		initSession();
-		announceAvailability(tmpdir->getString(),
-						unixsocket,
-						inetport,
-						connectionid);
+		announceAvailability(unixsocket,inetport,connectionid);
 
 		// loop to handle suspended sessions
 		bool	loopback=false;
@@ -1249,17 +1237,16 @@ void sqlrcontroller_svr::initSession() {
 	logDebugMessage("done initializing session...");
 }
 
-void sqlrcontroller_svr::announceAvailability(const char *tmpdir,
-					const char *unixsocket,
-					unsigned short inetport,
-					const char *connectionid) {
+void sqlrcontroller_svr::announceAvailability(const char *unixsocket,
+						unsigned short inetport,
+						const char *connectionid) {
 
 	logDebugMessage("announcing availability...");
 
 	// connect to listener if we haven't already
 	// and pass it this process's pid
 	if (!connected) {
-		registerForHandoff(tmpdir);
+		registerForHandoff();
 	}
 
 	// handle time-to-live
@@ -1315,16 +1302,17 @@ void sqlrcontroller_svr::announceAvailability(const char *tmpdir,
 	logDebugMessage("done announcing availability...");
 }
 
-void sqlrcontroller_svr::registerForHandoff(const char *tmpdir) {
+void sqlrcontroller_svr::registerForHandoff() {
 
 	logDebugMessage("registering for handoff...");
 
 	// construct the name of the socket to connect to
-	size_t	handoffsocknamelen=charstring::length(tmpdir)+9+
+	size_t	handoffsocknamelen=tmpdir->getLength()+9+
 				charstring::length(cmdl->getId())+8+1;
 	char	*handoffsockname=new char[handoffsocknamelen];
 	charstring::printf(handoffsockname,handoffsocknamelen,
-				"%s/sockets/%s-handoff",tmpdir,cmdl->getId());
+					"%s/sockets/%s-handoff",
+					tmpdir->getString(),cmdl->getId());
 
 	size_t	stringlen=17+charstring::length(handoffsockname)+1;
 	char	*string=new char[stringlen];
@@ -1351,7 +1339,7 @@ void sqlrcontroller_svr::registerForHandoff(const char *tmpdir) {
 				break;
 			}
 			handoffsockun.flushWriteBuffer(-1,-1);
-			deRegisterForHandoff(tmpdir);
+			deRegisterForHandoff();
 		}
 		snooze::macrosnooze(1);
 	}
@@ -1361,18 +1349,18 @@ void sqlrcontroller_svr::registerForHandoff(const char *tmpdir) {
 	delete[] handoffsockname;
 }
 
-void sqlrcontroller_svr::deRegisterForHandoff(const char *tmpdir) {
+void sqlrcontroller_svr::deRegisterForHandoff() {
 	
 	logDebugMessage("de-registering for handoff...");
 
 	// construct the name of the socket to connect to
-	size_t	removehandoffsocknamelen=charstring::length(tmpdir)+9+
+	size_t	removehandoffsocknamelen=tmpdir->getLength()+9+
 					charstring::length(cmdl->getId())+14+1;
 	char	*removehandoffsockname=new char[removehandoffsocknamelen];
 	charstring::printf(removehandoffsockname,
 				removehandoffsocknamelen,
 				"%s/sockets/%s-removehandoff",
-				tmpdir,cmdl->getId());
+				tmpdir->getString(),cmdl->getId());
 
 	size_t	stringlen=23+charstring::length(removehandoffsockname)+1;
 	char	*string=new char[stringlen];
@@ -5837,7 +5825,7 @@ void sqlrcontroller_svr::closeConnection() {
 
 	// deregister and close the handoff socket if necessary
 	if (connected) {
-		deRegisterForHandoff(tmpdir->getString());
+		deRegisterForHandoff();
 	}
 
 	// close the cursors
@@ -5891,13 +5879,13 @@ void sqlrcontroller_svr::deleteCursor(sqlrcursor_svr *curs) {
 	decrementOpenDatabaseCursors();
 }
 
-bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(
-					const char *tmpdir, const char *id) {
+bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(const char *id) {
 
-	size_t	idfilenamelen=charstring::length(tmpdir)+5+
+	size_t	idfilenamelen=tmpdir->getLength()+5+
 					charstring::length(id)+1;
 	char	*idfilename=new char[idfilenamelen];
-	charstring::printf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir,id);
+	charstring::printf(idfilename,idfilenamelen,"%s/ipc/%s",
+						tmpdir->getString(),id);
 
 	debugstr.clear();
 	debugstr.append("attaching to shared memory and semaphores ");

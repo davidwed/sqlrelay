@@ -58,9 +58,7 @@ class sqlrcontroller_svr : public rudiments::daemonprocess,
 						const char *tablename);
 		void		addTransactionTempTableForTrunc(
 						const char *tablename);
-		virtual bool	createSharedMemoryAndSemaphores(
-							const char *tmpdir,
-							const char *id);
+		virtual bool	createSharedMemoryAndSemaphores(const char *id);
 		void		cleanUpAllCursorData();
 
 		bool		getColumnNames(const char *query,
@@ -87,20 +85,15 @@ class sqlrcontroller_svr : public rudiments::daemonprocess,
 		void	incrementConnectionCount();
 		void	decrementConnectionCount();
 		void	decrementConnectedClientCount();
-		void	announceAvailability(const char *tmpdir,
-					const char *unixsocket,
-					uint16_t inetport,
-					const char *connectionid);
-		void	registerForHandoff(const char *tmpdir);
-		void	deRegisterForHandoff(const char *tmpdir);
-		bool	getUnixSocket(const char *tmpdir,
-						char *unixsocketptr);
-		bool	openSequenceFile(file *sockseq,
-						const char *tmpdir,
-						char *unixsocketptr);
+		void	announceAvailability(const char *unixsocket,
+						uint16_t inetport,
+						const char *connectionid);
+		void	registerForHandoff();
+		void	deRegisterForHandoff();
+		bool	getUnixSocket();
+		bool	openSequenceFile(file *sockseq);
 		bool	lockSequenceFile(file *sockseq);
-		bool	getAndIncrementSequenceNumber(file *sockseq,
-							char *unixsocketptr);
+		bool	getAndIncrementSequenceNumber(file *sockseq);
 		bool	unLockSequenceFile(file *sockseq);
 
 
@@ -386,7 +379,7 @@ class sqlrcontroller_svr : public rudiments::daemonprocess,
 		bool		dbselected;
 		char		*originaldb;
 
-		tempdir			*tmpdir;
+		tempdir		*tmpdir;
 
 		connectstringcontainer	*constr;
 
@@ -395,6 +388,7 @@ class sqlrcontroller_svr : public rudiments::daemonprocess,
 		uint16_t	inetport;
 		char		*unixsocket;
 		char		*unixsocketptr;
+		size_t		unixsocketptrlen;
 
 		uint16_t	sendcolumninfo;
 

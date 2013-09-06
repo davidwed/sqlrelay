@@ -311,8 +311,8 @@ void sqlrlistener::setHandoffMethod(const char *id) {
         	// on some OS'es, force proxy, even if pass was specified...
 
         	// get the os and version
-        	char    *os=rudiments::system::getOperatingSystemName();
-        	char    *rel=rudiments::system::getOperatingSystemRelease();
+        	char    *os=system::getOperatingSystemName();
+        	char    *rel=system::getOperatingSystemRelease();
         	double  ver=charstring::toFloat(rel);
 	
         	// force proxy for Cygwin and Linux < 2.2
