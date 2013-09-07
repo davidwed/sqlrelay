@@ -7,13 +7,12 @@
 #include <rudiments/charstring.h>
 #include <rudiments/error.h>
 #include <rudiments/stdio.h>
+#include <rudiments/null.h>
 #include <cmdline.h>
 #include <datatypes.h>
 #include <defines.h>
 #include <config.h>
 
-// for NULL
-#include <stddef.h>
 
 class status : public sqlrcontroller_svr {
 	public:

@@ -15,6 +15,7 @@
 #include <sqlrconnection.h>
 #include <rudiments/charstring.h>
 #include <rudiments/stdio.h>
+#include <rudiments/null.h>
 
 #include <datatypes.h>
 
@@ -22,11 +23,11 @@
 	#include <iodbcinst.h>
 #endif
 
-// for NULL
-#include <stddef.h>
-
 // for perror
 #include <stdio.h>
+
+// for malloc/free
+#include <stdlib.h>
 
 #define FETCH_AT_ONCE		10
 #define MAX_SELECT_LIST_SIZE	256

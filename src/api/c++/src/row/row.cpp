@@ -3,9 +3,7 @@
 
 #include <sqlrelay/private/sqlrdefines.h>
 #include <sqlrelay/private/row.h>
-
-// for NULL
-#include <stddef.h>
+#include <rudiments/null.h>
 
 #include <config.h>
 

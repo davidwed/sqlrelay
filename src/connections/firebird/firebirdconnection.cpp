@@ -7,6 +7,7 @@
 #include <rudiments/rawbuffer.h>
 #include <rudiments/snooze.h>
 #include <rudiments/system.h>
+#include <rudiments/null.h>
 
 #include <datatypes.h>
 #include <config.h>
@@ -15,9 +16,6 @@
 
 // for pow()
 #include <math.h>
-
-// for NULL
-#include <stddef.h>
 
 // for struct tm
 #include <time.h>
@@ -600,12 +598,14 @@ firebirdcursor::firebirdcursor(sqlrconnection_svr *conn) :
 						sqlrcursor_svr(conn) {
 	firebirdconn=(firebirdconnection *)conn;
 
-	outsqlda=(XSQLDA ISC_FAR *)malloc(XSQLDA_LENGTH(MAX_SELECT_LIST_SIZE));
+	outsqlda=(XSQLDA ISC_FAR *)new unsigned char[
+					XSQLDA_LENGTH(MAX_SELECT_LIST_SIZE)];
 	outsqlda->version=SQLDA_VERSION1;
 	outsqlda->sqln=(MAX_SELECT_LIST_SIZE>MAX_BIND_VARS)?
 				MAX_SELECT_LIST_SIZE:MAX_BIND_VARS;
 
-	insqlda=(XSQLDA ISC_FAR *)malloc(XSQLDA_LENGTH(MAX_BIND_VARS));
+	insqlda=(XSQLDA ISC_FAR *)new unsigned char[
+					XSQLDA_LENGTH(MAX_BIND_VARS)];
 	insqlda->version=SQLDA_VERSION1;
 	insqlda->sqln=MAX_BIND_VARS;
 
@@ -618,8 +618,8 @@ firebirdcursor::firebirdcursor(sqlrconnection_svr *conn) :
 }
 
 firebirdcursor::~firebirdcursor() {
-	free(outsqlda);
-	free(insqlda);
+	delete[] outsqlda;
+	delete[] insqlda;
 }
 
 bool firebirdcursor::prepareQuery(const char *query, uint32_t length) {

@@ -7,6 +7,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/regularexpression.h>
+#include <rudiments/null.h>
 
 #include <datatypes.h>
 #include <config.h>
@@ -15,9 +16,6 @@
 #if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=32200
 	#include <errmsg.h>
 #endif
-
-// for NULL
-#include <stddef.h>
 
 #ifndef TRUE
 #define TRUE (1)

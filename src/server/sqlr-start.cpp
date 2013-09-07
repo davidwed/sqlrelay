@@ -14,6 +14,9 @@
 // for FILE, popen, feof, fgetc, pclose
 #include <stdio.h>
 
+// for system()
+#include <stdlib.h>
+
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif

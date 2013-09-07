@@ -6,9 +6,7 @@
 #include <rudiments/stringbuffer.h>
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
-
-// for NULL
-#include <stddef.h>
+#include <rudiments/null.h>
 
 #include <defines.h>
 #include <defaults.h>

@@ -8,6 +8,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/stdio.h>
+#include <rudiments/null.h>
 
 #include <config.h>
 #include <datatypes.h>
@@ -15,9 +16,6 @@
 extern "C" {
 	#include <ctpublic.h>
 }
-
-// for NULL
-#include <stddef.h>
 
 #define FETCH_AT_ONCE		10
 #define MAX_SELECT_LIST_SIZE	256

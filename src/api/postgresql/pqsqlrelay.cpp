@@ -19,6 +19,7 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 #include <rudiments/character.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
+#include <rudiments/null.h>
 
 #define NEED_DATATYPESTRING	1
 #include <datatypes.h>
@@ -26,8 +27,8 @@ THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, B
 // for fprintf
 #include <stdio.h>
 
-// for NULL
-#include <stddef.h>
+// for malloc/calloc/free
+#include <stdlib.h>
 
 extern "C" {
 

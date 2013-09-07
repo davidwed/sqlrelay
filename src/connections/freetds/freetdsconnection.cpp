@@ -9,6 +9,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/stdio.h>
+#include <rudiments/null.h>
 
 #include <datatypes.h>
 #include <config.h>
@@ -20,9 +21,6 @@ extern "C" {
 #ifdef HAVE_FREETDS_H
 	#include <tdsver.h>
 #endif
-
-// for NULL
-#include <stddef.h>
 
 #ifndef HAVE_FREETDS_FUNCTION_DEFINITIONS
 // in freetds prior to 0.61, the cs_ functions are not defined in any header

@@ -6,13 +6,11 @@
 #include <rudiments/rawbuffer.h>
 #include <rudiments/character.h>
 #include <rudiments/regularexpression.h>
+#include <rudiments/null.h>
 
 #include <datatypes.h>
 
 #include <sqlrelay/sqlrclient.h>
-
-// for NULL
-#include <stddef.h>
 
 #define FETCH_AT_ONCE	10
 

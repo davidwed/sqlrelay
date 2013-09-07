@@ -8,13 +8,11 @@
 	#include <rudiments/file.h>
 #endif
 #include <rudiments/system.h>
+#include <rudiments/null.h>
 
 #include <datatypes.h>
 
 #include <libpq-fe.h>
-
-// for NULL
-#include <stddef.h>
 
 class postgresqlconnection : public sqlrconnection_svr {
 	friend class postgresqlcursor;
