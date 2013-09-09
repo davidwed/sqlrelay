@@ -146,6 +146,11 @@ void temptablessybaseize::mapSelectIntoTableName(sqlrconnection_svr *sqlrcon,
 		return;
 	}
 
+	// temporary...
+	// (might not exist if we're using sybase/mssql)
+	xmldomnode	*temporarynode=
+			selectintonode->getFirstTagChild(sqlparser::_temporary);
+
 	// table database...
 	node=selectintonode->getFirstTagChild(sqlparser::_table_name_database);
 	const char	*database=node->getAttributeValue(sqlparser::_value);
@@ -161,12 +166,15 @@ void temptablessybaseize::mapSelectIntoTableName(sqlrconnection_svr *sqlrcon,
 	}
 	const char	*oldtable=node->getAttributeValue(sqlparser::_value);
 
-	// FIXME: verify that this is actually a temp table, select into can
-	// be used with regular tables too
+	// Bail if this is not a temp table.  Select into can be used with
+	// regular tables too.
 	//
-	// only postgresql and sybase/mssqlserver support select into's.
-	// postgresql qualifies the table name with temp or temporary and
-	// sybase/mssqlserver temp table names start with #'s
+	// Only postgresql and sybase/mssqlserver support "select into table"'s.
+	// Postgresql qualifies the table name with temp or temporary and
+	// sybase/mssqlserver temp table names start with #'s.
+	if (temporarynode->isNullNode() && oldtable[0]!='#') {
+		return;
+	}
 
 	// create a sybase-ized name and put it in the map...
 	databaseobject	*oldtabledbo=sqlts->createDatabaseObject(
@@ -174,6 +182,11 @@ void temptablessybaseize::mapSelectIntoTableName(sqlrconnection_svr *sqlrcon,
 						database,schema,oldtable,NULL);
 	const char	*newtable=generateTempTableName(oldtable);
 	sqlts->temptablemap.setData(oldtabledbo,(char *)newtable);
+
+	// remove the temporary qualifier
+	if (!temporarynode->isNullNode()) {
+		selectintonode->deleteChild(temporarynode);
+	}
 
 	// add table name to drop-at-session-end list
 	// (skip the leading #, it will be added by the
