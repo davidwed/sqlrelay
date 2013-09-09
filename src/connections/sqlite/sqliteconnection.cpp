@@ -28,6 +28,7 @@ extern "C" {
 #endif
 
 #ifndef HAVE_SQLITE3_MALLOC
+	#include <stdlib.h>
 	#define sqlite3_malloc			malloc
 #endif
 
@@ -215,7 +216,11 @@ const char *sqliteconnection::dbVersion() {
 }
 
 const char *sqliteconnection::dbHostName() {
-	return system::getHostName();
+	// Some versions of sqlite don't define sqlite3_malloc so we have to
+	// use regular malloc.  To do that we have to include stdlib.h which
+	// defines a function system().  To prevent collisions with that
+	// function we have to fully qualify the system class here.
+	return rudiments::system::getHostName();
 }
 
 const char *sqliteconnection::getDatabaseListQuery(bool wild) {
