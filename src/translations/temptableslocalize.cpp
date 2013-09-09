@@ -28,6 +28,10 @@ class temptableslocalize : public sqltranslation {
 		void		mapCreateIndexOnTemporaryTableName(
 						xmldomnode *query,
 						const char *uniqueid);
+		void		mapSelectIntoTableName(
+						sqlrconnection_svr *sqlrcon,
+						xmldomnode *query,
+						const char *uniqueid);
 		const char	*generateTempTableName(const char *oldtable,
 							const char *uniqueid);
 		bool		replaceTempNames(xmldomnode *node);
@@ -57,6 +61,10 @@ bool temptableslocalize::run(sqlrconnection_svr *sqlrcon,
 	// index name, come up with a session-local name for it and put it in
 	// the map...
 	mapCreateIndexOnTemporaryTableName(querytree->getRootNode(),uniqueid);
+
+	// for "select ... into table ..." queries, find the table name,
+	// come up with a session-local name for it and put it in the map...
+	mapSelectIntoTableName(sqlrcon,querytree->getRootNode(),uniqueid);
 
 	// for all queries, look for table name nodes and apply the mapping
 	return replaceTempNames(querytree->getRootNode());
@@ -136,30 +144,6 @@ void temptableslocalize::mapCreateTemporaryTableName(
 	sqlrcon->cont->addSessionTempTableForDrop(newtable);
 }
 
-const char *temptableslocalize::generateTempTableName(const char *oldtable,
-							const char *uniqueid) {
-	debugFunction();
-
-	// get the process id
-	uint64_t	pid=process::getProcessId();
-
-	// calculate the size we need to store the new table name
-	uint64_t	size=charstring::length(oldtable)+1+
-				charstring::length(uniqueid)+1+
-				charstring::integerLength(pid)+1;
-
-	// allocate storage for the new table name
-	char	*newtable=(char *)sqlts->temptablepool->malloc(size);
-
-	// build up the new table name
-	charstring::copy(newtable,oldtable);
-	charstring::append(newtable,"_");
-	charstring::append(newtable,uniqueid);
-	charstring::append(newtable,"_");
-	charstring::append(newtable,pid);
-	return newtable;
-}
-
 void temptableslocalize::mapCreateIndexOnTemporaryTableName(xmldomnode *node,
 							const char *uniqueid) {
 	debugFunction();
@@ -226,6 +210,78 @@ void temptableslocalize::mapCreateIndexOnTemporaryTableName(xmldomnode *node,
 						newtable);
 	const char	*newindex=generateTempTableName(oldindex,uniqueid);
 	sqlts->tempindexmap.setData(oldindexdbo,(char *)newindex);
+}
+
+void temptableslocalize::mapSelectIntoTableName(sqlrconnection_svr *sqlrcon,
+							xmldomnode *node,
+							const char *uniqueid) {
+	debugFunction();
+
+	// select query
+	xmldomnode	*selectnode=
+			node->getFirstTagChild(sqlparser::_select);
+	if (selectnode->isNullNode()) {
+		return;
+	}
+
+	// select into
+	xmldomnode	*selectintonode=
+			selectnode->getFirstTagChild(sqlparser::_select_into);
+	if (selectintonode->isNullNode()) {
+		return;
+	}
+
+	// table database...
+	node=selectintonode->getFirstTagChild(sqlparser::_table_name_database);
+	const char	*database=node->getAttributeValue(sqlparser::_value);
+
+	// table schema...
+	node=selectintonode->getFirstTagChild(sqlparser::_table_name_schema);
+	const char	*schema=node->getAttributeValue(sqlparser::_value);
+
+	// table name...
+	node=selectintonode->getFirstTagChild(sqlparser::_table_name_table);
+	if (node->isNullNode()) {
+		return;
+	}
+	const char	*oldtable=node->getAttributeValue(sqlparser::_value);
+
+	// FIXME: verify that this is actually a temp table, select into can
+	// be used with regular tables too
+
+	// create a session-local name and put it in the map...
+	databaseobject	*oldtabledbo=sqlts->createDatabaseObject(
+						sqlts->temptablepool,
+						database,schema,oldtable,NULL);
+	const char	*newtable=generateTempTableName(oldtable,uniqueid);
+	sqlts->temptablemap.setData(oldtabledbo,(char *)newtable);
+
+	// add table name to drop-at-session-end list
+	sqlrcon->cont->addSessionTempTableForDrop(newtable);
+}
+
+const char *temptableslocalize::generateTempTableName(const char *oldtable,
+							const char *uniqueid) {
+	debugFunction();
+
+	// get the process id
+	uint64_t	pid=process::getProcessId();
+
+	// calculate the size we need to store the new table name
+	uint64_t	size=charstring::length(oldtable)+1+
+				charstring::length(uniqueid)+1+
+				charstring::integerLength(pid)+1;
+
+	// allocate storage for the new table name
+	char	*newtable=(char *)sqlts->temptablepool->malloc(size);
+
+	// build up the new table name
+	charstring::copy(newtable,oldtable);
+	charstring::append(newtable,"_");
+	charstring::append(newtable,uniqueid);
+	charstring::append(newtable,"_");
+	charstring::append(newtable,pid);
+	return newtable;
 }
 
 bool temptableslocalize::replaceTempNames(xmldomnode *node) {

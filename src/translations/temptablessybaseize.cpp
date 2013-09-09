@@ -161,6 +161,9 @@ void temptablessybaseize::mapSelectIntoTableName(sqlrconnection_svr *sqlrcon,
 	}
 	const char	*oldtable=node->getAttributeValue(sqlparser::_value);
 
+	// FIXME: verify that this is actually a temp table, select into can
+	// be used with regular tables too
+
 	// create a sybase-ized name and put it in the map...
 	databaseobject	*oldtabledbo=sqlts->createDatabaseObject(
 						sqlts->temptablepool,
