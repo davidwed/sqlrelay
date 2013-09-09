@@ -248,6 +248,10 @@ void temptableslocalize::mapSelectIntoTableName(sqlrconnection_svr *sqlrcon,
 
 	// FIXME: verify that this is actually a temp table, select into can
 	// be used with regular tables too
+	//
+	// only postgresql and sybase/mssqlserver support select into's.
+	// postgresql qualifies the table name with temp or temporary and
+	// sybase/mssqlserver temp table names start with #'s
 
 	// create a session-local name and put it in the map...
 	databaseobject	*oldtabledbo=sqlts->createDatabaseObject(
