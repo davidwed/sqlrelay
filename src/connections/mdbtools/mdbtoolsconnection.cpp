@@ -158,8 +158,8 @@ const char *mdbtoolsconnection::dbVersion() {
 }
 
 const char *mdbtoolsconnection::dbHostName() {
-	// some mdbtools headers include stdio.h which defines system()
-	// so we have to fully qualify the system class here
+	// some mdbtools headers include stdlib.h which defines a system()
+	// function, so we have to fully qualify the system class here
 	return rudiments::system::getHostName();
 }
 

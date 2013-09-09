@@ -20,11 +20,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-// for exec
-#ifdef HAVE_UNISTD_H
-	#include <unistd.h>
-#endif
-
 #ifdef RUDIMENTS_NAMESPACE
 using namespace rudiments;
 #endif
@@ -395,37 +390,36 @@ pid_t scaler::openOneConnection() {
 	charstring::printf(ttlstr,20,"%d",ttl);
 	ttlstr[19]='\0';
 
-	int	p=0;
-	char	*argv[20];
-	// execvp wants char* (arghh!)
-	argv[p++]=(char *)"sqlr-connection";
-	argv[p++]=(char *)"-silent";
-	argv[p++]=(char *)"-nodetach";
-	argv[p++]=(char *)"-ttl";
-	argv[p++]=(char *)ttlstr;
-	argv[p++]=(char *)"-id";
-	argv[p++]=(char *)id;
-	argv[p++]=(char *)"-connectionid";
-	argv[p++]=(char *)connectionid;
-	argv[p++]=(char *)"-config";
-	argv[p++]=config;
+	uint16_t	p=0;
+	const char	*args[20];
+	args[p++]="sqlr-connection";
+	args[p++]="-silent";
+	args[p++]="-nodetach";
+	args[p++]="-ttl";
+	args[p++]=ttlstr;
+	args[p++]="-id";
+	args[p++]=id;
+	args[p++]="-connectionid";
+	args[p++]=connectionid;
+	args[p++]="-config";
+	args[p++]=config;
 	if (charstring::length(cmdl->getLocalStateDir())) {
-		argv[p++]=(char *)"-localstatedir";
-		argv[p++]=(char *)cmdl->getLocalStateDir();
+		args[p++]="-localstatedir";
+		args[p++]=cmdl->getLocalStateDir();
 	}
-	argv[p++]=(char *)"-scaler";
+	args[p++]="-scaler";
 	if (debug) {
-		argv[p++]=(char *)"-debug";
+		args[p++]="-debug";
 	}
-	argv[p++]=NULL; // the last
+	args[p++]=NULL; // the last
 
 	pid_t	pid=process::fork();
 
 	if (pid==0) {
 		// child
-		int	ret=execvp(command,argv);
+		bool	ret=process::exec(command,args);
 		stderror.printf("Bad command %s\n",command);
-		process::exit(ret);
+		process::exit(!ret);
 	} else if (pid==-1) {
 		// error
 		stderror.printf("fork() returned %ld [%d]\n",
