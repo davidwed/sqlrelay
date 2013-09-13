@@ -492,22 +492,33 @@ const char *routerconnection::identify() {
 }
 
 const char *routerconnection::dbVersion() {
-	// FIXME: return SQL Relay version?
-	return "";
+	if (!cur) {
+		// try to find a usable connection
+		for (uint16_t index=0; !cur && index<concount; index++) {
+			cur=cons[index];
+		}
+	}
+	return (cur)?cur->dbVersion():NULL;
 }
 
 const char *routerconnection::dbHostName() {
 	if (!cur) {
-		cur=cons[0];
+		// try to find a usable connection
+		for (uint16_t index=0; !cur && index<concount; index++) {
+			cur=cons[index];
+		}
 	}
-	return cur->dbHostName();
+	return (cur)?cur->dbHostName():NULL;
 }
 
 const char *routerconnection::dbIpAddress() {
 	if (!cur) {
-		cur=cons[0];
+		// try to find a usable connection
+		for (uint16_t index=0; !cur && index<concount; index++) {
+			cur=cons[index];
+		}
 	}
-	return cur->dbIpAddress();
+	return (cur)?cur->dbIpAddress():NULL;
 }
 
 bool routerconnection::ping() {
@@ -1034,7 +1045,7 @@ void routercursor::errorMessage(char *errorbuffer,
 	*errorlength=charstring::length(errormessage);
 	charstring::safeCopy(errorbuffer,errorbufferlength,
 					errormessage,*errorlength);
-	*errorcode=cur->errorNumber();
+	*errorcode=(cur)?cur->errorNumber():0;
 	// FIXME: detect downed database or downed relay
 	*liveconnection=true;
 }

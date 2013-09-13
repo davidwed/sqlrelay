@@ -74,8 +74,8 @@ int main(int argc, const char **argv) {
 	cont->handleSignals(shutDown);
 
 	// open the connection to the db
-	bool	result=false;
-	if ((result=cont->init(argc,argv))) {
+	bool	result=cont->init(argc,argv);
+	if (result) {
 		// wait for client connections
 		result=cont->listen();
 	}
