@@ -18,6 +18,7 @@
 	added handling for "select into" queries to
 		temptableslocalize/sybaseize translations
 	fixed various crashes that could occur when a query filter was used
+	updated the query routing and filtering doc
 
 0.51 - fixed minor perl DBI driver documentation issue
 	added support for oracle 12c

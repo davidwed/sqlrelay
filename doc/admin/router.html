@@ -134,11 +134,11 @@ separate machines.</p>
                 <font color="#008b8b">&lt;</font><font color="#008b8b">router</font><font color="#008b8b">&gt;</font>
                         <font color="#0000ff">&lt;!</font><font color="#0000ff">-- send all DML/DDL queries to &quot;master&quot;  --</font><font color="#0000ff">&gt;</font>
                         <font color="#008b8b">&lt;</font><font color="#008b8b">route</font><font color="#008b8b"> </font><font color="#2e8b57"><b>host</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/master.socket&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;masteruser&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;masterpassword&quot;</font><font color="#008b8b">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^\s*insert\s+into\s+&quot;</font><font color="#008b8b">/&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^\s*update\s+&quot;</font><font color="#008b8b">/&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^\s*delete\s+from\s+&quot;</font><font color="#008b8b">/&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^\s*drop\s+table\s+&quot;</font><font color="#008b8b">/&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^\s*create\s+table\s+&quot;</font><font color="#008b8b">/&gt;</font>
+                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^drop &quot;</font><font color="#008b8b">/&gt;</font>
+                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^create &quot;</font><font color="#008b8b">/&gt;</font>
+                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^insert &quot;</font><font color="#008b8b">/&gt;</font>
+                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^update &quot;</font><font color="#008b8b">/&gt;</font>
+                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^delete &quot;</font><font color="#008b8b">/&gt;</font>
                         <font color="#008b8b">&lt;/route&gt;</font>
                         <font color="#0000ff">&lt;!</font><font color="#0000ff">-- send all other queries to &quot;slave&quot; --</font><font color="#0000ff">&gt;</font>
                         <font color="#008b8b">&lt;</font><font color="#008b8b">route</font><font color="#008b8b"> </font><font color="#2e8b57"><b>host</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/slave.socket&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;slaveuser&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;slavepassword&quot;</font><font color="#008b8b">&gt;</font>
@@ -200,11 +200,11 @@ all queries containing "postgresqldb." to the PostgreSQL database.</p>
                 <font color="#008b8b">&lt;</font><font color="#008b8b">router</font><font color="#008b8b">&gt;</font>
                         <font color="#0000ff">&lt;!</font><font color="#0000ff">-- send all mysqldb queries to &quot;mysqldb&quot; --</font><font color="#0000ff">&gt;</font>
                         <font color="#008b8b">&lt;</font><font color="#008b8b">route</font><font color="#008b8b"> </font><font color="#2e8b57"><b>host</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/mysqldb.socket&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;mysqldbuser&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;mysqldbpassword&quot;</font><font color="#008b8b">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;+\smysqldb\.&quot;</font><font color="#008b8b">/&gt;</font>
+                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;mysqldb\.&quot;</font><font color="#008b8b">/&gt;</font>
                         <font color="#008b8b">&lt;/route&gt;</font>
                         <font color="#0000ff">&lt;!</font><font color="#0000ff">-- send all postgresqldb queries to &quot;postgresqldb&quot; --</font><font color="#0000ff">&gt;</font>
                         <font color="#008b8b">&lt;</font><font color="#008b8b">route</font><font color="#008b8b"> </font><font color="#2e8b57"><b>host</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/postgresqldb.socket&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;postgresqldbuser&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;postgresqldbpassword&quot;</font><font color="#008b8b">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;+\spostgresqldb\.&quot;</font><font color="#008b8b">/&gt;</font>
+                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;postgresqldb\.&quot;</font><font color="#008b8b">/&gt;</font>
                         <font color="#008b8b">&lt;/route&gt;</font>
                 <font color="#008b8b">&lt;/router&gt;</font>
         <font color="#008b8b">&lt;/instance&gt;</font>
@@ -248,7 +248,7 @@ filtered out.</p>
                 <font color="#008b8b">&lt;</font><font color="#008b8b">router</font><font color="#008b8b">&gt;</font>
                         <font color="#0000ff">&lt;!</font><font color="#0000ff">-- filter out selects containing table1 and table3 --</font><font color="#0000ff">&gt;</font>
                         <font color="#008b8b">&lt;</font><font color="#008b8b">filter</font><font color="#008b8b">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^\s*select\s+.*(table1(\s+|,).*table3(\s+|,|$))|(table3(\s+|,).*table1(\s+|,|$))&quot;</font><font color="#008b8b">/&gt;</font>
+                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^select .* (table1.*table3|table3.*table1)&quot;</font><font color="#008b8b">/&gt;</font>
                         <font color="#008b8b">&lt;/filter&gt;</font>
                         <font color="#0000ff">&lt;!</font><font color="#0000ff">-- send any other queries to &quot;mysqldb&quot; --</font><font color="#0000ff">&gt;</font>
                         <font color="#008b8b">&lt;</font><font color="#008b8b">route</font><font color="#008b8b"> </font><font color="#2e8b57"><b>host</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/mysqldb.socket&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;mysqldbuser&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;mysqldbpassword&quot;</font><font color="#008b8b">&gt;</font>
@@ -295,17 +295,17 @@ clause.</span>
 <font color="#0000ff">                                specified patterns --</font><font color="#0000ff">&gt;</font>
                         <font color="#008b8b">&lt;</font><font color="#008b8b">route</font><font color="#008b8b"> </font><font color="#2e8b57"><b>host</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>socket</b></font>=<font color="#ff00ff">&quot;/tmp/mysqldb.socket&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;mysqldbuser&quot;</font><font color="#008b8b"> </font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;mysqldbpassword&quot;</font><font color="#008b8b">&gt;</font>
                                 <font color="#0000ff">&lt;!</font><font color="#0000ff">-- allow creates --</font><font color="#0000ff">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^\s*create\s+table\s+&quot;</font><font color="#008b8b">/&gt;</font>
+                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^create &quot;</font><font color="#008b8b">/&gt;</font>
                                 <font color="#0000ff">&lt;!</font><font color="#0000ff">-- allow drops --</font><font color="#0000ff">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^\s*drop\s+table\s+&quot;</font><font color="#008b8b">/&gt;</font>
+                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^drop &quot;</font><font color="#008b8b">/&gt;</font>
                                 <font color="#0000ff">&lt;!</font><font color="#0000ff">-- allow inserts --</font><font color="#0000ff">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^\s*insert\s+into\s+&quot;</font><font color="#008b8b">/&gt;</font>
+                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^insert &quot;</font><font color="#008b8b">/&gt;</font>
                                 <font color="#0000ff">&lt;!</font><font color="#0000ff">-- allow deletes --</font><font color="#0000ff">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^\s*delete\s+from\s+&quot;</font><font color="#008b8b">/&gt;</font>
+                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^delete &quot;</font><font color="#008b8b">/&gt;</font>
                                 <font color="#0000ff">&lt;!</font><font color="#0000ff">-- allow updates --</font><font color="#0000ff">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^\s*update\s+&quot;</font><font color="#008b8b">/&gt;</font>
+                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^update &quot;</font><font color="#008b8b">/&gt;</font>
                                 <font color="#0000ff">&lt;!</font><font color="#0000ff">-- allow selects with a where clause --</font><font color="#0000ff">&gt;</font>
-                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^\s*select\s+.*\s+from\s+.*\s+where\s+&quot;</font><font color="#008b8b">/&gt;</font>
+                                <font color="#008b8b">&lt;</font><font color="#008b8b">query</font><font color="#008b8b"> </font><font color="#2e8b57"><b>pattern</b></font>=<font color="#ff00ff">&quot;^select .* from .* where &quot;</font><font color="#008b8b">/&gt;</font>
                         <font color="#008b8b">&lt;/route&gt;</font>
                         <font color="#0000ff">&lt;!</font><font color="#0000ff">-- all other queries will be filtered out --</font><font color="#0000ff">&gt;</font>
                         <font color="#008b8b">&lt;</font><font color="#008b8b">filter</font><font color="#008b8b">&gt;</font>
@@ -319,6 +319,64 @@ clause.</span>
 </blockquote>
 
 <span class="heading1">Quirks and Limitations</span>
+
+<br><br>
+<span class="heading2">Query Normalization</span>
+
+<p>To make pattern matching easier, SQL Relay "normalizes" the query before
+matching it against the pattern.  The original query is run against the database
+but when matched against the pattern, whitespace is compresssed and the entire
+query is converted to lower-case.</p>
+
+<p>When matching query operators, you must use lower-cased versions of them such
+as "select", "insert", "and", "or", etc.  When matching table names, you must
+use a lower-cased version of the table-name.</p>
+
+<br><br>
+<span class="heading2">Examples are Limited</span>
+
+<p>The examples above are good introductions, but don't cover every scenario.
+For example, they expect the query to begin at the beginning of a line with
+no preceeding comments or spaces.  You may have to write more complex patterns
+for your applications.</p>
+
+<br><br>
+<span class="heading2">Perl Compatible Regular Expressions</span>
+
+<p>SQL Relay is built upon the Rudiments library.  Rudiments can be built with
+or without support for libpcre which provides support for Perl Compatible
+Regular Expressions.  PCRE's are more powerful than standard posix regular
+expressions and have many more operators.</p>
+
+<p>As such, if you copy an sqlrelay.conf file from a machine where Rudiments was
+compiled with PCRE support to a machine where Rudiments wasn't compiled with
+PCRE support, then it's possible that your patterns may not work on the new
+machine.</p>
+
+<p>To make matters worse, sufficiently old versions of the posix regular
+expression functions had fewer operators than modern versions.  So, even if
+Rudiments isn't using PCRE's, it's not impossible that after copying a
+sqlrelay.conf file from a fairly modern OS to an antique, the patterns won't
+work on the antique machine either.</p>
+
+<p>The examples above ought to work with PCRE's and all versions of posix
+regular expressions.</p>
+
+<br><br>
+<span class="heading2">Selects Not Showing Changes</span>
+
+<p>In the scenario above where DML/DDL is sent to the master database and
+selects are distributed over slaves, an unintuitive thing can happen.</p>
+
+<p>If you begin a transaction and do several inserts, updates and deletes,
+you'll find that if you do a select, you will not see your changes.  This is
+because in a master-slave configuration, changes to the database are not
+pushed out to the slaves until the changes have been committed.  Since your
+selects are being run against the slaves, you must first commit before your
+changes will be visible.</p>
+
+<br><br>
+<span class="heading2">Commits and Rollbacks</span>
 
 <p>Behind the scenes, the router maintains parallel transactions on each of the
 databases that it is routing queries to.  When the client issues a begin, commit
@@ -358,19 +416,28 @@ be run against Oracle.  Conversely, if your client application is using a router
 which only routes queries over a set of Oracle databases, then you do not have
 to use "begin" queries.</p>
 
-<p>Since each query is only sent to a single database it's not possible to
-join tables residing on different databases.  However, a limited version of
-this feature is planned.</p>
-
-<p>SQL Relay's query routing feature does not yet support sending a single
-query to multiple databases and merging the result sets.  But this feature is
-planned.</p>
+<br><br>
+<span class="heading2">Stored Procedures</span>
 
 <p>It's possible to use stored procedures with SQL Relay's query routing
 feature.  However, since stored procedures are run on the database, SQL Relay
 can't route the individual queries run inside the stored procedure.  So, the
 stored procedure and all queries run inside of it will be run against whichever
 database it was routed to.</p>
+
+<br><br>
+<span class="heading2">Cross-Database Joins</span>
+
+<p>Since each query is only sent to a single database it's not possible to
+join tables residing on different databases.  However, a limited version of
+this feature is planned.</p>
+
+<br><br>
+<span class="heading2">Merged Result Sets</span>
+
+<p>SQL Relay's query routing feature does not yet support sending a single
+query to multiple databases and merging the result sets.  But this feature is
+planned.</p>
 
 </body>
 </html>
