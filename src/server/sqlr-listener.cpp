@@ -16,7 +16,7 @@ void shutDown(int32_t signum) {
 	process::exit(0);
 }
 
-int	main(int argc, const char **argv) {
+int main(int argc, const char **argv) {
 
 	#include <version.h>
 
