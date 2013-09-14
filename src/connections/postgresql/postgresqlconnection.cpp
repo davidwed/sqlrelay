@@ -344,7 +344,7 @@ const char *postgresqlconnection::dbVersion() {
 #else
 	PGresult	*result=PQexec(pgconn,"select version()");
 	if (result==(PGresult *)NULL) {
-		return false;
+		return NULL;
 	}
 
 	const char	*versionstring=PQgetvalue(result,0,0);
