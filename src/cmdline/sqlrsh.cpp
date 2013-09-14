@@ -145,6 +145,9 @@ class	sqlrsh {
 					sqlrcursor *sqlrcur, sqlrshenv *env, 
 					const char *filename, bool returnerror,
 					bool displaycommand);
+		bool	runCommands(sqlrconnection *sqlrcon,
+					sqlrcursor *sqlrcur, sqlrshenv *env, 
+					const char *commands);
 		bool	getCommandFromFileOrString(file *fl,
 					const char *string,
 					const char **stringpos,
@@ -262,18 +265,21 @@ void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		for (;;) {
 		
 			// get a command
-			stringbuffer	cmd;
+			stringbuffer	command;
 			if (!getCommandFromFileOrString(
-					&scriptfile,NULL,NULL,&cmd,env)) {
+					&scriptfile,NULL,NULL,&command,env)) {
 				break;
 			}
 
 			if (displaycommand) {
-				stdoutput.printf("%s\n",cmd.getString());
+				stdoutput.printf("%s\n",command.getString());
 			}
 
 			// run the command
-			runCommand(sqlrcon,sqlrcur,env,cmd.getString());
+			if (!runCommand(sqlrcon,sqlrcur,env,
+						command.getString())) {
+				break;
+			}
 		}
 
 		// close the file
@@ -288,6 +294,22 @@ void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	}
 
 	delete[] trimmedfilename;
+}
+
+bool sqlrsh::runCommands(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
+					sqlrshenv *env, const char *commands) {
+	const char	*nextcommand=commands;
+	for (;;) {
+		stringbuffer	command;
+		if (!getCommandFromFileOrString(
+				NULL,nextcommand,&nextcommand,&command,env)) {
+			break;
+		}
+		if (!runCommand(sqlrcon,sqlrcur,env,command.getString())) {
+			return false;
+		}
+	}
+	return true;
 }
 
 bool sqlrsh::getCommandFromFileOrString(file *fl,
@@ -393,6 +415,7 @@ bool sqlrsh::runCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		externalCommand(sqlrcon,sqlrcur,env,command);
 		return true;
 	} else {
+		// exit
 		return false;
 	}
 }
@@ -1532,7 +1555,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		charstring::bothTrim(cmd);
 
 		// run the command
-		if (!runCommand(sqlrcon,sqlrcur,env,cmd)) {	
+		if (!runCommands(sqlrcon,sqlrcur,env,cmd)) {
 			exitprogram=1;
 		}
 
@@ -1627,14 +1650,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 		runScript(&sqlrcon,&sqlrcur,&env,script,true,false);
 	} else if (charstring::length(command)) {
 		// if a command was specified, run it
-		for (;;) {
-			stringbuffer	cmd;
-			if (!getCommandFromFileOrString(
-					NULL,command,&command,&cmd,&env)) {
-				break;
-			}
-			runCommand(&sqlrcon,&sqlrcur,&env,cmd.getString());
-		}
+		runCommands(&sqlrcon,&sqlrcur,&env,command);
 	} else {
 		// otherwise go into interactive mode
 		startupMessage(&env,host,port,user);
