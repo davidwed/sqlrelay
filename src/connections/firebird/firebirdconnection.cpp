@@ -6,7 +6,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/snooze.h>
-#include <rudiments/system.h>
+#include <rudiments/sys.h>
 #include <rudiments/null.h>
 
 #include <datatypes.h>
@@ -241,7 +241,7 @@ void firebirdconnection::handleConnectString() {
 	if (colon) {
 		host=charstring::duplicate(database,colon-database);
 	} else {
-		host=charstring::duplicate(system::getHostName());
+		host=charstring::duplicate(sys::getHostName());
 	}
 
 	const char	*dialectstr=cont->connectStringValue("dialect");

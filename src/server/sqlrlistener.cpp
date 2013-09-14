@@ -15,7 +15,7 @@
 #include <rudiments/error.h>
 #include <rudiments/datetime.h>
 #include <rudiments/logger.h>
-#include <rudiments/system.h>
+#include <rudiments/sys.h>
 #include <rudiments/stdio.h>
 
 #ifndef MAXPATHLEN
@@ -311,8 +311,8 @@ void sqlrlistener::setHandoffMethod(const char *id) {
         	// on some OS'es, force proxy, even if pass was specified...
 
         	// get the os and version
-        	char    *os=system::getOperatingSystemName();
-        	char    *rel=system::getOperatingSystemRelease();
+        	char    *os=sys::getOperatingSystemName();
+        	char    *rel=sys::getOperatingSystemRelease();
         	double  ver=charstring::toFloat(rel);
 	
         	// force proxy for Cygwin and Linux < 2.2

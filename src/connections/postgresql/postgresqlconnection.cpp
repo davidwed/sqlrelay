@@ -7,7 +7,7 @@
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 	#include <rudiments/file.h>
 #endif
-#include <rudiments/system.h>
+#include <rudiments/sys.h>
 #include <rudiments/null.h>
 
 #include <datatypes.h>
@@ -384,10 +384,7 @@ const char *postgresqlconnection::dbVersion() {
 
 const char *postgresqlconnection::dbHostName() {
 	const char	*hostname=sqlrconnection_svr::dbHostName();
-	// some postgresql headers include stdlib.h which defines a system()
-	// function, so we have to fully qualify the system class here
-	return (charstring::length(hostname))?
-				hostname:rudiments::system::getHostName();
+	return (charstring::length(hostname))?hostname:sys::getHostName();
 }
 
 const char *postgresqlconnection::dbIpAddressQuery() {

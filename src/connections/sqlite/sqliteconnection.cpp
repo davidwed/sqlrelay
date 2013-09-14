@@ -4,7 +4,7 @@
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <rudiments/regularexpression.h>
-#include <rudiments/system.h>
+#include <rudiments/sys.h>
 
 #include <datatypes.h>
 #include <config.h>
@@ -216,11 +216,7 @@ const char *sqliteconnection::dbVersion() {
 }
 
 const char *sqliteconnection::dbHostName() {
-	// Some versions of sqlite don't define sqlite3_malloc so we have to
-	// use regular malloc.  To do that we have to include stdlib.h which
-	// defines a function system().  To prevent collisions with that
-	// function we have to fully qualify the system class here.
-	return rudiments::system::getHostName();
+	return sys::getHostName();
 }
 
 const char *sqliteconnection::getDatabaseListQuery(bool wild) {

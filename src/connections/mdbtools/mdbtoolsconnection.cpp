@@ -5,7 +5,7 @@
 #include <sqlrconnection.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/regularexpression.h>
-#include <rudiments/system.h>
+#include <rudiments/sys.h>
 
 #include <datatypes.h>
 #include <config.h>
@@ -158,9 +158,7 @@ const char *mdbtoolsconnection::dbVersion() {
 }
 
 const char *mdbtoolsconnection::dbHostName() {
-	// some mdbtools headers include stdlib.h which defines a system()
-	// function, so we have to fully qualify the system class here
-	return rudiments::system::getHostName();
+	return sys::getHostName();
 }
 
 bool mdbtoolsconnection::getListsByApiCalls() {
