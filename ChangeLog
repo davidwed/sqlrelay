@@ -19,6 +19,9 @@
 		temptableslocalize/sybaseize translations
 	fixed various crashes that could occur when a query filter was used
 	updated the query routing and filtering doc
+	sqlrsh supports multiple commands on a single line or on the
+		command-line now
+	exit/quit in a sqlrsh script aborts the script now
 
 0.51 - fixed minor perl DBI driver documentation issue
 	added support for oracle 12c
