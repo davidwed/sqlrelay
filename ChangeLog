@@ -22,6 +22,7 @@
 	sqlrsh supports multiple commands on a single line or on the
 		command-line now
 	exit/quit in a sqlrsh script aborts the script now
+	improved date/time parsing for translations and result-set conversions
 
 0.51 - fixed minor perl DBI driver documentation issue
 	added support for oracle 12c
