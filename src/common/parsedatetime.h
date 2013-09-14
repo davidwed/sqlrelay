@@ -117,17 +117,48 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 						&timeparts,&timepartcount);
 	
 			// there could be:
+			// 2 parts, all numbers,
+			//     (02:03)
+			// 2 parts with AM/PM in part 2,
+			//     (02:03AM)
 			// 3 parts, all numbers,
 			//     (02:03:04)
 			// 3 parts with a decimal fraction and AM/PM in part 3,
 			//     (02:03:04.123AM)
+			// 3 parts with no decimal fraction and AM/PM in part 3,
+			//     (02:03:04AM)
 			// 3 parts with a decimal fraction and no AM/PM,
 			//     (14:03:04.123)
 			// 4 parts with a fractional part 4 and AM/PM,
 			//     (02:03:04:123AM)
 			// 4 parts with a fractional part 4 and no AM/PM
 			//     (14:03:04:123)
-			if (timepartcount==3 &&
+			if (timepartcount==2 &&
+				charstring::isNumber(timeparts[0]) &&
+				charstring::isNumber(timeparts[1])) {
+
+				*hour=charstring::toInteger(timeparts[0]);
+				*minute=charstring::toInteger(timeparts[1]);
+				*second=0;
+				*fraction=0;
+
+			} else if (timepartcount==2 &&
+				charstring::isNumber(timeparts[0]) &&
+				((charstring::contains(timeparts[1],"AM") &&
+				!*(charstring::findFirst(timeparts[1],"AM")+2))
+				||
+				(charstring::contains(timeparts[1],"PM") &&
+				!*(charstring::findFirst(timeparts[1],"PM")+2)))
+				) {
+
+				*hour=charstring::toInteger(timeparts[0]);
+				*minute=charstring::toInteger(timeparts[1]);
+				*second=0;
+				*fraction=0;
+				*hour=*hour+(12*charstring::contains(
+							timeparts[1],"PM"));
+
+			} else if (timepartcount==3 &&
 				charstring::isNumber(timeparts[0]) &&
 				charstring::isNumber(timeparts[1]) &&
 				charstring::isNumber(timeparts[2])) {
@@ -171,7 +202,9 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 								timeparts[1]);
 					*second=charstring::toInteger(
 								timeparts[2]);
+					*fraction=0;
 				}
+
 			} else if (timepartcount==3 &&
 				charstring::isNumber(timeparts[0]) &&
 				charstring::isNumber(timeparts[1]) &&
@@ -189,6 +222,23 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 				const char	*dot=
 					charstring::findFirst(timeparts[2],'.');
 				*fraction=charstring::toInteger(dot+1);
+				*hour=*hour+(12*charstring::contains(
+							timeparts[2],"PM"));
+
+			} else if (timepartcount==3 &&
+				charstring::isNumber(timeparts[0]) &&
+				charstring::isNumber(timeparts[1]) &&
+				((charstring::contains(timeparts[2],"AM") &&
+				!*(charstring::findFirst(timeparts[2],"AM")+2))
+				||
+				(charstring::contains(timeparts[2],"PM") &&
+				!*(charstring::findFirst(timeparts[2],"PM")+2)))
+				) {
+
+				*hour=charstring::toInteger(timeparts[0]);
+				*minute=charstring::toInteger(timeparts[1]);
+				*second=charstring::toInteger(timeparts[2]);
+				*fraction=0;
 				*hour=*hour+(12*charstring::contains(
 							timeparts[2],"PM"));
 
