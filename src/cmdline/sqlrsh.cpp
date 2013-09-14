@@ -145,7 +145,9 @@ class	sqlrsh {
 					sqlrcursor *sqlrcur, sqlrshenv *env, 
 					const char *filename, bool returnerror,
 					bool displaycommand);
-		bool	getCommandFromFile(file *fl,
+		bool	getCommandFromFileOrString(file *fl,
+					const char *string,
+					const char **stringpos,
 					stringbuffer *cmdbuffer,
 					sqlrshenv *env);
 		bool	runCommand(sqlrconnection *sqlrcon, 
@@ -260,17 +262,18 @@ void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		for (;;) {
 		
 			// get a command
-			stringbuffer	command;
-			if (!getCommandFromFile(&scriptfile,&command,env)) {
+			stringbuffer	cmd;
+			if (!getCommandFromFileOrString(
+					&scriptfile,NULL,NULL,&cmd,env)) {
 				break;
 			}
 
 			if (displaycommand) {
-				stdoutput.printf("%s\n",command.getString());
+				stdoutput.printf("%s\n",cmd.getString());
 			}
 
 			// run the command
-			runCommand(sqlrcon,sqlrcur,env,command.getString());
+			runCommand(sqlrcon,sqlrcur,env,cmd.getString());
 		}
 
 		// close the file
@@ -287,8 +290,11 @@ void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	delete[] trimmedfilename;
 }
 
-bool sqlrsh::getCommandFromFile(file *fl, stringbuffer *cmdbuffer,
-						sqlrshenv *env) {
+bool sqlrsh::getCommandFromFileOrString(file *fl,
+					const char *string,
+					const char **stringpos,
+					stringbuffer *cmdbuffer,
+					sqlrshenv *env) {
 
 	bool	insinglequotes=false;
 	bool	indoublequotes=false;
@@ -296,17 +302,31 @@ bool sqlrsh::getCommandFromFile(file *fl, stringbuffer *cmdbuffer,
 	
 	for (;;) {
 
-		// get a character from the file
-		if (fl->read(&character)!=sizeof(character)) {
-			return false;
+		// get a character from the file or string
+		if (fl) {
+			if (fl->read(&character)!=sizeof(character)) {
+				return false;
+			}
+		} else {
+			if (!*string) {
+				return false;
+			}
+			character=*string;
+			string++;
 		}
 
 		// handle single-quoted strings, with escaping
 		if (character=='\'') {
 			if (insinglequotes) {
 				cmdbuffer->append(character);
-				if (fl->read(&character)!=sizeof(character)) {
-					return false;
+				if (fl) {
+					if (fl->read(&character)!=
+							sizeof(character)) {
+						return false;
+					}
+				} else {
+					character=*string;
+					string++;
 				}
 				if (character!='\'') {
 					insinglequotes=false;
@@ -320,8 +340,14 @@ bool sqlrsh::getCommandFromFile(file *fl, stringbuffer *cmdbuffer,
 		if (character=='"') {
 			if (indoublequotes) {
 				cmdbuffer->append(character);
-				if (fl->read(&character)!=sizeof(character)) {
-					return false;
+				if (fl) {
+					if (fl->read(&character)!=
+							sizeof(character)) {
+						return false;
+					}
+				} else {
+					character=*string;
+					string++;
 				}
 				if (character!='"') {
 					indoublequotes=false;
@@ -329,6 +355,11 @@ bool sqlrsh::getCommandFromFile(file *fl, stringbuffer *cmdbuffer,
 			} else {
 				indoublequotes=true;
 			}
+		}
+
+		// update the string-position pointer
+		if (string && stringpos) {
+			*stringpos=string;
 		}
 
 		// look for an end of command delimiter
@@ -339,8 +370,12 @@ bool sqlrsh::getCommandFromFile(file *fl, stringbuffer *cmdbuffer,
 
 		// write character to buffer and move on
 		cmdbuffer->append(character);
+
+		// look for the end of the string
+		if (string && !*string) {
+			return true;
+		}
 	}
-		
 }
 
 bool sqlrsh::runCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
@@ -1592,7 +1627,14 @@ void sqlrsh::execute(int argc, const char **argv) {
 		runScript(&sqlrcon,&sqlrcur,&env,script,true,false);
 	} else if (charstring::length(command)) {
 		// if a command was specified, run it
-		runCommand(&sqlrcon,&sqlrcur,&env,command);
+		for (;;) {
+			stringbuffer	cmd;
+			if (!getCommandFromFileOrString(
+					NULL,command,&command,&cmd,&env)) {
+				break;
+			}
+			runCommand(&sqlrcon,&sqlrcur,&env,cmd.getString());
+		}
 	} else {
 		// otherwise go into interactive mode
 		startupMessage(&env,host,port,user);
