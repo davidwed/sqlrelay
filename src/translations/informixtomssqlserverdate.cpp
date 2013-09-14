@@ -8,10 +8,6 @@
 #include <rudiments/datetime.h>
 #include <debugprint.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 enum timeparts_t {
 	TIMEPARTS_YEAR=0,
 	TIMEPARTS_MONTH,

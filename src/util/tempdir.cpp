@@ -4,10 +4,6 @@
 #include <rudiments/charstring.h>
 #include <tempdir.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 tempdir::tempdir(cmdline *cmdl) {
 	if (cmdl->getLocalStateDir()[0]) {
 		tmpdirlen=charstring::length(cmdl->getLocalStateDir())+13;

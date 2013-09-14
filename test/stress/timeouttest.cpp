@@ -1,7 +1,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <stdio.h>
 
-main() {
+int main() {
 
 	sqlrconnection	sqlrcon("localhost",8009,"",
 				"oracle8test","oracle8test",0,1);

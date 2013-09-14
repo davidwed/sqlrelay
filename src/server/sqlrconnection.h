@@ -8,10 +8,6 @@
 #include <sqltranslations.h>
 #include <sqlwriter.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class sqlrcontroller_svr;
 
 class sqlrconnection_svr {

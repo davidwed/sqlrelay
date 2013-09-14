@@ -14,10 +14,6 @@
 #include <rudiments/filesystem.h>
 #include <rudiments/stringbuffer.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class slowqueries : public sqlrlogger {
 	public:
 			slowqueries(xmldomnode *parameters);

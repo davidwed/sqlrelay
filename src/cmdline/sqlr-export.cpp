@@ -10,10 +10,6 @@
 #include <rudiments/stdio.h>
 #include <sqlrconfigfile.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 bool exportTable(sqlrcursor *sqlrcur,
 			const char *table, const char *format);
 void exportTableXml(sqlrcursor *sqlrcur, const char *table);

@@ -12,16 +12,16 @@ class sqlrcursor_svr;
 
 class sqltrigger {
 	public:
-			sqltrigger(rudiments::xmldomnode *parameters);
+			sqltrigger(xmldomnode *parameters);
 		virtual	~sqltrigger();
 
 		virtual bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					rudiments::xmldom *querytree,
+					xmldom *querytree,
 					bool before,
 					bool success);
 	protected:
-		rudiments::xmldomnode	*parameters;
+		xmldomnode	*parameters;
 };
 
 #endif

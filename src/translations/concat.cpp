@@ -8,10 +8,6 @@
 #include <sqltranslation.h>
 #include <debugprint.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class concat : public sqltranslation {
 	public:
 			concat(sqltranslations *sqlts,

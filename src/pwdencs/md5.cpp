@@ -34,8 +34,6 @@
 #include <rudiments/private/inttypes.h>
 #include <rudiments/charstring.h>
 
-using namespace rudiments;
-
 //---------------------------------------------------------------------- 
 //typedefs
 typedef unsigned char *POINTER;
@@ -403,8 +401,6 @@ char *MD5::MD5Sum(const unsigned char *data, uint64_t size) {
 
 #include <sqlrpwdenc.h>
 #include <rudiments/charstring.h>
-
-using namespace rudiments;
 
 class md5 : public sqlrpwdenc {
 	public:

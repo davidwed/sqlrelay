@@ -9,10 +9,6 @@
 #include <debugprint.h>
 #include <rudiments/process.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class temptablessybaseize : public sqltranslation {
 	public:
 			temptablessybaseize(sqltranslations *sqlts,

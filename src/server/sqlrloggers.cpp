@@ -11,10 +11,6 @@
 
 #include <config.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 sqlrloggers::sqlrloggers() {
 	debugFunction();
 	xmld=NULL;

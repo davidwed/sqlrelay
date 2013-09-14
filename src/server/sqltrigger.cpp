@@ -5,10 +5,6 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 sqltrigger::sqltrigger(xmldomnode *parameters) {
 	this->parameters=parameters;
 }

@@ -7,10 +7,6 @@
 #include <sqltranslation.h>
 #include <debugprint.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class informixtomssqlserverselectinto : public sqltranslation {
 	public:
 			informixtomssqlserverselectinto(

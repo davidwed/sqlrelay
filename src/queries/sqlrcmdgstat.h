@@ -10,7 +10,7 @@
 
 class sqlrcmdgstat : public sqlrquery {
 	public:
-			sqlrcmdgstat(rudiments::xmldomnode *parameters);
+			sqlrcmdgstat(xmldomnode *parameters);
 		bool	match(const char *querystring, uint32_t querylength);
 		sqlrquerycursor	*getCursor(sqlrconnection_svr *conn);
 };
@@ -26,7 +26,7 @@ struct gs_result_row {
 class sqlrcmdgstatcursor : public sqlrquerycursor {
 	public:
 			sqlrcmdgstatcursor(sqlrconnection_svr *sqlrcon,
-					rudiments::xmldomnode *parameters);
+						xmldomnode *parameters);
 
 		bool		executeQuery(const char *query,
 						uint32_t length);

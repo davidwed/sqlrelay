@@ -16,7 +16,7 @@ class sqlrauthenticator {
 		bool	authenticate(const char *user, const char *password);
 
 	private:
-		rudiments::linkedlist< usercontainer * >	userlist;
+		linkedlist< usercontainer * >	userlist;
 
 		uint32_t	usercount;
 		char		**users;

@@ -3,10 +3,6 @@
 
 #include <sqlrlogger.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 sqlrlogger::sqlrlogger(xmldomnode *parameters) {
 	this->parameters=parameters;
 }

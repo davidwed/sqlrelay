@@ -3,10 +3,6 @@
 #include <sqlparser.h>
 #include <debugprint.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 freetdssqlwriter::freetdssqlwriter() : sqlwriter() {
 	debugFunction();
 }

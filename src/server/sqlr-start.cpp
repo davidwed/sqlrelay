@@ -17,10 +17,6 @@
 // for system()
 #include <stdlib.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 #define MAX_CONNECTIONS 200
 
 int32_t getConnections(sqlrconfigfile *cfgfile, bool override) {

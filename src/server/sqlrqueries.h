@@ -14,8 +14,8 @@ class sqlrcursor_svr;
 
 class sqlrqueryplugin {
 	public:
-		sqlrquery		*qr;
-		rudiments::dynamiclib	*dl;
+		sqlrquery	*qr;
+		dynamiclib	*dl;
 };
 
 class sqlrqueries {
@@ -29,10 +29,10 @@ class sqlrqueries {
 						uint32_t querylength);
 	private:
 		void		unloadQueries();
-		void		loadQuery(rudiments::xmldomnode *logger);
+		void		loadQuery(xmldomnode *logger);
 
-		rudiments::xmldom				*xmld;
-		rudiments::linkedlist< sqlrqueryplugin * >	llist;
+		xmldom				*xmld;
+		linkedlist< sqlrqueryplugin * >	llist;
 };
 
 #endif

@@ -10,10 +10,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 const char	*host;
 int		port;
 const  char	*sock;

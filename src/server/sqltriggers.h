@@ -14,8 +14,8 @@ class sqlrcursor_svr;
 
 class sqltriggerplugin {
 	public:
-		sqltrigger		*tr;
-		rudiments::dynamiclib	*dl;
+		sqltrigger	*tr;
+		dynamiclib	*dl;
 };
 
 class sqltriggers {
@@ -26,25 +26,25 @@ class sqltriggers {
 		bool	loadTriggers(const char *triggers);
 		void	runBeforeTriggers(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
-						rudiments::xmldom *querytree);
+						xmldom *querytree);
 		void	runAfterTriggers(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
-						rudiments::xmldom *querytree,
+						xmldom *querytree,
 						bool success);
 	private:
 		void		unloadTriggers();
-		void		loadTrigger(rudiments::xmldomnode *trigger,
-					rudiments::linkedlist< sqltriggerplugin *> *list);
+		void		loadTrigger(xmldomnode *trigger,
+					linkedlist< sqltriggerplugin *> *list);
 		void		runTriggers(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					rudiments::xmldom *querytree,
-					rudiments::linkedlist< sqltriggerplugin * > *list,
+					xmldom *querytree,
+					linkedlist< sqltriggerplugin * > *list,
 					bool before,
 					bool success);
 
-		rudiments::xmldom				*xmld;
-		rudiments::linkedlist< sqltriggerplugin * >	beforetriggers;
-		rudiments::linkedlist< sqltriggerplugin * >	aftertriggers;
+		xmldom					*xmld;
+		linkedlist< sqltriggerplugin * >	beforetriggers;
+		linkedlist< sqltriggerplugin * >	aftertriggers;
 };
 
 #endif

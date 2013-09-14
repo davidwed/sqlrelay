@@ -15,10 +15,6 @@
 #include <config.h>
 #include <defaults.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class dirnode {
 	friend class sqlrcachemanager;
 	private:

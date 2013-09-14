@@ -225,7 +225,7 @@ class sqlrcursor_svr {
 							uint64_t *charsread);
 		virtual void		cleanUpLobField(uint32_t col);
 		virtual	void		cleanUpData();
-		virtual bool		getColumnNameList(rudiments::stringbuffer *output);
+		virtual bool		getColumnNameList(stringbuffer *output);
 
 		void	setFakeInputBindsForThisQuery(bool fake);
 	
@@ -235,24 +235,24 @@ class sqlrcursor_svr {
 						const char *endptr);
 		const char	*skipWhitespaceAndComments(
 						const char *querybuffer);
-		bool	fakeInputBinds(rudiments::stringbuffer *outputquery);
+		bool	fakeInputBinds(stringbuffer *outputquery);
 
 		void	clearError();
 		void	setError(const char *err, int64_t errn, bool liveconn);
 
 		bool	openInternal(uint16_t id);
-		void	performSubstitution(rudiments::stringbuffer *buffer,
+		void	performSubstitution(stringbuffer *buffer,
 							int16_t index);
 		void	abort();
 
 		sqlrconnection_svr	*conn;
 
-		rudiments::regularexpression	createtemp;
+		regularexpression	createtemp;
 
-		char			*querybuffer;
-		uint32_t		querylength;
-		rudiments::xmldom	*querytree;
-		bool			queryresult;
+		char		*querybuffer;
+		uint32_t	querylength;
+		xmldom		*querytree;
+		bool		queryresult;
 
 		char		*error;
 		uint32_t	errorlength;

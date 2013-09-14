@@ -11,10 +11,6 @@
 // for gettimeofday
 #include <sys/time.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class sqlrcmdcstat : public sqlrquery {
 	public:
 			sqlrcmdcstat(xmldomnode *parameters);

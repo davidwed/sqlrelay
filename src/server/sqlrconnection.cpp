@@ -5,8 +5,6 @@
 #include <sqlrconnection.h>
 #include <rudiments/hostentry.h>
 
-using namespace rudiments;
-
 sqlrconnection_svr::sqlrconnection_svr(sqlrcontroller_svr *cont) {
 	this->cont=cont;
 

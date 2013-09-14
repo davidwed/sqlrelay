@@ -3,7 +3,7 @@
 
 #include <rudiments/commandline.h>
 
-class cmdline : public rudiments::commandline {
+class cmdline : public commandline {
 	public:
 			cmdline(int argc, const char **argv);
 

@@ -15,8 +15,8 @@ class sqlrcursor_svr;
 
 class sqlrloggerplugin {
 	public:
-		sqlrlogger		*lg;
-		rudiments::dynamiclib	*dl;
+		sqlrlogger	*lg;
+		dynamiclib	*dl;
 };
 
 class sqlrloggers {
@@ -35,10 +35,10 @@ class sqlrloggers {
 					const char *info);
 	private:
 		void		unloadLoggers();
-		void		loadLogger(rudiments::xmldomnode *logger);
+		void		loadLogger(xmldomnode *logger);
 
-		rudiments::xmldom				*xmld;
-		rudiments::linkedlist< sqlrloggerplugin * >	llist;
+		xmldom					*xmld;
+		linkedlist< sqlrloggerplugin * >	llist;
 };
 
 #endif

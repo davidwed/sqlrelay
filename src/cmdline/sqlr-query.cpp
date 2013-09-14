@@ -10,10 +10,6 @@
 #include <rudiments/stdio.h>
 #include <sqlrconfigfile.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 int main(int argc, const char **argv) {
 
 	#include <version.h>

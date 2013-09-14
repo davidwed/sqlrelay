@@ -10,10 +10,6 @@
 // for time_t, time(), localtime()
 #include <time.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class sqlrcmdgstat : public sqlrquery {
 	public:
 			sqlrcmdgstat(xmldomnode *parameters);

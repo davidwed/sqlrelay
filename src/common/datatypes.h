@@ -5,10 +5,6 @@
 #define DATATYPES_H
 #include <rudiments/charstring.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 extern "C" {
 
 #define COLUMN_TYPE_IDS		0

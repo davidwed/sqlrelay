@@ -22,10 +22,6 @@
 	#define MAXPATHLEN	256
 #endif
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 signalhandler		sqlrlistener::alarmhandler;
 volatile sig_atomic_t	sqlrlistener::alarmrang=0;
 

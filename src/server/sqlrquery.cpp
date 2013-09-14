@@ -6,10 +6,6 @@
 #include <sqlrcursor.h>
 #include <rudiments/xmldomnode.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 sqlrquery::sqlrquery(xmldomnode *parameters) {
 	this->parameters=parameters;
 }

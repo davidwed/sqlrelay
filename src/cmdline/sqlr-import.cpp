@@ -12,10 +12,6 @@
 #include <rudiments/stdio.h>
 #include <sqlrconfigfile.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class sqlrimport : public xmlsax {
 	public:
 			sqlrimport(sqlrconnection *sqlrcon,

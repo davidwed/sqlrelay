@@ -5,8 +5,6 @@
 #include <rudiments/charstring.h>
 #include <rudiments/crypt.h>
 
-using namespace rudiments;
-
 class crypt_pwdenc : public sqlrpwdenc {
 	public:
 			crypt_pwdenc(xmldomnode *parameters);

@@ -17,7 +17,7 @@
 // for pid_t
 #include <sys/types.h>
 
-class scaler : public rudiments::daemonprocess {
+class scaler : public daemonprocess {
 
 	public:
 			scaler();
@@ -56,13 +56,12 @@ class scaler : public rudiments::daemonprocess {
 		uint32_t	growby;
 		int32_t		ttl;
 
-		rudiments::semaphoreset	*semset;
+		semaphoreset	*semset;
 
-		rudiments::sharedmemory	*idmemory;
-		shmdata			*shm;
+		sharedmemory	*idmemory;
+		shmdata		*shm;
 
-		rudiments::linkedlist< connectstringcontainer * >
-						*connectstringlist;
+		linkedlist< connectstringcontainer * > *connectstringlist;
 		const char	*connectionid;
 		int32_t		metrictotal;
 

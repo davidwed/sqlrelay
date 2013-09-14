@@ -4,8 +4,6 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/charstring.h>
 
-using namespace rudiments;
-
 void sqlrconnection::setClientInfo(const char *clientinfo) {
 	delete[] this->clientinfo;
 	this->clientinfo=charstring::duplicate(clientinfo);

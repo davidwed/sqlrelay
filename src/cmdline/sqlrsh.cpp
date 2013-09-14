@@ -23,11 +23,6 @@
 // for clock()
 #include <time.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
-
 #ifdef HAVE_READLINE
 	#include <rudiments/charstring.h>
 	// This is an interesting story...

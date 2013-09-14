@@ -14,15 +14,15 @@ class sqltranslations;
 class sqltranslation {
 	public:
 			sqltranslation(sqltranslations *sqlts,
-					rudiments::xmldomnode *parameters);
+					xmldomnode *parameters);
 		virtual	~sqltranslation();
 
 		virtual bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					rudiments::xmldom *querytree);
+					xmldom *querytree);
 	protected:
 		sqltranslations		*sqlts;
-		rudiments::xmldomnode	*parameters;
+		xmldomnode		*parameters;
 };
 
 #endif

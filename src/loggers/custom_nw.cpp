@@ -14,10 +14,6 @@
 #include <rudiments/datetime.h>
 #include <debugprint.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class custom_nw : public sqlrlogger {
 	public:
 			custom_nw(xmldomnode *parameters);

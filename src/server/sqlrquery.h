@@ -15,25 +15,25 @@ class sqlrquerycursor;
 
 class sqlrquery {
 	public:
-			sqlrquery(rudiments::xmldomnode *parameters);
+			sqlrquery(xmldomnode *parameters);
 		virtual	~sqlrquery();
 
 		virtual bool	match(const char *querystring,
 						uint32_t querylength);
 		virtual sqlrquerycursor	*getCursor(sqlrconnection_svr *sqlrcon);
 	protected:
-		rudiments::xmldomnode	*parameters;
+		xmldomnode	*parameters;
 };
 
 class sqlrquerycursor : public sqlrcursor_svr {
 	public:
 			sqlrquerycursor(sqlrconnection_svr *conn,
-					rudiments::xmldomnode *parameters);
+					xmldomnode *parameters);
 		virtual	~sqlrquerycursor();
 		virtual sqlrquerytype_t	queryType(const char *query,
 							uint32_t length);
 	protected:
-		rudiments::xmldomnode	*parameters;
+		xmldomnode	*parameters;
 };
 
 #endif

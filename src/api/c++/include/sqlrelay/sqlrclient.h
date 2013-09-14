@@ -6,10 +6,6 @@
 
 #include <sqlrelay/private/sqlrincludes.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class SQLRCLIENT_DLLSPEC sqlrconnection {
 	public:
 			/** Initiates a connection to "server" on "port"

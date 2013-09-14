@@ -11,8 +11,8 @@
 
 class sqlrpwdencplugin {
 	public:
-		sqlrpwdenc		*pe;
-		rudiments::dynamiclib	*dl;
+		sqlrpwdenc	*pe;
+		dynamiclib	*dl;
 };
 
 class sqlrpwdencs {
@@ -24,10 +24,10 @@ class sqlrpwdencs {
 		sqlrpwdenc	*getPasswordEncryptionById(const char *id);
 	private:
 		void	unloadPasswordEncryptions();
-		void	loadPasswordEncryption(rudiments::xmldomnode *pwdenc);
+		void	loadPasswordEncryption(xmldomnode *pwdenc);
 
-		rudiments::xmldom	*xmld;
-		rudiments::linkedlist< sqlrpwdencplugin * >	llist;
+		xmldom					*xmld;
+		linkedlist< sqlrpwdencplugin * >	llist;
 };
 
 #endif

@@ -8,10 +8,6 @@
 #include <sqlparser.h>
 #include <debugprint.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class createtableautoincrementoracle : public sqltrigger {
 	public:
 			createtableautoincrementoracle(xmldomnode *parameters);

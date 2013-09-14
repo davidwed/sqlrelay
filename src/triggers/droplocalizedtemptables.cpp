@@ -9,10 +9,6 @@
 #include <sqltranslations.h>
 #include <debugprint.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class droplocalizedtemptables : public sqltrigger {
 	public:
 			droplocalizedtemptables(xmldomnode *parameters);

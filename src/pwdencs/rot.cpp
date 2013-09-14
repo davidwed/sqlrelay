@@ -4,8 +4,6 @@
 #include <sqlrpwdenc.h>
 #include <rudiments/character.h>
 
-using namespace rudiments;
-
 class rot : public sqlrpwdenc {
 	public:
 			rot(xmldomnode *parameters);

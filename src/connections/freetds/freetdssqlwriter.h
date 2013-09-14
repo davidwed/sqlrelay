@@ -9,8 +9,8 @@ class freetdssqlwriter : public sqlwriter {
 		virtual	~freetdssqlwriter();
 
 	private:
-		virtual bool	uniqueKey(rudiments::xmldomnode *node,
-					rudiments::stringbuffer *output);
+		virtual bool	uniqueKey(xmldomnode *node,
+					stringbuffer *output);
 };
 
 #endif

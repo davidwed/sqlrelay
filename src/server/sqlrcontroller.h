@@ -35,8 +35,7 @@
 
 #include <defines.h>
 
-class sqlrcontroller_svr : public rudiments::daemonprocess,
-				public rudiments::listener {
+class sqlrcontroller_svr : public daemonprocess, public listener {
 	public:
 			sqlrcontroller_svr();
 		virtual	~sqlrcontroller_svr();
@@ -62,7 +61,7 @@ class sqlrcontroller_svr : public rudiments::daemonprocess,
 		void		cleanUpAllCursorData();
 
 		bool		getColumnNames(const char *query,
-					rudiments::stringbuffer *output);
+						stringbuffer *output);
 
 		void	handleSignals(void (*shutdownfunction)(int32_t));
 		bool	init(int argc, const char **argv);
@@ -162,7 +161,7 @@ class sqlrcontroller_svr : public rudiments::daemonprocess,
 							const char *query,
 							const char *table,
 							const char *wild);
-		void	escapeParameter(rudiments::stringbuffer *buffer,
+		void	escapeParameter(stringbuffer *buffer,
 							const char *parameter);
 		bool	reExecuteQueryCommand(sqlrcursor_svr *cursor);
 		bool	fetchFromBindCursorCommand(sqlrcursor_svr *cursor);
@@ -216,9 +215,9 @@ class sqlrcontroller_svr : public rudiments::daemonprocess,
 		bool	matchesNativeBindFormat(const char *bind);
 		void	translateBindVariableInStringAndArray(
 					sqlrcursor_svr *cursor,
-					rudiments::stringbuffer *currentbind,
+					stringbuffer *currentbind,
 					uint16_t bindindex,
-					rudiments::stringbuffer *newquery);
+					stringbuffer *newquery);
 		void	translateBindVariableInArray(
 						sqlrcursor_svr *cursor,
 						const char *currentbind,
@@ -490,7 +489,7 @@ class sqlrcontroller_svr : public rudiments::daemonprocess,
 		bool		decrementonclose;
 		bool		silent;
 
-		rudiments::stringbuffer	debugstr;
+		stringbuffer	debugstr;
 
 		uint64_t	maxclientinfolength;
 		uint32_t	maxquerysize;
@@ -508,7 +507,7 @@ class sqlrcontroller_svr : public rudiments::daemonprocess,
 
 		bool		reformatdatetimes;
 
-		rudiments::signalhandler	shutdownhandler;
+		signalhandler	shutdownhandler;
 };
 
 #endif

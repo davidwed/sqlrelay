@@ -7,10 +7,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 void checkSuccess(const char *value, const char *success) {
 
 	if (!success) {

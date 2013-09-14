@@ -4,10 +4,6 @@
 #include <sqlrpwdenc.h>
 #include <rudiments/charstring.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 sqlrpwdenc::sqlrpwdenc(xmldomnode *parameters) {
 	this->parameters=parameters;
 }

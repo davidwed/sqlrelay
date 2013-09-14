@@ -11,10 +11,6 @@
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 class debug : public sqlrlogger {
 	public:
 			debug(xmldomnode *parameters);

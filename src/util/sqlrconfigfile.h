@@ -105,7 +105,7 @@ class SQLRUTIL_DLLSPEC usercontainer {
 		char	*pwdenc;
 };
 
-typedef rudiments::linkedlistnode< usercontainer * >	usernode;
+typedef linkedlistnode< usercontainer * >	usernode;
 
 class SQLRUTIL_DLLSPEC connectstringcontainer {
 	public:
@@ -132,11 +132,10 @@ class SQLRUTIL_DLLSPEC connectstringcontainer {
 		char		*pwdenc;
 
 		// connect string parameters
-		rudiments::parameterstring	connectstring;
+		parameterstring	connectstring;
 };
 
-typedef rudiments::linkedlistnode< connectstringcontainer * >	
-						connectstringnode;
+typedef linkedlistnode< connectstringcontainer * >	connectstringnode;
 
 class SQLRUTIL_DLLSPEC routecontainer {
 	friend class sqlrconfigfile;
@@ -157,8 +156,7 @@ class SQLRUTIL_DLLSPEC routecontainer {
 		const char	*getSocket();
 		const char	*getUser();
 		const char	*getPassword();
-		rudiments::linkedlist< rudiments::regularexpression * >	
-								*getRegexList();
+		linkedlist< regularexpression * >	*getRegexList();
 	private:
 		bool		isfilter;
 		char		*host;
@@ -166,13 +164,12 @@ class SQLRUTIL_DLLSPEC routecontainer {
 		char		*socket;
 		char		*user;
 		char		*password;
-		rudiments::linkedlist< rudiments::regularexpression * >
-								regexlist;
+		linkedlist< regularexpression * >	regexlist;
 };
 
-typedef rudiments::linkedlistnode< routecontainer * >	routenode;
+typedef linkedlistnode< routecontainer * >	routenode;
 
-class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
+class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 	public:
 			sqlrconfigfile();
 			~sqlrconfigfile();
@@ -235,8 +232,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 		const char	*getTimeFormat();
 		bool		getDateDdMm();
 
-		rudiments::stringlist	*getSessionStartQueries();
-		rudiments::stringlist	*getSessionEndQueries();
+		stringlist	*getSessionStartQueries();
+		stringlist	*getSessionEndQueries();
 
 		const char	*getTranslations();
 
@@ -248,15 +245,14 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 
 		const char	*getPasswordEncryptions();
 
-		rudiments::linkedlist< usercontainer * >	*getUserList();
-		rudiments::linkedlist< connectstringcontainer * >
-							*getConnectStringList();
+		linkedlist< usercontainer * >	*getUserList();
+		linkedlist< connectstringcontainer * >	*getConnectStringList();
 		connectstringcontainer	*getConnectString(
 						const char *connectionid);
 		uint32_t		getConnectionCount();
 		uint32_t		getMetricTotal();
 
-		rudiments::linkedlist< routecontainer * >	*getRouteList();
+		linkedlist< routecontainer * >	*getRouteList();
 	private:
 		const char	*id;
 		bool		correctid;
@@ -340,23 +336,23 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 
 		bool		instart;
 		bool		inend;
-		rudiments::stringlist	sessionstartqueries;
-		rudiments::stringlist	sessionendqueries;
+		stringlist	sessionstartqueries;
+		stringlist	sessionendqueries;
 
-		rudiments::stringbuffer	translations;
-		uint16_t		translationsdepth;
+		stringbuffer	translations;
+		uint16_t	translationsdepth;
 
-		rudiments::stringbuffer	triggers;
-		uint16_t		triggersdepth;
+		stringbuffer	triggers;
+		uint16_t	triggersdepth;
 
-		rudiments::stringbuffer	loggers;
-		uint16_t		loggersdepth;
+		stringbuffer	loggers;
+		uint16_t	loggersdepth;
 
-		rudiments::stringbuffer	queries;
-		uint16_t		queriesdepth;
+		stringbuffer	queries;
+		uint16_t	queriesdepth;
 
-		rudiments::stringbuffer	passwordencryptions;
-		uint16_t		passwordencryptionsdepth;
+		stringbuffer	passwordencryptions;
+		uint16_t	passwordencryptionsdepth;
 
 		usercontainer	*currentuser;
 
@@ -367,10 +363,9 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public rudiments::xmlsax {
 
 		routecontainer		*currentroute;
 
-		rudiments::linkedlist< connectstringcontainer * >	
-							connectstringlist;
-		rudiments::linkedlist< usercontainer * >	userlist;
-		rudiments::linkedlist< routecontainer *>	routelist;
+		linkedlist< connectstringcontainer * >	connectstringlist;
+		linkedlist< usercontainer * >		userlist;
+		linkedlist< routecontainer *>		routelist;
 		
 		typedef enum {
 			NO_TAG,

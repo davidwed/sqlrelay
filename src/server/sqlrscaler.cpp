@@ -20,10 +20,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 bool	scaler::shutdown=false;
 
 scaler::scaler() : daemonprocess() {

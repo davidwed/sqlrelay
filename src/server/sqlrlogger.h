@@ -33,7 +33,7 @@ enum sqlrlogger_eventtype_t {
 
 class sqlrlogger {
 	public:
-			sqlrlogger(rudiments::xmldomnode *parameters);
+			sqlrlogger(xmldomnode *parameters);
 		virtual	~sqlrlogger();
 
 		virtual bool	init(sqlrlistener *sqlrl,
@@ -47,7 +47,7 @@ class sqlrlogger {
 	protected:
 		const char	*logLevel(sqlrlogger_loglevel_t level);
 		const char	*eventType(sqlrlogger_eventtype_t event);
-		rudiments::xmldomnode	*parameters;
+		xmldomnode	*parameters;
 };
 
 #endif

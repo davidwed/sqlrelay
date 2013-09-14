@@ -8,10 +8,6 @@
 
 #include <sqlrauthenticator.h>
 
-#ifdef RUDIMENTS_NAMESPACE
-using namespace rudiments;
-#endif
-
 sqlrauthenticator::sqlrauthenticator(sqlrconfigfile *cfgfile,
 						sqlrpwdencs *sqlrpe) {
 
