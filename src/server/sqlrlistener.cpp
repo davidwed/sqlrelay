@@ -14,7 +14,6 @@
 #include <rudiments/file.h>
 #include <rudiments/error.h>
 #include <rudiments/datetime.h>
-#include <rudiments/logger.h>
 #include <rudiments/sys.h>
 #include <rudiments/stdio.h>
 
