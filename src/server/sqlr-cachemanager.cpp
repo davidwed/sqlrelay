@@ -100,7 +100,7 @@ sqlrcachemanager::~sqlrcachemanager() {
 void sqlrcachemanager::scan() {
 
 	// detach from the controlling tty
-	detach();
+	process::detach();
 
 	// create pid file
 	pid_t	pid=process::getProcessId();

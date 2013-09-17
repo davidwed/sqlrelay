@@ -182,7 +182,7 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 	maxlisteners=cfgfl.getMaxListeners();
 	listenertimeout=cfgfl.getListenerTimeout();
 
-	detach();
+	process::detach();
 
 	createPidFile(pidfile,permissions::ownerReadWrite());
 

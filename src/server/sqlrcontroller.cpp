@@ -374,7 +374,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 		}
 	}
 	if (!cmdl->found("-nodetach")) {
-		detach();
+		process::detach();
 	}
 	if (reloginatstart) {
 		while (!attemptLogIn(false)) {

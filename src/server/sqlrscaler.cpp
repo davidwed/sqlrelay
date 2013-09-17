@@ -290,7 +290,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	currentseed=dt.getEpoch();
 
 	// detach from the controlling tty
-	detach();
+	process::detach();
 
 	// create the pid file
 	createPidFile(pidfile,permissions::ownerReadWrite());
