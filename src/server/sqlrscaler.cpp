@@ -163,7 +163,8 @@ bool scaler::initScaler(int argc, const char **argv) {
 			// running as the group that we should switch to
 			if (charstring::compare(currentgroup,
 						cfgfile->getRunAsGroup()) &&
-					!runAsGroup(cfgfile->getRunAsGroup())) {
+					!process::setGroup(
+						cfgfile->getRunAsGroup())) {
 				stderror.printf("Warning: could not change ");
 				stderror.printf("group to %s\n",
 						cfgfile->getRunAsGroup());
@@ -173,7 +174,8 @@ bool scaler::initScaler(int argc, const char **argv) {
 			// running as the user that we should switch to
 			if (charstring::compare(currentuser,
 						cfgfile->getRunAsUser()) &&
-					!runAsUser(cfgfile->getRunAsUser())) {
+					!process::setUser(
+						cfgfile->getRunAsUser())) {
 				stderror.printf("Warning: could not change ");
 				stderror.printf("user to %s\n",
 						cfgfile->getRunAsUser());

@@ -204,7 +204,7 @@ void sqlrlistener::setUserAndGroup() {
 	// switch groups, but only if we're not currently running as the
 	// group that we should switch to
 	if (charstring::compare(currentgroup,cfgfl.getRunAsGroup()) &&
-					!runAsGroup(cfgfl.getRunAsGroup())) {
+				!process::setGroup(cfgfl.getRunAsGroup())) {
 		stderror.printf("Warning: could not change group to %s\n",
 						cfgfl.getRunAsGroup());
 	}
@@ -212,7 +212,7 @@ void sqlrlistener::setUserAndGroup() {
 	// switch users, but only if we're not currently running as the
 	// user that we should switch to
 	if (charstring::compare(currentuser,cfgfl.getRunAsUser()) &&
-					!runAsUser(cfgfl.getRunAsUser())) {
+				!process::setUser(cfgfl.getRunAsUser())) {
 		stderror.printf("Warning: could not change user to %s\n",
 						cfgfl.getRunAsUser());
 	}
