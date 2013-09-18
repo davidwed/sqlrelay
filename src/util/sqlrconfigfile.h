@@ -10,9 +10,9 @@
 
 #include <rudiments/xmlsax.h>
 #include <rudiments/stringbuffer.h>
-#include <rudiments/linkedlist.h>
 #include <rudiments/parameterstring.h>
 #include <rudiments/regularexpression.h>
+#include <rudiments/linkedlist.h>
 
 #define MAX_ADDRESSES	32
 

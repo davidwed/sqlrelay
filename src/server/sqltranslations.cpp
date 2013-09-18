@@ -255,11 +255,9 @@ bool	sqltranslations::getReplacementName(
 				const char **newname) {
 
 	*newname=NULL;
-	for (dictionarylistnode< databaseobject *, char * > *node=
-					dict->getList()->getFirstNode();
-		node;
-		node=(dictionarylistnode< databaseobject *, char *> *)
-							node->getNext()) {
+	for (linkedlistnode< dictionarynode< databaseobject *, char * > *>
+					*node=dict->getList()->getFirstNode();
+						node; node=node->getNext()) {
 
 		databaseobject	*dbo=node->getData()->getKey();
 		if (!charstring::compare(dbo->database,database) &&
@@ -334,16 +332,16 @@ bool sqltranslations::removeReplacementTable(const char *database,
 	}
 
 	// remove any indices that depend on the table
-	for (dictionarylistnode< databaseobject *, char * > *node=
-				tempindexmap.getList()->getFirstNode(); node;) {
+	for (linkedlistnode< dictionarynode< databaseobject *, char * > *>
+				*node=tempindexmap.getList()->getFirstNode();
+					node;) {
 
 		databaseobject	*dbo=node->getData()->getKey();
 
 		// make sure to move on to the next node here rather than
 		// after calling removeData, otherwise it could cause a
 		// reference-after-free condition
-		node=(dictionarylistnode< databaseobject *, char *> *)
-							node->getNext();
+		node=node->getNext();
 
 		if (!charstring::compare(dbo->database,database) &&
 			!charstring::compare(dbo->schema,schema) &&
@@ -367,11 +365,9 @@ bool sqltranslations::removeReplacement(
 				const char *schema,
 				const char *name) {
 
-	for (dictionarylistnode< databaseobject *, char * > *node=
-					dict->getList()->getFirstNode();
-		node;
-		node=(dictionarylistnode< databaseobject *, char *> *)
-							node->getNext()) {
+	for (linkedlistnode< dictionarynode< databaseobject *, char * > *>
+				*node=dict->getList()->getFirstNode();
+					node; node=node->getNext()) {
 
 		databaseobject	*dbo=node->getData()->getKey();
 		const char	*replacementname=node->getData()->getData();

@@ -58,7 +58,7 @@ struct CONN;
 
 struct ENV {
 	SQLINTEGER		odbcversion;
-	linkedlist< CONN * >	connlist;
+	linkedlist<CONN *>	connlist;
 	char			*error;
 	int64_t			errn;
 	const char		*sqlstate;
@@ -69,7 +69,7 @@ struct STMT;
 struct CONN {
 	sqlrconnection		*con;
 	ENV			*env;
-	linkedlist< STMT * >	stmtlist;
+	linkedlist<STMT *>	stmtlist;
 	char			*error;
 	int64_t			errn;
 	const char		*sqlstate;
@@ -116,13 +116,13 @@ struct STMT {
 	char					*error;
 	int64_t					errn;
 	const char				*sqlstate;
-	numericdictionary< FIELD * >		fieldlist;
+	dictionary<int32_t, FIELD *>		fieldlist;
 	rowdesc					*approwdesc;
 	paramdesc				*appparamdesc;
 	rowdesc					*improwdesc;
 	paramdesc				*impparamdesc;
-	numericdictionary< char * >		inputbindstrings;
-	numericdictionary< outputbind * >	outputbinds;
+	dictionary<int32_t, char *>		inputbindstrings;
+	dictionary<int32_t,outputbind *>	outputbinds;
 	SQLROWSETSIZE				*rowsfetchedptr;
 	SQLUSMALLINT				*rowstatusptr;
 };
@@ -380,23 +380,21 @@ static void SQLR_ResetParams(STMT *stmt) {
 	stmt->cur->clearBinds();
 
 	// clear input bind list
-	numericdictionarylist< char * >	*ibslist=
-					stmt->inputbindstrings.getList();
-	for (dictionarylistnode< int32_t, char * > *node=
-						ibslist->getFirstNode();
-		node; node=(dictionarylistnode< int32_t, char * > *)
-							node->getNext()) {
+	linkedlist<dictionarynode<int32_t, char * > *>
+				*ibslist=stmt->inputbindstrings.getList();
+	for (linkedlistnode<dictionarynode<int32_t, char * > *>
+					*node=ibslist->getFirstNode();
+					node; node=node->getNext()) {
 		delete[] node->getData();
 	}
 	ibslist->clear();
 
 	// clear output bind list
-	numericdictionarylist< outputbind * >	*oblist=
-					stmt->outputbinds.getList();
-	for (dictionarylistnode< int32_t, outputbind * > *node=
-						oblist->getFirstNode();
-		node; node=(dictionarylistnode< int32_t, outputbind * > *)
-							node->getNext()) {
+	linkedlist<dictionarynode<int32_t, outputbind * > *>
+				*oblist=stmt->outputbinds.getList();
+	for (linkedlistnode<dictionarynode<int32_t, outputbind * > *>
+					*node=oblist->getFirstNode();
+					node; node=node->getNext()) {
 		delete node->getData();
 	}
 	oblist->clear();
@@ -1738,9 +1736,9 @@ static SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
 				return SQL_INVALID_HANDLE;
 			}
 
-			for (linkedlistnode< CONN * >	*node=
+			for (linkedlistnode<CONN *>	*node=
 				env->connlist.getFirstNode(); node;
-				node=(linkedlistnode< CONN * > *)
+				node=(linkedlistnode<CONN *> *)
 							node->getNext()) {
 
 				if (completiontype==SQL_COMMIT) {
@@ -1999,13 +1997,11 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 
 	STMT	*stmt=(STMT *)statementhandle;
 
-	numericdictionarylist< outputbind * >	*list=
-					stmt->outputbinds.getList();
-
-	for (dictionarylistnode< int32_t, outputbind * > *node=
-						list->getFirstNode();
-		node; node=(dictionarylistnode< int32_t, outputbind * > *)
-							node->getNext()) {
+	linkedlist<dictionarynode<int32_t, outputbind *> *>
+				*list=stmt->outputbinds.getList();
+	for (linkedlistnode<dictionarynode<int32_t, outputbind *> *>
+					*node=list->getFirstNode();
+					node; node=node->getNext()) {
 
 		outputbind	*ob=node->getData()->getData();
 
