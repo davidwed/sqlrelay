@@ -4,7 +4,6 @@
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <rudiments/environment.h>
-#include <rudiments/null.h>
 
 #include <datatypes.h>
 #include <config.h>

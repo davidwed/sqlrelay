@@ -15,7 +15,6 @@
 #include <sqlrconnection.h>
 #include <rudiments/charstring.h>
 #include <rudiments/stdio.h>
-#include <rudiments/null.h>
 
 #include <datatypes.h>
 

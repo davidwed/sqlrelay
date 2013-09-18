@@ -7,7 +7,6 @@
 #include <rudiments/rawbuffer.h>
 #include <rudiments/snooze.h>
 #include <rudiments/sys.h>
-#include <rudiments/null.h>
 
 #include <datatypes.h>
 #include <config.h>

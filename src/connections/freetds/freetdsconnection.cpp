@@ -9,7 +9,6 @@
 #include <rudiments/charstring.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/stdio.h>
-#include <rudiments/null.h>
 
 #include <datatypes.h>
 #include <config.h>

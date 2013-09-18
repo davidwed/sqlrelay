@@ -6,7 +6,6 @@
 #include <rudiments/rawbuffer.h>
 #include <rudiments/character.h>
 #include <rudiments/regularexpression.h>
-#include <rudiments/null.h>
 
 #include <datatypes.h>
 

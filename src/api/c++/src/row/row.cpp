@@ -3,7 +3,6 @@
 
 #include <sqlrelay/private/sqlrdefines.h>
 #include <sqlrelay/private/row.h>
-#include <rudiments/null.h>
 
 #include <config.h>
 

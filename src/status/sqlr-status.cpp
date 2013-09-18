@@ -7,7 +7,6 @@
 #include <rudiments/charstring.h>
 #include <rudiments/error.h>
 #include <rudiments/stdio.h>
-#include <rudiments/null.h>
 #include <cmdline.h>
 #include <datatypes.h>
 #include <defines.h>
