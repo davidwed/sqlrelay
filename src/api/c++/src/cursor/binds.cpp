@@ -355,8 +355,7 @@ void sqlrcursor::inputBinds(const char **variables, const double *values,
 }
 
 void sqlrcursor::stringVar(bindvar *var, const char *variable,
-						const char *value) {
-	return stringVar(var,variable,value,charstring::length(value));
+	stringVar(var,variable,value,charstring::length(value));
 }
 
 void sqlrcursor::stringVar(bindvar *var, const char *variable,
