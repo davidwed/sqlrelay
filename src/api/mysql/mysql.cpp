@@ -850,11 +850,11 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 				defined(COMPAT_MYSQL_5_0) || \
 				defined(COMPAT_MYSQL_5_1)
   			fields[i].org_table=fields[i].table;
-  			fields[i].db=const_cast<char *>("");
+  			fields[i].db=reinterpret_cast<char *>("");
 			#if defined(COMPAT_MYSQL_4_1) || \
 				defined(COMPAT_MYSQL_5_0) || \
 				defined(COMPAT_MYSQL_5_1)
-  			fields[i].catalog=const_cast<char *>("");
+  			fields[i].catalog=reinterpret_cast<char *>("");
   			fields[i].org_name=fields[i].name;
 			fields[i].name_length=
 				charstring::length(fields[i].name);
@@ -1934,19 +1934,19 @@ static void processFields(MYSQL_STMT *stmt) {
 
 			fields[i].name=const_cast<char *>(
 					sqlrcur->getColumnName(i));
-			fields[i].table=const_cast<char *>("");
-			fields[i].def=const_cast<char *>("");
+			fields[i].table=reinterpret_cast<char *>("");
+			fields[i].def=reinterpret_cast<char *>("");
 
 			#if defined(COMPAT_MYSQL_4_0) || \
 				defined(COMPAT_MYSQL_4_1) || \
 				defined(COMPAT_MYSQL_5_0) || \
 				defined(COMPAT_MYSQL_5_1)
-  			fields[i].org_table=const_cast<char *>("");
-  			fields[i].db=const_cast<char *>("");
+  			fields[i].org_table=reinterpret_cast<char *>("");
+  			fields[i].db=reinterpret_cast<char *>("");
 			#if defined(COMPAT_MYSQL_4_1) || \
 				defined(COMPAT_MYSQL_5_0) || \
 				defined(COMPAT_MYSQL_5_1)
-  			fields[i].catalog=const_cast<char *>("");
+  			fields[i].catalog=reinterpret_cast<char *>("");
   			fields[i].org_name=const_cast<char *>(
 						sqlrcur->getColumnName(i));
 			fields[i].name_length=
@@ -2442,7 +2442,7 @@ void mysql_library_init(int argc, char **argv, char **groups) {
 
 void mysql_server_end() {
 	debugFunction();
-	return mysql_library_end();
+	mysql_library_end();
 }
 
 void mysql_library_end() {

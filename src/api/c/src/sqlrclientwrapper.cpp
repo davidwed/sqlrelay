@@ -185,23 +185,23 @@ uint64_t sqlrcur_getResultSetBufferSize(sqlrcur sqlrcurref) {
 }
 
 void sqlrcur_dontGetColumnInfo(sqlrcur sqlrcurref) {
-	return sqlrcurref->dontGetColumnInfo();
+	sqlrcurref->dontGetColumnInfo();
 }
 
 void sqlrcur_getColumnInfo(sqlrcur sqlrcurref) {
-	return sqlrcurref->getColumnInfo();
+	sqlrcurref->getColumnInfo();
 }
 
 void sqlrcur_mixedCaseColumnNames(sqlrcur sqlrcurref) {
-	return sqlrcurref->mixedCaseColumnNames();
+	sqlrcurref->mixedCaseColumnNames();
 }
 
 void sqlrcur_upperCaseColumnNames(sqlrcur sqlrcurref) {
-	return sqlrcurref->upperCaseColumnNames();
+	sqlrcurref->upperCaseColumnNames();
 }
 
 void sqlrcur_lowerCaseColumnNames(sqlrcur sqlrcurref) {
-	return sqlrcurref->lowerCaseColumnNames();
+	sqlrcurref->lowerCaseColumnNames();
 }
 
 void sqlrcur_cacheToFile(sqlrcur sqlrcurref, const char *filename) {
@@ -678,7 +678,7 @@ int sqlrcur_resumeCachedResultSet(sqlrcur sqlrcurref,
 }
 
 void sqlrcur_closeResultSet(sqlrcur sqlrcurref) {
-	return sqlrcurref->closeResultSet();
+	sqlrcurref->closeResultSet();
 }
 
 }

@@ -620,21 +620,21 @@ ExecStatusType PQresultStatus(const PGresult *res) {
 char *PQresStatus(ExecStatusType status) {
 	debugFunction();
 	if (status==PGRES_EMPTY_QUERY) {
-		return const_cast<char *>("PGRES_EMPTY_QUERY");
+		return (char *)"PGRES_EMPTY_QUERY";
 	} else if (status==PGRES_COMMAND_OK) {
-		return const_cast<char *>("PGRES_COMMAND_OK");
+		return (char *)"PGRES_COMMAND_OK";
 	} else if (status==PGRES_TUPLES_OK) {
-		return const_cast<char *>("PGRES_TUPLES_OK");
+		return (char *)"PGRES_TUPLES_OK";
 	} else if (status==PGRES_COPY_OUT) {
-		return const_cast<char *>("PGRES_COPY_OUT");
+		return (char *)"PGRES_COPY_OUT";
 	} else if (status==PGRES_COPY_IN) {
-		return const_cast<char *>("PGRES_COPY_IN");
+		return (char *)"PGRES_COPY_IN";
 	} else if (status==PGRES_BAD_RESPONSE) {
-		return const_cast<char *>("PGRES_BAD_RESPONSE");
+		return (char *)"PGRES_BAD_RESPONSE";
 	} else if (status==PGRES_NONFATAL_ERROR) {
-		return const_cast<char *>("PGRES_NONFATAL_ERROR");
+		return (char *)"PGRES_NONFATAL_ERROR";
 	} else if (status==PGRES_FATAL_ERROR) {
-		return const_cast<char *>("PGRES_FATAL_ERROR");
+		return (char *)"PGRES_FATAL_ERROR";
 	}
 	return NULL;
 }
@@ -1087,7 +1087,7 @@ char *PQoidStatus(const PGresult *res) {
 	debugFunction();
 	// return OID of tuple if query was an insert,
 	// otherwise return InvalidOid
-	return const_cast<char *>("InvalidOid");
+	return (char *)"InvalidOid";
 }
 
 Oid PQoidValue(const PGresult *res) {

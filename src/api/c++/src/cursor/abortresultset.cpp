@@ -6,7 +6,7 @@
 #include <defines.h>
 
 void sqlrcursor::closeResultSet() {
-	return closeResultSet(true);
+	closeResultSet(true);
 }
 
 void sqlrcursor::closeResultSet(bool closeremote) {
