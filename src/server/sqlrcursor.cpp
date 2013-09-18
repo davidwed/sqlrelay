@@ -343,8 +343,8 @@ void sqlrcursor_svr::errorMessage(char *errorbuffer,
 					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
-	return conn->errorMessage(errorbuffer,errorbuffersize,
-					errorlength,errorcode,liveconnection);
+	conn->errorMessage(errorbuffer,errorbuffersize,
+				errorlength,errorcode,liveconnection);
 }
 
 bool sqlrcursor_svr::knowsRowCount() {

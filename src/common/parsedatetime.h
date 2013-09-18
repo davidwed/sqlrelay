@@ -288,8 +288,8 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 			}
 
 			// clean up
-			for (uint64_t i=0; i<timepartcount; i++) {
-				delete[] timeparts[i];
+			for (uint64_t j=0; j<timepartcount; j++) {
+				delete[] timeparts[j];
 			}
 			delete[] timeparts;
 
@@ -348,8 +348,8 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 			}
 
 			// clean up
-			for (uint64_t i=0; i<datepartcount; i++) {
-				delete[] dateparts[i];
+			for (uint64_t j=0; j<datepartcount; j++) {
+				delete[] dateparts[j];
 			}
 			delete[] dateparts;
 
@@ -373,18 +373,18 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 
 					*day=charstring::toInteger(
 								dateparts[0]);
-					for (int i=0; shortmonths[i]; i++) {
+					for (int j=0; shortmonths[j]; j++) {
 						if (!charstring::
 							compareIgnoringCase(
 								dateparts[1],
-								shortmonths[i]) 
+								shortmonths[j]) 
 							||
 							!charstring::
 							compareIgnoringCase(
 								dateparts[1],
-								longmonths[i]))
+								longmonths[j]))
 						{
-							*month=i+1;
+							*month=j+1;
 						}
 					}
 					*year=charstring::toInteger(
@@ -436,8 +436,8 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 			}
 
 			// clean up
-			for (uint64_t i=0; i<datepartcount; i++) {
-				delete[] dateparts[i];
+			for (uint64_t j=0; j<datepartcount; j++) {
+				delete[] dateparts[j];
 			}
 			delete[] dateparts;
 
@@ -462,18 +462,18 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 
 					*day=charstring::toInteger(
 								dateparts[0]);
-					for (int i=0; shortmonths[i]; i++) {
+					for (int j=0; shortmonths[j]; j++) {
 						if (!charstring::
 							compareIgnoringCase(
 								dateparts[1],
-								shortmonths[i]) 
+								shortmonths[j]) 
 							||
 							!charstring::
 							compareIgnoringCase(
 								dateparts[1],
-								longmonths[i]))
+								longmonths[j]))
 						{
-							*month=i+1;
+							*month=j+1;
 						}
 					}
 					*year=charstring::toInteger(
@@ -525,8 +525,8 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 			}
 
 			// clean up
-			for (uint64_t i=0; i<datepartcount; i++) {
-				delete[] dateparts[i];
+			for (uint64_t j=0; j<datepartcount; j++) {
+				delete[] dateparts[j];
 			}
 			delete[] dateparts;
 		} else {

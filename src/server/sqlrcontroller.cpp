@@ -4584,12 +4584,12 @@ void sqlrcontroller_svr::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
 void sqlrcontroller_svr::returnOutputBindBlob(sqlrcursor_svr *cursor,
 							uint16_t index) {
-	return sendLobOutputBind(cursor,index);
+	sendLobOutputBind(cursor,index);
 }
 
 void sqlrcontroller_svr::returnOutputBindClob(sqlrcursor_svr *cursor,
 							uint16_t index) {
-	return sendLobOutputBind(cursor,index);
+	sendLobOutputBind(cursor,index);
 }
 
 #define MAX_BYTES_PER_CHAR	4
