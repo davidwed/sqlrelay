@@ -604,7 +604,7 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr,"querytree")) {	
 		xmldom	xmld;
 		if (xmld.parseString(sqlrcur->getQueryTree())) {
-			xmldomnode::print(xmld.getRootNode());
+			xmld.getRootNode()->print(&stdoutput);
 		}
 		return;
 	} else {

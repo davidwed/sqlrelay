@@ -3669,7 +3669,7 @@ bool sqlrcontroller_svr::translateQuery(sqlrcursor_svr *cursor) {
 
 	if (debugsqltranslation) {
 		stdoutput.printf("before translation:\n");
-		xmldomnode::print(cursor->querytree->getRootNode());
+		cursor->querytree->getRootNode()->print(&stdoutput);
 		stdoutput.printf("\n");
 	}
 
@@ -3691,7 +3691,7 @@ bool sqlrcontroller_svr::translateQuery(sqlrcursor_svr *cursor) {
 
 	if (debugsqltranslation) {
 		stdoutput.printf("after translation:\n");
-		xmldomnode::print(cursor->querytree->getRootNode());
+		cursor->querytree->getRootNode()->print(&stdoutput);
 		stdoutput.printf("\n");
 	}
 
