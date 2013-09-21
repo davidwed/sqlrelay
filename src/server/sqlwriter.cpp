@@ -316,16 +316,16 @@ bool sqlwriter::elementSupported(const char *element) {
 
 	// is it specifically unsupported
 	const char * const *elements=unsupportedElements();
-	for (uint64_t i=0; elements[i]; i++) {
-		if (!charstring::compare(element,elements[i])) {
+	for (uint64_t ui=0; elements[ui]; ui++) {
+		if (!charstring::compare(element,elements[ui])) {
 			return false;
 		}
 	}
 
 	// is it among the supported elements
 	elements=supportedElements();
-	for (uint64_t i=0; elements[i]; i++) {
-		if (!charstring::compare(element,elements[i])) {
+	for (uint64_t si=0; elements[si]; si++) {
+		if (!charstring::compare(element,elements[si])) {
 			return true;
 		}
 	}

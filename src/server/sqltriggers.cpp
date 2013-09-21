@@ -67,19 +67,19 @@ bool sqltriggers::loadTriggers(const char *triggers) {
 
 void sqltriggers::unloadTriggers() {
 	debugFunction();
-	for (linkedlistnode< sqltriggerplugin * > *node=
+	for (linkedlistnode< sqltriggerplugin * > *bnode=
 				beforetriggers.getFirstNode();
-					node; node=node->getNext()) {
-		sqltriggerplugin	*sqlt=node->getData();
+					bnode; bnode=bnode->getNext()) {
+		sqltriggerplugin	*sqlt=bnode->getData();
 		delete sqlt->tr;
 		delete sqlt->dl;
 		delete sqlt;
 	}
 	beforetriggers.clear();
-	for (linkedlistnode< sqltriggerplugin * > *node=
+	for (linkedlistnode< sqltriggerplugin * > *anode=
 				aftertriggers.getFirstNode();
-					node; node=node->getNext()) {
-		sqltriggerplugin	*sqlt=node->getData();
+					anode; anode=anode->getNext()) {
+		sqltriggerplugin	*sqlt=anode->getData();
 		delete sqlt->tr;
 		delete sqlt->dl;
 		delete sqlt;

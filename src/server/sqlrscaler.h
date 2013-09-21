@@ -45,9 +45,9 @@ class scaler : public daemonprocess {
 
 		char		*pidfile;
 
-		const char	*id;
+		char		*id;
 		char		*config;
-		const char	*dbase;
+		char		*dbase;
 
 		sqlrconfigfile	*cfgfile;
 

@@ -4056,9 +4056,9 @@ bool sqlrcontroller_svr::handleBinds(sqlrcursor_svr *cursor) {
 	bindvar_svr	*bind=NULL;
 	
 	// iterate through the arrays, binding values to variables
-	for (int16_t i=0; i<cursor->inbindcount; i++) {
+	for (int16_t in=0; in<cursor->inbindcount; in++) {
 
-		bind=&cursor->inbindvars[i];
+		bind=&cursor->inbindvars[in];
 
 		// bind the value to the variable
 		if (bind->type==STRING_BIND || bind->type==NULL_BIND) {
@@ -4124,9 +4124,9 @@ bool sqlrcontroller_svr::handleBinds(sqlrcursor_svr *cursor) {
 		}
 	}
 
-	for (int16_t i=0; i<cursor->outbindcount; i++) {
+	for (int16_t out=0; out<cursor->outbindcount; out++) {
 
-		bind=&cursor->outbindvars[i];
+		bind=&cursor->outbindvars[out];
 
 		// bind the value to the variable
 		if (bind->type==STRING_BIND) {
@@ -4176,14 +4176,14 @@ bool sqlrcontroller_svr::handleBinds(sqlrcursor_svr *cursor) {
 		} else if (bind->type==BLOB_BIND) {
 			if (!cursor->outputBindBlob(
 					bind->variable,
-					bind->variablesize,i,
+					bind->variablesize,out,
 					&bind->isnull)) {
 				return false;
 			}
 		} else if (bind->type==CLOB_BIND) {
 			if (!cursor->outputBindClob(
 					bind->variable,
-					bind->variablesize,i,
+					bind->variablesize,out,
 					&bind->isnull)) {
 				return false;
 			}
