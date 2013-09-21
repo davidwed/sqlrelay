@@ -535,8 +535,8 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 	}
 
 	// clean up
-	for (uint64_t i=0; i<partcount; i++) {
-		delete[] parts[i];
+	for (uint64_t j=0; j<partcount; j++) {
+		delete[] parts[j];
 	}
 	delete[] parts;
 

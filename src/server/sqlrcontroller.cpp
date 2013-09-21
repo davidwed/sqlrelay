@@ -4745,12 +4745,12 @@ void sqlrcontroller_svr::sendColumnDefinitionString(const char *name,
 
 	if (sqlrlg) {
 		debugstr.clear();
-		for (uint16_t i=0; i<namelen; i++) {
-			debugstr.append(name[i]);
+		for (uint16_t ni=0; ni<namelen; ni++) {
+			debugstr.append(name[ni]);
 		}
 		debugstr.append(":");
-		for (uint16_t i=0; i<typelen; i++) {
-			debugstr.append(type[i]);
+		for (uint16_t ti=0; ti<typelen; ti++) {
+			debugstr.append(type[ti]);
 		}
 		debugstr.append(":");
 		debugstr.append(size);
