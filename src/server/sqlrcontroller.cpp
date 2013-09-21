@@ -3601,9 +3601,11 @@ bool sqlrcontroller_svr::processQuery(sqlrcursor_svr *cursor,
 
 void sqlrcontroller_svr::translateBindVariablesFromMappings(
 						sqlrcursor_svr *cursor) {
+	// index variable
+	uint16_t	i=0;
 
 	// run two passes
-	for (uint16_t i=0; i<2; i++) {
+	for (i=0; i<2; i++) {
 
 		// first pass for input binds, second pass for output binds
 		uint16_t	count=(!i)?cursor->inbindcount:
@@ -3627,11 +3629,11 @@ void sqlrcontroller_svr::translateBindVariablesFromMappings(
 
 	// debug
 	logDebugMessage("remapped input binds:");
-	for (uint16_t i=0; i<cursor->inbindcount; i++) {
+	for (i=0; i<cursor->inbindcount; i++) {
 		logDebugMessage(cursor->inbindvars[i].variable);
 	}
 	logDebugMessage("remapped output binds:");
-	for (uint16_t i=0; i<cursor->outbindcount; i++) {
+	for (i=0; i<cursor->outbindcount; i++) {
 		logDebugMessage(cursor->outbindvars[i].variable);
 	}
 }
@@ -3730,16 +3732,19 @@ enum queryparsestate_t {
 
 void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 
+	// index variable
+	uint16_t	i=0;
+
 	// debug
 	logDebugMessage("translating bind variables...");
 	logDebugMessage("original:");
 	logDebugMessage(cursor->querybuffer);
 	logDebugMessage("input binds:");
-	for (uint16_t i=0; i<cursor->inbindcount; i++) {
+	for (i=0; i<cursor->inbindcount; i++) {
 		logDebugMessage(cursor->inbindvars[i].variable);
 	}
 	logDebugMessage("output binds:");
-	for (uint16_t i=0; i<cursor->outbindcount; i++) {
+	for (i=0; i<cursor->outbindcount; i++) {
 		logDebugMessage(cursor->outbindvars[i].variable);
 	}
 
@@ -3870,11 +3875,11 @@ void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 	if (debugsqltranslation) {
 		stdoutput.printf("bind translation:\n\"%s\"\n",
 						cursor->querybuffer);
-		for (uint16_t i=0; i<cursor->inbindcount; i++) {
+		for (i=0; i<cursor->inbindcount; i++) {
 			stdoutput.printf("  inbind: \"%s\"\n",
 					cursor->inbindvars[i].variable);
 		}
-		for (uint16_t i=0; i<cursor->outbindcount; i++) {
+		for (i=0; i<cursor->outbindcount; i++) {
 			stdoutput.printf("  outbind: \"%s\"\n",
 					cursor->outbindvars[i].variable);
 		}
@@ -3883,11 +3888,11 @@ void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 	logDebugMessage("converted:");
 	logDebugMessage(cursor->querybuffer);
 	logDebugMessage("input binds:");
-	for (uint16_t i=0; i<cursor->inbindcount; i++) {
+	for (i=0; i<cursor->inbindcount; i++) {
 		logDebugMessage(cursor->inbindvars[i].variable);
 	}
 	logDebugMessage("output binds:");
-	for (uint16_t i=0; i<cursor->outbindcount; i++) {
+	for (i=0; i<cursor->outbindcount; i++) {
 		logDebugMessage(cursor->outbindvars[i].variable);
 	}
 }
