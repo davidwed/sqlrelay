@@ -16323,7 +16323,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 if ( test "$STDLIB_TEST" = "no" )
 then
 	OLDCPPFLAGS="$CPPFLAGS"
-	CPPFLAGS="-fno-builtin -Werror $CPPFLAGS"
+	CPPFLAGS="-fno-builtin -Wall -Werror $CPPFLAGS"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <stdlib.h>
