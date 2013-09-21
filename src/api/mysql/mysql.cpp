@@ -2272,7 +2272,7 @@ my_bool mysql_stmt_attr_get(MYSQL_STMT *stmt,
 my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 	debugFunction();
 
-	stmt->bindvarnames->free();
+	stmt->bindvarnames->deallocate();
 
 	unsigned long	paramcount=mysql_param_count(stmt);
 	for (unsigned long i=0; i<paramcount; i++) {
@@ -2280,7 +2280,7 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 		// use 1-based index for variable names
 		size_t	buffersize=charstring::integerLength((uint32_t)i+1)+1;
 		char	*variable=
-			(char *)stmt->bindvarnames->malloc(buffersize);
+			(char *)stmt->bindvarnames->allocate(buffersize);
 		charstring::printf(variable,buffersize,"%ld",i+1);
 
 		// get the cursor

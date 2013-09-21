@@ -88,7 +88,7 @@ void sqlrcursor::clearRows() {
 	}
 
 	// reset the row storage pool
-	rowstorage->free();
+	rowstorage->deallocate();
 }
 
 void sqlrcursor::clearColumns() {
@@ -102,7 +102,7 @@ void sqlrcursor::clearColumns() {
 	}
 
 	// reset the column storage pool
-	colstorage->free();
+	colstorage->deallocate();
 
 	// reset the column count
 	previouscolcount=colcount;

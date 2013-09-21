@@ -102,7 +102,7 @@ bool sqlrcursor::parseData() {
 			if (returnnulls) {
 				buffer=NULL;
 			} else {
-				buffer=(char *)rowstorage->malloc(1);
+				buffer=(char *)rowstorage->allocate(1);
 				buffer[0]='\0';
 			}
 			length=0;
@@ -117,7 +117,7 @@ bool sqlrcursor::parseData() {
 
 			// for non-long, non-NULL datatypes...
 			// get the field into a buffer
-			buffer=(char *)rowstorage->malloc(length+1);
+			buffer=(char *)rowstorage->allocate(length+1);
 			if ((uint32_t)getString(buffer,length)!=length) {
 				setError("Failed to get the field data.\n A network error may have occurred");
 				return false;

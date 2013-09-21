@@ -130,7 +130,7 @@ bool sqlrcursor::parseColumnInfo() {
 			currentcol=getColumnInternal(i);
 	
 			// get the column name
-			currentcol->name=(char *)colstorage->malloc(length+1);
+			currentcol->name=(char *)colstorage->allocate(length+1);
 			if (getString(currentcol->name,length)!=length) {
 				setError("Failed to get the column name.\n A network error may have occurred.");
 				return false;

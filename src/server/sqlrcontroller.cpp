@@ -2470,7 +2470,7 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 	// clear bind mappings and reset the fake input binds flag
 	// (do this here because getInput/OutputBinds uses the bindmappingspool)
 	if (!bindcursor && !reexecute) {
-		bindmappingspool->free();
+		bindmappingspool->deallocate();
 		inbindmappings->clear();
 		outbindmappings->clear();
 		cursor->fakeinputbindsforthisquery=fakeinputbinds;
@@ -2604,7 +2604,7 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 			returnResultSetHeader(cursor);
 
 			// free memory used by binds
-			bindpool->free();
+			bindpool->deallocate();
 
 			logDebugMessage("handle query succeeded");
 
@@ -2866,12 +2866,14 @@ bool sqlrcontroller_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 			if (!getBindSize(cursor,bv,&maxstringbindvaluelength)) {
 				return false;
 			}
-			// This must be a calloc because oracle8 gets angry if
-			// these aren't initialized to NULL's.  It's possible
-			// that just the first character needs to be NULL, but
-			// for now I'm just going to go ahead and use calloc
+			// This must be a allocated and cleared because oracle8
+			// gets angry if these aren't initialized to NULL's.
+			// It's possible that just the first character needs to
+			// be NULL, but for now I'm just going to go ahead and
+			// use allocateAndClear.
 			bv->value.stringval=
-				(char *)bindpool->calloc(bv->valuesize+1);
+				(char *)bindpool->allocateAndClear(
+							bv->valuesize+1);
 			logDebugMessage("STRING");
 		} else if (bv->type==INTEGER_BIND) {
 			logDebugMessage("INTEGER");
@@ -2896,7 +2898,7 @@ bool sqlrcontroller_svr::getOutputBinds(sqlrcursor_svr *cursor) {
 			// or whatever buffer a child might need to store a
 			// date 512 bytes ought to be enough
 			bv->value.dateval.buffersize=512;
-			bv->value.dateval.buffer=(char *)bindpool->malloc(
+			bv->value.dateval.buffer=(char *)bindpool->allocate(
 						bv->value.dateval.buffersize);
 		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
 			if (!getBindSize(cursor,bv,&maxlobbindvaluelength)) {
@@ -3001,7 +3003,7 @@ bool sqlrcontroller_svr::getBindVarName(sqlrcursor_svr *cursor,
 
 	// get the variable name
 	bv->variablesize=bindnamesize+1;
-	bv->variable=(char *)bindmappingspool->malloc(bindnamesize+2);
+	bv->variable=(char *)bindmappingspool->allocate(bindnamesize+2);
 	bv->variable[0]=conn->bindVariablePrefix();
 	result=clientsock->read(bv->variable+1,bindnamesize,
 					idleclienttimeout,0);
@@ -3080,7 +3082,7 @@ void sqlrcontroller_svr::getNullBind(bindvar_svr *bv) {
 
 	logDebugMessage("NULL");
 
-	bv->value.stringval=(char *)bindpool->malloc(1);
+	bv->value.stringval=(char *)bindpool->allocate(1);
 	bv->value.stringval[0]='\0';
 	bv->valuesize=0;
 	bv->isnull=conn->nullBindValue();
@@ -3100,7 +3102,7 @@ bool sqlrcontroller_svr::getStringBind(sqlrcursor_svr *cursor,
 	}
 
 	// allocate space to store the value
-	bv->value.stringval=(char *)bindpool->malloc(bv->valuesize+1);
+	bv->value.stringval=(char *)bindpool->allocate(bv->valuesize+1);
 
 	// get the bind value
 	ssize_t	result=clientsock->read(bv->value.stringval,
@@ -3279,7 +3281,7 @@ bool sqlrcontroller_svr::getDateBind(bindvar_svr *bv) {
 	// FIXME: do bounds checking here
 
 	// allocate space to store the time zone
-	bv->value.dateval.tz=(char *)bindpool->malloc(length+1);
+	bv->value.dateval.tz=(char *)bindpool->allocate(length+1);
 
 	// get the time zone
 	result=clientsock->read(bv->value.dateval.tz,length,
@@ -3296,7 +3298,7 @@ bool sqlrcontroller_svr::getDateBind(bindvar_svr *bv) {
 	// allocate enough space to store the date/time string
 	// 64 bytes ought to be enough
 	bv->value.dateval.buffersize=64;
-	bv->value.dateval.buffer=(char *)bindpool->malloc(
+	bv->value.dateval.buffer=(char *)bindpool->allocate(
 					bv->value.dateval.buffersize);
 
 	stringbuffer	str;
@@ -3332,7 +3334,7 @@ bool sqlrcontroller_svr::getLobBind(sqlrcursor_svr *cursor, bindvar_svr *bv) {
 
 	// allocate space to store the value
 	// (the +1 is to store the NULL-terminator for CLOBS)
-	bv->value.stringval=(char *)bindpool->malloc(bv->valuesize+1);
+	bv->value.stringval=(char *)bindpool->allocate(bv->valuesize+1);
 
 	// get the bind value
 	ssize_t	result=clientsock->read(bv->value.stringval,
@@ -4004,7 +4006,7 @@ void sqlrcontroller_svr::translateBindVariableInArray(sqlrcursor_svr *cursor,
 
 				// allocate memory for the new name
 				b->variable=(char *)bindmappingspool->
-							malloc(tempnumberlen+2);
+						allocate(tempnumberlen+2);
 
 				// replace the existing bind var name and size
 				b->variable[0]=conn->bindVariablePrefix();

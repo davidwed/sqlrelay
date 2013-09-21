@@ -286,7 +286,7 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 		bind->valuesize=charstring::length(converted);
 		bind->value.stringval=
 			(char *)sqlrcon->cont->bindmappingspool->
-						calloc(bind->valuesize+1);
+					allocateAndClear(bind->valuesize+1);
 		charstring::copy(bind->value.stringval,converted);
 		delete[] converted;
 	}

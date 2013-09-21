@@ -197,7 +197,7 @@ const char *temptablessybaseize::generateTempTableName(const char *oldtable) {
 	uint64_t	size=1+charstring::length(oldtable)+1;
 
 	// allocate storage for the new table name
-	char	*newtable=(char *)sqlts->temptablepool->malloc(size);
+	char	*newtable=(char *)sqlts->temptablepool->allocate(size);
 
 	// build up the new table name
 	charstring::copy(newtable,"#");

@@ -156,8 +156,8 @@ bool sqltranslations::runTranslations(sqlrconnection_svr *sqlrcon,
 }
 
 void sqltranslations::endSession() {
-	temptablepool->free();
-	tempindexpool->free();
+	temptablepool->deallocate();
+	tempindexpool->deallocate();
 	temptablemap.clear();
 	tempindexmap.clear();
 }
@@ -284,29 +284,29 @@ databaseobject *sqltranslations::createDatabaseObject(memorypool *pool,
 
 	// create buffers and copy data into them
 	if (database) {
-		databasecopy=(char *)pool->malloc(
+		databasecopy=(char *)pool->allocate(
 				charstring::length(database)+1);
 		charstring::copy(databasecopy,database);
 	}
 	if (schema) {
-		schemacopy=(char *)pool->malloc(
+		schemacopy=(char *)pool->allocate(
 				charstring::length(schema)+1);
 		charstring::copy(schemacopy,schema);
 	}
 	if (object) {
-		objectcopy=(char *)pool->malloc(
+		objectcopy=(char *)pool->allocate(
 				charstring::length(object)+1);
 		charstring::copy(objectcopy,object);
 	}
 	if (dependency) {
-		dependencycopy=(char *)pool->malloc(
+		dependencycopy=(char *)pool->allocate(
 				charstring::length(dependency)+1);
 		charstring::copy(dependencycopy,dependency);
 	}
 
 	// create the databaseobject
 	databaseobject	*dbo=
-		(databaseobject *)pool->malloc(sizeof(databaseobject));
+		(databaseobject *)pool->allocate(sizeof(databaseobject));
 
 
 	// populate it

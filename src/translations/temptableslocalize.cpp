@@ -292,7 +292,7 @@ const char *temptableslocalize::generateTempTableName(const char *oldtable,
 				charstring::integerLength(pid)+1;
 
 	// allocate storage for the new table name
-	char	*newtable=(char *)sqlts->temptablepool->malloc(size);
+	char	*newtable=(char *)sqlts->temptablepool->allocate(size);
 
 	// build up the new table name
 	charstring::copy(newtable,oldtable);
