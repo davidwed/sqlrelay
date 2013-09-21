@@ -16304,7 +16304,6 @@ OLDCPPFLAGS="$CPPFLAGS"
 CPPFLAGS="-Wall -Werror $CPPFLAGS"
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether -fno-builtin needs to be used" >&5
 $as_echo_n "checking whether -fno-builtin needs to be used... " >&6; }
-CPPFLAGS="$OLDCPPFLAGS"
 
 STDLIB_TEST="no"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -16322,6 +16321,7 @@ if ac_fn_cxx_try_compile "$LINENO"; then :
   STDLIB_TEST="yes"
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+CPPFLAGS="$OLDCPPFLAGS"
 
 if ( test "$STDLIB_TEST" = "no" )
 then

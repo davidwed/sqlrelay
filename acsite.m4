@@ -553,10 +553,10 @@ dnl -fno-builtin flag.
 OLDCPPFLAGS="$CPPFLAGS"
 CPPFLAGS="-Wall -Werror $CPPFLAGS"
 AC_MSG_CHECKING(whether -fno-builtin needs to be used)
-CPPFLAGS="$OLDCPPFLAGS"
 
 STDLIB_TEST="no"
 AC_TRY_COMPILE([#include <stdlib.h>],[],STDLIB_TEST="yes")
+CPPFLAGS="$OLDCPPFLAGS"
 
 dnl If that failed, try again with -fno-builtin
 if ( test "$STDLIB_TEST" = "no" )
