@@ -471,6 +471,9 @@ FW_CHECK_PIPE
 FW_CHECK_WERROR
 FW_CHECK_WALL
 FW_CHECK_DEBUG
+
+FW_CHECK_F_NO_BUILTIN
+
 echo "******************************"
 
 
