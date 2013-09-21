@@ -90,14 +90,14 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 
 sqlrconfigfile::~sqlrconfigfile() {
 
-	for (uint64_t index=0; index<addresscount; index++) {
-		delete[] addresses[index];
+	for (uint64_t adrind=0; adrind<addresscount; adrind++) {
+		delete[] addresses[adrind];
 	}
 	delete[] addresses;
 
 
-	for (uint64_t index=0; index<mysqladdresscount; index++) {
-		delete[] mysqladdresses[index];
+	for (uint64_t myadrind=0; myadrind<mysqladdresscount; myadrind++) {
+		delete[] mysqladdresses[myadrind];
 	}
 	delete[] mysqladdresses;
 	delete[] mysqlunixport;
@@ -1170,7 +1170,8 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			passwordencryptions.append("=\"");
 			passwordencryptions.append(value)->append("\"");
 		} else if (currentattribute==ADDRESSES_ATTRIBUTE) {
-			for (uint64_t index=0; index<addresscount; index++) {
+			uint64_t	index;
+			for (index=0; index<addresscount; index++) {
 				delete[] addresses[index];
 			}
 			delete[] addresses;
@@ -1183,7 +1184,7 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 				!charstring::contains(value,DEFAULT_ADDRESSES))?
 				value:DEFAULT_ADDRESSES,
 				",",true,&addresses,&addresscount);
-			for (uint64_t index=0; index<addresscount; index++) {
+			for (index=0; index<addresscount; index++) {
 				charstring::bothTrim(addresses[index]);
 			}
 		} else if (currentattribute==PORT_ATTRIBUTE) {
@@ -1192,8 +1193,8 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			delete[] unixport;
 			unixport=charstring::duplicate(value);
 		} else if (currentattribute==MYSQLADDRESSES_ATTRIBUTE) {
-			for (uint64_t index=0;
-					index<mysqladdresscount; index++) {
+			uint64_t index;
+			for (index=0; index<mysqladdresscount; index++) {
 				delete[] mysqladdresses[index];
 			}
 			delete[] mysqladdresses;
@@ -1206,8 +1207,7 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 				!charstring::contains(value,DEFAULT_ADDRESSES))?
 				value:DEFAULT_ADDRESSES,
 				",",true,&mysqladdresses,&mysqladdresscount);
-			for (uint64_t index=0;
-					index<mysqladdresscount; index++) {
+			for (index=0; index<mysqladdresscount; index++) {
 				charstring::bothTrim(mysqladdresses[index]);
 			}
 		} else if (currentattribute==MYSQLPORT_ATTRIBUTE) {

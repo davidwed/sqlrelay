@@ -329,9 +329,9 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		char		*isolationlevel;
 		bool		ignoreselectdb;
 		bool		waitfordowndb;
-		const char	*datetimeformat;
-		const char	*dateformat;
-		const char	*timeformat;
+		char		*datetimeformat;
+		char		*dateformat;
+		char		*timeformat;
 		bool		dateddmm;
 
 		bool		instart;
