@@ -199,11 +199,11 @@ void sqlrcursor::validateBindsInternal() {
 
 	// check each input bind
 	count=inbindcount;
-	for (uint16_t i=0; i<count; i++) {
+	for (uint16_t in=0; in<count; in++) {
 
 		// don't check bind-by-position variables
-		len=charstring::length(inbindvars[i].variable);
-		if (charstring::isInteger(inbindvars[i].variable,len)) {
+		len=charstring::length(inbindvars[in].variable);
+		if (charstring::isInteger(inbindvars[in].variable,len)) {
 			continue;
 		}
 
@@ -215,7 +215,7 @@ void sqlrcursor::validateBindsInternal() {
 		// table_name's would match, but only the second is a bind
 		// variable
 		while ((ptr=charstring::findFirst(start,
-					inbindvars[i].variable))) {
+					inbindvars[in].variable))) {
 
 			// for a match to be a bind variable, it must be 
 			// preceded by a colon or at-sign and can't be followed
@@ -234,16 +234,16 @@ void sqlrcursor::validateBindsInternal() {
 			}
 		}
 
-		inbindvars[i].send=found;
+		inbindvars[in].send=found;
 	}
 
 	// check each output bind
 	count=outbindcount;
-	for (uint16_t i=0; i<count; i++) {
+	for (uint16_t out=0; out<count; out++) {
 
 		// don't check bind-by-position variables
-		len=charstring::length(outbindvars[i].variable);
-		if (charstring::isInteger(outbindvars[i].variable,len)) {
+		len=charstring::length(outbindvars[out].variable);
+		if (charstring::isInteger(outbindvars[out].variable,len)) {
 			continue;
 		}
 
@@ -254,7 +254,7 @@ void sqlrcursor::validateBindsInternal() {
 		// "select * from table where table_name=:table_name", both
 		// table_name's would match, but only 1 is correct
 		while ((ptr=charstring::findFirst(start,
-					outbindvars[i].variable))) {
+					outbindvars[out].variable))) {
 
 			// for a match to be a bind variable, it must be 
 			// preceded by a colon and can't be followed by an
@@ -273,7 +273,7 @@ void sqlrcursor::validateBindsInternal() {
 			}
 		}
 
-		outbindvars[i].send=found;
+		outbindvars[out].send=found;
 	}
 }
 

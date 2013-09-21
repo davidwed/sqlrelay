@@ -958,15 +958,15 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	}
 
 	// iterate through columns
-	for (uint32_t i=0; i<sqlrcur->colCount(); i++) {
+	for (uint32_t ci=0; ci<sqlrcur->colCount(); ci++) {
 
 		// write the column name
-		name=sqlrcur->getColumnName(i);
+		name=sqlrcur->getColumnName(ci);
 		stdoutput.printf("%s",name);
 
 		// which is longer, field name or longest field
 		namelen=charstring::length(name);
-		longest=sqlrcur->getLongest(i);
+		longest=sqlrcur->getLongest(ci);
 		if (namelen>longest) {
 			longest=namelen;
 		}
@@ -978,7 +978,7 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 		}
 
 		// put an extra space between names
-		if (i<colcount-1) {
+		if (ci<colcount-1) {
 			stdoutput.printf(" ");
 			charcount=charcount+1;
 		}

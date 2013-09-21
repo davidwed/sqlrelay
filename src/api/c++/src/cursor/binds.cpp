@@ -695,14 +695,14 @@ void sqlrcursor::validateBinds() {
 bool sqlrcursor::validBind(const char *variable) {
 	performSubstitutions();
 	validateBindsInternal();
-	for (uint16_t i=0; i<inbindcount; i++) {
-		if (!charstring::compare(inbindvars[i].variable,variable)) {
-			return inbindvars[i].send;
+	for (uint16_t in=0; in<inbindcount; in++) {
+		if (!charstring::compare(inbindvars[in].variable,variable)) {
+			return inbindvars[in].send;
 		}
 	}
-	for (uint16_t i=0; i<outbindcount; i++) {
-		if (!charstring::compare(outbindvars[i].variable,variable)) {
-			return outbindvars[i].send;
+	for (uint16_t out=0; out<outbindcount; out++) {
+		if (!charstring::compare(outbindvars[out].variable,variable)) {
+			return outbindvars[out].send;
 		}
 	}
 	return false;

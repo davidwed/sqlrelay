@@ -147,9 +147,12 @@ void sqlrcursor::sendCursorStatus() {
 
 void sqlrcursor::sendInputBinds() {
 
+	// index
+	uint16_t	i=0;
+
 	// adjust inbindcount
 	uint16_t	count=inbindcount;
-	for (uint16_t i=0; i<count; i++) {
+	for (i=0; i<count; i++) {
 		if (!inbindvars[i].send) {
 			inbindcount--;
 		}
@@ -167,7 +170,7 @@ void sqlrcursor::sendInputBinds() {
 	sqlrc->cs->write(inbindcount);
 	count=inbindcount;
 	uint16_t	size;
-	for (uint16_t i=0; i<count; i++) {
+	for (i=0; i<count; i++) {
 
 		// don't send anything if the send flag is turned off
 		if (!inbindvars[i].send) {
@@ -340,9 +343,12 @@ void sqlrcursor::sendInputBinds() {
 
 void sqlrcursor::sendOutputBinds() {
 
+	// index
+	uint16_t	i=0;
+
 	// adjust outbindcount
 	uint16_t	count=outbindcount;
-	for (uint16_t i=0; i<count; i++) {
+	for (i=0; i<count; i++) {
 		if (!outbindvars[i].send) {
 			outbindcount--;
 		}
@@ -360,7 +366,7 @@ void sqlrcursor::sendOutputBinds() {
 	sqlrc->cs->write(outbindcount);
 	uint16_t	size;
 	count=outbindcount;
-	for (uint16_t i=0; i<count; i++) {
+	for (i=0; i<count; i++) {
 
 		// don't send anything if the send flag is turned off
 		if (!outbindvars[i].send) {

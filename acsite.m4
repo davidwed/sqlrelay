@@ -559,7 +559,7 @@ dnl If that failed, try again with -fno-builtin
 if ( test "$STDLIB_TEST" = "no" )
 then
 	OLDCPPFLAGS="$CPPFLAGS"
-	CPPFLAGS="-fno-builtin $CPPFLAGS"
+	CPPFLAGS="-fno-builtin -Werror $CPPFLAGS"
 	AC_TRY_COMPILE([#include <stdlib.h>],[],STDLIB_TEST="yes")
 
 	dnl if that also failed then restore CPPFLAGS,
@@ -569,6 +569,7 @@ then
 		CPPFLAGS="$OLDCPPFLAGS"
 		AC_MSG_RESULT(no)
 	else
+		CPPFLAGS="-fno-builtin $OLDCPPFLAGS"
 		AC_MSG_RESULT(yes)
 	fi
  else

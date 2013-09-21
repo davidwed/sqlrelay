@@ -50,7 +50,7 @@ class sqlrimport : public xmlsax {
 		sqlrcursor	*sqlrcur;
 
 		unsigned short	currenttag;
-		const char	*currentattribute;
+		char		*currentattribute;
 
 		stringbuffer	query;
 		char		*table;

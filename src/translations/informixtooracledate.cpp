@@ -381,7 +381,7 @@ void informixtooracledate::translateIntervalQualifier(
 
 	// build up the format string
 	formatstring->append("'");
-	if (start<=TIMEPARTS_YEAR && end>=TIMEPARTS_YEAR) {
+	if (start<=TIMEPARTS_YEAR) {
 		formatstring->append("YYYY");
 		if (end!=TIMEPARTS_YEAR) {
 			formatstring->append("-");

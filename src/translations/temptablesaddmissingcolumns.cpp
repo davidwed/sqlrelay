@@ -93,9 +93,6 @@ bool temptablesaddmissingcolumns::run(sqlrconnection_svr *sqlrcon,
 			xmldomnode	*column=
 					sqlts->newNode(columns,"column");
 			sqlts->newNode(column,"name",parts[i]);
-		}
-
-		for (uint64_t i=0; i<partscount; i++) {
 			delete[] parts[i];
 		}
 

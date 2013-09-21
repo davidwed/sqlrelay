@@ -898,43 +898,43 @@ bool routercursor::executeQuery(const char *query, uint32_t length) {
 	nextrow=0;
 
 	// populate output bind values
-	for (uint16_t index=0; index<obcount; index++) {
-		const char	*variable=obv[index].variable;
-		*(obv[index].isnull)=routerconn->nonnullbindvalue;
-		if (obv[index].type==STRING_BIND) {
+	for (uint16_t outi=0; outi<obcount; outi++) {
+		const char	*variable=obv[outi].variable;
+		*(obv[outi].isnull)=routerconn->nonnullbindvalue;
+		if (obv[outi].type==STRING_BIND) {
 			const char	*str=cur->getOutputBindString(variable);
 			uint32_t	len=cur->getOutputBindLength(variable);
 			if (str) {
-				charstring::copy(obv[index].value.stringvalue,
+				charstring::copy(obv[outi].value.stringvalue,
 								str,len);
 			} else {
-				obv[index].value.stringvalue[0]='\0';
-				*(obv[index].isnull)=routerconn->nullbindvalue;
+				obv[outi].value.stringvalue[0]='\0';
+				*(obv[outi].isnull)=routerconn->nullbindvalue;
 			} 
-		} else if (obv[index].type==INTEGER_BIND) {
-			*(obv[index].value.intvalue)=
+		} else if (obv[outi].type==INTEGER_BIND) {
+			*(obv[outi].value.intvalue)=
 					cur->getOutputBindInteger(variable);
-		} else if (obv[index].type==DOUBLE_BIND) {
-			*(obv[index].value.doublevalue)=
+		} else if (obv[outi].type==DOUBLE_BIND) {
+			*(obv[outi].value.doublevalue)=
 					cur->getOutputBindDouble(variable);
-		} else if (obv[index].type==DATE_BIND) {
+		} else if (obv[outi].type==DATE_BIND) {
 			cur->getOutputBindDate(variable,
-					obv[index].value.datevalue.year,
-					obv[index].value.datevalue.month,
-					obv[index].value.datevalue.day,
-					obv[index].value.datevalue.hour,
-					obv[index].value.datevalue.minute,
-					obv[index].value.datevalue.second,
-					obv[index].value.datevalue.microsecond,
-					obv[index].value.datevalue.tz);
+					obv[outi].value.datevalue.year,
+					obv[outi].value.datevalue.month,
+					obv[outi].value.datevalue.day,
+					obv[outi].value.datevalue.hour,
+					obv[outi].value.datevalue.minute,
+					obv[outi].value.datevalue.second,
+					obv[outi].value.datevalue.microsecond,
+					obv[outi].value.datevalue.tz);
 		}
 	}
 
 	// handle cursor bind values
-	for (uint16_t index=0; index<cbcount; index++) {
-		routercursor	*rcur=(routercursor *)cbv[index].cursor;
+	for (uint16_t curi=0; curi<cbcount; curi++) {
+		routercursor	*rcur=(routercursor *)cbv[curi].cursor;
 		rcur->con=con;
-		rcur->cur=cur->getOutputBindCursor(cbv[index].variable);
+		rcur->cur=cur->getOutputBindCursor(cbv[curi].variable);
 		if (!rcur->cur) {
 			return false;
 		}

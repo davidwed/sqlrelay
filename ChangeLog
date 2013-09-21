@@ -23,6 +23,7 @@
 		command-line now
 	exit/quit in a sqlrsh script aborts the script now
 	improved date/time parsing for translations and result-set conversions
+	fixed lots of cases where const char *'s were being deleted
 
 0.51 - fixed minor perl DBI driver documentation issue
 	added support for oracle 12c

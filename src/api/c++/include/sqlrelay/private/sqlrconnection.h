@@ -50,25 +50,25 @@
 		bool	connected;
 
 		// connection
-		const char		*server;
-		uint16_t		listenerinetport;
-		uint16_t		connectioninetport;
-		char			*listenerunixport;
-		const char		*connectionunixport;
-		char			connectionunixportbuffer[MAXPATHLEN+1];
-		int32_t			connecttimeoutsec;
-		int32_t			connecttimeoutusec;
-		int32_t			authtimeoutsec;
-		int32_t			authtimeoutusec;
-		int32_t			responsetimeoutsec;
-		int32_t			responsetimeoutusec;
-		int32_t			retrytime;
-		int32_t			tries;
+		char		*server;
+		uint16_t	listenerinetport;
+		uint16_t	connectioninetport;
+		char		*listenerunixport;
+		const char	*connectionunixport;
+		char		connectionunixportbuffer[MAXPATHLEN+1];
+		int32_t		connecttimeoutsec;
+		int32_t		connecttimeoutusec;
+		int32_t		authtimeoutsec;
+		int32_t		authtimeoutusec;
+		int32_t		responsetimeoutsec;
+		int32_t		responsetimeoutusec;
+		int32_t		retrytime;
+		int32_t		tries;
 
 		// authentication
-		const char	*user;
+		char		*user;
 		uint32_t	userlen;
-		const char	*password;
+		char		*password;
 		uint32_t	passwordlen;
 
 		// error
