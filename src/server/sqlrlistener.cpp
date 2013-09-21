@@ -95,13 +95,13 @@ void sqlrlistener::cleanUp() {
 	delete[] unixport;
 	delete[] pidfile;
 	delete clientsockun;
-	for (uint64_t index=0; index<clientsockincount; index++) {
-		delete clientsockin[index];
+	for (uint64_t csind=0; csind<clientsockincount; csind++) {
+		delete clientsockin[csind];
 	}
 	delete[] clientsockin;
 	delete mysqlclientsockun;
-	for (uint64_t index=0; index<mysqlclientsockincount; index++) {
-		delete mysqlclientsockin[index];
+	for (uint64_t mcsind=0; mcsind<mysqlclientsockincount; mcsind++) {
+		delete mysqlclientsockin[mcsind];
 	}
 	delete[] mysqlclientsockin;
 	delete handoffsockun;
@@ -991,14 +991,14 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 
 	// handle connections to the client sockets
 	inetserversocket	*iss=NULL;
-	for (uint64_t index=0; index<clientsockincount; index++) {
-		if (fd==clientsockin[index]) {
-			iss=clientsockin[index];
+	for (uint64_t csind=0; csind<clientsockincount; csind++) {
+		if (fd==clientsockin[csind]) {
+			iss=clientsockin[csind];
 		}
 	}
-	for (uint64_t index=0; index<mysqlclientsockincount; index++) {
-		if (fd==mysqlclientsockin[index]) {
-			iss=mysqlclientsockin[index];
+	for (uint64_t mcsind=0; mcsind<mysqlclientsockincount; mcsind++) {
+		if (fd==mysqlclientsockin[mcsind]) {
+			iss=mysqlclientsockin[mcsind];
 		}
 	}
 	if (iss) {

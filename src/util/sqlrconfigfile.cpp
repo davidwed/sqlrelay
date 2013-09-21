@@ -131,13 +131,13 @@ sqlrconfigfile::~sqlrconfigfile() {
 		delete rn->getData();
 	}
 
-	for (stringlistnode *sln=sessionstartqueries.getFirstNode();
-						sln; sln=sln->getNext()) {
-		delete[] sln->getData();
+	for (stringlistnode *ssln=sessionstartqueries.getFirstNode();
+						ssln; ssln=ssln->getNext()) {
+		delete[] ssln->getData();
 	}
-	for (stringlistnode *sln=sessionendqueries.getFirstNode();
-						sln; sln=sln->getNext()) {
-		delete[] sln->getData();
+	for (stringlistnode *seln=sessionendqueries.getFirstNode();
+						seln; seln=seln->getNext()) {
+		delete[] seln->getData();
 	}
 }
 
