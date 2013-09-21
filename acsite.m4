@@ -545,6 +545,38 @@ fi
 ])
 
 
+AC_DEFUN([FW_CHECK_F_NO_BUILTIN],
+[
+dnl Some environments throw warnings if stdlib is used because it redefines
+dnl built-in functions abort() exit().  On those platforms we'll include the
+dnl -fno-builtin flag.
+AC_MSG_CHECKING(whether -fno-builtin needs to be used)
+
+STDLIB_TEST="no"
+AC_TRY_COMPILE([#include <stdlib.h>],[],STDLIB_TEST="yes")
+
+dnl If that failed, try again with -fno-builtin
+if ( test "$STDLIB_TEST" = "no" )
+then
+	OLDCPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="-fno-builtin $CPPFLAGS"
+	AC_TRY_COMPILE([#include <stdlib.h>],[],STDLIB_TEST="yes")
+
+	dnl if that also failed then restore CPPFLAGS,
+	dnl the platform probably just doesn't have stdlib.h
+	if ( test "$STDLIB_TEST" = "no" )
+	then
+		CPPFLAGS="$OLDCPPFLAGS"
+		AC_MSG_RESULT(no)
+	else
+		AC_MSG_RESULT(yes)
+	fi
+ else
+	AC_MSG_RESULT(no)
+fi
+])
+
+
 dnl Determines what extension shared object files have
 AC_DEFUN([FW_CHECK_SO_EXT],
 [
