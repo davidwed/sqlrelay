@@ -550,7 +550,10 @@ AC_DEFUN([FW_CHECK_F_NO_BUILTIN],
 dnl Some environments throw warnings if stdlib is used because it redefines
 dnl built-in functions abort() exit().  On those platforms we'll include the
 dnl -fno-builtin flag.
+OLDCPPFLAGS="$CPPFLAGS"
+CPPFLAGS="-Wall -Werror $CPPFLAGS"
 AC_MSG_CHECKING(whether -fno-builtin needs to be used)
+CPPFLAGS="$OLDCPPFLAGS"
 
 STDLIB_TEST="no"
 AC_TRY_COMPILE([#include <stdlib.h>],[],STDLIB_TEST="yes")
