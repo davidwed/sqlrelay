@@ -2,6 +2,12 @@
 // See the file COPYING for more information
 
 #include <config.h>
+
+// for pow()
+// NOTE: include this here rather than lower in the include list or the build
+// will fail on linux libc4 systems will LITTLE_ENDIAN redefined
+#include <math.h>
+
 #include <sqlrcontroller.h>
 #include <rudiments/file.h>
 #include <rudiments/rawbuffer.h>
@@ -24,9 +30,6 @@
 #include <datatypes.h>
 #define NEED_CONVERT_DATE_TIME
 #include <parsedatetime.h>
-
-// for pow()
-#include <math.h>
 
 sqlrcontroller_svr::sqlrcontroller_svr() : daemonprocess(), listener() {
 
