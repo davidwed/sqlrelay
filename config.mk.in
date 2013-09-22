@@ -71,6 +71,9 @@ UNAME = @UNAME@
 # rpm build directory
 RPM_BUILD_DIR = @RPM_BUILD_DIR@
 
+# math library
+MATHLIB = @MATHLIB@
+
 # extra libs
 EXTRALIBS = @LIBS@
 

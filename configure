@@ -724,6 +724,7 @@ RUDIMENTSLIBSPATH
 RUDIMENTSLIBS
 RUDIMENTSINCLUDES
 RUDIMENTSPATH
+MATHLIB
 ICONVLIBS
 ICONVINCLUDES
 HAVE_ICONV
@@ -18967,6 +18968,43 @@ export LD_LIBRARY_PATH
 
 
 
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether -lm required for ceil" >&5
+$as_echo_n "checking whether -lm required for ceil... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS=""
+LIBS=""
+LD_LIBRARY_PATH=""
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <math.h>
+int
+main ()
+{
+ceil(0);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }; MATHLIB=""
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }; MATHLIB="-lm"
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
 
 
 

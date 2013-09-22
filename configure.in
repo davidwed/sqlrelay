@@ -558,6 +558,10 @@ FW_CHECK_NEED_REDHAT_9_GLIBC_2_3_2_HACK
 
 FW_CHECK_ICONV
 
+AC_MSG_CHECKING(whether -lm required for ceil)
+FW_TRY_LINK([#include <math.h>],[ceil(0);],[],[],[],[AC_MSG_RESULT(no); MATHLIB=""],[AC_MSG_RESULT(yes); MATHLIB="-lm"])
+AC_SUBST(MATHLIB)
+
 echo "******************************"
 
 
