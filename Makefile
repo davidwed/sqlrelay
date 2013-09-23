@@ -85,6 +85,12 @@ distclean: clean
 		src/api/c/msvc/Release \
 		src/api/c/msvc/DebugCLR \
 		src/api/c/msvc/ReleaseCLR \
+		src/api/cs/SQLRClient/bin \
+		src/api/cs/SQLRClient/obj \
+		src/api/odbc/msvc/Debug \
+		src/api/odbc/msvc/Release \
+		src/api/odbc/msvc/DebugCLR \
+		src/api/odbc/msvc/ReleaseCLR \
 		src/cmdline/msvc/Debug \
 		src/cmdline/msvc/Release \
 		src/cmdline/msvc/DebugCLR \
@@ -92,6 +98,4 @@ distclean: clean
 		src/util/msvc/Debug \
 		src/util/msvc/Release \
 		src/util/msvc/DebugCLR \
-		src/util/msvc/ReleaseCLR \
-		src/api/cs/SQLRClient/bin \
-		src/api/cs/SQLRClient/obj
+		src/util/msvc/ReleaseCLR
