@@ -965,7 +965,7 @@ bool sqlrcontroller_svr::openSockets() {
 	if (cfgfl->getListenOnUnix() && unixsocketptr && unixsocketptr[0]) {
 
 		if (!serversockun) {
-			serversockun=new unixserversocket();
+			serversockun=new unixsocketserver();
 			if (serversockun->listen(unixsocket,0000,5)) {
 
 				size_t	stringlen=26+
@@ -1003,7 +1003,7 @@ bool sqlrcontroller_svr::openSockets() {
 		if (!serversockin) {
 			const char * const *addresses=cfgfl->getAddresses();
 			serversockincount=cfgfl->getAddressCount();
-			serversockin=new inetserversocket *[serversockincount];
+			serversockin=new inetsocketserver *[serversockincount];
 			bool	failed=false;
 			for (uint64_t index=0;
 					index<serversockincount;
@@ -1012,7 +1012,7 @@ bool sqlrcontroller_svr::openSockets() {
 				if (failed) {
 					continue;
 				}
-				serversockin[index]=new inetserversocket();
+				serversockin[index]=new inetsocketserver();
 				if (serversockin[index]->
 					listen(addresses[index],inetport,5)) {
 
@@ -1374,7 +1374,7 @@ void sqlrcontroller_svr::deRegisterForHandoff() {
 	delete[] string;
 
 	// attach to the socket and write the process id
-	unixclientsocket	removehandoffsockun;
+	unixsocketclient	removehandoffsockun;
 	removehandoffsockun.connect(removehandoffsockname,-1,-1,0,1);
 	removehandoffsockun.dontUseNaglesAlgorithm();
 	removehandoffsockun.write((uint32_t)process::getProcessId());
@@ -1519,7 +1519,7 @@ int32_t sqlrcontroller_svr::waitForClient() {
 			return -1;
 		}
 
-		inetserversocket	*iss=NULL;
+		inetsocketserver	*iss=NULL;
 		for (uint64_t index=0; index<serversockincount; index++) {
 			if (fd==serversockin[index]) {
 				iss=serversockin[index];

@@ -2,8 +2,8 @@
 // See the COPYING file for more information.
 
 
-#include <rudiments/inetclientsocket.h>
-#include <rudiments/unixclientsocket.h>
+#include <rudiments/inetsocketclient.h>
+#include <rudiments/unixsocketclient.h>
 #include <rudiments/memorypool.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/file.h>

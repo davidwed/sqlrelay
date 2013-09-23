@@ -4,8 +4,8 @@
 #include <sqlrlistener.h>
 
 #include <rudiments/permissions.h>
-#include <rudiments/unixclientsocket.h>
-#include <rudiments/inetclientsocket.h>
+#include <rudiments/unixsocketclient.h>
+#include <rudiments/inetsocketclient.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/snooze.h>
 #include <rudiments/passwdentry.h>
@@ -529,14 +529,14 @@ bool sqlrlistener::listenOnClientSockets() {
 	// (on each specified address), if necessary
 	bool	listening=false;
 	if (port && clientsockincount) {
-		clientsockin=new inetserversocket *[clientsockincount];
+		clientsockin=new inetsocketserver *[clientsockincount];
 		bool	failed=false;
 		for (uint64_t index=0; index<clientsockincount; index++) {
 			clientsockin[index]=NULL;
 			if (failed) {
 				continue;
 			}
-			clientsockin[index]=new inetserversocket();
+			clientsockin[index]=new inetsocketserver();
 			listening=clientsockin[index]->
 					listen(addresses[index],port,15);
 			if (listening) {
@@ -564,7 +564,7 @@ bool sqlrlistener::listenOnClientSockets() {
 	}
 
 	if (charstring::length(unixport)) {
-		clientsockun=new unixserversocket();
+		clientsockun=new unixsocketserver();
 		listening=clientsockun->listen(unixport,0000,15);
 		if (listening) {
 			addFileDescriptor(clientsockun);
@@ -600,14 +600,14 @@ bool sqlrlistener::listenOnClientSockets() {
 	// (on each specified address), if necessary
 	if (mysqlport && mysqlclientsockincount) {
 		mysqlclientsockin=
-			new inetserversocket *[mysqlclientsockincount];
+			new inetsocketserver *[mysqlclientsockincount];
 		bool	failed=false;
 		for (uint64_t index=0; index<mysqlclientsockincount; index++) {
 			mysqlclientsockin[index]=NULL;
 			if (failed) {
 				continue;
 			}
-			mysqlclientsockin[index]=new inetserversocket();
+			mysqlclientsockin[index]=new inetsocketserver();
 			listening=mysqlclientsockin[index]->listen(
 							mysqladdresses[index],
 							mysqlport,15);
@@ -636,7 +636,7 @@ bool sqlrlistener::listenOnClientSockets() {
 	}
 
 	if (charstring::length(mysqlunixport)) {
-		mysqlclientsockun=new unixserversocket();
+		mysqlclientsockun=new unixsocketserver();
 		listening=mysqlclientsockun->listen(mysqlunixport,0000,15);
 		if (listening) {
 			addFileDescriptor(mysqlclientsockun);
@@ -671,7 +671,7 @@ bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 				"%s/sockets/%s-handoff",
 				tmpdir->getString(),id);
 
-	handoffsockun=new unixserversocket();
+	handoffsockun=new unixsocketserver();
 	bool	success=handoffsockun->listen(handoffsockname,0066,15);
 
 	if (success) {
@@ -704,7 +704,7 @@ bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 				"%s/sockets/%s-removehandoff",
 				tmpdir->getString(),id);
 
-	removehandoffsockun=new unixserversocket();
+	removehandoffsockun=new unixsocketserver();
 	bool	success=removehandoffsockun->listen(
 						removehandoffsockname,0066,15);
 
@@ -738,7 +738,7 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 				"%s/sockets/%s-fixup",
 				tmpdir->getString(),id);
 
-	fixupsockun=new unixserversocket();
+	fixupsockun=new unixsocketserver();
 	bool	success=fixupsockun->listen(fixupsockname,0066,15);
 
 	if (success) {
@@ -990,7 +990,7 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 	}
 
 	// handle connections to the client sockets
-	inetserversocket	*iss=NULL;
+	inetsocketserver	*iss=NULL;
 	for (uint64_t csind=0; csind<clientsockincount; csind++) {
 		if (fd==clientsockin[csind]) {
 			iss=clientsockin[csind];
@@ -1689,7 +1689,7 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 	logDebugMessage("requesting socket of newly spawned connection...");
 
 	// connect to the fixup socket of the parent listener
-	unixclientsocket	fixupclientsockun;
+	unixsocketclient	fixupclientsockun;
 	if (fixupclientsockun.connect(fixupsockname,-1,-1,0,1)
 						!=RESULT_SUCCESS) {
 		logInternalError("fixup failed to connect");

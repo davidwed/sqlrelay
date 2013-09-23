@@ -40,9 +40,9 @@
 		void	flushWriteBuffer();
 
 		// clients
-		inetclientsocket	ics;
-		unixclientsocket	ucs;
-		clientsocket		*cs;
+		inetsocketclient	ics;
+		unixsocketclient	ucs;
+		socketclient		*cs;
 
 		// session state
 		bool	endsessionsent;

@@ -9,9 +9,9 @@
 #include <rudiments/signalclasses.h>
 #include <rudiments/daemonprocess.h>
 #include <rudiments/listener.h>
-#include <rudiments/unixserversocket.h>
-#include <rudiments/inetserversocket.h>
-#include <rudiments/unixclientsocket.h>
+#include <rudiments/unixsocketserver.h>
+#include <rudiments/inetsocketserver.h>
+#include <rudiments/unixsocketclient.h>
 #include <rudiments/memorypool.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/regularexpression.h>
@@ -417,9 +417,9 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		int32_t		accepttimeout;
 		bool		suspendedsession;
 
-		inetserversocket	**serversockin;
+		inetsocketserver	**serversockin;
 		uint64_t		serversockincount;
-		unixserversocket	*serversockun;
+		unixsocketserver	*serversockun;
 
 		filedescriptor	*clientsock;
 
@@ -449,7 +449,7 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 
 		char		*decrypteddbpassword;
 
-		unixclientsocket	handoffsockun;
+		unixsocketclient	handoffsockun;
 		bool			proxymode;
 		uint32_t		proxypid;
 

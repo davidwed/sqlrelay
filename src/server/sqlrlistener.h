@@ -15,8 +15,8 @@
 #include <rudiments/signalclasses.h>
 #include <rudiments/daemonprocess.h>
 #include <rudiments/listener.h>
-#include <rudiments/unixserversocket.h>
-#include <rudiments/inetserversocket.h>
+#include <rudiments/unixsocketserver.h>
+#include <rudiments/inetsocketserver.h>
 #include <rudiments/filedescriptor.h>
 #include <rudiments/semaphoreset.h>
 #include <rudiments/sharedmemory.h>
@@ -134,20 +134,20 @@ class sqlrlistener : public daemonprocess, public listener {
 
 		bool	init;
 
-		unixserversocket	*clientsockun;
-		inetserversocket	**clientsockin;
+		unixsocketserver	*clientsockun;
+		inetsocketserver	**clientsockin;
 		uint64_t			clientsockincount;
 
-		unixserversocket	*mysqlclientsockun;
-		inetserversocket	**mysqlclientsockin;
+		unixsocketserver	*mysqlclientsockun;
+		inetsocketserver	**mysqlclientsockin;
 		uint64_t		mysqlclientsockincount;
 
 		char	*unixport;
 		char	*mysqlunixport;
 
-		unixserversocket	*handoffsockun;
-		unixserversocket	*removehandoffsockun;
-		unixserversocket	*fixupsockun;
+		unixsocketserver	*handoffsockun;
+		unixsocketserver	*removehandoffsockun;
+		unixsocketserver	*fixupsockun;
 		char			*fixupsockname;
 
 		uint16_t		handoffmode;
