@@ -13,7 +13,6 @@
 #include <sqlrloggers.h>
 
 #include <rudiments/signalclasses.h>
-#include <rudiments/daemonprocess.h>
 #include <rudiments/listener.h>
 #include <rudiments/unixsocketserver.h>
 #include <rudiments/inetsocketserver.h>
@@ -32,11 +31,10 @@ class handoffsocketnode {
 		filedescriptor	*sock;
 };
 
-class sqlrlistener : public daemonprocess, public listener {
+class sqlrlistener : public listener {
 	public:
 			sqlrlistener();
 			~sqlrlistener();
-		void	handleSignals(void (*shutdownfunction)(int32_t));
 		bool	initListener(int argc, const char **argv);
 		void	listen();
 	private:

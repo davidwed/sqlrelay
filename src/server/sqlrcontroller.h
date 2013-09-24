@@ -6,8 +6,6 @@
 
 #include <config.h>
 #include <defaults.h>
-#include <rudiments/signalclasses.h>
-#include <rudiments/daemonprocess.h>
 #include <rudiments/listener.h>
 #include <rudiments/unixsocketserver.h>
 #include <rudiments/inetsocketserver.h>
@@ -35,7 +33,7 @@
 
 #include <defines.h>
 
-class sqlrcontroller_svr : public daemonprocess, public listener {
+class sqlrcontroller_svr : public listener {
 	public:
 			sqlrcontroller_svr();
 		virtual	~sqlrcontroller_svr();
@@ -63,7 +61,6 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		bool		getColumnNames(const char *query,
 						stringbuffer *output);
 
-		void	handleSignals(void (*shutdownfunction)(int32_t));
 		bool	init(int argc, const char **argv);
 		sqlrconnection_svr	*initConnection(const char *dbase);
 		bool	listen();
@@ -506,8 +503,6 @@ class sqlrcontroller_svr : public daemonprocess, public listener {
 		const char	*dbipaddress;
 
 		bool		reformatdatetimes;
-
-		signalhandler	shutdownhandler;
 };
 
 #endif

@@ -7,7 +7,6 @@
 #include <cmdline.h>
 #include <tempdir.h>
 
-#include <rudiments/daemonprocess.h>
 #include <rudiments/semaphoreset.h>
 #include <rudiments/sharedmemory.h>
 
@@ -17,7 +16,7 @@
 // for pid_t
 #include <sys/types.h>
 
-class scaler : public daemonprocess {
+class scaler {
 
 	public:
 			scaler();

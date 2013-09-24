@@ -10,7 +10,6 @@
 #include <rudiments/directory.h>
 #include <rudiments/process.h>
 #include <rudiments/permissions.h>
-#include <rudiments/daemonprocess.h>
 
 #include <config.h>
 #include <defaults.h>
@@ -25,7 +24,7 @@ class dirnode {
 		dirnode	*next;
 };
 
-class sqlrcachemanager : public daemonprocess {
+class sqlrcachemanager {
 	public:
 			sqlrcachemanager(int argc, const char **argv);
 			~sqlrcachemanager();
@@ -111,7 +110,7 @@ void sqlrcachemanager::scan() {
 				"%s/pids/sqlr-cachemanager.%ld",
 				tmpdir->getString(),(long)pid);
 
-	createPidFile(pidfile,permissions::ownerReadWrite());
+	process::createPidFile(pidfile,permissions::ownerReadWrite());
 
 	// scan...
 	directory	dir;
@@ -241,9 +240,11 @@ void shutDown(int32_t signum) {
 
 int main(int argc, const char **argv) {
 
+	process::exitOnCrashOrShutDown();
+
 	#include <version.h>
 
 	cacheman=new sqlrcachemanager(argc,argv);
-	cacheman->handleShutDown(shutDown);
+	process::handleShutDown(shutDown);
 	cacheman->scan();
 }

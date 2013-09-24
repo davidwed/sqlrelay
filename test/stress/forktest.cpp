@@ -5,7 +5,6 @@
 #include <rudiments/randomnumber.h>
 #include <rudiments/datetime.h>
 #include <rudiments/snooze.h>
-#include <rudiments/daemonprocess.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -66,6 +65,6 @@ main(int argc, char **argv) {
 			_exit(0);
 		}
 		//snooze::microsnooze(0,50000);
-		//daemonprocess::waitForChildren();
+		//process::waitForChildren();
 	}
 }

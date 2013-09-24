@@ -22,7 +22,7 @@
 
 bool	scaler::shutdown=false;
 
-scaler::scaler() : daemonprocess() {
+scaler::scaler() {
 
 	init=false;
 
@@ -52,8 +52,8 @@ scaler::~scaler() {
 
 bool scaler::initScaler(int argc, const char **argv) {
 
-	handleShutDown(shutDown);
-	handleCrash(shutDown);
+	process::handleShutDown(shutDown);
+	process::handleCrash(shutDown);
 
 	init=true;
 
@@ -86,7 +86,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 		if (i) {
 			snooze::microsnooze(0,100000);
 		}
-		found=(checkForPidFile(listenerpidfile)!=-1);
+		found=(process::checkForPidFile(listenerpidfile)!=-1);
 	}
 	if (!found) {
 		stderror.printf("\nsqlr-scaler error: \n");
@@ -107,7 +107,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	charstring::printf(pidfile,pidfilelen,
 				"%s/pids/sqlr-scaler-%s",
 				tmpdir->getString(),id);
-	if (checkForPidFile(pidfile)!=-1) {
+	if (process::checkForPidFile(pidfile)!=-1) {
 		stderror.printf("\nsqlr-scaler error:\n");
 		stderror.printf("	The pid file %s",pidfile);
 		stderror.printf(" exists.\n");
@@ -123,9 +123,6 @@ bool scaler::initScaler(int argc, const char **argv) {
 
 	// check for debug
 	debug=cmdl->found("-debug");
-
-	// since we do it by ourselves
-	dontWaitForChildren();
 
 	// get the config file
 	const char	*tmpconfig=cmdl->getValue("-config");
@@ -295,7 +292,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	process::detach();
 
 	// create the pid file
-	createPidFile(pidfile,permissions::ownerReadWrite());
+	process::createPidFile(pidfile,permissions::ownerReadWrite());
 
 	return true;
 }
