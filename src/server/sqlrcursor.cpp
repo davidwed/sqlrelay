@@ -17,7 +17,7 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 	
 	state=SQLRCURSORSTATE_AVAILABLE;
 
-	createtemp.compile("(create|CREATE|declare|DECLARE)[ \\t\\r\\n]+((global|GLOBAL|local|LOCAL)?[ \\t\\r\\n]+)?(temp|TEMP|temporary|TEMPORARY)?[ \\t\\r\\n]+(table|TABLE)[ \\t\\r\\n]+");
+	createtemp.compile("(create|CREATE|declare|DECLARE)[ 	\\r\\n]+((global|GLOBAL|local|LOCAL)?[ 	\\r\\n]+)?(temp|TEMP|temporary|TEMPORARY)?[ 	\\r\\n]+(table|TABLE)[ 	\\r\\n]+");
 
 	querybuffer=new char[conn->cont->maxquerysize+1];
 	querylength=0;

@@ -26,6 +26,8 @@
 	fixed lots of cases where const char *'s were being deleted
 	added 64-bit build support for windows
 	combined sqlrclient files for faster compiling
+	converted \t to actual tab in regular expressions for
+		posix-compatibility
 
 0.51 - fixed minor perl DBI driver documentation issue
 	added support for oracle 12c

@@ -847,13 +847,13 @@ freetdscursor::freetdscursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 	// replace the regular expressions used to detect creation of a
 	// temporary table
-	createtemp.compile("(create|CREATE)[ \\t\\r\\n]+(table|TABLE)[ \\t\\r\\n]+#");
+	createtemp.compile("(create|CREATE)[ 	\\r\\n]+(table|TABLE)[ 	\\r\\n]+#");
 	createtemp.study();
 
-	cursorquery.compile("^(select|SELECT)[ \\t\\r\\n]+");
+	cursorquery.compile("^(select|SELECT)[ 	\\r\\n]+");
 	cursorquery.study();
 
-	rpcquery.compile("^(execute|EXECUTE|exec|EXEC)[ \\t\\r\\n]+");
+	rpcquery.compile("^(execute|EXECUTE|exec|EXEC)[ 	\\r\\n]+");
 	rpcquery.study();
 }
 

@@ -1346,11 +1346,11 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	resultfreed=true;
 
 #ifdef HAVE_ORACLE_8i
-	createtemp.compile("(create|CREATE)[ \\t\\n\\r]+(global|GLOBAL)[ \\t\\n\\r]+(temporary|TEMPORARY)[ \\t\\n\\r]+(table|TABLE)[ \\t\\n\\r]+");
+	createtemp.compile("(create|CREATE)[ 	\\n\\r]+(global|GLOBAL)[ 	\\n\\r]+(temporary|TEMPORARY)[ 	\\n\\r]+(table|TABLE)[ 	\\n\\r]+");
 	createtemp.study();
-	deleterows.compile("(on|ON)[ \\t\\n\\r]+(commit|COMMIT)[ \\t\\n\\r]+(delete|DELETE)[ \\t\\n\\r]+(rows|ROWS)");
+	deleterows.compile("(on|ON)[ 	\\n\\r]+(commit|COMMIT)[ 	\\n\\r]+(delete|DELETE)[ 	\\n\\r]+(rows|ROWS)");
 	deleterows.study();
-	preserverows.compile("(on|ON)[ \\t\\n\\r]+(commit|COMMIT)[ \\t\\n\\r]+(preserve|PRESERVE)[ \\t\\n\\r]+(rows|ROWS)");
+	preserverows.compile("(on|ON)[ 	\\n\\r]+(commit|COMMIT)[ 	\\n\\r]+(preserve|PRESERVE)[ 	\\n\\r]+(rows|ROWS)");
 	preserverows.study();
 #endif
 }
