@@ -1,3 +1,5 @@
+0.53 - 
+
 0.52 - sqlrsh has long reported the wrong version, fixed that
 	added csv support to sqlr-export and a -format xml|csv option
 	replaced snprintf calls with charstring::printf calls
