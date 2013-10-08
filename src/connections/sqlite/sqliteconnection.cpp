@@ -90,6 +90,9 @@ class sqlitecursor : public sqlrcursor_svr {
 		#ifdef HAVE_SQLITE3_STMT
 		bool		prepareQuery(const char *query,
 						uint32_t length);
+		int32_t		getBindVariableIndex(
+						const char *variable,
+						uint16_t variablesize);
 		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -366,8 +369,7 @@ sqlitecursor::~sqlitecursor() {
 
 bool sqlitecursor::supportsNativeBinds() {
 	#ifdef HAVE_SQLITE3_STMT
-	//return true;
-	return false;
+	return true;
 	#else
 	return false;
 	#endif
@@ -401,18 +403,30 @@ bool sqlitecursor::prepareQuery(const char *query, uint32_t length) {
 	return false;
 }
 
+int32_t sqlitecursor::getBindVariableIndex(const char *variable,
+						uint16_t variablesize) {
+	if (charstring::isInteger(variable+1,variablesize-1)) {
+		return charstring::toInteger(variable+1);
+	}
+	return sqlite3_bind_parameter_index(stmt,variable);
+}
+
 bool sqlitecursor::inputBind(const char *variable, 
 				uint16_t variablesize,
 				const char *value, 
 				uint32_t valuesize,
 				int16_t *isnull) {
-	return true;
+	return (sqlite3_bind_text(stmt,
+				getBindVariableIndex(variable,variablesize),
+				value,valuesize,SQLITE_STATIC)==SQLITE_OK);
 }
 
 bool sqlitecursor::inputBind(const char *variable, 
 				uint16_t variablesize,
 				int64_t *value) {
-	return true;
+	return (sqlite3_bind_int64(stmt,
+				getBindVariableIndex(variable,variablesize),
+				*value)==SQLITE_OK);
 }
 
 bool sqlitecursor::inputBind(const char *variable, 
@@ -420,7 +434,9 @@ bool sqlitecursor::inputBind(const char *variable,
 				double *value,
 				uint32_t precision,
 				uint32_t scale) {
-	return true;
+	return (sqlite3_bind_double(stmt,
+				getBindVariableIndex(variable,variablesize),
+				*value)==SQLITE_OK);
 }
 
 bool sqlitecursor::inputBindBlob(const char *variable, 
@@ -428,7 +444,9 @@ bool sqlitecursor::inputBindBlob(const char *variable,
 				const char *value, 
 				uint32_t valuesize,
 				int16_t *isnull) {
-	return true;
+	return (sqlite3_bind_blob(stmt,
+				getBindVariableIndex(variable,variablesize),
+				value,valuesize,SQLITE_STATIC)==SQLITE_OK);
 }
 
 bool sqlitecursor::inputBindClob(const char *variable, 
@@ -436,7 +454,9 @@ bool sqlitecursor::inputBindClob(const char *variable,
 				const char *value, 
 				uint32_t valuesize,
 				int16_t *isnull) {
-	return true;
+	return (sqlite3_bind_blob(stmt,
+				getBindVariableIndex(variable,variablesize),
+				value,valuesize,SQLITE_STATIC)==SQLITE_OK);
 }
 #endif
 
