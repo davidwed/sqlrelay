@@ -4845,13 +4845,15 @@ void sqlrcontroller_svr::sendField(sqlrcursor_svr *cursor,
 	if (reformatdatetimes) {
 
 		// are dates going to be in MM/DD or DD/MM format?
-		bool		ddmm=cfgfl->getDateDdMm();
+		bool	ddmm=cfgfl->getDateDdMm();
+		bool	yyyyddmm=cfgfl->getDateYyyyDdMm();
 
 		// This weirdness is mainly to address a FreeTDS/MSSQL
 		// issue.  See the code for the method
-		// freetdscursor::ignoreDataDdMmParameter() for more info.
+		// freetdscursor::ignoreDateDdMmParameter() for more info.
 		if (cursor->ignoreDateDdMmParameter(index,data,size)) {
 			ddmm=false;
+			yyyyddmm=false;
 		}
 
 		int16_t	year=-1;
@@ -4861,7 +4863,7 @@ void sqlrcontroller_svr::sendField(sqlrcursor_svr *cursor,
 		int16_t	minute=-1;
 		int16_t	second=-1;
 		int16_t	fraction=-1;
-		if (parseDateTime(data,ddmm,true,
+		if (parseDateTime(data,ddmm,yyyyddmm,true,
 					&year,&month,&day,
 					&hour,&minute,&second,
 					&fraction)) {

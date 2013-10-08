@@ -37,7 +37,7 @@ static const char *longmonths[]={
 	NULL
 };
 
-static bool parseDateTime(const char *datetime, bool ddmm,
+static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 			bool supportdotdelimiteddate,
 			int16_t *year, int16_t *month, int16_t *day,
 			int16_t *hour, int16_t *minute, int16_t *second,
@@ -396,7 +396,7 @@ static bool parseDateTime(const char *datetime, bool ddmm,
 							dateparts[0])==4) {
 						*year=charstring::toInteger(
 								dateparts[0]);
-						if (ddmm) {
+						if (yyyyddmm) {
 							*day=
 							charstring::toInteger(
 								dateparts[1]);

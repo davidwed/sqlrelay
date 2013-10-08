@@ -1697,9 +1697,16 @@ static void getDate(const char *field, uint32_t length, MYSQL_BIND *bind) {
 					environment::getValue(
 					"SQLR_MYSQL_DATE_DDMM"),
 					"yes");
-	parseDateTime(buffer,ddmm,false,&year,&month,&day,
-					&hour,&minute,&second,
-					&fraction);
+	bool		yyyyddmm=ddmm;
+	const char	*yyyyddmmstr=environment::getValue(
+					"SQLR_MYSQL_DATE_YYYYDDMM");
+	if (yyyyddmmstr) {
+		yyyyddmm=!charstring::compare(yyyyddmmstr,"yes");
+	}
+	parseDateTime(buffer,ddmm,yyyyddmm,
+				false,&year,&month,&day,
+				&hour,&minute,&second,
+				&fraction);
 
 	// copy back data
 	tm->year=(year!=-1)?year:0;

@@ -39,6 +39,8 @@ bool translatedatetimes::run(sqlrconnection_svr *sqlrcon,
 		stdoutput.printf("date/time translation:\n");
 		stdoutput.printf("    ddmm: %s\n",
 			parameters->getAttributeValue("ddmm"));
+		stdoutput.printf("    yyyyddmm: %s\n",
+			parameters->getAttributeValue("yyyyddmm"));
 		stdoutput.printf("    datetime: %s\n",
 			parameters->getAttributeValue("datetime"));
 		stdoutput.printf("    date: %s\n",
@@ -75,11 +77,16 @@ bool translatedatetimes::translateDateTimesInQuery(
 					xmldomnode *querynode,
 					xmldomnode *parameters) {
 	debugFunction();
-	
+
 	// input format
-	bool		ddmm=!charstring::compare(
+	bool	ddmm=!charstring::compare(
 				parameters->getAttributeValue("ddmm"),
 				"yes");
+	bool		yyyyddmm=ddmm;
+	const char	*yyyyddmmstr=parameters->getAttributeValue("yyyyddmm");
+	if (yyyyddmmstr) {
+		yyyyddmm=!charstring::compare(yyyyddmmstr,"yes");
+	}
 
 	// output format
 	const char	*datetimeformat=
@@ -134,7 +141,7 @@ bool translatedatetimes::translateDateTimesInQuery(
 			int16_t	fraction=-1;
 	
 			// parse the date/time
-			if (parseDateTime(valuecopy,ddmm,false,
+			if (parseDateTime(valuecopy,ddmm,yyyyddmm,false,
 						&year,&month,&day,
 						&hour,&minute,&second,
 						&fraction)) {
@@ -207,9 +214,14 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 	debugFunction();
 
 	// input format
-	bool		ddmm=!charstring::compare(
+	bool	ddmm=!charstring::compare(
 				parameters->getAttributeValue("ddmm"),
 				"yes");
+	bool		yyyyddmm=ddmm;
+	const char	*yyyyddmmstr=parameters->getAttributeValue("yyyyddmm");
+	if (yyyyddmmstr) {
+		yyyyddmm=!charstring::compare(yyyyddmmstr,"yes");
+	}
 
 	// output format
 	const char	*datetimeformat=
@@ -249,7 +261,7 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 		int16_t fraction=-1;
 	
 		// parse the date/time
-		if (!parseDateTime(bind->value.stringval,ddmm,false,
+		if (!parseDateTime(bind->value.stringval,ddmm,yyyyddmm,false,
 						&year,&month,&day,
 						&hour,&minute,&second,
 						&fraction)) {

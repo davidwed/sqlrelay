@@ -2651,10 +2651,16 @@ static void SQLR_ParseDate(DATE_STRUCT *ds, const char *value) {
 					environment::getValue(
 					"SQLR_ODBC_DATE_DDMM"),
 					"yes");
+	bool		yyyyddmm=ddmm;
+	const char	*yyyyddmmstr=environment::getValue(
+					"SQLR_ODBC_DATE_YYYYDDMM");
+	if (yyyyddmmstr) {
+		yyyyddmm=!charstring::compare(yyyyddmmstr,"yes");
+	}
 
 	// parse
-	parseDateTime(value,ddmm,false,&year,&month,&day,
-				&hour,&minute,&second,&fraction);
+	parseDateTime(value,ddmm,yyyyddmm,false,&year,&month,&day,
+					&hour,&minute,&second,&fraction);
 
 	// copy data out
 	ds->year=(year!=-1)?year:0;
@@ -2678,10 +2684,16 @@ static void SQLR_ParseTime(TIME_STRUCT *ts, const char *value) {
 					environment::getValue(
 					"SQLR_ODBC_DATE_DDMM"),
 					"yes");
+	bool		yyyyddmm=ddmm;
+	const char	*yyyyddmmstr=environment::getValue(
+					"SQLR_ODBC_DATE_YYYYDDMM");
+	if (yyyyddmmstr) {
+		yyyyddmm=!charstring::compare(yyyyddmmstr,"yes");
+	}
 
 	// parse
-	parseDateTime(value,ddmm,false,&year,&month,&day,
-				&hour,&minute,&second,&fraction);
+	parseDateTime(value,ddmm,yyyyddmm,false,&year,&month,&day,
+					&hour,&minute,&second,&fraction);
 
 	// copy data out
 	ts->hour=(hour!=-1)?hour:0;
@@ -2705,10 +2717,16 @@ static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
 					environment::getValue(
 					"SQLR_ODBC_DATE_DDMM"),
 					"yes");
+	bool		yyyyddmm=ddmm;
+	const char	*yyyyddmmstr=environment::getValue(
+					"SQLR_ODBC_DATE_YYYYDDMM");
+	if (yyyyddmmstr) {
+		yyyyddmm=!charstring::compare(yyyyddmmstr,"yes");
+	}
 
 	// parse
-	parseDateTime(value,ddmm,false,&year,&month,&day,
-				&hour,&minute,&second,&fraction);
+	parseDateTime(value,ddmm,yyyyddmm,false,&year,&month,&day,
+					&hour,&minute,&second,&fraction);
 
 	// copy data out
 	tss->year=(year!=-1)?year:0;

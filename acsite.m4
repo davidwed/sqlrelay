@@ -384,12 +384,17 @@ AC_MSG_RESULT($host_cpu $ARCH)
 ])
 
 
-dnl Checks for multilib name
-AC_DEFUN([FW_CHECK_MULTILIB_SIGNATURE],
+dnl Checks for multiarch platform
+AC_DEFUN([FW_CHECK_MULTIARCH],
 [
-AC_MSG_CHECKING(for multilib signature)
-MULTILIBSIGNATURE="$host_cpu-$host_os"
-AC_MSG_RESULT($MULTILIBSIGNATURE)
+AC_MSG_CHECKING(for multiarch platform)
+MULTIARCHSIGNATURE="`$CC -print-multiarch 2> /dev/null`"
+if ( test -n "$MULTIARCHSIGNATURE" )
+then
+	AC_MSG_RESULT($MULTIARCHSIGNATURE)
+else
+	AC_MSG_RESULT(no)
+fi
 ])
 
 

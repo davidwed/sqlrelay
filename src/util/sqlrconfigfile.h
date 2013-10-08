@@ -84,7 +84,8 @@ typedef enum {
 	DATETIMEFORMAT_ATTRIBUTE,
 	DATEFORMAT_ATTRIBUTE,
 	TIMEFORMAT_ATTRIBUTE,
-	DATEDDMM_ATTRIBUTE
+	DATEDDMM_ATTRIBUTE,
+	DATEYYYYDDMM_ATTRIBUTE
 } attribute;
 
 class SQLRUTIL_DLLSPEC usercontainer {
@@ -231,6 +232,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		const char	*getDateFormat();
 		const char	*getTimeFormat();
 		bool		getDateDdMm();
+		bool		getDateYyyyDdMm();
 
 		stringlist	*getSessionStartQueries();
 		stringlist	*getSessionEndQueries();
@@ -333,6 +335,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		char		*dateformat;
 		char		*timeformat;
 		bool		dateddmm;
+		bool		dateyyyyddmm;
 
 		bool		instart;
 		bool		inend;

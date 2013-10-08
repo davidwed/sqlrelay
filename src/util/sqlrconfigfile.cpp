@@ -84,6 +84,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	dateformat=NULL;
 	timeformat=NULL;
 	dateddmm=false;
+	dateyyyyddmm=false;
 	instart=false;
 	inend=false;
 }
@@ -368,6 +369,10 @@ const char *sqlrconfigfile::getTimeFormat() {
 
 bool sqlrconfigfile::getDateDdMm() {
 	return dateddmm;
+}
+
+bool sqlrconfigfile::getDateYyyyDdMm() {
+	return dateyyyyddmm;
 }
 
 stringlist *sqlrconfigfile::getSessionStartQueries() {
@@ -962,6 +967,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=TIMEFORMAT_ATTRIBUTE;
 		} else if (!charstring::compare(name,"dateddmm")) {
 			currentattribute=DATEDDMM_ATTRIBUTE;
+		} else if (!charstring::compare(name,"dateyyyyddmm")) {
+			currentattribute=DATEYYYYDDMM_ATTRIBUTE;
 		}
 		break;
 	
@@ -1451,6 +1458,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			}
 		} else if (currentattribute==DATEDDMM_ATTRIBUTE) {
 			dateddmm=!charstring::compareIgnoringCase(value,"yes");
+		} else if (currentattribute==DATEYYYYDDMM_ATTRIBUTE) {
+			dateyyyyddmm=
+				!charstring::compareIgnoringCase(value,"yes");
 		}
 	}
 	return true;

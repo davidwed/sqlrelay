@@ -451,10 +451,7 @@ echo "******************************"
 dnl Checks for platform-specific stuff
 echo
 echo "***** Platform ***************"
-FW_CHECK_UNAME
-FW_CHECK_ARCH
-FW_CHECK_MULTILIB_SIGNATURE
-
+FW_CHECK_MULTIARCH
 FW_CHECK_MICROSOFT
 FW_CHECK_MINIX
 FW_CHECK_HAIKU
