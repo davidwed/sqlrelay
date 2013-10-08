@@ -138,10 +138,10 @@ procedural code that manufactures a result set.</p>
 <span class="heading2">What if my database doesn't support bind variables?</span><br><br>
 
 <p>The <b>SQL Relay</b> connection daemon will fake input binds for database 
-API's which don't natively support binds.  Currently those are the
-SQLite and MDB Tools connections.  Postgresql 8 and MySQL 4.1.2
-support bind variables but older versions do not.  <b>SQL Relay</b> fakes
-input binds for versions of Postgresql and MySQL that don't support them.
+API's which don't natively support binds.  Currently that is just the MDB Tools
+connection.  Postgresql 8, MySQL 4.1.2 and modern SQLite support bind variables
+but older versions do not.  <b>SQL Relay</b> fakes input binds for versions of
+Postgresql, MySQL and SQLite that don't support them.
 For versions that do, the "fakebinds" connect string parameter can be used to
 force <b>SQL Relay</b> to fake binds rather than using the database's built-in
 support.  You can use either Oracle style or DB2/Firebird style bind variables
