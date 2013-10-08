@@ -36,6 +36,7 @@ class sqliteconnection : public sqlrconnection_svr {
 	friend class sqlitecursor;
 	public:
 				sqliteconnection(sqlrcontroller_svr *cont);
+				~sqliteconnection();
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error);
@@ -68,6 +69,8 @@ class sqliteconnection : public sqlrconnection_svr {
 						int64_t	*errorcode,
 						bool *liveconnection);
 
+		void		clearErrors();
+
 		const char	*db;
 
 		#ifdef SQLITE3
@@ -77,6 +80,8 @@ class sqliteconnection : public sqlrconnection_svr {
 		#endif
 		char	*errmesg;
 		int64_t	errcode;
+
+		char	*hostname;
 };
 
 class sqlitecursor : public sqlrcursor_svr {
@@ -165,6 +170,12 @@ sqliteconnection::sqliteconnection(sqlrcontroller_svr *cont) :
 	sqliteptr=NULL;
 	errmesg=NULL;
 	errcode=0;
+	hostname=NULL;
+}
+
+sqliteconnection::~sqliteconnection() {
+	clearErrors();
+	delete[] hostname;
 }
 
 void sqliteconnection::handleConnectString() {
@@ -226,7 +237,10 @@ const char *sqliteconnection::dbVersion() {
 }
 
 const char *sqliteconnection::dbHostName() {
-	return sys::getHostName();
+	if (!hostname) {
+		hostname=sys::getHostName();
+	}
+	return hostname;
 }
 
 const char *sqliteconnection::getDatabaseListQuery(bool wild) {
@@ -335,6 +349,18 @@ void sqliteconnection::errorMessage(char *errorbuffer,
 	}
 }
 
+void sqliteconnection::clearErrors() {
+	if (errmesg) {
+		#ifdef HAVE_SQLITE3_FREE_WITH_CHAR
+			sqlite3_free(errmesg);
+		#else
+			sqlite3_free((void *)errmesg);
+		#endif
+		errmesg=NULL;
+		errcode=0;
+	}
+}
+
 sqlitecursor::sqlitecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 	columnnames=NULL;
@@ -360,6 +386,22 @@ sqlitecursor::sqlitecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 }
 
 sqlitecursor::~sqlitecursor() {
+
+	// clean up old column names
+	if (columnnames) {
+		for (int i=0; i<ncolumn; i++) {
+			delete[] columnnames[i];
+		}
+		delete[] columnnames;
+	}
+
+	#ifdef HAVE_SQLITE3_STMT
+	// clean up old column types
+	if (columntypes) {
+		delete[] columntypes;
+	}
+	#endif
+
 	cleanUpData();
 	#ifdef HAVE_SQLITE3_STMT
 	sqlite3_finalize(stmt);
@@ -377,6 +419,9 @@ bool sqlitecursor::supportsNativeBinds() {
 
 #ifdef HAVE_SQLITE3_STMT
 bool sqlitecursor::prepareQuery(const char *query, uint32_t length) {
+
+	// clear any errors
+	sqliteconn->clearErrors();
 
 	// don't prepare "select last insert rowid" queries
 	if (selectlastinsertrowid.match(query)) {
@@ -562,15 +607,7 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 int sqlitecursor::runQuery(const char *query) {
 
 	// clear any errors
-	if (sqliteconn->errmesg) {
-		#ifdef HAVE_SQLITE3_FREE_WITH_CHAR
-			sqlite3_free(sqliteconn->errmesg);
-		#else
-			sqlite3_free((void *)sqliteconn->errmesg);
-		#endif
-		sqliteconn->errmesg=NULL;
-		sqliteconn->errcode=0;
-	}
+	sqliteconn->clearErrors();
 
 	// clean up old column names
 	if (columnnames) {
