@@ -15793,27 +15793,17 @@ UNAME=`uname -s`
 
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for host architecture" >&5
-$as_echo_n "checking for host architecture... " >&6; }
-ARCH=$host_cpu
-case $host_cpu in
-	i[3456]86)
-		ARCH="x86"
-		;;
-	x86_64 | amd64)
-		ARCH="x64"
-		;;
-esac
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $host_cpu $ARCH" >&5
-$as_echo "$host_cpu $ARCH" >&6; }
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for multiarch signature" >&5
-$as_echo_n "checking for multiarch signature... " >&6; }
-MULTIARCHSIGNATURE="`$CC -print-multiarch 2> /dev/null`"
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $MULTIARCHSIGNATURE" >&5
-$as_echo "$MULTIARCHSIGNATURE" >&6; }
-
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for multiarch platform" >&5
+$as_echo_n "checking for multiarch platform... " >&6; }
+MULTIARCHDIR="`$CC $CPPFLAGS -print-multiarch 2> /dev/null`"
+if ( test -n "$MULTIARCHDIR" )
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $MULTIARCHDIR" >&5
+$as_echo "$MULTIARCHDIR" >&6; }
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for microsoft platform" >&5
@@ -16661,7 +16651,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -17147,7 +17137,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -17485,7 +17475,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -17822,7 +17812,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -18158,7 +18148,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -18766,7 +18756,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -20222,7 +20212,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -21448,7 +21438,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -21776,7 +21766,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -22105,7 +22095,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -22436,7 +22426,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -23331,7 +23321,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -23694,7 +23684,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -24021,7 +24011,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -24643,7 +24633,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -25900,7 +25890,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -26228,7 +26218,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -26556,7 +26546,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -26883,7 +26873,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -29216,7 +29206,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -29541,7 +29531,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -29866,7 +29856,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -30458,7 +30448,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -30835,7 +30825,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -31160,7 +31150,7 @@ fi
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )

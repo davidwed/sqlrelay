@@ -178,7 +178,7 @@ do
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib" "$path/lib/$NAME" "$path/lib/opt"
+		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -367,31 +367,14 @@ fi
 ])
 
 
-dnl Checks for host architecture
-AC_DEFUN([FW_CHECK_ARCH],
-[
-AC_MSG_CHECKING(for host architecture)
-ARCH=$host_cpu
-case $host_cpu in
-	i[[3456]]86)
-		ARCH="x86"
-		;;
-	x86_64 | amd64)
-		ARCH="x64"
-		;;
-esac
-AC_MSG_RESULT($host_cpu $ARCH)
-])
-
-
 dnl Checks for multiarch platform
 AC_DEFUN([FW_CHECK_MULTIARCH],
 [
 AC_MSG_CHECKING(for multiarch platform)
-MULTIARCHSIGNATURE="`$CC -print-multiarch 2> /dev/null`"
-if ( test -n "$MULTIARCHSIGNATURE" )
+MULTIARCHDIR="`$CC $CPPFLAGS -print-multiarch 2> /dev/null`"
+if ( test -n "$MULTIARCHDIR" )
 then
-	AC_MSG_RESULT($MULTIARCHSIGNATURE)
+	AC_MSG_RESULT($MULTIARCHDIR)
 else
 	AC_MSG_RESULT(no)
 fi
