@@ -1,6 +1,7 @@
 // Copyright (c) 2001  David Muse
 // See the file COPYING for more information.
 
+#include "../../config.h"
 #include <sqlrelay/sqlrclient.h>
 #include <string.h>
 #include <stdlib.h>
@@ -155,6 +156,16 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COLUMN TYPES: \n");
+	#ifdef HAVE_SQLITE3_STMT
+	checkSuccess(cur->getColumnType((uint32_t)0),"INTEGER");
+	checkSuccess(cur->getColumnType("testint"),"INTEGER");
+	checkSuccess(cur->getColumnType(1),"FLOAT");
+	checkSuccess(cur->getColumnType("testfloat"),"FLOAT");
+	checkSuccess(cur->getColumnType(2),"STRING");
+	checkSuccess(cur->getColumnType("testchar"),"STRING");
+	checkSuccess(cur->getColumnType(3),"STRING");
+	checkSuccess(cur->getColumnType("testvarchar"),"STRING");
+	#else
 	checkSuccess(cur->getColumnType((uint32_t)0),"UNKNOWN");
 	checkSuccess(cur->getColumnType("testint"),"UNKNOWN");
 	checkSuccess(cur->getColumnType(1),"UNKNOWN");
@@ -163,6 +174,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType("testchar"),"UNKNOWN");
 	checkSuccess(cur->getColumnType(3),"UNKNOWN");
 	checkSuccess(cur->getColumnType("testvarchar"),"UNKNOWN");
+	#endif
 	printf("\n");
 
 	printf("COLUMN LENGTH: \n");
@@ -192,7 +204,11 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("TOTAL ROWS: \n");
+	#ifdef HAVE_SQLITE3_STMT
+	checkSuccess(cur->totalRows(),0);
+	#else
 	checkSuccess(cur->totalRows(),8);
+	#endif
 	printf("\n");
 
 	printf("FIRST ROW INDEX: \n");
@@ -384,7 +400,11 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("select * from testtable order by testint"),1);
 	checkSuccess(cur->getColumnName(0),"testint");
 	checkSuccess(cur->getColumnLength((uint32_t)0),0);
+	#ifdef HAVE_SQLITE3_STMT
+	checkSuccess(cur->getColumnType((uint32_t)0),"INTEGER");
+	#else
 	checkSuccess(cur->getColumnType((uint32_t)0),"UNKNOWN");
+	#endif
 	printf("\n");
 
 	printf("SUSPENDED SESSION: \n");

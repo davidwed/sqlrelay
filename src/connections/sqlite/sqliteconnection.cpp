@@ -50,18 +50,18 @@ class sqliteconnection : public sqlrconnection_svr {
 		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(const char *table,
 								bool wild);
-#ifdef SQLITE_TRANSACTIONAL
+		#ifdef SQLITE_TRANSACTIONAL
 		const char	*setIsolationLevelQuery();
-#endif
+		#endif
 		bool		getLastInsertId(uint64_t *id);
-#ifdef SQLITE3
+		#ifdef SQLITE3
 		char		*duplicate(const char *str);
-#endif
-#ifndef SQLITE_TRANSACTIONAL
+		#endif
+		#ifndef SQLITE_TRANSACTIONAL
 		bool		isTransactional();
 		bool		commit();
 		bool		rollback();
-#endif
+		#endif
 		void		errorMessage(char *errorbuffer,
 						uint32_t errorbufferlength,
 						uint32_t *errorlength,
@@ -70,11 +70,11 @@ class sqliteconnection : public sqlrconnection_svr {
 
 		const char	*db;
 
-#ifdef SQLITE3
+		#ifdef SQLITE3
 		sqlite3	*sqliteptr;
-#else
+		#else
 		sqlite	*sqliteptr;
-#endif
+		#endif
 		char	*errmesg;
 		int64_t	errcode;
 };
@@ -84,13 +84,12 @@ class sqlitecursor : public sqlrcursor_svr {
 	private:
 				sqlitecursor(sqlrconnection_svr *conn);
 				~sqlitecursor();
-/*#ifdef HAVE_SQLITE3_BIND_INT
-		bool		prepareQuery(const char *query,
-						uint32_t length);
-#endif*/
+
 		bool		supportsNativeBinds();
 
-/*#ifdef HAVE_SQLITE3_BIND_INT
+		#ifdef HAVE_SQLITE3_STMT
+		bool		prepareQuery(const char *query,
+						uint32_t length);
 		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -114,7 +113,7 @@ class sqlitecursor : public sqlrcursor_svr {
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull);
-#endif*/
+		#endif
 		bool		executeQuery(const char *query,
 						uint32_t length);
 		int		runQuery(const char *query);
@@ -124,6 +123,9 @@ class sqlitecursor : public sqlrcursor_svr {
 		bool		knowsAffectedRows();
 		uint32_t	colCount();
 		const char	*getColumnName(uint32_t col);
+		#ifdef HAVE_SQLITE3_STMT
+		uint16_t	getColumnType(uint32_t col);
+		#endif
 		bool		noRowsToReturn();
 		bool		skipRow();
 		bool		fetchRow();
@@ -134,15 +136,20 @@ class sqlitecursor : public sqlrcursor_svr {
 					bool *null);
 		void		cleanUpData();
 
-		char		**result;
 		char		**columnnames;
-		int		nrow;
 		int		ncolumn;
-		int		rowindex;
+		int		nrow;
 		bool		lastinsertrowid;
 
-#ifdef HAVE_SQLITE3_BIND_INT
-#endif
+		#ifdef HAVE_SQLITE3_STMT
+		int		*columntypes;
+		sqlite3_stmt	*stmt;
+		bool		justexecuted;
+		char		*lastinsertrowidstr;
+		#else
+		char		**result;
+		int		rowindex;
+		#endif
 
 		regularexpression	selectlastinsertrowid;
 
@@ -192,11 +199,11 @@ void sqliteconnection::deleteCursor(sqlrcursor_svr *curs) {
 }
 
 void sqliteconnection::logOut() {
-#ifdef SQLITE_TRANSACTIONAL
+	#ifdef SQLITE_TRANSACTIONAL
 	if (sqliteptr) {
 		sqlite3_close(sqliteptr);
 	}
-#endif
+	#endif
 }
 
 bool sqliteconnection::ping() {
@@ -208,11 +215,11 @@ const char *sqliteconnection::identify() {
 }
 
 const char *sqliteconnection::dbVersion() {
-#ifdef SQLITE_VERSION
+	#ifdef SQLITE_VERSION
 	return SQLITE_VERSION;
-#else
+	#else
 	return "unknown";
-#endif
+	#endif
 }
 
 const char *sqliteconnection::dbHostName() {
@@ -327,12 +334,19 @@ void sqliteconnection::errorMessage(char *errorbuffer,
 
 sqlitecursor::sqlitecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
-	result=NULL;
 	columnnames=NULL;
-	nrow=0;
 	ncolumn=0;
-	rowindex=0;
+	nrow=0;
 	lastinsertrowid=false;
+	#ifdef HAVE_SQLITE3_STMT
+	columntypes=NULL;
+	stmt=NULL;
+	justexecuted=false;
+	lastinsertrowidstr=NULL;
+	#else
+	rowindex=0;
+	result=NULL;
+	#endif
 
 	sqliteconn=(sqliteconnection *)conn;
 
@@ -344,23 +358,47 @@ sqlitecursor::sqlitecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 sqlitecursor::~sqlitecursor() {
 	cleanUpData();
+	#ifdef HAVE_SQLITE3_STMT
+	sqlite3_finalize(stmt);
+	delete[] lastinsertrowidstr;
+	#endif
 }
 
 bool sqlitecursor::supportsNativeBinds() {
+	#ifdef HAVE_SQLITE3_STMT
+	//return true;
 	return false;
+	#else
+	return false;
+	#endif
 }
 
-/*bool sqlitecursor::supportsNativeBinds() {
-#ifdef HAVE_SQLITE3_BIND_INT
-	return true;
-#else
-	return false;
-#endif
-}
-
-#ifdef HAVE_SQLITE3_BIND_INT
+#ifdef HAVE_SQLITE3_STMT
 bool sqlitecursor::prepareQuery(const char *query, uint32_t length) {
-	return true;
+
+	// don't prepare "select last insert rowid" queries
+	if (selectlastinsertrowid.match(query)) {
+		return true;
+	}
+
+	// completely reset the statement
+	sqlite3_finalize(stmt);
+
+	// prepare the query
+	int	res=
+		#ifdef HAVE_SQLITE3_PREPARE_V2
+		sqlite3_prepare_v2
+		#else
+		sqlite3_prepare
+		#endif
+		(sqliteconn->sqliteptr,query,length,&stmt,NULL);
+	if (res==SQLITE_OK) {
+		return true;
+	}
+	sqliteconn->errcode=res;
+	sqliteconn->errmesg=sqliteconn->duplicate(
+				sqlite3_errmsg(sqliteconn->sqliteptr));
+	return false;
 }
 
 bool sqlitecursor::inputBind(const char *variable, 
@@ -400,13 +438,16 @@ bool sqlitecursor::inputBindClob(const char *variable,
 				int16_t *isnull) {
 	return true;
 }
-#endif*/
+#endif
 
 bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 
 	// execute the query
 	int	success=0;
 #ifdef SQLITE_TRANSACTIONAL
+	#ifdef HAVE_SQLITE3_STMT
+	success=runQuery(query);
+	#else
 	for (;;) {
 
 		success=runQuery(query);
@@ -443,6 +484,7 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 			break;
 		}
 	}
+	#endif
 #else
 	// For non-transactional sqlite, the db must be opened and closed
 	// before each query or the results of ddl/dml queries are never
@@ -450,7 +492,7 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 	if (sqliteconn->sqliteptr) {
 		sqlite3_close(sqliteconn->sqliteptr);
 	}
-#ifdef SQLITE3
+	#ifdef SQLITE3
 	if (sqlite3_open(sqliteconn->db,&(sqliteconn->sqliteptr))!=SQLITE_OK) {
 		sqliteconn->errmesg=
 			sqliteconn->duplicate(
@@ -459,13 +501,13 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 			sqlite3_errcode(sqliteconn->sqliteptr);
 		return false;
 	}
-#else
+	#else
 	if (!(sqliteconn->sqliteptr=
 			sqlite_open(sqliteconn->db,666,
 						&sqliteconn->errmesg))) {
 		return false;
 	}
-#endif
+	#endif
 	success=runQuery(query);
 #endif
 
@@ -473,13 +515,26 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 
 	// cache off the columns so they can be returned later if the result
 	// set is suspended/resumed
+	#ifdef HAVE_SQLITE3_STMT
+	columnnames=new char * [ncolumn];
+	columntypes=new int[ncolumn];
+	if (lastinsertrowid) {
+		columnnames[0]=charstring::duplicate("LASTINSERTROWID");
+		columntypes[0]=INTEGER_DATATYPE;
+	} else {
+		for (int i=0; i<ncolumn; i++) {
+			columnnames[i]=charstring::duplicate(
+						sqlite3_column_name(stmt,i));
+			columntypes[i]=sqlite3_column_type(stmt,i);
+		}
+	}
+	#else
 	columnnames=new char * [ncolumn];
 	for (int i=0; i<ncolumn; i++) {
 		columnnames[i]=charstring::duplicate(result[i]);
 	}
-
-	// set the rowindex past the column names
 	rowindex=rowindex+ncolumn;
+	#endif
 
 	return (success==SQLITE_OK);
 }
@@ -506,10 +561,20 @@ int sqlitecursor::runQuery(const char *query) {
 		columnnames=NULL;
 	}
 
+	#ifdef HAVE_SQLITE3_STMT
+	// clean up old column types
+	if (columntypes) {
+		delete[] columntypes;
+		columntypes=NULL;
+	}
+	#endif
+
 	// reset counters and flags
-	nrow=0;
 	ncolumn=0;
+	nrow=0;
+	#ifndef HAVE_SQLITE3_STMT
 	rowindex=0;
+	#endif
 	lastinsertrowid=false;
 
 	// handle special case of selecting the last row id
@@ -519,6 +584,38 @@ int sqlitecursor::runQuery(const char *query) {
 		return SQLITE_OK;
 	}
 
+#ifdef HAVE_SQLITE3_STMT
+	// sqlite3_step executes the query and fetches the first row.  There's
+	// no way to just execute the query, to see if there was an error or
+	// not, without also fetching the first row.
+	int	res=sqlite3_step(stmt);
+
+	// error of some kind
+	if (res!=SQLITE_DONE && res!=SQLITE_ROW) {
+		sqliteconn->errcode=res;
+		#ifndef HAVE_SQLITE3_PREPARE_V2
+		// When using sqlite3_step with sqlite3_prepare, if
+		// sqlite3_step returns SQLITE_ERROR then you have to call
+		// sqlite3_reset or sqlite3_finalize to get the specific error
+		// code.  You don't have to do this when using
+		// sqlite3_prepare_v2.  In that case, sqlite3_step will return
+		// the error code directly.
+		if (res==SQLITE_ERROR) {
+			sqliteconn->errcode=sqlite3_reset(stmt);
+		}
+		#endif
+		sqliteconn->errmesg=
+			sqliteconn->duplicate(
+				sqlite3_errmsg(sqliteconn->sqliteptr));
+		return SQLITE_ERROR;
+	}
+
+	// SQLITE_DONE or SQLITE_ROW
+	ncolumn=sqlite3_column_count(stmt);
+	nrow=(res!=SQLITE_DONE);
+	justexecuted=true;
+	return SQLITE_OK;
+#else
 	// run the appropriate query
 	int	retval=sqlite3_get_table(sqliteconn->sqliteptr,
 					query,
@@ -528,6 +625,7 @@ int sqlitecursor::runQuery(const char *query) {
 		sqliteconn->errcode=sqlite3_errcode(sqliteconn->sqliteptr);
 	}
 	return retval;
+#endif
 }
 
 void sqlitecursor::selectLastInsertRowId() {
@@ -535,18 +633,32 @@ void sqlitecursor::selectLastInsertRowId() {
 	// fake a result set with 1 field
 	nrow=1;
 	ncolumn=1;
+	#ifdef HAVE_SQLITE3_STMT
+	lastinsertrowidstr=charstring::parseNumber(
+					(int64_t)sqlite3_last_insert_rowid(
+							sqliteconn->sqliteptr));
+	#else
 	result=new char * [2];
 	result[0]=charstring::duplicate("LASTINSERTROWID");
 	result[1]=charstring::parseNumber((int64_t)sqlite3_last_insert_rowid(
 							sqliteconn->sqliteptr));
+	#endif
 }
 
 bool sqlitecursor::knowsRowCount() {
+	#ifdef HAVE_SQLITE3_STMT
+	return false;
+	#else
 	return true;
+	#endif
 }
 
 uint64_t sqlitecursor::rowCount() {
+	#ifdef HAVE_SQLITE3_STMT
+	return 0;
+	#else
 	return nrow;
+	#endif
 }
 
 bool sqlitecursor::knowsAffectedRows() {
@@ -561,25 +673,81 @@ const char *sqlitecursor::getColumnName(uint32_t col) {
 	return columnnames[col];
 }
 
+#ifdef HAVE_SQLITE3_STMT
+uint16_t sqlitecursor::getColumnType(uint32_t col) {
+	switch (columntypes[col]) {
+		case SQLITE_INTEGER:
+			return INTEGER_DATATYPE;
+		case SQLITE_FLOAT:
+			return FLOAT_DATATYPE;
+		case SQLITE_TEXT:
+			return STRING_DATATYPE;
+		case SQLITE_BLOB:
+			return BLOB_DATATYPE;
+		case SQLITE_NULL:
+			return NULL_DATATYPE;
+		default:
+			return UNKNOWN_DATATYPE;
+	}
+}
+#endif
+
 bool sqlitecursor::noRowsToReturn() {
 	return (!nrow);
 }
 
 bool sqlitecursor::skipRow() {
+	#ifdef HAVE_SQLITE3_STMT
+	return fetchRow();
+	#else
 	rowindex=rowindex+ncolumn;
 	return true;
+	#endif
 }
 
 bool sqlitecursor::fetchRow() {
+	#ifdef HAVE_SQLITE3_STMT
+	if (justexecuted) {
+		justexecuted=false;
+		return true;
+	}
+	if (lastinsertrowid) {
+		return false;
+	}
+	return (sqlite3_step(stmt)!=SQLITE_DONE);
+	#else
 	// have to check for nrow+1 because the 
 	// first row is actually the column names
 	return (rowindex<(ncolumn*(nrow+1)));
+	#endif
 }
 
 void sqlitecursor::getField(uint32_t col,
 				const char **field, uint64_t *fieldlength,
 				bool *blob, bool *null) {
 
+#ifdef HAVE_SQLITE3_STMT
+
+	// handle lastinsertrowid specially
+	if (lastinsertrowid) {
+		*field=lastinsertrowidstr;
+		*fieldlength=charstring::length(*field);
+		*blob=false;
+		*null=false;
+		return;
+	}
+
+	// Get the type before calling sqlite3_column_text.
+	// sqlite3_column_text does a type conversion and the result of
+	// sqlite3_column_type is undefined after the conversion.
+	int	dtype=sqlite3_column_type(stmt,col);
+	*blob=(dtype==SQLITE_BLOB);
+	*field=(const char *)((*blob)?
+				sqlite3_column_blob(stmt,col):
+				sqlite3_column_text(stmt,col));
+	*fieldlength=sqlite3_column_bytes(stmt,col);
+	*null=(*field==NULL);
+#else
 	// sqlite is kind of strange, the result set is not returned
 	// in a 2-d array of pointers to rows/columns, but rather
 	// a 1-d array pointing to fields.  You have to manually keep
@@ -591,10 +759,18 @@ void sqlitecursor::getField(uint32_t col,
 		*null=true;
 	}
 	rowindex++;
+#endif
 }
 
 void sqlitecursor::cleanUpData() {
 
+#ifdef HAVE_SQLITE3_STMT
+	if (lastinsertrowidstr) {
+		delete[] lastinsertrowidstr;
+		lastinsertrowidstr=NULL;
+	}
+	sqlite3_reset(stmt);
+#else
 	if (result) {
 		if (lastinsertrowid) {
 			delete[] result[0];
@@ -605,6 +781,7 @@ void sqlitecursor::cleanUpData() {
 		}
 		result=NULL;
 	}
+#endif
 }
 
 #ifdef SQLITE3

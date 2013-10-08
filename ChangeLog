@@ -1,4 +1,4 @@
-0.53 - 
+0.53 - added support for sqlite statement api
 
 0.52 - sqlrsh has long reported the wrong version, fixed that
 	added csv support to sqlr-export and a -format xml|csv option

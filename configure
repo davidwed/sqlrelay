@@ -24231,8 +24231,8 @@ _ACEOF
 
 	fi
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqlite3_bind_int" >&5
-$as_echo_n "checking for sqlite3_bind_int... " >&6; }
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqlite3_stmt" >&5
+$as_echo_n "checking for sqlite3_stmt... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
@@ -24248,7 +24248,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-sqlite3_bind_int(NULL,0,0);
+sqlite3_stmt *a=0;
   ;
   return 0;
 }
@@ -24256,7 +24256,46 @@ _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; };
-$as_echo "#define HAVE_SQLITE3_BIND_INT 1" >>confdefs.h
+$as_echo "#define HAVE_SQLITE3_STMT 1" >>confdefs.h
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqlite3_prepare_v2" >&5
+$as_echo_n "checking for sqlite3_prepare_v2... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$SQLITESTATIC $SQLITEINCLUDES"
+LIBS="$SQLITELIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <sqlite3.h>
+#include <stdlib.h>
+int
+main ()
+{
+sqlite3_prepare_v2(0,0,0,0,0);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; };
+$as_echo "#define HAVE_SQLITE3_PREPARE_V2 1" >>confdefs.h
 
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
