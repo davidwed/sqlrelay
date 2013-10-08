@@ -57,6 +57,7 @@ class postgresqlconnection : public sqlrconnection_svr {
 		uint16_t	typemangling;
 		const char	*charset;
 		char		*dbversion;
+		char		*hostname;
 
 #ifdef HAVE_POSTGRESQL_PQOIDVALUE
 		Oid	currentoid;
@@ -168,6 +169,7 @@ postgresqlconnection::postgresqlconnection(sqlrcontroller_svr *cont) :
 	currentoid=InvalidOid;
 #endif
 	lastinsertidquery=NULL;
+	hostname=NULL;
 }
 
 postgresqlconnection::~postgresqlconnection() {
@@ -176,6 +178,7 @@ postgresqlconnection::~postgresqlconnection() {
 #endif
 	delete[] dbversion;
 	delete[] lastinsertidquery;
+	delete[] hostname;
 }
 
 void postgresqlconnection::handleConnectString() {
@@ -382,8 +385,14 @@ const char *postgresqlconnection::dbVersion() {
 }
 
 const char *postgresqlconnection::dbHostName() {
-	const char	*hostname=sqlrconnection_svr::dbHostName();
-	return (charstring::length(hostname))?hostname:sys::getHostName();
+	const char	*dbhostname=sqlrconnection_svr::dbHostName();
+	if (charstring::length(dbhostname)) {
+		return dbhostname;
+	}
+	if (!hostname) {
+		hostname=sys::getHostName();
+	}
+	return hostname;
 }
 
 const char *postgresqlconnection::dbIpAddressQuery() {

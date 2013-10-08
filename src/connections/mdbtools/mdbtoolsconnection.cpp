@@ -29,6 +29,7 @@ class mdbtoolsconnection : public sqlrconnection_svr {
 	friend class mdbtoolscursor;
 	public:
 			mdbtoolsconnection(sqlrcontroller_svr *cont);
+			~mdbtoolsconnection();
 	private:
 		void	handleConnectString();
 		bool	logIn(const char **error);
@@ -60,6 +61,7 @@ class mdbtoolsconnection : public sqlrconnection_svr {
 					bool *liveconnection);
 
 		const char	*db;
+		char		*hostname;
 };
 
 enum cursortype_t {
@@ -116,6 +118,11 @@ class mdbtoolscursor : public sqlrcursor_svr {
 
 mdbtoolsconnection::mdbtoolsconnection(sqlrcontroller_svr *cont) :
 						sqlrconnection_svr(cont) {
+	hostname=NULL;
+}
+
+mdbtoolsconnection::~mdbtoolsconnection() {
+	delete[] hostname;
 }
 
 void mdbtoolsconnection::handleConnectString() {
@@ -158,7 +165,10 @@ const char *mdbtoolsconnection::dbVersion() {
 }
 
 const char *mdbtoolsconnection::dbHostName() {
-	return sys::getHostName();
+	if (!hostname) {
+		hostname=sys::getHostName();
+	}
+	return hostname;
 }
 
 bool mdbtoolsconnection::getListsByApiCalls() {
