@@ -625,9 +625,16 @@ void mdbtoolscursor::getField(uint32_t col,
 				case MDB_DOUBLE:
 					*field="DOUBLE";
 					break;
+				#ifdef MDB_DATETIME
+				case MDB_DATETIME:
+					*field="DATETIME";
+					break;
+				#endif
+				#ifdef MDB_SDATETIME
 				case MDB_SDATETIME:
 					*field="SDATETIME";
 					break;
+				#endif
 				case MDB_TEXT:
 					*field="TEXT";
 					break;
