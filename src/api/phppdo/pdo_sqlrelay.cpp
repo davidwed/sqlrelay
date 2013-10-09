@@ -17,6 +17,11 @@
 */
 
 #include <config.h>
+#define NEED_IS_BIT_TYPE_CHAR
+#define NEED_IS_BOOL_TYPE_CHAR
+#define NEED_IS_NUMBER_TYPE_CHAR
+#define NEED_IS_BLOB_TYPE_CHAR
+#include <datatypes.h>
 #include <php.h>
 #include <php_ini.h>
 #include <ext/standard/info.h>
@@ -26,35 +31,59 @@
 
 extern "C" {
 
+struct sqlrstatement {
+	sqlrcursor	*sqlrcur;
+	int64_t		currentrow;
+};
+
 static int sqlrcursorDestructor(pdo_stmt_t *stmt TSRMLS_DC) {
-	delete (sqlrcursor *)stmt->driver_data;
+	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+	delete sqlrstmt->sqlrcur;
+	delete sqlrstmt;
 	return 1;
 }
 
 static int sqlrcursorExecute(pdo_stmt_t *stmt TSRMLS_DC) {
 
-	sqlrcursor	*sqlrcur=(sqlrcursor *)stmt->driver_data;
+	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
 	if (!sqlrcur->executeQuery()) {
 		return 0;
 	}
+	sqlrstmt->currentrow=-1;
+	stmt->executed=1;
 	stmt->column_count=sqlrcur->colCount();
 	stmt->row_count=sqlrcur->rowCount();
-	// FIXME: set anything else?
 	return 1;
 }
 
 static int sqlrcursorFetch(pdo_stmt_t *stmt,
 				enum pdo_fetch_orientation ori,
 				long offset TSRMLS_DC) {
-	sqlrcursor	*sqlrcur=(sqlrcursor *)stmt->driver_data;
-	// FIXME: do something
+	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+	sqlrstmt->currentrow++;
 	return 1;
 }
 
 static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
 
-	sqlrcursor	*sqlrcur=(sqlrcursor *)stmt->driver_data;
-	// FIXME: fill in stmt->columns[colno].*
+	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
+	const char	*name=sqlrcur->getColumnName(colno);
+	const char	*type=sqlrcur->getColumnType(colno);
+	stmt->columns[colno].name=(char *)name;
+	stmt->columns[colno].namelen=charstring::length(name);
+	stmt->columns[colno].maxlen=sqlrcur->getColumnLength(colno);
+	if (isBitTypeChar(type) || isNumberTypeChar(type)) {
+		stmt->columns[colno].param_type=PDO_PARAM_INT;
+	} else if (isBlobTypeChar(type)) {
+		stmt->columns[colno].param_type=PDO_PARAM_LOB;
+	} else if (isBoolTypeChar(type)) {
+		stmt->columns[colno].param_type=PDO_PARAM_BOOL;
+	} else {
+		stmt->columns[colno].param_type=PDO_PARAM_STR;
+	}
+	stmt->columns[colno].precision=sqlrcur->getColumnPrecision(colno);
 	return 1;
 }
 
@@ -64,9 +93,9 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 				unsigned long *len,
 				int *caller_frees TSRMLS_DC) {
 
-	sqlrcursor	*sqlrcur=(sqlrcursor *)stmt->driver_data;
-	// FIXME: set *ptr and *len to string and length of specified field
-	// in current row
+	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+	*ptr=(char *)sqlrstmt->sqlrcur->getField(sqlrstmt->currentrow,colno);
+	*len=sqlrstmt->sqlrcur->getFieldLength(sqlrstmt->currentrow,colno);
 	return 1;
 }
 
@@ -74,17 +103,102 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 				struct pdo_bound_param_data *param,
 				enum pdo_param_event eventtype TSRMLS_DC) {
 
-	sqlrcursor	*sqlrcur=(sqlrcursor *)stmt->driver_data;
-	// FIXME: handle binds
-	return 1;
+	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
+	stringbuffer	paramname;
+	paramname.append((uint64_t)param->paramno+1);
+	if (eventtype!=PDO_PARAM_EVT_EXEC_PRE) {
+		return 1;
+	}
+	if (!param->is_param) {
+		return 1;
+	}
+	switch (PDO_PARAM_TYPE(param->param_type)) {
+		case PDO_PARAM_NULL:
+			sqlrcur->inputBind(paramname.getString(),
+						(const char *)NULL);
+			return 1;
+		case PDO_PARAM_INT:
+		case PDO_PARAM_BOOL:
+			convert_to_long(param->parameter);
+			sqlrcur->inputBind(paramname.getString(),
+						Z_LVAL_P(param->parameter));
+			return 1;
+		case PDO_PARAM_STR:
+			convert_to_string(param->parameter);
+			sqlrcur->inputBind(paramname.getString(),
+						Z_STRVAL_P(param->parameter),
+						Z_STRLEN_P(param->parameter));
+			return 1;
+		case PDO_PARAM_LOB:
+			if (Z_TYPE_P(param->parameter)==IS_STRING) {
+				convert_to_string(param->parameter);
+				sqlrcur->inputBindClob(paramname.getString(),
+						Z_STRVAL_P(param->parameter),
+						Z_STRLEN_P(param->parameter));
+			} else if (Z_TYPE_P(param->parameter)==IS_RESOURCE) {
+				php_stream	*strm=NULL;
+				php_stream_from_zval_no_verify(
+						strm,&param->parameter);
+				if (!strm) {
+					return 0;
+				}
+				SEPARATE_ZVAL(&param->parameter);
+				Z_TYPE_P(param->parameter)=IS_STRING;
+				Z_STRLEN_P(param->parameter)=
+					php_stream_copy_to_mem(strm,
+						&Z_STRVAL_P(param->parameter),
+						PHP_STREAM_COPY_ALL,0);
+				sqlrcur->inputBindBlob(paramname.getString(),
+						Z_STRVAL_P(param->parameter),
+						Z_STRLEN_P(param->parameter));
+			}
+			return 0;
+		case PDO_PARAM_STMT:
+			return 0;
+	}
+	return 0;
 }
 
 static int sqlrcursorColumnMetadata(pdo_stmt_t *stmt,
 					long colno,
 					zval *return_value TSRMLS_DC) {
 
-	sqlrcursor	*sqlrcur=(sqlrcursor *)stmt->driver_data;
-	// FIXME: build associative array with info for the specified column
+	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+	sqlrcursor	*sqlrcur=(sqlrcursor *)sqlrstmt->sqlrcur;
+
+	array_init(return_value);
+	add_assoc_string(return_value,"native_type",
+				(char *)sqlrcur->getColumnType(colno),0);
+
+	zval	*flags=NULL;
+	MAKE_STD_ZVAL(flags);
+	array_init(flags);
+	if (sqlrcur->getColumnIsNullable(colno)) {
+		add_next_index_string(return_value,"nullable",0);
+	}
+	if (sqlrcur->getColumnIsPrimaryKey(colno)) {
+		add_next_index_string(return_value,"primary_key",0);
+	}
+	if (sqlrcur->getColumnIsUnique(colno)) {
+		add_next_index_string(return_value,"unique",0);
+	}
+	if (sqlrcur->getColumnIsPartOfKey(colno)) {
+		add_next_index_string(return_value,"part_of_key",0);
+	}
+	if (sqlrcur->getColumnIsUnsigned(colno)) {
+		add_next_index_string(return_value,"unsigned",0);
+	}
+	if (sqlrcur->getColumnIsZeroFilled(colno)) {
+		add_next_index_string(return_value,"zero_filled",0);
+	}
+	if (sqlrcur->getColumnIsBinary(colno)) {
+		add_next_index_string(return_value,"binary",0);
+	}
+	if (sqlrcur->getColumnIsAutoIncrement(colno)) {
+		add_next_index_string(return_value,"auto_increment",0);
+	}
+	add_assoc_zval(return_value,"flags",flags);
 	return 1;
 }
 
@@ -112,6 +226,7 @@ int _pdo_sqlrelay_error(pdo_dbh_t *dbh,
 }
 
 static int sqlrconnectionClose(pdo_dbh_t *dbh TSRMLS_DC) {
+	dbh->is_closed=1;
 	delete (sqlrconnection *)dbh->driver_data;
 	return 0;
 }
@@ -119,28 +234,37 @@ static int sqlrconnectionClose(pdo_dbh_t *dbh TSRMLS_DC) {
 static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 					long sqllen, pdo_stmt_t *stmt,
 					zval *driveroptions TSRMLS_DC) {
-	sqlrcursor	*sqlrcur=
-			new sqlrcursor((sqlrconnection *)dbh->driver_data);
-	stmt->driver_data=(void *)sqlrcur;
+	sqlrstatement	*sqlrstmt=new sqlrstatement;
+	sqlrstmt->sqlrcur=new sqlrcursor((sqlrconnection *)dbh->driver_data);
+	sqlrstmt->currentrow=-1;
 	stmt->methods=&sqlrcursorMethods;
-	// FIXME: handle driver options
-	sqlrcur->prepareQuery(sql,sqllen);
+	stmt->driver_data=(void *)sqlrstmt;
+	stmt->executed=0;
+	stmt->supports_placeholders=1;
+	stmt->column_count=0;
+	stmt->columns=NULL;
+	stmt->row_count=0;
+	sqlrstmt->sqlrcur->prepareQuery(sql,sqllen);
+	if (dbh->oracle_nulls) {
+		sqlrstmt->sqlrcur->getNullsAsNulls();
+	} else {
+		sqlrstmt->sqlrcur->getNullsAsEmptyStrings();
+	}
+	sqlrstmt->sqlrcur=new sqlrcursor((sqlrconnection *)dbh->driver_data);
 	return 1;
 }
 
 static long sqlrconnectionExecute(pdo_dbh_t *dbh,
 					const char *sql,
 					long sqllen TSRMLS_DC) {
-	sqlrcursor	*sqlrcur=
-			new sqlrcursor((sqlrconnection *)dbh->driver_data);
+	sqlrcursor	sqlrcur((sqlrconnection *)dbh->driver_data);
 	long	retval=-1;
-	if (sqlrcur->sendQuery(sql,sqllen)) {
-		retval=sqlrcur->affectedRows();
+	if (sqlrcur.sendQuery(sql,sqllen)) {
+		retval=sqlrcur.affectedRows();
 		if (retval==-1) {
 			retval=0;
 		}
 	}
-	delete sqlrcur;
 	return retval;
 }
 
@@ -161,7 +285,8 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 
 	sqlrconnection	*sqlrcon=(sqlrconnection *)dbh->driver_data;
 	switch (attr) {
-		case PDO_ATTR_AUTOCOMMIT:		
+		case PDO_ATTR_AUTOCOMMIT:
+			// use to turn on or off auto-commit mode
 			convert_to_boolean(val);
 			if (dbh->auto_commit^Z_BVAL_P(val)) {
 				dbh->auto_commit=Z_BVAL_P(val);
@@ -172,7 +297,79 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 				}
 			}
 			return 1;
-		// FIXME: others?
+		case PDO_ATTR_PREFETCH:
+			// configure the prefetch size for drivers
+			// that support it. Size is in KB
+			return 1;
+		case PDO_ATTR_TIMEOUT:
+			// connection timeout in seconds
+			convert_to_long(val);
+			sqlrcon->setConnectTimeout(Z_LVAL_P(val),0);
+			sqlrcon->setAuthenticationTimeout(Z_LVAL_P(val),0);
+			sqlrcon->setResponseTimeout(Z_LVAL_P(val),0);
+			return 1;
+		case PDO_ATTR_ERRMODE:
+			// control how errors are handled
+			return 1;
+		case PDO_ATTR_SERVER_VERSION:
+			// database server version
+			return 1;
+		case PDO_ATTR_CLIENT_VERSION:
+			// client library version
+			return 1;
+		case PDO_ATTR_SERVER_INFO:
+			// server information
+			return 1;
+		case PDO_ATTR_CONNECTION_STATUS:
+			// connection status
+			return 1;
+		case PDO_ATTR_CASE:
+			// control case folding for portability
+			return 1;
+		case PDO_ATTR_CURSOR_NAME:
+			// name a cursor for use in "WHERE CURRENT OF <name>"
+			return 1;
+		case PDO_ATTR_CURSOR:
+			// cursor type
+			return 1;
+		case PDO_ATTR_ORACLE_NULLS:
+			// convert empty strings to NULL
+			convert_to_boolean(val);
+			dbh->oracle_nulls=(Z_BVAL_P(val)==TRUE);
+			return 1;
+		case PDO_ATTR_PERSISTENT:
+			// pconnect style connection
+			return 1;
+		case PDO_ATTR_STATEMENT_CLASS:
+			// array(classname, array(ctor_args)) to specify
+			// the class of the constructed statement
+			return 1;
+		case PDO_ATTR_FETCH_TABLE_NAMES:
+			// include table names in the column names,
+			// where available
+			return 1;
+		case PDO_ATTR_FETCH_CATALOG_NAMES:
+			// include the catalog/db name names in
+			// the column names, where available
+			return 1;
+		case PDO_ATTR_DRIVER_NAME:
+			// name of the driver (as used in the constructor)
+			return 1;
+		case PDO_ATTR_STRINGIFY_FETCHES:
+			// converts integer/float types to strings during fetch
+			convert_to_boolean(val);
+			dbh->stringify=(Z_BVAL_P(val)==TRUE);
+			return 1;
+		case PDO_ATTR_MAX_COLUMN_LEN:
+			// make database calculate maximum
+			// length of data found in a column
+			return 1;
+		case PDO_ATTR_DEFAULT_FETCH_MODE:
+			// Set the default fetch mode
+			return 1;
+		case PDO_ATTR_EMULATE_PREPARES:
+			// use query emulation rather than native
+			return 1;
 		default:
 			return 0;
 	}
@@ -199,22 +396,83 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 
 	sqlrconnection	*sqlrcon=(sqlrconnection *)dbh->driver_data;
 	switch (attr) {
-		case PDO_ATTR_CLIENT_VERSION:
-			ZVAL_STRING(retval,(char *)sqlrcon->clientVersion(),1);
-			break;
-
-		case PDO_ATTR_SERVER_VERSION:
-			ZVAL_STRING(retval,(char *)sqlrcon->serverVersion(),1);
-			break;
 		case PDO_ATTR_AUTOCOMMIT:
-			ZVAL_LONG(retval,dbh->auto_commit);
-			break;
-		// FIXME: others?
+			// use to turn on or off auto-commit mode
+			ZVAL_BOOL(retval,dbh->auto_commit);
+			return 1;
+		case PDO_ATTR_PREFETCH:
+			// configure the prefetch size for drivers
+			// that support it. Size is in KB
+			return 1;
+		case PDO_ATTR_TIMEOUT:
+			// connection timeout in seconds
+			return 1;
+		case PDO_ATTR_ERRMODE:
+			// control how errors are handled
+			return 1;
+		case PDO_ATTR_SERVER_VERSION:
+			// database server version
+			ZVAL_STRING(retval,(char *)sqlrcon->serverVersion(),1);
+			return 1;
+		case PDO_ATTR_CLIENT_VERSION:
+			// client library version
+			ZVAL_STRING(retval,(char *)sqlrcon->clientVersion(),0);
+			return 1;
+		case PDO_ATTR_SERVER_INFO:
+			// server information
+			return 1;
+		case PDO_ATTR_CONNECTION_STATUS:
+			// connection status
+			return 1;
+		case PDO_ATTR_CASE:
+			// control case folding for portability
+			return 1;
+		case PDO_ATTR_CURSOR_NAME:
+			// name a cursor for use in "WHERE CURRENT OF <name>"
+			return 1;
+		case PDO_ATTR_CURSOR:
+			// cursor type
+			return 1;
+		case PDO_ATTR_ORACLE_NULLS:
+			// convert empty strings to NULL
+			ZVAL_LONG(retval,dbh->oracle_nulls);
+			return 1;
+		case PDO_ATTR_PERSISTENT:
+			// pconnect style connection
+			return 1;
+		case PDO_ATTR_STATEMENT_CLASS:
+			// array(classname, array(ctor_args)) to specify
+			// the class of the constructed statement
+			return 1;
+		case PDO_ATTR_FETCH_TABLE_NAMES:
+			// include table names in the column names,
+			// where available
+			return 1;
+		case PDO_ATTR_FETCH_CATALOG_NAMES:
+			// include the catalog/db name names in
+			// the column names, where available
+			return 1;
+		case PDO_ATTR_DRIVER_NAME:
+			// name of the driver (as used in the constructor)
+			ZVAL_STRING(retval,"sqlrelay",0);
+			return 1;
+		case PDO_ATTR_STRINGIFY_FETCHES:
+			// converts integer/float types to strings during fetch
+			ZVAL_BOOL(retval,dbh->stringify);
+			return 1;
+		case PDO_ATTR_MAX_COLUMN_LEN:
+			// make database calculate maximum
+			// length of data found in a column
+			return 1;
+		case PDO_ATTR_DEFAULT_FETCH_MODE:
+			// Set the default fetch mode
+			return 1;
+		case PDO_ATTR_EMULATE_PREPARES:
+			// use query emulation rather than native
+			return 1;
 		default:
 			return 0;
 	}
-
-	return 1;
 }
 
 static struct pdo_dbh_methods sqlrconnectionMethods={
@@ -237,11 +495,11 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 
 	// parse the connect string
 	pdo_data_src_parser	options[]={
-		{"host","",0},
-		{"port","",0},
-		{"socket","",0},
-		{"tries","0",0},
-		{"retrytime","1",0},
+		{"host",(char *)"",0},
+		{"port",(char *)"",0},
+		{"socket",(char *)"",0},
+		{"tries",(char *)"0",0},
+		{"retrytime",(char *)"1",0},
 	};
 	php_pdo_parse_data_source(dbh->data_source,
 					dbh->data_source_len,
@@ -260,7 +518,14 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	dbh->driver_data=(void *)sqlrcon;
 	dbh->methods=&sqlrconnectionMethods;
 
-	// FIXME: driver options
+	dbh->is_persistent=0;
+	dbh->auto_commit=0;
+	dbh->is_closed=0;
+	dbh->alloc_own_columns=1;
+	dbh->in_txn=1;
+	dbh->max_escaped_char_length=2;
+	dbh->oracle_nulls=0; // don't convert empty strings to nulls by default
+	dbh->stringify=1;
 
 	// success
 	return 1;
@@ -283,7 +548,6 @@ static PHP_MSHUTDOWN_FUNCTION(pdo_sqlrelay) {
 static PHP_MINFO_FUNCTION(pdo_sqlrelay) {
 	php_info_print_table_start();
 	php_info_print_table_header(2, "PDO Driver for SQL Relay", "enabled");
-	// FIXME: replace with actual version
 	php_info_print_table_row(2, "Client API version", SQLR_VERSION);
 	php_info_print_table_end();
 }
