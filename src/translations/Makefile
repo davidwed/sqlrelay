@@ -27,7 +27,8 @@ all: sqltranslation_doublequotestosinglequotes.la \
 	sqltranslation_serialtoidentity.la \
 	sqltranslation_show.la \
 	sqltranslation_informixtomssqlserverselectinto.la \
-	sqltranslation_concat.la
+	sqltranslation_concat.la \
+	sqltranslation_uniquetodistinct.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
@@ -83,6 +84,9 @@ sqltranslation_informixtomssqlserverselectinto.la: informixtomssqlserverselectin
 
 sqltranslation_concat.la: concat.cpp concat.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ concat.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+
+sqltranslation_uniquetodistinct.la: uniquetodistinct.cpp uniquetodistinct.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ uniquetodistinct.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
 	$(MKINSTALLDIRS) $(libexecdir)
@@ -154,6 +158,10 @@ install:
 	$(RM) $(libexecdir)/sqltranslation_concat.a
 	$(RM) $(libexecdir)/sqltranslation_concat.la
 	$(MODULERENAME) $(libexecdir)/sqltranslation_concat.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqltranslation_uniquetodistinct.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_uniquetodistinct.a
+	$(RM) $(libexecdir)/sqltranslation_uniquetodistinct.la
+	$(MODULERENAME) $(libexecdir)/sqltranslation_uniquetodistinct.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/sqltranslation_*
