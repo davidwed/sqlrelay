@@ -284,6 +284,7 @@ static int sqlrconnectionRollback(pdo_dbh_t *dbh TSRMLS_DC) {
 static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 					long attr, zval *val TSRMLS_DC) {
 
+	// FIXME: support setResultSetBufferSize somehow
 	sqlrconnection	*sqlrcon=(sqlrconnection *)dbh->driver_data;
 	switch (attr) {
 		case PDO_ATTR_AUTOCOMMIT:
@@ -395,6 +396,7 @@ static int sqlrconnectionError(pdo_dbh_t *dbh,
 static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 				long attr, zval *retval TSRMLS_DC) {
 
+	// FIXME: support getResultSetBufferSize somehow
 	sqlrconnection	*sqlrcon=(sqlrconnection *)dbh->driver_data;
 	switch (attr) {
 		case PDO_ATTR_AUTOCOMMIT:
