@@ -25,6 +25,9 @@ ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php all
 	$(MAKE) -C phppeardb all
 endif
+ifneq ($(HAVE_PHP_PDO),)
+	$(MAKE) -C phppdo all
+endif
 ifneq ($(HAVE_JAVA),)
 	$(MAKE) -C java all
 endif
@@ -58,6 +61,9 @@ ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php clean
 	$(MAKE) -C phppeardb clean
 endif
+ifneq ($(HAVE_PHP_PDO),)
+	$(MAKE) -C phppdo clean
+endif
 ifneq ($(HAVE_JAVA),)
 	$(MAKE) -C java clean
 endif
@@ -90,6 +96,9 @@ endif
 ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php install
 	$(MAKE) -C phppeardb install
+endif
+ifneq ($(HAVE_PHP_PDO),)
+	$(MAKE) -C phppdo install
 endif
 ifneq ($(HAVE_JAVA),)
 	$(MAKE) -C java install
@@ -126,6 +135,9 @@ endif
 ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php uninstall
 	$(MAKE) -C phppeardb uninstall
+endif
+ifneq ($(HAVE_PHP_PDO),)
+	$(MAKE) -C phppdo uninstall
 endif
 ifneq ($(HAVE_JAVA),)
 	$(MAKE) -C java uninstall

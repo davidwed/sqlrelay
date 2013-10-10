@@ -702,6 +702,7 @@ echo
 echo "***** PHP ********************"
 FW_CHECK_PHP
 FW_CHECK_PHP_PEAR_DB
+FW_CHECK_PHP_PDO
 echo "******************************"
 
 

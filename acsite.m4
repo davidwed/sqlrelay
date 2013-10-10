@@ -3179,6 +3179,16 @@ AC_DEFUN([FW_CHECK_PHP_PEAR_DB],
 	AC_SUBST(PHPPEARDBDIR)
 ])
 
+AC_DEFUN([FW_CHECK_PHP_PDO],
+[
+	AC_MSG_CHECKING(for PHP PDO)
+	HAVE_PHP_PDO=""
+	FW_TRY_COMPILE([#include <php.h>
+#include <pdo/php_pdo.h>
+#include <pdo/php_pdo_driver.h>],[struct pdo_dbh_methods a;],[$PHPINCLUDES],[AC_MSG_RESULT(yes); HAVE_PHP_PDO="yes"],[AC_MSG_RESULT(no)])
+	AC_SUBST(HAVE_PHP_PDO)
+])
+
 
 AC_DEFUN([FW_CHECK_ERLANG],
 [
