@@ -22,14 +22,18 @@
 #define NEED_IS_NUMBER_TYPE_CHAR
 #define NEED_IS_BLOB_TYPE_CHAR
 #include <datatypes.h>
+#include <sqlrelay/sqlrclient.h>
+#include <rudiments/stringbuffer.h>
+#include <rudiments/charstring.h>
+#include <rudiments/character.h>
+
+extern "C" {
+
 #include <php.h>
 #include <php_ini.h>
 #include <ext/standard/info.h>
 #include <pdo/php_pdo.h>
 #include <pdo/php_pdo_driver.h>
-#include <sqlrelay/sqlrclient.h>
-
-extern "C" {
 
 struct sqlrstatement {
 	sqlrcursor	*sqlrcur;
@@ -51,7 +55,6 @@ static int sqlrcursorExecute(pdo_stmt_t *stmt TSRMLS_DC) {
 		return 0;
 	}
 	sqlrstmt->currentrow=-1;
-	stmt->executed=1;
 	stmt->column_count=sqlrcur->colCount();
 	stmt->row_count=sqlrcur->rowCount();
 	return 1;
@@ -69,9 +72,9 @@ static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
 
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
-	const char	*name=sqlrcur->getColumnName(colno);
+	char		*name=estrdup(sqlrcur->getColumnName(colno));
 	const char	*type=sqlrcur->getColumnType(colno);
-	stmt->columns[colno].name=(char *)name;
+	stmt->columns[colno].name=name;
 	stmt->columns[colno].namelen=charstring::length(name);
 	stmt->columns[colno].maxlen=sqlrcur->getColumnLength(colno);
 	if (isBitTypeChar(type) || isNumberTypeChar(type)) {
@@ -107,6 +110,10 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
 	stringbuffer	paramname;
 	paramname.append((uint64_t)param->paramno+1);
+	const char	*name=(param->name)?param->name:paramname.getString();
+	if (character::inSet(name[0],":@$")) {
+		name++;
+	}
 	if (eventtype!=PDO_PARAM_EVT_EXEC_PRE) {
 		return 1;
 	}
@@ -116,25 +123,22 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 	// FIXME: pdo does support output binds, implement that
 	switch (PDO_PARAM_TYPE(param->param_type)) {
 		case PDO_PARAM_NULL:
-			sqlrcur->inputBind(paramname.getString(),
-						(const char *)NULL);
+			sqlrcur->inputBind(name,(const char *)NULL);
 			return 1;
 		case PDO_PARAM_INT:
 		case PDO_PARAM_BOOL:
 			convert_to_long(param->parameter);
-			sqlrcur->inputBind(paramname.getString(),
-						Z_LVAL_P(param->parameter));
+			sqlrcur->inputBind(name,Z_LVAL_P(param->parameter));
 			return 1;
 		case PDO_PARAM_STR:
 			convert_to_string(param->parameter);
-			sqlrcur->inputBind(paramname.getString(),
-						Z_STRVAL_P(param->parameter),
+			sqlrcur->inputBind(name,Z_STRVAL_P(param->parameter),
 						Z_STRLEN_P(param->parameter));
 			return 1;
 		case PDO_PARAM_LOB:
 			if (Z_TYPE_P(param->parameter)==IS_STRING) {
 				convert_to_string(param->parameter);
-				sqlrcur->inputBindClob(paramname.getString(),
+				sqlrcur->inputBindBlob(name,
 						Z_STRVAL_P(param->parameter),
 						Z_STRLEN_P(param->parameter));
 			} else if (Z_TYPE_P(param->parameter)==IS_RESOURCE) {
@@ -150,11 +154,11 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 					php_stream_copy_to_mem(strm,
 						&Z_STRVAL_P(param->parameter),
 						PHP_STREAM_COPY_ALL,0);
-				sqlrcur->inputBindBlob(paramname.getString(),
+				sqlrcur->inputBindBlob(name,
 						Z_STRVAL_P(param->parameter),
 						Z_STRLEN_P(param->parameter));
 			}
-			return 0;
+			return 1;
 		case PDO_PARAM_STMT:
 			return 0;
 	}
@@ -236,12 +240,17 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 					long sqllen, pdo_stmt_t *stmt,
 					zval *driveroptions TSRMLS_DC) {
 	sqlrstatement	*sqlrstmt=new sqlrstatement;
-	sqlrstmt->sqlrcur=new sqlrcursor((sqlrconnection *)dbh->driver_data);
+	sqlrstmt->sqlrcur=new sqlrcursor(
+				(sqlrconnection *)dbh->driver_data,true);
 	sqlrstmt->currentrow=-1;
 	stmt->methods=&sqlrcursorMethods;
 	stmt->driver_data=(void *)sqlrstmt;
-	stmt->executed=0;
-	stmt->supports_placeholders=1;
+	// SQL Relay actually support named and postitional placeholders but
+	// there doesn't appear to be a way to set both.  Positional is a
+	// larger value in the enum, so I guess we'll use that.  The pdo code
+	// appears to just check to see if it's not PDO_PLACEHOLDER_NONE anyway
+	// so hopefully this is ok.
+	stmt->supports_placeholders=PDO_PLACEHOLDER_POSITIONAL;
 	stmt->column_count=0;
 	stmt->columns=NULL;
 	stmt->row_count=0;
@@ -251,7 +260,6 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 	} else {
 		sqlrstmt->sqlrcur->getNullsAsEmptyStrings();
 	}
-	sqlrstmt->sqlrcur=new sqlrcursor((sqlrconnection *)dbh->driver_data);
 	return 1;
 }
 
@@ -503,21 +511,27 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 		{"socket",(char *)"",0},
 		{"tries",(char *)"0",0},
 		{"retrytime",(char *)"1",0},
+		{"debug",(char *)"0",0},
 	};
 	php_pdo_parse_data_source(dbh->data_source,
 					dbh->data_source_len,
-					options,5);
+					options,6);
 	const char	*host=options[0].optval;
 	uint16_t	port=charstring::toInteger(options[1].optval);
 	const char	*socket=options[2].optval;
 	int32_t		tries=charstring::toInteger(options[3].optval);
 	int32_t		retrytime=charstring::toInteger(options[4].optval);
+	bool		debug=charstring::toInteger(options[5].optval);
 
 	// create a sqlrconnection and attach it to the dbh
 	sqlrconnection	*sqlrcon=new sqlrconnection(host,port,socket,
 							dbh->username,
 							dbh->password,
-							tries,retrytime);
+							tries,retrytime,
+							true);
+	if (debug) {
+		sqlrcon->debugOn();
+	}
 	dbh->driver_data=(void *)sqlrcon;
 	dbh->methods=&sqlrconnectionMethods;
 
