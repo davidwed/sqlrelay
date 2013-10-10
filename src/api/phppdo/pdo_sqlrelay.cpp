@@ -113,6 +113,7 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 	if (!param->is_param) {
 		return 1;
 	}
+	// FIXME: pdo does support output binds, implement that
 	switch (PDO_PARAM_TYPE(param->param_type)) {
 		case PDO_PARAM_NULL:
 			sqlrcur->inputBind(paramname.getString(),

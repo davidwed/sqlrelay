@@ -717,10 +717,6 @@ echo "******************************"
 dnl Checks for header files.
 echo
 echo "***** Headers ****************"
-AC_HEADER_DIRENT
-AC_HEADER_STDC
-AC_CHECK_HEADERS(unistd.h strings.h)
-
 AC_MSG_CHECKING(for sys/vnode.h)
 AC_TRY_COMPILE([#include <sys/vnode.h>],
 [],AC_DEFINE(SQLRELAY_HAVE_SYS_VNODE_H, 1, Some systems have sys/vnode.h) AC_MSG_RESULT(yes),AC_MSG_RESULT(no))
@@ -873,6 +869,12 @@ fi
 if ( test -n "$HAVE_PHP" ); then
 	PHPBUILD="yes"
 fi
+if ( test -n "$HAVE_PHP_PDO" ); then
+	PHPPDOBUILD="yes"
+fi
+if ( test -n "$PHPPEARDBDIR" ); then
+	PHPPEARDBBUILD="yes"
+fi
 if ( test -n "$HAVE_JAVA" ); then
 	JAVABUILD="yes"
 fi
@@ -889,8 +891,9 @@ echo "$APIS"
 echo " APIs         : C/C++       yes           Perl       $PERLBUILD"
 echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
 echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
-echo "                TCL         $TCLBUILD           Zope       $ZOPEBUILD"
-echo "                Erlang      $ERLANGBUILD           ODBC       $ODBCBUILD"
+echo "                PHP PEARDB  $PHPPEARDBBUILD           Zope       $ZOPEBUILD"
+echo "                PHP PDO     $PHPPDOBUILD           ODBC       $ODBCBUILD"
+echo "                TCL         $TCLBUILD           Erlang     $ERLANGBUILD"
 echo ""
 
 ORACLE8BUILD="no     "

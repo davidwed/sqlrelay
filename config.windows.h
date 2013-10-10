@@ -1,6 +1,9 @@
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
+/* On some platforms */
+/* #undef ADD_NEWLINE_AFTER_READ_FROM_STDIN */
+
 /* On some platforms NewObjectArray requires a cast */
 /* #undef CAST_NEW_OBJECT_ARRAY */
 
@@ -9,10 +12,6 @@
 
 /* Use dmalloc */
 #define DMALLOC 1
-
-/* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
-   */
-#define HAVE_DIRENT_H 1
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 /* #undef HAVE_DLFCN_H */
@@ -32,8 +31,14 @@
 /* Define to 1 if you have the `z' library (-lz). */
 /* #undef HAVE_LIBZ */
 
+/* Some versions of mdbtools have mdb_close() */
+/* #undef HAVE_MDB_CLOSE */
+
 /* Some versions of mdbtools have 5 param mdb_col_to_string */
 /* #undef HAVE_MDB_COL_TO_STRING_5_PARAM */
+
+/* Some versions of mdbtools have mdb_open() with 2 parameters */
+/* #undef HAVE_MDB_OPEN_2_PARAM 1 */
 
 /* Some versions of mdbtools have mdb_remove_backends() */
 /* #undef HAVE_MDB_REMOVE_BACKENDS */
@@ -107,20 +112,23 @@
 /* MySQL supports mysql_stmt_prepare */
 /* #undef HAVE_MYSQL_STMT_PREPARE */
 
-/* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
-/* #undef HAVE_NDIR_H */
-
 /* oci.h */
 /* #undef HAVE_OCI_H */
 
 /* Oracle 8i or greater */
 /* #undef HAVE_ORACLE_8i */
 
+/* Some versions of postgresql have PQbinaryTuples */
+/* #undef HAVE_POSTGRESQL_PQBINARYTUPLES */
+
 /* Some versions of postgresql have PQexecPrepared */
 /* #undef HAVE_POSTGRESQL_PQEXECPREPARED */
 
 /* Some versions of postgresql have PQfmod */
 /* #undef HAVE_POSTGRESQL_PQFMOD */
+
+/* Some versions of postgresql have PQoidValue */
+/* #undef HAVE_POSTGRESQL_PQOIDVALUE */
 
 /* Some versions of postgresql have PQparameterStatus */
 /* #undef HAVE_POSTGRESQL_PQPARAMETERSTATUS */
@@ -275,8 +283,17 @@
 /* Some systems have SQLConnectW */
 /* #undef HAVE_SQLCONNECTW */
 
-/* SQLite supports sqlite3_bind_int */
-/* #undef HAVE_SQLITE3_BIND_INT */
+/* SQLite supports sqlite3_malloc */
+#define HAVE_SQLITE3_FREE_WITH_CHAR 1
+
+/* SQLite supports sqlite3_malloc */
+#define HAVE_SQLITE3_MALLOC 1
+
+/* SQLite supports sqlite3_prepare_v2 */
+#define HAVE_SQLITE3_PREPARE_V2 1
+
+/* SQLite supports sqlite3_stmt */
+#define HAVE_SQLITE3_STMT 1
 
 /* Some systems have SQLROWSETSIZE */
 #define HAVE_SQLROWSETSIZE 1
@@ -293,14 +310,6 @@
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
 
-/* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
-   */
-/* #undef HAVE_SYS_DIR_H */
-
-/* Define to 1 if you have the <sys/ndir.h> header file, and it defines `DIR'.
-   */
-/* #undef HAVE_SYS_NDIR_H */
-
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define HAVE_SYS_STAT_H 1
 
@@ -312,6 +321,9 @@
 
 /* Some versions of TCL don't have Tcl_GetString */
 /* #undef HAVE_TCL_GETSTRING */
+
+/* Some versions of TCL don't use const char ** arguments */
+#define HAVE_TCL_NEWSTRINGOBJ_CONST_CHAR 1
 
 /* Some versions of TCL don't have Tcl_WideInt */
 /* #undef HAVE_TCL_WIDEINT */
@@ -365,9 +377,6 @@
 /* Define as the return type of signal handlers (`int' or `void'). */
 #define RETSIGTYPE void
 
-/* Rudiments supports threads */
-#define RUDIMENTS_HAS_THREADS 1
-
 /* Some systems use SQLLEN * in SQLBindCol */
 /* #undef SQLBINDCOL_SQLLEN */
 
@@ -380,14 +389,17 @@
 /* Some versions of sqlite are transactional */
 /* #undef SQLITE_TRANSACTIONAL */
 
-/* Compiler supports namespaces */
-#define SQLRELAY_NAMESPACE 1
+/* Some systems have sys/vnode.h */
+/* #undef SQLRELAY_HAVE_SYS_VNODE_H */
+
+/* Suffix for loadable modules */
+#define SQLRELAY_MODULESUFFIX "dll"
 
 /* Some systems use SQLLEN * in SQLRowCount */
 /* #undef SQLROWCOUNT_SQLLEN */
 
 /* Version */
-#define SQLR_VERSION "0.45"
+#define SQLR_VERSION "0.53"
 
 /* Define to 1 if you have the ANSI C header files. */
 /* #undef STDC_HEADERS */
