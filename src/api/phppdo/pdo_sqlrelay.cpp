@@ -230,6 +230,20 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 	return 0;
 }
 
+static int sqlrcursorSetAttribute(pdo_stmt_t *stmt,
+					long attr, zval *val TSRMLS_DC) {
+	// not supported but might be supported in the
+	// future so we'll let it fail silently for now
+	return 0;
+}
+
+static int sqlrcursorGetAttribute(pdo_stmt_t *stmt,
+					long attr, zval *retval TSRMLS_DC) {
+	// not supported but might be supported in the
+	// future so we'll let it fail silently for now
+	return 0;
+}
+
 static int sqlrcursorColumnMetadata(pdo_stmt_t *stmt,
 					long colno,
 					zval *return_value TSRMLS_DC) {
@@ -272,6 +286,13 @@ static int sqlrcursorColumnMetadata(pdo_stmt_t *stmt,
 	return 1;
 }
 
+static int sqlrcursorClose(pdo_stmt_t *stmt TSRMLS_DC) {
+	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+	sqlrcursor	*sqlrcur=(sqlrcursor *)sqlrstmt->sqlrcur;
+	sqlrcur->closeResultSet();
+	return 1;
+}
+
 static struct pdo_stmt_methods sqlrcursorMethods={
 	sqlrcursorDestructor,
 	sqlrcursorExecute,
@@ -279,11 +300,11 @@ static struct pdo_stmt_methods sqlrcursorMethods={
 	sqlrcursorDescribe,
 	sqlrcursorGetField,
 	sqlrcursorBind,
-	NULL, // set attr
-	NULL, // get attr
+	sqlrcursorSetAttribute,
+	sqlrcursorGetAttribute,
 	sqlrcursorColumnMetadata,
 	NULL, // next rowset
-	NULL  // close
+	sqlrcursorClose
 };
 
 
@@ -434,9 +455,25 @@ static int sqlrconnectionError(pdo_dbh_t *dbh,
 					pdo_stmt_t *stmt,
 					zval *info TSRMLS_DC) {
 
-	sqlrconnection	*sqlrcon=(sqlrconnection *)dbh->driver_data;
-	sqlrcon->errorNumber();
-	sqlrcon->errorMessage();
+	// FIXME: the first index in the info array should be the sqlstate
+	// currently we're leaving it at 00000 but it really ought to be
+	// set to some value.  DB2 and ODBC support this, others might too.
+	if (stmt) {
+		sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+		sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
+		add_next_index_long(info,sqlrcur->errorNumber());
+		const char	*msg=sqlrcur->errorMessage();
+		if (msg) {
+			add_next_index_string(info,msg,1);
+		}
+	} else if (dbh) {
+		sqlrconnection	*sqlrcon=(sqlrconnection *)dbh->driver_data;
+		add_next_index_long(info,sqlrcon->errorNumber());
+		const char	*msg=sqlrcon->errorMessage();
+		if (msg) {
+			add_next_index_string(info,msg,1);
+		}
+	}
 	return 1;
 }
 
