@@ -65,9 +65,31 @@ static int sqlrcursorFetch(pdo_stmt_t *stmt,
 				enum pdo_fetch_orientation ori,
 				long offset TSRMLS_DC) {
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
-	// FIXME: handle orientation and offset
-	sqlrstmt->currentrow++;
-	return 1;
+	switch (ori) {
+		case PDO_FETCH_ORI_NEXT:
+			sqlrstmt->currentrow++;
+			break;
+		case PDO_FETCH_ORI_PRIOR:
+			sqlrstmt->currentrow--;
+			break;
+		case PDO_FETCH_ORI_FIRST:
+			sqlrstmt->currentrow=0;
+			break;
+		case PDO_FETCH_ORI_LAST:
+			sqlrstmt->currentrow=stmt->row_count-1;
+			break;
+		case PDO_FETCH_ORI_ABS:
+			sqlrstmt->currentrow=offset;
+			break;
+		case PDO_FETCH_ORI_REL:
+			sqlrstmt->currentrow+=offset;
+			break;
+	}
+	if (sqlrstmt->currentrow<-1) {
+		sqlrstmt->currentrow=-1;
+	}
+	return (sqlrstmt->currentrow>-1 &&
+		sqlrstmt->currentrow<stmt->row_count);
 }
 
 static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
@@ -100,6 +122,8 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
+
+	*caller_frees=0;
 
 	switch (stmt->columns[colno].param_type) {
 		case PDO_PARAM_INT:
@@ -143,19 +167,25 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
+
 	stringbuffer	paramname;
 	paramname.append((uint64_t)param->paramno+1);
 	const char	*name=(param->name)?param->name:paramname.getString();
 	if (character::inSet(name[0],":@$")) {
 		name++;
 	}
+
+	// FIXME: handle other event types?
 	if (eventtype!=PDO_PARAM_EVT_EXEC_PRE) {
 		return 1;
 	}
+
+	// FIXME: what does this mean?
 	if (!param->is_param) {
 		return 1;
 	}
-	// FIXME: pdo does support output binds, implement that
+
+	// FIXME: pdo does support output binds, implement them somehow
 	switch (PDO_PARAM_TYPE(param->param_type)) {
 		case PDO_PARAM_NULL:
 			sqlrcur->inputBind(name,(const char *)NULL);
@@ -257,7 +287,7 @@ static struct pdo_stmt_methods sqlrcursorMethods={
 };
 
 
-// what is this function for?
+// FIXME: what is this function for?
 int _pdo_sqlrelay_error(pdo_dbh_t *dbh,
 			pdo_stmt_t *stmt,
 			const char *file,
@@ -290,11 +320,6 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 	stmt->columns=NULL;
 	stmt->row_count=0;
 	sqlrstmt->sqlrcur->prepareQuery(sql,sqllen);
-	if (dbh->oracle_nulls) {
-		sqlrstmt->sqlrcur->getNullsAsNulls();
-	} else {
-		sqlrstmt->sqlrcur->getNullsAsEmptyStrings();
-	}
 	return 1;
 }
 
@@ -327,8 +352,13 @@ static int sqlrconnectionRollback(pdo_dbh_t *dbh TSRMLS_DC) {
 static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 					long attr, zval *val TSRMLS_DC) {
 
-	// FIXME: support setResultSetBufferSize somehow
+	// FIXME: somehow support
+	// 	setResultSetBufferSize
+	// 	get/dontGetColumnInfo
 	sqlrconnection	*sqlrcon=(sqlrconnection *)dbh->driver_data;
+
+	// PDO handles several of these options itself.  These are the ones
+	// it doens't handle.
 	switch (attr) {
 		case PDO_ATTR_AUTOCOMMIT:
 			// use to turn on or off auto-commit mode
@@ -353,9 +383,6 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 			sqlrcon->setAuthenticationTimeout(Z_LVAL_P(val),0);
 			sqlrcon->setResponseTimeout(Z_LVAL_P(val),0);
 			return 1;
-		case PDO_ATTR_ERRMODE:
-			// control how errors are handled
-			return 1;
 		case PDO_ATTR_SERVER_VERSION:
 			// database server version
 			return 1;
@@ -368,26 +395,11 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 		case PDO_ATTR_CONNECTION_STATUS:
 			// connection status
 			return 1;
-		case PDO_ATTR_CASE:
-			// control case folding for portability
-			return 1;
-		case PDO_ATTR_CURSOR_NAME:
-			// name a cursor for use in "WHERE CURRENT OF <name>"
-			return 1;
 		case PDO_ATTR_CURSOR:
 			// cursor type
 			return 1;
-		case PDO_ATTR_ORACLE_NULLS:
-			// convert empty strings to NULL
-			convert_to_boolean(val);
-			dbh->oracle_nulls=(Z_BVAL_P(val)==TRUE);
-			return 1;
 		case PDO_ATTR_PERSISTENT:
 			// pconnect style connection
-			return 1;
-		case PDO_ATTR_STATEMENT_CLASS:
-			// array(classname, array(ctor_args)) to specify
-			// the class of the constructed statement
 			return 1;
 		case PDO_ATTR_FETCH_TABLE_NAMES:
 			// include table names in the column names,
@@ -400,17 +412,9 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 		case PDO_ATTR_DRIVER_NAME:
 			// name of the driver (as used in the constructor)
 			return 1;
-		case PDO_ATTR_STRINGIFY_FETCHES:
-			// converts integer/float types to strings during fetch
-			convert_to_boolean(val);
-			dbh->stringify=(Z_BVAL_P(val)==TRUE);
-			return 1;
 		case PDO_ATTR_MAX_COLUMN_LEN:
 			// make database calculate maximum
 			// length of data found in a column
-			return 1;
-		case PDO_ATTR_DEFAULT_FETCH_MODE:
-			// Set the default fetch mode
 			return 1;
 		case PDO_ATTR_EMULATE_PREPARES:
 			// use query emulation rather than native
@@ -439,8 +443,19 @@ static int sqlrconnectionError(pdo_dbh_t *dbh,
 static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 				long attr, zval *retval TSRMLS_DC) {
 
-	// FIXME: support getResultSetBufferSize somehow
+	// FIXME: somehow support 
+	// 	getResultSetBufferSize
+	// 	get/dontGetColumnInfo
+	//	identify
+	//	dbVersion
+	//	dbHostName
+	//	dbIpAddress
+	//	bindFormat
+	//	getCurrentDatabase
 	sqlrconnection	*sqlrcon=(sqlrconnection *)dbh->driver_data;
+
+	// PDO handles several of these options itself.  These are the ones
+	// it doens't handle.
 	switch (attr) {
 		case PDO_ATTR_AUTOCOMMIT:
 			// use to turn on or off auto-commit mode
@@ -453,16 +468,13 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 		case PDO_ATTR_TIMEOUT:
 			// connection timeout in seconds
 			return 1;
-		case PDO_ATTR_ERRMODE:
-			// control how errors are handled
-			return 1;
 		case PDO_ATTR_SERVER_VERSION:
 			// database server version
 			ZVAL_STRING(retval,(char *)sqlrcon->serverVersion(),1);
 			return 1;
 		case PDO_ATTR_CLIENT_VERSION:
 			// client library version
-			ZVAL_STRING(retval,(char *)sqlrcon->clientVersion(),0);
+			ZVAL_STRING(retval,(char *)sqlrcon->clientVersion(),1);
 			return 1;
 		case PDO_ATTR_SERVER_INFO:
 			// server information
@@ -470,25 +482,8 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 		case PDO_ATTR_CONNECTION_STATUS:
 			// connection status
 			return 1;
-		case PDO_ATTR_CASE:
-			// control case folding for portability
-			return 1;
-		case PDO_ATTR_CURSOR_NAME:
-			// name a cursor for use in "WHERE CURRENT OF <name>"
-			return 1;
 		case PDO_ATTR_CURSOR:
 			// cursor type
-			return 1;
-		case PDO_ATTR_ORACLE_NULLS:
-			// convert empty strings to NULL
-			ZVAL_LONG(retval,dbh->oracle_nulls);
-			return 1;
-		case PDO_ATTR_PERSISTENT:
-			// pconnect style connection
-			return 1;
-		case PDO_ATTR_STATEMENT_CLASS:
-			// array(classname, array(ctor_args)) to specify
-			// the class of the constructed statement
 			return 1;
 		case PDO_ATTR_FETCH_TABLE_NAMES:
 			// include table names in the column names,
@@ -498,20 +493,9 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 			// include the catalog/db name names in
 			// the column names, where available
 			return 1;
-		case PDO_ATTR_DRIVER_NAME:
-			// name of the driver (as used in the constructor)
-			ZVAL_STRING(retval,"sqlrelay",0);
-			return 1;
-		case PDO_ATTR_STRINGIFY_FETCHES:
-			// converts integer/float types to strings during fetch
-			ZVAL_BOOL(retval,dbh->stringify);
-			return 1;
 		case PDO_ATTR_MAX_COLUMN_LEN:
 			// make database calculate maximum
 			// length of data found in a column
-			return 1;
-		case PDO_ATTR_DEFAULT_FETCH_MODE:
-			// Set the default fetch mode
 			return 1;
 		case PDO_ATTR_EMULATE_PREPARES:
 			// use query emulation rather than native
@@ -574,10 +558,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	dbh->auto_commit=0;
 	dbh->is_closed=0;
 	dbh->alloc_own_columns=1;
-	dbh->in_txn=1;
 	dbh->max_escaped_char_length=2;
-	dbh->oracle_nulls=0; // don't convert empty strings to nulls by default
-	//dbh->stringify=1;
 
 	// success
 	return 1;
