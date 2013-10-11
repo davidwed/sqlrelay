@@ -20,7 +20,7 @@ dl("pdo_sqlrelay.so");
 	$socket="/tmp/test.socket";
 	$user="test";
 	$password="test";
-	$dsn = "sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;debug=1";
+	$dsn = "sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;debug=0";
 
 
 	# instantiation
@@ -38,6 +38,10 @@ dl("pdo_sqlrelay.so");
 
 	echo("INSERT: \n");
 	checkSuccess($dbh->exec("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1','testclob1',empty_blob())"),1);
+	echo("\n");
+
+	echo("LAST INSERT ID: \n");
+	checkSuccess($dbh->lastInsertId(),0);
 	echo("\n");
 
 	# doesn't work with oracle unless translatebindvariables="yes" is set
@@ -62,7 +66,7 @@ dl("pdo_sqlrelay.so");
 	checkSuccess($stmt->bindParam(2,$param2),true);
 	checkSuccess($stmt->bindParam(3,$param3),true);
 	checkSuccess($stmt->bindParam(4,$param4),true);
-	checkSuccess($stmt->bindValue(6,$param5),true);
+	checkSuccess($stmt->bindValue(5,$param5),true);
 	checkSuccess($stmt->bindValue(6,$param6),true);
 	checkSuccess($stmt->bindValue(7,$param7,PDO::PARAM_LOB),true);
 	checkSuccess($stmt->execute(),true);
@@ -174,38 +178,283 @@ dl("pdo_sqlrelay.so");
 	echo("\n");
 
 	echo("FIELDS BY INDEX: \n");
+	$result=$stmt->fetch(PDO::FETCH_NUM);
+	checkSuccess($result[0],1);
+	checkSuccess($result[1],"testchar1                               ");
+	checkSuccess($result[2],"testvarchar1");
+	checkSuccess($result[3],"01-JAN-01");
+	checkSuccess(stream_get_contents($result[4]),"testlong1");
+	checkSuccess(stream_get_contents($result[5]),"testclob1");
+	checkSuccess(stream_get_contents($result[6]),"");
+	echo("\n");
+
+	echo("FIELDS BY NAME: \n");
+	$result=$stmt->fetch(PDO::FETCH_ASSOC);
+	checkSuccess($result["TESTNUMBER"],2);
+	checkSuccess($result["TESTCHAR"],"testchar2                               ");
+	checkSuccess($result["TESTVARCHAR"],"testvarchar2");
+	checkSuccess($result["TESTDATE"],"01-JAN-02");
+	checkSuccess(stream_get_contents($result["TESTLONG"]),"testlong2");
+	checkSuccess(stream_get_contents($result["TESTCLOB"]),"testclob2");
+	checkSuccess(stream_get_contents($result["TESTBLOB"]),"testblob2");
+	echo("\n");
+
+	echo("FIELDS BY NAME AND INDEX: \n");
+	$result=$stmt->fetch();
+	checkSuccess($result[0],3);
+	checkSuccess($result[1],"testchar3                               ");
+	checkSuccess($result[2],"testvarchar3");
+	checkSuccess($result[3],"01-JAN-03");
+	checkSuccess(stream_get_contents($result[4]),"testlong3");
+	rewind($result[4]);
+	checkSuccess(stream_get_contents($result[5]),"testclob3");
+	rewind($result[5]);
+	checkSuccess(stream_get_contents($result[6]),"testblob3");
+	rewind($result[6]);
+	checkSuccess($result["TESTNUMBER"],3);
+	checkSuccess($result["TESTCHAR"],"testchar3                               ");
+	checkSuccess($result["TESTVARCHAR"],"testvarchar3");
+	checkSuccess($result["TESTDATE"],"01-JAN-03");
+	checkSuccess(stream_get_contents($result["TESTLONG"]),"testlong3");
+	checkSuccess(stream_get_contents($result["TESTCLOB"]),"testclob3");
+	checkSuccess(stream_get_contents($result["TESTBLOB"]),"testblob3");
+	echo("\n");
+
+	echo("FETCH COLUMN: \n");
+	checkSuccess($stmt->fetchColumn(0),"4");
+	checkSuccess($stmt->fetchColumn(0),"5");
+	checkSuccess($stmt->fetchColumn(0),"6");
+	echo("\n");
+
+	echo("FETCH ALL: \n");
+	$stmt=$dbh->query("select * from testtable order by testnumber");
+	$result=$stmt->fetchAll();
+	checkSuccess($result[0][0],1);
+	checkSuccess($result[1][0],2);
+	checkSuccess($result[2][0],3);
+	checkSuccess($result[3][0],4);
+	checkSuccess($result[4][0],5);
+	checkSuccess($result[5][0],6);
+	checkSuccess($result[6][0],7);
+	checkSuccess($result[0][2],"testvarchar1");
+	checkSuccess($result[1][2],"testvarchar2");
+	checkSuccess($result[2][2],"testvarchar3");
+	checkSuccess($result[3][2],"testvarchar4");
+	checkSuccess($result[4][2],"testvarchar5");
+	checkSuccess($result[5][2],"testvarchar6");
+	checkSuccess($result[6][2],"testvarchar7");
+	checkSuccess($result[0]["TESTNUMBER"],1);
+	checkSuccess($result[1]["TESTNUMBER"],2);
+	checkSuccess($result[2]["TESTNUMBER"],3);
+	checkSuccess($result[3]["TESTNUMBER"],4);
+	checkSuccess($result[4]["TESTNUMBER"],5);
+	checkSuccess($result[5]["TESTNUMBER"],6);
+	checkSuccess($result[6]["TESTNUMBER"],7);
+	checkSuccess($result[0]["TESTVARCHAR"],"testvarchar1");
+	checkSuccess($result[1]["TESTVARCHAR"],"testvarchar2");
+	checkSuccess($result[2]["TESTVARCHAR"],"testvarchar3");
+	checkSuccess($result[3]["TESTVARCHAR"],"testvarchar4");
+	checkSuccess($result[4]["TESTVARCHAR"],"testvarchar5");
+	checkSuccess($result[5]["TESTVARCHAR"],"testvarchar6");
+	checkSuccess($result[6]["TESTVARCHAR"],"testvarchar7");
+	echo("\n");
+
+	echo("FETCH OBJECT: \n");
+	$stmt=$dbh->query("select * from testtable order by testnumber");
+	$result=$stmt->fetchObject();
+	checkSuccess($result->TESTNUMBER,1);
+	checkSuccess($result->TESTCHAR,"testchar1                               ");
+	checkSuccess($result->TESTVARCHAR,"testvarchar1");
+	checkSuccess($result->TESTDATE,"01-JAN-01");
+	checkSuccess(stream_get_contents($result->TESTLONG),"testlong1");
+	checkSuccess(stream_get_contents($result->TESTCLOB),"testclob1");
+	checkSuccess(stream_get_contents($result->TESTBLOB),"");
+	echo("\n");
+
+	echo("FETCH ORIENTATIONS: \n");
+	$stmt=$dbh->query("select * from testtable order by testnumber");
+	$result=$stmt->fetch(PDO::FETCH_NUM);
+	checkSuccess($result[0],"1");
+	$result=$stmt->fetch(PDO::FETCH_NUM,PDO::FETCH_ORI_FIRST);
+	checkSuccess($result[0],"1");
+	$result=$stmt->fetch(PDO::FETCH_NUM,PDO::FETCH_ORI_NEXT);
+	checkSuccess($result[0],"2");
+	$result=$stmt->fetch(PDO::FETCH_NUM,PDO::FETCH_ORI_PRIOR);
+	checkSuccess($result[0],"1");
+	$result=$stmt->fetch(PDO::FETCH_NUM,PDO::FETCH_ORI_LAST);
+	checkSuccess($result[0],"7");
+	$result=$stmt->fetch(PDO::FETCH_NUM,PDO::FETCH_ORI_ABS,3);
+	checkSuccess($result[0],"4");
+	$result=$stmt->fetch(PDO::FETCH_NUM,PDO::FETCH_ORI_ABS,4);
+	checkSuccess($result[0],"5");
+	$result=$stmt->fetch(PDO::FETCH_NUM,PDO::FETCH_ORI_ABS,5);
+	checkSuccess($result[0],"6");
+	$result=$stmt->fetch(PDO::FETCH_NUM,PDO::FETCH_ORI_REL,1);
+	checkSuccess($result[0],"7");
+	$result=$stmt->fetch(PDO::FETCH_NUM,PDO::FETCH_ORI_REL,-1);
+	checkSuccess($result[0],"6");
+	$result=$stmt->fetch(PDO::FETCH_NUM,PDO::FETCH_ORI_REL,-1);
+	checkSuccess($result[0],"5");
+	echo("\n");
+
+	echo("BOUND COLUMNS: \n");
+	$stmt=$dbh->prepare("select * from testtable order by testnumber");
+	$col1=0;
+	$col2=0;
+	$col3=0;
+	$col4=0;
+	$col5=0;
+	$col6=0;
+	$col7=0;
+	$stmt->bindColumn(1,$col1);
+	$stmt->bindColumn(2,$col2);
+	$stmt->bindColumn(3,$col3);
+	$stmt->bindColumn(4,$col4);
+	$stmt->bindColumn(5,$col5,PDO::PARAM_LOB);
+	$stmt->bindColumn(6,$col6,PDO::PARAM_LOB);
+	$stmt->bindColumn(7,$col7,PDO::PARAM_LOB);
+	checkSuccess($stmt->execute(),1);
+	checkSuccess($stmt->fetch(PDO::FETCH_BOUND),TRUE);
+	checkSuccess($col1,1);
+	checkSuccess($col2,"testchar1                               ");
+	checkSuccess($col3,"testvarchar1");
+	checkSuccess($col4,"01-JAN-01");
+	checkSuccess(stream_get_contents($col5),"testlong1");
+	checkSuccess(stream_get_contents($col6),"testclob1");
+	checkSuccess(stream_get_contents($col7),"");
+	checkSuccess($stmt->fetch(PDO::FETCH_BOUND),TRUE);
+	checkSuccess($col1,2);
+	checkSuccess($col2,"testchar2                               ");
+	checkSuccess($col3,"testvarchar2");
+	checkSuccess($col4,"01-JAN-02");
+	checkSuccess(stream_get_contents($col5),"testlong2");
+	checkSuccess(stream_get_contents($col6),"testclob2");
+	checkSuccess(stream_get_contents($col7),"testblob2");
+	echo("\n");
+
+	echo("STRINGIFY: \n");
+	checkSuccess($dbh->setAttribute(PDO::ATTR_STRINGIFY_FETCHES,TRUE),1);
+	$stmt=$dbh->query("select * from testtable order by testnumber");
+	$result=$stmt->fetch(PDO::FETCH_NUM);
+	checkSuccess($result[0],"1");
+	checkSuccess($result[1],"testchar1                               ");
+	checkSuccess($result[2],"testvarchar1");
+	checkSuccess($result[3],"01-JAN-01");
+	checkSuccess($result[4],"testlong1");
+	checkSuccess($result[5],"testclob1");
+	checkSuccess($result[6],"");
+	$result=$stmt->fetch(PDO::FETCH_NUM);
+	checkSuccess($result[0],"2");
+	checkSuccess($result[1],"testchar2                               ");
+	checkSuccess($result[2],"testvarchar2");
+	checkSuccess($result[3],"01-JAN-02");
+	checkSuccess($result[4],"testlong2");
+	checkSuccess($result[5],"testclob2");
+	checkSuccess($result[6],"testblob2");
+	echo("\n");
+
+	echo("COMMIT AND ROLLBACK: \n");
+	$dbh->exec("drop table testtable1");
+	checkSuccess($dbh->exec("create table testtable1 (testnumber number)"),0);
+	checkSuccess($dbh->inTransaction(),0);
+	$dbh->beginTransaction();
+	checkSuccess($dbh->inTransaction(),1);
+	checkSuccess($dbh->exec("insert into testtable1 values (1)"),1);
+	$dbh2=new PDO($dsn,$user,$password);
+	$stmt2=$dbh2->query("select count(*) from testtable1");
+	$result2=$stmt2->fetch();
+	checkSuccess($result2[0],0);
+	$dbh->commit();
+	$stmt2=$dbh2->query("select count(*) from testtable1");
+	$result2=$stmt2->fetch();
+	checkSuccess($result2[0],1);
+	$dbh->beginTransaction();
+	checkSuccess($dbh->exec("insert into testtable1 values (1)"),1);
+	$stmt2=$dbh2->query("select count(*) from testtable1");
+	$result2=$stmt2->fetch();
+	checkSuccess($result2[0],1);
+	$dbh->rollback();
+	$stmt2=$dbh2->query("select count(*) from testtable1");
+	$result2=$stmt2->fetch();
+	checkSuccess($result2[0],1);
+	echo("\n");
+
+	echo("AUTOCOMMIT: \n");
+	checkSuccess($dbh->inTransaction(),0);
+	$dbh->setAttribute(PDO::ATTR_AUTOCOMMIT,TRUE);
+	checkSuccess($dbh->exec("insert into testtable1 values (1)"),1);
+	$stmt2=$dbh2->query("select count(*) from testtable1");
+	$result2=$stmt2->fetch();
+	checkSuccess($result2[0],2);
+	checkSuccess($dbh->inTransaction(),0);
+	$dbh->setAttribute(PDO::ATTR_AUTOCOMMIT,FALSE);
+	$dbh->beginTransaction();
+	checkSuccess($dbh->exec("insert into testtable1 values (1)"),1);
+	$stmt2=$dbh2->query("select count(*) from testtable1");
+	$result2=$stmt2->fetch();
+	checkSuccess($result2[0],2);
+	$dbh->commit();
+	$stmt2=$dbh2->query("select count(*) from testtable1");
+	$result2=$stmt2->fetch();
+	checkSuccess($result2[0],3);
+	echo("\n");
+
+	echo("CLOSE CURSOR\n");
+	$stmt=$dbh2->prepare("select * from testtable");
+	checkSuccess($stmt->execute(),1);
+	checkSuccess($stmt->rowCount(),7);
+	checkSuccess($stmt->closeCursor(),1);
+	checkSuccess($stmt->execute(),1);
+	checkSuccess($stmt->rowCount(),7);
+	echo("\n");
+
+	echo("CLIENT AND SERVER VERSIONS: \n");
+	checkSuccess($dbh->getAttribute(PDO::ATTR_CLIENT_VERSION),
+			$dbh->getAttribute(PDO::ATTR_SERVER_VERSION));
+	echo("\n");
+
+	# drop testtables
+	$dbh->exec("drop table testtable");
+	$dbh->exec("drop table testtable1");
+
+	echo("INVALID QUERIES: \n");
+	checkSuccess($dbh->query("select 1"),0);
+	checkSuccess($dbh->errorCode(),"00000");
+	$info=$dbh->errorInfo();
+	checkSuccess($info[0],"00000");
+	checkSuccess($info[1],923);
+	checkSuccess($info[2],"ORA-00923: FROM keyword not found where expected");
+	$stmt=$dbh->prepare("select 1");
+	checkSuccess($stmt->execute(),0);
+	checkSuccess($stmt->errorCode(),"00000");
+	$info=$stmt->errorInfo();
+	checkSuccess($info[0],"00000");
+	checkSuccess($info[1],923);
+	checkSuccess($info[2],"ORA-00923: FROM keyword not found where expected");
+	echo("\n");
+
+	echo("INVALID OPERATIONS: \n");
+	checkSuccess($stmt->nextRowset(),0);
+	checkSuccess($stmt->setAttribute(PDO::ATTR_AUTOCOMMIT,FALSE),0);
+	checkSuccess($stmt->getAttribute(PDO::ATTR_AUTOCOMMIT),0);
+	checkSuccess($dbh->quote("select * from table"),null);
 	echo("\n");
 
 	# dbh methods:
-	#  beginTransaction
-	#  commit
-	#  errorCode
-	#  errorInfo
-	#  getAttribute
-	#  inTransaction
-	#  lastInsertId
 	#  query
 	#    * FETCH_COLUMN
 	#    * FETCH_CLASS
 	#    * FETCH_INTO
-	#  quote
-	#  rollBack
-	#  setAttribute
 
 	# statement methods:
-	#  bindColumn
-	#  closeCursor
-	#  debugDumpParams
-	#  errorCode
-	#  errorInfo
-	#  fetch
-	#  fetchAll
-	#  fetchColumn
-	#  fetchObject
-	#  getAttribute
-	#  nextRowset
-	#  setAttribute
 	#  setFetchMode
+	#  fetch
+	#    fetch_style
+	#    * FETCH_CLASS
+	#    * FETCH_CLASSTYPE
+	#    * FETCH_INTO
+	#    * FETCH_LAZY
+	#    * FETCH_OBJ
 
 	$dbh->exec("drop table testtable");
 
