@@ -38,6 +38,7 @@ extern "C" {
 struct sqlrstatement {
 	sqlrcursor	*sqlrcur;
 	int64_t		currentrow;
+	long		longfield;
 };
 
 static int sqlrcursorDestructor(pdo_stmt_t *stmt TSRMLS_DC) {
@@ -64,6 +65,7 @@ static int sqlrcursorFetch(pdo_stmt_t *stmt,
 				enum pdo_fetch_orientation ori,
 				long offset TSRMLS_DC) {
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+	// FIXME: handle orientation and offset
 	sqlrstmt->currentrow++;
 	return 1;
 }
@@ -97,8 +99,41 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 				int *caller_frees TSRMLS_DC) {
 
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
-	*ptr=(char *)sqlrstmt->sqlrcur->getField(sqlrstmt->currentrow,colno);
-	*len=sqlrstmt->sqlrcur->getFieldLength(sqlrstmt->currentrow,colno);
+	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
+
+	switch (stmt->columns[colno].param_type) {
+		case PDO_PARAM_INT:
+		case PDO_PARAM_BOOL:
+			sqlrstmt->longfield=(long)sqlrcur->
+				getFieldAsInteger(sqlrstmt->currentrow,colno);
+			*ptr=(char *)&sqlrstmt->longfield;
+			*len=sizeof(long);
+			return 1;
+		case PDO_PARAM_STR:
+			*ptr=(char *)sqlrcur->
+				getField(sqlrstmt->currentrow,colno);
+			*len=sqlrcur->
+				getFieldLength(sqlrstmt->currentrow,colno);
+			return 1;
+		case PDO_PARAM_LOB:
+			// lobs can be usually be returned a strings...
+			*ptr=(char *)sqlrcur->
+				getField(sqlrstmt->currentrow,colno);
+			*len=sqlrcur->
+				getFieldLength(sqlrstmt->currentrow,colno);
+			// ...unless they're NULL...
+			if (!*ptr) {
+				return 1;
+			}
+			// ...and empty strings must be passed as empty streams
+			if (!*len) {
+				*ptr=(char *)php_stream_memory_create(
+							TEMP_STREAM_DEFAULT);
+			}
+			return 1;
+		default:
+			return 1;
+	}
 	return 1;
 }
 
@@ -542,7 +577,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	dbh->in_txn=1;
 	dbh->max_escaped_char_length=2;
 	dbh->oracle_nulls=0; // don't convert empty strings to nulls by default
-	dbh->stringify=1;
+	//dbh->stringify=1;
 
 	// success
 	return 1;
