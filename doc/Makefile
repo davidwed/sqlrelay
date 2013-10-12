@@ -199,6 +199,8 @@ install:
 	$(INSTALL) -m 644 programming/perl.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/perldbi.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/php.html $(docdir)/programming
+	$(INSTALL) -m 644 programming/phppeardb.html $(docdir)/programming
+	$(INSTALL) -m 644 programming/phppdo.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/python.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/pythondb.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/ruby.html $(docdir)/programming

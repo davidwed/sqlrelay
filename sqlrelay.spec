@@ -73,7 +73,7 @@ BuildRequires: rudiments-devel >= 0.34
 %{!?_without_erlang:BuildRequires: ,erlang}
 
 %description
-SQL Relay is a persistent database connection pooling, proxying, throttling, load balancing and query routing/filtering system for Unix and Linux supporting ODBC, Oracle, MySQL, PostgreSQL, Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and MS Access (minimally) with APIs for C, C++, .NET, Perl, Perl-DBI, Python, Python-DB, Zope, PHP, PHP PearDB, Ruby, Ruby-DBI, Java, TCL and Erlang, ODBC and ADO.NET drivers, drop-in replacement libraries for MySQL and PostgreSQL, command line clients and extensive documentation.  The APIs support advanced database operations such as bind variables, multi-row fetches, client-side result set caching and suspended transactions.  It is ideal for speeding up database-driven web-based applications, accessing databases from unsupported platforms, migrating between databases, distributing access to replicated or clustered databases and throttling database access.
+SQL Relay is a persistent database connection pooling, proxying, throttling, load balancing and query routing/filtering system for Unix and Linux supporting ODBC, Oracle, MySQL, PostgreSQL, Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and MS Access (minimally) with APIs for C, C++, .NET, Perl, Perl-DBI, Python, Python-DB, Zope, PHP, PHP PDO, PHP PearDB, Ruby, Ruby-DBI, Java, TCL and Erlang, ODBC and ADO.NET drivers, drop-in replacement libraries for MySQL and PostgreSQL, command line clients and extensive documentation.  The APIs support advanced database operations such as bind variables, multi-row fetches, client-side result set caching and suspended transactions.  It is ideal for speeding up database-driven web-based applications, accessing databases from unsupported platforms, migrating between databases, distributing access to replicated or clustered databases and throttling database access.
 
 
 %package server-devel
@@ -559,6 +559,7 @@ rm -rf %{buildroot}
 %{!?_without_php:%defattr(-, root, root)}
 %{!?_without_php:%{phpextdir}/sql_relay.so}
 %{!?_without_php:%{phppeardbdir}/sqlrelay.php}
+%{!?_without_php:%{phpextdir}/pdo_sqlrelay.so}
 
 %{!?_without_python:%files python}
 %{!?_without_python:%defattr(-, root, root)}
