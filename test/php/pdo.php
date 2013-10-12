@@ -417,6 +417,8 @@ dl("pdo_sqlrelay.so");
 	$dbh->exec("drop table testtable");
 	$dbh->exec("drop table testtable1");
 
+	$dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_SILENT);
+
 	echo("INVALID QUERIES: \n");
 	checkSuccess($dbh->query("select 1"),0);
 	checkSuccess($dbh->errorCode(),"00000");
@@ -439,22 +441,6 @@ dl("pdo_sqlrelay.so");
 	checkSuccess($stmt->getAttribute(PDO::ATTR_AUTOCOMMIT),0);
 	checkSuccess($dbh->quote("select * from table"),null);
 	echo("\n");
-
-	# dbh methods:
-	#  query
-	#    * FETCH_COLUMN
-	#    * FETCH_CLASS
-	#    * FETCH_INTO
-
-	# statement methods:
-	#  setFetchMode
-	#  fetch
-	#    fetch_style
-	#    * FETCH_CLASS
-	#    * FETCH_CLASSTYPE
-	#    * FETCH_INTO
-	#    * FETCH_LAZY
-	#    * FETCH_OBJ
 
 	$dbh->exec("drop table testtable");
 
