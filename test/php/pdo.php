@@ -20,7 +20,7 @@ dl("pdo_sqlrelay.so");
 	$socket="/tmp/test.socket";
 	$user="test";
 	$password="test";
-	$dsn = "sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;debug=0";
+	$dsn = "sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;debug=1";
 
 
 	# instantiation
@@ -416,6 +416,45 @@ dl("pdo_sqlrelay.so");
 	# drop testtables
 	$dbh->exec("drop table testtable");
 	$dbh->exec("drop table testtable1");
+
+	echo("OUTPUT BIND BY NAME: \n");
+	$stmt=$dbh->prepare("begin  :numvar:=1; :stringvar:='hello'; end;");
+	$param1=0;
+	$param2="";
+	checkSuccess($stmt->bindParam(":numvar",$param1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT),true);
+	checkSuccess($stmt->bindParam(":stringvar",$param2,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT,10),true);
+	checkSuccess($stmt->execute(),1);
+	checkSuccess($param1,1);
+	checkSuccess($param2,"hello");
+	echo("\n");
+
+	#echo("OUTPUT BIND BY POSITION: \n");
+	#$stmt=$dbh->prepare("begin  ?:=1; ?:='hello'; end;");
+	#$param1=0;
+	#$param2="";
+	#checkSuccess($stmt->bindParam(1,$param1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT),true);
+	#checkSuccess($stmt->bindParam(2,$param2,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT,10),true);
+	#checkSuccess($stmt->execute(),1);
+	#checkSuccess($param1,1);
+	#checkSuccess($param2,"hello");
+	#echo("\n");
+
+	echo("CLOB AND BLOB OUTPUT BIND: \n");
+	$dbh->exec("drop table testtable1");
+	checkSuccess($dbh->exec("create table testtable1 (testclob clob, testblob blob)"),0);
+	$stmt=$dbh->prepare("insert into testtable1 values ('hello',:var1)");
+	checkSuccess($stmt->bindValue("var1","hello",PDO::PARAM_LOB),true);
+	checkSuccess($stmt->execute(),1);
+	$stmt=$dbh->prepare("begin  select testclob into :clobvar from testtable1; select testblob into :blobvar from testtable1; end;");
+	$param1="";
+	$param2="";
+	checkSuccess($stmt->bindParam(":clobvar",$param1,PDO::PARAM_LOB|PDO::PARAM_INPUT_OUTPUT),true);
+	checkSuccess($stmt->bindParam(":blobvar",$param2,PDO::PARAM_LOB|PDO::PARAM_INPUT_OUTPUT),true);
+	checkSuccess($stmt->execute(),1);
+	checkSuccess(stream_get_contents($param1),"hello");
+	checkSuccess(stream_get_contents($param2),"hello");
+	$dbh->exec("drop table testtable1");
+	echo("\n");
 
 	$dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_SILENT);
 

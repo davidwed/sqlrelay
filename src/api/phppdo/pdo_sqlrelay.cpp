@@ -161,31 +161,10 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 	return 1;
 }
 
-static int sqlrcursorBind(pdo_stmt_t *stmt,
-				struct pdo_bound_param_data *param,
-				enum pdo_param_event eventtype TSRMLS_DC) {
+static int sqlrcursorInputBindPreExec(sqlrcursor *sqlrcur,
+					const char *name,
+					struct pdo_bound_param_data *param) {
 
-	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
-	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
-
-	stringbuffer	paramname;
-	paramname.append((uint64_t)param->paramno+1);
-	const char	*name=(param->name)?param->name:paramname.getString();
-	if (character::inSet(name[0],":@$")) {
-		name++;
-	}
-
-	// FIXME: handle other event types?
-	if (eventtype!=PDO_PARAM_EVT_EXEC_PRE) {
-		return 1;
-	}
-
-	// FIXME: what does this mean?
-	if (!param->is_param) {
-		return 1;
-	}
-
-	// FIXME: pdo does support output binds, implement them somehow
 	switch (PDO_PARAM_TYPE(param->param_type)) {
 		case PDO_PARAM_NULL:
 			sqlrcur->inputBind(name,(const char *)NULL);
@@ -228,6 +207,107 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 			return 0;
 	}
 	return 0;
+}
+
+static int sqlrcursorOutputBindPreExec(sqlrcursor *sqlrcur,
+				const char *name,
+				struct pdo_bound_param_data *param) {
+
+	switch (PDO_PARAM_TYPE(param->param_type)) {
+		case PDO_PARAM_NULL:
+			return 1;
+		case PDO_PARAM_INT:
+		case PDO_PARAM_BOOL:
+			sqlrcur->defineOutputBindInteger(name);
+			return 1;
+		case PDO_PARAM_STR:
+			sqlrcur->defineOutputBindString(name,
+							param->max_value_len);
+			return 1;
+		case PDO_PARAM_LOB:
+			sqlrcur->defineOutputBindBlob(name);
+			return 1;
+		case PDO_PARAM_STMT:
+			return 0;
+	}
+	return 0;
+}
+
+static int sqlrcursorBindPreExec(sqlrcursor *sqlrcur,
+				const char *name,
+				struct pdo_bound_param_data *param) {
+
+	if (param->param_type&PDO_PARAM_INPUT_OUTPUT) {
+		return sqlrcursorOutputBindPreExec(sqlrcur,name,param);
+	}
+	return sqlrcursorInputBindPreExec(sqlrcur,name,param);
+}
+
+static int sqlrcursorBindPostExec(sqlrcursor *sqlrcur,
+				const char *name,
+				struct pdo_bound_param_data *param) {
+
+	if (!(param->param_type&PDO_PARAM_INPUT_OUTPUT)) {
+		return 1;
+	}
+
+	switch (PDO_PARAM_TYPE(param->param_type)) {
+		case PDO_PARAM_NULL:
+			ZVAL_NULL(param->parameter);
+			return 1;
+		case PDO_PARAM_INT:
+			ZVAL_LONG(param->parameter,
+					sqlrcur->getOutputBindInteger(name));
+			return 1;
+		case PDO_PARAM_BOOL:
+			ZVAL_BOOL(param->parameter,
+					sqlrcur->getOutputBindInteger(name));
+			return 1;
+		case PDO_PARAM_STR:
+			ZVAL_STRING(param->parameter,
+				(char *)sqlrcur->getOutputBindString(name),1);
+			return 1;
+		case PDO_PARAM_LOB:
+			{
+			php_stream	*strm=php_stream_memory_create(
+							TEMP_STREAM_DEFAULT);
+			php_stream_write(strm,
+				sqlrcur->getOutputBindBlob(name),
+				sqlrcur->getOutputBindLength(name));
+			php_stream_to_zval(strm,param->parameter);
+			}
+			return 1;
+		case PDO_PARAM_STMT:
+			return 0;
+	}
+	return 0;
+}
+
+static int sqlrcursorBind(pdo_stmt_t *stmt,
+				struct pdo_bound_param_data *param,
+				enum pdo_param_event eventtype TSRMLS_DC) {
+
+	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
+
+	stringbuffer	paramname;
+	paramname.append((uint64_t)param->paramno+1);
+	const char	*name=(param->name)?param->name:paramname.getString();
+	if (character::inSet(name[0],":@$")) {
+		name++;
+	}
+
+	// FIXME: what does this mean?
+	if (!param->is_param) {
+		return 1;
+	}
+
+	if (eventtype==PDO_PARAM_EVT_EXEC_PRE) {
+		return sqlrcursorBindPreExec(sqlrcur,name,param);
+	} else if (eventtype==PDO_PARAM_EVT_EXEC_POST) {
+		return sqlrcursorBindPostExec(sqlrcur,name,param);
+	}
+	return 1;
 }
 
 static int sqlrcursorSetAttribute(pdo_stmt_t *stmt,
