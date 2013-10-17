@@ -445,6 +445,12 @@ dnl have to set ar here because libtool (currently) fails
 dnl to use the correct one when cross-compiling
 AC_CHECK_PROG(AR,$host_alias-ar,$host_alias-ar,ar)
 AC_SUBST(AR)
+
+if ( test "$enable_shared" = "yes" )
+then
+	AC_DEFINE_UNQUOTED(SQLRELAY_ENABLE_SHARED,1,Platform supports shared libraries)
+fi
+AC_SUBST(enable_shared)
 echo "******************************"
 
 

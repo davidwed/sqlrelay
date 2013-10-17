@@ -5,6 +5,7 @@ include ../../config.mk
 all:
 	$(MAKE) -C c++ all
 	$(MAKE) -C c all
+ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MAKE) -C postgresql all
 	$(MAKE) -C mysql all
 ifneq ($(ODBCLIBS),)
@@ -36,6 +37,7 @@ ifneq ($(HAVE_TCL),)
 endif
 ifneq ($(HAVE_ERLANG),)
 	$(MAKE) -C erlang all
+endif
 endif
 
 clean:
@@ -77,6 +79,7 @@ endif
 install:
 	$(MAKE) -C c++ install
 	$(MAKE) -C c install
+ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MAKE) -C postgresql install
 	$(MAKE) -C mysql install
 ifneq ($(ODBCLIBS),)
@@ -111,6 +114,7 @@ ifneq ($(HAVE_ZOPE),)
 endif
 ifneq ($(HAVE_ERLANG),)
 	$(MAKE) -C erlang install
+endif
 endif
 
 uninstall:

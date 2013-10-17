@@ -30,11 +30,13 @@ sqlrconnection_postgresql.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
+ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) sqlrconnection_postgresql.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_postgresql.a
 	$(RM) $(libexecdir)/sqlrconnection_postgresql.la
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_postgresql.so so $(MODULESUFFIX)
+endif
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_postgresql.*

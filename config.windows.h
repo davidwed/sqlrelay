@@ -389,6 +389,9 @@
 /* Some versions of sqlite are transactional */
 /* #undef SQLITE_TRANSACTIONAL */
 
+/* Platform supports shared libraries */
+/* #undef SQLRELAY_ENABLE_SHARED */
+
 /* Some systems have sys/vnode.h */
 /* #undef SQLRELAY_HAVE_SYS_VNODE_H */
 

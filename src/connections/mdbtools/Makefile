@@ -5,7 +5,7 @@ include ../../../config.mk
 .PHONY: all clean install uninstall
 
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server $(RUDIMENTSINCLUDES) $(MDBTOOLSINCLUDES)
-LIBS = $(MDBTOOLSLIBS) -L$(top_builddir)/src/server -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
+LIBS = $(MDBTOOLSLIBS) -L$(top_builddir)/src/server -lsqlrserver $(SERVERLIB) -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS)
 ifneq ($(strip $(MDBTOOLSLIBSPATH)),)
 ifeq ($(MDBTOOLSUSERPATH),yes)
 	RPATH = -R $(MDBTOOLSLIBSPATH)
@@ -30,11 +30,13 @@ sqlrconnection_mdbtools.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
+ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) sqlrconnection_mdbtools.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_mdbtools.a
 	$(RM) $(libexecdir)/sqlrconnection_mdbtools.la
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_mdbtools.so so $(MODULESUFFIX)
+endif
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_mdbtools.*

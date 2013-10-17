@@ -33,6 +33,7 @@ sqlrlogger_custom_sc.la: custom_sc.cpp custom_sc.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ custom_sc.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
+ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) sqlrlogger_debug.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrlogger_debug.a
@@ -50,6 +51,7 @@ install:
 	$(RM) $(libexecdir)/sqlrlogger_custom_sc.a
 	$(RM) $(libexecdir)/sqlrlogger_custom_sc.la
 	$(MODULERENAME) $(libexecdir)/sqlrlogger_custom_sc.so so $(MODULESUFFIX)
+endif
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrlogger_*

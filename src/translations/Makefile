@@ -89,6 +89,7 @@ sqltranslation_uniquetodistinct.la: uniquetodistinct.cpp uniquetodistinct.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ uniquetodistinct.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
+ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) sqltranslation_doublequotestosinglequotes.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_doublequotestosinglequotes.a
@@ -162,6 +163,7 @@ install:
 	$(RM) $(libexecdir)/sqltranslation_uniquetodistinct.a
 	$(RM) $(libexecdir)/sqltranslation_uniquetodistinct.la
 	$(MODULERENAME) $(libexecdir)/sqltranslation_uniquetodistinct.so so $(MODULESUFFIX)
+endif
 
 uninstall:
 	$(RM) $(libexecdir)/sqltranslation_*

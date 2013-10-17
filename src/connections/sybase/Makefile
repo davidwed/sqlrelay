@@ -30,11 +30,13 @@ sqlrconnection_sybase.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
+ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) sqlrconnection_sybase.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_sybase.a
 	$(RM) $(libexecdir)/sqlrconnection_sybase.la
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_sybase.so so $(MODULESUFFIX)
+endif
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_sybase.*

@@ -25,6 +25,7 @@ sqlrquery_sqlrcmdcstat.la: sqlrcmdcstat.cpp sqlrcmdcstat.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrcmdcstat.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
+ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) sqlrquery_sqlrcmdgstat.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrquery_sqlrcmdgstat.a
@@ -34,6 +35,7 @@ install:
 	$(RM) $(libexecdir)/sqlrquery_sqlrcmdcstat.a
 	$(RM) $(libexecdir)/sqlrquery_sqlrcmdcstat.la
 	$(MODULERENAME) $(libexecdir)/sqlrquery_sqlrcmdcstat.so so $(MODULESUFFIX)
+endif
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrquery_*

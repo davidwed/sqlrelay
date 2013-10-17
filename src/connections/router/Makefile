@@ -30,11 +30,13 @@ sqlrconnection_router.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
+ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) sqlrconnection_router.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_router.a
 	$(RM) $(libexecdir)/sqlrconnection_router.la
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_router.so so $(MODULESUFFIX)
+endif
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_router.*

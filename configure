@@ -753,6 +753,7 @@ UWIN
 CYGWIN
 MINGW32
 UNAME
+enable_shared
 CXXCPP
 OTOOL64
 OTOOL
@@ -15741,6 +15742,16 @@ $as_echo "no" >&6; }
 fi
 
 
+
+
+if ( test "$enable_shared" = "yes" )
+then
+
+cat >>confdefs.h <<_ACEOF
+#define SQLRELAY_ENABLE_SHARED 1
+_ACEOF
+
+fi
 
 echo "******************************"
 

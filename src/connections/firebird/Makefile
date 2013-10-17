@@ -30,11 +30,13 @@ sqlrconnection_firebird.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
+ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) sqlrconnection_firebird.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_firebird.a
 	$(RM) $(libexecdir)/sqlrconnection_firebird.la
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_firebird.so so $(MODULESUFFIX)
+endif
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_firebird.*

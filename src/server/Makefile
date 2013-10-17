@@ -4,6 +4,15 @@ include ../../config.mk
 
 .PHONY: all clean install uninstall
 
+ifeq ($(SQLRELAY_ENABLE_SHARED),no)
+PLUGINLOBJS = $(shell ls ../triggers/*.lo) \
+		$(shell ls ../translations/*.lo) \
+		$(shell ls ../queries/*.lo) \
+		$(shell ls ../loggers/*.lo) \
+		$(shell ls ../pwdencs/*.lo) \
+		$(shell ls ../connections/*.lo)
+endif
+
 CPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) $(CACHEDIRCPPFLAG) $(PSDEFINE) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
 LIBS = -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 RPATH =
@@ -49,7 +58,8 @@ LOBJS = sqlrlistener.lo \
 	sqlrquery.lo \
 	sqlrpwdencs.lo \
 	sqlrpwdenc.lo \
-	sqlrscaler.lo
+	sqlrscaler.lo \
+	$(PLUGINLOBJS)
 
 .SUFFIXES: .lo
 

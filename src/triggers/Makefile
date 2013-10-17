@@ -29,6 +29,7 @@ sqltrigger_droplocalizedtemptables.la: droplocalizedtemptables.cpp droplocalized
 	$(LIBTOOL) --mode=link $(CXX) -o $@ droplocalizedtemptables.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
+ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) sqltrigger_createtableautoincrementoracle.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltrigger_createtableautoincrementoracle.a
@@ -42,6 +43,7 @@ install:
 	$(RM) $(libexecdir)/sqltrigger_droplocalizedtemptables.a
 	$(RM) $(libexecdir)/sqltrigger_droplocalizedtemptables.la
 	$(MODULERENAME) $(libexecdir)/sqltrigger_droplocalizedtemptables.so so $(MODULESUFFIX)
+endif
 
 uninstall:
 	$(RM) $(libexecdir)/sqltrigger_*

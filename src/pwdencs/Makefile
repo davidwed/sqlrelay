@@ -29,6 +29,7 @@ sqlrpwdenc_crypt.la: crypt.cpp crypt.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ crypt.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
+ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) sqlrpwdenc_rot.la $(libexecdir)
 	$(RM) $(libexecdir)/sqlrpwdenc_rot.a
@@ -42,6 +43,7 @@ install:
 	$(RM) $(libexecdir)/sqlrpwdenc_crypt.a
 	$(RM) $(libexecdir)/sqlrpwdenc_crypt.la
 	$(MODULERENAME) $(libexecdir)/sqlrpwdenc_crypt.so so $(MODULESUFFIX)
+endif
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrpwdenc_*

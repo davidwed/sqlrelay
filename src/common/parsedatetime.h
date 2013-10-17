@@ -567,7 +567,7 @@ static bool parseDateTime(const char *datetime, bool ddmm, bool yyyyddmm,
 }
 
 #ifdef NEED_CONVERT_DATE_TIME
-char *convertDateTime(const char *format,
+static char *convertDateTime(const char *format,
 			int16_t year, int16_t month, int16_t day,
 			int16_t hour, int16_t minute, int16_t second,
 			int16_t fraction) {
