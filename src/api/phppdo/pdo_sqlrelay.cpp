@@ -228,6 +228,9 @@ static int sqlrcursorOutputBindPreExec(sqlrcursor *sqlrcur,
 			sqlrcur->defineOutputBindBlob(name);
 			return 1;
 		case PDO_PARAM_STMT:
+			// FIXME: there's no obvious way to create a PDO
+			// statement object to attach this to on the backend
+			//sqlrcur->defineOutputBindCursor(name);
 			return 0;
 	}
 	return 0;
@@ -279,6 +282,9 @@ static int sqlrcursorBindPostExec(sqlrcursor *sqlrcur,
 			}
 			return 1;
 		case PDO_PARAM_STMT:
+			// FIXME: there's no obvious way to create a PDO
+			// statement object to attach this to
+			//sqlrcur->getOutputBindCursor(name);
 			return 0;
 	}
 	return 0;
