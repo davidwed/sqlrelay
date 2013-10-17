@@ -428,16 +428,16 @@ dl("pdo_sqlrelay.so");
 	checkSuccess($param2,"hello");
 	echo("\n");
 
-	#echo("OUTPUT BIND BY POSITION: \n");
-	#$stmt=$dbh->prepare("begin  ?:=1; ?:='hello'; end;");
-	#$param1=0;
-	#$param2="";
-	#checkSuccess($stmt->bindParam(1,$param1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT),true);
-	#checkSuccess($stmt->bindParam(2,$param2,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT,10),true);
-	#checkSuccess($stmt->execute(),1);
-	#checkSuccess($param1,1);
-	#checkSuccess($param2,"hello");
-	#echo("\n");
+	echo("OUTPUT BIND BY POSITION: \n");
+	$stmt=$dbh->prepare("begin  ?:=1; ?:='hello'; end;");
+	$param1=0;
+	$param2="";
+	checkSuccess($stmt->bindParam(1,$param1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT),true);
+	checkSuccess($stmt->bindParam(2,$param2,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT,10),true);
+	checkSuccess($stmt->execute(),1);
+	checkSuccess($param1,1);
+	checkSuccess($param2,"hello");
+	echo("\n");
 
 	echo("CLOB AND BLOB OUTPUT BIND: \n");
 	$dbh->exec("drop table testtable1");

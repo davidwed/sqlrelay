@@ -3724,13 +3724,14 @@ void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 			// If we find whitespace or a few other things
 			// then we're done with the bind variable.  Process it.
 			// Otherwise get the variable itself in another buffer.
-			bool	isspecialchar=(character::isWhitespace(*c) ||
-						*c==',' || *c==')' || *c==';');
-			if (isspecialchar || c==endptr) {
+			bool	endofbind=(character::isWhitespace(*c) ||
+						*c==',' || *c==')' || *c==';' ||
+						(*c==':' && *(c+1)=='='));
+			if (endofbind || c==endptr) {
 
 				// special case if we hit the end of the string
 				// an it's not one of the special chars
-				if (c==endptr && !isspecialchar) {
+				if (c==endptr && !endofbind) {
 					currentbind.append(*c);
 					c++;
 				}
@@ -3744,6 +3745,7 @@ void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 
 				// translate...
 				convert=true;
+stdoutput.printf("translating bind: %s\n",currentbind.getString());
 				translateBindVariableInStringAndArray(cursor,
 								&currentbind,
 								bindindex,

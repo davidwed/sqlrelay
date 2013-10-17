@@ -2,6 +2,8 @@
 	fixed some leaks related to using sys::getHostName()
 	added multiarch detection
 	added PHP PDO driver
+	fixed a bind variable translation bug where output binds followed by
+		:= would not be detected
 
 0.52 - sqlrsh has long reported the wrong version, fixed that
 	added csv support to sqlr-export and a -format xml|csv option
