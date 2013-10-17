@@ -274,6 +274,7 @@ static int sqlrcursorBindPostExec(sqlrcursor *sqlrcur,
 			php_stream_write(strm,
 				sqlrcur->getOutputBindBlob(name),
 				sqlrcur->getOutputBindLength(name));
+			php_stream_seek(strm,0,SEEK_SET);
 			php_stream_to_zval(strm,param->parameter);
 			}
 			return 1;
