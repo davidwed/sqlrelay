@@ -3745,7 +3745,6 @@ void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 
 				// translate...
 				convert=true;
-stdoutput.printf("translating bind: %s\n",currentbind.getString());
 				translateBindVariableInStringAndArray(cursor,
 								&currentbind,
 								bindindex,
