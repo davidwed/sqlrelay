@@ -1,9 +1,9 @@
 #! /bin/sh
 #
-# sqlrelay   This starts and stops SQL relay.
+# sqlrelay   This starts and stops SQL Relay.
 #
 # chkconfig: 345 85 15
-# description: Persistent database connection system.
+# description: SQL Relay 
 #
 # PROVIDE: sqlrelay
 # REQUIRE: netif
@@ -29,17 +29,6 @@ else
     if ( test -r "/etc/rc.d/init.d/functions" )
     then
         . /etc/rc.d/init.d/functions
-    fi
-fi
-
-
-# make sure networking is up (if we can)
-if ( test -f "/etc/sysconfig/network" )
-then
-    . /etc/sysconfig/network
-    if ( test "${NETWORKING}" != "yes" )
-    then
-        exit 0
     fi
 fi
 
@@ -153,70 +142,138 @@ cleanup() {
 }
 
 start_sqlrelay() {
-    if ( test -r "${instances}" )
+
+    # bail if there's no instances file
+    if ( test ! -r "${instances}" )
     then
-        connids=`grep -v "^#" ${instances}`
-        if ( test -n "${connids}" )
-        then
-            launched=0
-            for connid in $connids do
-                printf "sqlrelay (${connid})"
-                sqlr-start -id ${connid} 0<&- 1>&- 2>&-
-                RETVAL=$?
-                if ( test "$BSD" = "no" )
-                then
-                    printf ": "
-                    if ( test $RETVAL -eq 0 )
-                    then
-                        success
-                    else
-                        failure
-                    fi
-                    echo
-                fi
-                launched=1
-            done
-        fi
+        return 0
     fi
+
+    # bail if no instances are defined in the file
+    connids=`grep -v "^#" ${instances}`
+    if ( test -z "${connids}" )
+    then
+        return 0
+    fi
+
+    # on BSD, print:
+    # sqlrelay (instance instance instance)
+    #
+    # on non-BSD, print:
+    # sqlrelay (instance): success
+    # sqlrelay (instance): success
+    # sqlrelay (instance): success
+    if ( test "$BSD" = "yes" )
+    then
+        printf "sqlrelay ("
+    fi
+
+    first="true"
+    for connid in $connids
+    do
+        sqlr-start -id ${connid} 0<&- 1>&- 2>&-
+        RETVAL=$?
+        if ( test "$BSD" = "yes" )
+        then
+            if ( test "$first" = "true" )
+            then
+                $first="false"
+            else
+                printf " "
+            fi
+            printf "${connid}"
+        else
+            printf "sqlrelay (${connid}): "
+            if ( test $RETVAL -eq 0 )
+            then
+                success
+            else
+                failure
+            fi
+            echo
+        fi
+    done
+
+    if ( test "$BSD" = "yes" )
+    then
+        printf ") "
+    fi
+
     if ( test $RETVAL -eq 0 )
     then
         touch ${lockdir}/sqlrelay
     fi
+
     cleanup
+
     return $RETVAL
 }
 
 stop_sqlrelay() {
-    if ( test -r "${instances}" )
+
+    # bail if there's no instances file
+    if ( test ! -r "${instances}" )
     then
-        connids=`grep -v "^#" ${instances}`
-        if ( test -n "${connids}" )
-        then
-            launched=0
-            for connid in $connids do
-                printf "sqlrelay (${connid})"
-                sqlr-stop ${connid} 0<&- 1>&- 2>&-
-                RETVAL=$?
-                if ( test "$BSD" = "no" )
-                then
-                    printf ": "
-                    if ( test $RETVAL -eq 0 )
-                    then
-                        success
-                    else
-                        failure
-                    fi
-                    echo
-                fi
-                launched=1
-            done
-        fi
+        return 0
     fi
+
+    # bail if no instances are defined in the file
+    connids=`grep -v "^#" ${instances}`
+    if ( test -z "${connids}" )
+    then
+        return 0
+    fi
+
+    # on BSD, print:
+    # sqlrelay (instance instance instance)
+    #
+    # on non-BSD, print:
+    # sqlrelay (instance): success
+    # sqlrelay (instance): success
+    # sqlrelay (instance): success
+    if ( test "$BSD" = "yes" )
+    then
+        printf "sqlrelay ("
+    fi
+
+    first="true"
+    for connid in $connids
+    do
+        sqlr-stop ${connid} 0<&- 1>&- 2>&-
+        RETVAL=$?
+        if ( test "$BSD" = "yes" )
+        then
+            if ( test "$first" = "true" )
+            then
+                $first="false"
+            else
+                printf " "
+            fi
+            printf "${connid}"
+        else
+            printf "sqlrelay (${connid}): "
+            if ( test $RETVAL -eq 0 )
+            then
+                success
+            else
+                failure
+            fi
+            echo
+        fi
+    done
+
+    if ( test "$BSD" = "yes" )
+    then
+        printf ") "
+    fi
+
     if ( test $RETVAL -eq 0 )
     then
         rm -f ${lockdir}/sqlrelay
     fi
+
     cleanup
+
     return $RETVAL
 }
 
