@@ -252,7 +252,7 @@ case "$1" in
         if ( test -r "/etc/rc.subr" -o -r "/etc/rc.d/rc.subr" )
         then
             # on BSD systems assume start
-            start
+            start_sqlrelay
         else
             # on others, print usage
             echo "Usage: sqlrelay {start|stop|restart|condrestart}"
