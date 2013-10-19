@@ -71,6 +71,8 @@ then
 
     else
 
+	PRINTACTION="yes"
+
         # on NetBSD and Minix (and others) sqlrelay=YES enables
         if ( test "${sqlrelay}" != "YES" -a \
                     "${sqlrelay}" != "Yes" -a \
