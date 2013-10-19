@@ -84,6 +84,7 @@ if ( test -w "/var/lock/subsys" )
 then
     lockdir=/var/lock/subsys
 elif ( test -w "/var/lock" )
+then
     lockdir=/var/lock
 fi
 
