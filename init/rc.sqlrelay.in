@@ -64,6 +64,7 @@ then
         fi
 
     elif ( test "$UNAME" = "FreeBSD" )
+    then
 
         # on FreeBSD sqlrelay_enable=YES enables
         if ( test "${sqlrelay_enable}" != "YES" -a \
@@ -139,7 +140,7 @@ cleanup(){
         if ( test -r "$i" )
         then
             PID=`cat $i`
-            if ( test -z "`ps -p $PID | grep "sqlr-" )
+            if ( test -z "`ps -p $PID | grep sqlr-`" )
             then
                 echo "$PID is not sqlr! removing pidfile ..."
                 rm -f $i
