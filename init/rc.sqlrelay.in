@@ -35,6 +35,7 @@ fi
 
 # for BSD-ish systems, bail if sqlrelay isn't enabled in /etc/rc.conf
 BSD="no"
+PRINTACTION="no"
 if ( test -r "/etc/rc.conf" )
 then
 
@@ -57,6 +58,8 @@ then
 
     elif ( test "$UNAME" = "FreeBSD" )
     then
+
+	PRINTACTION="yes"
 
         # on FreeBSD sqlrelay_enable=YES enables
         if ( test "${sqlrelay_enable}" != "YES" -a \
@@ -156,6 +159,12 @@ start_sqlrelay() {
         return 0
     fi
 
+    # print Starting if necessary
+    if ( test "$PRINTACTION" = "yes" )
+    then
+        printf "Starting"
+    fi
+
     # on BSD, print:
     # sqlrelay (instance instance instance)
     #
@@ -199,6 +208,11 @@ start_sqlrelay() {
         printf ")"
     fi
 
+    if ( test "$PRINTACTION" = "yes" )
+    then
+        echo "."
+    fi
+
     if ( test $RETVAL -eq 0 )
     then
         touch ${lockdir}/sqlrelay
@@ -222,6 +236,12 @@ stop_sqlrelay() {
     if ( test -z "${connids}" )
     then
         return 0
+    fi
+
+    # print Stopping if necessary
+    if ( test "$PRINTACTION" = "yes" )
+    then
+        printf "Stopping"
     fi
 
     # on BSD, print:
@@ -265,6 +285,11 @@ stop_sqlrelay() {
     if ( test "$BSD" = "yes" )
     then
         printf ")"
+    fi
+
+    if ( test "$PRINTACTION" = "yes" )
+    then
+        echo "."
     fi
 
     if ( test $RETVAL -eq 0 )
