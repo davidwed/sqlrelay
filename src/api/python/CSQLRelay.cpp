@@ -746,8 +746,10 @@ static PyObject *inputBind(PyObject *self, PyObject *args) {
     } else {
       ((sqlrcursor *)sqlrcur)->inputBind(variable, PyString_AsString(value));
     }
-  } else if (PyBool_Check(value)) {
-    ((sqlrcursor *)sqlrcur)->inputBind(variable, value == Py_True ? "1" : "0");
+  } else if (value == Py_True) {
+    ((sqlrcursor *)sqlrcur)->inputBind(variable, "1");
+  } else if (value == Py_False) {
+    ((sqlrcursor *)sqlrcur)->inputBind(variable, "0");
   } else if (PyInt_Check(value)) {
     ((sqlrcursor *)sqlrcur)->inputBind(variable, (int64_t)PyInt_AsLong(value));
   } else if (PyFloat_Check(value)) {
@@ -828,8 +830,10 @@ static PyObject *inputBinds(PyObject *self, PyObject *args) {
         ((sqlrcursor *)sqlrcur)->inputBind(variable, (char *)NULL);
       } else if (PyString_Check(value)) {
         ((sqlrcursor *)sqlrcur)->inputBind(variable, PyString_AsString(value));
-      } else if (PyBool_Check(value)) {
-	((sqlrcursor *)sqlrcur)->inputBind(variable, value == Py_True ? "1" : "0");
+      } else if (value == Py_True) {
+	((sqlrcursor *)sqlrcur)->inputBind(variable, "1");
+      } else if (value == Py_False) {
+	((sqlrcursor *)sqlrcur)->inputBind(variable, "0");
       } else if (PyInt_Check(value)) {
         ((sqlrcursor *)sqlrcur)->inputBind(variable, (int64_t)PyInt_AsLong(value));
       } else if (PyFloat_Check(value)) {
