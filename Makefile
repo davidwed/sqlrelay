@@ -51,12 +51,7 @@ distclean: clean
 		bin/sqlrclient-config \
 		bin/sqlrclientwrapper-config \
 		bin/sqlrserver-config \
-		init/openserver/init.d/sqlrelay \
-		init/redhat/init.d/sqlrelay \
-		init/slackware/rc.d/rc.sqlrelay \
-		init/debian/init.d/sqlrelay \
-		init/netbsd/rc.d/sqlrelay \
-		init/freebsd/rc.d/sqlrelay \
+		init/rc.sqlrelay \
 		test/test \
 		libtool \
 		libtool.gcc \

@@ -25,7 +25,6 @@ endif
 endif
 
 install:
-ifeq ($(UNAME),Linux)
 	if ( test -d "/etc/rc.d/init.d" ); \
 	then \
 		$(MKINSTALLDIRS) $(initroot)/etc/rc.d/init.d; \
@@ -37,7 +36,12 @@ ifeq ($(UNAME),Linux)
 	elif ( test -d "/etc/rc.d" ); \
 	then \
 		$(MKINSTALLDIRS) $(initroot)/etc/rc.d; \
-		$(INSTALL) -m 755 rc.sqlrelay $(initroot)/etc/rc.d/rc.sqlrelay; \
+		if ( test -r "/etc/rc.conf" ); \
+		then \
+			$(INSTALL) -m 755 rc.sqlrelay $(initroot)/etc/rc.d/sqlrelay; \
+		else \
+			$(INSTALL) -m 755 rc.sqlrelay $(initroot)/etc/rc.d/rc.sqlrelay; \
+		fi; \
 	fi
 	if ( test -d "/etc/sysconfig" ); \
 	then \
@@ -47,34 +51,6 @@ ifeq ($(UNAME),Linux)
 		$(MKINSTALLDIRS) $(initroot)/etc; \
 		$(INSTALL) -m 644 sqlrelay $(initroot)/etc/sqlrelay; \
 	fi
-endif
-ifeq ($(UNAME),NetBSD)
-	$(MKINSTALLDIRS) $(initroot)/etc/rc.d
-	$(INSTALL) -m 755 netbsd/rc.d/sqlrelay $(initroot)/etc/rc.d
-	$(INSTALL) -m 644 netbsd/sqlrelay $(initroot)/etc
-endif
-ifeq ($(UNAME),FreeBSD)
-	$(MKINSTALLDIRS) $(initroot)/usr/local/etc/rc.d
-	$(INSTALL) -m 755 freebsd/rc.d/sqlrelay $(initroot)/usr/local/etc/rc.d
-	$(INSTALL) -m 644 freebsd/sqlrelay $(initroot)/etc
-endif
-ifeq ($(UNAME),SCO_SV)
-	$(MKINSTALLDIRS) $(initroot)/etc/init.d
-	$(INSTALL) -m 755 openserver/init.d/sqlrelay $(initroot)/etc/init.d
-	$(INSTALL) -m 644 openserver/sqlrelay $(initroot)/etc
-endif
-ifeq ($(UNAME),IRIX)
-	# should work for irix too
-	$(MKINSTALLDIRS) $(initroot)/etc/init.d
-	$(INSTALL) -m 755 openserver/init.d/sqlrelay $(initroot)/etc/init.d
-	$(INSTALL) -m 644 openserver/sqlrelay $(initroot)/etc
-endif
-ifeq ($(UNAME),IRIX64)
-	# should work for irix too
-	$(MKINSTALLDIRS) $(initroot)/etc/init.d
-	$(INSTALL) -m 755 openserver/init.d/sqlrelay $(initroot)/etc/init.d
-	$(INSTALL) -m 644 openserver/sqlrelay $(initroot)/etc
-endif
 ifeq ($(initroot),)
 	if ( test -x "/sbin/chkconfig" -a -n "`/sbin/chkconfig -h 2>&1 | grep add`" ); then \
 		/sbin/chkconfig --add sqlrelay; \
