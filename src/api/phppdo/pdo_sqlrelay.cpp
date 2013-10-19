@@ -524,9 +524,11 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 			// make database calculate maximum
 			// length of data found in a column
 			return 1;
+		#ifdef PDO_ATTR_EMULATE_PREPARES
 		case PDO_ATTR_EMULATE_PREPARES:
 			// use query emulation rather than native
 			return 1;
+		#endif
 		default:
 			return 0;
 	}
@@ -549,14 +551,14 @@ static int sqlrconnectionError(pdo_dbh_t *dbh,
 		sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 		sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
 		add_next_index_long(info,sqlrcur->errorNumber());
-		const char	*msg=sqlrcur->errorMessage();
+		char	*msg=(char *)sqlrcur->errorMessage();
 		if (msg) {
 			add_next_index_string(info,msg,1);
 		}
 	} else if (dbh) {
 		sqlrconnection	*sqlrcon=(sqlrconnection *)dbh->driver_data;
 		add_next_index_long(info,sqlrcon->errorNumber());
-		const char	*msg=sqlrcon->errorMessage();
+		char	*msg=(char *)sqlrcon->errorMessage();
 		if (msg) {
 			add_next_index_string(info,msg,1);
 		}
@@ -621,9 +623,11 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 			// make database calculate maximum
 			// length of data found in a column
 			return 1;
+		#ifdef PDO_ATTR_EMULATE_PREPARES
 		case PDO_ATTR_EMULATE_PREPARES:
 			// use query emulation rather than native
 			return 1;
+		#endif
 		default:
 			return 0;
 	}
@@ -710,7 +714,7 @@ static PHP_MINFO_FUNCTION(pdo_sqlrelay) {
 }
 
 
-static const zend_function_entry sqlrelayFunctions[] = {
+static zend_function_entry sqlrelayFunctions[] = {
 #ifdef PHP_FE_END
 	PHP_FE_END
 #else
@@ -719,7 +723,7 @@ static const zend_function_entry sqlrelayFunctions[] = {
 };
 
 #if ZEND_MODULE_API_NO >= 20050922
-static const zend_module_dep sqlrelayDeps[] = {
+static zend_module_dep sqlrelayDeps[] = {
 	ZEND_MOD_REQUIRED("pdo")
 #ifdef PHP_MOD_END
 	ZEND_MOD_END
