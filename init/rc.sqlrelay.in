@@ -226,8 +226,15 @@ case "$1" in
         condrestart
         ;;
     *)
-        echo "Usage: sqlrelay {start|stop|restart|condrestart}"
-        RETVAL=1
+        if ( test -r "/etc/rc.subr" -o -r "/etc/rc.d/rc.subr" )
+        then
+            # on BSD systems assume start
+            start
+        else
+            # on others, print usage
+            echo "Usage: sqlrelay {start|stop|restart|condrestart}"
+            RETVAL=1
+        fi
 esac
 
 exit $RETVAL
