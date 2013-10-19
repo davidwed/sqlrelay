@@ -177,7 +177,7 @@ start_sqlrelay() {
         then
             if ( test "$first" = "true" )
             then
-                $first="false"
+                first="false"
             else
                 printf " "
             fi
@@ -245,7 +245,7 @@ stop_sqlrelay() {
         then
             if ( test "$first" = "true" )
             then
-                $first="false"
+                first="false"
             else
                 printf " "
             fi
