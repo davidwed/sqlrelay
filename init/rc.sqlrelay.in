@@ -6,7 +6,7 @@
 # description: SQL Relay 
 #
 # PROVIDE: sqlrelay
-# REQUIRE: netif
+# REQUIRE: NETWORKING
 
 
 # define default message functions
