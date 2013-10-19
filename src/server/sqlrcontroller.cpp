@@ -3,11 +3,6 @@
 
 #include <config.h>
 
-// for pow()
-// NOTE: include this here rather than lower in the include list or the build
-// will fail on linux libc4 systems will LITTLE_ENDIAN redefined
-#include <math.h>
-
 #include <sqlrcontroller.h>
 #include <rudiments/file.h>
 #include <rudiments/rawbuffer.h>
@@ -625,9 +620,8 @@ bool sqlrcontroller_svr::getAndIncrementSequenceNumber(file *sockseq) {
 	logDebugMessage(string);
 	delete[] string;
 
-	// increment the sequence number
-	// (the (double) cast is required for solaris with -compat=4)
-	if (buffer==pow((double)2,31)) {
+	// increment the sequence number but don't let it roll over
+	if (buffer==2147483647) {
 		buffer=0;
 	} else {
 		buffer=buffer+1;
