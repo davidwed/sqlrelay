@@ -711,13 +711,21 @@ static PHP_MINFO_FUNCTION(pdo_sqlrelay) {
 
 
 static const zend_function_entry sqlrelayFunctions[] = {
+#ifdef PHP_FE_END
 	PHP_FE_END
+#else
+	{NULL,NULL,NULL}
+#endif
 };
 
 #if ZEND_MODULE_API_NO >= 20050922
 static const zend_module_dep sqlrelayDeps[] = {
 	ZEND_MOD_REQUIRED("pdo")
+#ifdef PHP_MOD_END
 	ZEND_MOD_END
+#else
+	{NULL,NULL,NULL}
+#endif
 };
 #endif
 
