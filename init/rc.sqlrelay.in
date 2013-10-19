@@ -44,20 +44,40 @@ then
 fi
 
 
-# for BSD systems, bail if we're not enabled in /etc/rc.conf
+# for BSD systems, bail if sqlrelay isn't enabled in /etc/rc.conf
 if ( test -r "/etc/rc.subr" -o -r "/etc/rc.d/rc.subr" )
 then
+
+    # load subroutines to process /etc/rc.conf
     if ( test -r "/etc/rc.subr" )
     then
         . /etc/rc.subr
     else
         . /etc/rc.d/rc.subr
     fi
+
+    # get sqlrelay_enable (FreeBSD)
     rcvar="sqlrelay_enable"
     load_rc_config sqlrelay
+
+    # get sqlrelay_flags (OpenBSD)
+    rcvar="sqlrelay_enable"
+    load_rc_config sqlrelay
+
+    # get sqlrelay (NetBSD)
+    rcvar="sqlrelay"
+    load_rc_config sqlrelay
+
+    # bail if it wasn't enabled
     if ( test "${sqlrelay_enable}" != "YES" -a \
                 "${sqlrelay_enable}" != "Yes" -a \
-                "${sqlrelay_enable}" != "yes" )
+                "${sqlrelay_enable}" != "yes" -a \
+                "${sqlrelay_flags}" != "YES" -a \
+                "${sqlrelay_flags}" != "Yes" -a \
+                "${sqlrelay_flags}" != "yes" -a \
+                "${sqlrelay}" != "YES" -a \
+                "${sqlrelay}" != "Yes" -a \
+                "${sqlrelay}" != "yes")
     then
         exit 0
     fi
