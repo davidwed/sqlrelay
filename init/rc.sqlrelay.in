@@ -165,7 +165,7 @@ start_sqlrelay() {
     # sqlrelay (instance): success
     if ( test "$BSD" = "yes" )
     then
-        printf "sqlrelay ("
+        printf " sqlrelay ("
     fi
 
     first="true"
@@ -196,7 +196,7 @@ start_sqlrelay() {
 
     if ( test "$BSD" = "yes" )
     then
-        printf ") "
+        printf ")"
     fi
 
     if ( test $RETVAL -eq 0 )
@@ -233,7 +233,7 @@ stop_sqlrelay() {
     # sqlrelay (instance): success
     if ( test "$BSD" = "yes" )
     then
-        printf "sqlrelay ("
+        printf " sqlrelay ("
     fi
 
     first="true"
@@ -264,7 +264,7 @@ stop_sqlrelay() {
 
     if ( test "$BSD" = "yes" )
     then
-        printf ") "
+        printf ")"
     fi
 
     if ( test $RETVAL -eq 0 )
