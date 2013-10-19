@@ -58,7 +58,7 @@ then
         # on OpenBSD sqlrelay_flags=NO disables
         if ( test "${sqlrelay_flags}" = "NO" -o \
                     "${sqlrelay_flags}" = "No" -o \
-                    "${sqlrelay_flags}" = "no")
+                    "${sqlrelay_flags}" = "no" )
         then
             exit 0
         fi
@@ -79,7 +79,7 @@ then
         # on NetBSD and Minix (and others) sqlrelay=YES enables
         if ( test "${sqlrelay}" != "YES" -a \
                     "${sqlrelay}" != "Yes" -a \
-                    "${sqlrelay}" != "yes")
+                    "${sqlrelay}" != "yes" )
         then
             exit 0
         fi
@@ -134,7 +134,7 @@ fi
 RETVAL=0
 
 
-cleanup(){
+cleanup() {
     for i in `ls ${tmpdir}/pids/* 2>/dev/null`
     do
         if ( test -r "$i" )
@@ -149,7 +149,7 @@ cleanup(){
     done
 }
 
-start(){
+start_sqlrelay() {
     printf "Starting SQL Relay: "
     if ( test -r "${instances}" )
     then
@@ -183,7 +183,7 @@ start(){
     return $RETVAL
 }
 
-stop(){
+stop_sqlrelay() {
     printf "Stopping SQL Relay: "
     if ( test -r "${instances}" )
     then
@@ -217,15 +217,15 @@ stop(){
     return $RETVAL
 }
 
-restart(){
-    stop
-    start
+restart_sqlrelay() {
+    stop_sqlrelay
+    start_sqlrelay
 }
 
-condrestart(){
+condrestart_sqlrelay() {
     if ( test -r "${lockdir}/sqlrelay" )
     then
-        restart
+        restart_sqlrelay
     fi
     return 0
 }
@@ -234,19 +234,19 @@ condrestart(){
 # See how we were called.
 case "$1" in
     start)
-        start
+        start_sqlrelay
         ;;
     stop)
-        stop
+        stop_sqlrelay
         ;;
     restart)
-        restart
+        restart_sqlrelay
         ;;
     reload)
-        restart
+        restart_sqlrelay
         ;;
     condrestart)
-        condrestart
+        condrestart_sqlrelay
         ;;
     *)
         if ( test -r "/etc/rc.subr" -o -r "/etc/rc.d/rc.subr" )
