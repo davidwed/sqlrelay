@@ -35,7 +35,7 @@ fi
 
 # for BSD-ish systems, bail if sqlrelay isn't enabled in /etc/rc.conf
 BSD="no"
-PRINTACTION="no"
+PRINTACTION="yes"
 if ( test -r "/etc/rc.conf" )
 then
 
@@ -48,6 +48,8 @@ then
     if ( test "$UNAME" = "OpenBSD" )
     then
 
+	PRINTACTION="no"
+
         # on OpenBSD sqlrelay_flags=NO disables
         if ( test "${sqlrelay_flags}" = "NO" -o \
                     "${sqlrelay_flags}" = "No" -o \
@@ -59,8 +61,6 @@ then
     elif ( test "$UNAME" = "FreeBSD" )
     then
 
-	PRINTACTION="yes"
-
         # on FreeBSD sqlrelay_enable=YES enables
         if ( test "${sqlrelay_enable}" != "YES" -a \
                     "${sqlrelay_enable}" != "Yes" -a \
@@ -70,8 +70,6 @@ then
         fi
 
     else
-
-	PRINTACTION="yes"
 
         # on NetBSD and Minix (and others) sqlrelay=YES enables
         if ( test "${sqlrelay}" != "YES" -a \
@@ -208,11 +206,10 @@ start_sqlrelay() {
     if ( test "$BSD" = "yes" )
     then
         printf ")"
-    fi
-
-    if ( test "$PRINTACTION" = "yes" )
-    then
-        echo "."
+        if ( test "$PRINTACTION" = "yes" )
+        then
+            echo "."
+        fi
     fi
 
     if ( test $RETVAL -eq 0 )
@@ -287,6 +284,9 @@ stop_sqlrelay() {
     if ( test "$BSD" = "yes" )
     then
         printf ")"
+        if ( test "$PRINTACTION" = "yes" )
+        then
+            echo "."
     fi
 
     if ( test "$PRINTACTION" = "yes" )
