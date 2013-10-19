@@ -55,8 +55,8 @@ then
     fi
     rcvar="sqlrelay_enable"
     load_rc_config sqlrelay
-    if ( test "${sqlrelay_enable}" != "YES" && \
-                "${sqlrelay_enable}" != "Yes" && \
+    if ( test "${sqlrelay_enable}" != "YES" -a \
+                "${sqlrelay_enable}" != "Yes" -a \
                 "${sqlrelay_enable}" != "yes" )
     then
         exit 0
