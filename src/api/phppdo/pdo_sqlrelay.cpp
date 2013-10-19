@@ -551,6 +551,9 @@ static int sqlrconnectionError(pdo_dbh_t *dbh,
 		sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 		sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
 		add_next_index_long(info,sqlrcur->errorNumber());
+		// NOTE: This is un-const'ed because add_next_index_string
+		// takes a char * rather than const char * and this works
+		// with both.
 		char	*msg=(char *)sqlrcur->errorMessage();
 		if (msg) {
 			add_next_index_string(info,msg,1);
@@ -558,6 +561,9 @@ static int sqlrconnectionError(pdo_dbh_t *dbh,
 	} else if (dbh) {
 		sqlrconnection	*sqlrcon=(sqlrconnection *)dbh->driver_data;
 		add_next_index_long(info,sqlrcon->errorNumber());
+		// NOTE: This is un-const'ed because add_next_index_string
+		// takes a char * rather than const char * and this works
+		// with both.
 		char	*msg=(char *)sqlrcon->errorMessage();
 		if (msg) {
 			add_next_index_string(info,msg,1);
@@ -714,6 +720,7 @@ static PHP_MINFO_FUNCTION(pdo_sqlrelay) {
 }
 
 
+// NOTE: don't make this const or it will fail to compile with older PHP
 static zend_function_entry sqlrelayFunctions[] = {
 #ifdef PHP_FE_END
 	PHP_FE_END
@@ -723,6 +730,7 @@ static zend_function_entry sqlrelayFunctions[] = {
 };
 
 #if ZEND_MODULE_API_NO >= 20050922
+// NOTE: don't make this const or it will fail to compile with older PHP
 static zend_module_dep sqlrelayDeps[] = {
 	ZEND_MOD_REQUIRED("pdo")
 #ifdef PHP_MOD_END
