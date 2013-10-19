@@ -24,7 +24,6 @@ ifneq ($(HAVE_RUBY),)
 endif
 ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php all
-	$(MAKE) -C phppeardb all
 endif
 ifneq ($(HAVE_PHP_PDO),)
 	$(MAKE) -C phppdo all
@@ -61,7 +60,6 @@ ifneq ($(HAVE_RUBY),)
 endif
 ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php clean
-	$(MAKE) -C phppeardb clean
 endif
 ifneq ($(HAVE_PHP_PDO),)
 	$(MAKE) -C phppdo clean
@@ -98,7 +96,6 @@ ifneq ($(HAVE_RUBY),)
 endif
 ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php install
-	$(MAKE) -C phppeardb install
 endif
 ifneq ($(HAVE_PHP_PDO),)
 	$(MAKE) -C phppdo install
@@ -108,9 +105,6 @@ ifneq ($(HAVE_JAVA),)
 endif
 ifneq ($(HAVE_TCL),)
 	$(MAKE) -C tcl install
-endif
-ifneq ($(HAVE_ZOPE),)
-	$(MAKE) -C zope install
 endif
 ifneq ($(HAVE_ERLANG),)
 	$(MAKE) -C erlang install
@@ -138,7 +132,6 @@ ifneq ($(HAVE_RUBY),)
 endif
 ifneq ($(HAVE_PHP),)
 	$(MAKE) -C php uninstall
-	$(MAKE) -C phppeardb uninstall
 endif
 ifneq ($(HAVE_PHP_PDO),)
 	$(MAKE) -C phppdo uninstall
@@ -148,9 +141,6 @@ ifneq ($(HAVE_JAVA),)
 endif
 ifneq ($(HAVE_TCL),)
 	$(MAKE) -C tcl uninstall
-endif
-ifneq ($(HAVE_ZOPE),)
-	$(MAKE) -C zope uninstall
 endif
 ifneq ($(HAVE_ERLANG),)
 	$(MAKE) -C erlang uninstall

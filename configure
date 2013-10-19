@@ -648,7 +648,6 @@ ERL
 ERLCFLAGS
 ERLC
 HAVE_PHP_PDO
-PHPPEARDBDIR
 PHPLIB
 PHPMAJORVERSION
 PHPVERSION
@@ -666,8 +665,6 @@ HAVE_JAVA
 RUBYLIB
 HAVE_RUBY
 RUBY
-ZOPEDIR
-HAVE_ZOPE
 PYTHONLIB
 PYTHONDIR
 PYTHONINCLUDES
@@ -923,8 +920,6 @@ with_python_prefix
 enable_python
 enable_python_rpath
 with_python_dir
-with_zope_prefix
-enable_zope
 with_ruby_prefix
 enable_ruby
 with_ruby_site_arch_dir
@@ -936,7 +931,6 @@ with_php_prefix
 enable_php
 enable_php_rpath
 with_php_ext_dir
-with_pear_db_dir
 with_tcl_include
 with_tcl_libraries
 enable_tcl
@@ -1613,7 +1607,6 @@ Optional Features:
   --disable-perl                Don't build Perl api
   --disable-python              Don't build Python api
   --enable-python-rpath         Use -rpath when linking the Python library against the SQL Relay client library
-  --disable-zope                Don't build Zope api
   --disable-ruby                Don't build Ruby api
   --disable-java                Don't build Java api
   --enable-java-rpath           Use -rpath when linking the Java library against the SQL Relay client library
@@ -1660,14 +1653,12 @@ Optional Packages:
   --with-perl-man3-ext          Override Perl's built-in PERLMAN3EXT variable (extension to put on perl module man pages)
   --with-python-prefix          Location of Python
   --with-python-dir             Path to install Python driver
-  --with-zope-prefix            Location of Zope
   --with-ruby-prefix            Location of Ruby
   --with-ruby-site-arch-dir     Override Ruby's built-in sitearchdir variable (location to install binary ruby modules)
   --with-ruby-site-lib-dir      Override Ruby's built-in sitelibdir variable (location to install binary ruby modules)
   --with-java-prefix            Location of Java
   --with-php-prefix             Location of PHP
   --with-php-ext-dir            Path to install PHP modules
-  --with-pear-db-dir            Path to install PHP Pear DB driver
   --with-tcl-include		 Location of tcl.h include file
   --with-tcl-libraries		 Location of libtcl, where to install tcl module
   --with-erlang-prefix          Location of Erlang
@@ -3057,21 +3048,6 @@ else
 fi
 
 
-# Check whether --with-zope-prefix was given.
-if test "${with_zope_prefix+set}" = set; then :
-  withval=$with_zope_prefix; ZOPEPATH="$withval"
-else
-  ZOPEPATH=""
-fi
-
-# Check whether --enable-zope was given.
-if test "${enable_zope+set}" = set; then :
-  enableval=$enable_zope; ENABLE_ZOPE=""
-else
-  ENABLE_ZOPE="yes"
-fi
-
-
 # Check whether --with-ruby-prefix was given.
 if test "${with_ruby_prefix+set}" = set; then :
   withval=$with_ruby_prefix; RUBYPATH="$withval"
@@ -3156,14 +3132,6 @@ if test "${with_php_ext_dir+set}" = set; then :
   withval=$with_php_ext_dir; PHPEXTDIR="$withval"
 else
   PHPEXTDIR=""
-fi
-
-
-# Check whether --with-pear-db-dir was given.
-if test "${with_pear_db_dir+set}" = set; then :
-  withval=$with_pear_db_dir; PHPPEARDBDIR="$withval"
-else
-  PHPPEARDBDIR=""
 fi
 
 
@@ -3317,9 +3285,6 @@ if ( test -n "$PERLPATH" -a "`echo $PERLPATH | cut -c-3`" = "../" ); then
 fi
 if ( test -n "$PYTHONPATH" -a "`echo $PYTHONPATH | cut -c-3`" = "../" ); then
 	PYTHONPATH="$PWD/$PYTHONPATH"
-fi
-if ( test -n "$ZOPEPATH" -a "`echo $ZOPEPATH | cut -c-3`" = "../" ); then
-	ZOPEPATH="$PWD/$ZOPEPATH"
 fi
 if ( test -n "$RUBYPATH" -a "`echo $RUBYPATH | cut -c-3`" = "../" ); then
 	RUBYPATH="$PWD/$RUBYPATH"
@@ -31885,102 +31850,6 @@ echo "******************************"
 
 
 echo
-echo "***** Zope *******************"
-
-if ( test "$ENABLE_ZOPE" = "yes" )
-then
-
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Zope" >&5
-$as_echo_n "checking for Zope... " >&6; }
-
-	HAVE_ZOPE=""
-	ZOPEDIR=""
-
-	if ( test "$cross_compiling" = "yes" )
-	then
-
-				echo "cross compiling..."
-
-	else
-
-		if ( test -n "$HAVE_PYTHON" )
-		then
-			if ( test -n "$ZOPEPATH" )
-			then
-				ZOPEDIR="$ZOPEPATH/lib/python/Products"
-				HAVE_ZOPE="yes"
-			else
-
-				if ( test -z "$ZOPEDIR" )
-				then
-					for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr/local/lib" "/usr/local/lib64" "/usr" "/usr/lib" "/usr/lib64" "/opt" "/opt/csw" "/sw" "/usr/pkg" "/usr/pkg/share" "/usr/pkg/lib"
-					do
-						for j in "zope" "Zope" "zope2" "Zope2" "zope3" "Zope3"
-						do
-
-if ( test -r ""$i/$j/lib/python/Products/__init__.py"" )
-then
-	eval "HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j/lib/python/Products\""
-fi
-
-
-if ( test -r ""$i/$j/lib64/python/Products/__init__.py"" )
-then
-	eval "HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j/lib64/python/Products\""
-fi
-
-							if ( test -n "$ZOPEDIR" )
-							then
-								break
-							fi
-							for k in "2.2" "2.3" "2.4" "2.5" "2.6" "2.7" "2.8" "2.9" "3.0" "3.1" "3.2" "3.3" "3.4"
-							do
-
-if ( test -r ""$i/$j-$k/lib/python/Products/__init__.py"" )
-then
-	eval "HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j-$k/lib/python/Products\""
-fi
-
-
-if ( test -r ""$i/$j-$k/lib64/python/Products/__init__.py"" )
-then
-	eval "HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j-$k/lib64/python/Products\""
-fi
-
-								if ( test -n "$ZOPEDIR" )
-								then
-									break
-								fi
-							done
-						done
-						if ( test -n "$ZOPEDIR" )
-						then
-							break
-						fi
-					done
-				fi
-			fi
-		fi
-
-		if ( test -z "$HAVE_ZOPE" )
-		then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Zope API will not be installed." >&5
-$as_echo "$as_me: WARNING: The Zope API will not be installed." >&2;}
-		fi
-	fi
-
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ZOPEDIR" >&5
-$as_echo "$ZOPEDIR" >&6; }
-
-
-
-fi
-
-echo "******************************"
-
-
-
-echo
 echo "***** Ruby *******************"
 
 if ( test "$ENABLE_RUBY" = "yes" )
@@ -32737,41 +32606,6 @@ fi
 
 
 fi
-
-
-
-	if ( test -z "$PHPPEARDBDIR" )
-	then
-
-		for i in "/usr" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/sfw" "/opt/csw" "/sw"
-		do
-			for j in "pear/DB" "pear/bootstrap/DB"
-			do
-				if ( test -d "$i/$j" -a -r "$i/$j/common.php" )
-				then
-					PHPPEARDBDIR="$i/$j"
-					break
-				fi
-			done
-			if ( test -n "$PHPPEARDBDIR" )
-			then
-				break
-			fi
-		done
-
-	fi
-
-	if ( test -z "$PHPPEARDBDIR" -a "$HAVE_PHP" )
-	then
-		PHPPEARDBDIR="$PHPPREFIX/share/pear/DB"
-	fi
-
-	if ( test -z "$PHPPEARDBDIR" )
-	then
-		PHPPEARDBDIR="\${datadir}/pear/DB"
-	fi
-
-
 
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for PHP PDO" >&5
@@ -36743,7 +36577,6 @@ echo
 
 PERLBUILD="no "
 PYTHONBUILD="no "
-ZOPEBUILD="no "
 RUBYBUILD="no "
 PHPBUILD="no "
 JAVABUILD="no "
@@ -36756,9 +36589,6 @@ fi
 if ( test -n "$HAVE_PYTHON" ); then
 	PYTHONBUILD="yes"
 fi
-if ( test -n "$HAVE_ZOPE" ); then
-	ZOPEBUILD="yes"
-fi
 if ( test -n "$HAVE_RUBY" ); then
 	RUBYBUILD="yes"
 fi
@@ -36767,9 +36597,6 @@ if ( test -n "$HAVE_PHP" ); then
 fi
 if ( test -n "$HAVE_PHP_PDO" ); then
 	PHPPDOBUILD="yes"
-fi
-if ( test -n "$PHPPEARDBDIR" ); then
-	PHPPEARDBBUILD="yes"
 fi
 if ( test -n "$HAVE_JAVA" ); then
 	JAVABUILD="yes"
@@ -36787,7 +36614,6 @@ echo "$APIS"
 echo " APIs         : C/C++       yes           Perl       $PERLBUILD"
 echo "                Python      $PYTHONBUILD           Ruby       $RUBYBUILD"
 echo "                PHP         $PHPBUILD           Java       $JAVABUILD"
-echo "                PHP PEARDB  $PHPPEARDBBUILD           Zope       $ZOPEBUILD"
 echo "                PHP PDO     $PHPPDOBUILD           ODBC       $ODBCBUILD"
 echo "                TCL         $TCLBUILD           Erlang     $ERLANGBUILD"
 echo ""

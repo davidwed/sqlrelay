@@ -53,8 +53,7 @@
 <a href="http://www.python.org">Python</a>,
 <a href="http://www.ruby-lang.org">Ruby</a>,
 <a href="http://tcl.sourceforge.net">TCL</a>,
-<a href="http://java.sun.com">Java</a> (see note),
-<a href="http://www.zope.org">Zope</a> or
+<a href="http://java.sun.com">Java</a> (see note) or
 <a href="http://www.erlang.org">Erlang</a>.
 Note that these API's are not supported natively on Windows though many do work under Cygwin.</p>
 
@@ -187,13 +186,12 @@ rpmbuild -ta sqlrelay-X.XX.tar.gz<br>
 -without php<br>
 -without tcl<br>
 -without java<br>
--without zope<br>
 </b></blockquote>
 
-<p>For example, if you want to build everything but the oracle and zope modules, then you would run the following command:</p>
+<p>For example, if you want to build everything but the oracle module, then you would run the following command:</p>
 
 <blockquote><b>
-rpmbuild -ta -without oracle -without zope sqlrelay-X.XX.tar.gz<br>
+rpmbuild -ta -without oracle sqlrelay-X.XX.tar.gz<br>
 (where X.XX is replaced with the version number)<br>
 </b></blockquote>
 

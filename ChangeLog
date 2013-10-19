@@ -4,6 +4,8 @@
 	added PHP PDO driver
 	fixed a bind variable translation bug where output binds followed by
 		:= would not be detected
+	dropped zope support (for now)
+	dropped PHP Pear DB support
 
 0.52 - sqlrsh has long reported the wrong version, fixed that
 	added csv support to sqlr-export and a -format xml|csv option

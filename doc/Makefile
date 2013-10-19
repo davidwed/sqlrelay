@@ -32,7 +32,6 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/css
 	$(MKINSTALLDIRS) $(docdir)/modules
 	$(MKINSTALLDIRS) $(docdir)/programming
-	$(MKINSTALLDIRS) $(docdir)/programming/zope
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux
@@ -199,7 +198,6 @@ install:
 	$(INSTALL) -m 644 programming/perl.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/perldbi.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/php.html $(docdir)/programming
-	$(INSTALL) -m 644 programming/phppeardb.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/phppdo.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/python.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/pythondb.html $(docdir)/programming
@@ -207,15 +205,6 @@ install:
 	$(INSTALL) -m 644 programming/rubydbi.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/java.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/tcl.html $(docdir)/programming
-	$(INSTALL) -m 644 programming/zope.html $(docdir)/programming
-	$(INSTALL) -m 644 programming/zope/instance.gif $(docdir)/programming/zope
-	$(INSTALL) -m 644 programming/zope/management.gif $(docdir)/programming/zope
-	$(INSTALL) -m 644 programming/zope/resultset.gif $(docdir)/programming/zope
-	$(INSTALL) -m 644 programming/zope/sqlrelay.gif $(docdir)/programming/zope
-	$(INSTALL) -m 644 programming/zope/test.gif $(docdir)/programming/zope
-	$(INSTALL) -m 644 programming/zope/testzsqlmethod.gif $(docdir)/programming/zope
-	$(INSTALL) -m 644 programming/zope/zsqlmethod.gif $(docdir)/programming/zope
-	$(INSTALL) -m 644 programming/zope/zsqlmethodresultset.gif $(docdir)/programming/zope
 	$(INSTALL) -m 644 gettingstarted/db2.html $(docdir)/gettingstarted
 	$(INSTALL) -m 644 gettingstarted/firebird.html $(docdir)/gettingstarted
 	$(INSTALL) -m 644 gettingstarted/msde.html $(docdir)/gettingstarted

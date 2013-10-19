@@ -47,7 +47,6 @@
 <li><a href="#odbc">How does SQL Relay compare to ODBC, JDBC, Perl::DBI, PHP::ADODB, Ruby::DBI or PythonDB?</a></li>
 <li><a href="#dbiproxy">How does SQL Relay compare to DBI::Proxy?</a></li>
 <li><a href="#apachedbi">How does SQL Relay compare to Apache::DBI or PHP's internal persistent database connections?</a></li>
-<li><a href="#zope">Why should I use SQL Relay with Zope?</a></li>
 </ul>
 
 <br><span class="heading2">Database-Specific Questions</span><br>
@@ -159,12 +158,12 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <br><a name="languages"></a>
 <span class="heading3">What languages does SQL Relay support?</span>
 
-<p>SQL Relay currently supports C, C++, .NET-capable languages, Perl, Python, Zope, PHP, Ruby, Java, TCL and Erlang.</p>
+<p>SQL Relay currently supports C, C++, .NET-capable languages, Perl, Python, PHP, Ruby, Java, TCL and Erlang.</p>
 
 <br><a name="dbabstraction"></a>
 <span class="heading3">What database abstraction layers does SQL Relay support?</span>
 
-<p>SQL Relay currently supports ODBC, ADO.NET, Perl-DBI, Python-DB, PHP PDO, PHP PearDB and Ruby-DBI.</p>
+<p>SQL Relay currently supports ODBC, ADO.NET, Perl-DBI, Python-DB, PHP PDO and Ruby-DBI.</p>
 
 <p>The native SQL Relay Client API's are database abstraction layers as well, as the SQL Relay server can be connected to a variety of database and applications written using an SQL Relay Client API can talk to any SQL Relay server.</p>
 
@@ -319,7 +318,7 @@ ln -s bash sh
 <br><a name="odbc"></a>
 <span class="heading3">How does SQL Relay compare to ADO.NET, ODBC, JDBC, Perl::DBI, etc.?</span>
 
-<p>This is sort of an apples-to-oranges comparison.  These API's are primarily targeted as abstraction layers and make no attempt to improve application performance.  Some have features not supported by the SQL Relay client API's but the SQL Relay client API has features not supported by them too.  SQL Relay currently supports ADO.NET, Perl::DBI, PHP PearDB, Ruby::DBI and PythonDB on the API side and ODBC on the database connection side.  ODBC and JDBC API's for SQL Relay are on the TODO list.</p>
+<p>This is sort of an apples-to-oranges comparison.  These API's are primarily targeted as abstraction layers and make no attempt to improve application performance.  Some have features not supported by the SQL Relay client API's but the SQL Relay client API has features not supported by them too.  SQL Relay currently provides drivers for ADO.NET, Perl::DBI, PHP PDO, Ruby::DBI, PythonDB and ODBC and can connect to databases via ODBC.</p>
 
 <br><a name="dbiproxy"></a>
 <span class="heading3">How does SQL Relay compare to DBI::Proxy?</span>
@@ -336,21 +335,6 @@ ln -s bash sh
 <p>If a website runs a mixture of Perl modules and PHP scripts, the issue can be doubled.</p>
 
 <p>SQL Relay makes more efficient use of resources by maintaining fewer persistent connections to the database and funnelling all database requests through those connections.  When the number of database session requests exceeds the number of persistent connections, the session requests are queued.  This ultimately causes delayed response to the client, but keeps the database running smoothly.  In most cases, the delay is negligable and the tradeoff is acceptable.</p>
-
-<br><a name="zope"></a>
-<span class="heading3">Why should I use SQL Relay with Zope?</span>
-
-<p>The same efficiency arguments that can be made against Apache::DBI and PHP's persistent connections cannot be made against Zope.  Zope maintains a hackable (some say "configurable") number of persistent database connections in its cache and shares them among its threads.  The number of database connections and threads are independent.  There is always the possibility that one or all of the database connections will get pushed out of the cache and have to be started back up later, but in practice, this is highly unlikely and happens very infrequently.</p>
-
-<p>If you have such a large farm of Zope machines that the number of persistent database connections is straining the database server's resources, SQL Relay can provide a middle tier to reduce the number of persistent connections.</p>
-
-<p>SQL Relay adds immediate support for load distribution over a group of clustered or replicated databases to Zope.</p>
-
-<p>SQL Relay can provide a means for connecting to databases for which there is no Zope adapter.</p>
-
-<p>When using the ZOracleDA, Zope generally needs to be restarted if the database is bounced.  When using SQL Relay, the database can be bounced without having to restart Zope.  This behavior may be specific to the ZOracleDA though, may just be a bug, and may actually be fixed now.  SQL Relay also supports Oracle LOB and long datatypes.</p>
-
-<p>CAVEAT: It has been quite a while since I last tested SQL Relay with Zope or used Zope in general.  Any or all of the above listed issues may or may not still exist.</p>
 
 <hr>
 

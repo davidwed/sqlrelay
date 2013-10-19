@@ -2720,78 +2720,6 @@ fi
 
 
 
-AC_DEFUN([FW_CHECK_ZOPE],
-[
-if ( test "$ENABLE_ZOPE" = "yes" )
-then
-
-	AC_MSG_CHECKING(for Zope)
-
-	HAVE_ZOPE=""
-	ZOPEDIR=""
-
-	if ( test "$cross_compiling" = "yes" )
-	then
-
-		dnl cross compiling ...
-		echo "cross compiling..."
-
-	else
-
-		if ( test -n "$HAVE_PYTHON" )
-		then
-			if ( test -n "$ZOPEPATH" )
-			then
-				ZOPEDIR="$ZOPEPATH/lib/python/Products"
-				HAVE_ZOPE="yes"
-			else
-		
-				if ( test -z "$ZOPEDIR" )
-				then
-					for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr/local/lib" "/usr/local/lib64" "/usr" "/usr/lib" "/usr/lib64" "/opt" "/opt/csw" "/sw" "/usr/pkg" "/usr/pkg/share" "/usr/pkg/lib"
-					do
-						for j in "zope" "Zope" "zope2" "Zope2" "zope3" "Zope3"
-						do
-							FW_CHECK_FILE("$i/$j/lib/python/Products/__init__.py",[HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j/lib/python/Products\"])
-							FW_CHECK_FILE("$i/$j/lib64/python/Products/__init__.py",[HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j/lib64/python/Products\"])
-							if ( test -n "$ZOPEDIR" )
-							then
-								break
-							fi
-							for k in "2.2" "2.3" "2.4" "2.5" "2.6" "2.7" "2.8" "2.9" "3.0" "3.1" "3.2" "3.3" "3.4"
-							do
-								FW_CHECK_FILE("$i/$j-$k/lib/python/Products/__init__.py",[HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j-$k/lib/python/Products\"])
-								FW_CHECK_FILE("$i/$j-$k/lib64/python/Products/__init__.py",[HAVE_ZOPE=\"yes\"; ZOPEDIR=\"$i/$j-$k/lib64/python/Products\"])
-								if ( test -n "$ZOPEDIR" )
-								then
-									break
-								fi
-							done
-						done
-						if ( test -n "$ZOPEDIR" )
-						then
-							break
-						fi
-					done
-				fi
-			fi
-		fi
-		
-		if ( test -z "$HAVE_ZOPE" )
-		then
-			AC_MSG_WARN(The Zope API will not be installed.)
-		fi
-	fi
-
-	AC_MSG_RESULT($ZOPEDIR)
-
-	AC_SUBST(HAVE_ZOPE)
-	AC_SUBST(ZOPEDIR)
-fi
-])
-
-
-
 AC_DEFUN([FW_CHECK_RUBY],
 [
 if ( test "$ENABLE_RUBY" = "yes" )
@@ -3142,42 +3070,6 @@ then
 fi
 ])
 
-AC_DEFUN([FW_CHECK_PHP_PEAR_DB],
-[
-
-	if ( test -z "$PHPPEARDBDIR" )
-	then
-
-		for i in "/usr" "/usr/local" "/usr/pkg" "/opt/sfw" "/usr/sfw" "/opt/csw" "/sw"
-		do
-			for j in "pear/DB" "pear/bootstrap/DB"
-			do
-				if ( test -d "$i/$j" -a -r "$i/$j/common.php" )
-				then
-					PHPPEARDBDIR="$i/$j"
-					break
-				fi
-			done
-			if ( test -n "$PHPPEARDBDIR" )
-			then
-				break
-			fi
-		done
-
-	fi
-
-	if ( test -z "$PHPPEARDBDIR" -a "$HAVE_PHP" )
-	then
-		PHPPEARDBDIR="$PHPPREFIX/share/pear/DB"
-	fi
-
-	if ( test -z "$PHPPEARDBDIR" )
-	then
-		PHPPEARDBDIR="\${datadir}/pear/DB"
-	fi
-
-	AC_SUBST(PHPPEARDBDIR)
-])
 
 AC_DEFUN([FW_CHECK_PHP_PDO],
 [

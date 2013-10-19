@@ -21,7 +21,6 @@
 # --without php
 # --without python
 # --without ruby
-# --without zope
 # --without tcl
 # --without erlang
 
@@ -68,12 +67,11 @@ BuildRequires: rudiments-devel >= 0.34
 %{!?_without_php:BuildRequires: ,%{phpdevel}}
 %{!?_without_python:BuildRequires: ,python-devel}
 %{!?_without_ruby:BuildRequires: ,%{rubydevel}}
-%{!?_without_zope:BuildRequires: ,python-devel}
 %{!?_without_tcl:BuildRequires: ,%{tcldevel}}
 %{!?_without_erlang:BuildRequires: ,erlang}
 
 %description
-SQL Relay is a persistent database connection pooling, proxying, throttling, load balancing and query routing/filtering system for Unix and Linux supporting ODBC, Oracle, MySQL, PostgreSQL, Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and MS Access (minimally) with APIs for C, C++, .NET, Perl, Perl-DBI, Python, Python-DB, Zope, PHP, PHP PDO, PHP PearDB, Ruby, Ruby-DBI, Java, TCL and Erlang, ODBC and ADO.NET drivers, drop-in replacement libraries for MySQL and PostgreSQL, command line clients and extensive documentation.  The APIs support advanced database operations such as bind variables, multi-row fetches, client-side result set caching and suspended transactions.  It is ideal for speeding up database-driven web-based applications, accessing databases from unsupported platforms, migrating between databases, distributing access to replicated or clustered databases and throttling database access.
+SQL Relay is a persistent database connection pooling, proxying, throttling, load balancing and query routing/filtering system for Unix and Linux supporting ODBC, Oracle, MySQL, PostgreSQL, Sybase, MS SQL Server, IBM DB2, Firebird, SQLite and MS Access (minimally) with APIs for C, C++, .NET, Perl, Perl-DBI, Python, Python-DB, PHP, PHP PDO, Ruby, Ruby-DBI, Java, TCL and Erlang, ODBC and ADO.NET drivers, drop-in replacement libraries for MySQL and PostgreSQL, command line clients and extensive documentation.  The APIs support advanced database operations such as bind variables, multi-row fetches, client-side result set caching and suspended transactions.  It is ideal for speeding up database-driven web-based applications, accessing databases from unsupported platforms, migrating between databases, distributing access to replicated or clustered databases and throttling database access.
 
 
 %package server-devel
@@ -278,14 +276,6 @@ Group: Development/Languages
 SQL Relay modules for Ruby.
 
 
-%package zope
-Summary: SQL Relay modules for Zope.
-Group: Development/Languages
-
-%description zope
-SQL Relay modules for Zope.
-
-
 %package tcl
 Summary: SQL Relay modules for TCL.
 Group: Development/Languages
@@ -330,13 +320,7 @@ Man pages for SQL Relay.
 %else
 %define	pythondir	%(PYTHONINCLUDES=""; PYTHONDIR=""; for j in "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1" "2.0" "1.6" "1.5"; do for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j"; do if ( test -d "$i" ); then PYTHONINCLUDES="$i"; fi; if ( test -n "$PYTHONINCLUDES" ); then break; fi; done; for i in "/usr/lib/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j"; do if ( test -d "$i" ); then PYTHONDIR="$i"; fi; if ( test -n "$PYTHONDIR" ); then break; fi; done; if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" ); then echo $PYTHONDIR; break; fi; done)
 %endif
-%ifarch x86_64
-%define	zopedir		%(ZOPEPATH="/opt/Zope/lib/python/Proucts"; for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr/local/lib64" "/usr" "/usr/lib64" "/opt"; do for j in "zope" "Zope" "zope2" "Zope2" "zope3" "Zope3"; do if ( test -d "$i/$j" ); then ZOPEPATH="$i/$j/lib64/python/Products"; fi; done; done; echo $ZOPEPATH)
-%else
-%define	zopedir		%(ZOPEPATH="/opt/Zope/lib/python/Proucts"; for i in "/usr/local/www" "/usr/share" "/usr/local" "/usr/local/lib" "/usr" "/usr/lib" "/opt"; do for j in "zope" "Zope" "zope2" "Zope2" "zope3" "Zope3"; do if ( test -d "$i/$j" ); then ZOPEPATH="$i/$j/lib/python/Products"; fi; done; done; echo $ZOPEPATH)
-%endif
 %define	phpextdir	%(php-config --extension-dir)
-%define	phppeardbdir	%(echo "`php-config --prefix`/share/pear/DB")
 %define	perl_prefix	%(eval "export `perl -V:prefix`"; echo $prefix)
 %define	perl_sitelib	%(eval "export `perl -V:sitelib`"; echo $sitelib)
 %define	perl_installarchlib	%(eval "export `perl -V:installarchlib`"; echo $installarchlib)
@@ -370,8 +354,7 @@ Man pages for SQL Relay.
 	%{?_without_perl:	--disable-perl} \
 	%{?_without_php:	--disable-php} \
 	%{?_without_python:	--disable-python} \
-	%{?_without_ruby:	--disable-ruby} \
-	%{?_without_zope:	--disable-zope}
+	%{?_without_ruby:	--disable-ruby}
 	
 make
 
@@ -558,7 +541,6 @@ rm -rf %{buildroot}
 %{!?_without_php:%files php}
 %{!?_without_php:%defattr(-, root, root)}
 %{!?_without_php:%{phpextdir}/sql_relay.so}
-%{!?_without_php:%{phppeardbdir}/sqlrelay.php}
 %{!?_without_php:%{phpextdir}/pdo_sqlrelay.so}
 
 %{!?_without_python:%files python}
@@ -570,10 +552,6 @@ rm -rf %{buildroot}
 %{!?_without_ruby:%{ruby_sitearchdir}/sqlrelay.so}
 %{!?_without_ruby:%{ruby_sitelibdir}/DBD/SQLRelay}
 %{!?_without_ruby:%{ruby_sitelibdir}/dbd/SQLRelay.rb}
-
-%{!?_without_zope:%files zope}
-%{!?_without_zope:%defattr(-, root, root)}
-%{!?_without_zope:%{zopedir}/ZSQLRelayDA}
 
 %{!?_without_tcl:%files tcl}
 %{!?_without_tcl:%defattr(-, root, root)}

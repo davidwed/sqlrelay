@@ -8,7 +8,7 @@
 
 <span class="heading1">Supported Languages</span><br><br>
 
-<p>SQL Relay currently supports C, C++, .NET-capable languages, Java, Perl, Python, Zope, PHP, Ruby, TCL and Erlang.</p>
+<p>SQL Relay currently supports C, C++, .NET-capable languages, Java, Perl, Python, PHP, Ruby, TCL and Erlang.</p>
 
 <p>Adapters could also be written for any language that can call functions from one of the above-listed languages.</p>
 

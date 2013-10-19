@@ -162,19 +162,6 @@ then
 	fi
 fi
 
-if ( test "$API" = "pear" -o -z "$API" )
-then
-	if ( test "@HAVE_PHP@" = "yes" )
-	then
-		echo
-		echo "PEAR:"
-		cd php
-		php ${DB}peardb.php
-		sudo rm -f /tmp/cachefile* sqlnet.log
-		cd ..
-	fi
-fi
-
 if ( test "$API" = "tcl" -o -z "$API" )
 then
 	if ( test "@HAVE_TCL@" = "yes" )
