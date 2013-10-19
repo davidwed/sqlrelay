@@ -11,13 +11,13 @@
 
 # define default message functions
 success() {
-    echo success
+    echo -n success
 }
 failure() {
-    echo failure
+    echo -n failure
 }
 passed() {
-    echo passed
+    echo -n passed
 }
 
 
