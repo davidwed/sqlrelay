@@ -160,7 +160,7 @@ start_sqlrelay() {
     fi
 
     # print Starting if necessary
-    if ( test "$PRINTACTION" = "yes" )
+    if ( test "$BSD" = "yes" -a "$PRINTACTION" = "yes" )
     then
         printf "Starting"
     fi
@@ -169,9 +169,9 @@ start_sqlrelay() {
     # sqlrelay (instance instance instance)
     #
     # on non-BSD, print:
-    # sqlrelay (instance): success
-    # sqlrelay (instance): success
-    # sqlrelay (instance): success
+    # Starting sqlrelay (instance): success
+    # Starting sqlrelay (instance): success
+    # Starting sqlrelay (instance): success
     if ( test "$BSD" = "yes" )
     then
         printf " sqlrelay ("
@@ -192,7 +192,7 @@ start_sqlrelay() {
             fi
             printf "${connid}"
         else
-            printf "sqlrelay (${connid}): "
+            printf "Starting sqlrelay (${connid}): "
             if ( test $RETVAL -eq 0 )
             then
                 success
@@ -238,7 +238,7 @@ stop_sqlrelay() {
     fi
 
     # print Stopping if necessary
-    if ( test "$PRINTACTION" = "yes" )
+    if ( test "$BSD" = "yes" -a "$PRINTACTION" = "yes" )
     then
         printf "Stopping"
     fi
@@ -270,7 +270,7 @@ stop_sqlrelay() {
             fi
             printf "${connid}"
         else
-            printf "sqlrelay (${connid}): "
+            printf "Stopping sqlrelay (${connid}): "
             if ( test $RETVAL -eq 0 )
             then
                 success
@@ -288,11 +288,6 @@ stop_sqlrelay() {
         then
             echo "."
        fi
-    fi
-
-    if ( test "$PRINTACTION" = "yes" )
-    then
-        echo "."
     fi
 
     if ( test $RETVAL -eq 0 )
