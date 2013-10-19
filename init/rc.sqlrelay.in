@@ -4,39 +4,63 @@
 #
 # chkconfig: 345 85 15
 # description: Persistent database connection system.
+#
+# PROVIDE: sqlrelay
+# REQUIRE: netif
 
 
 # define default message functions
 success() {
-	echo success
+    echo success
 }
 failure() {
-	echo failure
+    echo failure
 }
 passed() {
-	echo passed
+    echo passed
 }
+
 
 # override them with fancier ones if available
 if ( test -r "/etc/init.d/functions" )
 then
-	. /etc/init.d/functions
+    . /etc/init.d/functions
 else
-	if ( test -r "/etc/rc.d/init.d/functions" )
-	then
-		. /etc/rc.d/init.d/functions
-	fi
+    if ( test -r "/etc/rc.d/init.d/functions" )
+    then
+        . /etc/rc.d/init.d/functions
+    fi
 fi
 
 
 # make sure networking is up (if we can)
 if ( test -f "/etc/sysconfig/network" )
 then
-	. /etc/sysconfig/network
-	if ( test "${NETWORKING}" != "yes" )
-	then
-		exit 0
-	fi
+    . /etc/sysconfig/network
+    if ( test "${NETWORKING}" != "yes" )
+    then
+        exit 0
+    fi
+fi
+
+
+# for BSD systems, bail if we're not enabled in /etc/rc.conf
+if ( test -r "/etc/rc.subr" -o -r "/etc/rc.d/rc.subr" )
+then
+    if ( test -r "/etc/rc.subr" )
+    then
+        . /etc/rc.subr
+    else
+        . /etc/rc.d/rc.subr
+    fi
+    rcvar="sqlrelay_enable"
+    load_rc_config sqlrelay
+    if ( test "${sqlrelay_enable}" != "YES" && \
+                "${sqlrelay_enable}" != "Yes" && \
+                "${sqlrelay_enable}" != "yes" )
+    then
+        exit 0
+    fi
 fi
 
 
@@ -50,7 +74,7 @@ tmpdir=${localstatedir}/sqlrelay/tmp
 # look for a readable sqlrelay.conf
 if ( test ! -r "${sysconfdir}/sqlrelay.conf" )
 then
-	exit 1
+    exit 1
 fi
 
 
@@ -58,9 +82,9 @@ fi
 lockdir=/tmp
 if ( test -w "/var/lock/subsys" )
 then
-	lockdir=/var/lock/subsys
+    lockdir=/var/lock/subsys
 elif ( test -w "/var/lock" )
-	lockdir=/var/lock
+    lockdir=/var/lock
 fi
 
 
@@ -68,17 +92,17 @@ fi
 instances=/etc/sqlrelay
 if ( test -r "/etc/sysconfig/sqlrelay" )
 then
-	instances=/etc/sysconfig/sqlrelay
+    instances=/etc/sysconfig/sqlrelay
 fi
 
 
 # Add appropriate bin/lib paths
 if ( test "${prefix}" != "/usr" )
 then
-	PATH=$PATH:${prefix}/bin
-	export PATH
-	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${prefix}/lib
-	export LD_LIBRARY_PATH
+    PATH=$PATH:${prefix}/bin
+    export PATH
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${prefix}/lib
+    export LD_LIBRARY_PATH
 fi
 
 
@@ -186,23 +210,23 @@ condrestart(){
 # See how we were called.
 case "$1" in
     start)
-	start
-	;;
+        start
+        ;;
     stop)
-	stop
-	;;
+        stop
+        ;;
     restart)
-	restart
-	;;
+        restart
+        ;;
     reload)
-	restart
-	;;
+        restart
+        ;;
     condrestart)
-	condrestart
-	;;
+        condrestart
+        ;;
     *)
-	echo "Usage: sqlrelay {start|stop|restart|condrestart}"
-	RETVAL=1
+        echo "Usage: sqlrelay {start|stop|restart|condrestart}"
+        RETVAL=1
 esac
 
 exit $RETVAL
