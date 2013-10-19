@@ -1,0 +1,208 @@
+#! /bin/sh
+#
+# sqlrelay   This starts and stops SQL relay.
+#
+# chkconfig: 345 85 15
+# description: Persistent database connection system.
+
+
+# define default message functions
+success() {
+	echo success
+}
+failure() {
+	echo failure
+}
+passed() {
+	echo passed
+}
+
+# override them with fancier ones if available
+if ( test -r "/etc/init.d/functions" )
+then
+	. /etc/init.d/functions
+else
+	if ( test -r "/etc/rc.d/init.d/functions" )
+	then
+		. /etc/rc.d/init.d/functions
+	fi
+fi
+
+
+# make sure networking is up (if we can)
+if ( test -f "/etc/sysconfig/network" )
+then
+	. /etc/sysconfig/network
+	if ( test "${NETWORKING}" != "yes" )
+	then
+		exit 0
+	fi
+fi
+
+
+# define paths
+prefix=@prefix@
+sysconfdir=@sysconfdir@
+localstatedir=@localstatedir@
+tmpdir=${localstatedir}/sqlrelay/tmp
+
+
+# look for a readable sqlrelay.conf
+if ( test ! -r "${sysconfdir}/sqlrelay.conf" )
+then
+	exit 1
+fi
+
+
+# define lock directory
+lockdir=/tmp
+if ( test -w "/var/lock/subsys" )
+then
+	lockdir=/var/lock/subsys
+elif ( test -w "/var/lock" )
+	lockdir=/var/lock
+fi
+
+
+# define instance file
+instances=/etc/sqlrelay
+if ( test -r "/etc/sysconfig/sqlrelay" )
+then
+	instances=/etc/sysconfig/sqlrelay
+fi
+
+
+# Add appropriate bin/lib paths
+if ( test "${prefix}" != "/usr" )
+then
+	PATH=$PATH:${prefix}/bin
+	export PATH
+	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${prefix}/lib
+	export LD_LIBRARY_PATH
+fi
+
+
+# initialize return value
+RETVAL=0
+
+
+cleanup(){
+    for i in `ls ${tmpdir}/pids/* 2>/dev/null`
+    do
+        if ( test -r "$i" )
+        then
+            PID=`cat $i`
+            if ( test -z "`ps -p $PID | grep -e "sqlr-cachemana" -e "sqlr-connectio" -e "sqlr-listener" -e "sqlr-scaler"`" )
+            then
+                echo "$PID is not sqlr! removing pidfile ..."
+                rm -f $i
+            fi
+        fi
+    done
+}
+
+start(){
+    echo -n $"Starting SQL Relay: "
+    if ( test -r "${instances}" )
+    then
+        launched=0
+        for connid in `grep -v ^# ${instances}`; do
+            echo
+            echo -n $"Launching SQL Relay instance '${connid}':"
+            sqlr-start -id ${connid} 0<&- 1>&- 2>&-
+            RETVAL=$?
+            if ( test $RETVAL -eq 0 )
+            then
+                success
+            else
+                failure
+            fi
+            launched=1
+        done
+        if ( test "$launched" -eq 0 )
+        then
+            passed
+        fi
+        echo
+    else
+        failure
+    fi
+    if ( test $RETVAL -eq 0 )
+    then
+        touch ${lockdir}/sqlrelay
+    fi
+    cleanup
+    return $RETVAL
+}
+
+stop(){
+    echo -n $"Stopping SQL Relay: "
+    if ( test -r "${instances}" )
+    then
+        launched=0
+        for connid in `grep -v ^# ${instances}`; do
+            echo
+            echo -n $"Stopping SQL Relay instance '${connid}':"
+            sqlr-stop ${connid} 0<&- 1>&- 2>&-
+            RETVAL=$?
+            if ( test $RETVAL -eq 0 )
+            then
+                success
+            else
+                failure
+            fi
+            launched=1
+        done
+        if ( test "$launched" -eq 0 )
+        then
+            passed
+        fi
+        echo
+    else
+        failure
+    fi
+    if ( test $RETVAL -eq 0 )
+    then
+        touch ${lockdir}/sqlrelay
+    fi
+    cleanup
+    return $RETVAL
+}
+
+restart(){
+    stop
+    start
+}
+
+condrestart(){
+    if ( test -r "${lockdir}/sqlrelay" )
+    then
+        restart
+    fi
+    return 0
+}
+
+
+# See how we were called.
+case "$1" in
+    start)
+	start
+	;;
+    stop)
+	stop
+	;;
+    restart)
+	restart
+	;;
+    reload)
+	restart
+	;;
+    condrestart)
+	condrestart
+	;;
+    *)
+	echo "Usage: sqlrelay {start|stop|restart|condrestart}"
+	RETVAL=1
+esac
+
+exit $RETVAL
