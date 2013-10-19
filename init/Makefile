@@ -24,6 +24,8 @@ endif
 endif
 endif
 
+all:
+
 install:
 	if ( test -d "/etc/rc.d/init.d" ); \
 	then \
