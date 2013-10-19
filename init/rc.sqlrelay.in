@@ -154,7 +154,7 @@ start(){
     if ( test -r "${instances}" )
     then
         launched=0
-        for connid in `grep -v ^# ${instances}`; do
+        for connid in `grep -v "^#" ${instances}`; do
             echo
             printf "    ${connid}: "
             sqlr-start -id ${connid} 0<&- 1>&- 2>&-
@@ -188,7 +188,7 @@ stop(){
     if ( test -r "${instances}" )
     then
         launched=0
-        for connid in `grep -v ^# ${instances}`; do
+        for connid in `grep -v "^#" ${instances}`; do
             echo
             printf "    ${connid}: "
             sqlr-stop ${connid} 0<&- 1>&- 2>&-
