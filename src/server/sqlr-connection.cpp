@@ -65,7 +65,7 @@ void shutDown(int32_t signum) {
 		   	// but reraising the signal sets the return status
 		   	// from the process correctly.
 			signal(signum,SIG_DFL);
-			raise(signum);
+			signalmanager::raiseSignal(signum);
 	}
 
 	cleanUp();
