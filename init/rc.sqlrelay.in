@@ -11,13 +11,13 @@
 
 # define default message functions
 success() {
-    echo -n success
+    printf success
 }
 failure() {
-    echo -n failure
+    printf failure
 }
 passed() {
-    echo -n passed
+    printf passed
 }
 
 
@@ -44,42 +44,44 @@ then
 fi
 
 
-# for BSD systems, bail if sqlrelay isn't enabled in /etc/rc.conf
-if ( test -r "/etc/rc.subr" -o -r "/etc/rc.d/rc.subr" )
+# for BSD-ish systems, bail if sqlrelay isn't enabled in /etc/rc.conf
+if ( test -r "/etc/rc.conf" )
 then
 
     # load subroutines to process /etc/rc.conf
-    if ( test -r "/etc/rc.subr" )
+    . /etc/rc.conf
+
+    UNAME=`uname`
+    if ( test "$UNAME" = "OpenBSD" )
     then
-        . /etc/rc.subr
+
+        # on OpenBSD sqlrelay_flags=NO disables
+        if ( test "${sqlrelay_flags}" = "NO" -o \
+                    "${sqlrelay_flags}" = "No" -o \
+                    "${sqlrelay_flags}" = "no")
+        then
+            exit 0
+        fi
+
+    elif ( test "$UNAME" = "FreeBSD" )
+
+        # on FreeBSD sqlrelay_enable=YES enables
+        if ( test "${sqlrelay_enable}" != "YES" -a \
+                    "${sqlrelay_enable}" != "Yes" -a \
+                    "${sqlrelay_enable}" != "yes" )
+        then
+            exit 0
+        fi
+
     else
-        . /etc/rc.d/rc.subr
-    fi
 
-    # get sqlrelay_enable (FreeBSD)
-    rcvar="sqlrelay_enable"
-    load_rc_config sqlrelay
-
-    # get sqlrelay_flags (OpenBSD)
-    rcvar="sqlrelay_enable"
-    load_rc_config sqlrelay
-
-    # get sqlrelay (NetBSD)
-    rcvar="sqlrelay"
-    load_rc_config sqlrelay
-
-    # bail if it wasn't enabled
-    if ( test "${sqlrelay_enable}" != "YES" -a \
-                "${sqlrelay_enable}" != "Yes" -a \
-                "${sqlrelay_enable}" != "yes" -a \
-                "${sqlrelay_flags}" != "YES" -a \
-                "${sqlrelay_flags}" != "Yes" -a \
-                "${sqlrelay_flags}" != "yes" -a \
-                "${sqlrelay}" != "YES" -a \
-                "${sqlrelay}" != "Yes" -a \
-                "${sqlrelay}" != "yes")
-    then
-        exit 0
+        # on NetBSD and Minix (and others) sqlrelay=YES enables
+        if ( test "${sqlrelay}" != "YES" -a \
+                    "${sqlrelay}" != "Yes" -a \
+                    "${sqlrelay}" != "yes")
+        then
+            exit 0
+        fi
     fi
 fi
 
@@ -137,7 +139,7 @@ cleanup(){
         if ( test -r "$i" )
         then
             PID=`cat $i`
-            if ( test -z "`ps -p $PID | grep -e "sqlr-cachemana" -e "sqlr-connectio" -e "sqlr-listener" -e "sqlr-scaler"`" )
+            if ( test -z "`ps -p $PID | grep "sqlr-" )
             then
                 echo "$PID is not sqlr! removing pidfile ..."
                 rm -f $i
@@ -147,13 +149,13 @@ cleanup(){
 }
 
 start(){
-    echo -n "Starting SQL Relay: "
+    printf "Starting SQL Relay: "
     if ( test -r "${instances}" )
     then
         launched=0
         for connid in `grep -v ^# ${instances}`; do
             echo
-            echo -n "    ${connid}: "
+            printf "    ${connid}: "
             sqlr-start -id ${connid} 0<&- 1>&- 2>&-
             RETVAL=$?
             if ( test $RETVAL -eq 0 )
@@ -181,13 +183,13 @@ start(){
 }
 
 stop(){
-    echo -n "Stopping SQL Relay: "
+    printf "Stopping SQL Relay: "
     if ( test -r "${instances}" )
     then
         launched=0
         for connid in `grep -v ^# ${instances}`; do
             echo
-            echo -n "    ${connid}: "
+            printf "    ${connid}: "
             sqlr-stop ${connid} 0<&- 1>&- 2>&-
             RETVAL=$?
             if ( test $RETVAL -eq 0 )
