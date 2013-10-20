@@ -40,7 +40,8 @@ Buildroot: %{_tmppath}/%{name}-root
 	%define phpdevel %(echo "mod_php4-devel")
 	%define rubydevel %(echo "ruby")
 	%define tcldevel %(echo "tcl-devel")
-	%define initscript /etc/init.d/sqlrelay
+	%define initscript1 /etc/init.d/sqlrelay
+	%define initscript2 /etc/init.d/sqlrcachemanager
 	%define inittab /etc/sqlrelay
 	%define docdir %{_docdir}/%{name}
 	%define exampledir %{_datadir}/examples/%{name}
@@ -53,7 +54,8 @@ Buildroot: %{_tmppath}/%{name}-root
 	%else
 		%define tcldevel %(echo "tcl")
 	%endif
-	%define initscript /etc/rc.d/init.d/sqlrelay
+	%define initscript1 /etc/rc.d/init.d/sqlrelay
+	%define initscript2 /etc/rc.d/init.d/sqlrcachemanager
 	%define inittab /etc/sysconfig/sqlrelay
 	%define docdir %{_docdir}/%{name}-%{version}
 	%define exampledir %{_datadir}/examples/%{name}-%{version}
@@ -398,7 +400,8 @@ rm -rf %{buildroot}
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.dtd
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.xsd
 %config(noreplace) %attr(600, root, root) %{inittab}
-%{initscript}
+%{initscript1}
+%{initscript2}
 %{_bindir}/sqlr-cachemanager*
 %{_bindir}/sqlr-listener*
 %{_bindir}/sqlr-connection*

@@ -51,10 +51,6 @@ sqlr-start -id ID [-config CONFIGFILE] [-localstatedir LOCALSTATEDIR]
 
 <p>The <b>sqlr-start</b> program starts up one instance of <b>sqlr-listener</b>, one instance of <b>sqlr-scaler</b> and the number of <b>sqlr-connection</b> daemons specified in the config file for the given ID.</p>
 
-<p>The <b>sqlr-start</b> program also checks to see if a <b>sqlr-cachemanager</b> is running.  If one is then it leaves it running.  If not then it starts one.</p>
-
-<p>See the section about <b>sqlr-cachemanager</b> below for an important note about it.</p>
-
 <p>CONFIGFILE is the filename of the configuration file to use.  The default configuration file is /usr/local/firstworks/etc/sqlrelay.conf</p>
 
 <p>If the optional LOCALSTATEDIR argument is used, it is passed to the programs started by <b>sqlr-start</b> as appropriate.</p>
