@@ -9,6 +9,8 @@
 	refactored init script - one script should work on all platforms now
 	updated init script installation - should work on virtually all unixes
 	added OS X init configuration
+	updated the sqlr-listener to clean up files related to ipc, sockets
+		and marking whether the db is up or down on exit
 
 0.52 - sqlrsh has long reported the wrong version, fixed that
 	added csv support to sqlr-export and a -format xml|csv option
