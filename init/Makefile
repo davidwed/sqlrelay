@@ -62,6 +62,11 @@ ifeq ($(initroot),)
 		/usr/sbin/update-rc.d sqlrelay defaults; \
 	elif ( test -x "/etc/init.d/sqlrelay" ); \
 	then \
+		if ( test -d "/etc/rc0.d" ); \
+		then \
+			cd /etc/rc0.d; \
+			ln -s ../init.d/sqlrelay K15sqlrelay; \
+		fi; \
 		if ( test -d "/etc/rc1.d" ); \
 		then \
 			cd /etc/rc1.d; \
@@ -110,6 +115,7 @@ uninstall:
 		/usr/sbin/update-rc.d sqlrelay remove; \
 	elif ( test ! -x "/sbin/chkconfig" ); \
 	then \
+		$(RM) /etc/rc0.d/K15sqlrelay; \
 		$(RM) /etc/rc1.d/K15sqlrelay; \
 		$(RM) /etc/rc2.d/K85sqlrelay; \
 		$(RM) /etc/rc3.d/K85sqlrelay; \
