@@ -129,12 +129,13 @@ class sqlrlistener : public listener {
 		semaphoreset	*semset;
 		sharedmemory	*idmemory;
 		shmdata		*shm;
+		char		*idfilename;
 
 		bool	init;
 
 		unixsocketserver	*clientsockun;
 		inetsocketserver	**clientsockin;
-		uint64_t			clientsockincount;
+		uint64_t		clientsockincount;
 
 		unixsocketserver	*mysqlclientsockun;
 		inetsocketserver	**mysqlclientsockin;
@@ -144,7 +145,9 @@ class sqlrlistener : public listener {
 		char	*mysqlunixport;
 
 		unixsocketserver	*handoffsockun;
+		char			*handoffsockname;
 		unixsocketserver	*removehandoffsockun;
+		char			*removehandoffsockname;
 		unixsocketserver	*fixupsockun;
 		char			*fixupsockname;
 

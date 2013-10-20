@@ -39,6 +39,7 @@ sqlrlistener::sqlrlistener() : listener() {
 	semset=NULL;
 	idmemory=NULL;
 	shm=NULL;
+	idfilename=NULL;
 
 	pidfile=NULL;
 	tmpdir=NULL;
@@ -54,7 +55,9 @@ sqlrlistener::sqlrlistener() : listener() {
 	mysqlunixport=NULL;
 
 	handoffsockun=NULL;
+	handoffsockname=NULL;
 	removehandoffsockun=NULL;
+	removehandoffsockname=NULL;
 	fixupsockun=NULL;
 	fixupsockname=NULL;
 
@@ -75,6 +78,11 @@ sqlrlistener::sqlrlistener() : listener() {
 sqlrlistener::~sqlrlistener() {
 	delete semset;
 	delete idmemory;
+	if (!isforkedchild && idfilename) {
+		file::remove(idfilename);
+	}
+	delete[] idfilename;
+
 	if (!isforkedchild) {
 		if (unixport) {
 			file::remove(unixport);
@@ -87,6 +95,28 @@ sqlrlistener::~sqlrlistener() {
 		cleanUp();
 	}
 	delete cmdl;
+
+	// remove files that indicate whether the db is up or down
+	linkedlist< connectstringcontainer * >	*csl=
+					cfgfl.getConnectStringList();
+	for (linkedlistnode< connectstringcontainer * > *node=
+						csl->getFirstNode();
+						node; node=node->getNext()) {
+		connectstringcontainer	*cs=node->getData();
+		const char	*connectionid=cs->getConnectionId();
+		size_t	updownlen=tmpdir->getLength()+5+
+				charstring::length(cmdl->getId())+1+
+				charstring::length(connectionid)+1;
+		char	*updown=new char[updownlen];
+		charstring::printf(updown,updownlen,
+					"%s/ipc/%s-%s",
+					tmpdir->getString(),
+					cmdl->getId(),connectionid);
+stdoutput.printf("\"%s\"\n",updown);
+		file::remove(updown);
+		delete[] updown;
+	}
+	delete tmpdir;
 }
 
 void sqlrlistener::cleanUp() {
@@ -94,16 +124,23 @@ void sqlrlistener::cleanUp() {
 	delete authc;
 	delete[] unixport;
 	delete[] pidfile;
+
 	delete clientsockun;
 	for (uint64_t csind=0; csind<clientsockincount; csind++) {
 		delete clientsockin[csind];
 	}
 	delete[] clientsockin;
+
 	delete mysqlclientsockun;
 	for (uint64_t mcsind=0; mcsind<mysqlclientsockincount; mcsind++) {
 		delete mysqlclientsockin[mcsind];
 	}
 	delete[] mysqlclientsockin;
+
+	if (!isforkedchild && handoffsockname) {
+		file::remove(handoffsockname);
+	}
+	delete[] handoffsockname;
 	delete handoffsockun;
 
 	if (handoffsocklist) {
@@ -113,12 +150,20 @@ void sqlrlistener::cleanUp() {
 		delete[] handoffsocklist;
 	}
 
+	if (!isforkedchild && removehandoffsockname) {
+		file::remove(removehandoffsockname);
+	}
+	delete[] removehandoffsockname;
 	delete removehandoffsockun;
+
+	if (!isforkedchild && fixupsockname) {
+		file::remove(fixupsockname);
+	}
 	delete[] fixupsockname;
 	delete fixupsockun;
+
 	delete denied;
 	delete allowed;
-	delete tmpdir;
 	delete sqlrlg;
 }
 
@@ -362,7 +407,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 
 	// initialize the ipc filename
 	size_t	idfilenamelen=tmpdir->getLength()+5+charstring::length(id)+1;
-	char	*idfilename=new char[idfilenamelen];
+	idfilename=new char[idfilenamelen];
 	charstring::printf(idfilename,idfilenamelen,
 				"%s/ipc/%s",tmpdir->getString(),id);
 
@@ -377,7 +422,6 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	// make sure that the file exists and is read/writeable
 	if (!file::createFile(idfilename,permissions::ownerReadWrite())) {
 		ipcFileError(idfilename);
-		delete[] idfilename;
 		return false;
 	}
 
@@ -385,10 +429,8 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	key_t	key=file::generateKey(idfilename,1);
 	if (key==-1) {
 		keyError(idfilename);
-		delete[] idfilename;
 		return false;
 	}
-	delete[] idfilename;
 
 	// create the shared memory segment
 	// FIXME: if it already exists, attempt to remove and re-create it
@@ -674,7 +716,7 @@ bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 	// the handoff socket
 	size_t	handoffsocknamelen=tmpdir->getLength()+9+
 					charstring::length(id)+8+1;
-	char	*handoffsockname=new char[handoffsocknamelen];
+	handoffsockname=new char[handoffsocknamelen];
 	charstring::printf(handoffsockname,handoffsocknamelen,
 				"%s/sockets/%s-handoff",
 				tmpdir->getString(),id);
@@ -697,7 +739,6 @@ bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 		stderror.printf("\n\n");
 	}
 
-	delete[] handoffsockname;
 	return success;
 }
 
@@ -706,7 +747,7 @@ bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 	// the deregistration socket
 	size_t	removehandoffsocknamelen=tmpdir->getLength()+9+
 						charstring::length(id)+14+1;
-	char	*removehandoffsockname=new char[removehandoffsocknamelen];
+	removehandoffsockname=new char[removehandoffsocknamelen];
 	charstring::printf(removehandoffsockname,
 				removehandoffsocknamelen,
 				"%s/sockets/%s-removehandoff",
@@ -730,8 +771,6 @@ bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 		stderror.printf("directory are readable and writable.");
 		stderror.printf("\n\n");
 	}
-
-	delete[] removehandoffsockname;
 
 	return success;
 }
