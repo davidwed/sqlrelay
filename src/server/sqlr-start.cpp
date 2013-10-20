@@ -187,56 +187,6 @@ bool startScaler(sqlrconfigfile *cfgfile, const char *id,
 	return success;
 }
 
-bool startCacheManager(const char *localstatedir) {
-
-	// create a ps command that will detect if the cachemanager is running
-	stringbuffer	command;
-	command.append(PS)->append(" | grep sqlr-cachemanager | grep -v grep");
-	
-	// run the command
-	FILE	*cmd=popen(command.getString(),"r");
-	command.clear();
-	
-	// get the result
-	// (Important to use a signed character here.  On arm platforms,
-	// and possibly others, char is unsigned by default, causing it to
-	// always be greater than -1.)
-	signed char	character;
-	stringbuffer	contents;
-	while (!feof(cmd) && (character=fgetc(cmd))>-1) {
-		contents.append(character);
-	}
-	pclose(cmd);
-	
-	// if the cachemanger isn't running, start it
-	if (!charstring::length(contents.getString())) {
-	
-		stdoutput.printf("\nStarting cache manager:\n");
-	
-		command.append("sqlr-cachemanager");
-		if (charstring::length(localstatedir)) {
-			command.append(" -cachedirs ")->append(localstatedir);
-			command.append("/sqlrelay/cache");
-			command.append(" -localstatedir ");
-			command.append(localstatedir);
-		}
-		stdoutput.printf("  %s\n",command.getString());
-
-		bool	success=!system(command.getString());
-
-		if (!success) {
-			stdoutput.printf("\nsqlr-cachemanager "
-						"failed to start.\n");
-			return false;
-		}
-	
-	} else {
-		stdoutput.printf("\ncache manager already running.\n");
-	}
-
-	return true;
-}
-
 int main(int argc, const char **argv) {
 
 	#include <version.h>
@@ -264,8 +214,7 @@ int main(int argc, const char **argv) {
 	bool	exitstatus=!(startListener(id,config,localstatedir) &&
 			startConnections(&cfgfile,strace,id,config,
 					localstatedir,overridemaxconn) &&
-			startScaler(&cfgfile,id,config,localstatedir) &&
-			startCacheManager(localstatedir));
+			startScaler(&cfgfile,id,config,localstatedir));
 
 	// many thanks...
 	// these companies don't exist any more so it's
