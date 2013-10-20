@@ -1,0 +1,287 @@
+#! /bin/sh
+#
+# sqlrcachemanager   This starts and stops the SQL Relay cache manager.
+#
+# chkconfig: 345 85 15
+# description: SQL Relay Cache Manager
+#
+### BEGIN INIT INFO
+# Provides:		sqlrcachemanager
+# Required-Start:	$local_fs $remote_fs $network $time
+# Required-Stop:	$local_fs $remote_fs $network $time
+# Should-Start:		$syslog
+# Should-Stop:		$syslog
+# Default-Start:	2 3 4 5
+# Default-Stop:		0 1 6
+# Short-Description:	SQL Relay Cache Manager
+### END INIT INFO
+#
+# PROVIDE: sqlrcachemanager
+# REQUIRE: NETWORKING
+
+
+# define default message functions
+success() {
+    printf success
+}
+failure() {
+    printf failure
+}
+passed() {
+    printf passed
+}
+
+
+# override them with fancier ones if available
+if ( test -r "/etc/init.d/functions" )
+then
+    . /etc/init.d/functions
+else
+    if ( test -r "/etc/rc.d/init.d/functions" )
+    then
+        . /etc/rc.d/init.d/functions
+    fi
+fi
+
+
+# for BSD-ish systems, bail if sqlrcachemanager isn't enabled in /etc/rc.conf
+BSD="no"
+PRINTACTION="yes"
+if ( test -r "/etc/rc.conf" )
+then
+
+    BSD="yes"
+
+    # load subroutines to process /etc/rc.conf
+    . /etc/rc.conf
+
+    UNAME=`uname`
+    if ( test "$UNAME" = "OpenBSD" )
+    then
+
+	PRINTACTION="no"
+
+        # on OpenBSD sqlrcachemanager_flags=NO disables
+        if ( test "${sqlrcachemanager_flags}" = "NO" -o \
+                    "${sqlrcachemanager_flags}" = "No" -o \
+                    "${sqlrcachemanager_flags}" = "no" )
+        then
+            exit 0
+        fi
+
+    elif ( test "$UNAME" = "FreeBSD" )
+    then
+
+        # on FreeBSD sqlrcachemanager_enable=YES enables
+        if ( test "${sqlrcachemanager_enable}" != "YES" -a \
+                    "${sqlrcachemanager_enable}" != "Yes" -a \
+                    "${sqlrcachemanager_enable}" != "yes" )
+        then
+            exit 0
+        fi
+
+    else
+
+        # on NetBSD and Minix (and others) sqlrcachemanager=YES enables
+        if ( test "${sqlrcachemanager}" != "YES" -a \
+                    "${sqlrcachemanager}" != "Yes" -a \
+                    "${sqlrcachemanager}" != "yes" )
+        then
+            exit 0
+        fi
+    fi
+fi
+
+
+# define paths
+prefix=@prefix@
+sysconfdir=@sysconfdir@
+localstatedir=@localstatedir@
+tmpdir=${localstatedir}/sqlrelay/tmp
+
+
+# define lock directory
+lockdir=/tmp
+if ( test -w "/var/lock/subsys" )
+then
+    lockdir=/var/lock/subsys
+elif ( test -w "/var/lock" )
+then
+    lockdir=/var/lock
+fi
+
+
+# Add appropriate bin/lib paths
+if ( test "${prefix}" != "/usr" )
+then
+    PATH=$PATH:${prefix}/bin
+    export PATH
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${prefix}/lib
+    export LD_LIBRARY_PATH
+fi
+
+
+# initialize return value
+RETVAL=0
+
+
+cleanup() {
+    for i in `ls ${tmpdir}/pids/* 2>/dev/null`
+    do
+        if ( test -r "$i" )
+        then
+            PID=`cat $i`
+            if ( test -z "`ps -p $PID 2> /dev/null | grep sqlr-`" )
+            then
+                echo "$PID is not sqlr! removing pidfile ..."
+                rm -f $i
+            fi
+        fi
+    done
+}
+
+start_sqlrcachemanager() {
+
+    # print Starting if necessary
+    if ( test "$BSD" = "yes" -a "$PRINTACTION" = "yes" )
+    then
+        printf "Starting"
+    fi
+
+    # on BSD, print:
+    # sqlrcachemanager
+    #
+    # on non-BSD, print:
+    # Starting sqlrcachemanager: success
+    if ( test "$BSD" = "yes" )
+    then
+        printf " sqlrcachemanager"
+    fi
+
+    sqlr-cachemanager 0<&- 1>&- 2>&-
+    RETVAL=$?
+    if ( test "$BSD" = "no" )
+    then
+        printf "Starting sqlrcachemanager: "
+        if ( test $RETVAL -eq 0 )
+        then
+            success
+        else
+            failure
+        fi
+        echo
+    fi
+
+    if ( test "$BSD" = "yes" -a "$PRINTACTION" = "yes" )
+    then
+        echo "."
+    fi
+
+    if ( test $RETVAL -eq 0 )
+    then
+        touch ${lockdir}/sqlrcachemanager
+    fi
+
+    cleanup
+
+    return $RETVAL
+}
+
+stop_sqlrcachemanager() {
+
+    # print Stopping if necessary
+    if ( test "$BSD" = "yes" -a "$PRINTACTION" = "yes" )
+    then
+        printf "Stopping"
+    fi
+
+    # on BSD, print:
+    # sqlrcachemanager
+    #
+    # on non-BSD, print:
+    # sqlrcachemanager: success
+    if ( test "$BSD" = "yes" )
+    then
+        printf " sqlrcachemanager"
+    fi
+
+    for i in `ls ${tmpdir}/pids/sqlr-cachemanager.* 2>/dev/null`
+    do
+        if ( test -r "$i" )
+        then
+            PID=`cat $i`
+            kill ${PID} 0<&- 1>&- 2>&-
+            RETVAL=$?
+            if ( test "$BSD" = "no" )
+            then
+                printf "Stopping sqlrcachemanager: "
+                if ( test $RETVAL -eq 0 )
+                then
+                    success
+                else
+                    failure
+                fi
+                echo
+            fi
+        fi
+    done
+
+    if ( test "$BSD" = "yes" -a "$PRINTACTION" = "yes" )
+    then
+        echo "."
+    fi
+
+    if ( test $RETVAL -eq 0 )
+    then
+        rm -f ${lockdir}/sqlrcachemanager
+    fi
+
+    cleanup
+
+    return $RETVAL
+}
+
+restart_sqlrcachemanager() {
+    stop_sqlrcachemanager
+    start_sqlrcachemanager
+}
+
+condrestart_sqlrcachemanager() {
+    if ( test -r "${lockdir}/sqlrcachemanager" )
+    then
+        restart_sqlrcachemanager
+    fi
+    return 0
+}
+
+
+# See how we were called.
+case "$1" in
+    start)
+        start_sqlrcachemanager
+        ;;
+    stop)
+        stop_sqlrcachemanager
+        ;;
+    restart)
+        restart_sqlrcachemanager
+        ;;
+    reload)
+        restart_sqlrcachemanager
+        ;;
+    condrestart)
+        condrestart_sqlrcachemanager
+        ;;
+    *)
+        if ( test -r "/etc/rc.subr" -o -r "/etc/rc.d/rc.subr" )
+        then
+            # on BSD systems assume start
+            start_sqlrcachemanager
+        else
+            # on others, print usage
+            echo "Usage: sqlrcachemanager {start|stop|restart|condrestart}"
+            RETVAL=1
+        fi
+esac
+
+exit $RETVAL
