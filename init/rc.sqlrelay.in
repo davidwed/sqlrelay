@@ -135,7 +135,7 @@ cleanup() {
         if ( test -r "$i" )
         then
             PID=`cat $i`
-            if ( test -z "`ps -p $PID | grep sqlr-`" )
+            if ( test -z "`ps -p $PID 2> /dev/null | grep sqlr-`" )
             then
                 echo "$PID is not sqlr! removing pidfile ..."
                 rm -f $i
