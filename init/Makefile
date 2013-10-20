@@ -44,6 +44,10 @@ install:
 		else \
 			$(INSTALL) -m 755 rc.sqlrelay $(initroot)/etc/rc.d/rc.sqlrelay; \
 		fi; \
+	elif ( test -d "/usr/pkg/etc/rc.d" ); \
+	then \
+		$(MKINSTALLDIRS) $(initroot)/usr/pkg/etc/rc.d; \
+		$(INSTALL) -m 755 rc.sqlrelay $(initroot)/usr/pkg/etc/rc.d/sqlrelay; \
 	fi
 	if ( test -d "/etc/sysconfig" ); \
 	then \
@@ -109,6 +113,8 @@ uninstall:
 	$(RM) $(initroot)/etc/rc.d/init.d/sqlrelay
 	$(RM) $(initroot)/etc/rc.d/rc.sqlrelay
 	$(RM) $(initroot)/etc/init.d/sqlrelay
+	$(RM) $(initroot)/rc.d/sqlrelay
+	$(RM) $(initroot)/usr/pkg/etc/rc.d/sqlrelay
 	$(RM) $(initroot)/usr/local/etc/rc.d/sqlrelay
 	if ( test -x "/usr/sbin/update-rc.d" ); \
 	then \
