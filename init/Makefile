@@ -115,13 +115,13 @@ uninstall:
 		/usr/sbin/update-rc.d sqlrelay remove; \
 	elif ( test ! -x "/sbin/chkconfig" ); \
 	then \
-		$(RM) /etc/rc0.d/K15sqlrelay; \
-		$(RM) /etc/rc1.d/K15sqlrelay; \
-		$(RM) /etc/rc2.d/K85sqlrelay; \
-		$(RM) /etc/rc3.d/K85sqlrelay; \
-		$(RM) /etc/rc4.d/K85sqlrelay; \
-		$(RM) /etc/rc5.d/K85sqlrelay; \
-		$(RM) /etc/rc6.d/K15sqlrelay; \
+		$(RM) /etc/rc0.d/*sqlrelay; \
+		$(RM) /etc/rc1.d/*sqlrelay; \
+		$(RM) /etc/rc2.d/*sqlrelay; \
+		$(RM) /etc/rc3.d/*sqlrelay; \
+		$(RM) /etc/rc4.d/*sqlrelay; \
+		$(RM) /etc/rc5.d/*sqlrelay; \
+		$(RM) /etc/rc6.d/*sqlrelay; \
 	fi
 	$(RM) $(initroot)/etc/sysconfig/sqlrelay
 	$(RM) $(initroot)/etc/sqlrelay
