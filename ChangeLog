@@ -6,6 +6,9 @@
 		:= would not be detected
 	dropped zope support (for now)
 	dropped PHP Pear DB support
+	refactored init script - one script should work on all platforms now
+	updated init script installation - should work on virtually all unixes
+	added OS X init configuration
 
 0.52 - sqlrsh has long reported the wrong version, fixed that
 	added csv support to sqlr-export and a -format xml|csv option
