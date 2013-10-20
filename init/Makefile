@@ -60,20 +60,59 @@ ifeq ($(initroot),)
 	elif ( test -x "/usr/sbin/update-rc.d" ); \
 	then \
 		/usr/sbin/update-rc.d sqlrelay defaults; \
+	elif ( test -x "/etc/init.d/sqlrelay" ); \
+	then \
+		if ( test -d "/etc/rc1.d" ); \
+		then \
+			cd /etc/rc1.d; \
+			ln -s ../init.d/sqlrelay K01sqlrelay; \
+		fi; \
+		if ( test -d "/etc/rc2.d" ); \
+		then \
+			cd /etc/rc2.d; \
+			ln -s ../init.d/sqlrelay S85sqlrelay; \
+		fi; \
+		if ( test -d "/etc/rc3.d" ); \
+		then \
+			cd /etc/rc3.d; \
+			ln -s ../init.d/sqlrelay S85sqlrelay; \
+		fi; \
+		if ( test -d "/etc/rc4.d" ); \
+		then \
+			cd /etc/rc4.d; \
+			ln -s ../init.d/sqlrelay S85sqlrelay; \
+		fi; \
+		if ( test -d "/etc/rc5.d" ); \
+		then \
+			cd /etc/rc5.d; \
+			ln -s ../init.d/sqlrelay S85sqlrelay; \
+		fi; \
+		if ( test -d "/etc/rc6.d" ); \
+		then \
+			cd /etc/rc6.d; \
+			ln -s ../init.d/sqlrelay K01sqlrelay; \
+		fi; \
 	fi
 endif
 
 uninstall:
-	if ( test -x "/sbin/chkconfig" -a -n "`/sbin/chkconfig --list sqlrelay 2> /dev/null`"); then \
-		/sbin/chkconfig --del sqlrelay; \
-	fi
 	$(RM) $(initroot)/etc/rc.d/init.d/sqlrelay
 	$(RM) $(initroot)/etc/rc.d/rc.sqlrelay
 	$(RM) $(initroot)/etc/init.d/sqlrelay
 	$(RM) $(initroot)/usr/local/etc/rc.d/sqlrelay
-	if ( test -x "/usr/sbin/update-rc.d" ); \
+	if ( test -x "/sbin/chkconfig" -a -n \
+		"`/sbin/chkconfig --list sqlrelay 2> /dev/null`"); then \
+		/sbin/chkconfig --del sqlrelay; \
+	elif ( test -x "/usr/sbin/update-rc.d" ); \
 	then \
 		/usr/sbin/update-rc.d sqlrelay remove; \
+	else \
+		$(RM) /etc/rc1.d/K01sqlrelay; \
+		$(RM) /etc/rc2.d/K85sqlrelay; \
+		$(RM) /etc/rc3.d/K85sqlrelay; \
+		$(RM) /etc/rc4.d/K85sqlrelay; \
+		$(RM) /etc/rc5.d/K85sqlrelay; \
+		$(RM) /etc/rc6.d/K01sqlrelay; \
 	fi
 	$(RM) $(initroot)/etc/sysconfig/sqlrelay
 	$(RM) $(initroot)/etc/sqlrelay
