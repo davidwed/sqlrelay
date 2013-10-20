@@ -5,6 +5,15 @@
 # chkconfig: 345 85 15
 # description: SQL Relay 
 #
+# Provides:		sqlrelay
+# Required-Start:	$local_fs $remote_fs $network $time
+# Required-Stop:	$local_fs $remote_fs $network $time
+# Should-Start:		$syslog
+# Should-Stop:		$syslog
+# Default-Start:	2 3 4 5
+# Default-Stop:		0 1 6
+# Short-Description:	SQL Relay
+#
 # PROVIDE: sqlrelay
 # REQUIRE: NETWORKING
 

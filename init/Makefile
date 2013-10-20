@@ -54,8 +54,12 @@ install:
 		$(INSTALL) -m 644 sqlrelay $(initroot)/etc/sqlrelay; \
 	fi
 ifeq ($(initroot),)
-	if ( test -x "/sbin/chkconfig" ); then \
+	if ( test -x "/sbin/chkconfig" ); \
+	then \
 		/sbin/chkconfig --add sqlrelay; \
+	elif ( test -x "/usr/sbin/update-rc.d" ); \
+	then \
+		/usr/sbin/update-rc.d sqlrelay defaults; \
 	fi
 endif
 
@@ -67,5 +71,9 @@ uninstall:
 	$(RM) $(initroot)/etc/rc.d/rc.sqlrelay
 	$(RM) $(initroot)/etc/init.d/sqlrelay
 	$(RM) $(initroot)/usr/local/etc/rc.d/sqlrelay
+	if ( test -x "/usr/sbin/update-rc.d" ); \
+	then \
+		/usr/sbin/update-rc.d sqlrelay remove; \
+	fi
 	$(RM) $(initroot)/etc/sysconfig/sqlrelay
 	$(RM) $(initroot)/etc/sqlrelay
