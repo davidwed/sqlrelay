@@ -1,0 +1,3 @@
+	if (!charstring::compare(module,"@module@")) {
+		tr=new_@module@(this,translation);
+	} else

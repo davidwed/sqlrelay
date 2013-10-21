@@ -1,0 +1,1 @@
+sqltrigger	*new_@module@(xmldomnode *parameters);

@@ -1,0 +1,1 @@
+sqlrquery	*new_@module@(xmldomnode *parameters);

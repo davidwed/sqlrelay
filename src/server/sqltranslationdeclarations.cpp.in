@@ -1,0 +1,1 @@
+sqltranslation	*new_@module@(sqltranslations *sqlts, xmldomnode *parameters);

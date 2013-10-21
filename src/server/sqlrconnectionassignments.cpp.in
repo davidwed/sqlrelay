@@ -1,0 +1,3 @@
+	if (!charstring::compare(connectionname.getString(),"@module@")) {
+		conn=new_@module@(this);
+	} else
