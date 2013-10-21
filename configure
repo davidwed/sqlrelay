@@ -736,7 +736,6 @@ PTHREADINCLUDES
 WALL
 WERROR
 PIPE
-PS
 TRANSLATIONPLUGINLIBS
 TRIGGERPLUGINLIBS
 PYTHONFRAMEWORK
@@ -15996,24 +15995,7 @@ $as_echo "no" >&6; }
 fi
 rm conftest
 
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ps aux works" >&5
-$as_echo_n "checking whether ps aux works... " >&6; }
-INVALID="`ps aux 2>&1 | grep illegal | grep -v grep`"
-DEPRECATED="`ps aux 2>&1 | grep deprecated | grep -v grep`"
-USAGE="`ps aux 2>&1 | grep -i usage | grep -v grep`"
-if ( test -n "$INVALID" -o -n "$DEPRECATED" -o -n "$USAGE" -o -n "$CYGWIN" )
-then
-	PS="ps\ \-efal"
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-else
-	PS="ps\ aux"
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-fi
-
-
+FW_CHECK_PS
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for -pipe option" >&5

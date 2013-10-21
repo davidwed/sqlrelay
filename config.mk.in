@@ -62,9 +62,6 @@ RMTREE = rm -rf
 # command to create a symbolic link
 SYMLINK = ln -s
 
-# ps command
-PSDEFINE = -DPS=\"@PS@\"
-
 # uname -s
 UNAME = @UNAME@
 

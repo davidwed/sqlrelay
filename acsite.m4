@@ -262,26 +262,6 @@ rm conftest
 ])
 
 
-dnl figures out whether to run  ps -efal or ps aux
-dnl sets the substitution variable PS
-AC_DEFUN([FW_CHECK_PS],
-[
-AC_MSG_CHECKING(whether ps aux works)
-INVALID="`ps aux 2>&1 | grep illegal | grep -v grep`"
-DEPRECATED="`ps aux 2>&1 | grep deprecated | grep -v grep`"
-USAGE="`ps aux 2>&1 | grep -i usage | grep -v grep`"
-if ( test -n "$INVALID" -o -n "$DEPRECATED" -o -n "$USAGE" -o -n "$CYGWIN" )
-then
-	PS="ps\ \-efal"
-	AC_MSG_RESULT(no)
-else
-	PS="ps\ aux"
-	AC_MSG_RESULT(yes)
-fi
-AC_SUBST(PS)
-])
-
-
 dnl sets the substitution variable UNAME with the uname of the machine
 AC_DEFUN([FW_CHECK_UNAME],
 [
