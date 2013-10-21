@@ -13,6 +13,12 @@
 
 #include <config.h>
 
+#ifndef SQLRELAY_ENABLE_SHARED
+	extern "C" {
+		#include "sqltranslationdeclarations.cpp"
+	}
+#endif
+
 sqltranslations::sqltranslations() {
 	debugFunction();
 	xmld=NULL;
@@ -95,6 +101,7 @@ void sqltranslations::loadTranslation(xmldomnode *translation) {
 
 	debugPrintf("loading translation: %s\n",module);
 
+#ifdef SQLRELAY_ENABLE_SHARED
 	// load the translation module
 	stringbuffer	modulename;
 	modulename.append(LIBEXECDIR);
@@ -127,6 +134,16 @@ void sqltranslations::loadTranslation(xmldomnode *translation) {
 		return;
 	}
 	sqltranslation	*tr=(*newTranslation)(this,translation);
+
+#else
+
+	dynamiclib	*dl=NULL;
+	sqltranslation	*tr;
+	#include "sqltranslationassignments.cpp"
+	{
+		tr=NULL;
+	}
+#endif
 
 	// add the plugin to the list
 	sqltranslationplugin	*sqltp=new sqltranslationplugin;

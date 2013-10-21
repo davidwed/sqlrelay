@@ -11,6 +11,12 @@
 
 #include <config.h>
 
+#ifndef SQLRELAY_ENABLE_SHARED
+	extern "C" {
+		#include "sqlrquerydeclarations.cpp"
+	}
+#endif
+
 sqlrqueries::sqlrqueries() {
 	debugFunction();
 	xmld=NULL;
@@ -89,6 +95,7 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 
 	debugPrintf("loading query: %s\n",module);
 
+#ifdef SQLRELAY_ENABLE_SHARED
 	// load the query module
 	stringbuffer	modulename;
 	modulename.append(LIBEXECDIR);
@@ -120,6 +127,16 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 		return;
 	}
 	sqlrquery	*qr=(*newQuery)(query);
+
+#else
+
+	dynamiclib	*dl=NULL;
+	sqlrquery	*qr;
+	#include "sqlrqueryassignments.cpp"
+	{
+		qr=NULL;
+	}
+#endif
 
 	// add the plugin to the list
 	sqlrqueryplugin	*sqlrlp=new sqlrqueryplugin;

@@ -11,6 +11,12 @@
 
 #include <config.h>
 
+#ifndef SQLRELAY_ENABLE_SHARED
+	extern "C" {
+		#include "sqlrpwdencdeclarations.cpp"
+	}
+#endif
+
 sqlrpwdencs::sqlrpwdencs() {
 	debugFunction();
 	xmld=NULL;
@@ -69,7 +75,6 @@ void sqlrpwdencs::unloadPasswordEncryptions() {
 }
 
 void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
-
 	debugFunction();
 
 	// ignore non-pssword encryptions
@@ -94,6 +99,7 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 
 	debugPrintf("loading password encryption: %s\n",module);
 
+#ifdef SQLRELAY_ENABLE_SHARED
 	// load the password encryption module
 	stringbuffer	modulename;
 	modulename.append(LIBEXECDIR);
@@ -127,6 +133,16 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 		return;
 	}
 	sqlrpwdenc	*pe=(*newPasswordEncryption)(pwdenc);
+
+#else
+
+	dynamiclib	*dl=NULL;
+	sqlrpwdenc	*pe;
+	#include "sqlrpwdencassignments.cpp"
+	{
+		pe=NULL;
+	}
+#endif
 
 	// add the plugin to the list
 	sqlrpwdencplugin	*sqlrlp=new sqlrpwdencplugin;

@@ -11,6 +11,12 @@
 
 #include <config.h>
 
+#ifndef SQLRELAY_ENABLE_SHARED
+	extern "C" {
+		#include "sqlrloggerdeclarations.cpp"
+	}
+#endif
+
 sqlrloggers::sqlrloggers() {
 	debugFunction();
 	xmld=NULL;
@@ -89,6 +95,7 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 
 	debugPrintf("loading logger: %s\n",module);
 
+#ifdef SQLRELAY_ENABLE_SHARED
 	// load the logger module
 	stringbuffer	modulename;
 	modulename.append(LIBEXECDIR);
@@ -120,6 +127,16 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 		return;
 	}
 	sqlrlogger	*lg=(*newLogger)(logger);
+
+#else
+
+	dynamiclib	*dl=NULL;
+	sqlrlogger	*lg;
+	#include "sqlrloggerassignments.cpp"
+	{
+		lg=NULL;
+	}
+#endif
 
 	// add the plugin to the list
 	sqlrloggerplugin	*sqlrlp=new sqlrloggerplugin;

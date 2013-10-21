@@ -13,6 +13,9 @@
 		and marking whether the db is up or down on exit
 	sqlr-start no longer starts the cache manager
 	added a second init script for the cache manager
+	plugins are statically linked into libsqlrserver if the platform
+		doesn't support shared libraries (or if --disable-shared is
+		specified at configure time)
 
 0.52 - sqlrsh has long reported the wrong version, fixed that
 	added csv support to sqlr-export and a -format xml|csv option

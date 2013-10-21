@@ -26,6 +26,12 @@
 #define NEED_CONVERT_DATE_TIME
 #include <parsedatetime.h>
 
+#ifndef SQLRELAY_ENABLE_SHARED
+	extern "C" {
+		#include "sqlrconnectiondeclarations.cpp"
+	}
+#endif
+
 sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 
 	conn=NULL;
@@ -419,6 +425,7 @@ void sqlrcontroller_svr::setUserAndGroup() {
 
 sqlrconnection_svr *sqlrcontroller_svr::initConnection(const char *dbase) {
 
+#ifdef SQLRELAY_ENABLE_SHARED
 	// load the connection module
 	stringbuffer	modulename;
 	modulename.append(LIBEXECDIR);
@@ -448,11 +455,24 @@ sqlrconnection_svr *sqlrcontroller_svr::initConnection(const char *dbase) {
 	}
 
 	sqlrconnection_svr	*conn=(*newConn)(this);
+
+#else
+	sqlrconnection_svr	*conn;
+	stringbuffer		connectionname;
+	connectionname.append(dbase)->append("connection");
+	#include "sqlrconnectionassignments.cpp"
+	{
+		conn=NULL;
+	}
+#endif
+
 	if (!conn) {
 		stderror.printf("failed to create connection: %s\n",dbase);
+#ifdef SQLRELAY_ENABLE_SHARED
 		char	*error=dl.getError();
 		stderror.printf("%s\n",error);
 		delete[] error;
+#endif
 	}
 	return conn;
 }

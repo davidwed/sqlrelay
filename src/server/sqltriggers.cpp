@@ -11,6 +11,12 @@
 
 #include <config.h>
 
+#ifndef SQLRELAY_ENABLE_SHARED
+	extern "C" {
+		#include "sqltriggerdeclarations.cpp"
+	}
+#endif
+
 sqltriggers::sqltriggers() {
 	debugFunction();
 	xmld=NULL;
@@ -109,6 +115,7 @@ void sqltriggers::loadTrigger(xmldomnode *trigger,
 
 	debugPrintf("loading trigger: %s\n",module);
 
+#ifdef SQLRELAY_ENABLE_SHARED
 	// load the trigger module
 	stringbuffer	modulename;
 	modulename.append(LIBEXECDIR);
@@ -140,6 +147,16 @@ void sqltriggers::loadTrigger(xmldomnode *trigger,
 		return;
 	}
 	sqltrigger	*tr=(*newTrigger)(trigger);
+
+#else
+
+	dynamiclib	*dl=NULL;
+	sqltrigger	*tr;
+	#include "sqltriggerassignments.cpp"
+	{
+		tr=NULL;
+	}
+#endif
 
 	// add the plugin to the list
 	sqltriggerplugin	*sqltp=new sqltriggerplugin;
