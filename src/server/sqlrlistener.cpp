@@ -112,7 +112,6 @@ sqlrlistener::~sqlrlistener() {
 					"%s/ipc/%s-%s",
 					tmpdir->getString(),
 					cmdl->getId(),connectionid);
-stdoutput.printf("\"%s\"\n",updown);
 		file::remove(updown);
 		delete[] updown;
 	}
