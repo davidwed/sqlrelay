@@ -39,50 +39,12 @@ endif
 	$(PERL) $(PERL_LIB)/ExtUtils/xsubpp -noprototypes -C++ -typemap $(PERL_LIB)/ExtUtils/typemap -typemap perlobject.map -typemap typemap $< > $<c && mv $<c $@
 
 .cpp.lo:
-	cp perlincludes1.h perlincludes.h; \
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ 2> errors1; \
-	if ( test ! -r Cursor.lo ); then \
-		cp perlincludes2.h perlincludes.h; \
-		$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ 2> errors2; \
-		if ( test ! -r Cursor.lo ); then \
-			cp perlincludes3.h perlincludes.h; \
-			$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ 2> errors3; \
-			if ( test ! -r Cursor.lo ); then \
-				cp perlincludes4.h perlincludes.h; \
-				$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ 2> errors4; \
-				if ( test ! -r Cursor.lo ); then \
-					if ( test -s errors1 ); then \
-						echo "first try errors : "; cat errors1; echo; \
-					fi; \
-					if ( test -s errors2 ); then \
-						echo "second try errors : "; cat errors2; echo; \
-					fi; \
-					if ( test -s errors3 ); then \
-						echo "third try errors : "; cat errors3; echo; \
-					fi; \
-					if ( test -s errors4 ); then \
-						echo "third try errors : "; cat errors4; echo; \
-					fi; \
-					exit 1; \
-				else \
-					cat errors4; \
-				fi; \
-			else \
-				cat errors3; \
-			fi; \
-		else \
-			cat errors2; \
-		fi; \
-	else \
-		cat errors1; \
-	fi; \
-	$(RM) errors1 errors2 errors3 errors4 perlincludes.h
-
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all: Cursor.la
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.cpp *.la *.lo* *.o *.so *.$(PERLMAN3EXT) errors* perlincludes.h
+	$(LIBTOOL) --mode=clean $(RM) *.cpp *.la *.lo* *.o *.so *.$(PERLMAN3EXT) errors*
 	$(RMTREE) .libs
 
 Cursor.la: Cursor.xs Cursor.cpp Cursor.lo

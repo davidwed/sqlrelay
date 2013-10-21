@@ -8,7 +8,15 @@
 	#include <sys/vnode.h>
 #endif
 
-#include "perlincludes.h"
+#include "../../c++/include/sqlrelay/sqlrclient.h"
+#include <EXTERN.h>
+extern "C" {
+	#include <perl.h>
+}
+#include <XSUB.h>
+#ifdef CLASS
+	#undef CLASS
+#endif
 
 #ifndef na
 	#define na PL_na
