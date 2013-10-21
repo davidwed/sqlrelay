@@ -175,7 +175,7 @@ sqlrconnectiondeclarations.cpp: sqlrconnectiondeclarations.cpp.in
 	$(RM) $@
 	for file in `ls ../connections/*/*connection.lo`; \
 	do \
-		module=`basename $$file .cpp`; \
+		module=`basename $$file .lo`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
@@ -183,7 +183,7 @@ sqlrconnectionassignments.cpp: sqlrconnectionassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../connections/*/*connection.lo`; \
 	do \
-		module=`basename $$file .cpp`; \
+		module=`basename $$file .lo`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
@@ -191,7 +191,7 @@ sqlrloggerdeclarations.cpp: sqlrloggerdeclarations.cpp.in
 	$(RM) $@
 	for file in `ls ../loggers/*.lo`; \
 	do \
-		module=`basename $$file .cpp`; \
+		module=`basename $$file .lo`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
@@ -199,7 +199,7 @@ sqlrloggerassignments.cpp: sqlrloggerassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../loggers/*.lo`; \
 	do \
-		module=`basename $$file .cpp`; \
+		module=`basename $$file .lo`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
@@ -207,7 +207,7 @@ sqlrpwdencdeclarations.cpp: sqlrpwdencdeclarations.cpp.in
 	$(RM) $@
 	for file in `ls ../pwdencs/*.lo`; \
 	do \
-		module=`basename $$file .cpp`; \
+		module=`basename $$file .lo`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
@@ -215,7 +215,7 @@ sqlrpwdencassignments.cpp: sqlrpwdencassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../pwdencs/*.lo`; \
 	do \
-		module=`basename $$file .cpp`; \
+		module=`basename $$file .lo`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
@@ -223,7 +223,7 @@ sqlrquerydeclarations.cpp: sqlrquerydeclarations.cpp.in
 	$(RM) $@
 	for file in `ls ../queries/*.lo`; \
 	do \
-		module=`basename $$file .cpp`; \
+		module=`basename $$file .lo`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
@@ -231,7 +231,7 @@ sqlrqueryassignments.cpp: sqlrqueryassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../queries/*.lo`; \
 	do \
-		module=`basename $$file .cpp`; \
+		module=`basename $$file .lo`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
@@ -239,7 +239,7 @@ sqltranslationdeclarations.cpp: sqltranslationdeclarations.cpp.in
 	$(RM) $@
 	for file in `ls ../translations/*.lo`; \
 	do \
-		module=`basename $$file .cpp`; \
+		module=`basename $$file .lo`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
@@ -247,7 +247,7 @@ sqltranslationassignments.cpp: sqltranslationassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../translations/*.lo`; \
 	do \
-		module=`basename $$file .cpp`; \
+		module=`basename $$file .lo`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
@@ -255,7 +255,7 @@ sqltriggerdeclarations.cpp: sqltriggerdeclarations.cpp.in
 	$(RM) $@
 	for file in `ls ../triggers/*.lo`; \
 	do \
-		module=`basename $$file .cpp`; \
+		module=`basename $$file .lo`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
@@ -263,7 +263,7 @@ sqltriggerassignments.cpp: sqltriggerassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../triggers/*.lo`; \
 	do \
-		module=`basename $$file .cpp`; \
+		module=`basename $$file .lo`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
