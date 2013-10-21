@@ -8,7 +8,15 @@
 	#include <sys/vnode.h>
 #endif
 
-#include "perlincludes.h"
+#include "../../c++/include/sqlrelay/sqlrclient.h"
+#include <EXTERN.h>
+extern "C" {
+	#include <perl.h>
+}
+#include <XSUB.h>
+#ifdef CLASS
+	#undef CLASS
+#endif
 
 /* xsubpp outputs __attribute__((noreturn)) this isn't
  * understood by gcc < 3.0. */
