@@ -10,6 +10,7 @@
 
 #include "../../c++/include/sqlrelay/sqlrclient.h"
 #include <EXTERN.h>
+#define explicit
 extern "C" {
 	#include <perl.h>
 }

@@ -8,6 +8,7 @@ uint64_t		T_UV
 int16_t			T_IV
 int32_t			T_IV
 int64_t			T_IV
+bool			T_IV
 
 INPUT
 T_IV
