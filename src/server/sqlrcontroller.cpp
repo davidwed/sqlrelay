@@ -395,12 +395,12 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 void sqlrcontroller_svr::setUserAndGroup() {
 
 	// get the user that we're currently running as
-	char	*currentuser=NULL;
-	passwdentry::getName(process::getEffectiveUserId(),&currentuser);
+	char	*currentuser=
+		passwdentry::getName(process::getEffectiveUserId());
 
 	// get the group that we're currently running as
-	char	*currentgroup=NULL;
-	groupentry::getName(process::getEffectiveGroupId(),&currentgroup);
+	char	*currentgroup=
+		groupentry::getName(process::getEffectiveGroupId());
 
 	// switch groups, but only if we're not currently running as the
 	// group that we should switch to

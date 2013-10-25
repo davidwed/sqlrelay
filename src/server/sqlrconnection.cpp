@@ -491,7 +491,7 @@ const char *sqlrconnection_svr::dbHostName() {
 				ipaddr++;
 			}
 		}
-		hostentry::getName(ip,4,AF_INET,&dbhostname);
+		dbhostname=hostentry::getName(ip,4,AF_INET);
 	}
 	dbhostiploop=0;
 	return dbhostname;
@@ -539,7 +539,7 @@ const char *sqlrconnection_svr::dbIpAddress() {
 		cont->deleteCursor(dbiacur);
 
 	} else {
-		hostentry::getAddressString(dbHostName(),&dbipaddress);
+		dbipaddress=hostentry::getAddressString(dbHostName());
 	}
 	dbhostiploop=0;
 	return dbipaddress;
