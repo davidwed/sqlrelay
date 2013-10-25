@@ -66,7 +66,7 @@ void sqlrloggers::unloadLoggers() {
 	for (linkedlistnode< sqlrloggerplugin * > *node=
 				llist.getFirstNode();
 					node; node=node->getNext()) {
-		sqlrloggerplugin	*sqlrlp=node->getData();
+		sqlrloggerplugin	*sqlrlp=node->getValue();
 		delete sqlrlp->lg;
 		delete sqlrlp->dl;
 		delete sqlrlp;
@@ -150,7 +150,7 @@ void sqlrloggers::initLoggers(sqlrlistener *sqlrl,
 	debugFunction();
 	for (linkedlistnode< sqlrloggerplugin * > *node=llist.getFirstNode();
 						node; node=node->getNext()) {
-		node->getData()->lg->init(sqlrl,sqlrcon);
+		node->getValue()->lg->init(sqlrl,sqlrcon);
 	}
 }
 
@@ -163,7 +163,7 @@ void sqlrloggers::runLoggers(sqlrlistener *sqlrl,
 	debugFunction();
 	for (linkedlistnode< sqlrloggerplugin * > *node=llist.getFirstNode();
 						node; node=node->getNext()) {
-		node->getData()->lg->run(sqlrl,sqlrcon,sqlrcur,
+		node->getValue()->lg->run(sqlrl,sqlrcon,sqlrcur,
 						level,event,info);
 	}
 }

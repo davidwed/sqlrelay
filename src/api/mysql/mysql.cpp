@@ -2478,7 +2478,7 @@ unsigned int mapErrorNumber(MYSQL *mysql, int64_t errorno) {
 	debugFunction();
 	unsigned int	retval=CR_UNKNOWN_ERROR;
 	if (mysql->errormap) {
-		mysql->errormap->getData(errorno,&retval);
+		mysql->errormap->getValue(errorno,&retval);
 	}
 	return retval;
 }
@@ -2523,7 +2523,7 @@ void loadErrorMap(MYSQL *mysql, const char *errormap) {
 			int64_t		nativecode=charstring::toInteger(line);
 			unsigned int	mysqlcode=
 				(unsigned int)charstring::toInteger(colon+1);
-			mysql->errormap->setData(nativecode,mysqlcode);
+			mysql->errormap->setValue(nativecode,mysqlcode);
 		}
 	}
 }

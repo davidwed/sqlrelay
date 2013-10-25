@@ -49,9 +49,8 @@ int main(int argc, const char **argv) {
 		host="localhost";
 		port=cfgfile.getPort();
 		socket=cfgfile.getUnixPort();
-		usercontainer	*currentnode=NULL;
-		// FIXME: this can return 0
-		cfgfile.getUserList()->getDataByIndex(0,&currentnode);
+		usercontainer	*currentnode=
+			cfgfile.getUserList()->getFirstNode()->getValue();
 		user=currentnode->getUser();
 		password=currentnode->getPassword();
 	}

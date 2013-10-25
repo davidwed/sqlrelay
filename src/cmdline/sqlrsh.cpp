@@ -102,8 +102,8 @@ void sqlrshenv::clearbinds(dictionary<char *, sqlrshbindvalue *> *binds) {
 					*node=binds->getList()->getFirstNode();
 		node; node=node->getNext()) {
 
-		delete[] node->getData()->getKey();
-		sqlrshbindvalue	*bv=node->getData()->getData();
+		delete[] node->getValue()->getKey();
+		sqlrshbindvalue	*bv=node->getValue()->getValue();
 		if (bv->type==STRING_BIND) {
 			delete[] bv->stringval;
 		}
@@ -788,8 +788,8 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 				*node=env->inputbinds.getList()->getFirstNode();
 				node; node=node->getNext()) {
 
-			const char	*name=node->getData()->getKey();
-			sqlrshbindvalue	*bv=node->getData()->getData();
+			const char	*name=node->getValue()->getKey();
+			sqlrshbindvalue	*bv=node->getValue()->getValue();
 			if (bv->type==STRING_BIND) {
 				sqlrcur->inputBind(name,bv->stringval);
 			} else if (bv->type==INTEGER_BIND) {
@@ -820,8 +820,8 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			*node=env->outputbinds.getList()->getFirstNode();
 			node; node=node->getNext()) {
 
-			const char	*name=node->getData()->getKey();
-			sqlrshbindvalue	*bv=node->getData()->getData();
+			const char	*name=node->getValue()->getKey();
+			sqlrshbindvalue	*bv=node->getValue()->getValue();
 			if (bv->type==STRING_BIND) {
 				// FIXME: make buffer length variable
 				sqlrcur->defineOutputBindString(name,
@@ -844,8 +844,8 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			*node=env->outputbinds.getList()->getFirstNode();
 			node; node=node->getNext()) {
 
-			const char	*name=node->getData()->getKey();
-			sqlrshbindvalue	*bv=node->getData()->getData();
+			const char	*name=node->getValue()->getKey();
+			sqlrshbindvalue	*bv=node->getValue()->getValue();
 			if (bv->type==STRING_BIND) {
 				delete[] bv->stringval;
 				bv->stringval=charstring::duplicate(
@@ -1182,7 +1182,7 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 
 	// if the bind variable is already defined, clear it...
 	sqlrshbindvalue	*bv=NULL;
-	if (env->inputbinds.getData(variable,&bv)) {
+	if (env->inputbinds.getValue(variable,&bv)) {
 		delete[] bv;
 	}
 
@@ -1244,7 +1244,7 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 	}
 
 	// put the bind variable in the list
-	env->inputbinds.setData(variable,bv);
+	env->inputbinds.setValue(variable,bv);
 }
 
 void sqlrsh::outputbind(sqlrcursor *sqlrcur,
@@ -1261,7 +1261,7 @@ void sqlrsh::outputbind(sqlrcursor *sqlrcur,
 
 		// if the bind variable is already defined, clear it...
 		sqlrshbindvalue	*bv=NULL;
-		if (env->outputbinds.getData(parts[1],&bv)) {
+		if (env->outputbinds.getValue(parts[1],&bv)) {
 			delete[] bv;
 		}
 
@@ -1307,7 +1307,7 @@ void sqlrsh::outputbind(sqlrcursor *sqlrcur,
 
 		// put the bind variable in the list
 		if (sane) {
-			env->outputbinds.setData(parts[1],bv);
+			env->outputbinds.setValue(parts[1],bv);
 		}
 
 	} else {
@@ -1336,8 +1336,8 @@ void sqlrsh::printbinds(const char *type,
 					*node=binds->getList()->getFirstNode();
 		node; node=node->getNext()) {
 
-		stdoutput.printf("    %s ",node->getData()->getKey());
-		sqlrshbindvalue	*bv=node->getData()->getData();
+		stdoutput.printf("    %s ",node->getValue()->getKey());
+		sqlrshbindvalue	*bv=node->getValue()->getValue();
 		if (bv->type==STRING_BIND) {
 			stdoutput.printf("(STRING) = %s\n",bv->stringval);
 		} else if (bv->type==INTEGER_BIND) {
@@ -1588,9 +1588,8 @@ void sqlrsh::execute(int argc, const char **argv) {
 		host="localhost";
 		port=cfgfile.getPort();
 		socket=cfgfile.getUnixPort();
-		// FIXME: this can return 0
-		usercontainer	*currentnode=NULL;
-		cfgfile.getUserList()->getDataByIndex(0,&currentnode);
+		usercontainer	*currentnode=
+			cfgfile.getUserList()->getFirstNode()->getValue();
 		user=currentnode->getUser();
 		password=currentnode->getPassword();
 	}

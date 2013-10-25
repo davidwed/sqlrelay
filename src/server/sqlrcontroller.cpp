@@ -1428,13 +1428,7 @@ int32_t sqlrcontroller_svr::waitForClient() {
 		}
 
 		// get the first socket that had data available...
-		filedescriptor	*fd=NULL;
-		if (!getReadyList()->getDataByIndex(0,&fd)) {
-			logInternalError(NULL,"client connect "
-						"ready list was empty");
-			// FIXME: I think this should return 0
-			return -1;
-		}
+		filedescriptor	*fd=getReadyList()->getFirstNode()->getValue();
 
 		inetsocketserver	*iss=NULL;
 		for (uint64_t index=0; index<serversockincount; index++) {
@@ -3541,7 +3535,7 @@ void sqlrcontroller_svr::translateBindVariablesFromMappings(
 
 			// remap it
 			char	*newvariable;
-			if (mappings->getData(b->variable,&newvariable)) {
+			if (mappings->getValue(b->variable,&newvariable)) {
 				b->variable=newvariable;
 			}
 		}
@@ -3941,7 +3935,7 @@ void sqlrcontroller_svr::translateBindVariableInArray(sqlrcursor_svr *cursor,
 				b->variablesize=tempnumberlen+1;
 
 				// create bind variable mappings
-				mappings->setData(oldvariable,b->variable);
+				mappings->setValue(oldvariable,b->variable);
 				
 				// clean up
 				delete[] tempnumber;
@@ -5554,8 +5548,8 @@ void sqlrcontroller_svr::dropTempTables(sqlrcursor_svr *cursor) {
 	// run through the temp table list, dropping tables
 	for (stringlistnode *sln=sessiontemptablesfordrop.getFirstNode();
 				sln; sln=(stringlistnode *)sln->getNext()) {
-		dropTempTable(cursor,sln->getData());
-		delete[] sln->getData();
+		dropTempTable(cursor,sln->getValue());
+		delete[] sln->getValue();
 	}
 	sessiontemptablesfordrop.clear();
 }
@@ -5605,8 +5599,8 @@ void sqlrcontroller_svr::truncateTempTables(sqlrcursor_svr *cursor) {
 	// run through the temp table list, truncating tables
 	for (stringlistnode *sln=sessiontemptablesfortrunc.getFirstNode();
 				sln; sln=(stringlistnode *)sln->getNext()) {
-		truncateTempTable(cursor,sln->getData());
-		delete[] sln->getData();
+		truncateTempTable(cursor,sln->getValue());
+		delete[] sln->getValue();
 	}
 	sessiontemptablesfortrunc.clear();
 }
@@ -6403,7 +6397,7 @@ void sqlrcontroller_svr::sessionStartQueries() {
 	for (stringlistnode *node=
 		cfgfl->getSessionStartQueries()->getFirstNode();
 						node; node=node->getNext()) {
-		sessionQuery(node->getData());
+		sessionQuery(node->getValue());
 	}
 }
 
@@ -6412,7 +6406,7 @@ void sqlrcontroller_svr::sessionEndQueries() {
 	for (stringlistnode *node=
 		cfgfl->getSessionEndQueries()->getFirstNode();
 						node; node=node->getNext()) {
-		sessionQuery(node->getData());
+		sessionQuery(node->getValue());
 	}
 }
 

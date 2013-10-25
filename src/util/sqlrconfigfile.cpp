@@ -120,25 +120,25 @@ sqlrconfigfile::~sqlrconfigfile() {
 
 	for (usernode *un=userlist.getFirstNode();
 				un; un=un->getNext()) {
-		delete un->getData();
+		delete un->getValue();
 	}
 
 	for (connectstringnode *csn=connectstringlist.getFirstNode();
 						csn; csn=csn->getNext()) {
-		delete csn->getData();
+		delete csn->getValue();
 	}
 
 	for (routenode *rn=routelist.getFirstNode(); rn; rn=rn->getNext()) {
-		delete rn->getData();
+		delete rn->getValue();
 	}
 
 	for (stringlistnode *ssln=sessionstartqueries.getFirstNode();
 						ssln; ssln=ssln->getNext()) {
-		delete[] ssln->getData();
+		delete[] ssln->getValue();
 	}
 	for (stringlistnode *seln=sessionendqueries.getFirstNode();
 						seln; seln=seln->getNext()) {
-		delete[] seln->getData();
+		delete[] seln->getValue();
 	}
 }
 
@@ -423,8 +423,8 @@ connectstringcontainer *sqlrconfigfile::getConnectString(
 	for (connectstringnode *csn=connectstringlist.getFirstNode();
 						csn; csn=csn->getNext()) {
 		if (!charstring::compare(connectionid,
-					csn->getData()->getConnectionId())) {
-			return csn->getData();
+					csn->getValue()->getConnectionId())) {
+			return csn->getValue();
 		}
 	}
 	return NULL;
@@ -443,7 +443,7 @@ uint32_t sqlrconfigfile::getMetricTotal() {
 		for (connectstringnode *csn=
 				connectstringlist.getFirstNode();
 						csn; csn=csn->getNext()) {
-			metrictotal=metrictotal+csn->getData()->getMetric();
+			metrictotal=metrictotal+csn->getValue()->getMetric();
 		}
 	}
 	return metrictotal;
@@ -1506,7 +1506,7 @@ routecontainer *sqlrconfigfile::routeAlreadyExists(routecontainer *cur) {
 
 	for (routenode *rn=routelist.getFirstNode(); rn; rn=rn->getNext()) {
 
-		routecontainer	*rc=rn->getData();
+		routecontainer	*rc=rn->getValue();
 		if (!charstring::compare(rc->getHost(),
 					cur->getHost()) &&
 			rc->getPort()==cur->getPort() &&
@@ -1528,7 +1528,7 @@ void sqlrconfigfile::moveRegexList(routecontainer *cur,
 	for (linkedlistnode< regularexpression * > *re=
 				cur->getRegexList()->getFirstNode();
 						re; re=re->getNext()) {
-		existing->getRegexList()->append(re->getData());
+		existing->getRegexList()->append(re->getValue());
 	}
 	cur->getRegexList()->clear();
 }
@@ -1691,7 +1691,7 @@ routecontainer::~routecontainer() {
 	for (linkedlistnode< regularexpression * > *re=
 					regexlist.getFirstNode();
 						re; re=re->getNext()) {
-		delete re->getData();
+		delete re->getValue();
 	}
 }
 

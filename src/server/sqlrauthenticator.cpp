@@ -24,11 +24,11 @@ sqlrauthenticator::sqlrauthenticator(sqlrconfigfile *cfgfile,
 	usernode	*current=userlist->getFirstNode();
 	for (uint32_t i=0; i<usercount; i++) {
 		users[i]=charstring::duplicate(
-				current->getData()->getUser());
+				current->getValue()->getUser());
 		passwords[i]=charstring::duplicate(
-				current->getData()->getPassword());
+				current->getValue()->getPassword());
 		passwordencryptions[i]=charstring::duplicate(
-				current->getData()->getPasswordEncryption());
+				current->getValue()->getPasswordEncryption());
 		current=current->getNext();
 	}
 

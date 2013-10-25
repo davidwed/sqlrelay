@@ -101,7 +101,7 @@ void temptablessybaseize::mapCreateTemporaryTableName(
 						sqlts->temptablepool,
 						database,schema,oldtable,NULL);
 	const char	*newtable=generateTempTableName(oldtable);
-	sqlts->temptablemap.setData(oldtabledbo,(char *)newtable);
+	sqlts->temptablemap.setValue(oldtabledbo,(char *)newtable);
 
 	// remove the global qualifier, if it was found
 	if (globalnode) {
@@ -177,7 +177,7 @@ void temptablessybaseize::mapSelectIntoTableName(sqlrconnection_svr *sqlrcon,
 						sqlts->temptablepool,
 						database,schema,oldtable,NULL);
 	const char	*newtable=generateTempTableName(oldtable);
-	sqlts->temptablemap.setData(oldtabledbo,(char *)newtable);
+	sqlts->temptablemap.setValue(oldtabledbo,(char *)newtable);
 
 	// remove the temporary qualifier
 	if (!temporarynode->isNullNode()) {

@@ -66,7 +66,7 @@ void sqlrpwdencs::unloadPasswordEncryptions() {
 	for (linkedlistnode< sqlrpwdencplugin * > *node=
 				llist.getFirstNode();
 					node; node=node->getNext()) {
-		sqlrpwdencplugin	*sqlrlp=node->getData();
+		sqlrpwdencplugin	*sqlrlp=node->getValue();
 		delete sqlrlp->pe;
 		delete sqlrlp->dl;
 		delete sqlrlp;
@@ -154,7 +154,7 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 sqlrpwdenc *sqlrpwdencs::getPasswordEncryptionById(const char *id) {
 	for (linkedlistnode< sqlrpwdencplugin * > *node=llist.getFirstNode();
 						node; node=node->getNext()) {
-		sqlrpwdenc	*pe=node->getData()->pe;
+		sqlrpwdenc	*pe=node->getValue()->pe;
 		if (!charstring::compare(pe->getId(),id)) {
 			return pe;
 		}

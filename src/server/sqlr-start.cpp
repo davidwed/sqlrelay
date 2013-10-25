@@ -115,7 +115,7 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 	while (!done) {
 
 		// get the appropriate connection
-		csc=csn->getData();
+		csc=csn->getValue();
 	
 		// scale the number of each connection to start by 
 		// each connection's metric vs the total number of 

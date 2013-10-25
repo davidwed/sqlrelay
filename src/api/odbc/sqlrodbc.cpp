@@ -327,7 +327,7 @@ SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementhandle,
 	field->bufferlength=bufferlength;
 	field->strlen_or_ind=strlen_or_ind;
 
-	stmt->fieldlist.setData(columnnumber-1,field);
+	stmt->fieldlist.setValue(columnnumber-1,field);
 
 	return SQL_SUCCESS;
 }
@@ -390,7 +390,7 @@ static void SQLR_ResetParams(STMT *stmt) {
 	for (linkedlistnode<dictionarynode<int32_t, char * > *>
 					*node=ibslist->getFirstNode();
 					node; node=node->getNext()) {
-		delete[] node->getData();
+		delete[] node->getValue();
 	}
 	ibslist->clear();
 
@@ -400,7 +400,7 @@ static void SQLR_ResetParams(STMT *stmt) {
 	for (linkedlistnode<dictionarynode<int32_t, outputbind * > *>
 					*node=oblist->getFirstNode();
 					node; node=node->getNext()) {
-		delete node->getData();
+		delete node->getValue();
 	}
 	oblist->clear();
 }
@@ -1747,9 +1747,9 @@ static SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
 							node->getNext()) {
 
 				if (completiontype==SQL_COMMIT) {
-					node->getData()->con->commit();
+					node->getValue()->con->commit();
 				} else if (completiontype==SQL_ROLLBACK) {
-					node->getData()->con->rollback();
+					node->getValue()->con->rollback();
 				}
 			}
 
@@ -2008,7 +2008,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 					*node=list->getFirstNode();
 					node; node=node->getNext()) {
 
-		outputbind	*ob=node->getData()->getData();
+		outputbind	*ob=node->getValue()->getValue();
 
 		// convert parameternumber to a string
 		char	*parametername=charstring::parseNumber(
@@ -2403,7 +2403,7 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 
 		// get the bound field, if this field isn't bound, move on
 		FIELD	*field=NULL;
-		if (!stmt->fieldlist.getData(index,&field)) {
+		if (!stmt->fieldlist.getValue(index,&field)) {
 			continue;
 		}
 
@@ -2484,7 +2484,7 @@ static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 				debugPrintf("NULL conn handle\n");
 				return SQL_INVALID_HANDLE;
 			}
-			conn->env->connlist.removeAllByData(conn);
+			conn->env->connlist.removeAllByValue(conn);
 			conn->stmtlist.clear();
 			delete conn->con;
 			delete[] conn->error;
@@ -2499,7 +2499,7 @@ static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 				debugPrintf("NULL stmt handle\n");
 				return SQL_INVALID_HANDLE;
 			}
-			stmt->conn->stmtlist.removeAllByData(stmt);
+			stmt->conn->stmtlist.removeAllByValue(stmt);
 			delete stmt->improwdesc;
 			delete stmt->impparamdesc;
 			delete stmt->cur;
@@ -5040,11 +5040,11 @@ static const char *SQLR_BuildNumeric(STMT *stmt,
 
 	// hang on to that string
 	char	*data=NULL;
-	if (stmt->inputbindstrings.getData(parameternumber,&data)) {
-		stmt->inputbindstrings.removeData(parameternumber);
+	if (stmt->inputbindstrings.getValue(parameternumber,&data)) {
+		stmt->inputbindstrings.removeValue(parameternumber);
 		delete[] data;
 	}
-	stmt->inputbindstrings.setData(parameternumber,string);
+	stmt->inputbindstrings.setValue(parameternumber,string);
 
 	// return the string
 	return string;
@@ -5106,11 +5106,11 @@ static const char *SQLR_BuildInterval(STMT *stmt,
 
 	// hang on to that string
 	char	*data=NULL;
-	if (stmt->inputbindstrings.getData(parameternumber,&data)) {
-		stmt->inputbindstrings.removeData(parameternumber);
+	if (stmt->inputbindstrings.getValue(parameternumber,&data)) {
+		stmt->inputbindstrings.removeValue(parameternumber);
 		delete[] data;
 	}
-	stmt->inputbindstrings.setData(parameternumber,string);
+	stmt->inputbindstrings.setValue(parameternumber,string);
 
 	// return the string
 	return string;
@@ -5169,11 +5169,11 @@ static const char *SQLR_BuildGuid(STMT *stmt,
 
 	// hang on to that string
 	char	*data=NULL;
-	if (stmt->inputbindstrings.getData(parameternumber,&data)) {
-		stmt->inputbindstrings.removeData(parameternumber);
+	if (stmt->inputbindstrings.getValue(parameternumber,&data)) {
+		stmt->inputbindstrings.removeValue(parameternumber);
 		delete[] data;
 	}
-	stmt->inputbindstrings.setData(parameternumber,string);
+	stmt->inputbindstrings.setValue(parameternumber,string);
 
 	// return the string
 	return string;
@@ -5395,7 +5395,7 @@ static SQLRETURN SQLR_OutputBindParameter(SQLHSTMT statementhandle,
 	ob->parametervalue=parametervalue;
 	ob->bufferlength=bufferlength;
 	ob->strlen_or_ind=strlen_or_ind;
-	stmt->outputbinds.setData(parameternumber,ob);
+	stmt->outputbinds.setValue(parameternumber,ob);
 
 	switch (valuetype) {
 		case SQL_C_CHAR:

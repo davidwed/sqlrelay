@@ -290,7 +290,7 @@ void routerconnection::handleConnectString() {
 		beginquery[index]=NULL;
 
 		routecontainer	*rn=routelist->
-					getNodeByIndex(index)->getData();
+					getNodeByIndex(index)->getValue();
 
 		// empty host/port/socket/user/password means that queries
 		// going to this connection will be filtered out
@@ -638,11 +638,11 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	bool	found=false;
 	while (rcn && !found) {
 		linkedlistnode< regularexpression * >	*ren=
-					rcn->getData()->getRegexList()->
+					rcn->getValue()->getRegexList()->
 							getFirstNode();
 
 		while (ren && !found) {
-			if (ren->getData()->match(nquery)) {
+			if (ren->getValue()->match(nquery)) {
 				con=routerconn->cons[conindex];
 				routerconn->cur=con;
 				cur=curs[conindex];

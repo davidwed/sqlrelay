@@ -73,7 +73,7 @@ void sqltranslations::unloadTranslations() {
 	for (linkedlistnode< sqltranslationplugin * > *node=
 						tlist.getFirstNode();
 						node; node=node->getNext()) {
-		sqltranslationplugin	*sqlt=node->getData();
+		sqltranslationplugin	*sqlt=node->getValue();
 		delete sqlt->tr;
 		delete sqlt->dl;
 		delete sqlt;
@@ -165,7 +165,7 @@ bool sqltranslations::runTranslations(sqlrconnection_svr *sqlrcon,
 	for (linkedlistnode< sqltranslationplugin * > *node=
 						tlist.getFirstNode();
 						node; node=node->getNext()) {
-		if (!node->getData()->tr->run(sqlrcon,sqlrcur,querytree)) {
+		if (!node->getValue()->tr->run(sqlrcon,sqlrcur,querytree)) {
 			return false;
 		}
 	}
@@ -276,11 +276,11 @@ bool	sqltranslations::getReplacementName(
 					*node=dict->getList()->getFirstNode();
 						node; node=node->getNext()) {
 
-		databaseobject	*dbo=node->getData()->getKey();
+		databaseobject	*dbo=node->getValue()->getKey();
 		if (!charstring::compare(dbo->database,database) &&
 			!charstring::compare(dbo->schema,schema) &&
 			!charstring::compare(dbo->object,oldname)) {
-			*newname=node->getData()->getData();
+			*newname=node->getValue()->getValue();
 			return true;
 		}
 	}
@@ -353,10 +353,10 @@ bool sqltranslations::removeReplacementTable(const char *database,
 				*node=tempindexmap.getList()->getFirstNode();
 					node;) {
 
-		databaseobject	*dbo=node->getData()->getKey();
+		databaseobject	*dbo=node->getValue()->getKey();
 
 		// make sure to move on to the next node here rather than
-		// after calling removeData, otherwise it could cause a
+		// after calling removeValue, otherwise it could cause a
 		// reference-after-free condition
 		node=node->getNext();
 
@@ -364,7 +364,7 @@ bool sqltranslations::removeReplacementTable(const char *database,
 			!charstring::compare(dbo->schema,schema) &&
 			!charstring::compare(dbo->dependency,table)) {
 
-			tempindexmap.removeData(dbo);
+			tempindexmap.removeValue(dbo);
 		}
 	}
 	return true;
@@ -386,13 +386,13 @@ bool sqltranslations::removeReplacement(
 				*node=dict->getList()->getFirstNode();
 					node; node=node->getNext()) {
 
-		databaseobject	*dbo=node->getData()->getKey();
-		const char	*replacementname=node->getData()->getData();
+		databaseobject	*dbo=node->getValue()->getKey();
+		const char	*replacementname=node->getValue()->getValue();
 		if (!charstring::compare(dbo->database,database) &&
 			!charstring::compare(dbo->schema,schema) &&
 			!charstring::compare(replacementname,name)) {
 
-			dict->removeData(dbo);
+			dict->removeValue(dbo);
 			return true;
 		}
 	}

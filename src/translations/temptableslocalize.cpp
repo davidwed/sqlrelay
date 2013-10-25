@@ -119,7 +119,7 @@ void temptableslocalize::mapCreateTemporaryTableName(
 						sqlts->temptablepool,
 						database,schema,oldtable,NULL);
 	const char	*newtable=generateTempTableName(oldtable,uniqueid);
-	sqlts->temptablemap.setData(oldtabledbo,(char *)newtable);
+	sqlts->temptablemap.setValue(oldtabledbo,(char *)newtable);
 
 	// remove the global qualifier, if it was found
 	if (globalnode) {
@@ -205,7 +205,7 @@ void temptableslocalize::mapCreateIndexOnTemporaryTableName(xmldomnode *node,
 						oldindex,
 						newtable);
 	const char	*newindex=generateTempTableName(oldindex,uniqueid);
-	sqlts->tempindexmap.setData(oldindexdbo,(char *)newindex);
+	sqlts->tempindexmap.setValue(oldindexdbo,(char *)newindex);
 }
 
 void temptableslocalize::mapSelectIntoTableName(sqlrconnection_svr *sqlrcon,
@@ -262,7 +262,7 @@ void temptableslocalize::mapSelectIntoTableName(sqlrconnection_svr *sqlrcon,
 						sqlts->temptablepool,
 						database,schema,oldtable,NULL);
 	const char	*newtable=generateTempTableName(oldtable,uniqueid);
-	sqlts->temptablemap.setData(oldtabledbo,(char *)newtable);
+	sqlts->temptablemap.setValue(oldtabledbo,(char *)newtable);
 
 	// remove the temporary qualifier
 	if (!temporarynode->isNullNode()) {
