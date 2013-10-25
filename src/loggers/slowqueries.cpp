@@ -111,12 +111,16 @@ bool slowqueries::run(sqlrlistener *sqlrl,
 	}
 
 	// reinit the log if the file was switched
-	ino_t	inode1=querylog.getInode();
-	ino_t	inode2;
-	if (!file::getInode(querylogname,&inode2) || inode1!=inode2) {
-		querylog.flushWriteBuffer(-1,-1);
-		querylog.close();
-		init(sqlrl,sqlrcon);
+	file	querylog2;
+	if (querylog2.open(querylogname,O_RDONLY)) {
+		ino_t	inode1=querylog.getInode();
+		ino_t	inode2=querylog2.getInode();
+		querylog2.close();
+		if (inode1!=inode2) {
+			querylog.flushWriteBuffer(-1,-1);
+			querylog.close();
+			init(sqlrl,sqlrcon);
+		}
 	}
 
 	uint64_t	querysec=sqlrcur->queryendsec-sqlrcur->querystartsec;

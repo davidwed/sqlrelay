@@ -108,10 +108,14 @@ bool custom_nw::run(sqlrlistener *sqlrl,
 	}
 
 	// reinit the log if the file was switched
-	ino_t	inode1=querylog.getInode();
-	ino_t	inode2;
-	if (!file::getInode(querylogname,&inode2) || inode1!=inode2) {
-		init(sqlrl,sqlrcon);
+	file	querylog2;
+	if (querylog2.open(querylogname,O_RDONLY)) {
+		ino_t	inode1=querylog.getInode();
+		ino_t	inode2=querylog.getInode();
+		querylog2.close();
+		if (inode1!=inode2) {
+			init(sqlrl,sqlrcon);
+		}
 	}
 
 	// get error, if there was one
