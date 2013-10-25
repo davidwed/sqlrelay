@@ -539,7 +539,7 @@ const char *sqlrconnection_svr::dbIpAddress() {
 		cont->deleteCursor(dbiacur);
 
 	} else {
-		hostentry::getAddressString(dbHostName(),0,&dbipaddress);
+		hostentry::getAddressString(dbHostName(),&dbipaddress);
 	}
 	dbhostiploop=0;
 	return dbipaddress;
