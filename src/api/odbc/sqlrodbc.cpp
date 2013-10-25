@@ -1742,9 +1742,8 @@ static SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
 			}
 
 			for (linkedlistnode<CONN *>	*node=
-				env->connlist.getFirstNode(); node;
-				node=(linkedlistnode<CONN *> *)
-							node->getNext()) {
+					env->connlist.getFirstNode();
+						node; node=node->getNext()) {
 
 				if (completiontype==SQL_COMMIT) {
 					node->getValue()->con->commit();
