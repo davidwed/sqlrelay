@@ -140,16 +140,17 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 				getFieldLength(sqlrstmt->currentrow,colno);
 			return 1;
 		case PDO_PARAM_LOB:
-			// lobs can be usually be returned a strings...
+			// lobs can be usually be returned as strings...
 			*ptr=(char *)sqlrcur->
 				getField(sqlrstmt->currentrow,colno);
 			*len=sqlrcur->
 				getFieldLength(sqlrstmt->currentrow,colno);
-			// ...unless they're NULL...
+			// NULLs can be returned as NULLs
 			if (!*ptr) {
 				return 1;
 			}
-			// ...and empty strings must be passed as empty streams
+			// ...but empty strings must be returned
+			// as empty streams
 			if (!*len) {
 				*ptr=(char *)php_stream_memory_create(
 							TEMP_STREAM_DEFAULT);
@@ -333,43 +334,59 @@ static int sqlrcursorGetAttribute(pdo_stmt_t *stmt,
 
 static int sqlrcursorColumnMetadata(pdo_stmt_t *stmt,
 					long colno,
-					zval *return_value TSRMLS_DC) {
+					zval *returnvalue TSRMLS_DC) {
 
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=(sqlrcursor *)sqlrstmt->sqlrcur;
 
-	array_init(return_value);
-	add_assoc_string(return_value,"native_type",
-				(char *)sqlrcur->getColumnType(colno),0);
+	array_init(returnvalue);
 
+	// native type
+	const char	*type=sqlrcur->getColumnType(colno);
+	add_assoc_string(returnvalue,"native_type",(char *)type,1);
+
+
+	// pdo type
+	int32_t		pdotype=PDO_PARAM_STR;
+	if (isBitTypeChar(type) || isNumberTypeChar(type)) {
+		pdotype=PDO_PARAM_INT;
+	} else if (isBlobTypeChar(type)) {
+		pdotype=PDO_PARAM_LOB;
+	} else if (isBoolTypeChar(type)) {
+		pdotype=PDO_PARAM_BOOL;
+	}
+	add_assoc_long(returnvalue,"pdo_type",pdotype);
+
+
+	// flags
 	zval	*flags=NULL;
 	MAKE_STD_ZVAL(flags);
 	array_init(flags);
 	if (sqlrcur->getColumnIsNullable(colno)) {
-		add_next_index_string(return_value,"nullable",0);
+		add_next_index_string(flags,"nullable",1);
 	}
 	if (sqlrcur->getColumnIsPrimaryKey(colno)) {
-		add_next_index_string(return_value,"primary_key",0);
+		add_next_index_string(flags,"primary_key",1);
 	}
 	if (sqlrcur->getColumnIsUnique(colno)) {
-		add_next_index_string(return_value,"unique",0);
+		add_next_index_string(flags,"unique",1);
 	}
 	if (sqlrcur->getColumnIsPartOfKey(colno)) {
-		add_next_index_string(return_value,"part_of_key",0);
+		add_next_index_string(flags,"part_of_key",1);
 	}
 	if (sqlrcur->getColumnIsUnsigned(colno)) {
-		add_next_index_string(return_value,"unsigned",0);
+		add_next_index_string(flags,"unsigned",1);
 	}
 	if (sqlrcur->getColumnIsZeroFilled(colno)) {
-		add_next_index_string(return_value,"zero_filled",0);
+		add_next_index_string(flags,"zero_filled",1);
 	}
 	if (sqlrcur->getColumnIsBinary(colno)) {
-		add_next_index_string(return_value,"binary",0);
+		add_next_index_string(flags,"binary",1);
 	}
 	if (sqlrcur->getColumnIsAutoIncrement(colno)) {
-		add_next_index_string(return_value,"auto_increment",0);
+		add_next_index_string(flags,"auto_increment",1);
 	}
-	add_assoc_zval(return_value,"flags",flags);
+	add_assoc_zval(returnvalue,"flags",flags);
 	return 1;
 }
 
