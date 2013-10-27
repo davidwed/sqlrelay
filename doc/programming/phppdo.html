@@ -40,33 +40,35 @@ use.</p>
 
 <blockquote>
 <pre>
+dl("pdo_sqlrelay.so");
+
+$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
 </pre>
 </blockquote>
 
-<p>In this connect string, the following components have the following
-meanings:</p>
+<p>The following connect string variables control attributes of the connection:</p>
 
-<blockquote>
-<table>
-<tr><td align="right" valign="top"><b>testuser</b></td>
-<td>- the username to use to connect to the
-SQL Relay server, corresponds to the username in an entry in the "users"
-tag of the sqlrelay.conf file</td></tr>
-<tr><td align="right" valign="top"><b>testpassword</b></td>
-<td>- the password to use to connect to
-the SQL Relay server, corresponds to the password in an entry in the "users"
-tag of the sqlrelay.conf file</td></tr>
-<tr><td align="right" valign="top"><b>testhost</b></td>
-<td>- the hostname that the SQL Relay
-server is running on</td></tr>
-<tr><td align="right" valign="top"><b>9000</b></td>
-<td>- the port that the SQL Relay server is
-listening on</td></tr>
-</table>
-</blockquote>
+<ul>
+<li><b>host</b> - The SQL Relay server to connect to.</li>
+<li><b>port</b> - The port that the SQL Relay server is listening on.  Either port or socket must be specified.  If both are specified, socket will be preferred to port.</li>
+<li><b>socket</b> - The socket that the SQL Relay server is listening on.  Either port or socket must be specified.  If both are specified, socket will be preferred to port.</li>
+<li><b>tries</b> - If a connection fails, it will be retried this many times.</li>
+<li><b>retrytime</b> - If a connection fails, it will be retried on this interval (in seconds).</li>
+<li><b>debug</b> - If this is set to true then debug is enabled.</li>
+</ul>
+
+<p>The other two parameters following the connect string are.</p>
+
+<ul>
+<li><b>user</b> - The username to use when logging into SQL Relay.</li>
+<li><b>password</b> - The password to use when logging into SQL Relay.</li>
+</ul>
 
 <p>After calling the constructor, a session is established when the first 
-query() or exec() is run.</p>
+query is run.</p>
 
 <p>For the duration of the session, the client occupies one of the database
 connection daemons, so care should be taken to minimize the length of a
@@ -85,6 +87,16 @@ best used with DML or DDL queries.</p>
 
 <blockquote>
 <pre>
+dl("pdo_sqlrelay.so");
+
+$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+if (!$dbh->exec("insert into testtable values (1,'hello')")) {
+	die("exec failed");
+}
 </pre>
 </blockquote>
 
@@ -94,15 +106,14 @@ return result sets.</p>
 
 <blockquote>
 <pre>
-</pre>
-</blockquote>
+dl("pdo_sqlrelay.so");
 
-<p>Call query() to run a query and return a statement object which can be used
-to set parameters, execute the query and fetch the result set.  This is best
-used with selects or other queries that return result sets.</p>
+$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
 
-<blockquote>
-<pre>
+$stmt=$dbh->query("select * from testtable"));
 </pre>
 </blockquote>
 
@@ -122,12 +133,36 @@ have no commit or rollback functions, the calls do nothing and the database
 throws no error.  This is especially important when using SQL Relay with
 ODBC.</p>
 
-<p>You can also turn Autocommit on or off using the steAttribute() method.</p>
+<blockquote>
+<pre>
+dl("pdo_sqlrelay.so");
+
+$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$dbh->beginTransaction();
+
+... run some queries that we want to keep the results of ...
+
+$dbh->commit();
+
+$dbh->beginTransaction();
+
+... run some queries that we don't want to keep the results of ...
+
+$dbh->rollBack();
+</pre>
+</blockquote>
+
+<p>You can also turn Autocommit on or off using the setAttribute() method.</p>
 
 <p>The following command turns Autocommit on.</p>
 
 <blockquote>
 <pre>
+$dbh->setAttribute(PDO::ATTR_AUTOCOMMIT,TRUE);
 </pre>
 </blockquote>
 
@@ -135,6 +170,7 @@ ODBC.</p>
 
 <blockquote>
 <pre>
+$dbh->setAttribute(PDO::ATTR_AUTOCOMMIT,FALSE);
 </pre>
 </blockquote>
 
@@ -181,10 +217,26 @@ options for error handling too that can be set using setAttribute().</p>
 </ul>
 
 <p>After determining that an error has occurred you can find out why by
-calling errorCode() or errorInfo().</p>
+calling errorCode() or errorInfo() on the database handle or statement
+objects.</p>
 
 <blockquote>
 <pre>
+dl("pdo_sqlrelay.so");
+
+$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+if (!$dbh->exec("insert into testtable values (1,1.1,'hello')")) {
+	die($dbh->errorCode().":".$dbh->errorInfo());
+}
+
+$stmt=$dbh->prepare("bad query");
+if ($stmt->execute()) {
+	die($stmt->errorCode().":".$stmt->errorInfo());
+}
 </pre>
 </blockquote>
 
@@ -192,26 +244,87 @@ calling errorCode() or errorInfo().</p>
 <span class="heading2">Bind Variables</span><br><br>
 
 <p>Programs rarely execute fixed queries.  More often than not, some part
-of the query is dynamically generated.  The PDO API provides several means for
-using bind variables in those queries.</p>
+of the query is dynamically generated.  The PDO API provides means for
+using bind variables (also known as parameters) in those queries.</p>
 
 <p>For a detailed discussion of substitutions and binds, see
 <a href="binds.html">this document</a>.
 
-<p>Here is an example where an associative array is used to bind a set of values
-to a set of variables.  The values in the array are the values that will be
-substituted in place of the bind variables.  The keys in the array may refer to
-either the name or (1-based) position of the bind variable.  The query must be
-run by calling prepare() and execute().  The array is passed as the parameter of
-the call to execute().</p>
+<p>PDO provides several means for using bind variables but in all cases, you
+must bind variable/value pairs to the statement.  Here is an example of using
+the bindValue() method.</p>
 
 <blockquote>
 <pre>
+dl("pdo_sqlrelay.so");
+
+$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->prepare("insert into testtable values (:var1,:var2,:var3,:var4)");
+$stmt->bindValue(":var",1,PDO::PARAM_INT);
+$stmt->bindValue(":var","1.1",PDO::PARAM_STR);
+$stmt->bindValue(":var","hello",PDO::PARAM_STR);
+$stmt->bindValue(":var","hello",PDO::PARAM_LOB);
+$stmt->execute();
 </pre>
 </blockquote>
 
-<p>Oddly, PDO doesn't support passing floating point number in as bind
-variables.  You have to pass them as strings.</p>
+<p>PDO supports binding integer, string and LOB values.  Oddly, it doesn't
+support binding floating point values.  You have to pass them as strings.
+Also, CLOB's have to be passed as LOB's.</p>
+
+<p>PDO also provides a bindParam() method and allows you to pass an associative
+array into the execute() method.  See the official PDO documentation for info
+on those methods.</p>
+
+<p>Output bind variables can be used too.  Just or the PDO::PARAM_INPUT_OUTPUT
+flag with the variable type.</p>
+
+<blockquote>
+<pre>
+dl("pdo_sqlrelay.so");
+
+$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->prepare("begin  :numvar:=1; :stringvar:='hello'; end;");
+$param1=0;
+$param2="";
+$stmt->bindParam(":numvar",$param1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
+$stmt->bindParam(":stringvar",$param2,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
+$stmt->execute();
+echo($param1.",".$param2);
+</pre>
+</blockquote>
+
+<p>BLOB's output binds can be used as well.  PDO returns BLOB values as
+streams, so you have to use stream functions to access them.</p>
+
+<blockquote>
+<pre>
+dl("pdo_sqlrelay.so");
+
+$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->prepare("select blob_col into :blobvar from testtable");
+$blobvar="";
+$stmt->bindParam(":blobvar",$blobvar,PDO::PARAM_LOB|PDO::PARAM_INPUT_OUTPUT);
+$stmt->execute();
+echo(stream_get_contents($blobvar));
+</pre>
+</blockquote>
+
+<p>PDO allows you to bind by name and by position.  So, you can pass either
+a variable name or a number as the first parameter of bindParam().  When
+binding by position, the first bind parameter is number 1, not 0.</p>
 
 <a name="rebinding"></a>
 <span class="heading2">Re-Binding and Re-Execution</span><br><br>
@@ -223,30 +336,88 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 
 <blockquote>
 <pre>
+dl("pdo_sqlrelay.so");
+
+$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->prepare("insert into testtable values (:var1,:var2,:var3)");
+$stmt->bindValue(":var",1,PDO::PARAM_INT);
+$stmt->bindValue(":var","1.1",PDO::PARAM_STR);
+$stmt->bindValue(":var","hello",PDO::PARAM_STR);
+$stmt->execute();
+
+$stmt->bindValue(":var",2,PDO::PARAM_INT);
+$stmt->bindValue(":var","2.2",PDO::PARAM_STR);
+$stmt->bindValue(":var","bye",PDO::PARAM_STR);
+$stmt->execute();
+
+... re-bind and re-execute again and again ...
 </pre>
 </blockquote>
 
 <a name="fields"></a>
 <span class="heading2">Accessing Fields in the Result Set</span><br><br>
 
-<p>The fetch() method is useful for processing result sets.  Both can be used to
-return ordered arrays, associative arrays, both ordered and associative arrays,
-objects or fetch data into preallocatd varaibles (by using bindParam()
-first).</p>
+<p>To fetch a row from a statement that has been executed, call the fetch()
+method.  When called with no parameters, fetch() returns an array of fields
+with both numeric and associative entries.  When called with the PDO::FETCH_NUM
+flag, it returns an array with only numeric entries.  When called with the
+PDO::FETCH_ASSOC flag, it returns an array with only associative entries.</p>
+
+<p>LOB values are returned as streams, just like output bind parameters.</p>
 
 <p>Here is an example using fetch() to return both ordered and associative
 arrays (the default).</p>
 
 <blockquote>
 <pre>
+dl("pdo_sqlrelay.so");
+
+$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->query("select int_col, float_col, string_col, blob_col from testtable");
+$result=$stmt->fetch();
+echo($result[0].",".$result[1].",".$result[2].",".stream_get_contents($result[3])."\n");
+echo($result["int_col"].",".$result["float_col"].",".$result["string_col"].",".stream_get_contents("blob_col")."\n");
 </pre>
 </blockquote>
 
-<p>Here is an example using bindParam() and fetch() to populate prellocated
-variables.</p>
+<p>The bindColumn() method and PDO::FETCH_BOUND flag can be used to fetch
+values into preallocated variables.</p>
 
 <blockquote>
 <pre>
+dl("pdo_sqlrelay.so");
+
+$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->prepare("select int_col, float_col, string_col, blob_col from testtable");
+
+$col1=0;
+$col2="";
+$col3="";
+$col4="";
+$stmt->bindColumn(1,$col1);
+$stmt->bindColumn(2,$col2);
+$stmt->bindColumn(3,$col3);
+$stmt->bindColumn(4,$col4);
+
+$stmt->execute();
+
+$result=$stmt->fetch(PDO::FETCH_BOUND);
+echo($col1.",".$col2.",".$col3.",".stream_get_contents($col4)."\n");
+
+$result=$stmt->fetch(PDO::FETCH_BOUND);
+echo($col1.",".$col2.",".$col3.",".stream_get_contents($col4)."\n");
 </pre>
 </blockquote>
 
@@ -255,6 +426,22 @@ an entire result set in one step.</p>
 
 <blockquote>
 <pre>
+dl("pdo_sqlrelay.so");
+
+$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->prepare("select int_col, float_col, string_col, blob_col from testtable");
+$stmt->execute();
+
+$result=$stmt->fetchAll();
+
+echo($result[0][0].",".$result[0][1].",".$result[0][2].",".stream_get_contents($result[0][3])."\n");
+echo($result[1][0].",".$result[1][1].",".$result[1][2].",".stream_get_contents($result[1][3])."\n");
+echo($result[2][0].",".$result[2][1].",".$result[2][2].",".stream_get_contents($result[2][3])."\n");
+... and so on ...
 </pre>
 </blockquote>
 
@@ -263,6 +450,22 @@ set too.</p>
 
 <blockquote>
 <pre>
+dl("pdo_sqlrelay.so");
+
+$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->prepare("select int_col, float_col, string_col, blob_col from testtable");
+$stmt->execute();
+
+$result=$stmt->fetchColumn(0);
+
+echo($result[0]."\n");
+echo($result[1]."\n");
+echo($result[2]."\n");
+... and so on ...
 </pre>
 </blockquote>
 
@@ -278,6 +481,26 @@ iterate through its result set, inserting rows into another table, using only
 
 <blockquote>
 <pre>
+dl("pdo_sqlrelay.so");
+
+$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt1=$dbh->prepare("select * from table1");
+$stmt2=$dbh->prepare("insert into table2 values (:col1, :col2, :col3)");
+
+$stmt1->execute();
+
+while ($result=$stmt1->fetch()) {
+
+	$stmt2->bindValue(":col1",$result[0],PDO::PARAM_INT);
+	$stmt2->bindValue(":col2",$result[1],PDO::PARAM_STR);
+	$stmt2->bindValue(":col3",$result[2],PDO::PARAM_STR);
+
+	$stmt2->execute();
+}
 </pre>
 </blockquote>
 
@@ -285,11 +508,26 @@ iterate through its result set, inserting rows into another table, using only
 <span class="heading2">Getting Column Information</span><br><br>
 
 <p>After executing a query, the column count may be retrieved using
-columnCount().  Column data, including column name, type and length are
-available in the associative array returned from getColumnMeta().</p>
+columnCount().  An associative array of column data, including column name,
+type, length and various flags are available from getColumnMeta().</p>
 
 <blockquote>
 <pre>
+dl("pdo_sqlrelay.so");
+
+$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+if (!$dbh) {
+	die("connection failed");
+}
+
+$stmt=$dbh->query("select * from testtable"));
+
+for ($i=0; $i<$stmt->columnCount(); $i++) {
+
+	$meta=$stmt->getColumnMeta($i);
+
+	... do something with $meta ...
+}
 </pre>
 </blockquote>
 
