@@ -710,10 +710,10 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery(&quot;<font color="#ff00ff">select testfunc(:in1,:in2,:in3)</font>&quot;)
-cur.inputBind(&quot;<font color="#ff00ff">in1</font>&quot;,1)
-cur.inputBind(&quot;<font color="#ff00ff">in2</font>&quot;,1.1,2,1)
-cur.inputBind(&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
+cur.prepareQuery(&quot;<font color="#ff00ff">select testfunc($1,$2,$3)</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">2</font>&quot;,1.1,2,1)
+cur.inputBind(&quot;<font color="#ff00ff">3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
 cur.executeQuery()
 </pre>
 </blockquote>
@@ -1007,10 +1007,10 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery(&quot;<font color="#ff00ff">select * from testfunc(:in1,:in2,:in3)</font>&quot;)
-cur.inputBind(&quot;<font color="#ff00ff">in1</font>&quot;,1)
-cur.inputBind(&quot;<font color="#ff00ff">in2</font>&quot;,1.1,4,2)
-cur.inputBind(&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
+cur.prepareQuery(&quot;<font color="#ff00ff">select * from testfunc($1,$2,$3)</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">2</font>&quot;,1.1,4,2)
+cur.inputBind(&quot;<font color="#ff00ff">3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
 cur.executeQuery()
 result=cur.getField(0,0)
 </pre>
@@ -1348,10 +1348,10 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery(&quot;<font color="#ff00ff">select * from testfunc(:in1,:in2,:in3) as (col1 int, col2 float, col3 char(20))</font>&quot;)
-cur.inputBind(&quot;<font color="#ff00ff">in1</font>&quot;,1)
-cur.inputBind(&quot;<font color="#ff00ff">in2</font>&quot;,1.1,4,2)
-cur.inputBind(&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
+cur.prepareQuery(&quot;<font color="#ff00ff">select * from testfunc($1,$2,$3) as (col1 int, col2 float, col3 char(20))</font>&quot;)
+cur.inputBind(&quot;<font color="#ff00ff">1</font>&quot;,1)
+cur.inputBind(&quot;<font color="#ff00ff">2</font>&quot;,1.1,4,2)
+cur.inputBind(&quot;<font color="#ff00ff">3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;)
 cur.executeQuery()
 out1=cur.getField(0,0)
 out2=cur.getField(0,1)

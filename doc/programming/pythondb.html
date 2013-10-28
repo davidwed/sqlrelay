@@ -445,7 +445,7 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.execute('<font color="#ff00ff">select testfunc(:in1,:in2,:in3)</font>',{'<font color="#ff00ff">in1</font>':1,'<font color="#ff00ff">in2</font>':1.1,'<font color="#ff00ff">in3</font>':'<font color="#ff00ff">hello</font>'})
+cur.execute('<font color="#ff00ff">select testfunc($1,$2,$3)</font>',{'<font color="#ff00ff">1</font>':1,'<font color="#ff00ff">2</font>':1.1,'<font color="#ff00ff">3</font>':'<font color="#ff00ff">hello</font>'})
 </pre>
 </blockquote>
 
@@ -599,7 +599,7 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.execute('<font color="#ff00ff">select * from testfunc(:in1,:in2,:in3)</font>',{'<font color="#ff00ff">in1</font>':1,'<font color="#ff00ff">in2</font>':1.1,'<font color="#ff00ff">in3</font>':'<font color="#ff00ff">hello</font>'})
+cur.execute('<font color="#ff00ff">select * from testfunc($1,$2,$3)</font>',{'<font color="#ff00ff">1</font>':1,'<font color="#ff00ff">2</font>':1.1,'<font color="#ff00ff">3</font>':'<font color="#ff00ff">hello</font>'})
 result=cur.fetchone()[0]
 </pre>
 </blockquote>
@@ -792,7 +792,7 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.execute('<font color="#ff00ff">select * from testfunc(:in1,:in2,:in3) as (col1 int, col2 float, col3 char(20))</font>',{'<font color="#ff00ff">in1</font>':1,'<font color="#ff00ff">in2</font>':1.1,'<font color="#ff00ff">in3</font>':'<font color="#ff00ff">hello</font>'})
+cur.execute('<font color="#ff00ff">select * from testfunc($1,$2,$3) as (col1 int, col2 float, col3 char(20))</font>',{'<font color="#ff00ff">1</font>':1,'<font color="#ff00ff">2</font>':1.1,'<font color="#ff00ff">3</font>':'<font color="#ff00ff">hello</font>'})
 out1=cur.fetchone()[0]
 out2=cur.fetchone()[1]
 out3=cur.fetchone()[2]

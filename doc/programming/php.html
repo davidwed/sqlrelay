@@ -940,10 +940,10 @@ following.</p>
 
 <blockquote>
 <pre>
-sqlrcur_prepareQuery<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">select testfunc(:in1,:in2,:in3)</font>&quot;<font color="#6b59ce">)</font>;
-sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">in1</font>&quot;,<font color="#ff00ff">1</font><font color="#6b59ce">)</font>;
-sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">in2</font>&quot;,<font color="#ff00ff">1</font><font color="#ff00ff">.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font><font color="#6b59ce">)</font>;
-sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;<font color="#6b59ce">)</font>;
+sqlrcur_prepareQuery<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">select testfunc($1,$2,$3)</font>&quot;<font color="#6b59ce">)</font>;
+sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">1</font>&quot;,<font color="#ff00ff">1</font><font color="#6b59ce">)</font>;
+sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">2</font>&quot;,<font color="#ff00ff">1</font><font color="#ff00ff">.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font><font color="#6b59ce">)</font>;
+sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;<font color="#6b59ce">)</font>;
 sqlrcur_executeQuery<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font><font color="#6b59ce">)</font>;
 </pre>
 </blockquote>
@@ -1238,10 +1238,10 @@ following.</p>
 
 <blockquote>
 <pre>
-sqlrcur_prepareQuery<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">select * from testfunc(:in1,:in2,:in3)</font>&quot;<font color="#6b59ce">)</font>;
-sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">in1</font>&quot;,<font color="#ff00ff">1</font><font color="#6b59ce">)</font>;
-sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">in2</font>&quot;,<font color="#ff00ff">1</font><font color="#ff00ff">.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font><font color="#6b59ce">)</font>;
-sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;<font color="#6b59ce">)</font>;
+sqlrcur_prepareQuery<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">select * from testfunc($1,$2,$3)</font>&quot;<font color="#6b59ce">)</font>;
+sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">1</font>&quot;,<font color="#ff00ff">1</font><font color="#6b59ce">)</font>;
+sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">2</font>&quot;,<font color="#ff00ff">1</font><font color="#ff00ff">.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font><font color="#6b59ce">)</font>;
+sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;<font color="#6b59ce">)</font>;
 sqlrcur_executeQuery<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font><font color="#6b59ce">)</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">result</font><font color="#a52829"><b>=</b></font>sqlrcur_getField<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">0</font><font color="#6b59ce">)</font>;
 </pre>
@@ -1578,10 +1578,10 @@ following.</p>
 
 <blockquote>
 <pre>
-sqlrcur_prepareQuery<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">select * from testfunc(:in1,:in2,:in3) as (col1 int, col2 float, col3 char(20))</font>&quot;<font color="#6b59ce">)</font>;
-sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">in1</font>&quot;,<font color="#ff00ff">1</font><font color="#6b59ce">)</font>;
-sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">in2</font>&quot;,<font color="#ff00ff">1</font><font color="#ff00ff">.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font><font color="#6b59ce">)</font>;
-sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">in3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;<font color="#6b59ce">)</font>;
+sqlrcur_prepareQuery<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">select * from testfunc($1,$2,$3) as (col1 int, col2 float, col3 char(20))</font>&quot;<font color="#6b59ce">)</font>;
+sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">1</font>&quot;,<font color="#ff00ff">1</font><font color="#6b59ce">)</font>;
+sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">2</font>&quot;,<font color="#ff00ff">1</font><font color="#ff00ff">.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font><font color="#6b59ce">)</font>;
+sqlrcur_inputBind<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,&quot;<font color="#ff00ff">3</font>&quot;,&quot;<font color="#ff00ff">hello</font>&quot;<font color="#6b59ce">)</font>;
 sqlrcur_executeQuery<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font><font color="#6b59ce">)</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">out1</font><font color="#a52829"><b>=</b></font>sqlrcur_getField<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">0</font><font color="#6b59ce">)</font>;
 <font color="#a52829"><b>$</b></font><font color="#008a8c">out2</font><font color="#a52829"><b>=</b></font>sqlrcur_getField<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><font color="#008a8c">cur</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font><font color="#6b59ce">)</font>;

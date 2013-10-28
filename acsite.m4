@@ -2575,7 +2575,6 @@ then
 		if ( test -n "$PYTHONPATH" )
 		then
 		
-			dnl for i in "3.9" "3.8" "3.7" "3.6" "3.5" "3.4" "3.2" "3.1" "3.0" "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
 			for i in "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
 			do
 				if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/lib64/python$i/config" )
@@ -2599,7 +2598,6 @@ then
 
 		else
 		
-			dnl for j in "3.9" "3.8" "3.7" "3.6" "3.5" "3.4" "3.2" "3.1" "3.0" "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
 			for j in "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
 			do
 				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j" "/opt/csw/include/python$j" "/sw/include/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/include/python$j"

@@ -1036,10 +1036,10 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("select testfunc(:in1,:in2,:in3)");
-cur.inputBind("in1", 1);
-cur.inputBind("in2", 1.1, 2, 1);
-cur.inputBind("in3", "hello");
+cur.prepareQuery("select testfunc($1,$2,$3)");
+cur.inputBind("$1", 1);
+cur.inputBind("$2", 1.1, 2, 1);
+cur.inputBind("$3", "hello");
 cur.executeQuery();
 </pre>
 </blockquote>
@@ -1333,10 +1333,10 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("select * from testfunc(:in1,:in2,:in3)");
-cur.inputBind("in1", 1);
-cur.inputBind("in2", 1.1, 4, 2);
-cur.inputBind("in3", "hello");
+cur.prepareQuery("select * from testfunc($1,$2,$3)");
+cur.inputBind("1", 1);
+cur.inputBind("2", 1.1, 4, 2);
+cur.inputBind("3", "hello");
 cur.executeQuery();
 String result=cur.getField(0,0);
 </pre>
@@ -1670,10 +1670,10 @@ following.</p>
 
 <blockquote>
 <pre>
-cur.prepareQuery("select * from testfunc(:in1,:in2,:in3) as (col1 int, col2 float, col3 char(20))");
-cur.inputBind("in1", 1);
-cur.inputBind("in2", 1.1, 4, 2);
-cur.inputBind("in3", "hello");
+cur.prepareQuery("select * from testfunc($1,$2,$3) as (col1 int, col2 float, col3 char(20))");
+cur.inputBind("1", 1);
+cur.inputBind("2", 1.1, 4, 2);
+cur.inputBind("3", "hello");
 cur.executeQuery();
 String out1=cur.getField(0, 0);
 String out2=cur.getField(0, 1);

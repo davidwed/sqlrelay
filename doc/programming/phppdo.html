@@ -584,6 +584,11 @@ following.</p>
 
 <blockquote>
 <pre>
+$stmt=$dbh->prepare("begin testproc(:in1,:in2,:in3); end;");
+$stmt->bindValue(":in1",1);
+$stmt->bindValue(":in2","1.1");
+$stmt->bindValue(":in3","hello");
+$result=$stmt->execute();
 </pre>
 </blockquote>
 
@@ -612,6 +617,11 @@ following.</p>
 
 <blockquote>
 <pre>
+$stmt=$dbh->prepare("exec testproc");
+$stmt->bindValue("@in1",1);
+$stmt->bindValue("@in2","1.1");
+$stmt->bindValue("@in3","hello");
+$result=$stmt->execute();
 </pre>
 </blockquote>
 
@@ -642,6 +652,12 @@ following.</p>
 
 <blockquote>
 <pre>
+$stmt=$dbh->prepare("execute procedure testproc ?, ?, ?");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$result=$stmt->execute();
+</pre>
 </pre>
 </blockquote>
 
@@ -671,6 +687,11 @@ following.</p>
 
 <blockquote>
 <pre>
+$stmt=$dbh->prepare("call testproc(?,?,?)");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$result=$stmt->execute();
 </pre>
 </blockquote>
 
@@ -701,6 +722,11 @@ following.</p>
 
 <blockquote>
 <pre>
+$stmt=$dbh->prepare("call testfunc($1,$2,$3)");
+$stmt->bindValue("$1",1);
+$stmt->bindValue("$2","1.1");
+$stmt->bindValue("$3","hello");
+$result=$stmt->execute();
 </pre>
 </blockquote>
 
@@ -730,6 +756,11 @@ following.</p>
 
 <blockquote>
 <pre>
+$stmt=$dbh->prepare("call testproc(?,?,?)");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$result=$stmt->execute();
 </pre>
 </blockquote>
 
@@ -754,6 +785,12 @@ each database that SQL Relay supports.</p>
 
 <span class="heading4">Oracle</span><br>
 
+<p>In Oracle, stored procedures can return values through output parameters or
+as return values of the procedure itself.</p>
+
+<p>Here is an example where the procedure itself returns a value.  Note that
+Oracle calls these functions.</p>
+
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
@@ -770,6 +807,11 @@ following.</p>
 
 <blockquote>
 <pre>
+$stmt=$dbh->prepare("select testproc(:in1,:in2,:in3) from dual");
+$stmt->bindValue(":in1",1);
+$stmt->bindValue(":in2","1.1");
+$stmt->bindValue(":in3","hello");
+$result=$stmt->execute();
 </pre>
 </blockquote>
 
@@ -781,12 +823,80 @@ following.</p>
 </pre>
 </blockquote>
 
+<p>Here is an example where the value is returned through an output
+parameter.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>, out1 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>number</b></font>) <font color="#6b59ce">as</font>
+<font color="#6b59ce">begin</font>
+        out1:=in1;
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("select testproc(:in1,:in2,:in3,:out1) from dual");
+$stmt->bindValue(":in1",1);
+$stmt->bindValue(":in2","1.1");
+$stmt->bindValue(":in3","hello");
+$out1=0;
+$stmt->bindParam(":out1",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
 <span class="heading4">Sybase and Microsoft SQL Server</span><br>
 
 <p>In Sybase and Microsoft SQL Server, stored procedures return values
 through output parameters rather than as return values of the procedure
-itself.  However, the SQL Relay PHP Pear DB driver does not currently support
-output parameters.</p>
+itself.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc @in1 int, @in2 <font color="#298a52"><b>float</b></font>, @in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), @out1 int output <font color="#6b59ce">as</font>
+        <font color="#a52829"><b>select</b></font> @out1=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in1)
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("exec testproc");
+$stmt->bindValue("@in1",1);
+$stmt->bindValue("@in2","1.1");
+$stmt->bindValue("@in3","hello");
+$out1=0;
+$stmt->bindParam("@out1",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
 
 
 <span class="heading4">Firebird</span><br>
@@ -808,6 +918,30 @@ following.</p>
 
 <blockquote>
 <pre>
+$stmt=$dbh->prepare("select * from testproc(?,?,?)");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>Alternatively, you can run a query like the following and receive the result
+using an output bind variable.  Note that in Firebird, input and
+output bind variable indices are distict from one another.  The index of the
+output bind variable is 1 rather than 4, even though there were 3 input bind
+variables.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("execute procedure testproc ?, ?, ?");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$out1=0;
+$stmt->bindParam("1",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
+$result=$stmt->execute();
+</pre>
 </pre>
 </blockquote>
 
@@ -823,8 +957,41 @@ following.</p>
 <span class="heading4">DB2</span><br>
 
 <p>In DB2, stored procedures return values through output parameters rather
-than as return values of the procedure itself.  However, the SQL Relay PHP
-Pear DB driver does not currently support output parameters.</p>
+than as return values of the procedure itself.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(<font color="#a52829"><b>in</b></font> in1 int, <font color="#a52829"><b>in</b></font> in2 double, <font color="#a52829"><b>in</b></font> in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), <font color="#a52829"><b>out</b></font> out1 int) language sql
+<font color="#6b59ce">begin</font>
+        <font color="#a52829"><b>set</b></font> out1 = in1;
+<font color="#6b59ce">end</font>
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("call testproc(?,?,?,?)");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$out1=0;
+$stmt->bindParam("4",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
 
 <span class="heading4">Postgresql</span><br>
 
@@ -850,6 +1017,11 @@ following.</p>
 
 <blockquote>
 <pre>
+$stmt=$dbh->prepare("select * from testfunc($1,$2,$3)");
+$stmt->bindValue("$1",1);
+$stmt->bindValue("$2","1.1");
+$stmt->bindValue("$3","hello");
+$result=$stmt->execute();
 </pre>
 </blockquote>
 
@@ -878,6 +1050,11 @@ following.</p>
 
 <blockquote>
 <pre>
+$stmt=$dbh->prepare("select * from testfunc(?,?,?)");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$result=$stmt->execute();
 </pre>
 </blockquote>
 
@@ -904,6 +1081,8 @@ following.</p>
 
 <blockquote>
 <pre>
+$stmt=$dbh->prepare("select * from testproc()");
+$result=$stmt->execute();
 </pre>
 </blockquote>
 
@@ -933,6 +1112,12 @@ following.</p>
 
 <blockquote>
 <pre>
+$dbh->query("set @out1=0");
+
+$dbh->query("call testproc(@out1)");
+
+$stmt=$dbh->prepare("select @out1");
+$result=$stmt->execute();
 </pre>
 </blockquote>
 
@@ -960,15 +1145,89 @@ each database that SQL Relay supports.</p>
 <p>In Oracle, stored procedures can return values through output parameters or
 as return values of the procedure itself.  If a procedure needs to return
 multiple values, it can return one of them as the return value of the procedure
-itself, but the rest must be returned through output parameters.  However, the
-SQL Relay PHP Pear DB driver does not currently support output parameters.</p>
+itself, but the rest must be returned through output parameters.</p>
+
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(in1 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in2 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>number</b></font>, in3 <font color="#a52829"><b>in</b></font> <font color="#298a52"><b>varchar2</b></font>, out1 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>number</b></font>, out2 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>number</b></font>, out3 <font color="#a52829"><b>out</b></font> <font color="#298a52"><b>varchar2</b></font>) <font color="#6b59ce">is</font>
+<font color="#6b59ce">begin</font>
+        out1:=in1;
+        out2:=in2;
+        out3:=in3;
+<font color="#6b59ce">end</font>;
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("select testproc(:in1,:in2,:in3,:out1,:out2,:out3) from dual");
+$stmt->bindValue(":in1",1);
+$stmt->bindValue(":in2","1.1");
+$stmt->bindValue(":in3","hello");
+$out1=0;
+$stmt->bindParam(":out1",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
+$out2="";
+$stmt->bindParam(":out2",$out2,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
+$out3="";
+$stmt->bindParam(":out3",$out3,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
 
 <span class="heading4">Sybase and Microsoft SQL Server</span><br>
 
-<p>In Sybase and Microsoft SQL Server, stored procedures return values
-through output parameters rather than as return values of the procedure
-itself.  However, the SQL Relay PHP Pear DB driver does not currently support
-output parameters.</p>
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc @in1 int, @in2 <font color="#298a52"><b>float</b></font>, @in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), @out1 int output, @out2 int output, @out3 int output <font color="#6b59ce">as</font>
+        <font color="#a52829"><b>select</b></font> @out1=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in1),
+                @out2=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in2),
+                @out2=convert(<font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>),@in2)
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("exec testproc");
+$stmt->bindValue("@in1",1);
+$stmt->bindValue("@in2","1.1");
+$stmt->bindValue("@in3","hello");
+$out1=0;
+$stmt->bindParam("@out1",$out1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
+$out2="";
+$stmt->bindParam("@out2",$out2,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
+$out3="";
+$stmt->bindParam("@out3",$out3,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
 
 <span class="heading4">Firebird</span><br>
 
@@ -991,6 +1250,11 @@ following.</p>
 
 <blockquote>
 <pre>
+$stmt=$dbh->prepare("select * from testproc(?,?,?)");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$result=$stmt->execute();
 </pre>
 </blockquote>
 
@@ -1005,9 +1269,46 @@ following.</p>
 
 <span class="heading4">DB2</span><br>
 
-<p>In DB2, stored procedures return values through output parameters rather
-than as return values of the procedure itself.  However, the SQL Relay PHP Pear
-DB driver does not currently support output parameters.</p>
+<p>To create the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>create</b></font> <font color="#6b59ce">procedure</font> testproc(<font color="#a52829"><b>in</b></font> in1 int, <font color="#a52829"><b>in</b></font> in2 double, <font color="#a52829"><b>in</b></font> in3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>), <font color="#a52829"><b>out</b></font> out1 int, <font color="#a52829"><b>out</b></font> out2 double, <font color="#a52829"><b>out</b></font> out3 <font color="#298a52"><b>varchar</b></font>(<font color="#ff00ff">20</font>)) language sql
+<font color="#6b59ce">begin</font>
+        <font color="#a52829"><b>set</b></font> out1 = in1;
+        <font color="#a52829"><b>set</b></font> out2 = in2;
+        <font color="#a52829"><b>set</b></font> out3 = in3;
+<font color="#6b59ce">end</font>
+</pre>
+</blockquote>
+
+<p>To execute the stored procedure from an SQL Relay program, use code like the
+following.</p>
+
+<blockquote>
+<pre>
+$stmt=$dbh->prepare("call testproc(?,?,?,?,?,?)");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$out4=0;
+$stmt->bindParam("4",$out4,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT);
+$out5="";
+$stmt->bindParam("5",$out5,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
+$out6="";
+$stmt->bindParam("6",$out6,PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT);
+$result=$stmt->execute();
+</pre>
+</blockquote>
+
+<p>To drop the stored procedure, run a query like the following.</p>
+
+<blockquote>
+<pre>
+<font color="#a52829"><b>drop</b></font> <font color="#6b59ce">procedure</font> testproc
+</pre>
+</blockquote>
+
 
 <span class="heading4">Postgresql</span><br>
 
@@ -1031,6 +1332,11 @@ following.</p>
 
 <blockquote>
 <pre>
+$stmt=$dbh->prepare("select * from testfunc($1,$2,$3) as (col1 int, col2 float, col3 char(20))");
+$stmt->bindValue("$1",1);
+$stmt->bindValue("$2","1.1");
+$stmt->bindValue("$3","hello");
+$result=$stmt->execute();
 </pre>
 </blockquote>
 
@@ -1060,6 +1366,11 @@ following.</p>
 
 <blockquote>
 <pre>
+$stmt=$dbh->prepare("call testproc(?,?,?)");
+$stmt->bindValue("1",1);
+$stmt->bindValue("2","1.1");
+$stmt->bindValue("3","hello");
+$result=$stmt->execute();
 </pre>
 </blockquote>
 
@@ -1089,6 +1400,12 @@ following.</p>
 
 <blockquote>
 <pre>
+$dbh->query("set @out1=0, @out2=0.0, @out3=''");
+
+$dbh->query("call testproc(@out1,@out2,@out3)");
+
+$stmt=$dbh->prepare("select @out1,@out2,@out3");
+$result=$stmt->execute();
 </pre>
 </blockquote>
 
@@ -1110,10 +1427,7 @@ each database that SQL Relay supports.</p>
 
 <span class="heading4">Oracle</span><br>
 
-<p>Stored procedures in Oracle can return open cursors as return values or
-output parameters.  A client-side cursor can be bound to this open cursor and
-rows can be fetched from it.  However, the SQL Relay PHP Pear DB driver does not
-currently support output parameters.</p>
+<p>In Oracle, for a result set to be fetched from a stored procedure, the result set must be bound to an output parameter of type cursor.  PDO had a PDO::PARAM_STMT type that could theoretically be used to get one of these but it is currently unimplemented by any driver, including the SQL Relay driver.  Quirks in the implementation of PDO itself make it impossible (or at least very difficult) to implement.  Specifically, there's no obvious way of creating an instance of the PDO statement type to set the bound parameter to.  Hopefully this will be remedied in a future version of PDO.</p>
 
 <span class="heading4">Sybase and Microsoft SQL Server</span><br>
 
@@ -1130,6 +1444,8 @@ following.</p>
 
 <blockquote>
 <pre>
+$stmt=$dbh->prepare("exec testproc");
+$result=$stmt->execute();
 </pre>
 </blockquote>
 
@@ -1177,6 +1493,8 @@ following.</p>
 
 <blockquote>
 <pre>
+$stmt=$dbh->prepare("select * from testfunc() as (testint int, testfloat float, testchar char(40)");
+$result=$stmt->execute();
 </pre>
 </blockquote>
 
@@ -1209,6 +1527,8 @@ following.</p>
 
 <blockquote>
 <pre>
+$stmt=$dbh->prepare("call testproc()");
+$result=$stmt->execute();
 </pre>
 </blockquote>
 

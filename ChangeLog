@@ -18,6 +18,7 @@
 		specified at configure time)
 	the perl API should build with old versions of perl (5.00X) on older
 		platforms (redhat 4.2, 5.2, 6.2, etc.) now
+	updated postgresql bind docs
 
 0.52 - sqlrsh has long reported the wrong version, fixed that
 	added csv support to sqlr-export and a -format xml|csv option

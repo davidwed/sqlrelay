@@ -825,10 +825,10 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select testfunc(:in1,:in2,:in3)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select testfunc($1,$2,$3)</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">2</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
 <font color="#008a8c">$cur</font>-&gt;executeQuery();
 </pre>
 </blockquote>
@@ -1127,10 +1127,10 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testfunc(:in1,:in2,:in3)</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testfunc($1,$2,$3)</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
+<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
 <font color="#008a8c">$cur</font>-&gt;executeQuery();
 <font color="#a52829"><b>my</b></font> <font color="#008a8c">$result</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">0</font>);
 </pre>
@@ -1466,10 +1466,10 @@ following.</p>
 
 <blockquote>
 <pre>
-<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testfunc(:in1,:in2,:in3) as (col1 int, col2 float, col3 char(20))</font><font color="#ff00ff">&quot;</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
-<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">in3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from testfunc($1,$2,$3) as (col1 int, col2 float, col3 char(20))</font><font color="#ff00ff">&quot;</font>);
+<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">$1</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1</font>);
+<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">$2</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">1.1</font>,<font color="#ff00ff">4</font>,<font color="#ff00ff">2</font>);
+<font color="#008a8c">$cur</font>-&gt;inputBind(<font color="#ff00ff">&quot;</font><font color="#ff00ff">$3</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">hello</font><font color="#ff00ff">&quot;</font>);
 <font color="#008a8c">$cur</font>-&gt;executeQuery();
 <font color="#a52829"><b>my</b></font> <font color="#008a8c">$out1</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">0</font>);
 <font color="#a52829"><b>my</b></font> <font color="#008a8c">$out2</font>=<font color="#008a8c">$cur</font>-&gt;getField(<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
