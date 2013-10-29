@@ -510,15 +510,12 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 	// execute the query
 	int	success=0;
 #ifdef SQLITE_TRANSACTIONAL
-	#ifdef HAVE_SQLITE3_STMT
-	success=runQuery(query);
-	#else
 	for (;;) {
 
 		success=runQuery(query);
 
 		// If we get a SQLITE_SCHEMA return value, we should retry
-		// the query.
+		// the query, once.
 		//
 		// If we get an SQLITE_ERROR and the error is "no such table:"
 		// then we need to workaround a bug/feature.  If you create a 
@@ -529,6 +526,16 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 		//
 		// For any other return values, jump out of the loop.
 		if (success==SQLITE_SCHEMA) {
+
+			// If we're using the statement API but don't have
+			// sqlite3_prepare_v2 then we need to reprepare the
+			// statement.
+			#if defined(HAVE_SQLITE3_STMT) && \
+				!defined(HAVE_SQLITE3_PREPARE_V2)
+				if (!prepareQuery(query,length)) {
+					break;
+				}
+			#endif
 			continue;
 		} else if (success==SQLITE_ERROR &&
 				sqliteconn->errmesg && 
@@ -549,7 +556,6 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 			break;
 		}
 	}
-	#endif
 #else
 	// For non-transactional sqlite, the db must be opened and closed
 	// before each query or the results of ddl/dml queries are never
@@ -664,7 +670,11 @@ int sqlitecursor::runQuery(const char *query) {
 		sqliteconn->errmesg=
 			sqliteconn->duplicate(
 				sqlite3_errmsg(sqliteconn->sqliteptr));
-		return SQLITE_ERROR;
+
+		// if the error code was SQLITE_SCHEMA then return that,
+		// otherwise return a generic SQLITE_ERROR
+		return (sqliteconn->errcode==SQLITE_SCHEMA)?
+					SQLITE_SCHEMA:SQLITE_ERROR;
 	}
 
 	// SQLITE_DONE or SQLITE_ROW
@@ -771,7 +781,7 @@ bool sqlitecursor::fetchRow() {
 	if (lastinsertrowid) {
 		return false;
 	}
-	return (sqlite3_step(stmt)!=SQLITE_DONE);
+	return (sqlite3_step(stmt)==SQLITE_ROW);
 	#else
 	// have to check for nrow+1 because the 
 	// first row is actually the column names
