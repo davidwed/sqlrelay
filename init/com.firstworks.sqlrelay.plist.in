@@ -5,8 +5,8 @@
 	<key>Label</key>
 	<string>com.firstworks.sqlrelay</string>
 
-	<key>OnDemand</key>
-	<false/>
+	<key>RunAtLoad</key>
+	<true/>
 
 	<key>UserName</key>
 	<string>root</string>
