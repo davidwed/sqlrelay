@@ -432,13 +432,16 @@ bool sqlitecursor::prepareQuery(const char *query, uint32_t length) {
 	sqlite3_finalize(stmt);
 
 	// prepare the query
-	int	res=
+	// try again if it fails with SQLITE_SCHEMA
+	int	res=SQLITE_SCHEMA;
+	while (res==SQLITE_SCHEMA) {
 		#ifdef HAVE_SQLITE3_PREPARE_V2
-		sqlite3_prepare_v2
+			res=sqlite3_prepare_v2
 		#else
-		sqlite3_prepare
+			res=sqlite3_prepare
 		#endif
-		(sqliteconn->sqliteptr,query,length,&stmt,NULL);
+			(sqliteconn->sqliteptr,query,length,&stmt,NULL);
+	}
 	if (res==SQLITE_OK) {
 		return true;
 	}
