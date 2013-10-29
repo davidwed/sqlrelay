@@ -19,6 +19,11 @@
 	the perl API should build with old versions of perl (5.00X) on older
 		platforms (redhat 4.2, 5.2, 6.2, etc.) now
 	updated postgresql bind docs
+	added dateyyyyddmm parameter
+	added yyyyddmm parameter to translatedates translation
+	added SQLR_MYSQL_DATE_YYYYDDMM envrionment variable to mysql drop-in
+		library
+	added SQLR_ODBC_DATE_YYYYDDMM envrionment variable to odbc driver
 
 0.52 - sqlrsh has long reported the wrong version, fixed that
 	added csv support to sqlr-export and a -format xml|csv option

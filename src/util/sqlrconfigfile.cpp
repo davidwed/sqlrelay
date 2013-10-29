@@ -85,6 +85,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	timeformat=NULL;
 	dateddmm=false;
 	dateyyyyddmm=false;
+	dateyyyyddmmset=false;
 	instart=false;
 	inend=false;
 }
@@ -1458,9 +1459,13 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			}
 		} else if (currentattribute==DATEDDMM_ATTRIBUTE) {
 			dateddmm=!charstring::compareIgnoringCase(value,"yes");
+			if (!dateyyyyddmmset) {
+				dateyyyyddmm=dateddmm;
+			}
 		} else if (currentattribute==DATEYYYYDDMM_ATTRIBUTE) {
 			dateyyyyddmm=
 				!charstring::compareIgnoringCase(value,"yes");
+			dateyyyyddmmset=true;
 		}
 	}
 	return true;

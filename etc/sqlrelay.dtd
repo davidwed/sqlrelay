@@ -41,6 +41,7 @@
 	<!ATTLIST instance dateformat CDATA "">
 	<!ATTLIST instance timeformat CDATA "">
 	<!ATTLIST instance dateddmm (yes|no) "no">
+	<!ATTLIST instance dateyyyyddmm (yes|no) "no">
 
 <!ELEMENT users (user*)>
 <!ELEMENT user EMPTY>

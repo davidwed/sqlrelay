@@ -129,6 +129,13 @@
       <xs:attribute name="dateformat" default=""/>
       <xs:attribute name="timeformat" default=""/>
       <xs:attribute name="dateddmm" default="no">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="yes"/>
+            <xs:enumeration value="no"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
       <xs:attribute name="dateyyyyddmm" default="no">
         <xs:simpleType>
           <xs:restriction base="xs:token">

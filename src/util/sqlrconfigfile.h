@@ -336,6 +336,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		char		*timeformat;
 		bool		dateddmm;
 		bool		dateyyyyddmm;
+		bool		dateyyyyddmmset;
 
 		bool		instart;
 		bool		inend;
