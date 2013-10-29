@@ -530,11 +530,12 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 		// For any other return values, jump out of the loop.
 		if (success==SQLITE_SCHEMA) {
 
-			// If we're using the statement API but don't have
-			// sqlite3_prepare_v2 then we need to reprepare the
-			// statement.
-			#if defined(HAVE_SQLITE3_STMT) && \
-				!defined(HAVE_SQLITE3_PREPARE_V2)
+			// If we're using the statement API then we need to
+			// reprepare the statement.  According to the API
+			// docs this shouldn't happen with sqlite3_prepare_v2.
+			// This appears to be generally true, but with 
+			// version 3.6.20 it does.
+			#if defined(HAVE_SQLITE3_STMT)
 				if (!prepareQuery(query,length)) {
 					break;
 				}
