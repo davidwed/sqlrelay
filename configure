@@ -31680,7 +31680,7 @@ then
 		if ( test -n "$PYTHONPATH" )
 		then
 
-						for i in "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
+			for i in "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
 			do
 				if ( test -d "$PYTHONPATH/include/python$i" -a -d "$PYTHONPATH/lib64/python$i/config" )
 				then
@@ -31703,7 +31703,7 @@ then
 
 		else
 
-						for j in "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
+			for j in "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
 			do
 				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j" "/opt/csw/include/python$j" "/sw/include/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/include/python$j"
 				do
@@ -36536,6 +36536,10 @@ chmod 755 bin/sqlrserver-config
 chmod 755 init/rc.sqlrelay
 chmod 755 init/rc.sqlrcachemanager
 chmod 755 test/test
+sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrcachemanager.plist > init/com.firstworks.sqlrcachemanager.plist.new
+mv init/com.firstworks.sqlrcachemanager.plist.new init/com.firstworks.sqlrcachemanager.plist
+sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrelay.plist > init/com.firstworks.sqlrelay.plist.new
+mv init/com.firstworks.sqlrelay.plist.new init/com.firstworks.sqlrelay.plist
 
 
 

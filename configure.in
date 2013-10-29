@@ -805,6 +805,10 @@ chmod 755 bin/sqlrserver-config
 chmod 755 init/rc.sqlrelay
 chmod 755 init/rc.sqlrcachemanager
 chmod 755 test/test
+sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrcachemanager.plist > init/com.firstworks.sqlrcachemanager.plist.new
+mv init/com.firstworks.sqlrcachemanager.plist.new init/com.firstworks.sqlrcachemanager.plist
+sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrelay.plist > init/com.firstworks.sqlrelay.plist.new
+mv init/com.firstworks.sqlrelay.plist.new init/com.firstworks.sqlrelay.plist
 
 
 
