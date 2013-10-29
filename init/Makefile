@@ -60,6 +60,10 @@ install:
 		$(INSTALL) -m 755 rc.sqlrcachemanager $(bindir)/bin/rc.sqlrcachemanager; \
 		$(INSTALL) -m 644 com.firstworks.sqlrelay.plist $(initroot)/Library/LaunchDaemons; \
 		$(INSTALL) -m 644 com.firstworks.sqlrcachemanager.plist $(initroot)/Library/LaunchDaemons; \
+ifneq ($(UID),)
+		chown root:wheel $(initroot)/Library/LaunchDaemons/com.firstworks.sqlrelay.plist; \
+		chown root:wheel $(initroot)/Library/LaunchDaemons/com.firstworks.sqlrcachemanager.plist; \
+endif
 	fi
 	if ( test -d "/etc/sysconfig" ); \
 	then \
