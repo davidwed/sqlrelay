@@ -15,6 +15,7 @@
 class custom_sc : public sqlrlogger {
 	public:
 			custom_sc(xmldomnode *parameters);
+			~custom_sc();
 
 		bool	init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon);
 		bool	run(sqlrlistener *sqlrl,
@@ -34,6 +35,10 @@ class custom_sc : public sqlrlogger {
 custom_sc::custom_sc(xmldomnode *parameters) : sqlrlogger(parameters) {
 	querylogname=NULL;
 	loglevel=SQLRLOGGER_LOGLEVEL_ERROR;
+}
+
+custom_sc::~custom_sc() {
+	delete[] querylogname;
 }
 
 bool custom_sc::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {

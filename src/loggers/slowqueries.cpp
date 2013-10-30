@@ -41,6 +41,7 @@ slowqueries::slowqueries(xmldomnode *parameters) : sqlrlogger(parameters) {
 
 slowqueries::~slowqueries() {
 	querylog.flushWriteBuffer(-1,-1);
+	delete[] querylogname;
 }
 
 bool slowqueries::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {

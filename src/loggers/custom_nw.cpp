@@ -17,6 +17,7 @@
 class custom_nw : public sqlrlogger {
 	public:
 			custom_nw(xmldomnode *parameters);
+			~custom_nw();
 
 		bool	init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon);
 		bool	run(sqlrlistener *sqlrl,
@@ -36,6 +37,10 @@ class custom_nw : public sqlrlogger {
 
 custom_nw::custom_nw(xmldomnode *parameters) : sqlrlogger(parameters) {
 	querylogname=NULL;
+}
+
+custom_nw::~custom_nw() {
+	delete[] querylogname;
 }
 
 bool custom_nw::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
