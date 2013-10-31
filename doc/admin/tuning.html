@@ -16,6 +16,7 @@
 <li><a href="#resultsetbuffersize">Use Result Set Buffer Size</a></li>
 <li><a href="#memoryusage">Memory Usage</a></li>
 <li><a href="#howmanyconnections">How Many Connections Should I Run?</a></li>
+<li><a href="#howmanycursors">How Many Cursors Should I Allocate?</a></li>
 </ul>
 
 <br>
@@ -414,33 +415,53 @@ finding it may dramatically improve that query's performance.</p>
 <a name="memoryusage"></a>
 <span class="heading2">Memory Usage</span><br>
 
-<p>Some databases only support single-row fetches; you can run a query,
-then fetch 1 row at a time from the database.  Oracle, DB2 and Sybase support
-array fetches; you can run a query and then fetch any number of rows from
-the database in a single round-trip.  This improves performance, but at a cost.
-For each cursor, a buffer which is large enough to accommodate the maximum size
-of the data that might be fetched, must be allocated and used to fetch the
-rows.</p>
+<p>Many database API's allocate memory internally to store result sets.  Oracle, DB2, Sybase and FreeTDS allow you to allocate buffers yourself and fetch result sets into these buffers.  When using these databases, SQL Relay preallocates a result set buffer and re-uses it over and over rather than dynamically allocating memory for each result set.  This improves performance at the cost of memory.  There are methods for tuning the size of the result set buffer though.</p>
 
-<p>For DB2 and Sybase, this is a 10mb buffer.  For Oracle, it's a 40mb
-buffer.</p>
-
-<p>If that seems like more memory than you'd like to allocate per-cursor,
-then you can tune it down.  Unfortunately, for now, except for Oracle, the
-tunable parameters are compile-time parameters.</p>
-
-<p>For Oracle, the fetchatonce, maxselectlistsize and maxitembuffersize
-parameters of the string attribute of the connection tag in the sqlrelay.conf
-file may be set to control these values at run time.</p>
-
-<p>For non-Oracle databases, in the following files...</p>
+<p>The size of the result set buffer is determined by 3 parameters:</p>
 
 <ul>
-<li>src/connections/db2/db2connection.h</li>
-<li>src/connections/sybase/sybaseconnection.h</li>
+<li>The maximum number of columns in the result set.</li>
+<ul>
+<li>Defaults to 256</li>
+</ul>
+<li>The maximum size of an individual non-LOB field.</li>
+<ul>
+<li>Defaults to 4096 for DB2, Sybase and FreeTDS</li>
+<li>Defaults to 32768 (the maximum size of a varchar2) for Oracle</li>
+</ul>
+<li>The number of rows of the result set to fetch at once.</li>
+<ul>
+<li>Defaults to 10</li>
+</ul>
 </ul>
 
-<p>There are lines like this:</p>
+<p>The third parameter might be a little confusing.  Some databases only support single-row fetches; you can run a query, then fetch 1 row at a time from the database.  Oracle, DB2 and Sybase support array fetches; you can run a query and then fetch any number of rows from the database in a single round-trip.  This can improve performance significantly.</p>
+
+<p>The default result set buffer size for Oracle is about 80mb (256 fields per row * 32768 bytes per field * 10 rows to fetch at once).  The default result set buffer size for DB2 and Sybase is about 10mb (256*4096*10 bytes).  FreeTDS doesn't support multi-row fetches so its default buffer size is about 1mb (256*4096*1 bytes).</p>
+
+<p>It is important to note that each cursor contains a result set buffer and each connection opens a configurable number of cursors.<p>
+
+<p>With oracle, for example, if you open 10 connections with 2 cursors each, then each connection will consume about 160mb of memory, 1.6g for all 10 connections.</p>
+
+<p>If that seems like more memory than you'd like to allocate to SQL Relay then you can tune it down.</p>
+
+<p>In general, the "maximum number of columns in the result set" should be set to the largest number of columns that a query run by your apps could return.  The "maximum size of an individual non-LOB field" parameter should be set to the longest non-LOB field that your app could fetch.  There is no rule of thumb for the "number of rows of the result set to fetch at once" parameter.  More tends to be better, but not always.  You may have to tune this by trial and error.</li>
+
+<p>For Oracle, the maxselectlistsize, maxitembuffersize and fetchatonce
+parameters of the string attribute of the connection tag in the sqlrelay.conf
+file may be set to control these values at run time.  See <a href="configuring.html">Configuring SQL Relay</a> for details.</p>
+
+<p>Unfortunately, for non-Oracle databases, the parameters are hardcoded.</p>
+
+<p>In the following files...</p>
+
+<ul>
+<li>src/connections/db2/db2connection.cpp</li>
+<li>src/connections/sybase/sybaseconnection.cpp</li>
+<li>src/connections/freetds/freetdsconnection.cpp</li>
+</ul>
+
+<p>...there are lines like this:</p>
 
 <blockquote>
 <pre>
@@ -455,41 +476,11 @@ at once.  MAX_SELECT_LIST_SIZE controls the maximum number of columns that may
 be fetched during a select.  MAX_ITEM_BUFFER_SIZE is the maximum size of an
 individual field that may be returned by the database during a select.</p>
 
-<p>The default values for FETCH_AT_ONCE and MAX_SELECT_LIST_SIZE are 10 and
-256 respectively, for all databases.  The value of MAX_ITEM_BUFFER_SIZE
-depends on the maximum number of characters that a varchar or varchar2 column
-type can store and varies between databases.</p>
+<p>To tune memory consumption, you can modify these parameters as described above.</p>
 
-<p>The number of bytes that the database connection daemon allocates for
-fetching multiple rows of result sets is equal to
-FETCH_AT_ONCE * MAX_SELECT_LIST_SIZE * MAX_ITEM_BUFFER_SIZE.  So, reducing any
-of those sizes will reduce the amount of memory used by each connection
-daemon.</p>
+<p>After modifying them, you must rebuild and re-install SQL Relay for the changes to have an effect.  If you have already run the <i>configure</i> script, then you should do a <i>make clean</i>, followed by a <i>make</i> and <i>make install</i> at the top level of the SQL Relay source distribution.  If you have not run the <i>configure</i> script, or have recently run a <i>make distclean</i> then just proceed as if you were building and installing SQL Relay for the first time.  See <a href="installing.html">Installing SQL Relay</a> for more information.</p>
 
-<p>Use care when reducing MAX_SELECT_LIST_SIZE and MAX_ITEM_BUFFER_SIZE.  If you
-reduce MAX_SELECT_LIST_SIZE to 20, but then run a query that fetched 25 columns,
-the last 5 will be truncated.  Similarly, if you set MAX_ITEM_BUFFER_SIZE to
-2048, but then fetch a varchar2 field with 3000 characters in it, the last 952
-characters will be truncated.  However, if you know that none of the queries
-your applications run fetch more than some number of rows, then it is safe to
-reduce the MAX_SELECT_LIST_SIZE to that number.  Similarly, if you know that
-none of the varchar or varchar2 columns that your applications access are
-larger than a particular size, it's safe to reduce MAX_ITEM_BUFFER_SIZE to
-that size.</p>
-
-<p>Reducing FETCH_AT_ONCE will cause a degredation in performance, as more 
-round-trips between SQL Relay and the database have to be made.  But,
-performance does not degrade on 1-to-1 basis.  For example, reducing
-FETCH_AT_ONCE from 10 to 5 will not your apps will not run half as fast.</p>
-
-<p>After modifying these parameters, you must rebuild and re-install SQL Relay 
-for the changes to have an effect.  If you have already run the <i>configure</i>
-script, then you should do a <i>make clean</i>, followed by a <i>make</i> and
-<i>make install</i> at the top level of the SQL Relay source distribution.
-If you have not run the <i>configure</i> script, or have recently run a 
-<i>make distclean</i> then just proceed as if you were building and installing
-SQL Relay for the first time.  See
-<a href="installing.html">Installing SQL Relay</a> for more information.</p>
+<p>Possibly more important than the parameters controlling the result set buffer size though, are the cursors and connections parameters as they are both multipliers.  See tips below for each.</p>
 
 <br>
 <a name="howmanyconnections"></a>
@@ -524,6 +515,37 @@ the kind of load your applications might place on SQL Relay and the database.
 <i>querytest</i> is OK as a starting point, but to do any serious testing, you
 should modify the queries that it runs to more accurately simulate your
 applications.</p>
+
+<p>If you are concerned about memory usage, consider allowing connections to scale up and down as necessary by using the connections, maxconnections, maxqueuelength and growby parameters in the sqlrelay.conf file.  See <a href="configuring.html">Configuring SQL Relay</a> for detailed information on these parameters.</p>
+
+<br>
+<a name="howmanycursors"></a>
+<span class="heading2">How Many Cursors Should I Allocate?</span><br>
+
+<p>Usually not very many.  Most often, only one.  If your app requires lots of
+cursors, then it's as likely as not that it isn't closing or freeing them
+properly.</p>
+
+<p>By default, unless setResultSetBufferSize() is called, SQL Relay clients
+use a server-side cursor to fetch the entire result set into memory and then
+release the cursor.  This way, only one server-side cursor is required,
+independent of how many client-side cursors are used.<p>
+
+<p>However, if you configure the client to fetch say, 10 rows at a time, and
+run nested queries - eg. run a select, and then run an insert for each row of
+the select, then two server side cursors would be required.  One for the outer
+select and another for the inner inserts.  This is a legitimate use of more
+than 1 cursor.</p>
+
+<p>Sometimes though, an app will allocate 10 cursors, set each to fetch 5 rows
+at a time, run a query using each cursor and then free all 10 cursors.  This
+would require 10 server-side cursors.  Only one server-side cursor would be
+required if: one cursor were allocated and reused, each cursor was closed when
+the app was done with it, or each cursor was freed when the app was done with
+it.  This is a common problem and, unfortunately, sometimes architectural
+constraints make it unavoidable.</p>
+
+<p>SQL Relay has parameters that allow cursors to scale up and down as needed.  If you are concerned about memory usage, consider using the cursors, maxcursors and cursors_growby parameters in the sqlrelay.conf file.  See <a href="configuring.html">Configuring SQL Relay</a> for detailed information on these parameters.</p>
 
 </body>
 </html>

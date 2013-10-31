@@ -1,3 +1,5 @@
+0.54 - updated the configuration and tuning docs a bit
+
 0.53 - added support for sqlite statement api and native binds
 	fixed some leaks related to using sys::getHostName()
 	added multiarch detection
