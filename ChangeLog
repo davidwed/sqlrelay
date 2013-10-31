@@ -8,7 +8,7 @@
 	dropped PHP Pear DB support
 	refactored init script - one script should work on all platforms now
 	updated init script installation - should work on virtually all unixes
-	added OS X init configuration
+	added OS X launchd configuration
 	updated the sqlr-listener to clean up files related to ipc, sockets
 		and marking whether the db is up or down on exit
 	sqlr-start no longer starts the cache manager

@@ -5,14 +5,11 @@
 	<key>Label</key>
 	<string>com.firstworks.sqlrcachemanager</string>
 
-	<key>RunAtLoad</key>
-	<true/>
+	<key>OnDemand</key>
+	<false/>
 
-	<key>UserName</key>
-	<string>root</string>
-
-	<key>GroupName</key>
-	<string>root</string>
+	<key>KeepAlive</key>
+	<false/>
 
 	<key>ProgramArguments</key>
 	<array>
