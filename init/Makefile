@@ -60,18 +60,20 @@ install:
 		$(INSTALL) -m 755 rc.sqlrcachemanager $(bindir)/bin/rc.sqlrcachemanager; \
 		$(INSTALL) -m 644 com.firstworks.sqlrelay.plist $(initroot)/Library/LaunchDaemons; \
 		$(INSTALL) -m 644 com.firstworks.sqlrcachemanager.plist $(initroot)/Library/LaunchDaemons; \
-ifneq ($(UID),)
-		chown root:wheel $(initroot)/Library/LaunchDaemons/com.firstworks.sqlrelay.plist; \
-		chown root:wheel $(initroot)/Library/LaunchDaemons/com.firstworks.sqlrcachemanager.plist; \
-endif
 	fi
 	if ( test -d "/etc/sysconfig" ); \
 	then \
-		$(MKINSTALLDIRS) $(initroot)/etc/sysconfig; \
-		$(INSTALL) -m 644 sqlrelay $(initroot)/etc/sysconfig/sqlrelay; \
+		if ( test ! -r "$(initroot)/etc/sysconfig/sqlrelay" ); \
+		then \
+			$(MKINSTALLDIRS) $(initroot)/etc/sysconfig; \
+			$(INSTALL) -m 644 sqlrelay $(initroot)/etc/sysconfig/sqlrelay; \
+		fi; \
 	else \
-		$(MKINSTALLDIRS) $(initroot)/etc; \
-		$(INSTALL) -m 644 sqlrelay $(initroot)/etc/sqlrelay; \
+		if ( test ! -r "$(initroot)/etc/sqlrelay" ); \
+		then \
+			$(MKINSTALLDIRS) $(initroot)/etc; \
+			$(INSTALL) -m 644 sqlrelay $(initroot)/etc/sqlrelay; \
+		fi; \
 	fi
 ifeq ($(initroot),)
 	if ( test -x "/sbin/chkconfig" ); \
