@@ -15995,7 +15995,6 @@ $as_echo "no" >&6; }
 fi
 rm conftest
 
-FW_CHECK_PS
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for -pipe option" >&5
