@@ -19,7 +19,10 @@
 #include <rudiments/stdio.h>
 
 // for gettimeofday()
-#include <sys/time.h>
+// SCO OSR 5.0.0 needs the extern "C"
+extern "C" {
+	#include <sys/time.h>
+}
 
 #include <defines.h>
 #include <datatypes.h>

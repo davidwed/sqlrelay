@@ -9,7 +9,10 @@
 #include <debugprint.h>
 
 // for gettimeofday
-#include <sys/time.h>
+// OSR 5.0.0 needs the extern "C"
+extern "C" {
+	#include <sys/time.h>
+}
 
 class sqlrcmdcstat : public sqlrquery {
 	public:
