@@ -1,4 +1,5 @@
 0.54 - updated the configuration and tuning docs a bit
+	fixed a Makefile bug that caused "make clean" to be interrupted
 
 0.53 - added support for sqlite statement api and native binds
 	fixed some leaks related to using sys::getHostName()
