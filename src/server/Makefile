@@ -150,7 +150,10 @@ all: $(PLUGINSRCS) \
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o sqlr-start$(EXE) sqlr-listener$(EXE) sqlr-connection$(EXE) sqlr-scaler$(EXE) sqlr-cachemanager$(EXE)
-	$(RM) $(PLUGINSRCS)
+	if ( test -n "$(PLUGINSRCS)" ); \
+	then \
+		$(RM) $(PLUGINSRCS); \
+	fi
 	$(RMTREE) .libs
 
 libsqlrserver.la: $(SRCS) $(LOBJS)
