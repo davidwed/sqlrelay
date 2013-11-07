@@ -1576,7 +1576,14 @@ void sqlrcontroller_svr::clientSession() {
 		// the client will request a cursor
 		sqlrcursor_svr	*cursor=getCursor(command);
 		if (!cursor) {
-			noAvailableCursors(command);
+			// Don't worry about reporting that a cursor wasn't
+			// available for abort-result-set commands. Those
+			// commands don't look for a response from the server
+			// and it doesn't matter if a non-existent result set
+			// was aborted.
+			if (command!=ABORT_RESULT_SET) {
+				noAvailableCursors(command);
+			}
 			continue;
 		}
 
