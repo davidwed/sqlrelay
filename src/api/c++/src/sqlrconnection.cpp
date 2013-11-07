@@ -115,7 +115,6 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	debug=(sqlrdebug && *sqlrdebug && !charstring::inSet(sqlrdebug,noset));
 	if (debug && !charstring::inSet(sqlrdebug,yesset) &&
 			!charstring::inSet(sqlrdebug,noset)) {
-stdoutput.printf("setting debug file: %s\n",sqlrdebug);
 		setDebugFile(sqlrdebug);
 	}
 	webdebug=-1;
