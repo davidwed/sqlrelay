@@ -196,6 +196,11 @@ class SQLRCLIENT_DLLSPEC sqlrconnection {
 		void	debugPrintFunction(int (*printfunction)
 							(const char *,...));
 
+		/** Allows you to specify a file to write debug to.
+		 *  Setting "filename" to NULL or an empty string causes debug
+		 *  to be written to standard output (the default). */
+		void	setDebugFile(const char *filename);
+
 
 		/** Allows you to set a string that will be passed to the
 		 *  server and ultimately included in server-side logging

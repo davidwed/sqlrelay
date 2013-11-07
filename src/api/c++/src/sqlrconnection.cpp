@@ -6,6 +6,8 @@
 #include <rudiments/environment.h>
 #include <rudiments/charstring.h>
 #include <rudiments/stdio.h>
+#include <rudiments/error.h>
+#include <rudiments/permissions.h>
 
 #include <defines.h>
 
@@ -101,11 +103,21 @@ void sqlrconnection::init(const char *server, uint16_t port,
 
 	// enable/disable debug
 	const char	*sqlrdebug=environment::getValue("SQLRDEBUG");
-	if (!charstring::length(sqlrdebug)) {
+	if (!sqlrdebug || !*sqlrdebug) {
 		sqlrdebug=environment::getValue("SQLR_CLIENT_DEBUG");
 	}
-	debug=(charstring::length(sqlrdebug) &&
-			charstring::compareIgnoringCase(sqlrdebug,"OFF"));
+	const char	*yesset[]={"YES","ON","TRUE","Y","T","1",
+					"yes","on","true","y","t",
+					"Yes","On","True",NULL};
+	const char	*noset[]={"NO","OFF","FALSE","N","F","0",
+					"no","off","false","n","f",
+					"No","Off","False",NULL};
+	debug=(sqlrdebug && *sqlrdebug && !charstring::inSet(sqlrdebug,noset));
+	if (debug && !charstring::inSet(sqlrdebug,yesset) &&
+			!charstring::inSet(sqlrdebug,noset)) {
+stdoutput.printf("setting debug file: %s\n",sqlrdebug);
+		setDebugFile(sqlrdebug);
+	}
 	webdebug=-1;
 
 	// copy references, delete cursors flags
@@ -1223,6 +1235,17 @@ void sqlrconnection::debugOff() {
 	debug=false;
 }
 
+void sqlrconnection::setDebugFile(const char *filename) {
+	debugfile.close();
+	error::clearError();
+	if (filename && *filename &&
+		!debugfile.open(filename,O_WRONLY|O_APPEND) &&
+				error::getErrorNumber()==ENOENT) {
+		debugfile.create(filename,
+				permissions::evalPermString("rw-r--r--"));
+	}
+}
+
 bool sqlrconnection::getDebug() {
 	return debug;
 }
@@ -1255,6 +1278,8 @@ void sqlrconnection::debugPrintFunction(
 void sqlrconnection::debugPrint(const char *string) {
 	if (printfunction) {
 		(*printfunction)("%s",string);
+	} else if (debugfile.getFileDescriptor()!=-1) {
+		debugfile.printf("%s",string);
 	} else {
 		stdoutput.printf("%s",string);
 	}
@@ -1263,6 +1288,8 @@ void sqlrconnection::debugPrint(const char *string) {
 void sqlrconnection::debugPrint(int64_t number) {
 	if (printfunction) {
 		(*printfunction)("%lld",(long long)number);
+	} else if (debugfile.getFileDescriptor()!=-1) {
+		debugfile.printf("%lld",(long long)number);
 	} else {
 		stdoutput.printf("%lld",(long long)number);
 	}
@@ -1271,6 +1298,8 @@ void sqlrconnection::debugPrint(int64_t number) {
 void sqlrconnection::debugPrint(double number) {
 	if (printfunction) {
 		(*printfunction)("%f",number);
+	} else if (debugfile.getFileDescriptor()!=-1) {
+		debugfile.printf("%f",number);
 	} else {
 		stdoutput.printf("%f",number);
 	}
@@ -1279,6 +1308,8 @@ void sqlrconnection::debugPrint(double number) {
 void sqlrconnection::debugPrint(char character) {
 	if (printfunction) {
 		(*printfunction)("%c",character);
+	} else if (debugfile.getFileDescriptor()!=-1) {
+		debugfile.printf("%c",character);
 	} else {
 		stdoutput.printf("%c",character);
 	}

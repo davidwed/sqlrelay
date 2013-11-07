@@ -104,6 +104,7 @@
 		bool		debug;
 		int32_t		webdebug;
 		int		(*printfunction)(const char *,...);
+		file		debugfile;
 
 		// copy references flag
 		bool		copyrefs;
