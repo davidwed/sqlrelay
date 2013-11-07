@@ -4304,13 +4304,6 @@ void sqlrcursor::closeResultSet(bool closeremote) {
 	// If we're caching data to a local file, get the rest of the data; we
 	// won't have to abort the result set in that case, the server will
 	// do it.
-	if (sqlrc->debug) {
-		sqlrc->debugPreStart();
-		sqlrc->debugPrint("Aborting Result Set For Cursor: ");
-		sqlrc->debugPrint((int64_t)cursorid);
-		sqlrc->debugPrint("\n");
-		sqlrc->debugPreEnd();
-	}
 
 	if (sqlrc->connected || cached) {
 		if (cachedest && cachedestind) {
@@ -4339,7 +4332,17 @@ void sqlrcursor::closeResultSet(bool closeremote) {
 					return;
 				}
 			}
-		} else if (closeremote) {
+		} else if (closeremote && havecursorid) {
+
+			if (sqlrc->debug) {
+				sqlrc->debugPreStart();
+				sqlrc->debugPrint("Aborting Result "
+							"Set For Cursor: ");
+				sqlrc->debugPrint((int64_t)cursorid);
+				sqlrc->debugPrint("\n");
+				sqlrc->debugPreEnd();
+			}
+
 			sqlrc->cs->write((uint16_t)ABORT_RESULT_SET);
 			sqlrc->cs->write((uint16_t)DONT_NEED_NEW_CURSOR);
 			sqlrc->cs->write(cursorid);
