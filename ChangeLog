@@ -1,4 +1,6 @@
-0.54 - updated the configuration and tuning docs a bit
+0.54 - fixed bugs that caused problems when unopened result sets were closed
+
+0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted
 	extern "C"-wrapped sys/times.h for OSR500
 
