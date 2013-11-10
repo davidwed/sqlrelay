@@ -1487,6 +1487,8 @@ void sqlrcontroller_svr::clientSession() {
 			break;
 		case SQLRPROTOCOL_HTTP:
 		case SQLRPROTOCOL_MYSQL:
+		case SQLRPROTOCOL_POSTGRESQL:
+		case SQLRPROTOCOL_TDS:
 		default:
 			closeClientSocket();
 			break;
