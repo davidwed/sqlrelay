@@ -20,6 +20,7 @@
 
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
+#include <sqlrprotocol.h>
 #include <sqlrauthenticator.h>
 #include <sqlparser.h>
 #include <sqltranslations.h>
@@ -32,15 +33,6 @@
 #include <cmdline.h>
 
 #include <defines.h>
-
-enum sqlrprotocol_t {
-	SQLRPROTOCOL_SQLRCLIENT=0,
-	SQLRPROTOCOL_HTTP,
-	SQLRPROTOCOL_MYSQL,
-	SQLRPROTOCOL_POSTGRESQL,
-	SQLRPROTOCOL_TDS,
-	SQLRPROTOCOL_UNKNOWN
-};
 
 class sqlrcontroller_svr : public listener {
 	public:

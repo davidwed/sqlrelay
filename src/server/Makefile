@@ -98,6 +98,7 @@ endif
 
 SRCS = sqlrlistener.cpp \
 	sqlrcontroller.cpp \
+	sqlrprotocol.cpp \
 	sqlrconnection.cpp \
 	sqlrcursor.cpp \
 	sqlrauthenticator.cpp \
@@ -117,6 +118,7 @@ SRCS = sqlrlistener.cpp \
 
 LOBJS = sqlrlistener.lo \
 	sqlrcontroller.lo \
+	sqlrprotocol.lo \
 	sqlrconnection.lo \
 	sqlrcursor.lo \
 	sqlrauthenticator.lo \
