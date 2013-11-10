@@ -20,9 +20,6 @@
       <xs:attribute name="addresses" default="0.0.0.0"/>
       <xs:attribute name="port" default="9000"/>
       <xs:attribute name="socket" default="/tmp/sqlrelay.socket"/>
-      <xs:attribute name="mysqladdresses" default="0.0.0.0"/>
-      <xs:attribute name="mysqlport" default="9001"/>
-      <xs:attribute name="mysqlsocket" default="/tmp/mysqlsqlrelay.socket"/>
       <xs:attribute name="dbase" default="oracle8">
         <xs:simpleType>
           <xs:restriction base="xs:token">

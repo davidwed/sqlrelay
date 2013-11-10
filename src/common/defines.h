@@ -10,6 +10,7 @@
 #define HANDOFF_PROXY 2
 
 // client-server protocol...
+#define SQLRCLIENT_PROTOCOL 0x5352 // 0x5352 = SR
 #define NEW_QUERY 0
 #define FETCH_RESULT_SET 1
 #define ABORT_RESULT_SET 2

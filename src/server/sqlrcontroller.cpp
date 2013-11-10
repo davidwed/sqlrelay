@@ -1480,6 +1480,51 @@ void sqlrcontroller_svr::clientSession() {
 
 	logClientConnected();
 
+	// determine client protocol...
+	switch (getClientProtocol()) {
+		case SQLRPROTOCOL_SQLRCLIENT:
+			sqlrClientSession();
+			break;
+		case SQLRPROTOCOL_HTTP:
+		case SQLRPROTOCOL_MYSQL:
+		default:
+			closeClientSocket();
+			break;
+	}
+}
+
+sqlrprotocol_t sqlrcontroller_svr::getClientProtocol() {
+
+	uint16_t	value=0;
+	ssize_t		result=0;
+
+	// get the first 2 bytes
+	result=clientsock->read(&value,idleclienttimeout,0);
+	if (result!=sizeof(value)) {
+		return SQLRPROTOCOL_UNKNOWN;
+	}
+
+	// check for sqlrclient protocol
+	if (value!=SQLRCLIENT_PROTOCOL) {
+		return SQLRPROTOCOL_UNKNOWN;
+	}
+
+	// get the next 2 bytes
+	result=clientsock->read(&value,idleclienttimeout,0);
+	if (result!=sizeof(value)) {
+		return SQLRPROTOCOL_UNKNOWN;
+	}
+
+	// check for version 1
+	if (value!=1) {
+		return SQLRPROTOCOL_UNKNOWN;
+	}
+
+	return SQLRPROTOCOL_SQLRCLIENT;
+}
+
+void sqlrcontroller_svr::sqlrClientSession() {
+
 	// During each session, the client will send a series of commands.
 	// The session ends when the client ends it or when certain commands
 	// fail.

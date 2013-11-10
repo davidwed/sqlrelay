@@ -33,6 +33,13 @@
 
 #include <defines.h>
 
+enum sqlrprotocol_t {
+	SQLRPROTOCOL_SQLRCLIENT=0,
+	SQLRPROTOCOL_HTTP,
+	SQLRPROTOCOL_MYSQL,
+	SQLRPROTOCOL_UNKNOWN
+};
+
 class sqlrcontroller_svr : public listener {
 	public:
 			sqlrcontroller_svr();
@@ -111,6 +118,8 @@ class sqlrcontroller_svr : public listener {
 		void	initSession();
 		int32_t	waitForClient();
 		void	clientSession();
+		sqlrprotocol_t	getClientProtocol();
+		void	sqlrClientSession();
 		bool	authenticateCommand();
 		void	suspendSessionCommand();
 		void	selectDatabaseCommand();

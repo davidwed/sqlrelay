@@ -361,6 +361,9 @@ bool sqlrconnection::openSession() {
 	cs->setReadBufferSize(8192);
 	cs->setWriteBufferSize(8192);
 
+	// send protocol info
+	protocol();
+
 	// authenticate
 	authenticate();
 
@@ -368,6 +371,18 @@ bool sqlrconnection::openSession() {
 	// connected and authenticated with the connection daemon
 	connected=true;
 	return true;
+}
+
+void sqlrconnection::protocol() {
+
+	if (debug) {
+		debugPreStart();
+		debugPrint("Protocol : SQLRCLIENT_PROTOCOL 1\n");
+		debugPreEnd();
+	}
+
+	cs->write((uint16_t)SQLRCLIENT_PROTOCOL);
+	cs->write((uint16_t)1);
 }
 
 void sqlrconnection::authenticate() {
@@ -531,6 +546,9 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 		//cs->setTcpWriteBufferSize(0);
 		cs->setReadBufferSize(8192);
 		cs->setWriteBufferSize(8192);
+
+		// send protocol info
+		protocol();
 
 		if (debug) {
 			debugPreStart();

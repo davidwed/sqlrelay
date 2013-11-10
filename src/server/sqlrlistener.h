@@ -137,12 +137,7 @@ class sqlrlistener : public listener {
 		inetsocketserver	**clientsockin;
 		uint64_t		clientsockincount;
 
-		unixsocketserver	*mysqlclientsockun;
-		inetsocketserver	**mysqlclientsockin;
-		uint64_t		mysqlclientsockincount;
-
 		char	*unixport;
-		char	*mysqlunixport;
 
 		unixsocketserver	*handoffsockun;
 		char			*handoffsockname;

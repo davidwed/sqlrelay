@@ -1,4 +1,5 @@
 0.54 - fixed bugs that caused problems when unopened result sets were closed
+	added protocol identification phase to client/server protocol
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted

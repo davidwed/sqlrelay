@@ -49,11 +49,6 @@ sqlrlistener::sqlrlistener() : listener() {
 	clientsockun=NULL;
 	unixport=NULL;
 
-	mysqlclientsockin=NULL;
-	mysqlclientsockincount=0;
-	mysqlclientsockun=NULL;
-	mysqlunixport=NULL;
-
 	handoffsockun=NULL;
 	handoffsockname=NULL;
 	removehandoffsockun=NULL;
@@ -129,12 +124,6 @@ void sqlrlistener::cleanUp() {
 		delete clientsockin[csind];
 	}
 	delete[] clientsockin;
-
-	delete mysqlclientsockun;
-	for (uint64_t mcsind=0; mcsind<mysqlclientsockincount; mcsind++) {
-		delete mysqlclientsockin[mcsind];
-	}
-	delete[] mysqlclientsockin;
 
 	if (!isforkedchild && handoffsockname) {
 		file::remove(handoffsockname);
@@ -635,78 +624,6 @@ bool sqlrlistener::listenOnClientSockets() {
 		}
 	}
 
-	// get addresses/inet port and unix port to
-	// listen on for the MySQL protocol
-	const char * const *mysqladdresses=cfgfl.getMySQLAddresses();
-	mysqlclientsockincount=cfgfl.getMySQLAddressCount();
-	uint16_t	mysqlport=cfgfl.getMySQLPort();
-	if (!mysqlport) {
-		mysqlclientsockincount=0;
-	}
-	mysqlunixport=charstring::duplicate(cfgfl.getMySQLUnixPort());
-
-	// attempt to listen on the MySQL inet ports
-	// (on each specified address), if necessary
-	if (mysqlport && mysqlclientsockincount) {
-		mysqlclientsockin=
-			new inetsocketserver *[mysqlclientsockincount];
-		bool	failed=false;
-		for (uint64_t index=0; index<mysqlclientsockincount; index++) {
-			mysqlclientsockin[index]=NULL;
-			if (failed) {
-				continue;
-			}
-			mysqlclientsockin[index]=new inetsocketserver();
-			listening=mysqlclientsockin[index]->listen(
-							mysqladdresses[index],
-							mysqlport,15);
-			if (listening) {
-				addFileDescriptor(mysqlclientsockin[index]);
-			} else {
-				stringbuffer	info;
-				info.append("failed to listen "
-						"on client port: ");
-				info.append(mysqlport);
-				logInternalError(info.getString());
-
-				char	*err=error::getErrorString();
-				stderror.printf(
-					"Could not listen "
-					"on: %s/%d\n"
-					"Error was: %s\n"
-					"Make sure that no other "
-					"processes are listening "
-					"on that port.\n\n",
-					mysqladdresses[index],mysqlport,err);
-				delete[] err;
-				failed=true;
-			}
-		}
-	}
-
-	if (charstring::length(mysqlunixport)) {
-		mysqlclientsockun=new unixsocketserver();
-		listening=mysqlclientsockun->listen(mysqlunixport,0000,15);
-		if (listening) {
-			addFileDescriptor(mysqlclientsockun);
-		} else {
-			stringbuffer	info;
-			info.append("failed to listen on client socket: ");
-			info.append(mysqlunixport);
-			logInternalError(info.getString());
-
-			stderror.printf("Could not listen on unix socket: ");
-			stderror.printf("%s\n",mysqlunixport);
-			stderror.printf("Make sure that the file and ");
-			stderror.printf("directory are readable and writable.");
-			stderror.printf("\n\n");
-			delete mysqlclientsockun;
-			mysqlclientsockun=NULL;
-			delete[] mysqlunixport;
-			mysqlunixport=NULL;
-		}
-	}
-
 	return listening;
 }
 
@@ -901,11 +818,6 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 			iss=clientsockin[csind];
 		}
 	}
-	for (uint64_t mcsind=0; mcsind<mysqlclientsockincount; mcsind++) {
-		if (fd==mysqlclientsockin[mcsind]) {
-			iss=mysqlclientsockin[mcsind];
-		}
-	}
 	if (iss) {
 
 		clientsock=iss->accept();
@@ -924,12 +836,6 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 
 	} else if (fd==clientsockun) {
 		clientsock=clientsockun->accept();
-		if (!clientsock) {
-			return false;
-		}
-		clientsock->translateByteOrder();
-	} else if (fd==mysqlclientsockun) {
-		clientsock=mysqlclientsockun->accept();
 		if (!clientsock) {
 			return false;
 		}

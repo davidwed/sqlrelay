@@ -16,6 +16,7 @@
 		bool	openSession();
 		void	closeConnection();
 
+		void	protocol();
 		void	authenticate();
 		bool	getNewPort();
 
