@@ -2583,9 +2583,7 @@ bool sqlrcontroller_svr::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 			cursor->lastrowvalid=false;
 
 			// return the result set
-			//return returnResultSetData(cursor,false);
-			bool	retval=returnResultSetData(cursor,false);
-			return retval;
+			return returnResultSetData(cursor,false);
 
 		} else {
 
