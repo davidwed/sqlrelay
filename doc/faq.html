@@ -10,6 +10,7 @@
 <br><span class="heading2">General Questions</span><br>
 <ul>
 <li><a href="#whatis">What is SQL Relay?</a></li>
+<li><a href="#whatisnot">What doesn't SQL Relay do?</a></li>
 <li><a href="#connectionpooling">What is "persistent database connection pooling"?</a></li>
 <li><a href="#proxying">What is "proxying"?</a></li>
 <li><a href="#throttling">What is "throttling"?</a></li>
@@ -113,7 +114,52 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <br><a name="whatis"></a>
 <span class="heading3">What is SQL Relay?</span><br>
 
-<p>See <a href="introduction.html">Introduction to SQL Relay</a>.</p>
+<p>SQL Relay is powerful database-access middleware consisting of a server-based connection pool and client API's for using it.</p>
+
+<img src="images/sqlrelay.png">
+
+<p>SQL Relay sits between your app and the database and provides functionality not typically provided by the database directly.</p>
+
+<p>The main features of SQL Relay are:</p>
+
+<p><b>Persistent database connection pooling</b> - makes database driven web-based applications faster and more efficient<br>
+Solves - "I've analyzed my app's performance and it seems to be spending a lot of time just logging into the database."</p>
+
+<p><b>Proxing</b> - access dtabases from unsupported platforms<br>
+Solves - "I need to access Oracle and MS SQL Server from FreeBSD (or other unsupported platform)."</p>
+
+<p><b>Throttling</b> - prevents databases from becoming overloaded<br>
+Solves - "When I run enough web servers to handle the traffic, it slams the database, even though most of the database connections appear to be idle."</p>
+
+<p><b>Load Balancing</b> - distributes access over replicated or clustered databases<br>
+Solves - "I can't afford a load balancing appliance to distribute access to the nodes in my database cluster."</li>
+
+<p><b>Query Routing</b> - conditionally sends queries to one database or another<br>
+Solves - "My database is getting slammed.  I could replicate it but then I'd have to rewrite my app to send DML to the master and somehow distribute selects over the slaves."</p>
+
+<p><b>Drop-In Replacement Libraries</b> - aims an existing MySQL or PostgreSQL app at SQL Relay without modification<br>
+Solves - "I wrote my app using the native MySQL API but the company is migrating to Oracle.  I can tweak the queries to work with Oracle but I really don't want to have to modify the app to use OCI."</p>
+
+<p>SQL Relay has client API's for most modern programming languages and drivers for many popular database abstraction API's.</p>
+
+
+<br><a name="whatisnot"></a>
+<span class="heading3">What doesn't SQL Relay do?</span><br>
+
+<p>SQL Relay is powerful but it does have some limits.</p>
+
+<p>It is a tool in a chain - another tier in a multi-tiered application - designed to solve specific problems.  It is not a database-enabled application development environment like Access or Delphi or modern equivalents.  It's not a reporting gateway like Crystal Reports.  It is not a database itself.  The server components currently require a unix-like system (including Linux or Mac OS X) and client support on Windows is limited to C/C++, C# and ADO.NET.</p>
+
+<p>There are some features that SQL Relay currently lacks that are either being worked on, or at least planned though.</p>
+
+<p>SQL Relay is not currently a transparent database gateway.  Ie. you can't currently aim SQL Relay at MySQL and aim your app at SQL Relay.  SQL Relay has it's own client/server protocol and API.  If your app uses a database abstraction API like ODBC or Perl DBI, you would need to use the SQL Relay driver.  You could also potentially use the SQL Relay Drop-in Replacement Library for MySQL.  Otherwise you'd need to modify your app to use the SQL Relay API.  Efforts are underway to add support for several native database protocols though.</p>
+
+<p>SQL Relay can provide a single-point of access for replicated databases but it does not provide replication.  It cannot keep multiple databases in sync.</p>
+
+<p>Similarly, though SQL Relay can provide a single-point of access for multiple databases, it does not currently provide a mechanism for joining tables across databases or sending the same query to multiple databases and merging the result sets.</p>
+
+<p>SQL Relay cannot currently translate queries from one syntax to another.  Though it can be used to aim an app originally written for MySQL at Oracle, for example, it cannot (yet) transparently convert queries in MySQL syntax to Oracle syntax.</p>
+
 
 <br><a name="connectionpooling"></a>
 <span class="heading3">What is "persistent database connection pooling"?</span><br>
