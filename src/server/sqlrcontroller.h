@@ -104,7 +104,6 @@ class sqlrcontroller_svr : public listener {
 		void		releaseConnectionCountMutex();
 
 
-		sqlrcursor_svr	*getCursor(uint16_t command);
 		sqlrcursor_svr	*findAvailableCursor();
 		void	closeCursors(bool destroy);
 		void	setUnixSocketDirectory();
@@ -113,17 +112,6 @@ class sqlrcontroller_svr : public listener {
 		int32_t	waitForClient();
 		void	clientSession();
 		sqlrprotocol_t	getClientProtocol();
-		void	sqlrClientSession();
-		bool	authenticateCommand();
-		void	suspendSessionCommand();
-		void	selectDatabaseCommand();
-		void	getCurrentDatabaseCommand();
-		void	getLastInsertIdCommand();
-		void	dbHostNameCommand();
-		void	dbIpAddressCommand();
-		void	pingCommand();
-		void	identifyCommand();
-		void	autoCommitCommand();
 		bool	autoCommitOn();
 		bool	autoCommitOff();
 		void	translateBeginTransaction(sqlrcursor_svr *cursor);
@@ -134,77 +122,16 @@ class sqlrcontroller_svr : public listener {
 		bool	isBeginTransactionQuery(sqlrcursor_svr *cursor);
 		bool	isCommitQuery(sqlrcursor_svr *cursor);
 		bool	isRollbackQuery(sqlrcursor_svr *cursor);
-		void	beginCommand();
 		bool	begin();
-		void	commitCommand();
 		bool	commit();
-		void	rollbackCommand();
 		bool	rollback();
-		void	dbVersionCommand();
-		void	serverVersionCommand();
-		void	bindFormatCommand();
-		bool	newQueryCommand(sqlrcursor_svr *cursor);
-		bool	getDatabaseListCommand(sqlrcursor_svr *cursor);
-		bool	getTableListCommand(sqlrcursor_svr *cursor);
-		bool	getColumnListCommand(sqlrcursor_svr *cursor);
-		bool	getListCommand(sqlrcursor_svr *cursor,
-						int which, bool gettable);
-		bool	getListByApiCall(sqlrcursor_svr *cursor,
-							int which,
-							const char *table,
-							const char *wild);
-		bool	getListByQuery(sqlrcursor_svr *cursor,
-							int which,
-							const char *table,
-							const char *wild);
-		bool	buildListQuery(sqlrcursor_svr *cursor,
-							const char *query,
-							const char *table,
-							const char *wild);
-		void	escapeParameter(stringbuffer *buffer,
-							const char *parameter);
-		bool	reExecuteQueryCommand(sqlrcursor_svr *cursor);
-		bool	fetchFromBindCursorCommand(sqlrcursor_svr *cursor);
-		bool	fetchResultSetCommand(sqlrcursor_svr *cursor);
-		void	abortResultSetCommand(sqlrcursor_svr *cursor);
-		void	suspendResultSetCommand(sqlrcursor_svr *cursor);
-		bool	resumeResultSetCommand(sqlrcursor_svr *cursor);
-		bool	getQueryTreeCommand(sqlrcursor_svr *cursor);
-		void	closeClientSocket();
 		void	closeSuspendedSessionSockets();
 		bool	authenticate();
-		bool	getUserFromClient();
-		bool	getPasswordFromClient();
 		bool	connectionBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
 		bool	databaseBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
-		bool	handleQueryOrBindCursor(sqlrcursor_svr *cursor,
-						bool reexecute,
-						bool bindcursor,
-						bool getquery);
 		void	endSession();
-		bool	getCommand(uint16_t *command);
-		void	noAvailableCursors(uint16_t command);
-		bool	getClientInfo(sqlrcursor_svr *cursor);
-		bool	getQuery(sqlrcursor_svr *cursor);
-		bool	getInputBinds(sqlrcursor_svr *cursor);
-		bool	getOutputBinds(sqlrcursor_svr *cursor);
-		bool	getBindVarCount(sqlrcursor_svr *cursor,
-						uint16_t *count);
-		bool	getBindVarName(sqlrcursor_svr *cursor,
-						bindvar_svr *bv);
-		bool	getBindVarType(bindvar_svr *bv);
-		void	getNullBind(bindvar_svr *bv);
-		bool	getBindSize(sqlrcursor_svr *cursor,
-					bindvar_svr *bv, uint32_t *maxsize);
-		bool	getStringBind(sqlrcursor_svr *cursor, bindvar_svr *bv);
-		bool	getIntegerBind(bindvar_svr *bv);
-		bool	getDoubleBind(bindvar_svr *bv);
-		bool	getDateBind(bindvar_svr *bv);
-		bool	getLobBind(sqlrcursor_svr *cursor, bindvar_svr *bv);
-		bool	getSendColumnInfo();
-		bool	getSkipAndFetch(sqlrcursor_svr *cursor);
 		bool	handleBinds(sqlrcursor_svr *cursor);
 		bool	processQuery(sqlrcursor_svr *cursor,
 						bool reexecute,
@@ -233,58 +160,7 @@ class sqlrcontroller_svr : public listener {
 							uint16_t index);
 		void	sendLobOutputBind(sqlrcursor_svr *cursor,
 							uint16_t index);
-		void	returnResultSetHeader(sqlrcursor_svr *cursor);
-		void	returnColumnInfo(sqlrcursor_svr *cursor,
-						uint16_t format);
-		bool	returnResultSetData(sqlrcursor_svr *cursor,
-						bool getskipandfetch);
-		void	sendRowCounts(bool knowsactual,
-						uint64_t actual,
-						bool knowsaffected,
-						uint64_t affected);
-		void	sendColumnDefinition(const char *name, 
-						uint16_t namelen, 
-						uint16_t type, 
-						uint32_t size,
-						uint32_t precision,
-						uint32_t scale,
-						uint16_t nullable,
-						uint16_t primarykey,
-						uint16_t unique,
-						uint16_t partofkey,
-						uint16_t unsignednumber,
-						uint16_t zerofill,
-						uint16_t binary,
-						uint16_t autoincrement);
-		void	sendColumnDefinitionString(const char *name, 
-						uint16_t namelen, 
-						const char *type, 
-						uint16_t typelen, 
-						uint32_t size,
-						uint32_t precision,
-						uint32_t scale,
-						uint16_t nullable,
-						uint16_t primarykey,
-						uint16_t unique,
-						uint16_t partofkey,
-						uint16_t unsignednumber,
-						uint16_t zerofill,
-						uint16_t binary,
-						uint16_t autoincrement);
 		bool	skipRows(sqlrcursor_svr *cursor, uint64_t rows);
-		void	returnRow(sqlrcursor_svr *cursor);
-		void	sendNullField();
-		void	sendField(sqlrcursor_svr *cursor,
-						uint32_t index,
-						const char *data,
-						uint32_t size);
-		void	sendField(const char *data, uint32_t size);
-		void	sendLobField(sqlrcursor_svr *cursor, uint32_t col);
-		void	startSendingLong(uint64_t longlength);
-		void	sendLongSegment(const char *data, uint32_t size);
-		void	endSendingLong();
-		void	returnError(bool disconnect);
-		void	returnError(sqlrcursor_svr *cursor, bool disconnect);
 
 		void	dropTempTables(sqlrcursor_svr *cursor);
 		void	dropTempTable(sqlrcursor_svr *cursor,
@@ -412,7 +288,6 @@ class sqlrcontroller_svr : public listener {
 		bool		translatebinds;
 
 		const char	*isolationlevel;
-		bool		ignoreselectdb;
 
 		int32_t		accepttimeout;
 		bool		suspendedsession;

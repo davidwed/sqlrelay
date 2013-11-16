@@ -19,11 +19,13 @@ enum sqlrprotocol_t {
 
 class sqlrcontroller_svr;
 class sqlrconnection_svr;
+class sqlrconfigfile;
 
 class sqlrprotocol {
 	public:
 			sqlrprotocol(sqlrcontroller_svr *cont,
 					sqlrconnection_svr *conn,
+					sqlrconfigfile *cfgfl,
 					filedescriptor *clientsock);
 		virtual	~sqlrprotocol();
 
@@ -32,6 +34,7 @@ class sqlrprotocol {
 	protected:
 		sqlrcontroller_svr	*cont;
 		sqlrconnection_svr	*conn;
+		sqlrconfigfile		*cfgfl;
 		filedescriptor		*clientsock;
 };
 
