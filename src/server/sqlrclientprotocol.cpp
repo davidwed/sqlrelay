@@ -35,8 +35,6 @@ sqlrclientprotocol::~sqlrclientprotocol() {
 
 sqlrclientexitstatus_t sqlrclientprotocol::clientSession() {
 
-	cont->logClientConnected();
-
 	// During each session, the client will send a series of commands.
 	// The session ends when the client ends it or when certain commands
 	// fail.
@@ -717,7 +715,7 @@ bool sqlrclientprotocol::newQueryCommand(sqlrcursor_svr *cursor) {
 
 	cont->logDebugMessage("handling query...");
 
-	cont->initQueryOrBindCursor(cursor,false,false,true);
+	cursor=cont->initQueryOrBindCursor(cursor,false,false,true);
 
 	// get the client info and query from the client
 	bool	success=(getClientInfo(cursor) && getQuery(cursor));
@@ -738,7 +736,7 @@ bool sqlrclientprotocol::newQueryCommand(sqlrcursor_svr *cursor) {
 	}
 
 	if (success) {
-		return queryOrBindCursor(cursor,false,false);
+		return processQueryOrBindCursor(cursor,false,false);
 	}
 
 	// The client is apparently sending us something we
@@ -758,7 +756,7 @@ bool sqlrclientprotocol::reExecuteQueryCommand(sqlrcursor_svr *cursor) {
 
 	cont->logDebugMessage("handling query...");
 
-	cont->initQueryOrBindCursor(cursor,true,false,true);
+	cursor=cont->initQueryOrBindCursor(cursor,true,false,true);
 
 	// get binds and whether to get column info
 	if (getInputBinds(cursor) &&
@@ -766,7 +764,7 @@ bool sqlrclientprotocol::reExecuteQueryCommand(sqlrcursor_svr *cursor) {
 		getSendColumnInfo()) {
 
 		cont->updateState(PROCESS_SQL);
-		return queryOrBindCursor(cursor,true,false);
+		return processQueryOrBindCursor(cursor,true,false);
 	}
 
 	// The client is apparently sending us something we
@@ -784,12 +782,12 @@ bool sqlrclientprotocol::fetchFromBindCursorCommand(sqlrcursor_svr *cursor) {
 
 	cont->logDebugMessage("fetch from bind cursor");
 
-	cont->initQueryOrBindCursor(cursor,false,true,true);
+	cursor=cont->initQueryOrBindCursor(cursor,false,true,true);
 
 	// get whether to get column info
 	if (getSendColumnInfo()) {
 		cont->updateState(PROCESS_SQL);
-		return queryOrBindCursor(cursor,false,true);
+		return processQueryOrBindCursor(cursor,false,true);
 	}
 
 	// The client is apparently sending us something we
@@ -803,7 +801,7 @@ bool sqlrclientprotocol::fetchFromBindCursorCommand(sqlrcursor_svr *cursor) {
 	return false;
 }
 
-bool sqlrclientprotocol::queryOrBindCursor(sqlrcursor_svr *cursor,
+bool sqlrclientprotocol::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 							bool reexecute,
 							bool bindcursor) {
 
@@ -2692,11 +2690,11 @@ bool sqlrclientprotocol::getListByQuery(sqlrcursor_svr *cursor,
 
 	cont->logDebugMessage("handling query...");
 
-	cont->initQueryOrBindCursor(cursor,false,false,false);
+	cursor=cont->initQueryOrBindCursor(cursor,false,false,false);
 
 	cont->updateState(PROCESS_SQL);
 
-	return queryOrBindCursor(cursor,false,false);
+	return processQueryOrBindCursor(cursor,false,false);
 }
 
 bool sqlrclientprotocol::buildListQuery(sqlrcursor_svr *cursor,

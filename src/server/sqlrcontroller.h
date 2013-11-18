@@ -138,7 +138,7 @@ class sqlrcontroller_svr : public listener {
 		void	suspendSession(const char **unixsocket,
 						uint16_t *inetportnumber);
 		void	endSession();
-		void	initQueryOrBindCursor(sqlrcursor_svr *cursor,
+		sqlrcursor_svr	*initQueryOrBindCursor(sqlrcursor_svr *cursor,
 							bool reexecute,
 							bool bindcursor,
 							bool getquery);

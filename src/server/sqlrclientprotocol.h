@@ -49,7 +49,7 @@ class sqlrclientprotocol : public sqlrprotocol {
 		bool	newQueryCommand(sqlrcursor_svr *cursor);
 		bool	reExecuteQueryCommand(sqlrcursor_svr *cursor);
 		bool	fetchFromBindCursorCommand(sqlrcursor_svr *cursor);
-		bool	queryOrBindCursor(sqlrcursor_svr *cursor,
+		bool	processQueryOrBindCursor(sqlrcursor_svr *cursor,
 							bool reexecute,
 							bool bindcursor);
 		bool	getClientInfo(sqlrcursor_svr *cursor);

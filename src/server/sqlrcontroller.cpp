@@ -2443,10 +2443,11 @@ void sqlrcontroller_svr::translateBeginTransaction(sqlrcursor_svr *cursor) {
 	logDebugMessage(cursor->querybuffer);
 }
 
-void sqlrcontroller_svr::initQueryOrBindCursor(sqlrcursor_svr *cursor,
-							bool reexecute,
-							bool bindcursor,
-							bool getquery) {
+sqlrcursor_svr	*sqlrcontroller_svr::initQueryOrBindCursor(
+						sqlrcursor_svr *cursor,
+						bool reexecute,
+						bool bindcursor,
+						bool getquery) {
 
 	// decide whether to use the cursor itself
 	// or an attached custom query cursor
@@ -2495,6 +2496,8 @@ void sqlrcontroller_svr::initQueryOrBindCursor(sqlrcursor_svr *cursor,
 						sizeof(bindvar_svr));
 		}
 	}
+
+	return cursor;
 }
 
 sqlrcursor_svr *sqlrcontroller_svr::useCustomQueryHandler(	
