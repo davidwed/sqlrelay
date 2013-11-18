@@ -5,13 +5,16 @@
 
 sqlrprotocol::sqlrprotocol(sqlrcontroller_svr *cont,
 				sqlrconnection_svr *conn,
-				sqlrconfigfile *cfgfl,
-				filedescriptor *clientsock) {
+				sqlrconfigfile *cfgfl) {
 	this->cont=cont;
 	this->conn=conn;
 	this->cfgfl=cfgfl;
-	this->clientsock=clientsock;
+	this->clientsock=NULL;
 }
 
 sqlrprotocol::~sqlrprotocol() {
+}
+
+void sqlrprotocol::setClientSocket(filedescriptor *clientsock) {
+	this->clientsock=clientsock;
 }

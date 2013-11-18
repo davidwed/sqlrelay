@@ -14,30 +14,36 @@ extern "C" {
 	#include <sys/time.h>
 }
 
-#include <defines.h>
 #include <datatypes.h>
-#define NEED_CONVERT_DATE_TIME
-#include <parsedatetime.h>
 
 sqlrclientprotocol::sqlrclientprotocol(sqlrcontroller_svr *cont,
 					sqlrconnection_svr *conn,
-					sqlrconfigfile *cfgfl,
-					filedescriptor *clientsock) :
-					sqlrprotocol(cont,conn,cfgfl,
-							clientsock) {
+					sqlrconfigfile *cfgfl) :
+					sqlrprotocol(cont,conn,cfgfl) {
+	idleclienttimeout=cfgfl->getIdleClientTimeout();
+	maxquerysize=cfgfl->getMaxQuerySize();
+	maxbindcount=cfgfl->getMaxBindCount();
+	maxbindnamelength=cfgfl->getMaxBindNameLength();
+	maxstringbindvaluelength=cfgfl->getMaxStringBindValueLength();
+	maxlobbindvaluelength=cfgfl->getMaxLobBindValueLength();
+	bindpool=new memorypool(512,128,100);
 }
 
 sqlrclientprotocol::~sqlrclientprotocol() {
+	delete bindpool;
 }
 
-void sqlrclientprotocol::clientSession() {
+sqlrclientexitstatus_t sqlrclientprotocol::clientSession() {
+
+	cont->logClientConnected();
 
 	// During each session, the client will send a series of commands.
 	// The session ends when the client ends it or when certain commands
 	// fail.
-	bool		loop=true;
-	bool		endsession=true;
-	uint16_t	command;
+	bool			loop=true;
+	bool			endsession=true;
+	sqlrclientexitstatus_t	status=SQLRCLIENTEXITSTATUS_ERROR;
+	uint16_t		command;
 	do {
 
 		// get a command from the client
@@ -61,10 +67,12 @@ void sqlrclientprotocol::clientSession() {
 		} else if (command==SUSPEND_SESSION) {
 			cont->incrementSuspendSessionCount();
 			suspendSessionCommand();
+			status=SQLRCLIENTEXITSTATUS_SUSPENDED_SESSION;
 			endsession=false;
 			break;
 		} else if (command==END_SESSION) {
 			cont->incrementEndSessionCount();
+			status=SQLRCLIENTEXITSTATUS_ENDED_SESSION;
 			break;
 		} else if (command==PING) {
 			cont->incrementPingCount();
@@ -196,26 +204,13 @@ void sqlrclientprotocol::clientSession() {
 
 	} while (loop);
 
+	// end the session if necessary
 	if (endsession) {
 		cont->endSession();
 	}
 
-	closeClientSocket();
-	cont->closeSuspendedSessionSockets();
-
-	const char	*info="an error occurred";
-	if (command==NO_COMMAND) {
-		info="client closed connection";
-	} else if (command==END_SESSION) {
-		info="client ended the session";
-	} else if (command==SUSPEND_SESSION) {
-		info="client suspended the session";
-	}
-	cont->logClientDisconnected(info);
-
-	cont->decrementOpenClientConnections();
-
-	cont->logDebugMessage("done with client session");
+	// return the exit status
+	return status;
 }
 
 bool sqlrclientprotocol::getCommand(uint16_t *command) {
@@ -225,24 +220,24 @@ bool sqlrclientprotocol::getCommand(uint16_t *command) {
 	cont->updateState(GET_COMMAND);
 
 	// get the command
-	ssize_t	result=clientsock->read(command,cont->idleclienttimeout,0);
+	ssize_t	result=clientsock->read(command,idleclienttimeout,0);
 	if (result!=sizeof(uint16_t)) {
 
 		// Return false but don't consider it an error if we get a
 		// timeout or a 0 (meaning that the client closed the socket)
 		// as either would be natural to do here.
 		if (result!=RESULT_TIMEOUT && result!=0) {
-			cont->logClientProtocolError(NULL,
-				"get command failed",result);
+			cont->logClientProtocolError(
+				NULL,"get command failed",result);
 		}
 
 		*command=NO_COMMAND;
 		return false;
 	}
 
-	cont->debugstr.clear();
-	cont->debugstr.append("command: ")->append(*command);
-	cont->logDebugMessage(cont->debugstr.getString());
+	debugstr.clear();
+	debugstr.append("command: ")->append(*command);
+	cont->logDebugMessage(debugstr.getString());
 
 	cont->logDebugMessage("done getting command");
 	return true;
@@ -261,7 +256,7 @@ sqlrcursor_svr *sqlrclientprotocol::getCursor(uint16_t command) {
 		command==ABORT_RESULT_SET ||
 		command==GET_QUERY_TREE) {
 		ssize_t	result=clientsock->read(&neednewcursor,
-						cont->idleclienttimeout,0);
+						idleclienttimeout,0);
 		if (result!=sizeof(uint16_t)) {
 			cont->logClientProtocolError(NULL,
 					"get cursor failed: "
@@ -278,7 +273,7 @@ sqlrcursor_svr *sqlrclientprotocol::getCursor(uint16_t command) {
 		// which cursor is the client requesting?
 		uint16_t	id;
 		ssize_t		result=clientsock->read(&id,
-						cont->idleclienttimeout,0);
+						idleclienttimeout,0);
 		if (result!=sizeof(uint16_t)) {
 			cont->logClientProtocolError(NULL,
 					"get cursor failed: "
@@ -286,25 +281,19 @@ sqlrcursor_svr *sqlrclientprotocol::getCursor(uint16_t command) {
 			return NULL;
 		}
 
-		// get the current cursor that they requested.
-		bool	found=false;
-		for (uint16_t i=0; i<cont->cursorcount; i++) {
-			if (cont->cur[i]->id==id) {
-				cursor=cont->cur[i];
-				cont->incrementTimesCursorReused();
-				found=true;
-				break;
-			}
-		}
+		// get the requested cursor
+		cursor=cont->getCursorById(id);
 
-		// don't allow the client to request a cursor 
-		// beyond the end of the array.
-		if (!found) {
-			cont->debugstr.clear();
-			cont->debugstr.append("get cursor failed: "
+		if (cursor) {
+			// mark this as an old cursor being reused
+			cont->incrementTimesCursorReused();
+		} else {
+			debugstr.clear();
+			debugstr.append("get cursor failed: "
 					"client requested an invalid cursor: ");
-			cont->debugstr.append(id);
-			cont->logClientProtocolError(NULL,cont->debugstr.getString(),1);
+			debugstr.append(id);
+			cont->logClientProtocolError(NULL,
+					debugstr.getString(),1);
 			return NULL;
 		}
 
@@ -313,8 +302,8 @@ sqlrcursor_svr *sqlrclientprotocol::getCursor(uint16_t command) {
 		// find an available cursor
 		cursor=cont->findAvailableCursor();
 
-		// mark this as a new cursor being used
 		if (cursor) {
+			// mark this as a new cursor being used
 			cont->incrementTimesNewCursorUsed();
 		}
 	}
@@ -335,17 +324,17 @@ void sqlrclientprotocol::noAvailableCursors(uint16_t command) {
 	// number of bytes that could be sent.
 	uint32_t	size=(
 				// query size and query
-				sizeof(uint32_t)+cont->maxquerysize+
+				sizeof(uint32_t)+maxquerysize+
 				// input bind var count
 				sizeof(uint16_t)+
 				// input bind vars
-				cont->maxbindcount*(2*sizeof(uint16_t)+
-						cont->maxbindnamelength)+
+				maxbindcount*(2*sizeof(uint16_t)+
+						maxbindnamelength)+
 				// output bind var count
 				sizeof(uint16_t)+
 				// output bind vars
-				cont->maxbindcount*(2*sizeof(uint16_t)+
-						cont->maxbindnamelength)+
+				maxbindcount*(2*sizeof(uint16_t)+
+						maxbindnamelength)+
 				// get column info
 				sizeof(uint16_t)+
 				// skip/fetch
@@ -353,7 +342,7 @@ void sqlrclientprotocol::noAvailableCursors(uint16_t command) {
 
 	clientsock->useNonBlockingMode();
 	unsigned char	*dummy=new unsigned char[size];
-	clientsock->read(dummy,size,cont->idleclienttimeout,0);
+	clientsock->read(dummy,size,idleclienttimeout,0);
 	clientsock->useBlockingMode();
 	delete[] dummy;
 
@@ -375,7 +364,9 @@ bool sqlrclientprotocol::authenticateCommand() {
 	cont->logDebugMessage("authenticate");
 
 	// get the user/password from the client and authenticate
-	if (getUserFromClient() && getPasswordFromClient() && cont->authenticate()) {
+	if (getUserFromClient() &&
+		getPasswordFromClient() &&
+		cont->authenticate(userbuffer,passwordbuffer)) {
 		return true;
 	}
 
@@ -392,56 +383,56 @@ bool sqlrclientprotocol::authenticateCommand() {
 
 bool sqlrclientprotocol::getUserFromClient() {
 	uint32_t	size=0;
-	ssize_t		result=clientsock->read(&size,cont->idleclienttimeout,0);
+	ssize_t		result=clientsock->read(&size,idleclienttimeout,0);
 	if (result!=sizeof(uint32_t)) {
 		cont->logClientProtocolError(NULL,
 			"authentication failed: "
 			"failed to get user size",result);
 		return false;
 	}
-	if (size>=sizeof(cont->userbuffer)) {
-		cont->debugstr.clear();
-		cont->debugstr.append("authentication failed: user size too long: ");
-		cont->debugstr.append(size);
-		cont->logClientConnectionRefused(cont->debugstr.getString());
+	if (size>=sizeof(userbuffer)) {
+		debugstr.clear();
+		debugstr.append("authentication failed: user size too long: ");
+		debugstr.append(size);
+		cont->logClientConnectionRefused(debugstr.getString());
 		return false;
 	}
-	result=clientsock->read(cont->userbuffer,size,cont->idleclienttimeout,0);
+	result=clientsock->read(userbuffer,size,idleclienttimeout,0);
 	if ((uint32_t)result!=size) {
 		cont->logClientProtocolError(NULL,
 			"authentication failed: "
 			"failed to get user",result);
 		return false;
 	}
-	cont->userbuffer[size]='\0';
+	userbuffer[size]='\0';
 	return true;
 }
 
 bool sqlrclientprotocol::getPasswordFromClient() {
 	uint32_t	size=0;
-	ssize_t		result=clientsock->read(&size,cont->idleclienttimeout,0);
+	ssize_t		result=clientsock->read(&size,idleclienttimeout,0);
 	if (result!=sizeof(uint32_t)) {
 		cont->logClientProtocolError(NULL,
 			"authentication failed: "
 			"failed to get password size",result);
 		return false;
 	}
-	if (size>=sizeof(cont->passwordbuffer)) {
-		cont->debugstr.clear();
-		cont->debugstr.append("authentication failed: "
+	if (size>=sizeof(passwordbuffer)) {
+		debugstr.clear();
+		debugstr.append("authentication failed: "
 				"password size too long: ");
-		cont->debugstr.append(size);
-		cont->logClientConnectionRefused(cont->debugstr.getString());
+		debugstr.append(size);
+		cont->logClientConnectionRefused(debugstr.getString());
 		return false;
 	}
-	result=clientsock->read(cont->passwordbuffer,size,cont->idleclienttimeout,0);
+	result=clientsock->read(passwordbuffer,size,idleclienttimeout,0);
 	if ((uint32_t)result!=size) {
 		cont->logClientProtocolError(NULL,
 			"authentication failed: "
 			"failed to get password",result);
 		return false;
 	}
-	cont->passwordbuffer[size]='\0';
+	passwordbuffer[size]='\0';
 	return true;
 }
 
@@ -449,39 +440,18 @@ void sqlrclientprotocol::suspendSessionCommand() {
 
 	cont->logDebugMessage("suspending session...");
 
-	// mark the session suspended
-	cont->suspendedsession=true;
-
-	// we can't wait forever for the client to resume, set a timeout
-	cont->accepttimeout=cfgfl->getSessionTimeout();
-
-	// abort all cursors that aren't suspended...
-	cont->logDebugMessage("aborting busy cursors...");
-	for (int32_t i=0; i<cont->cursorcount; i++) {
-		if (cont->cur[i]->state==SQLRCURSORSTATE_BUSY) {
-			cont->cur[i]->abort();
-		}
-	}
-	cont->logDebugMessage("done aborting busy cursors");
-
-	// open sockets to resume on
-	cont->logDebugMessage("opening sockets to resume on...");
-	uint16_t	unixsocketsize=0;
+	// suspend the session
+	const char	*unixsocketname=NULL;
 	uint16_t	inetportnumber=0;
-	if (cont->openSockets()) {
-		if (cont->serversockun) {
-			unixsocketsize=charstring::length(cont->unixsocket);
-		}
-		inetportnumber=cont->inetport;
-	}
-	cont->logDebugMessage("done opening sockets to resume on");
+	cont->suspendSession(&unixsocketname,&inetportnumber);
+	uint16_t	unixsocketsize=charstring::length(unixsocketname);
 
 	// pass the socket info to the client
 	cont->logDebugMessage("passing socket info to client...");
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	clientsock->write(unixsocketsize);
 	if (unixsocketsize) {
-		clientsock->write(cont->unixsocket,unixsocketsize);
+		clientsock->write(unixsocketname,unixsocketsize);
 	}
 	clientsock->write(inetportnumber);
 	clientsock->flushWriteBuffer(-1,-1);
@@ -524,7 +494,7 @@ void sqlrclientprotocol::identifyCommand() {
 void sqlrclientprotocol::autoCommitCommand() {
 	cont->logDebugMessage("autocommit...");
 	bool	on;
-	ssize_t	result=clientsock->read(&on,cont->idleclienttimeout,0);
+	ssize_t	result=clientsock->read(&on,idleclienttimeout,0);
 	if (result!=sizeof(bool)) {
 		cont->logClientProtocolError(NULL,
 				"get autocommit failed: "
@@ -636,7 +606,7 @@ void sqlrclientprotocol::selectDatabaseCommand() {
 
 	// get length of db parameter
 	uint32_t	dblen;
-	ssize_t		result=clientsock->read(&dblen,cont->idleclienttimeout,0);
+	ssize_t		result=clientsock->read(&dblen,idleclienttimeout,0);
 	if (result!=sizeof(uint32_t)) {
 		clientsock->write(false);
 		cont->logClientProtocolError(NULL,
@@ -646,20 +616,20 @@ void sqlrclientprotocol::selectDatabaseCommand() {
 	}
 
 	// bounds checking
-	if (dblen>cont->maxquerysize) {
+	if (dblen>maxquerysize) {
 		clientsock->write(false);
-		cont->debugstr.clear();
-		cont->debugstr.append("select database failed: "
+		debugstr.clear();
+		debugstr.append("select database failed: "
 				"client sent bad db length: ");
-		cont->debugstr.append(dblen);
-		cont->logClientProtocolError(NULL,cont->debugstr.getString(),1);
+		debugstr.append(dblen);
+		cont->logClientProtocolError(NULL,debugstr.getString(),1);
 		return;
 	}
 
 	// read the db parameter into the buffer
 	char	*db=new char[dblen+1];
 	if (dblen) {
-		result=clientsock->read(db,dblen,cont->idleclienttimeout,0);
+		result=clientsock->read(db,dblen,idleclienttimeout,0);
 		if ((uint32_t)result!=dblen) {
 			clientsock->write(false);
 			clientsock->flushWriteBuffer(-1,-1);
@@ -672,9 +642,8 @@ void sqlrclientprotocol::selectDatabaseCommand() {
 	}
 	db[dblen]='\0';
 	
-	// Select the db and send back the result.  If we've been told to
-	// ignore these calls, skip the actual call but act like it succeeded.
-	if ((cfgfl->getIgnoreSelectDatabase())?true:conn->selectDatabase(db)) {
+	// Select the db and send back the result.
+	if (cont->selectDatabase(db)) {
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 		clientsock->flushWriteBuffer(-1,-1);
 	} else {
@@ -743,162 +712,112 @@ void sqlrclientprotocol::dbIpAddressCommand() {
 }
 
 bool sqlrclientprotocol::newQueryCommand(sqlrcursor_svr *cursor) {
+
 	cont->logDebugMessage("new query");
-	return handleQueryOrBindCursor(cursor,false,false,true);
-}
-
-bool sqlrclientprotocol::reExecuteQueryCommand(sqlrcursor_svr *cursor) {
-	cont->logDebugMessage("rexecute query");
-	return handleQueryOrBindCursor(cursor,true,false,true);
-}
-
-bool sqlrclientprotocol::fetchFromBindCursorCommand(sqlrcursor_svr *cursor) {
-	cont->logDebugMessage("fetch from bind cursor");
-	return handleQueryOrBindCursor(cursor,false,true,true);
-}
-
-bool sqlrclientprotocol::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
-							bool reexecute,
-							bool bindcursor,
-							bool getquery) {
-
 
 	cont->logDebugMessage("handling query...");
 
-	// decide whether to use the cursor itself
-	// or an attached custom query cursor
-	if (cursor->customquerycursor) {
-		if (reexecute) {
-			cursor=cursor->customquerycursor;
-		} else {
-			cursor->customquerycursor->close();
-			delete cursor->customquerycursor;
-			cursor->customquerycursor=NULL;
-		}
+	cont->initQueryOrBindCursor(cursor,false,false,true);
+
+	// get the client info and query from the client
+	bool	success=(getClientInfo(cursor) && getQuery(cursor));
+
+	// do we need to use a custom query handler for this query?
+	if (success) {
+		sqlrcursor_svr	*originalcursor=cursor;
+		cursor=cont->useCustomQueryHandler(cursor);
+		cont->updateState((cursor!=originalcursor)?
+					PROCESS_CUSTOM:PROCESS_SQL);
 	}
 
-	// re-init error data
-	cursor->clearError();
-
-	// clear bind mappings and reset the fake input binds flag
-	// (do this here because getInput/OutputBinds uses the bindmappingspool)
-	if (!bindcursor && !reexecute) {
-		cont->bindmappingspool->deallocate();
-		cont->inbindmappings->clear();
-		cont->outbindmappings->clear();
-		cursor->fakeinputbindsforthisquery=cont->fakeinputbinds;
+	// get binds and whether to get column info
+	if (success) {
+		success=(getInputBinds(cursor) &&
+				getOutputBinds(cursor) &&
+				getSendColumnInfo());
 	}
 
-	// clean up whatever result set the cursor might have been busy with
-	cursor->cleanUpData();
-
-	// get the query and bind data from the client...
-	bool	usingcustomquerycursor=false;
-	if (getquery) {
-
-		// re-init buffers
-		if (!reexecute && !bindcursor) {
-			cont->clientinfo[0]='\0';
-			cont->clientinfolen=0;
-		}
-		if (!reexecute) {
-			cursor->querybuffer[0]='\0';
-			cursor->querylength=0;
-		}
-		cursor->inbindcount=0;
-		cursor->outbindcount=0;
-		for (uint16_t i=0; i<cont->maxbindcount; i++) {
-			rawbuffer::zero(&(cursor->inbindvars[i]),
-						sizeof(bindvar_svr));
-			rawbuffer::zero(&(cursor->outbindvars[i]),
-						sizeof(bindvar_svr));
-		}
-
-		// get the data
-		bool	success=true;
-		if (!reexecute && !bindcursor) {
-			success=(getClientInfo(cursor) &&
-					getQuery(cursor));
-
-			// do we need to use a custom query
-			// handler for this query?
-			if (success && cont->sqlrq) {
-				cursor->customquerycursor=
-					cont->sqlrq->match(conn,
-							cursor->querybuffer,
-							cursor->querylength);
-				
-			}
-
-			if (cursor->customquerycursor) {
-
-				// open the cursor
-				cursor->customquerycursor->openInternal(
-								cursor->id);
-
-				// copy the query that we just got into the
-				// custom query cursor
-				charstring::copy(
-					cursor->customquerycursor->querybuffer,
-					cursor->querybuffer);
-				cursor->customquerycursor->querylength=
-							cursor->querylength;
-
-				// set the cursor state
-				cursor->customquerycursor->state=
-						SQLRCURSORSTATE_BUSY;
-
-				// reset the rest of this method to use
-				// the custom query cursor
-				cursor=cursor->customquerycursor;
-
-				usingcustomquerycursor=true;
-			}
-		}
-		if (success && !bindcursor) {
-			success=(getInputBinds(cursor) &&
-					getOutputBinds(cursor));
-		}
-		if (success) {
-			success=getSendColumnInfo();
-		}
-		if (!success) {
-			// The client is apparently sending us something we
-			// can't handle.  Return an error if there was one,
-			// instruct the client to disconnect and return false
-			// to end the session on this side.
-			if (cursor->errnum) {
-				returnError(cursor,true);
-			}
-			cont->logDebugMessage("failed to handle query");
-			return false;
-		}
+	if (success) {
+		return queryOrBindCursor(cursor,false,false);
 	}
 
-	cont->updateState((usingcustomquerycursor)?PROCESS_CUSTOM:PROCESS_SQL);
+	// The client is apparently sending us something we
+	// can't handle.  Return an error if there was one,
+	// instruct the client to disconnect and return false
+	// to end the session on this side.
+	if (cursor->errnum) {
+		returnError(cursor,true);
+	}
+	cont->logDebugMessage("failed to handle query");
+	return false;
+}
+
+bool sqlrclientprotocol::reExecuteQueryCommand(sqlrcursor_svr *cursor) {
+
+	cont->logDebugMessage("rexecute query");
+
+	cont->logDebugMessage("handling query...");
+
+	cont->initQueryOrBindCursor(cursor,true,false,true);
+
+	// get binds and whether to get column info
+	if (getInputBinds(cursor) &&
+		getOutputBinds(cursor) &&
+		getSendColumnInfo()) {
+
+		cont->updateState(PROCESS_SQL);
+		return queryOrBindCursor(cursor,true,false);
+	}
+
+	// The client is apparently sending us something we
+	// can't handle.  Return an error if there was one,
+	// instruct the client to disconnect and return false
+	// to end the session on this side.
+	if (cursor->errnum) {
+		returnError(cursor,true);
+	}
+	cont->logDebugMessage("failed to handle query");
+	return false;
+}
+
+bool sqlrclientprotocol::fetchFromBindCursorCommand(sqlrcursor_svr *cursor) {
+
+	cont->logDebugMessage("fetch from bind cursor");
+
+	cont->initQueryOrBindCursor(cursor,false,true,true);
+
+	// get whether to get column info
+	if (getSendColumnInfo()) {
+		cont->updateState(PROCESS_SQL);
+		return queryOrBindCursor(cursor,false,true);
+	}
+
+	// The client is apparently sending us something we
+	// can't handle.  Return an error if there was one,
+	// instruct the client to disconnect and return false
+	// to end the session on this side.
+	if (cursor->errnum) {
+		returnError(cursor,true);
+	}
+	cont->logDebugMessage("failed to fetch from bind cursor");
+	return false;
+}
+
+bool sqlrclientprotocol::queryOrBindCursor(sqlrcursor_svr *cursor,
+							bool reexecute,
+							bool bindcursor) {
 
 	// loop here to handle down databases
 	for (;;) {
 
-		// process the query
-		bool	success=false;
-		bool	wasfaketransactionquery=false;
-		if (!reexecute && !bindcursor && cont->faketransactionblocks) {
-			success=cont->handleFakeTransactionQueries(cursor,
-						&wasfaketransactionquery);
-		}
-		if (!wasfaketransactionquery) {
-			success=cont->processQuery(cursor,reexecute,bindcursor);
-		}
+		// process the query and get skip and fetch parameters here so
+		// everything can be done in one round trip without relying on
+		// buffering
+		if (cont->processQueryOrBindCursor(
+					cursor,reexecute,bindcursor) &&
+					getSkipAndFetch(cursor)) {
 
-		if (success) {
-			// get skip and fetch parameters here so everything
-			// can be done in one round trip without relying on
-			// buffering
-			success=getSkipAndFetch(cursor);
-		}
-
-		if (success) {
+			cont->logDebugMessage("process query succeeded");
 
 			// indicate that no error has occurred
 			clientsock->write((uint16_t)NO_ERROR_OCCURRED);
@@ -911,28 +830,23 @@ bool sqlrclientprotocol::handleQueryOrBindCursor(sqlrcursor_svr *cursor,
 			// suspended result set
 			clientsock->write((uint16_t)NO_SUSPENDED_RESULT_SET);
 
-			// if the query processed 
-			// ok then send a result set
-			// header and return...
+			// send a result set header
 			returnResultSetHeader(cursor);
 
 			// free memory used by binds
-			cont->bindpool->deallocate();
-
-			cont->logDebugMessage("handle query succeeded");
+			bindpool->deallocate();
 
 			// reinit lastrow
 			cursor->lastrowvalid=false;
 
 			// return the result set
-			//return returnResultSetData(cursor,false);
-			bool	retval=returnResultSetData(cursor,false);
-			return retval;
+			return returnResultSetData(cursor,false);
 
 		} else {
 
-			// if the db is still up, or if we're not waiting
-			// for them if they're down, then return the error
+			// if the db is still up, or if we're not configured
+			// to wait for them if they're down, then return the
+			// error
 			if (cursor->liveconnection ||
 				!cfgfl->getWaitForDownDatabase()) {
 
@@ -990,11 +904,11 @@ bool sqlrclientprotocol::getClientInfo(sqlrcursor_svr *cursor) {
 		cursor->setError(err.getString(),
 				SQLR_ERROR_MAXCLIENTINFOLENGTH,true);
 
-		cont->debugstr.clear();
-		cont->debugstr.append("get client info failed: "
+		debugstr.clear();
+		debugstr.append("get client info failed: "
 				"client sent bad client info size: ");
-		cont->debugstr.append(cont->clientinfolen);
-		cont->logClientProtocolError(cursor,cont->debugstr.getString(),1);
+		debugstr.append(cont->clientinfolen);
+		cont->logClientProtocolError(cursor,debugstr.getString(),1);
 
 		cont->clientinfolen=0;
 		return false;
@@ -1013,12 +927,12 @@ bool sqlrclientprotocol::getClientInfo(sqlrcursor_svr *cursor) {
 	cont->clientinfo[cont->clientinfolen]='\0';
 
 	if (cont->sqlrlg) {
-		cont->debugstr.clear();
-		cont->debugstr.append("clientinfolen: ")->append(cont->clientinfolen);
-		cont->logDebugMessage(cont->debugstr.getString());
-		cont->debugstr.clear();
-		cont->debugstr.append("clientinfo: ")->append(cont->clientinfo);
-		cont->logDebugMessage(cont->debugstr.getString());
+		debugstr.clear();
+		debugstr.append("clientinfolen: ")->append(cont->clientinfolen);
+		cont->logDebugMessage(debugstr.getString());
+		debugstr.clear();
+		debugstr.append("clientinfo: ")->append(cont->clientinfo);
+		cont->logDebugMessage(debugstr.getString());
 		cont->logDebugMessage("getting clientinfo succeeded");
 	}
 
@@ -1038,7 +952,7 @@ bool sqlrclientprotocol::getQuery(sqlrcursor_svr *cursor) {
 
 	// get the length of the query
 	ssize_t	result=clientsock->read(&cursor->querylength,
-						cont->idleclienttimeout,0);
+						idleclienttimeout,0);
 	if (result!=sizeof(uint32_t)) {
 		cursor->querylength=0;
 		cont->logClientProtocolError(cursor,
@@ -1048,20 +962,20 @@ bool sqlrclientprotocol::getQuery(sqlrcursor_svr *cursor) {
 	}
 
 	// bounds checking
-	if (cursor->querylength>cont->maxquerysize) {
+	if (cursor->querylength>maxquerysize) {
 
 		stringbuffer	err;
 		err.append(SQLR_ERROR_MAXQUERYLENGTH_STRING);
 		err.append(" (")->append(cursor->querylength)->append('>');
-		err.append(cont->maxquerysize)->append(')');
+		err.append(maxquerysize)->append(')');
 		cursor->setError(err.getString(),
 				SQLR_ERROR_MAXQUERYLENGTH,true);
 
-		cont->debugstr.clear();
-		cont->debugstr.append("get query failed: "
+		debugstr.clear();
+		debugstr.append("get query failed: "
 				"client sent bad query length: ");
-		cont->debugstr.append(cursor->querylength);
-		cont->logClientProtocolError(cursor,cont->debugstr.getString(),1);
+		debugstr.append(cursor->querylength);
+		cont->logClientProtocolError(cursor,debugstr.getString(),1);
 
 		cursor->querylength=0;
 		return false;
@@ -1070,7 +984,7 @@ bool sqlrclientprotocol::getQuery(sqlrcursor_svr *cursor) {
 	// read the query into the buffer
 	result=clientsock->read(cursor->querybuffer,
 				cursor->querylength,
-				cont->idleclienttimeout,0);
+				idleclienttimeout,0);
 	if ((uint32_t)result!=cursor->querylength) {
 
 		cursor->querylength=0;
@@ -1084,12 +998,12 @@ bool sqlrclientprotocol::getQuery(sqlrcursor_svr *cursor) {
 	cursor->querybuffer[cursor->querylength]='\0';
 
 	if (cont->sqlrlg) {
-		cont->debugstr.clear();
-		cont->debugstr.append("querylength: ")->append(cursor->querylength);
-		cont->logDebugMessage(cont->debugstr.getString());
-		cont->debugstr.clear();
-		cont->debugstr.append("query: ")->append(cursor->querybuffer);
-		cont->logDebugMessage(cont->debugstr.getString());
+		debugstr.clear();
+		debugstr.append("querylength: ")->append(cursor->querylength);
+		cont->logDebugMessage(debugstr.getString());
+		debugstr.clear();
+		debugstr.append("query: ")->append(cursor->querybuffer);
+		cont->logDebugMessage(debugstr.getString());
 		cont->logDebugMessage("getting query succeeded");
 	}
 
@@ -1109,8 +1023,7 @@ bool sqlrclientprotocol::getInputBinds(sqlrcursor_svr *cursor) {
 	}
 	
 	// fill the buffers
-	for (uint16_t i=0; i<cursor->inbindcount &&
-				i<cont->maxbindcount; i++) {
+	for (uint16_t i=0; i<cursor->inbindcount && i<maxbindcount; i++) {
 
 		bindvar_svr	*bv=&(cursor->inbindvars[i]);
 
@@ -1165,8 +1078,7 @@ bool sqlrclientprotocol::getOutputBinds(sqlrcursor_svr *cursor) {
 	}
 
 	// fill the buffers
-	for (uint16_t i=0; i<cursor->outbindcount &&
-				i<cont->maxbindcount; i++) {
+	for (uint16_t i=0; i<cursor->outbindcount && i<maxbindcount; i++) {
 
 		bindvar_svr	*bv=&(cursor->outbindvars[i]);
 
@@ -1178,8 +1090,7 @@ bool sqlrclientprotocol::getOutputBinds(sqlrcursor_svr *cursor) {
 		// get the size of the value
 		if (bv->type==STRING_BIND) {
 			bv->value.stringval=NULL;
-			if (!getBindSize(cursor,bv,
-					&cont->maxstringbindvaluelength)) {
+			if (!getBindSize(cursor,bv,&maxstringbindvaluelength)) {
 				return false;
 			}
 			// This must be a allocated and cleared because oracle8
@@ -1188,7 +1099,7 @@ bool sqlrclientprotocol::getOutputBinds(sqlrcursor_svr *cursor) {
 			// be NULL, but for now I'm just going to go ahead and
 			// use allocateAndClear.
 			bv->value.stringval=
-				(char *)cont->bindpool->allocateAndClear(
+				(char *)bindpool->allocateAndClear(
 							bv->valuesize+1);
 			cont->logDebugMessage("STRING");
 		} else if (bv->type==INTEGER_BIND) {
@@ -1215,11 +1126,10 @@ bool sqlrclientprotocol::getOutputBinds(sqlrcursor_svr *cursor) {
 			// date 512 bytes ought to be enough
 			bv->value.dateval.buffersize=512;
 			bv->value.dateval.buffer=
-				(char *)cont->bindpool->allocate(
+				(char *)bindpool->allocate(
 						bv->value.dateval.buffersize);
 		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
-			if (!getBindSize(cursor,bv,
-					&cont->maxlobbindvaluelength)) {
+			if (!getBindSize(cursor,bv,&maxlobbindvaluelength)) {
 				return false;
 			}
 			if (bv->type==BLOB_BIND) {
@@ -1253,7 +1163,7 @@ bool sqlrclientprotocol::getBindVarCount(sqlrcursor_svr *cursor,
 	*count=0;
 
 	// get the number of input bind variable/values
-	ssize_t	result=clientsock->read(count,cont->idleclienttimeout,0);
+	ssize_t	result=clientsock->read(count,idleclienttimeout,0);
 	if (result!=sizeof(uint16_t)) {
 		cont->logClientProtocolError(cursor,
 				"get binds failed: "
@@ -1263,19 +1173,19 @@ bool sqlrclientprotocol::getBindVarCount(sqlrcursor_svr *cursor,
 	}
 
 	// bounds checking
-	if (*count>cont->maxbindcount) {
+	if (*count>maxbindcount) {
 
 		stringbuffer	err;
 		err.append(SQLR_ERROR_MAXBINDCOUNT_STRING);
 		err.append(" (")->append(*count)->append('>');
-		err.append(cont->maxbindcount)->append(')');
+		err.append(maxbindcount)->append(')');
 		cursor->setError(err.getString(),SQLR_ERROR_MAXBINDCOUNT,true);
 
-		cont->debugstr.clear();
-		cont->debugstr.append("get binds failed: "
+		debugstr.clear();
+		debugstr.append("get binds failed: "
 				"client tried to send too many binds: ");
-		cont->debugstr.append(*count);
-		cont->logClientProtocolError(cursor,cont->debugstr.getString(),1);
+		debugstr.append(*count);
+		cont->logClientProtocolError(cursor,debugstr.getString(),1);
 
 		*count=0;
 		return false;
@@ -1294,7 +1204,7 @@ bool sqlrclientprotocol::getBindVarName(sqlrcursor_svr *cursor,
 	// get the variable name size
 	uint16_t	bindnamesize;
 	ssize_t		result=clientsock->read(&bindnamesize,
-						cont->idleclienttimeout,0);
+						idleclienttimeout,0);
 	if (result!=sizeof(uint16_t)) {
 		cont->logClientProtocolError(cursor,
 				"get binds failed: "
@@ -1303,19 +1213,19 @@ bool sqlrclientprotocol::getBindVarName(sqlrcursor_svr *cursor,
 	}
 
 	// bounds checking
-	if (bindnamesize>cont->maxbindnamelength) {
+	if (bindnamesize>maxbindnamelength) {
 
 		stringbuffer	err;
 		err.append(SQLR_ERROR_MAXBINDNAMELENGTH_STRING);
 		err.append(" (")->append(bindnamesize)->append('>');
-		err.append(cont->maxbindnamelength)->append(')');
+		err.append(maxbindnamelength)->append(')');
 		cursor->setError(err.getString(),
 					SQLR_ERROR_MAXBINDNAMELENGTH,true);
 
-		cont->debugstr.clear();
-		cont->debugstr.append("get binds failed: bad variable name length: ");
-		cont->debugstr.append(bindnamesize);
-		cont->logClientProtocolError(cursor,cont->debugstr.getString(),1);
+		debugstr.clear();
+		debugstr.append("get binds failed: bad variable name length: ");
+		debugstr.append(bindnamesize);
+		cont->logClientProtocolError(cursor,debugstr.getString(),1);
 		return false;
 	}
 
@@ -1324,7 +1234,7 @@ bool sqlrclientprotocol::getBindVarName(sqlrcursor_svr *cursor,
 	bv->variable=(char *)cont->bindmappingspool->allocate(bindnamesize+2);
 	bv->variable[0]=conn->bindVariablePrefix();
 	result=clientsock->read(bv->variable+1,bindnamesize,
-					cont->idleclienttimeout,0);
+					idleclienttimeout,0);
 	if (result!=bindnamesize) {
 		bv->variablesize=0;
 		bv->variable[0]='\0';
@@ -1343,7 +1253,7 @@ bool sqlrclientprotocol::getBindVarName(sqlrcursor_svr *cursor,
 bool sqlrclientprotocol::getBindVarType(bindvar_svr *bv) {
 
 	// get the type
-	ssize_t	result=clientsock->read(&bv->type,cont->idleclienttimeout,0);
+	ssize_t	result=clientsock->read(&bv->type,idleclienttimeout,0);
 	if (result!=sizeof(uint16_t)) {
 		cont->logClientProtocolError(NULL,
 				"get binds failed: "
@@ -1360,7 +1270,7 @@ bool sqlrclientprotocol::getBindSize(sqlrcursor_svr *cursor,
 	bv->valuesize=0;
 
 	// get the size of the value
-	ssize_t	result=clientsock->read(&(bv->valuesize),cont->idleclienttimeout,0);
+	ssize_t	result=clientsock->read(&(bv->valuesize),idleclienttimeout,0);
 	if (result!=sizeof(uint32_t)) {
 		bv->valuesize=0;
 		cont->logClientProtocolError(cursor,
@@ -1371,7 +1281,7 @@ bool sqlrclientprotocol::getBindSize(sqlrcursor_svr *cursor,
 
 	// bounds checking
 	if (bv->valuesize>*maxsize) {
-		if (maxsize==&cont->maxstringbindvaluelength) {
+		if (maxsize==&maxstringbindvaluelength) {
 			stringbuffer	err;
 			err.append(SQLR_ERROR_MAXSTRINGBINDVALUELENGTH_STRING);
 			err.append(" (")->append(bv->valuesize)->append('>');
@@ -1386,10 +1296,10 @@ bool sqlrclientprotocol::getBindSize(sqlrcursor_svr *cursor,
 			cursor->setError(err.getString(),
 				SQLR_ERROR_MAXLOBBINDVALUELENGTH,true);
 		}
-		cont->debugstr.clear();
-		cont->debugstr.append("get binds failed: bad value length: ");
-		cont->debugstr.append(bv->valuesize);
-		cont->logClientProtocolError(cursor,cont->debugstr.getString(),1);
+		debugstr.clear();
+		debugstr.append("get binds failed: bad value length: ");
+		debugstr.append(bv->valuesize);
+		cont->logClientProtocolError(cursor,debugstr.getString(),1);
 		return false;
 	}
 
@@ -1400,7 +1310,7 @@ void sqlrclientprotocol::getNullBind(bindvar_svr *bv) {
 
 	cont->logDebugMessage("NULL");
 
-	bv->value.stringval=(char *)cont->bindpool->allocate(1);
+	bv->value.stringval=(char *)bindpool->allocate(1);
 	bv->value.stringval[0]='\0';
 	bv->valuesize=0;
 	bv->isnull=conn->nullBindValue();
@@ -1415,17 +1325,17 @@ bool sqlrclientprotocol::getStringBind(sqlrcursor_svr *cursor,
 	bv->value.stringval=NULL;
 
 	// get the size of the value
-	if (!getBindSize(cursor,bv,&cont->maxstringbindvaluelength)) {
+	if (!getBindSize(cursor,bv,&maxstringbindvaluelength)) {
 		return false;
 	}
 
 	// allocate space to store the value
-	bv->value.stringval=(char *)cont->bindpool->allocate(bv->valuesize+1);
+	bv->value.stringval=(char *)bindpool->allocate(bv->valuesize+1);
 
 	// get the bind value
 	ssize_t	result=clientsock->read(bv->value.stringval,
 					bv->valuesize,
-					cont->idleclienttimeout,0);
+					idleclienttimeout,0);
 	if ((uint32_t)result!=(uint32_t)(bv->valuesize)) {
 		bv->value.stringval[0]='\0';
 		const char	*info="get binds failed: "
@@ -1447,7 +1357,7 @@ bool sqlrclientprotocol::getIntegerBind(bindvar_svr *bv) {
 
 	// get the value itself
 	uint64_t	value;
-	ssize_t		result=clientsock->read(&value,cont->idleclienttimeout,0);
+	ssize_t		result=clientsock->read(&value,idleclienttimeout,0);
 	if (result!=sizeof(uint64_t)) {
 		cont->logClientProtocolError(NULL,
 				"get binds failed: "
@@ -1471,7 +1381,7 @@ bool sqlrclientprotocol::getDoubleBind(bindvar_svr *bv) {
 
 	// get the value
 	ssize_t	result=clientsock->read(&(bv->value.doubleval.value),
-						cont->idleclienttimeout,0);
+						idleclienttimeout,0);
 	if (result!=sizeof(double)) {
 		cont->logClientProtocolError(NULL,
 				"get binds failed: "
@@ -1481,7 +1391,7 @@ bool sqlrclientprotocol::getDoubleBind(bindvar_svr *bv) {
 
 	// get the precision
 	result=clientsock->read(&(bv->value.doubleval.precision),
-						cont->idleclienttimeout,0);
+						idleclienttimeout,0);
 	if (result!=sizeof(uint32_t)) {
 		cont->logClientProtocolError(NULL,
 				"get binds failed: "
@@ -1491,7 +1401,7 @@ bool sqlrclientprotocol::getDoubleBind(bindvar_svr *bv) {
 
 	// get the scale
 	result=clientsock->read(&(bv->value.doubleval.scale),
-						cont->idleclienttimeout,0);
+						idleclienttimeout,0);
 	if (result!=sizeof(uint32_t)) {
 		cont->logClientProtocolError(NULL,
 				"get binds failed: "
@@ -1516,7 +1426,7 @@ bool sqlrclientprotocol::getDateBind(bindvar_svr *bv) {
 	uint16_t	temp;
 
 	// get the year
-	ssize_t	result=clientsock->read(&temp,cont->idleclienttimeout,0);
+	ssize_t	result=clientsock->read(&temp,idleclienttimeout,0);
 	if (result!=sizeof(uint16_t)) {
 		cont->logClientProtocolError(NULL,
 				"get binds failed: "
@@ -1526,7 +1436,7 @@ bool sqlrclientprotocol::getDateBind(bindvar_svr *bv) {
 	bv->value.dateval.year=(int16_t)temp;
 
 	// get the month
-	result=clientsock->read(&temp,cont->idleclienttimeout,0);
+	result=clientsock->read(&temp,idleclienttimeout,0);
 	if (result!=sizeof(uint16_t)) {
 		cont->logClientProtocolError(NULL,
 				"get binds failed: "
@@ -1536,7 +1446,7 @@ bool sqlrclientprotocol::getDateBind(bindvar_svr *bv) {
 	bv->value.dateval.month=(int16_t)temp;
 
 	// get the day
-	result=clientsock->read(&temp,cont->idleclienttimeout,0);
+	result=clientsock->read(&temp,idleclienttimeout,0);
 	if (result!=sizeof(uint16_t)) {
 		cont->logClientProtocolError(NULL,
 				"get binds failed: "
@@ -1546,7 +1456,7 @@ bool sqlrclientprotocol::getDateBind(bindvar_svr *bv) {
 	bv->value.dateval.day=(int16_t)temp;
 
 	// get the hour
-	result=clientsock->read(&temp,cont->idleclienttimeout,0);
+	result=clientsock->read(&temp,idleclienttimeout,0);
 	if (result!=sizeof(uint16_t)) {
 		cont->logClientProtocolError(NULL,
 				"get binds failed: "
@@ -1556,7 +1466,7 @@ bool sqlrclientprotocol::getDateBind(bindvar_svr *bv) {
 	bv->value.dateval.hour=(int16_t)temp;
 
 	// get the minute
-	result=clientsock->read(&temp,cont->idleclienttimeout,0);
+	result=clientsock->read(&temp,idleclienttimeout,0);
 	if (result!=sizeof(uint16_t)) {
 		cont->logClientProtocolError(NULL,
 				"get binds failed: "
@@ -1566,7 +1476,7 @@ bool sqlrclientprotocol::getDateBind(bindvar_svr *bv) {
 	bv->value.dateval.minute=(int16_t)temp;
 
 	// get the second
-	result=clientsock->read(&temp,cont->idleclienttimeout,0);
+	result=clientsock->read(&temp,idleclienttimeout,0);
 	if (result!=sizeof(uint16_t)) {
 		cont->logClientProtocolError(NULL,
 				"get binds failed: "
@@ -1577,7 +1487,7 @@ bool sqlrclientprotocol::getDateBind(bindvar_svr *bv) {
 
 	// get the microsecond
 	uint32_t	temp32;
-	result=clientsock->read(&temp32,cont->idleclienttimeout,0);
+	result=clientsock->read(&temp32,idleclienttimeout,0);
 	if (result!=sizeof(uint32_t)) {
 		cont->logClientProtocolError(NULL,
 				"get binds failed: "
@@ -1588,7 +1498,7 @@ bool sqlrclientprotocol::getDateBind(bindvar_svr *bv) {
 
 	// get the size of the time zone
 	uint16_t	length;
-	result=clientsock->read(&length,cont->idleclienttimeout,0);
+	result=clientsock->read(&length,idleclienttimeout,0);
 	if (result!=sizeof(uint16_t)) {
 		cont->logClientProtocolError(NULL,
 				"get binds failed: "
@@ -1599,11 +1509,11 @@ bool sqlrclientprotocol::getDateBind(bindvar_svr *bv) {
 	// FIXME: do bounds checking here
 
 	// allocate space to store the time zone
-	bv->value.dateval.tz=(char *)cont->bindpool->allocate(length+1);
+	bv->value.dateval.tz=(char *)bindpool->allocate(length+1);
 
 	// get the time zone
 	result=clientsock->read(bv->value.dateval.tz,length,
-					cont->idleclienttimeout,0);
+					idleclienttimeout,0);
 	if ((uint16_t)result!=length) {
 		bv->value.dateval.tz[0]='\0';
 		cont->logClientProtocolError(NULL,
@@ -1616,7 +1526,7 @@ bool sqlrclientprotocol::getDateBind(bindvar_svr *bv) {
 	// allocate enough space to store the date/time string
 	// 64 bytes ought to be enough
 	bv->value.dateval.buffersize=64;
-	bv->value.dateval.buffer=(char *)cont->bindpool->allocate(
+	bv->value.dateval.buffer=(char *)bindpool->allocate(
 						bv->value.dateval.buffersize);
 
 	stringbuffer	str;
@@ -1646,18 +1556,18 @@ bool sqlrclientprotocol::getLobBind(sqlrcursor_svr *cursor, bindvar_svr *bv) {
 	}
 
 	// get the size of the value
-	if (!getBindSize(cursor,bv,&cont->maxlobbindvaluelength)) {
+	if (!getBindSize(cursor,bv,&maxlobbindvaluelength)) {
 		return false;
 	}
 
 	// allocate space to store the value
 	// (the +1 is to store the NULL-terminator for CLOBS)
-	bv->value.stringval=(char *)cont->bindpool->allocate(bv->valuesize+1);
+	bv->value.stringval=(char *)bindpool->allocate(bv->valuesize+1);
 
 	// get the bind value
 	ssize_t	result=clientsock->read(bv->value.stringval,
 					bv->valuesize,
-					cont->idleclienttimeout,0);
+					idleclienttimeout,0);
 	if ((uint32_t)result!=(uint32_t)(bv->valuesize)) {
 		bv->value.stringval[0]='\0';
 		cont->logClientProtocolError(cursor,
@@ -1678,7 +1588,8 @@ bool sqlrclientprotocol::getSendColumnInfo() {
 
 	cont->logDebugMessage("get send column info...");
 
-	ssize_t	result=clientsock->read(&cont->sendcolumninfo,cont->idleclienttimeout,0);
+	ssize_t	result=clientsock->read(&cont->sendcolumninfo,
+						idleclienttimeout,0);
 	if (result!=sizeof(uint16_t)) {
 		cont->logClientProtocolError(NULL,
 				"get send column info failed",result);
@@ -1698,8 +1609,7 @@ bool sqlrclientprotocol::getSendColumnInfo() {
 bool sqlrclientprotocol::getSkipAndFetch(sqlrcursor_svr *cursor) {
 
 	// get the number of rows to skip
-	ssize_t		result=clientsock->read(
-					&cont->skip,cont->idleclienttimeout,0);
+	ssize_t		result=clientsock->read(&skip,idleclienttimeout,0);
 	if (result!=sizeof(uint64_t)) {
 		cont->logClientProtocolError(cursor,
 				"return result set data failed: "
@@ -1708,7 +1618,7 @@ bool sqlrclientprotocol::getSkipAndFetch(sqlrcursor_svr *cursor) {
 	}
 
 	// get the number of rows to fetch
-	result=clientsock->read(&cont->fetch,cont->idleclienttimeout,0);
+	result=clientsock->read(&fetch,idleclienttimeout,0);
 	if (result!=sizeof(uint64_t)) {
 		cont->logClientProtocolError(cursor,
 				"return result set data failed: "
@@ -1865,11 +1775,11 @@ void sqlrclientprotocol::sendRowCounts(bool knowsactual, uint64_t actual,
 void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
 	if (cont->sqlrlg) {
-		cont->debugstr.clear();
-		cont->debugstr.append("returning ");
-		cont->debugstr.append(cursor->outbindcount);
-		cont->debugstr.append(" output bind values: ");
-		cont->logDebugMessage(cont->debugstr.getString());
+		debugstr.clear();
+		debugstr.append("returning ");
+		debugstr.append(cursor->outbindcount);
+		debugstr.append(" output bind values: ");
+		cont->logDebugMessage(debugstr.getString());
 	}
 
 	// run through the output bind values, sending them back
@@ -1878,15 +1788,15 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 		bindvar_svr	*bv=&(cursor->outbindvars[i]);
 
 		if (cont->sqlrlg) {
-			cont->debugstr.clear();
-			cont->debugstr.append(i);
-			cont->debugstr.append(":");
+			debugstr.clear();
+			debugstr.append(i);
+			debugstr.append(":");
 		}
 
 		if (conn->bindValueIsNull(bv->isnull)) {
 
 			if (cont->sqlrlg) {
-				cont->debugstr.append("NULL");
+				debugstr.append("NULL");
 			}
 
 			clientsock->write((uint16_t)NULL_DATA);
@@ -1894,7 +1804,7 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 		} else if (bv->type==BLOB_BIND) {
 
 			if (cont->sqlrlg) {
-				cont->debugstr.append("BLOB:");
+				debugstr.append("BLOB:");
 			}
 
 			returnOutputBindBlob(cursor,i);
@@ -1902,7 +1812,7 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 		} else if (bv->type==CLOB_BIND) {
 
 			if (cont->sqlrlg) {
-				cont->debugstr.append("CLOB:");
+				debugstr.append("CLOB:");
 			}
 
 			returnOutputBindClob(cursor,i);
@@ -1910,8 +1820,8 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 		} else if (bv->type==STRING_BIND) {
 
 			if (cont->sqlrlg) {
-				cont->debugstr.append("STRING:");
-				cont->debugstr.append(bv->value.stringval);
+				debugstr.append("STRING:");
+				debugstr.append(bv->value.stringval);
 			}
 
 			clientsock->write((uint16_t)STRING_DATA);
@@ -1923,8 +1833,8 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 		} else if (bv->type==INTEGER_BIND) {
 
 			if (cont->sqlrlg) {
-				cont->debugstr.append("INTEGER:");
-				cont->debugstr.append(bv->value.integerval);
+				debugstr.append("INTEGER:");
+				debugstr.append(bv->value.integerval);
 			}
 
 			clientsock->write((uint16_t)INTEGER_DATA);
@@ -1933,13 +1843,13 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 		} else if (bv->type==DOUBLE_BIND) {
 
 			if (cont->sqlrlg) {
-				cont->debugstr.append("DOUBLE:");
-				cont->debugstr.append(bv->value.doubleval.value);
-				cont->debugstr.append("(");
-				cont->debugstr.append(bv->value.doubleval.precision);
-				cont->debugstr.append(",");
-				cont->debugstr.append(bv->value.doubleval.scale);
-				cont->debugstr.append(")");
+				debugstr.append("DOUBLE:");
+				debugstr.append(bv->value.doubleval.value);
+				debugstr.append("(");
+				debugstr.append(bv->value.doubleval.precision);
+				debugstr.append(",");
+				debugstr.append(bv->value.doubleval.scale);
+				debugstr.append(")");
 			}
 
 			clientsock->write((uint16_t)DOUBLE_DATA);
@@ -1952,22 +1862,22 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 		} else if (bv->type==DATE_BIND) {
 
 			if (cont->sqlrlg) {
-				cont->debugstr.append("DATE:");
-				cont->debugstr.append(bv->value.dateval.year);
-				cont->debugstr.append("-");
-				cont->debugstr.append(bv->value.dateval.month);
-				cont->debugstr.append("-");
-				cont->debugstr.append(bv->value.dateval.day);
-				cont->debugstr.append(" ");
-				cont->debugstr.append(bv->value.dateval.hour);
-				cont->debugstr.append(":");
-				cont->debugstr.append(bv->value.dateval.minute);
-				cont->debugstr.append(":");
-				cont->debugstr.append(bv->value.dateval.second);
-				cont->debugstr.append(":");
-				cont->debugstr.append(bv->value.dateval.microsecond);
-				cont->debugstr.append(" ");
-				cont->debugstr.append(bv->value.dateval.tz);
+				debugstr.append("DATE:");
+				debugstr.append(bv->value.dateval.year);
+				debugstr.append("-");
+				debugstr.append(bv->value.dateval.month);
+				debugstr.append("-");
+				debugstr.append(bv->value.dateval.day);
+				debugstr.append(" ");
+				debugstr.append(bv->value.dateval.hour);
+				debugstr.append(":");
+				debugstr.append(bv->value.dateval.minute);
+				debugstr.append(":");
+				debugstr.append(bv->value.dateval.second);
+				debugstr.append(":");
+				debugstr.append(bv->value.dateval.microsecond);
+				debugstr.append(" ");
+				debugstr.append(bv->value.dateval.tz);
 			}
 
 			clientsock->write((uint16_t)DATE_DATA);
@@ -1987,8 +1897,8 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 		} else if (bv->type==CURSOR_BIND) {
 
 			if (cont->sqlrlg) {
-				cont->debugstr.append("CURSOR:");
-				cont->debugstr.append(bv->value.cursorid);
+				debugstr.append("CURSOR:");
+				debugstr.append(bv->value.cursorid);
 			}
 
 			clientsock->write((uint16_t)CURSOR_DATA);
@@ -1996,7 +1906,7 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 		}
 
 		if (cont->sqlrlg) {
-			cont->logDebugMessage(cont->debugstr.getString());
+			cont->logDebugMessage(debugstr.getString());
 		}
 	}
 
@@ -2093,29 +2003,29 @@ void sqlrclientprotocol::sendColumnDefinition(const char *name,
 						uint16_t autoincrement) {
 
 	if (cont->sqlrlg) {
-		cont->debugstr.clear();
+		debugstr.clear();
 		for (uint16_t i=0; i<namelen; i++) {
-			cont->debugstr.append(name[i]);
+			debugstr.append(name[i]);
 		}
-		cont->debugstr.append(":");
-		cont->debugstr.append(type);
-		cont->debugstr.append(":");
-		cont->debugstr.append(size);
-		cont->debugstr.append(" (");
-		cont->debugstr.append(precision);
-		cont->debugstr.append(",");
-		cont->debugstr.append(scale);
-		cont->debugstr.append(") ");
+		debugstr.append(":");
+		debugstr.append(type);
+		debugstr.append(":");
+		debugstr.append(size);
+		debugstr.append(" (");
+		debugstr.append(precision);
+		debugstr.append(",");
+		debugstr.append(scale);
+		debugstr.append(") ");
 		if (!nullable) {
-			cont->debugstr.append("NOT NULL ");
+			debugstr.append("NOT NULL ");
 		}
 		if (primarykey) {
-			cont->debugstr.append("Primary key ");
+			debugstr.append("Primary key ");
 		}
 		if (unique) {
-			cont->debugstr.append("Unique");
+			debugstr.append("Unique");
 		}
-		cont->logDebugMessage(cont->debugstr.getString());
+		cont->logDebugMessage(debugstr.getString());
 	}
 
 	clientsock->write(namelen);
@@ -2151,31 +2061,31 @@ void sqlrclientprotocol::sendColumnDefinitionString(const char *name,
 						uint16_t autoincrement) {
 
 	if (cont->sqlrlg) {
-		cont->debugstr.clear();
+		debugstr.clear();
 		for (uint16_t ni=0; ni<namelen; ni++) {
-			cont->debugstr.append(name[ni]);
+			debugstr.append(name[ni]);
 		}
-		cont->debugstr.append(":");
+		debugstr.append(":");
 		for (uint16_t ti=0; ti<typelen; ti++) {
-			cont->debugstr.append(type[ti]);
+			debugstr.append(type[ti]);
 		}
-		cont->debugstr.append(":");
-		cont->debugstr.append(size);
-		cont->debugstr.append(" (");
-		cont->debugstr.append(precision);
-		cont->debugstr.append(",");
-		cont->debugstr.append(scale);
-		cont->debugstr.append(") ");
+		debugstr.append(":");
+		debugstr.append(size);
+		debugstr.append(" (");
+		debugstr.append(precision);
+		debugstr.append(",");
+		debugstr.append(scale);
+		debugstr.append(") ");
 		if (!nullable) {
-			cont->debugstr.append("NOT NULL ");
+			debugstr.append("NOT NULL ");
 		}
 		if (primarykey) {
-			cont->debugstr.append("Primary key ");
+			debugstr.append("Primary key ");
 		}
 		if (unique) {
-			cont->debugstr.append("Unique");
+			debugstr.append("Unique");
 		}
-		cont->logDebugMessage(cont->debugstr.getString());
+		cont->logDebugMessage(debugstr.getString());
 	}
 
 	clientsock->write(namelen);
@@ -2227,7 +2137,7 @@ bool sqlrclientprotocol::returnResultSetData(sqlrcursor_svr *cursor,
 	}
 
 	// skip the specified number of rows
-	if (!cont->skipRows(cursor,cont->skip)) {
+	if (!cont->skipRows(cursor,skip)) {
 		clientsock->write((uint16_t)END_RESULT_SET);
 		clientsock->flushWriteBuffer(-1,-1);
 		cont->logDebugMessage("done returning result set data");
@@ -2236,15 +2146,15 @@ bool sqlrclientprotocol::returnResultSetData(sqlrcursor_svr *cursor,
 
 
 	if (cont->sqlrlg) {
-		cont->debugstr.clear();
-		cont->debugstr.append("fetching ");
-		cont->debugstr.append(cont->fetch);
-		cont->debugstr.append(" rows...");
-		cont->logDebugMessage(cont->debugstr.getString());
+		debugstr.clear();
+		debugstr.append("fetching ");
+		debugstr.append(fetch);
+		debugstr.append(" rows...");
+		cont->logDebugMessage(debugstr.getString());
 	}
 
 	// send the specified number of rows back
-	for (uint64_t i=0; (!cont->fetch || i<cont->fetch); i++) {
+	for (uint64_t i=0; (!fetch || i<fetch); i++) {
 
 		if (!cursor->fetchRow()) {
 			clientsock->write((uint16_t)END_RESULT_SET);
@@ -2254,13 +2164,13 @@ bool sqlrclientprotocol::returnResultSetData(sqlrcursor_svr *cursor,
 		}
 
 		if (cont->sqlrlg) {
-			cont->debugstr.clear();
+			debugstr.clear();
 		}
 
 		returnRow(cursor);
 
 		if (cont->sqlrlg) {
-			cont->logDebugMessage(cont->debugstr.getString());
+			cont->logDebugMessage(debugstr.getString());
 		}
 
 		if (cursor->lastrowvalid) {
@@ -2297,7 +2207,11 @@ void sqlrclientprotocol::returnRow(sqlrcursor_svr *cursor) {
 			sendLobField(cursor,i);
 			cursor->cleanUpLobField(i);
 		} else {
-			sendField(cursor,i,field,fieldlength);
+			const char	*newfield=NULL;
+			uint32_t	newfieldlength=0;
+			cont->reformatField(cursor,i,field,fieldlength,
+						&newfield,&newfieldlength);
+			sendField(newfield,newfieldlength);
 		}
 	}
 
@@ -2305,78 +2219,12 @@ void sqlrclientprotocol::returnRow(sqlrcursor_svr *cursor) {
 	cursor->nextRow();
 }
 
-void sqlrclientprotocol::sendField(sqlrcursor_svr *cursor,
-					uint32_t index,
-					const char *data,
-					uint32_t size) {
-
-	// convert date/time values, if configured to do so
-	if (cont->reformatdatetimes) {
-
-		// are dates going to be in MM/DD or DD/MM format?
-		bool	ddmm=cfgfl->getDateDdMm();
-		bool	yyyyddmm=cfgfl->getDateYyyyDdMm();
-
-		// This weirdness is mainly to address a FreeTDS/MSSQL
-		// issue.  See the code for the method
-		// freetdscursor::ignoreDateDdMmParameter() for more info.
-		if (cursor->ignoreDateDdMmParameter(index,data,size)) {
-			ddmm=false;
-			yyyyddmm=false;
-		}
-
-		int16_t	year=-1;
-		int16_t	month=-1;
-		int16_t	day=-1;
-		int16_t	hour=-1;
-		int16_t	minute=-1;
-		int16_t	second=-1;
-		int16_t	fraction=-1;
-		if (parseDateTime(data,ddmm,yyyyddmm,true,
-					&year,&month,&day,
-					&hour,&minute,&second,
-					&fraction)) {
-
-			// decide which format to use based on what parts
-			// were detected in the date/time
-			const char	*format=cfgfl->getDateTimeFormat();
-			if (hour==-1) {
-				format=cfgfl->getDateFormat();
-			} else if (day==-1) {
-				format=cfgfl->getTimeFormat();
-			}
-
-			// convert to the specified format
-			char	*newdata=convertDateTime(format,
-							year,month,day,
-							hour,minute,second,
-							fraction);
-
-			// send the field
-			sendField(newdata,charstring::length(newdata));
-
-			if (cont->debugsqltranslation) {
-				stdoutput.printf("converted date: "
-					"\"%s\" to \"%s\" using ddmm=%d\n",
-					data,newdata,ddmm);
-			}
-
-			// clean up
-			delete[] newdata;
-			return;
-		}
-	}
-
-	// send the field normally
-	sendField(data,size);
-}
-
 void sqlrclientprotocol::sendField(const char *data, uint32_t size) {
 
 	if (cont->sqlrlg) {
-		cont->debugstr.append("\"");
-		cont->debugstr.append(data,size);
-		cont->debugstr.append("\",");
+		debugstr.append("\"");
+		debugstr.append(data,size);
+		debugstr.append("\",");
 	}
 
 	clientsock->write((uint16_t)STRING_DATA);
@@ -2387,9 +2235,8 @@ void sqlrclientprotocol::sendField(const char *data, uint32_t size) {
 void sqlrclientprotocol::sendNullField() {
 
 	if (cont->sqlrlg) {
-		cont->debugstr.append("NULL");
+		debugstr.append("NULL");
 	}
-
 	clientsock->write((uint16_t)NULL_DATA);
 }
 
@@ -2463,7 +2310,7 @@ void sqlrclientprotocol::startSendingLong(uint64_t longlength) {
 void sqlrclientprotocol::sendLongSegment(const char *data, uint32_t size) {
 
 	if (cont->sqlrlg) {
-		cont->debugstr.append(data,size);
+		debugstr.append(data,size);
 	}
 
 	clientsock->write((uint16_t)STRING_DATA);
@@ -2474,7 +2321,7 @@ void sqlrclientprotocol::sendLongSegment(const char *data, uint32_t size) {
 void sqlrclientprotocol::endSendingLong() {
 
 	if (cont->sqlrlg) {
-		cont->debugstr.append(",");
+		debugstr.append(",");
 	}
 
 	clientsock->write((uint16_t)END_LONG_DATA);
@@ -2533,8 +2380,8 @@ void sqlrclientprotocol::returnError(sqlrcursor_svr *cursor, bool disconnect) {
 	// client will be sending skip/fetch, better get
 	// it even though we're not going to use it
 	uint64_t	skipfetch;
-	clientsock->read(&skipfetch,cont->idleclienttimeout,0);
-	clientsock->read(&skipfetch,cont->idleclienttimeout,0);
+	clientsock->read(&skipfetch,idleclienttimeout,0);
+	clientsock->read(&skipfetch,idleclienttimeout,0);
 
 	// Even though there was an error, we still 
 	// need to send the client the id of the 
@@ -2661,7 +2508,7 @@ bool sqlrclientprotocol::getListCommand(sqlrcursor_svr *cursor,
 
 	// get length of wild parameter
 	uint32_t	wildlen;
-	ssize_t		result=clientsock->read(&wildlen,cont->idleclienttimeout,0);
+	ssize_t		result=clientsock->read(&wildlen,idleclienttimeout,0);
 	if (result!=sizeof(uint32_t)) {
 		cont->logClientProtocolError(cursor,
 				"get list failed: "
@@ -2670,18 +2517,18 @@ bool sqlrclientprotocol::getListCommand(sqlrcursor_svr *cursor,
 	}
 
 	// bounds checking
-	if (wildlen>cont->maxquerysize) {
-		cont->debugstr.clear();
-		cont->debugstr.append("get list failed: wild length too large: ");
-		cont->debugstr.append(wildlen);
-		cont->logClientProtocolError(cursor,cont->debugstr.getString(),1);
+	if (wildlen>maxquerysize) {
+		debugstr.clear();
+		debugstr.append("get list failed: wild length too large: ");
+		debugstr.append(wildlen);
+		cont->logClientProtocolError(cursor,debugstr.getString(),1);
 		return false;
 	}
 
 	// read the wild parameter into the buffer
 	char	*wild=new char[wildlen+1];
 	if (wildlen) {
-		result=clientsock->read(wild,wildlen,cont->idleclienttimeout,0);
+		result=clientsock->read(wild,wildlen,idleclienttimeout,0);
 		if ((uint32_t)result!=wildlen) {
 			cont->logClientProtocolError(cursor,
 					"get list failed: "
@@ -2697,7 +2544,7 @@ bool sqlrclientprotocol::getListCommand(sqlrcursor_svr *cursor,
 
 		// get length of table parameter
 		uint32_t	tablelen;
-		result=clientsock->read(&tablelen,cont->idleclienttimeout,0);
+		result=clientsock->read(&tablelen,idleclienttimeout,0);
 		if (result!=sizeof(uint32_t)) {
 			cont->logClientProtocolError(cursor,
 					"get list failed: "
@@ -2706,12 +2553,12 @@ bool sqlrclientprotocol::getListCommand(sqlrcursor_svr *cursor,
 		}
 
 		// bounds checking
-		if (tablelen>cont->maxquerysize) {
-			cont->debugstr.clear();
-			cont->debugstr.append("get list failed: "
+		if (tablelen>maxquerysize) {
+			debugstr.clear();
+			debugstr.append("get list failed: "
 					"table length too large: ");
-			cont->debugstr.append(tablelen);
-			cont->logClientProtocolError(cursor,cont->debugstr.getString(),1);
+			debugstr.append(tablelen);
+			cont->logClientProtocolError(cursor,debugstr.getString(),1);
 			return false;
 		}
 
@@ -2719,7 +2566,7 @@ bool sqlrclientprotocol::getListCommand(sqlrcursor_svr *cursor,
 		table=new char[tablelen+1];
 		if (tablelen) {
 			result=clientsock->read(table,tablelen,
-						cont->idleclienttimeout,0);
+						idleclienttimeout,0);
 			if ((uint32_t)result!=tablelen) {
 				cont->logClientProtocolError(cursor,
 					"get list failed: "
@@ -2843,9 +2690,13 @@ bool sqlrclientprotocol::getListByQuery(sqlrcursor_svr *cursor,
 	// FIXME: this can fail
 	buildListQuery(cursor,query,wild,table);
 
-	// run it like a normal query, but don't request the query,
-	// binds or column info status from the client
-	return handleQueryOrBindCursor(cursor,false,false,false);
+	cont->logDebugMessage("handling query...");
+
+	cont->initQueryOrBindCursor(cursor,false,false,false);
+
+	cont->updateState(PROCESS_SQL);
+
+	return queryOrBindCursor(cursor,false,false);
 }
 
 bool sqlrclientprotocol::buildListQuery(sqlrcursor_svr *cursor,
@@ -2863,17 +2714,17 @@ bool sqlrclientprotocol::buildListQuery(sqlrcursor_svr *cursor,
 	cursor->querylength=charstring::length(query)+
 					wildbuf.getStringLength()+
 					tablebuf.getStringLength();
-	if (cursor->querylength>cont->maxquerysize) {
+	if (cursor->querylength>maxquerysize) {
 		return false;
 	}
 
 	// fill the query buffer and update the length
 	if (tablebuf.getStringLength()) {
-		charstring::printf(cursor->querybuffer,cont->maxquerysize+1,
+		charstring::printf(cursor->querybuffer,maxquerysize+1,
 						query,tablebuf.getString(),
 						wildbuf.getString());
 	} else {
-		charstring::printf(cursor->querybuffer,cont->maxquerysize+1,
+		charstring::printf(cursor->querybuffer,maxquerysize+1,
 						query,wildbuf.getString());
 	}
 	cursor->querylength=charstring::length(cursor->querybuffer);
@@ -2919,31 +2770,9 @@ bool sqlrclientprotocol::getQueryTreeCommand(sqlrcursor_svr *cursor) {
 	return true;
 }
 
-void sqlrclientprotocol::closeClientSocket() {
+void sqlrclientprotocol::closeClientSession() {
 
-	// Sometimes the server sends the result set and closes the socket
-	// while part of it is buffered but not yet transmitted.  This causes
-	// the client to receive a partial result set or error.  Telling the
-	// socket to linger doesn't always fix it.  Doing a read here should 
-	// guarantee that the client will close its end of the connection 
-	// before the server closes its end; the server will wait for data 
-	// from the client (which it will never receive) and when the client 
-	// closes its end (which it will only do after receiving the entire
-	// result set) the read will fall through.  This should guarantee 
-	// that the client will get the the entire result set without
-	// requiring the client to send data back indicating so.
-	//
-	// Also, if authentication fails, the client could send an entire query
-	// and bind vars before it reads the error and closes the socket.
-	// We have to absorb all of that data.  We shouldn't just loop forever
-	// though, that would provide a point of entry for a DOS attack.  We'll
-	// read the maximum number of bytes that could be sent.
-	cont->logDebugMessage("waiting for client to close the connection...");
-	uint16_t	dummy;
-	uint32_t	counter=0;
-	clientsock->useNonBlockingMode();
-	while (clientsock->read(&dummy,cont->idleclienttimeout,0)>0 &&
-				counter<
+	cont->closeClientSocket(
 				// sending auth
 				(sizeof(uint16_t)+
 				// user/password
@@ -2955,45 +2784,22 @@ void sqlrclientprotocol::closeClientSocket() {
 				// executing new query
 				sizeof(uint16_t)+
 				// query size and query
-				sizeof(uint32_t)+cont->maxquerysize+
+				sizeof(uint32_t)+maxquerysize+
 				// input bind var count
 				sizeof(uint16_t)+
 				// input bind vars
-				cont->maxbindcount*(2*sizeof(uint16_t)+
-						cont->maxbindnamelength)+
+				maxbindcount*(2*sizeof(uint16_t)+
+						maxbindnamelength)+
 				// output bind var count
 				sizeof(uint16_t)+
 				// output bind vars
-				cont->maxbindcount*(2*sizeof(uint16_t)+
-						cont->maxbindnamelength)+
+				maxbindcount*(2*sizeof(uint16_t)+
+						maxbindnamelength)+
 				// get column info
 				sizeof(uint16_t)+
 				// skip/fetch
 				2*sizeof(uint32_t)
 				// divide by two because we're
 				// reading 2 bytes at a time
-				)/2) {
-		counter++;
-	}
-	clientsock->useBlockingMode();
-	
-	cont->logDebugMessage("done waiting for client to close the connection");
-
-	// close the client socket
-	cont->logDebugMessage("closing the client socket...");
-	if (cont->proxymode) {
-
-		cont->logDebugMessage("(actually just signalling the listener)");
-
-		// we do need to signal the proxy that it
-		// needs to close the connection though
-		signalmanager::sendSignal(cont->proxypid,SIGUSR1);
-
-		// in proxy mode, the client socket is pointed at the
-		// handoff socket which we don't want to actually close
-		clientsock->setFileDescriptor(-1);
-	}
-	clientsock->close();
-	delete clientsock;
-	cont->logDebugMessage("done closing the client socket");
+				)/2);
 }

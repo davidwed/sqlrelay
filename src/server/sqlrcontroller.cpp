@@ -27,6 +27,8 @@ extern "C" {
 
 #include <defines.h>
 #include <datatypes.h>
+#define NEED_CONVERT_DATE_TIME
+#include <parsedatetime.h>
 
 #ifndef SQLRELAY_ENABLE_SHARED
 	extern "C" {
@@ -80,9 +82,6 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 
 	maxquerysize=0;
 	maxbindcount=0;
-	maxbindnamelength=0;
-	maxstringbindvaluelength=0;
-	maxlobbindvaluelength=0;
 	maxerrorlength=0;
 	idleclienttimeout=-1;
 
@@ -91,7 +90,6 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 	loggedin=false;
 
 	// maybe someday these parameters will be configurable
-	bindpool=new memorypool(512,128,100);
 	bindmappingspool=new memorypool(512,128,100);
 	inbindmappings=new namevaluepairs;
 	outbindmappings=new namevaluepairs;
@@ -126,6 +124,8 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 	dbipaddress=NULL;
 
 	reformatdatetimes=false;
+	reformattedfield=NULL;
+	reformattedfieldlength=0;
 
 	proxymode=false;
 	proxypid=0;
@@ -157,8 +157,6 @@ sqlrcontroller_svr::~sqlrcontroller_svr() {
 		delete[] unixsocket;
 	}
 
-	delete bindpool;
-
 	delete bindmappingspool;
 	delete inbindmappings;
 	delete outbindmappings;
@@ -179,6 +177,8 @@ sqlrcontroller_svr::~sqlrcontroller_svr() {
 		file::remove(pidfile);
 		delete[] pidfile;
 	}
+
+	delete[] reformattedfield;
 
 	delete conn;
 }
@@ -318,9 +318,6 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	maxclientinfolength=cfgfl->getMaxClientInfoLength();
 	maxquerysize=cfgfl->getMaxQuerySize();
 	maxbindcount=cfgfl->getMaxBindCount();
-	maxbindnamelength=cfgfl->getMaxBindNameLength();
-	maxstringbindvaluelength=cfgfl->getMaxStringBindValueLength();
-	maxlobbindvaluelength=cfgfl->getMaxLobBindValueLength();
 	maxerrorlength=cfgfl->getMaxErrorLength();
 	idleclienttimeout=cfgfl->getIdleClientTimeout();
 	reformatdatetimes=(cfgfl->getDateTimeFormat() ||
@@ -385,6 +382,12 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 		sqlrq=new sqlrqueries;
 		sqlrq->loadQueries(queries);
 	}
+
+	// init client protocols
+	for (uint8_t i=0; i<SQLRPROTOCOLCOUNT; i++) {
+		sqlrp[i]=NULL;
+	}
+	sqlrp[SQLRPROTOCOL_SQLRCLIENT]=new sqlrclientprotocol(this,conn,cfgfl);
 	
 	return true;
 }
@@ -1462,6 +1465,13 @@ int32_t sqlrcontroller_svr::waitForClient() {
 
 void sqlrcontroller_svr::clientSession() {
 
+	// determine client protocol
+	sqlrprotocol_t	protocol=getClientProtocol();
+	if (protocol==SQLRPROTOCOL_UNKNOWN) {
+		closeClientSocket(0);
+		return;
+	}
+
 	logDebugMessage("client session...");
 
 	inclientsession=true;
@@ -1474,31 +1484,41 @@ void sqlrcontroller_svr::clientSession() {
 
 	logClientConnected();
 
-	// determine client protocol and run client session
-	switch (getClientProtocol()) {
-		case SQLRPROTOCOL_SQLRCLIENT:
-			{
-			sqlrclientprotocol	sqlrcp(this,conn,cfgfl,
-								clientsock);
-			sqlrcp.clientSession();
-			}
-			break;
-		case SQLRPROTOCOL_HTTP:
-		case SQLRPROTOCOL_MYSQL:
-		case SQLRPROTOCOL_POSTGRESQL:
-		case SQLRPROTOCOL_TDS:
-		default:
-			logDebugMessage("closing the client socket...");
-			clientsock->close();
-			delete clientsock;
-			logDebugMessage("done closing the client socket");
-			logClientDisconnected("an error occurred");
-			decrementOpenClientConnections();
-			logDebugMessage("done with client session");
-			break;
+	// have client session using the appropriate protocol
+	sqlrprotocol		*proto=sqlrp[protocol];
+	sqlrclientexitstatus_t	exitstatus=SQLRCLIENTEXITSTATUS_ERROR;
+	if (proto) {
+		proto->setClientSocket(clientsock);
+		exitstatus=proto->clientSession();
+		proto->closeClientSession();
+	} else {
+		closeClientSocket(0);
 	}
 
+	closeSuspendedSessionSockets();
+
+	const char	*info;
+	switch (exitstatus) {
+		case SQLRCLIENTEXITSTATUS_CLOSED_CONNECTION:
+			info="client closed connection";
+			break;
+		case SQLRCLIENTEXITSTATUS_ENDED_SESSION:
+			info="client ended the session";
+			break;
+		case SQLRCLIENTEXITSTATUS_SUSPENDED_SESSION:
+			info="client suspended the session";
+			break;
+		default:
+			info="an error occurred";
+			break;
+	}
+	logClientDisconnected(info);
+
+	decrementOpenClientConnections();
+
 	inclientsession=false;
+
+	logDebugMessage("done with client session");
 }
 
 sqlrprotocol_t sqlrcontroller_svr::getClientProtocol() {
@@ -1529,6 +1549,16 @@ sqlrprotocol_t sqlrcontroller_svr::getClientProtocol() {
 	}
 
 	return SQLRPROTOCOL_SQLRCLIENT;
+}
+
+sqlrcursor_svr *sqlrcontroller_svr::getCursorById(uint16_t id) {
+
+	for (uint16_t i=0; i<cursorcount; i++) {
+		if (cur[i]->id==id) {
+			return cur[i];
+		}
+	}
+	return NULL;
 }
 
 sqlrcursor_svr *sqlrcontroller_svr::findAvailableCursor() {
@@ -1576,7 +1606,8 @@ sqlrcursor_svr *sqlrcontroller_svr::findAvailableCursor() {
 	return cur[firstnewcursor];
 }
 
-bool sqlrcontroller_svr::authenticate() {
+bool sqlrcontroller_svr::authenticate(const char *userbuffer,
+						const char *passwordbuffer) {
 
 	logDebugMessage("authenticate...");
 
@@ -1630,6 +1661,37 @@ bool sqlrcontroller_svr::databaseBasedAuth(const char *userbuffer,
 						"invalid user/password");
 	}
 	return lastauthsuccess;
+}
+
+void sqlrcontroller_svr::suspendSession(const char **unixsocketname,
+						uint16_t *inetportnumber) {
+
+	// mark the session suspended
+	suspendedsession=true;
+
+	// we can't wait forever for the client to resume, set a timeout
+	accepttimeout=cfgfl->getSessionTimeout();
+
+	// abort all cursors that aren't suspended...
+	logDebugMessage("aborting busy cursors...");
+	for (int32_t i=0; i<cursorcount; i++) {
+		if (cur[i]->state==SQLRCURSORSTATE_BUSY) {
+			cur[i]->abort();
+		}
+	}
+	logDebugMessage("done aborting busy cursors");
+
+	// open sockets to resume on
+	logDebugMessage("opening sockets to resume on...");
+	*unixsocketname=NULL;
+	*inetportnumber=0;
+	if (openSockets()) {
+		if (serversockun) {
+			*unixsocketname=unixsocket;
+		}
+		*inetportnumber=inetport;
+	}
+	logDebugMessage("done opening sockets to resume on");
 }
 
 bool sqlrcontroller_svr::autoCommitOn() {
@@ -1693,6 +1755,10 @@ bool sqlrcontroller_svr::rollback() {
 	return false;
 }
 
+bool sqlrcontroller_svr::selectDatabase(const char *db) {
+	return (cfgfl->getIgnoreSelectDatabase())?true:conn->selectDatabase(db);
+}
+
 bool sqlrcontroller_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 						bool *wasfaketransactionquery) {
 
@@ -1717,8 +1783,7 @@ bool sqlrcontroller_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 		return begin();
 		// FIXME: if the begin fails and the db api doesn't support
 		// a begin command then the connection-level error needs to
-		// be copied to the cursor so handleQueryOrBindCursor can
-		// report it
+		// be copied to the cursor so queryOrBindCursor can report it
 	} else if (isCommitQuery(cursor)) {
 		*wasfaketransactionquery=true;
 		cursor->inbindcount=0;
@@ -1734,8 +1799,7 @@ bool sqlrcontroller_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 		return commit();
 		// FIXME: if the commit fails and the db api doesn't support
 		// a commit command then the connection-level error needs to
-		// be copied to the cursor so handleQueryOrBindCursor can
-		// report it
+		// be copied to the cursor so queryOrBindCursor can report it
 	} else if (isRollbackQuery(cursor)) {
 		*wasfaketransactionquery=true;
 		cursor->inbindcount=0;
@@ -1751,8 +1815,7 @@ bool sqlrcontroller_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 		return rollback();
 		// FIXME: if the rollback fails and the db api doesn't support
 		// a rollback command then the connection-level error needs to
-		// be copied to the cursor so handleQueryOrBindCursor can
-		// report it
+		// be copied to the cursor so queryOrBindCursor can report it
 	}
 	return false;
 }
@@ -1801,9 +1864,21 @@ bool sqlrcontroller_svr::isRollbackQuery(sqlrcursor_svr *cursor) {
 			"rollback",8);
 }
 
-bool sqlrcontroller_svr::processQuery(sqlrcursor_svr *cursor,
+bool sqlrcontroller_svr::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 					bool reexecute, bool bindcursor) {
 
+	// handle fake transaction queries
+	bool	success=false;
+	bool	wasfaketransactionquery=false;
+	if (!reexecute && !bindcursor && faketransactionblocks) {
+		success=handleFakeTransactionQueries(cursor,
+					&wasfaketransactionquery);
+	}
+	if (wasfaketransactionquery) {
+		return success;
+	}
+
+	// process the query...
 	logDebugMessage("processing query...");
 
 	// on reexecute, translate bind variables from mapping
@@ -1811,7 +1886,7 @@ bool sqlrcontroller_svr::processQuery(sqlrcursor_svr *cursor,
 		translateBindVariablesFromMappings(cursor);
 	}
 
-	bool	success=false;
+	success=false;
 	bool	supportsnativebinds=cursor->supportsNativeBinds();
 
 	if (reexecute &&
@@ -2368,6 +2443,95 @@ void sqlrcontroller_svr::translateBeginTransaction(sqlrcursor_svr *cursor) {
 	logDebugMessage(cursor->querybuffer);
 }
 
+void sqlrcontroller_svr::initQueryOrBindCursor(sqlrcursor_svr *cursor,
+							bool reexecute,
+							bool bindcursor,
+							bool getquery) {
+
+	// decide whether to use the cursor itself
+	// or an attached custom query cursor
+	if (cursor->customquerycursor) {
+		if (reexecute) {
+			cursor=cursor->customquerycursor;
+		} else {
+			cursor->customquerycursor->close();
+			delete cursor->customquerycursor;
+			cursor->customquerycursor=NULL;
+		}
+	}
+
+	// re-init error data
+	cursor->clearError();
+
+	// clear bind mappings and reset the fake input binds flag
+	// (do this here because getInput/OutputBinds uses the bindmappingspool)
+	if (!bindcursor && !reexecute) {
+		bindmappingspool->deallocate();
+		inbindmappings->clear();
+		outbindmappings->clear();
+		cursor->fakeinputbindsforthisquery=fakeinputbinds;
+	}
+
+	// clean up whatever result set the cursor might have been busy with
+	cursor->cleanUpData();
+
+	if (getquery) {
+
+		// re-init buffers
+		if (!reexecute && !bindcursor) {
+			clientinfo[0]='\0';
+			clientinfolen=0;
+		}
+		if (!reexecute) {
+			cursor->querybuffer[0]='\0';
+			cursor->querylength=0;
+		}
+		cursor->inbindcount=0;
+		cursor->outbindcount=0;
+		for (uint16_t i=0; i<maxbindcount; i++) {
+			rawbuffer::zero(&(cursor->inbindvars[i]),
+						sizeof(bindvar_svr));
+			rawbuffer::zero(&(cursor->outbindvars[i]),
+						sizeof(bindvar_svr));
+		}
+	}
+}
+
+sqlrcursor_svr *sqlrcontroller_svr::useCustomQueryHandler(	
+						sqlrcursor_svr *cursor) {
+
+	// do we need to use a custom query handler for this query?
+
+	// bail right away if custom queries aren't enabled
+	if (!sqlrq) {
+		return cursor;
+	}
+
+	// see if the query matches one of the custom queries
+	cursor->customquerycursor=sqlrq->match(conn,cursor->querybuffer,
+							cursor->querylength);
+				
+	// if so...
+	if (cursor->customquerycursor) {
+
+		// open the cursor
+		cursor->customquerycursor->openInternal(cursor->id);
+
+		// copy the query that we just got into the custom query cursor
+		charstring::copy(cursor->customquerycursor->querybuffer,
+							cursor->querybuffer);
+		cursor->customquerycursor->querylength=cursor->querylength;
+
+		// set the cursor state
+		cursor->customquerycursor->state=SQLRCURSORSTATE_BUSY;
+
+		// reset the cursor
+		cursor=cursor->customquerycursor;
+	}
+
+	return cursor;
+}
+
 bool sqlrcontroller_svr::handleBinds(sqlrcursor_svr *cursor) {
 
 	bindvar_svr	*bind=NULL;
@@ -2638,6 +2802,77 @@ bool sqlrcontroller_svr::skipRows(sqlrcursor_svr *cursor, uint64_t rows) {
 	return true;
 }
 
+void sqlrcontroller_svr::reformatField(sqlrcursor_svr *cursor,
+						uint16_t index,
+						const char *field,
+						uint32_t fieldlength,
+						const char **newfield,
+						uint32_t *newfieldlength) {
+
+	// for now this method just reformats dates but in the future it could
+	// be extended to to configurable field reformatting...
+
+	// convert date/time values, if configured to do so
+	if (!reformatdatetimes) {
+		*newfield=field;
+		*newfieldlength=fieldlength;
+		return;
+	}
+
+	// are dates going to be in MM/DD or DD/MM format?
+	bool	ddmm=cfgfl->getDateDdMm();
+	bool	yyyyddmm=cfgfl->getDateYyyyDdMm();
+
+	// This weirdness is mainly to address a FreeTDS/MSSQL
+	// issue.  See the code for the method
+	// freetdscursor::ignoreDateDdMmParameter() for more info.
+	if (cursor->ignoreDateDdMmParameter(index,field,fieldlength)) {
+		ddmm=false;
+		yyyyddmm=false;
+	}
+
+	int16_t	year=-1;
+	int16_t	month=-1;
+	int16_t	day=-1;
+	int16_t	hour=-1;
+	int16_t	minute=-1;
+	int16_t	second=-1;
+	int16_t	fraction=-1;
+	if (!parseDateTime(field,ddmm,yyyyddmm,true,
+				&year,&month,&day,
+				&hour,&minute,&second,
+				&fraction)) {
+		return;
+	}
+
+	// decide which format to use based on what parts
+	// were detected in the date/time
+	const char	*format=cfgfl->getDateTimeFormat();
+	if (hour==-1) {
+		format=cfgfl->getDateFormat();
+	} else if (day==-1) {
+		format=cfgfl->getTimeFormat();
+	}
+
+	// convert to the specified format
+	delete[] reformattedfield;
+	reformattedfield=convertDateTime(format,
+					year,month,day,
+					hour,minute,second,
+					fraction);
+	reformattedfieldlength=charstring::length(reformattedfield);
+
+	if (debugsqltranslation) {
+		stdoutput.printf("converted date: "
+			"\"%s\" to \"%s\" using ddmm=%d\n",
+			reformattedfield,reformattedfieldlength,ddmm);
+	}
+
+	// set return values
+	*newfield=reformattedfield;
+	*newfieldlength=reformattedfieldlength;
+}
+
 void sqlrcontroller_svr::endSession() {
 
 	logDebugMessage("ending session...");
@@ -2798,6 +3033,56 @@ void sqlrcontroller_svr::truncateTempTable(sqlrcursor_svr *cursor,
 					truncatequery.getStringLength());
 	}
 	cursor->cleanUpData();
+}
+
+void sqlrcontroller_svr::closeClientSocket(uint32_t bytes) {
+
+	// Sometimes the server sends the result set and closes the socket
+	// while part of it is buffered but not yet transmitted.  This causes
+	// the client to receive a partial result set or error.  Telling the
+	// socket to linger doesn't always fix it.  Doing a read here should 
+	// guarantee that the client will close its end of the connection 
+	// before the server closes its end; the server will wait for data 
+	// from the client (which it will never receive) and when the client 
+	// closes its end (which it will only do after receiving the entire
+	// result set) the read will fall through.  This should guarantee 
+	// that the client will get the the entire result set without
+	// requiring the client to send data back indicating so.
+	//
+	// Also, if authentication fails, the client could send an entire query
+	// and bind vars before it reads the error and closes the socket.
+	// We have to absorb all of that data.  We shouldn't just loop forever
+	// though, that would provide a point of entry for a DOS attack.  We'll
+	// read the maximum number of bytes that could be sent.
+	logDebugMessage("waiting for client to close the connection...");
+	uint16_t	dummy;
+	uint32_t	counter=0;
+	clientsock->useNonBlockingMode();
+	while (clientsock->read(&dummy,idleclienttimeout,0)>0 &&
+							counter<bytes) {
+		counter++;
+	}
+	clientsock->useBlockingMode();
+	
+	logDebugMessage("done waiting for client to close the connection");
+
+	// close the client socket
+	logDebugMessage("closing the client socket...");
+	if (proxymode) {
+
+		logDebugMessage("(actually just signalling the listener)");
+
+		// we do need to signal the proxy that it
+		// needs to close the connection though
+		signalmanager::sendSignal(proxypid,SIGUSR1);
+
+		// in proxy mode, the client socket is pointed at the
+		// handoff socket which we don't want to actually close
+		clientsock->setFileDescriptor(-1);
+	}
+	clientsock->close();
+	delete clientsock;
+	logDebugMessage("done closing the client socket");
 }
 
 void sqlrcontroller_svr::closeSuspendedSessionSockets() {

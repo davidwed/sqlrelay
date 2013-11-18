@@ -104,6 +104,7 @@ class sqlrcontroller_svr : public listener {
 		void		releaseConnectionCountMutex();
 
 
+		sqlrcursor_svr	*getCursorById(uint16_t id);
 		sqlrcursor_svr	*findAvailableCursor();
 		void	closeCursors(bool destroy);
 		void	setUnixSocketDirectory();
@@ -125,17 +126,27 @@ class sqlrcontroller_svr : public listener {
 		bool	begin();
 		bool	commit();
 		bool	rollback();
+		bool	selectDatabase(const char *db);
+		void	closeClientSocket(uint32_t bytes);
 		void	closeSuspendedSessionSockets();
-		bool	authenticate();
+		bool	authenticate(const char *userbuffer,
+						const char *passwordbuffer);
 		bool	connectionBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
 		bool	databaseBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
+		void	suspendSession(const char **unixsocket,
+						uint16_t *inetportnumber);
 		void	endSession();
+		void	initQueryOrBindCursor(sqlrcursor_svr *cursor,
+							bool reexecute,
+							bool bindcursor,
+							bool getquery);
+		sqlrcursor_svr	*useCustomQueryHandler(sqlrcursor_svr *cursor);
 		bool	handleBinds(sqlrcursor_svr *cursor);
-		bool	processQuery(sqlrcursor_svr *cursor,
-						bool reexecute,
-						bool bindcursor);
+		bool	processQueryOrBindCursor(sqlrcursor_svr *cursor,
+							bool reexecute,
+							bool bindcursor);
 		void	rewriteQuery(sqlrcursor_svr *cursor);
 		bool	translateQuery(sqlrcursor_svr *cursor);
 		void	translateBindVariables(sqlrcursor_svr *cursor);
@@ -161,6 +172,13 @@ class sqlrcontroller_svr : public listener {
 		void	sendLobOutputBind(sqlrcursor_svr *cursor,
 							uint16_t index);
 		bool	skipRows(sqlrcursor_svr *cursor, uint64_t rows);
+
+		void	reformatField(sqlrcursor_svr *cursor,
+						uint16_t index,
+						const char *field,
+						uint32_t fieldlength,
+						const char **newfield,
+						uint32_t *newfieldlength);
 
 		void	dropTempTables(sqlrcursor_svr *cursor);
 		void	dropTempTable(sqlrcursor_svr *cursor,
@@ -269,9 +287,6 @@ class sqlrcontroller_svr : public listener {
 
 		sqlrauthenticator	*authc;
 
-		char		userbuffer[USERSIZE];
-		char		passwordbuffer[USERSIZE];
-
 		char		lastuserbuffer[USERSIZE];
 		char		lastpasswordbuffer[USERSIZE];
 		bool		lastauthsuccess;
@@ -298,7 +313,6 @@ class sqlrcontroller_svr : public listener {
 
 		filedescriptor	*clientsock;
 
-		memorypool	*bindpool;
 		memorypool	*bindmappingspool;
 		namevaluepairs	*inbindmappings;
 		namevaluepairs	*outbindmappings;
@@ -314,6 +328,7 @@ class sqlrcontroller_svr : public listener {
 		uint16_t	maxcursorcount;
 		sqlrcursor_svr	**cur;
 
+		sqlrprotocol	*sqlrp[SQLRPROTOCOLCOUNT];
 		sqlparser	*sqlp;
 		sqltranslations	*sqlt;
 		sqlwriter	*sqlw;
@@ -339,9 +354,6 @@ class sqlrcontroller_svr : public listener {
 		char		*pidfile;
 
 		bool		fakeinputbinds;
-
-		uint64_t	skip;
-		uint64_t	fetch;
 
 		semaphoreset	*semset;
 		sharedmemory	*idmemory;
@@ -369,9 +381,6 @@ class sqlrcontroller_svr : public listener {
 		uint64_t	maxclientinfolength;
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
-		uint16_t	maxbindnamelength;
-		uint32_t	maxstringbindvaluelength;
-		uint32_t	maxlobbindvaluelength;
 		uint32_t	maxerrorlength;
 
 		int64_t		loggedinsec;
@@ -381,6 +390,8 @@ class sqlrcontroller_svr : public listener {
 		const char	*dbipaddress;
 
 		bool		reformatdatetimes;
+		char		*reformattedfield;
+		uint32_t	reformattedfieldlength;
 };
 
 #endif

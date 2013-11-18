@@ -6,6 +6,9 @@
 
 #include <sqlrprotocol.h>
 #include <rudiments/stringbuffer.h>
+#include <rudiments/memorypool.h>
+
+#include <defines.h>
 
 class sqlrcontroller_svr;
 class sqlrconnection_svr;
@@ -16,11 +19,11 @@ class sqlrclientprotocol : public sqlrprotocol {
 	public:
 			sqlrclientprotocol(sqlrcontroller_svr *cont,
 						sqlrconnection_svr *conn,
-						sqlrconfigfile *cfgfl,
-						filedescriptor *clientsock);
+						sqlrconfigfile *cfgfl);
 		virtual	~sqlrclientprotocol();
 
-		void	clientSession();
+		sqlrclientexitstatus_t	clientSession();
+		void			closeClientSession();
 	private:
 		bool	getCommand(uint16_t *command);
 		sqlrcursor_svr	*getCursor(uint16_t command);
@@ -46,10 +49,9 @@ class sqlrclientprotocol : public sqlrprotocol {
 		bool	newQueryCommand(sqlrcursor_svr *cursor);
 		bool	reExecuteQueryCommand(sqlrcursor_svr *cursor);
 		bool	fetchFromBindCursorCommand(sqlrcursor_svr *cursor);
-		bool	handleQueryOrBindCursor(sqlrcursor_svr *cursor,
+		bool	queryOrBindCursor(sqlrcursor_svr *cursor,
 							bool reexecute,
-							bool bindcursor,
-							bool getquery);
+							bool bindcursor);
 		bool	getClientInfo(sqlrcursor_svr *cursor);
 		bool	getQuery(sqlrcursor_svr *cursor);
 		bool	getInputBinds(sqlrcursor_svr *cursor);
@@ -114,10 +116,6 @@ class sqlrclientprotocol : public sqlrprotocol {
 		bool	returnResultSetData(sqlrcursor_svr *cursor,
 						bool getskipandfetch);
 		void	returnRow(sqlrcursor_svr *cursor);
-		void	sendField(sqlrcursor_svr *cursor,
-					uint32_t index,
-					const char *data,
-					uint32_t size);
 		void	sendField(const char *data, uint32_t size);
 		void	sendNullField();
 		void	sendLobField(sqlrcursor_svr *cursor, uint32_t col);
@@ -150,7 +148,24 @@ class sqlrclientprotocol : public sqlrprotocol {
 		void	escapeParameter(stringbuffer *buffer,
 						const char *parameter);
 		bool	getQueryTreeCommand(sqlrcursor_svr *cursor);
-		void	closeClientSocket();
+
+		stringbuffer	debugstr;
+
+		int32_t		idleclienttimeout;
+
+		uint32_t	maxquerysize;
+		uint16_t	maxbindcount;
+		uint16_t	maxbindnamelength;
+		uint32_t	maxstringbindvaluelength;
+		uint32_t	maxlobbindvaluelength;
+
+		char		userbuffer[USERSIZE];
+		char		passwordbuffer[USERSIZE];
+
+		memorypool	*bindpool;
+
+		uint64_t	skip;
+		uint64_t	fetch;
 };
 
 #endif

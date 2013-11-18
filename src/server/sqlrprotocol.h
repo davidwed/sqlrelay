@@ -8,6 +8,7 @@
 #include <defaults.h>
 #include <rudiments/filedescriptor.h>
 
+#define	SQLRPROTOCOLCOUNT 5
 enum sqlrprotocol_t {
 	SQLRPROTOCOL_SQLRCLIENT=0,
 	SQLRPROTOCOL_HTTP,
@@ -15,6 +16,13 @@ enum sqlrprotocol_t {
 	SQLRPROTOCOL_POSTGRESQL,
 	SQLRPROTOCOL_TDS,
 	SQLRPROTOCOL_UNKNOWN
+};
+
+enum sqlrclientexitstatus_t {
+	SQLRCLIENTEXITSTATUS_ERROR=0,
+	SQLRCLIENTEXITSTATUS_CLOSED_CONNECTION,
+	SQLRCLIENTEXITSTATUS_ENDED_SESSION,
+	SQLRCLIENTEXITSTATUS_SUSPENDED_SESSION
 };
 
 class sqlrcontroller_svr;
@@ -25,11 +33,13 @@ class sqlrprotocol {
 	public:
 			sqlrprotocol(sqlrcontroller_svr *cont,
 					sqlrconnection_svr *conn,
-					sqlrconfigfile *cfgfl,
-					filedescriptor *clientsock);
+					sqlrconfigfile *cfgfl);
 		virtual	~sqlrprotocol();
 
-		virtual void	clientSession()=0;
+		void	setClientSocket(filedescriptor *clientsock);
+
+		virtual sqlrclientexitstatus_t	clientSession()=0;
+		virtual	void			closeClientSession()=0;
 
 	protected:
 		sqlrcontroller_svr	*cont;
