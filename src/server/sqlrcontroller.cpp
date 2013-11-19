@@ -1852,15 +1852,13 @@ bool sqlrcontroller_svr::isBeginTransactionQuery(sqlrcursor_svr *cursor) {
 
 bool sqlrcontroller_svr::isCommitQuery(sqlrcursor_svr *cursor) {
 	return !charstring::compareIgnoringCase(
-			cursor->skipWhitespaceAndComments(
-						cursor->querybuffer),
+			cursor->skipWhitespaceAndComments(cursor->querybuffer),
 			"commit",6);
 }
 
 bool sqlrcontroller_svr::isRollbackQuery(sqlrcursor_svr *cursor) {
 	return !charstring::compareIgnoringCase(
-			cursor->skipWhitespaceAndComments(
-						cursor->querybuffer),
+			cursor->skipWhitespaceAndComments(cursor->querybuffer),
 			"rollback",8);
 }
 
@@ -2466,7 +2464,7 @@ sqlrcursor_svr	*sqlrcontroller_svr::initQueryOrBindCursor(
 
 	// clear bind mappings and reset the fake input binds flag
 	// (do this here because getInput/OutputBinds uses the bindmappingspool)
-	if (!bindcursor && !reexecute) {
+	if (!reexecute && !bindcursor) {
 		bindmappingspool->deallocate();
 		inbindmappings->clear();
 		outbindmappings->clear();
@@ -2479,11 +2477,11 @@ sqlrcursor_svr	*sqlrcontroller_svr::initQueryOrBindCursor(
 	if (getquery) {
 
 		// re-init buffers
-		if (!reexecute && !bindcursor) {
-			clientinfo[0]='\0';
-			clientinfolen=0;
-		}
 		if (!reexecute) {
+			if (!bindcursor) {
+				clientinfo[0]='\0';
+				clientinfolen=0;
+			}
 			cursor->querybuffer[0]='\0';
 			cursor->querylength=0;
 		}
