@@ -1,6 +1,12 @@
 0.54 - fixed bugs that caused problems when unopened result sets were closed
 	added protocol identification phase to client/server protocol
 	split client protocol handling out into its own class and abstracted it
+	updated oracle code not to relogin when dropping tables unless a
+		temp table with an "on commit preserve rows" was run
+	updated server to run table-drop and session-end queries after the
+		session-end commit/rollback, as some queries on some platforms (
+		ncluding drop-table on oracle) cause an implicit commit and
+		the rollback needs to be run first
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted
