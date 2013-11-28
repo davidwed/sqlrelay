@@ -156,6 +156,7 @@ class oracle8connection : public sqlrconnection_svr {
 #endif
 #ifdef HAVE_ORACLE_8i
 		bool		droptemptables;
+		bool		temptabledroprelogin;
 #endif
 		bool		rejectduplicatebinds;
 };
@@ -423,6 +424,7 @@ oracle8connection::oracle8connection(sqlrcontroller_svr *cont) :
 #endif
 #ifdef HAVE_ORACLE_8i
 	droptemptables=false;
+	temptabledroprelogin=false;
 #endif
 	rejectduplicatebinds=false;
 }
@@ -519,7 +521,11 @@ bool oracle8connection::tempTableDropReLogIn() {
 	// ORA-14452: attempt to create, alter or drop an index on temporary
 	// table already in use
 	// It's not really clear why, but that's the case.
-	return true;
+	if (temptabledroprelogin) {
+		temptabledroprelogin=false;
+		return true;
+	}
+	return false;
 }
 #endif
 
@@ -2291,10 +2297,28 @@ void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 		ptr++;
 	}
 
+	// look for "on commit preserve rows"
+	bool	preserverowsoncommit=preserverows.match(ptr);
+
 	if (oracle8conn->droptemptables) {
+
+		// When dropping temporary tables, if any of those tables were
+		// created with "on commit preserve rows" then the session has
+		// to exit before the table can be dropped or oracle will return
+		// the following error:
+		// ORA-14452: attempt to create, alter or drop an index on
+		// temporary table already in use
+		//
+		// It's not really clear why, but that's the case.
+		// As such, we'll set a flag to cause a relogin if the query
+		// contained that clause.
+		oracle8conn->temptabledroprelogin=preserverowsoncommit;
+
 		// if "droptemptables" was specified...
 		conn->cont->addSessionTempTableForDrop(tablename.getString());
-	} else if (preserverows.match(ptr)) {
+
+	} else if (preserverowsoncommit) {
+
 		// If "on commit preserve rows" was specified, then when
 		// the commit/rollback is executed at the end of the
 		// session, the data won't be truncated.  It needs to
