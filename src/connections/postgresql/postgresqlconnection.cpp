@@ -234,8 +234,8 @@ bool postgresqlconnection::logIn(const char **error) {
 	PQsetNoticeProcessor(pgconn,nullNoticeProcessor,NULL);
 #else
 	if (devnull.open("/dev/null",O_RDONLY)) {
-		devnull.duplicate(STDOUT_FILENO);
-		devnull.duplicate(STDERR_FILENO);
+		devnull.duplicate(1);
+		devnull.duplicate(2);
 	}
 #endif
 
