@@ -8,6 +8,8 @@
 		ncluding drop-table on oracle) cause an implicit commit and
 		the rollback needs to be run first
 	replaced gettimeofday calls with calls to datetime::getSystemDateAndTime
+	fixed a bug in slow query logger that caused it to display the wrong
+		query time
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted

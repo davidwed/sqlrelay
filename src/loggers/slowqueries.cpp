@@ -31,12 +31,14 @@ class slowqueries : public sqlrlogger {
 		file		querylog;
 		uint64_t	sec;
 		uint64_t	usec;
+		uint64_t	totalusec;
 };
 
 slowqueries::slowqueries(xmldomnode *parameters) : sqlrlogger(parameters) {
 	querylogname=NULL;
 	sec=charstring::toInteger(parameters->getAttributeValue("sec"));
 	usec=charstring::toInteger(parameters->getAttributeValue("usec"));
+	totalusec=sec*1000000+usec;
 }
 
 slowqueries::~slowqueries() {
@@ -126,15 +128,16 @@ bool slowqueries::run(sqlrlistener *sqlrl,
 
 	uint64_t	querysec=sqlrcur->queryendsec-sqlrcur->querystartsec;
 	uint64_t	queryusec=sqlrcur->queryendusec-sqlrcur->querystartusec;
+	uint64_t	querytotalusec=querysec*1000000+queryusec;
 
-	if (querysec>sec || (querysec==sec && queryusec>=usec)) {
+	if (querytotalusec>totalusec) {
 
 		stringbuffer	logentry;
 		logentry.append("query:\n")->append(sqlrcur->querybuffer);
 		logentry.append("\n");
-		logentry.append("time: ")->append(sec);
+		logentry.append("time: ")->append(querysec);
 		logentry.append(".");
-		char	*usecstr=charstring::parseNumber(usec,6);
+		char	*usecstr=charstring::parseNumber(queryusec,6);
 		logentry.append(usecstr);
 		delete[] usecstr;
 		logentry.append("\n");
