@@ -250,7 +250,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 
 	// connect to the shared memory segment
 	idmemory=new sharedmemory;
-	if (!idmemory->attach(key)) {
+	if (!idmemory->attach(key,sizeof(shmdata))) {
 		char	*err=error::getErrorString();
 		stderror.printf("Couldn't attach to shared memory segment: ");
 		stderror.printf("%s\n",err);

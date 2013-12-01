@@ -3214,7 +3214,8 @@ bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(const char *id) {
 	// connect to the shared memory
 	logDebugMessage("attaching to shared memory...");
 	idmemory=new sharedmemory();
-	if (!idmemory->attach(file::generateKey(idfilename,1))) {
+	if (!idmemory->attach(file::generateKey(idfilename,1),
+						sizeof(shmdata))) {
 		char	*err=error::getErrorString();
 		stderror.printf("Couldn't attach to shared memory segment: ");
 		stderror.printf("%s\n",err);

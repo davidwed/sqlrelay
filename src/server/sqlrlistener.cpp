@@ -427,7 +427,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	idmemory=new sharedmemory;
 	if (!idmemory->create(key,sizeof(shmdata),
 				permissions::evalPermString("rw-r-----"))) {
-		idmemory->attach(key);
+		idmemory->attach(key,sizeof(shmdata));
 		shmError(id,idmemory->getId());
 		return false;
 	}
