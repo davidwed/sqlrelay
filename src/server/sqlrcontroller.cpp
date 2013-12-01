@@ -19,12 +19,6 @@
 #include <rudiments/charstring.h>
 #include <rudiments/stdio.h>
 
-// for gettimeofday()
-// SCO OSR 5.0.0 needs the extern "C"
-extern "C" {
-	#include <sys/time.h>
-}
-
 #include <defines.h>
 #include <datatypes.h>
 #define NEED_CONVERT_DATE_TIME
@@ -671,10 +665,10 @@ bool sqlrcontroller_svr::attemptLogIn(bool printerrors) {
 	}
 
 	// get stats
-	struct timeval	tv;
-	gettimeofday(&tv,NULL);
-	loggedinsec=tv.tv_sec;
-	loggedinusec=tv.tv_usec;
+	datetime	dt;
+	dt.getSystemDateAndTime();
+	loggedinsec=dt.getSeconds();
+	loggedinusec=dt.getMicroseconds();
 
 	logDebugMessage("done logging in");
 	return true;
@@ -2708,22 +2702,19 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *curs,
 		sqltr->runBeforeTriggers(conn,curs,curs->querytree);
 	}
 
-	// variables for query timing
-	timeval		tv;
-	struct timezone	tz;
-
 	// get the query start time
-	gettimeofday(&tv,&tz);
-	curs->querystartsec=tv.tv_sec;
-	curs->querystartusec=tv.tv_usec;
+	datetime	dt;
+	dt.getSystemDateAndTime();
+	curs->querystartsec=dt.getSeconds();
+	curs->querystartusec=dt.getMicroseconds();
 
 	// execute the query
 	curs->queryresult=curs->executeQuery(query,length);
 
 	// get the query end time
-	gettimeofday(&tv,&tz);
-	curs->queryendsec=tv.tv_sec;
-	curs->queryendusec=tv.tv_usec;
+	dt.getSystemDateAndTime();
+	curs->queryendsec=dt.getSeconds();
+	curs->queryendusec=dt.getMicroseconds();
 
 	// update query and error counts
 	incrementQueryCounts(curs->queryType(query,length));
@@ -3389,20 +3380,20 @@ void sqlrcontroller_svr::updateState(enum sqlrconnectionstate_t state) {
 		return;
 	}
 	connstats->state=state;
-	timeval		tv;
-	gettimeofday(&tv,NULL);
-	connstats->statestartsec=tv.tv_sec;
-	connstats->statestartusec=tv.tv_usec;
+	datetime	dt;
+	dt.getSystemDateAndTime();
+	connstats->statestartsec=dt.getSeconds();
+	connstats->statestartusec=dt.getMicroseconds();
 }
 
 void sqlrcontroller_svr::updateClientSessionStartTime() {
 	if (!connstats) {
 		return;
 	}
-	timeval		tv;
-	gettimeofday(&tv,NULL);
-	connstats->clientsessionsec=tv.tv_sec;
-	connstats->clientsessionusec=tv.tv_usec;
+	datetime	dt;
+	dt.getSystemDateAndTime();
+	connstats->clientsessionsec=dt.getSeconds();
+	connstats->clientsessionusec=dt.getMicroseconds();
 }
 
 void sqlrcontroller_svr::updateCurrentQuery(const char *query,

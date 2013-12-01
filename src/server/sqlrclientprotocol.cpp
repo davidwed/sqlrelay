@@ -7,12 +7,7 @@
 
 #include <rudiments/rawbuffer.h>
 #include <rudiments/signalclasses.h>
-
-// for gettimeofday()
-// SCO OSR 5.0.0 needs the extern "C"
-extern "C" {
-	#include <sys/time.h>
-}
+#include <rudiments/datetime.h>
 
 #include <datatypes.h>
 
@@ -50,8 +45,8 @@ sqlrclientexitstatus_t sqlrclientprotocol::clientSession() {
 		}
 
 		// get the command start time
-		timeval		tv;
-		gettimeofday(&tv,NULL);
+		datetime	dt;
+		dt.getSystemDateAndTime();
 
 		// these commands are all handled at the connection level
 		if (command==AUTHENTICATE) {
@@ -146,8 +141,8 @@ sqlrclientexitstatus_t sqlrclientprotocol::clientSession() {
 		}
 
 		// keep track of the command start time
-		cursor->commandstartsec=tv.tv_sec;
-		cursor->commandstartusec=tv.tv_usec;
+		cursor->commandstartsec=dt.getSeconds();
+		cursor->commandstartusec=dt.getMicroseconds();
 
 		// these commands are all handled at the cursor level
 		if (command==NEW_QUERY) {
@@ -188,9 +183,9 @@ sqlrclientexitstatus_t sqlrclientprotocol::clientSession() {
 		}
 
 		// get the command end-time
-		gettimeofday(&tv,NULL);
-		cursor->commandendsec=tv.tv_sec;
-		cursor->commandendusec=tv.tv_usec;
+		dt.getSystemDateAndTime();
+		cursor->commandendsec=dt.getSeconds();
+		cursor->commandendusec=dt.getMicroseconds();
 
 		// log query-related commands
 		// FIXME: this won't log triggers

@@ -6,13 +6,8 @@
 #include <sqlrquery.h>
 #include <rudiments/charstring.h>
 #include <rudiments/process.h>
+#include <rudiments/datetime.h>
 #include <debugprint.h>
-
-// for gettimeofday
-// OSR 5.0.0 needs the extern "C"
-extern "C" {
-	#include <sys/time.h>
-}
 
 class sqlrcmdcstat : public sqlrquery {
 	public:
@@ -212,12 +207,12 @@ void sqlrcmdcstatcursor::getField(uint32_t col,
 			{
 			// state_time -
 			// seconds the connection has been in its current state
-			struct timeval	now;
-			gettimeofday(&now,NULL);
+			datetime	dt;
+			dt.getSystemDateAndTime();
 			double	statetime=
-				((double)(now.tv_sec-
+				((double)(dt.getSeconds()-
 					cs->statestartsec))+
-				((double)(now.tv_usec-
+				((double)(dt.getMicroseconds()-
 					cs->statestartusec))/1000000.0;
 			fieldbuffer=charstring::parseNumber(statetime,
 					colinfo[5].precision,colinfo[5].scale);
