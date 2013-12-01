@@ -7,6 +7,7 @@
 		session-end commit/rollback, as some queries on some platforms (
 		ncluding drop-table on oracle) cause an implicit commit and
 		the rollback needs to be run first
+	replaced gettimeofday calls with calls to datetime::getSystemDateAndTime
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted
