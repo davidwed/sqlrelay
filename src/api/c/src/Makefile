@@ -4,7 +4,11 @@ include ../../../../config.mk
 
 .PHONY: all clean install uninstall
 
-CPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c/include -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
+ifeq ($(MINGW32),yes)
+DLLEXPORTS = -DLIBSQLRCLIENTWRAPPER_EXPORTS
+endif
+
+CPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(DLLEXPORTS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/api/c/include -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 LIBS = -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(libdir)),)
 ifeq ($(CUSERPATH),yes)

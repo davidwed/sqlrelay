@@ -4,7 +4,11 @@ include ../../config.mk
 
 .PHONY: all clean install uninstall
 
-CPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(TMPDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
+ifeq ($(MINGW32),yes)
+DLLEXPORTS = -DLIBSQLRUTIL_EXPORTS
+endif
+
+CPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(DLLEXPORTS) $(TMPDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
 LIBS = $(RUDIMENTSLIBS)
 
 SRCS = cmdline.cpp tempdir.cpp sqlrconfigfile.cpp

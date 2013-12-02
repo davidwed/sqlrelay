@@ -657,14 +657,17 @@ then
 
 	dnl cross compiling
 	echo "cross compiling"
-
-	if ( test -n "$PTHREADPATH" )
+	
+	if ( test -z "$MINGW32" )
 	then
-		PTHREADINCLUDES="$PTHREAD_COMPILE -I$PTHREADPATH/include"
-		PTHREADLIB="-L$PTHREADPATH/lib -lpthread -pthread"
-	else
-		PTHREADINCLUDES="$PTHREAD_COMPILE"
-		PTHREADLIB="-lpthread -pthread"
+		if ( test -n "$PTHREADPATH" )
+		then
+			PTHREADINCLUDES="$PTHREAD_COMPILE -I$PTHREADPATH/include"
+			PTHREADLIB="-L$PTHREADPATH/lib -lpthread -pthread"
+		else
+			PTHREADINCLUDES="$PTHREAD_COMPILE"
+			PTHREADLIB="-lpthread -pthread"
+		fi
 	fi
 	HAVE_PTHREAD="yes"
 
