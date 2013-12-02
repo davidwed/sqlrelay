@@ -10,6 +10,7 @@
 	replaced gettimeofday calls with calls to datetime::getSystemDateAndTime
 	fixed a bug in slow query logger that caused it to display the wrong
 		query time
+	a few mingw32 tweaks
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted
