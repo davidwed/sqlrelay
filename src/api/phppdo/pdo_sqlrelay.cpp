@@ -538,8 +538,11 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 
 static char *sqlrconnectionLastInsertId(pdo_dbh_t *dbh,
 				const char *name, unsigned int *len TSRMLS_DC) {
-	return charstring::parseNumber(
-		((sqlrconnection *)dbh->driver_data)->getLastInsertId());
+	char	*id=php_pdo_int64_to_str(
+				((sqlrconnection *)dbh->driver_data)->
+							getLastInsertId());
+	*len=charstring::length(id);
+	return id;
 }
 
 static int sqlrconnectionError(pdo_dbh_t *dbh,
