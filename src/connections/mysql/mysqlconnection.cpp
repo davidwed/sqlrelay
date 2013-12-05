@@ -201,6 +201,7 @@ class mysqlconnection : public sqlrconnection_svr {
 		const char	*port;
 		const char	*socket;
 		const char	*charset;
+		bool		foundrows;
 
 		char	*dbversion;
 		char	*dbhostname;
@@ -248,6 +249,8 @@ void mysqlconnection::handleConnectString() {
 	charset=cont->connectStringValue("charset");
 	cont->fakeinputbinds=!charstring::compare(
 				cont->connectStringValue("fakebinds"),"yes");
+	foundrows=!charstring::compare(
+				cont->connectStringValue("foundrows"),"yes");
 }
 
 bool mysqlconnection::logIn(const char **error) {
@@ -277,7 +280,12 @@ bool mysqlconnection::logIn(const char **error) {
 	const char	*socketval=(socket && socket[0])?socket:NULL;
 	unsigned long	clientflag=0;
 	#ifdef CLIENT_MULTI_STATEMENTS
-	clientflag=CLIENT_MULTI_STATEMENTS;
+	clientflag|=CLIENT_MULTI_STATEMENTS;
+	#endif
+	#ifdef CLIENT_FOUND_ROWS
+	if (foundrows) {
+		clientflag|=CLIENT_FOUND_ROWS;
+	}
 	#endif
 	#if MYSQL_VERSION_ID>=32200
 	// initialize database connection structure

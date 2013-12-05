@@ -13,6 +13,7 @@
 	a few mingw32 tweaks
 	fixed a few PDO driver bugs related to affected row counts and
 		last insert id
+	added foundrows option to mysql connect string
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted
