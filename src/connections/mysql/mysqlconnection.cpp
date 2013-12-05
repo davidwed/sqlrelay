@@ -202,6 +202,7 @@ class mysqlconnection : public sqlrconnection_svr {
 		const char	*socket;
 		const char	*charset;
 		bool		foundrows;
+		bool		ignorespace;
 
 		char	*dbversion;
 		char	*dbhostname;
@@ -251,6 +252,8 @@ void mysqlconnection::handleConnectString() {
 				cont->connectStringValue("fakebinds"),"yes");
 	foundrows=!charstring::compare(
 				cont->connectStringValue("foundrows"),"yes");
+	ignorespace=!charstring::compare(
+				cont->connectStringValue("ignorespace"),"yes");
 }
 
 bool mysqlconnection::logIn(const char **error) {
@@ -285,6 +288,11 @@ bool mysqlconnection::logIn(const char **error) {
 	#ifdef CLIENT_FOUND_ROWS
 	if (foundrows) {
 		clientflag|=CLIENT_FOUND_ROWS;
+	}
+	#endif
+	#ifdef CLIENT_IGNORE_SPACE
+	if (ignorespace) {
+		clientflag|=CLIENT_IGNORE_SPACE;
 	}
 	#endif
 	#if MYSQL_VERSION_ID>=32200
@@ -958,6 +966,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		}
 	}
 
+stdoutput.printf("query: %s\naffectedrows: %d\n",query,affectedrows);
 	return true;
 }
 
