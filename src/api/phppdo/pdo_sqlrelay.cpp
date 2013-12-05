@@ -22,6 +22,7 @@ extern "C" {
 
 struct sqlrstatement {
 	sqlrcursor	*sqlrcur;
+	int64_t		rows;
 	int64_t		currentrow;
 	long		longfield;
 };
@@ -42,8 +43,9 @@ static int sqlrcursorExecute(pdo_stmt_t *stmt TSRMLS_DC) {
 	}
 	sqlrstmt->currentrow=-1;
 	stmt->column_count=sqlrcur->colCount();
+	sqlrstmt->rows=sqlrcur->rowCount();
 	stmt->row_count=sqlrcur->affectedRows();
-	return 1;
+	return stmt->row_count;
 }
 
 static int sqlrcursorFetch(pdo_stmt_t *stmt,
@@ -61,7 +63,7 @@ static int sqlrcursorFetch(pdo_stmt_t *stmt,
 			sqlrstmt->currentrow=0;
 			break;
 		case PDO_FETCH_ORI_LAST:
-			sqlrstmt->currentrow=stmt->row_count-1;
+			sqlrstmt->currentrow=sqlrstmt->rows-1;
 			break;
 		case PDO_FETCH_ORI_ABS:
 			sqlrstmt->currentrow=offset;
@@ -73,8 +75,7 @@ static int sqlrcursorFetch(pdo_stmt_t *stmt,
 	if (sqlrstmt->currentrow<-1) {
 		sqlrstmt->currentrow=-1;
 	}
-	return (sqlrstmt->currentrow>-1 &&
-		sqlrstmt->currentrow<stmt->row_count);
+	return (sqlrstmt->currentrow>-1 && sqlrstmt->currentrow<sqlrstmt->rows);
 }
 
 static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
@@ -417,6 +418,7 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 	sqlrstatement	*sqlrstmt=new sqlrstatement;
 	sqlrstmt->sqlrcur=new sqlrcursor(
 				(sqlrconnection *)dbh->driver_data,true);
+	sqlrstmt->rows=0;
 	sqlrstmt->currentrow=-1;
 	stmt->methods=&sqlrcursorMethods;
 	stmt->driver_data=(void *)sqlrstmt;
