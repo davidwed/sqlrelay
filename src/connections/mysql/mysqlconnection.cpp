@@ -879,9 +879,6 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		}
 
 		checkForTempTable(query,length);
-	
-		// get the affected row count
-		affectedrows=mysql_stmt_affected_rows(stmt);
 
 		// get the column count
 		ncols=mysql_stmt_field_count(stmt);
@@ -904,6 +901,11 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 
 		// get the row count
 		nrows=mysql_stmt_num_rows(stmt);
+	
+		// get the affected row count
+		// (call after mysql_stmt_store_result or this will return
+		// -1 when the query is a select)
+		affectedrows=mysql_stmt_affected_rows(stmt);
 
 	} else {
 
@@ -931,9 +933,6 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 
 		checkForTempTable(query,length);
 
-		// get the affected row count
-		affectedrows=mysql_affected_rows(&mysqlconn->mysql);
-
 		// store the result set
 		if ((mysqlresult=mysql_store_result(&mysqlconn->mysql))==
 							(MYSQL_RES *)NULL) {
@@ -954,6 +953,11 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		// get the row count
 		nrows=mysql_num_rows(mysqlresult);
 
+		// get the affected row count
+		// (call after mysql_stmt_store_result or this will return
+		// -1 when the query is a select)
+		affectedrows=mysql_affected_rows(&mysqlconn->mysql);
+
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	}
 #endif
@@ -966,7 +970,6 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		}
 	}
 
-stdoutput.printf("query: %s\naffectedrows: %d\n",query,affectedrows);
 	return true;
 }
 
