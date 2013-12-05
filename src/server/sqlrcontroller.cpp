@@ -2804,10 +2804,12 @@ void sqlrcontroller_svr::reformatField(sqlrcursor_svr *cursor,
 	// for now this method just reformats dates but in the future it could
 	// be extended to to configurable field reformatting...
 
+	// initialize return values
+	*newfield=field;
+	*newfieldlength=fieldlength;
+
 	// convert date/time values, if configured to do so
 	if (!reformatdatetimes) {
-		*newfield=field;
-		*newfieldlength=fieldlength;
 		return;
 	}
 
@@ -2857,7 +2859,7 @@ void sqlrcontroller_svr::reformatField(sqlrcursor_svr *cursor,
 	if (debugsqltranslation) {
 		stdoutput.printf("converted date: "
 			"\"%s\" to \"%s\" using ddmm=%d\n",
-			reformattedfield,reformattedfieldlength,ddmm);
+			field,reformattedfield,ddmm);
 	}
 
 	// set return values
