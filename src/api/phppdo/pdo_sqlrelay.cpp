@@ -42,7 +42,7 @@ static int sqlrcursorExecute(pdo_stmt_t *stmt TSRMLS_DC) {
 	}
 	sqlrstmt->currentrow=-1;
 	stmt->column_count=sqlrcur->colCount();
-	stmt->row_count=sqlrcur->rowCount();
+	stmt->row_count=sqlrcur->affectedRows();
 	return 1;
 }
 

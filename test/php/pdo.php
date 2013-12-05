@@ -40,6 +40,10 @@ dl("pdo_sqlrelay.so");
 	checkSuccess($dbh->exec("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1','testclob1',empty_blob())"),1);
 	echo("\n");
 
+	echo("ROW COUNT: \n");
+	checkSuccess($stmt->rowCount(),1);
+	echo("\n");
+
 	echo("LAST INSERT ID: \n");
 	checkSuccess($dbh->lastInsertId(),0);
 	echo("\n");
@@ -171,10 +175,6 @@ dl("pdo_sqlrelay.so");
 	checkSuccess($meta4["len"],0);
 	checkSuccess($meta5["len"],0);
 	checkSuccess($meta6["len"],0);
-	echo("\n");
-
-	echo("ROW COUNT: \n");
-	checkSuccess($stmt->rowCount(),7);
 	echo("\n");
 
 	echo("FIELDS BY INDEX: \n");
@@ -402,10 +402,8 @@ dl("pdo_sqlrelay.so");
 	echo("CLOSE CURSOR\n");
 	$stmt=$dbh2->prepare("select * from testtable");
 	checkSuccess($stmt->execute(),1);
-	checkSuccess($stmt->rowCount(),7);
 	checkSuccess($stmt->closeCursor(),1);
 	checkSuccess($stmt->execute(),1);
-	checkSuccess($stmt->rowCount(),7);
 	echo("\n");
 
 	echo("CLIENT AND SERVER VERSIONS: \n");
