@@ -45,7 +45,7 @@ static int sqlrcursorExecute(pdo_stmt_t *stmt TSRMLS_DC) {
 	stmt->column_count=sqlrcur->colCount();
 	sqlrstmt->rows=sqlrcur->rowCount();
 	stmt->row_count=sqlrcur->affectedRows();
-	return stmt->row_count;
+	return 1;
 }
 
 static int sqlrcursorFetch(pdo_stmt_t *stmt,
@@ -439,11 +439,10 @@ static long sqlrconnectionExecute(pdo_dbh_t *dbh,
 					const char *sql,
 					long sqllen TSRMLS_DC) {
 	sqlrcursor	sqlrcur((sqlrconnection *)dbh->driver_data);
-	long	retval=0;
 	if (sqlrcur.sendQuery(sql,sqllen)) {
-		retval=sqlrcur.affectedRows();
+		return sqlrcur.affectedRows();
 	}
-	return retval;
+	return -1;
 }
 
 static int sqlrconnectionBegin(pdo_dbh_t *dbh TSRMLS_DC) {

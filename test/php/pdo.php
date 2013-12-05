@@ -40,10 +40,6 @@ dl("pdo_sqlrelay.so");
 	checkSuccess($dbh->exec("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001','testlong1','testclob1',empty_blob())"),1);
 	echo("\n");
 
-	echo("ROW COUNT: \n");
-	checkSuccess($stmt->rowCount(),1);
-	echo("\n");
-
 	echo("LAST INSERT ID: \n");
 	checkSuccess($dbh->lastInsertId(),0);
 	echo("\n");
@@ -74,6 +70,10 @@ dl("pdo_sqlrelay.so");
 	checkSuccess($stmt->bindValue(6,$param6),true);
 	checkSuccess($stmt->bindValue(7,$param7,PDO::PARAM_LOB),true);
 	checkSuccess($stmt->execute(),true);
+	echo("\n");
+
+	echo("ROW COUNT: \n");
+	checkSuccess($stmt->rowCount(),1);
 	echo("\n");
 
 	echo("ARRAY OF BINDS BY POSITION: \n");
