@@ -14,6 +14,8 @@
 	fixed a few PDO driver bugs related to affected row counts and
 		last insert id
 	added foundrows and ignorespace options to mysql connect string
+	fixed a bug where affectedRows() would return -1 for MySQL selects
+		instead of the same value as rowCount()
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted
