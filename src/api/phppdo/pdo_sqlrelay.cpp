@@ -439,12 +439,9 @@ static long sqlrconnectionExecute(pdo_dbh_t *dbh,
 					const char *sql,
 					long sqllen TSRMLS_DC) {
 	sqlrcursor	sqlrcur((sqlrconnection *)dbh->driver_data);
-	long	retval=-1;
+	long	retval=0;
 	if (sqlrcur.sendQuery(sql,sqllen)) {
 		retval=sqlrcur.affectedRows();
-		if (retval==-1) {
-			retval=0;
-		}
 	}
 	return retval;
 }
