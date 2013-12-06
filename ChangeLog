@@ -16,6 +16,9 @@
 	added foundrows and ignorespace options to mysql connect string
 	fixed a bug where affectedRows() would return -1 for MySQL selects
 		instead of the same value as rowCount()
+	updated sqlr-connection code not to get db host name and ip address
+		at startup unless logging is enabled to work around issues
+		where people fail to put the db host name in dns
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted

@@ -712,6 +712,7 @@ bool sqlrcontroller_svr::logIn(bool printerrors) {
 	if (sqlrlg) {
 		dbhostname=conn->dbHostName();
 		dbipaddress=conn->dbIpAddress();
+stdoutput.printf("host/ip - %s:%s\n",dbhostname,dbipaddress);
 	}
 
 	loggedin=true;
