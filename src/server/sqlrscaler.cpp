@@ -512,7 +512,7 @@ bool scaler::openMoreConnections() {
 				if (!connectionStarted()) {
 					// There is a race condition
 					// here.  connectionStarted()
-					// waits for 10 seconds.
+					// waits for 20 seconds.
 					// Presumably the connection
 					// will start up and signal
 					// during that time, or will be
@@ -538,9 +538,12 @@ bool scaler::openMoreConnections() {
 bool scaler::connectionStarted() {
 
 	// wait for the connection count to increase
-	// with 10 second timeout, if supported
+	// with 20 second timeout, if supported
+	// (the 20 second timeout is because, if logging is enabled, but
+	// someone forgot to put the database host name in DNS, it might take
+	// up to 15 seconds for the hostname/ipaddress lookup to time out)
 	return semset->supportsTimedSemaphoreOperations()?
-					semset->wait(8,10,0):
+					semset->wait(8,20,0):
 					semset->wait(8);
 }
 
