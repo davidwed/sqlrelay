@@ -214,7 +214,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 
 	// get password encryptions
 	const char	*pwdencs=cfgfl->getPasswordEncryptions();
-	if (charstring::length(pwdencs)) {
+	if (pwdencs && pwdencs[0]) {
 		sqlrpe=new sqlrpwdencs;
 		sqlrpe->loadPasswordEncryptions(pwdencs);
 	}	
@@ -232,7 +232,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 
 	// get loggers
 	const char	*loggers=cfgfl->getLoggers();
-	if (charstring::length(loggers)) {
+	if (loggers && loggers[0]) {
 		sqlrlg=new sqlrloggers;
 		sqlrlg->loadLoggers(loggers);
 		sqlrlg->initLoggers(NULL,conn);
@@ -288,7 +288,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	// getSqlTranslator might return a different class depending on what
 	// version of the db it gets logged into
 	const char	*translations=cfgfl->getTranslations();
-	if (charstring::length(translations)) {
+	if (translations && translations[0]) {
 		sqlp=new sqlparser;
 		sqlt=conn->getSqlTranslations();
 		sqlt->loadTranslations(translations);
@@ -298,7 +298,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 
 	// get the triggers
 	const char	*triggers=cfgfl->getTriggers();
-	if (charstring::length(triggers)) {
+	if (triggers && triggers[0]) {
 		// for triggers, we'll need an sqlparser as well
 		if (!sqlp) {
 			sqlp=new sqlparser;
@@ -372,7 +372,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 
 	// get the custom query handlers
 	const char	*queries=cfgfl->getQueries();
-	if (charstring::length(queries)) {
+	if (queries && queries[0]) {
 		sqlrq=new sqlrqueries;
 		sqlrq->loadQueries(queries);
 	}
@@ -705,8 +705,14 @@ bool sqlrcontroller_svr::logIn(bool printerrors) {
 	incrementOpenDatabaseConnections();
 
 	// update db host name and ip address
-	dbhostname=conn->dbHostName();
-	dbipaddress=conn->dbIpAddress();
+	// (Only do this if logging is enabled.  For now only the loggers use
+	// them, and if someone forgot to put the database host name in DNS
+	// then it can cause the connection to delay until a DNS timeout occurs
+	// to start.)
+	if (sqlrlg) {
+		dbhostname=conn->dbHostName();
+		dbipaddress=conn->dbIpAddress();
+	}
 
 	loggedin=true;
 
