@@ -712,7 +712,6 @@ bool sqlrcontroller_svr::logIn(bool printerrors) {
 	if (sqlrlg) {
 		dbhostname=conn->dbHostName();
 		dbipaddress=conn->dbIpAddress();
-stdoutput.printf("host/ip - %s:%s\n",dbhostname,dbipaddress);
 	}
 
 	loggedin=true;
@@ -2327,7 +2326,9 @@ void sqlrcontroller_svr::translateBindVariableInStringAndArray(
 	if (bindformatlen==1) {
 
 		// replace bind variable itself with number
-		translateBindVariableInArray(cursor,NULL,bindindex);
+		translateBindVariableInArray(cursor,
+					currentbind->getString(),
+					bindindex);
 
 	} else if (bindformat[1]=='1' &&
 			!charstring::isNumber(currentbind->getString()+1)) {
@@ -2364,6 +2365,12 @@ void sqlrcontroller_svr::translateBindVariableInArray(sqlrcursor_svr *cursor,
 						const char *currentbind,
 						uint16_t bindindex) {
 
+	// if the current bind variable is a ? then just
+	// set it NULL for special handling later
+	if (!charstring::compare(currentbind,"?")) {
+		currentbind=NULL;
+	}
+
 	// run two passes
 	for (uint16_t i=0; i<2; i++) {
 
@@ -2387,7 +2394,8 @@ void sqlrcontroller_svr::translateBindVariableInArray(sqlrcursor_svr *cursor,
 			if ((currentbind &&
 				!charstring::compare(currentbind,
 							b->variable)) ||
-				(charstring::toInteger((b->variable)+1)==
+				(!currentbind &&
+				charstring::toInteger((b->variable)+1)==
 								bindindex)) {
 
 				// create the new bind var
