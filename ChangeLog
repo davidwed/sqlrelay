@@ -19,6 +19,9 @@
 	updated sqlr-connection code not to get db host name and ip address
 		at startup unless logging is enabled to work around issues
 		where people fail to put the db host name in dns
+	fixed a subtle bind format translation bug that caused errors when
+		translating from oracle-style binds to mysql-style if the
+		varaibles were out of order with the placeholders in the query
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted
