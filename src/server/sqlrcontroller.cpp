@@ -1885,11 +1885,10 @@ bool sqlrcontroller_svr::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 	}
 
 	success=false;
-	bool	supportsnativebinds=cursor->supportsNativeBinds();
 
 	if (reexecute &&
 		!cursor->fakeinputbindsforthisquery &&
-		supportsnativebinds) {
+		cursor->supportsNativeBinds()) {
 
 		// if we're reexecuting and not faking binds then
 		// the statement doesn't need to be prepared again,
@@ -1927,7 +1926,7 @@ bool sqlrcontroller_svr::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 		// faking binds or we'll lose the original query and
 		// end up rerunning the modified query when reexecuting
 		if (cursor->fakeinputbindsforthisquery ||
-					!supportsnativebinds) {
+			!cursor->supportsNativeBinds(query)) {
 			logDebugMessage("faking binds...");
 			if (cursor->fakeInputBinds(&outputquery)) {
 				query=outputquery.getString();

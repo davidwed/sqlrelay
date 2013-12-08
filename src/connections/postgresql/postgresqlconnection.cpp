@@ -595,6 +595,13 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 		bindvalues=new char *[bindcount];
 		bindlengths=new int[bindcount];
 		bindformats=new int[bindcount];
+
+		// initialize bind arrays
+		for (int i=0; i<bindcount; i++) {
+			bindvalues[i]=NULL;
+			bindlengths[i]=0;
+			bindformats[i]=0;
+		}
 	}
 
 	// remove this named statement, if it exists already
@@ -628,20 +635,22 @@ bool postgresqlcursor::inputBind(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
+	uint32_t	pos=charstring::toInteger(variable+1)-1;
+
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
-	if (bindcounter>=bindcount) {
+	if (pos>=bindcount || bindcounter>=bindcount) {
 		return true;
 	}
 
 	if (*isnull) {
-		bindvalues[bindcounter]=NULL;
-		bindlengths[bindcounter]=0;
+		bindvalues[pos]=NULL;
+		bindlengths[pos]=0;
 	} else {
-		bindvalues[bindcounter]=charstring::duplicate(value,valuesize);
-		bindlengths[bindcounter]=valuesize;
+		bindvalues[pos]=charstring::duplicate(value,valuesize);
+		bindlengths[pos]=valuesize;
 	}
-	bindformats[bindcounter]=0;
+	bindformats[pos]=0;
 	bindcounter++;
 	return true;
 }
@@ -650,15 +659,17 @@ bool postgresqlcursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					int64_t *value) {
 
+	uint32_t	pos=charstring::toInteger(variable+1)-1;
+
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
-	if (bindcounter>=bindcount) {
+	if (pos>=bindcount || bindcounter>=bindcount) {
 		return true;
 	}
 
-	bindvalues[bindcounter]=charstring::parseNumber(*value);
-	bindlengths[bindcounter]=charstring::length(bindvalues[bindcounter]);
-	bindformats[bindcounter]=0;
+	bindvalues[pos]=charstring::parseNumber(*value);
+	bindlengths[pos]=charstring::length(bindvalues[pos]);
+	bindformats[pos]=0;
 	bindcounter++;
 	return true;
 }
@@ -669,15 +680,17 @@ bool postgresqlcursor::inputBind(const char *variable,
 					uint32_t precision,
 					uint32_t scale) {
 
+	uint32_t	pos=charstring::toInteger(variable+1)-1;
+
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
-	if (bindcounter>=bindcount) {
+	if (pos>=bindcount || bindcounter>=bindcount) {
 		return true;
 	}
 
-	bindvalues[bindcounter]=charstring::parseNumber(*value,precision,scale);
-	bindlengths[bindcounter]=charstring::length(bindvalues[bindcounter]);
-	bindformats[bindcounter]=0;
+	bindvalues[pos]=charstring::parseNumber(*value,precision,scale);
+	bindlengths[pos]=charstring::length(bindvalues[pos]);
+	bindformats[pos]=0;
 	bindcounter++;
 	return true;
 }
@@ -688,21 +701,23 @@ bool postgresqlcursor::inputBindBlob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
+	uint32_t	pos=charstring::toInteger(variable+1)-1;
+
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
-	if (bindcounter>=bindcount) {
+	if (pos>=bindcount || bindcounter>=bindcount) {
 		return true;
 	}
 
 	if (*isnull) {
-		bindvalues[bindcounter]=NULL;
-		bindlengths[bindcounter]=0;
+		bindvalues[pos]=NULL;
+		bindlengths[pos]=0;
 	} else {
-		bindvalues[bindcounter]=static_cast<char *>
+		bindvalues[pos]=static_cast<char *>
 					(rawbuffer::duplicate(value,valuesize));
-		bindlengths[bindcounter]=valuesize;
+		bindlengths[pos]=valuesize;
 	}
-	bindformats[bindcounter]=1;
+	bindformats[pos]=1;
 	bindcounter++;
 	return true;
 }
@@ -713,20 +728,22 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
+	uint32_t	pos=charstring::toInteger(variable+1)-1;
+
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
-	if (bindcounter>=bindcount) {
+	if (pos>=bindcount || bindcounter>=bindcount) {
 		return true;
 	}
 
 	if (*isnull) {
-		bindvalues[bindcounter]=NULL;
-		bindlengths[bindcounter]=0;
+		bindvalues[pos]=NULL;
+		bindlengths[pos]=0;
 	} else {
-		bindvalues[bindcounter]=charstring::duplicate(value,valuesize);
-		bindlengths[bindcounter]=valuesize;
+		bindvalues[pos]=charstring::duplicate(value,valuesize);
+		bindlengths[pos]=valuesize;
 	}
-	bindformats[bindcounter]=0;
+	bindformats[pos]=0;
 	bindcounter++;
 	return true;
 }

@@ -22,6 +22,9 @@
 	fixed a subtle bind format translation bug that caused errors when
 		translating from oracle-style binds to mysql-style if the
 		varaibles were out of order with the placeholders in the query
+	fixed bugs in the mysql and postgresql connection code that assumed
+		that the bind variables were bound in order, independent of
+		their names
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted

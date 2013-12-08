@@ -75,6 +75,7 @@ class sqlrcursor_svr {
 						uint32_t length);
 		virtual	bool	prepareQuery(const char *query,
 						uint32_t length);
+		virtual	bool	supportsNativeBinds(const char *query);
 		virtual	bool	supportsNativeBinds();
 		virtual	bool	inputBind(const char *variable, 
 						uint16_t variablesize,

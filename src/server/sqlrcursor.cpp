@@ -115,6 +115,10 @@ bool sqlrcursor_svr::prepareQuery(const char *query, uint32_t querylength) {
 	return true;
 }
 
+bool sqlrcursor_svr::supportsNativeBinds(const char *query) {
+	return supportsNativeBinds();
+}
+
 bool sqlrcursor_svr::supportsNativeBinds() {
 	return true;
 }

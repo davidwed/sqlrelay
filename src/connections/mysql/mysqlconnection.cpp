@@ -42,6 +42,7 @@ class mysqlcursor : public sqlrcursor_svr {
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 #endif
+		bool		supportsNativeBinds(const char *query);
 		bool		supportsNativeBinds();
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		bool		inputBind(const char *variable, 
@@ -132,8 +133,8 @@ class mysqlcursor : public sqlrcursor_svr {
 		my_bool		isnull[MAX_SELECT_LIST_SIZE];
 		unsigned long	fieldlength[MAX_SELECT_LIST_SIZE];
 
-		int		bindcount;
-		int		bindcounter;
+		uint16_t	bindcount;
+		bool		boundvariables;
 		MYSQL_BIND	*bind;
 		unsigned long	*bindvaluesize;
 
@@ -248,8 +249,8 @@ void mysqlconnection::handleConnectString() {
 	port=cont->connectStringValue("port");
 	socket=cont->connectStringValue("socket");
 	charset=cont->connectStringValue("charset");
-	cont->fakeinputbinds=!charstring::compare(
-				cont->connectStringValue("fakebinds"),"yes");
+	cont->setFakeInputBinds(!charstring::compare(
+				cont->connectStringValue("fakebinds"),"yes"));
 	foundrows=!charstring::compare(
 				cont->connectStringValue("foundrows"),"yes");
 	ignorespace=!charstring::compare(
@@ -359,7 +360,7 @@ bool mysqlconnection::logIn(const char **error) {
 		uint64_t	patch=charstring::toUnsignedInteger(list[2]);
 		if (major>4 || (major==4 && minor>1) ||
 				(major==4 && minor==1 && patch>=2)) {
-			setFakeInputBinds(true);
+			cont->setFakeInputBinds(true);
 		} 
 		for (uint64_t index=0; index<listlen; index++) {
 			delete[] list[index];
@@ -581,7 +582,7 @@ mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	bindvaluesize=new unsigned long[conn->cont->maxbindcount];
 	usestmtprepare=true;
 	unsupportedbystmt.compile(
-			"^\\s*((create|CREATE|drop|DROP|procedure|PROCEDURE|function|FUNCTION|use|USE|CALL|call|START|start)\\s+)|((begin|BEGIN)\\s*)");
+			"^\\s*((create|CREATE|drop|DROP|procedure|PROCEDURE|function|FUNCTION|use|USE|CALL|call|START|start|CHECK|check|REPAIR|repair)\\s+)|((begin|BEGIN)\\s*)");
 	unsupportedbystmt.study();
 	for (unsigned short index=0; index<MAX_SELECT_LIST_SIZE; index++) {
 		mysqlfields[index]=NULL;
@@ -634,9 +635,12 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	}
 
 	// can't use stmt API to run a couple of types of queries as of 5.0
-	usestmtprepare=true;
-	if (unsupportedbystmt.match(query)) {
-		usestmtprepare=false;
+	// (You might think we'd need to do some kind of test here to set
+	// usestmtprepare, but the sqlrcontroller class calls
+	// supportsNativeBinds(query) prior to preparing the query to decide
+	// whether it needs to fake binds before query preparation, and in this
+	// class that method sets usestmtprepare.)
+	if (!usestmtprepare) {
 		return true;
 	}
 
@@ -646,8 +650,8 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	// to address beyond the end of the various arrays
 	bindcount=inbindcount;
 
-	// reset bind counter
-	bindcounter=0;
+	// reset bound variables flag
+	boundvariables=false;
 
 	// re-init bind buffers
 	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
@@ -663,9 +667,18 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 }
 #endif
 
+bool mysqlcursor::supportsNativeBinds(const char *query) {
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	usestmtprepare=!unsupportedbystmt.match(query);
+	return usestmtprepare;
+#else
+	return false;
+#endif
+}
+
 bool mysqlcursor::supportsNativeBinds() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	return (usestmtprepare);
+	return usestmtprepare;
 #else
 	return false;
 #endif
@@ -682,27 +695,29 @@ bool mysqlcursor::inputBind(const char *variable,
 		return true;
 	}
 
+	uint16_t	pos=charstring::toInteger(variable+1)-1;
+
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
-	if (bindcounter>bindcount) {
+	if (pos>bindcount) {
 		return false;
 	}
 
-	bindvaluesize[bindcounter]=valuesize;
+	bindvaluesize[pos]=valuesize;
 
 	if (*isnull) {
-		bind[bindcounter].buffer_type=MYSQL_TYPE_NULL;
-		bind[bindcounter].buffer=(void *)NULL;
-		bind[bindcounter].buffer_length=0;
-		bind[bindcounter].length=0;
+		bind[pos].buffer_type=MYSQL_TYPE_NULL;
+		bind[pos].buffer=(void *)NULL;
+		bind[pos].buffer_length=0;
+		bind[pos].length=0;
 	} else {
-		bind[bindcounter].buffer_type=MYSQL_TYPE_STRING;
-		bind[bindcounter].buffer=(void *)value;
-		bind[bindcounter].buffer_length=valuesize;
-		bind[bindcounter].length=&bindvaluesize[bindcounter];
+		bind[pos].buffer_type=MYSQL_TYPE_STRING;
+		bind[pos].buffer=(void *)value;
+		bind[pos].buffer_length=valuesize;
+		bind[pos].length=&bindvaluesize[pos];
 	}
-	bind[bindcounter].is_null=(my_bool *)isnull;
-	bindcounter++;
+	bind[pos].is_null=(my_bool *)isnull;
+	boundvariables=true;
 
 	return true;
 }
@@ -715,20 +730,22 @@ bool mysqlcursor::inputBind(const char *variable,
 		return true;
 	}
 
+	uint16_t	pos=charstring::toInteger(variable+1)-1;
+
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
-	if (bindcounter>bindcount) {
+	if (pos>bindcount) {
 		return false;
 	}
 
-	bindvaluesize[bindcounter]=sizeof(int64_t);
+	bindvaluesize[pos]=sizeof(int64_t);
 
-	bind[bindcounter].buffer_type=MYSQL_TYPE_LONGLONG;
-	bind[bindcounter].buffer=(void *)value;
-	bind[bindcounter].buffer_length=sizeof(int64_t);
-	bind[bindcounter].length=&bindvaluesize[bindcounter];
-	bind[bindcounter].is_null=(my_bool *)&(mysqlconn->myfalse);
-	bindcounter++;
+	bind[pos].buffer_type=MYSQL_TYPE_LONGLONG;
+	bind[pos].buffer=(void *)value;
+	bind[pos].buffer_length=sizeof(int64_t);
+	bind[pos].length=&bindvaluesize[pos];
+	bind[pos].is_null=(my_bool *)&(mysqlconn->myfalse);
+	boundvariables=true;
 
 	return true;
 }
@@ -743,20 +760,22 @@ bool mysqlcursor::inputBind(const char *variable,
 		return true;
 	}
 
+	uint16_t	pos=charstring::toInteger(variable+1)-1;
+
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
-	if (bindcounter>bindcount) {
+	if (pos>bindcount) {
 		return false;
 	}
 
-	bindvaluesize[bindcounter]=sizeof(double);
+	bindvaluesize[pos]=sizeof(double);
 
-	bind[bindcounter].buffer_type=MYSQL_TYPE_DOUBLE;
-	bind[bindcounter].buffer=(void *)value;
-	bind[bindcounter].buffer_length=sizeof(double);
-	bind[bindcounter].length=&bindvaluesize[bindcounter];
-	bind[bindcounter].is_null=(my_bool *)&(mysqlconn->myfalse);
-	bindcounter++;
+	bind[pos].buffer_type=MYSQL_TYPE_DOUBLE;
+	bind[pos].buffer=(void *)value;
+	bind[pos].buffer_length=sizeof(double);
+	bind[pos].length=&bindvaluesize[pos];
+	bind[pos].is_null=(my_bool *)&(mysqlconn->myfalse);
+	boundvariables=true;
 
 	return true;
 }
@@ -779,19 +798,21 @@ bool mysqlcursor::inputBind(const char *variable,
 		return true;
 	}
 
+	uint16_t	pos=charstring::toInteger(variable+1)-1;
+
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
-	if (bindcounter>bindcount) {
+	if (pos>bindcount) {
 		return false;
 	}
 
-	bindvaluesize[bindcounter]=sizeof(MYSQL_TIME);
+	bindvaluesize[pos]=sizeof(MYSQL_TIME);
 
 	if (*isnull) {
-		bind[bindcounter].buffer_type=MYSQL_TYPE_NULL;
-		bind[bindcounter].buffer=(void *)NULL;
-		bind[bindcounter].buffer_length=0;
-		bind[bindcounter].length=0;
+		bind[pos].buffer_type=MYSQL_TYPE_NULL;
+		bind[pos].buffer=(void *)NULL;
+		bind[pos].buffer_length=0;
+		bind[pos].length=0;
 	} else {
 		MYSQL_TIME	*t=(MYSQL_TIME *)buffer;
 		t->year=year;
@@ -804,13 +825,13 @@ bool mysqlcursor::inputBind(const char *variable,
 		t->neg=FALSE;
 		t->time_type=MYSQL_TIMESTAMP_DATETIME;
 
-		bind[bindcounter].buffer_type=MYSQL_TYPE_DATETIME;
-		bind[bindcounter].buffer=(void *)buffer;
-		bind[bindcounter].buffer_length=sizeof(MYSQL_TIME);
-		bind[bindcounter].length=&bindvaluesize[bindcounter];
+		bind[pos].buffer_type=MYSQL_TYPE_DATETIME;
+		bind[pos].buffer=(void *)buffer;
+		bind[pos].buffer_length=sizeof(MYSQL_TIME);
+		bind[pos].length=&bindvaluesize[pos];
 	}
-	bind[bindcounter].is_null=(my_bool *)isnull;
-	bindcounter++;
+	bind[pos].is_null=(my_bool *)isnull;
+	boundvariables=true;
 
 	return true;
 }
@@ -825,27 +846,29 @@ bool mysqlcursor::inputBindBlob(const char *variable,
 		return true;
 	}
 
+	uint16_t	pos=charstring::toInteger(variable+1)-1;
+
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
-	if (bindcounter>bindcount) {
+	if (pos>bindcount) {
 		return false;
 	}
 
-	bindvaluesize[bindcounter]=valuesize;
+	bindvaluesize[pos]=valuesize;
 
 	if (*isnull) {
-		bind[bindcounter].buffer_type=MYSQL_TYPE_NULL;
-		bind[bindcounter].buffer=(void *)NULL;
-		bind[bindcounter].buffer_length=0;
-		bind[bindcounter].length=0;
+		bind[pos].buffer_type=MYSQL_TYPE_NULL;
+		bind[pos].buffer=(void *)NULL;
+		bind[pos].buffer_length=0;
+		bind[pos].length=0;
 	} else {
-		bind[bindcounter].buffer_type=MYSQL_TYPE_LONG_BLOB;
-		bind[bindcounter].buffer=(void *)value;
-		bind[bindcounter].buffer_length=valuesize;
-		bind[bindcounter].length=&bindvaluesize[bindcounter];
+		bind[pos].buffer_type=MYSQL_TYPE_LONG_BLOB;
+		bind[pos].buffer=(void *)value;
+		bind[pos].buffer_length=valuesize;
+		bind[pos].length=&bindvaluesize[pos];
 	}
-	bind[bindcounter].is_null=(my_bool *)isnull;
-	bindcounter++;
+	bind[pos].is_null=(my_bool *)isnull;
+	boundvariables=true;
 
 	return true;
 }
@@ -869,7 +892,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 	if (usestmtprepare) {
 
 		// handle binds
-		if (bindcounter && mysql_stmt_bind_param(stmt,bind)) {
+		if (boundvariables && mysql_stmt_bind_param(stmt,bind)) {
 			return false;
 		}
 
@@ -1300,7 +1323,7 @@ void mysqlcursor::getField(uint32_t col,
 void mysqlcursor::cleanUpData() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
-		bindcounter=0;
+		boundvariables=0;
 		for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
 			rawbuffer::zero(&bind[i],sizeof(MYSQL_BIND));
 		}
