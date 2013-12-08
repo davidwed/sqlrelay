@@ -2325,6 +2325,9 @@ void sqlrcontroller_svr::translateBindVariableInStringAndArray(
 
 	if (bindformatlen==1) {
 
+		// This section handles single-character bind variable
+		// placeholder such as ?'s. (mysql, db2 and firebird format)
+
 		// replace bind variable itself with number
 		translateBindVariableInArray(cursor,
 					currentbind->getString(),
@@ -2332,6 +2335,9 @@ void sqlrcontroller_svr::translateBindVariableInStringAndArray(
 
 	} else if (bindformat[1]=='1' &&
 			!charstring::isNumber(currentbind->getString()+1)) {
+
+		// This section handles 2-character placeholders where the
+		// second position is a 1, such as $1 (postgresql-format).
 
 		// replace bind variable in string with number
 		newquery->append(bindindex);
@@ -2343,13 +2349,15 @@ void sqlrcontroller_svr::translateBindVariableInStringAndArray(
 
 	} else {
 
-		// if the bind variable contained a name or number then use
-		// it, otherwise replace the bind variable in the string and
-		// the bind variable itself with a number 
-		if (currentbind->getStringLength()>1) {
-			newquery->append(currentbind->getString()+1,
-					currentbind->getStringLength()-1);
-		} else {
+		// This section handles everything else, such as :*, @*.
+		// (oracle, sybase and ms sql server formats)
+
+		// If the current bind variable was a single character
+		// placeholder (such as a ?) then replace it with a delimited
+		// number.  Otherwise use it as-is...
+
+		if (currentbind->getStringLength()==1) {
+
 			// replace bind variable in string with number
 			newquery->append(bindindex);
 
@@ -2357,6 +2365,9 @@ void sqlrcontroller_svr::translateBindVariableInStringAndArray(
 			translateBindVariableInArray(cursor,
 						currentbind->getString(),
 						bindindex);
+		} else {
+			newquery->append(currentbind->getString()+1,
+					currentbind->getStringLength()-1);
 		}
 	}
 }
