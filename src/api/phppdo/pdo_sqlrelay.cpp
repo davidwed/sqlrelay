@@ -455,7 +455,7 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 	sqlrstmt->currentrow=-1;
 	stmt->methods=&sqlrcursorMethods;
 	stmt->driver_data=(void *)sqlrstmt;
-	// SQL Relay actually support named and postitional placeholders but
+	// SQL Relay actually supports named and postitional placeholders but
 	// there doesn't appear to be a way to set both.  Positional is a
 	// larger value in the enum, so I guess we'll use that.  The pdo code
 	// appears to just check to see if it's not PDO_PLACEHOLDER_NONE anyway
