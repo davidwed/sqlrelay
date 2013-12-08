@@ -19,6 +19,13 @@ extern "C" {
 #include <ext/standard/info.h>
 #include <pdo/php_pdo.h>
 #include <pdo/php_pdo_driver.h>
+#include <pdo/php_pdo_driver.h>
+#include <zend_exceptions.h>
+
+#define sqlrelayError(s) \
+	_sqlrelayError(s,NULL,__FILE__,__LINE__ TSRMLS_DC)
+#define sqlrelayErrorStmt(s) \
+	_sqlrelayError(s->dbh,s,__FILE__,__LINE__ TSRMLS_DC)
 
 struct sqlrstatement {
 	sqlrcursor	*sqlrcur;
@@ -26,6 +33,39 @@ struct sqlrstatement {
 	int64_t		currentrow;
 	long		longfield;
 };
+
+int _sqlrelayError(pdo_dbh_t *dbh,
+			pdo_stmt_t *stmt,
+			const char *file,
+			int line TSRMLS_DC) {
+
+	int64_t		errornumber=0;
+	const char	*errormessage=NULL;
+	pdo_error_type	*pdoerr=NULL;
+
+	if (stmt) {
+		sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+		errornumber=sqlrstmt->sqlrcur->errorNumber();
+		errormessage=sqlrstmt->sqlrcur->errorMessage();
+		pdoerr=&stmt->error_code;
+	} else {
+		sqlrconnection	*sqlrcon=(sqlrconnection *)dbh->driver_data;
+		errornumber=sqlrcon->errorNumber();
+		errormessage=sqlrcon->errorMessage();
+		pdoerr=&dbh->error_code;
+	}
+
+	// FIXME: currently we're leaving this at HY000 but it really ought to
+	// be set to some value.  DB2 and ODBC support this, others might too.
+	charstring::copy(*pdoerr,"HY000",5);
+
+	if (!dbh->methods) {
+		zend_throw_exception_ex(php_pdo_get_exception(),errornumber,
+					"SQLSTATE[%s] [%d] %s",
+					*pdoerr,errornumber,errormessage);
+	}
+	return errornumber;
+}
 
 static int sqlrcursorDestructor(pdo_stmt_t *stmt TSRMLS_DC) {
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
@@ -39,6 +79,7 @@ static int sqlrcursorExecute(pdo_stmt_t *stmt TSRMLS_DC) {
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
 	if (!sqlrcur->executeQuery()) {
+		sqlrelayErrorStmt(stmt);
 		return 0;
 	}
 	sqlrstmt->currentrow=-1;
@@ -398,14 +439,6 @@ static struct pdo_stmt_methods sqlrcursorMethods={
 };
 
 
-// FIXME: what is this function for?
-int _pdo_sqlrelay_error(pdo_dbh_t *dbh,
-			pdo_stmt_t *stmt,
-			const char *file,
-			int line TSRMLS_DC) {
-	return ((sqlrconnection *)dbh->driver_data)->errorNumber();
-}
-
 static int sqlrconnectionClose(pdo_dbh_t *dbh TSRMLS_DC) {
 	dbh->is_closed=1;
 	delete (sqlrconnection *)dbh->driver_data;
@@ -442,19 +475,32 @@ static long sqlrconnectionExecute(pdo_dbh_t *dbh,
 	if (sqlrcur.sendQuery(sql,sqllen)) {
 		return sqlrcur.affectedRows();
 	}
+	sqlrelayError(dbh);
 	return -1;
 }
 
 static int sqlrconnectionBegin(pdo_dbh_t *dbh TSRMLS_DC) {
-	return ((sqlrconnection *)dbh->driver_data)->begin();
+	if (((sqlrconnection *)dbh->driver_data)->begin()) {
+		return 1;
+	}
+	sqlrelayError(dbh);
+	return 0;
 }
 
 static int sqlrconnectionCommit(pdo_dbh_t *dbh TSRMLS_DC) {
-	return ((sqlrconnection *)dbh->driver_data)->commit();
+	if (((sqlrconnection *)dbh->driver_data)->commit()) {
+		return 1;
+	}
+	sqlrelayError(dbh);
+	return 0;
 }
 
 static int sqlrconnectionRollback(pdo_dbh_t *dbh TSRMLS_DC) { 
-	return ((sqlrconnection *)dbh->driver_data)->rollback();
+	if (((sqlrconnection *)dbh->driver_data)->rollback()) {
+		return 1;
+	}
+	sqlrelayError(dbh);
+	return 0;
 }
 
 static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
