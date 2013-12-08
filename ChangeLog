@@ -25,6 +25,8 @@
 	fixed bugs in the mysql and postgresql connection code that assumed
 		that the bind variables were bound in order, independent of
 		their names
+	resolved a paradox involved in detecting whether the current mysql
+		query needs to have its bind variables faked or not
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted
