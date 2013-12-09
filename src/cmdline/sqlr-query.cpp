@@ -36,6 +36,10 @@ int main(int argc, const char **argv) {
 		rsbs=100;
 	}
 	bool		debug=cmdline.found("-debug");
+	const char	*debugfile=NULL;
+	if (debug) {
+		debugfile=cmdline.getValue("-debug");
+	}
 
 	if (!(charstring::length(id) ||
 		((charstring::length(host) ||
@@ -44,8 +48,8 @@ int main(int argc, const char **argv) {
 				charstring::length(password))) ||
 		!(charstring::length(query))) {
 
-		stdoutput.printf("usage: sqlr-query -host host -port port -socket socket -user user -password password -query query [-debug] [-resultsetbuffersize rows]\n"
-			"  or   sqlr-query  [-config configfile] -id id -query query [-debug] [-resultsetbuffersize rows]\n");
+		stdoutput.printf("usage: sqlr-query -host host -port port -socket socket -user user -password password -query query [-debug [filename]] [-resultsetbuffersize rows]\n"
+			"  or   sqlr-query  [-config configfile] -id id -query query [-debug [filename]] [-resultsetbuffersize rows]\n");
 		process::exit(1);
 	}
 
@@ -65,6 +69,9 @@ int main(int argc, const char **argv) {
 	sqlrcursor	sqlrcur(&sqlrcon);
 
 	if (debug) {
+		if (debugfile) {
+			sqlrcon.setDebugFile(debugfile);
+		}
 		sqlrcon.debugOn();
 	}
 

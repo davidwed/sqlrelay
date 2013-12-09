@@ -622,6 +622,21 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		return;
 	}
 
+	// handle debug
+	if (cmdtype==4) {
+		if (!charstring::compareIgnoringCase(ptr,"on",2)) {
+			sqlrcon->debugOn();
+			sqlrcon->setDebugFile(NULL);
+		} else if (!charstring::compareIgnoringCase(ptr,"off",3)) {
+			sqlrcon->debugOff();
+			sqlrcon->setDebugFile(NULL);
+		} else {
+			sqlrcon->debugOn();
+			sqlrcon->setDebugFile(ptr);
+		}
+		return;
+	}
+
 	// on or off?
 	bool	toggle=false;
 	if (!charstring::compareIgnoringCase(ptr,"on",2)) {
@@ -633,12 +648,6 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		env->headers=toggle;
 	} else if (cmdtype==3) {
 		env->stats=toggle;
-	} else if (cmdtype==4) {
-		if (toggle) {
-			sqlrcon->debugOn();
-		} else {
-			sqlrcon->debugOff();
-		}
 	} else if (cmdtype==5) {
 		env->final=toggle;
 	} else if (cmdtype==7) {

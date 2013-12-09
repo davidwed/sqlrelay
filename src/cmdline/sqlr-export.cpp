@@ -77,6 +77,10 @@ int main(int argc, const char **argv) {
 		rsbs=100;
 	}
 	bool		debug=cmdline.found("-debug");
+	const char	*debugfile=NULL;
+	if (debug) {
+		debugfile=cmdline.getValue("-debug");
+	}
 
 	if (!(charstring::length(id) ||
 		((charstring::length(host) ||
@@ -87,9 +91,9 @@ int main(int argc, const char **argv) {
 			charstring::length(sequence))) {
 
 		stdoutput.printf("usage: \n"
-			"  sqlr-export -host host -port port -socket socket -user user -password password (-table table | -sequence sequence) [-format (xml | csv)] [-resultsetbuffersize rows] [-debug]\n"
+			"  sqlr-export -host host -port port -socket socket -user user -password password (-table table | -sequence sequence) [-format (xml | csv)] [-resultsetbuffersize rows] [-debug [filename]]\n"
 			"    or\n"
-			"  sqlr-export [-config configfile] -id id (-table table | -sequence sequence) [-format (xml | csv)] [-resultsetbuffersize rows] [-debug]\n");
+			"  sqlr-export [-config configfile] -id id (-table table | -sequence sequence) [-format (xml | csv)] [-resultsetbuffersize rows] [-debug [filename]]\n");
 		process::exit(1);
 	}
 
@@ -110,6 +114,9 @@ int main(int argc, const char **argv) {
 	sqlrcursor	sqlrcur(&sqlrcon);
 
 	if (debug) {
+		if (debugfile) {
+			sqlrcon.setDebugFile(debugfile);
+		}
 		sqlrcon.debugOn();
 	}
 

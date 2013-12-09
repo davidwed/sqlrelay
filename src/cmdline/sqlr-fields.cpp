@@ -30,6 +30,11 @@ int main(int argc, const char **argv) {
 	const char	*user=cmdline.getValue("-user");
 	const char	*password=cmdline.getValue("-password");
 	const char	*table=cmdline.getValue("-table");
+	bool		debug=cmdline.found("-debug");
+	const char	*debugfile=NULL;
+	if (debug) {
+		debugfile=cmdline.getValue("-debug");
+	}
 
 	if (!(charstring::length(id) ||
 		((charstring::length(host) ||
@@ -38,8 +43,8 @@ int main(int argc, const char **argv) {
 				charstring::length(password))) ||
 		!(charstring::length(table))) {
 
-		stdoutput.printf("usage: sqlr-fields -host host -port port -socket socket -table table\n"
-			"  or   sqlr-fields  [-config configfile] -id id -table table\n");
+		stdoutput.printf("usage: sqlr-fields -host host -port port -socket socket -table table [-debug [filename]]\n"
+			"  or   sqlr-fields  [-config configfile] -id id -table table [-debug [filename]]\n");
 		process::exit(1);
 	}
 
@@ -57,6 +62,14 @@ int main(int argc, const char **argv) {
 
 	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);
 	sqlrcursor	sqlrcur(&sqlrcon);
+
+	if (debug) {
+		if (debugfile) {
+			sqlrcon.setDebugFile(debugfile);
+		}
+		sqlrcon.debugOn();
+	}
+
 	if (sqlrcur.getColumnList(table,NULL)) {
 		for (uint64_t j=0; j<sqlrcur.rowCount(); j++) {
 			if (j>0) {

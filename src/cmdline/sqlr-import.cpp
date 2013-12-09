@@ -507,6 +507,10 @@ int main(int argc, const char **argv) {
 	uint64_t	commitcount=charstring::toInteger(
 					cmdline.getValue("-commitcount"));
 	bool		debug=cmdline.found("-debug");
+	const char	*debugfile=NULL;
+	if (debug) {
+		debugfile=cmdline.getValue("-debug");
+	}
 	bool		verbose=cmdline.found("-verbose");
 
 	if (!(charstring::length(id) ||
@@ -517,9 +521,9 @@ int main(int argc, const char **argv) {
 		!charstring::length(file)) {
 
 		stdoutput.printf("usage: \n"
-			"  sqlr-import -host host -port port -socket socket -user user -password password -file file [-commit rowcount] [-debug] [-verbose]\n"
+			"  sqlr-import -host host -port port -socket socket -user user -password password -file file [-commit rowcount] [-debug [filename]] [-verbose]\n"
 			"    or\n"
-			"  sqlr-import [-config configfile] -id id -file file [-commit rowcount] [-debug] [-verbose]\n");
+			"  sqlr-import [-config configfile] -id id -file file [-commit rowcount] [-debug [filename]] [-verbose]\n");
 		process::exit(1);
 	}
 
@@ -540,6 +544,9 @@ int main(int argc, const char **argv) {
 	sqlrcursor	sqlrcur(&sqlrcon);
 
 	if (debug) {
+		if (debugfile) {
+			sqlrcon.setDebugFile(debugfile);
+		}
 		sqlrcon.debugOn();
 	}
 
