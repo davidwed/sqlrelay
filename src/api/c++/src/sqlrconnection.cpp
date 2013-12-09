@@ -184,6 +184,8 @@ sqlrconnection::~sqlrconnection() {
 		debugPrint("Deallocated connection\n");
 		debugPreEnd();
 	}
+
+	debugfile.close();
 }
 
 void sqlrconnection::setConnectTimeout(int32_t timeoutsec,
