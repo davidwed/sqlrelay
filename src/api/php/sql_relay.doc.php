@@ -172,6 +172,11 @@ function sqlrcon_debugOff($sqlrconref){}
  *  Returns 0 if debugging is off and 1 if debugging is on. */
 function sqlrcon_getDebug($sqlrconref){}
 
+/** Allows you to specify a file to write debug to.
+ *  Setting "filename" to NULL or an empty string causes debug
+ *  to be written to standard output (the default). */
+function sqlrcon_setDebugFile($sqlrconref, $filename){}
+
 /** Allows you to set a string that will be passed to the
  *  server and ultimately included in server-side logging
  *  along with queries that were run by this instance of

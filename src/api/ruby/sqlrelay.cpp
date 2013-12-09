@@ -368,6 +368,20 @@ static VALUE sqlrcon_getDebug(VALUE self) {
 
 /**
  *  call-seq:
+ *  setDebugFile(filename)
+ * 
+ *  Allows you to specify a file to write debug to.
+ *  Setting "filename" to NULL or an empty string causes debug
+ *  to be written to standard output (the default). */
+static VALUE sqlrcon_setDebugFile(VALUE self, VALUE filename) {
+	sqlrconnection	*sqlrcon;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	sqlrcon->setDebugFile(STR2CSTR(filename));
+	return Qnil;
+}
+
+/**
+ *  call-seq:
  *  setClientInfo(clientinfo)
  * 
  *  Allows you to set a string that will be passed to the server and ultimately
@@ -455,6 +469,8 @@ void Init_SQLRConnection() {
 				(CAST)sqlrcon_debugOff,0);
 	rb_define_method(csqlrconnection,"getDebug",
 				(CAST)sqlrcon_getDebug,0);
+	rb_define_method(csqlrconnection,"setDebugFile",
+				(CAST)sqlrcon_setDebugFile,1);
 	rb_define_method(csqlrconnection,"setClientInfo",
 				(CAST)sqlrcon_setClientInfo,1);
 	rb_define_method(csqlrconnection,"getClientInfo",

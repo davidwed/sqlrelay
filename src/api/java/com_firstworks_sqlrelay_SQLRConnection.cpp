@@ -376,6 +376,18 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getDebug
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    setDebugFile
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setDebugFile
+  (JNIEnv *env, jobject self, jstring debugfile) {
+	char	*debugfilestring=conGetStringUTFChars(env,debugfile,0);
+	getSqlrConnection(env,self)->setDebugFile(debugfilestring);
+	conReleaseStringUTFChars(env,debugfile,debugfilestring);
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    setClientInfo
  * Signature: (Ljava/lang/String;)V
  */

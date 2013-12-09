@@ -174,6 +174,11 @@ proc debugOff {}
 # if debugging is on.
 proc getDebug {} 
 
+# Allows you to specify a file to write debug to.
+# Setting "debugfilename" to NULL or an empty string causes debug
+# to be written to standard output (the default).
+proc setDebugFile {debugfilename}
+
 # Allows you to set a string that will be passed to the
 # server and ultimately included in server-side logging
 # along with queries that were run by this instance of

@@ -95,6 +95,8 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <tr><td><code><a href="#setConnectTimeout">setConnectTimeout</a> { timeoutsec timeoutusec }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the server connect timeout in seconds and
  milliseconds.</td></tr>
+<tr><td><code><a href="#setDebugFile">setDebugFile</a> { debugfilename }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Allows you to specify a file to write debug to.</td></tr>
 <tr><td><code><a href="#setResponseTimeout">setResponseTimeout</a> { timeoutsec timeoutusec }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the response timeout (for queries, commits, rollbacks,
  pings,</td></tr>
@@ -253,7 +255,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc getClientInfo {  }</pre>
 <dl>
 <dd>Returns the string that was set by setClientInfo().<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getClientInfo_184">sqlrconCmd.tcl, line 184</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getClientInfo_189">sqlrconCmd.tcl, line 189</a>
 </dl></dl>
 
 <hr>
@@ -380,7 +382,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  server and ultimately included in server-side logging
  along with queries that were run by this instance of
  the client.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setClientInfo_181">sqlrconCmd.tcl, line 181</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setClientInfo_186">sqlrconCmd.tcl, line 186</a>
 </dl></dl>
 
 <hr>
@@ -392,6 +394,16 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  timeout.  You can also set this timeout using the
  SQLR_CLIENT_CONNECT_TIMEOUT environment variable.<dl>
 <dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setConnectTimeout_29">sqlrconCmd.tcl, line 29</a>
+</dl></dl>
+
+<hr>
+<h3><a name="setDebugFile">setDebugFile</a></h3>
+<pre>proc setDebugFile { debugfilename }</pre>
+<dl>
+<dd>Allows you to specify a file to write debug to.
+ Setting "debugfilename" to NULL or an empty string causes debug
+ to be written to standard output (the default).<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setDebugFile_180">sqlrconCmd.tcl, line 180</a>
 </dl></dl>
 
 <hr>
@@ -454,7 +466,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2012-12-21 at 13:28.</cite>
+<cite>File generated 2013-12-08 at 23:59.</cite>
 </font>
 </body>
 </html>

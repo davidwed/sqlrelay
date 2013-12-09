@@ -224,6 +224,14 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getDebug
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    setDebugFile
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setDebugFile
+  (JNIEnv *, jobject, jstring);
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    setClientInfo
  * Signature: (Ljava/lang/String;)V
  */

@@ -10,80 +10,78 @@
 <body style="background-color: white">
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
-
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#usage">USAGE</a></li>
-	<ul>
-
-		<li><a href="#note_for_html__mason_users">Note for HTML::Mason Users</a></li>
-	</ul>
-
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#USAGE">USAGE</a>
+    <ul>
+      <li><a href="#Note-for-HTML::Mason-Users">Note for HTML::Mason Users</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
 </ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<h1 id="NAME">NAME</h1>
 
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
 <p>DBD::SQLRelay - perl DBI driver for SQL Relay</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
 <p>use DBD::SQLRelay;</p>
-<p>my $dbh = DBI -&gt; connect ('dbi:SQLRelay:$dsn', $login, $password);</p>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>This module is a pure-Perl DBI binding to SQL Relay's native API. 
-Connection string consists of following parts:</p>
+
+<p>my $dbh = DBI -&gt; connect (&#39;dbi:SQLRelay:$dsn&#39;, $login, $password);</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This module is a pure-Perl DBI binding to SQL Relay&#39;s native API. Connection string consists of following parts:</p>
+
 <dl>
-<dt><strong><a name="host_default_localhost_hostname_of_sql_relay_server" class="item"><strong>host=...</strong>      default: <em>localhost</em> --- hostname of SQL Relay server;</a></strong></dt>
 
-<dt><strong><a name="port_default_9000_port_number_that_sql_relay_server_listens_on" class="item"><strong>port=...</strong>      default: <em>9000</em>      --- port number that SQL Relay server listens on;</a></strong></dt>
+<dt id="host-...-default:-localhost-----hostname-of-SQL-Relay-server-"><b>host=...</b> default: <i>localhost</i> --- hostname of SQL Relay server;</dt>
+<dd>
 
-<dt><strong><a name="tries_default_1_how_much_times_do_we_try_to_connect" class="item"><strong>tries=...</strong>     default: <em>1</em>         --- how much times do we try to connect;</a></strong></dt>
+</dd>
+<dt id="port-...-default:-9000-----port-number-that-SQL-Relay-server-listens-on-"><b>port=...</b> default: <i>9000</i> --- port number that SQL Relay server listens on;</dt>
+<dd>
 
-<dt><strong><a name="time" class="item"><strong>retrytime=...</strong> default: <em>0</em>         --- time (in seconds) between connect attempts;</a></strong></dt>
+</dd>
+<dt id="tries-...-default:-1-----how-much-times-do-we-try-to-connect-"><b>tries=...</b> default: <i>1</i> --- how much times do we try to connect;</dt>
+<dd>
 
-<dt><strong><a name="debug_default_0_set_it_to_1_if_you_want_to_get_some_debug_messages_in_stdout" class="item"><strong>debug=...</strong>     default: <em>0</em>         --- set it to 1 if you want to get some debug messages in stdout;</a></strong></dt>
+</dd>
+<dt id="retrytime-...-default:-0-----time-in-seconds-between-connect-attempts-"><b>retrytime=...</b> default: <i>0</i> --- time (in seconds) between connect attempts;</dt>
+<dd>
 
+</dd>
+<dt id="debug-...-default:-0-----set-it-to-1-if-you-want-to-get-some-debug-messages-in-stdout-"><b>debug=...</b> default: <i>0</i> --- set it to 1 if you want to get some debug messages in stdout;</dt>
+<dd>
+
+</dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="usage">USAGE</a></h1>
-<p>Once connected, DB handler works as usual (see <em>DBI</em>).</p>
-<p>Don't ever try to share one SQLRelay connect by multiple scripts, for example, if you use 
-Apache mod_perl. Every $dbh holds one of server connections, so call <code>disconnect()</code> directly
-at the end of every script and don't use Apache::DBI or SQLRelay will be deadlocked.</p>
-<p>
-</p>
-<h2><a name="note_for_html__mason_users">Note for HTML::Mason Users</a></h2>
-<p>If you use <a href="/HTML/Mason.html">the HTML::Mason manpage</a>, your handler.pl sould look like this:</p>
-<pre>
-  ...</pre>
-<pre>
+
+<h1 id="USAGE">USAGE</h1>
+
+<p>Once connected, DB handler works as usual (see <a>DBI</a>).</p>
+
+<p>Don&#39;t ever try to share one SQLRelay connect by multiple scripts, for example, if you use Apache mod_perl. Every $dbh holds one of server connections, so call disconnect() directly at the end of every script and don&#39;t use Apache::DBI or SQLRelay will be deadlocked.</p>
+
+<h2 id="Note-for-HTML::Mason-Users">Note for HTML::Mason Users</h2>
+
+<p>If you use <a>HTML::Mason</a>, your handler.pl sould look like this:</p>
+
+<pre><code>  ...
+
      {
        package HTML::Mason::Commands;
        use DBI;
        use vars qw($db);  
      }
  
-  ...</pre>
-<pre>
+  ...
+
      sub handler {
        
        $HTML::Mason::Commands::dbh = DBI -&gt; connect (...);
@@ -94,21 +92,26 @@ at the end of every script and don't use Apache::DBI or SQLRelay will be deadloc
        
        return $status;
               
-     }</pre>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>D. E. Ovsyanko, <a href="mailto:do@mobile.ru">do@mobile.ru</a></p>
+     }
+     </code></pre>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>D. E. Ovsyanko, do@mobile.ru</p>
+
 <p>Contributions by:</p>
-<p>Erik Hollensbe &lt;<a href="mailto:erik@hollensbe.org">erik@hollensbe.org</a>&gt;</p>
-<p>Tony Fleisher &lt;<a href="mailto:tfleisher@musiciansfriend.com">tfleisher@musiciansfriend.com</a>&gt;</p>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p><a href="http://www.firstworks.com">http://www.firstworks.com</a></p>
+
+<p>Erik Hollensbe &lt;erik@hollensbe.org&gt;</p>
+
+<p>Tony Fleisher &lt;tfleisher@musiciansfriend.com&gt;</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p>http://www.firstworks.com</p>
+
 
 </body>
 
 </html>
+
+

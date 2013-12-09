@@ -262,6 +262,14 @@ public class SQLRConnection : IDisposable
         return sqlrcon_getDebug(sqlrconref)!=0;
     }
 
+    /** Allows you to specify a file to write debug to.
+     *  Setting "filename" to NULL or an empty string causes debug
+     *  to be written to standard output (the default). */
+    public void setDebugFile(const char *filename)
+    {
+        sqlrcon_setDebugFile(sqlrconref,filename);
+    }
+
     /** Allows you to set a string that will be passed to the server and
      *  ultimately included in server-side logging along with queries that were
      *  run by this instance of the client. */
@@ -376,6 +384,9 @@ public class SQLRConnection : IDisposable
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern Int32 sqlrcon_getDebug(IntPtr sqlrconref);
+    
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern void sqlrcon_setDebugFile(IntPtr sqlrconref, String filename);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_setClientInfo(IntPtr sqlrconref, String clientinfo);

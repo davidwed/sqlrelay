@@ -590,6 +590,22 @@ int main() {
 			}
 		}
 
+		if (strcmp("setDebugFile", command) == TRUE) {
+			char debugfile[2000];
+
+			// check number of arguments
+		    	if (arity != 1) return ERR_NUMBER_OF_ARGS;
+
+			// get input parameters
+			if (ei_decode_string(buf, &index, &debugfile[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+
+			// call function and encode result 
+			sqlrcon_setDebugFile(con, debugfile); 	
+			ENCODE_VOID;   
+		}
+
 		if (strcmp("setClientInfo", command) == TRUE) {
 			char clientinfo[2000];
 

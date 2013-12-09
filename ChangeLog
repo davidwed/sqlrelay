@@ -28,6 +28,8 @@
 		their names
 	resolved a paradox involved in detecting whether the current mysql
 		query needs to have its bind variables faked or not
+	added support for client-side debug-to-file
+	added debug-to-file support to command line clients
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted

@@ -235,6 +235,13 @@ void	sqlrcon_debugPrintFunction(sqlrcon sqlrconref,
 					int (*printfunction)(const char *,...));
 
 /** @ingroup sqlrclientwrapper
+ *  Allows you to specify a file to write debug to.
+ *  Setting "filename" to NULL or an empty string causes debug
+ *  to be written to standard output (the default). */
+SQLRCLIENTWRAPPER_DLLSPEC
+void	sqlrcon_setDebugFile(sqlrcon sqlrconref, const char *filename);
+
+/** @ingroup sqlrclientwrapper
  *  Allows you to set a string that will be passed to the server and ultimately
  *  included in server-side logging along with queries that were run by this
  *  instance of the client. */

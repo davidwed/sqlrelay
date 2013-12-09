@@ -154,6 +154,10 @@ void sqlrcon_debugPrintFunction(sqlrcon sqlrconref,
 	sqlrconref->debugPrintFunction(printfunction);
 }
 
+void sqlrcon_setDebugFile(sqlrcon sqlrconref, const char *filename) {
+	sqlrconref->setDebugFile(filename);
+}
+
 void sqlrcon_setClientInfo(sqlrcon sqlrconref, const char *clientinfo) {
 	sqlrconref->setClientInfo(clientinfo);
 }

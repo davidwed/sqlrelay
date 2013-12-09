@@ -1,0 +1,3837 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+<title>class SQLRCursor - RDoc Documentation</title>
+
+<link type="text/css" media="screen" href="./rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="./js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/darkfish.js"></script>
+
+
+<body id="top" class="class">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="./index.html">Home</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  
+
+  <div id="file-metadata">
+    <nav id="file-list-section" class="section">
+  <h3 class="section-header">Defined In</h3>
+  <ul>
+    <li>sqlrelay.cpp
+  </ul>
+</nav>
+
+    
+  </div>
+
+  <div id="class-metadata">
+    
+    <nav id="parent-class-section" class="section">
+  <h3 class="section-header">Parent</h3>
+  
+  <p class="link">Object
+  
+</nav>
+
+    
+    
+    <!-- Method Quickref -->
+<nav id="method-list-section" class="section">
+  <h3 class="section-header">Methods</h3>
+
+  <ul class="link-list">
+    
+    <li ><a href="#method-c-new">::new</a>
+    
+    <li ><a href="#method-i-affectedRows">#affectedRows</a>
+    
+    <li ><a href="#method-i-cacheOff">#cacheOff</a>
+    
+    <li ><a href="#method-i-cacheToFile">#cacheToFile</a>
+    
+    <li ><a href="#method-i-clearBinds">#clearBinds</a>
+    
+    <li ><a href="#method-i-closeResultSet">#closeResultSet</a>
+    
+    <li ><a href="#method-i-colCount">#colCount</a>
+    
+    <li ><a href="#method-i-countBindVariables">#countBindVariables</a>
+    
+    <li ><a href="#method-i-defineOutputBindBlob">#defineOutputBindBlob</a>
+    
+    <li ><a href="#method-i-defineOutputBindClob">#defineOutputBindClob</a>
+    
+    <li ><a href="#method-i-defineOutputBindCursor">#defineOutputBindCursor</a>
+    
+    <li ><a href="#method-i-defineOutputBindDouble">#defineOutputBindDouble</a>
+    
+    <li ><a href="#method-i-defineOutputBindInteger">#defineOutputBindInteger</a>
+    
+    <li ><a href="#method-i-defineOutputBindString">#defineOutputBindString</a>
+    
+    <li ><a href="#method-i-dontGetColumnInfo">#dontGetColumnInfo</a>
+    
+    <li ><a href="#method-i-endOfResultSet">#endOfResultSet</a>
+    
+    <li ><a href="#method-i-errorMessage">#errorMessage</a>
+    
+    <li ><a href="#method-i-errorNumber">#errorNumber</a>
+    
+    <li ><a href="#method-i-executeQuery">#executeQuery</a>
+    
+    <li ><a href="#method-i-fetchFromBindCursor">#fetchFromBindCursor</a>
+    
+    <li ><a href="#method-i-firstRowIndex">#firstRowIndex</a>
+    
+    <li ><a href="#method-i-getCacheFileName">#getCacheFileName</a>
+    
+    <li ><a href="#method-i-getColumnInfo">#getColumnInfo</a>
+    
+    <li ><a href="#method-i-getColumnIsAutoIncrement">#getColumnIsAutoIncrement</a>
+    
+    <li ><a href="#method-i-getColumnIsBinary">#getColumnIsBinary</a>
+    
+    <li ><a href="#method-i-getColumnIsNullable">#getColumnIsNullable</a>
+    
+    <li ><a href="#method-i-getColumnIsPartOfKey">#getColumnIsPartOfKey</a>
+    
+    <li ><a href="#method-i-getColumnIsPrimaryKey">#getColumnIsPrimaryKey</a>
+    
+    <li ><a href="#method-i-getColumnIsUnique">#getColumnIsUnique</a>
+    
+    <li ><a href="#method-i-getColumnIsUnsigned">#getColumnIsUnsigned</a>
+    
+    <li ><a href="#method-i-getColumnIsZeroFilled">#getColumnIsZeroFilled</a>
+    
+    <li ><a href="#method-i-getColumnLength">#getColumnLength</a>
+    
+    <li ><a href="#method-i-getColumnList">#getColumnList</a>
+    
+    <li ><a href="#method-i-getColumnName">#getColumnName</a>
+    
+    <li ><a href="#method-i-getColumnNames">#getColumnNames</a>
+    
+    <li ><a href="#method-i-getColumnPrecision">#getColumnPrecision</a>
+    
+    <li ><a href="#method-i-getColumnScale">#getColumnScale</a>
+    
+    <li ><a href="#method-i-getColumnType">#getColumnType</a>
+    
+    <li ><a href="#method-i-getDatabaseList">#getDatabaseList</a>
+    
+    <li ><a href="#method-i-getField">#getField</a>
+    
+    <li ><a href="#method-i-getFieldAsDouble">#getFieldAsDouble</a>
+    
+    <li ><a href="#method-i-getFieldAsInteger">#getFieldAsInteger</a>
+    
+    <li ><a href="#method-i-getFieldLength">#getFieldLength</a>
+    
+    <li ><a href="#method-i-getLongest">#getLongest</a>
+    
+    <li ><a href="#method-i-getNullsAsEmptyStrings">#getNullsAsEmptyStrings</a>
+    
+    <li ><a href="#method-i-getNullsAsNils">#getNullsAsNils</a>
+    
+    <li ><a href="#method-i-getOutputBindBlob">#getOutputBindBlob</a>
+    
+    <li ><a href="#method-i-getOutputBindClob">#getOutputBindClob</a>
+    
+    <li ><a href="#method-i-getOutputBindCursor">#getOutputBindCursor</a>
+    
+    <li ><a href="#method-i-getOutputBindDouble">#getOutputBindDouble</a>
+    
+    <li ><a href="#method-i-getOutputBindInteger">#getOutputBindInteger</a>
+    
+    <li ><a href="#method-i-getOutputBindLength">#getOutputBindLength</a>
+    
+    <li ><a href="#method-i-getOutputBindString">#getOutputBindString</a>
+    
+    <li ><a href="#method-i-getResultSetBufferSize">#getResultSetBufferSize</a>
+    
+    <li ><a href="#method-i-getResultSetId">#getResultSetId</a>
+    
+    <li ><a href="#method-i-getRow">#getRow</a>
+    
+    <li ><a href="#method-i-getRowHash">#getRowHash</a>
+    
+    <li ><a href="#method-i-getRowLengths">#getRowLengths</a>
+    
+    <li ><a href="#method-i-getRowLengthsHash">#getRowLengthsHash</a>
+    
+    <li ><a href="#method-i-getTableList">#getTableList</a>
+    
+    <li ><a href="#method-i-inputBind">#inputBind</a>
+    
+    <li ><a href="#method-i-inputBindBlob">#inputBindBlob</a>
+    
+    <li ><a href="#method-i-inputBindClob">#inputBindClob</a>
+    
+    <li ><a href="#method-i-inputBinds">#inputBinds</a>
+    
+    <li ><a href="#method-i-lowerCaseColumnNames">#lowerCaseColumnNames</a>
+    
+    <li ><a href="#method-i-mixedCaseColumnNames">#mixedCaseColumnNames</a>
+    
+    <li ><a href="#method-i-openCachedResultSet">#openCachedResultSet</a>
+    
+    <li ><a href="#method-i-prepareFileQuery">#prepareFileQuery</a>
+    
+    <li ><a href="#method-i-prepareQuery">#prepareQuery</a>
+    
+    <li ><a href="#method-i-prepareQueryWithLength">#prepareQueryWithLength</a>
+    
+    <li ><a href="#method-i-resumeCachedResultSet">#resumeCachedResultSet</a>
+    
+    <li ><a href="#method-i-resumeResultSet">#resumeResultSet</a>
+    
+    <li ><a href="#method-i-rowCount">#rowCount</a>
+    
+    <li ><a href="#method-i-sendFileQuery">#sendFileQuery</a>
+    
+    <li ><a href="#method-i-sendQuery">#sendQuery</a>
+    
+    <li ><a href="#method-i-sendQueryWithLength">#sendQueryWithLength</a>
+    
+    <li ><a href="#method-i-setCacheTtl">#setCacheTtl</a>
+    
+    <li ><a href="#method-i-setResultSetBufferSize">#setResultSetBufferSize</a>
+    
+    <li ><a href="#method-i-substitution">#substitution</a>
+    
+    <li ><a href="#method-i-substitutions">#substitutions</a>
+    
+    <li ><a href="#method-i-suspendResultSet">#suspendResultSet</a>
+    
+    <li ><a href="#method-i-totalRows">#totalRows</a>
+    
+    <li ><a href="#method-i-upperCaseColumnNames">#upperCaseColumnNames</a>
+    
+    <li ><a href="#method-i-validBind">#validBind</a>
+    
+    <li ><a href="#method-i-validateBinds">#validateBinds</a>
+    
+  </ul>
+</nav>
+
+  </div>
+
+  <div id="project-metadata">
+    
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="./SQLRConnection.html">SQLRConnection</a>
+  
+    <li><a href="./SQLRCursor.html">SQLRCursor</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation">
+  <h1 class="class">class SQLRCursor</h1>
+
+  <div id="description" class="description">
+    
+  </div><!-- description -->
+
+  
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
+
+    
+
+    
+
+    
+
+    <!-- Methods -->
+    
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Class Methods</h3>
+
+    
+      <div id="method-c-new" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            new(connection)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Creates a cursor to run queries and fetch result sets using connection
+“connection”</p>
+          
+          
+
+          
+          <div class="method-source-code" id="new-source">
+            <pre>static VALUE sqlrcur_new(VALUE self, VALUE connection) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(connection,sqlrconnection,sqlrcon);
+        sqlrcursor     *sqlrcur=new sqlrcursor(sqlrcon,true);
+        return Data_Wrap_Struct(self,0,sqlrcur_free,(void *)sqlrcur);
+}</pre>
+          </div><!-- new-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- new-method -->
+
+    
+    </section><!-- public-class-method-details -->
+  
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Instance Methods</h3>
+
+    
+      <div id="method-i-affectedRows" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">affectedRows</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the number of rows that were updated, inserted or deleted by the
+query.  Not all databases support this call.  Don&#39;t use it for
+applications which are designed to be portable across databases.  -1 is
+returned by databases which don&#39;t support this option.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="affectedRows-source">
+            <pre>static VALUE sqlrcur_affectedRows(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;affectedRows());
+}</pre>
+          </div><!-- affectedRows-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- affectedRows-method -->
+
+    
+      <div id="method-i-cacheOff" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">cacheOff</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Sets query caching off.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="cacheOff-source">
+            <pre>static VALUE sqlrcur_cacheOff(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;cacheOff();
+        return Qnil;
+}</pre>
+          </div><!-- cacheOff-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- cacheOff-method -->
+
+    
+      <div id="method-i-cacheToFile" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            cacheToFile(filename)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Sets query caching on.  Future queries will be cached to the file
+“filename”.</p>
+
+<p>A default time-to-live of 10 minutes is also set.</p>
+
+<p>Note that once cacheToFile() is called, the result sets of all future
+queries will be cached to that file until another call to cacheToFile()
+changes which file to cache to or a call to cacheOff() turns off caching.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="cacheToFile-source">
+            <pre>static VALUE sqlrcur_cacheToFile(VALUE self, VALUE filename) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;cacheToFile(STR2CSTR(filename));
+        return Qnil;
+}</pre>
+          </div><!-- cacheToFile-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- cacheToFile-method -->
+
+    
+      <div id="method-i-clearBinds" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">clearBinds</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Clears all bind variables.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="clearBinds-source">
+            <pre>static VALUE sqlrcur_clearBinds(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;clearBinds();
+        return Qnil;
+}</pre>
+          </div><!-- clearBinds-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- clearBinds-method -->
+
+    
+      <div id="method-i-closeResultSet" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">closeResultSet</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Closes the current result set, if one is open.  Data that has been fetched
+already is still available but no more data may be fetched.  Server side
+resources for the result set are freed as well.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="closeResultSet-source">
+            <pre>static VALUE sqlrcur_closeResultSet(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;closeResultSet();
+        return Qnil;
+}</pre>
+          </div><!-- closeResultSet-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- closeResultSet-method -->
+
+    
+      <div id="method-i-colCount" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">colCount</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the number of columns in the current result set.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="colCount-source">
+            <pre>static VALUE sqlrcur_colCount(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;colCount());
+}</pre>
+          </div><!-- colCount-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- colCount-method -->
+
+    
+      <div id="method-i-countBindVariables" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">countBindVariables</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Parses the previously prepared query, counts the number of bind variables
+defined in it and returns that number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="countBindVariables-source">
+            <pre>static VALUE sqlrcur_countBindVariables(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;countBindVariables());
+}</pre>
+          </div><!-- countBindVariables-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- countBindVariables-method -->
+
+    
+      <div id="method-i-defineOutputBindBlob" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            defineOuptutBindBlob(variable)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Defines a binary lob output bind variable</p>
+          
+          
+
+          
+          <div class="method-source-code" id="defineOutputBindBlob-source">
+            <pre>static VALUE sqlrcur_defineOutputBindBlob(VALUE self, VALUE variable) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;defineOutputBindBlob(STR2CSTR(variable));
+        return Qnil;
+}</pre>
+          </div><!-- defineOutputBindBlob-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- defineOutputBindBlob-method -->
+
+    
+      <div id="method-i-defineOutputBindClob" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            defineOutputBindClob(variable)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Defines a character lob output bind variable</p>
+          
+          
+
+          
+          <div class="method-source-code" id="defineOutputBindClob-source">
+            <pre>static VALUE sqlrcur_defineOutputBindClob(VALUE self, VALUE variable) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;defineOutputBindClob(STR2CSTR(variable));
+        return Qnil;
+}</pre>
+          </div><!-- defineOutputBindClob-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- defineOutputBindClob-method -->
+
+    
+      <div id="method-i-defineOutputBindCursor" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            defineOutputBindCursor(variable)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Defines a cursor output bind variable</p>
+          
+          
+
+          
+          <div class="method-source-code" id="defineOutputBindCursor-source">
+            <pre>static VALUE sqlrcur_defineOutputBindCursor(VALUE self, VALUE variable) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;defineOutputBindCursor(STR2CSTR(variable));
+        return Qnil;
+}</pre>
+          </div><!-- defineOutputBindCursor-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- defineOutputBindCursor-method -->
+
+    
+      <div id="method-i-defineOutputBindDouble" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            defineOutputBindDouble(variable)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Defines an decimal output bind variable.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="defineOutputBindDouble-source">
+            <pre>static VALUE sqlrcur_defineOutputBindDouble(VALUE self, VALUE variable) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;defineOutputBindDouble(STR2CSTR(variable));
+        return Qnil;
+}</pre>
+          </div><!-- defineOutputBindDouble-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- defineOutputBindDouble-method -->
+
+    
+      <div id="method-i-defineOutputBindInteger" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            defineOutputBindInteger(variable)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Defines an integer output bind variable.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="defineOutputBindInteger-source">
+            <pre>static VALUE sqlrcur_defineOutputBindInteger(VALUE self, VALUE variable) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;defineOutputBindInteger(STR2CSTR(variable));
+        return Qnil;
+}</pre>
+          </div><!-- defineOutputBindInteger-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- defineOutputBindInteger-method -->
+
+    
+      <div id="method-i-defineOutputBindString" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            defineOutputBindString(variable,length)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Defines a string output bind variable. “length” bytes will be reserved to
+store the value.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="defineOutputBindString-source">
+            <pre>static VALUE sqlrcur_defineOutputBindString(VALUE self, VALUE variable,
+                                                        VALUE bufferlength) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;defineOutputBindString(STR2CSTR(variable),NUM2INT(bufferlength));
+        return Qnil;
+}</pre>
+          </div><!-- defineOutputBindString-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- defineOutputBindString-method -->
+
+    
+      <div id="method-i-dontGetColumnInfo" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">dontGetColumnInfo</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Tells the server not to send any column info (names, types, sizes).  If you
+don&#39;t need that info, you should call this function to improve
+performance.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="dontGetColumnInfo-source">
+            <pre>static VALUE sqlrcur_dontGetColumnInfo(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;dontGetColumnInfo();
+        return Qnil;
+}</pre>
+          </div><!-- dontGetColumnInfo-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- dontGetColumnInfo-method -->
+
+    
+      <div id="method-i-endOfResultSet" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">endOfResultSet</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns 0 if part of the result set is still pending on the server and 1 if
+not.  This function can only return 0 if setResultSetBufferSize() has been
+called with a parameter other than 0.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="endOfResultSet-source">
+            <pre>static VALUE sqlrcur_endOfResultSet(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;endOfResultSet());
+}</pre>
+          </div><!-- endOfResultSet-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- endOfResultSet-method -->
+
+    
+      <div id="method-i-errorMessage" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">errorMessage</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>If a query failed and generated an error, the error message is available
+here.  If the query succeeded then this function returns a nil.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="errorMessage-source">
+            <pre>static VALUE sqlrcur_errorMessage(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        const char     *result=sqlrcur-&gt;errorMessage();
+        if (result) {
+                return rb_str_new2(result);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- errorMessage-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- errorMessage-method -->
+
+    
+      <div id="method-i-errorNumber" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">errorNumber</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>If a query failed and generated an error, the error number is available
+here.  If there is no error then this method returns 0.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="errorNumber-source">
+            <pre>static VALUE sqlrcur_errorNumber(VALUE self) {
+        sqlrcursor *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;errorNumber());
+}</pre>
+          </div><!-- errorNumber-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- errorNumber-method -->
+
+    
+      <div id="method-i-executeQuery" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">executeQuery</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Execute the query that was previously prepared and bound.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="executeQuery-source">
+            <pre>static VALUE sqlrcur_executeQuery(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;executeQuery());
+}</pre>
+          </div><!-- executeQuery-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- executeQuery-method -->
+
+    
+      <div id="method-i-fetchFromBindCursor" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">fetchFromBindCursor</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Fetch from a cursor that was returned as an output bind variable.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="fetchFromBindCursor-source">
+            <pre>static VALUE sqlrcur_fetchFromBindCursor(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;fetchFromBindCursor());
+}</pre>
+          </div><!-- fetchFromBindCursor-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- fetchFromBindCursor-method -->
+
+    
+      <div id="method-i-firstRowIndex" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">firstRowIndex</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the index of the first buffered row.  This is useful when buffering
+only part of the result set at a time.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="firstRowIndex-source">
+            <pre>static VALUE sqlrcur_firstRowIndex(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;firstRowIndex());
+}</pre>
+          </div><!-- firstRowIndex-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- firstRowIndex-method -->
+
+    
+      <div id="method-i-getCacheFileName" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">getCacheFileName</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the name of the file containing the most recently cached result
+set.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getCacheFileName-source">
+            <pre>static VALUE sqlrcur_getCacheFileName(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        const char     *result=sqlrcur-&gt;getCacheFileName();
+        if (result) {
+                return rb_str_new2(result);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- getCacheFileName-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getCacheFileName-method -->
+
+    
+      <div id="method-i-getColumnInfo" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">getColumnInfo</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Tells the server to send column info.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getColumnInfo-source">
+            <pre>static VALUE sqlrcur_getColumnInfo(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;getColumnInfo();
+        return Qnil;
+}</pre>
+          </div><!-- getColumnInfo-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getColumnInfo-method -->
+
+    
+      <div id="method-i-getColumnIsAutoIncrement" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getColumnIsAutoIncrement(col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns 1 if the specified column auto-increments and 0 otherwise. “col”
+may be specified as the column name or number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getColumnIsAutoIncrement-source">
+            <pre>static VALUE sqlrcur_getColumnIsAutoIncrement(VALUE self, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+                return INT2NUM(
+                        sqlrcur-&gt;getColumnIsAutoIncrement(STR2CSTR(col)));
+        } else {
+                return INT2NUM(
+                        sqlrcur-&gt;getColumnIsAutoIncrement(NUM2INT(col)));
+        }
+}</pre>
+          </div><!-- getColumnIsAutoIncrement-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getColumnIsAutoIncrement-method -->
+
+    
+      <div id="method-i-getColumnIsBinary" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getColumnIsBinary(col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns 1 if the specified column contains binary data and 0 otherwise.
+“col” may be specified as the column name or number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getColumnIsBinary-source">
+            <pre>static VALUE sqlrcur_getColumnIsBinary(VALUE self, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+                return INT2NUM(sqlrcur-&gt;getColumnIsBinary(STR2CSTR(col)));
+        } else {
+                return INT2NUM(sqlrcur-&gt;getColumnIsBinary(NUM2INT(col)));
+        }
+}</pre>
+          </div><!-- getColumnIsBinary-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getColumnIsBinary-method -->
+
+    
+      <div id="method-i-getColumnIsNullable" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getColumnIsNullable(col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns 1 if the specified column can contain nulls and 0 otherwise. “col”
+may be specified as the colum name or number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getColumnIsNullable-source">
+            <pre>static VALUE sqlrcur_getColumnIsNullable(VALUE self, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+                return INT2NUM(sqlrcur-&gt;getColumnIsNullable(STR2CSTR(col)));
+        } else {
+                return INT2NUM(sqlrcur-&gt;getColumnIsNullable(NUM2INT(col)));
+        }
+}</pre>
+          </div><!-- getColumnIsNullable-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getColumnIsNullable-method -->
+
+    
+      <div id="method-i-getColumnIsPartOfKey" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getColumnIsPartOfKey(col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns 1 if the specified column is part of a composite key and 0
+otherwise.  “col” may be specified as the column name or number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getColumnIsPartOfKey-source">
+            <pre>static VALUE sqlrcur_getColumnIsPartOfKey(VALUE self, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+                return INT2NUM(sqlrcur-&gt;getColumnIsPartOfKey(STR2CSTR(col)));
+        } else {
+                return INT2NUM(sqlrcur-&gt;getColumnIsPartOfKey(NUM2INT(col)));
+        }
+}</pre>
+          </div><!-- getColumnIsPartOfKey-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getColumnIsPartOfKey-method -->
+
+    
+      <div id="method-i-getColumnIsPrimaryKey" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getColumnIsPrimaryKey(col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns 1 if the specified column is a primary key and 0 otherwise. “col”
+may be specified as the column name or number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getColumnIsPrimaryKey-source">
+            <pre>static VALUE sqlrcur_getColumnIsPrimaryKey(VALUE self, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+                return INT2NUM(sqlrcur-&gt;getColumnIsPrimaryKey(STR2CSTR(col)));
+        } else {
+                return INT2NUM(sqlrcur-&gt;getColumnIsPrimaryKey(NUM2INT(col)));
+        }
+}</pre>
+          </div><!-- getColumnIsPrimaryKey-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getColumnIsPrimaryKey-method -->
+
+    
+      <div id="method-i-getColumnIsUnique" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getColumnIsUnique(col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns 1 if the specified column is unique and 0 otherwise.  “col” may be
+specified as the column name or number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getColumnIsUnique-source">
+            <pre>static VALUE sqlrcur_getColumnIsUnique(VALUE self, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+                return INT2NUM(sqlrcur-&gt;getColumnIsUnique(STR2CSTR(col)));
+        } else {
+                return INT2NUM(sqlrcur-&gt;getColumnIsUnique(NUM2INT(col)));
+        }
+}</pre>
+          </div><!-- getColumnIsUnique-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getColumnIsUnique-method -->
+
+    
+      <div id="method-i-getColumnIsUnsigned" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getColumnIsUnsigned(col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns 1 if the specified column is an unsigned number and 0 otherwise.
+“col” may be specified as the column name or number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getColumnIsUnsigned-source">
+            <pre>static VALUE sqlrcur_getColumnIsUnsigned(VALUE self, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+                return INT2NUM(sqlrcur-&gt;getColumnIsUnsigned(STR2CSTR(col)));
+        } else {
+                return INT2NUM(sqlrcur-&gt;getColumnIsUnsigned(NUM2INT(col)));
+        }
+}</pre>
+          </div><!-- getColumnIsUnsigned-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getColumnIsUnsigned-method -->
+
+    
+      <div id="method-i-getColumnIsZeroFilled" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getColumnIsZeroFilled(col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns 1 if the specified column was created with the zero-fill flag and 0
+otherwise.  “col” may be specified as the column name or number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getColumnIsZeroFilled-source">
+            <pre>static VALUE sqlrcur_getColumnIsZeroFilled(VALUE self, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+                return INT2NUM(sqlrcur-&gt;getColumnIsZeroFilled(STR2CSTR(col)));
+        } else {
+                return INT2NUM(sqlrcur-&gt;getColumnIsZeroFilled(NUM2INT(col)));
+        }
+}</pre>
+          </div><!-- getColumnIsZeroFilled-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getColumnIsZeroFilled-method -->
+
+    
+      <div id="method-i-getColumnLength" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getColumnLength(col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns the length of the specified column. “col” may be specified as the
+column name or number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getColumnLength-source">
+            <pre>static VALUE sqlrcur_getColumnLength(VALUE self, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+                return INT2NUM(sqlrcur-&gt;getColumnLength(STR2CSTR(col)));
+        } else {
+                return INT2NUM(sqlrcur-&gt;getColumnLength(NUM2INT(col)));
+        }
+}</pre>
+          </div><!-- getColumnLength-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getColumnLength-method -->
+
+    
+      <div id="method-i-getColumnList" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getColumnList(table,wild)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Sends a query that returns a list of columns in the table specified by the
+“table” parameter matching “wild”.  If wild is empty or nil then a list of
+all columns will be returned.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getColumnList-source">
+            <pre>static VALUE sqlrcur_getColumnList(VALUE self, VALUE table, VALUE wild) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;getColumnList(STR2CSTR(table),STR2CSTR(wild)));
+}</pre>
+          </div><!-- getColumnList-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getColumnList-method -->
+
+    
+      <div id="method-i-getColumnName" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getColumnName(col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns the name of the specified column.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getColumnName-source">
+            <pre>static VALUE sqlrcur_getColumnName(VALUE self, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        const char     *result=sqlrcur-&gt;getColumnName(NUM2INT(col));
+        if (result) {
+                return rb_str_new2(result);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- getColumnName-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getColumnName-method -->
+
+    
+      <div id="method-i-getColumnNames" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">getColumnNames</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns an array of the column names of the current result set.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getColumnNames-source">
+            <pre>static VALUE sqlrcur_getColumnNames(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        const char * const *names=sqlrcur-&gt;getColumnNames();
+        if (!names) {
+                return Qnil;
+        }
+        VALUE  nameary=rb_ary_new2(sqlrcur-&gt;colCount());
+        for (uint32_t i=0; i&lt;sqlrcur-&gt;colCount(); i++) {
+                if (names[i]) {
+                        rb_ary_store(nameary,i,rb_str_new2(names[i]));
+                } else {
+                        rb_ary_store(nameary,i,Qnil);
+                }
+        }
+        return nameary;
+}</pre>
+          </div><!-- getColumnNames-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getColumnNames-method -->
+
+    
+      <div id="method-i-getColumnPrecision" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getColumnPrecision(col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns the precision of the specified column.  Precision is the total
+number of digits in a number.  eg: 123.45 has a precision of 5.  For
+non-numeric types, it&#39;s the number of characters in the string.  “col”
+may be specified as the column name or number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getColumnPrecision-source">
+            <pre>static VALUE sqlrcur_getColumnPrecision(VALUE self, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+                return INT2NUM(sqlrcur-&gt;getColumnPrecision(STR2CSTR(col)));
+        } else {
+                return INT2NUM(sqlrcur-&gt;getColumnPrecision(NUM2INT(col)));
+        }
+}</pre>
+          </div><!-- getColumnPrecision-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getColumnPrecision-method -->
+
+    
+      <div id="method-i-getColumnScale" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getColumnScale(col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns the scale of the specified column.  Scale is the total number of
+digits to the right of the decimal point in a number.  eg: 123.45 has a
+scale of 2.  “col” may be specified as the column name or number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getColumnScale-source">
+            <pre>static VALUE sqlrcur_getColumnScale(VALUE self, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+                return INT2NUM(sqlrcur-&gt;getColumnScale(STR2CSTR(col)));
+        } else {
+                return INT2NUM(sqlrcur-&gt;getColumnScale(NUM2INT(col)));
+        }
+}</pre>
+          </div><!-- getColumnScale-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getColumnScale-method -->
+
+    
+      <div id="method-i-getColumnType" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getColumnType(col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns the type of the specified column. “col” may be specified as the
+column name or number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getColumnType-source">
+            <pre>static VALUE sqlrcur_getColumnType(VALUE self, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        const char     *result;
+        if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+                result=sqlrcur-&gt;getColumnType(STR2CSTR(col));
+        } else {
+                result=sqlrcur-&gt;getColumnType(NUM2INT(col));
+        }
+        if (result) {
+                return rb_str_new2(result);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- getColumnType-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getColumnType-method -->
+
+    
+      <div id="method-i-getDatabaseList" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getDatabaseList(wild)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Sends a query that returns a list of databases/schemas matching “wild”. If
+wild is empty or nil then a list of all databases/schemas will be returned.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getDatabaseList-source">
+            <pre>static VALUE sqlrcur_getDatabaseList(VALUE self, VALUE wild) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;getDatabaseList(STR2CSTR(wild)));
+}</pre>
+          </div><!-- getDatabaseList-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getDatabaseList-method -->
+
+    
+      <div id="method-i-getField" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getField(row,col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns the specified field as a string.  “col” may be specified as the 
+column name or number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getField-source">
+            <pre>static VALUE sqlrcur_getField(VALUE self, VALUE row, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        const char     *result;
+        long           length;
+        if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+                result=sqlrcur-&gt;getField(NUM2INT(row),STR2CSTR(col));
+                length=sqlrcur-&gt;getFieldLength(NUM2INT(row),STR2CSTR(col));
+        } else {
+                result=sqlrcur-&gt;getField(NUM2INT(row),NUM2INT(col));
+                length=sqlrcur-&gt;getFieldLength(NUM2INT(row),NUM2INT(col));
+        }
+        if (result) {
+                return rb_str_new(result,length);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- getField-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getField-method -->
+
+    
+      <div id="method-i-getFieldAsDouble" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getFieldAsDouble(row,col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns the specified field as an decimal.  “col” may be specified as the
+column name or number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getFieldAsDouble-source">
+            <pre>static VALUE sqlrcur_getFieldAsDouble(VALUE self, VALUE row, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        double result;
+        if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+                result=sqlrcur-&gt;getFieldAsDouble(NUM2INT(row),STR2CSTR(col));
+        } else {
+                result=sqlrcur-&gt;getFieldAsDouble(NUM2INT(row),NUM2INT(col));
+        }
+        return rb_float_new(result);
+}</pre>
+          </div><!-- getFieldAsDouble-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getFieldAsDouble-method -->
+
+    
+      <div id="method-i-getFieldAsInteger" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getFieldAsInteger(row,col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns the specified field as an integer.  “col” may be specified as the
+column name or number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getFieldAsInteger-source">
+            <pre>static VALUE sqlrcur_getFieldAsInteger(VALUE self, VALUE row, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        long   result;
+        if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+                result=sqlrcur-&gt;getFieldAsInteger(NUM2INT(row),STR2CSTR(col));
+        } else {
+                result=sqlrcur-&gt;getFieldAsInteger(NUM2INT(row),NUM2INT(col));
+        }
+        return INT2NUM(result);
+}</pre>
+          </div><!-- getFieldAsInteger-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getFieldAsInteger-method -->
+
+    
+      <div id="method-i-getFieldLength" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getFieldLength(row,col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns the length of the specified row and column.  “col” may be specified
+as the column name or number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getFieldLength-source">
+            <pre>static VALUE sqlrcur_getFieldLength(VALUE self, VALUE row, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+                return INT2NUM((int)sqlrcur-&gt;getFieldLength(NUM2INT(row),
+                                                                STR2CSTR(col)));
+        } else {
+                return INT2NUM((int)sqlrcur-&gt;getFieldLength(NUM2INT(row),
+                                                                NUM2INT(col)));
+        }
+}</pre>
+          </div><!-- getFieldLength-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getFieldLength-method -->
+
+    
+      <div id="method-i-getLongest" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getLongest(col)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns the length of the longest field in the specified column. “col” may
+be specified as the column name or number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getLongest-source">
+            <pre>static VALUE sqlrcur_getLongest(VALUE self, VALUE col) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
+                return INT2NUM(sqlrcur-&gt;getLongest(STR2CSTR(col)));
+        } else {
+                return INT2NUM(sqlrcur-&gt;getLongest(NUM2INT(col)));
+        }
+}</pre>
+          </div><!-- getLongest-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getLongest-method -->
+
+    
+      <div id="method-i-getNullsAsEmptyStrings" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">getNullsAsEmptyStrings</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Tells the connection to return NULL fields and output bind variables as
+empty strings.  This is the default.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getNullsAsEmptyStrings-source">
+            <pre>static VALUE sqlrcur_getNullsAsEmptyStrings(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;getNullsAsEmptyStrings();
+        return Qnil;
+}</pre>
+          </div><!-- getNullsAsEmptyStrings-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getNullsAsEmptyStrings-method -->
+
+    
+      <div id="method-i-getNullsAsNils" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">getNullsAsNils</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Tells the connection to return NULL fields and output bind variables as
+nil&#39;s.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getNullsAsNils-source">
+            <pre>static VALUE sqlrcur_getNullsAsNils(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;getNullsAsNulls();
+        return Qnil;
+}</pre>
+          </div><!-- getNullsAsNils-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getNullsAsNils-method -->
+
+    
+      <div id="method-i-getOutputBindBlob" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getOutputBindBlob(variable)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Get the value stored in a previously defined binary lob output bind
+variable.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getOutputBindBlob-source">
+            <pre>static VALUE sqlrcur_getOutputBindBlob(VALUE self, VALUE variable) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        const char     *varname=STR2CSTR(variable);
+        const char     *result=sqlrcur-&gt;getOutputBindBlob(varname);
+        long           length=sqlrcur-&gt;getOutputBindLength(varname);
+        if (result) {
+                return rb_str_new(result,length);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- getOutputBindBlob-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getOutputBindBlob-method -->
+
+    
+      <div id="method-i-getOutputBindClob" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getOutputBindClob(variable)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Get the value stored in a previously defined character lob output bind
+variable.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getOutputBindClob-source">
+            <pre>static VALUE sqlrcur_getOutputBindClob(VALUE self, VALUE variable) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        const char     *varname=STR2CSTR(variable);
+        const char     *result=sqlrcur-&gt;getOutputBindClob(varname);
+        long           length=sqlrcur-&gt;getOutputBindLength(varname);
+        if (result) {
+                return rb_str_new(result,length);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- getOutputBindClob-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getOutputBindClob-method -->
+
+    
+      <div id="method-i-getOutputBindCursor" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getOutputBindCursor(variable)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Get the cursor associated with a previously defined output bind variable.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getOutputBindCursor-source">
+            <pre>static VALUE sqlrcur_getOutputBindCursor(VALUE self, VALUE variable) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcursor     *returnsqlrcur=sqlrcur-&gt;getOutputBindCursor(
+                                                        STR2CSTR(variable),
+                                                        true);
+        return Data_Wrap_Struct(csqlrcursor,0,sqlrcur_free,
+                                        (void *)returnsqlrcur);
+}</pre>
+          </div><!-- getOutputBindCursor-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getOutputBindCursor-method -->
+
+    
+      <div id="method-i-getOutputBindDouble" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getOutputBindDouble(variable)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Get the value stored in a previously defined decimal output bind variable.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getOutputBindDouble-source">
+            <pre>static VALUE sqlrcur_getOutputBindDouble(VALUE self, VALUE variable) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        const char     *varname=STR2CSTR(variable);
+        double         result=sqlrcur-&gt;getOutputBindDouble(varname);
+        return rb_float_new(result);
+}</pre>
+          </div><!-- getOutputBindDouble-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getOutputBindDouble-method -->
+
+    
+      <div id="method-i-getOutputBindInteger" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getOutputBindInteger(variable)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Get the value stored in a previously defined integer output bind variable.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getOutputBindInteger-source">
+            <pre>static VALUE sqlrcur_getOutputBindInteger(VALUE self, VALUE variable) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        const char     *varname=STR2CSTR(variable);
+        long           result=sqlrcur-&gt;getOutputBindInteger(varname);
+        return INT2NUM(result);
+}</pre>
+          </div><!-- getOutputBindInteger-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getOutputBindInteger-method -->
+
+    
+      <div id="method-i-getOutputBindLength" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getOutputBindLength(variable)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Get the length of the value stored in a previously defined output bind
+variable.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getOutputBindLength-source">
+            <pre>static VALUE sqlrcur_getOutputBindLength(VALUE self, VALUE variable) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;getOutputBindLength(STR2CSTR(variable)));
+}</pre>
+          </div><!-- getOutputBindLength-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getOutputBindLength-method -->
+
+    
+      <div id="method-i-getOutputBindString" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getOutputBindString(variable)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Get the value stored in a previously defined string output bind variable.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getOutputBindString-source">
+            <pre>static VALUE sqlrcur_getOutputBindString(VALUE self, VALUE variable) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        const char     *varname=STR2CSTR(variable);
+        const char     *result=sqlrcur-&gt;getOutputBindString(varname);
+        long           length=sqlrcur-&gt;getOutputBindLength(varname);
+        if (result) {
+                return rb_str_new(result,length);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- getOutputBindString-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getOutputBindString-method -->
+
+    
+      <div id="method-i-getResultSetBufferSize" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">getResultSetBufferSize</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the number of result set rows that will be buffered at a time or 0
+for the entire result set.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getResultSetBufferSize-source">
+            <pre>static VALUE sqlrcur_getResultSetBufferSize(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;getResultSetBufferSize());
+}</pre>
+          </div><!-- getResultSetBufferSize-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getResultSetBufferSize-method -->
+
+    
+      <div id="method-i-getResultSetId" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">getResultSetId</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the internal ID of this result set.  This parameter may be passed
+to another statement for use in the resumeResultSet() function.  Note: The
+value this function returns is only valid after a call to
+suspendResultSet().</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getResultSetId-source">
+            <pre>static VALUE sqlrcur_getResultSetId(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;getResultSetId());
+}</pre>
+          </div><!-- getResultSetId-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getResultSetId-method -->
+
+    
+      <div id="method-i-getRow" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getRow(row)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns an array of the values of the fields in the specified row.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getRow-source">
+            <pre>static VALUE sqlrcur_getRow(VALUE self, VALUE row) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        const char * const *fields=sqlrcur-&gt;getRow(NUM2INT(row));
+        uint32_t       *lengths=sqlrcur-&gt;getRowLengths(NUM2INT(row));
+        VALUE  fieldary=rb_ary_new2(sqlrcur-&gt;colCount());
+        for (uint32_t i=0; i&lt;sqlrcur-&gt;colCount(); i++) {
+                if (fields[i]) {
+                        rb_ary_store(fieldary,i,rb_str_new(fields[i],
+                                                                lengths[i]));
+                } else {
+                        rb_ary_store(fieldary,i,Qnil);
+                }
+        }
+        return fieldary;
+}</pre>
+          </div><!-- getRow-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getRow-method -->
+
+    
+      <div id="method-i-getRowHash" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getRowHash(row)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns a hash of the values of the fields in the specified row.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getRowHash-source">
+            <pre>static VALUE sqlrcur_getRowHash(VALUE self, VALUE row) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        const char * const *fields=sqlrcur-&gt;getRow(NUM2INT(row));
+        uint32_t       *lengths=sqlrcur-&gt;getRowLengths(NUM2INT(row));
+        VALUE  fieldhash=rb_hash_new();
+        for (uint32_t i=0; i&lt;sqlrcur-&gt;colCount(); i++) {
+                if (fields[i]) {
+                        rb_hash_aset(fieldhash,
+                                        rb_str_new2(sqlrcur-&gt;getColumnName(i)),
+                                        rb_str_new(fields[i],lengths[i]));
+                } else {
+                        rb_hash_aset(fieldhash,
+                                        rb_str_new2(sqlrcur-&gt;getColumnName(i)),
+                                        Qnil);
+                }
+        }
+        return fieldhash;
+}</pre>
+          </div><!-- getRowHash-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getRowHash-method -->
+
+    
+      <div id="method-i-getRowLengths" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getRowLengths(row)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns an array of the lengths of the fields in the specified row.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getRowLengths-source">
+            <pre>static VALUE sqlrcur_getRowLengths(VALUE self, VALUE row) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        uint32_t       *lengths=sqlrcur-&gt;getRowLengths(NUM2INT(row));
+        if (!lengths) {
+                return Qnil;
+        }
+        VALUE  lengthary=rb_ary_new2(sqlrcur-&gt;colCount());
+        for (uint32_t i=0; i&lt;sqlrcur-&gt;colCount(); i++) {
+                rb_ary_store(lengthary,i,INT2NUM(lengths[i]));
+        }
+        return lengthary;
+}</pre>
+          </div><!-- getRowLengths-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getRowLengths-method -->
+
+    
+      <div id="method-i-getRowLengthsHash" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getRowLengthsHash(row)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns a hash of the lengths of the fields in the specified row.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getRowLengthsHash-source">
+            <pre>static VALUE sqlrcur_getRowLengthsHash(VALUE self, VALUE row) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        uint32_t       *lengths=sqlrcur-&gt;getRowLengths(NUM2INT(row));
+        VALUE  lengthhash=rb_hash_new();
+        for (uint32_t i=0; i&lt;sqlrcur-&gt;colCount(); i++) {
+                rb_hash_aset(lengthhash,
+                                rb_str_new2(sqlrcur-&gt;getColumnName(i)),
+                                INT2NUM(lengths[i]));
+        }
+        return lengthhash;
+}</pre>
+          </div><!-- getRowLengthsHash-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getRowLengthsHash-method -->
+
+    
+      <div id="method-i-getTableList" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            getTableList(wild)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Sends a query that returns a list of tables matching “wild”.  If wild is
+empty or nil then a list of all tables will be returned.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getTableList-source">
+            <pre>static VALUE sqlrcur_getTableList(VALUE self, VALUE wild) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;getTableList(STR2CSTR(wild)));
+}</pre>
+          </div><!-- getTableList-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getTableList-method -->
+
+    
+      <div id="method-i-inputBind" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            inputBind(variable,value,(precision),(scale))
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Defines am input bind variable.  The value may be a string, integer or
+decimal.  If it is a decimal then the precision and scale may be specified.
+If you don&#39;t have the precision and scale then set them both to 0. 
+However in that case you may get unexpected rounding behavior if the server
+is faking binds.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="inputBind-source">
+            <pre>static VALUE sqlrcur_inputBind(int argc, VALUE *argv, VALUE self) {
+        sqlrcursor     *sqlrcur;
+        VALUE  variable;
+        VALUE  value;
+        VALUE  precision;
+        VALUE  scale;
+        bool   success=true;
+        rb_scan_args(argc,argv,&quot;22&quot;,&amp;variable,&amp;value,&amp;precision,&amp;scale);
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        if (rb_obj_is_instance_of(value,rb_cString)==Qtrue) {
+                if ((rb_obj_is_instance_of(precision,rb_cBignum)==Qtrue ||
+                        rb_obj_is_instance_of(precision,rb_cFixnum)==Qtrue ||
+                        rb_obj_is_instance_of(precision,rb_cInteger)==Qtrue ||
+                        rb_obj_is_instance_of(precision,rb_cNumeric)==Qtrue) &amp;&amp; 
+                        NUM2INT(precision)&gt;0) {
+                        // in this case, the precision parameter is actually
+                        // the string length
+                        sqlrcur-&gt;inputBind(STR2CSTR(variable),
+                                        STR2CSTR(value),NUM2INT(precision));
+                } else {
+                        sqlrcur-&gt;inputBind(STR2CSTR(variable),STR2CSTR(value));
+                }
+        } else if (rb_obj_is_instance_of(value,rb_cBignum)==Qtrue ||
+                        rb_obj_is_instance_of(value,rb_cFixnum)==Qtrue ||
+                        rb_obj_is_instance_of(value,rb_cInteger)==Qtrue ||
+                        rb_obj_is_instance_of(value,rb_cNumeric)==Qtrue) {
+                sqlrcur-&gt;inputBind(STR2CSTR(variable),NUM2INT(value));
+        } else if (rb_obj_is_instance_of(value,rb_cFloat)==Qtrue) {
+                sqlrcur-&gt;inputBind(STR2CSTR(variable),NUM2DBL(value), 
+                                        (unsigned short)NUM2INT(precision),
+                                        (unsigned short)NUM2INT(scale));
+        } else if (rb_obj_is_instance_of(value,rb_cNilClass)==Qtrue) {
+                sqlrcur-&gt;inputBind(STR2CSTR(variable),(const char *)NULL);
+        } else {
+                success=false;
+        }
+        return INT2NUM(success);
+}</pre>
+          </div><!-- inputBind-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- inputBind-method -->
+
+    
+      <div id="method-i-inputBindBlob" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            inputBindBlob(variable,value,size)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Defines a binary lob input bind variable.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="inputBindBlob-source">
+            <pre>static VALUE sqlrcur_inputBindBlob(VALUE self, VALUE variable,
+                                        VALUE value, VALUE size) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        bool   success=true;
+        if (value==Qnil) {
+                sqlrcur-&gt;inputBindBlob(STR2CSTR(variable),NULL,NUM2INT(size));
+        } else if (rb_obj_is_instance_of(value,rb_cString)==Qtrue) {
+                sqlrcur-&gt;inputBindBlob(STR2CSTR(variable),
+                                STR2CSTR(value),NUM2INT(size));
+        } else {
+                success=false;
+        }
+        return INT2NUM(success);
+}</pre>
+          </div><!-- inputBindBlob-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- inputBindBlob-method -->
+
+    
+      <div id="method-i-inputBindClob" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            inputBindClob(variable,value,size)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Defines a character lob input bind variable.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="inputBindClob-source">
+            <pre>static VALUE sqlrcur_inputBindClob(VALUE self, VALUE variable,
+                                        VALUE value, VALUE size) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        bool   success=true;
+        if (value==Qnil) {
+                sqlrcur-&gt;inputBindClob(STR2CSTR(variable),NULL,NUM2INT(size));
+        } else if (rb_obj_is_instance_of(value,rb_cString)==Qtrue) {
+                sqlrcur-&gt;inputBindClob(STR2CSTR(variable),
+                                STR2CSTR(value),NUM2INT(size));
+        } else {
+                success=false;
+        }
+        return INT2NUM(success);
+}</pre>
+          </div><!-- inputBindClob-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- inputBindClob-method -->
+
+    
+      <div id="method-i-inputBinds" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            inputBinds(variables,values,(precisions),(scales))
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Defines an array of input bind variables.  The values may be strings,
+integers or decimals.  If they are decimals then the precisions and scales
+may also be specified.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="inputBinds-source">
+            <pre>static VALUE sqlrcur_inputBinds(int argc, VALUE *argv, VALUE self) {
+        sqlrcursor     *sqlrcur;
+        VALUE  variables;
+        VALUE  values;
+        VALUE  precisions;
+        VALUE  scales;
+        int    argcount=rb_scan_args(argc,argv,&quot;22&quot;,
+                                &amp;variables,&amp;values,&amp;precisions,&amp;scales);
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        if (variables==Qnil || values==Qnil) {
+                return Qnil;
+        }
+        VALUE  variable;
+        VALUE  value;
+        VALUE  precision=0;
+        VALUE  scale=0;
+        bool   success=true;
+        for (;;) {
+                variable=rb_ary_shift(variables);
+                if (variable==Qnil) {
+                        break;
+                }
+                value=rb_ary_shift(values);
+                if (argcount==4) {
+                        precision=rb_ary_shift(precisions);
+                        scale=rb_ary_shift(scales);
+                }
+                if (rb_obj_is_instance_of(value,rb_cString)==Qtrue) {
+                        sqlrcur-&gt;inputBind(STR2CSTR(variable),STR2CSTR(value));
+                } else if (rb_obj_is_instance_of(value,rb_cBignum)==Qtrue ||
+                        rb_obj_is_instance_of(value,rb_cFixnum)==Qtrue ||
+                        rb_obj_is_instance_of(value,rb_cInteger)==Qtrue ||
+                        rb_obj_is_instance_of(value,rb_cNumeric)==Qtrue) {
+                        sqlrcur-&gt;inputBind(STR2CSTR(variable),NUM2INT(value));
+                } else if (rb_obj_is_instance_of(value,rb_cFloat)==Qtrue) {
+                        sqlrcur-&gt;inputBind(STR2CSTR(variable),NUM2DBL(value), 
+                                        (unsigned short)NUM2INT(precision),
+                                        (unsigned short)NUM2INT(scale));
+                } else if (rb_obj_is_instance_of(value,rb_cNilClass)==Qtrue) {
+                        sqlrcur-&gt;inputBind(STR2CSTR(variable),
+                                                (const char *)NULL);
+                } else {
+                        success=false;
+                }
+        }
+        return INT2NUM(success);
+}</pre>
+          </div><!-- inputBinds-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- inputBinds-method -->
+
+    
+      <div id="method-i-lowerCaseColumnNames" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">lowerCaseColumnNames</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Columns names are converted to lower case.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="lowerCaseColumnNames-source">
+            <pre>static VALUE sqlrcur_lowerCaseColumnNames(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;lowerCaseColumnNames();
+        return Qnil;
+}</pre>
+          </div><!-- lowerCaseColumnNames-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- lowerCaseColumnNames-method -->
+
+    
+      <div id="method-i-mixedCaseColumnNames" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">mixedCaseColumnNames</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Columns names are returned in the same case as they are defined in the
+database.  This is the default.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="mixedCaseColumnNames-source">
+            <pre>static VALUE sqlrcur_mixedCaseColumnNames(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;mixedCaseColumnNames();
+        return Qnil;
+}</pre>
+          </div><!-- mixedCaseColumnNames-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- mixedCaseColumnNames-method -->
+
+    
+      <div id="method-i-openCachedResultSet" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            openCachedResultSet(filename)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Opens a cached result set.  Returns 1 on success and 0 on failure.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="openCachedResultSet-source">
+            <pre>static VALUE sqlrcur_openCachedResultSet(VALUE self, VALUE filename) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;openCachedResultSet(STR2CSTR(filename)));
+}</pre>
+          </div><!-- openCachedResultSet-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- openCachedResultSet-method -->
+
+    
+      <div id="method-i-prepareFileQuery" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            prepareFileQuery(path,filename)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Prepare to execute the contents of “path”/“filename”.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="prepareFileQuery-source">
+            <pre>static VALUE sqlrcur_prepareFileQuery(VALUE self, VALUE path, VALUE filename) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;prepareFileQuery(STR2CSTR(path),
+                                                STR2CSTR(filename)));
+}</pre>
+          </div><!-- prepareFileQuery-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- prepareFileQuery-method -->
+
+    
+      <div id="method-i-prepareQuery" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            prepareQuery(query)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Prepare to execute “query”.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="prepareQuery-source">
+            <pre>static VALUE sqlrcur_prepareQuery(VALUE self, VALUE query) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;prepareQuery(STR2CSTR(query));
+        return Qnil;
+}</pre>
+          </div><!-- prepareQuery-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- prepareQuery-method -->
+
+    
+      <div id="method-i-prepareQueryWithLength" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            prepareQuery(query,length)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Prepare to execute “query” with length “length”.  This function must be
+used if the query contains binary data.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="prepareQueryWithLength-source">
+            <pre>static VALUE sqlrcur_prepareQueryWithLength(VALUE self,
+                                        VALUE query, VALUE length) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;prepareQuery(STR2CSTR(query),NUM2INT(length));
+        return Qnil;
+}</pre>
+          </div><!-- prepareQueryWithLength-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- prepareQueryWithLength-method -->
+
+    
+      <div id="method-i-resumeCachedResultSet" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            resumeCachedResultSet(id,filename)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Resumes a result set previously left open using suspendSession() and
+continues caching the result set to “filename”.  Returns 1 on success and 0
+on failure.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="resumeCachedResultSet-source">
+            <pre>static VALUE sqlrcur_resumeCachedResultSet(VALUE self, 
+                                                VALUE id, VALUE filename) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;resumeCachedResultSet(NUM2INT(id),
+                                                        STR2CSTR(filename)));
+}</pre>
+          </div><!-- resumeCachedResultSet-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- resumeCachedResultSet-method -->
+
+    
+      <div id="method-i-resumeResultSet" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            resumeResultSet(id)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Resumes a result set previously left open using suspendSession(). Returns 1
+on success and 0 on failure.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="resumeResultSet-source">
+            <pre>static VALUE sqlrcur_resumeResultSet(VALUE self, VALUE id) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;resumeResultSet(NUM2INT(id)));
+}</pre>
+          </div><!-- resumeResultSet-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- resumeResultSet-method -->
+
+    
+      <div id="method-i-rowCount" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">rowCount</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the number of rows in the current result set.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="rowCount-source">
+            <pre>static VALUE sqlrcur_rowCount(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;rowCount());
+}</pre>
+          </div><!-- rowCount-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- rowCount-method -->
+
+    
+      <div id="method-i-sendFileQuery" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            sendFileQuery(path,filename)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Sends the query in file “path”/“filename” and gets a result set.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="sendFileQuery-source">
+            <pre>static VALUE sqlrcur_sendFileQuery(VALUE self, VALUE path, VALUE filename) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;sendFileQuery(STR2CSTR(path),
+                                                STR2CSTR(filename))); 
+}</pre>
+          </div><!-- sendFileQuery-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- sendFileQuery-method -->
+
+    
+      <div id="method-i-sendQuery" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            sendQuery(query)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Sends “query” directly and gets a result set.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="sendQuery-source">
+            <pre>static VALUE sqlrcur_sendQuery(VALUE self, VALUE query) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;sendQuery(STR2CSTR(query)));
+}</pre>
+          </div><!-- sendQuery-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- sendQuery-method -->
+
+    
+      <div id="method-i-sendQueryWithLength" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            sendQueryWithLength(query,length)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Sends “query” with length “length” directly and gets a result set. This
+function must be used if the query contains binary data.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="sendQueryWithLength-source">
+            <pre>static VALUE sqlrcur_sendQueryWithLength(VALUE self,
+                                        VALUE query, VALUE length) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;sendQuery(STR2CSTR(query),NUM2INT(length)));
+}</pre>
+          </div><!-- sendQueryWithLength-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- sendQueryWithLength-method -->
+
+    
+      <div id="method-i-setCacheTtl" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            setCacheTtl(ttl)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Sets the time-to-live for cached result sets. The sqlr-cachemanger will
+remove each cached result set “ttl” seconds after it&#39;s created,
+provided it&#39;s scanning the directory containing the cache files.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="setCacheTtl-source">
+            <pre>static VALUE sqlrcur_setCacheTtl(VALUE self, VALUE ttl) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;setCacheTtl(NUM2INT(ttl));
+        return Qnil;
+}</pre>
+          </div><!-- setCacheTtl-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- setCacheTtl-method -->
+
+    
+      <div id="method-i-setResultSetBufferSize" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            setResultSetBufferSize(rows)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Sets the number of rows of the result set to buffer at a time. 0 (the
+default) means buffer the entire result set.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="setResultSetBufferSize-source">
+            <pre>static VALUE sqlrcur_setResultSetBufferSize(VALUE self, VALUE rows) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;setResultSetBufferSize(NUM2INT(rows));
+        return Qnil;
+}</pre>
+          </div><!-- setResultSetBufferSize-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- setResultSetBufferSize-method -->
+
+    
+      <div id="method-i-substitution" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            substitution(variable,value,(precision),(scale))
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Defines a substitution variable.  The value may be a string, integer or
+decimal.  If it is a decimal then the precision and scale may be specified.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="substitution-source">
+            <pre>static VALUE sqlrcur_substitution(int argc, VALUE *argv, VALUE self) {
+        sqlrcursor     *sqlrcur;
+        VALUE  variable;
+        VALUE  value;
+        VALUE  precision;
+        VALUE  scale;
+        bool   result=true;
+        rb_scan_args(argc,argv,&quot;22&quot;,&amp;variable,&amp;value,&amp;precision,&amp;scale);
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        if (rb_obj_is_instance_of(value,rb_cString)==Qtrue) {
+                sqlrcur-&gt;substitution(STR2CSTR(variable),STR2CSTR(value));
+        } else if (rb_obj_is_instance_of(value,rb_cBignum)==Qtrue ||
+                        rb_obj_is_instance_of(value,rb_cFixnum)==Qtrue ||
+                        rb_obj_is_instance_of(value,rb_cInteger)==Qtrue ||
+                        rb_obj_is_instance_of(value,rb_cNumeric)==Qtrue) {
+                sqlrcur-&gt;substitution(STR2CSTR(variable),NUM2INT(value));
+        } else if (rb_obj_is_instance_of(value,rb_cFloat)==Qtrue) {
+                sqlrcur-&gt;substitution(STR2CSTR(variable),NUM2DBL(value), 
+                                        (unsigned short)NUM2INT(precision),
+                                        (unsigned short)NUM2INT(scale));
+        } else if (rb_obj_is_instance_of(value,rb_cNilClass)==Qtrue) {
+                sqlrcur-&gt;substitution(STR2CSTR(variable),(const char *)NULL);
+        } else {
+                result=false;
+        }
+        return INT2NUM(result);
+}</pre>
+          </div><!-- substitution-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- substitution-method -->
+
+    
+      <div id="method-i-substitutions" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            substitutions(variables,values,(precisions),(scales))
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Defines an array of substitution variables.  The values may be strings,
+integers or decimals.  If they are decimals then the precisions and scales
+may also be specified.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="substitutions-source">
+            <pre>static VALUE sqlrcur_substitutions(int argc, VALUE *argv, VALUE self) {
+        sqlrcursor     *sqlrcur;
+        VALUE  variables;
+        VALUE  values;
+        VALUE  precisions;
+        VALUE  scales;
+        int    argcount=rb_scan_args(argc,argv,&quot;22&quot;,
+                                        &amp;variables,&amp;values,&amp;precisions,&amp;scales);
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        if (variables==Qnil || values==Qnil) {
+                return Qnil;
+        }
+        VALUE  variable;
+        VALUE  value;
+        VALUE  precision=0;
+        VALUE  scale=0;
+        bool   success=true;
+        for (;;) {
+                variable=rb_ary_shift(variables);
+                if (variable==Qnil) {
+                        break;
+                }
+                value=rb_ary_shift(values);
+                if (argcount==4) {
+                        precision=rb_ary_shift(precisions);
+                        scale=rb_ary_shift(scales);
+                }
+                if (rb_obj_is_instance_of(value,rb_cString)==Qtrue) {
+                        sqlrcur-&gt;substitution(STR2CSTR(variable),
+                                                STR2CSTR(value));
+                } else if (rb_obj_is_instance_of(value,rb_cBignum)==Qtrue ||
+                        rb_obj_is_instance_of(value,rb_cFixnum)==Qtrue ||
+                        rb_obj_is_instance_of(value,rb_cInteger)==Qtrue ||
+                        rb_obj_is_instance_of(value,rb_cNumeric)==Qtrue) {
+                        sqlrcur-&gt;substitution(STR2CSTR(variable),
+                                                NUM2INT(value));
+                } else if (rb_obj_is_instance_of(value,rb_cFloat)==Qtrue) {
+                        sqlrcur-&gt;substitution(STR2CSTR(variable),
+                                        NUM2DBL(value), 
+                                        (unsigned short)NUM2INT(precision),
+                                        (unsigned short)NUM2INT(scale));
+                } else if (rb_obj_is_instance_of(value,rb_cNilClass)==Qtrue) {
+                        sqlrcur-&gt;substitution(STR2CSTR(variable),
+                                                (const char *)NULL);
+                } else {
+                        success=false;
+                }
+        }
+        return INT2NUM(success);
+}</pre>
+          </div><!-- substitutions-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- substitutions-method -->
+
+    
+      <div id="method-i-suspendResultSet" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">suspendResultSet</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Tells the server to leave this result set open when the connection calls
+suspendSession() so that another connection can connect to it using
+resumeResultSet() after it calls resumeSession().</p>
+          
+          
+
+          
+          <div class="method-source-code" id="suspendResultSet-source">
+            <pre>static VALUE sqlrcur_suspendResultSet(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;suspendResultSet();
+        return Qnil;
+}</pre>
+          </div><!-- suspendResultSet-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- suspendResultSet-method -->
+
+    
+      <div id="method-i-totalRows" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">totalRows</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the total number of rows that will be returned in the result set.
+Not all databases support this call.  Don&#39;t use it for applications
+which are designed to be portable across databases.  -1 is returned by
+databases which don&#39;t support this option.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="totalRows-source">
+            <pre>static VALUE sqlrcur_totalRows(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;totalRows());
+}</pre>
+          </div><!-- totalRows-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- totalRows-method -->
+
+    
+      <div id="method-i-upperCaseColumnNames" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">upperCaseColumnNames</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Columns names are converted to upper case.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="upperCaseColumnNames-source">
+            <pre>static VALUE sqlrcur_upperCaseColumnNames(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;upperCaseColumnNames();
+        return Qnil;
+}</pre>
+          </div><!-- upperCaseColumnNames-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- upperCaseColumnNames-method -->
+
+    
+      <div id="method-i-validBind" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            validBind(variable)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Returns true if “variable” was a valid bind variable of the query.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="validBind-source">
+            <pre>static VALUE sqlrcur_validBind(VALUE self, VALUE variable) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        return INT2NUM(sqlrcur-&gt;validBind(STR2CSTR(variable)));
+}</pre>
+          </div><!-- validBind-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- validBind-method -->
+
+    
+      <div id="method-i-validateBinds" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">validateBinds</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>If you are binding to any variables that might not actually be in your
+query, call this to ensure that the database won&#39;t try to bind them
+unless they really are in the query.  There is a performance penalty for
+calling this function</p>
+          
+          
+
+          
+          <div class="method-source-code" id="validateBinds-source">
+            <pre>static VALUE sqlrcur_validateBinds(VALUE self) {
+        sqlrcursor     *sqlrcur;
+        Data_Get_Struct(self,sqlrcursor,sqlrcur);
+        sqlrcur-&gt;validateBinds();
+        return Qnil;
+}</pre>
+          </div><!-- validateBinds-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- validateBinds-method -->
+
+    
+    </section><!-- public-instance-method-details -->
+  
+  </section><!-- 5Buntitled-5D -->
+
+</div><!-- documentation -->
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 4.0.1.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+

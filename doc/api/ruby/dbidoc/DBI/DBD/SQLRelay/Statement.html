@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+<title>class DBI::DBD::SQLRelay::Statement - RDoc Documentation</title>
+
+<link type="text/css" media="screen" href="../../../rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "../../../";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../../js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../../js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../../js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../../js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../../js/darkfish.js"></script>
+
+
+<body id="top" class="class">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="../../../index.html">Home</a>
+    <a href="../../../table_of_contents.html#classes">Classes</a>
+    <a href="../../../table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  
+
+  <div id="file-metadata">
+    <nav id="file-list-section" class="section">
+  <h3 class="section-header">Defined In</h3>
+  <ul>
+    <li>SQLRelay.rb
+  </ul>
+</nav>
+
+    
+  </div>
+
+  <div id="class-metadata">
+    
+    <nav id="parent-class-section" class="section">
+  <h3 class="section-header">Parent</h3>
+  
+  <p class="link">DBI::BaseStatement
+  
+</nav>
+
+    
+    
+    <!-- Method Quickref -->
+<nav id="method-list-section" class="section">
+  <h3 class="section-header">Methods</h3>
+
+  <ul class="link-list">
+    
+    <li class="calls-super" ><a href="#method-c-new">::new</a>
+    
+    <li ><a href="#method-i-bind_param">#bind_param</a>
+    
+    <li ><a href="#method-i-column_info">#column_info</a>
+    
+    <li ><a href="#method-i-execute">#execute</a>
+    
+    <li ><a href="#method-i-fetch">#fetch</a>
+    
+    <li ><a href="#method-i-fetch_all">#fetch_all</a>
+    
+    <li ><a href="#method-i-fetch_many">#fetch_many</a>
+    
+    <li ><a href="#method-i-fetch_scroll">#fetch_scroll</a>
+    
+    <li ><a href="#method-i-finish">#finish</a>
+    
+    <li ><a href="#method-i-rows">#rows</a>
+    
+  </ul>
+</nav>
+
+  </div>
+
+  <div id="project-metadata">
+    
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="../../../DBI.html">DBI</a>
+  
+    <li><a href="../../../DBI/DBD.html">DBI::DBD</a>
+  
+    <li><a href="../../../DBI/DBD/SQLRelay.html">DBI::DBD::SQLRelay</a>
+  
+    <li><a href="../../../DBI/DBD/SQLRelay/Database.html">DBI::DBD::SQLRelay::Database</a>
+  
+    <li><a href="../../../DBI/DBD/SQLRelay/Driver.html">DBI::DBD::SQLRelay::Driver</a>
+  
+    <li><a href="../../../DBI/DBD/SQLRelay/Statement.html">DBI::DBD::SQLRelay::Statement</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation">
+  <h1 class="class">class DBI::DBD::SQLRelay::Statement</h1>
+
+  <div id="description" class="description">
+    
+  </div><!-- description -->
+
+  
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
+
+    
+
+    
+
+    
+
+    <!-- Methods -->
+    
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Class Methods</h3>
+
+    
+      <div id="method-c-new" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">new</span><span
+            class="method-args">(handle, stmt)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+            <div class="method-calls-super">
+              Calls superclass method
+              
+            </div>
+          
+
+          
+          <div class="method-source-code" id="new-source">
+            <pre><span class="ruby-comment"># File SQLRelay.rb, line 176</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">handle</span>, <span class="ruby-identifier">stmt</span>)
+  <span class="ruby-keyword">super</span>(<span class="ruby-keyword">nil</span>)  <span class="ruby-comment"># attribs</span>
+
+  <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">handle</span> 
+  <span class="ruby-ivar">@handle</span> = <span class="ruby-constant">SQLRCursor</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@db</span>)
+  <span class="ruby-comment">#@handle.setResultSetBufferSize(100)</span>
+  <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">prepareQuery</span>(<span class="ruby-identifier">stmt</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- new-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- new-method -->
+
+    
+    </section><!-- public-class-method-details -->
+  
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Instance Methods</h3>
+
+    
+      <div id="method-i-bind_param" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">bind_param</span><span
+            class="method-args">(param, value, attribs)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Binds value to param defined earlier in the prepare call.  attribs is
+currently unused.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="bind_param-source">
+            <pre><span class="ruby-comment"># File SQLRelay.rb, line 188</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">bind_param</span>(<span class="ruby-identifier">param</span>, <span class="ruby-identifier">value</span>, <span class="ruby-identifier">attribs</span>)
+
+  <span class="ruby-comment"># in SQL Relay, bind variable names can be names or numbers and values</span>
+  <span class="ruby-comment"># can be either strings, integers or floats.  Floats come with precision</span>
+  <span class="ruby-comment"># and scale as well.</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">kind_of?</span> <span class="ruby-constant">Float</span> <span class="ruby-keyword">then</span>
+
+    <span class="ruby-comment"># for float binds, check attribs for precision and scale</span>
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">attribs</span>
+      <span class="ruby-identifier">precision</span> = <span class="ruby-identifier">attribs</span>[<span class="ruby-string">&#39;precision&#39;</span>].<span class="ruby-identifier">to_i</span>
+      <span class="ruby-identifier">scale</span>     = <span class="ruby-identifier">attribs</span>[<span class="ruby-string">&#39;scale&#39;</span>].<span class="ruby-identifier">to_i</span>
+    <span class="ruby-keyword">end</span>
+
+    <span class="ruby-comment"># if either of precision or scale is not passed in, extract them by</span>
+    <span class="ruby-comment"># parsing the value around the decimal point or using defaults</span>
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">precision</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword">or</span> <span class="ruby-identifier">scale</span>.<span class="ruby-identifier">nil?</span>
+      <span class="ruby-identifier">pr</span>, <span class="ruby-identifier">sc</span> = <span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&quot;.&quot;</span>)
+      <span class="ruby-identifier">precision</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">||</span> <span class="ruby-value">8</span>
+      <span class="ruby-identifier">scale</span>     <span class="ruby-operator">||=</span> <span class="ruby-identifier">sc</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">||</span> <span class="ruby-value">2</span>
+    <span class="ruby-keyword">end</span>
+
+    <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">inputBind</span>(<span class="ruby-identifier">param</span>.<span class="ruby-identifier">to_s</span>, <span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_f</span>, <span class="ruby-identifier">precision</span>, <span class="ruby-identifier">scale</span>)
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">inputBind</span>(<span class="ruby-identifier">param</span>.<span class="ruby-identifier">to_s</span>, <span class="ruby-identifier">value</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- bind_param-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- bind_param-method -->
+
+    
+      <div id="method-i-column_info" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">column_info</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns an array of hashes. Each hash contains a &#39;name&#39;,
+&#39;type_name&#39; and &#39;precision&#39; key.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="column_info-source">
+            <pre><span class="ruby-comment"># File SQLRelay.rb, line 329</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">column_info</span>
+
+  <span class="ruby-comment"># build a column info hash</span>
+  (<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">colCount</span>).<span class="ruby-identifier">collect</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">nr</span><span class="ruby-operator">|</span>
+    {
+      <span class="ruby-string">&#39;name&#39;</span>      =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">getColumnName</span>(<span class="ruby-identifier">nr</span>),
+      <span class="ruby-string">&#39;type_name&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">getColumnType</span>(<span class="ruby-identifier">nr</span>),
+      <span class="ruby-string">&#39;precision&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">getColumnLength</span>(<span class="ruby-identifier">nr</span>)
+    }
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- column_info-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- column_info-method -->
+
+    
+      <div id="method-i-execute" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">execute</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Send a SQL query to the server and returns the number of rows returned.
+Raises a DBI::ProgrammingError if it failed.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="execute-source">
+            <pre><span class="ruby-comment"># File SQLRelay.rb, line 218</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>
+
+  <span class="ruby-comment"># otherwise execute the already-prepared query, raising an error if it fails</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">executeQuery</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-keyword">then</span> 
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">DBI</span><span class="ruby-operator">::</span><span class="ruby-constant">ProgrammingError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">errorMessage</span>)
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-comment"># initialize some values</span>
+  <span class="ruby-ivar">@row_index</span> = <span class="ruby-value">0</span>
+  <span class="ruby-ivar">@row_count</span> = <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">rowCount</span>
+  <span class="ruby-ivar">@affected_rows</span> = <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">affectedRows</span>
+
+  <span class="ruby-comment"># clear bind values so the statement can be re-bound and re-executed</span>
+  <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">clearBinds</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- execute-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- execute-method -->
+
+    
+      <div id="method-i-fetch" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">fetch</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns one row of the result set.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="fetch-source">
+            <pre><span class="ruby-comment"># File SQLRelay.rb, line 242</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch</span>
+
+  <span class="ruby-comment"># if we&#39;re already at the end of the result set, return nil</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@row_index</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-ivar">@row_count</span> 
+    <span class="ruby-keyword">return</span> <span class="ruby-keyword">nil</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-comment"># otherwise get the current row, increment</span>
+  <span class="ruby-comment"># the row index and return the current row</span>
+  <span class="ruby-identifier">row</span> = <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">getRow</span>(<span class="ruby-ivar">@row_index</span>)
+  <span class="ruby-ivar">@row_index</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">row</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- fetch-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- fetch-method -->
+
+    
+      <div id="method-i-fetch_all" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">fetch_all</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the rest of the result set.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="fetch_all-source">
+            <pre><span class="ruby-comment"># File SQLRelay.rb, line 314</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_all</span>
+
+  <span class="ruby-comment"># otherwise, fetch the rest of the rows and return them</span>
+  <span class="ruby-operator">*</span><span class="ruby-identifier">rows</span> = []
+  <span class="ruby-identifier">index</span> = <span class="ruby-value">0</span>
+  <span class="ruby-keyword">while</span> <span class="ruby-ivar">@row_index</span> <span class="ruby-operator">&lt;</span> <span class="ruby-ivar">@row_count</span>
+    <span class="ruby-operator">*</span><span class="ruby-identifier">rows</span>[<span class="ruby-identifier">index</span>] = <span class="ruby-identifier">fetch</span>()
+    <span class="ruby-identifier">index</span> = <span class="ruby-identifier">index</span><span class="ruby-operator">+</span><span class="ruby-value">1</span>
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-operator">*</span><span class="ruby-identifier">rows</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- fetch_all-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- fetch_all-method -->
+
+    
+      <div id="method-i-fetch_many" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">fetch_many</span><span
+            class="method-args">(cnt)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the next “cnt” rows rest of the result set.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="fetch_many-source">
+            <pre><span class="ruby-comment"># File SQLRelay.rb, line 300</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_many</span>(<span class="ruby-identifier">cnt</span>)
+
+  <span class="ruby-comment"># fetch the next &quot;cnt&quot; rows and return them</span>
+  <span class="ruby-operator">*</span><span class="ruby-identifier">rows</span> = []
+  <span class="ruby-identifier">index</span> = <span class="ruby-value">0</span>
+  <span class="ruby-keyword">while</span> <span class="ruby-identifier">index</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">cnt</span> <span class="ruby-keyword">and</span> <span class="ruby-ivar">@row_index</span> <span class="ruby-operator">&lt;</span> <span class="ruby-ivar">@row_count</span>
+    <span class="ruby-operator">*</span><span class="ruby-identifier">rows</span>[<span class="ruby-identifier">index</span>] = <span class="ruby-identifier">fetch</span>()
+    <span class="ruby-identifier">index</span> = <span class="ruby-identifier">index</span><span class="ruby-operator">+</span><span class="ruby-value">1</span>
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-operator">*</span><span class="ruby-identifier">rows</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- fetch_many-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- fetch_many-method -->
+
+    
+      <div id="method-i-fetch_scroll" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">fetch_scroll</span><span
+            class="method-args">(direction, offset=1)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns one row of the result set. Which row depends on direction and
+offset. For DBI::SQL_FETCH_NEXT the next row is returned. For
+DBI::SQL_FETCH_PRIOR the prior row is returned. For DBI::SQL_FETCH_FIRST
+the first row is returned. For DBI::SQL_FETCH_LAST the last row is
+returned. For DBI::SQL_FETCH_ABSOLUTE the “offset” row is returned. For
+DBI::SQL_FETCH_RELATIVE the row “offset”  rows from the current row is
+returned.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="fetch_scroll-source">
+            <pre><span class="ruby-comment"># File SQLRelay.rb, line 266</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_scroll</span>(<span class="ruby-identifier">direction</span>, <span class="ruby-identifier">offset</span>=<span class="ruby-value">1</span>)
+
+  <span class="ruby-comment"># decide which row to fetch, take into account that the standard behavior</span>
+  <span class="ruby-comment"># of a fetch command is to fetch the row and then skip to the next row</span>
+  <span class="ruby-comment"># of the result set afterward</span>
+  <span class="ruby-identifier">fetch_row</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">direction</span>
+    <span class="ruby-keyword">when</span> <span class="ruby-constant">DBI</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL_FETCH_NEXT</span>     <span class="ruby-keyword">then</span> <span class="ruby-ivar">@row_index</span>
+    <span class="ruby-keyword">when</span> <span class="ruby-constant">DBI</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL_FETCH_PRIOR</span>    <span class="ruby-keyword">then</span> <span class="ruby-ivar">@row_index</span><span class="ruby-operator">-</span><span class="ruby-value">2</span>
+    <span class="ruby-keyword">when</span> <span class="ruby-constant">DBI</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL_FETCH_FIRST</span>    <span class="ruby-keyword">then</span> <span class="ruby-value">0</span>
+    <span class="ruby-keyword">when</span> <span class="ruby-constant">DBI</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL_FETCH_LAST</span>     <span class="ruby-keyword">then</span> <span class="ruby-ivar">@row_count</span><span class="ruby-operator">-</span><span class="ruby-value">1</span>
+    <span class="ruby-keyword">when</span> <span class="ruby-constant">DBI</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL_FETCH_ABSOLUTE</span> <span class="ruby-keyword">then</span> <span class="ruby-identifier">offset</span>
+    <span class="ruby-keyword">when</span> <span class="ruby-constant">DBI</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL_FETCH_RELATIVE</span> <span class="ruby-keyword">then</span> <span class="ruby-ivar">@row_index</span><span class="ruby-operator">+</span><span class="ruby-identifier">offset</span><span class="ruby-operator">-</span><span class="ruby-value">1</span>
+  <span class="ruby-keyword">end</span>
+  
+  <span class="ruby-comment"># fetch the row</span>
+  <span class="ruby-identifier">row</span> = <span class="ruby-keyword">nil</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">fetch_row</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">-1</span> <span class="ruby-keyword">and</span> <span class="ruby-identifier">fetch_row</span> <span class="ruby-operator">&lt;</span> <span class="ruby-ivar">@row_count</span>
+    <span class="ruby-identifier">row</span> = <span class="ruby-ivar">@handle</span>.<span class="ruby-identifier">getRow</span>(<span class="ruby-identifier">fetch_row</span>)
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-comment"># set the current row, avoid running past </span>
+  <span class="ruby-comment"># the end or beginning of the result set</span>
+  <span class="ruby-ivar">@row_index</span> = <span class="ruby-identifier">fetch_row</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@row_index</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">0</span> <span class="ruby-keyword">then</span>
+    <span class="ruby-ivar">@row_index</span> = <span class="ruby-value">0</span>
+  <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@row_index</span> <span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@row_count</span>
+    <span class="ruby-ivar">@row_index</span> = <span class="ruby-ivar">@row_count</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">row</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- fetch_scroll-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- fetch_scroll-method -->
+
+    
+      <div id="method-i-finish" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">finish</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Invalidates the statement.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="finish-source">
+            <pre><span class="ruby-comment"># File SQLRelay.rb, line 236</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">finish</span>
+  <span class="ruby-ivar">@handle</span> = <span class="ruby-keyword">nil</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- finish-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- finish-method -->
+
+    
+      <div id="method-i-rows" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">rows</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the number of rows in the current result set.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="rows-source">
+            <pre><span class="ruby-comment"># File SQLRelay.rb, line 343</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">rows</span>
+
+  <span class="ruby-comment"># For DML or DDL queries, row_count is 0 but affected_rows could</span>
+  <span class="ruby-comment"># be non-zero.  For selects, affected_rows will always be zero or</span>
+  <span class="ruby-comment"># equal to row_count (for select into queries, for example).  So,</span>
+  <span class="ruby-comment"># if row_count is 0, send affected_rows.</span>
+  <span class="ruby-ivar">@row_count</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-operator">?</span> <span class="ruby-ivar">@affected_rows</span> <span class="ruby-operator">:</span> <span class="ruby-ivar">@row_count</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- rows-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- rows-method -->
+
+    
+    </section><!-- public-instance-method-details -->
+  
+  </section><!-- 5Buntitled-5D -->
+
+</div><!-- documentation -->
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 4.0.1.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+

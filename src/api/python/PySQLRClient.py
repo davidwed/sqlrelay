@@ -260,6 +260,13 @@ class sqlrconnection:
         """
         return CSQLRelay.getDebug(self.connection)
 
+    def setDebugFile(self,filename):
+        """
+        Allows you to specify a file to write debug to.
+        Setting "filename" to NULL or an empty string causes debug
+        to be written to standard output (the default).
+        """
+        return CSQLRelay.setDebugFile(self.connection,filename)
 
     def setClientInfo(self,clientinfo):
         """

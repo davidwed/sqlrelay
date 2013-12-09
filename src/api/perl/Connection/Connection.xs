@@ -146,6 +146,10 @@ bool
 sqlrconnection::getDebug()
 
 void
+sqlrconnection::setDebugFile(filename)
+		const char	*filename
+
+void
 sqlrconnection::setClientInfo(clientinfo)
 		const char	*clientinfo
 

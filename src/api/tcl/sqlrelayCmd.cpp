@@ -1,7 +1,7 @@
 /*
  * sqlrelayCmd.c
  * Copyright (c) 2003 Takeshi Taguchi
- * $Id: sqlrelayCmd.cpp,v 1.10 2012-12-21 06:34:40 mused Exp $
+ * $Id: sqlrelayCmd.cpp,v 1.11 2013-12-09 05:08:26 mused Exp $
  */
 
 #include <tcl.h>
@@ -1844,6 +1844,7 @@ void sqlrconDelete(ClientData data) {
  *  $con rollback
  *  $con errorMessage
  *  $con debug ?bool?
+ *  $con setDebugFile debugfilename
  *  $con setClientInfo clientinfo
  *  $con getClientInfo
  *  $con sqlrcur
@@ -1881,6 +1882,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     "errorMessage",
     "errorNumber",
     "debug",
+    "setDebugFile",
     "setClientInfo",
     "getClientInfo",
     "sqlrcur",
@@ -1913,6 +1915,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     SQLR_ERRORMESSAGE,
     SQLR_ERRORNUMBER,
     SQLR_DEBUG,
+    SQLR_SETDEBUGFILE,
     SQLR_SETCLIENTINFO,
     SQLR_GETCLIENTINFO,
     SQLR_SQLRCUR,
@@ -2207,6 +2210,14 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       Tcl_WrongNumArgs(interp, 2, objv, "debug ?bool?");
       return TCL_ERROR;
     }
+  }
+  case SQLR_SETDEBUGFILE: {
+    if (objc != 3) {
+      Tcl_WrongNumArgs(interp,2, objv, "debugfilename");
+      return TCL_ERROR;
+    }
+    con->setDebugFile(Tcl_GetString(objv[2]));
+    break;
   }
   case SQLR_SETCLIENTINFO: {
     if (objc != 3) {

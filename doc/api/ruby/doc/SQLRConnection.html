@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+<title>class SQLRConnection - RDoc Documentation</title>
+
+<link type="text/css" media="screen" href="./rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="./js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/darkfish.js"></script>
+
+
+<body id="top" class="class">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="./index.html">Home</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  
+
+  <div id="file-metadata">
+    <nav id="file-list-section" class="section">
+  <h3 class="section-header">Defined In</h3>
+  <ul>
+    <li>sqlrelay.cpp
+  </ul>
+</nav>
+
+    
+  </div>
+
+  <div id="class-metadata">
+    
+    <nav id="parent-class-section" class="section">
+  <h3 class="section-header">Parent</h3>
+  
+  <p class="link">Object
+  
+</nav>
+
+    
+    
+    <!-- Method Quickref -->
+<nav id="method-list-section" class="section">
+  <h3 class="section-header">Methods</h3>
+
+  <ul class="link-list">
+    
+    <li ><a href="#method-c-new">::new</a>
+    
+    <li ><a href="#method-i-autoCommitOff">#autoCommitOff</a>
+    
+    <li ><a href="#method-i-autoCommitOn">#autoCommitOn</a>
+    
+    <li ><a href="#method-i-begin">#begin</a>
+    
+    <li ><a href="#method-i-bindFormat">#bindFormat</a>
+    
+    <li ><a href="#method-i-clientVersion">#clientVersion</a>
+    
+    <li ><a href="#method-i-commit">#commit</a>
+    
+    <li ><a href="#method-i-dbHostName">#dbHostName</a>
+    
+    <li ><a href="#method-i-dbIpAddress">#dbIpAddress</a>
+    
+    <li ><a href="#method-i-dbVersion">#dbVersion</a>
+    
+    <li ><a href="#method-i-debugOff">#debugOff</a>
+    
+    <li ><a href="#method-i-debugOn">#debugOn</a>
+    
+    <li ><a href="#method-i-endSession">#endSession</a>
+    
+    <li ><a href="#method-i-errorMessage">#errorMessage</a>
+    
+    <li ><a href="#method-i-errorNumber">#errorNumber</a>
+    
+    <li ><a href="#method-i-getClientInfo">#getClientInfo</a>
+    
+    <li ><a href="#method-i-getConnectionPort">#getConnectionPort</a>
+    
+    <li ><a href="#method-i-getConnectionSocket">#getConnectionSocket</a>
+    
+    <li ><a href="#method-i-getCurrentDatabase">#getCurrentDatabase</a>
+    
+    <li ><a href="#method-i-getDebug">#getDebug</a>
+    
+    <li ><a href="#method-i-getLastInsertId">#getLastInsertId</a>
+    
+    <li ><a href="#method-i-identify">#identify</a>
+    
+    <li ><a href="#method-i-ping">#ping</a>
+    
+    <li ><a href="#method-i-resumeSession">#resumeSession</a>
+    
+    <li ><a href="#method-i-rollback">#rollback</a>
+    
+    <li ><a href="#method-i-selectDatabase">#selectDatabase</a>
+    
+    <li ><a href="#method-i-serverVersion">#serverVersion</a>
+    
+    <li ><a href="#method-i-setClientInfo">#setClientInfo</a>
+    
+    <li ><a href="#method-i-setConnectTimeout">#setConnectTimeout</a>
+    
+    <li ><a href="#method-i-setDebugFile">#setDebugFile</a>
+    
+    <li ><a href="#method-i-suspendSession">#suspendSession</a>
+    
+  </ul>
+</nav>
+
+  </div>
+
+  <div id="project-metadata">
+    
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="./SQLRConnection.html">SQLRConnection</a>
+  
+    <li><a href="./SQLRCursor.html">SQLRCursor</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation">
+  <h1 class="class">class SQLRConnection</h1>
+
+  <div id="description" class="description">
+    
+  </div><!-- description -->
+
+  
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
+
+    
+
+    
+
+    
+
+    <!-- Methods -->
+    
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Class Methods</h3>
+
+    
+      <div id="method-c-new" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            new(host, port, socket, user, password, retrytime, tries)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Initiates a connection to “host” on “port” or to the unix “socket” on the
+local machine and authenticates with “user” and “password”.  Failed
+connections will be retried for “tries” times on interval “retrytime”. If
+“tries” is 0 then retries will continue forever.  If “retrytime” is 0 then
+retries will be attempted on a default interval. If the “socket” parameter
+is nether nil nor “” then an attempt will be made to connect through it
+before attempting to connect to “host” on “port”.  If it is nil or “” then
+no attempt will be made to connect through the socket.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="new-source">
+            <pre>static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
+                                VALUE user, VALUE password, 
+                                VALUE retrytime, VALUE tries) {
+        const char     *socketstr;
+        if (socket==Qnil) {
+                socketstr=&quot;&quot;;
+        } else {
+                socketstr=STR2CSTR(socket);
+        }
+        sqlrconnection *sqlrcon=new sqlrconnection(STR2CSTR(host),
+                                                        NUM2INT(port),
+                                                        socketstr,
+                                                        STR2CSTR(user),
+                                                        STR2CSTR(password),
+                                                        NUM2INT(retrytime),
+                                                        NUM2INT(tries),
+                                                        true);
+        return Data_Wrap_Struct(self,0,sqlrcon_free,(void *)sqlrcon);
+}</pre>
+          </div><!-- new-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- new-method -->
+
+    
+    </section><!-- public-class-method-details -->
+  
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Instance Methods</h3>
+
+    
+      <div id="method-i-autoCommitOff" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">autoCommitOff</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Instructs the database to wait for the client to tell it when to commit.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="autoCommitOff-source">
+            <pre>static VALUE sqlrcon_autoCommitOff(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        return INT2NUM(sqlrcon-&gt;autoCommitOff());
+}</pre>
+          </div><!-- autoCommitOff-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- autoCommitOff-method -->
+
+    
+      <div id="method-i-autoCommitOn" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">autoCommitOn</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Instructs the database to perform a commit after every successful query.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="autoCommitOn-source">
+            <pre>static VALUE sqlrcon_autoCommitOn(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        return INT2NUM(sqlrcon-&gt;autoCommitOn());
+}</pre>
+          </div><!-- autoCommitOn-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- autoCommitOn-method -->
+
+    
+      <div id="method-i-begin" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">begin</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Begins a transaction.  Returns true if the begin succeeded, false if it
+failed.  If the database automatically begins a new transaction when a
+commit or rollback is issued then this doesn&#39;t do anything unless SQL
+Relay is faking transaction blocks.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="begin-source">
+            <pre>static VALUE sqlrcon_begin(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        return INT2NUM(sqlrcon-&gt;begin());
+}</pre>
+          </div><!-- begin-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- begin-method -->
+
+    
+      <div id="method-i-bindFormat" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">bindFormat</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns a string representing the format of the bind variables used in the
+db.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="bindFormat-source">
+            <pre>static VALUE sqlrcon_bindFormat(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        const char     *result=sqlrcon-&gt;bindFormat();
+        if (result) {
+                return rb_str_new2(result);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- bindFormat-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- bindFormat-method -->
+
+    
+      <div id="method-i-clientVersion" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">clientVersion</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the version of the sqlrelay client software.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="clientVersion-source">
+            <pre>static VALUE sqlrcon_clientVersion(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        const char     *result=sqlrcon-&gt;clientVersion();
+        if (result) {
+                return rb_str_new2(result);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- clientVersion-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- clientVersion-method -->
+
+    
+      <div id="method-i-commit" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">commit</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Issues a commit.  Returns true if the commit succeeded, false if it failed.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="commit-source">
+            <pre>static VALUE sqlrcon_commit(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        return INT2NUM(sqlrcon-&gt;commit());
+}</pre>
+          </div><!-- commit-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- commit-method -->
+
+    
+      <div id="method-i-dbHostName" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">dbHostName</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the host name of the database</p>
+          
+          
+
+          
+          <div class="method-source-code" id="dbHostName-source">
+            <pre>static VALUE sqlrcon_dbHostName(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        const char     *result=sqlrcon-&gt;dbHostName();
+        if (result) {
+                return rb_str_new2(result);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- dbHostName-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- dbHostName-method -->
+
+    
+      <div id="method-i-dbIpAddress" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">dbIpAddress</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the ip address of the database</p>
+          
+          
+
+          
+          <div class="method-source-code" id="dbIpAddress-source">
+            <pre>static VALUE sqlrcon_dbIpAddress(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        const char     *result=sqlrcon-&gt;dbIpAddress();
+        if (result) {
+                return rb_str_new2(result);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- dbIpAddress-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- dbIpAddress-method -->
+
+    
+      <div id="method-i-dbVersion" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">dbVersion</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the version of the database</p>
+          
+          
+
+          
+          <div class="method-source-code" id="dbVersion-source">
+            <pre>static VALUE sqlrcon_dbVersion(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        const char     *result=sqlrcon-&gt;dbVersion();
+        if (result) {
+                return rb_str_new2(result);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- dbVersion-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- dbVersion-method -->
+
+    
+      <div id="method-i-debugOff" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">debugOff</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Turns debugging off.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="debugOff-source">
+            <pre>static VALUE sqlrcon_debugOff(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        sqlrcon-&gt;debugOff();
+        return Qnil;
+}</pre>
+          </div><!-- debugOff-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- debugOff-method -->
+
+    
+      <div id="method-i-debugOn" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">debugOn</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Causes verbose debugging information to be sent to standard output. Another
+way to do this is to start a query with “– debugn”.  Yet another way is to
+set the environment variable SQLR_CLIENT_DEBUG to “ON”</p>
+          
+          
+
+          
+          <div class="method-source-code" id="debugOn-source">
+            <pre>static VALUE sqlrcon_debugOn(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        sqlrcon-&gt;debugOn();
+        return Qnil;
+}</pre>
+          </div><!-- debugOn-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- debugOn-method -->
+
+    
+      <div id="method-i-endSession" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">endSession</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Ends the session.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="endSession-source">
+            <pre>static VALUE sqlrcon_endSession(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        sqlrcon-&gt;endSession();
+        return Qnil;
+}</pre>
+          </div><!-- endSession-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- endSession-method -->
+
+    
+      <div id="method-i-errorMessage" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">errorMessage</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>If an operation failed and generated an error, the error message is
+available here.  If there is no error then this method returns nil</p>
+          
+          
+
+          
+          <div class="method-source-code" id="errorMessage-source">
+            <pre>static VALUE sqlrcon_errorMessage(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        const char     *result=sqlrcon-&gt;errorMessage();
+        if (result) {
+                return rb_str_new2(result);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- errorMessage-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- errorMessage-method -->
+
+    
+      <div id="method-i-errorNumber" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">errorNumber</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>If an operation failed and generated an error, the error number is
+available here.  If there is no error then this method returns 0.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="errorNumber-source">
+            <pre>static VALUE sqlrcon_errorNumber(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        return INT2NUM(sqlrcon-&gt;errorNumber());
+}</pre>
+          </div><!-- errorNumber-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- errorNumber-method -->
+
+    
+      <div id="method-i-getClientInfo" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">getClientInfo</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the string that was set by setClientInfo().</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getClientInfo-source">
+            <pre>static VALUE sqlrcon_getClientInfo(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        const char     *result=sqlrcon-&gt;getClientInfo();
+        if (result) {
+                return rb_str_new2(result);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- getClientInfo-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getClientInfo-method -->
+
+    
+      <div id="method-i-getConnectionPort" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">getConnectionPort</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the inet port that the connection is communicating over.  This
+parameter may be passed to another connection for use in the
+sqlrcon_resumeSession() command.  Note: The result this function returns is
+only valid after a call to suspendSession().</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getConnectionPort-source">
+            <pre>static VALUE sqlrcon_getConnectionPort(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        return INT2NUM(sqlrcon-&gt;getConnectionPort());
+}</pre>
+          </div><!-- getConnectionPort-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getConnectionPort-method -->
+
+    
+      <div id="method-i-getConnectionSocket" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">getConnectionSocket</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the unix socket that the connection is communicating over.  This
+parameter may be passed to another connection for use in the
+sqlrcon_resumeSession() command.  Note: The result this function returns is
+only valid after a call to suspendSession().</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getConnectionSocket-source">
+            <pre>static VALUE sqlrcon_getConnectionSocket(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        const char     *result=sqlrcon-&gt;getConnectionSocket();
+        if (result) {
+                return rb_str_new2(result);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- getConnectionSocket-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getConnectionSocket-method -->
+
+    
+      <div id="method-i-getCurrentDatabase" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">getCurrentDatabase</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the database/schema that is currently in use.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getCurrentDatabase-source">
+            <pre>static VALUE sqlrcon_getCurrentDatabase(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        const char     *result=sqlrcon-&gt;getCurrentDatabase();
+        if (result) {
+                return rb_str_new2(result);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- getCurrentDatabase-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getCurrentDatabase-method -->
+
+    
+      <div id="method-i-getDebug" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">getDebug</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns 0 if debugging is off and 1 if debugging is on.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getDebug-source">
+            <pre>static VALUE sqlrcon_getDebug(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        return INT2NUM(sqlrcon-&gt;getDebug());
+}</pre>
+          </div><!-- getDebug-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getDebug-method -->
+
+    
+      <div id="method-i-getLastInsertId" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">getLastInsertId</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the value of the autoincrement column for the last insert</p>
+          
+          
+
+          
+          <div class="method-source-code" id="getLastInsertId-source">
+            <pre>static VALUE sqlrcon_getLastInsertId(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        return INT2NUM(sqlrcon-&gt;getLastInsertId());
+}</pre>
+          </div><!-- getLastInsertId-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- getLastInsertId-method -->
+
+    
+      <div id="method-i-identify" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">identify</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the type of database: oracle8, postgresql, mysql, etc.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="identify-source">
+            <pre>static VALUE sqlrcon_identify(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        const char     *result=sqlrcon-&gt;identify();
+        if (result) {
+                return rb_str_new2(result);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- identify-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- identify-method -->
+
+    
+      <div id="method-i-ping" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">ping</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns 1 if the database is up and 0 if it&#39;s down.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="ping-source">
+            <pre>static VALUE sqlrcon_ping(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        return INT2NUM(sqlrcon-&gt;ping());
+}</pre>
+          </div><!-- ping-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- ping-method -->
+
+    
+      <div id="method-i-resumeSession" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            resumeSession(port,socket)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Resumes a session previously left open using sqlrcon_suspendSession().
+Returns 1 on success and 0 on failure.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="resumeSession-source">
+            <pre>static VALUE sqlrcon_resumeSession(VALUE self, VALUE port, VALUE socket) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        return INT2NUM(sqlrcon-&gt;resumeSession(NUM2INT(port), 
+                                                        STR2CSTR(socket)));
+}</pre>
+          </div><!-- resumeSession-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- resumeSession-method -->
+
+    
+      <div id="method-i-rollback" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">rollback</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Issues a rollback.  Returns true if the rollback succeeded, false if it
+failed.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="rollback-source">
+            <pre>static VALUE sqlrcon_rollback(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        return INT2NUM(sqlrcon-&gt;rollback());
+}</pre>
+          </div><!-- rollback-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- rollback-method -->
+
+    
+      <div id="method-i-selectDatabase" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            selectDatabase(database)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Sets the current database/schema to “database”</p>
+          
+          
+
+          
+          <div class="method-source-code" id="selectDatabase-source">
+            <pre>static VALUE sqlrcon_selectDatabase(VALUE self, VALUE db) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        return INT2NUM(sqlrcon-&gt;selectDatabase(STR2CSTR(db)));
+}</pre>
+          </div><!-- selectDatabase-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- selectDatabase-method -->
+
+    
+      <div id="method-i-serverVersion" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">serverVersion</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the version of the sqlrelay server software.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="serverVersion-source">
+            <pre>static VALUE sqlrcon_serverVersion(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        const char     *result=sqlrcon-&gt;serverVersion();
+        if (result) {
+                return rb_str_new2(result);
+        } else {
+                return Qnil;
+        }
+}</pre>
+          </div><!-- serverVersion-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- serverVersion-method -->
+
+    
+      <div id="method-i-setClientInfo" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            setClientInfo(clientinfo)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Allows you to set a string that will be passed to the server and ultimately
+included in server-side logging along with queries that were run by this
+instance of the client.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="setClientInfo-source">
+            <pre>static VALUE sqlrcon_setClientInfo(VALUE self, VALUE clientinfo) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        sqlrcon-&gt;setClientInfo(STR2CSTR(clientinfo));
+        return Qnil;
+}</pre>
+          </div><!-- setClientInfo-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- setClientInfo-method -->
+
+    
+      <div id="method-i-setConnectTimeout" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            setConnectTimeout(timeoutsec,timeoutusec)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Sets the server connect timeout in seconds and milliseconds.  Setting
+either parameter to -1 disables the timeout.  You can also set this timeout
+using the SQLR_CLIENT_CONNECT_TIMEOUT environment variable.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="setConnectTimeout-source">
+            <pre>static VALUE sqlrcon_setConnectTimeout(VALUE self,
+                                VALUE timeoutsec, VALUE timeoutusec) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        sqlrcon-&gt;setConnectTimeout(NUM2INT(timeoutsec),NUM2INT(timeoutusec));
+        return Qnil;
+}</pre>
+          </div><!-- setConnectTimeout-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- setConnectTimeout-method -->
+
+    
+      <div id="method-i-setDebugFile" class="method-detail ">
+        
+        
+        <div class="method-heading">
+          <span class="method-callseq">
+            setDebugFile(filename)
+          </span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+        
+
+        <div class="method-description">
+          
+          <p>Allows you to specify a file to write debug to. Setting “filename” to NULL
+or an empty string causes debug to be written to standard output (the
+default).</p>
+          
+          
+
+          
+          <div class="method-source-code" id="setDebugFile-source">
+            <pre>static VALUE sqlrcon_setDebugFile(VALUE self, VALUE filename) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        sqlrcon-&gt;setDebugFile(STR2CSTR(filename));
+        return Qnil;
+}</pre>
+          </div><!-- setDebugFile-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- setDebugFile-method -->
+
+    
+      <div id="method-i-suspendSession" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">suspendSession</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Disconnects this connection from the current session but leaves the session
+open so that another connection can connect to it using
+sqlrcon_resumeSession().</p>
+          
+          
+
+          
+          <div class="method-source-code" id="suspendSession-source">
+            <pre>static VALUE sqlrcon_suspendSession(VALUE self) {
+        sqlrconnection *sqlrcon;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        return INT2NUM(sqlrcon-&gt;suspendSession());
+}</pre>
+          </div><!-- suspendSession-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- suspendSession-method -->
+
+    
+    </section><!-- public-instance-method-details -->
+  
+  </section><!-- 5Buntitled-5D -->
+
+</div><!-- documentation -->
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 4.0.1.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+

@@ -280,6 +280,20 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_getdebug) {
 	RETURN_FALSE;
 }
 
+DLEXPORT ZEND_FUNCTION(sqlrcon_setdebugfile) {
+	zval **sqlrcon,**filename;
+	if (ZEND_NUM_ARGS() != 2 || 
+		zend_get_parameters_ex(2,&sqlrcon,&filename) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	convert_to_string_ex(filename);
+	sqlrconnection *connection=NULL;
+	ZEND_FETCH_RESOURCE(connection,sqlrconnection *,sqlrcon,-1,"sqlrelay connection",sqlrelay_connection);
+	if (connection) {
+		connection->setDebugFile((*filename)->value.str.val);
+	}
+}
+
 DLEXPORT ZEND_FUNCTION(sqlrcon_setclientinfo) {
 	zval **sqlrcon,**clientinfo;
 	if (ZEND_NUM_ARGS() != 2 || 
@@ -2281,6 +2295,7 @@ zend_function_entry sql_relay_functions[] = {
 	ZEND_FE(sqlrcon_debugon,NULL)
 	ZEND_FE(sqlrcon_debugoff,NULL)
 	ZEND_FE(sqlrcon_getdebug,NULL)
+	ZEND_FE(sqlrcon_setdebugfile,NULL)
 	ZEND_FE(sqlrcon_setclientinfo,NULL)
 	ZEND_FE(sqlrcon_getclientinfo,NULL)
 	ZEND_FE(sqlrcur_alloc,NULL)
