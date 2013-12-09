@@ -734,6 +734,8 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	if (debug) {
 		sqlrcon->debugOn();
 	}
+	sqlrcon->debugPrintFunction(zend_printf);
+
 	dbh->driver_data=(void *)sqlrcon;
 	dbh->methods=&sqlrconnectionMethods;
 
