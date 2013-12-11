@@ -117,6 +117,9 @@
 /* Oracle 8i or greater */
 #undef HAVE_ORACLE_8i
 
+/* Some versions of PHP PDO have PDO::ATTR_EMULATE_PREPARES */
+#undef HAVE_PHP_PDO_ATTR_EMULATE_PREPARES
+
 /* Some versions of postgresql have PQbinaryTuples */
 #undef HAVE_POSTGRESQL_PQBINARYTUPLES
 

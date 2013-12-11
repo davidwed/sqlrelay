@@ -3060,6 +3060,14 @@ AC_DEFUN([FW_CHECK_PHP_PDO],
 #include <pdo/php_pdo.h>
 #include <pdo/php_pdo_driver.h>],[struct pdo_dbh_methods a;],[$PHPINCLUDES],[AC_MSG_RESULT(yes); HAVE_PHP_PDO="yes"],[AC_MSG_RESULT(no)])
 	AC_SUBST(HAVE_PHP_PDO)
+
+	if ( test "$HAVE_PHP_PDO" = "yes" )
+	then
+		AC_MSG_CHECKING(for PDO::ATTR_EMULATE_PREPARES)
+		FW_TRY_COMPILE([#include <php.h>
+#include <pdo/php_pdo.h>
+#include <pdo/php_pdo_driver.h>],[pdo_attribute_type a=PDO_ATTR_EMULATE_PREPARES;],[$PHPINCLUDES],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_PHP_PDO_ATTR_EMULATE_PREPARES,1,Some versions of PHP PDO have PDO::ATTR_EMULATE_PREPARES)],[AC_MSG_RESULT(no)])
+	fi
 ])
 
 

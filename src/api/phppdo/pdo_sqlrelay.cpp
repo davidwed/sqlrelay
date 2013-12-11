@@ -732,10 +732,12 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 			// make database calculate maximum
 			// length of data found in a column
 			return 1;
+		#ifdef HAVE_PHP_PDO_ATTR_EMULATE_PREPARES
 		case PDO_ATTR_EMULATE_PREPARES:
 			// use substititution variables rather than binds
 			sqlrdbh->usesubvars=Z_BVAL_P(val);
 			return 1;
+		#endif
 		default:
 			return 0;
 	}
@@ -842,10 +844,12 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 			// make database calculate maximum
 			// length of data found in a column
 			return 1;
+		#ifdef HAVE_PHP_PDO_ATTR_EMULATE_PREPARES
 		case PDO_ATTR_EMULATE_PREPARES:
 			// use substititution variables rather than binds
 			ZVAL_BOOL(retval,sqlrdbh->usesubvars);
 			return 1;
+		#endif
 		default:
 			return 0;
 	}
