@@ -32,14 +32,14 @@ struct sqlrstatement {
 	int64_t		rows;
 	int64_t		currentrow;
 	long		longfield;
-	stringbuffer	subquery;
+	stringbuffer	subvarquery;
 	linkedlist< char * >	subvarstrings;
 };
 
 struct sqlrdbhandle {
 	sqlrconnection	*sqlrcon;
 	bool		translatebindsonserver;
-	bool		usesubstitutionvariables;
+	bool		usesubvars;
 };
 
 int _sqlrelayError(pdo_dbh_t *dbh,
@@ -94,8 +94,7 @@ static int sqlrcursorDestructor(pdo_stmt_t *stmt TSRMLS_DC) {
 static int sqlrcursorExecute(pdo_stmt_t *stmt TSRMLS_DC) {
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
-	if (((sqlrdbhandle *)stmt->dbh->driver_data)->
-				usesubstitutionvariables) {
+	if (((sqlrdbhandle *)stmt->dbh->driver_data)->usesubvars) {
 		if (!sqlrcur->executeQuery()) {
 			sqlrelayErrorStmt(stmt);
 			return 0;
@@ -104,8 +103,8 @@ static int sqlrcursorExecute(pdo_stmt_t *stmt TSRMLS_DC) {
 		// If we're using substitution variables, then we need
 		// to re-prepare.  Arguably this is a bug in the
 		// SQL Relay client API.
-		sqlrcur->prepareQuery(sqlrstmt->subquery.getString(),
-					sqlrstmt->subquery.getStringLength());
+		sqlrcur->prepareQuery(sqlrstmt->subvarquery.getString(),
+				sqlrstmt->subvarquery.getStringLength());
 	} else {
 		if (!sqlrcur->executeQuery()) {
 			sqlrelayErrorStmt(stmt);
@@ -424,8 +423,7 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 		return 1;
 	}
 
-	if (((sqlrdbhandle *)stmt->dbh->driver_data)->
-				usesubstitutionvariables) {
+	if (((sqlrdbhandle *)stmt->dbh->driver_data)->usesubvars) {
 		if (eventtype==PDO_PARAM_EVT_EXEC_PRE) {
 			return sqlrcursorSubstitutionPreExec(
 						sqlrstmt,name,param);
@@ -598,7 +596,7 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 	stmt->columns=NULL;
 	stmt->row_count=0;
 
-	sqlrstmt->subquery.clear();
+	sqlrstmt->subvarquery.clear();
 	clearList(&sqlrstmt->subvarstrings);
 
 	// FIXME:
@@ -617,10 +615,10 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 	// hopefully this is ok.
 	stmt->supports_placeholders=PDO_PLACEHOLDER_POSITIONAL;
 
-	if (sqlrdbh->usesubstitutionvariables) {
-		sqlrconnectionRewriteQuery(sql,sqllen,&sqlrstmt->subquery);
-		sql=sqlrstmt->subquery.getString();
-		sqllen=sqlrstmt->subquery.getStringLength();
+	if (sqlrdbh->usesubvars) {
+		sqlrconnectionRewriteQuery(sql,sqllen,&sqlrstmt->subvarquery);
+		sql=sqlrstmt->subvarquery.getString();
+		sqllen=sqlrstmt->subvarquery.getStringLength();
 	}
 	
 	sqlrstmt->sqlrcur->prepareQuery(sql,sqllen);
@@ -736,7 +734,7 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 			return 1;
 		case PDO_ATTR_EMULATE_PREPARES:
 			// use substititution variables rather than binds
-			sqlrdbh->usesubstitutionvariables=Z_BVAL_P(val);
+			sqlrdbh->usesubvars=Z_BVAL_P(val);
 			return 1;
 		default:
 			return 0;
@@ -846,7 +844,7 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 			return 1;
 		case PDO_ATTR_EMULATE_PREPARES:
 			// use substititution variables rather than binds
-			ZVAL_BOOL(retval,sqlrdbh->usesubstitutionvariables);
+			ZVAL_BOOL(retval,sqlrdbh->usesubvars);
 			return 1;
 		default:
 			return 0;
@@ -902,9 +900,8 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	}
 	sqlrdbh->sqlrcon->debugPrintFunction(zend_printf);
 
-	// FIXME: parse options array and set these (and other values) from it
 	sqlrdbh->translatebindsonserver=false;
-	sqlrdbh->usesubstitutionvariables=false;
+	sqlrdbh->usesubvars=false;
 
 	dbh->driver_data=(void *)sqlrdbh;
 	dbh->methods=&sqlrconnectionMethods;
