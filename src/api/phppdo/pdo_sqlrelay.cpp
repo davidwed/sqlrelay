@@ -32,6 +32,14 @@ struct sqlrstatement {
 	int64_t		rows;
 	int64_t		currentrow;
 	long		longfield;
+	stringbuffer	subquery;
+	linkedlist< char * >	subvarstrings;
+};
+
+struct sqlrdbhandle {
+	sqlrconnection	*sqlrcon;
+	bool		translatebindsonserver;
+	bool		usesubstitutionvariables;
 };
 
 int _sqlrelayError(pdo_dbh_t *dbh,
@@ -49,9 +57,9 @@ int _sqlrelayError(pdo_dbh_t *dbh,
 		errormessage=sqlrstmt->sqlrcur->errorMessage();
 		pdoerr=&stmt->error_code;
 	} else {
-		sqlrconnection	*sqlrcon=(sqlrconnection *)dbh->driver_data;
-		errornumber=sqlrcon->errorNumber();
-		errormessage=sqlrcon->errorMessage();
+		sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
+		errornumber=sqlrdbh->sqlrcon->errorNumber();
+		errormessage=sqlrdbh->sqlrcon->errorMessage();
 		pdoerr=&dbh->error_code;
 	}
 
@@ -67,20 +75,42 @@ int _sqlrelayError(pdo_dbh_t *dbh,
 	return errornumber;
 }
 
+static void clearList(linkedlist< char * > *list) {
+	for (linkedlistnode< char * > *node=list->getFirstNode();
+					node; node=node->getNext()) {
+		delete[] node->getValue();
+	}
+	list->clear();
+}
+
 static int sqlrcursorDestructor(pdo_stmt_t *stmt TSRMLS_DC) {
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	delete sqlrstmt->sqlrcur;
+	clearList(&sqlrstmt->subvarstrings);
 	delete sqlrstmt;
 	return 1;
 }
 
 static int sqlrcursorExecute(pdo_stmt_t *stmt TSRMLS_DC) {
-
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
-	if (!sqlrcur->executeQuery()) {
-		sqlrelayErrorStmt(stmt);
-		return 0;
+	if (((sqlrdbhandle *)stmt->dbh->driver_data)->
+				usesubstitutionvariables) {
+		if (!sqlrcur->executeQuery()) {
+			sqlrelayErrorStmt(stmt);
+			return 0;
+		}
+		clearList(&sqlrstmt->subvarstrings);
+		// If we're using substitution variables, then we need
+		// to re-prepare.  Arguably this is a bug in the
+		// SQL Relay client API.
+		sqlrcur->prepareQuery(sqlrstmt->subquery.getString(),
+					sqlrstmt->subquery.getStringLength());
+	} else {
+		if (!sqlrcur->executeQuery()) {
+			sqlrelayErrorStmt(stmt);
+			return 0;
+		}
 	}
 	sqlrstmt->currentrow=-1;
 	stmt->column_count=sqlrcur->colCount();
@@ -189,6 +219,64 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 	return 1;
 }
 
+static int sqlrcursorSubstitutionPreExec(sqlrstatement *sqlrstmt,
+					const char *name,
+					struct pdo_bound_param_data *param) {
+
+	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
+
+	if (param->param_type&PDO_PARAM_INPUT_OUTPUT) {
+		return 0;
+	}
+
+	char	*nm=charstring::duplicate(name);
+	sqlrstmt->subvarstrings.append(nm);
+
+	char	*str=NULL;
+
+	switch (PDO_PARAM_TYPE(param->param_type)) {
+		case PDO_PARAM_NULL:
+			sqlrcur->substitution(nm,(const char *)NULL);
+			return 1;
+		case PDO_PARAM_INT:
+		case PDO_PARAM_BOOL:
+			convert_to_long(param->parameter);
+			sqlrcur->substitution(nm,Z_LVAL_P(param->parameter));
+			return 1;
+		case PDO_PARAM_STR:
+			convert_to_string(param->parameter);
+			str=new char[Z_STRLEN_P(param->parameter)+3];
+			charstring::copy(str,"'");
+			charstring::append(str,
+					Z_STRVAL_P(param->parameter),
+					Z_STRLEN_P(param->parameter));
+			str[Z_STRLEN_P(param->parameter)+1]='\0';
+			charstring::append(str,"'");
+			sqlrstmt->subvarstrings.append(str);
+			sqlrcur->substitution(nm,str);
+			return 1;
+		case PDO_PARAM_LOB:
+			if (Z_TYPE_P(param->parameter)==IS_STRING) {
+				convert_to_string(param->parameter);
+				str=new char[Z_STRLEN_P(param->parameter)+3];
+				charstring::copy(str,"'");
+				charstring::append(str,
+						Z_STRVAL_P(param->parameter),
+						Z_STRLEN_P(param->parameter));
+				str[Z_STRLEN_P(param->parameter)+1]='\0';
+				charstring::append(str,"'");
+				sqlrstmt->subvarstrings.append(str);
+				sqlrcur->substitution(nm,str);
+				return 1;
+			} else {
+				return 0;
+			}
+		case PDO_PARAM_STMT:
+			return 0;
+	}
+	return 0;
+}
+
 static int sqlrcursorInputBindPreExec(sqlrcursor *sqlrcur,
 					const char *name,
 					struct pdo_bound_param_data *param) {
@@ -256,8 +344,7 @@ static int sqlrcursorOutputBindPreExec(sqlrcursor *sqlrcur,
 			sqlrcur->defineOutputBindBlob(name);
 			return 1;
 		case PDO_PARAM_STMT:
-			// FIXME: there's no obvious way to create a PDO
-			// statement object to attach this to on the backend
+			// FIXME: use pdo_stmt_construct here
 			//sqlrcur->defineOutputBindCursor(name);
 			return 0;
 	}
@@ -337,10 +424,18 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 		return 1;
 	}
 
-	if (eventtype==PDO_PARAM_EVT_EXEC_PRE) {
-		return sqlrcursorBindPreExec(sqlrcur,name,param);
-	} else if (eventtype==PDO_PARAM_EVT_EXEC_POST) {
-		return sqlrcursorBindPostExec(sqlrcur,name,param);
+	if (((sqlrdbhandle *)stmt->dbh->driver_data)->
+				usesubstitutionvariables) {
+		if (eventtype==PDO_PARAM_EVT_EXEC_PRE) {
+			return sqlrcursorSubstitutionPreExec(
+						sqlrstmt,name,param);
+		}
+	} else {
+		if (eventtype==PDO_PARAM_EVT_EXEC_PRE) {
+			return sqlrcursorBindPreExec(sqlrcur,name,param);
+		} else if (eventtype==PDO_PARAM_EVT_EXEC_POST) {
+			return sqlrcursorBindPostExec(sqlrcur,name,param);
+		}
 	}
 	return 1;
 }
@@ -440,30 +535,94 @@ static struct pdo_stmt_methods sqlrcursorMethods={
 
 
 static int sqlrconnectionClose(pdo_dbh_t *dbh TSRMLS_DC) {
+	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
+	delete (sqlrconnection *)sqlrdbh->sqlrcon;
 	dbh->is_closed=1;
-	delete (sqlrconnection *)dbh->driver_data;
 	return 0;
+}
+
+static void sqlrconnectionRewriteQuery(const char *query,
+						uint32_t querylen,
+						stringbuffer *newquery) {
+	bool		inquotes=false;
+	bool		inbind=false;
+	uint16_t	varcounter=0;
+
+	for (const char *c=query; *c; c++) {
+
+		if (*c=='\'') {
+			inquotes=!inquotes;
+		}
+
+		if (!inquotes) {
+
+			if (inbind && (character::isWhitespace(*c) ||
+						character::inSet(*c,",);:="))) {
+				newquery->append(')');
+				inbind=false;
+			}
+
+			// catch ?, :, $ and @ but not @@
+			if (character::inSet(*c,"?:$") ||
+					(*c=='@' && *(c+1)!='@')) {
+				newquery->append("$(");
+				if (*c=='?') {
+					newquery->append(varcounter);
+					varcounter++;
+				} else {
+					inbind=true;
+				}
+				continue;
+			}
+		}
+
+		newquery->append(*c);
+	}
 }
 
 static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 					long sqllen, pdo_stmt_t *stmt,
 					zval *driveroptions TSRMLS_DC) {
+
+	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	sqlrstatement	*sqlrstmt=new sqlrstatement;
 	sqlrstmt->sqlrcur=new sqlrcursor(
-				(sqlrconnection *)dbh->driver_data,true);
+				(sqlrconnection *)sqlrdbh->sqlrcon,true);
+
 	sqlrstmt->rows=0;
 	sqlrstmt->currentrow=-1;
 	stmt->methods=&sqlrcursorMethods;
 	stmt->driver_data=(void *)sqlrstmt;
-	// SQL Relay actually supports named and postitional placeholders but
-	// there doesn't appear to be a way to set both.  Positional is a
-	// larger value in the enum, so I guess we'll use that.  The pdo code
-	// appears to just check to see if it's not PDO_PLACEHOLDER_NONE anyway
-	// so hopefully this is ok.
-	stmt->supports_placeholders=PDO_PLACEHOLDER_POSITIONAL;
+
 	stmt->column_count=0;
 	stmt->columns=NULL;
 	stmt->row_count=0;
+
+	sqlrstmt->subquery.clear();
+	clearList(&sqlrstmt->subvarstrings);
+
+	// FIXME:
+	// To not have to set translatebindvariables on the server, we need to
+	// figure out what db relay is connected to, set supports_placeholders
+	// and named_rewrite_template appropriately and rewrite the
+	// query using pdo_parse_params.
+	//
+	// Ideally we'd set a custom attribute for whether binds are translated
+	// on the server or not.
+
+	// SQL Relay actually supports named and postitional placeholders but
+	// there doesn't appear to be a way to set both.  Positional is a larger
+	// value in the enum, so I guess we'll use that.  The pdo code appears
+	// to just check to see if it's not PDO_PLACEHOLDER_NONE anyway so
+	// hopefully this is ok.
+	stmt->supports_placeholders=PDO_PLACEHOLDER_POSITIONAL;
+
+	if (sqlrdbh->usesubstitutionvariables) {
+		sqlrconnectionRewriteQuery(sql,sqllen,&sqlrstmt->subquery);
+		sql=sqlrstmt->subquery.getString();
+		sqllen=sqlrstmt->subquery.getStringLength();
+	}
+	
 	sqlrstmt->sqlrcur->prepareQuery(sql,sqllen);
 	return 1;
 }
@@ -471,7 +630,8 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 static long sqlrconnectionExecute(pdo_dbh_t *dbh,
 					const char *sql,
 					long sqllen TSRMLS_DC) {
-	sqlrcursor	sqlrcur((sqlrconnection *)dbh->driver_data);
+	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
+	sqlrcursor	sqlrcur((sqlrconnection *)sqlrdbh->sqlrcon);
 	if (sqlrcur.sendQuery(sql,sqllen)) {
 		return sqlrcur.affectedRows();
 	}
@@ -480,7 +640,8 @@ static long sqlrconnectionExecute(pdo_dbh_t *dbh,
 }
 
 static int sqlrconnectionBegin(pdo_dbh_t *dbh TSRMLS_DC) {
-	if (((sqlrconnection *)dbh->driver_data)->begin()) {
+	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
+	if (((sqlrconnection *)sqlrdbh->sqlrcon)->begin()) {
 		return 1;
 	}
 	sqlrelayError(dbh);
@@ -488,7 +649,8 @@ static int sqlrconnectionBegin(pdo_dbh_t *dbh TSRMLS_DC) {
 }
 
 static int sqlrconnectionCommit(pdo_dbh_t *dbh TSRMLS_DC) {
-	if (((sqlrconnection *)dbh->driver_data)->commit()) {
+	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
+	if (((sqlrconnection *)sqlrdbh->sqlrcon)->commit()) {
 		return 1;
 	}
 	sqlrelayError(dbh);
@@ -496,7 +658,8 @@ static int sqlrconnectionCommit(pdo_dbh_t *dbh TSRMLS_DC) {
 }
 
 static int sqlrconnectionRollback(pdo_dbh_t *dbh TSRMLS_DC) { 
-	if (((sqlrconnection *)dbh->driver_data)->rollback()) {
+	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
+	if (((sqlrconnection *)sqlrdbh->sqlrcon)->rollback()) {
 		return 1;
 	}
 	sqlrelayError(dbh);
@@ -509,7 +672,8 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 	// FIXME: somehow support
 	// 	setResultSetBufferSize
 	// 	get/dontGetColumnInfo
-	sqlrconnection	*sqlrcon=(sqlrconnection *)dbh->driver_data;
+	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
+	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
 
 	// PDO handles several of these options itself.  These are the ones
 	// it doens't handle.
@@ -570,11 +734,10 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 			// make database calculate maximum
 			// length of data found in a column
 			return 1;
-		#ifdef PDO_ATTR_EMULATE_PREPARES
 		case PDO_ATTR_EMULATE_PREPARES:
-			// use query emulation rather than native
+			// use substititution variables rather than binds
+			sqlrdbh->usesubstitutionvariables=Z_BVAL_P(val);
 			return 1;
-		#endif
 		default:
 			return 0;
 	}
@@ -582,8 +745,9 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 
 static char *sqlrconnectionLastInsertId(pdo_dbh_t *dbh,
 				const char *name, unsigned int *len TSRMLS_DC) {
+	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	char	*id=php_pdo_int64_to_str(
-				((sqlrconnection *)dbh->driver_data)->
+				((sqlrconnection *)sqlrdbh->sqlrcon)->
 							getLastInsertId());
 	*len=charstring::length(id);
 	return id;
@@ -608,7 +772,8 @@ static int sqlrconnectionError(pdo_dbh_t *dbh,
 			add_next_index_string(info,msg,1);
 		}
 	} else if (dbh) {
-		sqlrconnection	*sqlrcon=(sqlrconnection *)dbh->driver_data;
+		sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
+		sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
 		add_next_index_long(info,sqlrcon->errorNumber());
 		// NOTE: This is un-const'ed because add_next_index_string
 		// takes a char * rather than const char * and this works
@@ -633,7 +798,8 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 	//	dbIpAddress
 	//	bindFormat
 	//	getCurrentDatabase
-	sqlrconnection	*sqlrcon=(sqlrconnection *)dbh->driver_data;
+	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
+	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
 
 	// PDO handles several of these options itself.  These are the ones
 	// it doens't handle.
@@ -678,11 +844,10 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 			// make database calculate maximum
 			// length of data found in a column
 			return 1;
-		#ifdef PDO_ATTR_EMULATE_PREPARES
 		case PDO_ATTR_EMULATE_PREPARES:
-			// use query emulation rather than native
+			// use substititution variables rather than binds
+			ZVAL_BOOL(retval,sqlrdbh->usesubstitutionvariables);
 			return 1;
-		#endif
 		default:
 			return 0;
 	}
@@ -726,17 +891,22 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	bool		debug=charstring::toInteger(options[5].optval);
 
 	// create a sqlrconnection and attach it to the dbh
-	sqlrconnection	*sqlrcon=new sqlrconnection(host,port,socket,
+	sqlrdbhandle	*sqlrdbh=new sqlrdbhandle;
+	sqlrdbh->sqlrcon=new sqlrconnection(host,port,socket,
 							dbh->username,
 							dbh->password,
 							tries,retrytime,
 							true);
 	if (debug) {
-		sqlrcon->debugOn();
+		sqlrdbh->sqlrcon->debugOn();
 	}
-	sqlrcon->debugPrintFunction(zend_printf);
+	sqlrdbh->sqlrcon->debugPrintFunction(zend_printf);
 
-	dbh->driver_data=(void *)sqlrcon;
+	// FIXME: parse options array and set these (and other values) from it
+	sqlrdbh->translatebindsonserver=false;
+	sqlrdbh->usesubstitutionvariables=false;
+
+	dbh->driver_data=(void *)sqlrdbh;
 	dbh->methods=&sqlrconnectionMethods;
 
 	dbh->is_persistent=0;
