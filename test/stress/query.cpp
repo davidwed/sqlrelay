@@ -4,7 +4,8 @@
 #include <rudiments/stdio.h>
 
 int main() {
-	//sqlrconnection	sqlrcon("localhost",9000,"","test","test",0,1);
+	//sqlrconnection	sqlrcon("localhost",9000,"/tmp/test.socket",
+							//"test","test",0,1);
 	//sqlrcursor	sqlrcur(&sqlrcon);
 
 	//datetime	dt;
@@ -14,8 +15,8 @@ int main() {
 	int	loop=0;
 	for (;;) {
 
-		sqlrconnection	sqlrcon("localhost",9000,"",
-					"test","test",0,1);
+		sqlrconnection	sqlrcon("localhost",9000,"/tmp/test.socket",
+							"test","test",0,1);
 		sqlrcursor	sqlrcur(&sqlrcon);
 
 		//seed=randomnumber::generateNumber(seed);

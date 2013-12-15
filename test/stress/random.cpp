@@ -3,7 +3,8 @@
 
 int main(int argc, char **argv) {
 
-	sqlrconnection	sqlrcon("localhost",9000,"","test","test",0,1);
+	sqlrconnection	sqlrcon("localhost",9000,"/tmp/test.socket",
+							"test","test",0,1);
 	sqlrcursor	sqlrcur(&sqlrcon);
 
 	sqlrcon.debugOn();
@@ -22,7 +23,7 @@ int main(int argc, char **argv) {
 		colcount=randomnumber::scaleNumber(seed,1,15);
 		colcount=1;
 		query.clear();
-		query.append("create temp table test (");
+		query.append("create table test (");
 		for (int32_t i=0; i<colcount; i++) {
 			if (i) {
 				query.append(", ");

@@ -2,8 +2,8 @@
 
 int main() {
 
-	sqlrconnection	sqlrcon("localhost",8009,"",
-				"oracle8test","oracle8test",0,1);
+	sqlrconnection	sqlrcon("localhost",9000,"/tmp/test.socket",
+							"test","test",0,1);
 	sqlrcursor	sqlrcur(&sqlrcon);
 	sqlrcon.setConnectTimeout(0,1);
 
