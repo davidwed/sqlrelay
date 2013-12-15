@@ -70,9 +70,7 @@ sqlrlistener::sqlrlistener() : listener() {
 	isforkedchild=false;
 	handoffmode=HANDOFF_PASS;
 
-	// set this false for now
-	//usethreads=thread::supportsThreads();
-	usethreads=false;
+	usethreads=thread::supportsThreads();
 }
 
 sqlrlistener::~sqlrlistener() {
@@ -1227,16 +1225,12 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock) {
 		// If we got this far, everything worked.
 		retval=true;
 		
-		// If we're not using threads, then
-		// this is a forked child process...
-		if (!usethreads) {
-			// Set the file descriptor to -1, otherwise it will get
-			// closed when connectionsock is freed.  If the file
-			// descriptor gets closed, the next time we try to pass
-			// a file descriptor to the same connection, it will
-			// fail.
-			connectionsock.setFileDescriptor(-1);
-		}
+		// Set the file descriptor to -1, otherwise it will get
+		// closed when connectionsock is freed.  If the file
+		// descriptor gets closed, the next time we try to pass
+		// a file descriptor to the same connection, it will
+		// fail.
+		connectionsock.setFileDescriptor(-1);
 		break;
 	}
 
