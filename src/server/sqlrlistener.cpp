@@ -1062,35 +1062,42 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		return;
 	}
 
-	// if threads are supported, fork a thread rather than a new process
+	// if threads are supported, fork a thread
+	// to handle the client connection
 	if (usethreads) {
 
+		// set up the thread
 		thread			*thr=new thread;
 		clientsessionattr	*csa=new clientsessionattr;
 		csa->thr=thr;
 		csa->lsnr=this;
 		csa->clientsock=clientsock;
-
 		thr->setFunction((void*(*)(void*))clientSessionThread,csa);
-		if (!thr->create()) {
-			decrementBusyListeners();
-			decrementForkedListeners();
-			errorClientSession(clientsock,
-				SQLR_ERROR_ERRORFORKINGLISTENER,
-				SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
-			logInternalError(
-				SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
-			delete csa;
-			delete thr;
+
+		// fork the thread
+		if (thr->create()) {
+			return;
 		}
+
+		// error
+		decrementBusyListeners();
+		decrementForkedListeners();
+		errorClientSession(clientsock,
+			SQLR_ERROR_ERRORFORKINGLISTENER,
+			SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
+		logInternalError(
+			SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
+		delete csa;
+		delete thr;
 		return;
 	}
 
-	// if the client connected to one of the non-handoff
-	// sockets, fork a child to handle it
+	// if threads are not supported, fork a child
+	// process to handle the client connection
 	pid_t	childpid=process::fork();
 	if (!childpid) {
 
+		// child...
 		isforkedchild=true;
 
 		// since this is the forked off listener, we don't
@@ -1111,19 +1118,24 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 
 		cleanUp();
 		process::exit(0);
+
 	} else if (childpid>0) {
-		// parent
+
+		// parent...
 		if (sqlrlg) {
 			debugstr.clear();
 			debugstr.append("forked a child: ");
 			debugstr.append((int32_t)childpid);
 			logDebugMessage(debugstr.getString());
 		}
+
 		// the main process doesn't need to stay connected
 		// to the client, only the forked process
 		delete clientsock;
+
 	} else {
-		// error
+
+		// error...
 		decrementBusyListeners();
 		decrementForkedListeners();
 		errorClientSession(clientsock,
