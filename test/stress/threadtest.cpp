@@ -1,10 +1,10 @@
 // Copyright (c) 2000-2001  David Muse
 // See the file COPYING for more information.
 
-#include <stdlib.h>
 #include <sqlrelay/sqlrclient.h>
-#include <stdio.h>
-#include <pthread.h>
+#include <rudiments/thread.h>
+#include <rudiments/charstring.h>
+#include <rudiments/stdio.h>
 
 const char	*host;
 int		port;
@@ -25,11 +25,11 @@ void	runQuery(void *id) {
 	con->endSession();
 	
 	for (uint64_t i=0; i<cur->rowCount(); i++) {
-		printf("%d  ",(int)id);
+		stdoutput.printf("%d  ",(int)id);
 		for (uint32_t j=0; j<cur->colCount(); j++) {
-			printf("\"%s\",",cur->getField(i,j));
+			stdoutput.printf("\"%s\",",cur->getField(i,j));
 		}
-		printf("\n");
+		stdoutput.printf("\n");
 	}
 
 	delete cur;
@@ -44,17 +44,16 @@ int main(int argc, char **argv) {
 	login="test";
 	password="test";
 	query=argv[1];
-	threadcount=atoi(argv[2]);
+	threadcount=charstring::toInteger(argv[2]);
 
-	pthread_t	th[threadcount];
+	thread	th[threadcount];
 
 	for (int i=0; i<threadcount; i++) {
-		pthread_create(&th[i],NULL,
-			(void *(*)(void *))runQuery,
-			(void *)i);
+		th[i].setFunction((void *(*)(void *))runQuery,(void *)i);
+		th[i].create();
 	}
 
 	for (int i=0; i<threadcount; i++) {
-		pthread_join(th[i],NULL);
+		th[i].join(NULL);
 	}
 }
