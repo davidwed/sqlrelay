@@ -32,6 +32,8 @@
 		query needs to have its bind variables faked or not
 	added support for client-side debug-to-file
 	added debug-to-file support to command line clients
+	tweaked server processes to use process::spawn instead of system() and
+		process::fork()/process::exec()
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted

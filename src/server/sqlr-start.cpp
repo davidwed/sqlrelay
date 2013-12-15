@@ -11,12 +11,6 @@
 // for ceil()
 #include <math.h>
 
-// for FILE, popen, feof, fgetc, pclose
-#include <stdio.h>
-
-// for system()
-#include <stdlib.h>
-
 #define MAX_CONNECTIONS 200
 
 int32_t getConnections(sqlrconfigfile *cfgfile, bool override) {
@@ -32,54 +26,84 @@ bool startListener(const char *id, const char *config,
 
 	// start the listener
 	stdoutput.printf("\nStarting listener:\n");
-	
-	stringbuffer	command;
-	command.append("sqlr-listener");
-	command.append(" -id ")->append(id);
-	command.append(" -config ")->append(config);
+
+	// build command to spawn
+	const char	*cmd="sqlr-listener";
+	uint16_t	i=0;
+	const char	*args[8];
+	args[i++]="sqlr-listener";
+	args[i++]="-id";
+	args[i++]=id;
+	args[i++]="-config";
+	args[i++]=config;
 	if (charstring::length(localstatedir)) {
-		command.append(" -localstatedir ")->append(localstatedir);
+		args[i++]="-localstatedir";
+		args[i++]=localstatedir;
 	}
-	stdoutput.printf("  %s\n",command.getString());
+	args[i]=NULL;
+	
+	// display command
+	stdoutput.printf("  ");
+	for (uint16_t index=0; index<i; index++) {
+		stdoutput.printf("%s ",args[index]);
+	}
+	stdoutput.printf("\n");
 
-	bool	success=!system(command.getString());
-
-	if (!success) {
+	// spawn the command
+	if (process::spawn(cmd,args)==-1) {
 		stdoutput.printf("\nsqlr-listener failed to start.\n");
+		return false;
 	}
-
-	return success;
+	return true;
 }
 
 
 bool startConnection(bool strace, const char *id, const char *connectionid,
 				const char *config, const char *localstatedir) {
 
-	stringbuffer	command;
+	// build command to spawn
+	const char	*cmd=NULL;
+	uint16_t	i=0;
+	const char	*args[14];
 	if (strace) {
-		command.append("strace -ff -o sqlr-connection-strace ");
+		cmd="strace";
+		args[i++]="strace";
+		args[i++]="-ff";
+		args[i++]="-o";
+	} else {
+		cmd="sqlr-connection";
 	}
-	command.append("sqlr-connection -id ")->append(id);
+	args[i++]="sqlr-connection";
+	args[i++]="-id";
+	args[i++]=id;
 	if (connectionid) {
-		command.append(" -connectionid ")->append(connectionid);
+		args[i++]="-connectionid";
+		args[i++]=connectionid;
 	}
-	command.append(" -config ")->append(config);
+	args[i++]="-config";
+	args[i++]=config;
 	if (charstring::length(localstatedir)) {
-		command.append(" -localstatedir ")->append(localstatedir);
+		args[i++]="-localstatedir";
+		args[i++]=localstatedir;
 	}
 	if (strace) {
-		command.append(" &");
+		args[i++]="&";
 	}
+	args[i]=NULL;
 
-	stdoutput.printf("  %s\n",command.getString());
+	// display command
+	stdoutput.printf("  ");
+	for (uint16_t index=0; index<i; index++) {
+		stdoutput.printf("%s ",args[index]);
+	}
+	stdoutput.printf("\n");
 
-	bool	success=!system(command.getString());
-
-	if (!success) {
+	// spawn the command
+	if (process::spawn(cmd,args)==-1) {
 		stdoutput.printf("\nsqlr-connection failed to start.\n");
+		return false;
 	}
-
-	return success;
+	return true;
 }
 
 bool startConnections(sqlrconfigfile *cfgfile, bool strace,
@@ -169,22 +193,35 @@ bool startScaler(sqlrconfigfile *cfgfile, const char *id,
 	}
 
 	stdoutput.printf("\nStarting scaler:\n");
-	
-	stringbuffer	command;
-	command.append("sqlr-scaler")->append(" -id ")->append(id);
-	command.append(" -config ")->append(config);
+
+	// build command to spawn
+	const char	*cmd="sqlr-scaler";
+	uint16_t	i=0;
+	const char	*args[8];
+	args[i++]="sqlr-scaler";
+	args[i++]="-id";
+	args[i++]=id;
+	args[i++]="-config";
+	args[i++]=config;
 	if (charstring::length(localstatedir)) {
-		command.append(" -localstatedir ")->append(localstatedir);
+		args[i++]="-localstatedir";
+		args[i++]=localstatedir;
 	}
-	stdoutput.printf("  %s\n",command.getString());
+	args[i]=NULL;
 
-	bool	success=!system(command.getString());
+	// display command
+	stdoutput.printf("  ");
+	for (uint16_t index=0; index<i; index++) {
+		stdoutput.printf("%s ",args[index]);
+	}
+	stdoutput.printf("\n");
 
-	if (!success) {
+	// spawn the command
+	if (process::spawn(cmd,args)==-1) {
 		stdoutput.printf("\nsqlr-scaler failed to start.\n");
+		return false;
 	}
-
-	return success;
+	return true;
 }
 
 int main(int argc, const char **argv) {

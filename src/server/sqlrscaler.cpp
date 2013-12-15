@@ -406,19 +406,11 @@ pid_t scaler::openOneConnection() {
 	}
 	args[p++]=NULL; // the last
 
-	pid_t	pid=process::fork();
-
-	if (pid==0) {
-		// child
-		bool	ret=process::exec(command,args);
-		stderror.printf("Bad command %s\n",command);
-		process::exit(!ret);
-	} else if (pid==-1) {
+	pid_t	pid=process::spawn(command,args);
+	if (pid==-1) {
 		// error
-		stderror.printf("fork() returned %ld [%d]\n",
-					(long)pid,error::getErrorNumber());
+		stderror.printf("spawn() failed: %s\n",error::getErrorString());
 	}
-
 	return (pid>0)?pid:0;
 }
 
