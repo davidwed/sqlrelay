@@ -62,6 +62,7 @@ class sqlrlistener : public listener {
 		bool	fixup(filedescriptor *sock);
 		bool	deniedIp(filedescriptor *clientsock);
 		void	forkChild(filedescriptor *clientsock);
+		static void	clientSessionThread(void *attr);
 		void	clientSession(filedescriptor *clientsock);
 		void    errorClientSession(filedescriptor *clientsock,
 					int64_t errnum, const char *err);
@@ -166,10 +167,12 @@ class sqlrlistener : public listener {
 		uint32_t	runningconnections;
 
 		static	signalhandler		alarmhandler;
-		static	volatile sig_atomic_t		alarmrang;
+		static	volatile sig_atomic_t	alarmrang;
 
 		static	signalhandler		sigusr1handler;
-		static	volatile sig_atomic_t		gotsigusr1;
+		static	volatile sig_atomic_t	gotsigusr1;
+
+		bool	usethreads;
 };
 
 #endif

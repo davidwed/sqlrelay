@@ -16,6 +16,7 @@
 #include <rudiments/datetime.h>
 #include <rudiments/sys.h>
 #include <rudiments/stdio.h>
+#include <rudiments/thread.h>
 
 #ifndef MAXPATHLEN
 	#define MAXPATHLEN	256
@@ -68,6 +69,10 @@ sqlrlistener::sqlrlistener() : listener() {
 
 	isforkedchild=false;
 	handoffmode=HANDOFF_PASS;
+
+	// set this false for now
+	//usethreads=thread::supportsThreads();
+	usethreads=false;
 }
 
 sqlrlistener::~sqlrlistener() {
@@ -1030,6 +1035,12 @@ void sqlrlistener::errorClientSession(filedescriptor *clientsock,
 	delete clientsock;
 }
 
+struct clientsessionattr {
+	thread		*thr;
+	sqlrlistener	*lsnr;
+	filedescriptor	*clientsock;
+};
+
 void sqlrlistener::forkChild(filedescriptor *clientsock) {
 
 	// increment the number of "forked listeners"
@@ -1053,10 +1064,34 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		return;
 	}
 
+	// if threads are supported, fork a thread rather than a new process
+	if (usethreads) {
+
+		thread			*thr=new thread;
+		clientsessionattr	*csa=new clientsessionattr;
+		csa->thr=thr;
+		csa->lsnr=this;
+		csa->clientsock=clientsock;
+
+		thr->setFunction((void*(*)(void*))clientSessionThread,csa);
+		if (!thr->create()) {
+			decrementBusyListeners();
+			decrementForkedListeners();
+			errorClientSession(clientsock,
+				SQLR_ERROR_ERRORFORKINGLISTENER,
+				SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
+			logInternalError(
+				SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
+			delete csa;
+			delete thr;
+		}
+		return;
+	}
+
 	// if the client connected to one of the non-handoff
 	// sockets, fork a child to handle it
-	pid_t	childpid;
-	if (!(childpid=process::fork())) {
+	pid_t	childpid=process::fork();
+	if (!childpid) {
 
 		isforkedchild=true;
 
@@ -1098,6 +1133,16 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 				SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
 		logInternalError(SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
 	}
+}
+
+void sqlrlistener::clientSessionThread(void *attr) {
+	clientsessionattr	*csa=(clientsessionattr *)attr;
+	csa->thr->detach();
+	csa->lsnr->clientSession(csa->clientsock);
+	csa->lsnr->decrementBusyListeners();
+	csa->lsnr->decrementForkedListeners();
+	delete csa->thr;
+	delete csa;
 }
 
 void sqlrlistener::clientSession(filedescriptor *clientsock) {
@@ -1182,11 +1227,16 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock) {
 		// If we got this far, everything worked.
 		retval=true;
 		
-		// Set the file descriptor to -1, otherwise it will get closed
-		// when connectionsock is freed.  If the file descriptor gets
-		// closed, the next time we try to pass a file descriptor to
-		// the same connection, it will fail.
-		connectionsock.setFileDescriptor(-1);
+		// If we're not using threads, then
+		// this is a forked child process...
+		if (!usethreads) {
+			// Set the file descriptor to -1, otherwise it will get
+			// closed when connectionsock is freed.  If the file
+			// descriptor gets closed, the next time we try to pass
+			// a file descriptor to the same connection, it will
+			// fail.
+			connectionsock.setFileDescriptor(-1);
+		}
 		break;
 	}
 
