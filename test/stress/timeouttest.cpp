@@ -1,5 +1,4 @@
 #include <sqlrelay/sqlrclient.h>
-#include <stdio.h>
 
 int main() {
 

@@ -1,7 +1,7 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/randomnumber.h>
 #include <rudiments/datetime.h>
-#include <stdio.h>
+#include <rudiments/stdio.h>
 
 main() {
 
@@ -19,7 +19,7 @@ main() {
 
 	sqlrcur1.sendQuery("select * from user_tables");
 
-	printf("running second query\n");
+	stdoutput.printf("running second query\n");
 	sqlrcur2.sendQuery("select * from user_tables");
 
 	uint64_t	i=0;
@@ -28,11 +28,11 @@ main() {
 	while (cols2 && field) {
 		for (uint32_t j=0; j<cols2; j++) {
 			if ((field=sqlrcur2.getField(i,j))) {
-				printf("\"%s\"",field);
+				stdoutput.printf("\"%s\"",field);
 				if (j<cols2-1) {
-					printf(",");
+					stdoutput.printf(",");
 				} else {
-					printf("\n");
+					stdoutput.printf("\n");
 				}
 			}
 		}

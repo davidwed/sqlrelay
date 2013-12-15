@@ -1,6 +1,5 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/randomnumber.h>
-#include <stdio.h>
 
 int main(int argc, char **argv) {
 

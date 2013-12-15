@@ -1,9 +1,9 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/randomnumber.h>
 #include <rudiments/datetime.h>
-#include <stdio.h>
+#include <rudiments/stdio.h>
 
-main() {
+int main() {
 	//sqlrconnection	sqlrcon("localhost",9000,"","test","test",0,1);
 	//sqlrcursor	sqlrcur(&sqlrcon);
 
@@ -22,13 +22,14 @@ main() {
 		//int	count=randomnumber::scaleNumber(seed,1,50);
 		int	count=1;
 								
-		printf("looping %d times\n",count);
+		stdoutput.printf("looping %d times\n",count);
 		for (int i=0; i<count; i++) {
 			if (!sqlrcur.sendQuery("select * from user_tables")) {
-				printf("error: %s\n",sqlrcur.errorMessage());
+				stdoutput.printf("error: %s\n",
+						sqlrcur.errorMessage());
 			}
 		}
-		printf("%d\n",loop);
+		stdoutput.printf("%d\n",loop);
 		loop++;
 	}
 }

@@ -12,7 +12,7 @@ LIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: cursortest forktest query querytest random socketeater threadtest timeouttest
+all: cursortest forktest query random socketeater threadtest timeouttest
 
 cursortest: cursortest.cpp cursortest.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ cursortest.lo $(LIBS)
@@ -22,9 +22,6 @@ forktest: forktest.cpp forktest.lo
 
 query: query.cpp query.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ query.lo $(LIBS)
-
-querytest: querytest.cpp querytest.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ querytest.lo $(LIBS)
 
 random: random.cpp random.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ random.lo $(LIBS)
@@ -39,5 +36,5 @@ timeouttest: timeouttest.cpp timeouttest.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ timeouttest.lo $(LIBS)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.lo *.o cursortest forktest query querytest random socketeater threadtest timeouttest cachefile*
+	$(LIBTOOL) --mode=clean $(RM) *.lo *.o cursortest forktest query random socketeater threadtest timeouttest cachefile*
 	$(RMTREE) .libs

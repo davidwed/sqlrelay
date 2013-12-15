@@ -5,9 +5,9 @@
 #include <rudiments/randomnumber.h>
 #include <rudiments/datetime.h>
 #include <rudiments/snooze.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <rudiments/charstring.h>
+#include <rudiments/process.h>
+#include <rudiments/stdio.h>
 
 const char	*host;
 int		port;
@@ -28,25 +28,27 @@ void	runQuery(int seed) {
 		int	count=randomnumber::scaleNumber(seed,1,20);
 		//count=10;
 								
-		printf("%d: looping %d times\n",getpid(),count);
+		stdoutput.printf("%d: looping %d times\n",
+					process::getProcessId(),count);
 		int	successcount=0;
 		for (int i=0; i<count; i++) {
 			if (!sqlrcur.sendQuery(query)) {
-				printf("error: %s\n",sqlrcur.errorMessage());
+				stdoutput.printf("error: %s\n",
+						sqlrcur.errorMessage());
 				//exit(0);
 			} else {
 				successcount++;
 			}
 		}
-		printf("%d: succeeded\n",successcount);
+		stdoutput.printf("%d: succeeded\n",successcount);
 	}
 }
 
-main(int argc, char **argv) {
+int main(int argc, char **argv) {
 
 	if (argc<2) {
-		printf("usage: forktest query forkcount\n");
-		exit(1);
+		stdoutput.printf("usage: forktest \"query\" forkcount\n");
+		process::exit(1);
 	}
 
 	host="localhost";
@@ -55,14 +57,14 @@ main(int argc, char **argv) {
 	login="test";
 	password="test";
 	query=argv[1];
-	forkcount=atoi(argv[2]);
+	forkcount=charstring::toInteger(argv[2]);
 
 	for (int i=0; i<forkcount; i++) {
-		if (!fork()) {
+		if (!process::fork()) {
 			datetime	dt;
 			dt.getSystemDateAndTime();
 			runQuery(dt.getEpoch());
-			_exit(0);
+			process::exit(0);
 		}
 		//snooze::microsnooze(0,50000);
 		//process::waitForChildren();
