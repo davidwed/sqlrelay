@@ -54,7 +54,7 @@
 #define DEFAULT_AUTHTIER "connection"
 	// default tier to authenticate users on
 
-#define DEFAULT_SESSION_HANDLER "thread"
+#define DEFAULT_SESSION_HANDLER "process"
 	// default method to use for handing client sessions
 
 #define DEFAULT_HANDOFF "pass"
