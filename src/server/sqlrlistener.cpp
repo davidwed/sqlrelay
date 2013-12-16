@@ -193,9 +193,16 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 		sqlrlg->initLoggers(this,NULL);
 	}
 
-	setSessionHandlerMethod();
+	idleclienttimeout=cfgfl.getIdleClientTimeout();
+	maxquerysize=cfgfl.getMaxQuerySize();
+	maxbindcount=cfgfl.getMaxBindCount();
+	maxbindnamelength=cfgfl.getMaxBindNameLength();
+	maxlisteners=cfgfl.getMaxListeners();
+	listenertimeout=cfgfl.getListenerTimeout();
 
 	setHandoffMethod();
+
+	setSessionHandlerMethod();
 
 	setIpPermissions();
 
@@ -212,13 +219,6 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 	if (!listenOnFixupSocket(cmdl->getId())) {
 		return false;
 	}
-
-	idleclienttimeout=cfgfl.getIdleClientTimeout();
-	maxquerysize=cfgfl.getMaxQuerySize();
-	maxbindcount=cfgfl.getMaxBindCount();
-	maxbindnamelength=cfgfl.getMaxBindNameLength();
-	maxlisteners=cfgfl.getMaxListeners();
-	listenertimeout=cfgfl.getListenerTimeout();
 
 	process::detach();
 
@@ -350,18 +350,35 @@ void sqlrlistener::setSessionHandlerMethod() {
 	usethreads=false;
 	if (!charstring::compare(cfgfl.getSessionHandler(),"thread")) {
 
-		if (thread::supportsThreads()) {
-			usethreads=true;
-			return;
-		}
-
-		stderror.printf("Warning: sessionhandler=\"thread\" not "
-					"supported, falling back to "
+		if (!thread::supportsThreads()) {
+			stderror.printf("Warning: sessionhandler=\"thread\" "
+					"not supported, falling back to "
 					"sessionhandler=\"process\".  "
 					"Either threads are not supported on "
 					"this platform or Rudiments was "
 					"compiled without support for threads."
 					"\n");
+			return;
+		}
+
+		if (listenertimeout) {
+			stderror.printf("Warning: sessionhandler=\"thread\" is "
+					"currently unsupported when "
+					"listenertimeout is set to a non-zero "
+					"value.  Falling back to "
+					"sessionhandler=\"process\".\n");
+			return;
+		}
+
+		if (handoffmode==HANDOFF_PROXY) {
+			stderror.printf("Warning: sessionhandler=\"thread\" is "
+					"currently unsupported with "
+					"handoff=\"proxy\".  Falling back to "
+					"sessionhandler=\"process\".\n");
+			return;
+		}
+
+		usethreads=true;
 	}
 }
 
