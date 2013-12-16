@@ -549,7 +549,9 @@ void mysqlconnection::errorMessage(char *errorbuffer,
 		!charstring::compareIgnoringCase(errorstring,
 				"mysql server has gone away") ||
 		!charstring::compareIgnoringCase(errorstring,
-				"Can't connect to local MySQL",28) /*||
+				"Can't connect to local MySQL",28) ||
+		!charstring::compareIgnoringCase(errorstring,
+				"Can't connect to MySQL",22) /*||
 		!charstring::compareIgnoringCase(errorstring,
 			"Lost connection to MySQL server during query")*/);
 }
@@ -1042,7 +1044,9 @@ void mysqlcursor::errorMessage(char *errorbuffer,
 		!charstring::compareIgnoringCase(err,
 				"mysql server has gone away") ||
 		!charstring::compareIgnoringCase(err,
-				"Can't connect to local MySQL",28) /*||
+				"Can't connect to local MySQL",28) ||
+		!charstring::compareIgnoringCase(err,
+				"Can't connect to MySQL",22) /*||
 		!charstring::compareIgnoringCase(err,
 			"Lost connection to MySQL server during query")*/) {
 		*liveconnection=false;
