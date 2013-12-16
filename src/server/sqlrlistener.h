@@ -87,6 +87,10 @@ class sqlrlistener : public listener {
 		void	pingDatabase(uint32_t connectionpid,
 					const char *unixportstr,
 					uint16_t inetport);
+		static void	pingDatabaseThread(void *attr);
+		void	pingDatabaseInternal(uint32_t connectionpid,
+						const char *unixportstr,
+						uint16_t inetport);
 		void	waitForClientClose(bool passstatus,
 					filedescriptor *clientsock);
 

@@ -1507,26 +1507,66 @@ bool sqlrlistener::connectionIsUp(const char *connectionid) {
 	return retval;
 }
 
+struct pingdatabaseattr {
+	thread		*thr;
+	sqlrlistener	*lsnr;
+	uint32_t	connectionpid;
+	const char	*unixportstr;
+	uint16_t	inetport;
+};
+
 void sqlrlistener::pingDatabase(uint32_t connectionpid,
 					const char *unixportstr,
 					uint16_t inetport) {
 
-	// fork off and tell the connection to reconnect to the database
-	if (process::fork()) {
+	// if threads are supported, fork a thread
+	// to ping the database
+	if (usethreads) {
+
+		// set up the thread
+		thread			*thr=new thread;
+		pingdatabaseattr	*pda=new pingdatabaseattr;
+		pda->thr=thr;
+		pda->lsnr=this;
+		pda->connectionpid=connectionpid;
+		pda->unixportstr=unixportstr;
+		pda->inetport=inetport;
+		thr->setFunction((void*(*)(void*))pingDatabaseThread,pda);
+
+		// fork the thread
+		thr->create();
 		return;
 	}
 
-	isforkedchild=true;
+	// if threads are not supported, fork a child
+	// process to ping the database
+	pid_t	childpid=process::fork();
+	if (!childpid) {
+		isforkedchild=true;
+		pingDatabaseInternal(connectionpid,unixportstr,inetport);
+		cleanUp();
+		process::exit(0);
+	}
+}
 
+void sqlrlistener::pingDatabaseThread(void *attr) {
+	pingdatabaseattr	*pda=(pingdatabaseattr *)attr;
+	pda->thr->detach();
+	pda->lsnr->pingDatabaseInternal(pda->connectionpid,
+					pda->unixportstr,pda->inetport);
+	delete pda->thr;
+	delete pda;
+}
+
+void sqlrlistener::pingDatabaseInternal(uint32_t connectionpid,
+					const char *unixportstr,
+					uint16_t inetport) {
 	filedescriptor	connectionsock;
 	if (findMatchingSocket(connectionpid,&connectionsock)) {
 		connectionsock.write((uint16_t)HANDOFF_RECONNECT);
 		connectionsock.flushWriteBuffer(-1,-1);
 		snooze::macrosnooze(1);
 	}
-
-	cleanUp();
-	process::exit(0);
 }
 
 bool sqlrlistener::findMatchingSocket(uint32_t connectionpid,
