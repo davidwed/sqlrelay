@@ -15,7 +15,7 @@ const char	*password;
 const char	*query;
 int		threadcount;
 
-void	runQuery(void *id) {
+void runQuery(void *id) {
 
 	sqlrconnection	*con=new sqlrconnection(host,port,sock,
 						login,password,0,1);
