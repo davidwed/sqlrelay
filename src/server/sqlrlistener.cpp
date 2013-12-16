@@ -357,7 +357,11 @@ void sqlrlistener::setSessionHandlerMethod() {
 
 		stderror.printf("Warning: sessionhandler=\"thread\" not "
 					"supported, falling back to "
-					"sessionhandler=\"process\"\n");
+					"sessionhandler=\"process\".  "
+					"Either threads are not supported on "
+					"this platform or Rudiments was "
+					"compiled without support for threads."
+					"\n");
 	}
 }
 
@@ -378,7 +382,7 @@ void sqlrlistener::setHandoffMethod() {
 			handoffmode=HANDOFF_PROXY;
 			stderror.printf("Warning: handoff=\"pass\" not "
 					"supported, falling back to "
-					"handoff=\"proxy\"\n");
+					"handoff=\"proxy\".\n");
         	} else {
 			handoffmode=HANDOFF_PASS;
 		}
