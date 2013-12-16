@@ -70,7 +70,7 @@ sqlrlistener::sqlrlistener() : listener() {
 	isforkedchild=false;
 	handoffmode=HANDOFF_PASS;
 
-	usethreads=thread::supportsThreads();
+	usethreads=false;
 }
 
 sqlrlistener::~sqlrlistener() {
@@ -193,7 +193,9 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 		sqlrlg->initLoggers(this,NULL);
 	}
 
-	setHandoffMethod(cmdl->getId());
+	setSessionHandlerMethod();
+
+	setHandoffMethod();
 
 	setIpPermissions();
 
@@ -343,7 +345,23 @@ void sqlrlistener::handleDynamicScaling() {
 	dynamicscaling=cfgfl.getDynamicScaling();
 }
 
-void sqlrlistener::setHandoffMethod(const char *id) {
+void sqlrlistener::setSessionHandlerMethod() {
+	
+	usethreads=false;
+	if (!charstring::compare(cfgfl.getSessionHandler(),"thread")) {
+
+		if (thread::supportsThreads()) {
+			usethreads=true;
+			return;
+		}
+
+		stderror.printf("Warning: sessionhandler=\"thread\" not "
+					"supported, falling back to "
+					"sessionhandler=\"process\"\n");
+	}
+}
+
+void sqlrlistener::setHandoffMethod() {
 
 	if (!charstring::compare(cfgfl.getHandoff(),"pass")) {
 

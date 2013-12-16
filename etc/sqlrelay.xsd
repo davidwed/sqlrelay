@@ -65,6 +65,14 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
+      <xs:attribute name="sessionhandler" default="thread">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="thread"/>
+            <xs:enumeration value="process"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
       <xs:attribute name="handoff" default="pass">
         <xs:simpleType>
           <xs:restriction base="xs:token">

@@ -43,7 +43,8 @@ class sqlrlistener : public listener {
 		bool	verifyAccessToConfigFile(const char *configfile);
 		bool	handlePidFile(const char *id);
 		void	handleDynamicScaling();
-		void	setHandoffMethod(const char *id);
+		void	setSessionHandlerMethod();
+		void	setHandoffMethod();
 		void	setIpPermissions();
 		bool	createSharedMemoryAndSemaphores(const char *id);
 		void	ipcFileError(const char *idfilename);

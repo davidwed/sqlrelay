@@ -19,6 +19,7 @@
 	<!ATTLIST instance maxcursors CDATA "1300">
 	<!ATTLIST instance cursors_growby CDATA "5">
 	<!ATTLIST instance authtier (connection|database) "connecton">
+	<!ATTLIST instance sessionhandler (thread|process) "thread">
 	<!ATTLIST instance handoff (pass|proxy) "pass">
 	<!ATTLIST instance deniedips CDATA "">
 	<!ATTLIST instance allowedips CDATA "">

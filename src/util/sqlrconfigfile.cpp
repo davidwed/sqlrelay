@@ -36,6 +36,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	authtier=charstring::duplicate(DEFAULT_AUTHTIER);
 	authonconnection=charstring::compare(authtier,"database");
 	authondatabase=!charstring::compare(authtier,"database");
+	sessionhandler=charstring::duplicate(DEFAULT_SESSION_HANDLER);
 	handoff=charstring::duplicate(DEFAULT_HANDOFF);
 	allowedips=charstring::duplicate(DEFAULT_DENIEDIPS);
 	deniedips=charstring::duplicate(DEFAULT_DENIEDIPS);
@@ -96,6 +97,7 @@ sqlrconfigfile::~sqlrconfigfile() {
 	delete[] runasuser;
 	delete[] runasgroup;
 	delete[] authtier;
+	delete[] sessionhandler;
 	delete[] handoff;
 	delete[] allowedips;
 	delete[] deniedips;
@@ -220,6 +222,10 @@ uint16_t sqlrconfigfile::getCursorsGrowBy() {
 
 const char *sqlrconfigfile::getAuthTier() {
 	return authtier;
+}
+
+const char *sqlrconfigfile::getSessionHandler() {
+	return sessionhandler;
 }
 
 const char *sqlrconfigfile::getHandoff() {
@@ -870,6 +876,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		} else if (!charstring::compare(name,"authtier") ||
 				!charstring::compare(name,"authentication")) {
 			currentattribute=AUTHTIER_ATTRIBUTE;
+		} else if (!charstring::compare(name,"sessionhandler")) {
+			currentattribute=SESSION_HANDLER_ATTRIBUTE;
 		} else if (!charstring::compare(name,"handoff")) {
 			currentattribute=HANDOFF_ATTRIBUTE;
 		} else if (!charstring::compare(name,"deniedips")) {
@@ -1221,6 +1229,10 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 				!charstring::compare(authtier,"database");
 			authonconnection=
 				charstring::compare(authtier,"database");
+		} else if (currentattribute==SESSION_HANDLER_ATTRIBUTE) {
+			delete[] sessionhandler;
+			sessionhandler=charstring::duplicate((value)?value:
+						DEFAULT_SESSION_HANDLER);
 		} else if (currentattribute==HANDOFF_ATTRIBUTE) {
 			delete[] handoff;
 			handoff=charstring::duplicate((value)?value:

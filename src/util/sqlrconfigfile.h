@@ -37,6 +37,7 @@ typedef enum {
 	MAXCURSORS_ATTRIBUTE,
 	CURSORS_GROWBY_ATTRIBUTE,
 	AUTHTIER_ATTRIBUTE,
+	SESSION_HANDLER_ATTRIBUTE,
 	HANDOFF_ATTRIBUTE,
 	DENIEDIPS_ATTRIBUTE,
 	ALLOWEDIPS_ATTRIBUTE,
@@ -197,6 +198,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		const char	*getAuthTier();
 		bool		getAuthOnConnection();
 		bool		getAuthOnDatabase();
+		const char	*getSessionHandler();
 		const char	*getHandoff();
 		const char	*getAllowedIps();
 		const char	*getDeniedIps();
@@ -291,6 +293,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		uint16_t	maxcursors;
 		uint16_t	cursorsgrowby;
 		char		*authtier;
+		char		*sessionhandler;
 		char		*handoff;
 		bool		authonlistener;
 		bool		authonconnection;
