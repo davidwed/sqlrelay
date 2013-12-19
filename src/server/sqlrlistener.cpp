@@ -1015,7 +1015,7 @@ bool sqlrlistener::fixup(filedescriptor *sock) {
 	bool	retval=false;
 	for (uint32_t i=0; i<maxconnections; i++) {
 		if (handoffsocklist[i].pid==processid) {
-			retval=sock->passFileDescriptor(handoffsocklist[i].
+			retval=sock->passSocket(handoffsocklist[i].
 						sock->getFileDescriptor());
 			logDebugMessage("found socket for requested pid ");
 			if (retval) {
@@ -1254,7 +1254,7 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock) {
 		if (handoffmode==HANDOFF_PASS) {
 
 			// pass the file descriptor
-			if (!connectionsock.passFileDescriptor(
+			if (!connectionsock.passSocket(
 					sock->getFileDescriptor())) {
 				logInternalError("failed to pass "
 						"file descriptor");
@@ -1653,7 +1653,7 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 
 	// get the file descriptor of the socket
 	int32_t	fd;
-	if (!fixupclientsockun.receiveFileDescriptor(&fd)) {
+	if (!fixupclientsockun.receiveSocket(&fd)) {
 		logInternalError("fixup failed to receive socket");
 		return false;
 	}

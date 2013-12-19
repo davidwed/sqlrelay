@@ -1362,7 +1362,7 @@ int32_t sqlrcontroller_svr::waitForClient() {
 		} else if (command==HANDOFF_PASS) {
 
 			// Receive the client file descriptor and use it.
-			if (!handoffsockun.receiveFileDescriptor(&descriptor)) {
+			if (!handoffsockun.receiveSocket(&descriptor)) {
 				logInternalError(NULL,"failed to receive "
 						"client file descriptor");
 				logDebugMessage("done waiting for client");
