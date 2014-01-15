@@ -358,14 +358,17 @@ then
 else
 	AC_MSG_RESULT(no)
 fi
+])
+
 
 dnl check for x64 platform - important for sybase and db2 detection
+AC_DEFUN([FW_CHECK_X64],
+[
 ARCH=""
 if ( test "$host_cpu" = "ia64" -o "$host_cpu" = "x86_64" -o "$host_cpu" = "amd64" )
 then
 	ARCH="x64"
 fi
-		
 ])
 
 

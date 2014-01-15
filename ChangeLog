@@ -38,6 +38,8 @@
 	added support for a multi-threaded listener
 	fixed a bug that could cause a crash when logging connection-level
 		errors
+	added back x64-detection so sybase and db2 libraries will be detected
+		properly
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted
