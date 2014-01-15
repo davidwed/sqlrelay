@@ -36,6 +36,8 @@
 		process::fork()/process::exec()
 	added another error string to detect down mysql database
 	added support for a multi-threaded listener
+	fixed a bug that could cause a crash when logging connection-level
+		errors
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted
