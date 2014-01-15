@@ -40,6 +40,7 @@
 		errors
 	added back x64-detection so sybase and db2 libraries will be detected
 		properly
+	added support for forward-only cursors to the PDO driver
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted
