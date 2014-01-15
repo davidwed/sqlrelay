@@ -1256,10 +1256,11 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock) {
 			// pass the file descriptor
 			if (!connectionsock.passSocket(
 					sock->getFileDescriptor())) {
+
+				// this could fail if a connection died because
+				// it's ttl ran out
 				logInternalError("failed to pass "
 						"file descriptor");
-				// FIXME: should there be a limit to the number
-				// of times we retry?
 				continue;
 			}
 
@@ -1267,8 +1268,9 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock) {
 
 			// proxy the client
 			if (!proxyClient(connectionpid,&connectionsock,sock)) {
-				// FIXME: should there be a limit to the number
-				// of times we retry?
+
+				// this could fail if a connection died because
+				// it's ttl ran out
 				continue;
 			}
 		}
@@ -1299,7 +1301,7 @@ bool sqlrlistener::acquireShmAccess() {
 	}
 
 	// Loop, waiting.  Retry the wait if it was interrupted by a signal,
-	// other than an alarm, but if an alarm interrupted it then bail.
+	// other than an alarm, but bail if an alarm interrupted it.
 	bool	result=true;
 	semset->dontRetryInterruptedOperations();
 	do {

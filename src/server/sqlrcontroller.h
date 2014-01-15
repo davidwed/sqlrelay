@@ -15,6 +15,7 @@
 #include <rudiments/regularexpression.h>
 #include <rudiments/sharedmemory.h>
 #include <rudiments/semaphoreset.h>
+#include <rudiments/signalclasses.h>
 
 #include <tempdir.h>
 
@@ -82,7 +83,7 @@ class sqlrcontroller_svr : public listener {
 		void	incrementConnectionCount();
 		void	decrementConnectionCount();
 		void	decrementConnectedClientCount();
-		void	announceAvailability(const char *unixsocket,
+		bool	announceAvailability(const char *unixsocket,
 						uint16_t inetport,
 						const char *connectionid);
 		void	registerForHandoff();
@@ -94,10 +95,10 @@ class sqlrcontroller_svr : public listener {
 		bool	unLockSequenceFile(file *sockseq);
 
 
-		void		acquireAnnounceMutex();
+		bool		acquireAnnounceMutex();
 		shmdata		*getAnnounceBuffer();
 		void		signalListenerToRead();
-		void		waitForListenerToFinishReading();
+		bool		waitForListenerToFinishReading();
 		void		releaseAnnounceMutex();
 		void		acquireConnectionCountMutex();
 		void		signalScalerToRead();
@@ -266,6 +267,8 @@ class sqlrcontroller_svr : public listener {
 		void	logInternalError(sqlrcursor_svr *cursor,
 							const char *info);
 
+		static void	alarmHandler(int32_t signum);
+
 		const char	*user;
 		const char	*password;
 
@@ -392,6 +395,9 @@ class sqlrcontroller_svr : public listener {
 		bool		reformatdatetimes;
 		char		*reformattedfield;
 		uint32_t	reformattedfieldlength;
+
+		static	signalhandler		alarmhandler;
+		static	volatile sig_atomic_t	alarmrang;
 };
 
 #endif

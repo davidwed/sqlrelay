@@ -13,7 +13,6 @@
 #include <rudiments/permissions.h>
 #include <rudiments/snooze.h>
 #include <rudiments/error.h>
-#include <rudiments/signalclasses.h>
 #include <rudiments/datetime.h>
 #include <rudiments/character.h>
 #include <rudiments/charstring.h>
@@ -29,6 +28,9 @@
 		#include "sqlrconnectiondeclarations.cpp"
 	}
 #endif
+
+signalhandler		sqlrcontroller_svr::alarmhandler;
+volatile sig_atomic_t	sqlrcontroller_svr::alarmrang=0;
 
 sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 
@@ -382,6 +384,10 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 		sqlrp[i]=NULL;
 	}
 	sqlrp[SQLRPROTOCOL_SQLRCLIENT]=new sqlrclientprotocol(this,conn,cfgfl);
+
+	// set a handler for SIGALRMs
+	alarmhandler.setHandler(alarmHandler);
+	alarmhandler.handleSignal(SIGALRM);
 	
 	return true;
 }
@@ -987,7 +993,9 @@ bool sqlrcontroller_svr::listen() {
 
 		waitForAvailableDatabase();
 		initSession();
-		announceAvailability(unixsocket,inetport,connectionid);
+		if (!announceAvailability(unixsocket,inetport,connectionid)) {
+			return true;
+		}
 
 		// loop to handle suspended sessions
 		bool	loopback=false;
@@ -1028,17 +1036,16 @@ bool sqlrcontroller_svr::listen() {
 				clientconnectfailed=true;
 				break;
 
-			} else {
+			} else if (success==0) {
 
-				// if waitForClient() times out waiting for
-				// someone to pick up the suspended
-				// session, roll it back and kill it
-				if (suspendedsession) {
-					if (conn->isTransactional()) {
-						rollback();
-					}
-					suspendedsession=false;
+				// if waitForClient() times out or otherwise
+				// fails to wait for someone to pick up the
+				// suspended session then roll back and break
+				if (conn->isTransactional()) {
+					rollback();
 				}
+				suspendedsession=false;
+				break;
 			}
 		}
 
@@ -1157,7 +1164,7 @@ void sqlrcontroller_svr::initSession() {
 	logDebugMessage("done initializing session...");
 }
 
-void sqlrcontroller_svr::announceAvailability(const char *unixsocket,
+bool sqlrcontroller_svr::announceAvailability(const char *unixsocket,
 						unsigned short inetport,
 						const char *connectionid) {
 
@@ -1169,57 +1176,48 @@ void sqlrcontroller_svr::announceAvailability(const char *unixsocket,
 		registerForHandoff();
 	}
 
-	// handle time-to-live
+	// get a pointer to the shared memory segment
+	shmdata	*idmemoryptr=getAnnounceBuffer();
+
+	// set time-to-live alarm
 	if (ttl>0) {
+		alarmrang=0;
 		signalmanager::alarm(ttl);
 	}
 
-	acquireAnnounceMutex();
-
-	// cancel time-to-live alarm
-	//
-	// It's important to cancel the alarm here.
-	//
-	// Connections which successfully announce themselves to the listener
-	// cannot then die off.
-	//
-	// If handoff=pass, the listener can handle it if a connection dies off,
-	// but not if handoff=reconnect, there's no way for it to know the
-	// connection is gone.
-	//
-	// But, if the connection signals the listener to read the registration
-	// and dies off before it receives a return signal from the listener
-	// indicating that the listener has read it, then it can cause
-	// problems.  And we can't simply call waitWithUndo() and
-	// signalWithUndo().  Not only could the undo counter could overflow,
-	// but we really only want to undo the signal() if the connection shuts
-	// down before doing the wait() and there's no way to optionally
-	// undo a semaphore.
-	//
-	// What a mess.
-	if (ttl>0) {
-		signalmanager::alarm(0);
+	// This will fail if the ttl was reached while waiting.
+	// Since we failed to acquire the announce mutex, we don't need to
+	// release it.
+	if (!acquireAnnounceMutex()) {
+		logDebugMessage("ttl reached, aborting announcing availabilty");
+		return false;
 	}
 
 	updateState(ANNOUNCE_AVAILABILITY);
 
-	// get a pointer to the shared memory segment
-	shmdata	*idmemoryptr=getAnnounceBuffer();
-
-	// first, write the connectionid into the segment
+	// write the connectionid and pid into the segment
 	charstring::copy(idmemoryptr->connectionid,
 				connectionid,MAXCONNECTIONIDLEN);
-
-	// write the pid into the segment
 	idmemoryptr->connectioninfo.connectionpid=process::getProcessId();
 
 	signalListenerToRead();
 
-	waitForListenerToFinishReading();
+	// This will fail if the ttl was reached while waiting.
+	// Since we acquired the announce mutex earlier though,
+	// we need to release it in either case.
+	bool	retval=waitForListenerToFinishReading();
+
+	// turn off the alarm
+	signalmanager::alarm(0);
 
 	releaseAnnounceMutex();
 
-	logDebugMessage("done announcing availability...");
+	if (retval) {
+		logDebugMessage("done announcing availability...");
+	} else {
+		logDebugMessage("ttl reached, aborting announcing availabilty");
+	}
+	return retval;
 }
 
 void sqlrcontroller_svr::registerForHandoff() {
@@ -1310,10 +1308,6 @@ int32_t sqlrcontroller_svr::waitForClient() {
 
 	// reset proxy mode flag
 	proxymode=false;
-
-	// FIXME: listen() checks for 2,1,0 or -1 from this method, but this
-	// method only returns 2, 1 or -1.  0 should indicate that a suspended
-	// session timed out.
 
 	if (!suspendedsession) {
 
@@ -1423,8 +1417,7 @@ int32_t sqlrcontroller_svr::waitForClient() {
 
 		if (waitForNonBlockingRead(accepttimeout,0)<1) {
 			logInternalError(NULL,"wait for client connect failed");
-			// FIXME: I think this should return 0
-			return -1;
+			return 0;
 		}
 
 		// get the first socket that had data available...
@@ -1450,8 +1443,7 @@ int32_t sqlrcontroller_svr::waitForClient() {
 		logDebugMessage("done waiting for client");
 
 		if (!fd) {
-			// FIXME: I think this should return 0
-			return -1;
+			return 0;
 		}
 	}
 
@@ -3313,11 +3305,34 @@ void sqlrcontroller_svr::decrementConnectedClientCount() {
 	logDebugMessage("done decrementing session count");
 }
 
-void sqlrcontroller_svr::acquireAnnounceMutex() {
+bool sqlrcontroller_svr::acquireAnnounceMutex() {
+
 	logDebugMessage("acquiring announce mutex");
+
 	updateState(WAIT_SEMAPHORE);
-	semset->waitWithUndo(0);
+
+	// FIXME: It's possible that the alarm could ring prior to the wait
+	// below and not interrupt it.  If that happens, the ttl would be
+	// ignored.
+
+	// Loop, waiting.  Retry the wait if it was interrupted by a signal
+	// other than an alarm, but bail if an alarm interrupted it.
+	semset->dontRetryInterruptedOperations();
+	bool	result=true;
+	do {
+		result=semset->waitWithUndo(0);
+	} while (!result && error::getErrorNumber()==EINTR && alarmrang!=1);
+	semset->retryInterruptedOperations();
+
+	// handle alarm...
+	if (alarmrang) {
+		logDebugMessage("ttl reached, aborting "
+				"acquiring announce mutex");
+		return false;
+	}
+
 	logDebugMessage("done acquiring announce mutex");
+	return true;
 }
 
 void sqlrcontroller_svr::releaseAnnounceMutex() {
@@ -3332,9 +3347,23 @@ void sqlrcontroller_svr::signalListenerToRead() {
 	logDebugMessage("done signalling listener to read");
 }
 
-void sqlrcontroller_svr::waitForListenerToFinishReading() {
+bool sqlrcontroller_svr::waitForListenerToFinishReading() {
+
 	logDebugMessage("waiting for listener");
-	semset->wait(3);
+
+	// FIXME: It's possible that the alarm could ring prior to the wait
+	// below and not interrupt it.  If that happens, the ttl would be
+	// ignored.
+
+	// Loop, waiting.  Retry the wait if it was interrupted by a signal
+	// other than an alarm, but bail if an alarm interrupted it.
+	semset->dontRetryInterruptedOperations();
+	bool	result=true;
+	do {
+		result=semset->wait(3);
+	} while (!result && error::getErrorNumber()==EINTR && alarmrang!=1);
+	semset->retryInterruptedOperations();
+
 	// Reset this semaphore to 0.
 	// It can get left incremented if another sqlr-connection is killed
 	// between calls to signalListenerToRead() and this method.
@@ -3342,7 +3371,15 @@ void sqlrcontroller_svr::waitForListenerToFinishReading() {
 	// access to this semaphore at this time because of the lock on
 	// AnnounceMutex (semaphore 0).
 	semset->setValue(3,0);
+
+	// handle alarm...
+	if (alarmrang) {
+		logDebugMessage("ttl reached, aborting waiting for listener");
+		return false;
+	}
+
 	logDebugMessage("done waiting for listener");
+	return true;
 }
 
 void sqlrcontroller_svr::acquireConnectionCountMutex() {
@@ -4063,4 +4100,8 @@ void sqlrcontroller_svr::logInternalError(sqlrcursor_svr *cursor,
 			SQLRLOGGER_LOGLEVEL_ERROR,
 			SQLRLOGGER_EVENTTYPE_INTERNAL_ERROR,
 			errorbuffer.getString());
+}
+
+void sqlrcontroller_svr::alarmHandler(int32_t signum) {
+	alarmrang=1;
 }
