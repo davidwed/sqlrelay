@@ -34,6 +34,7 @@ struct sqlrstatement {
 	long		longfield;
 	stringbuffer	subvarquery;
 	linkedlist< char * >	subvarstrings;
+	bool		fwdonly;
 };
 
 struct sqlrdbhandle {
@@ -122,23 +123,38 @@ static int sqlrcursorFetch(pdo_stmt_t *stmt,
 				enum pdo_fetch_orientation ori,
 				long offset TSRMLS_DC) {
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+
 	switch (ori) {
 		case PDO_FETCH_ORI_NEXT:
 			sqlrstmt->currentrow++;
 			break;
 		case PDO_FETCH_ORI_PRIOR:
+			if (sqlrstmt->fwdonly) {
+				return 0;
+			}
 			sqlrstmt->currentrow--;
 			break;
 		case PDO_FETCH_ORI_FIRST:
+			if (sqlrstmt->fwdonly &&
+				sqlrstmt->currentrow!=-1) {
+				return 0;
+			}
 			sqlrstmt->currentrow=0;
 			break;
 		case PDO_FETCH_ORI_LAST:
 			sqlrstmt->currentrow=sqlrstmt->rows-1;
 			break;
 		case PDO_FETCH_ORI_ABS:
+			if (sqlrstmt->fwdonly &&
+				offset<=sqlrstmt->currentrow) {
+				return 0;
+			}
 			sqlrstmt->currentrow=offset;
 			break;
 		case PDO_FETCH_ORI_REL:
+			if (sqlrstmt->fwdonly && offset<1) {
+				return 0;
+			}
 			sqlrstmt->currentrow+=offset;
 			break;
 	}
@@ -620,6 +636,10 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 		sql=sqlrstmt->subvarquery.getString();
 		sqllen=sqlrstmt->subvarquery.getStringLength();
 	}
+
+	sqlrstmt->fwdonly=pdo_attr_lval(driveroptions,
+					PDO_ATTR_CURSOR,
+					PDO_CURSOR_SCROLL)==PDO_CURSOR_FWDONLY;
 	
 	sqlrstmt->sqlrcur->prepareQuery(sql,sqllen);
 	return 1;
