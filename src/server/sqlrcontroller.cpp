@@ -4034,7 +4034,7 @@ void sqlrcontroller_svr::logDbError(sqlrcursor_svr *cursor, const char *info) {
 	sqlrlg->runLoggers(NULL,conn,cursor,
 			SQLRLOGGER_LOGLEVEL_ERROR,
 			SQLRLOGGER_EVENTTYPE_DB_ERROR,
-			cursor->error);
+			info);
 }
 
 void sqlrcontroller_svr::logQuery(sqlrcursor_svr *cursor) {
