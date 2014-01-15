@@ -358,6 +358,14 @@ then
 else
 	AC_MSG_RESULT(no)
 fi
+
+echo "host_cpu=$host_cpu"
+if ( test "$host_cpu" = "ia64" -o "$host_cpu" = "x86_64" -o "$host_cpu" = "amd64" )
+then
+	ARCH="x64"
+fi
+		
+esac
 ])
 
 

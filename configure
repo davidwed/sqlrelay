@@ -15745,6 +15745,14 @@ else
 $as_echo "no" >&6; }
 fi
 
+echo "host_cpu=$host_cpu"
+if ( test "$host_cpu" = "ia64" -o "$host_cpu" = "x86_64" -o "$host_cpu" = "amd64" )
+then
+	ARCH="x64"
+fi
+
+esac
+
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for microsoft platform" >&5
 $as_echo_n "checking for microsoft platform... " >&6; }
