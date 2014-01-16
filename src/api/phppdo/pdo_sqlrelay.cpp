@@ -29,7 +29,6 @@ extern "C" {
 
 struct sqlrstatement {
 	sqlrcursor	*sqlrcur;
-	int64_t		rows;
 	int64_t		currentrow;
 	long		longfield;
 	stringbuffer	subvarquery;
@@ -41,6 +40,10 @@ struct sqlrdbhandle {
 	sqlrconnection	*sqlrcon;
 	bool		translatebindsonserver;
 	bool		usesubvars;
+};
+
+enum {
+	PDO_SQLRELAY_ATTR_RESULTSETBUFFERSIZE=PDO_ATTR_DRIVER_SPECIFIC
 };
 
 int _sqlrelayError(pdo_dbh_t *dbh,
@@ -114,7 +117,6 @@ static int sqlrcursorExecute(pdo_stmt_t *stmt TSRMLS_DC) {
 	}
 	sqlrstmt->currentrow=-1;
 	stmt->column_count=sqlrcur->colCount();
-	sqlrstmt->rows=sqlrcur->rowCount();
 	stmt->row_count=sqlrcur->affectedRows();
 	return 1;
 }
@@ -122,7 +124,10 @@ static int sqlrcursorExecute(pdo_stmt_t *stmt TSRMLS_DC) {
 static int sqlrcursorFetch(pdo_stmt_t *stmt,
 				enum pdo_fetch_orientation ori,
 				long offset TSRMLS_DC) {
+
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
+	uint64_t	rsbs=sqlrcur->getResultSetBufferSize();
 
 	switch (ori) {
 		case PDO_FETCH_ORI_NEXT:
@@ -142,7 +147,18 @@ static int sqlrcursorFetch(pdo_stmt_t *stmt,
 			sqlrstmt->currentrow=0;
 			break;
 		case PDO_FETCH_ORI_LAST:
-			sqlrstmt->currentrow=sqlrstmt->rows-1;
+			// If we're using a result set buffer size, then get
+			// fields until we've fetched the end of result set so
+			// rowCount() will be accurate when called below.
+			if (rsbs) {
+				uint64_t	count=sqlrcur->rowCount()/rsbs;
+				while (!sqlrcur->endOfResultSet()) {
+					sqlrcur->getField(count*rsbs+1,
+								(uint32_t)0);
+					count++;
+				}
+			}
+			sqlrstmt->currentrow=sqlrcur->rowCount()-1;
 			break;
 		case PDO_FETCH_ORI_ABS:
 			if (sqlrstmt->fwdonly &&
@@ -158,10 +174,21 @@ static int sqlrcursorFetch(pdo_stmt_t *stmt,
 			sqlrstmt->currentrow+=offset;
 			break;
 	}
+
 	if (sqlrstmt->currentrow<-1) {
 		sqlrstmt->currentrow=-1;
 	}
-	return (sqlrstmt->currentrow>-1 && sqlrstmt->currentrow<sqlrstmt->rows);
+
+	// If we're using a result set buffer size then get the field here
+	// so the row will actually be fetched and rowCount() will be accurate
+	// when called below.
+	if (rsbs && sqlrstmt->currentrow>-1) {
+		sqlrcur->getField(sqlrstmt->currentrow,(uint32_t)0);
+	}
+
+	return (sqlrstmt->currentrow>-1 &&
+		(uint64_t)sqlrstmt->currentrow>=sqlrcur->firstRowIndex() &&
+		(uint64_t)sqlrstmt->currentrow<sqlrcur->rowCount());
 }
 
 static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
@@ -456,16 +483,33 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 
 static int sqlrcursorSetAttribute(pdo_stmt_t *stmt,
 					long attr, zval *val TSRMLS_DC) {
-	// not supported but might be supported in the
-	// future so we'll let it fail silently for now
-	return 0;
+
+	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
+
+	switch (attr) {
+		case PDO_SQLRELAY_ATTR_RESULTSETBUFFERSIZE:
+			convert_to_long(val);
+			sqlrcur->setResultSetBufferSize(Z_LVAL_P(val));
+			return 1;
+		default:
+			return 0;
+	}
 }
 
 static int sqlrcursorGetAttribute(pdo_stmt_t *stmt,
 					long attr, zval *retval TSRMLS_DC) {
-	// not supported but might be supported in the
-	// future so we'll let it fail silently for now
-	return 0;
+
+	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
+
+	switch (attr) {
+		case PDO_SQLRELAY_ATTR_RESULTSETBUFFERSIZE:
+			ZVAL_LONG(retval,sqlrcur->getResultSetBufferSize());
+			return 1;
+		default:
+			return 0;
+	}
 }
 
 static int sqlrcursorColumnMetadata(pdo_stmt_t *stmt,
@@ -603,7 +647,6 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 	sqlrstmt->sqlrcur=new sqlrcursor(
 				(sqlrconnection *)sqlrdbh->sqlrcon,true);
 
-	sqlrstmt->rows=0;
 	sqlrstmt->currentrow=-1;
 	stmt->methods=&sqlrcursorMethods;
 	stmt->driver_data=(void *)sqlrstmt;
@@ -946,6 +989,10 @@ static pdo_driver_t sqlrelayDriver={
 };
 
 static PHP_MINIT_FUNCTION(pdo_sqlrelay) {
+
+	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_RESULTSETBUFFERSIZE",
+				(long)PDO_SQLRELAY_ATTR_RESULTSETBUFFERSIZE);
+
 	return php_pdo_register_driver(&sqlrelayDriver);
 }
 
