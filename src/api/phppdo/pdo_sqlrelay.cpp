@@ -821,7 +821,7 @@ static int sqlrconnectionError(pdo_dbh_t *dbh,
 					zval *info TSRMLS_DC) {
 
 	// FIXME: the first index in the info array should be the sqlstate
-	// currently we're leaving it at 00000 but it really ought to be
+	// currently we're leaving it at HY000 but it really ought to be
 	// set to some value.  DB2 and ODBC support this, others might too.
 	if (stmt) {
 		sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
