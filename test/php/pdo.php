@@ -323,6 +323,31 @@ dl("pdo_sqlrelay.so");
 	checkSuccess($result[0],"7");
 	echo("\n");
 
+	echo("DRIVER SPECIFIC ATTRS: \n");
+	$stmt=$dbh->prepare("select * from testtable order by testnumber");
+	checkSuccess($stmt->setAttribute(
+				PDO::SQLRELAY_ATTR_RESULTSETBUFFERSIZE,2),1);
+	checkSuccess($stmt->getAttribute(
+				PDO::SQLRELAY_ATTR_RESULTSETBUFFERSIZE),2);
+	checkSuccess($stmt->execute(),true);
+	$result=$stmt->fetch(PDO::FETCH_NUM);
+	checkSuccess($result[0],"1");
+	$result=$stmt->fetch(PDO::FETCH_NUM);
+	checkSuccess($result[0],"2");
+	$result=$stmt->fetch(PDO::FETCH_NUM);
+	checkSuccess($result[0],"3");
+	$result=$stmt->fetch(PDO::FETCH_NUM,PDO::FETCH_ORI_LAST);
+	checkSuccess($result[0],"7");
+	$result=$stmt->fetch(PDO::FETCH_NUM,PDO::FETCH_ORI_FIRST);
+	checkSuccess($result,false);
+	$result=$stmt->fetch(PDO::FETCH_NUM,PDO::FETCH_ORI_ABS,0);
+	checkSuccess($result,false);
+	$result=$stmt->fetch(PDO::FETCH_NUM,PDO::FETCH_ORI_ABS,6);
+	checkSuccess($result[0],"7");
+	$result=$stmt->fetch(PDO::FETCH_NUM,PDO::FETCH_ORI_ABS,5);
+	checkSuccess($result,false);
+	echo("\n");
+
 	echo("BOUND COLUMNS: \n");
 	$stmt=$dbh->prepare("select * from testtable order by testnumber");
 	$col1=0;

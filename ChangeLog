@@ -43,6 +43,7 @@
 	added support for forward-only cursors to the PDO driver
 	fixed a bug that could cause one (and only one) dynamically spawned
 		connection daemon to ignore its ttl
+	added support for get/set result set buffer size to the PDO driver
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted

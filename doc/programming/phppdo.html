@@ -17,6 +17,7 @@
 <li><a href="#bindvars">Bind Variables</a></li>
 <li><a href="#rebinding">Re-Binding and Re-Executing</a></li>
 <li><a href="#fields">Accessing Fields in the Result Set</a></li>
+<li><a href="#largeresultsets">Dealing With Large Result Sets</a></li>
 <li><a href="#statements">Statements</a></li>
 <li><a href="#columns">Getting Column Information</a></li>
 <li><a href="#storedprocedures">Stored Procedures</a></li>
@@ -466,6 +467,39 @@ echo($result[0]."\n");
 echo($result[1]."\n");
 echo($result[2]."\n");
 ... and so on ...
+</pre>
+</blockquote>
+
+<a name="largeresultsets"></a>
+<span class="heading2">Dealing With Large Result Sets</span><br><br>
+
+<p>SQL Relay normally buffers the entire result set.  This can speed things up 
+at the cost of memory.  With large enough result sets, it makes sense to buffer the result set in chunks instead of all at once.</p>
+
+<p>Use the statement attribute PDO::SQLRELAY_ATTR_RESULTSETBUFFERSIZE to set the
+number of rows to buffer at a time.  Calls to fetch() cause the chunk containing
+the requested field to be fetched.  Rows in that chunk are accessible but rows
+before it are not.</p>
+
+<p>For example, if you set the result set buffer size to 5 and execute a query
+that returns 20 rows, rows 0-4 are available at once, then rows 5-9, then 10-14,
+then 15-19.  When rows 5-9 are available, fetching row 0 will return false and
+fetching row 11 will cause rows 10-14 to be fetched and return the requested
+row.</p>
+
+<p>The following code sets the result set buffer size to 5.</p>
+
+<blockquote>
+<pre>
+$stmt->setAttribute(PDO::SQLRELAY_ATTR_RESULTSETBUFFERSIZE,5);
+</pre>
+</blockquote>
+
+<p>The following code retrieves the result set buffer size.</p>
+
+<blockquote>
+<pre>
+$rsbs=$stmt->getAttribute(PDO::SQLRELAY_ATTR_RESULTSETBUFFERSIZE);
 </pre>
 </blockquote>
 
