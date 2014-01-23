@@ -2687,6 +2687,7 @@ then
 
 		fi
 
+echo "includes: $PYTHONINCLUDES   dir: $PYTHONDIR"
 		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 		then
 			AC_MSG_CHECKING(for Python.h)

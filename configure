@@ -31737,6 +31737,7 @@ then
 
 		fi
 
+echo "includes: $PYTHONINCLUDES   dir: $PYTHONDIR"
 		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 		then
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Python.h" >&5
