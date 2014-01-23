@@ -408,6 +408,3 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
-
-/* Define to `int' if <sys/types.h> does not define. */
-#undef mode_t
