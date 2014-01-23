@@ -45,7 +45,6 @@ Buildroot: %{_tmppath}/%{name}-root
 	%define docdir %{_docdir}/%{name}
 	%define exampledir %{_datadir}/examples/%{name}
 %else
-	%define phpdevel %(echo "php-devel")
 	%define rubydevel %(echo "ruby-devel")
 	# fedora core >= 4 uses tcl-devel, other distros use tcl
 	%if %([[ "%{fedoraversion}" -ge "4" ]] && echo 1 || echo 0)
@@ -65,7 +64,6 @@ BuildRequires: rudiments-devel >= 0.34
 %{!?_without_odbc:BuildRequires: ,unixODBC-devel}
 %{!?_without_postgresql:BuildRequires: ,postgresql-devel}
 %{!?_without_perl:BuildRequires: ,perl}
-%{!?_without_php:BuildRequires: ,%{phpdevel}}
 %{!?_without_python:BuildRequires: ,python-devel}
 %{!?_without_ruby:BuildRequires: ,%{rubydevel}}
 %{!?_without_tcl:BuildRequires: ,%{tcldevel}}
