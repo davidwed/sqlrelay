@@ -37,7 +37,6 @@ Buildroot: %{_tmppath}/%{name}-root
 %define fedoraversion %(for word in `cat /etc/redhat-release 2> /dev/null`; do VAR=`echo $word | grep -x "[0-9]*"`; if ( test -n "$VAR" ); then echo $VAR; fi ; done)
 
 %if %([[ %{_vendor} == "suse" ]] && echo 1 || echo 0)
-	%define phpdevel %(echo "mod_php4-devel")
 	%define rubydevel %(echo "ruby")
 	%define tcldevel %(echo "tcl-devel")
 	%define initscript1 /etc/init.d/sqlrelay
