@@ -2542,7 +2542,7 @@ then
 			XSUBPP=$PERL_LIB/ExtUtils/xsubpp
 			if ( test ! -r "$XSUBPP" )
 			then
-				XSUBPP="`dirname $PERL`/xsubpp"
+				XSUBPP="$PERLPREFIX/bin/xsubpp"
 			fi
 			if ( test -n "`pod2man --help 2>&1 | grep Usage`" )
 			then
@@ -2563,6 +2563,7 @@ then
 	AC_SUBST(PERL)
 	AC_SUBST(PERLLIB)
 	AC_SUBST(PERLPREFIX)
+	AC_SUBST(XSUBPP)
 	AC_SUBST(POD2MAN)
 fi
 ])

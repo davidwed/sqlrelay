@@ -670,6 +670,7 @@ PYTHONDIR
 PYTHONINCLUDES
 HAVE_PYTHON
 POD2MAN
+XSUBPP
 PERLPREFIX
 PERLLIB
 HAVE_PERL
@@ -31645,7 +31646,7 @@ fi
 			XSUBPP=$PERL_LIB/ExtUtils/xsubpp
 			if ( test ! -r "$XSUBPP" )
 			then
-				XSUBPP="`dirname $PERL`/xsubpp"
+				XSUBPP="$PERLPREFIX/bin/xsubpp"
 			fi
 			if ( test -n "`pod2man --help 2>&1 | grep Usage`" )
 			then
@@ -31663,6 +31664,7 @@ $as_echo "$as_me: WARNING: xsubpp not found" >&2;}
 $as_echo "$as_me: WARNING: The Perl API will not be built." >&2;}
 		fi
 	fi
+
 
 
 
