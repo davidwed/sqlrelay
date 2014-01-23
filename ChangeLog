@@ -46,6 +46,7 @@
 	added support for get/set result set buffer size to the PDO driver
 	updated configure test for xsubpp
 	updated configure test for tcl to support multi-arch
+	updated configure test for python to support multi-arch
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted

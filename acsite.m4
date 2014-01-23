@@ -2644,7 +2644,7 @@ then
 				do
 
 					PYTHONDIR=""
-					for k in "config" "config-$j" "config-${j}mu" "config-${j}m" "config-${j}u"
+					for k in "config" "config-$MULTIARCHDIR" "config-$j" "config-${j}mu" "config-${j}m" "config-${j}u"
 					do
 
 						if ( test -d "$i/$k" )
@@ -2687,7 +2687,6 @@ then
 
 		fi
 
-echo "includes: $PYTHONINCLUDES   dir: $PYTHONDIR"
 		if ( test -n "$PYTHONINCLUDES" -a -n "$PYTHONDIR" )
 		then
 			AC_MSG_CHECKING(for Python.h)
