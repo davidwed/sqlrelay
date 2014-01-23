@@ -41,7 +41,7 @@ Buildroot: %{_tmppath}/%{name}-root
 	%define tcldevel %(echo "tcl-devel")
 	%define initscript1 /etc/init.d/sqlrelay
 	%define initscript2 /etc/init.d/sqlrcachemanager
-	%define inittab /etc/sqlrelay
+	%define inittab /etc/sysconfig/sqlrelay
 	%define docdir %{_docdir}/%{name}
 	%define exampledir %{_datadir}/examples/%{name}
 %else
