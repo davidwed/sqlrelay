@@ -32210,7 +32210,7 @@ then
 
 				for i in "/sw/include" "/opt/csw/include" "/usr/sfw/include" "/opt/sfw/include" "/usr/pkg/include" "/usr/local/include" "$prefix/include" "/usr/include" "$TCLINCLUDEPATH"
 		do
-			for j in "" "/tcl8.0" "/tcl8.1" "/tcl8.2" "/tcl8.3" "/tcl8.4" "/tcl8.5" "/tcl8.6" "/tcl8.7" "/tcl8.8" "/tcl8.9" "/tcl8.10" "/tcl8.11" "/tcl8.12" "/tcl8.13" "/tcl8.14" "/tcl8.15" "/tcl8.16" "/tcl8.17" "/tcl8.18" "/tcl8.19" "/tcl9.0" "/tcl9.1" "/tcl9.2" "/tcl9.3" "/tcl9.4" "/tcl9.5" "/tcl9.6" "/tcl9.7" "/tcl9.8" "/tcl9.9" "/tcl9.10" "/tcl9.11" "/tcl9.12" "/tcl9.13" "/tcl9.14" "/tcl9.15" "/tcl9.16" "/tcl9.17" "/tcl9.19"
+			for j in "" "/tcl8.0" "/tcl8.1" "/tcl8.2" "/tcl8.3" "/tcl8.4" "/tcl8.5" "/tcl8.6" "/tcl8.7" "/tcl8.8" "/tcl8.9"
 			do
 
 if ( test -r "$i$j/tcl.h" )
@@ -32222,9 +32222,9 @@ fi
 		done
 				if ( test -n "$TCLINCLUDE" )
 		then
-			for i in "/sw/lib" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "$TCLLIBSPATH"
+			for i in "/sw/lib" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
 			do
-				for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "8.6" "8.7" "8.8" "8.9" "8.10" "8.11" "8.12" "8.13" "8.14" "8.15" "8.16" "8.17" "8.18" "8.19" "9.0" "9.1" "9.2" "9.3" "9.4" "9.5" "9.6" "9.7" "9.8" "9.9" "9.10" "9.11" "9.12" "9.13" "9.14" "9.15" "9.16" "9.17" "9.18" "9.19" "80" "81" "82" "83" "84" "85" "86" "87" "88" "89" "810" "811" "812" "813" "814" "815" "816" "817" "818" "819" "90" "91" "92" "93" "94" "95" "96" "97" "98" "99" "910" "911" "912" "913" "914" "915" "916" "917" "918" "919"
+				for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "8.6" "8.7" "8.8" "8.9" "80" "81" "82" "83" "84" "85" "86" "87" "88" "89"
 				do
 
 if ( test -r "$i/libtcl$j.$SOSUFFIX" )
@@ -32265,9 +32265,9 @@ fi
 
 				if ( test -n "$TCLINCLUDE " -a -z "$TCLLIB" )
 		then
-			for i in "/sw/lib" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "/$prefix/lib64" "/usr/lib" "/usr/lib64" "$TCLLIBSPATH"
+			for i in "/sw/lib" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
 			do
-				for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "80" "81" "82" "83" "84" "85"
+				for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "8.6" "8.7" "8.8" "8.9" "80" "81" "82" "83" "84" "85" "86" "87" "88" "89"
 				do
 
 if ( test -r "$i/libtclstub$j.$SOSUFFIX" )
