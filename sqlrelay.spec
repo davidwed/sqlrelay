@@ -307,7 +307,7 @@ Group: Applications/Database
 Man pages for SQL Relay.
 
 
-%define	tclconfig	%(readlink `rpm -q -l %{tcldevel} | grep -m1 tclConfig.sh`)
+%define	tclconfig	%(TCLCONFIG=`rpm -q -l %{tcldevel} | grep -m1 "/tclConfig.sh"`; RTCLCONFIG=`readlink $TCLCONFIG`; if ( test -n "$RTCLCONFIG" ) then echo $RTCLCONFIG; else echo $TCLCONFIG; fi)
 %define	tcldir		%(dirname %{tclconfig})
 %ifarch x86_64
 %define	erlangdir	%(ERLPATH=""; for i in "/usr/local/lib64/erlang/lib" "/usr/lib64/erlang/lib"; do if ( test -d "$i" ); then ERLPATH="$i"; fi; done; echo $ERLPATH)
