@@ -36,27 +36,13 @@ Buildroot: %{_tmppath}/%{name}-root
 
 %define fedoraversion %(for word in `cat /etc/redhat-release 2> /dev/null`; do VAR=`echo $word | grep -x "[0-9]*"`; if ( test -n "$VAR" ); then echo $VAR; fi ; done)
 
+%define docdir %{_docdir}/%{name}
 %if %([[ %{_vendor} == "suse" ]] && echo 1 || echo 0)
-	%define rubydevel %(echo "ruby")
-	%define tcldevel %(echo "tcl-devel")
 	%define initscript1 /etc/init.d/sqlrelay
 	%define initscript2 /etc/init.d/sqlrcachemanager
-	%define inittab /etc/sysconfig/sqlrelay
-	%define docdir %{_docdir}/%{name}
-	%define exampledir %{_datadir}/examples/%{name}
 %else
-	%define rubydevel %(echo "ruby-devel")
-	# fedora core >= 4 uses tcl-devel, other distros use tcl
-	%if %([[ "%{fedoraversion}" -ge "4" ]] && echo 1 || echo 0)
-		%define tcldevel %(echo "tcl-devel")
-	%else
-		%define tcldevel %(echo "tcl")
-	%endif
 	%define initscript1 /etc/rc.d/init.d/sqlrelay
 	%define initscript2 /etc/rc.d/init.d/sqlrcachemanager
-	%define inittab /etc/sysconfig/sqlrelay
-	%define docdir %{_docdir}/%{name}-%{version}
-	%define exampledir %{_datadir}/examples/%{name}-%{version}
 %endif
 
 BuildRequires: rudiments-devel >= 0.34
@@ -65,8 +51,8 @@ BuildRequires: rudiments-devel >= 0.34
 %{!?_without_postgresql:BuildRequires: ,postgresql-devel}
 %{!?_without_perl:BuildRequires: ,perl}
 %{!?_without_python:BuildRequires: ,python-devel}
-%{!?_without_ruby:BuildRequires: ,%{rubydevel}}
-%{!?_without_tcl:BuildRequires: ,%{tcldevel}}
+%{!?_without_ruby:BuildRequires: ,ruby-devel}
+%{!?_without_tcl:BuildRequires: ,tcl-devel}
 %{!?_without_erlang:BuildRequires: ,erlang}
 
 %description
@@ -307,7 +293,7 @@ Group: Applications/Database
 Man pages for SQL Relay.
 
 
-%define	tclconfig	%(TCLCONFIG=`rpm -q -l %{tcldevel} | grep -m1 "/tclConfig.sh"`; RTCLCONFIG=`readlink $TCLCONFIG`; if ( test -n "$RTCLCONFIG" ) then echo $RTCLCONFIG; else echo $TCLCONFIG; fi)
+%define	tclconfig	%(TCLCONFIG=`rpm -q -l tcl-devel | grep -m1 "/tclConfig.sh"`; RTCLCONFIG=`readlink $TCLCONFIG`; if ( test -n "$RTCLCONFIG" ) then echo $RTCLCONFIG; else echo $TCLCONFIG; fi)
 %define	tcldir		%(dirname %{tclconfig})
 %ifarch x86_64
 %define	erlangdir	%(ERLPATH=""; for i in "/usr/local/lib64/erlang/lib" "/usr/lib64/erlang/lib"; do if ( test -d "$i" ); then ERLPATH="$i"; fi; done; echo $ERLPATH)
@@ -359,7 +345,7 @@ make
 
 %install
 rm -rf %{buildroot}
-make DESTDIR=%{buildroot} docdir=%{buildroot}%{docdir} EXAMPLEDIR=%{buildroot}%{exampledir} install
+make DESTDIR=%{buildroot} docdir=%{buildroot}%{_docdir}/%{name} EXAMPLEDIR=%{buildroot}%{_datadir}/examples/%{name} install
 # get rid of some garbage
 rm -f %{buildroot}%{perl_installsitearch}/perllocal.pod
 
@@ -396,7 +382,7 @@ rm -rf %{buildroot}
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.conf.example
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.dtd
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.xsd
-%config(noreplace) %attr(600, root, root) %{inittab}
+%config(noreplace) %attr(600, root, root) /etc/sysconfig/sqlrelay
 %{initscript1}
 %{initscript2}
 %{_bindir}/sqlr-cachemanager*
@@ -562,8 +548,8 @@ rm -rf %{buildroot}
 %{!?_without_erlang:%{erlangdir}/sqlrelay-%{version}}
 
 %files doc
-%{docdir}
-%{exampledir}
+%{_docdir}/%{name}
+%{_datadir}/examples/%{name}
 
 %files man
 %{_mandir}
