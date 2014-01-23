@@ -31643,6 +31643,10 @@ fi
 			PERLPREFIX=`eval "$PERLPREFIXCMD"; echo $prefix`
 			PERL_LIB=`eval "$PERLLIBCMD"; echo $privlibexp`
 			XSUBPP=$PERL_LIB/ExtUtils/xsubpp
+			if ( test ! -r "$XSUBPP" )
+			then
+				XSUBPP="`dirname $PERL`/xsubpp"
+			fi
 			if ( test -n "`pod2man --help 2>&1 | grep Usage`" )
 			then
 				POD2MAN="pod2man"
