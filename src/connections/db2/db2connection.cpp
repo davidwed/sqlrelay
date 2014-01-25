@@ -187,7 +187,7 @@ class db2connection : public sqlrconnection_svr {
 					int64_t	*errorcode,
 					bool *liveconnection);
 		bool	liveConnection(SQLINTEGER nativeerror,
-					SQLSMALLINT errnum);
+					SQLSMALLINT errlength);
 		const char	*pingQuery();
 		const char	*identify();
 		const char	*dbVersion();
@@ -362,15 +362,25 @@ bool db2connection::liveConnection(SQLINTEGER nativeerrnum,
 	// then upon repeated attempts to run a query, it reports:
 	//	[IBM][CLI Driver] CLI0106E  Connection is closed. SQLSTATE=08003
 	//	(in this case nativeerrnum==-99999 and errlength==64)
-	// here's another one
+	// here's another one for -1224
 	//	[IBM][CLI Driver] SQL1224N  The database manager is not able to
 	//	 accept new requests, has terminated all requests in progress,
 	//	or has terminated your particular request due to a problem with
 	//	your request.  SQLSTATE=55032
-	// We need to catch both...
+	// We need to catch it too.
+	// When a "force application" command forcibly kills a connection on
+	// the server side, the DB2 client reports:
+	//	[IBM][CLI Driver] SQL30081N  A communication error has been
+	//	detected. Communication protocol being used: "TCP/IP".  
+	//	Communication API being used: "SOCKETS".  Location where the
+	//	error was detected: "192.168.74.29".  Communication function
+	//	detecting the error: "recv".  Protocol specific error code(s):
+	//	"*", "*", "0".  SQLSTATE=08001
+	//	(in this case nativeerrnum==-30081 and errlength==333)
 	return !((nativeerrnum==-1224 && errlength==184) ||
 		(nativeerrnum==-99999 && errlength==64) ||
-		(nativeerrnum==-1224 && errlength==220));
+		(nativeerrnum==-1224 && errlength==220) ||
+		(nativeerrnum==-30081 && errlength==333));
 }
 
 
