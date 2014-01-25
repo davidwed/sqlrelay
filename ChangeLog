@@ -52,6 +52,7 @@
 	added custom PDO driver attribute to get/set current database
 	added custom PDO driver attribute to set whether or not to get column
 		info when fetching the result set
+	updated db2 to re-login when it sees error -30081
 
 0.53.1 - updated the configuration and tuning docs a bit
 	fixed a Makefile bug that caused "make clean" to be interrupted
