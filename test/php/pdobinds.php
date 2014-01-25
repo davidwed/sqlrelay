@@ -23,21 +23,19 @@ dl("pdo_sqlrelay.so");
 	$dsn="sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;debug=0";
 
 
-	# instantiation
 	$dbh=new PDO($dsn,$user,$password);
 	if(!$dbh){
 		die("new PDO failed");
 	}
 
-	# get databaes type
 	$dbtype=$dbh->getAttribute(PDO::SQLRELAY_ATTR_DB_TYPE);
 
-	# drop existing table
-	$dbh->exec("drop table testtable");
-
-	echo("CREATE TEMPTABLE: \n");
-	checkSuccess($dbh->exec("create table testtable (testnumber int)"),0);
-	echo("\n");
+	if ($dbtype!="firebird") {
+		$dbh->exec("drop table testtable");
+		echo("CREATE TEMPTABLE: \n");
+		checkSuccess($dbh->exec("create table testtable (testinteger int)"),0);
+		echo("\n");
+	}
 
 	echo("BIND BY POSITION: \n");
 	$queryvar="";
@@ -61,7 +59,7 @@ dl("pdo_sqlrelay.so");
 			break;
 	}
 	echo("queryvar: $queryvar\n");
-	$stmt=$dbh->prepare("insert into testtable values ($queryvar)");
+	$stmt=$dbh->prepare("insert into testtable (testinteger) values ($queryvar)");
 	checkSuccess($stmt->bindValue(1,2,PDO::PARAM_INT),true);
 	checkSuccess($stmt->execute(),true);
 	echo("\n");
@@ -92,11 +90,14 @@ dl("pdo_sqlrelay.so");
 			break;
 	}
 	echo("queryvar: $queryvar   bindvar: $bindvar\n");
-	$stmt=$dbh->prepare("insert into testtable values ($queryvar)");
+	$stmt=$dbh->prepare("insert into testtable (testinteger) values ($queryvar)");
 	checkSuccess($stmt->bindValue($bindvar,2,PDO::PARAM_INT),true);
 	checkSuccess($stmt->execute(),true);
 	echo("\n");
 
-	$dbh->exec("drop table testtable");
+	$dbh->exec("delete from testtable");
+	if ($dbtype!="firebird") {
+		$dbh->exec("drop table testtable");
+	}
 
 ?></pre></html>
