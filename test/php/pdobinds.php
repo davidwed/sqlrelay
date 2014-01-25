@@ -20,7 +20,7 @@ dl("pdo_sqlrelay.so");
 	$socket="/tmp/test.socket";
 	$user="test";
 	$password="test";
-	$dsn = "sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;debug=0";
+	$dsn="sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;debug=1";
 
 
 	# instantiation
@@ -29,22 +29,71 @@ dl("pdo_sqlrelay.so");
 		die("new PDO failed");
 	}
 
+	# get databaes type
+	$dbtype=$dbh->getAttribute(PDO::SQLRELAY_ATTR_DB_TYPE);
+
 	# drop existing table
 	$dbh->exec("drop table testtable");
 
 	echo("CREATE TEMPTABLE: \n");
-	checkSuccess($dbh->exec("create table testtable (testnumber number)"),0);
-	echo("\n");
-
-	echo("BIND BY NAME: \n");
-	$stmt=$dbh->prepare("insert into testtable values (@var)");
-	checkSuccess($stmt->bindValue("@var",2,PDO::PARAM_INT),true);
-	checkSuccess($stmt->execute(),true);
+	checkSuccess($dbh->exec("create table testtable (testnumber int)"),0);
 	echo("\n");
 
 	echo("BIND BY POSITION: \n");
-	$stmt=$dbh->prepare("insert into testtable values (?)");
+	$queryvar="";
+	$bindvar=1;
+	switch ($dbtype) {
+		case "oracle8":
+		case "sqlite":
+			$queryvar=":1";
+			break;
+		case "sybase":
+		case "freetds":
+			$queryvar="@1";
+			break;
+		case "db2":
+		case "firebird":
+		case "mysql":
+			$queryvar="?";
+			break;
+		case "postgresql":
+			$queryvar="$1";
+			break;
+	}
+	echo("queryvar: $queryvar\n");
+	$stmt=$dbh->prepare("insert into testtable values ($queryvar)");
 	checkSuccess($stmt->bindValue(1,2,PDO::PARAM_INT),true);
+	checkSuccess($stmt->execute(),true);
+	echo("\n");
+
+	echo("BIND BY NAME: \n");
+	$queryvar="";
+	$bindvar="";
+	switch ($dbtype) {
+		case "oracle8":
+		case "sqlite":
+			$queryvar=":var1";
+			$bindvar="var1";
+			break;
+		case "sybase":
+		case "freetds":
+			$queryvar="@var1";
+			$bindvar="var1";
+			break;
+		case "db2":
+		case "firebird":
+		case "mysql":
+			$queryvar="?";
+			$bindvar="1";
+			break;
+		case "postgresql":
+			$queryvar="$1";
+			$bindvar="1";
+			break;
+	}
+	echo("queryvar: $queryvar   bindvar: $bindvar\n");
+	$stmt=$dbh->prepare("insert into testtable values ($queryvar)");
+	checkSuccess($stmt->bindValue($bindvar,2,PDO::PARAM_INT),true);
 	checkSuccess($stmt->execute(),true);
 	echo("\n");
 
