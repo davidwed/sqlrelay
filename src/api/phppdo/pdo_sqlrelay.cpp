@@ -465,7 +465,11 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 	stringbuffer	paramname;
 	paramname.append((uint64_t)param->paramno+1);
 	const char	*name=(param->name)?param->name:paramname.getString();
-	if (character::inSet(name[0],":@$")) {
+
+	// Chop any :, @ or $'s off of the front of the name.  We have to
+	// iterate because PDO itself prepends a : if the name doesn't already
+	// have one.
+	while (character::inSet(*name,":@$")) {
 		name++;
 	}
 
