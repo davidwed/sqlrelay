@@ -323,12 +323,12 @@ dl("pdo_sqlrelay.so");
 	checkSuccess($result[0],"7");
 	echo("\n");
 
-	echo("DRIVER SPECIFIC ATTRS: \n");
+	echo("RESULT SET BUFFER SIZE: \n");
 	$stmt=$dbh->prepare("select * from testtable order by testnumber");
 	checkSuccess($stmt->setAttribute(
-				PDO::SQLRELAY_ATTR_RESULTSETBUFFERSIZE,2),1);
+				PDO::SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE,2),1);
 	checkSuccess($stmt->getAttribute(
-				PDO::SQLRELAY_ATTR_RESULTSETBUFFERSIZE),2);
+				PDO::SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE),2);
 	checkSuccess($stmt->execute(),true);
 	$result=$stmt->fetch(PDO::FETCH_NUM);
 	checkSuccess($result[0],"1");
@@ -346,6 +346,41 @@ dl("pdo_sqlrelay.so");
 	checkSuccess($result[0],"7");
 	$result=$stmt->fetch(PDO::FETCH_NUM,PDO::FETCH_ORI_ABS,5);
 	checkSuccess($result,false);
+	echo("\n");
+
+	echo("DON'T GET COLUMN INFO: \n");
+	$stmt=$dbh->prepare("select * from testtable order by testnumber");
+	checkSuccess($stmt->setAttribute(
+				PDO::SQLRELAY_ATTR_GET_COLUMN_INFO,0),1);
+	checkSuccess($stmt->execute(),true);
+	$meta0=$stmt->getColumnMeta(0);
+	checkSuccess($meta0["name"],null);
+	checkSuccess($meta0["native_type"],null);
+	checkSuccess($meta0["pdo_type"],PDO::PARAM_STR);
+	checkSuccess($meta0["len"],null);
+	$stmt=$dbh->prepare("select * from testtable order by testnumber");
+	checkSuccess($stmt->setAttribute(
+				PDO::SQLRELAY_ATTR_GET_COLUMN_INFO,1),1);
+	checkSuccess($stmt->execute(),true);
+	$meta0=$stmt->getColumnMeta(0);
+	checkSuccess($meta0["name"],"TESTNUMBER");
+	checkSuccess($meta0["native_type"],"NUMBER");
+	checkSuccess($meta0["pdo_type"],PDO::PARAM_INT);
+	checkSuccess($meta0["len"],22);
+	echo("\n");
+
+	echo("OTHER DRIVER-SPECIFIC OPTIONS: \n");
+	checkSuccess($dbh->getAttribute(PDO::SQLRELAY_ATTR_BIND_FORMAT),":*");
+	checkSuccess($dbh->getAttribute(
+				PDO::SQLRELAY_ATTR_DB_TYPE),"oracle8");
+	echo("db version: ".$dbh->getAttribute(
+				PDO::SQLRELAY_ATTR_DB_VERSION)."\n");
+	echo("db host name: ".$dbh->getAttribute(
+				PDO::SQLRELAY_ATTR_DB_HOST_NAME)."\n");
+	echo("db ip address: ".$dbh->getAttribute(
+				PDO::SQLRELAY_ATTR_DB_IP_ADDRESS)."\n");
+	echo("current db: ".$dbh->getAttribute(
+				PDO::SQLRELAY_ATTR_CURRENT_DB)."\n");
 	echo("\n");
 
 	echo("BOUND COLUMNS: \n");

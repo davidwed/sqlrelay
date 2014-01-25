@@ -43,7 +43,14 @@ struct sqlrdbhandle {
 };
 
 enum {
-	PDO_SQLRELAY_ATTR_RESULTSETBUFFERSIZE=PDO_ATTR_DRIVER_SPECIFIC
+	PDO_SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE=PDO_ATTR_DRIVER_SPECIFIC,
+	PDO_SQLRELAY_ATTR_GET_COLUMN_INFO,
+	PDO_SQLRELAY_ATTR_DB_TYPE,
+	PDO_SQLRELAY_ATTR_DB_VERSION,
+	PDO_SQLRELAY_ATTR_DB_HOST_NAME,
+	PDO_SQLRELAY_ATTR_DB_IP_ADDRESS,
+	PDO_SQLRELAY_ATTR_BIND_FORMAT,
+	PDO_SQLRELAY_ATTR_CURRENT_DB
 };
 
 int _sqlrelayError(pdo_dbh_t *dbh,
@@ -195,7 +202,8 @@ static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
 
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
-	char		*name=estrdup(sqlrcur->getColumnName(colno));
+	const char	*n=sqlrcur->getColumnName(colno);
+	char		*name=estrdup((n)?n:"");
 	const char	*type=sqlrcur->getColumnType(colno);
 	stmt->columns[colno].name=name;
 	stmt->columns[colno].namelen=charstring::length(name);
@@ -488,9 +496,17 @@ static int sqlrcursorSetAttribute(pdo_stmt_t *stmt,
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
 
 	switch (attr) {
-		case PDO_SQLRELAY_ATTR_RESULTSETBUFFERSIZE:
+		case PDO_SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE:
 			convert_to_long(val);
 			sqlrcur->setResultSetBufferSize(Z_LVAL_P(val));
+			return 1;
+		case PDO_SQLRELAY_ATTR_GET_COLUMN_INFO:
+			convert_to_boolean(val);
+			if (Z_BVAL_P(val)==TRUE) {
+				sqlrcur->getColumnInfo();
+			} else {
+				sqlrcur->dontGetColumnInfo();
+			}
 			return 1;
 		default:
 			return 0;
@@ -504,7 +520,7 @@ static int sqlrcursorGetAttribute(pdo_stmt_t *stmt,
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
 
 	switch (attr) {
-		case PDO_SQLRELAY_ATTR_RESULTSETBUFFERSIZE:
+		case PDO_SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE:
 			ZVAL_LONG(retval,sqlrcur->getResultSetBufferSize());
 			return 1;
 		default:
@@ -523,7 +539,7 @@ static int sqlrcursorColumnMetadata(pdo_stmt_t *stmt,
 
 	// native type
 	const char	*type=sqlrcur->getColumnType(colno);
-	add_assoc_string(returnvalue,"native_type",(char *)type,1);
+	add_assoc_string(returnvalue,"native_type",(char *)((type)?type:""),1);
 
 
 	// pdo type
@@ -730,9 +746,6 @@ static int sqlrconnectionRollback(pdo_dbh_t *dbh TSRMLS_DC) {
 static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 					long attr, zval *val TSRMLS_DC) {
 
-	// FIXME: somehow support
-	// 	setResultSetBufferSize
-	// 	get/dontGetColumnInfo
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
 
@@ -798,9 +811,17 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 		#ifdef HAVE_PHP_PDO_ATTR_EMULATE_PREPARES
 		case PDO_ATTR_EMULATE_PREPARES:
 			// use substititution variables rather than binds
+			convert_to_boolean(val);
 			sqlrdbh->usesubvars=Z_BVAL_P(val);
 			return 1;
 		#endif
+		case PDO_SQLRELAY_ATTR_CURRENT_DB:
+			convert_to_string(val);
+			if (sqlrcon->selectDatabase(Z_STRVAL_P(val))) {
+				return 1;
+			} else {
+				return 0;
+			}
 		default:
 			return 0;
 	}
@@ -852,15 +873,6 @@ static int sqlrconnectionError(pdo_dbh_t *dbh,
 static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 				long attr, zval *retval TSRMLS_DC) {
 
-	// FIXME: somehow support 
-	// 	getResultSetBufferSize
-	// 	get/dontGetColumnInfo
-	//	identify
-	//	dbVersion
-	//	dbHostName
-	//	dbIpAddress
-	//	bindFormat
-	//	getCurrentDatabase
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
 
@@ -913,6 +925,25 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 			ZVAL_BOOL(retval,sqlrdbh->usesubvars);
 			return 1;
 		#endif
+		case PDO_SQLRELAY_ATTR_DB_TYPE:
+			ZVAL_STRING(retval,(char *)sqlrcon->identify(),1);
+			return 1;
+		case PDO_SQLRELAY_ATTR_DB_VERSION:
+			ZVAL_STRING(retval,(char *)sqlrcon->dbVersion(),1);
+			return 1;
+		case PDO_SQLRELAY_ATTR_DB_HOST_NAME:
+			ZVAL_STRING(retval,(char *)sqlrcon->dbHostName(),1);
+			return 1;
+		case PDO_SQLRELAY_ATTR_DB_IP_ADDRESS:
+			ZVAL_STRING(retval,(char *)sqlrcon->dbIpAddress(),1);
+			return 1;
+		case PDO_SQLRELAY_ATTR_BIND_FORMAT:
+			ZVAL_STRING(retval,(char *)sqlrcon->bindFormat(),1);
+			return 1;
+		case PDO_SQLRELAY_ATTR_CURRENT_DB:
+			ZVAL_STRING(retval,
+				(char *)sqlrcon->getCurrentDatabase(),1);
+			return 1;
 		default:
 			return 0;
 	}
@@ -990,8 +1021,22 @@ static pdo_driver_t sqlrelayDriver={
 
 static PHP_MINIT_FUNCTION(pdo_sqlrelay) {
 
-	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_RESULTSETBUFFERSIZE",
-				(long)PDO_SQLRELAY_ATTR_RESULTSETBUFFERSIZE);
+	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE",
+				(long)PDO_SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE);
+	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_GET_COLUMN_INFO",
+				(long)PDO_SQLRELAY_ATTR_GET_COLUMN_INFO);
+	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_DB_TYPE",
+				(long)PDO_SQLRELAY_ATTR_DB_TYPE);
+	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_DB_VERSION",
+				(long)PDO_SQLRELAY_ATTR_DB_VERSION);
+	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_DB_HOST_NAME",
+				(long)PDO_SQLRELAY_ATTR_DB_HOST_NAME);
+	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_DB_IP_ADDRESS",
+				(long)PDO_SQLRELAY_ATTR_DB_IP_ADDRESS);
+	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_BIND_FORMAT",
+				(long)PDO_SQLRELAY_ATTR_BIND_FORMAT);
+	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_CURRENT_DB",
+				(long)PDO_SQLRELAY_ATTR_CURRENT_DB);
 
 	return php_pdo_register_driver(&sqlrelayDriver);
 }

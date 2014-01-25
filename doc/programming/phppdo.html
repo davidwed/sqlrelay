@@ -22,6 +22,7 @@
 <li><a href="#columns">Getting Column Information</a></li>
 <li><a href="#storedprocedures">Stored Procedures</a></li>
 <li><a href="#lastinsertid">Getting the Last Insert ID</a></li>
+<li><a href="#driverspecific">Driver-Specific Attributes</a></li>
 </ul>
 
 <a name="intro"></a>
@@ -476,10 +477,10 @@ echo($result[2]."\n");
 <p>SQL Relay normally buffers the entire result set.  This can speed things up 
 at the cost of memory.  With large enough result sets, it makes sense to buffer the result set in chunks instead of all at once.</p>
 
-<p>Use the statement attribute PDO::SQLRELAY_ATTR_RESULTSETBUFFERSIZE to set the
-number of rows to buffer at a time.  Calls to fetch() cause the chunk containing
-the requested field to be fetched.  Rows in that chunk are accessible but rows
-before it are not.</p>
+<p>Use the statement attribute PDO::SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE to set
+the number of rows to buffer at a time.  Calls to fetch() cause the chunk
+containing the requested field to be fetched.  Rows in that chunk are accessible
+but rows before it are not.</p>
 
 <p>For example, if you set the result set buffer size to 5 and execute a query
 that returns 20 rows, rows 0-4 are available at once, then rows 5-9, then 10-14,
@@ -491,7 +492,7 @@ row.</p>
 
 <blockquote>
 <pre>
-$stmt->setAttribute(PDO::SQLRELAY_ATTR_RESULTSETBUFFERSIZE,5);
+$stmt->setAttribute(PDO::SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE,5);
 </pre>
 </blockquote>
 
@@ -499,7 +500,7 @@ $stmt->setAttribute(PDO::SQLRELAY_ATTR_RESULTSETBUFFERSIZE,5);
 
 <blockquote>
 <pre>
-$rsbs=$stmt->getAttribute(PDO::SQLRELAY_ATTR_RESULTSETBUFFERSIZE);
+$rsbs=$stmt->getAttribute(PDO::SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE);
 </pre>
 </blockquote>
 
@@ -1588,6 +1589,28 @@ as well.  You just have to run the query:
 <b>select last insert rowid</b>
 </blockquote>
 
+<a name="driverspecific"></a>
+<span class="heading2">Driver-Specific Attributes</span><br><br>
+
+<p>PHP PDO allows drivers to define their own attributes for database handles and statements.  These attributes can be used with the getAttribute and setAttribute methods to control various parameters unique to the driver.  SQL Relay implements several of these to interface with some of the more obscure native client API methods.</p>
+
+<p>Database handle attributes defined by the SQL Relay driver:</p>
+
+<ul>
+<li><b>PDO::SQLRELAY_ATTR_DB_TYPE</b> - get-only, returns database type</li>
+<li><b>PDO::SQLRELAY_ATTR_DB_VERSION</b> - get-only, returns database version string</li>
+<li><b>PDO::SQLRELAY_ATTR_DB_HOST_NAME</b> - get-only, returns the host name of the machine the database is running on</li>
+<li><b>PDO::SQLRELAY_ATTR_DB_IP_ADDRESS</b> - get-only, returns the ip address of the machine the database is running on</li>
+<li><b>PDO::SQLRELAY_ATTR_BIND_FORMAT</b> - get-only, returns a string representing the bind-format accepted by the database</li>
+<li><b>PDO::SQLRELAY_ATTR_CURRENT_DB</b> - get/set, returns or sets the current database/schema</li>
+</ul>
+
+<p>Statement handle attributes defined by the SQL Relay driver:</p>
+
+<ul>
+<li><b>PDO::SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE</b> - get/set, returns or sets the result set buffer size as described <a href="#largeresultsets">above</a>.</li>
+<li><b>PDO::SQLRELAY_ATTR_GET_COLUMN_INFO</b> - set-only (1 or 0), sets whether or not to fetch column info with the result set</li>
+</ul>
 
 </body>
 </html>
