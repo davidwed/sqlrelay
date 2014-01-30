@@ -46,7 +46,7 @@ dl("pdo_sqlrelay.so");
 
 	# doesn't work with oracle unless translatebindvariables="yes" is set
 	echo("BIND BY POSITION: \n");
-	$stmt=$dbh->prepare("insert into testtable values (?,?,?,?,?,?,?)");
+	$stmt=$dbh->prepare("insert into testtable values (:1,:2,:3,:4,:5,:6,:7)");
 	checkSuccess($stmt->bindValue(1,2,PDO::PARAM_INT),true);
 	checkSuccess($stmt->bindValue(2,"testchar2"),true);
 	checkSuccess($stmt->bindValue(3,"testvarchar2"),true);
@@ -77,7 +77,7 @@ dl("pdo_sqlrelay.so");
 	echo("\n");
 
 	echo("ARRAY OF BINDS BY POSITION: \n");
-	$stmt=$dbh->prepare("insert into testtable values (?,?,?,?,?,?,empty_blob())");
+	$stmt=$dbh->prepare("insert into testtable values (:1,:2,:3,:4,:5,:6,empty_blob())");
 	$param1=4;
 	$param2="testchar4";
 	$param3="testvarchar4";
@@ -513,7 +513,7 @@ dl("pdo_sqlrelay.so");
 	echo("\n");
 
 	echo("OUTPUT BIND BY POSITION: \n");
-	$stmt=$dbh->prepare("begin  ?:=1; ?:='hello'; end;");
+	$stmt=$dbh->prepare("begin  :1:=1; :2:='hello'; end;");
 	$param1=0;
 	$param2="";
 	checkSuccess($stmt->bindParam(1,$param1,PDO::PARAM_INT|PDO::PARAM_INPUT_OUTPUT),true);
