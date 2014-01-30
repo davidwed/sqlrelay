@@ -48,7 +48,7 @@ sub checkSuccessString {
 
 
 # instantiation
-my $dbh=DBI->connect("DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/test.socket;debug=1","test","test",{AutoCommit=>0}) or die DBI->errstr;
+my $dbh=DBI->connect("DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/test.socket;debug=0","test","test",{AutoCommit=>0}) or die DBI->errstr;
 
 
 # ping
@@ -368,7 +368,7 @@ checkSuccess($$cols[6],7);
 print("\n");
 
 print("COMMIT AND ROLLBACK: \n");
-my $dbh2=DBI->connect("DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/test.socket;debug=1","test","test",{AutoCommit=>0}) or die DBI->errstr;
+my $dbh2=DBI->connect("DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/test.socket;debug=0","test","test",{AutoCommit=>0}) or die DBI->errstr;
 my @row=$dbh2->selectrow_array("select count(*) from testtable");
 checkSuccess($row[0],0);
 checkSuccess($dbh->commit(),1);

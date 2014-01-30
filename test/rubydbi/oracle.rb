@@ -15,7 +15,7 @@ require 'dbi'
 
 
 	# debug and autocommit attributes
-	db["sqlrelay_debug"]=true
+	#db["sqlrelay_debug"]=true
 	#db["AutoCommit"]=true
 
 
