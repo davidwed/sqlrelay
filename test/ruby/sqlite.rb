@@ -112,14 +112,14 @@ checkSuccess(cols[3],"testvarchar")
 print "\n"
 
 print "COLUMN TYPES: \n"
-checkSuccess(cur.getColumnType(0),"UNKNOWN")
-checkSuccess(cur.getColumnType('testint'),"UNKNOWN")
-checkSuccess(cur.getColumnType(1),"UNKNOWN")
-checkSuccess(cur.getColumnType('testfloat'),"UNKNOWN")
-checkSuccess(cur.getColumnType(2),"UNKNOWN")
-checkSuccess(cur.getColumnType('testchar'),"UNKNOWN")
-checkSuccess(cur.getColumnType(3),"UNKNOWN")
-checkSuccess(cur.getColumnType('testvarchar'),"UNKNOWN")
+checkSuccess(cur.getColumnType(0),"INTEGER")
+checkSuccess(cur.getColumnType('testint'),"INTEGER")
+checkSuccess(cur.getColumnType(1),"FLOAT")
+checkSuccess(cur.getColumnType('testfloat'),"FLOAT")
+checkSuccess(cur.getColumnType(2),"STRING")
+checkSuccess(cur.getColumnType('testchar'),"STRING")
+checkSuccess(cur.getColumnType(3),"STRING")
+checkSuccess(cur.getColumnType('testvarchar'),"STRING")
 print "\n"
 
 print "COLUMN LENGTH: \n"
@@ -149,7 +149,7 @@ checkSuccess(cur.rowCount(),8)
 print "\n"
 
 print "TOTAL ROWS: \n"
-checkSuccess(cur.totalRows(),8)
+checkSuccess(cur.totalRows(),0)
 print "\n"
 
 print "FIRST ROW INDEX: \n"
@@ -339,7 +339,7 @@ cur.getColumnInfo()
 checkSuccess(cur.sendQuery("select * from testtable order by testint"),1)
 checkSuccess(cur.getColumnName(0),"testint")
 checkSuccess(cur.getColumnLength(0),0)
-checkSuccess(cur.getColumnType(0),"UNKNOWN")
+checkSuccess(cur.getColumnType(0),"INTEGER")
 print "\n"
 
 print "SUSPENDED SESSION: \n"

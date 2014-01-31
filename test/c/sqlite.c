@@ -1,6 +1,7 @@
 // Copyright (c) 2001  David Muse
 // See the file COPYING for more information.
 
+#include "../../config.h"
 #include <sqlrelay/sqlrclientwrapper.h>
 #include <string.h>
 #include <stdlib.h>
@@ -159,6 +160,16 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COLUMN TYPES: \n");
+	#ifdef HAVE_SQLITE3_STMT
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,0),"INTEGER");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testint"),"INTEGER");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,1),"FLOAT");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testfloat"),"FLOAT");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,2),"STRING");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testchar"),"STRING");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,3),"STRING");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testvarchar"),"STRING");
+	#else
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,0),"UNKNOWN");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testint"),"UNKNOWN");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,1),"UNKNOWN");
@@ -167,6 +178,7 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testchar"),"UNKNOWN");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,3),"UNKNOWN");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testvarchar"),"UNKNOWN");
+	#endif
 	printf("\n");
 
 	printf("COLUMN LENGTH: \n");
@@ -196,7 +208,11 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("TOTAL ROWS: \n");
+	#ifdef HAVE_SQLITE3_STMT
+	checkSuccessInt(sqlrcur_totalRows(cur),0);
+	#else
 	checkSuccessInt(sqlrcur_totalRows(cur),8);
+	#endif
 	printf("\n");
 
 	printf("FIRST ROW INDEX: \n");
@@ -388,7 +404,11 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_sendQuery(cur,"select * from testtable order by testint"),1);
 	checkSuccessString(sqlrcur_getColumnName(cur,0),"testint");
 	checkSuccessInt(sqlrcur_getColumnLengthByIndex(cur,0),0);
+	#ifdef HAVE_SQLITE3_STMT
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,0),"INTEGER");
+	#else
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,0),"UNKNOWN");
+	#endif
 	printf("\n");
 
 	printf("SUSPENDED SESSION: \n");

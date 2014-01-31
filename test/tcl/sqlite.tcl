@@ -119,14 +119,14 @@ checkSuccess [lindex $cols 3] "testvarchar"
 puts ""
 
 puts "COLUMN TYPES: "
-checkSuccess [$cur getColumnTypeByIndex 0] "UNKNOWN"
-checkSuccess [$cur getColumnTypeByName "testint"] "UNKNOWN"
-checkSuccess [$cur getColumnTypeByIndex 1] "UNKNOWN"
-checkSuccess [$cur getColumnTypeByName "testfloat"] "UNKNOWN"
-checkSuccess [$cur getColumnTypeByIndex 2] "UNKNOWN"
-checkSuccess [$cur getColumnTypeByName "testchar"] "UNKNOWN"
-checkSuccess [$cur getColumnTypeByIndex 3] "UNKNOWN"
-checkSuccess [$cur getColumnTypeByName "testvarchar"] "UNKNOWN"
+checkSuccess [$cur getColumnTypeByIndex 0] "INTEGER"
+checkSuccess [$cur getColumnTypeByName "testint"] "INTEGER"
+checkSuccess [$cur getColumnTypeByIndex 1] "FLOAT"
+checkSuccess [$cur getColumnTypeByName "testfloat"] "FLOAT"
+checkSuccess [$cur getColumnTypeByIndex 2] "STRING"
+checkSuccess [$cur getColumnTypeByName "testchar"] "STRING"
+checkSuccess [$cur getColumnTypeByIndex 3] "STRING"
+checkSuccess [$cur getColumnTypeByName "testvarchar"] "STRING"
 puts ""
 
 puts "COLUMN LENGTH: "
@@ -156,7 +156,7 @@ checkSuccess [$cur rowCount] 8
 puts ""
 
 puts "TOTAL ROWS: "
-checkSuccess [$cur totalRows] 8
+checkSuccess [$cur totalRows] 0
 puts ""
 
 puts "FIRST ROW INDEX: "
@@ -302,7 +302,7 @@ $cur getColumnInfo
 checkSuccess [$cur sendQuery "select * from testtable order by testint"] 1
 checkSuccess [$cur getColumnName 0] "testint"
 checkSuccess [$cur getColumnLengthByIndex 0] 0
-checkSuccess [$cur getColumnTypeByIndex 0] "UNKNOWN"
+checkSuccess [$cur getColumnTypeByIndex 0] "INTEGER"
 puts ""
 
 puts "SUSPENDED SESSION: "

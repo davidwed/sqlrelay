@@ -118,14 +118,14 @@ dl("sql_relay.so");
 	echo("\n");
 
 	echo("COLUMN TYPES: \n");
-	checkSuccess(sqlrcur_getColumnType($cur,0),"UNKNOWN");
-	checkSuccess(sqlrcur_getColumnType($cur,"testint"),"UNKNOWN");
-	checkSuccess(sqlrcur_getColumnType($cur,1),"UNKNOWN");
-	checkSuccess(sqlrcur_getColumnType($cur,"testfloat"),"UNKNOWN");
-	checkSuccess(sqlrcur_getColumnType($cur,2),"UNKNOWN");
-	checkSuccess(sqlrcur_getColumnType($cur,"testchar"),"UNKNOWN");
-	checkSuccess(sqlrcur_getColumnType($cur,3),"UNKNOWN");
-	checkSuccess(sqlrcur_getColumnType($cur,"testvarchar"),"UNKNOWN");
+	checkSuccess(sqlrcur_getColumnType($cur,0),"INTEGER");
+	checkSuccess(sqlrcur_getColumnType($cur,"testint"),"INTEGER");
+	checkSuccess(sqlrcur_getColumnType($cur,1),"FLOAT");
+	checkSuccess(sqlrcur_getColumnType($cur,"testfloat"),"FLOAT");
+	checkSuccess(sqlrcur_getColumnType($cur,2),"STRING");
+	checkSuccess(sqlrcur_getColumnType($cur,"testchar"),"STRING");
+	checkSuccess(sqlrcur_getColumnType($cur,3),"STRING");
+	checkSuccess(sqlrcur_getColumnType($cur,"testvarchar"),"STRING");
 	echo("\n");
 
 	echo("COLUMN LENGTH: \n");
@@ -155,7 +155,7 @@ dl("sql_relay.so");
 	echo("\n");
 
 	echo("TOTAL ROWS: \n");
-	checkSuccess(sqlrcur_totalRows($cur),8);
+	checkSuccess(sqlrcur_totalRows($cur),0);
 	echo("\n");
 
 	echo("FIRST ROW INDEX: \n");
@@ -352,7 +352,7 @@ dl("sql_relay.so");
 	checkSuccess(sqlrcur_sendQuery($cur,"select * from testtable order by testint"),1);
 	checkSuccess(sqlrcur_getColumnName($cur,0),"testint");
 	checkSuccess(sqlrcur_getColumnLength($cur,0),0);
-	checkSuccess(sqlrcur_getColumnType($cur,0),"UNKNOWN");
+	checkSuccess(sqlrcur_getColumnType($cur,0),"INTEGER");
 	echo("\n");
 
 	echo("SUSPENDED SESSION: \n");
