@@ -1,4 +1,4 @@
-0.55 -
+0.55 - fixed a sql translation bug related to exists clauses
 
 0.54 - fixed bugs that caused problems when unopened result sets were closed
 	added protocol identification phase to client/server protocol

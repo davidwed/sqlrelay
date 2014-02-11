@@ -371,16 +371,14 @@ bool db2connection::liveConnection(SQLINTEGER nativeerrnum,
 	// When a "force application" command forcibly kills a connection on
 	// the server side, the DB2 client reports:
 	//	[IBM][CLI Driver] SQL30081N  A communication error has been
-	//	detected. Communication protocol being used: "TCP/IP".  
-	//	Communication API being used: "SOCKETS".  Location where the
-	//	error was detected: "192.168.74.29".  Communication function
-	//	detecting the error: "recv".  Protocol specific error code(s):
-	//	"*", "*", "0".  SQLSTATE=08001
-	//	(in this case nativeerrnum==-30081 and errlength==333)
+	//	detected...
+	//	(in this case nativeerrnum==-30081 and the error length is
+	//	variable depending on the host name/ip address of the server
+	//	and other things, so we'll only test for the error number)
 	return !((nativeerrnum==-1224 && errlength==184) ||
 		(nativeerrnum==-99999 && errlength==64) ||
 		(nativeerrnum==-1224 && errlength==220) ||
-		(nativeerrnum==-30081 && errlength==333));
+		(nativeerrnum==-30081));
 }
 
 
