@@ -2684,7 +2684,7 @@ bool sqlrcontroller_svr::handleBinds(sqlrcursor_svr *cursor) {
 
 			bool	found=false;
 
-			// find the cursor that we acquird earlier...
+			// find the cursor that we acquired earlier...
 			for (uint16_t j=0; j<cursorcount; j++) {
 
 				if (cur[j]->id==bind->value.cursorid) {
@@ -2959,6 +2959,8 @@ void sqlrcontroller_svr::endSession() {
 	}
 
 	// shrink the cursor array, if necessary
+	// FIXME: it would probably be more efficient to scale
+	// these down gradually rather than all at once
 	while (cursorcount>mincursorcount) {
 		cursorcount--;
 		deleteCursor(cur[cursorcount]);
