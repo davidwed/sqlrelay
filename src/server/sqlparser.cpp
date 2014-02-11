@@ -5338,6 +5338,11 @@ bool sqlparser::parseTerm(xmldomnode *currentnode,
 		return true;
 	}
 
+	// next check for an exists clause
+	if (parseExists(currentnode,*newptr,newptr)) {
+		return true;
+	}
+
 	// initialize the return value
 	bool	retval=true;
 
