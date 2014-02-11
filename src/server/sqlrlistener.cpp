@@ -469,8 +469,8 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	idmemory=new sharedmemory;
 	if (!idmemory->create(key,sizeof(shmdata),
 				permissions::evalPermString("rw-r-----"))) {
-		idmemory->attach(key,sizeof(shmdata));
 		shmError(id,idmemory->getId());
+		idmemory->attach(key,sizeof(shmdata));
 		return false;
 	}
 	shm=(shmdata *)idmemory->getPointer();
@@ -529,9 +529,8 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	int32_t	vals[11]={1,1,0,0,1,1,0,0,0,1,0};
 	semset=new semaphoreset();
 	if (!semset->create(key,permissions::ownerReadWrite(),11,vals)) {
-
-		semset->attach(key,11);
 		semError(id,semset->getId());
+		semset->attach(key,11);
 		return false;
 	}
 
