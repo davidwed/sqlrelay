@@ -82,7 +82,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 				"%s/pids/sqlr-listener-%s",
 				tmpdir->getString(),id);
 	bool	found=false;
-	for (uint8_t i=0; !found && i<5; i++) {
+	for (uint8_t i=0; !found && i<20; i++) {
 		if (i) {
 			snooze::microsnooze(0,100000);
 		}
