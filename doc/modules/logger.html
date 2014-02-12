@@ -58,9 +58,9 @@
 
 <p>The <b>debug</b> module logs a great deal of information to about the internal operation of the SQL Relay server to log files in the "debug directory", usually /usr/local/firstworks/var/sqlrelay/debug.  It creates files named sqlr-listener."pid" and sqlr-connection."pid" where "pid" is replaced with the process id of the process that is being logged.  As new processes are forked, new files are created with debug information about those processes.</p>
 
-<p>This module takes two parameters: <b>listener</b> and <b>connection</b>.  The <b>listener</b> parameter may be set to "no" to disable logging of the sqlr-listener processes.  The <b>connection</b> parameter may be set to "no" to disable logging of the sqlr-connection processes.  Logging is enabled if either parameter is omitted or set to any other value.</p>
+<p>This module takes three parameters: <b>listener</b>, <b>connection</b> and <b>perms</b>.  The <b>listener</b> parameter may be set to "no" to disable logging of the sqlr-listener processes.  The <b>connection</b> parameter may be set to "no" to disable logging of the sqlr-connection processes.  Logging is enabled if either parameter is omitted or set to any other value.  The <b>perms</b> parameter may be set to any ls -l style permissions string.  The default is "rw-------" which translates to read/write for owner only.</p>
 
-<p>The general format is:</p>
+<p>The general log format is:</p>
 
 <blockquote><code>
 mm/dd/yyyy hh:mm:ss TZ processname [pid] : info
