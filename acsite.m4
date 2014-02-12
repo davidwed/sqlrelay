@@ -2101,6 +2101,11 @@ extern "C" SQLRETURN SQL_API SQLRowCount(SQLHSTMT statementhandle,
 		AC_MSG_CHECKING(for SQLROWSETSIZE)
 		FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>],[SQLROWSETSIZE a;],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLROWSETSIZE,1,Some systems have SQLROWSETSIZE) ODBCUNICODE="yes"],[AC_MSG_RESULT(no)])
+		
+		AC_MSG_CHECKING(parameters for SQLExtendedFetch)
+		FW_TRY_LINK([#include <sql.h>
+#include <sqlext.h>
+extern "C" SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT statementhandle, SQLUSMALLINT fetchorientation, SQLLEN fetchoffset, SQLULEN *pcrow, SQLUSMALLINT *rgfrowstatus) { return 0; }],[],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(SQLLEN/SQLULEN); AC_DEFINE(HAVE_SQLEXTENDEDFETCH_LEN,1,Some systems have SQLLEN/SQLULEN parameters for SQLExtendedFetch)],[AC_MSG_RESULT(SQLROWOFFSET/SQLROWSETSIZE)])
 	fi
 
 	if ( test -z "$ODBCLIBS" -o -z "$ODBCUNICODE" )
