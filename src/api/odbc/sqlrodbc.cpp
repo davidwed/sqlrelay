@@ -4777,11 +4777,19 @@ SQLRETURN SQL_API SQLDescribeParam(SQLHSTMT statementhandle,
 	return SQL_ERROR;
 }
 
+#ifdef HAVE_SQLEXTENDEDFETCH_LEN
 SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT statementhandle,
 					SQLUSMALLINT fetchorientation,
 					SQLLEN fetchoffset,
 					SQLULEN *pcrow,
 					SQLUSMALLINT *rgfrowstatus) {
+#else
+SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT statementhandle,
+					SQLUSMALLINT fetchorientation,
+					SQLROWOFFSET fetchoffset,
+					SQLROWSETSIZE *pcrow,
+					SQLUSMALLINT *rgfrowstatus) {
+#endif
 	debugFunction();
 	return SQLR_Fetch(statementhandle,NULL,NULL);
 }
