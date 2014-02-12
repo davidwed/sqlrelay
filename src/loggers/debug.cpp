@@ -7,6 +7,7 @@
 #include <sqlrlogger.h>
 #include <cmdline.h>
 #include <rudiments/charstring.h>
+#include <rudiments/permissions.h>
 #include <rudiments/logger.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
@@ -30,6 +31,7 @@ class debug : public sqlrlogger {
 		filedestination		*dbgfile;
 		logger			*debuglogger;
 		char			*dbgfilename;
+		mode_t			dbgfileperms;
 		const char		*name;
 		bool			loglistener;
 		bool			logconnection;
@@ -39,6 +41,11 @@ debug::debug(xmldomnode *parameters) : sqlrlogger(parameters) {
 	dbgfile=NULL;
 	debuglogger=NULL;
 	dbgfilename=NULL;
+	const char	*permstring=parameters->getAttributeValue("perms");
+	if (!charstring::length(permstring)) {
+		permstring="rw-------";
+	}
+	dbgfileperms=permissions::evalPermString(permstring);
 	name=NULL;
 	loglistener=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("listener"),"no");
@@ -114,13 +121,11 @@ bool debug::run(sqlrlistener *sqlrl,
 bool debug::openDebugFile() {
 
 	// create the debug file
-	mode_t	oldumask=process::setFileCreationMask(066);
 	dbgfile=new filedestination();
-	process::setFileCreationMask(oldumask);
 
 	// open the file
 	bool	retval=false;
-	if (dbgfile->open(dbgfilename)) {
+	if (dbgfile->open(dbgfilename,dbgfileperms)) {
 		stdoutput.printf("Debugging to: %s\n",dbgfilename);
 		debuglogger=new logger();
 		debuglogger->addLogDestination(dbgfile);
