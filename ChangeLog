@@ -1,4 +1,7 @@
 0.55 - fixed a sql translation bug related to exists clauses
+	added deployment projects for windows
+	tweaked make.batch install target to install 32-bit files under
+		C:\Program Files (x86)
 
 0.54 - fixed bugs that caused problems when unopened result sets were closed
 	added protocol identification phase to client/server protocol

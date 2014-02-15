@@ -132,35 +132,42 @@ goto end
 
 
 :install
+mkdir C:\"Program Files"\Firstworks
 mkdir C:\"Program Files"\Firstworks\lib
 mkdir C:\"Program Files"\Firstworks\include\sqlrelay\private
 mkdir C:\"Program Files"\Firstworks\bin
 
-copy /Y src\api\"c++"\msvc\Release\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\api\"c++"\msvc\Release\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
-copy /Y src\api\"c++"\msvc\ReleaseCLR\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\api\"c++"\msvc\ReleaseCLR\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
-copy /Y src\api\"c++"\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
-copy /Y src\api\"c++"\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
+mkdir C:\"Program Files (x86)"\Firstworks
+mkdir C:\"Program Files (x86)"\Firstworks\lib
+mkdir C:\"Program Files (x86)"\Firstworks\include\sqlrelay\private
+mkdir C:\"Program Files (x86)"\Firstworks\bin
 
-copy /Y src\api\c\msvc\Release\libsqlrclientwrapper.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\api\c\msvc\Release\libsqlrclientwrapper.lib C:\"Program Files"\Firstworks\lib
-copy /Y src\api\c\msvc\ReleaseCLR\libsqlrclientwrapper.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\api\c\msvc\ReleaseCLR\libsqlrclientwrapper.lib C:\"Program Files"\Firstworks\lib
-copy /Y src\api\c\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
+copy /Y src\api\"c++"\msvc\Release\libsqlrclient.dll C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\api\"c++"\msvc\Release\libsqlrclient.lib C:\"Program Files (x86)"\Firstworks\lib
+copy /Y src\api\"c++"\msvc\ReleaseCLR\libsqlrclient.dll C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\api\"c++"\msvc\ReleaseCLR\libsqlrclient.lib C:\"Program Files (x86)"\Firstworks\lib
+copy /Y src\api\"c++"\include\sqlrelay\*.h C:\"Program Files (x86)"\Firstworks\include\sqlrelay
+copy /Y src\api\"c++"\include\sqlrelay\private\*.h C:\"Program Files (x86)"\Firstworks\include\sqlrelay\private
+
+copy /Y src\api\c\msvc\Release\libsqlrclientwrapper.dll C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\api\c\msvc\Release\libsqlrclientwrapper.lib C:\"Program Files (x86)"\Firstworks\lib
+copy /Y src\api\c\msvc\ReleaseCLR\libsqlrclientwrapper.dll C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\api\c\msvc\ReleaseCLR\libsqlrclientwrapper.lib C:\"Program Files (x86)"\Firstworks\lib
+copy /Y src\api\c\include\sqlrelay\*.h C:\"Program Files (x86)"\Firstworks\include\sqlrelay
 copy /Y src\api\c\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
 
-copy /Y src\api\odbc\msvc\ReleaseCLR\libsqlrodbc.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\api\odbc\msvc\Release\libsqlrodbc.dll C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\api\odbc\msvc\ReleaseCLR\libsqlrodbc.dll C:\"Program Files (x86)"\Firstworks\bin
 
-copy /Y src\api\cs\SQLRCLient\SQLRClient.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\api\cs\SQLRCLient\SQLRClient.dll C:\"Program Files (x86)"\Firstworks\bin
 
-copy /Y src\util\msvc\Release\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\util\msvc\Release\libsqlrutil.lib C:\"Program Files"\Firstworks\lib
-copy /Y src\util\msvc\ReleaseCLR\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\util\msvc\ReleaseCLR\libsqlrutil.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\util\msvc\Release\libsqlrutil.dll C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\util\msvc\Release\libsqlrutil.lib C:\"Program Files (x86)"\Firstworks\lib
+copy /Y src\util\msvc\ReleaseCLR\libsqlrutil.dll C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\util\msvc\ReleaseCLR\libsqlrutil.lib C:\"Program Files (x86)"\Firstworks\lib
 
-copy /Y src\cmdline\msvc\Release\sqlrsh.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\cmdline\msvc\ReleaseCLR\sqlrsh.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\cmdline\msvc\Release\sqlrsh.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\cmdline\msvc\ReleaseCLR\sqlrsh.exe C:\"Program Files (x86)"\Firstworks\bin
 
 
 
@@ -178,6 +185,7 @@ copy /Y src\api\c\msvc\x64\ReleaseCLR\libsqlrclientwrapper.lib C:\"Program Files
 copy /Y src\api\c\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
 copy /Y src\api\c\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
 
+copy /Y src\api\odbc\msvc\x64\Release\libsqlrodbc.dll C:\"Program Files"\Firstworks\bin
 copy /Y src\api\odbc\msvc\x64\ReleaseCLR\libsqlrodbc.dll C:\"Program Files"\Firstworks\bin
 
 copy /Y src\util\msvc\x64\Release\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
@@ -196,6 +204,11 @@ del "C:\Program Files\Firstworks\lib\libsqlr*.lib"
 del "C:\Program Files\Firstworks\bin\libsqlr*.dll"
 del "C:\Program Files\Firstworks\bin\SQLR*.dll"
 del "C:\Program Files\Firstworks\bin\sqlrsh.exe"
+rmdir /s /q "C:\Program Files (x86)\Firstworks\include\sqlrelay"
+del "C:\Program Files (x86)\Firstworks\lib\libsqlr*.lib"
+del "C:\Program Files (x86)\Firstworks\bin\libsqlr*.dll"
+del "C:\Program Files (x86)\Firstworks\bin\SQLR*.dll"
+del "C:\Program Files (x86)\Firstworks\bin\sqlrsh.exe"
 goto end
 
 

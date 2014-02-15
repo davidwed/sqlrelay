@@ -265,7 +265,7 @@ public class SQLRConnection : IDisposable
     /** Allows you to specify a file to write debug to.
      *  Setting "filename" to NULL or an empty string causes debug
      *  to be written to standard output (the default). */
-    public void setDebugFile(const char *filename)
+    public void setDebugFile(String filename)
     {
         sqlrcon_setDebugFile(sqlrconref,filename);
     }
