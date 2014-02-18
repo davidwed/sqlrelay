@@ -208,6 +208,7 @@ class db2connection : public sqlrconnection_svr {
 
 		const char	*server;
 		const char	*lang;
+		uint64_t	timeout;
 
 		char		dbversion[512];
 
@@ -241,6 +242,14 @@ void db2connection::handleConnectString() {
 		!charstring::compare(
 			cont->connectStringValue("fakebinds"),
 			"yes");
+
+	const char	*to=cont->connectStringValue("timeout");
+	if (!charstring::length(to)) {
+		// for back-compatibility
+		timeout=5;
+	} else {
+		timeout=charstring::toInteger(to);
+	}
 }
 
 bool db2connection::logIn(const char **error) {
@@ -269,7 +278,10 @@ bool db2connection::logIn(const char **error) {
 	}
 
 	// set the connect timeout
-	SQLSetConnectAttr(dbc,SQL_LOGIN_TIMEOUT,(SQLPOINTER *)5,0);
+	if (timeout) {
+		SQLSetConnectAttr(dbc,SQL_LOGIN_TIMEOUT,
+					(SQLPOINTER *)timeout,0);
+	}
 
 	// connect to the database
 	erg=SQLConnect(dbc,(SQLCHAR *)server,SQL_NTS,

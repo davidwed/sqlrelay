@@ -237,6 +237,7 @@ class odbcconnection : public sqlrconnection_svr {
 		SQLHDBC		dbc;
 
 		const char	*dsn;
+		uint64_t	timeout;
 
 		char		dbversion[512];
 
@@ -400,6 +401,14 @@ void odbcconnection::handleConnectString() {
 	cont->fakeinputbinds=
 		!charstring::compare(
 			cont->connectStringValue("fakebinds"),"yes");
+
+	const char	*to=cont->connectStringValue("timeout");
+	if (!charstring::length(to)) {
+		// for back-compatibility
+		timeout=5;
+	} else {
+		timeout=charstring::toInteger(to);
+	}
 }
 
 bool odbcconnection::logIn(const char **error) {
@@ -444,7 +453,10 @@ bool odbcconnection::logIn(const char **error) {
 
 	// set the connect timeout
 #if (ODBCVER >= 0x0300)
-	SQLSetConnectAttr(dbc,SQL_LOGIN_TIMEOUT,(SQLPOINTER *)5,0);
+	if (timeout) {
+		SQLSetConnectAttr(dbc,SQL_LOGIN_TIMEOUT,
+					(SQLPOINTER *)timeout,0);
+	}
 #endif
 
 	// connect to the database
