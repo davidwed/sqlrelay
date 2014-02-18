@@ -2,6 +2,7 @@
 	added deployment projects for windows
 	tweaked make.batch install target to install 32-bit files under
 		C:\Program Files (x86)
+	added a timeout parameter to db2 and odbc connect strings
 
 0.54 - fixed bugs that caused problems when unopened result sets were closed
 	added protocol identification phase to client/server protocol

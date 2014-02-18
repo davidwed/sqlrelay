@@ -615,15 +615,16 @@ or a tnsnames-style expression such as:
 <li><b>packetsize</b>: The packetsize to use.  Optional.</li>
 </ul>
 </li>
-<li>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;"</li>
+<li>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;timeout=TIMEOUT;"</li>
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
 <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
 <li><b>dsn</b>: The entry in the the odbcinst.ini which specifies host, port and other database connection parameters.</li>
 <li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
+<li><b>timeout</b>: Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.</li>
 </ul>
 </li>
-<li>For <b>db2</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;autocommit=yes/no;faketransactionblocks=YESORNO"</li>
+<li>For <b>db2</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;autocommit=yes/no;faketransactionblocks=YESORNO;timeout=TIMEOUT;"</li>
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
 <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
@@ -631,6 +632,7 @@ or a tnsnames-style expression such as:
 <li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
 <li><b>lang</b>: Sets/overrides the LANG environment variable and by extension, all locale-related variables.  Optional if the LANG environment variable is set.</li>
 <li><b>faketransactionblocks</b>: Some databases are in autocommit mode until you explicitly start a transaction with a "start" or "begin" statement.  DB2 is always in a transaction though, unless autocommit is turned on.  Setting this parameter to "yes" causes SQL Relay to put the database in autocommit mode until a "start" or "begin" statement is issued, and then put it back in autocommit mode when a commit or rollback is issued.  In effect, emulating the behavior of databases which require an explicit "start" or "begin".</li>
+<li><b>timeout</b>: Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.</li>
 </ul>
 </li>
 <li>For <b>firebird</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DATABASE;dialect=DIALECT;autocommit=yes/no;charset=CHARSET;faketransactionblocks=YESORNO;lastinsertidfunction=LASTINSERTIDFUNCTION"</li>
