@@ -1185,9 +1185,9 @@ bool sqlrcontroller_svr::announceAvailability(const char *unixsocket,
 		signalmanager::alarm(ttl);
 	}
 
-	// This will fail if the ttl was reached while waiting.
-	// Since we failed to acquire the announce mutex, we don't need to
-	// release it.
+	// This will fall through if the ttl was reached while waiting.
+	// In that case, since we failed to acquire the announce mutex,
+	// we don't need to release it.
 	if (!acquireAnnounceMutex()) {
 		logDebugMessage("ttl reached, aborting announcing availabilty");
 		return false;
@@ -1202,9 +1202,9 @@ bool sqlrcontroller_svr::announceAvailability(const char *unixsocket,
 
 	signalListenerToRead();
 
-	// This will fail if the ttl was reached while waiting.
-	// Since we acquired the announce mutex earlier though,
-	// we need to release it in either case.
+	// This will fall through if the ttl was reached while waiting.
+	// Since we acquired the announce mutex earlier though, we need to
+	// release it in either case.
 	bool	retval=waitForListenerToFinishReading();
 
 	// turn off the alarm
@@ -3345,7 +3345,7 @@ void sqlrcontroller_svr::releaseAnnounceMutex() {
 
 void sqlrcontroller_svr::signalListenerToRead() {
 	logDebugMessage("signalling listener to read");
-	semset->signal(2);
+	semset->signalWithUndo(2);
 	logDebugMessage("done signalling listener to read");
 }
 
@@ -3353,9 +3353,10 @@ bool sqlrcontroller_svr::waitForListenerToFinishReading() {
 
 	logDebugMessage("waiting for listener");
 
-	// FIXME: It's possible that the alarm could ring prior to the wait
-	// below and not interrupt it.  If that happens, the ttl would be
-	// ignored.
+	// It's possible that the alarm could ring prior to the wait below and
+	// not interrupt it.  If that happens, the ttl would be ignored.  This
+	// is highly unlikely as the minimum ttl is 1 second, but I guess if a
+	// machine was super, super busy, then it might happen.
 
 	// Loop, waiting.  Retry the wait if it was interrupted by a signal
 	// other than an alarm, but bail if an alarm interrupted it.
