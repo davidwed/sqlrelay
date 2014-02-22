@@ -2699,7 +2699,7 @@ bool sqlparser::parseRestrict(xmldomnode *currentnode,
 	if (!restrictClause(ptr,newptr)) {
 		return false;
 	}
-	newNode(currentnode,_restrict);
+	newNode(currentnode,_restrictclause);
 	return true;
 }
 
@@ -2708,7 +2708,7 @@ bool sqlparser::restrictClause(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,"restrict");
 }
 
-const char *sqlparser::_restrict="restrict";
+const char *sqlparser::_restrictclause="restrict";
 
 bool sqlparser::parseCascade(xmldomnode *currentnode,
 					const char *ptr,
