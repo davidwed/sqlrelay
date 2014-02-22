@@ -552,8 +552,12 @@ void scaler::killConnection(pid_t connpid) {
 				(tries==1)?"Terminating":"Killing",
 				(long)connpid);
 
+			#ifdef SIGKILL
 			signalmanager::sendSignal(connpid,
 					(tries==1)?SIGTERM:SIGKILL);
+			#else
+			signalmanager::sendSignal(connpid,SIGTERM);
+			#endif
 
 			// wait for process to terminate
 			snooze::macrosnooze(5);

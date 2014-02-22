@@ -4,10 +4,12 @@
 #ifndef SQLRAUTHENTICATOR_H
 #define SQLRAUTHENTICATOR_H
 
+#include <sqlrserverdll.h>
+
 #include <sqlrconfigfile.h>
 #include <sqlrpwdencs.h>
 
-class sqlrauthenticator {
+class SQLRSERVER_DLLSPEC sqlrauthenticator {
 
 	public:
 			sqlrauthenticator(sqlrconfigfile *cfgfile,

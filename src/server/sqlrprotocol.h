@@ -4,6 +4,8 @@
 #ifndef SQLRPROTOCOL_H
 #define SQLRPROTOCOL_H
 
+#include <sqlrserverdll.h>
+
 #include <config.h>
 #include <defaults.h>
 #include <rudiments/filedescriptor.h>
@@ -29,7 +31,7 @@ class sqlrcontroller_svr;
 class sqlrconnection_svr;
 class sqlrconfigfile;
 
-class sqlrprotocol {
+class SQLRSERVER_DLLSPEC sqlrprotocol {
 	public:
 			sqlrprotocol(sqlrcontroller_svr *cont,
 					sqlrconnection_svr *conn,

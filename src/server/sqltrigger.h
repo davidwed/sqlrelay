@@ -4,13 +4,15 @@
 #ifndef SQLTRIGGER_H
 #define SQLTRIGGER_H
 
+#include <sqlrserverdll.h>
+
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 
 class sqlrconnection_svr;
 class sqlrcursor_svr;
 
-class sqltrigger {
+class SQLRSERVER_DLLSPEC sqltrigger {
 	public:
 			sqltrigger(xmldomnode *parameters);
 		virtual	~sqltrigger();

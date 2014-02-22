@@ -4,6 +4,8 @@
 #ifndef SQLRLOGGER_H
 #define SQLRLOGGER_H
 
+#include <sqlrserverdll.h>
+
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 
@@ -31,7 +33,7 @@ enum sqlrlogger_eventtype_t {
 	SQLRLOGGER_EVENTTYPE_DEBUG_MESSAGE
 };
 
-class sqlrlogger {
+class SQLRSERVER_DLLSPEC sqlrlogger {
 	public:
 			sqlrlogger(xmldomnode *parameters);
 		virtual	~sqlrlogger();

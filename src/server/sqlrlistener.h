@@ -4,6 +4,8 @@
 #ifndef SQLRLISTENER_H
 #define SQLRLISTENER_H
 
+#include <sqlrserverdll.h>
+
 #include <config.h>
 
 #include <cmdline.h>
@@ -24,14 +26,14 @@
 #include <defaults.h>
 #include <defines.h>
 
-class handoffsocketnode {
+class SQLRSERVER_DLLSPEC handoffsocketnode {
 	friend class sqlrlistener;
 	private:
 		uint32_t	pid;
 		filedescriptor	*sock;
 };
 
-class sqlrlistener : public listener {
+class SQLRSERVER_DLLSPEC sqlrlistener : public listener {
 	public:
 			sqlrlistener();
 			~sqlrlistener();

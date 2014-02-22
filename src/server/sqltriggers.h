@@ -4,6 +4,8 @@
 #ifndef SQLTRIGGERS_H
 #define SQLTRIGGERS_H
 
+#include <sqlrserverdll.h>
+
 #include <rudiments/xmldom.h>
 #include <rudiments/linkedlist.h>
 #include <rudiments/dynamiclib.h>
@@ -12,13 +14,13 @@
 class sqlrconnection_svr;
 class sqlrcursor_svr;
 
-class sqltriggerplugin {
+class SQLRSERVER_DLLSPEC sqltriggerplugin {
 	public:
 		sqltrigger	*tr;
 		dynamiclib	*dl;
 };
 
-class sqltriggers {
+class SQLRSERVER_DLLSPEC sqltriggers {
 	public:
 			sqltriggers();
 			~sqltriggers();

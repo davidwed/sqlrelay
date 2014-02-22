@@ -390,7 +390,7 @@
 /* #undef SQLITE_TRANSACTIONAL */
 
 /* Platform supports shared libraries */
-/* #undef SQLRELAY_ENABLE_SHARED */
+#define SQLRELAY_ENABLE_SHARED 1
 
 /* Some systems have sys/vnode.h */
 /* #undef SQLRELAY_HAVE_SYS_VNODE_H */

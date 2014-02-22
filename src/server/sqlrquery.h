@@ -4,6 +4,8 @@
 #ifndef SQLRQUERY_H
 #define SQLRQUERY_H
 
+#include <sqlrserverdll.h>
+
 #include <sqlrcursor.h>
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
@@ -13,7 +15,7 @@
 
 class sqlrquerycursor;
 
-class sqlrquery {
+class SQLRSERVER_DLLSPEC sqlrquery {
 	public:
 			sqlrquery(xmldomnode *parameters);
 		virtual	~sqlrquery();
@@ -25,7 +27,7 @@ class sqlrquery {
 		xmldomnode	*parameters;
 };
 
-class sqlrquerycursor : public sqlrcursor_svr {
+class SQLRSERVER_DLLSPEC sqlrquerycursor : public sqlrcursor_svr {
 	public:
 			sqlrquerycursor(sqlrconnection_svr *conn,
 					xmldomnode *parameters);

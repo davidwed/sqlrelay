@@ -4,6 +4,8 @@
 #ifndef SQLRCONTROLLER_H
 #define SQLRCONTROLLER_H
 
+#include <sqlrserverdll.h>
+
 #include <config.h>
 #include <defaults.h>
 #include <rudiments/listener.h>
@@ -35,7 +37,7 @@
 
 #include <defines.h>
 
-class sqlrcontroller_svr : public listener {
+class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 	public:
 			sqlrcontroller_svr();
 		virtual	~sqlrcontroller_svr();

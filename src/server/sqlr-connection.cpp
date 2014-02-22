@@ -45,6 +45,7 @@ void shutDown(int32_t signum) {
 
 		case SIGTERM:
 			// Shutdown
+		#ifdef HAVE_SIGALRM
 		case SIGALRM:
 			// Timeout
 			stderror.printf("(pid=%ld) Process terminated "
@@ -52,6 +53,7 @@ void shutDown(int32_t signum) {
 					(long)process::getProcessId(),signum);
 			exitcode=0;
 			break;
+		#endif
 
 		default:
 			// Other signals are bugs

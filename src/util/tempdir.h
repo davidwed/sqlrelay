@@ -1,11 +1,14 @@
+// Copyright (c) 1999-2014 David Muse
+// See the file COPYING for more information
+
 #ifndef SQLRUTIL_TEMPDIR_H
 #define SQLRUTIL_TEMPDIR_H
 
-#include <dll.h>
+#include <sqlrutildll.h>
 
 #include <cmdline.h>
 
-class tempdir {
+class SQLRUTIL_DLLSPEC tempdir {
 	public:
 			tempdir(cmdline *cmdl);
 			~tempdir();

@@ -1,11 +1,11 @@
 #ifndef SQLRUTIL_CMDLINE_H
 #define SQLRUTIL_CMDLINE_H
 
-#include <dll.h>
+#include <sqlrutildll.h>
 
 #include <rudiments/commandline.h>
 
-class cmdline : public commandline {
+class SQLRUTIL_DLLSPEC cmdline : public commandline {
 	public:
 			cmdline(int argc, const char **argv);
 

@@ -4,13 +4,15 @@
 #ifndef SQLRCURSOR_H
 #define SQLRCURSOR_H
 
+#include <sqlrserverdll.h>
+
 #include <rudiments/stringbuffer.h>
 #include <rudiments/regularexpression.h>
 #include <rudiments/xmldom.h>
 
 #include <defines.h>
 
-class bindvar_svr {
+class SQLRSERVER_DLLSPEC bindvar_svr {
 	public:
 		char	*variable;
 		int16_t	variablesize;
@@ -63,7 +65,7 @@ enum sqlrquerytype_t {
 class sqlrconnection_svr;
 class sqlrquerycursor;
 
-class sqlrcursor_svr {
+class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 	public:
 			sqlrcursor_svr(sqlrconnection_svr *conn);
 		virtual	~sqlrcursor_svr();

@@ -4,6 +4,8 @@
 #ifndef SQLRCLIENTPROTOCOL_H
 #define SQLRCLIENTPROTOCOL_H
 
+#include <sqlrserverdll.h>
+
 #include <sqlrprotocol.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/memorypool.h>
@@ -15,7 +17,7 @@ class sqlrconnection_svr;
 class sqlrcursor_svr;
 class bindvar_svr;
 
-class sqlrclientprotocol : public sqlrprotocol {
+class SQLRSERVER_DLLSPEC sqlrclientprotocol : public sqlrprotocol {
 	public:
 			sqlrclientprotocol(sqlrcontroller_svr *cont,
 						sqlrconnection_svr *conn,

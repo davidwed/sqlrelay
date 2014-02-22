@@ -23,6 +23,8 @@ cd ..\..\..\util\msvc
 msbuild.exe /property:Configuration=Release /property:Platform=Win32
 cd ..\..\cmdline\msvc
 msbuild.exe /property:Configuration=Release /property:Platform=Win32
+cd ..\..\server\msvc
+msbuild.exe /property:Configuration=Release /property:Platform=Win32
 cd ..\..\..
 goto end
 
@@ -39,6 +41,8 @@ msbuild.exe /property:Configuration=Release
 cd ..\..\..\util\msvc
 msbuild.exe /property:Configuration=Release /property:Platform=x64
 cd ..\..\cmdline\msvc
+msbuild.exe /property:Configuration=Release /property:Platform=x64
+cd ..\..\server\msvc
 msbuild.exe /property:Configuration=Release /property:Platform=x64
 cd ..\..\..
 goto end
@@ -57,6 +61,8 @@ cd ..\..\..\util\msvc
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32
 cd ..\..\cmdline\msvc
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32
+cd ..\..\server\msvc
+msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32
 cd ..\..\..
 goto end
 
@@ -73,6 +79,8 @@ msbuild.exe /property:Configuration=Release
 cd ..\..\..\util\msvc
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64
 cd ..\..\cmdline\msvc
+msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64
+cd ..\..\server\msvc
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64
 cd ..\..\..
 goto end
@@ -127,6 +135,15 @@ msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=x64
 msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=x64
 msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=x64
 msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=x64
+cd ..\..\server\msvc
+msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=Win32
+msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=Win32
+msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=Win32
+msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=Win32
+msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=x64
+msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=x64
+msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=x64
+msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=x64
 cd ..\..\..
 goto end
 
@@ -173,6 +190,11 @@ copy /Y src\util\msvc\ReleaseCLR\libsqlrutil.lib C:\"Program Files (x86)"\Firstw
 copy /Y src\cmdline\msvc\Release\sqlrsh.exe C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\cmdline\msvc\ReleaseCLR\sqlrsh.exe C:\"Program Files (x86)"\Firstworks\bin
 
+copy /Y src\server\msvc\Release\libsqlrserver.dll C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\msvc\Release\libsqlrserver.lib C:\"Program Files (x86)"\Firstworks\lib
+copy /Y src\server\msvc\ReleaseCLR\libsqlrserver.dll C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\msvc\ReleaseCLR\libsqlrserver.lib C:\"Program Files (x86)"\Firstworks\lib
+
 
 
 copy /Y src\api\"c++"\msvc\x64\Release\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
@@ -199,6 +221,11 @@ copy /Y src\util\msvc\x64\ReleaseCLR\libsqlrutil.lib C:\"Program Files"\Firstwor
 
 copy /Y src\cmdline\msvc\x64\Release\sqlrsh.exe C:\"Program Files"\Firstworks\bin
 copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlrsh.exe C:\"Program Files"\Firstworks\bin
+
+copy /Y src\sever\msvc\x64\Release\libsqlrsever.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\sever\msvc\x64\Release\libsqlrsever.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\sever\msvc\x64\ReleaseCLR\libsqlrsever.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\sever\msvc\x64\ReleaseCLR\libsqlrsever.lib C:\"Program Files"\Firstworks\lib
 goto end
 
 

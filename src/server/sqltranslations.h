@@ -4,6 +4,8 @@
 #ifndef SQLTRANSLATOR_H
 #define SQLTRANSLATOR_H
 
+#include <sqlrserverdll.h>
+
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 #include <rudiments/memorypool.h>
@@ -14,7 +16,7 @@
 class sqlrconnection_svr;
 class sqlrcursor_svr;
 
-class databaseobject {
+class SQLRSERVER_DLLSPEC databaseobject {
 	public:
 		const char	*database;
 		const char	*schema;
@@ -22,13 +24,13 @@ class databaseobject {
 		const char	*dependency;
 };
 
-class sqltranslationplugin {
+class SQLRSERVER_DLLSPEC sqltranslationplugin {
 	public:
 		sqltranslation	*tr;
 		dynamiclib	*dl;
 };
 
-class sqltranslations {
+class SQLRSERVER_DLLSPEC sqltranslations {
 	public:
 			sqltranslations();
 			~sqltranslations();

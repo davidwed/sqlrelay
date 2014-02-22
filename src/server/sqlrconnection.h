@@ -4,13 +4,15 @@
 #ifndef SQLRCONNECTION_H
 #define SQLRCONNECTION_H
 
+#include <sqlrserverdll.h>
+
 #include <sqlrcursor.h>
 #include <sqltranslations.h>
 #include <sqlwriter.h>
 
 class sqlrcontroller_svr;
 
-class sqlrconnection_svr {
+class SQLRSERVER_DLLSPEC sqlrconnection_svr {
 	public:
 			sqlrconnection_svr(sqlrcontroller_svr *cont);
 		virtual	~sqlrconnection_svr();

@@ -4,6 +4,8 @@
 #ifndef SQLRQUERIES_H
 #define SQLRQUERIES_H
 
+#include <sqlrserverdll.h>
+
 #include <rudiments/xmldom.h>
 #include <rudiments/linkedlist.h>
 #include <rudiments/dynamiclib.h>
@@ -12,13 +14,13 @@
 class sqlrconnection_svr;
 class sqlrcursor_svr;
 
-class sqlrqueryplugin {
+class SQLRSERVER_DLLSPEC sqlrqueryplugin {
 	public:
 		sqlrquery	*qr;
 		dynamiclib	*dl;
 };
 
-class sqlrqueries {
+class SQLRSERVER_DLLSPEC sqlrqueries {
 	public:
 			sqlrqueries();
 			~sqlrqueries();

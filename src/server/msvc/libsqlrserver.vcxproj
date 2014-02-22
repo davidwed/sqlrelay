@@ -140,7 +140,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRUTIL_EXPORTS;LIBSQLRUTIL_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -151,7 +151,8 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\util\msvc\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>cd ..\..\..
@@ -164,7 +165,7 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRUTIL_EXPORTS;LIBSQLRUTIL_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -174,7 +175,8 @@ copy /Y config.windows.h config.h</Command>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\util\msvc\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>cd ..\..\..
@@ -187,7 +189,7 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRUTIL_EXPORTS;LIBSQLRUTIL_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -198,7 +200,8 @@ copy /Y config.windows.h config.h</Command>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\util\msvc\DebugCLR;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>cd ..\..\..
@@ -211,7 +214,7 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRUTIL_EXPORTS;LIBSQLRUTIL_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -221,7 +224,8 @@ copy /Y config.windows.h config.h</Command>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\util\msvc\x64\DebugCLR;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>cd ..\..\..
@@ -234,7 +238,7 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRUTIL_EXPORTS;LIBSQLRUTIL_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -246,7 +250,8 @@ copy /Y config.windows.h config.h</Command>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\util\msvc\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>cd ..\..\..
@@ -259,7 +264,7 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRUTIL_EXPORTS;LIBSQLRUTIL_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -270,7 +275,8 @@ copy /Y config.windows.h config.h</Command>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\util\msvc\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>cd ..\..\..
@@ -283,7 +289,7 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRUTIL_EXPORTS;LIBSQLRUTIL_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -295,7 +301,8 @@ copy /Y config.windows.h config.h</Command>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\util\msvc\ReleaseCLR;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>cd ..\..\..
@@ -308,7 +315,7 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRUTIL_EXPORTS;LIBSQLRUTIL_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -319,7 +326,8 @@ copy /Y config.windows.h config.h</Command>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\util\msvc\x64\ReleaseCLR;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>cd ..\..\..

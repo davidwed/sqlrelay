@@ -4,6 +4,8 @@
 #ifndef SQLRLOGGERS_H
 #define SQLRLOGGERS_H
 
+#include <sqlrserverdll.h>
+
 #include <rudiments/xmldom.h>
 #include <rudiments/linkedlist.h>
 #include <rudiments/dynamiclib.h>
@@ -13,13 +15,13 @@ class sqlrlistener;
 class sqlrconnection_svr;
 class sqlrcursor_svr;
 
-class sqlrloggerplugin {
+class SQLRSERVER_DLLSPEC sqlrloggerplugin {
 	public:
 		sqlrlogger	*lg;
 		dynamiclib	*dl;
 };
 
-class sqlrloggers {
+class SQLRSERVER_DLLSPEC sqlrloggers {
 	public:
 			sqlrloggers();
 			~sqlrloggers();

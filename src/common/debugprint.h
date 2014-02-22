@@ -10,11 +10,18 @@
 //#define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
 	#define debugFunction() stdoutput.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
-	#define debugPrintf(args...) stdoutput.printf(args); fflush(stdout);
-
+	#ifdef _MSC_VER
+		#define debugPrintf(args,...) stdoutput.printf(args,__VA_ARGS__); fflush(stdout);
+	#else
+		#define debugPrintf(args...) stdoutput.printf(args); fflush(stdout);
+	#endif
 #else
 	#define debugFunction() /* */
-	#define debugPrintf(args...) /* */
+	#ifdef _MSC_VER
+		#define debugPrintf(args,...) /* */
+	#else
+		#define debugPrintf(args...) /* */
+	#endif
 #endif
 
 #endif

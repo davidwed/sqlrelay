@@ -6,7 +6,7 @@
 
 #include <config.h>
 
-#include <dll.h>
+#include <sqlrutildll.h>
 
 #include <rudiments/xmlsax.h>
 #include <rudiments/stringbuffer.h>

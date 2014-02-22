@@ -224,8 +224,10 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 	setMaxListeners(maxlisteners);
 
 	// set a handler for SIGALRMs
+	#ifdef HAVE_SIGALRM
 	alarmhandler.setHandler(alarmHandler);
 	alarmhandler.handleSignal(SIGALRM);
+	#endif
 
 	return true;
 }
@@ -2056,5 +2058,7 @@ void sqlrlistener::logInternalError(const char *info) {
 
 void sqlrlistener::alarmHandler(int32_t signum) {
 	alarmrang=1;
+	#ifdef HAVE_SIGALRM
 	alarmhandler.handleSignal(SIGALRM);
+	#endif
 }

@@ -4,18 +4,20 @@
 #ifndef SQLRPWDENCS_H
 #define SQLRPWDENCS_H
 
+#include <sqlrserverdll.h>
+
 #include <rudiments/xmldom.h>
 #include <rudiments/linkedlist.h>
 #include <rudiments/dynamiclib.h>
 #include <sqlrpwdenc.h>
 
-class sqlrpwdencplugin {
+class SQLRSERVER_DLLSPEC sqlrpwdencplugin {
 	public:
 		sqlrpwdenc	*pe;
 		dynamiclib	*dl;
 };
 
-class sqlrpwdencs {
+class SQLRSERVER_DLLSPEC sqlrpwdencs {
 	public:
 			sqlrpwdencs();
 			~sqlrpwdencs();

@@ -4,13 +4,15 @@
 #ifndef SQLWRITER_H
 #define SQLWRITER_H
 
+#include <sqlrserverdll.h>
+
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 
 class sqlrconnection_svr;
 class sqlrcursor_svr;
 
-class sqlwriter {
+class SQLRSERVER_DLLSPEC sqlwriter {
 	public:
 			sqlwriter();
 		virtual	~sqlwriter();

@@ -4,10 +4,12 @@
 #ifndef SQLPARSER
 #define SQLPARSER
 
+#include <sqlrserverdll.h>
+
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 
-class sqlparser {
+class SQLRSERVER_DLLSPEC sqlparser {
 	public:
 			sqlparser();
 			~sqlparser();

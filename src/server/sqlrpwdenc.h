@@ -4,9 +4,11 @@
 #ifndef SQLRPWDENC_H
 #define SQLRPWDENC_H
 
+#include <sqlrserverdll.h>
+
 #include <rudiments/xmldomnode.h>
 
-class sqlrpwdenc {
+class SQLRSERVER_DLLSPEC sqlrpwdenc {
 	public:
 			sqlrpwdenc(xmldomnode *parameters);
 		virtual	~sqlrpwdenc();
