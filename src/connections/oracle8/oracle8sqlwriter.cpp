@@ -33,7 +33,7 @@ const char * const *oracle8sqlwriter::unsupportedElements() {
 
 		// drop...
 		sqlparser::_drop_temporary,
-		sqlparser::_restrict,
+		sqlparser::_restrict_clause,
 
 		// set...
 		sqlparser::_set_global,

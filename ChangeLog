@@ -8,6 +8,7 @@
 		expired
 	updated handoff="proxy" code to work with sessionhandler="thread"
 	the cmdline and tempdir classes now compile on windows
+	replaced waitpid call in sqlrscaler with rudiments equivalent
 
 0.54 - fixed bugs that caused problems when unopened result sets were closed
 	added protocol identification phase to client/server protocol
