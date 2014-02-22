@@ -6,6 +6,7 @@
 	fixed a bug that could cause a connection's ttl to fail because a
 		semaphore was left signalled when another connection's ttl
 		expired
+	updated handoff="proxy" code to work with sessionhandler="thread"
 
 0.54 - fixed bugs that caused problems when unopened result sets were closed
 	added protocol identification phase to client/server protocol

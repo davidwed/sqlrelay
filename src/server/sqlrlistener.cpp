@@ -25,9 +25,6 @@
 signalhandler		sqlrlistener::alarmhandler;
 volatile sig_atomic_t	sqlrlistener::alarmrang=0;
 
-signalhandler		sqlrlistener::sigusr1handler;
-volatile sig_atomic_t	sqlrlistener::gotsigusr1=0;
-
 sqlrlistener::sqlrlistener() : listener() {
 
 	cmdl=NULL;
@@ -226,10 +223,6 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 
 	setMaxListeners(maxlisteners);
 
-	// handle SIGUSR1
-	sigusr1handler.setHandler(sigUsr1Handler);
-	sigusr1handler.handleSignal(SIGUSR1);
-
 	// set a handler for SIGALRMs
 	alarmhandler.setHandler(alarmHandler);
 	alarmhandler.handleSignal(SIGALRM);
@@ -366,14 +359,6 @@ void sqlrlistener::setSessionHandlerMethod() {
 					"currently unsupported when "
 					"listenertimeout is set to a non-zero "
 					"value.  Falling back to "
-					"sessionhandler=\"process\".\n");
-			return;
-		}
-
-		if (handoffmode==HANDOFF_PROXY) {
-			stderror.printf("Warning: sessionhandler=\"thread\" is "
-					"currently unsupported with "
-					"handoff=\"proxy\".  Falling back to "
 					"sessionhandler=\"process\".\n");
 			return;
 		}
@@ -1695,12 +1680,9 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	clientsock->useNonBlockingMode();
 
 	// Set up a listener to listen on both client and server sockets.
-	// Allow waits to be interrupted because the connecton daemon will
-	// send us a SIGUSR1 when it's done talking to the client.
 	listener	proxy;
 	proxy.addFileDescriptor(serversock);
 	proxy.addFileDescriptor(clientsock);
-	proxy.dontRetryInterruptedWaits();
 
 	// set up a read buffer
 	unsigned char	readbuffer[8192];
@@ -1711,29 +1693,14 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	for (;;) {
 
 		// wait for data to be available from the client or server
-		// or for the server to signal that we should bail
 		error::clearError();
 		int32_t	waitcount=proxy.waitForNonBlockingRead(-1,-1);
 
-		// were we interrupted?
-		if (error::getErrorNumber()==EINTR) {
-
-			logDebugMessage("interrupted");
-
-			// if it was a SIGUSR1 then bail
-			if (gotsigusr1) {
-				logDebugMessage("received SIGUSR1");
-				break;
-			}
-
-			// must have been some other signal,
-			// loop back and wait again
-			continue;
-		}
-
-		// No interrupt, but nobody had data...
-		// One of the sockets must have gotten closed.
-		// Most likely the client disconnected.
+		// The wait fell through but nobody had data.  This is just here
+		// for good measure now.  I'm not sure what could cause this.
+		// I originally thought it could happen if one side or the other
+		// closed the socket, but it appears in that case, the wait does		// fall through with the side that closed the socket indicated
+		// as ready and then the read fails.
 		if (waitcount<1) {
 			logDebugMessage("wait exited with no data");
 			endsession=true;
@@ -2090,9 +2057,4 @@ void sqlrlistener::logInternalError(const char *info) {
 void sqlrlistener::alarmHandler(int32_t signum) {
 	alarmrang=1;
 	alarmhandler.handleSignal(SIGALRM);
-}
-
-void sqlrlistener::sigUsr1Handler(int32_t signum) {
-	gotsigusr1=1;
-	sigusr1handler.handleSignal(SIGUSR1);
 }

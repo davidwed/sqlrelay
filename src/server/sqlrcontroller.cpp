@@ -3086,21 +3086,15 @@ void sqlrcontroller_svr::closeClientSocket(uint32_t bytes) {
 
 	// close the client socket
 	logDebugMessage("closing the client socket...");
-	if (proxymode) {
-
-		logDebugMessage("(actually just signalling the listener)");
-
-		// we do need to signal the proxy that it
-		// needs to close the connection though
-		signalmanager::sendSignal(proxypid,SIGUSR1);
-
-		// in proxy mode, the client socket is pointed at the
-		// handoff socket which we don't want to actually close
-		clientsock->setFileDescriptor(-1);
-	}
 	clientsock->close();
 	delete clientsock;
 	logDebugMessage("done closing the client socket");
+
+	// in proxy mode, the client socket is pointed at the handoff
+	// socket which now needs to be reestablished
+	if (proxymode) {
+		registerForHandoff();
+	}
 }
 
 void sqlrcontroller_svr::closeSuspendedSessionSockets() {

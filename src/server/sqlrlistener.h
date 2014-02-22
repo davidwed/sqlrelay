@@ -112,7 +112,6 @@ class sqlrlistener : public listener {
 		void	logInternalError(const char *info);
 
 		static void	alarmHandler(int32_t signum);
-		static void	sigUsr1Handler(int32_t signum);
 
 	public:
 		uint32_t	maxconnections;
@@ -173,9 +172,6 @@ class sqlrlistener : public listener {
 
 		static	signalhandler		alarmhandler;
 		static	volatile sig_atomic_t	alarmrang;
-
-		static	signalhandler		sigusr1handler;
-		static	volatile sig_atomic_t	gotsigusr1;
 
 		bool	usethreads;
 };
