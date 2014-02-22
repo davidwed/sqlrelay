@@ -136,11 +136,15 @@ mkdir C:\"Program Files"\Firstworks
 mkdir C:\"Program Files"\Firstworks\lib
 mkdir C:\"Program Files"\Firstworks\include\sqlrelay\private
 mkdir C:\"Program Files"\Firstworks\bin
+mkdir C:\"Program Files"\Firstworks\etc
+mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp
 
 mkdir C:\"Program Files (x86)"\Firstworks
 mkdir C:\"Program Files (x86)"\Firstworks\lib
 mkdir C:\"Program Files (x86)"\Firstworks\include\sqlrelay\private
 mkdir C:\"Program Files (x86)"\Firstworks\bin
+mkdir C:\"Program Files (x86)"\Firstworks\etc
+mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp
 
 copy /Y src\api\"c++"\msvc\Release\libsqlrclient.dll C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\api\"c++"\msvc\Release\libsqlrclient.lib C:\"Program Files (x86)"\Firstworks\lib

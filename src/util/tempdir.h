@@ -1,6 +1,8 @@
 #ifndef SQLRUTIL_TEMPDIR_H
 #define SQLRUTIL_TEMPDIR_H
 
+#include <dll.h>
+
 #include <cmdline.h>
 
 class tempdir {

@@ -1,6 +1,8 @@
 #ifndef SQLRUTIL_CMDLINE_H
 #define SQLRUTIL_CMDLINE_H
 
+#include <dll.h>
+
 #include <rudiments/commandline.h>
 
 class cmdline : public commandline {
