@@ -16,10 +16,6 @@
 #include <rudiments/charstring.h>
 #include <rudiments/stdio.h>
 
-// for waitpid()
-#include <sys/types.h>
-#include <sys/wait.h>
-
 bool	scaler::shutdown=false;
 
 scaler::scaler() {
@@ -324,51 +320,46 @@ bool scaler::reapChildren(pid_t connpid) {
 	bool	reaped=false;
 
 	for (;;) {
-		int	childstatus;
-		int	pid=waitpid(connpid,&childstatus,WNOHANG);
-		if (pid==0) {
-			break;
-		}
-		if (pid==-1) {
-			if (error::getErrorNumber()==EINTR) {
-				continue;
-			}
-			// most likely the error is "No child processes"
+		childstatechange	childstate;
+		int32_t			exitstatus=0;
+		int32_t			signum=0;
+		bool			coredump=false;
+		int	pid=process::getChildStateChange(connpid,
+						false,true,true,
+						&childstate,
+						&exitstatus,&signum,&coredump);
+		if (pid<1) {
 			break;
 		}
 
 		reaped=true;
 		decrementConnectionCount();
 
-		if (WIFEXITED(childstatus)) {
-			int	exitstatus=WEXITSTATUS(childstatus);
+		if (childstate==EXIT_CHILDSTATECHANGE) {
 			if (exitstatus) {
 				stderror.printf(
 					"Connection (pid=%d) exited "
 					"with code %d\n",
 					pid,exitstatus);
 			}
-		} else if (WIFSIGNALED(childstatus)) {
-#ifdef WCOREDUMP
-			if (WCOREDUMP(childstatus)) {
+		} else if (childstate==TERMINATED_CHILDSTATECHANGE) {
+			if (coredump) {
 				stderror.printf(
 					"Connection (pid=%d) terminated "
 					"by signal %d, with coredump\n",
-					pid,WTERMSIG(childstatus));
+					pid,signum);
 			} else {
-#endif
 				stderror.printf(
 					"Connection (pid=%d) terminated "
 					"by signal %d\n",
-					pid,WTERMSIG(childstatus));
-#ifdef WCOREDUMP
+					pid,signum);
 			}
-#endif
-		} else {
-			// something strange happened, we shouldn't be here
-			stderror.printf("Connection (pid=%d) exited, "
-					"childstatus is %d\n",
-					pid,childstatus);
+		} else if (childstate==STOPPED_CHILDSTATECHANGE) {
+			// this shouldn't happen
+			stderror.printf("Connection (pid=%d) stopped",pid);
+		} else if (childstate==CONTINUED_CHILDSTATECHANGE) {
+			// this shouldn't happen
+			stderror.printf("Connection (pid=%d) continued",pid);
 		}
 	}
 
