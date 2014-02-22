@@ -500,7 +500,7 @@ class sqlparser {
 						const char **newptr);
 		bool	restrictClause(const char *ptr,
 						const char **newptr);
-		static const char	*_restrictclause;
+		static const char	*_restrict_clause;
 		bool	parseCascade(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr);

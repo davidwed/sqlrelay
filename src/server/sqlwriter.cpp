@@ -170,7 +170,7 @@ const char * const *sqlwriter::supportedElements() {
 		sqlparser::_if_exists,
 		sqlparser::_table_name_list,
 		sqlparser::_table_name_list_item,
-		sqlparser::_restrictclause,
+		sqlparser::_restrict_clause,
 		sqlparser::_cascade,
 		sqlparser::_cascade_constraints_clause,
 
@@ -533,7 +533,7 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 	if (!charstring::compare(nodename,sqlparser::_if_exists)) {
 		return ifExists(node,output);
 	}
-	if (!charstring::compare(nodename,sqlparser::_restrictclause)) {
+	if (!charstring::compare(nodename,sqlparser::_restrict_clause)) {
 		return restrictClause(node,output);
 	}
 	if (!charstring::compare(nodename,sqlparser::_cascade)) {
