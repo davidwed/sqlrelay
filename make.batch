@@ -24,7 +24,8 @@ msbuild.exe /property:Configuration=Release /property:Platform=Win32
 cd ..\..\cmdline\msvc
 msbuild.exe /property:Configuration=Release /property:Platform=Win32
 cd ..\..\server\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=Win32
+msbuild.exe /property:Configuration=Release /property:Platform=Win32 libsqlrserver.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-listener.vcxproj
 cd ..\..\..
 goto end
 
@@ -43,7 +44,8 @@ msbuild.exe /property:Configuration=Release /property:Platform=x64
 cd ..\..\cmdline\msvc
 msbuild.exe /property:Configuration=Release /property:Platform=x64
 cd ..\..\server\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=x64
+msbuild.exe /property:Configuration=Release /property:Platform=Win32 libsqlrserver.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-listener.vcxproj
 cd ..\..\..
 goto end
 
@@ -62,7 +64,8 @@ msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32
 cd ..\..\cmdline\msvc
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32
 cd ..\..\server\msvc
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32
+msbuild.exe /property:Configuration=Release /property:Platform=Win32 libsqlrserver.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-listener.vcxproj
 cd ..\..\..
 goto end
 
@@ -81,7 +84,8 @@ msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64
 cd ..\..\cmdline\msvc
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64
 cd ..\..\server\msvc
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64
+msbuild.exe /property:Configuration=Release /property:Platform=Win32 libsqlrserver.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-listener.vcxproj
 cd ..\..\..
 goto end
 
@@ -136,14 +140,14 @@ msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=x64
 msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=x64
 msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=x64
 cd ..\..\server\msvc
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=x64
+msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=Win32 sqlrserver.sln
+msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=Win32 sqlrserver.sln
+msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=Win32 sqlrserver.sln
+msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlrserver.sln
+msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=x64 sqlrserver.sln
+msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=x64 sqlrserver.sln
+msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=x64 sqlrserver.sln
+msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=x64 sqlrserver.sln
 cd ..\..\..
 goto end
 
@@ -192,8 +196,10 @@ copy /Y src\cmdline\msvc\ReleaseCLR\sqlrsh.exe C:\"Program Files (x86)"\Firstwor
 
 copy /Y src\server\msvc\Release\libsqlrserver.dll C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\server\msvc\Release\libsqlrserver.lib C:\"Program Files (x86)"\Firstworks\lib
+copy /Y src\server\msvc\Release\sqlr-listener.exe C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\server\msvc\ReleaseCLR\libsqlrserver.dll C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\server\msvc\ReleaseCLR\libsqlrserver.lib C:\"Program Files (x86)"\Firstworks\lib
+copy /Y src\server\msvc\ReleaseCLR\sqlr-listener.exe C:\"Program Files (x86)"\Firstworks\bin
 
 
 
@@ -222,10 +228,12 @@ copy /Y src\util\msvc\x64\ReleaseCLR\libsqlrutil.lib C:\"Program Files"\Firstwor
 copy /Y src\cmdline\msvc\x64\Release\sqlrsh.exe C:\"Program Files"\Firstworks\bin
 copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlrsh.exe C:\"Program Files"\Firstworks\bin
 
-copy /Y src\sever\msvc\x64\Release\libsqlrsever.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\sever\msvc\x64\Release\libsqlrsever.lib C:\"Program Files"\Firstworks\lib
-copy /Y src\sever\msvc\x64\ReleaseCLR\libsqlrsever.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\sever\msvc\x64\ReleaseCLR\libsqlrsever.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\server\msvc\x64\Release\libsqlrserver.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\server\msvc\x64\Release\libsqlrserver.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\server\msvc\x64\Release\sqlr-listener.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\msvc\x64\ReleaseCLR\libsqlrserver.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\server\msvc\x64\ReleaseCLR\libsqlrserver.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-listener.exe C:\"Program Files"\Firstworks\bin
 goto end
 
 
@@ -234,12 +242,12 @@ rmdir /s /q "C:\Program Files\Firstworks\include\sqlrelay"
 del "C:\Program Files\Firstworks\lib\libsqlr*.lib"
 del "C:\Program Files\Firstworks\bin\libsqlr*.dll"
 del "C:\Program Files\Firstworks\bin\SQLR*.dll"
-del "C:\Program Files\Firstworks\bin\sqlrsh.exe"
+del "C:\Program Files\Firstworks\bin\sqlr*.exe"
 rmdir /s /q "C:\Program Files (x86)\Firstworks\include\sqlrelay"
 del "C:\Program Files (x86)\Firstworks\lib\libsqlr*.lib"
 del "C:\Program Files (x86)\Firstworks\bin\libsqlr*.dll"
 del "C:\Program Files (x86)\Firstworks\bin\SQLR*.dll"
-del "C:\Program Files (x86)\Firstworks\bin\sqlrsh.exe"
+del "C:\Program Files (x86)\Firstworks\bin\sqlr*.exe"
 goto end
 
 
