@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlr-scaler", "sqlr-scaler.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlr-start", "sqlr-start.vcxproj", "{294CF309-4FDA-9BF1-A092-02BD5565AB9C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqlr-cachemanager", "sqlr-cachemanager.vcxproj", "{761AB3D0-CC04-2620-B1A2-1E39598F3665}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -103,6 +105,22 @@ Global
 		{294CF309-4FDA-9BF1-A092-02BD5565AB9C}.ReleaseCLR|Win32.Build.0 = ReleaseCLR|Win32
 		{294CF309-4FDA-9BF1-A092-02BD5565AB9C}.ReleaseCLR|x64.ActiveCfg = ReleaseCLR|x64
 		{294CF309-4FDA-9BF1-A092-02BD5565AB9C}.ReleaseCLR|x64.Build.0 = ReleaseCLR|x64
+		{761AB3D0-CC04-2620-B1A2-1E39598F3665}.Debug|Win32.ActiveCfg = Debug|Win32
+		{761AB3D0-CC04-2620-B1A2-1E39598F3665}.Debug|Win32.Build.0 = Debug|Win32
+		{761AB3D0-CC04-2620-B1A2-1E39598F3665}.Debug|x64.ActiveCfg = Debug|x64
+		{761AB3D0-CC04-2620-B1A2-1E39598F3665}.Debug|x64.Build.0 = Debug|x64
+		{761AB3D0-CC04-2620-B1A2-1E39598F3665}.DebugCLR|Win32.ActiveCfg = DebugCLR|Win32
+		{761AB3D0-CC04-2620-B1A2-1E39598F3665}.DebugCLR|Win32.Build.0 = DebugCLR|Win32
+		{761AB3D0-CC04-2620-B1A2-1E39598F3665}.DebugCLR|x64.ActiveCfg = DebugCLR|x64
+		{761AB3D0-CC04-2620-B1A2-1E39598F3665}.DebugCLR|x64.Build.0 = DebugCLR|x64
+		{761AB3D0-CC04-2620-B1A2-1E39598F3665}.Release|Win32.ActiveCfg = Release|Win32
+		{761AB3D0-CC04-2620-B1A2-1E39598F3665}.Release|Win32.Build.0 = Release|Win32
+		{761AB3D0-CC04-2620-B1A2-1E39598F3665}.Release|x64.ActiveCfg = Release|x64
+		{761AB3D0-CC04-2620-B1A2-1E39598F3665}.Release|x64.Build.0 = Release|x64
+		{761AB3D0-CC04-2620-B1A2-1E39598F3665}.ReleaseCLR|Win32.ActiveCfg = ReleaseCLR|Win32
+		{761AB3D0-CC04-2620-B1A2-1E39598F3665}.ReleaseCLR|Win32.Build.0 = ReleaseCLR|Win32
+		{761AB3D0-CC04-2620-B1A2-1E39598F3665}.ReleaseCLR|x64.ActiveCfg = ReleaseCLR|x64
+		{761AB3D0-CC04-2620-B1A2-1E39598F3665}.ReleaseCLR|x64.Build.0 = ReleaseCLR|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

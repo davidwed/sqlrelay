@@ -29,6 +29,7 @@ msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-listen
 msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-connection.vcxproj
 msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-scaler.vcxproj
 msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-start.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-cachemanager.vcxproj
 cd ..\..\..
 goto end
 
@@ -52,6 +53,7 @@ msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-listener
 msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-connection.vcxproj
 msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-scaler.vcxproj
 msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-start.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-cachemanager.vcxproj
 cd ..\..\..
 goto end
 
@@ -75,6 +77,7 @@ msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-lis
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-connection.vcxproj
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-scaler.vcxproj
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-start.vcxproj
+msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-cachemanager.vcxproj
 cd ..\..\..
 goto end
 
@@ -98,6 +101,7 @@ msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-listener
 msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-connection.vcxproj
 msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-scaler.vcxproj
 msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-start.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-cachemanager.vcxproj
 cd ..\..\..
 goto end
 
@@ -215,12 +219,14 @@ copy /Y src\server\msvc\Release\sqlr-listener.exe C:\"Program Files (x86)"\First
 copy /Y src\server\msvc\Release\sqlr-connection.exe C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\server\msvc\Release\sqlr-scaler.exe C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\server\msvc\Release\sqlr-start.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\msvc\Release\sqlr-cachemanager.exe C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\server\msvc\ReleaseCLR\libsqlrserver.dll C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\server\msvc\ReleaseCLR\libsqlrserver.lib C:\"Program Files (x86)"\Firstworks\lib
 copy /Y src\server\msvc\ReleaseCLR\sqlr-listener.exe C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\server\msvc\ReleaseCLR\sqlr-connection.exe C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\server\msvc\ReleaseCLR\sqlr-scaler.exe C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\server\msvc\ReleaseCLR\sqlr-start.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\msvc\ReleaseCLR\sqlr-cachemanager.exe C:\"Program Files (x86)"\Firstworks\bin
 
 
 
@@ -255,12 +261,14 @@ copy /Y src\server\msvc\x64\Release\sqlr-listener.exe C:\"Program Files"\Firstwo
 copy /Y src\server\msvc\x64\Release\sqlr-connection.exe C:\"Program Files"\Firstworks\bin
 copy /Y src\server\msvc\x64\Release\sqlr-scaler.exe C:\"Program Files"\Firstworks\bin
 copy /Y src\server\msvc\x64\Release\sqlr-start.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\msvc\x64\Release\sqlr-cachemanager.exe C:\"Program Files"\Firstworks\bin
 copy /Y src\server\msvc\x64\ReleaseCLR\libsqlrserver.dll C:\"Program Files"\Firstworks\bin
 copy /Y src\server\msvc\x64\ReleaseCLR\libsqlrserver.lib C:\"Program Files"\Firstworks\lib
 copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-listener.exe C:\"Program Files"\Firstworks\bin
 copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-connection.exe C:\"Program Files"\Firstworks\bin
 copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-scaler.exe C:\"Program Files"\Firstworks\bin
 copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-start.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-cachemanager.exe C:\"Program Files"\Firstworks\bin
 goto end
 
 

@@ -7,8 +7,8 @@
 		semaphore was left signalled when another connection's ttl
 		expired
 	updated handoff="proxy" code to work with sessionhandler="thread"
-	the cmdline and tempdir classes now compile on windows
 	replaced waitpid call in sqlrscaler with rudiments equivalent
+	got the server-side stuff to compile on windows
 
 0.54 - fixed bugs that caused problems when unopened result sets were closed
 	added protocol identification phase to client/server protocol
