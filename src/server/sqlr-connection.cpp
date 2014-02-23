@@ -83,7 +83,9 @@ void handleSignals(void (*shutdownfunction)(int32_t)) {
 	// handle various other shutdown conditions
 	shutdownhandler.setHandler(shutdownfunction);
 	// timeouts
-	shutdownhandler.handleSignal(SIGALRM);
+	#ifdef HAVE_SIGALRM
+		shutdownhandler.handleSignal(SIGALRM);
+	#endif
 	// quit
 	#ifdef HAVE_SIGQUIT
 		shutdownhandler.handleSignal(SIGQUIT);

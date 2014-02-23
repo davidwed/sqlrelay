@@ -1,6 +1,8 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
+#include <sqlrserverdll.h>
+
 #include <config.h>
 
 #include <sqlrconfigfile.h>
@@ -16,7 +18,7 @@
 // for pid_t
 #include <sys/types.h>
 
-class scaler {
+class SQLRSERVER_DLLSPEC scaler {
 
 	public:
 			scaler();

@@ -26,6 +26,9 @@ msbuild.exe /property:Configuration=Release /property:Platform=Win32
 cd ..\..\server\msvc
 msbuild.exe /property:Configuration=Release /property:Platform=Win32 libsqlrserver.vcxproj
 msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-listener.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-connection.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-scaler.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-start.vcxproj
 cd ..\..\..
 goto end
 
@@ -44,8 +47,11 @@ msbuild.exe /property:Configuration=Release /property:Platform=x64
 cd ..\..\cmdline\msvc
 msbuild.exe /property:Configuration=Release /property:Platform=x64
 cd ..\..\server\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=Win32 libsqlrserver.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-listener.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=x64 libsqlrserver.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-listener.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-connection.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-scaler.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-start.vcxproj
 cd ..\..\..
 goto end
 
@@ -64,8 +70,11 @@ msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32
 cd ..\..\cmdline\msvc
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32
 cd ..\..\server\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=Win32 libsqlrserver.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-listener.vcxproj
+msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 libsqlrserver.vcxproj
+msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-listener.vcxproj
+msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-connection.vcxproj
+msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-scaler.vcxproj
+msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-start.vcxproj
 cd ..\..\..
 goto end
 
@@ -84,8 +93,11 @@ msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64
 cd ..\..\cmdline\msvc
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64
 cd ..\..\server\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=Win32 libsqlrserver.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-listener.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=x64 libsqlrserver.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-listener.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-connection.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-scaler.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-start.vcxproj
 cd ..\..\..
 goto end
 
@@ -167,6 +179,9 @@ mkdir C:\"Program Files (x86)"\Firstworks\bin
 mkdir C:\"Program Files (x86)"\Firstworks\etc
 mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp
 
+copy /Y etc\sqlrelay.* C:\"Program Files (x86)"\Firstworks\etc
+copy /Y etc\sqlrelay.* C:\"Program Files"\Firstworks\etc
+
 copy /Y src\api\"c++"\msvc\Release\libsqlrclient.dll C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\api\"c++"\msvc\Release\libsqlrclient.lib C:\"Program Files (x86)"\Firstworks\lib
 copy /Y src\api\"c++"\msvc\ReleaseCLR\libsqlrclient.dll C:\"Program Files (x86)"\Firstworks\bin
@@ -197,9 +212,15 @@ copy /Y src\cmdline\msvc\ReleaseCLR\sqlrsh.exe C:\"Program Files (x86)"\Firstwor
 copy /Y src\server\msvc\Release\libsqlrserver.dll C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\server\msvc\Release\libsqlrserver.lib C:\"Program Files (x86)"\Firstworks\lib
 copy /Y src\server\msvc\Release\sqlr-listener.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\msvc\Release\sqlr-connection.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\msvc\Release\sqlr-scaler.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\msvc\Release\sqlr-start.exe C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\server\msvc\ReleaseCLR\libsqlrserver.dll C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\server\msvc\ReleaseCLR\libsqlrserver.lib C:\"Program Files (x86)"\Firstworks\lib
 copy /Y src\server\msvc\ReleaseCLR\sqlr-listener.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\msvc\ReleaseCLR\sqlr-connection.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\msvc\ReleaseCLR\sqlr-scaler.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\msvc\ReleaseCLR\sqlr-start.exe C:\"Program Files (x86)"\Firstworks\bin
 
 
 
@@ -231,9 +252,15 @@ copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlrsh.exe C:\"Program Files"\Firstworks
 copy /Y src\server\msvc\x64\Release\libsqlrserver.dll C:\"Program Files"\Firstworks\bin
 copy /Y src\server\msvc\x64\Release\libsqlrserver.lib C:\"Program Files"\Firstworks\lib
 copy /Y src\server\msvc\x64\Release\sqlr-listener.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\msvc\x64\Release\sqlr-connection.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\msvc\x64\Release\sqlr-scaler.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\msvc\x64\Release\sqlr-start.exe C:\"Program Files"\Firstworks\bin
 copy /Y src\server\msvc\x64\ReleaseCLR\libsqlrserver.dll C:\"Program Files"\Firstworks\bin
 copy /Y src\server\msvc\x64\ReleaseCLR\libsqlrserver.lib C:\"Program Files"\Firstworks\lib
 copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-listener.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-connection.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-scaler.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-start.exe C:\"Program Files"\Firstworks\bin
 goto end
 
 
