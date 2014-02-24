@@ -140,23 +140,23 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\server\msvc\Debug;..\..\..\util\msvc\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;oci.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\server\msvc\Debug;..\..\..\util\msvc\Debug;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\..\..
-copy /Y config.windows.h config.h</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -165,22 +165,22 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;C:\Program Files\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\server\msvc\x64\Debug;..\..\..\util\msvc\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;oci.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\server\msvc\x64\Debug;..\..\..\util\msvc\x64\Debug;C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\..\..
-copy /Y config.windows.h config.h</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -189,23 +189,23 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\server\msvc\DebugCLR;..\..\..\util\msvc\DebugCLR;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;oci.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\server\msvc\DebugCLR;..\..\..\util\msvc\DebugCLR;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\..\..
-copy /Y config.windows.h config.h</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -214,22 +214,22 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;C:\Program Files\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\server\msvc\x64\DebugCLR;..\..\..\util\msvc\x64\DebugCLR;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;oci.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\server\msvc\x64\DebugCLR;..\..\..\util\msvc\x64\DebugCLR;C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\..\..
-copy /Y config.windows.h config.h</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -238,11 +238,11 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -250,12 +250,12 @@ copy /Y config.windows.h config.h</Command>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\server\msvc\Release;..\..\..\util\msvc\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;oci.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\server\msvc\Release;..\..\..\util\msvc\Release;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\..\..
-copy /Y config.windows.h config.h</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -264,23 +264,23 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;C:\Program Files\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\server\msvc\x64\Release;..\..\..\util\msvc\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;oci.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\server\msvc\x64\Release;..\..\..\util\msvc\x64\Release;C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\..\..
-copy /Y config.windows.h config.h</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -289,11 +289,11 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -301,12 +301,12 @@ copy /Y config.windows.h config.h</Command>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\server\msvc\ReleaseCLR;..\..\..\util\msvc\ReleaseCLR;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;oci.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\server\msvc\ReleaseCLR;..\..\..\util\msvc\ReleaseCLR;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\..\..
-copy /Y config.windows.h config.h</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -315,23 +315,23 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;C:\Program Files\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\server\msvc\x64\ReleaseCLR;..\..\..\util\msvc\x64\ReleaseCLR;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;oci.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\server\msvc\x64\ReleaseCLR;..\..\..\util\msvc\x64\ReleaseCLR;C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\..\..
-copy /Y config.windows.h config.h</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>

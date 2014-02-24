@@ -1,6 +1,12 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
+#ifdef _WIN32
+	#define DLLSPEC __declspec(dllexport)
+#else
+	#define DLLSPEC
+#endif
+
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <oracle8sqlwriter.h>
@@ -79,7 +85,7 @@ struct datebind {
 	OCIDate		*ocidate;
 };
 
-class oracle8connection : public sqlrconnection_svr {
+class DLLSPEC oracle8connection : public sqlrconnection_svr {
 	friend class oracle8cursor;
 	public:
 				oracle8connection(sqlrcontroller_svr *cont);
@@ -161,7 +167,7 @@ class oracle8connection : public sqlrconnection_svr {
 		bool		rejectduplicatebinds;
 };
 
-class oracle8cursor : public sqlrcursor_svr {
+class DLLSPEC oracle8cursor : public sqlrcursor_svr {
 	friend class oracle8connection;
 	private:
 				oracle8cursor(sqlrconnection_svr *conn);

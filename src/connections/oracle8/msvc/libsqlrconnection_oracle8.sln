@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libsqlrconnection_oracle8", "libsqlrconnection_oracle8.vcxproj", "{92F15EFF-2787-4723-927C-F8FE45D24944}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libsqlrconnection_oracle8", "libsqlrconnection_oracle8.vcxproj", "{B150FA5E-C225-1E09-E976-1E9360B614BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,22 +15,22 @@ Global
 		ReleaseCLR|x64 = ReleaseCLR|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{92F15EFF-2787-4723-927C-F8FE45D24944}.Debug|Win32.ActiveCfg = Debug|Win32
-		{92F15EFF-2787-4723-927C-F8FE45D24944}.Debug|Win32.Build.0 = Debug|Win32
-		{92F15EFF-2787-4723-927C-F8FE45D24944}.Debug|x64.ActiveCfg = Debug|x64
-		{92F15EFF-2787-4723-927C-F8FE45D24944}.Debug|x64.Build.0 = Debug|x64
-		{92F15EFF-2787-4723-927C-F8FE45D24944}.DebugCLR|Win32.ActiveCfg = DebugCLR|Win32
-		{92F15EFF-2787-4723-927C-F8FE45D24944}.DebugCLR|Win32.Build.0 = DebugCLR|Win32
-		{92F15EFF-2787-4723-927C-F8FE45D24944}.DebugCLR|x64.ActiveCfg = DebugCLR|x64
-		{92F15EFF-2787-4723-927C-F8FE45D24944}.DebugCLR|x64.Build.0 = DebugCLR|x64
-		{92F15EFF-2787-4723-927C-F8FE45D24944}.Release|Win32.ActiveCfg = Release|Win32
-		{92F15EFF-2787-4723-927C-F8FE45D24944}.Release|Win32.Build.0 = Release|Win32
-		{92F15EFF-2787-4723-927C-F8FE45D24944}.Release|x64.ActiveCfg = Release|x64
-		{92F15EFF-2787-4723-927C-F8FE45D24944}.Release|x64.Build.0 = Release|x64
-		{92F15EFF-2787-4723-927C-F8FE45D24944}.ReleaseCLR|Win32.ActiveCfg = ReleaseCLR|Win32
-		{92F15EFF-2787-4723-927C-F8FE45D24944}.ReleaseCLR|Win32.Build.0 = ReleaseCLR|Win32
-		{92F15EFF-2787-4723-927C-F8FE45D24944}.ReleaseCLR|x64.ActiveCfg = ReleaseCLR|x64
-		{92F15EFF-2787-4723-927C-F8FE45D24944}.ReleaseCLR|x64.Build.0 = ReleaseCLR|x64
+		{B150FA5E-C225-1E09-E976-1E9360B614BC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B150FA5E-C225-1E09-E976-1E9360B614BC}.Debug|Win32.Build.0 = Debug|Win32
+		{B150FA5E-C225-1E09-E976-1E9360B614BC}.Debug|x64.ActiveCfg = Debug|x64
+		{B150FA5E-C225-1E09-E976-1E9360B614BC}.Debug|x64.Build.0 = Debug|x64
+		{B150FA5E-C225-1E09-E976-1E9360B614BC}.DebugCLR|Win32.ActiveCfg = DebugCLR|Win32
+		{B150FA5E-C225-1E09-E976-1E9360B614BC}.DebugCLR|Win32.Build.0 = DebugCLR|Win32
+		{B150FA5E-C225-1E09-E976-1E9360B614BC}.DebugCLR|x64.ActiveCfg = DebugCLR|x64
+		{B150FA5E-C225-1E09-E976-1E9360B614BC}.DebugCLR|x64.Build.0 = DebugCLR|x64
+		{B150FA5E-C225-1E09-E976-1E9360B614BC}.Release|Win32.ActiveCfg = Release|Win32
+		{B150FA5E-C225-1E09-E976-1E9360B614BC}.Release|Win32.Build.0 = Release|Win32
+		{B150FA5E-C225-1E09-E976-1E9360B614BC}.Release|x64.ActiveCfg = Release|x64
+		{B150FA5E-C225-1E09-E976-1E9360B614BC}.Release|x64.Build.0 = Release|x64
+		{B150FA5E-C225-1E09-E976-1E9360B614BC}.ReleaseCLR|Win32.ActiveCfg = ReleaseCLR|Win32
+		{B150FA5E-C225-1E09-E976-1E9360B614BC}.ReleaseCLR|Win32.Build.0 = ReleaseCLR|Win32
+		{B150FA5E-C225-1E09-E976-1E9360B614BC}.ReleaseCLR|x64.ActiveCfg = ReleaseCLR|x64
+		{B150FA5E-C225-1E09-E976-1E9360B614BC}.ReleaseCLR|x64.Build.0 = ReleaseCLR|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
