@@ -3017,7 +3017,8 @@ void oracle8cursor::cleanUpData() {
 }
 
 extern "C" {
-	sqlrconnection_svr *new_oracle8connection(sqlrcontroller_svr *cont) {
+	DLLSPEC sqlrconnection_svr *new_oracle8connection(
+					sqlrcontroller_svr *cont) {
 		return new oracle8connection(cont);
 	}
 }
