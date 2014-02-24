@@ -30,7 +30,9 @@ msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-connec
 msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-scaler.vcxproj
 msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-start.vcxproj
 msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-cachemanager.vcxproj
-cd ..\..\..
+cd ..\..\connections\oracle8\msvc
+msbuild.exe /property:Configuration=Release /property:Platform=Win32
+cd ..\..\..\..
 goto end
 
 
@@ -54,7 +56,9 @@ msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-connecti
 msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-scaler.vcxproj
 msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-start.vcxproj
 msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-cachemanager.vcxproj
-cd ..\..\..
+cd ..\..\connections\oracle8\msvc
+msbuild.exe /property:Configuration=Release /property:Platform=x64
+cd ..\..\..\..
 goto end
 
 
@@ -78,7 +82,9 @@ msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-con
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-scaler.vcxproj
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-start.vcxproj
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-cachemanager.vcxproj
-cd ..\..\..
+cd ..\..\connections\oracle8\msvc
+msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32
+cd ..\..\..\..
 goto end
 
 
@@ -102,7 +108,9 @@ msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-connecti
 msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-scaler.vcxproj
 msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-start.vcxproj
 msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-cachemanager.vcxproj
-cd ..\..\..
+cd ..\..\connections\oracle8\msvc
+msbuild.exe /property:Configuration=Release /property:Platform=x64
+cd ..\..\..\..
 goto end
 
 
@@ -164,24 +172,47 @@ msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=x64 s
 msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=x64 sqlrserver.sln
 msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=x64 sqlrserver.sln
 msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=x64 sqlrserver.sln
-cd ..\..\..
+cd ..\..\connections\oracle8\msvc
+msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=Win32
+msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=Win32
+msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=Win32
+msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=Win32
+msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=x64
+msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=x64
+msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=x64
+msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=x64
+cd ..\..\..\..
 goto end
 
 
 :install
 mkdir C:\"Program Files"\Firstworks
 mkdir C:\"Program Files"\Firstworks\lib
+mkdir C:\"Program Files"\Firstworks\libexec\sqlrelay
 mkdir C:\"Program Files"\Firstworks\include\sqlrelay\private
 mkdir C:\"Program Files"\Firstworks\bin
 mkdir C:\"Program Files"\Firstworks\etc
+mkdir C:\"Program Files"\Firstworks\var\sqlrelay\cache
+mkdir C:\"Program Files"\Firstworks\var\sqlrelay\debug
+mkdir C:\"Program Files"\Firstworks\var\sqlrelay\log
 mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp
+mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp\ipc
+mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp\pids
+mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp\sockets
 
 mkdir C:\"Program Files (x86)"\Firstworks
 mkdir C:\"Program Files (x86)"\Firstworks\lib
+mkdir C:\"Program Files (x86)"\Firstworks\libexec\sqlrelay
 mkdir C:\"Program Files (x86)"\Firstworks\include\sqlrelay\private
 mkdir C:\"Program Files (x86)"\Firstworks\bin
 mkdir C:\"Program Files (x86)"\Firstworks\etc
+mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\cache
+mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\debug
+mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\log
 mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp
+mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\ipc
+mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\pids
+mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\sockets
 
 copy /Y etc\sqlrelay.* C:\"Program Files (x86)"\Firstworks\etc
 copy /Y etc\sqlrelay.* C:\"Program Files"\Firstworks\etc
@@ -269,16 +300,24 @@ copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-connection.exe C:\"Program Files"\Fi
 copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-scaler.exe C:\"Program Files"\Firstworks\bin
 copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-start.exe C:\"Program Files"\Firstworks\bin
 copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-cachemanager.exe C:\"Program Files"\Firstworks\bin
+
+copy /Y src\connections\oracle8\msvc\Release\sqlrconnection_oracle8.dll C:\"Program Files (x86)"\Firstworks\libexec\sqlrelay
+copy /Y src\connections\oracle8\msvc\ReleaseCLR\sqlrconnection_oracle8.dll C:\"Program Files (x86)"\Firstworks\libexec\sqlrelay
+copy /Y src\connections\oracle8\msvc\x64\Release\sqlrconnection_oracle8.dll C:\"Program Files"\Firstworks\libexec\sqlrelay
+copy /Y src\connections\oracle8\msvc\x64\ReleaseCLR\sqlrconnection_oracle8.dll C:\"Program Files"\Firstworks\libexec\sqlrelay
+
 goto end
 
 
 :uninstall
 rmdir /s /q "C:\Program Files\Firstworks\include\sqlrelay"
+rmdir /s /q "C:\Program Files\Firstworks\libexec\sqlrelay"
 del "C:\Program Files\Firstworks\lib\libsqlr*.lib"
 del "C:\Program Files\Firstworks\bin\libsqlr*.dll"
 del "C:\Program Files\Firstworks\bin\SQLR*.dll"
 del "C:\Program Files\Firstworks\bin\sqlr*.exe"
 rmdir /s /q "C:\Program Files (x86)\Firstworks\include\sqlrelay"
+rmdir /s /q "C:\Program Files (x86)\Firstworks\libexec\sqlrelay"
 del "C:\Program Files (x86)\Firstworks\lib\libsqlr*.lib"
 del "C:\Program Files (x86)\Firstworks\bin\libsqlr*.dll"
 del "C:\Program Files (x86)\Firstworks\bin\SQLR*.dll"
