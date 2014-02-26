@@ -1223,7 +1223,7 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock) {
 
 		// Get the socket associated with the pid of the
 		// available connection.
-		filedescriptor	connectionsock;
+		unixsocketclient	connectionsock;
 		if (!findMatchingSocket(connectionpid,&connectionsock)) {
 			// FIXME: should there be a limit to the number
 			// of times we retry?
@@ -1588,7 +1588,7 @@ void sqlrlistener::pingDatabaseThread(void *attr) {
 void sqlrlistener::pingDatabaseInternal(uint32_t connectionpid,
 					const char *unixportstr,
 					uint16_t inetport) {
-	filedescriptor	connectionsock;
+	unixsocketclient	connectionsock;
 	if (findMatchingSocket(connectionpid,&connectionsock)) {
 		connectionsock.write((uint16_t)HANDOFF_RECONNECT);
 		connectionsock.flushWriteBuffer(-1,-1);
@@ -1605,7 +1605,8 @@ bool sqlrlistener::findMatchingSocket(uint32_t connectionpid,
 	// connection over the handoff socket associated with that node.
 	for (uint32_t i=0; i<maxconnections; i++) {
 		if (handoffsocklist[i].pid==connectionpid) {
-			connectionsock->setFileDescriptor(handoffsocklist[i].
+			connectionsock->setFileDescriptor(
+						handoffsocklist[i].
 						sock->getFileDescriptor());
 			return true;
 		}

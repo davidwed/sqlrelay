@@ -6,6 +6,9 @@
 #include <sqlrcontroller.h>
 #include <sqlrclientprotocol.h>
 #include <rudiments/file.h>
+#ifdef WIN32
+#include <rudiments/inetsocketclient.h>
+#endif
 #include <rudiments/rawbuffer.h>
 #include <rudiments/passwdentry.h>
 #include <rudiments/groupentry.h>
@@ -1406,7 +1409,11 @@ int32_t sqlrcontroller_svr::waitForClient() {
 		}
 
 		// set up the client socket
+		#ifdef _WIN32
+		clientsock=new inetsocketclient();
+		#else
 		clientsock=new filedescriptor;
+		#endif
 		clientsock->setFileDescriptor(descriptor);
 
 		logDebugMessage("done waiting for client");
