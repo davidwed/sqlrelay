@@ -1,7 +1,7 @@
 # Available build options, you need rpm-build >= 4.0.3 for this to work.
-# Example : rpmbuild -ba --without mysql --without php sqlrelay.spec
+# Example: rpmbuild -ba --without mysql --without php sqlrelay.spec
 #
-# Database options :
+# Database options:
 # ================
 # --without db2
 # --without freetds
@@ -14,7 +14,7 @@
 # --without sqlite
 # --without sybase
 #
-# Language options :
+# Language options:
 # ================
 # --without java
 # --without perl
@@ -23,10 +23,14 @@
 # --without ruby
 # --without tcl
 # --without erlang
+#
+# Features options:
+# --with triggers
+# --with translations
 
 Summary: Persistent database connection system.
 Name: sqlrelay
-Version: 0.55
+Version: 1.0
 Release: 1
 License: GPL/LGPL and Others
 Group: System Environment/Daemons
@@ -339,7 +343,9 @@ Man pages for SQL Relay.
 	%{?_without_perl:	--disable-perl} \
 	%{?_without_php:	--disable-php} \
 	%{?_without_python:	--disable-python} \
-	%{?_without_ruby:	--disable-ruby}
+	%{?_without_ruby:	--disable-ruby} \
+	%{?_with_triggers:	--enable-triggers} \
+	%{?_with_translations:	--enable-translations}
 	
 make
 
@@ -396,9 +402,9 @@ rm -rf %{buildroot}
 %{_libdir}/libsqlrutil-*.so.*
 %{_libexecdir}/sqlrelay/sqlrlogger_*
 %{_libexecdir}/sqlrelay/sqlrquery_*
-%{_libexecdir}/sqlrelay/sqltranslation_*
-%{_libexecdir}/sqlrelay/sqltrigger_*
 %{_libexecdir}/sqlrelay/sqlrpwdenc_*
+%{?_with_translations:%{_libexecdir}/sqlrelay/sqltranslation_*}
+%{?_with_triggers:%{_libexecdir}/sqlrelay/sqltrigger_*}
 %{_localstatedir}/sqlrelay/tmp
 %{_localstatedir}/sqlrelay/debug
 

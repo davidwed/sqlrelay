@@ -799,6 +799,8 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
+TRANSLATIONS
+TRIGGERS
 LIBEFENCE
 LIBDMALLOC
 PSQLUSERPATH
@@ -944,6 +946,8 @@ with_pthread_prefix
 with_system_libtool
 enable_dmalloc
 enable_efence
+enable_triggers
+enable_translations
 enable_shared
 enable_static
 with_pic
@@ -1620,6 +1624,8 @@ Optional Features:
   --enable-psql-rpath           Use -rpath when linking the psql replacement library against the SQL Relay client library
   --enable-dmalloc              Use the dmalloc library
   --enable-efence               Use the efence library
+  --enable-triggers             Enable trigger framework (experimental)
+  --enable-translations         Enable translation framework (experimental)
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -3184,6 +3190,22 @@ if test "${enable_efence+set}" = set; then :
   enableval=$enable_efence; LIBEFENCE="-lefence"
 else
   LIBEFENCE=""
+fi
+
+
+# Check whether --enable-triggers was given.
+if test "${enable_triggers+set}" = set; then :
+  enableval=$enable_triggers; TRIGGERS="yes"
+else
+  TRIGGERS=""
+fi
+
+
+# Check whether --enable-translations was given.
+if test "${enable_translations+set}" = set; then :
+  enableval=$enable_translations; TRANSLATIONS="yes"
+else
+  TRANSLATIONS=""
 fi
 
 
@@ -34013,7 +34035,7 @@ RPM_BUILD_DIR=`rpm --eval "%_topdir" 2>/dev/null`
 
 
 
-SQLR_VERSION="0.55"
+SQLR_VERSION="1.0"
 
 
 cat >>confdefs.h <<_ACEOF

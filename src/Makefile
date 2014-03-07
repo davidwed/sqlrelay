@@ -8,8 +8,12 @@ all:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MAKE) -C server all
 endif
+ifeq ($(TRIGGERS),yes)
 	$(MAKE) -C triggers all
+endif
+ifeq ($(TRANSLATIONS),yes)
 	$(MAKE) -C translations all
+endif
 	$(MAKE) -C queries all
 	$(MAKE) -C loggers all
 	$(MAKE) -C pwdencs all
@@ -39,8 +43,12 @@ install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MAKE) -C server install
 endif
+ifeq ($(TRIGGERS),yes)
 	$(MAKE) -C triggers install
+endif
+ifeq ($(TRANSLATIONS),yes)
 	$(MAKE) -C translations install
+endif
 	$(MAKE) -C queries install
 	$(MAKE) -C loggers install
 	$(MAKE) -C pwdencs install
