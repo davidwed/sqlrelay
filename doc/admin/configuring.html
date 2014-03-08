@@ -545,8 +545,7 @@ or a tnsnames-style expression such as:
 <li><b>oracle_home</b>: The base directory of the oracle installation to use.  Optional if the ORACLE_HOME environment variable is set.  The SID will be looked up in $ORACLE_HOME/network/admin/tnsnames.ora</li>
 <li><b>nls_lang</b>: The NLS_LANG to use.  Optional if the NLS_LANG environment variable is set.  Overrides the NLS_LANG environment variable.</li>
 <li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
-<li><b>fetchatonce</b>: The number of rows that SQL Relay fetches from the database in each round trip.  Defaults to 10. (see
-<a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
+<li><b>fetchatonce</b>: The number of rows that SQL Relay fetches from the database in each round trip.  Defaults to 10. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 <li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (See <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 <li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Fields longer than that will be truncated.  Defaults to 32768. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 <li><b>faketransactionblocks</b>: Some databases are in autocommit mode until you explicitly start a transaction with a "start" or "begin" statement.  Oracle is always in a transaction though, unless autocommit is turned on.  Setting this parameter to "yes" causes SQL Relay to put the database in autocommit mode until a "start" or "begin" statement is issued, and then put it back in autocommit mode when a commit or rollback is issued.  In effect, emulating the behavior of databases which require an explicit "start" or "begin".</li>
@@ -589,7 +588,7 @@ or a tnsnames-style expression such as:
 <li><b>db</b>: The filename of the database open.  Required.</li>
 </ul>
 </li>
-<li>For <b>freetds</b> databases, the connect string syntax is "sybase=SYBASE;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;"
+<li>For <b>freetds</b> databases, the connect string syntax is "sybase=SYBASE;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;"
 <ul>
 <li><b>sybase</b>: The directory containing the "interfaces" or "freetds.conf" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.</li>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
@@ -600,9 +599,11 @@ or a tnsnames-style expression such as:
 <li><b>language</b>: The language to use.  Optional.</li>
 <li><b>hostname</b>: The host to connect to.  Optional, overrides the host in the "interfaces" or "freetds.conf" file.</li>
 <li><b>packetsize</b>: The packetsize to use.  Optional.</li>
+<li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (See <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
+<li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Fields longer than that will be truncated.  Defaults to 4096. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 </ul>
 </li>
-<li>For <b>sybase</b> databases, the connect string syntax is "sybase=SYBASE;lang=LANG;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;"
+<li>For <b>sybase</b> databases, the connect string syntax is "sybase=SYBASE;lang=LANG;user=USER;password=PASSWORD;server=SERVER;db=DATABASE;charset=CHARSET;language=LANGUAGE;hostname=HOSTNAME;packetsize=PACKETSIZE;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;"
 <ul>
 <li><b>sybase</b>: The directory containing the "interfaces" or "freetds.conf" file.  Optional if the SYBASE environment variable is set.  Overrides the SYBASE environment variable.</li>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
@@ -613,6 +614,9 @@ or a tnsnames-style expression such as:
 <li><b>language</b>: The language to use.  Optional.</li>
 <li><b>hostname</b>: The host to connect to.  Optional, overrides the host in the "interfaces" or "freetds.conf" file.</li>
 <li><b>packetsize</b>: The packetsize to use.  Optional.</li>
+<li><b>fetchatonce</b>: The number of rows that SQL Relay fetches from the database in each round trip.  Defaults to 10. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
+<li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (See <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
+<li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Fields longer than that will be truncated.  Defaults to 4096. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 </ul>
 </li>
 <li>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;timeout=TIMEOUT;"</li>
@@ -624,7 +628,7 @@ or a tnsnames-style expression such as:
 <li><b>timeout</b>: Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.</li>
 </ul>
 </li>
-<li>For <b>db2</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;autocommit=yes/no;faketransactionblocks=YESORNO;timeout=TIMEOUT;"</li>
+<li>For <b>db2</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;autocommit=yes/no;faketransactionblocks=YESORNO;timeout=TIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;"</li>
 <ul>
 <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
 <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="../modules/passwordencryption.html">Password Encryption Modules</a></li>
@@ -633,6 +637,9 @@ or a tnsnames-style expression such as:
 <li><b>lang</b>: Sets/overrides the LANG environment variable and by extension, all locale-related variables.  Optional if the LANG environment variable is set.</li>
 <li><b>faketransactionblocks</b>: Some databases are in autocommit mode until you explicitly start a transaction with a "start" or "begin" statement.  DB2 is always in a transaction though, unless autocommit is turned on.  Setting this parameter to "yes" causes SQL Relay to put the database in autocommit mode until a "start" or "begin" statement is issued, and then put it back in autocommit mode when a commit or rollback is issued.  In effect, emulating the behavior of databases which require an explicit "start" or "begin".</li>
 <li><b>timeout</b>: Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.</li>
+<li><b>fetchatonce</b>: The number of rows that SQL Relay fetches from the database in each round trip.  Defaults to 10. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
+<li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (See <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
+<li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Fields longer than that will be truncated.  Defaults to 4096. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 </ul>
 </li>
 <li>For <b>firebird</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DATABASE;dialect=DIALECT;autocommit=yes/no;charset=CHARSET;faketransactionblocks=YESORNO;lastinsertidfunction=LASTINSERTIDFUNCTION"</li>

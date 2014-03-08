@@ -415,7 +415,7 @@ finding it may dramatically improve that query's performance.</p>
 <a name="memoryusage"></a>
 <span class="heading2">Memory Usage</span><br>
 
-<p>Many database API's allocate memory internally to store result sets.  Oracle, DB2, Sybase and FreeTDS allow you to allocate buffers yourself and fetch result sets into these buffers.  When using these databases, SQL Relay preallocates a result set buffer and re-uses it over and over rather than dynamically allocating memory for each result set.  This improves performance at the cost of memory.  There are methods for tuning the size of the result set buffer though.</p>
+<p>Many database API's allocate memory internally to store result sets.  However, Oracle, DB2, Sybase and FreeTDS allow you to allocate buffers yourself and fetch result sets into these buffers.  When using these databases, SQL Relay preallocates a result set buffer and re-uses it over and over rather than dynamically allocating memory for each result set.  This improves performance at the cost of memory.  There are parameters for tuning the size of the result set buffer though.</p>
 
 <p>The size of the result set buffer is determined by 3 parameters:</p>
 
@@ -435,50 +435,19 @@ finding it may dramatically improve that query's performance.</p>
 </ul>
 </ul>
 
-<p>The third parameter might be a little confusing.  Some databases only support single-row fetches; you can run a query, then fetch 1 row at a time from the database.  Oracle, DB2 and Sybase support array fetches; you can run a query and then fetch any number of rows from the database in a single round-trip.  This can improve performance significantly.</p>
+<p>The third parameter might be a little confusing.  Some databases only support single-row fetches; you run a query, then fetch 1 row at a time from the database.  Oracle, DB2 and Sybase support array fetches; you can run a query and then fetch any number of rows from the database in a single round-trip.  This can improve performance significantly.</p>
 
 <p>The default result set buffer size for Oracle is about 80mb (256 fields per row * 32768 bytes per field * 10 rows to fetch at once).  The default result set buffer size for DB2 and Sybase is about 10mb (256*4096*10 bytes).  FreeTDS doesn't support multi-row fetches so its default buffer size is about 1mb (256*4096*1 bytes).</p>
 
 <p>It is important to note that each cursor contains a result set buffer and each connection opens a configurable number of cursors.<p>
 
-<p>With oracle, for example, if you open 10 connections with 2 cursors each, then each connection will consume about 160mb of memory, 1.6g for all 10 connections.</p>
+<p>With oracle, for example, if you open 10 connections with 2 cursors each, then since each cursor will consume 80mb, each connection will consume about 160mb, and all 10 connections will consume about 1.6g.</p>
 
 <p>If that seems like more memory than you'd like to allocate to SQL Relay then you can tune it down.</p>
 
 <p>In general, the "maximum number of columns in the result set" should be set to the largest number of columns that a query run by your apps could return.  The "maximum size of an individual non-LOB field" parameter should be set to the longest non-LOB field that your app could fetch.  There is no rule of thumb for the "number of rows of the result set to fetch at once" parameter.  More tends to be better, but not always.  You may have to tune this by trial and error.</li>
 
-<p>For Oracle, the maxselectlistsize, maxitembuffersize and fetchatonce
-parameters of the string attribute of the connection tag in the sqlrelay.conf
-file may be set to control these values at run time.  See <a href="configuring.html">Configuring SQL Relay</a> for details.</p>
-
-<p>Unfortunately, for non-Oracle databases, the parameters are hardcoded.</p>
-
-<p>In the following files...</p>
-
-<ul>
-<li>src/connections/db2/db2connection.cpp</li>
-<li>src/connections/sybase/sybaseconnection.cpp</li>
-<li>src/connections/freetds/freetdsconnection.cpp</li>
-</ul>
-
-<p>...there are lines like this:</p>
-
-<blockquote>
-<pre>
-<font color="#a020f0">#define FETCH_AT_ONCE           </font><font color="#ff00ff">10</font>
-<font color="#a020f0">#define MAX_SELECT_LIST_SIZE    </font><font color="#ff00ff">256</font>
-<font color="#a020f0">#define MAX_ITEM_BUFFER_SIZE    </font><font color="#ff00ff">4096</font>
-</pre>
-</blockquote>
-
-<p>FETCH_AT_ONCE controls the number of rows that are fetched from the database
-at once.  MAX_SELECT_LIST_SIZE controls the maximum number of columns that may
-be fetched during a select.  MAX_ITEM_BUFFER_SIZE is the maximum size of an
-individual field that may be returned by the database during a select.</p>
-
-<p>To tune memory consumption, you can modify these parameters as described above.</p>
-
-<p>After modifying them, you must rebuild and re-install SQL Relay for the changes to have an effect.  If you have already run the <i>configure</i> script, then you should do a <i>make clean</i>, followed by a <i>make</i> and <i>make install</i> at the top level of the SQL Relay source distribution.  If you have not run the <i>configure</i> script, or have recently run a <i>make distclean</i> then just proceed as if you were building and installing SQL Relay for the first time.  See <a href="installing.html">Installing SQL Relay</a> for more information.</p>
+<p>For Oracle, Sybase and DB2, the maxselectlistsize, maxitembuffersize and fetchatonce parameters of the string attribute of the connection tag in the sqlrelay.conf file may be set to control these values at run time.  For FreeTDS, the maxselectlistsize and maxitembuffersize parameters are available but the fetchatonce parameter is not.  See <a href="configuring.html">Configuring SQL Relay</a> for details.</p>
 
 <p>Possibly more important than the parameters controlling the result set buffer size though, are the cursors and connections parameters as they are both multipliers.  See tips below for each.</p>
 
