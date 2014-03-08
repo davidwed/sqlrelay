@@ -62,6 +62,8 @@ extern	CS_INT	ct_dynamic(CS_COMMAND *,CS_INT,CS_CHAR *,CS_INT,CS_CHAR *,CS_INT);
 #define FETCH_AT_ONCE		1
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	4096
+
+// this is here in case freetds ever supports cursors
 //#define FREETDS_SUPPORTS_CURSORS
 
 // some versions of freetds don't define this

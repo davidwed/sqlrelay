@@ -9,6 +9,7 @@
 	updated handoff="proxy" code to work with sessionhandler="thread"
 	replaced waitpid call in sqlrscaler with rudiments equivalent
 	got the server-side stuff to compile on windows
+	added configurable fetch buffer sizes to sybase, freetds and db2
 
 0.54 - fixed bugs that caused problems when unopened result sets were closed
 	added protocol identification phase to client/server protocol
