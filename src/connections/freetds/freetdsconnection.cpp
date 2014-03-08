@@ -87,6 +87,8 @@ class freetdscursor : public sqlrcursor_svr {
 	private:
 				freetdscursor(sqlrconnection_svr *conn);
 				~freetdscursor();
+		void		allocateResultSetBuffers();
+		void		deallocateResultSetBuffers();
 		bool		open(uint16_t id);
 		bool		close();
 		bool		prepareQuery(const char *query,
@@ -212,14 +214,10 @@ class freetdscursor : public sqlrcursor_svr {
 		datebind	*outbinddates;
 		uint16_t	outbindindex;
 
-		CS_DATAFMT	column[MAX_SELECT_LIST_SIZE];
-		char		data[MAX_SELECT_LIST_SIZE]
-					[FETCH_AT_ONCE]
-					[MAX_ITEM_BUFFER_SIZE];
-		CS_INT		datalength[MAX_SELECT_LIST_SIZE]
-					[FETCH_AT_ONCE];
-		CS_SMALLINT	nullindicator[MAX_SELECT_LIST_SIZE]
-					[FETCH_AT_ONCE];
+		CS_DATAFMT	*column;
+		char		**data;
+		CS_INT		**datalength;
+		CS_SMALLINT	**nullindicator;
 
 		char		*query;
 		uint32_t	length;
@@ -283,6 +281,10 @@ class freetdsconnection : public sqlrconnection_svr {
 		const char	*hostname;
 		const char	*packetsize;
 
+		uint32_t	fetchatonce;
+		int32_t		maxselectlistsize;
+		int32_t		maxitembuffersize;
+
 		bool		dbused;
 
 		char		*dbversion;
@@ -314,6 +316,10 @@ freetdsconnection::freetdsconnection(sqlrcontroller_svr *cont) :
 	dbused=false;
 	dbversion=NULL;
 	sybasedb=true;
+
+	fetchatonce=FETCH_AT_ONCE;
+	maxselectlistsize=MAX_SELECT_LIST_SIZE;
+	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 }
 
 freetdsconnection::~freetdsconnection() {
@@ -333,6 +339,22 @@ void freetdsconnection::handleConnectString() {
 	packetsize=cont->connectStringValue("packetsize");
 	cont->fakeinputbinds=!charstring::compare(
 				cont->connectStringValue("fakebinds"),"yes");
+	// this is here in case freetds ever supports array fetches
+	/*fetchatonce=charstring::toUnsignedInteger(
+				cont->connectStringValue("fetchatonce"));
+	if (!fetchatonce) {
+		fetchatonce=FETCH_AT_ONCE;
+	}*/
+	maxselectlistsize=charstring::toInteger(
+				cont->connectStringValue("maxselectlistsize"));
+	if (!maxselectlistsize) {
+		maxselectlistsize=MAX_SELECT_LIST_SIZE;
+	}
+	maxitembuffersize=charstring::toInteger(
+				cont->connectStringValue("maxitembuffersize"));
+	if (!maxitembuffersize) {
+		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
+	}
 }
 
 bool freetdsconnection::logIn(const char **error) {
@@ -855,6 +877,8 @@ freetdscursor::freetdscursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 	rpcquery.compile("^(execute|EXECUTE|exec|EXEC)[ 	\\r\\n]+");
 	rpcquery.study();
+
+	allocateResultSetBuffers();
 }
 
 freetdscursor::~freetdscursor() {
@@ -867,6 +891,34 @@ freetdscursor::~freetdscursor() {
 	delete[] outbindints;
 	delete[] outbinddoubles;
 	delete[] outbinddates;
+
+	deallocateResultSetBuffers();
+}
+
+void freetdscursor::allocateResultSetBuffers() {
+
+	column=new CS_DATAFMT[freetdsconn->maxselectlistsize];
+	data=new char *[freetdsconn->maxselectlistsize];
+	datalength=new CS_INT *[freetdsconn->maxselectlistsize];
+	nullindicator=new CS_SMALLINT *[freetdsconn->maxselectlistsize];
+	for (int32_t i=0; i<freetdsconn->maxselectlistsize; i++) {
+		data[i]=new char[freetdsconn->fetchatonce*
+					freetdsconn->maxitembuffersize];
+		datalength[i]=new CS_INT[freetdsconn->fetchatonce];
+		nullindicator[i]=new CS_SMALLINT[freetdsconn->fetchatonce];
+	}
+}
+
+void freetdscursor::deallocateResultSetBuffers() {
+	delete[] column;
+	for (int32_t i=0; i<freetdsconn->maxselectlistsize; i++) {
+		delete[] data[i];
+		delete[] datalength[i];
+		delete[] nullindicator[i];
+	}
+	delete[] data;
+	delete[] datalength;
+	delete[] nullindicator;
 }
 
 bool freetdscursor::open(uint16_t id) {
@@ -916,10 +968,9 @@ bool freetdscursor::open(uint16_t id) {
 				executeQuery(query,len) &&
 				fetchRow()) {
 			const char	*space=
-				charstring::findFirst(data[1][0],' ');
+				charstring::findFirst(data[1],' ');
 			freetdsconn->dbversion=
-				charstring::duplicate(data[1][0],
-							space-data[1][0]);
+				charstring::duplicate(data[1],space-data[1]);
 			success=true;
 		}
 		cleanUpData();
@@ -936,7 +987,7 @@ bool freetdscursor::open(uint16_t id) {
 			// parse out the version
 			freetdsconn->sybasedb=false;
 			const char	*dash=
-				charstring::findFirst(data[0][0]," - ");
+				charstring::findFirst(data[0]," - ");
 			if (dash) {
 				dash=dash+3;
 				const char	*space=
@@ -1605,20 +1656,18 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 					length=datalength[i][0];
 				}
 				rawbuffer::copy(outbindstrings[i],
-						data[i][0],length);
+						data[i],length);
 			} else if (outbindtype[i]==CS_INT_TYPE) {
-				*outbindints[i]=charstring::toInteger(
-								data[i][0]);
+				*outbindints[i]=charstring::toInteger(data[i]);
 			} else if (outbindtype[i]==CS_FLOAT_TYPE) {
-				*outbinddoubles[i]=charstring::toFloat(
-								data[i][0]);
+				*outbinddoubles[i]=charstring::toFloat(data[i]);
 			} else if (outbindtype[i]==CS_DATETIME_TYPE) {
 
 				// convert to a CS_DATEREC
 				CS_DATEREC	dr;
 				cs_dt_crack(freetdsconn->context,
 						CS_DATETIME_TYPE,
-						(CS_VOID *)data[i][0],&dr);
+						(CS_VOID *)data[i],&dr);
 
 				datebind	*db=&outbinddates[i];
 				*(db->year)=dr.dateyear;
@@ -1884,7 +1933,7 @@ void freetdscursor::getField(uint32_t col,
 
 	// handle normal datatypes
 	if (nullindicator[col][row]>-1 && datalength[col][row]) {
-		*field=data[col][row];
+		*field=&data[col][row*freetdsconn->maxitembuffersize];
 		*fieldlength=datalength[col][row]-1;
 		return;
 	}
