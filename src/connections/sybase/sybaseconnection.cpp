@@ -67,6 +67,10 @@ class sybaseconnection : public sqlrconnection_svr {
 		const char	*hostname;
 		const char	*packetsize;
 
+		uint32_t	fetchatonce;
+		int32_t		maxselectlistsize;
+		int32_t		maxitembuffersize;
+
 		bool		dbused;
 
 		char		*dbversion;
@@ -103,6 +107,8 @@ class sybasecursor : public sqlrcursor_svr {
 	private:
 				sybasecursor(sqlrconnection_svr *conn);
 				~sybasecursor();
+		void		allocateResultSetBuffers();
+		void		deallocateResultSetBuffers();
 		bool		open(uint16_t id);
 		bool		close();
 		bool		prepareQuery(const char *query,
@@ -216,14 +222,10 @@ class sybasecursor : public sqlrcursor_svr {
 		datebind	*outbinddates;
 		uint16_t	outbindindex;
 
-		CS_DATAFMT	column[MAX_SELECT_LIST_SIZE];
-		char		data[MAX_SELECT_LIST_SIZE]
-					[FETCH_AT_ONCE]
-					[MAX_ITEM_BUFFER_SIZE];
-		CS_INT		datalength[MAX_SELECT_LIST_SIZE]
-					[FETCH_AT_ONCE];
-		CS_SMALLINT	nullindicator[MAX_SELECT_LIST_SIZE]
-					[FETCH_AT_ONCE];
+		CS_DATAFMT	*column;
+		char		**data;
+		CS_INT		**datalength;
+		CS_SMALLINT	**nullindicator;
 
 		const char	*query;
 		uint32_t	length;
@@ -248,6 +250,10 @@ sybaseconnection::sybaseconnection(sqlrcontroller_svr *cont) :
 					sqlrconnection_svr(cont) {
 	dbused=false;
 	dbversion=NULL;
+
+	fetchatonce=FETCH_AT_ONCE;
+	maxselectlistsize=MAX_SELECT_LIST_SIZE;
+	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 }
 
 sybaseconnection::~sybaseconnection() {
@@ -269,6 +275,21 @@ void sybaseconnection::handleConnectString() {
 		!charstring::compare(
 				cont->connectStringValue("fakebinds"),
 				"yes");
+	fetchatonce=charstring::toUnsignedInteger(
+				cont->connectStringValue("fetchatonce"));
+	if (!fetchatonce) {
+		fetchatonce=FETCH_AT_ONCE;
+	}
+	maxselectlistsize=charstring::toInteger(
+				cont->connectStringValue("maxselectlistsize"));
+	if (!maxselectlistsize) {
+		maxselectlistsize=MAX_SELECT_LIST_SIZE;
+	}
+	maxitembuffersize=charstring::toInteger(
+				cont->connectStringValue("maxitembuffersize"));
+	if (!maxitembuffersize) {
+		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
+	}
 }
 
 bool sybaseconnection::logIn(const char **error) {
@@ -640,6 +661,8 @@ sybasecursor::sybasecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 
 	rpcquery.compile("^(execute|exec|EXECUTE|EXEC)[ 	\\r\\n]+");
 	rpcquery.study();
+
+	allocateResultSetBuffers();
 }
 
 sybasecursor::~sybasecursor() {
@@ -652,6 +675,34 @@ sybasecursor::~sybasecursor() {
 	delete[] outbindints;
 	delete[] outbinddoubles;
 	delete[] outbinddates;
+
+	deallocateResultSetBuffers();
+}
+
+void sybasecursor::allocateResultSetBuffers() {
+
+	column=new CS_DATAFMT[sybaseconn->maxselectlistsize];
+	data=new char *[sybaseconn->maxselectlistsize];
+	datalength=new CS_INT *[sybaseconn->maxselectlistsize];
+	nullindicator=new CS_SMALLINT *[sybaseconn->maxselectlistsize];
+	for (int32_t i=0; i<sybaseconn->maxselectlistsize; i++) {
+		data[i]=new char[sybaseconn->fetchatonce*
+					sybaseconn->maxitembuffersize];
+		datalength[i]=new CS_INT[sybaseconn->fetchatonce];
+		nullindicator[i]=new CS_SMALLINT[sybaseconn->fetchatonce];
+	}
+}
+
+void sybasecursor::deallocateResultSetBuffers() {
+	delete[] column;
+	for (int32_t i=0; i<sybaseconn->maxselectlistsize; i++) {
+		delete[] data[i];
+		delete[] datalength[i];
+		delete[] nullindicator[i];
+	}
+	delete[] data;
+	delete[] datalength;
+	delete[] nullindicator;
 }
 
 bool sybasecursor::open(uint16_t id) {
@@ -700,10 +751,9 @@ bool sybasecursor::open(uint16_t id) {
 				charstring::duplicate("unknown");
 		} else {
 			const char	*space=
-				charstring::findFirst(data[1][0],' ');
+				charstring::findFirst(data[1],' ');
 			sybaseconn->dbversion=
-				charstring::duplicate(data[1][0],
-							space-data[1][0]);
+				charstring::duplicate(data[1],space-data[1]);
 		}
 		cleanUpData();
 	}
@@ -1256,13 +1306,11 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 					length=datalength[i][0];
 				}
 				rawbuffer::copy(outbindstrings[i],
-						data[i][0],length);
+						data[i],length);
 			} else if (outbindtype[i]==CS_INT_TYPE) {
-				*outbindints[i]=charstring::toInteger(
-								data[i][0]);
+				*outbindints[i]=charstring::toInteger(data[i]);
 			} else if (outbindtype[i]==CS_FLOAT_TYPE) {
-				*outbinddoubles[i]=charstring::toFloat(
-								data[i][0]);
+				*outbinddoubles[i]=charstring::toFloat(data[i]);
 			} else if (outbindtype[i]==CS_DATETIME_TYPE) {
 
 				// convert to a CS_DATEREC
@@ -1270,7 +1318,7 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 				rawbuffer::zero(&dr,sizeof(CS_DATEREC));
 				cs_dt_crack(sybaseconn->context,
 						CS_DATETIME_TYPE,
-						(CS_VOID *)data[i][0],&dr);
+						(CS_VOID *)data[i],&dr);
 
 				datebind	*db=&outbinddates[i];
 				*(db->year)=dr.dateyear;
@@ -1454,7 +1502,7 @@ void sybasecursor::getField(uint32_t col,
 
 	// handle normal datatypes
 	if (nullindicator[col][row]>-1 && datalength[col][row]) {
-		*field=data[col][row];
+		*field=&data[col][row*sybaseconn->maxitembuffersize];
 		*fieldlength=datalength[col][row]-1;
 		return;
 	}
