@@ -107,7 +107,8 @@ class sybasecursor : public sqlrcursor_svr {
 	private:
 				sybasecursor(sqlrconnection_svr *conn);
 				~sybasecursor();
-		void		allocateResultSetBuffers();
+		void		allocateResultSetBuffers(
+					int32_t selectlistsize);
 		void		deallocateResultSetBuffers();
 		bool		open(uint16_t id);
 		bool		close();
@@ -222,6 +223,7 @@ class sybasecursor : public sqlrcursor_svr {
 		datebind	*outbinddates;
 		uint16_t	outbindindex;
 
+		int32_t		selectlistsize;
 		CS_DATAFMT	*column;
 		char		**data;
 		CS_INT		**datalength;
@@ -662,7 +664,8 @@ sybasecursor::sybasecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	rpcquery.compile("^(execute|exec|EXECUTE|EXEC)[ 	\\r\\n]+");
 	rpcquery.study();
 
-	allocateResultSetBuffers();
+	selectlistsize=0;
+	allocateResultSetBuffers(sybaseconn->maxselectlistsize);
 }
 
 sybasecursor::~sybasecursor() {
@@ -679,30 +682,44 @@ sybasecursor::~sybasecursor() {
 	deallocateResultSetBuffers();
 }
 
-void sybasecursor::allocateResultSetBuffers() {
+void sybasecursor::allocateResultSetBuffers(int32_t selectlistsize) {
 
-	column=new CS_DATAFMT[sybaseconn->maxselectlistsize];
-	data=new char *[sybaseconn->maxselectlistsize];
-	datalength=new CS_INT *[sybaseconn->maxselectlistsize];
-	nullindicator=new CS_SMALLINT *[sybaseconn->maxselectlistsize];
-	for (int32_t i=0; i<sybaseconn->maxselectlistsize; i++) {
-		data[i]=new char[sybaseconn->fetchatonce*
+	if (selectlistsize==-1) {
+		this->selectlistsize=0;
+		column=NULL;
+		data=NULL;
+		datalength=NULL;
+		nullindicator=NULL;
+	} else {
+		this->selectlistsize=selectlistsize;
+		column=new CS_DATAFMT[selectlistsize];
+		data=new char *[selectlistsize];
+		datalength=new CS_INT *[selectlistsize];
+		nullindicator=new CS_SMALLINT *[selectlistsize];
+		for (int32_t i=0; i<selectlistsize; i++) {
+			data[i]=new char[sybaseconn->fetchatonce*
 					sybaseconn->maxitembuffersize];
-		datalength[i]=new CS_INT[sybaseconn->fetchatonce];
-		nullindicator[i]=new CS_SMALLINT[sybaseconn->fetchatonce];
+			datalength[i]=
+				new CS_INT[sybaseconn->fetchatonce];
+			nullindicator[i]=
+				new CS_SMALLINT[sybaseconn->fetchatonce];
+		}
 	}
 }
 
 void sybasecursor::deallocateResultSetBuffers() {
-	delete[] column;
-	for (int32_t i=0; i<sybaseconn->maxselectlistsize; i++) {
-		delete[] data[i];
-		delete[] datalength[i];
-		delete[] nullindicator[i];
+	if (selectlistsize) {
+		delete[] column;
+		for (int32_t i=0; i<selectlistsize; i++) {
+			delete[] data[i];
+			delete[] datalength[i];
+			delete[] nullindicator[i];
+		}
+		delete[] data;
+		delete[] datalength;
+		delete[] nullindicator;
+		selectlistsize=0;
 	}
-	delete[] data;
-	delete[] datalength;
-	delete[] nullindicator;
 }
 
 bool sybasecursor::open(uint16_t id) {
@@ -1232,7 +1249,10 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 			return false;
 		}
 
-		if (ncols>sybaseconn->maxselectlistsize) {
+		// allocate buffers and limit column count if necessary
+		if (sybaseconn->maxselectlistsize==-1) {
+			allocateResultSetBuffers(ncols);
+		} else if (ncols>sybaseconn->maxselectlistsize) {
 			ncols=sybaseconn->maxselectlistsize;
 		}
 
@@ -1549,6 +1569,10 @@ void sybasecursor::discardResults() {
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
 			// maybe return false
 		}
+	}
+
+	if (sybaseconn->maxselectlistsize==-1) {
+		deallocateResultSetBuffers();
 	}
 }
 
