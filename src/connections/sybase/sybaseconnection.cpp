@@ -286,6 +286,10 @@ void sybaseconnection::handleConnectString() {
 				cont->connectStringValue("maxselectlistsize"));
 	if (!maxselectlistsize) {
 		maxselectlistsize=MAX_SELECT_LIST_SIZE;
+	} else if (maxselectlistsize==1) {
+		// if maxselectlistsize is set to 1 then force it
+		// to 2 so the db version detection doesn't crash
+		maxselectlistsize=2;
 	}
 	maxitembuffersize=charstring::toInteger(
 				cont->connectStringValue("maxitembuffersize"));

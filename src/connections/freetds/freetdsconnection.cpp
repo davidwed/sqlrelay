@@ -89,7 +89,8 @@ class freetdscursor : public sqlrcursor_svr {
 	private:
 				freetdscursor(sqlrconnection_svr *conn);
 				~freetdscursor();
-		void		allocateResultSetBuffers();
+		void		allocateResultSetBuffers(
+					int32_t selectlistsize);
 		void		deallocateResultSetBuffers();
 		bool		open(uint16_t id);
 		bool		close();
@@ -216,6 +217,7 @@ class freetdscursor : public sqlrcursor_svr {
 		datebind	*outbinddates;
 		uint16_t	outbindindex;
 
+		int32_t		selectlistsize;
 		CS_DATAFMT	*column;
 		char		**data;
 		CS_INT		**datalength;
@@ -351,6 +353,10 @@ void freetdsconnection::handleConnectString() {
 				cont->connectStringValue("maxselectlistsize"));
 	if (!maxselectlistsize) {
 		maxselectlistsize=MAX_SELECT_LIST_SIZE;
+	} else if (maxselectlistsize==1) {
+		// if maxselectlistsize is set to 1 then force it
+		// to 2 so the db version detection doesn't crash
+		maxselectlistsize=2;
 	}
 	maxitembuffersize=charstring::toInteger(
 				cont->connectStringValue("maxitembuffersize"));
@@ -880,7 +886,7 @@ freetdscursor::freetdscursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	rpcquery.compile("^(execute|EXECUTE|exec|EXEC)[ 	\\r\\n]+");
 	rpcquery.study();
 
-	allocateResultSetBuffers();
+	allocateResultSetBuffers(freetdsconn->maxselectlistsize);
 }
 
 freetdscursor::~freetdscursor() {
@@ -897,30 +903,44 @@ freetdscursor::~freetdscursor() {
 	deallocateResultSetBuffers();
 }
 
-void freetdscursor::allocateResultSetBuffers() {
+void freetdscursor::allocateResultSetBuffers(int32_t selectlistsize) {
 
-	column=new CS_DATAFMT[freetdsconn->maxselectlistsize];
-	data=new char *[freetdsconn->maxselectlistsize];
-	datalength=new CS_INT *[freetdsconn->maxselectlistsize];
-	nullindicator=new CS_SMALLINT *[freetdsconn->maxselectlistsize];
-	for (int32_t i=0; i<freetdsconn->maxselectlistsize; i++) {
-		data[i]=new char[freetdsconn->fetchatonce*
+	if (selectlistsize==-1) {
+		this->selectlistsize=0;
+		column=NULL;
+		data=NULL;
+		datalength=NULL;
+		nullindicator=NULL;
+	} else {
+		this->selectlistsize=selectlistsize;
+		column=new CS_DATAFMT[selectlistsize];
+		data=new char *[selectlistsize];
+		datalength=new CS_INT *[selectlistsize];
+		nullindicator=new CS_SMALLINT *[selectlistsize];
+		for (int32_t i=0; i<selectlistsize; i++) {
+			data[i]=new char[freetdsconn->fetchatonce*
 					freetdsconn->maxitembuffersize];
-		datalength[i]=new CS_INT[freetdsconn->fetchatonce];
-		nullindicator[i]=new CS_SMALLINT[freetdsconn->fetchatonce];
+			datalength[i]=
+				new CS_INT[freetdsconn->fetchatonce];
+			nullindicator[i]=
+				new CS_SMALLINT[freetdsconn->fetchatonce];
+		}
 	}
 }
 
 void freetdscursor::deallocateResultSetBuffers() {
-	delete[] column;
-	for (int32_t i=0; i<freetdsconn->maxselectlistsize; i++) {
-		delete[] data[i];
-		delete[] datalength[i];
-		delete[] nullindicator[i];
+	if (selectlistsize) {
+		delete[] column;
+		for (int32_t i=0; i<selectlistsize; i++) {
+			delete[] data[i];
+			delete[] datalength[i];
+			delete[] nullindicator[i];
+		}
+		delete[] data;
+		delete[] datalength;
+		delete[] nullindicator;
+		selectlistsize=0;
 	}
-	delete[] data;
-	delete[] datalength;
-	delete[] nullindicator;
 }
 
 bool freetdscursor::open(uint16_t id) {
@@ -1546,7 +1566,10 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 			return false;
 		}
 
-		if (ncols>freetdsconn->maxselectlistsize) {
+		// allocate buffers and limit column count if necessary
+		if (freetdsconn->maxselectlistsize==-1) {
+			allocateResultSetBuffers(ncols);
+		} else if (ncols>freetdsconn->maxselectlistsize) {
 			ncols=freetdsconn->maxselectlistsize;
 		}
 
@@ -1982,6 +2005,10 @@ void freetdscursor::discardResults() {
 			// FIXME: call ct_close(CS_FORCE_CLOSE)
 			// maybe return false
 		}
+	}
+
+	if (freetdsconn->maxselectlistsize==-1) {
+		deallocateResultSetBuffers();
 	}
 }
 
