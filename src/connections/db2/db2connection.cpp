@@ -53,7 +53,8 @@ class db2cursor : public sqlrcursor_svr {
 			db2cursor(sqlrconnection_svr *conn);
 			~db2cursor();
 	private:
-		void		allocateResultSetBuffers();
+		void		allocateResultSetBuffers(
+						int32_t selectlistsize);
 		void		deallocateResultSetBuffers();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
@@ -145,11 +146,13 @@ class db2cursor : public sqlrcursor_svr {
 		SQLHSTMT	stmt;
 		SQLSMALLINT	ncols;
 		SQLINTEGER 	affectedrows;
+
+		int32_t		selectlistsize;
 		char		**field;
 		SQLINTEGER	**indicator;
-#if (DB2VERSION>7)
+		#if (DB2VERSION>7)
 		SQLUSMALLINT	*rowstat;
-#endif
+		#endif
 		db2column	*col;
 
 		datebind	**outdatebind;
@@ -564,7 +567,7 @@ db2cursor::db2cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
 		outdatebind[i]=NULL;
 	}
-	allocateResultSetBuffers();
+	allocateResultSetBuffers(db2conn->maxselectlistsize);
 }
 
 db2cursor::~db2cursor() {
@@ -572,33 +575,48 @@ db2cursor::~db2cursor() {
 	deallocateResultSetBuffers();
 }
 
-void db2cursor::allocateResultSetBuffers() {
-	field=new char *[db2conn->maxselectlistsize];
-	indicator=new SQLINTEGER *[db2conn->maxselectlistsize];
-#if (DB2VERSION>7)
-	rowstat=new SQLUSMALLINT[db2conn->fetchatonce];
-#endif
-	col=new db2column[db2conn->maxselectlistsize];
-	for (int32_t i=0; i<db2conn->maxselectlistsize; i++) {
-		col[i].name=new char[db2conn->maxitembuffersize];
-		field[i]=new char[db2conn->fetchatonce*
-					db2conn->maxitembuffersize];
-		indicator[i]=new SQLINTEGER[db2conn->fetchatonce];
+void db2cursor::allocateResultSetBuffers(int32_t selectlistsize) {
+
+	if (selectlistsize==-1) {
+		this->selectlistsize=0;
+		field=NULL;
+		indicator=NULL;
+		#if (DB2VERSION>7)
+		rowstat=NULL;
+		#endif
+		col=NULL;
+	} else {
+		this->selectlistsize=selectlistsize;
+		field=new char *[selectlistsize];
+		indicator=new SQLINTEGER *[selectlistsize];
+		#if (DB2VERSION>7)
+		rowstat=new SQLUSMALLINT[db2conn->fetchatonce];
+		#endif
+		col=new db2column[selectlistsize];
+		for (int32_t i=0; i<selectlistsize; i++) {
+			col[i].name=new char[db2conn->maxitembuffersize];
+			field[i]=new char[db2conn->fetchatonce*
+						db2conn->maxitembuffersize];
+			indicator[i]=new SQLINTEGER[db2conn->fetchatonce];
+		}
 	}
 }
 
 void db2cursor::deallocateResultSetBuffers() {
-	for (int32_t i=0; i<db2conn->maxselectlistsize; i++) {
-		delete[] col[i].name;
-		delete[] field[i];
-		delete[] indicator[i];
+	if (selectlistsize) {
+		for (int32_t i=0; i<selectlistsize; i++) {
+			delete[] col[i].name;
+			delete[] field[i];
+			delete[] indicator[i];
+		}
+		delete[] col;
+		delete[] field;
+		delete[] indicator;
+		#if (DB2VERSION>7)
+		delete[] rowstat;
+		#endif
+		selectlistsize=0;
 	}
-	delete[] col;
-	delete[] field;
-	delete[] indicator;
-#if (DB2VERSION>7)
-	delete[] rowstat;
-#endif
 }
 
 bool db2cursor::prepareQuery(const char *query, uint32_t length) {
@@ -620,14 +638,19 @@ bool db2cursor::prepareQuery(const char *query, uint32_t length) {
 		return false;
 	}
 
-#if (DB2VERSION>7)
-	// set the row status ptr
-	erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_STATUS_PTR,
-				(SQLPOINTER)rowstat,0);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		return false;
+	#if (DB2VERSION>7)
+	if (db2conn->maxselectlistsize!=-1) {
+
+		// set the row status ptr
+		// (only do this here if we're not
+		// dynamically allocating row buffers)
+		erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_STATUS_PTR,
+					(SQLPOINTER)rowstat,0);
+		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+			return false;
+		}
 	}
-#endif
+	#endif
 
 	// prepare the query
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
@@ -890,7 +913,24 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
-	if (ncols>db2conn->maxselectlistsize) {
+
+	// allocate buffers and limit column count if necessary
+	if (db2conn->maxselectlistsize==-1) {
+
+		allocateResultSetBuffers(ncols);
+
+		#if (DB2VERSION>7)
+		// set the row status ptr
+		// (only do this here if we're
+		// dynamically allocating row buffers)
+		erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_STATUS_PTR,
+					(SQLPOINTER)rowstat,0);
+		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+			return false;
+		}
+		#endif
+
+	} else if (ncols>db2conn->maxselectlistsize) {
 		ncols=db2conn->maxselectlistsize;
 	}
 
@@ -1170,7 +1210,7 @@ bool db2cursor::fetchRow() {
 		}
 
 		// Determine the current rownumber
-#if (DB2VERSION>7)
+		#if (DB2VERSION>7)
 		// An apparant bug in version 8.1 causes the
 		// SQL_ATTR_ROW_NUMBER to always be 1, running through
 		// the row status buffer appears to work though.
@@ -1181,10 +1221,10 @@ bool db2cursor::fetchRow() {
 			index++;
 		}
 		rownumber=totalrows+index;
-#else
+		#else
 		SQLGetStmtAttr(stmt,SQL_ATTR_ROW_NUMBER,
 				(SQLPOINTER)&rownumber,0,NULL);
-#endif
+		#endif
 
 		// In the event that there's a bug in SQLFetchScroll and it
 		// returns SQL_SUCCESS or SQL_SUCCESS_WITH_INFO even if we were
@@ -1223,6 +1263,10 @@ void db2cursor::cleanUpData() {
 	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
 		delete outdatebind[i];
 		outdatebind[i]=NULL;
+	}
+
+	if (db2conn->maxselectlistsize==-1) {
+		deallocateResultSetBuffers();
 	}
 }
 
