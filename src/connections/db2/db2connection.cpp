@@ -4,6 +4,7 @@
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <rudiments/environment.h>
+#include <rudiments/process.h>
 
 #include <datatypes.h>
 #include <config.h>
@@ -15,7 +16,7 @@
 #define MAX_ITEM_BUFFER_SIZE	4096
 
 struct db2column {
-	char		name[MAX_ITEM_BUFFER_SIZE];
+	char		*name;
 	uint16_t	namelength;
 	// SQLColAttribute requires that these are signed, 32 bit integers
 	int32_t		type;
@@ -579,6 +580,7 @@ void db2cursor::allocateResultSetBuffers() {
 #endif
 	col=new db2column[db2conn->maxselectlistsize];
 	for (int32_t i=0; i<db2conn->maxselectlistsize; i++) {
+		col[i].name=new char[db2conn->maxitembuffersize];
 		field[i]=new char[db2conn->fetchatonce*
 					db2conn->maxitembuffersize];
 		indicator[i]=new SQLINTEGER[db2conn->fetchatonce];
@@ -586,16 +588,17 @@ void db2cursor::allocateResultSetBuffers() {
 }
 
 void db2cursor::deallocateResultSetBuffers() {
+	for (int32_t i=0; i<db2conn->maxselectlistsize; i++) {
+		delete[] col[i].name;
+		delete[] field[i];
+		delete[] indicator[i];
+	}
+	delete[] col;
 	delete[] field;
 	delete[] indicator;
 #if (DB2VERSION>7)
 	delete[] rowstat;
 #endif
-	delete[] col;
-	for (int32_t i=0; i<db2conn->maxselectlistsize; i++) {
-		delete[] field[i];
-		delete[] indicator[i];
-	}
 }
 
 bool db2cursor::prepareQuery(const char *query, uint32_t length) {
@@ -612,7 +615,7 @@ bool db2cursor::prepareQuery(const char *query, uint32_t length) {
 
 	// set the row array size
 	erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_ARRAY_SIZE,
-				(SQLPOINTER)FETCH_AT_ONCE,0);
+				(SQLPOINTER)db2conn->fetchatonce,0);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
@@ -887,8 +890,8 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
-	if (ncols>MAX_SELECT_LIST_SIZE) {
-		ncols=MAX_SELECT_LIST_SIZE;
+	if (ncols>db2conn->maxselectlistsize) {
+		ncols=db2conn->maxselectlistsize;
 	}
 
 	// run through the columns
@@ -898,7 +901,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 
 			// column name
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_LABEL,
-					col[i].name,MAX_ITEM_BUFFER_SIZE,
+					col[i].name,db2conn->maxitembuffersize,
 					(SQLSMALLINT *)&(col[i].namelength),
 					NULL);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -968,7 +971,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 
 		// bind the column to a buffer
 		erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-				field[i],MAX_ITEM_BUFFER_SIZE,
+				field[i],db2conn->maxitembuffersize,
 				(SQLINTEGER *)indicator[i]);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			return false;
@@ -1148,7 +1151,7 @@ bool db2cursor::skipRow() {
 
 bool db2cursor::fetchRow() {
 
-	if (rowgroupindex==FETCH_AT_ONCE) {
+	if (rowgroupindex==db2conn->fetchatonce) {
 		rowgroupindex=0;
 	}
 	if (rowgroupindex>0 && rowgroupindex==totalinrowgroup) {
@@ -1170,13 +1173,9 @@ bool db2cursor::fetchRow() {
 #if (DB2VERSION>7)
 		// An apparant bug in version 8.1 causes the
 		// SQL_ATTR_ROW_NUMBER to always be 1, running through
-		// the row status buffer appears to work.
-		int32_t	index=0;
-		while (index<FETCH_AT_ONCE) {
-			index++;
-		}
-		index=0;
-		while (index<FETCH_AT_ONCE &&
+		// the row status buffer appears to work though.
+		uint32_t	index=0;
+		while (index<db2conn->fetchatonce &&
 			(rowstat[index]==SQL_ROW_SUCCESS ||
 			rowstat[index]==SQL_ROW_SUCCESS_WITH_INFO)) {
 			index++;

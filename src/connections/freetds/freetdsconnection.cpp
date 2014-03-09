@@ -283,7 +283,7 @@ class freetdsconnection : public sqlrconnection_svr {
 		const char	*hostname;
 		const char	*packetsize;
 
-		uint32_t	fetchatonce;
+		int32_t		fetchatonce;
 		int32_t		maxselectlistsize;
 		int32_t		maxitembuffersize;
 
@@ -342,7 +342,7 @@ void freetdsconnection::handleConnectString() {
 	cont->fakeinputbinds=!charstring::compare(
 				cont->connectStringValue("fakebinds"),"yes");
 	// this is here in case freetds ever supports array fetches
-	/*fetchatonce=charstring::toUnsignedInteger(
+	/*fetchatonce=charstring::toInteger(
 				cont->connectStringValue("fetchatonce"));
 	if (!fetchatonce) {
 		fetchatonce=FETCH_AT_ONCE;
@@ -1439,7 +1439,8 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 		if (ct_cursor(cursorcmd,CS_CURSOR_ROWS,
 					NULL,CS_UNUSED,
 					NULL,CS_UNUSED,
-					(CS_INT)FETCH_AT_ONCE)!=CS_SUCCEED) {
+					(CS_INT)freetdsconn->fetchatonce)!=
+					CS_SUCCEED) {
 			return false;
 		}
 		if (ct_cursor(cursorcmd,CS_CURSOR_OPEN,
@@ -1545,8 +1546,8 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 			return false;
 		}
 
-		if (ncols>MAX_SELECT_LIST_SIZE) {
-			ncols=MAX_SELECT_LIST_SIZE;
+		if (ncols>freetdsconn->maxselectlistsize) {
+			ncols=freetdsconn->maxselectlistsize;
 		}
 
 		// bind columns
@@ -1591,12 +1592,13 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 			} else {
 				column[i].datatype=CS_CHAR_TYPE;
 				column[i].format=CS_FMT_NULLTERM;
-				column[i].maxlength=MAX_ITEM_BUFFER_SIZE;
+				column[i].maxlength=
+					freetdsconn->maxitembuffersize;
 			}
 			column[i].scale=CS_UNUSED;
 			column[i].precision=CS_UNUSED;
 			column[i].status=CS_UNUSED;
-			column[i].count=FETCH_AT_ONCE;
+			column[i].count=freetdsconn->fetchatonce;
 			column[i].usertype=CS_UNUSED;
 			column[i].locale=NULL;
 	
@@ -1787,8 +1789,8 @@ uint16_t freetdscursor::getColumnType(uint32_t col) {
 
 uint32_t freetdscursor::getColumnLength(uint32_t col) {
 	// limit the column size
-	if (column[col].maxlength>MAX_ITEM_BUFFER_SIZE) {
-		column[col].maxlength=MAX_ITEM_BUFFER_SIZE;
+	if (column[col].maxlength>freetdsconn->maxitembuffersize) {
+		column[col].maxlength=freetdsconn->maxitembuffersize;
 	}
 	return column[col].maxlength;
 }
@@ -1888,7 +1890,7 @@ bool freetdscursor::skipRow() {
 }
 
 bool freetdscursor::fetchRow() {
-	if (row==FETCH_AT_ONCE) {
+	if (row==freetdsconn->fetchatonce) {
 		row=0;
 	}
 	if (row>0 && row==maxrow) {
