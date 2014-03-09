@@ -599,7 +599,7 @@ or a tnsnames-style expression such as:
 <li><b>language</b>: The language to use.  Optional.</li>
 <li><b>hostname</b>: The host to connect to.  Optional, overrides the host in the "interfaces" or "freetds.conf" file.</li>
 <li><b>packetsize</b>: The packetsize to use.  Optional.</li>
-<li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
+<li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 <li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 4096. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 </ul>
 </li>
@@ -615,7 +615,7 @@ or a tnsnames-style expression such as:
 <li><b>hostname</b>: The host to connect to.  Optional, overrides the host in the "interfaces" or "freetds.conf" file.</li>
 <li><b>packetsize</b>: The packetsize to use.  Optional.</li>
 <li><b>fetchatonce</b>: The number of rows that SQL Relay fetches from the database in each round trip.  Defaults to 10. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
-<li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256.  (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
+<li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 <li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 4096. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 </ul>
 </li>
@@ -638,7 +638,7 @@ or a tnsnames-style expression such as:
 <li><b>faketransactionblocks</b>: Some databases are in autocommit mode until you explicitly start a transaction with a "start" or "begin" statement.  DB2 is always in a transaction though, unless autocommit is turned on.  Setting this parameter to "yes" causes SQL Relay to put the database in autocommit mode until a "start" or "begin" statement is issued, and then put it back in autocommit mode when a commit or rollback is issued.  In effect, emulating the behavior of databases which require an explicit "start" or "begin".</li>
 <li><b>timeout</b>: Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.</li>
 <li><b>fetchatonce</b>: The number of rows that SQL Relay fetches from the database in each round trip.  Defaults to 10. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
-<li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256.  (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
+<li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 <li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 4096. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
 </ul>
 </li>

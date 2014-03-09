@@ -423,6 +423,7 @@ finding it may dramatically improve that query's performance.</p>
 <li>The maximum number of columns in the result set.</li>
 <ul>
 <li>Defaults to 256</li>
+<li>Setting to -1 causes buffers to be allocated dynamically</li>
 </ul>
 <li>The maximum size of an individual non-LOB field.</li>
 <ul>
@@ -445,7 +446,11 @@ finding it may dramatically improve that query's performance.</p>
 
 <p>If that seems like more memory than you'd like to allocate to SQL Relay then you can tune it down.</p>
 
-<p>In general, the "maximum number of columns in the result set" should be set to the largest number of columns that a query run by your apps could return.  The "maximum size of an individual non-LOB field" parameter should be set to the longest non-LOB field that your app could fetch.  There is no rule of thumb for the "number of rows of the result set to fetch at once" parameter.  More tends to be better, but not always.  You may have to tune this by trial and error.</li>
+<p>For the best performance/memory-usage trade-off, the "maximum number of columns in the result set" should be set to the largest number of columns that a query run by your apps could return.  However, this parameter can also be set to -1, causing column buffers to be allocated dynamically for each result set.  This won't perform as well but will conserve memory.</p>
+
+<p>The "maximum size of an individual non-LOB field" parameter should be set to the longest non-LOB field that your app could fetch.</p>
+
+<p>There is no rule of thumb for the "number of rows of the result set to fetch at once" parameter.  More tends to be better, but not always.  You may have to tune this by trial and error.</p>
 
 <p>For Oracle, Sybase and DB2, the maxselectlistsize, maxitembuffersize and fetchatonce parameters of the string attribute of the connection tag in the sqlrelay.conf file may be set to control these values at run time.  For FreeTDS, the maxselectlistsize and maxitembuffersize parameters are available but the fetchatonce parameter is not.  See <a href="configuring.html">Configuring SQL Relay</a> for details.</p>
 
