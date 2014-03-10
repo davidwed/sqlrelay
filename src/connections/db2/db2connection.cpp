@@ -174,6 +174,7 @@ class db2connection : public sqlrconnection_svr {
 	private:
 		void	handleConnectString();
 		bool	logIn(const char **error);
+		const char	*logInError(const char *errmsg);
 		sqlrcursor_svr	*initCursor();
 		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
@@ -212,6 +213,8 @@ class db2connection : public sqlrconnection_svr {
 		const char	*server;
 		const char	*lang;
 		uint32_t	timeout;
+
+		stringbuffer	errormessage;
 
 		uint32_t	fetchatonce;
 		int32_t		maxselectlistsize;
@@ -282,16 +285,15 @@ void db2connection::handleConnectString() {
 bool db2connection::logIn(const char **error) {
 
 	// set the LANG environment variable
-	if (charstring::length(lang)) {
-		if (!environment::setValue("LANG",lang)) {
-			*error="Failed to set LANG environment variable.";
-			return false;
-		}
+	if (charstring::length(lang) && !environment::setValue("LANG",lang)) {
+		*error="Failed to set LANG environment variable";
+		return false;
 	}
 
 	// allocate environment handle
 	erg=SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		*error="Failed to allocate environment handle";
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
 		return false;
 	}
@@ -299,6 +301,7 @@ bool db2connection::logIn(const char **error) {
 	// allocate connection handle
 	erg=SQLAllocHandle(SQL_HANDLE_DBC,env,&dbc);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		*error="Failed to allocate connection handle";
 		SQLFreeHandle(SQL_HANDLE_DBC,dbc);
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
 		return false;
@@ -314,6 +317,7 @@ bool db2connection::logIn(const char **error) {
 				#endif
 				(SQLPOINTER *)timeout,0);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+			*error="Failed to set timeout";
 			SQLFreeHandle(SQL_HANDLE_DBC,dbc);
 			SQLFreeHandle(SQL_HANDLE_ENV,env);
 			return false;
@@ -325,11 +329,29 @@ bool db2connection::logIn(const char **error) {
 				(SQLCHAR *)cont->getUser(),SQL_NTS,
 				(SQLCHAR *)cont->getPassword(),SQL_NTS);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		*error=logInError("SQLConnect failed");
 		SQLFreeHandle(SQL_HANDLE_DBC,dbc);
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
 		return false;
 	}
 	return true;
+}
+
+const char *db2connection::logInError(const char *errmsg) {
+
+	errormessage.clear();
+	errormessage.append(errmsg)->append(": ");
+
+	// get the error message from db2
+	SQLCHAR		state[10];
+	SQLINTEGER	nativeerrnum;
+	SQLCHAR		errorbuffer[1024];
+	SQLSMALLINT	errlength;
+
+	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,1,state,&nativeerrnum,
+					errorbuffer,1024,&errlength);
+	errormessage.append(errorbuffer,errlength);
+	return errormessage.getString();
 }
 
 sqlrcursor_svr *db2connection::initCursor() {
