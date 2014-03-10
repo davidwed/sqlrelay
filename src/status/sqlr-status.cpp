@@ -44,6 +44,9 @@ semaphoreset *status::getSemset() {
 }
 
 shmdata *status::getStatistics() {
+	if (!statussemset) {
+		return NULL;
+	}
 	statussemset->waitWithUndo(9);
 	privateshm=*shm;
 	statussemset->signalWithUndo(9);
@@ -51,10 +54,16 @@ shmdata *status::getStatistics() {
 }
 
 uint32_t status::getConnectionCount() {
+	if (!shm) {
+		return 0;
+	}
 	return shm->totalconnections;
 }
 
 uint32_t status::getConnectedClientCount() {
+	if (!shm) {
+		return 0;
+	}
 	return shm->connectedclients;
 }
 
@@ -64,6 +73,7 @@ bool status::init(int argc, const char **argv) {
 
 	cfgfl=new sqlrconfigfile();
 	tmpdir=new tempdir(cmdl);
+	shm=NULL;
 
 	if (!cfgfl->parse(cmdl->getConfig(),cmdl->getId())) {
 		return false;
@@ -100,6 +110,7 @@ bool status::createSharedMemoryAndSemaphores(const char *tmpdir,
 		stderror.printf("%s\n",err);
 		delete[] err;
 		delete idmemory;
+		statussemset=NULL;
 		idmemory=NULL;
 		delete[] idfilename;
 		return false;
@@ -143,6 +154,9 @@ int main(int argc, const char **argv) {
 	s.init(argc,argv);
 	
 	shmdata	*statistics=s.getStatistics();
+	if (!statistics) {
+		process::exit(0);
+	}
 
 	stdoutput.printf( 
 		"  Open   Database Connections:  %d\n" 
