@@ -21,6 +21,7 @@ class postgresqlconnection : public sqlrconnection_svr {
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error);
+		const char	*logInError(const char *errmsg);
 		sqlrcursor_svr	*initCursor();
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
@@ -58,6 +59,8 @@ class postgresqlconnection : public sqlrconnection_svr {
 		const char	*charset;
 		char		*dbversion;
 		char		*hostname;
+
+		stringbuffer	errormessage;
 
 #ifdef HAVE_POSTGRESQL_PQOIDVALUE
 		Oid	currentoid;
@@ -225,6 +228,7 @@ bool postgresqlconnection::logIn(const char **error) {
 
 	// check the status of the login
 	if (PQstatus(pgconn)==CONNECTION_BAD) {
+		*error=logInError("Log in failed");
 		logOut();
 		return false;
 	}
@@ -250,6 +254,7 @@ bool postgresqlconnection::logIn(const char **error) {
 		PGresult	*result=PQexec(pgconn,
 					"select oid,typname from pg_type");
 		if (result==(PGresult *)NULL) {
+			*error=logInError("Get datatypes failed");
 			return false;
 		}
 
@@ -279,6 +284,17 @@ bool postgresqlconnection::logIn(const char **error) {
 #endif
 
 	return true;
+}
+
+const char *postgresqlconnection::logInError(const char *errmsg) {
+
+	errormessage.clear();
+	errormessage.append(errmsg)->append(": ");
+
+	// get the error message from postgresql
+	const char	*message=PQerrorMessage(pgconn);
+	errormessage.append(message);
+	return errormessage.getString();
 }
 
 sqlrcursor_svr *postgresqlconnection::initCursor() {
@@ -635,7 +651,7 @@ bool postgresqlcursor::inputBind(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	uint32_t	pos=charstring::toInteger(variable+1)-1;
+	int32_t	pos=charstring::toInteger(variable+1)-1;
 
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
@@ -659,7 +675,7 @@ bool postgresqlcursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					int64_t *value) {
 
-	uint32_t	pos=charstring::toInteger(variable+1)-1;
+	int32_t	pos=charstring::toInteger(variable+1)-1;
 
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
@@ -680,7 +696,7 @@ bool postgresqlcursor::inputBind(const char *variable,
 					uint32_t precision,
 					uint32_t scale) {
 
-	uint32_t	pos=charstring::toInteger(variable+1)-1;
+	int32_t	pos=charstring::toInteger(variable+1)-1;
 
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
@@ -701,7 +717,7 @@ bool postgresqlcursor::inputBindBlob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	uint32_t	pos=charstring::toInteger(variable+1)-1;
+	int32_t	pos=charstring::toInteger(variable+1)-1;
 
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
@@ -728,7 +744,7 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	uint32_t	pos=charstring::toInteger(variable+1)-1;
+	int32_t	pos=charstring::toInteger(variable+1)-1;
 
 	// ignore attempts to bind beyond the number of
 	// variables defined when the query was prepared
