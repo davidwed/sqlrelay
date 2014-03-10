@@ -201,6 +201,7 @@ class odbcconnection : public sqlrconnection_svr {
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error);
+		const char	*logInError(const char *errmsg);
 		sqlrcursor_svr	*initCursor();
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
@@ -238,6 +239,8 @@ class odbcconnection : public sqlrconnection_svr {
 
 		const char	*dsn;
 		uint64_t	timeout;
+
+		stringbuffer	errormessage;
 
 		char		dbversion[512];
 
@@ -417,6 +420,7 @@ bool odbcconnection::logIn(const char **error) {
 #if (ODBCVER >= 0x0300)
 	erg=SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&env);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		*error="Failed to allocate environment handle";
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
 		return false;
 	}
@@ -426,6 +430,7 @@ bool odbcconnection::logIn(const char **error) {
 	erg=SQLAllocEnv(&env);
 #endif
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		*error="Failed to allocate environment handle";
 #if (ODBCVER >= 0x0300)
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
 #else
@@ -441,6 +446,7 @@ bool odbcconnection::logIn(const char **error) {
 	erg=SQLAllocConnect(env,&dbc);
 #endif
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		*error="Failed to allocate connection handle";
 #if (ODBCVER >= 0x0300)
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
 		SQLFreeHandle(SQL_HANDLE_DBC,dbc);
@@ -456,6 +462,12 @@ bool odbcconnection::logIn(const char **error) {
 	if (timeout) {
 		SQLSetConnectAttr(dbc,SQL_LOGIN_TIMEOUT,
 					(SQLPOINTER *)timeout,0);
+		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+			*error="Failed to set timeout";
+			SQLFreeHandle(SQL_HANDLE_DBC,dbc);
+			SQLFreeHandle(SQL_HANDLE_ENV,env);
+			return false;
+		}
 	}
 #endif
 
@@ -481,6 +493,7 @@ bool odbcconnection::logIn(const char **error) {
 #endif
 	
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		*error=logInError("SQLConnect failed");
 #if (ODBCVER >= 0x0300)
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
 		SQLFreeHandle(SQL_HANDLE_DBC,dbc);
@@ -491,6 +504,23 @@ bool odbcconnection::logIn(const char **error) {
 		return false;
 	}
 	return true;
+}
+
+const char *odbcconnection::logInError(const char *errmsg) {
+
+	errormessage.clear();
+	errormessage.append(errmsg)->append(": ");
+
+	// get the error message from db2
+	SQLCHAR		state[10];
+	SQLINTEGER	nativeerrnum;
+	SQLCHAR		errorbuffer[1024];
+	SQLSMALLINT	errlength;
+
+	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,1,state,&nativeerrnum,
+					errorbuffer,1024,&errlength);
+	errormessage.append(errorbuffer,errlength);
+	return errormessage.getString();
 }
 
 sqlrcursor_svr *odbcconnection::initCursor() {
