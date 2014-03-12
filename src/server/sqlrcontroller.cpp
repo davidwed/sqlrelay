@@ -2995,6 +2995,7 @@ void sqlrcontroller_svr::endSession() {
 	// these down gradually rather than all at once
 	while (cursorcount>mincursorcount) {
 		cursorcount--;
+		cur[cursorcount]->close();
 		deleteCursor(cur[cursorcount]);
 		cur[cursorcount]=NULL;
 	}
