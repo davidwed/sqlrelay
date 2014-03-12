@@ -18,6 +18,7 @@
 #include <rudiments/sharedmemory.h>
 #include <rudiments/semaphoreset.h>
 #include <rudiments/signalclasses.h>
+#include <rudiments/datetime.h>
 
 #include <tempdir.h>
 
@@ -351,6 +352,8 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		bool		connected;
 		bool		inclientsession;
 		bool		loggedin;
+		int32_t		reloginseed;
+		time_t		relogintime;
 
 		bool		scalerspawned;
 		const char	*connectionid;

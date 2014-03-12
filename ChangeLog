@@ -10,6 +10,8 @@
 	replaced waitpid call in sqlrscaler with rudiments equivalent
 	got the server-side stuff to compile on windows
 	added configurable fetch buffer sizes to sybase, freetds and db2
+	connections re-distribute themselves periodically if the database is
+		behind a load balancer now
 
 0.54 - fixed bugs that caused problems when unopened result sets were closed
 	added protocol identification phase to client/server protocol

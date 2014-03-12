@@ -16,9 +16,9 @@
 #include <rudiments/permissions.h>
 #include <rudiments/snooze.h>
 #include <rudiments/error.h>
-#include <rudiments/datetime.h>
 #include <rudiments/character.h>
 #include <rudiments/charstring.h>
+#include <rudiments/randomnumber.h>
 #include <rudiments/stdio.h>
 
 #include <defines.h>
@@ -87,6 +87,8 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 	connected=false;
 	inclientsession=false;
 	loggedin=false;
+	reloginseed=0;
+	relogintime=0;
 
 	// maybe someday these parameters will be configurable
 	bindmappingspool=new memorypool(512,128,100);
@@ -726,6 +728,27 @@ bool sqlrcontroller_svr::logIn(bool printerrors) {
 	}
 
 	loggedin=true;
+
+	// If the db is behind a load balancer, we need to re-login
+	// periodically to redistribute connections over newly added nodes.
+	// Determine when to re-login next.
+	if (constr->getBehindLoadBalancer()) {
+		datetime	dt;
+		if (dt.getSystemDateAndTime()) {
+			if (!reloginseed) {
+				// Ideally we'd use randomnumber:getSeed for
+				// this, but on some platforms that's generated
+				// from the epoch and could end up being the
+				// same for all sqlr-connections.  The process
+				// id is guaranteed unique.
+				reloginseed=process::getProcessId();
+			}
+			reloginseed=randomnumber::generateNumber(reloginseed);
+			int32_t	seconds=randomnumber::scaleNumber(
+							reloginseed,600,900);
+			relogintime=dt.getEpoch()+seconds;
+		}
+	}
 
 	logDbLogIn();
 
@@ -2978,6 +3001,21 @@ void sqlrcontroller_svr::endSession() {
 
 	// end the session
 	conn->endSession();
+
+	// if the db is behind a load balancer, re-login
+	// periodically to redistribute connections
+	if (constr->getBehindLoadBalancer()) {
+		logDebugMessage("relogging in to "
+				"redistribute connections");
+		datetime	dt;
+		if (dt.getSystemDateAndTime()) {
+			if (dt.getEpoch()>=relogintime) {
+				reLogIn();
+			}
+		}
+		logDebugMessage("done relogging in to "
+				"redistribute connections");
+	}
 
 	logDebugMessage("done ending session");
 }
