@@ -12,6 +12,9 @@
 	added configurable fetch buffer sizes to sybase, freetds and db2
 	connections re-distribute themselves periodically if the database is
 		behind a load balancer now
+	fixed a bug that caused sqlrsh to incorrectly interpret internal
+		commands with leading whitespace when run from a script or on
+		the command line
 
 0.54 - fixed bugs that caused problems when unopened result sets were closed
 	added protocol identification phase to client/server protocol
