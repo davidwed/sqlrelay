@@ -15,8 +15,9 @@
 #include <rudiments/datetime.h>
 #include <rudiments/signalclasses.h>
 #include <rudiments/xmldom.h>
-#include <sqlrconfigfile.h>
 #include <rudiments/stdio.h>
+#include <rudiments/character.h>
+#include <sqlrconfigfile.h>
 
 #include <defines.h>
 
@@ -136,8 +137,7 @@ class	sqlrsh {
 					sqlrshenv *env);
 		void	runScript(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur, sqlrshenv *env, 
-					const char *filename, bool returnerror,
-					bool displaycommand);
+					const char *filename, bool returnerror);
 		bool	runCommands(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur, sqlrshenv *env, 
 					const char *commands);
@@ -213,7 +213,7 @@ sqlrsh::sqlrsh() {
 
 void sqlrsh::systemRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
 						sqlrshenv *env) {
-	runScript(sqlrcon,sqlrcur,env,SYSTEM_SQLRSHRC,false,false);
+	runScript(sqlrcon,sqlrcur,env,SYSTEM_SQLRSHRC,false);
 }
 
 void sqlrsh::userRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
@@ -232,13 +232,13 @@ void sqlrsh::userRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	charstring::append(userrcfile,"/.sqlrshrc");
 
 	// process the file
-	runScript(sqlrcon,sqlrcur,env,userrcfile,false,false);
+	runScript(sqlrcon,sqlrcur,env,userrcfile,false);
 	delete[] userrcfile;
 }
 
 void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur, 
 			sqlrshenv *env, const char *filename,
-			bool returnerror, bool displaycommand) {
+			bool returnerror) {
 
 	char	*trimmedfilename=charstring::duplicate(filename);
 	charstring::bothTrim(trimmedfilename);
@@ -261,10 +261,6 @@ void sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 			if (!getCommandFromFileOrString(
 					&scriptfile,NULL,NULL,&command,env)) {
 				break;
-			}
-
-			if (displaycommand) {
-				stdoutput.printf("%s\n",command.getString());
 			}
 
 			// run the command
@@ -310,39 +306,47 @@ bool sqlrsh::getCommandFromFileOrString(file *fl,
 					stringbuffer *cmdbuffer,
 					sqlrshenv *env) {
 
+	bool	ininitialwhitespace=true;
 	bool	insinglequotes=false;
 	bool	indoublequotes=false;
-	char	character;
+	char	ch;
 	
 	for (;;) {
 
 		// get a character from the file or string
 		if (fl) {
-			if (fl->read(&character)!=sizeof(character)) {
+			if (fl->read(&ch)!=sizeof(ch)) {
 				return false;
 			}
 		} else {
 			if (!*string) {
 				return false;
 			}
-			character=*string;
+			ch=*string;
 			string++;
 		}
 
+		// skip whitespace at the beginning
+		if (ininitialwhitespace) {
+			if (character::isWhitespace(ch)) {
+				continue;
+			}
+			ininitialwhitespace=false;
+		}
+
 		// handle single-quoted strings, with escaping
-		if (character=='\'') {
+		if (ch=='\'') {
 			if (insinglequotes) {
-				cmdbuffer->append(character);
+				cmdbuffer->append(ch);
 				if (fl) {
-					if (fl->read(&character)!=
-							sizeof(character)) {
+					if (fl->read(&ch)!=sizeof(ch)) {
 						return false;
 					}
 				} else {
-					character=*string;
+					ch=*string;
 					string++;
 				}
-				if (character!='\'') {
+				if (ch!='\'') {
 					insinglequotes=false;
 				}
 			} else {
@@ -351,19 +355,18 @@ bool sqlrsh::getCommandFromFileOrString(file *fl,
 		}
 
 		// handle double-quoted strings, with escaping
-		if (character=='"') {
+		if (ch=='"') {
 			if (indoublequotes) {
-				cmdbuffer->append(character);
+				cmdbuffer->append(ch);
 				if (fl) {
-					if (fl->read(&character)!=
-							sizeof(character)) {
+					if (fl->read(&ch)!=sizeof(ch)) {
 						return false;
 					}
 				} else {
-					character=*string;
+					ch=*string;
 					string++;
 				}
-				if (character!='"') {
+				if (ch!='"') {
 					indoublequotes=false;
 				}
 			} else {
@@ -377,13 +380,12 @@ bool sqlrsh::getCommandFromFileOrString(file *fl,
 		}
 
 		// look for an end of command delimiter
-		if (!insinglequotes && !indoublequotes &&
-					character==env->delimiter) {
+		if (!insinglequotes && !indoublequotes && ch==env->delimiter) {
 			return true;
 		}
 
 		// write character to buffer and move on
-		cmdbuffer->append(character);
+		cmdbuffer->append(ch);
 
 		// look for the end of the string
 		if (string && !*string) {
@@ -618,7 +620,7 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 
 	// handle scripts
 	if (cmdtype==6) {
-		runScript(sqlrcon,sqlrcur,env,ptr,true,false);
+		runScript(sqlrcon,sqlrcur,env,ptr,true);
 		return;
 	}
 
@@ -932,7 +934,6 @@ void sqlrsh::initStats(sqlrshenv *env) {
 		return;
 	}
 
-	// call clock here or something
 	clock();
 }
 
@@ -1638,7 +1639,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 
 	if (charstring::length(script)) {
 		// if a script was specified, run it
-		runScript(&sqlrcon,&sqlrcur,&env,script,true,false);
+		runScript(&sqlrcon,&sqlrcur,&env,script,true);
 	} else if (charstring::length(command)) {
 		// if a command was specified, run it
 		runCommands(&sqlrcon,&sqlrcur,&env,command);
