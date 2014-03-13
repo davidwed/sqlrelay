@@ -191,6 +191,8 @@ class	sqlrsh {
 		void	setclientinfo(sqlrconnection *sqlrcon,
 						const char *command);
 		void	getclientinfo(sqlrconnection *sqlrcon);
+		void	responseTimeout(sqlrconnection *sqlrcon,
+						const char *command);
 		void	displayHelp(sqlrshenv *env);
 		void	interactWithUser(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur, sqlrshenv *env);
@@ -458,7 +460,8 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,
 					"getresultsetbuffersize") ||
 		!charstring::compareIgnoringCase(ptr,"endsession") ||
-		!charstring::compareIgnoringCase(ptr,"querytree")) {
+		!charstring::compareIgnoringCase(ptr,"querytree") ||
+		!charstring::compareIgnoringCase(ptr,"response timeout",16)) {
 
 		// return value of 1 is internal command
 		return 1;
@@ -608,6 +611,10 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		if (xmld.parseString(sqlrcur->getQueryTree())) {
 			xmld.getRootNode()->print(&stdoutput);
 		}
+		return;
+	} else if (!charstring::compareIgnoringCase(
+					ptr,"response timeout",16)) {
+		responseTimeout(sqlrcon,command);
 		return;
 	} else {
 		return;
@@ -1386,6 +1393,36 @@ void sqlrsh::getclientinfo(sqlrconnection *sqlrcon) {
 	stdoutput.printf("%s\n",(ci)?ci:"");
 }
 
+void sqlrsh::responseTimeout(sqlrconnection *sqlrcon, const char *command) {
+
+	// skip to timeout itself
+	const char	*value=command+16;
+	while (character::isWhitespace(*value)) {
+		value++;
+	}
+
+	// get seconds
+	uint32_t	sec=charstring::toInteger(value);
+
+	// get milliseconds
+	char	msecbuf[5];
+	rawbuffer::set(msecbuf,'0',4);
+	msecbuf[4]='\0';
+	const char	*dot=charstring::findFirst(value,'.');
+	if (dot) {
+		value=dot+1;
+		for (uint8_t i=0; i<4 && *value; i++) {
+			msecbuf[i]=*value;
+			value++;
+		}
+	}
+	uint32_t	msec=charstring::toInteger(msecbuf);
+
+	// set timeout
+	sqlrcon->setResponseTimeout(sec,msec);
+	stdoutput.printf("Response Timeout set to %d.%04d seconds\n",sec,msec);
+}
+
 void sqlrsh::displayHelp(sqlrshenv *env) {
 
 	stdoutput.printf("\n");
@@ -1425,6 +1462,8 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	stdoutput.printf("toggles use of one session per query\n");
 	stdoutput.printf("	delimiter [character]	- ");
 	stdoutput.printf("sets delimiter character to [character]\n\n");
+	stdoutput.printf("	response timeout [sec.msec]   - ");
+	stdoutput.printf("sets response timeout to [sec.msec]\n\n");
 	stdoutput.printf("	inputbind ...                 - ");
 	stdoutput.printf("defines an input bind variable\n");
 	stdoutput.printf("		inputbind [variable] = [stringvalue]\n");

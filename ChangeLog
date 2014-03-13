@@ -17,6 +17,8 @@
 		the command line
 	fixed a bug that caused cursors not to be completely cleaned up after
 		when dynamic scaling is used
+	fixed a bug that caused the response timeout to be handled improperly
+	added response timeout command to sqlrsh
 
 0.54 - fixed bugs that caused problems when unopened result sets were closed
 	added protocol identification phase to client/server protocol
