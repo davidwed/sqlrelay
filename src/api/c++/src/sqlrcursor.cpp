@@ -2187,6 +2187,14 @@ bool sqlrcursor::processResultSet(bool getallrows, uint64_t rowtoget) {
 		uint16_t	err=getErrorStatus();
 		if (err!=NO_ERROR_OCCURRED) {
 
+			// if there was a timeout, then end
+			// the session and bail immediately
+			if (err==TIMEOUT_GETTING_ERROR_STATUS) {
+				sqlrc->endSession();
+				return false;
+			}
+
+			// otherwise, get the error from the server
 			getErrorFromServer();
 
 			// don't get the cursor if the error was that there
@@ -2333,12 +2341,17 @@ uint16_t sqlrcursor::getErrorStatus() {
 
 	// get a flag indicating whether there's been an error or not
 	uint16_t	err;
-	if (getShort(&err,sqlrc->responsetimeoutsec,
-				sqlrc->responsetimeoutusec)!=sizeof(uint16_t)) {
+	int32_t	result=getShort(&err,sqlrc->responsetimeoutsec,
+					sqlrc->responsetimeoutusec);
+	if (result==RESULT_TIMEOUT) {
+		setError("Timeout while determining whether "
+				"an error occurred or not.\n");
+		return TIMEOUT_GETTING_ERROR_STATUS;
+	} else if (result!=sizeof(uint16_t)) {
 		setError("Failed to determine whether an "
 				"error occurred or not.\n "
 				"A network error may have ocurred.");
-		return false;
+		return ERROR_OCCURRED;
 	}
 
 	if (err==NO_ERROR_OCCURRED) {
@@ -4487,6 +4500,10 @@ char *sqlrcursor::getQueryTree() {
 
 	uint16_t	err=getErrorStatus();
 	if (err!=NO_ERROR_OCCURRED) {
+		if (err==TIMEOUT_GETTING_ERROR_STATUS) {
+			sqlrc->endSession();
+			return NULL;
+		}
 		getErrorFromServer();
 		if (err==ERROR_OCCURRED_DISCONNECT) {
 			sqlrc->endSession();
