@@ -276,6 +276,10 @@ bool sqlrcursor_svr::getLobOutputBindSegment(uint16_t index,
 	return false;
 }
 
+void sqlrcursor_svr::cleanUpLobOutputBind(uint16_t index) {
+	// by default, do nothing
+}
+
 void sqlrcursor_svr::checkForTempTable(const char *query, uint32_t length) {
 
 	const char	*ptr=query;

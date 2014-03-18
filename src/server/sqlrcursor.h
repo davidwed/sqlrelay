@@ -172,6 +172,7 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 							uint64_t offset,
 							uint64_t charstoread,
 							uint64_t *charsread);
+		virtual void	cleanUpLobOutputBind(uint16_t index);
 		virtual void	checkForTempTable(const char *query,
 							uint32_t length);
 		virtual	bool	executeQuery(const char *query,

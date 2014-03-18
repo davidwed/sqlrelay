@@ -121,7 +121,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("9","testchar2");
 	cur->inputBind("10","testvarchar2");
 	cur->inputBind("11",(char *)NULL);
-	cur->inputBind("12","testblob2",9);
+	cur->inputBindBlob("12","testblob2",9);
 	checkSuccess(cur->executeQuery(),1);
 	cur->clearBinds();
 	cur->inputBind("1",3);
@@ -135,7 +135,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("9","testchar3");
 	cur->inputBind("10","testvarchar3");
 	cur->inputBind("11",(char *)NULL);
-	cur->inputBind("13","testblob3",9);
+	cur->inputBindBlob("13","testblob3",9);
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");
 
@@ -157,25 +157,51 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("STORED PROCEDURE: \n");
-	cur->prepareQuery("select * from testproc(?,?,?)");
+	cur->prepareQuery("select * from testproc(?,?,?,?)");
 	cur->inputBind("1",1);
 	cur->inputBind("2",1.1,2,1);
 	cur->inputBind("3","hello");
+	cur->inputBindBlob("4","blob",4);
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(cur->getField(0,1),"1.1000");
 	checkSuccess(cur->getField(0,2),"hello");
-	cur->prepareQuery("execute procedure testproc ?, ?, ?");
+	checkSuccess(cur->getField(0,3),"blob");
+	cur->prepareQuery("execute procedure testproc ?, ?, ?, ?");
 	cur->inputBind("1",1);
 	cur->inputBind("2",1.1,2,1);
 	cur->inputBind("3","hello");
+	cur->inputBindBlob("4","blob",4);
 	cur->defineOutputBindInteger("1");
 	cur->defineOutputBindDouble("2");
 	cur->defineOutputBindString("3",20);
+	cur->defineOutputBindBlob("4");
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getOutputBindInteger("1"),1);
 	//checkSuccess(cur->getOutputBindDouble("2"),1.1);
 	checkSuccess(cur->getOutputBindString("3"),"hello               ");
+	checkSuccess(cur->getOutputBindBlob("4"),"blob");
+	printf("\n");
+
+	printf("LONG BLOB: \n");
+	cur->sendQuery("delete from testtable1");
+	cur->prepareQuery("insert into testtable1 values (?)");
+	char	blobval[20*1024+1];
+	for (int i=0; i<20*1024; i++) {
+		blobval[i]='C';
+	}
+	blobval[20*1024]='\0';
+	cur->inputBindClob("1",blobval,20*1024);
+	checkSuccess(cur->executeQuery(),1);
+	cur->sendQuery("select testblob from testtable1");
+	checkSuccess(cur->getFieldLength(0,"testblob"),20*1024);
+	checkSuccess(cur->getField(0,"testblob"),blobval);
+	cur->prepareQuery("execute procedure testproc1 ?");
+	cur->inputBindBlob("1",blobval,20*1024);
+	cur->defineOutputBindBlob("1");
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getOutputBindLength("1"),20*1024);
+	checkSuccess(cur->getOutputBindBlob("1"),blobval);
 	printf("\n");
 
 	printf("SELECT: \n");

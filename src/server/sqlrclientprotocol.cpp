@@ -1909,11 +1909,13 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 void sqlrclientprotocol::returnOutputBindBlob(sqlrcursor_svr *cursor,
 							uint16_t index) {
 	sendLobOutputBind(cursor,index);
+	cursor->cleanUpLobOutputBind(index);
 }
 
 void sqlrclientprotocol::returnOutputBindClob(sqlrcursor_svr *cursor,
 							uint16_t index) {
 	sendLobOutputBind(cursor,index);
+	cursor->cleanUpLobOutputBind(index);
 }
 
 #define MAX_BYTES_PER_CHAR	4

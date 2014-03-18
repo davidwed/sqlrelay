@@ -127,6 +127,23 @@ class firebirdcursor : public sqlrcursor_svr {
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
+		bool		outputBindBlob(const char *variable,
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull);
+		bool		outputBindClob(const char *variable,
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull);
+		bool		getLobOutputBindLength(uint16_t index,
+							uint64_t *length);
+		bool		getLobOutputBindSegment(uint16_t index,
+							char *buffer,
+							uint64_t buffersize,
+							uint64_t offset,
+							uint64_t charstoread,
+							uint64_t *charsread);
+		void		cleanUpLobOutputBind(uint16_t index);
 		bool		executeQuery(const char *query,
 						uint32_t length);
 		bool		queryIsNotSelect();
@@ -161,9 +178,13 @@ class firebirdcursor : public sqlrcursor_svr {
 		datebind	outdatebind[MAX_BIND_VARS];
 		
 		XSQLDA	ISC_FAR	*outsqlda;
+		ISC_QUAD	*outblobid;
+		isc_blob_handle	*outblobhandle;
+		bool		*outblobisopen;
+
 		XSQLDA	ISC_FAR	*insqlda;
-		isc_blob_handle	*inblobhandle;
 		ISC_QUAD	*inblobid;
+		isc_blob_handle	*inblobhandle;
 
 		ISC_LONG	querytype;
 
@@ -172,7 +193,7 @@ class firebirdcursor : public sqlrcursor_svr {
 
 		firebirdconnection	*firebirdconn;
 
-		bool		queryIsExecSP;
+		bool		queryisexecsp;
 };
 
 class firebirdconnection : public sqlrconnection_svr {
@@ -623,32 +644,39 @@ firebirdcursor::firebirdcursor(sqlrconnection_svr *conn) :
 	outsqlda->version=SQLDA_VERSION1;
 	outsqlda->sqln=(MAX_SELECT_LIST_SIZE>MAX_BIND_VARS)?
 				MAX_SELECT_LIST_SIZE:MAX_BIND_VARS;
+	outblobid=new ISC_QUAD[MAX_BIND_VARS];
+	outblobhandle=new isc_blob_handle[MAX_BIND_VARS];
+	outblobisopen=new bool[MAX_BIND_VARS];
 
 	insqlda=(XSQLDA ISC_FAR *)new unsigned char[
 					XSQLDA_LENGTH(MAX_BIND_VARS)];
 	insqlda->version=SQLDA_VERSION1;
 	insqlda->sqln=MAX_BIND_VARS;
-	inblobhandle=new isc_blob_handle[MAX_BIND_VARS];
 	inblobid=new ISC_QUAD[MAX_BIND_VARS];
+	inblobhandle=new isc_blob_handle[MAX_BIND_VARS];
 
 	querytype=0;
 	stmt=NULL;
 
-	queryIsExecSP=false;
+	queryisexecsp=false;
 
 	outbindcount=0;
 }
 
 firebirdcursor::~firebirdcursor() {
 	delete[] outsqlda;
+	delete[] outblobid;
+	delete[] outblobhandle;
+	delete[] outblobisopen;
+
 	delete[] insqlda;
-	delete[] inblobhandle;
 	delete[] inblobid;
+	delete[] inblobhandle;
 }
 
 bool firebirdcursor::prepareQuery(const char *query, uint32_t length) {
 
-	queryIsExecSP=false;
+	queryisexecsp=false;
 
 	// free the old statement if it exists
 	if (stmt) {
@@ -836,23 +864,39 @@ bool firebirdcursor::inputBindBlob(const char *variable,
 		return false;
 	}
 
-	// create a blob, write the value to it, and close it
+	// create a blob
 	if (isc_create_blob2(firebirdconn->error,
 				&firebirdconn->db,
 				&firebirdconn->tr,
 				&inblobhandle[index],
-				&inblobid[index],0,NULL) ||
-		isc_put_segment(firebirdconn->error,
-				&inblobhandle[index],
-				valuesize,value)) {
+				&inblobid[index],0,NULL)) {
 		return false;
 	}
+
+	// write the value to the blob, 65535 bytes at a time
+	uint16_t	bytesput=0;
+	while (bytesput<valuesize) {
+		uint16_t	bytestoput=0;
+		if (valuesize-bytesput<65535) {
+			bytestoput=valuesize-bytesput;
+		} else {
+			bytestoput=65535;
+		}
+		if (isc_put_segment(firebirdconn->error,
+					&inblobhandle[index],
+					bytestoput,value+bytesput)) {
+			return false;
+		}
+		bytesput=bytesput+bytestoput;
+	}
+
+	// close the blob
 	isc_close_blob(firebirdconn->error,&inblobhandle[index]);
 
 	insqlda->sqlvar[index].sqltype=SQL_BLOB+1;
 	insqlda->sqlvar[index].sqlscale=0;
 	insqlda->sqlvar[index].sqlsubtype=0;
-	insqlda->sqlvar[index].sqllen=valuesize;
+	insqlda->sqlvar[index].sqllen=sizeof(ISC_QUAD);
 	insqlda->sqlvar[index].sqldata=(char *)&inblobid[index];
 	insqlda->sqlvar[index].sqlind=isnull;
 	insqlda->sqlvar[index].sqlname_length=0;
@@ -885,7 +929,7 @@ bool firebirdcursor::outputBind(const char *variable,
 
 	// if we're doing output binds then the
 	// query must be a stored procedure
-	queryIsExecSP=true;
+	queryisexecsp=true;
 
 	// make bind vars 1 based like all other db's
 	long	index=charstring::toInteger(variable+1)-1;
@@ -918,7 +962,7 @@ bool firebirdcursor::outputBind(const char *variable,
 
 	// if we're doing output binds then the
 	// query must be a stored procedure
-	queryIsExecSP=true;
+	queryisexecsp=true;
 
 	// make bind vars 1 based like all other db's
 	long	index=charstring::toInteger(variable+1)-1;
@@ -953,7 +997,7 @@ bool firebirdcursor::outputBind(const char *variable,
 
 	// if we're doing output binds then the
 	// query must be a stored procedure
-	queryIsExecSP=true;
+	queryisexecsp=true;
 
 	// make bind vars 1 based like all other db's
 	long	index=charstring::toInteger(variable+1)-1;
@@ -1004,7 +1048,7 @@ bool firebirdcursor::outputBind(const char *variable,
 
 	// if we're doing output binds then the
 	// query must be a stored procedure
-	queryIsExecSP=true;
+	queryisexecsp=true;
 
 	// make bind vars 1 based like all other db's
 	long	index=charstring::toInteger(variable+1)-1;
@@ -1028,6 +1072,170 @@ bool firebirdcursor::outputBind(const char *variable,
 	return true;
 }
 
+bool firebirdcursor::outputBindBlob(const char *variable,
+					uint16_t variablesize,
+					uint16_t ind,
+					int16_t *isnull) {
+
+	outbindcount++;
+
+	// if we're doing output binds then the
+	// query must be a stored procedure
+	queryisexecsp=true;
+
+	// make bind vars 1 based like all other db's
+	long	index=charstring::toInteger(variable+1)-1;
+	if (index<0) {
+		return false;
+	}
+
+	outblobisopen[index]=false;
+
+	outsqlda->sqlvar[index].sqltype=SQL_BLOB+1;
+	outsqlda->sqlvar[index].sqlscale=0;
+	outsqlda->sqlvar[index].sqlsubtype=0;
+	outsqlda->sqlvar[index].sqllen=sizeof(ISC_QUAD);
+	outsqlda->sqlvar[index].sqldata=(char *)&outblobid[index];
+	outsqlda->sqlvar[index].sqlind=isnull;
+	outsqlda->sqlvar[index].sqlname_length=0;
+	outsqlda->sqlvar[index].sqlname[0]='\0';
+	outsqlda->sqlvar[index].relname_length=0;
+	outsqlda->sqlvar[index].relname[0]='\0';
+	outsqlda->sqlvar[index].ownname_length=0;
+	outsqlda->sqlvar[index].ownname[0]='\0';
+	outsqlda->sqlvar[index].aliasname_length=0;
+	outsqlda->sqlvar[index].aliasname[0]='\0';
+	return true;
+}
+
+bool firebirdcursor::outputBindClob(const char *variable,
+					uint16_t variablesize,
+					uint16_t index,
+					int16_t *isnull) {
+	return outputBindBlob(variable,variablesize,index,isnull);
+}
+
+bool firebirdcursor::getLobOutputBindLength(uint16_t index, uint64_t *length) {
+
+	// open the blob
+	outblobhandle[index]=NULL;
+	if (isc_open_blob2(firebirdconn->error,
+				&firebirdconn->db,
+				&firebirdconn->tr,
+				&outblobhandle[index],
+				&outblobid[index],0,NULL)) {
+		return false;
+	}
+
+	bool	retval=true;
+
+	// read blob info
+	char	blobitems[]={isc_info_blob_total_length};
+	char	resultbuffer[64];
+	if (isc_blob_info(firebirdconn->error,
+				&outblobhandle[index],
+				sizeof(blobitems),
+				blobitems,
+				sizeof(resultbuffer),
+				resultbuffer)) {
+		retval=false;
+	}
+
+	// get the blob size from the result buffer
+	for (const char *p=resultbuffer; *p!=isc_info_end;) {
+
+		// get the item type
+		char	itemtype=*p;
+		p++;
+
+		// get the item size
+		uint16_t	itemsize=(uint16_t)isc_vax_integer(p,2);
+		p=p+2;
+
+		// get the lob length
+		if (itemtype==isc_info_blob_total_length) {
+			*length=isc_vax_integer(p,itemsize);
+		}
+ 
+		// move on
+		p=p+itemsize;
+	}
+				
+	// close the blob
+	isc_close_blob(firebirdconn->error,&outblobhandle[index]);
+
+	return retval;
+}
+
+bool firebirdcursor::getLobOutputBindSegment(uint16_t index,
+					char *buffer, uint64_t buffersize,
+					uint64_t offset, uint64_t charstoread,
+					uint64_t *charsread) {
+
+	// open the blob, if necessary
+	if (!outblobisopen[index]) {
+		outblobhandle[index]=NULL;
+		if (isc_open_blob2(firebirdconn->error,
+					&firebirdconn->db,
+					&firebirdconn->tr,
+					&outblobhandle[index],
+					&outblobid[index],0,NULL)) {
+			return false;
+		}
+		outblobisopen[index]=true;
+	}
+
+	// read a blob segment, at most 65535 bytes at a time
+	uint64_t	totalbytesread=0;
+	uint64_t	bytestoread=0;
+	uint64_t	remainingbytestoread=charstoread;
+	ISC_STATUS	status=0;
+	for (;;) {
+
+		// figure out how many bytes to read this time
+		if (remainingbytestoread<65535) {
+			bytestoread=remainingbytestoread;
+		} else {
+			bytestoread=65535;
+			remainingbytestoread=remainingbytestoread-65535;
+		}
+		// read the bytes
+		uint16_t	bytesread=0;
+		status=isc_get_segment(firebirdconn->error,
+					&outblobhandle[index],
+					&bytesread,
+					bytestoread,
+					buffer+totalbytesread);
+
+		// bail on error
+		if (status && status!=isc_segment) {
+			break;
+		}
+
+		// update total bytes read
+		totalbytesread=totalbytesread+bytesread;
+
+		// bail if we're done reading
+		if (bytesread<bytestoread || totalbytesread==charstoread) {
+			break;
+		}
+	}
+
+	// return number of bytes/chars read
+	*charsread=totalbytesread;
+
+	return true;
+}
+
+void firebirdcursor::cleanUpLobOutputBind(uint16_t index) {
+
+	// close the blob, if necessary
+	if (outblobisopen[index]) {
+		isc_close_blob(firebirdconn->error,&outblobhandle[index]);
+		outblobisopen[index]=false;
+	}
+}
+
 bool firebirdcursor::executeQuery(const char *query, uint32_t length) {
 
 	// for commit or rollback, execute the API call and return
@@ -1037,7 +1245,7 @@ bool firebirdcursor::executeQuery(const char *query, uint32_t length) {
 	} else if (querytype==isc_info_sql_stmt_rollback) {
 		return !isc_rollback_retaining(firebirdconn->error,
 							&firebirdconn->tr);
-	} else if (queryIsExecSP) {
+	} else if (queryisexecsp) {
 
 		// if the query is a stored procedure then execute it as such
 		bool	retval=!isc_dsql_execute2(firebirdconn->error,
@@ -1290,7 +1498,7 @@ uint32_t firebirdcursor::getColumnScale(uint32_t col) {
 bool firebirdcursor::noRowsToReturn() {
 	// for exec procedure queries, outsqlda contains output bind values
 	// rather than a result set and there is no result set
-	return (queryIsExecSP)?true:!outsqlda->sqld;
+	return (queryisexecsp)?true:!outsqlda->sqld;
 }
 
 bool firebirdcursor::fetchRow() {
@@ -1538,7 +1746,7 @@ bool firebirdcursor::getLobFieldLength(uint32_t col, uint64_t *length) {
 		// move on
 		p=p+itemsize;
 	}
-				
+
 	// close the blob
 	isc_close_blob(firebirdconn->error,&field[col].blobhandle);
 
@@ -1568,7 +1776,7 @@ bool firebirdcursor::getLobFieldSegment(uint32_t col,
 		field[col].blobisopen=true;
 	}
 
-	// read a blob segment, at most 65536 bytes at a time
+	// read a blob segment, at most 65535 bytes at a time
 	uint64_t	totalbytesread=0;
 	uint64_t	bytestoread=0;
 	uint64_t	remainingbytestoread=charstoread;
@@ -1576,11 +1784,11 @@ bool firebirdcursor::getLobFieldSegment(uint32_t col,
 	for (;;) {
 
 		// figure out how many bytes to read this time
-		if (remainingbytestoread<65536) {
+		if (remainingbytestoread<65535) {
 			bytestoread=remainingbytestoread;
 		} else {
-			bytestoread=65536;
-			remainingbytestoread=remainingbytestoread-65536;
+			bytestoread=65535;
+			remainingbytestoread=remainingbytestoread-65535;
 		}
 		// read the bytes
 		uint16_t	bytesread=0;
@@ -1591,7 +1799,7 @@ bool firebirdcursor::getLobFieldSegment(uint32_t col,
 					buffer+totalbytesread);
 
 		// bail on error
-		if (status) {
+		if (status && status!=isc_segment) {
 			break;
 		}
 
@@ -1599,7 +1807,7 @@ bool firebirdcursor::getLobFieldSegment(uint32_t col,
 		totalbytesread=totalbytesread+bytesread;
 
 		// bail if we're done reading
-		if (bytesread<bytestoread) {
+		if (bytesread<bytestoread || totalbytesread==charstoread) {
 			break;
 		}
 	}
