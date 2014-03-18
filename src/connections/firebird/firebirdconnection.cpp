@@ -37,6 +37,9 @@ struct fieldstruct {
 	ISC_TIMESTAMP	timestampbuffer;
 	ISC_INT64	int64buffer;
 	char		textbuffer[MAX_ITEM_BUFFER_SIZE+1];
+	ISC_QUAD	blobid;
+	isc_blob_handle	blobhandle;
+	bool		blobisopen;
 
 	short		nullindicator;
 };
@@ -133,6 +136,13 @@ class firebirdcursor : public sqlrcursor_svr {
 					uint64_t *fieldlength,
 					bool *blob,
 					bool *null);
+		bool		getLobFieldLength(uint32_t col,
+					uint64_t *length);
+		bool		getLobFieldSegment(uint32_t col,
+					char *buffer, uint64_t buffersize,
+					uint64_t offset, uint64_t charstoread,
+					uint64_t *charsread);
+		void		cleanUpLobField(uint32_t col);
 		void		cleanUpData();
 
 
@@ -1110,8 +1120,10 @@ bool firebirdcursor::executeQuery(const char *query, uint32_t length) {
 		} else if (outsqlda->sqlvar[i].sqltype==SQL_BLOB || 
 				outsqlda->sqlvar[i].sqltype==SQL_BLOB+1) {
 			outsqlda->sqlvar[i].sqltype=SQL_BLOB;
-			outsqlda->sqlvar[i].sqldata=(char *)NULL;
+			outsqlda->sqlvar[i].sqldata=(char *)&field[i].blobid;
+			outsqlda->sqlvar[i].sqllen=sizeof(ISC_QUAD);
 			field[i].sqlrtype=BLOB_DATATYPE;
+			field[i].blobisopen=false;
 		} else {
 			outsqlda->sqlvar[i].sqltype=SQL_VARYING;
 			outsqlda->sqlvar[i].sqldata=field[i].textbuffer;
@@ -1401,14 +1413,149 @@ void firebirdcursor::getField(uint32_t col,
 	#endif
 	} else if (outsqlda->sqlvar[col].sqltype==SQL_BLOB ||
 			outsqlda->sqlvar[col].sqltype==SQL_BLOB+1) {
-		// FIXME: handle blobs for real here...
-		*null=true;
+		*blob=true;
 		return;
 	}
 
 	// for any case that didn't return already, we need to do this...
 	*fld=fieldbuffer.getString();
 	*fldlength=fieldbuffer.getStringLength();
+}
+
+bool firebirdcursor::getLobFieldLength(uint32_t col, uint64_t *length) {
+
+	// ignore non-blobs
+	if (field[col].sqlrtype!=BLOB_DATATYPE) {
+		return false;
+	}
+
+	// open the blob
+	field[col].blobhandle=NULL;
+	if (isc_open_blob2(firebirdconn->error,
+				&firebirdconn->db,
+				&firebirdconn->tr,
+				&field[col].blobhandle,
+				&field[col].blobid,0,NULL)) {
+		return false;
+	}
+
+	bool	retval=true;
+
+	// read blob info
+	char	blobitems[]={isc_info_blob_total_length};
+	char	resultbuffer[64];
+	if (isc_blob_info(firebirdconn->error,
+				&field[col].blobhandle,
+				sizeof(blobitems),
+				blobitems,
+				sizeof(resultbuffer),
+				resultbuffer)) {
+		retval=false;
+	}
+
+	// get the blob size from the result buffer
+	for (const char *p=resultbuffer; *p!=isc_info_end;) {
+
+		// get the item type
+		char	itemtype=*p;
+		p++;
+
+		// get the item size
+		uint16_t	itemsize=(uint16_t)isc_vax_integer(p,2);
+		p=p+2;
+
+		// get the lob length
+		if (itemtype==isc_info_blob_total_length) {
+			*length=isc_vax_integer(p,itemsize);
+		}
+ 
+		// move on
+		p=p+itemsize;
+	}
+				
+	// close the blob
+	isc_close_blob(firebirdconn->error,&field[col].blobhandle);
+
+	return retval;
+}
+
+bool firebirdcursor::getLobFieldSegment(uint32_t col,
+					char *buffer, uint64_t buffersize,
+					uint64_t offset, uint64_t charstoread,
+					uint64_t *charsread) {
+
+	// ignore non-blobs
+	if (field[col].sqlrtype!=BLOB_DATATYPE) {
+		return false;
+	}
+
+	// open the blob, if necessary
+	if (!field[col].blobisopen) {
+		field[col].blobhandle=NULL;
+		if (isc_open_blob2(firebirdconn->error,
+					&firebirdconn->db,
+					&firebirdconn->tr,
+					&field[col].blobhandle,
+					&field[col].blobid,0,NULL)) {
+			return false;
+		}
+		field[col].blobisopen=true;
+	}
+
+	// read a blob segment, at most 65536 bytes at a time
+	uint64_t	totalbytesread=0;
+	uint64_t	bytestoread=0;
+	uint64_t	remainingbytestoread=charstoread;
+	ISC_STATUS	status=0;
+	for (;;) {
+
+		// figure out how many bytes to read this time
+		if (remainingbytestoread<65536) {
+			bytestoread=remainingbytestoread;
+		} else {
+			bytestoread=65536;
+			remainingbytestoread=remainingbytestoread-65536;
+		}
+		// read the bytes
+		uint16_t	bytesread=0;
+		status=isc_get_segment(firebirdconn->error,
+					&field[col].blobhandle,
+					&bytesread,
+					bytestoread,
+					buffer+totalbytesread);
+
+		// bail on error
+		if (status) {
+			break;
+		}
+
+		// update total bytes read
+		totalbytesread=totalbytesread+bytesread;
+
+		// bail if we're done reading
+		if (bytesread<bytestoread) {
+			break;
+		}
+	}
+
+	// return number of bytes/chars read
+	*charsread=totalbytesread;
+
+	return true;
+}
+
+void firebirdcursor::cleanUpLobField(uint32_t col) {
+
+	// ignore non-blobs
+	if (field[col].sqlrtype!=BLOB_DATATYPE) {
+		return;
+	}
+
+	// close the blob, if necessary
+	if (field[col].blobisopen) {
+		isc_close_blob(firebirdconn->error,&field[col].blobhandle);
+		field[col].blobisopen=false;
+	}
 }
 
 void firebirdcursor::cleanUpData() {
