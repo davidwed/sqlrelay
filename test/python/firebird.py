@@ -41,12 +41,12 @@ def main():
 	con.commit()
 
 	print "INSERT: "
-	checkSuccess(cur.sendQuery("insert into testtable values (1,1,1.1,1.1,1.1,1.1,'01-JAN-2001','01:00:00','testchar1','testvarchar1',NULL)"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (1,1,1.1,1.1,1.1,1.1,'01-JAN-2001','01:00:00','testchar1','testvarchar1',NULL,NULL)"),1)
 	print
 
 
 	print "BIND BY POSITION: "
-	cur.prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,?)")
+	cur.prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,?,NULL)")
 	checkSuccess(cur.countBindVariables(),11)
 	cur.inputBind("1",2)
 	cur.inputBind("2",2)
@@ -87,10 +87,10 @@ def main():
 	print
 
 	print "INSERT: "
-	checkSuccess(cur.sendQuery("insert into testtable values (5,5,5.5,5.5,5.5,5.5,'01-JAN-2005','05:00:00','testchar5','testvarchar5',NULL)"),1)
-	checkSuccess(cur.sendQuery("insert into testtable values (6,6,6.6,6.6,6.6,6.6,'01-JAN-2006','06:00:00','testchar6','testvarchar6',NULL)"),1)
-	checkSuccess(cur.sendQuery("insert into testtable values (7,7,7.7,7.7,7.7,7.7,'01-JAN-2007','07:00:00','testchar7','testvarchar7',NULL)"),1)
-	checkSuccess(cur.sendQuery("insert into testtable values (8,8,8.8,8.8,8.8,8.8,'01-JAN-2008','08:00:00','testchar8','testvarchar8',NULL)"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (5,5,5.5,5.5,5.5,5.5,'01-JAN-2005','05:00:00','testchar5','testvarchar5',NULL,NULL)"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (6,6,6.6,6.6,6.6,6.6,'01-JAN-2006','06:00:00','testchar6','testvarchar6',NULL,NULL)"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (7,7,7.7,7.7,7.7,7.7,'01-JAN-2007','07:00:00','testchar7','testvarchar7',NULL,NULL)"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (8,8,8.8,8.8,8.8,8.8,'01-JAN-2008','08:00:00','testchar8','testvarchar8',NULL,NULL)"),1)
 	print
 
 	print "AFFECTED ROWS: "
@@ -98,7 +98,7 @@ def main():
 	print
 
 	print "STORED PROCEDURE: "
-	cur.prepareQuery("select * from testproc(?,?,?)")
+	cur.prepareQuery("select * from testproc(?,?,?,NULL)")
 	cur.inputBind("1",1)
 	cur.inputBind("2",1.1,2,1)
 	cur.inputBind("3","hello")
@@ -106,7 +106,7 @@ def main():
 	checkSuccess(cur.getField(0,0),1)
 	checkSuccess(cur.getField(0,1),Decimal(Decimal("1.1000")))
 	checkSuccess(cur.getField(0,2),"hello")
-	cur.prepareQuery("execute procedure testproc ?, ?, ?")
+	cur.prepareQuery("execute procedure testproc ?, ?, ?, NULL")
 	cur.inputBind("1",1)
 	cur.inputBind("2",1.1,2,1)
 	cur.inputBind("3","hello")
@@ -124,7 +124,7 @@ def main():
 	print
 
 	print "COLUMN COUNT: "
-	checkSuccess(cur.colCount(),11)
+	checkSuccess(cur.colCount(),12)
 	print
 
 	print "COLUMN NAMES: "
@@ -593,7 +593,7 @@ def main():
 	print
 
 	print "COLUMN COUNT FOR CACHED RESULT SET: "
-	checkSuccess(cur.colCount(),11)
+	checkSuccess(cur.colCount(),12)
 	print
 
 	print "COLUMN NAMES FOR CACHED RESULT SET: "
@@ -705,7 +705,7 @@ def main():
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 	checkSuccess(secondcur.getField(0,0),8)
 	checkSuccess(con.autoCommitOn(),1)
-	checkSuccess(cur.sendQuery("insert into testtable values (10,10,10.1,10.1,10.1,10.1,'01-JAN-2010','10:00:00','testchar10','testvarchar10',NULL)"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (10,10,10.1,10.1,10.1,10.1,'01-JAN-2010','10:00:00','testchar10','testvarchar10',NULL,NULL)"),1)
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 	checkSuccess(secondcur.getField(0,0),9)
 	checkSuccess(con.autoCommitOff(),1)

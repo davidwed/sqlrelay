@@ -16,4 +16,20 @@ echo "set term ^; create procedure testproc(in1 integer, in2 float, in3 varchar(
 
 isql-fb -u testuser -p testpassword '/opt/firebird/testdb.gdb' -i createscript.sql
 
+echo "drop table testtable1;" > createscript.sql
+
+isql-fb -u testuser -p testpassword '/opt/firebird/testdb.gdb' -i createscript.sql
+
+echo "create table testtable1 (testblob blob);" > createscript.sql
+
+isql-fb -u testuser -p testpassword '/opt/firebird/testdb.gdb' -i createscript.sql
+
+echo "drop procedure testproc1;" > createscript.sql
+
+isql-fb -u testuser -p testpassword '/opt/firebird/testdb.gdb' -i createscript.sql
+
+echo "set term ^; create procedure testproc1(in1 blob) returns (out1 blob) as begin out1 = in1; suspend; end^" > createscript.sql
+
+isql-fb -u testuser -p testpassword '/opt/firebird/testdb.gdb' -i createscript.sql
+
 rm createscript.sql

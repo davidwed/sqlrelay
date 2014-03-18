@@ -92,12 +92,12 @@ int	main(int argc, char **argv) {
 	sqlrcon_commit(con);
 
 	printf("INSERT: \n");
-	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (1,1,1.1,1.1,1.1,1.1,'01-JAN-2001','01:00:00','testchar1','testvarchar1',NULL)"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (1,1,1.1,1.1,1.1,1.1,'01-JAN-2001','01:00:00','testchar1','testvarchar1',NULL,NULL)"),1);
 	printf("\n");
 
 
 	printf("BIND BY POSITION: \n");
-	sqlrcur_prepareQuery(cur,"insert into testtable values (?,?,?,?,?,?,?,?,?,?,?)");
+	sqlrcur_prepareQuery(cur,"insert into testtable values (?,?,?,?,?,?,?,?,?,?,?,NULL)");
 	checkSuccessInt(sqlrcur_countBindVariables(cur),11);
 	sqlrcur_inputBindLong(cur,"1",2);
 	sqlrcur_inputBindLong(cur,"2",2);
@@ -133,10 +133,10 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("INSERT: \n");
-	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (5,5,5.5,5.5,5.5,5.5,'01-JAN-2005','05:00:00','testchar5','testvarchar5',NULL)"),1);
-	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (6,6,6.6,6.6,6.6,6.6,'01-JAN-2006','06:00:00','testchar6','testvarchar6',NULL)"),1);
-	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (7,7,7.7,7.7,7.7,7.7,'01-JAN-2007','07:00:00','testchar7','testvarchar7',NULL)"),1);
-	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (8,8,8.8,8.8,8.8,8.8,'01-JAN-2008','08:00:00','testchar8','testvarchar8',NULL)"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (5,5,5.5,5.5,5.5,5.5,'01-JAN-2005','05:00:00','testchar5','testvarchar5',NULL,NULL)"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (6,6,6.6,6.6,6.6,6.6,'01-JAN-2006','06:00:00','testchar6','testvarchar6',NULL,NULL)"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (7,7,7.7,7.7,7.7,7.7,'01-JAN-2007','07:00:00','testchar7','testvarchar7',NULL,NULL)"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (8,8,8.8,8.8,8.8,8.8,'01-JAN-2008','08:00:00','testchar8','testvarchar8',NULL,NULL)"),1);
 	printf("\n");
 
 	printf("AFFECTED ROWS: \n");
@@ -144,7 +144,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("STORED PROCEDURE: \n");
-	sqlrcur_prepareQuery(cur,"select * from testproc(?,?,?)");
+	sqlrcur_prepareQuery(cur,"select * from testproc(?,?,?,NULL)");
 	sqlrcur_inputBindLong(cur,"1",1);
 	sqlrcur_inputBindDouble(cur,"2",1.1,2,1);
 	sqlrcur_inputBindString(cur,"3","hello");
@@ -152,7 +152,7 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,(uint32_t)0),"1");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,1),"1.1000");
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,2),"hello");
-	sqlrcur_prepareQuery(cur,"execute procedure testproc ?, ?, ?");
+	sqlrcur_prepareQuery(cur,"execute procedure testproc ?, ?, ?, NULL");
 	sqlrcur_inputBindLong(cur,"1",1);
 	sqlrcur_inputBindDouble(cur,"2",1.1,2,1);
 	sqlrcur_inputBindString(cur,"3","hello");
@@ -170,7 +170,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COLUMN COUNT: \n");
-	checkSuccessInt(sqlrcur_colCount(cur),11);
+	checkSuccessInt(sqlrcur_colCount(cur),12);
 	printf("\n");
 
 	printf("COLUMN NAMES: \n");
@@ -611,7 +611,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COLUMN COUNT FOR CACHED RESULT SET: \n");
-	checkSuccessInt(sqlrcur_colCount(cur),11);
+	checkSuccessInt(sqlrcur_colCount(cur),12);
 	printf("\n");
 
 	printf("COLUMN NAMES FOR CACHED RESULT SET: \n");
@@ -724,7 +724,7 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"8");
 	checkSuccessInt(sqlrcon_autoCommitOn(con),1);
-	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (10,10,10.1,10.1,10.1,10.1,'01-JAN-2010','10:00:00','testchar10','testvarchar10',NULL)"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (10,10,10.1,10.1,10.1,10.1,'01-JAN-2010','10:00:00','testchar10','testvarchar10',NULL,NULL)"),1);
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"9");
 	checkSuccessInt(sqlrcon_autoCommitOff(con),1);
