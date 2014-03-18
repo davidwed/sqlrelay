@@ -89,6 +89,16 @@ class firebirdcursor : public sqlrcursor_svr {
                                         	char *buffer,
                                         	uint16_t buffersize,
                                         	int16_t *isnull);
+		bool		inputBindBlob(const char *variable,
+						uint16_t variablesize,
+						const char *value,
+						uint32_t valuesize,
+						int16_t *isnull);
+		bool		inputBindClob(const char *variable,
+						uint16_t variablesize,
+						const char *value,
+						uint32_t valuesize,
+						int16_t *isnull);
 		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
 						char *value, 
@@ -152,7 +162,8 @@ class firebirdcursor : public sqlrcursor_svr {
 		
 		XSQLDA	ISC_FAR	*outsqlda;
 		XSQLDA	ISC_FAR	*insqlda;
-		ISC_BLOB_DESC	to_desc;
+		isc_blob_handle	*inblobhandle;
+		ISC_QUAD	*inblobid;
 
 		ISC_LONG	querytype;
 
@@ -617,6 +628,8 @@ firebirdcursor::firebirdcursor(sqlrconnection_svr *conn) :
 					XSQLDA_LENGTH(MAX_BIND_VARS)];
 	insqlda->version=SQLDA_VERSION1;
 	insqlda->sqln=MAX_BIND_VARS;
+	inblobhandle=new isc_blob_handle[MAX_BIND_VARS];
+	inblobid=new ISC_QUAD[MAX_BIND_VARS];
 
 	querytype=0;
 	stmt=NULL;
@@ -629,6 +642,8 @@ firebirdcursor::firebirdcursor(sqlrconnection_svr *conn) :
 firebirdcursor::~firebirdcursor() {
 	delete[] outsqlda;
 	delete[] insqlda;
+	delete[] inblobhandle;
+	delete[] inblobid;
 }
 
 bool firebirdcursor::prepareQuery(const char *query, uint32_t length) {
@@ -807,6 +822,57 @@ bool firebirdcursor::inputBind(const char *variable,
 	insqlda->sqlvar[index].aliasname_length=0;
 	insqlda->sqlvar[index].aliasname[0]='\0';
 	return true;
+}
+
+bool firebirdcursor::inputBindBlob(const char *variable,
+					uint16_t variablesize,
+					const char *value,
+					uint32_t valuesize,
+					int16_t *isnull) {
+
+	// make bind vars 1 based like all other db's
+	long	index=charstring::toInteger(variable+1)-1;
+	if (index<0) {
+		return false;
+	}
+
+	// create a blob, write the value to it, and close it
+	if (isc_create_blob2(firebirdconn->error,
+				&firebirdconn->db,
+				&firebirdconn->tr,
+				&inblobhandle[index],
+				&inblobid[index],0,NULL) ||
+		isc_put_segment(firebirdconn->error,
+				&inblobhandle[index],
+				valuesize,value)) {
+		return false;
+	}
+	isc_close_blob(firebirdconn->error,&inblobhandle[index]);
+
+	insqlda->sqlvar[index].sqltype=SQL_BLOB+1;
+	insqlda->sqlvar[index].sqlscale=0;
+	insqlda->sqlvar[index].sqlsubtype=0;
+	insqlda->sqlvar[index].sqllen=valuesize;
+	insqlda->sqlvar[index].sqldata=(char *)&inblobid[index];
+	insqlda->sqlvar[index].sqlind=isnull;
+	insqlda->sqlvar[index].sqlname_length=0;
+	insqlda->sqlvar[index].sqlname[0]='\0';
+	insqlda->sqlvar[index].relname_length=0;
+	insqlda->sqlvar[index].relname[0]='\0';
+	insqlda->sqlvar[index].ownname_length=0;
+	insqlda->sqlvar[index].ownname[0]='\0';
+	insqlda->sqlvar[index].aliasname_length=0;
+	insqlda->sqlvar[index].aliasname[0]='\0';
+	return true;
+}
+
+bool firebirdcursor::inputBindClob(const char *variable,
+					uint16_t variablesize,
+					const char *value,
+					uint32_t valuesize,
+					int16_t *isnull) {
+	return inputBindBlob(variable,variablesize,
+				value,valuesize,isnull);
 }
 
 bool firebirdcursor::outputBind(const char *variable, 
