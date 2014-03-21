@@ -116,11 +116,6 @@ class sqlitecursor : public sqlrcursor_svr {
 						const char *value, 
 						uint32_t valuesize,
 						int16_t *isnull);
-		bool		inputBindClob(const char *variable, 
-						uint16_t variablesize,
-						const char *value, 
-						uint32_t valuesize,
-						int16_t *isnull);
 		#endif
 		bool		executeQuery(const char *query,
 						uint32_t length);
@@ -493,16 +488,6 @@ bool sqlitecursor::inputBindBlob(const char *variable,
 				uint32_t valuesize,
 				int16_t *isnull) {
 	return (sqlite3_bind_blob(stmt,
-				getBindVariableIndex(variable,variablesize),
-				value,valuesize,SQLITE_STATIC)==SQLITE_OK);
-}
-
-bool sqlitecursor::inputBindClob(const char *variable, 
-				uint16_t variablesize,
-				const char *value, 
-				uint32_t valuesize,
-				int16_t *isnull) {
-	return (sqlite3_bind_text(stmt,
 				getBindVariableIndex(variable,variablesize),
 				value,valuesize,SQLITE_STATIC)==SQLITE_OK);
 }
