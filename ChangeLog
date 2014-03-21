@@ -19,8 +19,10 @@
 		when dynamic scaling is used
 	fixed a bug that caused the response timeout to be handled improperly
 	added response timeout command to sqlrsh
-	added support for blobs with firebird
+	added support for clobs/blobs with firebird
 	fixed a blob-related bug with sqlite
+	added support for blob input binds with db2
+	added support for clob/blob output binds with db2
 
 0.54 - fixed bugs that caused problems when unopened result sets were closed
 	added protocol identification phase to client/server protocol

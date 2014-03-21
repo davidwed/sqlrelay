@@ -776,14 +776,17 @@ bool odbccursor::inputBind(const char *variable,
 	#endif
 						
 	if (*isnull==SQL_NULL_DATA) {
+		// the 4th parameter (ValueType) must by
+		// SQL_C_BINARY for this to work with blobs
 		erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
-				#ifdef HAVE_SQLCONNECTW
+				/*#ifdef HAVE_SQLCONNECTW
 				SQL_C_WCHAR,
 				#else
 				SQL_C_CHAR,
-				#endif
+				#endif*/
+				SQL_C_BINARY,
 				SQL_CHAR,
 				1,
 				0,

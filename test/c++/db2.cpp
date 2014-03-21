@@ -30,6 +30,7 @@ void checkSuccess(const char *value, const char *success) {
 		printf("success ");
 	} else {
 		printf("\"%s\"!=\"%s\"\n",value,success);
+stdoutput.printf("%d!=%d\n",charstring::length(value),charstring::length(success));
 		printf("failure ");
 		delete cur;
 		delete con;
@@ -65,9 +66,9 @@ void checkSuccess(double value, double success) {
 
 int	main(int argc, char **argv) {
 
-	const char	*bindvars[11]={"1","2","3","4","5","6","7","8","9","10",NULL};
-	const char	*bindvals[10]={"4","4","4","4.4","4.4","4.4",
-			"testchar4","testvarchar4","01/01/2004","04:00:00"};
+	const char	*bindvars[13]={"1","2","3","4","5","6","7","8","9","10","11","12",NULL};
+	const char	*bindvals[12]={"4","4","4","4.4","4.4","4.4",
+			"testchar4","testvarchar4","01/01/2004","04:00:00","testclob1",NULL};
 	const char	*subvars[4]={"var1","var2","var3",NULL};
 	const char	*subvalstrings[3]={"hi","hello","bye"};
 	int64_t		subvallongs[3]={1,2,3};
@@ -101,16 +102,16 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table testtable");
 
 	printf("CREATE TEMPTABLE: \n");
-	checkSuccess(cur->sendQuery("create table testtable (testsmallint smallint, testint integer, testbigint bigint, testdecimal decimal(10,2), testreal real, testdouble double, testchar char(40), testvarchar varchar(40), testdate date, testtime time, testtimestamp timestamp)"),1);
+	checkSuccess(cur->sendQuery("create table testtable (testsmallint smallint, testint integer, testbigint bigint, testdecimal decimal(10,2), testreal real, testdouble double, testchar char(40), testvarchar varchar(40), testdate date, testtime time, testtimestamp timestamp, testclob clob, testblob blob)"),1);
 	printf("\n");
 
 	printf("INSERT: \n");
-	checkSuccess(cur->sendQuery("insert into testtable values (1,1,1,1.1,1.1,1.1,'testchar1','testvarchar1','01/01/2001','01:00:00',NULL)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (1,1,1,1.1,1.1,1.1,'testchar1','testvarchar1','01/01/2001','01:00:00',NULL,'testclob1',blob('testblob1'))"),1);
 	printf("\n");
 
 	printf("BIND BY POSITION: \n");
-	cur->prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,NULL)");
-	checkSuccess(cur->countBindVariables(),10);
+	cur->prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,NULL,?,?)");
+	checkSuccess(cur->countBindVariables(),12);
 	cur->inputBind("1",2);
 	cur->inputBind("2",2);
 	cur->inputBind("3",2);
@@ -121,6 +122,8 @@ int	main(int argc, char **argv) {
 	cur->inputBind("8","testvarchar2");
 	cur->inputBind("9","01/01/2002");
 	cur->inputBind("10","02:00:00");
+	cur->inputBindClob("11","testclob1",9);
+	cur->inputBindBlob("12","testblob1",9);
 	checkSuccess(cur->executeQuery(),1);
 	cur->clearBinds();
 	cur->inputBind("1",3);
@@ -133,6 +136,8 @@ int	main(int argc, char **argv) {
 	cur->inputBind("8","testvarchar3");
 	cur->inputBind("9","01/01/2003");
 	cur->inputBind("10","03:00:00");
+	cur->inputBindClob("11","testclob3",9);
+	cur->inputBindBlob("12","testblob3",9);
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");
 
@@ -143,10 +148,10 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("INSERT: \n");
-	checkSuccess(cur->sendQuery("insert into testtable values (5,5,5,5.5,5.5,5.5,'testchar5','testvarchar5','01/01/2005','05:00:00',NULL)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values (6,6,6,6.6,6.6,6.6,'testchar6','testvarchar6','01/01/2006','06:00:00',NULL)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values (7,7,7,7.7,7.7,7.7,'testchar7','testvarchar7','01/01/2007','07:00:00',NULL)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values (8,8,8,8.8,8.8,8.8,'testchar8','testvarchar8','01/01/2008','08:00:00',NULL)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (5,5,5,5.5,5.5,5.5,'testchar5','testvarchar5','01/01/2005','05:00:00',NULL,'testclob5',blob('testblob5'))"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (6,6,6,6.6,6.6,6.6,'testchar6','testvarchar6','01/01/2006','06:00:00',NULL,'testclob6',blob('testblob6'))"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (7,7,7,7.7,7.7,7.7,'testchar7','testvarchar7','01/01/2007','07:00:00',NULL,'testclob7',blob('testblob7'))"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (8,8,8,8.8,8.8,8.8,'testchar8','testvarchar8','01/01/2008','08:00:00',NULL,'testclob8',blob('testblob8'))"),1);
 	printf("\n");
 
 	printf("AFFECTED ROWS: \n");
@@ -156,18 +161,24 @@ int	main(int argc, char **argv) {
 	printf("STORED PROCEDURE: \n");
 	// return multiple values
 	cur->sendQuery("drop procedure testproc");
-	checkSuccess(cur->sendQuery("create procedure testproc(in in1 int, in in2 double, in in3 varchar(20), out out1 int, out out2 double, out out3 varchar(20)) language sql begin set out1 = in1; set out2 = in2; set out3 = in3; end"),1);
-	cur->prepareQuery("call testproc(?,?,?,?,?,?)");
+	checkSuccess(cur->sendQuery("create procedure testproc(in in1 int, in in2 double, in in3 varchar(20), in in4 clob, in in5 blob, out out1 int, out out2 double, out out3 varchar(20), out out4 clob, out out5 blob) language sql begin set out1 = in1; set out2 = in2; set out3 = in3; set out4 = in4; set out5 = in5; end"),1);
+	cur->prepareQuery("call testproc(?,?,?,?,?,?,?,?,?,?)");
 	cur->inputBind("1",1);
 	cur->inputBind("2",1.1,2,1);
 	cur->inputBind("3","hello");
-	cur->defineOutputBindInteger("4");
-	cur->defineOutputBindDouble("5");
-	cur->defineOutputBindString("6",20);
+	cur->inputBindClob("4","clob",4);
+	cur->inputBindBlob("5","blob",4);
+	cur->defineOutputBindInteger("6");
+	cur->defineOutputBindDouble("7");
+	cur->defineOutputBindString("8",20);
+	cur->defineOutputBindClob("9");
+	cur->defineOutputBindBlob("10");
 	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getOutputBindInteger("4"),1);
-	checkSuccess(cur->getOutputBindDouble("5"),1.1);
-	checkSuccess(cur->getOutputBindString("6"),"hello");
+	checkSuccess(cur->getOutputBindInteger("6"),1);
+	checkSuccess(cur->getOutputBindDouble("7"),1.1);
+	checkSuccess(cur->getOutputBindString("8"),"hello");
+	checkSuccess(cur->getOutputBindClob("9"),"clob");
+	checkSuccess(cur->getOutputBindBlob("10"),"blob");
 	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
 	printf("\n");
 
@@ -178,12 +189,36 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
 	printf("\n");
 
+	printf("LONG BLOB: \n");
+	cur->sendQuery("drop table testtable1");
+	cur->sendQuery("create table testtable1 (testclob clob)");
+	cur->prepareQuery("insert into testtable1 values (?)");
+	char	clobval[3*1024+1];
+	for (int i=0; i<3*1024; i++) {
+		clobval[i]='C';
+	}
+	clobval[3*1024]='\0';
+	cur->inputBindBlob("1",clobval,3*1024);
+	checkSuccess(cur->executeQuery(),1);
+	cur->sendQuery("select testclob from testtable1");
+	checkSuccess(cur->getFieldLength(0,"testclob"),3*1024);
+	checkSuccess(cur->getField(0,"testclob"),clobval);
+	checkSuccess(cur->sendQuery("create procedure testproc(in in1 clob, out out1 clob) language sql begin set out1 = in1; end"),1);
+	cur->prepareQuery("call testproc(?,?)");
+	cur->inputBindBlob("1",clobval,3*1024);
+	cur->defineOutputBindBlob("2");
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getOutputBindLength("2"),3*1024);
+	checkSuccess(cur->getOutputBindBlob("2"),clobval);
+	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
+	printf("\n");
+
 	printf("SELECT: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testsmallint"),1);
 	printf("\n");
 
 	printf("COLUMN COUNT: \n");
-	checkSuccess(cur->colCount(),11);
+	checkSuccess(cur->colCount(),13);
 	printf("\n");
 
 	printf("COLUMN NAMES: \n");
@@ -626,7 +661,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COLUMN COUNT FOR CACHED RESULT SET: \n");
-	checkSuccess(cur->colCount(),11);
+	checkSuccess(cur->colCount(),13);
 	printf("\n");
 
 	printf("COLUMN NAMES FOR CACHED RESULT SET: \n");
