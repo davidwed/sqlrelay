@@ -87,16 +87,16 @@ int	main(int argc, char **argv) {
 	// create a new table
 	printf("CREATE TEMPTABLE: \n");
 	cur->sendQuery("begin transaction");
-	checkSuccess(cur->sendQuery("create table testtable (testint int, testfloat float, testchar char(40), testvarchar varchar(40))"),1);
+	checkSuccess(cur->sendQuery("create table testtable (testint int, testfloat float, testchar char(40), testvarchar varchar(40), testclob clob, testblob blob)"),1);
 	con->commit();
 	printf("\n");
 
 	printf("INSERT: \n");
 	cur->sendQuery("begin transaction");
-	checkSuccess(cur->sendQuery("insert into testtable values (1,1.1,'testchar1','testvarchar1')"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values (2,2.2,'testchar2','testvarchar2')"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values (3,3.3,'testchar3','testvarchar3')"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values (4,4.4,'testchar4','testvarchar4')"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (1,1.1,'testchar1','testvarchar1','testclob1','testblob1')"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (2,2.2,'testchar2','testvarchar2','testclob2','testblob2')"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (3,3.3,'testchar3','testvarchar3','testclob3','testblob3')"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (4,4.4,'testchar4','testvarchar4','testclob4','testblob4')"),1);
 	printf("\n");
 
 	printf("AFFECTED ROWS: \n");
@@ -104,24 +104,30 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("BIND BY NAME: \n");
-	cur->prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4)");
-	checkSuccess(cur->countBindVariables(),4);
+	cur->prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6)");
+	checkSuccess(cur->countBindVariables(),6);
 	cur->inputBind("var1",5);
 	cur->inputBind("var2",5.5,4,1);
 	cur->inputBind("var3","testchar5");
 	cur->inputBind("var4","testvarchar5");
+	cur->inputBindClob("var5","testclob5",9);
+	cur->inputBindBlob("var6","testblob5",9);
 	checkSuccess(cur->executeQuery(),1);
 	cur->clearBinds();
 	cur->inputBind("var1",6);
 	cur->inputBind("var2",6.6,4,1);
 	cur->inputBind("var3","testchar6");
 	cur->inputBind("var4","testvarchar6");
+	cur->inputBindClob("var5","testclob6",9);
+	cur->inputBindBlob("var6","testblob6",9);
 	checkSuccess(cur->executeQuery(),1);
 	cur->clearBinds();
 	cur->inputBind("var1",7);
 	cur->inputBind("var2",7.7,4,1);
 	cur->inputBind("var3","testchar7");
 	cur->inputBind("var4","testvarchar7");
+	cur->inputBindClob("var5","testclob7",9);
+	cur->inputBindBlob("var6","testblob7",9);
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");
 
@@ -131,6 +137,8 @@ int	main(int argc, char **argv) {
 	cur->inputBind("var2",8.8,4,1);
 	cur->inputBind("var3","testchar8");
 	cur->inputBind("var4","testvarchar8");
+	cur->inputBindClob("var5","testclob8",9);
+	cur->inputBindBlob("var6","testblob8",9);
 	cur->validateBinds();
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");
@@ -140,7 +148,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COLUMN COUNT: \n");
-	checkSuccess(cur->colCount(),4);
+	checkSuccess(cur->colCount(),6);
 	printf("\n");
 
 	printf("COLUMN NAMES: \n");
@@ -165,6 +173,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType("testchar"),"STRING");
 	checkSuccess(cur->getColumnType(3),"STRING");
 	checkSuccess(cur->getColumnType("testvarchar"),"STRING");
+	checkSuccess(cur->getColumnType(4),"STRING");
+	checkSuccess(cur->getColumnType("testclob"),"STRING");
+	checkSuccess(cur->getColumnType(5),"STRING");
+	checkSuccess(cur->getColumnType("testblob"),"STRING");
 	#else
 	checkSuccess(cur->getColumnType((uint32_t)0),"UNKNOWN");
 	checkSuccess(cur->getColumnType("testint"),"UNKNOWN");
@@ -174,6 +186,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType("testchar"),"UNKNOWN");
 	checkSuccess(cur->getColumnType(3),"UNKNOWN");
 	checkSuccess(cur->getColumnType("testvarchar"),"UNKNOWN");
+	checkSuccess(cur->getColumnType(4),"UNKNOWN");
+	checkSuccess(cur->getColumnType("testclob"),"UNKNOWN");
+	checkSuccess(cur->getColumnType(5),"UNKNOWN");
+	checkSuccess(cur->getColumnType("testblob"),"UNKNOWN");
 	#endif
 	printf("\n");
 
@@ -186,6 +202,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnLength("testchar"),0);
 	checkSuccess(cur->getColumnLength(3),0);
 	checkSuccess(cur->getColumnLength("testvarchar"),0);
+	checkSuccess(cur->getColumnLength(4),0);
+	checkSuccess(cur->getColumnLength("testclob"),0);
+	checkSuccess(cur->getColumnLength(5),0);
+	checkSuccess(cur->getColumnLength("testblob"),0);
 	printf("\n");
 
 	printf("LONGEST COLUMN: \n");
@@ -197,6 +217,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getLongest("testchar"),9);
 	checkSuccess(cur->getLongest(3),12);
 	checkSuccess(cur->getLongest("testvarchar"),12);
+	checkSuccess(cur->getLongest(4),9);
+	checkSuccess(cur->getLongest("testclob"),9);
+	checkSuccess(cur->getLongest(5),9);
+	checkSuccess(cur->getLongest("testblob"),9);
 	printf("\n");
 
 	printf("ROW COUNT: \n");
@@ -224,11 +248,15 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,1),"1.1");
 	checkSuccess(cur->getField(0,2),"testchar1");
 	checkSuccess(cur->getField(0,3),"testvarchar1");
+	checkSuccess(cur->getField(0,4),"testclob1");
+	checkSuccess(cur->getField(0,5),"testblob1");
 	printf("\n");
 	checkSuccess(cur->getField(7,(uint32_t)0),"8");
 	checkSuccess(cur->getField(7,1),"8.8");
 	checkSuccess(cur->getField(7,2),"testchar8");
 	checkSuccess(cur->getField(7,3),"testvarchar8");
+	checkSuccess(cur->getField(7,4),"testclob8");
+	checkSuccess(cur->getField(7,5),"testblob8");
 	printf("\n");
 
 	printf("FIELD LENGTHS BY INDEX: \n");
@@ -236,11 +264,15 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getFieldLength(0,1),3);
 	checkSuccess(cur->getFieldLength(0,2),9);
 	checkSuccess(cur->getFieldLength(0,3),12);
+	checkSuccess(cur->getFieldLength(0,4),9);
+	checkSuccess(cur->getFieldLength(0,5),9);
 	printf("\n");
 	checkSuccess(cur->getFieldLength(7,(uint32_t)0),1);
 	checkSuccess(cur->getFieldLength(7,1),3);
 	checkSuccess(cur->getFieldLength(7,2),9);
 	checkSuccess(cur->getFieldLength(7,3),12);
+	checkSuccess(cur->getFieldLength(7,4),9);
+	checkSuccess(cur->getFieldLength(7,5),9);
 	printf("\n");
 
 	printf("FIELDS BY NAME: \n");
@@ -248,11 +280,15 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,"testfloat"),"1.1");
 	checkSuccess(cur->getField(0,"testchar"),"testchar1");
 	checkSuccess(cur->getField(0,"testvarchar"),"testvarchar1");
+	checkSuccess(cur->getField(0,"testclob"),"testclob1");
+	checkSuccess(cur->getField(0,"testblob"),"testblob1");
 	printf("\n");
 	checkSuccess(cur->getField(7,"testint"),"8");
 	checkSuccess(cur->getField(7,"testfloat"),"8.8");
 	checkSuccess(cur->getField(7,"testchar"),"testchar8");
 	checkSuccess(cur->getField(7,"testvarchar"),"testvarchar8");
+	checkSuccess(cur->getField(7,"testclob"),"testclob8");
+	checkSuccess(cur->getField(7,"testblob"),"testblob8");
 	printf("\n");
 
 	printf("FIELD LENGTHS BY NAME: \n");
@@ -260,11 +296,15 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getFieldLength(0,"testfloat"),3);
 	checkSuccess(cur->getFieldLength(0,"testchar"),9);
 	checkSuccess(cur->getFieldLength(0,"testvarchar"),12);
+	checkSuccess(cur->getFieldLength(0,"testclob"),9);
+	checkSuccess(cur->getFieldLength(0,"testblob"),9);
 	printf("\n");
 	checkSuccess(cur->getFieldLength(7,"testint"),1);
 	checkSuccess(cur->getFieldLength(7,"testfloat"),3);
 	checkSuccess(cur->getFieldLength(7,"testchar"),9);
 	checkSuccess(cur->getFieldLength(7,"testvarchar"),12);
+	checkSuccess(cur->getFieldLength(7,"testclob"),9);
+	checkSuccess(cur->getFieldLength(7,"testblob"),9);
 	printf("\n");
 
 	printf("FIELDS BY ARRAY: \n");
@@ -273,6 +313,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(fields[1],"1.1");
 	checkSuccess(fields[2],"testchar1");
 	checkSuccess(fields[3],"testvarchar1");
+	checkSuccess(fields[4],"testclob1");
+	checkSuccess(fields[5],"testblob1");
 	printf("\n");
 
 	printf("FIELD LENGTHS BY ARRAY: \n");
@@ -281,6 +323,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(fieldlens[1],3);
 	checkSuccess(fieldlens[2],9);
 	checkSuccess(fieldlens[3],12);
+	checkSuccess(fieldlens[4],9);
+	checkSuccess(fieldlens[5],9);
 	printf("\n");
 
 	printf("INDIVIDUAL SUBSTITUTIONS: \n");
@@ -466,7 +510,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COLUMN COUNT FOR CACHED RESULT SET: \n");
-	checkSuccess(cur->colCount(),4);
+	checkSuccess(cur->colCount(),6);
 	printf("\n");
 
 	printf("COLUMN NAMES FOR CACHED RESULT SET: \n");
@@ -474,11 +518,15 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnName(1),"testfloat");
 	checkSuccess(cur->getColumnName(2),"testchar");
 	checkSuccess(cur->getColumnName(3),"testvarchar");
+	checkSuccess(cur->getColumnName(4),"testclob");
+	checkSuccess(cur->getColumnName(5),"testblob");
 	cols=cur->getColumnNames();
 	checkSuccess(cols[0],"testint");
 	checkSuccess(cols[1],"testfloat");
 	checkSuccess(cols[2],"testchar");
 	checkSuccess(cols[3],"testvarchar");
+	checkSuccess(cols[4],"testclob");
+	checkSuccess(cols[5],"testblob");
 	printf("\n");
 
 	printf("CACHED RESULT SET WITH RESULT SET BUFFER SIZE: \n");
@@ -564,7 +612,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(con->commit(),1);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"8");
-	checkSuccess(cur->sendQuery("insert into testtable values (10,10.1,'testchar10','testvarchar10')"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (10,10.1,'testchar10','testvarchar10','testclob10','testblob10')"),1);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"9");
 	printf("\n");

@@ -502,7 +502,7 @@ bool sqlitecursor::inputBindClob(const char *variable,
 				const char *value, 
 				uint32_t valuesize,
 				int16_t *isnull) {
-	return (sqlite3_bind_blob(stmt,
+	return (sqlite3_bind_text(stmt,
 				getBindVariableIndex(variable,variablesize),
 				value,valuesize,SQLITE_STATIC)==SQLITE_OK);
 }
@@ -812,12 +812,16 @@ void sqlitecursor::getField(uint32_t col,
 	// sqlite3_column_text does a type conversion and the result of
 	// sqlite3_column_type is undefined after the conversion.
 	int	dtype=sqlite3_column_type(stmt,col);
-	*blob=(dtype==SQLITE_BLOB);
-	*field=(const char *)((*blob)?
+	*field=(const char *)((dtype==SQLITE_BLOB)?
 				sqlite3_column_blob(stmt,col):
 				sqlite3_column_text(stmt,col));
 	*fieldlength=sqlite3_column_bytes(stmt,col);
 	*null=(*field==NULL);
+
+	// set the blob indiciator false, otherwise we'll have to implement
+	// methods for fetching the blob in chunks and there's no need to
+	// do that, for now at least
+	*blob=false;
 #else
 	// sqlite is kind of strange, the result set is not returned
 	// in a 2-d array of pointers to rows/columns, but rather

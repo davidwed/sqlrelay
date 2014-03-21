@@ -97,7 +97,7 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table testtable");
 
 	printf("CREATE TEMPTABLE: \n");
-	checkSuccess(cur->sendQuery("create table testtable (testint int, testfloat float, testreal real, testsmallint smallint, testchar char(40), testvarchar varchar(40), testdate date, testtime time, testtimestamp timestamp)"),1);
+	checkSuccess(cur->sendQuery("create table testtable (testint int, testfloat float, testreal real, testsmallint smallint, testchar char(40), testvarchar varchar(40), testdate date, testtime time, testtimestamp timestamp, testtext text, testbytea bytea)"),1);
 	printf("\n");
 
 	printf("BEGIN TRANSCTION: \n");
@@ -105,10 +105,10 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("INSERT: \n");
-	checkSuccess(cur->sendQuery("insert into testtable values (1,1.1,1.1,1,'testchar1','testvarchar1','01/01/2001','01:00:00',NULL)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values (2,2.2,2.2,2,'testchar2','testvarchar2','01/01/2002','02:00:00',NULL)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values (3,3.3,3.3,3,'testchar3','testvarchar3','01/01/2003','03:00:00',NULL)"),1);
-	checkSuccess(cur->sendQuery("insert into testtable values (4,4.4,4.4,4,'testchar4','testvarchar4','01/01/2004','04:00:00',NULL)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (1,1.1,1.1,1,'testchar1','testvarchar1','01/01/2001','01:00:00',NULL,'testtext1','testbytea1')"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (2,2.2,2.2,2,'testchar2','testvarchar2','01/01/2002','02:00:00',NULL,'testtext2','testbytea2')"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (3,3.3,3.3,3,'testchar3','testvarchar3','01/01/2003','03:00:00',NULL,'testtext3','testbytea3')"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (4,4.4,4.4,4,'testchar4','testvarchar4','01/01/2004','04:00:00',NULL,'testtext4','testbytea4')"),1);
 	printf("\n");
 
 	printf("AFFECTED ROWS: \n");
@@ -116,8 +116,8 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("BIND BY POSITION: \n");
-	cur->prepareQuery("insert into testtable values ($1,$2,$3,$4,$5,$6,$7,$8)");
-	checkSuccess(cur->countBindVariables(),8);
+	cur->prepareQuery("insert into testtable values ($1,$2,$3,$4,$5,$6,$7,$8,NULL,$9,$10)");
+	checkSuccess(cur->countBindVariables(),10);
 	cur->inputBind("1",5);
 	cur->inputBind("2",5.5,4,2);
 	cur->inputBind("3",5.5,4,2);
@@ -126,6 +126,8 @@ int	main(int argc, char **argv) {
 	cur->inputBind("6","testvarchar5");
 	cur->inputBind("7","01/01/2005");
 	cur->inputBind("8","05:00:00");
+	cur->inputBindClob("9","testtext5",9);
+	cur->inputBindBlob("10","testbytea5",10);
 	checkSuccess(cur->executeQuery(),1);
 	cur->clearBinds();
 	cur->inputBind("1",6);
@@ -136,6 +138,8 @@ int	main(int argc, char **argv) {
 	cur->inputBind("6","testvarchar6");
 	cur->inputBind("7","01/01/2006");
 	cur->inputBind("8","06:00:00");
+	cur->inputBindClob("9","testtext6",9);
+	cur->inputBindBlob("10","testbytea6",10);
 	checkSuccess(cur->executeQuery(),1);
 	cur->clearBinds();
 	cur->inputBind("1",7);
@@ -146,6 +150,8 @@ int	main(int argc, char **argv) {
 	cur->inputBind("6","testvarchar7");
 	cur->inputBind("7","01/01/2007");
 	cur->inputBind("8","07:00:00");
+	cur->inputBindClob("9","testtext7",9);
+	cur->inputBindBlob("10","testbytea8",10);
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");
 
@@ -159,7 +165,9 @@ int	main(int argc, char **argv) {
 	cur->inputBind("6","testvarchar8");
 	cur->inputBind("7","01/01/2008");
 	cur->inputBind("8","08:00:00");
-	cur->inputBind("9","junkvalue");
+	cur->inputBindClob("9","testtext8",9);
+	cur->inputBindClob("10","testbytea8",10);
+	cur->inputBind("11","junkvalue");
 	cur->validateBinds();
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");
@@ -169,7 +177,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COLUMN COUNT: \n");
-	checkSuccess(cur->colCount(),9);
+	checkSuccess(cur->colCount(),11);
 	printf("\n");
 
 	printf("COLUMN NAMES: \n");
@@ -182,6 +190,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnName(6),"testdate");
 	checkSuccess(cur->getColumnName(7),"testtime");
 	checkSuccess(cur->getColumnName(8),"testtimestamp");
+	checkSuccess(cur->getColumnName(9),"testtext");
+	checkSuccess(cur->getColumnName(10),"testbytea");
 	cols=cur->getColumnNames();
 	checkSuccess(cols[0],"testint");
 	checkSuccess(cols[1],"testfloat");
@@ -192,6 +202,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cols[6],"testdate");
 	checkSuccess(cols[7],"testtime");
 	checkSuccess(cols[8],"testtimestamp");
+	checkSuccess(cols[9],"testtext");
+	checkSuccess(cols[10],"testbytea");
 	printf("\n");
 
 	printf("COLUMN TYPES: \n");
@@ -213,6 +225,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType("testtime"),"time");
 	checkSuccess(cur->getColumnType(8),"timestamp");
 	checkSuccess(cur->getColumnType("testtimestamp"),"timestamp");
+	checkSuccess(cur->getColumnType(9),"text");
+	checkSuccess(cur->getColumnType("testtext"),"text");
+	checkSuccess(cur->getColumnType(10),"bytea");
+	checkSuccess(cur->getColumnType("testbytea"),"bytea");
 	printf("\n");
 
 	printf("COLUMN LENGTH: \n");
@@ -234,6 +250,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnLength("testtime"),8);
 	checkSuccess(cur->getColumnLength(8),8);
 	checkSuccess(cur->getColumnLength("testtimestamp"),8);
+	checkSuccess(cur->getColumnLength(9),0);
+	checkSuccess(cur->getColumnLength("testtext"),0);
+	checkSuccess(cur->getColumnLength(10),0);
+	checkSuccess(cur->getColumnLength("testbytea"),0);
 	printf("\n");
 
 	printf("LONGEST COLUMN: \n");
@@ -253,6 +273,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getLongest("testdate"),10);
 	checkSuccess(cur->getLongest(7),8);
 	checkSuccess(cur->getLongest("testtime"),8);
+	checkSuccess(cur->getLongest(9),9);
+	checkSuccess(cur->getLongest("testtext"),9);
+	checkSuccess(cur->getLongest(10),22);
+	checkSuccess(cur->getLongest("testbytea"),22);
 	printf("\n");
 
 	printf("ROW COUNT: \n");
@@ -280,6 +304,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,5),"testvarchar1");
 	checkSuccess(cur->getField(0,6),"2001-01-01");
 	checkSuccess(cur->getField(0,7),"01:00:00");
+	checkSuccess(cur->getField(0,9),"testtext1");
+	checkSuccess(cur->getField(0,10),"\\x74657374627974656131");
 	printf("\n");
 	checkSuccess(cur->getField(7,(uint32_t)0),"8");
 	checkSuccess(cur->getField(7,1),"8.8");
@@ -289,6 +315,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(7,5),"testvarchar8");
 	checkSuccess(cur->getField(7,6),"2008-01-01");
 	checkSuccess(cur->getField(7,7),"08:00:00");
+	checkSuccess(cur->getField(7,9),"testtext8");
+	checkSuccess(cur->getField(7,10),"\\x74657374627974656138");
 	printf("\n");
 
 	printf("FIELD LENGTHS BY INDEX: \n");
@@ -300,6 +328,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getFieldLength(0,5),12);
 	checkSuccess(cur->getFieldLength(0,6),10);
 	checkSuccess(cur->getFieldLength(0,7),8);
+	checkSuccess(cur->getFieldLength(0,9),9);
+	checkSuccess(cur->getFieldLength(0,10),22);
 	printf("\n");
 	checkSuccess(cur->getFieldLength(7,(uint32_t)0),1);
 	checkSuccess(cur->getFieldLength(7,1),3);
@@ -309,6 +339,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getFieldLength(7,5),12);
 	checkSuccess(cur->getFieldLength(7,6),10);
 	checkSuccess(cur->getFieldLength(7,7),8);
+	checkSuccess(cur->getFieldLength(7,9),9);
+	checkSuccess(cur->getFieldLength(7,10),22);
 	printf("\n");
 
 	printf("FIELDS BY NAME: \n");
@@ -320,6 +352,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,"testvarchar"),"testvarchar1");
 	checkSuccess(cur->getField(0,"testdate"),"2001-01-01");
 	checkSuccess(cur->getField(0,"testtime"),"01:00:00");
+	checkSuccess(cur->getField(0,"testtext"),"testtext1");
+	checkSuccess(cur->getField(0,"testbytea"),"\\x74657374627974656131");
 	printf("\n");
 	checkSuccess(cur->getField(7,"testint"),"8");
 	checkSuccess(cur->getField(7,"testfloat"),"8.8");
@@ -329,6 +363,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(7,"testvarchar"),"testvarchar8");
 	checkSuccess(cur->getField(7,"testdate"),"2008-01-01");
 	checkSuccess(cur->getField(7,"testtime"),"08:00:00");
+	checkSuccess(cur->getField(7,"testtext"),"testtext8");
+	checkSuccess(cur->getField(7,"testbytea"),"\\x74657374627974656138");
 	printf("\n");
 
 	printf("FIELD LENGTHS BY NAME: \n");
@@ -340,6 +376,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getFieldLength(0,"testvarchar"),12);
 	checkSuccess(cur->getFieldLength(0,"testdate"),10);
 	checkSuccess(cur->getFieldLength(0,"testtime"),8);
+	checkSuccess(cur->getFieldLength(0,"testtext"),9);
+	checkSuccess(cur->getFieldLength(0,"testbytea"),22);
 	printf("\n");
 	checkSuccess(cur->getFieldLength(7,"testint"),1);
 	checkSuccess(cur->getFieldLength(7,"testfloat"),3);
@@ -349,6 +387,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getFieldLength(7,"testvarchar"),12);
 	checkSuccess(cur->getFieldLength(7,"testdate"),10);
 	checkSuccess(cur->getFieldLength(7,"testtime"),8);
+	checkSuccess(cur->getFieldLength(7,"testtext"),9);
+	checkSuccess(cur->getFieldLength(7,"testbytea"),22);
 	printf("\n");
 
 	printf("FIELDS BY ARRAY: \n");
@@ -361,6 +401,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(fields[5],"testvarchar1");
 	checkSuccess(fields[6],"2001-01-01");
 	checkSuccess(fields[7],"01:00:00");
+	checkSuccess(fields[9],"testtext1");
+	checkSuccess(fields[10],"\\x74657374627974656131");
 	printf("\n");
 
 	printf("FIELD LENGTHS BY ARRAY: \n");
@@ -373,6 +415,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(fieldlens[5],12);
 	checkSuccess(fieldlens[6],10);
 	checkSuccess(fieldlens[7],8);
+	checkSuccess(fieldlens[9],9);
+	checkSuccess(fieldlens[10],22);
 	printf("\n");
 
 	printf("INDIVIDUAL SUBSTITUTIONS: \n");
@@ -572,7 +616,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COLUMN COUNT FOR CACHED RESULT SET: \n");
-	checkSuccess(cur->colCount(),9);
+	checkSuccess(cur->colCount(),11);
 	printf("\n");
 
 	printf("COLUMN NAMES FOR CACHED RESULT SET: \n");
@@ -758,7 +802,7 @@ int	main(int argc, char **argv) {
 	// return result set
 	cur->sendQuery("drop function testfunc()");
 	checkSuccess(cur->sendQuery("create function testfunc() returns setof record as ' declare output record; begin for output in select * from testtable loop return next output; end loop; return; end;' language plpgsql"),1);
-	checkSuccess(cur->sendQuery("select * from testfunc() as (testint int, testfloat float, testreal real, testsmallint smallint, testchar char(40), testvarchar varchar(40), testdate date, testtime time, testtimestamp timestamp)"),1);
+	checkSuccess(cur->sendQuery("select * from testfunc() as (testint int, testfloat float, testreal real, testsmallint smallint, testchar char(40), testvarchar varchar(40), testdate date, testtime time, testtimestamp timestamp, testtext text, testbytea bytea)"),1);
 	checkSuccess(cur->getField(4,(uint32_t)0),"5");
 	checkSuccess(cur->getField(5,(uint32_t)0),"6");
 	checkSuccess(cur->getField(6,(uint32_t)0),"7");

@@ -183,8 +183,8 @@ bool sqlrcursor_svr::inputBindBlob(const char *variable,
 					const char *value,
 					uint32_t valuesize,
 					int16_t *isnull) {
-	// by default, do nothing...
-	return true;
+	// fall back to string bind implementation
+	return inputBind(variable,variablesize,value,valuesize,isnull);
 }
 
 bool sqlrcursor_svr::inputBindClob(const char *variable,
