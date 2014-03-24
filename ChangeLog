@@ -1,4 +1,4 @@
-1.0 - fixed a sql translation bug related to exists clauses
+0.55 - fixed a sql translation bug related to exists clauses
 	added deployment projects for windows
 	tweaked make.batch install target to install 32-bit files under
 		C:\Program Files (x86)
