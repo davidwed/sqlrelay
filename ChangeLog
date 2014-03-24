@@ -23,6 +23,8 @@
 	fixed a blob-related bug with sqlite
 	added support for blob input binds with db2
 	added support for clob/blob output binds with db2
+	added -Wno-unknown-pragmas flag (if it it supported) to java build for
+		solaris 8
 
 0.54 - fixed bugs that caused problems when unopened result sets were closed
 	added protocol identification phase to client/server protocol

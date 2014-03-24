@@ -440,6 +440,22 @@ esac
 ])
 
 
+dnl checks to see if -Wno-unknown-pragmas option to gcc works or not
+dnl (old versions of gcc with old versions of java might need this)
+AC_DEFUN([FW_CHECK_WNOUNKNOWNPRAGMAS],
+[
+AC_MSG_CHECKING(for -Wno-unknown-pragmas option)
+FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Wno-unknown-pragmas],[],[],[WNOUNKNOWNPRAGMAS="-Wno-unknown-pragmas"],[WNOUNKNOWNPRAGMAS=""])
+if ( test -n "$WNOUNKNOWNPRAGMAS" )
+then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+AC_SUBST(WNOUNKNOWNPRAGMAS)
+])
+
+
 dnl checks to see if -Wno-long-double option to gcc works or not
 AC_DEFUN([FW_CHECK_WNOLONGDOUBLE],
 [
