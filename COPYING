@@ -59,7 +59,7 @@ The SQLRelay software package is really several packages:
 --------------------------------------------------------------------------------
 
 The SQLRelay Executables
-Copyright (c) 1999-2003  David Muse
+Copyright (c) 1999-2014  David Muse
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -78,7 +78,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 --------------------------------------------------------------------------------
 
 The SQLRelay C/C++ API
-Copyright (c) 1999-2001  David Muse
+Copyright (c) 1999-2014  David Muse
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -98,7 +98,7 @@ Boston, MA  02111-1307, USA.
 --------------------------------------------------------------------------------
 
 The SQLRelay Perl API
-Copyright (c) 2000-2001  David Muse and Dmitry Ovsyanko
+Copyright (c) 2000-2014  David Muse and Dmitry Ovsyanko
 
 These libraries are covered by the Artistic License.  (attached below)
 
@@ -132,7 +132,7 @@ Boston, MA  02111-1307, USA.
 --------------------------------------------------------------------------------
 
 The SQLRelay PHP PDO API
-Copyright (c) 2004  David Muse
+Copyright (c) 2014  David Muse
 
 This source file is subject to version 3.01 of the PHP license,
 that is bundled with this package in the file COPYING, and is
@@ -145,7 +145,7 @@ license@php.net so we can mail you a copy immediately.
 --------------------------------------------------------------------------------
 
 The SQLRelay Ruby API
-Copyright (c) 2001  David Muse
+Copyright (c) 2014  David Muse
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -203,7 +203,7 @@ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 --------------------------------------------------------------------------------
 
 The SQLRelay PostgreSQL Drop-In API
-Copyright (c) 2003-2004 David Muse
+Copyright (c) 2003-2014 David Muse
 
 These libraries are covered by the BSD License for derivative works of
 PostgreSQL.  (attached below)
@@ -211,7 +211,7 @@ PostgreSQL.  (attached below)
 --------------------------------------------------------------------------------
 
 The SQLRelay MySQL Drop-In API
-Copyright (c) 2004 David Muse
+Copyright (c) 2014 David Muse
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -230,7 +230,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 --------------------------------------------------------------------------------
 
 The SQLRelay ODBC API
-Copyright (c) 1999-2001  David Muse
+Copyright (c) 1999-2014  David Muse
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -250,7 +250,7 @@ Boston, MA  02111-1307, USA.
 --------------------------------------------------------------------------------
 
 The SQLRelay Extensions API
-Copyright (c) 1999-2001  David Muse
+Copyright (c) 1999-2014  David Muse
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -942,7 +942,7 @@ Portions Copyright (c) 1996-2002, The PostgreSQL Global Development Group
 
 Portions Copyright (c) 1994, The Regents of the University of California
 
-Portions Copyright (c) 2003-2004, David Muse
+Portions Copyright (c) 2003-2014, David Muse
 
 Permission to use, copy, modify, and distribute this software and its documentation for any purpose, without fee, and without a written agreement is hereby granted, provided that the above copyright notice and this paragraph and the following two paragraphs appear in all copies.
 
