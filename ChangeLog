@@ -23,6 +23,7 @@
 	fixed a blob-related bug with sqlite
 	added support for blob input binds with db2
 	added support for clob/blob output binds with db2
+	inputBindClob/Blob methods work with all db's now
 	added -Wno-unknown-pragmas flag (if it it supported) to java build for
 		solaris 8
 

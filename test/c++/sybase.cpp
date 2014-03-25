@@ -100,7 +100,7 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table testtable");
 
 	printf("CREATE TEMPTABLE: \n");
-	checkSuccess(cur->sendQuery("create table testtable (testint int, testsmallint smallint, testtinyint tinyint, testreal real, testfloat float, testdecimal decimal(4,1), testnumeric numeric(4,1), testmoney money, testsmallmoney smallmoney, testdatetime datetime, testsmalldatetime smalldatetime, testchar char(40), testvarchar varchar(40), testbit bit)"),1);
+	checkSuccess(cur->sendQuery("create table testtable (testint int, testsmallint smallint, testtinyint tinyint, testreal real, testfloat float, testdecimal decimal(4,1), testnumeric numeric(4,1), testmoney money, testsmallmoney smallmoney, testdatetime datetime, testsmalldatetime smalldatetime, testchar char(40), testvarchar varchar(40), testbit bit, testtext text)"),1);
 	printf("\n");
 
 	printf("CREATE STORED PROCEDURES: \n");
@@ -115,7 +115,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("INSERT: \n");
-	checkSuccess(cur->sendQuery("insert into testtable values (1,1,1,1.1,1.1,1.1,1.1,1.00,1.00,'01-Jan-2001 01:00:00','01-Jan-2001 01:00:00','testchar1','testvarchar1',1)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (1,1,1,1.1,1.1,1.1,1.1,1.00,1.00,'01-Jan-2001 01:00:00','01-Jan-2001 01:00:00','testchar1','testvarchar1',1,'testtext1')"),1);
 	printf("\n");
 
 	printf("AFFECTED ROWS: \n");
@@ -123,8 +123,8 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("BIND BY POSITION: \n");
-	cur->prepareQuery("insert into testtable values (@var1,@var2,@var3,@var4,@var5,@var6,@var7,@var8,@var9,@var10,@var11,@var12,@var13,@var14)");
-	checkSuccess(cur->countBindVariables(),14);
+	cur->prepareQuery("insert into testtable values (@var1,@var2,@var3,@var4,@var5,@var6,@var7,@var8,@var9,@var10,@var11,@var12,@var13,@var14,@var15)");
+	checkSuccess(cur->countBindVariables(),15);
 	cur->inputBind("1",2);
 	cur->inputBind("2",2);
 	cur->inputBind("3",2);
@@ -139,6 +139,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("12","testchar2");
 	cur->inputBind("13","testvarchar2");
 	cur->inputBind("14",1);
+	cur->inputBindClob("15","testtext2",9);
 	checkSuccess(cur->executeQuery(),1);
 	cur->clearBinds();
 	cur->inputBind("1",3);
@@ -155,6 +156,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("12","testchar3");
 	cur->inputBind("13","testvarchar3");
 	cur->inputBind("14",1);
+	cur->inputBindClob("15","testtext3",9);
 	checkSuccess(cur->executeQuery(),1);
 	cur->clearBinds();
 	cur->inputBind("1",4);
@@ -171,6 +173,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("12","testchar4");
 	cur->inputBind("13","testvarchar4");
 	cur->inputBind("14",1);
+	cur->inputBindClob("15","testtext4",9);
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");
 
@@ -190,6 +193,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("var12","testchar5");
 	cur->inputBind("var13","testvarchar5");
 	cur->inputBind("var14",1);
+	cur->inputBindClob("var15","testtext5",9);
 	checkSuccess(cur->executeQuery(),1);
 	cur->clearBinds();
 	cur->inputBind("var1",6);
@@ -206,6 +210,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("var12","testchar6");
 	cur->inputBind("var13","testvarchar6");
 	cur->inputBind("var14",1);
+	cur->inputBindClob("var15","testtext6",9);
 	checkSuccess(cur->executeQuery(),1);
 	cur->clearBinds();
 	cur->inputBind("var1",7);
@@ -222,6 +227,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("var12","testchar7");
 	cur->inputBind("var13","testvarchar7");
 	cur->inputBind("var14",1);
+	cur->inputBindClob("var15","testtext7",9);
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");
 
@@ -241,7 +247,8 @@ int	main(int argc, char **argv) {
 	cur->inputBind("var12","testchar8");
 	cur->inputBind("var13","testvarchar8");
 	cur->inputBind("var14",1);
-	cur->inputBind("var15","junkvalue");
+	cur->inputBindClob("var15","testtext8",9);
+	cur->inputBind("var16","junkvalue");
 	cur->validateBinds();
 	checkSuccess(cur->executeQuery(),1);
 	printf("\n");
@@ -266,7 +273,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COLUMN COUNT: \n");
-	checkSuccess(cur->colCount(),14);
+	checkSuccess(cur->colCount(),15);
 	printf("\n");
 
 	printf("COLUMN NAMES: \n");
@@ -770,7 +777,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COLUMN COUNT FOR CACHED RESULT SET: \n");
-	checkSuccess(cur->colCount(),14);
+	checkSuccess(cur->colCount(),15);
 	printf("\n");
 
 	printf("COLUMN NAMES FOR CACHED RESULT SET: \n");
