@@ -1,60 +1,61 @@
 The SQLRelay software package is really several packages:
 
 1) Source code, scripts and binaries found in the bin, bench and test
-	directories of this distribution (after successful compilation)
-	and source code, scripts and binaries found in the src 
-	directory of this distribution except for the api subdirectory.  
-	This package is hereafter refered to as The SQLRelay Executables.
+	directories of the SQL Relay source distribution (after successful
+	compilation) and source code, scripts and binaries found in the src 
+	directory of the SQL Relay source distribution except for the api
+	subdirectory.  This package is hereafter refered to as The SQLRelay
+	Executables.
 
 2) Source code, scripts and binaries found in the src/api/c and src/api/c++
-	directories of this distribution. This package is 
+	directories of the SQL Relay distribution. This package is 
 	hereafter refered to as The SQLRelay C/C++ API.
 
 3) Source code, scripts and binaries found in the src/api/python and 
-	src/api/zope directories of this distribution. This package is 
+	src/api/zope directories of the SQL Relay distribution. This package is 
 	hereafter refered to as The SQLRelay Python/Zope API.
 
 4) Source code, scripts and binaries found in the src/api/perl and 
-	src/api/perl-DBD directories of this distribution. This package is 
-	hereafter refered to as The SQLRelay Perl API.
+	src/api/perl-DBD directories of the SQL Relay distribution. This
+	package is hereafter refered to as The SQLRelay Perl API.
 
 5) Source code, scripts and binaries found in the src/api/php 
-	directory of this distribution. This package is 
+	directory of the SQL Relay source distribution. This package is 
 	hereafter refered to as The SQLRelay PHP API.
 
 6) Source code, scripts and binaries found in the src/api/phppdo
-	directory of this distribution. This package is 
+	directory of the SQL Relay source distribution. This package is 
 	hereafter refered to as The SQLRelay PHP PDO API.
 
 7) Source code, scripts and binaries found in the src/api/ruby 
-	directory of this distribution except for SQLRelay.rb. 
+	directory of the SQL Relay source distribution except for SQLRelay.rb. 
         This package is hereafter refered to as The SQLRelay Ruby API.
 
-8) The file SQLRelay.rb found in the src/api/ruby directory of this
-	distribution.  This package is hereafter refered to as The SQLRelay 
-	Ruby DBD.
+8) The file SQLRelay.rb found in the src/api/ruby directory of the SQL Relay
+	source distribution.  This package is hereafter refered to as
+	The SQLRelay Ruby DBD.
 
 9) Source code, scripts and binaries found in the src/api/tcl
-	directory of this distribution.  This package is hereafter refered to
-	as The SQLRelay TCL API.
+	directory of the SQL Relay source distribution.  This package is
+	hereafter refered to as The SQLRelay TCL API.
 
 10) Source code, scripts and binaries found in the src/api/postgresql
-	directory of this distribution.  This package is hereafter refered to
-	as The SQLRelay PostgreSQL Drop-In API.
+	directory of the SQL Relay source distribution.  This package is
+	hereafter refered to as The SQLRelay PostgreSQL Drop-In API.
 
 11) Source code, scripts and binaries found in the src/api/mysql
-	directory of this distribution.  This package is hereafter refered to
-	as The SQLRelay MySQL Drop-In API.
+	directory of the SQL Relay source distribution.  This package is
+	hereafter refered to as The SQLRelay MySQL Drop-In API.
 
 12) Source code, scripts and binaries found in the src/api/odbc
-	directory of this distribution.  This package is hereafter refered to
-	as The SQLRelay ODBC API
+	directory of the SQL Relay source distribution.  This package is
+	hereafter refered to as The SQLRelay ODBC API
 
 13) Header files that may be used to build modules to extend the functionality
-	of SQL Relay, found in various directories of this distribution:
-	sqlparser.h, sqlrlogger.h, sqlrquery.h, sqltranslation.h, sqltrigger.h,
-	sqlwriter.h and sqlrpwdenc.h.  These are collectively referred to
-	hereafter as the SQLRelay Extensions API.
+	of SQL Relay, found in various directories of the SQL Relay source
+	distribution: sqlparser.h, sqlrlogger.h, sqlrquery.h, sqltranslation.h,
+	sqltrigger.h, sqlwriter.h and sqlrpwdenc.h.  These are collectively
+	referred to hereafter as the SQLRelay Extensions API.
 
 --------------------------------------------------------------------------------
 
