@@ -13,7 +13,7 @@
 
 #define FETCH_AT_ONCE		10
 #define MAX_SELECT_LIST_SIZE	256
-#define MAX_ITEM_BUFFER_SIZE	32768
+#define MAX_ITEM_BUFFER_SIZE	32768	
 
 struct db2column {
 	char		*name;
@@ -645,7 +645,7 @@ void db2cursor::allocateResultSetBuffers(int32_t selectlistsize) {
 		#endif
 		col=new db2column[selectlistsize];
 		for (int32_t i=0; i<selectlistsize; i++) {
-			col[i].name=new char[db2conn->maxitembuffersize];
+			col[i].name=new char[4096];
 			field[i]=new char[db2conn->fetchatonce*
 						db2conn->maxitembuffersize];
 			indicator[i]=new SQLINTEGER[db2conn->fetchatonce];
@@ -1083,7 +1083,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 
 			// column name
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_LABEL,
-					col[i].name,db2conn->maxitembuffersize,
+					col[i].name,4096,
 					(SQLSMALLINT *)&(col[i].namelength),
 					NULL);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {

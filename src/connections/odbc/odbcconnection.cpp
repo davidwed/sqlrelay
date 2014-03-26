@@ -33,7 +33,7 @@
 #define MAX_ITEM_BUFFER_SIZE	32768
 
 struct odbccolumn {
-	char		name[MAX_ITEM_BUFFER_SIZE];
+	char		name[4096];
 	uint16_t	namelength;
 	// SQLColAttribute requires that these are signed, 32 bit integers
 	int32_t		type;
@@ -1170,7 +1170,7 @@ bool odbccursor::handleColumns() {
 
 		
 			erg=SQLColAttribute(stmt,i+1,SQL_DESC_LABEL,
-					col[i].name,MAX_ITEM_BUFFER_SIZE,
+					col[i].name,4096,
 					(SQLSMALLINT *)&(col[i].namelength),
 					#ifdef SQLCOLATTRIBUTE_SQLLEN
 					(SQLLEN *)NULL
@@ -1288,7 +1288,7 @@ bool odbccursor::handleColumns() {
 #else
 			// column name
 			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_LABEL,
-					col[i].name,MAX_ITEM_BUFFER_SIZE,
+					col[i].name,4096,
 					(SQLSMALLINT *)&(col[i].namelength),
 					NULL);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
