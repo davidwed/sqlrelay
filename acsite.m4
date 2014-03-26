@@ -956,11 +956,11 @@ then
 			if ( test -n "$ORACLE_INSTANTCLIENT_PREFIX" -a -r "`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX.* 2> /dev/null | tail -1`" -a -r "$ORACLE_INSTANTCLIENT_PREFIX/sdk/include/oci.h" )
 			then
 				ORACLEVERSION="10g"
-				if ( test -n `echo $ORACLE_INSTANTCLIENT_PREFIX | grep 11` )
+				if ( test -n "`basename $ORACLE_INSTANTCLIENT_PREFIX | grep 11`" )
 				then
 					ORACLEVERSION="11g"
 				fi
-				if ( test -n `echo $ORACLE_INSTANTCLIENT_PREFIX | grep 12` )
+				if ( test -n "`basename $ORACLE_INSTANTCLIENT_PREFIX | grep 12`" )
 				then
 					ORACLEVERSION="12c"
 				fi

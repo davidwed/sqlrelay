@@ -28,6 +28,8 @@
 		solaris 8
 	updated default item buffer sizes to 32768 for sybase, freetds, db2
 		and odbc
+	applied Gerhard Lausser's patch to improve Oracle instantclient
+		detection
 
 0.54 - fixed bugs that caused problems when unopened result sets were closed
 	added protocol identification phase to client/server protocol
