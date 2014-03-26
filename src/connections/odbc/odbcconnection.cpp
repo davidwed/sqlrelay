@@ -30,7 +30,7 @@
 
 #define FETCH_AT_ONCE		10
 #define MAX_SELECT_LIST_SIZE	256
-#define MAX_ITEM_BUFFER_SIZE	4096
+#define MAX_ITEM_BUFFER_SIZE	32768
 
 struct odbccolumn {
 	char		name[MAX_ITEM_BUFFER_SIZE];

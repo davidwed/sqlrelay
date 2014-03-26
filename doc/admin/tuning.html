@@ -415,7 +415,7 @@ finding it may dramatically improve that query's performance.</p>
 <a name="memoryusage"></a>
 <span class="heading2">Memory Usage</span><br>
 
-<p>Many database API's allocate memory internally to store result sets.  However, Oracle, DB2, Sybase and FreeTDS allow you to allocate buffers yourself and fetch result sets into these buffers.  When using these databases, SQL Relay preallocates a result set buffer and re-uses it over and over rather than dynamically allocating memory for each result set.  This improves performance at the cost of memory.  There are parameters for tuning the size of the result set buffer though.</p>
+<p>Many database API's allocate memory internally to store result sets.  However, Oracle, DB2, Sybase, FreeTDS and ODBC allow you to allocate buffers yourself and fetch result sets into these buffers.  When using these databases, SQL Relay preallocates a result set buffer and re-uses it over and over rather than dynamically allocating memory for each result set.  This improves performance at the cost of memory.  There are parameters for tuning the size of the result set buffer though.</p>
 
 <p>The size of the result set buffer is determined by 3 parameters:</p>
 
@@ -427,8 +427,7 @@ finding it may dramatically improve that query's performance.</p>
 </ul>
 <li>The maximum size of an individual non-LOB field.</li>
 <ul>
-<li>Defaults to 4096 for DB2, Sybase and FreeTDS</li>
-<li>Defaults to 32768 (the maximum size of a varchar2) for Oracle</li>
+<li>Defaults to 32768, the maximum size of a varchar and varbinary types</li>
 </ul>
 <li>The number of rows of the result set to fetch at once.</li>
 <ul>
@@ -438,11 +437,11 @@ finding it may dramatically improve that query's performance.</p>
 
 <p>The third parameter might be a little confusing.  Some databases only support single-row fetches; you run a query, then fetch 1 row at a time from the database.  Oracle, DB2 and Sybase support array fetches; you can run a query and then fetch any number of rows from the database in a single round-trip.  This can improve performance significantly.</p>
 
-<p>The default result set buffer size for Oracle is about 80mb (256 fields per row * 32768 bytes per field * 10 rows to fetch at once).  The default result set buffer size for DB2 and Sybase is about 10mb (256*4096*10 bytes).  FreeTDS doesn't support multi-row fetches so its default buffer size is about 1mb (256*4096*1 bytes).</p>
+<p>The default result set buffer size for Oracle, DB2 and Sybase is 80mb (256 fields per row * 32768 bytes per field * 10 rows to fetch at once).  FreeTDS and ODBC don't support multi-row fetches so its default buffer size is about 8mb (256*32768*1 bytes).</p>
 
 <p>It is important to note that each cursor contains a result set buffer and each connection opens a configurable number of cursors.<p>
 
-<p>With oracle, for example, if you open 10 connections with 2 cursors each, then since each cursor will consume 80mb, each connection will consume about 160mb, and all 10 connections will consume about 1.6g.</p>
+<p>For example, if you open 10 connections with 2 cursors each, then since each cursor will consume 80mb, each connection will consume about 160mb, and all 10 connections will consume about 1.6g.</p>
 
 <p>If that seems like more memory than you'd like to allocate to SQL Relay then you can tune it down.</p>
 

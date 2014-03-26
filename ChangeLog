@@ -26,6 +26,8 @@
 	inputBindClob/Blob methods work with all db's now
 	added -Wno-unknown-pragmas flag (if it it supported) to java build for
 		solaris 8
+	updated default item buffer sizes to 32768 for sybase, freetds, db2
+		and odbc
 
 0.54 - fixed bugs that caused problems when unopened result sets were closed
 	added protocol identification phase to client/server protocol
