@@ -22,6 +22,7 @@
 #define MAX_ITEM_BUFFER_SIZE 4096
 #define MAX_SELECT_LIST_SIZE 256
 #define MAX_BIND_VARS 512
+#define MAX_LOB_CHUNK_SIZE 65535
 
 struct fieldstruct {
 	int		sqlrtype;
@@ -873,14 +874,14 @@ bool firebirdcursor::inputBindBlob(const char *variable,
 		return false;
 	}
 
-	// write the value to the blob, 65535 bytes at a time
+	// write the value to the blob, MAX_LOB_CHUNK_SIZE bytes at a time
 	uint16_t	bytesput=0;
 	while (bytesput<valuesize) {
 		uint16_t	bytestoput=0;
-		if (valuesize-bytesput<65535) {
+		if (valuesize-bytesput<MAX_LOB_CHUNK_SIZE) {
 			bytestoput=valuesize-bytesput;
 		} else {
-			bytestoput=65535;
+			bytestoput=MAX_LOB_CHUNK_SIZE;
 		}
 		if (isc_put_segment(firebirdconn->error,
 					&inblobhandle[index],
@@ -1185,7 +1186,7 @@ bool firebirdcursor::getLobOutputBindSegment(uint16_t index,
 		outblobisopen[index]=true;
 	}
 
-	// read a blob segment, at most 65535 bytes at a time
+	// read a blob segment, at most MAX_LOB_CHUNK_SIZE bytes at a time
 	uint64_t	totalbytesread=0;
 	uint64_t	bytestoread=0;
 	uint64_t	remainingbytestoread=charstoread;
@@ -1193,11 +1194,12 @@ bool firebirdcursor::getLobOutputBindSegment(uint16_t index,
 	for (;;) {
 
 		// figure out how many bytes to read this time
-		if (remainingbytestoread<65535) {
+		if (remainingbytestoread<MAX_LOB_CHUNK_SIZE) {
 			bytestoread=remainingbytestoread;
 		} else {
-			bytestoread=65535;
-			remainingbytestoread=remainingbytestoread-65535;
+			bytestoread=MAX_LOB_CHUNK_SIZE;
+			remainingbytestoread=remainingbytestoread-
+						MAX_LOB_CHUNK_SIZE;
 		}
 		// read the bytes
 		uint16_t	bytesread=0;
@@ -1776,7 +1778,7 @@ bool firebirdcursor::getLobFieldSegment(uint32_t col,
 		field[col].blobisopen=true;
 	}
 
-	// read a blob segment, at most 65535 bytes at a time
+	// read a blob segment, at most MAX_LOB_CHUNK_SIZE bytes at a time
 	uint64_t	totalbytesread=0;
 	uint64_t	bytestoread=0;
 	uint64_t	remainingbytestoread=charstoread;
@@ -1784,11 +1786,12 @@ bool firebirdcursor::getLobFieldSegment(uint32_t col,
 	for (;;) {
 
 		// figure out how many bytes to read this time
-		if (remainingbytestoread<65535) {
+		if (remainingbytestoread<MAX_LOB_CHUNK_SIZE) {
 			bytestoread=remainingbytestoread;
 		} else {
-			bytestoread=65535;
-			remainingbytestoread=remainingbytestoread-65535;
+			bytestoread=MAX_LOB_CHUNK_SIZE;
+			remainingbytestoread=remainingbytestoread-
+						MAX_LOB_CHUNK_SIZE;
 		}
 		// read the bytes
 		uint16_t	bytesread=0;

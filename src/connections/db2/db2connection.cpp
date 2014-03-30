@@ -4,7 +4,7 @@
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <rudiments/environment.h>
-#include <rudiments/process.h>
+#include <rudiments/snooze.h>
 
 #include <datatypes.h>
 #include <config.h>
@@ -14,6 +14,7 @@
 #define FETCH_AT_ONCE		10
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	32768	
+#define MAX_LOB_CHUNK_SIZE	2147483647
 
 struct db2column {
 	char		*name;
@@ -161,20 +162,29 @@ class db2cursor : public sqlrcursor_svr {
 					bool *blob,
 					bool *null);
 		void		nextRow();
+		bool		getLobFieldLength(uint32_t col,
+							uint64_t *length);
+		bool		getLobFieldSegment(uint32_t col,
+					char *buffer, uint64_t buffersize,
+					uint64_t offset, uint64_t charstoread,
+					uint64_t *charsread);
 		void		cleanUpData();
 
 		SQLRETURN	erg;
 		SQLHSTMT	stmt;
+		SQLHSTMT	lobstmt;
 		SQLSMALLINT	ncols;
 		SQLINTEGER 	affectedrows;
 
 		int32_t		selectlistsize;
 		char		**field;
+		SQLINTEGER	**loblocator;
+		SQLINTEGER	**loblength;
 		SQLINTEGER	**indicator;
 		#if (DB2VERSION>7)
 		SQLUSMALLINT	*rowstat;
 		#endif
-		db2column	*col;
+		db2column	*column;
 
 		datebind	**outdatebind;
 		char		**outlobbind;
@@ -608,6 +618,7 @@ const char *db2connection::setIsolationLevelQuery() {
 db2cursor::db2cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	db2conn=(db2connection *)conn;
 	stmt=0;
+	lobstmt=0;
 	outdatebind=new datebind *[conn->cont->maxbindcount];
 	outlobbind=new char *[conn->cont->maxbindcount];
 	outlobbindlen=new SQLINTEGER[conn->cont->maxbindcount];
@@ -631,23 +642,29 @@ void db2cursor::allocateResultSetBuffers(int32_t selectlistsize) {
 	if (selectlistsize==-1) {
 		this->selectlistsize=0;
 		field=NULL;
+		loblocator=NULL;
+		loblength=NULL;
 		indicator=NULL;
 		#if (DB2VERSION>7)
 		rowstat=NULL;
 		#endif
-		col=NULL;
+		column=NULL;
 	} else {
 		this->selectlistsize=selectlistsize;
 		field=new char *[selectlistsize];
+		loblocator=new SQLINTEGER *[selectlistsize];
+		loblength=new SQLINTEGER *[selectlistsize];
 		indicator=new SQLINTEGER *[selectlistsize];
 		#if (DB2VERSION>7)
 		rowstat=new SQLUSMALLINT[db2conn->fetchatonce];
 		#endif
-		col=new db2column[selectlistsize];
+		column=new db2column[selectlistsize];
 		for (int32_t i=0; i<selectlistsize; i++) {
-			col[i].name=new char[4096];
+			column[i].name=new char[4096];
 			field[i]=new char[db2conn->fetchatonce*
 						db2conn->maxitembuffersize];
+			loblocator[i]=new SQLINTEGER[db2conn->fetchatonce];
+			loblength[i]=new SQLINTEGER[db2conn->fetchatonce];
 			indicator[i]=new SQLINTEGER[db2conn->fetchatonce];
 		}
 	}
@@ -656,12 +673,16 @@ void db2cursor::allocateResultSetBuffers(int32_t selectlistsize) {
 void db2cursor::deallocateResultSetBuffers() {
 	if (selectlistsize) {
 		for (int32_t i=0; i<selectlistsize; i++) {
-			delete[] col[i].name;
+			delete[] column[i].name;
 			delete[] field[i];
+			delete[] loblocator[i];
+			delete[] loblength[i];
 			delete[] indicator[i];
 		}
-		delete[] col;
+		delete[] column;
 		delete[] field;
+		delete[] loblocator;
+		delete[] loblength;
 		delete[] indicator;
 		#if (DB2VERSION>7)
 		delete[] rowstat;
@@ -674,6 +695,10 @@ bool db2cursor::prepareQuery(const char *query, uint32_t length) {
 
 	if (stmt) {
 		SQLFreeHandle(SQL_HANDLE_STMT,stmt);
+	}
+	if (lobstmt) {
+		SQLFreeHandle(SQL_HANDLE_STMT,lobstmt);
+		lobstmt=0;
 	}
 
 	// allocate the cursor
@@ -1083,8 +1108,8 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 
 			// column name
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_LABEL,
-					col[i].name,4096,
-					(SQLSMALLINT *)&(col[i].namelength),
+					column[i].name,4096,
+					(SQLSMALLINT *)&(column[i].namelength),
 					NULL);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
@@ -1092,35 +1117,35 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 
 			// column length
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_LENGTH,
-					NULL,0,NULL,&(col[i].length));
+					NULL,0,NULL,&(column[i].length));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
 
 			// column type
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_TYPE,
-					NULL,0,NULL,&(col[i].type));
+					NULL,0,NULL,&(column[i].type));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
 
 			// column precision
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_PRECISION,
-					NULL,0,NULL,&(col[i].precision));
+					NULL,0,NULL,&(column[i].precision));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
 
 			// column scale
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_SCALE,
-					NULL,0,NULL,&(col[i].scale));
+					NULL,0,NULL,&(column[i].scale));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
 
 			// column nullable
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_NULLABLE,
-					NULL,0,NULL,&(col[i].nullable));
+					NULL,0,NULL,&(column[i].nullable));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -1133,7 +1158,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 
 			// unsigned number
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_UNSIGNED,
-					NULL,0,NULL,&(col[i].unsignednumber));
+				NULL,0,NULL,&(column[i].unsignednumber));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -1144,17 +1169,27 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 
 			// autoincrement
 			erg=SQLColAttribute(stmt,i+1,
-					SQL_COLUMN_AUTO_INCREMENT,
-					NULL,0,NULL,&(col[i].autoincrement));
+				SQL_COLUMN_AUTO_INCREMENT,
+				NULL,0,NULL,&(column[i].autoincrement));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
 		}
 
-		// bind the column to a buffer
-		erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-				field[i],db2conn->maxitembuffersize,
-				(SQLINTEGER *)indicator[i]);
+		// bind the column to a lob locator or buffer
+		if (column[i].type==SQL_CLOB) {
+			erg=SQLBindCol(stmt,i+1,SQL_C_CLOB_LOCATOR,
+					loblocator[i],0,
+					(SQLINTEGER *)indicator[i]);
+		} else if (column[i].type==SQL_BLOB) {
+			erg=SQLBindCol(stmt,i+1,SQL_C_BLOB_LOCATOR,
+					loblocator[i],0,
+					(SQLINTEGER *)indicator[i]);
+		} else {
+			erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
+					field[i],db2conn->maxitembuffersize,
+					(SQLINTEGER *)indicator[i]);
+		}
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			return false;
 		}
@@ -1214,15 +1249,15 @@ uint32_t db2cursor::colCount() {
 }
 
 const char *db2cursor::getColumnName(uint32_t i) {
-	return col[i].name;
+	return column[i].name;
 }
 
 uint16_t db2cursor::getColumnNameLength(uint32_t i) {
-	return col[i].namelength;
+	return column[i].namelength;
 }
 
 uint16_t db2cursor::getColumnType(uint32_t i) {
-	switch (col[i].type) {
+	switch (column[i].type) {
 		case SQL_BIGINT:
 			return BIGINT_DATATYPE;
 		case SQL_BINARY:
@@ -1284,23 +1319,23 @@ uint16_t db2cursor::getColumnType(uint32_t i) {
 }
 
 uint32_t db2cursor::getColumnLength(uint32_t i) {
-	return col[i].length;
+	return column[i].length;
 }
 
 uint32_t db2cursor::getColumnPrecision(uint32_t i) {
-	return col[i].precision;
+	return column[i].precision;
 }
 
 uint32_t db2cursor::getColumnScale(uint32_t i) {
-	return col[i].scale;
+	return column[i].scale;
 }
 
 uint16_t db2cursor::getColumnIsNullable(uint32_t i) {
-	return col[i].nullable;
+	return column[i].nullable;
 }
 
 uint16_t db2cursor::getColumnIsUnsigned(uint32_t i) {
-	return col[i].unsignednumber;
+	return column[i].unsignednumber;
 }
 
 uint16_t db2cursor::getColumnIsBinary(uint32_t i) {
@@ -1315,7 +1350,7 @@ uint16_t db2cursor::getColumnIsBinary(uint32_t i) {
 }
 
 uint16_t db2cursor::getColumnIsAutoIncrement(uint32_t i) {
-	return col[i].autoincrement;
+	return column[i].autoincrement;
 }
 
 bool db2cursor::noRowsToReturn() {
@@ -1392,6 +1427,12 @@ void db2cursor::getField(uint32_t col,
 		return;
 	}
 
+	// handle blobs
+	if (column[col].type==SQL_CLOB || column[col].type==SQL_BLOB) {
+		*blob=true;
+		return;
+	}
+
 	// handle normal datatypes
 	*fld=&field[col][rowgroupindex*db2conn->maxitembuffersize];
 	*fldlength=indicator[col][rowgroupindex];
@@ -1399,6 +1440,115 @@ void db2cursor::getField(uint32_t col,
 
 void db2cursor::nextRow() {
 	rowgroupindex++;
+}
+
+bool db2cursor::getLobFieldLength(uint32_t col, uint64_t *length) {
+
+	// create a new handle if necessary
+	if (!lobstmt) {
+		erg=SQLAllocHandle(SQL_HANDLE_STMT,db2conn->dbc,&lobstmt);
+		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+			return false;
+		}
+	}
+
+	// get the length of the lob
+	SQLINTEGER	ind;
+	SQLSMALLINT	locatortype=(column[col].type==SQL_CLOB)?
+						SQL_C_CLOB_LOCATOR:
+						SQL_C_BLOB_LOCATOR;
+	erg=SQLGetLength(lobstmt,locatortype,
+				loblocator[col][rowgroupindex],
+				&loblength[col][rowgroupindex],&ind);
+	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		return false;
+	}
+
+	// copy out the length
+	*length=loblength[col][rowgroupindex];
+
+	return true;
+}
+
+bool db2cursor::getLobFieldSegment(uint32_t col,
+					char *buffer, uint64_t buffersize,
+					uint64_t offset, uint64_t charstoread,
+					uint64_t *charsread) {
+
+	// Usually, methods to fetch lob segments return an error, or at least
+	// return that fewer characters were read than attempted, when we try
+	// to read past the end.  SQLGetSubString does not.  It allows you to
+	// read past the end and just returns a bunch of nulls if you do and
+	// doesn't indicate that anything odd has happened.  So we have to
+	// detect attempts to read past the end ourselves.
+
+	// bail if we're attempting to start reading past the end
+	if (offset>(uint64_t)loblength[col][rowgroupindex]) {
+		return false;
+	}
+
+	// create a new handle if necessary
+	if (!lobstmt) {
+		erg=SQLAllocHandle(SQL_HANDLE_STMT,db2conn->dbc,&lobstmt);
+		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+			return false;
+		}
+	}
+
+	// prevent attempts to read past the end
+	if (offset+charstoread>(uint64_t)loblength[col][rowgroupindex]) {
+		charstoread=charstoread-
+			((offset+charstoread)-loblength[col][rowgroupindex]);
+	}
+
+	// read a blob segment, at most MAX_LOB_CHUNK_SIZE bytes at a time
+	uint64_t	totalbytesread=0;
+	SQLUINTEGER	bytestoread=0;
+	uint64_t	remainingbytestoread=charstoread;
+	for (;;) {
+
+		// figure out how many bytes to read this time
+		if (remainingbytestoread<MAX_LOB_CHUNK_SIZE) {
+			bytestoread=remainingbytestoread;
+		} else {
+			bytestoread=MAX_LOB_CHUNK_SIZE;
+			remainingbytestoread=remainingbytestoread-
+						MAX_LOB_CHUNK_SIZE;
+		}
+
+		// read the bytes
+		SQLINTEGER	bytesread=0;
+		SQLINTEGER	ind=0;
+		SQLSMALLINT	locatortype=(column[col].type==SQL_CLOB)?
+							SQL_C_CLOB_LOCATOR:
+							SQL_C_BLOB_LOCATOR;
+		SQLSMALLINT	targettype=(column[col].type==SQL_CLOB)?
+							SQL_C_CHAR:
+							SQL_C_BINARY;
+		erg=SQLGetSubString(lobstmt,locatortype,
+					loblocator[col][rowgroupindex],
+					offset+1,bytestoread,
+					targettype,buffer+totalbytesread,
+					buffersize-totalbytesread,
+					&bytesread,&ind);
+		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+			return false;
+		}
+
+		// update total bytes read
+		totalbytesread=totalbytesread+bytesread;
+
+		// bail if we're done reading
+		if ((SQLUINTEGER)bytesread<bytestoread ||
+				totalbytesread==charstoread) {
+			break;
+		}
+	}
+
+	// return number of bytes/chars read
+	*charsread=totalbytesread;
+
+	return true;
 }
 
 void db2cursor::cleanUpData() {
