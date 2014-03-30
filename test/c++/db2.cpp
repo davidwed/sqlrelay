@@ -193,22 +193,22 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table testtable1");
 	cur->sendQuery("create table testtable1 (testclob clob)");
 	cur->prepareQuery("insert into testtable1 values (?)");
-	char	clobval[3*1024+1];
-	for (int i=0; i<3*1024; i++) {
+	char	clobval[20*1024+1];
+	for (int i=0; i<20*1024; i++) {
 		clobval[i]='C';
 	}
-	clobval[3*1024]='\0';
-	cur->inputBindBlob("1",clobval,3*1024);
+	clobval[20*1024]='\0';
+	cur->inputBindBlob("1",clobval,20*1024);
 	checkSuccess(cur->executeQuery(),1);
 	cur->sendQuery("select testclob from testtable1");
-	checkSuccess(cur->getFieldLength(0,"testclob"),3*1024);
+	checkSuccess(cur->getFieldLength(0,"testclob"),20*1024);
 	checkSuccess(cur->getField(0,"testclob"),clobval);
 	checkSuccess(cur->sendQuery("create procedure testproc(in in1 clob, out out1 clob) language sql begin set out1 = in1; end"),1);
 	cur->prepareQuery("call testproc(?,?)");
-	cur->inputBindBlob("1",clobval,3*1024);
+	cur->inputBindBlob("1",clobval,20*1024);
 	cur->defineOutputBindBlob("2");
 	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getOutputBindLength("2"),3*1024);
+	checkSuccess(cur->getOutputBindLength("2"),20*1024);
 	checkSuccess(cur->getOutputBindBlob("2"),clobval);
 	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
 	printf("\n");

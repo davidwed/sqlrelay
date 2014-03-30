@@ -14,6 +14,8 @@
 #define FETCH_AT_ONCE		10
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	32768	
+#define MAX_OUT_BIND_LOB_SIZE	2097152
+
 #define MAX_LOB_CHUNK_SIZE	2147483647
 
 struct db2column {
@@ -252,6 +254,7 @@ class db2connection : public sqlrconnection_svr {
 		uint32_t	fetchatonce;
 		int32_t		maxselectlistsize;
 		int32_t		maxitembuffersize;
+		int32_t		maxoutbindlobsize;
 
 		char		dbversion[512];
 
@@ -264,6 +267,7 @@ db2connection::db2connection(sqlrcontroller_svr *cont) :
 	fetchatonce=FETCH_AT_ONCE;
 	maxselectlistsize=MAX_SELECT_LIST_SIZE;
 	maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
+	maxoutbindlobsize=MAX_OUT_BIND_LOB_SIZE;
 }
 
 void db2connection::handleConnectString() {
@@ -312,6 +316,11 @@ void db2connection::handleConnectString() {
 				cont->connectStringValue("maxitembuffersize"));
 	if (!maxitembuffersize) {
 		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
+	}
+	maxoutbindlobsize=charstring::toInteger(
+				cont->connectStringValue("maxoutbindlobsize"));
+	if (!maxoutbindlobsize) {
+		maxoutbindlobsize=MAX_OUT_BIND_LOB_SIZE;
 	}
 }
 
@@ -995,8 +1004,10 @@ bool db2cursor::outputBindBlob(const char *variable,
 					uint16_t index,
 					int16_t *isnull) {
 
-	outlobbind[index]=new char[db2conn->maxitembuffersize];
+	outlobbind[index]=new char[db2conn->maxoutbindlobsize];
 
+	// FIXME: Ideally we'd bind a lob locator like we are for columns,
+	// but I can't seem to get that working.
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_OUTPUT,
@@ -1005,7 +1016,7 @@ bool db2cursor::outputBindBlob(const char *variable,
 				0,
 				0,
 				outlobbind[index],
-				db2conn->maxitembuffersize,
+				db2conn->maxoutbindlobsize,
 				&outlobbindlen[index]);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
@@ -1018,8 +1029,13 @@ bool db2cursor::outputBindClob(const char *variable,
 					uint16_t index,
 					int16_t *isnull) {
 
-	outlobbind[index]=new char[db2conn->maxitembuffersize];
+	outlobbind[index]=new char[db2conn->maxoutbindlobsize];
 
+	// FIXME: Ideally we'd bind a lob locator like we are for columns,
+	// but I can't seem to get that working.
+	// Also, I'm using SQL_CHAR instead of SQL_CLOB because it appears
+	// that some versions of DB2 don't have SQL_CLOB, but all have SQL_CHAR,
+	// and SQL_CHAR works.
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_OUTPUT,
@@ -1028,7 +1044,7 @@ bool db2cursor::outputBindClob(const char *variable,
 				0,
 				0,
 				outlobbind[index],
-				db2conn->maxitembuffersize,
+				db2conn->maxoutbindlobsize,
 				&outlobbindlen[index]);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
@@ -1037,6 +1053,9 @@ bool db2cursor::outputBindClob(const char *variable,
 }
 
 bool db2cursor::getLobOutputBindLength(uint16_t index, uint64_t *length) {
+	if (outlobbindlen[index]>db2conn->maxoutbindlobsize) {
+		outlobbindlen[index]=db2conn->maxoutbindlobsize;
+	}
 	*length=outlobbindlen[index];
 	return true;
 }
