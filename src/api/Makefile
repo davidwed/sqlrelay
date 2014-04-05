@@ -15,9 +15,7 @@ ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python all
 endif
 ifneq ($(HAVE_PERL),)
-	$(MAKE) -C perl/Connection -f Makefile all
-	$(MAKE) -C perl/Cursor -f Makefile all
-	$(MAKE) -C perl/DBD -f Makefile all
+	$(MAKE) -C perl -f Makefile all
 endif
 ifneq ($(HAVE_RUBY),)
 	$(MAKE) -C ruby all
@@ -51,9 +49,7 @@ ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python clean
 endif
 ifneq ($(HAVE_PERL),)
-	$(MAKE) -C perl/Connection -f Makefile clean
-	$(MAKE) -C perl/Cursor -f Makefile clean
-	$(MAKE) -C perl/DBD -f Makefile clean
+	$(MAKE) -C perl -f Makefile clean
 endif
 ifneq ($(HAVE_RUBY),)
 	$(MAKE) -C ruby clean
@@ -87,9 +83,7 @@ ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python install
 endif
 ifneq ($(HAVE_PERL),)
-	$(MAKE) -C perl/Connection -f Makefile install
-	$(MAKE) -C perl/Cursor -f Makefile install
-	$(MAKE) -C perl/DBD -f Makefile install
+	$(MAKE) -C perl -f Makefile install
 endif
 ifneq ($(HAVE_RUBY),)
 	$(MAKE) -C ruby install
@@ -123,9 +117,7 @@ ifneq ($(HAVE_PYTHON),)
 	$(MAKE) -C python uninstall
 endif
 ifneq ($(HAVE_PERL),)
-	$(MAKE) -C perl/Connection -f Makefile uninstall
-	$(MAKE) -C perl/Cursor -f Makefile uninstall
-	$(MAKE) -C perl/DBD -f Makefile uninstall
+	$(MAKE) -C perl -f Makefile uninstall
 endif
 ifneq ($(HAVE_RUBY),)
 	$(MAKE) -C ruby uninstall
