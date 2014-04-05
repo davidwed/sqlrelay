@@ -105,3 +105,37 @@ pre {
 	font-weight:	medium;
 	font-size:	10pt;
 }
+
+.tabs ul {
+	list-style:	none;
+	padding:	0px;
+	margin:		0px;
+}
+
+.tabs li {
+	display:	inline;
+	border-width:	1px 1px 0px 1px;
+	border-style:	solid;
+}
+
+.tabs li a {
+	color:			black;
+	text-decoration:	none;
+	padding:		0px 5px;
+}
+
+.tabs .selected {
+	padding-bottom:		1px;
+	background-color:	white;
+}
+
+.tabcontent {
+	display:	none;
+}
+
+.selectedtabcontent {
+	border-width:	1px;
+	border-style:	solid;
+	padding-left:	20px;
+	display:	block;
+}

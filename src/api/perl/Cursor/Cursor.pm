@@ -6,9 +6,7 @@ package SQLRelay::Cursor;
 require DynaLoader;
 @ISA = 'DynaLoader';
 
-$VERSION = '@SQLR_VERSION@';
-
-bootstrap SQLRelay::Cursor $VERSION;
+bootstrap SQLRelay::Cursor;
 
 sub getRowLengths {
 	($this,$row)=@_;
