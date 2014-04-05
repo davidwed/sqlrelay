@@ -806,7 +806,7 @@ then
 fi
 
 
-MAKELIST="config.mk src/api/perl/DBD/SQLRelay.pm bin/sqlr-stop bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist test/test sqlrelay-c++.pc sqlrelay-c.pc"
+MAKELIST="config.mk bin/sqlr-stop bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist test/test sqlrelay-c++.pc sqlrelay-c.pc"
 AC_OUTPUT($MAKELIST)
 chmod 755 bin/sqlr-stop
 chmod 755 bin/sqlrclient-config
