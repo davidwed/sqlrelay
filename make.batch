@@ -17,8 +17,11 @@ cd ..\..\c\msvc
 msbuild.exe /property:Configuration=Release /property:Platform=Win32
 cd ..\..\odbc\msvc
 msbuild.exe /property:Configuration=Release /property:Platform=Win32
-cd ..\..\cs\SQLRClient
+cd ..\..\cs\SQLRClient 
 msbuild.exe /property:Configuration=Release
+cd ..\..\perl\msvc
+msbuild.exe /property:Configuration=Release /property:Platform=Win32 Connection.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=Win32 Cursor.vcxproj
 cd ..\..\..\util\msvc
 msbuild.exe /property:Configuration=Release /property:Platform=Win32
 cd ..\..\cmdline\msvc
@@ -45,6 +48,9 @@ cd ..\..\odbc\msvc
 msbuild.exe /property:Configuration=Release /property:Platform=x64
 cd ..\..\cs\SQLRClient
 msbuild.exe /property:Configuration=Release
+cd ..\..\perl\msvc
+msbuild.exe /property:Configuration=Release /property:Platform=x64 Connection.vcxproj
+msbuild.exe /property:Configuration=Release /property:Platform=x64 Cursor.vcxproj
 cd ..\..\..\util\msvc
 msbuild.exe /property:Configuration=Release /property:Platform=x64
 cd ..\..\cmdline\msvc
@@ -71,6 +77,9 @@ cd ..\..\odbc\msvc
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32
 cd ..\..\cs\SQLRClient
 msbuild.exe /property:Configuration=Release
+cd ..\..\perl\msvc
+msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 Connection.vcxproj
+msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 Cursor.vcxproj
 cd ..\..\..\util\msvc
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32
 cd ..\..\cmdline\msvc
@@ -97,6 +106,9 @@ cd ..\..\odbc\msvc
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64
 cd ..\..\cs\SQLRClient
 msbuild.exe /property:Configuration=Release
+cd ..\..\perl\msvc
+msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64 Connection.vcxproj
+msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64 Cursor.vcxproj
 cd ..\..\..\util\msvc
 msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64
 cd ..\..\cmdline\msvc
@@ -145,6 +157,19 @@ msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=
 cd ..\..\cs\SQLRClient
 msbuild.exe /target:Clean /property:Configuration=Debug
 msbuild.exe /target:Clean /property:Configuration=Release
+cd ..\..\perl\msvc
+msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=Win32 Connection.vcxproj
+msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=Win32 Cursor.vcxproj
+msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=Win32 Connection.vcxproj
+msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=Win32 Cursor.vcxproj
+msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=Win32
+msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=Win32
+msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=x64
+msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=x64
+msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=x64
+msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=x64
+del *.cpp
+del *.3
 cd ..\..\..\util\msvc
 msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=Win32
 msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=Win32
@@ -214,6 +239,10 @@ mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\ipc
 mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\pids
 mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\sockets
 
+mkdir C:\Perl64\site\lib\SQLRelay
+
+mkdir C:\Perl\site\lib\SQLRelay
+
 copy /Y etc\sqlrelay.* C:\"Program Files (x86)"\Firstworks\etc
 copy /Y etc\sqlrelay.* C:\"Program Files"\Firstworks\etc
 
@@ -235,6 +264,13 @@ copy /Y src\api\odbc\msvc\Release\libsqlrodbc.dll C:\"Program Files (x86)"\First
 copy /Y src\api\odbc\msvc\ReleaseCLR\libsqlrodbc.dll C:\"Program Files (x86)"\Firstworks\bin
 
 copy /Y src\api\cs\SQLRCLient\SQLRClient.dll C:\"Program Files (x86)"\Firstworks\bin
+
+copy /Y src\api\perl\msvc\Release\Connection.dll C:\Perl\site\lib\SQLRelay
+copy /Y src\api\perl\msvc\ReleaseCLR\Connection.dll C:\Perl\site\lib\SQLRelay
+copy /Y src\api\perl\msvc\Release\Cursor.dll C:\Perl\site\lib\SQLRelay
+copy /Y src\api\perl\msvc\ReleaseCLR\Cursor.dll C:\Perl\site\lib\SQLRelay
+copy /Y src\api\perl\msvc\SQLRelay.Connection.3 C:\Perl\man\man3
+copy /Y src\api\perl\msvc\SQLRelay.Cursor.3 C:\Perl\man\man3
 
 copy /Y src\util\msvc\Release\libsqlrutil.dll C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\util\msvc\Release\libsqlrutil.lib C:\"Program Files (x86)"\Firstworks\lib
@@ -278,6 +314,13 @@ copy /Y src\api\c\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\inc
 copy /Y src\api\odbc\msvc\x64\Release\libsqlrodbc.dll C:\"Program Files"\Firstworks\bin
 copy /Y src\api\odbc\msvc\x64\ReleaseCLR\libsqlrodbc.dll C:\"Program Files"\Firstworks\bin
 
+copy /Y src\api\perl\msvc\x64\Release\Connection.dll C:\Perl64\site\lib\SQLRelay
+copy /Y src\api\perl\msvc\x64\ReleaseCLR\Connection.dll C:\Perl64\site\lib\SQLRelay
+copy /Y src\api\perl\msvc\x64\Release\Cursor.dll C:\Perl64\site\lib\SQLRelay
+copy /Y src\api\perl\msvc\x64\ReleaseCLR\Cursor.dll C:\Perl64\site\lib\SQLRelay
+copy /Y src\api\perl\msvc\SQLRelay.Connection.3 C:\Perl\man\man3
+copy /Y src\api\perl\msvc\SQLRelay.Cursor.3 C:\Perl\man\man3
+
 copy /Y src\util\msvc\x64\Release\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
 copy /Y src\util\msvc\x64\Release\libsqlrutil.lib C:\"Program Files"\Firstworks\lib
 copy /Y src\util\msvc\x64\ReleaseCLR\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
@@ -316,12 +359,16 @@ del "C:\Program Files\Firstworks\lib\libsqlr*.lib"
 del "C:\Program Files\Firstworks\bin\libsqlr*.dll"
 del "C:\Program Files\Firstworks\bin\SQLR*.dll"
 del "C:\Program Files\Firstworks\bin\sqlr*.exe"
+del "C:\Perl64\site\lib\SQLRelay\*.dll"
+rmdir /s /q "C:\Perl64\site\lib\SQLRelay"
 rmdir /s /q "C:\Program Files (x86)\Firstworks\include\sqlrelay"
 rmdir /s /q "C:\Program Files (x86)\Firstworks\libexec\sqlrelay"
 del "C:\Program Files (x86)\Firstworks\lib\libsqlr*.lib"
 del "C:\Program Files (x86)\Firstworks\bin\libsqlr*.dll"
 del "C:\Program Files (x86)\Firstworks\bin\SQLR*.dll"
 del "C:\Program Files (x86)\Firstworks\bin\sqlr*.exe"
+del "C:\Perl\site\lib\SQLRelay\*.dll"
+rmdir /s /q "C:\Perl\site\lib\SQLRelay"
 goto end
 
 

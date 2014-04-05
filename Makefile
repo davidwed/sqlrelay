@@ -72,21 +72,31 @@ distclean: clean
 		src/api/c++/msvc/Release \
 		src/api/c++/msvc/DebugCLR \
 		src/api/c++/msvc/ReleaseCLR \
+		src/api/c++/msvc/x64 \
 		src/api/c/msvc/Debug \
 		src/api/c/msvc/Release \
 		src/api/c/msvc/DebugCLR \
 		src/api/c/msvc/ReleaseCLR \
+		src/api/c/msvc/x64 \
 		src/api/cs/SQLRClient/bin \
 		src/api/cs/SQLRClient/obj \
 		src/api/odbc/msvc/Debug \
 		src/api/odbc/msvc/Release \
 		src/api/odbc/msvc/DebugCLR \
 		src/api/odbc/msvc/ReleaseCLR \
+		src/api/odbc/msvc/x64 \
+		src/api/perl/msvc/Debug \
+		src/api/perl/msvc/Release \
+		src/api/perl/msvc/DebugCLR \
+		src/api/perl/msvc/ReleaseCLR \
+		src/api/perl/msvc/x64 \
 		src/cmdline/msvc/Debug \
 		src/cmdline/msvc/Release \
 		src/cmdline/msvc/DebugCLR \
 		src/cmdline/msvc/ReleaseCLR \
+		src/cmdline/msvc/x64 \
 		src/util/msvc/Debug \
 		src/util/msvc/Release \
 		src/util/msvc/DebugCLR \
-		src/util/msvc/ReleaseCLR
+		src/util/msvc/ReleaseCLR \
+		src/util/msvc/x64
