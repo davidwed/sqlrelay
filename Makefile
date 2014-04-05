@@ -43,8 +43,6 @@ distclean: clean
 		config.log \
 		config.status \
 		config.mk \
-		src/api/perl/Connection/Connection.pm \
-		src/api/perl/Cursor/Cursor.pm \
 		src/api/perl/DBD/Makefile.PL \
 		src/api/perl/DBD/SQLRelay.pm \
 		bin/sqlr-stop \
