@@ -18,6 +18,9 @@ extern "C" {
 #ifdef CLASS
 	#undef CLASS
 #endif
+#ifdef THIS
+	#undef THIS
+#endif
 
 #ifndef na
 	#define na PL_na

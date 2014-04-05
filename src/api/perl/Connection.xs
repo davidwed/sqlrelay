@@ -18,6 +18,9 @@ extern "C" {
 #ifdef CLASS
 	#undef CLASS
 #endif
+#ifdef THIS
+	#undef THIS
+#endif
 
 /* xsubpp outputs __attribute__((noreturn)) this isn't
  * understood by gcc < 3.0. */
