@@ -110,3 +110,6 @@ uninstall:
 	$(RM) $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
 	$(RM) `cat $(PERLSITEARCH)/auto/DBD/SQLRelay/.packlist`
 	$(RM) $(PERLSITEARCH)/auto/DBD/SQLRelay/.packlist
+	$(RMTREE) $(PERLSITEARCH)/auto/SQLRelay
+	$(RMTREE) $(PERLSITEARCH)/auto/DBD/SQLRelay
+	$(RMTREE) $(PERLSITEARCH)/SQLRelay
