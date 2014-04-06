@@ -159,8 +159,7 @@
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;perl516.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>pod2man ..\Cursor.pm &gt; SQLRelay.Cursor.3
-xsubpp -noprototypes -C++ -typemap C:\Perl\lib\ExtUtils\typemap -typemap perlobject.map -typemap typemap ..\Cursor.xs &gt; Cursor.cpp</Command>
+      <Command>pod2man ..\Cursor.pm &gt; SQLRelay.Cursor.3 &amp;&amp; xsubpp -noprototypes -C++ -typemap C:\Perl\lib\ExtUtils\typemap -typemap perlobject.map -typemap typemap ..\Cursor.xs &gt; Cursor.cpp</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -183,8 +182,7 @@ xsubpp -noprototypes -C++ -typemap C:\Perl\lib\ExtUtils\typemap -typemap perlobj
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;perl516.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>pod2man ..\Cursor.pm &gt; SQLRelay.Cursor.3
-xsubpp -noprototypes -C++ -typemap C:\Perl64\lib\ExtUtils\typemap -typemap perlobject.map -typemap typemap ..\Cursor.xs &gt; Cursor.cpp</Command>
+      <Command>pod2man ..\Cursor.pm &gt; SQLRelay.Cursor.3 &amp;&amp; xsubpp -noprototypes -C++ -typemap C:\Perl64\lib\ExtUtils\typemap -typemap perlobject.map -typemap typemap ..\Cursor.xs &gt; Cursor.cpp</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -208,8 +206,7 @@ xsubpp -noprototypes -C++ -typemap C:\Perl64\lib\ExtUtils\typemap -typemap perlo
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;perl516.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>pod2man ..\Cursor.pm &gt; SQLRelay.Cursor.3
-xsubpp -noprototypes -C++ -typemap C:\Perl\lib\ExtUtils\typemap -typemap perlobject.map -typemap typemap ..\Cursor.xs &gt; Cursor.cpp</Command>
+      <Command>pod2man ..\Cursor.pm &gt; SQLRelay.Cursor.3 &amp;&amp; xsubpp -noprototypes -C++ -typemap C:\Perl\lib\ExtUtils\typemap -typemap perlobject.map -typemap typemap ..\Cursor.xs &gt; Cursor.cpp</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -232,8 +229,7 @@ xsubpp -noprototypes -C++ -typemap C:\Perl\lib\ExtUtils\typemap -typemap perlobj
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;perl516.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>pod2man ..\Cursor.pm &gt; SQLRelay.Cursor.3
-xsubpp -noprototypes -C++ -typemap C:\Perl64\lib\ExtUtils\typemap -typemap perlobject.map -typemap typemap ..\Cursor.xs &gt; Cursor.cpp</Command>
+      <Command>pod2man ..\Cursor.pm &gt; SQLRelay.Cursor.3 &amp;&amp; xsubpp -noprototypes -C++ -typemap C:\Perl64\lib\ExtUtils\typemap -typemap perlobject.map -typemap typemap ..\Cursor.xs &gt; Cursor.cpp</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -258,8 +254,7 @@ xsubpp -noprototypes -C++ -typemap C:\Perl64\lib\ExtUtils\typemap -typemap perlo
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;perl516.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>pod2man ..\Cursor.pm &gt; SQLRelay.Cursor.3
-xsubpp -noprototypes -C++ -typemap C:\Perl\lib\ExtUtils\typemap -typemap perlobject.map -typemap typemap ..\Cursor.xs &gt; Cursor.cpp</Command>
+      <Command>pod2man ..\Cursor.pm &gt; SQLRelay.Cursor.3 &amp;&amp; xsubpp -noprototypes -C++ -typemap C:\Perl\lib\ExtUtils\typemap -typemap perlobject.map -typemap typemap ..\Cursor.xs &gt; Cursor.cpp</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -283,8 +278,7 @@ xsubpp -noprototypes -C++ -typemap C:\Perl\lib\ExtUtils\typemap -typemap perlobj
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;perl516.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>pod2man ..\Cursor.pm &gt; SQLRelay.Cursor.3
-xsubpp -noprototypes -C++ -typemap C:\Perl64\lib\ExtUtils\typemap -typemap perlobject.map -typemap typemap ..\Cursor.xs &gt; Cursor.cpp</Command>
+      <Command>pod2man ..\Cursor.pm &gt; SQLRelay.Cursor.3 &amp;&amp; xsubpp -noprototypes -C++ -typemap C:\Perl64\lib\ExtUtils\typemap -typemap perlobject.map -typemap typemap ..\Cursor.xs &gt; Cursor.cpp</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -309,8 +303,7 @@ xsubpp -noprototypes -C++ -typemap C:\Perl64\lib\ExtUtils\typemap -typemap perlo
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;perl516.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>pod2man ..\Cursor.pm &gt; SQLRelay.Cursor.3
-xsubpp -noprototypes -C++ -typemap C:\Perl\lib\ExtUtils\typemap -typemap perlobject.map -typemap typemap ..\Cursor.xs &gt; Cursor.cpp</Command>
+      <Command>pod2man ..\Cursor.pm &gt; SQLRelay.Cursor.3 &amp;&amp; xsubpp -noprototypes -C++ -typemap C:\Perl\lib\ExtUtils\typemap -typemap perlobject.map -typemap typemap ..\Cursor.xs &gt; Cursor.cpp</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -334,8 +327,7 @@ xsubpp -noprototypes -C++ -typemap C:\Perl\lib\ExtUtils\typemap -typemap perlobj
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;perl516.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>pod2man ..\Cursor.pm &gt; SQLRelay.Cursor.3
-xsubpp -noprototypes -C++ -typemap C:\Perl64\lib\ExtUtils\typemap -typemap perlobject.map -typemap typemap ..\Cursor.xs &gt; Cursor.cpp</Command>
+      <Command>pod2man ..\Cursor.pm &gt; SQLRelay.Cursor.3 &amp;&amp; xsubpp -noprototypes -C++ -typemap C:\Perl64\lib\ExtUtils\typemap -typemap perlobject.map -typemap typemap ..\Cursor.xs &gt; Cursor.cpp</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>

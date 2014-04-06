@@ -1963,8 +1963,10 @@ static PyMethodDef SQLRMethods[] = {
   {NULL,      NULL}        /* Sentinel */
 };
 
-void
-initCSQLRelay()
+#ifdef _WIN32
+__declspec(dllexport)
+#endif
+void initCSQLRelay()
 {
   (void) Py_InitModule("SQLRelay.CSQLRelay", SQLRMethods);
 
