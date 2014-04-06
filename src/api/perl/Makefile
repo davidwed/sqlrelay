@@ -63,8 +63,11 @@ install:
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/SQLRelay
 	$(INSTALL) -m 644 Connection.pm $(PERLSITEARCH)/SQLRelay
 	$(INSTALL) -m 644 Cursor.pm $(PERLSITEARCH)/SQLRelay
+	$(MKINSTALLDIRS) $(PERLSITELIB)/DBD
+	$(INSTALL) -m 644 SQLRelay.pm $(PERLSITELIB)/DBD
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/SQLRelay/Connection
 	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/SQLRelay/Cursor
+	$(MKINSTALLDIRS) $(PERLSITEARCH)/auto/DBD/SQLRelay
 	$(LTINSTALL) -m 755 Connection.la $(PERLSITEARCH)/auto/SQLRelay/Connection
 	$(LTINSTALL) -m 755 Cursor.la $(PERLSITEARCH)/auto/SQLRelay/Cursor
 	$(RM) $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.a
@@ -75,23 +78,30 @@ install:
 	$(MODULERENAME) $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.so so $(MODULESUFFIX)
 	touch $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs
 	touch $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs
+	echo $(PERLSITEARCH)/SQLRelay/Connection.pm > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
+	echo $(PERLSITEARCH)/SQLRelay/Cursor.pm > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
+	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.$(MODULESUFFIX) >> $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
+	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.$(MODULESUFFIX) >> $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
+	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs >> $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
+	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs >> $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
+	echo $(PERLSITELIB)/DBD/SQLRelay.pm >> $(PERLSITEARCH)/auto/DBD/SQLRelay/.packlist
 ifneq ($(POD2MAN),)
 ifneq ($(PERLINSTALLMAN3DIR),)
 	$(POD2MAN) Connection.pm > SQLRelay::Connection.$(PERLMAN3EXT)
 	$(POD2MAN) Cursor.pm > SQLRelay::Cursor.$(PERLMAN3EXT)
+	$(POD2MAN) SQLRelay.pm > DBD::SQLRelay.$(PERLMAN3EXT)
 	$(MKINSTALLDIRS) $(PERLINSTALLMAN3DIR)
 	$(INSTALL) -m 644 SQLRelay::Connection.$(PERLMAN3EXT) $(PERLINSTALLMAN3DIR)
 	$(INSTALL) -m 644 SQLRelay::Cursor.$(PERLMAN3EXT) $(PERLINSTALLMAN3DIR)
+	$(INSTALL) -m 644 DBD::SQLRelay.$(PERLMAN3EXT) $(PERLINSTALLMAN3DIR)
 	$(RM) SQLRelay::Connection.$(PERLMAN3EXT)
 	$(RM) SQLRelay::Cursor.$(PERLMAN3EXT)
-	echo $(PERLINSTALLMAN3DIR)/SQLRelay::Connection.$(PERLMAN3EXT) > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
-	echo $(PERLINSTALLMAN3DIR)/SQLRelay::Cursor.$(PERLMAN3EXT) > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
+	$(RM) DBD::SQLRelay.$(PERLMAN3EXT)
+	echo $(PERLINSTALLMAN3DIR)/SQLRelay::Connection.$(PERLMAN3EXT) >> $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
+	echo $(PERLINSTALLMAN3DIR)/SQLRelay::Cursor.$(PERLMAN3EXT) >> $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
+	echo $(PERLINSTALLMAN3DIR)/DBD::SQLRelay.$(PERLMAN3EXT) >> $(PERLSITEARCH)/auto/DBD/SQLRelay/.packlist
 endif
 endif
-	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.$(MODULESUFFIX) > $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
-	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.$(MODULESUFFIX) > $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
-	echo $(PERLSITEARCH)/auto/SQLRelay/Connection/Connection.bs >> $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist
-	echo $(PERLSITEARCH)/auto/SQLRelay/Cursor/Cursor.bs >> $(PERLSITEARCH)/auto/SQLRelay/Cursor/.packlist
 
 uninstall:
 	$(RM) `cat $(PERLSITEARCH)/auto/SQLRelay/Connection/.packlist`
