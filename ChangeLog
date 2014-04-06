@@ -1,5 +1,6 @@
-0.56 - removed VERSION from perl api bootstraps
+0.56 - removed VERSION from perl api bootstrap
 	reorganized and simplified perl api code
+	got perl api working on windows with ActivePerl
 
 0.55 - fixed a sql translation bug related to exists clauses
 	added deployment projects for windows
