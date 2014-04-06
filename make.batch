@@ -322,8 +322,8 @@ copy /Y src\api\perl\msvc\x64\Release\Connection.dll C:\Perl64\site\lib
 copy /Y src\api\perl\msvc\x64\ReleaseCLR\Connection.dll C:\Perl64\site\lib
 copy /Y src\api\perl\msvc\x64\Release\Cursor.dll C:\Perl64\site\lib
 copy /Y src\api\perl\msvc\x64\ReleaseCLR\Cursor.dll C:\Perl64\site\lib
-copy /Y src\api\perl\msvc\SQLRelay.Connection.3 C:\Perl\man\man3
-copy /Y src\api\perl\msvc\SQLRelay.Cursor.3 C:\Perl\man\man3
+copy /Y src\api\perl\msvc\SQLRelay.Connection.3 C:\Perl64\man\man3
+copy /Y src\api\perl\msvc\SQLRelay.Cursor.3 C:\Perl64\man\man3
 
 copy /Y src\util\msvc\x64\Release\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
 copy /Y src\util\msvc\x64\Release\libsqlrutil.lib C:\"Program Files"\Firstworks\lib
@@ -365,7 +365,8 @@ del "C:\Program Files\Firstworks\bin\SQLR*.dll"
 del "C:\Program Files\Firstworks\bin\sqlr*.exe"
 del "C:\Perl64\site\lib\Connection.dll"
 del "C:\Perl64\site\lib\Cursor.dll"
-del "C:\Perl\site\lib\SQLRelay\*.pm"
+del "C:\Perl64\site\lib\SQLRelay\*.pm"
+del "C:\Perl64\man\man3\SQLRelay*"
 rmdir /s /q "C:\Perl64\site\lib\SQLRelay"
 rmdir /s /q "C:\Program Files (x86)\Firstworks\include\sqlrelay"
 rmdir /s /q "C:\Program Files (x86)\Firstworks\libexec\sqlrelay"
@@ -376,6 +377,7 @@ del "C:\Program Files (x86)\Firstworks\bin\sqlr*.exe"
 del "C:\Perl\site\lib\Connection.dll"
 del "C:\Perl\site\lib\Cursor.dll"
 del "C:\Perl\site\lib\SQLRelay\*.pm"
+del "C:\Perl\man\man3\SQLRelay*"
 rmdir /s /q "C:\Perl\site\lib\SQLRelay"
 goto end
 
