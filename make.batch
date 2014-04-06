@@ -11,201 +11,121 @@ goto end
 
 
 :all
-cd src\api\c++\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=Win32
-cd ..\..\c\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=Win32
-cd ..\..\odbc\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=Win32
-cd ..\..\cs\SQLRClient 
-msbuild.exe /property:Configuration=Release
-cd ..\..\perl\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=Win32 Connection.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=Win32 Cursor.vcxproj
-cd ..\..\..\util\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=Win32
-cd ..\..\cmdline\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=Win32
-cd ..\..\server\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=Win32 libsqlrserver.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-listener.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-connection.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-scaler.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-start.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=Win32 sqlr-cachemanager.vcxproj
-cd ..\..\connections\oracle8\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=Win32
-cd ..\..\..\..
-goto end
+set release=Release
+set platform=Win32
+set csrelease=Release
+set csplatform=Any CPU
+goto build
 
 
 :all64
-cd src\api\c++\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=x64
-cd ..\..\c\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=x64
-cd ..\..\odbc\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=x64
-cd ..\..\cs\SQLRClient
-msbuild.exe /property:Configuration=Release
-cd ..\..\perl\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=x64 Connection.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=x64 Cursor.vcxproj
-cd ..\..\..\util\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=x64
-cd ..\..\cmdline\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=x64
-cd ..\..\server\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=x64 libsqlrserver.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-listener.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-connection.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-scaler.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-start.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-cachemanager.vcxproj
-cd ..\..\connections\oracle8\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=x64
-cd ..\..\..\..
-goto end
+set release=Release
+set platform=x64
+set csrelease=Release
+set csplatform=Any CPU
+goto build
 
 
 :clr
-cd src\api\c++\msvc
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32
-cd ..\..\c\msvc
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32
-cd ..\..\odbc\msvc
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32
-cd ..\..\cs\SQLRClient
-msbuild.exe /property:Configuration=Release
-cd ..\..\perl\msvc
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 Connection.vcxproj
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 Cursor.vcxproj
-cd ..\..\..\util\msvc
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32
-cd ..\..\cmdline\msvc
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32
-cd ..\..\server\msvc
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 libsqlrserver.vcxproj
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-listener.vcxproj
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-connection.vcxproj
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-scaler.vcxproj
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-start.vcxproj
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlr-cachemanager.vcxproj
-cd ..\..\connections\oracle8\msvc
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=Win32
-cd ..\..\..\..
-goto end
+set release=ReleaseCLR
+set platform=Win32
+set csrelease=Release
+set csplatform=Any CPU
+goto build
 
 
 :clr64
+set release=ReleaseCLR
+set platform=x64
+set csrelease=Release
+set csplatform=Any CPU
+goto build
+
+
+:clean
+set release=Debug
+set platform=Win32
+call :cleanone
+set release=DebugCLR
+set platform=Win32
+call :cleanone
+set release=Release
+set platform=Win32
+call :cleanone
+set release=ReleaseCLR
+set platform=Win32
+call :cleanone
+set release=Debug
+set platform=x64
+call :cleanone
+set release=DebugCLR
+set platform=x64
+call :cleanone
+set release=Release
+set platform=x64
+call :cleanone
+set release=ReleaseCLR
+set platform=x64
+call :cleanone
+goto end
+
+
+:build
 cd src\api\c++\msvc
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform%
 cd ..\..\c\msvc
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform%
 cd ..\..\odbc\msvc
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64
-cd ..\..\cs\SQLRClient
-msbuild.exe /property:Configuration=Release
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform%
+cd ..\..\cs\SQLRClient 
+msbuild.exe /property:Configuration=%csrelease% /property:Platform="%csplatform%"
 cd ..\..\perl\msvc
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64 Connection.vcxproj
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64 Cursor.vcxproj
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% Connection.vcxproj
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% Cursor.vcxproj
+cd ..\..\python\msvc
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% CSQLRelay.vcxproj
 cd ..\..\..\util\msvc
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform%
 cd ..\..\cmdline\msvc
-msbuild.exe /property:Configuration=ReleaseCLR /property:Platform=x64
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform%
 cd ..\..\server\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=x64 libsqlrserver.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-listener.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-connection.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-scaler.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-start.vcxproj
-msbuild.exe /property:Configuration=Release /property:Platform=x64 sqlr-cachemanager.vcxproj
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% libsqlrserver.vcxproj
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-listener.vcxproj
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-connection.vcxproj
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-scaler.vcxproj
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-start.vcxproj
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-cachemanager.vcxproj
 cd ..\..\connections\oracle8\msvc
-msbuild.exe /property:Configuration=Release /property:Platform=x64
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform%
 cd ..\..\..\..
 goto end
 
 
-:clean
+:cleanone
 cd src\api\c++\msvc
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=x64
+msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform%
 cd ..\..\c\msvc
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=x64
+msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform%
 cd ..\..\odbc\msvc
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=x64
+msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform%
 cd ..\..\cs\SQLRClient
-msbuild.exe /target:Clean /property:Configuration=Debug
-msbuild.exe /target:Clean /property:Configuration=Release
+msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform="Any CPU"
+msbuild.exe /target:Clean /property:Configuration=Release /property:Platform="Any CPU"
 cd ..\..\perl\msvc
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=Win32 Connection.vcxproj
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=Win32 Cursor.vcxproj
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=Win32 Connection.vcxproj
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=Win32 Cursor.vcxproj
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=x64
+msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% Connection.vcxproj
+msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% Cursor.vcxproj
 del *.cpp
 del *.3
+cd ..\..\python\msvc
+msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% CSQLRelay.vcxproj
 cd ..\..\..\util\msvc
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=x64
+msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform%
 cd ..\..\cmdline\msvc
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=x64
+msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform%
 cd ..\..\server\msvc
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=Win32 sqlrserver.sln
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=Win32 sqlrserver.sln
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=Win32 sqlrserver.sln
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=Win32 sqlrserver.sln
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=x64 sqlrserver.sln
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=x64 sqlrserver.sln
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=x64 sqlrserver.sln
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=x64 sqlrserver.sln
+msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% sqlrserver.sln
 cd ..\..\connections\oracle8\msvc
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=Win32
-msbuild.exe /target:Clean /property:Configuration=Debug /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=Release /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=DebugCLR /property:Platform=x64
-msbuild.exe /target:Clean /property:Configuration=ReleaseCLR /property:Platform=x64
+msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform%
 cd ..\..\..\..
 goto end
 
@@ -224,6 +144,8 @@ mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp
 mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp\ipc
 mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp\pids
 mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp\sockets
+mkdir C:\Perl64\site\lib\SQLRelay
+mkdir C:\Python27\Lib\SQLRelay
 
 mkdir C:\"Program Files (x86)"\Firstworks
 mkdir C:\"Program Files (x86)"\Firstworks\lib
@@ -238,9 +160,6 @@ mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp
 mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\ipc
 mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\pids
 mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\sockets
-
-mkdir C:\Perl64\site\lib\SQLRelay
-
 mkdir C:\Perl\site\lib\SQLRelay
 
 copy /Y etc\sqlrelay.* C:\"Program Files (x86)"\Firstworks\etc
@@ -273,6 +192,12 @@ copy /Y src\api\perl\msvc\Release\Cursor.dll C:\Perl\site\lib
 copy /Y src\api\perl\msvc\ReleaseCLR\Cursor.dll C:\Perl\site\lib
 copy /Y src\api\perl\msvc\SQLRelay.Connection.3 C:\Perl\man\man3
 copy /Y src\api\perl\msvc\SQLRelay.Cursor.3 C:\Perl\man\man3
+
+copy /Y src\api\python\__init__.py C:\Python27\lib\SQLRelay
+copy /Y src\api\python\PySQLRClient.py C:\Python27\lib\SQLRelay
+copy /Y src\api\python\PySQLRDB.py C:\Python27\lib\SQLRelay
+copy /Y src\api\python\msvc\Release\CSQLRelay.dll C:\Python27\DLLs
+copy /Y src\api\python\msvc\ReleaseCLR\CSQLRelay.dll C:\Python27\DLLs
 
 copy /Y src\util\msvc\Release\libsqlrutil.dll C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\util\msvc\Release\libsqlrutil.lib C:\"Program Files (x86)"\Firstworks\lib
