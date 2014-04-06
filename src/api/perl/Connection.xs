@@ -22,6 +22,13 @@ extern "C" {
 	#undef THIS
 #endif
 
+#ifdef WIN32
+	#undef XS_EXTERNAL
+	#undef XS_INTERNAL
+	#define XS_EXTERNAL(name) __declspec(dllexport) XSPROTO(name)
+	#define XS_INTERNAL(name) STATIC XSPROTO(name)
+#endif
+
 /* xsubpp outputs __attribute__((noreturn)) this isn't
  * understood by gcc < 3.0. */
 #ifdef __GNUC__

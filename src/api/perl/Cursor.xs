@@ -22,6 +22,13 @@ extern "C" {
 	#undef THIS
 #endif
 
+#ifdef WIN32
+	#undef XS_EXTERNAL
+	#undef XS_INTERNAL
+	#define XS_EXTERNAL(name) __declspec(dllexport) XSPROTO(name)
+	#define XS_INTERNAL(name) STATIC XSPROTO(name)
+#endif
+
 #ifndef na
 	#define na PL_na
 #endif
@@ -36,6 +43,13 @@ extern "C" {
 	#if __GNUC__ < 3
 		#define __attribute__(x)
 	#endif
+#endif
+
+#ifdef WIN32
+	#undef XS_EXTERNAL
+	#undef XS_INTERNAL
+	#define XS_EXTERNAL(name) __declspec(dllexport) XSPROTO(name)
+	#define XS_INTERNAL(name) STATIC XSPROTO(name)
 #endif
 
 typedef class sqlrcursor sqlrcursor;
