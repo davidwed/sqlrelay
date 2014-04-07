@@ -159,7 +159,7 @@
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;jvm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\com\firstworks\sqlrelay &amp;&amp; javac *.java</Command>
+      <Command>cd .. &amp;&amp; javac com\firstworks\sqlrelay\*.java</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -182,7 +182,7 @@
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;jvm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\com\firstworks\sqlrelay &amp;&amp; javac *.java</Command>
+      <Command>cd .. &amp;&amp; javac com\firstworks\sqlrelay\*.java</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -206,7 +206,7 @@
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;jvm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\com\firstworks\sqlrelay &amp;&amp; javac *.java</Command>
+      <Command>cd .. &amp;&amp; javac com\firstworks\sqlrelay\*.java</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -229,7 +229,7 @@
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;jvm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\com\firstworks\sqlrelay &amp;&amp; javac *.java</Command>
+      <Command>cd .. &amp;&amp; javac com\firstworks\sqlrelay\*.java</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -254,7 +254,7 @@
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;jvm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\com\firstworks\sqlrelay &amp;&amp; javac *.java</Command>
+      <Command>cd .. &amp;&amp; javac com\firstworks\sqlrelay\*.java</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -278,7 +278,7 @@
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;jvm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\com\firstworks\sqlrelay &amp;&amp; javac *.java</Command>
+      <Command>cd .. &amp;&amp; javac com\firstworks\sqlrelay\*.java</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -303,7 +303,7 @@
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;jvm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\com\firstworks\sqlrelay &amp;&amp; javac *.java</Command>
+      <Command>cd .. &amp;&amp; javac com\firstworks\sqlrelay\*.java</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -327,7 +327,7 @@
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;jvm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\com\firstworks\sqlrelay &amp;&amp; javac *.java</Command>
+      <Command>cd .. &amp;&amp; javac com\firstworks\sqlrelay\*.java</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>

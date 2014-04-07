@@ -163,7 +163,7 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>jar cf sqlrelay.jar ..\com\firstworks\sqlrelay\SQLRConnection.class ..\com\firstworks\sqlrelay\SQLRCursor.class</Command>
+      <Command>cd .. &amp;&amp; jar cf msvc\sqlrelay.jar com\firstworks\sqlrelay\SQLRConnection.class com\firstworks\sqlrelay\SQLRCursor.class</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -186,7 +186,7 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>jar cf sqlrelay.jar ..\com\firstworks\sqlrelay\SQLRConnection.class ..\com\firstworks\sqlrelay\SQLRCursor.class</Command>
+      <Command>cd .. &amp;&amp; jar cf msvc\sqlrelay.jar com\firstworks\sqlrelay\SQLRConnection.class com\firstworks\sqlrelay\SQLRCursor.class</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|Win32'">
@@ -210,7 +210,7 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>jar cf sqlrelay.jar ..\com\firstworks\sqlrelay\SQLRConnection.class ..\com\firstworks\sqlrelay\SQLRCursor.class</Command>
+      <Command>cd .. &amp;&amp; jar cf msvc\sqlrelay.jar com\firstworks\sqlrelay\SQLRConnection.class com\firstworks\sqlrelay\SQLRCursor.class</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|x64'">
@@ -233,7 +233,7 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>jar cf sqlrelay.jar ..\com\firstworks\sqlrelay\SQLRConnection.class ..\com\firstworks\sqlrelay\SQLRCursor.class</Command>
+      <Command>cd .. &amp;&amp; jar cf msvc\sqlrelay.jar com\firstworks\sqlrelay\SQLRConnection.class com\firstworks\sqlrelay\SQLRCursor.class</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -258,7 +258,7 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>jar cf sqlrelay.jar ..\com\firstworks\sqlrelay\SQLRConnection.class ..\com\firstworks\sqlrelay\SQLRCursor.class</Command>
+      <Command>cd .. &amp;&amp; jar cf msvc\sqlrelay.jar com\firstworks\sqlrelay\SQLRConnection.class com\firstworks\sqlrelay\SQLRCursor.class</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -282,7 +282,7 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>jar cf sqlrelay.jar ..\com\firstworks\sqlrelay\SQLRConnection.class ..\com\firstworks\sqlrelay\SQLRCursor.class</Command>
+      <Command>cd .. &amp;&amp; jar cf msvc\sqlrelay.jar com\firstworks\sqlrelay\SQLRConnection.class com\firstworks\sqlrelay\SQLRCursor.class</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|Win32'">
@@ -307,7 +307,7 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>jar cf sqlrelay.jar ..\com\firstworks\sqlrelay\SQLRConnection.class ..\com\firstworks\sqlrelay\SQLRCursor.class</Command>
+      <Command>cd .. &amp;&amp; jar cf msvc\sqlrelay.jar com\firstworks\sqlrelay\SQLRConnection.class com\firstworks\sqlrelay\SQLRCursor.class</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|x64'">
@@ -331,7 +331,7 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>jar cf sqlrelay.jar ..\com\firstworks\sqlrelay\SQLRConnection.class ..\com\firstworks\sqlrelay\SQLRCursor.class</Command>
+      <Command>cd .. &amp;&amp; jar cf msvc\sqlrelay.jar com\firstworks\sqlrelay\SQLRConnection.class com\firstworks\sqlrelay\SQLRCursor.class</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
