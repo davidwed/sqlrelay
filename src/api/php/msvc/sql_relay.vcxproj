@@ -145,7 +145,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\Python27\include;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\PHP\include;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -155,8 +155,8 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>..\..\c++\msvc\Debug;C:\Program Files (x86)\Firstworks\lib;C:\Python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\c++\msvc\Debug;C:\Program Files (x86)\Firstworks\lib;C:\PHP\dev;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;php5ts.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -170,7 +170,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\Python27\include;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\PHP\include;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -179,8 +179,8 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>..\..\c++\msvc\x64\Debug;C:\Program Files\Firstworks\lib;C:\Python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\c++\msvc\x64\Debug;C:\Program Files\Firstworks\lib;C:\PHP\dev;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;php5ts.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -194,7 +194,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\Python27\include;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\PHP\include;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -204,8 +204,8 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>..\..\c++\msvc\DebugCLR;C:\Program Files (x86)\Firstworks\lib;C:\Python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\c++\msvc\DebugCLR;C:\Program Files (x86)\Firstworks\lib;C:\PHP\dev;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;php5ts.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -219,7 +219,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|x64'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\Python27\include;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\PHP\include;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -228,8 +228,8 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>..\..\c++\msvc\x64\DebugCLR;C:\Program Files\Firstworks\lib;C:\Python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\c++\msvc\x64\DebugCLR;C:\Program Files\Firstworks\lib;C:\PHP\dev;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;php5ts.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -243,7 +243,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\Python27\include;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\PHP\include;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -254,8 +254,8 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\c++\msvc\Release;C:\Program Files (x86)\Firstworks\lib;C:\Python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\c++\msvc\Release;C:\Program Files (x86)\Firstworks\lib;C:\PHP\dev;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;php5ts.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -269,7 +269,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\Python27\include;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\PHP\include;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -279,8 +279,8 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\c++\msvc\x64\Release;C:\Program Files\Firstworks\lib;C:\Python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\c++\msvc\x64\Release;C:\Program Files\Firstworks\lib;C:\PHP\dev;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;php5ts.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -294,7 +294,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\Python27\include;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\PHP\include;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -305,8 +305,8 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\c++\msvc\ReleaseCLR;C:\Program Files (x86)\Firstworks\lib;C:\Python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\c++\msvc\ReleaseCLR;C:\Program Files (x86)\Firstworks\lib;C:\PHP\dev;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;php5ts.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -320,7 +320,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|x64'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\Python27\include;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\PHP\include;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -330,8 +330,8 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\c++\msvc\x64\ReleaseCLR;C:\Program Files\Firstworks\lib;C:\Python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\c++\msvc\x64\ReleaseCLR;C:\Program Files\Firstworks\lib;C:\PHP\dev;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;php5ts.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
