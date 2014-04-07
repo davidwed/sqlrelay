@@ -84,6 +84,9 @@ msbuild.exe /property:Configuration=%release% /property:Platform=%platform% Conn
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% Cursor.vcxproj
 cd ..\..\python\msvc
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% CSQLRelay.vcxproj
+cd ..\..\java\msvc
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% SQLRConnection.vcxproj
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% SQLRCursor.vcxproj
 cd ..\..\..\util\msvc
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform%
 cd ..\..\cmdline\msvc
@@ -118,6 +121,11 @@ del *.cpp
 del *.3
 cd ..\..\python\msvc
 msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% CSQLRelay.vcxproj
+cd ..\..\java\msvc
+msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% SQLRConnection.vcxproj
+msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% SQLRCursor.vcxproj
+del ..\com\firstworks\sqlrelay\*.class
+del *.jar
 cd ..\..\..\util\msvc
 msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform%
 cd ..\..\cmdline\msvc
@@ -146,6 +154,10 @@ mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp\pids
 mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp\sockets
 mkdir C:\Perl64\site\lib\SQLRelay
 mkdir C:\Python27\Lib\site-packages\SQLRelay
+mkdir C:\"Program Files"\Firstworks\java
+mkdir C:\"Program Files"\Firstworks\java\com
+mkdir C:\"Program Files"\Firstworks\java\com\firstworks
+mkdir C:\"Program Files"\Firstworks\java\com\firstworks\sqlrelay
 
 mkdir C:\"Program Files (x86)"\Firstworks
 mkdir C:\"Program Files (x86)"\Firstworks\lib
@@ -161,6 +173,11 @@ mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\ipc
 mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\pids
 mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\sockets
 mkdir C:\Perl\site\lib\SQLRelay
+mkdir C:\Python27\Lib\site-packages\SQLRelay
+mkdir C:\"Program Files (x86)"\Firstworks\java
+mkdir C:\"Program Files (x86)"\Firstworks\java\com
+mkdir C:\"Program Files (x86)"\Firstworks\java\com\firstworks
+mkdir C:\"Program Files (x86)"\Firstworks\java\com\firstworks\sqlrelay
 
 copy /Y etc\sqlrelay.* C:\"Program Files (x86)"\Firstworks\etc
 copy /Y etc\sqlrelay.* C:\"Program Files"\Firstworks\etc
@@ -198,8 +215,12 @@ copy /Y src\api\python\PySQLRClient.py C:\Python27\Lib\site-packages\SQLRelay
 copy /Y src\api\python\PySQLRDB.py C:\Python27\Lib\site-packages\SQLRelay
 copy /Y src\api\python\msvc\Release\CSQLRelay.dll C:\Python27\Lib\site-packages\SQLRelay\CSQLRelay.pyd
 copy /Y src\api\python\msvc\ReleaseCLR\CSQLRelay.dll C:\Python27\Lib\site-packages\SQLRelay\CSQLRelay.pyd
-copy /Y src\api\python\msvc\x64\Release\CSQLRelay.dll C:\Python27\Lib\site-packages\SQLRelay\CSQLRelay.pyd
-copy /Y src\api\python\msvc\x64\ReleaseCLR\CSQLRelay.dll C:\Python27\Lib\site-packages\SQLRelay\CSQLRelay.pyd
+
+copy /Y src\api\java\msvc\sqlrelay.jar C:\"Program Files (x86)"\Firstworks\java
+copy /Y src\api\java\msvc\Release\SQLRConnection.dll C:\"Program Files (x86)"\Firstworks\java\com\firstworks\sqlrelay
+copy /Y src\api\java\msvc\ReleaseCLR\SQLRConnection.dll C:\"Program Files (x86)"\Firstworks\java\com\firstworks\sqlrelay
+copy /Y src\api\java\msvc\Release\SQLRCursor.dll C:\"Program Files (x86)"\Firstworks\java\com\firstworks\sqlrelay
+copy /Y src\api\java\msvc\ReleaseCLR\SQLRCursor.dll C:\"Program Files (x86)"\Firstworks\java\com\firstworks\sqlrelay
 
 copy /Y src\util\msvc\Release\libsqlrutil.dll C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\util\msvc\Release\libsqlrutil.lib C:\"Program Files (x86)"\Firstworks\lib
@@ -252,6 +273,18 @@ copy /Y src\api\perl\msvc\x64\ReleaseCLR\Cursor.dll C:\Perl64\site\lib
 copy /Y src\api\perl\msvc\SQLRelay.Connection.3 C:\Perl64\man\man3
 copy /Y src\api\perl\msvc\SQLRelay.Cursor.3 C:\Perl64\man\man3
 
+copy /Y src\api\python\__init__.py C:\Python27\Lib\site-packages\SQLRelay
+copy /Y src\api\python\PySQLRClient.py C:\Python27\Lib\site-packages\SQLRelay
+copy /Y src\api\python\PySQLRDB.py C:\Python27\Lib\site-packages\SQLRelay
+copy /Y src\api\python\msvc\x64\Release\CSQLRelay.dll C:\Python27\Lib\site-packages\SQLRelay\CSQLRelay.pyd
+copy /Y src\api\python\msvc\x64\ReleaseCLR\CSQLRelay.dll C:\Python27\Lib\site-packages\SQLRelay\CSQLRelay.pyd
+
+copy /Y src\api\java\msvc\sqlrelay.jar C:\"Program Files"\Firstworks\java
+copy /Y src\api\java\msvc\x64\Release\SQLRConnection.dll C:\"Program Files"\Firstworks\java\com\firstworks\sqlrelay
+copy /Y src\api\java\msvc\x64\ReleaseCLR\SQLRConnection.dll C:\"Program Files"\Firstworks\java\com\firstworks\sqlrelay
+copy /Y src\api\java\msvc\x64\Release\SQLRCursor.dll C:\"Program Files"\Firstworks\java\com\firstworks\sqlrelay
+copy /Y src\api\java\msvc\x64\ReleaseCLR\SQLRCursor.dll C:\"Program Files"\Firstworks\java\com\firstworks\sqlrelay
+
 copy /Y src\util\msvc\x64\Release\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
 copy /Y src\util\msvc\x64\Release\libsqlrutil.lib C:\"Program Files"\Firstworks\lib
 copy /Y src\util\msvc\x64\ReleaseCLR\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
@@ -296,6 +329,9 @@ del "C:\Perl64\site\lib\SQLRelay\*.pm"
 del "C:\Perl64\man\man3\SQLRelay*"
 rmdir /s /q "C:\Perl64\site\lib\SQLRelay"
 rmdir /s /q "C:\Python27\Lib\site-packages\SQLRelay"
+del "C:\Program Files\Firstworks\java\sqlrelay.jar"
+rmdir /s /q "C:\Program Files\Firstworks\java\com\firstworks\sqlrelay"
+
 rmdir /s /q "C:\Program Files (x86)\Firstworks\include\sqlrelay"
 rmdir /s /q "C:\Program Files (x86)\Firstworks\libexec\sqlrelay"
 del "C:\Program Files (x86)\Firstworks\lib\libsqlr*.lib"
@@ -308,6 +344,8 @@ del "C:\Perl\site\lib\SQLRelay\*.pm"
 del "C:\Perl\man\man3\SQLRelay*"
 rmdir /s /q "C:\Perl\site\lib\SQLRelay"
 rmdir /s /q "C:\Python27\Lib\site-packages\SQLRelay"
+del "C:\Program Files (x86)\Firstworks\java\sqlrelay.jar"
+rmdir /s /q "C:\Program Files (x86)\Firstworks\java\com\firstworks\sqlrelay"
 goto end
 
 

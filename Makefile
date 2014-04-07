@@ -95,6 +95,11 @@ distclean: clean
 		src/api/python/msvc/DebugCLR \
 		src/api/python/msvc/ReleaseCLR \
 		src/api/python/msvc/x64 \
+		src/api/java/msvc/Debug \
+		src/api/java/msvc/Release \
+		src/api/java/msvc/DebugCLR \
+		src/api/java/msvc/ReleaseCLR \
+		src/api/java/msvc/x64 \
 		src/cmdline/msvc/Debug \
 		src/cmdline/msvc/Release \
 		src/cmdline/msvc/DebugCLR \

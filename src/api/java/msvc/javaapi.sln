@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SQLRConnection", "SQLRConnection.vcxproj", "{2512E62B-BC17-88F0-D756-80048EA1ECEE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SQLRCursor", "SQLRCursor.vcxproj", "{F27237DB-764C-01AE-636D-D232A6D9141A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		DebugCLR|Win32 = DebugCLR|Win32
+		DebugCLR|x64 = DebugCLR|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+		ReleaseCLR|Win32 = ReleaseCLR|Win32
+		ReleaseCLR|x64 = ReleaseCLR|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2512E62B-BC17-88F0-D756-80048EA1ECEE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2512E62B-BC17-88F0-D756-80048EA1ECEE}.Debug|Win32.Build.0 = Debug|Win32
+		{2512E62B-BC17-88F0-D756-80048EA1ECEE}.Debug|x64.ActiveCfg = Debug|x64
+		{2512E62B-BC17-88F0-D756-80048EA1ECEE}.Debug|x64.Build.0 = Debug|x64
+		{2512E62B-BC17-88F0-D756-80048EA1ECEE}.DebugCLR|Win32.ActiveCfg = DebugCLR|Win32
+		{2512E62B-BC17-88F0-D756-80048EA1ECEE}.DebugCLR|Win32.Build.0 = DebugCLR|Win32
+		{2512E62B-BC17-88F0-D756-80048EA1ECEE}.DebugCLR|x64.ActiveCfg = DebugCLR|x64
+		{2512E62B-BC17-88F0-D756-80048EA1ECEE}.DebugCLR|x64.Build.0 = DebugCLR|x64
+		{2512E62B-BC17-88F0-D756-80048EA1ECEE}.Release|Win32.ActiveCfg = Release|Win32
+		{2512E62B-BC17-88F0-D756-80048EA1ECEE}.Release|Win32.Build.0 = Release|Win32
+		{2512E62B-BC17-88F0-D756-80048EA1ECEE}.Release|x64.ActiveCfg = Release|x64
+		{2512E62B-BC17-88F0-D756-80048EA1ECEE}.Release|x64.Build.0 = Release|x64
+		{2512E62B-BC17-88F0-D756-80048EA1ECEE}.ReleaseCLR|Win32.ActiveCfg = ReleaseCLR|Win32
+		{2512E62B-BC17-88F0-D756-80048EA1ECEE}.ReleaseCLR|Win32.Build.0 = ReleaseCLR|Win32
+		{2512E62B-BC17-88F0-D756-80048EA1ECEE}.ReleaseCLR|x64.ActiveCfg = ReleaseCLR|x64
+		{2512E62B-BC17-88F0-D756-80048EA1ECEE}.ReleaseCLR|x64.Build.0 = ReleaseCLR|x64
+		{F27237DB-764C-01AE-636D-D232A6D9141A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F27237DB-764C-01AE-636D-D232A6D9141A}.Debug|Win32.Build.0 = Debug|Win32
+		{F27237DB-764C-01AE-636D-D232A6D9141A}.Debug|x64.ActiveCfg = Debug|x64
+		{F27237DB-764C-01AE-636D-D232A6D9141A}.Debug|x64.Build.0 = Debug|x64
+		{F27237DB-764C-01AE-636D-D232A6D9141A}.DebugCLR|Win32.ActiveCfg = DebugCLR|Win32
+		{F27237DB-764C-01AE-636D-D232A6D9141A}.DebugCLR|Win32.Build.0 = DebugCLR|Win32
+		{F27237DB-764C-01AE-636D-D232A6D9141A}.DebugCLR|x64.ActiveCfg = DebugCLR|x64
+		{F27237DB-764C-01AE-636D-D232A6D9141A}.DebugCLR|x64.Build.0 = DebugCLR|x64
+		{F27237DB-764C-01AE-636D-D232A6D9141A}.Release|Win32.ActiveCfg = Release|Win32
+		{F27237DB-764C-01AE-636D-D232A6D9141A}.Release|Win32.Build.0 = Release|Win32
+		{F27237DB-764C-01AE-636D-D232A6D9141A}.Release|x64.ActiveCfg = Release|x64
+		{F27237DB-764C-01AE-636D-D232A6D9141A}.Release|x64.Build.0 = Release|x64
+		{F27237DB-764C-01AE-636D-D232A6D9141A}.ReleaseCLR|Win32.ActiveCfg = ReleaseCLR|Win32
+		{F27237DB-764C-01AE-636D-D232A6D9141A}.ReleaseCLR|Win32.Build.0 = ReleaseCLR|Win32
+		{F27237DB-764C-01AE-636D-D232A6D9141A}.ReleaseCLR|x64.ActiveCfg = ReleaseCLR|x64
+		{F27237DB-764C-01AE-636D-D232A6D9141A}.ReleaseCLR|x64.Build.0 = ReleaseCLR|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
