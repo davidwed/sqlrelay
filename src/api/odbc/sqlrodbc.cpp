@@ -15,7 +15,7 @@
 
 // windows needs this
 // (don't include for __CYGWIN__ though)
-#if defined(_WIN32)
+#ifdef _WIN32
 	#include <windows.h>
 #endif
 
@@ -5561,5 +5561,36 @@ SQLRETURN SQL_API SQLBindParameter(SQLHSTMT statementhandle,
 					bufferlength,
 					strlen_or_ind);
 }
+
+#ifdef _WIN32
+
+BOOL INSTAPI ConfigDSN(HWND hwndparent, WORD frequest,
+		LPCSTR lpszdriver, LPCSTR lpszattributes) {
+
+	// parse lpszattributes
+
+	// if hwndparent isn't NULL, display a dialog box displaying values
+	// supplied in lpszattributes and prompting the user for data not
+	// supplied
+
+	switch (frequest) {
+		case ODBC_ADD_DSN:
+			// validate DSN with SQLValidDSN
+			// call SQLWriteDSNToIni
+			break;
+		case ODBC_CONFIG_DSN:
+			// validate DSN with SQLValidDSN
+			// then
+			// call SQLRemoveDSNFromIni and SQLWriteDSNToIni
+			break;
+		case ODBC_REMOVE_DSN:
+			// call SQLRemoveDSNFromIni	
+			break;
+	}
+
+	return FALSE;
+}
+
+#endif
 
 }
