@@ -28,6 +28,7 @@ endif
 ifneq ($(strip $(ORACLELIBS)),)
 	$(MAKE) oracle
 	$(MAKE) oracle8
+	$(MAKE) oracle7
 	$(MAKE) extensions
 endif
 ifneq ($(strip $(POSTGRESQLLIBS)),)
@@ -61,6 +62,9 @@ oracle: oracle.cpp oracle.lo
 oracle8: oracle8.cpp oracle8.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle8.lo $(LIBS)
 
+oracle7: oracle7.cpp oracle7.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle7.lo $(LIBS)
+
 extensions: extensions.cpp extensions.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ extensions.lo $(LIBS)
 
@@ -83,6 +87,6 @@ router: router.cpp router.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ router.lo $(LIBS)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.lo *.o db2 extensions freetds firebird mysql oracleclobfetch oracleclobinsert oracle oracle8 postgresql sqlite sybase router
+	$(LIBTOOL) --mode=clean $(RM) *.lo *.o db2 extensions freetds firebird mysql oracleclobfetch oracleclobinsert oracle oracle8 oracle7 postgresql sqlite sybase router
 	$(RM) cachefile* sqlnet.log
 	$(RMTREE) .libs
