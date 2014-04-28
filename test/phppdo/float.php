@@ -56,6 +56,7 @@ dl("pdo_sqlrelay.so");
 	$result=$stmt->fetch(PDO::FETCH_ASSOC);
 	checkSuccess($result["testfloat"],"6.28");
 	checkSuccess($result["testdouble"],"6.28");
+	var_dump($result);
 	echo("\n");
 
 	echo("FIELDS BY NAME AND INDEX: \n");
