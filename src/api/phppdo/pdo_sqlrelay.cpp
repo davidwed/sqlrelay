@@ -5,6 +5,7 @@
 #define NEED_IS_BIT_TYPE_CHAR
 #define NEED_IS_BOOL_TYPE_CHAR
 #define NEED_IS_NUMBER_TYPE_CHAR
+#define NEED_IS_FLOAT_TYPE_CHAR
 #define NEED_IS_BLOB_TYPE_CHAR
 #include <datatypes.h>
 #include <sqlrelay/sqlrclient.h>
@@ -209,7 +210,11 @@ static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
 	stmt->columns[colno].namelen=charstring::length(name);
 	stmt->columns[colno].maxlen=sqlrcur->getColumnLength(colno);
 	if (isBitTypeChar(type) || isNumberTypeChar(type)) {
-		stmt->columns[colno].param_type=PDO_PARAM_INT;
+		if (isFloatTypeChar(type)) {
+			stmt->columns[colno].param_type=PDO_PARAM_STR;
+		} else {
+			stmt->columns[colno].param_type=PDO_PARAM_INT;
+		}
 	} else if (isBlobTypeChar(type)) {
 		stmt->columns[colno].param_type=PDO_PARAM_LOB;
 	} else if (isBoolTypeChar(type)) {
@@ -549,7 +554,11 @@ static int sqlrcursorColumnMetadata(pdo_stmt_t *stmt,
 	// pdo type
 	int32_t		pdotype=PDO_PARAM_STR;
 	if (isBitTypeChar(type) || isNumberTypeChar(type)) {
-		pdotype=PDO_PARAM_INT;
+		if (isFloatTypeChar(type)) {
+			pdotype=PDO_PARAM_STR;
+		} else {
+			pdotype=PDO_PARAM_INT;
+		}
 	} else if (isBlobTypeChar(type)) {
 		pdotype=PDO_PARAM_LOB;
 	} else if (isBoolTypeChar(type)) {

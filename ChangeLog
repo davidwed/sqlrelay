@@ -5,6 +5,7 @@
 	got python api working on windows with ActivePython
 	consolidated php include tweaks
 	got java api working on windows
+	updated pdo driver to convert float fields to strings rather than ints
 
 0.55 - fixed a sql translation bug related to exists clauses
 	added deployment projects for windows
