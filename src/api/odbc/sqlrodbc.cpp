@@ -1074,7 +1074,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 					"SQL_DESC/COLUMN_COUNT\n");
 			*(SQLSMALLINT *)numericattribute=colcount;
 			debugPrintf("count: %lld\n",
-					(int64_t)*numericattribute);
+				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		case SQL_DESC_TYPE:
 		//case SQL_DESC_CONCISE_TYPE:
@@ -1086,7 +1086,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			*(SQLSMALLINT *)numericattribute=
 					SQLR_MapColumnType(stmt->cur,col);
 			debugPrintf("type: %lld\n",
-					(int64_t)*numericattribute);
+				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		case SQL_DESC_LENGTH:
 		case SQL_DESC_OCTET_LENGTH:
@@ -1097,7 +1097,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			*(SQLINTEGER *)numericattribute=
 					stmt->cur->getColumnLength(col);
 			debugPrintf("length: %lld\n",
-					(int64_t)*numericattribute);
+				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		case SQL_DESC_PRECISION:
 		case SQL_COLUMN_PRECISION:
@@ -1106,7 +1106,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			*(SQLSMALLINT *)numericattribute=
 					stmt->cur->getColumnPrecision(col);
 			debugPrintf("precision: %lld\n",
-					(int64_t)*numericattribute);
+				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		case SQL_DESC_SCALE:
 		case SQL_COLUMN_SCALE:
@@ -1115,7 +1115,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			*(SQLSMALLINT *)numericattribute=
 					stmt->cur->getColumnScale(col);
 			debugPrintf("scale: %lld\n",
-					(int64_t)*numericattribute);
+				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		case SQL_DESC_NULLABLE:
 		case SQL_COLUMN_NULLABLE:
@@ -1124,7 +1124,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			*(SQLSMALLINT *)numericattribute=
 					stmt->cur->getColumnIsNullable(col);
 			debugPrintf("nullable: %lld\n",
-					(int64_t)*numericattribute);
+				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		case SQL_DESC_NAME:
 		case SQL_COLUMN_NAME:
@@ -1153,7 +1153,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 				*(SQLSMALLINT *)numericattribute=SQL_UNNAMED;
 			} 
 			debugPrintf("unnamed: %lld\n",
-					(int64_t)*numericattribute);
+				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		//case SQL_DESC_AUTO_UNIQUE_VALUE:
 		case SQL_COLUMN_AUTO_INCREMENT:
@@ -1163,7 +1163,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			*(SQLINTEGER *)numericattribute=stmt->cur->
 					getColumnIsAutoIncrement(col);
 			debugPrintf("auto-increment: %lld\n",
-					(int64_t)*numericattribute);
+				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		case SQL_DESC_BASE_COLUMN_NAME:
 			debugPrintf("fieldidentifier: "
@@ -1199,7 +1199,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			// not supported, return true
 			*(SQLSMALLINT *)numericattribute=SQL_TRUE;
 			debugPrintf("case sensitive: %lld\n",
-					(int64_t)*numericattribute);
+				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		//case SQL_DESC_CATALOG_NAME:
 		case SQL_COLUMN_QUALIFIER_NAME:
@@ -1222,7 +1222,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 					"SQL_DESC/COLUMN_DISPLAY_SIZE\n");
 			*(SQLLEN *)numericattribute=stmt->cur->getLongest(col);
 			debugPrintf("display size: %lld\n",
-					(int64_t)*numericattribute);
+				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		//case SQL_DESC_FIXED_PREC_SCALE
 		case SQL_COLUMN_MONEY:
@@ -1346,7 +1346,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			// 10 for exact numeric types, 0 otherwise
 			*(SQLINTEGER *)numericattribute=0;
 			debugPrintf("num prec radix: %lld\n",
-					(int64_t)*numericattribute);
+				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		//case SQL_DESC_SCHEMA_NAME
 		case SQL_COLUMN_OWNER_NAME:
@@ -1410,7 +1410,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			*(SQLSMALLINT *)numericattribute=
 					stmt->cur->getColumnIsUnsigned(col);
 			debugPrintf("unsigned: %lld\n",
-					(int64_t)*numericattribute);
+				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		//case SQL_DESC_UPDATABLE
 		case SQL_COLUMN_UPDATABLE:
@@ -1428,7 +1428,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			// not supported, return 0
 			*(SQLINTEGER *)numericattribute=0;
 			debugPrintf("driver start: %lld\n",
-					(int64_t)*numericattribute);
+				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		#endif
 		default:
