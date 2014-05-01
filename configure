@@ -16375,7 +16375,7 @@ then
 
 else
 
-		for i in "pthread" "c_r" "thread" "pthreads" "gthreads" ""
+		for i in "pthread" "thread" "pthreads" "gthreads" ""
 	do
 		if ( test -n "$i" )
 		then
@@ -16727,15 +16727,6 @@ fi
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
-			if ( test -n "$i" )
-			then
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether lib$i works" >&5
-$as_echo_n "checking whether lib$i works... " >&6; }
-			else
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether no library works" >&5
-$as_echo_n "checking whether no library works... " >&6; }
-			fi
-
 																					for try in 1 2 3 4 5 6
 			do
 
@@ -16753,40 +16744,47 @@ $as_echo_n "checking whether no library works... " >&6; }
 					TESTLIB="$PTHREADLIB"
 				elif ( test "$try" = "4" )
 				then
-					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDESS"
+					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
 					TESTLIB="$PTHREADLIB -pthread"
 				elif ( test "$try" = "5" )
 				then
-					TESTINCLUDES="$PTHREADINCLUDESS"
+					TESTINCLUDES="$PTHREADINCLUDES"
 					TESTLIB="-pthread"
 				elif ( test "$try" = "6" )
 				then
-					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDESS"
+					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
 					TESTLIB="-pthread"
 				fi
 
 				HAVE_PTHREAD=""
+								{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $TESTINCLUDES ... $TESTLIB works" >&5
+$as_echo_n "checking whether $TESTINCLUDES ... $TESTLIB works... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$PTHREAD_COMPILE $CPPFLAGS $PTHREADINCLUDES"
-LIBS="$PTHREADLIB"
+CPPFLAGS="$CPPFLAGS $TESTINCLUDES"
+LIBS="$TESTLIB"
 LD_LIBRARY_PATH=""
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
+#include <stddef.h>
 #include <pthread.h>
 int
 main ()
 {
-pthread_create(NULL,NULL,NULL,NULL);
+pthread_exit(NULL);
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
-  HAVE_PTHREAD="yes"
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }; HAVE_PTHREAD="yes"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
@@ -16795,38 +16793,6 @@ LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
-				if ( test -z "$HAVE_PTHREAD" )
-				then
-
-SAVECPPFLAGS="$CPPFLAGS"
-SAVELIBS="$LIBS"
-SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$PTHREAD_COMPILE $CPPFLAGS"
-LIBS="-pthread"
-LD_LIBRARY_PATH=""
-export LD_LIBRARY_PATH
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <pthread.h>
-int
-main ()
-{
-pthread_create(NULL,pthread_attr_default,NULL,NULL);
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  HAVE_PTHREAD="yes"
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-CPPFLAGS="$SAVECPPFLAGS"
-LIBS="$SAVELIBS"
-LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-
-				fi
 
 												if ( test -n "$HAVE_PTHREAD" )
 				then
@@ -16841,12 +16807,7 @@ export LD_LIBRARY_PATH
 
 			if ( test -n "$HAVE_PTHREAD" )
 			then
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
 				break
-			else
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
 			fi
 
 		else
