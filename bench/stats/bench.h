@@ -7,28 +7,49 @@
 
 class benchconnection {
 	public:
-			benchconnection();
+			benchconnection(const char *connectstring,
+					const char *dbtype);
 		virtual	~benchconnection();
 
-		virtual void	setConnectString(
-					parameterstring *connectstring)=0;
-
-		virtual void	setColumnCount(uint32_t columncount);
 		virtual void	setRowCount(uint64_t rowcount);
+		virtual void	setColumnCount(uint32_t columncount);
 
-		virtual	void	buildQueries()=0;
+		virtual	void	buildQueries();
 
 		virtual	bool	connect()=0;
 		virtual	bool	disconnect()=0;
 
-	protected:
-		uint32_t	columncount;
+		const char	*getParam(const char *param);
+
+		const char	*getDbType();
+
+		const char	*getCreateQuery();
+		const char	*getDropQuery();
+		const char	*getInsertQuery();
+		const char	*getUpdateQuery();
+		const char	*getDeleteQuery();
+		const char	*getSelectQuery();
+
+	private:
+		void	buildOracleQueries();
+
+		parameterstring	pstring;
+		const char	*dbtype;
+
 		uint64_t	rowcount;
+		uint32_t	columncount;
+
+		char	*createquery;
+		char	*dropquery;
+		char	*insertquery;
+		char	*updatequery;
+		char	*deletequery;
+		char	*selectquery;
 };
 
 class benchcursor {
 	public:
-			benchcursor(benchconnection *conn);
+			benchcursor(benchconnection *bcon);
 		virtual	~benchcursor();
 
 		virtual	bool	createTable()=0;
@@ -38,6 +59,9 @@ class benchcursor {
 		virtual	bool	updateQuery()=0;
 		virtual	bool	deleteQuery()=0;
 		virtual	bool	selectQuery()=0;
+
+	protected:
+		benchconnection	*bcon;
 };
 
 #endif
