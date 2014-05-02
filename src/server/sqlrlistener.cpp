@@ -1648,6 +1648,13 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 	}
 	connectionsock->setFileDescriptor(fd);
 
+	// On most systems, the file descriptor is in whatever mode
+	// it was in the other process, but on FreeBSD < 5.0 and
+	// possibly other systems, it ends up in non-blocking mode
+	// in this process, independent of its mode in the other
+	// process.  So, we force it to blocking mode here.
+	connectionsock->useBlockingMode();
+
 	logDebugMessage("received socket of newly spawned connection");
 	return true;
 }

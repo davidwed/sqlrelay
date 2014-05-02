@@ -1439,6 +1439,13 @@ int32_t sqlrcontroller_svr::waitForClient() {
 		#endif
 		clientsock->setFileDescriptor(descriptor);
 
+		// On most systems, the file descriptor is in whatever mode
+		// it was in the other process, but on FreeBSD < 5.0 and
+		// possibly other systems, it ends up in non-blocking mode
+		// in this process, independent of its mode in the other
+		// process.  So, we force it to blocking mode here.
+		clientsock->useBlockingMode();
+
 		logDebugMessage("done waiting for client");
 
 	} else {
