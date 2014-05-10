@@ -44,15 +44,6 @@ const char * const *oracle8sqlwriter::unsupportedElements() {
 	return unsupportedelements;
 }
 
-bool oracle8sqlwriter::temporary(xmldomnode *node, stringbuffer *output) {
-	debugFunction();
-	if (node->getPreviousTagSibling("global")->isNullNode()) {
-		output->append("global ");
-	}
-	output->append("temporary");
-	return true;
-}
-
 bool oracle8sqlwriter::uniqueKey(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("unique");

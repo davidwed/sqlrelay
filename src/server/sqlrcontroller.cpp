@@ -6,9 +6,7 @@
 #include <sqlrcontroller.h>
 #include <sqlrclientprotocol.h>
 #include <rudiments/file.h>
-#ifdef WIN32
-#include <rudiments/inetsocketclient.h>
-#endif
+#include <rudiments/socketclient.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/passwdentry.h>
 #include <rudiments/groupentry.h>
@@ -1432,11 +1430,7 @@ int32_t sqlrcontroller_svr::waitForClient() {
 		}
 
 		// set up the client socket
-		#ifdef _WIN32
-		clientsock=new inetsocketclient();
-		#else
-		clientsock=new filedescriptor;
-		#endif
+		clientsock=new socketclient;
 		clientsock->setFileDescriptor(descriptor);
 
 		// On most systems, the file descriptor is in whatever mode
