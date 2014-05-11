@@ -3,7 +3,6 @@
 
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
-#include <freetdssqlwriter.h>
 #include <rudiments/environment.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/charstring.h>
@@ -269,8 +268,6 @@ class freetdsconnection : public sqlrconnection_svr {
 					uint32_t *errorlength,
 					int64_t	*errorcode,
 					bool *liveconnection);
-
-		sqlwriter	*getSqlWriter();
 
 		CS_CONTEXT	*context;
 		CS_LOCALE	*locale;
@@ -2178,10 +2175,6 @@ void freetdsconnection::errorMessage(char *errorbuffer,
 				this->errorstring.getString(),*errorlength);
 	*liveconnection=this->liveconnection;
 	*errorcode=this->errorcode;
-}
-
-sqlwriter *freetdsconnection::getSqlWriter() {
-	return new freetdssqlwriter;
 }
 
 extern "C" {
