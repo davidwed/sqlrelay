@@ -343,6 +343,7 @@ installheaders:
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlwriter.h $(includedir)/sqlrelay
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
 	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverdll.h $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrshmdata.h $(includedir)/sqlrelay/private
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrserver.la
@@ -368,6 +369,7 @@ uninstall:
 	$(RM) $(includedir)/sqlrelay/sqlrtriggers.h
 	$(RM) $(includedir)/sqlrelay/sqlwriter.h
 	$(RM) $(includedir)/sqlrelay/private/sqlrserverdll.h
+	$(RM) $(includedir)/sqlrelay/private/sqlrshmdata.h
 	$(RM) $(bindir)/sqlr-start$(EXE)
 	$(RM) $(bindir)/sqlr-listener$(EXE)
 	$(RM) $(bindir)/sqlr-connection$(EXE)
