@@ -11,6 +11,8 @@ PLUGINSRCS = sqlrconnectiondeclarations.cpp \
 		sqlrloggerassignments.cpp \
 		sqlrpwdencdeclarations.cpp \
 		sqlrpwdencassignments.cpp \
+		sqlrauthdeclarations.cpp \
+		sqlrauthassignments.cpp \
 		sqlrquerydeclarations.cpp \
 		sqlrqueryassignments.cpp \
 		sqltranslationdeclarations.cpp \
@@ -20,6 +22,7 @@ PLUGINSRCS = sqlrconnectiondeclarations.cpp \
 PLUGINLOBJS = $(shell ls ../connections/*/*.lo) \
 		$(shell ls ../loggers/*.lo) \
 		$(shell ls ../pwdencs/*.lo) \
+		$(shell ls ../auths/*.lo) \
 		$(shell ls ../queries/*.lo) \
 		$(shell ls ../translations/*.lo) \
 		$(shell ls ../triggers/*.lo)
@@ -115,6 +118,8 @@ SRCS = sqlrlistener.cpp \
 	sqlrquery.cpp \
 	sqlrpwdencs.cpp \
 	sqlrpwdenc.cpp \
+	sqlrauths.cpp \
+	sqlrauth.cpp \
 	sqlrscaler.cpp \
 
 LOBJS = sqlrlistener.lo \
@@ -136,6 +141,8 @@ LOBJS = sqlrlistener.lo \
 	sqlrquery.lo \
 	sqlrpwdencs.lo \
 	sqlrpwdenc.lo \
+	sqlrauths.lo \
+	sqlrauth.lo \
 	sqlrscaler.lo \
 	$(PLUGINLOBJS)
 
@@ -221,6 +228,22 @@ sqlrpwdencdeclarations.cpp: sqlrpwdencdeclarations.cpp.in
 sqlrpwdencassignments.cpp: sqlrpwdencassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../pwdencs/*.lo`; \
+	do \
+		module=`basename $$file .lo`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrauthdeclarations.cpp: sqlrauthdeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../auths/*.lo`; \
+	do \
+		module=`basename $$file .lo`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrauthassignments.cpp: sqlrauthassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../auths/*.lo`; \
 	do \
 		module=`basename $$file .lo`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \

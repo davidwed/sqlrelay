@@ -17,6 +17,7 @@ endif
 	$(MAKE) -C queries all
 	$(MAKE) -C loggers all
 	$(MAKE) -C pwdencs all
+	$(MAKE) -C auths all
 	$(MAKE) -C connections all
 ifeq ($(SQLRELAY_ENABLE_SHARED),no)
 	$(MAKE) -C server all
@@ -32,6 +33,7 @@ clean:
 	$(MAKE) -C queries clean
 	$(MAKE) -C loggers clean
 	$(MAKE) -C pwdencs clean
+	$(MAKE) -C auths clean
 	$(MAKE) -C connections clean
 	$(MAKE) -C status clean
 	$(MAKE) -C server clean
@@ -52,6 +54,7 @@ endif
 	$(MAKE) -C queries install
 	$(MAKE) -C loggers install
 	$(MAKE) -C pwdencs install
+	$(MAKE) -C auths install
 	$(MAKE) -C connections install
 ifeq ($(SQLRELAY_ENABLE_SHARED),no)
 	$(MAKE) -C server install
@@ -67,6 +70,7 @@ uninstall:
 	$(MAKE) -C queries uninstall
 	$(MAKE) -C loggers uninstall
 	$(MAKE) -C pwdencs uninstall
+	$(MAKE) -C auths uninstall
 	$(MAKE) -C connections uninstall
 	$(MAKE) -C status uninstall
 	$(MAKE) -C server uninstall
