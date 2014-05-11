@@ -12,8 +12,8 @@ ifeq ($(ORACLEUSERPATH),yes)
 endif
 endif
 
-SRCS= oracle8connection.cpp oracle8sqlwriter.cpp
-LOBJS= oracle8connection.lo oracle8sqlwriter.lo
+SRCS= oracle8connection.cpp
+LOBJS= oracle8connection.lo
 
 .SUFFIXES: .lo
 

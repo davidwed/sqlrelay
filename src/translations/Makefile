@@ -25,6 +25,8 @@ all: sqltranslation_doublequotestosinglequotes.la \
 	sqltranslation_oracleisolationlevel.la \
 	sqltranslation_cascadetocascadeconstraints.la \
 	sqltranslation_createselecttocreateasselect.la \
+	sqltranslation_fakebindsforcreateasselect.la \
+	sqltranslation_oracleunsupported.la \
 	sqltranslation_translatedatetimes.la \
 	sqltranslation_matchestolike.la \
 	sqltranslation_oracleize.la \
@@ -80,6 +82,12 @@ sqltranslation_cascadetocascadeconstraints.la: cascadetocascadeconstraints.cpp c
 
 sqltranslation_createselecttocreateasselect.la: createselecttocreateasselect.cpp createselecttocreateasselect.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ createselecttocreateasselect.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+
+sqltranslation_fakebindsforcreateasselect.la: fakebindsforcreateasselect.cpp fakebindsforcreateasselect.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ fakebindsforcreateasselect.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+
+sqltranslation_oracleunsupported.la: oracleunsupported.cpp oracleunsupported.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ oracleunsupported.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_translatedatetimes.la: translatedatetimes.cpp translatedatetimes.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ translatedatetimes.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
@@ -167,6 +175,14 @@ ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(RM) $(libexecdir)/sqltranslation_createselecttocreateasselect.a
 	$(RM) $(libexecdir)/sqltranslation_createselecttocreateasselect.la
 	$(MODULERENAME) $(libexecdir)/sqltranslation_createselecttocreateasselect.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqltranslation_fakebindsforcreateasselect.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_fakebindsforcreateasselect.a
+	$(RM) $(libexecdir)/sqltranslation_fakebindsforcreateasselect.la
+	$(MODULERENAME) $(libexecdir)/sqltranslation_fakebindsforcreateasselect.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqltranslation_oracleunsupported.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_oracleunsupported.a
+	$(RM) $(libexecdir)/sqltranslation_oracleunsupported.la
+	$(MODULERENAME) $(libexecdir)/sqltranslation_oracleunsupported.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_translatedatetimes.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.a
 	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.la

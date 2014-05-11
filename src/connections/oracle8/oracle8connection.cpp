@@ -9,7 +9,6 @@
 
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
-#include <oracle8sqlwriter.h>
 #ifdef HAVE_ORACLE_8i
 	#include <rudiments/regularexpression.h>
 #endif
@@ -125,8 +124,6 @@ class DLLSPEC oracle8connection : public sqlrconnection_svr {
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
-
-		sqlwriter	*getSqlWriter();
 
 		ub4		stmtmode;
 
@@ -1048,10 +1045,6 @@ bool oracle8connection::commit() {
 
 bool oracle8connection::rollback() {
 	return (OCITransRollback(svc,err,OCI_DEFAULT)==OCI_SUCCESS);
-}
-
-sqlwriter *oracle8connection::getSqlWriter() {
-	return new oracle8sqlwriter;
 }
 
 void oracle8connection::errorMessage(char *errorbuffer,
