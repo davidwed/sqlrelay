@@ -21,6 +21,7 @@ all: sqltranslation_doublequotestosinglequotes.la \
 	sqltranslation_temptableslocalize.la \
 	sqltranslation_temptablessybaseize.la \
 	sqltranslation_temporarytoglobaltemporary.la \
+	sqltranslation_uniquekeytounique.la \
 	sqltranslation_translatedatetimes.la \
 	sqltranslation_matchestolike.la \
 	sqltranslation_oracleize.la \
@@ -64,6 +65,9 @@ sqltranslation_temptablessybaseize.la: temptablessybaseize.cpp temptablessybasei
 
 sqltranslation_temporarytoglobaltemporary.la: temporarytoglobaltemporary.cpp temporarytoglobaltemporary.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ temporarytoglobaltemporary.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+
+sqltranslation_uniquekeytounique.la: uniquekeytounique.cpp uniquekeytounique.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ uniquekeytounique.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_translatedatetimes.la: translatedatetimes.cpp translatedatetimes.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ translatedatetimes.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
@@ -135,6 +139,10 @@ ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(RM) $(libexecdir)/sqltranslation_temporarytoglobaltemporary.a
 	$(RM) $(libexecdir)/sqltranslation_temporarytoglobaltemporary.la
 	$(MODULERENAME) $(libexecdir)/sqltranslation_temporarytoglobaltemporary.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqltranslation_uniquekeytounique.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_uniquekeytounique.a
+	$(RM) $(libexecdir)/sqltranslation_uniquekeytounique.la
+	$(MODULERENAME) $(libexecdir)/sqltranslation_uniquekeytounique.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_translatedatetimes.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.a
 	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.la
