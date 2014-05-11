@@ -44,12 +44,6 @@ const char * const *oracle8sqlwriter::unsupportedElements() {
 	return unsupportedelements;
 }
 
-bool oracle8sqlwriter::uniqueKey(xmldomnode *node, stringbuffer *output) {
-	debugFunction();
-	output->append("unique");
-	return true;
-}
-
 bool oracle8sqlwriter::cascade(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("cascade");

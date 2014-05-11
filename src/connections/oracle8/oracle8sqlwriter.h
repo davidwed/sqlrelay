@@ -11,8 +11,6 @@ class oracle8sqlwriter : public sqlwriter {
 	private:
 		virtual const char * const *unsupportedElements();
 
-		virtual bool	uniqueKey(xmldomnode *node,
-					stringbuffer *output);
 		virtual bool	cascade(xmldomnode *node,
 					stringbuffer *output);
 		virtual bool	selectQuery(xmldomnode *node,
