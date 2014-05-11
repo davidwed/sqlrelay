@@ -23,6 +23,7 @@ all: sqltranslation_doublequotestosinglequotes.la \
 	sqltranslation_temporarytoglobaltemporary.la \
 	sqltranslation_uniquekeytounique.la \
 	sqltranslation_oracleisolationlevel.la \
+	sqltranslation_cascadetocascadeconstraints.la \
 	sqltranslation_translatedatetimes.la \
 	sqltranslation_matchestolike.la \
 	sqltranslation_oracleize.la \
@@ -72,6 +73,9 @@ sqltranslation_uniquekeytounique.la: uniquekeytounique.cpp uniquekeytounique.lo
 
 sqltranslation_oracleisolationlevel.la: oracleisolationlevel.cpp oracleisolationlevel.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ oracleisolationlevel.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+
+sqltranslation_cascadetocascadeconstraints.la: cascadetocascadeconstraints.cpp cascadetocascadeconstraints.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ cascadetocascadeconstraints.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_translatedatetimes.la: translatedatetimes.cpp translatedatetimes.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ translatedatetimes.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
@@ -151,6 +155,10 @@ ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(RM) $(libexecdir)/sqltranslation_oracleisolationlevel.a
 	$(RM) $(libexecdir)/sqltranslation_oracleisolationlevel.la
 	$(MODULERENAME) $(libexecdir)/sqltranslation_oracleisolationlevel.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqltranslation_cascadetocascadeconstraints.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_cascadetocascadeconstraints.a
+	$(RM) $(libexecdir)/sqltranslation_cascadetocascadeconstraints.la
+	$(MODULERENAME) $(libexecdir)/sqltranslation_cascadetocascadeconstraints.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_translatedatetimes.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.a
 	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.la

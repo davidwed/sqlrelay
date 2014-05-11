@@ -33,18 +33,21 @@ bool temporarytoglobaltemporary::run(sqlrconnection_svr *sqlrcon,
 
 void temporarytoglobaltemporary::insertGlobal(xmldomnode *node) {
 
-	xmldomnode	*create=node->getFirstTagChild("create");
+	xmldomnode	*create=
+			node->getFirstTagChild(sqlparser::_create);
 	if (create->isNullNode()) {
 		return;
 	}
 
-	xmldomnode	*temporary=create->getFirstTagChild("temporary");
+	xmldomnode	*temporary=
+			create->getFirstTagChild(sqlparser::_temporary);
 	if (temporary->isNullNode()) {
 		return;
 	}
 
-	if (temporary->getPreviousTagSibling("global")->isNullNode()) {
-		create->insertTag("global",temporary->getPosition());
+	if (temporary->getPreviousTagSibling(sqlparser::_global)->
+							isNullNode()) {
+		create->insertTag(sqlparser::_global,temporary->getPosition());
 	}
 }
 

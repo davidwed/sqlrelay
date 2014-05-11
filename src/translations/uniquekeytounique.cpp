@@ -33,21 +33,22 @@ bool uniquekeytounique::run(sqlrconnection_svr *sqlrcon,
 
 void uniquekeytounique::replaceUniqueKey(xmldomnode *node) {
 
-	xmldomnode	*columns=node->getFirstTagChild("create")->
-					getFirstTagChild("table")->
-					getFirstTagChild("columns");
+	xmldomnode	*columns=node->getFirstTagChild(sqlparser::_create)->
+					getFirstTagChild(sqlparser::_table)->
+					getFirstTagChild(sqlparser::_columns);
 	if (columns->isNullNode()) {
 		return;
 	}
 
-	for (xmldomnode *col=columns->getFirstTagChild("column");
-		!col->isNullNode(); col=col->getNextTagSibling("column")) {
+	for (xmldomnode *col=columns->getFirstTagChild(sqlparser::_column);
+			!col->isNullNode();
+			col=col->getNextTagSibling(sqlparser::_column)) {
 
 		xmldomnode	*uniquekey=
-				col->getFirstTagChild("constraints")->
-					getFirstTagChild("unique_key");
+			col->getFirstTagChild(sqlparser::_constraints)->
+				getFirstTagChild(sqlparser::_unique_key);
 		if (!uniquekey->isNullNode()) {
-			uniquekey->setName("unique");
+			uniquekey->setName(sqlparser::_unique);
 		}
 	}
 }

@@ -44,16 +44,6 @@ const char * const *oracle8sqlwriter::unsupportedElements() {
 	return unsupportedelements;
 }
 
-bool oracle8sqlwriter::cascade(xmldomnode *node, stringbuffer *output) {
-	debugFunction();
-	output->append("cascade");
-	if (node->getFirstTagChild(
-			sqlparser::_cascade_constraints_clause)->isNullNode()) {
-		output->append(" constraints");
-	}
-	return true;
-}
-
 bool oracle8sqlwriter::selectQuery(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	// if the select is a clause of a create table command then the

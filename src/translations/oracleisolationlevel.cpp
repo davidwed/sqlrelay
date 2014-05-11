@@ -33,9 +33,9 @@ bool oracleisolationlevel::run(sqlrconnection_svr *sqlrcon,
 
 void oracleisolationlevel::replaceIsolationLevel(xmldomnode *node) {
 
-	xmldomnode	*level=node->getFirstTagChild("set")->
-					getFirstTagChild("transaction")->
-					getFirstTagChild("isolation_level");
+	xmldomnode	*level=node->getFirstTagChild(sqlparser::_set)->
+				getFirstTagChild(sqlparser::_transaction)->
+				getFirstTagChild(sqlparser::_isolation_level);
 	if (level->isNullNode()) {
 		return;
 	}
