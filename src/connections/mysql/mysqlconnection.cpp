@@ -3,7 +3,6 @@
 
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
-#include <mysqlsqlwriter.h>
 #include <rudiments/charstring.h>
 #include <rudiments/rawbuffer.h>
 #include <rudiments/regularexpression.h>
@@ -187,7 +186,6 @@ class mysqlconnection : public sqlrconnection_svr {
 						uint32_t *errorlength,
 						int64_t	*errorcode,
 						bool *liveconnection);
-		sqlwriter	*getSqlWriter();
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		short		nonNullBindValue();
 		short		nullBindValue();
@@ -554,10 +552,6 @@ void mysqlconnection::errorMessage(char *errorbuffer,
 				"Can't connect to MySQL",22) /*||
 		!charstring::compareIgnoringCase(errorstring,
 			"Lost connection to MySQL server during query")*/);
-}
-
-sqlwriter *mysqlconnection::getSqlWriter() {
-	return new mysqlsqlwriter;
 }
 
 #ifdef HAVE_MYSQL_STMT_PREPARE

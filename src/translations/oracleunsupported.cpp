@@ -14,8 +14,6 @@ class oracleunsupported : public sqltranslation {
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
-	private:
-		void	replaceIsolationLevel(xmldomnode *node);
 };
 
 oracleunsupported::oracleunsupported(sqltranslations *sqlts,

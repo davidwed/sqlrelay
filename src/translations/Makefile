@@ -27,6 +27,7 @@ all: sqltranslation_doublequotestosinglequotes.la \
 	sqltranslation_createselecttocreateasselect.la \
 	sqltranslation_fakebindsforcreateasselect.la \
 	sqltranslation_oracleunsupported.la \
+	sqltranslation_mysqlunsupported.la \
 	sqltranslation_translatedatetimes.la \
 	sqltranslation_matchestolike.la \
 	sqltranslation_oracleize.la \
@@ -88,6 +89,9 @@ sqltranslation_fakebindsforcreateasselect.la: fakebindsforcreateasselect.cpp fak
 
 sqltranslation_oracleunsupported.la: oracleunsupported.cpp oracleunsupported.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ oracleunsupported.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+
+sqltranslation_mysqlunsupported.la: mysqlunsupported.cpp mysqlunsupported.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ mysqlunsupported.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_translatedatetimes.la: translatedatetimes.cpp translatedatetimes.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ translatedatetimes.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
@@ -183,6 +187,10 @@ ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(RM) $(libexecdir)/sqltranslation_oracleunsupported.a
 	$(RM) $(libexecdir)/sqltranslation_oracleunsupported.la
 	$(MODULERENAME) $(libexecdir)/sqltranslation_oracleunsupported.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqltranslation_mysqlunsupported.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_mysqlunsupported.a
+	$(RM) $(libexecdir)/sqltranslation_mysqlunsupported.la
+	$(MODULERENAME) $(libexecdir)/sqltranslation_mysqlunsupported.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_translatedatetimes.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.a
 	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.la

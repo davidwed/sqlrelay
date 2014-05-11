@@ -12,8 +12,8 @@ ifeq ($(MYSQLUSERPATH),yes)
 endif
 endif
 
-SRCS= mysqlconnection.cpp mysqlsqlwriter.cpp
-LOBJS= mysqlconnection.lo mysqlsqlwriter.lo
+SRCS= mysqlconnection.cpp
+LOBJS= mysqlconnection.lo
 
 .SUFFIXES: .lo
 
