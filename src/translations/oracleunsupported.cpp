@@ -57,11 +57,17 @@ bool oracleunsupported::run(sqlrconnection_svr *sqlrcon,
 			sqlparser::_on_update,
 			NULL
 		};
-		for (const char * const *cstr=unsupported; *cstr; cstr++) {
-			xmldomnode	*constraint=
-				constraints->getFirstTagChild(*cstr);
-			if (!constraint->isNullNode()) {
-				constraints->deleteChild(constraint);
+
+		for (xmldomnode *con=constraints->getFirstTagChild();
+					!con->isNullNode();
+					con=con->getNextTagSibling()) {
+			for (const char * const *cstr=unsupported;
+							*cstr; cstr++) {
+				if (!charstring::compare(
+						con->getName(),*cstr)) {
+					con->setAttributeValue(
+						"supported","false");
+				}
 			}
 		}
 	}
@@ -70,7 +76,7 @@ bool oracleunsupported::run(sqlrconnection_svr *sqlrcon,
 	xmldomnode	*withnolog=
 			table->getFirstTagChild(sqlparser::_with_no_log);
 	if (!withnolog->isNullNode()) {
-		table->deleteChild(withnolog);
+		withnolog->setAttributeValue("supported","false");
 	}
 
 	// drop temporary
@@ -78,7 +84,7 @@ bool oracleunsupported::run(sqlrconnection_svr *sqlrcon,
 	xmldomnode	*temporary=drop->getFirstTagChild(
 						sqlparser::_drop_temporary);
 	if (!temporary->isNullNode()) {
-		drop->deleteChild(temporary);
+		temporary->setAttributeValue("supported","false");
 	}
 
 	// drop restrict
@@ -86,20 +92,20 @@ bool oracleunsupported::run(sqlrconnection_svr *sqlrcon,
 	xmldomnode	*restrictclause=table->getFirstTagChild(
 						sqlparser::_restrict_clause);
 	if (!restrictclause->isNullNode()) {
-		table->deleteChild(restrictclause);
+		restrictclause->setAttributeValue("supported","false");
 	}
 
 	// set global
 	xmldomnode	*set=root->getFirstTagChild(sqlparser::_set);
 	xmldomnode	*global=set->getFirstTagChild(sqlparser::_set_global);
 	if (!global->isNullNode()) {
-		set->deleteChild(global);
+		global->setAttributeValue("supported","false");
 	}
 
 	// set session
 	xmldomnode	*session=set->getFirstTagChild(sqlparser::_set_session);
 	if (!session->isNullNode()) {
-		set->deleteChild(session);
+		session->setAttributeValue("supported","false");
 	}
 
 	return true;

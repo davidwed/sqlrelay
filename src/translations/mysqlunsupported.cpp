@@ -34,7 +34,7 @@ bool mysqlunsupported::run(sqlrconnection_svr *sqlrcon,
 void mysqlunsupported::removeNoWait(xmldomnode *node) {
 
 	if (!charstring::compare(node->getName(),sqlparser::_nowait)) {
-		node->getParent()->deleteChild(node);
+		node->setAttributeValue("supported","false");
 		return;
 	}
 

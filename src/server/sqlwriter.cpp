@@ -84,6 +84,11 @@ bool sqlwriter::write(xmldomnode *node, stringbuffer *output) {
 bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 
+	if (!charstring::compare(
+		node->getAttributeValue("supported"),"false")) {
+		return true;
+	}
+
 	const char	*nodename=node->getName();
 
 	// generic...
@@ -649,6 +654,11 @@ bool sqlwriter::handleStart(xmldomnode *node, stringbuffer *output) {
 
 bool sqlwriter::handleEnd(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
+
+	if (!charstring::compare(
+		node->getAttributeValue("supported"),"false")) {
+		return true;
+	}
 
 	const char	*nodename=node->getName();
 
