@@ -614,10 +614,6 @@ sqltranslations *sqlrconnection_svr::getSqlTranslations() {
 	return new sqltranslations;
 }
 
-sqlwriter *sqlrconnection_svr::getSqlWriter() {
-	return new sqlwriter;
-}
-
 void sqlrconnection_svr::clearError() {
 	setError(NULL,0,true);
 }

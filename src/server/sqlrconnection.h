@@ -8,7 +8,6 @@
 
 #include <sqlrcursor.h>
 #include <sqltranslations.h>
-#include <sqlwriter.h>
 
 class sqlrcontroller_svr;
 
@@ -100,7 +99,6 @@ class SQLRSERVER_DLLSPEC sqlrconnection_svr {
 		virtual void		endSession();
 
 		virtual sqltranslations	*getSqlTranslations();
-		virtual sqlwriter	*getSqlWriter();
 
 		void	clearError();
 		void	setError(const char *err, int64_t errn, bool liveconn);

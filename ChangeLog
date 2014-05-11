@@ -7,6 +7,8 @@
 	got java api working on windows
 	updated pdo driver to convert float fields to strings rather than ints
 	updated pthread test to match rudiments pthread test
+	moved everything done by children of sqlwriter interface into
+		individual translations
 
 0.55 - fixed a sql translation bug related to exists clauses
 	added deployment projects for windows

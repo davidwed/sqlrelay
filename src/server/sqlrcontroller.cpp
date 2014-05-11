@@ -297,7 +297,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 		sqlp=new sqlparser;
 		sqlt=conn->getSqlTranslations();
 		sqlt->loadTranslations(translations);
-		sqlw=conn->getSqlWriter();
+		sqlw=new sqlwriter;
 	}
 	debugsqltranslation=cfgfl->getDebugTranslations();
 

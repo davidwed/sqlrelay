@@ -41,7 +41,7 @@ void mysqlunsupported::removeNoWait(xmldomnode *node) {
 	xmldomnode *child=node->getFirstTagChild();
 	while (!child->isNullNode()) {
 		xmldomnode	*next=child->getNextTagSibling();
-		removeNoWait(next);
+		removeNoWait(child);
 		child=next;
 	}
 }

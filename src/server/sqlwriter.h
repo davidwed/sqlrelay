@@ -30,10 +30,6 @@ class SQLRSERVER_DLLSPEC sqlwriter {
 		virtual bool	write(xmldomnode *tree, 
 					stringbuffer *output);
 
-		virtual const char * const *supportedElements();
-		virtual const char * const *unsupportedElements();
-
-		virtual	bool	elementSupported(const char *element);
 		virtual bool	handleStart(xmldomnode *node,
 						stringbuffer *output);
 		virtual bool	handleEnd(xmldomnode *node,
