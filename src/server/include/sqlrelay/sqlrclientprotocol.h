@@ -10,6 +10,7 @@
 #include <rudiments/stringbuffer.h>
 #include <rudiments/memorypool.h>
 
+// for USERSIZE
 #include <defines.h>
 
 class sqlrcontroller_svr;

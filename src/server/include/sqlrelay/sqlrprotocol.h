@@ -6,8 +6,6 @@
 
 #include <sqlrelay/private/sqlrserverdll.h>
 
-#include <config.h>
-#include <defaults.h>
 #include <rudiments/filedescriptor.h>
 
 #define	SQLRPROTOCOLCOUNT 5

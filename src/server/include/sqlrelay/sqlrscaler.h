@@ -3,8 +3,6 @@
 
 #include <sqlrelay/private/sqlrserverdll.h>
 
-#include <config.h>
-
 #include <sqlrconfigfile.h>
 #include <cmdline.h>
 #include <tempdir.h>
@@ -12,8 +10,8 @@
 #include <rudiments/semaphoreset.h>
 #include <rudiments/sharedmemory.h>
 
+// for shmdata
 #include <defines.h>
-#include <defaults.h>
 
 // for pid_t
 #include <sys/types.h>

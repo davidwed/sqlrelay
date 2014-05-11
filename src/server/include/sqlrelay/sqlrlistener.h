@@ -6,8 +6,6 @@
 
 #include <sqlrelay/private/sqlrserverdll.h>
 
-#include <config.h>
-
 #include <cmdline.h>
 #include <tempdir.h>
 #include <sqlrconfigfile.h>
@@ -22,7 +20,7 @@
 #include <rudiments/sharedmemory.h>
 #include <rudiments/regularexpression.h>
 
-#include <defaults.h>
+// for shmdata
 #include <defines.h>
 
 class SQLRSERVER_DLLSPEC handoffsocketnode {

@@ -16,6 +16,8 @@
 #include <rudiments/charstring.h>
 #include <rudiments/stdio.h>
 
+#include <defaults.h>
+
 bool	scaler::shutdown=false;
 
 scaler::scaler() {

@@ -10,8 +10,6 @@
 #include <rudiments/regularexpression.h>
 #include <rudiments/xmldom.h>
 
-#include <defines.h>
-
 class SQLRSERVER_DLLSPEC bindvar_svr {
 	public:
 		char	*variable;

@@ -6,8 +6,6 @@
 
 #include <sqlrelay/private/sqlrserverdll.h>
 
-#include <config.h>
-#include <defaults.h>
 #include <rudiments/listener.h>
 #include <rudiments/unixsocketserver.h>
 #include <rudiments/inetsocketserver.h>
@@ -37,6 +35,7 @@
 
 #include <cmdline.h>
 
+// for shmdata
 #include <defines.h>
 
 class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {

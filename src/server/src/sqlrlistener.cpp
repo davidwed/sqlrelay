@@ -18,6 +18,8 @@
 #include <rudiments/stdio.h>
 #include <rudiments/thread.h>
 
+#include <defaults.h>
+
 #ifndef MAXPATHLEN
 	#define MAXPATHLEN	256
 #endif
