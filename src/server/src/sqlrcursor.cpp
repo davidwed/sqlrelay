@@ -7,6 +7,8 @@
 #include <rudiments/character.h>
 #include <rudiments/stdio.h>
 
+#include <defines.h>
+
 sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 
 	this->conn=conn;

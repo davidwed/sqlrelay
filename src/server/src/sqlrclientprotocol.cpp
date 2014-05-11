@@ -10,6 +10,7 @@
 #include <rudiments/datetime.h>
 
 #include <datatypes.h>
+#include <defines.h>
 
 sqlrclientprotocol::sqlrclientprotocol(sqlrcontroller_svr *cont,
 					sqlrconnection_svr *conn,

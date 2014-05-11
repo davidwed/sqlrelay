@@ -8,6 +8,8 @@
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
+#include <defines.h>
+
 class translatedatetimes : public sqlrtranslation {
 	public:
 			translatedatetimes(sqlrtranslations *sqlts,

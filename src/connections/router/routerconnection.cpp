@@ -8,6 +8,7 @@
 #include <rudiments/regularexpression.h>
 
 #include <datatypes.h>
+#include <defines.h>
 
 #include <sqlrelay/sqlrclient.h>
 

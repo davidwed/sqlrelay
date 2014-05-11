@@ -10,8 +10,7 @@
 #include <rudiments/semaphoreset.h>
 #include <rudiments/sharedmemory.h>
 
-// for shmdata
-#include <defines.h>
+#include <sqlrelay/private/sqlrshmdata.h>
 
 // for pid_t
 #include <sys/types.h>

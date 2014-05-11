@@ -20,8 +20,7 @@
 #include <rudiments/sharedmemory.h>
 #include <rudiments/regularexpression.h>
 
-// for shmdata
-#include <defines.h>
+#include <sqlrelay/private/sqlrshmdata.h>
 
 class SQLRSERVER_DLLSPEC handoffsocketnode {
 	friend class sqlrlistener;

@@ -10,8 +10,7 @@
 #include <rudiments/stringbuffer.h>
 #include <rudiments/memorypool.h>
 
-// for USERSIZE
-#include <defines.h>
+#include <sqlrelay/private/sqlrshmdata.h>
 
 class sqlrcontroller_svr;
 class sqlrconnection_svr;

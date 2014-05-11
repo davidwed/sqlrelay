@@ -33,10 +33,11 @@
 #include <sqlrelay/sqlrpwdencs.h>
 #include <sqlrelay/sqlrauths.h>
 
+#include <sqlrelay/private/sqlrshmdata.h>
+
 #include <cmdline.h>
 
 // for shmdata
-#include <defines.h>
 
 class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 	public:

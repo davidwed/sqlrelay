@@ -20,6 +20,7 @@
 #include <parsedatetime.h>
 
 #include <datatypes.h>
+#include <defines.h>
 
 #define MAX_BYTES_PER_CHAR	4
 

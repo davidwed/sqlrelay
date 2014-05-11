@@ -13,6 +13,7 @@
 #include <rudiments/filesystem.h>
 #include <rudiments/datetime.h>
 #include <debugprint.h>
+#include <defines.h>
 
 class custom_nw : public sqlrlogger {
 	public:

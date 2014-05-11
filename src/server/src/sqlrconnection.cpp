@@ -5,6 +5,8 @@
 #include <sqlrelay/sqlrconnection.h>
 #include <rudiments/hostentry.h>
 
+#include <defines.h>
+
 sqlrconnection_svr::sqlrconnection_svr(sqlrcontroller_svr *cont) {
 	this->cont=cont;
 

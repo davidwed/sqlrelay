@@ -95,13 +95,14 @@
 #define DATE_BIND 7
 
 // sizes...
+// FIXME: these are duplicated here and in sqlrshmdata.h
 #define USERSIZE 128
 #define MAXCONNECTIONIDLEN 256
 #define MAXUNIXSOCKETLEN 1024
 #define MAXCONNECTIONS 512
-#define STATQPSKEEP 900
+/*#define STATQPSKEEP 900
 #define STATSQLTEXTLEN 512
-#define STATCLIENTINFOLEN 512
+#define STATCLIENTINFOLEN 512*/
 
 // errors...
 // (hopefully the 900000+ range doesn't collide with anyone's native codes)
@@ -154,8 +155,13 @@
 #define SQLR_ERROR_LASTINSERTIDNOTSUPPORTED_STRING \
 	"Get last insert id not supported."
 
+enum clientsessiontype_t {
+	SQLRELAY_CLIENT_SESSION_TYPE=0,
+	MYSQL_CLIENT_SESSION_TYPE
+};
+
 // structures...
-enum sqlrconnectionstate_t {
+/*enum sqlrconnectionstate_t {
 	NOT_AVAILABLE=0,
 	INIT,
 	WAIT_FOR_AVAIL_DB,
@@ -284,11 +290,6 @@ struct shmdata {
 	uint32_t	qps_etc[STATQPSKEEP];
 
 	sqlrconnstatistics	connstats[MAXCONNECTIONS];
-};
-
-enum clientsessiontype_t {
-	SQLRELAY_CLIENT_SESSION_TYPE=0,
-	MYSQL_CLIENT_SESSION_TYPE
-};
+};*/
 
 #endif
