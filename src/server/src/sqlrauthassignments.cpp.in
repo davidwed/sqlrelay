@@ -1,0 +1,3 @@
+	if (!charstring::compare(module,"@module@")) {
+		au=new_@module@(auth,sqlrpe);
+	} else

@@ -299,6 +299,26 @@ install:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libsqlrserver.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
+	$(MKINSTALLDIRS) $(bindir)
+	$(LTINSTALL) sqlr-start$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-listener$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-connection$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-scaler$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-cachemanager$(EXE) $(bindir)
+	$(MKINSTALLDIRS) $(tmpdir)
+	chmod 777 $(tmpdir)
+	$(MKINSTALLDIRS) $(tmpdir)/sockets
+	chmod 777 $(tmpdir)/sockets
+	$(MKINSTALLDIRS) $(tmpdir)/pids
+	chmod 777 $(tmpdir)/pids
+	$(MKINSTALLDIRS) $(tmpdir)/ipc
+	chmod 777 $(tmpdir)/ipc
+	$(MKINSTALLDIRS) $(logdir)
+	chmod 777 $(logdir)
+	$(MKINSTALLDIRS) $(debugdir)
+	chmod 777 $(debugdir)
+
+installheaders:
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlparser.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrauth.h $(includedir)/sqlrelay
@@ -323,24 +343,6 @@ install:
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlwriter.h $(includedir)/sqlrelay
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
 	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverdll.h $(includedir)/sqlrelay/private
-	$(MKINSTALLDIRS) $(bindir)
-	$(LTINSTALL) sqlr-start$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-listener$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-connection$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-scaler$(EXE) $(bindir)
-	$(LTINSTALL) sqlr-cachemanager$(EXE) $(bindir)
-	$(MKINSTALLDIRS) $(tmpdir)
-	chmod 777 $(tmpdir)
-	$(MKINSTALLDIRS) $(tmpdir)/sockets
-	chmod 777 $(tmpdir)/sockets
-	$(MKINSTALLDIRS) $(tmpdir)/pids
-	chmod 777 $(tmpdir)/pids
-	$(MKINSTALLDIRS) $(tmpdir)/ipc
-	chmod 777 $(tmpdir)/ipc
-	$(MKINSTALLDIRS) $(logdir)
-	chmod 777 $(logdir)
-	$(MKINSTALLDIRS) $(debugdir)
-	chmod 777 $(debugdir)
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrserver.la

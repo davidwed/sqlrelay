@@ -1,0 +1,1 @@
+sqlrpwdenc	*new_@module@(xmldomnode *parameters, sqlrpwdencs *sqlrpe);
