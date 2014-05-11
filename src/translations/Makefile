@@ -24,6 +24,7 @@ all: sqltranslation_doublequotestosinglequotes.la \
 	sqltranslation_uniquekeytounique.la \
 	sqltranslation_oracleisolationlevel.la \
 	sqltranslation_cascadetocascadeconstraints.la \
+	sqltranslation_createselecttocreateasselect.la \
 	sqltranslation_translatedatetimes.la \
 	sqltranslation_matchestolike.la \
 	sqltranslation_oracleize.la \
@@ -76,6 +77,9 @@ sqltranslation_oracleisolationlevel.la: oracleisolationlevel.cpp oracleisolation
 
 sqltranslation_cascadetocascadeconstraints.la: cascadetocascadeconstraints.cpp cascadetocascadeconstraints.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ cascadetocascadeconstraints.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+
+sqltranslation_createselecttocreateasselect.la: createselecttocreateasselect.cpp createselecttocreateasselect.lo
+	$(LIBTOOL) --mode=link $(CXX) -o $@ createselecttocreateasselect.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqltranslation_translatedatetimes.la: translatedatetimes.cpp translatedatetimes.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ translatedatetimes.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
@@ -159,6 +163,10 @@ ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(RM) $(libexecdir)/sqltranslation_cascadetocascadeconstraints.a
 	$(RM) $(libexecdir)/sqltranslation_cascadetocascadeconstraints.la
 	$(MODULERENAME) $(libexecdir)/sqltranslation_cascadetocascadeconstraints.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqltranslation_createselecttocreateasselect.la $(libexecdir)
+	$(RM) $(libexecdir)/sqltranslation_createselecttocreateasselect.a
+	$(RM) $(libexecdir)/sqltranslation_createselecttocreateasselect.la
+	$(MODULERENAME) $(libexecdir)/sqltranslation_createselecttocreateasselect.so so $(MODULESUFFIX)
 	$(LTINSTALL) sqltranslation_translatedatetimes.la $(libexecdir)
 	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.a
 	$(RM) $(libexecdir)/sqltranslation_translatedatetimes.la

@@ -44,23 +44,6 @@ const char * const *oracle8sqlwriter::unsupportedElements() {
 	return unsupportedelements;
 }
 
-bool oracle8sqlwriter::selectQuery(xmldomnode *node, stringbuffer *output) {
-	debugFunction();
-	// if the select is a clause of a create table command then the
-	// as keyword must preceed it.
-	if (!charstring::compare(node->getParent()->getName(),
-						sqlparser::_table) &&
-		charstring::compare(node->getPreviousSibling()->getName(),
-							sqlparser::_as) &&
-		charstring::compare(node->getPreviousSibling()->getName(),
-							sqlparser::_union)) {
-		if (!as(node,output)) {
-			return false;
-		}
-	}
-	return sqlwriter::selectQuery(node,output);
-}
-
 bool oracle8sqlwriter::as(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	// Oracle doesn't allow bind variables in the select clause of a
