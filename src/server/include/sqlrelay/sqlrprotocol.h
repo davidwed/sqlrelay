@@ -4,7 +4,7 @@
 #ifndef SQLRPROTOCOL_H
 #define SQLRPROTOCOL_H
 
-#include <sqlrelay/sqlrserverdll.h>
+#include <sqlrelay/private/sqlrserverdll.h>
 
 #include <config.h>
 #include <defaults.h>

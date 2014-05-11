@@ -4,7 +4,7 @@
 #ifndef SQLRCONTROLLER_H
 #define SQLRCONTROLLER_H
 
-#include <sqlrelay/sqlrserverdll.h>
+#include <sqlrelay/private/sqlrserverdll.h>
 
 #include <config.h>
 #include <defaults.h>

@@ -11,8 +11,8 @@
 
 // note that sqlrconnection.h must be included after sqltypes.h to
 // get around a problem with CHAR/xmlChar in gnome-xml
-#include <sqlrcontroller.h>
-#include <sqlrconnection.h>
+#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrconnection.h>
 #include <rudiments/charstring.h>
 #include <rudiments/stdio.h>
 

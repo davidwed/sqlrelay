@@ -1,8 +1,8 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrcontroller.h>
-#include <sqlrconnection.h>
+#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrconnection.h>
 #include <rudiments/rawbuffer.h>
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 	#include <rudiments/file.h>

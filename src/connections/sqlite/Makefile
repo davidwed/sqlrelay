@@ -4,8 +4,8 @@ include ../../../config.mk
 
 .PHONY: all clean install uninstall
 
-CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server $(RUDIMENTSINCLUDES) $(SQLITEINCLUDES)
-LIBS = $(SQLITELIBS) -L$(top_builddir)/src/server -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS) 
+CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server/include $(RUDIMENTSINCLUDES) $(SQLITEINCLUDES)
+LIBS = $(SQLITELIBS) -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS) 
 ifneq ($(strip $(SQLITELIBSPATH)),)
 ifeq ($(SQLITEUSERPATH),yes)
 	RPATH = -R $(SQLITELIBSPATH)

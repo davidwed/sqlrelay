@@ -4,7 +4,7 @@
 #ifndef SQLRLOGGERS_H
 #define SQLRLOGGERS_H
 
-#include <sqlrelay/sqlrserverdll.h>
+#include <sqlrelay/private/sqlrserverdll.h>
 
 #include <rudiments/xmldom.h>
 #include <rudiments/linkedlist.h>

@@ -4,7 +4,7 @@
 #ifndef SQLRQUERY_H
 #define SQLRQUERY_H
 
-#include <sqlrelay/sqlrserverdll.h>
+#include <sqlrelay/private/sqlrserverdll.h>
 
 #include <sqlrelay/sqlrcursor.h>
 #include <rudiments/xmldom.h>

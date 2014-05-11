@@ -399,7 +399,7 @@ char *MD5::MD5Sum(const unsigned char *data, uint64_t size) {
 // Code below Copyright (c) 2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrpwdenc.h>
+#include <sqlrelay/sqlrpwdenc.h>
 #include <rudiments/charstring.h>
 
 class md5 : public sqlrpwdenc {

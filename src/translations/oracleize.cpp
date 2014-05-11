@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrconnection.h>
-#include <sqlrcursor.h>
-#include <sqlrtranslation.h>
+#include <sqlrelay/sqlrconnection.h>
+#include <sqlrelay/sqlrcursor.h>
+#include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
 class oracleize : public sqlrtranslation {

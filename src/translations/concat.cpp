@@ -1,11 +1,11 @@
 // Copyright (c) 2013  David Muse
 // See the file COPYING for more information
 
-#include <sqlrcontroller.h>
-#include <sqlrconnection.h>
-#include <sqlrcursor.h>
-#include <sqlparser.h>
-#include <sqlrtranslation.h>
+#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrconnection.h>
+#include <sqlrelay/sqlrcursor.h>
+#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
 class concat : public sqlrtranslation {

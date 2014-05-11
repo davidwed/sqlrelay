@@ -316,12 +316,13 @@ install:
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrqueries.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrquery.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrscaler.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrserverdll.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrtranslation.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrtranslations.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrtrigger.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrtriggers.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlwriter.h $(includedir)/sqlrelay
+	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverdll.h $(includedir)/sqlrelay/private
 	$(MKINSTALLDIRS) $(bindir)
 	$(LTINSTALL) sqlr-start$(EXE) $(bindir)
 	$(LTINSTALL) sqlr-listener$(EXE) $(bindir)
@@ -359,12 +360,12 @@ uninstall:
 	$(RM) $(includedir)/sqlrelay/sqlrqueries.h
 	$(RM) $(includedir)/sqlrelay/sqlrquery.h
 	$(RM) $(includedir)/sqlrelay/sqlrscaler.h
-	$(RM) $(includedir)/sqlrelay/sqlrserverdll.h
 	$(RM) $(includedir)/sqlrelay/sqlrtranslation.h
 	$(RM) $(includedir)/sqlrelay/sqlrtranslations.h
 	$(RM) $(includedir)/sqlrelay/sqlrtrigger.h
 	$(RM) $(includedir)/sqlrelay/sqlrtriggers.h
 	$(RM) $(includedir)/sqlrelay/sqlwriter.h
+	$(RM) $(includedir)/sqlrelay/private/sqlrserverdll.h
 	$(RM) $(bindir)/sqlr-start$(EXE)
 	$(RM) $(bindir)/sqlr-listener$(EXE)
 	$(RM) $(bindir)/sqlr-connection$(EXE)

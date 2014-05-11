@@ -1,9 +1,9 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrcontroller.h>
-#include <sqlrconnection.h>
-#include <sqlrquery.h>
+#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrconnection.h>
+#include <sqlrelay/sqlrquery.h>
 #include <rudiments/charstring.h>
 #include <debugprint.h>
 

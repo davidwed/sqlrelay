@@ -1,11 +1,11 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrcontroller.h>
-#include <sqlrconnection.h>
-#include <sqlrcursor.h>
-#include <sqlparser.h>
-#include <sqlrtrigger.h>
+#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrconnection.h>
+#include <sqlrelay/sqlrcursor.h>
+#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlrtrigger.h>
 #include <debugprint.h>
 
 class droptableautoincrementoracle : public sqlrtrigger {

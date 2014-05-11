@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2014  David Muse
 // See the file COPYING for more information
 
-#include <sqlrauth.h>
+#include <sqlrelay/sqlrauth.h>
 #include <rudiments/charstring.h>
 
 class defaultauth : public sqlrauth {

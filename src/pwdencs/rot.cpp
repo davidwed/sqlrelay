@@ -1,7 +1,7 @@
 // Copyright (c) 2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrpwdenc.h>
+#include <sqlrelay/sqlrpwdenc.h>
 #include <rudiments/character.h>
 
 class rot : public sqlrpwdenc {

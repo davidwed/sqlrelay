@@ -7,8 +7,8 @@
 	#define DLLSPEC
 #endif
 
-#include <sqlrcontroller.h>
-#include <sqlrconnection.h>
+#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrconnection.h>
 #ifdef HAVE_ORACLE_8i
 	#include <rudiments/regularexpression.h>
 #endif

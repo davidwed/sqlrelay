@@ -8,7 +8,7 @@
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
 #include <sqlrconfigfile.h>
-#include <sqlrpwdencs.h>
+#include <sqlrelay/sqlrpwdencs.h>
 
 int main(int argc, const char **argv) {
 

@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrserverdll.h>
+#include <sqlrelay/private/sqlrserverdll.h>
 
 #include <config.h>
 

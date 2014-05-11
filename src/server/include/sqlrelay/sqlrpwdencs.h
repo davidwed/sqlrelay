@@ -4,7 +4,7 @@
 #ifndef SQLRPWDENCS_H
 #define SQLRPWDENCS_H
 
-#include <sqlrelay/sqlrserverdll.h>
+#include <sqlrelay/private/sqlrserverdll.h>
 
 #include <rudiments/xmldom.h>
 #include <rudiments/linkedlist.h>

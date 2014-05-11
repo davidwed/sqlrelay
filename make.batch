@@ -91,7 +91,7 @@ cd ..\..\..\util\msvc
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform%
 cd ..\..\cmdline\msvc
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform%
-cd ..\..\server\msvc
+cd ..\..\server\src\msvc
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% libsqlrserver.vcxproj
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-listener.vcxproj
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-connection.vcxproj
@@ -130,7 +130,7 @@ cd ..\..\..\util\msvc
 msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform%
 cd ..\..\cmdline\msvc
 msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform%
-cd ..\..\server\msvc
+cd ..\..\server\src\msvc
 msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% sqlrserver.sln
 cd ..\..\connections\oracle8\msvc
 msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform%
@@ -230,20 +230,20 @@ copy /Y src\util\msvc\ReleaseCLR\libsqlrutil.lib C:\"Program Files (x86)"\Firstw
 copy /Y src\cmdline\msvc\Release\sqlrsh.exe C:\"Program Files (x86)"\Firstworks\bin
 copy /Y src\cmdline\msvc\ReleaseCLR\sqlrsh.exe C:\"Program Files (x86)"\Firstworks\bin
 
-copy /Y src\server\msvc\Release\libsqlrserver.dll C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\msvc\Release\libsqlrserver.lib C:\"Program Files (x86)"\Firstworks\lib
-copy /Y src\server\msvc\Release\sqlr-listener.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\msvc\Release\sqlr-connection.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\msvc\Release\sqlr-scaler.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\msvc\Release\sqlr-start.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\msvc\Release\sqlr-cachemanager.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\msvc\ReleaseCLR\libsqlrserver.dll C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\msvc\ReleaseCLR\libsqlrserver.lib C:\"Program Files (x86)"\Firstworks\lib
-copy /Y src\server\msvc\ReleaseCLR\sqlr-listener.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\msvc\ReleaseCLR\sqlr-connection.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\msvc\ReleaseCLR\sqlr-scaler.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\msvc\ReleaseCLR\sqlr-start.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\msvc\ReleaseCLR\sqlr-cachemanager.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\src\msvc\Release\libsqlrserver.dll C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\src\msvc\Release\libsqlrserver.lib C:\"Program Files (x86)"\Firstworks\lib
+copy /Y src\server\src\msvc\Release\sqlr-listener.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\src\msvc\Release\sqlr-connection.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\src\msvc\Release\sqlr-scaler.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\src\msvc\Release\sqlr-start.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\src\msvc\Release\sqlr-cachemanager.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\src\msvc\ReleaseCLR\libsqlrserver.dll C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\src\msvc\ReleaseCLR\libsqlrserver.lib C:\"Program Files (x86)"\Firstworks\lib
+copy /Y src\server\src\msvc\ReleaseCLR\sqlr-listener.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\src\msvc\ReleaseCLR\sqlr-connection.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\src\msvc\ReleaseCLR\sqlr-scaler.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\src\msvc\ReleaseCLR\sqlr-start.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\server\src\msvc\ReleaseCLR\sqlr-cachemanager.exe C:\"Program Files (x86)"\Firstworks\bin
 
 
 
@@ -293,20 +293,20 @@ copy /Y src\util\msvc\x64\ReleaseCLR\libsqlrutil.lib C:\"Program Files"\Firstwor
 copy /Y src\cmdline\msvc\x64\Release\sqlrsh.exe C:\"Program Files"\Firstworks\bin
 copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlrsh.exe C:\"Program Files"\Firstworks\bin
 
-copy /Y src\server\msvc\x64\Release\libsqlrserver.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\server\msvc\x64\Release\libsqlrserver.lib C:\"Program Files"\Firstworks\lib
-copy /Y src\server\msvc\x64\Release\sqlr-listener.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\msvc\x64\Release\sqlr-connection.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\msvc\x64\Release\sqlr-scaler.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\msvc\x64\Release\sqlr-start.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\msvc\x64\Release\sqlr-cachemanager.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\msvc\x64\ReleaseCLR\libsqlrserver.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\server\msvc\x64\ReleaseCLR\libsqlrserver.lib C:\"Program Files"\Firstworks\lib
-copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-listener.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-connection.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-scaler.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-start.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\msvc\x64\ReleaseCLR\sqlr-cachemanager.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\src\msvc\x64\Release\libsqlrserver.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\server\src\msvc\x64\Release\libsqlrserver.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\server\src\msvc\x64\Release\sqlr-listener.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\src\msvc\x64\Release\sqlr-connection.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\src\msvc\x64\Release\sqlr-scaler.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\src\msvc\x64\Release\sqlr-start.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\src\msvc\x64\Release\sqlr-cachemanager.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\src\msvc\x64\ReleaseCLR\libsqlrserver.dll C:\"Program Files"\Firstworks\bin
+copy /Y src\server\src\msvc\x64\ReleaseCLR\libsqlrserver.lib C:\"Program Files"\Firstworks\lib
+copy /Y src\server\src\msvc\x64\ReleaseCLR\sqlr-listener.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\src\msvc\x64\ReleaseCLR\sqlr-connection.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\src\msvc\x64\ReleaseCLR\sqlr-scaler.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\src\msvc\x64\ReleaseCLR\sqlr-start.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\server\src\msvc\x64\ReleaseCLR\sqlr-cachemanager.exe C:\"Program Files"\Firstworks\bin
 
 copy /Y src\connections\oracle8\msvc\Release\sqlrconnection_oracle8.dll C:\"Program Files (x86)"\Firstworks\libexec\sqlrelay
 copy /Y src\connections\oracle8\msvc\ReleaseCLR\sqlrconnection_oracle8.dll C:\"Program Files (x86)"\Firstworks\libexec\sqlrelay

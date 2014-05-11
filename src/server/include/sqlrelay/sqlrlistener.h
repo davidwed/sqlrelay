@@ -4,7 +4,7 @@
 #ifndef SQLRLISTENER_H
 #define SQLRLISTENER_H
 
-#include <sqlrelay/sqlrserverdll.h>
+#include <sqlrelay/private/sqlrserverdll.h>
 
 #include <config.h>
 

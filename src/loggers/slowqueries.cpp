@@ -1,11 +1,11 @@
 // Copyright (c) 2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrlistener.h>
-#include <sqlrcontroller.h>
-#include <sqlrconnection.h>
-#include <sqlrcursor.h>
-#include <sqlrlogger.h>
+#include <sqlrelay/sqlrlistener.h>
+#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrconnection.h>
+#include <sqlrelay/sqlrcursor.h>
+#include <sqlrelay/sqlrlogger.h>
 #include <cmdline.h>
 #include <rudiments/process.h>
 #include <rudiments/charstring.h>

@@ -4,7 +4,7 @@
 #ifndef SQLRCURSOR_H
 #define SQLRCURSOR_H
 
-#include <sqlrelay/sqlrserverdll.h>
+#include <sqlrelay/private/sqlrserverdll.h>
 
 #include <rudiments/stringbuffer.h>
 #include <rudiments/regularexpression.h>

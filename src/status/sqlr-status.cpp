@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrcontroller.h>
+#include <sqlrelay/sqlrcontroller.h>
 #include <rudiments/signalclasses.h>
 #include <rudiments/process.h>
 #include <rudiments/charstring.h>

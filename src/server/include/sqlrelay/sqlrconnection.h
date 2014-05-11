@@ -4,7 +4,7 @@
 #ifndef SQLRCONNECTION_H
 #define SQLRCONNECTION_H
 
-#include <sqlrelay/sqlrserverdll.h>
+#include <sqlrelay/private/sqlrserverdll.h>
 
 #include <sqlrelay/sqlrcursor.h>
 #include <sqlrelay/sqlrtranslations.h>

@@ -4,7 +4,7 @@
 #ifndef SQLRAUTH_H
 #define SQLRAUTH_H
 
-#include <sqlrelay/sqlrserverdll.h>
+#include <sqlrelay/private/sqlrserverdll.h>
 
 #include <sqlrelay/sqlrpwdencs.h>
 #include <rudiments/xmldomnode.h>
