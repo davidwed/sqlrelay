@@ -17,8 +17,6 @@ class oracle8sqlwriter : public sqlwriter {
 					stringbuffer *output);
 		virtual bool	as(xmldomnode *node,
 					stringbuffer *output);
-		virtual bool	isolationLevel(xmldomnode *node,
-					stringbuffer *output);
 
 		bool	convertDate(const char *date,
 					stringbuffer *output);
