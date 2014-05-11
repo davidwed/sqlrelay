@@ -9,7 +9,7 @@ LIBS = -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util 
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) -I$(top_builddir)/ -I$(top_builddir)/src/server -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -c $< -o $@
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) -I$(top_builddir)/ -I$(top_builddir)/src/server/include -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -c $< -o $@
 
 all: sqlrtrigger_createtableautoincrementoracle.la \
 	sqlrtrigger_droptableautoincrementoracle.la \
