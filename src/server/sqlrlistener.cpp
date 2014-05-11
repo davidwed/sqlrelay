@@ -31,7 +31,6 @@ sqlrlistener::sqlrlistener() : listener() {
 
 	init=false;
 
-	authc=NULL;
 	sqlrlg=NULL;
 
 	semset=NULL;
@@ -115,7 +114,6 @@ sqlrlistener::~sqlrlistener() {
 
 void sqlrlistener::cleanUp() {
 
-	delete authc;
 	delete[] unixport;
 	delete[] pidfile;
 

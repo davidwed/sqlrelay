@@ -22,10 +22,10 @@
 
 #include <tempdir.h>
 
+#include <sqlrconfigfile.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlrprotocol.h>
-#include <sqlrauthenticator.h>
 #include <sqlparser.h>
 #include <sqltranslations.h>
 #include <sqlwriter.h>
@@ -33,6 +33,7 @@
 #include <sqlrloggers.h>
 #include <sqlrqueries.h>
 #include <sqlrpwdencs.h>
+#include <sqlrauths.h>
 
 #include <cmdline.h>
 
@@ -137,6 +138,9 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 						const char *passwordbuffer);
 		bool	connectionBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
+		void	initLocalAuthentication();
+		bool	authenticateLocal(const char *user,
+						const char *password);
 		bool	databaseBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
 		void	suspendSession(const char **unixsocket,
@@ -291,7 +295,10 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 
 		uint16_t	sendcolumninfo;
 
-		sqlrauthenticator	*authc;
+		uint32_t	usercount;
+		char		**users;
+		char		**passwords;
+		char		**passwordencryptions;
 
 		char		lastuserbuffer[USERSIZE];
 		char		lastpasswordbuffer[USERSIZE];
@@ -342,6 +349,7 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		sqlrloggers	*sqlrlg;
 		sqlrqueries	*sqlrq;
 		sqlrpwdencs	*sqlrpe;
+		sqlrauths	*sqlra;
 
 		char		*decrypteddbpassword;
 

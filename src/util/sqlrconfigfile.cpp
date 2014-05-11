@@ -66,6 +66,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 					DEFAULT_TRANSLATEBINDVARIABLES,"yes");
 	currentroute=NULL;
 	currenttag=NO_TAG;
+	authenticationsdepth=0;
 	translationsdepth=0;
 	triggersdepth=0;
 	loggersdepth=0;
@@ -372,6 +373,10 @@ const char *sqlrconfigfile::getPasswordEncryptions() {
 	return passwordencryptions.getString();
 }
 
+const char *sqlrconfigfile::getAuthentications() {
+	return authentications.getString();
+}
+
 linkedlist< usercontainer * > *sqlrconfigfile::getUserList() {
 	// if there are no users in the list, add a default user/password
 	if (!userlist.getLength()) {
@@ -440,7 +445,10 @@ bool sqlrconfigfile::tagStart(const char *name) {
 		// Root level, nested (users,connections?,router?)
 		case NO_TAG:
 			currentname="instance";
-			if (!charstring::compare(name,"users")) {
+			if (!charstring::compare(name,"authentications")) {
+				thistag=AUTHENTICATIONS_TAG;
+				authentications.clear();
+			} else if (!charstring::compare(name,"users")) {
 				thistag=USERS_TAG;
 			} else if (!charstring::compare(name,"session")) {
 				thistag=SESSION_TAG;
@@ -585,6 +593,19 @@ bool sqlrconfigfile::tagStart(const char *name) {
 
 	// initialize tag data
 	switch (thistag) {
+		case AUTHENTICATIONS_TAG:
+			if (!charstring::compare(name,"authentications")) {
+				authenticationsdepth=0;
+			} else {
+				authenticationsdepth++;
+			}
+			if (authenticationsdepth) {
+				authentications.append(">");
+			}
+			authentications.append("<");
+			authentications.append(name);
+			currenttag=thistag;
+			break;
 		case USER_TAG:
 			currentuser=new usercontainer();
 			userlist.append(currentuser);
@@ -715,6 +736,17 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 			if (!charstring::compare(name,"router")) {
 				currenttag=NO_TAG;
 			}
+			break;
+		case AUTHENTICATIONS_TAG:
+			if (!charstring::compare(name,"authentications")) {
+				currenttag=NO_TAG;
+			}
+			authentications.append("></");
+			authentications.append(name);
+			if (!authenticationsdepth) {
+				authentications.append(">");
+			}
+			authenticationsdepth--;
 			break;
 		case USERS_TAG:
 		case CONNECTIONS_TAG:
@@ -933,6 +965,11 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=DATEYYYYDDMM_ATTRIBUTE;
 		}
 		break;
+
+	case AUTHENTICATIONS_TAG:
+		authentications.append(" ")->append(name);
+		currentattribute=AUTHENTICATIONS_ATTRIBUTE;
+		break;
 	
 	// Attributes of the <users> and <user> tags
 	case USERS_TAG:
@@ -1042,6 +1079,9 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			case NO_TAG:
 				tagname="instance";
 				break;
+			case AUTHENTICATIONS_TAG:
+				tagname="authentications";
+				break;
 			case USERS_TAG:
 				tagname="users";
 				break;
@@ -1123,7 +1163,10 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 
 		// if we have found the correct id, process the attribute...
 
-		if (currenttag==TRANSLATIONS_TAG) {
+		if (currenttag==AUTHENTICATIONS_TAG) {
+			authentications.append("=\"");
+			authentications.append(value)->append("\"");
+		} else if (currenttag==TRANSLATIONS_TAG) {
 			translations.append("=\"");
 			translations.append(value)->append("\"");
 		} else if (currenttag==TRIGGERS_TAG) {

@@ -4,8 +4,8 @@
 #include <sqlrauth.h>
 #include <rudiments/charstring.h>
 
-sqlrauth::sqlrauth(xmldomnode *usersnode, sqlrpwdencs *sqlrpe) {
-	this->usersnode=usersnode;
+sqlrauth::sqlrauth(xmldomnode *parameters, sqlrpwdencs *sqlrpe) {
+	this->parameters=parameters;
 	this->sqlrpe=sqlrpe;
 }
 

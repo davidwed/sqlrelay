@@ -11,7 +11,6 @@
 #include <cmdline.h>
 #include <tempdir.h>
 #include <sqlrconfigfile.h>
-#include <sqlrauthenticator.h>
 #include <sqlrloggers.h>
 
 #include <rudiments/signalclasses.h>
@@ -125,7 +124,6 @@ class SQLRSERVER_DLLSPEC sqlrlistener : public listener {
 		char		*pidfile;
 		tempdir		*tmpdir;
 
-		sqlrauthenticator	*authc;
 		sqlrloggers		*sqlrlg;
 
 		stringbuffer	debugstr;

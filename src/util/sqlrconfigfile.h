@@ -19,6 +19,7 @@
 typedef enum {
 	NO_ATTRIBUTE,
 	ID_ATTRIBUTE,
+	AUTHENTICATIONS_ATTRIBUTE,
 	ADDRESSES_ATTRIBUTE,
 	PORT_ATTRIBUTE,
 	SOCKET_ATTRIBUTE,
@@ -240,6 +241,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 
 		const char	*getPasswordEncryptions();
 
+		const char	*getAuthentications();
+
 		linkedlist< usercontainer * >	*getUserList();
 		linkedlist< connectstringcontainer * >	*getConnectStringList();
 		connectstringcontainer	*getConnectString(
@@ -331,6 +334,9 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		stringlist	sessionstartqueries;
 		stringlist	sessionendqueries;
 
+		stringbuffer	authentications;
+		uint16_t	authenticationsdepth;
+
 		stringbuffer	translations;
 		uint16_t	translationsdepth;
 
@@ -361,6 +367,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		
 		typedef enum {
 			NO_TAG,
+			AUTHENTICATIONS_TAG,
 			USERS_TAG,
 			USER_TAG,
 			SESSION_TAG,

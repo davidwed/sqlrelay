@@ -28,7 +28,7 @@ sqlrauths::~sqlrauths() {
 	delete xmld;
 }
 
-bool sqlrauths::loadAuthenticators(const char *instance,
+bool sqlrauths::loadAuthenticators(const char *auths,
 					sqlrpwdencs *sqlrpe) {
 	debugFunction();
 
@@ -38,26 +38,27 @@ bool sqlrauths::loadAuthenticators(const char *instance,
 	delete xmld;
 	xmld=new xmldom();
 
-	// parse the instance
-	if (!xmld->parseString(instance)) {
+	// parse the auths
+	if (!xmld->parseString(auths)) {
 		return false;
 	}
 
-	// get the instance tag
-	xmldomnode	*instances=
-		xmld->getRootNode()->getFirstTagChild("instances");
-	if (instances->isNullNode()) {
+	// get the auths tag
+	xmldomnode	*authsnode=
+		xmld->getRootNode()->getFirstTagChild("authentications");
+	if (authsnode->isNullNode()) {
 		return false;
 	}
 
-	// run through each set of users
-	for (xmldomnode *users=instances->getFirstTagChild("users");
-		!users->isNullNode(); users=users->getNextTagSibling("users")) {
+	// run through each set of auths
+	for (xmldomnode *auth=authsnode->getFirstTagChild("authentication");
+			!auth->isNullNode();
+			auth=auth->getNextTagSibling("authentication")) {
 
 		debugPrintf("loading authenticator ...\n");
 
 		// load password encryption
-		loadAuthenticator(users,sqlrpe);
+		loadAuthenticator(auth,sqlrpe);
 	}
 	return true;
 }
@@ -75,18 +76,17 @@ void sqlrauths::unloadAuthenticators() {
 	llist.clear();
 }
 
-void sqlrauths::loadAuthenticator(xmldomnode *users,
+void sqlrauths::loadAuthenticator(xmldomnode *auth,
 					sqlrpwdencs *sqlrpe) {
 	debugFunction();
 
 	// get the authenticator name
-	const char	*module=users->getAttributeValue("module");
+	const char	*module=auth->getAttributeValue("module");
 	if (!charstring::length(module)) {
 		// try "file", that's what it used to be called
-		module=users->getAttributeValue("file");
+		module=auth->getAttributeValue("file");
 		if (!charstring::length(module)) {
-			// if that fails, fall back to "default"
-			// to load the default module
+			// fall back to default if no module is specified
 			module="default";
 		}
 	}
@@ -127,7 +127,7 @@ void sqlrauths::loadAuthenticator(xmldomnode *users,
 		delete dl;
 		return;
 	}
-	sqlrauth	*au=(*newAuthenticator)(users,sqlrpe);
+	sqlrauth	*au=(*newAuthenticator)(auth,sqlrpe);
 
 #else
 
@@ -144,4 +144,15 @@ void sqlrauths::loadAuthenticator(xmldomnode *users,
 	sqlrap->au=au;
 	sqlrap->dl=dl;
 	llist.append(sqlrap);
+}
+
+bool sqlrauths::authenticate(const char *user, const char *password) {
+	debugFunction();
+	for (linkedlistnode< sqlrauthplugin * > *node=llist.getFirstNode();
+						node; node=node->getNext()) {
+		if (node->getValue()->au->authenticate(user,password)) {
+			return true;
+		}
+	}
+	return false;
 }

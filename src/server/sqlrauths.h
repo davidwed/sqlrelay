@@ -23,11 +23,12 @@ class SQLRSERVER_DLLSPEC sqlrauths {
 			sqlrauths();
 			~sqlrauths();
 
-		bool		loadAuthenticators(const char *instance,
-							sqlrpwdencs *sqlrpe);
+		bool	loadAuthenticators(const char *auths,
+						sqlrpwdencs *sqlrpe);
+		bool	authenticate(const char *user, const char *password);
 	private:
 		void	unloadAuthenticators();
-		void	loadAuthenticator(xmldomnode *users,
+		void	loadAuthenticator(xmldomnode *auth,
 						sqlrpwdencs *sqlrpe);
 
 		xmldom				*xmld;

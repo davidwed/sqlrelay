@@ -11,13 +11,13 @@
 
 class SQLRSERVER_DLLSPEC sqlrauth {
 	public:
-			sqlrauth(xmldomnode *usersnode,
+			sqlrauth(xmldomnode *parameters,
 					sqlrpwdencs *sqlrpe);
 		virtual	~sqlrauth();
 		virtual	bool	authenticate(const char *user,
 						const char *password);
 	protected:
-		xmldomnode		*usersnode;
+		xmldomnode		*parameters;
 		sqlrpwdencs		*sqlrpe;
 };
 

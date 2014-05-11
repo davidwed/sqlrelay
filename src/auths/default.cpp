@@ -6,7 +6,7 @@
 
 class defaultauth : public sqlrauth {
 	public:
-			defaultauth(xmldomnode *usersnode,
+			defaultauth(xmldomnode *parameters,
 					sqlrpwdencs *sqlrpe);
 		bool	authenticate(const char *user, const char *password);
 	private:
@@ -16,14 +16,14 @@ class defaultauth : public sqlrauth {
 		uint64_t	usercount;
 };
 
-defaultauth::defaultauth(xmldomnode *usersnode,
+defaultauth::defaultauth(xmldomnode *parameters,
 				sqlrpwdencs *sqlrpe) :
-				sqlrauth(usersnode,sqlrpe) {
+				sqlrauth(parameters,sqlrpe) {
 
 	users=NULL;
 	passwords=NULL;
 	passwordencryptions=NULL;
-	usercount=usersnode->getChildCount();
+	usercount=parameters->getChildCount();
 	if (!usercount) {
 		return;
 	}
@@ -35,7 +35,8 @@ defaultauth::defaultauth(xmldomnode *usersnode,
 	passwords=new const char *[usercount];
 	passwordencryptions=new const char *[usercount];
 
-	xmldomnode *user=usersnode->getFirstTagChild("user");
+	xmldomnode *user=parameters->getFirstTagChild("users")->
+					getFirstTagChild("user");
 	for (uint64_t i=0; i<usercount; i++) {
 
 		users[i]=user->getAttributeValue("user");
