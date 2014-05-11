@@ -4,21 +4,21 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class locksnowaitbydefault : public sqltranslation {
+class locksnowaitbydefault : public sqlrtranslation {
 	public:
-			locksnowaitbydefault(sqltranslations *sqlts,
+			locksnowaitbydefault(sqlrtranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
 };
 
-locksnowaitbydefault::locksnowaitbydefault(sqltranslations *sqlts,
+locksnowaitbydefault::locksnowaitbydefault(sqlrtranslations *sqlts,
 					xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool locksnowaitbydefault::run(sqlrconnection_svr *sqlrcon,
@@ -77,8 +77,8 @@ bool locksnowaitbydefault::run(sqlrconnection_svr *sqlrcon,
 }
 
 extern "C" {
-	sqltranslation	*new_locksnowaitbydefault(
-					sqltranslations *sqlts,
+	sqlrtranslation	*new_locksnowaitbydefault(
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new locksnowaitbydefault(sqlts,parameters);
 	}

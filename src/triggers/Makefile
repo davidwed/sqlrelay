@@ -11,39 +11,40 @@ LIBS = -L$(top_builddir)/src/server -lsqlrserver -L$(top_builddir)/src/util -lsq
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) -I$(top_builddir)/ -I$(top_builddir)/src/server -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -c $< -o $@
 
-all: sqltrigger_createtableautoincrementoracle.la \
-	sqltrigger_droptableautoincrementoracle.la \
-	sqltrigger_droplocalizedtemptables.la
+all: sqlrtrigger_createtableautoincrementoracle.la \
+	sqlrtrigger_droptableautoincrementoracle.la \
+	sqlrtrigger_droplocalizedtemptables.la
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
 	$(RMTREE) .libs
 
-sqltrigger_createtableautoincrementoracle.la: createtableautoincrementoracle.cpp createtableautoincrementoracle.lo
+sqlrtrigger_createtableautoincrementoracle.la: createtableautoincrementoracle.cpp createtableautoincrementoracle.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ createtableautoincrementoracle.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-sqltrigger_droptableautoincrementoracle.la: droptableautoincrementoracle.cpp droptableautoincrementoracle.lo
+sqlrtrigger_droptableautoincrementoracle.la: droptableautoincrementoracle.cpp droptableautoincrementoracle.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ droptableautoincrementoracle.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
-sqltrigger_droplocalizedtemptables.la: droplocalizedtemptables.cpp droplocalizedtemptables.lo
+sqlrtrigger_droplocalizedtemptables.la: droplocalizedtemptables.cpp droplocalizedtemptables.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ droplocalizedtemptables.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) sqltrigger_createtableautoincrementoracle.la $(libexecdir)
-	$(RM) $(libexecdir)/sqltrigger_createtableautoincrementoracle.a
-	$(RM) $(libexecdir)/sqltrigger_createtableautoincrementoracle.la
-	$(MODULERENAME) $(libexecdir)/sqltrigger_createtableautoincrementoracle.so so $(MODULESUFFIX)
-	$(LTINSTALL) sqltrigger_droptableautoincrementoracle.la $(libexecdir)
-	$(RM) $(libexecdir)/sqltrigger_droptableautoincrementoracle.a
-	$(RM) $(libexecdir)/sqltrigger_droptableautoincrementoracle.la
-	$(MODULERENAME) $(libexecdir)/sqltrigger_droptableautoincrementoracle.so so $(MODULESUFFIX)
-	$(LTINSTALL) sqltrigger_droplocalizedtemptables.la $(libexecdir)
-	$(RM) $(libexecdir)/sqltrigger_droplocalizedtemptables.a
-	$(RM) $(libexecdir)/sqltrigger_droplocalizedtemptables.la
-	$(MODULERENAME) $(libexecdir)/sqltrigger_droplocalizedtemptables.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqlrtrigger_createtableautoincrementoracle.la $(libexecdir)
+	$(RM) $(libexecdir)/sqlrtrigger_createtableautoincrementoracle.a
+	$(RM) $(libexecdir)/sqlrtrigger_createtableautoincrementoracle.la
+	$(MODULERENAME) $(libexecdir)/sqlrtrigger_createtableautoincrementoracle.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqlrtrigger_droptableautoincrementoracle.la $(libexecdir)
+	$(RM) $(libexecdir)/sqlrtrigger_droptableautoincrementoracle.a
+	$(RM) $(libexecdir)/sqlrtrigger_droptableautoincrementoracle.la
+	$(MODULERENAME) $(libexecdir)/sqlrtrigger_droptableautoincrementoracle.so so $(MODULESUFFIX)
+	$(LTINSTALL) sqlrtrigger_droplocalizedtemptables.la $(libexecdir)
+	$(RM) $(libexecdir)/sqlrtrigger_droplocalizedtemptables.a
+	$(RM) $(libexecdir)/sqlrtrigger_droplocalizedtemptables.la
+	$(MODULERENAME) $(libexecdir)/sqlrtrigger_droplocalizedtemptables.so so $(MODULESUFFIX)
 endif
 
 uninstall:
 	$(RM) $(libexecdir)/sqltrigger_*
+	$(RM) $(libexecdir)/sqlrtrigger_*

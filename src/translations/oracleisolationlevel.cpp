@@ -4,12 +4,12 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class oracleisolationlevel : public sqltranslation {
+class oracleisolationlevel : public sqlrtranslation {
 	public:
-			oracleisolationlevel(sqltranslations *sqlts,
+			oracleisolationlevel(sqlrtranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
@@ -18,9 +18,9 @@ class oracleisolationlevel : public sqltranslation {
 		void	replaceIsolationLevel(xmldomnode *node);
 };
 
-oracleisolationlevel::oracleisolationlevel(sqltranslations *sqlts,
+oracleisolationlevel::oracleisolationlevel(sqlrtranslations *sqlts,
 						xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool oracleisolationlevel::run(sqlrconnection_svr *sqlrcon,
@@ -70,7 +70,8 @@ void oracleisolationlevel::replaceIsolationLevel(xmldomnode *node) {
 }
 
 extern "C" {
-	sqltranslation	*new_oracleisolationlevel(sqltranslations *sqlts,
+	sqlrtranslation	*new_oracleisolationlevel(
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new oracleisolationlevel(sqlts,parameters);
 	}

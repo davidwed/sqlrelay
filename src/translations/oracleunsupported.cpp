@@ -4,21 +4,21 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class oracleunsupported : public sqltranslation {
+class oracleunsupported : public sqlrtranslation {
 	public:
-			oracleunsupported(sqltranslations *sqlts,
+			oracleunsupported(sqlrtranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
 };
 
-oracleunsupported::oracleunsupported(sqltranslations *sqlts,
+oracleunsupported::oracleunsupported(sqlrtranslations *sqlts,
 						xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool oracleunsupported::run(sqlrconnection_svr *sqlrcon,
@@ -112,7 +112,8 @@ bool oracleunsupported::run(sqlrconnection_svr *sqlrcon,
 }
 
 extern "C" {
-	sqltranslation	*new_oracleunsupported(sqltranslations *sqlts,
+	sqlrtranslation	*new_oracleunsupported(
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new oracleunsupported(sqlts,parameters);
 	}

@@ -5,13 +5,13 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class temptablesaddmissingcolumns : public sqltranslation {
+class temptablesaddmissingcolumns : public sqlrtranslation {
 	public:
 			temptablesaddmissingcolumns(
-					sqltranslations *sqlts,
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
@@ -19,9 +19,9 @@ class temptablesaddmissingcolumns : public sqltranslation {
 };
 
 temptablesaddmissingcolumns::temptablesaddmissingcolumns(
-					sqltranslations *sqlts,
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool temptablesaddmissingcolumns::run(sqlrconnection_svr *sqlrcon,
@@ -103,8 +103,8 @@ bool temptablesaddmissingcolumns::run(sqlrconnection_svr *sqlrcon,
 }
 
 extern "C" {
-	sqltranslation	*new_temptablesaddmissingcolumns(
-					sqltranslations *sqlts,
+	sqlrtranslation	*new_temptablesaddmissingcolumns(
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new temptablesaddmissingcolumns(sqlts,parameters);
 	}

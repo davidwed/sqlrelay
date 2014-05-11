@@ -5,12 +5,12 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class concat : public sqltranslation {
+class concat : public sqlrtranslation {
 	public:
-			concat(sqltranslations *sqlts,
+			concat(sqlrtranslations *sqlts,
 					xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
@@ -27,8 +27,8 @@ class concat : public sqltranslation {
 		xmldomnode	*parameters;
 };
 
-concat::concat(sqltranslations *sqlts,xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+concat::concat(sqlrtranslations *sqlts,xmldomnode *parameters) :
+					sqlrtranslation(sqlts,parameters) {
 	this->parameters=parameters;
 }
 
@@ -206,7 +206,7 @@ bool concat::translatePlus(sqlrconnection_svr *sqlrcon,
 }
 
 extern "C" {
-	sqltranslation	*new_concat(sqltranslations *sqlts,
+	sqlrtranslation	*new_concat(sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new concat(sqlts,parameters);
 	}

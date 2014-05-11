@@ -5,10 +5,10 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltrigger.h>
+#include <sqlrtrigger.h>
 #include <debugprint.h>
 
-class droptableautoincrementoracle : public sqltrigger {
+class droptableautoincrementoracle : public sqlrtrigger {
 	public:
 			droptableautoincrementoracle(xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
@@ -31,7 +31,7 @@ class droptableautoincrementoracle : public sqltrigger {
 };
 
 droptableautoincrementoracle::droptableautoincrementoracle(
-			xmldomnode *parameters) : sqltrigger(parameters) {
+			xmldomnode *parameters) : sqlrtrigger(parameters) {
 }
 
 bool droptableautoincrementoracle::run(sqlrconnection_svr *sqlrcon,
@@ -259,7 +259,7 @@ bool droptableautoincrementoracle::deleteSequence(sqlrconnection_svr *sqlrcon,
 }
 
 extern "C" {
-	sqltrigger	*new_droptableautoincrementoracle(
+	sqlrtrigger	*new_droptableautoincrementoracle(
 					xmldomnode *parameters) {
 		return new droptableautoincrementoracle(parameters);
 	}

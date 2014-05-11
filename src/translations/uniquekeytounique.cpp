@@ -4,12 +4,12 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class uniquekeytounique : public sqltranslation {
+class uniquekeytounique : public sqlrtranslation {
 	public:
-			uniquekeytounique(sqltranslations *sqlts,
+			uniquekeytounique(sqlrtranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
@@ -18,9 +18,9 @@ class uniquekeytounique : public sqltranslation {
 		void	replaceUniqueKey(xmldomnode *node);
 };
 
-uniquekeytounique::uniquekeytounique(sqltranslations *sqlts,
+uniquekeytounique::uniquekeytounique(sqlrtranslations *sqlts,
 						xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool uniquekeytounique::run(sqlrconnection_svr *sqlrcon,
@@ -54,8 +54,8 @@ void uniquekeytounique::replaceUniqueKey(xmldomnode *node) {
 }
 
 extern "C" {
-	sqltranslation	*new_uniquekeytounique(sqltranslations *sqlts,
-					xmldomnode *parameters) {
+	sqlrtranslation	*new_uniquekeytounique(sqlrtranslations *sqlts,
+						xmldomnode *parameters) {
 		return new uniquekeytounique(sqlts,parameters);
 	}
 }

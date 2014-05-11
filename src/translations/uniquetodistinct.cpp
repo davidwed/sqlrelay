@@ -4,12 +4,12 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class uniquetodistinct : public sqltranslation {
+class uniquetodistinct : public sqlrtranslation {
 	public:
-			uniquetodistinct(sqltranslations *sqlts,
+			uniquetodistinct(sqlrtranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
@@ -18,9 +18,9 @@ class uniquetodistinct : public sqltranslation {
 		void	replaceUnique(xmldomnode *node);
 };
 
-uniquetodistinct::uniquetodistinct(sqltranslations *sqlts,
+uniquetodistinct::uniquetodistinct(sqlrtranslations *sqlts,
 						xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool uniquetodistinct::run(sqlrconnection_svr *sqlrcon,
@@ -59,8 +59,8 @@ void uniquetodistinct::replaceUnique(xmldomnode *node) {
 }
 
 extern "C" {
-	sqltranslation	*new_uniquetodistinct(sqltranslations *sqlts,
-					xmldomnode *parameters) {
+	sqlrtranslation	*new_uniquetodistinct(sqlrtranslations *sqlts,
+						xmldomnode *parameters) {
 		return new uniquetodistinct(sqlts,parameters);
 	}
 }

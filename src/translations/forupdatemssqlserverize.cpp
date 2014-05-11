@@ -4,12 +4,12 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class forupdatemssqlserverize : public sqltranslation {
+class forupdatemssqlserverize : public sqlrtranslation {
 	public:
-			forupdatemssqlserverize(sqltranslations *sqlts,
+			forupdatemssqlserverize(sqlrtranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
@@ -17,9 +17,9 @@ class forupdatemssqlserverize : public sqltranslation {
 };
 
 forupdatemssqlserverize::forupdatemssqlserverize(
-					sqltranslations *sqlts,
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool forupdatemssqlserverize::run(sqlrconnection_svr *sqlrcon,
@@ -75,8 +75,8 @@ bool forupdatemssqlserverize::run(sqlrconnection_svr *sqlrcon,
 }
 
 extern "C" {
-	sqltranslation	*new_forupdatemssqlserverize(
-					sqltranslations *sqlts,
+	sqlrtranslation	*new_forupdatemssqlserverize(
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new forupdatemssqlserverize(sqlts,parameters);
 	}

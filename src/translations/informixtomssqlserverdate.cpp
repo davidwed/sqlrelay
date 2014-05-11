@@ -4,7 +4,7 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <rudiments/datetime.h>
 #include <debugprint.h>
 
@@ -30,9 +30,9 @@ static const char *timeparts[]={
 	NULL
 };
 
-class informixtomssqlserverdate : public sqltranslation {
+class informixtomssqlserverdate : public sqlrtranslation {
 	public:
-			informixtomssqlserverdate(sqltranslations *sqlts,
+			informixtomssqlserverdate(sqlrtranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
@@ -74,9 +74,9 @@ class informixtomssqlserverdate : public sqltranslation {
 						const char *formatstring);
 };
 
-informixtomssqlserverdate::informixtomssqlserverdate(sqltranslations *sqlts,
+informixtomssqlserverdate::informixtomssqlserverdate(sqlrtranslations *sqlts,
 					xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool informixtomssqlserverdate::run(sqlrconnection_svr *sqlrcon,
@@ -702,8 +702,8 @@ xmldomnode *informixtomssqlserverdate::wrapConvert(xmldomnode *functionnode,
 }
 
 extern "C" {
-	sqltranslation	*new_informixtomssqlserverdate(
-					sqltranslations *sqlts,
+	sqlrtranslation	*new_informixtomssqlserverdate(
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new informixtomssqlserverdate(sqlts,parameters);
 	}

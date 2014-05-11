@@ -4,12 +4,12 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class mysqlunsupported : public sqltranslation {
+class mysqlunsupported : public sqlrtranslation {
 	public:
-			mysqlunsupported(sqltranslations *sqlts,
+			mysqlunsupported(sqlrtranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
@@ -18,9 +18,9 @@ class mysqlunsupported : public sqltranslation {
 		void	removeNoWait(xmldomnode *node);
 };
 
-mysqlunsupported::mysqlunsupported(sqltranslations *sqlts,
+mysqlunsupported::mysqlunsupported(sqlrtranslations *sqlts,
 						xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool mysqlunsupported::run(sqlrconnection_svr *sqlrcon,
@@ -47,7 +47,7 @@ void mysqlunsupported::removeNoWait(xmldomnode *node) {
 }
 
 extern "C" {
-	sqltranslation	*new_mysqlunsupported(sqltranslations *sqlts,
+	sqlrtranslation	*new_mysqlunsupported(sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new mysqlunsupported(sqlts,parameters);
 	}

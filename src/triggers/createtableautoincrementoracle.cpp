@@ -4,11 +4,11 @@
 #include <sqlrcontroller.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
-#include <sqltrigger.h>
+#include <sqlrtrigger.h>
 #include <sqlparser.h>
 #include <debugprint.h>
 
-class createtableautoincrementoracle : public sqltrigger {
+class createtableautoincrementoracle : public sqlrtrigger {
 	public:
 			createtableautoincrementoracle(xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
@@ -29,7 +29,7 @@ class createtableautoincrementoracle : public sqltrigger {
 };
 
 createtableautoincrementoracle::createtableautoincrementoracle(
-			xmldomnode *parameters) : sqltrigger(parameters) {
+			xmldomnode *parameters) : sqlrtrigger(parameters) {
 }
 
 bool createtableautoincrementoracle::run(sqlrconnection_svr *sqlrcon,
@@ -262,7 +262,7 @@ bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
 }
 
 extern "C" {
-	sqltrigger	*new_createtableautoincrementoracle(
+	sqlrtrigger	*new_createtableautoincrementoracle(
 					xmldomnode *parameters) {
 		return new createtableautoincrementoracle(parameters);
 	}

@@ -29,7 +29,7 @@
 #include <sqlparser.h>
 #include <sqlrtranslations.h>
 #include <sqlwriter.h>
-#include <sqltriggers.h>
+#include <sqlrtriggers.h>
 #include <sqlrloggers.h>
 #include <sqlrqueries.h>
 #include <sqlrpwdencs.h>
@@ -345,7 +345,7 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		sqlparser		*sqlp;
 		sqlrtranslations	*sqlrt;
 		sqlwriter		*sqlw;
-		sqltriggers		*sqltr;
+		sqlrtriggers		*sqlrtr;
 		sqlrloggers		*sqlrlg;
 		sqlrqueries		*sqlrq;
 		sqlrpwdencs		*sqlrpe;

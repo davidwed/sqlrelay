@@ -4,12 +4,12 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class matchestolike : public sqltranslation {
+class matchestolike : public sqlrtranslation {
 	public:
-			matchestolike(sqltranslations *sqlts,
+			matchestolike(sqlrtranslations *sqlts,
 					xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
@@ -19,9 +19,9 @@ class matchestolike : public sqltranslation {
 		void	wrap(xmldomnode *node);
 };
 
-matchestolike::matchestolike(sqltranslations *sqlts,
+matchestolike::matchestolike(sqlrtranslations *sqlts,
 					xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool matchestolike::run(sqlrconnection_svr *sqlrcon,
@@ -110,7 +110,7 @@ void matchestolike::wrap(xmldomnode *node) {
 }
 
 extern "C" {
-	sqltranslation	*new_matchestolike(sqltranslations *sqlts,
+	sqlrtranslation	*new_matchestolike(sqlrtranslations *sqlts,
 						xmldomnode *parameters) {
 		return new matchestolike(sqlts,parameters);
 	}

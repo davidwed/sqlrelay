@@ -4,12 +4,13 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class cascadetocascadeconstraints : public sqltranslation {
+class cascadetocascadeconstraints : public sqlrtranslation {
 	public:
-			cascadetocascadeconstraints(sqltranslations *sqlts,
+			cascadetocascadeconstraints(
+						sqlrtranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
@@ -18,9 +19,10 @@ class cascadetocascadeconstraints : public sqltranslation {
 		void	insertConstraints(xmldomnode *node);
 };
 
-cascadetocascadeconstraints::cascadetocascadeconstraints(sqltranslations *sqlts,
+cascadetocascadeconstraints::cascadetocascadeconstraints(
+						sqlrtranslations *sqlts,
 						xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool cascadetocascadeconstraints::run(sqlrconnection_svr *sqlrcon,
@@ -47,7 +49,8 @@ void cascadetocascadeconstraints::insertConstraints(xmldomnode *node) {
 }
 
 extern "C" {
-	sqltranslation	*new_cascadetocascadeconstraints(sqltranslations *sqlts,
+	sqlrtranslation	*new_cascadetocascadeconstraints(
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new cascadetocascadeconstraints(sqlts,parameters);
 	}

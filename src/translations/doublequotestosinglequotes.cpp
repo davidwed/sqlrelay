@@ -4,12 +4,12 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class doublequotestosinglequotes : public sqltranslation {
+class doublequotestosinglequotes : public sqlrtranslation {
 	public:
-			doublequotestosinglequotes(sqltranslations *sqlts,
+			doublequotestosinglequotes(sqlrtranslations *sqlts,
 							xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
@@ -18,9 +18,9 @@ class doublequotestosinglequotes : public sqltranslation {
 		bool	replaceDoubleQuotes(xmldomnode *node);
 };
 
-doublequotestosinglequotes::doublequotestosinglequotes(sqltranslations *sqlts,
+doublequotestosinglequotes::doublequotestosinglequotes(sqlrtranslations *sqlts,
 					xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool doublequotestosinglequotes::run(sqlrconnection_svr *sqlrcon,
@@ -68,8 +68,8 @@ bool doublequotestosinglequotes::replaceDoubleQuotes(xmldomnode *node) {
 }
 
 extern "C" {
-	sqltranslation	*new_doublequotestosinglequotes(
-					sqltranslations *sqlts,
+	sqlrtranslation	*new_doublequotestosinglequotes(
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new doublequotestosinglequotes(sqlts,parameters);
 	}

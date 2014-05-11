@@ -3,20 +3,20 @@
 
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class oracleize : public sqltranslation {
+class oracleize : public sqlrtranslation {
 	public:
-			oracleize(sqltranslations *sqlts,
+			oracleize(sqlrtranslations *sqlts,
 					xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
 };
 
-oracleize::oracleize(sqltranslations *sqlts, xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+oracleize::oracleize(sqlrtranslations *sqlts, xmldomnode *parameters) :
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool oracleize::run(sqlrconnection_svr *sqlrcon,
@@ -27,7 +27,7 @@ bool oracleize::run(sqlrconnection_svr *sqlrcon,
 }
 
 extern "C" {
-	sqltranslation	*new_oracleize(sqltranslations *sqlts,
+	sqlrtranslation	*new_oracleize(sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new oracleize(sqlts,parameters);
 	}

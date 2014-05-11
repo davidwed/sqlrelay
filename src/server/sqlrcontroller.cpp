@@ -101,7 +101,7 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 	sqlp=NULL;
 	sqlrt=NULL;
 	sqlw=NULL;
-	sqltr=NULL;
+	sqlrtr=NULL;
 	sqlrlg=NULL;
 	sqlrq=NULL;
 	sqlrpe=NULL;
@@ -176,7 +176,7 @@ sqlrcontroller_svr::~sqlrcontroller_svr() {
 	delete sqlp;
 	delete sqlrt;
 	delete sqlw;
-	delete sqltr;
+	delete sqlrtr;
 	delete sqlrlg;
 	delete sqlrq;
 	delete sqlrpe;
@@ -327,8 +327,8 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 		if (!sqlp) {
 			sqlp=new sqlparser;
 		}
-		sqltr=new sqltriggers;
-		sqltr->loadTriggers(triggers);
+		sqlrtr=new sqlrtriggers;
+		sqlrtr->loadTriggers(triggers);
 	}
 	debugtriggers=cfgfl->getDebugTriggers();
 
@@ -2865,8 +2865,8 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *curs,
 						uint32_t length) {
 
 	// handle before-triggers
-	if (sqltr) {
-		sqltr->runBeforeTriggers(conn,curs,curs->querytree);
+	if (sqlrtr) {
+		sqlrtr->runBeforeTriggers(conn,curs,curs->querytree);
 	}
 
 	// get the query start time
@@ -2890,8 +2890,8 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *curs,
 	}
 
 	// handle after-triggers
-	if (sqltr) {
-		sqltr->runAfterTriggers(conn,curs,curs->querytree,true);
+	if (sqlrtr) {
+		sqlrtr->runAfterTriggers(conn,curs,curs->querytree,true);
 	}
 
 	return curs->queryresult;
@@ -3167,9 +3167,9 @@ void sqlrcontroller_svr::dropTempTable(sqlrcursor_svr *cursor,
 	// FIXME: I need to refactor all of this so that this just gets
 	// run as a matter of course instead of explicitly getting run here
 	// FIXME: freetds/sybase override this method but don't do this
-	if (sqltr) {
+	if (sqlrtr) {
 		if (sqlp->parse(dropquery.getString())) {
-			sqltr->runBeforeTriggers(conn,cursor,sqlp->getTree());
+			sqlrtr->runBeforeTriggers(conn,cursor,sqlp->getTree());
 		}
 	}
 
@@ -3191,8 +3191,8 @@ void sqlrcontroller_svr::dropTempTable(sqlrcursor_svr *cursor,
 	// FIXME: I need to refactor all of this so that this just gets
 	// run as a matter of course instead of explicitly getting run here
 	// FIXME: freetds/sybase override this method but don't do this
-	if (sqltr) {
-		sqltr->runAfterTriggers(conn,cursor,sqlp->getTree(),true);
+	if (sqlrtr) {
+		sqlrtr->runAfterTriggers(conn,cursor,sqlp->getTree(),true);
 	}
 }
 

@@ -4,13 +4,13 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class createselecttocreateasselect : public sqltranslation {
+class createselecttocreateasselect : public sqlrtranslation {
 	public:
 			createselecttocreateasselect(
-						sqltranslations *sqlts,
+						sqlrtranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
@@ -20,9 +20,9 @@ class createselecttocreateasselect : public sqltranslation {
 };
 
 createselecttocreateasselect::createselecttocreateasselect(
-						sqltranslations *sqlts,
+						sqlrtranslations *sqlts,
 						xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool createselecttocreateasselect::run(sqlrconnection_svr *sqlrcon,
@@ -49,8 +49,8 @@ void createselecttocreateasselect::insertAs(xmldomnode *node) {
 }
 
 extern "C" {
-	sqltranslation	*new_createselecttocreateasselect(
-					sqltranslations *sqlts,
+	sqlrtranslation	*new_createselecttocreateasselect(
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new createselecttocreateasselect(sqlts,parameters);
 	}

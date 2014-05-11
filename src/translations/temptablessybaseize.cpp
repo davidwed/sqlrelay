@@ -5,13 +5,13 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 #include <rudiments/process.h>
 
-class temptablessybaseize : public sqltranslation {
+class temptablessybaseize : public sqlrtranslation {
 	public:
-			temptablessybaseize(sqltranslations *sqlts,
+			temptablessybaseize(sqlrtranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
@@ -27,9 +27,9 @@ class temptablessybaseize : public sqltranslation {
 		bool		replaceTempNames(xmldomnode *node);
 };
 
-temptablessybaseize::temptablessybaseize(sqltranslations *sqlts,
+temptablessybaseize::temptablessybaseize(sqlrtranslations *sqlts,
 					xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool temptablessybaseize::run(sqlrconnection_svr *sqlrcon,
@@ -292,8 +292,8 @@ bool temptablessybaseize::replaceTempNames(xmldomnode *node) {
 }
 
 extern "C" {
-	sqltranslation	*new_temptablessybaseize(
-					sqltranslations *sqlts,
+	sqlrtranslation	*new_temptablessybaseize(
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new temptablessybaseize(sqlts,parameters);
 	}

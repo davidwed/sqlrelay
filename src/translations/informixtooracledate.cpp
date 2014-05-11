@@ -4,12 +4,12 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class informixtooracledate : public sqltranslation {
+class informixtooracledate : public sqlrtranslation {
 	public:
-			informixtooracledate(sqltranslations *sqlts,
+			informixtooracledate(sqlrtranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
@@ -49,9 +49,9 @@ class informixtooracledate : public sqltranslation {
 					const char *formatstring);
 };
 
-informixtooracledate::informixtooracledate(sqltranslations *sqlts,
+informixtooracledate::informixtooracledate(sqlrtranslations *sqlts,
 					xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool informixtooracledate::run(sqlrconnection_svr *sqlrcon,
@@ -471,8 +471,8 @@ xmldomnode *informixtooracledate::wrap(xmldomnode *functionnode,
 }
 
 extern "C" {
-	sqltranslation	*new_informixtooracledate(
-					sqltranslations *sqlts,
+	sqlrtranslation	*new_informixtooracledate(
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new informixtooracledate(sqlts,parameters);
 	}

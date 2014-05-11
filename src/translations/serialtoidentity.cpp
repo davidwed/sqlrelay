@@ -4,21 +4,21 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class serialtoidentity : public sqltranslation {
+class serialtoidentity : public sqlrtranslation {
 	public:
-			serialtoidentity(sqltranslations *sqlts,
+			serialtoidentity(sqlrtranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
 };
 
-serialtoidentity::serialtoidentity(sqltranslations *sqlts,
+serialtoidentity::serialtoidentity(sqlrtranslations *sqlts,
 						xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool serialtoidentity::run(sqlrconnection_svr *sqlrcon,
@@ -76,8 +76,8 @@ bool serialtoidentity::run(sqlrconnection_svr *sqlrcon,
 }
 
 extern "C" {
-	sqltranslation	*new_serialtoidentity(sqltranslations *sqlts,
-					xmldomnode *parameters) {
+	sqlrtranslation	*new_serialtoidentity(sqlrtranslations *sqlts,
+						xmldomnode *parameters) {
 		return new serialtoidentity(sqlts,parameters);
 	}
 }

@@ -5,11 +5,11 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltrigger.h>
-#include <sqltranslations.h>
+#include <sqlrtrigger.h>
+#include <sqlrtranslations.h>
 #include <debugprint.h>
 
-class droplocalizedtemptables : public sqltrigger {
+class droplocalizedtemptables : public sqlrtrigger {
 	public:
 			droplocalizedtemptables(xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
@@ -18,12 +18,12 @@ class droplocalizedtemptables : public sqltrigger {
 					bool before,
 					bool success);
 	private:
-		bool	dropTable(sqltranslations *sqlt, xmldom *querytree);
-		bool	dropIndex(sqltranslations *sqlt, xmldom *querytree);
+		bool	dropTable(sqlrtranslations *sqlrt, xmldom *querytree);
+		bool	dropIndex(sqlrtranslations *sqlrt, xmldom *querytree);
 };
 
 droplocalizedtemptables::droplocalizedtemptables(
-			xmldomnode *parameters) : sqltrigger(parameters) {
+			xmldomnode *parameters) : sqlrtrigger(parameters) {
 }
 
 bool droplocalizedtemptables::run(sqlrconnection_svr *sqlrcon,
@@ -41,16 +41,16 @@ bool droplocalizedtemptables::run(sqlrconnection_svr *sqlrcon,
 		return false;
 	}
 
-	// sqltranslations must exist too
-	sqltranslations	*sqlt=sqlrcon->cont->sqlt;
-	if (!sqlt) {
+	// sqlrtranslations must exist too
+	sqlrtranslations	*sqlrt=sqlrcon->cont->sqlrt;
+	if (!sqlrt) {
 		return false;
 	}
 
-	return dropTable(sqlt,querytree) || dropIndex(sqlt,querytree);
+	return dropTable(sqlrt,querytree) || dropIndex(sqlrt,querytree);
 }
 
-bool droplocalizedtemptables::dropTable(sqltranslations *sqlt,
+bool droplocalizedtemptables::dropTable(sqlrtranslations *sqlrt,
 							xmldom *querytree) {
 	debugFunction();
 
@@ -105,12 +105,12 @@ bool droplocalizedtemptables::dropTable(sqltranslations *sqlt,
 		}
 
 		// unmap the table (and any indices that depend on it)
-		sqlt->removeReplacementTable(database,schema,table);
+		sqlrt->removeReplacementTable(database,schema,table);
 	}
 	return true;
 }
 
-bool droplocalizedtemptables::dropIndex(sqltranslations *sqlt,
+bool droplocalizedtemptables::dropIndex(sqlrtranslations *sqlrt,
 							xmldom *querytree) {
 	debugFunction();
 
@@ -144,12 +144,12 @@ bool droplocalizedtemptables::dropIndex(sqltranslations *sqlt,
 	}
 
 	// unmap the index
-	sqlt->removeReplacementIndex(database,schema,index);
+	sqlrt->removeReplacementIndex(database,schema,index);
 	return true;
 }
 
 extern "C" {
-	sqltrigger	*new_droplocalizedtemptables(xmldomnode *parameters) {
+	sqlrtrigger	*new_droplocalizedtemptables(xmldomnode *parameters) {
 		return new droplocalizedtemptables(parameters);
 	}
 }

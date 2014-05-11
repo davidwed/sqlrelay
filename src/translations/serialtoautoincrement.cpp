@@ -4,21 +4,21 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class serialtoautoincrement : public sqltranslation {
+class serialtoautoincrement : public sqlrtranslation {
 	public:
-			serialtoautoincrement(sqltranslations *sqlts,
+			serialtoautoincrement(sqlrtranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
 };
 
-serialtoautoincrement::serialtoautoincrement(sqltranslations *sqlts,
+serialtoautoincrement::serialtoautoincrement(sqlrtranslations *sqlts,
 						xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool serialtoautoincrement::run(sqlrconnection_svr *sqlrcon,
@@ -76,7 +76,8 @@ bool serialtoautoincrement::run(sqlrconnection_svr *sqlrcon,
 }
 
 extern "C" {
-	sqltranslation	*new_serialtoautoincrement(sqltranslations *sqlts,
+	sqlrtranslation	*new_serialtoautoincrement(
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new serialtoautoincrement(sqlts,parameters);
 	}

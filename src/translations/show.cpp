@@ -4,20 +4,20 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class show : public sqltranslation {
+class show : public sqlrtranslation {
 	public:
-			show(sqltranslations *sqlts,
+			show(sqlrtranslations *sqlts,
 					xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
 };
 
-show::show(sqltranslations *sqlts,xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+show::show(sqlrtranslations *sqlts,xmldomnode *parameters) :
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool show::run(sqlrconnection_svr *sqlrcon,
@@ -54,7 +54,7 @@ bool show::run(sqlrconnection_svr *sqlrcon,
 }
 
 extern "C" {
-	sqltranslation	*new_show(sqltranslations *sqlts,
+	sqlrtranslation	*new_show(sqlrtranslations *sqlts,
 						xmldomnode *parameters) {
 		return new show(sqlts,parameters);
 	}

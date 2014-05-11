@@ -4,13 +4,13 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class informixtomssqlserverselectinto : public sqltranslation {
+class informixtomssqlserverselectinto : public sqlrtranslation {
 	public:
 			informixtomssqlserverselectinto(
-						sqltranslations *sqlts,
+						sqlrtranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
@@ -18,9 +18,9 @@ class informixtomssqlserverselectinto : public sqltranslation {
 };
 
 informixtomssqlserverselectinto::informixtomssqlserverselectinto(
-					sqltranslations *sqlts,
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool informixtomssqlserverselectinto::run(sqlrconnection_svr *sqlrcon,
@@ -67,8 +67,8 @@ bool informixtomssqlserverselectinto::run(sqlrconnection_svr *sqlrcon,
 }
 
 extern "C" {
-	sqltranslation	*new_informixtomssqlserverselectinto(
-					sqltranslations *sqlts,
+	sqlrtranslation	*new_informixtomssqlserverselectinto(
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new informixtomssqlserverselectinto(sqlts,parameters);
 	}

@@ -5,12 +5,12 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class translatedatetimes : public sqltranslation {
+class translatedatetimes : public sqlrtranslation {
 	public:
-			translatedatetimes(sqltranslations *sqlts,
+			translatedatetimes(sqlrtranslations *sqlts,
 					xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
@@ -27,15 +27,15 @@ class translatedatetimes : public sqltranslation {
 					xmldomnode *parameters);
 };
 
-translatedatetimes::translatedatetimes(sqltranslations *sqlts,
+translatedatetimes::translatedatetimes(sqlrtranslations *sqlts,
 					xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool translatedatetimes::run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree) {
-	if (sqlrcon->cont->debugsqltranslation) {
+	if (sqlrcon->cont->debugsqlrtranslation) {
 		stdoutput.printf("date/time translation:\n");
 		stdoutput.printf("    ddmm: %s\n",
 			parameters->getAttributeValue("ddmm"));
@@ -54,7 +54,7 @@ bool translatedatetimes::run(sqlrconnection_svr *sqlrcon,
 						parameters)) {
 		return false;
 	}
-	if (sqlrcon->cont->debugsqltranslation) {
+	if (sqlrcon->cont->debugsqlrtranslation) {
 		stdoutput.printf("  query:\n");
 	}
 	if (!translateDateTimesInQuery(sqlrcon,sqlrcur,
@@ -62,7 +62,7 @@ bool translatedatetimes::run(sqlrconnection_svr *sqlrcon,
 						parameters)) {
 		return false;
 	}
-	if (sqlrcon->cont->debugsqltranslation) {
+	if (sqlrcon->cont->debugsqlrtranslation) {
 		stdoutput.printf("\n");
 	}
 	return true;
@@ -168,7 +168,8 @@ bool translatedatetimes::translateDateTimesInQuery(
 							fraction);
 				if (converted) {
 
-					if (sqlrcon->cont->debugsqltranslation) {
+					if (sqlrcon->cont->
+						debugsqlrtranslation) {
 						stdoutput.printf(
 							"    %s -> %s\n",
 							valuecopy,converted);
@@ -289,7 +290,7 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 			continue;
 		}
 
-		if (sqlrcon->cont->debugsqltranslation) {
+		if (sqlrcon->cont->debugsqlrtranslation) {
 			stdoutput.printf("    %s -> %s\n",
 					bind->value.stringval,converted);
 		}
@@ -307,8 +308,8 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 }
 
 extern "C" {
-	sqltranslation	*new_translatedatetimes(
-					sqltranslations *sqlts,
+	sqlrtranslation	*new_translatedatetimes(
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new translatedatetimes(sqlts,parameters);
 	}

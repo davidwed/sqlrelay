@@ -4,12 +4,12 @@
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <debugprint.h>
 
-class temporarytoglobaltemporary : public sqltranslation {
+class temporarytoglobaltemporary : public sqlrtranslation {
 	public:
-			temporarytoglobaltemporary(sqltranslations *sqlts,
+			temporarytoglobaltemporary(sqlrtranslations *sqlts,
 						xmldomnode *parameters);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
@@ -18,9 +18,9 @@ class temporarytoglobaltemporary : public sqltranslation {
 		void	insertGlobal(xmldomnode *node);
 };
 
-temporarytoglobaltemporary::temporarytoglobaltemporary(sqltranslations *sqlts,
+temporarytoglobaltemporary::temporarytoglobaltemporary(sqlrtranslations *sqlts,
 						xmldomnode *parameters) :
-					sqltranslation(sqlts,parameters) {
+					sqlrtranslation(sqlts,parameters) {
 }
 
 bool temporarytoglobaltemporary::run(sqlrconnection_svr *sqlrcon,
@@ -52,7 +52,8 @@ void temporarytoglobaltemporary::insertGlobal(xmldomnode *node) {
 }
 
 extern "C" {
-	sqltranslation	*new_temporarytoglobaltemporary(sqltranslations *sqlts,
+	sqlrtranslation	*new_temporarytoglobaltemporary(
+					sqlrtranslations *sqlts,
 					xmldomnode *parameters) {
 		return new temporarytoglobaltemporary(sqlts,parameters);
 	}
