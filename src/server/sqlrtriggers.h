@@ -1,29 +1,29 @@
 // Copyright (c) 2012  David Muse
 // See the file COPYING for more information
 
-#ifndef SQLTRIGGERS_H
-#define SQLTRIGGERS_H
+#ifndef SQLRTRIGGERS_H
+#define SQLRTRIGGERS_H
 
 #include <sqlrserverdll.h>
 
 #include <rudiments/xmldom.h>
 #include <rudiments/linkedlist.h>
 #include <rudiments/dynamiclib.h>
-#include <sqltrigger.h>
+#include <sqlrtrigger.h>
 
 class sqlrconnection_svr;
 class sqlrcursor_svr;
 
-class SQLRSERVER_DLLSPEC sqltriggerplugin {
+class SQLRSERVER_DLLSPEC sqlrtriggerplugin {
 	public:
-		sqltrigger	*tr;
+		sqlrtrigger	*tr;
 		dynamiclib	*dl;
 };
 
-class SQLRSERVER_DLLSPEC sqltriggers {
+class SQLRSERVER_DLLSPEC sqlrtriggers {
 	public:
-			sqltriggers();
-			~sqltriggers();
+			sqlrtriggers();
+			~sqlrtriggers();
 
 		bool	loadTriggers(const char *triggers);
 		void	runBeforeTriggers(sqlrconnection_svr *sqlrcon,
@@ -36,17 +36,17 @@ class SQLRSERVER_DLLSPEC sqltriggers {
 	private:
 		void		unloadTriggers();
 		void		loadTrigger(xmldomnode *trigger,
-					linkedlist< sqltriggerplugin *> *list);
+					linkedlist< sqlrtriggerplugin *> *list);
 		void		runTriggers(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree,
-					linkedlist< sqltriggerplugin * > *list,
+					linkedlist< sqlrtriggerplugin * > *list,
 					bool before,
 					bool success);
 
 		xmldom					*xmld;
-		linkedlist< sqltriggerplugin * >	beforetriggers;
-		linkedlist< sqltriggerplugin * >	aftertriggers;
+		linkedlist< sqlrtriggerplugin * >	beforetriggers;
+		linkedlist< sqlrtriggerplugin * >	aftertriggers;
 };
 
 #endif

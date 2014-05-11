@@ -7,7 +7,7 @@
 #include <sqlrserverdll.h>
 
 #include <sqlrcursor.h>
-#include <sqltranslations.h>
+#include <sqlrtranslations.h>
 
 class sqlrcontroller_svr;
 
@@ -98,7 +98,7 @@ class SQLRSERVER_DLLSPEC sqlrconnection_svr {
 
 		virtual void		endSession();
 
-		virtual sqltranslations	*getSqlTranslations();
+		virtual sqlrtranslations	*getSqlTranslations();
 
 		void	clearError();
 		void	setError(const char *err, int64_t errn, bool liveconn);

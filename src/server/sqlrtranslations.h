@@ -1,8 +1,8 @@
 // Copyright (c) 1999-2011  David Muse
 // See the file COPYING for more information
 
-#ifndef SQLTRANSLATOR_H
-#define SQLTRANSLATOR_H
+#ifndef SQLRTRANSLATIONS_H
+#define SQLRTRANSLATIONS_H
 
 #include <sqlrserverdll.h>
 
@@ -11,7 +11,7 @@
 #include <rudiments/memorypool.h>
 #include <rudiments/dictionary.h>
 #include <rudiments/dynamiclib.h>
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 
 class sqlrconnection_svr;
 class sqlrcursor_svr;
@@ -24,16 +24,16 @@ class SQLRSERVER_DLLSPEC databaseobject {
 		const char	*dependency;
 };
 
-class SQLRSERVER_DLLSPEC sqltranslationplugin {
+class SQLRSERVER_DLLSPEC sqlrtranslationplugin {
 	public:
-		sqltranslation	*tr;
+		sqlrtranslation	*tr;
 		dynamiclib	*dl;
 };
 
-class SQLRSERVER_DLLSPEC sqltranslations {
+class SQLRSERVER_DLLSPEC sqlrtranslations {
 	public:
-			sqltranslations();
-			~sqltranslations();
+			sqlrtranslations();
+			~sqlrtranslations();
 
 		bool	loadTranslations(const char *translations);
 		bool	runTranslations(sqlrconnection_svr *sqlrcon,
@@ -81,7 +81,7 @@ class SQLRSERVER_DLLSPEC sqltranslations {
 		xmldom	*xmld;
 		xmldom	*tree;
 
-		linkedlist< sqltranslationplugin * >	tlist;
+		linkedlist< sqlrtranslationplugin * >	tlist;
 
 
 	public:

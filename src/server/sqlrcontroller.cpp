@@ -99,7 +99,7 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 	outbindmappings=new namevaluepairs;
 
 	sqlp=NULL;
-	sqlt=NULL;
+	sqlrt=NULL;
 	sqlw=NULL;
 	sqltr=NULL;
 	sqlrlg=NULL;
@@ -109,7 +109,7 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 
 	decrypteddbpassword=NULL;
 
-	debugsqltranslation=false;
+	debugsqlrtranslation=false;
 	debugtriggers=false;
 
 	cur=NULL;
@@ -174,7 +174,7 @@ sqlrcontroller_svr::~sqlrcontroller_svr() {
 	delete outbindmappings;
 
 	delete sqlp;
-	delete sqlt;
+	delete sqlrt;
 	delete sqlw;
 	delete sqltr;
 	delete sqlrlg;
@@ -314,11 +314,11 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	const char	*translations=cfgfl->getTranslations();
 	if (translations && translations[0]) {
 		sqlp=new sqlparser;
-		sqlt=conn->getSqlTranslations();
-		sqlt->loadTranslations(translations);
+		sqlrt=conn->getSqlTranslations();
+		sqlrt->loadTranslations(translations);
 		sqlw=new sqlwriter;
 	}
-	debugsqltranslation=cfgfl->getDebugTranslations();
+	debugsqlrtranslation=cfgfl->getDebugTranslations();
 
 	// get the triggers
 	const char	*triggers=cfgfl->getTriggers();
@@ -2170,7 +2170,7 @@ void sqlrcontroller_svr::translateBindVariablesFromMappings(
 
 void sqlrcontroller_svr::rewriteQuery(sqlrcursor_svr *cursor) {
 
-	if (sqlp && sqlt && sqlw) {
+	if (sqlp && sqlrt && sqlw) {
 		if (!translateQuery(cursor)) {
 			// FIXME: do something?
 		}
@@ -2187,7 +2187,7 @@ void sqlrcontroller_svr::rewriteQuery(sqlrcursor_svr *cursor) {
 
 bool sqlrcontroller_svr::translateQuery(sqlrcursor_svr *cursor) {
 
-	if (debugsqltranslation) {
+	if (debugsqlrtranslation) {
 		stdoutput.printf("original:\n\"%s\"\n\n",cursor->querybuffer);
 	}
 
@@ -2201,14 +2201,14 @@ bool sqlrcontroller_svr::translateQuery(sqlrcursor_svr *cursor) {
 		return false;
 	}
 
-	if (debugsqltranslation) {
+	if (debugsqlrtranslation) {
 		stdoutput.printf("before translation:\n");
 		cursor->querytree->getRootNode()->print(&stdoutput);
 		stdoutput.printf("\n");
 	}
 
 	if (!parsed) {
-		if (debugsqltranslation) {
+		if (debugsqlrtranslation) {
 			stdoutput.printf(
 				"parse failed, using original:\n\"%s\"\n\n",
 							cursor->querybuffer);
@@ -2219,11 +2219,11 @@ bool sqlrcontroller_svr::translateQuery(sqlrcursor_svr *cursor) {
 	}
 
 	// apply translation rules
-	if (!sqlt->runTranslations(conn,cursor,cursor->querytree)) {
+	if (!sqlrt->runTranslations(conn,cursor,cursor->querytree)) {
 		return false;
 	}
 
-	if (debugsqltranslation) {
+	if (debugsqlrtranslation) {
 		stdoutput.printf("after translation:\n");
 		cursor->querytree->getRootNode()->print(&stdoutput);
 		stdoutput.printf("\n");
@@ -2235,7 +2235,7 @@ bool sqlrcontroller_svr::translateQuery(sqlrcursor_svr *cursor) {
 		return false;
 	}
 
-	if (debugsqltranslation) {
+	if (debugsqlrtranslation) {
 		stdoutput.printf("translated:\n\"%s\"\n\n",
 				translatedquery.getString());
 	}
@@ -2403,7 +2403,7 @@ void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 
 
 	// debug
-	if (debugsqltranslation) {
+	if (debugsqlrtranslation) {
 		stdoutput.printf("bind translation:\n\"%s\"\n",
 						cursor->querybuffer);
 		for (i=0; i<cursor->inbindcount; i++) {
@@ -3023,7 +3023,7 @@ void sqlrcontroller_svr::reformatField(sqlrcursor_svr *cursor,
 					fraction);
 	reformattedfieldlength=charstring::length(reformattedfield);
 
-	if (debugsqltranslation) {
+	if (debugsqlrtranslation) {
 		stdoutput.printf("converted date: "
 			"\"%s\" to \"%s\" using ddmm=%d\n",
 			field,reformattedfield,ddmm);
@@ -3104,8 +3104,8 @@ void sqlrcontroller_svr::endSession() {
 	conn->setIsolationLevel(isolationlevel);
 
 	// reset sql translation
-	if (sqlt) {
-		sqlt->endSession();
+	if (sqlrt) {
+		sqlrt->endSession();
 	}
 
 	// shrink the cursor array, if necessary

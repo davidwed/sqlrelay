@@ -1,20 +1,20 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqltranslation.h>
+#include <sqlrtranslation.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 
-sqltranslation::sqltranslation(sqltranslations *sqlts,
+sqlrtranslation::sqlrtranslation(sqlrtranslations *sqlts,
 				xmldomnode *parameters) {
 	this->sqlts=sqlts;
 	this->parameters=parameters;
 }
 
-sqltranslation::~sqltranslation() {
+sqlrtranslation::~sqlrtranslation() {
 }
 
-bool sqltranslation::run(sqlrconnection_svr *sqlrcon,
+bool sqlrtranslation::run(sqlrconnection_svr *sqlrcon,
 				sqlrcursor_svr *sqlrcur,
 				xmldom *querytree) {
 	return true;

@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqltriggers.h>
+#include <sqlrtriggers.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <debugprint.h>
@@ -13,22 +13,22 @@
 
 #ifndef SQLRELAY_ENABLE_SHARED
 	extern "C" {
-		#include "sqltriggerdeclarations.cpp"
+		#include "sqlrtriggerdeclarations.cpp"
 	}
 #endif
 
-sqltriggers::sqltriggers() {
+sqlrtriggers::sqlrtriggers() {
 	debugFunction();
 	xmld=NULL;
 }
 
-sqltriggers::~sqltriggers() {
+sqlrtriggers::~sqlrtriggers() {
 	debugFunction();
 	unloadTriggers();
 	delete xmld;
 }
 
-bool sqltriggers::loadTriggers(const char *triggers) {
+bool sqlrtriggers::loadTriggers(const char *triggers) {
 	debugFunction();
 
 	unloadTriggers();
@@ -62,7 +62,7 @@ bool sqltriggers::loadTriggers(const char *triggers) {
 				(before)?"before":"after");
 
 		// determine which list to put the trigger in
-		linkedlist< sqltriggerplugin * >	*list=
+		linkedlist< sqlrtriggerplugin * >	*list=
 				(before)?&beforetriggers:&aftertriggers;
 
 		// load trigger
@@ -71,21 +71,21 @@ bool sqltriggers::loadTriggers(const char *triggers) {
 	return true;
 }
 
-void sqltriggers::unloadTriggers() {
+void sqlrtriggers::unloadTriggers() {
 	debugFunction();
-	for (linkedlistnode< sqltriggerplugin * > *bnode=
+	for (linkedlistnode< sqlrtriggerplugin * > *bnode=
 				beforetriggers.getFirstNode();
 					bnode; bnode=bnode->getNext()) {
-		sqltriggerplugin	*sqlt=bnode->getValue();
+		sqlrtriggerplugin	*sqlt=bnode->getValue();
 		delete sqlt->tr;
 		delete sqlt->dl;
 		delete sqlt;
 	}
 	beforetriggers.clear();
-	for (linkedlistnode< sqltriggerplugin * > *anode=
+	for (linkedlistnode< sqlrtriggerplugin * > *anode=
 				aftertriggers.getFirstNode();
 					anode; anode=anode->getNext()) {
-		sqltriggerplugin	*sqlt=anode->getValue();
+		sqlrtriggerplugin	*sqlt=anode->getValue();
 		delete sqlt->tr;
 		delete sqlt->dl;
 		delete sqlt;
@@ -93,8 +93,8 @@ void sqltriggers::unloadTriggers() {
 	aftertriggers.clear();
 }
 
-void sqltriggers::loadTrigger(xmldomnode *trigger,
-				linkedlist< sqltriggerplugin * > *list) {
+void sqlrtriggers::loadTrigger(xmldomnode *trigger,
+				linkedlist< sqlrtriggerplugin * > *list) {
 
 	debugFunction();
 
@@ -119,7 +119,7 @@ void sqltriggers::loadTrigger(xmldomnode *trigger,
 	// load the trigger module
 	stringbuffer	modulename;
 	modulename.append(LIBEXECDIR);
-	modulename.append("/sqltrigger_");
+	modulename.append("/sqlrtrigger_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
@@ -134,8 +134,8 @@ void sqltriggers::loadTrigger(xmldomnode *trigger,
 	// load the trigger itself
 	stringbuffer	functionname;
 	functionname.append("new_")->append(module);
-	sqltrigger *(*newTrigger)(xmldomnode *)=
-			(sqltrigger *(*)(xmldomnode *))
+	sqlrtrigger *(*newTrigger)(xmldomnode *)=
+			(sqlrtrigger *(*)(xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newTrigger) {
 		stdoutput.printf("failed to create trigger: %s\n",module);
@@ -146,33 +146,33 @@ void sqltriggers::loadTrigger(xmldomnode *trigger,
 		delete dl;
 		return;
 	}
-	sqltrigger	*tr=(*newTrigger)(trigger);
+	sqlrtrigger	*tr=(*newTrigger)(trigger);
 
 #else
 
 	dynamiclib	*dl=NULL;
-	sqltrigger	*tr;
-	#include "sqltriggerassignments.cpp"
+	sqlrtrigger	*tr;
+	#include "sqlrtriggerassignments.cpp"
 	{
 		tr=NULL;
 	}
 #endif
 
 	// add the plugin to the list
-	sqltriggerplugin	*sqltp=new sqltriggerplugin;
+	sqlrtriggerplugin	*sqltp=new sqlrtriggerplugin;
 	sqltp->tr=tr;
 	sqltp->dl=dl;
 	list->append(sqltp);
 }
 
-void sqltriggers::runBeforeTriggers(sqlrconnection_svr *sqlrcon,
+void sqlrtriggers::runBeforeTriggers(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree) {
 	debugFunction();
 	runTriggers(sqlrcon,sqlrcur,querytree,&beforetriggers,true,true);
 }
 
-void sqltriggers::runAfterTriggers(sqlrconnection_svr *sqlrcon,
+void sqlrtriggers::runAfterTriggers(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldom *querytree,
 						bool success) {
@@ -180,17 +180,17 @@ void sqltriggers::runAfterTriggers(sqlrconnection_svr *sqlrcon,
 	runTriggers(sqlrcon,sqlrcur,querytree,&aftertriggers,false,success);
 }
 
-void sqltriggers::runTriggers(sqlrconnection_svr *sqlrcon,
+void sqlrtriggers::runTriggers(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree,
-					linkedlist< sqltriggerplugin * > *list,
+					linkedlist< sqlrtriggerplugin * > *list,
 					bool before,
 					bool success) {
 	debugFunction();
 	if (!querytree) {
 		return;
 	}
-	for (linkedlistnode< sqltriggerplugin * > *node=list->getFirstNode();
+	for (linkedlistnode< sqlrtriggerplugin * > *node=list->getFirstNode();
 						node; node=node->getNext()) {
 		node->getValue()->tr->run(sqlrcon,sqlrcur,
 						querytree,before,success);

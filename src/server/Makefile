@@ -15,10 +15,10 @@ PLUGINSRCS = sqlrconnectiondeclarations.cpp \
 		sqlrauthassignments.cpp \
 		sqlrquerydeclarations.cpp \
 		sqlrqueryassignments.cpp \
-		sqltranslationdeclarations.cpp \
-		sqltranslationassignments.cpp \
-		sqltriggerdeclarations.cpp \
-		sqltriggerassignments.cpp
+		sqlrtranslationdeclarations.cpp \
+		sqlrtranslationassignments.cpp \
+		sqlrtriggerdeclarations.cpp \
+		sqlrtriggerassignments.cpp
 PLUGINLOBJS = $(shell ls ../connections/*/*.lo) \
 		$(shell ls ../loggers/*.lo) \
 		$(shell ls ../pwdencs/*.lo) \
@@ -107,10 +107,10 @@ SRCS = sqlrlistener.cpp \
 	sqlrcursor.cpp \
 	sqlparser.cpp \
 	sqlwriter.cpp \
-	sqltranslations.cpp \
-	sqltranslation.cpp \
-	sqltriggers.cpp \
-	sqltrigger.cpp \
+	sqlrtranslations.cpp \
+	sqlrtranslation.cpp \
+	sqlrtriggers.cpp \
+	sqlrtrigger.cpp \
 	sqlrloggers.cpp \
 	sqlrlogger.cpp \
 	sqlrqueries.cpp \
@@ -129,10 +129,10 @@ LOBJS = sqlrlistener.lo \
 	sqlrcursor.lo \
 	sqlparser.lo \
 	sqlwriter.lo \
-	sqltranslations.lo \
-	sqltranslation.lo \
-	sqltriggers.lo \
-	sqltrigger.lo \
+	sqlrtranslations.lo \
+	sqlrtranslation.lo \
+	sqlrtriggers.lo \
+	sqlrtrigger.lo \
 	sqlrloggers.lo \
 	sqlrlogger.lo \
 	sqlrqueries.lo \
@@ -263,7 +263,7 @@ sqlrqueryassignments.cpp: sqlrqueryassignments.cpp.in
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
-sqltranslationdeclarations.cpp: sqltranslationdeclarations.cpp.in
+sqlrtranslationdeclarations.cpp: sqlrtranslationdeclarations.cpp.in
 	$(RM) $@
 	for file in `ls ../translations/*.lo`; \
 	do \
@@ -271,7 +271,7 @@ sqltranslationdeclarations.cpp: sqltranslationdeclarations.cpp.in
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
-sqltranslationassignments.cpp: sqltranslationassignments.cpp.in
+sqlrtranslationassignments.cpp: sqlrtranslationassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../translations/*.lo`; \
 	do \
@@ -279,7 +279,7 @@ sqltranslationassignments.cpp: sqltranslationassignments.cpp.in
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
-sqltriggerdeclarations.cpp: sqltriggerdeclarations.cpp.in
+sqlrtriggerdeclarations.cpp: sqlrtriggerdeclarations.cpp.in
 	$(RM) $@
 	for file in `ls ../triggers/*.lo`; \
 	do \
@@ -287,7 +287,7 @@ sqltriggerdeclarations.cpp: sqltriggerdeclarations.cpp.in
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
-sqltriggerassignments.cpp: sqltriggerassignments.cpp.in
+sqlrtriggerassignments.cpp: sqlrtriggerassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../triggers/*.lo`; \
 	do \
@@ -300,7 +300,12 @@ install:
 	$(LTINSTALL) libsqlrserver.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay
+	$(INSTALL) -m 644 sqlrauth.h $(includedir)/sqlrelay
+	$(INSTALL) -m 644 sqlrlogger.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 sqlrpwdenc.h $(includedir)/sqlrelay
+	$(INSTALL) -m 644 sqlrquery.h $(includedir)/sqlrelay
+	$(INSTALL) -m 644 sqlrtranslation.h $(includedir)/sqlrelay
+	$(INSTALL) -m 644 sqlrtrigger.h $(includedir)/sqlrelay
 	$(MKINSTALLDIRS) $(bindir)
 	$(LTINSTALL) sqlr-start$(EXE) $(bindir)
 	$(LTINSTALL) sqlr-listener$(EXE) $(bindir)

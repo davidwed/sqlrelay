@@ -27,7 +27,7 @@
 #include <sqlrcursor.h>
 #include <sqlrprotocol.h>
 #include <sqlparser.h>
-#include <sqltranslations.h>
+#include <sqlrtranslations.h>
 #include <sqlwriter.h>
 #include <sqltriggers.h>
 #include <sqlrloggers.h>
@@ -330,7 +330,7 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		namevaluepairs	*inbindmappings;
 		namevaluepairs	*outbindmappings;
 
-		bool		debugsqltranslation;
+		bool		debugsqlrtranslation;
 		bool		debugtriggers;
 
 		dynamiclib		dl;
@@ -341,15 +341,15 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		uint16_t	maxcursorcount;
 		sqlrcursor_svr	**cur;
 
-		sqlrprotocol	*sqlrp[SQLRPROTOCOLCOUNT];
-		sqlparser	*sqlp;
-		sqltranslations	*sqlt;
-		sqlwriter	*sqlw;
-		sqltriggers	*sqltr;
-		sqlrloggers	*sqlrlg;
-		sqlrqueries	*sqlrq;
-		sqlrpwdencs	*sqlrpe;
-		sqlrauths	*sqlra;
+		sqlrprotocol		*sqlrp[SQLRPROTOCOLCOUNT];
+		sqlparser		*sqlp;
+		sqlrtranslations	*sqlrt;
+		sqlwriter		*sqlw;
+		sqltriggers		*sqltr;
+		sqlrloggers		*sqlrlg;
+		sqlrqueries		*sqlrq;
+		sqlrpwdencs		*sqlrpe;
+		sqlrauths		*sqlra;
 
 		char		*decrypteddbpassword;
 

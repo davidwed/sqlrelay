@@ -633,7 +633,7 @@ bool sqlrcursor_svr::fakeInputBinds(stringbuffer *outputquery) {
 		}
 	}
 
-	if (conn->cont->debugsqltranslation) {
+	if (conn->cont->debugsqlrtranslation) {
 		stdoutput.printf("after faking input binds:\n%s\n\n",
 						outputquery->getString());
 	}

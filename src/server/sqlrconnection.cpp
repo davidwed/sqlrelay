@@ -610,8 +610,8 @@ void sqlrconnection_svr::endSession() {
 	// by default, do nothing
 }
 
-sqltranslations *sqlrconnection_svr::getSqlTranslations() {
-	return new sqltranslations;
+sqlrtranslations *sqlrconnection_svr::getSqlTranslations() {
+	return new sqlrtranslations;
 }
 
 void sqlrconnection_svr::clearError() {

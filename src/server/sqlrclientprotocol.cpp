@@ -2575,9 +2575,9 @@ bool sqlrclientprotocol::getListCommand(sqlrcursor_svr *cursor,
 		charstring::bothTrim(table);
 
 		// translate table name, if necessary
-		if (cont->sqlt) {
+		if (cont->sqlrt) {
 			const char	*newname=NULL;
-			if (cont->sqlt->getReplacementTableName(
+			if (cont->sqlrt->getReplacementTableName(
 						NULL,NULL,table,&newname)) {
 				delete[] table;
 				table=charstring::duplicate(newname);

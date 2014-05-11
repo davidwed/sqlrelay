@@ -1,8 +1,8 @@
 // Copyright (c) 2012  David Muse
 // See the file COPYING for more information
 
-#ifndef SQLTRANSLATION_H
-#define SQLTRANSLATION_H
+#ifndef SQLRTRIGGER_H
+#define SQLRTRIGGER_H
 
 #include <sqlrserverdll.h>
 
@@ -11,20 +11,19 @@
 
 class sqlrconnection_svr;
 class sqlrcursor_svr;
-class sqltranslations;
 
-class SQLRSERVER_DLLSPEC sqltranslation {
+class SQLRSERVER_DLLSPEC sqlrtrigger {
 	public:
-			sqltranslation(sqltranslations *sqlts,
-					xmldomnode *parameters);
-		virtual	~sqltranslation();
+			sqlrtrigger(xmldomnode *parameters);
+		virtual	~sqlrtrigger();
 
 		virtual bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					xmldom *querytree);
+					xmldom *querytree,
+					bool before,
+					bool success);
 	protected:
-		sqltranslations		*sqlts;
-		xmldomnode		*parameters;
+		xmldomnode	*parameters;
 };
 
 #endif

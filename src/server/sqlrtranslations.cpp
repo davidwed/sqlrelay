@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2011  David Muse
 // See the file COPYING for more information
 
-#include <sqltranslations.h>
+#include <sqlrtranslations.h>
 #include <sqlrconnection.h>
 #include <sqlrcursor.h>
 #include <sqlparser.h>
@@ -15,11 +15,11 @@
 
 #ifndef SQLRELAY_ENABLE_SHARED
 	extern "C" {
-		#include "sqltranslationdeclarations.cpp"
+		#include "sqlrtranslationdeclarations.cpp"
 	}
 #endif
 
-sqltranslations::sqltranslations() {
+sqlrtranslations::sqlrtranslations() {
 	debugFunction();
 	xmld=NULL;
 	tree=NULL;
@@ -27,7 +27,7 @@ sqltranslations::sqltranslations() {
 	tempindexpool=new memorypool(0,128,100);
 }
 
-sqltranslations::~sqltranslations() {
+sqlrtranslations::~sqlrtranslations() {
 	debugFunction();
 	unloadTranslations();
 	delete xmld;
@@ -35,7 +35,7 @@ sqltranslations::~sqltranslations() {
 	delete tempindexpool;
 }
 
-bool sqltranslations::loadTranslations(const char *translations) {
+bool sqlrtranslations::loadTranslations(const char *translations) {
 	debugFunction();
 
 	unloadTranslations();
@@ -68,12 +68,12 @@ bool sqltranslations::loadTranslations(const char *translations) {
 	return true;
 }
 
-void sqltranslations::unloadTranslations() {
+void sqlrtranslations::unloadTranslations() {
 	debugFunction();
-	for (linkedlistnode< sqltranslationplugin * > *node=
+	for (linkedlistnode< sqlrtranslationplugin * > *node=
 						tlist.getFirstNode();
 						node; node=node->getNext()) {
-		sqltranslationplugin	*sqlt=node->getValue();
+		sqlrtranslationplugin	*sqlt=node->getValue();
 		delete sqlt->tr;
 		delete sqlt->dl;
 		delete sqlt;
@@ -81,7 +81,7 @@ void sqltranslations::unloadTranslations() {
 	tlist.clear();
 }
 
-void sqltranslations::loadTranslation(xmldomnode *translation) {
+void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 	debugFunction();
 
 	// ignore non-translations
@@ -105,7 +105,7 @@ void sqltranslations::loadTranslation(xmldomnode *translation) {
 	// load the translation module
 	stringbuffer	modulename;
 	modulename.append(LIBEXECDIR);
-	modulename.append("/sqltranslation_");
+	modulename.append("/sqlrtranslation_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
@@ -121,8 +121,8 @@ void sqltranslations::loadTranslation(xmldomnode *translation) {
 	// load the translation itself
 	stringbuffer	functionname;
 	functionname.append("new_")->append(module);
-	sqltranslation *(*newTranslation)(sqltranslations *, xmldomnode *)=
-			(sqltranslation *(*)(sqltranslations *, xmldomnode *))
+	sqlrtranslation *(*newTranslation)(sqlrtranslations *, xmldomnode *)=
+			(sqlrtranslation *(*)(sqlrtranslations *, xmldomnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newTranslation) {
 		stdoutput.printf("failed to create translation: %s\n",module);
@@ -133,26 +133,26 @@ void sqltranslations::loadTranslation(xmldomnode *translation) {
 		delete dl;
 		return;
 	}
-	sqltranslation	*tr=(*newTranslation)(this,translation);
+	sqlrtranslation	*tr=(*newTranslation)(this,translation);
 
 #else
 
 	dynamiclib	*dl=NULL;
-	sqltranslation	*tr;
-	#include "sqltranslationassignments.cpp"
+	sqlrtranslation	*tr;
+	#include "sqlrtranslationassignments.cpp"
 	{
 		tr=NULL;
 	}
 #endif
 
 	// add the plugin to the list
-	sqltranslationplugin	*sqltp=new sqltranslationplugin;
+	sqlrtranslationplugin	*sqltp=new sqlrtranslationplugin;
 	sqltp->tr=tr;
 	sqltp->dl=dl;
 	tlist.append(sqltp);
 }
 
-bool sqltranslations::runTranslations(sqlrconnection_svr *sqlrcon,
+bool sqlrtranslations::runTranslations(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree) {
 	debugFunction();
@@ -162,7 +162,7 @@ bool sqltranslations::runTranslations(sqlrconnection_svr *sqlrcon,
 
 	tree=querytree;
 
-	for (linkedlistnode< sqltranslationplugin * > *node=
+	for (linkedlistnode< sqlrtranslationplugin * > *node=
 						tlist.getFirstNode();
 						node; node=node->getNext()) {
 		if (!node->getValue()->tr->run(sqlrcon,sqlrcur,querytree)) {
@@ -172,28 +172,29 @@ bool sqltranslations::runTranslations(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-void sqltranslations::endSession() {
+void sqlrtranslations::endSession() {
 	temptablepool->deallocate();
 	tempindexpool->deallocate();
 	temptablemap.clear();
 	tempindexmap.clear();
 }
 
-xmldomnode *sqltranslations::newNode(xmldomnode *parentnode, const char *type) {
+xmldomnode *sqlrtranslations::newNode(xmldomnode *parentnode,
+						const char *type) {
 	xmldomnode	*retval=new xmldomnode(tree,parentnode->getNullNode(),
 						TAG_XMLDOMNODETYPE,type,NULL);
 	parentnode->appendChild(retval);
 	return retval;
 }
 
-xmldomnode *sqltranslations::newNode(xmldomnode *parentnode,
+xmldomnode *sqlrtranslations::newNode(xmldomnode *parentnode,
 				const char *type, const char *value) {
 	xmldomnode	*node=newNode(parentnode,type);
 	setAttribute(node,sqlparser::_value,value);
 	return node;
 }
 
-xmldomnode *sqltranslations::newNodeAfter(xmldomnode *parentnode,
+xmldomnode *sqlrtranslations::newNodeAfter(xmldomnode *parentnode,
 						xmldomnode *node,
 						const char *type) {
 	xmldomnode	*retval=new xmldomnode(tree,parentnode->getNullNode(),
@@ -202,7 +203,7 @@ xmldomnode *sqltranslations::newNodeAfter(xmldomnode *parentnode,
 	return retval;
 }
 
-xmldomnode *sqltranslations::newNodeAfter(xmldomnode *parentnode,
+xmldomnode *sqlrtranslations::newNodeAfter(xmldomnode *parentnode,
 						xmldomnode *node,
 						const char *type,
 						const char *value) {
@@ -211,7 +212,7 @@ xmldomnode *sqltranslations::newNodeAfter(xmldomnode *parentnode,
 	return retval;
 }
 
-xmldomnode *sqltranslations::newNodeBefore(xmldomnode *parentnode,
+xmldomnode *sqlrtranslations::newNodeBefore(xmldomnode *parentnode,
 						xmldomnode *node,
 						const char *type) {
 	xmldomnode	*retval=new xmldomnode(tree,parentnode->getNullNode(),
@@ -220,7 +221,7 @@ xmldomnode *sqltranslations::newNodeBefore(xmldomnode *parentnode,
 	return retval;
 }
 
-xmldomnode *sqltranslations::newNodeBefore(xmldomnode *parentnode,
+xmldomnode *sqlrtranslations::newNodeBefore(xmldomnode *parentnode,
 						xmldomnode *node,
 						const char *type,
 						const char *value) {
@@ -229,7 +230,7 @@ xmldomnode *sqltranslations::newNodeBefore(xmldomnode *parentnode,
 	return retval;
 }
 
-void sqltranslations::setAttribute(xmldomnode *node,
+void sqlrtranslations::setAttribute(xmldomnode *node,
 				const char *name, const char *value) {
 	// FIXME: I shouldn't have to do this.
 	// setAttribute should append it automatically
@@ -240,13 +241,13 @@ void sqltranslations::setAttribute(xmldomnode *node,
 	}
 }
 
-bool sqltranslations::isString(const char *value) {
+bool sqlrtranslations::isString(const char *value) {
 	size_t	length=charstring::length(value);
 	return ((value[0]=='\'' && value[length-1]=='\'') ||
 			(value[0]=='"' && value[length-1]=='"'));
 }
 
-bool	sqltranslations::getReplacementTableName(const char *database,
+bool	sqlrtranslations::getReplacementTableName(const char *database,
 						const char *schema,
 						const char *oldname,
 						const char **newname) {
@@ -255,7 +256,7 @@ bool	sqltranslations::getReplacementTableName(const char *database,
 						oldname,newname);
 }
 
-bool	sqltranslations::getReplacementIndexName(const char *database,
+bool	sqlrtranslations::getReplacementIndexName(const char *database,
 						const char *schema,
 						const char *oldname,
 						const char **newname) {
@@ -264,7 +265,7 @@ bool	sqltranslations::getReplacementIndexName(const char *database,
 						oldname,newname);
 }
 
-bool	sqltranslations::getReplacementName(
+bool	sqlrtranslations::getReplacementName(
 				dictionary< databaseobject *, char *> *dict,
 				const char *database,
 				const char *schema,
@@ -287,7 +288,7 @@ bool	sqltranslations::getReplacementName(
 	return false;
 }
 
-databaseobject *sqltranslations::createDatabaseObject(memorypool *pool,
+databaseobject *sqlrtranslations::createDatabaseObject(memorypool *pool,
 						const char *database,
 						const char *schema,
 						const char *object,
@@ -339,7 +340,7 @@ databaseobject *sqltranslations::createDatabaseObject(memorypool *pool,
 	return dbo;
 }
 
-bool sqltranslations::removeReplacementTable(const char *database,
+bool sqlrtranslations::removeReplacementTable(const char *database,
 						const char *schema,
 						const char *table) {
 
@@ -370,13 +371,13 @@ bool sqltranslations::removeReplacementTable(const char *database,
 	return true;
 }
 
-bool sqltranslations::removeReplacementIndex(const char *database,
+bool sqlrtranslations::removeReplacementIndex(const char *database,
 						const char *schema,
 						const char *index) {
 	return removeReplacement(&tempindexmap,database,schema,index);
 }
 
-bool sqltranslations::removeReplacement(
+bool sqlrtranslations::removeReplacement(
 				dictionary< databaseobject *, char *> *dict,
 				const char *database,
 				const char *schema,
