@@ -53,9 +53,10 @@ The SQLRelay software package is really several packages:
 
 13) Header files that may be used to build modules to extend the functionality
 	of SQL Relay, found in various directories of the SQL Relay source
-	distribution: sqlparser.h, sqlrlogger.h, sqlrquery.h, sqltranslation.h,
-	sqltrigger.h, sqlwriter.h and sqlrpwdenc.h.  These are collectively
-	referred to hereafter as the SQLRelay Extensions API.
+	distribution: sqlrauth.h, sqlrlogger.h, sqlrpwdenc.h, sqlrquery.h,
+	sqlrtranslation.h, and sqlrtrigger.h
+	These are collectively referred to hereafter as the SQLRelay Extensions
+	API.
 
 --------------------------------------------------------------------------------
 

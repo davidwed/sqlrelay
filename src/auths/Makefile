@@ -21,7 +21,7 @@ sqlrauth_default.la: default.cpp default.lo
 	$(LIBTOOL) --mode=link $(CXX) -o $@ default.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 sqlrauth_sqlrelay.la: sqlrelay.cpp sqlrelay.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrelay.lo $(LDFLAGS) -L$(topdir)/src/api/c++/src -lsqlrclient $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrelay.lo $(LDFLAGS) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
 
 install:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
