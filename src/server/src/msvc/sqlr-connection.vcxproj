@@ -108,40 +108,40 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>Debug;..\..\util\msvc\Debug;c:\Program Files (x86)\Firstworks\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>Debug;..\..\..\util\msvc\Debug;c:\Program Files (x86)\Firstworks\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>x64\Debug;..\..\util\msvc\x64\Debug;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>x64\Debug;..\..\..\util\msvc\x64\Debug;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>DebugCLR;..\..\util\msvc\DebugCLR;c:\Program Files (x86)\Firstworks\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>DebugCLR;..\..\..\util\msvc\DebugCLR;c:\Program Files (x86)\Firstworks\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>x64\DebugCLR;..\..\util\msvc\x64\DebugCLR;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>x64\DebugCLR;..\..\..\util\msvc\x64\DebugCLR;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>Release;..\..\util\msvc\Release;c:\Program Files (x86)\Firstworks\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>Release;..\..\..\util\msvc\Release;c:\Program Files (x86)\Firstworks\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>x64\Release;..\..\util\msvc\x64\Release;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>x64\Release;..\..\..\util\msvc\x64\Release;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>ReleaseCLR;..\..\util\msvc\ReleaseCLR;c:\Program Files (x86)\Firstworks\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>ReleaseCLR;..\..\..\util\msvc\ReleaseCLR;c:\Program Files (x86)\Firstworks\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>x64\ReleaseCLR;..\..\util\msvc\x64\ReleaseCLR;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>x64\ReleaseCLR;..\..\..\util\msvc\x64\ReleaseCLR;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;..\..\..;..\..\common;..\..\util;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..;..\..\..\..;..\..\..\common;..\..\..\util;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -154,7 +154,7 @@
       <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\..\..
+      <Command>cd ..\..\..\..
 copy /Y config.windows.h config.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
@@ -165,7 +165,7 @@ copy /Y config.windows.h config.h</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;..\..\..;..\..\common;..\..\util;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..;..\..\..\..;..\..\..\common;..\..\..\util;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -177,7 +177,7 @@ copy /Y config.windows.h config.h</Command>
       <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\..\..
+      <Command>cd ..\..\..\..
 copy /Y config.windows.h config.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
@@ -188,7 +188,7 @@ copy /Y config.windows.h config.h</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;..\..\..;..\..\common;..\..\util;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..;..\..\..\..;..\..\..\common;..\..\..\util;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -201,7 +201,7 @@ copy /Y config.windows.h config.h</Command>
       <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\..\..
+      <Command>cd ..\..\..\..
 copy /Y config.windows.h config.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
@@ -212,7 +212,7 @@ copy /Y config.windows.h config.h</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|x64'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;..\..\..;..\..\common;..\..\util;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..;..\..\..\..;..\..\..\common;..\..\..\util;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -224,7 +224,7 @@ copy /Y config.windows.h config.h</Command>
       <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cd ..\..\..
+      <Command>cd ..\..\..\..
 copy /Y config.windows.h config.h</Command>
     </PreBuildEvent>
     <PostBuildEvent>
@@ -235,7 +235,7 @@ copy /Y config.windows.h config.h</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;..\..\..;..\..\common;..\..\util;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..;..\..\..\..;..\..\..\common;..\..\..\util;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -253,14 +253,14 @@ copy /Y config.windows.h config.h</Command>
       </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>cd ..\..\..
+      <Command>cd ..\..\..\..
 copy /Y config.windows.h config.h</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;..\..\..;..\..\common;..\..\util;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..;..\..\..\..;..\..\..\common;..\..\..\util;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -277,14 +277,14 @@ copy /Y config.windows.h config.h</Command>
       </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>cd ..\..\..
+      <Command>cd ..\..\..\..
 copy /Y config.windows.h config.h</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;..\..\..;..\..\common;..\..\util;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..;..\..\..\..;..\..\..\common;..\..\..\util;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -302,14 +302,14 @@ copy /Y config.windows.h config.h</Command>
       </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>cd ..\..\..
+      <Command>cd ..\..\..\..
 copy /Y config.windows.h config.h</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|x64'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;..\..\..;..\..\common;..\..\util;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..;..\..\..\..;..\..\..\common;..\..\..\util;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -326,7 +326,7 @@ copy /Y config.windows.h config.h</Command>
       </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>cd ..\..\..
+      <Command>cd ..\..\..\..
 copy /Y config.windows.h config.h</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
