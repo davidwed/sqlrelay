@@ -1,1 +1,1 @@
-sqltrigger	*new_@module@(xmldomnode *parameters);
+sqlrtrigger	*new_@module@(xmldomnode *parameters);
