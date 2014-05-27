@@ -13,5 +13,5 @@ sqlrauth::~sqlrauth() {
 }
 
 bool sqlrauth::authenticate(const char *user, const char *password) {
-	return NULL;
+	return false;
 }
