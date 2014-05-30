@@ -354,7 +354,6 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 
 		usercontainer	*currentuser;
 
-		connectstringcontainer	*firstconnect;
 		connectstringcontainer	*currentconnect;
 		uint32_t		connectioncount;
 		uint32_t		metrictotal;

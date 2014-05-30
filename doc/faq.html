@@ -1172,7 +1172,7 @@ additional resource consumption.</p>
 
 <p>This can happen if maxqueuelength=0, all connection daemons are occupied and a client calls endSession and immediately runs another query.  The connection daemon that the client was using has to loop back and tell the listener that it's ready for another client.  The client will attempt to reconnect to SQL Relay to run the next query, but depending on the exact timing, if the connetion daemon hasn't finished looping back, to the scaler daemon, it will appear that all connections are busy, but there's a new client attempting to connect and it will fork off a new connection daemon to service it.</p>
 
-<p>There is no easy fix for this.  Anything that might be done to guarantee that a new connection daemon won't be spawned would reduce overall performance.  So, if you're using maxqueuelength=0, then expect for this to happen.  It should not happen if maxqueuelenght is set to some value greater than 0.</p>
+<p>There is no easy fix for this.  Anything that might be done to guarantee that a new connection daemon won't be spawned would reduce overall performance.  So, if you're using maxqueuelength=0, then expect for this to happen.  It should not happen if maxqueuelength is set to some value greater than 0.</p>
 
 <br><a name="cursorgrowth"></a>
 <span class="heading3">In sqlrelay.conf, I set the cursors parameter to a small number.  Why does sqlr-status show Opened Server Cursors growing and growing?</span><br>

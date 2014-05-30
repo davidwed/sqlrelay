@@ -21,7 +21,7 @@
 #define DEFAULT_ENDOFSESSION "commit"
 	// default action to take at end of session
 
-#define DEFAULT_MAXQUEUELENGTH "1"
+#define DEFAULT_MAXQUEUELENGTH "0"
 	// default maximum queue length before
 	// another connection will be fired off
 
@@ -36,7 +36,7 @@
 	// default max client sessions for connections
 	// that were fired off to handle increased load
 
-#define DEFAULT_SESSIONTIMEOUT "60"
+#define DEFAULT_SESSIONTIMEOUT "600"
 	// default session timeout
 
 #define DEFAULT_RUNASUSER "nobody"
@@ -48,7 +48,7 @@
 #define DEFAULT_CURSORS "5"
 	// default number of cursors to open
 
-#define DEFAULT_CURSORS_GROWBY "5"
+#define DEFAULT_CURSORS_GROWBY "1"
 	// when we need more cursors, allocate this many more in one shot
 
 #define DEFAULT_AUTHTIER "connection"
@@ -94,10 +94,10 @@
 #define DEFAULT_IDLECLIENTTIMEOUT "-1"
 	// default idle client timeout
 
-#define DEFAULT_USER "user"
+#define DEFAULT_USER ""
 	// default user name for authentication
 
-#define DEFAULT_PASSWORD "password"
+#define DEFAULT_PASSWORD ""
 	// default password for authentication
 
 #define DEFAULT_CONNECTIONID "defaultid"
@@ -111,24 +111,6 @@
 
 #define DEFAULT_BEHINDLOADBALANCER "no"
 	// default behind-load-balancer flag
-
-#define DEFAULT_SID_ENABLED false
-	// default sid-enabled flag
-
-#define DEFAULT_SID_HOST ""
-	// default sid-host
-
-#define DEFAULT_SID_PORT 0
-	// default sid-port
-
-#define DEFAULT_SID_SOCKET ""
-	// default sid-socket
-
-#define DEFAULT_SID_USER "user"
-	// default sid-user
-
-#define DEFAULT_SID_PASSWORD "password"
-	// default sid-password
 
 #define DEFAULT_ROUTER_HOST ""
 	// default router host

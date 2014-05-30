@@ -1613,18 +1613,17 @@ void sqlrsh::execute(int argc, const char **argv) {
 	const char	*id=cmdline.getValue("-id");
 	const char	*host=cmdline.getValue("-host");
 	uint16_t	port=charstring::toInteger(
-					cmdline.getValue("-port"));
+				(cmdline.found("-port"))?
+					cmdline.getValue("-port"):DEFAULT_PORT);
 	const char	*socket=cmdline.getValue("-socket");
 	const char	*user=cmdline.getValue("-user");
 	const char	*password=cmdline.getValue("-password");
 	const char	*script=cmdline.getValue("-script");
 	const char	*command=cmdline.getValue("-command");
-
+	
 	if (!(charstring::length(id) ||
-		((charstring::length(host) ||
-			charstring::length(socket)) &&
-				charstring::length(user) &&
-				charstring::length(password)))) {
+		charstring::length(host) ||
+		charstring::length(socket))) {
 
 		stdoutput.printf("usage: sqlrsh -host host -port port -socket socket -user user -password password [-script script | -command command]\n"
 			"  or   sqlrsh [-config configfile] -id id [-script script | -command command]\n");

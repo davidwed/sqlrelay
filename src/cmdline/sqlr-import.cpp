@@ -499,7 +499,8 @@ int main(int argc, const char **argv) {
 	const char	*id=cmdline.getValue("-id");
 	const char	*host=cmdline.getValue("-host");
 	uint16_t	port=charstring::toInteger(
-					cmdline.getValue("-port"));
+				(cmdline.found("-port"))?
+					cmdline.getValue("-port"):DEFAULT_PORT);
 	const char	*socket=cmdline.getValue("-socket");
 	const char	*user=cmdline.getValue("-user");
 	const char	*password=cmdline.getValue("-password");
@@ -514,10 +515,8 @@ int main(int argc, const char **argv) {
 	bool		verbose=cmdline.found("-verbose");
 
 	if (!(charstring::length(id) ||
-		((charstring::length(host) ||
-			charstring::length(socket)) &&
-				charstring::length(user) &&
-				charstring::length(password))) ||
+		charstring::length(host) ||
+		charstring::length(socket)) ||
 		!charstring::length(file)) {
 
 		stdoutput.printf("usage: \n"

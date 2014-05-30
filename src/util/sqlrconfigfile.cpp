@@ -54,8 +54,8 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	maxerrorlength=charstring::toInteger(DEFAULT_MAXERRORLENGTH);
 	idleclienttimeout=charstring::toInteger(DEFAULT_IDLECLIENTTIMEOUT);
 	currentuser=NULL;
-	firstconnect=NULL;
 	currentconnect=NULL;
+	connectioncount=0;
 	metrictotal=0;
 	maxlisteners=charstring::toInteger(DEFAULT_MAXLISTENERS);
 	listenertimeout=charstring::toUnsignedInteger(DEFAULT_LISTENERTIMEOUT);
@@ -610,9 +610,16 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			currentuser=new usercontainer();
 			userlist.append(currentuser);
 			break;
-		case CONNECTION_TAG:
+		case CONNECTION_TAG: {
 			currentconnect=new connectstringcontainer();
 			connectstringlist.append(currentconnect);
+			stringbuffer	connectionid;
+			connectionid.append(id)->append("-");
+			connectionid.append(connectioncount);
+			currentconnect->setConnectionId(
+					connectionid.getString());
+			connectioncount++;
+			}
 			break;
 		case ROUTER_TAG:
 			currentconnect=new connectstringcontainer();
