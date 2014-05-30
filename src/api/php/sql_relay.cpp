@@ -8,7 +8,8 @@ extern "C" {
 		#undef __cplusplus
 		#define cpluspluswasdefined
 	#endif
-	#include "php.h"
+	#define HAVE_SOCKLEN_T
+	#include <php.h>
 	#ifdef cpluspluswasdefined
 		#define __cplusplus
 	#endif
