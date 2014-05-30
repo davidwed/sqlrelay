@@ -18,7 +18,13 @@ endif
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-query$(EXE) sqlr-fields$(EXE) sqlrsh$(EXE) sqlr-export$(EXE) sqlr-import$(EXE) sqlr-pwdenc$(EXE) sqlr-status$(EXE)
+all: sqlr-query$(EXE) \
+	sqlr-fields$(EXE) \
+	sqlrsh$(EXE) \
+	sqlr-export$(EXE) \
+	sqlr-import$(EXE) \
+	sqlr-pwdenc$(EXE) \
+	sqlr-status$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo *.o sqlr-fields$(EXE) sqlr-query$(EXE) sqlr-export$(EXE) sqlr-import$(EXE) sqlr-pwdenc$(EXE) sqlr-status$(EXE) sqlrsh$(EXE)
