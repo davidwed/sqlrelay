@@ -13,6 +13,7 @@ ifeq ($(TRIGGERS),yes)
 endif
 ifeq ($(TRANSLATIONS),yes)
 	$(MAKE) -C translations all
+	$(MAKE) -C resultsettranslations all
 endif
 	$(MAKE) -C queries all
 	$(MAKE) -C loggers all
@@ -29,6 +30,7 @@ clean:
 	$(MAKE) -C api clean
 	$(MAKE) -C triggers clean
 	$(MAKE) -C translations clean
+	$(MAKE) -C resultsettranslations clean
 	$(MAKE) -C queries clean
 	$(MAKE) -C loggers clean
 	$(MAKE) -C pwdencs clean
@@ -48,6 +50,7 @@ ifeq ($(TRIGGERS),yes)
 endif
 ifeq ($(TRANSLATIONS),yes)
 	$(MAKE) -C translations install
+	$(MAKE) -C resultsettranslations install
 endif
 	$(MAKE) -C queries install
 	$(MAKE) -C loggers install
@@ -64,6 +67,7 @@ uninstall:
 	$(MAKE) -C api uninstall
 	$(MAKE) -C triggers uninstall
 	$(MAKE) -C translations uninstall
+	$(MAKE) -C resultsettranslations uninstall
 	$(MAKE) -C queries uninstall
 	$(MAKE) -C loggers uninstall
 	$(MAKE) -C pwdencs uninstall
