@@ -17,6 +17,8 @@ PLUGINSRCS = sqlrconnectiondeclarations.cpp \
 		sqlrqueryassignments.cpp \
 		sqlrtranslationdeclarations.cpp \
 		sqlrtranslationassignments.cpp \
+		sqlrresultsettranslationdeclarations.cpp \
+		sqlrresultsettranslationassignments.cpp \
 		sqlrtriggerdeclarations.cpp \
 		sqlrtriggerassignments.cpp
 PLUGINLOBJS = $(shell ls ../../connections/*/*.lo) \
@@ -109,6 +111,8 @@ SRCS = sqlrlistener.cpp \
 	sqlwriter.cpp \
 	sqlrtranslations.cpp \
 	sqlrtranslation.cpp \
+	sqlrresultsettranslations.cpp \
+	sqlrresultsettranslation.cpp \
 	sqlrtriggers.cpp \
 	sqlrtrigger.cpp \
 	sqlrloggers.cpp \
@@ -131,6 +135,8 @@ LOBJS = sqlrlistener.lo \
 	sqlwriter.lo \
 	sqlrtranslations.lo \
 	sqlrtranslation.lo \
+	sqlrresultsettranslations.lo \
+	sqlrresultsettranslation.lo \
 	sqlrtriggers.lo \
 	sqlrtrigger.lo \
 	sqlrloggers.lo \
@@ -274,6 +280,24 @@ sqlrtranslationdeclarations.cpp: sqlrtranslationdeclarations.cpp.in
 sqlrtranslationassignments.cpp: sqlrtranslationassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../../translations/*.lo`; \
+	do \
+		module=`basename $$file .lo`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrresultsettranslationdeclarations.cpp: \
+			sqlrresultsettranslationdeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../../resultsettranslations/*.lo`; \
+	do \
+		module=`basename $$file .lo`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrresultsettranslationassignments.cpp: \
+			sqlrresultsettranslationassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../../resultsettranslations/*.lo`; \
 	do \
 		module=`basename $$file .lo`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
