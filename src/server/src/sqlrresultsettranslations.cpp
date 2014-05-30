@@ -15,7 +15,7 @@
 
 #ifndef SQLRELAY_ENABLE_SHARED
 	extern "C" {
-		#include "sqlrtranslationdeclarations.cpp"
+		#include "sqlrresultsettranslationdeclarations.cpp"
 	}
 #endif
 
