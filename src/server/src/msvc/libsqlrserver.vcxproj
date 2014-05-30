@@ -145,7 +145,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..;..\..\..\common;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\include;..\..\..\common;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -170,7 +170,7 @@ copy /Y config.windows.h config.h</Command>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..;..\..\..\common;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\include;..\..\..\common;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -194,7 +194,7 @@ copy /Y config.windows.h config.h</Command>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..;..\..\..\common;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\include;..\..\..\common;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -219,7 +219,7 @@ copy /Y config.windows.h config.h</Command>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..;..\..\..\common;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\include;..\..\..\common;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -242,7 +242,7 @@ copy /Y config.windows.h config.h</Command>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..\..;..\..\..\common;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\include;..\..\..\common;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -268,7 +268,7 @@ copy /Y config.windows.h config.h</Command>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..\..;..\..\..\common;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\include;..\..\..\common;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -293,7 +293,7 @@ copy /Y config.windows.h config.h</Command>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..\..;..\..\..\common;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\include;..\..\..\common;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -319,7 +319,7 @@ copy /Y config.windows.h config.h</Command>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..\..;..\..\..\common;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\include;..\..\..\common;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -345,19 +345,22 @@ copy /Y config.windows.h config.h</Command>
     <ClCompile Include="..\sqlrclientprotocol.cpp" />
     <ClCompile Include="..\sqlrconnection.cpp" />
     <ClCompile Include="..\sqlrcursor.cpp" />
-    <ClCompile Include="..\sqlrauthenticator.cpp" />
     <ClCompile Include="..\sqlparser.cpp" />
     <ClCompile Include="..\sqlwriter.cpp" />
-    <ClCompile Include="..\sqltranslations.cpp" />
-    <ClCompile Include="..\sqltranslation.cpp" />
-    <ClCompile Include="..\sqltriggers.cpp" />
-    <ClCompile Include="..\sqltrigger.cpp" />
+    <ClCompile Include="..\sqlrtranslations.cpp" />
+    <ClCompile Include="..\sqlrtranslation.cpp" />
+    <ClCompile Include="..\sqlrresultsettranslations.cpp" />
+    <ClCompile Include="..\sqlrresultsettranslation.cpp" />
+    <ClCompile Include="..\sqlrtriggers.cpp" />
+    <ClCompile Include="..\sqlrtrigger.cpp" />
     <ClCompile Include="..\sqlrloggers.cpp" />
     <ClCompile Include="..\sqlrlogger.cpp" />
     <ClCompile Include="..\sqlrqueries.cpp" />
     <ClCompile Include="..\sqlrquery.cpp" />
     <ClCompile Include="..\sqlrpwdencs.cpp" />
     <ClCompile Include="..\sqlrpwdenc.cpp" />
+    <ClCompile Include="..\sqlrauths.cpp" />
+    <ClCompile Include="..\sqlrauth.cpp" />
     <ClCompile Include="..\sqlrscaler.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
