@@ -18,7 +18,7 @@ endif
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: sqlr-query$(EXE) sqlr-fields$(EXE) sqlrsh$(EXE) sqlr-export$(EXE) sqlr-import$(EXE) sqlr-pwdenc$(EXE)
+all: sqlr-query$(EXE) sqlr-fields$(EXE) sqlrsh$(EXE) sqlr-export$(EXE) sqlr-import$(EXE) sqlr-pwdenc$(EXE) sqlr-status$(EXE)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo *.o sqlr-fields$(EXE) sqlr-query$(EXE) sqlr-export$(EXE) sqlr-import$(EXE) sqlr-pwdenc$(EXE) sqlrsh$(EXE)
@@ -39,6 +39,10 @@ sqlr-import$(EXE): sqlr-import.cpp sqlr-import.lo
 sqlr-pwdenc$(EXE): sqlr-pwdenc.cpp sqlr-pwdenc.lo
 	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-pwdenc.lo -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE) $(RPATH)
 
+sqlr-status$(EXE): sqlr-status.cpp sqlr-status.lo
+	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-status.lo -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
+$(RPATH)
+
 sqlrsh$(EXE): sqlrsh.cpp sqlrsh.lo 
 	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.lo $(LIBS) $(READLINELIBS) $(RPATH)
 
@@ -49,6 +53,7 @@ install:
 	$(LTINSTALL) sqlr-export$(EXE) $(bindir)
 	$(LTINSTALL) sqlr-import$(EXE) $(bindir)
 	$(LTINSTALL) sqlr-pwdenc$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-status$(EXE) $(bindir)
 	$(LTINSTALL) sqlrsh$(EXE) $(bindir)
 
 uninstall:
@@ -59,4 +64,5 @@ uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-export$(EXE)
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-import$(EXE)
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-pwdenc$(EXE)
+	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlr-status$(EXE)
 	$(LIBTOOL) --mode=uninstall $(RM) $(bindir)/sqlrsh$(EXE)

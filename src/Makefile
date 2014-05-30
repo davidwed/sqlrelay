@@ -22,7 +22,6 @@ endif
 ifeq ($(SQLRELAY_ENABLE_SHARED),no)
 	$(MAKE) -C server all
 endif
-	$(MAKE) -C status all
 	$(MAKE) -C cmdline all
 
 clean:
@@ -35,7 +34,6 @@ clean:
 	$(MAKE) -C pwdencs clean
 	$(MAKE) -C auths clean
 	$(MAKE) -C connections clean
-	$(MAKE) -C status clean
 	$(MAKE) -C server clean
 	$(MAKE) -C cmdline clean
 
@@ -59,7 +57,6 @@ endif
 ifeq ($(SQLRELAY_ENABLE_SHARED),no)
 	$(MAKE) -C server install
 endif
-	$(MAKE) -C status install
 	$(MAKE) -C cmdline install
 
 uninstall:
@@ -72,6 +69,5 @@ uninstall:
 	$(MAKE) -C pwdencs uninstall
 	$(MAKE) -C auths uninstall
 	$(MAKE) -C connections uninstall
-	$(MAKE) -C status uninstall
 	$(MAKE) -C server uninstall
 	$(MAKE) -C cmdline uninstall
