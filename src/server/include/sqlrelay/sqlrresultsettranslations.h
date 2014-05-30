@@ -16,7 +16,7 @@ class sqlrcursor_svr;
 
 class SQLRSERVER_DLLSPEC sqlrresultsettranslationplugin {
 	public:
-		sqlrresultsettranslation	*tr;
+		sqlrresultsettranslation	*rstr;
 		dynamiclib			*dl;
 };
 

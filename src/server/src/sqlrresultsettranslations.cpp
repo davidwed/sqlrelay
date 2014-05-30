@@ -73,7 +73,7 @@ void sqlrresultsettranslations::unloadResultSetTranslations() {
 						tlist.getFirstNode();
 						node; node=node->getNext()) {
 		sqlrresultsettranslationplugin	*sqlt=node->getValue();
-		delete sqlt->tr;
+		delete sqlt->rstr;
 		delete sqlt->dl;
 		delete sqlt;
 	}
@@ -138,25 +138,25 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 		delete dl;
 		return;
 	}
-	sqlrresultsettranslation	*tr=
+	sqlrresultsettranslation	*rstr=
 		(*newResultSetTranslation)(this,resultsettranslation);
 
 #else
 
 	dynamiclib	*dl=NULL;
-	sqlrresultsettranslation	*tr;
+	sqlrresultsettranslation	*rstr;
 	#include "sqlrresultsettranslationassignments.cpp"
 	{
-		tr=NULL;
+		rstr=NULL;
 	}
 #endif
 
 	// add the plugin to the list
-	sqlrresultsettranslationplugin	*sqltp=
+	sqlrresultsettranslationplugin	*sqlrrstp=
 				new sqlrresultsettranslationplugin;
-	sqltp->tr=tr;
-	sqltp->dl=dl;
-	tlist.append(sqltp);
+	sqlrrstp->rstr=rstr;
+	sqlrrstp->dl=dl;
+	tlist.append(sqlrrstp);
 }
 
 bool sqlrresultsettranslations::runResultSetTranslations(
@@ -172,7 +172,7 @@ bool sqlrresultsettranslations::runResultSetTranslations(
 	for (linkedlistnode< sqlrresultsettranslationplugin * > *node=
 						tlist.getFirstNode();
 						node; node=node->getNext()) {
-		if (!node->getValue()->tr->run(sqlrcon,sqlrcur,
+		if (!node->getValue()->rstr->run(sqlrcon,sqlrcur,
 						fieldindex,
 						field,fieldlength,
 						newfield,newfieldlength)) {
