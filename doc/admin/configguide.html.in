@@ -1,0 +1,292 @@
+<html>
+<head>
+<title>firstworks   SQL Relay Configuration Guide</title>
+<link href="../css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<span class="heading1">SQL Relay Configuration Guide</span><br>
+
+<ul>
+<li><a href="#minimal">Minimal Configuration</a></li>
+<li><a href="#typical">Typical Configuration</a></li>
+<li><a href="#cursors">Database Cursors</a></li>
+<li><a href="#dynamicscaling">Dynamic Scaling</a></li>
+<li><a href="#listener">Listener Configuration</a></li>
+<li><a href="#database">Database Configuration</a></li>
+<li><a href="#cluster">Replicated or Clustered Databases</a></li>
+<li><a href="#router">Master-Slave Query Routing</a></li>
+<li><a href="#instances">Multiple Instances</a></li>
+</ul>
+
+
+<br><br><a name="minimal"></a>
+<span class="heading2">Minimal Configuration</span><br>
+
+<p>The SQL Relay configuration file is usually located at /usr/local/firstworks/etc/sqlrelay.conf</p>
+
+<p>The most minimal configuration would be something like:</p>
+
+<blockquote>
+@sqlrelay-minimal.conf.html@
+</blockquote>
+
+<p>This configuration defines an instance of SQL Relay named <i>example</i> that opens and maintains a single persistent connection to the <i>orcl</i> instance of an Oracle database using user <i>scott</i> and password <i>tiger</i>.</p>
+
+<p>The instance can be started using:</p>
+
+<blockquote>
+<code>
+sqlr-start -id example
+</code>
+</blockquote>
+
+<p>By default, SQL Relay listens on all available network interfaces, on port 9000.  It can be accessed remotely by hostname.  For example, if the server running SQL Relay is named <i>sqlrserver</i> then it can be accessed using:</p>
+
+<blockquote>
+<code>
+sqlrsh -host <i>sqlrserver</i>
+</code>
+</blockquote>
+
+<p>It can also be accessed from the local server using <i>localhost</i>.</p>
+
+<blockquote>
+<code>
+sqlrsh -host localhost
+</code>
+</blockquote>
+
+<p>This configuration is good for testing connectivity, but it's insecure and won't perform very well.</p>
+
+
+<br><br><a name="connections"></a>
+<span class="heading2">Typical Configuration</span><br>
+
+<p>A more typical SQL Relay configuration opens and maintains multiple persistent connections to the database and is secured by a user and password.</p>
+
+<p>This configuration opens 10 connections and defines a user and password.</p>
+
+<blockquote>
+@sqlrelay-typical.conf.html@
+</blockquote>
+
+<p>It can be accessed using:</p>
+
+<blockquote>
+<code>
+sqlrsh -host <i>sqlrserver</i> -user sqlruser -password sqlrpassword
+</code>
+</blockquote>
+
+<p>The number of connections determines how many client applications can access the database simultaneously .  In this case, up to 10, assuming each client only needs one connection.  Additional clients can connect but get queued up and have to wait for one of the first 10 to disconnect before being able to access the database.</p>
+
+<p>Any number of connections can be opened.  A good rule of thumb is to open as many as you can.  The optimal number is application specific though and is limited by database, system and network resources.</p>
+
+
+<br><br><a name="cursors"></a>
+<span class="heading2">Database Cursors</span><br>
+
+<p>Database cursors are used to execute queries and step through result sets.  Most applications only need to use one cursor at a time.  Some apps require more though, either because they run nested queries, or sometimes because they just don't properly free them.</p>
+
+<p>SQL Relay maintains persistent cursors as well as connections.  By default, each connection opens one cursor, but the number of cursors opened by each connection can be configured using the cursors parameter.</p>
+
+<blockquote>
+@sqlrelay-cursors.conf.html@
+</blockquote>
+
+<p>Any number of cursors can be opened.  A good rule of thumb is to open as few as possible but as many as you know that your application will need.</p>
+
+
+<br><br><a name="dynamicscaling"></a>
+<span class="heading2">Dynamic Scaling</span><br>
+
+<p>Both connections and cursors can be configured to scale dynamically - open on demand and then die off when no longer needed.  This feature is useful if you have spikes in traffic during certain times of day or if your application has a few modules that occasionally need more cursors than usual.</p>
+
+<p>The maxconnections and maxcursors parameters define the upper bounds.</p>
+
+<blockquote>
+@sqlrelay-dynamicscaling.conf.html@
+</blockquote>
+
+<p>In this example, 10 connections will be started initially but more will be be started as necessary, up to 20.  Each of the newly spawned connections will die off if they are inactive for longer than 1 minute.</p>
+
+<p>In this example, each connection will initially open 2 cursors but more will be opened as necessary, up to 10.  Each newly opened cursor will be closed as soon as it is no longer needed.</p>
+
+<p>Other parameters that control dynamic scaling behavior include:</p>
+
+<ul>
+<li>maxqueuelength</li>
+<li>growby</li>
+<li>ttl</li>
+<li>cursors_growby</li>
+</ul>
+
+<p>See the <a href="configreference.html">SQL Relay Configuration Reference</a> for more information on these parameters.</p>
+
+
+<br><br><a name="listener"></a>
+<span class="heading2">Listener Configuration</span><br>
+
+<p>By default, SQL Relay listens for client connections on port 9000, on all available network interfaces.</p>
+
+<p>It can be configured to listen on a different port though...</p>
+
+<blockquote>
+@sqlrelay-port.conf.html@
+</blockquote>
+
+<p>...and accessed using:</p>
+
+<blockquote>
+<code>
+sqlrsh -host <i>sqlrserver</i> -port 9001 -user sqlruser -password sqlrpassword
+</code>
+</blockquote>
+
+<p>It can also be configured to listen on a unix socket...</p>
+
+<blockquote>
+@sqlrelay-socket.conf.html@
+</blockquote>
+
+<p>...and accessed from the local server using:</p>
+
+<blockquote>
+<code>
+sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
+</code>
+</blockquote>
+
+<p>If the server has multiple network interfaces, SQL Relay can also be configured to listen on specific IP addresses.</p>
+
+<blockquote>
+@sqlrelay-addresses.conf.html@
+</blockquote>
+
+<p>When configured this way, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).</p>
+
+<p>If the socket option is specified but port and addresses options are not, then SQL Relay will only listen on the socket.  If addresses/port and socket options are both specified then it listens on both.</p>
+
+
+<br><br><a name="database"></a>
+<span class="heading2">Database Configuration</span><br>
+
+<p>By default, SQL Relay assumes that it's connecting to an Oracle database, but SQL Relay supports many other databases.  The dbase parameter can be used to specify the database type.</p>
+
+<p>In the following example, SQL Relay is configured to connect to a Sybase database.</p>
+
+<blockquote>
+@sqlrelay-sybase.conf.html@
+</blockquote>
+
+<p>In this example, SQL Relay is configured to connect to an IBM DB2 database.</p>
+
+<blockquote>
+@sqlrelay-db2.conf.html@
+</blockquote>
+
+<p>When connecting to an Oracle database, the dbase parameter may be omitted or set to "oracle8".  The 8 is for historical reasons.  SQL Relay originally supported Oracle OCI 7 and 8 and the dbase parameter could be set to "oracle7" or "oracle8".  Eventually "oracle7" was dropped and "oracle8" was updated to support all future versions of OCI but the "oracle8" label remained.</p>
+
+<p>SQL Relay supports many different databases and the connect string options (options in the string attribute of the connection tag) are different for each database.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for valid dbase settings and information on connect string options for each database.</p>
+
+
+<br><br><a name="cluster"></a>
+<span class="heading2">Replicated or Clustered Databases</span><br>
+
+<p>SQL Relay can be configured to distribute connections over the nodes of a database cluster or pool of replicated servers.  Each connection tag defines a  node to connect to.</p>
+
+<p>In this example, SQL Relay is configured to distribute over two instances of Oracle - orcl1 and orcl2</p>
+
+<blockquote>
+@sqlrelay-replicated.conf.html@
+</blockquote>
+
+<p>Any number of connection tags may be defined.</p>
+
+<p>The metric parameter is especially important if the nodes are heterogenous.  SQL Relay uses it to decide how many connections to open to each node.  It doesn't specify the number of connections to open to each node, but the higher the metric relative to the other metrics, the more connections to that node will be started.  For example, if the metric for the first node is twice as large as the metric for the second node, then SQL Relay will open twice as many connections to the first node as the second.</p>
+
+<p>In this example, 15 is 1.5 times 10, so 1.5 as many connections will be started to orcl2 as to orcl1.  Since a total of 10 connections will be started, 4 will be started to orcl1 and 6 to orcl2.</p>
+
+<p>A similar configuration could be used to distribute connections over the nodes of a cluster.</p>
+
+<p>When the nodes are located behind a load balancer or share a common IP address, only one connection tag should be used, with the behindloadbalancer attribute.</p>
+
+<p>In this example, SQL Relay is configured to distribute over an Oracle RAC.</p>
+
+<blockquote>
+@sqlrelay-rac.conf.html@
+</blockquote>
+
+<p>See the <a href="configreference.html">SQL Relay Configuration Reference</a> for more information on this parameter.</p>
+
+
+<br><br><a name="router"></a>
+<span class="heading2">Master-Slave Query Routing</span><br>
+
+<p>In a master-slave replication scenario, SQL Relay can be configured to route DML and DDL queries to the master and distribute selects over the slaves.</p>
+
+<p>This actually requires 3 instances of SQL Relay.  One to connect to the master, one to connect to the slaves, and a third to route queries to the first two.</p>
+
+<blockquote>
+@sqlrelay-router.conf.html@
+</blockquote>
+
+<p>The first two instances use familiar configuration options, but the third uses a dbtype of "router" and rather than defining connections, uses router, route and query tags to define query routing rules.</p>
+
+<p>The router tag defines a set of routes.  The attributes of each route tag specify an instance of SQL Relay to connect to.  The pattern attribute of each query tag defines a regular expression used to match queries.  Queries that match the set of patterns defined in the route tag are sent to the instance of SQL Relay designated in the route tag.</p>
+
+<p>The three instances can be started using:</p>
+
+<blockquote>
+<code>
+sqlr-start -id master<br>
+sqlr-start -id slave<br>
+sqlr-start -id router
+</code>
+</blockquote>
+
+<p>Client programs should connect to the router instance rather than the master or slave instances.</p>
+
+<blockquote>
+<code>
+sqlrsh -host <i>sqlrserver</i> -user routeruser -password routerpassword
+</code>
+</blockquote>
+
+<p>See the <a href="router.html">SQL Relay Configuration Reference</a> for more information on this parameter.</p>
+
+
+<br><br><a name="instances"></a>
+<span class="heading2">Multiple Instances</span><br>
+
+<p>Any number of SQL Relay instances can be defined in the sqlrelay.conf file.</p>
+
+<p>In following example, instances that connect to Oracle, Sybase and DB2 are defined in the same file.</p>
+
+<blockquote>
+@sqlrelay-multiple.conf.html@
+</blockquote>
+
+<p>These instances can be started using:</p>
+
+<blockquote>
+<code>
+sqlr-start -id oracleexample<br>
+sqlr-start -id sybaseexample<br>
+sqlr-start -id db2example
+</code>
+</blockquote>
+
+<p>They can be accessed using:</p>
+
+<blockquote>
+<code>
+sqlrsh -host <i>sqlrserver</i> -port 9000<br>
+sqlrsh -host <i>sqlrserver</i> -port 9001<br>
+sqlrsh -host <i>sqlrserver</i> -port 9002<br>
+</code>
+</blockquote>
+
+</body>
+</html>
