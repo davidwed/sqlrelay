@@ -49,7 +49,8 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/gettingstarted/db2
 	$(INSTALL) -m 644 index.html $(docdir)
 	$(INSTALL) -m 644 faq.html $(docdir)
-	$(INSTALL) -m 644 admin/configuring.html $(docdir)/admin
+	$(INSTALL) -m 644 admin/configguide.html $(docdir)/admin
+	$(INSTALL) -m 644 admin/configreference.html $(docdir)/admin
 	$(INSTALL) -m 644 admin/installing.html $(docdir)/admin
 	$(INSTALL) -m 644 admin/loadbalfailover.html $(docdir)/admin
 	$(INSTALL) -m 644 admin/oraclentier.html $(docdir)/admin

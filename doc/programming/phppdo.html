@@ -338,7 +338,7 @@ binding by position, the first bind parameter is number 1, not 0.</p>
 
 <p>However...</p>
 
-<p>Another solution is to configure SQL Relay to translate bind variables by setting translatebindvariables="yes" in the sqlrelay.conf file for the instance you're using.  Simply put, this parameter makes every database support every bind variable format.  See <a href="../admin/configuring.html">Configuring SQL Relay</a> for more information on this parameter.</p>
+<p>Another solution is to configure SQL Relay to translate bind variables by setting translatebindvariables="yes" in the sqlrelay.conf file for the instance you're using.  Simply put, this parameter makes every database support every bind variable format.  See the <a href="../admin/configreference.html">SQL Relay Configuration Reference</a> for more information on this parameter.</p>
 
 <p>A third solution is to configure PDO to emulate prepares by setting the PDO::ATTR_EMULATE_PREPARES attribute to true.  When the SQL Relay driver sees that this is set true, it rewrites the queries and translates the bind variables to substitution variables.  This solution also makes every database support every bind variable format, but the translation is done on the client-side.</p>
 

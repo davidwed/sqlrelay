@@ -57,7 +57,7 @@ sqlr-start -id ID [-config CONFIGFILE] [-localstatedir LOCALSTATEDIR]
 
 <span class="heading2">Debugging and Tracing</span>
 
-<p>The instance tag of the CONFIGFILE contains an optional debug attribute.  When it is set, the <b>sqlr-listener</b> and/or <b>sqlr-connection</b> daemons output debugging information to files in /usr/local/firstworks/var/sqlrelay/debug.  See <a href="configuring.html">Configuring SQL Relay</a> for more information on the debug attribute.</p>
+<p>The instance tag of the CONFIGFILE contains an optional debug attribute.  When it is set, the <b>sqlr-listener</b> and/or <b>sqlr-connection</b> daemons output debugging information to files in /usr/local/firstworks/var/sqlrelay/debug.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for more information on the debug attribute.</p>
 
 <p>The <b>sqlr-start</b> program also takes an optional <b>-strace</b> parameter.  When run as root, if the <b>-strace</b> parameter is used, <b>sqlr-start</b> starts the <b>sqlr-connection</b> daemons using <i>strace -ff -o sqlr-connection-strace</i> causing <i>sqlr-connection-strace.pid</i> files to be written to the root directory.  See the <i>strace</i> man page for more information.</p>
 
