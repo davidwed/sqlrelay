@@ -45,7 +45,7 @@
 #define DEFAULT_RUNASGROUP "nobody"
 	// default group to run as
 
-#define DEFAULT_CURSORS "5"
+#define DEFAULT_CURSORS "2"
 	// default number of cursors to open
 
 #define DEFAULT_CURSORS_GROWBY "1"
