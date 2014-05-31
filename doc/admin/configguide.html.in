@@ -10,6 +10,7 @@
 <ul>
 <li><a href="#minimal">Minimal Configuration</a></li>
 <li><a href="#typical">Typical Configuration</a></li>
+<li><a href="#auth">Authentication</a></li>
 <li><a href="#cursors">Database Cursors</a></li>
 <li><a href="#dynamicscaling">Dynamic Scaling</a></li>
 <li><a href="#listener">Listener Configuration</a></li>
@@ -17,6 +18,7 @@
 <li><a href="#cluster">Replicated or Clustered Databases</a></li>
 <li><a href="#router">Master-Slave Query Routing</a></li>
 <li><a href="#instances">Multiple Instances</a></li>
+<li><a href="#modules">Extension Modules</a></li>
 </ul>
 
 
@@ -83,6 +85,19 @@ sqlrsh -host <i>sqlrserver</i> -user sqlruser -password sqlrpassword
 
 <p>Any number of connections can be opened.  A good rule of thumb is to open as many as you can.  The optimal number is application specific though and is limited by database, system and network resources.</p>
 
+
+<br><br><a name="auth"></a>
+<span class="heading2">Authentication</span><br>
+
+<p>Authentication of client programs is typically done against users and passwords defined in the sqlrelay.conf file but another authentication option is available.</p>
+
+<p>The authtier parameter can be set to either "connection" or "database".  When set to "connection" (the default), authentication is done against the users and passwords defined in the sqlrelay.conf file.  When set to "database", authentication is done against the database itself and the users tag can be omitted from the config file.</p>
+
+<blockquote>
+@sqlrelay-auth.conf.html@
+</blockquote>
+
+<p>See the <a href="configreference.html">SQL Relay Configuration Reference</a> for more information on this parameter.</p>
 
 <br><br><a name="cursors"></a>
 <span class="heading2">Database Cursors</span><br>
@@ -287,6 +302,12 @@ sqlrsh -host <i>sqlrserver</i> -port 9001<br>
 sqlrsh -host <i>sqlrserver</i> -port 9002<br>
 </code>
 </blockquote>
+
+
+<br><br><a name="modules"></a>
+<span class="heading2">Extension Modules</span><br>
+
+<p>SQL Relay can be extended via modules.  To load and enable a module, you must add additional tags and attributes to the config file and each module has its own tags and attributes.  Currently <a href="../modules/passwordencryption.html">Password Encryption</a> and <a href="../modules/logger.html">Logger</a> modules are supported.</p>
 
 </body>
 </html>
