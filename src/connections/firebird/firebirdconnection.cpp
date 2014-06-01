@@ -712,8 +712,10 @@ bool firebirdcursor::prepareQuery(const char *query, uint32_t length) {
 		return false;
 	}
 
-	ISC_LONG	len=isc_vax_integer(resbuffer+1,2);
-	querytype=isc_vax_integer(resbuffer+3,len);
+	// (modern versions of isc_vax_integer take a const char * parameter,
+	// but old versions take char * and this cast works with both)
+	ISC_LONG	len=isc_vax_integer((char *)(resbuffer+1),2);
+	querytype=isc_vax_integer((char *)(resbuffer+3),len);
 
 	// find bind parameters, if any
 	insqlda->sqld=0;
@@ -883,9 +885,12 @@ bool firebirdcursor::inputBindBlob(const char *variable,
 		} else {
 			bytestoput=MAX_LOB_CHUNK_SIZE;
 		}
+		// (modern versions of isc_put_segment take a const char *
+		// parameter, but old versions take char * and this cast works
+		// with both)
 		if (isc_put_segment(firebirdconn->error,
 					&inblobhandle[index],
-					bytestoput,value+bytesput)) {
+					bytestoput,(char *)(value+bytesput))) {
 			return false;
 		}
 		bytesput=bytesput+bytestoput;
@@ -1150,12 +1155,18 @@ bool firebirdcursor::getLobOutputBindLength(uint16_t index, uint64_t *length) {
 		p++;
 
 		// get the item size
-		uint16_t	itemsize=(uint16_t)isc_vax_integer(p,2);
+		// (modern versions of isc_vax_integer take a const char *
+		// parameter, but old versions take char * and this cast works
+		// with both)
+		uint16_t	itemsize=(uint16_t)isc_vax_integer((char *)p,2);
 		p=p+2;
 
 		// get the lob length
 		if (itemtype==isc_info_blob_total_length) {
-			*length=isc_vax_integer(p,itemsize);
+			// (modern versions of isc_vax_integer take a
+			// const char * parameter, but old versions take a
+			// char * and this cast works with both)
+			*length=isc_vax_integer((char *)p,itemsize);
 		}
  
 		// move on
@@ -1737,12 +1748,18 @@ bool firebirdcursor::getLobFieldLength(uint32_t col, uint64_t *length) {
 		p++;
 
 		// get the item size
-		uint16_t	itemsize=(uint16_t)isc_vax_integer(p,2);
+		// (modern versions of isc_vax_integer take a const char *
+		// parameter, but old versions take a char * and this cast
+		// works with both)
+		uint16_t	itemsize=(uint16_t)isc_vax_integer((char *)p,2);
 		p=p+2;
 
 		// get the lob length
 		if (itemtype==isc_info_blob_total_length) {
-			*length=isc_vax_integer(p,itemsize);
+			// (modern versions of isc_vax_integer take a
+			// const char * parameter, but old versions take a
+			// char * and this cast works with both)
+			*length=isc_vax_integer((char *)p,itemsize);
 		}
  
 		// move on
