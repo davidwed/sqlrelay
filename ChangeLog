@@ -12,6 +12,7 @@
 	added plugin-based authentication framework
 	reorganized code tree a bit
 	reworked default values to enable more minimal configurations
+	udpated configuration docs and added configuration guide
 
 0.55 - fixed a sql translation bug related to exists clauses
 	added deployment projects for windows

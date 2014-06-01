@@ -614,11 +614,17 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			connectioncount++;
 			}
 			break;
-		case ROUTER_TAG:
+		case ROUTER_TAG: {
 			currentconnect=new connectstringcontainer();
 			connectstringlist.append(currentconnect);
-			currentconnect->setConnectionId(DEFAULT_CONNECTIONID);
+			stringbuffer	connectionid;
+			connectionid.append(id)->append("-");
+			connectionid.append(connectioncount);
+			currentconnect->setConnectionId(
+					connectionid.getString());
+			connectioncount++;
 			currenttag=thistag;
+			}
 			break;
 		case ROUTE_TAG:
 		case FILTER_TAG:
@@ -1346,8 +1352,15 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 					stderror.printf("error: connectionid \"%s\" is too long, must be %d characters or fewer.\n",value,MAXCONNECTIONIDLEN);
 					return false;
 				}
-				currentconnect->setConnectionId((value)?value:
-							DEFAULT_CONNECTIONID);
+				if (!value) {
+					stringbuffer	connectionid;
+					connectionid.append(id)->append("-");
+					connectionid.append(connectioncount);
+					currentconnect->setConnectionId(
+						connectionid.getString());
+				} else {
+					currentconnect->setConnectionId(value);
+				}
 			}
 		} else if (currentattribute==STRING_ATTRIBUTE) {
 			if (currentconnect) {
