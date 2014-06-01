@@ -17,4 +17,5 @@ html:
 		sed -i -e "/<html>/d" -e "/<head>/d" -e "/<title>.*<\/title>/d" -e "/<\!DOCTYPE.*/d" -e "/<script.*>/d" -e "/<\!--.*/d" -e "/.*-->/d" -e "/<\/script>.*/d" -e "/<meta.*/d" -e "/<\/head>/d" -e "/<body.*/d" -e "/<\/body>/d" -e "/<\/html>/d" $$i; \
 	done
 	./insert.pl configguide.html.in > configguide.html
+	./insert.pl configreference.html.in > configreference.html
 	rm -f parts/*.html
