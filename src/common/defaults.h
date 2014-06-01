@@ -45,7 +45,7 @@
 #define DEFAULT_RUNASGROUP "nobody"
 	// default group to run as
 
-#define DEFAULT_CURSORS "2"
+#define DEFAULT_CURSORS "1"
 	// default number of cursors to open
 
 #define DEFAULT_CURSORS_GROWBY "1"
@@ -97,7 +97,7 @@
 #define DEFAULT_CONNECTIONID "defaultid"
 	// default id for an individual set of connections
 
-#define DEFAULT_CONNECTSTRING "user=scott;password=tiger;"
+#define DEFAULT_CONNECTSTRING ""
 	// default connect string
 
 #define DEFAULT_METRIC "1"
