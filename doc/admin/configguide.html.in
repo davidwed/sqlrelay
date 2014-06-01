@@ -9,8 +9,7 @@
 
 <ul>
 <li><a href="#minimal">Minimal Configuration</a></li>
-<li><a href="#typical">Typical Configuration</a></li>
-<li><a href="#auth">Authentication</a></li>
+<li><a href="#connections">Database Connections</a></li>
 <li><a href="#cursors">Database Cursors</a></li>
 <li><a href="#dynamicscaling">Dynamic Scaling</a></li>
 <li><a href="#listener">Listener Configuration</a></li>
@@ -33,7 +32,9 @@
 @sqlrelay-minimal.conf.html@
 </blockquote>
 
-<p>This configuration defines an instance of SQL Relay named <i>example</i> that opens and maintains a single persistent connection to the <i>orcl</i> instance of an Oracle database using user <i>scott</i> and password <i>tiger</i>.</p>
+<p>This configuration defines an instance of SQL Relay named <i>example</i>, secured by a user and password, that opens and maintains 5 persistent connections to the <i>orcl</i> instance of an Oracle database using user <i>scott</i> and password <i>tiger</i>.</p>
+
+<p>It also defines a user and password to 
 
 <p>The instance can be started using:</p>
 
@@ -47,7 +48,7 @@ sqlr-start -id example
 
 <blockquote>
 <code>
-sqlrsh -host <i>sqlrserver</i>
+sqlrsh -host <i>sqlrserver</i> -user sqlruser -password sqlrpassword
 </code>
 </blockquote>
 
@@ -55,30 +56,18 @@ sqlrsh -host <i>sqlrserver</i>
 
 <blockquote>
 <code>
-sqlrsh -host localhost
+sqlrsh -host localhost -user sqlruser -password sqlrpassword
 </code>
 </blockquote>
-
-<p>This configuration is good for testing connectivity, but it's insecure and won't perform very well.</p>
 
 
 <br><br><a name="connections"></a>
-<span class="heading2">Typical Configuration</span><br>
+<span class="heading2">Database Connections</span><br>
 
-<p>A more typical SQL Relay configuration opens and maintains multiple persistent connections to the database and is secured by a user and password.</p>
-
-<p>This configuration opens 10 connections and defines a user and password.</p>
+<p>By default, SQL Relay opens and maintains 5 persistent database connections, but the number of connections can be configured using the connections parameter.</p>
 
 <blockquote>
-@sqlrelay-typical.conf.html@
-</blockquote>
-
-<p>It can be accessed using:</p>
-
-<blockquote>
-<code>
-sqlrsh -host <i>sqlrserver</i> -user sqlruser -password sqlrpassword
-</code>
+@sqlrelay-connections.conf.html@
 </blockquote>
 
 <p>The number of connections determines how many client applications can access the database simultaneously .  In this case, up to 10, assuming each client only needs one connection.  Additional clients can connect but get queued up and have to wait for one of the first 10 to disconnect before being able to access the database.</p>

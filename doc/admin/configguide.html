@@ -9,8 +9,7 @@
 
 <ul>
 <li><a href="#minimal">Minimal Configuration</a></li>
-<li><a href="#typical">Typical Configuration</a></li>
-<li><a href="#auth">Authentication</a></li>
+<li><a href="#connections">Database Connections</a></li>
 <li><a href="#cursors">Database Cursors</a></li>
 <li><a href="#dynamicscaling">Dynamic Scaling</a></li>
 <li><a href="#listener">Listener Configuration</a></li>
@@ -39,6 +38,9 @@
 <font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
 <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;example&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
@@ -48,7 +50,9 @@
 </font>
 </blockquote>
 
-<p>This configuration defines an instance of SQL Relay named <i>example</i> that opens and maintains a single persistent connection to the <i>orcl</i> instance of an Oracle database using user <i>scott</i> and password <i>tiger</i>.</p>
+<p>This configuration defines an instance of SQL Relay named <i>example</i>, secured by a user and password, that opens and maintains 5 persistent connections to the <i>orcl</i> instance of an Oracle database using user <i>scott</i> and password <i>tiger</i>.</p>
+
+<p>It also defines a user and password to 
 
 <p>The instance can be started using:</p>
 
@@ -62,7 +66,7 @@ sqlr-start -id example
 
 <blockquote>
 <code>
-sqlrsh -host <i>sqlrserver</i>
+sqlrsh -host <i>sqlrserver</i> -user sqlruser -password sqlrpassword
 </code>
 </blockquote>
 
@@ -70,19 +74,15 @@ sqlrsh -host <i>sqlrserver</i>
 
 <blockquote>
 <code>
-sqlrsh -host localhost
+sqlrsh -host localhost -user sqlruser -password sqlrpassword
 </code>
 </blockquote>
 
-<p>This configuration is good for testing connectivity, but it's insecure and won't perform very well.</p>
-
 
 <br><br><a name="connections"></a>
-<span class="heading2">Typical Configuration</span><br>
+<span class="heading2">Database Connections</span><br>
 
-<p>A more typical SQL Relay configuration opens and maintains multiple persistent connections to the database and is secured by a user and password.</p>
-
-<p>This configuration opens 10 connections and defines a user and password.</p>
+<p>By default, SQL Relay opens and maintains 5 persistent database connections, but the number of connections can be configured using the connections parameter.</p>
 
 <blockquote>
 
@@ -104,14 +104,6 @@ sqlrsh -host localhost
 <br>
 <font color="#008b8b">&lt;/instances&gt;</font><br>
 </font>
-</blockquote>
-
-<p>It can be accessed using:</p>
-
-<blockquote>
-<code>
-sqlrsh -host <i>sqlrserver</i> -user sqlruser -password sqlrpassword
-</code>
 </blockquote>
 
 <p>The number of connections determines how many client applications can access the database simultaneously .  In this case, up to 10, assuming each client only needs one connection.  Additional clients can connect but get queued up and have to wait for one of the first 10 to disconnect before being able to access the database.</p>
