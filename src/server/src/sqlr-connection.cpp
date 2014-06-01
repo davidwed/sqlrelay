@@ -206,6 +206,12 @@ int main(int argc, const char **argv) {
 	// unsuccessful completion
 	cleanUp();
 
+	// Some versions of Oracle register an atexit() function
+	// epc_exit_handler() which is known to crash under certain
+	// circumstances and cause shutDown() to loop up.  This unregisters
+	// shutDown() so the process will just exit in that case.
+	process::exitOnCrash();
+
 	// return successful or unsuccessful completion based on listenresult
 	process::exit((result)?0:1);
 }
