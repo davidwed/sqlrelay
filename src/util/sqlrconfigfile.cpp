@@ -378,13 +378,6 @@ const char *sqlrconfigfile::getAuthentications() {
 }
 
 linkedlist< usercontainer * > *sqlrconfigfile::getUserList() {
-	// if there are no users in the list, add a default user/password
-	if (!userlist.getLength()) {
-		currentuser=new usercontainer();
-		currentuser->setUser(DEFAULT_USER);
-		currentuser->setPassword(DEFAULT_PASSWORD);
-		userlist.append(currentuser);
-	}
 	return &userlist;
 }
 
@@ -1334,10 +1327,9 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			idleclienttimeout=charstring::toInteger((value)?value:
 						DEFAULT_IDLECLIENTTIMEOUT);
 		} else if (currentattribute==USER_ATTRIBUTE) {
-			currentuser->setUser((value)?value:DEFAULT_USER);
+			currentuser->setUser((value)?value:"");
 		} else if (currentattribute==PASSWORD_ATTRIBUTE) {
-			currentuser->setPassword((value)?value:
-							DEFAULT_PASSWORD);
+			currentuser->setPassword((value)?value:"");
 		} else if (currentattribute==PASSWORDENCRYPTION_ATTRIBUTE) {
 			if (currenttag==USERS_TAG) {
 				currentuser->setPasswordEncryption(

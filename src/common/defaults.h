@@ -15,7 +15,7 @@
 #define DEFAULT_DBASE "oracle8"
 	// default database type
 
-#define DEFAULT_CONNECTIONS "1"
+#define DEFAULT_CONNECTIONS "5"
 	// default number of connections to start
 
 #define DEFAULT_ENDOFSESSION "commit"
@@ -93,12 +93,6 @@
 
 #define DEFAULT_IDLECLIENTTIMEOUT "-1"
 	// default idle client timeout
-
-#define DEFAULT_USER ""
-	// default user name for authentication
-
-#define DEFAULT_PASSWORD ""
-	// default password for authentication
 
 #define DEFAULT_CONNECTIONID "defaultid"
 	// default id for an individual set of connections

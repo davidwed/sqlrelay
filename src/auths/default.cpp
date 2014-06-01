@@ -35,8 +35,7 @@ defaultauth::defaultauth(xmldomnode *parameters,
 	passwords=new const char *[usercount];
 	passwordencryptions=new const char *[usercount];
 
-	xmldomnode *user=parameters->getFirstTagChild("users")->
-					getFirstTagChild("user");
+	xmldomnode *user=parameters->getFirstTagChild("user");
 	for (uint64_t i=0; i<usercount; i++) {
 
 		users[i]=user->getAttributeValue("user");

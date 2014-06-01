@@ -32,9 +32,7 @@
 @sqlrelay-minimal.conf.html@
 </blockquote>
 
-<p>This configuration defines an instance of SQL Relay named <i>example</i>, secured by a user and password, that opens and maintains 5 persistent connections to the <i>orcl</i> instance of an Oracle database using user <i>scott</i> and password <i>tiger</i>.</p>
-
-<p>It also defines a user and password to 
+<p>This configuration defines an instance of SQL Relay named <i>example</i>, secured by a user and password, that opens and maintains 5 persistent connections to the <i>orcl</i> instance of an Oracle database using <i>scott</i>/<i>tiger</i> credentials.</p>
 
 <p>The instance can be started using:</p>
 
@@ -245,7 +243,7 @@ sqlrsh -host <i>sqlrserver</i> -user routeruser -password routerpassword
 </code>
 </blockquote>
 
-<p>See the <a href="router.html">SQL Relay Configuration Reference</a> for more information on this parameter.</p>
+<p>See the <a href="router.html">SQL Relay - Query Routing and Filtering</a> for more information on query routing.</p>
 
 
 <br><br><a name="instances"></a>
