@@ -10,6 +10,7 @@
 sqlrcontroller_svr	*cont=NULL;
 volatile sig_atomic_t	shutdowninprogress=0;
 signalhandler		shutdownhandler;
+bool			shutdownalready=false;
 
 void cleanUp() {
 	cont->closeConnection();
@@ -17,6 +18,17 @@ void cleanUp() {
 }
 
 void shutDown(int32_t signum) {
+
+	// Various situations can cause this function to get looped up, such as
+	// bugs in functions set to run at exit.  Detect a loop and just exit
+	// if that's happening.
+	if (shutdownalready) {
+		stderror.printf("(pid=%ld) Shutdown loop detected, exiting.\n",
+						(long)process::getProcessId());
+		process::exit(0);
+	}
+
+	shutdownalready=true;
 
 	if (!signalhandler::isSignalHandlerIntUsed()) {
 		cleanUp();
@@ -205,12 +217,6 @@ int main(int argc, const char **argv) {
 
 	// unsuccessful completion
 	cleanUp();
-
-	// Some versions of Oracle register an atexit() function
-	// epc_exit_handler() which is known to crash under certain
-	// circumstances and cause shutDown() to loop up.  This unregisters
-	// shutDown() so the process will just exit in that case.
-	process::exitOnCrash();
 
 	// return successful or unsuccessful completion based on listenresult
 	process::exit((result)?0:1);
