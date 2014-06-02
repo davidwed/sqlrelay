@@ -19,6 +19,7 @@
 #include <rudiments/semaphoreset.h>
 #include <rudiments/sharedmemory.h>
 #include <rudiments/regularexpression.h>
+#include <rudiments/thread.h>
 
 #include <sqlrelay/private/sqlrshmdata.h>
 
@@ -62,19 +63,23 @@ class SQLRSERVER_DLLSPEC sqlrlistener : public listener {
 		bool	deniedIp(filedescriptor *clientsock);
 		void	forkChild(filedescriptor *clientsock);
 		static void	clientSessionThread(void *attr);
-		void	clientSession(filedescriptor *clientsock);
+		void	clientSession(filedescriptor *clientsock,
+							thread *thr);
 		void    errorClientSession(filedescriptor *clientsock,
 					int64_t errnum, const char *err);
 		bool	acquireShmAccess();
 		bool	releaseShmAccess();
 		bool	acceptAvailableConnection(bool *alldbsdown);
 		bool	doneAcceptingAvailableConnection();
-		bool	handOffOrProxyClient(filedescriptor *sock);
+		bool	handOffOrProxyClient(filedescriptor *sock,
+							thread *thr);
 		bool	getAConnection(uint32_t *connectionpid,
 					uint16_t *inetport,
 					char *unixportstr,
 					uint16_t *unixportstrlen,
-					filedescriptor *sock);
+					filedescriptor *sock,
+					thread *thr);
+		static void	alarmThread(void *attr);
 		bool	findMatchingSocket(uint32_t connectionpid,
 					filedescriptor *connectionsock);
 		bool	requestFixup(uint32_t connectionpid,
@@ -162,6 +167,7 @@ class SQLRSERVER_DLLSPEC sqlrlistener : public listener {
 		int32_t		idleclienttimeout;
 
 		bool	isforkedchild;
+		bool	isforkedthread;
 
 		sqlrconfigfile		cfgfl;
 
