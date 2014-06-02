@@ -73,6 +73,7 @@ typedef enum {
 	FAKEINPUTBINDVARIABLES_ATTRIBUTE,
 	TRANSLATEBINDVARIABLES_ATTRIBUTE,
 	TRANSLATIONS_ATTRIBUTE,
+	RESULTSETTRANSLATIONS_ATTRIBUTE,
 	TRIGGERS_ATTRIBUTE,
 	LOGGERS_ATTRIBUTE,
 	QUERIES_ATTRIBUTE,
@@ -233,6 +234,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 
 		const char	*getTranslations();
 
+		const char	*getResultSetTranslations();
+
 		const char	*getTriggers();
 
 		const char	*getLoggers();
@@ -340,6 +343,9 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		stringbuffer	translations;
 		uint16_t	translationsdepth;
 
+		stringbuffer	resultsettranslations;
+		uint16_t	resultsettranslationsdepth;
+
 		stringbuffer	triggers;
 		uint16_t	triggersdepth;
 
@@ -380,6 +386,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 			FILTER_TAG,
 			QUERY_TAG,
 	   		TRANSLATIONS_TAG,
+	   		RESULTSETTRANSLATIONS_TAG,
 	   		TRIGGERS_TAG,
 	   		LOGGERS_TAG,
 	   		QUERIES_TAG,

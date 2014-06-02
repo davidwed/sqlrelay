@@ -101,6 +101,7 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 
 	sqlp=NULL;
 	sqlrt=NULL;
+	sqlrrst=NULL;
 	sqlw=NULL;
 	sqlrtr=NULL;
 	sqlrlg=NULL;
@@ -176,6 +177,7 @@ sqlrcontroller_svr::~sqlrcontroller_svr() {
 
 	delete sqlp;
 	delete sqlrt;
+	delete sqlrrst;
 	delete sqlw;
 	delete sqlrtr;
 	delete sqlrlg;
@@ -309,17 +311,23 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	}
 	initConnStats();
 
-	// Get the query translators.  Do it after logging in, as
-	// getSqlTranslator might return a different class depending on what
-	// version of the db it gets logged into
+	// get the query translators
 	const char	*translations=cfgfl->getTranslations();
 	if (translations && translations[0]) {
 		sqlp=new sqlparser;
-		sqlrt=conn->getSqlTranslations();
+		sqlrt=new sqlrtranslations;
 		sqlrt->loadTranslations(translations);
 		sqlw=new sqlwriter;
 	}
 	debugsqlrtranslation=cfgfl->getDebugTranslations();
+
+	// get the result set translators
+	const char	*resultsettranslations=
+				cfgfl->getResultSetTranslations();
+	if (resultsettranslations && resultsettranslations[0]) {
+		sqlrrst=new sqlrresultsettranslations;
+		sqlrrst->loadResultSetTranslations(resultsettranslations);
+	}
 
 	// get the triggers
 	const char	*triggers=cfgfl->getTriggers();

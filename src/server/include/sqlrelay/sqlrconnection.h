@@ -98,8 +98,6 @@ class SQLRSERVER_DLLSPEC sqlrconnection_svr {
 
 		virtual void		endSession();
 
-		virtual sqlrtranslations	*getSqlTranslations();
-
 		void	clearError();
 		void	setError(const char *err, int64_t errn, bool liveconn);
 

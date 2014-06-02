@@ -26,6 +26,7 @@
 #include <sqlrelay/sqlrprotocol.h>
 #include <sqlrelay/sqlparser.h>
 #include <sqlrelay/sqlrtranslations.h>
+#include <sqlrelay/sqlrresultsettranslations.h>
 #include <sqlrelay/sqlwriter.h>
 #include <sqlrelay/sqlrtriggers.h>
 #include <sqlrelay/sqlrloggers.h>
@@ -341,15 +342,16 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		uint16_t	maxcursorcount;
 		sqlrcursor_svr	**cur;
 
-		sqlrprotocol		*sqlrp[SQLRPROTOCOLCOUNT];
-		sqlparser		*sqlp;
-		sqlrtranslations	*sqlrt;
-		sqlwriter		*sqlw;
-		sqlrtriggers		*sqlrtr;
-		sqlrloggers		*sqlrlg;
-		sqlrqueries		*sqlrq;
-		sqlrpwdencs		*sqlrpe;
-		sqlrauths		*sqlra;
+		sqlrprotocol			*sqlrp[SQLRPROTOCOLCOUNT];
+		sqlparser			*sqlp;
+		sqlrtranslations		*sqlrt;
+		sqlrresultsettranslations	*sqlrrst;
+		sqlwriter			*sqlw;
+		sqlrtriggers			*sqlrtr;
+		sqlrloggers			*sqlrlg;
+		sqlrqueries			*sqlrq;
+		sqlrpwdencs			*sqlrpe;
+		sqlrauths			*sqlra;
 
 		char		*decrypteddbpassword;
 
