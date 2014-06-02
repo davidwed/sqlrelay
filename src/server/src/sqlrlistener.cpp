@@ -18,6 +18,8 @@
 #include <rudiments/stdio.h>
 #include <rudiments/thread.h>
 
+#include <pthread.h>
+
 #include <defaults.h>
 #include <defines.h>
 
@@ -67,6 +69,7 @@ sqlrlistener::sqlrlistener() : listener() {
 	idleclienttimeout=-1;
 
 	isforkedchild=false;
+	isforkedthread=false;
 	handoffmode=HANDOFF_PASS;
 
 	usethreads=false;
@@ -357,14 +360,14 @@ void sqlrlistener::setSessionHandlerMethod() {
 			return;
 		}
 
-		if (listenertimeout) {
+		/*if (listenertimeout) {
 			stderror.printf("Warning: sessionhandler=\"thread\" is "
 					"currently unsupported when "
 					"listenertimeout is set to a non-zero "
 					"value.  Falling back to "
 					"sessionhandler=\"process\".\n");
 			return;
-		}
+		}*/
 
 		usethreads=true;
 	}
@@ -898,7 +901,7 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 		forkChild(clientsock);
 	} else {
 		incrementBusyListeners();
-		clientSession(clientsock);
+		clientSession(clientsock,NULL);
 		decrementBusyListeners();
 	}
 
@@ -1102,6 +1105,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 
 		// fork the thread
 		if (thr->create()) {
+			isforkedthread=true;
 			return;
 		}
 
@@ -1137,7 +1141,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 			sqlrlg->initLoggers(this,NULL);
 		}
 
-		clientSession(clientsock);
+		clientSession(clientsock,NULL);
 
 		decrementBusyListeners();
 		decrementForkedListeners();
@@ -1174,20 +1178,20 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 void sqlrlistener::clientSessionThread(void *attr) {
 	clientsessionattr	*csa=(clientsessionattr *)attr;
 	csa->thr->detach();
-	csa->lsnr->clientSession(csa->clientsock);
+	csa->lsnr->clientSession(csa->clientsock,csa->thr);
 	csa->lsnr->decrementBusyListeners();
 	csa->lsnr->decrementForkedListeners();
 	delete csa->thr;
 	delete csa;
 }
 
-void sqlrlistener::clientSession(filedescriptor *clientsock) {
+void sqlrlistener::clientSession(filedescriptor *clientsock, thread *thr) {
 
 	if (dynamicscaling) {
 		incrementConnectedClientCount();
 	}
 
-	bool	passstatus=handOffOrProxyClient(clientsock);
+	bool	passstatus=handOffOrProxyClient(clientsock,thr);
 
 	// If the handoff failed, decrement the connected client count.
 	// If it had succeeded then the connection daemon would
@@ -1203,7 +1207,7 @@ void sqlrlistener::clientSession(filedescriptor *clientsock) {
 	delete clientsock;
 }
 
-bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock) {
+bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock, thread *thr) {
 
 	uint32_t	connectionpid;
 	uint16_t	inetport;
@@ -1216,7 +1220,7 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock) {
 
 		if (!getAConnection(&connectionpid,&inetport,
 					unixportstr,&unixportstrlen,
-					sock)) {
+					sock,thr)) {
 			// fatal error occurred while getting a connection
 			retval=false;
 			break;
@@ -1406,23 +1410,45 @@ bool sqlrlistener::doneAcceptingAvailableConnection() {
 	return true;
 }
 
+struct alarmthreadattr {
+	thread		*alarmthr;
+	thread		*mainthr;
+	uint64_t	listenertimeout;
+};
+
 bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					uint16_t *inetport,
 					char *unixportstr,
 					uint16_t *unixportstrlen,
-					filedescriptor *sock) {
+					filedescriptor *sock,
+					thread *thr) {
 
 	// use an alarm, if we're a forked child and a timeout is set
-	bool	usealarm=(isforkedchild && listenertimeout);
+	bool	usealarm=((isforkedthread || isforkedchild) && listenertimeout);
 
 	for (;;) {
 
 		logDebugMessage("getting a connection...");
 
+		// set up an alarm thread, should we need it
+		thread		*alarmthread=NULL;
+		alarmthreadattr	*ata=NULL;
+
 		// set an alarm
 		if (usealarm) {
 			alarmrang=0;
-			signalmanager::alarm(listenertimeout);
+			if (isforkedthread) {
+				alarmthread=new thread;
+				ata=new alarmthreadattr;
+				ata->alarmthr=alarmthread;
+				ata->mainthr=thr;
+				ata->listenertimeout=listenertimeout;
+				alarmthread->setFunction(
+					(void*(*)(void*))alarmThread,ata);
+				alarmthread->create();
+			} else {
+				signalmanager::alarm(listenertimeout);
+			}
 		}
 
 		// set "all db's down" flag
@@ -1442,7 +1468,11 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 			// turn off the alarm
 			if (usealarm) {
-				signalmanager::alarm(0);
+				if (isforkedthread) {
+					alarmthread->cancel();
+				} else {
+					signalmanager::alarm(0);
+				}
 			}
 
 			if (ok) {
@@ -1466,8 +1496,16 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 		// turn off the alarm
 		if (usealarm) {
-			signalmanager::alarm(0);
+			if (isforkedthread) {
+				alarmthread->cancel();
+			} else {
+				signalmanager::alarm(0);
+			}
 		}
+
+		// clean up alarm thread stuff
+		delete alarmthread;
+		delete ata;
 
 		// execute this only if code above executed without errors...
 		if (ok) {
@@ -1517,6 +1555,13 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			return false;
 		}
 	}
+}
+
+void sqlrlistener::alarmThread(void *attr) {
+	alarmthreadattr	*ata=(alarmthreadattr *)attr;
+	ata->alarmthr->detach();
+	snooze::macrosnooze(ata->listenertimeout);
+	ata->mainthr->raiseSignal(SIGALRM);
 }
 
 bool sqlrlistener::connectionIsUp(const char *connectionid) {
