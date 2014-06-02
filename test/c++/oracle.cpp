@@ -865,6 +865,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("CURSOR BINDS: \n");
+con->debugOn();
 	cur->clearBinds();
 	checkSuccess(cur->sendQuery("create or replace package types is type cursorType is ref cursor; end;"),1);
 	checkSuccess(cur->sendQuery("create or replace function sp_testtable(value in number) return types.cursortype is l_cursor    types.cursorType; begin open l_cursor for select * from testtable where testnumber>value; return l_cursor; end;"),1);
