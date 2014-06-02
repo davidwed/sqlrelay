@@ -21,11 +21,11 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 
 		virtual bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					uint32_t fieldindex,
+					uint16_t fieldindex,
 					const char *field,
-					uint64_t fieldlength,
+					uint32_t fieldlength,
 					const char **newfield,
-					uint64_t newfieldlength);
+					uint32_t *newfieldlength);
 	protected:
 		sqlrresultsettranslations	*sqlrrsts;
 		xmldomnode			*parameters;

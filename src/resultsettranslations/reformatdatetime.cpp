@@ -6,8 +6,6 @@
 #include <sqlrelay/sqlrcursor.h>
 #include <sqlrelay/sqlparser.h>
 #include <sqlrelay/sqlrresultsettranslation.h>
-#define NEED_CONVERT_DATE_TIME
-#include <parsedatetime.h>
 #include <debugprint.h>
 
 class reformatdatetime : public sqlrresultsettranslation {
@@ -17,21 +15,45 @@ class reformatdatetime : public sqlrresultsettranslation {
 			~reformatdatetime();
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					uint32_t fieldindex,
+					uint16_t fieldindex,
 					const char *field,
-					uint64_t fieldlength,
+					uint32_t fieldlength,
 					const char **newfield,
-					uint64_t *newfieldlength);
+					uint32_t *newfieldlength);
 	private:
 		char		*reformattedfield;
 		uint32_t	reformattedfieldlength;
+
+		bool		ddmm;
+		bool		yyyyddmm;
+		const char	*datetimeformat;
+		const char	*dateformat;
+		const char	*timeformat;
 };
 
 reformatdatetime::reformatdatetime(sqlrresultsettranslations *sqlrrsts,
 						xmldomnode *parameters) :
 				sqlrresultsettranslation(sqlrrsts,parameters) {
+
 	reformattedfield=NULL;
 	reformattedfieldlength=0;
+
+	// get the parameters
+	const char	*dateddmm=
+			parameters->getAttributeValue("dateddmm");
+	const char	*dateyyyyddmm=
+			parameters->getAttributeValue("dateyyyyddmm");
+	if (charstring::length(dateddmm) &&
+		!charstring::length(dateyyyyddmm)) {
+		dateyyyyddmm=dateddmm;
+	}
+	ddmm=!charstring::compareIgnoringCase(dateddmm,"yes");
+	yyyyddmm=!charstring::compareIgnoringCase(dateyyyyddmm,"yes");
+
+	datetimeformat=parameters->getAttributeValue("datetimeformat");
+	dateformat=parameters->getAttributeValue("dateformat");
+	timeformat=parameters->getAttributeValue("timeformat");
+
 }
 
 reformatdatetime::~reformatdatetime() {
@@ -40,69 +62,22 @@ reformatdatetime::~reformatdatetime() {
 
 bool reformatdatetime::run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
-					uint32_t fieldindex,
+					uint16_t fieldindex,
 					const char *field,
-					uint64_t fieldlength,
+					uint32_t fieldlength,
 					const char **newfield,
-					uint64_t *newfieldlength) {
+					uint32_t *newfieldlength) {
 	debugFunction();
 
-	// initialize return values
-	*newfield=field;
-	*newfieldlength=fieldlength;
-
-	// are dates going to be in MM/DD or DD/MM format?
-	bool	ddmm=sqlrcon->cont->cfgfl->getDateDdMm();
-	bool	yyyyddmm=sqlrcon->cont->cfgfl->getDateYyyyDdMm();
-
-	// This weirdness is mainly to address a FreeTDS/MSSQL
-	// issue.  See the code for the method
-	// freetdscursor::ignoreDateDdMmParameter() for more info.
-	if (sqlrcur->ignoreDateDdMmParameter(fieldindex,field,fieldlength)) {
-		ddmm=false;
-		yyyyddmm=false;
-	}
-
-	int16_t	year=-1;
-	int16_t	month=-1;
-	int16_t	day=-1;
-	int16_t	hour=-1;
-	int16_t	minute=-1;
-	int16_t	second=-1;
-	int16_t	fraction=-1;
-	if (!parseDateTime(field,ddmm,yyyyddmm,true,
-				&year,&month,&day,
-				&hour,&minute,&second,
-				&fraction)) {
-		return true;
-	}
-
-	// decide which format to use based on what parts
-	// were detected in the date/time
-	const char	*format=sqlrcon->cont->cfgfl->getDateTimeFormat();
-	if (hour==-1) {
-		format=sqlrcon->cont->cfgfl->getDateFormat();
-	} else if (day==-1) {
-		format=sqlrcon->cont->cfgfl->getTimeFormat();
-	}
-
-	// convert to the specified format
-	delete[] reformattedfield;
-	reformattedfield=convertDateTime(format,
-					year,month,day,
-					hour,minute,second,
-					fraction);
-	reformattedfieldlength=charstring::length(reformattedfield);
-
-	if (sqlrcon->cont->debugsqlrtranslation) {
-		stdoutput.printf("converted date: "
-			"\"%s\" to \"%s\" using ddmm=%d\n",
-			field,reformattedfield,ddmm);
-	}
-
-	// set return values
-	*newfield=reformattedfield;
-	*newfieldlength=reformattedfieldlength;
+	// For now, call the sqlrcontroller method.
+	// Eventually that code should be moved here.
+	sqlrcon->cont->reformatDateTimes(sqlrcur,fieldindex,
+					field,fieldlength,
+					newfield,newfieldlength,
+					ddmm,yyyyddmm,
+					datetimeformat,
+					dateformat,
+					timeformat);
 
 	return true;
 }

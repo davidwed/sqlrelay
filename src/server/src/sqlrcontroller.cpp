@@ -2977,21 +2977,46 @@ void sqlrcontroller_svr::reformatField(sqlrcursor_svr *cursor,
 						const char **newfield,
 						uint32_t *newfieldlength) {
 
-	// for now this method just reformats dates but in the future it could
-	// be extended to to configurable field reformatting...
-
 	// initialize return values
 	*newfield=field;
 	*newfieldlength=fieldlength;
 
-	// convert date/time values, if configured to do so
-	if (!reformatdatetimes) {
-		return;
+	// handle old-school date translation first
+	if (reformatdatetimes) {
+		bool		ddmm=cfgfl->getDateDdMm();
+		bool		yyyyddmm=cfgfl->getDateYyyyDdMm();
+		const char	*datetimeformat=cfgfl->getDateTimeFormat();
+		const char	*dateformat=cfgfl->getDateFormat();
+		const char	*timeformat=cfgfl->getTimeFormat();
+		reformatDateTimes(cursor,index,
+					field,fieldlength,
+					newfield,newfieldlength,
+					ddmm,yyyyddmm,
+					datetimeformat,
+					dateformat,timeformat);
 	}
 
-	// are dates going to be in MM/DD or DD/MM format?
-	bool	ddmm=cfgfl->getDateDdMm();
-	bool	yyyyddmm=cfgfl->getDateYyyyDdMm();
+	// run translations
+	if (sqlrrst) {
+		sqlrrst->runResultSetTranslations(conn,cursor,
+							index,
+							field,
+							fieldlength,
+							newfield,
+							newfieldlength);
+	}
+}
+
+void sqlrcontroller_svr::reformatDateTimes(sqlrcursor_svr *cursor,
+						uint16_t index,
+						const char *field,
+						uint32_t fieldlength,
+						const char **newfield,
+						uint32_t *newfieldlength,
+						bool ddmm, bool yyyyddmm,
+						const char *datetimeformat,
+						const char *dateformat,
+						const char *timeformat) {
 
 	// This weirdness is mainly to address a FreeTDS/MSSQL
 	// issue.  See the code for the method
@@ -3017,11 +3042,11 @@ void sqlrcontroller_svr::reformatField(sqlrcursor_svr *cursor,
 
 	// decide which format to use based on what parts
 	// were detected in the date/time
-	const char	*format=cfgfl->getDateTimeFormat();
+	const char	*format=datetimeformat;
 	if (hour==-1) {
-		format=cfgfl->getDateFormat();
+		format=dateformat;
 	} else if (day==-1) {
-		format=cfgfl->getTimeFormat();
+		format=timeformat;
 	}
 
 	// convert to the specified format

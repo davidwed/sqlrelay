@@ -189,6 +189,17 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 						const char **newfield,
 						uint32_t *newfieldlength);
 
+		void	reformatDateTimes(sqlrcursor_svr *cursor,
+						uint16_t index,
+						const char *field,
+						uint32_t fieldlength,
+						const char **newfield,
+						uint32_t *newfieldlength,
+						bool ddmm, bool yyyyddmm,
+						const char *datetimeformat,
+						const char *dateformat,
+						const char *timeformat);
+
 		void	dropTempTables(sqlrcursor_svr *cursor);
 		void	dropTempTable(sqlrcursor_svr *cursor,
 						const char *tablename);

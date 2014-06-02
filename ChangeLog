@@ -14,6 +14,8 @@
 	reworked default values to enable more minimal configurations
 	updated configuration docs and added configuration guide
 	fixed cast issue with firebird 1.5
+	added result set translation framework and re-implemented date
+		translation using it
 
 0.55 - fixed a sql translation bug related to exists clauses
 	added deployment projects for windows
