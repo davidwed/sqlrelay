@@ -1,16 +1,16 @@
 <html>
 <head>
-<title>firstworks   SQL Relay - Supported Languages</title>
+<title>firstworks   SQL Relay - Native API</title>
 <link href="../css/styles.css" rel="stylesheet">
 <script language="Javascript" src="../js/rotate.js"></script>
 </head>
 <body onload="rotate();">
 
-<span class="heading1">Supported Languages</span><br><br>
+<span class="heading1">Native API</span><br><br>
 
-<p>SQL Relay currently supports C, C++, .NET-capable languages, Java, Perl, Python, PHP, Ruby, TCL and Erlang.</p>
+<p>The native SQL Relay client API currently supports C, C++, .NET languages, Java, Perl, Python, PHP, Ruby, TCL and Erlang.</p>
 
-<p>Adapters could also be written for any language that can call functions from one of the above-listed languages.</p>
+<p>The native API is intuitive, consistent across languages, and supports powerful features not available when using a database abstraction layer like suspended sessions, result set caching and tuning options.</p>
 
 <p>Programming guides with sample code and API references are available for each language:</p>
 
