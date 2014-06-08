@@ -18,8 +18,6 @@
 #include <rudiments/stdio.h>
 #include <rudiments/thread.h>
 
-#include <pthread.h>
-
 #include <defaults.h>
 #include <defines.h>
 
