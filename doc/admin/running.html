@@ -8,42 +8,20 @@
 <span class="heading1">Running SQL Relay</span>
 
 <ul>
-<li><a href="#cygwin">Cygwin Considerations</a></li>
-<li><a href="#everything">Starting Everything at Once</a></li>
-<li><a href="#individual">Starting Daemons Individually</a></li>
-<ul>
-<li><a href="#connection">Setting Up a Connection</a></li>
-<li><a href="#listener">Setting Up a Listener</a></li>
-<li><a href="#scaler">Setting Up a Scaler</a></li>
-<li><a href="#cachemanager">Setting Up a Cache Manager</a></li>
-</ul>
-<li><a href="#extending">Extending, Killing and Restarting</a></li>
+<li><a href="#sqlrstart">Starting SQL Relay</a></li>
+<li><a href="#stopping">Stopping and Restarting SQL Relay</a></li>
 <li><a href="#cmdline">Using The Command Line Interfaces</a></li>
 <li><a href="#status">Using The Status Monitor</a></li>
 <li><a href="#problems">Common Problems</a></li>
+<li><a href="#cygwin">Cygwin Considerations</a></li>
 </ul>
 
-<a name="cygwin"></a>
-<span class="heading2">Cygwin Considerations</span>
+<p>Note: if you are using SQL Relay on Cygwin, see <a href="#cygwin">Cygwin Considerations</a> below.</p>
 
-<p>If you are not running SQL Relay under Cygwin then you can skip this section.</p>
+<a name="sqlrstart"></a>
+<span class="heading2">Starting SQL Relay</span>
 
-<p>If you are running SQL Relay under Cygwin then you must first install the Cygwin IPC server.  SQL Relay makes extensive use of shared memory and semaphores.  The Cygwin IPC server simulates these facilities on Windows.  Install the server as a service and start it up following the instructions <a href="http://cygwin.com/cygwin-ug-net/using-cygserver.html">here</a>.
-
-<p>After installing the Cygwin IPC server, you need to add a CYGWIN environment variable.  Use the System control panel to add an environment variable called CYGWIN with the value <b>server</b>.</p>
-
-<p>Once the IPC server is running, start up the database and follow the standard instructions below for running SQL Relay.</p> 
-
-<p>Make sure to execute the instructions from within a Cygwin shell rather than from the Windows Command Line or DOS shell.  Do not ssh into your windows machine and run from SQL Relay from that shell.  When logging in over ssh, the CYGWIN environment variable get's overridden and doesn't contain <b>server</b>, preventing SQL Relay from using the Cygwin IPC server.</p>
-
-<p>Currently, there is no facility for installing SQL Relay as a service, so it must be started and stopped manually from a Cygwin shell.</p>
-
-
-<a name="everything"></a>
-<span class="heading2">Starting Everything at Once</span>
-
-<p>The <b>sqlr-start</b> program is provided to simplify the startup 
-process.</p>
+<p>Use the <b>sqlr-start</b> program to start the SQL Relay server processes.</p>
 
 <blockquote>
 sqlr-start -id ID [-config CONFIGFILE] [-localstatedir LOCALSTATEDIR]
@@ -57,108 +35,21 @@ sqlr-start -id ID [-config CONFIGFILE] [-localstatedir LOCALSTATEDIR]
 
 <span class="heading2">Debugging and Tracing</span>
 
-<p>The instance tag of the CONFIGFILE contains an optional debug attribute.  When it is set, the <b>sqlr-listener</b> and/or <b>sqlr-connection</b> daemons output debugging information to files in /usr/local/firstworks/var/sqlrelay/debug.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for more information on the debug attribute.</p>
+<p>The CONFIGFILE can be configured to load a debug logger module.  When it is configured, the <b>sqlr-listener</b> and/or <b>sqlr-connection</b> daemons output debugging information to files in /usr/local/firstworks/var/sqlrelay/debug.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> and <a href="http://sqlrelay.sourceforge.net/sqlrelay/modules/logger.html">Logger Modules</a> for more information on debugging.</p>
 
 <p>The <b>sqlr-start</b> program also takes an optional <b>-strace</b> parameter.  When run as root, if the <b>-strace</b> parameter is used, <b>sqlr-start</b> starts the <b>sqlr-connection</b> daemons using <i>strace -ff -o sqlr-connection-strace</i> causing <i>sqlr-connection-strace.pid</i> files to be written to the root directory.  See the <i>strace</i> man page for more information.</p>
 
 
-<a name="individual"></a>
-<span class="heading2">Starting Daemons Individually</span>
+<a name="stopping"></a>
+<span class="heading2">Stopping and Restarting SQL Relay</span>
 
-<p>If for some reason you don't want to use <b>sqlr-start</b>, you can start the daemons individually.</p>
-
-
-<a name="listener"></a>
-<span class="heading2">Setting Up a Listener</span>
-
-<p>The first step in is setting up a listener.  The job of the listener is to connect to a TCP port and wait for queries.  When it gets one, it waits for an available connection daemon and hands off the client to it.</p>
-
-<p>Run the <b>sqlr-listener</b> daemon to establish a listener.</p>
-
-<blockquote>
-sqlr-listener -id ID [-config CONFIGFILE] [-localstatedir LOCALSTATEDIR]
-</blockquote>
-
-<p>ID is an identifier that associates a listener with a pool of connections.</p>
-
-<p>Only one listener needs to be established for a given ID.</p>
-
-<p>CONFIGFILE is the filename of the configuration file to use.  The default configuration file is /usr/local/firstworks/etc/sqlrelay.conf</p>
-
-<p>LOCALSTATEDIR is the base directory for temporary files and debug logs.  By default, this is /usr/local/firstworks/var, PREFIX/var if you compiled SQL Relay with a prefix other than /usr/local/firstworks or possibly another directory if you specified a different localstatedir when compiling SQL Relay.  Under the localstatedir, temporary files go in sqlrelay/tmp and debug logs go in sqlrelay/debug.</p>
-
-
-<a name="connection"></a>
-<span class="heading2">Setting Up a Connection</span>
-
-<p>Connecting to a database is the next step.  To estabish a connection, run one or more of the <b>sqlr-connection</b> daemons.</p>
-
-<blockquote>
-<p>sqlr-connection -id ID [-config CONFIGFILE] -connectionid CONNECTIONID [-localstatedir LOCALSTATEDIR]</p>
-</blockquote>
-
-<p>Where "dbase" is one of oracle8, mysql, postgresql, sqlite, odbc, db2, firebird, sybase, freetds or mdbtools.</p>
-
-<p>ID is just an identifier.  Starting multiple connections with the same ID make them available as a pool of connections.  The more connections you start, the more queries can be executed in parallel.  In addition, the ID argument specifies which config file entry to use.</p>
-
-<p>CONFIGFILE is the configuration file to use when starting the daemon.  The default configuration file is /usr/local/firstworks/etc/sqlrelay.conf</p>
-
-<p>CONNECTIONID is another identifier.  When using replicated or clustered databases, within a pool of connections, some connections will connected to 1 machine and some will connect to another.  This argument tells the connection daemon which machine to connect to.  When not using clustered or replicated databases, this id will be the same for every connection in the pool.</p>
-
-<p>LOCALSTATEDIR is the base directory for temporary files and debug logs.  By default, this is /usr/local/firstworks/var, PREFIX/var if you compiled SQL Relay with a prefix other than /usr/local/firstworks or possibly another directory if you specified a different localstatedir when compiling SQL Relay.  Under the localstatedir, temporary files go in sqlrelay/tmp and debug logs go in sqlrelay/debug.</p> 
-
-<a name="scaler"></a>
-<span class="heading2">Setting Up the Scaler</span>
-
-<p>The third step is running the scaler.  You can start as many <b>sqlr-connection</b> daemons as you like.  If you start fewer than the maximum number defined for the ID, the <b>sqlr-scaler</b> daemon will fire up new connections on demand.  The new connections will time out after a period of inactivity and shut down on their own.</p>
-
-<p>Run the <b>sqlr-scaler</b> daemon to establish a scaler.</p>
-
-<blockquote>
-sqlr-scaler -id ID [-config CONFIGFILE]
-</blockquote>
-
-<p>ID is the same as the ID argument in the <b>sqlr-connection</b> daemon and associates a scaler with a pool of connections.</p>
-
-<p>Only one scaler needs to be established for a given ID.</p>
-
-<p>CONFIGFILE is the filename of the configuration file to use.  The default configuration file is /usr/local/firstworks/etc/sqlrelay.conf</p>
-
-<a name="cachemanager"></a>
-<span class="heading2">Setting Up the Cache Manager</span>
-
-<p>The fourth step is running the cache manager.  Clients can cache result sets with a time-to-live on them.  The cache manager goes through the cached result sets periodically and removes the ones that have expired.</p>
-
-<p>Run the <b>sqlr-cachemanager</b> daemon to establish the cache manager.</p>
-
-<blockquote>
-sqlr-cachemanager [-scaninterval INTERVAL] [-cachedirs CACHEDIRS]
-</blockquote>
-
-<p>The optional INTERVAL argument specifies in seconds how often the cache manager scans the result sets.  Each scan is scheduled from the end of the previous scan.  If the argument is left off, the cache manager scans at a default interval of 30 seconds.</p>
-
-<p>The optional CACHEDIRS argument is a colon seperated list of directories to scan for cache files.  If you use <b>sqlr-start</b> and specify a LOCALSTATEDIR, sqlr-start will pass the -scandirs LOCALSTATEDIR/sqlrelay/cache to sqlr-cachemanager.</p>
-
-<p>Only one cache manager needs to be started per machine.</p>
-
-<p><b>Important Note:</b> Since cache managers clean up after SQL Relay clients, not servers, they need to be run on machines which run clients that could cache result sets.  These may not be the same machines that run the <b>sqlr-listener</b> and <b>sqlr-connection</b> daemons.  If there is no SQL Relay installation on those machines, you should create the cache directory (/usr/local/firstworks/var/sqlrelay/cache unless changed at compile time), install the <b>sqlr-cachemanager</b> program by itself and set it up to run at boot time.</p>
-
-
-<a name="extending"></a>
-<span class="heading2">Extending, Killing and Restarting</span>
-
-<p>Once the daemons are up and running, clients can use them.  In the event that more connections are required, additional <b>sqlr-connection</b> daemons may be started from the command line using the same ID and CONFIGFILE and will be immediately available to clients.</p>
-
-<p>Connection daemons should not be killed once they have been started without restarting everything with that ID.</p>
-
-<p>The <b>sqlr-stop</b> command is provided to kill running daemons.  It accepts
-two optional arguments: the id of the instance to kill and SIGKILL.</p>
+<p>The <b>sqlr-stop</b> command is provided to kill running instances of SQL Relay.  It accepts two optional arguments: the id of the instance to kill and SIGKILL.</p>
 
 <blockquote><b>
 sqlr-stop [id] [SIGKILL]
 </b></blockquote>
 
-<p>Running it kills anything with "sqlr-" and the supplied id in its name.  It uses grep, so it's not perfect. If you have id's like "web" and "webster" and run "sqlr-stop web" then it will kill both of them.  Running it with no arguments will kill all SQL Relay processes.</p>
+<p>Running it with an id kills sqlrelay processes that were started with the supplied id.  Running it with no arguments will kill all SQL Relay processes.</p>
 
 <p>Supplying sqlr-stop with the SIGKILL option will cause it to pass the -9 option to the kill command.  It is not possible to supply the SIGKILL option without supplying an id.  Note that when the SIGKILL option is used, semaphores and shared memory segments will be left lying around and will need to be cleaned up.  Use the <b>ipcs</b> and <b>ipcrm</b> commands to clean them up.</p>
 
@@ -204,7 +95,7 @@ sqlr-import -id ID -file exportfile.xml<br>
 
 <p><b>sqlr-export</b> and <b>sqlr-import</b> may be used to export data from one database and import it into another database, even if the databases are dissimilar (eg. one is PostgreSQL and the other is MySQL), if the structures of the tables in both databases are compatible.</p>
 
-<p>On Windows, if you built SQL Relay natively using Visual Studio, then the command-line clients can be run from the Windows Command Line or DOS Prompt.  Adding C:\Program Files\Firstworks\bin to the PATH environemnt variable makes this easier, though is is not essential.  You could just change directories to C:\Program Files\Firstworks\bin and run the programs from there.</p>
+<p>On Windows, if you built SQL Relay natively using Visual Studio, then the command-line clients can be run from the Windows Command Line or DOS Prompt.  Adding C:\Program Files\Firstworks\bin to the PATH environment variable makes this easier, though is is not essential.  You could just change directories to C:\Program Files\Firstworks\bin and run the programs from there.</p>
 
 <p>If you built SQL Relay under Cygwin then you must use the Cygwin shell to run the command-line clients.</p>
 
@@ -221,44 +112,71 @@ sqlr-status -id <i>instance</i>
 <p>Currently it generates output like:</p>
 
 <blockquote><pre>
-  Open   Server Connections:  3
-  Opened Server Connections:  3
+  Open   Database Connections:  0
+  Opened Database Connections:  394
 
-  Open   Client Connections:  0
-  Opened Client Connections:  1
+  Open   Database Cursors:      0
+  Opened Database Cursors:      2286
 
-  Open   Server Cursors:      15
-  Opened Server Cursors:      16
+  Open   Client Connections:    0
+  Opened Client Connections:    394
 
-  Times  New Cursor Used:     0
-  Times  Cursor Reused:       10
+  Times  New Cursor Used:       267
+  Times  Cursor Reused:         2571
 
-  Total  Queries:      10
-  Total  Errors:       1
+  Total  Queries:               3542
+  Total  Errors:                1
+
+  Forked Listeners:             0
+
+Scaler's view:
+  Connections:                  0
+  Connected Clients:            0
+
+Mutexes:
+  Connection Announce               : acquired     (1)
+  Shared Memory Access              : acquired     (1)
+  Connection Count                  : acquired     (1)
+  Session Count                     : acquired     (1)
+  Open Connections/Forked Listeners : acquired     (1)
+
+Triggers:
+  Accept Available Connection (l-w, c-s)         : not triggered (0)
+  Done Accepting Available Connection (c-w, l-s) : not triggered (0)
+  Evaluate Connection Count (s-w, l-s)           : not triggered (0)
+  Done Evaluating Connection Count (l-w, s-s)    : not triggered (0)
+  Connection Has Started (s-w, c-s)              : not triggered (0)
+
+Counts:
+  Busy Listener Count : 0
+
+Raw Semaphores:
+  +---------------------------------------------+
+  | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |  10 |
+  +---+---+---+---+---+---+---+---+---+---+-----+
+  | 1 | 1 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 1 |   0 |
+  +---------------------------------------------+
 </pre></blockquote>
 
 <p>Here are descriptions of the statistics:</p>
 
 <ul>
-<li>Open Server Connections: The number of database connections that are
-currently open.</li>
-<li>Opened Server Connections: The total number of database connections that
-have been opened since the instance was started.</li>
-<li>Open Client Connections: The number of SQL Relay clients that are currently
-connected to the SQL Relay server.</li>
-<li>Opened Server Connections: The total number of SQL Relay clients that have
-connected to this instance of the SQL Relay server since the instance was
+<li>Open Database Connections: The number of database connections that are currently open.</li>
+<li>Opened Database Connections: The total number of database connections that have been opened since the instance was started.</li>
+<li>Open Database Cursors: The number of database cursors that are currently open.</li>
+<li>Opened Database Cursors: The total number of database cursors that have been opened since the instance was started.</li>
+<li>Open Client Connections: The number of SQL Relay clients that are currently connected to the SQL Relay server.</li>
+<li>Opened Server Connections: The total number of SQL Relay clients that have connected to this instance of the SQL Relay server since the instance was
 started.</li>
-<li>Open Server Cursors: The number of database cursors that are
-currently open.</li>
-<li>Opened Server Cursors: The total number of database cursors that have been
-opened to the since the instance was started.</li>
 <li>Times New Cursor Used: The number of times a cursor couldn't be reused.</li>
 <li>Times Cursor Reused: The number of times a cursor could be reused.</li>
 <li>Total Queries: The total number of queries that have been run through this
 instance.</li>
 <li>Total Errors: The total number of queries that generated errors.</li>
+<li>Forked Listeners: The total number of child listener processes that are running.  This roughly corresponds to the number of clients that are waiting to access the database.</li>
 </ul>
+
+<p>The rest of the stats are useful when reporting suspected bugs but are much more value to SQL Relay developers than users.</p>
 
 <a name="problems"></a>
 <span class="heading2">Common Problems</span>
@@ -296,6 +214,21 @@ instance.</li>
 <li><p>The SQL Relay daemons also use temporary files, usually located in /usr/local/firstworks/var/sqlrelay/tmp.  That directory should have 777 permissions, but sometimes it doesn't.  The sockseq file in that directory should have 666 permissions, but sometimes it doesn't.  The files named ID and ID-CONNECTIONID owned by the user that started the connections in that directory should get removed by <b>sqlr-stop</b>, but sometimes they don't.  Sometimes <b>sqlr-stop</b> isn't even used to stop the daemons.</p></li>
 </ul>
 </ul>
+
+<a name="cygwin"></a>
+<span class="heading2">Cygwin Considerations</span>
+
+<p>If you are not running SQL Relay under Cygwin then you can skip this section.</p>
+
+<p>If you are running SQL Relay under Cygwin then you must first install the Cygwin IPC server.  SQL Relay makes extensive use of shared memory and semaphores.  The Cygwin IPC server simulates these facilities on Windows.  Install the server as a service and start it up following the instructions <a href="http://cygwin.com/cygwin-ug-net/using-cygserver.html">here</a>.
+
+<p>After installing the Cygwin IPC server, you need to add a CYGWIN environment variable.  Use the System control panel to add an environment variable called CYGWIN with the value <b>server</b>.</p>
+
+<p>Once the IPC server is running, start up the database and follow the standard instructions below for running SQL Relay.</p> 
+
+<p>Make sure to execute the instructions from within a Cygwin shell rather than from the Windows Command Line or DOS shell.  Do not ssh into your windows machine and run from SQL Relay from that shell.  When logging in over ssh, the CYGWIN environment variable get's overridden and doesn't contain <b>server</b>, preventing SQL Relay from using the Cygwin IPC server.</p>
+
+<p>Currently, there is no facility for installing SQL Relay as a service, so it must be started and stopped manually from a Cygwin shell.</p>
 
 </body>
 </html>

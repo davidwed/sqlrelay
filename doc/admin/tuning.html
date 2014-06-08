@@ -289,11 +289,11 @@ host/port.</p>
 <a name="handoff"></a>
 <span class="heading2">Use a Platform That Supports File Descriptor Passing</span><br>
 
-<p>When a client connects to the SQL Relay listener process, it waits for an available database connection, then either hands the client off to that process via file descriptor passing or proxys the incoming client, ferrying data back and forth between it and the database connecton process.</p>
+<p>When a client connects to the SQL Relay listener process, it waits for an available database connection, then either hands the client off to that process via file descriptor passing, or proxies the incoming client, ferrying data back and forth between it and the database connecton process.</p>
 
-<p>The method to use can be specified by the "handoff" parameter in ths sqlrelay.conf file.  If you set handoff="pass" then file descriptor passing will be used.  If you set handoff="proxy" then proxying will be used.</p>
+<p>Whether to pass or proxy can be specified by the "handoff" parameter in ths sqlrelay.conf file.  If you omit the handoff parameter or set handoff="pass" then file descriptor passing will be used.  If you set handoff="proxy" then proxying will be used.</p>
 
-<p>File descriptor passing is faster and lighter than proxying but it is not supported on all platforms.  For example, Linux kernels prior to 2.2 and the Cygwin environment under Windows, do not support file descriptor passing and it is likely that other platforms don't as well, especially older platforms.</p>
+<p>File descriptor passing is faster and lighter than proxying, and is the default, but it isn't supported on all platforms.  For example, Linux kernels prior to 2.2 and the Cygwin environment under Windows, do not support file descriptor passing and it is likely that other platforms don't as well, especially older platforms.</p>
 
 <p>If you want the best performance, you must use a platform that supports file descriptor passing.</p>
 
@@ -301,8 +301,7 @@ host/port.</p>
 <a name="systemparameters"></a>
 <span class="heading2">Tweak Various System Parameters</span><br>
 
-<p>Certain system parameters can be tuned to get better performance out of
-SQL Relay.</p>
+<p>Certain system parameters can be tuned to get better performance out of SQL Relay.</p>
 
 <span class="heading3">TIME_WAIT timeout</span>
 
