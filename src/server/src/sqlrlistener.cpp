@@ -1559,7 +1559,9 @@ void sqlrlistener::alarmThread(void *attr) {
 	alarmthreadattr	*ata=(alarmthreadattr *)attr;
 	ata->alarmthr->detach();
 	snooze::macrosnooze(ata->listenertimeout);
+	#ifdef HAVE_SIGALRM
 	ata->mainthr->raiseSignal(SIGALRM);
+	#endif
 }
 
 bool sqlrlistener::connectionIsUp(const char *connectionid) {

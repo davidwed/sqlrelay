@@ -414,7 +414,7 @@ bool scaler::openMoreConnections() {
 	// cause this to run on-demand.
 	bool	waitresult=false;
 	if (semset->supportsTimedSemaphoreOperations()) {
-		waitresult=semset->wait(6,0,100);
+		waitresult=semset->wait(6,0,100000000);
 
 		// If the wait returned false for some other reason than a
 		// timeout, then an error has occurred and the semaphore can't

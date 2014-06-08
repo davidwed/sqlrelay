@@ -99,7 +99,7 @@ msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-start.vcxproj
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-cachemanager.vcxproj
 cd ..\..\connections\oracle8\msvc
-msbuild.exe /property:Configuration=%release% /property:Platform=%platform%
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlrconnection_oracle8.vcxproj
 cd ..\..\..\..
 goto end
 
@@ -133,7 +133,7 @@ msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%
 cd ..\..\server\src\msvc
 msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% sqlrserver.sln
 cd ..\..\connections\oracle8\msvc
-msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform%
+msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% sqlrconnection_oracle8.sln
 cd ..\..\..\..
 goto end
 
