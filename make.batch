@@ -90,7 +90,11 @@ msbuild.exe /property:Configuration=%release% /property:Platform=%platform% SQLR
 cd ..\..\..\util\msvc
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform%
 cd ..\..\cmdline\msvc
-msbuild.exe /property:Configuration=%release% /property:Platform=%platform%
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlrsh.vcxproj
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-export.vcxproj
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-fields.vcxproj
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-import.vcxproj
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-query.vcxproj
 cd ..\..\server\src\msvc
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% libsqlrserver.vcxproj
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-listener.vcxproj
@@ -304,14 +308,14 @@ copy /Y src\util\msvc\x64\ReleaseCLR\libsqlrutil.lib C:\"Program Files"\Firstwor
 
 copy /Y src\cmdline\msvc\x64\Release\sqlrsh.exe C:\"Program Files"\Firstworks\bin
 copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlrsh.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\cmdline\msvc\x64\Release\sqlr-export.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlr-export.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\cmdline\msvc\x64\Release\sqlr-fields.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlr-fields.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\cmdline\msvc\x64\Release\sqlr-import.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlr-import.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\cmdline\msvc\x64\Release\sqlr-query.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlr-query.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\cmdline\msvc\x64\Release\sqlr-export.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlr-export.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\cmdline\msvc\x64\Release\sqlr-fields.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlr-fields.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\cmdline\msvc\x64\Release\sqlr-import.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlr-import.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\cmdline\msvc\x64\Release\sqlr-query.exe C:\"Program Files"\Firstworks\bin
+copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlr-query.exe C:\"Program Files"\Firstworks\bin
 
 copy /Y src\server\src\msvc\x64\Release\libsqlrserver.dll C:\"Program Files"\Firstworks\bin
 copy /Y src\server\src\msvc\x64\Release\libsqlrserver.lib C:\"Program Files"\Firstworks\lib
