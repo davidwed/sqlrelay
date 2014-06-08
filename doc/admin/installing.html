@@ -1,11 +1,11 @@
 <html>
 <head>
-<title>firstworks   Installing SQL Relay</title>
+<title>firstworks   Building and Installing SQL Relay</title>
 <link href="../css/styles.css" rel="stylesheet">
 </head>
 <body>
 
-<span class="heading1">Installing SQL Relay</span>
+<span class="heading1">Building and Installing SQL Relay</span>
 
 <ul>
 <li><a href="#platforms">Supported Platforms</a></li>
@@ -16,7 +16,6 @@
 <li><a href="#extracting">Extracting SQL Relay</a></li>
 <li><a href="#compiling">Building SQL Relay</a></li>
 <li><a href="#installing">Installing SQL Relay</a></li>
-<li><a href="#rpms">Installing SQL Relay RPMS</a></li>
 </ul>
 <li><a href="#windows">Installation on Windows</a></li>
 <ul>
@@ -133,7 +132,7 @@ configure --help
 <ul>
 <li>You must use the Cygwin shell to build SQL Relay, rather than the Windows Command Line or DOS prompt.</li>
 <li>The <b>file</b> command must be present.  If it is not, the build will fail and you will get a very cryptic error.</li>
-<li>SQL Relay cannot be built against non-Cygwin dll's.  You can't, for instance, build against the Oracle, Sybase, the native Windows version of MySQL or the native Windows versions of Perl, Python, PHP, etc.  Many languages and a few databases come with Cygwin though and others can be compiled from source under Cygwin. when using Cygwin.</li>
+<li>SQL Relay cannot be built against non-Cygwin dll's.  You can't, for instance, build against the Oracle, Sybase, the native Windows version of MySQL or the native Windows versions of Perl, Python, PHP, etc.  Many languages and a few databases come with Cygwin though and others can be compiled from source under Cygwin.</li>
 </ul>
 
 <a name="installing"></a>
@@ -155,50 +154,6 @@ make install
 
 <blockquote><b>
 make uninstall
-</b></blockquote>
-
-
-<a name="rpms"></a>
-<span class="heading2">Installing SQL Relay RPMS</span>
-
-<p>If your system supports RedHat Package Manager version 4.0.3 or greater then you can build RPMS by running the following command against the source distribution tarball:</p>
-
-<blockquote><b>
-rpmbuild -ta sqlrelay-X.XX.tar.gz<br>
-(where X.XX is replaced with the version number)<br>
-</b></blockquote>
-
-<p>You can instruct the build process not to build certain modules by giving it one of the following flags:</p>
-
-<blockquote><b>
--without db2<br>
--without freetds<br>
--without firebird<br>
--without mysql<br>
--without odbc<br>
--without oracle<br>
--without postgresql<br>
--without sqlite<br>
--without sybase<br>
--without mdbtools<br>
--without perl<br>
--without python<br>
--without php<br>
--without tcl<br>
--without java<br>
-</b></blockquote>
-
-<p>For example, if you want to build everything but the oracle module, then you would run the following command:</p>
-
-<blockquote><b>
-rpmbuild -ta -without oracle sqlrelay-X.XX.tar.gz<br>
-(where X.XX is replaced with the version number)<br>
-</b></blockquote>
-
-<p>This will generate RPM's in the system-wide RPM directory (usually /usr/src/redhat/RPMS or /usr/local/rpm/RPMS) under the subdirectory corresponding to your system architecture.  You can install them by changing directories into that directory and executing the following command as root:</p>
-
-<blockquote><b>
-rpm -i --nodeps sqlrelay-*
 </b></blockquote>
 
 
