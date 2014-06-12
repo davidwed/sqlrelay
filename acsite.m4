@@ -972,11 +972,11 @@ then
 				if ( test -r "/usr/lib/oracle/$version/client/lib/libclntsh.$SOSUFFIX" -a -r "/usr/include/oracle/$version/client/oci.h" )
 				then
 					ORACLEVERSION="10g"
-					if ( test -n `echo $version | grep 11` )
+					if ( test -n "`echo $version | grep 11`" )
 					then
 						ORACLEVERSION="11g"
 					fi
-					if ( test -n `echo $version | grep 12` )
+					if ( test -n "`echo $version | grep 12`" )
 					then
 						ORACLEVERSION="12c"
 					fi
@@ -994,11 +994,11 @@ then
 				if ( test -r "/usr/lib/oracle/$version/client64/lib/libclntsh.$SOSUFFIX" -a -r "/usr/include/oracle/$version/client64/oci.h" )
 				then
 					ORACLEVERSION="10g"
-					if ( test -n `echo $version | grep 11` )
+					if ( test -n "`echo $version | grep 11`" )
 					then
 						ORACLEVERSION="11g"
 					fi
-					if ( test -n `echo $version | grep 12` )
+					if ( test -n "`echo $version | grep 12`" )
 					then
 						ORACLEVERSION="12c"
 					fi

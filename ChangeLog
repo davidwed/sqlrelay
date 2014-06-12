@@ -17,6 +17,7 @@
 	added result set translation framework and re-implemented date
 		translation using it
 	fixed millisecond->nanosecond confusion in sqlr-scaler
+	fixed subtle oracle instantclient version detection bug
 
 0.55 - fixed a sql translation bug related to exists clauses
 	added deployment projects for windows
