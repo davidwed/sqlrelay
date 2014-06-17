@@ -1187,8 +1187,11 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 	ptr=space;
 	if (*(ptr+1)=='=' && *(ptr+2)==' ') {
 		ptr=ptr+3;
+	} else if (!charstring::compareIgnoringCase(ptr+1,"is null")) {
+		ptr=NULL;
 	} else {
 		stdoutput.printf("usage: inputbind [variable] = [value]\n");
+		stdoutput.printf("       inputbind [variable] is null\n");
 		return;
 	}
 		
@@ -1466,6 +1469,7 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	stdoutput.printf("sets response timeout to [sec.msec]\n\n");
 	stdoutput.printf("	inputbind ...                 - ");
 	stdoutput.printf("defines an input bind variable\n");
+	stdoutput.printf("		inputbind [variable] is null\n");
 	stdoutput.printf("		inputbind [variable] = [stringvalue]\n");
 	stdoutput.printf("		inputbind [variable] = [integervalue]\n");
 	stdoutput.printf("		inputbind [variable] = [doublevalue]\n");
