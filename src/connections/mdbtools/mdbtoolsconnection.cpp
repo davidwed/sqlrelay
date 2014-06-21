@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrcontroller.h>
 #include <sqlrelay/sqlrconnection.h>
-#include <rudiments/rawbuffer.h>
+#include <rudiments/bytestring.h>
 #include <rudiments/regularexpression.h>
 #include <rudiments/sys.h>
 
@@ -235,7 +235,7 @@ mdbtoolscursor::mdbtoolscursor(sqlrconnection_svr *conn) :
 					sqlrcursor_svr(conn) {
 	mdbtoolsconn=(mdbtoolsconnection *)conn;
 	mdbsql=(void *)new MdbSQL;
-	rawbuffer::zero(mdbsql,sizeof(MdbSQL));
+	bytestring::zero(mdbsql,sizeof(MdbSQL));
 	mdb=NULL;
 	currentlistindex=0;
 	currenttable=NULL;

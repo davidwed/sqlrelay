@@ -7,7 +7,7 @@
 #include <sqlrelay/sqlrclientprotocol.h>
 #include <rudiments/file.h>
 #include <rudiments/socketclient.h>
-#include <rudiments/rawbuffer.h>
+#include <rudiments/bytestring.h>
 #include <rudiments/passwdentry.h>
 #include <rudiments/groupentry.h>
 #include <rudiments/process.h>
@@ -141,7 +141,7 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 sqlrcontroller_svr::~sqlrcontroller_svr() {
 
 	if (connstats) {
-		rawbuffer::zero(connstats,sizeof(sqlrconnstatistics));
+		bytestring::zero(connstats,sizeof(sqlrconnstatistics));
 	}
 
 	delete cmdl;
@@ -828,7 +828,7 @@ bool sqlrcontroller_svr::initCursors(int32_t count) {
 	cursorcount=count;
 	if (!cur) {
 		cur=new sqlrcursor_svr *[maxcursorcount];
-		rawbuffer::zero(cur,maxcursorcount*sizeof(sqlrcursor_svr *));
+		bytestring::zero(cur,maxcursorcount*sizeof(sqlrcursor_svr *));
 	}
 
 	for (int32_t i=0; i<cursorcount; i++) {
@@ -2658,9 +2658,9 @@ sqlrcursor_svr	*sqlrcontroller_svr::initQueryOrBindCursor(
 		cursor->inbindcount=0;
 		cursor->outbindcount=0;
 		for (uint16_t i=0; i<maxbindcount; i++) {
-			rawbuffer::zero(&(cursor->inbindvars[i]),
+			bytestring::zero(&(cursor->inbindvars[i]),
 						sizeof(bindvar_svr));
-			rawbuffer::zero(&(cursor->outbindvars[i]),
+			bytestring::zero(&(cursor->outbindvars[i]),
 						sizeof(bindvar_svr));
 		}
 	}
@@ -3633,7 +3633,7 @@ void sqlrcontroller_svr::clearConnStats() {
 	if (!connstats) {
 		return;
 	}
-	rawbuffer::zero(connstats,sizeof(struct sqlrconnstatistics));
+	bytestring::zero(connstats,sizeof(struct sqlrconnstatistics));
 }
 
 void sqlrcontroller_svr::updateState(enum sqlrconnectionstate_t state) {

@@ -13,7 +13,7 @@
 	#include <rudiments/regularexpression.h>
 #endif
 #include <rudiments/charstring.h>
-#include <rudiments/rawbuffer.h>
+#include <rudiments/bytestring.h>
 #include <rudiments/character.h>
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
@@ -929,7 +929,7 @@ const char *oracle8connection::logInError(const char *errmsg) {
 
 	// get the error message from oracle
 	text	message[1024];
-	rawbuffer::zero((void *)message,sizeof(message));
+	bytestring::zero((void *)message,sizeof(message));
 	sb4	errcode;
 	OCIErrorGet((dvoid *)err,1,(text *)0,&errcode,
 			message,sizeof(message),OCI_HTYPE_ERROR);
@@ -1055,7 +1055,7 @@ void oracle8connection::errorMessage(char *errorbuffer,
 					bool *liveconnection) {
 
 	// get the message from oracle
-	rawbuffer::zero(errorbuffer,errorbufferlength);
+	bytestring::zero(errorbuffer,errorbufferlength);
 	sb4	errcode=0;
 	OCIErrorGet((dvoid *)err,1,(text *)0,&errcode,
 			(text *)errorbuffer,errorbufferlength,OCI_HTYPE_ERROR);
@@ -1858,7 +1858,7 @@ bool oracle8cursor::outputBind(const char *variable,
 	checkRePrepare();
 
 	outintbindstring[oraoutbindcount]=new char[21];
-	rawbuffer::zero(outintbindstring[oraoutbindcount],21);
+	bytestring::zero(outintbindstring[oraoutbindcount],21);
 	outintbind[oraoutbindcount]=value;
 	outdatebind[oraoutbindcount]=NULL;
 
@@ -2433,7 +2433,7 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 		for (sword i=0; i<ncols; i++) {
 
 			// FIXME: neowiz bzero's desc[i] here
-			//rawbuffer::zero(&desc[i],sizeof(describe));
+			//bytestring::zero(&desc[i],sizeof(describe));
 
 			// get the entire column definition
 			if (OCIParamGet(stmt,OCI_HTYPE_STMT,
@@ -2498,7 +2498,7 @@ bool oracle8cursor::executeQueryOrFetchFromBindCursor(const char *query,
 				desc[i].dbsize=0;
 
 				// set the NULL indicators to false
-				rawbuffer::zero(def_indp[i],
+				bytestring::zero(def_indp[i],
 						sizeof(sb2)*
 						oracle8conn->fetchatonce);
 

@@ -1071,7 +1071,7 @@ bool db2cursor::getLobOutputBindSegment(uint16_t index,
 	if (offset+charstoread>len) {
 		charstoread=charstoread-((offset+charstoread)-len);
 	}
-	rawbuffer::copy(buffer,outlobbind[index]+offset,charstoread);
+	bytestring::copy(buffer,outlobbind[index]+offset,charstoread);
 	*charsread=charstoread;
 	return true;
 }

@@ -6,7 +6,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/charstring.h>
-#include <rudiments/rawbuffer.h>
+#include <rudiments/bytestring.h>
 #include <rudiments/stdio.h>
 
 #include <datatypes.h>
@@ -1138,7 +1138,7 @@ bool freetdscursor::inputBind(const char *variable,
 
 	checkRePrepare();
 
-	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
+	(CS_VOID)bytestring::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]='\0';
@@ -1165,7 +1165,7 @@ bool freetdscursor::inputBind(const char *variable,
 
 	checkRePrepare();
 
-	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
+	(CS_VOID)bytestring::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]='\0';
@@ -1194,7 +1194,7 @@ bool freetdscursor::inputBind(const char *variable,
 
 	checkRePrepare();
 
-	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
+	(CS_VOID)bytestring::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]='\0';
@@ -1286,7 +1286,7 @@ bool freetdscursor::outputBind(const char *variable,
 	outbindstringlengths[outbindindex]=valuesize;
 	outbindindex++;
 
-	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
+	(CS_VOID)bytestring::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]='\0';
@@ -1319,7 +1319,7 @@ bool freetdscursor::outputBind(const char *variable,
 	outbindints[outbindindex]=value;
 	outbindindex++;
 
-	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
+	(CS_VOID)bytestring::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]='\0';
@@ -1354,7 +1354,7 @@ bool freetdscursor::outputBind(const char *variable,
 	outbinddoubles[outbindindex]=value;
 	outbindindex++;
 
-	(CS_VOID)rawbuffer::zero(&parameter[paramindex],
+	(CS_VOID)bytestring::zero(&parameter[paramindex],
 				sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]='\0';
@@ -1402,7 +1402,7 @@ bool freetdscursor::outputBind(const char *variable,
 	outbinddates[outbindindex].tz=tz;
 	outbindindex++;
 
-	rawbuffer::zero(&parameter[paramindex],sizeof(parameter[paramindex]));
+	bytestring::zero(&parameter[paramindex],sizeof(parameter[paramindex]));
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		parameter[paramindex].name[0]='\0';
 		parameter[paramindex].namelen=0;
@@ -1679,7 +1679,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 				if (datalength[i][0]<length) {
 					length=datalength[i][0];
 				}
-				rawbuffer::copy(outbindstrings[i],
+				bytestring::copy(outbindstrings[i],
 						data[i],length);
 			} else if (outbindtype[i]==CS_INT_TYPE) {
 				*outbindints[i]=charstring::toInteger(data[i]);

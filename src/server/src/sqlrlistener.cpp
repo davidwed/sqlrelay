@@ -6,7 +6,7 @@
 #include <rudiments/permissions.h>
 #include <rudiments/unixsocketclient.h>
 #include <rudiments/inetsocketclient.h>
-#include <rudiments/rawbuffer.h>
+#include <rudiments/bytestring.h>
 #include <rudiments/snooze.h>
 #include <rudiments/passwdentry.h>
 #include <rudiments/groupentry.h>
@@ -463,7 +463,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 		return false;
 	}
 	shm=(shmdata *)idmemory->getPointer();
-	rawbuffer::zero(shm,sizeof(shmdata));
+	bytestring::zero(shm,sizeof(shmdata));
 
 	setStartTime();
 

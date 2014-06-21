@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrcontroller.h>
 #include <sqlrelay/sqlrconnection.h>
-#include <rudiments/rawbuffer.h>
+#include <rudiments/bytestring.h>
 #include <rudiments/character.h>
 #include <rudiments/regularexpression.h>
 
@@ -868,7 +868,7 @@ bool routercursor::getLobOutputBindSegment(uint16_t index,
 	if (offset+charstoread>length) {
 		charstoread=length-offset;
 	}
-	rawbuffer::copy(buffer,var,charstoread);
+	bytestring::copy(buffer,var,charstoread);
 	*charsread=charstoread;
 	return true;
 }

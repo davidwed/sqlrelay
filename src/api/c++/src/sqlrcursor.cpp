@@ -6,7 +6,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/permissions.h>
 #include <rudiments/datetime.h>
-#include <rudiments/rawbuffer.h>
+#include <rudiments/bytestring.h>
 #include <rudiments/character.h>
 #include <rudiments/error.h>
 #include <defines.h>
@@ -1152,7 +1152,7 @@ void sqlrcursor::lobVar(bindvar *var, const char *variable,
 	if (value && size>0) {
 		if (copyrefs) {
 			var->value.lobval=new char[size];
-			rawbuffer::copy(var->value.lobval,value,size);
+			bytestring::copy(var->value.lobval,value,size);
 		} else {
 			var->value.lobval=(char *)value;
 		}
@@ -3371,7 +3371,7 @@ bool sqlrcursor::parseData() {
 				if (offset+length>totallength) {
 					char	*newbuffer=
 						new char[offset+length+1];
-					rawbuffer::copy(
+					bytestring::copy(
 						newbuffer,buffer,offset);
 					delete[] buffer;
 					buffer=newbuffer;

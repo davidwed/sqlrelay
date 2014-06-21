@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrcontroller.h>
 #include <sqlrelay/sqlrconnection.h>
 #include <rudiments/charstring.h>
-#include <rudiments/rawbuffer.h>
+#include <rudiments/bytestring.h>
 #include <rudiments/regularexpression.h>
 
 #include <datatypes.h>
@@ -651,7 +651,7 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 	// re-init bind buffers
 	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
-		rawbuffer::zero(&bind[i],sizeof(MYSQL_BIND));
+		bytestring::zero(&bind[i],sizeof(MYSQL_BIND));
 	}
 
 	// prepare the statement
@@ -1323,7 +1323,7 @@ void mysqlcursor::cleanUpData() {
 	if (usestmtprepare) {
 		boundvariables=0;
 		for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
-			rawbuffer::zero(&bind[i],sizeof(MYSQL_BIND));
+			bytestring::zero(&bind[i],sizeof(MYSQL_BIND));
 		}
 		mysql_stmt_reset(stmt);
 		if (stmtfreeresult) {

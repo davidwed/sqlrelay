@@ -5,7 +5,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/character.h>
 #include <rudiments/stringbuffer.h>
-#include <rudiments/rawbuffer.h>
+#include <rudiments/bytestring.h>
 #include <rudiments/environment.h>
 #include <rudiments/dictionary.h>
 #include <rudiments/file.h>
@@ -447,11 +447,11 @@ MYSQL *mysql_init(MYSQL *mysql) {
 	debugFunction();
 	my_init();
 	if (mysql) {
-		rawbuffer::zero(mysql,sizeof(MYSQL));
+		bytestring::zero(mysql,sizeof(MYSQL));
 		return mysql;
 	} else {
 		MYSQL	*retval=new MYSQL;
-		rawbuffer::zero(retval,sizeof(MYSQL));
+		bytestring::zero(retval,sizeof(MYSQL));
 		return retval;
 	}
 }
@@ -973,7 +973,7 @@ unsigned long mysql_real_escape_string(MYSQL *mysql, char *to,
 	debugFunction();
 
 	if (mysql && charstring::compare(mysql->sqlrcon->identify(),"mysql")) {
-		rawbuffer::copy(to,from,length);
+		bytestring::copy(to,from,length);
 		to[length]='\0';
 		return length;
 	}
@@ -1825,7 +1825,7 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 
 					// copy data into the buffer (if we can)
 					if (stmt->resultbinds[i].buffer) {
-						rawbuffer::copy(
+						bytestring::copy(
 						stmt->resultbinds[i].buffer,
 						row[i],len);
 					}

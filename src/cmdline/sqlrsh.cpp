@@ -1409,7 +1409,7 @@ void sqlrsh::responseTimeout(sqlrconnection *sqlrcon, const char *command) {
 
 	// get milliseconds
 	char	msecbuf[5];
-	rawbuffer::set(msecbuf,'0',4);
+	bytestring::set(msecbuf,'0',4);
 	msecbuf[4]='\0';
 	const char	*dot=charstring::findFirst(value,'.');
 	if (dot) {

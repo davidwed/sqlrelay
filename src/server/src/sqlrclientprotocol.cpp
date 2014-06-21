@@ -5,7 +5,7 @@
 #include <sqlrelay/sqlrcontroller.h>
 #include <sqlrelay/sqlrcursor.h>
 
-#include <rudiments/rawbuffer.h>
+#include <rudiments/bytestring.h>
 #include <rudiments/signalclasses.h>
 #include <rudiments/datetime.h>
 

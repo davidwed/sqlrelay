@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrcontroller.h>
 #include <sqlrelay/sqlrconnection.h>
-#include <rudiments/rawbuffer.h>
+#include <rudiments/bytestring.h>
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
 	#include <rudiments/file.h>
 #endif
@@ -730,7 +730,7 @@ bool postgresqlcursor::inputBindBlob(const char *variable,
 		bindlengths[pos]=0;
 	} else {
 		bindvalues[pos]=static_cast<char *>
-					(rawbuffer::duplicate(value,valuesize));
+				(bytestring::duplicate(value,valuesize));
 		bindlengths[pos]=valuesize;
 	}
 	bindformats[pos]=1;

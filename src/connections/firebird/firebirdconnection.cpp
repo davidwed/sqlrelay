@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrcontroller.h>
 #include <sqlrelay/sqlrconnection.h>
 #include <rudiments/environment.h>
-#include <rudiments/rawbuffer.h>
+#include <rudiments/bytestring.h>
 #include <rudiments/snooze.h>
 #include <rudiments/sys.h>
 
@@ -1578,7 +1578,7 @@ void firebirdcursor::getField(uint32_t col,
 		// the first 2 bytes are the length in 
 		// an SQL_VARYING field
 		int16_t	size;
-		rawbuffer::copy((void *)&size,
+		bytestring::copy((void *)&size,
 				(void *)field[col].textbuffer,
 				sizeof(int16_t));
 		*fld=field[col].textbuffer+sizeof(int16_t);

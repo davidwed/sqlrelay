@@ -4,7 +4,7 @@
 #include <config.h>
 
 #include <sqlrelay/sqlrclient.h>
-#include <rudiments/rawbuffer.h>
+#include <rudiments/bytestring.h>
 #include <rudiments/linkedlist.h>
 #include <rudiments/parameterstring.h>
 #include <rudiments/charstring.h>
@@ -1964,7 +1964,7 @@ static void SQLR_ParseGuid(SQLGUID *guid,
 	if (valuesize!=36 ||
 		value[8]!='-' || value[13]!='-' ||
 		value[18]!='-' || value[23]!='-') {
-		rawbuffer::zero(guid,sizeof(SQLGUID));
+		bytestring::zero(guid,sizeof(SQLGUID));
 		return;
 	}
 
@@ -2879,7 +2879,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			if (strlen_or_ind) {
 				*strlen_or_ind=sizetocopy;
 			}
-			rawbuffer::copy((void *)targetvalue,
+			bytestring::copy((void *)targetvalue,
 					(const void *)field,sizetocopy);
 			}
 			break;
