@@ -3182,7 +3182,8 @@ void sqlrcontroller_svr::dropTempTables(sqlrcursor_svr *cursor) {
 	}
 
 	// run through the temp table list, dropping tables
-	for (linkedlistnode< char * > *sln=sessiontemptablesfordrop.getFirst();
+	for (singlylinkedlistnode< char * >
+				*sln=sessiontemptablesfordrop.getFirst();
 						sln; sln=sln->getNext()) {
 		dropTempTable(cursor,sln->getValue());
 		delete[] sln->getValue();
@@ -3233,7 +3234,8 @@ void sqlrcontroller_svr::dropTempTable(sqlrcursor_svr *cursor,
 void sqlrcontroller_svr::truncateTempTables(sqlrcursor_svr *cursor) {
 
 	// run through the temp table list, truncating tables
-	for (linkedlistnode< char * > *sln=sessiontemptablesfortrunc.getFirst();
+	for (singlylinkedlistnode< char * >
+			*sln=sessiontemptablesfortrunc.getFirst();
 						sln; sln=sln->getNext()) {
 		truncateTempTable(cursor,sln->getValue());
 		delete[] sln->getValue();

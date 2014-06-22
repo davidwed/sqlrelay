@@ -69,7 +69,7 @@ bool sqlrresultsettranslations::loadResultSetTranslations(
 
 void sqlrresultsettranslations::unloadResultSetTranslations() {
 	debugFunction();
-	for (linkedlistnode< sqlrresultsettranslationplugin * > *node=
+	for (singlylinkedlistnode< sqlrresultsettranslationplugin * > *node=
 						tlist.getFirst();
 						node; node=node->getNext()) {
 		sqlrresultsettranslationplugin	*sqlt=node->getValue();
@@ -169,7 +169,7 @@ bool sqlrresultsettranslations::runResultSetTranslations(
 						uint32_t *newfieldlength) {
 	debugFunction();
 
-	for (linkedlistnode< sqlrresultsettranslationplugin * > *node=
+	for (singlylinkedlistnode< sqlrresultsettranslationplugin * > *node=
 						tlist.getFirst();
 						node; node=node->getNext()) {
 		if (!node->getValue()->rstr->run(sqlrcon,sqlrcur,

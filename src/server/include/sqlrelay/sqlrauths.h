@@ -7,7 +7,7 @@
 #include <sqlrelay/private/sqlrserverdll.h>
 
 #include <rudiments/xmldom.h>
-#include <rudiments/linkedlist.h>
+#include <rudiments/singlylinkedlist.h>
 #include <rudiments/dynamiclib.h>
 #include <sqlrelay/sqlrpwdencs.h>
 #include <sqlrelay/sqlrauth.h>
@@ -31,8 +31,8 @@ class SQLRSERVER_DLLSPEC sqlrauths {
 		void	loadAuthenticator(xmldomnode *auth,
 						sqlrpwdencs *sqlrpe);
 
-		xmldom				*xmld;
-		linkedlist< sqlrauthplugin * >	llist;
+		xmldom					*xmld;
+		singlylinkedlist< sqlrauthplugin * >	llist;
 };
 
 #endif

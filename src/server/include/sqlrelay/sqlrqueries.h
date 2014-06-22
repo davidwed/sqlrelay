@@ -7,7 +7,7 @@
 #include <sqlrelay/private/sqlrserverdll.h>
 
 #include <rudiments/xmldom.h>
-#include <rudiments/linkedlist.h>
+#include <rudiments/singlylinkedlist.h>
 #include <rudiments/dynamiclib.h>
 #include <sqlrelay/sqlrquery.h>
 
@@ -33,8 +33,8 @@ class SQLRSERVER_DLLSPEC sqlrqueries {
 		void		unloadQueries();
 		void		loadQuery(xmldomnode *logger);
 
-		xmldom				*xmld;
-		linkedlist< sqlrqueryplugin * >	llist;
+		xmldom					*xmld;
+		singlylinkedlist< sqlrqueryplugin * >	llist;
 };
 
 #endif

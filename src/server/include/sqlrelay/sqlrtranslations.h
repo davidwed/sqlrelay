@@ -10,6 +10,7 @@
 #include <rudiments/xmldomnode.h>
 #include <rudiments/memorypool.h>
 #include <rudiments/dictionary.h>
+#include <rudiments/singlylinkedlist.h>
 #include <rudiments/dynamiclib.h>
 #include <sqlrelay/sqlrtranslation.h>
 
@@ -81,7 +82,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 		xmldom	*xmld;
 		xmldom	*tree;
 
-		linkedlist< sqlrtranslationplugin * >	tlist;
+		singlylinkedlist< sqlrtranslationplugin * >	tlist;
 
 
 	public:

@@ -65,7 +65,7 @@ bool sqlrauths::loadAuthenticators(const char *auths,
 
 void sqlrauths::unloadAuthenticators() {
 	debugFunction();
-	for (linkedlistnode< sqlrauthplugin * > *node=llist.getFirst();
+	for (singlylinkedlistnode< sqlrauthplugin * > *node=llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrauthplugin	*sqlrap=node->getValue();
 		delete sqlrap->au;
@@ -147,7 +147,7 @@ void sqlrauths::loadAuthenticator(xmldomnode *auth,
 
 bool sqlrauths::authenticate(const char *user, const char *password) {
 	debugFunction();
-	for (linkedlistnode< sqlrauthplugin * > *node=llist.getFirst();
+	for (singlylinkedlistnode< sqlrauthplugin * > *node=llist.getFirst();
 						node; node=node->getNext()) {
 		if (node->getValue()->au->authenticate(user,password)) {
 			return true;

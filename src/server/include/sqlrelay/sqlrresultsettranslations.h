@@ -9,6 +9,7 @@
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 #include <rudiments/dynamiclib.h>
+#include <rudiments/singlylinkedlist.h>
 #include <sqlrelay/sqlrresultsettranslation.h>
 
 class sqlrconnection_svr;
@@ -41,7 +42,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 		
 		xmldom	*xmld;
 
-		linkedlist< sqlrresultsettranslationplugin * >	tlist;
+		singlylinkedlist< sqlrresultsettranslationplugin * >	tlist;
 };
 
 #endif

@@ -29,12 +29,12 @@ extern "C" {
 	_sqlrelayError(s->dbh,s,__FILE__,__LINE__ TSRMLS_DC)
 
 struct sqlrstatement {
-	sqlrcursor	*sqlrcur;
-	int64_t		currentrow;
-	long		longfield;
-	stringbuffer	subvarquery;
-	linkedlist< char * >	subvarstrings;
-	bool		fwdonly;
+	sqlrcursor			*sqlrcur;
+	int64_t				currentrow;
+	long				longfield;
+	stringbuffer			subvarquery;
+	singlylinkedlist< char * >	subvarstrings;
+	bool				fwdonly;
 };
 
 struct sqlrdbhandle {
@@ -87,8 +87,8 @@ int _sqlrelayError(pdo_dbh_t *dbh,
 	return errornumber;
 }
 
-static void clearList(linkedlist< char * > *list) {
-	for (linkedlistnode< char * > *node=list->getFirst();
+static void clearList(singlylinkedlist< char * > *list) {
+	for (singlylinkedlistnode< char * > *node=list->getFirst();
 					node; node=node->getNext()) {
 		delete[] node->getValue();
 	}

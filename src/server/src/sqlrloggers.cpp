@@ -63,7 +63,7 @@ bool sqlrloggers::loadLoggers(const char *loggers) {
 
 void sqlrloggers::unloadLoggers() {
 	debugFunction();
-	for (linkedlistnode< sqlrloggerplugin * > *node=llist.getFirst();
+	for (singlylinkedlistnode< sqlrloggerplugin * > *node=llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrloggerplugin	*sqlrlp=node->getValue();
 		delete sqlrlp->lg;
@@ -147,7 +147,7 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 void sqlrloggers::initLoggers(sqlrlistener *sqlrl,
 				sqlrconnection_svr *sqlrcon) {
 	debugFunction();
-	for (linkedlistnode< sqlrloggerplugin * > *node=llist.getFirst();
+	for (singlylinkedlistnode< sqlrloggerplugin * > *node=llist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->lg->init(sqlrl,sqlrcon);
 	}
@@ -160,7 +160,7 @@ void sqlrloggers::runLoggers(sqlrlistener *sqlrl,
 					sqlrlogger_eventtype_t event,
 					const char *info) {
 	debugFunction();
-	for (linkedlistnode< sqlrloggerplugin * > *node=llist.getFirst();
+	for (singlylinkedlistnode< sqlrloggerplugin * > *node=llist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->lg->run(sqlrl,sqlrcon,sqlrcur,
 						level,event,info);

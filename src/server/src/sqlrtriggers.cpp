@@ -62,7 +62,7 @@ bool sqlrtriggers::loadTriggers(const char *triggers) {
 				(before)?"before":"after");
 
 		// determine which list to put the trigger in
-		linkedlist< sqlrtriggerplugin * >	*list=
+		singlylinkedlist< sqlrtriggerplugin * >	*list=
 				(before)?&beforetriggers:&aftertriggers;
 
 		// load trigger
@@ -73,7 +73,7 @@ bool sqlrtriggers::loadTriggers(const char *triggers) {
 
 void sqlrtriggers::unloadTriggers() {
 	debugFunction();
-	for (linkedlistnode< sqlrtriggerplugin * > *bnode=
+	for (singlylinkedlistnode< sqlrtriggerplugin * > *bnode=
 				beforetriggers.getFirst();
 					bnode; bnode=bnode->getNext()) {
 		sqlrtriggerplugin	*sqlt=bnode->getValue();
@@ -82,7 +82,7 @@ void sqlrtriggers::unloadTriggers() {
 		delete sqlt;
 	}
 	beforetriggers.clear();
-	for (linkedlistnode< sqlrtriggerplugin * > *anode=
+	for (singlylinkedlistnode< sqlrtriggerplugin * > *anode=
 				aftertriggers.getFirst();
 					anode; anode=anode->getNext()) {
 		sqlrtriggerplugin	*sqlt=anode->getValue();
@@ -94,7 +94,7 @@ void sqlrtriggers::unloadTriggers() {
 }
 
 void sqlrtriggers::loadTrigger(xmldomnode *trigger,
-				linkedlist< sqlrtriggerplugin * > *list) {
+				singlylinkedlist< sqlrtriggerplugin * > *list) {
 
 	debugFunction();
 
@@ -181,16 +181,16 @@ void sqlrtriggers::runAfterTriggers(sqlrconnection_svr *sqlrcon,
 }
 
 void sqlrtriggers::runTriggers(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
-					xmldom *querytree,
-					linkedlist< sqlrtriggerplugin * > *list,
-					bool before,
-					bool success) {
+				sqlrcursor_svr *sqlrcur,
+				xmldom *querytree,
+				singlylinkedlist< sqlrtriggerplugin * > *list,
+				bool before,
+				bool success) {
 	debugFunction();
 	if (!querytree) {
 		return;
 	}
-	for (linkedlistnode< sqlrtriggerplugin * > *node=list->getFirst();
+	for (singlylinkedlistnode< sqlrtriggerplugin * > *node=list->getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->tr->run(sqlrcon,sqlrcur,
 						querytree,before,success);

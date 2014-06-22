@@ -7,7 +7,7 @@
 #include <sqlrelay/private/sqlrserverdll.h>
 
 #include <rudiments/xmldom.h>
-#include <rudiments/linkedlist.h>
+#include <rudiments/singlylinkedlist.h>
 #include <rudiments/dynamiclib.h>
 #include <sqlrelay/sqlrpwdenc.h>
 
@@ -29,7 +29,7 @@ class SQLRSERVER_DLLSPEC sqlrpwdencs {
 		void	loadPasswordEncryption(xmldomnode *pwdenc);
 
 		xmldom					*xmld;
-		linkedlist< sqlrpwdencplugin * >	llist;
+		singlylinkedlist< sqlrpwdencplugin * >	llist;
 };
 
 #endif

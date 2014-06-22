@@ -70,7 +70,7 @@ bool sqlrtranslations::loadTranslations(const char *translations) {
 
 void sqlrtranslations::unloadTranslations() {
 	debugFunction();
-	for (linkedlistnode< sqlrtranslationplugin * > *node=
+	for (singlylinkedlistnode< sqlrtranslationplugin * > *node=
 						tlist.getFirst();
 						node; node=node->getNext()) {
 		sqlrtranslationplugin	*sqlt=node->getValue();
@@ -162,7 +162,7 @@ bool sqlrtranslations::runTranslations(sqlrconnection_svr *sqlrcon,
 
 	tree=querytree;
 
-	for (linkedlistnode< sqlrtranslationplugin * > *node=
+	for (singlylinkedlistnode< sqlrtranslationplugin * > *node=
 						tlist.getFirst();
 						node; node=node->getNext()) {
 		if (!node->getValue()->tr->run(sqlrcon,sqlrcur,querytree)) {
@@ -356,7 +356,7 @@ bool sqlrtranslations::removeReplacementTable(const char *database,
 		databaseobject	*dbo=node->getValue()->getKey();
 
 		// make sure to move on to the next node here rather than
-		// after calling removeValue, otherwise it could cause a
+		// after calling remove, otherwise it could cause a
 		// reference-after-free condition
 		node=node->getNext();
 
@@ -364,7 +364,7 @@ bool sqlrtranslations::removeReplacementTable(const char *database,
 			!charstring::compare(dbo->schema,schema) &&
 			!charstring::compare(dbo->dependency,table)) {
 
-			tempindexmap.removeValue(dbo);
+			tempindexmap.remove(dbo);
 		}
 	}
 	return true;
@@ -392,7 +392,7 @@ bool sqlrtranslations::removeReplacement(
 			!charstring::compare(dbo->schema,schema) &&
 			!charstring::compare(replacementname,name)) {
 
-			dict->removeValue(dbo);
+			dict->remove(dbo);
 			return true;
 		}
 	}

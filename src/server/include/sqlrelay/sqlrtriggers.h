@@ -7,7 +7,7 @@
 #include <sqlrelay/private/sqlrserverdll.h>
 
 #include <rudiments/xmldom.h>
-#include <rudiments/linkedlist.h>
+#include <rudiments/singlylinkedlist.h>
 #include <rudiments/dynamiclib.h>
 #include <sqlrelay/sqlrtrigger.h>
 
@@ -36,17 +36,19 @@ class SQLRSERVER_DLLSPEC sqlrtriggers {
 	private:
 		void		unloadTriggers();
 		void		loadTrigger(xmldomnode *trigger,
-					linkedlist< sqlrtriggerplugin *> *list);
+					singlylinkedlist< sqlrtriggerplugin *>
+					*list);
 		void		runTriggers(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree,
-					linkedlist< sqlrtriggerplugin * > *list,
+					singlylinkedlist< sqlrtriggerplugin * >
+					*list,
 					bool before,
 					bool success);
 
 		xmldom					*xmld;
-		linkedlist< sqlrtriggerplugin * >	beforetriggers;
-		linkedlist< sqlrtriggerplugin * >	aftertriggers;
+		singlylinkedlist< sqlrtriggerplugin * >	beforetriggers;
+		singlylinkedlist< sqlrtriggerplugin * >	aftertriggers;
 };
 
 #endif

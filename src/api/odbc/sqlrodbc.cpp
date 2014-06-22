@@ -70,29 +70,29 @@ static	uint16_t	stmtid=0;
 struct CONN;
 
 struct ENV {
-	SQLINTEGER		odbcversion;
-	linkedlist<CONN *>	connlist;
-	char			*error;
-	int64_t			errn;
-	const char		*sqlstate;
+	SQLINTEGER			odbcversion;
+	singlylinkedlist<CONN *>	connlist;
+	char				*error;
+	int64_t				errn;
+	const char			*sqlstate;
 };
 
 struct STMT;
 
 struct CONN {
-	sqlrconnection		*con;
-	ENV			*env;
-	linkedlist<STMT *>	stmtlist;
-	char			*error;
-	int64_t			errn;
-	const char		*sqlstate;
-	char			server[1024];
-	uint16_t		port;
-	char			socket[1024];
-	char			user[1024];
-	char			password[1024];
-	int32_t			retrytime;
-	int32_t			tries;
+	sqlrconnection			*con;
+	ENV				*env;
+	singlylinkedlist<STMT *>	stmtlist;
+	char				*error;
+	int64_t				errn;
+	const char			*sqlstate;
+	char				server[1024];
+	uint16_t			port;
+	char				socket[1024];
+	char				user[1024];
+	char				password[1024];
+	int32_t				retrytime;
+	int32_t				tries;
 };
 
 struct rowdesc {
@@ -1749,8 +1749,8 @@ static SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
 				return SQL_INVALID_HANDLE;
 			}
 
-			for (linkedlistnode<CONN *>	*node=
-					env->connlist.getFirst();
+			for (singlylinkedlistnode<CONN *>	*node=
+						env->connlist.getFirst();
 						node; node=node->getNext()) {
 
 				if (completiontype==SQL_COMMIT) {
@@ -5056,7 +5056,7 @@ static const char *SQLR_BuildNumeric(STMT *stmt,
 	// hang on to that string
 	char	*data=NULL;
 	if (stmt->inputbindstrings.getValue(parameternumber,&data)) {
-		stmt->inputbindstrings.removeValue(parameternumber);
+		stmt->inputbindstrings.remove(parameternumber);
 		delete[] data;
 	}
 	stmt->inputbindstrings.setValue(parameternumber,string);
@@ -5122,7 +5122,7 @@ static const char *SQLR_BuildInterval(STMT *stmt,
 	// hang on to that string
 	char	*data=NULL;
 	if (stmt->inputbindstrings.getValue(parameternumber,&data)) {
-		stmt->inputbindstrings.removeValue(parameternumber);
+		stmt->inputbindstrings.remove(parameternumber);
 		delete[] data;
 	}
 	stmt->inputbindstrings.setValue(parameternumber,string);
@@ -5185,7 +5185,7 @@ static const char *SQLR_BuildGuid(STMT *stmt,
 	// hang on to that string
 	char	*data=NULL;
 	if (stmt->inputbindstrings.getValue(parameternumber,&data)) {
-		stmt->inputbindstrings.removeValue(parameternumber);
+		stmt->inputbindstrings.remove(parameternumber);
 		delete[] data;
 	}
 	stmt->inputbindstrings.setValue(parameternumber,string);

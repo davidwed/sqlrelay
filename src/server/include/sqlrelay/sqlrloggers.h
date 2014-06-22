@@ -7,7 +7,7 @@
 #include <sqlrelay/private/sqlrserverdll.h>
 
 #include <rudiments/xmldom.h>
-#include <rudiments/linkedlist.h>
+#include <rudiments/singlylinkedlist.h>
 #include <rudiments/dynamiclib.h>
 #include <sqlrelay/sqlrlogger.h>
 
@@ -40,7 +40,7 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 		void		loadLogger(xmldomnode *logger);
 
 		xmldom					*xmld;
-		linkedlist< sqlrloggerplugin * >	llist;
+		singlylinkedlist< sqlrloggerplugin * >	llist;
 };
 
 #endif

@@ -17,6 +17,7 @@
 #include <rudiments/semaphoreset.h>
 #include <rudiments/signalclasses.h>
 #include <rudiments/datetime.h>
+#include <rudiments/singlylinkedlist.h>
 
 #include <tempdir.h>
 
@@ -395,10 +396,10 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		char		*clientinfo;
 		uint64_t	clientinfolen;
 
-		linkedlist< char * >	sessiontemptablesfordrop;
-		linkedlist< char * >	sessiontemptablesfortrunc;
-		linkedlist< char * >	transtemptablesfordrop;
-		linkedlist< char * >	transtemptablesfortrunc;
+		singlylinkedlist< char * >	sessiontemptablesfordrop;
+		singlylinkedlist< char * >	sessiontemptablesfortrunc;
+		singlylinkedlist< char * >	transtemptablesfordrop;
+		singlylinkedlist< char * >	transtemptablesfortrunc;
 
 		int32_t		idleclienttimeout;
 
