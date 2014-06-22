@@ -71,7 +71,7 @@ bool sqlrtranslations::loadTranslations(const char *translations) {
 void sqlrtranslations::unloadTranslations() {
 	debugFunction();
 	for (linkedlistnode< sqlrtranslationplugin * > *node=
-						tlist.getFirstNode();
+						tlist.getFirst();
 						node; node=node->getNext()) {
 		sqlrtranslationplugin	*sqlt=node->getValue();
 		delete sqlt->tr;
@@ -163,7 +163,7 @@ bool sqlrtranslations::runTranslations(sqlrconnection_svr *sqlrcon,
 	tree=querytree;
 
 	for (linkedlistnode< sqlrtranslationplugin * > *node=
-						tlist.getFirstNode();
+						tlist.getFirst();
 						node; node=node->getNext()) {
 		if (!node->getValue()->tr->run(sqlrcon,sqlrcur,querytree)) {
 			return false;
@@ -274,7 +274,7 @@ bool	sqlrtranslations::getReplacementName(
 
 	*newname=NULL;
 	for (linkedlistnode< dictionarynode< databaseobject *, char * > *>
-					*node=dict->getList()->getFirstNode();
+					*node=dict->getList()->getFirst();
 						node; node=node->getNext()) {
 
 		databaseobject	*dbo=node->getValue()->getKey();
@@ -351,8 +351,7 @@ bool sqlrtranslations::removeReplacementTable(const char *database,
 
 	// remove any indices that depend on the table
 	for (linkedlistnode< dictionarynode< databaseobject *, char * > *>
-				*node=tempindexmap.getList()->getFirstNode();
-					node;) {
+			*node=tempindexmap.getList()->getFirst(); node;) {
 
 		databaseobject	*dbo=node->getValue()->getKey();
 
@@ -384,7 +383,7 @@ bool sqlrtranslations::removeReplacement(
 				const char *name) {
 
 	for (linkedlistnode< dictionarynode< databaseobject *, char * > *>
-				*node=dict->getList()->getFirstNode();
+				*node=dict->getList()->getFirst();
 					node; node=node->getNext()) {
 
 		databaseobject	*dbo=node->getValue()->getKey();

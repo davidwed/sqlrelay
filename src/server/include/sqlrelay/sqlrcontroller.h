@@ -395,10 +395,10 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		char		*clientinfo;
 		uint64_t	clientinfolen;
 
-		stringlist	sessiontemptablesfordrop;
-		stringlist	sessiontemptablesfortrunc;
-		stringlist	transtemptablesfordrop;
-		stringlist	transtemptablesfortrunc;
+		linkedlist< char * >	sessiontemptablesfordrop;
+		linkedlist< char * >	sessiontemptablesfortrunc;
+		linkedlist< char * >	transtemptablesfordrop;
+		linkedlist< char * >	transtemptablesfortrunc;
 
 		int32_t		idleclienttimeout;
 

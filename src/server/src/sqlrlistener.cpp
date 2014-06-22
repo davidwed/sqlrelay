@@ -97,8 +97,7 @@ sqlrlistener::~sqlrlistener() {
 	// remove files that indicate whether the db is up or down
 	linkedlist< connectstringcontainer * >	*csl=
 					cfgfl.getConnectStringList();
-	for (linkedlistnode< connectstringcontainer * > *node=
-						csl->getFirstNode();
+	for (linkedlistnode< connectstringcontainer * > *node=csl->getFirst();
 						node; node=node->getNext()) {
 		connectstringcontainer	*cs=node->getValue();
 		const char	*connectionid=cs->getConnectionId();
@@ -795,7 +794,7 @@ filedescriptor *sqlrlistener::waitForTraffic() {
 	// return first file descriptor that had data available or an invalid
 	// file descriptor on error
 	filedescriptor	*fd=
-		listener::getReadyList()->getFirstNode()->getValue();
+		listener::getReadyList()->getFirst()->getValue();
 
 	logDebugMessage("finished waiting for traffic");
 
@@ -1338,7 +1337,7 @@ bool sqlrlistener::acceptAvailableConnection(bool *alldbsdown) {
 		linkedlist< connectstringcontainer * >	*csl=
 					cfgfl.getConnectStringList();
 		for (linkedlistnode< connectstringcontainer * > *node=
-						csl->getFirstNode(); node;
+						csl->getFirst(); node;
 						node=node->getNext()) {
 			connectstringcontainer	*cs=node->getValue();
 			if (connectionIsUp(cs->getConnectionId())) {
@@ -1765,7 +1764,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 
 		// get the file descriptor that data was available from
 		filedescriptor	*fd=
-			proxy.getReadyList()->getFirstNode()->getValue();
+			proxy.getReadyList()->getFirst()->getValue();
 
 		// read whatever data was available
 		ssize_t	readcount=fd->read(readbuffer,sizeof(readbuffer));

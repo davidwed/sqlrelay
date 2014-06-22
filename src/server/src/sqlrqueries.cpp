@@ -63,9 +63,8 @@ bool sqlrqueries::loadQueries(const char *queries) {
 
 void sqlrqueries::unloadQueries() {
 	debugFunction();
-	for (linkedlistnode< sqlrqueryplugin * > *node=
-				llist.getFirstNode();
-					node; node=node->getNext()) {
+	for (linkedlistnode< sqlrqueryplugin * > *node=llist.getFirst();
+						node; node=node->getNext()) {
 		sqlrqueryplugin	*sqlrlp=node->getValue();
 		delete sqlrlp->qr;
 		delete sqlrlp->dl;
@@ -149,7 +148,7 @@ sqlrquerycursor *sqlrqueries::match(sqlrconnection_svr *sqlrcon,
 					const char *querystring,
 					uint32_t querylength) {
 	debugFunction();
-	for (linkedlistnode< sqlrqueryplugin * > *node=llist.getFirstNode();
+	for (linkedlistnode< sqlrqueryplugin * > *node=llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrquery	*qr=node->getValue()->qr;
 		if (qr->match(querystring,querylength)) {

@@ -285,23 +285,25 @@ void routerconnection::handleConnectString() {
 	cons=new sqlrconnection *[concount];
 	beginquery=new const char *[concount];
 	anymustbegin=false;
-	for (uint16_t index=0; index<concount; index++) {
+	uint16_t index=0;
+	linkedlistnode< routecontainer * >	*rln=routelist->getFirst();
+	while (index<concount) {
 
 		cons[index]=NULL;
 		beginquery[index]=NULL;
 
-		routecontainer	*rn=routelist->
-					getNodeByIndex(index)->getValue();
+		routecontainer	*rc=rln->getValue();
 
 		// empty host/port/socket/user/password means that queries
 		// going to this connection will be filtered out
-		if (rn->getIsFilter()) {
+		if (rc->getIsFilter()) {
+			index++;
 			continue;
 		}
 
-		cons[index]=new sqlrconnection(rn->getHost(),rn->getPort(),
-						rn->getSocket(),rn->getUser(),
-						rn->getPassword(),0,1);
+		cons[index]=new sqlrconnection(rc->getHost(),rc->getPort(),
+						rc->getSocket(),rc->getUser(),
+						rc->getPassword(),0,1);
 
 		const char	*id=cons[index]->identify();
 		if (!charstring::compare(id,"sybase") ||
@@ -317,6 +319,9 @@ void routerconnection::handleConnectString() {
 		if (beginquery[index]) {
 			anymustbegin=true;
 		}
+
+		index++;
+		rln=rln->getNext();
 	}
 }
 
@@ -634,13 +639,11 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	// look through the regular expressions and figure out which
 	// connection this query needs to be run through
 	uint16_t	conindex=0;
-	routenode	*rcn=routerconn->cfgfile->
-					getRouteList()->getFirstNode();
+	routenode	*rcn=routerconn->cfgfile->getRouteList()->getFirst();
 	bool	found=false;
 	while (rcn && !found) {
 		linkedlistnode< regularexpression * >	*ren=
-					rcn->getValue()->getRegexList()->
-							getFirstNode();
+				rcn->getValue()->getRegexList()->getFirst();
 
 		while (ren && !found) {
 			if (ren->getValue()->match(nquery)) {

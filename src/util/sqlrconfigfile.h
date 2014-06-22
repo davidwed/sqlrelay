@@ -229,8 +229,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		bool		getDateDdMm();
 		bool		getDateYyyyDdMm();
 
-		stringlist	*getSessionStartQueries();
-		stringlist	*getSessionEndQueries();
+		linkedlist< char *>	*getSessionStartQueries();
+		linkedlist< char *>	*getSessionEndQueries();
 
 		const char	*getTranslations();
 
@@ -334,8 +334,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 
 		bool		instart;
 		bool		inend;
-		stringlist	sessionstartqueries;
-		stringlist	sessionendqueries;
+		linkedlist< char *>	sessionstartqueries;
+		linkedlist< char *>	sessionendqueries;
 
 		stringbuffer	authentications;
 		uint16_t	authenticationsdepth;

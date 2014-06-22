@@ -1482,7 +1482,7 @@ int32_t sqlrcontroller_svr::waitForClient() {
 		}
 
 		// get the first socket that had data available...
-		filedescriptor	*fd=getReadyList()->getFirstNode()->getValue();
+		filedescriptor	*fd=getReadyList()->getFirst()->getValue();
 
 		inetsocketserver	*iss=NULL;
 		for (uint64_t index=0; index<serversockincount; index++) {
@@ -1699,7 +1699,7 @@ void sqlrcontroller_svr::initLocalAuthentication() {
 	passwords=new char *[usercount];
 	passwordencryptions=new char *[usercount];
 
-	usernode	*current=userlist->getFirstNode();
+	usernode	*current=userlist->getFirst();
 	for (uint32_t i=0; i<usercount; i++) {
 		users[i]=charstring::duplicate(
 				current->getValue()->getUser());
@@ -3182,8 +3182,8 @@ void sqlrcontroller_svr::dropTempTables(sqlrcursor_svr *cursor) {
 	}
 
 	// run through the temp table list, dropping tables
-	for (stringlistnode *sln=sessiontemptablesfordrop.getFirstNode();
-				sln; sln=(stringlistnode *)sln->getNext()) {
+	for (linkedlistnode< char * > *sln=sessiontemptablesfordrop.getFirst();
+						sln; sln=sln->getNext()) {
 		dropTempTable(cursor,sln->getValue());
 		delete[] sln->getValue();
 	}
@@ -3233,8 +3233,8 @@ void sqlrcontroller_svr::dropTempTable(sqlrcursor_svr *cursor,
 void sqlrcontroller_svr::truncateTempTables(sqlrcursor_svr *cursor) {
 
 	// run through the temp table list, truncating tables
-	for (stringlistnode *sln=sessiontemptablesfortrunc.getFirstNode();
-				sln; sln=(stringlistnode *)sln->getNext()) {
+	for (linkedlistnode< char * > *sln=sessiontemptablesfortrunc.getFirst();
+						sln; sln=sln->getNext()) {
 		truncateTempTable(cursor,sln->getValue());
 		delete[] sln->getValue();
 	}
@@ -4042,18 +4042,18 @@ void sqlrcontroller_svr::incrementReLogInCount() {
 
 void sqlrcontroller_svr::sessionStartQueries() {
 	// run a configurable set of queries at the start of each session
-	for (stringlistnode *node=
-		cfgfl->getSessionStartQueries()->getFirstNode();
-						node; node=node->getNext()) {
+	for (linkedlistnode< char * > *node=
+		cfgfl->getSessionStartQueries()->getFirst();
+					node; node=node->getNext()) {
 		sessionQuery(node->getValue());
 	}
 }
 
 void sqlrcontroller_svr::sessionEndQueries() {
 	// run a configurable set of queries at the end of each session
-	for (stringlistnode *node=
-		cfgfl->getSessionEndQueries()->getFirstNode();
-						node; node=node->getNext()) {
+	for (linkedlistnode< char * > *node=
+		cfgfl->getSessionEndQueries()->getFirst();
+					node; node=node->getNext()) {
 		sessionQuery(node->getValue());
 	}
 }

@@ -100,7 +100,7 @@ sqlrshenv::~sqlrshenv() {
 void sqlrshenv::clearbinds(dictionary<char *, sqlrshbindvalue *> *binds) {
 
 	for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
-					*node=binds->getList()->getFirstNode();
+					*node=binds->getList()->getFirst();
 		node; node=node->getNext()) {
 
 		delete[] node->getValue()->getKey();
@@ -803,7 +803,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	if (env->inputbinds.getList()->getLength()) {
 
 		for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
-				*node=env->inputbinds.getList()->getFirstNode();
+				*node=env->inputbinds.getList()->getFirst();
 				node; node=node->getNext()) {
 
 			const char	*name=node->getValue()->getKey();
@@ -835,7 +835,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	if (env->outputbinds.getList()->getLength()) {
 
 		for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
-			*node=env->outputbinds.getList()->getFirstNode();
+			*node=env->outputbinds.getList()->getFirst();
 			node; node=node->getNext()) {
 
 			const char	*name=node->getValue()->getKey();
@@ -859,7 +859,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	if (env->outputbinds.getList()->getLength()) {
 
 		for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
-			*node=env->outputbinds.getList()->getFirstNode();
+			*node=env->outputbinds.getList()->getFirst();
 			node; node=node->getNext()) {
 
 			const char	*name=node->getValue()->getKey();
@@ -1353,7 +1353,7 @@ void sqlrsh::printbinds(const char *type,
 	stdoutput.printf("%s bind variables:\n",type);
 
 	for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
-					*node=binds->getList()->getFirstNode();
+					*node=binds->getList()->getFirst();
 		node; node=node->getNext()) {
 
 		stdoutput.printf("    %s ",node->getValue()->getKey());
@@ -1641,7 +1641,7 @@ void sqlrsh::execute(int argc, const char **argv) {
 		port=cfgfile.getPort();
 		socket=cfgfile.getUnixPort();
 		usercontainer	*currentnode=
-			cfgfile.getUserList()->getFirstNode()->getValue();
+				cfgfile.getUserList()->getFirst()->getValue();
 		user=currentnode->getUser();
 		password=currentnode->getPassword();
 	}

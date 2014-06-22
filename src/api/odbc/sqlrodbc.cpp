@@ -396,7 +396,7 @@ static void SQLR_ResetParams(STMT *stmt) {
 	linkedlist<dictionarynode<int32_t, char * > *>
 				*ibslist=stmt->inputbindstrings.getList();
 	for (linkedlistnode<dictionarynode<int32_t, char * > *>
-					*node=ibslist->getFirstNode();
+					*node=ibslist->getFirst();
 					node; node=node->getNext()) {
 		delete[] node->getValue();
 	}
@@ -406,7 +406,7 @@ static void SQLR_ResetParams(STMT *stmt) {
 	linkedlist<dictionarynode<int32_t, outputbind * > *>
 				*oblist=stmt->outputbinds.getList();
 	for (linkedlistnode<dictionarynode<int32_t, outputbind * > *>
-					*node=oblist->getFirstNode();
+					*node=oblist->getFirst();
 					node; node=node->getNext()) {
 		delete node->getValue();
 	}
@@ -1750,7 +1750,7 @@ static SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
 			}
 
 			for (linkedlistnode<CONN *>	*node=
-					env->connlist.getFirstNode();
+					env->connlist.getFirst();
 						node; node=node->getNext()) {
 
 				if (completiontype==SQL_COMMIT) {
@@ -2012,7 +2012,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 	linkedlist<dictionarynode<int32_t, outputbind *> *>
 				*list=stmt->outputbinds.getList();
 	for (linkedlistnode<dictionarynode<int32_t, outputbind *> *>
-					*node=list->getFirstNode();
+					*node=list->getFirst();
 					node; node=node->getNext()) {
 
 		outputbind	*ob=node->getValue()->getValue();
@@ -2491,7 +2491,7 @@ static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 				debugPrintf("NULL conn handle\n");
 				return SQL_INVALID_HANDLE;
 			}
-			conn->env->connlist.removeAllByValue(conn);
+			conn->env->connlist.removeAll(conn);
 			conn->stmtlist.clear();
 			delete conn->con;
 			delete[] conn->error;
@@ -2506,7 +2506,7 @@ static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 				debugPrintf("NULL stmt handle\n");
 				return SQL_INVALID_HANDLE;
 			}
-			stmt->conn->stmtlist.removeAllByValue(stmt);
+			stmt->conn->stmtlist.removeAll(stmt);
 			delete stmt->improwdesc;
 			delete stmt->impparamdesc;
 			delete stmt->cur;

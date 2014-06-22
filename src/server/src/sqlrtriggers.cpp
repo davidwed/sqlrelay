@@ -74,7 +74,7 @@ bool sqlrtriggers::loadTriggers(const char *triggers) {
 void sqlrtriggers::unloadTriggers() {
 	debugFunction();
 	for (linkedlistnode< sqlrtriggerplugin * > *bnode=
-				beforetriggers.getFirstNode();
+				beforetriggers.getFirst();
 					bnode; bnode=bnode->getNext()) {
 		sqlrtriggerplugin	*sqlt=bnode->getValue();
 		delete sqlt->tr;
@@ -83,7 +83,7 @@ void sqlrtriggers::unloadTriggers() {
 	}
 	beforetriggers.clear();
 	for (linkedlistnode< sqlrtriggerplugin * > *anode=
-				aftertriggers.getFirstNode();
+				aftertriggers.getFirst();
 					anode; anode=anode->getNext()) {
 		sqlrtriggerplugin	*sqlt=anode->getValue();
 		delete sqlt->tr;
@@ -190,7 +190,7 @@ void sqlrtriggers::runTriggers(sqlrconnection_svr *sqlrcon,
 	if (!querytree) {
 		return;
 	}
-	for (linkedlistnode< sqlrtriggerplugin * > *node=list->getFirstNode();
+	for (linkedlistnode< sqlrtriggerplugin * > *node=list->getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->tr->run(sqlrcon,sqlrcur,
 						querytree,before,success);

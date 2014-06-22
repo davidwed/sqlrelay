@@ -88,7 +88,7 @@ int _sqlrelayError(pdo_dbh_t *dbh,
 }
 
 static void clearList(linkedlist< char * > *list) {
-	for (linkedlistnode< char * > *node=list->getFirstNode();
+	for (linkedlistnode< char * > *node=list->getFirst();
 					node; node=node->getNext()) {
 		delete[] node->getValue();
 	}

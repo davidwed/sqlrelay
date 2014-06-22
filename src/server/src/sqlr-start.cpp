@@ -130,7 +130,7 @@ bool startConnections(sqlrconfigfile *cfgfile, bool strace,
 	int32_t	connections=getConnections(cfgfile,overridemaxconn);
 
 	// start the connections
-	connectstringnode	*csn=connectionlist->getFirstNode();
+	connectstringnode	*csn=connectionlist->getFirst();
 	connectstringcontainer	*csc;
 	int32_t	metric=0;
 	int32_t	startup=0;

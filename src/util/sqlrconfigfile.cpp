@@ -109,25 +109,24 @@ sqlrconfigfile::~sqlrconfigfile() {
 	delete[] dateformat;
 	delete[] timeformat;
 
-	for (usernode *un=userlist.getFirstNode();
-				un; un=un->getNext()) {
+	for (usernode *un=userlist.getFirst(); un; un=un->getNext()) {
 		delete un->getValue();
 	}
 
-	for (connectstringnode *csn=connectstringlist.getFirstNode();
+	for (connectstringnode *csn=connectstringlist.getFirst();
 						csn; csn=csn->getNext()) {
 		delete csn->getValue();
 	}
 
-	for (routenode *rn=routelist.getFirstNode(); rn; rn=rn->getNext()) {
+	for (routenode *rn=routelist.getFirst(); rn; rn=rn->getNext()) {
 		delete rn->getValue();
 	}
 
-	for (stringlistnode *ssln=sessionstartqueries.getFirstNode();
+	for (linkedlistnode< char * > *ssln=sessionstartqueries.getFirst();
 						ssln; ssln=ssln->getNext()) {
 		delete[] ssln->getValue();
 	}
-	for (stringlistnode *seln=sessionendqueries.getFirstNode();
+	for (linkedlistnode< char * > *seln=sessionendqueries.getFirst();
 						seln; seln=seln->getNext()) {
 		delete[] seln->getValue();
 	}
@@ -346,11 +345,11 @@ bool sqlrconfigfile::getDateYyyyDdMm() {
 	return dateyyyyddmm;
 }
 
-stringlist *sqlrconfigfile::getSessionStartQueries() {
+linkedlist< char * > *sqlrconfigfile::getSessionStartQueries() {
 	return &sessionstartqueries;
 }
 
-stringlist *sqlrconfigfile::getSessionEndQueries() {
+linkedlist< char * > *sqlrconfigfile::getSessionEndQueries() {
 	return &sessionendqueries;
 }
 
@@ -392,7 +391,7 @@ linkedlist< connectstringcontainer * > *sqlrconfigfile::getConnectStringList() {
 
 connectstringcontainer *sqlrconfigfile::getConnectString(
 						const char *connectionid) {
-	for (connectstringnode *csn=connectstringlist.getFirstNode();
+	for (connectstringnode *csn=connectstringlist.getFirst();
 						csn; csn=csn->getNext()) {
 		if (!charstring::compare(connectionid,
 					csn->getValue()->getConnectionId())) {
@@ -412,8 +411,7 @@ uint32_t sqlrconfigfile::getMetricTotal() {
 	// attributes.  In that case, though each connection has a metric,
 	// metrictotal=0, causing no connections to start.
 	if (!metrictotal) {
-		for (connectstringnode *csn=
-				connectstringlist.getFirstNode();
+		for (connectstringnode *csn=connectstringlist.getFirst();
 						csn; csn=csn->getNext()) {
 			metrictotal=metrictotal+csn->getValue()->getMetric();
 		}
@@ -1517,7 +1515,7 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 bool sqlrconfigfile::text(const char *string) {
 
 	if (currenttag==RUNQUERY_TAG) {
-		stringlist	*ptr=NULL;
+		linkedlist< char * >	*ptr=NULL;
 		if (instart) {
 			ptr=&sessionstartqueries;
 		} else if (inend) {
@@ -1552,7 +1550,7 @@ int32_t sqlrconfigfile::atoint32_t(const char *value,
 
 routecontainer *sqlrconfigfile::routeAlreadyExists(routecontainer *cur) {
 
-	for (routenode *rn=routelist.getFirstNode(); rn; rn=rn->getNext()) {
+	for (routenode *rn=routelist.getFirst(); rn; rn=rn->getNext()) {
 
 		routecontainer	*rc=rn->getValue();
 		if (!charstring::compare(rc->getHost(),
@@ -1574,7 +1572,7 @@ void sqlrconfigfile::moveRegexList(routecontainer *cur,
 					routecontainer *existing) {
 
 	for (linkedlistnode< regularexpression * > *re=
-				cur->getRegexList()->getFirstNode();
+				cur->getRegexList()->getFirst();
 						re; re=re->getNext()) {
 		existing->getRegexList()->append(re->getValue());
 	}
@@ -1737,7 +1735,7 @@ routecontainer::~routecontainer() {
 	delete[] user;
 	delete[] password;
 	for (linkedlistnode< regularexpression * > *re=
-					regexlist.getFirstNode();
+					regexlist.getFirst();
 						re; re=re->getNext()) {
 		delete re->getValue();
 	}

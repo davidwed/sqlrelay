@@ -576,7 +576,7 @@ void scaler::getRandomConnectionId() {
 
 	// run through list, decrementing scalednum by the metric
 	// for each, when scalednum is 0, pick that connection id
-	for (connectstringnode *csn=connectstringlist->getFirstNode();
+	for (connectstringnode *csn=connectstringlist->getFirst();
 						csn; csn=csn->getNext()) {
 		connectstringcontainer	*currentnode=csn->getValue();
 		scalednum=scalednum-currentnode->getMetric();

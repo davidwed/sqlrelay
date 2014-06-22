@@ -59,7 +59,7 @@ int main(int argc, const char **argv) {
 		port=cfgfile.getPort();
 		socket=cfgfile.getUnixPort();
 		usercontainer	*currentnode=
-			cfgfile.getUserList()->getFirstNode()->getValue();
+				cfgfile.getUserList()->getFirst()->getValue();
 		user=currentnode->getUser();
 		password=currentnode->getPassword();
 	}
