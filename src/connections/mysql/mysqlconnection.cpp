@@ -200,6 +200,11 @@ class mysqlconnection : public sqlrconnection_svr {
 		const char	*port;
 		const char	*socket;
 		const char	*charset;
+		const char	*sslkey;
+		const char	*sslcert;
+		const char	*sslca;
+		const char	*sslcapath;
+		const char	*sslcipher;
 		bool		foundrows;
 		bool		ignorespace;
 
@@ -247,6 +252,11 @@ void mysqlconnection::handleConnectString() {
 	port=cont->connectStringValue("port");
 	socket=cont->connectStringValue("socket");
 	charset=cont->connectStringValue("charset");
+	sslkey=cont->connectStringValue("sslkey");
+	sslcert=cont->connectStringValue("sslcert");
+	sslca=cont->connectStringValue("sslca");
+	sslcapath=cont->connectStringValue("sslcapath");
+	sslcipher=cont->connectStringValue("sslcipher");
 	cont->setFakeInputBinds(!charstring::compare(
 				cont->connectStringValue("fakebinds"),"yes"));
 	foundrows=!charstring::compare(
@@ -300,9 +310,17 @@ bool mysqlconnection::logIn(const char **error) {
 		*error="mysql_init failed";
 		return false;
 	}
+	#ifdef HAVE_MYSQL_SSL_SET
+	mysql_ssl_set(&mysql,sslkey,sslcert,sslca,sslcapath,sslcipher);
+	#endif
 	if (!mysql_real_connect(&mysql,hostval,user,password,dbval,
 					portval,socketval,clientflag)) {
 	#else
+	#ifdef HAVE_MYSQL_SSL_SET
+	#endif
+	#ifdef HAVE_MYSQL_SSL_SET
+	mysql_ssl_set(&mysql,sslkey,sslcert,sslca,sslcapath,sslcipher);
+	#endif
 	if (!mysql_real_connect(&mysql,hostval,user,password,
 					portval,socketval,clientflag)) {
 	#endif
