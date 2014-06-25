@@ -108,6 +108,9 @@
 /* MySQL supports mysql_set_character_set */
 #undef HAVE_MYSQL_SET_CHARACTER_SET
 
+/* MySQL supports mysql_ssl_set */
+#undef HAVE_MYSQL_SSL_SET
+
 /* MySQL supports mysql_stmt_prepare */
 #undef HAVE_MYSQL_STMT_PREPARE
 
