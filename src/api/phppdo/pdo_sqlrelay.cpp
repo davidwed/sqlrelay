@@ -351,9 +351,17 @@ static int sqlrcursorInputBindPreExec(sqlrcursor *sqlrcur,
 			return 1;
 		case PDO_PARAM_INT:
 		case PDO_PARAM_BOOL:
+			{
+			// handle NULLs/empty-strings
+			const char	*strval=Z_STRVAL_P(param->parameter);
+			if (!strval || !strval[0]) {
+				sqlrcur->inputBind(name,(const char *)NULL);
+				return 1;
+			}
 			convert_to_long(param->parameter);
 			sqlrcur->inputBind(name,Z_LVAL_P(param->parameter));
 			return 1;
+			}
 		case PDO_PARAM_STR:
 			convert_to_string(param->parameter);
 			sqlrcur->inputBind(name,Z_STRVAL_P(param->parameter),

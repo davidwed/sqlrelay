@@ -37,7 +37,7 @@ dl("pdo_sqlrelay.so");
 	$dbh->exec("drop table testtable");
 
 	echo("CREATE TEMPTABLE: \n");
-	$dbh->exec("create table testtable (testint int, testfloat float, testchar varchar(20), testblob blob, testdate date)");
+	$dbh->exec("create table testtable (testint int, testfloat float, testchar varchar(20), testblob blob, testdate datetime)");
 	echo("\n");
 
 	echo("INSERT: \n");
@@ -58,7 +58,7 @@ dl("pdo_sqlrelay.so");
 	checkSuccess($result[1],1.1);
 	checkSuccess($result[2],"1");
 	checkSuccess(stream_get_contents($result[3]),"1");
-	checkSuccess($result[4],"2001-01-01");
+	checkSuccess($result[4],"2001-01-01 00:00:00");
 	echo("\n");
 
 	echo("FIELDS BY INDEX (as NULL): \n");
@@ -77,7 +77,29 @@ dl("pdo_sqlrelay.so");
 	checkSuccess($result[1],1.1);
 	checkSuccess($result[2],"1");
 	checkSuccess(stream_get_contents($result[3]),"1");
-	checkSuccess($result[4],"2001-01-01");
+	checkSuccess($result[4],"2001-01-01 00:00:00");
+	echo("\n");
+
+	echo("NULL INTEGER INPUT BIND\n");
+	$stmt=$dbh->prepare("select ?,?");
+	$param1=null;
+	$param2="";
+	$stmt->bindParam("1",$param1,PDO::PARAM_INT);
+	$stmt->bindParam("2",$param2,PDO::PARAM_INT);
+	$stmt->setAttribute(
+		PDO::SQLRELAY_ATTR_GET_NULLS_AS_EMPTY_STRINGS,true);
+	$stmt->execute();
+	$result=$stmt->fetch(PDO::FETCH_NUM);
+	checkSuccess($result[0],"");
+	checkSuccess($result[1],"");
+	$param1=null;
+	$param2="";
+	$stmt->setAttribute(
+		PDO::SQLRELAY_ATTR_GET_NULLS_AS_EMPTY_STRINGS,false);
+	$stmt->execute();
+	$result=$stmt->fetch(PDO::FETCH_NUM);
+	checkSuccess($result[0],null);
+	checkSuccess($result[1],null);
 	echo("\n");
 
 	$dbh->exec("drop table testtable");
