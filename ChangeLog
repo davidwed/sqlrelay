@@ -19,8 +19,9 @@
 	fixed millisecond->nanosecond confusion in sqlr-scaler
 	fixed subtle oracle instantclient version detection bug
 	added null input bind support to sqlrsh
-	fixed php pdo driver to return nulls rather than 0 for null integer
-		fields
+	fixed php pdo driver to return null rather than 0 for null integer
+		fields and bind null rather than 0 for null integer input
+		binds
 	added attribute to return nulls as nulls or empty strings to php pdo
 
 0.55 - fixed a sql translation bug related to exists clauses
