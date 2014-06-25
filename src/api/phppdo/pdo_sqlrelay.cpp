@@ -46,6 +46,7 @@ struct sqlrdbhandle {
 enum {
 	PDO_SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE=PDO_ATTR_DRIVER_SPECIFIC,
 	PDO_SQLRELAY_ATTR_GET_COLUMN_INFO,
+	PDO_SQLRELAY_ATTR_GET_NULLS_AS_EMPTY_STRINGS,
 	PDO_SQLRELAY_ATTR_DB_TYPE,
 	PDO_SQLRELAY_ATTR_DB_VERSION,
 	PDO_SQLRELAY_ATTR_DB_HOST_NAME,
@@ -240,6 +241,14 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 	switch (stmt->columns[colno].param_type) {
 		case PDO_PARAM_INT:
 		case PDO_PARAM_BOOL:
+			// handle NULLs/empty-strings
+			if (!sqlrcur->getFieldLength(
+					sqlrstmt->currentrow,colno)) {
+				*ptr=(char *)sqlrcur->getField(
+					sqlrstmt->currentrow,colno);
+				*len=0;
+				return 1;
+			}
 			sqlrstmt->longfield=(long)sqlrcur->
 				getFieldAsInteger(sqlrstmt->currentrow,colno);
 			*ptr=(char *)&sqlrstmt->longfield;
@@ -515,6 +524,14 @@ static int sqlrcursorSetAttribute(pdo_stmt_t *stmt,
 				sqlrcur->getColumnInfo();
 			} else {
 				sqlrcur->dontGetColumnInfo();
+			}
+			return 1;
+		case PDO_SQLRELAY_ATTR_GET_NULLS_AS_EMPTY_STRINGS:
+			convert_to_boolean(val);
+			if (Z_BVAL_P(val)==TRUE) {
+				sqlrcur->getNullsAsEmptyStrings();
+			} else {
+				sqlrcur->getNullsAsNulls();
 			}
 			return 1;
 		default:
@@ -1038,6 +1055,9 @@ static PHP_MINIT_FUNCTION(pdo_sqlrelay) {
 				(long)PDO_SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE);
 	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_GET_COLUMN_INFO",
 				(long)PDO_SQLRELAY_ATTR_GET_COLUMN_INFO);
+	REGISTER_PDO_CLASS_CONST_LONG(
+			"SQLRELAY_ATTR_GET_NULLS_AS_EMPTY_STRINGS",
+			(long)PDO_SQLRELAY_ATTR_GET_NULLS_AS_EMPTY_STRINGS);
 	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_DB_TYPE",
 				(long)PDO_SQLRELAY_ATTR_DB_TYPE);
 	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_DB_VERSION",

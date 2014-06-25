@@ -63,7 +63,8 @@ dl("pdo_sqlrelay.so");
 
 	echo("FIELDS BY INDEX (as NULL): \n");
 	$stmt=$dbh->prepare("select * from testtable");
-	$stmt->setAttribute(PDO::SQLRELAY_ATTR_GET_NULLS_AS_NULLS,true);
+	$stmt->setAttribute(
+		PDO::SQLRELAY_ATTR_GET_NULLS_AS_EMPTY_STRINGS,false);
 	$stmt->execute();
 	$result=$stmt->fetch(PDO::FETCH_NUM);
 	checkSuccess($result[0],null);
