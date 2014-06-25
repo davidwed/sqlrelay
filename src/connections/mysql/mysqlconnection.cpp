@@ -316,11 +316,6 @@ bool mysqlconnection::logIn(const char **error) {
 	if (!mysql_real_connect(&mysql,hostval,user,password,dbval,
 					portval,socketval,clientflag)) {
 	#else
-	#ifdef HAVE_MYSQL_SSL_SET
-	#endif
-	#ifdef HAVE_MYSQL_SSL_SET
-	mysql_ssl_set(&mysql,sslkey,sslcert,sslca,sslcapath,sslcipher);
-	#endif
 	if (!mysql_real_connect(&mysql,hostval,user,password,
 					portval,socketval,clientflag)) {
 	#endif
