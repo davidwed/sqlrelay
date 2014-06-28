@@ -15,6 +15,8 @@ LIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
 all:
 ifneq ($(strip $(DB2LIBS)),)
 	$(MAKE) db2
+	$(MAKE) db27
+	$(MAKE) db26
 endif
 ifneq ($(strip $(FREETDSLIBS)),)
 	$(MAKE) freetds
@@ -47,6 +49,12 @@ endif
 db2: db2.cpp db2.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ db2.lo $(LIBS)
 
+db27: db27.cpp db27.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ db27.lo $(LIBS)
+
+db26: db26.cpp db26.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ db26.lo $(LIBS)
+
 freetds: freetds.cpp freetds.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ freetds.lo $(LIBS)
 
@@ -61,7 +69,6 @@ oracle: oracle.cpp oracle.lo
 
 oracle8: oracle8.cpp oracle8.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle8.lo $(LIBS)
-
 oracle7: oracle7.cpp oracle7.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ oracle7.lo $(LIBS)
 
@@ -87,6 +94,6 @@ router: router.cpp router.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ router.lo $(LIBS)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.lo *.o db2 extensions freetds firebird mysql oracleclobfetch oracleclobinsert oracle oracle8 oracle7 postgresql sqlite sybase router
+	$(LIBTOOL) --mode=clean $(RM) *.lo *.o db2 db27 db26 extensions freetds firebird mysql oracleclobfetch oracleclobinsert oracle oracle8 oracle7 postgresql sqlite sybase router
 	$(RM) cachefile* sqlnet.log
 	$(RMTREE) .libs
