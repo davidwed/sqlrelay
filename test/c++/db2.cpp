@@ -67,8 +67,8 @@ void checkSuccess(double value, double success) {
 int	main(int argc, char **argv) {
 
 	const char	*bindvars[13]={"1","2","3","4","5","6","7","8","9","10","11","12",NULL};
-	const char	*bindvals[12]={"4","4","4","4.4","4.4","4.4",
-			"testchar4","testvarchar4","01/01/2004","04:00:00","testclob1",NULL};
+	const char	*bindvals[13]={"4","4","4","4.4","4.4","4.4",
+			"testchar4","testvarchar4","01/01/2004","04:00:00","testclob1","testblob1",NULL};
 	const char	*subvars[4]={"var1","var2","var3",NULL};
 	const char	*subvalstrings[3]={"hi","hello","bye"};
 	int64_t		subvallongs[3]={1,2,3};
@@ -198,18 +198,18 @@ int	main(int argc, char **argv) {
 		clobval[i]='C';
 	}
 	clobval[20*1024]='\0';
-	cur->inputBindBlob("1",clobval,20*1024);
+	cur->inputBindClob("1",clobval,20*1024);
 	checkSuccess(cur->executeQuery(),1);
 	cur->sendQuery("select testclob from testtable1");
 	checkSuccess(cur->getFieldLength(0,"testclob"),20*1024);
 	checkSuccess(cur->getField(0,"testclob"),clobval);
 	checkSuccess(cur->sendQuery("create procedure testproc(in in1 clob, out out1 clob) language sql begin set out1 = in1; end"),1);
 	cur->prepareQuery("call testproc(?,?)");
-	cur->inputBindBlob("1",clobval,20*1024);
-	cur->defineOutputBindBlob("2");
+	cur->inputBindClob("1",clobval,20*1024);
+	cur->defineOutputBindClob("2");
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getOutputBindLength("2"),20*1024);
-	checkSuccess(cur->getOutputBindBlob("2"),clobval);
+	checkSuccess(cur->getOutputBindClob("2"),clobval);
 	checkSuccess(cur->sendQuery("drop procedure testproc"),1);
 	printf("\n");
 
