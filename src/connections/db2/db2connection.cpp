@@ -4,7 +4,6 @@
 #include <sqlrelay/sqlrcontroller.h>
 #include <sqlrelay/sqlrconnection.h>
 #include <rudiments/environment.h>
-#include <rudiments/snooze.h>
 
 #include <datatypes.h>
 #include <config.h>
@@ -208,8 +207,10 @@ class db2connection : public sqlrconnection_svr {
 			db2connection(sqlrcontroller_svr *cont);
 	private:
 		void	handleConnectString();
+		bool	mustDetachBeforeLogIn();
 		bool	logIn(const char **error);
 		const char	*logInError(const char *errmsg);
+		void	dbVersionSpecificTasks();
 		sqlrcursor_svr	*initCursor();
 		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
@@ -257,6 +258,11 @@ class db2connection : public sqlrconnection_svr {
 		int32_t		maxoutbindlobsize;
 
 		char		dbversion[512];
+		uint16_t	dbmajorversion;
+
+		const char	*gettablelistquery;
+		const char	*gettablelistquerywild;
+		const char	*dbhostnamequery;
 
 		stringbuffer	errormsg;
 };
@@ -324,6 +330,14 @@ void db2connection::handleConnectString() {
 	}
 }
 
+bool db2connection::mustDetachBeforeLogIn() {
+	#if (DB2VERSION>7)
+	return false;
+	#else
+	return true;
+	#endif
+}
+
 bool db2connection::logIn(const char **error) {
 
 	// set the LANG environment variable
@@ -376,6 +390,9 @@ bool db2connection::logIn(const char **error) {
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
 		return false;
 	}
+
+	dbVersionSpecificTasks();
+
 	return true;
 }
 
@@ -394,6 +411,91 @@ const char *db2connection::logInError(const char *errmsg) {
 					errorbuffer,1024,&errlength);
 	errormessage.append(errorbuffer,errlength);
 	return errormessage.getString();
+}
+
+void db2connection::dbVersionSpecificTasks() {
+
+	// get the db version
+	SQLSMALLINT	dbversionlen;
+	SQLGetInfo(dbc,SQL_DBMS_VER,
+			(SQLPOINTER)dbversion,
+			(SQLSMALLINT)sizeof(dbversion),
+			&dbversionlen);
+	dbmajorversion=charstring::toInteger(dbversion);
+
+	// set queries to use based on version
+	if (dbmajorversion>7) {
+
+		gettablelistquery=
+			"select distinct "
+			"	tabname "
+			"from "
+			"	syscat.tables "
+			"where "
+			"	ownertype='U' "
+			"	and "
+			"	tabschema!='SYSTOOLS' "
+			"	and "
+			"	type in ('T','U','V','W') "
+			"	and "
+			"	tabname like '%s' "
+			"order by "
+			"	tabname";
+
+		gettablelistquerywild=
+			"select distinct "
+			"	tabname "
+			"from "
+			"	syscat.tables "
+			"where "
+			"	ownertype='U' "
+			"	and "
+			"	tabschema!='SYSTOOLS' "
+			"	and "
+			"	type in ('T','U','V','W') "
+			"order by "
+			"	tabname";
+
+		dbhostnamequery=
+			"select "
+			"	host_name "
+			"from "
+			"	table(sysproc.env_get_sys_info())";
+	} else {
+
+		gettablelistquery=
+			"select distinct "
+			"	tabname "
+			"from "
+			"	syscat.tables "
+			"where "
+			"	tabschema!='SYSTOOLS' "
+			"	and "
+			"	type in ('T','U','V','W') "
+			"	and "
+			"	tabname like '%s' "
+			"order by "
+			"	tabname";
+
+		gettablelistquerywild=
+			"select distinct "
+			"	tabname "
+			"from "
+			"	syscat.tables "
+			"where "
+			"	tabschema!='SYSTOOLS' "
+			"	and "
+			"	type in ('T','U','V','W') "
+			"order by "
+			"	tabname";
+
+		// there is no obvious way to get this prior to 8.0
+		dbhostnamequery=
+			"select "
+			"	NULL "
+			"from "
+			"	sysibm.sysdummy1";
+	}
 }
 
 sqlrcursor_svr *db2connection::initCursor() {
@@ -504,19 +606,11 @@ const char *db2connection::identify() {
 }
 
 const char *db2connection::dbVersion() {
-	SQLSMALLINT	dbversionlen;
-	SQLGetInfo(dbc,SQL_DBMS_VER,
-			(SQLPOINTER)dbversion,
-			(SQLSMALLINT)sizeof(dbversion),
-			&dbversionlen);
 	return dbversion;
 }
 
 const char *db2connection::dbHostNameQuery() {
-	return "select "
-		"	host_name "
-		"from "
-		"	table(sysproc.env_get_sys_info())";
+	return dbhostnamequery;
 }
 
 const char *db2connection::getDatabaseListQuery(bool wild) {
@@ -535,34 +629,7 @@ const char *db2connection::getDatabaseListQuery(bool wild) {
 }
 
 const char *db2connection::getTableListQuery(bool wild) {
-	return (wild)?
-		"select "
-		"	tabname "
-		"from "
-		"	syscat.tables "
-		"where "
-		"	ownertype='U' "
-		"	and "
-		"	tabschema!='SYSTOOLS' "
-		"	and "
-		"	type in ('T','U','V','W') "
-		"	and "
-		"	tabname like '%s' "
-		"order by "
-		"	tabname":
-
-		"select "
-		"	tabname "
-		"from "
-		"	syscat.tables "
-		"where "
-		"	ownertype='U' "
-		"	and "
-		"	tabschema!='SYSTOOLS' "
-		"	and "
-		"	type in ('T','U','V','W') "
-		"order by "
-		"	tabname";
+	return (wild)?gettablelistquery:gettablelistquerywild;
 }
 
 const char *db2connection::getColumnListQuery(const char *table, bool wild) {

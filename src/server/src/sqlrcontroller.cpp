@@ -295,13 +295,16 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	}
 
 	// log in and detach
+	if (conn->mustDetachBeforeLogIn() && !cmdl->found("-nodetach")) {
+		process::detach();
+	}
 	bool	reloginatstart=cfgfl->getReLoginAtStart();
 	if (!reloginatstart) {
 		if (!attemptLogIn(!silent)) {
 			return false;
 		}
 	}
-	if (!cmdl->found("-nodetach")) {
+	if (!conn->mustDetachBeforeLogIn() && !cmdl->found("-nodetach")) {
 		process::detach();
 	}
 	if (reloginatstart) {

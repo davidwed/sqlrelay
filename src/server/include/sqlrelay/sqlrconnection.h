@@ -16,6 +16,8 @@ class SQLRSERVER_DLLSPEC sqlrconnection_svr {
 			sqlrconnection_svr(sqlrcontroller_svr *cont);
 		virtual	~sqlrconnection_svr();
 
+		virtual bool	mustDetachBeforeLogIn();
+
 		virtual bool	supportsAuthOnDatabase();
 		virtual	void	handleConnectString()=0;
 

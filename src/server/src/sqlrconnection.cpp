@@ -29,6 +29,10 @@ sqlrconnection_svr::~sqlrconnection_svr() {
 	delete[] dbipaddress;
 }
 
+bool sqlrconnection_svr::mustDetachBeforeLogIn() {
+	return false;
+}
+
 bool sqlrconnection_svr::supportsAuthOnDatabase() {
 	return true;
 }
