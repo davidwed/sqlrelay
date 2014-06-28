@@ -67,8 +67,8 @@ void checkSuccess(double value, double success) {
 int	main(int argc, char **argv) {
 
 	const char	*bindvars[13]={"1","2","3","4","5","6","7","8","9","10","11","12",NULL};
-	const char	*bindvals[13]={"4","4","4","4.4","4.4","4.4",
-			"testchar4","testvarchar4","01/01/2004","04:00:00","testclob1","testblob1",NULL};
+	const char	*bindvals[12]={"4","4","4","4.4","4.4","4.4",
+			"testchar4","testvarchar4","01/01/2004","04:00:00","testclob1",NULL};
 	const char	*subvars[4]={"var1","var2","var3",NULL};
 	const char	*subvalstrings[3]={"hi","hello","bye"};
 	int64_t		subvallongs[3]={1,2,3};

@@ -91,6 +91,13 @@ class db2cursor : public sqlrcursor_svr {
 						const char *value,
 						uint32_t valuesize,
 						int16_t *isnull);
+		#if (DB2VERSION<=7)
+		bool		inputBindClob(const char *variable,
+						uint16_t variablesize,
+						const char *value,
+						uint32_t valuesize,
+						int16_t *isnull);
+		#endif
 		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
 						char *value, 
@@ -956,6 +963,34 @@ bool db2cursor::inputBindBlob(const char *variable,
 	return true;
 }
 
+#if (DB2VERSION<=7)
+// The default implementeation of inputBindClob() just calls inputBind().
+// That works fine for versions > 7 but does not work with 7 or less.
+// Conversely, SQL_CLOB doesn't work with some versions > 7 so we can't use
+// this code with versions > 7.
+bool db2cursor::inputBindClob(const char *variable,
+					uint16_t variablesize,
+					const char *value,
+					uint32_t valuesize,
+					int16_t *isnull) {
+
+	erg=SQLBindParameter(stmt,
+				charstring::toInteger(variable+1),
+				SQL_PARAM_INPUT,
+				SQL_C_CHAR,
+				SQL_CLOB,
+				0,
+				0,
+				(SQLPOINTER)value,
+				valuesize,
+				(SQLINTEGER *)NULL);
+	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		return false;
+	}
+	return true;
+}
+#endif
+
 bool db2cursor::outputBind(const char *variable, 
 					uint16_t variablesize,
 					char *value, 
@@ -1104,14 +1139,19 @@ bool db2cursor::outputBindClob(const char *variable,
 
 	// FIXME: Ideally we'd bind a lob locator like we are for columns,
 	// but I can't seem to get that working.
-	// Also, I'm using SQL_CHAR instead of SQL_CLOB because it appears
-	// that some versions of DB2 don't have SQL_CLOB, but all have SQL_CHAR,
-	// and SQL_CHAR works.
+	//
+	// SQL_CHAR is used instead of SQL_CLOB for versions > 7.
+	// Some versions of DB2 don't have SQL_CLOB, but all have SQL_CHAR.
+	// SQL_CHAR works on versions > 7 but does not work on versions <= 7
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_OUTPUT,
 				SQL_C_CHAR,
+				#if (DB2VERSION>7)
 				SQL_CHAR,
+				#else
+				SQL_CLOB,
+				#endif
 				0,
 				0,
 				outlobbind[index],

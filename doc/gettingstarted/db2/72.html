@@ -242,7 +242,7 @@ log in as db2as<br>
 run the following commands:<br>
 <blockquote><b>
 . /home/db2inst1/sqllib/db2profile<br>
-db2 "update database manager configuration using svcename db2inst1"<br>
+db2 "update database manager configuration using svcename db2cdb2inst1"<br>
 db2stop<br>
 db2start<br>
 </b></blockquote>
@@ -250,6 +250,10 @@ db2start<br>
 
 <p>Now the <i>db2inst1</i> instance should be accessible to remote clients on 
 port 50000.</p>
+
+<span class="heading2">Creating a Sample Database</span><br>
+
+<p>To create a sample database, run the command <i>/usr/IDMdb2/V7.1/bin/db2sampl</i>.</p>
 
 <span class="heading2">Starting the Database at Boot Time</span><br>
 
