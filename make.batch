@@ -161,6 +161,7 @@ mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp\ipc
 mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp\pids
 mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp\sockets
 mkdir C:\Perl64\site\lib\SQLRelay
+mkdir C:\Perl64\site\lib\DBD
 mkdir C:\Python27\Lib\site-packages\SQLRelay
 mkdir C:\"Program Files"\Firstworks\java
 mkdir C:\"Program Files"\Firstworks\java\com
@@ -181,6 +182,7 @@ mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\ipc
 mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\pids
 mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\sockets
 mkdir C:\Perl\site\lib\SQLRelay
+mkdir C:\Perl\site\lib\DBD
 mkdir C:\Python27\Lib\site-packages\SQLRelay
 mkdir C:\"Program Files (x86)"\Firstworks\java
 mkdir C:\"Program Files (x86)"\Firstworks\java\com
@@ -215,6 +217,7 @@ copy /Y src\api\perl\msvc\Release\Connection.dll C:\Perl\site\lib
 copy /Y src\api\perl\msvc\ReleaseCLR\Connection.dll C:\Perl\site\lib
 copy /Y src\api\perl\msvc\Release\Cursor.dll C:\Perl\site\lib
 copy /Y src\api\perl\msvc\ReleaseCLR\Cursor.dll C:\Perl\site\lib
+copy /Y src\api\perl\SQLRelay.pm C:\Perl\site\lib\DBD
 copy /Y src\api\perl\msvc\SQLRelay.Connection.3 C:\Perl\man\man3
 copy /Y src\api\perl\msvc\SQLRelay.Cursor.3 C:\Perl\man\man3
 
@@ -286,6 +289,7 @@ copy /Y src\api\perl\msvc\x64\Release\Connection.dll C:\Perl64\site\lib
 copy /Y src\api\perl\msvc\x64\ReleaseCLR\Connection.dll C:\Perl64\site\lib
 copy /Y src\api\perl\msvc\x64\Release\Cursor.dll C:\Perl64\site\lib
 copy /Y src\api\perl\msvc\x64\ReleaseCLR\Cursor.dll C:\Perl64\site\lib
+copy /Y src\api\perl\SQLRelay.pm C:\Perl64\site\lib\DBD
 copy /Y src\api\perl\msvc\SQLRelay.Connection.3 C:\Perl64\man\man3
 copy /Y src\api\perl\msvc\SQLRelay.Cursor.3 C:\Perl64\man\man3
 
@@ -353,6 +357,7 @@ del "C:\Program Files\Firstworks\etc\sqlrelay.xsd
 del "C:\Perl64\site\lib\Connection.dll"
 del "C:\Perl64\site\lib\Cursor.dll"
 del "C:\Perl64\site\lib\SQLRelay\*.pm"
+del "C:\Perl64\site\lib\DBD\SQLRelay.pm"
 del "C:\Perl64\man\man3\SQLRelay*"
 rmdir /s /q "C:\Perl64\site\lib\SQLRelay"
 rmdir /s /q "C:\Python27\Lib\site-packages\SQLRelay"
@@ -371,6 +376,7 @@ del "C:\Program Files (x86)\Firstworks\etc\sqlrelay.xsd
 del "C:\Perl\site\lib\Connection.dll"
 del "C:\Perl\site\lib\Cursor.dll"
 del "C:\Perl\site\lib\SQLRelay\*.pm"
+del "C:\Perl\site\lib\DBD\SQLRelay.pm"
 del "C:\Perl\man\man3\SQLRelay*"
 rmdir /s /q "C:\Perl\site\lib\SQLRelay"
 rmdir /s /q "C:\Python27\Lib\site-packages\SQLRelay"
