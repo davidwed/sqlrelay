@@ -49,7 +49,7 @@ sub checkSuccessString {
 
 
 # instantiation
-$con=SQLRelay::Connection->new("fedora",9000,"/tmp/test.socket",
+$con=SQLRelay::Connection->new("localhost",9000,"/tmp/test.socket",
 							"test","test",0,1);
 $cur=SQLRelay::Cursor->new($con);
 
