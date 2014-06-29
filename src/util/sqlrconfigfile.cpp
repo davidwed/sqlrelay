@@ -11,9 +11,8 @@
 #include <defaults.h>
 
 sqlrconfigfile::sqlrconfigfile() : xmlsax() {
-	addresses=new char *[1];
-	addresses[0]=charstring::duplicate("0.0.0.0");
-	addresscount=1;
+	addresses=NULL;
+	addresscount=0;
 	port=0;
 	unixport=charstring::duplicate("");
 	listenoninet=false;
@@ -737,23 +736,41 @@ bool sqlrconfigfile::tagStart(const char *name) {
 
 bool sqlrconfigfile::tagEnd(const char *name) {
 
-	if (!charstring::compare(name,"instance")) {
-
-		// if neither port nor socket were specified,
-		// use the default port
-		if (!port && !unixport[0]) {
-			port=charstring::toInteger(DEFAULT_PORT);
-			addresscount=1;
-		}
-
-		listenoninet=(port)?true:false;
-		listenonunix=(unixport[0])?true:false;
-	}
-
 	// don't do anything if we're already done
 	// or have not found the correct id
 	if (done || !correctid) {
 		return true;
+	}
+
+	if (!charstring::compare(name,"instance")) {
+
+		// handle various address, port, socket combos...
+
+		// if nothing was specified, use the
+		// default address and port but no socket
+		if (!addresses && !port && !unixport[0]) {
+			addresses=new char *[1];
+			addresses[0]=charstring::duplicate(DEFAULT_ADDRESS);
+			addresscount=1;
+			port=charstring::toInteger(DEFAULT_PORT);
+		} else
+
+		// if a port was specified but no address,
+		// use the default address
+		if (port && !addresses) {
+			addresses=new char *[1];
+			addresses[0]=charstring::duplicate(DEFAULT_ADDRESS);
+			addresscount=1;
+		} else
+
+		// if an address was specified by no port
+		// use the default port
+		if (!port && addresses) {
+			port=charstring::toInteger(DEFAULT_PORT);
+		}
+
+		listenoninet=(port)?true:false;
+		listenonunix=(unixport[0])?true:false;
 	}
 
 	// Close up the current tag
@@ -912,10 +929,10 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		} else if (!charstring::compare(name,"addresses")) {
 			currentattribute=ADDRESSES_ATTRIBUTE;
 		} else if (!charstring::compare(name,"port")) {
-				currentattribute=PORT_ATTRIBUTE;
+			currentattribute=PORT_ATTRIBUTE;
 		} else if (!charstring::compare(name,"socket") ||
 				!charstring::compare(name,"unixport")) {
-				currentattribute=SOCKET_ATTRIBUTE;
+			currentattribute=SOCKET_ATTRIBUTE;
 		} else if (!charstring::compare(name,"dbase")) {
 			currentattribute=DBASE_ATTRIBUTE;
 		} else if (!charstring::compare(name,"connections")) {
@@ -1033,11 +1050,11 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=METRIC_ATTRIBUTE;
 		} else if (!charstring::compare(name,"behindloadbalancer")) {
 			currentattribute=BEHINDLOADBALANCER_ATTRIBUTE;
-		} else if (!charstring::compare(name,"port")) {
+		/*} else if (!charstring::compare(name,"port")) {
 			currentattribute=PORT_ATTRIBUTE;
 		} else if (!charstring::compare(name,"socket") ||
-			!charstring::compare(name,"unixport")) {
-			currentattribute=SOCKET_ATTRIBUTE;
+				!charstring::compare(name,"unixport")) {
+			currentattribute=SOCKET_ATTRIBUTE;*/
 		} else if (!charstring::compare(name,"passwordencryption")) {
 			currentattribute=PASSWORDENCRYPTION_ATTRIBUTE;
 		}
@@ -1239,13 +1256,10 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			delete[] addresses;
 			// if the attribute was left blank, assume 0.0.0.0
 			if (!charstring::length(value)) {
-				value="0.0.0.0";
+				value=DEFAULT_ADDRESS;
 			}
-			charstring::split(
-				(value &&
-				!charstring::contains(value,DEFAULT_ADDRESSES))?
-				value:DEFAULT_ADDRESSES,
-				",",true,&addresses,&addresscount);
+			charstring::split(value,",",true,
+						&addresses,&addresscount);
 			for (index=0; index<addresscount; index++) {
 				charstring::bothTrim(addresses[index]);
 			}

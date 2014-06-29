@@ -3,14 +3,11 @@
 #define DEFAULT_ID "defaultid"
 	// default id for listeners/connections
 
-#define DEFAULT_ADDRESSES "0.0.0.0"
+#define DEFAULT_ADDRESS "0.0.0.0"
 	// default addresses for listeners/connections
 
 #define DEFAULT_PORT "9000"
 	// default port to listen on
-
-#define DEFAULT_SOCKET "/tmp/sqlrelay.socket"
-	// default unix socket to listen on
 
 #define DEFAULT_DBASE "oracle8"
 	// default database type
