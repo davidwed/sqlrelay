@@ -3716,8 +3716,8 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 	// open the file
 	cachesource=new file();
 	cachesourceind=new file();
-	if ((cachesource->open(filename,O_RDWR|O_EXCL)) &&
-		(cachesourceind->open(indexfilename,O_RDWR|O_EXCL))) {
+	if ((cachesource->open(filename,O_RDWR)) &&
+		(cachesourceind->open(indexfilename,O_RDWR))) {
 
 		delete[] indexfilename;
 
