@@ -124,11 +124,11 @@ static PyObject *suspendSession(PyObject *self, PyObject *args) {
 
 static PyObject *getConnectionPort(PyObject *self, PyObject *args) {
   long sqlrcon;
-  bool rc;
+  short rc;
   if (!PyArg_ParseTuple(args, "l", &sqlrcon))
     return NULL;
   rc=((sqlrconnection *)sqlrcon)->getConnectionPort();
-  return Py_BuildValue("h", (short)rc);
+  return Py_BuildValue("h", rc);
 }
 
 static PyObject *getConnectionSocket(PyObject *self, PyObject *args) {
