@@ -9,6 +9,7 @@
 
 <ul>
 <li><a href="#intro">Introduction</a></li>
+<li><a href="#config">Configuring PHP</a></li>
 <li><a href="#session">Establishing a Session</a></li>
 <li><a href="#query">Executing Queries</a></li>
 <li><a href="#transactions">Transactions</a></li>
@@ -34,6 +35,30 @@
 reference</a> can be found on the PHP site but a short discussion of it
 follows here as well.</p>
 
+<a name="config"></a>
+<span class="heading2">Configuring PHP</span><br><br>
+
+<p>PHP modules can be loaded dynamically at runtime using the dl() function but it is far more efficient to configure PHP to pre-load modules using the php.ini file.  The location of the php.ini file may vary, but it is usually /etc/php.in on Linux and Unix systems and C:\Windows\php.ini on Windows.</p>
+
+<p>To pre-load the php module on Linux or Unix, you usually just need to add a line to the file like:</p>
+
+<blockquote>
+<pre>
+extension=pdo_sqlrelay.so
+</pre>
+</blockquote>
+
+<p>To pre-load the php module on Windows, you usually need to add lines like:</p>
+
+<blockquote>
+<pre>
+extension_dir=C:\PHP\ext
+extensionr=php_pdo_sqlrelay.dll
+</pre>
+</blockquote>
+
+<p>The <i>extension_dir</i> value might need to be changed, depending on where PHP is installed on your system.</p>
+
 <a name="session"></a>
 <span class="heading2">Establishing a Session</span><br><br>
 
@@ -42,8 +67,6 @@ use.</p>
 
 <blockquote>
 <pre>
-dl("pdo_sqlrelay.so");
-
 $dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
@@ -89,8 +112,6 @@ best used with DML or DDL queries.</p>
 
 <blockquote>
 <pre>
-dl("pdo_sqlrelay.so");
-
 $dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
@@ -108,8 +129,6 @@ return result sets.</p>
 
 <blockquote>
 <pre>
-dl("pdo_sqlrelay.so");
-
 $dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
@@ -137,8 +156,6 @@ ODBC.</p>
 
 <blockquote>
 <pre>
-dl("pdo_sqlrelay.so");
-
 $dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
@@ -224,8 +241,6 @@ objects.</p>
 
 <blockquote>
 <pre>
-dl("pdo_sqlrelay.so");
-
 $dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
@@ -258,8 +273,6 @@ the bindValue() method.</p>
 
 <blockquote>
 <pre>
-dl("pdo_sqlrelay.so");
-
 $dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
@@ -287,8 +300,6 @@ flag with the variable type.</p>
 
 <blockquote>
 <pre>
-dl("pdo_sqlrelay.so");
-
 $dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
@@ -309,8 +320,6 @@ streams, so you have to use stream functions to access them.</p>
 
 <blockquote>
 <pre>
-dl("pdo_sqlrelay.so");
-
 $dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
@@ -352,8 +361,6 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 
 <blockquote>
 <pre>
-dl("pdo_sqlrelay.so");
-
 $dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
@@ -390,8 +397,6 @@ arrays (the default).</p>
 
 <blockquote>
 <pre>
-dl("pdo_sqlrelay.so");
-
 $dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
@@ -409,8 +414,6 @@ values into preallocated variables.</p>
 
 <blockquote>
 <pre>
-dl("pdo_sqlrelay.so");
-
 $dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
@@ -442,8 +445,6 @@ an entire result set in one step.</p>
 
 <blockquote>
 <pre>
-dl("pdo_sqlrelay.so");
-
 $dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
@@ -466,8 +467,6 @@ set too.</p>
 
 <blockquote>
 <pre>
-dl("pdo_sqlrelay.so");
-
 $dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
@@ -530,8 +529,6 @@ iterate through its result set, inserting rows into another table, using only
 
 <blockquote>
 <pre>
-dl("pdo_sqlrelay.so");
-
 $dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
@@ -562,8 +559,6 @@ type, length and various flags are available from getColumnMeta().</p>
 
 <blockquote>
 <pre>
-dl("pdo_sqlrelay.so");
-
 $dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
