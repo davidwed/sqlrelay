@@ -2,9 +2,7 @@
 # Copyright (c) 2001  David Muse
 # See the file COPYING for more information.
 
-if (!strncasecmp(PHP_OS,"WIN",3)) {
-	dl("sql_relay.dll");
-} else {
+if (strncasecmp(PHP_OS,"WIN",3)) {
 	dl("sql_relay.so");
 }
 

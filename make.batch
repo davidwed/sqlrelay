@@ -221,7 +221,7 @@ copy /Y src\api\python\PySQLRDB.py C:\Python27\Lib\site-packages\SQLRelay
 copy /Y src\api\python\msvc\%platform%Release\CSQLRelay.dll C:\Python27\Lib\site-packages\SQLRelay\CSQLRelay.pyd
 copy /Y src\api\python\msvc\%platform%ReleaseCLR\CSQLRelay.dll C:\Python27\Lib\site-packages\SQLRelay\CSQLRelay.pyd
 
-copy /Y src\api\php\msvc\%platform%Release\sql_relay.dll C:\PHP\sql_relay.dll
+copy /Y src\api\php\msvc\%platform%Release\sql_relay.dll C:\PHP\ext\php_sql_relay.dll
 
 copy /Y src\api\java\msvc\sqlrelay.jar "C:\%dir%\Firstworks\java"
 copy /Y src\api\java\msvc\%platform%Release\SQLRConnection.dll "C:\%dir%\Firstworks\java\com\firstworks\sqlrelay"
@@ -290,7 +290,7 @@ del "C:\Perl64\site\lib\DBD\SQLRelay.pm"
 del "C:\Perl64\man\man3\SQLRelay*"
 rmdir /s /q "C:\Perl64\site\lib\SQLRelay"
 rmdir /s /q "C:\Python27\Lib\site-packages\SQLRelay"
-del "C:\PHP\sql_relay.dll"
+del "C:\PHP\ext\php_sql_relay.dll"
 del "C:\%dir%\Firstworks\java\sqlrelay.jar"
 rmdir /s /q "C:\%dir%\Firstworks\java\com\firstworks\sqlrelay"
 
