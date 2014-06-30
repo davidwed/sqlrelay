@@ -13,6 +13,19 @@
 #include <rudiments/charstring.h>
 #include <rudiments/character.h>
 
+#ifdef WIN32
+	#undef uid_t
+	#undef gid_t
+	#undef ssize_t
+	#undef socklen_t
+	#undef pid_t
+	#undef mode_t
+	#define PHP_WIN32
+	#define ZEND_WIN32
+	#define ZEND_DEBUG 0
+	#define ZTS 1
+#endif
+
 extern "C" {
 
 #include <php.h>
@@ -24,9 +37,9 @@ extern "C" {
 #include <zend_exceptions.h>
 
 #define sqlrelayError(s) \
-	_sqlrelayError(s,NULL,__FILE__,__LINE__ TSRMLS_DC)
+	_sqlrelayError(s,NULL,__FILE__,__LINE__ TSRMLS_CC)
 #define sqlrelayErrorStmt(s) \
-	_sqlrelayError(s->dbh,s,__FILE__,__LINE__ TSRMLS_DC)
+	_sqlrelayError(s->dbh,s,__FILE__,__LINE__ TSRMLS_CC)
 
 struct sqlrstatement {
 	sqlrcursor			*sqlrcur;
@@ -81,7 +94,9 @@ int _sqlrelayError(pdo_dbh_t *dbh,
 	charstring::copy(*pdoerr,"HY000",5);
 
 	if (!dbh->methods) {
-		zend_throw_exception_ex(php_pdo_get_exception(),errornumber,
+		TSRMLS_FETCH();
+		zend_throw_exception_ex(php_pdo_get_exception(),
+					errornumber TSRMLS_CC,
 					"SQLSTATE[%s] [%d] %s",
 					*pdoerr,errornumber,errormessage);
 	}
@@ -374,6 +389,7 @@ static int sqlrcursorInputBindPreExec(sqlrcursor *sqlrcur,
 						Z_STRVAL_P(param->parameter),
 						Z_STRLEN_P(param->parameter));
 			} else if (Z_TYPE_P(param->parameter)==IS_RESOURCE) {
+				TSRMLS_FETCH();
 				php_stream	*strm=NULL;
 				php_stream_from_zval_no_verify(
 						strm,&param->parameter);
@@ -459,6 +475,7 @@ static int sqlrcursorBindPostExec(sqlrcursor *sqlrcur,
 			return 1;
 		case PDO_PARAM_LOB:
 			{
+			TSRMLS_FETCH();
 			php_stream	*strm=php_stream_memory_create(
 							TEMP_STREAM_DEFAULT);
 			php_stream_write(strm,
@@ -736,7 +753,8 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 
 	sqlrstmt->fwdonly=pdo_attr_lval(driveroptions,
 					PDO_ATTR_CURSOR,
-					PDO_CURSOR_SCROLL)==PDO_CURSOR_FWDONLY;
+					PDO_CURSOR_SCROLL TSRMLS_CC)==
+					PDO_CURSOR_FWDONLY;
 	
 	sqlrstmt->sqlrcur->prepareQuery(sql,sqllen);
 	return 1;
@@ -870,7 +888,8 @@ static char *sqlrconnectionLastInsertId(pdo_dbh_t *dbh,
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	char	*id=php_pdo_int64_to_str(
 				((sqlrconnection *)sqlrdbh->sqlrcon)->
-							getLastInsertId());
+							getLastInsertId()
+				TSRMLS_CC);
 	*len=charstring::length(id);
 	return id;
 }
