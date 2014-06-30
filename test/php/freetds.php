@@ -2,7 +2,11 @@
 # Copyright (c) 2001  David Muse
 # See the file COPYING for more information.
 
-dl("sql_relay.so");
+if (!strncasecmp(PHP_OS,"WIN",3)) {
+	dl("sql_relay.dll");
+} else {
+	dl("sql_relay.so");
+}
 
 	function checkSuccess($value,$success) {
 
@@ -719,11 +723,11 @@ dl("sql_relay.so");
 	echo("\n");
 
 	echo("CACHED RESULT SET: \n");
-	sqlrcur_cacheToFile($cur,"/tmp/cachefile1");
+	sqlrcur_cacheToFile($cur,"cachefile1");
 	sqlrcur_setCacheTtl($cur,200);
 	checkSuccess(sqlrcur_sendQuery($cur,"select * from testtable order by testint"),1);
 	$filename=sqlrcur_getCacheFileName($cur);
-	checkSuccess($filename,"/tmp/cachefile1");
+	checkSuccess($filename,"cachefile1");
 	sqlrcur_cacheOff($cur);
 	checkSuccess(sqlrcur_openCachedResultSet($cur,$filename),1);
 	checkSuccess(sqlrcur_getField($cur,7,0),"8");
@@ -767,11 +771,11 @@ dl("sql_relay.so");
 
 	echo("CACHED RESULT SET WITH RESULT SET BUFFER SIZE: \n");
 	sqlrcur_setResultSetBufferSize($cur,2);
-	sqlrcur_cacheToFile($cur,"/tmp/cachefile1");
+	sqlrcur_cacheToFile($cur,"cachefile1");
 	sqlrcur_setCacheTtl($cur,200);
 	checkSuccess(sqlrcur_sendQuery($cur,"select * from testtable order by testint"),1);
 	$filename=sqlrcur_getCacheFileName($cur);
-	checkSuccess($filename,"/tmp/cachefile1");
+	checkSuccess($filename,"cachefile1");
 	sqlrcur_cacheOff($cur);
 	checkSuccess(sqlrcur_openCachedResultSet($cur,$filename),1);
 	checkSuccess(sqlrcur_getField($cur,7,0),"8");
@@ -780,20 +784,20 @@ dl("sql_relay.so");
 	echo("\n");
 
 	echo("FROM ONE CACHE FILE TO ANOTHER: \n");
-	sqlrcur_cacheToFile($cur,"/tmp/cachefile2");
-	checkSuccess(sqlrcur_openCachedResultSet($cur,"/tmp/cachefile1"),1);
+	sqlrcur_cacheToFile($cur,"cachefile2");
+	checkSuccess(sqlrcur_openCachedResultSet($cur,"cachefile1"),1);
 	sqlrcur_cacheOff($cur);
-	checkSuccess(sqlrcur_openCachedResultSet($cur,"/tmp/cachefile2"),1);
+	checkSuccess(sqlrcur_openCachedResultSet($cur,"cachefile2"),1);
 	checkSuccess(sqlrcur_getField($cur,7,0),"8");
 	checkSuccess(sqlrcur_getField($cur,8,0),NULL);
 	echo("\n");
 
 	echo("FROM ONE CACHE FILE TO ANOTHER WITH RESULT SET BUFFER SIZE: \n");
 	sqlrcur_setResultSetBufferSize($cur,2);
-	sqlrcur_cacheToFile($cur,"/tmp/cachefile2");
-	checkSuccess(sqlrcur_openCachedResultSet($cur,"/tmp/cachefile1"),1);
+	sqlrcur_cacheToFile($cur,"cachefile2");
+	checkSuccess(sqlrcur_openCachedResultSet($cur,"cachefile1"),1);
 	sqlrcur_cacheOff($cur);
-	checkSuccess(sqlrcur_openCachedResultSet($cur,"/tmp/cachefile2"),1);
+	checkSuccess(sqlrcur_openCachedResultSet($cur,"cachefile2"),1);
 	checkSuccess(sqlrcur_getField($cur,7,0),"8");
 	checkSuccess(sqlrcur_getField($cur,8,0),NULL);
 	sqlrcur_setResultSetBufferSize($cur,0);
@@ -801,12 +805,12 @@ dl("sql_relay.so");
 
 	echo("CACHED RESULT SET WITH SUSPEND AND RESULT SET BUFFER SIZE: \n");
 	sqlrcur_setResultSetBufferSize($cur,2);
-	sqlrcur_cacheToFile($cur,"/tmp/cachefile1");
+	sqlrcur_cacheToFile($cur,"cachefile1");
 	sqlrcur_setCacheTtl($cur,200);
 	checkSuccess(sqlrcur_sendQuery($cur,"select * from testtable order by testint"),1);
 	checkSuccess(sqlrcur_getField($cur,2,0),"3");
 	$filename=sqlrcur_getCacheFileName($cur);
-	checkSuccess($filename,"/tmp/cachefile1");
+	checkSuccess($filename,"cachefile1");
 	$id=sqlrcur_getResultSetId($cur);
 	sqlrcur_suspendResultSet($cur);
 	checkSuccess(sqlrcon_suspendSession($con),1);
