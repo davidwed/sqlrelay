@@ -3,20 +3,37 @@
 
 #include <sqlrelay/sqlrclient.h>
 
+#ifdef WIN32
+	#undef uid_t
+	#undef gid_t
+	#undef ssize_t
+	#undef socklen_t
+	#undef pid_t
+	#undef mode_t
+	#define PHP_WIN32
+	#define ZEND_WIN32
+	#define ZEND_DEBUG 0
+	#define ZTS 1
+#endif
+
 extern "C" {
-	#ifdef __cplusplus
-		#undef __cplusplus
-		#define cpluspluswasdefined
-	#endif
-	#ifndef HAVE_SOCKLEN_T
-		#define HAVE_SOCKLEN_T
-	#endif
-	#ifndef _WCHAR_T_DEFINED_
-		#define _WCHAR_T_DEFINED_
+	#ifndef WIN32
+		#ifdef __cplusplus
+			#undef __cplusplus
+			#define cpluspluswasdefined
+		#endif
+		#ifndef HAVE_SOCKLEN_T
+			#define HAVE_SOCKLEN_T
+		#endif
+		#ifndef _WCHAR_T_DEFINED_
+			#define _WCHAR_T_DEFINED_
+		#endif
 	#endif
 	#include <php.h>
-	#ifdef cpluspluswasdefined
-		#define __cplusplus
+	#ifndef WIN32
+		#ifdef cpluspluswasdefined
+			#define __cplusplus
+		#endif
 	#endif
 }
 
@@ -2442,6 +2459,6 @@ zend_module_entry sql_relay_module_entry = {
 	STANDARD_MODULE_PROPERTIES
 };
 
-DLEXPORT ZEND_GET_MODULE(sql_relay)
+ZEND_GET_MODULE(sql_relay)
 
 }
