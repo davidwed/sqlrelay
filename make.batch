@@ -152,7 +152,7 @@ goto end
 
 :install
 set first=true
-set dir="Program Files (x86)"
+set dir=Program Files (x86)
 set platform=
 goto installone
 :installreturn
@@ -266,11 +266,11 @@ goto end
 
 :uninstall
 set first=true
-set dir="Program Files"
+set dir=Program Files
 goto uninstallone
 :uninstallreturn
 set first=false
-set dir="Program Files (x86)"
+set dir=Program Files (x86)
 goto uninstallone
 
 :uninstallone
