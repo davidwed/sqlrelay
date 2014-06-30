@@ -84,6 +84,8 @@ msbuild.exe /property:Configuration=%release% /property:Platform=%platform% Conn
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% Cursor.vcxproj
 cd ..\..\python\msvc
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% CSQLRelay.vcxproj
+cd ..\..\php\msvc
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sql_relay.vcxproj
 cd ..\..\java\msvc
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% SQLRConnection.vcxproj
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% SQLRCursor.vcxproj
@@ -125,6 +127,8 @@ del *.cpp
 del *.3
 cd ..\..\python\msvc
 msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% CSQLRelay.vcxproj
+cd ..\..\php\msvc
+msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% sql_relay.vcxproj
 cd ..\..\java\msvc
 msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% SQLRConnection.vcxproj
 msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% SQLRCursor.vcxproj
@@ -147,76 +151,66 @@ goto end
 
 
 :install
-mkdir C:\"Program Files"\Firstworks
-mkdir C:\"Program Files"\Firstworks\lib
-mkdir C:\"Program Files"\Firstworks\libexec\sqlrelay
-mkdir C:\"Program Files"\Firstworks\include\sqlrelay\private
-mkdir C:\"Program Files"\Firstworks\bin
-mkdir C:\"Program Files"\Firstworks\etc
-mkdir C:\"Program Files"\Firstworks\var\sqlrelay\cache
-mkdir C:\"Program Files"\Firstworks\var\sqlrelay\debug
-mkdir C:\"Program Files"\Firstworks\var\sqlrelay\log
-mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp
-mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp\ipc
-mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp\pids
-mkdir C:\"Program Files"\Firstworks\var\sqlrelay\tmp\sockets
+set first=true
+set dir="Program Files (x86)"
+set platform=
+goto installone
+:installreturn
+set first=false
+set dir=Program Files
+set platform=x64\
+goto installone
+
+
+:installone
+mkdir "C:\%dir%\Firstworks"
+mkdir "C:\%dir%\Firstworks\lib"
+mkdir "C:\%dir%\Firstworks\libexec\sqlrelay"
+mkdir "C:\%dir%\Firstworks\include\sqlrelay\private"
+mkdir "C:\%dir%\Firstworks\bin"
+mkdir "C:\%dir%\Firstworks\etc"
+mkdir "C:\%dir%\Firstworks\var\sqlrelay\cache"
+mkdir "C:\%dir%\Firstworks\var\sqlrelay\debug"
+mkdir "C:\%dir%\Firstworks\var\sqlrelay\log"
+mkdir "C:\%dir%\Firstworks\var\sqlrelay\tmp"
+mkdir "C:\%dir%\Firstworks\var\sqlrelay\tmp\ipc"
+mkdir "C:\%dir%\Firstworks\var\sqlrelay\tmp\pids"
+mkdir "C:\%dir%\Firstworks\var\sqlrelay\tmp\sockets"
 mkdir C:\Perl64\site\lib\SQLRelay
 mkdir C:\Perl64\site\lib\DBD
 mkdir C:\Python27\Lib\site-packages\SQLRelay
-mkdir C:\"Program Files"\Firstworks\java
-mkdir C:\"Program Files"\Firstworks\java\com
-mkdir C:\"Program Files"\Firstworks\java\com\firstworks
-mkdir C:\"Program Files"\Firstworks\java\com\firstworks\sqlrelay
+mkdir "C:\%dir%\Firstworks\java"
+mkdir "C:\%dir%\Firstworks\java\com"
+mkdir "C:\%dir%\Firstworks\java\com\firstworks"
+mkdir "C:\%dir%\Firstworks\java\com\firstworks\sqlrelay"
 
-mkdir C:\"Program Files (x86)"\Firstworks
-mkdir C:\"Program Files (x86)"\Firstworks\lib
-mkdir C:\"Program Files (x86)"\Firstworks\libexec\sqlrelay
-mkdir C:\"Program Files (x86)"\Firstworks\include\sqlrelay\private
-mkdir C:\"Program Files (x86)"\Firstworks\bin
-mkdir C:\"Program Files (x86)"\Firstworks\etc
-mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\cache
-mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\debug
-mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\log
-mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp
-mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\ipc
-mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\pids
-mkdir C:\"Program Files (x86)"\Firstworks\var\sqlrelay\tmp\sockets
-mkdir C:\Perl\site\lib\SQLRelay
-mkdir C:\Perl\site\lib\DBD
-mkdir C:\Python27\Lib\site-packages\SQLRelay
-mkdir C:\"Program Files (x86)"\Firstworks\java
-mkdir C:\"Program Files (x86)"\Firstworks\java\com
-mkdir C:\"Program Files (x86)"\Firstworks\java\com\firstworks
-mkdir C:\"Program Files (x86)"\Firstworks\java\com\firstworks\sqlrelay
+copy /Y etc\sqlrelay.* "C:\%dir%\Firstworks\etc"
 
-copy /Y etc\sqlrelay.* C:\"Program Files (x86)"\Firstworks\etc
-copy /Y etc\sqlrelay.* C:\"Program Files"\Firstworks\etc
+copy /Y src\api\"c++"\msvc\%platform%Release\libsqlrclient.dll "C:\%dir%\Firstworks\bin"
+copy /Y src\api\"c++"\msvc\%platform%Release\libsqlrclient.lib "C:\%dir%\Firstworks\lib"
+copy /Y src\api\"c++"\msvc\%platform%ReleaseCLR\libsqlrclient.dll "C:\%dir%\Firstworks\bin"
+copy /Y src\api\"c++"\msvc\%platform%ReleaseCLR\libsqlrclient.lib "C:\%dir%\Firstworks\lib"
+copy /Y src\api\"c++"\include\sqlrelay\*.h "C:\%dir%\Firstworks\include\sqlrelay"
+copy /Y src\api\"c++"\include\sqlrelay\private\*.h "C:\%dir%\Firstworks\include\sqlrelay\private"
 
-copy /Y src\api\"c++"\msvc\Release\libsqlrclient.dll C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\api\"c++"\msvc\Release\libsqlrclient.lib C:\"Program Files (x86)"\Firstworks\lib
-copy /Y src\api\"c++"\msvc\ReleaseCLR\libsqlrclient.dll C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\api\"c++"\msvc\ReleaseCLR\libsqlrclient.lib C:\"Program Files (x86)"\Firstworks\lib
-copy /Y src\api\"c++"\include\sqlrelay\*.h C:\"Program Files (x86)"\Firstworks\include\sqlrelay
-copy /Y src\api\"c++"\include\sqlrelay\private\*.h C:\"Program Files (x86)"\Firstworks\include\sqlrelay\private
+copy /Y src\api\c\msvc\%platform%Release\libsqlrclientwrapper.dll "C:\%dir%\Firstworks\bin"
+copy /Y src\api\c\msvc\%platform%Release\libsqlrclientwrapper.lib "C:\%dir%\Firstworks\lib"
+copy /Y src\api\c\msvc\%platform%ReleaseCLR\libsqlrclientwrapper.dll "C:\%dir%\Firstworks\bin"
+copy /Y src\api\c\msvc\%platform%ReleaseCLR\libsqlrclientwrapper.lib "C:\%dir%\Firstworks\lib"
+copy /Y src\api\c\include\sqlrelay\*.h "C:\%dir%\Firstworks\include\sqlrelay"
+copy /Y src\api\c\include\sqlrelay\private\*.h "C:\%dir%\Firstworks\include\sqlrelay\private"
 
-copy /Y src\api\c\msvc\Release\libsqlrclientwrapper.dll C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\api\c\msvc\Release\libsqlrclientwrapper.lib C:\"Program Files (x86)"\Firstworks\lib
-copy /Y src\api\c\msvc\ReleaseCLR\libsqlrclientwrapper.dll C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\api\c\msvc\ReleaseCLR\libsqlrclientwrapper.lib C:\"Program Files (x86)"\Firstworks\lib
-copy /Y src\api\c\include\sqlrelay\*.h C:\"Program Files (x86)"\Firstworks\include\sqlrelay
-copy /Y src\api\c\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
+copy /Y src\api\odbc\msvc\%platform%Release\libsqlrodbc.dll "C:\%dir%\Firstworks\bin"
+copy /Y src\api\odbc\msvc\%platform%ReleaseCLR\libsqlrodbc.dll "C:\%dir%\Firstworks\bin"
 
-copy /Y src\api\odbc\msvc\Release\libsqlrodbc.dll C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\api\odbc\msvc\ReleaseCLR\libsqlrodbc.dll C:\"Program Files (x86)"\Firstworks\bin
-
-copy /Y src\api\cs\SQLRCLient\SQLRClient.dll C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\api\cs\SQLRCLient\SQLRClient.dll "C:\%dir%\Firstworks\bin"
 
 copy /Y src\api\perl\Connection.pm C:\Perl\site\lib\SQLRelay
 copy /Y src\api\perl\Cursor.pm C:\Perl\site\lib\SQLRelay
-copy /Y src\api\perl\msvc\Release\Connection.dll C:\Perl\site\lib
-copy /Y src\api\perl\msvc\ReleaseCLR\Connection.dll C:\Perl\site\lib
-copy /Y src\api\perl\msvc\Release\Cursor.dll C:\Perl\site\lib
-copy /Y src\api\perl\msvc\ReleaseCLR\Cursor.dll C:\Perl\site\lib
+copy /Y src\api\perl\msvc\%platform%Release\Connection.dll C:\Perl\site\lib
+copy /Y src\api\perl\msvc\%platform%ReleaseCLR\Connection.dll C:\Perl\site\lib
+copy /Y src\api\perl\msvc\%platform%Release\Cursor.dll C:\Perl\site\lib
+copy /Y src\api\perl\msvc\%platform%ReleaseCLR\Cursor.dll C:\Perl\site\lib
 copy /Y src\api\perl\SQLRelay.pm C:\Perl\site\lib\DBD
 copy /Y src\api\perl\msvc\SQLRelay.Connection.3 C:\Perl\man\man3
 copy /Y src\api\perl\msvc\SQLRelay.Cursor.3 C:\Perl\man\man3
@@ -224,136 +218,71 @@ copy /Y src\api\perl\msvc\SQLRelay.Cursor.3 C:\Perl\man\man3
 copy /Y src\api\python\__init__.py C:\Python27\Lib\site-packages\SQLRelay
 copy /Y src\api\python\PySQLRClient.py C:\Python27\Lib\site-packages\SQLRelay
 copy /Y src\api\python\PySQLRDB.py C:\Python27\Lib\site-packages\SQLRelay
-copy /Y src\api\python\msvc\Release\CSQLRelay.dll C:\Python27\Lib\site-packages\SQLRelay\CSQLRelay.pyd
-copy /Y src\api\python\msvc\ReleaseCLR\CSQLRelay.dll C:\Python27\Lib\site-packages\SQLRelay\CSQLRelay.pyd
+copy /Y src\api\python\msvc\%platform%Release\CSQLRelay.dll C:\Python27\Lib\site-packages\SQLRelay\CSQLRelay.pyd
+copy /Y src\api\python\msvc\%platform%ReleaseCLR\CSQLRelay.dll C:\Python27\Lib\site-packages\SQLRelay\CSQLRelay.pyd
 
-copy /Y src\api\java\msvc\sqlrelay.jar C:\"Program Files (x86)"\Firstworks\java
-copy /Y src\api\java\msvc\Release\SQLRConnection.dll C:\"Program Files (x86)"\Firstworks\java\com\firstworks\sqlrelay
-copy /Y src\api\java\msvc\ReleaseCLR\SQLRConnection.dll C:\"Program Files (x86)"\Firstworks\java\com\firstworks\sqlrelay
-copy /Y src\api\java\msvc\Release\SQLRCursor.dll C:\"Program Files (x86)"\Firstworks\java\com\firstworks\sqlrelay
-copy /Y src\api\java\msvc\ReleaseCLR\SQLRCursor.dll C:\"Program Files (x86)"\Firstworks\java\com\firstworks\sqlrelay
+copy /Y src\api\php\msvc\%platform%Release\sql_relay.dll C:\PHP\sql_relay.dll
 
-copy /Y src\util\msvc\Release\libsqlrutil.dll C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\util\msvc\Release\libsqlrutil.lib C:\"Program Files (x86)"\Firstworks\lib
-copy /Y src\util\msvc\ReleaseCLR\libsqlrutil.dll C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\util\msvc\ReleaseCLR\libsqlrutil.lib C:\"Program Files (x86)"\Firstworks\lib
+copy /Y src\api\java\msvc\sqlrelay.jar "C:\%dir%\Firstworks\java"
+copy /Y src\api\java\msvc\%platform%Release\SQLRConnection.dll "C:\%dir%\Firstworks\java\com\firstworks\sqlrelay"
+copy /Y src\api\java\msvc\%platform%ReleaseCLR\SQLRConnection.dll "C:\%dir%\Firstworks\java\com\firstworks\sqlrelay"
+copy /Y src\api\java\msvc\%platform%Release\SQLRCursor.dll "C:\%dir%\Firstworks\java\com\firstworks\sqlrelay"
+copy /Y src\api\java\msvc\%platform%ReleaseCLR\SQLRCursor.dll "C:\%dir%\Firstworks\java\com\firstworks\sqlrelay"
 
-copy /Y src\cmdline\msvc\Release\sqlrsh.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\cmdline\msvc\ReleaseCLR\sqlrsh.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\cmdline\msvc\Release\sqlr-export.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\cmdline\msvc\ReleaseCLR\sqlr-export.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\cmdline\msvc\Release\sqlr-fields.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\cmdline\msvc\ReleaseCLR\sqlr-fields.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\cmdline\msvc\Release\sqlr-import.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\cmdline\msvc\ReleaseCLR\sqlr-import.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\cmdline\msvc\Release\sqlr-query.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\cmdline\msvc\ReleaseCLR\sqlr-query.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\util\msvc\%platform%Release\libsqlrutil.dll "C:\%dir%\Firstworks\bin"
+copy /Y src\util\msvc\%platform%Release\libsqlrutil.lib "C:\%dir%\Firstworks\lib"
+copy /Y src\util\msvc\%platform%ReleaseCLR\libsqlrutil.dll "C:\%dir%\Firstworks\bin"
+copy /Y src\util\msvc\%platform%ReleaseCLR\libsqlrutil.lib "C:\%dir%\Firstworks\lib"
 
-copy /Y src\server\src\msvc\Release\libsqlrserver.dll C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\src\msvc\Release\libsqlrserver.lib C:\"Program Files (x86)"\Firstworks\lib
-copy /Y src\server\src\msvc\Release\sqlr-listener.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\src\msvc\Release\sqlr-connection.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\src\msvc\Release\sqlr-scaler.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\src\msvc\Release\sqlr-start.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\src\msvc\Release\sqlr-cachemanager.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\src\msvc\ReleaseCLR\libsqlrserver.dll C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\src\msvc\ReleaseCLR\libsqlrserver.lib C:\"Program Files (x86)"\Firstworks\lib
-copy /Y src\server\src\msvc\ReleaseCLR\sqlr-listener.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\src\msvc\ReleaseCLR\sqlr-connection.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\src\msvc\ReleaseCLR\sqlr-scaler.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\src\msvc\ReleaseCLR\sqlr-start.exe C:\"Program Files (x86)"\Firstworks\bin
-copy /Y src\server\src\msvc\ReleaseCLR\sqlr-cachemanager.exe C:\"Program Files (x86)"\Firstworks\bin
+copy /Y src\cmdline\msvc\%platform%Release\sqlrsh.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\cmdline\msvc\%platform%ReleaseCLR\sqlrsh.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\cmdline\msvc\%platform%Release\sqlr-export.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\cmdline\msvc\%platform%ReleaseCLR\sqlr-export.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\cmdline\msvc\%platform%Release\sqlr-fields.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\cmdline\msvc\%platform%ReleaseCLR\sqlr-fields.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\cmdline\msvc\%platform%Release\sqlr-import.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\cmdline\msvc\%platform%ReleaseCLR\sqlr-import.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\cmdline\msvc\%platform%Release\sqlr-query.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\cmdline\msvc\%platform%ReleaseCLR\sqlr-query.exe "C:\%dir%\Firstworks\bin"
 
+copy /Y src\server\src\msvc\%platform%Release\libsqlrserver.dll "C:\%dir%\Firstworks\bin"
+copy /Y src\server\src\msvc\%platform%Release\libsqlrserver.lib "C:\%dir%\Firstworks\lib"
+copy /Y src\server\src\msvc\%platform%Release\sqlr-listener.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\server\src\msvc\%platform%Release\sqlr-connection.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\server\src\msvc\%platform%Release\sqlr-scaler.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\server\src\msvc\%platform%Release\sqlr-start.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\server\src\msvc\%platform%Release\sqlr-cachemanager.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\server\src\msvc\%platform%ReleaseCLR\libsqlrserver.dll "C:\%dir%\Firstworks\bin"
+copy /Y src\server\src\msvc\%platform%ReleaseCLR\libsqlrserver.lib "C:\%dir%\Firstworks\lib"
+copy /Y src\server\src\msvc\%platform%ReleaseCLR\sqlr-listener.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\server\src\msvc\%platform%ReleaseCLR\sqlr-connection.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\server\src\msvc\%platform%ReleaseCLR\sqlr-scaler.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\server\src\msvc\%platform%ReleaseCLR\sqlr-start.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\server\src\msvc\%platform%ReleaseCLR\sqlr-cachemanager.exe "C:\%dir%\Firstworks\bin"
 
-
-copy /Y src\api\"c++"\msvc\x64\Release\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\api\"c++"\msvc\x64\Release\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
-copy /Y src\api\"c++"\msvc\x64\ReleaseCLR\libsqlrclient.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\api\"c++"\msvc\x64\ReleaseCLR\libsqlrclient.lib C:\"Program Files"\Firstworks\lib
-copy /Y src\api\"c++"\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
-copy /Y src\api\"c++"\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
-
-copy /Y src\api\c\msvc\x64\Release\libsqlrclientwrapper.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\api\c\msvc\x64\Release\libsqlrclientwrapper.lib C:\"Program Files"\Firstworks\lib
-copy /Y src\api\c\msvc\x64\ReleaseCLR\libsqlrclientwrapper.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\api\c\msvc\x64\ReleaseCLR\libsqlrclientwrapper.lib C:\"Program Files"\Firstworks\lib
-copy /Y src\api\c\include\sqlrelay\*.h C:\"Program Files"\Firstworks\include\sqlrelay
-copy /Y src\api\c\include\sqlrelay\private\*.h C:\"Program Files"\Firstworks\include\sqlrelay\private
-
-copy /Y src\api\odbc\msvc\x64\Release\libsqlrodbc.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\api\odbc\msvc\x64\ReleaseCLR\libsqlrodbc.dll C:\"Program Files"\Firstworks\bin
-
-copy /Y src\api\perl\Connection.pm C:\Perl64\site\lib\SQLRelay
-copy /Y src\api\perl\Cursor.pm C:\Perl64\site\lib\SQLRelay
-copy /Y src\api\perl\msvc\x64\Release\Connection.dll C:\Perl64\site\lib
-copy /Y src\api\perl\msvc\x64\ReleaseCLR\Connection.dll C:\Perl64\site\lib
-copy /Y src\api\perl\msvc\x64\Release\Cursor.dll C:\Perl64\site\lib
-copy /Y src\api\perl\msvc\x64\ReleaseCLR\Cursor.dll C:\Perl64\site\lib
-copy /Y src\api\perl\SQLRelay.pm C:\Perl64\site\lib\DBD
-copy /Y src\api\perl\msvc\SQLRelay.Connection.3 C:\Perl64\man\man3
-copy /Y src\api\perl\msvc\SQLRelay.Cursor.3 C:\Perl64\man\man3
-
-copy /Y src\api\python\__init__.py C:\Python27\Lib\site-packages\SQLRelay
-copy /Y src\api\python\PySQLRClient.py C:\Python27\Lib\site-packages\SQLRelay
-copy /Y src\api\python\PySQLRDB.py C:\Python27\Lib\site-packages\SQLRelay
-copy /Y src\api\python\msvc\x64\Release\CSQLRelay.dll C:\Python27\Lib\site-packages\SQLRelay\CSQLRelay.pyd
-copy /Y src\api\python\msvc\x64\ReleaseCLR\CSQLRelay.dll C:\Python27\Lib\site-packages\SQLRelay\CSQLRelay.pyd
-
-copy /Y src\api\java\msvc\sqlrelay.jar C:\"Program Files"\Firstworks\java
-copy /Y src\api\java\msvc\x64\Release\SQLRConnection.dll C:\"Program Files"\Firstworks\java\com\firstworks\sqlrelay
-copy /Y src\api\java\msvc\x64\ReleaseCLR\SQLRConnection.dll C:\"Program Files"\Firstworks\java\com\firstworks\sqlrelay
-copy /Y src\api\java\msvc\x64\Release\SQLRCursor.dll C:\"Program Files"\Firstworks\java\com\firstworks\sqlrelay
-copy /Y src\api\java\msvc\x64\ReleaseCLR\SQLRCursor.dll C:\"Program Files"\Firstworks\java\com\firstworks\sqlrelay
-
-copy /Y src\util\msvc\x64\Release\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\util\msvc\x64\Release\libsqlrutil.lib C:\"Program Files"\Firstworks\lib
-copy /Y src\util\msvc\x64\ReleaseCLR\libsqlrutil.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\util\msvc\x64\ReleaseCLR\libsqlrutil.lib C:\"Program Files"\Firstworks\lib
-
-copy /Y src\cmdline\msvc\x64\Release\sqlrsh.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlrsh.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\cmdline\msvc\x64\Release\sqlr-export.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlr-export.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\cmdline\msvc\x64\Release\sqlr-fields.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlr-fields.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\cmdline\msvc\x64\Release\sqlr-import.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlr-import.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\cmdline\msvc\x64\Release\sqlr-query.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\cmdline\msvc\x64\ReleaseCLR\sqlr-query.exe C:\"Program Files"\Firstworks\bin
-
-copy /Y src\server\src\msvc\x64\Release\libsqlrserver.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\server\src\msvc\x64\Release\libsqlrserver.lib C:\"Program Files"\Firstworks\lib
-copy /Y src\server\src\msvc\x64\Release\sqlr-listener.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\src\msvc\x64\Release\sqlr-connection.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\src\msvc\x64\Release\sqlr-scaler.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\src\msvc\x64\Release\sqlr-start.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\src\msvc\x64\Release\sqlr-cachemanager.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\src\msvc\x64\ReleaseCLR\libsqlrserver.dll C:\"Program Files"\Firstworks\bin
-copy /Y src\server\src\msvc\x64\ReleaseCLR\libsqlrserver.lib C:\"Program Files"\Firstworks\lib
-copy /Y src\server\src\msvc\x64\ReleaseCLR\sqlr-listener.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\src\msvc\x64\ReleaseCLR\sqlr-connection.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\src\msvc\x64\ReleaseCLR\sqlr-scaler.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\src\msvc\x64\ReleaseCLR\sqlr-start.exe C:\"Program Files"\Firstworks\bin
-copy /Y src\server\src\msvc\x64\ReleaseCLR\sqlr-cachemanager.exe C:\"Program Files"\Firstworks\bin
-
-copy /Y src\connections\oracle8\msvc\Release\sqlrconnection_oracle8.dll C:\"Program Files (x86)"\Firstworks\libexec\sqlrelay
-copy /Y src\connections\oracle8\msvc\ReleaseCLR\sqlrconnection_oracle8.dll C:\"Program Files (x86)"\Firstworks\libexec\sqlrelay
-copy /Y src\connections\oracle8\msvc\x64\Release\sqlrconnection_oracle8.dll C:\"Program Files"\Firstworks\libexec\sqlrelay
-copy /Y src\connections\oracle8\msvc\x64\ReleaseCLR\sqlrconnection_oracle8.dll C:\"Program Files"\Firstworks\libexec\sqlrelay
-
+if "%first%" == "true" goto installreturn
 goto end
 
 
 :uninstall
-rmdir /s /q "C:\Program Files\Firstworks\include\sqlrelay"
-rmdir /s /q "C:\Program Files\Firstworks\libexec\sqlrelay"
-del "C:\Program Files\Firstworks\lib\libsqlr*.lib"
-del "C:\Program Files\Firstworks\bin\libsqlr*.dll"
-del "C:\Program Files\Firstworks\bin\SQLR*.dll"
-del "C:\Program Files\Firstworks\bin\sqlr*.exe"
-del "C:\Program Files\Firstworks\etc\sqlrelay.conf.example
-del "C:\Program Files\Firstworks\etc\sqlrelay.dtd
-del "C:\Program Files\Firstworks\etc\sqlrelay.xsd
+set first=true
+set dir="Program Files"
+goto uninstallone
+:uninstallreturn
+set first=false
+set dir="Program Files (x86)"
+goto uninstallone
+
+:uninstallone
+rmdir /s /q "C:\%dir%\Firstworks\include\sqlrelay"
+rmdir /s /q "C:\%dir%\Firstworks\libexec\sqlrelay"
+del "C:\%dir%\Firstworks\lib\libsqlr*.lib"
+del "C:\%dir%\Firstworks\bin\libsqlr*.dll"
+del "C:\%dir%\Firstworks\bin\SQLR*.dll"
+del "C:\%dir%\Firstworks\bin\sqlr*.exe"
+del "C:\%dir%\Firstworks\etc\sqlrelay.conf.example
+del "C:\%dir%\Firstworks\etc\sqlrelay.dtd
+del "C:\%dir%\Firstworks\etc\sqlrelay.xsd
 del "C:\Perl64\site\lib\Connection.dll"
 del "C:\Perl64\site\lib\Cursor.dll"
 del "C:\Perl64\site\lib\SQLRelay\*.pm"
@@ -361,27 +290,11 @@ del "C:\Perl64\site\lib\DBD\SQLRelay.pm"
 del "C:\Perl64\man\man3\SQLRelay*"
 rmdir /s /q "C:\Perl64\site\lib\SQLRelay"
 rmdir /s /q "C:\Python27\Lib\site-packages\SQLRelay"
-del "C:\Program Files\Firstworks\java\sqlrelay.jar"
-rmdir /s /q "C:\Program Files\Firstworks\java\com\firstworks\sqlrelay"
+del "C:\PHP\sql_relay.dll"
+del "C:\%dir%\Firstworks\java\sqlrelay.jar"
+rmdir /s /q "C:\%dir%\Firstworks\java\com\firstworks\sqlrelay"
 
-rmdir /s /q "C:\Program Files (x86)\Firstworks\include\sqlrelay"
-rmdir /s /q "C:\Program Files (x86)\Firstworks\libexec\sqlrelay"
-del "C:\Program Files (x86)\Firstworks\lib\libsqlr*.lib"
-del "C:\Program Files (x86)\Firstworks\bin\libsqlr*.dll"
-del "C:\Program Files (x86)\Firstworks\bin\SQLR*.dll"
-del "C:\Program Files (x86)\Firstworks\bin\sqlr*.exe"
-del "C:\Program Files (x86)\Firstworks\etc\sqlrelay.conf.example
-del "C:\Program Files (x86)\Firstworks\etc\sqlrelay.dtd
-del "C:\Program Files (x86)\Firstworks\etc\sqlrelay.xsd
-del "C:\Perl\site\lib\Connection.dll"
-del "C:\Perl\site\lib\Cursor.dll"
-del "C:\Perl\site\lib\SQLRelay\*.pm"
-del "C:\Perl\site\lib\DBD\SQLRelay.pm"
-del "C:\Perl\man\man3\SQLRelay*"
-rmdir /s /q "C:\Perl\site\lib\SQLRelay"
-rmdir /s /q "C:\Python27\Lib\site-packages\SQLRelay"
-del "C:\Program Files (x86)\Firstworks\java\sqlrelay.jar"
-rmdir /s /q "C:\Program Files (x86)\Firstworks\java\com\firstworks\sqlrelay"
+if "%first%" == "true" goto uninstallreturn
 goto end
 
 
