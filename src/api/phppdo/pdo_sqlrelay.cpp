@@ -368,8 +368,7 @@ static int sqlrcursorInputBindPreExec(sqlrcursor *sqlrcur,
 		case PDO_PARAM_BOOL:
 			{
 			// handle NULLs/empty-strings
-			const char	*strval=Z_STRVAL_P(param->parameter);
-			if (!strval || !strval[0]) {
+			if (Z_TYPE_P(param->parameter)==IS_NULL) {
 				sqlrcur->inputBind(name,(const char *)NULL);
 				return 1;
 			}
