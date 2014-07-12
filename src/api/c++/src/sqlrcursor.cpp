@@ -505,43 +505,49 @@ void sqlrcursor::clearCacheDest() {
 }
 
 bool sqlrcursor::getDatabaseList(const char *wild) {
-	sqlrc->debugPreStart();
-	sqlrc->debugPrint("getting database list");
-	if (wild) {
-		sqlrc->debugPrint("\"");
-		sqlrc->debugPrint(wild);
-		sqlrc->debugPrint("\"");
+	if (sqlrc->debug) {
+		sqlrc->debugPreStart();
+		sqlrc->debugPrint("getting database list");
+		if (wild) {
+			sqlrc->debugPrint("\"");
+			sqlrc->debugPrint(wild);
+			sqlrc->debugPrint("\"");
+		}
+		sqlrc->debugPrint("\n");
+		sqlrc->debugPreEnd();
 	}
-	sqlrc->debugPrint("\n");
-	sqlrc->debugPreEnd();
 	return getList(GETDBLIST,NULL,wild);
 }
 
 bool sqlrcursor::getTableList(const char *wild) {
-	sqlrc->debugPreStart();
-	sqlrc->debugPrint("getting table list");
-	if (wild) {
-		sqlrc->debugPrint("\"");
-		sqlrc->debugPrint(wild);
-		sqlrc->debugPrint("\"");
+	if (sqlrc->debug) {
+		sqlrc->debugPreStart();
+		sqlrc->debugPrint("getting table list");
+		if (wild) {
+			sqlrc->debugPrint("\"");
+			sqlrc->debugPrint(wild);
+			sqlrc->debugPrint("\"");
+		}
+		sqlrc->debugPrint("\n");
+		sqlrc->debugPreEnd();
 	}
-	sqlrc->debugPrint("\n");
-	sqlrc->debugPreEnd();
 	return getList(GETTABLELIST,NULL,wild);
 }
 
 bool sqlrcursor::getColumnList(const char *table, const char *wild) {
-	sqlrc->debugPreStart();
-	sqlrc->debugPrint("getting column list for: \"");
-	sqlrc->debugPrint(table);
-	sqlrc->debugPrint("\"");
-	if (wild) {
-		sqlrc->debugPrint(" - \"");
-		sqlrc->debugPrint(wild);
+	if (sqlrc->debug) {
+		sqlrc->debugPreStart();
+		sqlrc->debugPrint("getting column list for: \"");
+		sqlrc->debugPrint(table);
 		sqlrc->debugPrint("\"");
+		if (wild) {
+			sqlrc->debugPrint(" - \"");
+			sqlrc->debugPrint(wild);
+			sqlrc->debugPrint("\"");
+		}
+		sqlrc->debugPrint("\n");
+		sqlrc->debugPreEnd();
 	}
-	sqlrc->debugPrint("\n");
-	sqlrc->debugPreEnd();
 	return getList(GETCOLUMNLIST,(table)?table:"",wild);
 }
 
