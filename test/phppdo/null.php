@@ -43,6 +43,7 @@ dl("pdo_sqlrelay.so");
 	echo("INSERT: \n");
 	checkSuccess($dbh->exec("insert into testtable values (NULL,NULL,NULL,NULL,NULL)"),1);
 	checkSuccess($dbh->exec("insert into testtable values (1,1.1,'1','1','2001-01-01')"),1);
+	checkSuccess($dbh->exec("insert into testtable values (0,0.0,'0','0','0000-00-00 00:00:00')"),1);
 	echo("\n");
 
 	echo("FIELDS BY INDEX: \n");
@@ -59,6 +60,12 @@ dl("pdo_sqlrelay.so");
 	checkSuccess($result[2],"1");
 	checkSuccess(stream_get_contents($result[3]),"1");
 	checkSuccess($result[4],"2001-01-01 00:00:00");
+	$result=$stmt->fetch(PDO::FETCH_NUM);
+	checkSuccess($result[0],0);
+	checkSuccess($result[1],0.0);
+	checkSuccess($result[2],"0");
+	checkSuccess(stream_get_contents($result[3]),"0");
+	checkSuccess($result[4],"0000-00-00 00:00:00");
 	echo("\n");
 
 	echo("FIELDS BY INDEX (as NULL): \n");
@@ -78,6 +85,12 @@ dl("pdo_sqlrelay.so");
 	checkSuccess($result[2],"1");
 	checkSuccess(stream_get_contents($result[3]),"1");
 	checkSuccess($result[4],"2001-01-01 00:00:00");
+	$result=$stmt->fetch(PDO::FETCH_NUM);
+	checkSuccess($result[0],0);
+	checkSuccess($result[1],0.0);
+	checkSuccess($result[2],"0");
+	checkSuccess(stream_get_contents($result[3]),"0");
+	checkSuccess($result[4],"0000-00-00 00:00:00");
 	echo("\n");
 
 	echo("NULL INTEGER INPUT BIND\n");
