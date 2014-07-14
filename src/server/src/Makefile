@@ -27,6 +27,7 @@ PLUGINLOBJS = $(shell ls ../../connections/*/*.lo) \
 		$(shell ls ../../auths/*.lo) \
 		$(shell ls ../../queries/*.lo) \
 		$(shell ls ../../translations/*.lo) \
+		$(shell ls ../../resultsettranslations/*.lo) \
 		$(shell ls ../../triggers/*.lo)
 PLUGINLIBS =
 ifneq ($(strip $(DB2LIBSPATH)),)
