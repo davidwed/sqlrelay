@@ -26,6 +26,7 @@
 	added parameters for connecting to mysql via ssl
 	added a few tweaks to support DB2 < 8.0
 	fixed bad return value type in python getConnectionPort method
+	fixed sessionhandler="thread" with listenertimeout!="0"
 
 0.55 - fixed a sql translation bug related to exists clauses
 	added deployment projects for windows

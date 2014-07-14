@@ -1530,7 +1530,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		if (alarmrang) {
 			logDebugMessage("failed to get "
 					"a connection: timeout");
-			sock->write((uint16_t)ERROR_OCCURRED);
+			sock->write((uint16_t)ERROR_OCCURRED_DISCONNECT);
 			sock->write((uint64_t)SQLR_ERROR_HANDOFFFAILED);
 			sock->write((uint16_t)charstring::length(
 					SQLR_ERROR_HANDOFFFAILED_STRING));
