@@ -8,10 +8,10 @@ int main() {
 							//"test","test",0,1);
 	//sqlrcursor	sqlrcur(&sqlrcon);
 
-	//datetime	dt;
-	//dt.getSystemDateAndTime();
+	datetime	dt;
+	dt.getSystemDateAndTime();
 
-	//int	seed=dt.getEpoch();
+	int	seed=dt.getEpoch();
 	int	loop=0;
 	for (;;) {
 
@@ -19,9 +19,9 @@ int main() {
 							"test","test",0,1);
 		sqlrcursor	sqlrcur(&sqlrcon);
 
-		//seed=randomnumber::generateNumber(seed);
-		//int	count=randomnumber::scaleNumber(seed,1,50);
-		int	count=1;
+		seed=randomnumber::generateNumber(seed);
+		int	count=randomnumber::scaleNumber(seed,1,50);
+		//int	count=1;
 								
 		stdoutput.printf("looping %d times\n",count);
 		for (int i=0; i<count; i++) {
