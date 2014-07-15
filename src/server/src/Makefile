@@ -321,6 +321,8 @@ sqlrtriggerassignments.cpp: sqlrtriggerassignments.cpp.in
 	done
 
 install:
+	$(MKINSTALLDIRS) $(includedir)/sqlrelay
+	$(INSTALL) -m 644 ../include/sqlrelay/sqlrpwdenc.h $(includedir)/sqlrelay
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libsqlrserver.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
@@ -356,7 +358,6 @@ installheaders:
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrlogger.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrloggers.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrprotocol.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrpwdenc.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrpwdencs.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrqueries.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrquery.h $(includedir)/sqlrelay
