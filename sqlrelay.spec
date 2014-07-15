@@ -403,8 +403,10 @@ rm -rf %{buildroot}
 %{_libexecdir}/sqlrelay/sqlrlogger_*
 %{_libexecdir}/sqlrelay/sqlrquery_*
 %{_libexecdir}/sqlrelay/sqlrpwdenc_*
-%{?_with_translations:%{_libexecdir}/sqlrelay/sqltranslation_*}
-%{?_with_triggers:%{_libexecdir}/sqlrelay/sqltrigger_*}
+%{_libexecdir}/sqlrelay/sqlrauth_*
+%{?_with_translations:%{_libexecdir}/sqlrelay/sqlrtranslation_*}
+%{?_with_translations:%{_libexecdir}/sqlrelay/sqlrresultsettranslation_*}
+%{?_with_triggers:%{_libexecdir}/sqlrelay/sqlrtrigger_*}
 %{_localstatedir}/sqlrelay/tmp
 %{_localstatedir}/sqlrelay/debug
 
