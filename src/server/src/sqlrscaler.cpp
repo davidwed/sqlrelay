@@ -572,7 +572,7 @@ void scaler::getRandomConnectionId() {
 
 	// get a scaled random number
 	currentseed=randomnumber::generateNumber(currentseed);
-	int	scalednum=randomnumber::scaleNumber(currentseed,0,metrictotal);
+	int32_t	scalednum=randomnumber::scaleNumber(currentseed,0,metrictotal);
 
 	// run through list, decrementing scalednum by the metric
 	// for each, when scalednum is 0, pick that connection id

@@ -10,14 +10,14 @@
 #include <rudiments/stdio.h>
 
 const char	*host;
-int		port;
+uint16_t	port;
 const  char	*sock;
 const char	*login;
 const char	*password;
 const char	*query;
-int		forkcount;
+int32_t		forkcount;
 
-void	runQuery(int seed) {
+void	runQuery(uint32_t seed) {
 
 	for (;;) {
 
@@ -25,13 +25,13 @@ void	runQuery(int seed) {
 		sqlrcursor	sqlrcur(&sqlrcon);
 
 		seed=randomnumber::generateNumber(seed);
-		int	count=randomnumber::scaleNumber(seed,1,20);
+		int32_t	count=randomnumber::scaleNumber(seed,1,20);
 		//count=10;
 								
 		stdoutput.printf("%d: looping %d times\n",
 					process::getProcessId(),count);
-		int	successcount=0;
-		for (int i=0; i<count; i++) {
+		int32_t	successcount=0;
+		for (int32_t i=0; i<count; i++) {
 			if (!sqlrcur.sendQuery(query)) {
 				stdoutput.printf("error: %s\n",
 						sqlrcur.errorMessage());
@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
 	query=argv[1];
 	forkcount=charstring::toInteger(argv[2]);
 
-	for (int i=0; i<forkcount; i++) {
+	for (int32_t i=0; i<forkcount; i++) {
 		if (!process::fork()) {
 			datetime	dt;
 			dt.getSystemDateAndTime();

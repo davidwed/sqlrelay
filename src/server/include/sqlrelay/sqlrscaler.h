@@ -63,7 +63,7 @@ class SQLRSERVER_DLLSPEC scaler {
 		const char	*connectionid;
 		int32_t		metrictotal;
 
-		int		currentseed;
+		uint32_t	currentseed;
 
 		bool		init;
 

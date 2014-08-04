@@ -374,7 +374,7 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		bool		connected;
 		bool		inclientsession;
 		bool		loggedin;
-		int32_t		reloginseed;
+		uint32_t	reloginseed;
 		time_t		relogintime;
 
 		bool		scalerspawned;

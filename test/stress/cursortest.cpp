@@ -1,5 +1,4 @@
 #include <sqlrelay/sqlrclient.h>
-#include <rudiments/randomnumber.h>
 #include <rudiments/datetime.h>
 #include <rudiments/stdio.h>
 

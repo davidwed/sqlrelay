@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
 	//sqlrcon.debugOn();
 
 	stringbuffer	query;
-	int32_t		seed=randomnumber::getSeed();
+	uint32_t	seed=randomnumber::getSeed();
 	int32_t		colcount=0;
 	int32_t		rowcount=0;
 	int32_t		value=0;
