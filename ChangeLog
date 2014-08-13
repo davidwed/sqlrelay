@@ -1,4 +1,5 @@
 0.57 - fixed an overloaded virtual function error in sqlr-status
+	fixed parsing of "term as type" clauses in queries
 
 0.56 - removed VERSION from perl api bootstrap
 	reorganized and simplified perl api code
