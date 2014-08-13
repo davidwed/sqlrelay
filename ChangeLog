@@ -1,4 +1,4 @@
-0.57 - ...
+0.57 - fixed an overloaded virtual function error in sqlr-status
 
 0.56 - removed VERSION from perl api bootstrap
 	reorganized and simplified perl api code

@@ -22,12 +22,11 @@ class status : public sqlrcontroller_svr {
 		bool			init(int argc, const char **argv);
 		semaphoreset		*getSemset();
 	private:
-		bool	createSharedMemoryAndSemaphores(const char *tmpdir,
+		bool	attachToSharedMemoryAndSemaphores(const char *tmpdir,
 								const char *id);
 
 		bool	connected;
 
-		const char	*connectionid;
 		tempdir		*tmpdir;
 
 		semaphoreset	*statussemset;
@@ -79,7 +78,7 @@ bool status::init(int argc, const char **argv) {
 		return false;
 	}
 
-	if (!createSharedMemoryAndSemaphores(tmpdir->getString(),
+	if (!attachToSharedMemoryAndSemaphores(tmpdir->getString(),
 							cmdl->getId())) {
 		return false;
 	}
@@ -93,7 +92,7 @@ bool status::init(int argc, const char **argv) {
 	return true;
 }
 
-bool status::createSharedMemoryAndSemaphores(const char *tmpdir,
+bool status::attachToSharedMemoryAndSemaphores(const char *tmpdir,
 							const char *id) {
 	
 	size_t  idfilenamelen=charstring::length(tmpdir)+5+
