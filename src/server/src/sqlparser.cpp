@@ -5384,6 +5384,13 @@ bool sqlparser::parseTerm(xmldomnode *currentnode,
 		}
 	}
 
+	// a term might be followed with "as <type>"
+	// eg: cast(col1 as varchar2(200))
+	if (parseAs(currentnode,*newptr,newptr)) {
+		parseType(currentnode,*newptr,newptr);
+	}
+
+
 	// clean up
 	delete[] term;
 
