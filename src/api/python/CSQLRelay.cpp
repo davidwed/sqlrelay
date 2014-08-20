@@ -1350,7 +1350,10 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
     Py_END_ALLOW_THREADS
     name=((sqlrcursor *)sqlrcur)->getColumnName(counter);
     type=((sqlrcursor *)sqlrcur)->getColumnType(counter);
-    if (usenumeric && isFloatTypeChar(type)) {
+    if (!field) {
+        Py_INCREF(Py_None);
+        PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_None);
+    } else if (usenumeric && isFloatTypeChar(type)) {
         if (decimal) {
           PyObject *tuple=PyTuple_New(1);
           PyTuple_SetItem(tuple, 0, Py_BuildValue("s", field));
