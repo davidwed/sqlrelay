@@ -6,6 +6,7 @@ if "%1"=="clr" goto clr
 if "%1"=="clr64" goto clr64
 if "%1"=="clean" goto clean
 if "%1"=="install" goto install
+if "%1"=="install64" goto install64
 if "%1"=="uninstall" goto uninstall
 goto end
 
@@ -86,6 +87,8 @@ cd ..\..\python\msvc
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% CSQLRelay.vcxproj
 cd ..\..\php\msvc
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sql_relay.vcxproj
+cd ..\..\phppdo\msvc
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% pdo_sqlrelay.vcxproj
 cd ..\..\java\msvc
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% SQLRConnection.vcxproj
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% SQLRCursor.vcxproj
@@ -129,6 +132,8 @@ cd ..\..\python\msvc
 msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% CSQLRelay.vcxproj
 cd ..\..\php\msvc
 msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% sql_relay.vcxproj
+cd ..\..\phppdo\msvc
+msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% pdo_sqlrelay.vcxproj
 cd ..\..\java\msvc
 msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% SQLRConnection.vcxproj
 msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% SQLRCursor.vcxproj
@@ -154,11 +159,14 @@ goto end
 set first=true
 set dir=Program Files (x86)
 set platform=
+set perl=Perl
 goto installone
-:installreturn
+
+:install64
 set first=false
 set dir=Program Files
 set platform=x64\
+set perl=Perl64
 goto installone
 
 
@@ -176,8 +184,8 @@ mkdir "C:\%dir%\Firstworks\var\sqlrelay\tmp"
 mkdir "C:\%dir%\Firstworks\var\sqlrelay\tmp\ipc"
 mkdir "C:\%dir%\Firstworks\var\sqlrelay\tmp\pids"
 mkdir "C:\%dir%\Firstworks\var\sqlrelay\tmp\sockets"
-mkdir C:\Perl64\site\lib\SQLRelay
-mkdir C:\Perl64\site\lib\DBD
+mkdir C:\%perl%\site\lib\SQLRelay
+mkdir C:\%perl%\site\lib\DBD
 mkdir C:\Python27\Lib\site-packages\SQLRelay
 mkdir "C:\%dir%\Firstworks\java"
 mkdir "C:\%dir%\Firstworks\java\com"
@@ -205,15 +213,15 @@ copy /Y src\api\odbc\msvc\%platform%ReleaseCLR\libsqlrodbc.dll "C:\%dir%\Firstwo
 
 copy /Y src\api\cs\SQLRCLient\SQLRClient.dll "C:\%dir%\Firstworks\bin"
 
-copy /Y src\api\perl\Connection.pm C:\Perl\site\lib\SQLRelay
-copy /Y src\api\perl\Cursor.pm C:\Perl\site\lib\SQLRelay
-copy /Y src\api\perl\msvc\%platform%Release\Connection.dll C:\Perl\site\lib
-copy /Y src\api\perl\msvc\%platform%ReleaseCLR\Connection.dll C:\Perl\site\lib
-copy /Y src\api\perl\msvc\%platform%Release\Cursor.dll C:\Perl\site\lib
-copy /Y src\api\perl\msvc\%platform%ReleaseCLR\Cursor.dll C:\Perl\site\lib
-copy /Y src\api\perl\SQLRelay.pm C:\Perl\site\lib\DBD
-copy /Y src\api\perl\msvc\SQLRelay.Connection.3 C:\Perl\man\man3
-copy /Y src\api\perl\msvc\SQLRelay.Cursor.3 C:\Perl\man\man3
+copy /Y src\api\perl\Connection.pm C:\%perl%\site\lib\SQLRelay
+copy /Y src\api\perl\Cursor.pm C:\%perl%\site\lib\SQLRelay
+copy /Y src\api\perl\msvc\%platform%Release\Connection.dll C:\%perl%\site\lib
+copy /Y src\api\perl\msvc\%platform%ReleaseCLR\Connection.dll C:\%perl%\site\lib
+copy /Y src\api\perl\msvc\%platform%Release\Cursor.dll C:\%perl%\site\lib
+copy /Y src\api\perl\msvc\%platform%ReleaseCLR\Cursor.dll C:\%perl%\site\lib
+copy /Y src\api\perl\SQLRelay.pm C:\%perl%\site\lib\DBD
+copy /Y src\api\perl\msvc\SQLRelay.Connection.3 C:\%perl%\man\man3
+copy /Y src\api\perl\msvc\SQLRelay.Cursor.3 C:\%perl%\man\man3
 
 copy /Y src\api\python\__init__.py C:\Python27\Lib\site-packages\SQLRelay
 copy /Y src\api\python\PySQLRClient.py C:\Python27\Lib\site-packages\SQLRelay
@@ -222,6 +230,7 @@ copy /Y src\api\python\msvc\%platform%Release\CSQLRelay.dll C:\Python27\Lib\site
 copy /Y src\api\python\msvc\%platform%ReleaseCLR\CSQLRelay.dll C:\Python27\Lib\site-packages\SQLRelay\CSQLRelay.pyd
 
 copy /Y src\api\php\msvc\%platform%Release\sql_relay.dll C:\PHP\ext\php_sql_relay.dll
+copy /Y src\api\phppdo\msvc\%platform%Release\pdo_sqlrelay.dll C:\PHP\ext\php_pdo_sqlrelay.dll
 
 copy /Y src\api\java\msvc\sqlrelay.jar "C:\%dir%\Firstworks\java"
 copy /Y src\api\java\msvc\%platform%Release\SQLRConnection.dll "C:\%dir%\Firstworks\java\com\firstworks\sqlrelay"
@@ -259,18 +268,18 @@ copy /Y src\server\src\msvc\%platform%ReleaseCLR\sqlr-connection.exe "C:\%dir%\F
 copy /Y src\server\src\msvc\%platform%ReleaseCLR\sqlr-scaler.exe "C:\%dir%\Firstworks\bin"
 copy /Y src\server\src\msvc\%platform%ReleaseCLR\sqlr-start.exe "C:\%dir%\Firstworks\bin"
 copy /Y src\server\src\msvc\%platform%ReleaseCLR\sqlr-cachemanager.exe "C:\%dir%\Firstworks\bin"
-
-if "%first%" == "true" goto installreturn
 goto end
 
 
 :uninstall
 set first=true
 set dir=Program Files
+set perl=Perl64
 goto uninstallone
 :uninstallreturn
 set first=false
 set dir=Program Files (x86)
+set perl=Perl
 goto uninstallone
 
 :uninstallone
@@ -283,14 +292,15 @@ del "C:\%dir%\Firstworks\bin\sqlr*.exe"
 del "C:\%dir%\Firstworks\etc\sqlrelay.conf.example
 del "C:\%dir%\Firstworks\etc\sqlrelay.dtd
 del "C:\%dir%\Firstworks\etc\sqlrelay.xsd
-del "C:\Perl64\site\lib\Connection.dll"
-del "C:\Perl64\site\lib\Cursor.dll"
-del "C:\Perl64\site\lib\SQLRelay\*.pm"
-del "C:\Perl64\site\lib\DBD\SQLRelay.pm"
-del "C:\Perl64\man\man3\SQLRelay*"
-rmdir /s /q "C:\Perl64\site\lib\SQLRelay"
+del "C:\%perl%\site\lib\Connection.dll"
+del "C:\%perl%\site\lib\Cursor.dll"
+del "C:\%perl%\site\lib\SQLRelay\*.pm"
+del "C:\%perl%\site\lib\DBD\SQLRelay.pm"
+del "C:\%perl%\man\man3\SQLRelay*"
+rmdir /s /q "C:\%perl%\site\lib\SQLRelay"
 rmdir /s /q "C:\Python27\Lib\site-packages\SQLRelay"
 del "C:\PHP\ext\php_sql_relay.dll"
+del "C:\PHP\ext\php_pdo_sqlrelay.dll"
 del "C:\%dir%\Firstworks\java\sqlrelay.jar"
 rmdir /s /q "C:\%dir%\Firstworks\java\com\firstworks\sqlrelay"
 
