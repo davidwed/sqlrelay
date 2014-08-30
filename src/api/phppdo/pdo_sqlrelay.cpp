@@ -1,6 +1,10 @@
 // Copyright (c) 2013 David Muse
 // See the file COPYING for more information
 
+#if defined(WIN32) && !defined(_WIN64)
+	#define _USE_32BIT_TIME_T
+#endif
+
 #include <config.h>
 #define NEED_IS_BIT_TYPE_CHAR
 #define NEED_IS_BOOL_TYPE_CHAR
@@ -366,7 +370,6 @@ static int sqlrcursorInputBindPreExec(sqlrcursor *sqlrcur,
 			return 1;
 		case PDO_PARAM_INT:
 		case PDO_PARAM_BOOL:
-			{
 			// handle NULLs/empty-strings
 			if (Z_TYPE_P(param->parameter)==IS_NULL) {
 				sqlrcur->inputBind(name,(const char *)NULL);
@@ -375,7 +378,6 @@ static int sqlrcursorInputBindPreExec(sqlrcursor *sqlrcur,
 			convert_to_long(param->parameter);
 			sqlrcur->inputBind(name,Z_LVAL_P(param->parameter));
 			return 1;
-			}
 		case PDO_PARAM_STR:
 			convert_to_string(param->parameter);
 			sqlrcur->inputBind(name,Z_STRVAL_P(param->parameter),

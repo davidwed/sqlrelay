@@ -1,6 +1,10 @@
 /* Copyright (c) 2000  Adam Kropielnicki
    See the file COPYING for more information */
 
+#if defined(WIN32) && !defined(_WIN64)
+	#define _USE_32BIT_TIME_T
+#endif
+
 #include <sqlrelay/sqlrclient.h>
 
 #ifdef WIN32
