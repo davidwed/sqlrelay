@@ -2,7 +2,9 @@
 # Copyright (c) 2013  David Muse
 # See the file COPYING for more information.
 
-dl("pdo_sqlrelay.so");
+if (strncasecmp(PHP_OS,"WIN",3)) {
+	dl("pdo_sqlrelay.so");
+}
 
 	function checkSuccess($value,$success) {
 
@@ -15,7 +17,7 @@ dl("pdo_sqlrelay.so");
 		}
 	}
 
-	$host="localhost";
+	$host="fedora";
 	$port=9000;
 	$socket="/tmp/test.socket";
 	$user="test";
