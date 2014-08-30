@@ -17,7 +17,7 @@ if (strncasecmp(PHP_OS,"WIN",3)) {
 		}
 	}
 
-	$host="fedora";
+	$host="localhost";
 	$port=9000;
 	$socket="/tmp/test.socket";
 	$user="test";

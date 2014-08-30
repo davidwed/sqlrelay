@@ -1,6 +1,7 @@
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries
 	fixed 0 vs. None error in python getRowDictionary method
+	tweaked php and php_pdo modules to build with php 5.6.0 on windows
 
 0.56 - removed VERSION from perl api bootstrap
 	reorganized and simplified perl api code
