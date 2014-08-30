@@ -4,9 +4,9 @@ if "%1"=="all" goto all
 if "%1"=="all64" goto all64
 if "%1"=="clr" goto clr
 if "%1"=="clr64" goto clr64
-if "%1"=="clean" goto clean
 if "%1"=="install" goto install
 if "%1"=="install64" goto install64
+if "%1"=="clean" goto clean
 if "%1"=="uninstall" goto uninstall
 goto end
 
