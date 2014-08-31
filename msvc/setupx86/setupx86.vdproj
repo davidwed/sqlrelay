@@ -27,6 +27,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_08BD4E4F7D444F23B0D18457C151A543"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_0B567D3099494B259EDE009D740B95FE"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -39,7 +45,25 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_2A635BF4667943FBBE0616EF498EAACE"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_369A23960C784423A5E2CBB9AF972931"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_36F509C3AC254288B128BBCD4EEDB013"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3894E7BCEE9F405391386EC9ABB792F8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -63,6 +87,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_5B5199B7EA8C4399A8E9520405D1292F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_5F286DA6B6294750B449E263E977F3CF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -75,13 +105,67 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_7254876BB4324737A84B0D480401C9EE"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7B3AC8CB79554FD0ABA256A768F4B2FE"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8A493B3626084EB78059913EA2F07401"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8CA62E57CF8644C6A0DAE7A7312A2EB4"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8D2BA14A65BD4984B23C8E707ED066A2"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_8F8DB754D3EF4F298519D9FA79BCF28B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
+        "MsmKey" = "8:_911A53B776AB430F8C97695845A1151F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_92EF0E506B17460581B626FB056E6452"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_95D68952DF0F4A818488516DA5E3FB67"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_9A41DDBD38954FA69674591819E60B38"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9E7655E428ED4F1C9289E43825291B63"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -100,6 +184,12 @@
         "Entry"
         {
         "MsmKey" = "8:_BA444554D2254D4DB971D9F304B49EC0"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_C25A12158F584715A80A51383D1B729C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -145,6 +235,12 @@
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_A351E139533C43DD98973D0C88BCEBED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
     }
     "Configurations"
     {
@@ -163,6 +259,27 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.0,Profile=Client"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4 Client Profile (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.0,Profile=Client"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
+                    {
+                    "Name" = "8:Windows Installer 3.1"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
+                    }
+                }
+            }
         }
         "Release"
         {
@@ -179,6 +296,27 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.0,Profile=Client"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4 Client Profile (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.0,Profile=Client"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
+                    {
+                    "Name" = "8:Windows Installer 3.1"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
+                    }
+                }
+            }
         }
     }
     "Deployable"
@@ -248,6 +386,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_08BD4E4F7D444F23B0D18457C151A543"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\perl\\Cursor.pm"
+            "TargetName" = "8:Cursor.pm"
+            "Tag" = "8:"
+            "Folder" = "8:_398045C330044B5390D4D7356052298B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0B567D3099494B259EDE009D740B95FE"
             {
             "SourcePath" = "8:..\\..\\src\\api\\c++\\msvc\\Release\\libsqlrclient.lib"
@@ -288,12 +446,72 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2A635BF4667943FBBE0616EF498EAACE"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\perl\\Connection.pm"
+            "TargetName" = "8:Connection.pm"
+            "Tag" = "8:"
+            "Folder" = "8:_398045C330044B5390D4D7356052298B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_369A23960C784423A5E2CBB9AF972931"
             {
             "SourcePath" = "8:..\\..\\src\\api\\c++\\include\\sqlrelay\\private\\sqlrconnection.h"
             "TargetName" = "8:sqlrconnection.h"
             "Tag" = "8:"
             "Folder" = "8:_7BDF062D93FD4957BF3C3B7F26D65685"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_36F509C3AC254288B128BBCD4EEDB013"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\python\\PySQLRDB.py"
+            "TargetName" = "8:PySQLRDB.py"
+            "Tag" = "8:"
+            "Folder" = "8:_4D1A4830A9A1421399CD5702CF2378D5"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3894E7BCEE9F405391386EC9ABB792F8"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\php\\msvc\\Release\\sql_relay.dll"
+            "TargetName" = "8:php_sql_relay.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_0A0476BD1304438886C9F7E2AF718453"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -368,6 +586,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5B5199B7EA8C4399A8E9520405D1292F"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\perl\\SQLRelay.pm"
+            "TargetName" = "8:SQLRelay.pm"
+            "Tag" = "8:"
+            "Folder" = "8:_77A27810C2F74498918D0EFA5DCE0CCF"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5F286DA6B6294750B449E263E977F3CF"
             {
             "SourcePath" = "8:..\\..\\src\\api\\c\\include\\sqlrelay\\private\\wrapperdll.h"
@@ -408,12 +646,172 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7254876BB4324737A84B0D480401C9EE"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\perl\\msvc\\Release\\Cursor.dll"
+            "TargetName" = "8:Cursor.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_8E26E7AAE42A48EFBCC4563AED5FDC70"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7B3AC8CB79554FD0ABA256A768F4B2FE"
+            {
+            "SourcePath" = "8:..\\..\\src\\cmdline\\msvc\\Release\\sqlr-export.exe"
+            "TargetName" = "8:sqlr-export.exe"
+            "Tag" = "8:"
+            "Folder" = "8:_50D6824D8DC3431E983EBB87DC7A870A"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8A493B3626084EB78059913EA2F07401"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\perl\\msvc\\Release\\Connection.dll"
+            "TargetName" = "8:Connection.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_8E26E7AAE42A48EFBCC4563AED5FDC70"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8CA62E57CF8644C6A0DAE7A7312A2EB4"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\python\\PySQLRClient.py"
+            "TargetName" = "8:PySQLRClient.py"
+            "Tag" = "8:"
+            "Folder" = "8:_4D1A4830A9A1421399CD5702CF2378D5"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8D2BA14A65BD4984B23C8E707ED066A2"
+            {
+            "SourcePath" = "8:..\\..\\src\\cmdline\\msvc\\Release\\sqlr-query.exe"
+            "TargetName" = "8:sqlr-query.exe"
+            "Tag" = "8:"
+            "Folder" = "8:_50D6824D8DC3431E983EBB87DC7A870A"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8F8DB754D3EF4F298519D9FA79BCF28B"
             {
             "SourcePath" = "8:..\\..\\src\\api\\c++\\include\\sqlrelay\\private\\column.h"
             "TargetName" = "8:column.h"
             "Tag" = "8:"
             "Folder" = "8:_7BDF062D93FD4957BF3C3B7F26D65685"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_911A53B776AB430F8C97695845A1151F"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\phppdo\\msvc\\Release\\pdo_sqlrelay.dll"
+            "TargetName" = "8:php_pdo_sqlrelay.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_0A0476BD1304438886C9F7E2AF718453"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_92EF0E506B17460581B626FB056E6452"
+            {
+            "SourcePath" = "8:..\\..\\src\\cmdline\\msvc\\Release\\sqlr-fields.exe"
+            "TargetName" = "8:sqlr-fields.exe"
+            "Tag" = "8:"
+            "Folder" = "8:_50D6824D8DC3431E983EBB87DC7A870A"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_95D68952DF0F4A818488516DA5E3FB67"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\python\\msvc\\Release\\CSQLRelay.dll"
+            "TargetName" = "8:CSQLRelay.pyd"
+            "Tag" = "8:"
+            "Folder" = "8:_4D1A4830A9A1421399CD5702CF2378D5"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -448,6 +846,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9E7655E428ED4F1C9289E43825291B63"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\python\\__init__.py"
+            "TargetName" = "8:__init__.py"
+            "Tag" = "8:"
+            "Folder" = "8:_4D1A4830A9A1421399CD5702CF2378D5"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_A351E139533C43DD98973D0C88BCEBED"
             {
             "AssemblyRegister" = "3:1"
@@ -455,6 +873,11 @@
             "AssemblyAsmDisplayName" = "8:SQLRClient, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
+                    "_A351E139533C43DD98973D0C88BCEBED"
+                    {
+                    "Name" = "8:SQLRClient.dll"
+                    "Attributes" = "3:512"
+                    }
                 }
             "SourcePath" = "8:..\\..\\src\\api\\cs\\SQLRClient\\bin\\Release\\SQLRClient.dll"
             "TargetName" = "8:"
@@ -500,6 +923,26 @@
             "TargetName" = "8:bindvar.h"
             "Tag" = "8:"
             "Folder" = "8:_7BDF062D93FD4957BF3C3B7F26D65685"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C25A12158F584715A80A51383D1B729C"
+            {
+            "SourcePath" = "8:..\\..\\src\\cmdline\\msvc\\Release\\sqlr-import.exe"
+            "TargetName" = "8:sqlr-import.exe"
+            "Tag" = "8:"
+            "Folder" = "8:_50D6824D8DC3431E983EBB87DC7A870A"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -660,6 +1103,29 @@
         }
         "Folder"
         {
+            "{994432C3-9487-495D-8656-3E829A8DBDDE}:_72C51DCB0BF847928DC6CE70CC377479"
+            {
+            "DefaultLocation" = "8:C:\\PHP"
+            "Name" = "8:PHP"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:NEWPROPERTY3"
+                "Folders"
+                {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_0A0476BD1304438886C9F7E2AF718453"
+                    {
+                    "Name" = "8:ext"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_0A85A7735411461EAFDF47EDB3A54BF5"
+                        "Folders"
+                        {
+                        }
+                    }
+                }
+            }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_7EA96DA1A4A544C6872FD11F19E02D38"
             {
             "DefaultLocation" = "8:C:\\Program Files (x86)\\Firstworks"
@@ -738,6 +1204,107 @@
                     }
                 }
             }
+            "{994432C3-9487-495D-8656-3E829A8DBDDE}:_D04AC6A833C54F46BB707E434E3CBB52"
+            {
+            "DefaultLocation" = "8:C:\\Perl"
+            "Name" = "8:Perl"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:NEWPROPERTY1"
+                "Folders"
+                {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_5AA8F76D785744E6A7ED6085C4F646B0"
+                    {
+                    "Name" = "8:site"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_8C74CCA2C9334C5D84EEC02058BBCA41"
+                        "Folders"
+                        {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_8E26E7AAE42A48EFBCC4563AED5FDC70"
+                            {
+                            "Name" = "8:lib"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_669C4F8BA059451EBA85248211C2A31F"
+                                "Folders"
+                                {
+                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_398045C330044B5390D4D7356052298B"
+                                    {
+                                    "Name" = "8:SQLRelay"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "Property" = "8:_D3194D12C1B048E0B8B7233D56806128"
+                                        "Folders"
+                                        {
+                                        }
+                                    }
+                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_77A27810C2F74498918D0EFA5DCE0CCF"
+                                    {
+                                    "Name" = "8:DBD"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "Property" = "8:_5B025200CA40477580D994219B02D55E"
+                                        "Folders"
+                                        {
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            "{994432C3-9487-495D-8656-3E829A8DBDDE}:_ED5FC92E38494B6C957CB38E9BD212F8"
+            {
+            "DefaultLocation" = "8:C:\\Python27"
+            "Name" = "8:Python27"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:NEWPROPERTY2"
+                "Folders"
+                {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_99B71E65553E418587EB467EC2B89588"
+                    {
+                    "Name" = "8:Lib"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_2B9753CD8296442FB57230A7E4500E7B"
+                        "Folders"
+                        {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_BAA260D268C446DCAB1C0EE48F7BEB1F"
+                            {
+                            "Name" = "8:site-packages"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_7C380819E82942C8843F48E7DC4130C6"
+                                "Folders"
+                                {
+                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_4D1A4830A9A1421399CD5702CF2378D5"
+                                    {
+                                    "Name" = "8:SQLRelay"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "Property" = "8:_19EC61937D6741D7B15B6DCFC55A56AE"
+                                        "Folders"
+                                        {
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         "LaunchCondition"
         {
@@ -754,15 +1321,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SQL Relay (32-bit)"
-        "ProductCode" = "8:{36BFE994-C013-4BE5-BD3B-02EF275430C2}"
-        "PackageCode" = "8:{A48AE7A5-E561-49DD-B877-B6D58E1F5D37}"
+        "ProductCode" = "8:{6FB132F6-21A7-4357-B01B-87E7D8E94B92}"
+        "PackageCode" = "8:{5BA0A922-F974-43F1-B170-EC989FD9DF77}"
         "UpgradeCode" = "8:{69E16E5B-0C53-451E-B2E0-07BA63AE847F}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:0.55"
+        "ProductVersion" = "8:0.57"
         "Manufacturer" = "8:firstworks.com"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
