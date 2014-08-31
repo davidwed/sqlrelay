@@ -16,7 +16,9 @@ set release=Release
 set platform=Win32
 set csrelease=Release
 set csplatform=Any CPU
-goto build
+call :build
+call :setupx86
+goto end
 
 
 :all64
@@ -24,7 +26,9 @@ set release=Release
 set platform=x64
 set csrelease=Release
 set csplatform=Any CPU
-goto build
+call :build
+call :setupx64
+goto end
 
 
 :clr
@@ -32,7 +36,9 @@ set release=ReleaseCLR
 set platform=Win32
 set csrelease=Release
 set csplatform=Any CPU
-goto build
+call :build
+call :setupx86
+goto end
 
 
 :clr64
@@ -40,34 +46,44 @@ set release=ReleaseCLR
 set platform=x64
 set csrelease=Release
 set csplatform=Any CPU
-goto build
+call :build
+call :setupx64
+goto end
 
 
 :clean
 set release=Debug
 set platform=Win32
 call :cleanone
+call :cleansetupx86
 set release=DebugCLR
 set platform=Win32
 call :cleanone
+call :cleansetupx86
 set release=Release
 set platform=Win32
 call :cleanone
+call :cleansetupx86
 set release=ReleaseCLR
 set platform=Win32
 call :cleanone
+call :cleansetupx86
 set release=Debug
 set platform=x64
 call :cleanone
+call :cleansetupx64
 set release=DebugCLR
 set platform=x64
 call :cleanone
+call :cleansetupx64
 set release=Release
 set platform=x64
 call :cleanone
+call :cleansetupx64
 set release=ReleaseCLR
 set platform=x64
 call :cleanone
+call :cleansetupx64
 goto end
 
 
@@ -275,12 +291,12 @@ goto end
 set first=true
 set dir=Program Files
 set perl=Perl64
-goto uninstallone
-:uninstallreturn
+call :uninstallone
 set first=false
 set dir=Program Files (x86)
 set perl=Perl
-goto uninstallone
+call :uninstallone
+goto end
 
 :uninstallone
 rmdir /s /q "C:\%dir%\Firstworks\include\sqlrelay"
@@ -303,9 +319,36 @@ del "C:\PHP\ext\php_sql_relay.dll"
 del "C:\PHP\ext\php_pdo_sqlrelay.dll"
 del "C:\%dir%\Firstworks\java\sqlrelay.jar"
 rmdir /s /q "C:\%dir%\Firstworks\java\com\firstworks\sqlrelay"
-
-if "%first%" == "true" goto uninstallreturn
 goto end
 
+:setupx86
+rem cd msvc\setupx86
+rem msbuild.exe /property:Configuration=%release% /property:Platform=Default setupx86.sln
+rem cd ..\..
+goto end
+
+:setupx64
+rem cd msvc\setupx64
+rem msbuild.exe /property:Configuration=%release% /property:Platform=Default setupx64.sln
+rem cd ..\..
+goto end
+
+:cleansetupx86
+cd msvc\setupx86
+del /Q Debug\*.*
+del /Q Release\*.*
+del /Q DebugCLR\*.*
+del /Q ReleaseCLR\*.*
+cd ..\..
+goto end
+
+:cleansetupx64
+rem cd msvc\setupx64
+rem del /Q Debug\*.*
+rem del /Q Release\*.*
+rem del /Q DebugCLR\*.*
+rem del /Q ReleaseCLR\*.*
+rem cd ..\..
+goto end
 
 :end
