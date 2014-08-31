@@ -16,7 +16,7 @@ set release=Release
 set platform=Win32
 set csrelease=Release
 set csplatform=Any CPU
-call :build
+call :buildone
 call :setupx86
 goto end
 
@@ -26,7 +26,7 @@ set release=Release
 set platform=x64
 set csrelease=Release
 set csplatform=Any CPU
-call :build
+call :buildone
 call :setupx64
 goto end
 
@@ -36,7 +36,7 @@ set release=ReleaseCLR
 set platform=Win32
 set csrelease=Release
 set csplatform=Any CPU
-call :build
+call :buildone
 call :setupx86
 goto end
 
@@ -46,7 +46,7 @@ set release=ReleaseCLR
 set platform=x64
 set csrelease=Release
 set csplatform=Any CPU
-call :build
+call :buildone
 call :setupx64
 goto end
 
@@ -87,7 +87,7 @@ call :cleansetupx64
 goto end
 
 
-:build
+:buildone
 cd src\api\c++\msvc
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform%
 cd ..\..\c\msvc
