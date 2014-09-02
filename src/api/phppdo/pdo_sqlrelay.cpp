@@ -1,10 +1,6 @@
 // Copyright (c) 2013 David Muse
 // See the file COPYING for more information
 
-#if defined(WIN32) && !defined(_WIN64)
-	#define _USE_32BIT_TIME_T
-#endif
-
 #include <config.h>
 #define NEED_IS_BIT_TYPE_CHAR
 #define NEED_IS_BOOL_TYPE_CHAR

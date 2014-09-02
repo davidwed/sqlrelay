@@ -140,7 +140,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;_DEBUG;_WINDOWS;_USRDLL;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -189,7 +189,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;_DEBUG;_WINDOWS;_USRDLL;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -238,7 +238,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;NDEBUG;_WINDOWS;_USRDLL;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -289,7 +289,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;NDEBUG;_WINDOWS;_USRDLL;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>

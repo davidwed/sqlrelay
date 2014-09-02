@@ -1,4 +1,3 @@
-#! /usr/bin/env perl
 
 # Copyright (c) 2001  David Muse
 # See the file COPYING for more information.
@@ -49,7 +48,7 @@ sub checkSuccessString {
 
 
 # instantiation
-$con=SQLRelay::Connection->new("fedora",9000,"/tmp/test.socket",
+$con=SQLRelay::Connection->new("localhost",9000,"/tmp/test.socket",
 							"test","test",0,1);
 $cur=SQLRelay::Cursor->new($con);
 
@@ -935,7 +934,7 @@ print("COMMIT AND ROLLBACK: \n");
 # Note: Mysql's default isolation level is repeatable-read,
 # not read-committed like most other db's.  Both sessions must
 # commit to see the changes that each other has made.
-$secondcon=SQLRelay::Connection->new("fedora",9000,"/tmp/test.socket",
+$secondcon=SQLRelay::Connection->new("localhost",9000,"/tmp/test.socket",
 							"test","test",0,1);
 $secondcur=SQLRelay::Cursor->new($secondcon);
 checkSuccess($secondcur->sendQuery("select count(*) from testtable"),1);
