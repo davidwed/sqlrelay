@@ -343,12 +343,12 @@ cd ..\..
 goto end
 
 :cleansetupx64
-rem cd msvc\setupx64
-rem del /Q Debug\*.*
-rem del /Q Release\*.*
-rem del /Q DebugCLR\*.*
-rem del /Q ReleaseCLR\*.*
-rem cd ..\..
+cd msvc\setupx64
+del /Q Debug\*.*
+del /Q Release\*.*
+del /Q DebugCLR\*.*
+del /Q ReleaseCLR\*.*
+cd ..\..
 goto end
 
 :end
