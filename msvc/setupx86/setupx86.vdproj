@@ -1320,7 +1320,7 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:SQL Relay (32-bit)"
+        "ProductName" = "8:Firstworks SQL Relay (32-bit)"
         "ProductCode" = "8:{6FB132F6-21A7-4357-B01B-87E7D8E94B92}"
         "PackageCode" = "8:{5BA0A922-F974-43F1-B170-EC989FD9DF77}"
         "UpgradeCode" = "8:{69E16E5B-0C53-451E-B2E0-07BA63AE847F}"
@@ -1333,7 +1333,7 @@
         "Manufacturer" = "8:firstworks.com"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:SQL Relay (32-bit)"
+        "Title" = "8:Firstworks SQL Relay (32-bit)"
         "Subject" = "8:"
         "ARPCONTACT" = "8:firstworks.com"
         "Keywords" = "8:"

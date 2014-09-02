@@ -73,7 +73,7 @@ class mysql {
 	
 	
 		// instantiation
-		SQLRConnection con=new SQLRConnection("localhost",
+		SQLRConnection con=new SQLRConnection("fedora",
 						(short)9000,
 						"/tmp/test.socket",
 						"test","test",0,1);
@@ -904,7 +904,7 @@ class mysql {
 		// Note: Mysql's default isolation level is repeatable-read,
 		// not read-committed like most other db's.  Both sessions must
 		// commit to see the changes that each other has made.
-		SQLRConnection secondcon=new SQLRConnection("localhost",
+		SQLRConnection secondcon=new SQLRConnection("fedora",
 						(short)9000,
 						"/tmp/test.socket",
 						"test","test",0,1);
