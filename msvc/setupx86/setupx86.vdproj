@@ -177,6 +177,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_A46919E97D1B4079A9F9EF50407F2555"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_B727B639FB8D48658F9D6D9EF2ADCB69"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -190,6 +196,12 @@
         "Entry"
         {
         "MsmKey" = "8:_C25A12158F584715A80A51383D1B729C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_C30E9BDF439E466599D36952A6F86D3C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -226,6 +238,12 @@
         "Entry"
         {
         "MsmKey" = "8:_E846C254B1094B5F853407C34017F0EC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F0E8D1C1F9914E9EBE5C28CD0AC19A41"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -897,6 +915,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A46919E97D1B4079A9F9EF50407F2555"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\java\\msvc\\sqlrelay.jar"
+            "TargetName" = "8:sqlrelay.jar"
+            "Tag" = "8:"
+            "Folder" = "8:_EE04C146A79242F385D2BD07E77EC140"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B727B639FB8D48658F9D6D9EF2ADCB69"
             {
             "SourcePath" = "8:..\\..\\src\\api\\c\\include\\sqlrelay\\private\\sqlrclientwrapper.h"
@@ -943,6 +981,26 @@
             "TargetName" = "8:sqlr-import.exe"
             "Tag" = "8:"
             "Folder" = "8:_50D6824D8DC3431E983EBB87DC7A870A"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C30E9BDF439E466599D36952A6F86D3C"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\java\\msvc\\Release\\SQLRCursor.dll"
+            "TargetName" = "8:SQLRCursor.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_BAC27EF9858145A3B80DFF58CC6C668D"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1063,6 +1121,26 @@
             "TargetName" = "8:libsqlrodbc.dll"
             "Tag" = "8:"
             "Folder" = "8:_50D6824D8DC3431E983EBB87DC7A870A"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F0E8D1C1F9914E9EBE5C28CD0AC19A41"
+            {
+            "SourcePath" = "8:..\\..\\src\\api\\java\\msvc\\Release\\SQLRConnection.dll"
+            "TargetName" = "8:SQLRConnection.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_BAC27EF9858145A3B80DFF58CC6C668D"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1200,6 +1278,50 @@
                     "Property" = "8:_62760286D11E4A90B13484D66908721A"
                         "Folders"
                         {
+                        }
+                    }
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_EE04C146A79242F385D2BD07E77EC140"
+                    {
+                    "Name" = "8:java"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_184B86F0E2B94E8BBA4EDDC66387E97A"
+                        "Folders"
+                        {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_A3B87A682F4640D8880FEB7ECF483F78"
+                            {
+                            "Name" = "8:com"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_4CE3DDF21C0F4776BB91D3FE1AAEBA25"
+                                "Folders"
+                                {
+                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_29EFC60C66B141C8945C2BECEA862652"
+                                    {
+                                    "Name" = "8:firstworks"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "Property" = "8:_AD75886777F54107A54E34D4AEF25303"
+                                        "Folders"
+                                        {
+                                            "{9EF0B969-E518-4E46-987F-47570745A589}:_BAC27EF9858145A3B80DFF58CC6C668D"
+                                            {
+                                            "Name" = "8:sqlrelay"
+                                            "AlwaysCreate" = "11:FALSE"
+                                            "Condition" = "8:"
+                                            "Transitive" = "11:FALSE"
+                                            "Property" = "8:_4CFB969DBD2F497E8F7812D8FEACA077"
+                                                "Folders"
+                                                {
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
