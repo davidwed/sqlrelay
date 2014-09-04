@@ -580,6 +580,13 @@ const char *sqlrconnection_svr::getTableListQuery(bool wild) {
 }
 
 const char *sqlrconnection_svr::getColumnListQuery(const char *table,
+							bool wild,
+							uint16_t *tablecount) {
+	*tablecount=1;
+	return getColumnListQuery(table,wild);
+}
+
+const char *sqlrconnection_svr::getColumnListQuery(const char *table,
 								bool wild) {
 	return "select 1";
 }

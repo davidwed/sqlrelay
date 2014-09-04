@@ -4,6 +4,7 @@
 	tweaked php and php_pdo modules to build with php 5.6.0 on windows
 	updated deployment projects for windows, adding perl, php, python
 		and java, and adding x64 support
+	describe/getColumnList supports synonyms with oracle now
 
 0.56 - removed VERSION from perl api bootstrap
 	reorganized and simplified perl api code
