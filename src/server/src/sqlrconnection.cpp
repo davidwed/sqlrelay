@@ -580,15 +580,42 @@ const char *sqlrconnection_svr::getTableListQuery(bool wild) {
 }
 
 const char *sqlrconnection_svr::getColumnListQuery(const char *table,
-							bool wild,
-							uint16_t *tablecount) {
-	*tablecount=1;
-	return getColumnListQuery(table,wild);
-}
-
-const char *sqlrconnection_svr::getColumnListQuery(const char *table,
 								bool wild) {
 	return "select 1";
+}
+
+bool sqlrconnection_svr::isSynonym(const char *table) {
+
+	// get the base query
+	const char	*synquerybase=isSynonymQuery();
+	if (!synquerybase) {
+		return false;
+	}
+
+	// rebuild it to include the table
+	size_t	synquerylen=charstring::length(synquerybase)+
+					charstring::length(table);
+	char	*synquery=new char[synquerylen+1];
+	charstring::printf(synquery,synquerylen+1,synquerybase,table);
+	synquerylen=charstring::length(synquery);
+
+	// since we're creating a new cursor for this, make sure it can't
+	// have an ID that might already exist
+	sqlrcursor_svr	*syncur=cont->initCursor();
+	bool	result=(syncur->openInternal(cont->cursorcount+1) &&
+			syncur->prepareQuery(synquery,synquerylen) &&
+			syncur->executeQuery(synquery,synquerylen) &&
+			!syncur->noRowsToReturn() &&
+			syncur->fetchRow());
+	syncur->cleanUpData();
+	syncur->close();
+	cont->deleteCursor(syncur);
+	delete[] synquery;
+	return result;
+}
+
+const char *sqlrconnection_svr::isSynonymQuery() {
+	return NULL;
 }
 
 const char *sqlrconnection_svr::bindFormat() {

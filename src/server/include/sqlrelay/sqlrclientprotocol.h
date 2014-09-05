@@ -146,8 +146,7 @@ class SQLRSERVER_DLLSPEC sqlrclientprotocol : public sqlrprotocol {
 		bool	buildListQuery(sqlrcursor_svr *cursor,
 						const char *query,
 						const char *wild,
-						const char *table,
-						uint16_t tablecount);
+						const char *table);
 		void	escapeParameter(stringbuffer *buffer,
 						const char *parameter);
 		bool	getQueryTreeCommand(sqlrcursor_svr *cursor);

@@ -84,11 +84,9 @@ class SQLRSERVER_DLLSPEC sqlrconnection_svr {
 		virtual const char	*getTableListQuery(bool wild);
 		virtual const char	*getColumnListQuery(
 						const char *table,
-						bool wild,
-						uint16_t *tablecount);
-		virtual const char	*getColumnListQuery(
-						const char *table,
 						bool wild);
+		virtual bool		isSynonym(const char *table);
+		virtual const char	*isSynonymQuery();
 
 		virtual sqlrcursor_svr	*initCursor()=0;
 		virtual void		deleteCursor(sqlrcursor_svr *curs)=0;

@@ -2671,7 +2671,6 @@ bool sqlrclientprotocol::getListByQuery(sqlrcursor_svr *cursor,
 	// build the appropriate query
 	const char	*query=NULL;
 	bool		havewild=charstring::length(wild);
-	uint16_t	tablecount=1;
 	switch (which) {
 		case 0:
 			query=conn->getDatabaseListQuery(havewild);
@@ -2680,13 +2679,12 @@ bool sqlrclientprotocol::getListByQuery(sqlrcursor_svr *cursor,
 			query=conn->getTableListQuery(havewild);
 			break;
 		case 2:
-			query=conn->getColumnListQuery(table,havewild,
-							&tablecount);
+			query=conn->getColumnListQuery(table,havewild);
 			break;
 	}
 
 	// FIXME: this can fail
-	buildListQuery(cursor,query,wild,table,tablecount);
+	buildListQuery(cursor,query,wild,table);
 
 	cont->logDebugMessage("handling query...");
 
@@ -2700,8 +2698,7 @@ bool sqlrclientprotocol::getListByQuery(sqlrcursor_svr *cursor,
 bool sqlrclientprotocol::buildListQuery(sqlrcursor_svr *cursor,
 						const char *query,
 						const char *wild,
-						const char *table,
-						uint16_t tablecount) {
+						const char *table) {
 
 	// clean up buffers to avoid SQL injection
 	stringbuffer	wildbuf;
@@ -2719,22 +2716,9 @@ bool sqlrclientprotocol::buildListQuery(sqlrcursor_svr *cursor,
 
 	// fill the query buffer and update the length
 	if (tablebuf.getStringLength()) {
-
-		// for now, tablecount can only be 1 or 2
-		if (tablecount>1) {
-			charstring::printf(cursor->querybuffer,
-						maxquerysize+1,
-						query,
-						tablebuf.getString(),
-						tablebuf.getString(),
+		charstring::printf(cursor->querybuffer,maxquerysize+1,
+						query,tablebuf.getString(),
 						wildbuf.getString());
-		} else {
-			charstring::printf(cursor->querybuffer,
-						maxquerysize+1,
-						query,
-						tablebuf.getString(),
-						wildbuf.getString());
-		}
 	} else {
 		charstring::printf(cursor->querybuffer,maxquerysize+1,
 						query,wildbuf.getString());
