@@ -7,6 +7,7 @@
 #include <rudiments/bytestring.h>
 #include <rudiments/regularexpression.h>
 
+#include <defines.h>
 #include <datatypes.h>
 #include <config.h>
 
@@ -138,6 +139,7 @@ class mysqlcursor : public sqlrcursor_svr {
 		unsigned long	*bindvaluesize;
 
 		bool		usestmtprepare;
+		bool		bindformaterror;
 
 		regularexpression	unsupportedbystmt;
 #endif
@@ -590,6 +592,7 @@ mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	bind=new MYSQL_BIND[conn->cont->maxbindcount];
 	bindvaluesize=new unsigned long[conn->cont->maxbindcount];
 	usestmtprepare=true;
+	bindformaterror=false;
 	unsupportedbystmt.compile(
 			"^\\s*((create|CREATE|drop|DROP|procedure|PROCEDURE|function|FUNCTION|use|USE|CALL|call|START|start|CHECK|check|REPAIR|repair)\\s+)|((begin|BEGIN)\\s*)");
 	unsupportedbystmt.study();
@@ -643,13 +646,11 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 		mysqlconn->firstquery=false;
 	}
 
+	// reset the bind format error flag
+	bindformaterror=false;
+
 	// can't use stmt API to run a couple of types of queries as of 5.0
-	// (You might think we'd need to do some kind of test here to set
-	// usestmtprepare, but the sqlrcontroller class calls
-	// supportsNativeBinds(query) prior to preparing the query to decide
-	// whether it needs to fake binds before query preparation, and in this
-	// class that method sets usestmtprepare.)
-	if (!usestmtprepare) {
+	if (!supportsNativeBinds(query)) {
 		return true;
 	}
 
@@ -704,11 +705,16 @@ bool mysqlcursor::inputBind(const char *variable,
 		return true;
 	}
 
+	// "variable" should be something like :1,:2,:3, etc.
+	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// converted to 0.  1 will be subtracted and after the cast it will
+	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
 
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
 	if (pos>bindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -739,11 +745,16 @@ bool mysqlcursor::inputBind(const char *variable,
 		return true;
 	}
 
+	// "variable" should be something like :1,:2,:3, etc.
+	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// converted to 0.  1 will be subtracted and after the cast it will
+	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
 
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
 	if (pos>bindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -769,11 +780,16 @@ bool mysqlcursor::inputBind(const char *variable,
 		return true;
 	}
 
+	// "variable" should be something like :1,:2,:3, etc.
+	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// converted to 0.  1 will be subtracted and after the cast it will
+	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
 
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
 	if (pos>bindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -807,11 +823,16 @@ bool mysqlcursor::inputBind(const char *variable,
 		return true;
 	}
 
+	// "variable" should be something like :1,:2,:3, etc.
+	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// converted to 0.  1 will be subtracted and after the cast it will
+	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
 
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
 	if (pos>bindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -855,11 +876,16 @@ bool mysqlcursor::inputBindBlob(const char *variable,
 		return true;
 	}
 
+	// "variable" should be something like :1,:2,:3, etc.
+	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// converted to 0.  1 will be subtracted and after the cast it will
+	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
 
 	// don't attempt to bind beyond the number of
 	// variables defined when the query was prepared
 	if (pos>bindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1015,47 +1041,50 @@ void mysqlcursor::errorMessage(char *errorbuffer,
 
 	const char	*err;
 	unsigned int	errn;
-#ifdef HAVE_MYSQL_STMT_PREPARE
-	if (usestmtprepare) {
-		err=mysql_stmt_error(stmt);
-		errn=mysql_stmt_errno(stmt);
+	if (bindformaterror) {
+		errn=SQLR_ERROR_INVALIDBINDVARIABLEFORMAT;
+		err=SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING;
 	} else {
-#endif
-		err=mysql_error(&mysqlconn->mysql);
-		errn=mysql_errno(&mysqlconn->mysql);
-#ifdef HAVE_MYSQL_STMT_PREPARE
+		#ifdef HAVE_MYSQL_STMT_PREPARE
+		if (usestmtprepare) {
+			err=mysql_stmt_error(stmt);
+			errn=mysql_stmt_errno(stmt);
+		} else {
+		#endif
+			err=mysql_error(&mysqlconn->mysql);
+			errn=mysql_errno(&mysqlconn->mysql);
+		#ifdef HAVE_MYSQL_STMT_PREPARE
+		}
+		#endif
 	}
-#endif
 
 	// Below we check both queryresult and errn.  At one time, we only
 	// checked queryresult.  This may have been a bug.  It's possible that
 	// back then we should have only checked errn.  But I have a fuzzy
 	// memory of some version of mysql returning these error codes in
 	// queryresult, so for now I'll leave that code and check both.
-#if defined(HAVE_MYSQL_CR_SERVER_GONE_ERROR) || \
-		defined(HAVE_MYSQL_CR_SERVER_LOST) 
-	#ifdef HAVE_MYSQL_CR_SERVER_GONE_ERROR
+	#if defined(HAVE_MYSQL_CR_SERVER_GONE_ERROR) || \
+			defined(HAVE_MYSQL_CR_SERVER_LOST) 
+		#ifdef HAVE_MYSQL_CR_SERVER_GONE_ERROR
 		if (queryresult==CR_SERVER_GONE_ERROR ||
 				errn==CR_SERVER_GONE_ERROR) {
 			*liveconnection=false;
 		} else
-	#endif
-	#ifdef HAVE_MYSQL_CR_SERVER_LOST
+		#endif
+		#ifdef HAVE_MYSQL_CR_SERVER_LOST
 		if (queryresult==CR_SERVER_GONE_ERROR /*||
 				errn==CR_SERVER_LOST*/) {
 			*liveconnection=false;
 		} else
+		#endif
 	#endif
-#endif
 	if (!charstring::compare(err,"") ||
 		!charstring::compareIgnoringCase(err,
 				"mysql server has gone away") ||
 		!charstring::compareIgnoringCase(err,
 				"Can't connect to local MySQL",28) ||
 		!charstring::compareIgnoringCase(err,
-				"Can't connect to MySQL",22) /*||
-		!charstring::compareIgnoringCase(err,
-			"Lost connection to MySQL server during query")*/) {
+				"Can't connect to MySQL",22)) {
 		*liveconnection=false;
 	}
 

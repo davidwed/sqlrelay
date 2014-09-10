@@ -5,6 +5,15 @@
 	updated deployment projects for windows, adding perl, php, python
 		and java, and adding x64 support
 	describe/getColumnList supports synonyms with oracle now
+	the mysql, firebird and oracle connections return sensible errors when
+		the format of a numeric bind variable is wrong now
+	fixed a bug that could cause the mysql connection to loop up if
+		alphanumeric bind variable names were used instead of numbers
+	fixed a bug that could cause the database specified in the mysql
+		connection string to be ignored
+	fixed a bind-variable translation bug that could cause variables not
+		to be translated when multiple formats are used in the same
+		query and one of them is the correct format
 
 0.56 - removed VERSION from perl api bootstrap
 	reorganized and simplified perl api code

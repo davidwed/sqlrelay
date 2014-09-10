@@ -207,6 +207,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		const char	*getDebug();
 		bool		getDebugTranslations();
 		bool		getDebugTriggers();
+		bool		getDebugBindTranslations();
 		uint64_t	getMaxClientInfoLength();
 		uint32_t	getMaxQuerySize();
 		uint16_t	getMaxBindCount();
@@ -308,6 +309,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		char		*debug;
 		bool		debugtranslations;
 		bool		debugtriggers;
+		bool		debugbindtranslations;
 		uint64_t	maxclientinfolength;
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;

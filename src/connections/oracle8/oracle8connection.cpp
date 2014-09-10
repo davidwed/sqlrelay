@@ -377,6 +377,8 @@ class DLLSPEC oracle8cursor : public sqlrcursor_svr {
 		uint16_t	oraoutbindlobcount;
 #endif
 
+		bool		bindformaterror;
+
 		uint64_t	row;
 		uint64_t	maxrow;
 		uint64_t	totalrows;
@@ -1502,6 +1504,7 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	orainbindlobcount=0;
 	oraoutbindlobcount=0;
 #endif
+	bindformaterror=false;
 
 	row=0;
 	maxrow=0;
@@ -1677,6 +1680,9 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 	// output bind cursor
 	bound=false;
 
+	// reset the bind format error flag
+	bindformaterror=false;
+
 	// If statement caching is available then use OCIStmtPrepare2,
 	// otherwise just use OCIStmtPrepare.
 
@@ -1808,6 +1814,7 @@ bool oracle8cursor::inputBind(const char *variable,
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		ub4	pos=charstring::toInteger(variable+1);
 		if (!pos) {
+			bindformaterror=true;
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
@@ -1848,6 +1855,7 @@ bool oracle8cursor::inputBind(const char *variable,
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		ub4	pos=charstring::toInteger(variable+1);
 		if (!pos) {
+			bindformaterror=true;
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
@@ -1890,6 +1898,7 @@ bool oracle8cursor::inputBind(const char *variable,
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		ub4	pos=charstring::toInteger(variable+1);
 		if (!pos) {
+			bindformaterror=true;
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
@@ -1940,6 +1949,7 @@ bool oracle8cursor::inputBind(const char *variable,
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		ub4	pos=charstring::toInteger(variable+1);
 		if (!pos) {
+			bindformaterror=true;
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
@@ -1983,6 +1993,7 @@ bool oracle8cursor::outputBind(const char *variable,
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		ub4	pos=charstring::toInteger(variable+1);
 		if (!pos) {
+			bindformaterror=true;
 			return false;
 		}
 		if (OCIBindByPos(stmt,&outbindpp[oraoutbindcount],
@@ -2028,6 +2039,7 @@ bool oracle8cursor::outputBind(const char *variable,
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		ub4	pos=charstring::toInteger(variable+1);
 		if (!pos) {
+			bindformaterror=true;
 			return false;
 		}
 		if (OCIBindByPos(stmt,&outbindpp[oraoutbindcount],
@@ -2073,6 +2085,7 @@ bool oracle8cursor::outputBind(const char *variable,
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		ub4	pos=charstring::toInteger(variable+1);
 		if (!pos) {
+			bindformaterror=true;
 			return false;
 		}
 		if (OCIBindByPos(stmt,&outbindpp[oraoutbindcount],
@@ -2132,6 +2145,7 @@ bool oracle8cursor::outputBind(const char *variable,
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		ub4	pos=charstring::toInteger(variable+1);
 		if (!pos) {
+			bindformaterror=true;
 			return false;
 		}
 		if (OCIBindByPos(stmt,&outbindpp[oraoutbindcount],
@@ -2185,6 +2199,7 @@ bool oracle8cursor::outputBindCursor(const char *variable,
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		ub4	pos=charstring::toInteger(variable+1);
 		if (!pos) {
+			bindformaterror=true;
 			return false;
 		}
 		if (OCIBindByPos(stmt,&curbindpp[oracurbindcount],
@@ -2300,6 +2315,7 @@ bool oracle8cursor::inputBindGenericLob(const char *variable,
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		ub4	pos=charstring::toInteger(variable+1);
 		if (!pos) {
+			bindformaterror=true;
 			return false;
 		}
 		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
@@ -2364,6 +2380,7 @@ bool oracle8cursor::outputBindGenericLob(const char *variable,
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		ub4	pos=charstring::toInteger(variable+1);
 		if (!pos) {
+			bindformaterror=true;
 			return false;
 		}
 		if (OCIBindByPos(stmt,&outbindpp[oraoutbindcount],
@@ -2844,8 +2861,27 @@ void oracle8cursor::errorMessage(char *errorbuffer,
 					int64_t *errorcode,
 					bool *liveconnection) {
 
-	oracle8conn->errorMessage(errorbuffer,errorbufferlength,
-					errorlength,errorcode,liveconnection);
+	if (bindformaterror) {
+
+		// handle bind format errors
+		*errorlength=charstring::length(
+				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
+		charstring::safeCopy(errorbuffer,
+				errorbufferlength,
+				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING,
+				*errorlength);
+		*errorcode=SQLR_ERROR_INVALIDBINDVARIABLEFORMAT;
+		*liveconnection=true;
+
+	} else {
+
+		// otherwise fall back to default implementation
+		sqlrcursor_svr::errorMessage(errorbuffer,
+						errorbufferlength,
+						errorlength,
+						errorcode,
+						liveconnection);
+	}
 
 #ifdef OCI_STMT_CACHE
 	// set the statement release mode such that this query will be

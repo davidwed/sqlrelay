@@ -42,6 +42,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	debug=charstring::duplicate(DEFAULT_DEBUG);
 	debugtranslations=charstring::contains(debug,"translations");
 	debugtriggers=charstring::contains(debug,"triggers");
+	debugbindtranslations=charstring::contains(debug,"bindtranslations");
 	maxclientinfolength=charstring::toInteger(DEFAULT_MAXCLIENTINFOLENGTH);
 	maxquerysize=charstring::toInteger(DEFAULT_MAXQUERYSIZE);
 	maxbindcount=charstring::toInteger(DEFAULT_MAXBINDCOUNT);
@@ -258,6 +259,10 @@ bool sqlrconfigfile::getDebugTranslations() {
 
 bool sqlrconfigfile::getDebugTriggers() {
 	return debugtriggers;
+}
+
+bool sqlrconfigfile::getDebugBindTranslations() {
+	return debugbindtranslations;
 }
 
 uint64_t sqlrconfigfile::getMaxClientInfoLength() {
@@ -1360,6 +1365,8 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 							"translations");
 			debugtriggers=charstring::contains(debug,
 							"triggers");
+			debugbindtranslations=charstring::contains(debug,
+							"bindtranslations");
 		} else if (currentattribute==MAXCLIENTINFOLENGTH_ATTRIBUTE) {
 			maxclientinfolength=
 				charstring::toInteger((value)?value:

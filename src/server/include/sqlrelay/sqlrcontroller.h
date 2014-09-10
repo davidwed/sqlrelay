@@ -345,6 +345,7 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 
 		bool		debugsqlrtranslation;
 		bool		debugtriggers;
+		bool		debugbindtranslation;
 
 		dynamiclib		dl;
 		sqlrconnection_svr	*conn;

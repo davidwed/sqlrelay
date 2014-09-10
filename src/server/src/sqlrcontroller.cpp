@@ -113,6 +113,7 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 
 	debugsqlrtranslation=false;
 	debugtriggers=false;
+	debugbindtranslation=false;
 
 	cur=NULL;
 
@@ -363,6 +364,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 
 	// get translate bind variable behavior
 	translatebinds=cfgfl->getTranslateBindVariables();
+	debugbindtranslation=cfgfl->getDebugBindTranslations();
 
 	// initialize cursors
 	mincursorcount=cfgfl->getCursors();
@@ -2278,6 +2280,21 @@ void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 	uint16_t	i=0;
 
 	// debug
+	if (debugbindtranslation) {
+		stdoutput.printf("bind translation:\n");
+		stdoutput.printf("original:\n\"%s\"\n",cursor->querybuffer);
+		stdoutput.printf("  input binds:\n");
+		for (i=0; i<cursor->inbindcount; i++) {
+			stdoutput.printf("    \"%s\"\n",
+					cursor->inbindvars[i].variable);
+		}
+		stdoutput.printf("  output binds:\n");
+		for (i=0; i<cursor->outbindcount; i++) {
+			stdoutput.printf("    \"%s\"\n",
+					cursor->outbindvars[i].variable);
+		}
+		stdoutput.printf("\n");
+	}
 	logDebugMessage("translating bind variables...");
 	logDebugMessage("original:");
 	logDebugMessage(cursor->querybuffer);
@@ -2372,19 +2389,22 @@ void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 					c++;
 				}
 
-				// Bail if the current bind variable format
-				// matches the db bind format.
-				if (matchesNativeBindFormat(
+				// if the current bind variable format doesn't
+				// match the db bind format...
+				if (!matchesNativeBindFormat(
 						currentbind.getString())) {
-					return;
-				}
 
-				// translate...
-				convert=true;
-				translateBindVariableInStringAndArray(cursor,
+					// translate...
+					convert=true;
+					translateBindVariableInStringAndArray(
+								cursor,
 								&currentbind,
 								bindindex,
 								&newquery);
+				} else {
+					newquery.append(
+						currentbind.getString());
+				}
 				bindindex++;
 
 				parsestate=IN_QUERY;
@@ -2399,6 +2419,10 @@ void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 	} while (c<=endptr);
 
 	if (!convert) {
+		if (debugbindtranslation) {
+			stdoutput.printf("no bind translation performed\n");
+		}
+		logDebugMessage("no bind translation performed");
 		return;
 	}
 
@@ -2415,15 +2439,16 @@ void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 
 
 	// debug
-	if (debugsqlrtranslation) {
-		stdoutput.printf("bind translation:\n\"%s\"\n",
-						cursor->querybuffer);
+	if (debugbindtranslation) {
+		stdoutput.printf("converted:\n\"%s\"\n",cursor->querybuffer);
+		stdoutput.printf("  input binds:\n");
 		for (i=0; i<cursor->inbindcount; i++) {
-			stdoutput.printf("  inbind: \"%s\"\n",
+			stdoutput.printf("    \"%s\"\n",
 					cursor->inbindvars[i].variable);
 		}
+		stdoutput.printf("  output binds:\n");
 		for (i=0; i<cursor->outbindcount; i++) {
-			stdoutput.printf("  outbind: \"%s\"\n",
+			stdoutput.printf("    \"%s\"\n",
 					cursor->outbindvars[i].variable);
 		}
 		stdoutput.printf("\n");

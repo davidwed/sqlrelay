@@ -8,6 +8,7 @@
 #include <rudiments/snooze.h>
 #include <rudiments/sys.h>
 
+#include <defines.h>
 #include <datatypes.h>
 #include <config.h>
 
@@ -147,6 +148,11 @@ class firebirdcursor : public sqlrcursor_svr {
 		void		cleanUpLobOutputBind(uint16_t index);
 		bool		executeQuery(const char *query,
 						uint32_t length);
+		void		errorMessage(char *errorbuffer,
+						uint32_t errorbufferlength,
+						uint32_t *errorlength,
+						int64_t	*errorcode,
+						bool *liveconnection);
 		bool		queryIsNotSelect();
 		bool		queryIsCommitOrRollback();
 		bool		knowsAffectedRows();
@@ -194,7 +200,8 @@ class firebirdcursor : public sqlrcursor_svr {
 
 		firebirdconnection	*firebirdconn;
 
-		bool		queryisexecsp;
+		bool	queryisexecsp;
+		bool	bindformaterror;
 };
 
 class firebirdconnection : public sqlrconnection_svr {
@@ -660,6 +667,7 @@ firebirdcursor::firebirdcursor(sqlrconnection_svr *conn) :
 	stmt=NULL;
 
 	queryisexecsp=false;
+	bindformaterror=false;
 
 	outbindcount=0;
 }
@@ -678,6 +686,9 @@ firebirdcursor::~firebirdcursor() {
 bool firebirdcursor::prepareQuery(const char *query, uint32_t length) {
 
 	queryisexecsp=false;
+
+	// reset the bind format error flag
+	bindformaterror=false;
 
 	// free the old statement if it exists
 	if (stmt) {
@@ -736,6 +747,7 @@ bool firebirdcursor::inputBind(const char *variable,
 	// make bind vars 1 based like all other db's
 	long	index=charstring::toInteger(variable+1)-1;
 	if (index<0) {
+		bindformaterror=true;
 		return false;
 	}
 	insqlda->sqlvar[index].sqltype=SQL_TEXT+1;
@@ -762,6 +774,7 @@ bool firebirdcursor::inputBind(const char *variable,
 	// make bind vars 1 based like all other db's
 	long	index=charstring::toInteger(variable+1)-1;
 	if (index<0) {
+		bindformaterror=true;
 		return false;
 	}
 	insqlda->sqlvar[index].sqltype=SQL_INT64;
@@ -790,6 +803,7 @@ bool firebirdcursor::inputBind(const char *variable,
 	// make bind vars 1 based like all other db's
 	long	index=charstring::toInteger(variable+1)-1;
 	if (index<0) {
+		bindformaterror=true;
 		return false;
 	}
 	insqlda->sqlvar[index].sqltype=SQL_DOUBLE;
@@ -836,6 +850,7 @@ bool firebirdcursor::inputBind(const char *variable,
 	// make bind vars 1 based like all other db's
 	long	index=charstring::toInteger(variable+1)-1;
 	if (index<0) {
+		bindformaterror=true;
 		return false;
 	}
 	insqlda->sqlvar[index].sqltype=SQL_TIMESTAMP;
@@ -864,6 +879,7 @@ bool firebirdcursor::inputBindBlob(const char *variable,
 	// make bind vars 1 based like all other db's
 	long	index=charstring::toInteger(variable+1)-1;
 	if (index<0) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -940,6 +956,7 @@ bool firebirdcursor::outputBind(const char *variable,
 	// make bind vars 1 based like all other db's
 	long	index=charstring::toInteger(variable+1)-1;
 	if (index<0) {
+		bindformaterror=true;
 		return false;
 	}
 	outsqlda->sqlvar[index].sqltype=SQL_TEXT+1;
@@ -973,6 +990,7 @@ bool firebirdcursor::outputBind(const char *variable,
 	// make bind vars 1 based like all other db's
 	long	index=charstring::toInteger(variable+1)-1;
 	if (index<0) {
+		bindformaterror=true;
 		return false;
 	}
 	outsqlda->sqlvar[index].sqltype=SQL_INT64;
@@ -1008,6 +1026,7 @@ bool firebirdcursor::outputBind(const char *variable,
 	// make bind vars 1 based like all other db's
 	long	index=charstring::toInteger(variable+1)-1;
 	if (index<0) {
+		bindformaterror=true;
 		return false;
 	}
 	outsqlda->sqlvar[index].sqltype=SQL_DOUBLE;
@@ -1059,6 +1078,7 @@ bool firebirdcursor::outputBind(const char *variable,
 	// make bind vars 1 based like all other db's
 	long	index=charstring::toInteger(variable+1)-1;
 	if (index<0) {
+		bindformaterror=true;
 		return false;
 	}
 	outsqlda->sqlvar[index].sqltype=SQL_TIMESTAMP;
@@ -1092,6 +1112,7 @@ bool firebirdcursor::outputBindBlob(const char *variable,
 	// make bind vars 1 based like all other db's
 	long	index=charstring::toInteger(variable+1)-1;
 	if (index<0) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1421,6 +1442,33 @@ bool firebirdcursor::executeQuery(const char *query, uint32_t length) {
 	// Execute the query
 	return !isc_dsql_execute(firebirdconn->error,&firebirdconn->tr,
 							&stmt,1,insqlda);
+}
+
+void firebirdcursor::errorMessage(char *errorbuffer,
+					uint32_t errorbufferlength,
+					uint32_t *errorlength,
+					int64_t *errorcode,
+					bool *liveconnection) {
+
+	// handle bind format errors
+	if (bindformaterror) {
+		*errorlength=charstring::length(
+				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
+		charstring::safeCopy(errorbuffer,
+				errorbufferlength,
+				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING,
+				*errorlength);
+		*errorcode=SQLR_ERROR_INVALIDBINDVARIABLEFORMAT;
+		*liveconnection=true;
+		return;
+	}
+
+	// otherwise fall back to default implementation
+	sqlrcursor_svr::errorMessage(errorbuffer,
+					errorbufferlength,
+					errorlength,
+					errorcode,
+					liveconnection);
 }
 
 bool firebirdcursor::queryIsNotSelect() {
