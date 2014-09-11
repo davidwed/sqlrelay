@@ -14,6 +14,9 @@
 	fixed a bind-variable translation bug that could cause variables not
 		to be translated when multiple formats are used in the same
 		query and one of them is the correct format
+	added key information when describing oracle tables
+	added disablekeylookup option to disable getting key information when
+		describing oracle tables
 
 0.56 - removed VERSION from perl api bootstrap
 	reorganized and simplified perl api code
