@@ -14,7 +14,7 @@
 	fixed a bind-variable translation bug that could cause variables not
 		to be translated when multiple formats are used in the same
 		query and one of them is the correct format
-	added key information when describing oracle tables
+	describing oracle tables returns key (PRI,UNI,MUL) info now
 	added disablekeylookup option to disable getting key information when
 		describing oracle tables
 
