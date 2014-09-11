@@ -1046,21 +1046,21 @@ void mysqlcursor::errorMessage(char *errorbuffer,
 
 	const char	*err;
 	unsigned int	errn;
+	#ifdef HAVE_MYSQL_STMT_PREPARE
 	if (bindformaterror) {
 		errn=SQLR_ERROR_INVALIDBINDVARIABLEFORMAT;
 		err=SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING;
 	} else {
-		#ifdef HAVE_MYSQL_STMT_PREPARE
 		if (usestmtprepare) {
 			err=mysql_stmt_error(stmt);
 			errn=mysql_stmt_errno(stmt);
 		} else {
-		#endif
+	#endif
 			err=mysql_error(&mysqlconn->mysql);
 			errn=mysql_errno(&mysqlconn->mysql);
-		#ifdef HAVE_MYSQL_STMT_PREPARE
+	#ifdef HAVE_MYSQL_STMT_PREPARE
 		}
-		#endif
+	#endif
 	}
 
 	// Below we check both queryresult and errn.  At one time, we only
