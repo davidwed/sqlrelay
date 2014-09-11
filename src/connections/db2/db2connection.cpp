@@ -841,7 +841,7 @@ bool db2cursor::inputBind(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				(SQLINTEGER *)isnull);
+				(SQLINTEGER *)NULL);
 	} else {
 		erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
