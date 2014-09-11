@@ -1,6 +1,10 @@
 <html><pre><?php
+# Copyright (c) 2014  David Muse
+# See the file COPYING for more information.
 
+if (strncasecmp(PHP_OS,"WIN",3)) {
 	dl("pdo_sqlrelay.so");
+}
 
 	# sqlrelay
 	$host="localhost";

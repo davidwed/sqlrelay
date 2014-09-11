@@ -48,7 +48,7 @@ if (strncasecmp(PHP_OS,"WIN",3)) {
 	checkSuccess($dbh->exec("insert into testtable values (0,0.0,'0','0','0000-00-00 00:00:00')"),1);
 	echo("\n");
 
-	echo("FIELDS BY INDEX: \n");
+	echo("FIELDS BY INDEX (as NULL): \n");
 	$stmt=$dbh->query("select * from testtable");
 	$result=$stmt->fetch(PDO::FETCH_NUM);
 	checkSuccess($result[0],"");
@@ -56,21 +56,30 @@ if (strncasecmp(PHP_OS,"WIN",3)) {
 	checkSuccess($result[2],"");
 	checkSuccess(stream_get_contents($result[3]),"");
 	checkSuccess($result[4],"");
+echo("\n");
+print_r($result);
+echo("\n");
 	$result=$stmt->fetch(PDO::FETCH_NUM);
 	checkSuccess($result[0],1);
 	checkSuccess($result[1],1.1);
 	checkSuccess($result[2],"1");
 	checkSuccess(stream_get_contents($result[3]),"1");
 	checkSuccess($result[4],"2001-01-01 00:00:00");
+echo("\n");
+print_r($result);
+echo("\n");
 	$result=$stmt->fetch(PDO::FETCH_NUM);
 	checkSuccess($result[0],0);
 	checkSuccess($result[1],0.0);
 	checkSuccess($result[2],"0");
 	checkSuccess(stream_get_contents($result[3]),"0");
 	checkSuccess($result[4],"0000-00-00 00:00:00");
+echo("\n");
+print_r($result);
+echo("\n");
 	echo("\n");
 
-	echo("FIELDS BY INDEX (as NULL): \n");
+	echo("FIELDS BY INDEX (as empty strings): \n");
 	$stmt=$dbh->prepare("select * from testtable");
 	$stmt->setAttribute(
 		PDO::SQLRELAY_ATTR_GET_NULLS_AS_EMPTY_STRINGS,false);
@@ -81,18 +90,27 @@ if (strncasecmp(PHP_OS,"WIN",3)) {
 	checkSuccess($result[2],null);
 	checkSuccess($result[3],null);
 	checkSuccess($result[4],null);
+echo("\n");
+print_r($result);
+echo("\n");
 	$result=$stmt->fetch(PDO::FETCH_NUM);
 	checkSuccess($result[0],1);
 	checkSuccess($result[1],1.1);
 	checkSuccess($result[2],"1");
 	checkSuccess(stream_get_contents($result[3]),"1");
 	checkSuccess($result[4],"2001-01-01 00:00:00");
+echo("\n");
+print_r($result);
+echo("\n");
 	$result=$stmt->fetch(PDO::FETCH_NUM);
 	checkSuccess($result[0],0);
 	checkSuccess($result[1],0.0);
 	checkSuccess($result[2],"0");
 	checkSuccess(stream_get_contents($result[3]),"0");
 	checkSuccess($result[4],"0000-00-00 00:00:00");
+echo("\n");
+print_r($result);
+echo("\n");
 	echo("\n");
 
 	echo("NULL INTEGER INPUT BIND\n");
