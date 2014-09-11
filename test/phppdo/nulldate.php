@@ -26,8 +26,8 @@ if (strncasecmp(PHP_OS,"WIN",3)) {
 	}
 
 	$dbh->exec("drop table testdate");
-	$dbh->exec("create table testdate (date1 datetime, date2 datetime, date3 datetime, date4 datetime)");
-	$dbh->exec("insert into testdate values (NULL,'','0000-00-00 00:00:00','2001-01-01')");
+	$dbh->exec("create table testdate (date1 datetime, date2 datetime, date3 datetime, date4 datetime, date5 datetime)");
+	$dbh->exec("insert into testdate values (NULL,'','0','0000-00-00 00:00:00','2001-01-01')");
 
 	$stmt=$dbh->query("select * from testdate");
 	$result=$stmt->fetch(PDO::FETCH_ASSOC);
