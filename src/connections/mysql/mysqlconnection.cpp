@@ -1060,8 +1060,8 @@ void mysqlcursor::errorMessage(char *errorbuffer,
 			errn=mysql_errno(&mysqlconn->mysql);
 	#ifdef HAVE_MYSQL_STMT_PREPARE
 		}
-	#endif
 	}
+	#endif
 
 	// Below we check both queryresult and errn.  At one time, we only
 	// checked queryresult.  This may have been a bug.  It's possible that
