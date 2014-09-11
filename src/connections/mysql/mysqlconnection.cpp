@@ -650,6 +650,11 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	bindformaterror=false;
 
 	// can't use stmt API to run a couple of types of queries as of 5.0
+	// (This call is a little redundant though...  the sqlrcontroller
+	// calls supportsNativeBinds for each query to see if it needs to
+	// fake binds.  Unfortunately it doesn't call it for things like
+	// pings or "use xxx" or other internal queries.  It might be good
+	// to sort all of that out at some point.)
 	if (!supportsNativeBinds(query)) {
 		return true;
 	}
