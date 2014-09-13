@@ -867,7 +867,6 @@ bool oracle8connection::logIn(const char **error) {
 			supportsproxycredentials=true;
 			#endif
 			supportssyscontext=true;
-supportssyscontext=false;
 		}
 
 		// anything below 9 requires reprepare
