@@ -1205,7 +1205,6 @@ const char *oracle8connection::getColumnListQuery(const char *table,
 const char *oracle8connection::getColumnListQueryWithoutKeys(
 							const char *table,
 							bool wild) {
-stdoutput.printf("without keys\n");
 
 	// It takes a lot longer to look up synonyms than tables.  It's quick
 	// to see if the object is a synonym though, so we'll do that first
@@ -1427,7 +1426,6 @@ stdoutput.printf("without keys\n");
 const char *oracle8connection::getColumnListQueryWithKeys(
 							const char *table,
 							bool wild) {
-stdoutput.printf("with keys\n");
 
 	// It takes a lot longer to look up synonyms than tables.  It's quick
 	// to see if the object is a synonym though, so we'll do that first
