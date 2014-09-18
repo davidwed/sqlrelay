@@ -17,6 +17,7 @@
 	describing oracle tables returns key (PRI,UNI,MUL) info now
 	added disablekeylookup option to disable getting key information when
 		describing oracle tables
+	fixed broken --with-system-libtool configure option
 
 0.56 - removed VERSION from perl api bootstrap
 	reorganized and simplified perl api code

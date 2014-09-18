@@ -435,6 +435,7 @@ echo
 echo "***** Libtool ****************"
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
+FW_CHECK_USE_SYSTEM_LIBTOOL
 
 dnl have to set ar here because libtool (currently) fails
 dnl to use the correct one when cross-compiling

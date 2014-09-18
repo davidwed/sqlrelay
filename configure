@@ -752,6 +752,7 @@ CYGWIN
 MINGW32
 UNAME
 enable_shared
+LIBTOOLGCC
 CXXCPP
 OTOOL64
 OTOOL
@@ -15641,6 +15642,16 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 # Only expand once:
+
+
+
+if ( test "$USE_SYSTEM_LIBTOOL" = "yes" )
+then
+  LIBTOOL="libtool"
+  LIBTOOLGCC="libtool"
+else
+  LIBTOOLGCC="$LIBTOOL.gcc"
+fi
 
 
 
