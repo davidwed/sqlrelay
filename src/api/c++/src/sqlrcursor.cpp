@@ -4258,10 +4258,10 @@ void sqlrcursor::createFieldLengths() {
 	// 	fieldlengths[1] (corresponding to row 4)
 	uint64_t	rowbuffercount=rowcount-firstrowindex;
 	fieldlengths=new uint32_t *[rowbuffercount+1];
-	fieldlengths[rowbuffercount]=(uint32_t)NULL;
+	fieldlengths[rowbuffercount]=0;
 	for (uint64_t i=0; i<rowbuffercount; i++) {
 		fieldlengths[i]=new uint32_t[colcount+1];
-		fieldlengths[i][colcount]=(uint32_t)NULL;
+		fieldlengths[i][colcount]=0;
 		for (uint32_t j=0; j<colcount; j++) {
 			fieldlengths[i][j]=getFieldLengthInternal(i,j);
 		}
