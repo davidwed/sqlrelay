@@ -795,7 +795,7 @@ fi
 dnl on minix, disable -lpthreads, just use -pthreads
 case $host_os in
 	*minix* )
-		PTHREADLIBS=""
+		PTHREADLIB=""
 esac
 
 FW_INCLUDES(pthreads,[$PTHREADINCLUDES])

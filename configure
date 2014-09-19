@@ -16830,7 +16830,7 @@ fi
 
 case $host_os in
 	*minix* )
-		PTHREADLIBS=""
+		PTHREADLIB=""
 esac
 
 
