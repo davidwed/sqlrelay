@@ -16738,10 +16738,14 @@ fi
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
-																					for try in 1 2 3 4 5 6
+																					for try in 0 1 2 3 4 5 6
 			do
 
-				if ( test "$try" = "1" )
+				if ( test "$try" = "0" )
+				then
+					TESTINCLUDES="$PTHREADINCLUDES"
+					TESTLIB="-lmthread $PTHREADLIB"
+				elif ( test "$try" = "1" )
 				then
 					TESTINCLUDES="$PTHREADINCLUDES"
 					TESTLIB="$PTHREADLIB"
@@ -16828,10 +16832,6 @@ $as_echo "no" >&6; }
 	done
 fi
 
-case $host_os in
-	*minix* )
-		PTHREADLIB="-L/usr/pkg/lib -lpthread"
-esac
 
 
 if ( test -n "$PTHREADINCLUDES" )
