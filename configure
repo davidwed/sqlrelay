@@ -16738,34 +16738,38 @@ fi
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
-																					for try in 0 1 2 3 4 5 6
+									for try in 1 2 3 4 5 6 7 8
 			do
 
-				if ( test "$try" = "0" )
+				if ( test "$try" = "1" )
 				then
-					TESTINCLUDES="$PTHREADINCLUDES"
+										TESTINCLUDES="$PTHREADINCLUDES"
 					TESTLIB="-lmthread $PTHREADLIB"
-				elif ( test "$try" = "1" )
-				then
-					TESTINCLUDES="$PTHREADINCLUDES"
-					TESTLIB="$PTHREADLIB"
 				elif ( test "$try" = "2" )
 				then
-					TESTINCLUDES="$PTHREADINCLUDES"
-					TESTLIB="$PTHREADLIB -pthread"
+										TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
+					TESTLIB="-lmthread $PTHREADLIB"
 				elif ( test "$try" = "3" )
 				then
-					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
+					TESTINCLUDES="$PTHREADINCLUDES"
 					TESTLIB="$PTHREADLIB"
 				elif ( test "$try" = "4" )
 				then
-					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
+					TESTINCLUDES="$PTHREADINCLUDES"
 					TESTLIB="$PTHREADLIB -pthread"
 				elif ( test "$try" = "5" )
 				then
+					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
+					TESTLIB="$PTHREADLIB"
+				elif ( test "$try" = "6" )
+				then
+					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
+					TESTLIB="$PTHREADLIB -pthread"
+				elif ( test "$try" = "7" )
+				then
 					TESTINCLUDES="$PTHREADINCLUDES"
 					TESTLIB="-pthread"
-				elif ( test "$try" = "6" )
+				elif ( test "$try" = "8" )
 				then
 					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
 					TESTLIB="-pthread"
@@ -16831,7 +16835,6 @@ $as_echo "no" >&6; }
 		fi
 	done
 fi
-
 
 
 if ( test -n "$PTHREADINCLUDES" )

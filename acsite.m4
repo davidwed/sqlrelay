@@ -727,39 +727,41 @@ else
 			AC_MSG_RESULT(yes)
 
 			dnl  If we found a set of headers and libs, try
-			dnl  linking with them.  We'll try six times,
-			dnl  first with just the header and lib that we
-			dnl  found, then with -pthread added to one,
-			dnl  the other and both, and then finally
-			dnl  without any libs, just -pthread
-			for try in 0 1 2 3 4 5 6
+			dnl  linking with them a bunch of different ways.
+			for try in 1 2 3 4 5 6 7 8
 			do
 
-				if ( test "$try" = "0" )
+				if ( test "$try" = "1" )
 				then
+					dnl for minix
 					TESTINCLUDES="$PTHREADINCLUDES"
 					TESTLIB="-lmthread $PTHREADLIB"
-				elif ( test "$try" = "1" )
-				then
-					TESTINCLUDES="$PTHREADINCLUDES"
-					TESTLIB="$PTHREADLIB"
 				elif ( test "$try" = "2" )
 				then
-					TESTINCLUDES="$PTHREADINCLUDES"
-					TESTLIB="$PTHREADLIB -pthread"
+					dnl for minix
+					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
+					TESTLIB="-lmthread $PTHREADLIB"
 				elif ( test "$try" = "3" )
 				then
-					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
+					TESTINCLUDES="$PTHREADINCLUDES"
 					TESTLIB="$PTHREADLIB"
 				elif ( test "$try" = "4" )
 				then
-					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
+					TESTINCLUDES="$PTHREADINCLUDES"
 					TESTLIB="$PTHREADLIB -pthread"
 				elif ( test "$try" = "5" )
 				then
+					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
+					TESTLIB="$PTHREADLIB"
+				elif ( test "$try" = "6" )
+				then
+					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
+					TESTLIB="$PTHREADLIB -pthread"
+				elif ( test "$try" = "7" )
+				then
 					TESTINCLUDES="$PTHREADINCLUDES"
 					TESTLIB="-pthread"
-				elif ( test "$try" = "6" )
+				elif ( test "$try" = "8" )
 				then
 					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
 					TESTLIB="-pthread"
@@ -795,12 +797,6 @@ else
 		fi
 	done
 fi
-
-dnl on minix, disable -lpthread, just use -pthread
-dnl case $host_os in
-	dnl *minix* )
-		dnl PTHREADLIB="-L/usr/pkg/lib -lpthread"
-dnl esac
 
 FW_INCLUDES(pthreads,[$PTHREADINCLUDES])
 FW_LIBS(pthreads,[$PTHREADLIB])
