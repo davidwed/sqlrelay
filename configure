@@ -16820,8 +16820,8 @@ export LD_LIBRARY_PATH
 					break
 				fi
 
-								PTHREADINCLUDES=""
-				PTHREADLIB=""
+								TESTINCLUDES=""
+				TESTLIB=""
 			done
 
 			if ( test -n "$HAVE_PTHREAD" )
