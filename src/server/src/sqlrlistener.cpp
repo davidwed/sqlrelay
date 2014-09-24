@@ -607,7 +607,7 @@ bool sqlrlistener::listenOnClientSockets() {
 			listening=clientsockin[index]->
 					listen(addresses[index],port,15);
 			if (listening) {
-				addFileDescriptor(clientsockin[index]);
+				addReadFileDescriptor(clientsockin[index]);
 			} else {
 				stringbuffer	info;
 				info.append("failed to listen "
@@ -634,7 +634,7 @@ bool sqlrlistener::listenOnClientSockets() {
 		clientsockun=new unixsocketserver();
 		listening=clientsockun->listen(unixport,0000,15);
 		if (listening) {
-			addFileDescriptor(clientsockun);
+			addReadFileDescriptor(clientsockun);
 		} else {
 			stringbuffer	info;
 			info.append("failed to listen on client socket: ");
@@ -670,7 +670,7 @@ bool sqlrlistener::listenOnHandoffSocket(const char *id) {
 	bool	success=handoffsockun->listen(handoffsockname,0066,15);
 
 	if (success) {
-		addFileDescriptor(handoffsockun);
+		addReadFileDescriptor(handoffsockun);
 	} else {
 		stringbuffer	info;
 		info.append("failed to listen on handoff socket: ");
@@ -703,7 +703,7 @@ bool sqlrlistener::listenOnDeregistrationSocket(const char *id) {
 						removehandoffsockname,0066,15);
 
 	if (success) {
-		addFileDescriptor(removehandoffsockun);
+		addReadFileDescriptor(removehandoffsockun);
 	} else {
 		stringbuffer	info;
 		info.append("failed to listen on deregistration socket: ");
@@ -734,7 +734,7 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 	bool	success=fixupsockun->listen(fixupsockname,0066,15);
 
 	if (success) {
-		addFileDescriptor(fixupsockun);
+		addReadFileDescriptor(fixupsockun);
 	} else {
 		stringbuffer	info;
 		info.append("failed to listen on fixup socket: ");
@@ -787,14 +787,14 @@ filedescriptor *sqlrlistener::waitForTraffic() {
 
 	// wait for data on one of the sockets...
 	// if something bad happened, return an invalid file descriptor
-	if (listener::waitForNonBlockingRead(-1,-1)<1) {
+	if (listener::listen(-1,-1)<1) {
 		return NULL;
 	}
 
 	// return first file descriptor that had data available or an invalid
 	// file descriptor on error
 	filedescriptor	*fd=
-		listener::getReadyList()->getFirst()->getValue();
+		listener::getReadReadyList()->getFirst()->getValue();
 
 	logDebugMessage("finished waiting for traffic");
 
@@ -1736,8 +1736,8 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 
 	// Set up a listener to listen on both client and server sockets.
 	listener	proxy;
-	proxy.addFileDescriptor(serversock);
-	proxy.addFileDescriptor(clientsock);
+	proxy.addReadFileDescriptor(serversock);
+	proxy.addReadFileDescriptor(clientsock);
 
 	// set up a read buffer
 	unsigned char	readbuffer[8192];
@@ -1749,7 +1749,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 
 		// wait for data to be available from the client or server
 		error::clearError();
-		int32_t	waitcount=proxy.waitForNonBlockingRead(-1,-1);
+		int32_t	waitcount=proxy.listen(-1,-1);
 
 		// The wait fell through but nobody had data.  This is just here
 		// for good measure now.  I'm not sure what could cause this.
@@ -1764,7 +1764,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 
 		// get the file descriptor that data was available from
 		filedescriptor	*fd=
-			proxy.getReadyList()->getFirst()->getValue();
+			proxy.getReadReadyList()->getFirst()->getValue();
 
 		// read whatever data was available
 		ssize_t	readcount=fd->read(readbuffer,sizeof(readbuffer));

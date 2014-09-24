@@ -959,7 +959,7 @@ bool sqlrcontroller_svr::openSockets() {
 				logDebugMessage(string);
 				delete[] string;
 
-				addFileDescriptor(serversockun);
+				addReadFileDescriptor(serversockun);
 
 			} else {
 				debugstr.clear();
@@ -1009,7 +1009,8 @@ bool sqlrcontroller_svr::openSockets() {
 						inetport);
 					logDebugMessage(string);
 	
-					addFileDescriptor(serversockin[index]);
+					addReadFileDescriptor(
+							serversockin[index]);
 
 				} else {
 					debugstr.clear();
@@ -1481,13 +1482,13 @@ int32_t sqlrcontroller_svr::waitForClient() {
 		// a client to reconnect...
 
 
-		if (waitForNonBlockingRead(accepttimeout,0)<1) {
+		if (listener::listen(accepttimeout,0)<1) {
 			logInternalError(NULL,"wait for client connect failed");
 			return 0;
 		}
 
 		// get the first socket that had data available...
-		filedescriptor	*fd=getReadyList()->getFirst()->getValue();
+		filedescriptor	*fd=getReadReadyList()->getFirst()->getValue();
 
 		inetsocketserver	*iss=NULL;
 		for (uint64_t index=0; index<serversockincount; index++) {
