@@ -4,15 +4,36 @@
 
 #include "sqlrelaybench.h"
 
+sqlrelaybenchmarks::sqlrelaybenchmarks(const char *connectstring,
+					const char *db,
+					uint64_t cons,
+					uint64_t queries,
+					uint64_t rows,
+					uint32_t cols,
+					uint32_t colsize,
+					bool debug) :
+					benchmarks(connectstring,db,cons,
+						queries,rows,cols,colsize,
+						debug) {
+	con=new sqlrelaybenchconnection(connectstring,db);
+	cur=new sqlrelaybenchcursor(con);
+}
+
+
 sqlrelaybenchconnection::sqlrelaybenchconnection(
-				const char *connectstring, const char *dbtype) :
-					benchconnection(connectstring,dbtype) {
+				const char *connectstring,
+				const char *db) :
+				benchconnection(connectstring,db) {
 	host=getParam("host");
 	port=charstring::toInteger(getParam("port"));
 	socket=getParam("socket");
 	user=getParam("user");
 	password=getParam("password");
+	debug=!charstring::compare(getParam("debug"),"yes");
 	sqlrcon=new sqlrconnection(host,port,socket,user,password,0,1);
+	if (debug) {
+		sqlrcon->debugOn();
+	}
 }
 
 sqlrelaybenchconnection::~sqlrelaybenchconnection() {
@@ -29,9 +50,8 @@ bool sqlrelaybenchconnection::disconnect() {
 }
 
 
-
 sqlrelaybenchcursor::sqlrelaybenchcursor(benchconnection *con) :
-							benchcursor(con){
+							benchcursor(con) {
 	sqlrbcon=(sqlrelaybenchconnection *)con;
 	sqlrcur=new sqlrcursor(sqlrbcon->sqlrcon);
 }
@@ -40,26 +60,6 @@ sqlrelaybenchcursor::~sqlrelaybenchcursor() {
 	delete sqlrcur;
 }
 
-bool sqlrelaybenchcursor::createTable() {
-	return sqlrcur->sendQuery(bcon->getCreateQuery());
-}
-
-bool sqlrelaybenchcursor::dropTable() {
-	return sqlrcur->sendQuery(bcon->getDropQuery());
-}
-
-bool sqlrelaybenchcursor::insertQuery() {
-	return sqlrcur->sendQuery(bcon->getInsertQuery());
-}
-
-bool sqlrelaybenchcursor::updateQuery() {
-	return sqlrcur->sendQuery(bcon->getUpdateQuery());
-}
-
-bool sqlrelaybenchcursor::deleteQuery() {
-	return sqlrcur->sendQuery(bcon->getDeleteQuery());
-}
-
-bool sqlrelaybenchcursor::selectQuery() {
-	return sqlrcur->sendQuery(bcon->getSelectQuery());
+bool sqlrelaybenchcursor::query(const char *query) {
+	return sqlrcur->sendQuery(query);
 }

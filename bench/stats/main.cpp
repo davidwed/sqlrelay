@@ -6,134 +6,105 @@
 
 #include "bench.h"
 
+//#include "oraclebench.h"
 #include "sqlrelaybench.h"
 
-bool benchmarks(benchconnection *bcon, benchcursor *bcur,
-			uint64_t connections, uint64_t queries) {
-
-	// reconnect some number of times
-	for (uint64_t c=0; c<connections; c++) {
-
-		// connect to db
-		bcon->connect();
-
-		// run some number of queries per connection
-		for (uint64_t q=0; q<queries; q++) {
-
-			// run query
-			if (!bcur->selectQuery()) {
-				return false;
-			}
-		}
-
-		// disconnect from the db
-		bcon->disconnect();
-	}
-	return true;
-}
+#define ORACLE_SID "(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = db64.firstworks.com)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))"
 
 int main(int argc, const char **argv) {
 
 	// process the command line
 	commandline	cmdl(argc,argv);
 
-	uint64_t	connections=charstring::toInteger(
-					cmdl.getValue("connections"));
-	uint64_t	queries=charstring::toInteger(
-					cmdl.getValue("queries"));
-	uint64_t	rows=charstring::toInteger(
-					cmdl.getValue("rows"));
-	uint64_t	cols=charstring::toInteger(
-					cmdl.getValue("cols"));
-
-	// sanity check
-	if (!connections || !queries || !rows || !cols) {
+	// usage info
+	if (cmdl.found("help") || cmdl.found("h")) {
 		stdoutput.printf(
 			"usage: bench \\\n"
+			"	-db [db] \\\n"
 			"	-connections [connection-count] \\\n"
 			"	-queries [query-per-connection-count] \\\n"
 			"	-rows [rows-per-query] \\\n"
-			"	-cols [columns-per-query]\n");
+			"	-cols [columns-per-query] \\\n"
+			"	-colsize [characters-per-column] \\\n"
+			"	-debug\n");
 		process::exit(1);
 	}
 
-	const char	*dbs[]={
-		/*"db2",
-		"firebird",
-		"freetds",
-		"mdbtools",
-		"mysql",
-		"odbc",*/
-		"oracle",
-		/*"postgresql",
-		"sqlite",
-		"sybase",*/
-		NULL
-	};
+	// default parameters
+	const char	*db="oracle";
+	uint64_t	conns=10;
+	uint64_t	queries=10;
+	uint64_t	rows=10;
+	uint32_t	cols=10;
+	uint32_t	colsize=10;
+	bool		debug=false;
+
+	// override defaults with command line parameters
+	if (cmdl.found("db")) {
+		db=cmdl.getValue("db");
+	}
+	if (cmdl.found("connections")) {
+		conns=charstring::toInteger(cmdl.getValue("connections"));
+	}
+	if (cmdl.found("queries")) {
+		queries=charstring::toInteger(cmdl.getValue("queries"));
+	}
+	if (cmdl.found("rows")) {
+		rows=charstring::toInteger(cmdl.getValue("rows"));
+	}
+	if (cmdl.found("cols")) {
+		cols=charstring::toInteger(cmdl.getValue("cols"));
+	}
+	if (cmdl.found("colsize")) {
+		colsize=charstring::toInteger(cmdl.getValue("colsize"));
+	}
+	if (cmdl.found("debug")) {
+		debug=true;
+	}
 
 	// for each database...
 	bool	error=false;
-	for (const char * const *db=dbs; *db && !error; db++) {
 
-		// first time for the real db, second time for sqlrelay...
-		for (uint16_t which=0; which<2 && !error; which++) {
+	// first time for the real db, second time for sqlrelay...
+	for (uint16_t which=0; which<2 && !error; which++) {
 
-			// init connection and cursor
-			benchconnection	*bcon=NULL;
-			benchcursor	*bcur=NULL;
-			if (!which) {
-				stdoutput.printf("benchmarking %s\n",*db);
-				if (!charstring::compare(*db,"db2")) {
-				} else if (!charstring::compare(
-							*db,"firebird")) {
-				} else if (!charstring::compare(
-							*db,"freetds")) {
-				} else if (!charstring::compare(
-							*db,"mdbtools")) {
-				} else if (!charstring::compare(
-							*db,"mysql")) {
-				} else if (!charstring::compare(
-							*db,"odbc")) {
-				} else if (!charstring::compare(
-							*db,"oracle")) {
-				} else if (!charstring::compare(
-							*db,"postgresql")) {
-				} else if (!charstring::compare(
-							*db,"sqlite")) {
-				} else if (!charstring::compare(
-							*db,"sybase")) {
-				}
-continue;
-			} else {
-				stdoutput.printf("benchmarking "
-						"sqlrelay-%s\n",*db);
-				bcon=new sqlrelaybenchconnection(
-						"host=localhost;port=9000;"
-						"socket=/tmp/test.socket;"
-						"user=test;password=test",
-						*db);
-				bcur=new sqlrelaybenchcursor(bcon);
-			}
-
-			// set up everything...
-			bcon->setRowCount(rows);
-			bcon->setColumnCount(cols);
-			bcon->buildQueries();
-			bcur->createTable();
-
-			// run the benchmarks
-			error=benchmarks(bcon,bcur,connections,queries);
-
-			// handle errors
-			if (error) {
-				stdoutput.printf("error running query\n");
-			}
-
-			// clean up
-			bcur->dropTable();
-			delete bcon;
-			delete bcur;
+		if (!which) {
+			stdoutput.printf("benchmarking %s\n",db);
+		} else {
+			stdoutput.printf("benchmarking sqlrelay-%s\n",db);
 		}
+
+		// init benchmarks
+		benchmarks	*bm=NULL;
+		if (which) {
+			bm=new sqlrelaybenchmarks(
+					"host=localhost;port=9000;"
+					"socket=/tmp/test.socket;"
+					"user=test;password=test;"
+					"debug=no",
+					db,conns,queries,
+					rows,cols,colsize,debug);
+		} else if (!charstring::compare(db,"db2")) {
+		} else if (!charstring::compare(db,"firebird")) {
+		} else if (!charstring::compare(db,"freetds")) {
+		} else if (!charstring::compare(db,"mdbtools")) {
+		} else if (!charstring::compare(db,"mysql")) {
+		} else if (!charstring::compare(db,"odbc")) {
+		} else if (!charstring::compare(db,"oracle")) {
+		} else if (!charstring::compare(db,"postgresql")) {
+		} else if (!charstring::compare(db,"sqlite")) {
+		} else if (!charstring::compare(db,"sybase")) {
+		}
+		if (!bm) {
+			stdoutput.printf("error creating benchmarks\n");
+			continue;
+		}
+
+		// run the benchmarks
+		bm->run();
+
+		// clean up
+		delete bm;
 	}
 
 	// exit

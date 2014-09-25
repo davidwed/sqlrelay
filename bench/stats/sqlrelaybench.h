@@ -7,6 +7,18 @@
 
 #include "bench.h"
 
+class sqlrelaybenchmarks : public benchmarks {
+	public:
+		sqlrelaybenchmarks(const char *connectstring,
+					const char *db,
+					uint64_t cons,
+					uint64_t queries,
+					uint64_t rows,
+					uint32_t cols,
+					uint32_t colsize,
+					bool debug);
+};
+
 class sqlrelaybenchconnection : public benchconnection {
 	friend class sqlrelaybenchcursor;
 	public:
@@ -23,6 +35,7 @@ class sqlrelaybenchconnection : public benchconnection {
 		const char	*socket;
 		const char	*user;
 		const char	*password;
+		bool		debug;
 
 		sqlrconnection	*sqlrcon;
 };
@@ -32,13 +45,7 @@ class sqlrelaybenchcursor : public benchcursor {
 			sqlrelaybenchcursor(benchconnection *con);
 			~sqlrelaybenchcursor();
 
-		bool	createTable();
-		bool	dropTable();
-
-		bool	insertQuery();
-		bool	updateQuery();
-		bool	deleteQuery();
-		bool	selectQuery();
+		bool	query(const char *query);
 
 	private:
 		sqlrelaybenchconnection	*sqlrbcon;

@@ -4,40 +4,43 @@
 #define BENCH_H
 
 #include <rudiments/parameterstring.h>
+#include <rudiments/stringbuffer.h>
+#include <rudiments/randomnumber.h>
 
-class benchconnection {
+class benchconnection;
+class benchcursor;
+
+class benchmarks {
 	public:
-			benchconnection(const char *connectstring,
-					const char *dbtype);
-		virtual	~benchconnection();
+			benchmarks(const char *connectstring,
+						const char *db,
+						uint64_t cons,
+						uint64_t queries,
+						uint64_t rows,
+						uint32_t cols,
+						uint32_t colsize,
+						bool debug);
+		virtual	~benchmarks();
+		void	run();
 
-		virtual void	setRowCount(uint64_t rowcount);
-		virtual void	setColumnCount(uint32_t columncount);
-
-		virtual	void	buildQueries();
-
-		virtual	bool	connect()=0;
-		virtual	bool	disconnect()=0;
-
-		const char	*getParam(const char *param);
-
-		const char	*getDbType();
-
-		const char	*getCreateQuery();
-		const char	*getDropQuery();
-		const char	*getInsertQuery();
-		const char	*getUpdateQuery();
-		const char	*getDeleteQuery();
-		const char	*getSelectQuery();
+	protected:
+		benchconnection	*con;
+		benchcursor	*cur;
 
 	private:
-		void	buildOracleQueries();
+		char	*buildQuery(const char *query, uint64_t key);
+		void	appendRandomString(stringbuffer *str);
 
-		parameterstring	pstring;
-		const char	*dbtype;
+		const char	*connectstring;
+		const char	*db;
+		uint64_t	cons;
+		uint64_t	queries;
+		uint64_t	rows;
+		uint32_t	cols;
+		uint32_t	colsize;
+		bool		debug;
 
-		uint64_t	rowcount;
-		uint32_t	columncount;
+		randomnumber	rnd;
 
 		char	*createquery;
 		char	*dropquery;
@@ -47,18 +50,28 @@ class benchconnection {
 		char	*selectquery;
 };
 
+class benchconnection {
+	public:
+			benchconnection(const char *connectstring,
+					const char *db);
+		virtual	~benchconnection();
+
+		virtual	bool	connect()=0;
+		virtual	bool	disconnect()=0;
+
+	protected:
+		const char	*getParam(const char *param);
+
+		parameterstring	pstring;
+		const char	*db;
+};
+
 class benchcursor {
 	public:
 			benchcursor(benchconnection *bcon);
 		virtual	~benchcursor();
 
-		virtual	bool	createTable()=0;
-		virtual	bool	dropTable()=0;
-
-		virtual	bool	insertQuery()=0;
-		virtual	bool	updateQuery()=0;
-		virtual	bool	deleteQuery()=0;
-		virtual	bool	selectQuery()=0;
+		virtual	bool	query(const char *query)=0;
 
 	protected:
 		benchconnection	*bcon;
