@@ -7,6 +7,7 @@
 #include "bench.h"
 
 #include "oraclebench.h"
+#include "mysqlbench.h"
 #include "sqlrelaybench.h"
 
 #define ORACLE_SID "(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = db64.firstworks.com)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))"
@@ -66,7 +67,8 @@ int main(int argc, const char **argv) {
 	bool	error=false;
 
 	// first time for the real db, second time for sqlrelay...
-	for (uint16_t which=0; which<2 && !error; which++) {
+	//for (uint16_t which=0; which<2 && !error; which++) {
+	for (uint16_t which=1; which<2 && !error; which++) {
 
 		if (!which) {
 			stdoutput.printf("benchmarking %s\n",db);
@@ -89,6 +91,11 @@ int main(int argc, const char **argv) {
 		} else if (!charstring::compare(db,"freetds")) {
 		} else if (!charstring::compare(db,"mdbtools")) {
 		} else if (!charstring::compare(db,"mysql")) {
+			bm=new mysqlbenchmarks(
+					"host=db64;db=testdb;"
+					"user=testuser;password=testpassword;",
+					db,queries,rows,
+					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"odbc")) {
 		} else if (!charstring::compare(db,"oracle")) {
 			bm=new oraclebenchmarks(

@@ -183,6 +183,8 @@ char *benchmarks::createQuery(uint32_t cols, uint32_t colsize) {
 		createquerystr.append("col")->append(i)->append(" ");
 		if (!charstring::compare(db,"oracle")) {
 			createquerystr.append("varchar2");
+		} else {
+			createquerystr.append("varchar");
 		}
 		createquerystr.append("(")->append(colsize)->append(")");
 	}

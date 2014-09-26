@@ -8,14 +8,24 @@ CPPFLAGS = \
 	$(BASECPPFLAGS) \
 	$(RUDIMENTSINCLUDES) \
 	-I$(top_builddir)/src/api/c++/include \
-	$(ORACLEINCLUDES)
+	$(ORACLEINCLUDES) \
+	$(MYSQLINCLUDES)
 
 LIBS = \
 	-L$(top_builddir)/src/api/c++/src \
 	-lsqlrclient \
 	$(RUDIMENTSLIBS) \
-	-R $(ORACLELIBSPATH) $(ORACLELIBS) \
 	$(EXTRALIBS)
+
+ifneq ($(strip $(ORACLELIBSPATH)),)
+	LIBS += -R $(ORACLELIBSPATH)
+endif
+LIBS += $(ORACLELIBS)
+
+ifneq ($(strip $(MYSQLLIBSPATH)),)
+	LIBS += -R $(MYSQLLIBSPATH)
+endif
+LIBS += $(MYSQLLIBS)
 
 SRCS = bench.cpp main.cpp
 LOBJS = bench.lo main.lo
@@ -25,6 +35,9 @@ LOBJS += sqlrelaybench.lo
 
 SRCS += oraclebench.cpp
 LOBJS += oraclebench.lo
+
+SRCS += mysqlbench.cpp
+LOBJS += mysqlbench.lo
 
 .SUFFIXES: .lo
 
