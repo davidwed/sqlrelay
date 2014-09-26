@@ -39,12 +39,18 @@ benchmarks::~benchmarks() {
 
 void benchmarks::run() {
 
-	// connect
+	// connect and open
 	if (debug) {
 		stdoutput.printf("connecting\n");
 	}
 	if (!con->connect()) {
 		stdoutput.printf("error connecting\n");
+	}
+	if (debug) {
+		stdoutput.printf("opening\n");
+	}
+	if (!cur->open()) {
+		stdoutput.printf("error opening\n");
 	}
 
 
@@ -125,8 +131,17 @@ void benchmarks::run() {
 
 
 	// re-connect
+	if (debug) {
+		stdoutput.printf("re-connecting\n");
+	}
 	if (!con->connect()) {
-		stdoutput.printf("error disconnecting\n");
+		stdoutput.printf("error connecting\n");
+	}
+	if (debug) {
+		stdoutput.printf("re-opening\n");
+	}
+	if (!cur->open()) {
+		stdoutput.printf("error opening\n");
 	}
 
 
@@ -139,7 +154,13 @@ void benchmarks::run() {
 	}
 
 
-	// disconnect
+	// close and disconnect
+	if (debug) {
+		stdoutput.printf("closing\n");
+	}
+	if (!cur->close()) {
+		stdoutput.printf("error closing\n");
+	}
 	if (debug) {
 		stdoutput.printf("disconnecting\n");
 	}
@@ -193,7 +214,16 @@ void benchmarks::benchSelect(const char *selectquery,
 				uint32_t cols, uint32_t colsize,
 				uint16_t iterations) {
 
-	// disconnect
+	// close and disconnect
+	if (debug) {
+		stdoutput.printf("closing\n");
+	}
+	if (!cur->close()) {
+		stdoutput.printf("error closing\n");
+	}
+	if (debug) {
+		stdoutput.printf("disconnecting\n");
+	}
 	if (!con->disconnect()) {
 		stdoutput.printf("error disconnecting\n");
 	}
@@ -229,13 +259,22 @@ void benchmarks::benchSelect(const char *selectquery,
 
 			for (uint64_t i=0; i<actualconcount; i++) {
 
-				// connect
+				// connect and open
 				if (debug) {
 					stdoutput.printf(
 						"  connection %lld\n",i);
 				}
+				if (debug) {
+					stdoutput.printf("connecting\n");
+				}
 				if (!con->connect()) {
 					stdoutput.printf("error connecting\n");
+				}
+				if (debug) {
+					stdoutput.printf("opening\n");
+				}
+				if (!cur->open()) {
+					stdoutput.printf("error opening\n");
 				}
 
 				// run some number of queries per connection
@@ -257,7 +296,16 @@ void benchmarks::benchSelect(const char *selectquery,
 					}
 				}
 
-				// disconnect
+				// close and disconnect
+				if (debug) {
+					stdoutput.printf("closing\n");
+				}
+				if (!cur->close()) {
+					stdoutput.printf("error closing\n");
+				}
+				if (debug) {
+					stdoutput.printf("disconnecting\n");
+				}
 				if (!con->disconnect()) {
 					stdoutput.printf(
 						"error disconnecting\n");
@@ -331,4 +379,12 @@ benchcursor::benchcursor(benchconnection *bcon) {
 }
 
 benchcursor::~benchcursor() {
+}
+
+bool benchcursor::open() {
+	return true;
+}
+
+bool benchcursor::close() {
+	return true;
 }

@@ -7,12 +7,14 @@ include ../../config.mk
 CPPFLAGS = \
 	$(BASECPPFLAGS) \
 	$(RUDIMENTSINCLUDES) \
-	-I$(top_builddir)/src/api/c++/include
+	-I$(top_builddir)/src/api/c++/include \
+	$(ORACLEINCLUDES)
 
 LIBS = \
 	-L$(top_builddir)/src/api/c++/src \
 	-lsqlrclient \
 	$(RUDIMENTSLIBS) \
+	-R $(ORACLELIBSPATH) $(ORACLELIBS) \
 	$(EXTRALIBS)
 
 SRCS = bench.cpp main.cpp
@@ -20,6 +22,9 @@ LOBJS = bench.lo main.lo
 
 SRCS += sqlrelaybench.cpp
 LOBJS += sqlrelaybench.lo
+
+SRCS += oraclebench.cpp
+LOBJS += oraclebench.lo
 
 .SUFFIXES: .lo
 

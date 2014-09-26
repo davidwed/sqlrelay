@@ -6,7 +6,7 @@
 
 #include "bench.h"
 
-//#include "oraclebench.h"
+#include "oraclebench.h"
 #include "sqlrelaybench.h"
 
 #define ORACLE_SID "(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = db64.firstworks.com)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))"
@@ -91,6 +91,11 @@ int main(int argc, const char **argv) {
 		} else if (!charstring::compare(db,"mysql")) {
 		} else if (!charstring::compare(db,"odbc")) {
 		} else if (!charstring::compare(db,"oracle")) {
+			bm=new oraclebenchmarks(
+					"sid="ORACLE_SID";"
+					"user=testuser;password=testpassword;",
+					db,queries,rows,
+					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"postgresql")) {
 		} else if (!charstring::compare(db,"sqlite")) {
 		} else if (!charstring::compare(db,"sybase")) {

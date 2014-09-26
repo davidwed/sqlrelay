@@ -69,7 +69,9 @@ class benchcursor {
 			benchcursor(benchconnection *bcon);
 		virtual	~benchcursor();
 
+		virtual	bool	open();
 		virtual	bool	query(const char *query)=0;
+		virtual	bool	close();
 
 	protected:
 		benchconnection	*bcon;
