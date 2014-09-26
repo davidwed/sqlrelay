@@ -14,11 +14,11 @@ class benchmarks {
 	public:
 			benchmarks(const char *connectstring,
 						const char *db,
-						uint64_t cons,
 						uint64_t queries,
 						uint64_t rows,
 						uint32_t cols,
 						uint32_t colsize,
+						uint16_t iterations,
 						bool debug);
 		virtual	~benchmarks();
 		void	run();
@@ -28,26 +28,24 @@ class benchmarks {
 		benchcursor	*cur;
 
 	private:
-		char	*buildQuery(const char *query, uint64_t key);
-		void	appendRandomString(stringbuffer *str);
+		char	*createQuery(uint32_t cols, uint32_t colsize);
+		char	*insertQuery(uint32_t cols, uint32_t colsize);
+		void	appendRandomString(stringbuffer *str, uint32_t colsize);
+		void	benchSelect(const char *selectquery,
+					uint64_t queries,
+					uint64_t rows, uint32_t cols,
+					uint32_t colsize, uint16_t iterations);
 
 		const char	*connectstring;
 		const char	*db;
-		uint64_t	cons;
 		uint64_t	queries;
 		uint64_t	rows;
 		uint32_t	cols;
 		uint32_t	colsize;
+		uint16_t	iterations;
 		bool		debug;
 
 		randomnumber	rnd;
-
-		char	*createquery;
-		char	*dropquery;
-		char	*insertquery;
-		char	*updatequery;
-		char	*deletequery;
-		char	*selectquery;
 };
 
 class benchconnection {

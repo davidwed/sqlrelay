@@ -6,15 +6,15 @@
 
 sqlrelaybenchmarks::sqlrelaybenchmarks(const char *connectstring,
 					const char *db,
-					uint64_t cons,
 					uint64_t queries,
 					uint64_t rows,
 					uint32_t cols,
 					uint32_t colsize,
+					uint16_t iterations,
 					bool debug) :
-					benchmarks(connectstring,db,cons,
+					benchmarks(connectstring,db,
 						queries,rows,cols,colsize,
-						debug) {
+						iterations,debug) {
 	con=new sqlrelaybenchconnection(connectstring,db);
 	cur=new sqlrelaybenchcursor(con);
 }

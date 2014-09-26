@@ -21,30 +21,27 @@ int main(int argc, const char **argv) {
 		stdoutput.printf(
 			"usage: bench \\\n"
 			"	-db [db] \\\n"
-			"	-connections [connection-count] \\\n"
-			"	-queries [query-per-connection-count] \\\n"
+			"	-queries [total-query-count] \\\n"
 			"	-rows [rows-per-query] \\\n"
-			"	-cols [columns-per-query] \\\n"
+			"	-cols [columns-per-row] \\\n"
 			"	-colsize [characters-per-column] \\\n"
+			"	-iterations [iterations-per-test] \\\n"
 			"	-debug\n");
 		process::exit(1);
 	}
 
 	// default parameters
 	const char	*db="oracle";
-	uint64_t	conns=10;
-	uint64_t	queries=10;
-	uint64_t	rows=10;
-	uint32_t	cols=10;
-	uint32_t	colsize=10;
+	uint64_t	queries=20;
+	uint64_t	rows=256;
+	uint32_t	cols=16;
+	uint32_t	colsize=32;
+	uint16_t	iterations=10;
 	bool		debug=false;
 
 	// override defaults with command line parameters
 	if (cmdl.found("db")) {
 		db=cmdl.getValue("db");
-	}
-	if (cmdl.found("connections")) {
-		conns=charstring::toInteger(cmdl.getValue("connections"));
 	}
 	if (cmdl.found("queries")) {
 		queries=charstring::toInteger(cmdl.getValue("queries"));
@@ -57,6 +54,9 @@ int main(int argc, const char **argv) {
 	}
 	if (cmdl.found("colsize")) {
 		colsize=charstring::toInteger(cmdl.getValue("colsize"));
+	}
+	if (cmdl.found("iterations")) {
+		iterations=charstring::toInteger(cmdl.getValue("iterations"));
 	}
 	if (cmdl.found("debug")) {
 		debug=true;
@@ -82,8 +82,8 @@ int main(int argc, const char **argv) {
 					"socket=/tmp/test.socket;"
 					"user=test;password=test;"
 					"debug=no",
-					db,conns,queries,
-					rows,cols,colsize,debug);
+					db,queries,rows,
+					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"db2")) {
 		} else if (!charstring::compare(db,"firebird")) {
 		} else if (!charstring::compare(db,"freetds")) {

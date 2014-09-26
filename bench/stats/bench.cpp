@@ -1,92 +1,38 @@
 // Copyright (c) 2014  David Muse
 // See the file COPYING for more information
-#include <rudiments/stringbuffer.h>
+#include <rudiments/datetime.h>
+
+// for pow()
+#include <math.h>
+// for fflush and stdout
+#include <stdio.h>
 
 #include "bench.h"
 
 benchmarks::benchmarks(const char *connectstring,
 				const char *db,
-				uint64_t cons,
 				uint64_t queries,
 				uint64_t rows,
 				uint32_t cols,
 				uint32_t colsize,
+				uint16_t iterations,
 				bool debug) {
 
 	this->connectstring=connectstring;
 	this->db=db;
-	this->cons=cons;
 	this->queries=queries;
 	this->rows=rows;
 	this->cols=cols;
 	this->colsize=colsize;
+	this->iterations=iterations;
 	this->debug=debug;
 	this->con=NULL;
 	this->cur=NULL;
 
 	rnd.setSeed(randomnumber::getSeed());
-
-	// create query
-	stringbuffer	createquerystr;
-	createquerystr.append("create table testtable (");
-	createquerystr.append("keycol int");
-	for (uint32_t i=0; i<cols; i++) {
-		createquerystr.append(",");
-		createquerystr.append("col")->append(i)->append(" ");
-		if (!charstring::compare(db,"oracle")) {
-			createquerystr.append("varchar2");
-		}
-		createquerystr.append("(")->append(colsize)->append(")");
-	}
-	createquerystr.append(")");
-	createquery=createquerystr.detachString();
-
-	// drop query
-	dropquery=charstring::duplicate(
-			"drop table testtable");
-
-	// insert query
-	stringbuffer	insertquerystr;
-	insertquerystr.append("insert into testtable values (%lld");
-	for (uint32_t i=0; i<cols; i++) {
-		insertquerystr.append(",'");
-		appendRandomString(&insertquerystr);
-		insertquerystr.append("'");
-	}
-	insertquerystr.append(")");
-	insertquery=insertquerystr.detachString();
-
-	// update query
-	stringbuffer	updatequerystr;
-	updatequerystr.append("update testtable set ");
-	for (uint32_t i=0; i<cols; i++) {
-		if (i) {
-			updatequerystr.append(",");
-		}
-		updatequerystr.append("col")->append(i);
-		updatequerystr.append("='");
-		appendRandomString(&updatequerystr);
-		updatequerystr.append("'");
-	}
-	updatequerystr.append(" where keycol=%lld");
-	updatequery=updatequerystr.detachString();
-
-	// select query
-	selectquery=charstring::duplicate("select * from testtable");
-
-	// delete query
-	stringbuffer	deletequerystr;
-	deletequerystr.append("delete from testtable where keycol=%lld");
-	deletequery=deletequerystr.detachString();
 }
 
 benchmarks::~benchmarks() {
-	delete[] createquery;
-	delete[] dropquery;
-	delete[] insertquery;
-	delete[] updatequery;
-	delete[] selectquery;
-	delete[] deletequery;
 	delete cur;
 	delete con;
 }
@@ -101,104 +47,97 @@ void benchmarks::run() {
 		stdoutput.printf("error connecting\n");
 	}
 
-	// create the table
+
+	// drop table (just in case)
+	const char	*dropquery="drop table testtable";
+	cur->query(dropquery);
+
+
+	// create
+	char	*createquery=createQuery(cols,colsize);
 	if (debug) {
 		stdoutput.printf("creating table:\n%s\n",createquery);
 	}
 	if (!cur->query(createquery)) {
 		stdoutput.printf("error creating table\n");
 	}
+	delete[] createquery;
 
-	// insert rows
+
+	// insert
 	if (debug) {
-		stdoutput.printf("inserting %lld rows:\n%s\n",rows,insertquery);
+		stdoutput.printf("inserting %lld rows:\n",rows);
 	}
 	for (uint64_t i=0; i<rows; i++) {
+		char	*insertquery=insertQuery(cols,colsize);
 		if (debug) {
-			stdoutput.printf("  row %lld\n",i);
+			stdoutput.printf("  row %lld\n%s\n",i,insertquery);
 		}
-		char	*newq=buildQuery(insertquery,i);
-		bool	result=cur->query(newq);
-		delete[] newq;
+		bool	result=cur->query(insertquery);
 		if (!result) {
 			stdoutput.printf("error inserting rows\n");
 		}
+		delete[] insertquery;
 	}
 
-	// update rows
-	if (debug) {
-		stdoutput.printf("updating %lld rows:\n%s\n",rows,updatequery);
-	}
-	for (uint64_t i=0; i<rows; i++) {
-		if (debug) {
-			stdoutput.printf("  row %lld\n",i);
-		}
-		char	*newq=buildQuery(updatequery,i);
-		bool	result=cur->query(newq);
-		delete[] newq;
-		if (!result) {
-			stdoutput.printf("error updating rows\n");
-		}
-	}
+	// select
+	const char	*selectquery="select * from testtable";
+	uint32_t	colfactor=4;
+	uint32_t	colcount=pow(2,colfactor);
+	while (colcount<=cols) {
 
-	// disconnect
-	if (!con->disconnect()) {
-		stdoutput.printf("error disconnecting\n");
-	}
+		uint32_t	rowfactor=6;
+		uint32_t	rowcount=pow(2,rowfactor);
+		while (rowcount<=rows) {
 
-	// select rows
-	if (debug) {
-		stdoutput.printf("selecting %lld rows, %ld columns:\n%s\n",
-							rows,cols,selectquery);
-	}
-	for (uint64_t i=0; i<cons; i++) {
-		if (debug) {
-			stdoutput.printf("  connection %lld\n",i);
-		}
-		if (!con->connect()) {
-			stdoutput.printf("error connecting\n");
-		}
-		for (uint64_t j=0; j<queries; j++) {
 			if (debug) {
-				stdoutput.printf("    query %lld\n",j);
+				stdoutput.printf("selecting %lld rows, "
+						"%ld columns:\n%s\n",
+						rowcount,colcount,selectquery);
 			}
-			if (!cur->query(selectquery)) {
-				stdoutput.printf("error selecting rows\n");
+			benchSelect(selectquery,queries,
+					rowcount,colcount,colsize,
+					iterations);
+
+			// 1, 2, 4, 8, 16...rows
+			if (rowcount==rows) {
+				rowcount++;
+			} else {
+				rowfactor++;
+				rowcount=pow(2,rowfactor);
+				if (rowcount>rows) {
+					rowcount=rows;
+				}
 			}
 		}
-		if (!con->disconnect()) {
-			stdoutput.printf("error disconnecting\n");
+
+		// 1, 2, 4, 8, 16...cols
+		if (colcount==cols) {
+			colcount++;
+		} else {
+			colfactor++;
+			colcount=pow(2,colfactor);
+			if (colcount>cols) {
+				colcount=cols;
+			}
 		}
 	}
+
 
 	// re-connect
 	if (!con->connect()) {
 		stdoutput.printf("error disconnecting\n");
 	}
 
-	// delete rows
-	if (debug) {
-		stdoutput.printf("deleting %lld rows:\n%s\n",rows,deletequery);
-	}
-	for (uint64_t i=0; i<rows; i++) {
-		if (debug) {
-			stdoutput.printf("  row %lld\n",i);
-		}
-		char	*newq=buildQuery(deletequery,i);
-		bool	result=cur->query(newq);
-		delete[] newq;
-		if (!result) {
-			stdoutput.printf("error deleting rows\n");
-		}
-	}
 
-	// drop the table
+	// drop
 	if (debug) {
 		stdoutput.printf("dropping table:\n%s\n",dropquery);
 	}
 	if (!cur->query(dropquery)) {
 		stdoutput.printf("error dropping table\n");
 	}
+
 
 	// disconnect
 	if (debug) {
@@ -209,7 +148,39 @@ void benchmarks::run() {
 	}
 }
 
-void benchmarks::appendRandomString(stringbuffer *str) {
+char *benchmarks::createQuery(uint32_t cols, uint32_t colsize) {
+
+	stringbuffer	createquerystr;
+	createquerystr.append("create table testtable (");
+	for (uint32_t i=0; i<cols; i++) {
+		if (i) {
+			createquerystr.append(",");
+		}
+		createquerystr.append("col")->append(i)->append(" ");
+		if (!charstring::compare(db,"oracle")) {
+			createquerystr.append("varchar2");
+		}
+		createquerystr.append("(")->append(colsize)->append(")");
+	}
+	createquerystr.append(")");
+	return createquerystr.detachString();
+}
+
+char *benchmarks::insertQuery(uint32_t cols, uint32_t colsize) {
+	stringbuffer	insertquerystr;
+	insertquerystr.append("insert into testtable values ('");
+	for (uint32_t i=0; i<cols; i++) {
+		if (i) {
+			insertquerystr.append(",'");
+		}
+		appendRandomString(&insertquerystr,colsize);
+		insertquerystr.append("'");
+	}
+	insertquerystr.append(")");
+	return insertquerystr.detachString();
+}
+
+void benchmarks::appendRandomString(stringbuffer *str, uint32_t colsize) {
 	for (uint32_t j=0; j<colsize; j++) {
 		int32_t	result;
 		rnd.generateScaledNumber('a','z',&result);
@@ -217,14 +188,129 @@ void benchmarks::appendRandomString(stringbuffer *str) {
 	}
 }
 
-char *benchmarks::buildQuery(const char *query, uint64_t key) {
+void benchmarks::benchSelect(const char *selectquery,
+				uint64_t queries, uint64_t rows,
+				uint32_t cols, uint32_t colsize,
+				uint16_t iterations) {
 
-	// build the query (inserting the key)
-	const char	*q=query;
-	size_t	newqlen=charstring::length(q)+22;
-	char	*newq=new char[newqlen];
-	charstring::printf(newq,newqlen,q,key);
-	return newq;
+	// disconnect
+	if (!con->disconnect()) {
+		stdoutput.printf("error disconnecting\n");
+	}
+
+	// display stats
+	stdoutput.printf("\nqueries rows cols colsize\n");
+	stdoutput.printf("   % 4lld % 4lld % 4d    % 4d\n",
+					queries,rows,cols,colsize);
+	stdoutput.printf("connections    queries-per-cx     "
+				"seconds  queries-per-second\n");
+
+	// run selects
+	for (uint64_t concount=1; concount<=queries; concount++) {
+
+		// for this set, figure out how many connections to run
+		// and how many queries to run per connection
+		uint64_t	actualconcount=concount;
+		uint64_t	queriespercon=queries/actualconcount;
+		if (queries%actualconcount) {
+			actualconcount++;
+		}
+
+		// run all of this some number of times and average the results
+		float		avgsec=0;
+		for (uint16_t iter=0; iter<iterations; iter++) {
+
+			// keep track of how many queries we've actually run
+			uint64_t	queriesrun=0;
+
+			// get start time
+			datetime	start;
+			start.getSystemDateAndTime();
+
+			for (uint64_t i=0; i<actualconcount; i++) {
+
+				// connect
+				if (debug) {
+					stdoutput.printf(
+						"  connection %lld\n",i);
+				}
+				if (!con->connect()) {
+					stdoutput.printf("error connecting\n");
+				}
+
+				// run some number of queries per connection
+				uint64_t	queriestorun=
+						queriesrun+queriespercon;
+				if (queriestorun>queries) {
+					queriestorun=queries;
+				}
+				for (uint64_t j=queriesrun;
+						j<queriestorun; j++) {
+
+					if (debug) {
+						stdoutput.printf(
+							"    query %lld\n",j);
+					}
+					if (!cur->query(selectquery)) {
+						stdoutput.printf(
+						"error selecting rows\n");
+					}
+				}
+
+				// disconnect
+				if (!con->disconnect()) {
+					stdoutput.printf(
+						"error disconnecting\n");
+				}
+			}
+
+			// get end time
+			datetime	end;
+			end.getSystemDateAndTime();
+
+			// calculate total time
+			uint32_t	sec=end.getEpoch()-start.getEpoch();
+			int32_t		usec=end.getMicroseconds()-
+						start.getMicroseconds();
+ 			if (usec<0) {
+				sec--;
+				usec=usec+1000000;
+			}
+
+			// tally seconds
+			avgsec=avgsec+(float)sec+(((float)usec)/1000000.0);
+
+			// progress
+			if (iterations>=100) {
+				if (!((iter+1)%(iterations/10))) {
+					if (iter/(iterations/10)) {
+						stdoutput.printf(".");
+					}
+					stdoutput.printf("%d",
+						(iter+1)/(iterations/10));
+					fflush(stdout);
+					if (iter+1==iterations) {
+						stdoutput.printf("\n");
+					}
+				}
+			}
+		}
+		
+		// average seconds
+		avgsec=avgsec/iterations;
+
+		// calcualate queries per second
+		float	qps=((float)queries)/avgsec;
+
+		// display stats
+		stdoutput.printf(" % 4lld(% 4lld) % 8.2f(% 4lld+% 2lld)"
+					" % 4.6f % 4.2f\n",
+					concount,actualconcount,
+					(float)queries/(float)concount,
+					queries/concount,
+					queries%concount,
+					avgsec,qps);
+	}
 }
 
 benchconnection::benchconnection(const char *connectstring,

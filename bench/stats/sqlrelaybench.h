@@ -11,11 +11,11 @@ class sqlrelaybenchmarks : public benchmarks {
 	public:
 		sqlrelaybenchmarks(const char *connectstring,
 					const char *db,
-					uint64_t cons,
 					uint64_t queries,
 					uint64_t rows,
 					uint32_t cols,
 					uint32_t colsize,
+					uint16_t iterations,
 					bool debug);
 };
 
