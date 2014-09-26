@@ -63,7 +63,7 @@ class oraclebenchcursor : public benchcursor {
 			~oraclebenchcursor();
 
 		bool	open();
-		bool	query(const char *query);
+		bool	query(const char *query, bool getcolumns);
 		bool	close();
 
 	private:

@@ -56,7 +56,10 @@ void benchmarks::run() {
 
 	// drop table (just in case)
 	const char	*dropquery="drop table testtable";
-	cur->query(dropquery);
+	if (debug) {
+		stdoutput.printf("dropping table:\n%s\n",dropquery);
+	}
+	cur->query(dropquery,false);
 
 
 	// create
@@ -64,7 +67,7 @@ void benchmarks::run() {
 	if (debug) {
 		stdoutput.printf("creating table:\n%s\n",createquery);
 	}
-	if (!cur->query(createquery)) {
+	if (!cur->query(createquery,false)) {
 		stdoutput.printf("error creating table\n");
 	}
 	delete[] createquery;
@@ -79,7 +82,7 @@ void benchmarks::run() {
 		if (debug) {
 			stdoutput.printf("  row %lld\n%s\n",i,insertquery);
 		}
-		bool	result=cur->query(insertquery);
+		bool	result=cur->query(insertquery,false);
 		if (!result) {
 			stdoutput.printf("error inserting rows\n");
 		}
@@ -149,7 +152,7 @@ void benchmarks::run() {
 	if (debug) {
 		stdoutput.printf("dropping table:\n%s\n",dropquery);
 	}
-	if (!cur->query(dropquery)) {
+	if (!cur->query(dropquery,false)) {
 		stdoutput.printf("error dropping table\n");
 	}
 
@@ -290,7 +293,7 @@ void benchmarks::benchSelect(const char *selectquery,
 						stdoutput.printf(
 							"    query %lld\n",j);
 					}
-					if (!cur->query(selectquery)) {
+					if (!cur->query(selectquery,true)) {
 						stdoutput.printf(
 						"error selecting rows\n");
 					}

@@ -60,6 +60,11 @@ sqlrelaybenchcursor::~sqlrelaybenchcursor() {
 	delete sqlrcur;
 }
 
-bool sqlrelaybenchcursor::query(const char *query) {
+bool sqlrelaybenchcursor::query(const char *query, bool getcolumns) {
+	if (getcolumns) {
+		sqlrcur->getColumnInfo();
+	} else {
+		sqlrcur->dontGetColumnInfo();
+	}
 	return sqlrcur->sendQuery(query);
 }

@@ -204,36 +204,53 @@ bool oraclebenchcursor::open() {
 			OCI_ATTR_PREFETCH_ROWS,
 			(OCIError *)orabcon->err)!=OCI_SUCCESS) {
 		stdoutput.printf("OCIAttrSet (prefetch) Failed\n");
+		OCIHandleFree(stmt,OCI_HTYPE_STMT);
 		return false;
 	}
 
 	return true;
 }
 
-bool oraclebenchcursor::query(const char *query) {
+bool oraclebenchcursor::query(const char *query, bool getcolumns) {
 
 	// prepare the query
-	OCIStmtPrepare(stmt,orabcon->err,(text *)query,
+	if (OCIStmtPrepare(stmt,orabcon->err,(text *)query,
 				(ub4)charstring::length(query),
 				(ub4)OCI_NTV_SYNTAX,
-				(ub4)OCI_DEFAULT);
+				(ub4)OCI_DEFAULT)!=OCI_SUCCESS) {
+		//stdoutput.printf("OCIStmtPrepare Failed\n");
+		return false;
+	}
 
 	// get the statement type
 	ub2	stmttype;
-	OCIAttrGet(stmt,OCI_HTYPE_STMT,
+	if (OCIAttrGet(stmt,OCI_HTYPE_STMT,
 				(dvoid *)&stmttype,(ub4 *)NULL,
-				OCI_ATTR_STMT_TYPE,orabcon->err);
+				OCI_ATTR_STMT_TYPE,
+				orabcon->err)!=OCI_SUCCESS) {
+		stdoutput.printf("OCIAttrGet (stmt-type) Failed\n");
+		return false;
+	}
 
 	// execute the query
-	OCIStmtExecute(orabcon->svc,stmt,orabcon->err,
+	if (OCIStmtExecute(orabcon->svc,stmt,orabcon->err,
 				(stmttype==OCI_STMT_SELECT)?0:1,
-				(ub4)0,NULL,NULL,OCI_DEFAULT);
+				(ub4)0,NULL,NULL,OCI_DEFAULT)!=OCI_SUCCESS) {
+		stdoutput.printf("OCIStmtExecute Failed\n");
+		return false;
+	}
 
 	// get the column count
-	sword	ncols;
-	OCIAttrGet((dvoid *)stmt,OCI_HTYPE_STMT,
-				(dvoid *)&ncols,(ub4 *)0,
-				OCI_ATTR_PARAM_COUNT,orabcon->err);
+	sword	ncols=0;
+	if (getcolumns) {
+		if (OCIAttrGet((dvoid *)stmt,OCI_HTYPE_STMT,
+					(dvoid *)&ncols,(ub4 *)0,
+					OCI_ATTR_PARAM_COUNT,
+					orabcon->err)!=OCI_SUCCESS) {
+			stdoutput.printf("OCIAttrGet (ncols) Failed\n");
+			return false;
+		}
+	}
 
 	// run through the columns...
 	for (sword i=0; i<ncols; i++) {

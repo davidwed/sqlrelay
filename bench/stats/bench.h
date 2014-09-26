@@ -70,7 +70,7 @@ class benchcursor {
 		virtual	~benchcursor();
 
 		virtual	bool	open();
-		virtual	bool	query(const char *query)=0;
+		virtual	bool	query(const char *query, bool getcolumns)=0;
 		virtual	bool	close();
 
 	protected:

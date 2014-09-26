@@ -45,7 +45,7 @@ class sqlrelaybenchcursor : public benchcursor {
 			sqlrelaybenchcursor(benchconnection *con);
 			~sqlrelaybenchcursor();
 
-		bool	query(const char *query);
+		bool	query(const char *query, bool getcolumns);
 
 	private:
 		sqlrelaybenchconnection	*sqlrbcon;
