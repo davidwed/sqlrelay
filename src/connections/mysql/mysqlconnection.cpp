@@ -922,7 +922,11 @@ bool mysqlcursor::inputBindClob(const char *variable,
 }
 #endif
 
+/*datetime	start;
+datetime	end;*/
+
 bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
+//start.getSystemDateAndTime();
 
 	// initialize counts
 	ncols=0;
@@ -1332,6 +1336,21 @@ bool mysqlcursor::fetchRow() {
 		return !mysql_stmt_fetch(stmt);
 	} else {
 #endif
+/*if ((mysqlrow=mysql_fetch_row(mysqlresult))==NULL ||
+			(mysqlrowlengths=mysql_fetch_lengths(
+						mysqlresult))==NULL) {
+	end.getSystemDateAndTime();
+	uint32_t	sec=end.getEpoch()-start.getEpoch();
+	int32_t		usec=end.getMicroseconds()-start.getMicroseconds();
+	if (usec<0) {
+		sec--;
+		usec=usec+1000000;
+	}
+	stdoutput.printf("% 4d.%06d\n",sec,usec);
+	return false;
+}
+return true;*/
+
 		return ((mysqlrow=mysql_fetch_row(mysqlresult))!=NULL &&
 			(mysqlrowlengths=mysql_fetch_lengths(
 						mysqlresult))!=NULL);

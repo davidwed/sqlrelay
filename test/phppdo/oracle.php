@@ -18,7 +18,7 @@ if (strncasecmp(PHP_OS,"WIN",3)) {
 	}
 
 	$host="localhost";
-	$port=9001;
+	$port=9000;
 	$socket="/tmp/test.socket";
 	$user="test";
 	$password="test";
