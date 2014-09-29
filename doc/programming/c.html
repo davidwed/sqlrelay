@@ -23,7 +23,7 @@
 <li><a href="#storedprocedures">Stored Procedures</a></li>
 <li><a href="#caching">Caching The Result Set</a></li>
 <li><a href="#suspending">Suspending and Resuming Sessions</a></li>
-<li><a href="#lastinsertid">Getting the Last Insert ID in SQLite</a></li>
+<li><a href="#lastinsertid">Getting the Last Insert ID</a></li>
 </ul>
 
 
@@ -2041,18 +2041,18 @@ continue caching the result set.  You must use sqlrcur_resumeCachedResultSet()
 instead of sqlrcur_resumeResultSet() however.</p>
 
 <a name="lastinsertid"></a>
-<span class="heading2">Getting the Last Insert ID in SQLite</span><br><br>
+<span class="heading2">Getting the Last Insert ID</span><br><br>
 
-<p>The SQLite API provides a function which returns the "last insert rowid";
-the rowid of the most recent insert into the database or 0 if no inserts have 
-ever been performed during the session.</p>
+<p>Databases with autoincrement or "identity" columns often provide functions which return the "last insert id"; the value of the autoincrement column that was generated during the insert into the database or 0 if no inserts have been performed during the session.</p>
 
-<p>SQL Relay supports fetching the last insert rowid from an SQLite database
-as well.  You just have to run the query:
+<p>SQL Relay provides the sqlrcon_getLastInsertId() method to get this value.</p>
+
+<p>When using the SQLite database, you can also get the last insert id by running the query:</p>
 
 <blockquote>
 <b>select last insert rowid</b>
 </blockquote>
+
 
 </body>
 </html>
