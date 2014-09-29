@@ -3,6 +3,7 @@
 #include <rudiments/commandline.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
+#include <rudiments/signalclasses.h>
 
 #include "bench.h"
 
@@ -12,6 +13,14 @@
 
 #define ORACLE_SID "(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = db64.firstworks.com)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))"
 
+benchmarks	*bm;
+
+void shutDown(int32_t signum) {
+	if (bm) {
+		bm->shutDown();
+	}
+}
+
 int main(int argc, const char **argv) {
 
 	// process the command line
@@ -20,13 +29,14 @@ int main(int argc, const char **argv) {
 	// usage info
 	if (cmdl.found("help") || cmdl.found("h")) {
 		stdoutput.printf(
-			"usage: bench \\\n"
+			"usage: sqlr-bench \\\n"
 			"	-db [db] \\\n"
 			"	-queries [total-query-count] \\\n"
 			"	-rows [rows-per-query] \\\n"
 			"	-cols [columns-per-row] \\\n"
 			"	-colsize [characters-per-column] \\\n"
 			"	-iterations [iterations-per-test] \\\n"
+			"	-dbonly|-sqlrelayonly \\n"
 			"	-debug\n");
 		process::exit(1);
 	}
@@ -38,6 +48,8 @@ int main(int argc, const char **argv) {
 	uint32_t	cols=16;
 	uint32_t	colsize=32;
 	uint16_t	iterations=10;
+	bool		dbonly=false;
+	bool		sqlrelayonly=false;
 	bool		debug=false;
 
 	// override defaults with command line parameters
@@ -59,16 +71,28 @@ int main(int argc, const char **argv) {
 	if (cmdl.found("iterations")) {
 		iterations=charstring::toInteger(cmdl.getValue("iterations"));
 	}
+	if (cmdl.found("dbonly")) {
+		dbonly=true;
+	}
+	if (cmdl.found("sqlrelayonly")) {
+		sqlrelayonly=true;
+	}
 	if (cmdl.found("debug")) {
 		debug=true;
 	}
+
+	// handle signals
+	bm=NULL;
+	process::handleShutDown(shutDown);
+	process::handleCrash(shutDown);
 
 	// for each database...
 	bool	error=false;
 
 	// first time for the real db, second time for sqlrelay...
-	//for (uint16_t which=0; which<2 && !error; which++) {
-	for (uint16_t which=1; which<2 && !error; which++) {
+	uint16_t	start=(sqlrelayonly)?1:0;
+	uint16_t	end=(dbonly)?1:2;
+	for (uint16_t which=start; which<end && !error; which++) {
 
 		if (!which) {
 			stdoutput.printf("benchmarking %s\n",db);
@@ -77,7 +101,7 @@ int main(int argc, const char **argv) {
 		}
 
 		// init benchmarks
-		benchmarks	*bm=NULL;
+		delete bm;
 		if (which) {
 			bm=new sqlrelaybenchmarks(
 					"host=localhost;port=9000;"
@@ -114,9 +138,6 @@ int main(int argc, const char **argv) {
 
 		// run the benchmarks
 		bm->run();
-
-		// clean up
-		delete bm;
 	}
 
 	// exit

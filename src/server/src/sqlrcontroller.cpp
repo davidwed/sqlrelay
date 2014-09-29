@@ -1517,8 +1517,10 @@ int32_t sqlrcontroller_svr::waitForClient() {
 	// set up the socket
 	clientsock->translateByteOrder();
 	clientsock->dontUseNaglesAlgorithm();
-	clientsock->setReadBufferSize(8192);
-	clientsock->setWriteBufferSize(8192);
+	clientsock->setReadBufferSize(65536);
+	//clientsock->setTcpReadBufferSize(65536);
+	clientsock->setWriteBufferSize(65536);
+	//clientsock->setTcpWriteBufferSize(65536);
 	return 1;
 }
 

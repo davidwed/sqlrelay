@@ -40,6 +40,8 @@ class mysqlbenchconnection : public benchconnection {
 		const char	*password;
 
 		MYSQL	mysql;
+
+		bool		firstquery;
 };
 
 class mysqlbenchcursor : public benchcursor {

@@ -357,11 +357,10 @@ bool sqlrconnection::openSession() {
 	// use 8k read and write buffers
 	cs->dontUseNaglesAlgorithm();
 	// FIXME: make these buffer sizes user-configurable
-	// SO_SNDBUF=0 causes no data to ever be sent on openbsd
-	//cs->setTcpReadBufferSize(8192);
-	//cs->setTcpWriteBufferSize(0);
-	cs->setReadBufferSize(8192);
-	cs->setWriteBufferSize(8192);
+	cs->setReadBufferSize(65536);
+	//cs->setTcpReadBufferSize(65536);
+	cs->setWriteBufferSize(65536);
+	//cs->setTcpWriteBufferSize(65536);
 
 	// send protocol info
 	protocol();

@@ -2154,9 +2154,7 @@ bool sqlrclientprotocol::returnResultSetData(sqlrcursor_svr *cursor,
 
 		if (!cursor->fetchRow()) {
 			clientsock->write((uint16_t)END_RESULT_SET);
-			clientsock->flushWriteBuffer(-1,-1);
-			cont->logDebugMessage("done returning result set data");
-			return true;
+			break;
 		}
 
 		if (cont->sqlrlg) {

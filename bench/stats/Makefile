@@ -44,11 +44,11 @@ LOBJS += mysqlbench.lo
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-all: bench
+all: sqlr-bench
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) bench *.lo *.o
-	$(RM) bench
+	$(LIBTOOL) --mode=clean $(RM) sqlr-bench *.lo *.o
+	$(RM) sqlr-bench
 
-bench: $(SRCS) $(LOBJS)
+sqlr-bench: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS)

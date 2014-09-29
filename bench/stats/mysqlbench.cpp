@@ -4,6 +4,7 @@
 
 #include <rudiments/charstring.h>
 #include <rudiments/environment.h>
+#include <rudiments/datetime.h>
 
 #include "mysqlbench.h"
 
@@ -67,6 +68,9 @@ bool mysqlbenchconnection::connect() {
 		return false;
 	}
 	#endif
+
+	firstquery=true;
+
 	return true;
 }
 
@@ -84,6 +88,19 @@ mysqlbenchcursor::~mysqlbenchcursor() {
 }
 
 bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
+/*datetime	start;
+datetime	end;
+start.getSystemDateAndTime();*/
+
+	#ifdef HAVE_MYSQL_COMMIT
+	if (mbcon->firstquery) {
+		if (mysql_commit(&mbcon->mysql)) {
+			stdoutput.printf("mysql_commit failed\n");
+			return false;
+		}
+		mbcon->firstquery=false;
+	}
+	#endif
 
 	// execute the query
 	if (mysql_real_query(&mbcon->mysql,query,
@@ -97,20 +114,41 @@ bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
 
 		// get column info
 		uint32_t	ncols=mysql_num_fields(mysqlresult);
+
+		// get the row count
+		mysql_num_rows(mysqlresult);
+
+		// get the affected row count
+		mysql_affected_rows(&mbcon->mysql);
+
 		if (getcolumns) {
+			mysql_field_seek(mysqlresult,0);
 			for (uint32_t i=0; i<ncols; i++) {
-				mysql_fetch_field(mysqlresult);
+				MYSQL_FIELD	*mysqlfields=
+					mysql_fetch_field(mysqlresult);
+				//stdoutput.printf("%s,",mysqlfields->name);
 			}
+			//stdoutput.printf("\n");
 		}
 
 		// run through the rows
 		MYSQL_ROW	mysqlrow;
-		while ((mysqlrow=mysql_fetch_row(mysqlresult))) {
-			/*for (uint32_t i=0; i<ncols; i++) {
-				stdoutput.printf("\"%s\",",mysqlrow[i]);
-			}
-			stdoutput.printf("\n");*/
+		unsigned long	*mysqlrowlengths;
+		while ((mysqlrow=mysql_fetch_row(mysqlresult)) &&
+			(mysqlrowlengths=mysql_fetch_lengths(mysqlresult))) {
+			/*stdoutput.printf("row...\n");
+			for (uint32_t i=0; i<ncols; i++) {
+				stdoutput.printf("  \"%s\"\n",mysqlrow[i]);
+			}*/
 		}
+/*end.getSystemDateAndTime();
+uint32_t	sec=end.getEpoch()-start.getEpoch();
+int32_t		usec=end.getMicroseconds()-start.getMicroseconds();
+if (usec<0) {
+	sec--;
+	usec=usec+1000000;
+}
+stdoutput.printf("% 4d.%06d\n",sec,usec);*/
 
 		// free the result set
 		mysql_free_result(mysqlresult);

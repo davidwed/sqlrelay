@@ -21,6 +21,7 @@ class benchmarks {
 						uint16_t iterations,
 						bool debug);
 		virtual	~benchmarks();
+		void	shutDown();
 		void	run();
 
 	protected:
@@ -46,6 +47,8 @@ class benchmarks {
 		bool		debug;
 
 		randomnumber	rnd;
+
+		bool		shutdown;
 };
 
 class benchconnection {

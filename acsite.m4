@@ -1233,7 +1233,15 @@ then
 			then
 				MYSQLINCLUDES=`echo $MYSQLINCLUDES | sed -e "s|-x.* ||g" -e "s|-x.*$||g" -e "s|-nofstore ||g" -e "s|-nofstore$||g" -e "s|-f.* ||g" -e "s|-f.*$||g" -e "s|-mt ||g" -e "s|-mt$||g"`
 			fi
+
+			dnl try --libs and --libs_r flags and go with
+			dnl --libs_r if it's valid
 			MYSQLLIBS=`mysql_config --libs 2> /dev/null | sed -e "s|'||g"`
+			MYSQLLIBSR=`mysql_config --libs_r 2> /dev/null | sed -e "s|'||g"`
+			if ( test -n "$MYSQLLIBSR" -a -z "`echo $MYSQLLIBSR | grep Usage:`" )
+			then
+				MYSQLLIBS=$MYSQLLIBSR
+			fi
 
 			if ( test -n "$MYSQLLIBS" )
 			then

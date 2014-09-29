@@ -30,11 +30,18 @@ benchmarks::benchmarks(const char *connectstring,
 	this->cur=NULL;
 
 	rnd.setSeed(randomnumber::getSeed());
+
+	shutdown=false;
 }
 
 benchmarks::~benchmarks() {
 	delete cur;
 	delete con;
+}
+
+void benchmarks::shutDown() {
+	stdoutput.printf("shutting down, please wait...\n");
+	shutdown=true;
 }
 
 void benchmarks::run() {
@@ -53,7 +60,6 @@ void benchmarks::run() {
 		stdoutput.printf("error opening\n");
 	}
 
-
 	// drop table (just in case)
 	const char	*dropquery="drop table testtable";
 	if (debug) {
@@ -61,6 +67,10 @@ void benchmarks::run() {
 	}
 	cur->query(dropquery,false);
 
+	// handle shutdown
+	if (shutdown) {
+		return;
+	}
 
 	// create
 	char	*createquery=createQuery(cols,colsize);
@@ -77,7 +87,7 @@ void benchmarks::run() {
 	if (debug) {
 		stdoutput.printf("inserting %lld rows:\n",rows);
 	}
-	for (uint64_t i=0; i<rows; i++) {
+	for (uint64_t i=0; i<rows && !shutdown; i++) {
 		char	*insertquery=insertQuery(cols,colsize);
 		if (debug) {
 			stdoutput.printf("  row %lld\n%s\n",i,insertquery);
@@ -93,11 +103,11 @@ void benchmarks::run() {
 	const char	*selectquery="select * from testtable";
 	uint32_t	colfactor=4;
 	uint32_t	colcount=pow(2,colfactor);
-	while (colcount<=cols) {
+	while (colcount<=cols && !shutdown) {
 
 		uint32_t	rowfactor=6;
 		uint32_t	rowcount=pow(2,rowfactor);
-		while (rowcount<=rows) {
+		while (rowcount<=rows && !shutdown) {
 
 			if (debug) {
 				stdoutput.printf("selecting %lld rows, "
@@ -233,6 +243,11 @@ void benchmarks::benchSelect(const char *selectquery,
 		stdoutput.printf("error disconnecting\n");
 	}
 
+	// handle shutdown
+	if (shutdown) {
+		return;
+	}
+
 	// display stats
 	stdoutput.printf("\nqueries rows cols colsize\n");
 	stdoutput.printf("   % 4lld % 4lld % 4d    % 4d\n",
@@ -241,7 +256,7 @@ void benchmarks::benchSelect(const char *selectquery,
 				"seconds  queries-per-second\n");
 
 	// run selects
-	for (uint64_t concount=1; concount<=queries; concount++) {
+	for (uint64_t concount=1; concount<=queries && !shutdown; concount++) {
 
 		// for this set, figure out how many connections to run
 		// and how many queries to run per connection
@@ -253,7 +268,7 @@ void benchmarks::benchSelect(const char *selectquery,
 
 		// run all of this some number of times and average the results
 		float		avgsec=0;
-		for (uint16_t iter=0; iter<iterations; iter++) {
+		for (uint16_t iter=0; iter<iterations && !shutdown; iter++) {
 
 			// keep track of how many queries we've actually run
 			uint64_t	queriesrun=0;
@@ -262,7 +277,7 @@ void benchmarks::benchSelect(const char *selectquery,
 			datetime	start;
 			start.getSystemDateAndTime();
 
-			for (uint64_t i=0; i<actualconcount; i++) {
+			for (uint64_t i=0; i<actualconcount && !shutdown; i++) {
 
 				// connect and open
 				if (debug) {
@@ -289,7 +304,8 @@ void benchmarks::benchSelect(const char *selectquery,
 					queriestorun=queries;
 				}
 				for (uint64_t j=queriesrun;
-						j<queriestorun; j++) {
+						j<queriestorun && !shutdown;
+						j++) {
 
 					if (debug) {
 						stdoutput.printf(
