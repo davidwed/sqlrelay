@@ -18,6 +18,8 @@
 	added disablekeylookup option to disable getting key information when
 		describing oracle tables
 	fixed broken --with-system-libtool configure option
+	mysql-config --libs_r is used in preference to --libs now
+		(solves build error with maria db on ubuntu 14.04.1)
 
 0.56 - removed VERSION from perl api bootstrap
 	reorganized and simplified perl api code
