@@ -1,4 +1,4 @@
-pod2html --infile=../../../src/api/perl/Connection/Connection.pm --outfile=Connection.html --title=Connection
-pod2html --infile=../../../src/api/perl/Cursor/Cursor.pm --outfile=Cursor.html --title=Cursor
-pod2html --infile=../../../src/api/perl/DBD/SQLRelay.pm --outfile=SQLRelay.html --title=SQLRelay
+pod2html --infile=../../../src/api/perl/Connection.pm --outfile=Connection.html --title=Connection
+pod2html --infile=../../../src/api/perl/Cursor.pm --outfile=Cursor.html --title=Cursor
+pod2html --infile=../../../src/api/perl/SQLRelay.pm --outfile=SQLRelay.html --title=SQLRelay
 rm pod*

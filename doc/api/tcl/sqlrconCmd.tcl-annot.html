@@ -426,10 +426,10 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  or to the unix "socket" on the local machine
  and authenticates with "user" and "password".
  Failed connections will be retried for 
- "tries" times on interval "retrytime".
- If "tries" is 0 then retries will continue
- forever.  If "retrytime" is 0 then retries
- will be attempted on a default interval.
+ "tries" times, waiting "retrytime" seconds
+ between each try.  If "tries" is 0 then retries
+ will continue forever.  If "retrytime" is 0 then
+ retries will be attempted on a default interval.
 
  If the "socket" parameter is neither 
  NULL nor "" then an attempt will be made to 
@@ -466,7 +466,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2013-12-08 at 23:59.</cite>
+<cite>File generated 2014-09-29 at 19:24.</cite>
 </font>
 </body>
 </html>

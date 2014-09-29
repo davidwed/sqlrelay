@@ -47,10 +47,10 @@
             # or to the unix &quot;socket&quot; on the local machine
             # and authenticates with &quot;user&quot; and &quot;password&quot;.
             # Failed connections will be retried for 
-            # &quot;tries&quot; times on interval &quot;retrytime&quot;.
-            # If &quot;tries&quot; is 0 then retries will continue
-            # forever.  If &quot;retrytime&quot; is 0 then retries
-            # will be attempted on a default interval.
+            # &quot;tries&quot; times, waiting &quot;retrytime&quot; seconds between each
+            # try.  If &quot;tries&quot; is 0 then retries will continue forever.
+            # If &quot;retrytime&quot; is 0 then retries will be attempted on
+            # a default interval.
             #
             # If the &quot;socket&quot; parameter is neither
             # NULL nor &quot;&quot; then an attempt will be made to
