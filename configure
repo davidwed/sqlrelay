@@ -36809,13 +36809,6 @@ echo
 echo "Type:  configure --help   for a list of options."
 echo
 
-echo
-echo "Thanks to MP3.com for sponsoring:"
-echo "	Clustered/Replicated database support."
-echo "	Perl API."
-echo "Thanks to FeedLounge for sponsoring:"
-echo "	Query routing and filtering."
-echo
 
 if ( test -n "$PYTHONVERSION" )
 then

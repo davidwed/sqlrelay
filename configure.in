@@ -969,13 +969,13 @@ echo "Type:  configure --help   for a list of options."
 echo
 
 dnl Credits.
-echo
-echo "Thanks to MP3.com for sponsoring:"
-echo "	Clustered/Replicated database support."
-echo "	Perl API."
-echo "Thanks to FeedLounge for sponsoring:"
-echo "	Query routing and filtering."
-echo
+dnl echo
+dnl echo "Thanks to MP3.com for sponsoring:"
+dnl echo "	Clustered/Replicated database support."
+dnl echo "	Perl API."
+dnl echo "Thanks to FeedLounge for sponsoring:"
+dnl echo "	Query routing and filtering."
+dnl echo
 
 if ( test -n "$PYTHONVERSION" )
 then
