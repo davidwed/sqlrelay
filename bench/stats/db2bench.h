@@ -69,9 +69,7 @@ class db2benchcursor : public benchcursor {
 			db2benchcursor(benchconnection *con);
 			~db2benchcursor();
 
-		bool	open();
 		bool	query(const char *query, bool getcolumns);
-		bool	close();
 
 	private:
 		db2benchconnection	*db2bcon;

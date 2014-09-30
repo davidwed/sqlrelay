@@ -57,10 +57,6 @@ postgresqlbenchcursor::postgresqlbenchcursor(benchconnection *con) :
 postgresqlbenchcursor::~postgresqlbenchcursor() {
 }
 
-bool postgresqlbenchcursor::open() {
-	return true;
-}
-
 bool postgresqlbenchcursor::query(const char *query, bool getcolumns) {
 
 	pgresult=PQexec(pgbcon->pgconn,query);
@@ -90,9 +86,5 @@ bool postgresqlbenchcursor::query(const char *query, bool getcolumns) {
 	}
 	PQclear(pgresult);
 
-	return true;
-}
-
-bool postgresqlbenchcursor::close() {
 	return true;
 }

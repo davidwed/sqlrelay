@@ -44,9 +44,7 @@ class postgresqlbenchcursor : public benchcursor {
 			postgresqlbenchcursor(benchconnection *con);
 			~postgresqlbenchcursor();
 
-		bool	open();
 		bool	query(const char *query, bool getcolumns);
-		bool	close();
 
 	private:
 		postgresqlbenchconnection	*pgbcon;

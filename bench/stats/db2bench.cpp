@@ -73,10 +73,6 @@ db2benchcursor::db2benchcursor(benchconnection *con) : benchcursor(con) {
 db2benchcursor::~db2benchcursor() {
 }
 
-bool db2benchcursor::open() {
-	return true;
-}
-
 bool db2benchcursor::query(const char *query, bool getcolumns) {
 
 	erg=SQLAllocHandle(SQL_HANDLE_STMT,db2bcon->dbc,&stmt);
@@ -243,9 +239,5 @@ bool db2benchcursor::query(const char *query, bool getcolumns) {
 	}
 
 	SQLFreeHandle(SQL_HANDLE_STMT,stmt);
-	return true;
-}
-
-bool db2benchcursor::close() {
 	return true;
 }
