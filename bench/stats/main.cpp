@@ -7,8 +7,11 @@
 
 #include "bench.h"
 
-#include "oraclebench.h"
+#include "db2bench.h"
 #include "mysqlbench.h"
+#include "oraclebench.h"
+#include "postgresqlbench.h"
+#include "sybasebench.h"
 #include "sqlrelaybench.h"
 
 #define ORACLE_SID "(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = db64.firstworks.com)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))"
@@ -111,6 +114,11 @@ int main(int argc, const char **argv) {
 					db,queries,rows,
 					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"db2")) {
+			bm=new db2benchmarks(
+					"db=testdb;lang=C;"
+					"user=db2inst1;password=1qazxdr5;",
+					db,queries,rows,
+					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"firebird")) {
 		} else if (!charstring::compare(db,"freetds")) {
 		} else if (!charstring::compare(db,"mdbtools")) {
@@ -128,8 +136,19 @@ int main(int argc, const char **argv) {
 					db,queries,rows,
 					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"postgresql")) {
+			bm=new postgresqlbenchmarks(
+					"user=testuser;password=testpassword;"
+					"db=testdb;host=db64.firstworks.com;",
+					db,queries,rows,
+					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"sqlite")) {
 		} else if (!charstring::compare(db,"sybase")) {
+			bm=new sybasebenchmarks(
+					"sybase=/opt/sybase;lang=en_US;"
+					"server=TESTDB;db=testdb;"
+					"user=testuser;password=testpassword;",
+					db,queries,rows,
+					cols,colsize,iterations,debug);
 		}
 		if (!bm) {
 			stdoutput.printf("error creating benchmarks\n");
