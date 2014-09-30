@@ -37,6 +37,7 @@ int main(int argc, const char **argv) {
 		stdoutput.printf(
 			"usage: sqlr-bench \\\n"
 			"	-db [db] \\\n"
+			"	-connectstring [connectstring] \\\n"
 			"	-queries [total-query-count] \\\n"
 			"	-rows [rows-per-query] \\\n"
 			"	-cols [columns-per-row] \\\n"
@@ -49,6 +50,7 @@ int main(int argc, const char **argv) {
 
 	// default parameters
 	const char	*db="oracle";
+	const char	*connectstring=NULL;
 	uint64_t	queries=20;
 	uint64_t	rows=256;
 	uint32_t	cols=16;
@@ -61,6 +63,9 @@ int main(int argc, const char **argv) {
 	// override defaults with command line parameters
 	if (cmdl.found("db")) {
 		db=cmdl.getValue("db");
+	}
+	if (cmdl.found("connectstring")) {
+		connectstring=cmdl.getValue("connectstring");
 	}
 	if (cmdl.found("queries")) {
 		queries=charstring::toInteger(cmdl.getValue("queries"));
@@ -109,62 +114,99 @@ int main(int argc, const char **argv) {
 		// init benchmarks
 		delete bm;
 		if (which) {
-			bm=new sqlrelaybenchmarks(
+			if (!connectstring) {
+				connectstring=
 					"host=localhost;port=9000;"
 					"socket=/tmp/test.socket;"
 					"user=test;password=test;"
-					"debug=no",
+					"debug=no";
+			}
+			bm=new sqlrelaybenchmarks(
+					connectstring,
 					db,queries,rows,
 					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"db2")) {
-			bm=new db2benchmarks(
+			if (!connectstring) {
+				connectstring=
 					"db=testdb;lang=C;"
-					"user=db2inst1;password=1qazxdr5;",
+					"user=db2inst1;"
+					"password=1qazxdr5;";
+			}
+			bm=new db2benchmarks(
+					connectstring,
 					db,queries,rows,
 					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"firebird")) {
-			bm=new firebirdbenchmarks(
+			if (!connectstring) {
+				connectstring=
 					"user=testuser;password=testpassword;"
 					"db=db64.firstworks.com:"
 					"/opt/firebird/testdb.gdb;"
-					"dialect=3",
+					"dialect=3";
+			}
+			bm=new firebirdbenchmarks(
+					connectstring,
 					db,queries,rows,
 					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"freetds")) {
-			bm=new freetdsbenchmarks(
+			if (!connectstring) {
+				connectstring=
 					"sybase=/usr/localfreetds/etc;"
 					"server=DB64;db=testdb;"
-					"user=testuser;password=testpassword;",
+					"user=testuser;password=testpassword;";
+			}
+			bm=new freetdsbenchmarks(
+					connectstring,
 					db,queries,rows,
 					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"mysql")) {
-			bm=new mysqlbenchmarks(
+			if (!connectstring) {
+				connectstring=
 					"host=db64;db=testdb;"
-					"user=testuser;password=testpassword;",
+					"user=testuser;password=testpassword;";
+			}
+			bm=new mysqlbenchmarks(
+					connectstring,
 					db,queries,rows,
 					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"oracle")) {
-			bm=new oraclebenchmarks(
+			if (!connectstring) {
+				connectstring=
 					"sid="ORACLE_SID";"
-					"user=testuser;password=testpassword;",
+					"user=testuser;password=testpassword;";
+			}
+			bm=new oraclebenchmarks(
+					connectstring,
 					db,queries,rows,
 					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"postgresql")) {
-			bm=new postgresqlbenchmarks(
+			if (!connectstring) {
+				connectstring=
 					"user=testuser;password=testpassword;"
-					"db=testdb;host=db64.firstworks.com;",
+					"db=testdb;host=db64.firstworks.com;";
+			}
+			bm=new postgresqlbenchmarks(
+					connectstring,
 					db,queries,rows,
 					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"sqlite")) {
+			if (!connectstring) {
+				connectstring=
+					"db=/usr/local/sqlite/var/testdb;";
+			}
 			bm=new sqlitebenchmarks(
-					"db=/usr/local/sqlite/var/testdb;",
+					connectstring,
 					db,queries,rows,
 					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"sybase")) {
-			bm=new sybasebenchmarks(
+			if (!connectstring) {
+				connectstring=
 					"sybase=/opt/sybase;lang=en_US;"
 					"server=TESTDB;db=testdb;"
-					"user=testuser;password=testpassword;",
+					"user=testuser;password=testpassword;";
+			}
+			bm=new sybasebenchmarks(
+					connectstring,
 					db,queries,rows,
 					cols,colsize,iterations,debug);
 		}
