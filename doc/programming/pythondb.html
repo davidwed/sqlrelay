@@ -1004,7 +1004,7 @@ result=cur.fetchall()
 <a name="lastinsertid"></a>
 <span class="heading2">Getting the Last Insert ID</span><br><br>
 
-<p>Databases with autoincrement or "identity" columns often provide functions which return the "last insert id"; the value of the autoincrement column that was generated during the insert into the database or 0 if no inserts have been performed during the session.</p>
+<p>Databases with autoincrement or identity columns often provide functions which return the "last insert id"; the value of the autoincrement column that was generated during the insert into the database.</p>
 
 <p>Unfortunately Python DB doesn't expose a generic method for getting the last insert id, but when using the SQLite database, you can get the last insert id by running the query:</p>
 

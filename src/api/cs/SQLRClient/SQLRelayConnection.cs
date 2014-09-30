@@ -45,10 +45,10 @@ namespace SQLRClient
          *
          *  Password - The password to use when logging into SQL Relay.
          *
-         *  Retry Time - If a connection fails, it will be retried in this
+         *  Retry Time - If a connection fails, it will be retried on this
          *  interval (in seconds).
          *
-         *  Tries - If a connection fails, it will be retries this many times.
+         *  Tries - If a connection fails, it will be retried this many times.
          *
          *  Initial Catalog - The database/schema to switch to after logging in.
          *  Optional.

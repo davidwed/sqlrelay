@@ -29,10 +29,10 @@ class sqlrconnection:
     def __init__(self, host, port, socket, user, password, retrytime=0, tries=1):
         """ 
         Opens a connection to the sqlrelay server and authenticates with
-        user and password.  Failed connections are retried for tries times
-        at retrytime interval.  If tries is 0 then retries will continue
-        forever.  If retrytime is 0 then retries will be attempted on a
-        default interval.
+        user and password.  Failed connections are retried for tries times,
+        waiting retrytime seconds between each try.  If tries is 0 then retries
+        will continue forever.  If retrytime is 0 then retries will be attempted
+        on a default interval.
         """
         self.connection = CSQLRelay.sqlrcon_alloc(host, port, socket, user, password, retrytime, tries)
 
@@ -180,7 +180,7 @@ class sqlrconnection:
 
     def getLastInsertId(self):
         """
-	Returns the value of the autoincrement column for the last insert
+        Returns the value of the autoincrement column for the last insert
         """
         return CSQLRelay.getLastInsertId(self.connection)
 
@@ -242,8 +242,8 @@ class sqlrconnection:
     def debugOn(self):
         """
         Turn verbose debugging on.
-	Another way to do this is to start a query with "-- debug\n".
-	Yet another way is to set the environment variable SQLR_CLIENT_DEBUG
+        Another way to do this is to start a query with "-- debug\n".
+        Yet another way is to set the environment variable SQLR_CLIENT_DEBUG
         to "ON"
         """
         return CSQLRelay.debugOn(self.connection)
@@ -497,9 +497,9 @@ class sqlrcursor:
         Define an input bind varaible.
         Returns true if the variable was successfully bound or false if the
         variable isn't a string, integer or decimal.  If the value is a decimal
-	then precision and scale may also be specified.  If you don't have the
-	precision and scale then set them both to 0.  However in that case you
-	may get unexpected rounding behavior if the server is faking binds.
+        then precision and scale may also be specified.  If you don't have the
+        precision and scale then set them both to 0.  However in that case you
+        may get unexpected rounding behavior if the server is faking binds.
         """
         return CSQLRelay.inputBind(self.cursor, variable, value, precision, scale)
 
@@ -583,8 +583,8 @@ class sqlrcursor:
 
     def validBind(self,variable):
         """
-	Returns true if "variable" was a valid
-	input bind variable of the query.
+        Returns true if "variable" was a valid
+        input bind variable of the query.
         """
         return CSQLRelay.validBind(self.cursor,variable)
         

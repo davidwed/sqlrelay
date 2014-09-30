@@ -16,13 +16,13 @@ typedef	struct sqlrcursor *sqlrcur;
 /** @ingroup sqlrclientwrapper
  *  Initiates a connection to "server" on "port" or to the unix "socket" on
  *  the local machine and authenticates with "user" and "password".  Failed
- *  connections will be retried for "tries" times on interval "retrytime".
- *  If "tries" is 0 then retries will continue forever.  If "retrytime" is 0
- *  then retries will be attempted on a default interval.
- *  If the "socket" parameter is nether NULL nor "" then an attempt will be
- *  made to connect through it before attempting to connect to "server" on
- *  "port".  If it is NULL or "" then no attempt will be made to connect
- *  through the socket.*/
+ *  connections will be retried for "tries" times, waiting "retrytime" seconds
+ *  between each try.  If "tries" is 0 then retries will continue forever.  If
+ *  "retrytime" is 0 then retries will be attempted on a default interval.  If
+ *  the "socket" parameter is nether NULL nor "" then an attempt will be made
+ *  to connect through it before attempting to connect to "server" on "port".
+ *  If it is NULL or "" then no attempt will be made to connect through the
+ *  socket.*/
 SQLRCLIENTWRAPPER_DLLSPEC
 sqlrcon	sqlrcon_alloc(const char *server, uint16_t port, const char *socket,
 					const char *user, const char *password, 

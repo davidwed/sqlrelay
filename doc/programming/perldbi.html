@@ -1533,9 +1533,9 @@ following.</p>
 </blockquote>
 
 <a name="lastinsertid"></a>
-<span class="heading2">Getting the Last Insert ID in SQLite</span><br><br>
+<span class="heading2">Getting the Last Insert ID</span><br><br>
 
-<p>Databases with autoincrement or "identity" columns often provide functions which return the "last insert id"; the value of the autoincrement column that was generated during the insert into the database or 0 if no inserts have been performed during the session.</p>
+<p>Databases with autoincrement or identity columns often provide functions which return the "last insert id"; the value of the autoincrement column that was generated during the insert into the database.</p>
 
 <p>DBI provides the $dbh-&gt;last_insert_id() method to get this value.</p>
 

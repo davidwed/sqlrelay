@@ -36,6 +36,9 @@ LOBJS += sqlrelaybench.lo
 SRCS += oraclebench.cpp
 LOBJS += oraclebench.lo
 
+SRCS += sybasebench.cpp
+LOBJS += sybasebench.lo
+
 SRCS += mysqlbench.cpp
 LOBJS += mysqlbench.lo
 
