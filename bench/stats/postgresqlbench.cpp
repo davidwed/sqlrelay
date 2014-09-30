@@ -27,8 +27,8 @@ postgresqlbenchconnection::postgresqlbenchconnection(
 }
 
 postgresqlbenchconnection::~postgresqlbenchconnection() {
+	host=getParam("host");
 	db=getParam("db");
-	lang=getParam("lang");
 	user=getParam("user");
 	password=getParam("password");
 }

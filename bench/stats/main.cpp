@@ -8,9 +8,12 @@
 #include "bench.h"
 
 #include "db2bench.h"
+#include "firebirdbench.h"
+#include "freetdsbench.h"
 #include "mysqlbench.h"
 #include "oraclebench.h"
 #include "postgresqlbench.h"
+#include "sqlitebench.h"
 #include "sybasebench.h"
 #include "sqlrelaybench.h"
 
@@ -120,15 +123,26 @@ int main(int argc, const char **argv) {
 					db,queries,rows,
 					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"firebird")) {
+			bm=new firebirdbenchmarks(
+					"user=testuser;password=testpassword;"
+					"db=db64.firstworks.com:"
+					"/opt/firebird/testdb.gdb;"
+					"dialect=3",
+					db,queries,rows,
+					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"freetds")) {
-		} else if (!charstring::compare(db,"mdbtools")) {
+			bm=new freetdsbenchmarks(
+					"sybase=/usr/localfreetds/etc;"
+					"server=DB64;db=testdb;"
+					"user=testuser;password=testpassword;",
+					db,queries,rows,
+					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"mysql")) {
 			bm=new mysqlbenchmarks(
 					"host=db64;db=testdb;"
 					"user=testuser;password=testpassword;",
 					db,queries,rows,
 					cols,colsize,iterations,debug);
-		} else if (!charstring::compare(db,"odbc")) {
 		} else if (!charstring::compare(db,"oracle")) {
 			bm=new oraclebenchmarks(
 					"sid="ORACLE_SID";"
@@ -142,6 +156,10 @@ int main(int argc, const char **argv) {
 					db,queries,rows,
 					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"sqlite")) {
+			bm=new sqlitebenchmarks(
+					"db=/usr/local/sqlite/var/testdb;",
+					db,queries,rows,
+					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"sybase")) {
 			bm=new sybasebenchmarks(
 					"sybase=/opt/sybase;lang=en_US;"

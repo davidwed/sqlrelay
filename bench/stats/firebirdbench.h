@@ -1,14 +1,14 @@
 // Copyright (c) 2014  David Muse
 // See the file COPYING for more information
-#ifndef POSTGRESQL_BENCH_H
-#define POSTGRESQL_BENCH_H
+#ifndef FIREBIRD_BENCH_H
+#define FIREBIRD_BENCH_H
 
 #include "bench.h"
 
 
-class postgresqlbenchmarks : public benchmarks {
+class firebirdbenchmarks : public benchmarks {
 	public:
-		postgresqlbenchmarks(const char *connectstring,
+		firebirdbenchmarks(const char *connectstring,
 					const char *db,
 					uint64_t queries,
 					uint64_t rows,
@@ -18,34 +18,34 @@ class postgresqlbenchmarks : public benchmarks {
 					bool debug);
 };
 
-class postgresqlbenchconnection : public benchconnection {
-	friend class postgresqlbenchcursor;
+class firebirdbenchconnection : public benchconnection {
+	friend class firebirdbenchcursor;
 	public:
-			postgresqlbenchconnection(const char *connectstring,
+			firebirdbenchconnection(const char *connectstring,
 						const char *dbtype);
-			~postgresqlbenchconnection();
+			~firebirdbenchconnection();
 
 		bool	connect();
 		bool	disconnect();
 
 	private:
-		const char	*host;
 		const char	*db;
+		const char	*dialect;
 		const char	*user;
 		const char	*password;
 };
 
-class postgresqlbenchcursor : public benchcursor {
+class firebirdbenchcursor : public benchcursor {
 	public:
-			postgresqlbenchcursor(benchconnection *con);
-			~postgresqlbenchcursor();
+			firebirdbenchcursor(benchconnection *con);
+			~firebirdbenchcursor();
 
 		bool	open();
 		bool	query(const char *query, bool getcolumns);
 		bool	close();
 
 	private:
-		postgresqlbenchconnection	*pgbcon;
+		firebirdbenchconnection	*fbbcon;
 };
 
 #endif

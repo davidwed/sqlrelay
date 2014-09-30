@@ -9,9 +9,12 @@ CPPFLAGS = \
 	$(RUDIMENTSINCLUDES) \
 	-I$(top_builddir)/src/api/c++/include \
 	$(DB2INCLUDES) \
+	$(FIREBIRDINCLUDES) \
+	$(FREETDSINCLUDES) \
 	$(MYSQLINCLUDES) \
 	$(ORACLEINCLUDES) \
 	$(POSTGRESQLINCLUDES) \
+	$(SQLITEINCLUDES) \
 	$(SYBASEINCLUDES)
 
 LIBS = \
@@ -24,6 +27,16 @@ ifneq ($(strip $(DB2LIBSPATH)),)
 	LIBS += -R $(DB2LIBSPATH)
 endif
 LIBS += $(DB2LIBS)
+
+ifneq ($(strip $(FIREBIRDLIBSPATH)),)
+	LIBS += -R $(FIREBIRDLIBSPATH)
+endif
+LIBS += $(FIREBIRDLIBS)
+
+ifneq ($(strip $(FREETDSLIBSPATH)),)
+	LIBS += -R $(FREETDSLIBSPATH)
+endif
+LIBS += $(FREETDSLIBS)
 
 ifneq ($(strip $(MYSQLLIBSPATH)),)
 	LIBS += -R $(MYSQLLIBSPATH)
@@ -40,31 +53,37 @@ ifneq ($(strip $(POSTGRESQLLIBSPATH)),)
 endif
 LIBS += $(POSTGRESQLLIBS)
 
+ifneq ($(strip $(SQLITELIBSPATH)),)
+	LIBS += -R $(SQLITELIBSPATH)
+endif
+LIBS += $(SQLITELIBS)
+
 ifneq ($(strip $(SYBASELIBSPATH)),)
 	LIBS += -R $(SYBASELIBSPATH)
 endif
 LIBS += $(SYBASELIBS)
 
-SRCS = bench.cpp main.cpp
-LOBJS = bench.lo main.lo
+SRCS = bench.cpp main.cpp \
+	sqlrelaybench.cpp \
+	db2bench.cpp \
+	firebirdbench.cpp \
+	freetdsbench.cpp \
+	mysqlbench.cpp \
+	oraclebench.cpp \
+	postgresqlbench.cpp \
+	sqlitebench.cpp \
+	sybasebench.cpp
 
-SRCS += sqlrelaybench.cpp
-LOBJS += sqlrelaybench.lo
-
-SRCS += db2bench.cpp
-LOBJS += db2bench.lo
-
-SRCS += mysqlbench.cpp
-LOBJS += mysqlbench.lo
-
-SRCS += oraclebench.cpp
-LOBJS += oraclebench.lo
-
-SRCS += postgresqlbench.cpp
-LOBJS += postgresqlbench.lo
-
-SRCS += sybasebench.cpp
-LOBJS += sybasebench.lo
+LOBJS = bench.lo main.lo \
+	sqlrelaybench.lo \
+	db2bench.lo \
+	firebirdbench.lo \
+	freetdsbench.lo \
+	mysqlbench.lo \
+	oraclebench.lo \
+	postgresqlbench.lo \
+	sqlitebench.lo \
+	sybasebench.lo
 
 .SUFFIXES: .lo
 
