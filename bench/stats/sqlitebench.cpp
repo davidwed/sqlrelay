@@ -24,10 +24,10 @@ sqlitebenchconnection::sqlitebenchconnection(
 				const char *connectstring,
 				const char *db) :
 				benchconnection(connectstring,db) {
+	db=getParam("db");
 }
 
 sqlitebenchconnection::~sqlitebenchconnection() {
-	db=getParam("db");
 }
 
 bool sqlitebenchconnection::connect() {

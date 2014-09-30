@@ -24,13 +24,13 @@ firebirdbenchconnection::firebirdbenchconnection(
 				const char *connectstring,
 				const char *db) :
 				benchconnection(connectstring,db) {
-}
-
-firebirdbenchconnection::~firebirdbenchconnection() {
 	db=getParam("db");
 	dialect=getParam("dialect");
 	user=getParam("user");
 	password=getParam("password");
+}
+
+firebirdbenchconnection::~firebirdbenchconnection() {
 }
 
 bool firebirdbenchconnection::connect() {

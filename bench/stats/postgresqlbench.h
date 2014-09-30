@@ -5,6 +5,7 @@
 
 #include "bench.h"
 
+#include <libpq-fe.h>
 
 class postgresqlbenchmarks : public benchmarks {
 	public:
@@ -30,9 +31,12 @@ class postgresqlbenchconnection : public benchconnection {
 
 	private:
 		const char	*host;
-		const char	*db;
+		const char	*port;
+		const char	*dbname;
 		const char	*user;
 		const char	*password;
+
+		PGconn	*pgconn;
 };
 
 class postgresqlbenchcursor : public benchcursor {
@@ -46,6 +50,8 @@ class postgresqlbenchcursor : public benchcursor {
 
 	private:
 		postgresqlbenchconnection	*pgbcon;
+
+		PGresult	*pgresult;
 };
 
 #endif

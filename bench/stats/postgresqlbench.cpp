@@ -24,20 +24,27 @@ postgresqlbenchconnection::postgresqlbenchconnection(
 				const char *connectstring,
 				const char *db) :
 				benchconnection(connectstring,db) {
-}
-
-postgresqlbenchconnection::~postgresqlbenchconnection() {
 	host=getParam("host");
-	db=getParam("db");
+	port=getParam("port");
+	dbname=getParam("db");
 	user=getParam("user");
 	password=getParam("password");
 }
 
+postgresqlbenchconnection::~postgresqlbenchconnection() {
+}
+
 bool postgresqlbenchconnection::connect() {
+	pgconn=PQsetdbLogin(host,port,NULL,NULL,dbname,user,password);
+	if (PQstatus(pgconn)==CONNECTION_BAD) {
+		stdoutput.printf("PQsetdbLogin failed\n");
+		return false;
+	}
 	return true;
 }
 
 bool postgresqlbenchconnection::disconnect() {
+	PQfinish(pgconn);
 	return true;
 }
 
@@ -55,6 +62,34 @@ bool postgresqlbenchcursor::open() {
 }
 
 bool postgresqlbenchcursor::query(const char *query, bool getcolumns) {
+
+	pgresult=PQexec(pgbcon->pgconn,query);
+	if (pgresult==(PGresult *)NULL) {
+		stdoutput.printf("PQexec failed\n");
+		return false;
+	}
+
+	int32_t	cols=PQnfields(pgresult);
+
+	if (getcolumns) {
+		for (int i=0; i<cols; i++) {
+			PQfname(pgresult,i);
+			PQftype(pgresult,i);
+			PQfsize(pgresult,i);
+		}
+	}
+
+	// run through the rows
+	int	rows=PQntuples(pgresult);
+	for (int i=0; i<rows; i++) {
+		for (int j=0; j<cols; j++) {
+			//printf("%s,",PQgetvalue(pgresult,i,j));
+			PQgetvalue(pgresult,i,j);
+		}
+		//printf("\n");
+	}
+	PQclear(pgresult);
+
 	return true;
 }
 
