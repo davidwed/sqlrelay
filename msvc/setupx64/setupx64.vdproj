@@ -93,6 +93,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_63BBD106A3A74F279BD5684069A75B59"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_68094413FEA040E292AA2D63664C8D7D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -130,6 +136,12 @@
         "Entry"
         {
         "MsmKey" = "8:_80A62748ED0B4E2E8DC689E8EA99B3C6"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_81FE56F00C0E4403869EAE09007E43E4"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -341,6 +353,34 @@
     {
         "CustomAction"
         {
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_DEF4D19C5CAD4D34BDB2D2B5698E1E16"
+            {
+            "Name" = "8:pathuninstall.vbs"
+            "Condition" = "8:"
+            "Object" = "8:_81FE56F00C0E4403869EAE09007E43E4"
+            "FileType" = "3:4"
+            "InstallAction" = "3:4"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_C9E0E1C7_8042_4051_9180_D47EA7BA03E5"
+            "InstallerClass" = "11:FALSE"
+            "CustomActionData" = "8:"
+            }
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_ECDDC1DBB8864D5387C8FC167319A79C"
+            {
+            "Name" = "8:pathinstall.vbs"
+            "Condition" = "8:"
+            "Object" = "8:_63BBD106A3A74F279BD5684069A75B59"
+            "FileType" = "3:4"
+            "InstallAction" = "3:2"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_A7572FA6_28FA_4791_BAF5_9EF849377208"
+            "InstallerClass" = "11:FALSE"
+            "CustomActionData" = "8:"
+            }
         }
         "DefaultFeature"
         {
@@ -635,6 +675,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_63BBD106A3A74F279BD5684069A75B59"
+            {
+            "SourcePath" = "8:pathinstall.vbs"
+            "TargetName" = "8:pathinstall.vbs"
+            "Tag" = "8:"
+            "Folder" = "8:_1CC44F4587134A968D439AFB1479C24A"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_68094413FEA040E292AA2D63664C8D7D"
             {
             "SourcePath" = "8:..\\..\\src\\api\\c++\\include\\sqlrelay\\sqlrclient.h"
@@ -761,6 +821,26 @@
             "TargetName" = "8:php_sql_relay.dll"
             "Tag" = "8:"
             "Folder" = "8:_B7AAF5A9B3AC4CAC900E7C98D4899782"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_81FE56F00C0E4403869EAE09007E43E4"
+            {
+            "SourcePath" = "8:pathuninstall.vbs"
+            "TargetName" = "8:pathuninstall.vbs"
+            "Tag" = "8:"
+            "Folder" = "8:_1CC44F4587134A968D439AFB1479C24A"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1367,6 +1447,28 @@
                     "Property" = "8:_E4C3F63DD1C44CF88D7EAD52B5BA0C59"
                         "Folders"
                         {
+                        }
+                    }
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_EDB10B1F19E741EC8927FCA69DC365A7"
+                    {
+                    "Name" = "8:share"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_B81E186D910E437E94E60C696E33DB0C"
+                        "Folders"
+                        {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_1CC44F4587134A968D439AFB1479C24A"
+                            {
+                            "Name" = "8:sqlrelay"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_633822E5422442509DDE5FC4FF95909C"
+                                "Folders"
+                                {
+                                }
+                            }
                         }
                     }
                 }

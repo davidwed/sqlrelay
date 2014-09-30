@@ -93,6 +93,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_5F174DDA9BE6499483326F72B0B680E8"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_5F286DA6B6294750B449E263E977F3CF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -166,6 +172,12 @@
         "Entry"
         {
         "MsmKey" = "8:_9E7655E428ED4F1C9289E43825291B63"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9F65DCD2FC3E45FBB89F6DF9AC8BCCE3"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -341,6 +353,34 @@
     {
         "CustomAction"
         {
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_27F79250D11D45B693818A38C1403BBC"
+            {
+            "Name" = "8:pathinstall.vbs"
+            "Condition" = "8:"
+            "Object" = "8:_5F174DDA9BE6499483326F72B0B680E8"
+            "FileType" = "3:4"
+            "InstallAction" = "3:2"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_D056F0F7_2FE7_4953_97B0_6980BABCC537"
+            "InstallerClass" = "11:FALSE"
+            "CustomActionData" = "8:"
+            }
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_74B082169C5C4DF7A090E5E1EC07F752"
+            {
+            "Name" = "8:pathuninstall.vbs"
+            "Condition" = "8:"
+            "Object" = "8:_9F65DCD2FC3E45FBB89F6DF9AC8BCCE3"
+            "FileType" = "3:4"
+            "InstallAction" = "3:4"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_4B744D5F_F1E0_4D1B_9A7D_E3786F6638D8"
+            "InstallerClass" = "11:FALSE"
+            "CustomActionData" = "8:"
+            }
         }
         "DefaultFeature"
         {
@@ -624,6 +664,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5F174DDA9BE6499483326F72B0B680E8"
+            {
+            "SourcePath" = "8:pathinstall.vbs"
+            "TargetName" = "8:pathinstall.vbs"
+            "Tag" = "8:"
+            "Folder" = "8:_35EE1DF003BD4940BD085858663C497F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5F286DA6B6294750B449E263E977F3CF"
             {
             "SourcePath" = "8:..\\..\\src\\api\\c\\include\\sqlrelay\\private\\wrapperdll.h"
@@ -870,6 +930,26 @@
             "TargetName" = "8:__init__.py"
             "Tag" = "8:"
             "Folder" = "8:_4D1A4830A9A1421399CD5702CF2378D5"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9F65DCD2FC3E45FBB89F6DF9AC8BCCE3"
+            {
+            "SourcePath" = "8:pathuninstall.vbs"
+            "TargetName" = "8:pathuninstall.vbs"
+            "Tag" = "8:"
+            "Folder" = "8:_35EE1DF003BD4940BD085858663C497F"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1214,6 +1294,17 @@
             "Property" = "8:TARGETDIR"
                 "Folders"
                 {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_35EE1DF003BD4940BD085858663C497F"
+                    {
+                    "Name" = "8:share"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_64F2A47106AF486F9300D9CC84117157"
+                        "Folders"
+                        {
+                        }
+                    }
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_4DA373B2B3F444B4ADBD53A5E504524B"
                     {
                     "Name" = "8:include"
