@@ -44,7 +44,7 @@
 
 <p>Before you can compile SQL Relay, you will need to install some pre-requisites.</p>
 
-<p>To build any part of SQL Relay, you need to install the Rudiments library, which is available at: <a target="_top" href="http://rudiments.sourceforge.net">rudiments.sourceforge.net</a></p>
+<p>To build any part of SQL Relay, you need to install the Rudiments library.  The library is available at <a href="http://rudiments.sourceforge.net/download.html">rudiments.sourceforge.net</a> and instructions for building and installing it are available at <a href="http://rudiments.sourceforge.net/rudiments/installing.html">Installing Rudiments</a>.</p>
 
 <p>To build the non-C/C++ API's, you need to install one or more of
 <a href="http://www.perl.org">Perl</a>, 
@@ -54,25 +54,29 @@
 <a href="http://tcl.sourceforge.net">TCL</a>,
 <a href="http://java.sun.com">Java</a> (see note) or
 <a href="http://www.erlang.org">Erlang</a>.
-Note that these API's are not supported natively on Windows though many do work under Cygwin.</p>
+</p>
 
-<p>To build the C, C++, .NET and ADO.NET API's natively on Windows, you need to install Microsoft Visual Studio or Microsoft Visual Studio Express.</p>
+<p>Note that the Ruby, TCL and Erlang API's are not supported on Windows, though they may work under Cygwin.</p>
+
+<p>To build the API's natively on Windows, you need to install Microsoft Visual Studio or Microsoft Visual Studio Express.</p>
 
 <p>To build the database connection daemons, you need to install one or more of
-<a target="_top" href="http://www.oracle.com">Oracle</a>,
-<a target="_top" href="http://web.mysql.com">MySQL</a>, 
-<a target="_top" href="http://www.postgresql.org">PostgreSQL</a>, 
-<a target="_top" href="http://www.sqlite.org">SQLite</a>,
-<a target="_top" href="http://www.unixodbc.org">unixODBC</a>,
-<a target="_top" href="http://www.iodbc.org">iODBC</a>,
-<a target="_top" href="http://www.ibm.com/software/data/db2/">DB2</a>,
-<a target="_top" href="http://www.firebirdsql.com/">Firebird</a>,
-<a target="_top" href="http://www.sybase.com">Sybase</a> or
-<a target="_top" href="http://www.freetds.org">FreeTDS</a> (for accessing either
-<a target="_top" href="http://www.sybase.com">Sybase</a> or
-<a target="_top" href="http://www.microsof.com/sql/default.html">MS SQL Server</a>),
-<a target="_top" href="http://mdbtools.sourceforge.net">MDB Tools</a> for accessing MS Access Databases.
-Note that the database connection components are not supported natively under Windows though some do work under Cygwin.</p>
+<a href="http://www.oracle.com">Oracle</a>,
+<a href="http://web.mysql.com">MySQL</a>, 
+<a href="http://www.postgresql.org">PostgreSQL</a>, 
+<a href="http://www.sqlite.org">SQLite</a>,
+<a href="http://www.unixodbc.org">unixODBC</a>,
+<a href="http://www.iodbc.org">iODBC</a>,
+<a href="http://www.ibm.com/software/data/db2/">DB2</a>,
+<a href="http://www.firebirdsql.com/">Firebird</a>,
+<a href="http://www.sybase.com">Sybase</a> or
+<a href="http://www.freetds.org">FreeTDS</a> (for accessing either
+<a href="http://www.sybase.com">Sybase</a> or
+<a href="http://www.microsof.com/sql/default.html">MS SQL Server</a>),
+<a href="http://mdbtools.sourceforge.net">MDB Tools</a> for accessing MS Access Databases.
+</p>
+
+<p>Note that the database connection components are not supported natively under Windows though some do work under Cygwin.</p>
 
 
 <br>
@@ -185,30 +189,62 @@ make uninstall
 
 <p>There should be a file named <i>make.batch</i> in that directory.  Rename this file to <i>make.bat</i>.  It is named with the .batch extension because various mail services don't allow .bat files to be emailed around, even if they are inside of an archive.  To get around this, the file must manually be renamed.</p>
 
-<p>There are two build options.  SQL Relay can be built with or without Common Language Runtime (CLR) support.  There are advantages and disadvantages to building either way but you must build SQL Relay with the same option that you built Rudiments with.</p>
+<p>Unfortunately, building SQL Relay on Windows is currently rather difficult.</p>
 
-<p>To build without CLR support, run:</p>
+<p>The build scripts assume that correct versions of Perl, PHP, Python and Java are all available and intalled in the correct places.  If they are absent then build errors occur.</p>
+
+<p>Perl is expected to be installed under C:\Perl (or C:\Perl64 for 64-bit builds).</p>
+
+<p>Python is expected to be installed under C:\Python27</p>
+
+<p>PHP is expected to be installed under C:\PHP</p>
+
+<p>Java is expected to be installed under C:\Program Files\Java\jdk1.8.0_20 (or C:\Program Files (x86)\Java\jdk1.8.0_20 for 64-bit builds).</p>
+
+<p>Though inconvenient, it is possible to modify the <i>make.bat</i> file manually to exclude certain API's.</p>
+
+<p>There are 4 build options.  SQL Relay can be built as 32-bit or 64-bit binaries, and with or without Common Language Runtime (CLR) support.  There are advantages and disadvantages to building each way but you must build SQL Relay with the same option that you built Rudiments with.</p>
+
+<p>To build 32-bit without CLR support, run:</p>
 
 <blockquote><b>
 make
 </b></blockquote>
 
-<p>To build with CLR support, run:</p>
+<p>To build 32-bit with CLR support, run:</p>
 
 <blockquote><b>
 make clr
+</b></blockquote>
+
+<p>To build 64-bit without CLR support, run:</p>
+
+<blockquote><b>
+make 64
+</b></blockquote>
+
+<p>To build 64-bit with CLR support, run:</p>
+
+<blockquote><b>
+make clr64
 </b></blockquote>
 
 
 <a name="wininstalling"></a>
 <span class="heading2">Installing SQL Relay</span>
 
-<p>By default, on Windows, everything is installed under C:\Program Files\Firstworks.  You should either create that directory and give yourself full access permissions or install as Administrator.</p>
+<p>By default, on Windows, most components are installed under C:\Program Files\Firstworks for 64-bit builds or C:\Program Files (x86)\Firstworks for 32-bit builds.  You should either create the appropriate directory and give yourself full access permissions or install as Administrator.</p>
 
-<p>To install SQL Relay run:</p>
+<p>To install 32-bit SQL Relay run:</p>
 
 <blockquote><b>
 make install
+</b></blockquote>
+
+<p>To install 64-bit SQL Relay run:</p>
+
+<blockquote><b>
+make install64
 </b></blockquote>
 
 <p>To uninstall SQL Relay run:</p>
@@ -217,7 +253,7 @@ make install
 make uninstall
 </b></blockquote>
 
-<p>To run the command line programs, it is helpful to add C:\Program Files\Firstworks\bin to your PATH but not strictly necessary.  Alternatively, you could just navigate to C:\Program Files\Firstworks\bin and run them from there.</p>
+<p>To run the command line programs, it is helpful to add C:\Program Files\Firstworks\bin or C:\Program Files (x86)\Firstworks\bin to your PATH, as approriate, but not strictly necessary.  Alternatively, you could just navigate to C:\Program Files\Firstworks\bin or C:\Program Files (x86)\Firstworks\bin and run them from there.</p>
 
 </body>
 </html>
