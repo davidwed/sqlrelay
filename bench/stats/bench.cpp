@@ -72,34 +72,6 @@ void benchmarks::run() {
 		return;
 	}
 
-	// create
-	char	*createquery=createQuery(cols,colsize);
-	if (debug) {
-		stdoutput.printf("creating table:\n%s\n",createquery);
-	}
-	if (!cur->query(createquery,false)) {
-		stdoutput.printf("error creating table\n");
-	}
-	delete[] createquery;
-
-
-	// insert
-	if (debug) {
-		stdoutput.printf("inserting %lld rows:\n",rows);
-	}
-	for (uint64_t i=0; i<rows && !shutdown; i++) {
-		char	*insertquery=insertQuery(cols,colsize);
-		if (debug) {
-			stdoutput.printf("  row %lld\n%s\n",i,insertquery);
-		}
-		bool	result=cur->query(insertquery,false);
-		if (!result) {
-			stdoutput.printf("error inserting rows\n");
-		}
-		delete[] insertquery;
-	}
-
-	// select
 	const char	*selectquery="select * from testtable";
 	uint32_t	colfactor=4;
 	uint32_t	colcount=pow(2,colfactor);
@@ -109,14 +81,73 @@ void benchmarks::run() {
 		uint32_t	rowcount=pow(2,rowfactor);
 		while (rowcount<=rows && !shutdown) {
 
+			// create
+			char	*createquery=createQuery(colcount,colsize);
+			if (debug) {
+				stdoutput.printf("creating table with "
+							"%d columns:\n%s\n",
+								colcount,
+								createquery);
+			}
+			if (!cur->query(createquery,false)) {
+				stdoutput.printf("error creating table\n");
+			}
+			delete[] createquery;
+
+			// insert
+			if (debug) {
+				stdoutput.printf("inserting %lld rows:\n",
+								rowcount);
+			}
+			for (uint64_t i=0; i<rowcount && !shutdown; i++) {
+				char	*insertquery=
+					insertQuery(colcount,colsize);
+				if (debug) {
+					stdoutput.printf("  row %lld\n%s\n",
+								i,insertquery);
+				}
+				bool	result=cur->query(insertquery,false);
+				if (!result) {
+					stdoutput.printf(
+						"error inserting rows\n");
+				}
+				delete[] insertquery;
+			}
+
+			// select
 			if (debug) {
 				stdoutput.printf("selecting %lld rows, "
 						"%ld columns:\n%s\n",
 						rowcount,colcount,selectquery);
 			}
-			benchSelect(selectquery,queries,
-					rowcount,colcount,colsize,
-					iterations);
+			if (!shutdown) {
+				benchSelect(selectquery,queries,
+						rowcount,colcount,colsize,
+						iterations);
+			}
+
+			// re-connect
+			if (debug) {
+				stdoutput.printf("re-connecting\n");
+			}
+			if (!con->connect()) {
+				stdoutput.printf("error connecting\n");
+			}
+			if (debug) {
+				stdoutput.printf("re-opening\n");
+			}
+			if (!cur->open()) {
+				stdoutput.printf("error opening\n");
+			}
+
+			// drop
+			if (debug) {
+				stdoutput.printf("dropping table:\n%s\n",
+								dropquery);
+			}
+			if (!cur->query(dropquery,false)) {
+				stdoutput.printf("error dropping table\n");
+			}
 
 			// 1, 2, 4, 8, 16...rows
 			if (rowcount==rows) {
@@ -141,31 +172,6 @@ void benchmarks::run() {
 			}
 		}
 	}
-
-
-	// re-connect
-	if (debug) {
-		stdoutput.printf("re-connecting\n");
-	}
-	if (!con->connect()) {
-		stdoutput.printf("error connecting\n");
-	}
-	if (debug) {
-		stdoutput.printf("re-opening\n");
-	}
-	if (!cur->open()) {
-		stdoutput.printf("error opening\n");
-	}
-
-
-	// drop
-	if (debug) {
-		stdoutput.printf("dropping table:\n%s\n",dropquery);
-	}
-	if (!cur->query(dropquery,false)) {
-		stdoutput.printf("error dropping table\n");
-	}
-
 
 	// close and disconnect
 	if (debug) {

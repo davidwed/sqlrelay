@@ -240,7 +240,6 @@ bool db2benchcursor::query(const char *query, bool getcolumns) {
 			oldrow=rownumber;
 			totalrows=rownumber;
 		}
-stdoutput.printf("%d rows\n",totalrows);
 	}
 
 	SQLFreeHandle(SQL_HANDLE_STMT,stmt);
