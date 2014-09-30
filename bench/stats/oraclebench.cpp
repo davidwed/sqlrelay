@@ -31,9 +31,8 @@ oraclebenchconnection::oraclebenchconnection(
 	user=getParam("user");
 	password=getParam("password");
 
-	environment	envr;
-	envr.setValue("ORACLE_SID",sid);
-	envr.setValue("TWO_TASK",sid);
+	environment::setValue("ORACLE_SID",sid);
+	environment::setValue("TWO_TASK",sid);
 }
 
 oraclebenchconnection::~oraclebenchconnection() {

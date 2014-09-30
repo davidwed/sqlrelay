@@ -5,6 +5,14 @@
 
 #include "bench.h"
 
+extern "C" {
+	#include <ctpublic.h>
+}
+
+#define FETCH_AT_ONCE 10
+#define MAX_SELECT_LIST_SIZE 256
+#define MAX_ITEM_BUFFER_SIZE 2048
+
 
 class sybasebenchmarks : public benchmarks {
 	public:
@@ -32,9 +40,22 @@ class sybasebenchconnection : public benchconnection {
 		const char	*sybase;
 		const char	*lang;
 		const char	*server;
-		const char	*db;
+		const char	*dbname;
 		const char	*user;
 		const char	*password;
+
+		CS_CONTEXT	*context;
+		CS_LOCALE	*locale;
+		CS_CONNECTION	*conn;
+
+		static	CS_RETCODE	csMessageCallback(CS_CONTEXT *ctxt,
+						CS_CLIENTMSG *msgp);
+		static	CS_RETCODE	clientMessageCallback(CS_CONTEXT *ctxt,
+						CS_CONNECTION *cnn,
+						CS_CLIENTMSG *msgp);
+		static	CS_RETCODE	serverMessageCallback(CS_CONTEXT *ctxt,
+						CS_CONNECTION *cnn,
+						CS_SERVERMSG *msgp);
 };
 
 class sybasebenchcursor : public benchcursor {
@@ -48,6 +69,18 @@ class sybasebenchcursor : public benchcursor {
 
 	private:
 		sybasebenchconnection	*sybbcon;
+
+		CS_COMMAND	*cmd;
+		CS_INT		resultstype;
+		CS_INT		ncols;
+		CS_DATAFMT	column[MAX_SELECT_LIST_SIZE];
+		char		data[MAX_SELECT_LIST_SIZE]
+					[FETCH_AT_ONCE][MAX_ITEM_BUFFER_SIZE];
+		CS_INT		datalength[MAX_SELECT_LIST_SIZE]
+							[FETCH_AT_ONCE];
+		CS_SMALLINT	nullindicator[MAX_SELECT_LIST_SIZE]
+							[FETCH_AT_ONCE];
+		CS_INT		rowcount;
 };
 
 #endif
