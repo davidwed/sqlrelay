@@ -4,7 +4,7 @@
 # See the file COPYING for more information.
 
 
-load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
+load @TCLLIBSPATH@/sqlrelay/sqlrelay.so sqlrelay
 
 proc checkUndef {value} {
 
