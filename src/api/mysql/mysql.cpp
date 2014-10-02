@@ -1164,13 +1164,13 @@ my_ulonglong mysql_affected_rows(MYSQL *mysql) {
 MYSQL_ROW_OFFSET mysql_row_seek(MYSQL_RES *result, MYSQL_ROW_OFFSET offset) {
 	debugFunction();
 	result->previousrow=result->currentrow;
-	result->currentrow=*offset;
-	return (MYSQL_ROW_OFFSET)&result->previousrow;
+	result->currentrow=(unsigned long)offset;
+	return (MYSQL_ROW_OFFSET)result->previousrow;
 }
 
 MYSQL_ROW_OFFSET mysql_row_tell(MYSQL_RES *result) {
 	debugFunction();
-	return (MYSQL_ROW_OFFSET)&result->currentrow;
+	return (MYSQL_ROW_OFFSET)result->currentrow;
 }
 
 void mysql_data_seek(MYSQL_RES *result, my_ulonglong offset) {
