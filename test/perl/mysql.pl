@@ -1,3 +1,4 @@
+#! /usr/bin/env perl
 
 # Copyright (c) 2001  David Muse
 # See the file COPYING for more information.
