@@ -2396,15 +2396,8 @@ bool sqlrclientprotocol::fetchResultSetCommand(sqlrcursor_svr *cursor) {
 }
 
 void sqlrclientprotocol::abortResultSetCommand(sqlrcursor_svr *cursor) {
-
 	cont->logDebugMessage("aborting result set...");
-
-	// Very important...
-	// Do not cleanUpData() here, otherwise result sets that were suspended
-	// after the entire result set was fetched won't be able to return
-	// column data when resumed.
 	cursor->abort();
-
 	cont->logDebugMessage("done aborting result set");
 }
 
