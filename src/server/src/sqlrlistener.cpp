@@ -8,7 +8,7 @@
 #include <rudiments/inetsocketclient.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/snooze.h>
-#include <rudiments/passwdentry.h>
+#include <rudiments/userentry.h>
 #include <rudiments/groupentry.h>
 #include <rudiments/process.h>
 #include <rudiments/file.h>
@@ -237,7 +237,7 @@ void sqlrlistener::setUserAndGroup() {
 
 	// get the user that we're currently running as
 	char	*currentuser=
-		passwdentry::getName(process::getEffectiveUserId());
+		userentry::getName(process::getEffectiveUserId());
 
 	// get the group that we're currently running as
 	char	*currentgroup=

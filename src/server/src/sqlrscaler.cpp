@@ -7,7 +7,7 @@
 #include <rudiments/snooze.h>
 #include <rudiments/permissions.h>
 #include <rudiments/file.h>
-#include <rudiments/passwdentry.h>
+#include <rudiments/userentry.h>
 #include <rudiments/groupentry.h>
 #include <rudiments/process.h>
 #include <rudiments/datetime.h>
@@ -146,7 +146,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 
 			// get the user that we're currently running as
 			char	*currentuser=
-			passwdentry::getName(process::getEffectiveUserId());
+			userentry::getName(process::getEffectiveUserId());
 
 			// get the group that we're currently running as
 			char	*currentgroup=

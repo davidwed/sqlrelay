@@ -8,7 +8,7 @@
 #include <rudiments/file.h>
 #include <rudiments/socketclient.h>
 #include <rudiments/bytestring.h>
-#include <rudiments/passwdentry.h>
+#include <rudiments/userentry.h>
 #include <rudiments/groupentry.h>
 #include <rudiments/process.h>
 #include <rudiments/permissions.h>
@@ -434,7 +434,7 @@ void sqlrcontroller_svr::setUserAndGroup() {
 
 	// get the user that we're currently running as
 	char	*currentuser=
-		passwdentry::getName(process::getEffectiveUserId());
+		userentry::getName(process::getEffectiveUserId());
 
 	// get the group that we're currently running as
 	char	*currentgroup=
