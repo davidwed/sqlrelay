@@ -14,6 +14,7 @@
 #include <rudiments/error.h>
 #include <rudiments/randomnumber.h>
 #include <rudiments/charstring.h>
+#include <rudiments/sys.h>
 #include <rudiments/stdio.h>
 
 #include <defaults.h>
@@ -39,6 +40,9 @@ scaler::scaler() {
 	dbase=NULL;
 
 	debug=false;
+
+	iswindows=!charstring::compareIgnoringCase(
+				sys::getOperatingSystemName(),"Windows");
 }
 
 scaler::~scaler() {
@@ -399,7 +403,7 @@ pid_t scaler::openOneConnection() {
 	}
 	args[p++]=NULL; // the last
 
-	pid_t	pid=process::spawn(command,args);
+	pid_t	pid=process::spawn(command,args,(iswindows)?true:false);
 	if (pid==-1) {
 		// error
 		stderror.printf("spawn() failed: %s\n",error::getErrorString());

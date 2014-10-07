@@ -72,5 +72,7 @@ class SQLRSERVER_DLLSPEC scaler {
 		tempdir		*tmpdir;
 		cmdline		*cmdl;
 
+		bool		iswindows;
+
 		static	bool	shutdown;
 };

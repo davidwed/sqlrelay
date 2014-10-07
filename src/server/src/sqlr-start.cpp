@@ -6,12 +6,15 @@
 #include <sqlrconfigfile.h>
 #include <cmdline.h>
 #include <rudiments/process.h>
+#include <rudiments/sys.h>
 #include <rudiments/stdio.h>
 
 // for ceil()
 #include <math.h>
 
 #define MAX_CONNECTIONS 200
+
+bool	iswindows;
 
 int32_t getConnections(sqlrconfigfile *cfgfile, bool override) {
 	int32_t	connections=cfgfile->getConnections();
@@ -50,7 +53,7 @@ bool startListener(const char *id, const char *config,
 	stdoutput.printf("\n");
 
 	// spawn the command
-	if (process::spawn(cmd,args)==-1) {
+	if (process::spawn(cmd,args,(iswindows)?true:false)==-1) {
 		stdoutput.printf("\nsqlr-listener failed to start.\n");
 		return false;
 	}
@@ -99,7 +102,7 @@ bool startConnection(bool strace, const char *id, const char *connectionid,
 	stdoutput.printf("\n");
 
 	// spawn the command
-	if (process::spawn(cmd,args)==-1) {
+	if (process::spawn(cmd,args,(iswindows)?true:false)==-1) {
 		stdoutput.printf("\nsqlr-connection failed to start.\n");
 		return false;
 	}
@@ -217,7 +220,7 @@ bool startScaler(sqlrconfigfile *cfgfile, const char *id,
 	stdoutput.printf("\n");
 
 	// spawn the command
-	if (process::spawn(cmd,args)==-1) {
+	if (process::spawn(cmd,args,(iswindows)?true:false)==-1) {
 		stdoutput.printf("\nsqlr-scaler failed to start.\n");
 		return false;
 	}
@@ -235,6 +238,10 @@ int main(int argc, const char **argv) {
 	const char	*id=cmdl.getId();
 	const char	*config=cmdl.getConfig();
 	bool		overridemaxconn=cmdl.found("-overridemaxconnections");
+
+	// are we running on windows
+	iswindows=!charstring::compareIgnoringCase(
+				sys::getOperatingSystemName(),"Windows");
 
 	// default id warning
 	if (!charstring::compare(cmdl.getId(),DEFAULT_ID)) {

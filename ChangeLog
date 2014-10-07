@@ -1,4 +1,4 @@
-0.58 -
+0.58 - updated spawn() calls to detach on windows
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries
