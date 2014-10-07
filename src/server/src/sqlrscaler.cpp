@@ -380,7 +380,7 @@ bool scaler::reapChildren(pid_t connpid) {
 
 pid_t scaler::openOneConnection() {
 
-	char	*command=NULL;
+	const char	*command=NULL;
 	if (iswindows) {
 		command=WINDOWSPATH"sqlr-connection.exe";
 	} else {
