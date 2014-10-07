@@ -14,12 +14,6 @@
 
 #define MAX_CONNECTIONS 200
 
-#ifdef _USE_32_BIT_TIME_T
-	#define WINDOWSPATH "C:\\Program Files (x86)\\Firstworks\\bin\\"
-#else
-	#define WINDOWSPATH "C:\\Program Files\\Firstworks\\bin\\"
-#endif
-
 bool	iswindows;
 
 int32_t getConnections(sqlrconfigfile *cfgfile, bool override) {
@@ -39,7 +33,7 @@ bool startListener(const char *id, const char *config,
 	// build command to spawn
 	const char	*cmd=NULL;
 	if (iswindows) {
-		cmd=WINDOWSPATH"sqlr-listener.exe";
+		cmd="sqlr-listener.exe";
 	} else {
 		cmd="sqlr-listener";
  	}
@@ -86,7 +80,7 @@ bool startConnection(bool strace, const char *id, const char *connectionid,
 		args[i++]="-o";
 	} else {
 		if (iswindows) {
-			cmd=WINDOWSPATH"sqlr-connection.exe";
+			cmd="sqlr-connection.exe";
 		} else {
 			cmd="sqlr-connection";
  		}
@@ -215,7 +209,7 @@ bool startScaler(sqlrconfigfile *cfgfile, const char *id,
 	// build command to spawn
 	const char	*cmd=NULL;
 	if (iswindows) {
-		cmd=WINDOWSPATH"sqlr-scaler.exe";
+		cmd="sqlr-scaler.exe";
 	} else {
 		cmd="sqlr-scaler";
  	}
