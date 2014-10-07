@@ -1546,7 +1546,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Firstworks SQL Relay (64-bit)"
         "ProductCode" = "8:{C0EC8D59-D301-4F83-83D9-1CCD6E8001A5}"
-        "PackageCode" = "8:{5A7FB1FF-1064-4F0A-9A3B-4EC4B711B5F1}"
+        "PackageCode" = "8:{9E37BBED-DD92-464E-AE65-4C0535BE2F53}"
         "UpgradeCode" = "8:{97679A6A-B07C-4278-9494-57F8C96615C6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1819,7 +1819,7 @@
                             "ContextData" = "8:1;True=1;False=0"
                             "Attributes" = "3:0"
                             "Setting" = "3:0"
-                            "Value" = "3:1"
+                            "Value" = "3:0"
                             "DefaultValue" = "3:1"
                             "UsePlugInResources" = "11:TRUE"
                             }

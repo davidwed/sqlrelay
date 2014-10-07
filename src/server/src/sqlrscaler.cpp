@@ -19,6 +19,12 @@
 
 #include <defaults.h>
 
+#ifdef _USE_32_BIT_TIME_T
+	#define WINDOWSPATH "C:\\Program Files (x86)\\Firstworks\\bin\\"
+#else
+	#define WINDOWSPATH "C:\\Program Files\\Firstworks\\bin\\"
+#endif
+
 bool	scaler::shutdown=false;
 
 scaler::scaler() {
@@ -374,7 +380,12 @@ bool scaler::reapChildren(pid_t connpid) {
 
 pid_t scaler::openOneConnection() {
 
-	char	command[]="sqlr-connection";
+	char	*command=NULL;
+	if (iswindows) {
+		command=WINDOWSPATH"sqlr-connection.exe";
+	} else {
+		command="sqlr-connection";
+	}
 
 	char	ttlstr[20];
 	charstring::printf(ttlstr,20,"%d",ttl);

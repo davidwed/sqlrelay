@@ -14,6 +14,12 @@
 
 #define MAX_CONNECTIONS 200
 
+#ifdef _USE_32_BIT_TIME_T
+	#define WINDOWSPATH "C:\\Program Files (x86)\\Firstworks\\bin\\"
+#else
+	#define WINDOWSPATH "C:\\Program Files\\Firstworks\\bin\\"
+#endif
+
 bool	iswindows;
 
 int32_t getConnections(sqlrconfigfile *cfgfile, bool override) {
@@ -31,7 +37,12 @@ bool startListener(const char *id, const char *config,
 	stdoutput.printf("\nStarting listener:\n");
 
 	// build command to spawn
-	const char	*cmd="sqlr-listener";
+	const char	*cmd=NULL;
+	if (iswindows) {
+		cmd=WINDOWSPATH"sqlr-listener.exe";
+	} else {
+		cmd="sqlr-listener";
+ 	}
 	uint16_t	i=0;
 	const char	*args[8];
 	args[i++]="sqlr-listener";
@@ -74,7 +85,11 @@ bool startConnection(bool strace, const char *id, const char *connectionid,
 		args[i++]="-ff";
 		args[i++]="-o";
 	} else {
-		cmd="sqlr-connection";
+		if (iswindows) {
+			cmd=WINDOWSPATH"sqlr-connection.exe";
+		} else {
+			cmd="sqlr-connection";
+ 		}
 	}
 	args[i++]="sqlr-connection";
 	args[i++]="-id";
@@ -198,7 +213,12 @@ bool startScaler(sqlrconfigfile *cfgfile, const char *id,
 	stdoutput.printf("\nStarting scaler:\n");
 
 	// build command to spawn
-	const char	*cmd="sqlr-scaler";
+	const char	*cmd=NULL;
+	if (iswindows) {
+		cmd=WINDOWSPATH"sqlr-scaler.exe";
+	} else {
+		cmd="sqlr-scaler";
+ 	}
 	uint16_t	i=0;
 	const char	*args[8];
 	args[i++]="sqlr-scaler";
