@@ -225,7 +225,7 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 	setMaxListeners(maxlisteners);
 
 	// set a handler for SIGALRMs
-	#ifdef HAVE_SIGALRM
+	#ifdef SIGALRM
 	alarmhandler.setHandler(alarmHandler);
 	alarmhandler.handleSignal(SIGALRM);
 	#endif
@@ -1558,7 +1558,7 @@ void sqlrlistener::alarmThread(void *attr) {
 	alarmthreadattr	*ata=(alarmthreadattr *)attr;
 	ata->alarmthr->detach();
 	snooze::macrosnooze(ata->listenertimeout);
-	#ifdef HAVE_SIGALRM
+	#ifdef SIGALRM
 	ata->mainthr->raiseSignal(SIGALRM);
 	#endif
 }
@@ -2111,7 +2111,7 @@ void sqlrlistener::logInternalError(const char *info) {
 
 void sqlrlistener::alarmHandler(int32_t signum) {
 	alarmrang=1;
-	#ifdef HAVE_SIGALRM
+	#ifdef SIGALRM
 	alarmhandler.handleSignal(SIGALRM);
 	#endif
 }

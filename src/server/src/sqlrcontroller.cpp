@@ -422,7 +422,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	sqlrp[SQLRPROTOCOL_SQLRCLIENT]=new sqlrclientprotocol(this,conn,cfgfl);
 
 	// set a handler for SIGALRMs
-	#ifdef HAVE_SIGALRM
+	#ifdef SIGALRM
 	alarmhandler.setHandler(alarmHandler);
 	alarmhandler.handleSignal(SIGALRM);
 	#endif
