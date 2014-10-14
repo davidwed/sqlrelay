@@ -17,6 +17,7 @@
 <li><a href="#cluster">Replicated or Clustered Databases</a></li>
 <li><a href="#router">Master-Slave Query Routing</a></li>
 <li><a href="#instances">Multiple Instances</a></li>
+<li><a href="#files">Multiple Files</a></li>
 <li><a href="#advanced">Advanced Configuration</a></li>
 </ul>
 
@@ -195,7 +196,7 @@ sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
 
 <p>Any number of connection tags may be defined.</p>
 
-<p>The metric parameter is especially important if the nodes are heterogenous.  SQL Relay uses it to decide how many connections to open to each node.  It doesn't specify the number of connections to open to each node, but the higher the metric relative to the other metrics, the more connections to that node will be started.  For example, if the metric for the first node is twice as large as the metric for the second node, then SQL Relay will open twice as many connections to the first node as the second.</p>
+<p>The metric parameter is especially important if the nodes are heterogenous (ie. if some nodes are more powerful than others).  SQL Relay uses it to decide how many connections to open to each node.  It doesn't specify the number of connections to open to each node, but the higher the metric relative to the other metrics, the more connections to that node will be started.  For example, if the metric for the first node is twice as large as the metric for the second node, then SQL Relay will open twice as many connections to the first node as the second.</p>
 
 <p>In this example, 15 is 1.5 times 10, so 1.5 as many connections will be started to orcl2 as to orcl1.  Since a total of 10 connections will be started, 4 will be started to orcl1 and 6 to orcl2.</p>
 
@@ -251,7 +252,7 @@ sqlrsh -host <i>sqlrserver</i> -user routeruser -password routerpassword
 <br><br><a name="instances"></a>
 <span class="heading2">Multiple Instances</span><br>
 
-<p>Any number of SQL Relay instances can be defined in the sqlrelay.conf file.</p>
+<p>Any number of SQL Relay instances can be defined in the configuration file.</p>
 
 <p>In following example, instances that connect to Oracle, Sybase and DB2 are defined in the same file.</p>
 
@@ -280,10 +281,40 @@ sqlrsh -host <i>sqlrserver</i> -port 9002<br>
 </blockquote>
 
 
+<br><br><a name="files"></a>
+<span class="heading2">Multiple Files</span><br>
+
+<p>While any number of SQL Relay instances can be defined in a single configuration file, it might be more convenient to split configurations up into multiple files.</p>
+
+<p>The default the SQL Relay configuration directory is /usr/local/firstworks/etc/sqlrelay.conf.d</p>
+
+<p>Additional configuration files may be created under this directory.  These files must follow the same format as the main configuration file.</p>
+
+<p>For example, if you wanted to split up oracle, sybase and db2 configurations into 3 separate files, you could create:</p>
+
+<p><b>/usr/local/firstworks/etc/sqlrelay.conf.d/oracle.conf</b></p>
+
+<blockquote>
+@sqlrelay-multipleoracle.conf.html@
+</blockquote>
+
+<p><b>/usr/local/firstworks/etc/sqlrelay.conf.d/sybase.conf</b></p>
+
+<blockquote>
+@sqlrelay-multiplesybase.conf.html@
+</blockquote>
+
+<p><b>/usr/local/firstworks/etc/sqlrelay.conf.d/db2.conf</b></p>
+
+<blockquote>
+@sqlrelay-multipledb2.conf.html@
+</blockquote>
+
+
 <br><br><a name="advanced"></a>
 <span class="heading2">Advanced Configuration</span><br>
 
-<p>The sqlrelay.conf file supports many more attributes and features than the ones described in this guide including tuning options and extension modules.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> and <a href="tuning.html">Tuning SQL Relay</a> for more information.</p>
+<p>The configuration file supports many more attributes and features than the ones described in this guide including tuning options and extension modules.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> and <a href="tuning.html">Tuning SQL Relay</a> for more information.</p>
 
 </body>
 </html>

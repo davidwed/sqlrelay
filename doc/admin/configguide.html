@@ -17,6 +17,7 @@
 <li><a href="#cluster">Replicated or Clustered Databases</a></li>
 <li><a href="#router">Master-Slave Query Routing</a></li>
 <li><a href="#instances">Multiple Instances</a></li>
+<li><a href="#files">Multiple Files</a></li>
 <li><a href="#advanced">Advanced Configuration</a></li>
 </ul>
 
@@ -376,7 +377,7 @@ sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
 
 <p>Any number of connection tags may be defined.</p>
 
-<p>The metric parameter is especially important if the nodes are heterogenous.  SQL Relay uses it to decide how many connections to open to each node.  It doesn't specify the number of connections to open to each node, but the higher the metric relative to the other metrics, the more connections to that node will be started.  For example, if the metric for the first node is twice as large as the metric for the second node, then SQL Relay will open twice as many connections to the first node as the second.</p>
+<p>The metric parameter is especially important if the nodes are heterogenous (ie. if some nodes are more powerful than others).  SQL Relay uses it to decide how many connections to open to each node.  It doesn't specify the number of connections to open to each node, but the higher the metric relative to the other metrics, the more connections to that node will be started.  For example, if the metric for the first node is twice as large as the metric for the second node, then SQL Relay will open twice as many connections to the first node as the second.</p>
 
 <p>In this example, 15 is 1.5 times 10, so 1.5 as many connections will be started to orcl2 as to orcl1.  Since a total of 10 connections will be started, 4 will be started to orcl1 and 6 to orcl2.</p>
 
@@ -516,7 +517,7 @@ sqlrsh -host <i>sqlrserver</i> -user routeruser -password routerpassword
 <br><br><a name="instances"></a>
 <span class="heading2">Multiple Instances</span><br>
 
-<p>Any number of SQL Relay instances can be defined in the sqlrelay.conf file.</p>
+<p>Any number of SQL Relay instances can be defined in the configuration file.</p>
 
 <p>In following example, instances that connect to Oracle, Sybase and DB2 are defined in the same file.</p>
 
@@ -581,10 +582,94 @@ sqlrsh -host <i>sqlrserver</i> -port 9002<br>
 </blockquote>
 
 
+<br><br><a name="files"></a>
+<span class="heading2">Multiple Files</span><br>
+
+<p>While any number of SQL Relay instances can be defined in a single configuration file, it might be more convenient to split configurations up into multiple files.</p>
+
+<p>The default the SQL Relay configuration directory is /usr/local/firstworks/etc/sqlrelay.conf.d</p>
+
+<p>Additional configuration files may be created under this directory.  These files must follow the same format as the main configuration file.</p>
+
+<p>For example, if you wanted to split up oracle, sybase and db2 configurations into 3 separate files, you could create:</p>
+
+<p><b>/usr/local/firstworks/etc/sqlrelay.conf.d/oracle.conf</b></p>
+
+<blockquote>
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>DOCTYPE</b></font>&nbsp;instances&nbsp;<font color="#a52a2a"><b>SYSTEM</b></font>&nbsp;<font color="#ff00ff">&quot;sqlrelay.dtd&quot;</font><font color="#008b8b">&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;oracleexample&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9000&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;user=scott;password=tiger;oracle_sid=orcl&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
+</blockquote>
+
+<p><b>/usr/local/firstworks/etc/sqlrelay.conf.d/sybase.conf</b></p>
+
+<blockquote>
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>DOCTYPE</b></font>&nbsp;instances&nbsp;<font color="#a52a2a"><b>SYSTEM</b></font>&nbsp;<font color="#ff00ff">&quot;sqlrelay.dtd&quot;</font><font color="#008b8b">&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;sybaseexample&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;sybase&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9001&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;sybase=/opt/sybase;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
+</blockquote>
+
+<p><b>/usr/local/firstworks/etc/sqlrelay.conf.d/db2.conf</b></p>
+
+<blockquote>
+
+
+<font face="monospace">
+<font color="#0000ff">&lt;?</font><font color="#2e8b57"><b>xml</b></font><font color="#2e8b57"><b>&nbsp;</b></font><font color="#2e8b57"><b>version</b></font>=<font color="#ff00ff">&quot;1.0&quot;</font><font color="#0000ff">?&gt;</font><br>
+<font color="#008b8b">&lt;!</font><font color="#a52a2a"><b>DOCTYPE</b></font>&nbsp;instances&nbsp;<font color="#a52a2a"><b>SYSTEM</b></font>&nbsp;<font color="#ff00ff">&quot;sqlrelay.dtd&quot;</font><font color="#008b8b">&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;</font><font color="#008b8b">instances</font><font color="#008b8b">&gt;</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">instance</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>id</b></font>=<font color="#ff00ff">&quot;db2example&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>dbase</b></font>=<font color="#ff00ff">&quot;db2&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>port</b></font>=<font color="#ff00ff">&quot;9002&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>connections</b></font>=<font color="#ff00ff">&quot;10&quot;</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">users</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">user</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>user</b></font>=<font color="#ff00ff">&quot;sqlruser&quot;</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>password</b></font>=<font color="#ff00ff">&quot;sqlrpassword&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/users&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connections</font><font color="#008b8b">&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;</font><font color="#008b8b">connection</font><font color="#008b8b">&nbsp;</font><font color="#2e8b57"><b>string</b></font>=<font color="#ff00ff">&quot;db=testdb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0&quot;</font><font color="#008b8b">/&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/connections&gt;</font><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008b8b">&lt;/instance&gt;</font><br>
+<br>
+<font color="#008b8b">&lt;/instances&gt;</font><br>
+</font>
+</blockquote>
+
+
 <br><br><a name="advanced"></a>
 <span class="heading2">Advanced Configuration</span><br>
 
-<p>The sqlrelay.conf file supports many more attributes and features than the ones described in this guide including tuning options and extension modules.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> and <a href="tuning.html">Tuning SQL Relay</a> for more information.</p>
+<p>The configuration file supports many more attributes and features than the ones described in this guide including tuning options and extension modules.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> and <a href="tuning.html">Tuning SQL Relay</a> for more information.</p>
 
 </body>
 </html>

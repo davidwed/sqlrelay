@@ -51,7 +51,7 @@ the [mysqld] section if it's not already there:</p>
 <p>Now restart MySQL.</p>
 
 <p>To configure SQL Relay to connect to MySQL using the local connection,
-edit the sqlrelay.conf file and make sure that the connectstring for the
+edit the configuration file and make sure that the connectstring for the
 MySQL instance uses the socket parameter, as follows:</p>
 
 <blockquote>
@@ -103,7 +103,7 @@ overrides the port parameter.</p>
 <p>After you modify postgresql.conf, restart PostgreSQL.</p>
 
 <p>To configure SQL Relay to connect to PostgreSQL using the local connection,
-edit the sqlrelay.conf file and make sure that the connectstring for the
+edit the configuration file and make sure that the connectstring for the
 PostgreSQL instance uses the host and port parameters as follows:</p>
 
 <blockquote>
@@ -250,7 +250,7 @@ client (your program) and the SQL Relay server on the same machine, make sure
 that they are talking to each other over the unix socket.</p>
 
 <p>First make sure that SQL Relay is configured to listen on a unix
-socket.  In the sqlrelay.conf file, the instance that is talking to mysql
+socket.  In the configuration file, the instance that is talking to mysql
 should have a socket attribute:</p>
 
 <blockquote>
@@ -291,7 +291,7 @@ host/port.</p>
 
 <p>When a client connects to the SQL Relay listener process, it waits for an available database connection, then either hands the client off to that process via file descriptor passing, or proxies the incoming client, ferrying data back and forth between it and the database connecton process.</p>
 
-<p>Whether to pass or proxy can be specified by the "handoff" parameter in ths sqlrelay.conf file.  If you omit the handoff parameter or set handoff="pass" then file descriptor passing will be used.  If you set handoff="proxy" then proxying will be used.</p>
+<p>Whether to pass or proxy can be specified by the "handoff" parameter in ths configuration file.  If you omit the handoff parameter or set handoff="pass" then file descriptor passing will be used.  If you set handoff="proxy" then proxying will be used.</p>
 
 <p>File descriptor passing is faster and lighter than proxying, and is the default, but it isn't supported on all platforms.  For example, Linux kernels prior to 2.2 and the Cygwin environment under Windows, do not support file descriptor passing and it is likely that other platforms don't as well, especially older platforms.</p>
 
@@ -450,7 +450,7 @@ finding it may dramatically improve that query's performance.</p>
 
 <p>There is no rule of thumb for the "number of rows of the result set to fetch at once" parameter.  More tends to be better, but not always.  You may have to tune this by trial and error.</p>
 
-<p>For Oracle, Sybase and DB2, the maxselectlistsize, maxitembuffersize and fetchatonce parameters of the string attribute of the connection tag in the sqlrelay.conf file may be set to control these values at run time.  For FreeTDS, the maxselectlistsize and maxitembuffersize parameters are available but the fetchatonce parameter is not.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for details.</p>
+<p>For Oracle, Sybase and DB2, the maxselectlistsize, maxitembuffersize and fetchatonce parameters of the string attribute of the connection tag in the configuration file may be set to control these values at run time.  For FreeTDS, the maxselectlistsize and maxitembuffersize parameters are available but the fetchatonce parameter is not.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for details.</p>
 
 <p>Possibly more important than the parameters controlling the result set buffer size though, are the cursors and connections parameters as they are both multipliers.  See tips below for each.</p>
 
@@ -488,7 +488,7 @@ the kind of load your applications might place on SQL Relay and the database.
 should modify the queries that it runs to more accurately simulate your
 applications.</p>
 
-<p>If you are concerned about memory usage, consider allowing connections to scale up and down as necessary by using the connections, maxconnections, maxqueuelength and growby parameters in the sqlrelay.conf file.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for detailed information on these parameters.</p>
+<p>If you are concerned about memory usage, consider allowing connections to scale up and down as necessary by using the connections, maxconnections, maxqueuelength and growby parameters in the configuration file.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for detailed information on these parameters.</p>
 
 <br>
 <a name="howmanycursors"></a>
@@ -517,7 +517,7 @@ the app was done with it, or each cursor was freed when the app was done with
 it.  This is a common problem and, unfortunately, sometimes architectural
 constraints make it unavoidable.</p>
 
-<p>SQL Relay has parameters that allow cursors to scale up and down as needed.  If you are concerned about memory usage, consider using the cursors, maxcursors and cursors_growby parameters in the sqlrelay.conf file.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for detailed information on these parameters.</p>
+<p>SQL Relay has parameters that allow cursors to scale up and down as needed.  If you are concerned about memory usage, consider using the cursors, maxcursors and cursors_growby parameters in the configuration file.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for detailed information on these parameters.</p>
 
 </body>
 </html>

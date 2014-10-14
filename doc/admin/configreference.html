@@ -20,6 +20,12 @@
 
 <p>The SQL Relay configuration file is usually located at /usr/local/firstworks/etc/sqlrelay.conf</p>
 
+<p>Additional configuration files may be created under the configuration directory, usually /usr/local/firstworks/etc/sqlrelay.conf.d</p>
+
+<p>Files in the configuration directory may be given any name, but it is conventional to give them a .conf suffix.<p>
+
+<p>Each configuration file may define any number of SQL Relay instances.</p>
+
 <p>A comprehensive example follows.</p>
 
 <blockquote>
@@ -119,11 +125,9 @@
 <br><a name="tags"></a>
 <span class="heading2">Tags</span><br>
 
-<p>So what do all these tags do?</p>
+<p>The <b>instances</b> tag is just the root tag.  Each configuration file should have only one of these tags surrounding all other tags.</p>
 
-<p>The <b>instances</b> tag is just the root tag.  The sqlrelay.conf file should have only one of these tags surrounding all other tags.</p>
-
-<p>Each <b>instance</b> tag defines an instance of SQL Relay.  An instance consists of one sqlr-listener and one or more sqlr-connection daemons.  You can define as many of these as you like.</p>
+<p>Each <b>instance</b> tag defines an instance of SQL Relay.  An instance consists of one sqlr-listener and one or more sqlr-connection daemons.  You can define as many of these as you like in each configuration file.</p>
 
 <p>The <b>users</b> tag surrounds the list of users that may connect to the instance.</p>
 
@@ -168,8 +172,8 @@
 <li><b>maxsessioncount</b> - The number of client sessions that a connection will handle after being spawned dynamically before shutting down, even if it never goes idle.  Setting this to 0 will cause the connection to only shut down if it does idle for longer than <b>ttl</b> seconds.  This parameter does not apply to connections spawned by sqlr-start.  Defaults to 0.</li>
 <li><b>endofsession</b> - The command to issue when a client ends its session or dies.  Should be either "commit" or "rollback".  Defaults to "commit".</li>
 <li><b>sessiontimeout</b> - If a client leaves a session open for another client to pick up but no client picks it up, the session will time out after this number of seconds.  Defaults to 600 (10 minutes).</li>
-<li><b>runasuser</b> - The user to run the sqlr-listener, sqlr-connections and sqlr-scaler as.  Note that the sqlrelay.conf file must be readable by this user and the various "temp" directories (usually under /usr/local/firstworks/var/sqlrelay) must be writable by this user.  If this parameter is set to a user other than the user who runs sqlr-start, then unless sqlr-start is run as root, it will not be possible to switch to this user and the following warning will be displayed: <i>Warning: could not change user to <b>user</b>.</i>  Defaults to "nobody".</li>
-<li><b>runasgroup</b> - The group to run the sqlr-listener and sqlr-connections and sqlr-scaler as.  Note that the sqlrelay.conf file must be readable by this group and the various "temp" directories (usually under /usr/local/firstworks/var/sqlrelay) must be writable by this group.  If this parameter is set to a group other than a group that the user who runs sqlr-start belongs to, then unless sqlr-start is run as root, it will not be possible to switch to this group and the following warning will be displayed: <i>Warning: could not change group to <b>group</b>.</i>  Defaults to "nobody".</li>
+<li><b>runasuser</b> - The user to run the sqlr-listener, sqlr-connections and sqlr-scaler as.  Note that a configuration file must be readable by this user and the various "temp" directories (usually under /usr/local/firstworks/var/sqlrelay) must be writable by this user.  If this parameter is set to a user other than the user who runs sqlr-start, then unless sqlr-start is run as root, it will not be possible to switch to this user and the following warning will be displayed: <i>Warning: could not change user to <b>user</b>.</i>  Defaults to "nobody".</li>
+<li><b>runasgroup</b> - The group to run the sqlr-listener and sqlr-connections and sqlr-scaler as.  Note that a configuration file must be readable by this group and the various "temp" directories (usually under /usr/local/firstworks/var/sqlrelay) must be writable by this group.  If this parameter is set to a group other than a group that the user who runs sqlr-start belongs to, then unless sqlr-start is run as root, it will not be possible to switch to this group and the following warning will be displayed: <i>Warning: could not change group to <b>group</b>.</i>  Defaults to "nobody".</li>
 <li><b>cursors</b> - The number of database cursors that each sqlr-connection daemon will open and maintain.  More cursors may be opened if needed, but the pool of cursors will shrink back down to this size at the end of each client session.  This may be set to any positive number or 0.  Defaults to 1.</li>
 <li><b>maxcursors</b> - The maximum number of database cursors that may be opened for a single client session.  If this is set to a number lower than the value for the <b>cursors</b> parameter then it will be automatically bumped up to the value set for <b>cursors</b>.  Defaults to the same value as <b>cursors</b>.</li>
 <li><b>cursors_growby</b> - The number of new cursors that will be opened at a time when new cursors are required.  Defaults to 1.</li>
@@ -384,9 +388,9 @@ or a tnsnames-style expression such as:
 
 <p>The client will send a user and password to the sqlr-connection daemon when it connects to it.</p>
 
-<p>If the <b>authtier</b> attribute is set to "connection", the sqlr-connection daemon will compare the user/password to the list of user/passwords in the sqlrelay.conf file and accept or reject the client connection.</p>
+<p>If the <b>authtier</b> attribute is set to "connection", the sqlr-connection daemon will compare the user/password to the list of user/passwords in a configuration file and accept or reject the client connection.</p>
 
-<p>If the <b>authtier</b> attribute is set to "database", the sqlr-connection daemon will authenticate the user against the database itself rather than against the list of user/passwords in the sqlrelay.conf file.  This causes SQL Relay to switch which user it is logged into the database as.</p>
+<p>If the <b>authtier</b> attribute is set to "database", the sqlr-connection daemon will authenticate the user against the database itself rather than against the list of user/passwords in a configuration file.  This causes SQL Relay to switch which user it is logged into the database as.</p>
 
 <p>When SQL Relay is used with Oracle 8i or higher, the sqlr-connection daemon switches users without logging out.  The sqlr-connection daemon must be configured to log into the database as a user that can proxy other users and the client must attempt to log in to <b>SQL Relay</b> as one of the users that can be proxied.  See <a href="oraclentier.html">this document</a> for more information including instructions for configuring Oracle.</p>
 
@@ -401,7 +405,7 @@ or a tnsnames-style expression such as:
 <br><a name="modules"></a>
 <span class="heading2">Extension Modules</span><br>
 
-<p>SQL Relay can be extended via modules.  To load and enable a module, you must add additional tags and attributes to the config file and each module has its own tags and attributes.  Currently <a href="../modules/passwordencryption.html">Password Encryption</a> and <a href="../modules/logger.html">Logger</a> modules are supported.</p>
+<p>SQL Relay can be extended via modules.  To load and enable a module, you must add additional tags and attributes to a configuration file and each module has its own tags and attributes.  Currently <a href="../modules/passwordencryption.html">Password Encryption</a> and <a href="../modules/logger.html">Logger</a> modules are supported.</p>
 
 </body>
 </html>

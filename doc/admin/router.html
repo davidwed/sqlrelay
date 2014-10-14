@@ -28,7 +28,7 @@ types of databases (eg. MySQL, Oracle, MS SQL Server).</li>
 
 <p>Normally, SQL Relay maintains a set of persistent connections to a database
 or database cluster and distributes queries over the connections.  The databases
-to connect to are defined in the sqlrelay.conf file.</p>
+to connect to are defined in a configuration file.</p>
 
 <p>When used in query routing and filtering mode, SQL Relay is configured to
 distribute queries over other instances of SQL Relay running in standard
@@ -56,7 +56,7 @@ queries to filter out.</p>
 
 <p>When deciding where to route a query (or whether to filter it out), SQL
 Relay runs through the <b>query</b> tags, in the order that they appear in the
-sqlrelay.conf file, and compares the query to the regular expression defined in
+configuration file, and compares the query to the regular expression defined in
 the tag.  If the query matches a regular expression defined in a <b>query</b>
 tag inside of a <b>route</b> tag, it will be routed to the instance of SQL Relay
 defined in the <b>route</b> tag.  If the query matches a regular expression

@@ -100,11 +100,12 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <li><a href="#socketonly">How can I get SQL Relay to only listen on the unix socket and not the inet port?</a></li>
 <li><a href="#dynamicscaling">If I set up SQL Relay to use dynamic scaling, it eventually spawns off as many connections as it can and they never die off.  What's going on?</a></li>
 <li><a href="#maxqueuelengthzero">If I set up SQL Relay to use dynamic scaling with a maxqueuelength=0, sometimes it spawns off new connections even when there should be enough to handle the clients.  What's going on?</a></li>
-<li><a href="#cursorgrowth">In sqlrelay.conf, I set the cursors parameter to a small number.  Why does sqlr-status show Opened Server Cursors growing and growing?</a></li>
+<li><a href="#cursorgrowth">In the configuration file, I set the cursors parameter to a small number.  Why does sqlr-status show Opened Server Cursors growing and growing?</a></li>
 <li><a href="#cygwinstart">When using SQL Relay on Cygwin, sqlr-start never returns to a command prompt.  How do I fix that?</a></li>
 <li><a href="#cygwinfork">When using SQL Relay on Cygwin, I get an error like "child_info_fork::abort: ...xxx.dll: Loaded to different address: parent(xxx)!=child(yyy)" and nothing runs.  How do I fix that?</a></li>
 <li><a href="#debug">What happened to the "debug" option?  How do I enable the debug logs?</a></li>
-<li><a href="#passwordencryption">I don't like storing plaintext passwords in my sqlrelay.conf file.  Can I encrypt them somehow?</a></li>
+<li><a href="#passwordencryption">I don't like storing plaintext passwords in my configuration file.  Can I encrypt them somehow?</a></li>
+<li><a href="#multipleconfig">Do I have to put define all of my instances in the same configuration file?</a></li>
 </ul>
 
 <hr>
@@ -285,7 +286,7 @@ databases?</span>
 <br><a name="databaseusers"></a>
 <span class="heading3">Can SQL Relay proxy multiple database users instead of using the same user for every session?</span>
 
-<p>Yes.  Set the authtier attribute of the instance tag in the sqlrelay.conf file to "database".  See the <a href="admin/configreference.html">SQL Relay Configuration Reference</a> for more information.</p>
+<p>Yes.  Set the authtier attribute of the instance tag in the configuration file to "database".  See the <a href="admin/configreference.html">SQL Relay Configuration Reference</a> for more information.</p>
 
 <p>SQL Relay does it very efficiently when used with Oracle 8i or greater and MySQL version 3.23.3 or greater.  For Oracle, the database must be configured properly.  See <a href="admin/oraclentier.html">this document</a> for step-by-step instructions.</p>
 
@@ -568,7 +569,7 @@ ln -s bash sh
 
 <p>Following installation, the permissions on the <i>tnsnames.ora</i> file are often set to 640, meaning the read-write for the <i>oracle</i> user, read-only for the <i>oinstall</i> group and no permissions for everyone else.</p>
 
-<p>If the runasuser and/or runasgroup settings in the sqlrelay.conf file are set to a user and/or group that can't read the file, then SQL Relay will fail to connect to the database.  The examples generally show runasuser and runasgroup being set to "nobody", which won't work with the default settings for the tnsnames.ora file.</p>
+<p>If the runasuser and/or runasgroup settings in the configuration file are set to a user and/or group that can't read the file, then SQL Relay will fail to connect to the database.  The examples generally show runasuser and runasgroup being set to "nobody", which won't work with the default settings for the tnsnames.ora file.</p>
 
 <p>There are multiple solutions.  Perhaps the simplest is to change the permissions using:</p>
 
@@ -589,7 +590,7 @@ chmod o+r tnsnames.ora
 
 <p>The next most common cause of this is a permissions issue.  Something under the ORACLE_HOME (or Instant Client installation directory, if you're using Instant Client) isn't readable or executable by the user that SQL Relay is trying to run as.  Try running sqlplus as the same user and see if it works.  If it does then there probably isn't a permissions issue.  If it doesn't, then there could be a permissions issue.</p>
 
-<p>The next most common cause is an invalid ORACLE_HOME environment variable, or invalid oracle_home setting in the sqlrelay.conf file.  The ORACLE_SID environment variable, or oracle_sid setting in the sqlrelay.conf file, can either refer to an entry in the tnsnames.ora file or it can just be an fully qualified entry itself.  In the case of the former, the ORACLE_HOME must be set to a valid directory, under which network/admin/tnsnames.ora can be found.  In the case of the latter, when using Oracle 8 and 8i or any version of Oracle Instant Client, ORACLE_HOME can be set to anything at all or left empty, but when using Oracle 9i and up, ORACLE_HOME must be set to a valid location.</p>
+<p>The next most common cause is an invalid ORACLE_HOME environment variable, or invalid oracle_home setting in the configuration file.  The ORACLE_SID environment variable, or oracle_sid setting in the configuration file, can either refer to an entry in the tnsnames.ora file or it can just be an fully qualified entry itself.  In the case of the former, the ORACLE_HOME must be set to a valid directory, under which network/admin/tnsnames.ora can be found.  In the case of the latter, when using Oracle 8 and 8i or any version of Oracle Instant Client, ORACLE_HOME can be set to anything at all or left empty, but when using Oracle 9i and up, ORACLE_HOME must be set to a valid location.</p>
 
 <br><a name="sqlserver"></a>
 <span class="heading3">Why can't I get SQL Relay to connect to Sybase/Microsoft SQL Server?</span>
@@ -649,7 +650,7 @@ chmod o+r tnsnames.ora
 <br><a name="postgresql"></a>
 <span class="heading3">Postgresql's native API uses numbers for types but SQL Relay mangles them.  How do I get the numbers?</span>
 
-<p>Prior to version 0.28, SQL Relay mangled Postgresql numeric types into pseudo-standard datatype names.  I read a thread in a discussion group indicating that someone was specifically unhappy with SQL Relay because of this behavior though, and decided to change it.  So, as of version 0.28, by default, SQL Relay returns numeric types when run against Postgresql.  If you prefer getting type names, you can set the mangletypes connect string value to "yes" in your sqlrelay.conf file.</p>
+<p>Prior to version 0.28, SQL Relay mangled Postgresql numeric types into pseudo-standard datatype names.  I read a thread in a discussion group indicating that someone was specifically unhappy with SQL Relay because of this behavior though, and decided to change it.  So, as of version 0.28, by default, SQL Relay returns numeric types when run against Postgresql.  If you prefer getting type names, you can set the mangletypes connect string value to "yes" in your configuration file.</p>
 
 <p>For example, in version 0.28 or higher the following connectstring will instruct SQL Relay to return type names instead of numbers:</p>
 
@@ -676,7 +677,7 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 
 <p>Configuring the character set used by the SQL Relay process is different for each database.</p>
 
-<p>Since SQL Relay 0.43, when using MySQL, PostgreSQL, FreeTDS, Sybase and Firebird databases, the character set can be set by setting the <b>charset</b> variable in the connect string of the sqlrelay.conf file.</p>
+<p>Since SQL Relay 0.43, when using MySQL, PostgreSQL, FreeTDS, Sybase and Firebird databases, the character set can be set by setting the <b>charset</b> variable in the connect string of the configuration file.</p>
 
 <p>Since SQL Relay 0.37, when using Oracle, the character set can be set by setting the <b>nls_lang</b> variable in the connect string.</p>
 
@@ -705,7 +706,7 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 
 <p>Now you can log in as <b>mused</b> and connect to the database using <b>sqlplus /</b> and you will not be prompted for a username and password.</p>
 
-<p>In the sqlrelay.conf file, set the runasuser attribute of the instance tag to the user that you want to connect as and leave out the user, password and oracle_sid parameters of the string attribute of the connection tag.</p> 
+<p>In the configuration file, set the runasuser attribute of the instance tag to the user that you want to connect as and leave out the user, password and oracle_sid parameters of the string attribute of the connection tag.</p> 
 
 <p>For example, here's a normal (non-OS-authentication) configuration which connects to the ora1 instance of oracle using testuser/testpassword:</p>
 
@@ -794,7 +795,7 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 <b>DATETIME:</b> Aug  5 2013 09:25:25:917PM<br>
 </blockquote>
 
-<p>The <b>dateformat</b> parameter in the sqlrelay.conf file can be used to normalize these DATE fields but there is an interesting potential issue.</p>
+<p>The <b>dateformat</b> parameter in the configuration file can be used to normalize these DATE fields but there is an interesting potential issue.</p>
 
 <p>The date/time conversion routines take any fields in the result set that appear to be a date, time or date/time combination and translate them to the format specified by the <b>dateformat</b>, <b>timeformat</b> and <b>datetimeformat</b> parameters.  However the routines must also use the <b>dateddmm</b> parameter to determine whether the month or day comes first.  For example, the date 03/04/2005 could be recognized as either March 4, 2005 or April 3, 2005.  If <b>dateddmm="yes"</b> is set then it will be recognized as the latter.</p>
 
@@ -1144,7 +1145,7 @@ connection:
 
 <p>SQL Relay is typically started as root.  The sqlr-start command runs as root and starts up the sqlr-listener, sqlr-connection and sqlr-scaler processes as root.  They then read the config file and switch to run as whatever user/group are specified in the runasuser and runasgroup parameters.  The sqlr-scaler is most likely now running as a non-root user (such as nobody).  When it spawns new connections, they start out running as that same non-root user.  The root user can always read the config file, but the config file may not have permissions set so that the non-root user can read it.  In that case, the sqlr-connection daemon will start up, fail to read the config file, display a message and exit.</p>
 
-<p>To remedy the situation, make sure that the sqlrelay.conf file is readable by each of the users and groups specified in the runasuser/runasgroup attributes inside the file.</p>
+<p>To remedy the situation, make sure that the configuration file is readable by each of the users and groups specified in the runasuser/runasgroup attributes inside the file.</p>
 
 <br><a name="gui"></a>
 <span class="heading3">Where'd the configuration GUI go?</span><br>
@@ -1154,7 +1155,7 @@ connection:
 <br><a name="socketonly"></a>
 <span class="heading3">How can I get SQL Relay to only listen on the unix socket and not the inet port?</span><br>
 
-<p>This was broken prior to version 0.40.  But in 0.40 or newer, you can just set port="" in the instance tag of the sqlrelay.conf file or leave the attribute out altogether.  However, in either case, you must supply a value for the socket attribute.  If neither are specified then SQL Relay will fall back to listening on the default port 9000 and not listening on the unix socket at all.</p> 
+<p>This was broken prior to version 0.40.  But in 0.40 or newer, you can just set port="" in the instance tag of the configuration file or leave the attribute out altogether.  However, in either case, you must supply a value for the socket attribute.  If neither are specified then SQL Relay will fall back to listening on the default port 9000 and not listening on the unix socket at all.</p> 
 
 <br><a name="dynamicscaling"></a>
 <span class="heading3">If I set up SQL Relay to use dynamic scaling, it eventually spawns off as many connections as it can and they never die off.  What's up with that?</span><br>
@@ -1175,7 +1176,7 @@ additional resource consumption.</p>
 <p>There is no easy fix for this.  Anything that might be done to guarantee that a new connection daemon won't be spawned would reduce overall performance.  So, if you're using maxqueuelength=0, then expect for this to happen.  It should not happen if maxqueuelength is set to some value greater than 0.</p>
 
 <br><a name="cursorgrowth"></a>
-<span class="heading3">In sqlrelay.conf, I set the cursors parameter to a small number.  Why does sqlr-status show Opened Server Cursors growing and growing?</span><br>
+<span class="heading3">In the configuration file, I set the cursors parameter to a small number.  Why does sqlr-status show Opened Server Cursors growing and growing?</span><br>
 
 <p>Some database API's provide functions for doing commits and rollbacks.  Others do not.  For those that do not, SQL Relay allocates a new cursor and uses it to execute the commit or rollback as a query.  Each time this happens, the Opened Server Cursors count increases.  Aside from being confusing, this shouldn't cause any problems.</p>
 
@@ -1204,7 +1205,7 @@ additional resource consumption.</p>
 <br><a name="debug"></a>
 <span class="heading3">What happened to the debug option?  How do I enable the debug logs?</span><br>
 
-<p>Prior to version 0.49, the instance tag of the sqlrelay.conf file had a debug attribute that made it possible to enable debug logs for the listeners and connections.</p>
+<p>Prior to version 0.49, the instance tag of the configuration file had a debug attribute that made it possible to enable debug logs for the listeners and connections.</p>
 
 <p>As of 0.49, this has been replaced by an modular logging framework and the classic debug has been reimplemented as a module.</p>
 
@@ -1227,11 +1228,27 @@ additional resource consumption.</p>
 <p>See <a href="../modules/logger.html">Logger Modules</a> for more information.</p>
 
 <br><a name="passwordencryption"></a>
-<span class="heading3">I don't like storing plaintext passwords in my sqlrelay.conf file.  Can I encrypt them somehow?</span><br>
+<span class="heading3">I don't like storing plaintext passwords in my configuration file.  Can I encrypt them somehow?</span><br>
 
 <p>Yes.  Both database passwords and passwords for accessing SQL Relay itself can be encrypted via extension modules.  You can use one of the provided modules or develop your own.</p>
 
 <p>See <a href="modules/passwordencryption.html">Password Encryption Modules</a> for more information.</p>
+
+<br><a name="multipleconfig"></a>
+<span class="heading3">Do I have to put define all of my instances in the same configuration file?</span><br>
+
+<p>No.  There are two ways to define instances in separate config files.</p>
+
+<p>The -config option to sqlr-start allows you to specify a configuration file.
+So you can create multiple configuration files and specify which one to use when
+starting SQL Relay.</p>
+
+<p>Also, as of version 0.58, multiple configuration files can be placed under
+the configuration directory (usually /usr/local/firstworks/etc/sqlrelay.conf.d)
+and each will be consulted at startup in addition to the main configuration file
+(usually /usr/local/firstworks/etc/sqlrelay.conf).  See the
+<a href="/admin/configguide.html#files">SQL Relay Configuration Guide</a> for
+more information.</p>
 
 </body>
 </html>
