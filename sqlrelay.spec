@@ -385,6 +385,7 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-, root, root)
+%{_sysconfdir}/sqlrelay/sqlrelay.conf.d
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.conf.example
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.dtd
 %config %attr(600, root, root) %{_sysconfdir}/sqlrelay.xsd

@@ -175,6 +175,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 			sqlrconfigfile();
 			~sqlrconfigfile();
 		bool	parse(const char *config, const char *id);
+		bool	accessible();
 		const char * const *getAddresses();
 		uint64_t	getAddressCount();
 		uint16_t	getPort();

@@ -270,8 +270,7 @@ bool sqlrlistener::verifyAccessToConfigFile(const char *configfile) {
 		return true;
 	}
 
-	file	test;
-	if (!test.open(configfile,O_RDONLY)) {
+	if (!cfgfl.accessible()) {
 		stderror.printf("\nsqlr-listener error:\n");
 		stderror.printf("	This instance of SQL Relay is ");
 		stderror.printf("configured to run as:\n");
@@ -301,7 +300,6 @@ bool sqlrlistener::verifyAccessToConfigFile(const char *configfile) {
 						cfgfl.getRunAsGroup());
 		return false;
 	}
-	test.close();
 	return true;
 }
 

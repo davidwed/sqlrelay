@@ -127,12 +127,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	debug=cmdl->found("-debug");
 
 	// get the config file
-	const char	*tmpconfig=cmdl->getValue("-config");
-	if (!(tmpconfig && tmpconfig[0])) {
-		tmpconfig=DEFAULT_CONFIG_FILE;
-	}
-	config=new char[charstring::length(tmpconfig)+1];
-	charstring::copy(config,tmpconfig);
+	config=charstring::duplicate(cmdl->getValue("-config"));
 
 	// parse the config file
 	cfgfile=new sqlrconfigfile;
@@ -189,8 +184,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 		// it won't start, the scaler won't start.  However someone
 		// could get crafty and force the sqlr-scaler to start so
 		// we'll do this check just to make sure)
-		file	test;
-		if (!test.open(config,O_RDONLY)) {
+		if (!cfgfile->accessible()) {
 			stderror.printf("\nsqlr-scaler error:\n");
 			stderror.printf("	This instance of ");
 			stderror.printf("SQL Relay is ");
@@ -224,7 +218,6 @@ bool scaler::initScaler(int argc, const char **argv) {
 						cfgfile->getRunAsGroup());
 			return false;
 		}
-		test.close();
 
 		// get the dynamic connection scaling parameters
 		maxconnections=cfgfile->getMaxConnections();
@@ -396,8 +389,10 @@ pid_t scaler::openOneConnection() {
 	args[p++]=id;
 	args[p++]="-connectionid";
 	args[p++]=connectionid;
-	args[p++]="-config";
-	args[p++]=config;
+	if (config && config[0]) {
+		args[p++]="-config";
+		args[p++]=config;
+	}
 	if (charstring::length(cmdl->getLocalStateDir())) {
 		args[p++]="-localstatedir";
 		args[p++]=cmdl->getLocalStateDir();

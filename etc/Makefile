@@ -6,6 +6,7 @@ include ../config.mk
 
 install:
 	$(MKINSTALLDIRS) $(sysconfdir)
+	$(MKINSTALLDIRS) $(sysconfdir)/sqlrelay.conf.d
 	$(INSTALL) -m 644 sqlrelay.conf.example $(sysconfdir)
 	$(INSTALL) -m 644 sqlrelay.dtd $(sysconfdir)
 	$(INSTALL) -m 644 sqlrelay.xsd $(sysconfdir)

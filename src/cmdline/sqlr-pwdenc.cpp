@@ -17,9 +17,6 @@ int main(int argc, const char **argv) {
 	// get the command line arguments
 	commandline	cmdline(argc,argv);
 	const char	*config=cmdline.getValue("-config");
-	if (!(config && config[0])) {
-		config=DEFAULT_CONFIG_FILE;
-	}
 	const char	*id=cmdline.getValue("-id");
 	const char	*pwdencid=cmdline.getValue("-pwdencid");
 	const char	*password=cmdline.getValue("-password");

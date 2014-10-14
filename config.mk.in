@@ -33,7 +33,7 @@ BASECPPFLAGS = @CPPFLAGS@ @PTHREADINCLUDES@
 TMPDIRCPPFLAG = -DTMP_DIR=\"$(tmpdir)\"
 DEBUGDIRCPPFLAG = -DDEBUG_DIR=\"$(debugdir)\"
 LOGDIRCPPFLAG = -DLOG_DIR=\"$(logdir)\"
-CONFIGFILECPPFLAG = -DDEFAULT_CONFIG_FILE=\"$(sysconfdir)/sqlrelay.conf\"
+CONFIGFILECPPFLAG = -DDEFAULT_CONFIG_FILE=\"$(sysconfdir)/sqlrelay.conf\" -DDEFAULT_CONFIG_DIR=\"$(sysconfdir)/sqlrelay.conf.d\"
 CACHEDIRCPPFLAG = -DCACHE_DIR=\"$(cachedir)\"
 
 # link flags (-s, -static, -melf, -belf, etc.)

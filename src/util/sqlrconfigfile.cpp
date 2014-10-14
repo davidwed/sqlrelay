@@ -5,6 +5,8 @@
 #include <sqlrconfigfile.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/environment.h>
+#include <rudiments/directory.h>
+#include <rudiments/sys.h>
 #include <rudiments/stdio.h>
 
 #include <defines.h>
@@ -1607,14 +1609,44 @@ bool sqlrconfigfile::parse(const char *config, const char *id) {
 	correctid=false;
 	done=false;
 
-	// parse the file
-	bool	retval=true;
-	if (!parseFile(config)) {
-		stderror.printf("Couldn't parse config file %s.\n",config);
-		retval=false;
+	// attempt to parse the config file
+	if (!config || !config[0]) {
+		config=DEFAULT_CONFIG_FILE;
 	}
+	parseFile(config);
 
-	// parse the user's .sqlrelay.conf file
+	// attempt to parse files in the config dir
+	directory	d;
+	stringbuffer	fullpath;
+	bool		iswindows=!charstring::compareIgnoringCase(
+						sys::getOperatingSystemName(),
+						"Windows");
+	if (!done && d.open(DEFAULT_CONFIG_DIR)) {
+		for (;;) {
+			char	*filename=d.read();
+			if (!filename) {
+				break;
+			}
+			if (charstring::compare(filename,".") &&
+				charstring::compare(filename,"..")) {
+
+				fullpath.clear();
+				fullpath.append(DEFAULT_CONFIG_DIR);
+				if (iswindows) {
+					fullpath.append("\\");
+				} else {
+					fullpath.append("/");
+				}
+				fullpath.append(filename);
+				delete[] filename;
+
+				parseFile(fullpath.getString());
+			}
+		}
+	}
+	d.close();
+
+	// attempt to parse the user's .sqlrelay.conf file
 	const char	*homedir=environment::getValue("HOME");
 	char		*filename;
 	if (homedir && homedir[0]) {
@@ -1625,19 +1657,20 @@ bool sqlrconfigfile::parse(const char *config, const char *id) {
 	} else {
 		filename=charstring::duplicate("~/.sqlrelay.conf");
 	}
-
-	// see if the file exists before trying to parse it, don't worry about
-	// an error message here
 	parseFile(filename);
 	delete[] filename;
 
-	// if the specified instance wasn't found, warn the user
+	// warn the user if the specified instance wasn't found
 	if (!done) {
 		stderror.printf("Couldn't find id %s.\n",id);
-		retval=false;
 	}
 
-	return retval;
+	return done;
+}
+
+bool sqlrconfigfile::accessible() {
+	// FIXME: implement this
+	return true;
 }
 
 usercontainer::usercontainer() {

@@ -55,9 +55,6 @@ int main(int argc, const char **argv) {
 	commandline	cmdline(argc,argv);
 
 	const char	*config=cmdline.getValue("-config");
-	if (!(config && config[0])) {
-		config=DEFAULT_CONFIG_FILE;
-	}
 	const char	*id=cmdline.getValue("-id");
 	const char	*host=cmdline.getValue("-host");
 	uint16_t	port=charstring::toInteger(
