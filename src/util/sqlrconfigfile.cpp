@@ -1618,9 +1618,9 @@ bool sqlrconfigfile::parse(const char *config, const char *id) {
 	// attempt to parse files in the config dir
 	directory	d;
 	stringbuffer	fullpath;
-	bool		iswindows=!charstring::compareIgnoringCase(
+	const char	*slash=(!charstring::compareIgnoringCase(
 						sys::getOperatingSystemName(),
-						"Windows");
+						"Windows"))?"\\":"/";
 	if (!done && d.open(DEFAULT_CONFIG_DIR)) {
 		for (;;) {
 			char	*filename=d.read();
@@ -1632,11 +1632,7 @@ bool sqlrconfigfile::parse(const char *config, const char *id) {
 
 				fullpath.clear();
 				fullpath.append(DEFAULT_CONFIG_DIR);
-				if (iswindows) {
-					fullpath.append("\\");
-				} else {
-					fullpath.append("/");
-				}
+				fullpath.append(slash);
 				fullpath.append(filename);
 				delete[] filename;
 
@@ -1645,20 +1641,6 @@ bool sqlrconfigfile::parse(const char *config, const char *id) {
 		}
 	}
 	d.close();
-
-	// attempt to parse the user's .sqlrelay.conf file
-	const char	*homedir=environment::getValue("HOME");
-	char		*filename;
-	if (homedir && homedir[0]) {
-		size_t	filenamelen=charstring::length(homedir)+15+1;
-		filename=new char[filenamelen];
-		charstring::copy(filename,homedir);
-		charstring::append(filename,"/.sqlrelay.conf");
-	} else {
-		filename=charstring::duplicate("~/.sqlrelay.conf");
-	}
-	parseFile(filename);
-	delete[] filename;
 
 	// warn the user if the specified instance wasn't found
 	if (!done) {
