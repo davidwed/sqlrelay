@@ -722,7 +722,6 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 echo
 echo "***** Structures *************"
 AC_TYPE_SIGNAL
-FW_CHECK_SIGNALS
 echo "******************************"
 
 
