@@ -32712,7 +32712,7 @@ $as_echo_n "checking for PHP config directory... " >&6; }
 	fi
 	if ( test "$PHPCONFSTYLE" = "unknown" )
 	then
-		for dir in `ls $PHPPREFIX/php/* 2> /dev/null`
+		for dir in `ls $PHPPREFIX/etc/php/* 2> /dev/null`
 		do
 			if ( test -d "$PHPPREFIX/etc/php/$dir/conf.d" )
 			then

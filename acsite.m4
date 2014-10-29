@@ -3112,7 +3112,7 @@ then
 	fi
 	if ( test "$PHPCONFSTYLE" = "unknown" )
 	then
-		for dir in `ls $PHPPREFIX/php/* 2> /dev/null`
+		for dir in `ls $PHPPREFIX/etc/php/* 2> /dev/null`
 		do
 			if ( test -d "$PHPPREFIX/etc/php/$dir/conf.d" )
 			then
