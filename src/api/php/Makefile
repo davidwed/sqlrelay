@@ -46,7 +46,7 @@ install: sql_relay.la
 			if ( test -r "$(DESTDIR)$(PHPCONFDIR)/../conf.d" -a ! -h "$(DESTDIR)$(PHPCONFDIR)/../conf.d/10-sql_relay.ini" -a ! -r "$(DESTDIR)$(PHPCONFDIR)/../conf.d/10-sql_relay.ini" ); \
 			then \
 				cd $(DESTDIR)$(PHPCONFDIR)/../conf.d; \
-				ln -s ../../mods-available/sql_relay.ini 10-sql_relay.ini; \
+				ln -s ../mods-available/sql_relay.ini 10-sql_relay.ini; \
 			fi; \
 		else \
 			for dir in `ls $(DESTDIR)$(PHPCONFDIR)/.. 2> /dev/null`; \
