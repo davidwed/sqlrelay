@@ -48,6 +48,9 @@ distclean: clean
 		bin/sqlrclientwrapper-config \
 		bin/sqlrserver-config \
 		init/rc.sqlrelay \
+		init/rc.sqlrcachemanager \
+		init/com.firstworks.sqlrelay.plist \
+		init/com.firstworks.sqlrcachemanager.plist \
 		test/test \
 		libtool \
 		libtool.gcc \
