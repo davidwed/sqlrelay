@@ -43,8 +43,7 @@ install: sql_relay.la
 		$(LTINSTALL) -m 644 sql_relay.ini $(DESTDIR)$(PHPCONFDIR); \
 		for dir in `ls $(DESTDIR)$(PHPCONFDIR)/.. 2> /dev/null`; \
 		do \
-			echo $(DESTDIR)$(PHPCONFDIR)/../$$dir/conf.d; \
-			if ( test -r "$(DESTDIR)$(PHPCONFDIR)/../$$dir/conf.d" -a ! -r "$(DESTDIR)$(PHPCONFDIR)/../$$dir/conf.d/sql_relay.ini" ); \
+			if ( test -r "$(DESTDIR)$(PHPCONFDIR)/../$$dir/conf.d" -a ! -h "$(DESTDIR)$(PHPCONFDIR)/../$$dir/conf.d/10-sql_relay.ini" -a ! -r "$(DESTDIR)$(PHPCONFDIR)/../$$dir/conf.d/10-sql_relay.ini" ); \
 			then \
 				cd $(DESTDIR)$(PHPCONFDIR)/../$$dir/conf.d; \
 				ln -s ../../mods-available/sql_relay.ini 10-sql_relay.ini; \
@@ -55,3 +54,7 @@ install: sql_relay.la
 uninstall:
 	$(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.so
 	$(RM) $(DESTDIR)$(PHPCONFDIR)/sql_relay.ini
+	if ( test "$(PHPCONFSTYLE)" = "debian" ); \
+	then \
+		$(RM) $(DESTDIR)$(PHPCONFDIR)/../*/conf.d/10-sql_relay.ini; \
+	fi
