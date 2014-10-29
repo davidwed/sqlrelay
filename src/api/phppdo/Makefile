@@ -32,7 +32,7 @@ install: pdo_sqlrelay.la
 	$(LTINSTALL) pdo_sqlrelay.la $(DESTDIR)$(PHPEXTDIR)
 	$(RM) $(DESTDIR)$(PHPEXTDIR)/pdo_sqlrelay.la
 	$(RM) $(DESTDIR)$(PHPEXTDIR)/pdo_sqlrelay.a
-	if ( test "$(PHPCONFSTYLE)" = "fedora" -o "$(PHPCONFSTYLE)" = "suse" ); \
+	if ( test "$(PHPCONFSTYLE)" = "fedora" -o "$(PHPCONFSTYLE)" = "suse" -o "$(PHPCONFSTYLE)" = "solaris" ); \
 	then \
 		$(MKINSTALLDIRS) $(DESTDIR)$(PHPCONFDIR); \
 		$(LTINSTALL) -m 644 pdo_sqlrelay.ini $(DESTDIR)$(PHPCONFDIR); \
