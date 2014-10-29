@@ -648,6 +648,8 @@ ERL
 ERLCFLAGS
 ERLC
 HAVE_PHP_PDO
+PHPCONFSTYLE
+PHPCONFDIR
 PHPLIB
 PHPMAJORVERSION
 PHPVERSION
@@ -32679,6 +32681,25 @@ fi
 	then
 		PHPEXTDIR="$OVERRIDEPHPEXTDIR"
 	fi
+
+		if ( test "$PHPPREFIX" = "/usr" )
+	then
+		PHPPREFIX=""
+	fi
+	PHPCONFDIR=""
+	PHPCONFSTYLE=""
+	if ( test -d "$PHPPREFIX/etc/php.d" )
+	then
+		PHPCONFDIR="$PHPPREFIX/etc/php.d"
+		PHPCONFSTYLE="fedora"
+	fi
+	if ( test -d "$PHPPREFIX/etc/php5/mods-available" )
+	then
+		PHPCONFDIR="$PHPPREFIX/etc/php5/mods-available"
+		PHPCONFSTYLE="debian"
+	fi
+
+
 
 
 

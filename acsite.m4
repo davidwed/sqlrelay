@@ -3082,12 +3082,32 @@ then
 		PHPEXTDIR="$OVERRIDEPHPEXTDIR"
 	fi
 
+	dnl find the directory for secondary config files
+	if ( test "$PHPPREFIX" = "/usr" )
+	then
+		PHPPREFIX=""
+	fi
+	PHPCONFDIR=""
+	PHPCONFSTYLE=""
+	if ( test -d "$PHPPREFIX/etc/php.d" )
+	then
+		PHPCONFDIR="$PHPPREFIX/etc/php.d"
+		PHPCONFSTYLE="fedora"
+	fi
+	if ( test -d "$PHPPREFIX/etc/php5/mods-available" )
+	then
+		PHPCONFDIR="$PHPPREFIX/etc/php5/mods-available"
+		PHPCONFSTYLE="debian"
+	fi
+
 	AC_SUBST(HAVE_PHP)
 	AC_SUBST(PHPINCLUDES)
 	AC_SUBST(PHPEXTDIR)
 	AC_SUBST(PHPVERSION)
 	AC_SUBST(PHPMAJORVERSION)
 	AC_SUBST(PHPLIB)
+	AC_SUBST(PHPCONFDIR)
+	AC_SUBST(PHPCONFSTYLE)
 fi
 ])
 
