@@ -32695,7 +32695,12 @@ $as_echo_n "checking for PHP config directory... " >&6; }
 		PHPCONFDIR="$PHPPREFIX/etc/php.d"
 		PHPCONFSTYLE="fedora"
 	fi
-	if ( test -d "$PHPPREFIX/etc/php5/mods-available")
+	if ( test -d "$PHPPREFIX/etc/php5/conf.d" )
+	then
+		PHPCONFDIR="$PHPPREFIX/etc/php5/conf.d"
+		PHPCONFSTYLE="suse"
+	fi
+	if ( test -d "$PHPPREFIX/etc/php5/mods-available" )
 	then
 		PHPCONFDIR="$PHPPREFIX/etc/php5/mods-available"
 		if ( test -d "$PHPPREFIX/etc/php5/conf.d" )
@@ -32705,12 +32710,19 @@ $as_echo_n "checking for PHP config directory... " >&6; }
 			PHPCONFSTYLE="ubuntu"
 		fi
 	fi
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $PHPCONFDIR" >&5
-$as_echo "$PHPCONFDIR" >&6; }
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for PHP config style" >&5
-$as_echo_n "checking for PHP config style... " >&6; }
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $PHPCONFSTYLE" >&5
-$as_echo "$PHPCONFSTYLE" >&6; }
+	if ( test "$PHPCONFSTYLE" = "unknown" )
+	then
+		for dir in `ls $PHPPREFIX/php/* 2> /dev/null`
+		do
+			if ( test -d "$PHPPREFIX/etc/php/$dir/conf.d" )
+			then
+				PHPCONFDIR="$PHPPREFIX/etc/php/$dir/conf.d"
+				PHPCONFSTYLE="solaris"
+			fi
+		done
+	fi
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $PHPCONFDIR - $PHPCONFSTYLE style" >&5
+$as_echo "$PHPCONFDIR - $PHPCONFSTYLE style" >&6; }
 
 
 

@@ -3095,7 +3095,12 @@ then
 		PHPCONFDIR="$PHPPREFIX/etc/php.d"
 		PHPCONFSTYLE="fedora"
 	fi
-	if ( test -d "$PHPPREFIX/etc/php5/mods-available")
+	if ( test -d "$PHPPREFIX/etc/php5/conf.d" )
+	then
+		PHPCONFDIR="$PHPPREFIX/etc/php5/conf.d"
+		PHPCONFSTYLE="suse"
+	fi
+	if ( test -d "$PHPPREFIX/etc/php5/mods-available" )
 	then
 		PHPCONFDIR="$PHPPREFIX/etc/php5/mods-available"
 		if ( test -d "$PHPPREFIX/etc/php5/conf.d" )
@@ -3105,9 +3110,18 @@ then
 			PHPCONFSTYLE="ubuntu"
 		fi
 	fi
-	AC_MSG_RESULT($PHPCONFDIR)
-	AC_MSG_CHECKING(for PHP config style)
-	AC_MSG_RESULT($PHPCONFSTYLE)
+	if ( test "$PHPCONFSTYLE" = "unknown" )
+	then
+		for dir in `ls $PHPPREFIX/php/* 2> /dev/null`
+		do
+			if ( test -d "$PHPPREFIX/etc/php/$dir/conf.d" )
+			then
+				PHPCONFDIR="$PHPPREFIX/etc/php/$dir/conf.d"
+				PHPCONFSTYLE="solaris"
+			fi
+		done
+	fi
+	AC_MSG_RESULT($PHPCONFDIR - $PHPCONFSTYLE style)
 
 	AC_SUBST(HAVE_PHP)
 	AC_SUBST(PHPINCLUDES)
