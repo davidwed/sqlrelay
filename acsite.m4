@@ -3094,10 +3094,15 @@ then
 		PHPCONFDIR="$PHPPREFIX/etc/php.d"
 		PHPCONFSTYLE="fedora"
 	fi
-	if ( test -d "$PHPPREFIX/etc/php5/mods-available" )
+	if ( test -d "$PHPPREFIX/etc/php5/mods-available")
 	then
 		PHPCONFDIR="$PHPPREFIX/etc/php5/mods-available"
-		PHPCONFSTYLE="debian"
+		if ( test -d "$PHPPREFIX/etc/php5/conf.d" )
+		then
+			PHPCONFSTYLE="debian"
+		else
+			PHPCONFSTYLE="ubuntu"
+		fi
 	fi
 
 	AC_SUBST(HAVE_PHP)
