@@ -3083,12 +3083,13 @@ then
 	fi
 
 	dnl find the directory for secondary config files
+	AC_MSG_CHECKING(for PHP config directory)
 	if ( test "$PHPPREFIX" = "/usr" )
 	then
 		PHPPREFIX=""
 	fi
-	PHPCONFDIR=""
-	PHPCONFSTYLE=""
+	PHPCONFDIR="none"
+	PHPCONFSTYLE="unknown"
 	if ( test -d "$PHPPREFIX/etc/php.d" )
 	then
 		PHPCONFDIR="$PHPPREFIX/etc/php.d"
@@ -3104,6 +3105,9 @@ then
 			PHPCONFSTYLE="ubuntu"
 		fi
 	fi
+	AC_MSG_RESULT($PHPCONFDIR)
+	AC_MSG_CHECKING(for PHP config style)
+	AC_MSG_RESULT($PHPCONFSTYLE)
 
 	AC_SUBST(HAVE_PHP)
 	AC_SUBST(PHPINCLUDES)

@@ -32682,12 +32682,14 @@ fi
 		PHPEXTDIR="$OVERRIDEPHPEXTDIR"
 	fi
 
-		if ( test "$PHPPREFIX" = "/usr" )
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for PHP config directory" >&5
+$as_echo_n "checking for PHP config directory... " >&6; }
+	if ( test "$PHPPREFIX" = "/usr" )
 	then
 		PHPPREFIX=""
 	fi
-	PHPCONFDIR=""
-	PHPCONFSTYLE=""
+	PHPCONFDIR="none"
+	PHPCONFSTYLE="unknown"
 	if ( test -d "$PHPPREFIX/etc/php.d" )
 	then
 		PHPCONFDIR="$PHPPREFIX/etc/php.d"
@@ -32703,6 +32705,12 @@ fi
 			PHPCONFSTYLE="ubuntu"
 		fi
 	fi
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $PHPCONFDIR" >&5
+$as_echo "$PHPCONFDIR" >&6; }
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for PHP config style" >&5
+$as_echo_n "checking for PHP config style... " >&6; }
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $PHPCONFSTYLE" >&5
+$as_echo "$PHPCONFSTYLE" >&6; }
 
 
 
