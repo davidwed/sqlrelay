@@ -3083,27 +3083,24 @@ then
 	fi
 
 	dnl find the directory for secondary config files
+	dnl (ignore PHPPREFIX, PHP reliably wants its ini files under /etc)
 	AC_MSG_CHECKING(for PHP config directory)
-	if ( test "$PHPPREFIX" = "/usr" )
-	then
-		PHPPREFIX=""
-	fi
 	PHPCONFDIR="none"
 	PHPCONFSTYLE="unknown"
-	if ( test -d "$PHPPREFIX/etc/php.d" )
+	if ( test -d "/etc/php.d" )
 	then
-		PHPCONFDIR="$PHPPREFIX/etc/php.d"
+		PHPCONFDIR="/etc/php.d"
 		PHPCONFSTYLE="fedora"
 	fi
-	if ( test -d "$PHPPREFIX/etc/php5/conf.d" )
+	if ( test -d "/etc/php5/conf.d" )
 	then
-		PHPCONFDIR="$PHPPREFIX/etc/php5/conf.d"
+		PHPCONFDIR="/etc/php5/conf.d"
 		PHPCONFSTYLE="suse"
 	fi
-	if ( test -d "$PHPPREFIX/etc/php5/mods-available" )
+	if ( test -d "/etc/php5/mods-available" )
 	then
-		PHPCONFDIR="$PHPPREFIX/etc/php5/mods-available"
-		if ( test -d "$PHPPREFIX/etc/php5/conf.d" )
+		PHPCONFDIR="/etc/php5/mods-available"
+		if ( test -d "/etc/php5/conf.d" )
 		then
 			PHPCONFSTYLE="debian"
 		else
@@ -3112,11 +3109,11 @@ then
 	fi
 	if ( test "$PHPCONFSTYLE" = "unknown" )
 	then
-		for dir in `ls $PHPPREFIX/etc/php/* 2> /dev/null`
+		for dir in `ls -d /etc/php/* 2> /dev/null`
 		do
-			if ( test -d "$PHPPREFIX/etc/php/$dir/conf.d" )
+			if ( test -d "$dir/conf.d" )
 			then
-				PHPCONFDIR="$PHPPREFIX/etc/php/$dir/conf.d"
+				PHPCONFDIR="$dir/conf.d"
 				PHPCONFSTYLE="solaris"
 			fi
 		done

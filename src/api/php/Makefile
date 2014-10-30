@@ -32,7 +32,7 @@ install: sql_relay.la
 	$(LTINSTALL) sql_relay.la $(DESTDIR)$(PHPEXTDIR)
 	$(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.la
 	$(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.a
-	if ( test "$(PHPCONFSTYLE)" = "fedora" -o "$(PHPCONFSTYLE)" = "suse" ); \
+	if ( test "$(PHPCONFSTYLE)" = "fedora" -o "$(PHPCONFSTYLE)" = "suse" -o "$(PHPCONFSTYLE)" = "solaris" ); \
 	then \
 		$(MKINSTALLDIRS) $(DESTDIR)$(PHPCONFDIR); \
 		$(LTINSTALL) -m 644 sql_relay.ini $(DESTDIR)$(PHPCONFDIR); \
