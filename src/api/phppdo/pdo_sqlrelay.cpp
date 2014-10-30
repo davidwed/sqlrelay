@@ -54,6 +54,9 @@ struct sqlrdbhandle {
 	sqlrconnection	*sqlrcon;
 	bool		translatebindsonserver;
 	bool		usesubvars;
+	int64_t		resultsetbuffersize;
+	bool		dontgetcolumninfo;
+	bool		nullsasnulls;
 };
 
 enum {
@@ -715,6 +718,17 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 	sqlrstmt->sqlrcur=new sqlrcursor(
 				(sqlrconnection *)sqlrdbh->sqlrcon,true);
 
+	if (sqlrdbh->resultsetbuffersize>0) {
+		sqlrstmt->sqlrcur->setResultSetBufferSize(
+					sqlrdbh->resultsetbuffersize);
+	}
+	if (sqlrdbh->dontgetcolumninfo) {
+		sqlrstmt->sqlrcur->dontGetColumnInfo();
+	}
+	if (sqlrdbh->nullsasnulls) {
+		sqlrstmt->sqlrcur->getNullsAsNulls();
+	}
+
 	sqlrstmt->currentrow=-1;
 	stmt->methods=&sqlrcursorMethods;
 	stmt->driver_data=(void *)sqlrstmt;
@@ -1029,6 +1043,9 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 		{"tries",(char *)"0",0},
 		{"retrytime",(char *)"1",0},
 		{"debug",(char *)"0",0},
+		{"resultsetbuffersize",(char *)"0",0},
+		{"dontgetcolumninfo",(char *)"0",0},
+		{"nullsasnulls",(char *)"0",0},
 	};
 	php_pdo_parse_data_source(dbh->data_source,
 					dbh->data_source_len,
@@ -1050,6 +1067,11 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	if (debug) {
 		sqlrdbh->sqlrcon->debugOn();
 	}
+
+	sqlrdbh->resultsetbuffersize=charstring::toInteger(options[6].optval);
+	sqlrdbh->dontgetcolumninfo=charstring::toInteger(options[7].optval);
+	sqlrdbh->nullsasnulls=charstring::toInteger(options[8].optval);
+
 	sqlrdbh->sqlrcon->debugPrintFunction(zend_printf);
 
 	sqlrdbh->translatebindsonserver=false;
