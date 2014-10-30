@@ -2,10 +2,6 @@
 # Copyright (c) 2013  David Muse
 # See the file COPYING for more information.
 
-if (strncasecmp(PHP_OS,"WIN",3)) {
-	dl("pdo_sqlrelay.so");
-}
-
 	function checkSuccess($value,$success) {
 
 		if ($value==$success) {

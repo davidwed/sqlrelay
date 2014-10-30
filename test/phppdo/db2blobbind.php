@@ -2,8 +2,6 @@
 
 	print("\n");
 
-	dl("pdo_sqlrelay.so");
-
 	$host="localhost";
 	$port=9000;
 	$socket="/tmp/test.socket";

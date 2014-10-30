@@ -1,9 +1,5 @@
 <?php
 
-if (strncasecmp(PHP_OS,"WIN",3)) {
-	dl("pdo_sqlrelay.so");
-}
-
 function tcPrintException($tc, $e)
 {
 	// just print

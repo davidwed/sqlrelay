@@ -29,9 +29,32 @@
 <a name="config"></a>
 <span class="heading2">Configuring PHP</span><br><br>
 
-<p>PHP modules can be loaded dynamically at runtime using the dl() function but it is far more efficient to configure PHP to pre-load modules using the php.ini file.  The location of the php.ini file may vary, but it is usually /etc/php.in on Linux and Unix systems and C:\Windows\php.ini on Windows.</p>
+<p>To use SQL Relay, PHP must be configured to load the appropriate module - sql_relay.so on Linux or Unix and php_sql_relay.dll on Windows.</p>
 
-<p>To pre-load the php module on Linux or Unix, you usually just need to add a line to the file like:</p>
+<p>If you are using SQL Relay version 0.58 or higher on reasonably modern Linux
+or Solaris with PHP installed from a package, then the installation process
+should have configured PHP correctly and you can probably ignore the rest of
+this section.</p>
+
+<p>On other operating sytems, or if you built PHP from source, or if the
+installation process didn't go smoothly, then you may have to configure PHP
+manually.</p>
+
+<p>The PHP configuration file is usually named php.ini.  The name and location
+of the file may vary though.  Here are some common names and locations, by
+platform.</p>
+
+<ul>
+<li><b>Linux</b> - /etc/php.ini</li>
+<li><b>Solaris</b> - /etc/php/&lt;php version&gt;/php.ini</li>
+<li><b>FreeBSD</b> - /usr/local/etc/php.ini</li>
+<li><b>NetBSD</b> - /usr/pkg/etc/php.ini</li>
+<li><b>OpenBSD</b> - /etc/php-&lt;php version&gt;.ini</li>
+<li><b>Windows</b> - C:\Windows\php.ini</li>
+</ul>
+
+<p>To load the php module on Linux or Unix, you usually just need to add a line
+to the configuration file like:</p>
 
 <blockquote>
 <pre>
@@ -39,16 +62,16 @@ extension=sql_relay.so
 </pre>
 </blockquote>
 
-<p>To pre-load the php module on Windows, you usually need to add lines like:</p>
+<p>To load the php module on Windows, you usually need to add lines like:</p>
 
 <blockquote>
 <pre>
 extension_dir=C:\PHP\ext
-extensionr=php_sql_relay.dll
+extension=php_sql_relay.dll
 </pre>
 </blockquote>
 
-<p>The <i>extension_dir</i> value might need to be changed, depending on where PHP is installed on your system.</p>
+<p>(the <i>extension_dir</i> value might need to be changed, depending on where PHP is installed on your system)</p>
 
 <a name="session"></a>
 <span class="heading2">Establishing a Session</span><br><br>
