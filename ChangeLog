@@ -3,6 +3,8 @@
 	removed support for undocumented ~/.sqlrelay.conf
 	fixed detection of oracle jdk 7 and 8 on debian and ubuntu systems
 	added ini files for PHP and PDO modules
+	added resultsetbuffersize, dontgetcolumninfo and nullsasnulls connect
+		string variables to the PHP PDO driver
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries

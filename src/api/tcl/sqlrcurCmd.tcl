@@ -2,7 +2,7 @@
 # sets using connecton "sqlrc".
 proc sqlrcurCmd {sqlrc} 
 
-# Destroys the cursor and cleans up all assocuated
+# Destroys the cursor and cleans up all associated
 # result set data.
 proc sqlrcurDelete {} 
 
