@@ -102,22 +102,36 @@ class SQLRSERVER_DLLSPEC sqlrconnection_svr {
 
 		virtual void		endSession();
 
+		bool	getAutoCommit();
+		void	setAutoCommit(bool autocommit);
+		bool	getFakeAutoCommit();
+
 		void	clearError();
 		void	setError(const char *err, int64_t errn, bool liveconn);
+
+		char		*getErrorBuffer();
+		uint32_t	getErrorLength();
+		void		setErrorLength(uint32_t errorlength);
+		uint32_t	getErrorNumber();
+		void		setErrorNumber(uint32_t errnum);
+		bool		getLiveConnection();
+		void		setLiveConnection(bool liveconnection);
+
+		sqlrcontroller_svr	*cont;
+
+	protected:
+
+		bool		autocommit;
+		bool		fakeautocommit;
 
 		char		*error;
 		uint32_t	errorlength;
 		int64_t		errnum;
 		bool		liveconnection;
 
-		bool		autocommit;
-		bool		fakeautocommit;
-
 		char		*dbhostname;
 		char		*dbipaddress;
 		uint32_t	dbhostiploop;
-
-		sqlrcontroller_svr	*cont;
 };
 
 

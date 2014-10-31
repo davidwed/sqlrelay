@@ -127,15 +127,16 @@ bool custom_nw::run(sqlrlistener *sqlrl,
 	// get error, if there was one
 	static char	errorcodebuf[100+1];
 	errorcodebuf[0]='\0';
-	if (sqlrcur->queryresult) {
+	if (sqlrcur->getErrorBuffer()[0]) {
 		charstring::copy(errorcodebuf,"0");
 	} else {
-		charstring::printf(errorcodebuf,100,"%s",sqlrcur->error);
+		charstring::printf(errorcodebuf,100,"%s",
+					sqlrcur->getErrorBuffer());
 	}
 
 	// escape the query
 	static char	sqlbuf[7000+1];
-	strescape(sqlrcur->querybuffer,sqlbuf,7000);
+	strescape(sqlrcur->getQueryBuffer(),sqlbuf,7000);
 
 	// escape the client info
 	static char	infobuf[1024+1];
@@ -157,8 +158,10 @@ bool custom_nw::run(sqlrlistener *sqlrl,
 	}
 
 	// get the execution time
-	uint64_t	sec=sqlrcur->commandendsec-sqlrcur->commandstartsec;
-	uint64_t	usec=sqlrcur->commandendusec-sqlrcur->commandstartusec;
+	uint64_t	sec=sqlrcur->getCommandEndSec()-
+				sqlrcur->getCommandStartSec();
+	uint64_t	usec=sqlrcur->getCommandEndUSec()-
+				sqlrcur->getCommandStartUSec();
 	
 	// get the current date/time
 	datetime	dt;
@@ -176,7 +179,7 @@ bool custom_nw::run(sqlrlistener *sqlrl,
 		sqlrcon->cont->connstats->index,
 		sec+usec/1000000.0,
 		errorcodebuf,
-		(long long)((sqlrcur->lastrowvalid)?sqlrcur->lastrow:0),
+		(long long)sqlrcur->getTotalRowsFetched(),
         	infobuf,
 		sqlbuf,
 		sec+usec/1000000.0,
@@ -229,9 +232,10 @@ bool custom_nw::descInputBinds(sqlrcursor_svr *cursor, char *buf, int limit) {
 	*c='\0';
 
 	// fill the buffers
-	for (uint16_t i=0; i<cursor->inbindcount; i++) {
+	bindvar_svr	*inbinds=cursor->getInputBinds();
+	for (uint16_t i=0; i<cursor->getInputBindCount(); i++) {
 
-		bindvar_svr	*bv=&(cursor->inbindvars[i]);
+		bindvar_svr	*bv=&(inbinds[i]);
 	
 		write_len=charstring::printf(
 				c,remain_len,"[%s => ",bv->variable);

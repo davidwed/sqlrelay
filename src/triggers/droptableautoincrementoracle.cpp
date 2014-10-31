@@ -158,12 +158,18 @@ bool droptableautoincrementoracle::dropSequences(sqlrconnection_svr *sqlrcon,
 
 		// error...
 		if (sqlrcon->cont->debugtriggers) {
-			cur->errorMessage(cur->error,
+			uint32_t	errorlength;
+			int64_t		errnum;
+			bool		liveconnection;
+			cur->errorMessage(cur->getErrorBuffer(),
 						sqlrcon->cont->maxerrorlength,
-						&(cur->errorlength),
-						&(cur->errnum),
-						&(cur->liveconnection));
-			stdoutput.printf("error:\n%s\n",cur->error);
+						&errorlength,
+						&errnum,
+						&liveconnection);
+			cur->setErrorLength(errorlength);
+			cur->setErrorNumber(errnum);
+			cur->setLiveConnection(liveconnection);
+			stdoutput.printf("error:\n%s\n",cur->getErrorBuffer());
 		}
 	}
 	cur->cleanUpData();
@@ -201,12 +207,18 @@ bool droptableautoincrementoracle::dropSequence(sqlrconnection_svr *sqlrcon,
 	} else {
 		// error...
 		if (sqlrcon->cont->debugtriggers) {
-			cur->errorMessage(cur->error,
+			uint32_t	errorlength;
+			int64_t		errnum;
+			bool		liveconnection;
+			cur->errorMessage(cur->getErrorBuffer(),
 						sqlrcon->cont->maxerrorlength,
-						&(cur->errorlength),
-						&(cur->errnum),
-						&(cur->liveconnection));
-			stdoutput.printf("error:\n%s\n",cur->error);
+						&errorlength,
+						&errnum,
+						&liveconnection);
+			cur->setErrorLength(errorlength);
+			cur->setErrorNumber(errnum);
+			cur->setLiveConnection(liveconnection);
+			stdoutput.printf("error:\n%s\n",cur->getErrorBuffer());
 		}
 	}
 	cur->cleanUpData();
@@ -243,12 +255,18 @@ bool droptableautoincrementoracle::deleteSequence(sqlrconnection_svr *sqlrcon,
 	} else {
 		// error...
 		if (sqlrcon->cont->debugtriggers) {
-			cur->errorMessage(cur->error,
+			uint32_t	errorlength;
+			int64_t		errnum;
+			bool		liveconnection;
+			cur->errorMessage(cur->getErrorBuffer(),
 						sqlrcon->cont->maxerrorlength,
-						&(cur->errorlength),
-						&(cur->errnum),
-						&(cur->liveconnection));
-			stdoutput.printf("error:\n%s\n",cur->error);
+						&errorlength,
+						&errnum,
+						&liveconnection);
+			cur->setErrorLength(errorlength);
+			cur->setErrorNumber(errnum);
+			cur->setLiveConnection(liveconnection);
+			stdoutput.printf("error:\n%s\n",cur->getErrorBuffer());
 		}
 	}
 	cur->cleanUpData();

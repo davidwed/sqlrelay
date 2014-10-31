@@ -243,11 +243,13 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 		timeformat="HH24:MI:SS";
 	}
 
+	bindvar_svr	*inbinds=sqlrcur->getInputBinds();
+
 	// run through the bind variables...
-	for (uint16_t i=0; i<sqlrcur->inbindcount; i++) {
+	for (uint16_t i=0; i<sqlrcur->getInputBindCount(); i++) {
 
 		// get the variable
-		bindvar_svr	*bind=&(sqlrcur->inbindvars[i]);
+		bindvar_svr	*bind=&(inbinds[i]);
 
 		// ignore non-strings...
 		if (bind->type!=STRING_BIND) {

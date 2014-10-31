@@ -12,37 +12,35 @@
 sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 
 	this->conn=conn;
-	inbindcount=0;
+	setInputBindCount(0);
 	inbindvars=new bindvar_svr[conn->cont->maxbindcount];
-	outbindcount=0;
+	setOutputBindCount(0);
 	outbindvars=new bindvar_svr[conn->cont->maxbindcount];
 	
-	state=SQLRCURSORSTATE_AVAILABLE;
+	setState(SQLRCURSORSTATE_AVAILABLE);
 
 	createtemp.compile("(create|CREATE|declare|DECLARE)[ 	\\r\\n]+((global|GLOBAL|local|LOCAL)?[ 	\\r\\n]+)?(temp|TEMP|temporary|TEMPORARY)?[ 	\\r\\n]+(table|TABLE)[ 	\\r\\n]+");
 
 	querybuffer=new char[conn->cont->maxquerysize+1];
-	querylength=0;
-	querytree=NULL;
-	queryresult=false;
+	setQueryLength(0);
+
+	setQueryTree(NULL);
 
 	error=new char[conn->cont->maxerrorlength+1];
 	errorlength=0;
 	errnum=0;
 	liveconnection=true;
 
-	commandstartsec=0;
-	commandstartusec=0;
-	querystartsec=0;
-	querystartusec=0;
-	queryendsec=0;
-	queryendusec=0;
-	commandendsec=0;
-	commandendusec=0;
+	setCommandStart(0,0);
+	setCommandEnd(0,0);
+	setQueryStart(0,0);
+	setQueryEnd(0,0);
 
-	fakeinputbindsforthisquery=false;
+	setFakeInputBindsForThisQuery(false);
 
-	customquerycursor=NULL;
+	setCustomQueryCursor(NULL);
+
+	clearTotalRowsFetched();
 
 	id=0;
 }
@@ -505,8 +503,16 @@ bool sqlrcursor_svr::getColumnNameList(stringbuffer *output) {
 	return true;
 }
 
+uint16_t sqlrcursor_svr::getId() {
+	return id;
+}
+
 void sqlrcursor_svr::setFakeInputBindsForThisQuery(bool fake) {
 	fakeinputbindsforthisquery=fake;
+}
+
+bool sqlrcursor_svr::getFakeInputBindsForThisQuery() {
+	return fakeinputbindsforthisquery;
 }
 
 bool sqlrcursor_svr::skipComment(const char **ptr, const char *endptr) {
@@ -713,6 +719,153 @@ void sqlrcursor_svr::performSubstitution(stringbuffer *buffer, int16_t index) {
 	}
 }
 
+void sqlrcursor_svr::setInputBindCount(uint16_t inbindcount) {
+	this->inbindcount=inbindcount;
+}
+
+uint16_t sqlrcursor_svr::getInputBindCount() {
+	return inbindcount;
+}
+
+bindvar_svr *sqlrcursor_svr::getInputBinds() {
+	return inbindvars;
+}
+
+void sqlrcursor_svr::setOutputBindCount(uint16_t outbindcount) {
+	this->outbindcount=outbindcount;
+}
+
+uint16_t sqlrcursor_svr::getOutputBindCount() {
+	return outbindcount;
+}
+
+bindvar_svr *sqlrcursor_svr::getOutputBinds() {
+	return outbindvars;
+}
+
+void sqlrcursor_svr::abort() {
+	// I was once concerned that calling this here would prevent suspended
+	// result sets from being able to return column data upon resume if the
+	// entire result set had already been sent, but I don't think that's an
+	// issue any more.
+	cleanUpData();
+	setState(SQLRCURSORSTATE_AVAILABLE);
+	clearCustomQueryCursor();
+}
+
+char *sqlrcursor_svr::getQueryBuffer() {
+	return querybuffer;
+}
+
+uint32_t sqlrcursor_svr::getQueryLength() {
+	return querylength;
+}
+
+void sqlrcursor_svr::setQueryLength(uint32_t querylength) {
+	this->querylength=querylength;
+}
+
+void sqlrcursor_svr::setQueryTree(xmldom *tree) {
+	querytree=tree;
+}
+
+xmldom *sqlrcursor_svr::getQueryTree() {
+	return querytree;
+}
+
+void sqlrcursor_svr::clearQueryTree() {
+	delete querytree;
+	querytree=NULL;
+}
+
+void sqlrcursor_svr::setCommandStart(uint64_t sec, uint64_t usec) {
+	commandstartsec=sec;
+	commandstartusec=usec;
+}
+
+uint64_t sqlrcursor_svr::getCommandStartSec() {
+	return commandstartsec;
+}
+
+uint64_t sqlrcursor_svr::getCommandStartUSec() {
+	return commandstartusec;
+}
+
+
+void sqlrcursor_svr::setCommandEnd(uint64_t sec, uint64_t usec) {
+	commandendsec=sec;
+	commandendusec=usec;
+}
+
+uint64_t sqlrcursor_svr::getCommandEndSec() {
+	return commandendsec;
+}
+
+uint64_t sqlrcursor_svr::getCommandEndUSec() {
+	return commandendusec;
+}
+
+
+void sqlrcursor_svr::setQueryStart(uint64_t sec, uint64_t usec) {
+	querystartsec=sec;
+	querystartusec=usec;
+}
+
+uint64_t sqlrcursor_svr::getQueryStartSec() {
+	return querystartsec;
+}
+
+uint64_t sqlrcursor_svr::getQueryStartUSec() {
+	return querystartusec;
+}
+
+
+void sqlrcursor_svr::setQueryEnd(uint64_t sec, uint64_t usec) {
+	queryendsec=sec;
+	queryendusec=usec;
+}
+
+uint64_t sqlrcursor_svr::getQueryEndSec() {
+	return queryendsec;
+}
+
+uint64_t sqlrcursor_svr::getQueryEndUSec() {
+	return queryendusec;
+}
+
+void sqlrcursor_svr::setState(sqlrcursorstate_t state) {
+	this->state=state;
+}
+
+sqlrcursorstate_t sqlrcursor_svr::getState() {
+	return state;
+}
+
+void sqlrcursor_svr::setCustomQueryCursor(sqlrquerycursor *cur) {
+	customquerycursor=cur;
+}
+
+sqlrquerycursor *sqlrcursor_svr::getCustomQueryCursor() {
+	return customquerycursor;
+}
+
+void sqlrcursor_svr::clearCustomQueryCursor() {
+	delete customquerycursor;
+	customquerycursor=NULL;
+}
+
+void sqlrcursor_svr::clearTotalRowsFetched() {
+	totalrowsfetched=0;
+}
+
+uint64_t sqlrcursor_svr::getTotalRowsFetched() {
+	return totalrowsfetched;
+}
+
+void sqlrcursor_svr::incrementTotalRowsFetched() {
+	totalrowsfetched++;
+}
+
 void sqlrcursor_svr::clearError() {
 	setError(NULL,0,true);
 }
@@ -728,13 +881,30 @@ void sqlrcursor_svr::setError(const char *err, int64_t errn, bool liveconn) {
 	liveconnection=liveconn;
 }
 
-void sqlrcursor_svr::abort() {
-	// I was once concerned that calling this here would prevent suspended
-	// result sets from being able to return column data upon resume if the
-	// entire result set had already been sent, but I don't think that's an
-	// issue any more.
-	cleanUpData();
-	state=SQLRCURSORSTATE_AVAILABLE;
-	delete customquerycursor;
-	customquerycursor=NULL;
+char *sqlrcursor_svr::getErrorBuffer() {
+	return error;
+}
+
+uint32_t sqlrcursor_svr::getErrorLength() {
+	return errorlength;
+}
+
+void sqlrcursor_svr::setErrorLength(uint32_t errorlength) {
+	this->errorlength=errorlength;
+}
+
+uint32_t sqlrcursor_svr::getErrorNumber() {
+	return errnum;
+}
+
+void sqlrcursor_svr::setErrorNumber(uint32_t errnum) {
+	this->errnum=errnum;
+}
+
+bool sqlrcursor_svr::getLiveConnection() {
+	return liveconnection;
+}
+
+void sqlrcursor_svr::setLiveConnection(bool liveconnection) {
+	this->liveconnection=liveconnection;
 }

@@ -10,7 +10,7 @@
 sqlrconnection_svr::sqlrconnection_svr(sqlrcontroller_svr *cont) {
 	this->cont=cont;
 
-	error=NULL;
+	error=new char[cont->maxerrorlength+1];
 	errorlength=0;
 	errnum=0;
 	liveconnection=false;
@@ -650,6 +650,18 @@ void sqlrconnection_svr::endSession() {
 	// by default, do nothing
 }
 
+bool sqlrconnection_svr::getAutoCommit() {
+	return autocommit;
+}
+
+void sqlrconnection_svr::setAutoCommit(bool autocommit) {
+	this->autocommit=autocommit;
+}
+
+bool sqlrconnection_svr::getFakeAutoCommit() {
+	return fakeautocommit;
+}
+
 void sqlrconnection_svr::clearError() {
 	setError(NULL,0,true);
 }
@@ -665,4 +677,32 @@ void sqlrconnection_svr::setError(const char *err,
 	error[errorlength]='\0';
 	errnum=errn;
 	liveconnection=liveconn;
+}
+
+char *sqlrconnection_svr::getErrorBuffer() {
+	return error;
+}
+
+uint32_t sqlrconnection_svr::getErrorLength() {
+	return errorlength;
+}
+
+void sqlrconnection_svr::setErrorLength(uint32_t errorlength) {
+	this->errorlength=errorlength;
+}
+
+uint32_t sqlrconnection_svr::getErrorNumber() {
+	return errnum;
+}
+
+void sqlrconnection_svr::setErrorNumber(uint32_t errnum) {
+	this->errnum=errnum;
+}
+
+bool sqlrconnection_svr::getLiveConnection() {
+	return liveconnection;
+}
+
+void sqlrconnection_svr::setLiveConnection(bool liveconnection) {
+	this->liveconnection=liveconnection;
 }

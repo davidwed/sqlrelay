@@ -126,14 +126,16 @@ bool slowqueries::run(sqlrlistener *sqlrl,
 		}
 	}
 
-	uint64_t	querysec=sqlrcur->queryendsec-sqlrcur->querystartsec;
-	uint64_t	queryusec=sqlrcur->queryendusec-sqlrcur->querystartusec;
+	uint64_t	querysec=sqlrcur->getQueryEndSec()-
+					sqlrcur->getQueryStartSec();
+	uint64_t	queryusec=sqlrcur->getQueryEndUSec()-
+					sqlrcur->getQueryStartUSec();
 	uint64_t	querytotalusec=querysec*1000000+queryusec;
 
 	if (querytotalusec>totalusec) {
 
 		stringbuffer	logentry;
-		logentry.append("query:\n")->append(sqlrcur->querybuffer);
+		logentry.append("query:\n")->append(sqlrcur->getQueryBuffer());
 		logentry.append("\n");
 		logentry.append("time: ")->append(querysec);
 		logentry.append(".");

@@ -229,7 +229,12 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 		virtual	void		cleanUpData();
 		virtual bool		getColumnNameList(stringbuffer *output);
 
-		void	setFakeInputBindsForThisQuery(bool fake);
+
+
+		uint16_t	getId();
+
+		void		setFakeInputBindsForThisQuery(bool fake);
+		bool		getFakeInputBindsForThisQuery();
 	
 		bool		skipComment(const char **ptr,
 						const char *endptr);
@@ -237,54 +242,103 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 						const char *endptr);
 		const char	*skipWhitespaceAndComments(
 						const char *querybuffer);
-		bool	fakeInputBinds(stringbuffer *outputquery);
+		bool		fakeInputBinds(stringbuffer *outputquery);
 
-		void	clearError();
-		void	setError(const char *err, int64_t errn, bool liveconn);
+		void		setInputBindCount(uint16_t inbindcount);
+		uint16_t	getInputBindCount();
+		bindvar_svr	*getInputBinds();
+
+		void		setOutputBindCount(uint16_t outbindcount);
+		uint16_t	getOutputBindCount();
+		bindvar_svr	*getOutputBinds();
 
 		bool	openInternal(uint16_t id);
 		void	performSubstitution(stringbuffer *buffer,
 							int16_t index);
 		void	abort();
 
+		char		*getQueryBuffer();
+		uint32_t 	getQueryLength();
+		void		setQueryLength(uint32_t querylength);
+
+		void		setQueryTree(xmldom *tree);
+		xmldom		*getQueryTree();
+		void		clearQueryTree();
+
+		void		setCommandStart(uint64_t sec, uint64_t usec);
+		uint64_t	getCommandStartSec();
+		uint64_t	getCommandStartUSec();
+
+		void		setCommandEnd(uint64_t sec, uint64_t usec);
+		uint64_t	getCommandEndSec();
+		uint64_t	getCommandEndUSec();
+
+		void		setQueryStart(uint64_t sec, uint64_t usec);
+		uint64_t	getQueryStartSec();
+		uint64_t	getQueryStartUSec();
+
+		void		setQueryEnd(uint64_t sec, uint64_t usec);
+		uint64_t	getQueryEndSec();
+		uint64_t	getQueryEndUSec();
+
+		void			setState(sqlrcursorstate_t state);
+		sqlrcursorstate_t	getState();
+
+		void		setCustomQueryCursor(sqlrquerycursor *cur);
+		sqlrquerycursor	*getCustomQueryCursor();
+		void		clearCustomQueryCursor();
+
+		void		clearTotalRowsFetched();
+		uint64_t	getTotalRowsFetched();
+		void		incrementTotalRowsFetched();
+
+		void	clearError();
+		void	setError(const char *err, int64_t errn, bool liveconn);
+
+		char		*getErrorBuffer();
+		uint32_t	getErrorLength();
+		void		setErrorLength(uint32_t errorlength);
+		uint32_t	getErrorNumber();
+		void		setErrorNumber(uint32_t errnum);
+		bool		getLiveConnection();
+		void		setLiveConnection(bool liveconnection);
+
 		sqlrconnection_svr	*conn;
 
+	protected:
 		regularexpression	createtemp;
+
+		uint16_t	id;
 
 		char		*querybuffer;
 		uint32_t	querylength;
+
 		xmldom		*querytree;
-		bool		queryresult;
-
-		char		*error;
-		uint32_t	errorlength;
-		int64_t		errnum;
-		bool		liveconnection;
-
-		uint64_t	commandstartsec;
-		uint64_t	commandstartusec;
-		uint64_t	querystartsec;
-		uint64_t	querystartusec;
-		uint64_t	queryendsec;
-		uint64_t	queryendusec;
-		uint64_t	commandendsec;
-		uint64_t	commandendusec;
-
-		bool	fakeinputbindsforthisquery;
 
 		uint16_t	inbindcount;
 		bindvar_svr	*inbindvars;
 		uint16_t	outbindcount;
 		bindvar_svr	*outbindvars;
 
-		bool		lastrowvalid;
-		uint64_t	lastrow;
+		uint64_t	totalrowsfetched;
+
+		bool		fakeinputbindsforthisquery;
+
+		uint64_t	commandstartsec;
+		uint64_t	commandstartusec;
+		uint64_t	commandendsec;
+		uint64_t	commandendusec;
+		uint64_t	querystartsec;
+		uint64_t	querystartusec;
+		uint64_t	queryendsec;
+		uint64_t	queryendusec;
+
+		char		*error;
+		uint32_t	errorlength;
+		int64_t		errnum;
+		bool		liveconnection;
 
 		sqlrcursorstate_t	state;
-
-		uint16_t	id;
-
-		char		lobbuffer[32768];
 
 		sqlrquerycursor	*customquerycursor;
 };

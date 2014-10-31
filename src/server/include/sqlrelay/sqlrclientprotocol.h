@@ -168,6 +168,8 @@ class SQLRSERVER_DLLSPEC sqlrclientprotocol : public sqlrprotocol {
 
 		uint64_t	skip;
 		uint64_t	fetch;
+
+		char		lobbuffer[32768];
 };
 
 #endif
