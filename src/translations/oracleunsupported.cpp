@@ -10,15 +10,17 @@
 class oracleunsupported : public sqlrtranslation {
 	public:
 			oracleunsupported(sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
 };
 
 oracleunsupported::oracleunsupported(sqlrtranslations *sqlts,
-						xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+						xmldomnode *parameters,
+						bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool oracleunsupported::run(sqlrconnection_svr *sqlrcon,
@@ -114,7 +116,8 @@ bool oracleunsupported::run(sqlrconnection_svr *sqlrcon,
 extern "C" {
 	sqlrtranslation	*new_oracleunsupported(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new oracleunsupported(sqlts,parameters);
+					xmldomnode *parameters,
+					bool debug) {
+		return new oracleunsupported(sqlts,parameters,debug);
 	}
 }

@@ -13,7 +13,8 @@
 class translatedatetimes : public sqlrtranslation {
 	public:
 			translatedatetimes(sqlrtranslations *sqlts,
-					xmldomnode *parameters);
+					xmldomnode *parameters,
+					bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
@@ -30,14 +31,15 @@ class translatedatetimes : public sqlrtranslation {
 };
 
 translatedatetimes::translatedatetimes(sqlrtranslations *sqlts,
-					xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+					xmldomnode *parameters,
+					bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool translatedatetimes::run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree) {
-	if (sqlrcon->cont->debugsqlrtranslation) {
+	if (debug) {
 		stdoutput.printf("date/time translation:\n");
 		stdoutput.printf("    ddmm: %s\n",
 			parameters->getAttributeValue("ddmm"));
@@ -56,7 +58,7 @@ bool translatedatetimes::run(sqlrconnection_svr *sqlrcon,
 						parameters)) {
 		return false;
 	}
-	if (sqlrcon->cont->debugsqlrtranslation) {
+	if (debug) {
 		stdoutput.printf("  query:\n");
 	}
 	if (!translateDateTimesInQuery(sqlrcon,sqlrcur,
@@ -64,7 +66,7 @@ bool translatedatetimes::run(sqlrconnection_svr *sqlrcon,
 						parameters)) {
 		return false;
 	}
-	if (sqlrcon->cont->debugsqlrtranslation) {
+	if (debug) {
 		stdoutput.printf("\n");
 	}
 	return true;
@@ -170,8 +172,7 @@ bool translatedatetimes::translateDateTimesInQuery(
 							fraction);
 				if (converted) {
 
-					if (sqlrcon->cont->
-						debugsqlrtranslation) {
+					if (debug) {
 						stdoutput.printf(
 							"    %s -> %s\n",
 							valuecopy,converted);
@@ -294,7 +295,7 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 			continue;
 		}
 
-		if (sqlrcon->cont->debugsqlrtranslation) {
+		if (debug) {
 			stdoutput.printf("    %s -> %s\n",
 					bind->value.stringval,converted);
 		}
@@ -302,7 +303,7 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 		// replace the value with the converted string
 		bind->valuesize=charstring::length(converted);
 		bind->value.stringval=
-			(char *)sqlrcon->cont->bindmappingspool->
+			(char *)sqlrcon->cont->getBindMappingsPool()->
 					allocateAndClear(bind->valuesize+1);
 		charstring::copy(bind->value.stringval,converted);
 		delete[] converted;
@@ -314,7 +315,8 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 extern "C" {
 	sqlrtranslation	*new_translatedatetimes(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new translatedatetimes(sqlts,parameters);
+					xmldomnode *parameters,
+					bool debug) {
+		return new translatedatetimes(sqlts,parameters,debug);
 	}
 }

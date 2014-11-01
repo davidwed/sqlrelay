@@ -11,7 +11,8 @@
 class concat : public sqlrtranslation {
 	public:
 			concat(sqlrtranslations *sqlts,
-					xmldomnode *parameters);
+					xmldomnode *parameters,
+					bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
@@ -27,8 +28,8 @@ class concat : public sqlrtranslation {
 		xmldomnode	*parameters;
 };
 
-concat::concat(sqlrtranslations *sqlts,xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+concat::concat(sqlrtranslations *sqlts, xmldomnode *parameters, bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 	this->parameters=parameters;
 }
 
@@ -207,7 +208,8 @@ bool concat::translatePlus(sqlrconnection_svr *sqlrcon,
 
 extern "C" {
 	sqlrtranslation	*new_concat(sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new concat(sqlts,parameters);
+					xmldomnode *parameters,
+					bool debug) {
+		return new concat(sqlts,parameters,debug);
 	}
 }

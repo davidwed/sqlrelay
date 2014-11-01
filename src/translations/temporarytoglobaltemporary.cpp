@@ -10,7 +10,8 @@
 class temporarytoglobaltemporary : public sqlrtranslation {
 	public:
 			temporarytoglobaltemporary(sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
@@ -18,9 +19,11 @@ class temporarytoglobaltemporary : public sqlrtranslation {
 		void	insertGlobal(xmldomnode *node);
 };
 
-temporarytoglobaltemporary::temporarytoglobaltemporary(sqlrtranslations *sqlts,
-						xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+temporarytoglobaltemporary::temporarytoglobaltemporary(
+						sqlrtranslations *sqlts,
+						xmldomnode *parameters,
+						bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool temporarytoglobaltemporary::run(sqlrconnection_svr *sqlrcon,
@@ -54,7 +57,8 @@ void temporarytoglobaltemporary::insertGlobal(xmldomnode *node) {
 extern "C" {
 	sqlrtranslation	*new_temporarytoglobaltemporary(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new temporarytoglobaltemporary(sqlts,parameters);
+					xmldomnode *parameters,
+					bool debug) {
+		return new temporarytoglobaltemporary(sqlts,parameters,debug);
 	}
 }

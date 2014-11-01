@@ -10,7 +10,8 @@
 class forupdatemssqlserverize : public sqlrtranslation {
 	public:
 			forupdatemssqlserverize(sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldom *querytree);
@@ -18,8 +19,9 @@ class forupdatemssqlserverize : public sqlrtranslation {
 
 forupdatemssqlserverize::forupdatemssqlserverize(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+					xmldomnode *parameters,
+					bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool forupdatemssqlserverize::run(sqlrconnection_svr *sqlrcon,
@@ -77,7 +79,8 @@ bool forupdatemssqlserverize::run(sqlrconnection_svr *sqlrcon,
 extern "C" {
 	sqlrtranslation	*new_forupdatemssqlserverize(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new forupdatemssqlserverize(sqlts,parameters);
+					xmldomnode *parameters,
+					bool debug) {
+		return new forupdatemssqlserverize(sqlts,parameters,debug);
 	}
 }

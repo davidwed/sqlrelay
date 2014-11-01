@@ -33,7 +33,8 @@ static const char *timeparts[]={
 class informixtomssqlserverdate : public sqlrtranslation {
 	public:
 			informixtomssqlserverdate(sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
@@ -74,9 +75,11 @@ class informixtomssqlserverdate : public sqlrtranslation {
 						const char *formatstring);
 };
 
-informixtomssqlserverdate::informixtomssqlserverdate(sqlrtranslations *sqlts,
-					xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+informixtomssqlserverdate::informixtomssqlserverdate(
+					sqlrtranslations *sqlts,
+					xmldomnode *parameters,
+					bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool informixtomssqlserverdate::run(sqlrconnection_svr *sqlrcon,
@@ -704,7 +707,8 @@ xmldomnode *informixtomssqlserverdate::wrapConvert(xmldomnode *functionnode,
 extern "C" {
 	sqlrtranslation	*new_informixtomssqlserverdate(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new informixtomssqlserverdate(sqlts,parameters);
+					xmldomnode *parameters,
+					bool debug) {
+		return new informixtomssqlserverdate(sqlts,parameters,debug);
 	}
 }

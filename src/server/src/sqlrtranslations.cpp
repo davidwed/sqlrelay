@@ -19,10 +19,11 @@
 	}
 #endif
 
-sqlrtranslations::sqlrtranslations() {
+sqlrtranslations::sqlrtranslations(bool debug) {
 	debugFunction();
 	xmld=NULL;
 	tree=NULL;
+	this->debug=debug;
 	temptablepool=new memorypool(0,128,100);
 	tempindexpool=new memorypool(0,128,100);
 }
@@ -121,8 +122,9 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 	// load the translation itself
 	stringbuffer	functionname;
 	functionname.append("new_")->append(module);
-	sqlrtranslation *(*newTranslation)(sqlrtranslations *, xmldomnode *)=
-			(sqlrtranslation *(*)(sqlrtranslations *, xmldomnode *))
+	sqlrtranslation *(*newTranslation)
+		(sqlrtranslations *, xmldomnode *, bool)=
+		(sqlrtranslation *(*)(sqlrtranslations *, xmldomnode *, bool))
 				dl->getSymbol(functionname.getString());
 	if (!newTranslation) {
 		stdoutput.printf("failed to create translation: %s\n",module);
@@ -133,7 +135,7 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 		delete dl;
 		return;
 	}
-	sqlrtranslation	*tr=(*newTranslation)(this,translation);
+	sqlrtranslation	*tr=(*newTranslation)(this,translation,debug);
 
 #else
 

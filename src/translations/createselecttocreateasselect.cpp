@@ -11,7 +11,8 @@ class createselecttocreateasselect : public sqlrtranslation {
 	public:
 			createselecttocreateasselect(
 						sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldom *querytree);
@@ -21,8 +22,9 @@ class createselecttocreateasselect : public sqlrtranslation {
 
 createselecttocreateasselect::createselecttocreateasselect(
 						sqlrtranslations *sqlts,
-						xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+						xmldomnode *parameters,
+						bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool createselecttocreateasselect::run(sqlrconnection_svr *sqlrcon,
@@ -51,7 +53,8 @@ void createselecttocreateasselect::insertAs(xmldomnode *node) {
 extern "C" {
 	sqlrtranslation	*new_createselecttocreateasselect(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new createselecttocreateasselect(sqlts,parameters);
+					xmldomnode *parameters,
+					bool debug) {
+		return new createselecttocreateasselect(sqlts,parameters,debug);
 	}
 }

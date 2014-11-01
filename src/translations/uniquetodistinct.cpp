@@ -10,7 +10,8 @@
 class uniquetodistinct : public sqlrtranslation {
 	public:
 			uniquetodistinct(sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
@@ -19,8 +20,9 @@ class uniquetodistinct : public sqlrtranslation {
 };
 
 uniquetodistinct::uniquetodistinct(sqlrtranslations *sqlts,
-						xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+					xmldomnode *parameters,
+					bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool uniquetodistinct::run(sqlrconnection_svr *sqlrcon,
@@ -60,7 +62,8 @@ void uniquetodistinct::replaceUnique(xmldomnode *node) {
 
 extern "C" {
 	sqlrtranslation	*new_uniquetodistinct(sqlrtranslations *sqlts,
-						xmldomnode *parameters) {
-		return new uniquetodistinct(sqlts,parameters);
+						xmldomnode *parameters,
+						bool debug) {
+		return new uniquetodistinct(sqlts,parameters,debug);
 	}
 }

@@ -273,10 +273,9 @@ void sybaseconnection::handleConnectString() {
 	language=cont->connectStringValue("language");
 	hostname=cont->connectStringValue("hostname");
 	packetsize=cont->connectStringValue("packetsize");
-	cont->fakeinputbinds=
+	cont->setFakeInputBinds(
 		!charstring::compare(
-				cont->connectStringValue("fakebinds"),
-				"yes");
+			cont->connectStringValue("fakebinds"),"yes"));
 	fetchatonce=charstring::toInteger(
 				cont->connectStringValue("fetchatonce"));
 	if (!fetchatonce) {
@@ -649,13 +648,14 @@ sybasecursor::sybasecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	cursorname=NULL;
 	cursornamelength=0;
 
-	parameter=new CS_DATAFMT[conn->cont->maxbindcount];
-	outbindtype=new CS_INT[conn->cont->maxbindcount];
-	outbindstrings=new char *[conn->cont->maxbindcount];
-	outbindstringlengths=new uint16_t[conn->cont->maxbindcount];
-	outbindints=new int64_t *[conn->cont->maxbindcount];
-	outbinddoubles=new double *[conn->cont->maxbindcount];
-	outbinddates=new datebind[conn->cont->maxbindcount];
+	uint16_t	maxbindcount=conn->cont->cfgfl->getMaxBindCount();
+	parameter=new CS_DATAFMT[maxbindcount];
+	outbindtype=new CS_INT[maxbindcount];
+	outbindstrings=new char *[maxbindcount];
+	outbindstringlengths=new uint16_t[maxbindcount];
+	outbindints=new int64_t *[maxbindcount];
+	outbinddoubles=new double *[maxbindcount];
+	outbinddates=new datebind[maxbindcount];
 
 	// replace the regular expression used to detect creation of a
 	// temporary table

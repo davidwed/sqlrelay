@@ -5,8 +5,9 @@
 #include <sqlrelay/sqlrconnection.h>
 #include <sqlrelay/sqlrcursor.h>
 
-sqlrtrigger::sqlrtrigger(xmldomnode *parameters) {
+sqlrtrigger::sqlrtrigger(xmldomnode *parameters, bool debug) {
 	this->parameters=parameters;
+	this->debug=debug;
 }
 
 sqlrtrigger::~sqlrtrigger() {

@@ -10,15 +10,17 @@
 class serialtoautoincrement : public sqlrtranslation {
 	public:
 			serialtoautoincrement(sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
 };
 
 serialtoautoincrement::serialtoautoincrement(sqlrtranslations *sqlts,
-						xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+						xmldomnode *parameters,
+						bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool serialtoautoincrement::run(sqlrconnection_svr *sqlrcon,
@@ -78,7 +80,8 @@ bool serialtoautoincrement::run(sqlrconnection_svr *sqlrcon,
 extern "C" {
 	sqlrtranslation	*new_serialtoautoincrement(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new serialtoautoincrement(sqlts,parameters);
+					xmldomnode *parameters,
+					bool debug) {
+		return new serialtoautoincrement(sqlts,parameters,debug);
 	}
 }

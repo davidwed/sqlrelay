@@ -194,6 +194,7 @@ class db2cursor : public sqlrcursor_svr {
 		#endif
 		db2column	*column;
 
+		uint16_t	maxbindcount;
 		datebind	**outdatebind;
 		char		**outlobbind;
 		SQLINTEGER 	*outlobbindlen;
@@ -302,10 +303,9 @@ void db2connection::handleConnectString() {
 		!charstring::compare(
 			cont->connectStringValue("faketransactionblocks"),
 			"yes"));
-	cont->fakeinputbinds=
+	cont->setFakeInputBinds(
 		!charstring::compare(
-			cont->connectStringValue("fakebinds"),
-			"yes");
+			cont->connectStringValue("fakebinds"),"yes"));
 
 	const char	*to=cont->connectStringValue("timeout");
 	if (!charstring::length(to)) {
@@ -706,10 +706,11 @@ db2cursor::db2cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	db2conn=(db2connection *)conn;
 	stmt=0;
 	lobstmt=0;
-	outdatebind=new datebind *[conn->cont->maxbindcount];
-	outlobbind=new char *[conn->cont->maxbindcount];
-	outlobbindlen=new SQLINTEGER[conn->cont->maxbindcount];
-	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
+	maxbindcount=conn->cont->cfgfl->getMaxBindCount();
+	outdatebind=new datebind *[maxbindcount];
+	outlobbind=new char *[maxbindcount];
+	outlobbindlen=new SQLINTEGER[maxbindcount];
+	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
 		outlobbind[i]=NULL;
 		outlobbindlen[i]=0;
@@ -1332,7 +1333,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	// convert date output binds
-	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
+	for (uint16_t i=0; i<maxbindcount; i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
 			SQL_TIMESTAMP_STRUCT	*ts=
@@ -1682,7 +1683,7 @@ bool db2cursor::getLobFieldSegment(uint32_t col,
 }
 
 void db2cursor::cleanUpData() {
-	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
+	for (uint16_t i=0; i<maxbindcount; i++) {
 		delete outdatebind[i];
 		outdatebind[i]=NULL;
 		delete outlobbind[i];

@@ -12,21 +12,24 @@
 sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 
 	this->conn=conn;
+
+	maxerrorlength=conn->cont->cfgfl->getMaxErrorLength();
+
 	setInputBindCount(0);
-	inbindvars=new bindvar_svr[conn->cont->maxbindcount];
+	inbindvars=new bindvar_svr[conn->cont->cfgfl->getMaxBindCount()];
 	setOutputBindCount(0);
-	outbindvars=new bindvar_svr[conn->cont->maxbindcount];
+	outbindvars=new bindvar_svr[conn->cont->cfgfl->getMaxBindCount()];
 	
 	setState(SQLRCURSORSTATE_AVAILABLE);
 
 	createtemp.compile("(create|CREATE|declare|DECLARE)[ 	\\r\\n]+((global|GLOBAL|local|LOCAL)?[ 	\\r\\n]+)?(temp|TEMP|temporary|TEMPORARY)?[ 	\\r\\n]+(table|TABLE)[ 	\\r\\n]+");
 
-	querybuffer=new char[conn->cont->maxquerysize+1];
+	querybuffer=new char[conn->cont->cfgfl->getMaxQuerySize()+1];
 	setQueryLength(0);
 
 	setQueryTree(NULL);
 
-	error=new char[conn->cont->maxerrorlength+1];
+	error=new char[maxerrorlength+1];
 	errorlength=0;
 	errnum=0;
 	liveconnection=true;
@@ -640,12 +643,6 @@ bool sqlrcursor_svr::fakeInputBinds(stringbuffer *outputquery) {
 			ptr++;
 		}
 	}
-
-	if (conn->cont->debugsqlrtranslation) {
-		stdoutput.printf("after faking input binds:\n%s\n\n",
-						outputquery->getString());
-	}
-
 	return true;
 }
 
@@ -872,8 +869,8 @@ void sqlrcursor_svr::clearError() {
 
 void sqlrcursor_svr::setError(const char *err, int64_t errn, bool liveconn) {
 	errorlength=charstring::length(err);
-	if (errorlength>conn->cont->maxerrorlength) {
-		errorlength=conn->cont->maxerrorlength;
+	if (errorlength>maxerrorlength) {
+		errorlength=maxerrorlength;
 	}
 	charstring::copy(error,err,errorlength);
 	error[errorlength]='\0';

@@ -10,7 +10,8 @@
 class mysqlunsupported : public sqlrtranslation {
 	public:
 			mysqlunsupported(sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
@@ -19,8 +20,9 @@ class mysqlunsupported : public sqlrtranslation {
 };
 
 mysqlunsupported::mysqlunsupported(sqlrtranslations *sqlts,
-						xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+						xmldomnode *parameters,
+						bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool mysqlunsupported::run(sqlrconnection_svr *sqlrcon,
@@ -47,8 +49,10 @@ void mysqlunsupported::removeNoWait(xmldomnode *node) {
 }
 
 extern "C" {
-	sqlrtranslation	*new_mysqlunsupported(sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new mysqlunsupported(sqlts,parameters);
+	sqlrtranslation	*new_mysqlunsupported(
+					sqlrtranslations *sqlts,
+					xmldomnode *parameters,
+					bool debug) {
+		return new mysqlunsupported(sqlts,parameters,debug);
 	}
 }

@@ -17,9 +17,10 @@
 	}
 #endif
 
-sqlrtriggers::sqlrtriggers() {
+sqlrtriggers::sqlrtriggers(bool debug) {
 	debugFunction();
 	xmld=NULL;
+	this->debug=debug;
 }
 
 sqlrtriggers::~sqlrtriggers() {
@@ -134,8 +135,8 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 	// load the trigger itself
 	stringbuffer	functionname;
 	functionname.append("new_")->append(module);
-	sqlrtrigger *(*newTrigger)(xmldomnode *)=
-			(sqlrtrigger *(*)(xmldomnode *))
+	sqlrtrigger *(*newTrigger)(xmldomnode *, bool)=
+			(sqlrtrigger *(*)(xmldomnode *, bool))
 				dl->getSymbol(functionname.getString());
 	if (!newTrigger) {
 		stdoutput.printf("failed to create trigger: %s\n",module);
@@ -146,7 +147,7 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 		delete dl;
 		return;
 	}
-	sqlrtrigger	*tr=(*newTrigger)(trigger);
+	sqlrtrigger	*tr=(*newTrigger)(trigger,debug);
 
 #else
 

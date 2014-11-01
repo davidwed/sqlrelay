@@ -16,7 +16,8 @@ class sqlrtranslations;
 class SQLRSERVER_DLLSPEC sqlrtranslation {
 	public:
 			sqlrtranslation(sqlrtranslations *sqlts,
-					xmldomnode *parameters);
+					xmldomnode *parameters,
+					bool debug);
 		virtual	~sqlrtranslation();
 
 		virtual bool	run(sqlrconnection_svr *sqlrcon,
@@ -25,6 +26,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslation {
 	protected:
 		sqlrtranslations	*sqlts;
 		xmldomnode		*parameters;
+		bool			debug;
 };
 
 #endif

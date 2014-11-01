@@ -10,7 +10,8 @@
 class oracleisolationlevel : public sqlrtranslation {
 	public:
 			oracleisolationlevel(sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
@@ -19,8 +20,9 @@ class oracleisolationlevel : public sqlrtranslation {
 };
 
 oracleisolationlevel::oracleisolationlevel(sqlrtranslations *sqlts,
-						xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+						xmldomnode *parameters,
+						bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool oracleisolationlevel::run(sqlrconnection_svr *sqlrcon,
@@ -72,7 +74,8 @@ void oracleisolationlevel::replaceIsolationLevel(xmldomnode *node) {
 extern "C" {
 	sqlrtranslation	*new_oracleisolationlevel(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new oracleisolationlevel(sqlts,parameters);
+					xmldomnode *parameters,
+					bool debug) {
+		return new oracleisolationlevel(sqlts,parameters,debug);
 	}
 }

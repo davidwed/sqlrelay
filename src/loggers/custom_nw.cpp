@@ -140,7 +140,7 @@ bool custom_nw::run(sqlrlistener *sqlrl,
 
 	// escape the client info
 	static char	infobuf[1024+1];
-	strescape(sqlrcon->cont->clientinfo,infobuf,1024);
+	strescape(sqlrcon->cont->getClientInfoBuffer(),infobuf,1024);
 
 	// escape the input bind variables
 	char	bindbuf[1000+1];

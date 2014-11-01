@@ -20,8 +20,7 @@ class bindvar_svr;
 class SQLRSERVER_DLLSPEC sqlrclientprotocol : public sqlrprotocol {
 	public:
 			sqlrclientprotocol(sqlrcontroller_svr *cont,
-						sqlrconnection_svr *conn,
-						sqlrconfigfile *cfgfl);
+						sqlrconnection_svr *conn);
 		virtual	~sqlrclientprotocol();
 
 		sqlrclientexitstatus_t	clientSession();
@@ -155,11 +154,13 @@ class SQLRSERVER_DLLSPEC sqlrclientprotocol : public sqlrprotocol {
 
 		int32_t		idleclienttimeout;
 
+		uint64_t	maxclientinfolength;
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
 		uint16_t	maxbindnamelength;
 		uint32_t	maxstringbindvaluelength;
 		uint32_t	maxlobbindvaluelength;
+		uint32_t	maxerrorlength;
 
 		char		userbuffer[USERSIZE];
 		char		passwordbuffer[USERSIZE];

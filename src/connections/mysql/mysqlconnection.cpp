@@ -259,12 +259,13 @@ void mysqlconnection::handleConnectString() {
 	sslca=cont->connectStringValue("sslca");
 	sslcapath=cont->connectStringValue("sslcapath");
 	sslcipher=cont->connectStringValue("sslcipher");
-	cont->setFakeInputBinds(!charstring::compare(
-				cont->connectStringValue("fakebinds"),"yes"));
+	cont->setFakeInputBinds(
+		!charstring::compare(
+			cont->connectStringValue("fakebinds"),"yes"));
 	foundrows=!charstring::compare(
-				cont->connectStringValue("foundrows"),"yes");
+			cont->connectStringValue("foundrows"),"yes");
 	ignorespace=!charstring::compare(
-				cont->connectStringValue("ignorespace"),"yes");
+			cont->connectStringValue("ignorespace"),"yes");
 }
 
 bool mysqlconnection::logIn(const char **error) {
@@ -589,8 +590,8 @@ mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	stmt=NULL;
 	stmtfreeresult=false;
-	bind=new MYSQL_BIND[conn->cont->maxbindcount];
-	bindvaluesize=new unsigned long[conn->cont->maxbindcount];
+	bind=new MYSQL_BIND[conn->cont->cfgfl->getMaxBindCount()];
+	bindvaluesize=new unsigned long[conn->cont->cfgfl->getMaxBindCount()];
 	usestmtprepare=true;
 	bindformaterror=false;
 	unsupportedbystmt.compile(
@@ -669,7 +670,7 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	boundvariables=false;
 
 	// re-init bind buffers
-	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
+	for (uint16_t i=0; i<conn->cont->cfgfl->getMaxBindCount(); i++) {
 		bytestring::zero(&bind[i],sizeof(MYSQL_BIND));
 	}
 
@@ -1369,7 +1370,9 @@ void mysqlcursor::cleanUpData() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
 		boundvariables=0;
-		for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
+		for (uint16_t i=0;
+			i<conn->cont->cfgfl->getMaxBindCount();
+			i++) {
 			bytestring::zero(&bind[i],sizeof(MYSQL_BIND));
 		}
 		mysql_stmt_reset(stmt);

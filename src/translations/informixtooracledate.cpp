@@ -10,7 +10,8 @@
 class informixtooracledate : public sqlrtranslation {
 	public:
 			informixtooracledate(sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
@@ -50,8 +51,9 @@ class informixtooracledate : public sqlrtranslation {
 };
 
 informixtooracledate::informixtooracledate(sqlrtranslations *sqlts,
-					xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+						xmldomnode *parameters,
+						bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool informixtooracledate::run(sqlrconnection_svr *sqlrcon,
@@ -473,7 +475,8 @@ xmldomnode *informixtooracledate::wrap(xmldomnode *functionnode,
 extern "C" {
 	sqlrtranslation	*new_informixtooracledate(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new informixtooracledate(sqlts,parameters);
+					xmldomnode *parameters,
+					bool debug) {
+		return new informixtooracledate(sqlts,parameters,debug);
 	}
 }

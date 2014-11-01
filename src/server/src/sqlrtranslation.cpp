@@ -6,9 +6,11 @@
 #include <sqlrelay/sqlrcursor.h>
 
 sqlrtranslation::sqlrtranslation(sqlrtranslations *sqlts,
-				xmldomnode *parameters) {
+				xmldomnode *parameters,
+				bool debug) {
 	this->sqlts=sqlts;
 	this->parameters=parameters;
+	this->debug=debug;
 }
 
 sqlrtranslation::~sqlrtranslation() {

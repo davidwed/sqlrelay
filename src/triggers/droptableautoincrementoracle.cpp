@@ -10,7 +10,8 @@
 
 class droptableautoincrementoracle : public sqlrtrigger {
 	public:
-			droptableautoincrementoracle(xmldomnode *parameters);
+			droptableautoincrementoracle(
+					xmldomnode *parameters, bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree,
@@ -31,7 +32,8 @@ class droptableautoincrementoracle : public sqlrtrigger {
 };
 
 droptableautoincrementoracle::droptableautoincrementoracle(
-			xmldomnode *parameters) : sqlrtrigger(parameters) {
+					xmldomnode *parameters, bool debug) :
+					sqlrtrigger(parameters,debug) {
 }
 
 bool droptableautoincrementoracle::run(sqlrconnection_svr *sqlrcon,
@@ -118,17 +120,17 @@ bool droptableautoincrementoracle::dropSequences(sqlrconnection_svr *sqlrcon,
 	query.append(table)->append("'");
 
 	// get the sequences from the table-sequence map table
-	if (sqlrcon->cont->debugtriggers) {
+	if (debug) {
 		stdoutput.printf("running trigger:\n%s\n",query.getString());
 	}
 	sqlrcursor_svr	*cur=sqlrcon->cont->initCursor();
-	if (cur->openInternal(sqlrcon->cont->cursorcount+1) &&
+	if (cur->openInternal(sqlrcon->cont->getCursorCount()+1) &&
 		cur->prepareQuery(query.getString(),query.getStringLength()) &&
 		sqlrcon->cont->executeQuery(cur,query.getString(),
 						query.getStringLength())) {
 
 		// success...
-		if (sqlrcon->cont->debugtriggers) {
+		if (debug) {
 			stdoutput.printf("success\n\n");
 		}
 
@@ -157,12 +159,13 @@ bool droptableautoincrementoracle::dropSequences(sqlrconnection_svr *sqlrcon,
 		// schema and database explicitly.
 
 		// error...
-		if (sqlrcon->cont->debugtriggers) {
+		if (debug) {
 			uint32_t	errorlength;
 			int64_t		errnum;
 			bool		liveconnection;
 			cur->errorMessage(cur->getErrorBuffer(),
-						sqlrcon->cont->maxerrorlength,
+						sqlrcon->cont->cfgfl->
+							getMaxErrorLength(),
 						&errorlength,
 						&errnum,
 						&liveconnection);
@@ -189,16 +192,16 @@ bool droptableautoincrementoracle::dropSequence(sqlrconnection_svr *sqlrcon,
 	query.append("drop sequence ")->append(sequencename);
 
 	// drop the sequence
-	if (sqlrcon->cont->debugtriggers) {
+	if (debug) {
 		stdoutput.printf("running trigger:\n%s\n",query.getString());
 	}
 	sqlrcursor_svr	*cur=sqlrcon->cont->initCursor();
-	if (cur->openInternal(sqlrcon->cont->cursorcount+1) &&
+	if (cur->openInternal(sqlrcon->cont->getCursorCount()+1) &&
 		cur->prepareQuery(query.getString(),query.getStringLength()) &&
 		sqlrcon->cont->executeQuery(cur,query.getString(),
 						query.getStringLength())) {
 		// success...
-		if (sqlrcon->cont->debugtriggers) {
+		if (debug) {
 			stdoutput.printf("success\n\n");
 		}
 
@@ -206,12 +209,13 @@ bool droptableautoincrementoracle::dropSequence(sqlrconnection_svr *sqlrcon,
 		deleteSequence(sqlrcon,sqlrcur,sequencename);
 	} else {
 		// error...
-		if (sqlrcon->cont->debugtriggers) {
+		if (debug) {
 			uint32_t	errorlength;
 			int64_t		errnum;
 			bool		liveconnection;
 			cur->errorMessage(cur->getErrorBuffer(),
-						sqlrcon->cont->maxerrorlength,
+						sqlrcon->cont->cfgfl->
+							getMaxErrorLength(),
 						&errorlength,
 						&errnum,
 						&liveconnection);
@@ -240,26 +244,27 @@ bool droptableautoincrementoracle::deleteSequence(sqlrconnection_svr *sqlrcon,
 	query.append(sequencename)->append("'");
 
 	// delete the sequence
-	if (sqlrcon->cont->debugtriggers) {
+	if (debug) {
 		stdoutput.printf("running trigger:\n%s\n",query.getString());
 	}
 	sqlrcursor_svr	*cur=sqlrcon->cont->initCursor();
-	if (cur->openInternal(sqlrcon->cont->cursorcount+1) &&
+	if (cur->openInternal(sqlrcon->cont->getCursorCount()+1) &&
 		cur->prepareQuery(query.getString(),query.getStringLength()) &&
 		sqlrcon->cont->executeQuery(cur,query.getString(),
 						query.getStringLength())) {
 		// success...
-		if (sqlrcon->cont->debugtriggers) {
+		if (debug) {
 			stdoutput.printf("success\n\n");
 		}
 	} else {
 		// error...
-		if (sqlrcon->cont->debugtriggers) {
+		if (debug) {
 			uint32_t	errorlength;
 			int64_t		errnum;
 			bool		liveconnection;
 			cur->errorMessage(cur->getErrorBuffer(),
-						sqlrcon->cont->maxerrorlength,
+						sqlrcon->cont->cfgfl->
+							getMaxErrorLength(),
 						&errorlength,
 						&errnum,
 						&liveconnection);
@@ -278,7 +283,7 @@ bool droptableautoincrementoracle::deleteSequence(sqlrconnection_svr *sqlrcon,
 
 extern "C" {
 	sqlrtrigger	*new_droptableautoincrementoracle(
-					xmldomnode *parameters) {
-		return new droptableautoincrementoracle(parameters);
+				xmldomnode *parameters, bool debug) {
+		return new droptableautoincrementoracle(parameters,debug);
 	}
 }

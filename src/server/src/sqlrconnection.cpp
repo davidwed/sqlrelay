@@ -8,9 +8,13 @@
 #include <defines.h>
 
 sqlrconnection_svr::sqlrconnection_svr(sqlrcontroller_svr *cont) {
+
 	this->cont=cont;
 
-	error=new char[cont->maxerrorlength+1];
+	maxquerysize=cont->cfgfl->getMaxQuerySize();
+	maxerrorlength=cont->cfgfl->getMaxErrorLength();
+
+	error=new char[maxerrorlength+1];
 	errorlength=0;
 	errnum=0;
 	liveconnection=false;
@@ -43,7 +47,8 @@ bool sqlrconnection_svr::changeUser(const char *newuser,
 	cont->logOut();
 	cont->setUser(newuser);
 	cont->setPassword(newpassword);
-	return (cont->logIn(false) && cont->initCursors(cont->cursorcount));
+	return (cont->logIn(false) &&
+		cont->initCursors(cont->getCursorCount()));
 }
 
 bool sqlrconnection_svr::autoCommitOn() {
@@ -88,7 +93,7 @@ bool sqlrconnection_svr::begin() {
 	// run the query...
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
-	if (begincur->openInternal(cont->cursorcount+1) &&
+	if (begincur->openInternal(cont->getCursorCount()+1) &&
 		begincur->prepareQuery(beginquery,beginquerylen)) {
 		retval=begincur->executeQuery(beginquery,beginquerylen);
 	}
@@ -96,7 +101,7 @@ bool sqlrconnection_svr::begin() {
 	// If there was an error, copy it out.  We'll be destroying the
 	// cursor in a moment and the error will be lost otherwise.
 	if (!retval) {
-		begincur->errorMessage(error,cont->maxerrorlength,
+		begincur->errorMessage(error,maxerrorlength,
 					&errorlength,&errnum,&liveconnection);
 	}
 
@@ -131,7 +136,7 @@ bool sqlrconnection_svr::commit() {
 	// run the query...
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
-	if (commitcur->openInternal(cont->cursorcount+1) &&
+	if (commitcur->openInternal(cont->getCursorCount()+1) &&
 		commitcur->prepareQuery(commitquery,commitquerylen)) {
 		retval=commitcur->executeQuery(commitquery,commitquerylen);
 	}
@@ -139,7 +144,7 @@ bool sqlrconnection_svr::commit() {
 	// If there was an error, copy it out.  We'll be destroying the
 	// cursor in a moment and the error will be lost otherwise.
 	if (!retval) {
-		commitcur->errorMessage(error,cont->maxerrorlength,
+		commitcur->errorMessage(error,maxerrorlength,
 					&errorlength,&errnum,&liveconnection);
 	}
 
@@ -170,7 +175,7 @@ bool sqlrconnection_svr::rollback() {
 	// run the query...
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
-	if (rbcur->openInternal(cont->cursorcount+1) &&
+	if (rbcur->openInternal(cont->getCursorCount()+1) &&
 		rbcur->prepareQuery(rollbackquery,rollbackquerylen)) {
 		retval=rbcur->executeQuery(rollbackquery,rollbackquerylen);
 	}
@@ -178,7 +183,7 @@ bool sqlrconnection_svr::rollback() {
 	// If there was an error, copy it out.  We'll be destroying the
 	// cursor in a moment and the error will be lost otherwise.
 	if (!retval) {
-		rbcur->errorMessage(error,cont->maxerrorlength,
+		rbcur->errorMessage(error,maxerrorlength,
 					&errorlength,&errnum,&liveconnection);
 	}
 
@@ -217,7 +222,7 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 	// bounds checking
 	size_t		sdquerylen=charstring::length(sdquerybase)+
 					charstring::length(database)+1;
-	if (sdquerylen>cont->maxquerysize) {
+	if (sdquerylen>maxquerysize) {
 		return false;
 	}
 
@@ -230,7 +235,7 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	bool	retval=false;
-	if (sdcur->openInternal(cont->cursorcount+1) &&
+	if (sdcur->openInternal(cont->getCursorCount()+1) &&
 		sdcur->prepareQuery(sdquery,sdquerylen) &&
 		sdcur->executeQuery(sdquery,sdquerylen)) {
 		sdcur->cleanUpData();
@@ -242,7 +247,7 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 	} else {
 		// If there was an error, copy it out.  We'l be destroying the
 		// cursor in a moment and the error will be lost otherwise.
-		sdcur->errorMessage(error,cont->maxerrorlength,
+		sdcur->errorMessage(error,maxerrorlength,
 					&errorlength,&errnum,&liveconnection);
 	}
 	delete[] sdquery;
@@ -272,7 +277,7 @@ char *sqlrconnection_svr::getCurrentDatabase() {
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	char	*retval=NULL;
-	if (gcdcur->openInternal(cont->cursorcount+1) &&
+	if (gcdcur->openInternal(cont->getCursorCount()+1) &&
 		gcdcur->prepareQuery(gcdquery,gcdquerylen) &&
 		gcdcur->executeQuery(gcdquery,gcdquerylen)) {
 
@@ -319,7 +324,7 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id) {
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	bool	retval=false;
-	if (liicur->openInternal(cont->cursorcount+1) &&
+	if (liicur->openInternal(cont->getCursorCount()+1) &&
 		liicur->prepareQuery(liiquery,liiquerylen) &&
 		liicur->executeQuery(liiquery,liiquerylen)) {
 
@@ -344,7 +349,7 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id) {
 	} else {
 		// If there was an error, copy it out.  We'l be destroying the
 		// cursor in a moment and the error will be lost otherwise.
-		liicur->errorMessage(error,cont->maxerrorlength,
+		liicur->errorMessage(error,maxerrorlength,
 					&errorlength,&errnum,&liveconnection);
 	}
 
@@ -377,7 +382,7 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 	// bounds checking
 	size_t		silquerylen=charstring::length(silquerybase)+
 					charstring::length(isolevel)+1;
-	if (silquerylen>cont->maxquerysize) {
+	if (silquerylen>maxquerysize) {
 		return false;
 	}
 
@@ -390,7 +395,7 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	bool	retval=false;
-	if (silcur->openInternal(cont->cursorcount+1) &&
+	if (silcur->openInternal(cont->getCursorCount()+1) &&
 		silcur->prepareQuery(silquery,silquerylen) &&
 		silcur->executeQuery(silquery,silquerylen)) {
 		retval=true;
@@ -399,7 +404,7 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 	// FIXME: we don't really need to do this now but we will
 	// later if we ever add an API call to set the isolation level
 	/* else {
-		silcur->errorMessage(error,cont->maxerrorlength,
+		silcur->errorMessage(error,maxerrorlength,
 					&errorlength,&errnum,&liveconnection));
 	} */
 
@@ -420,7 +425,7 @@ bool sqlrconnection_svr::ping() {
 	int		pingquerylen=charstring::length(pingquery);
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
-	if (pingcur->openInternal(cont->cursorcount+1) &&
+	if (pingcur->openInternal(cont->getCursorCount()+1) &&
 		pingcur->prepareQuery(pingquery,pingquerylen) &&
 		pingcur->executeQuery(pingquery,pingquerylen)) {
 		pingcur->cleanUpData();
@@ -467,7 +472,7 @@ const char *sqlrconnection_svr::dbHostName() {
 		int		dbhnquerylen=charstring::length(dbhnquery);
 		// since we're creating a new cursor for this, make
 		// sure it can't have an ID that might already exist
-		if (dbhncur->openInternal(cont->cursorcount+1) &&
+		if (dbhncur->openInternal(cont->getCursorCount()+1) &&
 			dbhncur->prepareQuery(dbhnquery,dbhnquerylen) &&
 			dbhncur->executeQuery(dbhnquery,dbhnquerylen)) {
 
@@ -525,7 +530,7 @@ const char *sqlrconnection_svr::dbIpAddress() {
 		int		dbiaquerylen=charstring::length(dbiaquery);
 		// since we're creating a new cursor for this, make
 		// sure it can't have an ID that might already exist
-		if (dbiacur->openInternal(cont->cursorcount+1) &&
+		if (dbiacur->openInternal(cont->getCursorCount()+1) &&
 			dbiacur->prepareQuery(dbiaquery,dbiaquerylen) &&
 			dbiacur->executeQuery(dbiaquery,dbiaquerylen)) {
 
@@ -602,7 +607,7 @@ bool sqlrconnection_svr::isSynonym(const char *table) {
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	sqlrcursor_svr	*syncur=cont->initCursor();
-	bool	result=(syncur->openInternal(cont->cursorcount+1) &&
+	bool	result=(syncur->openInternal(cont->getCursorCount()+1) &&
 			syncur->prepareQuery(synquery,synquerylen) &&
 			syncur->executeQuery(synquery,synquerylen) &&
 			!syncur->noRowsToReturn() &&
@@ -670,8 +675,8 @@ void sqlrconnection_svr::setError(const char *err,
 					int64_t errn,
 					bool liveconn) {
 	errorlength=charstring::length(err);
-	if (errorlength>cont->maxerrorlength-1) {
-		errorlength=cont->maxerrorlength-1;
+	if (errorlength>maxerrorlength-1) {
+		errorlength=maxerrorlength-1;
 	}
 	charstring::copy(error,err,errorlength);
 	error[errorlength]='\0';

@@ -208,9 +208,9 @@ void postgresqlconnection::handleConnectString() {
 		liiquery.append(lastinsertidfunc);
 		lastinsertidquery=liiquery.detachString();
 	}
-	cont->fakeinputbinds=
+	cont->setFakeInputBinds(
 		!charstring::compare(
-			cont->connectStringValue("fakebinds"),"yes");
+			cont->connectStringValue("fakebinds"),"yes"));
 }
 
 bool postgresqlconnection::logIn(const char **error) {

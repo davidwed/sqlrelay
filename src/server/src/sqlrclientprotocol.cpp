@@ -13,16 +13,17 @@
 #include <defines.h>
 
 sqlrclientprotocol::sqlrclientprotocol(sqlrcontroller_svr *cont,
-					sqlrconnection_svr *conn,
-					sqlrconfigfile *cfgfl) :
-					sqlrprotocol(cont,conn,cfgfl) {
-	idleclienttimeout=cfgfl->getIdleClientTimeout();
-	maxquerysize=cfgfl->getMaxQuerySize();
-	maxbindcount=cfgfl->getMaxBindCount();
-	maxbindnamelength=cfgfl->getMaxBindNameLength();
-	maxstringbindvaluelength=cfgfl->getMaxStringBindValueLength();
-	maxlobbindvaluelength=cfgfl->getMaxLobBindValueLength();
+					sqlrconnection_svr *conn) :
+					sqlrprotocol(cont,conn) {
+	idleclienttimeout=cont->cfgfl->getIdleClientTimeout();
+	maxclientinfolength=cont->cfgfl->getMaxClientInfoLength();
+	maxquerysize=cont->cfgfl->getMaxQuerySize();
+	maxbindcount=cont->cfgfl->getMaxBindCount();
+	maxbindnamelength=cont->cfgfl->getMaxBindNameLength();
+	maxstringbindvaluelength=cont->cfgfl->getMaxStringBindValueLength();
+	maxlobbindvaluelength=cont->cfgfl->getMaxLobBindValueLength();
 	bindpool=new memorypool(512,128,100);
+	maxerrorlength=cont->cfgfl->getMaxErrorLength();
 }
 
 sqlrclientprotocol::~sqlrclientprotocol() {
@@ -840,7 +841,7 @@ bool sqlrclientprotocol::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 			// to wait for them if they're down, then return the
 			// error
 			if (cursor->getLiveConnection() ||
-				!cfgfl->getWaitForDownDatabase()) {
+				!cont->cfgfl->getWaitForDownDatabase()) {
 
 				// return the error
 				returnError(cursor,
@@ -860,7 +861,7 @@ bool sqlrclientprotocol::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 
 				// if we're waiting for down databases then
 				// loop back and try the query again
-				if (cfgfl->getWaitForDownDatabase()) {
+				if (cont->cfgfl->getWaitForDownDatabase()) {
 					continue;
 				}
 			}
@@ -875,63 +876,64 @@ bool sqlrclientprotocol::getClientInfo(sqlrcursor_svr *cursor) {
 	cont->logDebugMessage("getting client info...");
 
 	// init
-	cont->clientinfolen=0;
-	cont->clientinfo[0]='\0';
+	char	*clientinfo=cont->getClientInfoBuffer();
+	clientinfo[0]='\0';
+	uint64_t	clientinfolen=0;
 
 	// get the length of the client info
-	ssize_t	result=clientsock->read(&cont->clientinfolen);
+	ssize_t	result=clientsock->read(&clientinfolen);
 	if (result!=sizeof(uint64_t)) {
-		cont->clientinfolen=0;
 		cont->logClientProtocolError(cursor,
 				"get client info failed: "
 				"failed to get clientinfo length",result);
+		cont->setClientInfoLength(0);
 		return false;
 	}
 
 	// bounds checking
-	if (cont->clientinfolen>cont->maxclientinfolength) {
+	if (clientinfolen>maxclientinfolength) {
 
 		stringbuffer	err;
 		err.append(SQLR_ERROR_MAXCLIENTINFOLENGTH_STRING);
-		err.append(" (")->append(cont->clientinfolen)->append('>');
-		err.append(cont->maxclientinfolength)->append(')');
+		err.append(" (")->append(clientinfolen)->append('>');
+		err.append(maxclientinfolength)->append(')');
 		cursor->setError(err.getString(),
 				SQLR_ERROR_MAXCLIENTINFOLENGTH,true);
 
 		debugstr.clear();
 		debugstr.append("get client info failed: "
 				"client sent bad client info size: ");
-		debugstr.append(cont->clientinfolen);
+		debugstr.append(clientinfolen);
 		cont->logClientProtocolError(cursor,debugstr.getString(),1);
 
-		cont->clientinfolen=0;
+		cont->setClientInfoLength(0);
 		return false;
 	}
 
 	// read the client info into the buffer
-	result=clientsock->read(cont->clientinfo,cont->clientinfolen);
-	if ((uint64_t)result!=cont->clientinfolen) {
-		cont->clientinfolen=0;
-		cont->clientinfo[0]='\0';
+	result=clientsock->read(clientinfo,clientinfolen);
+	if ((uint64_t)result!=clientinfolen) {
 		cont->logClientProtocolError(cursor,
 				"get client info failed: "
 				"failed to get client info",result);
+		clientinfo[0]='\0';
+		cont->setClientInfoLength(0);
 		return false;
 	}
-	cont->clientinfo[cont->clientinfolen]='\0';
+	clientinfo[clientinfolen]='\0';
 
 	if (cont->sqlrlg) {
 		debugstr.clear();
-		debugstr.append("clientinfolen: ")->append(cont->clientinfolen);
+		debugstr.append("clientinfolen: ")->append(clientinfolen);
 		cont->logDebugMessage(debugstr.getString());
 		debugstr.clear();
-		debugstr.append("clientinfo: ")->append(cont->clientinfo);
+		debugstr.append("clientinfo: ")->append(clientinfo);
 		cont->logDebugMessage(debugstr.getString());
 		cont->logDebugMessage("getting clientinfo succeeded");
 	}
 
 	// update the stats with the client info
-	cont->updateClientInfo(cont->clientinfo,cont->clientinfolen);
+	cont->updateClientInfo(clientinfo,clientinfolen);
 
 	return true;
 }
@@ -1236,7 +1238,8 @@ bool sqlrclientprotocol::getBindVarName(sqlrcursor_svr *cursor,
 
 	// get the variable name
 	bv->variablesize=bindnamesize+1;
-	bv->variable=(char *)cont->bindmappingspool->allocate(bindnamesize+2);
+	bv->variable=(char *)cont->getBindMappingsPool()->
+					allocate(bindnamesize+2);
 	bv->variable[0]=conn->bindVariablePrefix();
 	result=clientsock->read(bv->variable+1,bindnamesize,
 					idleclienttimeout,0);
@@ -2333,10 +2336,8 @@ void sqlrclientprotocol::returnError(bool disconnect) {
 		int64_t		errnum;
 		bool		liveconnection;
 		conn->errorMessage(conn->getErrorBuffer(),
-					cont->maxerrorlength,
-					&errorlength,
-					&errnum,
-					&liveconnection);
+					maxerrorlength,
+					&errorlength,&errnum,&liveconnection);
 		conn->setErrorLength(errorlength);
 		conn->setErrorNumber(errnum);
 		conn->setLiveConnection(liveconnection);
@@ -2643,7 +2644,7 @@ bool sqlrclientprotocol::getListByApiCall(sqlrcursor_svr *cursor,
 		int64_t		errnum;
 		bool		liveconnection;
 		cursor->errorMessage(cursor->getErrorBuffer(),
-					cont->maxerrorlength,
+					maxerrorlength,
 					&errorlength,&errnum,&liveconnection);
 		cursor->setErrorLength(errorlength);
 		cursor->setErrorNumber(errnum);

@@ -10,15 +10,17 @@
 class locksnowaitbydefault : public sqlrtranslation {
 	public:
 			locksnowaitbydefault(sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
 };
 
 locksnowaitbydefault::locksnowaitbydefault(sqlrtranslations *sqlts,
-					xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+					xmldomnode *parameters,
+					bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool locksnowaitbydefault::run(sqlrconnection_svr *sqlrcon,
@@ -79,7 +81,8 @@ bool locksnowaitbydefault::run(sqlrconnection_svr *sqlrcon,
 extern "C" {
 	sqlrtranslation	*new_locksnowaitbydefault(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new locksnowaitbydefault(sqlts,parameters);
+					xmldomnode *parameters,
+					bool debug) {
+		return new locksnowaitbydefault(sqlts,parameters,debug);
 	}
 }

@@ -12,7 +12,8 @@
 class temptablessybaseize : public sqlrtranslation {
 	public:
 			temptablessybaseize(sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
@@ -28,8 +29,9 @@ class temptablessybaseize : public sqlrtranslation {
 };
 
 temptablessybaseize::temptablessybaseize(sqlrtranslations *sqlts,
-					xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+					xmldomnode *parameters,
+					bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool temptablessybaseize::run(sqlrconnection_svr *sqlrcon,
@@ -294,7 +296,8 @@ bool temptablessybaseize::replaceTempNames(xmldomnode *node) {
 extern "C" {
 	sqlrtranslation	*new_temptablessybaseize(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new temptablessybaseize(sqlts,parameters);
+					xmldomnode *parameters,
+					bool debug) {
+		return new temptablessybaseize(sqlts,parameters,debug);
 	}
 }

@@ -10,7 +10,8 @@
 class doublequotestosinglequotes : public sqlrtranslation {
 	public:
 			doublequotestosinglequotes(sqlrtranslations *sqlts,
-							xmldomnode *parameters);
+							xmldomnode *parameters,
+							bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
@@ -18,9 +19,11 @@ class doublequotestosinglequotes : public sqlrtranslation {
 		bool	replaceDoubleQuotes(xmldomnode *node);
 };
 
-doublequotestosinglequotes::doublequotestosinglequotes(sqlrtranslations *sqlts,
-					xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+doublequotestosinglequotes::doublequotestosinglequotes(
+					sqlrtranslations *sqlts,
+					xmldomnode *parameters,
+					bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool doublequotestosinglequotes::run(sqlrconnection_svr *sqlrcon,
@@ -70,7 +73,8 @@ bool doublequotestosinglequotes::replaceDoubleQuotes(xmldomnode *node) {
 extern "C" {
 	sqlrtranslation	*new_doublequotestosinglequotes(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new doublequotestosinglequotes(sqlts,parameters);
+					xmldomnode *parameters,
+					bool debug) {
+		return new doublequotestosinglequotes(sqlts,parameters,debug);
 	}
 }

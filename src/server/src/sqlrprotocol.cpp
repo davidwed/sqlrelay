@@ -4,11 +4,9 @@
 #include <sqlrelay/sqlrprotocol.h>
 
 sqlrprotocol::sqlrprotocol(sqlrcontroller_svr *cont,
-				sqlrconnection_svr *conn,
-				sqlrconfigfile *cfgfl) {
+				sqlrconnection_svr *conn) {
 	this->cont=cont;
 	this->conn=conn;
-	this->cfgfl=cfgfl;
 	this->clientsock=NULL;
 }
 

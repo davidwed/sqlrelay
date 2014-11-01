@@ -32,8 +32,7 @@ class sqlrconfigfile;
 class SQLRSERVER_DLLSPEC sqlrprotocol {
 	public:
 			sqlrprotocol(sqlrcontroller_svr *cont,
-					sqlrconnection_svr *conn,
-					sqlrconfigfile *cfgfl);
+					sqlrconnection_svr *conn);
 		virtual	~sqlrprotocol();
 
 		void	setClientSocket(filedescriptor *clientsock);
@@ -44,7 +43,6 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 	protected:
 		sqlrcontroller_svr	*cont;
 		sqlrconnection_svr	*conn;
-		sqlrconfigfile		*cfgfl;
 		filedescriptor		*clientsock;
 };
 

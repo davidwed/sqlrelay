@@ -85,7 +85,7 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 						uint32_t length);
 
 		void	setUserAndGroup();
-		bool	initCursors(int32_t count);
+		bool	initCursors(uint16_t count);
 		void	incrementConnectionCount();
 		void	decrementConnectionCount();
 		void	decrementConnectedClientCount();
@@ -289,10 +289,57 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 
 		static void	alarmHandler(int32_t signum);
 
+		const char	*getDbHostName();
+		const char	*getDbIpAddress();
+
+		char		*getClientInfoBuffer();
+		uint64_t	getClientInfoLength();
+		void		setClientInfoLength(uint64_t clientinfolen);
+
+		uint16_t	getCursorCount();
+
+		memorypool	*getBindMappingsPool();
+
+	public:
+		bool		dbselected;
+
+		uint16_t	sendcolumninfo;
+
+		bool		commitorrollback;
+
+		filedescriptor	*clientsock;
+
+		sqlrconnection_svr	*conn;
+
+		sqlrprotocol			*sqlrp[SQLRPROTOCOLCOUNT];
+		sqlparser			*sqlp;
+		sqlrtranslations		*sqlrt;
+		sqlrresultsettranslations	*sqlrrst;
+		sqlwriter			*sqlw;
+		sqlrtriggers			*sqlrtr;
+		sqlrloggers			*sqlrlg;
+		sqlrqueries			*sqlrq;
+		sqlrpwdencs			*sqlrpe;
+		sqlrauths			*sqlra;
+
+		semaphoreset	*semset;
+		sharedmemory	*idmemory;
+		cmdline		*cmdl;
+		sqlrconfigfile	*cfgfl;
+
+		singlylinkedlist< char * >	sessiontemptablesfordrop;
+		singlylinkedlist< char * >	sessiontemptablesfortrunc;
+		singlylinkedlist< char * >	transtemptablesfordrop;
+		singlylinkedlist< char * >	transtemptablesfortrunc;
+
+		shmdata			*shm;
+		sqlrconnstatistics	*connstats;
+
+	private:
+
 		const char	*user;
 		const char	*password;
 
-		bool		dbselected;
 		char		*originaldb;
 
 		tempdir		*tmpdir;
@@ -306,8 +353,6 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		char		*unixsocketptr;
 		size_t		unixsocketptrlen;
 
-		uint16_t	sendcolumninfo;
-
 		uint32_t	usercount;
 		char		**users;
 		char		**passwords;
@@ -316,8 +361,6 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		char		lastuserbuffer[USERSIZE];
 		char		lastpasswordbuffer[USERSIZE];
 		bool		lastauthsuccess;
-
-		bool		commitorrollback;
 
 		bool		autocommitforthissession;
 
@@ -337,8 +380,6 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		uint64_t		serversockincount;
 		unixsocketserver	*serversockun;
 
-		filedescriptor	*clientsock;
-
 		memorypool	*bindmappingspool;
 		namevaluepairs	*inbindmappings;
 		namevaluepairs	*outbindmappings;
@@ -348,23 +389,11 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		bool		debugbindtranslation;
 
 		dynamiclib		dl;
-		sqlrconnection_svr	*conn;
 
 		uint16_t	cursorcount;
 		uint16_t	mincursorcount;
 		uint16_t	maxcursorcount;
 		sqlrcursor_svr	**cur;
-
-		sqlrprotocol			*sqlrp[SQLRPROTOCOLCOUNT];
-		sqlparser			*sqlp;
-		sqlrtranslations		*sqlrt;
-		sqlrresultsettranslations	*sqlrrst;
-		sqlwriter			*sqlw;
-		sqlrtriggers			*sqlrtr;
-		sqlrloggers			*sqlrlg;
-		sqlrqueries			*sqlrq;
-		sqlrpwdencs			*sqlrpe;
-		sqlrauths			*sqlra;
 
 		char		*decrypteddbpassword;
 
@@ -386,21 +415,8 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 
 		bool		fakeinputbinds;
 
-		semaphoreset	*semset;
-		sharedmemory	*idmemory;
-		cmdline		*cmdl;
-		sqlrconfigfile	*cfgfl;
-
-		shmdata			*shm;
-		sqlrconnstatistics	*connstats;
-
 		char		*clientinfo;
 		uint64_t	clientinfolen;
-
-		singlylinkedlist< char * >	sessiontemptablesfordrop;
-		singlylinkedlist< char * >	sessiontemptablesfortrunc;
-		singlylinkedlist< char * >	transtemptablesfordrop;
-		singlylinkedlist< char * >	transtemptablesfortrunc;
 
 		int32_t		idleclienttimeout;
 

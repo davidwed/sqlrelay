@@ -333,6 +333,8 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 		uint64_t	queryendsec;
 		uint64_t	queryendusec;
 
+		uint32_t	maxerrorlength;
+
 		char		*error;
 		uint32_t	errorlength;
 		int64_t		errnum;

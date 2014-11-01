@@ -22,7 +22,7 @@ class SQLRSERVER_DLLSPEC sqlrtriggerplugin {
 
 class SQLRSERVER_DLLSPEC sqlrtriggers {
 	public:
-			sqlrtriggers();
+			sqlrtriggers(bool debug);
 			~sqlrtriggers();
 
 		bool	loadTriggers(const char *triggers);
@@ -47,6 +47,7 @@ class SQLRSERVER_DLLSPEC sqlrtriggers {
 					bool success);
 
 		xmldom					*xmld;
+		bool					debug;
 		singlylinkedlist< sqlrtriggerplugin * >	beforetriggers;
 		singlylinkedlist< sqlrtriggerplugin * >	aftertriggers;
 };

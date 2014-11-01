@@ -10,7 +10,8 @@
 
 class createtableautoincrementoracle : public sqlrtrigger {
 	public:
-			createtableautoincrementoracle(xmldomnode *parameters);
+			createtableautoincrementoracle(
+					xmldomnode *parameters, bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree,
@@ -29,7 +30,8 @@ class createtableautoincrementoracle : public sqlrtrigger {
 };
 
 createtableautoincrementoracle::createtableautoincrementoracle(
-			xmldomnode *parameters) : sqlrtrigger(parameters) {
+					xmldomnode *parameters, bool debug) :
+					sqlrtrigger(parameters,debug) {
 }
 
 bool createtableautoincrementoracle::run(sqlrconnection_svr *sqlrcon,
@@ -226,29 +228,30 @@ bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
 							uint32_t length) {
 	debugFunction();
 
-	if (sqlrcon->cont->debugtriggers) {
+	if (debug) {
 		stdoutput.printf("running trigger:\n%s\n",query);
 	}
 
 	bool	retval=false;
 
 	sqlrcursor_svr	*cur=sqlrcon->cont->initCursor();
-	if (cur->openInternal(sqlrcon->cont->cursorcount+1) &&
+	if (cur->openInternal(sqlrcon->cont->getCursorCount()+1) &&
 		cur->prepareQuery(query,length) &&
 		sqlrcon->cont->executeQuery(cur,query,length)) {
 		// success...
 		retval=true;
-		if (sqlrcon->cont->debugtriggers) {
+		if (debug) {
 			stdoutput.printf("success\n");
 		}
 	} else {
 		// error...
-		if (sqlrcon->cont->debugtriggers) {
+		if (debug) {
 			uint32_t	errorlength;
 			int64_t		errnum;
 			bool		liveconnection;
 			cur->errorMessage(cur->getErrorBuffer(),
-						sqlrcon->cont->maxerrorlength,
+						sqlrcon->cont->cfgfl->
+							getMaxErrorLength(),
 						&errorlength,
 						&errnum,
 						&liveconnection);
@@ -258,7 +261,7 @@ bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
 			stdoutput.printf("error:\n%s\n",cur->getErrorBuffer());
 		}
 	}
-	if (sqlrcon->cont->debugtriggers) {
+	if (debug) {
 		stdoutput.printf("\n");
 	}
 	cur->cleanUpData();
@@ -269,7 +272,7 @@ bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
 
 extern "C" {
 	sqlrtrigger	*new_createtableautoincrementoracle(
-					xmldomnode *parameters) {
-		return new createtableautoincrementoracle(parameters);
+					xmldomnode *parameters, bool debug) {
+		return new createtableautoincrementoracle(parameters,debug);
 	}
 }

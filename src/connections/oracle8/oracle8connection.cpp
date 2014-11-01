@@ -356,6 +356,7 @@ class DLLSPEC oracle8cursor : public sqlrcursor_svr {
 		ub2		**def_col_retlen;
 		ub2		**def_col_retcode;
 
+		uint16_t	maxbindcount;
 		OCIBind		**inbindpp;
 		OCIBind		**outbindpp;
 		OCIBind		**curbindpp;
@@ -526,10 +527,9 @@ void oracle8connection::handleConnectString() {
 		lastinsertidquery=liiquery.detachString();
 	}
 
-	cont->fakeinputbinds=
+	cont->setFakeInputBinds(
 		!charstring::compare(
-			cont->connectStringValue("fakebinds"),
-			"yes");
+			cont->connectStringValue("fakebinds"),"yes"));
 }
 
 #ifdef HAVE_ORACLE_8i
@@ -1878,23 +1878,24 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 					oracle8conn->maxselectlistsize,
 					oracle8conn->maxitembuffersize);
 
-	inbindpp=new OCIBind *[conn->cont->maxbindcount];
-	outbindpp=new OCIBind *[conn->cont->maxbindcount];
-	curbindpp=new OCIBind *[conn->cont->maxbindcount];
-	inintbindstring=new char *[conn->cont->maxbindcount];
-	indatebind=new OCIDate *[conn->cont->maxbindcount];
-	outintbindstring=new char *[conn->cont->maxbindcount];
-	outdatebind=new datebind *[conn->cont->maxbindcount];
-	outintbind=new int64_t *[conn->cont->maxbindcount];
-	bindvarname=new const char *[conn->cont->maxbindcount];
-	boundbypos=new bool[conn->cont->maxbindcount];
-	bvnp=new text *[conn->cont->maxbindcount];
-	invp=new text *[conn->cont->maxbindcount];
-	inpl=new ub1[conn->cont->maxbindcount];
-	dupl=new ub1[conn->cont->maxbindcount];
-	bvnl=new ub1[conn->cont->maxbindcount];
-	hndl=new OCIBind *[conn->cont->maxbindcount];
-	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
+	maxbindcount=conn->cont->cfgfl->getMaxBindCount();
+	inbindpp=new OCIBind *[maxbindcount];
+	outbindpp=new OCIBind *[maxbindcount];
+	curbindpp=new OCIBind *[maxbindcount];
+	inintbindstring=new char *[maxbindcount];
+	indatebind=new OCIDate *[maxbindcount];
+	outintbindstring=new char *[maxbindcount];
+	outdatebind=new datebind *[maxbindcount];
+	outintbind=new int64_t *[maxbindcount];
+	bindvarname=new const char *[maxbindcount];
+	boundbypos=new bool[maxbindcount];
+	bvnp=new text *[maxbindcount];
+	invp=new text *[maxbindcount];
+	inpl=new ub1[maxbindcount];
+	dupl=new ub1[maxbindcount];
+	bvnl=new ub1[maxbindcount];
+	hndl=new OCIBind *[maxbindcount];
+	for (uint16_t i=0; i<maxbindcount; i++) {
 		inbindpp[i]=NULL;
 		outbindpp[i]=NULL;
 		curbindpp[i]=NULL;
@@ -1912,9 +1913,9 @@ oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	bindvarcount=0;
 
 #ifdef HAVE_ORACLE_8i
-	inbind_lob=new OCILobLocator *[conn->cont->maxbindcount];
-	outbind_lob=new OCILobLocator *[conn->cont->maxbindcount];
-	for (uint16_t i=0; i<conn->cont->maxbindcount; i++) {
+	inbind_lob=new OCILobLocator *[maxbindcount];
+	outbind_lob=new OCILobLocator *[maxbindcount];
+	for (uint16_t i=0; i<maxbindcount; i++) {
 		inbind_lob[i]=NULL;
 		outbind_lob[i]=NULL;
 	}
@@ -3220,8 +3221,7 @@ bool oracle8cursor::validBinds() {
 
 	// get the bind info from the query
 	sb4	found;
-	sword	ret=OCIStmtGetBindInfo(stmt,oracle8conn->err,
-					conn->cont->maxbindcount,
+	sword	ret=OCIStmtGetBindInfo(stmt,oracle8conn->err,maxbindcount,
 					1,&found,bvnp,bvnl,invp,inpl,dupl,hndl);
 
 	// there were no bind variables

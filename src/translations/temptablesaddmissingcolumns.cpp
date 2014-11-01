@@ -12,7 +12,8 @@ class temptablesaddmissingcolumns : public sqlrtranslation {
 	public:
 			temptablesaddmissingcolumns(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters);
+					xmldomnode *parameters,
+					bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
@@ -20,8 +21,9 @@ class temptablesaddmissingcolumns : public sqlrtranslation {
 
 temptablesaddmissingcolumns::temptablesaddmissingcolumns(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+					xmldomnode *parameters,
+					bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool temptablesaddmissingcolumns::run(sqlrconnection_svr *sqlrcon,
@@ -105,7 +107,8 @@ bool temptablesaddmissingcolumns::run(sqlrconnection_svr *sqlrcon,
 extern "C" {
 	sqlrtranslation	*new_temptablesaddmissingcolumns(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new temptablesaddmissingcolumns(sqlts,parameters);
+					xmldomnode *parameters,
+					bool debug) {
+		return new temptablesaddmissingcolumns(sqlts,parameters,debug);
 	}
 }

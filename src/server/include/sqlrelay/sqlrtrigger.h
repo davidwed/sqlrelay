@@ -14,7 +14,7 @@ class sqlrcursor_svr;
 
 class SQLRSERVER_DLLSPEC sqlrtrigger {
 	public:
-			sqlrtrigger(xmldomnode *parameters);
+			sqlrtrigger(xmldomnode *parameters, bool debug);
 		virtual	~sqlrtrigger();
 
 		virtual bool	run(sqlrconnection_svr *sqlrcon,
@@ -24,6 +24,7 @@ class SQLRSERVER_DLLSPEC sqlrtrigger {
 					bool success);
 	protected:
 		xmldomnode	*parameters;
+		bool		debug;
 };
 
 #endif

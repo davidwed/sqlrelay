@@ -33,7 +33,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslationplugin {
 
 class SQLRSERVER_DLLSPEC sqlrtranslations {
 	public:
-			sqlrtranslations();
+			sqlrtranslations(bool debug);
 			~sqlrtranslations();
 
 		bool	loadTranslations(const char *translations);
@@ -81,6 +81,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 		
 		xmldom	*xmld;
 		xmldom	*tree;
+		bool	debug;
 
 		singlylinkedlist< sqlrtranslationplugin * >	tlist;
 

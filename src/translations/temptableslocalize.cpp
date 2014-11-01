@@ -12,7 +12,8 @@
 class temptableslocalize : public sqlrtranslation {
 	public:
 			temptableslocalize(sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
@@ -34,8 +35,9 @@ class temptableslocalize : public sqlrtranslation {
 };
 
 temptableslocalize::temptableslocalize(sqlrtranslations *sqlts,
-					xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+					xmldomnode *parameters,
+					bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool temptableslocalize::run(sqlrconnection_svr *sqlrcon,
@@ -392,7 +394,8 @@ bool temptableslocalize::replaceTempNames(xmldomnode *node) {
 extern "C" {
 	sqlrtranslation	*new_temptableslocalize(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new temptableslocalize(sqlts,parameters);
+					xmldomnode *parameters,
+					bool debug) {
+		return new temptableslocalize(sqlts,parameters,debug);
 	}
 }

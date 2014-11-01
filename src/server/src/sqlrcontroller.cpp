@@ -326,14 +326,14 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	initConnStats();
 
 	// get the query translators
+	debugsqlrtranslation=cfgfl->getDebugTranslations();
 	const char	*translations=cfgfl->getTranslations();
 	if (translations && translations[0]) {
 		sqlp=new sqlparser;
-		sqlrt=new sqlrtranslations;
+		sqlrt=new sqlrtranslations(debugsqlrtranslation);
 		sqlrt->loadTranslations(translations);
 		sqlw=new sqlwriter;
 	}
-	debugsqlrtranslation=cfgfl->getDebugTranslations();
 
 	// get the result set translators
 	const char	*resultsettranslations=
@@ -344,16 +344,16 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	}
 
 	// get the triggers
+	debugtriggers=cfgfl->getDebugTriggers();
 	const char	*triggers=cfgfl->getTriggers();
 	if (triggers && triggers[0]) {
 		// for triggers, we'll need an sqlparser as well
 		if (!sqlp) {
 			sqlp=new sqlparser;
 		}
-		sqlrtr=new sqlrtriggers;
+		sqlrtr=new sqlrtriggers(debugtriggers);
 		sqlrtr->loadTriggers(triggers);
 	}
-	debugtriggers=cfgfl->getDebugTriggers();
 
 	// set autocommit behavior
 	setAutoCommit(conn->getAutoCommit());
@@ -415,7 +415,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	for (uint8_t i=0; i<SQLRPROTOCOLCOUNT; i++) {
 		sqlrp[i]=NULL;
 	}
-	sqlrp[SQLRPROTOCOL_SQLRCLIENT]=new sqlrclientprotocol(this,conn,cfgfl);
+	sqlrp[SQLRPROTOCOL_SQLRCLIENT]=new sqlrclientprotocol(this,conn);
 
 	// set a handler for SIGALRMs
 	#ifdef SIGALRM
@@ -822,7 +822,7 @@ void sqlrcontroller_svr::setAutoCommit(bool ac) {
 	logDebugMessage("done setting autocommit");
 }
 
-bool sqlrcontroller_svr::initCursors(int32_t count) {
+bool sqlrcontroller_svr::initCursors(uint16_t count) {
 
 	logDebugMessage("initializing cursors...");
 
@@ -832,7 +832,7 @@ bool sqlrcontroller_svr::initCursors(int32_t count) {
 		bytestring::zero(cur,maxcursorcount*sizeof(sqlrcursor_svr *));
 	}
 
-	for (int32_t i=0; i<cursorcount; i++) {
+	for (uint16_t i=0; i<cursorcount; i++) {
 
 		if (!cur[i]) {
 			cur[i]=initCursor();
@@ -2085,6 +2085,11 @@ bool sqlrcontroller_svr::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 			if (cursor->fakeInputBinds(&outputquery)) {
 				query=outputquery.getString();
 				querylen=outputquery.getStringLength();
+				if (debugsqlrtranslation) {
+					stdoutput.printf(
+					"after faking input binds:\n%s\n\n",
+									query);
+				}
 			}
 		}
 
@@ -2973,10 +2978,7 @@ void sqlrcontroller_svr::setFakeInputBinds(bool fake) {
 }
 
 bool sqlrcontroller_svr::sendColumnInfo() {
-	if (sendcolumninfo==SEND_COLUMN_INFO) {
-		return true;
-	}
-	return false;
+	return (sendcolumninfo==SEND_COLUMN_INFO);
 }
 
 bool sqlrcontroller_svr::skipRows(sqlrcursor_svr *cursor, uint64_t rows) {
@@ -4338,4 +4340,32 @@ void sqlrcontroller_svr::logInternalError(sqlrcursor_svr *cursor,
 
 void sqlrcontroller_svr::alarmHandler(int32_t signum) {
 	alarmrang=1;
+}
+
+const char *sqlrcontroller_svr::getDbHostName() {
+	return dbhostname;
+}
+
+const char *sqlrcontroller_svr::getDbIpAddress() {
+	return dbipaddress;
+}
+
+char *sqlrcontroller_svr::getClientInfoBuffer() {
+	return clientinfo;
+}
+
+uint64_t sqlrcontroller_svr::getClientInfoLength() {
+	return clientinfolen;
+}
+
+void sqlrcontroller_svr::setClientInfoLength(uint64_t clientinfolen) {
+	this->clientinfolen=clientinfolen;
+}
+
+uint16_t sqlrcontroller_svr::getCursorCount() {
+	return cursorcount;
+}
+
+memorypool *sqlrcontroller_svr::getBindMappingsPool() {
+	return bindmappingspool;
 }

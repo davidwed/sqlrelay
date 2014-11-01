@@ -124,6 +124,9 @@ class SQLRSERVER_DLLSPEC sqlrconnection_svr {
 		bool		autocommit;
 		bool		fakeautocommit;
 
+		uint32_t	maxquerysize;
+		uint32_t	maxerrorlength;
+
 		char		*error;
 		uint32_t	errorlength;
 		int64_t		errnum;

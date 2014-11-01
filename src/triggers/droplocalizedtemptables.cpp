@@ -11,7 +11,8 @@
 
 class droplocalizedtemptables : public sqlrtrigger {
 	public:
-			droplocalizedtemptables(xmldomnode *parameters);
+			droplocalizedtemptables(
+					xmldomnode *parameters, bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree,
@@ -23,7 +24,8 @@ class droplocalizedtemptables : public sqlrtrigger {
 };
 
 droplocalizedtemptables::droplocalizedtemptables(
-			xmldomnode *parameters) : sqlrtrigger(parameters) {
+					xmldomnode *parameters, bool debug) :
+					sqlrtrigger(parameters,debug) {
 }
 
 bool droplocalizedtemptables::run(sqlrconnection_svr *sqlrcon,
@@ -149,7 +151,8 @@ bool droplocalizedtemptables::dropIndex(sqlrtranslations *sqlrt,
 }
 
 extern "C" {
-	sqlrtrigger	*new_droplocalizedtemptables(xmldomnode *parameters) {
-		return new droplocalizedtemptables(parameters);
+	sqlrtrigger	*new_droplocalizedtemptables(
+				xmldomnode *parameters, bool debug) {
+		return new droplocalizedtemptables(parameters,debug);
 	}
 }

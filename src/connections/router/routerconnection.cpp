@@ -576,10 +576,10 @@ routercursor::routercursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	}
 	beginquery=false;
 
-	obv=new outputbindvar[conn->cont->maxbindcount];
+	obv=new outputbindvar[conn->cont->cfgfl->getMaxBindCount()];
 	obcount=0;
 
-	cbv=new cursorbindvar[conn->cont->maxbindcount];
+	cbv=new cursorbindvar[conn->cont->cfgfl->getMaxBindCount()];
 	cbcount=0;
 
 	createoratemp.compile("(create|CREATE)[ 	\\n\\r]+(global|GLOBAL)[ 	\\n\\r]+(temporary|TEMPORARY)[ 	\\n\\r]+(table|TABLE)[ 	\\n\\r]+");

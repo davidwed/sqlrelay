@@ -327,9 +327,9 @@ void firebirdconnection::handleConnectString() {
 		lastinsertidquery=liiquery.detachString();
 	}
 
-	cont->fakeinputbinds=
+	cont->setFakeInputBinds(
 		!charstring::compare(
-			cont->connectStringValue("fakebinds"),"yes");
+			cont->connectStringValue("fakebinds"),"yes"));
 }
 
 bool firebirdconnection::logIn(const char **err) {

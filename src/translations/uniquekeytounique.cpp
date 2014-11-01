@@ -10,7 +10,8 @@
 class uniquekeytounique : public sqlrtranslation {
 	public:
 			uniquekeytounique(sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
@@ -19,8 +20,9 @@ class uniquekeytounique : public sqlrtranslation {
 };
 
 uniquekeytounique::uniquekeytounique(sqlrtranslations *sqlts,
-						xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+						xmldomnode *parameters,
+						bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool uniquekeytounique::run(sqlrconnection_svr *sqlrcon,
@@ -55,7 +57,8 @@ void uniquekeytounique::replaceUniqueKey(xmldomnode *node) {
 
 extern "C" {
 	sqlrtranslation	*new_uniquekeytounique(sqlrtranslations *sqlts,
-						xmldomnode *parameters) {
-		return new uniquekeytounique(sqlts,parameters);
+						xmldomnode *parameters,
+						bool debug) {
+		return new uniquekeytounique(sqlts,parameters,debug);
 	}
 }

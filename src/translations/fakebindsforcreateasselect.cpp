@@ -11,7 +11,8 @@ class fakebindsforcreateasselect : public sqlrtranslation {
 	public:
 			fakebindsforcreateasselect(
 						sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 						sqlrcursor_svr *sqlrcur,
 						xmldom *querytree);
@@ -19,8 +20,9 @@ class fakebindsforcreateasselect : public sqlrtranslation {
 
 fakebindsforcreateasselect::fakebindsforcreateasselect(
 						sqlrtranslations *sqlts,
-						xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+						xmldomnode *parameters,
+						bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool fakebindsforcreateasselect::run(sqlrconnection_svr *sqlrcon,
@@ -34,7 +36,6 @@ bool fakebindsforcreateasselect::run(sqlrconnection_svr *sqlrcon,
 				getFirstTagChild(sqlparser::_as)->
 				getNextTagSibling(sqlparser::_select)->
 				isNullNode()) {
-stdoutput.printf("faking input binds!!!\n");
 		sqlrcur->setFakeInputBindsForThisQuery(true);
 	}
 	return true;
@@ -43,7 +44,8 @@ stdoutput.printf("faking input binds!!!\n");
 extern "C" {
 	sqlrtranslation	*new_fakebindsforcreateasselect(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new fakebindsforcreateasselect(sqlts,parameters);
+					xmldomnode *parameters,
+					bool debug) {
+		return new fakebindsforcreateasselect(sqlts,parameters,debug);
 	}
 }

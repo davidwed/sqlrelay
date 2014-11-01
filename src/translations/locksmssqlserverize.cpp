@@ -10,15 +10,17 @@
 class locksmssqlserverize : public sqlrtranslation {
 	public:
 			locksmssqlserverize(sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						bool debug);
 		bool	run(sqlrconnection_svr *sqlrcon,
 					sqlrcursor_svr *sqlrcur,
 					xmldom *querytree);
 };
 
 locksmssqlserverize::locksmssqlserverize(sqlrtranslations *sqlts,
-					xmldomnode *parameters) :
-					sqlrtranslation(sqlts,parameters) {
+					xmldomnode *parameters,
+					bool debug) :
+				sqlrtranslation(sqlts,parameters,debug) {
 }
 
 bool locksmssqlserverize::run(sqlrconnection_svr *sqlrcon,
@@ -118,7 +120,8 @@ bool locksmssqlserverize::run(sqlrconnection_svr *sqlrcon,
 extern "C" {
 	sqlrtranslation	*new_locksmssqlserverize(
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
-		return new locksmssqlserverize(sqlts,parameters);
+					xmldomnode *parameters,
+					bool debug) {
+		return new locksmssqlserverize(sqlts,parameters,debug);
 	}
 }
