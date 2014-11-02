@@ -6,7 +6,6 @@
 #include <sqlrelay/sqlrconnection.h>
 #include <sqlrelay/sqlrcursor.h>
 #include <sqlrelay/sqlrlogger.h>
-#include <cmdline.h>
 #include <rudiments/process.h>
 #include <rudiments/charstring.h>
 #include <rudiments/file.h>
@@ -56,28 +55,16 @@ bool slowqueries::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 	// get the pid
 	pid_t	pid=process::getProcessId();
 
-	cmdline	*cmdl=sqlrcon->cont->cmdl;
-
 	// build up the query log name
-	size_t	querylognamelen;
+	size_t	querylognamelen=
+			charstring::length(sqlrcon->cont->getLogDir())+17+
+			charstring::length(sqlrcon->cont->getId())+10+20+1;
 	delete[] querylogname;
-	if (charstring::length(cmdl->getLocalStateDir())) {
-		querylognamelen=charstring::length(cmdl->getLocalStateDir())+30+
-				charstring::length(cmdl->getId())+10+20+1;
-		querylogname=new char[querylognamelen];
-		charstring::printf(querylogname,querylognamelen,
-					"%s/sqlrelay/log/sqlr-connection-%s"
-					"-querylog.%ld",
-					cmdl->getLocalStateDir(),
-					cmdl->getId(),(long)pid);
-	} else {
-		querylognamelen=charstring::length(LOG_DIR)+17+
-				charstring::length(cmdl->getId())+10+20+1;
-		querylogname=new char[querylognamelen];
-		charstring::printf(querylogname,querylognamelen,
-					"%s/sqlr-connection-%s-querylog.%ld",
-					LOG_DIR,cmdl->getId(),(long)pid);
-	}
+	querylogname=new char[querylognamelen];
+	charstring::printf(querylogname,querylognamelen,
+				"%s/sqlr-connection-%s-querylog.%ld",
+				sqlrcon->cont->getLogDir(),
+				sqlrcon->cont->getId(),(long)pid);
 
 	// remove any old log file
 	file::remove(querylogname);

@@ -36,6 +36,10 @@ class SQLRSERVER_DLLSPEC sqlrlistener : public listener {
 			~sqlrlistener();
 		bool	initListener(int argc, const char **argv);
 		void	listen();
+
+		const char	*getId();
+		const char	*getLogDir();
+		const char	*getDebugDir();
 	private:
 		void	cleanUp();
 		void	setUserAndGroup();
@@ -116,7 +120,7 @@ class SQLRSERVER_DLLSPEC sqlrlistener : public listener {
 
 		static void	alarmHandler(int32_t signum);
 
-	public:
+	private:
 		uint32_t	maxconnections;
 		bool		dynamicscaling;
 
@@ -126,7 +130,10 @@ class SQLRSERVER_DLLSPEC sqlrlistener : public listener {
 		char		*pidfile;
 		tempdir		*tmpdir;
 
-		sqlrloggers		*sqlrlg;
+		char		*logdir;
+		char		*debugdir;
+
+		sqlrloggers	*sqlrlg;
 
 		stringbuffer	debugstr;
 

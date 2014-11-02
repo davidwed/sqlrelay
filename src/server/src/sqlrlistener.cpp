@@ -44,6 +44,9 @@ sqlrlistener::sqlrlistener() : listener() {
 	pidfile=NULL;
 	tmpdir=NULL;
 
+	logdir=NULL;
+	debugdir=NULL;
+
 	clientsockin=NULL;
 	clientsockincount=0;
 	clientsockun=NULL;
@@ -113,6 +116,9 @@ sqlrlistener::~sqlrlistener() {
 		delete[] updown;
 	}
 	delete tmpdir;
+
+	delete[] logdir;
+	delete[] debugdir;
 }
 
 void sqlrlistener::cleanUp() {
@@ -163,6 +169,23 @@ bool sqlrlistener::initListener(int argc, const char **argv) {
 	cmdl=new cmdline(argc,argv);
 
 	tmpdir=new tempdir(cmdl);
+
+	const char	*localstatedir=cmdl->getLocalStateDir();
+	if (localstatedir && localstatedir[0]) {
+
+		size_t	dirlen=charstring::length(localstatedir)+14+1;
+		logdir=new char[dirlen];
+		charstring::printf(logdir,dirlen,
+					"%s/sqlrelay/log/",localstatedir);
+
+		dirlen=charstring::length(localstatedir)+16+1;
+		debugdir=new char[dirlen];
+		charstring::printf(debugdir,dirlen,
+					"%s/sqlrelay/debug/",localstatedir);
+	} else {
+		logdir=charstring::duplicate(LOG_DIR);
+		debugdir=charstring::duplicate(DEBUG_DIR);
+	}
 
 	if (!charstring::compare(cmdl->getId(),DEFAULT_ID)) {
 		stderror.printf("Warning: using default id.\n");
@@ -2112,4 +2135,16 @@ void sqlrlistener::alarmHandler(int32_t signum) {
 	#ifdef SIGALRM
 	alarmhandler.handleSignal(SIGALRM);
 	#endif
+}
+
+const char *sqlrlistener::getId() {
+	return cmdl->getId();
+}
+
+const char *sqlrlistener::getLogDir() {
+	return logdir;
+}
+
+const char *sqlrlistener::getDebugDir() {
+	return debugdir;
 }

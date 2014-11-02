@@ -5,7 +5,6 @@
 #include <sqlrelay/sqlrcontroller.h>
 #include <sqlrelay/sqlrconnection.h>
 #include <sqlrelay/sqlrlogger.h>
-#include <cmdline.h>
 #include <rudiments/charstring.h>
 #include <rudiments/permissions.h>
 #include <rudiments/logger.h>
@@ -74,26 +73,14 @@ bool debug::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 
 	// set the debug file name
 	name=(sqlrl)?"listener":"connection";
-	cmdline		*cmdl=(sqlrcon)?sqlrcon->cont->cmdl:sqlrl->cmdl;
-	const char	*localstatedir=cmdl->getLocalStateDir();
-	size_t	dbgfilenamelen;
-	if (localstatedir[0]) {
-		dbgfilenamelen=charstring::length(localstatedir)+
-					16+5+charstring::length(name)+20+1;
-		dbgfilename=new char[dbgfilenamelen];
-		charstring::printf(dbgfilename,dbgfilenamelen,
-					"%s/sqlrelay/debug/sqlr-%s.%ld",
-						localstatedir,name,
-						(long)process::getProcessId());
-	} else {
-		dbgfilenamelen=charstring::length(DEBUG_DIR)+5+
-					charstring::length(name)+20+1;
-		dbgfilename=new char[dbgfilenamelen];
-		charstring::printf(dbgfilename,dbgfilenamelen,
-					"%s/sqlr-%s.%ld",DEBUG_DIR,name,
-						(long)process::getProcessId());
-	}
-
+	const char	*debugdir=(sqlrcon)?sqlrcon->cont->getDebugDir():
+							sqlrl->getDebugDir();
+	size_t	dbgfilenamelen=charstring::length(debugdir)+6+
+					charstring::length(name)+1+20+1;
+	dbgfilename=new char[dbgfilenamelen];
+	charstring::printf(dbgfilename,dbgfilenamelen,
+				"%s/sqlr-%s.%ld",debugdir,name,
+					(long)process::getProcessId());
 	return true;
 }
 

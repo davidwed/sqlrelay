@@ -172,6 +172,7 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 						uint16_t bindindex);
 		void	translateBindVariablesFromMappings(
 						sqlrcursor_svr *cursor);
+		void	setNeedCommitOrRollback(bool needcommitorrollback);
 		void	commitOrRollback(sqlrcursor_svr *cursor);
 		void	returnResultSet();
 		void	returnOutputBindValues(sqlrcursor_svr *cursor);
@@ -220,9 +221,6 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		void	sessionStartQueries();
 		void	sessionEndQueries();
 		void	sessionQuery(const char *query);
-
-		bool	initQueryLog();
-		bool	writeQueryLog(sqlrcursor_svr *cursor);
 
 		void	initConnStats();
 		void	clearConnStats();
@@ -292,22 +290,49 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		const char	*getDbHostName();
 		const char	*getDbIpAddress();
 
+		bool		getDbSelected();
+		void		setDbSelected(bool dbselected);
+
 		char		*getClientInfoBuffer();
 		uint64_t	getClientInfoLength();
 		void		setClientInfoLength(uint64_t clientinfolen);
+
+		uint16_t	getSendColumnInfo();
+		void		setSendColumnInfo(uint16_t sendcolumninfo);
 
 		uint16_t	getCursorCount();
 
 		memorypool	*getBindMappingsPool();
 
+		filedescriptor	*getClientSocket();
+
+		bool		loggingEnabled();
+
+		const char	*translateTableName(const char *table);
+		bool		removeReplacementTable(const char *database,
+							const char *schema,
+							const char *table);
+		bool		removeReplacementIndex(const char *database,
+							const char *schema,
+							const char *table);
+
+		const char	*getId();
+		const char	*getLogDir();
+		const char	*getDebugDir();
+
 	public:
-		bool		dbselected;
+		sqlrconfigfile	*cfgfl;
 
-		uint16_t	sendcolumninfo;
+		shmdata			*shm;
+		sqlrconnstatistics	*connstats;
 
-		bool		commitorrollback;
+	protected:
+		cmdline		*cmdl;
 
-		filedescriptor	*clientsock;
+		semaphoreset	*semset;
+		sharedmemory	*idmemory;
+
+	private:
 
 		sqlrconnection_svr	*conn;
 
@@ -322,24 +347,12 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		sqlrpwdencs			*sqlrpe;
 		sqlrauths			*sqlra;
 
-		semaphoreset	*semset;
-		sharedmemory	*idmemory;
-		cmdline		*cmdl;
-		sqlrconfigfile	*cfgfl;
-
-		singlylinkedlist< char * >	sessiontemptablesfordrop;
-		singlylinkedlist< char * >	sessiontemptablesfortrunc;
-		singlylinkedlist< char * >	transtemptablesfordrop;
-		singlylinkedlist< char * >	transtemptablesfortrunc;
-
-		shmdata			*shm;
-		sqlrconnstatistics	*connstats;
-
-	private:
+		filedescriptor	*clientsock;
 
 		const char	*user;
 		const char	*password;
 
+		bool		dbselected;
 		char		*originaldb;
 
 		tempdir		*tmpdir;
@@ -369,9 +382,13 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		bool		faketransactionblocksautocommiton;
 		bool		intransactionblock;
 
+		bool		needcommitorrollback;
+
 		bool		translatebinds;
 
 		const char	*isolationlevel;
+
+		uint16_t	sendcolumninfo;
 
 		int32_t		accepttimeout;
 		bool		suspendedsession;
@@ -423,6 +440,9 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		bool		decrementonclose;
 		bool		silent;
 
+		char		*logdir;
+
+		char		*debugdir;
 		stringbuffer	debugstr;
 
 		uint64_t	maxclientinfolength;
@@ -442,6 +462,11 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 
 		static	signalhandler		alarmhandler;
 		static	volatile sig_atomic_t	alarmrang;
+
+		singlylinkedlist< char * >	sessiontemptablesfordrop;
+		singlylinkedlist< char * >	sessiontemptablesfortrunc;
+		singlylinkedlist< char * >	transtemptablesfordrop;
+		singlylinkedlist< char * >	transtemptablesfortrunc;
 };
 
 #endif

@@ -19,8 +19,8 @@ class droplocalizedtemptables : public sqlrtrigger {
 					bool before,
 					bool success);
 	private:
-		bool	dropTable(sqlrtranslations *sqlrt, xmldom *querytree);
-		bool	dropIndex(sqlrtranslations *sqlrt, xmldom *querytree);
+		bool	dropTable(sqlrcontroller_svr *cont, xmldom *querytree);
+		bool	dropIndex(sqlrcontroller_svr *cont, xmldom *querytree);
 };
 
 droplocalizedtemptables::droplocalizedtemptables(
@@ -35,6 +35,10 @@ bool droplocalizedtemptables::run(sqlrconnection_svr *sqlrcon,
 					bool success) {
 	debugFunction();
 
+	if (!querytree) {
+		return false;
+	}
+
 	// this trigger must be run after a query succeeds
 	if (before) {
 		return false;
@@ -43,17 +47,12 @@ bool droplocalizedtemptables::run(sqlrconnection_svr *sqlrcon,
 		return false;
 	}
 
-	// sqlrtranslations must exist too
-	sqlrtranslations	*sqlrt=sqlrcon->cont->sqlrt;
-	if (!sqlrt) {
-		return false;
-	}
-
-	return dropTable(sqlrt,querytree) || dropIndex(sqlrt,querytree);
+	return dropTable(sqlrcon->cont,querytree) ||
+			dropIndex(sqlrcon->cont,querytree);
 }
 
-bool droplocalizedtemptables::dropTable(sqlrtranslations *sqlrt,
-							xmldom *querytree) {
+bool droplocalizedtemptables::dropTable(sqlrcontroller_svr *cont,
+						xmldom *querytree) {
 	debugFunction();
 
 	// drop...
@@ -107,13 +106,13 @@ bool droplocalizedtemptables::dropTable(sqlrtranslations *sqlrt,
 		}
 
 		// unmap the table (and any indices that depend on it)
-		sqlrt->removeReplacementTable(database,schema,table);
+		cont->removeReplacementTable(database,schema,table);
 	}
 	return true;
 }
 
-bool droplocalizedtemptables::dropIndex(sqlrtranslations *sqlrt,
-							xmldom *querytree) {
+bool droplocalizedtemptables::dropIndex(sqlrcontroller_svr *cont,
+						xmldom *querytree) {
 	debugFunction();
 
 	// drop...
@@ -146,7 +145,7 @@ bool droplocalizedtemptables::dropIndex(sqlrtranslations *sqlrt,
 	}
 
 	// unmap the index
-	sqlrt->removeReplacementIndex(database,schema,index);
+	cont->removeReplacementIndex(database,schema,index);
 	return true;
 }
 

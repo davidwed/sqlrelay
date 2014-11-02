@@ -5,7 +5,6 @@
 #include <sqlrelay/sqlrcontroller.h>
 #include <sqlrelay/sqlrconnection.h>
 #include <sqlrelay/sqlrlogger.h>
-#include <cmdline.h>
 #include <rudiments/charstring.h>
 #include <rudiments/file.h>
 #include <rudiments/permissions.h>
@@ -27,7 +26,6 @@ class custom_sc : public sqlrlogger {
 	private:
 		file	querylog;
 		char	*querylogname;
-		stringbuffer		defaultquerylogpath;
 		sqlrlogger_loglevel_t	loglevel;
 		stringbuffer		logbuffer;
 };
@@ -57,14 +55,7 @@ bool custom_sc::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 	// get log path and name
 	const char	*path=parameters->getAttributeValue("path");
 	if (!charstring::length(path)) {
-		cmdline	*cmdl=(sqlrcon)?sqlrcon->cont->cmdl:sqlrl->cmdl;
-		defaultquerylogpath.clear();
-		const char	*logdir=LOG_DIR;
-		if (charstring::length(cmdl->getLocalStateDir())) {
-			logdir=cmdl->getLocalStateDir();
-		}
-		defaultquerylogpath.append(logdir)->append("/sqlrelay/log");
-		path=defaultquerylogpath.getString();
+		path=(sqlrcon)?sqlrcon->cont->getLogDir():sqlrl->getLogDir();
 	}
 	const char	*name=parameters->getAttributeValue("name");
 	if (!charstring::length(name)) {

@@ -177,8 +177,7 @@ bool sqlrcmdgstatcursor::executeQuery(const char *query, uint32_t length) {
 	setGSResult("sqlrcmd_15",sqlrcmd_15/15,rowcount++);
 	setGSResult("max_listener",gs->max_listeners,rowcount++);
 	setGSResult("max_listener_error",gs->max_listeners_errors,rowcount++);
-	setGSResult("busy_listener",
-			conn->cont->semset->getValue(10),rowcount++);
+	setGSResult("busy_listener",gs->forked_listeners,rowcount++);
 	setGSResult("peak_listener",gs->peak_listeners,rowcount++);
 	setGSResult("connection",conn->cont->shm->totalconnections,rowcount++);
 	setGSResult("session",connectedclients,rowcount++);

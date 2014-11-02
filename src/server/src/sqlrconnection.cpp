@@ -112,7 +112,7 @@ bool sqlrconnection_svr::begin() {
 
 	// we will need to commit or rollback at the end of the session now
 	if (retval) {
-		cont->commitorrollback=true;
+		cont->setNeedCommitOrRollback(true);
 	}
 
 	return retval;
@@ -155,7 +155,7 @@ bool sqlrconnection_svr::commit() {
 
 	// we don't need to commit or rollback at the end of the session now
 	if (retval) {
-		cont->commitorrollback=false;
+		cont->setNeedCommitOrRollback(false);
 	}
 
 	return retval;
@@ -194,7 +194,7 @@ bool sqlrconnection_svr::rollback() {
 
 	// we don't need to commit or rollback at the end of the session now
 	if (retval) {
-		cont->commitorrollback=false;
+		cont->setNeedCommitOrRollback(false);
 	}
 
 	return retval;
@@ -243,7 +243,7 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 
 		// set a flag indicating that the db has been changed
 		// so it can be reset at the end of the session
-		cont->dbselected=true;
+		cont->setDbSelected(true);
 	} else {
 		// If there was an error, copy it out.  We'l be destroying the
 		// cursor in a moment and the error will be lost otherwise.

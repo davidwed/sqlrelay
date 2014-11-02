@@ -51,6 +51,9 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 
 	tmpdir=NULL;
 
+	logdir=NULL;
+	debugdir=NULL;
+
 	unixsocket=NULL;
 	unixsocketptr=NULL;
 	unixsocketptrlen=0;
@@ -69,7 +72,7 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 	lastpasswordbuffer[0]='\0';
 	lastauthsuccess=false;
 
-	commitorrollback=false;
+	needcommitorrollback=false;
 
 	autocommitforthissession=false;
 
@@ -152,6 +155,9 @@ sqlrcontroller_svr::~sqlrcontroller_svr() {
 
 	delete[] originaldb;
 
+	delete[] logdir;
+	delete[] debugdir;
+
 	delete tmpdir;
 
 	for (uint32_t i=0; i<usercount; i++) {
@@ -207,6 +213,24 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 
 	// set the tmpdir
 	tmpdir=new tempdir(cmdl);
+
+	// set the log and debug dirs
+	const char	*localstatedir=cmdl->getLocalStateDir();
+	if (localstatedir && localstatedir[0]) {
+
+		size_t	dirlen=charstring::length(localstatedir)+14+1;
+		logdir=new char[dirlen];
+		charstring::printf(logdir,dirlen,
+					"%s/sqlrelay/log/",localstatedir);
+
+		dirlen=charstring::length(localstatedir)+16+1;
+		debugdir=new char[dirlen];
+		charstring::printf(debugdir,dirlen,
+					"%s/sqlrelay/debug/",localstatedir);
+	} else {
+		logdir=charstring::duplicate(LOG_DIR);
+		debugdir=charstring::duplicate(DEBUG_DIR);
+	}
 
 	// default id warning
 	if (!charstring::compare(cmdl->getId(),DEFAULT_ID)) {
@@ -1210,7 +1234,7 @@ void sqlrcontroller_svr::initSession() {
 
 	logDebugMessage("initializing session...");
 
-	commitorrollback=false;
+	needcommitorrollback=false;
 	suspendedsession=false;
 	for (int32_t i=0; i<cursorcount; i++) {
 		cur[i]->setState(SQLRCURSORSTATE_AVAILABLE);
@@ -2120,7 +2144,7 @@ bool sqlrcontroller_svr::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 	// connections.
 	// FIXME: when faking autocommit, a BEGIN on a db that supports them
 	// could cause commit to be called immediately
-	if (success && conn->isTransactional() && commitorrollback &&
+	if (success && conn->isTransactional() && needcommitorrollback &&
 			conn->getFakeAutoCommit() && conn->getAutoCommit()) {
 		logDebugMessage("commit necessary...");
 		success=commit();
@@ -2952,6 +2976,10 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *curs,
 	return result;
 }
 
+void sqlrcontroller_svr::setNeedCommitOrRollback(bool needcommitorrollback) {
+	this->needcommitorrollback=needcommitorrollback;
+}
+
 void sqlrcontroller_svr::commitOrRollback(sqlrcursor_svr *cursor) {
 
 	logDebugMessage("commit or rollback check...");
@@ -2959,14 +2987,14 @@ void sqlrcontroller_svr::commitOrRollback(sqlrcursor_svr *cursor) {
 	// if the query was a commit or rollback, set a flag indicating so
 	if (conn->isTransactional()) {
 		// FIXME: if db has been put in the repeatable-read isolation
-		// level then commitorrollback=true needs to be set no
+		// level then needcommitorrollback=true needs to be set no
 		// matter what the query was
 		if (cursor->queryIsCommitOrRollback()) {
 			logDebugMessage("commit or rollback not needed");
-			commitorrollback=false;
+			needcommitorrollback=false;
 		} else if (cursor->queryIsNotSelect()) {
 			logDebugMessage("commit or rollback needed");
-			commitorrollback=true;
+			needcommitorrollback=true;
 		}
 	}
 
@@ -3136,7 +3164,7 @@ void sqlrcontroller_svr::endSession() {
 		rollback();
 		intransactionblock=false;
 
-	} else if (conn->isTransactional() && commitorrollback) {
+	} else if (conn->isTransactional() && needcommitorrollback) {
 
 		// otherwise, commit or rollback as necessary
 		if (cfgfl->getEndOfSessionCommit()) {
@@ -4350,6 +4378,14 @@ const char *sqlrcontroller_svr::getDbIpAddress() {
 	return dbipaddress;
 }
 
+bool sqlrcontroller_svr::getDbSelected() {
+	return dbselected;
+}
+
+void sqlrcontroller_svr::setDbSelected(bool dbselected) {
+	this->dbselected=dbselected;
+}
+
 char *sqlrcontroller_svr::getClientInfoBuffer() {
 	return clientinfo;
 }
@@ -4362,10 +4398,66 @@ void sqlrcontroller_svr::setClientInfoLength(uint64_t clientinfolen) {
 	this->clientinfolen=clientinfolen;
 }
 
+uint16_t sqlrcontroller_svr::getSendColumnInfo() {
+	return sendcolumninfo;
+}
+
+void sqlrcontroller_svr::setSendColumnInfo(uint16_t sendcolumninfo) {
+	this->sendcolumninfo=sendcolumninfo;
+}
+
 uint16_t sqlrcontroller_svr::getCursorCount() {
 	return cursorcount;
 }
 
 memorypool *sqlrcontroller_svr::getBindMappingsPool() {
 	return bindmappingspool;
+}
+
+filedescriptor *sqlrcontroller_svr::getClientSocket() {
+	return clientsock;
+}
+
+bool sqlrcontroller_svr::loggingEnabled() {
+	return (sqlrlg!=NULL);
+}
+
+const char *sqlrcontroller_svr::translateTableName(const char *table) {
+	if (sqlrt) {
+		const char	*newname=NULL;
+		if (sqlrt->getReplacementTableName(NULL,NULL,table,&newname)) {
+			return newname;
+		}
+	}
+	return NULL;
+}
+
+bool sqlrcontroller_svr::removeReplacementTable(const char *database,
+							const char *schema,
+							const char *table) {
+	if (sqlrt) {
+		return sqlrt->removeReplacementTable(database,schema,table);
+	}
+	return false;
+}
+
+bool sqlrcontroller_svr::removeReplacementIndex(const char *database,
+							const char *schema,
+							const char *table) {
+	if (sqlrt) {
+		return sqlrt->removeReplacementIndex(database,schema,table);
+	}
+	return false;
+}
+
+const char *sqlrcontroller_svr::getId() {
+	return cmdl->getId();
+}
+
+const char *sqlrcontroller_svr::getLogDir() {
+	return logdir;
+}
+
+const char *sqlrcontroller_svr::getDebugDir() {
+	return debugdir;
 }

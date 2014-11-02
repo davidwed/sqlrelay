@@ -5,7 +5,6 @@
 #include <sqlrelay/sqlrcontroller.h>
 #include <sqlrelay/sqlrconnection.h>
 #include <sqlrelay/sqlrlogger.h>
-#include <cmdline.h>
 #include <rudiments/charstring.h>
 #include <rudiments/directory.h>
 #include <rudiments/file.h>
@@ -47,51 +46,27 @@ custom_nw::~custom_nw() {
 bool custom_nw::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 	debugFunction();
 
-	cmdline	*cmdl=(sqlrcon)?sqlrcon->cont->cmdl:sqlrl->cmdl;
+	const char	*logdir=
+			(sqlrcon)?sqlrcon->cont->getLogDir():sqlrl->getLogDir();
+	const char	*id=
+			(sqlrcon)?sqlrcon->cont->getId():sqlrl->getId();
 
-	// build up the query log name
-	size_t	querylognamelen;
+	// create the directory
+	size_t	querylognamelen=charstring::length(logdir)+1+
+					charstring::length(id)+1+1;
 	delete[] querylogname;
-	if (charstring::length(cmdl->getLocalStateDir())) {
+	querylogname=new char[querylognamelen];
+	charstring::printf(querylogname,querylognamelen,"%s/%s",logdir,id);
+	directory::create(querylogname,
+			permissions::evalPermString("rwxrwxrwx"));
 
-		// create the directory
-		querylognamelen=charstring::length(cmdl->getLocalStateDir())+14+
-				charstring::length(cmdl->getId())+1+1;
-		querylogname=new char[querylognamelen];
-		charstring::printf(querylogname,querylognamelen,
-					"%s/sqlrelay/log/%s",
-					cmdl->getLocalStateDir(),cmdl->getId());
-		directory::create(querylogname,
-				permissions::evalPermString("rwxrwxrwx"));
-
-		// create the log file name
-		querylognamelen=charstring::length(cmdl->getLocalStateDir())+14+
-				charstring::length(cmdl->getId())+10+1;
-		delete[] querylogname;
-		querylogname=new char[querylognamelen];
-		charstring::printf(querylogname,querylognamelen,
-					"%s/sqlrelay/log/%s/query.log",
-					cmdl->getLocalStateDir(),cmdl->getId());
-	} else {
-
-		// create the directory
-		querylognamelen=charstring::length(LOG_DIR)+1+
-				charstring::length(cmdl->getId())+1+1;
-		querylogname=new char[querylognamelen];
-		charstring::printf(querylogname,querylognamelen,
-					"%s/%s",LOG_DIR,cmdl->getId());
-		directory::create(querylogname,
-				permissions::evalPermString("rwxrwxrwx"));
-
-		// create the log file name
-		querylognamelen=charstring::length(LOG_DIR)+1+
-				charstring::length(cmdl->getId())+10+1;
-		delete[] querylogname;
-		querylogname=new char[querylognamelen];
-		charstring::printf(querylogname,querylognamelen,
-					"%s/%s/query.log",
-					LOG_DIR,cmdl->getId());
-	}
+	// create the log file name
+	querylognamelen=charstring::length(logdir)+1+
+				charstring::length(id)+10+1;
+	delete[] querylogname;
+	querylogname=new char[querylognamelen];
+	charstring::printf(querylogname,querylognamelen,
+				"%s/%s/query.log",logdir,id);
 
 	// create the new log file
 	querylog.close();
@@ -147,9 +122,10 @@ bool custom_nw::run(sqlrlistener *sqlrl,
 	descInputBinds(sqlrcur,bindbuf,1000);
 
 	// get the client address
-	char	*clientaddrbuf=NULL;
-	if (sqlrcon->cont->clientsock) {
-		clientaddrbuf=sqlrcon->cont->clientsock->getPeerAddress();
+	char		*clientaddrbuf=NULL;
+	filedescriptor	*clientsock=sqlrcon->cont->getClientSocket();
+	if (clientsock) {
+		clientaddrbuf=clientsock->getPeerAddress();
 		if (!clientaddrbuf) {
 			clientaddrbuf=charstring::duplicate("UNIX");
 		}

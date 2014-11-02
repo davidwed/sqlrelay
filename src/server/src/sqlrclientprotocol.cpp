@@ -922,7 +922,7 @@ bool sqlrclientprotocol::getClientInfo(sqlrcursor_svr *cursor) {
 	}
 	clientinfo[clientinfolen]='\0';
 
-	if (cont->sqlrlg) {
+	if (cont->loggingEnabled()) {
 		debugstr.clear();
 		debugstr.append("clientinfolen: ")->append(clientinfolen);
 		cont->logDebugMessage(debugstr.getString());
@@ -994,7 +994,7 @@ bool sqlrclientprotocol::getQuery(sqlrcursor_svr *cursor) {
 	querybuffer[querylength]='\0';
 	cursor->setQueryLength(querylength);
 
-	if (cont->sqlrlg) {
+	if (cont->loggingEnabled()) {
 		debugstr.clear();
 		debugstr.append("querylength: ")->append(querylength);
 		cont->logDebugMessage(debugstr.getString());
@@ -1596,20 +1596,22 @@ bool sqlrclientprotocol::getSendColumnInfo() {
 
 	cont->logDebugMessage("get send column info...");
 
-	ssize_t	result=clientsock->read(&cont->sendcolumninfo,
-						idleclienttimeout,0);
+	uint16_t	sendcolumninfo;
+	ssize_t	result=clientsock->read(&sendcolumninfo,idleclienttimeout,0);
 	if (result!=sizeof(uint16_t)) {
 		cont->logClientProtocolError(NULL,
 				"get send column info failed",result);
 		return false;
 	}
 
-	if (cont->sendcolumninfo==SEND_COLUMN_INFO) {
+	if (sendcolumninfo==SEND_COLUMN_INFO) {
 		cont->logDebugMessage("send column info");
 	} else {
 		cont->logDebugMessage("don't send column info");
 	}
 	cont->logDebugMessage("done getting send column info...");
+
+	cont->setSendColumnInfo(sendcolumninfo);
 
 	return true;
 }
@@ -1646,12 +1648,13 @@ void sqlrclientprotocol::returnResultSetHeader(sqlrcursor_svr *cursor) {
 			cursor->knowsAffectedRows(),cursor->affectedRows());
 	cont->logDebugMessage("done returning row counts");
 
+	uint16_t	sendcolumninfo=cont->getSendColumnInfo();
 
 	// write a flag to the client indicating whether 
 	// or not the column information will be sent
-	clientsock->write(cont->sendcolumninfo);
+	clientsock->write(sendcolumninfo);
 
-	if (cont->sendcolumninfo==SEND_COLUMN_INFO) {
+	if (sendcolumninfo==SEND_COLUMN_INFO) {
 		cont->logDebugMessage("column info will be sent");
 	} else {
 		cont->logDebugMessage("column info will not be sent");
@@ -1664,7 +1667,7 @@ void sqlrclientprotocol::returnResultSetHeader(sqlrcursor_svr *cursor) {
 	cont->logDebugMessage("done returning column counts");
 
 
-	if (cont->sendcolumninfo==SEND_COLUMN_INFO) {
+	if (sendcolumninfo==SEND_COLUMN_INFO) {
 
 		// return the column type format
 		cont->logDebugMessage("sending column type format...");
@@ -1782,7 +1785,7 @@ void sqlrclientprotocol::sendRowCounts(bool knowsactual, uint64_t actual,
 
 void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
-	if (cont->sqlrlg) {
+	if (cont->loggingEnabled()) {
 		debugstr.clear();
 		debugstr.append("returning ");
 		debugstr.append(cursor->getOutputBindCount());
@@ -1795,7 +1798,7 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
 		bindvar_svr	*bv=&(cursor->getOutputBinds()[i]);
 
-		if (cont->sqlrlg) {
+		if (cont->loggingEnabled()) {
 			debugstr.clear();
 			debugstr.append(i);
 			debugstr.append(":");
@@ -1803,7 +1806,7 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
 		if (conn->bindValueIsNull(bv->isnull)) {
 
-			if (cont->sqlrlg) {
+			if (cont->loggingEnabled()) {
 				debugstr.append("NULL");
 			}
 
@@ -1811,7 +1814,7 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
 		} else if (bv->type==BLOB_BIND) {
 
-			if (cont->sqlrlg) {
+			if (cont->loggingEnabled()) {
 				debugstr.append("BLOB:");
 			}
 
@@ -1819,7 +1822,7 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
 		} else if (bv->type==CLOB_BIND) {
 
-			if (cont->sqlrlg) {
+			if (cont->loggingEnabled()) {
 				debugstr.append("CLOB:");
 			}
 
@@ -1827,7 +1830,7 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
 		} else if (bv->type==STRING_BIND) {
 
-			if (cont->sqlrlg) {
+			if (cont->loggingEnabled()) {
 				debugstr.append("STRING:");
 				debugstr.append(bv->value.stringval);
 			}
@@ -1840,7 +1843,7 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
 		} else if (bv->type==INTEGER_BIND) {
 
-			if (cont->sqlrlg) {
+			if (cont->loggingEnabled()) {
 				debugstr.append("INTEGER:");
 				debugstr.append(bv->value.integerval);
 			}
@@ -1850,7 +1853,7 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
 		} else if (bv->type==DOUBLE_BIND) {
 
-			if (cont->sqlrlg) {
+			if (cont->loggingEnabled()) {
 				debugstr.append("DOUBLE:");
 				debugstr.append(bv->value.doubleval.value);
 				debugstr.append("(");
@@ -1869,7 +1872,7 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
 		} else if (bv->type==DATE_BIND) {
 
-			if (cont->sqlrlg) {
+			if (cont->loggingEnabled()) {
 				debugstr.append("DATE:");
 				debugstr.append(bv->value.dateval.year);
 				debugstr.append("-");
@@ -1904,7 +1907,7 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 
 		} else if (bv->type==CURSOR_BIND) {
 
-			if (cont->sqlrlg) {
+			if (cont->loggingEnabled()) {
 				debugstr.append("CURSOR:");
 				debugstr.append(bv->value.cursorid);
 			}
@@ -1913,7 +1916,7 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 			clientsock->write(bv->value.cursorid);
 		}
 
-		if (cont->sqlrlg) {
+		if (cont->loggingEnabled()) {
 			cont->logDebugMessage(debugstr.getString());
 		}
 	}
@@ -2010,7 +2013,7 @@ void sqlrclientprotocol::sendColumnDefinition(const char *name,
 						uint16_t binary,
 						uint16_t autoincrement) {
 
-	if (cont->sqlrlg) {
+	if (cont->loggingEnabled()) {
 		debugstr.clear();
 		for (uint16_t i=0; i<namelen; i++) {
 			debugstr.append(name[i]);
@@ -2068,7 +2071,7 @@ void sqlrclientprotocol::sendColumnDefinitionString(const char *name,
 						uint16_t binary,
 						uint16_t autoincrement) {
 
-	if (cont->sqlrlg) {
+	if (cont->loggingEnabled()) {
 		debugstr.clear();
 		for (uint16_t ni=0; ni<namelen; ni++) {
 			debugstr.append(name[ni]);
@@ -2153,7 +2156,7 @@ bool sqlrclientprotocol::returnResultSetData(sqlrcursor_svr *cursor,
 	}
 
 
-	if (cont->sqlrlg) {
+	if (cont->loggingEnabled()) {
 		debugstr.clear();
 		debugstr.append("fetching ");
 		debugstr.append(fetch);
@@ -2171,13 +2174,13 @@ bool sqlrclientprotocol::returnResultSetData(sqlrcursor_svr *cursor,
 
 		cursor->incrementTotalRowsFetched();
 
-		if (cont->sqlrlg) {
+		if (cont->loggingEnabled()) {
 			debugstr.clear();
 		}
 
 		returnRow(cursor);
 
-		if (cont->sqlrlg) {
+		if (cont->loggingEnabled()) {
 			cont->logDebugMessage(debugstr.getString());
 		}
 	}
@@ -2222,7 +2225,7 @@ void sqlrclientprotocol::returnRow(sqlrcursor_svr *cursor) {
 
 void sqlrclientprotocol::sendField(const char *data, uint32_t size) {
 
-	if (cont->sqlrlg) {
+	if (cont->loggingEnabled()) {
 		debugstr.append("\"");
 		debugstr.append(data,size);
 		debugstr.append("\",");
@@ -2235,7 +2238,7 @@ void sqlrclientprotocol::sendField(const char *data, uint32_t size) {
 
 void sqlrclientprotocol::sendNullField() {
 
-	if (cont->sqlrlg) {
+	if (cont->loggingEnabled()) {
 		debugstr.append("NULL");
 	}
 	clientsock->write((uint16_t)NULL_DATA);
@@ -2308,7 +2311,7 @@ void sqlrclientprotocol::startSendingLong(uint64_t longlength) {
 
 void sqlrclientprotocol::sendLongSegment(const char *data, uint32_t size) {
 
-	if (cont->sqlrlg) {
+	if (cont->loggingEnabled()) {
 		debugstr.append(data,size);
 	}
 
@@ -2319,7 +2322,7 @@ void sqlrclientprotocol::sendLongSegment(const char *data, uint32_t size) {
 
 void sqlrclientprotocol::endSendingLong() {
 
-	if (cont->sqlrlg) {
+	if (cont->loggingEnabled()) {
 		debugstr.append(",");
 	}
 
@@ -2583,20 +2586,17 @@ bool sqlrclientprotocol::getListCommand(sqlrcursor_svr *cursor,
 		charstring::bothTrim(table);
 
 		// translate table name, if necessary
-		if (cont->sqlrt) {
-			const char	*newname=NULL;
-			if (cont->sqlrt->getReplacementTableName(
-						NULL,NULL,table,&newname)) {
-				delete[] table;
-				table=charstring::duplicate(newname);
-			}
+		const char	*newtable=cont->translateTableName(table);
+		if (newtable) {
+			delete[] table;
+			table=charstring::duplicate(newtable);
 		}
 	}
 
 	// set the values that we won't get from the client
 	cursor->setInputBindCount(0);
 	cursor->setOutputBindCount(0);
-	cont->sendcolumninfo=SEND_COLUMN_INFO;
+	cont->setSendColumnInfo(SEND_COLUMN_INFO);
 
 	// get the list and return it
 	bool	retval=true;
