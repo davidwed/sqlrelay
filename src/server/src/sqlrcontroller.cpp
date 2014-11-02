@@ -46,6 +46,11 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 
 	updown=NULL;
 
+	clientsock=NULL;
+
+	user=NULL;
+	password=NULL;
+
 	dbselected=false;
 	originaldb=NULL;
 
@@ -140,6 +145,8 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 }
 
 sqlrcontroller_svr::~sqlrcontroller_svr() {
+
+	shutDown();
 
 	if (connstats) {
 		bytestring::zero(connstats,sizeof(sqlrconnstatistics));
@@ -3457,7 +3464,7 @@ void sqlrcontroller_svr::closeSuspendedSessionSockets() {
 	}
 }
 
-void sqlrcontroller_svr::closeConnection() {
+void sqlrcontroller_svr::shutDown() {
 
 	logDebugMessage("closing connection...");
 
@@ -4201,7 +4208,7 @@ void sqlrcontroller_svr::sessionQuery(const char *query) {
 	deleteCursor(cur);
 }
 
-const char *sqlrcontroller_svr::connectStringValue(const char *variable) {
+const char *sqlrcontroller_svr::getConnectStringValue(const char *variable) {
 
 	// If we're using password encryption and the password is requested,
 	// and the password encryption module supports two-way encryption,
@@ -4440,10 +4447,6 @@ uint16_t sqlrcontroller_svr::getCursorCount() {
 
 memorypool *sqlrcontroller_svr::getBindMappingsPool() {
 	return bindmappingspool;
-}
-
-filedescriptor *sqlrcontroller_svr::getClientSocket() {
-	return clientsock;
 }
 
 const char *sqlrcontroller_svr::translateTableName(const char *table) {

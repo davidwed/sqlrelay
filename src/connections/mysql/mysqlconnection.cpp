@@ -247,25 +247,25 @@ mysqlconnection::~mysqlconnection() {
 }
 
 void mysqlconnection::handleConnectString() {
-	cont->setUser(cont->connectStringValue("user"));
-	cont->setPassword(cont->connectStringValue("password"));
-	db=cont->connectStringValue("db");
-	host=cont->connectStringValue("host");
-	port=cont->connectStringValue("port");
-	socket=cont->connectStringValue("socket");
-	charset=cont->connectStringValue("charset");
-	sslkey=cont->connectStringValue("sslkey");
-	sslcert=cont->connectStringValue("sslcert");
-	sslca=cont->connectStringValue("sslca");
-	sslcapath=cont->connectStringValue("sslcapath");
-	sslcipher=cont->connectStringValue("sslcipher");
+	cont->setUser(cont->getConnectStringValue("user"));
+	cont->setPassword(cont->getConnectStringValue("password"));
+	db=cont->getConnectStringValue("db");
+	host=cont->getConnectStringValue("host");
+	port=cont->getConnectStringValue("port");
+	socket=cont->getConnectStringValue("socket");
+	charset=cont->getConnectStringValue("charset");
+	sslkey=cont->getConnectStringValue("sslkey");
+	sslcert=cont->getConnectStringValue("sslcert");
+	sslca=cont->getConnectStringValue("sslca");
+	sslcapath=cont->getConnectStringValue("sslcapath");
+	sslcipher=cont->getConnectStringValue("sslcipher");
 	cont->setFakeInputBinds(
 		!charstring::compare(
-			cont->connectStringValue("fakebinds"),"yes"));
+			cont->getConnectStringValue("fakebinds"),"yes"));
 	foundrows=!charstring::compare(
-			cont->connectStringValue("foundrows"),"yes");
+			cont->getConnectStringValue("foundrows"),"yes");
 	ignorespace=!charstring::compare(
-			cont->connectStringValue("ignorespace"),"yes");
+			cont->getConnectStringValue("ignorespace"),"yes");
 }
 
 bool mysqlconnection::logIn(const char **error) {

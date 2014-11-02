@@ -395,17 +395,17 @@ odbcconnection::odbcconnection(sqlrcontroller_svr *cont) :
 
 
 void odbcconnection::handleConnectString() {
-	dsn=cont->connectStringValue("dsn");
-	cont->setUser(cont->connectStringValue("user"));
-	cont->setPassword(cont->connectStringValue("password"));
-	const char	*autocom=cont->connectStringValue("autocommit");
+	dsn=cont->getConnectStringValue("dsn");
+	cont->setUser(cont->getConnectStringValue("user"));
+	cont->setPassword(cont->getConnectStringValue("password"));
+	const char	*autocom=cont->getConnectStringValue("autocommit");
 	cont->setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
 	cont->setFakeInputBinds(
 		!charstring::compare(
-			cont->connectStringValue("fakebinds"),"yes"));
+			cont->getConnectStringValue("fakebinds"),"yes"));
 
-	const char	*to=cont->connectStringValue("timeout");
+	const char	*to=cont->getConnectStringValue("timeout");
 	if (!charstring::length(to)) {
 		// for back-compatibility
 		timeout=5;

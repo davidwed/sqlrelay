@@ -12,11 +12,6 @@ volatile sig_atomic_t	shutdowninprogress=0;
 signalhandler		shutdownhandler;
 bool			shutdownalready=false;
 
-void cleanUp() {
-	cont->closeConnection();
-	delete cont;
-}
-
 void shutDown(int32_t signum) {
 
 	// Various situations can cause this function to get looped up, such as
@@ -31,7 +26,7 @@ void shutDown(int32_t signum) {
 	shutdownalready=true;
 
 	if (!signalhandler::isSignalHandlerIntUsed()) {
-		cleanUp();
+		delete cont;
 		process::exit(0);
 	}
 
@@ -72,7 +67,7 @@ void shutDown(int32_t signum) {
 			stderror.printf("(pid=%ld) Abnormal termination: "
 					"signal %d received\n",
 					(long)process::getProcessId(),signum);
-			cleanUp();
+			delete cont;
 			// Now reraise the signal.  We reactivate the signal's
 		   	// default handling, which is to terminate the process.
 		   	// We could just call exit or abort,
@@ -82,7 +77,7 @@ void shutDown(int32_t signum) {
 			signalmanager::raiseSignal(signum);
 	}
 
-	cleanUp();
+	delete cont;
 	process::exit(exitcode);
 }
 
@@ -164,7 +159,7 @@ int main(int argc, const char **argv) {
 	shutdowninprogress=1;
 
 	// unsuccessful completion
-	cleanUp();
+	delete cont;
 
 	// return successful or unsuccessful completion based on listenresult
 	process::exit((result)?0:1);

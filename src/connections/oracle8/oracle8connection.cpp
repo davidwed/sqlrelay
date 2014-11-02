@@ -450,29 +450,29 @@ oracle8connection::~oracle8connection() {
 }
 
 void oracle8connection::handleConnectString() {
-	cont->setUser(cont->connectStringValue("user"));
-	cont->setPassword(cont->connectStringValue("password"));
-	sid=cont->connectStringValue("oracle_sid");
-	home=cont->connectStringValue("oracle_home");
-	nlslang=cont->connectStringValue("nls_lang");
-	const char	*autocom=cont->connectStringValue("autocommit");
+	cont->setUser(cont->getConnectStringValue("user"));
+	cont->setPassword(cont->getConnectStringValue("password"));
+	sid=cont->getConnectStringValue("oracle_sid");
+	home=cont->getConnectStringValue("oracle_home");
+	nlslang=cont->getConnectStringValue("nls_lang");
+	const char	*autocom=cont->getConnectStringValue("autocommit");
 	cont->setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
 
 	fetchatonce=charstring::toUnsignedInteger(
-				cont->connectStringValue("fetchatonce"));
+				cont->getConnectStringValue("fetchatonce"));
 	if (!fetchatonce) {
 		fetchatonce=FETCH_AT_ONCE;
 	}
 
 	maxselectlistsize=charstring::toInteger(
-				cont->connectStringValue("maxselectlistsize"));
+			cont->getConnectStringValue("maxselectlistsize"));
 	if (!maxselectlistsize) {
 		maxselectlistsize=MAX_SELECT_LIST_SIZE;
 	}
 
 	maxitembuffersize=charstring::toInteger(
-				cont->connectStringValue("maxitembuffersize"));
+			cont->getConnectStringValue("maxitembuffersize"));
 	if (!maxitembuffersize) {
 		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 	}
@@ -493,7 +493,7 @@ void oracle8connection::handleConnectString() {
 
 #ifdef OCI_STMT_CACHE
 	stmtcachesize=charstring::toUnsignedInteger(
-				cont->connectStringValue("stmtcachesize"));
+				cont->getConnectStringValue("stmtcachesize"));
 	if (!stmtcachesize) {
 		stmtcachesize=STMT_CACHE_SIZE;
 	}
@@ -501,24 +501,24 @@ void oracle8connection::handleConnectString() {
 
 	cont->setFakeTransactionBlocksBehavior(
 		!charstring::compare(
-			cont->connectStringValue("faketransactionblocks"),
+			cont->getConnectStringValue("faketransactionblocks"),
 			"yes"));
 
 #ifdef HAVE_ORACLE_8i
 	droptemptables=!charstring::compare(
-			cont->connectStringValue("droptemptables"),"yes");
+			cont->getConnectStringValue("droptemptables"),"yes");
 #endif
 
 	rejectduplicatebinds=!charstring::compare(
-			cont->connectStringValue("rejectduplicatebinds"),
+			cont->getConnectStringValue("rejectduplicatebinds"),
 			"yes");
 
 	disablekeylookup=!charstring::compareIgnoringCase(
-				cont->connectStringValue("disablekeylookup"),
-				"yes");
+			cont->getConnectStringValue("disablekeylookup"),
+			"yes");
 
 	const char	*lastinsertidfunc=
-			cont->connectStringValue("lastinsertidfunction");
+			cont->getConnectStringValue("lastinsertidfunction");
 	if (lastinsertidfunc) {
 		stringbuffer	liiquery;
 		liiquery.append("select ");
@@ -529,7 +529,7 @@ void oracle8connection::handleConnectString() {
 
 	cont->setFakeInputBinds(
 		!charstring::compare(
-			cont->connectStringValue("fakebinds"),"yes"));
+			cont->getConnectStringValue("fakebinds"),"yes"));
 }
 
 #ifdef HAVE_ORACLE_8i

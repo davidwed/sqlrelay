@@ -95,8 +95,10 @@ void checkSuccess(double value, double success) {
 int	main(int argc, char **argv) {
 
 	// instantiation
-	con=new sqlrconnection("localhost",9000,"/tmp/test.socket",
-							"test","test",0,1);
+	con=new sqlrconnection("localhost",9000,
+					//"/tmp/test.socket",
+					NULL,
+					"test","test",0,1);
 	cur=new sqlrcursor(con);
 
 	con->setClientInfo("extensionstest");
@@ -154,8 +156,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("create table testtable (col1 int)"),1);
 
 	// open a second connection and set autocommit off there too
-	secondcon=new sqlrconnection("localhost",9000,"/tmp/test.socket",
-							"test","test",0,1);
+	secondcon=new sqlrconnection("localhost",9000,
+						//"/tmp/test.socket",
+						NULL,
+						"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
 	checkSuccess(secondcon->autoCommitOff(),1);
 
@@ -193,8 +197,10 @@ int	main(int argc, char **argv) {
 	delete secondcon;
 	delete cur;
 	delete con;
-	con=new sqlrconnection("localhost",9000,"/tmp/test.socket",
-							"test","test",0,1);
+	con=new sqlrconnection("localhost",9000,
+					//"/tmp/test.socket",
+					NULL,
+					"test","test",0,1);
 	cur=new sqlrcursor(con);
 	checkSuccess(cur->sendQuery("drop table testtable"),1);
 	con->setClientInfo("extensionstest");
@@ -499,8 +505,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("create table testtable (col1 int)"),1);
 	checkSuccess(con->begin(),1);
 	checkSuccess(cur->sendQuery("lock table testtable in exclusive mode"),1);
-	secondcon=new sqlrconnection("localhost",9000,"/tmp/test.socket",
-							"test","test",0,1);
+	secondcon=new sqlrconnection("localhost",9000,
+						//"/tmp/test.socket",
+						NULL,
+						"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
 	checkSuccess(secondcur->sendQuery("lock table testtable in exclusive mode"),0);
 	checkSuccess(secondcur->errorNumber(),54);

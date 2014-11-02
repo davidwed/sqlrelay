@@ -174,7 +174,7 @@ sqliteconnection::~sqliteconnection() {
 }
 
 void sqliteconnection::handleConnectString() {
-	db=cont->connectStringValue("db");
+	db=cont->getConnectStringValue("db");
 }
 
 bool sqliteconnection::logIn(const char **error) {

@@ -126,7 +126,7 @@ mdbtoolsconnection::~mdbtoolsconnection() {
 }
 
 void mdbtoolsconnection::handleConnectString() {
-	db=cont->connectStringValue("db");
+	db=cont->getConnectStringValue("db");
 }
 
 bool mdbtoolsconnection::logIn(const char **error) {

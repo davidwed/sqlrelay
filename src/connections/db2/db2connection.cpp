@@ -287,27 +287,27 @@ db2connection::db2connection(sqlrcontroller_svr *cont) :
 void db2connection::handleConnectString() {
 
 	// override legacy "server" parameter with modern "db" parameter
-	server=cont->connectStringValue("server");
-	const char	*tmp=cont->connectStringValue("db");
+	server=cont->getConnectStringValue("server");
+	const char	*tmp=cont->getConnectStringValue("db");
 	if (tmp && tmp[0]) {
 		server=tmp;
 	}
 
-	cont->setUser(cont->connectStringValue("user"));
-	cont->setPassword(cont->connectStringValue("password"));
-	const char	*autocom=cont->connectStringValue("autocommit");
+	cont->setUser(cont->getConnectStringValue("user"));
+	cont->setPassword(cont->getConnectStringValue("password"));
+	const char	*autocom=cont->getConnectStringValue("autocommit");
 	cont->setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
-	lang=cont->connectStringValue("lang");
+	lang=cont->getConnectStringValue("lang");
 	cont->setFakeTransactionBlocksBehavior(
 		!charstring::compare(
-			cont->connectStringValue("faketransactionblocks"),
+			cont->getConnectStringValue("faketransactionblocks"),
 			"yes"));
 	cont->setFakeInputBinds(
 		!charstring::compare(
-			cont->connectStringValue("fakebinds"),"yes"));
+			cont->getConnectStringValue("fakebinds"),"yes"));
 
-	const char	*to=cont->connectStringValue("timeout");
+	const char	*to=cont->getConnectStringValue("timeout");
 	if (!charstring::length(to)) {
 		// for back-compatibility
 		timeout=5;
@@ -316,22 +316,22 @@ void db2connection::handleConnectString() {
 	}
 
 	fetchatonce=charstring::toUnsignedInteger(
-				cont->connectStringValue("fetchatonce"));
+				cont->getConnectStringValue("fetchatonce"));
 	if (!fetchatonce) {
 		fetchatonce=FETCH_AT_ONCE;
 	}
 	maxselectlistsize=charstring::toInteger(
-				cont->connectStringValue("maxselectlistsize"));
+			cont->getConnectStringValue("maxselectlistsize"));
 	if (!maxselectlistsize) {
 		maxselectlistsize=MAX_SELECT_LIST_SIZE;
 	}
 	maxitembuffersize=charstring::toInteger(
-				cont->connectStringValue("maxitembuffersize"));
+			cont->getConnectStringValue("maxitembuffersize"));
 	if (!maxitembuffersize) {
 		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 	}
 	maxoutbindlobsize=charstring::toInteger(
-				cont->connectStringValue("maxoutbindlobsize"));
+			cont->getConnectStringValue("maxoutbindlobsize"));
 	if (!maxoutbindlobsize) {
 		maxoutbindlobsize=MAX_OUT_BIND_LOB_SIZE;
 	}

@@ -328,27 +328,27 @@ freetdsconnection::~freetdsconnection() {
 }
 
 void freetdsconnection::handleConnectString() {
-	sybase=cont->connectStringValue("sybase");
-	lang=cont->connectStringValue("lang");
-	cont->setUser(cont->connectStringValue("user"));
-	cont->setPassword(cont->connectStringValue("password"));
-	server=cont->connectStringValue("server");
-	db=cont->connectStringValue("db");
-	charset=cont->connectStringValue("charset");
-	language=cont->connectStringValue("language");
-	hostname=cont->connectStringValue("hostname");
-	packetsize=cont->connectStringValue("packetsize");
+	sybase=cont->getConnectStringValue("sybase");
+	lang=cont->getConnectStringValue("lang");
+	cont->setUser(cont->getConnectStringValue("user"));
+	cont->setPassword(cont->getConnectStringValue("password"));
+	server=cont->getConnectStringValue("server");
+	db=cont->getConnectStringValue("db");
+	charset=cont->getConnectStringValue("charset");
+	language=cont->getConnectStringValue("language");
+	hostname=cont->getConnectStringValue("hostname");
+	packetsize=cont->getConnectStringValue("packetsize");
 	cont->setFakeInputBinds(
 		!charstring::compare(
-			cont->connectStringValue("fakebinds"),"yes"));
+			cont->getConnectStringValue("fakebinds"),"yes"));
 	// this is here in case freetds ever supports array fetches
 	/*fetchatonce=charstring::toInteger(
-				cont->connectStringValue("fetchatonce"));
+				cont->getConnectStringValue("fetchatonce"));
 	if (!fetchatonce) {
 		fetchatonce=FETCH_AT_ONCE;
 	}*/
 	maxselectlistsize=charstring::toInteger(
-				cont->connectStringValue("maxselectlistsize"));
+			cont->getConnectStringValue("maxselectlistsize"));
 	if (!maxselectlistsize) {
 		maxselectlistsize=MAX_SELECT_LIST_SIZE;
 	} else if (maxselectlistsize==1) {
@@ -357,7 +357,7 @@ void freetdsconnection::handleConnectString() {
 		maxselectlistsize=2;
 	}
 	maxitembuffersize=charstring::toInteger(
-				cont->connectStringValue("maxitembuffersize"));
+			cont->getConnectStringValue("maxitembuffersize"));
 	if (!maxitembuffersize) {
 		maxitembuffersize=MAX_ITEM_BUFFER_SIZE;
 	}

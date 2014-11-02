@@ -185,13 +185,13 @@ postgresqlconnection::~postgresqlconnection() {
 }
 
 void postgresqlconnection::handleConnectString() {
-	host=cont->connectStringValue("host");
-	port=cont->connectStringValue("port");
-	options=cont->connectStringValue("options");
-	db=cont->connectStringValue("db");
-	cont->setUser(cont->connectStringValue("user"));
-	cont->setPassword(cont->connectStringValue("password"));
-	const char	*typemang=cont->connectStringValue("typemangling");
+	host=cont->getConnectStringValue("host");
+	port=cont->getConnectStringValue("port");
+	options=cont->getConnectStringValue("options");
+	db=cont->getConnectStringValue("db");
+	cont->setUser(cont->getConnectStringValue("user"));
+	cont->setPassword(cont->getConnectStringValue("password"));
+	const char	*typemang=cont->getConnectStringValue("typemangling");
 	if (!typemang ||!charstring::compareIgnoringCase(typemang,"no")) {
 		typemangling=0;
 	} else if (!charstring::compareIgnoringCase(typemang,"yes")) {
@@ -199,9 +199,9 @@ void postgresqlconnection::handleConnectString() {
 	} else {
 		typemangling=2;
 	}
-	charset=cont->connectStringValue("charset");
+	charset=cont->getConnectStringValue("charset");
 	const char	*lastinsertidfunc=
-			cont->connectStringValue("lastinsertidfunction");
+			cont->getConnectStringValue("lastinsertidfunction");
 	if (lastinsertidfunc) {
 		stringbuffer	liiquery;
 		liiquery.append("select ");
@@ -210,7 +210,7 @@ void postgresqlconnection::handleConnectString() {
 	}
 	cont->setFakeInputBinds(
 		!charstring::compare(
-			cont->connectStringValue("fakebinds"),"yes"));
+			cont->getConnectStringValue("fakebinds"),"yes"));
 }
 
 bool postgresqlconnection::logIn(const char **error) {

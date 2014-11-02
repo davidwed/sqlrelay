@@ -47,10 +47,9 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		// main program methods
 		bool	init(int argc, const char **argv);
 		bool	listen();
-		void	closeConnection();
 
 		// connect string 
-		const char	*connectStringValue(const char *variable);
+		const char	*getConnectStringValue(const char *variable);
 
 		// environment
 		const char	*getId();
@@ -58,9 +57,10 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		const char	*getDebugDir();
 
 		// log in/out of the database
-		bool	logIn(bool printerrors);
-		void	logOut();
 		void	reLogIn();
+
+		// client connections
+		void		closeClientSocket(uint32_t bytes);
 
 		// client authentication
 		void		setUser(const char *user);
@@ -77,8 +77,6 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		void	suspendSession(const char **unixsocket,
 						uint16_t *inetportnumber);
 		void	endSession();
-		filedescriptor	*getClientSocket();
-		void		closeClientSocket(uint32_t bytes);
 
 		// database info
 		const char	*getDbHostName();
@@ -173,10 +171,8 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 						const char *timeformat);
 		void	closeAllResultSets();
 
-
 		// states
 		void	updateState(enum sqlrconnectionstate_t state);
-
 
 		// logging
 		bool	logEnabled();
@@ -273,6 +269,8 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		bool	unLockSequenceFile(file *sockseq);
 
 		bool	attemptLogIn(bool printerrors);
+		bool	logIn(bool printerrors);
+		void	logOut();
 
 		void	setAutoCommit(bool ac);
 
@@ -348,6 +346,8 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 						const char *tablename);
 
 		void	closeSuspendedSessionSockets();
+
+		void	shutDown();
 
 		void	closeCursors(bool destroy);
 

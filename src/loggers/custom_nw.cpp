@@ -121,18 +121,6 @@ bool custom_nw::run(sqlrlistener *sqlrl,
 	char	bindbuf[1000+1];
 	descInputBinds(sqlrcur,bindbuf,1000);
 
-	// get the client address
-	char		*clientaddrbuf=NULL;
-	filedescriptor	*clientsock=sqlrcon->cont->getClientSocket();
-	if (clientsock) {
-		clientaddrbuf=clientsock->getPeerAddress();
-		if (!clientaddrbuf) {
-			clientaddrbuf=charstring::duplicate("UNIX");
-		}
-	} else {
-		clientaddrbuf=charstring::duplicate("internal");
-	}
-
 	// get the execution time
 	uint64_t	sec=sqlrcur->getCommandEndSec()-
 				sqlrcur->getCommandStartSec();
@@ -159,12 +147,9 @@ bool custom_nw::run(sqlrlistener *sqlrl,
         	infobuf,
 		sqlbuf,
 		sec+usec/1000000.0,
-		clientaddrbuf,
+		sqlrcon->cont->connstats->clientaddr,
 		bindbuf
 		);
-
-	// clean up
-	delete[] clientaddrbuf;
 
 	// write that buffer to the log file
 	return ((size_t)querylog.write(querylogbuf)==

@@ -279,8 +279,8 @@ firebirdconnection::~firebirdconnection() {
 void firebirdconnection::handleConnectString() {
 
 	// override legacy "database" parameter with modern "db" parameter
-	database=cont->connectStringValue("database");
-	const char	*tmp=cont->connectStringValue("db");
+	database=cont->getConnectStringValue("database");
+	const char	*tmp=cont->getConnectStringValue("db");
 	if (tmp && tmp[0]) {
 		database=tmp;
 	}
@@ -293,7 +293,7 @@ void firebirdconnection::handleConnectString() {
 		host=sys::getHostName();
 	}
 
-	const char	*dialectstr=cont->connectStringValue("dialect");
+	const char	*dialectstr=cont->getConnectStringValue("dialect");
 	if (dialectstr) {
 		dialect=charstring::toInteger(dialectstr);
 		if (dialect<1) {
@@ -305,21 +305,21 @@ void firebirdconnection::handleConnectString() {
 	} else {
 		dialect=3;
 	}
-	cont->setUser(cont->connectStringValue("user"));
-	cont->setPassword(cont->connectStringValue("password"));
-	const char	*autocom=cont->connectStringValue("autocommit");
+	cont->setUser(cont->getConnectStringValue("user"));
+	cont->setPassword(cont->getConnectStringValue("password"));
+	const char	*autocom=cont->getConnectStringValue("autocommit");
 	cont->setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
 
-	charset=cont->connectStringValue("charset");
+	charset=cont->getConnectStringValue("charset");
 
 	cont->setFakeTransactionBlocksBehavior(
 		!charstring::compare(
-			cont->connectStringValue("faketransactionblocks"),
+			cont->getConnectStringValue("faketransactionblocks"),
 			"yes"));
 
 	const char	*lastinsertidfunc=
-			cont->connectStringValue("lastinsertidfunction");
+			cont->getConnectStringValue("lastinsertidfunction");
 	if (lastinsertidfunc) {
 		stringbuffer	liiquery;
 		liiquery.append("select id from ");
@@ -329,7 +329,7 @@ void firebirdconnection::handleConnectString() {
 
 	cont->setFakeInputBinds(
 		!charstring::compare(
-			cont->connectStringValue("fakebinds"),"yes"));
+			cont->getConnectStringValue("fakebinds"),"yes"));
 }
 
 bool firebirdconnection::logIn(const char **err) {
