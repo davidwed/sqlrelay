@@ -5,6 +5,7 @@
 	added ini files for PHP and PDO modules
 	added resultsetbuffersize, dontgetcolumninfo and nullsasnulls connect
 		string variables to the PHP PDO driver
+	refactored sqlr-status and removed dependency on libsqlrserver
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries

@@ -46,8 +46,7 @@ sqlr-pwdenc$(EXE): sqlr-pwdenc.cpp sqlr-pwdenc.lo
 	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-pwdenc.lo -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE) $(RPATH)
 
 sqlr-status$(EXE): sqlr-status.cpp sqlr-status.lo
-	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-status.lo -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
-$(RPATH)
+	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlr-status.lo $(LIBS) $(RPATH)
 
 sqlrsh$(EXE): sqlrsh.cpp sqlrsh.lo 
 	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ sqlrsh.lo $(LIBS) $(READLINELIBS) $(RPATH)
