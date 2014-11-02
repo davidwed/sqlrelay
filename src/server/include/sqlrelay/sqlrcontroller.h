@@ -111,8 +111,8 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		void		releaseConnectionCountMutex();
 
 
-		sqlrcursor_svr	*getCursorById(uint16_t id);
-		sqlrcursor_svr	*findAvailableCursor();
+		sqlrcursor_svr	*getCursor(uint16_t id);
+		sqlrcursor_svr	*getCursor();
 		void	closeCursors(bool destroy);
 		void	setUnixSocketDirectory();
 		bool	handlePidFile();
@@ -148,11 +148,15 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		void	suspendSession(const char **unixsocket,
 						uint16_t *inetportnumber);
 		void	endSession();
+		sqlrcursor_svr	*initNewQuery(sqlrcursor_svr *cursor);
+		sqlrcursor_svr	*initReExecuteQuery(sqlrcursor_svr *cursor);
+		sqlrcursor_svr	*initListQuery(sqlrcursor_svr *cursor);
+		sqlrcursor_svr	*initBindCursor(sqlrcursor_svr *cursor);
 		sqlrcursor_svr	*initQueryOrBindCursor(sqlrcursor_svr *cursor,
 							bool reexecute,
 							bool bindcursor,
-							bool getquery);
-		sqlrcursor_svr	*useCustomQueryHandler(sqlrcursor_svr *cursor);
+							bool reinitbuffers);
+		sqlrcursor_svr	*getCustomQueryHandler(sqlrcursor_svr *cursor);
 		bool	handleBinds(sqlrcursor_svr *cursor);
 		bool	processQueryOrBindCursor(sqlrcursor_svr *cursor,
 							bool reexecute,
@@ -271,6 +275,7 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		void	incrementGetQueryTreeCount();
 		void	incrementReLogInCount();
 
+		bool	logEnabled();
 		void	logDebugMessage(const char *info);
 		void	logClientConnected();
 		void	logClientConnectionRefused(const char *info);
@@ -293,10 +298,6 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		bool		getDbSelected();
 		void		setDbSelected(bool dbselected);
 
-		char		*getClientInfoBuffer();
-		uint64_t	getClientInfoLength();
-		void		setClientInfoLength(uint64_t clientinfolen);
-
 		uint16_t	getSendColumnInfo();
 		void		setSendColumnInfo(uint16_t sendcolumninfo);
 
@@ -305,8 +306,6 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		memorypool	*getBindMappingsPool();
 
 		filedescriptor	*getClientSocket();
-
-		bool		loggingEnabled();
 
 		const char	*translateTableName(const char *table);
 		bool		removeReplacementTable(const char *database,
@@ -432,9 +431,6 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 
 		bool		fakeinputbinds;
 
-		char		*clientinfo;
-		uint64_t	clientinfolen;
-
 		int32_t		idleclienttimeout;
 
 		bool		decrementonclose;
@@ -445,7 +441,6 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		char		*debugdir;
 		stringbuffer	debugstr;
 
-		uint64_t	maxclientinfolength;
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
 		uint32_t	maxerrorlength;

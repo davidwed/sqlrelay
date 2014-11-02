@@ -793,7 +793,7 @@ bool oracle8connection::logIn(const char **error) {
 		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
-	if (cont->loggingEnabled()) {
+	if (cont->logEnabled()) {
 		if (OCIAttrGet((dvoid *)svc,OCI_HTYPE_SVCCTX,
 				(dvoid *)&stmtcachesize,(ub4)0,
 				(ub4)OCI_ATTR_STMTCACHESIZE,
@@ -2131,7 +2131,7 @@ bool oracle8cursor::prepareQuery(const char *query, uint32_t length) {
 
 		// prepare the query...
 		bool	prepare=true;
-		if (oracle8conn->cont->loggingEnabled()) {
+		if (oracle8conn->cont->logEnabled()) {
 			// check for a statment cache hit
 			// and report our findings
 			if (OCIStmtPrepare2(oracle8conn->svc,&stmt,

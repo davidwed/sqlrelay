@@ -102,7 +102,7 @@ bool custom_nw::run(sqlrlistener *sqlrl,
 	// get error, if there was one
 	static char	errorcodebuf[100+1];
 	errorcodebuf[0]='\0';
-	if (sqlrcur->getErrorBuffer()[0]) {
+	if (!sqlrcur->getErrorBuffer()[0]) {
 		charstring::copy(errorcodebuf,"0");
 	} else {
 		charstring::printf(errorcodebuf,100,"%s",
@@ -115,7 +115,7 @@ bool custom_nw::run(sqlrlistener *sqlrl,
 
 	// escape the client info
 	static char	infobuf[1024+1];
-	strescape(sqlrcon->cont->getClientInfoBuffer(),infobuf,1024);
+	strescape(sqlrcon->cont->connstats->clientinfo,infobuf,1024);
 
 	// escape the input bind variables
 	char	bindbuf[1000+1];

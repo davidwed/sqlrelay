@@ -122,9 +122,6 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 
 	pidfile=NULL;
 
-	clientinfo=NULL;
-	clientinfolen=0;
-
 	decrementonclose=false;
 	silent=false;
 
@@ -194,8 +191,6 @@ sqlrcontroller_svr::~sqlrcontroller_svr() {
 
 	delete[] decrypteddbpassword;
 
-	delete[] clientinfo;
-
 	if (pidfile) {
 		file::remove(pidfile);
 		delete[] pidfile;
@@ -260,7 +255,6 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	}
 
 	// update various configurable parameters
-	maxclientinfolength=cfgfl->getMaxClientInfoLength();
 	maxquerysize=cfgfl->getMaxQuerySize();
 	maxbindcount=cfgfl->getMaxBindCount();
 	maxerrorlength=cfgfl->getMaxErrorLength();
@@ -409,9 +403,6 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 				"%s/pids/sqlr-connection-%s.%ld",
 				tmpdir->getString(),cmdl->getId(),(long)pid);
 	process::createPidFile(pidfile,permissions::ownerReadWrite());
-
-	// create clientinfo buffer
-	clientinfo=new char[maxclientinfolength+1];
 
 	// increment connection counter
 	if (cfgfl->getDynamicScaling()) {
@@ -1571,7 +1562,6 @@ void sqlrcontroller_svr::clientSession() {
 	if (proto) {
 		proto->setClientSocket(clientsock);
 		exitstatus=proto->clientSession();
-		proto->closeClientSession();
 	} else {
 		closeClientSocket(0);
 	}
@@ -1632,17 +1622,26 @@ sqlrprotocol_t sqlrcontroller_svr::getClientProtocol() {
 	return SQLRPROTOCOL_SQLRCLIENT;
 }
 
-sqlrcursor_svr *sqlrcontroller_svr::getCursorById(uint16_t id) {
+sqlrcursor_svr *sqlrcontroller_svr::getCursor(uint16_t id) {
 
+	// get the specified cursor
 	for (uint16_t i=0; i<cursorcount; i++) {
 		if (cur[i]->getId()==id) {
+			incrementTimesCursorReused(); 
 			return cur[i];
 		}
 	}
+
+	debugstr.clear();
+	debugstr.append("get cursor failed: "
+			"client requested an invalid cursor: ");
+	debugstr.append(id);
+	logClientProtocolError(NULL,debugstr.getString(),1);
+
 	return NULL;
 }
 
-sqlrcursor_svr *sqlrcontroller_svr::findAvailableCursor() {
+sqlrcursor_svr *sqlrcontroller_svr::getCursor() {
 
 	// find an available cursor
 	for (uint16_t i=0; i<cursorcount; i++) {
@@ -1651,6 +1650,7 @@ sqlrcursor_svr *sqlrcontroller_svr::findAvailableCursor() {
 			debugstr.append("available cursor: ")->append(i);
 			logDebugMessage(debugstr.getString());
 			cur[i]->setState(SQLRCURSORSTATE_BUSY);
+			incrementTimesNewCursorUsed();
 			return cur[i];
 		}
 	}
@@ -1684,6 +1684,7 @@ sqlrcursor_svr *sqlrcontroller_svr::findAvailableCursor() {
 	
 	// return the first new cursor that we created
 	cur[firstnewcursor]->setState(SQLRCURSORSTATE_BUSY);
+	incrementTimesNewCursorUsed();
 	return cur[firstnewcursor];
 }
 
@@ -2680,19 +2681,39 @@ void sqlrcontroller_svr::translateBeginTransaction(sqlrcursor_svr *cursor) {
 	logDebugMessage(querybuffer);
 }
 
+sqlrcursor_svr	*sqlrcontroller_svr::initNewQuery(
+					sqlrcursor_svr *cursor) {
+	return initQueryOrBindCursor(cursor,false,false,true);
+}
+
+sqlrcursor_svr	*sqlrcontroller_svr::initReExecuteQuery(
+					sqlrcursor_svr *cursor) {
+	return initQueryOrBindCursor(cursor,true,false,true);
+}
+
+sqlrcursor_svr	*sqlrcontroller_svr::initListQuery(
+					sqlrcursor_svr *cursor) {
+	return initQueryOrBindCursor(cursor,false,false,false);
+}
+
+sqlrcursor_svr	*sqlrcontroller_svr::initBindCursor(
+					sqlrcursor_svr *cursor) {
+	return initQueryOrBindCursor(cursor,false,true,true);
+}
+
 sqlrcursor_svr	*sqlrcontroller_svr::initQueryOrBindCursor(
 						sqlrcursor_svr *cursor,
 						bool reexecute,
 						bool bindcursor,
-						bool getquery) {
+						bool reinitbuffers) {
 
-	// decide whether to use the cursor itself
-	// or an attached custom query cursor
-	if (cursor->getCustomQueryCursor()) {
+	// if we're using a custom cursor then deal with it appropriately
+	sqlrcursor_svr	*customcursor=cursor->getCustomQueryCursor();
+	if (customcursor) {
 		if (reexecute) {
-			cursor=cursor->getCustomQueryCursor();
+			cursor=customcursor;
 		} else {
-			cursor->getCustomQueryCursor()->close();
+			customcursor->close();
 			cursor->clearCustomQueryCursor();
 		}
 	}
@@ -2712,14 +2733,10 @@ sqlrcursor_svr	*sqlrcontroller_svr::initQueryOrBindCursor(
 	// clean up whatever result set the cursor might have been busy with
 	cursor->cleanUpData();
 
-	if (getquery) {
+	if (reinitbuffers) {
 
 		// re-init buffers
 		if (!reexecute) {
-			if (!bindcursor) {
-				clientinfo[0]='\0';
-				clientinfolen=0;
-			}
 			cursor->getQueryBuffer()[0]='\0';
 			cursor->setQueryLength(0);
 		}
@@ -2736,7 +2753,7 @@ sqlrcursor_svr	*sqlrcontroller_svr::initQueryOrBindCursor(
 	return cursor;
 }
 
-sqlrcursor_svr *sqlrcontroller_svr::useCustomQueryHandler(	
+sqlrcursor_svr *sqlrcontroller_svr::getCustomQueryHandler(	
 						sqlrcursor_svr *cursor) {
 
 	// do we need to use a custom query handler for this query?
@@ -2770,6 +2787,7 @@ sqlrcursor_svr *sqlrcontroller_svr::useCustomQueryHandler(
 
 		// reset the cursor
 		cursor=cursor->getCustomQueryCursor();
+
 	}
 
 	return cursor;
@@ -4240,6 +4258,10 @@ void sqlrcontroller_svr::addTransactionTempTableForTrunc(const char *table) {
 	transtemptablesfortrunc.append(charstring::duplicate(table));
 }
 
+bool sqlrcontroller_svr::logEnabled() {
+	return (sqlrlg!=NULL);
+}
+
 void sqlrcontroller_svr::logDebugMessage(const char *info) {
 	if (!sqlrlg) {
 		return;
@@ -4386,18 +4408,6 @@ void sqlrcontroller_svr::setDbSelected(bool dbselected) {
 	this->dbselected=dbselected;
 }
 
-char *sqlrcontroller_svr::getClientInfoBuffer() {
-	return clientinfo;
-}
-
-uint64_t sqlrcontroller_svr::getClientInfoLength() {
-	return clientinfolen;
-}
-
-void sqlrcontroller_svr::setClientInfoLength(uint64_t clientinfolen) {
-	this->clientinfolen=clientinfolen;
-}
-
 uint16_t sqlrcontroller_svr::getSendColumnInfo() {
 	return sendcolumninfo;
 }
@@ -4416,10 +4426,6 @@ memorypool *sqlrcontroller_svr::getBindMappingsPool() {
 
 filedescriptor *sqlrcontroller_svr::getClientSocket() {
 	return clientsock;
-}
-
-bool sqlrcontroller_svr::loggingEnabled() {
-	return (sqlrlg!=NULL);
 }
 
 const char *sqlrcontroller_svr::translateTableName(const char *table) {

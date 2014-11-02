@@ -38,7 +38,6 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 		void	setClientSocket(filedescriptor *clientsock);
 
 		virtual sqlrclientexitstatus_t	clientSession()=0;
-		virtual	void			closeClientSession()=0;
 
 	protected:
 		sqlrcontroller_svr	*cont;

@@ -34,6 +34,7 @@ class SQLRSERVER_DLLSPEC sqlrquerycursor : public sqlrcursor_svr {
 		virtual	~sqlrquerycursor();
 		virtual sqlrquerytype_t	queryType(const char *query,
 							uint32_t length);
+		bool	isCustomQuery();
 	protected:
 		xmldomnode	*parameters;
 };

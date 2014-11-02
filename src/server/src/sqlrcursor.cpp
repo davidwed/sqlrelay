@@ -113,6 +113,10 @@ sqlrquerytype_t sqlrcursor_svr::queryType(const char *query,
 	return retval;
 }
 
+bool sqlrcursor_svr::isCustomQuery() {
+	return false;
+}
+
 bool sqlrcursor_svr::prepareQuery(const char *query, uint32_t querylength) {
 	// by default, do nothing...
 	return true;
