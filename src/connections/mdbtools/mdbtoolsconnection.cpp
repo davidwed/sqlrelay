@@ -33,7 +33,7 @@ class mdbtoolsconnection : public sqlrconnection_svr {
 	private:
 		void	handleConnectString();
 		bool	logIn(const char **error);
-		sqlrcursor_svr	*initCursor();
+		sqlrcursor_svr	*newCursor();
 		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
 		bool	isTransactional();
@@ -91,7 +91,7 @@ class mdbtoolscursor : public sqlrcursor_svr {
 						uint64_t *fieldlength,
 						bool *blob,
 						bool *null);
-		void		cleanUpData();
+		void		closeResultSet();
 		bool		getDatabaseList(const char *wild);
 		bool		getTableList(const char *wild);
 		bool		getColumnList(const char *table,
@@ -134,7 +134,7 @@ bool mdbtoolsconnection::logIn(const char **error) {
 	return true;
 }
 
-sqlrcursor_svr *mdbtoolsconnection::initCursor() {
+sqlrcursor_svr *mdbtoolsconnection::newCursor() {
 	return (sqlrcursor_svr *)new mdbtoolscursor((sqlrconnection_svr *)this);
 }
 
@@ -674,7 +674,7 @@ void mdbtoolscursor::getField(uint32_t col,
 	}
 }
 
-void mdbtoolscursor::cleanUpData() {
+void mdbtoolscursor::closeResultSet() {
 
 	if (cursortype==COLUMN_LIST_CURSORTYPE) {
 		delete[] currentcolumnsize;

@@ -283,7 +283,7 @@ bool sqlrcursor_svr::getLobOutputBindSegment(uint16_t index,
 	return false;
 }
 
-void sqlrcursor_svr::cleanUpLobOutputBind(uint16_t index) {
+void sqlrcursor_svr::closeLobOutputBind(uint16_t index) {
 	// by default, do nothing
 }
 
@@ -491,11 +491,11 @@ bool sqlrcursor_svr::getLobFieldSegment(uint32_t col,
 	return false;
 }
 
-void sqlrcursor_svr::cleanUpLobField(uint32_t col) {
+void sqlrcursor_svr::closeLobField(uint32_t col) {
 	// by default, do nothing
 }
 
-void sqlrcursor_svr::cleanUpData() {
+void sqlrcursor_svr::closeResultSet() {
 	// by default, do nothing...
 	return;
 }
@@ -749,7 +749,7 @@ void sqlrcursor_svr::abort() {
 	// result sets from being able to return column data upon resume if the
 	// entire result set had already been sent, but I don't think that's an
 	// issue any more.
-	cleanUpData();
+	closeResultSet();
 	setState(SQLRCURSORSTATE_AVAILABLE);
 	clearCustomQueryCursor();
 }

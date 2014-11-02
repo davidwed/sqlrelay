@@ -176,7 +176,7 @@ class db2cursor : public sqlrcursor_svr {
 					char *buffer, uint64_t buffersize,
 					uint64_t offset, uint64_t charstoread,
 					uint64_t *charsread);
-		void		cleanUpData();
+		void		closeResultSet();
 
 		SQLRETURN	erg;
 		SQLHSTMT	stmt;
@@ -219,7 +219,7 @@ class db2connection : public sqlrconnection_svr {
 		bool	logIn(const char **error);
 		const char	*logInError(const char *errmsg);
 		void	dbVersionSpecificTasks();
-		sqlrcursor_svr	*initCursor();
+		sqlrcursor_svr	*newCursor();
 		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
 		int16_t	nullBindValue();
@@ -509,7 +509,7 @@ void db2connection::dbVersionSpecificTasks() {
 	}
 }
 
-sqlrcursor_svr *db2connection::initCursor() {
+sqlrcursor_svr *db2connection::newCursor() {
 	return (sqlrcursor_svr *)new db2cursor((sqlrconnection_svr *)this);
 }
 
@@ -1682,7 +1682,7 @@ bool db2cursor::getLobFieldSegment(uint32_t col,
 	return true;
 }
 
-void db2cursor::cleanUpData() {
+void db2cursor::closeResultSet() {
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		delete outdatebind[i];
 		outdatebind[i]=NULL;

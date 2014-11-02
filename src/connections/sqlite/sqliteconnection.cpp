@@ -40,7 +40,7 @@ class sqliteconnection : public sqlrconnection_svr {
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error);
-		sqlrcursor_svr	*initCursor();
+		sqlrcursor_svr	*newCursor();
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 		bool		ping();
@@ -137,7 +137,7 @@ class sqlitecursor : public sqlrcursor_svr {
 					uint64_t *fieldlength,
 					bool *blob,
 					bool *null);
-		void		cleanUpData();
+		void		closeResultSet();
 
 		char		**columnnames;
 		int		ncolumn;
@@ -199,7 +199,7 @@ bool sqliteconnection::logIn(const char **error) {
 #endif
 }
 
-sqlrcursor_svr *sqliteconnection::initCursor() {
+sqlrcursor_svr *sqliteconnection::newCursor() {
 	return (sqlrcursor_svr *)new sqlitecursor((sqlrconnection_svr *)this);
 }
 
@@ -397,7 +397,7 @@ sqlitecursor::~sqlitecursor() {
 	}
 	#endif
 
-	cleanUpData();
+	closeResultSet();
 	#ifdef HAVE_SQLITE3_STMT
 	sqlite3_finalize(stmt);
 	delete[] lastinsertrowidstr;
@@ -531,13 +531,13 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 				!charstring::compare(sqliteconn->errmesg,
 							"no such table:",14)) {
 
-			cleanUpData();
+			closeResultSet();
 			// If for some reason, querying sqlite_master doesn't
 			// return SQLITE_SCHEMA, rerun the original query and
 			// jump out of the loop.
 			if (runQuery("select * from sqlite_master")
 							!=SQLITE_SCHEMA) {
-				cleanUpData();
+				closeResultSet();
 				success=runQuery(query);
 				break;
 			}
@@ -822,7 +822,7 @@ void sqlitecursor::getField(uint32_t col,
 #endif
 }
 
-void sqlitecursor::cleanUpData() {
+void sqlitecursor::closeResultSet() {
 
 #ifdef HAVE_SQLITE3_STMT
 	if (lastinsertrowidstr) {

@@ -123,7 +123,7 @@ bool droptableautoincrementoracle::dropSequences(sqlrconnection_svr *sqlrcon,
 	if (debug) {
 		stdoutput.printf("running trigger:\n%s\n",query.getString());
 	}
-	sqlrcursor_svr	*cur=sqlrcon->cont->initCursor();
+	sqlrcursor_svr	*cur=sqlrcon->cont->newCursor();
 	if (cur->openInternal(sqlrcon->cont->getCursorCount()+1) &&
 		cur->prepareQuery(query.getString(),query.getStringLength()) &&
 		sqlrcon->cont->executeQuery(cur,query.getString(),
@@ -175,7 +175,7 @@ bool droptableautoincrementoracle::dropSequences(sqlrconnection_svr *sqlrcon,
 			stdoutput.printf("error:\n%s\n",cur->getErrorBuffer());
 		}
 	}
-	cur->cleanUpData();
+	cur->closeResultSet();
 	cur->close();
 	sqlrcon->cont->deleteCursor(cur);
 
@@ -195,7 +195,7 @@ bool droptableautoincrementoracle::dropSequence(sqlrconnection_svr *sqlrcon,
 	if (debug) {
 		stdoutput.printf("running trigger:\n%s\n",query.getString());
 	}
-	sqlrcursor_svr	*cur=sqlrcon->cont->initCursor();
+	sqlrcursor_svr	*cur=sqlrcon->cont->newCursor();
 	if (cur->openInternal(sqlrcon->cont->getCursorCount()+1) &&
 		cur->prepareQuery(query.getString(),query.getStringLength()) &&
 		sqlrcon->cont->executeQuery(cur,query.getString(),
@@ -225,7 +225,7 @@ bool droptableautoincrementoracle::dropSequence(sqlrconnection_svr *sqlrcon,
 			stdoutput.printf("error:\n%s\n",cur->getErrorBuffer());
 		}
 	}
-	cur->cleanUpData();
+	cur->closeResultSet();
 	cur->close();
 	sqlrcon->cont->deleteCursor(cur);
 
@@ -247,7 +247,7 @@ bool droptableautoincrementoracle::deleteSequence(sqlrconnection_svr *sqlrcon,
 	if (debug) {
 		stdoutput.printf("running trigger:\n%s\n",query.getString());
 	}
-	sqlrcursor_svr	*cur=sqlrcon->cont->initCursor();
+	sqlrcursor_svr	*cur=sqlrcon->cont->newCursor();
 	if (cur->openInternal(sqlrcon->cont->getCursorCount()+1) &&
 		cur->prepareQuery(query.getString(),query.getStringLength()) &&
 		sqlrcon->cont->executeQuery(cur,query.getString(),
@@ -274,7 +274,7 @@ bool droptableautoincrementoracle::deleteSequence(sqlrconnection_svr *sqlrcon,
 			stdoutput.printf("error:\n%s\n",cur->getErrorBuffer());
 		}
 	}
-	cur->cleanUpData();
+	cur->closeResultSet();
 	cur->close();
 	sqlrcon->cont->deleteCursor(cur);
 

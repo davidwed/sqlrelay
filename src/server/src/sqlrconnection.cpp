@@ -43,12 +43,7 @@ bool sqlrconnection_svr::supportsAuthOnDatabase() {
 
 bool sqlrconnection_svr::changeUser(const char *newuser,
 					const char *newpassword) {
-	cont->closeCursors(false);
-	cont->logOut();
-	cont->setUser(newuser);
-	cont->setPassword(newpassword);
-	return (cont->logIn(false) &&
-		cont->initCursors(cont->getCursorCount()));
+	return cont->changeUser(newuser,newpassword);
 }
 
 bool sqlrconnection_svr::autoCommitOn() {
@@ -85,7 +80,7 @@ bool sqlrconnection_svr::begin() {
 	// for db's that support begin queries, run one...
 
 	// init some variables
-	sqlrcursor_svr	*begincur=cont->initCursor();
+	sqlrcursor_svr	*begincur=cont->newCursor();
 	const char	*beginquery=beginTransactionQuery();
 	int		beginquerylen=charstring::length(beginquery);
 	bool		retval=false;
@@ -106,7 +101,7 @@ bool sqlrconnection_svr::begin() {
 	}
 
 	// clean up
-	begincur->cleanUpData();
+	begincur->closeResultSet();
 	begincur->close();
 	cont->deleteCursor(begincur);
 
@@ -128,7 +123,7 @@ bool sqlrconnection_svr::commit() {
 	clearError();
 
 	// init some variables
-	sqlrcursor_svr	*commitcur=cont->initCursor();
+	sqlrcursor_svr	*commitcur=cont->newCursor();
 	const char	*commitquery="commit";
 	int		commitquerylen=6;
 	bool		retval=false;
@@ -149,7 +144,7 @@ bool sqlrconnection_svr::commit() {
 	}
 
 	// clean up
-	commitcur->cleanUpData();
+	commitcur->closeResultSet();
 	commitcur->close();
 	cont->deleteCursor(commitcur);
 
@@ -167,7 +162,7 @@ bool sqlrconnection_svr::rollback() {
 	clearError();
 
 	// init some variables
-	sqlrcursor_svr	*rbcur=cont->initCursor();
+	sqlrcursor_svr	*rbcur=cont->newCursor();
 	const char	*rollbackquery="rollback";
 	int		rollbackquerylen=8;
 	bool		retval=false;
@@ -188,7 +183,7 @@ bool sqlrconnection_svr::rollback() {
 	}
 
 	// clean up
-	rbcur->cleanUpData();
+	rbcur->closeResultSet();
 	rbcur->close();
 	cont->deleteCursor(rbcur);
 
@@ -231,14 +226,14 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 	charstring::printf(sdquery,sdquerylen,sdquerybase,database);
 	sdquerylen=charstring::length(sdquery);
 
-	sqlrcursor_svr	*sdcur=cont->initCursor();
+	sqlrcursor_svr	*sdcur=cont->newCursor();
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	bool	retval=false;
 	if (sdcur->openInternal(cont->getCursorCount()+1) &&
 		sdcur->prepareQuery(sdquery,sdquerylen) &&
 		sdcur->executeQuery(sdquery,sdquerylen)) {
-		sdcur->cleanUpData();
+		sdcur->closeResultSet();
 		retval=true;
 
 		// set a flag indicating that the db has been changed
@@ -273,7 +268,7 @@ char *sqlrconnection_svr::getCurrentDatabase() {
 
 	size_t		gcdquerylen=charstring::length(gcdquery);
 
-	sqlrcursor_svr	*gcdcur=cont->initCursor();
+	sqlrcursor_svr	*gcdcur=cont->newCursor();
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	char	*retval=NULL;
@@ -292,7 +287,7 @@ char *sqlrconnection_svr::getCurrentDatabase() {
 			retval=charstring::duplicate(field);
 		} 
 	}
-	gcdcur->cleanUpData();
+	gcdcur->closeResultSet();
 	gcdcur->close();
 	cont->deleteCursor(gcdcur);
 	return retval;
@@ -320,7 +315,7 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id) {
 
 	size_t	liiquerylen=charstring::length(liiquery);
 
-	sqlrcursor_svr	*liicur=cont->initCursor();
+	sqlrcursor_svr	*liicur=cont->newCursor();
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	bool	retval=false;
@@ -353,7 +348,7 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id) {
 					&errorlength,&errnum,&liveconnection);
 	}
 
-	liicur->cleanUpData();
+	liicur->closeResultSet();
 	liicur->close();
 	cont->deleteCursor(liicur);
 	return retval;
@@ -391,7 +386,7 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 	charstring::printf(silquery,silquerylen,silquerybase,isolevel);
 	silquerylen=charstring::length(silquery);
 
-	sqlrcursor_svr	*silcur=cont->initCursor();
+	sqlrcursor_svr	*silcur=cont->newCursor();
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	bool	retval=false;
@@ -409,7 +404,7 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 	} */
 
 	delete[] silquery;
-	silcur->cleanUpData();
+	silcur->closeResultSet();
 	silcur->close();
 	cont->deleteCursor(silcur);
 	return retval;
@@ -420,7 +415,7 @@ const char *sqlrconnection_svr::setIsolationLevelQuery() {
 }
 
 bool sqlrconnection_svr::ping() {
-	sqlrcursor_svr	*pingcur=cont->initCursor();
+	sqlrcursor_svr	*pingcur=cont->newCursor();
 	const char	*pingquery=pingQuery();
 	int		pingquerylen=charstring::length(pingquery);
 	// since we're creating a new cursor for this, make sure it can't
@@ -428,7 +423,7 @@ bool sqlrconnection_svr::ping() {
 	if (pingcur->openInternal(cont->getCursorCount()+1) &&
 		pingcur->prepareQuery(pingquery,pingquerylen) &&
 		pingcur->executeQuery(pingquery,pingquerylen)) {
-		pingcur->cleanUpData();
+		pingcur->closeResultSet();
 		pingcur->close();
 		cont->deleteCursor(pingcur);
 		return true;
@@ -468,7 +463,7 @@ const char *sqlrconnection_svr::dbHostName() {
 	const char	*dbhnquery=dbHostNameQuery();
 	if (dbhnquery) {
 
-		sqlrcursor_svr	*dbhncur=cont->initCursor();
+		sqlrcursor_svr	*dbhncur=cont->newCursor();
 		int		dbhnquerylen=charstring::length(dbhnquery);
 		// since we're creating a new cursor for this, make
 		// sure it can't have an ID that might already exist
@@ -486,7 +481,7 @@ const char *sqlrconnection_svr::dbHostName() {
 				dbhostname=charstring::duplicate(field);
 			} 
 		
-			dbhncur->cleanUpData();
+			dbhncur->closeResultSet();
 		}
 		dbhncur->close();
 		cont->deleteCursor(dbhncur);
@@ -526,7 +521,7 @@ const char *sqlrconnection_svr::dbIpAddress() {
 	const char	*dbiaquery=dbIpAddressQuery();
 	if (dbiaquery) {
 
-		sqlrcursor_svr	*dbiacur=cont->initCursor();
+		sqlrcursor_svr	*dbiacur=cont->newCursor();
 		int		dbiaquerylen=charstring::length(dbiaquery);
 		// since we're creating a new cursor for this, make
 		// sure it can't have an ID that might already exist
@@ -544,7 +539,7 @@ const char *sqlrconnection_svr::dbIpAddress() {
 				dbipaddress=charstring::duplicate(field);
 			} 
 		
-			dbiacur->cleanUpData();
+			dbiacur->closeResultSet();
 		}
 		dbiacur->close();
 		cont->deleteCursor(dbiacur);
@@ -606,13 +601,13 @@ bool sqlrconnection_svr::isSynonym(const char *table) {
 
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
-	sqlrcursor_svr	*syncur=cont->initCursor();
+	sqlrcursor_svr	*syncur=cont->newCursor();
 	bool	result=(syncur->openInternal(cont->getCursorCount()+1) &&
 			syncur->prepareQuery(synquery,synquerylen) &&
 			syncur->executeQuery(synquery,synquerylen) &&
 			!syncur->noRowsToReturn() &&
 			syncur->fetchRow());
-	syncur->cleanUpData();
+	syncur->closeResultSet();
 	syncur->close();
 	cont->deleteCursor(syncur);
 	delete[] synquery;

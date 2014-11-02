@@ -850,7 +850,7 @@ bool sqlrcontroller_svr::initCursors(uint16_t count) {
 	for (uint16_t i=0; i<cursorcount; i++) {
 
 		if (!cur[i]) {
-			cur[i]=initCursor();
+			cur[i]=newCursor();
 		}
 		if (!cur[i]->openInternal(i)) {
 			debugstr.clear();
@@ -865,8 +865,8 @@ bool sqlrcontroller_svr::initCursors(uint16_t count) {
 	return true;
 }
 
-sqlrcursor_svr *sqlrcontroller_svr::initCursor() {
-	sqlrcursor_svr	*cursor=conn->initCursor();
+sqlrcursor_svr *sqlrcontroller_svr::newCursor() {
+	sqlrcursor_svr	*cursor=conn->newCursor();
 	if (cursor) {
 		incrementOpenDatabaseCursors();
 	}
@@ -1670,7 +1670,7 @@ sqlrcursor_svr *sqlrcontroller_svr::getCursor() {
 	}
 	uint16_t	firstnewcursor=cursorcount;
 	do {
-		cur[cursorcount]=initCursor();
+		cur[cursorcount]=newCursor();
 		cur[cursorcount]->setState(SQLRCURSORSTATE_AVAILABLE);
 		if (!cur[cursorcount]->openInternal(cursorcount)) {
 			debugstr.clear();
@@ -1843,6 +1843,19 @@ bool sqlrcontroller_svr::databaseBasedAuth(const char *userbuffer,
 	return lastauthsuccess;
 }
 
+bool sqlrcontroller_svr::changeUser(const char *newuser,
+					const char *newpassword) {
+	closeCursors(false);
+	logOut();
+	setUser(newuser);
+	setPassword(newpassword);
+	return (logIn(false) && initCursors(cursorcount));
+}
+
+void sqlrcontroller_svr::beginSession() {
+	sessionStartQueries();
+}
+
 void sqlrcontroller_svr::suspendSession(const char **unixsocketname,
 						uint16_t *inetportnumber) {
 
@@ -1937,6 +1950,14 @@ bool sqlrcontroller_svr::rollback() {
 
 bool sqlrcontroller_svr::selectDatabase(const char *db) {
 	return (cfgfl->getIgnoreSelectDatabase())?true:conn->selectDatabase(db);
+}
+
+bool sqlrcontroller_svr::getDbSelected() {
+	return dbselected;
+}
+
+void sqlrcontroller_svr::setDbSelected(bool dbselected) {
+	this->dbselected=dbselected;
 }
 
 bool sqlrcontroller_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
@@ -2163,6 +2184,11 @@ bool sqlrcontroller_svr::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 		cursor->setErrorLength(errorlength);
 		cursor->setErrorNumber(errnum);
 		cursor->setLiveConnection(liveconnection);
+	}
+
+	// reset total rows fetched
+	if (success) {
+		cursor->clearTotalRowsFetched();
 	}
 
 	if (success) {
@@ -2731,7 +2757,7 @@ sqlrcursor_svr	*sqlrcontroller_svr::initQueryOrBindCursor(
 	}
 
 	// clean up whatever result set the cursor might have been busy with
-	cursor->cleanUpData();
+	cursor->closeResultSet();
 
 	if (reinitbuffers) {
 
@@ -3019,12 +3045,16 @@ void sqlrcontroller_svr::commitOrRollback(sqlrcursor_svr *cursor) {
 	logDebugMessage("done with commit or rollback check");
 }
 
-void sqlrcontroller_svr::setFakeInputBinds(bool fake) {
-	fakeinputbinds=fake;
-}
-
 bool sqlrcontroller_svr::sendColumnInfo() {
 	return (sendcolumninfo==SEND_COLUMN_INFO);
+}
+
+uint16_t sqlrcontroller_svr::getSendColumnInfo() {
+	return sendcolumninfo;
+}
+
+void sqlrcontroller_svr::setSendColumnInfo(uint16_t sendcolumninfo) {
+	this->sendcolumninfo=sendcolumninfo;
 }
 
 bool sqlrcontroller_svr::skipRows(sqlrcursor_svr *cursor, uint64_t rows) {
@@ -3150,6 +3180,16 @@ void sqlrcontroller_svr::reformatDateTimes(sqlrcursor_svr *cursor,
 	// set return values
 	*newfield=reformattedfield;
 	*newfieldlength=reformattedfieldlength;
+}
+
+void sqlrcontroller_svr::closeAllResultSets() {
+	logDebugMessage("closing result sets for all cursors...");
+	for (int32_t i=0; i<cursorcount; i++) {
+		if (cur[i]) {
+			cur[i]->closeResultSet();
+		}
+	}
+	logDebugMessage("done closing result sets for all cursors...");
 }
 
 void sqlrcontroller_svr::endSession() {
@@ -3304,7 +3344,7 @@ void sqlrcontroller_svr::dropTempTable(sqlrcursor_svr *cursor,
 		executeQuery(cursor,dropquery.getString(),
 					dropquery.getStringLength());
 	}
-	cursor->cleanUpData();
+	cursor->closeResultSet();
 
 	// FIXME: I need to refactor all of this so that this just gets
 	// run as a matter of course instead of explicitly getting run here
@@ -3335,7 +3375,7 @@ void sqlrcontroller_svr::truncateTempTable(sqlrcursor_svr *cursor,
 		executeQuery(cursor,truncatequery.getString(),
 					truncatequery.getStringLength());
 	}
-	cursor->cleanUpData();
+	cursor->closeResultSet();
 }
 
 void sqlrcontroller_svr::closeClientSocket(uint32_t bytes) {
@@ -3467,7 +3507,7 @@ void sqlrcontroller_svr::closeCursors(bool destroy) {
 			cursorcount--;
 
 			if (cur[cursorcount]) {
-				cur[cursorcount]->cleanUpData();
+				cur[cursorcount]->closeResultSet();
 				cur[cursorcount]->close();
 				if (destroy) {
 					deleteCursor(cur[cursorcount]);
@@ -4148,14 +4188,14 @@ void sqlrcontroller_svr::sessionQuery(const char *query) {
 	// create the select database query
 	size_t	querylen=charstring::length(query);
 
-	sqlrcursor_svr	*cur=initCursor();
+	sqlrcursor_svr	*cur=newCursor();
 
 	// since we're creating a new cursor for this, make sure it
 	// can't have an ID that might already exist
 	if (cur->openInternal(cursorcount+1) &&
 		cur->prepareQuery(query,querylen) &&
 		executeQuery(cur,query,querylen)) {
-		cur->cleanUpData();
+		cur->closeResultSet();
 	}
 	cur->close();
 	deleteCursor(cur);
@@ -4204,14 +4244,8 @@ void sqlrcontroller_svr::setFakeTransactionBlocksBehavior(bool ftb) {
 	faketransactionblocks=ftb;
 }
 
-void sqlrcontroller_svr::cleanUpAllCursorData() {
-	logDebugMessage("cleaning up all cursors...");
-	for (int32_t i=0; i<cursorcount; i++) {
-		if (cur[i]) {
-			cur[i]->cleanUpData();
-		}
-	}
-	logDebugMessage("done cleaning up all cursors");
+void sqlrcontroller_svr::setFakeInputBinds(bool fake) {
+	fakeinputbinds=fake;
 }
 
 bool sqlrcontroller_svr::getColumnNames(const char *query,
@@ -4224,7 +4258,7 @@ bool sqlrcontroller_svr::getColumnNames(const char *query,
 
 	size_t		querylen=charstring::length(query);
 
-	sqlrcursor_svr	*gcncur=initCursor();
+	sqlrcursor_svr	*gcncur=newCursor();
 	// since we're creating a new cursor for this, make sure it can't
 	// have an ID that might already exist
 	bool	retval=false;
@@ -4236,7 +4270,7 @@ bool sqlrcontroller_svr::getColumnNames(const char *query,
 		retval=gcncur->getColumnNameList(output);
 
 	}
-	gcncur->cleanUpData();
+	gcncur->closeResultSet();
 	gcncur->close();
 	deleteCursor(gcncur);
 	return retval;
@@ -4398,22 +4432,6 @@ const char *sqlrcontroller_svr::getDbHostName() {
 
 const char *sqlrcontroller_svr::getDbIpAddress() {
 	return dbipaddress;
-}
-
-bool sqlrcontroller_svr::getDbSelected() {
-	return dbselected;
-}
-
-void sqlrcontroller_svr::setDbSelected(bool dbselected) {
-	this->dbselected=dbselected;
-}
-
-uint16_t sqlrcontroller_svr::getSendColumnInfo() {
-	return sendcolumninfo;
-}
-
-void sqlrcontroller_svr::setSendColumnInfo(uint16_t sendcolumninfo) {
-	this->sendcolumninfo=sendcolumninfo;
 }
 
 uint16_t sqlrcontroller_svr::getCursorCount() {

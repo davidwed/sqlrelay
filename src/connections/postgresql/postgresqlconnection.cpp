@@ -22,7 +22,7 @@ class postgresqlconnection : public sqlrconnection_svr {
 		void		handleConnectString();
 		bool		logIn(const char **error);
 		const char	*logInError(const char *errmsg);
-		sqlrcursor_svr	*initCursor();
+		sqlrcursor_svr	*newCursor();
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 		void		errorMessage(char *errorbuffer,
@@ -131,7 +131,7 @@ class postgresqlcursor : public sqlrcursor_svr {
 					uint64_t *fieldlength,
 					bool *blob,
 					bool *null);
-		void		cleanUpData();
+		void		closeResultSet();
 
 		PGresult	*pgresult;
 		ExecStatusType	pgstatus;
@@ -297,7 +297,7 @@ const char *postgresqlconnection::logInError(const char *errmsg) {
 	return errormessage.getString();
 }
 
-sqlrcursor_svr *postgresqlconnection::initCursor() {
+sqlrcursor_svr *postgresqlconnection::newCursor() {
 	return (sqlrcursor_svr *)new
 			postgresqlcursor((sqlrconnection_svr *)this);
 }
@@ -1180,7 +1180,7 @@ void postgresqlcursor::getField(uint32_t col,
 	*fieldlength=PQgetlength(pgresult,currentrow,col);
 }
 
-void postgresqlcursor::cleanUpData() {
+void postgresqlcursor::closeResultSet() {
 
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)

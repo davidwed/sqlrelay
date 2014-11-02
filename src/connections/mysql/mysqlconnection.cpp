@@ -113,7 +113,7 @@ class mysqlcursor : public sqlrcursor_svr {
 					uint64_t *fieldlength,
 					bool *blob,
 					bool *null);
-		void		cleanUpData();
+		void		closeResultSet();
 
 		MYSQL_RES	*mysqlresult;
 		MYSQL_FIELD	*mysqlfields[MAX_SELECT_LIST_SIZE];
@@ -161,7 +161,7 @@ class mysqlconnection : public sqlrconnection_svr {
 		bool		changeUser(const char *newuser,
 						const char *newpassword);
 #endif
-		sqlrcursor_svr	*initCursor();
+		sqlrcursor_svr	*newCursor();
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 		bool		isTransactional();
@@ -412,7 +412,7 @@ bool mysqlconnection::changeUser(const char *newuser,
 }
 #endif
 
-sqlrcursor_svr *mysqlconnection::initCursor() {
+sqlrcursor_svr *mysqlconnection::newCursor() {
 	return (sqlrcursor_svr *)new mysqlcursor((sqlrconnection_svr *)this);
 }
 
@@ -1366,7 +1366,7 @@ void mysqlcursor::getField(uint32_t col,
 #endif
 }
 
-void mysqlcursor::cleanUpData() {
+void mysqlcursor::closeResultSet() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
 		boundvariables=0;

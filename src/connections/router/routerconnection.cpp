@@ -50,7 +50,7 @@ class routerconnection : public sqlrconnection_svr {
 		bool		supportsAuthOnDatabase();
 		void		handleConnectString();
 		bool		logIn(const char **error);
-		sqlrcursor_svr	*initCursor();
+		sqlrcursor_svr	*newCursor();
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 		bool		autoCommitOn();
@@ -221,7 +221,7 @@ class routercursor : public sqlrcursor_svr {
 					uint64_t *fieldlength,
 					bool *blob,
 					bool *null);
-		void		cleanUpData();
+		void		closeResultSet();
 
 		routerconnection	*routerconn;
 
@@ -330,9 +330,8 @@ bool routerconnection::logIn(const char **error) {
 	return true;
 }
 
-sqlrcursor_svr *routerconnection::initCursor() {
-	return (sqlrcursor_svr *)new
-			routercursor((sqlrconnection_svr *)this);
+sqlrcursor_svr *routerconnection::newCursor() {
+	return (sqlrcursor_svr *)new routercursor((sqlrconnection_svr *)this);
 }
 
 void routerconnection::deleteCursor(sqlrcursor_svr *curs) {
@@ -1153,7 +1152,7 @@ void routercursor::getField(uint32_t col,
 	}
 }
 
-void routercursor::cleanUpData() {
+void routercursor::closeResultSet() {
 	if (cur) {
 		cur->clearBinds();
 	}

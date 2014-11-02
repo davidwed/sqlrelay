@@ -158,7 +158,7 @@ class odbccursor : public sqlrcursor_svr {
 					bool *blob,
 					bool *null);
 		void		nextRow();
-		void		cleanUpData();
+		void		closeResultSet();
 
 
 		SQLRETURN	erg;
@@ -202,7 +202,7 @@ class odbcconnection : public sqlrconnection_svr {
 		void		handleConnectString();
 		bool		logIn(const char **error);
 		const char	*logInError(const char *errmsg);
-		sqlrcursor_svr	*initCursor();
+		sqlrcursor_svr	*newCursor();
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 #if (ODBCVER>=0x0300)
@@ -523,7 +523,7 @@ const char *odbcconnection::logInError(const char *errmsg) {
 	return errormessage.getString();
 }
 
-sqlrcursor_svr *odbcconnection::initCursor() {
+sqlrcursor_svr *odbcconnection::newCursor() {
 	return (sqlrcursor_svr *)new odbccursor((sqlrconnection_svr *)this);
 }
 
@@ -1645,7 +1645,7 @@ void odbccursor::nextRow() {
 	//row++;
 }
 
-void odbccursor::cleanUpData() {
+void odbccursor::closeResultSet() {
 
 	for (uint16_t i=0; i<conn->cont->cfgfl->getMaxBindCount(); i++) {
 		delete outdatebind[i];

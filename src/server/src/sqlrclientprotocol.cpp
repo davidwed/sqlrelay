@@ -57,7 +57,7 @@ sqlrclientexitstatus_t sqlrclientprotocol::clientSession() {
 		if (command==AUTHENTICATE) {
 			cont->incrementAuthenticateCount();
 			if (authenticateCommand()) {
-				cont->sessionStartQueries();
+				cont->beginSession();
 				continue;
 			}
 			endsession=false;
@@ -145,7 +145,7 @@ sqlrclientexitstatus_t sqlrclientprotocol::clientSession() {
 			continue;
 		}
 
-		// keep track of the command start time
+		// get the command start-time
 		cursor->setCommandStart(dt.getSeconds(),dt.getMicroseconds());
 
 		// these commands are all handled at the cursor level
@@ -847,8 +847,9 @@ bool sqlrclientprotocol::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 			// indicate that no error has occurred
 			clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 
-			// send the client the id of the 
-			// cursor that it's going to use
+			// send the client the id of the cursor
+			// that it's going to use so it can request
+			// it again later for re-execute
 			clientsock->write(cursor->getId());
 
 			// tell the client that this is not a
@@ -860,9 +861,6 @@ bool sqlrclientprotocol::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 
 			// free memory used by binds
 			bindpool->deallocate();
-
-			// reinit total rows fetched
-			cursor->clearTotalRowsFetched();
 
 			// return the result set
 			return returnResultSetData(cursor,false);
@@ -1084,6 +1082,7 @@ bool sqlrclientprotocol::getInputBinds(sqlrcursor_svr *cursor) {
 			}
 		} else if (bv->type==BLOB_BIND) {
 			// can't fake blob binds
+			// FIXME: push up?
 			cursor->setFakeInputBindsForThisQuery(false);
 			if (!getLobBind(cursor,bv)) {
 				return false;
@@ -1940,13 +1939,13 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 void sqlrclientprotocol::returnOutputBindBlob(sqlrcursor_svr *cursor,
 							uint16_t index) {
 	sendLobOutputBind(cursor,index);
-	cursor->cleanUpLobOutputBind(index);
+	cursor->closeLobOutputBind(index);
 }
 
 void sqlrclientprotocol::returnOutputBindClob(sqlrcursor_svr *cursor,
 							uint16_t index) {
 	sendLobOutputBind(cursor,index);
-	cursor->cleanUpLobOutputBind(index);
+	cursor->closeLobOutputBind(index);
 }
 
 #define MAX_BYTES_PER_CHAR	4
@@ -2139,8 +2138,10 @@ bool sqlrclientprotocol::returnResultSetData(sqlrcursor_svr *cursor,
 
 	// decide whether to use the cursor itself
 	// or an attached custom query cursor
-	if (cursor->getCustomQueryCursor()) {
-		cursor=cursor->getCustomQueryCursor();
+	// FIXME: push up?
+	sqlrcursor_svr	*customcursor=cursor->getCustomQueryCursor();
+	if (customcursor) {
+		cursor=customcursor;
 	}
 
 	// get the number of rows to skip and fetch
@@ -2151,6 +2152,7 @@ bool sqlrclientprotocol::returnResultSetData(sqlrcursor_svr *cursor,
 	}
 
 	// reinit cursor state (in case it was suspended)
+	// FIXME: push up?
 	cursor->setState(SQLRCURSORSTATE_BUSY);
 
 	// for some queries, there are no rows to return, 
@@ -2169,7 +2171,6 @@ bool sqlrclientprotocol::returnResultSetData(sqlrcursor_svr *cursor,
 		return true;
 	}
 
-
 	if (cont->logEnabled()) {
 		debugstr.clear();
 		debugstr.append("fetching ");
@@ -2186,6 +2187,7 @@ bool sqlrclientprotocol::returnResultSetData(sqlrcursor_svr *cursor,
 			break;
 		}
 
+		// FIXME: push up?
 		cursor->incrementTotalRowsFetched();
 
 		if (cont->logEnabled()) {
@@ -2223,7 +2225,7 @@ void sqlrclientprotocol::returnRow(sqlrcursor_svr *cursor) {
 			sendNullField();
 		} else if (blob) {
 			sendLobField(cursor,i);
-			cursor->cleanUpLobField(i);
+			cursor->closeLobField(i);
 		} else {
 			const char	*newfield=NULL;
 			uint32_t	newfieldlength=0;
@@ -2234,6 +2236,7 @@ void sqlrclientprotocol::returnRow(sqlrcursor_svr *cursor) {
 	}
 
 	// get the next row
+	// FIXME: kludgy
 	cursor->nextRow();
 }
 
@@ -2431,11 +2434,14 @@ void sqlrclientprotocol::abortResultSetCommand(sqlrcursor_svr *cursor) {
 
 void sqlrclientprotocol::suspendResultSetCommand(sqlrcursor_svr *cursor) {
 	cont->logDebugMessage("suspend result set...");
+
+	// FIXME: push up?
 	cursor->setState(SQLRCURSORSTATE_SUSPENDED);
 	if (cursor->getCustomQueryCursor()) {
 		cursor->getCustomQueryCursor()->
 			setState(SQLRCURSORSTATE_SUSPENDED);
 	}
+
 	cont->logDebugMessage("done suspending result set");
 }
 
@@ -2517,13 +2523,14 @@ bool sqlrclientprotocol::getListCommand(sqlrcursor_svr *cursor,
 						int which, bool gettable) {
 
 	// clean up any custom query cursors
+	// FIXME: push up?
 	if (cursor->getCustomQueryCursor()) {
 		cursor->getCustomQueryCursor()->close();
 		cursor->clearCustomQueryCursor();
 	}
 
 	// clean up whatever result set the cursor might have been busy with
-	cursor->cleanUpData();
+	cursor->closeResultSet();
 
 	// get length of wild parameter
 	uint32_t	wildlen;

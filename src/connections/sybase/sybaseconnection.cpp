@@ -29,7 +29,7 @@ class sybaseconnection : public sqlrconnection_svr {
 		void		handleConnectString();
 		bool		logIn(const char **error);
 		const char	*logInError(const char *error, uint16_t stage);
-		sqlrcursor_svr	*initCursor();
+		sqlrcursor_svr	*newCursor();
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 		const char	*identify();
@@ -191,7 +191,7 @@ class sybasecursor : public sqlrcursor_svr {
 					bool *blob,
 					bool *null);
 		void		nextRow();
-		void		cleanUpData();
+		void		closeResultSet();
 		void		discardResults();
 		void		discardCursor();
 
@@ -500,7 +500,7 @@ const char *sybaseconnection::logInError(const char *error, uint16_t stage) {
 	return loginerror.getString();
 }
 
-sqlrcursor_svr *sybaseconnection::initCursor() {
+sqlrcursor_svr *sybaseconnection::newCursor() {
 	return (sqlrcursor_svr *)new sybasecursor((sqlrconnection_svr *)this);
 }
 
@@ -759,7 +759,7 @@ bool sybasecursor::open(uint16_t id) {
 		} else {
 			sybaseconn->dbused=true;
 		}
-		cleanUpData();
+		closeResultSet();
 	}
 
 	if (!sybaseconn->dbversion) {
@@ -776,7 +776,7 @@ bool sybasecursor::open(uint16_t id) {
 			sybaseconn->dbversion=
 				charstring::duplicate(data[1],space-data[1]);
 		}
-		cleanUpData();
+		closeResultSet();
 	}
 	return retval;
 }
@@ -1177,7 +1177,7 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	if (ct_send(cmd)!=CS_SUCCEED) {
-		cleanUpData();
+		closeResultSet();
 		return false;
 	}
 
@@ -1186,7 +1186,7 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 		results=ct_results(cmd,&resultstype);
 
 		if (results==CS_FAIL || resultstype==CS_CMD_FAIL) {
-			cleanUpData();
+			closeResultSet();
 			return false;
 		}
 
@@ -1541,7 +1541,7 @@ void sybasecursor::nextRow() {
 	row++;
 }
 
-void sybasecursor::cleanUpData() {
+void sybasecursor::closeResultSet() {
 
 	if (clean) {
 		return;
@@ -1721,12 +1721,12 @@ const char *sybaseconnection::tempTableDropPrefix() {
 }
 
 bool sybaseconnection::commit() {
-	cont->cleanUpAllCursorData();
+	cont->closeAllResultSets();
 	return sqlrconnection_svr::commit();
 }
 
 bool sybaseconnection::rollback() {
-	cont->cleanUpAllCursorData();
+	cont->closeAllResultSets();
 	return sqlrconnection_svr::rollback();
 }
 

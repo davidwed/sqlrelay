@@ -179,7 +179,7 @@ class freetdscursor : public sqlrcursor_svr {
 					bool *blob,
 					bool *null);
 		void		nextRow();
-		void		cleanUpData();
+		void		closeResultSet();
 		void		discardResults();
 		void		discardCursor();
 
@@ -244,7 +244,7 @@ class freetdsconnection : public sqlrconnection_svr {
 		void	handleConnectString();
 		bool	logIn(const char **error);
 		const char	*logInError(const char *error, uint16_t stage);
-		sqlrcursor_svr	*initCursor();
+		sqlrcursor_svr	*newCursor();
 		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
 		const char	*identify();
@@ -561,7 +561,7 @@ const char *freetdsconnection::logInError(const char *error, uint16_t stage) {
 	return loginerror.getString();
 }
 
-sqlrcursor_svr *freetdsconnection::initCursor() {
+sqlrcursor_svr *freetdsconnection::newCursor() {
 	return (sqlrcursor_svr *)new freetdscursor((sqlrconnection_svr *)this);
 }
 
@@ -975,7 +975,7 @@ bool freetdscursor::open(uint16_t id) {
 		} else {
 			freetdsconn->dbused=true;
 		}
-		cleanUpData();
+		closeResultSet();
 	}
 
 	if (!freetdsconn->dbversion) {
@@ -994,7 +994,7 @@ bool freetdscursor::open(uint16_t id) {
 				charstring::duplicate(data[1],space-data[1]);
 			success=true;
 		}
-		cleanUpData();
+		closeResultSet();
 		if (success) {
 			return retval;
 		}
@@ -1021,7 +1021,7 @@ bool freetdscursor::open(uint16_t id) {
 				}
 			}
 		}
-		cleanUpData();
+		closeResultSet();
 		if (success) {
 			return retval;
 		}
@@ -1050,11 +1050,11 @@ bool freetdscursor::close() {
 bool freetdscursor::prepareQuery(const char *query, uint32_t length) {
 
 	// if the client aborts while a query is in the middle of running,
-	// commit or rollback will be called, potentially before cleanUpData
+	// commit or rollback will be called, potentially before closeResultSet
 	// is called and, since we're really only using 1 cursor, it will fail
-	// unless cleanUpData gets called, so just to make sure, we'll call it
-	// here
-	cleanUpData();
+	// unless closeResultSet gets called, so just to make sure, we'll call
+	// it here
+	closeResultSet();
 
 	clean=true;
 
@@ -1472,7 +1472,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 #endif
 
 	if (ct_send(cmd)!=CS_SUCCEED) {
-		cleanUpData();
+		closeResultSet();
 		return false;
 	}
 
@@ -1482,7 +1482,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 
 		if (results==CS_FAIL ||
 			resultstype==CS_CMD_FAIL || resultstype==CS_CMD_DONE) {
-			cleanUpData();
+			closeResultSet();
 			return false;
 		}
 
@@ -1648,7 +1648,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 
 	// If we got a moneycolumn (and version<0.53) then cancel the
 	// result set.  Otherwise FreeTDS will spew "unknown marker"
-	// errors to the screen when cleanUpData() is called.
+	// errors to the screen when closeResultSet() is called.
 	if (moneycolumn) {
 		if (ct_cancel(NULL,cmd,CS_CANCEL_CURRENT)==CS_FAIL) {
 			freetdsconn->liveconnection=false;
@@ -1936,7 +1936,7 @@ bool freetdscursor::fetchRow() {
 		// sets must be fetched or cancelled as well until ct_results
 		// returns CS_END_RESULTS or CS_CANCELLED.  Since SQL Relay only
 		// supports one result set per query, we can go ahead and cancel
-		// any remaining result sets here.  cleanUpData would do this
+		// any remaining result sets here.  closeResultSet would do this
 		// for us but not before another query gets run on the same
 		// cursor, so we must explicitly call it here too in case
 		// someone wants to do something with another cursor.
@@ -1972,7 +1972,7 @@ void freetdscursor::nextRow() {
 	row++;
 }
 
-void freetdscursor::cleanUpData() {
+void freetdscursor::closeResultSet() {
 
 	if (clean) {
 		return;
@@ -2158,12 +2158,12 @@ const char *freetdsconnection::tempTableDropPrefix() {
 }
 
 bool freetdsconnection::commit() {
-	cont->cleanUpAllCursorData();
+	cont->closeAllResultSets();
 	return sqlrconnection_svr::commit();
 }
 
 bool freetdsconnection::rollback() {
-	cont->cleanUpAllCursorData();
+	cont->closeAllResultSets();
 	return sqlrconnection_svr::rollback();
 }
 

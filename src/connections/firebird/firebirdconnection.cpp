@@ -145,7 +145,7 @@ class firebirdcursor : public sqlrcursor_svr {
 							uint64_t offset,
 							uint64_t charstoread,
 							uint64_t *charsread);
-		void		cleanUpLobOutputBind(uint16_t index);
+		void		closeLobOutputBind(uint16_t index);
 		bool		executeQuery(const char *query,
 						uint32_t length);
 		void		errorMessage(char *errorbuffer,
@@ -176,8 +176,8 @@ class firebirdcursor : public sqlrcursor_svr {
 					char *buffer, uint64_t buffersize,
 					uint64_t offset, uint64_t charstoread,
 					uint64_t *charsread);
-		void		cleanUpLobField(uint32_t col);
-		void		cleanUpData();
+		void		closeLobField(uint32_t col);
+		void		closeResultSet();
 
 
 		isc_stmt_handle	stmt;
@@ -212,7 +212,7 @@ class firebirdconnection : public sqlrconnection_svr {
 	private:
 		void	handleConnectString();
 		bool	logIn(const char **error);
-		sqlrcursor_svr	*initCursor();
+		sqlrcursor_svr	*newCursor();
 		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
 		bool	supportsTransactionBlocks();
@@ -404,9 +404,8 @@ bool firebirdconnection::logIn(const char **err) {
 	return true;
 }
 
-sqlrcursor_svr *firebirdconnection::initCursor() {
-	return (sqlrcursor_svr *)new firebirdcursor(
-					(sqlrconnection_svr *)this);
+sqlrcursor_svr *firebirdconnection::newCursor() {
+	return (sqlrcursor_svr *)new firebirdcursor((sqlrconnection_svr *)this);
 }
 
 void firebirdconnection::deleteCursor(sqlrcursor_svr *curs) {
@@ -1261,7 +1260,7 @@ bool firebirdcursor::getLobOutputBindSegment(uint16_t index,
 	return true;
 }
 
-void firebirdcursor::cleanUpLobOutputBind(uint16_t index) {
+void firebirdcursor::closeLobOutputBind(uint16_t index) {
 
 	// close the blob, if necessary
 	if (outblobisopen[index]) {
@@ -1886,7 +1885,7 @@ bool firebirdcursor::getLobFieldSegment(uint32_t col,
 	return true;
 }
 
-void firebirdcursor::cleanUpLobField(uint32_t col) {
+void firebirdcursor::closeLobField(uint32_t col) {
 
 	// ignore non-blobs
 	if (field[col].sqlrtype!=BLOB_DATATYPE) {
@@ -1900,7 +1899,7 @@ void firebirdcursor::cleanUpLobField(uint32_t col) {
 	}
 }
 
-void firebirdcursor::cleanUpData() {
+void firebirdcursor::closeResultSet() {
 	outbindcount=0;
 }
 

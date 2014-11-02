@@ -97,7 +97,7 @@ class DLLSPEC oracle8connection : public sqlrconnection_svr {
 #endif
 		bool		logIn(const char **error);
 		const char	*logInError(const char *errmsg);
-		sqlrcursor_svr	*initCursor();
+		sqlrcursor_svr	*newCursor();
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
@@ -324,8 +324,8 @@ class DLLSPEC oracle8cursor : public sqlrcursor_svr {
 					char *buffer, uint64_t buffersize,
 					uint64_t offset, uint64_t charstoread,
 					uint64_t *charsread);
-		void		cleanUpLobField(uint32_t col);
-		void		cleanUpData();
+		void		closeLobField(uint32_t col);
+		void		closeResultSet();
 
 		void		checkRePrepare();
 
@@ -953,7 +953,7 @@ const char *oracle8connection::logInError(const char *errmsg) {
 	return errormessage.getString();
 }
 
-sqlrcursor_svr *oracle8connection::initCursor() {
+sqlrcursor_svr *oracle8connection::newCursor() {
 	return (sqlrcursor_svr *)new oracle8cursor((sqlrconnection_svr *)this);
 }
 
@@ -2075,7 +2075,7 @@ bool oracle8cursor::open(uint16_t id) {
 
 bool oracle8cursor::close() {
 
-	cleanUpData();
+	closeResultSet();
 
 #ifdef OCI_STMT_CACHE
 	if (oracle8conn->stmtcachesize && stmt) {
@@ -2197,7 +2197,7 @@ void oracle8cursor::checkRePrepare() {
 
 	if (oracle8conn->requiresreprepare && !prepared &&
 			stmttype && stmttype!=OCI_STMT_SELECT) {
-		cleanUpData();
+		closeResultSet();
 		prepareQuery(query,length);
 		prepared=true;
 	}
@@ -3496,7 +3496,7 @@ bool oracle8cursor::getLobFieldSegment(uint32_t col,
 	return (result!=OCI_INVALID_HANDLE);
 }
 
-void oracle8cursor::cleanUpLobField(uint32_t col) {
+void oracle8cursor::closeLobField(uint32_t col) {
 #ifdef HAVE_ORACLE_8i
 	// if the lob is temporary, deallocate it
 	boolean	templob;
@@ -3514,7 +3514,7 @@ void oracle8cursor::cleanUpLobField(uint32_t col) {
 #endif
 }
 
-void oracle8cursor::cleanUpData() {
+void oracle8cursor::closeResultSet() {
 
 	// OCI8 version of ocan(), but since it uses OCIStmtFetch we
 	// only want to run it if the statement was a select
