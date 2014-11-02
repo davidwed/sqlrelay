@@ -238,7 +238,7 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 
 		// set a flag indicating that the db has been changed
 		// so it can be reset at the end of the session
-		cont->setDbSelected(true);
+		cont->dbHasChanged();
 	} else {
 		// If there was an error, copy it out.  We'l be destroying the
 		// cursor in a moment and the error will be lost otherwise.

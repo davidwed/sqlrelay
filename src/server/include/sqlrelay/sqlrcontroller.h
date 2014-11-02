@@ -60,7 +60,7 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		void	reLogIn();
 
 		// client connections
-		void		closeClientSocket(uint32_t bytes);
+		void	closeClientSocket(uint32_t bytes);
 
 		// client authentication
 		void		setUser(const char *user);
@@ -82,19 +82,16 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		const char	*getDbHostName();
 		const char	*getDbIpAddress();
 
-		// selecting which db to use
+		// db selection
 		bool	selectDatabase(const char *db);
-		bool	getDbSelected();
-		void	setDbSelected(bool dbselected);
+		void	dbHasChanged();
 
 		// transactions
 		void	setFakeTransactionBlocksBehavior(bool ftb);
 		void	setAutoCommitBehavior(bool ac);
 		void	setNeedCommitOrRollback(bool needcommitorrollback);
-
 		bool	autoCommitOn();
 		bool	autoCommitOff();
-
 		bool	begin();
 		bool	commit();
 		bool	rollback();
@@ -127,10 +124,9 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 							uint32_t length);
 
 		// custom query handlers
-		sqlrcursor_svr	*getCustomQueryHandler(sqlrcursor_svr *cursor);
+		sqlrcursor_svr	*getCustomQueryCursor(sqlrcursor_svr *cursor);
 
 		// column info
-		bool		sendColumnInfo();
 		uint16_t	getSendColumnInfo();
 		void		setSendColumnInfo(uint16_t sendcolumninfo);
 		bool		getColumnNames(const char *query,
@@ -173,22 +169,10 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 
 		// states
 		void	updateState(enum sqlrconnectionstate_t state);
-
-		// logging
-		bool	logEnabled();
-		void	logDebugMessage(const char *info);
-		void	logClientConnected();
-		void	logClientConnectionRefused(const char *info);
-		void	logClientDisconnected(const char *info);
-		void	logClientProtocolError(sqlrcursor_svr *cursor,
-							const char *info,
-							ssize_t result);
-		void	logDbLogIn();
-		void	logDbLogOut();
-		void	logDbError(sqlrcursor_svr *cursor, const char *info);
-		void	logQuery(sqlrcursor_svr *cursor);
-		void	logInternalError(sqlrcursor_svr *cursor,
-							const char *info);
+		void	updateCurrentQuery(const char *query,
+						uint32_t querylen);
+		void	updateClientInfo(const char *info,
+						uint32_t infolen);
 
 		// statistics
 		void	incrementOpenDatabaseConnections();
@@ -230,10 +214,22 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		void	incrementGetColumnListCount();
 		void	incrementGetQueryTreeCount();
 		void	incrementReLogInCount();
-		void	updateCurrentQuery(const char *query,
-						uint32_t querylen);
-		void	updateClientInfo(const char *info,
-						uint32_t infolen);
+
+		// logging
+		bool	logEnabled();
+		void	logDebugMessage(const char *info);
+		void	logClientConnected();
+		void	logClientConnectionRefused(const char *info);
+		void	logClientDisconnected(const char *info);
+		void	logClientProtocolError(sqlrcursor_svr *cursor,
+							const char *info,
+							ssize_t result);
+		void	logDbLogIn();
+		void	logDbLogOut();
+		void	logDbError(sqlrcursor_svr *cursor, const char *info);
+		void	logQuery(sqlrcursor_svr *cursor);
+		void	logInternalError(sqlrcursor_svr *cursor,
+							const char *info);
 
 		// config file
 		sqlrconfigfile	*cfgfl;
@@ -241,14 +237,6 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		// statistics
 		shmdata			*shm;
 		sqlrconnstatistics	*connstats;
-
-	protected:
-		virtual bool	createSharedMemoryAndSemaphores(const char *id);
-
-		cmdline		*cmdl;
-
-		semaphoreset	*semset;
-		sharedmemory	*idmemory;
 
 	private:
 		void	setUserAndGroup();
@@ -351,20 +339,21 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 
 		void	closeCursors(bool destroy);
 
-		shmdata		*getAnnounceBuffer();
+		bool	createSharedMemoryAndSemaphores(const char *id);
+		shmdata	*getAnnounceBuffer();
 
 		void	decrementConnectedClientCount();
 
-		bool		acquireAnnounceMutex();
-		void		releaseAnnounceMutex();
+		bool	acquireAnnounceMutex();
+		void	releaseAnnounceMutex();
 
-		void		signalListenerToRead();
-		bool		waitForListenerToFinishReading();
+		void	signalListenerToRead();
+		bool	waitForListenerToFinishReading();
 
-		void		acquireConnectionCountMutex();
-		void		releaseConnectionCountMutex();
+		void	acquireConnectionCountMutex();
+		void	releaseConnectionCountMutex();
 
-		void		signalScalerToRead();
+		void	signalScalerToRead();
 
 		void	initConnStats();
 		void	clearConnStats();
@@ -379,7 +368,12 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 
 		static void	alarmHandler(int32_t signum);
 
+		cmdline		*cmdl;
+
 		sqlrconnection_svr	*conn;
+
+		semaphoreset	*semset;
+		sharedmemory	*shmem;
 
 		sqlrprotocol			*sqlrp[SQLRPROTOCOLCOUNT];
 		sqlparser			*sqlp;
@@ -397,7 +391,7 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		const char	*user;
 		const char	*password;
 
-		bool		dbselected;
+		bool		dbchanged;
 		char		*originaldb;
 
 		tempdir		*tmpdir;

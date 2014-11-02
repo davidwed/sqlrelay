@@ -141,7 +141,7 @@ class SQLRSERVER_DLLSPEC sqlrlistener : public listener {
 		// it appears that they do have to be or their destructors don't
 		// get called for some reason.
 		semaphoreset	*semset;
-		sharedmemory	*idmemory;
+		sharedmemory	*shmem;
 		shmdata		*shm;
 		char		*idfilename;
 

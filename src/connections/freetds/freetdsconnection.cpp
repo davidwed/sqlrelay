@@ -10,6 +10,7 @@
 #include <rudiments/stdio.h>
 
 #include <datatypes.h>
+#include <defines.h>
 #include <config.h>
 
 extern "C" {
@@ -1631,7 +1632,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 			}
 
 			// describe the columns
-			if (conn->cont->sendColumnInfo()) {
+			if (conn->cont->getSendColumnInfo()==SEND_COLUMN_INFO) {
 				if (ct_describe(cmd,i+1,&column[i])!=
 								CS_SUCCEED) {
 					break;

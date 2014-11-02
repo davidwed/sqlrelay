@@ -1,138 +1,20 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
-#include <rudiments/signalclasses.h>
+#include <rudiments/semaphoreset.h>
+#include <rudiments/sharedmemory.h>
 #include <rudiments/process.h>
 #include <rudiments/charstring.h>
 #include <rudiments/error.h>
 #include <rudiments/stdio.h>
+#include <sqlrelay/private/sqlrshmdata.h>
 #include <cmdline.h>
+#include <sqlrconfigfile.h>
+#include <tempdir.h>
 #include <datatypes.h>
 #include <defines.h>
 #include <config.h>
 
-
-class status : public sqlrcontroller_svr {
-	public:
-		status();
-		shmdata 		*getStatistics();
-		uint32_t		getConnectionCount();
-		uint32_t		getConnectedClientCount();
-		bool			init(int argc, const char **argv);
-		semaphoreset		*getSemset();
-	private:
-		bool	attachToSharedMemoryAndSemaphores(const char *tmpdir,
-								const char *id);
-
-		bool	connected;
-
-		tempdir		*tmpdir;
-
-		semaphoreset	*statussemset;
-
-		shmdata		privateshm;
-};
-
-status::status() : sqlrcontroller_svr() {
-	connected=false;
-}
-
-semaphoreset *status::getSemset() {
-	return statussemset;
-}
-
-shmdata *status::getStatistics() {
-	if (!statussemset) {
-		return NULL;
-	}
-	statussemset->waitWithUndo(9);
-	privateshm=*shm;
-	statussemset->signalWithUndo(9);
-	return &privateshm;
-}
-
-uint32_t status::getConnectionCount() {
-	if (!shm) {
-		return 0;
-	}
-	return shm->totalconnections;
-}
-
-uint32_t status::getConnectedClientCount() {
-	if (!shm) {
-		return 0;
-	}
-	return shm->connectedclients;
-}
-
-bool status::init(int argc, const char **argv) {
-	
-	cmdl=new cmdline(argc,argv);
-
-	cfgfl=new sqlrconfigfile();
-	tmpdir=new tempdir(cmdl);
-	shm=NULL;
-
-	if (!cfgfl->parse(cmdl->getConfig(),cmdl->getId())) {
-		return false;
-	}
-
-	if (!attachToSharedMemoryAndSemaphores(tmpdir->getString(),
-							cmdl->getId())) {
-		return false;
-	}
-
-	shm=(shmdata *)idmemory->getPointer();
-	if (!shm) {
-		stderror.printf("failed to get pointer to shmdata\n");
-		return false;
-	}
-
-	return true;
-}
-
-bool status::attachToSharedMemoryAndSemaphores(const char *tmpdir,
-							const char *id) {
-	
-	size_t  idfilenamelen=charstring::length(tmpdir)+5+
-		charstring::length(id)+1;
-	char	*idfilename=new char[idfilenamelen];
-	charstring::printf(idfilename,idfilenamelen,"%s/ipc/%s",tmpdir,id);
-
-	key_t	key=file::generateKey(idfilename,1);
-
-	idmemory=new sharedmemory();
-	if (!idmemory->attach(key,sizeof(shmdata))) {
-		char	*err=error::getErrorString();
-		stderror.printf("Couldn't attach to shared memory segment: ");
-		stderror.printf("%s\n",err);
-		delete[] err;
-		delete idmemory;
-		statussemset=NULL;
-		idmemory=NULL;
-		delete[] idfilename;
-		return false;
-	}
-
-	statussemset=new semaphoreset();
-	if (!statussemset->attach(key,11)) {
-		char	*err=error::getErrorString();
-		stderror.printf("Couldn't attach to semaphore set: ");
-		stderror.printf("%s\n",err);
-		delete[] err;
-		delete statussemset;
-		delete idmemory;
-		statussemset=NULL;
-		idmemory=NULL;
-		delete[] idfilename;
-		return false;
-	}
-
-	delete[] idfilename;
-
-	return true;
-}
 
 void printAcquisitionStatus(int32_t sem) {
 	stdoutput.printf("%s (%d)\n",(sem)?"acquired    ":"not acquired",sem);
@@ -146,17 +28,59 @@ int main(int argc, const char **argv) {
 
 	#include <version.h>
 
-	status	s;
+	// parse the command line
+	cmdline	cmdl(argc,argv);
 
-	// open the connection
-	// this will fail, just ignore it for now
-	s.init(argc,argv);
+	// parse the config file
+	sqlrconfigfile	cfgfl;
+	if (!cfgfl.parse(cmdl.getConfig(),cmdl.getId())) {
+		process::exit(0);
+	}
 	
-	shmdata	*statistics=s.getStatistics();
-	if (!statistics) {
+	// get the id filename and key
+	tempdir		tmpdir(&cmdl);
+	stringbuffer	idfilename;
+	idfilename.append(tmpdir.getString());
+	idfilename.append("/ipc/");
+	idfilename.append(cmdl.getId());
+	key_t	key=file::generateKey(idfilename.getString(),1);
+
+	// attach to the shared memory segment for the specified instance
+	sharedmemory	idmemory;
+	if (!idmemory.attach(key,sizeof(shmdata))) {
+		char	*err=error::getErrorString();
+		stderror.printf("Couldn't attach to shared memory segment: ");
+		stderror.printf("%s\n",err);
+		delete[] err;
+		process::exit(0);
+	}
+	shmdata	*shm=(shmdata *)idmemory.getPointer();
+	if (!shm) {
+		stderror.printf("failed to get pointer to shmdata\n");
 		process::exit(0);
 	}
 
+	// attach to the semaphore set for the specified instance
+	semaphoreset	semset;
+	if (!semset.attach(key,11)) {
+		char	*err=error::getErrorString();
+		stderror.printf("Couldn't attach to semaphore set: ");
+		stderror.printf("%s\n",err);
+		delete[] err;
+		process::exit(0);
+	}
+
+	// take a snapshot of the stats
+	semset.waitWithUndo(9);
+	shmdata		statistics=*shm;
+	semset.signalWithUndo(9);
+	#define SEM_COUNT	11
+	int32_t	sem[SEM_COUNT];
+	for (uint16_t i=0; i<SEM_COUNT; i++) {
+		sem[i]=semset.getValue(i);
+	}
+
+	// print out stats
 	stdoutput.printf( 
 		"  Open   Database Connections:  %d\n" 
 		"  Opened Database Connections:  %d\n" 
@@ -174,34 +98,25 @@ int main(int argc, const char **argv) {
 		"  Total  Errors:                %d\n"
 		"\n"
 		"  Forked Listeners:             %d\n"
-		"\n",
-		statistics->open_db_connections, 
-		statistics->opened_db_connections,
-		statistics->open_db_cursors,
-		statistics->opened_db_cursors,
-		statistics->open_cli_connections, 
-		statistics->opened_cli_connections,
-		statistics->times_new_cursor_used,
-		statistics->times_cursor_reused,
-		statistics->total_queries,
-		statistics->total_errors,
-		statistics->forked_listeners
-		);
-	
-	stdoutput.printf(
+		"\n"
 		"Scaler's view:\n"
 		"  Connections:                  %d\n"
 		"  Connected Clients:            %d\n"
 		"\n",
-		s.getConnectionCount(),
-		s.getConnectedClientCount()
+		statistics.open_db_connections, 
+		statistics.opened_db_connections,
+		statistics.open_db_cursors,
+		statistics.opened_db_cursors,
+		statistics.open_cli_connections, 
+		statistics.opened_cli_connections,
+		statistics.times_new_cursor_used,
+		statistics.times_cursor_reused,
+		statistics.total_queries,
+		statistics.total_errors,
+		statistics.forked_listeners,
+		statistics.totalconnections,
+		statistics.connectedclients
 		);
-
-	#define SEM_COUNT	11
-	int32_t	sem[SEM_COUNT];
-	for (uint16_t i=0; i<SEM_COUNT; i++) {
-		sem[i]=s.getSemset()->getValue(i);
-	}
 
 	stdoutput.printf("Mutexes:\n");
 	stdoutput.printf("  Connection Announce               : ");
@@ -243,7 +158,6 @@ int main(int argc, const char **argv) {
 		sem[0],sem[1],sem[2],sem[3],sem[4],
 		sem[5],sem[6],sem[7],sem[8],sem[9],sem[10]
 		);
-
 
 	process::exit(0);
 }

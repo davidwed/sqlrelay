@@ -56,7 +56,7 @@ class SQLRSERVER_DLLSPEC scaler {
 
 		semaphoreset	*semset;
 
-		sharedmemory	*idmemory;
+		sharedmemory	*shmem;
 		shmdata		*shm;
 
 		linkedlist< connectstringcontainer * > *connectstringlist;

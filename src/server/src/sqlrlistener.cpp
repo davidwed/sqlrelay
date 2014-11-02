@@ -37,7 +37,7 @@ sqlrlistener::sqlrlistener() : listener() {
 	sqlrlg=NULL;
 
 	semset=NULL;
-	idmemory=NULL;
+	shmem=NULL;
 	shm=NULL;
 	idfilename=NULL;
 
@@ -78,7 +78,7 @@ sqlrlistener::sqlrlistener() : listener() {
 
 sqlrlistener::~sqlrlistener() {
 	delete semset;
-	delete idmemory;
+	delete shmem;
 	if (!isforkedchild && idfilename) {
 		file::remove(idfilename);
 	}
@@ -475,14 +475,14 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	// FIXME: if it already exists, attempt to remove and re-create it
 	logDebugMessage("creating shared memory...");
 
-	idmemory=new sharedmemory;
-	if (!idmemory->create(key,sizeof(shmdata),
+	shmem=new sharedmemory;
+	if (!shmem->create(key,sizeof(shmdata),
 				permissions::evalPermString("rw-r-----"))) {
-		shmError(id,idmemory->getId());
-		idmemory->attach(key,sizeof(shmdata));
+		shmError(id,shmem->getId());
+		shmem->attach(key,sizeof(shmdata));
 		return false;
 	}
-	shm=(shmdata *)idmemory->getPointer();
+	shm=(shmdata *)shmem->getPointer();
 	bytestring::zero(shm,sizeof(shmdata));
 
 	setStartTime();
@@ -1151,7 +1151,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		// since this is the forked off listener, we don't
 		// want to actually remove the semaphore set or shared
 		// memory segment when it exits
-		idmemory->dontRemove();
+		shmem->dontRemove();
 		semset->dontRemove();
 
 		// re-init loggers

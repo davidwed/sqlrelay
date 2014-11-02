@@ -11,6 +11,7 @@
 
 #include <config.h>
 #include <datatypes.h>
+#include <defines.h>
 
 extern "C" {
 	#include <ctpublic.h>
@@ -1294,7 +1295,7 @@ bool sybasecursor::executeQuery(const char *query, uint32_t length) {
 			}
 
 			// describe the columns
-			if (conn->cont->sendColumnInfo()) {
+			if (conn->cont->getSendColumnInfo()==SEND_COLUMN_INFO) {
 				if (ct_describe(cmd,i+1,&column[i])!=
 								CS_SUCCEED) {
 					break;

@@ -6,6 +6,7 @@
 #include <rudiments/environment.h>
 
 #include <datatypes.h>
+#include <defines.h>
 #include <config.h>
 
 #include <sqlcli1.h>
@@ -1235,7 +1236,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 	// run through the columns
 	for (SQLSMALLINT i=0; i<ncols; i++) {
 
-		if (conn->cont->sendColumnInfo()) {
+		if (conn->cont->getSendColumnInfo()==SEND_COLUMN_INFO) {
 
 			// column name
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_LABEL,

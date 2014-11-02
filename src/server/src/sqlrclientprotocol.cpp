@@ -738,7 +738,7 @@ bool sqlrclientprotocol::newQueryCommand(sqlrcursor_svr *cursor) {
 
 	// do we need to use a custom query handler for this query?
 	if (success) {
-		cursor=cont->getCustomQueryHandler(cursor);
+		cursor=cont->getCustomQueryCursor(cursor);
 	}
 
 	// get binds and whether to get column info

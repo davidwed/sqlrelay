@@ -41,7 +41,7 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 	cmdl=NULL;
 	cfgfl=NULL;
 	semset=NULL;
-	idmemory=NULL;
+	shmem=NULL;
 	connstats=NULL;
 
 	updown=NULL;
@@ -51,7 +51,7 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 	user=NULL;
 	password=NULL;
 
-	dbselected=false;
+	dbchanged=false;
 	originaldb=NULL;
 
 	tmpdir=NULL;
@@ -173,7 +173,7 @@ sqlrcontroller_svr::~sqlrcontroller_svr() {
 	delete[] passwords;
 	delete[] passwordencryptions;
 
-	delete idmemory;
+	delete shmem;
 
 	delete semset;
 
@@ -1255,7 +1255,7 @@ bool sqlrcontroller_svr::announceAvailability(const char *unixsocket,
 	}
 
 	// get a pointer to the shared memory segment
-	shmdata	*idmemoryptr=getAnnounceBuffer();
+	shmdata	*shmemptr=getAnnounceBuffer();
 
 	// set time-to-live alarm
 	if (ttl>0) {
@@ -1274,9 +1274,9 @@ bool sqlrcontroller_svr::announceAvailability(const char *unixsocket,
 	updateState(ANNOUNCE_AVAILABILITY);
 
 	// write the connectionid and pid into the segment
-	charstring::copy(idmemoryptr->connectionid,
+	charstring::copy(shmemptr->connectionid,
 				connectionid,MAXCONNECTIONIDLEN);
-	idmemoryptr->connectioninfo.connectionpid=process::getProcessId();
+	shmemptr->connectioninfo.connectionpid=process::getProcessId();
 
 	signalListenerToRead();
 
@@ -1959,12 +1959,8 @@ bool sqlrcontroller_svr::selectDatabase(const char *db) {
 	return (cfgfl->getIgnoreSelectDatabase())?true:conn->selectDatabase(db);
 }
 
-bool sqlrcontroller_svr::getDbSelected() {
-	return dbselected;
-}
-
-void sqlrcontroller_svr::setDbSelected(bool dbselected) {
-	this->dbselected=dbselected;
+void sqlrcontroller_svr::dbHasChanged() {
+	this->dbchanged=true;
 }
 
 bool sqlrcontroller_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
@@ -2786,10 +2782,10 @@ sqlrcursor_svr	*sqlrcontroller_svr::initQueryOrBindCursor(
 	return cursor;
 }
 
-sqlrcursor_svr *sqlrcontroller_svr::getCustomQueryHandler(	
+sqlrcursor_svr *sqlrcontroller_svr::getCustomQueryCursor(	
 						sqlrcursor_svr *cursor) {
 
-	// do we need to use a custom query handler for this query?
+	// do we need to use a custom query cursor for this query?
 
 	// bail right away if custom queries aren't enabled
 	if (!sqlrq) {
@@ -3052,10 +3048,6 @@ void sqlrcontroller_svr::commitOrRollback(sqlrcursor_svr *cursor) {
 	logDebugMessage("done with commit or rollback check");
 }
 
-bool sqlrcontroller_svr::sendColumnInfo() {
-	return (sendcolumninfo==SEND_COLUMN_INFO);
-}
-
 uint16_t sqlrcontroller_svr::getSendColumnInfo() {
 	return sendcolumninfo;
 }
@@ -3255,11 +3247,11 @@ void sqlrcontroller_svr::endSession() {
 	sessionEndQueries();
 
 	// reset database/schema
-	if (dbselected) {
+	if (dbchanged) {
 		// FIXME: we're ignoring the result and error,
 		// should we do something if there's an error?
 		conn->selectDatabase(originaldb);
-		dbselected=false;
+		dbchanged=false;
 	}
 
 	// reset autocommit behavior
@@ -3476,7 +3468,7 @@ void sqlrcontroller_svr::shutDown() {
 
 	// decrement the connection counter
 	if (decrementonclose && cfgfl->getDynamicScaling() &&
-						semset && idmemory) {
+						semset && shmem) {
 		decrementConnectionCount();
 	}
 
@@ -3551,23 +3543,23 @@ bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(const char *id) {
 
 	// connect to the shared memory
 	logDebugMessage("attaching to shared memory...");
-	idmemory=new sharedmemory();
-	if (!idmemory->attach(file::generateKey(idfilename,1),
+	shmem=new sharedmemory();
+	if (!shmem->attach(file::generateKey(idfilename,1),
 						sizeof(shmdata))) {
 		char	*err=error::getErrorString();
 		stderror.printf("Couldn't attach to shared memory segment: ");
 		stderror.printf("%s\n",err);
 		delete[] err;
-		delete idmemory;
-		idmemory=NULL;
+		delete shmem;
+		shmem=NULL;
 		delete[] idfilename;
 		return false;
 	}
-	shm=(shmdata *)idmemory->getPointer();
+	shm=(shmdata *)shmem->getPointer();
 	if (!shm) {
 		stderror.printf("failed to get pointer to shmdata\n");
-		delete idmemory;
-		idmemory=NULL;
+		delete shmem;
+		shmem=NULL;
 		delete[] idfilename;
 		return false;
 	}
@@ -3581,9 +3573,9 @@ bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(const char *id) {
 		stderror.printf("%s\n",err);
 		delete[] err;
 		delete semset;
-		delete idmemory;
+		delete shmem;
 		semset=NULL;
-		idmemory=NULL;
+		shmem=NULL;
 		delete[] idfilename;
 		return false;
 	}
@@ -3596,7 +3588,7 @@ bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(const char *id) {
 }
 
 shmdata *sqlrcontroller_svr::getAnnounceBuffer() {
-	return (shmdata *)idmemory->getPointer();
+	return (shmdata *)shmem->getPointer();
 }
 
 void sqlrcontroller_svr::decrementConnectedClientCount() {
@@ -4275,7 +4267,6 @@ bool sqlrcontroller_svr::getColumnNames(const char *query,
 
 		// build column list...
 		retval=gcncur->getColumnNameList(output);
-
 	}
 	gcncur->closeResultSet();
 	gcncur->close();

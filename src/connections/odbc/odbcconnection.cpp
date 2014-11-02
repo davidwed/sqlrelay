@@ -17,6 +17,7 @@
 #include <rudiments/stdio.h>
 
 #include <datatypes.h>
+#include <defines.h>
 
 #ifdef HAVE_IODBC
 	#include <iodbcinst.h>
@@ -1164,7 +1165,7 @@ bool odbccursor::handleColumns() {
 	// run through the columns
 	for (SQLSMALLINT i=0; i<ncols; i++) {
 
-		if (conn->cont->sendColumnInfo()) {
+		if (conn->cont->getSendColumnInfo()==SEND_COLUMN_INFO) {
 #if (ODBCVER >= 0x0300)
 			// column name
 

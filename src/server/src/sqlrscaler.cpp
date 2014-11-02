@@ -29,7 +29,7 @@ scaler::scaler() {
 
 	pidfile=NULL;
 	semset=NULL;
-	idmemory=NULL;
+	shmem=NULL;
 	shm=0;
 
 	cfgfile=NULL;
@@ -244,21 +244,21 @@ bool scaler::initScaler(int argc, const char **argv) {
 	delete[] idfilename;
 
 	// connect to the shared memory segment
-	idmemory=new sharedmemory;
-	if (!idmemory->attach(key,sizeof(shmdata))) {
+	shmem=new sharedmemory;
+	if (!shmem->attach(key,sizeof(shmdata))) {
 		char	*err=error::getErrorString();
 		stderror.printf("Couldn't attach to shared memory segment: ");
 		stderror.printf("%s\n",err);
 		delete[] err;
-		delete idmemory;
-		idmemory=NULL;
+		delete shmem;
+		shmem=NULL;
 		return false;
 	}
-	shm=(shmdata *)idmemory->getPointer();
+	shm=(shmdata *)shmem->getPointer();
 	if (!shm) {
 		stderror.printf("failed to get pointer to shmdata\n");
-		delete idmemory;
-		idmemory=NULL;
+		delete shmem;
+		shmem=NULL;
 		return false;
 	}
 
@@ -270,9 +270,9 @@ bool scaler::initScaler(int argc, const char **argv) {
 		stderror.printf("%s\n",err);
 		delete[] err;
 		delete semset;
-		delete idmemory;
+		delete shmem;
 		semset=NULL;
-		idmemory=NULL;
+		shmem=NULL;
 		return false;
 	}
 
@@ -297,7 +297,7 @@ void scaler::shutDown(int32_t signum) {
 void scaler::cleanUp() {
 
 	delete semset;
-	delete idmemory;
+	delete shmem;
 	delete cfgfile;
 	delete[] id;
 
