@@ -91,6 +91,7 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 
 	bindswerefaked=false;
 	querywasintercepted=false;
+	executedsinceprepare=false;
 
 	isolationlevel=NULL;
 
@@ -2203,74 +2204,6 @@ const char *sqlrcontroller_svr::skipWhitespaceAndComments(const char *query) {
 	return ptr;
 }
 
-bool sqlrcontroller_svr::reExecuteQuery(sqlrcursor_svr *cursor) {
-
-	// if we're faking binds then the query must be re-prepared
-	if (!cursor->supportsNativeBinds() ||
-		cursor->getFakeInputBindsForThisQuery()) {
-
-		if (!prepareQuery(cursor,
-				cursor->getQueryBuffer(),
-				cursor->getQueryLength(),
-				true)) {
-			return false;
-		}
-
-	} else {
-		// this should only be done during a true re-execute
-		translateBindVariablesFromMappings(cursor);
-	}
-
-	return executeQuery(cursor,true);
-}
-
-void sqlrcontroller_svr::translateBindVariablesFromMappings(
-						sqlrcursor_svr *cursor) {
-
-	// bail if no bind variables are defined
-	if (!cursor->getInputBindCount() && !cursor->getOutputBindCount()) {
-		return;
-	}
-
-	// index variable
-	uint16_t	i=0;
-
-	// run two passes
-	for (i=0; i<2; i++) {
-
-		// first pass for input binds, second pass for output binds
-		uint16_t	count=(!i)?cursor->getInputBindCount():
-						cursor->getOutputBindCount();
-		bindvar_svr	*vars=(!i)?cursor->getInputBinds():
-						cursor->getOutputBinds();
-		namevaluepairs	*mappings=(!i)?inbindmappings:outbindmappings;
-
-		for (uint16_t j=0; j<count; j++) {
-
-			// get the bind var
-			bindvar_svr	*b=&(vars[j]);
-
-			// remap it
-			char	*newvariable;
-			if (mappings->getValue(b->variable,&newvariable)) {
-				b->variable=newvariable;
-			}
-		}
-	}
-
-	// debug
-	if (logEnabled()) {
-		logDebugMessage("remapped input binds:");
-		for (i=0; i<cursor->getInputBindCount(); i++) {
-			logDebugMessage(cursor->getInputBinds()[i].variable);
-		}
-		logDebugMessage("remapped output binds:");
-		for (i=0; i<cursor->getOutputBindCount(); i++) {
-			logDebugMessage(cursor->getOutputBinds()[i].variable);
-		}
-	}
-}
-
 bool sqlrcontroller_svr::translateQuery(sqlrcursor_svr *cursor) {
 
 	// get the query buffer
@@ -2356,49 +2289,24 @@ enum queryparsestate_t {
 
 void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 
-	// bail if no bind variables are defined
-	if (!cursor->getInputBindCount() && !cursor->getOutputBindCount()) {
-		return;
-	}
-
-	// index variable
-	uint16_t	i=0;
-
 	// get query buffer
 	char	*querybuffer=cursor->getQueryBuffer();
 
 	// debug
 	if (debugbindtranslation) {
-		stdoutput.printf("bind translation:\n");
-		stdoutput.printf("original:\n\"%s\"\n",querybuffer);
-		stdoutput.printf("  input binds:\n");
-		for (i=0; i<cursor->getInputBindCount(); i++) {
-			stdoutput.printf("    \"%s\"\n",
-					cursor->getInputBinds()[i].variable);
-		}
-		stdoutput.printf("  output binds:\n");
-		for (i=0; i<cursor->getOutputBindCount(); i++) {
-			stdoutput.printf("    \"%s\"\n",
-					cursor->getOutputBinds()[i].variable);
-		}
-		stdoutput.printf("\n");
+		stdoutput.printf("translating bind variables...\n");
+		stdoutput.printf("before translation:\n%s\n",querybuffer);
 	}
-	logDebugMessage("translating bind variables...");
-	logDebugMessage("original:");
-	logDebugMessage(querybuffer);
-	logDebugMessage("input binds:");
-	for (i=0; i<cursor->getInputBindCount(); i++) {
-		logDebugMessage(cursor->getInputBinds()[i].variable);
-	}
-	logDebugMessage("output binds:");
-	for (i=0; i<cursor->getOutputBindCount(); i++) {
-		logDebugMessage(cursor->getOutputBinds()[i].variable);
+	if (logEnabled()) {
+		logDebugMessage("translating bind variables...");
+		logDebugMessage("before translation:");
+		logDebugMessage(querybuffer);
 	}
 
 	// convert queries from whatever bind variable format they currently
 	// use to the format required by the database...
 
-	bool			convert=false;
+	bool			translated=false;
 	queryparsestate_t	parsestate=IN_QUERY;
 	stringbuffer		newquery;
 	stringbuffer		currentbind;
@@ -2445,9 +2353,12 @@ void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 		if (parsestate==BEFORE_BIND) {
 
 			// if we find a bind variable...
-			// (make sure to catch @'s but not @@'s
-			if (*c=='?' || *c==':' ||
-				(*c=='@' && *(c+1)!='@') || *c=='$') {
+			// (make sure to catch :'s but not :='s)
+			// (make sure to catch @'s but not @@'s)
+			if (*c=='?' ||
+				(*c==':' && *(c+1)!='=') ||
+				(*c=='@' && *(c+1)!='@') ||
+				*c=='$') {
 				parsestate=IN_BIND;
 				currentbind.clear();
 				continue;
@@ -2483,8 +2394,8 @@ void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 						currentbind.getString())) {
 
 					// translate...
-					convert=true;
-					translateBindVariableInStringAndArray(
+					translated=true;
+					translateBindVariableInStringAndMap(
 								cursor,
 								&currentbind,
 								bindindex,
@@ -2506,9 +2417,11 @@ void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 
 	} while (c<=endptr);
 
-	if (!convert) {
+
+	// if no translation was performed
+	if (!translated) {
 		if (debugbindtranslation) {
-			stdoutput.printf("no bind translation performed\n");
+			stdoutput.printf("\nno bind translation performed\n\n");
 		}
 		logDebugMessage("no bind translation performed");
 		return;
@@ -2529,28 +2442,11 @@ void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 
 	// debug
 	if (debugbindtranslation) {
-		stdoutput.printf("converted:\n\"%s\"\n",querybuffer);
-		stdoutput.printf("  input binds:\n");
-		for (i=0; i<cursor->getInputBindCount(); i++) {
-			stdoutput.printf("    \"%s\"\n",
-					cursor->getInputBinds()[i].variable);
-		}
-		stdoutput.printf("  output binds:\n");
-		for (i=0; i<cursor->getOutputBindCount(); i++) {
-			stdoutput.printf("    \"%s\"\n",
-					cursor->getOutputBinds()[i].variable);
-		}
-		stdoutput.printf("\n");
+		stdoutput.printf("\nafter translation:\n%s\n\n",querybuffer);
 	}
-	logDebugMessage("converted:");
-	logDebugMessage(querybuffer);
-	logDebugMessage("input binds:");
-	for (i=0; i<cursor->getInputBindCount(); i++) {
-		logDebugMessage(cursor->getInputBinds()[i].variable);
-	}
-	logDebugMessage("output binds:");
-	for (i=0; i<cursor->getOutputBindCount(); i++) {
-		logDebugMessage(cursor->getOutputBinds()[i].variable);
+	if (logEnabled()) {
+		logDebugMessage("translated:");
+		logDebugMessage(querybuffer);
 	}
 }
 
@@ -2575,10 +2471,10 @@ bool sqlrcontroller_svr::matchesNativeBindFormat(const char *bind) {
 	return (bind[0]==bindformat[0]  &&
 		(bindformatlen==1 ||
 		(bindformat[1]=='1' && character::isDigit(bind[1])) ||
-		(bindformat[1]=='*' && !character::isAlphanumeric(bind[1]))));
+		(bindformat[1]=='*' && character::isAlphanumeric(bind[1]))));
 }
 
-void sqlrcontroller_svr::translateBindVariableInStringAndArray(
+void sqlrcontroller_svr::translateBindVariableInStringAndMap(
 						sqlrcursor_svr *cursor,
 						stringbuffer *currentbind,
 						uint16_t bindindex,
@@ -2596,9 +2492,7 @@ void sqlrcontroller_svr::translateBindVariableInStringAndArray(
 		// placeholder such as ?'s. (mysql, db2 and firebird format)
 
 		// replace bind variable itself with number
-		translateBindVariableInArray(cursor,
-					currentbind->getString(),
-					bindindex);
+		mapBindVariable(cursor,currentbind->getString(),bindindex);
 
 	} else if (bindformat[1]=='1' &&
 			!charstring::isNumber(currentbind->getString()+1)) {
@@ -2610,9 +2504,7 @@ void sqlrcontroller_svr::translateBindVariableInStringAndArray(
 		newquery->append(bindindex);
 
 		// replace bind variable itself with number
-		translateBindVariableInArray(cursor,
-					currentbind->getString(),
-					bindindex);
+		mapBindVariable(cursor,currentbind->getString(),bindindex);
 
 	} else {
 
@@ -2629,9 +2521,8 @@ void sqlrcontroller_svr::translateBindVariableInStringAndArray(
 			newquery->append(bindindex);
 
 			// replace bind variable itself with number
-			translateBindVariableInArray(cursor,
-						currentbind->getString(),
-						bindindex);
+			mapBindVariable(cursor,
+					currentbind->getString(),bindindex);
 		} else {
 			newquery->append(currentbind->getString()+1,
 					currentbind->getStringLength()-1);
@@ -2639,17 +2530,17 @@ void sqlrcontroller_svr::translateBindVariableInStringAndArray(
 	}
 }
 
-void sqlrcontroller_svr::translateBindVariableInArray(sqlrcursor_svr *cursor,
-						const char *currentbind,
+void sqlrcontroller_svr::mapBindVariable(sqlrcursor_svr *cursor,
+						const char *bindvariable,
 						uint16_t bindindex) {
 
 	// if the current bind variable is a ? then just
 	// set it NULL for special handling later
-	if (!charstring::compare(currentbind,"?")) {
-		currentbind=NULL;
+	if (!charstring::compare(bindvariable,"?")) {
+		bindvariable=NULL;
 	}
 
-	// run two passes
+	// run two passes, first for input binds, second for output binds
 	for (uint16_t i=0; i<2; i++) {
 
 		// first pass for input binds, second pass for output binds
@@ -2669,10 +2560,10 @@ void sqlrcontroller_svr::translateBindVariableInArray(sqlrcursor_svr *cursor,
 			// If no name was passed in then the bind vars are
 			// numeric; get the variable who's numeric name matches
 			// the index passed in.
-			if ((currentbind &&
-				!charstring::compare(currentbind,
+			if ((bindvariable &&
+				!charstring::compare(bindvariable,
 							b->variable)) ||
-				(!currentbind &&
+				(!bindvariable &&
 				charstring::toInteger((b->variable)+1)==
 								bindindex)) {
 
@@ -2683,25 +2574,116 @@ void sqlrcontroller_svr::translateBindVariableInArray(sqlrcursor_svr *cursor,
 				uint16_t	tempnumberlen=charstring::
 							length(tempnumber);
 
-				// keep track of the old name
-				char	*oldvariable=b->variable;
-
 				// allocate memory for the new name
-				b->variable=(char *)bindmappingspool->
+				char	*newvariable=
+					(char *)bindmappingspool->
 						allocate(tempnumberlen+2);
 
 				// replace the existing bind var name and size
-				b->variable[0]=conn->bindVariablePrefix();
-				charstring::copy(b->variable+1,tempnumber);
-				b->variable[tempnumberlen+1]='\0';
-				b->variablesize=tempnumberlen+1;
+				newvariable[0]=conn->bindVariablePrefix();
+				charstring::copy(newvariable+1,tempnumber);
+				newvariable[tempnumberlen+1]='\0';
 
-				// create bind variable mappings
-				mappings->setValue(oldvariable,b->variable);
+				// map existing name to new name
+				mappings->setValue(b->variable,newvariable);
 				
 				// clean up
 				delete[] tempnumber;
 			}
+		}
+	}
+}
+
+void sqlrcontroller_svr::translateBindVariablesFromMappings(
+						sqlrcursor_svr *cursor) {
+
+	// index variable
+	uint16_t	i=0;
+
+	// debug and logging
+	if (debugbindtranslation) {
+		stdoutput.printf("remapping bind variables:\n");
+		stdoutput.printf("  input binds:\n");
+		for (i=0; i<cursor->getInputBindCount(); i++) {
+			stdoutput.printf("    %s\n",
+					cursor->getInputBinds()[i].variable);
+		}
+		stdoutput.printf("  output binds:\n");
+		for (i=0; i<cursor->getOutputBindCount(); i++) {
+			stdoutput.printf("    %s\n",
+					cursor->getOutputBinds()[i].variable);
+		}
+		stdoutput.printf("\n");
+	}
+	if (logEnabled()) {
+		logDebugMessage("remapping bind variables...");
+		logDebugMessage("input binds:");
+		for (i=0; i<cursor->getInputBindCount(); i++) {
+			logDebugMessage(cursor->getInputBinds()[i].variable);
+		}
+		logDebugMessage("output binds:");
+		for (i=0; i<cursor->getOutputBindCount(); i++) {
+			logDebugMessage(cursor->getOutputBinds()[i].variable);
+		}
+	}
+
+	// run two passes, first for input binds, second for output binds
+	bool	remapped=false;
+	for (i=0; i<2; i++) {
+
+		// first pass for input binds, second pass for output binds
+		uint16_t	count=(!i)?cursor->getInputBindCount():
+						cursor->getOutputBindCount();
+		bindvar_svr	*vars=(!i)?cursor->getInputBinds():
+						cursor->getOutputBinds();
+		namevaluepairs	*mappings=(!i)?inbindmappings:outbindmappings;
+
+		for (uint16_t j=0; j<count; j++) {
+
+			// get the bind var
+			bindvar_svr	*b=&(vars[j]);
+
+			// remap it
+			char	*newvariable;
+			if (mappings->getValue(b->variable,&newvariable)) {
+				b->variable=newvariable;
+				b->variablesize=charstring::length(b->variable);
+				remapped=true;
+			}
+		}
+	}
+
+	// if no remapping was performed
+	if (!remapped) {
+		if (debugbindtranslation) {
+			stdoutput.printf("  no variables remapped\n\n");
+		}
+		logDebugMessage("no variables remapped");
+		return;
+	}
+
+	// debug and logging
+	if (debugbindtranslation) {
+		stdoutput.printf("  remapped input binds:\n");
+		for (i=0; i<cursor->getInputBindCount(); i++) {
+			stdoutput.printf("    %s\n",
+					cursor->getInputBinds()[i].variable);
+		}
+		stdoutput.printf("  remapped output binds:\n");
+		for (i=0; i<cursor->getOutputBindCount(); i++) {
+			stdoutput.printf("    %s\n",
+					cursor->getOutputBinds()[i].variable);
+		}
+		stdoutput.printf("\n");
+	}
+	if (logEnabled()) {
+		logDebugMessage("remapped input binds:");
+		for (i=0; i<cursor->getInputBindCount(); i++) {
+			logDebugMessage(cursor->getInputBinds()[i].variable);
+		}
+		logDebugMessage("remapped output binds:");
+		for (i=0; i<cursor->getOutputBindCount(); i++) {
+			logDebugMessage(cursor->getOutputBinds()[i].variable);
 		}
 	}
 }
@@ -2777,7 +2759,6 @@ sqlrcursor_svr	*sqlrcontroller_svr::initQueryOrBindCursor(
 		cursor->setFakeInputBindsForThisQuery(fakeinputbinds);
 	}
 	bindswerefaked=false;
-	querywasintercepted=false;
 
 	// clean up whatever result set the cursor might have been busy with
 	closeResultSet(cursor);
@@ -3020,7 +3001,11 @@ bool sqlrcontroller_svr::prepareQuery(sqlrcursor_svr *cursor,
 bool sqlrcontroller_svr::prepareQuery(sqlrcursor_svr *cursor,
 						const char *query,
 						uint32_t querylen,
-						bool enabletranslation) {
+						bool enabletranslations) {
+
+	// reset some flags
+	executedsinceprepare=false;
+	querywasintercepted=false;
 
 	// intercept some queries for special handling
 	bool	success=interceptQuery(cursor,&querywasintercepted);
@@ -3046,7 +3031,7 @@ bool sqlrcontroller_svr::prepareQuery(sqlrcursor_svr *cursor,
 	}
 
 	// translate query
-	if (enabletranslation && sqlp && sqlrt && sqlw) {
+	if (enabletranslations && sqlp && sqlrt && sqlw) {
 		translateQuery(cursor);
 	}
 
@@ -3099,11 +3084,24 @@ bool sqlrcontroller_svr::prepareQuery(sqlrcursor_svr *cursor,
 }
 
 bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor) {
-	return executeQuery(cursor,false);
+	return executeQuery(cursor,false,false);
 }
 
 bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor,
+						bool enabletranslations,
 						bool enabletriggers) {
+
+	// if we're faking binds then the query must be re-prepared
+	if (executedsinceprepare &&
+		(!cursor->supportsNativeBinds() ||
+		cursor->getFakeInputBindsForThisQuery())) {
+		if (!prepareQuery(cursor,
+				cursor->getQueryBuffer(),
+				cursor->getQueryLength(),
+				enabletranslations)) {
+			return false;
+		}
+	}
 
 	// if the query was intercepted during the
 	// prepare then we don't need to do anything
@@ -3115,6 +3113,9 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor,
 
 	// set state
 	updateState((isCustomQuery(cursor))?PROCESS_CUSTOM:PROCESS_SQL);
+
+	// translate bind variables
+	translateBindVariablesFromMappings(cursor);
 
 	// handle binds (unless they were faked during the prepare)
 	if (!bindswerefaked) {
@@ -3139,6 +3140,10 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor,
 
 	// execute the query
 	bool	success=cursor->executeQuery(query,querylen);
+
+	// set flag indicating that query has been
+	// executed since it was prepared
+	executedsinceprepare=true;
 
 	// get the query end time
 	dt.getSystemDateAndTime();

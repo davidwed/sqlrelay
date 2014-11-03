@@ -256,16 +256,16 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 							bool reexecute,
 							bool bindcursor,
 							bool reinitbuffers);
-		bool	reExecuteQuery(sqlrcursor_svr *cursor);
 		bool	prepareQuery(sqlrcursor_svr *cursor,
 						const char *query,
 						uint32_t length);
 		bool	prepareQuery(sqlrcursor_svr *cursor,
 						const char *query,
 						uint32_t length,
-						bool enabletranslation);
+						bool enabletranslations);
 		bool	executeQuery(sqlrcursor_svr *cursor);
 		bool	executeQuery(sqlrcursor_svr *cursor,
+						bool enabletranslations,
 						bool enabletriggers);
 		bool	fetchFromBindCursor(sqlrcursor_svr *cursor);
 
@@ -534,15 +534,14 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		bool	translateQuery(sqlrcursor_svr *cursor);
 		void	translateBindVariables(sqlrcursor_svr *cursor);
 		bool	matchesNativeBindFormat(const char *bind);
-		void	translateBindVariableInStringAndArray(
+		void	translateBindVariableInStringAndMap(
 					sqlrcursor_svr *cursor,
 					stringbuffer *currentbind,
 					uint16_t bindindex,
 					stringbuffer *newquery);
-		void	translateBindVariableInArray(
-						sqlrcursor_svr *cursor,
-						const char *currentbind,
-						uint16_t bindindex);
+		void	mapBindVariable(sqlrcursor_svr *cursor,
+					const char *variablename,
+					uint16_t bindindex);
 
 		void	translateBeginTransaction(sqlrcursor_svr *cursor);
 
@@ -650,8 +649,9 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		bool		fakeinputbinds;
 		bool		translatebinds;
 
-		bool		querywasintercepted;
 		bool		bindswerefaked;
+		bool		querywasintercepted;
+		bool		executedsinceprepare;
 
 		const char	*isolationlevel;
 

@@ -258,10 +258,12 @@ bool droptableautoincrementoracle::deleteSequence(sqlrconnection_svr *sqlrcon,
 		sqlrcon->cont->prepareQuery(
 			cur,query.getString(),query.getStringLength()) &&
 		sqlrcon->cont->executeQuery(cur)) {
+
 		// success...
 		if (debug) {
 			stdoutput.printf("success\n\n");
 		}
+
 	} else {
 		// error...
 		if (debug) {
