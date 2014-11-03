@@ -752,7 +752,7 @@ bool sqlrclientprotocol::newQueryCommand(sqlrcursor_svr *cursor) {
 	}
 
 	if (success) {
-		return processNewQuery(cursor);
+		return processQueryOrBindCursor(cursor,false,false);
 	}
 
 	// The client is apparently sending us something we
@@ -778,7 +778,7 @@ bool sqlrclientprotocol::reExecuteQueryCommand(sqlrcursor_svr *cursor) {
 	if (getInputBinds(cursor) &&
 		getOutputBinds(cursor) &&
 		getSendColumnInfo()) {
-		return processReExecuteQuery(cursor);
+		return processQueryOrBindCursor(cursor,true,false);
 	}
 
 	// The client is apparently sending us something we
@@ -800,7 +800,7 @@ bool sqlrclientprotocol::fetchFromBindCursorCommand(sqlrcursor_svr *cursor) {
 
 	// get whether to get column info
 	if (getSendColumnInfo()) {
-		return processBindCursor(cursor);
+		return processQueryOrBindCursor(cursor,false,true);
 	}
 
 	// The client is apparently sending us something we
@@ -814,18 +814,6 @@ bool sqlrclientprotocol::fetchFromBindCursorCommand(sqlrcursor_svr *cursor) {
 	return false;
 }
 
-bool sqlrclientprotocol::processNewQuery(sqlrcursor_svr *cursor) {
-	return processQueryOrBindCursor(cursor,false,false);
-}
-
-bool sqlrclientprotocol::processReExecuteQuery(sqlrcursor_svr *cursor) {
-	return processQueryOrBindCursor(cursor,true,false);
-}
-
-bool sqlrclientprotocol::processBindCursor(sqlrcursor_svr *cursor) {
-	return processQueryOrBindCursor(cursor,false,true);
-}
-
 bool sqlrclientprotocol::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 							bool reexecute,
 							bool bindcursor) {
@@ -836,11 +824,15 @@ bool sqlrclientprotocol::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 		// process the query or bind cursor...
 		bool	success=false;
 		if (bindcursor) {
-			success=cont->bindCursor(cursor);
+			success=cont->fetchFromBindCursor(cursor);
 		} else if (reexecute) {
 			success=cont->reExecuteQuery(cursor);
 		} else {
-			success=cont->newQuery(cursor);
+			success=(cont->prepareQuery(cursor,
+					cont->getQueryBuffer(cursor),
+					cont->getQueryLength(cursor),
+					true) &&
+				cont->executeQuery(cursor,true));
 		}
 
 		// get the skip and fetch parameters here so everything can be

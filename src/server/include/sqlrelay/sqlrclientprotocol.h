@@ -49,9 +49,6 @@ class SQLRSERVER_DLLSPEC sqlrclientprotocol : public sqlrprotocol {
 		bool	newQueryCommand(sqlrcursor_svr *cursor);
 		bool	reExecuteQueryCommand(sqlrcursor_svr *cursor);
 		bool	fetchFromBindCursorCommand(sqlrcursor_svr *cursor);
-		bool	processNewQuery(sqlrcursor_svr *cursor);
-		bool	processReExecuteQuery(sqlrcursor_svr *cursor);
-		bool	processBindCursor(sqlrcursor_svr *cursor);
 		bool	processQueryOrBindCursor(sqlrcursor_svr *cursor,
 							bool reexecute,
 							bool bindcursor);

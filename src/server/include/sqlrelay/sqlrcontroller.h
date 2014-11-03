@@ -256,15 +256,17 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 							bool reexecute,
 							bool bindcursor,
 							bool reinitbuffers);
-		bool	newQuery(sqlrcursor_svr *cursor);
 		bool	reExecuteQuery(sqlrcursor_svr *cursor);
-		bool	bindCursor(sqlrcursor_svr *cursor);
 		bool	prepareQuery(sqlrcursor_svr *cursor,
 						const char *query,
 						uint32_t length);
-		bool	executeQuery(sqlrcursor_svr *cursor,
+		bool	prepareQuery(sqlrcursor_svr *cursor,
 						const char *query,
-						uint32_t length);
+						uint32_t length,
+						bool enabletranslation);
+		bool	executeQuery(sqlrcursor_svr *cursor);
+		bool	executeQuery(sqlrcursor_svr *cursor,
+						bool enabletriggers);
 		bool	fetchFromBindCursor(sqlrcursor_svr *cursor);
 
 		// input bind variables
@@ -520,8 +522,8 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 
 		bool	beginFakeTransactionBlock();
 		bool	endFakeTransactionBlock();
-		bool	handleFakeTransactionQueries(sqlrcursor_svr *cursor,
-						bool *wasfaketransactionquery);
+		bool	interceptQuery(sqlrcursor_svr *cursor,
+						bool *querywasintercepted);
 		bool	isBeginTransactionQuery(sqlrcursor_svr *cursor);
 		bool	isCommitQuery(sqlrcursor_svr *cursor);
 		bool	isRollbackQuery(sqlrcursor_svr *cursor);
@@ -645,7 +647,11 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 
 		bool		needcommitorrollback;
 
+		bool		fakeinputbinds;
 		bool		translatebinds;
+
+		bool		querywasintercepted;
+		bool		bindswerefaked;
 
 		const char	*isolationlevel;
 
@@ -690,8 +696,6 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		int32_t		ttl;
 
 		char		*pidfile;
-
-		bool		fakeinputbinds;
 
 		int32_t		idleclienttimeout;
 
