@@ -248,14 +248,10 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		xmldom		*getQueryTree(sqlrcursor_svr *cursor);
 
 		// running queries
-		sqlrcursor_svr	*initNewQuery(sqlrcursor_svr *cursor);
+		void		initNewQuery(sqlrcursor_svr *cursor);
 		sqlrcursor_svr	*initReExecuteQuery(sqlrcursor_svr *cursor);
-		sqlrcursor_svr	*initListQuery(sqlrcursor_svr *cursor);
-		sqlrcursor_svr	*initBindCursor(sqlrcursor_svr *cursor);
-		sqlrcursor_svr	*initQueryOrBindCursor(sqlrcursor_svr *cursor,
-							bool reexecute,
-							bool bindcursor,
-							bool reinitbuffers);
+		void		initListQuery(sqlrcursor_svr *cursor);
+		void		initBindCursor(sqlrcursor_svr *cursor);
 		bool	prepareQuery(sqlrcursor_svr *cursor,
 						const char *query,
 						uint32_t length);

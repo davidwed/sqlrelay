@@ -2710,27 +2710,123 @@ void sqlrcontroller_svr::translateBeginTransaction(sqlrcursor_svr *cursor) {
 	logDebugMessage(querybuffer);
 }
 
-sqlrcursor_svr	*sqlrcontroller_svr::initNewQuery(
-					sqlrcursor_svr *cursor) {
-	return initQueryOrBindCursor(cursor,false,false,true);
+void sqlrcontroller_svr::initNewQuery(sqlrcursor_svr *cursor) {
+
+	// if we're using a custom cursor then close it
+	sqlrcursor_svr	*customcursor=cursor->getCustomQueryCursor();
+	if (customcursor) {
+		customcursor->close();
+		cursor->clearCustomQueryCursor();
+	}
+
+	// clean up whatever result set the cursor might have been busy with
+	closeResultSet(cursor);
+
+	// clear bind mappings
+	inbindmappings->clear();
+	outbindmappings->clear();
+	bindmappingspool->deallocate();
+
+	// clear bind buffers
+	for (uint16_t i=0; i<maxbindcount; i++) {
+		bytestring::zero(&(cursor->getInputBinds()[i]),
+						sizeof(bindvar_svr));
+		bytestring::zero(&(cursor->getOutputBinds()[i]),
+						sizeof(bindvar_svr));
+	}
+	cursor->setInputBindCount(0);
+	cursor->setOutputBindCount(0);
+
+	// re-init bind flags
+	cursor->setFakeInputBindsForThisQuery(fakeinputbinds);
+
+	// re-init error data
+	clearError(cursor);
 }
 
 sqlrcursor_svr	*sqlrcontroller_svr::initReExecuteQuery(
 					sqlrcursor_svr *cursor) {
-	return initQueryOrBindCursor(cursor,true,false,true);
+
+	// if we're using a custom cursor then operate on it
+	sqlrcursor_svr	*customcursor=cursor->getCustomQueryCursor();
+	if (customcursor) {
+		cursor=customcursor;
+	}
+
+	// clean up whatever result set the cursor might have been busy with
+	closeResultSet(cursor);
+
+	// clear bind buffers
+	for (uint16_t i=0; i<maxbindcount; i++) {
+		bytestring::zero(&(cursor->getInputBinds()[i]),
+						sizeof(bindvar_svr));
+		bytestring::zero(&(cursor->getOutputBinds()[i]),
+						sizeof(bindvar_svr));
+	}
+	cursor->setInputBindCount(0);
+	cursor->setOutputBindCount(0);
+
+	// re-init error data
+	clearError(cursor);
+
+	return cursor;
 }
 
-sqlrcursor_svr	*sqlrcontroller_svr::initListQuery(
-					sqlrcursor_svr *cursor) {
-	return initQueryOrBindCursor(cursor,false,false,false);
+void sqlrcontroller_svr::initListQuery(sqlrcursor_svr *cursor) {
+
+	// if we're using a custom cursor then close it
+	sqlrcursor_svr	*customcursor=cursor->getCustomQueryCursor();
+	if (customcursor) {
+		customcursor->close();
+		cursor->clearCustomQueryCursor();
+	}
+
+	// clean up whatever result set the cursor might have been busy with
+	closeResultSet(cursor);
+
+	// clear bind mappings
+	inbindmappings->clear();
+	outbindmappings->clear();
+	bindmappingspool->deallocate();
+
+	// re-init bind flags
+	cursor->setFakeInputBindsForThisQuery(fakeinputbinds);
+
+	// re-init error data
+	clearError(cursor);
 }
 
-sqlrcursor_svr	*sqlrcontroller_svr::initBindCursor(
-					sqlrcursor_svr *cursor) {
-	return initQueryOrBindCursor(cursor,false,true,true);
+void sqlrcontroller_svr::initBindCursor(sqlrcursor_svr *cursor) {
+
+	// if we're using a custom cursor then close it
+	sqlrcursor_svr	*customcursor=cursor->getCustomQueryCursor();
+	if (customcursor) {
+		customcursor->close();
+		cursor->clearCustomQueryCursor();
+	}
+
+	// clean up whatever result set the cursor might have been busy with
+	closeResultSet(cursor);
+
+	// clear query buffer
+	cursor->getQueryBuffer()[0]='\0';
+	cursor->setQueryLength(0);
+
+	// clear bind buffers
+	for (uint16_t i=0; i<maxbindcount; i++) {
+		bytestring::zero(&(cursor->getInputBinds()[i]),
+						sizeof(bindvar_svr));
+		bytestring::zero(&(cursor->getOutputBinds()[i]),
+						sizeof(bindvar_svr));
+	}
+	cursor->setInputBindCount(0);
+	cursor->setOutputBindCount(0);
+
+	// re-init error data
+	clearError(cursor);
 }
 
-sqlrcursor_svr	*sqlrcontroller_svr::initQueryOrBindCursor(
+/*sqlrcursor_svr	*sqlrcontroller_svr::initQueryOrBindCursor(
 						sqlrcursor_svr *cursor,
 						bool reexecute,
 						bool bindcursor,
@@ -2781,7 +2877,7 @@ sqlrcursor_svr	*sqlrcontroller_svr::initQueryOrBindCursor(
 	}
 
 	return cursor;
-}
+}*/
 
 sqlrcursor_svr *sqlrcontroller_svr::getCustomQueryCursor(	
 						sqlrcursor_svr *cursor) {
@@ -3006,6 +3102,7 @@ bool sqlrcontroller_svr::prepareQuery(sqlrcursor_svr *cursor,
 	// reset some flags
 	executedsinceprepare=false;
 	querywasintercepted=false;
+	bindswerefaked=false;
 
 	// intercept some queries for special handling
 	bool	success=interceptQuery(cursor,&querywasintercepted);

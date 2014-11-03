@@ -734,7 +734,7 @@ bool sqlrclientprotocol::newQueryCommand(sqlrcursor_svr *cursor) {
 
 	cont->logDebugMessage("handling query...");
 
-	cursor=cont->initNewQuery(cursor);
+	cont->initNewQuery(cursor);
 
 	// get the client info and query from the client
 	bool	success=(getClientInfo(cursor) && getQuery(cursor));
@@ -796,7 +796,7 @@ bool sqlrclientprotocol::fetchFromBindCursorCommand(sqlrcursor_svr *cursor) {
 
 	cont->logDebugMessage("fetch from bind cursor");
 
-	cursor=cont->initBindCursor(cursor);
+	cont->initBindCursor(cursor);
 
 	// get whether to get column info
 	if (getSendColumnInfo()) {
@@ -2719,7 +2719,7 @@ bool sqlrclientprotocol::getListByQuery(sqlrcursor_svr *cursor,
 
 	cont->logDebugMessage("handling query...");
 
-	cursor=cont->initListQuery(cursor);
+	cont->initListQuery(cursor);
 
 	return processQueryOrBindCursor(cursor,false,false);
 }
