@@ -40,7 +40,7 @@ class sqliteconnection : public sqlrconnection_svr {
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error);
-		sqlrcursor_svr	*newCursor();
+		sqlrcursor_svr	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 		bool		ping();
@@ -87,7 +87,8 @@ class sqliteconnection : public sqlrconnection_svr {
 class sqlitecursor : public sqlrcursor_svr {
 	friend class sqliteconnection;
 	private:
-				sqlitecursor(sqlrconnection_svr *conn);
+				sqlitecursor(sqlrconnection_svr *conn,
+								uint16_t id);
 				~sqlitecursor();
 
 		bool		supportsNativeBinds();
@@ -199,8 +200,9 @@ bool sqliteconnection::logIn(const char **error) {
 #endif
 }
 
-sqlrcursor_svr *sqliteconnection::newCursor() {
-	return (sqlrcursor_svr *)new sqlitecursor((sqlrconnection_svr *)this);
+sqlrcursor_svr *sqliteconnection::newCursor(uint16_t id) {
+	return (sqlrcursor_svr *)new sqlitecursor(
+					(sqlrconnection_svr *)this,id);
 }
 
 void sqliteconnection::deleteCursor(sqlrcursor_svr *curs) {
@@ -356,7 +358,8 @@ void sqliteconnection::clearErrors() {
 	}
 }
 
-sqlitecursor::sqlitecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
+sqlitecursor::sqlitecursor(sqlrconnection_svr *conn, uint16_t id) :
+						sqlrcursor_svr(conn,id) {
 
 	columnnames=NULL;
 	ncolumn=0;

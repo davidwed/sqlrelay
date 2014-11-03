@@ -22,7 +22,8 @@ class SQLRSERVER_DLLSPEC sqlrquery {
 
 		virtual bool	match(const char *querystring,
 						uint32_t querylength);
-		virtual sqlrquerycursor	*getCursor(sqlrconnection_svr *sqlrcon);
+		virtual sqlrquerycursor	*newCursor(sqlrconnection_svr *sqlrcon,
+								uint16_t id);
 	protected:
 		xmldomnode	*parameters;
 };
@@ -30,7 +31,8 @@ class SQLRSERVER_DLLSPEC sqlrquery {
 class SQLRSERVER_DLLSPEC sqlrquerycursor : public sqlrcursor_svr {
 	public:
 			sqlrquerycursor(sqlrconnection_svr *conn,
-					xmldomnode *parameters);
+					xmldomnode *parameters,
+					uint16_t id);
 		virtual	~sqlrquerycursor();
 		virtual sqlrquerytype_t	queryType(const char *query,
 							uint32_t length);

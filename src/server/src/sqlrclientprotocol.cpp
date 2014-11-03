@@ -145,8 +145,9 @@ sqlrclientexitstatus_t sqlrclientprotocol::clientSession() {
 			continue;
 		}
 
-		// get the command start-time
-		cursor->setCommandStart(dt.getSeconds(),dt.getMicroseconds());
+		// set the command start-time
+		cont->setCommandStart(cursor,
+				dt.getSeconds(),dt.getMicroseconds());
 
 		// these commands are all handled at the cursor level
 		if (command==NEW_QUERY) {
@@ -186,9 +187,10 @@ sqlrclientexitstatus_t sqlrclientprotocol::clientSession() {
 			loop=false;
 		}
 
-		// get the command end-time
+		// set the command end-time
 		dt.getSystemDateAndTime();
-		cursor->setCommandEnd(dt.getSeconds(),dt.getMicroseconds());
+		cont->setCommandEnd(cursor,
+				dt.getSeconds(),dt.getMicroseconds());
 
 		// log query-related commands
 		// FIXME: this won't log triggers
@@ -210,7 +212,7 @@ sqlrclientexitstatus_t sqlrclientprotocol::clientSession() {
 	// socket.  We have to absorb all of that data.  We shouldn't just loop
 	// forever though, that would provide a point of entry for a DOS attack.
 	// We'll read the maximum number of bytes that could be sent.
-	cont->closeClientSocket(
+	cont->closeClientConnection(
 				// sending auth
 				(sizeof(uint16_t)+
 				// user/password
@@ -391,6 +393,7 @@ bool sqlrclientprotocol::authenticateCommand() {
 				SQLR_ERROR_AUTHENTICATIONERROR_STRING));
 	clientsock->write(SQLR_ERROR_AUTHENTICATIONERROR_STRING);
 	clientsock->flushWriteBuffer(-1,-1);
+	// FIXME: use cont->endSession()?
 	conn->endSession();
 	return false;
 }
@@ -476,14 +479,14 @@ void sqlrclientprotocol::suspendSessionCommand() {
 
 void sqlrclientprotocol::pingCommand() {
 	cont->logDebugMessage("ping");
-	bool	pingresult=conn->ping();
+	bool	pingresult=cont->ping();
 	if (pingresult) {
 		cont->logDebugMessage("ping succeeded");
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		cont->logDebugMessage("ping failed");
-		returnError(!conn->getLiveConnection());
+		returnError(!cont->getLiveConnection());
 	}
 	if (!pingresult) {
 		cont->reLogIn();
@@ -495,7 +498,7 @@ void sqlrclientprotocol::identifyCommand() {
 	cont->logDebugMessage("identify");
 
 	// get the identification
-	const char	*ident=conn->identify();
+	const char	*ident=cont->identify();
 
 	// send it to the client
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
@@ -529,7 +532,7 @@ void sqlrclientprotocol::autoCommitCommand() {
 		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		cont->logDebugMessage("failed");
-		returnError(!conn->getLiveConnection());
+		returnError(!cont->getLiveConnection());
 	}
 }
 
@@ -541,7 +544,7 @@ void sqlrclientprotocol::beginCommand() {
 		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		cont->logDebugMessage("failed");
-		returnError(!conn->getLiveConnection());
+		returnError(!cont->getLiveConnection());
 	}
 }
 
@@ -553,7 +556,7 @@ void sqlrclientprotocol::commitCommand() {
 		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		cont->logDebugMessage("failed");
-		returnError(!conn->getLiveConnection());
+		returnError(!cont->getLiveConnection());
 	}
 }
 
@@ -565,7 +568,7 @@ void sqlrclientprotocol::rollbackCommand() {
 		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		cont->logDebugMessage("failed");
-		returnError(!conn->getLiveConnection());
+		returnError(!cont->getLiveConnection());
 	}
 }
 
@@ -574,7 +577,7 @@ void sqlrclientprotocol::dbVersionCommand() {
 	cont->logDebugMessage("db version");
 
 	// get the db version
-	const char	*dbversion=conn->dbVersion();
+	const char	*dbversion=cont->dbVersion();
 
 	// send it to the client
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
@@ -589,7 +592,7 @@ void sqlrclientprotocol::bindFormatCommand() {
 	cont->logDebugMessage("bind format");
 
 	// get the bind format
-	const char	*bf=conn->bindFormat();
+	const char	*bf=cont->bindFormat();
 
 	// send it to the client
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
@@ -661,7 +664,7 @@ void sqlrclientprotocol::selectDatabaseCommand() {
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 		clientsock->flushWriteBuffer(-1,-1);
 	} else {
-		returnError(!conn->getLiveConnection());
+		returnError(!cont->getLiveConnection());
 	}
 
 	delete[] db;
@@ -674,7 +677,7 @@ void sqlrclientprotocol::getCurrentDatabaseCommand() {
 	cont->logDebugMessage("get current database");
 
 	// get the current database
-	char	*currentdb=conn->getCurrentDatabase();
+	char	*currentdb=cont->getCurrentDatabase();
 
 	// send it to the client
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
@@ -690,14 +693,14 @@ void sqlrclientprotocol::getCurrentDatabaseCommand() {
 void sqlrclientprotocol::getLastInsertIdCommand() {
 	cont->logDebugMessage("getting last insert id...");
 	uint64_t	id;
-	if (conn->getLastInsertId(&id)) {
+	if (cont->getLastInsertId(&id)) {
 		cont->logDebugMessage("get last insert id succeeded");
 		clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 		clientsock->write(id);
 		clientsock->flushWriteBuffer(-1,-1);
 	} else {
 		cont->logDebugMessage("get last insert id failed");
-		returnError(!conn->getLiveConnection());
+		returnError(!cont->getLiveConnection());
 	}
 }
 
@@ -705,7 +708,7 @@ void sqlrclientprotocol::dbHostNameCommand() {
 
 	cont->logDebugMessage("getting db host name");
 
-	const char	*hostname=conn->dbHostName();
+	const char	*hostname=cont->dbHostName();
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	uint16_t	hostnamelen=charstring::length(hostname);
 	clientsock->write(hostnamelen);
@@ -717,7 +720,7 @@ void sqlrclientprotocol::dbIpAddressCommand() {
 
 	cont->logDebugMessage("getting db host name");
 
-	const char	*ipaddress=conn->dbIpAddress();
+	const char	*ipaddress=cont->dbIpAddress();
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
 	uint16_t	ipaddresslen=charstring::length(ipaddress);
 	clientsock->write(ipaddresslen);
@@ -756,7 +759,7 @@ bool sqlrclientprotocol::newQueryCommand(sqlrcursor_svr *cursor) {
 	// can't handle.  Return an error if there was one,
 	// instruct the client to disconnect and return false
 	// to end the session on this side.
-	if (cursor->getErrorNumber()) {
+	if (cont->getErrorNumber(cursor)) {
 		returnError(cursor,true);
 	}
 	cont->logDebugMessage("failed to handle query");
@@ -782,7 +785,7 @@ bool sqlrclientprotocol::reExecuteQueryCommand(sqlrcursor_svr *cursor) {
 	// can't handle.  Return an error if there was one,
 	// instruct the client to disconnect and return false
 	// to end the session on this side.
-	if (cursor->getErrorNumber()) {
+	if (cont->getErrorNumber(cursor)) {
 		returnError(cursor,true);
 	}
 	cont->logDebugMessage("failed to handle query");
@@ -804,7 +807,7 @@ bool sqlrclientprotocol::fetchFromBindCursorCommand(sqlrcursor_svr *cursor) {
 	// can't handle.  Return an error if there was one,
 	// instruct the client to disconnect and return false
 	// to end the session on this side.
-	if (cursor->getErrorNumber()) {
+	if (cont->getErrorNumber(cursor)) {
 		returnError(cursor,true);
 	}
 	cont->logDebugMessage("failed to fetch from bind cursor");
@@ -827,18 +830,26 @@ bool sqlrclientprotocol::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 							bool reexecute,
 							bool bindcursor) {
 
-	// FIXME: push up?
-	cont->updateState((cursor->isCustomQuery())?PROCESS_CUSTOM:PROCESS_SQL);
-
 	// loop here to handle down databases
 	for (;;) {
 
-		// process the query and get skip and fetch parameters here so
-		// everything can be done in one round trip without relying on
-		// buffering
-		if (cont->processQueryOrBindCursor(
-					cursor,reexecute,bindcursor) &&
-					getSkipAndFetch(cursor)) {
+		// process the query or bind cursor...
+		bool	success=false;
+		if (bindcursor) {
+			success=cont->bindCursor(cursor);
+		} else if (reexecute) {
+			success=cont->reExecuteQuery(cursor);
+		} else {
+			success=cont->newQuery(cursor);
+		}
+
+		// get the skip and fetch parameters here so everything can be
+		// done in one round trip without relying on buffering
+		if (success) {
+			success=getSkipAndFetch(cursor);
+		}
+
+		if (success) {
 
 			// success...
 
@@ -850,7 +861,7 @@ bool sqlrclientprotocol::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 			// send the client the id of the cursor
 			// that it's going to use so it can request
 			// it again later for re-execute
-			clientsock->write(cursor->getId());
+			clientsock->write(cont->getId(cursor));
 
 			// tell the client that this is not a
 			// suspended result set
@@ -870,7 +881,7 @@ bool sqlrclientprotocol::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 			// an error occurred...
 
 			// is the db still up?
-			bool	dbup=cursor->getLiveConnection();
+			bool	dbup=cont->getLiveConnection(cursor);
 
 			// if the db is still up, or if we're not configured
 			// to wait for them if they're down, then return the
@@ -888,7 +899,7 @@ bool sqlrclientprotocol::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 				cont->logDebugMessage("database is down...");
 
 				cont->logDbError(cursor,
-						cursor->getErrorBuffer());
+						cont->getErrorBuffer(cursor));
 
 				cont->reLogIn();
 
@@ -898,7 +909,6 @@ bool sqlrclientprotocol::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 					continue;
 				}
 			}
-
 			return true;
 		}
 	}
@@ -928,7 +938,7 @@ bool sqlrclientprotocol::getClientInfo(sqlrcursor_svr *cursor) {
 		err.append(SQLR_ERROR_MAXCLIENTINFOLENGTH_STRING);
 		err.append(" (")->append(clientinfolen)->append('>');
 		err.append(maxclientinfolength)->append(')');
-		cursor->setError(err.getString(),
+		cont->setError(cursor,err.getString(),
 				SQLR_ERROR_MAXCLIENTINFOLENGTH,true);
 
 		debugstr.clear();
@@ -972,9 +982,9 @@ bool sqlrclientprotocol::getQuery(sqlrcursor_svr *cursor) {
 
 	// init
 	uint32_t	querylength=0;
-	char		*querybuffer=cursor->getQueryBuffer();
+	char		*querybuffer=cont->getQueryBuffer(cursor);
 	querybuffer[0]='\0';
-	cursor->setQueryLength(0);
+	cont->setQueryLength(cursor,0);
 
 	// get the length of the query
 	ssize_t	result=clientsock->read(&querylength,idleclienttimeout,0);
@@ -992,7 +1002,7 @@ bool sqlrclientprotocol::getQuery(sqlrcursor_svr *cursor) {
 		err.append(SQLR_ERROR_MAXQUERYLENGTH_STRING);
 		err.append(" (")->append(querylength)->append('>');
 		err.append(maxquerysize)->append(')');
-		cursor->setError(err.getString(),
+		cont->setError(cursor,err.getString(),
 				SQLR_ERROR_MAXQUERYLENGTH,true);
 
 		debugstr.clear();
@@ -1018,7 +1028,7 @@ bool sqlrclientprotocol::getQuery(sqlrcursor_svr *cursor) {
 
 	// update query buffer and length
 	querybuffer[querylength]='\0';
-	cursor->setQueryLength(querylength);
+	cont->setQueryLength(cursor,querylength);
 
 	if (cont->logEnabled()) {
 		debugstr.clear();
@@ -1046,10 +1056,10 @@ bool sqlrclientprotocol::getInputBinds(sqlrcursor_svr *cursor) {
 	if (!getBindVarCount(cursor,&inbindcount)) {
 		return false;
 	}
-	cursor->setInputBindCount(inbindcount);
+	cont->setInputBindCount(cursor,inbindcount);
 
 	// get the input bind buffers
-	bindvar_svr	*inbinds=cursor->getInputBinds();
+	bindvar_svr	*inbinds=cont->getInputBinds(cursor);
 
 	// fill the buffers
 	for (uint16_t i=0; i<inbindcount && i<maxbindcount; i++) {
@@ -1083,7 +1093,7 @@ bool sqlrclientprotocol::getInputBinds(sqlrcursor_svr *cursor) {
 		} else if (bv->type==BLOB_BIND) {
 			// can't fake blob binds
 			// FIXME: push up?
-			cursor->setFakeInputBindsForThisQuery(false);
+			cont->setFakeInputBindsForThisQuery(cursor,false);
 			if (!getLobBind(cursor,bv)) {
 				return false;
 			}
@@ -1107,10 +1117,10 @@ bool sqlrclientprotocol::getOutputBinds(sqlrcursor_svr *cursor) {
 	if (!getBindVarCount(cursor,&outbindcount)) {
 		return false;
 	}
-	cursor->setOutputBindCount(outbindcount);
+	cont->setOutputBindCount(cursor,outbindcount);
 
 	// get the output bind buffers
-	bindvar_svr	*outbinds=cursor->getOutputBinds();
+	bindvar_svr	*outbinds=cont->getOutputBinds(cursor);
 
 	// fill the buffers
 	for (uint16_t i=0; i<outbindcount && i<maxbindcount; i++) {
@@ -1184,7 +1194,7 @@ bool sqlrclientprotocol::getOutputBinds(sqlrcursor_svr *cursor) {
 		}
 
 		// init the null indicator
-		bv->isnull=conn->nonNullBindValue();
+		bv->isnull=cont->nonNullBindValue();
 	}
 
 	cont->logDebugMessage("done getting output binds");
@@ -1214,7 +1224,8 @@ bool sqlrclientprotocol::getBindVarCount(sqlrcursor_svr *cursor,
 		err.append(SQLR_ERROR_MAXBINDCOUNT_STRING);
 		err.append(" (")->append(*count)->append('>');
 		err.append(maxbindcount)->append(')');
-		cursor->setError(err.getString(),SQLR_ERROR_MAXBINDCOUNT,true);
+		cont->setError(cursor,err.getString(),
+				SQLR_ERROR_MAXBINDCOUNT,true);
 
 		debugstr.clear();
 		debugstr.append("get binds failed: "
@@ -1254,7 +1265,7 @@ bool sqlrclientprotocol::getBindVarName(sqlrcursor_svr *cursor,
 		err.append(SQLR_ERROR_MAXBINDNAMELENGTH_STRING);
 		err.append(" (")->append(bindnamesize)->append('>');
 		err.append(maxbindnamelength)->append(')');
-		cursor->setError(err.getString(),
+		cont->setError(cursor,err.getString(),
 					SQLR_ERROR_MAXBINDNAMELENGTH,true);
 
 		debugstr.clear();
@@ -1267,7 +1278,7 @@ bool sqlrclientprotocol::getBindVarName(sqlrcursor_svr *cursor,
 	// get the variable name
 	bv->variablesize=bindnamesize+1;
 	bv->variable=(char *)bindpool->allocate(bindnamesize+2);
-	bv->variable[0]=conn->bindVariablePrefix();
+	bv->variable[0]=cont->bindVariablePrefix();
 	result=clientsock->read(bv->variable+1,bindnamesize,
 					idleclienttimeout,0);
 	if (result!=bindnamesize) {
@@ -1321,14 +1332,14 @@ bool sqlrclientprotocol::getBindSize(sqlrcursor_svr *cursor,
 			err.append(SQLR_ERROR_MAXSTRINGBINDVALUELENGTH_STRING);
 			err.append(" (")->append(bv->valuesize)->append('>');
 			err.append(*maxsize)->append(')');
-			cursor->setError(err.getString(),
+			cont->setError(cursor,err.getString(),
 				SQLR_ERROR_MAXSTRINGBINDVALUELENGTH,true);
 		} else {
 			stringbuffer	err;
 			err.append(SQLR_ERROR_MAXLOBBINDVALUELENGTH_STRING);
 			err.append(" (")->append(bv->valuesize)->append('>');
 			err.append(*maxsize)->append(')');
-			cursor->setError(err.getString(),
+			cont->setError(cursor,err.getString(),
 				SQLR_ERROR_MAXLOBBINDVALUELENGTH,true);
 		}
 		debugstr.clear();
@@ -1348,7 +1359,7 @@ void sqlrclientprotocol::getNullBind(bindvar_svr *bv) {
 	bv->value.stringval=(char *)bindpool->allocate(1);
 	bv->value.stringval[0]='\0';
 	bv->valuesize=0;
-	bv->isnull=conn->nullBindValue();
+	bv->isnull=cont->nullBindValue();
 }
 
 bool sqlrclientprotocol::getStringBind(sqlrcursor_svr *cursor,
@@ -1379,7 +1390,7 @@ bool sqlrclientprotocol::getStringBind(sqlrcursor_svr *cursor,
 		return false;
 	}
 	bv->value.stringval[bv->valuesize]='\0';
-	bv->isnull=conn->nonNullBindValue();
+	bv->isnull=cont->nonNullBindValue();
 
 	cont->logDebugMessage(bv->value.stringval);
 
@@ -1614,7 +1625,7 @@ bool sqlrclientprotocol::getLobBind(sqlrcursor_svr *cursor, bindvar_svr *bv) {
 	// (which doesn't include the NULL terminator) should be used when
 	// binding.
 	bv->value.stringval[bv->valuesize]='\0';
-	bv->isnull=conn->nonNullBindValue();
+	bv->isnull=cont->nonNullBindValue();
 
 	return true;
 }
@@ -1671,8 +1682,10 @@ void sqlrclientprotocol::returnResultSetHeader(sqlrcursor_svr *cursor) {
 
 	// return the row counts
 	cont->logDebugMessage("returning row counts...");
-	sendRowCounts(cursor->knowsRowCount(),cursor->rowCount(),
-			cursor->knowsAffectedRows(),cursor->affectedRows());
+	sendRowCounts(cont->knowsRowCount(cursor),
+			cont->rowCount(cursor),
+			cont->knowsAffectedRows(cursor),
+			cont->affectedRows(cursor));
 	cont->logDebugMessage("done returning row counts");
 
 	// tell the client whether or not the column information will be sent
@@ -1684,14 +1697,14 @@ void sqlrclientprotocol::returnResultSetHeader(sqlrcursor_svr *cursor) {
 
 	// return the column count
 	cont->logDebugMessage("returning column counts...");
-	clientsock->write(cursor->colCount());
+	clientsock->write(cont->colCount(cursor));
 	cont->logDebugMessage("done returning column counts");
 
 	if (sendcolumninfo==SEND_COLUMN_INFO) {
 
 		// return the column type format
 		cont->logDebugMessage("sending column type format...");
-		uint16_t	format=cursor->columnTypeFormat();
+		uint16_t	format=cont->columnTypeFormat(cursor);
 		cont->logDebugMessage((format==COLUMN_TYPE_IDS)?"id's":"names");
 		clientsock->write(format);
 		cont->logDebugMessage("done sending column type format");
@@ -1711,34 +1724,36 @@ void sqlrclientprotocol::returnResultSetHeader(sqlrcursor_svr *cursor) {
 void sqlrclientprotocol::returnColumnInfo(sqlrcursor_svr *cursor,
 							uint16_t format) {
 
-	for (uint32_t i=0; i<cursor->colCount(); i++) {
+	for (uint32_t i=0; i<cont->colCount(cursor); i++) {
 
-		const char	*name=cursor->getColumnName(i);
-		uint16_t	namelen=cursor->getColumnNameLength(i);
-		uint32_t	length=cursor->getColumnLength(i);
-		uint32_t	precision=cursor->getColumnPrecision(i);
-		uint32_t	scale=cursor->getColumnScale(i);
-		uint16_t	nullable=cursor->getColumnIsNullable(i);
-		uint16_t	primarykey=cursor->getColumnIsPrimaryKey(i);
-		uint16_t	unique=cursor->getColumnIsUnique(i);
-		uint16_t	partofkey=cursor->getColumnIsPartOfKey(i);
-		uint16_t	unsignednumber=cursor->getColumnIsUnsigned(i);
-		uint16_t	zerofill=cursor->getColumnIsZeroFilled(i);
-		uint16_t	binary=cursor->getColumnIsBinary(i);
+		const char	*name=cont->getColumnName(cursor,i);
+		uint16_t	namelen=cont->getColumnNameLength(cursor,i);
+		uint32_t	length=cont->getColumnLength(cursor,i);
+		uint32_t	precision=cont->getColumnPrecision(cursor,i);
+		uint32_t	scale=cont->getColumnScale(cursor,i);
+		uint16_t	nullable=cont->getColumnIsNullable(cursor,i);
+		uint16_t	primarykey=
+				cont->getColumnIsPrimaryKey(cursor,i);
+		uint16_t	unique=cont->getColumnIsUnique(cursor,i);
+		uint16_t	partofkey=cont->getColumnIsPartOfKey(cursor,i);
+		uint16_t	unsignednumber=
+				cont->getColumnIsUnsigned(cursor,i);
+		uint16_t	zerofill=cont->getColumnIsZeroFilled(cursor,i);
+		uint16_t	binary=cont->getColumnIsBinary(cursor,i);
 		uint16_t	autoincrement=
-					cursor->getColumnIsAutoIncrement(i);
+				cont->getColumnIsAutoIncrement(cursor,i);
 
 		if (format==COLUMN_TYPE_IDS) {
 			sendColumnDefinition(name,namelen,
-					cursor->getColumnType(i),
+					cont->getColumnType(cursor,i),
 					length,precision,scale,
 					nullable,primarykey,unique,partofkey,
 					unsignednumber,zerofill,binary,
 					autoincrement);
 		} else {
 			sendColumnDefinitionString(name,namelen,
-					cursor->getColumnTypeName(i),
-					cursor->getColumnTypeNameLength(i),
+					cont->getColumnTypeName(cursor,i),
+					cont->getColumnTypeNameLength(cursor,i),
 					length,precision,scale,
 					nullable,primarykey,unique,partofkey,
 					unsignednumber,zerofill,binary,
@@ -1797,15 +1812,15 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 	if (cont->logEnabled()) {
 		debugstr.clear();
 		debugstr.append("returning ");
-		debugstr.append(cursor->getOutputBindCount());
+		debugstr.append(cont->getOutputBindCount(cursor));
 		debugstr.append(" output bind values: ");
 		cont->logDebugMessage(debugstr.getString());
 	}
 
 	// run through the output bind values, sending them back
-	for (uint16_t i=0; i<cursor->getOutputBindCount(); i++) {
+	for (uint16_t i=0; i<cont->getOutputBindCount(cursor); i++) {
 
-		bindvar_svr	*bv=&(cursor->getOutputBinds()[i]);
+		bindvar_svr	*bv=&(cont->getOutputBinds(cursor)[i]);
 
 		if (cont->logEnabled()) {
 			debugstr.clear();
@@ -1813,7 +1828,7 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 			debugstr.append(":");
 		}
 
-		if (conn->bindValueIsNull(bv->isnull)) {
+		if (cont->bindValueIsNull(bv->isnull)) {
 
 			if (cont->logEnabled()) {
 				debugstr.append("NULL");
@@ -1939,13 +1954,13 @@ void sqlrclientprotocol::returnOutputBindValues(sqlrcursor_svr *cursor) {
 void sqlrclientprotocol::returnOutputBindBlob(sqlrcursor_svr *cursor,
 							uint16_t index) {
 	sendLobOutputBind(cursor,index);
-	cursor->closeLobOutputBind(index);
+	cont->closeLobOutputBind(cursor,index);
 }
 
 void sqlrclientprotocol::returnOutputBindClob(sqlrcursor_svr *cursor,
 							uint16_t index) {
 	sendLobOutputBind(cursor,index);
-	cursor->closeLobOutputBind(index);
+	cont->closeLobOutputBind(cursor,index);
 }
 
 #define MAX_BYTES_PER_CHAR	4
@@ -1955,7 +1970,7 @@ void sqlrclientprotocol::sendLobOutputBind(sqlrcursor_svr *cursor,
 
 	// Get lob length.  If this fails, send a NULL field.
 	uint64_t	loblength;
-	if (!cursor->getLobOutputBindLength(index,&loblength)) {
+	if (!cont->getLobOutputBindLength(cursor,index,&loblength)) {
 		sendNullField();
 		return;
 	}
@@ -1977,8 +1992,7 @@ void sqlrclientprotocol::sendLobOutputBind(sqlrcursor_svr *cursor,
 	for (;;) {
 
 		// read a segment from the lob
-		if (!cursor->getLobOutputBindSegment(
-					index,
+		if (!cont->getLobOutputBindSegment(cursor,index,
 					lobbuffer,sizeof(lobbuffer),
 					offset,charstoread,&charsread) ||
 					!charsread) {
@@ -2153,10 +2167,10 @@ bool sqlrclientprotocol::returnResultSetData(sqlrcursor_svr *cursor,
 
 	// reinit cursor state (in case it was suspended)
 	// FIXME: push up?
-	cursor->setState(SQLRCURSORSTATE_BUSY);
+	cont->setState(cursor,SQLRCURSORSTATE_BUSY);
 
 	// for some queries, there are no rows to return, 
-	if (cursor->noRowsToReturn()) {
+	if (cont->noRowsToReturn(cursor)) {
 		clientsock->write((uint16_t)END_RESULT_SET);
 		clientsock->flushWriteBuffer(-1,-1);
 		cont->logDebugMessage("done returning result set data");
@@ -2182,19 +2196,19 @@ bool sqlrclientprotocol::returnResultSetData(sqlrcursor_svr *cursor,
 	// send the specified number of rows back
 	for (uint64_t i=0; (!fetch || i<fetch); i++) {
 
-		if (!cursor->fetchRow()) {
+		if (!cont->fetchRow(cursor)) {
 			clientsock->write((uint16_t)END_RESULT_SET);
 			break;
 		}
-
-		// FIXME: push up?
-		cursor->incrementTotalRowsFetched();
 
 		if (cont->logEnabled()) {
 			debugstr.clear();
 		}
 
 		returnRow(cursor);
+
+		// FIXME: kludgy
+		cont->nextRow(cursor);
 
 		if (cont->logEnabled()) {
 			cont->logDebugMessage(debugstr.getString());
@@ -2209,7 +2223,7 @@ bool sqlrclientprotocol::returnResultSetData(sqlrcursor_svr *cursor,
 void sqlrclientprotocol::returnRow(sqlrcursor_svr *cursor) {
 
 	// run through the columns...
-	for (uint32_t i=0; i<cursor->colCount(); i++) {
+	for (uint32_t i=0; i<cont->colCount(cursor); i++) {
 
 		// init variables
 		const char	*field=NULL;
@@ -2218,14 +2232,14 @@ void sqlrclientprotocol::returnRow(sqlrcursor_svr *cursor) {
 		bool		null=false;
 
 		// get the field
-		cursor->getField(i,&field,&fieldlength,&blob,&null);
+		cont->getField(cursor,i,&field,&fieldlength,&blob,&null);
 
 		// send data to the client
 		if (null) {
 			sendNullField();
 		} else if (blob) {
 			sendLobField(cursor,i);
-			cursor->closeLobField(i);
+			cont->closeLobField(cursor,i);
 		} else {
 			const char	*newfield=NULL;
 			uint32_t	newfieldlength=0;
@@ -2234,10 +2248,6 @@ void sqlrclientprotocol::returnRow(sqlrcursor_svr *cursor) {
 			sendField(newfield,newfieldlength);
 		}
 	}
-
-	// get the next row
-	// FIXME: kludgy
-	cursor->nextRow();
 }
 
 void sqlrclientprotocol::sendField(const char *data, uint32_t size) {
@@ -2267,7 +2277,7 @@ void sqlrclientprotocol::sendLobField(sqlrcursor_svr *cursor, uint32_t col) {
 
 	// Get lob length.  If this fails, send a NULL field.
 	uint64_t	loblength;
-	if (!cursor->getLobFieldLength(col,&loblength)) {
+	if (!cont->getLobFieldLength(cursor,col,&loblength)) {
 		sendNullField();
 		return;
 	}
@@ -2289,7 +2299,7 @@ void sqlrclientprotocol::sendLobField(sqlrcursor_svr *cursor, uint32_t col) {
 	for (;;) {
 
 		// read a segment from the lob
-		if (!cursor->getLobFieldSegment(col,
+		if (!cont->getLobFieldSegment(cursor,col,
 					lobbuffer,sizeof(lobbuffer),
 					offset,charstoread,&charsread) ||
 					!charsread) {
@@ -2350,17 +2360,18 @@ void sqlrclientprotocol::returnError(bool disconnect) {
 
 	// Get the error data if none is set already
 	// FIXME: this will always evaluate false,
-	// shouldn't it be !conn->getErrorLength()?
-	if (!conn->getErrorBuffer()) {
+	// shouldn't it be !cont->getErrorLength()?
+	if (!cont->getErrorBuffer()) {
 		uint32_t	errorlength;
 		int64_t		errnum;
 		bool		liveconnection;
-		conn->errorMessage(conn->getErrorBuffer(),
-					maxerrorlength,
-					&errorlength,&errnum,&liveconnection);
-		conn->setErrorLength(errorlength);
-		conn->setErrorNumber(errnum);
-		conn->setLiveConnection(liveconnection);
+		cont->errorMessage(
+				cont->getErrorBuffer(),
+				maxerrorlength,
+				&errorlength,&errnum,&liveconnection);
+		cont->setErrorLength(errorlength);
+		cont->setErrorNumber(errnum);
+		cont->setLiveConnection(liveconnection);
 		if (!liveconnection) {
 			disconnect=true;
 		}
@@ -2374,14 +2385,15 @@ void sqlrclientprotocol::returnError(bool disconnect) {
 	}
 
 	// send the error code and error string
-	clientsock->write((uint64_t)conn->getErrorNumber());
+	clientsock->write((uint64_t)cont->getErrorNumber());
 
 	// send the error string
-	clientsock->write((uint16_t)conn->getErrorLength());
-	clientsock->write(conn->getErrorBuffer(),conn->getErrorLength());
+	clientsock->write((uint16_t)cont->getErrorLength());
+	clientsock->write(cont->getErrorBuffer(),
+				cont->getErrorLength());
 	clientsock->flushWriteBuffer(-1,-1);
 
-	cont->logDbError(NULL,conn->getErrorBuffer());
+	cont->logDbError(NULL,cont->getErrorBuffer());
 }
 
 void sqlrclientprotocol::returnError(sqlrcursor_svr *cursor, bool disconnect) {
@@ -2396,11 +2408,12 @@ void sqlrclientprotocol::returnError(sqlrcursor_svr *cursor, bool disconnect) {
 	}
 
 	// send the error code
-	clientsock->write((uint64_t)cursor->getErrorNumber());
+	clientsock->write((uint64_t)cont->getErrorNumber(cursor));
 
 	// send the error string
-	clientsock->write((uint16_t)cursor->getErrorLength());
-	clientsock->write(cursor->getErrorBuffer(),cursor->getErrorLength());
+	clientsock->write((uint16_t)cont->getErrorLength(cursor));
+	clientsock->write(cont->getErrorBuffer(cursor),
+				cont->getErrorLength(cursor));
 
 	// client will be sending skip/fetch, better get
 	// it even though we're not going to use it
@@ -2411,12 +2424,12 @@ void sqlrclientprotocol::returnError(sqlrcursor_svr *cursor, bool disconnect) {
 	// Even though there was an error, we still 
 	// need to send the client the id of the 
 	// cursor that it's going to use.
-	clientsock->write(cursor->getId());
+	clientsock->write(cont->getId(cursor));
 	clientsock->flushWriteBuffer(-1,-1);
 
 	cont->logDebugMessage("done returning error");
 
-	cont->logDbError(cursor,cursor->getErrorBuffer());
+	cont->logDbError(cursor,cont->getErrorBuffer(cursor));
 }
 
 bool sqlrclientprotocol::fetchResultSetCommand(sqlrcursor_svr *cursor) {
@@ -2428,20 +2441,13 @@ bool sqlrclientprotocol::fetchResultSetCommand(sqlrcursor_svr *cursor) {
 
 void sqlrclientprotocol::abortResultSetCommand(sqlrcursor_svr *cursor) {
 	cont->logDebugMessage("aborting result set...");
-	cursor->abort();
+	cont->abort(cursor);
 	cont->logDebugMessage("done aborting result set");
 }
 
 void sqlrclientprotocol::suspendResultSetCommand(sqlrcursor_svr *cursor) {
 	cont->logDebugMessage("suspend result set...");
-
-	// FIXME: push up?
-	cursor->setState(SQLRCURSORSTATE_SUSPENDED);
-	if (cursor->getCustomQueryCursor()) {
-		cursor->getCustomQueryCursor()->
-			setState(SQLRCURSORSTATE_SUSPENDED);
-	}
-
+	cont->suspendResultSet(cursor);
 	cont->logDebugMessage("done suspending result set");
 }
 
@@ -2450,7 +2456,7 @@ bool sqlrclientprotocol::resumeResultSetCommand(sqlrcursor_svr *cursor) {
 
 	bool	retval=true;
 
-	if (cursor->getState()==SQLRCURSORSTATE_SUSPENDED) {
+	if (cont->getState(cursor)==SQLRCURSORSTATE_SUSPENDED) {
 
 		cont->logDebugMessage("previous result set was suspended");
 
@@ -2459,7 +2465,7 @@ bool sqlrclientprotocol::resumeResultSetCommand(sqlrcursor_svr *cursor) {
 
 		// send the client the id of the 
 		// cursor that it's going to use
-		clientsock->write(cursor->getId());
+		clientsock->write(cont->getId(cursor));
 		clientsock->write((uint16_t)SUSPENDED_RESULT_SET);
 
 		// if the requested cursor really had a suspended
@@ -2468,7 +2474,8 @@ bool sqlrclientprotocol::resumeResultSetCommand(sqlrcursor_svr *cursor) {
 		// (FIXME: 0 will be sent if no rows were fetched or if
 		// only the first row was fetched. This probably isn't
 		// correct.)
-		uint64_t	totalrowsfetched=cursor->getTotalRowsFetched();
+		uint64_t	totalrowsfetched=
+				cont->getTotalRowsFetched(cursor);
 		clientsock->write((totalrowsfetched)?totalrowsfetched-1:0);
 
 		returnResultSetHeader(cursor);
@@ -2529,8 +2536,8 @@ bool sqlrclientprotocol::getListCommand(sqlrcursor_svr *cursor,
 		cursor->clearCustomQueryCursor();
 	}
 
-	// clean up whatever result set the cursor might have been busy with
-	cursor->closeResultSet();
+	// close whatever result set the cursor might have been busy with
+	cont->closeResultSet(cursor);
 
 	// get length of wild parameter
 	uint32_t	wildlen;
@@ -2615,13 +2622,13 @@ bool sqlrclientprotocol::getListCommand(sqlrcursor_svr *cursor,
 	}
 
 	// set the values that we won't get from the client
-	cursor->setInputBindCount(0);
-	cursor->setOutputBindCount(0);
+	cont->setInputBindCount(cursor,0);
+	cont->setOutputBindCount(cursor,0);
 	cont->setSendColumnInfo(SEND_COLUMN_INFO);
 
 	// get the list and return it
 	bool	retval=true;
-	if (conn->getListsByApiCalls()) {
+	if (cont->getListsByApiCalls()) {
 		retval=getListByApiCall(cursor,which,table,wild);
 	} else {
 		retval=getListByQuery(cursor,which,table,wild);
@@ -2645,13 +2652,13 @@ bool sqlrclientprotocol::getListByApiCall(sqlrcursor_svr *cursor,
 	// get the appropriate list
 	switch (which) {
 		case 0:
-			success=conn->getDatabaseList(cursor,wild);
+			success=cont->getDatabaseList(cursor,wild);
 			break;
 		case 1:
-			success=conn->getTableList(cursor,wild);
+			success=cont->getTableList(cursor,wild);
 			break;
 		case 2:
-			success=conn->getColumnList(cursor,table,wild);
+			success=cont->getColumnList(cursor,table,wild);
 			break;
 	}
 
@@ -2664,12 +2671,12 @@ bool sqlrclientprotocol::getListByApiCall(sqlrcursor_svr *cursor,
 		uint32_t	errorlength;
 		int64_t		errnum;
 		bool		liveconnection;
-		cursor->errorMessage(cursor->getErrorBuffer(),
+		cont->errorMessage(cursor,cont->getErrorBuffer(cursor),
 					maxerrorlength,
 					&errorlength,&errnum,&liveconnection);
-		cursor->setErrorLength(errorlength);
-		cursor->setErrorNumber(errnum);
-		cursor->setLiveConnection(liveconnection);
+		cont->setErrorLength(cursor,errorlength);
+		cont->setErrorNumber(cursor,errnum);
+		cont->setLiveConnection(cursor,liveconnection);
 		returnError(cursor,!liveconnection);
 
 		// this is actually OK, only return false on a network error
@@ -2681,7 +2688,7 @@ bool sqlrclientprotocol::getListByApiCall(sqlrcursor_svr *cursor,
 
 	// send the client the id of the 
 	// cursor that it's going to use
-	clientsock->write(cursor->getId());
+	clientsock->write(cont->getId(cursor));
 
 	// tell the client that this is not a
 	// suspended result set
@@ -2705,13 +2712,13 @@ bool sqlrclientprotocol::getListByQuery(sqlrcursor_svr *cursor,
 	bool		havewild=charstring::length(wild);
 	switch (which) {
 		case 0:
-			query=conn->getDatabaseListQuery(havewild);
+			query=cont->getDatabaseListQuery(havewild);
 			break;
 		case 1:
-			query=conn->getTableListQuery(havewild);
+			query=cont->getTableListQuery(havewild);
 			break;
 		case 2:
-			query=conn->getColumnListQuery(table,havewild);
+			query=cont->getColumnListQuery(table,havewild);
 			break;
 	}
 
@@ -2737,15 +2744,15 @@ bool sqlrclientprotocol::buildListQuery(sqlrcursor_svr *cursor,
 	escapeParameter(&tablebuf,table);
 
 	// bounds checking
-	cursor->setQueryLength(charstring::length(query)+
+	cont->setQueryLength(cursor,charstring::length(query)+
 					wildbuf.getStringLength()+
 					tablebuf.getStringLength());
-	if (cursor->getQueryLength()>maxquerysize) {
+	if (cont->getQueryLength(cursor)>maxquerysize) {
 		return false;
 	}
 
 	// fill the query buffer and update the length
-	char	*querybuffer=cursor->getQueryBuffer();
+	char	*querybuffer=cont->getQueryBuffer(cursor);
 	if (tablebuf.getStringLength()) {
 		charstring::printf(querybuffer,maxquerysize+1,
 						query,tablebuf.getString(),
@@ -2754,7 +2761,7 @@ bool sqlrclientprotocol::buildListQuery(sqlrcursor_svr *cursor,
 		charstring::printf(querybuffer,maxquerysize+1,
 						query,wildbuf.getString());
 	}
-	cursor->setQueryLength(charstring::length(querybuffer));
+	cont->setQueryLength(cursor,charstring::length(querybuffer));
 	return true;
 }
 
@@ -2779,7 +2786,7 @@ bool sqlrclientprotocol::getQueryTreeCommand(sqlrcursor_svr *cursor) {
 	cont->logDebugMessage("getting query tree");
 
 	// get the tree as a string
-	xmldom		*tree=cursor->getQueryTree();
+	xmldom		*tree=cont->getQueryTree(cursor);
 	xmldomnode	*root=(tree)?tree->getRootNode():NULL;
 	stringbuffer	*xml=(root)?root->xml():NULL;
 	const char	*xmlstring=(xml)?xml->getString():NULL;

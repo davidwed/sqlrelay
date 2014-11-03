@@ -150,11 +150,11 @@ bool custom_sc::run(sqlrlistener *sqlrl,
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_LOGIN:
 			logbuffer.append("SQL Relay logged in to DB ");
-			logbuffer.append(sqlrcon->cont->getDbIpAddress());
+			logbuffer.append(sqlrcon->cont->dbIpAddress());
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_LOGOUT:
 			logbuffer.append("SQL Relay logged out of DB ");
-			logbuffer.append(sqlrcon->cont->getDbIpAddress());
+			logbuffer.append(sqlrcon->cont->dbIpAddress());
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_ERROR:
 			{

@@ -30,7 +30,7 @@ class sybaseconnection : public sqlrconnection_svr {
 		void		handleConnectString();
 		bool		logIn(const char **error);
 		const char	*logInError(const char *error, uint16_t stage);
-		sqlrcursor_svr	*newCursor();
+		sqlrcursor_svr	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 		const char	*identify();
@@ -106,12 +106,13 @@ struct datebind {
 class sybasecursor : public sqlrcursor_svr {
 	friend class sybaseconnection;
 	private:
-				sybasecursor(sqlrconnection_svr *conn);
+				sybasecursor(sqlrconnection_svr *conn,
+								uint16_t id);
 				~sybasecursor();
 		void		allocateResultSetBuffers(
 					int32_t selectlistsize);
 		void		deallocateResultSetBuffers();
-		bool		open(uint16_t id);
+		bool		open();
 		bool		close();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
@@ -274,9 +275,10 @@ void sybaseconnection::handleConnectString() {
 	language=cont->getConnectStringValue("language");
 	hostname=cont->getConnectStringValue("hostname");
 	packetsize=cont->getConnectStringValue("packetsize");
-	cont->setFakeInputBinds(
-		!charstring::compare(
-			cont->getConnectStringValue("fakebinds"),"yes"));
+	if (!charstring::compare(
+			cont->getConnectStringValue("fakebinds"),"yes")) {
+		cont->fakeInputBinds();
+	}
 	fetchatonce=charstring::toInteger(
 				cont->getConnectStringValue("fetchatonce"));
 	if (!fetchatonce) {
@@ -501,8 +503,9 @@ const char *sybaseconnection::logInError(const char *error, uint16_t stage) {
 	return loginerror.getString();
 }
 
-sqlrcursor_svr *sybaseconnection::newCursor() {
-	return (sqlrcursor_svr *)new sybasecursor((sqlrconnection_svr *)this);
+sqlrcursor_svr *sybaseconnection::newCursor(uint16_t id) {
+	return (sqlrcursor_svr *)new sybasecursor(
+					(sqlrconnection_svr *)this,id);
 }
 
 void sybaseconnection::deleteCursor(sqlrcursor_svr *curs) {
@@ -640,14 +643,16 @@ char sybaseconnection::bindVariablePrefix() {
 	return '@';
 }
 
-sybasecursor::sybasecursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
+sybasecursor::sybasecursor(sqlrconnection_svr *conn, uint16_t id) :
+						sqlrcursor_svr(conn,id) {
 	prepared=false;
 	sybaseconn=(sybaseconnection *)conn;
 	cmd=NULL;
 	languagecmd=NULL;
 	cursorcmd=NULL;
-	cursorname=NULL;
-	cursornamelength=0;
+
+	cursornamelength=charstring::integerLength(id);
+	cursorname=charstring::parseNumber(id);
 
 	uint16_t	maxbindcount=conn->cont->cfgfl->getMaxBindCount();
 	parameter=new CS_DATAFMT[maxbindcount];
@@ -727,12 +732,9 @@ void sybasecursor::deallocateResultSetBuffers() {
 	}
 }
 
-bool sybasecursor::open(uint16_t id) {
+bool sybasecursor::open() {
 
 	clean=true;
-
-	cursornamelength=charstring::integerLength(id);
-	cursorname=charstring::parseNumber(id);
 
 	if (ct_cmd_alloc(sybaseconn->dbconn,&languagecmd)!=CS_SUCCEED) {
 		return false;

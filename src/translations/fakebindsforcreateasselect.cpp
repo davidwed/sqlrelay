@@ -1,6 +1,7 @@
 // Copyright (c) 2013  David Muse
 // See the file COPYING for more information
 
+#include <sqlrelay/sqlrcontroller.h>
 #include <sqlrelay/sqlrconnection.h>
 #include <sqlrelay/sqlrcursor.h>
 #include <sqlrelay/sqlparser.h>
@@ -36,7 +37,7 @@ bool fakebindsforcreateasselect::run(sqlrconnection_svr *sqlrcon,
 				getFirstTagChild(sqlparser::_as)->
 				getNextTagSibling(sqlparser::_select)->
 				isNullNode()) {
-		sqlrcur->setFakeInputBindsForThisQuery(true);
+		sqlrcon->cont->setFakeInputBindsForThisQuery(sqlrcur,true);
 	}
 	return true;
 }

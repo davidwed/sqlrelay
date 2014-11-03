@@ -14,7 +14,8 @@ class sqlrcmdgstat : public sqlrquery {
 	public:
 			sqlrcmdgstat(xmldomnode *parameters);
 		bool	match(const char *querystring, uint32_t querylength);
-		sqlrquerycursor	*getCursor(sqlrconnection_svr *conn);
+		sqlrquerycursor	*newCursor(sqlrconnection_svr *conn,
+							uint16_t id);
 };
 
 #define GSTAT_KEY_LEN	40
@@ -28,7 +29,8 @@ struct gs_result_row {
 class sqlrcmdgstatcursor : public sqlrquerycursor {
 	public:
 			sqlrcmdgstatcursor(sqlrconnection_svr *sqlrcon,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						uint16_t id);
 
 		bool		executeQuery(const char *query,
 						uint32_t length);
@@ -67,13 +69,14 @@ bool sqlrcmdgstat::match(const char *querystring,
 	return !charstring::compareIgnoringCase(querystring,"sqlrcmd gstat");
 }
 
-sqlrquerycursor *sqlrcmdgstat::getCursor(sqlrconnection_svr *sqlrcon) {
-	return new sqlrcmdgstatcursor(sqlrcon,parameters);
+sqlrquerycursor *sqlrcmdgstat::newCursor(sqlrconnection_svr *sqlrcon,
+							uint16_t id) {
+	return new sqlrcmdgstatcursor(sqlrcon,parameters,id);
 }
 
-sqlrcmdgstatcursor::sqlrcmdgstatcursor(
-		sqlrconnection_svr *sqlrcon,xmldomnode *parameters) :
-					sqlrquerycursor(sqlrcon,parameters) {
+sqlrcmdgstatcursor::sqlrcmdgstatcursor(sqlrconnection_svr *sqlrcon,
+					xmldomnode *parameters, uint16_t id) :
+					sqlrquerycursor(sqlrcon,parameters,id) {
 	rowcount=0;
 	currentrow=0;
 }

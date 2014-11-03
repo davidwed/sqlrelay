@@ -34,10 +34,11 @@ class mysqlconnection;
 class mysqlcursor : public sqlrcursor_svr {
 	friend class mysqlconnection;
 	private:
-				mysqlcursor(sqlrconnection_svr *conn);
+				mysqlcursor(sqlrconnection_svr *conn,
+							uint16_t id);
 				~mysqlcursor();
 #ifdef HAVE_MYSQL_STMT_PREPARE
-		bool		open(uint16_t id);
+		bool		open();
 		bool		close();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
@@ -161,7 +162,7 @@ class mysqlconnection : public sqlrconnection_svr {
 		bool		changeUser(const char *newuser,
 						const char *newpassword);
 #endif
-		sqlrcursor_svr	*newCursor();
+		sqlrcursor_svr	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 		bool		isTransactional();
@@ -259,9 +260,10 @@ void mysqlconnection::handleConnectString() {
 	sslca=cont->getConnectStringValue("sslca");
 	sslcapath=cont->getConnectStringValue("sslcapath");
 	sslcipher=cont->getConnectStringValue("sslcipher");
-	cont->setFakeInputBinds(
-		!charstring::compare(
-			cont->getConnectStringValue("fakebinds"),"yes"));
+	if (!charstring::compare(
+			cont->getConnectStringValue("fakebinds"),"yes")) {
+		cont->fakeInputBinds();
+	}
 	foundrows=!charstring::compare(
 			cont->getConnectStringValue("foundrows"),"yes");
 	ignorespace=!charstring::compare(
@@ -360,7 +362,7 @@ bool mysqlconnection::logIn(const char **error) {
 	// fake binds when connected to older servers
 #ifdef HAVE_MYSQL_GET_SERVER_VERSION
 	if (mysql_get_server_version(&mysql)<40102) {
-		cont->setFakeInputBinds(true);
+		cont->fakeInputBinds();
 	}
 #else
 	char		**list;
@@ -374,7 +376,7 @@ bool mysqlconnection::logIn(const char **error) {
 		uint64_t	patch=charstring::toUnsignedInteger(list[2]);
 		if (major>4 || (major==4 && minor>1) ||
 				(major==4 && minor==1 && patch>=2)) {
-			cont->setFakeInputBinds(true);
+			cont->fakeInputBinds();
 		} 
 		for (uint64_t index=0; index<listlen; index++) {
 			delete[] list[index];
@@ -412,8 +414,8 @@ bool mysqlconnection::changeUser(const char *newuser,
 }
 #endif
 
-sqlrcursor_svr *mysqlconnection::newCursor() {
-	return (sqlrcursor_svr *)new mysqlcursor((sqlrconnection_svr *)this);
+sqlrcursor_svr *mysqlconnection::newCursor(uint16_t id) {
+	return (sqlrcursor_svr *)new mysqlcursor((sqlrconnection_svr *)this,id);
 }
 
 void mysqlconnection::deleteCursor(sqlrcursor_svr *curs) {
@@ -584,7 +586,8 @@ void mysqlconnection::endSession() {
 	firstquery=true;
 }
 
-mysqlcursor::mysqlcursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
+mysqlcursor::mysqlcursor(sqlrconnection_svr *conn, uint16_t id) :
+						sqlrcursor_svr(conn,id) {
 	mysqlconn=(mysqlconnection *)conn;
 	mysqlresult=NULL;
 #ifdef HAVE_MYSQL_STMT_PREPARE
@@ -622,7 +625,7 @@ mysqlcursor::~mysqlcursor() {
 }
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
-bool mysqlcursor::open(uint16_t id) {
+bool mysqlcursor::open() {
 	stmt=mysql_stmt_init(&mysqlconn->mysql);
 	return true;
 }

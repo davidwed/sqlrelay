@@ -28,7 +28,8 @@ class SQLRSERVER_DLLSPEC sqlrqueries {
 		bool		loadQueries(const char *queries);
 		sqlrquerycursor	*match(sqlrconnection_svr *sqlrcon,
 						const char *querystring,
-						uint32_t querylength);
+						uint32_t querylength,
+						uint16_t id);
 	private:
 		void		unloadQueries();
 		void		loadQuery(xmldomnode *logger);

@@ -33,7 +33,7 @@ class mdbtoolsconnection : public sqlrconnection_svr {
 	private:
 		void	handleConnectString();
 		bool	logIn(const char **error);
-		sqlrcursor_svr	*newCursor();
+		sqlrcursor_svr	*newCursor(uint16_t id);
 		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
 		bool	isTransactional();
@@ -74,9 +74,10 @@ enum cursortype_t {
 class mdbtoolscursor : public sqlrcursor_svr {
 	friend class mdbtoolsconnection;
 	private:
-				mdbtoolscursor(sqlrconnection_svr *conn);
+				mdbtoolscursor(sqlrconnection_svr *conn,
+								uint16_t id);
 				~mdbtoolscursor();
-		bool		open(uint16_t id);
+		bool		open();
 		bool		close();
 		bool		supportsNativeBinds();
 		bool		executeQuery(const char *query,
@@ -134,8 +135,9 @@ bool mdbtoolsconnection::logIn(const char **error) {
 	return true;
 }
 
-sqlrcursor_svr *mdbtoolsconnection::newCursor() {
-	return (sqlrcursor_svr *)new mdbtoolscursor((sqlrconnection_svr *)this);
+sqlrcursor_svr *mdbtoolsconnection::newCursor(uint16_t id) {
+	return (sqlrcursor_svr *)new mdbtoolscursor(
+					(sqlrconnection_svr *)this,id);
 }
 
 void mdbtoolsconnection::deleteCursor(sqlrcursor_svr *curs) {
@@ -231,8 +233,8 @@ void mdbtoolsconnection::errorMessage(char *errorbuffer,
 	*liveconnection=true;
 }
 
-mdbtoolscursor::mdbtoolscursor(sqlrconnection_svr *conn) :
-					sqlrcursor_svr(conn) {
+mdbtoolscursor::mdbtoolscursor(sqlrconnection_svr *conn, uint16_t id) :
+						sqlrcursor_svr(conn,id) {
 	mdbtoolsconn=(mdbtoolsconnection *)conn;
 	mdbsql=(void *)new MdbSQL;
 	bytestring::zero(mdbsql,sizeof(MdbSQL));
@@ -251,7 +253,7 @@ mdbtoolscursor::~mdbtoolscursor() {
 	delete (MdbSQL *)mdbsql;
 }
 
-bool mdbtoolscursor::open(uint16_t id) {
+bool mdbtoolscursor::open() {
 
 	// handle db
 	const char	*dbval;

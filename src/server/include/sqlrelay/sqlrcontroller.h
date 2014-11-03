@@ -44,9 +44,11 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 			sqlrcontroller_svr();
 		virtual	~sqlrcontroller_svr();
 
-		// main program methods
 		bool	init(int argc, const char **argv);
 		bool	listen();
+
+
+		// connection api...
 
 		// connect string 
 		const char	*getConnectStringValue(const char *variable);
@@ -56,11 +58,8 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		const char	*getLogDir();
 		const char	*getDebugDir();
 
-		// log in/out of the database
+		// re-login to the database
 		void	reLogIn();
-
-		// client connections
-		void	closeClientSocket(uint32_t bytes);
 
 		// client authentication
 		void		setUser(const char *user);
@@ -72,109 +71,82 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		bool		changeUser(const char *newuser,
 						const char *newpassword);
 
+		// close client connection
+		void	closeClientConnection(uint32_t bytes);
+
 		// session management
 		void	beginSession();
 		void	suspendSession(const char **unixsocket,
-						uint16_t *inetportnumber);
+						uint16_t *inetport);
 		void	endSession();
 
+		// ping
+		bool	ping();
+
 		// database info
-		const char	*getDbHostName();
-		const char	*getDbIpAddress();
+		const char	*identify();
+		const char	*dbVersion();
+		const char	*dbHostName();
+		const char	*dbIpAddress();
+
+		// bind variables
+		const char	*bindFormat();
+		char		bindVariablePrefix();
+		int16_t		nonNullBindValue();
+		int16_t		nullBindValue();
+		bool		bindValueIsNull(int16_t isnull);
+		void		fakeInputBinds();
+		memorypool	*getBindMappingsPool();
 
 		// db selection
 		bool	selectDatabase(const char *db);
 		void	dbHasChanged();
+		char	*getCurrentDatabase();
+
+		// column names
+		bool	getColumnNames(const char *query, stringbuffer *output);
+
+		// last insert id
+		bool	getLastInsertId(uint64_t *id);
 
 		// transactions
-		void	setFakeTransactionBlocksBehavior(bool ftb);
-		void	setAutoCommitBehavior(bool ac);
-		void	setNeedCommitOrRollback(bool needcommitorrollback);
-		bool	autoCommitOn();
-		bool	autoCommitOff();
 		bool	begin();
 		bool	commit();
 		bool	rollback();
+		bool	autoCommitOn();
+		bool	autoCommitOff();
+		void	commitOrRollbackIsNeeded();
+		void	commitOrRollbackIsNotNeeded();
+		bool	setIsolationLevel(const char *isolevel);
+		void	setFakeTransactionBlocksBehavior(bool ftb);
+		void	setAutoCommitBehavior(bool ac);
 
-		// cursor management
-		sqlrcursor_svr	*newCursor();
-		sqlrcursor_svr	*getCursor(uint16_t id);
-		sqlrcursor_svr	*getCursor();
-		uint16_t	getCursorCount();
-		void		deleteCursor(sqlrcursor_svr *curs);
+		// errors
+		void		errorMessage(char *errorbuffer,
+					uint32_t errorbuffersize,
+					uint32_t *errorlength,
+					int64_t *errorcode,
+					bool *liveconnection);
+		void		clearError();
+		void		setError(const char *err,
+					int64_t errn, bool liveconn);
+		char		*getErrorBuffer();
+		uint32_t	getErrorLength();
+		void		setErrorLength(uint32_t errorlength);
+		uint32_t	getErrorNumber();
+		void		setErrorNumber(uint32_t errnum);
+		bool		getLiveConnection();
+		void		setLiveConnection(bool liveconnection);
 
-		// bind variables
-		void		setFakeInputBinds(bool fake);
-		memorypool	*getBindMappingsPool();
-
-		// running queries
-		sqlrcursor_svr	*initNewQuery(sqlrcursor_svr *cursor);
-		sqlrcursor_svr	*initReExecuteQuery(sqlrcursor_svr *cursor);
-		sqlrcursor_svr	*initListQuery(sqlrcursor_svr *cursor);
-		sqlrcursor_svr	*initBindCursor(sqlrcursor_svr *cursor);
-		sqlrcursor_svr	*initQueryOrBindCursor(sqlrcursor_svr *cursor,
-							bool reexecute,
-							bool bindcursor,
-							bool reinitbuffers);
-		bool	processQueryOrBindCursor(sqlrcursor_svr *cursor,
-							bool reexecute,
-							bool bindcursor);
-		bool	executeQuery(sqlrcursor_svr *curs,
-							const char *query,
-							uint32_t length);
-
-		// custom query handlers
-		sqlrcursor_svr	*getCustomQueryCursor(sqlrcursor_svr *cursor);
-
-		// column info
-		uint16_t	getSendColumnInfo();
-		void		setSendColumnInfo(uint16_t sendcolumninfo);
-		bool		getColumnNames(const char *query,
-						stringbuffer *output);
-
-		// temp tables
-		void	addSessionTempTableForDrop(const char *tablename);
-		void	addSessionTempTableForTrunc(const char *tablename);
-		void	addTransactionTempTableForDrop(const char *tablename);
-		void	addTransactionTempTableForTrunc(const char *tablename);
-
-		// table name remapping
-		const char	*translateTableName(const char *table);
-		bool		removeReplacementTable(const char *database,
-							const char *schema,
-							const char *table);
-		bool		removeReplacementIndex(const char *database,
-							const char *schema,
-							const char *table);
-
-		// processing result sets
-		bool	skipRows(sqlrcursor_svr *cursor, uint64_t rows);
-		void	reformatField(sqlrcursor_svr *cursor,
-						uint16_t index,
-						const char *field,
-						uint32_t fieldlength,
-						const char **newfield,
-						uint32_t *newfieldlength);
-		void	reformatDateTimes(sqlrcursor_svr *cursor,
-						uint16_t index,
-						const char *field,
-						uint32_t fieldlength,
-						const char **newfield,
-						uint32_t *newfieldlength,
-						bool ddmm, bool yyyyddmm,
-						const char *datetimeformat,
-						const char *dateformat,
-						const char *timeformat);
-		void	closeAllResultSets();
-
-		// states
+		// connection state
 		void	updateState(enum sqlrconnectionstate_t state);
 		void	updateCurrentQuery(const char *query,
 						uint32_t querylen);
 		void	updateClientInfo(const char *info,
 						uint32_t infolen);
 
-		// statistics
+
+		// statistics api...
 		void	incrementOpenDatabaseConnections();
 		void	decrementOpenDatabaseConnections();
 		void	incrementOpenClientConnections();
@@ -215,7 +187,8 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		void	incrementGetQueryTreeCount();
 		void	incrementReLogInCount();
 
-		// logging
+
+		// logging api...
 		bool	logEnabled();
 		void	logDebugMessage(const char *info);
 		void	logClientConnected();
@@ -230,6 +203,254 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		void	logQuery(sqlrcursor_svr *cursor);
 		void	logInternalError(sqlrcursor_svr *cursor,
 							const char *info);
+
+
+		// cursor api...
+
+		// cursor management
+		sqlrcursor_svr	*newCursor();
+		sqlrcursor_svr	*getCursor();
+		sqlrcursor_svr	*getCursor(uint16_t id);
+		uint16_t	getId(sqlrcursor_svr *cursor);
+		bool		open(sqlrcursor_svr *cursor);
+		bool		close(sqlrcursor_svr *cursor);
+		void		suspendResultSet(sqlrcursor_svr *cursor);
+		void		abort(sqlrcursor_svr *cursor);
+		void		deleteCursor(sqlrcursor_svr *curs);
+
+		// command stats
+		void		setCommandStart(sqlrcursor_svr *cursor,
+						uint64_t sec, uint64_t usec);
+		uint64_t	getCommandStartSec(sqlrcursor_svr *cursor);
+		uint64_t	getCommandStartUSec(sqlrcursor_svr *cursor);
+		void		setCommandEnd(sqlrcursor_svr *cursor,
+						uint64_t sec, uint64_t usec);
+		uint64_t	getCommandEndSec(sqlrcursor_svr *cursor);
+		uint64_t	getCommandEndUSec(sqlrcursor_svr *cursor);
+
+		// query stats
+		void		setQueryStart(sqlrcursor_svr *cursor,
+						uint64_t sec, uint64_t usec);
+		uint64_t	getQueryStartSec(sqlrcursor_svr *cursor);
+		uint64_t	getQueryStartUSec(sqlrcursor_svr *cursor);
+		void		setQueryEnd(sqlrcursor_svr *cursor,
+						uint64_t sec, uint64_t usec);
+		uint64_t	getQueryEndSec(sqlrcursor_svr *cursor);
+		uint64_t	getQueryEndUSec(sqlrcursor_svr *cursor);
+
+		// query buffer
+		char		*getQueryBuffer(sqlrcursor_svr *cursor);
+		uint32_t 	getQueryLength(sqlrcursor_svr *cursor);
+		void		setQueryLength(sqlrcursor_svr *cursor,
+						uint32_t querylength);
+
+		// query tree
+		xmldom		*getQueryTree(sqlrcursor_svr *cursor);
+
+		// running queries
+		sqlrcursor_svr	*initNewQuery(sqlrcursor_svr *cursor);
+		sqlrcursor_svr	*initReExecuteQuery(sqlrcursor_svr *cursor);
+		sqlrcursor_svr	*initListQuery(sqlrcursor_svr *cursor);
+		sqlrcursor_svr	*initBindCursor(sqlrcursor_svr *cursor);
+		sqlrcursor_svr	*initQueryOrBindCursor(sqlrcursor_svr *cursor,
+							bool reexecute,
+							bool bindcursor,
+							bool reinitbuffers);
+		bool	newQuery(sqlrcursor_svr *cursor);
+		bool	reExecuteQuery(sqlrcursor_svr *cursor);
+		bool	bindCursor(sqlrcursor_svr *cursor);
+		bool	prepareQuery(sqlrcursor_svr *cursor,
+						const char *query,
+						uint32_t length);
+		bool	executeQuery(sqlrcursor_svr *cursor,
+						const char *query,
+						uint32_t length);
+		bool	fetchFromBindCursor(sqlrcursor_svr *cursor);
+
+		// input bind variables
+		void		setFakeInputBindsForThisQuery(
+						sqlrcursor_svr *cursor,
+						bool fake);
+		bool		getFakeInputBindsForThisQuery(
+						sqlrcursor_svr *cursor);
+		void		setInputBindCount(sqlrcursor_svr *cursor,
+						uint16_t inbindcount);
+		uint16_t	getInputBindCount(sqlrcursor_svr *cursor);
+		bindvar_svr	*getInputBinds(sqlrcursor_svr *cursor);
+
+		// output bind variables
+		void		setOutputBindCount(sqlrcursor_svr *cursor,
+						uint16_t outbindcount);
+		uint16_t	getOutputBindCount(sqlrcursor_svr *cursor);
+		bindvar_svr	*getOutputBinds(sqlrcursor_svr *cursor);
+		bool		getLobOutputBindLength(sqlrcursor_svr *cursor,
+							uint16_t index,
+							uint64_t *length);
+		bool		getLobOutputBindSegment(sqlrcursor_svr *cursor,
+							uint16_t index,
+							char *buffer,
+							uint64_t buffersize,
+							uint64_t offset,
+							uint64_t charstoread,
+							uint64_t *charsread);
+		void		closeLobOutputBind(sqlrcursor_svr *cursor,
+							uint16_t index);
+
+		// custom queries
+		bool		isCustomQuery(sqlrcursor_svr *cursor);
+		sqlrcursor_svr	*getCustomQueryCursor(sqlrcursor_svr *cursor);
+
+		// temp tables
+		void	addSessionTempTableForDrop(const char *tablename);
+		void	addSessionTempTableForTrunc(const char *tablename);
+		void	addTransactionTempTableForDrop(const char *tablename);
+		void	addTransactionTempTableForTrunc(const char *tablename);
+
+		// table name remapping
+		const char	*translateTableName(const char *table);
+		bool		removeReplacementTable(const char *database,
+							const char *schema,
+							const char *table);
+		bool		removeReplacementIndex(const char *database,
+							const char *schema,
+							const char *table);
+
+		// db, table, column lists
+		bool		getListsByApiCalls();
+		bool		getDatabaseList(sqlrcursor_svr *cursor,
+							const char *wild);
+		bool		getTableList(sqlrcursor_svr *cursor,
+							const char *wild);
+		bool		getColumnList(sqlrcursor_svr *cursor,
+							const char *table,
+							const char *wild);
+		const char	*getDatabaseListQuery(bool wild);
+		const char	*getTableListQuery(bool wild);
+		const char	*getColumnListQuery(const char *table,
+							bool wild);
+
+		// column info
+		uint16_t	getSendColumnInfo();
+		void		setSendColumnInfo(uint16_t sendcolumninfo);
+		uint32_t	colCount(sqlrcursor_svr *cursor);
+		uint16_t	columnTypeFormat(sqlrcursor_svr *cursor);
+		const char	*getColumnName(sqlrcursor_svr *cursor,
+							uint32_t col);
+		uint16_t	getColumnNameLength(sqlrcursor_svr *cursor,
+							uint32_t col);
+		uint16_t	getColumnType(sqlrcursor_svr *cursor,
+							uint32_t col);
+		const char	*getColumnTypeName(sqlrcursor_svr *cursor,
+							uint32_t col);
+		uint16_t	getColumnTypeNameLength(sqlrcursor_svr *cursor,
+							uint32_t col);
+		uint32_t	getColumnLength(sqlrcursor_svr *cursor,
+							uint32_t col);
+		uint32_t	getColumnPrecision(sqlrcursor_svr *cursor,
+							uint32_t col);
+		uint32_t	getColumnScale(sqlrcursor_svr *cursor,
+							uint32_t col);
+		uint16_t	getColumnIsNullable(sqlrcursor_svr *cursor,
+							uint32_t col);
+		uint16_t	getColumnIsPrimaryKey(sqlrcursor_svr *cursor,
+							uint32_t col);
+		uint16_t	getColumnIsUnique(sqlrcursor_svr *cursor,
+							uint32_t col);
+		uint16_t	getColumnIsPartOfKey(sqlrcursor_svr *cursor,
+							uint32_t col);
+		uint16_t	getColumnIsUnsigned(sqlrcursor_svr *cursor,
+							uint32_t col);
+		uint16_t	getColumnIsZeroFilled(sqlrcursor_svr *cursor,
+							uint32_t col);
+		uint16_t	getColumnIsBinary(sqlrcursor_svr *cursor,
+							uint32_t col);
+		uint16_t	getColumnIsAutoIncrement(sqlrcursor_svr *cursor,
+							uint32_t col);
+
+		// result set navigation
+		bool		knowsRowCount(sqlrcursor_svr *cursor);
+		uint64_t	rowCount(sqlrcursor_svr *cursor);
+		bool		knowsAffectedRows(sqlrcursor_svr *cursor);
+		uint64_t	affectedRows(sqlrcursor_svr *cursor);
+		bool		noRowsToReturn(sqlrcursor_svr *cursor);
+		bool		skipRow(sqlrcursor_svr *cursor);
+		bool		skipRows(sqlrcursor_svr *cursor, uint64_t rows);
+		bool		fetchRow(sqlrcursor_svr *cursor);
+		void		nextRow(sqlrcursor_svr *cursor);
+		uint64_t	getTotalRowsFetched(sqlrcursor_svr *cursor);
+		void		closeResultSet(sqlrcursor_svr *cursor);
+		void		closeAllResultSets();
+
+		// fields
+		void	getField(sqlrcursor_svr *cursor,
+						uint32_t col,
+						const char **field,
+						uint64_t *fieldlength,
+						bool *blob,
+						bool *null);
+		bool	getLobFieldLength(sqlrcursor_svr *cursor,
+						uint32_t col,
+						uint64_t *length);
+		bool	getLobFieldSegment(sqlrcursor_svr *cursor,
+						uint32_t col,
+						char *buffer,
+						uint64_t buffersize,
+						uint64_t offset,
+						uint64_t charstoread,
+						uint64_t *charsread);
+		void	closeLobField(sqlrcursor_svr *cursor,
+						uint32_t col);
+		void	reformatField(sqlrcursor_svr *cursor,
+						uint16_t index,
+						const char *field,
+						uint32_t fieldlength,
+						const char **newfield,
+						uint32_t *newfieldlength);
+		void	reformatDateTimes(sqlrcursor_svr *cursor,
+						uint16_t index,
+						const char *field,
+						uint32_t fieldlength,
+						const char **newfield,
+						uint32_t *newfieldlength,
+						bool ddmm, bool yyyyddmm,
+						const char *datetimeformat,
+						const char *dateformat,
+						const char *timeformat);
+
+		// errors
+		void		errorMessage(sqlrcursor_svr *cursor,
+						char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorlength,
+						int64_t *errorcode,
+						bool *liveconnection);
+		void		clearError(sqlrcursor_svr *cursor);
+		void		setError(sqlrcursor_svr *cursor,
+						const char *err,
+						int64_t errn,
+						bool liveconn);
+		char		*getErrorBuffer(sqlrcursor_svr *cursor);
+		uint32_t	getErrorLength(sqlrcursor_svr *cursor);
+		void		setErrorLength(sqlrcursor_svr *cursor,
+							uint32_t errorlength);
+		uint32_t	getErrorNumber(sqlrcursor_svr *cursor);
+		void		setErrorNumber(sqlrcursor_svr *cursor,
+							uint32_t errnum);
+		bool		getLiveConnection(sqlrcursor_svr *cursor);
+		void		setLiveConnection(sqlrcursor_svr *cursor,
+							bool liveconnection);
+
+		// cursor state
+		void			setState(sqlrcursor_svr *cursor,
+						sqlrcursorstate_t state);
+		sqlrcursorstate_t	getState(sqlrcursor_svr *cursor);
+
+		// utilities
+		bool		skipComment(const char **ptr,
+						const char *endptr);
+		bool		skipWhitespace(const char **ptr,
+						const char *endptr);
+		const char	*skipWhitespaceAndComments(const char *query);
 
 		// config file
 		sqlrconfigfile	*cfgfl;
@@ -262,7 +483,8 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 
 		void	setAutoCommit(bool ac);
 
-		bool	initCursors(uint16_t count);
+		bool		initCursors(uint16_t count);
+		sqlrcursor_svr	*newCursor(uint16_t id);
 
 		void	incrementConnectionCount();
 		void	decrementConnectionCount();

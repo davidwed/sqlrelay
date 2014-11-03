@@ -80,15 +80,13 @@ bool sqlrconnection_svr::begin() {
 	// for db's that support begin queries, run one...
 
 	// init some variables
-	sqlrcursor_svr	*begincur=cont->newCursor();
 	const char	*beginquery=beginTransactionQuery();
 	int		beginquerylen=charstring::length(beginquery);
 	bool		retval=false;
 
 	// run the query...
-	// since we're creating a new cursor for this, make sure it can't
-	// have an ID that might already exist
-	if (begincur->openInternal(cont->getCursorCount()+1) &&
+	sqlrcursor_svr	*begincur=cont->newCursor();
+	if (begincur->open() &&
 		begincur->prepareQuery(beginquery,beginquerylen)) {
 		retval=begincur->executeQuery(beginquery,beginquerylen);
 	}
@@ -107,7 +105,7 @@ bool sqlrconnection_svr::begin() {
 
 	// we will need to commit or rollback at the end of the session now
 	if (retval) {
-		cont->setNeedCommitOrRollback(true);
+		cont->commitOrRollbackIsNeeded();
 	}
 
 	return retval;
@@ -123,15 +121,13 @@ bool sqlrconnection_svr::commit() {
 	clearError();
 
 	// init some variables
-	sqlrcursor_svr	*commitcur=cont->newCursor();
 	const char	*commitquery="commit";
 	int		commitquerylen=6;
 	bool		retval=false;
 
 	// run the query...
-	// since we're creating a new cursor for this, make sure it can't
-	// have an ID that might already exist
-	if (commitcur->openInternal(cont->getCursorCount()+1) &&
+	sqlrcursor_svr	*commitcur=cont->newCursor();
+	if (commitcur->open() &&
 		commitcur->prepareQuery(commitquery,commitquerylen)) {
 		retval=commitcur->executeQuery(commitquery,commitquerylen);
 	}
@@ -150,7 +146,7 @@ bool sqlrconnection_svr::commit() {
 
 	// we don't need to commit or rollback at the end of the session now
 	if (retval) {
-		cont->setNeedCommitOrRollback(false);
+		cont->commitOrRollbackIsNotNeeded();
 	}
 
 	return retval;
@@ -162,15 +158,13 @@ bool sqlrconnection_svr::rollback() {
 	clearError();
 
 	// init some variables
-	sqlrcursor_svr	*rbcur=cont->newCursor();
 	const char	*rollbackquery="rollback";
 	int		rollbackquerylen=8;
 	bool		retval=false;
 
 	// run the query...
-	// since we're creating a new cursor for this, make sure it can't
-	// have an ID that might already exist
-	if (rbcur->openInternal(cont->getCursorCount()+1) &&
+	sqlrcursor_svr	*rbcur=cont->newCursor();
+	if (rbcur->open() &&
 		rbcur->prepareQuery(rollbackquery,rollbackquerylen)) {
 		retval=rbcur->executeQuery(rollbackquery,rollbackquerylen);
 	}
@@ -189,7 +183,7 @@ bool sqlrconnection_svr::rollback() {
 
 	// we don't need to commit or rollback at the end of the session now
 	if (retval) {
-		cont->setNeedCommitOrRollback(false);
+		cont->commitOrRollbackIsNotNeeded();
 	}
 
 	return retval;
@@ -226,11 +220,10 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 	charstring::printf(sdquery,sdquerylen,sdquerybase,database);
 	sdquerylen=charstring::length(sdquery);
 
-	sqlrcursor_svr	*sdcur=cont->newCursor();
-	// since we're creating a new cursor for this, make sure it can't
-	// have an ID that might already exist
+	// run the query...
 	bool	retval=false;
-	if (sdcur->openInternal(cont->getCursorCount()+1) &&
+	sqlrcursor_svr	*sdcur=cont->newCursor();
+	if (sdcur->open() &&
 		sdcur->prepareQuery(sdquery,sdquerylen) &&
 		sdcur->executeQuery(sdquery,sdquerylen)) {
 		sdcur->closeResultSet();
@@ -268,11 +261,10 @@ char *sqlrconnection_svr::getCurrentDatabase() {
 
 	size_t		gcdquerylen=charstring::length(gcdquery);
 
-	sqlrcursor_svr	*gcdcur=cont->newCursor();
-	// since we're creating a new cursor for this, make sure it can't
-	// have an ID that might already exist
+	// run the query...
 	char	*retval=NULL;
-	if (gcdcur->openInternal(cont->getCursorCount()+1) &&
+	sqlrcursor_svr	*gcdcur=cont->newCursor();
+	if (gcdcur->open() &&
 		gcdcur->prepareQuery(gcdquery,gcdquerylen) &&
 		gcdcur->executeQuery(gcdquery,gcdquerylen)) {
 
@@ -315,11 +307,10 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id) {
 
 	size_t	liiquerylen=charstring::length(liiquery);
 
-	sqlrcursor_svr	*liicur=cont->newCursor();
-	// since we're creating a new cursor for this, make sure it can't
-	// have an ID that might already exist
+	// run the query...
 	bool	retval=false;
-	if (liicur->openInternal(cont->getCursorCount()+1) &&
+	sqlrcursor_svr	*liicur=cont->newCursor();
+	if (liicur->open() &&
 		liicur->prepareQuery(liiquery,liiquerylen) &&
 		liicur->executeQuery(liiquery,liiquerylen)) {
 
@@ -386,11 +377,10 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 	charstring::printf(silquery,silquerylen,silquerybase,isolevel);
 	silquerylen=charstring::length(silquery);
 
-	sqlrcursor_svr	*silcur=cont->newCursor();
-	// since we're creating a new cursor for this, make sure it can't
-	// have an ID that might already exist
+	// run the query...
 	bool	retval=false;
-	if (silcur->openInternal(cont->getCursorCount()+1) &&
+	sqlrcursor_svr	*silcur=cont->newCursor();
+	if (silcur->open() &&
 		silcur->prepareQuery(silquery,silquerylen) &&
 		silcur->executeQuery(silquery,silquerylen)) {
 		retval=true;
@@ -415,12 +405,10 @@ const char *sqlrconnection_svr::setIsolationLevelQuery() {
 }
 
 bool sqlrconnection_svr::ping() {
-	sqlrcursor_svr	*pingcur=cont->newCursor();
 	const char	*pingquery=pingQuery();
 	int		pingquerylen=charstring::length(pingquery);
-	// since we're creating a new cursor for this, make sure it can't
-	// have an ID that might already exist
-	if (pingcur->openInternal(cont->getCursorCount()+1) &&
+	sqlrcursor_svr	*pingcur=cont->newCursor();
+	if (pingcur->open() &&
 		pingcur->prepareQuery(pingquery,pingquerylen) &&
 		pingcur->executeQuery(pingquery,pingquerylen)) {
 		pingcur->closeResultSet();
@@ -463,11 +451,9 @@ const char *sqlrconnection_svr::dbHostName() {
 	const char	*dbhnquery=dbHostNameQuery();
 	if (dbhnquery) {
 
-		sqlrcursor_svr	*dbhncur=cont->newCursor();
 		int		dbhnquerylen=charstring::length(dbhnquery);
-		// since we're creating a new cursor for this, make
-		// sure it can't have an ID that might already exist
-		if (dbhncur->openInternal(cont->getCursorCount()+1) &&
+		sqlrcursor_svr	*dbhncur=cont->newCursor();
+		if (dbhncur->open() &&
 			dbhncur->prepareQuery(dbhnquery,dbhnquerylen) &&
 			dbhncur->executeQuery(dbhnquery,dbhnquerylen)) {
 
@@ -521,11 +507,9 @@ const char *sqlrconnection_svr::dbIpAddress() {
 	const char	*dbiaquery=dbIpAddressQuery();
 	if (dbiaquery) {
 
-		sqlrcursor_svr	*dbiacur=cont->newCursor();
 		int		dbiaquerylen=charstring::length(dbiaquery);
-		// since we're creating a new cursor for this, make
-		// sure it can't have an ID that might already exist
-		if (dbiacur->openInternal(cont->getCursorCount()+1) &&
+		sqlrcursor_svr	*dbiacur=cont->newCursor();
+		if (dbiacur->open() &&
 			dbiacur->prepareQuery(dbiaquery,dbiaquerylen) &&
 			dbiacur->executeQuery(dbiaquery,dbiaquerylen)) {
 
@@ -599,10 +583,8 @@ bool sqlrconnection_svr::isSynonym(const char *table) {
 	charstring::printf(synquery,synquerylen+1,synquerybase,table);
 	synquerylen=charstring::length(synquery);
 
-	// since we're creating a new cursor for this, make sure it can't
-	// have an ID that might already exist
 	sqlrcursor_svr	*syncur=cont->newCursor();
-	bool	result=(syncur->openInternal(cont->getCursorCount()+1) &&
+	bool	result=(syncur->open() &&
 			syncur->prepareQuery(synquery,synquerylen) &&
 			syncur->executeQuery(synquery,synquerylen) &&
 			!syncur->noRowsToReturn() &&

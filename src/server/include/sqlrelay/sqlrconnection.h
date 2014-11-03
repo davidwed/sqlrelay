@@ -88,7 +88,7 @@ class SQLRSERVER_DLLSPEC sqlrconnection_svr {
 		virtual bool		isSynonym(const char *table);
 		virtual const char	*isSynonymQuery();
 
-		virtual sqlrcursor_svr	*newCursor()=0;
+		virtual sqlrcursor_svr	*newCursor(uint16_t id)=0;
 		virtual void		deleteCursor(sqlrcursor_svr *curs)=0;
 
 		virtual	const char	*bindFormat();

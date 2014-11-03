@@ -9,7 +9,7 @@
 
 #include <defines.h>
 
-sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
+sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn, uint16_t id) {
 
 	this->conn=conn;
 
@@ -45,7 +45,7 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn) {
 
 	clearTotalRowsFetched();
 
-	id=0;
+	this->id=id;
 }
 
 sqlrcursor_svr::~sqlrcursor_svr() {
@@ -57,12 +57,7 @@ sqlrcursor_svr::~sqlrcursor_svr() {
 	delete[] error;
 }
 
-bool sqlrcursor_svr::openInternal(uint16_t id) {
-	this->id=id;
-	return open(id);
-}
-
-bool sqlrcursor_svr::open(uint16_t id) {
+bool sqlrcursor_svr::open() {
 	return true;
 }
 
@@ -75,7 +70,7 @@ sqlrquerytype_t sqlrcursor_svr::queryType(const char *query,
 						uint32_t querylength) {
 
 	// skip past leading garbage
-	const char	*ptr=skipWhitespaceAndComments(query);
+	const char	*ptr=conn->cont->skipWhitespaceAndComments(query);
 
 	// initialize to "etc"
 	sqlrquerytype_t	retval=SQLRQUERYTYPE_ETC;
@@ -293,8 +288,9 @@ void sqlrcursor_svr::checkForTempTable(const char *query, uint32_t length) {
 	const char	*endptr=query+length;
 
 	// skip any leading comments
-	if (!skipWhitespace(&ptr,endptr) || !skipComment(&ptr,endptr) ||
-		!skipWhitespace(&ptr,endptr)) {
+	if (!conn->cont->skipWhitespace(&ptr,endptr) ||
+		!conn->cont->skipComment(&ptr,endptr) ||
+		!conn->cont->skipWhitespace(&ptr,endptr)) {
 		return;
 	}
 
@@ -331,7 +327,7 @@ bool sqlrcursor_svr::fetchFromBindCursor() {
 bool sqlrcursor_svr::queryIsNotSelect() {
 
 	// scan the query, bypassing whitespace and comments.
-	const char	*ptr=skipWhitespaceAndComments(querybuffer);
+	const char	*ptr=conn->cont->skipWhitespaceAndComments(querybuffer);
 
 	// if the query is a select but not a select into then return false,
 	// otherwise return true
@@ -345,7 +341,7 @@ bool sqlrcursor_svr::queryIsNotSelect() {
 bool sqlrcursor_svr::queryIsCommitOrRollback() {
 
 	// scan the query, bypassing whitespace and comments.
-	const char	*ptr=skipWhitespaceAndComments(querybuffer);
+	const char	*ptr=conn->cont->skipWhitespaceAndComments(querybuffer);
 
 	// if the query is a commit or rollback, return true
 	// otherwise return false
@@ -520,39 +516,6 @@ void sqlrcursor_svr::setFakeInputBindsForThisQuery(bool fake) {
 
 bool sqlrcursor_svr::getFakeInputBindsForThisQuery() {
 	return fakeinputbindsforthisquery;
-}
-
-bool sqlrcursor_svr::skipComment(const char **ptr, const char *endptr) {
-	while (*ptr<endptr && !charstring::compare(*ptr,"--",2)) {
-		while (**ptr && **ptr!='\n') {
-			(*ptr)++;
-		}
-	}
-	return *ptr!=endptr;
-}
-
-bool sqlrcursor_svr::skipWhitespace(const char **ptr, const char *endptr) {
-	while ((**ptr==' ' || **ptr=='\n' || **ptr=='	') && *ptr<endptr) {
-		(*ptr)++;
-	}
-	return *ptr!=endptr;
-}
-
-const char *sqlrcursor_svr::skipWhitespaceAndComments(const char *querybuffer) {
-	// scan the query, bypassing whitespace and comments.
-	const char	*ptr=querybuffer;
-	while (*ptr && 
-		(*ptr==' ' || *ptr=='\n' || *ptr=='	' || *ptr=='-')) {
-
-		// skip any comments
-		if (*ptr=='-') {
-			while (*ptr && *ptr!='\n') {
-				ptr++;
-			}
-		}
-		ptr++;
-	}
-	return ptr;
 }
 
 bool sqlrcursor_svr::fakeInputBinds(stringbuffer *outputquery) {

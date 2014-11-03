@@ -22,7 +22,7 @@ class postgresqlconnection : public sqlrconnection_svr {
 		void		handleConnectString();
 		bool		logIn(const char **error);
 		const char	*logInError(const char *errmsg);
-		sqlrcursor_svr	*newCursor();
+		sqlrcursor_svr	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 		void		errorMessage(char *errorbuffer,
@@ -76,11 +76,11 @@ class postgresqlconnection : public sqlrconnection_svr {
 class postgresqlcursor : public sqlrcursor_svr {
 	friend class postgresqlconnection;
 	private:
-				postgresqlcursor(sqlrconnection_svr *conn);
+				postgresqlcursor(sqlrconnection_svr *conn,
+								uint16_t id);
 				~postgresqlcursor();
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
-		bool		open(uint16_t id);
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 		bool		deallocateStatement();
@@ -208,9 +208,10 @@ void postgresqlconnection::handleConnectString() {
 		liiquery.append(lastinsertidfunc);
 		lastinsertidquery=liiquery.detachString();
 	}
-	cont->setFakeInputBinds(
-		!charstring::compare(
-			cont->getConnectStringValue("fakebinds"),"yes"));
+	if (!charstring::compare(
+			cont->getConnectStringValue("fakebinds"),"yes")) {
+		cont->fakeInputBinds();
+	}
 }
 
 bool postgresqlconnection::logIn(const char **error) {
@@ -279,7 +280,7 @@ bool postgresqlconnection::logIn(const char **error) {
 		defined(HAVE_POSTGRESQL_PQPREPARE)
 	// don't use bind variables against older servers
 	if (PQprotocolVersion(pgconn)<3) {
-		cont->setFakeInputBinds(true);
+		cont->fakeInputBinds();
 	}
 #endif
 
@@ -297,9 +298,9 @@ const char *postgresqlconnection::logInError(const char *errmsg) {
 	return errormessage.getString();
 }
 
-sqlrcursor_svr *postgresqlconnection::newCursor() {
+sqlrcursor_svr *postgresqlconnection::newCursor(uint16_t id) {
 	return (sqlrcursor_svr *)new
-			postgresqlcursor((sqlrconnection_svr *)this);
+			postgresqlcursor((sqlrconnection_svr *)this,id);
 }
 
 void postgresqlconnection::deleteCursor(sqlrcursor_svr *curs) {
@@ -535,14 +536,16 @@ const char *postgresqlconnection::bindFormat() {
 #endif
 }
 
-postgresqlcursor::postgresqlcursor(sqlrconnection_svr *conn) :
-						sqlrcursor_svr(conn) {
+postgresqlcursor::postgresqlcursor(sqlrconnection_svr *conn, uint16_t id) :
+						sqlrcursor_svr(conn,id) {
 	postgresqlconn=(postgresqlconnection *)conn;
 	pgresult=NULL;
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
 	deallocatestatement=false;
-	cursorname=NULL;
+	size_t	cursornamelen=6+charstring::integerLength(id)+1;
+	cursorname=new char[cursornamelen];
+	charstring::printf(cursorname,cursornamelen,"cursor%d",id);
 	bindcounter=0;
 	bindcount=0;
 	bindvalues=NULL;
@@ -568,13 +571,6 @@ postgresqlcursor::~postgresqlcursor() {
 
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
-bool postgresqlcursor::open(uint16_t id) {
-	size_t	cursornamelen=6+charstring::integerLength(id)+1;
-	cursorname=new char[cursornamelen];
-	charstring::printf(cursorname,cursornamelen,"cursor%d",id);
-	return true;
-}
-
 bool postgresqlcursor::deallocateStatement() {
 	if (deallocatestatement) {
 		stringbuffer	rmquery;

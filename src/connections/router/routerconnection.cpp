@@ -50,7 +50,7 @@ class routerconnection : public sqlrconnection_svr {
 		bool		supportsAuthOnDatabase();
 		void		handleConnectString();
 		bool		logIn(const char **error);
-		sqlrcursor_svr	*newCursor();
+		sqlrcursor_svr	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 		bool		autoCommitOn();
@@ -98,7 +98,8 @@ class routerconnection : public sqlrconnection_svr {
 class routercursor : public sqlrcursor_svr {
 	friend class routerconnection;
 	private:
-				routercursor(sqlrconnection_svr *conn);
+				routercursor(sqlrconnection_svr *conn,
+								uint16_t id);
 				~routercursor();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
@@ -330,8 +331,9 @@ bool routerconnection::logIn(const char **error) {
 	return true;
 }
 
-sqlrcursor_svr *routerconnection::newCursor() {
-	return (sqlrcursor_svr *)new routercursor((sqlrconnection_svr *)this);
+sqlrcursor_svr *routerconnection::newCursor(uint16_t id) {
+	return (sqlrcursor_svr *)new routercursor(
+					(sqlrconnection_svr *)this,id);
 }
 
 void routerconnection::deleteCursor(sqlrcursor_svr *curs) {
@@ -557,7 +559,8 @@ bool routerconnection::getLastInsertId(uint64_t *id) {
 	return true;
 }
 
-routercursor::routercursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
+routercursor::routercursor(sqlrconnection_svr *conn, uint16_t id) :
+						sqlrcursor_svr(conn,id) {
 	routerconn=(routerconnection *)conn;
 	nextrow=0;
 	con=NULL;
@@ -965,8 +968,9 @@ void routercursor::checkForTempTable(const char *query, uint32_t length) {
 	const char	*endptr=query+length;
 
 	// skip any leading comments
-	if (!skipWhitespace(&ptr,endptr) || !skipComment(&ptr,endptr) ||
-		!skipWhitespace(&ptr,endptr)) {
+	if (!conn->cont->skipWhitespace(&ptr,endptr) ||
+		!conn->cont->skipComment(&ptr,endptr) ||
+		!conn->cont->skipWhitespace(&ptr,endptr)) {
 		return;
 	}
 

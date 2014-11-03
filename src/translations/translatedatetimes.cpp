@@ -244,10 +244,10 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 		timeformat="HH24:MI:SS";
 	}
 
-	bindvar_svr	*inbinds=sqlrcur->getInputBinds();
+	bindvar_svr	*inbinds=sqlrcon->cont->getInputBinds(sqlrcur);
 
 	// run through the bind variables...
-	for (uint16_t i=0; i<sqlrcur->getInputBindCount(); i++) {
+	for (uint16_t i=0; i<sqlrcon->cont->getInputBindCount(sqlrcur); i++) {
 
 		// get the variable
 		bindvar_svr	*bind=&(inbinds[i]);

@@ -97,7 +97,7 @@ class DLLSPEC oracle8connection : public sqlrconnection_svr {
 #endif
 		bool		logIn(const char **error);
 		const char	*logInError(const char *errmsg);
-		sqlrcursor_svr	*newCursor();
+		sqlrcursor_svr	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
@@ -176,13 +176,14 @@ class DLLSPEC oracle8connection : public sqlrconnection_svr {
 class DLLSPEC oracle8cursor : public sqlrcursor_svr {
 	friend class oracle8connection;
 	private:
-				oracle8cursor(sqlrconnection_svr *conn);
+				oracle8cursor(sqlrconnection_svr *conn,
+								uint16_t id);
 				~oracle8cursor();
 		void		allocateResultSetBuffers(uint32_t fetchatonce,
 							int32_t selectlistsize,
 							int32_t itembuffersize);
 		void		deallocateResultSetBuffers();
-		bool		open(uint16_t id);
+		bool		open();
 		bool		close();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
@@ -527,9 +528,10 @@ void oracle8connection::handleConnectString() {
 		lastinsertidquery=liiquery.detachString();
 	}
 
-	cont->setFakeInputBinds(
-		!charstring::compare(
-			cont->getConnectStringValue("fakebinds"),"yes"));
+	if (!charstring::compare(
+			cont->getConnectStringValue("fakebinds"),"yes")) {
+		cont->fakeInputBinds();
+	}
 }
 
 #ifdef HAVE_ORACLE_8i
@@ -953,8 +955,9 @@ const char *oracle8connection::logInError(const char *errmsg) {
 	return errormessage.getString();
 }
 
-sqlrcursor_svr *oracle8connection::newCursor() {
-	return (sqlrcursor_svr *)new oracle8cursor((sqlrconnection_svr *)this);
+sqlrcursor_svr *oracle8connection::newCursor(uint16_t id) {
+	return (sqlrcursor_svr *)new oracle8cursor(
+					(sqlrconnection_svr *)this,id);
 }
 
 void oracle8connection::deleteCursor(sqlrcursor_svr *curs) {
@@ -1864,7 +1867,8 @@ const char *oracle8connection::getLastInsertIdQuery() {
 	return lastinsertidquery;
 }
 
-oracle8cursor::oracle8cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
+oracle8cursor::oracle8cursor(sqlrconnection_svr *conn, uint16_t id) :
+						sqlrcursor_svr(conn,id) {
 
 	stmt=NULL;
 	stmttype=0;
@@ -2041,7 +2045,7 @@ void oracle8cursor::deallocateResultSetBuffers() {
 	}
 }
 
-bool oracle8cursor::open(uint16_t id) {
+bool oracle8cursor::open() {
 
 	stmt=NULL;
 
@@ -2875,7 +2879,7 @@ void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 	const char	*endptr=query+length;
 
 	// skip any leading whitespace and comments
-	ptr=skipWhitespaceAndComments(query);
+	ptr=conn->cont->skipWhitespaceAndComments(query);
 	if (!(*ptr)) {
 		return;
 	}

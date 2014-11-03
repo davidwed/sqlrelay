@@ -53,7 +53,7 @@ class db2connection;
 class db2cursor : public sqlrcursor_svr {
 	friend class db2connection;
 	public:
-			db2cursor(sqlrconnection_svr *conn);
+			db2cursor(sqlrconnection_svr *conn, uint16_t id);
 			~db2cursor();
 	private:
 		void		allocateResultSetBuffers(
@@ -220,7 +220,7 @@ class db2connection : public sqlrconnection_svr {
 		bool	logIn(const char **error);
 		const char	*logInError(const char *errmsg);
 		void	dbVersionSpecificTasks();
-		sqlrcursor_svr	*newCursor();
+		sqlrcursor_svr	*newCursor(uint16_t id);
 		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
 		int16_t	nullBindValue();
@@ -304,9 +304,10 @@ void db2connection::handleConnectString() {
 		!charstring::compare(
 			cont->getConnectStringValue("faketransactionblocks"),
 			"yes"));
-	cont->setFakeInputBinds(
-		!charstring::compare(
-			cont->getConnectStringValue("fakebinds"),"yes"));
+	if (!charstring::compare(
+			cont->getConnectStringValue("fakebinds"),"yes")) {
+		cont->fakeInputBinds();
+	}
 
 	const char	*to=cont->getConnectStringValue("timeout");
 	if (!charstring::length(to)) {
@@ -510,8 +511,8 @@ void db2connection::dbVersionSpecificTasks() {
 	}
 }
 
-sqlrcursor_svr *db2connection::newCursor() {
-	return (sqlrcursor_svr *)new db2cursor((sqlrconnection_svr *)this);
+sqlrcursor_svr *db2connection::newCursor(uint16_t id) {
+	return (sqlrcursor_svr *)new db2cursor((sqlrconnection_svr *)this,id);
 }
 
 void db2connection::deleteCursor(sqlrcursor_svr *curs) {
@@ -703,7 +704,8 @@ const char *db2connection::setIsolationLevelQuery() {
         return "set current isolation %s";
 }
 
-db2cursor::db2cursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
+db2cursor::db2cursor(sqlrconnection_svr *conn, uint16_t id) :
+						sqlrcursor_svr(conn,id) {
 	db2conn=(db2connection *)conn;
 	stmt=0;
 	lobstmt=0;

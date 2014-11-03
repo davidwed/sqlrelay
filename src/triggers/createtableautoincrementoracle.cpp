@@ -235,8 +235,8 @@ bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
 	bool	retval=false;
 
 	sqlrcursor_svr	*cur=sqlrcon->cont->newCursor();
-	if (cur->openInternal(sqlrcon->cont->getCursorCount()+1) &&
-		cur->prepareQuery(query,length) &&
+	if (sqlrcon->cont->open(cur) &&
+		sqlrcon->cont->prepareQuery(cur,query,length) &&
 		sqlrcon->cont->executeQuery(cur,query,length)) {
 		// success...
 		retval=true;
@@ -249,23 +249,25 @@ bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
 			uint32_t	errorlength;
 			int64_t		errnum;
 			bool		liveconnection;
-			cur->errorMessage(cur->getErrorBuffer(),
-						sqlrcon->cont->cfgfl->
-							getMaxErrorLength(),
-						&errorlength,
-						&errnum,
-						&liveconnection);
-			cur->setErrorLength(errorlength);
-			cur->setErrorNumber(errnum);
-			cur->setLiveConnection(liveconnection);
-			stdoutput.printf("error:\n%s\n",cur->getErrorBuffer());
+			sqlrcon->cont->errorMessage(cur,
+					sqlrcon->cont->getErrorBuffer(cur),
+					sqlrcon->cont->cfgfl->
+						getMaxErrorLength(),
+					&errorlength,
+					&errnum,
+					&liveconnection);
+			sqlrcon->cont->setErrorLength(cur,errorlength);
+			sqlrcon->cont->setErrorNumber(cur,errnum);
+			sqlrcon->cont->setLiveConnection(cur,liveconnection);
+			stdoutput.printf("error:\n%s\n",
+					sqlrcon->cont->getErrorBuffer(cur));
 		}
 	}
 	if (debug) {
 		stdoutput.printf("\n");
 	}
-	cur->closeResultSet();
-	cur->close();
+	sqlrcon->cont->closeResultSet(cur);
+	sqlrcon->cont->close(cur);
 	sqlrcon->cont->deleteCursor(cur);
 	return retval;
 }

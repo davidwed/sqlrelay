@@ -68,7 +68,8 @@ class odbcconnection;
 class odbccursor : public sqlrcursor_svr {
 	friend class odbcconnection;
 	private:
-				odbccursor(sqlrconnection_svr *conn);
+				odbccursor(sqlrconnection_svr *conn,
+							uint16_t id);
 				~odbccursor();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
@@ -203,7 +204,7 @@ class odbcconnection : public sqlrconnection_svr {
 		void		handleConnectString();
 		bool		logIn(const char **error);
 		const char	*logInError(const char *errmsg);
-		sqlrcursor_svr	*newCursor();
+		sqlrcursor_svr	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrcursor_svr *curs);
 		void		logOut();
 #if (ODBCVER>=0x0300)
@@ -402,9 +403,10 @@ void odbcconnection::handleConnectString() {
 	const char	*autocom=cont->getConnectStringValue("autocommit");
 	cont->setAutoCommitBehavior((autocom &&
 		!charstring::compareIgnoringCase(autocom,"yes")));
-	cont->setFakeInputBinds(
-		!charstring::compare(
-			cont->getConnectStringValue("fakebinds"),"yes"));
+	if (!charstring::compare(
+			cont->getConnectStringValue("fakebinds"),"yes")) {
+		cont->fakeInputBinds();
+	}
 
 	const char	*to=cont->getConnectStringValue("timeout");
 	if (!charstring::length(to)) {
@@ -524,8 +526,8 @@ const char *odbcconnection::logInError(const char *errmsg) {
 	return errormessage.getString();
 }
 
-sqlrcursor_svr *odbcconnection::newCursor() {
-	return (sqlrcursor_svr *)new odbccursor((sqlrconnection_svr *)this);
+sqlrcursor_svr *odbcconnection::newCursor(uint16_t id) {
+	return (sqlrcursor_svr *)new odbccursor((sqlrconnection_svr *)this,id);
 }
 
 void odbcconnection::deleteCursor(sqlrcursor_svr *curs) {
@@ -691,7 +693,8 @@ bool odbcconnection::setIsolationLevel(const char *isolevel) {
 	return true;
 }
 
-odbccursor::odbccursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
+odbccursor::odbccursor(sqlrconnection_svr *conn, uint16_t id) :
+						sqlrcursor_svr(conn,id) {
 	odbcconn=(odbcconnection *)conn;
 	stmt=NULL;
 	outdatebind=new datebind *[conn->cont->cfgfl->getMaxBindCount()];

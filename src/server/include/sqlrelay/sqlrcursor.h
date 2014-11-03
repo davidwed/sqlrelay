@@ -65,10 +65,10 @@ class sqlrquerycursor;
 
 class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 	public:
-			sqlrcursor_svr(sqlrconnection_svr *conn);
+			sqlrcursor_svr(sqlrconnection_svr *conn, uint16_t id);
 		virtual	~sqlrcursor_svr();
 
-		virtual	bool	open(uint16_t id);
+		virtual	bool	open();
 		virtual	bool	close();
 
 		virtual sqlrquerytype_t	queryType(const char *query,
@@ -237,12 +237,6 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 		void		setFakeInputBindsForThisQuery(bool fake);
 		bool		getFakeInputBindsForThisQuery();
 	
-		bool		skipComment(const char **ptr,
-						const char *endptr);
-		bool		skipWhitespace(const char **ptr,
-						const char *endptr);
-		const char	*skipWhitespaceAndComments(
-						const char *querybuffer);
 		bool		fakeInputBinds(stringbuffer *outputquery);
 
 		void		setInputBindCount(uint16_t inbindcount);
@@ -253,7 +247,6 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 		uint16_t	getOutputBindCount();
 		bindvar_svr	*getOutputBinds();
 
-		bool	openInternal(uint16_t id);
 		void	performSubstitution(stringbuffer *buffer,
 							int16_t index);
 		void	abort();

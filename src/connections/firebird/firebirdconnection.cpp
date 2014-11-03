@@ -61,7 +61,8 @@ class firebirdconnection;
 class firebirdcursor : public sqlrcursor_svr {
 	friend class firebirdconnection;
 	private:
-				firebirdcursor(sqlrconnection_svr *conn);
+				firebirdcursor(sqlrconnection_svr *conn,
+								uint16_t id);
 				~firebirdcursor();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
@@ -212,7 +213,7 @@ class firebirdconnection : public sqlrconnection_svr {
 	private:
 		void	handleConnectString();
 		bool	logIn(const char **error);
-		sqlrcursor_svr	*newCursor();
+		sqlrcursor_svr	*newCursor(uint16_t id);
 		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
 		bool	supportsTransactionBlocks();
@@ -327,9 +328,10 @@ void firebirdconnection::handleConnectString() {
 		lastinsertidquery=liiquery.detachString();
 	}
 
-	cont->setFakeInputBinds(
-		!charstring::compare(
-			cont->getConnectStringValue("fakebinds"),"yes"));
+	if (!charstring::compare(
+			cont->getConnectStringValue("fakebinds"),"yes")) {
+		cont->fakeInputBinds();
+	}
 }
 
 bool firebirdconnection::logIn(const char **err) {
@@ -404,8 +406,9 @@ bool firebirdconnection::logIn(const char **err) {
 	return true;
 }
 
-sqlrcursor_svr *firebirdconnection::newCursor() {
-	return (sqlrcursor_svr *)new firebirdcursor((sqlrconnection_svr *)this);
+sqlrcursor_svr *firebirdconnection::newCursor(uint16_t id) {
+	return (sqlrcursor_svr *)new firebirdcursor(
+					(sqlrconnection_svr *)this,id);
 }
 
 void firebirdconnection::deleteCursor(sqlrcursor_svr *curs) {
@@ -642,8 +645,8 @@ const char *firebirdconnection::getLastInsertIdQuery() {
 	return lastinsertidquery;
 }
 
-firebirdcursor::firebirdcursor(sqlrconnection_svr *conn) :
-						sqlrcursor_svr(conn) {
+firebirdcursor::firebirdcursor(sqlrconnection_svr *conn, uint16_t id) :
+						sqlrcursor_svr(conn,id) {
 	firebirdconn=(firebirdconnection *)conn;
 
 	outsqlda=(XSQLDA ISC_FAR *)new unsigned char[

@@ -857,9 +857,9 @@ bool sqlrcontroller_svr::initCursors(uint16_t count) {
 	for (uint16_t i=0; i<cursorcount; i++) {
 
 		if (!cur[i]) {
-			cur[i]=newCursor();
+			cur[i]=newCursor(i);
 		}
-		if (!cur[i]->openInternal(i)) {
+		if (!cur[i]->open()) {
 			debugstr.clear();
 			debugstr.append("cursor init failed: ")->append(i);
 			logInternalError(NULL,debugstr.getString());
@@ -872,12 +872,17 @@ bool sqlrcontroller_svr::initCursors(uint16_t count) {
 	return true;
 }
 
-sqlrcursor_svr *sqlrcontroller_svr::newCursor() {
-	sqlrcursor_svr	*cursor=conn->newCursor();
+sqlrcursor_svr *sqlrcontroller_svr::newCursor(uint16_t id) {
+	sqlrcursor_svr	*cursor=conn->newCursor(id);
 	if (cursor) {
 		incrementOpenDatabaseCursors();
 	}
 	return cursor;
+}
+
+sqlrcursor_svr *sqlrcontroller_svr::newCursor() {
+	// return a cursor with an ID that can't already exist
+	return newCursor(cursorcount+1);
 }
 
 void sqlrcontroller_svr::incrementConnectionCount() {
@@ -1547,7 +1552,7 @@ void sqlrcontroller_svr::clientSession() {
 	// determine client protocol
 	sqlrprotocol_t	protocol=getClientProtocol();
 	if (protocol==SQLRPROTOCOL_UNKNOWN) {
-		closeClientSocket(0);
+		closeClientConnection(0);
 		return;
 	}
 
@@ -1570,7 +1575,7 @@ void sqlrcontroller_svr::clientSession() {
 		proto->setClientSocket(clientsock);
 		exitstatus=proto->clientSession();
 	} else {
-		closeClientSocket(0);
+		closeClientConnection(0);
 	}
 
 	closeSuspendedSessionSockets();
@@ -1677,9 +1682,9 @@ sqlrcursor_svr *sqlrcontroller_svr::getCursor() {
 	}
 	uint16_t	firstnewcursor=cursorcount;
 	do {
-		cur[cursorcount]=newCursor();
+		cur[cursorcount]=newCursor(cursorcount);
 		cur[cursorcount]->setState(SQLRCURSORSTATE_AVAILABLE);
-		if (!cur[cursorcount]->openInternal(cursorcount)) {
+		if (!cur[cursorcount]->open()) {
 			debugstr.clear();
 			debugstr.append("cursor init failure: ");
 			debugstr.append(cursorcount);
@@ -1863,8 +1868,8 @@ void sqlrcontroller_svr::beginSession() {
 	sessionStartQueries();
 }
 
-void sqlrcontroller_svr::suspendSession(const char **unixsocketname,
-						uint16_t *inetportnumber) {
+void sqlrcontroller_svr::suspendSession(const char **unixsocket,
+						uint16_t *inetport) {
 
 	// mark the session suspended
 	suspendedsession=true;
@@ -1883,13 +1888,13 @@ void sqlrcontroller_svr::suspendSession(const char **unixsocketname,
 
 	// open sockets to resume on
 	logDebugMessage("opening sockets to resume on...");
-	*unixsocketname=NULL;
-	*inetportnumber=0;
+	*unixsocket=NULL;
+	*inetport=0;
 	if (openSockets()) {
 		if (serversockun) {
-			*unixsocketname=unixsocket;
+			*unixsocket=this->unixsocket;
 		}
-		*inetportnumber=inetport;
+		*inetport=this->inetport;
 	}
 	logDebugMessage("done opening sockets to resume on");
 }
@@ -1963,6 +1968,102 @@ void sqlrcontroller_svr::dbHasChanged() {
 	this->dbchanged=true;
 }
 
+char *sqlrcontroller_svr::getCurrentDatabase() {
+	return conn->getCurrentDatabase();
+}
+
+bool sqlrcontroller_svr::getLastInsertId(uint64_t *id) {
+	return conn->getLastInsertId(id);
+}
+
+bool sqlrcontroller_svr::setIsolationLevel(const char *isolevel) {
+	return conn->setIsolationLevel(isolevel);
+}
+
+bool sqlrcontroller_svr::ping() {
+	return conn->ping();
+}
+
+bool sqlrcontroller_svr::getListsByApiCalls() {
+	return conn->getListsByApiCalls();
+}
+
+bool sqlrcontroller_svr::getDatabaseList(sqlrcursor_svr *cursor,
+						const char *wild) {
+	return conn->getDatabaseList(cursor,wild);
+}
+
+bool sqlrcontroller_svr::getTableList(sqlrcursor_svr *cursor,
+						const char *wild) {
+	return conn->getTableList(cursor,wild);
+}
+
+bool sqlrcontroller_svr::getColumnList(sqlrcursor_svr *cursor,
+						const char *table,
+						const char *wild) {
+	return conn->getColumnList(cursor,table,wild);
+}
+
+const char *sqlrcontroller_svr::getDatabaseListQuery(bool wild) {
+	return conn->getDatabaseListQuery(wild);
+}
+
+const char *sqlrcontroller_svr::getTableListQuery(bool wild) {
+	return conn->getTableListQuery(wild);
+}
+
+const char *sqlrcontroller_svr::getColumnListQuery(const char *table,
+							bool wild) {
+	return conn->getColumnListQuery(table,wild);
+}
+
+void sqlrcontroller_svr::errorMessage(char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorlength,
+						int64_t *errorcode,
+						bool *liveconnection) {
+	return conn->errorMessage(errorbuffer,errorbuffersize,
+					errorlength,errorcode,liveconnection);
+}
+
+void sqlrcontroller_svr::clearError() {
+	conn->clearError();
+}
+
+void sqlrcontroller_svr::setError(const char *err,
+					int64_t errn,
+					bool liveconn) {
+	conn->setError(err,errn,liveconn);
+}
+
+char *sqlrcontroller_svr::getErrorBuffer() {
+	return conn->getErrorBuffer();
+}
+
+uint32_t sqlrcontroller_svr::getErrorLength() {
+	return conn->getErrorLength();
+}
+
+void sqlrcontroller_svr::setErrorLength(uint32_t errorlength) {
+	conn->setErrorLength(errorlength);
+}
+
+uint32_t sqlrcontroller_svr::getErrorNumber() {
+	return conn->getErrorNumber();
+}
+
+void sqlrcontroller_svr::setErrorNumber(uint32_t errnum) {
+	conn->setErrorNumber(errnum);
+}
+
+bool sqlrcontroller_svr::getLiveConnection() {
+	return conn->getLiveConnection();
+}
+
+void sqlrcontroller_svr::setLiveConnection(bool liveconnection) {
+	return conn->setLiveConnection(liveconnection);
+}
+
 bool sqlrcontroller_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 						bool *wasfaketransactionquery) {
 
@@ -1978,8 +2079,9 @@ bool sqlrcontroller_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 		cursor->setOutputBindCount(0);
 		sendcolumninfo=DONT_SEND_COLUMN_INFO;
 		if (intransactionblock) {
-			cursor->setError("begin while in transaction block",
-								999999,false);
+			cursor->setError(
+				"begin while in transaction block",
+							999999,false);
 			return false;
 		}
 		return begin();
@@ -2023,8 +2125,8 @@ bool sqlrcontroller_svr::handleFakeTransactionQueries(sqlrcursor_svr *cursor,
 bool sqlrcontroller_svr::isBeginTransactionQuery(sqlrcursor_svr *cursor) {
 
 	// find the start of the actual query
-	const char	*ptr=cursor->skipWhitespaceAndComments(
-						cursor->getQueryBuffer());
+	const char	*ptr=skipWhitespaceAndComments(
+					cursor->getQueryBuffer());
 
 	// See if it was any of the different queries used to start a
 	// transaction.  IMPORTANT: don't just look for the first 5 characters
@@ -2035,8 +2137,7 @@ bool sqlrcontroller_svr::isBeginTransactionQuery(sqlrcursor_svr *cursor) {
 
 		// make sure there are only spaces, comments or the word "work"
 		// after the begin
-		const char	*spaceptr=
-				cursor->skipWhitespaceAndComments(ptr+5);
+		const char	*spaceptr=skipWhitespaceAndComments(ptr+5);
 		
 		if (!charstring::compareIgnoringCase(spaceptr,"WORK",4) ||
 			*spaceptr=='\0') {
@@ -2052,154 +2153,215 @@ bool sqlrcontroller_svr::isBeginTransactionQuery(sqlrcursor_svr *cursor) {
 
 bool sqlrcontroller_svr::isCommitQuery(sqlrcursor_svr *cursor) {
 	return !charstring::compareIgnoringCase(
-			cursor->skipWhitespaceAndComments(
-					cursor->getQueryBuffer()),
+			skipWhitespaceAndComments(cursor->getQueryBuffer()),
 			"commit",6);
 }
 
 bool sqlrcontroller_svr::isRollbackQuery(sqlrcursor_svr *cursor) {
 	return !charstring::compareIgnoringCase(
-			cursor->skipWhitespaceAndComments(
-					cursor->getQueryBuffer()),
+			skipWhitespaceAndComments(cursor->getQueryBuffer()),
 			"rollback",8);
 }
 
-bool sqlrcontroller_svr::processQueryOrBindCursor(sqlrcursor_svr *cursor,
-					bool reexecute, bool bindcursor) {
-
-	// handle fake transaction queries
-	bool	success=false;
-	bool	wasfaketransactionquery=false;
-	if (!reexecute && !bindcursor && faketransactionblocks) {
-		success=handleFakeTransactionQueries(cursor,
-					&wasfaketransactionquery);
+bool sqlrcontroller_svr::skipComment(const char **ptr, const char *endptr) {
+	while (*ptr<endptr && !charstring::compare(*ptr,"--",2)) {
+		while (**ptr && **ptr!='\n') {
+			(*ptr)++;
+		}
 	}
-	if (wasfaketransactionquery) {
-		return success;
+	return *ptr!=endptr;
+}
+
+bool sqlrcontroller_svr::skipWhitespace(const char **ptr, const char *endptr) {
+	while ((**ptr==' ' || **ptr=='\n' || **ptr=='	') && *ptr<endptr) {
+		(*ptr)++;
 	}
+	return *ptr!=endptr;
+}
 
-	// process the query...
-	logDebugMessage("processing query...");
-
-	// on reexecute, translate bind variables from mapping
-	if (reexecute) {
-		translateBindVariablesFromMappings(cursor);
-	}
-
-	success=false;
-
-	if (reexecute &&
-		!cursor->getFakeInputBindsForThisQuery() &&
-		cursor->supportsNativeBinds()) {
-
-		// if we're reexecuting and not faking binds then
-		// the statement doesn't need to be prepared again,
-		// just execute it...
-
-		logDebugMessage("re-executing...");
-		success=(handleBinds(cursor) &&
-					executeQuery(cursor,
-						cursor->getQueryBuffer(),
-						cursor->getQueryLength()));
-
-	} else if (bindcursor) {
-
-		// if we're handling a bind cursor...
-		logDebugMessage("bind cursor...");
-		success=cursor->fetchFromBindCursor();
-
-	} else {
-
-		// otherwise, prepare and execute the query...
-		// generally this a first time query but it could also be
-		// a reexecute if we're faking binds
-
-		logDebugMessage("preparing/executing...");
-
-		// rewrite the query, if necessary
-		rewriteQuery(cursor);
-
-		// buffers and pointers...
-		stringbuffer	outputquery;
-		const char	*query=cursor->getQueryBuffer();
-		uint32_t	querylen=cursor->getQueryLength();
-
-		// fake input binds if necessary
-		// NOTE: we can't just overwrite the querybuffer when
-		// faking binds or we'll lose the original query and
-		// end up rerunning the modified query when reexecuting
-		if (cursor->getFakeInputBindsForThisQuery() ||
-			!cursor->supportsNativeBinds(query)) {
-			logDebugMessage("faking binds...");
-			if (cursor->fakeInputBinds(&outputquery)) {
-				query=outputquery.getString();
-				querylen=outputquery.getStringLength();
-				if (debugsqlrtranslation) {
-					stdoutput.printf(
-					"after faking input binds:\n%s\n\n",
-									query);
-				}
+const char *sqlrcontroller_svr::skipWhitespaceAndComments(const char *query) {
+	const char	*ptr=query;
+	while (*ptr && 
+		(*ptr==' ' || *ptr=='\n' || *ptr=='	' || *ptr=='-')) {
+		if (*ptr=='-') {
+			while (*ptr && *ptr!='\n') {
+				ptr++;
 			}
 		}
+		ptr++;
+	}
+	return ptr;
+}
 
-		// prepare
-		success=cursor->prepareQuery(query,querylen);
+bool sqlrcontroller_svr::newQuery(sqlrcursor_svr *cursor) {
 
-		// if we're not faking binds then
-		// handle the binds for real
-		if (success &&
-			!cursor->getFakeInputBindsForThisQuery() &&
-			cursor->supportsNativeBinds()) {
-			success=handleBinds(cursor);
-		}
-
-		// execute
-		if (success) {
-			success=executeQuery(cursor,query,querylen);
+	// handle fake transaction queries
+	if (faketransactionblocks) {
+		bool	wasfaketransactionquery=false;
+		bool	success=handleFakeTransactionQueries(cursor,
+						&wasfaketransactionquery);
+		if (wasfaketransactionquery) {
+			return success;
 		}
 	}
 
-	// was the query a commit or rollback?
-	commitOrRollback(cursor);
+	// set state
+	updateState((isCustomQuery(cursor))?PROCESS_CUSTOM:PROCESS_SQL);
 
-	// On success, autocommit if necessary.
-	// Connection classes could override autoCommitOn() and autoCommitOff()
-	// to do database API-specific things, but will not set 
-	// fakeautocommit, so this code won't get called at all for those 
-	// connections.
-	// FIXME: when faking autocommit, a BEGIN on a db that supports them
-	// could cause commit to be called immediately
-	if (success && conn->isTransactional() && needcommitorrollback &&
-			conn->getFakeAutoCommit() && conn->getAutoCommit()) {
-		logDebugMessage("commit necessary...");
-		success=commit();
+	logDebugMessage("new query...");
+
+	// perform query translation
+	if (sqlp && sqlrt && sqlw) {
+		translateQuery(cursor);
 	}
-	
-	// if the query failed, get the error (unless it's already been set)
+
+	// perform bind variable translation
+	if (translatebinds) {
+		translateBindVariables(cursor);
+	}
+
+	// translate "begin" queries
+	if (conn->supportsTransactionBlocks() &&
+			isBeginTransactionQuery(cursor)) {
+		translateBeginTransaction(cursor);
+	}
+
+	// get the query
+	const char	*query=cursor->getQueryBuffer();
+	uint32_t	querylen=cursor->getQueryLength();
+
+	// fake input binds if necessary
+	bool	fakebinds=(!cursor->supportsNativeBinds(query) ||
+				cursor->getFakeInputBindsForThisQuery());
+	stringbuffer	outputquery;
+	if (fakebinds) {
+		logDebugMessage("faking binds...");
+		if (cursor->fakeInputBinds(&outputquery)) {
+			// don't copy the rewritten query to the cursor's
+			// query buffer, we need the original if we decide
+			// to re-execute it later
+			query=outputquery.getString();
+			querylen=outputquery.getStringLength();
+			if (debugsqlrtranslation) {
+				stdoutput.printf(
+				"after faking input binds:\n%s\n\n",query);
+			}
+		}
+	}
+
+	// prepare
+	bool	success=prepareQuery(cursor,query,querylen);
+
+	// if we didn't fake binds earlier then handle them for real here
+	if (success && !fakebinds) {
+		success=handleBinds(cursor);
+	}
+
+	// execute
+	if (success) {
+		success=executeQuery(cursor,query,querylen);
+	}
+
+	// on failure get the error (unless it's already been set)
 	if (!success && !cursor->getErrorNumber()) {
-		// FIXME: errors for queries run by triggers won't be set here
 		uint32_t	errorlength;
 		int64_t		errnum;
 		bool		liveconnection;
-		cursor->errorMessage(cursor->getErrorBuffer(),
-					maxerrorlength,
-					&errorlength,&errnum,&liveconnection);
+		errorMessage(cursor,
+				cursor->getErrorBuffer(),
+				maxerrorlength,
+				&errorlength,&errnum,&liveconnection);
 		cursor->setErrorLength(errorlength);
 		cursor->setErrorNumber(errnum);
 		cursor->setLiveConnection(liveconnection);
 	}
 
-	// reset total rows fetched
-	if (success) {
-		cursor->clearTotalRowsFetched();
+	logDebugMessage((success)?"new query succeeded":"new query failed");
+	logDebugMessage("done with new query");
+
+	return success;
+}
+
+bool sqlrcontroller_svr::reExecuteQuery(sqlrcursor_svr *cursor) {
+
+	// if we're faking binds then we can't re-execute,
+	// it must be treated as a new query
+	if (!cursor->supportsNativeBinds() ||
+		cursor->getFakeInputBindsForThisQuery()) {
+		return newQuery(cursor);
 	}
 
+	// set state
+	updateState((isCustomQuery(cursor))?PROCESS_CUSTOM:PROCESS_SQL);
+
+	// process the query...
+	logDebugMessage("reexecuting query...");
+
+	// translate bind variables from mappings
+	translateBindVariablesFromMappings(cursor);
+
+	// handle binds
+	bool	success=handleBinds(cursor);
+
+	// execute
 	if (success) {
-		logDebugMessage("processing query succeeded");
-	} else {
-		logDebugMessage("processing query failed");
+		success=executeQuery(cursor,cursor->getQueryBuffer(),
+						cursor->getQueryLength());
 	}
-	logDebugMessage("done processing query");
+	
+	// on failure get the error (unless it's already been set)
+	if (!success && !cursor->getErrorNumber()) {
+		uint32_t	errorlength;
+		int64_t		errnum;
+		bool		liveconnection;
+		errorMessage(cursor,
+				cursor->getErrorBuffer(),
+				maxerrorlength,
+				&errorlength,&errnum,&liveconnection);
+		cursor->setErrorLength(errorlength);
+		cursor->setErrorNumber(errnum);
+		cursor->setLiveConnection(liveconnection);
+	}
+
+	logDebugMessage((success)?"reexecuting query succeeded":
+					"reexecuting query failed");
+	logDebugMessage("done reexecuting query");
+
+	return success;
+}
+
+bool sqlrcontroller_svr::bindCursor(sqlrcursor_svr *cursor) {
+
+	// set state
+	updateState(PROCESS_SQL);
+
+	// process the bind cursor
+	logDebugMessage("processing bind cursor...");
+
+	bool	success=false;
+
+
+	// if we're handling a bind cursor...
+	logDebugMessage("bind cursor...");
+	success=fetchFromBindCursor(cursor);
+
+	// on failure get the error (unless it's already been set)
+	if (!success && !cursor->getErrorNumber()) {
+		uint32_t	errorlength;
+		int64_t		errnum;
+		bool		liveconnection;
+		errorMessage(cursor,
+				cursor->getErrorBuffer(),
+				maxerrorlength,
+				&errorlength,&errnum,&liveconnection);
+		cursor->setErrorLength(errorlength);
+		cursor->setErrorNumber(errnum);
+		cursor->setLiveConnection(liveconnection);
+	}
+
+	logDebugMessage((success)?"processing bind cursor succeeded":
+					"processing bind cursor failed");
+	logDebugMessage("done processing bind cursor");
 
 	return success;
 }
@@ -2233,30 +2395,15 @@ void sqlrcontroller_svr::translateBindVariablesFromMappings(
 	}
 
 	// debug
-	logDebugMessage("remapped input binds:");
-	for (i=0; i<cursor->getInputBindCount(); i++) {
-		logDebugMessage(cursor->getInputBinds()[i].variable);
-	}
-	logDebugMessage("remapped output binds:");
-	for (i=0; i<cursor->getOutputBindCount(); i++) {
-		logDebugMessage(cursor->getOutputBinds()[i].variable);
-	}
-}
-
-void sqlrcontroller_svr::rewriteQuery(sqlrcursor_svr *cursor) {
-
-	if (sqlp && sqlrt && sqlw) {
-		if (!translateQuery(cursor)) {
-			// FIXME: do something?
+	if (logEnabled()) {
+		logDebugMessage("remapped input binds:");
+		for (i=0; i<cursor->getInputBindCount(); i++) {
+			logDebugMessage(cursor->getInputBinds()[i].variable);
 		}
-	}
-
-	if (translatebinds) {
-		translateBindVariables(cursor);
-	}
-
-	if (conn->supportsTransactionBlocks()) {
-		translateBeginTransaction(cursor);
+		logDebugMessage("remapped output binds:");
+		for (i=0; i<cursor->getOutputBindCount(); i++) {
+			logDebugMessage(cursor->getOutputBinds()[i].variable);
+		}
 	}
 }
 
@@ -2314,19 +2461,25 @@ bool sqlrcontroller_svr::translateQuery(sqlrcursor_svr *cursor) {
 
 	if (debugsqlrtranslation) {
 		stdoutput.printf("translated:\n\"%s\"\n\n",
-				translatedquery.getString());
+					translatedquery.getString());
 	}
 
-	// copy the translated query into query buffer
+	// bail if the translated query is too large
 	if (translatedquery.getStringLength()>maxquerysize) {
-		// the translated query was too large
+		if (debugsqlrtranslation) {
+			stdoutput.printf("translated query too large\n");
+		}
 		return false;
 	}
-	charstring::copy(querybuffer,
+
+	// write the translated query to the cursor's query buffer
+	// so it'll be there if we decide to re-execute it later
+	charstring::copy(cursor->getQueryBuffer(),
 			translatedquery.getString(),
 			translatedquery.getStringLength());
-	cursor->setQueryLength(translatedquery.getStringLength());
-	querybuffer[cursor->getQueryLength()]='\0';
+	cursor->setQueryLength(
+			translatedquery.getStringLength());
+	cursor->getQueryBuffer()[cursor->getQueryLength()]='\0';
 	return true;
 }
 
@@ -2686,10 +2839,6 @@ void sqlrcontroller_svr::translateBindVariableInArray(sqlrcursor_svr *cursor,
 
 void sqlrcontroller_svr::translateBeginTransaction(sqlrcursor_svr *cursor) {
 
-	if (!isBeginTransactionQuery(cursor)) {
-		return;
-	}
-
 	// get query buffer
 	char	*querybuffer=cursor->getQueryBuffer();
 
@@ -2748,7 +2897,7 @@ sqlrcursor_svr	*sqlrcontroller_svr::initQueryOrBindCursor(
 	}
 
 	// re-init error data
-	cursor->clearError();
+	clearError(cursor);
 
 	// clear bind mappings and reset the fake input binds flag
 	// (do this here because getInput/OutputBinds uses the bindmappingspool)
@@ -2760,7 +2909,7 @@ sqlrcursor_svr	*sqlrcontroller_svr::initQueryOrBindCursor(
 	}
 
 	// clean up whatever result set the cursor might have been busy with
-	cursor->closeResultSet();
+	closeResultSet(cursor);
 
 	if (reinitbuffers) {
 
@@ -2793,16 +2942,19 @@ sqlrcursor_svr *sqlrcontroller_svr::getCustomQueryCursor(
 	}
 
 	// see if the query matches one of the custom queries
+	// FIXME: the 0 isn't safe, none of the custom queries do anything with
+	// the id, but they might in the future so it needs to be unique
 	cursor->setCustomQueryCursor(
 			sqlrq->match(conn,
 				cursor->getQueryBuffer(),
-				cursor->getQueryLength()));
+				cursor->getQueryLength(),
+				0));
 				
 	// if so...
 	if (cursor->getCustomQueryCursor()) {
 
 		// open the cursor
-		cursor->getCustomQueryCursor()->openInternal(cursor->getId());
+		cursor->getCustomQueryCursor()->open();
 
 		// copy the query that we just got into the custom query cursor
 		charstring::copy(
@@ -2988,43 +3140,77 @@ bool sqlrcontroller_svr::handleBinds(sqlrcursor_svr *cursor) {
 	return true;
 }
 
-bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *curs,
+bool sqlrcontroller_svr::prepareQuery(sqlrcursor_svr *cursor,
+						const char *query,
+						uint32_t length) {
+	logDebugMessage("preparing query...");
+	return cursor->prepareQuery(query,length);
+}
+
+bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor,
 						const char *query,
 						uint32_t length) {
 
 	// handle before-triggers
 	if (sqlrtr) {
-		sqlrtr->runBeforeTriggers(conn,curs,curs->getQueryTree());
+		sqlrtr->runBeforeTriggers(conn,cursor,cursor->getQueryTree());
 	}
 
 	// get the query start time
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	curs->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+	cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
 
 	// execute the query
-	bool	result=curs->executeQuery(query,length);
+	logDebugMessage("executing query...");
+	bool	success=cursor->executeQuery(query,length);
 
 	// get the query end time
 	dt.getSystemDateAndTime();
-	curs->setQueryEnd(dt.getSeconds(),dt.getMicroseconds());
+	cursor->setQueryEnd(dt.getSeconds(),dt.getMicroseconds());
+
+	// reset total rows fetched
+	cursor->clearTotalRowsFetched();
 
 	// update query and error counts
-	incrementQueryCounts(curs->queryType(query,length));
-	if (!result) {
+	incrementQueryCounts(cursor->queryType(query,length));
+	if (!success) {
 		incrementTotalErrors();
 	}
 
 	// handle after-triggers
 	if (sqlrtr) {
-		sqlrtr->runAfterTriggers(conn,curs,curs->getQueryTree(),true);
+		sqlrtr->runAfterTriggers(conn,cursor,
+					cursor->getQueryTree(),true);
 	}
 
-	return result;
+	// was the query a commit or rollback?
+	commitOrRollback(cursor);
+
+	// On success, autocommit if necessary.
+	// Connection classes could override autoCommitOn() and autoCommitOff()
+	// to do database API-specific things, but will not set 
+	// fakeautocommit, so this code won't get called at all for those 
+	// connections.
+	// FIXME: when faking autocommit, a BEGIN on a db that supports them
+	// could cause commit to be called immediately
+	if (success && conn->isTransactional() &&
+			needcommitorrollback &&
+			conn->getFakeAutoCommit() &&
+			conn->getAutoCommit()) {
+		logDebugMessage("commit necessary...");
+		success=commit();
+	}
+
+	return success;
 }
 
-void sqlrcontroller_svr::setNeedCommitOrRollback(bool needcommitorrollback) {
-	this->needcommitorrollback=needcommitorrollback;
+void sqlrcontroller_svr::commitOrRollbackIsNeeded() {
+	needcommitorrollback=true;
+}
+
+void sqlrcontroller_svr::commitOrRollbackIsNotNeeded() {
+	needcommitorrollback=false;
 }
 
 void sqlrcontroller_svr::commitOrRollback(sqlrcursor_svr *cursor) {
@@ -3338,7 +3524,7 @@ void sqlrcontroller_svr::dropTempTable(sqlrcursor_svr *cursor,
 	// we intend to run.
 	cursor->clearQueryTree();
 
-	if (cursor->prepareQuery(dropquery.getString(),
+	if (prepareQuery(cursor,dropquery.getString(),
 					dropquery.getStringLength())) {
 		executeQuery(cursor,dropquery.getString(),
 					dropquery.getStringLength());
@@ -3369,7 +3555,7 @@ void sqlrcontroller_svr::truncateTempTable(sqlrcursor_svr *cursor,
 						const char *tablename) {
 	stringbuffer	truncatequery;
 	truncatequery.append("delete from ")->append(tablename);
-	if (cursor->prepareQuery(truncatequery.getString(),
+	if (prepareQuery(cursor,truncatequery.getString(),
 					truncatequery.getStringLength())) {
 		executeQuery(cursor,truncatequery.getString(),
 					truncatequery.getStringLength());
@@ -3377,7 +3563,7 @@ void sqlrcontroller_svr::truncateTempTable(sqlrcursor_svr *cursor,
 	cursor->closeResultSet();
 }
 
-void sqlrcontroller_svr::closeClientSocket(uint32_t bytes) {
+void sqlrcontroller_svr::closeClientConnection(uint32_t bytes) {
 
 	// Sometimes the server sends the result set and closes the socket
 	// while part of it is buffered but not yet transmitted.  This causes
@@ -4188,15 +4374,12 @@ void sqlrcontroller_svr::sessionQuery(const char *query) {
 	size_t	querylen=charstring::length(query);
 
 	sqlrcursor_svr	*cur=newCursor();
-
-	// since we're creating a new cursor for this, make sure it
-	// can't have an ID that might already exist
-	if (cur->openInternal(cursorcount+1) &&
-		cur->prepareQuery(query,querylen) &&
+	if (open(cur) &&
+		prepareQuery(cur,query,querylen) &&
 		executeQuery(cur,query,querylen)) {
-		cur->closeResultSet();
+		closeResultSet(cur);
 	}
-	cur->close();
+	close(cur);
 	deleteCursor(cur);
 }
 
@@ -4243,8 +4426,28 @@ void sqlrcontroller_svr::setFakeTransactionBlocksBehavior(bool ftb) {
 	faketransactionblocks=ftb;
 }
 
-void sqlrcontroller_svr::setFakeInputBinds(bool fake) {
-	fakeinputbinds=fake;
+const char *sqlrcontroller_svr::bindFormat() {
+	return conn->bindFormat();
+}
+
+int16_t sqlrcontroller_svr::nonNullBindValue() {
+	return conn->nonNullBindValue();
+}
+
+int16_t sqlrcontroller_svr::nullBindValue() {
+	return conn->nullBindValue();
+}
+
+char sqlrcontroller_svr::bindVariablePrefix() {
+	return conn->bindVariablePrefix();
+}
+
+bool sqlrcontroller_svr::bindValueIsNull(int16_t isnull) {
+	return conn->bindValueIsNull(isnull);
+}
+
+void sqlrcontroller_svr::fakeInputBinds() {
+	fakeinputbinds=true;
 }
 
 bool sqlrcontroller_svr::getColumnNames(const char *query,
@@ -4257,19 +4460,17 @@ bool sqlrcontroller_svr::getColumnNames(const char *query,
 
 	size_t		querylen=charstring::length(query);
 
-	sqlrcursor_svr	*gcncur=newCursor();
-	// since we're creating a new cursor for this, make sure it can't
-	// have an ID that might already exist
 	bool	retval=false;
-	if (gcncur->openInternal(cursorcount+1) &&
-		gcncur->prepareQuery(query,querylen) &&
+	sqlrcursor_svr	*gcncur=newCursor();
+	if (open(gcncur) &&
+		prepareQuery(gcncur,query,querylen) &&
 		executeQuery(gcncur,query,querylen)) {
 
 		// build column list...
 		retval=gcncur->getColumnNameList(output);
 	}
-	gcncur->closeResultSet();
-	gcncur->close();
+	closeResultSet(gcncur);
+	close(gcncur);
 	deleteCursor(gcncur);
 	return retval;
 }
@@ -4424,16 +4625,20 @@ void sqlrcontroller_svr::alarmHandler(int32_t signum) {
 	alarmrang=1;
 }
 
-const char *sqlrcontroller_svr::getDbHostName() {
+const char *sqlrcontroller_svr::dbHostName() {
 	return dbhostname;
 }
 
-const char *sqlrcontroller_svr::getDbIpAddress() {
+const char *sqlrcontroller_svr::dbIpAddress() {
 	return dbipaddress;
 }
 
-uint16_t sqlrcontroller_svr::getCursorCount() {
-	return cursorcount;
+const char *sqlrcontroller_svr::identify() {
+	return conn->identify();
+}
+
+const char *sqlrcontroller_svr::dbVersion() {
+	return conn->dbVersion();
 }
 
 memorypool *sqlrcontroller_svr::getBindMappingsPool() {
@@ -4478,4 +4683,392 @@ const char *sqlrcontroller_svr::getLogDir() {
 
 const char *sqlrcontroller_svr::getDebugDir() {
 	return debugdir;
+}
+
+bool sqlrcontroller_svr::isCustomQuery(sqlrcursor_svr *cursor) {
+	return cursor->isCustomQuery();
+}
+
+bool sqlrcontroller_svr::getLobOutputBindLength(sqlrcursor_svr *cursor,
+							uint16_t index,
+							uint64_t *length) {
+	return cursor->getLobOutputBindLength(index,length);
+}
+
+bool sqlrcontroller_svr::getLobOutputBindSegment(sqlrcursor_svr *cursor,
+							uint16_t index,
+							char *buffer,
+							uint64_t buffersize,
+							uint64_t offset,
+							uint64_t charstoread,
+							uint64_t *charsread) {
+	return cursor->getLobOutputBindSegment(index,buffer,buffersize,
+						offset,charstoread,charsread);
+}
+
+void sqlrcontroller_svr::closeLobOutputBind(sqlrcursor_svr *cursor,
+							uint16_t index) {
+	cursor->closeLobOutputBind(index);
+}
+
+bool sqlrcontroller_svr::fetchFromBindCursor(sqlrcursor_svr *cursor) {
+
+	bool	result=cursor->fetchFromBindCursor();
+	
+	// reset total rows fetched
+	cursor->clearTotalRowsFetched();
+
+	return result;
+}
+
+void sqlrcontroller_svr::errorMessage(sqlrcursor_svr *cursor,
+						char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorlength,
+						int64_t *errorcode,
+						bool *liveconnection) {
+	return cursor->errorMessage(errorbuffer,errorbuffersize,
+					errorlength,errorcode,liveconnection);
+}
+
+bool sqlrcontroller_svr::knowsRowCount(sqlrcursor_svr *cursor) {
+	return cursor->knowsRowCount();
+}
+
+uint64_t sqlrcontroller_svr::rowCount(sqlrcursor_svr *cursor) {
+	return cursor->rowCount();
+}
+
+bool sqlrcontroller_svr::knowsAffectedRows(sqlrcursor_svr *cursor) {
+	return cursor->knowsAffectedRows();
+}
+
+uint64_t sqlrcontroller_svr::affectedRows(sqlrcursor_svr *cursor) {
+	return cursor->affectedRows();
+}
+
+uint32_t sqlrcontroller_svr::colCount(sqlrcursor_svr *cursor) {
+	return cursor->colCount();
+}
+
+uint16_t sqlrcontroller_svr::columnTypeFormat(sqlrcursor_svr *cursor) {
+	return cursor->columnTypeFormat();
+}
+
+const char *sqlrcontroller_svr::getColumnName(sqlrcursor_svr *cursor,
+							uint32_t col) {
+	return cursor->getColumnName(col);
+}
+
+uint16_t sqlrcontroller_svr::getColumnNameLength(sqlrcursor_svr *cursor,
+							uint32_t col) {
+	return cursor->getColumnNameLength(col);
+}
+
+uint16_t sqlrcontroller_svr::getColumnType(sqlrcursor_svr *cursor,
+							uint32_t col) {
+	return cursor->getColumnType(col);
+}
+
+const char *sqlrcontroller_svr::getColumnTypeName(sqlrcursor_svr *cursor,
+							uint32_t col) {
+	return cursor->getColumnTypeName(col);
+}
+
+uint16_t sqlrcontroller_svr::getColumnTypeNameLength(sqlrcursor_svr *cursor,
+							uint32_t col) {
+	return cursor->getColumnTypeNameLength(col);
+}
+
+uint32_t sqlrcontroller_svr::getColumnLength(sqlrcursor_svr *cursor,
+							uint32_t col) {
+	return cursor->getColumnLength(col);
+}
+
+uint32_t sqlrcontroller_svr::getColumnPrecision(sqlrcursor_svr *cursor,
+							uint32_t col) {
+	return cursor->getColumnPrecision(col);
+}
+
+uint32_t sqlrcontroller_svr::getColumnScale(sqlrcursor_svr *cursor,
+							uint32_t col) {
+	return cursor->getColumnScale(col);
+}
+
+uint16_t sqlrcontroller_svr::getColumnIsNullable(sqlrcursor_svr *cursor,
+							uint32_t col) {
+	return cursor->getColumnIsNullable(col);
+}
+
+uint16_t sqlrcontroller_svr::getColumnIsPrimaryKey(sqlrcursor_svr *cursor,
+							uint32_t col) {
+	return cursor->getColumnIsPrimaryKey(col);
+}
+
+uint16_t sqlrcontroller_svr::getColumnIsUnique(sqlrcursor_svr *cursor,
+							uint32_t col) {
+	return cursor->getColumnIsUnique(col);
+}
+
+uint16_t sqlrcontroller_svr::getColumnIsPartOfKey(sqlrcursor_svr *cursor,
+							uint32_t col) {
+	return cursor->getColumnIsPartOfKey(col);
+}
+
+uint16_t sqlrcontroller_svr::getColumnIsUnsigned(sqlrcursor_svr *cursor,
+							uint32_t col) {
+	return cursor->getColumnIsUnsigned(col);
+}
+
+uint16_t sqlrcontroller_svr::getColumnIsZeroFilled(sqlrcursor_svr *cursor,
+							uint32_t col) {
+	return cursor->getColumnIsZeroFilled(col);
+}
+
+uint16_t sqlrcontroller_svr::getColumnIsBinary(sqlrcursor_svr *cursor,
+							uint32_t col) {
+	return cursor->getColumnIsBinary(col);
+}
+
+uint16_t sqlrcontroller_svr::getColumnIsAutoIncrement(sqlrcursor_svr *cursor,
+							uint32_t col) {
+	return cursor->getColumnIsAutoIncrement(col);
+}
+
+bool sqlrcontroller_svr::noRowsToReturn(sqlrcursor_svr *cursor) {
+	return cursor->noRowsToReturn();
+}
+
+bool sqlrcontroller_svr::skipRow(sqlrcursor_svr *cursor) {
+	return cursor->skipRow();
+}
+
+bool sqlrcontroller_svr::fetchRow(sqlrcursor_svr *cursor) {
+	if (cursor->fetchRow()) {
+		cursor->incrementTotalRowsFetched();
+		return true;
+	}
+	return false;
+}
+
+void sqlrcontroller_svr::nextRow(sqlrcursor_svr *cursor) {
+	return cursor->nextRow();
+}
+
+void sqlrcontroller_svr::getField(sqlrcursor_svr *cursor,
+						uint32_t col,
+						const char **field,
+						uint64_t *fieldlength,
+						bool *blob,
+						bool *null) {
+	cursor->getField(col,field,fieldlength,blob,null);
+}
+
+bool sqlrcontroller_svr::getLobFieldLength(sqlrcursor_svr *cursor,
+							uint32_t col,
+							uint64_t *length) {
+	return cursor->getLobFieldLength(col,length);
+}
+
+bool sqlrcontroller_svr::getLobFieldSegment(sqlrcursor_svr *cursor,
+							uint32_t col,
+							char *buffer,
+							uint64_t buffersize,
+							uint64_t offset,
+							uint64_t charstoread,
+							uint64_t *charsread) {
+	return cursor->getLobFieldSegment(col,buffer,buffersize,
+						offset,charstoread,charsread);
+}
+
+void sqlrcontroller_svr::closeLobField(sqlrcursor_svr *cursor,
+							uint32_t col) {
+	cursor->closeLobField(col);
+}
+
+void sqlrcontroller_svr::closeResultSet(sqlrcursor_svr *cursor) {
+	cursor->closeResultSet();
+}
+
+uint16_t sqlrcontroller_svr::getId(sqlrcursor_svr *cursor) {
+	return cursor->getId();
+}
+
+void sqlrcontroller_svr::setFakeInputBindsForThisQuery(
+						sqlrcursor_svr *cursor,
+						bool fake) {
+	return cursor->setFakeInputBindsForThisQuery(fake);
+}
+
+bool sqlrcontroller_svr::getFakeInputBindsForThisQuery(
+						sqlrcursor_svr *cursor) {
+	return cursor->getFakeInputBindsForThisQuery();
+}
+	
+void sqlrcontroller_svr::setInputBindCount(sqlrcursor_svr *cursor,
+						uint16_t inbindcount) {
+	cursor->setInputBindCount(inbindcount);
+}
+
+uint16_t sqlrcontroller_svr::getInputBindCount(sqlrcursor_svr *cursor) {
+	return cursor->getInputBindCount();
+}
+
+bindvar_svr *sqlrcontroller_svr::getInputBinds(sqlrcursor_svr *cursor) {
+	return cursor->getInputBinds();
+}
+
+void sqlrcontroller_svr::setOutputBindCount(sqlrcursor_svr *cursor,
+						uint16_t outbindcount) {
+	return cursor->setOutputBindCount(outbindcount);
+}
+
+uint16_t sqlrcontroller_svr::getOutputBindCount(sqlrcursor_svr *cursor) {
+	return cursor->getOutputBindCount();
+}
+
+bindvar_svr *sqlrcontroller_svr::getOutputBinds(sqlrcursor_svr *cursor) {
+	return cursor->getOutputBinds();
+}
+
+bool sqlrcontroller_svr::open(sqlrcursor_svr *cursor) {
+	return cursor->open();
+}
+
+bool sqlrcontroller_svr::close(sqlrcursor_svr *cursor) {
+	return cursor->close();
+}
+
+void sqlrcontroller_svr::suspendResultSet(sqlrcursor_svr *cursor) {
+	cursor->setState(SQLRCURSORSTATE_SUSPENDED);
+	if (cursor->getCustomQueryCursor()) {
+		cursor->getCustomQueryCursor()->
+			setState(SQLRCURSORSTATE_SUSPENDED);
+	}
+}
+
+void sqlrcontroller_svr::abort(sqlrcursor_svr *cursor) {
+	cursor->abort();
+}
+
+char *sqlrcontroller_svr::getQueryBuffer(sqlrcursor_svr *cursor) {
+	return cursor->getQueryBuffer();
+}
+
+uint32_t  sqlrcontroller_svr::getQueryLength(sqlrcursor_svr *cursor) {
+	return cursor->getQueryLength();
+}
+
+void sqlrcontroller_svr::setQueryLength(sqlrcursor_svr *cursor,
+						uint32_t querylength) {
+	cursor->setQueryLength(querylength);
+}
+
+xmldom *sqlrcontroller_svr::getQueryTree(sqlrcursor_svr *cursor) {
+	return cursor->getQueryTree();
+}
+
+void sqlrcontroller_svr::setCommandStart(sqlrcursor_svr *cursor,
+						uint64_t sec, uint64_t usec) {
+	cursor->setCommandStart(sec,usec);
+}
+
+uint64_t sqlrcontroller_svr::getCommandStartSec(sqlrcursor_svr *cursor) {
+	return cursor->getCommandStartSec();
+}
+
+uint64_t sqlrcontroller_svr::getCommandStartUSec(sqlrcursor_svr *cursor) {
+	return cursor->getCommandStartUSec();
+}
+
+void sqlrcontroller_svr::setCommandEnd(sqlrcursor_svr *cursor,
+						uint64_t sec, uint64_t usec) {
+	cursor->setCommandEnd(sec,usec);
+}
+
+uint64_t sqlrcontroller_svr::getCommandEndSec(sqlrcursor_svr *cursor) {
+	return cursor->getCommandEndSec();
+}
+
+uint64_t sqlrcontroller_svr::getCommandEndUSec(sqlrcursor_svr *cursor) {
+	return cursor->getCommandEndUSec();
+}
+
+void sqlrcontroller_svr::setQueryStart(sqlrcursor_svr *cursor,
+						uint64_t sec, uint64_t usec) {
+	cursor->setQueryStart(sec,usec);
+}
+
+uint64_t sqlrcontroller_svr::getQueryStartSec(sqlrcursor_svr *cursor) {
+	return cursor->getQueryStartSec();
+}
+
+uint64_t sqlrcontroller_svr::getQueryStartUSec(sqlrcursor_svr *cursor) {
+	return cursor->getQueryStartUSec();
+}
+
+void sqlrcontroller_svr::setQueryEnd(sqlrcursor_svr *cursor,
+						uint64_t sec, uint64_t usec) {
+	return cursor->setQueryEnd(sec,usec);
+}
+
+uint64_t sqlrcontroller_svr::getQueryEndSec(sqlrcursor_svr *cursor) {
+	return cursor->getQueryEndSec();
+}
+
+uint64_t sqlrcontroller_svr::getQueryEndUSec(sqlrcursor_svr *cursor) {
+	return cursor->getQueryEndUSec();
+}
+
+void sqlrcontroller_svr::setState(sqlrcursor_svr *cursor,
+						sqlrcursorstate_t state) {
+	cursor->setState(state);
+}
+
+sqlrcursorstate_t sqlrcontroller_svr::getState(sqlrcursor_svr *cursor) {
+	return cursor->getState();
+}
+
+uint64_t sqlrcontroller_svr::getTotalRowsFetched(sqlrcursor_svr *cursor) {
+	return cursor->getTotalRowsFetched();
+}
+
+void sqlrcontroller_svr::clearError(sqlrcursor_svr *cursor) {
+	cursor->clearError();
+}
+
+void sqlrcontroller_svr::setError(sqlrcursor_svr *cursor,
+				const char *err, int64_t errn, bool liveconn) {
+	cursor->setError(err,errn,liveconn);
+}
+
+char *sqlrcontroller_svr::getErrorBuffer(sqlrcursor_svr *cursor) {
+	return cursor->getErrorBuffer();
+}
+
+uint32_t sqlrcontroller_svr::getErrorLength(sqlrcursor_svr *cursor) {
+	return cursor->getErrorLength();
+}
+
+void sqlrcontroller_svr::setErrorLength(sqlrcursor_svr *cursor,
+						uint32_t errorlength) {
+	cursor->setErrorLength(errorlength);
+}
+
+uint32_t sqlrcontroller_svr::getErrorNumber(sqlrcursor_svr *cursor) {
+	return cursor->getErrorNumber();
+}
+
+void sqlrcontroller_svr::setErrorNumber(sqlrcursor_svr *cursor,
+						uint32_t errnum) {
+	cursor->setErrorNumber(errnum);
+}
+
+bool sqlrcontroller_svr::getLiveConnection(sqlrcursor_svr *cursor) {
+	return cursor->getLiveConnection();
+}
+
+void sqlrcontroller_svr::setLiveConnection(sqlrcursor_svr *cursor,
+						bool liveconnection) {
+	return cursor->setLiveConnection(liveconnection);
 }

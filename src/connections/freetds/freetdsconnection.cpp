@@ -87,12 +87,13 @@ class freetdsconnection;
 class freetdscursor : public sqlrcursor_svr {
 	friend class freetdsconnection;
 	private:
-				freetdscursor(sqlrconnection_svr *conn);
+				freetdscursor(sqlrconnection_svr *conn,
+								uint16_t id);
 				~freetdscursor();
 		void		allocateResultSetBuffers(
 					int32_t selectlistsize);
 		void		deallocateResultSetBuffers();
-		bool		open(uint16_t id);
+		bool		open();
 		bool		close();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
@@ -245,7 +246,7 @@ class freetdsconnection : public sqlrconnection_svr {
 		void	handleConnectString();
 		bool	logIn(const char **error);
 		const char	*logInError(const char *error, uint16_t stage);
-		sqlrcursor_svr	*newCursor();
+		sqlrcursor_svr	*newCursor(uint16_t id);
 		void	deleteCursor(sqlrcursor_svr *curs);
 		void	logOut();
 		const char	*identify();
@@ -339,9 +340,10 @@ void freetdsconnection::handleConnectString() {
 	language=cont->getConnectStringValue("language");
 	hostname=cont->getConnectStringValue("hostname");
 	packetsize=cont->getConnectStringValue("packetsize");
-	cont->setFakeInputBinds(
-		!charstring::compare(
-			cont->getConnectStringValue("fakebinds"),"yes"));
+	if (!charstring::compare(
+			cont->getConnectStringValue("fakebinds"),"yes")) {
+		cont->fakeInputBinds();
+	}
 	// this is here in case freetds ever supports array fetches
 	/*fetchatonce=charstring::toInteger(
 				cont->getConnectStringValue("fetchatonce"));
@@ -562,8 +564,9 @@ const char *freetdsconnection::logInError(const char *error, uint16_t stage) {
 	return loginerror.getString();
 }
 
-sqlrcursor_svr *freetdsconnection::newCursor() {
-	return (sqlrcursor_svr *)new freetdscursor((sqlrconnection_svr *)this);
+sqlrcursor_svr *freetdsconnection::newCursor(uint16_t id) {
+	return (sqlrcursor_svr *)new freetdscursor(
+					(sqlrconnection_svr *)this,id);
 }
 
 void freetdsconnection::deleteCursor(sqlrcursor_svr *curs) {
@@ -814,7 +817,8 @@ char freetdsconnection::bindVariablePrefix() {
 	return '@';
 }
 
-freetdscursor::freetdscursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
+freetdscursor::freetdscursor(sqlrconnection_svr *conn, uint16_t id) :
+						sqlrcursor_svr(conn,id) {
 
 	#if defined(VERSION_NO)
 	char	*versionstring=charstring::duplicate(VERSION_NO);
@@ -863,8 +867,9 @@ freetdscursor::freetdscursor(sqlrconnection_svr *conn) : sqlrcursor_svr(conn) {
 	cmd=NULL;
 	languagecmd=NULL;
 	cursorcmd=NULL;
-	cursorname=NULL;
-	cursornamelength=0;
+
+	cursornamelength=charstring::integerLength(id);
+	cursorname=charstring::parseNumber(id);
 
 	uint16_t	maxbindcount=conn->cont->cfgfl->getMaxBindCount();
 	parameter=new CS_DATAFMT[maxbindcount];
@@ -943,12 +948,9 @@ void freetdscursor::deallocateResultSetBuffers() {
 	}
 }
 
-bool freetdscursor::open(uint16_t id) {
+bool freetdscursor::open() {
 
 	clean=true;
-
-	cursornamelength=charstring::integerLength(id);
-	cursorname=charstring::parseNumber(id);
 
 	if (ct_cmd_alloc(freetdsconn->dbconn,&languagecmd)!=CS_SUCCEED) {
 		return false;

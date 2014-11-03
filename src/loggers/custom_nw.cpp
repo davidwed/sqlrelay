@@ -28,7 +28,8 @@ class custom_nw : public sqlrlogger {
 					const char *info);
 	private:
 		int	strescape(const char *str, char *buf, int limit);
-		bool	descInputBinds(sqlrcursor_svr *cursor,
+		bool	descInputBinds(sqlrconnection_svr *sqlrcon,
+						sqlrcursor_svr *sqlrcur,
 						char *buf, int limit);
 		file	querylog;
 		char	*querylogname;
@@ -119,7 +120,7 @@ bool custom_nw::run(sqlrlistener *sqlrl,
 
 	// escape the input bind variables
 	char	bindbuf[1000+1];
-	descInputBinds(sqlrcur,bindbuf,1000);
+	descInputBinds(sqlrcon,sqlrcur,bindbuf,1000);
 
 	// get the execution time
 	uint64_t	sec=sqlrcur->getCommandEndSec()-
@@ -183,7 +184,9 @@ int custom_nw::strescape(const char *str, char *buf, int limit) {
 	return (q-buf);
 }
 
-bool custom_nw::descInputBinds(sqlrcursor_svr *cursor, char *buf, int limit) {
+bool custom_nw::descInputBinds(sqlrconnection_svr *sqlrcon,
+					sqlrcursor_svr *sqlrcur,
+					char *buf, int limit) {
 
 	char		*c=buf;	
 	int		remain_len=limit;
@@ -193,8 +196,8 @@ bool custom_nw::descInputBinds(sqlrcursor_svr *cursor, char *buf, int limit) {
 	*c='\0';
 
 	// fill the buffers
-	bindvar_svr	*inbinds=cursor->getInputBinds();
-	for (uint16_t i=0; i<cursor->getInputBindCount(); i++) {
+	bindvar_svr	*inbinds=sqlrcon->cont->getInputBinds(sqlrcur);
+	for (uint16_t i=0; i<sqlrcon->cont->getInputBindCount(sqlrcur); i++) {
 
 		bindvar_svr	*bv=&(inbinds[i]);
 	

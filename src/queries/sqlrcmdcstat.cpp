@@ -13,13 +13,15 @@ class sqlrcmdcstat : public sqlrquery {
 	public:
 			sqlrcmdcstat(xmldomnode *parameters);
 		bool	match(const char *querystring, uint32_t querylength);
-		sqlrquerycursor	*getCursor(sqlrconnection_svr *conn);
+		sqlrquerycursor	*newCursor(sqlrconnection_svr *conn,
+							uint16_t id);
 };
 
 class sqlrcmdcstatcursor : public sqlrquerycursor {
 	public:
 			sqlrcmdcstatcursor(sqlrconnection_svr *sqlrcon,
-						xmldomnode *parameters);
+						xmldomnode *parameters,
+						uint16_t id);
 			~sqlrcmdcstatcursor();
 
 		bool		executeQuery(const char *query,
@@ -55,13 +57,14 @@ bool sqlrcmdcstat::match(const char *querystring,
 	return !charstring::compareIgnoringCase(querystring,"sqlrcmd cstat");
 }
 
-sqlrquerycursor *sqlrcmdcstat::getCursor(sqlrconnection_svr *sqlrcon) {
-	return new sqlrcmdcstatcursor(sqlrcon,parameters);
+sqlrquerycursor *sqlrcmdcstat::newCursor(sqlrconnection_svr *sqlrcon,
+							uint16_t id) {
+	return new sqlrcmdcstatcursor(sqlrcon,parameters,id);
 }
 
-sqlrcmdcstatcursor::sqlrcmdcstatcursor(
-		sqlrconnection_svr *sqlrcon,xmldomnode *parameters) :
-					sqlrquerycursor(sqlrcon,parameters) {
+sqlrcmdcstatcursor::sqlrcmdcstatcursor(sqlrconnection_svr *sqlrcon,
+					xmldomnode *parameters, uint16_t id) :
+					sqlrquerycursor(sqlrcon,parameters,id) {
 	currentrow=0;
 	fieldbuffer=NULL;
 	cs=NULL;
