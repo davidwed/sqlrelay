@@ -796,7 +796,7 @@ bool sqlrclientprotocol::fetchFromBindCursorCommand(sqlrcursor_svr *cursor) {
 
 	cont->logDebugMessage("fetch from bind cursor");
 
-	cont->initBindCursor(cursor);
+	cont->initNewQuery(cursor);
 
 	// get whether to get column info
 	if (getSendColumnInfo()) {
@@ -1382,6 +1382,7 @@ bool sqlrclientprotocol::getStringBind(sqlrcursor_svr *cursor,
 		return false;
 	}
 	bv->value.stringval[bv->valuesize]='\0';
+
 	bv->isnull=cont->nonNullBindValue();
 
 	cont->logDebugMessage(bv->value.stringval);
@@ -1567,6 +1568,8 @@ bool sqlrclientprotocol::getDateBind(bindvar_svr *bv) {
 	bv->value.dateval.buffer=(char *)bindpool->allocate(
 						bv->value.dateval.buffersize);
 
+	bv->isnull=cont->nonNullBindValue();
+
 	stringbuffer	str;
 	str.append(bv->value.dateval.year)->append("-");
 	str.append(bv->value.dateval.month)->append("-");
@@ -1617,6 +1620,7 @@ bool sqlrclientprotocol::getLobBind(sqlrcursor_svr *cursor, bindvar_svr *bv) {
 	// (which doesn't include the NULL terminator) should be used when
 	// binding.
 	bv->value.stringval[bv->valuesize]='\0';
+
 	bv->isnull=cont->nonNullBindValue();
 
 	return true;
@@ -2719,7 +2723,7 @@ bool sqlrclientprotocol::getListByQuery(sqlrcursor_svr *cursor,
 
 	cont->logDebugMessage("handling query...");
 
-	cont->initListQuery(cursor);
+	cont->initNewQuery(cursor);
 
 	return processQueryOrBindCursor(cursor,false,false);
 }

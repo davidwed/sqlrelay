@@ -319,7 +319,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	constr=cfgfl->getConnectString(connectionid);
 	if (!constr) {
 		stderror.printf("Error: invalid connectionid \"%s\".\n",
-							connectionid);
+								connectionid);
 		return false;
 	}
 	conn->handleConnectString();
@@ -2289,6 +2289,11 @@ enum queryparsestate_t {
 
 void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 
+	// clear bind mappings
+	inbindmappings->clear();
+	outbindmappings->clear();
+	bindmappingspool->deallocate();
+
 	// get query buffer
 	char	*querybuffer=cursor->getQueryBuffer();
 
@@ -2722,21 +2727,6 @@ void sqlrcontroller_svr::initNewQuery(sqlrcursor_svr *cursor) {
 	// clean up whatever result set the cursor might have been busy with
 	closeResultSet(cursor);
 
-	// clear bind mappings
-	inbindmappings->clear();
-	outbindmappings->clear();
-	bindmappingspool->deallocate();
-
-	// clear bind buffers
-	for (uint16_t i=0; i<maxbindcount; i++) {
-		bytestring::zero(&(cursor->getInputBinds()[i]),
-						sizeof(bindvar_svr));
-		bytestring::zero(&(cursor->getOutputBinds()[i]),
-						sizeof(bindvar_svr));
-	}
-	cursor->setInputBindCount(0);
-	cursor->setOutputBindCount(0);
-
 	// re-init bind flags
 	cursor->setFakeInputBindsForThisQuery(fakeinputbinds);
 
@@ -2756,128 +2746,11 @@ sqlrcursor_svr	*sqlrcontroller_svr::initReExecuteQuery(
 	// clean up whatever result set the cursor might have been busy with
 	closeResultSet(cursor);
 
-	// clear bind buffers
-	for (uint16_t i=0; i<maxbindcount; i++) {
-		bytestring::zero(&(cursor->getInputBinds()[i]),
-						sizeof(bindvar_svr));
-		bytestring::zero(&(cursor->getOutputBinds()[i]),
-						sizeof(bindvar_svr));
-	}
-	cursor->setInputBindCount(0);
-	cursor->setOutputBindCount(0);
-
 	// re-init error data
 	clearError(cursor);
 
 	return cursor;
 }
-
-void sqlrcontroller_svr::initListQuery(sqlrcursor_svr *cursor) {
-
-	// if we're using a custom cursor then close it
-	sqlrcursor_svr	*customcursor=cursor->getCustomQueryCursor();
-	if (customcursor) {
-		customcursor->close();
-		cursor->clearCustomQueryCursor();
-	}
-
-	// clean up whatever result set the cursor might have been busy with
-	closeResultSet(cursor);
-
-	// clear bind mappings
-	inbindmappings->clear();
-	outbindmappings->clear();
-	bindmappingspool->deallocate();
-
-	// re-init bind flags
-	cursor->setFakeInputBindsForThisQuery(fakeinputbinds);
-
-	// re-init error data
-	clearError(cursor);
-}
-
-void sqlrcontroller_svr::initBindCursor(sqlrcursor_svr *cursor) {
-
-	// if we're using a custom cursor then close it
-	sqlrcursor_svr	*customcursor=cursor->getCustomQueryCursor();
-	if (customcursor) {
-		customcursor->close();
-		cursor->clearCustomQueryCursor();
-	}
-
-	// clean up whatever result set the cursor might have been busy with
-	closeResultSet(cursor);
-
-	// clear query buffer
-	cursor->getQueryBuffer()[0]='\0';
-	cursor->setQueryLength(0);
-
-	// clear bind buffers
-	for (uint16_t i=0; i<maxbindcount; i++) {
-		bytestring::zero(&(cursor->getInputBinds()[i]),
-						sizeof(bindvar_svr));
-		bytestring::zero(&(cursor->getOutputBinds()[i]),
-						sizeof(bindvar_svr));
-	}
-	cursor->setInputBindCount(0);
-	cursor->setOutputBindCount(0);
-
-	// re-init error data
-	clearError(cursor);
-}
-
-/*sqlrcursor_svr	*sqlrcontroller_svr::initQueryOrBindCursor(
-						sqlrcursor_svr *cursor,
-						bool reexecute,
-						bool bindcursor,
-						bool reinitbuffers) {
-
-	// if we're using a custom cursor then deal with it appropriately
-	sqlrcursor_svr	*customcursor=cursor->getCustomQueryCursor();
-	if (customcursor) {
-		if (reexecute) {
-			cursor=customcursor;
-		} else {
-			customcursor->close();
-			cursor->clearCustomQueryCursor();
-		}
-	}
-
-	// re-init error data
-	clearError(cursor);
-
-	// clear bind mappings and reset the fake input binds flag
-	// (do this here because getInput/OutputBinds uses the bindmappingspool)
-	if (!reexecute && !bindcursor) {
-		bindmappingspool->deallocate();
-		inbindmappings->clear();
-		outbindmappings->clear();
-		cursor->setFakeInputBindsForThisQuery(fakeinputbinds);
-	}
-	bindswerefaked=false;
-
-	// clean up whatever result set the cursor might have been busy with
-	closeResultSet(cursor);
-
-	if (reinitbuffers) {
-
-		// re-init buffers
-		if (!reexecute) {
-			cursor->getQueryBuffer()[0]='\0';
-			cursor->setQueryLength(0);
-		}
-		cursor->setInputBindCount(0);
-		cursor->setOutputBindCount(0);
-		for (uint16_t i=0; i<maxbindcount; i++) {
-			bytestring::zero(&(cursor->getInputBinds()[i]),
-							sizeof(bindvar_svr));
-			bytestring::zero(&(cursor->getOutputBinds()[i]),
-							sizeof(bindvar_svr));
-		}
-	}
-
-	return cursor;
-}*/
 
 sqlrcursor_svr *sqlrcontroller_svr::getCustomQueryCursor(	
 						sqlrcursor_svr *cursor) {
@@ -4808,6 +4681,11 @@ bool sqlrcontroller_svr::fetchFromBindCursor(sqlrcursor_svr *cursor) {
 	updateState(PROCESS_SQL);
 
 	logDebugMessage("fetching from bind cursor...");
+
+	// clear query buffer just so some future operation doesn't
+	// get confused into thinking this cursor actually ran one
+	cursor->getQueryBuffer()[0]='\0';
+	cursor->setQueryLength(0);
 
 	bool	success=cursor->fetchFromBindCursor();
 	

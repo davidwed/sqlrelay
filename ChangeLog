@@ -7,6 +7,7 @@
 		string variables to the PHP PDO driver
 	refactored sqlr-status and removed dependency on libsqlrserver
 	cleaned up and refactored server-side classes quite a bit
+	fixed a bug where sqlrsh was losing the timezone when binding dates
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries

@@ -250,8 +250,6 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		// running queries
 		void		initNewQuery(sqlrcursor_svr *cursor);
 		sqlrcursor_svr	*initReExecuteQuery(sqlrcursor_svr *cursor);
-		void		initListQuery(sqlrcursor_svr *cursor);
-		void		initBindCursor(sqlrcursor_svr *cursor);
 		bool	prepareQuery(sqlrcursor_svr *cursor,
 						const char *query,
 						uint32_t length);
