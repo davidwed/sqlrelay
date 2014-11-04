@@ -829,7 +829,6 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 						bv->dateval.second,
 						bv->dateval.microsecond,
 						bv->dateval.tz);
-stdoutput.printf("tz=%s\n",bv->dateval.tz);
 			} else if (bv->type==NULL_BIND) {
 				sqlrcur->inputBind(name,(const char *)NULL);
 			}
