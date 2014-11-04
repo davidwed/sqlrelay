@@ -108,6 +108,9 @@ void sqlrshenv::clearbinds(dictionary<char *, sqlrshbindvalue *> *binds) {
 		if (bv->type==STRING_BIND) {
 			delete[] bv->stringval;
 		}
+		if (bv->type==DATE_BIND) {
+			delete[] bv->dateval.tz;
+		}
 	}
 	binds->clear();
 }
@@ -826,6 +829,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 						bv->dateval.second,
 						bv->dateval.microsecond,
 						bv->dateval.tz);
+stdoutput.printf("tz=%s\n",bv->dateval.tz);
 			} else if (bv->type==NULL_BIND) {
 				sqlrcur->inputBind(name,(const char *)NULL);
 			}
@@ -1243,7 +1247,7 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		bv->dateval.second=dt.getSeconds();
 		bv->dateval.microsecond=charstring::toInteger(
 					charstring::findLast(value,":")+1);
-		bv->dateval.tz=dt.getTimeZoneString();
+		bv->dateval.tz=charstring::duplicate(dt.getTimeZoneString());
 		delete[] value;
 
 	} else if (charstring::isInteger(value)) {
