@@ -2724,14 +2724,8 @@ void sqlrcontroller_svr::initNewQuery(sqlrcursor_svr *cursor) {
 		cursor->clearCustomQueryCursor();
 	}
 
-	// clean up whatever result set the cursor might have been busy with
-	closeResultSet(cursor);
-
-	// re-init bind flags
+	// re-init fake bind flag
 	cursor->setFakeInputBindsForThisQuery(fakeinputbinds);
-
-	// re-init error data
-	clearError(cursor);
 }
 
 sqlrcursor_svr	*sqlrcontroller_svr::initReExecuteQuery(
@@ -2740,15 +2734,8 @@ sqlrcursor_svr	*sqlrcontroller_svr::initReExecuteQuery(
 	// if we're using a custom cursor then operate on it
 	sqlrcursor_svr	*customcursor=cursor->getCustomQueryCursor();
 	if (customcursor) {
-		cursor=customcursor;
+		return customcursor;
 	}
-
-	// clean up whatever result set the cursor might have been busy with
-	closeResultSet(cursor);
-
-	// re-init error data
-	clearError(cursor);
-
 	return cursor;
 }
 
@@ -2972,6 +2959,12 @@ bool sqlrcontroller_svr::prepareQuery(sqlrcursor_svr *cursor,
 						uint32_t querylen,
 						bool enabletranslations) {
 
+	// clean up the previous result set
+	closeResultSet(cursor);
+
+	// re-init error data
+	clearError(cursor);
+
 	// reset some flags
 	executedsinceprepare=false;
 	querywasintercepted=false;
@@ -3060,15 +3053,31 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor,
 						bool enabletranslations,
 						bool enabletriggers) {
 
-	// if we're faking binds then the original query must be re-prepared
-	if (executedsinceprepare &&
-		(!cursor->supportsNativeBinds() ||
-		cursor->getFakeInputBindsForThisQuery())) {
-		if (!prepareQuery(cursor,
-				cursor->getQueryBuffer(),
-				cursor->getQueryLength(),
-				enabletranslations)) {
-			return false;
+	// if we're re-executing...
+	if (executedsinceprepare) {
+
+		// if we're faking binds then the original
+		// query must be re-prepared
+		if (!cursor->supportsNativeBinds() ||
+			cursor->getFakeInputBindsForThisQuery()) {
+
+			if (!prepareQuery(cursor,
+					cursor->getQueryBuffer(),
+					cursor->getQueryLength(),
+					enabletranslations)) {
+				return false;
+			}
+
+		} else {
+
+			// these are done by prepare, but we need to do them
+			// here if we're re-executing and not re-preparing...
+
+			// clean up the previous result set
+			closeResultSet(cursor);
+
+			// re-init error data
+			clearError(cursor);
 		}
 	}
 
