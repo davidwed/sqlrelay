@@ -2521,13 +2521,6 @@ bool sqlrclientprotocol::getColumnListCommand(sqlrcursor_svr *cursor) {
 bool sqlrclientprotocol::getListCommand(sqlrcursor_svr *cursor,
 						int which, bool gettable) {
 
-	// clean up any custom query cursors
-	// FIXME: push up?
-	if (cursor->getCustomQueryCursor()) {
-		cursor->getCustomQueryCursor()->close();
-		cursor->clearCustomQueryCursor();
-	}
-
 	cont->initNewQuery(cursor);
 
 	// get length of wild parameter
