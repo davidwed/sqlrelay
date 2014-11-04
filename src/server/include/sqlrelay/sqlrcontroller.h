@@ -647,6 +647,8 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		bool		querywasintercepted;
 		bool		executedsinceprepare;
 
+		stringbuffer	querywithfakebinds;
+
 		const char	*isolationlevel;
 
 		uint16_t	sendcolumninfo;

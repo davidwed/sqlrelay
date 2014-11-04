@@ -3021,25 +3021,24 @@ bool sqlrcontroller_svr::prepareQuery(sqlrcursor_svr *cursor,
 	querylen=cursor->getQueryLength();
 
 	// fake input binds if necessary
-	stringbuffer	outputquery;
+	querywithfakebinds.clear();
 	if (!cursor->supportsNativeBinds(query) ||
 		cursor->getFakeInputBindsForThisQuery()) {
 
 		logDebugMessage("faking binds...");
 
-		if (cursor->fakeInputBinds(&outputquery)) {
+		if (cursor->fakeInputBinds(&querywithfakebinds)) {
 			// don't copy the rewritten query to the cursor's
 			// query buffer, we need the original if we decide
 			// to re-execute it later
-			query=outputquery.getString();
-			querylen=outputquery.getStringLength();
+			query=querywithfakebinds.getString();
+			querylen=querywithfakebinds.getStringLength();
 			if (debugsqlrtranslation) {
 				stdoutput.printf(
 				"after faking input binds:\n%s\n\n",query);
 			}
+			bindswerefaked=true;
 		}
-
-		bindswerefaked=true;
 	}
 
 	// prepare the query
@@ -3061,7 +3060,7 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor,
 						bool enabletranslations,
 						bool enabletriggers) {
 
-	// if we're faking binds then the query must be re-prepared
+	// if we're faking binds then the original query must be re-prepared
 	if (executedsinceprepare &&
 		(!cursor->supportsNativeBinds() ||
 		cursor->getFakeInputBindsForThisQuery())) {
@@ -3105,8 +3104,17 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor,
 	cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
 
 	// get the query
-	const char	*query=cursor->getQueryBuffer();
-	uint32_t	querylen=cursor->getQueryLength();
+	// if binds were faked, then make sure to send the query containing
+	// the fake binds rather then the original query
+	const char	*query;
+	uint32_t	querylen;
+	if (!bindswerefaked) {
+		query=cursor->getQueryBuffer();
+		querylen=cursor->getQueryLength();
+	} else {
+		query=querywithfakebinds.getString();
+		querylen=querywithfakebinds.getStringLength();
+	}
 
 	// execute the query
 	bool	success=cursor->executeQuery(query,querylen);
