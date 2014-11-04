@@ -732,8 +732,6 @@ bool sqlrclientprotocol::newQueryCommand(sqlrcursor_svr *cursor) {
 
 	cont->logDebugMessage("new query");
 
-	cont->logDebugMessage("handling query...");
-
 	cont->initNewQuery(cursor);
 
 	// get the client info and query from the client
@@ -762,15 +760,13 @@ bool sqlrclientprotocol::newQueryCommand(sqlrcursor_svr *cursor) {
 	if (cont->getErrorNumber(cursor)) {
 		returnError(cursor,true);
 	}
-	cont->logDebugMessage("failed to handle query");
+	cont->logDebugMessage("new query failed");
 	return false;
 }
 
 bool sqlrclientprotocol::reExecuteQueryCommand(sqlrcursor_svr *cursor) {
 
 	cont->logDebugMessage("rexecute query");
-
-	cont->logDebugMessage("handling query...");
 
 	cursor=cont->initReExecuteQuery(cursor);
 
@@ -788,7 +784,7 @@ bool sqlrclientprotocol::reExecuteQueryCommand(sqlrcursor_svr *cursor) {
 	if (cont->getErrorNumber(cursor)) {
 		returnError(cursor,true);
 	}
-	cont->logDebugMessage("failed to handle query");
+	cont->logDebugMessage("reexecute query failed");
 	return false;
 }
 
@@ -2532,8 +2528,7 @@ bool sqlrclientprotocol::getListCommand(sqlrcursor_svr *cursor,
 		cursor->clearCustomQueryCursor();
 	}
 
-	// close whatever result set the cursor might have been busy with
-	cont->closeResultSet(cursor);
+	cont->initNewQuery(cursor);
 
 	// get length of wild parameter
 	uint32_t	wildlen;
@@ -2720,10 +2715,6 @@ bool sqlrclientprotocol::getListByQuery(sqlrcursor_svr *cursor,
 
 	// FIXME: this can fail
 	buildListQuery(cursor,query,wild,table);
-
-	cont->logDebugMessage("handling query...");
-
-	cont->initNewQuery(cursor);
 
 	return processQueryOrBindCursor(cursor,false,false);
 }
