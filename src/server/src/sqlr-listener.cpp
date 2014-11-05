@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2012  David Muse
+// Copyright (c) 1999-2014  David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrlistener.h>
@@ -47,7 +47,7 @@ int main(int argc, const char **argv) {
 	handleSignals(shutDown);
 
 	// initialize
-	if (lsnr->initListener(argc,argv)) {
+	if (lsnr->init(argc,argv)) {
 
 		// wait for client connections
 		lsnr->listen();

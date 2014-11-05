@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2010  David Muse
+// Copyright (c) 1999-2014  David Muse
 // See the file COPYING for more information
 
 #include <config.h>

@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2001  David Muse
+// Copyright (c) 1999-2014  David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrlistener.h>
@@ -32,7 +32,7 @@ sqlrlistener::sqlrlistener() : listener() {
 
 	cmdl=NULL;
 
-	init=false;
+	initialized=false;
 
 	sqlrlg=NULL;
 
@@ -92,7 +92,7 @@ sqlrlistener::~sqlrlistener() {
 			file::remove(pidfile);
 		}
 	}
-	if (init) {
+	if (initialized) {
 		cleanUp();
 	}
 	delete cmdl;
@@ -162,9 +162,9 @@ void sqlrlistener::cleanUp() {
 	delete sqlrlg;
 }
 
-bool sqlrlistener::initListener(int argc, const char **argv) {
+bool sqlrlistener::init(int argc, const char **argv) {
 
-	init=true;
+	initialized=true;
 
 	cmdl=new cmdline(argc,argv);
 
