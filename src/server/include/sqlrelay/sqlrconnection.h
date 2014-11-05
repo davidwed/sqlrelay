@@ -4,10 +4,7 @@
 #ifndef SQLRCONNECTION_H
 #define SQLRCONNECTION_H
 
-#include <sqlrelay/private/sqlrserverdll.h>
-
-#include <sqlrelay/sqlrcursor.h>
-#include <sqlrelay/sqlrtranslations.h>
+#include <sqlrelay/private/sqlrconnectionincludes.h>
 
 class sqlrcontroller_svr;
 
@@ -119,22 +116,7 @@ class SQLRSERVER_DLLSPEC sqlrconnection_svr {
 
 		sqlrcontroller_svr	*cont;
 
-	protected:
-
-		bool		autocommit;
-		bool		fakeautocommit;
-
-		uint32_t	maxquerysize;
-		uint32_t	maxerrorlength;
-
-		char		*error;
-		uint32_t	errorlength;
-		int64_t		errnum;
-		bool		liveconnection;
-
-		char		*dbhostname;
-		char		*dbipaddress;
-		uint32_t	dbhostiploop;
+	#include <sqlrelay/private/sqlrconnection.h>
 };
 
 

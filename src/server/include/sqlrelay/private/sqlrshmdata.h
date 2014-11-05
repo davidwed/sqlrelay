@@ -1,4 +1,4 @@
-// Copyright (c) 2000-2001  David Muse
+// Copyright (c) 2000-2014  David Muse
 // See the file COPYING for more information.
 
 #ifndef SQLRSHMDATA_H

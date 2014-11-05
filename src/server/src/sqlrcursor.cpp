@@ -13,11 +13,6 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn, uint16_t id) {
 
 	this->conn=conn;
 
-	prepared=false;
-	querywasintercepted=false;
-	bindswerefaked=false;
-	fakeinputbindsforthisquery=false;
-
 	maxerrorlength=conn->cont->cfgfl->getMaxErrorLength();
 
 	setInputBindCount(0);
@@ -49,6 +44,12 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn, uint16_t id) {
 	clearTotalRowsFetched();
 
 	this->id=id;
+
+	// sqlrcontroller flags
+	prepared=false;
+	querywasintercepted=false;
+	bindswerefaked=false;
+	fakeinputbindsforthisquery=false;
 }
 
 sqlrcursor_svr::~sqlrcursor_svr() {

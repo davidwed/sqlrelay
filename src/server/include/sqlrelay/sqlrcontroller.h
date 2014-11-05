@@ -417,8 +417,7 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		shmdata			*shm;
 		sqlrconnstatistics	*connstats;
 
-	private:
-		#include <sqlrelay/private/sqlrcontroller.h>
+	#include <sqlrelay/private/sqlrcontroller.h>
 };
 
 #endif
