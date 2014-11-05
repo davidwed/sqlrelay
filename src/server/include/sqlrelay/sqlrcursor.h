@@ -234,9 +234,6 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 
 		uint16_t	getId();
 
-		void		setFakeInputBindsForThisQuery(bool fake);
-		bool		getFakeInputBindsForThisQuery();
-	
 		bool		fakeInputBinds();
 
 		void		setInputBindCount(uint16_t inbindcount);
@@ -302,6 +299,8 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 		bool	prepared;
 		bool	querywasintercepted;
 		bool	bindswerefaked;
+		bool	fakeinputbindsforthisquery;
+
 		stringbuffer	querywithfakeinputbinds;
 
 	protected:
@@ -320,8 +319,6 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 		bindvar_svr	*outbindvars;
 
 		uint64_t	totalrowsfetched;
-
-		bool		fakeinputbindsforthisquery;
 
 		uint64_t	commandstartsec;
 		uint64_t	commandstartusec;

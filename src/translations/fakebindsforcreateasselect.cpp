@@ -37,7 +37,7 @@ bool fakebindsforcreateasselect::run(sqlrconnection_svr *sqlrcon,
 				getFirstTagChild(sqlparser::_as)->
 				getNextTagSibling(sqlparser::_select)->
 				isNullNode()) {
-		sqlrcon->cont->setFakeInputBindsForThisQuery(sqlrcur,true);
+		sqlrcur->fakeinputbindsforthisquery=true;
 	}
 	return true;
 }

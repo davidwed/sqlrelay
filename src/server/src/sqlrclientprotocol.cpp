@@ -742,7 +742,7 @@ bool sqlrclientprotocol::newQueryCommand(sqlrcursor_svr *cursor) {
 
 	// re-init fake bind flag
 	// FIXME: push up?
-	cont->setFakeInputBindsForThisQuery(cursor,cont->getFakeInputBinds());
+	cursor->fakeinputbindsforthisquery=false;
 
 	// get the client info and query from the client
 	bool	success=(getClientInfo(cursor) && getQuery(cursor));
@@ -1101,7 +1101,7 @@ bool sqlrclientprotocol::getInputBinds(sqlrcursor_svr *cursor) {
 		} else if (bv->type==BLOB_BIND) {
 			// can't fake blob binds
 			// FIXME: push up?
-			cont->setFakeInputBindsForThisQuery(cursor,false);
+			cursor->fakeinputbindsforthisquery=false;
 			if (!getLobBind(cursor,bv)) {
 				return false;
 			}
@@ -2551,7 +2551,7 @@ bool sqlrclientprotocol::getListCommand(sqlrcursor_svr *cursor,
 
 	// re-init fake bind flag
 	// FIXME: push up?
-	cont->setFakeInputBindsForThisQuery(cursor,false);
+	cursor->fakeinputbindsforthisquery=false;
 
 	// get length of wild parameter
 	uint32_t	wildlen;

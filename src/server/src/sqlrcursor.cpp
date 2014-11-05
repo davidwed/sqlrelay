@@ -43,8 +43,6 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn, uint16_t id) {
 	setQueryStart(0,0);
 	setQueryEnd(0,0);
 
-	setFakeInputBindsForThisQuery(false);
-
 	setCustomQueryCursor(NULL);
 
 	clearTotalRowsFetched();
@@ -512,14 +510,6 @@ bool sqlrcursor_svr::getColumnNameList(stringbuffer *output) {
 
 uint16_t sqlrcursor_svr::getId() {
 	return id;
-}
-
-void sqlrcursor_svr::setFakeInputBindsForThisQuery(bool fake) {
-	fakeinputbindsforthisquery=fake;
-}
-
-bool sqlrcursor_svr::getFakeInputBindsForThisQuery() {
-	return fakeinputbindsforthisquery;
 }
 
 bool sqlrcursor_svr::fakeInputBinds() {

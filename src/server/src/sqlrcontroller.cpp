@@ -2987,7 +2987,7 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor,
 		// if we're faking binds then the original
 		// query must be re-prepared
 		if (fakeinputbinds ||
-			cursor->getFakeInputBindsForThisQuery() ||
+			cursor->fakeinputbindsforthisquery ||
 			!cursor->supportsNativeBinds()) {
 
 			cursor->prepared=false;
@@ -3019,7 +3019,7 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor,
 		// fake input binds if necessary
 		cursor->querywithfakeinputbinds.clear();
 		if (fakeinputbinds ||
-			cursor->getFakeInputBindsForThisQuery() ||
+			cursor->fakeinputbindsforthisquery ||
 			!cursor->supportsNativeBinds(
 					cursor->getQueryBuffer())) {
 
@@ -4872,17 +4872,6 @@ uint16_t sqlrcontroller_svr::getId(sqlrcursor_svr *cursor) {
 	return cursor->getId();
 }
 
-void sqlrcontroller_svr::setFakeInputBindsForThisQuery(
-						sqlrcursor_svr *cursor,
-						bool fake) {
-	return cursor->setFakeInputBindsForThisQuery(fake);
-}
-
-bool sqlrcontroller_svr::getFakeInputBindsForThisQuery(
-						sqlrcursor_svr *cursor) {
-	return cursor->getFakeInputBindsForThisQuery();
-}
-	
 void sqlrcontroller_svr::setInputBindCount(sqlrcursor_svr *cursor,
 						uint16_t inbindcount) {
 	cursor->setInputBindCount(inbindcount);
