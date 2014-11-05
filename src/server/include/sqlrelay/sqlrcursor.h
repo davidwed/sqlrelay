@@ -177,9 +177,9 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 		virtual	bool	executeQuery(const char *query,
 							uint32_t length);
 		virtual bool	fetchFromBindCursor();
-		virtual	bool		queryIsNotSelect();
-		virtual	bool		queryIsCommitOrRollback();
-		virtual	void		errorMessage(char *errorbuffer,
+		virtual	bool	queryIsNotSelect();
+		virtual	bool	queryIsCommitOrRollback();
+		virtual	void	errorMessage(char *errorbuffer,
 						uint32_t errorbuffersize,
 						uint32_t *errorlength,
 						int64_t *errorcode,
@@ -209,27 +209,26 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 		virtual bool		ignoreDateDdMmParameter(uint32_t col,
 							const char *data,
 							uint32_t size);
-		virtual	bool		noRowsToReturn();
-		virtual	bool		skipRow();
-		virtual	bool		fetchRow();
-		virtual	void		nextRow();
-		virtual void		getField(uint32_t col,
-							const char **field,
-							uint64_t *fieldlength,
-							bool *blob,
-							bool *null);
-		virtual bool		getLobFieldLength(uint32_t col,
-							uint64_t *length);
-		virtual bool		getLobFieldSegment(uint32_t col,
-							char *buffer,
-							uint64_t buffersize,
-							uint64_t offset,
-							uint64_t charstoread,
-							uint64_t *charsread);
-		virtual void		closeLobField(uint32_t col);
-		virtual	void		closeResultSet();
-		virtual bool		getColumnNameList(stringbuffer *output);
-
+		virtual	bool	noRowsToReturn();
+		virtual	bool	skipRow();
+		virtual	bool	fetchRow();
+		virtual	void	nextRow();
+		virtual void	getField(uint32_t col,
+						const char **field,
+						uint64_t *fieldlength,
+						bool *blob,
+						bool *null);
+		virtual bool	getLobFieldLength(uint32_t col,
+						uint64_t *length);
+		virtual bool	getLobFieldSegment(uint32_t col,
+						char *buffer,
+						uint64_t buffersize,
+						uint64_t offset,
+						uint64_t charstoread,
+						uint64_t *charsread);
+		virtual void	closeLobField(uint32_t col);
+		virtual	void	closeResultSet();
+		virtual bool	getColumnNameList(stringbuffer *output);
 
 
 		uint16_t	getId();
@@ -296,13 +295,6 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 
 		sqlrconnection_svr	*conn;
 
-		bool	prepared;
-		bool	querywasintercepted;
-		bool	bindswerefaked;
-		bool	fakeinputbindsforthisquery;
-
-		stringbuffer	querywithfakeinputbinds;
-
 	protected:
 		regularexpression	createtemp;
 
@@ -338,7 +330,15 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 
 		sqlrcursorstate_t	state;
 
-		sqlrquerycursor	*customquerycursor;
+		sqlrquerycursor		*customquerycursor;
+
+	public:
+		// flags that are only useful to the sqlrcontroller
+		bool		prepared;
+		bool		querywasintercepted;
+		bool		bindswerefaked;
+		bool		fakeinputbindsforthisquery;
+		stringbuffer	querywithfakeinputbinds;
 };
 
 #endif

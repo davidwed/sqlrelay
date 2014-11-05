@@ -24,6 +24,7 @@ class SQLRSERVER_DLLSPEC sqlrclientprotocol : public sqlrprotocol {
 		virtual	~sqlrclientprotocol();
 
 		sqlrclientexitstatus_t	clientSession();
+
 	private:
 		bool	getCommand(uint16_t *command);
 		sqlrcursor_svr	*getCursor(uint16_t command);
