@@ -89,10 +89,6 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 	fakeinputbinds=false;
 	translatebinds=false;
 
-	bindswerefaked=false;
-	querywasintercepted=false;
-	executedsinceprepare=false;
-
 	isolationlevel=NULL;
 
 	maxquerysize=0;
@@ -2715,36 +2711,12 @@ void sqlrcontroller_svr::translateBeginTransaction(sqlrcursor_svr *cursor) {
 	logDebugMessage(querybuffer);
 }
 
-void sqlrcontroller_svr::initNewQuery(sqlrcursor_svr *cursor) {
-
-	// if we're using a custom cursor then close it
-	sqlrcursor_svr	*customcursor=cursor->getCustomQueryCursor();
-	if (customcursor) {
-		customcursor->close();
-		cursor->clearCustomQueryCursor();
-	}
-
-	// re-init fake bind flag
-	cursor->setFakeInputBindsForThisQuery(fakeinputbinds);
-}
-
-sqlrcursor_svr	*sqlrcontroller_svr::initReExecuteQuery(
-					sqlrcursor_svr *cursor) {
-
-	// if we're using a custom cursor then operate on it
-	sqlrcursor_svr	*customcursor=cursor->getCustomQueryCursor();
-	if (customcursor) {
-		return customcursor;
-	}
-	return cursor;
-}
-
-sqlrcursor_svr *sqlrcontroller_svr::getCustomQueryCursor(	
+sqlrcursor_svr *sqlrcontroller_svr::useCustomQueryCursor(	
 						sqlrcursor_svr *cursor) {
 
 	// do we need to use a custom query cursor for this query?
 
-	// bail right away if custom queries aren't enabled
+	// not if custom queries aren't enabled...
 	if (!sqlrq) {
 		return cursor;
 	}
@@ -2752,34 +2724,35 @@ sqlrcursor_svr *sqlrcontroller_svr::getCustomQueryCursor(
 	// see if the query matches one of the custom queries
 	// FIXME: the 0 isn't safe, none of the custom queries do anything with
 	// the id, but they might in the future so it needs to be unique
-	cursor->setCustomQueryCursor(
-			sqlrq->match(conn,
-				cursor->getQueryBuffer(),
-				cursor->getQueryLength(),
-				0));
+	sqlrquerycursor	*customcursor=sqlrq->match(conn,
+						cursor->getQueryBuffer(),
+						cursor->getQueryLength(),0);
 				
-	// if so...
-	if (cursor->getCustomQueryCursor()) {
-
-		// open the cursor
-		cursor->getCustomQueryCursor()->open();
-
-		// copy the query that we just got into the custom query cursor
-		charstring::copy(
-			cursor->getCustomQueryCursor()->getQueryBuffer(),
-			cursor->getQueryBuffer());
-		cursor->getCustomQueryCursor()->setQueryLength(
-						cursor->getQueryLength());
-
-		// set the cursor state
-		cursor->getCustomQueryCursor()->setState(SQLRCURSORSTATE_BUSY);
-
-		// reset the cursor
-		cursor=cursor->getCustomQueryCursor();
-
+	// if not...
+	if (!customcursor) {
+		return cursor;
 	}
 
-	return cursor;
+	// if so...
+
+	// open the custom cursor
+	customcursor->open();
+
+	// copy the query that we just got into
+	// the custom query cursor's buffers
+	charstring::copy(
+		customcursor->getQueryBuffer(),
+		cursor->getQueryBuffer());
+	customcursor->setQueryLength(cursor->getQueryLength());
+
+	// set the custom cursor' state
+	customcursor->setState(SQLRCURSORSTATE_BUSY);
+
+	// attach the custom cursor to the cursor
+	cursor->setCustomQueryCursor(customcursor);
+
+	// return the custom cursor
+	return customcursor;
 }
 
 bool sqlrcontroller_svr::handleBinds(sqlrcursor_svr *cursor) {
@@ -2951,13 +2924,18 @@ bool sqlrcontroller_svr::handleBinds(sqlrcursor_svr *cursor) {
 bool sqlrcontroller_svr::prepareQuery(sqlrcursor_svr *cursor,
 						const char *query,
 						uint32_t querylen) {
-	return prepareQuery(cursor,query,querylen,false);
-}
 
-bool sqlrcontroller_svr::prepareQuery(sqlrcursor_svr *cursor,
-						const char *query,
-						uint32_t querylen,
-						bool enabletranslations) {
+	// The standard paradigm is:
+	//
+	// * prepare(query)
+	// * bind(variable,value)
+	// * execute()
+	//
+	// In various circumstances, we may need to fake binds though.  This
+	// requires the query to be rewritten to include the bind values before
+	// being prepared.  So, we'll defer preparing the query until the
+	// execution phase so that we'll be sure to have all of the bind
+	// values on hand.
 
 	// clean up the previous result set
 	closeResultSet(cursor);
@@ -2965,84 +2943,25 @@ bool sqlrcontroller_svr::prepareQuery(sqlrcursor_svr *cursor,
 	// re-init error data
 	clearError(cursor);
 
-	// reset some flags
-	executedsinceprepare=false;
-	querywasintercepted=false;
-	bindswerefaked=false;
-
-	// intercept some queries for special handling
-	bool	success=interceptQuery(cursor,&querywasintercepted);
-	if (querywasintercepted) {
-		return success;
-	}
-
-	logDebugMessage("preparing query...");
-
-	// set state
-	updateState((isCustomQuery(cursor))?PROCESS_CUSTOM:PROCESS_SQL);
+	// reset flags
+	cursor->prepared=false;
+	cursor->querywasintercepted=false;
+	cursor->bindswerefaked=false;
 
 	// sanity check
 	if (querylen>maxquerysize) {
 		querylen=maxquerysize;
+		cursor->setQueryLength(maxquerysize);
 	}
 
 	// copy query to cursor's query buffer if necessary
 	if (query!=cursor->getQueryBuffer()) {
 		charstring::copy(cursor->getQueryBuffer(),query,querylen);
+		cursor->getQueryBuffer()[querylen]='\0';
 		cursor->setQueryLength(querylen);
-		cursor->getQueryBuffer()[cursor->getQueryLength()]='\0';
 	}
 
-	// translate query
-	if (enabletranslations && sqlp && sqlrt && sqlw) {
-		translateQuery(cursor);
-	}
-
-	// translate bind variables
-	if (translatebinds) {
-		translateBindVariables(cursor);
-	}
-
-	// translate "begin" queries
-	if (conn->supportsTransactionBlocks() &&
-			isBeginTransactionQuery(cursor)) {
-		translateBeginTransaction(cursor);
-	}
-
-	// get the query
-	query=cursor->getQueryBuffer();
-	querylen=cursor->getQueryLength();
-
-	// fake input binds if necessary
-	querywithfakebinds.clear();
-	if (!cursor->supportsNativeBinds(query) ||
-		cursor->getFakeInputBindsForThisQuery()) {
-
-		logDebugMessage("faking binds...");
-
-		if (cursor->fakeInputBinds(&querywithfakebinds)) {
-			// don't copy the rewritten query to the cursor's
-			// query buffer, we need the original if we decide
-			// to re-execute it later
-			query=querywithfakebinds.getString();
-			querylen=querywithfakebinds.getStringLength();
-			if (debugsqlrtranslation) {
-				stdoutput.printf(
-				"after faking input binds:\n%s\n\n",query);
-			}
-			bindswerefaked=true;
-		}
-	}
-
-	// prepare the query
-	success=cursor->prepareQuery(query,querylen);
-
-	// log result
-	logDebugMessage((success)?"prepare query succeeded":
-					"prepare query failed");
-	logDebugMessage("done with prepare query");
-
-	return success;
+	return true;
 }
 
 bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor) {
@@ -3053,50 +2972,113 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor,
 						bool enabletranslations,
 						bool enabletriggers) {
 
-	// if we're re-executing...
-	if (executedsinceprepare) {
+	// set state
+	updateState((isCustomQuery(cursor))?PROCESS_CUSTOM:PROCESS_SQL);
+
+	// if we're re-executing
+	if (cursor->prepared) {
+
+		// clean up the previous result set
+		closeResultSet(cursor);
+
+		// re-init error data
+		clearError(cursor);
 
 		// if we're faking binds then the original
 		// query must be re-prepared
-		if (!cursor->supportsNativeBinds() ||
-			cursor->getFakeInputBindsForThisQuery()) {
+		if (fakeinputbinds ||
+			cursor->getFakeInputBindsForThisQuery() ||
+			!cursor->supportsNativeBinds()) {
 
-			if (!prepareQuery(cursor,
-					cursor->getQueryBuffer(),
-					cursor->getQueryLength(),
-					enabletranslations)) {
-				return false;
-			}
-
-		} else {
-
-			// these are done by prepare, but we need to do them
-			// here if we're re-executing and not re-preparing...
-
-			// clean up the previous result set
-			closeResultSet(cursor);
-
-			// re-init error data
-			clearError(cursor);
+			cursor->prepared=false;
 		}
 	}
 
-	// if the query was intercepted during the
-	// prepare then we don't need to do anything
-	if (querywasintercepted) {
-		return true;
+	// init result
+	bool	success=false;
+
+	// if the query hasn't been prepared then do various translations
+	if (!cursor->prepared) {
+
+		// translate query
+		if (enabletranslations && sqlp && sqlrt && sqlw) {
+			translateQuery(cursor);
+		}
+
+		// translate bind variables
+		if (translatebinds) {
+			translateBindVariables(cursor);
+		}
+
+		// translate "begin" queries
+		if (conn->supportsTransactionBlocks() &&
+				isBeginTransactionQuery(cursor)) {
+			translateBeginTransaction(cursor);
+		}
+
+		// fake input binds if necessary
+		cursor->querywithfakeinputbinds.clear();
+		if (fakeinputbinds ||
+			cursor->getFakeInputBindsForThisQuery() ||
+			!cursor->supportsNativeBinds(
+					cursor->getQueryBuffer())) {
+
+			logDebugMessage("faking binds...");
+
+			if (cursor->fakeInputBinds()) {
+				if (debugsqlrtranslation) {
+					stdoutput.printf(
+					"after faking input binds:\n%s\n\n",
+					cursor->querywithfakeinputbinds.
+								getString());
+				}
+				cursor->bindswerefaked=true;
+			}
+		}
+
+		// intercept some queries for special handling
+		success=interceptQuery(cursor,&(cursor->querywasintercepted));
+		if (cursor->querywasintercepted) {
+			return success;
+		}
+	}
+
+	// get the query
+	const char	*query=cursor->getQueryBuffer();
+	uint32_t	querylen=cursor->getQueryLength();
+	if (cursor->bindswerefaked) {
+		query=cursor->querywithfakeinputbinds.getString();
+		querylen=cursor->querywithfakeinputbinds.getStringLength();
+	}
+
+	// now actually prepare the query, if necessary
+	if (!cursor->prepared) {
+
+		logDebugMessage("preparing query...");
+
+		// prepare the query
+		success=cursor->prepareQuery(query,querylen);
+
+		// log result
+		logDebugMessage((success)?"prepare query succeeded":
+						"prepare query failed");
+		logDebugMessage("done with prepare query");
+
+		if (!success) {
+			return false;
+		}
+
+		// set flag indicating that the query has been prepared
+		cursor->prepared=true;
 	}
 
 	logDebugMessage("executing query...");
 
-	// set state
-	updateState((isCustomQuery(cursor))?PROCESS_CUSTOM:PROCESS_SQL);
-
-	// translate bind variables
+	// translate bind variables (from mappings)
 	translateBindVariablesFromMappings(cursor);
 
 	// handle binds (unless they were faked during the prepare)
-	if (!bindswerefaked) {
+	if (!cursor->bindswerefaked) {
 		if (!handleBinds(cursor)) {
 			return false;
 		}
@@ -3112,25 +3094,8 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor,
 	dt.getSystemDateAndTime();
 	cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
 
-	// get the query
-	// if binds were faked, then make sure to send the query containing
-	// the fake binds rather then the original query
-	const char	*query;
-	uint32_t	querylen;
-	if (!bindswerefaked) {
-		query=cursor->getQueryBuffer();
-		querylen=cursor->getQueryLength();
-	} else {
-		query=querywithfakebinds.getString();
-		querylen=querywithfakebinds.getStringLength();
-	}
-
 	// execute the query
-	bool	success=cursor->executeQuery(query,querylen);
-
-	// set flag indicating that query has been
-	// executed since it was prepared
-	executedsinceprepare=true;
+	success=cursor->executeQuery(query,querylen);
 
 	// get the query end time
 	dt.getSystemDateAndTime();
@@ -4430,6 +4395,10 @@ bool sqlrcontroller_svr::bindValueIsNull(int16_t isnull) {
 
 void sqlrcontroller_svr::fakeInputBinds() {
 	fakeinputbinds=true;
+}
+
+bool sqlrcontroller_svr::getFakeInputBinds() {
+	return fakeinputbinds;
 }
 
 bool sqlrcontroller_svr::getColumnNames(const char *query,

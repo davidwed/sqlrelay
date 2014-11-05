@@ -96,6 +96,7 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		int16_t		nullBindValue();
 		bool		bindValueIsNull(int16_t isnull);
 		void		fakeInputBinds();
+		bool		getFakeInputBinds();
 		memorypool	*getBindMappingsPool();
 
 		// db selection
@@ -248,15 +249,9 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 		xmldom		*getQueryTree(sqlrcursor_svr *cursor);
 
 		// running queries
-		void		initNewQuery(sqlrcursor_svr *cursor);
-		sqlrcursor_svr	*initReExecuteQuery(sqlrcursor_svr *cursor);
 		bool	prepareQuery(sqlrcursor_svr *cursor,
 						const char *query,
 						uint32_t length);
-		bool	prepareQuery(sqlrcursor_svr *cursor,
-						const char *query,
-						uint32_t length,
-						bool enabletranslations);
 		bool	executeQuery(sqlrcursor_svr *cursor);
 		bool	executeQuery(sqlrcursor_svr *cursor,
 						bool enabletranslations,
@@ -294,7 +289,7 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 
 		// custom queries
 		bool		isCustomQuery(sqlrcursor_svr *cursor);
-		sqlrcursor_svr	*getCustomQueryCursor(sqlrcursor_svr *cursor);
+		sqlrcursor_svr	*useCustomQueryCursor(sqlrcursor_svr *cursor);
 
 		// temp tables
 		void	addSessionTempTableForDrop(const char *tablename);
@@ -642,12 +637,6 @@ class SQLRSERVER_DLLSPEC sqlrcontroller_svr : public listener {
 
 		bool		fakeinputbinds;
 		bool		translatebinds;
-
-		bool		bindswerefaked;
-		bool		querywasintercepted;
-		bool		executedsinceprepare;
-
-		stringbuffer	querywithfakebinds;
 
 		const char	*isolationlevel;
 

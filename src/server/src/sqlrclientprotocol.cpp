@@ -732,14 +732,24 @@ bool sqlrclientprotocol::newQueryCommand(sqlrcursor_svr *cursor) {
 
 	cont->logDebugMessage("new query");
 
-	cont->initNewQuery(cursor);
+	// if we're using a custom cursor then close it
+	// FIXME: push up?
+	sqlrcursor_svr	*customcursor=cursor->getCustomQueryCursor();
+	if (customcursor) {
+		customcursor->close();
+		cursor->clearCustomQueryCursor();
+	}
+
+	// re-init fake bind flag
+	// FIXME: push up?
+	cont->setFakeInputBindsForThisQuery(cursor,cont->getFakeInputBinds());
 
 	// get the client info and query from the client
 	bool	success=(getClientInfo(cursor) && getQuery(cursor));
 
 	// do we need to use a custom query handler for this query?
 	if (success) {
-		cursor=cont->getCustomQueryCursor(cursor);
+		cursor=cont->useCustomQueryCursor(cursor);
 	}
 
 	// get binds and whether to get column info
@@ -768,7 +778,12 @@ bool sqlrclientprotocol::reExecuteQueryCommand(sqlrcursor_svr *cursor) {
 
 	cont->logDebugMessage("rexecute query");
 
-	cursor=cont->initReExecuteQuery(cursor);
+	// if we're using a custom cursor then operate on it
+	// FIXME: push up?
+	sqlrcursor_svr	*customcursor=cursor->getCustomQueryCursor();
+	if (customcursor) {
+		cursor=customcursor;
+	}
 
 	// get binds and whether to get column info
 	if (getInputBinds(cursor) &&
@@ -792,7 +807,13 @@ bool sqlrclientprotocol::fetchFromBindCursorCommand(sqlrcursor_svr *cursor) {
 
 	cont->logDebugMessage("fetch from bind cursor");
 
-	cont->initNewQuery(cursor);
+	// if we're using a custom cursor then close it
+	// FIXME: push up?
+	sqlrcursor_svr	*customcursor=cursor->getCustomQueryCursor();
+	if (customcursor) {
+		customcursor->close();
+		cursor->clearCustomQueryCursor();
+	}
 
 	// get whether to get column info
 	if (getSendColumnInfo()) {
@@ -826,8 +847,7 @@ bool sqlrclientprotocol::processQueryOrBindCursor(sqlrcursor_svr *cursor,
 		} else {
 			success=(cont->prepareQuery(cursor,
 					cont->getQueryBuffer(cursor),
-					cont->getQueryLength(cursor),
-					true) &&
+					cont->getQueryLength(cursor)) &&
 				cont->executeQuery(cursor,true,true));
 		}
 
@@ -2521,7 +2541,17 @@ bool sqlrclientprotocol::getColumnListCommand(sqlrcursor_svr *cursor) {
 bool sqlrclientprotocol::getListCommand(sqlrcursor_svr *cursor,
 						int which, bool gettable) {
 
-	cont->initNewQuery(cursor);
+	// if we're using a custom cursor then close it
+	// FIXME: push up?
+	sqlrcursor_svr	*customcursor=cursor->getCustomQueryCursor();
+	if (customcursor) {
+		customcursor->close();
+		cursor->clearCustomQueryCursor();
+	}
+
+	// re-init fake bind flag
+	// FIXME: push up?
+	cont->setFakeInputBindsForThisQuery(cursor,false);
 
 	// get length of wild parameter
 	uint32_t	wildlen;

@@ -13,6 +13,10 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn, uint16_t id) {
 
 	this->conn=conn;
 
+	prepared=false;
+	querywasintercepted=false;
+	bindswerefaked=false;
+
 	maxerrorlength=conn->cont->cfgfl->getMaxErrorLength();
 
 	setInputBindCount(0);
@@ -518,12 +522,15 @@ bool sqlrcursor_svr::getFakeInputBindsForThisQuery() {
 	return fakeinputbindsforthisquery;
 }
 
-bool sqlrcursor_svr::fakeInputBinds(stringbuffer *outputquery) {
+bool sqlrcursor_svr::fakeInputBinds() {
 
 	// return false if there aren't any input binds
 	if (!inbindcount) {
 		return false;
 	}
+
+	// re-init the buffer
+	querywithfakeinputbinds.clear();
 
 	// loop through the query, performing substitutions
 	char	prefix=inbindvars[0].variable[0];
@@ -591,7 +598,8 @@ bool sqlrcursor_svr::fakeInputBinds(stringbuffer *outputquery) {
 							'\0')
 					)) {
 
-					performSubstitution(outputquery,i);
+					performSubstitution(
+						&querywithfakeinputbinds,i);
 					if (*ptr=='?') {
 						ptr++;
 					} else {
@@ -606,7 +614,7 @@ bool sqlrcursor_svr::fakeInputBinds(stringbuffer *outputquery) {
 
 		// write the input query to the output query
 		if (*ptr) {
-			outputquery->append(*ptr);
+			querywithfakeinputbinds.append(*ptr);
 			ptr++;
 		}
 	}
