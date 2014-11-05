@@ -1,8 +1,8 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrconnection.h>
-#include <sqlrelay/sqlrcursor.h>
+#include <sqlrelay/sqlrserverconnection.h>
+#include <sqlrelay/sqlrservercursor.h>
 #include <sqlrelay/sqlparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <rudiments/datetime.h>

@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrcontroller.h>
-#include <sqlrelay/sqlrconnection.h>
+#include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrquery.h>
 #include <rudiments/charstring.h>
 #include <debugprint.h>

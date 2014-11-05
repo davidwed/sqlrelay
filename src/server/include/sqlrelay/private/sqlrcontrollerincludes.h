@@ -19,8 +19,8 @@
 #include <tempdir.h>
 
 #include <sqlrconfigfile.h>
-#include <sqlrelay/sqlrconnection.h>
-#include <sqlrelay/sqlrcursor.h>
+#include <sqlrelay/sqlrserverconnection.h>
+#include <sqlrelay/sqlrservercursor.h>
 #include <sqlrelay/sqlrprotocol.h>
 #include <sqlrelay/sqlparser.h>
 #include <sqlrelay/sqlrtranslations.h>

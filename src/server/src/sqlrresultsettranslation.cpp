@@ -2,8 +2,8 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrresultsettranslation.h>
-#include <sqlrelay/sqlrconnection.h>
-#include <sqlrelay/sqlrcursor.h>
+#include <sqlrelay/sqlrserverconnection.h>
+#include <sqlrelay/sqlrservercursor.h>
 
 sqlrresultsettranslation::sqlrresultsettranslation(
 				sqlrresultsettranslations *sqlrrsts,

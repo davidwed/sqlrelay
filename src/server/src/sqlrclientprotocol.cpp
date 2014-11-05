@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrclientprotocol.h>
 #include <sqlrelay/sqlrcontroller.h>
-#include <sqlrelay/sqlrcursor.h>
+#include <sqlrelay/sqlrservercursor.h>
 
 #include <rudiments/bytestring.h>
 #include <rudiments/signalclasses.h>

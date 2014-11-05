@@ -2,8 +2,8 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrloggers.h>
-#include <sqlrelay/sqlrconnection.h>
-#include <sqlrelay/sqlrcursor.h>
+#include <sqlrelay/sqlrserverconnection.h>
+#include <sqlrelay/sqlrservercursor.h>
 #include <debugprint.h>
 
 #include <rudiments/xmldomnode.h>

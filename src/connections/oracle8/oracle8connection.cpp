@@ -8,7 +8,7 @@
 #endif
 
 #include <sqlrelay/sqlrcontroller.h>
-#include <sqlrelay/sqlrconnection.h>
+#include <sqlrelay/sqlrserverconnection.h>
 #ifdef HAVE_ORACLE_8i
 	#include <rudiments/regularexpression.h>
 #endif

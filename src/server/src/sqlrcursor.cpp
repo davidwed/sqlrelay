@@ -3,7 +3,7 @@
 
 #include <config.h>
 #include <sqlrelay/sqlrcontroller.h>
-#include <sqlrelay/sqlrconnection.h>
+#include <sqlrelay/sqlrserverconnection.h>
 #include <rudiments/character.h>
 #include <rudiments/stdio.h>
 

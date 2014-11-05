@@ -4,7 +4,7 @@
 #ifndef SQLRCURSOR_H
 #define SQLRCURSOR_H
 
-#include <sqlrelay/private/sqlrcursorincludes.h>
+#include <sqlrelay/private/sqlrservercursorincludes.h>
 
 class SQLRSERVER_DLLSPEC bindvar_svr {
 	public:
@@ -291,7 +291,7 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 
 		sqlrconnection_svr	*conn;
 
-	#include <sqlrelay/private/sqlrcursor.h>
+	#include <sqlrelay/private/sqlrservercursor.h>
 };
 
 #endif

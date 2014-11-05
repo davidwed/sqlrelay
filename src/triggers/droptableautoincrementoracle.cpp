@@ -2,8 +2,8 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrcontroller.h>
-#include <sqlrelay/sqlrconnection.h>
-#include <sqlrelay/sqlrcursor.h>
+#include <sqlrelay/sqlrserverconnection.h>
+#include <sqlrelay/sqlrservercursor.h>
 #include <sqlrelay/sqlparser.h>
 #include <sqlrelay/sqlrtrigger.h>
 #include <debugprint.h>

@@ -3,5 +3,5 @@
 
 #include <sqlrelay/private/sqlrserverdll.h>
 
-#include <sqlrelay/sqlrcursor.h>
+#include <sqlrelay/sqlrservercursor.h>
 #include <sqlrelay/sqlrtranslations.h>

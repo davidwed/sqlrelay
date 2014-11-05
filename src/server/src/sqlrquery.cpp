@@ -2,8 +2,8 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrquery.h>
-#include <sqlrelay/sqlrconnection.h>
-#include <sqlrelay/sqlrcursor.h>
+#include <sqlrelay/sqlrserverconnection.h>
+#include <sqlrelay/sqlrservercursor.h>
 #include <rudiments/xmldomnode.h>
 
 sqlrquery::sqlrquery(xmldomnode *parameters) {

@@ -2,8 +2,8 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrtrigger.h>
-#include <sqlrelay/sqlrconnection.h>
-#include <sqlrelay/sqlrcursor.h>
+#include <sqlrelay/sqlrserverconnection.h>
+#include <sqlrelay/sqlrservercursor.h>
 
 sqlrtrigger::sqlrtrigger(xmldomnode *parameters, bool debug) {
 	this->parameters=parameters;

@@ -4,7 +4,7 @@
 #ifndef SQLRCONNECTION_H
 #define SQLRCONNECTION_H
 
-#include <sqlrelay/private/sqlrconnectionincludes.h>
+#include <sqlrelay/private/sqlrserverconnectionincludes.h>
 
 class sqlrcontroller_svr;
 
@@ -116,7 +116,7 @@ class SQLRSERVER_DLLSPEC sqlrconnection_svr {
 
 		sqlrcontroller_svr	*cont;
 
-	#include <sqlrelay/private/sqlrconnection.h>
+	#include <sqlrelay/private/sqlrserverconnection.h>
 };
 
 
