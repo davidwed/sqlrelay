@@ -368,6 +368,14 @@ installheaders:
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrtriggers.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlwriter.h $(includedir)/sqlrelay
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrconnection.h $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrconnectionincludes.h $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrcontroller.h $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrcontrollerincludes.h $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrcursor.h $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrcursorincludes.h $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrlistener.h $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrlistenerincludes.h $(includedir)/sqlrelay/private
 	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverdll.h $(includedir)/sqlrelay/private
 	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrshmdata.h $(includedir)/sqlrelay/private
 
