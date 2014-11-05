@@ -43,8 +43,8 @@ class mysqlcursor : public sqlrcursor_svr {
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 #endif
-		bool		supportsNativeBinds(const char *query);
-		bool		supportsNativeBinds();
+		bool		supportsNativeBinds(const char *query,
+							uint32_t length);
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
@@ -659,7 +659,7 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	// fake binds.  Unfortunately it doesn't call it for things like
 	// pings or "use xxx" or other internal queries.  It might be good
 	// to sort all of that out at some point.)
-	if (!supportsNativeBinds(query)) {
+	if (!supportsNativeBinds(query,length)) {
 		return true;
 	}
 
@@ -686,17 +686,9 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 }
 #endif
 
-bool mysqlcursor::supportsNativeBinds(const char *query) {
+bool mysqlcursor::supportsNativeBinds(const char *query, uint32_t length) {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	usestmtprepare=!unsupportedbystmt.match(query);
-	return usestmtprepare;
-#else
-	return false;
-#endif
-}
-
-bool mysqlcursor::supportsNativeBinds() {
-#ifdef HAVE_MYSQL_STMT_PREPARE
 	return usestmtprepare;
 #else
 	return false;

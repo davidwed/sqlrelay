@@ -103,7 +103,8 @@ class routercursor : public sqlrcursor_svr {
 				~routercursor();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
-		bool		supportsNativeBinds();
+		bool		supportsNativeBinds(const char *query,
+							uint32_t length);
 		bool		begin(const char *query, uint32_t length);
 		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
@@ -683,7 +684,7 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-bool routercursor::supportsNativeBinds() {
+bool routercursor::supportsNativeBinds(const char *query, uint32_t length) {
 	return true;
 }
 

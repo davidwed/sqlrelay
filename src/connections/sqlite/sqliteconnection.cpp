@@ -91,7 +91,8 @@ class sqlitecursor : public sqlrcursor_svr {
 								uint16_t id);
 				~sqlitecursor();
 
-		bool		supportsNativeBinds();
+		bool		supportsNativeBinds(const char *query,
+							uint32_t length);
 
 		#ifdef HAVE_SQLITE3_STMT
 		bool		prepareQuery(const char *query,
@@ -407,7 +408,7 @@ sqlitecursor::~sqlitecursor() {
 	#endif
 }
 
-bool sqlitecursor::supportsNativeBinds() {
+bool sqlitecursor::supportsNativeBinds(const char *query, uint32_t length) {
 	#ifdef HAVE_SQLITE3_STMT
 	return true;
 	#else

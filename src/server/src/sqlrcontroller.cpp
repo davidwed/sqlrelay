@@ -2931,11 +2931,13 @@ bool sqlrcontroller_svr::prepareQuery(sqlrcursor_svr *cursor,
 	// * bind(variable,value)
 	// * execute()
 	//
-	// In various circumstances, we may need to fake binds though.  This
+	// We need to do lazy preparing though.
+	//
+	// Under various circumstances, we may need to fake binds.  This
 	// requires the query to be rewritten to include the bind values before
 	// being prepared.  So, we'll defer preparing the query until the
-	// execution phase so that we'll be sure to have all of the bind
-	// values on hand.
+	// execution phase so that we'll be sure to have all of the bind values
+	// on hand.
 
 	// clean up the previous result set
 	closeResultSet(cursor);
@@ -2947,6 +2949,7 @@ bool sqlrcontroller_svr::prepareQuery(sqlrcursor_svr *cursor,
 	cursor->prepared=false;
 	cursor->querywasintercepted=false;
 	cursor->bindswerefaked=false;
+	cursor->fakeinputbindsforthisquery=false;
 
 	// sanity check
 	if (querylen>maxquerysize) {
@@ -2986,10 +2989,7 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor,
 
 		// if we're faking binds then the original
 		// query must be re-prepared
-		if (fakeinputbinds ||
-			cursor->fakeinputbindsforthisquery ||
-			!cursor->supportsNativeBinds()) {
-
+		if (cursor->fakeinputbindsforthisquery) {
 			cursor->prepared=false;
 		}
 	}
@@ -3017,13 +3017,19 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor,
 		}
 
 		// fake input binds if necessary
-		cursor->querywithfakeinputbinds.clear();
+		// * the instance could be configured to fake all input binds
+		// * the specific query might not support native binds
+		// * one of the translations might have set the
+		// 	fakeinputbindsforthisquery flag true
 		if (fakeinputbinds ||
-			cursor->fakeinputbindsforthisquery ||
 			!cursor->supportsNativeBinds(
-					cursor->getQueryBuffer())) {
+					cursor->getQueryBuffer(),
+					cursor->getQueryLength()) ||
+			cursor->fakeinputbindsforthisquery) {
 
 			logDebugMessage("faking binds...");
+
+			cursor->fakeinputbindsforthisquery=true;
 
 			if (cursor->fakeInputBinds()) {
 				if (debugsqlrtranslation) {

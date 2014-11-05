@@ -79,9 +79,10 @@ class mdbtoolscursor : public sqlrcursor_svr {
 				~mdbtoolscursor();
 		bool		open();
 		bool		close();
-		bool		supportsNativeBinds();
+		bool		supportsNativeBinds(const char *query,
+							uint32_t length);
 		bool		executeQuery(const char *query,
-						uint32_t length);
+							uint32_t length);
 		bool		knowsAffectedRows();
 		uint32_t	colCount();
 		const char	*getColumnName(uint32_t col);
@@ -281,7 +282,7 @@ bool mdbtoolscursor::close() {
 	return true;
 }
 
-bool mdbtoolscursor::supportsNativeBinds() {
+bool mdbtoolscursor::supportsNativeBinds(const char *query, uint32_t length) {
 	return false;
 }
 

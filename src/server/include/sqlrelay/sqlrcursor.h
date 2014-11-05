@@ -72,12 +72,12 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 		virtual	bool	close();
 
 		virtual sqlrquerytype_t	queryType(const char *query,
-						uint32_t length);
+							uint32_t length);
 		virtual	bool	isCustomQuery();
 		virtual	bool	prepareQuery(const char *query,
-						uint32_t length);
-		virtual	bool	supportsNativeBinds(const char *query);
-		virtual	bool	supportsNativeBinds();
+							uint32_t length);
+		virtual	bool	supportsNativeBinds(const char *query,
+							uint32_t length);
 		virtual	bool	inputBind(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 

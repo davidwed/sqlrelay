@@ -96,8 +96,9 @@ class freetdscursor : public sqlrcursor_svr {
 		bool		open();
 		bool		close();
 		bool		prepareQuery(const char *query,
-						uint32_t length);
-		bool		supportsNativeBinds();
+							uint32_t length);
+		bool		supportsNativeBinds(const char *query,
+							uint32_t length);
 #ifdef FREETDS_SUPPORTS_CURSORS
 		bool		inputBind(const char *variable,
 						uint16_t variablesize,
@@ -1116,7 +1117,7 @@ bool freetdscursor::prepareQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-bool freetdscursor::supportsNativeBinds() {
+bool freetdscursor::supportsNativeBinds(const char *query, uint32_t length) {
 #ifdef FREETDS_SUPPORTS_CURSORS
 	return true;
 #else

@@ -85,7 +85,8 @@ class postgresqlcursor : public sqlrcursor_svr {
 						uint32_t length);
 		bool		deallocateStatement();
 #endif
-		bool		supportsNativeBinds();
+		bool		supportsNativeBinds(const char *query,
+							uint32_t length);
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
 		bool		inputBind(const char *variable, 
@@ -761,7 +762,7 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 }
 #endif
 
-bool postgresqlcursor::supportsNativeBinds() {
+bool postgresqlcursor::supportsNativeBinds(const char *query, uint32_t length) {
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
 	return true;

@@ -16,6 +16,7 @@ sqlrcursor_svr::sqlrcursor_svr(sqlrconnection_svr *conn, uint16_t id) {
 	prepared=false;
 	querywasintercepted=false;
 	bindswerefaked=false;
+	fakeinputbindsforthisquery=false;
 
 	maxerrorlength=conn->cont->cfgfl->getMaxErrorLength();
 
@@ -69,7 +70,7 @@ bool sqlrcursor_svr::close() {
 }
 
 sqlrquerytype_t sqlrcursor_svr::queryType(const char *query,
-						uint32_t querylength) {
+						uint32_t length) {
 
 	// skip past leading garbage
 	const char	*ptr=conn->cont->skipWhitespaceAndComments(query);
@@ -114,16 +115,13 @@ bool sqlrcursor_svr::isCustomQuery() {
 	return false;
 }
 
-bool sqlrcursor_svr::prepareQuery(const char *query, uint32_t querylength) {
+bool sqlrcursor_svr::prepareQuery(const char *query, uint32_t length) {
 	// by default, do nothing...
 	return true;
 }
 
-bool sqlrcursor_svr::supportsNativeBinds(const char *query) {
-	return supportsNativeBinds();
-}
-
-bool sqlrcursor_svr::supportsNativeBinds() {
+bool sqlrcursor_svr::supportsNativeBinds(const char *query,
+						uint32_t length) {
 	return true;
 }
 
@@ -316,7 +314,7 @@ void sqlrcursor_svr::checkForTempTable(const char *query, uint32_t length) {
 	conn->cont->addSessionTempTableForDrop(tablename.getString());
 }
 
-bool sqlrcursor_svr::executeQuery(const char *query, uint32_t querylength) {
+bool sqlrcursor_svr::executeQuery(const char *query, uint32_t length) {
 	// by default, do nothing...
 	return true;
 }
@@ -638,6 +636,8 @@ void sqlrcursor_svr::performSubstitution(stringbuffer *buffer, int16_t index) {
 
 		buffer->append("'");
 
+	} else if (inbindvars[index].type==CLOB_BIND) {
+		// FIXME: support BLOB_BINDs with an encodeBlob() method
 	} else if (inbindvars[index].type==INTEGER_BIND) {
 		buffer->append(inbindvars[index].value.integerval);
 	} else if (inbindvars[index].type==DOUBLE_BIND) {
