@@ -5,6 +5,8 @@
 #include <defaults.h>
 
 #include <sqlrelay/sqlrclient.h>
+#include <sqlrelay/sqlrutil.h>
+
 #include <rudiments/commandline.h>
 #include <rudiments/file.h>
 #include <rudiments/permissions.h>
@@ -17,7 +19,6 @@
 #include <rudiments/xmldom.h>
 #include <rudiments/stdio.h>
 #include <rudiments/character.h>
-#include <sqlrconfigfile.h>
 
 #include <defines.h>
 

@@ -3,9 +3,7 @@
 
 #include <sqlrelay/private/sqlrserverdll.h>
 
-#include <sqlrcmdline.h>
-#include <sqlrtempdir.h>
-#include <sqlrconfigfile.h>
+#include <sqlrelay/sqlrutil.h>
 #include <sqlrelay/sqlrloggers.h>
 
 #include <rudiments/signalclasses.h>

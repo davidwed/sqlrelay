@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <rudiments/charstring.h>
-#include <sqlrutil.h>
+#include <sqlrelay/sqlrutil.h>
 
 sqlrtempdir::sqlrtempdir(sqlrcmdline *cmdl) {
 	if (cmdl->getLocalStateDir()[0]) {

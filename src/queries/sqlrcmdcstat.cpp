@@ -7,6 +7,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/process.h>
 #include <rudiments/datetime.h>
+#include <datatypes.h>
 #include <debugprint.h>
 
 class sqlrcmdcstat : public sqlrquery {

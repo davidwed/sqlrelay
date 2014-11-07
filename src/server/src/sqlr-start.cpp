@@ -3,8 +3,7 @@
 
 #include <config.h>
 #include <defaults.h>
-#include <sqlrconfigfile.h>
-#include <sqlrcmdline.h>
+#include <sqlrelay/sqlrutil.h>
 #include <rudiments/process.h>
 #include <rudiments/sys.h>
 #include <rudiments/stdio.h>

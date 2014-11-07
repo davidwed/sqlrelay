@@ -1,6 +1,8 @@
 // Copyright (c) 1999-2014  David Muse
 // See the file COPYING for more information
 
+#include <config.h>
+
 #include <sqlrelay/sqlrlistener.h>
 
 #include <rudiments/process.h>

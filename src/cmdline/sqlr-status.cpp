@@ -8,9 +8,7 @@
 #include <rudiments/error.h>
 #include <rudiments/stdio.h>
 #include <sqlrelay/private/sqlrshmdata.h>
-#include <sqlrcmdline.h>
-#include <sqlrconfigfile.h>
-#include <sqlrtempdir.h>
+#include <sqlrelay/sqlrutil.h>
 #include <datatypes.h>
 #include <defines.h>
 #include <config.h>

@@ -7,10 +7,11 @@
 #include <datatypes.h>
 
 #include <sqlrelay/sqlrclient.h>
+#include <sqlrelay/sqlrutil.h>
+
 #include <rudiments/commandline.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
-#include <sqlrconfigfile.h>
 
 class sqlrimport : public xmlsax {
 	public:

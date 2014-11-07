@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <config.h>
-#include <sqlrutil.h>
+#include <sqlrelay/sqlrutil.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/environment.h>
 #include <rudiments/directory.h>

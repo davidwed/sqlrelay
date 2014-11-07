@@ -10,9 +10,6 @@
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 
-// for return values of columnTypeFormat
-#include <datatypes.h>
-
 class sqlrquerycursor;
 
 class SQLRSERVER_DLLSPEC sqlrquery {

@@ -5,10 +5,11 @@
 #include <defaults.h>
 
 #include <sqlrelay/sqlrclient.h>
+#include <sqlrelay/sqlrutil.h>
+
 #include <rudiments/commandline.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
-#include <sqlrconfigfile.h>
 
 int main(int argc, const char **argv) {
 

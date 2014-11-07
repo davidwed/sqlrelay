@@ -35,10 +35,12 @@ install:
 
 installheaders:
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay
-	$(INSTALL) -m 644 sqlrutil.h $(includedir)/sqlrelay
+	$(INSTALL) -m 644 sqlrelay/sqlrutil.h $(includedir)/sqlrelay
+	$(INSTALL) -m 644 sqlrelay/sqlrutildll.h $(includedir)/sqlrelay
 
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrutil.la
 	$(RM) $(includedir)/sqlrelay/sqlrutil.h
+	$(RM) $(includedir)/sqlrelay/sqlrutildll.h
 	$(RM) $(libdir)/libsqlrelay_*
 	$(RM) $(libdir)/libsqlrutil_p*.*

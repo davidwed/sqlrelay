@@ -7,6 +7,7 @@
 #include <rudiments/character.h>
 #include <rudiments/stdio.h>
 
+#include <datatypes.h>
 #include <defines.h>
 
 sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {

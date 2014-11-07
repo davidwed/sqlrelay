@@ -1,8 +1,7 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrcmdline.h>
-#include <sqlrtempdir.h>
+#include <sqlrelay/sqlrutil.h>
 #include <rudiments/snooze.h>
 #include <rudiments/charstring.h>
 #include <rudiments/datetime.h>

@@ -4,7 +4,6 @@
 #ifndef SQLRUTIL_H
 #define SQLRUTIL_H
 
-#include <config.h>
 #include <rudiments/xmlsax.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/parameterstring.h>
@@ -12,7 +11,7 @@
 #include <rudiments/commandline.h>
 #include <rudiments/linkedlist.h>
 
-#include <sqlrutildll.h>
+#include <sqlrelay/sqlrutildll.h>
 
 class SQLRUTIL_DLLSPEC sqlrcmdline : public commandline {
 	public:

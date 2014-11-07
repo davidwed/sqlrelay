@@ -361,6 +361,8 @@ installheaders:
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrpwdencs.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrqueries.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrquery.h $(includedir)/sqlrelay
+	$(INSTALL) -m 644 ../include/sqlrelay/sqlrresultsettranslation.h $(includedir)/sqlrelay
+	$(INSTALL) -m 644 ../include/sqlrelay/sqlrresultsettranslations.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrscaler.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrtranslation.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrtranslations.h $(includedir)/sqlrelay
@@ -396,6 +398,8 @@ uninstall:
 	$(RM) $(includedir)/sqlrelay/sqlrpwdencs.h
 	$(RM) $(includedir)/sqlrelay/sqlrqueries.h
 	$(RM) $(includedir)/sqlrelay/sqlrquery.h
+	$(RM) $(includedir)/sqlrelay/sqlrresultsettranslation.h
+	$(RM) $(includedir)/sqlrelay/sqlrresultsettranslations.h
 	$(RM) $(includedir)/sqlrelay/sqlrscaler.h
 	$(RM) $(includedir)/sqlrelay/sqlrtranslation.h
 	$(RM) $(includedir)/sqlrelay/sqlrtranslations.h

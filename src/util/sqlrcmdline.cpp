@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <defaults.h>
-#include <sqlrutil.h>
+#include <sqlrelay/sqlrutil.h>
 #include <config.h>
 
 sqlrcmdline::sqlrcmdline(int argc, const char **argv) : commandline(argc,argv) {

@@ -4,11 +4,12 @@
 #include <config.h>
 #include <defaults.h>
 
+#include <sqlrelay/sqlrutil.h>
+#include <sqlrelay/sqlrpwdencs.h>
+
 #include <rudiments/commandline.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
-#include <sqlrconfigfile.h>
-#include <sqlrelay/sqlrpwdencs.h>
 
 int main(int argc, const char **argv) {
 

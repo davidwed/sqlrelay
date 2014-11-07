@@ -5,10 +5,11 @@
 #include <defaults.h>
 
 #include <sqlrelay/sqlrclient.h>
+#include <sqlrelay/sqlrutil.h>
+
 #include <rudiments/commandline.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
-#include <sqlrconfigfile.h>
 
 bool exportTable(sqlrcursor *sqlrcur,
 			const char *table, const char *format);
