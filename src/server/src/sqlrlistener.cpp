@@ -166,9 +166,9 @@ bool sqlrlistener::init(int argc, const char **argv) {
 
 	initialized=true;
 
-	cmdl=new cmdline(argc,argv);
+	cmdl=new sqlrcmdline(argc,argv);
 
-	tmpdir=new tempdir(cmdl);
+	tmpdir=new sqlrtempdir(cmdl);
 
 	const char	*localstatedir=cmdl->getLocalStateDir();
 	if (localstatedir && localstatedir[0]) {

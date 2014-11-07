@@ -1,17 +1,17 @@
 // Copyright (c) 1999-2014 David Muse
 // See the file COPYING for more information
 
-#ifndef SQLRUTIL_TEMPDIR_H
-#define SQLRUTIL_TEMPDIR_H
+#ifndef SQLRUTIL_SQLRTEMPDIR_H
+#define SQLRUTIL_SQLRTEMPDIR_H
 
 #include <sqlrutildll.h>
 
-#include <cmdline.h>
+#include <sqlrcmdline.h>
 
-class SQLRUTIL_DLLSPEC tempdir {
+class SQLRUTIL_DLLSPEC sqlrtempdir {
 	public:
-			tempdir(cmdline *cmdl);
-			~tempdir();
+			sqlrtempdir(sqlrcmdline *cmdl);
+			~sqlrtempdir();
 		char	*getString();
 		int32_t	getLength();
 	protected:

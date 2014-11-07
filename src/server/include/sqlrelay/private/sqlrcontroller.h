@@ -131,7 +131,7 @@
 
 		static void	alarmHandler(int32_t signum);
 
-		cmdline		*cmdl;
+		sqlrcmdline	*cmdl;
 
 		sqlrconnection_svr	*conn;
 
@@ -157,7 +157,7 @@
 		bool		dbchanged;
 		char		*originaldb;
 
-		tempdir		*tmpdir;
+		sqlrtempdir	*tmpdir;
 
 		connectstringcontainer	*constr;
 

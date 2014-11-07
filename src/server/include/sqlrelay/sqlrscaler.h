@@ -4,8 +4,8 @@
 #include <sqlrelay/private/sqlrserverdll.h>
 
 #include <sqlrconfigfile.h>
-#include <cmdline.h>
-#include <tempdir.h>
+#include <sqlrcmdline.h>
+#include <sqlrtempdir.h>
 
 #include <rudiments/semaphoreset.h>
 #include <rudiments/sharedmemory.h>
@@ -69,8 +69,8 @@ class SQLRSERVER_DLLSPEC scaler {
 
 		bool		debug;
 
-		tempdir		*tmpdir;
-		cmdline		*cmdl;
+		sqlrtempdir	*tmpdir;
+		sqlrcmdline	*cmdl;
 
 		bool		iswindows;
 

@@ -1,8 +1,8 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <cmdline.h>
-#include <tempdir.h>
+#include <sqlrcmdline.h>
+#include <sqlrtempdir.h>
 #include <rudiments/snooze.h>
 #include <rudiments/charstring.h>
 #include <rudiments/datetime.h>
@@ -37,8 +37,8 @@ class sqlrcachemanager {
 		dirnode	*firstdir;
 		dirnode	*currentdir;
 
-		cmdline	*cmdl;
-		tempdir	*tmpdir;
+		sqlrcmdline	*cmdl;
+		sqlrtempdir	*tmpdir;
 
 		char	*pidfile;
 };
@@ -60,8 +60,8 @@ dirnode::~dirnode() {
 
 sqlrcachemanager::sqlrcachemanager(int argc, const char **argv) {
 
-	cmdl=new cmdline(argc,argv);
-	tmpdir=new tempdir(cmdl);
+	cmdl=new sqlrcmdline(argc,argv);
+	tmpdir=new sqlrtempdir(cmdl);
 	pidfile=NULL;
 
 	// get the scaninterval

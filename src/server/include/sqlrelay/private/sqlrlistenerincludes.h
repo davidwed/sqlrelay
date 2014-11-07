@@ -3,8 +3,8 @@
 
 #include <sqlrelay/private/sqlrserverdll.h>
 
-#include <cmdline.h>
-#include <tempdir.h>
+#include <sqlrcmdline.h>
+#include <sqlrtempdir.h>
 #include <sqlrconfigfile.h>
 #include <sqlrelay/sqlrloggers.h>
 

@@ -11,8 +11,8 @@ endif
 CPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(DLLEXPORTS) $(TMPDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(CONFIGFILECPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
 LIBS = $(RUDIMENTSLIBS)
 
-SRCS = cmdline.cpp tempdir.cpp sqlrconfigfile.cpp
-LOBJS = cmdline.lo tempdir.lo sqlrconfigfile.lo
+SRCS = sqlrcmdline.cpp sqlrtempdir.cpp sqlrconfigfile.cpp
+LOBJS = sqlrcmdline.lo sqlrtempdir.lo sqlrconfigfile.lo
 
 .SUFFIXES: .lo
 

@@ -60,7 +60,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	init=true;
 
 	// read the commandline
-	cmdl=new cmdline(argc,argv);
+	cmdl=new sqlrcmdline(argc,argv);
 
 	// get the id
 	const char	*tmpid=cmdl->getValue("-id");
@@ -70,7 +70,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	}
 	id=charstring::duplicate(tmpid);
 
-	tmpdir=new tempdir(cmdl);
+	tmpdir=new sqlrtempdir(cmdl);
 
 	// check for listener's pid file
 	// (Look a few times.  It might not be there right away.  The listener

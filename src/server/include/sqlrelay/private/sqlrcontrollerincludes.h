@@ -16,7 +16,7 @@
 #include <rudiments/datetime.h>
 #include <rudiments/singlylinkedlist.h>
 
-#include <tempdir.h>
+#include <sqlrtempdir.h>
 
 #include <sqlrconfigfile.h>
 #include <sqlrelay/sqlrserverconnection.h>
@@ -34,4 +34,4 @@
 
 #include <sqlrelay/private/sqlrshmdata.h>
 
-#include <cmdline.h>
+#include <sqlrcmdline.h>

@@ -331,9 +331,9 @@ copy /Y config.windows.h config.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\cmdline.cpp" />
+    <ClCompile Include="..\sqlrcmdline.cpp" />
     <ClCompile Include="..\sqlrconfigfile.cpp" />
-    <ClCompile Include="..\tempdir.cpp" />
+    <ClCompile Include="..\sqlrtempdir.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

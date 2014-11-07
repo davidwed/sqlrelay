@@ -8,9 +8,9 @@
 #include <rudiments/error.h>
 #include <rudiments/stdio.h>
 #include <sqlrelay/private/sqlrshmdata.h>
-#include <cmdline.h>
+#include <sqlrcmdline.h>
 #include <sqlrconfigfile.h>
-#include <tempdir.h>
+#include <sqlrtempdir.h>
 #include <datatypes.h>
 #include <defines.h>
 #include <config.h>
@@ -29,7 +29,7 @@ int main(int argc, const char **argv) {
 	#include <version.h>
 
 	// parse the command line
-	cmdline	cmdl(argc,argv);
+	sqlrcmdline	cmdl(argc,argv);
 
 	// parse the config file
 	sqlrconfigfile	cfgfl;
@@ -38,7 +38,7 @@ int main(int argc, const char **argv) {
 	}
 	
 	// get the id filename and key
-	tempdir		tmpdir(&cmdl);
+	sqlrtempdir	tmpdir(&cmdl);
 	stringbuffer	idfilename;
 	idfilename.append(tmpdir.getString());
 	idfilename.append("/ipc/");

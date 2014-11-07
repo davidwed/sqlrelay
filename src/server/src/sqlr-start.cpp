@@ -4,7 +4,7 @@
 #include <config.h>
 #include <defaults.h>
 #include <sqlrconfigfile.h>
-#include <cmdline.h>
+#include <sqlrcmdline.h>
 #include <rudiments/process.h>
 #include <rudiments/sys.h>
 #include <rudiments/stdio.h>
@@ -246,7 +246,7 @@ int main(int argc, const char **argv) {
 	#include <version.h>
 
 	// get the command line args
-	cmdline	cmdl(argc,argv);
+	sqlrcmdline	cmdl(argc,argv);
 	const char	*localstatedir=cmdl.getValue("-localstatedir");
 	bool		strace=cmdl.found("-strace");
 	const char	*id=cmdl.getId();

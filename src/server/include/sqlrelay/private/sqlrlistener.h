@@ -88,7 +88,7 @@
 		uint64_t	listenertimeout;
 
 		char		*pidfile;
-		tempdir		*tmpdir;
+		sqlrtempdir	*tmpdir;
 
 		char		*logdir;
 		char		*debugdir;
@@ -123,7 +123,7 @@
 		regularexpression	*allowed;
 		regularexpression	*denied;
 
-		cmdline		*cmdl;
+		sqlrcmdline	*cmdl;
 
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;

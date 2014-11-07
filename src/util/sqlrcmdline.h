@@ -1,13 +1,13 @@
-#ifndef SQLRUTIL_CMDLINE_H
-#define SQLRUTIL_CMDLINE_H
+#ifndef SQLRUTIL_SQLRCMDLINE_H
+#define SQLRUTIL_SQLRCMDLINE_H
 
 #include <sqlrutildll.h>
 
 #include <rudiments/commandline.h>
 
-class SQLRUTIL_DLLSPEC cmdline : public commandline {
+class SQLRUTIL_DLLSPEC sqlrcmdline : public commandline {
 	public:
-			cmdline(int argc, const char **argv);
+			sqlrcmdline(int argc, const char **argv);
 
 		const char	*getConfig() const;
 		const char	*getId() const;

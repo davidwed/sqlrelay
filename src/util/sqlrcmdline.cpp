@@ -2,16 +2,16 @@
 // See the file COPYING for more information
 
 #include <defaults.h>
-#include <cmdline.h>
+#include <sqlrcmdline.h>
 #include <config.h>
 
-cmdline::cmdline(int argc, const char **argv) : commandline(argc,argv) {
+sqlrcmdline::sqlrcmdline(int argc, const char **argv) : commandline(argc,argv) {
 	setId();
 	setConfig();
 	setLocalStateDir();
 }
 
-void cmdline::setId() {
+void sqlrcmdline::setId() {
 
 	// get the id from the command line
 	id=getValue("-id");
@@ -20,7 +20,7 @@ void cmdline::setId() {
 	}
 }
 
-void cmdline::setConfig() {
+void sqlrcmdline::setConfig() {
 
 	// get the config file from the command line
 	config=getValue("-config");
@@ -29,20 +29,20 @@ void cmdline::setConfig() {
 	}
 }
 
-void cmdline::setLocalStateDir() {
+void sqlrcmdline::setLocalStateDir() {
 
 	// get the localstatedir from the command line
 	localstatedir=getValue("-localstatedir");
 }
 
-const char *cmdline::getConfig() const {
+const char *sqlrcmdline::getConfig() const {
 	return config;
 }
 
-const char *cmdline::getId() const {
+const char *sqlrcmdline::getId() const {
 	return id;
 }
 
-const char *cmdline::getLocalStateDir() const {
+const char *sqlrcmdline::getLocalStateDir() const {
 	return localstatedir;
 }

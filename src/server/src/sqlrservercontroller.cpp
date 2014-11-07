@@ -211,10 +211,10 @@ sqlrservercontroller::~sqlrservercontroller() {
 bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// process command line
-	cmdl=new cmdline(argc,argv);
+	cmdl=new sqlrcmdline(argc,argv);
 
 	// set the tmpdir
-	tmpdir=new tempdir(cmdl);
+	tmpdir=new sqlrtempdir(cmdl);
 
 	// set the log and debug dirs
 	const char	*localstatedir=cmdl->getLocalStateDir();

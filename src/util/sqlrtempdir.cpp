@@ -2,9 +2,9 @@
 // See the file COPYING for more information
 
 #include <rudiments/charstring.h>
-#include <tempdir.h>
+#include <sqlrtempdir.h>
 
-tempdir::tempdir(cmdline *cmdl) {
+sqlrtempdir::sqlrtempdir(sqlrcmdline *cmdl) {
 	if (cmdl->getLocalStateDir()[0]) {
 		tmpdirlen=charstring::length(cmdl->getLocalStateDir())+13;
 		tmpdir=new char[tmpdirlen+1];
@@ -16,14 +16,14 @@ tempdir::tempdir(cmdline *cmdl) {
 	}
 }
 
-tempdir::~tempdir() {
+sqlrtempdir::~sqlrtempdir() {
 	delete[] tmpdir;
 }
 
-char *tempdir::getString() {
+char *sqlrtempdir::getString() {
 	return tmpdir;
 }
 
-int32_t tempdir::getLength() {
+int32_t sqlrtempdir::getLength() {
 	return tmpdirlen;
 }
