@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrlistener.h>
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrlogger.h>
 #include <rudiments/charstring.h>
@@ -16,10 +16,10 @@ class debug : public sqlrlogger {
 			debug(xmldomnode *parameters);
 			~debug();
 
-		bool	init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon);
+		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
 		bool	run(sqlrlistener *sqlrl,
-					sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+					sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					sqlrlogger_loglevel_t level,
 					sqlrlogger_eventtype_t event,
 					const char *info);
@@ -57,7 +57,7 @@ debug::~debug() {
 	delete[] dbgfilename;
 }
 
-bool debug::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
+bool debug::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
 
 	closeDebugFile();
 	delete[] dbgfilename;
@@ -85,8 +85,8 @@ bool debug::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 }
 
 bool debug::run(sqlrlistener *sqlrl,
-				sqlrconnection_svr *sqlrcon,
-				sqlrcursor_svr *sqlrcur,
+				sqlrserverconnection *sqlrcon,
+				sqlrservercursor *sqlrcur,
 				sqlrlogger_loglevel_t level,
 				sqlrlogger_eventtype_t event,
 				const char *info) {

@@ -1,7 +1,7 @@
 // Copyright (c) 2006 David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/character.h>
@@ -38,20 +38,20 @@ struct outputbindvar {
 
 struct cursorbindvar {
 	const char	*variable;
-	sqlrcursor_svr	*cursor;
+	sqlrservercursor	*cursor;
 };
 
-class routerconnection : public sqlrconnection_svr {
+class routerconnection : public sqlrserverconnection {
 	friend class routercursor;
 	public:
-			routerconnection(sqlrcontroller_svr *cont);
+			routerconnection(sqlrservercontroller *cont);
 			~routerconnection();
 	private:
 		bool		supportsAuthOnDatabase();
 		void		handleConnectString();
 		bool		logIn(const char **error);
-		sqlrcursor_svr	*newCursor(uint16_t id);
-		void		deleteCursor(sqlrcursor_svr *curs);
+		sqlrservercursor	*newCursor(uint16_t id);
+		void		deleteCursor(sqlrservercursor *curs);
 		void		logOut();
 		bool		autoCommitOn();
 		bool		autoCommitOff();
@@ -95,10 +95,10 @@ class routerconnection : public sqlrconnection_svr {
 		const char	*error;
 };
 
-class routercursor : public sqlrcursor_svr {
+class routercursor : public sqlrservercursor {
 	friend class routerconnection;
 	private:
-				routercursor(sqlrconnection_svr *conn,
+				routercursor(sqlrserverconnection *conn,
 								uint16_t id);
 				~routercursor();
 		bool		prepareQuery(const char *query,
@@ -180,7 +180,7 @@ class routercursor : public sqlrcursor_svr {
 						int16_t *isnull);
 		bool		outputBindCursor(const char *variable,
 						uint16_t variablesize,
-						sqlrcursor_svr *cursor);
+						sqlrservercursor *cursor);
 		bool		getLobOutputBindLength(uint16_t index,
 						uint64_t *length);
 		bool		getLobOutputBindSegment(uint16_t index,
@@ -247,8 +247,8 @@ class routercursor : public sqlrcursor_svr {
 		regularexpression	preserverows;
 };
 
-routerconnection::routerconnection(sqlrcontroller_svr *cont) :
-					sqlrconnection_svr(cont) {
+routerconnection::routerconnection(sqlrservercontroller *cont) :
+					sqlrserverconnection(cont) {
 	cons=NULL;
 	cur=NULL;
 	beginquery=NULL;
@@ -332,12 +332,12 @@ bool routerconnection::logIn(const char **error) {
 	return true;
 }
 
-sqlrcursor_svr *routerconnection::newCursor(uint16_t id) {
-	return (sqlrcursor_svr *)new routercursor(
-					(sqlrconnection_svr *)this,id);
+sqlrservercursor *routerconnection::newCursor(uint16_t id) {
+	return (sqlrservercursor *)new routercursor(
+					(sqlrserverconnection *)this,id);
 }
 
-void routerconnection::deleteCursor(sqlrcursor_svr *curs) {
+void routerconnection::deleteCursor(sqlrservercursor *curs) {
 	delete (routercursor *)curs;
 }
 
@@ -560,8 +560,8 @@ bool routerconnection::getLastInsertId(uint64_t *id) {
 	return true;
 }
 
-routercursor::routercursor(sqlrconnection_svr *conn, uint16_t id) :
-						sqlrcursor_svr(conn,id) {
+routercursor::routercursor(sqlrserverconnection *conn, uint16_t id) :
+						sqlrservercursor(conn,id) {
 	routerconn=(routerconnection *)conn;
 	nextrow=0;
 	con=NULL;
@@ -848,7 +848,7 @@ bool routercursor::outputBindClob(const char *variable,
 
 bool routercursor::outputBindCursor(const char *variable,
 					uint16_t variablesize,
-					sqlrcursor_svr *cursor) {
+					sqlrservercursor *cursor) {
 	cur->defineOutputBindCursor(variable+1);
 	cbv[cbcount].variable=variable+1;
 	cbv[cbcount].cursor=cursor;
@@ -959,7 +959,7 @@ void routercursor::checkForTempTable(const char *query, uint32_t length) {
 
 	// for non-oracle db's
 	if (charstring::compare(con->identify(),"oracle8")) {
-		sqlrcursor_svr::checkForTempTable(query,length);
+		sqlrservercursor::checkForTempTable(query,length);
 		return;
 	}
 
@@ -1182,7 +1182,7 @@ void routerconnection::beginQueryFailed(uint16_t index) {
 }
 
 extern "C" {
-	sqlrconnection_svr *new_routerconnection(sqlrcontroller_svr *cont) {
+	sqlrserverconnection *new_routerconnection(sqlrservercontroller *cont) {
 		return new routerconnection(cont);
 	}
 }

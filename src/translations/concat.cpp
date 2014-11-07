@@ -1,7 +1,7 @@
 // Copyright (c) 2013  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
 #include <sqlrelay/sqlparser.h>
@@ -13,16 +13,16 @@ class concat : public sqlrtranslation {
 			concat(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 	private:
-		bool translateConcat(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool translateConcat(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldomnode *querynode,
 					bool *found);
-		bool translatePlus(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool translatePlus(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldomnode *querynode,
 					bool *found);
 		xmldomnode	*parameters;
@@ -33,8 +33,8 @@ concat::concat(sqlrtranslations *sqlts, xmldomnode *parameters, bool debug) :
 	this->parameters=parameters;
 }
 
-bool concat::run(sqlrconnection_svr *sqlrcon,
-				sqlrcursor_svr *sqlrcur,
+bool concat::run(sqlrserverconnection *sqlrcon,
+				sqlrservercursor *sqlrcur,
 				xmldom *querytree) {
 
 	if (!charstring::compareIgnoringCase(
@@ -69,8 +69,8 @@ bool concat::run(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool concat::translateConcat(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool concat::translateConcat(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldomnode *querynode,
 					bool *found) {
 	debugFunction();
@@ -117,8 +117,8 @@ bool concat::translateConcat(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool concat::translatePlus(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool concat::translatePlus(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldomnode *querynode,
 					bool *found) {
 	debugFunction();

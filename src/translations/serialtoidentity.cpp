@@ -12,8 +12,8 @@ class serialtoidentity : public sqlrtranslation {
 			serialtoidentity(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 };
 
@@ -23,8 +23,8 @@ serialtoidentity::serialtoidentity(sqlrtranslations *sqlts,
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-bool serialtoidentity::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool serialtoidentity::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 	debugFunction();
 

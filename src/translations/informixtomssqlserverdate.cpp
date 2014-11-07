@@ -35,16 +35,16 @@ class informixtomssqlserverdate : public sqlrtranslation {
 			informixtomssqlserverdate(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 	private:
-		bool	translateFunctions(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+		bool	translateFunctions(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldomnode *node,
 						bool *found);
-		bool	translateExtend(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+		bool	translateExtend(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldomnode *node);
 		void	evaluateIntervalQualifier(timeparts_t start,
 						timeparts_t end,
@@ -55,14 +55,14 @@ class informixtomssqlserverdate : public sqlrtranslation {
 		void	tweakDateString(xmldomnode *functionnode,
 						const char *prepend,
 						const char *append);
-		bool	translateCurrentDate(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+		bool	translateCurrentDate(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldomnode *node);
-		bool	translateDateTime(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+		bool	translateDateTime(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldomnode *node);
-		bool	translateInterval(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+		bool	translateInterval(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldomnode *node);
 		void	translateDateTimeString(const char *indtstring,
 						stringbuffer *outdtstring,
@@ -82,8 +82,8 @@ informixtomssqlserverdate::informixtomssqlserverdate(
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-bool informixtomssqlserverdate::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool informixtomssqlserverdate::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 
 	// The methods called inside of here rebuild the tree torrentially and
@@ -99,8 +99,8 @@ bool informixtomssqlserverdate::run(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool informixtomssqlserverdate::translateFunctions(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+bool informixtomssqlserverdate::translateFunctions(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldomnode *node,
 						bool *found) {
 	debugFunction();
@@ -146,8 +146,8 @@ bool informixtomssqlserverdate::translateFunctions(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool informixtomssqlserverdate::translateExtend(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+bool informixtomssqlserverdate::translateExtend(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldomnode *node) {
 	debugFunction();
 
@@ -350,8 +350,8 @@ void informixtomssqlserverdate::tweakDateString(xmldomnode *functionnode,
 	}
 }
 
-bool informixtomssqlserverdate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+bool informixtomssqlserverdate::translateCurrentDate(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldomnode *node) {
 
 	// "function" -> sysdatetime()
@@ -438,8 +438,8 @@ bool informixtomssqlserverdate::translateCurrentDate(sqlrconnection_svr *sqlrcon
 	return true;
 }
 
-bool informixtomssqlserverdate::translateDateTime(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+bool informixtomssqlserverdate::translateDateTime(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldomnode *node) {
 
 	// datetime(...) interval_qualifier -> convert(datetime, ..., format)
@@ -516,8 +516,8 @@ bool informixtomssqlserverdate::translateDateTime(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool informixtomssqlserverdate::translateInterval(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+bool informixtomssqlserverdate::translateInterval(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldomnode *node) {
 	// FIXME... sqlserver doesn't support intervals, use DATEADD?
 	// for now, don't do anything here

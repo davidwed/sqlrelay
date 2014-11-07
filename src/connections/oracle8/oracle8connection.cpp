@@ -7,7 +7,7 @@
 	#define DLLSPEC
 #endif
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #ifdef HAVE_ORACLE_8i
 	#include <rudiments/regularexpression.h>
@@ -85,10 +85,10 @@ struct datebind {
 	OCIDate		*ocidate;
 };
 
-class DLLSPEC oracle8connection : public sqlrconnection_svr {
+class DLLSPEC oracle8connection : public sqlrserverconnection {
 	friend class oracle8cursor;
 	public:
-				oracle8connection(sqlrcontroller_svr *cont);
+				oracle8connection(sqlrservercontroller *cont);
 				~oracle8connection();
 	private:
 		void		handleConnectString();
@@ -97,8 +97,8 @@ class DLLSPEC oracle8connection : public sqlrconnection_svr {
 #endif
 		bool		logIn(const char **error);
 		const char	*logInError(const char *errmsg);
-		sqlrcursor_svr	*newCursor(uint16_t id);
-		void		deleteCursor(sqlrcursor_svr *curs);
+		sqlrservercursor	*newCursor(uint16_t id);
+		void		deleteCursor(sqlrservercursor *curs);
 		void		logOut();
 #ifdef OCI_ATTR_PROXY_CREDENTIALS
 		bool		changeUser(const char *newuser,
@@ -173,10 +173,10 @@ class DLLSPEC oracle8connection : public sqlrconnection_svr {
 		bool		disablekeylookup;
 };
 
-class DLLSPEC oracle8cursor : public sqlrcursor_svr {
+class DLLSPEC oracle8cursor : public sqlrservercursor {
 	friend class oracle8connection;
 	private:
-				oracle8cursor(sqlrconnection_svr *conn,
+				oracle8cursor(sqlrserverconnection *conn,
 								uint16_t id);
 				~oracle8cursor();
 		void		allocateResultSetBuffers(uint32_t fetchatonce,
@@ -243,7 +243,7 @@ class DLLSPEC oracle8cursor : public sqlrcursor_svr {
 						int16_t *isnull);
 		bool		outputBindCursor(const char *variable,
 						uint16_t variablesize,
-						sqlrcursor_svr *cursor);
+						sqlrservercursor *cursor);
 #ifdef HAVE_ORACLE_8i
 		bool		inputBindBlob(const char *variable, 
 						uint16_t variablesize,
@@ -408,8 +408,8 @@ class DLLSPEC oracle8cursor : public sqlrcursor_svr {
 #endif
 };
 
-oracle8connection::oracle8connection(sqlrcontroller_svr *cont) :
-						sqlrconnection_svr(cont) {
+oracle8connection::oracle8connection(sqlrservercontroller *cont) :
+						sqlrserverconnection(cont) {
 	stmtmode=OCI_DEFAULT;
 
 	env=NULL;
@@ -955,12 +955,12 @@ const char *oracle8connection::logInError(const char *errmsg) {
 	return errormessage.getString();
 }
 
-sqlrcursor_svr *oracle8connection::newCursor(uint16_t id) {
-	return (sqlrcursor_svr *)new oracle8cursor(
-					(sqlrconnection_svr *)this,id);
+sqlrservercursor *oracle8connection::newCursor(uint16_t id) {
+	return (sqlrservercursor *)new oracle8cursor(
+					(sqlrserverconnection *)this,id);
 }
 
-void oracle8connection::deleteCursor(sqlrcursor_svr *curs) {
+void oracle8connection::deleteCursor(sqlrservercursor *curs) {
 	delete (oracle8cursor *)curs;
 }
 
@@ -992,7 +992,7 @@ bool oracle8connection::changeUser(const char *newuser,
 	// support proxy credentials, use the sqlrconnection
 	// class's default changeUser() method
 	if (!supportsproxycredentials) {
-		return sqlrconnection_svr::changeUser(newuser,newpassword);
+		return sqlrserverconnection::changeUser(newuser,newpassword);
 	}
 
 	// delete any previously existing "newsessions"
@@ -1867,8 +1867,8 @@ const char *oracle8connection::getLastInsertIdQuery() {
 	return lastinsertidquery;
 }
 
-oracle8cursor::oracle8cursor(sqlrconnection_svr *conn, uint16_t id) :
-						sqlrcursor_svr(conn,id) {
+oracle8cursor::oracle8cursor(sqlrserverconnection *conn, uint16_t id) :
+						sqlrservercursor(conn,id) {
 
 	stmt=NULL;
 	stmttype=0;
@@ -2601,7 +2601,7 @@ bool oracle8cursor::outputBind(const char *variable,
 
 bool oracle8cursor::outputBindCursor(const char *variable,
 					uint16_t variablesize,
-					sqlrcursor_svr *cursor) {
+					sqlrservercursor *cursor) {
 
 #ifdef OCI_STMT_CACHE
 	// If the statement cache is in use then OCIStmtExecute will crash
@@ -3297,7 +3297,7 @@ void oracle8cursor::errorMessage(char *errorbuffer,
 	} else {
 
 		// otherwise fall back to default implementation
-		sqlrcursor_svr::errorMessage(errorbuffer,
+		sqlrservercursor::errorMessage(errorbuffer,
 						errorbufferlength,
 						errorlength,
 						errorcode,
@@ -3631,8 +3631,8 @@ void oracle8cursor::closeResultSet() {
 }
 
 extern "C" {
-	DLLSPEC sqlrconnection_svr *new_oracle8connection(
-					sqlrcontroller_svr *cont) {
+	DLLSPEC sqlrserverconnection *new_oracle8connection(
+					sqlrservercontroller *cont) {
 		return new oracle8connection(cont);
 	}
 }

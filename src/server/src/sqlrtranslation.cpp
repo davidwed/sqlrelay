@@ -16,8 +16,8 @@ sqlrtranslation::sqlrtranslation(sqlrtranslations *sqlts,
 sqlrtranslation::~sqlrtranslation() {
 }
 
-bool sqlrtranslation::run(sqlrconnection_svr *sqlrcon,
-				sqlrcursor_svr *sqlrcur,
+bool sqlrtranslation::run(sqlrserverconnection *sqlrcon,
+				sqlrservercursor *sqlrcur,
 				xmldom *querytree) {
 	return true;
 }

@@ -11,8 +11,8 @@
 #include <rudiments/dynamiclib.h>
 #include <sqlrelay/sqlrquery.h>
 
-class sqlrconnection_svr;
-class sqlrcursor_svr;
+class sqlrserverconnection;
+class sqlrservercursor;
 
 class SQLRSERVER_DLLSPEC sqlrqueryplugin {
 	public:
@@ -26,7 +26,7 @@ class SQLRSERVER_DLLSPEC sqlrqueries {
 			~sqlrqueries();
 
 		bool		loadQueries(const char *queries);
-		sqlrquerycursor	*match(sqlrconnection_svr *sqlrcon,
+		sqlrquerycursor	*match(sqlrserverconnection *sqlrcon,
 						const char *querystring,
 						uint32_t querylength,
 						uint16_t id);

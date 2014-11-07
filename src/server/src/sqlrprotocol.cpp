@@ -3,8 +3,8 @@
 
 #include <sqlrelay/sqlrprotocol.h>
 
-sqlrprotocol::sqlrprotocol(sqlrcontroller_svr *cont,
-				sqlrconnection_svr *conn) {
+sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont,
+				sqlrserverconnection *conn) {
 	this->cont=cont;
 	this->conn=conn;
 	this->clientsock=NULL;

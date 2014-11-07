@@ -16,8 +16,8 @@ sqlwriter::~sqlwriter() {
 	debugFunction();
 }
 
-bool sqlwriter::write(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool sqlwriter::write(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *tree,
 					stringbuffer *output) {
 	debugFunction();
@@ -26,8 +26,8 @@ bool sqlwriter::write(sqlrconnection_svr *sqlrcon,
 			output,false);
 }
 
-bool sqlwriter::write(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool sqlwriter::write(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldomnode *tree,
 					stringbuffer *output,
 					bool omitsiblings) {

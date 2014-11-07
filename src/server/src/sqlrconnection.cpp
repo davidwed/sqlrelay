@@ -1,13 +1,13 @@
 // Copyright (c) 1999-2014  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <rudiments/hostentry.h>
 
 #include <defines.h>
 
-sqlrconnection_svr::sqlrconnection_svr(sqlrcontroller_svr *cont) {
+sqlrserverconnection::sqlrserverconnection(sqlrservercontroller *cont) {
 
 	this->cont=cont;
 
@@ -27,46 +27,46 @@ sqlrconnection_svr::sqlrconnection_svr(sqlrcontroller_svr *cont) {
 	dbhostiploop=0;
 }
 
-sqlrconnection_svr::~sqlrconnection_svr() {
+sqlrserverconnection::~sqlrserverconnection() {
 	delete[] error;
 	delete[] dbhostname;
 	delete[] dbipaddress;
 }
 
-bool sqlrconnection_svr::mustDetachBeforeLogIn() {
+bool sqlrserverconnection::mustDetachBeforeLogIn() {
 	return false;
 }
 
-bool sqlrconnection_svr::supportsAuthOnDatabase() {
+bool sqlrserverconnection::supportsAuthOnDatabase() {
 	return true;
 }
 
-bool sqlrconnection_svr::changeUser(const char *newuser,
+bool sqlrserverconnection::changeUser(const char *newuser,
 					const char *newpassword) {
 	return cont->changeUser(newuser,newpassword);
 }
 
-bool sqlrconnection_svr::autoCommitOn() {
+bool sqlrserverconnection::autoCommitOn() {
 	fakeautocommit=true;
 	autocommit=true;
 	return true;
 }
 
-bool sqlrconnection_svr::autoCommitOff() {
+bool sqlrserverconnection::autoCommitOff() {
 	fakeautocommit=true;
 	autocommit=false;
 	return true;
 }
 
-bool sqlrconnection_svr::isTransactional() {
+bool sqlrserverconnection::isTransactional() {
 	return true;
 }
 
-bool sqlrconnection_svr::supportsTransactionBlocks() {
+bool sqlrserverconnection::supportsTransactionBlocks() {
 	return true;
 }
 
-bool sqlrconnection_svr::begin() {
+bool sqlrserverconnection::begin() {
 
 	// re-init error data
 	clearError();
@@ -85,7 +85,7 @@ bool sqlrconnection_svr::begin() {
 	bool		retval=false;
 
 	// run the query...
-	sqlrcursor_svr	*begincur=cont->newCursor();
+	sqlrservercursor	*begincur=cont->newCursor();
 	if (begincur->open() &&
 		begincur->prepareQuery(beginquery,beginquerylen)) {
 		retval=begincur->executeQuery(beginquery,beginquerylen);
@@ -111,11 +111,11 @@ bool sqlrconnection_svr::begin() {
 	return retval;
 }
 
-const char *sqlrconnection_svr::beginTransactionQuery() {
+const char *sqlrserverconnection::beginTransactionQuery() {
 	return "BEGIN";
 }
 
-bool sqlrconnection_svr::commit() {
+bool sqlrserverconnection::commit() {
 
 	// re-init error data
 	clearError();
@@ -126,7 +126,7 @@ bool sqlrconnection_svr::commit() {
 	bool		retval=false;
 
 	// run the query...
-	sqlrcursor_svr	*commitcur=cont->newCursor();
+	sqlrservercursor	*commitcur=cont->newCursor();
 	if (commitcur->open() &&
 		commitcur->prepareQuery(commitquery,commitquerylen)) {
 		retval=commitcur->executeQuery(commitquery,commitquerylen);
@@ -152,7 +152,7 @@ bool sqlrconnection_svr::commit() {
 	return retval;
 }
 
-bool sqlrconnection_svr::rollback() {
+bool sqlrserverconnection::rollback() {
 
 	// re-init error data
 	clearError();
@@ -163,7 +163,7 @@ bool sqlrconnection_svr::rollback() {
 	bool		retval=false;
 
 	// run the query...
-	sqlrcursor_svr	*rbcur=cont->newCursor();
+	sqlrservercursor	*rbcur=cont->newCursor();
 	if (rbcur->open() &&
 		rbcur->prepareQuery(rollbackquery,rollbackquerylen)) {
 		retval=rbcur->executeQuery(rollbackquery,rollbackquerylen);
@@ -189,7 +189,7 @@ bool sqlrconnection_svr::rollback() {
 	return retval;
 }
 
-bool sqlrconnection_svr::selectDatabase(const char *database) {
+bool sqlrserverconnection::selectDatabase(const char *database) {
 
 	// re-init error data
 	clearError();
@@ -222,7 +222,7 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 
 	// run the query...
 	bool	retval=false;
-	sqlrcursor_svr	*sdcur=cont->newCursor();
+	sqlrservercursor	*sdcur=cont->newCursor();
 	if (sdcur->open() &&
 		sdcur->prepareQuery(sdquery,sdquerylen) &&
 		sdcur->executeQuery(sdquery,sdquerylen)) {
@@ -244,11 +244,11 @@ bool sqlrconnection_svr::selectDatabase(const char *database) {
 	return retval;
 }
 
-const char *sqlrconnection_svr::selectDatabaseQuery() {
+const char *sqlrserverconnection::selectDatabaseQuery() {
 	return NULL;
 }
 
-char *sqlrconnection_svr::getCurrentDatabase() {
+char *sqlrserverconnection::getCurrentDatabase() {
 
 	// get the get current database query base
 	const char	*gcdquery=getCurrentDatabaseQuery();
@@ -263,7 +263,7 @@ char *sqlrconnection_svr::getCurrentDatabase() {
 
 	// run the query...
 	char	*retval=NULL;
-	sqlrcursor_svr	*gcdcur=cont->newCursor();
+	sqlrservercursor	*gcdcur=cont->newCursor();
 	if (gcdcur->open() &&
 		gcdcur->prepareQuery(gcdquery,gcdquerylen) &&
 		gcdcur->executeQuery(gcdquery,gcdquerylen)) {
@@ -285,11 +285,11 @@ char *sqlrconnection_svr::getCurrentDatabase() {
 	return retval;
 }
 
-const char *sqlrconnection_svr::getCurrentDatabaseQuery() {
+const char *sqlrserverconnection::getCurrentDatabaseQuery() {
 	return NULL;
 }
 
-bool sqlrconnection_svr::getLastInsertId(uint64_t *id) {
+bool sqlrserverconnection::getLastInsertId(uint64_t *id) {
 
 	// re-init error data
 	clearError();
@@ -309,7 +309,7 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id) {
 
 	// run the query...
 	bool	retval=false;
-	sqlrcursor_svr	*liicur=cont->newCursor();
+	sqlrservercursor	*liicur=cont->newCursor();
 	if (liicur->open() &&
 		liicur->prepareQuery(liiquery,liiquerylen) &&
 		liicur->executeQuery(liiquery,liiquerylen)) {
@@ -345,11 +345,11 @@ bool sqlrconnection_svr::getLastInsertId(uint64_t *id) {
 	return retval;
 }
 
-const char *sqlrconnection_svr::getLastInsertIdQuery() {
+const char *sqlrserverconnection::getLastInsertIdQuery() {
 	return NULL;
 }
 
-bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
+bool sqlrserverconnection::setIsolationLevel(const char *isolevel) {
 
 	// if no isolation level was passed in then bail
 	if (!charstring::length(isolevel)) {
@@ -379,7 +379,7 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 
 	// run the query...
 	bool	retval=false;
-	sqlrcursor_svr	*silcur=cont->newCursor();
+	sqlrservercursor	*silcur=cont->newCursor();
 	if (silcur->open() &&
 		silcur->prepareQuery(silquery,silquerylen) &&
 		silcur->executeQuery(silquery,silquerylen)) {
@@ -400,14 +400,14 @@ bool sqlrconnection_svr::setIsolationLevel(const char *isolevel) {
 	return retval;
 }
 
-const char *sqlrconnection_svr::setIsolationLevelQuery() {
+const char *sqlrserverconnection::setIsolationLevelQuery() {
 	return "set transaction isolation level %s";
 }
 
-bool sqlrconnection_svr::ping() {
+bool sqlrserverconnection::ping() {
 	const char	*pingquery=pingQuery();
 	int		pingquerylen=charstring::length(pingquery);
-	sqlrcursor_svr	*pingcur=cont->newCursor();
+	sqlrservercursor	*pingcur=cont->newCursor();
 	if (pingcur->open() &&
 		pingcur->prepareQuery(pingquery,pingquerylen) &&
 		pingcur->executeQuery(pingquery,pingquerylen)) {
@@ -421,19 +421,19 @@ bool sqlrconnection_svr::ping() {
 	return false;
 }
 
-const char *sqlrconnection_svr::pingQuery() {
+const char *sqlrserverconnection::pingQuery() {
 	return "select 1";
 }
 
-const char *sqlrconnection_svr::dbHostNameQuery() {
+const char *sqlrserverconnection::dbHostNameQuery() {
 	return NULL;
 }
 
-const char *sqlrconnection_svr::dbIpAddressQuery() {
+const char *sqlrserverconnection::dbIpAddressQuery() {
 	return NULL;
 }
 
-const char *sqlrconnection_svr::dbHostName() {
+const char *sqlrserverconnection::dbHostName() {
 
 	// don't get looped up...
 	if (dbhostiploop==2) {
@@ -452,7 +452,7 @@ const char *sqlrconnection_svr::dbHostName() {
 	if (dbhnquery) {
 
 		int		dbhnquerylen=charstring::length(dbhnquery);
-		sqlrcursor_svr	*dbhncur=cont->newCursor();
+		sqlrservercursor	*dbhncur=cont->newCursor();
 		if (dbhncur->open() &&
 			dbhncur->prepareQuery(dbhnquery,dbhnquerylen) &&
 			dbhncur->executeQuery(dbhnquery,dbhnquerylen)) {
@@ -489,7 +489,7 @@ const char *sqlrconnection_svr::dbHostName() {
 	return dbhostname;
 }
 
-const char *sqlrconnection_svr::dbIpAddress() {
+const char *sqlrserverconnection::dbIpAddress() {
 
 	// don't get looped up...
 	if (dbhostiploop==2) {
@@ -508,7 +508,7 @@ const char *sqlrconnection_svr::dbIpAddress() {
 	if (dbiaquery) {
 
 		int		dbiaquerylen=charstring::length(dbiaquery);
-		sqlrcursor_svr	*dbiacur=cont->newCursor();
+		sqlrservercursor	*dbiacur=cont->newCursor();
 		if (dbiacur->open() &&
 			dbiacur->prepareQuery(dbiaquery,dbiaquerylen) &&
 			dbiacur->executeQuery(dbiaquery,dbiaquerylen)) {
@@ -535,40 +535,40 @@ const char *sqlrconnection_svr::dbIpAddress() {
 	return dbipaddress;
 }
 
-bool sqlrconnection_svr::getListsByApiCalls() {
+bool sqlrserverconnection::getListsByApiCalls() {
 	return false;
 }
 
-bool sqlrconnection_svr::getDatabaseList(sqlrcursor_svr *cursor,
+bool sqlrserverconnection::getDatabaseList(sqlrservercursor *cursor,
 						const char *wild) {
 	return false;
 }
 
-bool sqlrconnection_svr::getTableList(sqlrcursor_svr *cursor,
+bool sqlrserverconnection::getTableList(sqlrservercursor *cursor,
 						const char *wild) {
 	return false;
 }
 
-bool sqlrconnection_svr::getColumnList(sqlrcursor_svr *cursor,
+bool sqlrserverconnection::getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
 	return false;
 }
 
-const char *sqlrconnection_svr::getDatabaseListQuery(bool wild) {
+const char *sqlrserverconnection::getDatabaseListQuery(bool wild) {
 	return "select 1";
 }
 
-const char *sqlrconnection_svr::getTableListQuery(bool wild) {
+const char *sqlrserverconnection::getTableListQuery(bool wild) {
 	return "select 1";
 }
 
-const char *sqlrconnection_svr::getColumnListQuery(const char *table,
+const char *sqlrserverconnection::getColumnListQuery(const char *table,
 								bool wild) {
 	return "select 1";
 }
 
-bool sqlrconnection_svr::isSynonym(const char *table) {
+bool sqlrserverconnection::isSynonym(const char *table) {
 
 	// get the base query
 	const char	*synquerybase=isSynonymQuery();
@@ -583,7 +583,7 @@ bool sqlrconnection_svr::isSynonym(const char *table) {
 	charstring::printf(synquery,synquerylen+1,synquerybase,table);
 	synquerylen=charstring::length(synquery);
 
-	sqlrcursor_svr	*syncur=cont->newCursor();
+	sqlrservercursor	*syncur=cont->newCursor();
 	bool	result=(syncur->open() &&
 			syncur->prepareQuery(synquery,synquerylen) &&
 			syncur->executeQuery(synquery,synquerylen) &&
@@ -596,59 +596,59 @@ bool sqlrconnection_svr::isSynonym(const char *table) {
 	return result;
 }
 
-const char *sqlrconnection_svr::isSynonymQuery() {
+const char *sqlrserverconnection::isSynonymQuery() {
 	return NULL;
 }
 
-const char *sqlrconnection_svr::bindFormat() {
+const char *sqlrserverconnection::bindFormat() {
 	return ":*";
 }
 
-int16_t sqlrconnection_svr::nonNullBindValue() {
+int16_t sqlrserverconnection::nonNullBindValue() {
 	return 0;
 }
 
-int16_t sqlrconnection_svr::nullBindValue() {
+int16_t sqlrserverconnection::nullBindValue() {
 	return -1;
 }
 
-char sqlrconnection_svr::bindVariablePrefix() {
+char sqlrserverconnection::bindVariablePrefix() {
 	return ':';
 }
 
-bool sqlrconnection_svr::bindValueIsNull(int16_t isnull) {
+bool sqlrserverconnection::bindValueIsNull(int16_t isnull) {
 	return (isnull==nullBindValue());
 }
 
-const char *sqlrconnection_svr::tempTableDropPrefix() {
+const char *sqlrserverconnection::tempTableDropPrefix() {
 	return "";
 }
 
-bool sqlrconnection_svr::tempTableDropReLogIn() {
+bool sqlrserverconnection::tempTableDropReLogIn() {
 	return false;
 }
 
-void sqlrconnection_svr::endSession() {
+void sqlrserverconnection::endSession() {
 	// by default, do nothing
 }
 
-bool sqlrconnection_svr::getAutoCommit() {
+bool sqlrserverconnection::getAutoCommit() {
 	return autocommit;
 }
 
-void sqlrconnection_svr::setAutoCommit(bool autocommit) {
+void sqlrserverconnection::setAutoCommit(bool autocommit) {
 	this->autocommit=autocommit;
 }
 
-bool sqlrconnection_svr::getFakeAutoCommit() {
+bool sqlrserverconnection::getFakeAutoCommit() {
 	return fakeautocommit;
 }
 
-void sqlrconnection_svr::clearError() {
+void sqlrserverconnection::clearError() {
 	setError(NULL,0,true);
 }
 
-void sqlrconnection_svr::setError(const char *err,
+void sqlrserverconnection::setError(const char *err,
 					int64_t errn,
 					bool liveconn) {
 	errorlength=charstring::length(err);
@@ -661,30 +661,30 @@ void sqlrconnection_svr::setError(const char *err,
 	liveconnection=liveconn;
 }
 
-char *sqlrconnection_svr::getErrorBuffer() {
+char *sqlrserverconnection::getErrorBuffer() {
 	return error;
 }
 
-uint32_t sqlrconnection_svr::getErrorLength() {
+uint32_t sqlrserverconnection::getErrorLength() {
 	return errorlength;
 }
 
-void sqlrconnection_svr::setErrorLength(uint32_t errorlength) {
+void sqlrserverconnection::setErrorLength(uint32_t errorlength) {
 	this->errorlength=errorlength;
 }
 
-uint32_t sqlrconnection_svr::getErrorNumber() {
+uint32_t sqlrserverconnection::getErrorNumber() {
 	return errnum;
 }
 
-void sqlrconnection_svr::setErrorNumber(uint32_t errnum) {
+void sqlrserverconnection::setErrorNumber(uint32_t errnum) {
 	this->errnum=errnum;
 }
 
-bool sqlrconnection_svr::getLiveConnection() {
+bool sqlrserverconnection::getLiveConnection() {
 	return liveconnection;
 }
 
-void sqlrconnection_svr::setLiveConnection(bool liveconnection) {
+void sqlrserverconnection::setLiveConnection(bool liveconnection) {
 	this->liveconnection=liveconnection;
 }

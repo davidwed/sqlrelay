@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
 #include <sqlrelay/sqlparser.h>
@@ -14,15 +14,15 @@ class temptablessybaseize : public sqlrtranslation {
 			temptablessybaseize(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 	private:
 		void		mapCreateTemporaryTableName(
-						sqlrconnection_svr *sqlrcon,
+						sqlrserverconnection *sqlrcon,
 						xmldomnode *query);
 		void		mapSelectIntoTableName(
-						sqlrconnection_svr *sqlrcon,
+						sqlrserverconnection *sqlrcon,
 						xmldomnode *query);
 		const char	*generateTempTableName(const char *oldtable);
 		bool		replaceTempNames(xmldomnode *node);
@@ -34,8 +34,8 @@ temptablessybaseize::temptablessybaseize(sqlrtranslations *sqlts,
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-bool temptablessybaseize::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool temptablessybaseize::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 	debugFunction();
 
@@ -52,7 +52,7 @@ bool temptablessybaseize::run(sqlrconnection_svr *sqlrcon,
 }
 
 void temptablessybaseize::mapCreateTemporaryTableName(
-						sqlrconnection_svr *sqlrcon,
+						sqlrserverconnection *sqlrcon,
 						xmldomnode *node) {
 	debugFunction();
 
@@ -122,11 +122,11 @@ void temptablessybaseize::mapCreateTemporaryTableName(
 
 	// add table name to drop-at-session-end list
 	// (skip the leading #, it will be added by the
-	// sqlrcontroller during the drop)
+	// sqlrservercontroller during the drop)
 	sqlrcon->cont->addSessionTempTableForDrop(newtable+1);
 }
 
-void temptablessybaseize::mapSelectIntoTableName(sqlrconnection_svr *sqlrcon,
+void temptablessybaseize::mapSelectIntoTableName(sqlrserverconnection *sqlrcon,
 						xmldomnode *node) {
 	debugFunction();
 
@@ -188,7 +188,7 @@ void temptablessybaseize::mapSelectIntoTableName(sqlrconnection_svr *sqlrcon,
 
 	// add table name to drop-at-session-end list
 	// (skip the leading #, it will be added by the
-	// sqlrcontroller during the drop)
+	// sqlrservercontroller during the drop)
 	sqlrcon->cont->addSessionTempTableForDrop(newtable+1);
 }
 

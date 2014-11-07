@@ -12,24 +12,24 @@ class informixtooracledate : public sqlrtranslation {
 			informixtooracledate(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 	private:
-		bool	translateFunctions(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	translateFunctions(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldomnode *node);
-		bool	translateExtend(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	translateExtend(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldomnode *node);
-		bool	translateCurrentDate(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	translateCurrentDate(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldomnode *node);
-		bool	translateDateTime(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	translateDateTime(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldomnode *node);
-		bool	translateInterval(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	translateInterval(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldomnode *node);
 		void	compressIntervalQualifier(xmldomnode *iqnode);
 		void	translateIntervalQualifier(
@@ -56,14 +56,14 @@ informixtooracledate::informixtooracledate(sqlrtranslations *sqlts,
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-bool informixtooracledate::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool informixtooracledate::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 	return translateFunctions(sqlrcon,sqlrcur,querytree->getRootNode());
 }
 
-bool informixtooracledate::translateFunctions(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+bool informixtooracledate::translateFunctions(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldomnode *node) {
 	debugFunction();
 
@@ -108,8 +108,8 @@ bool informixtooracledate::translateFunctions(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool informixtooracledate::translateExtend(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+bool informixtooracledate::translateExtend(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldomnode *node) {
 	debugFunction();
 
@@ -163,8 +163,8 @@ bool informixtooracledate::translateExtend(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool informixtooracledate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+bool informixtooracledate::translateCurrentDate(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldomnode *node) {
 
 	// "function" -> systimestamp
@@ -201,8 +201,8 @@ bool informixtooracledate::translateCurrentDate(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool informixtooracledate::translateDateTime(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+bool informixtooracledate::translateDateTime(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldomnode *node) {
 
 	// datetime(...) interval_qualifier -> to_date(..., format_string)
@@ -278,8 +278,8 @@ bool informixtooracledate::translateDateTime(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool informixtooracledate::translateInterval(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+bool informixtooracledate::translateInterval(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldomnode *node) {
 
 	// interval(...) interval_qualifier -> interval '...' interval_qualifier

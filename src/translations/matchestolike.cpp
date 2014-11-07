@@ -12,8 +12,8 @@ class matchestolike : public sqlrtranslation {
 			matchestolike(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 	private:
 		bool	replaceMatchesWithLike(xmldomnode *node);
@@ -26,8 +26,8 @@ matchestolike::matchestolike(sqlrtranslations *sqlts,
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-bool matchestolike::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool matchestolike::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 	return replaceMatchesWithLike(querytree->getRootNode());
 }

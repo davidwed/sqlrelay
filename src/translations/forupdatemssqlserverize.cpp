@@ -12,8 +12,8 @@ class forupdatemssqlserverize : public sqlrtranslation {
 			forupdatemssqlserverize(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldom *querytree);
 };
 
@@ -24,8 +24,8 @@ forupdatemssqlserverize::forupdatemssqlserverize(
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-bool forupdatemssqlserverize::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool forupdatemssqlserverize::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 
 	xmldomnode	*query=querytree->getRootNode();

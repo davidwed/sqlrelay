@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
 #include <sqlrelay/sqlrtrigger.h>
@@ -12,19 +12,19 @@ class createtableautoincrementoracle : public sqlrtrigger {
 	public:
 			createtableautoincrementoracle(
 					xmldomnode *parameters, bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree,
 					bool before,
 					bool success);
 	private:
-		bool	createSequenceAndTrigger(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+		bool	createSequenceAndTrigger(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						const char *database,
 						const char *schema,
 						const char *table,
 						const char *columnname);
-		bool	runQuery(sqlrconnection_svr *sqlrcon,
+		bool	runQuery(sqlrserverconnection *sqlrcon,
 						const char *query,
 						uint32_t length);
 };
@@ -34,8 +34,8 @@ createtableautoincrementoracle::createtableautoincrementoracle(
 					sqlrtrigger(parameters,debug) {
 }
 
-bool createtableautoincrementoracle::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool createtableautoincrementoracle::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree,
 					bool before,
 					bool success) {
@@ -111,8 +111,8 @@ bool createtableautoincrementoracle::run(sqlrconnection_svr *sqlrcon,
 }
 
 bool createtableautoincrementoracle::createSequenceAndTrigger(
-						sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+						sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						const char *database,
 						const char *schema,
 						const char *table,
@@ -223,7 +223,7 @@ bool createtableautoincrementoracle::createSequenceAndTrigger(
 	return true;
 }
 
-bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
+bool createtableautoincrementoracle::runQuery(sqlrserverconnection *sqlrcon,
 							const char *query,
 							uint32_t length) {
 	debugFunction();
@@ -234,7 +234,7 @@ bool createtableautoincrementoracle::runQuery(sqlrconnection_svr *sqlrcon,
 
 	bool	retval=false;
 
-	sqlrcursor_svr	*cur=sqlrcon->cont->newCursor();
+	sqlrservercursor	*cur=sqlrcon->cont->newCursor();
 	if (sqlrcon->cont->open(cur) &&
 		sqlrcon->cont->prepareQuery(cur,query,length) &&
 		sqlrcon->cont->executeQuery(cur)) {

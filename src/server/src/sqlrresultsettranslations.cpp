@@ -160,8 +160,8 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 }
 
 bool sqlrresultsettranslations::runResultSetTranslations(
-						sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+						sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						uint16_t fieldindex,
 						const char *field,
 						uint32_t fieldlength,

@@ -15,8 +15,8 @@ sqlrresultsettranslation::sqlrresultsettranslation(
 sqlrresultsettranslation::~sqlrresultsettranslation() {
 }
 
-bool sqlrresultsettranslation::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool sqlrresultsettranslation::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					uint16_t fieldindex,
 					const char *field,
 					uint32_t fieldlength,

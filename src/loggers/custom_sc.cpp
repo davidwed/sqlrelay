@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrlistener.h>
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrlogger.h>
 #include <rudiments/charstring.h>
@@ -16,10 +16,10 @@ class custom_sc : public sqlrlogger {
 			custom_sc(xmldomnode *parameters);
 			~custom_sc();
 
-		bool	init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon);
+		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
 		bool	run(sqlrlistener *sqlrl,
-					sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+					sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					sqlrlogger_loglevel_t level,
 					sqlrlogger_eventtype_t event,
 					const char *info);
@@ -39,7 +39,7 @@ custom_sc::~custom_sc() {
 	delete[] querylogname;
 }
 
-bool custom_sc::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
+bool custom_sc::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
 	debugFunction();
 
 	// get log level
@@ -76,8 +76,8 @@ bool custom_sc::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 }
 
 bool custom_sc::run(sqlrlistener *sqlrl,
-				sqlrconnection_svr *sqlrcon,
-				sqlrcursor_svr *sqlrcur,
+				sqlrserverconnection *sqlrcon,
+				sqlrservercursor *sqlrcur,
 				sqlrlogger_loglevel_t level,
 				sqlrlogger_eventtype_t event,
 				const char *info) {

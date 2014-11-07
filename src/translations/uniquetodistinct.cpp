@@ -12,8 +12,8 @@ class uniquetodistinct : public sqlrtranslation {
 			uniquetodistinct(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 	private:
 		void	replaceUnique(xmldomnode *node);
@@ -25,8 +25,8 @@ uniquetodistinct::uniquetodistinct(sqlrtranslations *sqlts,
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-bool uniquetodistinct::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool uniquetodistinct::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 	debugFunction();
 	replaceUnique(querytree->getRootNode());

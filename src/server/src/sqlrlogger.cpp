@@ -10,13 +10,13 @@ sqlrlogger::sqlrlogger(xmldomnode *parameters) {
 sqlrlogger::~sqlrlogger() {
 }
 
-bool sqlrlogger::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
+bool sqlrlogger::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
 	return true;
 }
 
 bool sqlrlogger::run(sqlrlistener *sqlrl,
-			sqlrconnection_svr *sqlrcon,
-			sqlrcursor_svr *sqlrcur,
+			sqlrserverconnection *sqlrcon,
+			sqlrservercursor *sqlrcur,
 			sqlrlogger_loglevel_t level,
 			sqlrlogger_eventtype_t event,
 			const char *info) {

@@ -12,8 +12,8 @@ class locksnowaitbydefault : public sqlrtranslation {
 			locksnowaitbydefault(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 };
 
@@ -23,8 +23,8 @@ locksnowaitbydefault::locksnowaitbydefault(sqlrtranslations *sqlts,
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-bool locksnowaitbydefault::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool locksnowaitbydefault::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 
 	xmldomnode	*query=querytree->getRootNode();

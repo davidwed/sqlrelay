@@ -12,8 +12,8 @@ class oracleisolationlevel : public sqlrtranslation {
 			oracleisolationlevel(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 	private:
 		void	replaceIsolationLevel(xmldomnode *node);
@@ -25,8 +25,8 @@ oracleisolationlevel::oracleisolationlevel(sqlrtranslations *sqlts,
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-bool oracleisolationlevel::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool oracleisolationlevel::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 	debugFunction();
 	replaceIsolationLevel(querytree->getRootNode());

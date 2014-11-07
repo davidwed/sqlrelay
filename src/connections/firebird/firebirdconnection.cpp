@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <rudiments/environment.h>
 #include <rudiments/bytestring.h>
@@ -58,10 +58,10 @@ struct datebind {
 
 class firebirdconnection;
 
-class firebirdcursor : public sqlrcursor_svr {
+class firebirdcursor : public sqlrservercursor {
 	friend class firebirdconnection;
 	private:
-				firebirdcursor(sqlrconnection_svr *conn,
+				firebirdcursor(sqlrserverconnection *conn,
 								uint16_t id);
 				~firebirdcursor();
 		bool		prepareQuery(const char *query,
@@ -205,16 +205,16 @@ class firebirdcursor : public sqlrcursor_svr {
 		bool	bindformaterror;
 };
 
-class firebirdconnection : public sqlrconnection_svr {
+class firebirdconnection : public sqlrserverconnection {
 	friend class firebirdcursor;
 	public:
-			firebirdconnection(sqlrcontroller_svr *cont);
+			firebirdconnection(sqlrservercontroller *cont);
 			~firebirdconnection();
 	private:
 		void	handleConnectString();
 		bool	logIn(const char **error);
-		sqlrcursor_svr	*newCursor(uint16_t id);
-		void	deleteCursor(sqlrcursor_svr *curs);
+		sqlrservercursor	*newCursor(uint16_t id);
+		void	deleteCursor(sqlrservercursor *curs);
 		void	logOut();
 		bool	supportsTransactionBlocks();
 		bool	commit();
@@ -264,8 +264,8 @@ static char tpb[] = {
 	isc_tpb_wait
 };
 
-firebirdconnection::firebirdconnection(sqlrcontroller_svr *cont) :
-						sqlrconnection_svr(cont) {
+firebirdconnection::firebirdconnection(sqlrservercontroller *cont) :
+						sqlrserverconnection(cont) {
 	dbversion=NULL;
 	lastinsertidquery=NULL;
 	host=NULL;
@@ -406,12 +406,12 @@ bool firebirdconnection::logIn(const char **err) {
 	return true;
 }
 
-sqlrcursor_svr *firebirdconnection::newCursor(uint16_t id) {
-	return (sqlrcursor_svr *)new firebirdcursor(
-					(sqlrconnection_svr *)this,id);
+sqlrservercursor *firebirdconnection::newCursor(uint16_t id) {
+	return (sqlrservercursor *)new firebirdcursor(
+					(sqlrserverconnection *)this,id);
 }
 
-void firebirdconnection::deleteCursor(sqlrcursor_svr *curs) {
+void firebirdconnection::deleteCursor(sqlrservercursor *curs) {
 	delete (firebirdcursor *)curs;
 }
 
@@ -645,8 +645,8 @@ const char *firebirdconnection::getLastInsertIdQuery() {
 	return lastinsertidquery;
 }
 
-firebirdcursor::firebirdcursor(sqlrconnection_svr *conn, uint16_t id) :
-						sqlrcursor_svr(conn,id) {
+firebirdcursor::firebirdcursor(sqlrserverconnection *conn, uint16_t id) :
+						sqlrservercursor(conn,id) {
 	firebirdconn=(firebirdconnection *)conn;
 
 	outsqlda=(XSQLDA ISC_FAR *)new unsigned char[
@@ -1466,7 +1466,7 @@ void firebirdcursor::errorMessage(char *errorbuffer,
 	}
 
 	// otherwise fall back to default implementation
-	sqlrcursor_svr::errorMessage(errorbuffer,
+	sqlrservercursor::errorMessage(errorbuffer,
 					errorbufferlength,
 					errorlength,
 					errorcode,
@@ -1907,7 +1907,7 @@ void firebirdcursor::closeResultSet() {
 }
 
 extern "C" {
-	sqlrconnection_svr *new_firebirdconnection(sqlrcontroller_svr *cont) {
+	sqlrserverconnection *new_firebirdconnection(sqlrservercontroller *cont) {
 		return new firebirdconnection(cont);
 	}
 }

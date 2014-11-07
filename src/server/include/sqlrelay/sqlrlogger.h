@@ -10,8 +10,8 @@
 #include <rudiments/xmldomnode.h>
 
 class sqlrlistener;
-class sqlrconnection_svr;
-class sqlrcursor_svr;
+class sqlrserverconnection;
+class sqlrservercursor;
 
 enum sqlrlogger_loglevel_t {
 	SQLRLOGGER_LOGLEVEL_DEBUG=0,
@@ -39,10 +39,10 @@ class SQLRSERVER_DLLSPEC sqlrlogger {
 		virtual	~sqlrlogger();
 
 		virtual bool	init(sqlrlistener *sqlrl,
-					sqlrconnection_svr *sqlrcon);
+					sqlrserverconnection *sqlrcon);
 		virtual bool	run(sqlrlistener *sqlrl,
-					sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+					sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					sqlrlogger_loglevel_t level,
 					sqlrlogger_eventtype_t event,
 					const char *info);

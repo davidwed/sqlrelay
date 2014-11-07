@@ -103,7 +103,7 @@ endif
 endif
 
 SRCS = sqlrlistener.cpp \
-	sqlrcontroller.cpp \
+	sqlrservercontroller.cpp \
 	sqlrprotocol.cpp \
 	sqlrclientprotocol.cpp \
 	sqlrconnection.cpp \
@@ -127,7 +127,7 @@ SRCS = sqlrlistener.cpp \
 	sqlrscaler.cpp \
 
 LOBJS = sqlrlistener.lo \
-	sqlrcontroller.lo \
+	sqlrservercontroller.lo \
 	sqlrprotocol.lo \
 	sqlrclientprotocol.lo \
 	sqlrconnection.lo \
@@ -352,7 +352,7 @@ installheaders:
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrauths.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrclientprotocol.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrserverconnection.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrcontroller.h $(includedir)/sqlrelay
+	$(INSTALL) -m 644 ../include/sqlrelay/sqlrservercontroller.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrservercursor.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrlistener.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrlogger.h $(includedir)/sqlrelay
@@ -370,8 +370,8 @@ installheaders:
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
 	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverconnection.h $(includedir)/sqlrelay/private
 	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverconnectionincludes.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrcontroller.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrcontrollerincludes.h $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrservercontroller.h $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrservercontrollerincludes.h $(includedir)/sqlrelay/private
 	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrservercursor.h $(includedir)/sqlrelay/private
 	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrservercursorincludes.h $(includedir)/sqlrelay/private
 	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrlistener.h $(includedir)/sqlrelay/private
@@ -386,7 +386,7 @@ uninstall:
 	$(RM) $(includedir)/sqlrelay/sqlrauths.h
 	$(RM) $(includedir)/sqlrelay/sqlrclientprotocol.h
 	$(RM) $(includedir)/sqlrelay/sqlrconnection.h
-	$(RM) $(includedir)/sqlrelay/sqlrcontroller.h
+	$(RM) $(includedir)/sqlrelay/sqlrservercontroller.h
 	$(RM) $(includedir)/sqlrelay/sqlrservercursor.h
 	$(RM) $(includedir)/sqlrelay/sqlrlistener.h
 	$(RM) $(includedir)/sqlrelay/sqlrlogger.h

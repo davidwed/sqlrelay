@@ -12,8 +12,8 @@
 #include <sqlrelay/sqlrlogger.h>
 
 class sqlrlistener;
-class sqlrconnection_svr;
-class sqlrcursor_svr;
+class sqlrserverconnection;
+class sqlrservercursor;
 
 class SQLRSERVER_DLLSPEC sqlrloggerplugin {
 	public:
@@ -28,10 +28,10 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 
 		bool	loadLoggers(const char *loggers);
 		void	initLoggers(sqlrlistener *sqlrl,
-					sqlrconnection_svr *sqlrcon);
+					sqlrserverconnection *sqlrcon);
 		void	runLoggers(sqlrlistener *sqlrl,
-					sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+					sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					sqlrlogger_loglevel_t level,
 					sqlrlogger_eventtype_t event,
 					const char *info);

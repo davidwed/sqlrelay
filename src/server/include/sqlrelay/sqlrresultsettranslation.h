@@ -8,8 +8,8 @@
 
 #include <rudiments/xmldomnode.h>
 
-class sqlrconnection_svr;
-class sqlrcursor_svr;
+class sqlrserverconnection;
+class sqlrservercursor;
 class sqlrresultsettranslations;
 
 class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
@@ -19,8 +19,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 					xmldomnode *parameters);
 		virtual	~sqlrresultsettranslation();
 
-		virtual bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		virtual bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					uint16_t fieldindex,
 					const char *field,
 					uint32_t fieldlength,

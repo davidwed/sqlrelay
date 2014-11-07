@@ -1,7 +1,7 @@
 // Copyright (c) 2013  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
 #include <sqlrelay/sqlparser.h>
@@ -14,8 +14,8 @@ class fakebindsforcreateasselect : public sqlrtranslation {
 						sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldom *querytree);
 };
 
@@ -26,8 +26,8 @@ fakebindsforcreateasselect::fakebindsforcreateasselect(
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-bool fakebindsforcreateasselect::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool fakebindsforcreateasselect::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 	debugFunction();
 

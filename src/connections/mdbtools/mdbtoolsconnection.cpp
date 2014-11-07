@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/regularexpression.h>
@@ -25,16 +25,16 @@ extern "C" {
 
 extern void mdb_remove_backends();
 
-class mdbtoolsconnection : public sqlrconnection_svr {
+class mdbtoolsconnection : public sqlrserverconnection {
 	friend class mdbtoolscursor;
 	public:
-			mdbtoolsconnection(sqlrcontroller_svr *cont);
+			mdbtoolsconnection(sqlrservercontroller *cont);
 			~mdbtoolsconnection();
 	private:
 		void	handleConnectString();
 		bool	logIn(const char **error);
-		sqlrcursor_svr	*newCursor(uint16_t id);
-		void	deleteCursor(sqlrcursor_svr *curs);
+		sqlrservercursor	*newCursor(uint16_t id);
+		void	deleteCursor(sqlrservercursor *curs);
 		void	logOut();
 		bool	isTransactional();
 		bool	ping();
@@ -42,11 +42,11 @@ class mdbtoolsconnection : public sqlrconnection_svr {
 		const char	*dbVersion();
 		const char	*dbHostName();
 		bool	getListsByApiCalls();
-		bool	getDatabaseList(sqlrcursor_svr *cursor,
+		bool	getDatabaseList(sqlrservercursor *cursor,
 						const char *wild);
-		bool	getTableList(sqlrcursor_svr *cursor,
+		bool	getTableList(sqlrservercursor *cursor,
 						const char *wild);
-		bool	getColumnList(sqlrcursor_svr *cursor,
+		bool	getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild);
 		bool	setIsolationLevel(const char *isolevel);
@@ -71,10 +71,10 @@ enum cursortype_t {
 	COLUMN_LIST_CURSORTYPE
 };
 
-class mdbtoolscursor : public sqlrcursor_svr {
+class mdbtoolscursor : public sqlrservercursor {
 	friend class mdbtoolsconnection;
 	private:
-				mdbtoolscursor(sqlrconnection_svr *conn,
+				mdbtoolscursor(sqlrserverconnection *conn,
 								uint16_t id);
 				~mdbtoolscursor();
 		bool		open();
@@ -118,8 +118,8 @@ class mdbtoolscursor : public sqlrcursor_svr {
 		cursortype_t	cursortype;
 };
 
-mdbtoolsconnection::mdbtoolsconnection(sqlrcontroller_svr *cont) :
-						sqlrconnection_svr(cont) {
+mdbtoolsconnection::mdbtoolsconnection(sqlrservercontroller *cont) :
+						sqlrserverconnection(cont) {
 	hostname=NULL;
 }
 
@@ -136,12 +136,12 @@ bool mdbtoolsconnection::logIn(const char **error) {
 	return true;
 }
 
-sqlrcursor_svr *mdbtoolsconnection::newCursor(uint16_t id) {
-	return (sqlrcursor_svr *)new mdbtoolscursor(
-					(sqlrconnection_svr *)this,id);
+sqlrservercursor *mdbtoolsconnection::newCursor(uint16_t id) {
+	return (sqlrservercursor *)new mdbtoolscursor(
+					(sqlrserverconnection *)this,id);
 }
 
-void mdbtoolsconnection::deleteCursor(sqlrcursor_svr *curs) {
+void mdbtoolsconnection::deleteCursor(sqlrservercursor *curs) {
 	delete (mdbtoolscursor *)curs;
 }
 
@@ -178,17 +178,17 @@ bool mdbtoolsconnection::getListsByApiCalls() {
 	return true;
 }
 
-bool mdbtoolsconnection::getDatabaseList(sqlrcursor_svr *cursor,
+bool mdbtoolsconnection::getDatabaseList(sqlrservercursor *cursor,
 						const char *wild) {
 	return ((mdbtoolscursor *)cursor)->getDatabaseList(wild);
 }
 
-bool mdbtoolsconnection::getTableList(sqlrcursor_svr *cursor,
+bool mdbtoolsconnection::getTableList(sqlrservercursor *cursor,
 						const char *wild) {
 	return ((mdbtoolscursor *)cursor)->getTableList(wild);
 }
 
-bool mdbtoolsconnection::getColumnList(sqlrcursor_svr *cursor,
+bool mdbtoolsconnection::getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
 	return ((mdbtoolscursor *)cursor)->getColumnList(table,wild);
@@ -234,8 +234,8 @@ void mdbtoolsconnection::errorMessage(char *errorbuffer,
 	*liveconnection=true;
 }
 
-mdbtoolscursor::mdbtoolscursor(sqlrconnection_svr *conn, uint16_t id) :
-						sqlrcursor_svr(conn,id) {
+mdbtoolscursor::mdbtoolscursor(sqlrserverconnection *conn, uint16_t id) :
+						sqlrservercursor(conn,id) {
 	mdbtoolsconn=(mdbtoolsconnection *)conn;
 	mdbsql=(void *)new MdbSQL;
 	bytestring::zero(mdbsql,sizeof(MdbSQL));
@@ -269,7 +269,7 @@ bool mdbtoolscursor::open() {
 
 bool mdbtoolscursor::close() {
 
-	if (!sqlrcursor_svr::close()) {
+	if (!sqlrservercursor::close()) {
 		return false;
 	}
 
@@ -694,7 +694,7 @@ void mdbtoolscursor::closeResultSet() {
 }
 
 extern "C" {
-	sqlrconnection_svr *new_mdbtoolsconnection(sqlrcontroller_svr *cont) {
+	sqlrserverconnection *new_mdbtoolsconnection(sqlrservercontroller *cont) {
 		return new mdbtoolsconnection(cont);
 	}
 }

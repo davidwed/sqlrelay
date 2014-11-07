@@ -340,11 +340,11 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\sqlrlistener.cpp" />
-    <ClCompile Include="..\sqlrcontroller.cpp" />
+    <ClCompile Include="..\sqlrservercontroller.cpp" />
     <ClCompile Include="..\sqlrprotocol.cpp" />
     <ClCompile Include="..\sqlrclientprotocol.cpp" />
-    <ClCompile Include="..\sqlrconnection.cpp" />
-    <ClCompile Include="..\sqlrcursor.cpp" />
+    <ClCompile Include="..\sqlrserverconnection.cpp" />
+    <ClCompile Include="..\sqlrservercursor.cpp" />
     <ClCompile Include="..\sqlparser.cpp" />
     <ClCompile Include="..\sqlwriter.cpp" />
     <ClCompile Include="..\sqlrtranslations.cpp" />

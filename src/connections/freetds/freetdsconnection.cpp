@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <rudiments/environment.h>
 #include <rudiments/stringbuffer.h>
@@ -84,10 +84,10 @@ struct datebind {
 
 class freetdsconnection;
 
-class freetdscursor : public sqlrcursor_svr {
+class freetdscursor : public sqlrservercursor {
 	friend class freetdsconnection;
 	private:
-				freetdscursor(sqlrconnection_svr *conn,
+				freetdscursor(sqlrserverconnection *conn,
 								uint16_t id);
 				~freetdscursor();
 		void		allocateResultSetBuffers(
@@ -238,17 +238,17 @@ class freetdscursor : public sqlrcursor_svr {
 };
 
 
-class freetdsconnection : public sqlrconnection_svr {
+class freetdsconnection : public sqlrserverconnection {
 	friend class freetdscursor;
 	public:
-			freetdsconnection(sqlrcontroller_svr *cont);
+			freetdsconnection(sqlrservercontroller *cont);
 			~freetdsconnection();
 	private:
 		void	handleConnectString();
 		bool	logIn(const char **error);
 		const char	*logInError(const char *error, uint16_t stage);
-		sqlrcursor_svr	*newCursor(uint16_t id);
-		void	deleteCursor(sqlrcursor_svr *curs);
+		sqlrservercursor	*newCursor(uint16_t id);
+		void	deleteCursor(sqlrservercursor *curs);
 		void	logOut();
 		const char	*identify();
 		const char	*dbVersion();
@@ -315,8 +315,8 @@ stringbuffer	freetdsconnection::errorstring;
 int64_t		freetdsconnection::errorcode;
 bool		freetdsconnection::liveconnection;
 
-freetdsconnection::freetdsconnection(sqlrcontroller_svr *cont) :
-						sqlrconnection_svr(cont) {
+freetdsconnection::freetdsconnection(sqlrservercontroller *cont) :
+						sqlrserverconnection(cont) {
 	dbused=false;
 	dbversion=NULL;
 	sybasedb=true;
@@ -565,12 +565,12 @@ const char *freetdsconnection::logInError(const char *error, uint16_t stage) {
 	return loginerror.getString();
 }
 
-sqlrcursor_svr *freetdsconnection::newCursor(uint16_t id) {
-	return (sqlrcursor_svr *)new freetdscursor(
-					(sqlrconnection_svr *)this,id);
+sqlrservercursor *freetdsconnection::newCursor(uint16_t id) {
+	return (sqlrservercursor *)new freetdscursor(
+					(sqlrserverconnection *)this,id);
 }
 
-void freetdsconnection::deleteCursor(sqlrcursor_svr *curs) {
+void freetdsconnection::deleteCursor(sqlrservercursor *curs) {
 	delete (freetdscursor *)curs;
 }
 
@@ -818,8 +818,8 @@ char freetdsconnection::bindVariablePrefix() {
 	return '@';
 }
 
-freetdscursor::freetdscursor(sqlrconnection_svr *conn, uint16_t id) :
-						sqlrcursor_svr(conn,id) {
+freetdscursor::freetdscursor(sqlrserverconnection *conn, uint16_t id) :
+						sqlrservercursor(conn,id) {
 
 	#if defined(VERSION_NO)
 	char	*versionstring=charstring::duplicate(VERSION_NO);
@@ -2163,12 +2163,12 @@ const char *freetdsconnection::tempTableDropPrefix() {
 
 bool freetdsconnection::commit() {
 	cont->closeAllResultSets();
-	return sqlrconnection_svr::commit();
+	return sqlrserverconnection::commit();
 }
 
 bool freetdsconnection::rollback() {
 	cont->closeAllResultSets();
-	return sqlrconnection_svr::rollback();
+	return sqlrserverconnection::rollback();
 }
 
 void freetdsconnection::errorMessage(char *errorbuffer,
@@ -2184,7 +2184,7 @@ void freetdsconnection::errorMessage(char *errorbuffer,
 }
 
 extern "C" {
-	sqlrconnection_svr *new_freetdsconnection(sqlrcontroller_svr *cont) {
+	sqlrserverconnection *new_freetdsconnection(sqlrservercontroller *cont) {
 		return new freetdsconnection(cont);
 	}
 }

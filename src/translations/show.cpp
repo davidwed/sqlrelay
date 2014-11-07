@@ -12,8 +12,8 @@ class show : public sqlrtranslation {
 			show(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 };
 
@@ -21,8 +21,8 @@ show::show(sqlrtranslations *sqlts, xmldomnode *parameters, bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-bool show::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool show::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 
 	xmldomnode	*node=querytree->getRootNode()->getFirstTagChild();

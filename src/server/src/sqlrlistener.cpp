@@ -378,15 +378,6 @@ void sqlrlistener::setSessionHandlerMethod() {
 			return;
 		}
 
-		/*if (listenertimeout) {
-			stderror.printf("Warning: sessionhandler=\"thread\" is "
-					"currently unsupported when "
-					"listenertimeout is set to a non-zero "
-					"value.  Falling back to "
-					"sessionhandler=\"process\".\n");
-			return;
-		}*/
-
 		usethreads=true;
 	}
 }

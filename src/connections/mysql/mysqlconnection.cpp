@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2011  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <rudiments/charstring.h>
 #include <rudiments/bytestring.h>
@@ -31,10 +31,10 @@
 
 class mysqlconnection;
 
-class mysqlcursor : public sqlrcursor_svr {
+class mysqlcursor : public sqlrservercursor {
 	friend class mysqlconnection;
 	private:
-				mysqlcursor(sqlrconnection_svr *conn,
+				mysqlcursor(sqlrserverconnection *conn,
 							uint16_t id);
 				~mysqlcursor();
 #ifdef HAVE_MYSQL_STMT_PREPARE
@@ -150,10 +150,10 @@ class mysqlcursor : public sqlrcursor_svr {
 		mysqlconnection	*mysqlconn;
 };
 
-class mysqlconnection : public sqlrconnection_svr {
+class mysqlconnection : public sqlrserverconnection {
 	friend class mysqlcursor;
 	public:
-				mysqlconnection(sqlrcontroller_svr *cont);
+				mysqlconnection(sqlrservercontroller *cont);
 				~mysqlconnection();
 	private:
 		void		handleConnectString();
@@ -162,8 +162,8 @@ class mysqlconnection : public sqlrconnection_svr {
 		bool		changeUser(const char *newuser,
 						const char *newpassword);
 #endif
-		sqlrcursor_svr	*newCursor(uint16_t id);
-		void		deleteCursor(sqlrcursor_svr *curs);
+		sqlrservercursor	*newCursor(uint16_t id);
+		void		deleteCursor(sqlrservercursor *curs);
 		void		logOut();
 		bool		isTransactional();
 #ifdef HAVE_MYSQL_PING
@@ -223,7 +223,7 @@ class mysqlconnection : public sqlrconnection_svr {
 };
 
 extern "C" {
-	sqlrconnection_svr *new_mysqlconnection(sqlrcontroller_svr *cont) {
+	sqlrserverconnection *new_mysqlconnection(sqlrservercontroller *cont) {
 		return new mysqlconnection(cont);
 	}
 }
@@ -231,8 +231,8 @@ extern "C" {
 const my_bool	mysqlconnection::mytrue=TRUE;
 const my_bool	mysqlconnection::myfalse=FALSE;
 
-mysqlconnection::mysqlconnection(sqlrcontroller_svr *cont) :
-					sqlrconnection_svr(cont) {
+mysqlconnection::mysqlconnection(sqlrservercontroller *cont) :
+					sqlrserverconnection(cont) {
 	connected=false;
 	dbversion=NULL;
 	dbhostname=NULL;
@@ -414,11 +414,11 @@ bool mysqlconnection::changeUser(const char *newuser,
 }
 #endif
 
-sqlrcursor_svr *mysqlconnection::newCursor(uint16_t id) {
-	return (sqlrcursor_svr *)new mysqlcursor((sqlrconnection_svr *)this,id);
+sqlrservercursor *mysqlconnection::newCursor(uint16_t id) {
+	return (sqlrservercursor *)new mysqlcursor((sqlrserverconnection *)this,id);
 }
 
-void mysqlconnection::deleteCursor(sqlrcursor_svr *curs) {
+void mysqlconnection::deleteCursor(sqlrservercursor *curs) {
 	delete (mysqlcursor *)curs;
 }
 
@@ -451,7 +451,7 @@ const char *mysqlconnection::bindFormat() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	return "?";
 #else
-	return sqlrconnection_svr::bindFormat();
+	return sqlrserverconnection::bindFormat();
 #endif
 }
 
@@ -586,8 +586,8 @@ void mysqlconnection::endSession() {
 	firstquery=true;
 }
 
-mysqlcursor::mysqlcursor(sqlrconnection_svr *conn, uint16_t id) :
-						sqlrcursor_svr(conn,id) {
+mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
+						sqlrservercursor(conn,id) {
 	mysqlconn=(mysqlconnection *)conn;
 	mysqlresult=NULL;
 #ifdef HAVE_MYSQL_STMT_PREPARE
@@ -654,7 +654,7 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	bindformaterror=false;
 
 	// can't use stmt API to run a couple of types of queries as of 5.0
-	// (This call is a little redundant though...  the sqlrcontroller
+	// (This call is a little redundant though...  the sqlrservercontroller
 	// calls supportsNativeBinds for each query to see if it needs to
 	// fake binds.  Unfortunately it doesn't call it for things like
 	// pings or "use xxx" or other internal queries.  It might be good

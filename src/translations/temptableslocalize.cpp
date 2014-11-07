@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
 #include <sqlrelay/sqlparser.h>
@@ -14,19 +14,19 @@ class temptableslocalize : public sqlrtranslation {
 			temptableslocalize(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 	private:
 		void		mapCreateTemporaryTableName(
-						sqlrconnection_svr *sqlrcon,
+						sqlrserverconnection *sqlrcon,
 						xmldomnode *query,
 						const char *uniqueid);
 		void		mapCreateIndexOnTemporaryTableName(
 						xmldomnode *query,
 						const char *uniqueid);
 		void		mapSelectIntoTableName(
-						sqlrconnection_svr *sqlrcon,
+						sqlrserverconnection *sqlrcon,
 						xmldomnode *query,
 						const char *uniqueid);
 		const char	*generateTempTableName(const char *oldtable,
@@ -40,8 +40,8 @@ temptableslocalize::temptableslocalize(sqlrtranslations *sqlts,
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-bool temptableslocalize::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool temptableslocalize::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 	debugFunction();
 
@@ -69,7 +69,7 @@ bool temptableslocalize::run(sqlrconnection_svr *sqlrcon,
 }
 
 void temptableslocalize::mapCreateTemporaryTableName(
-						sqlrconnection_svr *sqlrcon,
+						sqlrserverconnection *sqlrcon,
 						xmldomnode *node,
 						const char *uniqueid) {
 	debugFunction();
@@ -210,7 +210,7 @@ void temptableslocalize::mapCreateIndexOnTemporaryTableName(xmldomnode *node,
 	sqlts->tempindexmap.setValue(oldindexdbo,(char *)newindex);
 }
 
-void temptableslocalize::mapSelectIntoTableName(sqlrconnection_svr *sqlrcon,
+void temptableslocalize::mapSelectIntoTableName(sqlrserverconnection *sqlrcon,
 							xmldomnode *node,
 							const char *uniqueid) {
 	debugFunction();

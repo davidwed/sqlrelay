@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <rudiments/environment.h>
 #include <rudiments/stringbuffer.h>
@@ -21,17 +21,17 @@ extern "C" {
 #define MAX_SELECT_LIST_SIZE	256
 #define MAX_ITEM_BUFFER_SIZE	32768
 
-class sybaseconnection : public sqlrconnection_svr {
+class sybaseconnection : public sqlrserverconnection {
 	friend class sybasecursor;
 	public:
-			sybaseconnection(sqlrcontroller_svr *cont);
+			sybaseconnection(sqlrservercontroller *cont);
 			~sybaseconnection();
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error);
 		const char	*logInError(const char *error, uint16_t stage);
-		sqlrcursor_svr	*newCursor(uint16_t id);
-		void		deleteCursor(sqlrcursor_svr *curs);
+		sqlrservercursor	*newCursor(uint16_t id);
+		void		deleteCursor(sqlrservercursor *curs);
 		void		logOut();
 		const char	*identify();
 		const char	*dbVersion();
@@ -103,10 +103,10 @@ struct datebind {
         const char      **tz;
 };
 
-class sybasecursor : public sqlrcursor_svr {
+class sybasecursor : public sqlrservercursor {
 	friend class sybaseconnection;
 	private:
-				sybasecursor(sqlrconnection_svr *conn,
+				sybasecursor(sqlrserverconnection *conn,
 								uint16_t id);
 				~sybasecursor();
 		void		allocateResultSetBuffers(
@@ -250,8 +250,8 @@ int64_t		sybaseconnection::errorcode;
 bool		sybaseconnection::liveconnection;
 
 
-sybaseconnection::sybaseconnection(sqlrcontroller_svr *cont) :
-					sqlrconnection_svr(cont) {
+sybaseconnection::sybaseconnection(sqlrservercontroller *cont) :
+					sqlrserverconnection(cont) {
 	dbused=false;
 	dbversion=NULL;
 
@@ -503,12 +503,12 @@ const char *sybaseconnection::logInError(const char *error, uint16_t stage) {
 	return loginerror.getString();
 }
 
-sqlrcursor_svr *sybaseconnection::newCursor(uint16_t id) {
-	return (sqlrcursor_svr *)new sybasecursor(
-					(sqlrconnection_svr *)this,id);
+sqlrservercursor *sybaseconnection::newCursor(uint16_t id) {
+	return (sqlrservercursor *)new sybasecursor(
+					(sqlrserverconnection *)this,id);
 }
 
-void sybaseconnection::deleteCursor(sqlrcursor_svr *curs) {
+void sybaseconnection::deleteCursor(sqlrservercursor *curs) {
 	delete (sybasecursor *)curs;
 }
 
@@ -643,8 +643,8 @@ char sybaseconnection::bindVariablePrefix() {
 	return '@';
 }
 
-sybasecursor::sybasecursor(sqlrconnection_svr *conn, uint16_t id) :
-						sqlrcursor_svr(conn,id) {
+sybasecursor::sybasecursor(sqlrserverconnection *conn, uint16_t id) :
+						sqlrservercursor(conn,id) {
 	prepared=false;
 	sybaseconn=(sybaseconnection *)conn;
 	cmd=NULL;
@@ -1725,12 +1725,12 @@ const char *sybaseconnection::tempTableDropPrefix() {
 
 bool sybaseconnection::commit() {
 	cont->closeAllResultSets();
-	return sqlrconnection_svr::commit();
+	return sqlrserverconnection::commit();
 }
 
 bool sybaseconnection::rollback() {
 	cont->closeAllResultSets();
-	return sqlrconnection_svr::rollback();
+	return sqlrserverconnection::rollback();
 }
 
 void sybaseconnection::errorMessage(char *errorbuffer,
@@ -1746,7 +1746,7 @@ void sybaseconnection::errorMessage(char *errorbuffer,
 }
 
 extern "C" {
-	sqlrconnection_svr *new_sybaseconnection(sqlrcontroller_svr *cont) {
+	sqlrserverconnection *new_sybaseconnection(sqlrservercontroller *cont) {
 		return new sybaseconnection(cont);
 	}
 }

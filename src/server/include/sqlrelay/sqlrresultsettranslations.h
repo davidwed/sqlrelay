@@ -12,8 +12,8 @@
 #include <rudiments/singlylinkedlist.h>
 #include <sqlrelay/sqlrresultsettranslation.h>
 
-class sqlrconnection_svr;
-class sqlrcursor_svr;
+class sqlrserverconnection;
+class sqlrservercursor;
 
 class SQLRSERVER_DLLSPEC sqlrresultsettranslationplugin {
 	public:
@@ -28,8 +28,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 
 		bool	loadResultSetTranslations(
 					const char *resultsettranslations);
-		bool	runResultSetTranslations(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+		bool	runResultSetTranslations(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						uint16_t fieldindex,
 						const char *field,
 						uint32_t fieldlength,

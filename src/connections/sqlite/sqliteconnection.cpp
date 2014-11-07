@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <rudiments/regularexpression.h>
 #include <rudiments/sys.h>
@@ -32,16 +32,16 @@ extern "C" {
 	#define sqlite3_malloc			malloc
 #endif
 
-class sqliteconnection : public sqlrconnection_svr {
+class sqliteconnection : public sqlrserverconnection {
 	friend class sqlitecursor;
 	public:
-				sqliteconnection(sqlrcontroller_svr *cont);
+				sqliteconnection(sqlrservercontroller *cont);
 				~sqliteconnection();
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error);
-		sqlrcursor_svr	*newCursor(uint16_t id);
-		void		deleteCursor(sqlrcursor_svr *curs);
+		sqlrservercursor	*newCursor(uint16_t id);
+		void		deleteCursor(sqlrservercursor *curs);
 		void		logOut();
 		bool		ping();
 		const char	*identify();
@@ -84,10 +84,10 @@ class sqliteconnection : public sqlrconnection_svr {
 		char	*hostname;
 };
 
-class sqlitecursor : public sqlrcursor_svr {
+class sqlitecursor : public sqlrservercursor {
 	friend class sqliteconnection;
 	private:
-				sqlitecursor(sqlrconnection_svr *conn,
+				sqlitecursor(sqlrserverconnection *conn,
 								uint16_t id);
 				~sqlitecursor();
 
@@ -162,8 +162,8 @@ class sqlitecursor : public sqlrcursor_svr {
 };
 
 
-sqliteconnection::sqliteconnection(sqlrcontroller_svr *cont) :
-					sqlrconnection_svr(cont) {
+sqliteconnection::sqliteconnection(sqlrservercontroller *cont) :
+					sqlrserverconnection(cont) {
 	sqliteptr=NULL;
 	errmesg=NULL;
 	errcode=0;
@@ -201,12 +201,12 @@ bool sqliteconnection::logIn(const char **error) {
 #endif
 }
 
-sqlrcursor_svr *sqliteconnection::newCursor(uint16_t id) {
-	return (sqlrcursor_svr *)new sqlitecursor(
-					(sqlrconnection_svr *)this,id);
+sqlrservercursor *sqliteconnection::newCursor(uint16_t id) {
+	return (sqlrservercursor *)new sqlitecursor(
+					(sqlrserverconnection *)this,id);
 }
 
-void sqliteconnection::deleteCursor(sqlrcursor_svr *curs) {
+void sqliteconnection::deleteCursor(sqlrservercursor *curs) {
 	delete (sqlitecursor *)curs;
 }
 
@@ -359,8 +359,8 @@ void sqliteconnection::clearErrors() {
 	}
 }
 
-sqlitecursor::sqlitecursor(sqlrconnection_svr *conn, uint16_t id) :
-						sqlrcursor_svr(conn,id) {
+sqlitecursor::sqlitecursor(sqlrserverconnection *conn, uint16_t id) :
+						sqlrservercursor(conn,id) {
 
 	columnnames=NULL;
 	ncolumn=0;
@@ -862,7 +862,7 @@ char *sqliteconnection::duplicate(const char *str) {
 #endif
 
 extern "C" {
-	sqlrconnection_svr *new_sqliteconnection(sqlrcontroller_svr *cont) {
+	sqlrserverconnection *new_sqliteconnection(sqlrservercontroller *cont) {
 		return new sqliteconnection(cont);
 	}
 }

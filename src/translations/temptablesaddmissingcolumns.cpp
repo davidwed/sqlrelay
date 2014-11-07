@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
 #include <sqlrelay/sqlparser.h>
@@ -14,8 +14,8 @@ class temptablesaddmissingcolumns : public sqlrtranslation {
 					sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 };
 
@@ -26,8 +26,8 @@ temptablesaddmissingcolumns::temptablesaddmissingcolumns(
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-bool temptablesaddmissingcolumns::run(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+bool temptablesaddmissingcolumns::run(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldom *querytree) {
 	debugFunction();
 

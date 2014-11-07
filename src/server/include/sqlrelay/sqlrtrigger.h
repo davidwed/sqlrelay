@@ -9,16 +9,16 @@
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 
-class sqlrconnection_svr;
-class sqlrcursor_svr;
+class sqlrserverconnection;
+class sqlrservercursor;
 
 class SQLRSERVER_DLLSPEC sqlrtrigger {
 	public:
 			sqlrtrigger(xmldomnode *parameters, bool debug);
 		virtual	~sqlrtrigger();
 
-		virtual bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		virtual bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree,
 					bool before,
 					bool success);

@@ -13,8 +13,8 @@ class cascadetocascadeconstraints : public sqlrtranslation {
 						sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 	private:
 		void	insertConstraints(xmldomnode *node);
@@ -27,8 +27,8 @@ cascadetocascadeconstraints::cascadetocascadeconstraints(
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-bool cascadetocascadeconstraints::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool cascadetocascadeconstraints::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 	debugFunction();
 	insertConstraints(querytree->getRootNode());

@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrlistener.h>
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrlogger.h>
 #include <rudiments/charstring.h>
@@ -19,17 +19,17 @@ class custom_nw : public sqlrlogger {
 			custom_nw(xmldomnode *parameters);
 			~custom_nw();
 
-		bool	init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon);
+		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
 		bool	run(sqlrlistener *sqlrl,
-					sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+					sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					sqlrlogger_loglevel_t level,
 					sqlrlogger_eventtype_t event,
 					const char *info);
 	private:
 		int	strescape(const char *str, char *buf, int limit);
-		bool	descInputBinds(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+		bool	descInputBinds(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						char *buf, int limit);
 		file	querylog;
 		char	*querylogname;
@@ -44,7 +44,7 @@ custom_nw::~custom_nw() {
 	delete[] querylogname;
 }
 
-bool custom_nw::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
+bool custom_nw::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
 	debugFunction();
 
 	const char	*logdir=
@@ -76,8 +76,8 @@ bool custom_nw::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 }
 
 bool custom_nw::run(sqlrlistener *sqlrl,
-				sqlrconnection_svr *sqlrcon,
-				sqlrcursor_svr *sqlrcur,
+				sqlrserverconnection *sqlrcon,
+				sqlrservercursor *sqlrcur,
 				sqlrlogger_loglevel_t level,
 				sqlrlogger_eventtype_t event,
 				const char *info) {
@@ -184,8 +184,8 @@ int custom_nw::strescape(const char *str, char *buf, int limit) {
 	return (q-buf);
 }
 
-bool custom_nw::descInputBinds(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool custom_nw::descInputBinds(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					char *buf, int limit) {
 
 	char		*c=buf;	
@@ -196,10 +196,10 @@ bool custom_nw::descInputBinds(sqlrconnection_svr *sqlrcon,
 	*c='\0';
 
 	// fill the buffers
-	bindvar_svr	*inbinds=sqlrcon->cont->getInputBinds(sqlrcur);
+	sqlrserverbindvar	*inbinds=sqlrcon->cont->getInputBinds(sqlrcur);
 	for (uint16_t i=0; i<sqlrcon->cont->getInputBindCount(sqlrcur); i++) {
 
-		bindvar_svr	*bv=&(inbinds[i]);
+		sqlrserverbindvar	*bv=&(inbinds[i]);
 	
 		write_len=charstring::printf(
 				c,remain_len,"[%s => ",bv->variable);

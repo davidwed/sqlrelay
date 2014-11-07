@@ -12,22 +12,22 @@
 
 #include <sqlrelay/private/sqlrshmdata.h>
 
-class sqlrcontroller_svr;
-class sqlrconnection_svr;
-class sqlrcursor_svr;
-class bindvar_svr;
+class sqlrservercontroller;
+class sqlrserverconnection;
+class sqlrservercursor;
+class sqlrserverbindvar;
 
 class SQLRSERVER_DLLSPEC sqlrclientprotocol : public sqlrprotocol {
 	public:
-			sqlrclientprotocol(sqlrcontroller_svr *cont,
-						sqlrconnection_svr *conn);
+			sqlrclientprotocol(sqlrservercontroller *cont,
+						sqlrserverconnection *conn);
 		virtual	~sqlrclientprotocol();
 
 		sqlrclientexitstatus_t	clientSession();
 
 	private:
 		bool	getCommand(uint16_t *command);
-		sqlrcursor_svr	*getCursor(uint16_t command);
+		sqlrservercursor	*getCursor(uint16_t command);
 		void	noAvailableCursors(uint16_t command);
 		bool	authenticateCommand();
 		bool	getUserFromClient();
@@ -47,43 +47,45 @@ class SQLRSERVER_DLLSPEC sqlrclientprotocol : public sqlrprotocol {
 		void	getLastInsertIdCommand();
 		void	dbHostNameCommand();
 		void	dbIpAddressCommand();
-		bool	newQueryCommand(sqlrcursor_svr *cursor);
-		bool	reExecuteQueryCommand(sqlrcursor_svr *cursor);
-		bool	fetchFromBindCursorCommand(sqlrcursor_svr *cursor);
-		bool	processQueryOrBindCursor(sqlrcursor_svr *cursor,
+		bool	newQueryCommand(sqlrservercursor *cursor);
+		bool	reExecuteQueryCommand(sqlrservercursor *cursor);
+		bool	fetchFromBindCursorCommand(sqlrservercursor *cursor);
+		bool	processQueryOrBindCursor(sqlrservercursor *cursor,
 							bool reexecute,
 							bool bindcursor);
-		bool	getClientInfo(sqlrcursor_svr *cursor);
-		bool	getQuery(sqlrcursor_svr *cursor);
-		bool	getInputBinds(sqlrcursor_svr *cursor);
-		bool	getOutputBinds(sqlrcursor_svr *cursor);
-		bool	getBindVarCount(sqlrcursor_svr *cursor,
+		bool	getClientInfo(sqlrservercursor *cursor);
+		bool	getQuery(sqlrservercursor *cursor);
+		bool	getInputBinds(sqlrservercursor *cursor);
+		bool	getOutputBinds(sqlrservercursor *cursor);
+		bool	getBindVarCount(sqlrservercursor *cursor,
 						uint16_t *count);
-		bool	getBindVarName(sqlrcursor_svr *cursor,
-						bindvar_svr *bv);
-		bool	getBindVarType(bindvar_svr *bv);
-		bool	getBindSize(sqlrcursor_svr *cursor,
-					bindvar_svr *bv, uint32_t *maxsize);
-		void	getNullBind(bindvar_svr *bv);
-		bool	getStringBind(sqlrcursor_svr *cursor,
-						bindvar_svr *bv);
-		bool	getIntegerBind(bindvar_svr *bv);
-		bool	getDoubleBind(bindvar_svr *bv);
-		bool	getDateBind(bindvar_svr *bv);
-		bool	getLobBind(sqlrcursor_svr *cursor, bindvar_svr *bv);
+		bool	getBindVarName(sqlrservercursor *cursor,
+						sqlrserverbindvar *bv);
+		bool	getBindVarType(sqlrserverbindvar *bv);
+		bool	getBindSize(sqlrservercursor *cursor,
+						sqlrserverbindvar *bv,
+						uint32_t *maxsize);
+		void	getNullBind(sqlrserverbindvar *bv);
+		bool	getStringBind(sqlrservercursor *cursor,
+						sqlrserverbindvar *bv);
+		bool	getIntegerBind(sqlrserverbindvar *bv);
+		bool	getDoubleBind(sqlrserverbindvar *bv);
+		bool	getDateBind(sqlrserverbindvar *bv);
+		bool	getLobBind(sqlrservercursor *cursor,
+						sqlrserverbindvar *bv);
 		bool	getSendColumnInfo();
-		bool	getSkipAndFetch(sqlrcursor_svr *cursor);
-		void	returnResultSetHeader(sqlrcursor_svr *cursor);
-		void	returnColumnInfo(sqlrcursor_svr *cursor,
+		bool	getSkipAndFetch(sqlrservercursor *cursor);
+		void	returnResultSetHeader(sqlrservercursor *cursor);
+		void	returnColumnInfo(sqlrservercursor *cursor,
 							uint16_t format);
 		void	sendRowCounts(bool knowsactual, uint64_t actual,
 					bool knowsaffected, uint64_t affected);
-		void	returnOutputBindValues(sqlrcursor_svr *cursor);
-		void	returnOutputBindBlob(sqlrcursor_svr *cursor,
+		void	returnOutputBindValues(sqlrservercursor *cursor);
+		void	returnOutputBindBlob(sqlrservercursor *cursor,
 							uint16_t index);
-		void	returnOutputBindClob(sqlrcursor_svr *cursor,
+		void	returnOutputBindClob(sqlrservercursor *cursor,
 							uint16_t index);
-		void	sendLobOutputBind(sqlrcursor_svr *cursor,
+		void	sendLobOutputBind(sqlrservercursor *cursor,
 							uint16_t index);
 		void	sendColumnDefinition(const char *name,
 						uint16_t namelen,
@@ -114,41 +116,41 @@ class SQLRSERVER_DLLSPEC sqlrclientprotocol : public sqlrprotocol {
 						uint16_t zerofill,
 						uint16_t binary,
 						uint16_t autoincrement);
-		bool	returnResultSetData(sqlrcursor_svr *cursor,
+		bool	returnResultSetData(sqlrservercursor *cursor,
 						bool getskipandfetch);
-		void	returnRow(sqlrcursor_svr *cursor);
+		void	returnRow(sqlrservercursor *cursor);
 		void	sendField(const char *data, uint32_t size);
 		void	sendNullField();
-		void	sendLobField(sqlrcursor_svr *cursor, uint32_t col);
+		void	sendLobField(sqlrservercursor *cursor, uint32_t col);
 		void	startSendingLong(uint64_t longlength);
 		void	sendLongSegment(const char *data, uint32_t size);
 		void	endSendingLong();
 		void	returnError(bool disconnect);
-		void	returnError(sqlrcursor_svr *cursor, bool disconnect);
-		bool	fetchResultSetCommand(sqlrcursor_svr *cursor);
-		void	abortResultSetCommand(sqlrcursor_svr *cursor);
-		void	suspendResultSetCommand(sqlrcursor_svr *cursor);
-		bool	resumeResultSetCommand(sqlrcursor_svr *cursor);
-		bool	getDatabaseListCommand(sqlrcursor_svr *cursor);
-		bool	getTableListCommand(sqlrcursor_svr *cursor);
-		bool	getColumnListCommand(sqlrcursor_svr *cursor);
-		bool	getListCommand(sqlrcursor_svr *cursor,
+		void	returnError(sqlrservercursor *cursor, bool disconnect);
+		bool	fetchResultSetCommand(sqlrservercursor *cursor);
+		void	abortResultSetCommand(sqlrservercursor *cursor);
+		void	suspendResultSetCommand(sqlrservercursor *cursor);
+		bool	resumeResultSetCommand(sqlrservercursor *cursor);
+		bool	getDatabaseListCommand(sqlrservercursor *cursor);
+		bool	getTableListCommand(sqlrservercursor *cursor);
+		bool	getColumnListCommand(sqlrservercursor *cursor);
+		bool	getListCommand(sqlrservercursor *cursor,
 						int which, bool gettable);
-		bool	getListByApiCall(sqlrcursor_svr *cursor,
+		bool	getListByApiCall(sqlrservercursor *cursor,
 						int which,
 						const char *table,
 						const char *wild);
-		bool	getListByQuery(sqlrcursor_svr *cursor,
+		bool	getListByQuery(sqlrservercursor *cursor,
 						int which,
 						const char *table,
 						const char *wild);
-		bool	buildListQuery(sqlrcursor_svr *cursor,
+		bool	buildListQuery(sqlrservercursor *cursor,
 						const char *query,
 						const char *wild,
 						const char *table);
 		void	escapeParameter(stringbuffer *buffer,
 						const char *parameter);
-		bool	getQueryTreeCommand(sqlrcursor_svr *cursor);
+		bool	getQueryTreeCommand(sqlrservercursor *cursor);
 
 		stringbuffer	debugstr;
 

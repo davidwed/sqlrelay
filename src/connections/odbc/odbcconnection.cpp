@@ -11,7 +11,7 @@
 
 // note that sqlrserverconnection.h must be included after sqltypes.h to
 // get around a problem with CHAR/xmlChar in gnome-xml
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <rudiments/charstring.h>
 #include <rudiments/stdio.h>
@@ -65,10 +65,10 @@ struct datebind {
 
 class odbcconnection;
 
-class odbccursor : public sqlrcursor_svr {
+class odbccursor : public sqlrservercursor {
 	friend class odbcconnection;
 	private:
-				odbccursor(sqlrconnection_svr *conn,
+				odbccursor(sqlrserverconnection *conn,
 							uint16_t id);
 				~odbccursor();
 		bool		prepareQuery(const char *query,
@@ -196,16 +196,16 @@ class odbccursor : public sqlrcursor_svr {
 		odbcconnection	*odbcconn;
 };
 
-class odbcconnection : public sqlrconnection_svr {
+class odbcconnection : public sqlrserverconnection {
 	friend class odbccursor;
 	public:
-			odbcconnection(sqlrcontroller_svr *cont);
+			odbcconnection(sqlrservercontroller *cont);
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error);
 		const char	*logInError(const char *errmsg);
-		sqlrcursor_svr	*newCursor(uint16_t id);
-		void		deleteCursor(sqlrcursor_svr *curs);
+		sqlrservercursor	*newCursor(uint16_t id);
+		void		deleteCursor(sqlrservercursor *curs);
 		void		logOut();
 #if (ODBCVER>=0x0300)
 		bool		autoCommitOn();
@@ -222,15 +222,15 @@ class odbcconnection : public sqlrconnection_svr {
 		const char	*identify();
 		const char	*dbVersion();
 		bool		getListsByApiCalls();
-		bool		getDatabaseList(sqlrcursor_svr *cursor,
+		bool		getDatabaseList(sqlrservercursor *cursor,
 						const char *wild);
-		bool		getTableList(sqlrcursor_svr *cursor,
+		bool		getTableList(sqlrservercursor *cursor,
 						const char *wild);
 		bool		getDatabaseOrTableList(
-						sqlrcursor_svr *cursor,
+						sqlrservercursor *cursor,
 						const char *wild,
 						bool table);
-		bool		getColumnList(sqlrcursor_svr *cursor,
+		bool		getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild);
 		bool		setIsolationLevel(const char *isolevel);
@@ -391,8 +391,8 @@ char *conv_to_ucs(char *inbuf)
 }
 #endif
 
-odbcconnection::odbcconnection(sqlrcontroller_svr *cont) :
-					sqlrconnection_svr(cont) {
+odbcconnection::odbcconnection(sqlrservercontroller *cont) :
+					sqlrserverconnection(cont) {
 }
 
 
@@ -526,11 +526,11 @@ const char *odbcconnection::logInError(const char *errmsg) {
 	return errormessage.getString();
 }
 
-sqlrcursor_svr *odbcconnection::newCursor(uint16_t id) {
-	return (sqlrcursor_svr *)new odbccursor((sqlrconnection_svr *)this,id);
+sqlrservercursor *odbcconnection::newCursor(uint16_t id) {
+	return (sqlrservercursor *)new odbccursor((sqlrserverconnection *)this,id);
 }
 
-void odbcconnection::deleteCursor(sqlrcursor_svr *curs) {
+void odbcconnection::deleteCursor(sqlrservercursor *curs) {
 	delete (odbccursor *)curs;
 }
 
@@ -566,15 +566,15 @@ bool odbcconnection::getListsByApiCalls() {
 	return true;
 }
 
-bool odbcconnection::getDatabaseList(sqlrcursor_svr *cursor, const char *wild) {
+bool odbcconnection::getDatabaseList(sqlrservercursor *cursor, const char *wild) {
 	return getDatabaseOrTableList(cursor,wild,false);
 }
 
-bool odbcconnection::getTableList(sqlrcursor_svr *cursor, const char *wild) {
+bool odbcconnection::getTableList(sqlrservercursor *cursor, const char *wild) {
 	return getDatabaseOrTableList(cursor,wild,true);
 }
 
-bool odbcconnection::getDatabaseOrTableList(sqlrcursor_svr *cursor,
+bool odbcconnection::getDatabaseOrTableList(sqlrservercursor *cursor,
 							const char *wild,
 							bool table) {
 
@@ -611,7 +611,7 @@ bool odbcconnection::getDatabaseOrTableList(sqlrcursor_svr *cursor,
 	return (retval)?odbccur->handleColumns():false;
 }
 
-bool odbcconnection::getColumnList(sqlrcursor_svr *cursor,
+bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 					const char *table,
 					const char *wild) {
 
@@ -693,8 +693,8 @@ bool odbcconnection::setIsolationLevel(const char *isolevel) {
 	return true;
 }
 
-odbccursor::odbccursor(sqlrconnection_svr *conn, uint16_t id) :
-						sqlrcursor_svr(conn,id) {
+odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
+						sqlrservercursor(conn,id) {
 	odbcconn=(odbcconnection *)conn;
 	stmt=NULL;
 	outdatebind=new datebind *[conn->cont->cfgfl->getMaxBindCount()];
@@ -1658,7 +1658,7 @@ void odbccursor::closeResultSet() {
 }
 
 extern "C" {
-	sqlrconnection_svr *new_odbcconnection(sqlrcontroller_svr *cont) {
+	sqlrserverconnection *new_odbcconnection(sqlrservercontroller *cont) {
 		return new odbcconnection(cont);
 	}
 }

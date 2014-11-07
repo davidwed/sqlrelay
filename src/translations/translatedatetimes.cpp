@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
 #include <sqlrelay/sqlparser.h>
@@ -15,17 +15,17 @@ class translatedatetimes : public sqlrtranslation {
 			translatedatetimes(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 	private:
-		bool translateDateTimesInQuery(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool translateDateTimesInQuery(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldomnode *querynode,
 					xmldomnode *parameters);
 		bool translateDateTimesInBindVariables(
-					sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+					sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldomnode *querynode,
 					xmldomnode *parameters);
 };
@@ -36,8 +36,8 @@ translatedatetimes::translatedatetimes(sqlrtranslations *sqlts,
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-bool translatedatetimes::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool translatedatetimes::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 	if (debug) {
 		stdoutput.printf("date/time translation:\n");
@@ -76,8 +76,8 @@ bool translatedatetimes::run(sqlrconnection_svr *sqlrcon,
 #include <parsedatetime.h>
 
 bool translatedatetimes::translateDateTimesInQuery(
-					sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+					sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldomnode *querynode,
 					xmldomnode *parameters) {
 	debugFunction();
@@ -211,8 +211,8 @@ bool translatedatetimes::translateDateTimesInQuery(
 }
 
 bool translatedatetimes::translateDateTimesInBindVariables(
-						sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+						sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldomnode *querynode,
 						xmldomnode *parameters) {
 	debugFunction();
@@ -244,13 +244,13 @@ bool translatedatetimes::translateDateTimesInBindVariables(
 		timeformat="HH24:MI:SS";
 	}
 
-	bindvar_svr	*inbinds=sqlrcon->cont->getInputBinds(sqlrcur);
+	sqlrserverbindvar	*inbinds=sqlrcon->cont->getInputBinds(sqlrcur);
 
 	// run through the bind variables...
 	for (uint16_t i=0; i<sqlrcon->cont->getInputBindCount(sqlrcur); i++) {
 
 		// get the variable
-		bindvar_svr	*bind=&(inbinds[i]);
+		sqlrserverbindvar	*bind=&(inbinds[i]);
 
 		// ignore non-strings...
 		if (bind->type!=STRING_BIND) {

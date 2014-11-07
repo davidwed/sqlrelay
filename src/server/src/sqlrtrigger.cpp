@@ -13,8 +13,8 @@ sqlrtrigger::sqlrtrigger(xmldomnode *parameters, bool debug) {
 sqlrtrigger::~sqlrtrigger() {
 }
 
-bool sqlrtrigger::run(sqlrconnection_svr *sqlrcon,
-				sqlrcursor_svr *sqlrcur,
+bool sqlrtrigger::run(sqlrserverconnection *sqlrcon,
+				sqlrservercursor *sqlrcur,
 				xmldom *querytree,
 				bool before,
 				bool success) {

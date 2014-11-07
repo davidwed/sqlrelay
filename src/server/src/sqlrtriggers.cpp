@@ -166,23 +166,23 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 	list->append(sqltp);
 }
 
-void sqlrtriggers::runBeforeTriggers(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+void sqlrtriggers::runBeforeTriggers(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 	debugFunction();
 	runTriggers(sqlrcon,sqlrcur,querytree,&beforetriggers,true,true);
 }
 
-void sqlrtriggers::runAfterTriggers(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+void sqlrtriggers::runAfterTriggers(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldom *querytree,
 						bool success) {
 	debugFunction();
 	runTriggers(sqlrcon,sqlrcur,querytree,&aftertriggers,false,success);
 }
 
-void sqlrtriggers::runTriggers(sqlrconnection_svr *sqlrcon,
-				sqlrcursor_svr *sqlrcur,
+void sqlrtriggers::runTriggers(sqlrserverconnection *sqlrcon,
+				sqlrservercursor *sqlrcur,
 				xmldom *querytree,
 				singlylinkedlist< sqlrtriggerplugin * > *list,
 				bool before,

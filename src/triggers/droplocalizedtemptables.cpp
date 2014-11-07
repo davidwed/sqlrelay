@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
 #include <sqlrelay/sqlparser.h>
@@ -13,14 +13,14 @@ class droplocalizedtemptables : public sqlrtrigger {
 	public:
 			droplocalizedtemptables(
 					xmldomnode *parameters, bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree,
 					bool before,
 					bool success);
 	private:
-		bool	dropTable(sqlrcontroller_svr *cont, xmldom *querytree);
-		bool	dropIndex(sqlrcontroller_svr *cont, xmldom *querytree);
+		bool	dropTable(sqlrservercontroller *cont, xmldom *querytree);
+		bool	dropIndex(sqlrservercontroller *cont, xmldom *querytree);
 };
 
 droplocalizedtemptables::droplocalizedtemptables(
@@ -28,8 +28,8 @@ droplocalizedtemptables::droplocalizedtemptables(
 					sqlrtrigger(parameters,debug) {
 }
 
-bool droplocalizedtemptables::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool droplocalizedtemptables::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree,
 					bool before,
 					bool success) {
@@ -51,7 +51,7 @@ bool droplocalizedtemptables::run(sqlrconnection_svr *sqlrcon,
 			dropIndex(sqlrcon->cont,querytree);
 }
 
-bool droplocalizedtemptables::dropTable(sqlrcontroller_svr *cont,
+bool droplocalizedtemptables::dropTable(sqlrservercontroller *cont,
 						xmldom *querytree) {
 	debugFunction();
 
@@ -111,7 +111,7 @@ bool droplocalizedtemptables::dropTable(sqlrcontroller_svr *cont,
 	return true;
 }
 
-bool droplocalizedtemptables::dropIndex(sqlrcontroller_svr *cont,
+bool droplocalizedtemptables::dropIndex(sqlrservercontroller *cont,
 						xmldom *querytree) {
 	debugFunction();
 

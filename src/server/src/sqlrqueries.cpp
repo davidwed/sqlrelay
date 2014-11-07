@@ -144,7 +144,7 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 	llist.append(sqlrlp);
 }
 
-sqlrquerycursor *sqlrqueries::match(sqlrconnection_svr *sqlrcon,
+sqlrquerycursor *sqlrqueries::match(sqlrserverconnection *sqlrcon,
 					const char *querystring,
 					uint32_t querylength,
 					uint16_t id) {

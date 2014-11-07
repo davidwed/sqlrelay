@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrlistener.h>
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
 #include <sqlrelay/sqlrlogger.h>
@@ -18,10 +18,10 @@ class slowqueries : public sqlrlogger {
 			slowqueries(xmldomnode *parameters);
 			~slowqueries();
 
-		bool	init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon);
+		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
 		bool	run(sqlrlistener *sqlrl,
-					sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+					sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					sqlrlogger_loglevel_t level,
 					sqlrlogger_eventtype_t event,
 					const char *info);
@@ -45,7 +45,7 @@ slowqueries::~slowqueries() {
 	delete[] querylogname;
 }
 
-bool slowqueries::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
+bool slowqueries::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
 
 	// don't log anything for the listener
 	if (!sqlrcon) {
@@ -83,8 +83,8 @@ bool slowqueries::init(sqlrlistener *sqlrl, sqlrconnection_svr *sqlrcon) {
 }
 
 bool slowqueries::run(sqlrlistener *sqlrl,
-				sqlrconnection_svr *sqlrcon,
-				sqlrcursor_svr *sqlrcur,
+				sqlrserverconnection *sqlrcon,
+				sqlrservercursor *sqlrcur,
 				sqlrlogger_loglevel_t level,
 				sqlrlogger_eventtype_t event,
 				const char *info) {

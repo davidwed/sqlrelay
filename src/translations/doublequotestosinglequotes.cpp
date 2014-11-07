@@ -12,8 +12,8 @@ class doublequotestosinglequotes : public sqlrtranslation {
 			doublequotestosinglequotes(sqlrtranslations *sqlts,
 							xmldomnode *parameters,
 							bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 	private:
 		bool	replaceDoubleQuotes(xmldomnode *node);
@@ -26,8 +26,8 @@ doublequotestosinglequotes::doublequotestosinglequotes(
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-bool doublequotestosinglequotes::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool doublequotestosinglequotes::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 	return replaceDoubleQuotes(querytree->getRootNode());
 }

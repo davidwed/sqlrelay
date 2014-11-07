@@ -25,14 +25,14 @@ enum sqlrclientexitstatus_t {
 	SQLRCLIENTEXITSTATUS_SUSPENDED_SESSION
 };
 
-class sqlrcontroller_svr;
-class sqlrconnection_svr;
+class sqlrservercontroller;
+class sqlrserverconnection;
 class sqlrconfigfile;
 
 class SQLRSERVER_DLLSPEC sqlrprotocol {
 	public:
-			sqlrprotocol(sqlrcontroller_svr *cont,
-					sqlrconnection_svr *conn);
+			sqlrprotocol(sqlrservercontroller *cont,
+					sqlrserverconnection *conn);
 		virtual	~sqlrprotocol();
 
 		void	setClientSocket(filedescriptor *clientsock);
@@ -40,8 +40,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 		virtual sqlrclientexitstatus_t	clientSession()=0;
 
 	protected:
-		sqlrcontroller_svr	*cont;
-		sqlrconnection_svr	*conn;
+		sqlrservercontroller	*cont;
+		sqlrserverconnection	*conn;
 		filedescriptor		*clientsock;
 };
 

@@ -11,8 +11,8 @@
 #include <rudiments/dynamiclib.h>
 #include <sqlrelay/sqlrtrigger.h>
 
-class sqlrconnection_svr;
-class sqlrcursor_svr;
+class sqlrserverconnection;
+class sqlrservercursor;
 
 class SQLRSERVER_DLLSPEC sqlrtriggerplugin {
 	public:
@@ -26,11 +26,11 @@ class SQLRSERVER_DLLSPEC sqlrtriggers {
 			~sqlrtriggers();
 
 		bool	loadTriggers(const char *triggers);
-		void	runBeforeTriggers(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+		void	runBeforeTriggers(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldom *querytree);
-		void	runAfterTriggers(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+		void	runAfterTriggers(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldom *querytree,
 						bool success);
 	private:
@@ -38,8 +38,8 @@ class SQLRSERVER_DLLSPEC sqlrtriggers {
 		void		loadTrigger(xmldomnode *trigger,
 					singlylinkedlist< sqlrtriggerplugin *>
 					*list);
-		void		runTriggers(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		void		runTriggers(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree,
 					singlylinkedlist< sqlrtriggerplugin * >
 					*list,

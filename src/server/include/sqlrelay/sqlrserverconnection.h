@@ -6,12 +6,12 @@
 
 #include <sqlrelay/private/sqlrserverconnectionincludes.h>
 
-class sqlrcontroller_svr;
+class sqlrservercontroller;
 
-class SQLRSERVER_DLLSPEC sqlrconnection_svr {
+class SQLRSERVER_DLLSPEC sqlrserverconnection {
 	public:
-			sqlrconnection_svr(sqlrcontroller_svr *cont);
-		virtual	~sqlrconnection_svr();
+			sqlrserverconnection(sqlrservercontroller *cont);
+		virtual	~sqlrserverconnection();
 
 		virtual bool	mustDetachBeforeLogIn();
 
@@ -68,13 +68,13 @@ class SQLRSERVER_DLLSPEC sqlrconnection_svr {
 
 		virtual bool		getListsByApiCalls();
 		virtual bool		getDatabaseList(
-						sqlrcursor_svr *cursor,
+						sqlrservercursor *cursor,
 						const char *wild);
 		virtual bool		getTableList(
-						sqlrcursor_svr *cursor,
+						sqlrservercursor *cursor,
 						const char *wild);
 		virtual bool		getColumnList(
-						sqlrcursor_svr *cursor,
+						sqlrservercursor *cursor,
 						const char *table,
 						const char *wild);
 		virtual const char	*getDatabaseListQuery(bool wild);
@@ -85,8 +85,8 @@ class SQLRSERVER_DLLSPEC sqlrconnection_svr {
 		virtual bool		isSynonym(const char *table);
 		virtual const char	*isSynonymQuery();
 
-		virtual sqlrcursor_svr	*newCursor(uint16_t id)=0;
-		virtual void		deleteCursor(sqlrcursor_svr *curs)=0;
+		virtual sqlrservercursor	*newCursor(uint16_t id)=0;
+		virtual void		deleteCursor(sqlrservercursor *curs)=0;
 
 		virtual	const char	*bindFormat();
 		virtual	int16_t		nonNullBindValue();
@@ -114,7 +114,7 @@ class SQLRSERVER_DLLSPEC sqlrconnection_svr {
 		bool		getLiveConnection();
 		void		setLiveConnection(bool liveconnection);
 
-		sqlrcontroller_svr	*cont;
+		sqlrservercontroller	*cont;
 
 	#include <sqlrelay/private/sqlrserverconnection.h>
 };

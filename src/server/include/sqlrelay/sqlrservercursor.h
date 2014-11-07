@@ -6,7 +6,7 @@
 
 #include <sqlrelay/private/sqlrservercursorincludes.h>
 
-class SQLRSERVER_DLLSPEC bindvar_svr {
+class SQLRSERVER_DLLSPEC sqlrserverbindvar {
 	public:
 		char	*variable;
 		int16_t	variablesize;
@@ -56,13 +56,14 @@ enum sqlrquerytype_t {
 	SQLRQUERYTYPE_ETC
 };
 
-class sqlrconnection_svr;
+class sqlrserverconnection;
 class sqlrquerycursor;
 
-class SQLRSERVER_DLLSPEC sqlrcursor_svr {
+class SQLRSERVER_DLLSPEC sqlrservercursor {
 	public:
-			sqlrcursor_svr(sqlrconnection_svr *conn, uint16_t id);
-		virtual	~sqlrcursor_svr();
+			sqlrservercursor(sqlrserverconnection *conn,
+							uint16_t id);
+		virtual	~sqlrservercursor();
 
 		virtual	bool	open();
 		virtual	bool	close();
@@ -158,7 +159,7 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 						int16_t *isnull);
 		virtual	bool	outputBindCursor(const char *variable,
 						uint16_t variablesize,
-						sqlrcursor_svr *cursor);
+						sqlrservercursor *cursor);
 		virtual bool	getLobOutputBindLength(uint16_t index,
 							uint64_t *length);
 		virtual bool	getLobOutputBindSegment(uint16_t index,
@@ -233,11 +234,11 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 
 		void		setInputBindCount(uint16_t inbindcount);
 		uint16_t	getInputBindCount();
-		bindvar_svr	*getInputBinds();
+		sqlrserverbindvar	*getInputBinds();
 
 		void		setOutputBindCount(uint16_t outbindcount);
 		uint16_t	getOutputBindCount();
-		bindvar_svr	*getOutputBinds();
+		sqlrserverbindvar	*getOutputBinds();
 
 		void	performSubstitution(stringbuffer *buffer,
 							int16_t index);
@@ -289,7 +290,7 @@ class SQLRSERVER_DLLSPEC sqlrcursor_svr {
 		bool		getLiveConnection();
 		void		setLiveConnection(bool liveconnection);
 
-		sqlrconnection_svr	*conn;
+		sqlrserverconnection	*conn;
 
 	#include <sqlrelay/private/sqlrservercursor.h>
 };

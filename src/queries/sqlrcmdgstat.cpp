@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrquery.h>
 #include <rudiments/charstring.h>
@@ -14,7 +14,7 @@ class sqlrcmdgstat : public sqlrquery {
 	public:
 			sqlrcmdgstat(xmldomnode *parameters);
 		bool	match(const char *querystring, uint32_t querylength);
-		sqlrquerycursor	*newCursor(sqlrconnection_svr *conn,
+		sqlrquerycursor	*newCursor(sqlrserverconnection *conn,
 							uint16_t id);
 };
 
@@ -28,7 +28,7 @@ struct gs_result_row {
 
 class sqlrcmdgstatcursor : public sqlrquerycursor {
 	public:
-			sqlrcmdgstatcursor(sqlrconnection_svr *sqlrcon,
+			sqlrcmdgstatcursor(sqlrserverconnection *sqlrcon,
 						xmldomnode *parameters,
 						uint16_t id);
 
@@ -69,12 +69,12 @@ bool sqlrcmdgstat::match(const char *querystring,
 	return !charstring::compareIgnoringCase(querystring,"sqlrcmd gstat");
 }
 
-sqlrquerycursor *sqlrcmdgstat::newCursor(sqlrconnection_svr *sqlrcon,
+sqlrquerycursor *sqlrcmdgstat::newCursor(sqlrserverconnection *sqlrcon,
 							uint16_t id) {
 	return new sqlrcmdgstatcursor(sqlrcon,parameters,id);
 }
 
-sqlrcmdgstatcursor::sqlrcmdgstatcursor(sqlrconnection_svr *sqlrcon,
+sqlrcmdgstatcursor::sqlrcmdgstatcursor(sqlrserverconnection *sqlrcon,
 					xmldomnode *parameters, uint16_t id) :
 					sqlrquerycursor(sqlrcon,parameters,id) {
 	rowcount=0;

@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <rudiments/environment.h>
 
@@ -50,10 +50,10 @@ struct datebind {
 
 class db2connection;
 
-class db2cursor : public sqlrcursor_svr {
+class db2cursor : public sqlrservercursor {
 	friend class db2connection;
 	public:
-			db2cursor(sqlrconnection_svr *conn, uint16_t id);
+			db2cursor(sqlrserverconnection *conn, uint16_t id);
 			~db2cursor();
 	private:
 		void		allocateResultSetBuffers(
@@ -210,18 +210,18 @@ class db2cursor : public sqlrcursor_svr {
 		db2connection	*db2conn;
 };
 
-class db2connection : public sqlrconnection_svr {
+class db2connection : public sqlrserverconnection {
 	friend class db2cursor;
 	public:
-			db2connection(sqlrcontroller_svr *cont);
+			db2connection(sqlrservercontroller *cont);
 	private:
 		void	handleConnectString();
 		bool	mustDetachBeforeLogIn();
 		bool	logIn(const char **error);
 		const char	*logInError(const char *errmsg);
 		void	dbVersionSpecificTasks();
-		sqlrcursor_svr	*newCursor(uint16_t id);
-		void	deleteCursor(sqlrcursor_svr *curs);
+		sqlrservercursor	*newCursor(uint16_t id);
+		void	deleteCursor(sqlrservercursor *curs);
 		void	logOut();
 		int16_t	nullBindValue();
 		bool	bindValueIsNull(int16_t isnull);
@@ -276,8 +276,8 @@ class db2connection : public sqlrconnection_svr {
 		stringbuffer	errormsg;
 };
 
-db2connection::db2connection(sqlrcontroller_svr *cont) :
-					sqlrconnection_svr(cont) {
+db2connection::db2connection(sqlrservercontroller *cont) :
+					sqlrserverconnection(cont) {
 
 	fetchatonce=FETCH_AT_ONCE;
 	maxselectlistsize=MAX_SELECT_LIST_SIZE;
@@ -511,11 +511,11 @@ void db2connection::dbVersionSpecificTasks() {
 	}
 }
 
-sqlrcursor_svr *db2connection::newCursor(uint16_t id) {
-	return (sqlrcursor_svr *)new db2cursor((sqlrconnection_svr *)this,id);
+sqlrservercursor *db2connection::newCursor(uint16_t id) {
+	return (sqlrservercursor *)new db2cursor((sqlrserverconnection *)this,id);
 }
 
-void db2connection::deleteCursor(sqlrcursor_svr *curs) {
+void db2connection::deleteCursor(sqlrservercursor *curs) {
 	delete (db2cursor *)curs;
 }
 
@@ -704,8 +704,8 @@ const char *db2connection::setIsolationLevelQuery() {
         return "set current isolation %s";
 }
 
-db2cursor::db2cursor(sqlrconnection_svr *conn, uint16_t id) :
-						sqlrcursor_svr(conn,id) {
+db2cursor::db2cursor(sqlrserverconnection *conn, uint16_t id) :
+						sqlrservercursor(conn,id) {
 	db2conn=(db2connection *)conn;
 	stmt=0;
 	lobstmt=0;
@@ -1700,7 +1700,7 @@ void db2cursor::closeResultSet() {
 }
 
 extern "C" {
-	sqlrconnection_svr *new_db2connection(sqlrcontroller_svr *cont) {
+	sqlrserverconnection *new_db2connection(sqlrservercontroller *cont) {
 		return new db2connection(cont);
 	}
 }

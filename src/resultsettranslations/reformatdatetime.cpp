@@ -1,7 +1,7 @@
 // Copyright (c) 2014  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
 #include <sqlrelay/sqlparser.h>
@@ -13,8 +13,8 @@ class reformatdatetime : public sqlrresultsettranslation {
 			reformatdatetime(sqlrresultsettranslations *sqlrrsts,
 							xmldomnode *parameters);
 			~reformatdatetime();
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					uint16_t fieldindex,
 					const char *field,
 					uint32_t fieldlength,
@@ -60,8 +60,8 @@ reformatdatetime::~reformatdatetime() {
 	delete[] reformattedfield;
 }
 
-bool reformatdatetime::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool reformatdatetime::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					uint16_t fieldindex,
 					const char *field,
 					uint32_t fieldlength,
@@ -69,7 +69,7 @@ bool reformatdatetime::run(sqlrconnection_svr *sqlrcon,
 					uint32_t *newfieldlength) {
 	debugFunction();
 
-	// For now, call the sqlrcontroller method.
+	// For now, call the sqlrservercontroller method.
 	// Eventually that code should be moved here.
 	sqlrcon->cont->reformatDateTimes(sqlrcur,fieldindex,
 					field,fieldlength,

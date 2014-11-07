@@ -2,12 +2,12 @@
 // See the file COPYING for more information
 
 #include <config.h>
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <rudiments/process.h>
 #include <rudiments/signalclasses.h>
 #include <rudiments/stdio.h>
 
-sqlrcontroller_svr	*cont=NULL;
+sqlrservercontroller	*cont=NULL;
 volatile sig_atomic_t	shutdowninprogress=0;
 signalhandler		shutdownhandler;
 bool			shutdownalready=false;
@@ -137,7 +137,7 @@ int main(int argc, const char **argv) {
 	#include <version.h>
 
 	// create the controller
-	cont=new sqlrcontroller_svr;
+	cont=new sqlrservercontroller;
 
 	// handle signals more particularly
 	handleSignals(shutDown);

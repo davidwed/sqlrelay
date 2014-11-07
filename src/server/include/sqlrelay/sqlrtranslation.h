@@ -9,8 +9,8 @@
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 
-class sqlrconnection_svr;
-class sqlrcursor_svr;
+class sqlrserverconnection;
+class sqlrservercursor;
 class sqlrtranslations;
 
 class SQLRSERVER_DLLSPEC sqlrtranslation {
@@ -20,8 +20,8 @@ class SQLRSERVER_DLLSPEC sqlrtranslation {
 					bool debug);
 		virtual	~sqlrtranslation();
 
-		virtual bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		virtual bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 	protected:
 		sqlrtranslations	*sqlts;

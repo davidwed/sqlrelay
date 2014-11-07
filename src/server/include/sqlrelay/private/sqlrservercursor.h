@@ -11,10 +11,10 @@
 
 		xmldom		*querytree;
 
-		uint16_t	inbindcount;
-		bindvar_svr	*inbindvars;
-		uint16_t	outbindcount;
-		bindvar_svr	*outbindvars;
+		uint16_t		inbindcount;
+		sqlrserverbindvar	*inbindvars;
+		uint16_t		outbindcount;
+		sqlrserverbindvar	*outbindvars;
 
 		uint64_t	totalrowsfetched;
 
@@ -39,7 +39,7 @@
 		sqlrquerycursor		*customquerycursor;
 
 	public:
-		// flags that are only useful to the sqlrcontroller
+		// flags that are only useful to the sqlrservercontroller
 		bool		prepared;
 		bool		querywasintercepted;
 		bool		bindswerefaked;

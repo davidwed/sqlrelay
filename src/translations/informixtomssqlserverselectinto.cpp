@@ -13,8 +13,8 @@ class informixtomssqlserverselectinto : public sqlrtranslation {
 						sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 };
 
@@ -25,8 +25,8 @@ informixtomssqlserverselectinto::informixtomssqlserverselectinto(
 				sqlrtranslation(sqlts,parameters,debug) {
 }
 
-bool informixtomssqlserverselectinto::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool informixtomssqlserverselectinto::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 	debugFunction();
 

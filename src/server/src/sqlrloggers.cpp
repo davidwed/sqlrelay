@@ -145,7 +145,7 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 }
 
 void sqlrloggers::initLoggers(sqlrlistener *sqlrl,
-				sqlrconnection_svr *sqlrcon) {
+				sqlrserverconnection *sqlrcon) {
 	debugFunction();
 	for (singlylinkedlistnode< sqlrloggerplugin * > *node=llist.getFirst();
 						node; node=node->getNext()) {
@@ -154,8 +154,8 @@ void sqlrloggers::initLoggers(sqlrlistener *sqlrl,
 }
 
 void sqlrloggers::runLoggers(sqlrlistener *sqlrl,
-					sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+					sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					sqlrlogger_loglevel_t level,
 					sqlrlogger_eventtype_t event,
 					const char *info) {

@@ -3,7 +3,7 @@
 
 #include <config.h>
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrclientprotocol.h>
 #include <rudiments/file.h>
 #include <rudiments/socketclient.h>
@@ -31,10 +31,10 @@
 	}
 #endif
 
-signalhandler		sqlrcontroller_svr::alarmhandler;
-volatile sig_atomic_t	sqlrcontroller_svr::alarmrang=0;
+signalhandler		sqlrservercontroller::alarmhandler;
+volatile sig_atomic_t	sqlrservercontroller::alarmrang=0;
 
-sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
+sqlrservercontroller::sqlrservercontroller() : listener() {
 
 	conn=NULL;
 
@@ -144,7 +144,7 @@ sqlrcontroller_svr::sqlrcontroller_svr() : listener() {
 	proxypid=0;
 }
 
-sqlrcontroller_svr::~sqlrcontroller_svr() {
+sqlrservercontroller::~sqlrservercontroller() {
 
 	shutDown();
 
@@ -208,7 +208,7 @@ sqlrcontroller_svr::~sqlrcontroller_svr() {
 	delete conn;
 }
 
-bool sqlrcontroller_svr::init(int argc, const char **argv) {
+bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// process command line
 	cmdl=new cmdline(argc,argv);
@@ -448,7 +448,7 @@ bool sqlrcontroller_svr::init(int argc, const char **argv) {
 	return true;
 }
 
-void sqlrcontroller_svr::setUserAndGroup() {
+void sqlrservercontroller::setUserAndGroup() {
 
 	// get the user that we're currently running as
 	char	*currentuser=
@@ -479,7 +479,7 @@ void sqlrcontroller_svr::setUserAndGroup() {
 	delete[] currentgroup;
 }
 
-sqlrconnection_svr *sqlrcontroller_svr::initConnection(const char *dbase) {
+sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the connection module
@@ -499,8 +499,8 @@ sqlrconnection_svr *sqlrcontroller_svr::initConnection(const char *dbase) {
 	// load the connection itself
 	stringbuffer	functionname;
 	functionname.append("new_")->append(dbase)->append("connection");
-	sqlrconnection_svr	*(*newConn)(sqlrcontroller_svr *)=
-				(sqlrconnection_svr *(*)(sqlrcontroller_svr *))
+	sqlrserverconnection	*(*newConn)(sqlrservercontroller *)=
+				(sqlrserverconnection *(*)(sqlrservercontroller *))
 					dl.getSymbol(functionname.getString());
 	if (!newConn) {
 		stderror.printf("failed to load connection: %s\n",dbase);
@@ -510,10 +510,10 @@ sqlrconnection_svr *sqlrcontroller_svr::initConnection(const char *dbase) {
 		return NULL;
 	}
 
-	sqlrconnection_svr	*conn=(*newConn)(this);
+	sqlrserverconnection	*conn=(*newConn)(this);
 
 #else
-	sqlrconnection_svr	*conn;
+	sqlrserverconnection	*conn;
 	stringbuffer		connectionname;
 	connectionname.append(dbase)->append("connection");
 	#include "sqlrconnectionassignments.cpp"
@@ -533,7 +533,7 @@ sqlrconnection_svr *sqlrcontroller_svr::initConnection(const char *dbase) {
 	return conn;
 }
 
-void sqlrcontroller_svr::setUnixSocketDirectory() {
+void sqlrservercontroller::setUnixSocketDirectory() {
 	size_t	unixsocketlen=tmpdir->getLength()+31;
 	unixsocket=new char[unixsocketlen];
 	charstring::printf(unixsocket,unixsocketlen,
@@ -542,7 +542,7 @@ void sqlrcontroller_svr::setUnixSocketDirectory() {
 	unixsocketptrlen=unixsocketlen-(unixsocketptr-unixsocket);
 }
 
-bool sqlrcontroller_svr::handlePidFile() {
+bool sqlrservercontroller::handlePidFile() {
 
 	// check for listener's pid file
 	// (Look a few times.  It might not be there right away.  The listener
@@ -581,7 +581,7 @@ bool sqlrcontroller_svr::handlePidFile() {
 	return retval;
 }
 
-void sqlrcontroller_svr::initDatabaseAvailableFileName() {
+void sqlrservercontroller::initDatabaseAvailableFileName() {
 
 	// initialize the database up/down filename
 	size_t	updownlen=charstring::length(tmpdir->getString())+5+
@@ -592,7 +592,7 @@ void sqlrcontroller_svr::initDatabaseAvailableFileName() {
 			tmpdir->getString(),cmdl->getId(),connectionid);
 }
 
-bool sqlrcontroller_svr::getUnixSocket() {
+bool sqlrservercontroller::getUnixSocket() {
 
 	logDebugMessage("getting unix socket...");
 
@@ -618,7 +618,7 @@ bool sqlrcontroller_svr::getUnixSocket() {
 	return true;
 }
 
-bool sqlrcontroller_svr::openSequenceFile(file *sockseq) {
+bool sqlrservercontroller::openSequenceFile(file *sockseq) {
 
 	// open the sequence file and get the current port number
 	size_t	sockseqnamelen=tmpdir->getLength()+9;
@@ -657,7 +657,7 @@ bool sqlrcontroller_svr::openSequenceFile(file *sockseq) {
 	return success;
 }
 
-bool sqlrcontroller_svr::lockSequenceFile(file *sockseq) {
+bool sqlrservercontroller::lockSequenceFile(file *sockseq) {
 
 	logDebugMessage("locking...");
 
@@ -668,7 +668,7 @@ bool sqlrcontroller_svr::lockSequenceFile(file *sockseq) {
 	return true;
 }
 
-bool sqlrcontroller_svr::unLockSequenceFile(file *sockseq) {
+bool sqlrservercontroller::unLockSequenceFile(file *sockseq) {
 
 	// unlock and close the file in a platform-independent manner
 	logDebugMessage("unlocking...");
@@ -680,7 +680,7 @@ bool sqlrcontroller_svr::unLockSequenceFile(file *sockseq) {
 	return true;
 }
 
-bool sqlrcontroller_svr::getAndIncrementSequenceNumber(file *sockseq) {
+bool sqlrservercontroller::getAndIncrementSequenceNumber(file *sockseq) {
 
 	// get the sequence number from the file
 	int32_t	buffer;
@@ -717,7 +717,7 @@ bool sqlrcontroller_svr::getAndIncrementSequenceNumber(file *sockseq) {
 	return true;
 }
 
-bool sqlrcontroller_svr::attemptLogIn(bool printerrors) {
+bool sqlrservercontroller::attemptLogIn(bool printerrors) {
 
 	logDebugMessage("logging in...");
 
@@ -736,7 +736,7 @@ bool sqlrcontroller_svr::attemptLogIn(bool printerrors) {
 	return true;
 }
 
-bool sqlrcontroller_svr::logIn(bool printerrors) {
+bool sqlrservercontroller::logIn(bool printerrors) {
 
 	// don't do anything if we're already logged in
 	if (loggedin) {
@@ -804,7 +804,7 @@ bool sqlrcontroller_svr::logIn(bool printerrors) {
 	return true;
 }
 
-void sqlrcontroller_svr::logOut() {
+void sqlrservercontroller::logOut() {
 
 	// don't do anything if we're already logged out
 	if (!loggedin) {
@@ -826,7 +826,7 @@ void sqlrcontroller_svr::logOut() {
 	logDebugMessage("done logging out");
 }
 
-void sqlrcontroller_svr::setAutoCommit(bool ac) {
+void sqlrservercontroller::setAutoCommit(bool ac) {
 	logDebugMessage("setting autocommit...");
 	if (ac) {
 		if (!autoCommitOn()) {
@@ -844,14 +844,14 @@ void sqlrcontroller_svr::setAutoCommit(bool ac) {
 	logDebugMessage("done setting autocommit");
 }
 
-bool sqlrcontroller_svr::initCursors(uint16_t count) {
+bool sqlrservercontroller::initCursors(uint16_t count) {
 
 	logDebugMessage("initializing cursors...");
 
 	cursorcount=count;
 	if (!cur) {
-		cur=new sqlrcursor_svr *[maxcursorcount];
-		bytestring::zero(cur,maxcursorcount*sizeof(sqlrcursor_svr *));
+		cur=new sqlrservercursor *[maxcursorcount];
+		bytestring::zero(cur,maxcursorcount*sizeof(sqlrservercursor *));
 	}
 
 	for (uint16_t i=0; i<cursorcount; i++) {
@@ -872,20 +872,20 @@ bool sqlrcontroller_svr::initCursors(uint16_t count) {
 	return true;
 }
 
-sqlrcursor_svr *sqlrcontroller_svr::newCursor(uint16_t id) {
-	sqlrcursor_svr	*cursor=conn->newCursor(id);
+sqlrservercursor *sqlrservercontroller::newCursor(uint16_t id) {
+	sqlrservercursor	*cursor=conn->newCursor(id);
 	if (cursor) {
 		incrementOpenDatabaseCursors();
 	}
 	return cursor;
 }
 
-sqlrcursor_svr *sqlrcontroller_svr::newCursor() {
+sqlrservercursor *sqlrservercontroller::newCursor() {
 	// return a cursor with an ID that can't already exist
 	return newCursor(cursorcount+1);
 }
 
-void sqlrcontroller_svr::incrementConnectionCount() {
+void sqlrservercontroller::incrementConnectionCount() {
 
 	logDebugMessage("incrementing connection count...");
 
@@ -908,7 +908,7 @@ void sqlrcontroller_svr::incrementConnectionCount() {
 	logDebugMessage("done incrementing connection count");
 }
 
-void sqlrcontroller_svr::decrementConnectionCount() {
+void sqlrservercontroller::decrementConnectionCount() {
 
 	logDebugMessage("decrementing connection count...");
 
@@ -931,7 +931,7 @@ void sqlrcontroller_svr::decrementConnectionCount() {
 	logDebugMessage("done decrementing connection count");
 }
 
-void sqlrcontroller_svr::markDatabaseAvailable() {
+void sqlrservercontroller::markDatabaseAvailable() {
 
 	size_t	stringlen=9+charstring::length(updown)+1;
 	char	*string=new char[stringlen];
@@ -945,7 +945,7 @@ void sqlrcontroller_svr::markDatabaseAvailable() {
 	fd.create(updown,permissions::ownerReadWrite());
 }
 
-void sqlrcontroller_svr::markDatabaseUnavailable() {
+void sqlrservercontroller::markDatabaseUnavailable() {
 
 	// if the database is behind a load balancer, don't mark it unavailable
 	if (constr->getBehindLoadBalancer()) {
@@ -962,7 +962,7 @@ void sqlrcontroller_svr::markDatabaseUnavailable() {
 	file::remove(updown);
 }
 
-bool sqlrcontroller_svr::openSockets() {
+bool sqlrservercontroller::openSockets() {
 
 	logDebugMessage("listening on sockets...");
 
@@ -1067,7 +1067,7 @@ bool sqlrcontroller_svr::openSockets() {
 	return true;
 }
 
-bool sqlrcontroller_svr::listen() {
+bool sqlrservercontroller::listen() {
 
 	uint16_t	sessioncount=0;
 	bool		clientconnectfailed=false;
@@ -1158,7 +1158,7 @@ bool sqlrcontroller_svr::listen() {
 	}
 }
 
-void sqlrcontroller_svr::waitForAvailableDatabase() {
+void sqlrservercontroller::waitForAvailableDatabase() {
 
 	logDebugMessage("waiting for available database...");
 
@@ -1173,7 +1173,7 @@ void sqlrcontroller_svr::waitForAvailableDatabase() {
 	logDebugMessage("database is available");
 }
 
-void sqlrcontroller_svr::reLogIn() {
+void sqlrservercontroller::reLogIn() {
 
 	markDatabaseUnavailable();
 
@@ -1233,7 +1233,7 @@ void sqlrcontroller_svr::reLogIn() {
 	markDatabaseAvailable();
 }
 
-void sqlrcontroller_svr::initSession() {
+void sqlrservercontroller::initSession() {
 
 	logDebugMessage("initializing session...");
 
@@ -1247,7 +1247,7 @@ void sqlrcontroller_svr::initSession() {
 	logDebugMessage("done initializing session...");
 }
 
-bool sqlrcontroller_svr::announceAvailability(const char *unixsocket,
+bool sqlrservercontroller::announceAvailability(const char *unixsocket,
 						unsigned short inetport,
 						const char *connectionid) {
 
@@ -1303,7 +1303,7 @@ bool sqlrcontroller_svr::announceAvailability(const char *unixsocket,
 	return retval;
 }
 
-void sqlrcontroller_svr::registerForHandoff() {
+void sqlrservercontroller::registerForHandoff() {
 
 	logDebugMessage("registering for handoff...");
 
@@ -1350,7 +1350,7 @@ void sqlrcontroller_svr::registerForHandoff() {
 	delete[] handoffsockname;
 }
 
-void sqlrcontroller_svr::deRegisterForHandoff() {
+void sqlrservercontroller::deRegisterForHandoff() {
 	
 	logDebugMessage("de-registering for handoff...");
 
@@ -1383,7 +1383,7 @@ void sqlrcontroller_svr::deRegisterForHandoff() {
 	delete[] removehandoffsockname;
 }
 
-int32_t sqlrcontroller_svr::waitForClient() {
+int32_t sqlrservercontroller::waitForClient() {
 
 	logDebugMessage("waiting for client...");
 
@@ -1547,7 +1547,7 @@ int32_t sqlrcontroller_svr::waitForClient() {
 	return 1;
 }
 
-void sqlrcontroller_svr::clientSession() {
+void sqlrservercontroller::clientSession() {
 
 	// determine client protocol
 	sqlrprotocol_t	protocol=getClientProtocol();
@@ -1604,7 +1604,7 @@ void sqlrcontroller_svr::clientSession() {
 	logDebugMessage("done with client session");
 }
 
-sqlrprotocol_t sqlrcontroller_svr::getClientProtocol() {
+sqlrprotocol_t sqlrservercontroller::getClientProtocol() {
 
 	uint16_t	value=0;
 	ssize_t		result=0;
@@ -1634,7 +1634,7 @@ sqlrprotocol_t sqlrcontroller_svr::getClientProtocol() {
 	return SQLRPROTOCOL_SQLRCLIENT;
 }
 
-sqlrcursor_svr *sqlrcontroller_svr::getCursor(uint16_t id) {
+sqlrservercursor *sqlrservercontroller::getCursor(uint16_t id) {
 
 	// get the specified cursor
 	for (uint16_t i=0; i<cursorcount; i++) {
@@ -1653,7 +1653,7 @@ sqlrcursor_svr *sqlrcontroller_svr::getCursor(uint16_t id) {
 	return NULL;
 }
 
-sqlrcursor_svr *sqlrcontroller_svr::getCursor() {
+sqlrservercursor *sqlrservercontroller::getCursor() {
 
 	// find an available cursor
 	for (uint16_t i=0; i<cursorcount; i++) {
@@ -1700,7 +1700,7 @@ sqlrcursor_svr *sqlrcontroller_svr::getCursor() {
 	return cur[firstnewcursor];
 }
 
-bool sqlrcontroller_svr::authenticate(const char *userbuffer,
+bool sqlrservercontroller::authenticate(const char *userbuffer,
 						const char *passwordbuffer) {
 
 	logDebugMessage("authenticate...");
@@ -1712,7 +1712,7 @@ bool sqlrcontroller_svr::authenticate(const char *userbuffer,
 	return connectionBasedAuth(userbuffer,passwordbuffer);
 }
 
-bool sqlrcontroller_svr::connectionBasedAuth(const char *userbuffer,
+bool sqlrservercontroller::connectionBasedAuth(const char *userbuffer,
 						const char *passwordbuffer) {
 
 	// handle connection-based authentication
@@ -1728,7 +1728,7 @@ bool sqlrcontroller_svr::connectionBasedAuth(const char *userbuffer,
 	return retval;
 }
 
-void sqlrcontroller_svr::initLocalAuthentication() {
+void sqlrservercontroller::initLocalAuthentication() {
 
 	// get the list of users from the config file
 	linkedlist< usercontainer * >	*userlist=cfgfl->getUserList();
@@ -1752,7 +1752,7 @@ void sqlrcontroller_svr::initLocalAuthentication() {
 	}
 }
 
-bool sqlrcontroller_svr::authenticateLocal(const char *user,
+bool sqlrservercontroller::authenticateLocal(const char *user,
 						const char *password) {
 
 	// run through the user/password arrays...
@@ -1824,7 +1824,7 @@ bool sqlrcontroller_svr::authenticateLocal(const char *user,
 	return false;
 }
 
-bool sqlrcontroller_svr::databaseBasedAuth(const char *userbuffer,
+bool sqlrservercontroller::databaseBasedAuth(const char *userbuffer,
 						const char *passwordbuffer) {
 
 	// if the user we want to change to is different from the
@@ -1855,7 +1855,7 @@ bool sqlrcontroller_svr::databaseBasedAuth(const char *userbuffer,
 	return lastauthsuccess;
 }
 
-bool sqlrcontroller_svr::changeUser(const char *newuser,
+bool sqlrservercontroller::changeUser(const char *newuser,
 					const char *newpassword) {
 	closeCursors(false);
 	logOut();
@@ -1864,11 +1864,11 @@ bool sqlrcontroller_svr::changeUser(const char *newuser,
 	return (logIn(false) && initCursors(cursorcount));
 }
 
-void sqlrcontroller_svr::beginSession() {
+void sqlrservercontroller::beginSession() {
 	sessionStartQueries();
 }
 
-void sqlrcontroller_svr::suspendSession(const char **unixsocket,
+void sqlrservercontroller::suspendSession(const char **unixsocket,
 						uint16_t *inetport) {
 
 	// mark the session suspended
@@ -1899,24 +1899,24 @@ void sqlrcontroller_svr::suspendSession(const char **unixsocket,
 	logDebugMessage("done opening sockets to resume on");
 }
 
-bool sqlrcontroller_svr::autoCommitOn() {
+bool sqlrservercontroller::autoCommitOn() {
 	autocommitforthissession=true;
 	return conn->autoCommitOn();
 }
 
-bool sqlrcontroller_svr::autoCommitOff() {
+bool sqlrservercontroller::autoCommitOff() {
 	autocommitforthissession=false;
 	return conn->autoCommitOff();
 }
 
-bool sqlrcontroller_svr::begin() {
+bool sqlrservercontroller::begin() {
 	// if we're faking transaction blocks, do that,
 	// otherwise run an actual begin query
 	return (faketransactionblocks)?
 			beginFakeTransactionBlock():conn->begin();
 }
 
-bool sqlrcontroller_svr::beginFakeTransactionBlock() {
+bool sqlrservercontroller::beginFakeTransactionBlock() {
 
 	// save the current autocommit state
 	faketransactionblocksautocommiton=autocommitforthissession;
@@ -1931,7 +1931,7 @@ bool sqlrcontroller_svr::beginFakeTransactionBlock() {
 	return true;
 }
 
-bool sqlrcontroller_svr::commit() {
+bool sqlrservercontroller::commit() {
 	if (conn->commit()) {
 		endFakeTransactionBlock();
 		return true;
@@ -1939,7 +1939,7 @@ bool sqlrcontroller_svr::commit() {
 	return false;
 }
 
-bool sqlrcontroller_svr::endFakeTransactionBlock() {
+bool sqlrservercontroller::endFakeTransactionBlock() {
 
 	// if we're faking begins and autocommit is on,
 	// reset autocommit behavior
@@ -1952,7 +1952,7 @@ bool sqlrcontroller_svr::endFakeTransactionBlock() {
 	return true;
 }
 
-bool sqlrcontroller_svr::rollback() {
+bool sqlrservercontroller::rollback() {
 	if (conn->rollback()) {
 		endFakeTransactionBlock();
 		return true;
@@ -1960,64 +1960,64 @@ bool sqlrcontroller_svr::rollback() {
 	return false;
 }
 
-bool sqlrcontroller_svr::selectDatabase(const char *db) {
+bool sqlrservercontroller::selectDatabase(const char *db) {
 	return (cfgfl->getIgnoreSelectDatabase())?true:conn->selectDatabase(db);
 }
 
-void sqlrcontroller_svr::dbHasChanged() {
+void sqlrservercontroller::dbHasChanged() {
 	this->dbchanged=true;
 }
 
-char *sqlrcontroller_svr::getCurrentDatabase() {
+char *sqlrservercontroller::getCurrentDatabase() {
 	return conn->getCurrentDatabase();
 }
 
-bool sqlrcontroller_svr::getLastInsertId(uint64_t *id) {
+bool sqlrservercontroller::getLastInsertId(uint64_t *id) {
 	return conn->getLastInsertId(id);
 }
 
-bool sqlrcontroller_svr::setIsolationLevel(const char *isolevel) {
+bool sqlrservercontroller::setIsolationLevel(const char *isolevel) {
 	return conn->setIsolationLevel(isolevel);
 }
 
-bool sqlrcontroller_svr::ping() {
+bool sqlrservercontroller::ping() {
 	return conn->ping();
 }
 
-bool sqlrcontroller_svr::getListsByApiCalls() {
+bool sqlrservercontroller::getListsByApiCalls() {
 	return conn->getListsByApiCalls();
 }
 
-bool sqlrcontroller_svr::getDatabaseList(sqlrcursor_svr *cursor,
+bool sqlrservercontroller::getDatabaseList(sqlrservercursor *cursor,
 						const char *wild) {
 	return conn->getDatabaseList(cursor,wild);
 }
 
-bool sqlrcontroller_svr::getTableList(sqlrcursor_svr *cursor,
+bool sqlrservercontroller::getTableList(sqlrservercursor *cursor,
 						const char *wild) {
 	return conn->getTableList(cursor,wild);
 }
 
-bool sqlrcontroller_svr::getColumnList(sqlrcursor_svr *cursor,
+bool sqlrservercontroller::getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
 	return conn->getColumnList(cursor,table,wild);
 }
 
-const char *sqlrcontroller_svr::getDatabaseListQuery(bool wild) {
+const char *sqlrservercontroller::getDatabaseListQuery(bool wild) {
 	return conn->getDatabaseListQuery(wild);
 }
 
-const char *sqlrcontroller_svr::getTableListQuery(bool wild) {
+const char *sqlrservercontroller::getTableListQuery(bool wild) {
 	return conn->getTableListQuery(wild);
 }
 
-const char *sqlrcontroller_svr::getColumnListQuery(const char *table,
+const char *sqlrservercontroller::getColumnListQuery(const char *table,
 							bool wild) {
 	return conn->getColumnListQuery(table,wild);
 }
 
-void sqlrcontroller_svr::errorMessage(char *errorbuffer,
+void sqlrservercontroller::errorMessage(char *errorbuffer,
 						uint32_t errorbuffersize,
 						uint32_t *errorlength,
 						int64_t *errorcode,
@@ -2026,45 +2026,45 @@ void sqlrcontroller_svr::errorMessage(char *errorbuffer,
 					errorlength,errorcode,liveconnection);
 }
 
-void sqlrcontroller_svr::clearError() {
+void sqlrservercontroller::clearError() {
 	conn->clearError();
 }
 
-void sqlrcontroller_svr::setError(const char *err,
+void sqlrservercontroller::setError(const char *err,
 					int64_t errn,
 					bool liveconn) {
 	conn->setError(err,errn,liveconn);
 }
 
-char *sqlrcontroller_svr::getErrorBuffer() {
+char *sqlrservercontroller::getErrorBuffer() {
 	return conn->getErrorBuffer();
 }
 
-uint32_t sqlrcontroller_svr::getErrorLength() {
+uint32_t sqlrservercontroller::getErrorLength() {
 	return conn->getErrorLength();
 }
 
-void sqlrcontroller_svr::setErrorLength(uint32_t errorlength) {
+void sqlrservercontroller::setErrorLength(uint32_t errorlength) {
 	conn->setErrorLength(errorlength);
 }
 
-uint32_t sqlrcontroller_svr::getErrorNumber() {
+uint32_t sqlrservercontroller::getErrorNumber() {
 	return conn->getErrorNumber();
 }
 
-void sqlrcontroller_svr::setErrorNumber(uint32_t errnum) {
+void sqlrservercontroller::setErrorNumber(uint32_t errnum) {
 	conn->setErrorNumber(errnum);
 }
 
-bool sqlrcontroller_svr::getLiveConnection() {
+bool sqlrservercontroller::getLiveConnection() {
 	return conn->getLiveConnection();
 }
 
-void sqlrcontroller_svr::setLiveConnection(bool liveconnection) {
+void sqlrservercontroller::setLiveConnection(bool liveconnection) {
 	return conn->setLiveConnection(liveconnection);
 }
 
-bool sqlrcontroller_svr::interceptQuery(sqlrcursor_svr *cursor,
+bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor,
 						bool *querywasintercepted) {
 
 	*querywasintercepted=false;
@@ -2129,7 +2129,7 @@ bool sqlrcontroller_svr::interceptQuery(sqlrcursor_svr *cursor,
 	return false;
 }
 
-bool sqlrcontroller_svr::isBeginTransactionQuery(sqlrcursor_svr *cursor) {
+bool sqlrservercontroller::isBeginTransactionQuery(sqlrservercursor *cursor) {
 
 	// find the start of the actual query
 	const char	*ptr=skipWhitespaceAndComments(
@@ -2158,19 +2158,19 @@ bool sqlrcontroller_svr::isBeginTransactionQuery(sqlrcursor_svr *cursor) {
 	return false;
 }
 
-bool sqlrcontroller_svr::isCommitQuery(sqlrcursor_svr *cursor) {
+bool sqlrservercontroller::isCommitQuery(sqlrservercursor *cursor) {
 	return !charstring::compareIgnoringCase(
 			skipWhitespaceAndComments(cursor->getQueryBuffer()),
 			"commit",6);
 }
 
-bool sqlrcontroller_svr::isRollbackQuery(sqlrcursor_svr *cursor) {
+bool sqlrservercontroller::isRollbackQuery(sqlrservercursor *cursor) {
 	return !charstring::compareIgnoringCase(
 			skipWhitespaceAndComments(cursor->getQueryBuffer()),
 			"rollback",8);
 }
 
-bool sqlrcontroller_svr::skipComment(const char **ptr, const char *endptr) {
+bool sqlrservercontroller::skipComment(const char **ptr, const char *endptr) {
 	while (*ptr<endptr && !charstring::compare(*ptr,"--",2)) {
 		while (**ptr && **ptr!='\n') {
 			(*ptr)++;
@@ -2179,14 +2179,14 @@ bool sqlrcontroller_svr::skipComment(const char **ptr, const char *endptr) {
 	return *ptr!=endptr;
 }
 
-bool sqlrcontroller_svr::skipWhitespace(const char **ptr, const char *endptr) {
+bool sqlrservercontroller::skipWhitespace(const char **ptr, const char *endptr) {
 	while ((**ptr==' ' || **ptr=='\n' || **ptr=='	') && *ptr<endptr) {
 		(*ptr)++;
 	}
 	return *ptr!=endptr;
 }
 
-const char *sqlrcontroller_svr::skipWhitespaceAndComments(const char *query) {
+const char *sqlrservercontroller::skipWhitespaceAndComments(const char *query) {
 	const char	*ptr=query;
 	while (*ptr && 
 		(*ptr==' ' || *ptr=='\n' || *ptr=='	' || *ptr=='-')) {
@@ -2200,7 +2200,7 @@ const char *sqlrcontroller_svr::skipWhitespaceAndComments(const char *query) {
 	return ptr;
 }
 
-bool sqlrcontroller_svr::translateQuery(sqlrcursor_svr *cursor) {
+bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 
 	// get the query buffer
 	char	*querybuffer=cursor->getQueryBuffer();
@@ -2283,7 +2283,7 @@ enum queryparsestate_t {
 	IN_BIND
 };
 
-void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
+void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 
 	// clear bind mappings
 	inbindmappings->clear();
@@ -2451,7 +2451,7 @@ void sqlrcontroller_svr::translateBindVariables(sqlrcursor_svr *cursor) {
 	}
 }
 
-bool sqlrcontroller_svr::matchesNativeBindFormat(const char *bind) {
+bool sqlrservercontroller::matchesNativeBindFormat(const char *bind) {
 
 	const char	*bindformat=conn->bindFormat();
 	size_t		bindformatlen=charstring::length(bindformat);
@@ -2475,8 +2475,8 @@ bool sqlrcontroller_svr::matchesNativeBindFormat(const char *bind) {
 		(bindformat[1]=='*' && character::isAlphanumeric(bind[1]))));
 }
 
-void sqlrcontroller_svr::translateBindVariableInStringAndMap(
-						sqlrcursor_svr *cursor,
+void sqlrservercontroller::translateBindVariableInStringAndMap(
+						sqlrservercursor *cursor,
 						stringbuffer *currentbind,
 						uint16_t bindindex,
 						stringbuffer *newquery) {
@@ -2531,7 +2531,7 @@ void sqlrcontroller_svr::translateBindVariableInStringAndMap(
 	}
 }
 
-void sqlrcontroller_svr::mapBindVariable(sqlrcursor_svr *cursor,
+void sqlrservercontroller::mapBindVariable(sqlrservercursor *cursor,
 						const char *bindvariable,
 						uint16_t bindindex) {
 
@@ -2547,14 +2547,14 @@ void sqlrcontroller_svr::mapBindVariable(sqlrcursor_svr *cursor,
 		// first pass for input binds, second pass for output binds
 		uint16_t	count=(!i)?cursor->getInputBindCount():
 						cursor->getOutputBindCount();
-		bindvar_svr	*vars=(!i)?cursor->getInputBinds():
+		sqlrserverbindvar	*vars=(!i)?cursor->getInputBinds():
 						cursor->getOutputBinds();
 		namevaluepairs	*mappings=(!i)?inbindmappings:outbindmappings;
 
 		for (uint16_t j=0; j<count; j++) {
 
 			// get the bind var
-			bindvar_svr	*b=&(vars[j]);
+			sqlrserverbindvar	*b=&(vars[j]);
 
 			// If a bind var name was passed in, look for a bind
 			// variable with a matching name.
@@ -2595,8 +2595,8 @@ void sqlrcontroller_svr::mapBindVariable(sqlrcursor_svr *cursor,
 	}
 }
 
-void sqlrcontroller_svr::translateBindVariablesFromMappings(
-						sqlrcursor_svr *cursor) {
+void sqlrservercontroller::translateBindVariablesFromMappings(
+						sqlrservercursor *cursor) {
 
 	// index variable
 	uint16_t	i=0;
@@ -2635,14 +2635,14 @@ void sqlrcontroller_svr::translateBindVariablesFromMappings(
 		// first pass for input binds, second pass for output binds
 		uint16_t	count=(!i)?cursor->getInputBindCount():
 						cursor->getOutputBindCount();
-		bindvar_svr	*vars=(!i)?cursor->getInputBinds():
+		sqlrserverbindvar	*vars=(!i)?cursor->getInputBinds():
 						cursor->getOutputBinds();
 		namevaluepairs	*mappings=(!i)?inbindmappings:outbindmappings;
 
 		for (uint16_t j=0; j<count; j++) {
 
 			// get the bind var
-			bindvar_svr	*b=&(vars[j]);
+			sqlrserverbindvar	*b=&(vars[j]);
 
 			// remap it
 			char	*newvariable;
@@ -2689,7 +2689,7 @@ void sqlrcontroller_svr::translateBindVariablesFromMappings(
 	}
 }
 
-void sqlrcontroller_svr::translateBeginTransaction(sqlrcursor_svr *cursor) {
+void sqlrservercontroller::translateBeginTransaction(sqlrservercursor *cursor) {
 
 	// get query buffer
 	char	*querybuffer=cursor->getQueryBuffer();
@@ -2711,8 +2711,8 @@ void sqlrcontroller_svr::translateBeginTransaction(sqlrcursor_svr *cursor) {
 	logDebugMessage(querybuffer);
 }
 
-sqlrcursor_svr *sqlrcontroller_svr::useCustomQueryCursor(	
-						sqlrcursor_svr *cursor) {
+sqlrservercursor *sqlrservercontroller::useCustomQueryCursor(	
+						sqlrservercursor *cursor) {
 
 	// do we need to use a custom query cursor for this query?
 
@@ -2755,9 +2755,9 @@ sqlrcursor_svr *sqlrcontroller_svr::useCustomQueryCursor(
 	return customcursor;
 }
 
-bool sqlrcontroller_svr::handleBinds(sqlrcursor_svr *cursor) {
+bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 
-	bindvar_svr	*bind=NULL;
+	sqlrserverbindvar	*bind=NULL;
 	
 	// iterate through the arrays, binding values to variables
 	for (int16_t in=0; in<cursor->getInputBindCount(); in++) {
@@ -2921,7 +2921,7 @@ bool sqlrcontroller_svr::handleBinds(sqlrcursor_svr *cursor) {
 	return true;
 }
 
-bool sqlrcontroller_svr::prepareQuery(sqlrcursor_svr *cursor,
+bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 						const char *query,
 						uint32_t querylen) {
 
@@ -2967,11 +2967,11 @@ bool sqlrcontroller_svr::prepareQuery(sqlrcursor_svr *cursor,
 	return true;
 }
 
-bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor) {
+bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor) {
 	return executeQuery(cursor,false,false);
 }
 
-bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor,
+bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 						bool enabletranslations,
 						bool enabletriggers) {
 
@@ -3161,15 +3161,15 @@ bool sqlrcontroller_svr::executeQuery(sqlrcursor_svr *cursor,
 	return success;
 }
 
-void sqlrcontroller_svr::commitOrRollbackIsNeeded() {
+void sqlrservercontroller::commitOrRollbackIsNeeded() {
 	needcommitorrollback=true;
 }
 
-void sqlrcontroller_svr::commitOrRollbackIsNotNeeded() {
+void sqlrservercontroller::commitOrRollbackIsNotNeeded() {
 	needcommitorrollback=false;
 }
 
-void sqlrcontroller_svr::commitOrRollback(sqlrcursor_svr *cursor) {
+void sqlrservercontroller::commitOrRollback(sqlrservercursor *cursor) {
 
 	logDebugMessage("commit or rollback check...");
 
@@ -3190,15 +3190,15 @@ void sqlrcontroller_svr::commitOrRollback(sqlrcursor_svr *cursor) {
 	logDebugMessage("done with commit or rollback check");
 }
 
-uint16_t sqlrcontroller_svr::getSendColumnInfo() {
+uint16_t sqlrservercontroller::getSendColumnInfo() {
 	return sendcolumninfo;
 }
 
-void sqlrcontroller_svr::setSendColumnInfo(uint16_t sendcolumninfo) {
+void sqlrservercontroller::setSendColumnInfo(uint16_t sendcolumninfo) {
 	this->sendcolumninfo=sendcolumninfo;
 }
 
-bool sqlrcontroller_svr::skipRows(sqlrcursor_svr *cursor, uint64_t rows) {
+bool sqlrservercontroller::skipRows(sqlrservercursor *cursor, uint64_t rows) {
 
 	if (sqlrlg) {
 		debugstr.clear();
@@ -3225,7 +3225,7 @@ bool sqlrcontroller_svr::skipRows(sqlrcursor_svr *cursor, uint64_t rows) {
 	return true;
 }
 
-void sqlrcontroller_svr::reformatField(sqlrcursor_svr *cursor,
+void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 						uint16_t index,
 						const char *field,
 						uint32_t fieldlength,
@@ -3262,7 +3262,7 @@ void sqlrcontroller_svr::reformatField(sqlrcursor_svr *cursor,
 	}
 }
 
-void sqlrcontroller_svr::reformatDateTimes(sqlrcursor_svr *cursor,
+void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 						uint16_t index,
 						const char *field,
 						uint32_t fieldlength,
@@ -3323,7 +3323,7 @@ void sqlrcontroller_svr::reformatDateTimes(sqlrcursor_svr *cursor,
 	*newfieldlength=reformattedfieldlength;
 }
 
-void sqlrcontroller_svr::closeAllResultSets() {
+void sqlrservercontroller::closeAllResultSets() {
 	logDebugMessage("closing result sets for all cursors...");
 	for (int32_t i=0; i<cursorcount; i++) {
 		if (cur[i]) {
@@ -3333,7 +3333,7 @@ void sqlrcontroller_svr::closeAllResultSets() {
 	logDebugMessage("done closing result sets for all cursors...");
 }
 
-void sqlrcontroller_svr::endSession() {
+void sqlrservercontroller::endSession() {
 
 	logDebugMessage("ending session...");
 
@@ -3438,7 +3438,7 @@ void sqlrcontroller_svr::endSession() {
 	logDebugMessage("done ending session");
 }
 
-void sqlrcontroller_svr::dropTempTables(sqlrcursor_svr *cursor) {
+void sqlrservercontroller::dropTempTables(sqlrservercursor *cursor) {
 
 	// some databases require us to re-login before dropping temp tables
 	if (sessiontemptablesfordrop.getLength() &&
@@ -3456,7 +3456,7 @@ void sqlrcontroller_svr::dropTempTables(sqlrcursor_svr *cursor) {
 	sessiontemptablesfordrop.clear();
 }
 
-void sqlrcontroller_svr::dropTempTable(sqlrcursor_svr *cursor,
+void sqlrservercontroller::dropTempTable(sqlrservercursor *cursor,
 					const char *tablename) {
 
 	stringbuffer	dropquery;
@@ -3494,7 +3494,7 @@ void sqlrcontroller_svr::dropTempTable(sqlrcursor_svr *cursor,
 	}
 }
 
-void sqlrcontroller_svr::truncateTempTables(sqlrcursor_svr *cursor) {
+void sqlrservercontroller::truncateTempTables(sqlrservercursor *cursor) {
 
 	// run through the temp table list, truncating tables
 	for (singlylinkedlistnode< char * >
@@ -3506,7 +3506,7 @@ void sqlrcontroller_svr::truncateTempTables(sqlrcursor_svr *cursor) {
 	sessiontemptablesfortrunc.clear();
 }
 
-void sqlrcontroller_svr::truncateTempTable(sqlrcursor_svr *cursor,
+void sqlrservercontroller::truncateTempTable(sqlrservercursor *cursor,
 						const char *tablename) {
 	stringbuffer	truncatequery;
 	truncatequery.append("delete from ")->append(tablename);
@@ -3517,7 +3517,7 @@ void sqlrcontroller_svr::truncateTempTable(sqlrcursor_svr *cursor,
 	cursor->closeResultSet();
 }
 
-void sqlrcontroller_svr::closeClientConnection(uint32_t bytes) {
+void sqlrservercontroller::closeClientConnection(uint32_t bytes) {
 
 	// Sometimes the server sends the result set and closes the socket
 	// while part of it is buffered but not yet transmitted.  This causes
@@ -3561,7 +3561,7 @@ void sqlrcontroller_svr::closeClientConnection(uint32_t bytes) {
 	}
 }
 
-void sqlrcontroller_svr::closeSuspendedSessionSockets() {
+void sqlrservercontroller::closeSuspendedSessionSockets() {
 
 	if (suspendedsession) {
 		return;
@@ -3596,7 +3596,7 @@ void sqlrcontroller_svr::closeSuspendedSessionSockets() {
 	}
 }
 
-void sqlrcontroller_svr::shutDown() {
+void sqlrservercontroller::shutDown() {
 
 	logDebugMessage("closing connection...");
 
@@ -3637,7 +3637,7 @@ void sqlrcontroller_svr::shutDown() {
 	logDebugMessage("done closing connection");
 }
 
-void sqlrcontroller_svr::closeCursors(bool destroy) {
+void sqlrservercontroller::closeCursors(bool destroy) {
 
 	logDebugMessage("closing cursors...");
 
@@ -3663,12 +3663,12 @@ void sqlrcontroller_svr::closeCursors(bool destroy) {
 	logDebugMessage("done closing cursors...");
 }
 
-void sqlrcontroller_svr::deleteCursor(sqlrcursor_svr *curs) {
+void sqlrservercontroller::deleteCursor(sqlrservercursor *curs) {
 	conn->deleteCursor(curs);
 	decrementOpenDatabaseCursors();
 }
 
-bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(const char *id) {
+bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 
 	size_t	idfilenamelen=tmpdir->getLength()+5+
 					charstring::length(id)+1;
@@ -3727,11 +3727,11 @@ bool sqlrcontroller_svr::createSharedMemoryAndSemaphores(const char *id) {
 	return true;
 }
 
-shmdata *sqlrcontroller_svr::getAnnounceBuffer() {
+shmdata *sqlrservercontroller::getAnnounceBuffer() {
 	return (shmdata *)shmem->getPointer();
 }
 
-void sqlrcontroller_svr::decrementConnectedClientCount() {
+void sqlrservercontroller::decrementConnectedClientCount() {
 
 	logDebugMessage("decrementing session count...");
 
@@ -3765,7 +3765,7 @@ void sqlrcontroller_svr::decrementConnectedClientCount() {
 	logDebugMessage("done decrementing session count");
 }
 
-bool sqlrcontroller_svr::acquireAnnounceMutex() {
+bool sqlrservercontroller::acquireAnnounceMutex() {
 
 	logDebugMessage("acquiring announce mutex");
 
@@ -3795,19 +3795,19 @@ bool sqlrcontroller_svr::acquireAnnounceMutex() {
 	return true;
 }
 
-void sqlrcontroller_svr::releaseAnnounceMutex() {
+void sqlrservercontroller::releaseAnnounceMutex() {
 	logDebugMessage("releasing announce mutex");
 	semset->signalWithUndo(0);
 	logDebugMessage("done releasing announce mutex");
 }
 
-void sqlrcontroller_svr::signalListenerToRead() {
+void sqlrservercontroller::signalListenerToRead() {
 	logDebugMessage("signalling listener to read");
 	semset->signalWithUndo(2);
 	logDebugMessage("done signalling listener to read");
 }
 
-bool sqlrcontroller_svr::waitForListenerToFinishReading() {
+bool sqlrservercontroller::waitForListenerToFinishReading() {
 
 	logDebugMessage("waiting for listener");
 
@@ -3843,25 +3843,25 @@ bool sqlrcontroller_svr::waitForListenerToFinishReading() {
 	return true;
 }
 
-void sqlrcontroller_svr::acquireConnectionCountMutex() {
+void sqlrservercontroller::acquireConnectionCountMutex() {
 	logDebugMessage("acquiring connection count mutex");
 	semset->waitWithUndo(4);
 	logDebugMessage("done acquiring connection count mutex");
 }
 
-void sqlrcontroller_svr::releaseConnectionCountMutex() {
+void sqlrservercontroller::releaseConnectionCountMutex() {
 	logDebugMessage("releasing connection count mutex");
 	semset->signalWithUndo(4);
 	logDebugMessage("done releasing connection count mutex");
 }
 
-void sqlrcontroller_svr::signalScalerToRead() {
+void sqlrservercontroller::signalScalerToRead() {
 	logDebugMessage("signalling scaler to read");
 	semset->signal(8);
 	logDebugMessage("done signalling scaler to read");
 }
 
-void sqlrcontroller_svr::initConnStats() {
+void sqlrservercontroller::initConnStats() {
 
 	semset->waitWithUndo(9);
 
@@ -3893,14 +3893,14 @@ void sqlrcontroller_svr::initConnStats() {
 	connstats=NULL;
 }
 
-void sqlrcontroller_svr::clearConnStats() {
+void sqlrservercontroller::clearConnStats() {
 	if (!connstats) {
 		return;
 	}
 	bytestring::zero(connstats,sizeof(struct sqlrconnstatistics));
 }
 
-void sqlrcontroller_svr::updateState(enum sqlrconnectionstate_t state) {
+void sqlrservercontroller::updateState(enum sqlrconnectionstate_t state) {
 	if (!connstats) {
 		return;
 	}
@@ -3911,7 +3911,7 @@ void sqlrcontroller_svr::updateState(enum sqlrconnectionstate_t state) {
 	connstats->statestartusec=dt.getMicroseconds();
 }
 
-void sqlrcontroller_svr::updateClientSessionStartTime() {
+void sqlrservercontroller::updateClientSessionStartTime() {
 	if (!connstats) {
 		return;
 	}
@@ -3921,7 +3921,7 @@ void sqlrcontroller_svr::updateClientSessionStartTime() {
 	connstats->clientsessionusec=dt.getMicroseconds();
 }
 
-void sqlrcontroller_svr::updateCurrentQuery(const char *query,
+void sqlrservercontroller::updateCurrentQuery(const char *query,
 						uint32_t querylen) {
 	if (!connstats) {
 		return;
@@ -3934,7 +3934,7 @@ void sqlrcontroller_svr::updateCurrentQuery(const char *query,
 	connstats->sqltext[len]='\0';
 }
 
-void sqlrcontroller_svr::updateClientInfo(const char *info, uint32_t infolen) {
+void sqlrservercontroller::updateClientInfo(const char *info, uint32_t infolen) {
 	if (!connstats) {
 		return;
 	}
@@ -3946,7 +3946,7 @@ void sqlrcontroller_svr::updateClientInfo(const char *info, uint32_t infolen) {
 	connstats->clientinfo[len]='\0';
 }
 
-void sqlrcontroller_svr::updateClientAddr() {
+void sqlrservercontroller::updateClientAddr() {
 	if (!connstats) {
 		return;
 	}
@@ -3963,14 +3963,14 @@ void sqlrcontroller_svr::updateClientAddr() {
 	}
 }
 
-void sqlrcontroller_svr::incrementOpenDatabaseConnections() {
+void sqlrservercontroller::incrementOpenDatabaseConnections() {
 	semset->waitWithUndo(9);
 	shm->open_db_connections++;
 	shm->opened_db_connections++;
 	semset->signalWithUndo(9);
 }
 
-void sqlrcontroller_svr::decrementOpenDatabaseConnections() {
+void sqlrservercontroller::decrementOpenDatabaseConnections() {
 	semset->waitWithUndo(9);
 	if (shm->open_db_connections) {
 		shm->open_db_connections--;
@@ -3978,7 +3978,7 @@ void sqlrcontroller_svr::decrementOpenDatabaseConnections() {
 	semset->signalWithUndo(9);
 }
 
-void sqlrcontroller_svr::incrementOpenClientConnections() {
+void sqlrservercontroller::incrementOpenClientConnections() {
 	semset->waitWithUndo(9);
 	shm->open_cli_connections++;
 	shm->opened_cli_connections++;
@@ -3989,7 +3989,7 @@ void sqlrcontroller_svr::incrementOpenClientConnections() {
 	connstats->nconnect++;
 }
 
-void sqlrcontroller_svr::decrementOpenClientConnections() {
+void sqlrservercontroller::decrementOpenClientConnections() {
 	semset->waitWithUndo(9);
 	if (shm->open_cli_connections) {
 		shm->open_cli_connections--;
@@ -3997,14 +3997,14 @@ void sqlrcontroller_svr::decrementOpenClientConnections() {
 	semset->signalWithUndo(9);
 }
 
-void sqlrcontroller_svr::incrementOpenDatabaseCursors() {
+void sqlrservercontroller::incrementOpenDatabaseCursors() {
 	semset->waitWithUndo(9);
 	shm->open_db_cursors++;
 	shm->opened_db_cursors++;
 	semset->signalWithUndo(9);
 }
 
-void sqlrcontroller_svr::decrementOpenDatabaseCursors() {
+void sqlrservercontroller::decrementOpenDatabaseCursors() {
 	semset->waitWithUndo(9);
 	if (shm->open_db_cursors) {
 		shm->open_db_cursors--;
@@ -4012,19 +4012,19 @@ void sqlrcontroller_svr::decrementOpenDatabaseCursors() {
 	semset->signalWithUndo(9);
 }
 
-void sqlrcontroller_svr::incrementTimesNewCursorUsed() {
+void sqlrservercontroller::incrementTimesNewCursorUsed() {
 	semset->waitWithUndo(9);
 	shm->times_new_cursor_used++;
 	semset->signalWithUndo(9);
 }
 
-void sqlrcontroller_svr::incrementTimesCursorReused() {
+void sqlrservercontroller::incrementTimesCursorReused() {
 	semset->waitWithUndo(9);
 	shm->times_cursor_reused++;
 	semset->signalWithUndo(9);
 }
 
-void sqlrcontroller_svr::incrementQueryCounts(sqlrquerytype_t querytype) {
+void sqlrservercontroller::incrementQueryCounts(sqlrquerytype_t querytype) {
 
 	semset->waitWithUndo(9);
 
@@ -4095,216 +4095,216 @@ void sqlrcontroller_svr::incrementQueryCounts(sqlrquerytype_t querytype) {
 	}
 }
 
-void sqlrcontroller_svr::incrementTotalErrors() {
+void sqlrservercontroller::incrementTotalErrors() {
 	semset->waitWithUndo(9);
 	shm->total_errors++;
 	semset->signalWithUndo(9);
 }
 
-void sqlrcontroller_svr::incrementAuthenticateCount() {
+void sqlrservercontroller::incrementAuthenticateCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nauthenticate++;
 }
 
-void sqlrcontroller_svr::incrementSuspendSessionCount() {
+void sqlrservercontroller::incrementSuspendSessionCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nsuspend_session++;
 }
 
-void sqlrcontroller_svr::incrementEndSessionCount() {
+void sqlrservercontroller::incrementEndSessionCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nend_session++;
 }
 
-void sqlrcontroller_svr::incrementPingCount() {
+void sqlrservercontroller::incrementPingCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nping++;
 }
 
-void sqlrcontroller_svr::incrementIdentifyCount() {
+void sqlrservercontroller::incrementIdentifyCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nidentify++;
 }
 
-void sqlrcontroller_svr::incrementAutocommitCount() {
+void sqlrservercontroller::incrementAutocommitCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nautocommit++;
 }
 
-void sqlrcontroller_svr::incrementBeginCount() {
+void sqlrservercontroller::incrementBeginCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nbegin++;
 }
 
-void sqlrcontroller_svr::incrementCommitCount() {
+void sqlrservercontroller::incrementCommitCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->ncommit++;
 }
 
-void sqlrcontroller_svr::incrementRollbackCount() {
+void sqlrservercontroller::incrementRollbackCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nrollback++;
 }
 
-void sqlrcontroller_svr::incrementDbVersionCount() {
+void sqlrservercontroller::incrementDbVersionCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->ndbversion++;
 }
 
-void sqlrcontroller_svr::incrementBindFormatCount() {
+void sqlrservercontroller::incrementBindFormatCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nbindformat++;
 }
 
-void sqlrcontroller_svr::incrementServerVersionCount() {
+void sqlrservercontroller::incrementServerVersionCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nserverversion++;
 }
 
-void sqlrcontroller_svr::incrementSelectDatabaseCount() {
+void sqlrservercontroller::incrementSelectDatabaseCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nselectdatabase++;
 }
 
-void sqlrcontroller_svr::incrementGetCurrentDatabaseCount() {
+void sqlrservercontroller::incrementGetCurrentDatabaseCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->ngetcurrentdatabase++;
 }
 
-void sqlrcontroller_svr::incrementGetLastInsertIdCount() {
+void sqlrservercontroller::incrementGetLastInsertIdCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->ngetlastinsertid++;
 }
 
-void sqlrcontroller_svr::incrementDbHostNameCount() {
+void sqlrservercontroller::incrementDbHostNameCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->ndbhostname++;
 }
 
-void sqlrcontroller_svr::incrementDbIpAddressCount() {
+void sqlrservercontroller::incrementDbIpAddressCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->ndbipaddress++;
 }
 
-void sqlrcontroller_svr::incrementNewQueryCount() {
+void sqlrservercontroller::incrementNewQueryCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nnewquery++;
 }
 
-void sqlrcontroller_svr::incrementReexecuteQueryCount() {
+void sqlrservercontroller::incrementReexecuteQueryCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nreexecutequery++;
 }
 
-void sqlrcontroller_svr::incrementFetchFromBindCursorCount() {
+void sqlrservercontroller::incrementFetchFromBindCursorCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nfetchfrombindcursor++;
 }
 
-void sqlrcontroller_svr::incrementFetchResultSetCount() {
+void sqlrservercontroller::incrementFetchResultSetCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nfetchresultset++;
 }
 
-void sqlrcontroller_svr::incrementAbortResultSetCount() {
+void sqlrservercontroller::incrementAbortResultSetCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nabortresultset++;
 }
 
-void sqlrcontroller_svr::incrementSuspendResultSetCount() {
+void sqlrservercontroller::incrementSuspendResultSetCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nsuspendresultset++;
 }
 
-void sqlrcontroller_svr::incrementResumeResultSetCount() {
+void sqlrservercontroller::incrementResumeResultSetCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nresumeresultset++;
 }
 
-void sqlrcontroller_svr::incrementGetDbListCount() {
+void sqlrservercontroller::incrementGetDbListCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->ngetdblist++;
 }
 
-void sqlrcontroller_svr::incrementGetTableListCount() {
+void sqlrservercontroller::incrementGetTableListCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->ngettablelist++;
 }
 
-void sqlrcontroller_svr::incrementGetColumnListCount() {
+void sqlrservercontroller::incrementGetColumnListCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->ngetcolumnlist++;
 }
 
-void sqlrcontroller_svr::incrementGetQueryTreeCount() {
+void sqlrservercontroller::incrementGetQueryTreeCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->ngetquerytree++;
 }
 
-void sqlrcontroller_svr::incrementReLogInCount() {
+void sqlrservercontroller::incrementReLogInCount() {
 	if (!connstats) {
 		return;
 	}
 	connstats->nrelogin++;
 }
 
-void sqlrcontroller_svr::sessionStartQueries() {
+void sqlrservercontroller::sessionStartQueries() {
 	// run a configurable set of queries at the start of each session
 	for (linkedlistnode< char * > *node=
 		cfgfl->getSessionStartQueries()->getFirst();
@@ -4313,7 +4313,7 @@ void sqlrcontroller_svr::sessionStartQueries() {
 	}
 }
 
-void sqlrcontroller_svr::sessionEndQueries() {
+void sqlrservercontroller::sessionEndQueries() {
 	// run a configurable set of queries at the end of each session
 	for (linkedlistnode< char * > *node=
 		cfgfl->getSessionEndQueries()->getFirst();
@@ -4322,12 +4322,12 @@ void sqlrcontroller_svr::sessionEndQueries() {
 	}
 }
 
-void sqlrcontroller_svr::sessionQuery(const char *query) {
+void sqlrservercontroller::sessionQuery(const char *query) {
 
 	// create the select database query
 	size_t	querylen=charstring::length(query);
 
-	sqlrcursor_svr	*cur=newCursor();
+	sqlrservercursor	*cur=newCursor();
 	if (open(cur) &&
 		prepareQuery(cur,query,querylen) && executeQuery(cur)) {
 		closeResultSet(cur);
@@ -4336,7 +4336,7 @@ void sqlrcontroller_svr::sessionQuery(const char *query) {
 	deleteCursor(cur);
 }
 
-const char *sqlrcontroller_svr::getConnectStringValue(const char *variable) {
+const char *sqlrservercontroller::getConnectStringValue(const char *variable) {
 
 	// If we're using password encryption and the password is requested,
 	// and the password encryption module supports two-way encryption,
@@ -4356,58 +4356,58 @@ const char *sqlrcontroller_svr::getConnectStringValue(const char *variable) {
 	return constr->getConnectStringValue(variable);
 }
 
-void sqlrcontroller_svr::setUser(const char *user) {
+void sqlrservercontroller::setUser(const char *user) {
 	this->user=user;
 }
 
-void sqlrcontroller_svr::setPassword(const char *password) {
+void sqlrservercontroller::setPassword(const char *password) {
 	this->password=password;
 }
 
-const char *sqlrcontroller_svr::getUser() {
+const char *sqlrservercontroller::getUser() {
 	return user;
 }
 
-const char *sqlrcontroller_svr::getPassword() {
+const char *sqlrservercontroller::getPassword() {
 	return password;
 }
-void sqlrcontroller_svr::setAutoCommitBehavior(bool ac) {
+void sqlrservercontroller::setAutoCommitBehavior(bool ac) {
 	conn->setAutoCommit(ac);
 }
 
-void sqlrcontroller_svr::setFakeTransactionBlocksBehavior(bool ftb) {
+void sqlrservercontroller::setFakeTransactionBlocksBehavior(bool ftb) {
 	faketransactionblocks=ftb;
 }
 
-const char *sqlrcontroller_svr::bindFormat() {
+const char *sqlrservercontroller::bindFormat() {
 	return conn->bindFormat();
 }
 
-int16_t sqlrcontroller_svr::nonNullBindValue() {
+int16_t sqlrservercontroller::nonNullBindValue() {
 	return conn->nonNullBindValue();
 }
 
-int16_t sqlrcontroller_svr::nullBindValue() {
+int16_t sqlrservercontroller::nullBindValue() {
 	return conn->nullBindValue();
 }
 
-char sqlrcontroller_svr::bindVariablePrefix() {
+char sqlrservercontroller::bindVariablePrefix() {
 	return conn->bindVariablePrefix();
 }
 
-bool sqlrcontroller_svr::bindValueIsNull(int16_t isnull) {
+bool sqlrservercontroller::bindValueIsNull(int16_t isnull) {
 	return conn->bindValueIsNull(isnull);
 }
 
-void sqlrcontroller_svr::fakeInputBinds() {
+void sqlrservercontroller::fakeInputBinds() {
 	fakeinputbinds=true;
 }
 
-bool sqlrcontroller_svr::getFakeInputBinds() {
+bool sqlrservercontroller::getFakeInputBinds() {
 	return fakeinputbinds;
 }
 
-bool sqlrcontroller_svr::getColumnNames(const char *query,
+bool sqlrservercontroller::getColumnNames(const char *query,
 					stringbuffer *output) {
 
 	// sanity check on the query
@@ -4418,7 +4418,7 @@ bool sqlrcontroller_svr::getColumnNames(const char *query,
 	size_t		querylen=charstring::length(query);
 
 	bool	retval=false;
-	sqlrcursor_svr	*gcncur=newCursor();
+	sqlrservercursor	*gcncur=newCursor();
 	if (open(gcncur) &&
 		prepareQuery(gcncur,query,querylen) && executeQuery(gcncur)) {
 
@@ -4431,27 +4431,27 @@ bool sqlrcontroller_svr::getColumnNames(const char *query,
 	return retval;
 }
 
-void sqlrcontroller_svr::addSessionTempTableForDrop(const char *table) {
+void sqlrservercontroller::addSessionTempTableForDrop(const char *table) {
 	sessiontemptablesfordrop.append(charstring::duplicate(table));
 }
 
-void sqlrcontroller_svr::addTransactionTempTableForDrop(const char *table) {
+void sqlrservercontroller::addTransactionTempTableForDrop(const char *table) {
 	transtemptablesfordrop.append(charstring::duplicate(table));
 }
 
-void sqlrcontroller_svr::addSessionTempTableForTrunc(const char *table) {
+void sqlrservercontroller::addSessionTempTableForTrunc(const char *table) {
 	sessiontemptablesfortrunc.append(charstring::duplicate(table));
 }
 
-void sqlrcontroller_svr::addTransactionTempTableForTrunc(const char *table) {
+void sqlrservercontroller::addTransactionTempTableForTrunc(const char *table) {
 	transtemptablesfortrunc.append(charstring::duplicate(table));
 }
 
-bool sqlrcontroller_svr::logEnabled() {
+bool sqlrservercontroller::logEnabled() {
 	return (sqlrlg!=NULL);
 }
 
-void sqlrcontroller_svr::logDebugMessage(const char *info) {
+void sqlrservercontroller::logDebugMessage(const char *info) {
 	if (!sqlrlg) {
 		return;
 	}
@@ -4461,7 +4461,7 @@ void sqlrcontroller_svr::logDebugMessage(const char *info) {
 			info);
 }
 
-void sqlrcontroller_svr::logClientConnected() {
+void sqlrservercontroller::logClientConnected() {
 	if (!sqlrlg) {
 		return;
 	}
@@ -4471,7 +4471,7 @@ void sqlrcontroller_svr::logClientConnected() {
 			NULL);
 }
 
-void sqlrcontroller_svr::logClientConnectionRefused(const char *info) {
+void sqlrservercontroller::logClientConnectionRefused(const char *info) {
 	if (!sqlrlg) {
 		return;
 	}
@@ -4481,7 +4481,7 @@ void sqlrcontroller_svr::logClientConnectionRefused(const char *info) {
 			info);
 }
 
-void sqlrcontroller_svr::logClientDisconnected(const char *info) {
+void sqlrservercontroller::logClientDisconnected(const char *info) {
 	if (!sqlrlg) {
 		return;
 	}
@@ -4491,7 +4491,7 @@ void sqlrcontroller_svr::logClientDisconnected(const char *info) {
 			info);
 }
 
-void sqlrcontroller_svr::logClientProtocolError(sqlrcursor_svr *cursor,
+void sqlrservercontroller::logClientProtocolError(sqlrservercursor *cursor,
 							const char *info,
 							ssize_t result) {
 	if (!sqlrlg) {
@@ -4519,7 +4519,7 @@ void sqlrcontroller_svr::logClientProtocolError(sqlrcursor_svr *cursor,
 			errorbuffer.getString());
 }
 
-void sqlrcontroller_svr::logDbLogIn() {
+void sqlrservercontroller::logDbLogIn() {
 	if (!sqlrlg) {
 		return;
 	}
@@ -4529,7 +4529,7 @@ void sqlrcontroller_svr::logDbLogIn() {
 			NULL);
 }
 
-void sqlrcontroller_svr::logDbLogOut() {
+void sqlrservercontroller::logDbLogOut() {
 	if (!sqlrlg) {
 		return;
 	}
@@ -4539,7 +4539,7 @@ void sqlrcontroller_svr::logDbLogOut() {
 			NULL);
 }
 
-void sqlrcontroller_svr::logDbError(sqlrcursor_svr *cursor, const char *info) {
+void sqlrservercontroller::logDbError(sqlrservercursor *cursor, const char *info) {
 	if (!sqlrlg) {
 		return;
 	}
@@ -4549,7 +4549,7 @@ void sqlrcontroller_svr::logDbError(sqlrcursor_svr *cursor, const char *info) {
 			info);
 }
 
-void sqlrcontroller_svr::logQuery(sqlrcursor_svr *cursor) {
+void sqlrservercontroller::logQuery(sqlrservercursor *cursor) {
 	if (!sqlrlg) {
 		return;
 	}
@@ -4559,7 +4559,7 @@ void sqlrcontroller_svr::logQuery(sqlrcursor_svr *cursor) {
 			NULL);
 }
 
-void sqlrcontroller_svr::logInternalError(sqlrcursor_svr *cursor,
+void sqlrservercontroller::logInternalError(sqlrservercursor *cursor,
 							const char *info) {
 	if (!sqlrlg) {
 		return;
@@ -4577,31 +4577,31 @@ void sqlrcontroller_svr::logInternalError(sqlrcursor_svr *cursor,
 			errorbuffer.getString());
 }
 
-void sqlrcontroller_svr::alarmHandler(int32_t signum) {
+void sqlrservercontroller::alarmHandler(int32_t signum) {
 	alarmrang=1;
 }
 
-const char *sqlrcontroller_svr::dbHostName() {
+const char *sqlrservercontroller::dbHostName() {
 	return dbhostname;
 }
 
-const char *sqlrcontroller_svr::dbIpAddress() {
+const char *sqlrservercontroller::dbIpAddress() {
 	return dbipaddress;
 }
 
-const char *sqlrcontroller_svr::identify() {
+const char *sqlrservercontroller::identify() {
 	return conn->identify();
 }
 
-const char *sqlrcontroller_svr::dbVersion() {
+const char *sqlrservercontroller::dbVersion() {
 	return conn->dbVersion();
 }
 
-memorypool *sqlrcontroller_svr::getBindMappingsPool() {
+memorypool *sqlrservercontroller::getBindMappingsPool() {
 	return bindmappingspool;
 }
 
-const char *sqlrcontroller_svr::translateTableName(const char *table) {
+const char *sqlrservercontroller::translateTableName(const char *table) {
 	if (sqlrt) {
 		const char	*newname=NULL;
 		if (sqlrt->getReplacementTableName(NULL,NULL,table,&newname)) {
@@ -4611,7 +4611,7 @@ const char *sqlrcontroller_svr::translateTableName(const char *table) {
 	return NULL;
 }
 
-bool sqlrcontroller_svr::removeReplacementTable(const char *database,
+bool sqlrservercontroller::removeReplacementTable(const char *database,
 							const char *schema,
 							const char *table) {
 	if (sqlrt) {
@@ -4620,7 +4620,7 @@ bool sqlrcontroller_svr::removeReplacementTable(const char *database,
 	return false;
 }
 
-bool sqlrcontroller_svr::removeReplacementIndex(const char *database,
+bool sqlrservercontroller::removeReplacementIndex(const char *database,
 							const char *schema,
 							const char *table) {
 	if (sqlrt) {
@@ -4629,29 +4629,29 @@ bool sqlrcontroller_svr::removeReplacementIndex(const char *database,
 	return false;
 }
 
-const char *sqlrcontroller_svr::getId() {
+const char *sqlrservercontroller::getId() {
 	return cmdl->getId();
 }
 
-const char *sqlrcontroller_svr::getLogDir() {
+const char *sqlrservercontroller::getLogDir() {
 	return logdir;
 }
 
-const char *sqlrcontroller_svr::getDebugDir() {
+const char *sqlrservercontroller::getDebugDir() {
 	return debugdir;
 }
 
-bool sqlrcontroller_svr::isCustomQuery(sqlrcursor_svr *cursor) {
+bool sqlrservercontroller::isCustomQuery(sqlrservercursor *cursor) {
 	return cursor->isCustomQuery();
 }
 
-bool sqlrcontroller_svr::getLobOutputBindLength(sqlrcursor_svr *cursor,
+bool sqlrservercontroller::getLobOutputBindLength(sqlrservercursor *cursor,
 							uint16_t index,
 							uint64_t *length) {
 	return cursor->getLobOutputBindLength(index,length);
 }
 
-bool sqlrcontroller_svr::getLobOutputBindSegment(sqlrcursor_svr *cursor,
+bool sqlrservercontroller::getLobOutputBindSegment(sqlrservercursor *cursor,
 							uint16_t index,
 							char *buffer,
 							uint64_t buffersize,
@@ -4662,12 +4662,12 @@ bool sqlrcontroller_svr::getLobOutputBindSegment(sqlrcursor_svr *cursor,
 						offset,charstoread,charsread);
 }
 
-void sqlrcontroller_svr::closeLobOutputBind(sqlrcursor_svr *cursor,
+void sqlrservercontroller::closeLobOutputBind(sqlrservercursor *cursor,
 							uint16_t index) {
 	cursor->closeLobOutputBind(index);
 }
 
-bool sqlrcontroller_svr::fetchFromBindCursor(sqlrcursor_svr *cursor) {
+bool sqlrservercontroller::fetchFromBindCursor(sqlrservercursor *cursor) {
 
 	// set state
 	updateState(PROCESS_SQL);
@@ -4705,7 +4705,7 @@ bool sqlrcontroller_svr::fetchFromBindCursor(sqlrcursor_svr *cursor) {
 	return success;
 }
 
-void sqlrcontroller_svr::errorMessage(sqlrcursor_svr *cursor,
+void sqlrservercontroller::errorMessage(sqlrservercursor *cursor,
 						char *errorbuffer,
 						uint32_t errorbuffersize,
 						uint32_t *errorlength,
@@ -4715,119 +4715,119 @@ void sqlrcontroller_svr::errorMessage(sqlrcursor_svr *cursor,
 					errorlength,errorcode,liveconnection);
 }
 
-bool sqlrcontroller_svr::knowsRowCount(sqlrcursor_svr *cursor) {
+bool sqlrservercontroller::knowsRowCount(sqlrservercursor *cursor) {
 	return cursor->knowsRowCount();
 }
 
-uint64_t sqlrcontroller_svr::rowCount(sqlrcursor_svr *cursor) {
+uint64_t sqlrservercontroller::rowCount(sqlrservercursor *cursor) {
 	return cursor->rowCount();
 }
 
-bool sqlrcontroller_svr::knowsAffectedRows(sqlrcursor_svr *cursor) {
+bool sqlrservercontroller::knowsAffectedRows(sqlrservercursor *cursor) {
 	return cursor->knowsAffectedRows();
 }
 
-uint64_t sqlrcontroller_svr::affectedRows(sqlrcursor_svr *cursor) {
+uint64_t sqlrservercontroller::affectedRows(sqlrservercursor *cursor) {
 	return cursor->affectedRows();
 }
 
-uint32_t sqlrcontroller_svr::colCount(sqlrcursor_svr *cursor) {
+uint32_t sqlrservercontroller::colCount(sqlrservercursor *cursor) {
 	return cursor->colCount();
 }
 
-uint16_t sqlrcontroller_svr::columnTypeFormat(sqlrcursor_svr *cursor) {
+uint16_t sqlrservercontroller::columnTypeFormat(sqlrservercursor *cursor) {
 	return cursor->columnTypeFormat();
 }
 
-const char *sqlrcontroller_svr::getColumnName(sqlrcursor_svr *cursor,
+const char *sqlrservercontroller::getColumnName(sqlrservercursor *cursor,
 							uint32_t col) {
 	return cursor->getColumnName(col);
 }
 
-uint16_t sqlrcontroller_svr::getColumnNameLength(sqlrcursor_svr *cursor,
+uint16_t sqlrservercontroller::getColumnNameLength(sqlrservercursor *cursor,
 							uint32_t col) {
 	return cursor->getColumnNameLength(col);
 }
 
-uint16_t sqlrcontroller_svr::getColumnType(sqlrcursor_svr *cursor,
+uint16_t sqlrservercontroller::getColumnType(sqlrservercursor *cursor,
 							uint32_t col) {
 	return cursor->getColumnType(col);
 }
 
-const char *sqlrcontroller_svr::getColumnTypeName(sqlrcursor_svr *cursor,
+const char *sqlrservercontroller::getColumnTypeName(sqlrservercursor *cursor,
 							uint32_t col) {
 	return cursor->getColumnTypeName(col);
 }
 
-uint16_t sqlrcontroller_svr::getColumnTypeNameLength(sqlrcursor_svr *cursor,
+uint16_t sqlrservercontroller::getColumnTypeNameLength(sqlrservercursor *cursor,
 							uint32_t col) {
 	return cursor->getColumnTypeNameLength(col);
 }
 
-uint32_t sqlrcontroller_svr::getColumnLength(sqlrcursor_svr *cursor,
+uint32_t sqlrservercontroller::getColumnLength(sqlrservercursor *cursor,
 							uint32_t col) {
 	return cursor->getColumnLength(col);
 }
 
-uint32_t sqlrcontroller_svr::getColumnPrecision(sqlrcursor_svr *cursor,
+uint32_t sqlrservercontroller::getColumnPrecision(sqlrservercursor *cursor,
 							uint32_t col) {
 	return cursor->getColumnPrecision(col);
 }
 
-uint32_t sqlrcontroller_svr::getColumnScale(sqlrcursor_svr *cursor,
+uint32_t sqlrservercontroller::getColumnScale(sqlrservercursor *cursor,
 							uint32_t col) {
 	return cursor->getColumnScale(col);
 }
 
-uint16_t sqlrcontroller_svr::getColumnIsNullable(sqlrcursor_svr *cursor,
+uint16_t sqlrservercontroller::getColumnIsNullable(sqlrservercursor *cursor,
 							uint32_t col) {
 	return cursor->getColumnIsNullable(col);
 }
 
-uint16_t sqlrcontroller_svr::getColumnIsPrimaryKey(sqlrcursor_svr *cursor,
+uint16_t sqlrservercontroller::getColumnIsPrimaryKey(sqlrservercursor *cursor,
 							uint32_t col) {
 	return cursor->getColumnIsPrimaryKey(col);
 }
 
-uint16_t sqlrcontroller_svr::getColumnIsUnique(sqlrcursor_svr *cursor,
+uint16_t sqlrservercontroller::getColumnIsUnique(sqlrservercursor *cursor,
 							uint32_t col) {
 	return cursor->getColumnIsUnique(col);
 }
 
-uint16_t sqlrcontroller_svr::getColumnIsPartOfKey(sqlrcursor_svr *cursor,
+uint16_t sqlrservercontroller::getColumnIsPartOfKey(sqlrservercursor *cursor,
 							uint32_t col) {
 	return cursor->getColumnIsPartOfKey(col);
 }
 
-uint16_t sqlrcontroller_svr::getColumnIsUnsigned(sqlrcursor_svr *cursor,
+uint16_t sqlrservercontroller::getColumnIsUnsigned(sqlrservercursor *cursor,
 							uint32_t col) {
 	return cursor->getColumnIsUnsigned(col);
 }
 
-uint16_t sqlrcontroller_svr::getColumnIsZeroFilled(sqlrcursor_svr *cursor,
+uint16_t sqlrservercontroller::getColumnIsZeroFilled(sqlrservercursor *cursor,
 							uint32_t col) {
 	return cursor->getColumnIsZeroFilled(col);
 }
 
-uint16_t sqlrcontroller_svr::getColumnIsBinary(sqlrcursor_svr *cursor,
+uint16_t sqlrservercontroller::getColumnIsBinary(sqlrservercursor *cursor,
 							uint32_t col) {
 	return cursor->getColumnIsBinary(col);
 }
 
-uint16_t sqlrcontroller_svr::getColumnIsAutoIncrement(sqlrcursor_svr *cursor,
+uint16_t sqlrservercontroller::getColumnIsAutoIncrement(sqlrservercursor *cursor,
 							uint32_t col) {
 	return cursor->getColumnIsAutoIncrement(col);
 }
 
-bool sqlrcontroller_svr::noRowsToReturn(sqlrcursor_svr *cursor) {
+bool sqlrservercontroller::noRowsToReturn(sqlrservercursor *cursor) {
 	return cursor->noRowsToReturn();
 }
 
-bool sqlrcontroller_svr::skipRow(sqlrcursor_svr *cursor) {
+bool sqlrservercontroller::skipRow(sqlrservercursor *cursor) {
 	return cursor->skipRow();
 }
 
-bool sqlrcontroller_svr::fetchRow(sqlrcursor_svr *cursor) {
+bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 	if (cursor->fetchRow()) {
 		cursor->incrementTotalRowsFetched();
 		return true;
@@ -4835,11 +4835,11 @@ bool sqlrcontroller_svr::fetchRow(sqlrcursor_svr *cursor) {
 	return false;
 }
 
-void sqlrcontroller_svr::nextRow(sqlrcursor_svr *cursor) {
+void sqlrservercontroller::nextRow(sqlrservercursor *cursor) {
 	return cursor->nextRow();
 }
 
-void sqlrcontroller_svr::getField(sqlrcursor_svr *cursor,
+void sqlrservercontroller::getField(sqlrservercursor *cursor,
 						uint32_t col,
 						const char **field,
 						uint64_t *fieldlength,
@@ -4848,13 +4848,13 @@ void sqlrcontroller_svr::getField(sqlrcursor_svr *cursor,
 	cursor->getField(col,field,fieldlength,blob,null);
 }
 
-bool sqlrcontroller_svr::getLobFieldLength(sqlrcursor_svr *cursor,
+bool sqlrservercontroller::getLobFieldLength(sqlrservercursor *cursor,
 							uint32_t col,
 							uint64_t *length) {
 	return cursor->getLobFieldLength(col,length);
 }
 
-bool sqlrcontroller_svr::getLobFieldSegment(sqlrcursor_svr *cursor,
+bool sqlrservercontroller::getLobFieldSegment(sqlrservercursor *cursor,
 							uint32_t col,
 							char *buffer,
 							uint64_t buffersize,
@@ -4865,54 +4865,54 @@ bool sqlrcontroller_svr::getLobFieldSegment(sqlrcursor_svr *cursor,
 						offset,charstoread,charsread);
 }
 
-void sqlrcontroller_svr::closeLobField(sqlrcursor_svr *cursor,
+void sqlrservercontroller::closeLobField(sqlrservercursor *cursor,
 							uint32_t col) {
 	cursor->closeLobField(col);
 }
 
-void sqlrcontroller_svr::closeResultSet(sqlrcursor_svr *cursor) {
+void sqlrservercontroller::closeResultSet(sqlrservercursor *cursor) {
 	cursor->closeResultSet();
 }
 
-uint16_t sqlrcontroller_svr::getId(sqlrcursor_svr *cursor) {
+uint16_t sqlrservercontroller::getId(sqlrservercursor *cursor) {
 	return cursor->getId();
 }
 
-void sqlrcontroller_svr::setInputBindCount(sqlrcursor_svr *cursor,
+void sqlrservercontroller::setInputBindCount(sqlrservercursor *cursor,
 						uint16_t inbindcount) {
 	cursor->setInputBindCount(inbindcount);
 }
 
-uint16_t sqlrcontroller_svr::getInputBindCount(sqlrcursor_svr *cursor) {
+uint16_t sqlrservercontroller::getInputBindCount(sqlrservercursor *cursor) {
 	return cursor->getInputBindCount();
 }
 
-bindvar_svr *sqlrcontroller_svr::getInputBinds(sqlrcursor_svr *cursor) {
+sqlrserverbindvar *sqlrservercontroller::getInputBinds(sqlrservercursor *cursor) {
 	return cursor->getInputBinds();
 }
 
-void sqlrcontroller_svr::setOutputBindCount(sqlrcursor_svr *cursor,
+void sqlrservercontroller::setOutputBindCount(sqlrservercursor *cursor,
 						uint16_t outbindcount) {
 	return cursor->setOutputBindCount(outbindcount);
 }
 
-uint16_t sqlrcontroller_svr::getOutputBindCount(sqlrcursor_svr *cursor) {
+uint16_t sqlrservercontroller::getOutputBindCount(sqlrservercursor *cursor) {
 	return cursor->getOutputBindCount();
 }
 
-bindvar_svr *sqlrcontroller_svr::getOutputBinds(sqlrcursor_svr *cursor) {
+sqlrserverbindvar *sqlrservercontroller::getOutputBinds(sqlrservercursor *cursor) {
 	return cursor->getOutputBinds();
 }
 
-bool sqlrcontroller_svr::open(sqlrcursor_svr *cursor) {
+bool sqlrservercontroller::open(sqlrservercursor *cursor) {
 	return cursor->open();
 }
 
-bool sqlrcontroller_svr::close(sqlrcursor_svr *cursor) {
+bool sqlrservercontroller::close(sqlrservercursor *cursor) {
 	return cursor->close();
 }
 
-void sqlrcontroller_svr::suspendResultSet(sqlrcursor_svr *cursor) {
+void sqlrservercontroller::suspendResultSet(sqlrservercursor *cursor) {
 	cursor->setState(SQLRCURSORSTATE_SUSPENDED);
 	if (cursor->getCustomQueryCursor()) {
 		cursor->getCustomQueryCursor()->
@@ -4920,128 +4920,128 @@ void sqlrcontroller_svr::suspendResultSet(sqlrcursor_svr *cursor) {
 	}
 }
 
-void sqlrcontroller_svr::abort(sqlrcursor_svr *cursor) {
+void sqlrservercontroller::abort(sqlrservercursor *cursor) {
 	cursor->abort();
 }
 
-char *sqlrcontroller_svr::getQueryBuffer(sqlrcursor_svr *cursor) {
+char *sqlrservercontroller::getQueryBuffer(sqlrservercursor *cursor) {
 	return cursor->getQueryBuffer();
 }
 
-uint32_t  sqlrcontroller_svr::getQueryLength(sqlrcursor_svr *cursor) {
+uint32_t  sqlrservercontroller::getQueryLength(sqlrservercursor *cursor) {
 	return cursor->getQueryLength();
 }
 
-void sqlrcontroller_svr::setQueryLength(sqlrcursor_svr *cursor,
+void sqlrservercontroller::setQueryLength(sqlrservercursor *cursor,
 						uint32_t querylength) {
 	cursor->setQueryLength(querylength);
 }
 
-xmldom *sqlrcontroller_svr::getQueryTree(sqlrcursor_svr *cursor) {
+xmldom *sqlrservercontroller::getQueryTree(sqlrservercursor *cursor) {
 	return cursor->getQueryTree();
 }
 
-void sqlrcontroller_svr::setCommandStart(sqlrcursor_svr *cursor,
+void sqlrservercontroller::setCommandStart(sqlrservercursor *cursor,
 						uint64_t sec, uint64_t usec) {
 	cursor->setCommandStart(sec,usec);
 }
 
-uint64_t sqlrcontroller_svr::getCommandStartSec(sqlrcursor_svr *cursor) {
+uint64_t sqlrservercontroller::getCommandStartSec(sqlrservercursor *cursor) {
 	return cursor->getCommandStartSec();
 }
 
-uint64_t sqlrcontroller_svr::getCommandStartUSec(sqlrcursor_svr *cursor) {
+uint64_t sqlrservercontroller::getCommandStartUSec(sqlrservercursor *cursor) {
 	return cursor->getCommandStartUSec();
 }
 
-void sqlrcontroller_svr::setCommandEnd(sqlrcursor_svr *cursor,
+void sqlrservercontroller::setCommandEnd(sqlrservercursor *cursor,
 						uint64_t sec, uint64_t usec) {
 	cursor->setCommandEnd(sec,usec);
 }
 
-uint64_t sqlrcontroller_svr::getCommandEndSec(sqlrcursor_svr *cursor) {
+uint64_t sqlrservercontroller::getCommandEndSec(sqlrservercursor *cursor) {
 	return cursor->getCommandEndSec();
 }
 
-uint64_t sqlrcontroller_svr::getCommandEndUSec(sqlrcursor_svr *cursor) {
+uint64_t sqlrservercontroller::getCommandEndUSec(sqlrservercursor *cursor) {
 	return cursor->getCommandEndUSec();
 }
 
-void sqlrcontroller_svr::setQueryStart(sqlrcursor_svr *cursor,
+void sqlrservercontroller::setQueryStart(sqlrservercursor *cursor,
 						uint64_t sec, uint64_t usec) {
 	cursor->setQueryStart(sec,usec);
 }
 
-uint64_t sqlrcontroller_svr::getQueryStartSec(sqlrcursor_svr *cursor) {
+uint64_t sqlrservercontroller::getQueryStartSec(sqlrservercursor *cursor) {
 	return cursor->getQueryStartSec();
 }
 
-uint64_t sqlrcontroller_svr::getQueryStartUSec(sqlrcursor_svr *cursor) {
+uint64_t sqlrservercontroller::getQueryStartUSec(sqlrservercursor *cursor) {
 	return cursor->getQueryStartUSec();
 }
 
-void sqlrcontroller_svr::setQueryEnd(sqlrcursor_svr *cursor,
+void sqlrservercontroller::setQueryEnd(sqlrservercursor *cursor,
 						uint64_t sec, uint64_t usec) {
 	return cursor->setQueryEnd(sec,usec);
 }
 
-uint64_t sqlrcontroller_svr::getQueryEndSec(sqlrcursor_svr *cursor) {
+uint64_t sqlrservercontroller::getQueryEndSec(sqlrservercursor *cursor) {
 	return cursor->getQueryEndSec();
 }
 
-uint64_t sqlrcontroller_svr::getQueryEndUSec(sqlrcursor_svr *cursor) {
+uint64_t sqlrservercontroller::getQueryEndUSec(sqlrservercursor *cursor) {
 	return cursor->getQueryEndUSec();
 }
 
-void sqlrcontroller_svr::setState(sqlrcursor_svr *cursor,
+void sqlrservercontroller::setState(sqlrservercursor *cursor,
 						sqlrcursorstate_t state) {
 	cursor->setState(state);
 }
 
-sqlrcursorstate_t sqlrcontroller_svr::getState(sqlrcursor_svr *cursor) {
+sqlrcursorstate_t sqlrservercontroller::getState(sqlrservercursor *cursor) {
 	return cursor->getState();
 }
 
-uint64_t sqlrcontroller_svr::getTotalRowsFetched(sqlrcursor_svr *cursor) {
+uint64_t sqlrservercontroller::getTotalRowsFetched(sqlrservercursor *cursor) {
 	return cursor->getTotalRowsFetched();
 }
 
-void sqlrcontroller_svr::clearError(sqlrcursor_svr *cursor) {
+void sqlrservercontroller::clearError(sqlrservercursor *cursor) {
 	cursor->clearError();
 }
 
-void sqlrcontroller_svr::setError(sqlrcursor_svr *cursor,
+void sqlrservercontroller::setError(sqlrservercursor *cursor,
 				const char *err, int64_t errn, bool liveconn) {
 	cursor->setError(err,errn,liveconn);
 }
 
-char *sqlrcontroller_svr::getErrorBuffer(sqlrcursor_svr *cursor) {
+char *sqlrservercontroller::getErrorBuffer(sqlrservercursor *cursor) {
 	return cursor->getErrorBuffer();
 }
 
-uint32_t sqlrcontroller_svr::getErrorLength(sqlrcursor_svr *cursor) {
+uint32_t sqlrservercontroller::getErrorLength(sqlrservercursor *cursor) {
 	return cursor->getErrorLength();
 }
 
-void sqlrcontroller_svr::setErrorLength(sqlrcursor_svr *cursor,
+void sqlrservercontroller::setErrorLength(sqlrservercursor *cursor,
 						uint32_t errorlength) {
 	cursor->setErrorLength(errorlength);
 }
 
-uint32_t sqlrcontroller_svr::getErrorNumber(sqlrcursor_svr *cursor) {
+uint32_t sqlrservercontroller::getErrorNumber(sqlrservercursor *cursor) {
 	return cursor->getErrorNumber();
 }
 
-void sqlrcontroller_svr::setErrorNumber(sqlrcursor_svr *cursor,
+void sqlrservercontroller::setErrorNumber(sqlrservercursor *cursor,
 						uint32_t errnum) {
 	cursor->setErrorNumber(errnum);
 }
 
-bool sqlrcontroller_svr::getLiveConnection(sqlrcursor_svr *cursor) {
+bool sqlrservercontroller::getLiveConnection(sqlrservercursor *cursor) {
 	return cursor->getLiveConnection();
 }
 
-void sqlrcontroller_svr::setLiveConnection(sqlrcursor_svr *cursor,
+void sqlrservercontroller::setLiveConnection(sqlrservercursor *cursor,
 						bool liveconnection) {
 	return cursor->setLiveConnection(liveconnection);
 }

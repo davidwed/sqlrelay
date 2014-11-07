@@ -154,8 +154,8 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 	tlist.append(sqltp);
 }
 
-bool sqlrtranslations::runTranslations(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree) {
 	debugFunction();
 	if (!querytree) {

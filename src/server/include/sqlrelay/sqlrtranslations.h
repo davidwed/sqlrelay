@@ -14,8 +14,8 @@
 #include <rudiments/dynamiclib.h>
 #include <sqlrelay/sqlrtranslation.h>
 
-class sqlrconnection_svr;
-class sqlrcursor_svr;
+class sqlrserverconnection;
+class sqlrservercursor;
 
 class SQLRSERVER_DLLSPEC databaseobject {
 	public:
@@ -37,8 +37,8 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 			~sqlrtranslations();
 
 		bool	loadTranslations(const char *translations);
-		bool	runTranslations(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+		bool	runTranslations(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						xmldom *querytree);
 
 		bool	getReplacementTableName(const char *database,

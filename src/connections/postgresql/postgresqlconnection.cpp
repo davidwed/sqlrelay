@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2001  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <rudiments/bytestring.h>
 #ifndef HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR
@@ -13,17 +13,17 @@
 
 #include <libpq-fe.h>
 
-class postgresqlconnection : public sqlrconnection_svr {
+class postgresqlconnection : public sqlrserverconnection {
 	friend class postgresqlcursor;
 	public:
-			postgresqlconnection(sqlrcontroller_svr *cont);
+			postgresqlconnection(sqlrservercontroller *cont);
 			~postgresqlconnection();
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error);
 		const char	*logInError(const char *errmsg);
-		sqlrcursor_svr	*newCursor(uint16_t id);
-		void		deleteCursor(sqlrcursor_svr *curs);
+		sqlrservercursor	*newCursor(uint16_t id);
+		void		deleteCursor(sqlrservercursor *curs);
 		void		logOut();
 		void		errorMessage(char *errorbuffer,
 						uint32_t errorbufferlength,
@@ -73,10 +73,10 @@ class postgresqlconnection : public sqlrconnection_svr {
 #endif
 };
 
-class postgresqlcursor : public sqlrcursor_svr {
+class postgresqlcursor : public sqlrservercursor {
 	friend class postgresqlconnection;
 	private:
-				postgresqlcursor(sqlrconnection_svr *conn,
+				postgresqlcursor(sqlrserverconnection *conn,
 								uint16_t id);
 				~postgresqlcursor();
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
@@ -162,8 +162,8 @@ static void nullNoticeProcessor(void *arg, const char *message) {
 }
 #endif
 
-postgresqlconnection::postgresqlconnection(sqlrcontroller_svr *cont) :
-						sqlrconnection_svr(cont) {
+postgresqlconnection::postgresqlconnection(sqlrservercontroller *cont) :
+						sqlrserverconnection(cont) {
 	dbversion=NULL;
 	datatypecount=0;
 	datatypeids=NULL;
@@ -299,12 +299,12 @@ const char *postgresqlconnection::logInError(const char *errmsg) {
 	return errormessage.getString();
 }
 
-sqlrcursor_svr *postgresqlconnection::newCursor(uint16_t id) {
-	return (sqlrcursor_svr *)new
-			postgresqlcursor((sqlrconnection_svr *)this,id);
+sqlrservercursor *postgresqlconnection::newCursor(uint16_t id) {
+	return (sqlrservercursor *)new
+			postgresqlcursor((sqlrserverconnection *)this,id);
 }
 
-void postgresqlconnection::deleteCursor(sqlrcursor_svr *curs) {
+void postgresqlconnection::deleteCursor(sqlrservercursor *curs) {
 	delete (postgresqlcursor *)curs;
 }
 
@@ -403,7 +403,7 @@ const char *postgresqlconnection::dbVersion() {
 }
 
 const char *postgresqlconnection::dbHostName() {
-	const char	*dbhostname=sqlrconnection_svr::dbHostName();
+	const char	*dbhostname=sqlrserverconnection::dbHostName();
 	if (charstring::length(dbhostname)) {
 		return dbhostname;
 	}
@@ -418,7 +418,7 @@ const char *postgresqlconnection::dbIpAddressQuery() {
 }
 
 const char *postgresqlconnection::dbIpAddress() {
-	const char	*ipaddress=sqlrconnection_svr::dbIpAddress();
+	const char	*ipaddress=sqlrserverconnection::dbIpAddress();
 	return (charstring::length(ipaddress))?ipaddress:"127.0.0.1";
 }
 
@@ -515,7 +515,7 @@ const char *postgresqlconnection::getCurrentDatabaseQuery() {
 bool postgresqlconnection::getLastInsertId(uint64_t *id) {
 #ifdef HAVE_POSTGRESQL_PQOIDVALUE
 	if (lastinsertidquery) {
-		return sqlrconnection_svr::getLastInsertId(id);
+		return sqlrserverconnection::getLastInsertId(id);
 	}
 	*id=(currentoid!=InvalidOid)?currentoid:0;
 	return true;
@@ -533,12 +533,12 @@ const char *postgresqlconnection::bindFormat() {
 		defined(HAVE_POSTGRESQL_PQPREPARE)
 	return "$1";
 #else
-	return sqlrconnection_svr::bindFormat();
+	return sqlrserverconnection::bindFormat();
 #endif
 }
 
-postgresqlcursor::postgresqlcursor(sqlrconnection_svr *conn, uint16_t id) :
-						sqlrcursor_svr(conn,id) {
+postgresqlcursor::postgresqlcursor(sqlrserverconnection *conn, uint16_t id) :
+						sqlrservercursor(conn,id) {
 	postgresqlconn=(postgresqlconnection *)conn;
 	pgresult=NULL;
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
@@ -1194,7 +1194,7 @@ void postgresqlcursor::closeResultSet() {
 }
 
 extern "C" {
-	sqlrconnection_svr *new_postgresqlconnection(sqlrcontroller_svr *cont) {
+	sqlrserverconnection *new_postgresqlconnection(sqlrservercontroller *cont) {
 		return new postgresqlconnection(cont);
 	}
 }

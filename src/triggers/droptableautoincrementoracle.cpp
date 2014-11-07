@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrcontroller.h>
+#include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
 #include <sqlrelay/sqlparser.h>
@@ -12,22 +12,22 @@ class droptableautoincrementoracle : public sqlrtrigger {
 	public:
 			droptableautoincrementoracle(
 					xmldomnode *parameters, bool debug);
-		bool	run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree,
 					bool before,
 					bool success);
 	private:
-		bool	dropSequences(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+		bool	dropSequences(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						const char *database,
 						const char *schema,
 						const char *tablename);
-		bool	dropSequence(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+		bool	dropSequence(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						const char *sequencename);
-		bool	deleteSequence(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+		bool	deleteSequence(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						const char *sequencename);
 };
 
@@ -36,8 +36,8 @@ droptableautoincrementoracle::droptableautoincrementoracle(
 					sqlrtrigger(parameters,debug) {
 }
 
-bool droptableautoincrementoracle::run(sqlrconnection_svr *sqlrcon,
-					sqlrcursor_svr *sqlrcur,
+bool droptableautoincrementoracle::run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
 					xmldom *querytree,
 					bool before,
 					bool success) {
@@ -100,8 +100,8 @@ bool droptableautoincrementoracle::run(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool droptableautoincrementoracle::dropSequences(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+bool droptableautoincrementoracle::dropSequences(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						const char *database,
 						const char *schema,
 						const char *table) {
@@ -123,7 +123,7 @@ bool droptableautoincrementoracle::dropSequences(sqlrconnection_svr *sqlrcon,
 	if (debug) {
 		stdoutput.printf("running trigger:\n%s\n",query.getString());
 	}
-	sqlrcursor_svr	*cur=sqlrcon->cont->newCursor();
+	sqlrservercursor	*cur=sqlrcon->cont->newCursor();
 	if (sqlrcon->cont->open(cur) &&
 		sqlrcon->cont->prepareQuery(
 			cur,query.getString(),query.getStringLength()) &&
@@ -185,8 +185,8 @@ bool droptableautoincrementoracle::dropSequences(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool droptableautoincrementoracle::dropSequence(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+bool droptableautoincrementoracle::dropSequence(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						const char *sequencename) {
 	debugFunction();
 
@@ -198,7 +198,7 @@ bool droptableautoincrementoracle::dropSequence(sqlrconnection_svr *sqlrcon,
 	if (debug) {
 		stdoutput.printf("running trigger:\n%s\n",query.getString());
 	}
-	sqlrcursor_svr	*cur=sqlrcon->cont->newCursor();
+	sqlrservercursor	*cur=sqlrcon->cont->newCursor();
 	if (sqlrcon->cont->open(cur) &&
 		sqlrcon->cont->prepareQuery(
 			cur,query.getString(),query.getStringLength()) &&
@@ -238,8 +238,8 @@ bool droptableautoincrementoracle::dropSequence(sqlrconnection_svr *sqlrcon,
 	return true;
 }
 
-bool droptableautoincrementoracle::deleteSequence(sqlrconnection_svr *sqlrcon,
-						sqlrcursor_svr *sqlrcur,
+bool droptableautoincrementoracle::deleteSequence(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
 						const char *sequencename) {
 	debugFunction();
 
@@ -253,7 +253,7 @@ bool droptableautoincrementoracle::deleteSequence(sqlrconnection_svr *sqlrcon,
 	if (debug) {
 		stdoutput.printf("running trigger:\n%s\n",query.getString());
 	}
-	sqlrcursor_svr	*cur=sqlrcon->cont->newCursor();
+	sqlrservercursor	*cur=sqlrcon->cont->newCursor();
 	if (sqlrcon->cont->open(cur) &&
 		sqlrcon->cont->prepareQuery(
 			cur,query.getString(),query.getStringLength()) &&
