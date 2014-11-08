@@ -104,10 +104,10 @@ endif
 
 SRCS = sqlrlistener.cpp \
 	sqlrservercontroller.cpp \
+	sqlrserverconnection.cpp \
+	sqlrservercursor.cpp \
 	sqlrprotocol.cpp \
 	sqlrclientprotocol.cpp \
-	sqlrconnection.cpp \
-	sqlrcursor.cpp \
 	sqlparser.cpp \
 	sqlwriter.cpp \
 	sqlrtranslations.cpp \
@@ -128,10 +128,10 @@ SRCS = sqlrlistener.cpp \
 
 LOBJS = sqlrlistener.lo \
 	sqlrservercontroller.lo \
+	sqlrserverconnection.lo \
+	sqlrservercursor.lo \
 	sqlrprotocol.lo \
 	sqlrclientprotocol.lo \
-	sqlrconnection.lo \
-	sqlrcursor.lo \
 	sqlparser.lo \
 	sqlwriter.lo \
 	sqlrtranslations.lo \
