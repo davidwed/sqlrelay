@@ -4,7 +4,6 @@
 #include <config.h>
 
 #include <sqlrelay/sqlrservercontroller.h>
-#include <sqlrelay/sqlrclientprotocol.h>
 #include <rudiments/file.h>
 #include <rudiments/socketclient.h>
 #include <rudiments/bytestring.h>
@@ -47,6 +46,8 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 	updown=NULL;
 
 	clientsock=NULL;
+
+	protocol=NULL;
 
 	user=NULL;
 	password=NULL;
@@ -107,6 +108,7 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 	inbindmappings=new namevaluepairs;
 	outbindmappings=new namevaluepairs;
 
+	sqlrpr=NULL;
 	sqlp=NULL;
 	sqlrt=NULL;
 	sqlrrst=NULL;
@@ -164,6 +166,8 @@ sqlrservercontroller::~sqlrservercontroller() {
 
 	delete tmpdir;
 
+	delete[] protocol;
+
 	for (uint32_t i=0; i<usercount; i++) {
 		delete[] users[i];
 		delete[] passwords[i];
@@ -186,6 +190,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete inbindmappings;
 	delete outbindmappings;
 
+	delete sqlrpr;
 	delete sqlp;
 	delete sqlrt;
 	delete sqlrrst;
@@ -434,10 +439,8 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// init client protocols
-	for (uint8_t i=0; i<SQLRPROTOCOLCOUNT; i++) {
-		sqlrp[i]=NULL;
-	}
-	sqlrp[SQLRPROTOCOL_SQLRCLIENT]=new sqlrclientprotocol(this,conn);
+	sqlrpr=new sqlrprotocols(this,conn);
+	sqlrpr->loadProtocols();
 
 	// set a handler for SIGALRMs
 	#ifdef SIGALRM
@@ -1562,33 +1565,32 @@ bool sqlrservercontroller::getProtocol() {
 
 	// get protocol length
 	uint16_t	protocollen=0;
-	if (clientsock->read(&protocollen)!=sizeof(uint16_t)) {
+	if (handoffsockun.read(&protocollen)!=sizeof(uint16_t)) {
 		logDebugMessage("failed to get the client protocol length");
 		return false;
 	}
 
 	// get the protocol string
-	char	*protocol=new char[protocollen+1];
-	if (clientsock->read(protocol,protocollen)!=protocollen) {
-		logDebugMessage("failed to get the client protocol string");
-		delete[] protocol;
-		return false;
+	delete[] protocol;
+	protocol=NULL;
+	if (!protocollen) {
+		protocol=charstring::duplicate(DEFAULT_PROTOCOL);
+	} else {
+		char	*protocol=new char[protocollen+1];
+		if (handoffsockun.read(protocol,protocollen)!=protocollen) {
+			logDebugMessage("failed to get the "
+					"client protocol string");
+			delete[] protocol;
+			return false;
+		}
+		protocol[protocollen]='\0';
 	}
-	protocol[protocollen]='\0';
-stdoutput.printf("protocol: %s\n",protocol);
 
 	logDebugMessage("done getting the client protocol...");
 	return true;
 }
 
 void sqlrservercontroller::clientSession() {
-
-	// determine client protocol
-	sqlrprotocol_t	protocol=getClientProtocol();
-	if (protocol==SQLRPROTOCOL_UNKNOWN) {
-		closeClientConnection(0);
-		return;
-	}
 
 	logDebugMessage("client session...");
 
@@ -1603,7 +1605,7 @@ void sqlrservercontroller::clientSession() {
 	logClientConnected();
 
 	// have client session using the appropriate protocol
-	sqlrprotocol		*proto=sqlrp[protocol];
+	sqlrprotocol		*proto=sqlrpr->getProtocol(protocol);
 	sqlrclientexitstatus_t	exitstatus=SQLRCLIENTEXITSTATUS_ERROR;
 	if (proto) {
 		proto->setClientSocket(clientsock);
@@ -1636,36 +1638,6 @@ void sqlrservercontroller::clientSession() {
 	inclientsession=false;
 
 	logDebugMessage("done with client session");
-}
-
-sqlrprotocol_t sqlrservercontroller::getClientProtocol() {
-
-	uint16_t	value=0;
-	ssize_t		result=0;
-
-	// get the first 2 bytes
-	result=clientsock->read(&value,idleclienttimeout,0);
-	if (result!=sizeof(value)) {
-		return SQLRPROTOCOL_UNKNOWN;
-	}
-
-	// check for sqlrclient protocol
-	if (value!=SQLRCLIENT_PROTOCOL) {
-		return SQLRPROTOCOL_UNKNOWN;
-	}
-
-	// get the next 2 bytes
-	result=clientsock->read(&value,idleclienttimeout,0);
-	if (result!=sizeof(value)) {
-		return SQLRPROTOCOL_UNKNOWN;
-	}
-
-	// check for version 1
-	if (value!=1) {
-		return SQLRPROTOCOL_UNKNOWN;
-	}
-
-	return SQLRPROTOCOL_SQLRCLIENT;
 }
 
 sqlrservercursor *sqlrservercontroller::getCursor(uint16_t id) {

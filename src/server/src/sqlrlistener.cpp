@@ -660,6 +660,15 @@ bool sqlrlistener::listenOnClientSocket(listenercontainer *lc) {
 			clientsockin[ind]=new inetsocketserver();
 			clientsockinproto[ind]=lc->getProtocol();
 
+			// for the default protocol, use an empty string
+			// the listener has to pass the protocol to the
+			// connection and this makes that even faster for
+			// the default protocol
+			if (!charstring::compare(clientsockinproto[ind],
+							DEFAULT_PROTOCOL)) {
+				clientsockinproto[ind]="";
+			}
+
 			if (clientsockin[ind]->
 					listen(addresses[index],port,15)) {
 				addReadFileDescriptor(clientsockin[ind]);
@@ -695,6 +704,14 @@ bool sqlrlistener::listenOnClientSocket(listenercontainer *lc) {
 
 		clientsockun[clientsockunindex]=new unixsocketserver();
 		clientsockunproto[clientsockunindex]=lc->getProtocol();
+
+		// for the default protocol, use an empty string
+		// the listener has to pass the protocol to the connection
+		// and this makes that even faster for the default protocol
+		if (!charstring::compare(clientsockunproto[clientsockunindex],
+							DEFAULT_PROTOCOL)) {
+			clientsockunproto[clientsockunindex]="";
+		}
 
 		if (clientsockun[clientsockunindex]->
 				listen(lc->getSocket(),0000,15)) {

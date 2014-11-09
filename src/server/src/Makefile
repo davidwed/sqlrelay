@@ -106,8 +106,8 @@ SRCS = sqlrlistener.cpp \
 	sqlrservercontroller.cpp \
 	sqlrserverconnection.cpp \
 	sqlrservercursor.cpp \
+	sqlrprotocols.cpp \
 	sqlrprotocol.cpp \
-	sqlrclientprotocol.cpp \
 	sqlparser.cpp \
 	sqlwriter.cpp \
 	sqlrtranslations.cpp \
@@ -130,8 +130,8 @@ LOBJS = sqlrlistener.lo \
 	sqlrservercontroller.lo \
 	sqlrserverconnection.lo \
 	sqlrservercursor.lo \
+	sqlrprotocols.lo \
 	sqlrprotocol.lo \
-	sqlrclientprotocol.lo \
 	sqlparser.lo \
 	sqlwriter.lo \
 	sqlrtranslations.lo \
@@ -350,7 +350,6 @@ installheaders:
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlparser.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrauth.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrauths.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrclientprotocol.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrserverconnection.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrservercontroller.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrservercursor.h $(includedir)/sqlrelay
@@ -358,6 +357,7 @@ installheaders:
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrlogger.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrloggers.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrprotocol.h $(includedir)/sqlrelay
+	$(INSTALL) -m 644 ../include/sqlrelay/sqlrprotocols.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrpwdencs.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrqueries.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrquery.h $(includedir)/sqlrelay
@@ -386,7 +386,6 @@ uninstall:
 	$(RM) $(includedir)/sqlrelay/sqlparser.h
 	$(RM) $(includedir)/sqlrelay/sqlrauth.h
 	$(RM) $(includedir)/sqlrelay/sqlrauths.h
-	$(RM) $(includedir)/sqlrelay/sqlrclientprotocol.h
 	$(RM) $(includedir)/sqlrelay/sqlrconnection.h
 	$(RM) $(includedir)/sqlrelay/sqlrservercontroller.h
 	$(RM) $(includedir)/sqlrelay/sqlrservercursor.h
@@ -394,6 +393,7 @@ uninstall:
 	$(RM) $(includedir)/sqlrelay/sqlrlogger.h
 	$(RM) $(includedir)/sqlrelay/sqlrloggers.h
 	$(RM) $(includedir)/sqlrelay/sqlrprotocol.h
+	$(RM) $(includedir)/sqlrelay/sqlrprotocols.h
 	$(RM) $(includedir)/sqlrelay/sqlrpwdenc.h
 	$(RM) $(includedir)/sqlrelay/sqlrpwdencs.h
 	$(RM) $(includedir)/sqlrelay/sqlrqueries.h

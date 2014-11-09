@@ -378,11 +378,11 @@ void sqlrconnection::protocol() {
 
 	if (debug) {
 		debugPreStart();
-		debugPrint("Protocol : SQLRCLIENT_PROTOCOL 1\n");
+		debugPrint("Protocol : sqlrclient version 1\n");
 		debugPreEnd();
 	}
 
-	cs->write((uint16_t)SQLRCLIENT_PROTOCOL);
+	cs->write((uint16_t)PROTOCOLVERSION);
 	cs->write((uint16_t)1);
 }
 

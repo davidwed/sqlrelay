@@ -20,6 +20,7 @@
 
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
+#include <sqlrelay/sqlrprotocols.h>
 #include <sqlrelay/sqlrprotocol.h>
 #include <sqlrelay/sqlparser.h>
 #include <sqlrelay/sqlrtranslations.h>

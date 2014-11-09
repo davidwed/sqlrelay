@@ -51,8 +51,6 @@
 		bool	getProtocol();
 		void	clientSession();
 
-		sqlrprotocol_t	getClientProtocol();
-
 		bool	connectionBasedAuth(const char *userbuffer,
 						const char *passwordbuffer);
 		void	initLocalAuthentication();
@@ -139,7 +137,7 @@
 		semaphoreset	*semset;
 		sharedmemory	*shmem;
 
-		sqlrprotocol			*sqlrp[SQLRPROTOCOLCOUNT];
+		sqlrprotocols			*sqlrpr;
 		sqlparser			*sqlp;
 		sqlrtranslations		*sqlrt;
 		sqlrresultsettranslations	*sqlrrst;
@@ -151,6 +149,8 @@
 		sqlrauths			*sqlra;
 
 		filedescriptor	*clientsock;
+
+		const char	*protocol;
 
 		const char	*user;
 		const char	*password;
