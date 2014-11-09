@@ -187,6 +187,7 @@ bool sqlrservercursor::inputBindBlob(const char *variable,
 					const char *value,
 					uint32_t valuesize,
 					int16_t *isnull) {
+stdoutput.printf("sqlrservercursor::inputBindBlob(%s)\n",value);
 	// fall back to string bind implementation
 	return inputBind(variable,variablesize,value,valuesize,isnull);
 }

@@ -9,6 +9,7 @@
 
 #include <datatypes.h>
 #include <defines.h>
+#include <config.h>
 
 #include <sqlrelay/sqlrclient.h>
 

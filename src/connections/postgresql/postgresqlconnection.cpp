@@ -10,6 +10,7 @@
 #include <rudiments/sys.h>
 
 #include <datatypes.h>
+#include <config.h>
 
 #include <libpq-fe.h>
 

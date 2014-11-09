@@ -21,6 +21,7 @@
 
 #include <datatypes.h>
 #include <defines.h>
+#include <config.h>
 
 #define MAX_BYTES_PER_CHAR	4
 
