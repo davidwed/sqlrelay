@@ -5,8 +5,8 @@ include ../../../config.mk
 .PHONY: all clean install uninstall
 
 ifeq ($(SQLRELAY_ENABLE_SHARED),no)
-PLUGINSRCS = sqlrconnectiondeclarations.cpp \
-		sqlrconnectionassignments.cpp \
+PLUGINSRCS = sqlrserverconnectiondeclarations.cpp \
+		sqlrserverconnectionassignments.cpp \
 		sqlrprotocoldeclarations.cpp \
 		sqlrprotocolassignments.cpp \
 		sqlrloggerdeclarations.cpp \
@@ -193,7 +193,7 @@ sqlr-scaler$(EXE): sqlr-scaler.cpp sqlr-scaler.lo
 sqlr-cachemanager$(EXE): sqlr-cachemanager.cpp sqlr-cachemanager.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-cachemanager.lo $(LIBS) $(RPATH)
 
-sqlrconnectiondeclarations.cpp: sqlrconnectiondeclarations.cpp.in
+sqlrserverconnectiondeclarations.cpp: sqlrserverconnectiondeclarations.cpp.in
 	$(RM) $@
 	for file in `ls ../../connections/*/*connection.lo`; \
 	do \
@@ -201,7 +201,7 @@ sqlrconnectiondeclarations.cpp: sqlrconnectiondeclarations.cpp.in
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
-sqlrconnectionassignments.cpp: sqlrconnectionassignments.cpp.in
+sqlrserverconnectionassignments.cpp: sqlrserverconnectionassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../../connections/*/*connection.lo`; \
 	do \
@@ -405,7 +405,7 @@ uninstall:
 	$(RM) $(includedir)/sqlrelay/sqlparser.h
 	$(RM) $(includedir)/sqlrelay/sqlrauth.h
 	$(RM) $(includedir)/sqlrelay/sqlrauths.h
-	$(RM) $(includedir)/sqlrelay/sqlrconnection.h
+	$(RM) $(includedir)/sqlrelay/sqlrserverconnection.h
 	$(RM) $(includedir)/sqlrelay/sqlrservercontroller.h
 	$(RM) $(includedir)/sqlrelay/sqlrservercursor.h
 	$(RM) $(includedir)/sqlrelay/sqlrlistener.h

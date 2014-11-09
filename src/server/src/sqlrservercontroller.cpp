@@ -26,7 +26,7 @@
 
 #ifndef SQLRELAY_ENABLE_SHARED
 	extern "C" {
-		#include "sqlrconnectiondeclarations.cpp"
+		#include "sqlrserverconnectiondeclarations.cpp"
 	}
 #endif
 
@@ -519,7 +519,7 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 	sqlrserverconnection	*conn;
 	stringbuffer		connectionname;
 	connectionname.append(dbase)->append("connection");
-	#include "sqlrconnectionassignments.cpp"
+	#include "sqlrserverconnectionassignments.cpp"
 	{
 		conn=NULL;
 	}
