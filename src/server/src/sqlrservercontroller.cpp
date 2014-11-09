@@ -1006,8 +1006,9 @@ bool sqlrservercontroller::openSockets() {
 	if (cfgfl->getListenOnInet()) {
 
 		if (!serversockin) {
-			const char * const *addresses=cfgfl->getAddresses();
-			serversockincount=cfgfl->getAddressCount();
+			const char * const *addresses=
+					cfgfl->getDefaultAddresses();
+			serversockincount=cfgfl->getDefaultAddressCount();
 			serversockin=new inetsocketserver *[serversockincount];
 			bool	failed=false;
 			for (uint64_t index=0;
@@ -1438,6 +1439,10 @@ int32_t sqlrservercontroller::waitForClient() {
 
 		} else if (command==HANDOFF_PASS) {
 
+			if (!getProtocol()) {
+				return -1;
+			}
+
 			// Receive the client file descriptor and use it.
 			if (!handoffsockun.receiveSocket(&descriptor)) {
 				logInternalError(NULL,"failed to receive "
@@ -1456,6 +1461,10 @@ int32_t sqlrservercontroller::waitForClient() {
 			}
 
 		} else if (command==HANDOFF_PROXY) {
+
+			if (!getProtocol()) {
+				return -1;
+			}
 
 			logDebugMessage("listener is proxying the client");
 
@@ -1545,6 +1554,31 @@ int32_t sqlrservercontroller::waitForClient() {
 	clientsock->setWriteBufferSize(65536);
 	//clientsock->setTcpWriteBufferSize(65536);
 	return 1;
+}
+
+bool sqlrservercontroller::getProtocol() {
+
+	logDebugMessage("getting the client protocol...");
+
+	// get protocol length
+	uint16_t	protocollen=0;
+	if (clientsock->read(&protocollen)!=sizeof(uint16_t)) {
+		logDebugMessage("failed to get the client protocol length");
+		return false;
+	}
+
+	// get the protocol string
+	char	*protocol=new char[protocollen+1];
+	if (clientsock->read(protocol,protocollen)!=protocollen) {
+		logDebugMessage("failed to get the client protocol string");
+		delete[] protocol;
+		return false;
+	}
+	protocol[protocollen]='\0';
+stdoutput.printf("protocol: %s\n",protocol);
+
+	logDebugMessage("done getting the client protocol...");
+	return true;
 }
 
 void sqlrservercontroller::clientSession() {

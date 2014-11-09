@@ -9,6 +9,9 @@
 #define DEFAULT_PORT "9000"
 	// default port to listen on
 
+#define DEFAULT_PROTOCOL "sqlrclient"
+	// default client-server protocol
+
 #define DEFAULT_DBASE "oracle8"
 	// default database type
 

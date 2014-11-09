@@ -98,8 +98,8 @@ int main(int argc, const char **argv) {
 
 		// get the host/port/socket/username/password
 		host="localhost";
-		port=cfgfile.getPort();
-		socket=cfgfile.getUnixPort();
+		port=cfgfile.getDefaultPort();
+		socket=cfgfile.getDefaultSocket();
 		usercontainer	*currentnode=
 				cfgfile.getUserList()->getFirst()->getValue();
 		user=currentnode->getUser();

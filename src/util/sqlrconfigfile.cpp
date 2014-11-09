@@ -55,6 +55,8 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 					DEFAULT_MAXLOBBINDVALUELENGTH);
 	maxerrorlength=charstring::toInteger(DEFAULT_MAXERRORLENGTH);
 	idleclienttimeout=charstring::toInteger(DEFAULT_IDLECLIENTTIMEOUT);
+	currentlistener=NULL;
+	defaultlistener=NULL;
 	currentuser=NULL;
 	currentconnect=NULL;
 	connectioncount=0;
@@ -67,7 +69,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 	translatebindvariables=!charstring::compare(
 					DEFAULT_TRANSLATEBINDVARIABLES,"yes");
 	currentroute=NULL;
-	currenttag=NO_TAG;
+	currenttag=INSTANCE_TAG;
 	authenticationsdepth=0;
 	translationsdepth=0;
 	resultsettranslationsdepth=0;
@@ -90,11 +92,6 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 
 sqlrconfigfile::~sqlrconfigfile() {
 
-	for (uint64_t adrind=0; adrind<addresscount; adrind++) {
-		delete[] addresses[adrind];
-	}
-	delete[] addresses;
-
 	delete[] dbase;
 	delete[] unixport;
 	delete[] endofsession;
@@ -110,6 +107,10 @@ sqlrconfigfile::~sqlrconfigfile() {
 	delete[] datetimeformat;
 	delete[] dateformat;
 	delete[] timeformat;
+
+	for (listenernode *ln=listenerlist.getFirst(); ln; ln=ln->getNext()) {
+		delete ln->getValue();
+	}
 
 	for (usernode *un=userlist.getFirst(); un; un=un->getNext()) {
 		delete un->getValue();
@@ -134,20 +135,20 @@ sqlrconfigfile::~sqlrconfigfile() {
 	}
 }
 
-const char * const * sqlrconfigfile::getAddresses() {
-	return addresses;
+const char * const *sqlrconfigfile::getDefaultAddresses() {
+	return defaultlistener->getAddresses();
 }
 
-uint64_t sqlrconfigfile::getAddressCount() {
-	return addresscount;
+uint64_t sqlrconfigfile::getDefaultAddressCount() {
+	return defaultlistener->getAddressCount();
 }
 
-uint16_t sqlrconfigfile::getPort() {
-	return port;
+uint16_t sqlrconfigfile::getDefaultPort() {
+	return defaultlistener->getPort();
 }
 
-const char *sqlrconfigfile::getUnixPort() {
-	return unixport;
+const char *sqlrconfigfile::getDefaultSocket() {
+	return defaultlistener->getSocket();
 }
 
 bool sqlrconfigfile::getListenOnInet() {
@@ -387,6 +388,10 @@ const char *sqlrconfigfile::getAuthentications() {
 	return authentications.getString();
 }
 
+linkedlist< listenercontainer * > *sqlrconfigfile::getListenerList() {
+	return &listenerlist;
+}
+
 linkedlist< usercontainer * > *sqlrconfigfile::getUserList() {
 	return &userlist;
 }
@@ -444,10 +449,12 @@ bool sqlrconfigfile::tagStart(const char *name) {
 	// set the current tag, validate structure in the process
 	switch(currenttag) {
 	
-		// Root level, nested (users,connections?,router?)
-		case NO_TAG:
+		case INSTANCE_TAG:
 			currentname="instance";
-			if (!charstring::compare(name,"authentications")) {
+			if (!charstring::compare(name,"listeners")) {
+				thistag=LISTENERS_TAG;
+			} else if (!charstring::compare(name,
+						"authentications")) {
 				thistag=AUTHENTICATIONS_TAG;
 				authentications.clear();
 			} else if (!charstring::compare(name,"users")) {
@@ -482,8 +489,21 @@ bool sqlrconfigfile::tagStart(const char *name) {
 				ok=false;
 			}
 			break;
+
+		case LISTENERS_TAG:
+			currentname="listeners";
+			if (!charstring::compare(name,"listener")) {
+				thistag=LISTENER_TAG;
+			} else {
+				ok=false;
+			}
+			break;
+
+		case LISTENER_TAG:
+			currentname="listener";
+			ok=false;
+			break;
 		
-		// Users section, nested (user*)
 		case USERS_TAG:
 			currentname="users";
 			if (!charstring::compare(name,"user")) {
@@ -492,8 +512,12 @@ bool sqlrconfigfile::tagStart(const char *name) {
 				ok=false;
 			}
 			break;
+
+		case USER_TAG:
+			currentname="user";
+			ok=false;
+			break;
 		
-		// Session section, nested (start,end)
 		case SESSION_TAG:
 			currentname="session";
 			if (!charstring::compare(name,"start")) {
@@ -507,7 +531,6 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			}
 			break;
 		
-		// Start section, nested (runquery*)
 		case START_TAG:
 			currentname="start";
 			if (!charstring::compare(name,"runquery")) {
@@ -517,7 +540,6 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			}
 			break;
 
-		// End section, nested (runquery*)
 		case END_TAG:
 			currentname="end";
 			if (!charstring::compare(name,"runquery")) {
@@ -526,8 +548,12 @@ bool sqlrconfigfile::tagStart(const char *name) {
 				ok=false;
 			}
 			break;
+
+		case RUNQUERY_TAG:
+			currentname="runquery";
+			ok=false;
+			break;
 		
-		// Connections section, nested (connection*)
 		case CONNECTIONS_TAG:
 			currentname="connections";
 			if (!charstring::compare(name,"connection")) {
@@ -536,8 +562,12 @@ bool sqlrconfigfile::tagStart(const char *name) {
 				ok=false;
 			}
 			break;
+
+		case CONNECTION_TAG:
+			currentname="connection";
+			ok=false;
+			break;
 		
-		// Router section, nested ((route*|filter*)*)
 		case ROUTER_TAG:
 			currentname="router";
 			if (!charstring::compare(name,"route")) {
@@ -549,7 +579,6 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			}
 			break;
 		
-		// Filter section, nested (query*)
 		case FILTER_TAG:
 			currentname="filter";
 			if (!charstring::compare(name,"query")) {
@@ -558,8 +587,12 @@ bool sqlrconfigfile::tagStart(const char *name) {
 				ok=false;
 			}
 			break;
+
+		case QUERY_TAG:
+			currentname="query";
+			ok=false;
+			break;
 		
-		// Filter section, nested (query*)
 		case ROUTE_TAG:
 			currentname="route";
 			if (!charstring::compare(name,"query")) {
@@ -569,23 +602,6 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			}
 			break;
 
-		// Leaves, cannot be nested
-		case USER_TAG:
-			currentname="user";
-			ok=false;
-			break;
-		case CONNECTION_TAG:
-			currentname="connection";
-			ok=false;
-			break;
-		case QUERY_TAG:
-			currentname="query";
-			ok=false;
-			break;
-		case RUNQUERY_TAG:
-			currentname="runquery";
-			ok=false;
-			break;
 		default:
 			// Nothing to do
 			break;
@@ -599,6 +615,14 @@ bool sqlrconfigfile::tagStart(const char *name) {
 
 	// initialize tag data
 	switch (thistag) {
+		case LISTENERS_TAG:
+			currenttag=thistag;
+			break;
+		case LISTENER_TAG:
+			currenttag=thistag;
+			currentlistener=new listenercontainer();
+			listenerlist.append(currentlistener);
+			break;
 		case AUTHENTICATIONS_TAG:
 			if (!charstring::compare(name,"authentications")) {
 				authenticationsdepth=0;
@@ -612,9 +636,15 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			authentications.append(name);
 			currenttag=thistag;
 			break;
+		case USERS_TAG:
+			currenttag=thistag;
+			break;
 		case USER_TAG:
 			currentuser=new usercontainer();
 			userlist.append(currentuser);
+			break;
+		case CONNECTIONS_TAG:
+			currenttag=thistag;
 			break;
 		case CONNECTION_TAG: {
 			currentconnect=new connectstringcontainer();
@@ -643,10 +673,6 @@ bool sqlrconfigfile::tagStart(const char *name) {
 		case FILTER_TAG:
 			currentroute=new routecontainer();
 			currentroute->setIsFilter(thistag==FILTER_TAG);
-			currenttag=thistag;
-			break;
-		case USERS_TAG:
-		case CONNECTIONS_TAG:
 			currenttag=thistag;
 			break;
 		case TRANSLATIONS_TAG:
@@ -729,8 +755,14 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			currenttag=thistag;
 			break;
 		case SESSION_TAG:
+			currenttag=thistag;
+			break;
 		case START_TAG:
+			currenttag=thistag;
+			break;
 		case END_TAG:
+			currenttag=thistag;
+			break;
 		case RUNQUERY_TAG:
 			currenttag=thistag;
 			break;
@@ -751,46 +783,69 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 
 	if (!charstring::compare(name,"instance")) {
 
-		// handle various address, port, socket combos...
+		// add a listener node for the addresses, port and
+		// socket set in the instance tag
+		defaultlistener=new listenercontainer();
+		defaultlistener->setAddresses(addresses,addresscount);
+		defaultlistener->setPort(port);
+		defaultlistener->setSocket(unixport);
+		listenerlist.append(defaultlistener);
 
-		// if nothing was specified, use the
-		// default address and port but no socket
-		if (!addresses && !port && !unixport[0]) {
-			addresses=new char *[1];
-			addresses[0]=charstring::duplicate(DEFAULT_ADDRESS);
-			addresscount=1;
-			port=charstring::toInteger(DEFAULT_PORT);
-		} else
+		// reset flags
+		listenoninet=false;
+		listenonunix=false;
 
-		// if a port was specified but no address,
-		// use the default address
-		if (port && !addresses) {
-			addresses=new char *[1];
-			addresses[0]=charstring::duplicate(DEFAULT_ADDRESS);
-			addresscount=1;
-		} else
+		for (listenernode *node=listenerlist.getFirst();
+					node; node=node->getNext()) {
 
-		// if an address was specified by no port
-		// use the default port
-		if (!port && addresses) {
-			port=charstring::toInteger(DEFAULT_PORT);
+			listenercontainer	*l=node->getValue();
+
+			// normalize various address, port, socket combos...
+
+			const char * const	*setaddresses=l->getAddresses();
+			uint16_t		setport=l->getPort();
+			const char		*setsocket=l->getSocket();
+
+			// if nothing was specified, use the
+			// default address and port but no socket
+			if (!setaddresses && !setport && !setsocket) {
+				char	**addr=new char *[1];
+				addr[0]=charstring::duplicate(DEFAULT_ADDRESS);
+				l->setAddresses(addr,1);
+				l->setPort(charstring::toInteger(DEFAULT_PORT));
+			} else
+
+			// if a port was specified but no address,
+			// use the default address
+			if (setport && !setaddresses) {
+				char	**addr=new char *[1];
+				addr[0]=charstring::duplicate(DEFAULT_ADDRESS);
+				l->setAddresses(addr,1);
+			} else
+
+			// if an address was specified by no port
+			// use the default port
+			if (!setport && setaddresses) {
+				l->setPort(charstring::toInteger(DEFAULT_PORT));
+			}
+
+			// update flags
+			// (FIXME: maybe only set these if the listener uses
+			// the default protocol)
+			if (l->getPort()) {
+				listenoninet=true;
+			}
+			if (l->getSocket()) {
+				listenonunix=true;
+			}
 		}
-
-		listenoninet=(port)?true:false;
-		listenonunix=(unixport[0])?true:false;
 	}
 
 	// Close up the current tag
 	switch (currenttag) {
-		case ROUTER_TAG:
-			// Check closing tag, no need, but just in case
-			if (!charstring::compare(name,"router")) {
-				currenttag=NO_TAG;
-			}
-			break;
 		case AUTHENTICATIONS_TAG:
 			if (!charstring::compare(name,"authentications")) {
-				currenttag=NO_TAG;
+				currenttag=INSTANCE_TAG;
 			}
 			authentications.append("></");
 			authentications.append(name);
@@ -799,17 +854,31 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 			}
 			authenticationsdepth--;
 			break;
+		case LISTENERS_TAG:
+			if (!charstring::compare(name,"listeners")) {
+				currenttag=INSTANCE_TAG;
+			}
+			break;
+		case LISTENER_TAG:
+			currenttag=LISTENERS_TAG;
+			break;
 		case USERS_TAG:
+			if (!charstring::compare(name,"users")) {
+				currenttag=INSTANCE_TAG;
+			}
+			break;
 		case CONNECTIONS_TAG:
-			// Must check closing tag, we have leaves inside
-			if (!charstring::compare(name,"users") ||
-				!charstring::compare(name,"connections")) {
-				currenttag=NO_TAG;
+			if (!charstring::compare(name,"connections")) {
+				currenttag=INSTANCE_TAG;
+			}
+			break;
+		case ROUTER_TAG:
+			if (!charstring::compare(name,"router")) {
+				currenttag=INSTANCE_TAG;
 			}
 			break;
 		case ROUTE_TAG:
 		case FILTER_TAG:
-			// Must check closing tag, we have leaves inside
 			if (!charstring::compare(name,"route") ||
 				!charstring::compare(name,"filter")) {
 				currenttag=ROUTER_TAG;
@@ -826,7 +895,7 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 			break;
 		case TRANSLATIONS_TAG:
 			if (!charstring::compare(name,"translations")) {
-				currenttag=NO_TAG;
+				currenttag=INSTANCE_TAG;
 			}
 			translations.append("></");
 			translations.append(name);
@@ -838,7 +907,7 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 		case RESULTSETTRANSLATIONS_TAG:
 			if (!charstring::compare(name,
 						"resultsettranslations")) {
-				currenttag=NO_TAG;
+				currenttag=INSTANCE_TAG;
 			}
 			resultsettranslations.append("></");
 			resultsettranslations.append(name);
@@ -849,7 +918,7 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 			break;
 		case TRIGGERS_TAG:
 			if (!charstring::compare(name,"triggers")) {
-				currenttag=NO_TAG;
+				currenttag=INSTANCE_TAG;
 			}
 			triggers.append("></");
 			triggers.append(name);
@@ -860,7 +929,7 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 			break;
 		case LOGGERS_TAG:
 			if (!charstring::compare(name,"loggers")) {
-				currenttag=NO_TAG;
+				currenttag=INSTANCE_TAG;
 			}
 			loggers.append("></");
 			loggers.append(name);
@@ -871,7 +940,7 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 			break;
 		case QUERIES_TAG:
 			if (!charstring::compare(name,"queries")) {
-				currenttag=NO_TAG;
+				currenttag=INSTANCE_TAG;
 			}
 			queries.append("></");
 			queries.append(name);
@@ -882,7 +951,7 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 			break;
 		case PASSWORDENCRYPTIONS_TAG:
 			if (!charstring::compare(name,"passwordencryptions")) {
-				currenttag=NO_TAG;
+				currenttag=INSTANCE_TAG;
 			}
 			passwordencryptions.append("></");
 			passwordencryptions.append(name);
@@ -892,7 +961,7 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 			passwordencryptionsdepth--;
 			break;
 		case SESSION_TAG:
-			currenttag=NO_TAG;
+			currenttag=INSTANCE_TAG;
 			break;
 		case START_TAG:
 			instart=false;
@@ -929,7 +998,7 @@ bool sqlrconfigfile::attributeName(const char *name) {
 	switch (currenttag) {
 	
 	// Attributes of the <instance> tag
-	case NO_TAG:
+	case INSTANCE_TAG:
 
 		if (!charstring::compare(name,"id")) {
 			currentattribute=ID_ATTRIBUTE;
@@ -1029,6 +1098,20 @@ bool sqlrconfigfile::attributeName(const char *name) {
 		}
 		break;
 
+	// Attributes of the <listeners> and <listener> tags
+	case LISTENERS_TAG:
+	case LISTENER_TAG:
+		if (!charstring::compare(name,"addresses")) {
+			currentattribute=ADDRESSES_ATTRIBUTE;
+		} else if (!charstring::compare(name,"port")) {
+			currentattribute=PORT_ATTRIBUTE;
+		} else if (!charstring::compare(name,"socket")) {
+			currentattribute=SOCKET_ATTRIBUTE;
+		} else if (!charstring::compare(name,"protocol")) {
+			currentattribute=PROTOCOL_ATTRIBUTE;
+		}
+		break;
+
 	case AUTHENTICATIONS_TAG:
 		authentications.append(" ")->append(name);
 		currentattribute=AUTHENTICATIONS_ATTRIBUTE;
@@ -1057,11 +1140,6 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=METRIC_ATTRIBUTE;
 		} else if (!charstring::compare(name,"behindloadbalancer")) {
 			currentattribute=BEHINDLOADBALANCER_ATTRIBUTE;
-		/*} else if (!charstring::compare(name,"port")) {
-			currentattribute=PORT_ATTRIBUTE;
-		} else if (!charstring::compare(name,"socket") ||
-				!charstring::compare(name,"unixport")) {
-			currentattribute=SOCKET_ATTRIBUTE;*/
 		} else if (!charstring::compare(name,"passwordencryption")) {
 			currentattribute=PASSWORDENCRYPTION_ATTRIBUTE;
 		}
@@ -1144,8 +1222,14 @@ bool sqlrconfigfile::attributeName(const char *name) {
 	if (correctid && currentattribute==NO_ATTRIBUTE) {
 		const char *tagname="instance";
 		switch (currenttag) {
-			case NO_TAG:
+			case INSTANCE_TAG:
 				tagname="instance";
+				break;
+			case LISTENERS_TAG:
+				tagname="listeners";
+				break;
+			case LISTENER_TAG:
+				tagname="listener";
 				break;
 			case AUTHENTICATIONS_TAG:
 				tagname="authentications";
@@ -1256,25 +1340,47 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			passwordencryptions.append("=\"");
 			passwordencryptions.append(value)->append("\"");
 		} else if (currentattribute==ADDRESSES_ATTRIBUTE) {
-			uint64_t	index;
-			for (index=0; index<addresscount; index++) {
-				delete[] addresses[index];
-			}
-			delete[] addresses;
-			// if the attribute was left blank, assume 0.0.0.0
+
+			// if the attribute was left blank,
+			// assume 0.0.0.0
 			if (!charstring::length(value)) {
 				value=DEFAULT_ADDRESS;
 			}
+			char		**addr=NULL;
+			uint64_t	addrcount=0;
 			charstring::split(value,",",true,
-						&addresses,&addresscount);
-			for (index=0; index<addresscount; index++) {
-				charstring::bothTrim(addresses[index]);
+					&addr,&addrcount);
+			uint64_t	index;
+			for (index=0; index<addrcount; index++) {
+				charstring::bothTrim(addr[index]);
+			}
+
+			if (currenttag==INSTANCE_TAG) {
+				for (index=0; index<addresscount; index++) {
+					delete[] addresses[index];
+				}
+				delete[] addresses;
+				addresses=addr;
+				addresscount=addrcount;
+			} else if (currenttag==LISTENER_TAG) {
+				currentlistener->setAddresses(addr,addrcount);
 			}
 		} else if (currentattribute==PORT_ATTRIBUTE) {
-			port=atouint32_t(value,"0",0);
+			if (currenttag==INSTANCE_TAG) {
+				port=atouint32_t(value,"0",0);
+			} else if (currenttag==LISTENER_TAG) {
+				currentlistener->setPort(
+						atouint32_t(value,"0",0));
+			}
+		} else if (currentattribute==PROTOCOL_ATTRIBUTE) {
+			currentlistener->setProtocol(value);
 		} else if (currentattribute==SOCKET_ATTRIBUTE) {
-			delete[] unixport;
-			unixport=charstring::duplicate(value);
+			if (currenttag==INSTANCE_TAG) {
+				delete[] unixport;
+				unixport=charstring::duplicate(value);
+			} else if (currenttag==LISTENER_TAG) {
+				currentlistener->setSocket(value);
+			}
 		} else if (currentattribute==DBASE_ATTRIBUTE) {
 			delete[] dbase;
 			dbase=charstring::duplicate((value)?value:
@@ -1655,6 +1761,68 @@ bool sqlrconfigfile::accessible() {
 	return true;
 }
 
+
+listenercontainer::listenercontainer() {
+	addresses=NULL;
+	addresscount=0;
+	socket=NULL;
+	protocol=charstring::duplicate(DEFAULT_PROTOCOL);
+}
+
+listenercontainer::~listenercontainer() {
+	for (uint64_t i=0; i<addresscount; i++) {
+		delete[] addresses[i];
+	}
+	delete[] addresses;
+	delete[] socket;
+	delete[] protocol;
+}
+
+void listenercontainer::setAddresses(char **addresses,
+					uint64_t addresscount) {
+	for (uint64_t i=0; i<this->addresscount; i++) {
+		delete[] this->addresses[i];
+	}
+	delete[] this->addresses;
+	this->addresses=addresses;
+	this->addresscount=addresscount;
+}
+
+void listenercontainer::setPort(uint16_t port) {
+	this->port=port;
+}
+
+void listenercontainer::setSocket(const char *socket) {
+	delete[] this->socket;
+	this->socket=charstring::duplicate(socket);
+}
+
+void listenercontainer::setProtocol(const char *protocol) {
+	delete[] this->protocol;
+	this->protocol=charstring::duplicate(protocol);
+}
+
+const char * const *listenercontainer::getAddresses() {
+	return addresses;
+}
+
+uint64_t listenercontainer::getAddressCount() {
+	return addresscount;
+}
+
+uint16_t listenercontainer::getPort() {
+	return port;
+}
+
+const char *listenercontainer::getSocket() {
+	return socket;
+}
+
+const char *listenercontainer::getProtocol() {
+	return protocol;
+}
+
+
 usercontainer::usercontainer() {
 	user=NULL;
 	password=NULL;
@@ -1690,6 +1858,7 @@ const char *usercontainer::getPassword() {
 const char *usercontainer::getPasswordEncryption() {
 	return pwdenc;
 }
+
 
 connectstringcontainer::connectstringcontainer() {
 	connectionid=NULL;

@@ -49,8 +49,10 @@ sqlrlistener::sqlrlistener() : listener() {
 
 	clientsockin=NULL;
 	clientsockincount=0;
+	clientsockinindex=0;
 	clientsockun=NULL;
-	unixport=NULL;
+	clientsockuncount=0;
+	clientsockunindex=0;
 
 	handoffsockun=NULL;
 	handoffsockname=NULL;
@@ -85,8 +87,13 @@ sqlrlistener::~sqlrlistener() {
 	delete[] idfilename;
 
 	if (!isforkedchild) {
-		if (unixport) {
-			file::remove(unixport);
+		for (linkedlistnode< listenercontainer * > *node=
+					cfgfl.getListenerList()->getFirst();
+					node; node=node->getNext()) {
+			const char	*unixport=node->getValue()->getSocket();
+			if (unixport) {
+				file::remove(unixport);
+			}
 		}
 		if (pidfile) {
 			file::remove(pidfile);
@@ -95,7 +102,6 @@ sqlrlistener::~sqlrlistener() {
 	if (initialized) {
 		cleanUp();
 	}
-	delete cmdl;
 
 	// remove files that indicate whether the db is up or down
 	linkedlist< connectstringcontainer * >	*csl=
@@ -116,6 +122,7 @@ sqlrlistener::~sqlrlistener() {
 		delete[] updown;
 	}
 	delete tmpdir;
+	delete cmdl;
 
 	delete[] logdir;
 	delete[] debugdir;
@@ -123,14 +130,18 @@ sqlrlistener::~sqlrlistener() {
 
 void sqlrlistener::cleanUp() {
 
-	delete[] unixport;
 	delete[] pidfile;
 
-	delete clientsockun;
 	for (uint64_t csind=0; csind<clientsockincount; csind++) {
 		delete clientsockin[csind];
 	}
 	delete[] clientsockin;
+	delete[] clientsockinproto;
+	for (uint64_t csind=0; csind<clientsockuncount; csind++) {
+		delete clientsockun[csind];
+	}
+	delete[] clientsockun;
+	delete[] clientsockunproto;
 
 	if (!isforkedchild && handoffsockname) {
 		file::remove(handoffsockname);
@@ -594,32 +605,65 @@ void sqlrlistener::semError(const char *id, int semid) {
 
 bool sqlrlistener::listenOnClientSockets() {
 
-	// get addresses/inet port and unix port to
-	// listen on for the SQL Relay protocol
-	const char * const *addresses=cfgfl.getAddresses();
-	clientsockincount=cfgfl.getAddressCount();
-	uint16_t	port=cfgfl.getPort();
-	if (!port) {
-		clientsockincount=0;
-	}
-	unixport=charstring::duplicate(cfgfl.getUnixPort());
+	linkedlist< listenercontainer * >	*listenerlist=
+						cfgfl.getListenerList();
 
-	// attempt to listen on the SQL Relay inet ports
-	// (on each specified address), if necessary
+	// count sockets and build socket arrays
+	clientsockincount=0;
+	clientsockuncount=0;
+	for (linkedlistnode< listenercontainer * > *node=
+					listenerlist->getFirst();
+					node; node=node->getNext()) {
+		if (node->getValue()->getPort()) {
+			clientsockincount=clientsockincount+
+					node->getValue()->getAddressCount();
+		}
+		if (node->getValue()->getSocket()) {
+			clientsockuncount=clientsockuncount+
+					node->getValue()->getAddressCount();
+		}
+	}
+	clientsockin=new inetsocketserver *[clientsockincount];
+	clientsockinproto=new const char *[clientsockincount];
+	clientsockinindex=0;
+	clientsockun=new unixsocketserver *[clientsockuncount];
+	clientsockunproto=new const char *[clientsockuncount];
+	clientsockunindex=0;
+
+	// listen on sockets
 	bool	listening=false;
-	if (port && clientsockincount) {
-		clientsockin=new inetsocketserver *[clientsockincount];
-		bool	failed=false;
-		for (uint64_t index=0; index<clientsockincount; index++) {
-			clientsockin[index]=NULL;
-			if (failed) {
-				continue;
-			}
-			clientsockin[index]=new inetsocketserver();
-			listening=clientsockin[index]->
-					listen(addresses[index],port,15);
-			if (listening) {
-				addReadFileDescriptor(clientsockin[index]);
+	for (linkedlistnode< listenercontainer * > *node=
+					listenerlist->getFirst();
+					node; node=node->getNext()) {
+		if (listenOnClientSocket(node->getValue())) {
+			listening=true;
+		}
+	}
+	return listening;
+}
+
+bool sqlrlistener::listenOnClientSocket(listenercontainer *lc) {
+
+	// init return value
+	bool	listening=false;
+
+	// get addresses/inet port and unix port to listen on
+	const char * const *addresses=lc->getAddresses();
+	uint16_t	port=lc->getPort();
+
+	// attempt to listen on the inet ports (on each specified address)
+	if (port && lc->getAddressCount()) {
+
+		for (uint64_t index=0; index<lc->getAddressCount(); index++) {
+
+			uint64_t	ind=clientsockinindex+index;
+			clientsockin[ind]=new inetsocketserver();
+			clientsockinproto[ind]=lc->getProtocol();
+
+			if (clientsockin[ind]->
+					listen(addresses[index],port,15)) {
+				addReadFileDescriptor(clientsockin[ind]);
+				listening=true;
 			} else {
 				stringbuffer	info;
 				info.append("failed to listen "
@@ -637,32 +681,42 @@ bool sqlrlistener::listenOnClientSockets() {
 					"on that port.\n\n",
 					addresses[index],port,err);
 				delete[] err;
-				failed=true;
+
+				delete clientsockin[ind];
+				clientsockin[ind]=NULL;
 			}
+
+			clientsockinindex++;
 		}
 	}
 
-	if (charstring::length(unixport)) {
-		clientsockun=new unixsocketserver();
-		listening=clientsockun->listen(unixport,0000,15);
-		if (listening) {
-			addReadFileDescriptor(clientsockun);
+	// attempt to listen on the unix socket
+	if (charstring::length(lc->getSocket())) {
+
+		clientsockun[clientsockunindex]=new unixsocketserver();
+		clientsockunproto[clientsockunindex]=lc->getProtocol();
+
+		if (clientsockun[clientsockunindex]->
+				listen(lc->getSocket(),0000,15)) {
+			addReadFileDescriptor(clientsockun[clientsockunindex]);
+			listening=true;
 		} else {
 			stringbuffer	info;
 			info.append("failed to listen on client socket: ");
-			info.append(unixport);
+			info.append(lc->getSocket());
 			logInternalError(info.getString());
 
 			stderror.printf("Could not listen on unix socket: ");
-			stderror.printf("%s\n",unixport);
+			stderror.printf("%s\n",lc->getSocket());
 			stderror.printf("Make sure that the file and ");
 			stderror.printf("directory are readable and writable.");
 			stderror.printf("\n\n");
-			delete clientsockun;
-			clientsockun=NULL;
-			delete[] unixport;
-			unixport=NULL;
+
+			delete clientsockun[clientsockunindex];
+			clientsockun[clientsockunindex]=NULL;
 		}
+
+		clientsockunindex++;
 	}
 
 	return listening;
@@ -853,12 +907,27 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 	}
 
 	// handle connections to the client sockets
+	uint64_t 		csind=0;
 	inetsocketserver	*iss=NULL;
-	for (uint64_t csind=0; csind<clientsockincount; csind++) {
+	unixsocketserver	*uss=NULL;
+	const char		*protocol=NULL;
+	for (csind=0; csind<clientsockincount; csind++) {
 		if (fd==clientsockin[csind]) {
 			iss=clientsockin[csind];
+			protocol=clientsockinproto[csind];
+			break;
 		}
 	}
+	if (!iss) {
+		for (csind=0; csind<clientsockuncount; csind++) {
+			if (fd==clientsockun[csind]) {
+				uss=clientsockun[csind];
+				protocol=clientsockinproto[csind];
+				break;
+			}
+		}
+	}
+
 	if (iss) {
 
 		clientsock=iss->accept();
@@ -875,12 +944,14 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 			return true;
 		}
 
-	} else if (fd==clientsockun) {
-		clientsock=clientsockun->accept();
+	} else if (uss) {
+
+		clientsock=uss->accept();
 		if (!clientsock) {
 			return false;
 		}
 		clientsock->translateByteOrder();
+
 	} else {
 		return true;
 	}
@@ -907,10 +978,10 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 	// happen, getValue(10) would return something greater than 0 and we
 	// would have forked anyway.
 	if (dynamicscaling || getBusyListeners() || !semset->getValue(2)) {
-		forkChild(clientsock);
+		forkChild(clientsock,protocol);
 	} else {
 		incrementBusyListeners();
-		clientSession(clientsock,NULL);
+		clientSession(clientsock,protocol,NULL);
 		decrementBusyListeners();
 	}
 
@@ -1075,9 +1146,10 @@ struct clientsessionattr {
 	thread		*thr;
 	sqlrlistener	*lsnr;
 	filedescriptor	*clientsock;
+	const char	*protocol;
 };
 
-void sqlrlistener::forkChild(filedescriptor *clientsock) {
+void sqlrlistener::forkChild(filedescriptor *clientsock, const char *protocol) {
 
 	// increment the number of "forked listeners"
 	// do this before we actually fork to prevent a race condition where
@@ -1110,6 +1182,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 		csa->thr=thr;
 		csa->lsnr=this;
 		csa->clientsock=clientsock;
+		csa->protocol=protocol;
 		thr->setFunction((void*(*)(void*))clientSessionThread,csa);
 
 		// fork the thread
@@ -1150,7 +1223,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 			sqlrlg->initLoggers(this,NULL);
 		}
 
-		clientSession(clientsock,NULL);
+		clientSession(clientsock,protocol,NULL);
 
 		decrementBusyListeners();
 		decrementForkedListeners();
@@ -1187,20 +1260,21 @@ void sqlrlistener::forkChild(filedescriptor *clientsock) {
 void sqlrlistener::clientSessionThread(void *attr) {
 	clientsessionattr	*csa=(clientsessionattr *)attr;
 	csa->thr->detach();
-	csa->lsnr->clientSession(csa->clientsock,csa->thr);
+	csa->lsnr->clientSession(csa->clientsock,csa->protocol,csa->thr);
 	csa->lsnr->decrementBusyListeners();
 	csa->lsnr->decrementForkedListeners();
 	delete csa->thr;
 	delete csa;
 }
 
-void sqlrlistener::clientSession(filedescriptor *clientsock, thread *thr) {
+void sqlrlistener::clientSession(filedescriptor *clientsock,
+					const char *protocol, thread *thr) {
 
 	if (dynamicscaling) {
 		incrementConnectedClientCount();
 	}
 
-	bool	passstatus=handOffOrProxyClient(clientsock,thr);
+	bool	passstatus=handOffOrProxyClient(clientsock,protocol,thr);
 
 	// If the handoff failed, decrement the connected client count.
 	// If it had succeeded then the connection daemon would
@@ -1216,7 +1290,9 @@ void sqlrlistener::clientSession(filedescriptor *clientsock, thread *thr) {
 	delete clientsock;
 }
 
-bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock, thread *thr) {
+bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
+						const char *protocol,
+						thread *thr) {
 
 	uint32_t	connectionpid;
 	uint16_t	inetport;
@@ -1250,6 +1326,10 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock, thread *thr) {
 
 		// tell the connection what handoff mode to expect
 		connectionsock.write(handoffmode);
+
+		// tell the connection what protocol to use
+		connectionsock.write((uint16_t)charstring::length(protocol));
+		connectionsock.write(protocol);
 
 		if (handoffmode==HANDOFF_PASS) {
 

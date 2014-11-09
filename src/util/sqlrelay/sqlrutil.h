@@ -42,6 +42,32 @@ class SQLRUTIL_DLLSPEC sqlrtempdir {
 		int32_t	tmpdirlen;
 };
 
+class SQLRUTIL_DLLSPEC listenercontainer {
+	friend class sqlrconfigfile;
+	public:
+				listenercontainer();
+				~listenercontainer();
+
+		void		setAddresses(char **addresses,
+						uint64_t addresscount);
+		void		setPort(uint16_t port);
+		void		setSocket(const char *socket);
+		void		setProtocol(const char *protocol);
+		const char * const *getAddresses();
+		uint64_t	getAddressCount();
+		uint16_t	getPort();
+		const char	*getSocket();
+		const char	*getProtocol();
+	private:
+		char		**addresses;
+		uint64_t	addresscount;
+		uint16_t	port;
+		char		*socket;
+		char		*protocol;
+};
+
+typedef linkedlistnode< listenercontainer * >	listenernode;
+
 class SQLRUTIL_DLLSPEC usercontainer {
 	friend class sqlrconfigfile;
 	public:
@@ -130,10 +156,10 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 			~sqlrconfigfile();
 		bool	parse(const char *config, const char *id);
 		bool	accessible();
-		const char * const *getAddresses();
-		uint64_t	getAddressCount();
-		uint16_t	getPort();
-		const char	*getUnixPort();
+		const char * const	*getDefaultAddresses();
+		uint64_t		getDefaultAddressCount();
+		uint16_t		getDefaultPort();
+		const char		*getDefaultSocket();
 		bool		getListenOnInet();
 		bool		getListenOnUnix();
 		const char	*getDbase();
@@ -202,7 +228,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 
 		const char	*getAuthentications();
 
-		linkedlist< usercontainer * >	*getUserList();
+		linkedlist< listenercontainer * >	*getListenerList();
+		linkedlist< usercontainer * >		*getUserList();
 		linkedlist< connectstringcontainer * >	*getConnectStringList();
 		connectstringcontainer	*getConnectString(
 						const char *connectionid);
@@ -313,7 +340,10 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 		stringbuffer	passwordencryptions;
 		uint16_t	passwordencryptionsdepth;
 
-		usercontainer	*currentuser;
+		listenercontainer	*currentlistener;
+		listenercontainer	*defaultlistener;
+
+		usercontainer		*currentuser;
 
 		connectstringcontainer	*currentconnect;
 		uint32_t		connectioncount;
@@ -321,12 +351,15 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 
 		routecontainer		*currentroute;
 
-		linkedlist< connectstringcontainer * >	connectstringlist;
+		linkedlist< listenercontainer * >	listenerlist;
 		linkedlist< usercontainer * >		userlist;
 		linkedlist< routecontainer *>		routelist;
+		linkedlist< connectstringcontainer * >	connectstringlist;
 		
 		typedef enum {
-			NO_TAG,
+			INSTANCE_TAG,
+			LISTENERS_TAG,
+			LISTENER_TAG,
 			AUTHENTICATIONS_TAG,
 			USERS_TAG,
 			USER_TAG,
@@ -357,6 +390,7 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 			ADDRESSES_ATTRIBUTE,
 			PORT_ATTRIBUTE,
 			SOCKET_ATTRIBUTE,
+			PROTOCOL_ATTRIBUTE,
 			DBASE_ATTRIBUTE,
 			CONNECTIONS_ATTRIBUTE,
 			MAXCONNECTIONS_ATTRIBUTE,
