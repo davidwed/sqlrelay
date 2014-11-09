@@ -783,13 +783,15 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 
 	if (!charstring::compare(name,"instance")) {
 
-		// add a listener node for the addresses, port and
-		// socket set in the instance tag
-		defaultlistener=new listenercontainer();
-		defaultlistener->setAddresses(addresses,addresscount);
-		defaultlistener->setPort(port);
-		defaultlistener->setSocket(unixport);
-		listenerlist.append(defaultlistener);
+		// if a port or socket was specified in the instance tag then
+		// add a listener node for whatever was in the instance tag
+		if (port || unixport[0]) {
+			defaultlistener=new listenercontainer();
+			defaultlistener->setAddresses(addresses,addresscount);
+			defaultlistener->setPort(port);
+			defaultlistener->setSocket(unixport);
+			listenerlist.append(defaultlistener);
+		}
 
 		// reset flags
 		listenoninet=false;
@@ -837,6 +839,28 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 			}
 			if (l->getSocket()) {
 				listenonunix=true;
+			}
+		}
+
+		// get the "default" listener if it hasn't already been defined
+		if (!defaultlistener) {
+
+			// use the first listener for the default protocol...
+			for (listenernode *node=listenerlist.getFirst();
+						node; node=node->getNext()) {
+
+				listenercontainer	*l=node->getValue();
+				if (!charstring::compare(l->getProtocol(),
+							DEFAULT_PROTOCOL)) {
+					defaultlistener=l;
+					break;
+				}
+			}
+
+			// if that doesn't exist then just the first listener
+			if (!defaultlistener) {
+				defaultlistener=
+					listenerlist.getFirst()->getValue();
 			}
 		}
 	}
