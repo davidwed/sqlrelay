@@ -17,6 +17,7 @@ ifeq ($(TRANSLATIONS),yes)
 endif
 	$(MAKE) -C queries all
 	$(MAKE) -C loggers all
+	$(MAKE) -C protocols all
 	$(MAKE) -C pwdencs all
 	$(MAKE) -C auths all
 	$(MAKE) -C connections all
@@ -33,6 +34,7 @@ clean:
 	$(MAKE) -C resultsettranslations clean
 	$(MAKE) -C queries clean
 	$(MAKE) -C loggers clean
+	$(MAKE) -C protocols clean
 	$(MAKE) -C pwdencs clean
 	$(MAKE) -C auths clean
 	$(MAKE) -C connections clean
@@ -54,6 +56,7 @@ ifeq ($(TRANSLATIONS),yes)
 endif
 	$(MAKE) -C queries install
 	$(MAKE) -C loggers install
+	$(MAKE) -C protocols install
 	$(MAKE) -C pwdencs install
 	$(MAKE) -C auths install
 	$(MAKE) -C connections install
@@ -70,6 +73,7 @@ uninstall:
 	$(MAKE) -C resultsettranslations uninstall
 	$(MAKE) -C queries uninstall
 	$(MAKE) -C loggers uninstall
+	$(MAKE) -C protocols uninstall
 	$(MAKE) -C pwdencs uninstall
 	$(MAKE) -C auths uninstall
 	$(MAKE) -C connections uninstall
