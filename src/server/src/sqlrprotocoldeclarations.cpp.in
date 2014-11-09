@@ -1,0 +1,2 @@
+sqlrprotocol	*new_@module@(sqlrservercontroller *cont,
+				sqlrserverconnection *conn);

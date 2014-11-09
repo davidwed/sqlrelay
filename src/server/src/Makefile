@@ -7,6 +7,8 @@ include ../../../config.mk
 ifeq ($(SQLRELAY_ENABLE_SHARED),no)
 PLUGINSRCS = sqlrconnectiondeclarations.cpp \
 		sqlrconnectionassignments.cpp \
+		sqlrprotocoldeclarations.cpp \
+		sqlrprotocolassignments.cpp \
 		sqlrloggerdeclarations.cpp \
 		sqlrloggerassignments.cpp \
 		sqlrpwdencdeclarations.cpp \
@@ -22,6 +24,7 @@ PLUGINSRCS = sqlrconnectiondeclarations.cpp \
 		sqlrtriggerdeclarations.cpp \
 		sqlrtriggerassignments.cpp
 PLUGINLOBJS = $(shell ls ../../connections/*/*.lo) \
+		$(shell ls ../../protocols/*.lo) \
 		$(shell ls ../../loggers/*.lo) \
 		$(shell ls ../../pwdencs/*.lo) \
 		$(shell ls ../../auths/*.lo) \
@@ -201,6 +204,22 @@ sqlrconnectiondeclarations.cpp: sqlrconnectiondeclarations.cpp.in
 sqlrconnectionassignments.cpp: sqlrconnectionassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../../connections/*/*connection.lo`; \
+	do \
+		module=`basename $$file .lo`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrprotocoldeclarations.cpp: sqlrprotocoldeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../../protocols/*.lo`; \
+	do \
+		module=`basename $$file .lo`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrprotocolassignments.cpp: sqlrprotocolassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../../protocols/*.lo`; \
 	do \
 		module=`basename $$file .lo`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
