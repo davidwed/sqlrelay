@@ -48,6 +48,7 @@
 		void	deRegisterForHandoff();
 
 		int32_t	waitForClient();
+		bool	getProtocol();
 		void	clientSession();
 
 		sqlrprotocol_t	getClientProtocol();
