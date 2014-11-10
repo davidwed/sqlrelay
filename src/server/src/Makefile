@@ -359,6 +359,15 @@ sqlrtriggerassignments.cpp: sqlrtriggerassignments.cpp.in
 
 install:
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay
+	$(INSTALL) -m 644 ../include/sqlrelay/sqlrserver.h $(includedir)/sqlrelay
+	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrlistener.h $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverconnection.h $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrservercontroller.h $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrservercursor.h $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverdll.h $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverincludes.h $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrshmdata.h $(includedir)/sqlrelay/private
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libsqlrserver.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
@@ -381,66 +390,15 @@ install:
 	$(MKINSTALLDIRS) $(debugdir)
 	chmod 777 $(debugdir)
 
-installheaders:
-	$(MKINSTALLDIRS) $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlparser.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrauth.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrauths.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrserverconnection.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrservercontroller.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrservercursor.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrlistener.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrlogger.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrloggers.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrprotocol.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrprotocols.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrpwdencs.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrqueries.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrquery.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrresultsettranslation.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrresultsettranslations.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrscaler.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrtranslation.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrtranslations.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrtrigger.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlrtriggers.h $(includedir)/sqlrelay
-	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverconnection.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverconnectionincludes.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrservercontroller.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrservercontrollerincludes.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrservercursor.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrservercursorincludes.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrlistener.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrlistenerincludes.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverdll.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrshmdata.h $(includedir)/sqlrelay/private
-
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrserver.la
-	$(RM) $(includedir)/sqlrelay/sqlparser.h
-	$(RM) $(includedir)/sqlrelay/sqlrauth.h
-	$(RM) $(includedir)/sqlrelay/sqlrauths.h
-	$(RM) $(includedir)/sqlrelay/sqlrserverconnection.h
-	$(RM) $(includedir)/sqlrelay/sqlrservercontroller.h
-	$(RM) $(includedir)/sqlrelay/sqlrservercursor.h
-	$(RM) $(includedir)/sqlrelay/sqlrlistener.h
-	$(RM) $(includedir)/sqlrelay/sqlrlogger.h
-	$(RM) $(includedir)/sqlrelay/sqlrloggers.h
-	$(RM) $(includedir)/sqlrelay/sqlrprotocol.h
-	$(RM) $(includedir)/sqlrelay/sqlrprotocols.h
-	$(RM) $(includedir)/sqlrelay/sqlrpwdenc.h
-	$(RM) $(includedir)/sqlrelay/sqlrpwdencs.h
-	$(RM) $(includedir)/sqlrelay/sqlrqueries.h
-	$(RM) $(includedir)/sqlrelay/sqlrquery.h
-	$(RM) $(includedir)/sqlrelay/sqlrresultsettranslation.h
-	$(RM) $(includedir)/sqlrelay/sqlrresultsettranslations.h
-	$(RM) $(includedir)/sqlrelay/sqlrscaler.h
-	$(RM) $(includedir)/sqlrelay/sqlrtranslation.h
-	$(RM) $(includedir)/sqlrelay/sqlrtranslations.h
-	$(RM) $(includedir)/sqlrelay/sqlrtrigger.h
-	$(RM) $(includedir)/sqlrelay/sqlrtriggers.h
+	$(RM) $(includedir)/sqlrelay/sqlrserver.h
+	$(RM) $(includedir)/sqlrelay/private/sqlrlistener.h
+	$(RM) $(includedir)/sqlrelay/private/sqlrserverconnection.h
+	$(RM) $(includedir)/sqlrelay/private/sqlrservercontroller.h
+	$(RM) $(includedir)/sqlrelay/private/sqlrservercursor.h
 	$(RM) $(includedir)/sqlrelay/private/sqlrserverdll.h
+	$(RM) $(includedir)/sqlrelay/private/sqlrserverincludes.h
 	$(RM) $(includedir)/sqlrelay/private/sqlrshmdata.h
 	$(RM) $(bindir)/sqlr-start$(EXE)
 	$(RM) $(bindir)/sqlr-listener$(EXE)

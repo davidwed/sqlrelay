@@ -11,7 +11,7 @@
 #include <rudiments/commandline.h>
 #include <rudiments/linkedlist.h>
 
-#include <sqlrelay/sqlrutildll.h>
+#include <sqlrelay/private/sqlrutildll.h>
 
 class SQLRUTIL_DLLSPEC sqlrcmdline : public commandline {
 	public:

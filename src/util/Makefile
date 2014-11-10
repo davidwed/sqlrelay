@@ -29,18 +29,17 @@ libsqlrutil.la: $(SRCS) $(LOBJS)
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
 
 install:
+	$(MKINSTALLDIRS) $(includedir)/sqlrelay
+	$(INSTALL) -m 644 sqlrelay/sqlrutil.h $(includedir)/sqlrelay
+	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
+	$(INSTALL) -m 644 sqlrelay/private/sqlrutildll.h $(includedir)/sqlrelay/private
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) libsqlrutil.la $(libdir)
 	$(LIBTOOL) --mode=finish $(libdir)
 
-installheaders:
-	$(MKINSTALLDIRS) $(includedir)/sqlrelay
-	$(INSTALL) -m 644 sqlrelay/sqlrutil.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 sqlrelay/sqlrutildll.h $(includedir)/sqlrelay
-
 uninstall:
 	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrutil.la
 	$(RM) $(includedir)/sqlrelay/sqlrutil.h
-	$(RM) $(includedir)/sqlrelay/sqlrutildll.h
+	$(RM) $(includedir)/sqlrelay/private/sqlrutildll.h
 	$(RM) $(libdir)/libsqlrelay_*
 	$(RM) $(libdir)/libsqlrutil_p*.*
