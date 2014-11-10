@@ -44,9 +44,11 @@ Buildroot: %{_tmppath}/%{name}-root
 %if %([[ %{_vendor} == "suse" ]] && echo 1 || echo 0)
 	%define initscript1 /etc/init.d/sqlrelay
 	%define initscript2 /etc/init.d/sqlrcachemanager
+	%define phpconfdir /etc/php5/conf.d
 %else
 	%define initscript1 /etc/rc.d/init.d/sqlrelay
 	%define initscript2 /etc/rc.d/init.d/sqlrcachemanager
+	%define phpconfdir /etc/php.d
 %endif
 
 BuildRequires: rudiments-devel >= 0.34
@@ -406,6 +408,8 @@ rm -rf %{buildroot}
 %{_libexecdir}/sqlrelay/sqlrquery_*
 %{_libexecdir}/sqlrelay/sqlrpwdenc_*
 %{_libexecdir}/sqlrelay/sqlrauth_*
+%{_libexecdir}/sqlrelay/sqlrparser_*
+%{_libexecdir}/sqlrelay/sqlrprotocol_*
 %{?_with_translations:%{_libexecdir}/sqlrelay/sqlrtranslation_*}
 %{?_with_translations:%{_libexecdir}/sqlrelay/sqlrresultsettranslation_*}
 %{?_with_triggers:%{_libexecdir}/sqlrelay/sqlrtrigger_*}
@@ -463,6 +467,7 @@ rm -rf %{buildroot}
 %{_includedir}/sqlrelay/private/bindvar.h
 %{_includedir}/sqlrelay/private/column.h
 %{_includedir}/sqlrelay/private/dll.h
+%{_includedir}/sqlrelay/private/row.h
 %{_includedir}/sqlrelay/private/sqlrdefines.h
 %{_includedir}/sqlrelay/private/sqlrincludes.h
 %{_libdir}/libsqlrclient.a
@@ -474,6 +479,7 @@ rm -rf %{buildroot}
 %defattr(-, root, root)
 %{_bindir}/sqlrclientwrapper-config
 %{_includedir}/sqlrelay/sqlrclientwrapper.h
+%{_includedir}/sqlrelay/private/sqlrclientwrapper.h
 %{_includedir}/sqlrelay/private/wrapperdll.h
 %{_libdir}/libsqlrclientwrapper.a
 %{_libdir}/libsqlrclientwrapper.la
@@ -557,6 +563,8 @@ rm -rf %{buildroot}
 %{!?_without_php:%defattr(-, root, root)}
 %{!?_without_php:%{phpextdir}/sql_relay.so}
 %{!?_without_php:%{phpextdir}/pdo_sqlrelay.so}
+%{!?_without_php:%{phpconfdir}/sql_relay.ini}
+%{!?_without_php:%{phpconfdir}/pdo_sqlrelay.ini}
 
 %{!?_without_python:%files python}
 %{!?_without_python:%defattr(-, root, root)}
