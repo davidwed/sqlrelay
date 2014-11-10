@@ -13,7 +13,6 @@ install:
 	$(INSTALL) -m 644 man1/sqlrsh.1 $(mandir)/man1
 	$(INSTALL) -m 644 man8/sqlr-cachemanager.8 $(mandir)/man8
 	$(INSTALL) -m 644 man8/sqlr-connection.8 $(mandir)/man8
-	$(INSTALL) -m 644 man8/sqlr-ipclean.8 $(mandir)/man8
 	$(INSTALL) -m 644 man8/sqlr-listener.8 $(mandir)/man8
 	$(INSTALL) -m 644 man8/sqlr-scaler.8 $(mandir)/man8
 	$(INSTALL) -m 644 man8/sqlr-start.8 $(mandir)/man8
@@ -28,7 +27,6 @@ uninstall:
 	$(RM) $(mandir)/man1/sqlrsh.1
 	$(RM) $(mandir)/man8/sqlr-cachemanager.8
 	$(RM) $(mandir)/man8/sqlr-connection.8
-	$(RM) $(mandir)/man8/sqlr-ipclean.8
 	$(RM) $(mandir)/man8/sqlr-listener.8
 	$(RM) $(mandir)/man8/sqlr-scaler.8
 	$(RM) $(mandir)/man8/sqlr-start.8

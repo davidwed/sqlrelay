@@ -443,7 +443,6 @@ rm -rf %{buildroot}
 
 %files clients
 %defattr(-, root, root)
-%{_bindir}/backupschema
 %{_bindir}/sqlr-fields
 %{_bindir}/sqlr-query
 %{_bindir}/sqlrsh

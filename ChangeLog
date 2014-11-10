@@ -9,6 +9,7 @@
 	cleaned up and refactored server-side classes quite a bit
 	fixed a bug where sqlrsh was losing the timezone when binding dates
 	server-devel headers are now installed
+	removed backupschema script
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries

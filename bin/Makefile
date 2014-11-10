@@ -6,14 +6,12 @@ include ../config.mk
 
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) backupschema $(bindir)
 	$(INSTALL) sqlr-stop $(bindir)
 	$(INSTALL) sqlrclient-config $(bindir)
 	$(INSTALL) sqlrclientwrapper-config $(bindir)
 	$(INSTALL) sqlrserver-config $(bindir)
 
 uninstall:
-	$(RM) $(bindir)/backupschema
 	$(RM) $(bindir)/sqlr-stop
 	$(RM) $(bindir)/sqlr-kill
 	$(RM) $(bindir)/killsqlr
