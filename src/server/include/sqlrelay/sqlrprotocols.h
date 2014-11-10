@@ -17,12 +17,10 @@ class SQLRSERVER_DLLSPEC sqlrprotocolplugin {
 };
 
 class sqlrservercontroller;
-class sqlrserverconnection;
 
 class SQLRSERVER_DLLSPEC sqlrprotocols {
 	public:
-			sqlrprotocols(sqlrservercontroller *cont,
-					sqlrserverconnection *conn);
+			sqlrprotocols(sqlrservercontroller *cont);
 			~sqlrprotocols();
 
 		bool		loadProtocols();
@@ -34,7 +32,6 @@ class SQLRSERVER_DLLSPEC sqlrprotocols {
 		dictionary< const char *, sqlrprotocolplugin * >	protos;
 
 		sqlrservercontroller	*cont;
-		sqlrserverconnection	*conn;
 };
 
 #endif

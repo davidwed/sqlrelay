@@ -18,8 +18,7 @@
 
 class SQLRSERVER_DLLSPEC sqlrclient : public sqlrprotocol {
 	public:
-			sqlrclient(sqlrservercontroller *cont,
-						sqlrserverconnection *conn);
+			sqlrclient(sqlrservercontroller *cont);
 		virtual	~sqlrclient();
 
 		sqlrclientexitstatus_t	clientSession();
@@ -177,9 +176,7 @@ class SQLRSERVER_DLLSPEC sqlrclient : public sqlrprotocol {
 		char		lobbuffer[32768];
 };
 
-sqlrclient::sqlrclient(sqlrservercontroller *cont,
-					sqlrserverconnection *conn) :
-					sqlrprotocol(cont,conn) {
+sqlrclient::sqlrclient(sqlrservercontroller *cont) : sqlrprotocol(cont) {
 	idleclienttimeout=cont->cfgfl->getIdleClientTimeout();
 	maxclientinfolength=cont->cfgfl->getMaxClientInfoLength();
 	maxquerysize=cont->cfgfl->getMaxQuerySize();
@@ -573,7 +570,7 @@ bool sqlrclient::authenticateCommand() {
 	clientsock->write(SQLR_ERROR_AUTHENTICATIONERROR_STRING);
 	clientsock->flushWriteBuffer(-1,-1);
 	// FIXME: use cont->endSession()?
-	conn->endSession();
+	cont->conn->endSession();
 	return false;
 }
 
@@ -2983,8 +2980,7 @@ bool sqlrclient::getQueryTreeCommand(sqlrservercursor *cursor) {
 }
 
 extern "C" {
-	sqlrprotocol	*new_sqlrclient(sqlrservercontroller *cont,
-					sqlrserverconnection *conn) {
-		return new sqlrclient(cont,conn);
+	sqlrprotocol	*new_sqlrclient(sqlrservercontroller *cont) {
+		return new sqlrclient(cont);
 	}
 }

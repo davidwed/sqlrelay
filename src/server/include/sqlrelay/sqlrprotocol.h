@@ -16,13 +16,11 @@ enum sqlrclientexitstatus_t {
 };
 
 class sqlrservercontroller;
-class sqlrserverconnection;
 class sqlrconfigfile;
 
 class SQLRSERVER_DLLSPEC sqlrprotocol {
 	public:
-			sqlrprotocol(sqlrservercontroller *cont,
-					sqlrserverconnection *conn);
+			sqlrprotocol(sqlrservercontroller *cont);
 		virtual	~sqlrprotocol();
 
 		void	setClientSocket(filedescriptor *clientsock);
@@ -31,7 +29,6 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 
 	protected:
 		sqlrservercontroller	*cont;
-		sqlrserverconnection	*conn;
 		filedescriptor		*clientsock;
 };
 

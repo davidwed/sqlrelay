@@ -12,7 +12,6 @@
 #include <sqlrelay/sqlrquery.h>
 
 class sqlrserverconnection;
-class sqlrservercursor;
 
 class SQLRSERVER_DLLSPEC sqlrqueryplugin {
 	public:

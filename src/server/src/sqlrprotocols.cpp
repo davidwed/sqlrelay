@@ -3,7 +3,6 @@
 
 #include <sqlrelay/sqlrprotocols.h>
 #include <sqlrelay/sqlrservercontroller.h>
-#include <sqlrelay/sqlrserverconnection.h>
 
 #include <debugprint.h>
 
@@ -17,11 +16,9 @@
 	}
 #endif
 
-sqlrprotocols::sqlrprotocols(sqlrservercontroller *cont,
-				sqlrserverconnection *conn) {
+sqlrprotocols::sqlrprotocols(sqlrservercontroller *cont) {
 	debugFunction();
 	this->cont=cont;
-	this->conn=conn;
 }
 
 sqlrprotocols::~sqlrprotocols() {
@@ -96,10 +93,8 @@ void sqlrprotocols::loadProtocol(const char *module) {
 	// load the password encryption itself
 	stringbuffer	functionname;
 	functionname.append("new_")->append(module);
-	sqlrprotocol *(*newProtocol)(sqlrservercontroller *,
-					sqlrserverconnection *)=
-			(sqlrprotocol *(*)(sqlrservercontroller *,
-					sqlrserverconnection *))
+	sqlrprotocol *(*newProtocol)(sqlrservercontroller *)=
+			(sqlrprotocol *(*)(sqlrservercontroller *))
 				dl->getSymbol(functionname.getString());
 	if (!newProtocol) {
 		stdoutput.printf("failed to create protocol: %s\n",module);
@@ -110,7 +105,7 @@ void sqlrprotocols::loadProtocol(const char *module) {
 		delete dl;
 		return;
 	}
-	sqlrprotocol	*pr=(*newProtocol)(cont,conn);
+	sqlrprotocol	*pr=(*newProtocol)(cont);
 
 #else
 

@@ -418,8 +418,11 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 						const char *endptr);
 		const char	*skipWhitespaceAndComments(const char *query);
 
+		// connection
+		sqlrserverconnection	*conn;
+
 		// config file
-		sqlrconfigfile	*cfgfl;
+		sqlrconfigfile		*cfgfl;
 
 		// statistics
 		shmdata			*shm;

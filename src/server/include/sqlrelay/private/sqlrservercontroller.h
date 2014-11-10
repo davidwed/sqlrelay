@@ -139,8 +139,6 @@
 
 		sqlrcmdline	*cmdl;
 
-		sqlrserverconnection	*conn;
-
 		semaphoreset	*semset;
 		sharedmemory	*shmem;
 

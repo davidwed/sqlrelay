@@ -437,7 +437,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// init client protocols
-	sqlrpr=new sqlrprotocols(this,conn);
+	sqlrpr=new sqlrprotocols(this);
 	sqlrpr->loadProtocols();
 
 	// set a handler for SIGALRMs
