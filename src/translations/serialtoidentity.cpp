@@ -12,6 +12,7 @@ class serialtoidentity : public sqlrtranslation {
 			serialtoidentity(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -21,6 +22,10 @@ serialtoidentity::serialtoidentity(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool serialtoidentity::usesTree() {
+	return true;
 }
 
 bool serialtoidentity::run(sqlrserverconnection *sqlrcon,

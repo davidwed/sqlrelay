@@ -15,6 +15,7 @@ class translatedatetimes : public sqlrtranslation {
 			translatedatetimes(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -34,6 +35,10 @@ translatedatetimes::translatedatetimes(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool translatedatetimes::usesTree() {
+	return true;
 }
 
 bool translatedatetimes::run(sqlrserverconnection *sqlrcon,

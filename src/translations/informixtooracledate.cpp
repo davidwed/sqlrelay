@@ -12,6 +12,7 @@ class informixtooracledate : public sqlrtranslation {
 			informixtooracledate(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -54,6 +55,10 @@ informixtooracledate::informixtooracledate(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool informixtooracledate::usesTree() {
+	return true;
 }
 
 bool informixtooracledate::run(sqlrserverconnection *sqlrcon,

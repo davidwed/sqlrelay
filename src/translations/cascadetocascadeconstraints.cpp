@@ -13,6 +13,7 @@ class cascadetocascadeconstraints : public sqlrtranslation {
 						sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -25,6 +26,10 @@ cascadetocascadeconstraints::cascadetocascadeconstraints(
 						xmldomnode *parameters,
 						bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool cascadetocascadeconstraints::usesTree() {
+	return true;
 }
 
 bool cascadetocascadeconstraints::run(sqlrserverconnection *sqlrcon,

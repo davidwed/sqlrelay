@@ -20,6 +20,13 @@ class SQLRSERVER_DLLSPEC sqlrtranslation {
 					bool debug);
 		virtual	~sqlrtranslation();
 
+		virtual bool	usesTree();
+
+		virtual bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					const char *query,
+					stringbuffer *translatedquery);
+
 		virtual bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);

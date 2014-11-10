@@ -156,21 +156,90 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 
 bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
-					xmldom *querytree) {
+					sqlparser *sqlp,
+					sqlwriter *sqlw,
+					const char *query,
+					stringbuffer *translatedquery) {
 	debugFunction();
-	if (!querytree) {
+
+	if (!query || !translatedquery) {
 		return false;
 	}
 
-	tree=querytree;
+	tree=NULL;
 
+	stringbuffer	tempquerystr;
 	for (singlylinkedlistnode< sqlrtranslationplugin * > *node=
 						tlist.getFirst();
 						node; node=node->getNext()) {
-		if (!node->getValue()->tr->run(sqlrcon,sqlrcur,querytree)) {
+
+		if (debug) {
+			stdoutput.printf("running translation...\n\n");
+		}
+
+		sqlrtranslation	*tr=node->getValue()->tr;
+
+		if (tr->usesTree()) {
+
+			if (!tree) {
+				if (!sqlp->parse(query)) {
+					return false;
+				}
+				tree=sqlp->getTree();
+				if (debug) {
+					stdoutput.printf(
+						"current query tree:\n");
+					tree->getRootNode()->print(&stdoutput);
+					stdoutput.printf("\n");
+				}
+			}
+
+			if (!tr->run(sqlrcon,sqlrcur,tree)) {
+				return false;
+			}
+
+		} else {
+
+			if (tree) {
+				if (!sqlw->write(tree,&tempquerystr)) {
+					return false;
+				}
+				tree=NULL;
+			}
+
+			char	*tempquery=tempquerystr.detachString();
+			if (tempquery) {
+				query=tempquery;
+			}
+
+			if (!tr->run(sqlrcon,sqlrcur,query,&tempquerystr)) {
+				delete[] tempquery;
+				return false;
+			}
+
+			delete[] tempquery;
+
+			query=tempquerystr.getString();
+		}
+	}
+
+	if (tree) {
+		if (!sqlw->write(tree,translatedquery)) {
+			return false;
+		}
+	} else {
+		translatedquery->append(query);
+		if (!sqlp->parse(translatedquery->getString())) {
 			return false;
 		}
 	}
+
+	if (debug) {
+		stdoutput.printf("after translation:\n");
+		tree->getRootNode()->print(&stdoutput);
+		stdoutput.printf("\n");
+	}
+
 	return true;
 }
 

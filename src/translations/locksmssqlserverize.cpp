@@ -12,6 +12,7 @@ class locksmssqlserverize : public sqlrtranslation {
 			locksmssqlserverize(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -21,6 +22,10 @@ locksmssqlserverize::locksmssqlserverize(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool locksmssqlserverize::usesTree() {
+	return true;
 }
 
 bool locksmssqlserverize::run(sqlrserverconnection *sqlrcon,

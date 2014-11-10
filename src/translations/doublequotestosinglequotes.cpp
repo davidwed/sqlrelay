@@ -12,6 +12,7 @@ class doublequotestosinglequotes : public sqlrtranslation {
 			doublequotestosinglequotes(sqlrtranslations *sqlts,
 							xmldomnode *parameters,
 							bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -24,6 +25,10 @@ doublequotestosinglequotes::doublequotestosinglequotes(
 					xmldomnode *parameters,
 					bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool doublequotestosinglequotes::usesTree() {
+	return true;
 }
 
 bool doublequotestosinglequotes::run(sqlrserverconnection *sqlrcon,

@@ -8,32 +8,21 @@
 
 sqlwriter::sqlwriter() {
 	debugFunction();
-	sqlrcon=NULL;
-	sqlrcur=NULL;
 }
 
 sqlwriter::~sqlwriter() {
 	debugFunction();
 }
 
-bool sqlwriter::write(sqlrserverconnection *sqlrcon,
-					sqlrservercursor *sqlrcur,
-					xmldom *tree,
-					stringbuffer *output) {
+bool sqlwriter::write(xmldom *tree, stringbuffer *output) {
 	debugFunction();
-	return write(sqlrcon,sqlrcur,
-			tree->getRootNode()->getFirstTagChild(),
-			output,false);
+	return write(tree->getRootNode()->getFirstTagChild(),output,false);
 }
 
-bool sqlwriter::write(sqlrserverconnection *sqlrcon,
-					sqlrservercursor *sqlrcur,
-					xmldomnode *tree,
-					stringbuffer *output,
-					bool omitsiblings) {
+bool sqlwriter::write(xmldomnode *tree,
+				stringbuffer *output,
+				bool omitsiblings) {
 	debugFunction();
-	this->sqlrcon=sqlrcon;
-	this->sqlrcur=sqlrcur;
 	if (omitsiblings) {
 		return write(tree,output);
 	}

@@ -11,6 +11,7 @@ class oracleize : public sqlrtranslation {
 			oracleize(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -20,6 +21,10 @@ oracleize::oracleize(sqlrtranslations *sqlts,
 				xmldomnode *parameters,
 				bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool oracleize::usesTree() {
+	return true;
 }
 
 bool oracleize::run(sqlrserverconnection *sqlrcon,

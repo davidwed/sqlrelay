@@ -35,6 +35,7 @@ class informixtomssqlserverdate : public sqlrtranslation {
 			informixtomssqlserverdate(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -80,6 +81,10 @@ informixtomssqlserverdate::informixtomssqlserverdate(
 					xmldomnode *parameters,
 					bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool informixtomssqlserverdate::usesTree() {
+	return true;
 }
 
 bool informixtomssqlserverdate::run(sqlrserverconnection *sqlrcon,

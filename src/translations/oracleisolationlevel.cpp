@@ -12,6 +12,7 @@ class oracleisolationlevel : public sqlrtranslation {
 			oracleisolationlevel(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -23,6 +24,10 @@ oracleisolationlevel::oracleisolationlevel(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool oracleisolationlevel::usesTree() {
+	return true;
 }
 
 bool oracleisolationlevel::run(sqlrserverconnection *sqlrcon,

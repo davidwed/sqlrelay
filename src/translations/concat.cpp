@@ -13,6 +13,7 @@ class concat : public sqlrtranslation {
 			concat(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -31,6 +32,10 @@ class concat : public sqlrtranslation {
 concat::concat(sqlrtranslations *sqlts, xmldomnode *parameters, bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
 	this->parameters=parameters;
+}
+
+bool concat::usesTree() {
+	return true;
 }
 
 bool concat::run(sqlrserverconnection *sqlrcon,

@@ -14,6 +14,7 @@ class temptablessybaseize : public sqlrtranslation {
 			temptablessybaseize(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -32,6 +33,10 @@ temptablessybaseize::temptablessybaseize(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool temptablessybaseize::usesTree() {
+	return true;
 }
 
 bool temptablessybaseize::run(sqlrserverconnection *sqlrcon,

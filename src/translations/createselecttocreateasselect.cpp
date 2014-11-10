@@ -13,6 +13,7 @@ class createselecttocreateasselect : public sqlrtranslation {
 						sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						xmldom *querytree);
@@ -25,6 +26,10 @@ createselecttocreateasselect::createselecttocreateasselect(
 						xmldomnode *parameters,
 						bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool createselecttocreateasselect::usesTree() {
+	return true;
 }
 
 bool createselecttocreateasselect::run(sqlrserverconnection *sqlrcon,

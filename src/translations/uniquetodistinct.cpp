@@ -12,6 +12,7 @@ class uniquetodistinct : public sqlrtranslation {
 			uniquetodistinct(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -23,6 +24,10 @@ uniquetodistinct::uniquetodistinct(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool uniquetodistinct::usesTree() {
+	return true;
 }
 
 bool uniquetodistinct::run(sqlrserverconnection *sqlrcon,

@@ -12,6 +12,7 @@ class show : public sqlrtranslation {
 			show(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -19,6 +20,10 @@ class show : public sqlrtranslation {
 
 show::show(sqlrtranslations *sqlts, xmldomnode *parameters, bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool show::usesTree() {
+	return true;
 }
 
 bool show::run(sqlrserverconnection *sqlrcon,

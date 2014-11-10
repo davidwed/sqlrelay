@@ -13,6 +13,7 @@ class informixtomssqlserverselectinto : public sqlrtranslation {
 						sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -23,6 +24,10 @@ informixtomssqlserverselectinto::informixtomssqlserverselectinto(
 					xmldomnode *parameters,
 					bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool informixtomssqlserverselectinto::usesTree() {
+	return true;
 }
 
 bool informixtomssqlserverselectinto::run(sqlrserverconnection *sqlrcon,

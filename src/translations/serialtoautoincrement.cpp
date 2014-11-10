@@ -12,6 +12,7 @@ class serialtoautoincrement : public sqlrtranslation {
 			serialtoautoincrement(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -21,6 +22,10 @@ serialtoautoincrement::serialtoautoincrement(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool serialtoautoincrement::usesTree() {
+	return true;
 }
 
 bool serialtoautoincrement::run(sqlrserverconnection *sqlrcon,

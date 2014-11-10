@@ -14,6 +14,7 @@ class temptableslocalize : public sqlrtranslation {
 			temptableslocalize(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -38,6 +39,10 @@ temptableslocalize::temptableslocalize(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool temptableslocalize::usesTree() {
+	return true;
 }
 
 bool temptableslocalize::run(sqlrserverconnection *sqlrcon,

@@ -8,11 +8,14 @@
 
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
+#include <rudiments/stringbuffer.h>
 #include <rudiments/memorypool.h>
 #include <rudiments/dictionary.h>
 #include <rudiments/singlylinkedlist.h>
 #include <rudiments/dynamiclib.h>
 #include <sqlrelay/sqlrtranslation.h>
+#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlwriter.h>
 
 class sqlrserverconnection;
 class sqlrservercursor;
@@ -39,7 +42,10 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 		bool	loadTranslations(const char *translations);
 		bool	runTranslations(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
-						xmldom *querytree);
+						sqlparser *sqlp,
+						sqlwriter *sqlw,
+						const char *query,
+						stringbuffer *translatedquery);
 
 		bool	getReplacementTableName(const char *database,
 						const char *schema,

@@ -12,6 +12,7 @@ class temporarytoglobaltemporary : public sqlrtranslation {
 			temporarytoglobaltemporary(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -24,6 +25,10 @@ temporarytoglobaltemporary::temporarytoglobaltemporary(
 						xmldomnode *parameters,
 						bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool temporarytoglobaltemporary::usesTree() {
+	return true;
 }
 
 bool temporarytoglobaltemporary::run(sqlrserverconnection *sqlrcon,

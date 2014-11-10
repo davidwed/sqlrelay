@@ -12,6 +12,7 @@ class matchestolike : public sqlrtranslation {
 			matchestolike(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -24,6 +25,10 @@ matchestolike::matchestolike(sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool matchestolike::usesTree() {
+	return true;
 }
 
 bool matchestolike::run(sqlrserverconnection *sqlrcon,

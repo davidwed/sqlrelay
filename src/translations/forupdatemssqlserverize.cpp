@@ -12,6 +12,7 @@ class forupdatemssqlserverize : public sqlrtranslation {
 			forupdatemssqlserverize(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						xmldom *querytree);
@@ -22,6 +23,10 @@ forupdatemssqlserverize::forupdatemssqlserverize(
 					xmldomnode *parameters,
 					bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool forupdatemssqlserverize::usesTree() {
+	return true;
 }
 
 bool forupdatemssqlserverize::run(sqlrserverconnection *sqlrcon,

@@ -14,6 +14,7 @@ class temptablesaddmissingcolumns : public sqlrtranslation {
 					sqlrtranslations *sqlts,
 					xmldomnode *parameters,
 					bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -24,6 +25,10 @@ temptablesaddmissingcolumns::temptablesaddmissingcolumns(
 					xmldomnode *parameters,
 					bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool temptablesaddmissingcolumns::usesTree() {
+	return true;
 }
 
 bool temptablesaddmissingcolumns::run(sqlrserverconnection *sqlrcon,
@@ -71,7 +76,7 @@ bool temptablesaddmissingcolumns::run(sqlrserverconnection *sqlrcon,
 	}
 	stringbuffer	selectclause;
 	sqlwriter	sqlw;
-	if (!sqlw.write(sqlrcon,sqlrcur,select,&selectclause,false)) {
+	if (!sqlw.write(select,&selectclause,false)) {
 		return true;
 	}
 

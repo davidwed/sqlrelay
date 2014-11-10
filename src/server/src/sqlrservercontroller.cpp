@@ -359,10 +359,10 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	debugsqlrtranslation=cfgfl->getDebugTranslations();
 	const char	*translations=cfgfl->getTranslations();
 	if (translations && translations[0]) {
-		sqlp=new sqlparser;
+		sqlp=newSqlParser();
 		sqlrt=new sqlrtranslations(debugsqlrtranslation);
 		sqlrt->loadTranslations(translations);
-		sqlw=new sqlwriter;
+		sqlw=newSqlWriter();
 	}
 
 	// get the result set translators
@@ -379,7 +379,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	if (triggers && triggers[0]) {
 		// for triggers, we'll need an sqlparser as well
 		if (!sqlp) {
-			sqlp=new sqlparser;
+			sqlp=newSqlParser();
 		}
 		sqlrtr=new sqlrtriggers(debugtriggers);
 		sqlrtr->loadTriggers(triggers);
@@ -2208,55 +2208,29 @@ const char *sqlrservercontroller::skipWhitespaceAndComments(const char *query) {
 
 bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 
-	// get the query buffer
-	char	*querybuffer=cursor->getQueryBuffer();
+	const char	*query=cursor->getQueryBuffer();
 
 	if (debugsqlrtranslation) {
-		stdoutput.printf("original:\n\"%s\"\n\n",querybuffer);
+		stdoutput.printf("original:\n\"%s\"\n\n",query);
 	}
 
-	// parse the query
-	bool	parsed=sqlp->parse(querybuffer);
-
-	// get the parsed tree
+	// clear the query tree
 	cursor->clearQueryTree();
-	cursor->setQueryTree(sqlp->detachTree());
-	if (!cursor->getQueryTree()) {
-		return false;
-	}
-
-	if (debugsqlrtranslation) {
-		stdoutput.printf("before translation:\n");
-		cursor->getQueryTree()->getRootNode()->print(&stdoutput);
-		stdoutput.printf("\n");
-	}
-
-	if (!parsed) {
-		if (debugsqlrtranslation) {
-			stdoutput.printf(
-				"parse failed, using original:\n\"%s\"\n\n",
-								querybuffer);
-		}
-		cursor->clearQueryTree();
-		return false;
-	}
 
 	// apply translation rules
-	if (!sqlrt->runTranslations(conn,cursor,cursor->getQueryTree())) {
-		return false;
-	}
-
-	if (debugsqlrtranslation) {
-		stdoutput.printf("after translation:\n");
-		cursor->getQueryTree()->getRootNode()->print(&stdoutput);
-		stdoutput.printf("\n");
-	}
-
-	// write the query back out
 	stringbuffer	translatedquery;
-	if (!sqlw->write(conn,cursor,cursor->getQueryTree(),&translatedquery)) {
+	if (!sqlrt->runTranslations(conn,cursor,sqlp,sqlw,
+						query,&translatedquery)) {
+		if (debugsqlrtranslation) {
+			stdoutput.printf("translation failed, "
+						"using original:\n\"%s\"\n\n",
+						query);
+		}
 		return false;
 	}
+
+	// update the query tree
+	cursor->setQueryTree(sqlp->detachTree());
 
 	if (debugsqlrtranslation) {
 		stdoutput.printf("translated:\n\"%s\"\n\n",
@@ -3007,7 +2981,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	if (!cursor->prepared) {
 
 		// translate query
-		if (enabletranslations && sqlp && sqlrt && sqlw) {
+		if (enabletranslations && sqlrt) {
 			translateQuery(cursor);
 		}
 
@@ -3904,6 +3878,14 @@ void sqlrservercontroller::clearConnStats() {
 		return;
 	}
 	bytestring::zero(connstats,sizeof(struct sqlrconnstatistics));
+}
+
+sqlparser *sqlrservercontroller::newSqlParser() {
+	return new sqlparser;
+}
+
+sqlwriter *sqlrservercontroller::newSqlWriter() {
+	return new sqlwriter;
 }
 
 void sqlrservercontroller::updateState(enum sqlrconnectionstate_t state) {

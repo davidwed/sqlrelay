@@ -12,6 +12,7 @@ class mysqlunsupported : public sqlrtranslation {
 			mysqlunsupported(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -23,6 +24,10 @@ mysqlunsupported::mysqlunsupported(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool mysqlunsupported::usesTree() {
+	return true;
 }
 
 bool mysqlunsupported::run(sqlrserverconnection *sqlrcon,

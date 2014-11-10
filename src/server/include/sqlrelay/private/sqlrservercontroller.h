@@ -71,6 +71,10 @@
 						sqlrservercursor *cursor);
 		void	rewriteQuery(sqlrservercursor *cursor);
 		bool	translateQuery(sqlrservercursor *cursor);
+		bool	translateQueryWithParser(sqlrservercursor *cursor,
+						stringbuffer *translatedquery);
+		bool	translateQueryWithoutParser(sqlrservercursor *cursor,
+						stringbuffer *translatedquery);
 		void	translateBindVariables(sqlrservercursor *cursor);
 		bool	matchesNativeBindFormat(const char *bind);
 		void	translateBindVariableInStringAndMap(
@@ -119,6 +123,9 @@
 
 		void	initConnStats();
 		void	clearConnStats();
+
+		sqlparser	*newSqlParser();
+		sqlwriter	*newSqlWriter();
 
 		void	updateClientSessionStartTime();
 		void	updateClientAddr();

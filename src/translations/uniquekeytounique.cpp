@@ -12,6 +12,7 @@ class uniquekeytounique : public sqlrtranslation {
 			uniquekeytounique(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -23,6 +24,10 @@ uniquekeytounique::uniquekeytounique(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool uniquekeytounique::usesTree() {
+	return true;
 }
 
 bool uniquekeytounique::run(sqlrserverconnection *sqlrcon,

@@ -9,21 +9,14 @@
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 
-class sqlrserverconnection;
-class sqlrservercursor;
-
 class SQLRSERVER_DLLSPEC sqlwriter {
 	public:
 			sqlwriter();
 		virtual	~sqlwriter();
 
-		virtual bool	write(sqlrserverconnection *sqlrcon,
-					sqlrservercursor *sqlrcur,
-					xmldom *tree,
+		virtual bool	write(xmldom *tree,
 					stringbuffer *output);
-		virtual bool	write(sqlrserverconnection *sqlrcon,
-					sqlrservercursor *sqlrcur,
-					xmldomnode *tree,
+		virtual bool	write(xmldomnode *tree,
 					stringbuffer *output,
 					bool omitsiblings);
 	protected:
@@ -474,9 +467,6 @@ class SQLRSERVER_DLLSPEC sqlwriter {
 		virtual bool	rightParen(stringbuffer *output);
 		virtual bool	hasSibling(xmldomnode *node);
 		virtual bool	dontAppendSpace(stringbuffer *output);
-
-		sqlrserverconnection	*sqlrcon;
-		sqlrservercursor		*sqlrcur;
 };
 
 #endif

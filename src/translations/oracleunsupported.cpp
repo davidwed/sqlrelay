@@ -12,6 +12,7 @@ class oracleunsupported : public sqlrtranslation {
 			oracleunsupported(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug);
+		bool	usesTree();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
@@ -21,6 +22,10 @@ oracleunsupported::oracleunsupported(sqlrtranslations *sqlts,
 						xmldomnode *parameters,
 						bool debug) :
 				sqlrtranslation(sqlts,parameters,debug) {
+}
+
+bool oracleunsupported::usesTree() {
+	return true;
 }
 
 bool oracleunsupported::run(sqlrserverconnection *sqlrcon,
