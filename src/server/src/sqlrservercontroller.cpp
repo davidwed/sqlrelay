@@ -27,6 +27,7 @@
 #ifndef SQLRELAY_ENABLE_SHARED
 	extern "C" {
 		#include "sqlrserverconnectiondeclarations.cpp"
+		#include "sqlrparserdeclarations.cpp"
 	}
 #endif
 
@@ -109,7 +110,7 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 	outbindmappings=new namevaluepairs;
 
 	sqlrpr=NULL;
-	sqlp=NULL;
+	sqlrp=NULL;
 	sqlrt=NULL;
 	sqlrrst=NULL;
 	sqlrtr=NULL;
@@ -190,7 +191,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete outbindmappings;
 
 	delete sqlrpr;
-	delete sqlp;
+	delete sqlrp;
 	delete sqlrt;
 	delete sqlrrst;
 	delete sqlrtr;
@@ -357,7 +358,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	debugsqlrtranslation=cfgfl->getDebugTranslations();
 	const char	*translations=cfgfl->getTranslations();
 	if (translations && translations[0]) {
-		sqlp=newSqlParser();
+		sqlrp=newParser();
 		sqlrt=new sqlrtranslations(debugsqlrtranslation);
 		sqlrt->loadTranslations(translations);
 	}
@@ -374,9 +375,9 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	debugtriggers=cfgfl->getDebugTriggers();
 	const char	*triggers=cfgfl->getTriggers();
 	if (triggers && triggers[0]) {
-		// for triggers, we'll need an sqlparser as well
-		if (!sqlp) {
-			sqlp=newSqlParser();
+		// for triggers, we'll need an sqlrparser as well
+		if (!sqlrp) {
+			sqlrp=newParser();
 		}
 		sqlrtr=new sqlrtriggers(debugtriggers);
 		sqlrtr->loadTriggers(triggers);
@@ -487,10 +488,10 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 	modulename.append(LIBEXECDIR);
 	modulename.append("/sqlrconnection_");
 	modulename.append(dbase)->append(".")->append(SQLRELAY_MODULESUFFIX);
-	if (!dl.open(modulename.getString(),true,true)) {
+	if (!conndl.open(modulename.getString(),true,true)) {
 		stderror.printf("failed to load connection module: %s\n",
 							modulename.getString());
-		char	*error=dl.getError();
+		char	*error=conndl.getError();
 		stderror.printf("%s\n",error);
 		delete[] error;
 		return NULL;
@@ -500,11 +501,11 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 	stringbuffer	functionname;
 	functionname.append("new_")->append(dbase)->append("connection");
 	sqlrserverconnection	*(*newConn)(sqlrservercontroller *)=
-				(sqlrserverconnection *(*)(sqlrservercontroller *))
-					dl.getSymbol(functionname.getString());
+			(sqlrserverconnection *(*)(sqlrservercontroller *))
+				conndl.getSymbol(functionname.getString());
 	if (!newConn) {
 		stderror.printf("failed to load connection: %s\n",dbase);
-		char	*error=dl.getError();
+		char	*error=conndl.getError();
 		stderror.printf("%s\n",error);
 		delete[] error;
 		return NULL;
@@ -525,7 +526,7 @@ sqlrserverconnection *sqlrservercontroller::initConnection(const char *dbase) {
 	if (!conn) {
 		stderror.printf("failed to create connection: %s\n",dbase);
 #ifdef SQLRELAY_ENABLE_SHARED
-		char	*error=dl.getError();
+		char	*error=conndl.getError();
 		stderror.printf("%s\n",error);
 		delete[] error;
 #endif
@@ -2216,7 +2217,7 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 
 	// apply translation rules
 	stringbuffer	translatedquery;
-	if (!sqlrt->runTranslations(conn,cursor,sqlp,query,&translatedquery)) {
+	if (!sqlrt->runTranslations(conn,cursor,sqlrp,query,&translatedquery)) {
 		if (debugsqlrtranslation) {
 			stdoutput.printf("translation failed, "
 						"using original:\n\"%s\"\n\n",
@@ -2226,7 +2227,7 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	}
 
 	// update the query tree
-	cursor->setQueryTree(sqlp->detachTree());
+	cursor->setQueryTree(sqlrp->detachTree());
 
 	if (debugsqlrtranslation) {
 		stdoutput.printf("translated:\n\"%s\"\n\n",
@@ -3444,8 +3445,8 @@ void sqlrservercontroller::dropTempTable(sqlrservercursor *cursor,
 	// run as a matter of course instead of explicitly getting run here
 	// FIXME: freetds/sybase override this method but don't do this
 	if (sqlrtr) {
-		if (sqlp->parse(dropquery.getString())) {
-			sqlrtr->runBeforeTriggers(conn,cursor,sqlp->getTree());
+		if (sqlrp->parse(dropquery.getString())) {
+			sqlrtr->runBeforeTriggers(conn,cursor,sqlrp->getTree());
 		}
 	}
 
@@ -3466,7 +3467,7 @@ void sqlrservercontroller::dropTempTable(sqlrservercursor *cursor,
 	// run as a matter of course instead of explicitly getting run here
 	// FIXME: freetds/sybase override this method but don't do this
 	if (sqlrtr) {
-		sqlrtr->runAfterTriggers(conn,cursor,sqlp->getTree(),true);
+		sqlrtr->runAfterTriggers(conn,cursor,sqlrp->getTree(),true);
 	}
 }
 
@@ -3876,8 +3877,65 @@ void sqlrservercontroller::clearConnStats() {
 	bytestring::zero(connstats,sizeof(struct sqlrconnstatistics));
 }
 
-sqlparser *sqlrservercontroller::newSqlParser() {
-	return new sqlparser;
+sqlrparser *sqlrservercontroller::newParser() {
+	sqlrparser	*p=newParser("enterprise");
+	if (!p) {
+		p=newParser("base");
+	}
+	return p;
+}
+
+sqlrparser *sqlrservercontroller::newParser(const char *module) {
+
+#ifdef SQLRELAY_ENABLE_SHARED
+	// load the parser module
+	stringbuffer	modulename;
+	modulename.append(LIBEXECDIR);
+	modulename.append("/sqlrparser_");
+	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
+	if (!parserdl.open(modulename.getString(),true,true)) {
+		stderror.printf("failed to load parser module: %s\n",module);
+		char	*error=parserdl.getError();
+		stderror.printf("%s\n",error);
+		delete[] error;
+		return NULL;
+	}
+
+	// load the parser itself
+	stringbuffer	functionname;
+	functionname.append("new_")->append(module);
+	sqlrparser	*(*newParser)()=
+			(sqlrparser *(*)())
+				parserdl.getSymbol(functionname.getString());
+	if (!newParser) {
+		stderror.printf("failed to load parser: %s\n",module);
+		char	*error=parserdl.getError();
+		stderror.printf("%s\n",error);
+		delete[] error;
+		return NULL;
+	}
+
+	sqlrparser	*parser=(*newParser)();
+
+#else
+	sqlrparser	*parser;
+	stringbuffer	parsername;
+	parsername.append(module);
+	#include "sqlrparserassignments.cpp"
+	{
+		parser=NULL;
+	}
+#endif
+
+	if (!parser) {
+		stderror.printf("failed to create parser: %s\n",module);
+#ifdef SQLRELAY_ENABLE_SHARED
+		char	*error=parserdl.getError();
+		stderror.printf("%s\n",error);
+		delete[] error;
+#endif
+	}
+	return parser;
 }
 
 void sqlrservercontroller::updateState(enum sqlrconnectionstate_t state) {

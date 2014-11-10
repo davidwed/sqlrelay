@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrtranslations.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlrparser.h>
 #include <debugprint.h>
 
 #include <rudiments/process.h>
@@ -156,7 +156,7 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 
 bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
-					sqlparser *sqlp,
+					sqlrparser *sqlrp,
 					const char *query,
 					stringbuffer *translatedquery) {
 	debugFunction();
@@ -181,10 +181,10 @@ bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
 		if (tr->usesTree()) {
 
 			if (!tree) {
-				if (!sqlp->parse(query)) {
+				if (!sqlrp->parse(query)) {
 					return false;
 				}
-				tree=sqlp->getTree();
+				tree=sqlrp->getTree();
 				if (debug) {
 					stdoutput.printf(
 						"current query tree:\n");
@@ -200,7 +200,7 @@ bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
 		} else {
 
 			if (tree) {
-				if (!sqlp->write(&tempquerystr)) {
+				if (!sqlrp->write(&tempquerystr)) {
 					return false;
 				}
 				tree=NULL;
@@ -223,12 +223,12 @@ bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
 	}
 
 	if (tree) {
-		if (!sqlp->write(translatedquery)) {
+		if (!sqlrp->write(translatedquery)) {
 			return false;
 		}
 	} else {
 		translatedquery->append(query);
-		if (!sqlp->parse(translatedquery->getString())) {
+		if (!sqlrp->parse(translatedquery->getString())) {
 			return false;
 		}
 	}
@@ -260,7 +260,7 @@ xmldomnode *sqlrtranslations::newNode(xmldomnode *parentnode,
 xmldomnode *sqlrtranslations::newNode(xmldomnode *parentnode,
 				const char *type, const char *value) {
 	xmldomnode	*node=newNode(parentnode,type);
-	setAttribute(node,sqlparser::_value,value);
+	setAttribute(node,"value",value);
 	return node;
 }
 
@@ -278,7 +278,7 @@ xmldomnode *sqlrtranslations::newNodeAfter(xmldomnode *parentnode,
 						const char *type,
 						const char *value) {
 	xmldomnode	*retval=newNodeAfter(parentnode,node,type);
-	setAttribute(retval,sqlparser::_value,value);
+	setAttribute(retval,"value",value);
 	return retval;
 }
 
@@ -296,7 +296,7 @@ xmldomnode *sqlrtranslations::newNodeBefore(xmldomnode *parentnode,
 						const char *type,
 						const char *value) {
 	xmldomnode	*retval=newNodeBefore(parentnode,node,type);
-	setAttribute(retval,sqlparser::_value,value);
+	setAttribute(retval,"value",value);
 	return retval;
 }
 

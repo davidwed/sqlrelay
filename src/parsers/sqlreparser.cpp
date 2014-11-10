@@ -4,51 +4,51 @@
 #include <rudiments/character.h>
 #include <rudiments/charstring.h>
 #include <rudiments/stringbuffer.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <debugprint.h>
 
-sqlparser::sqlparser() {
+sqlreparser::sqlreparser() : sqlrparser() {
 	tree=NULL;
 	foreigntree=false;
 	error=false;
 }
 
-sqlparser::~sqlparser() {
+sqlreparser::~sqlreparser() {
 	if (!foreigntree) {
 		delete tree;
 	}
 }
 
-void sqlparser::useTree(xmldom *tree) {
+void sqlreparser::useTree(xmldom *tree) {
 	this->tree=tree;
 	foreigntree=(tree!=NULL);
 }
 
-xmldom *sqlparser::getTree() {
+xmldom *sqlreparser::getTree() {
 	return tree;
 }
 
-xmldom *sqlparser::detachTree() {
+xmldom *sqlreparser::detachTree() {
 	xmldom	*retval=tree;
 	tree=NULL;
 	return retval;
 }
 
-xmldomnode *sqlparser::newNode(xmldomnode *parentnode, const char *type) {
+xmldomnode *sqlreparser::newNode(xmldomnode *parentnode, const char *type) {
 	xmldomnode	*retval=new xmldomnode(tree,parentnode->getNullNode(),
 						TAG_XMLDOMNODETYPE,type,NULL);
 	parentnode->appendChild(retval);
 	return retval;
 }
 
-xmldomnode *sqlparser::newNode(xmldomnode *parentnode,
+xmldomnode *sqlreparser::newNode(xmldomnode *parentnode,
 				const char *type, const char *value) {
 	xmldomnode	*node=newNode(parentnode,type);
 	setAttribute(node,_value,value);
 	return node;
 }
 
-void sqlparser::setAttribute(xmldomnode *node,
+void sqlreparser::setAttribute(xmldomnode *node,
 				const char *name, const char *value) {
 	// FIXME: I shouldn't have to do this.
 	// setAttribute should append it automatically
@@ -59,7 +59,7 @@ void sqlparser::setAttribute(xmldomnode *node,
 	}
 }
 
-char *sqlparser::cleanQuery(const char *query) {
+char *sqlreparser::cleanQuery(const char *query) {
 
 	// remove comments and convert all whitespace into spaces
 	stringbuffer	cleanquery;
@@ -118,17 +118,17 @@ char *sqlparser::cleanQuery(const char *query) {
 	return retval;
 }
 
-bool sqlparser::comma(const char *ptr, const char **newptr) {
+bool sqlreparser::comma(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,",");
 }
 
-bool sqlparser::equals(const char *ptr, const char **newptr) {
+bool sqlreparser::equals(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"=");
 }
 
-bool sqlparser::notEquals(const char *ptr, const char **newptr) {
+bool sqlreparser::notEquals(const char *ptr, const char **newptr) {
 	debugFunction();
 	const char *parts[]={
 		"!=",
@@ -138,97 +138,97 @@ bool sqlparser::notEquals(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,parts);
 }
 
-bool sqlparser::lessThan(const char *ptr, const char **newptr) {
+bool sqlreparser::lessThan(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"<");
 }
 
-bool sqlparser::greaterThan(const char *ptr, const char **newptr) {
+bool sqlreparser::greaterThan(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,">");
 }
 
-bool sqlparser::lessThanOrEqualTo(const char *ptr, const char **newptr) {
+bool sqlreparser::lessThanOrEqualTo(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"<=");
 }
 
-bool sqlparser::greaterThanOrEqualTo(const char *ptr, const char **newptr) {
+bool sqlreparser::greaterThanOrEqualTo(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,">=");
 }
 
-bool sqlparser::leftParen(const char *ptr, const char **newptr) {
+bool sqlreparser::leftParen(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"(");
 }
 
-bool sqlparser::rightParen(const char *ptr, const char **newptr) {
+bool sqlreparser::rightParen(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,")");
 }
 
-bool sqlparser::compliment(const char *ptr, const char **newptr) {
+bool sqlreparser::compliment(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"~");
 }
 
-bool sqlparser::inverse(const char *ptr, const char **newptr) {
+bool sqlreparser::inverse(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"!");
 }
 
-bool sqlparser::plus(const char *ptr, const char **newptr) {
+bool sqlreparser::plus(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"+");
 }
 
-bool sqlparser::minus(const char *ptr, const char **newptr) {
+bool sqlreparser::minus(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"-");
 }
 
-bool sqlparser::times(const char *ptr, const char **newptr) {
+bool sqlreparser::times(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"*");
 }
 
-bool sqlparser::dividedBy(const char *ptr, const char **newptr) {
+bool sqlreparser::dividedBy(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"/");
 }
 
-bool sqlparser::modulo(const char *ptr, const char **newptr) {
+bool sqlreparser::modulo(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"%");
 }
 
-bool sqlparser::bitwiseAnd(const char *ptr, const char **newptr) {
+bool sqlreparser::bitwiseAnd(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"&");
 }
 
-bool sqlparser::bitwiseOr(const char *ptr, const char **newptr) {
+bool sqlreparser::bitwiseOr(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"|");
 }
 
-bool sqlparser::bitwiseXor(const char *ptr, const char **newptr) {
+bool sqlreparser::bitwiseXor(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"^");
 }
 
-bool sqlparser::logicalAnd(const char *ptr, const char **newptr) {
+bool sqlreparser::logicalAnd(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"&&");
 }
 
-bool sqlparser::logicalOr(const char *ptr, const char **newptr) {
+bool sqlreparser::logicalOr(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"||");
 }
 
-bool sqlparser::endOfQuery(const char *ptr, const char **newptr) {
+bool sqlreparser::endOfQuery(const char *ptr, const char **newptr) {
 	debugFunction();
 	whiteSpace(ptr,newptr);
 	if (**newptr=='\0') {
@@ -238,7 +238,7 @@ bool sqlparser::endOfQuery(const char *ptr, const char **newptr) {
 	return false;
 }
 
-bool sqlparser::whiteSpace(const char *ptr, const char **newptr) {
+bool sqlreparser::whiteSpace(const char *ptr, const char **newptr) {
 	while (*ptr && *ptr==' ') {
 		ptr++;
 	}
@@ -246,7 +246,7 @@ bool sqlparser::whiteSpace(const char *ptr, const char **newptr) {
 	return true;
 }
 
-bool sqlparser::comparePart(const char *ptr, const char **newptr,
+bool sqlreparser::comparePart(const char *ptr, const char **newptr,
 							const char *part) {
 	debugFunction();
 
@@ -271,7 +271,7 @@ bool sqlparser::comparePart(const char *ptr, const char **newptr,
 	return false;
 }
 
-bool sqlparser::comparePart(const char *ptr, const char **newptr,
+bool sqlreparser::comparePart(const char *ptr, const char **newptr,
 						const char * const *parts) {
 	debugFunction();
 
@@ -290,7 +290,7 @@ bool sqlparser::comparePart(const char *ptr, const char **newptr,
 	return false;
 }
 
-char *sqlparser::getWord(const char *ptr, const char **newptr) {
+char *sqlreparser::getWord(const char *ptr, const char **newptr) {
 	debugFunction();
 
 	whiteSpace(ptr,newptr);
@@ -300,13 +300,13 @@ char *sqlparser::getWord(const char *ptr, const char **newptr) {
 	return getUntil(" (,)~!^*-+=<>/%&|='\"",*newptr,newptr);
 }
 
-char *sqlparser::getClause(const char *ptr, const char *newptr) {
+char *sqlreparser::getClause(const char *ptr, const char *newptr) {
 	const char	*start;
 	whiteSpace(ptr,&start);
 	return charstring::duplicate(start,newptr-start);
 }
 
-char *sqlparser::getUntil(const char *set,
+char *sqlreparser::getUntil(const char *set,
 				const char *ptr, const char **newptr) {
 	debugFunction();
 
@@ -328,7 +328,7 @@ char *sqlparser::getUntil(const char *set,
 
 static const char *verbatimterminators=" (,)~!^*-+=<>/%&|";
 
-char *sqlparser::getVerbatim(const char *ptr, const char **newptr) {
+char *sqlreparser::getVerbatim(const char *ptr, const char **newptr) {
 	debugFunction();
 
 	whiteSpace(ptr,newptr);
@@ -398,11 +398,11 @@ char *sqlparser::getVerbatim(const char *ptr, const char **newptr) {
 	return verbatim.detachString();
 }
 
-bool sqlparser::parse(const char *query) {
+bool sqlreparser::parse(const char *query) {
 	return parseInternal(query,true) || parseInternal(query,false);
 }
 
-bool sqlparser::parseInternal(const char *query, bool useescapecharacters) {
+bool sqlreparser::parseInternal(const char *query, bool useescapecharacters) {
 	debugFunction();
 
 	// set the useescapecharacters flag
@@ -440,7 +440,7 @@ bool sqlparser::parseInternal(const char *query, bool useescapecharacters) {
 	return !error;
 }
 
-bool sqlparser::parseTableName(xmldomnode *currentnode,
+bool sqlreparser::parseTableName(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -474,11 +474,11 @@ bool sqlparser::parseTableName(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_table_name_database="table_name_database";
-const char *sqlparser::_table_name_schema="table_name_schema";
-const char *sqlparser::_table_name_table="table_name_table";
+const char *sqlreparser::_table_name_database="table_name_database";
+const char *sqlreparser::_table_name_schema="table_name_schema";
+const char *sqlreparser::_table_name_table="table_name_table";
 
-void sqlparser::splitDatabaseObjectName(xmldomnode *currentnode,
+void sqlreparser::splitDatabaseObjectName(xmldomnode *currentnode,
 						const char *name,
 						const char *databasetag,
 						const char *schematag,
@@ -535,7 +535,7 @@ void sqlparser::splitDatabaseObjectName(xmldomnode *currentnode,
 	delete[] parts;
 }
 
-bool sqlparser::parseName(xmldomnode *currentnode,
+bool sqlreparser::parseName(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -545,9 +545,9 @@ bool sqlparser::parseName(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_name="name";
+const char *sqlreparser::_name="name";
 
-bool sqlparser::parseType(xmldomnode *currentnode,
+bool sqlreparser::parseType(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -619,10 +619,10 @@ bool sqlparser::parseType(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_type="type";
-const char *sqlparser::_size="size";
+const char *sqlreparser::_type="type";
+const char *sqlreparser::_size="size";
 
-bool sqlparser::parseValues(xmldomnode *currentnode,
+bool sqlreparser::parseValues(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -665,10 +665,10 @@ bool sqlparser::parseValues(xmldomnode *currentnode,
 	}
 }
 
-const char *sqlparser::_values="values";
-const char *sqlparser::_value="value";
+const char *sqlreparser::_values="values";
+const char *sqlreparser::_value="value";
 
-bool sqlparser::parseLength(xmldomnode *currentnode,
+bool sqlreparser::parseLength(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -678,9 +678,9 @@ bool sqlparser::parseLength(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_length="length";
+const char *sqlreparser::_length="length";
 
-bool sqlparser::parseScale(xmldomnode *currentnode,
+bool sqlreparser::parseScale(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -690,9 +690,9 @@ bool sqlparser::parseScale(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_scale="scale";
+const char *sqlreparser::_scale="scale";
 
-bool sqlparser::parseVerbatim(xmldomnode *currentnode,
+bool sqlreparser::parseVerbatim(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -714,9 +714,9 @@ bool sqlparser::parseVerbatim(xmldomnode *currentnode,
 	return retval;
 }
 
-const char *sqlparser::_verbatim="verbatim";
+const char *sqlreparser::_verbatim="verbatim";
 
-bool sqlparser::parseRemainderVerbatim(xmldomnode *currentnode,
+bool sqlreparser::parseRemainderVerbatim(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	*newptr=ptr;
@@ -725,7 +725,7 @@ bool sqlparser::parseRemainderVerbatim(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::parseCreate(xmldomnode *currentnode,
+bool sqlreparser::parseCreate(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -771,14 +771,14 @@ bool sqlparser::parseCreate(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::createClause(const char *ptr, const char **newptr) {
+bool sqlreparser::createClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"create ");
 }
 
-const char *sqlparser::_create="create";
+const char *sqlreparser::_create="create";
 
-bool sqlparser::parseGlobal(xmldomnode *currentnode,
+bool sqlreparser::parseGlobal(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -789,14 +789,14 @@ bool sqlparser::parseGlobal(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::globalClause(const char *ptr, const char **newptr) {
+bool sqlreparser::globalClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"global ");
 }
 
-const char *sqlparser::_global="global";
+const char *sqlreparser::_global="global";
 
-bool sqlparser::parseTemporary(xmldomnode *currentnode,
+bool sqlreparser::parseTemporary(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -807,7 +807,7 @@ bool sqlparser::parseTemporary(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::temporaryClause(const char *ptr, const char **newptr) {
+bool sqlreparser::temporaryClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	const char *parts[]={
 		"temporary ",
@@ -817,9 +817,9 @@ bool sqlparser::temporaryClause(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,parts);
 }
 
-const char *sqlparser::_temporary="temporary";
+const char *sqlreparser::_temporary="temporary";
 
-bool sqlparser::parseFulltext(xmldomnode *currentnode,
+bool sqlreparser::parseFulltext(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -827,7 +827,7 @@ bool sqlparser::parseFulltext(xmldomnode *currentnode,
 	return parseFulltext(currentnode,ptr,newptr,&newnode);
 }
 
-bool sqlparser::parseFulltext(xmldomnode *currentnode,
+bool sqlreparser::parseFulltext(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr,
 					xmldomnode **newnode) {
@@ -839,14 +839,14 @@ bool sqlparser::parseFulltext(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::fulltext(const char *ptr, const char **newptr) {
+bool sqlreparser::fulltext(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"fulltext ");
 }
 
-const char *sqlparser::_fulltext="fulltext";
+const char *sqlreparser::_fulltext="fulltext";
 
-bool sqlparser::parseSpatial(xmldomnode *currentnode,
+bool sqlreparser::parseSpatial(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -854,7 +854,7 @@ bool sqlparser::parseSpatial(xmldomnode *currentnode,
 	return parseSpatial(currentnode,ptr,newptr,&newnode);
 }
 
-bool sqlparser::parseSpatial(xmldomnode *currentnode,
+bool sqlreparser::parseSpatial(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr,
 					xmldomnode **newnode) {
@@ -866,19 +866,19 @@ bool sqlparser::parseSpatial(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::spatial(const char *ptr, const char **newptr) {
+bool sqlreparser::spatial(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"spatial ");
 }
 
-const char *sqlparser::_spatial="spatial";
+const char *sqlreparser::_spatial="spatial";
 
-bool sqlparser::tableClause(const char *ptr, const char **newptr) {
+bool sqlreparser::tableClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"table ");
 }
 
-bool sqlparser::parseCreateTable(xmldomnode *currentnode,
+bool sqlreparser::parseCreateTable(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -929,9 +929,9 @@ bool sqlparser::parseCreateTable(xmldomnode *currentnode,
 	}
 }
 
-const char *sqlparser::_table="table";
+const char *sqlreparser::_table="table";
 
-bool sqlparser::parseIfNotExists(xmldomnode *currentnode,
+bool sqlreparser::parseIfNotExists(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -942,14 +942,14 @@ bool sqlparser::parseIfNotExists(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::ifNotExistsClause(const char *ptr, const char **newptr) {
+bool sqlreparser::ifNotExistsClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"if not exists ");
 }
 
-const char *sqlparser::_if_not_exists="if_not_exists";
+const char *sqlreparser::_if_not_exists="if_not_exists";
 
-bool sqlparser::parseColumnAndConstraintDefinitions(
+bool sqlreparser::parseColumnAndConstraintDefinitions(
 						xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
@@ -985,10 +985,10 @@ bool sqlparser::parseColumnAndConstraintDefinitions(
 	}
 }
 
-const char *sqlparser::_columns="columns";
-const char *sqlparser::_column="column";
+const char *sqlreparser::_columns="columns";
+const char *sqlreparser::_column="column";
 
-bool sqlparser::parseColumnDefinition(xmldomnode *currentnode,
+bool sqlreparser::parseColumnDefinition(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1023,7 +1023,7 @@ bool sqlparser::parseColumnDefinition(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::parseConstraints(xmldomnode *currentnode,
+bool sqlreparser::parseConstraints(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -1086,9 +1086,9 @@ bool sqlparser::parseConstraints(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_constraints="constraints";
+const char *sqlreparser::_constraints="constraints";
 
-bool sqlparser::parseUnsigned(xmldomnode *currentnode,
+bool sqlreparser::parseUnsigned(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1099,14 +1099,14 @@ bool sqlparser::parseUnsigned(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::unsignedClause(const char *ptr, const char **newptr) {
+bool sqlreparser::unsignedClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"unsigned");
 }
 
-const char *sqlparser::_unsigned="unsigned";
+const char *sqlreparser::_unsigned="unsigned";
 
-bool sqlparser::parseZeroFill(xmldomnode *currentnode,
+bool sqlreparser::parseZeroFill(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1117,14 +1117,14 @@ bool sqlparser::parseZeroFill(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::zeroFillClause(const char *ptr, const char **newptr) {
+bool sqlreparser::zeroFillClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"zerofill");
 }
 
-const char *sqlparser::_zerofill="zerofill";
+const char *sqlreparser::_zerofill="zerofill";
 
-bool sqlparser::parseBinary(xmldomnode *currentnode,
+bool sqlreparser::parseBinary(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1135,14 +1135,14 @@ bool sqlparser::parseBinary(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::binaryClause(const char *ptr, const char **newptr) {
+bool sqlreparser::binaryClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"binary");
 }
 
-const char *sqlparser::_binary="binary";
+const char *sqlreparser::_binary="binary";
 
-bool sqlparser::parseCharacterSet(xmldomnode *currentnode,
+bool sqlreparser::parseCharacterSet(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1159,7 +1159,7 @@ bool sqlparser::parseCharacterSet(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::characterSetClause(const char *ptr, const char **newptr) {
+bool sqlreparser::characterSetClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	const char *parts[]={
 		"character set ",
@@ -1170,9 +1170,9 @@ bool sqlparser::characterSetClause(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,parts);
 }
 
-const char *sqlparser::_character_set="character_set";
+const char *sqlreparser::_character_set="character_set";
 
-bool sqlparser::parseCollate(xmldomnode *currentnode,
+bool sqlreparser::parseCollate(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1189,14 +1189,14 @@ bool sqlparser::parseCollate(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::collateClause(const char *ptr, const char **newptr) {
+bool sqlreparser::collateClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"collate");
 }
 
-const char *sqlparser::_collate="collate";
+const char *sqlreparser::_collate="collate";
 
-bool sqlparser::parseNull(xmldomnode *currentnode,
+bool sqlreparser::parseNull(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1207,7 +1207,7 @@ bool sqlparser::parseNull(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::nullClause(const char *ptr, const char **newptr) {
+bool sqlreparser::nullClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	const char *parts[]={
 		"nullable",
@@ -1217,9 +1217,9 @@ bool sqlparser::nullClause(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,parts);
 }
 
-const char *sqlparser::_null="null";
+const char *sqlreparser::_null="null";
 
-bool sqlparser::parseNotNull(xmldomnode *currentnode,
+bool sqlreparser::parseNotNull(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1230,7 +1230,7 @@ bool sqlparser::parseNotNull(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::notNullClause(const char *ptr, const char **newptr) {
+bool sqlreparser::notNullClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	const char *parts[]={
 		"not nullable",
@@ -1240,9 +1240,9 @@ bool sqlparser::notNullClause(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,parts);
 }
 
-const char *sqlparser::_not_null="not_null";
+const char *sqlreparser::_not_null="not_null";
 
-bool sqlparser::parseDefault(xmldomnode *currentnode,
+bool sqlreparser::parseDefault(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1260,7 +1260,7 @@ bool sqlparser::parseDefault(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::defaultClause(const char *ptr, const char **newptr) {
+bool sqlreparser::defaultClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	const char *parts[]={
 		"default value ",
@@ -1270,9 +1270,9 @@ bool sqlparser::defaultClause(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,parts);
 }
 
-const char *sqlparser::_default="default";
+const char *sqlreparser::_default="default";
 
-bool sqlparser::parseAutoIncrement(xmldomnode *currentnode,
+bool sqlreparser::parseAutoIncrement(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1283,14 +1283,14 @@ bool sqlparser::parseAutoIncrement(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::autoIncrementClause(const char *ptr, const char **newptr) {
+bool sqlreparser::autoIncrementClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"auto_increment");
 }
 
-const char *sqlparser::_auto_increment="auto_increment";
+const char *sqlreparser::_auto_increment="auto_increment";
 
-bool sqlparser::parseIdentity(xmldomnode *currentnode,
+bool sqlreparser::parseIdentity(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1301,14 +1301,14 @@ bool sqlparser::parseIdentity(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::identityClause(const char *ptr, const char **newptr) {
+bool sqlreparser::identityClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"identity");
 }
 
-const char *sqlparser::_identity="identity";
+const char *sqlreparser::_identity="identity";
 
-bool sqlparser::parseUniqueKey(xmldomnode *currentnode,
+bool sqlreparser::parseUniqueKey(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1319,7 +1319,7 @@ bool sqlparser::parseUniqueKey(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::uniqueKeyClause(const char *ptr, const char **newptr) {
+bool sqlreparser::uniqueKeyClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	const char *parts[]={
 		"unique key",
@@ -1329,9 +1329,9 @@ bool sqlparser::uniqueKeyClause(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,parts);
 }
 
-const char *sqlparser::_unique_key="unique_key";
+const char *sqlreparser::_unique_key="unique_key";
 
-bool sqlparser::parsePrimaryKey(xmldomnode *currentnode,
+bool sqlreparser::parsePrimaryKey(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1339,7 +1339,7 @@ bool sqlparser::parsePrimaryKey(xmldomnode *currentnode,
 	return parsePrimaryKey(currentnode,ptr,newptr,&newnode);
 }
 
-bool sqlparser::parsePrimaryKey(xmldomnode *currentnode,
+bool sqlreparser::parsePrimaryKey(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr,
 						xmldomnode **newnode) {
@@ -1351,14 +1351,14 @@ bool sqlparser::parsePrimaryKey(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::primaryKeyClause(const char *ptr, const char **newptr) {
+bool sqlreparser::primaryKeyClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"primary key");
 }
 
-const char *sqlparser::_primary_key="primary_key";
+const char *sqlreparser::_primary_key="primary_key";
 
-bool sqlparser::parseKey(xmldomnode *currentnode,
+bool sqlreparser::parseKey(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1366,7 +1366,7 @@ bool sqlparser::parseKey(xmldomnode *currentnode,
 	return parseKey(currentnode,ptr,newptr,&newnode);
 }
 
-bool sqlparser::parseKey(xmldomnode *currentnode,
+bool sqlreparser::parseKey(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr,
 						xmldomnode **newnode) {
@@ -1378,14 +1378,14 @@ bool sqlparser::parseKey(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::keyClause(const char *ptr, const char **newptr) {
+bool sqlreparser::keyClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"key");
 }
 
-const char *sqlparser::_key="key";
+const char *sqlreparser::_key="key";
 
-bool sqlparser::parseComment(xmldomnode *currentnode,
+bool sqlreparser::parseComment(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1403,14 +1403,14 @@ bool sqlparser::parseComment(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::commentClause(const char *ptr, const char **newptr) {
+bool sqlreparser::commentClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"comment ");
 }
 
-const char *sqlparser::_comment="comment";
+const char *sqlreparser::_comment="comment";
 
-bool sqlparser::parseColumnFormat(xmldomnode *currentnode,
+bool sqlreparser::parseColumnFormat(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1427,14 +1427,14 @@ bool sqlparser::parseColumnFormat(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::columnFormatClause(const char *ptr, const char **newptr) {
+bool sqlreparser::columnFormatClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"column_format ");
 }
 
-const char *sqlparser::_column_format="column_format";
+const char *sqlreparser::_column_format="column_format";
 
-bool sqlparser::parseReferenceDefinition(xmldomnode *currentnode,
+bool sqlreparser::parseReferenceDefinition(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1483,14 +1483,14 @@ bool sqlparser::parseReferenceDefinition(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::referencesClause(const char *ptr, const char **newptr) {
+bool sqlreparser::referencesClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"references ");
 }
 
-const char *sqlparser::_references="references";
+const char *sqlreparser::_references="references";
 
-bool sqlparser::parseColumnNameList(xmldomnode *currentnode,
+bool sqlreparser::parseColumnNameList(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1553,7 +1553,7 @@ bool sqlparser::parseColumnNameList(xmldomnode *currentnode,
 	}
 }
 
-bool sqlparser::parseMatch(xmldomnode *currentnode,
+bool sqlreparser::parseMatch(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1570,14 +1570,14 @@ bool sqlparser::parseMatch(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::matchClause(const char *ptr, const char **newptr) {
+bool sqlreparser::matchClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"match ");
 }
 
-const char *sqlparser::_match="match";
+const char *sqlreparser::_match="match";
 
-bool sqlparser::parseOnDelete(xmldomnode *currentnode,
+bool sqlreparser::parseOnDelete(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1598,14 +1598,14 @@ bool sqlparser::parseOnDelete(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::onDeleteClause(const char *ptr, const char **newptr) {
+bool sqlreparser::onDeleteClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"on delete ");
 }
 
-const char *sqlparser::_on_delete="on_delete";
+const char *sqlreparser::_on_delete="on_delete";
 
-bool sqlparser::parseOnUpdate(xmldomnode *currentnode,
+bool sqlreparser::parseOnUpdate(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1626,14 +1626,14 @@ bool sqlparser::parseOnUpdate(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::onUpdateClause(const char *ptr, const char **newptr) {
+bool sqlreparser::onUpdateClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"on update ");
 }
 
-const char *sqlparser::_on_update="on_update";
+const char *sqlreparser::_on_update="on_update";
 
-bool sqlparser::parseReferenceOption(xmldomnode *currentnode,
+bool sqlreparser::parseReferenceOption(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1656,7 +1656,7 @@ bool sqlparser::parseReferenceOption(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::referenceOptionClause(const char *ptr, const char **newptr) {
+bool sqlreparser::referenceOptionClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	const char *parts[]={
 		"restrict",
@@ -1668,7 +1668,7 @@ bool sqlparser::referenceOptionClause(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,parts);
 }
 
-bool sqlparser::parseOnCommit(xmldomnode *currentnode,
+bool sqlreparser::parseOnCommit(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1701,14 +1701,14 @@ bool sqlparser::parseOnCommit(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::onCommitClause(const char *ptr, const char **newptr) {
+bool sqlreparser::onCommitClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"on commit ");
 }
 
-const char *sqlparser::_on_commit="on_commit";
+const char *sqlreparser::_on_commit="on_commit";
 
-bool sqlparser::onCommitOptionClause(const char *ptr, const char **newptr) {
+bool sqlreparser::onCommitOptionClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	const char *parts[]={
 		"delete rows",
@@ -1718,7 +1718,7 @@ bool sqlparser::onCommitOptionClause(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,parts);
 }
 
-bool sqlparser::parseAs(xmldomnode *currentnode,
+bool sqlreparser::parseAs(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	if (!asClause(ptr,newptr)) {
@@ -1728,14 +1728,14 @@ bool sqlparser::parseAs(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::asClause(const char *ptr, const char **newptr) {
+bool sqlreparser::asClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"as ");
 }
 
-const char *sqlparser::_as="as";
+const char *sqlreparser::_as="as";
 
-bool sqlparser::parseWithNoLog(xmldomnode *currentnode,
+bool sqlreparser::parseWithNoLog(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	const char	*start=ptr;
@@ -1749,9 +1749,9 @@ bool sqlparser::parseWithNoLog(xmldomnode *currentnode,
 	return false;
 }
 
-const char *sqlparser::_with_no_log="with_no_log";
+const char *sqlreparser::_with_no_log="with_no_log";
 
-bool sqlparser::parseCreateIndex(xmldomnode *currentnode,
+bool sqlreparser::parseCreateIndex(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -1801,14 +1801,14 @@ bool sqlparser::parseCreateIndex(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::indexClause(const char *ptr, const char **newptr) {
+bool sqlreparser::indexClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"index ");
 }
 
-const char *sqlparser::_index="index";
+const char *sqlreparser::_index="index";
 
-bool sqlparser::parseIndexName(xmldomnode *currentnode,
+bool sqlreparser::parseIndexName(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -1835,11 +1835,11 @@ bool sqlparser::parseIndexName(xmldomnode *currentnode,
 	return retval;
 }
 
-const char *sqlparser::_index_name_database="index_name_database";
-const char *sqlparser::_index_name_schema="index_name_schema";
-const char *sqlparser::_index_name_index="index_name_index";
+const char *sqlreparser::_index_name_database="index_name_database";
+const char *sqlreparser::_index_name_schema="index_name_schema";
+const char *sqlreparser::_index_name_index="index_name_index";
 
-bool sqlparser::parseIndexType(xmldomnode *currentnode,
+bool sqlreparser::parseIndexType(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -1863,7 +1863,7 @@ bool sqlparser::parseIndexType(xmldomnode *currentnode,
 	return false;
 }
 
-bool sqlparser::parseBtree(xmldomnode *currentnode,
+bool sqlreparser::parseBtree(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -1874,14 +1874,14 @@ bool sqlparser::parseBtree(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::btree(const char *ptr, const char **newptr) {
+bool sqlreparser::btree(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"btree");
 }
 
-const char *sqlparser::_btree="btree";
+const char *sqlreparser::_btree="btree";
 
-bool sqlparser::parseHash(xmldomnode *currentnode,
+bool sqlreparser::parseHash(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -1892,14 +1892,14 @@ bool sqlparser::parseHash(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::hash(const char *ptr, const char **newptr) {
+bool sqlreparser::hash(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"hash");
 }
 
-const char *sqlparser::_hash="hash";
+const char *sqlreparser::_hash="hash";
 
-bool sqlparser::parseOnClause(xmldomnode *currentnode,
+bool sqlreparser::parseOnClause(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -1910,7 +1910,7 @@ bool sqlparser::parseOnClause(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::parseConstraint(xmldomnode *currentnode,
+bool sqlreparser::parseConstraint(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1920,7 +1920,7 @@ bool sqlparser::parseConstraint(xmldomnode *currentnode,
 		parseCheckConstraint(currentnode,ptr,newptr);
 }
 
-bool sqlparser::parseKeyConstraint(xmldomnode *currentnode,
+bool sqlreparser::parseKeyConstraint(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -1959,7 +1959,7 @@ bool sqlparser::parseKeyConstraint(xmldomnode *currentnode,
 	}
 }
 
-bool sqlparser::parseConstraintClause(xmldomnode *currentnode,
+bool sqlreparser::parseConstraintClause(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -2001,14 +2001,14 @@ bool sqlparser::parseConstraintClause(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::constraintClause(const char *ptr, const char **newptr) {
+bool sqlreparser::constraintClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"constraint ");
 }
 
-const char *sqlparser::_constraint="constraint";
+const char *sqlreparser::_constraint="constraint";
 
-bool sqlparser::parsePrimaryKeyConstraint(xmldomnode *currentnode,
+bool sqlreparser::parsePrimaryKeyConstraint(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -2034,7 +2034,7 @@ bool sqlparser::parsePrimaryKeyConstraint(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::parseUniqueConstraint(xmldomnode *currentnode,
+bool sqlreparser::parseUniqueConstraint(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -2068,7 +2068,7 @@ bool sqlparser::parseUniqueConstraint(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::parseForeignKeyConstraint(xmldomnode *currentnode,
+bool sqlreparser::parseForeignKeyConstraint(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -2094,7 +2094,7 @@ bool sqlparser::parseForeignKeyConstraint(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::parseForeignKey(xmldomnode *currentnode,
+bool sqlreparser::parseForeignKey(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr,
 						xmldomnode **newnode) {
@@ -2106,14 +2106,14 @@ bool sqlparser::parseForeignKey(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::foreignKeyClause(const char *ptr, const char **newptr) {
+bool sqlreparser::foreignKeyClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"foreign key");
 }
 
-const char *sqlparser::_foreign_key="foreign_key";
+const char *sqlreparser::_foreign_key="foreign_key";
 
-bool sqlparser::parseIndexOrKeyConstraint(xmldomnode *currentnode,
+bool sqlreparser::parseIndexOrKeyConstraint(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -2141,7 +2141,7 @@ bool sqlparser::parseIndexOrKeyConstraint(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::parseFulltextOrSpatialConstraint(xmldomnode *currentnode,
+bool sqlreparser::parseFulltextOrSpatialConstraint(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -2173,7 +2173,7 @@ bool sqlparser::parseFulltextOrSpatialConstraint(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::parseIndex(xmldomnode *currentnode,
+bool sqlreparser::parseIndex(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -2181,7 +2181,7 @@ bool sqlparser::parseIndex(xmldomnode *currentnode,
 	return parseIndex(currentnode,ptr,newptr,&newnode);
 }
 
-bool sqlparser::parseIndex(xmldomnode *currentnode,
+bool sqlreparser::parseIndex(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr,
 						xmldomnode **newnode) {
@@ -2193,7 +2193,7 @@ bool sqlparser::parseIndex(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::parseIndexOption(xmldomnode *currentnode,
+bool sqlreparser::parseIndexOption(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -2202,7 +2202,7 @@ bool sqlparser::parseIndexOption(xmldomnode *currentnode,
 		parseWithParser(currentnode,ptr,newptr);
 }
 
-bool sqlparser::parseKeyBlockSize(xmldomnode *currentnode,
+bool sqlreparser::parseKeyBlockSize(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -2234,14 +2234,14 @@ bool sqlparser::parseKeyBlockSize(xmldomnode *currentnode,
 	return retval;
 }
 
-bool sqlparser::keyBlockSize(const char *ptr, const char **newptr) {
+bool sqlreparser::keyBlockSize(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"key_block_size");
 }
 
-const char *sqlparser::_key_block_size="key_block_size";
+const char *sqlreparser::_key_block_size="key_block_size";
 
-bool sqlparser::parseWithParser(xmldomnode *currentnode,
+bool sqlreparser::parseWithParser(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -2267,14 +2267,14 @@ bool sqlparser::parseWithParser(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::withParser(const char *ptr, const char **newptr) {
+bool sqlreparser::withParser(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"with parser ");
 }
 
-const char *sqlparser::_with_parser="with_parser";
+const char *sqlreparser::_with_parser="with_parser";
 
-bool sqlparser::parseCheckConstraint(xmldomnode *currentnode,
+bool sqlreparser::parseCheckConstraint(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -2310,14 +2310,14 @@ bool sqlparser::parseCheckConstraint(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::checkClause(const char *ptr, const char **newptr) {
+bool sqlreparser::checkClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"check ");
 }
 
-const char *sqlparser::_check="check";
+const char *sqlreparser::_check="check";
 
-bool sqlparser::parseCreateSynonym(xmldomnode *currentnode,
+bool sqlreparser::parseCreateSynonym(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2354,14 +2354,14 @@ bool sqlparser::parseCreateSynonym(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::synonymClause(const char *ptr, const char **newptr) {
+bool sqlreparser::synonymClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"synonym ");
 }
 
-const char *sqlparser::_synonym="synonym";
+const char *sqlreparser::_synonym="synonym";
 
-bool sqlparser::parseDatabaseObjectName(xmldomnode *currentnode,
+bool sqlreparser::parseDatabaseObjectName(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -2375,11 +2375,11 @@ bool sqlparser::parseDatabaseObjectName(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_object_name_database="object_name_database";
-const char *sqlparser::_object_name_schema="object_name_schema";
-const char *sqlparser::_object_name_object="object_name_object";
+const char *sqlreparser::_object_name_database="object_name_database";
+const char *sqlreparser::_object_name_schema="object_name_schema";
+const char *sqlreparser::_object_name_object="object_name_object";
 
-bool sqlparser::parseFor(xmldomnode *currentnode,
+bool sqlreparser::parseFor(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -2390,14 +2390,14 @@ bool sqlparser::parseFor(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::forClause(const char *ptr, const char **newptr) {
+bool sqlreparser::forClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"for ");
 }
 
-const char *sqlparser::_for="for";
+const char *sqlreparser::_for="for";
 
-bool sqlparser::parseCreatePackage(xmldomnode *currentnode,
+bool sqlreparser::parseCreatePackage(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2411,14 +2411,14 @@ bool sqlparser::parseCreatePackage(xmldomnode *currentnode,
 	return false;
 }
 
-bool sqlparser::packageClause(const char *ptr, const char **newptr) {
+bool sqlreparser::packageClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"package ");
 }
 
-const char *sqlparser::_package="package";
+const char *sqlreparser::_package="package";
 
-bool sqlparser::parseCreateProcedure(xmldomnode *currentnode,
+bool sqlreparser::parseCreateProcedure(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2432,7 +2432,7 @@ bool sqlparser::parseCreateProcedure(xmldomnode *currentnode,
 	return false;
 }
 
-bool sqlparser::parseCreateFunction(xmldomnode *currentnode,
+bool sqlreparser::parseCreateFunction(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2446,12 +2446,12 @@ bool sqlparser::parseCreateFunction(xmldomnode *currentnode,
 	return false;
 }
 
-bool sqlparser::functionClause(const char *ptr, const char **newptr) {
+bool sqlreparser::functionClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"function ");
 }
 
-bool sqlparser::parseDelete(xmldomnode *currentnode,
+bool sqlreparser::parseDelete(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2521,14 +2521,14 @@ bool sqlparser::parseDelete(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::deleteClause(const char *ptr, const char **newptr) {
+bool sqlreparser::deleteClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"delete ");
 }
 
-const char *sqlparser::_delete="delete";
+const char *sqlreparser::_delete="delete";
 
-bool sqlparser::parseDeleteFrom(xmldomnode *currentnode,
+bool sqlreparser::parseDeleteFrom(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2539,14 +2539,14 @@ bool sqlparser::parseDeleteFrom(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::deleteFromClause(const char *ptr, const char **newptr) {
+bool sqlreparser::deleteFromClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"from ");
 }
 
-const char *sqlparser::_delete_from="delete_from";
+const char *sqlreparser::_delete_from="delete_from";
 
-bool sqlparser::parseUsing(xmldomnode *currentnode,
+bool sqlreparser::parseUsing(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2557,14 +2557,14 @@ bool sqlparser::parseUsing(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::usingClause(const char *ptr, const char **newptr) {
+bool sqlreparser::usingClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"using ");
 }
 
-const char *sqlparser::_using="using";
+const char *sqlreparser::_using="using";
 
-bool sqlparser::parseDrop(xmldomnode *currentnode,
+bool sqlreparser::parseDrop(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2591,14 +2591,14 @@ bool sqlparser::parseDrop(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::dropClause(const char *ptr, const char **newptr) {
+bool sqlreparser::dropClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"drop ");
 }
 
-const char *sqlparser::_drop="drop";
+const char *sqlreparser::_drop="drop";
 
-bool sqlparser::parseDropTemporary(xmldomnode *currentnode,
+bool sqlreparser::parseDropTemporary(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	if (!temporaryClause(ptr,newptr)) {
@@ -2608,9 +2608,9 @@ bool sqlparser::parseDropTemporary(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_drop_temporary="drop_temporary";
+const char *sqlreparser::_drop_temporary="drop_temporary";
 
-bool sqlparser::parseDropTable(xmldomnode *currentnode,
+bool sqlreparser::parseDropTable(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2643,7 +2643,7 @@ bool sqlparser::parseDropTable(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::parseIfExists(xmldomnode *currentnode,
+bool sqlreparser::parseIfExists(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2654,14 +2654,14 @@ bool sqlparser::parseIfExists(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::ifExistsClause(const char *ptr, const char **newptr) {
+bool sqlreparser::ifExistsClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"if exists ");
 }
 
-const char *sqlparser::_if_exists="if_exists";
+const char *sqlreparser::_if_exists="if_exists";
 
-bool sqlparser::parseTableNameList(xmldomnode *currentnode,
+bool sqlreparser::parseTableNameList(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2689,10 +2689,10 @@ bool sqlparser::parseTableNameList(xmldomnode *currentnode,
 	}
 }
 
-const char *sqlparser::_table_name_list="table_name_list";
-const char *sqlparser::_table_name_list_item="table_name_list_item";
+const char *sqlreparser::_table_name_list="table_name_list";
+const char *sqlreparser::_table_name_list_item="table_name_list_item";
 
-bool sqlparser::parseRestrict(xmldomnode *currentnode,
+bool sqlreparser::parseRestrict(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2703,14 +2703,14 @@ bool sqlparser::parseRestrict(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::restrictClause(const char *ptr, const char **newptr) {
+bool sqlreparser::restrictClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"restrict");
 }
 
-const char *sqlparser::_restrict_clause="restrict";
+const char *sqlreparser::_restrict_clause="restrict";
 
-bool sqlparser::parseCascade(xmldomnode *currentnode,
+bool sqlreparser::parseCascade(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2728,14 +2728,14 @@ bool sqlparser::parseCascade(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::cascadeClause(const char *ptr, const char **newptr) {
+bool sqlreparser::cascadeClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"cascade");
 }
 
-const char *sqlparser::_cascade="cascade";
+const char *sqlreparser::_cascade="cascade";
 
-bool sqlparser::parseCascadeConstraintsClause(xmldomnode *currentnode,
+bool sqlreparser::parseCascadeConstraintsClause(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -2746,14 +2746,14 @@ bool sqlparser::parseCascadeConstraintsClause(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::cascadeConstraintsClause(const char *ptr, const char **newptr) {
+bool sqlreparser::cascadeConstraintsClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"constraints");
 }
 
-const char *sqlparser::_cascade_constraints_clause="cascade_constraints_clause";
+const char *sqlreparser::_cascade_constraints_clause="cascade_constraints_clause";
 
-bool sqlparser::parseDropIndex(xmldomnode *currentnode,
+bool sqlreparser::parseDropIndex(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2780,7 +2780,7 @@ bool sqlparser::parseDropIndex(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::parseInsert(xmldomnode *currentnode,
+bool sqlreparser::parseInsert(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2824,14 +2824,14 @@ bool sqlparser::parseInsert(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::insertClause(const char *ptr, const char **newptr) {
+bool sqlreparser::insertClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"insert ");
 }
 
-const char *sqlparser::_insert="insert";
+const char *sqlreparser::_insert="insert";
 
-bool sqlparser::parseInsertInto(xmldomnode *currentnode,
+bool sqlreparser::parseInsertInto(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2857,14 +2857,14 @@ bool sqlparser::parseInsertInto(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::insertIntoClause(const char *ptr, const char **newptr) {
+bool sqlreparser::insertIntoClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"into ");
 }
 
-const char *sqlparser::_insert_into="insert_into";
+const char *sqlreparser::_insert_into="insert_into";
 
-bool sqlparser::parseInsertValues(xmldomnode *currentnode,
+bool sqlreparser::parseInsertValues(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2881,14 +2881,14 @@ bool sqlparser::parseInsertValues(xmldomnode *currentnode,
 	return parseInsertValuesList(valuesnode,*newptr,newptr);
 }
 
-bool sqlparser::insertValuesClause(const char *ptr, const char **newptr) {
+bool sqlreparser::insertValuesClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"values ");
 }
 
-const char *sqlparser::_insert_values_clause="insert_values_clause";
+const char *sqlreparser::_insert_values_clause="insert_values_clause";
 
-bool sqlparser::parseInsertValue(xmldomnode *currentnode,
+bool sqlreparser::parseInsertValue(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2905,14 +2905,14 @@ bool sqlparser::parseInsertValue(xmldomnode *currentnode,
 	return parseInsertValuesList(valuenode,*newptr,newptr);
 }
 
-bool sqlparser::insertValueClause(const char *ptr, const char **newptr) {
+bool sqlreparser::insertValueClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"value ");
 }
 
-const char *sqlparser::_insert_value_clause="insert_value_clause";
+const char *sqlreparser::_insert_value_clause="insert_value_clause";
 
-bool sqlparser::parseInsertValuesList(xmldomnode *currentnode,
+bool sqlreparser::parseInsertValuesList(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -2946,9 +2946,9 @@ bool sqlparser::parseInsertValuesList(xmldomnode *currentnode,
 	}
 }
 
-const char *sqlparser::_insert_value="insert_value";
+const char *sqlreparser::_insert_value="insert_value";
 
-bool sqlparser::parseSelect(xmldomnode *currentnode,
+bool sqlreparser::parseSelect(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3114,22 +3114,22 @@ bool sqlparser::parseSelect(xmldomnode *currentnode,
 	}
 }
 
-bool sqlparser::selectClause(const char *ptr, const char **newptr) {
+bool sqlreparser::selectClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"select ");
 }
 
-const char *sqlparser::_select="select";
-const char *sqlparser::_select_expressions="select_expressions";
-const char *sqlparser::_select_expression="select_expression";
+const char *sqlreparser::_select="select";
+const char *sqlreparser::_select_expressions="select_expressions";
+const char *sqlreparser::_select_expression="select_expression";
 
-bool sqlparser::parseSelectExpressionAlias(xmldomnode *currentnode,
+bool sqlreparser::parseSelectExpressionAlias(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	return parseAlias(currentnode,ptr,newptr,false);
 }
 
-bool sqlparser::parseAlias(xmldomnode *currentnode,
+bool sqlreparser::parseAlias(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr,
 						bool subselect) {
@@ -3143,7 +3143,7 @@ bool sqlparser::parseAlias(xmldomnode *currentnode,
 	char	*word=getVerbatim(ptr,newptr);
 
 	// if it's "as" then get the word after that
-	if (!charstring::compareIgnoringCase(word,sqlparser::_as)) {
+	if (!charstring::compareIgnoringCase(word,sqlreparser::_as)) {
 		as=word;
 		reset=*newptr;
 		word=getVerbatim(*newptr,newptr);
@@ -3155,7 +3155,7 @@ bool sqlparser::parseAlias(xmldomnode *currentnode,
 		!charstring::compareIgnoringCase(word,",") ||
 		!charstring::compareIgnoringCase(word,")") ||
 		// from clause
-		!charstring::compareIgnoringCase(word,sqlparser::_from) ||
+		!charstring::compareIgnoringCase(word,sqlreparser::_from) ||
 		// for clause
 		!charstring::compareIgnoringCase(word,"for") ||
 		// order by clause
@@ -3166,19 +3166,19 @@ bool sqlparser::parseAlias(xmldomnode *currentnode,
 		!charstring::compareIgnoringCase(word,"into") ||
 		(subselect &&
 		// where clause
-		(!charstring::compareIgnoringCase(word,sqlparser::_where) ||
+		(!charstring::compareIgnoringCase(word,sqlreparser::_where) ||
 		// join clauses
-		!charstring::compareIgnoringCase(word,sqlparser::_inner) ||
-		!charstring::compareIgnoringCase(word,sqlparser::_cross) ||
+		!charstring::compareIgnoringCase(word,sqlreparser::_inner) ||
+		!charstring::compareIgnoringCase(word,sqlreparser::_cross) ||
 		!charstring::compareIgnoringCase(
-					word,sqlparser::_straight_join) ||
-		!charstring::compareIgnoringCase(word,sqlparser::_left) ||
-		!charstring::compareIgnoringCase(word,sqlparser::_right) ||
-		!charstring::compareIgnoringCase(word,sqlparser::_natural) ||
-		!charstring::compareIgnoringCase(word,sqlparser::_on) ||
-		!charstring::compareIgnoringCase(word,sqlparser::_using) ||
+					word,sqlreparser::_straight_join) ||
+		!charstring::compareIgnoringCase(word,sqlreparser::_left) ||
+		!charstring::compareIgnoringCase(word,sqlreparser::_right) ||
+		!charstring::compareIgnoringCase(word,sqlreparser::_natural) ||
+		!charstring::compareIgnoringCase(word,sqlreparser::_on) ||
+		!charstring::compareIgnoringCase(word,sqlreparser::_using) ||
 		// union clause
-		!charstring::compareIgnoringCase(word,sqlparser::_union)))) {
+		!charstring::compareIgnoringCase(word,sqlreparser::_union)))) {
 
 		// if so...
 		if (charstring::length(as)) {
@@ -3208,7 +3208,7 @@ bool sqlparser::parseAlias(xmldomnode *currentnode,
 	return retval;
 }
 
-bool sqlparser::parseSubSelects(xmldomnode *currentnode,
+bool sqlreparser::parseSubSelects(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3253,17 +3253,17 @@ bool sqlparser::parseSubSelects(xmldomnode *currentnode,
 	}
 }
 
-const char *sqlparser::_sub_select="sub_select";
+const char *sqlreparser::_sub_select="sub_select";
 
-bool sqlparser::parseSubSelectAlias(xmldomnode *currentnode,
+bool sqlreparser::parseSubSelectAlias(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	return parseAlias(currentnode,ptr,newptr,true);
 }
 
-const char *sqlparser::_alias="alias";
+const char *sqlreparser::_alias="alias";
 
-bool sqlparser::parseUnion(xmldomnode *currentnode,
+bool sqlreparser::parseUnion(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3284,14 +3284,14 @@ bool sqlparser::parseUnion(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::unionClause(const char *ptr, const char **newptr) {
+bool sqlreparser::unionClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"union ");
 }
 
-const char *sqlparser::_union="union";
+const char *sqlreparser::_union="union";
 
-bool sqlparser::parseAll(xmldomnode *currentnode,
+bool sqlreparser::parseAll(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3302,14 +3302,14 @@ bool sqlparser::parseAll(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::allClause(const char *ptr, const char **newptr) {
+bool sqlreparser::allClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"all ");
 }
 
-const char *sqlparser::_all="all";
+const char *sqlreparser::_all="all";
 
-bool sqlparser::parseUnique(xmldomnode *currentnode,
+bool sqlreparser::parseUnique(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3317,7 +3317,7 @@ bool sqlparser::parseUnique(xmldomnode *currentnode,
 	return parseUnique(currentnode,ptr,newptr,&newnode);
 }
 
-bool sqlparser::parseUnique(xmldomnode *currentnode,
+bool sqlreparser::parseUnique(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr,
 					xmldomnode **newnode) {
@@ -3329,14 +3329,14 @@ bool sqlparser::parseUnique(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::uniqueClause(const char *ptr, const char **newptr) {
+bool sqlreparser::uniqueClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"unique ");
 }
 
-const char *sqlparser::_unique="unique";
+const char *sqlreparser::_unique="unique";
 
-bool sqlparser::parseDistinct(xmldomnode *currentnode,
+bool sqlreparser::parseDistinct(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3347,14 +3347,14 @@ bool sqlparser::parseDistinct(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::distinctClause(const char *ptr, const char **newptr) {
+bool sqlreparser::distinctClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"distinct ");
 }
 
-const char *sqlparser::_distinct="distinct";
+const char *sqlreparser::_distinct="distinct";
 
-bool sqlparser::parseDistinctRow(xmldomnode *currentnode,
+bool sqlreparser::parseDistinctRow(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3365,14 +3365,14 @@ bool sqlparser::parseDistinctRow(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::distinctRowClause(const char *ptr, const char **newptr) {
+bool sqlreparser::distinctRowClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"distinctrow ");
 }
 
-const char *sqlparser::_distinct_row="distinct_row";
+const char *sqlreparser::_distinct_row="distinct_row";
 
-bool sqlparser::parseHighPriority(xmldomnode *currentnode,
+bool sqlreparser::parseHighPriority(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3383,14 +3383,14 @@ bool sqlparser::parseHighPriority(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::highPriorityClause(const char *ptr, const char **newptr) {
+bool sqlreparser::highPriorityClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"high_priority ");
 }
 
-const char *sqlparser::_high_priority="high_priority";
+const char *sqlreparser::_high_priority="high_priority";
 
-bool sqlparser::parseStraightJoinSelectOption(xmldomnode *currentnode,
+bool sqlreparser::parseStraightJoinSelectOption(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -3401,15 +3401,15 @@ bool sqlparser::parseStraightJoinSelectOption(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::straightJoinClause(const char *ptr, const char **newptr) {
+bool sqlreparser::straightJoinClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"straight_join ");
 }
 
-const char *sqlparser::_straight_join_select_option=
+const char *sqlreparser::_straight_join_select_option=
 					"straight_join_select_option";
 
-bool sqlparser::parseSqlSmallResult(xmldomnode *currentnode,
+bool sqlreparser::parseSqlSmallResult(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3420,14 +3420,14 @@ bool sqlparser::parseSqlSmallResult(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::sqlSmallResultClause(const char *ptr, const char **newptr) {
+bool sqlreparser::sqlSmallResultClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"sql_small_result ");
 }
 
-const char *sqlparser::_sql_small_result="sql_small_result";
+const char *sqlreparser::_sql_small_result="sql_small_result";
 
-bool sqlparser::parseSqlBigResult(xmldomnode *currentnode,
+bool sqlreparser::parseSqlBigResult(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3438,14 +3438,14 @@ bool sqlparser::parseSqlBigResult(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::sqlBigResultClause(const char *ptr, const char **newptr) {
+bool sqlreparser::sqlBigResultClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"sql_big_result ");
 }
 
-const char *sqlparser::_sql_big_result="sql_big_result";
+const char *sqlreparser::_sql_big_result="sql_big_result";
 
-bool sqlparser::parseSqlBufferResult(xmldomnode *currentnode,
+bool sqlreparser::parseSqlBufferResult(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3456,14 +3456,14 @@ bool sqlparser::parseSqlBufferResult(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::sqlBufferResultClause(const char *ptr, const char **newptr) {
+bool sqlreparser::sqlBufferResultClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"sql_buffer_result ");
 }
 
-const char *sqlparser::_sql_buffer_result="sql_buffer_result";
+const char *sqlreparser::_sql_buffer_result="sql_buffer_result";
 
-bool sqlparser::parseSqlCache(xmldomnode *currentnode,
+bool sqlreparser::parseSqlCache(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3474,14 +3474,14 @@ bool sqlparser::parseSqlCache(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::sqlCacheClause(const char *ptr, const char **newptr) {
+bool sqlreparser::sqlCacheClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"sql_cache ");
 }
 
-const char *sqlparser::_sql_cache="sql_cache";
+const char *sqlreparser::_sql_cache="sql_cache";
 
-bool sqlparser::parseSqlNoCache(xmldomnode *currentnode,
+bool sqlreparser::parseSqlNoCache(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3492,14 +3492,14 @@ bool sqlparser::parseSqlNoCache(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::sqlNoCacheClause(const char *ptr, const char **newptr) {
+bool sqlreparser::sqlNoCacheClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"sql_no_cache ");
 }
 
-const char *sqlparser::_sql_no_cache="sql_no_cache";
+const char *sqlreparser::_sql_no_cache="sql_no_cache";
 
-bool sqlparser::parseSqlCalcFoundRows(xmldomnode *currentnode,
+bool sqlreparser::parseSqlCalcFoundRows(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3510,14 +3510,14 @@ bool sqlparser::parseSqlCalcFoundRows(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::sqlCalcFoundRowsClause(const char *ptr, const char **newptr) {
+bool sqlreparser::sqlCalcFoundRowsClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"sql_calc_found_rows ");
 }
 
-const char *sqlparser::_sql_calc_found_rows="sql_calc_found_rows";
+const char *sqlreparser::_sql_calc_found_rows="sql_calc_found_rows";
 
-bool sqlparser::parseGroupBy(xmldomnode *currentnode,
+bool sqlreparser::parseGroupBy(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3560,15 +3560,15 @@ bool sqlparser::parseGroupBy(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::groupByClause(const char *ptr, const char **newptr) {
+bool sqlreparser::groupByClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"group by ");
 }
 
-const char *sqlparser::_group_by="group_by";
-const char *sqlparser::_group_by_item="group_by_item";
+const char *sqlreparser::_group_by="group_by";
+const char *sqlreparser::_group_by_item="group_by_item";
 
-bool sqlparser::parseWithRollup(xmldomnode *currentnode,
+bool sqlreparser::parseWithRollup(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3579,14 +3579,14 @@ bool sqlparser::parseWithRollup(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::withRollupClause(const char *ptr, const char **newptr) {
+bool sqlreparser::withRollupClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"with rollup");
 }
 
-const char *sqlparser::_with_rollup="with_rollup";
+const char *sqlreparser::_with_rollup="with_rollup";
 
-bool sqlparser::parseOrderBy(xmldomnode *currentnode,
+bool sqlreparser::parseOrderBy(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3626,15 +3626,15 @@ bool sqlparser::parseOrderBy(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::orderByClause(const char *ptr, const char **newptr) {
+bool sqlreparser::orderByClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"order by ");
 }
 
-const char *sqlparser::_order_by="order_by";
-const char *sqlparser::_order_by_item="order_by_item";
+const char *sqlreparser::_order_by="order_by";
+const char *sqlreparser::_order_by_item="order_by_item";
 
-bool sqlparser::parseAsc(xmldomnode *currentnode,
+bool sqlreparser::parseAsc(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3645,14 +3645,14 @@ bool sqlparser::parseAsc(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::asc(const char *ptr, const char **newptr) {
+bool sqlreparser::asc(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"asc");
 }
 
-const char *sqlparser::_asc="asc";
+const char *sqlreparser::_asc="asc";
 
-bool sqlparser::parseDesc(xmldomnode *currentnode,
+bool sqlreparser::parseDesc(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3663,14 +3663,14 @@ bool sqlparser::parseDesc(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::desc(const char *ptr, const char **newptr) {
+bool sqlreparser::desc(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"desc");
 }
 
-const char *sqlparser::_desc="desc";
+const char *sqlreparser::_desc="desc";
 
-bool sqlparser::parseLimit(xmldomnode *currentnode,
+bool sqlreparser::parseLimit(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3681,14 +3681,14 @@ bool sqlparser::parseLimit(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::limitClause(const char *ptr, const char **newptr) {
+bool sqlreparser::limitClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"limit ");
 }
 
-const char *sqlparser::_limit="limit";
+const char *sqlreparser::_limit="limit";
 
-bool sqlparser::parseProcedure(xmldomnode *currentnode,
+bool sqlreparser::parseProcedure(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3699,14 +3699,14 @@ bool sqlparser::parseProcedure(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::procedureClause(const char *ptr, const char **newptr) {
+bool sqlreparser::procedureClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"procedure ");
 }
 
-const char *sqlparser::_procedure="procedure";
+const char *sqlreparser::_procedure="procedure";
 
-bool sqlparser::parseSelectIntoTable(xmldomnode *currentnode,
+bool sqlreparser::parseSelectIntoTable(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3739,7 +3739,7 @@ bool sqlparser::parseSelectIntoTable(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::parseSelectIntoVariables(xmldomnode *currentnode,
+bool sqlreparser::parseSelectIntoVariables(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -3750,14 +3750,14 @@ bool sqlparser::parseSelectIntoVariables(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::selectIntoClause(const char *ptr, const char **newptr) {
+bool sqlreparser::selectIntoClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"into ");
 }
 
-const char *sqlparser::_select_into="select_into";
+const char *sqlreparser::_select_into="select_into";
 
-bool sqlparser::parseForUpdate(xmldomnode *currentnode,
+bool sqlreparser::parseForUpdate(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3768,14 +3768,14 @@ bool sqlparser::parseForUpdate(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::forUpdateClause(const char *ptr, const char **newptr) {
+bool sqlreparser::forUpdateClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"for update");
 }
 
-const char *sqlparser::_for_update="for_update";
+const char *sqlreparser::_for_update="for_update";
 
-bool sqlparser::parseUpdate(xmldomnode *currentnode,
+bool sqlreparser::parseUpdate(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -3895,14 +3895,14 @@ bool sqlparser::parseUpdate(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::updateClause(const char *ptr, const char **newptr) {
+bool sqlreparser::updateClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"update ");
 }
 
-const char *sqlparser::_update="update";
+const char *sqlreparser::_update="update";
 
-bool sqlparser::parseUpdateSet(xmldomnode *currentnode,
+bool sqlreparser::parseUpdateSet(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr,
 					bool required) {
@@ -3965,16 +3965,16 @@ bool sqlparser::parseUpdateSet(xmldomnode *currentnode,
 	}
 }
 
-bool sqlparser::updateSetClause(const char *ptr, const char **newptr) {
+bool sqlreparser::updateSetClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"set ");
 }
 
-const char *sqlparser::_update_set="update_set";
-const char *sqlparser::_assignment="assignment";
-const char *sqlparser::_equals="equals";
+const char *sqlreparser::_update_set="update_set";
+const char *sqlreparser::_assignment="assignment";
+const char *sqlreparser::_equals="equals";
 
-bool sqlparser::parseSet(xmldomnode *currentnode,
+bool sqlreparser::parseSet(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4003,14 +4003,14 @@ bool sqlparser::parseSet(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::setClause(const char *ptr, const char **newptr) {
+bool sqlreparser::setClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"set ");
 }
 
-const char *sqlparser::_set="set";
+const char *sqlreparser::_set="set";
 
-bool sqlparser::parseSetGlobal(xmldomnode *currentnode,
+bool sqlreparser::parseSetGlobal(xmldomnode *currentnode,
 				const char *ptr,
 				const char **newptr) {
 	if (!setGlobalClause(ptr,newptr)) {
@@ -4020,14 +4020,14 @@ bool sqlparser::parseSetGlobal(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::setGlobalClause(const char *ptr, const char **newptr) {
+bool sqlreparser::setGlobalClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"global ");
 }
 
-const char *sqlparser::_set_global="set_global";
+const char *sqlreparser::_set_global="set_global";
 
-bool sqlparser::parseSetSession(xmldomnode *currentnode,
+bool sqlreparser::parseSetSession(xmldomnode *currentnode,
 				const char *ptr,
 				const char **newptr) {
 	if (!setSessionClause(ptr,newptr)) {
@@ -4037,14 +4037,14 @@ bool sqlparser::parseSetSession(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::setSessionClause(const char *ptr, const char **newptr) {
+bool sqlreparser::setSessionClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"session ");
 }
 
-const char *sqlparser::_set_session="set_session";
+const char *sqlreparser::_set_session="set_session";
 
-bool sqlparser::parseTransaction(xmldomnode *currentnode,
+bool sqlreparser::parseTransaction(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4077,14 +4077,14 @@ bool sqlparser::parseTransaction(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::transactionClause(const char *ptr, const char **newptr) {
+bool sqlreparser::transactionClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"transaction ");
 }
 
-const char *sqlparser::_transaction="transaction";
+const char *sqlreparser::_transaction="transaction";
 
-bool sqlparser::parseIsolationLevel(xmldomnode *currentnode,
+bool sqlreparser::parseIsolationLevel(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4110,14 +4110,14 @@ bool sqlparser::parseIsolationLevel(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::isolationLevelClause(const char *ptr, const char **newptr) {
+bool sqlreparser::isolationLevelClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"isolation level ");
 }
 
-const char *sqlparser::_isolation_level="isolation_level";
+const char *sqlreparser::_isolation_level="isolation_level";
 
-bool sqlparser::isolationLevelOptionClause(const char *ptr,
+bool sqlreparser::isolationLevelOptionClause(const char *ptr,
 						const char **newptr) {
 	debugFunction();
 	const char *parts[]={
@@ -4146,7 +4146,7 @@ bool sqlparser::isolationLevelOptionClause(const char *ptr,
 	return comparePart(ptr,newptr,parts);
 }
 
-bool sqlparser::parseFrom(xmldomnode *currentnode,
+bool sqlreparser::parseFrom(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4162,14 +4162,14 @@ bool sqlparser::parseFrom(xmldomnode *currentnode,
 	return parseTableReferences(fromnode,*newptr,newptr);
 }
 
-bool sqlparser::fromClause(const char *ptr, const char **newptr) {
+bool sqlreparser::fromClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"from ");
 }
 
-const char *sqlparser::_from="from";
+const char *sqlreparser::_from="from";
 
-bool sqlparser::parseTableReferences(xmldomnode *currentnode,
+bool sqlreparser::parseTableReferences(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4217,9 +4217,9 @@ bool sqlparser::parseTableReferences(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_table_references="table_references";
+const char *sqlreparser::_table_references="table_references";
 
-bool sqlparser::parseTableReference(xmldomnode *currentnode,
+bool sqlreparser::parseTableReference(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4248,9 +4248,9 @@ bool sqlparser::parseTableReference(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_table_reference="table_reference";
+const char *sqlreparser::_table_reference="table_reference";
 
-bool sqlparser::parseJoin(xmldomnode *currentnode,
+bool sqlreparser::parseJoin(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4347,60 +4347,60 @@ bool sqlparser::parseJoin(xmldomnode *currentnode,
 		true;
 }
 
-const char *sqlparser::_join_clause="join_clause";
+const char *sqlreparser::_join_clause="join_clause";
 
-bool sqlparser::innerClause(const char *ptr, const char **newptr) {
+bool sqlreparser::innerClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"inner ");
 }
 
-const char *sqlparser::_inner="inner";
+const char *sqlreparser::_inner="inner";
 
-bool sqlparser::crossClause(const char *ptr, const char **newptr) {
+bool sqlreparser::crossClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"cross ");
 }
 
-const char *sqlparser::_cross="cross";
+const char *sqlreparser::_cross="cross";
 
-const char *sqlparser::_straight_join="straight_join";
+const char *sqlreparser::_straight_join="straight_join";
 
-bool sqlparser::leftClause(const char *ptr, const char **newptr) {
+bool sqlreparser::leftClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"left ");
 }
 
-const char *sqlparser::_left="left";
+const char *sqlreparser::_left="left";
 
-bool sqlparser::outerClause(const char *ptr, const char **newptr) {
+bool sqlreparser::outerClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"outer ");
 }
 
-const char *sqlparser::_right="right";
+const char *sqlreparser::_right="right";
 
-bool sqlparser::rightClause(const char *ptr, const char **newptr) {
+bool sqlreparser::rightClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"right ");
 }
 
-const char *sqlparser::_outer="outer";
+const char *sqlreparser::_outer="outer";
 
-bool sqlparser::naturalClause(const char *ptr, const char **newptr) {
+bool sqlreparser::naturalClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"natural ");
 }
 
-const char *sqlparser::_natural="natural";
+const char *sqlreparser::_natural="natural";
 
-bool sqlparser::joinClause(const char *ptr, const char **newptr) {
+bool sqlreparser::joinClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"join ");
 }
 
-const char *sqlparser::_join="join";
+const char *sqlreparser::_join="join";
 
-bool sqlparser::parseOn(xmldomnode *currentnode,
+bool sqlreparser::parseOn(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4416,14 +4416,14 @@ bool sqlparser::parseOn(xmldomnode *currentnode,
 	return parseWhereClauseTerms(onnode,*newptr,newptr);
 }
 
-bool sqlparser::onClause(const char *ptr, const char **newptr) {
+bool sqlreparser::onClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"on ");
 }
 
-const char *sqlparser::_on="on";
+const char *sqlreparser::_on="on";
 
-bool sqlparser::parseJoinUsing(xmldomnode *currentnode,
+bool sqlreparser::parseJoinUsing(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4445,14 +4445,14 @@ bool sqlparser::parseJoinUsing(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::joinUsingClause(const char *ptr, const char **newptr) {
+bool sqlreparser::joinUsingClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"using ");
 }
 
-const char *sqlparser::_join_using="join_using";
+const char *sqlreparser::_join_using="join_using";
 
-bool sqlparser::parseWhere(xmldomnode *currentnode,
+bool sqlreparser::parseWhere(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4469,14 +4469,14 @@ bool sqlparser::parseWhere(xmldomnode *currentnode,
 	return parseWhereClauseTerms(wherenode,*newptr,newptr);
 }
 
-bool sqlparser::whereClause(const char *ptr, const char **newptr) {
+bool sqlreparser::whereClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"where ");
 }
 
-const char *sqlparser::_where="where";
+const char *sqlreparser::_where="where";
 
-bool sqlparser::parseHaving(xmldomnode *currentnode,
+bool sqlreparser::parseHaving(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4493,14 +4493,14 @@ bool sqlparser::parseHaving(xmldomnode *currentnode,
 	return parseWhereClauseTerms(havingnode,*newptr,newptr);
 }
 
-bool sqlparser::havingClause(const char *ptr, const char **newptr) {
+bool sqlreparser::havingClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"having ");
 }
 
-const char *sqlparser::_having="having";
+const char *sqlreparser::_having="having";
 
-bool sqlparser::parseWhereClauseTerms(xmldomnode *currentnode,
+bool sqlreparser::parseWhereClauseTerms(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -4530,7 +4530,7 @@ bool sqlparser::parseWhereClauseTerms(xmldomnode *currentnode,
 	}
 }
 
-bool sqlparser::parseAnd(xmldomnode *currentnode,
+bool sqlreparser::parseAnd(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4541,14 +4541,14 @@ bool sqlparser::parseAnd(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::andClause(const char *ptr, const char **newptr) {
+bool sqlreparser::andClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"and ");
 }
 
-const char *sqlparser::_and="and";
+const char *sqlreparser::_and="and";
 
-bool sqlparser::parseOr(xmldomnode *currentnode,
+bool sqlreparser::parseOr(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4559,14 +4559,14 @@ bool sqlparser::parseOr(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::orClause(const char *ptr, const char **newptr) {
+bool sqlreparser::orClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"or ");
 }
 
-const char *sqlparser::_or="or";
+const char *sqlreparser::_or="or";
 
-bool sqlparser::parseWhereClauseTerm(xmldomnode *currentnode,
+bool sqlreparser::parseWhereClauseTerm(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4602,9 +4602,9 @@ bool sqlparser::parseWhereClauseTerm(xmldomnode *currentnode,
 	return false;
 }
 
-const char *sqlparser::_group="group";
+const char *sqlreparser::_group="group";
 
-bool sqlparser::parseComparison(xmldomnode *currentnode,
+bool sqlreparser::parseComparison(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr,
 					bool checkforgroup) {
@@ -4707,16 +4707,16 @@ bool sqlparser::parseComparison(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_comparison="comparison";
+const char *sqlreparser::_comparison="comparison";
 
-bool sqlparser::notClause(const char *ptr, const char **newptr) {
+bool sqlreparser::notClause(const char *ptr, const char **newptr) {
         debugFunction();
         return comparePart(ptr,newptr,"not ");
 }                                   
 
-const char *sqlparser::_not="not";
+const char *sqlreparser::_not="not";
 
-bool sqlparser::parseBetween(xmldomnode *currentnode,
+bool sqlreparser::parseBetween(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4748,14 +4748,14 @@ bool sqlparser::parseBetween(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::betweenClause(const char *ptr, const char **newptr) {
+bool sqlreparser::betweenClause(const char *ptr, const char **newptr) {
         debugFunction();
         return comparePart(ptr,newptr,"between ");
 }                                   
 
-const char *sqlparser::_between="between";
+const char *sqlreparser::_between="between";
 
-bool sqlparser::parseIn(xmldomnode *currentnode,
+bool sqlreparser::parseIn(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4793,14 +4793,14 @@ bool sqlparser::parseIn(xmldomnode *currentnode,
 	return false;
 }
 
-bool sqlparser::inClause(const char *ptr, const char **newptr) {
+bool sqlreparser::inClause(const char *ptr, const char **newptr) {
         debugFunction();
         return comparePart(ptr,newptr,"in ");
 }                                   
 
-const char *sqlparser::_in="in";
+const char *sqlreparser::_in="in";
 
-bool sqlparser::parseInSet(xmldomnode *currentnode,
+bool sqlreparser::parseInSet(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4831,9 +4831,9 @@ bool sqlparser::parseInSet(xmldomnode *currentnode,
 	}
 }
 
-const char *sqlparser::_in_set_item="in_set_item";
+const char *sqlreparser::_in_set_item="in_set_item";
 
-bool sqlparser::parseExists(xmldomnode *currentnode,
+bool sqlreparser::parseExists(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4870,14 +4870,14 @@ bool sqlparser::parseExists(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::existsClause(const char *ptr, const char **newptr) {
+bool sqlreparser::existsClause(const char *ptr, const char **newptr) {
         debugFunction();
         return comparePart(ptr,newptr,"exists");
 }                                   
 
-const char *sqlparser::_exists="exists";
+const char *sqlreparser::_exists="exists";
 
-bool sqlparser::parseIs(xmldomnode *currentnode,
+bool sqlreparser::parseIs(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4888,14 +4888,14 @@ bool sqlparser::parseIs(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::is(const char *ptr, const char **newptr) {
+bool sqlreparser::is(const char *ptr, const char **newptr) {
         debugFunction();
         return comparePart(ptr,newptr,"is ");
 }                                   
 
-const char *sqlparser::_is="is";
+const char *sqlreparser::_is="is";
 
-bool sqlparser::parseLike(xmldomnode *currentnode,
+bool sqlreparser::parseLike(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4906,14 +4906,14 @@ bool sqlparser::parseLike(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::like(const char *ptr, const char **newptr) {
+bool sqlreparser::like(const char *ptr, const char **newptr) {
         debugFunction();
         return comparePart(ptr,newptr,"like ");
 }                                   
 
-const char *sqlparser::_like="like";
+const char *sqlreparser::_like="like";
 
-bool sqlparser::parseMatches(xmldomnode *currentnode,
+bool sqlreparser::parseMatches(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4924,14 +4924,14 @@ bool sqlparser::parseMatches(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::matches(const char *ptr, const char **newptr) {
+bool sqlreparser::matches(const char *ptr, const char **newptr) {
         debugFunction();
         return comparePart(ptr,newptr,"matches ");
 }                                   
 
-const char *sqlparser::_matches="matches";
+const char *sqlreparser::_matches="matches";
 
-bool sqlparser::parseNullSafeEquals(xmldomnode *currentnode,
+bool sqlreparser::parseNullSafeEquals(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4942,14 +4942,14 @@ bool sqlparser::parseNullSafeEquals(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::nullSafeEquals(const char *ptr, const char **newptr) {
+bool sqlreparser::nullSafeEquals(const char *ptr, const char **newptr) {
         debugFunction();
         return comparePart(ptr,newptr,"<=>");
 }                                   
 
-const char *sqlparser::_null_safe_equals="null_safe_equals";
+const char *sqlreparser::_null_safe_equals="null_safe_equals";
 
-bool sqlparser::parseEquals(xmldomnode *currentnode,
+bool sqlreparser::parseEquals(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4960,7 +4960,7 @@ bool sqlparser::parseEquals(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::parseNotEquals(xmldomnode *currentnode,
+bool sqlreparser::parseNotEquals(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4971,9 +4971,9 @@ bool sqlparser::parseNotEquals(xmldomnode *currentnode,
 	return true;
 }
                    
-const char *sqlparser::_not_equals="notequals";
+const char *sqlreparser::_not_equals="notequals";
 
-bool sqlparser::parseLessThan(xmldomnode *currentnode,
+bool sqlreparser::parseLessThan(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4984,9 +4984,9 @@ bool sqlparser::parseLessThan(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_less_than="lessthan";
+const char *sqlreparser::_less_than="lessthan";
 
-bool sqlparser::parseGreaterThan(xmldomnode *currentnode,
+bool sqlreparser::parseGreaterThan(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -4997,9 +4997,9 @@ bool sqlparser::parseGreaterThan(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_greater_than="greaterthan";
+const char *sqlreparser::_greater_than="greaterthan";
 
-bool sqlparser::parseLessThanOrEqualTo(xmldomnode *currentnode,
+bool sqlreparser::parseLessThanOrEqualTo(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5010,9 +5010,9 @@ bool sqlparser::parseLessThanOrEqualTo(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_less_than_or_equal_to="lessthanorequalto";
+const char *sqlreparser::_less_than_or_equal_to="lessthanorequalto";
 
-bool sqlparser::parseGreaterThanOrEqualTo(xmldomnode *currentnode,
+bool sqlreparser::parseGreaterThanOrEqualTo(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5023,9 +5023,9 @@ bool sqlparser::parseGreaterThanOrEqualTo(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_greater_than_or_equal_to="greaterthanorequalto";
+const char *sqlreparser::_greater_than_or_equal_to="greaterthanorequalto";
 
-bool sqlparser::parseEscape(xmldomnode *currentnode,
+bool sqlreparser::parseEscape(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5036,21 +5036,21 @@ bool sqlparser::parseEscape(xmldomnode *currentnode,
 	return parseTerm(currentnode,*newptr,newptr);
 }
 
-bool sqlparser::escape(const char *ptr, const char **newptr) {
+bool sqlreparser::escape(const char *ptr, const char **newptr) {
         debugFunction();
         return comparePart(ptr,newptr,"escape ");
 }                                   
 
-const char *sqlparser::_escape="escape";
+const char *sqlreparser::_escape="escape";
 
-bool sqlparser::parseExpression(xmldomnode *currentnode,
+bool sqlreparser::parseExpression(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
 	return parseExpression(currentnode,ptr,newptr,false);
 }
 
-bool sqlparser::parseExpression(xmldomnode *currentnode,
+bool sqlreparser::parseExpression(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr,
 					bool ingroup) {
@@ -5119,9 +5119,9 @@ bool sqlparser::parseExpression(xmldomnode *currentnode,
 	}
 }
 
-const char *sqlparser::_expression="expression";
+const char *sqlreparser::_expression="expression";
 
-bool sqlparser::parseUnaryOperator(xmldomnode *currentnode,
+bool sqlreparser::parseUnaryOperator(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5132,7 +5132,7 @@ bool sqlparser::parseUnaryOperator(xmldomnode *currentnode,
 		parseNegative(currentnode,ptr,newptr));
 }
 
-bool sqlparser::parseNot(xmldomnode *currentnode,
+bool sqlreparser::parseNot(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5143,7 +5143,7 @@ bool sqlparser::parseNot(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::parseCompliment(xmldomnode *currentnode,
+bool sqlreparser::parseCompliment(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5154,9 +5154,9 @@ bool sqlparser::parseCompliment(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_compliment="compliment";
+const char *sqlreparser::_compliment="compliment";
 
-bool sqlparser::parseInverse(xmldomnode *currentnode,
+bool sqlreparser::parseInverse(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5167,9 +5167,9 @@ bool sqlparser::parseInverse(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_inverse="inverse";
+const char *sqlreparser::_inverse="inverse";
 
-bool sqlparser::parseNegative(xmldomnode *currentnode,
+bool sqlreparser::parseNegative(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5180,9 +5180,9 @@ bool sqlparser::parseNegative(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_negative="negative";
+const char *sqlreparser::_negative="negative";
 
-bool sqlparser::parseBinaryOperator(xmldomnode *currentnode,
+bool sqlreparser::parseBinaryOperator(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5198,7 +5198,7 @@ bool sqlparser::parseBinaryOperator(xmldomnode *currentnode,
 		parseBitwiseXor(currentnode,ptr,newptr));
 }
 
-bool sqlparser::parseTimes(xmldomnode *currentnode,
+bool sqlreparser::parseTimes(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5209,9 +5209,9 @@ bool sqlparser::parseTimes(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_times="times";
+const char *sqlreparser::_times="times";
 
-bool sqlparser::parseDividedBy(xmldomnode *currentnode,
+bool sqlreparser::parseDividedBy(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5222,9 +5222,9 @@ bool sqlparser::parseDividedBy(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_divided_by="divided_by";
+const char *sqlreparser::_divided_by="divided_by";
 
-bool sqlparser::parseModulo(xmldomnode *currentnode,
+bool sqlreparser::parseModulo(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5235,9 +5235,9 @@ bool sqlparser::parseModulo(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_modulo="modulo";
+const char *sqlreparser::_modulo="modulo";
 
-bool sqlparser::parsePlus(xmldomnode *currentnode,
+bool sqlreparser::parsePlus(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5248,9 +5248,9 @@ bool sqlparser::parsePlus(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_plus="plus";
+const char *sqlreparser::_plus="plus";
 
-bool sqlparser::parseMinus(xmldomnode *currentnode,
+bool sqlreparser::parseMinus(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5261,9 +5261,9 @@ bool sqlparser::parseMinus(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_minus="minus";
+const char *sqlreparser::_minus="minus";
 
-bool sqlparser::parseLogicalAnd(xmldomnode *currentnode,
+bool sqlreparser::parseLogicalAnd(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5274,9 +5274,9 @@ bool sqlparser::parseLogicalAnd(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_logical_and="logical_and";
+const char *sqlreparser::_logical_and="logical_and";
 
-bool sqlparser::parseLogicalOr(xmldomnode *currentnode,
+bool sqlreparser::parseLogicalOr(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5287,9 +5287,9 @@ bool sqlparser::parseLogicalOr(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_logical_or="logical_or";
+const char *sqlreparser::_logical_or="logical_or";
 
-bool sqlparser::parseBitwiseAnd(xmldomnode *currentnode,
+bool sqlreparser::parseBitwiseAnd(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5300,9 +5300,9 @@ bool sqlparser::parseBitwiseAnd(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_bitwise_and="bitwise_and";
+const char *sqlreparser::_bitwise_and="bitwise_and";
 
-bool sqlparser::parseBitwiseOr(xmldomnode *currentnode,
+bool sqlreparser::parseBitwiseOr(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5313,9 +5313,9 @@ bool sqlparser::parseBitwiseOr(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_bitwise_or="bitwise_or";
+const char *sqlreparser::_bitwise_or="bitwise_or";
 
-bool sqlparser::parseBitwiseXor(xmldomnode *currentnode,
+bool sqlreparser::parseBitwiseXor(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5326,9 +5326,9 @@ bool sqlparser::parseBitwiseXor(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_bitwise_xor="bitwise_xor";
+const char *sqlreparser::_bitwise_xor="bitwise_xor";
 
-bool sqlparser::parseTerm(xmldomnode *currentnode,
+bool sqlreparser::parseTerm(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5397,11 +5397,11 @@ bool sqlparser::parseTerm(xmldomnode *currentnode,
 	return retval;
 }
 
-const char *sqlparser::_number="number";
-const char *sqlparser::_string_literal="string_literal";
-const char *sqlparser::_bind_variable="bind_variable";
+const char *sqlreparser::_number="number";
+const char *sqlreparser::_string_literal="string_literal";
+const char *sqlreparser::_bind_variable="bind_variable";
 
-bool sqlparser::parseIntervalQualifier(xmldomnode *currentnode,
+bool sqlreparser::parseIntervalQualifier(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5440,23 +5440,23 @@ bool sqlparser::parseIntervalQualifier(xmldomnode *currentnode,
 	return retval;
 }
 
-const char *sqlparser::_interval_qualifier="interval_qualifier";
+const char *sqlreparser::_interval_qualifier="interval_qualifier";
 
-bool sqlparser::parseTo(xmldomnode *currentnode,
+bool sqlreparser::parseTo(xmldomnode *currentnode,
 				const char *ptr,
 				const char **newptr) {
 	debugFunction();
 	return toClause(ptr,newptr);
 }
 
-bool sqlparser::toClause(const char *ptr, const char **newptr) {
+bool sqlreparser::toClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"to ");
 }
 
-const char *sqlparser::_to="to";
+const char *sqlreparser::_to="to";
 
-bool sqlparser::parseTimeComponent(xmldomnode *currentnode,
+bool sqlreparser::parseTimeComponent(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr,
 					const char *timecomponent,
@@ -5514,12 +5514,12 @@ bool sqlparser::parseTimeComponent(xmldomnode *currentnode,
 	return rightParen(*newptr,newptr);
 }
 
-const char *sqlparser::_from_precision="fromprecision";
-const char *sqlparser::_from_scale="fromscale";
-const char *sqlparser::_to_precision="toprecision";
-const char *sqlparser::_to_scale="toscale";
+const char *sqlreparser::_from_precision="fromprecision";
+const char *sqlreparser::_from_scale="fromscale";
+const char *sqlreparser::_to_precision="toprecision";
+const char *sqlreparser::_to_scale="toscale";
 
-bool sqlparser::parseUnquotedLiteral(xmldomnode *currentnode,
+bool sqlreparser::parseUnquotedLiteral(xmldomnode *currentnode,
 						const char *ptr,
 						const char **newptr) {
 	debugFunction();
@@ -5538,13 +5538,13 @@ bool sqlparser::parseUnquotedLiteral(xmldomnode *currentnode,
 
 	// add a new node containing the unqouted literal
 	newNode(currentnode,
-		sqlparser::_string_literal,
+		sqlreparser::_string_literal,
 		unqoutedliteral.getString());
 
 	return true;
 }
 
-bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
+bool sqlreparser::parseColumnOrFunction(xmldomnode *currentnode,
 						const char *name,
 						const char *ptr,
 						const char **newptr) {
@@ -5649,10 +5649,10 @@ bool sqlparser::parseColumnOrFunction(xmldomnode *currentnode,
 	return true;
 }
 
-const char *sqlparser::_column_reference="column_reference";
-const char *sqlparser::_function="function";
-const char *sqlparser::_parameters="parameters";
-const char *sqlparser::_parameter="parameter";
+const char *sqlreparser::_column_reference="column_reference";
+const char *sqlreparser::_function="function";
+const char *sqlreparser::_parameters="parameters";
+const char *sqlreparser::_parameter="parameter";
 
 static const char *defaultspecialfunctionnames[]={
 	// date functions
@@ -5666,7 +5666,7 @@ static const char *defaultspecialfunctionnames[]={
 	NULL
 };
 
-bool sqlparser::specialFunctionName(const char *name) {
+bool sqlreparser::specialFunctionName(const char *name) {
 
 	const char * const	*names=defaultspecialfunctionnames;
 	for (uint64_t i=0; names[i]; i++) {
@@ -5677,7 +5677,7 @@ bool sqlparser::specialFunctionName(const char *name) {
 	return false;
 }
 
-void sqlparser::splitColumnName(xmldomnode *currentnode, const char *name) {
+void sqlreparser::splitColumnName(xmldomnode *currentnode, const char *name) {
 
 	// split the name
 	char		**parts;
@@ -5734,12 +5734,12 @@ void sqlparser::splitColumnName(xmldomnode *currentnode, const char *name) {
 	delete[] parts;
 }
 
-const char *sqlparser::_column_name_database="column_name_database";
-const char *sqlparser::_column_name_schema="column_name_schema";
-const char *sqlparser::_column_name_table="column_name_table";
-const char *sqlparser::_column_name_column="column_name_column";
+const char *sqlreparser::_column_name_database="column_name_database";
+const char *sqlreparser::_column_name_schema="column_name_schema";
+const char *sqlreparser::_column_name_table="column_name_table";
+const char *sqlreparser::_column_name_column="column_name_column";
 
-bool sqlparser::parseOuterJoinOperator(xmldomnode *currentnode,
+bool sqlreparser::parseOuterJoinOperator(xmldomnode *currentnode,
 					const char *ptr, const char **newptr) {
 	debugFunction();
 	if (!outerJoinOperatorClause(ptr,newptr)) {
@@ -5749,7 +5749,7 @@ bool sqlparser::parseOuterJoinOperator(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::outerJoinOperatorClause(const char *ptr, const char **newptr) {
+bool sqlreparser::outerJoinOperatorClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	const char	*start=ptr;
 	if (!(leftParen(ptr,newptr) &&
@@ -5761,9 +5761,9 @@ bool sqlparser::outerJoinOperatorClause(const char *ptr, const char **newptr) {
 	return true;
 }
 
-const char *sqlparser::_outer_join_operator="outer_join_operator";
+const char *sqlreparser::_outer_join_operator="outer_join_operator";
 
-bool sqlparser::parseLock(xmldomnode *currentnode,
+bool sqlreparser::parseLock(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5822,16 +5822,16 @@ bool sqlparser::parseLock(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::lockClause(const char *ptr, const char **newptr) {
+bool sqlreparser::lockClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"lock ");
 }
 
-const char *sqlparser::_lock="lock";
+const char *sqlreparser::_lock="lock";
 
-const char *sqlparser::_in_mode="in_mode";
+const char *sqlreparser::_in_mode="in_mode";
 
-bool sqlparser::parseLockMode(xmldomnode *currentnode,
+bool sqlreparser::parseLockMode(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5851,7 +5851,7 @@ bool sqlparser::parseLockMode(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::lockModeClause(const char *ptr, const char **newptr) {
+bool sqlreparser::lockModeClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	const char	*parts[]={
 		"row share",
@@ -5866,9 +5866,9 @@ bool sqlparser::lockModeClause(const char *ptr, const char **newptr) {
 	return comparePart(ptr,newptr,parts);
 }
 
-const char *sqlparser::_lock_mode="lock_mode";
+const char *sqlreparser::_lock_mode="lock_mode";
 
-bool sqlparser::parseMode(xmldomnode *currentnode,
+bool sqlreparser::parseMode(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5879,14 +5879,14 @@ bool sqlparser::parseMode(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::modeClause(const char *ptr, const char **newptr) {
+bool sqlreparser::modeClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"mode");
 }
 
-const char *sqlparser::_mode="mode";
+const char *sqlreparser::_mode="mode";
 
-bool sqlparser::parseNoWait(xmldomnode *currentnode,
+bool sqlreparser::parseNoWait(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 	debugFunction();
@@ -5897,14 +5897,14 @@ bool sqlparser::parseNoWait(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::noWaitClause(const char *ptr, const char **newptr) {
+bool sqlreparser::noWaitClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"nowait");
 }
 
-const char *sqlparser::_nowait="nowait";
+const char *sqlreparser::_nowait="nowait";
 
-bool sqlparser::parseShow(xmldomnode *currentnode,
+bool sqlreparser::parseShow(xmldomnode *currentnode,
 					const char *ptr,
 					const char **newptr) {
 
@@ -5929,19 +5929,19 @@ bool sqlparser::parseShow(xmldomnode *currentnode,
 	return true;
 }
 
-bool sqlparser::showClause(const char *ptr, const char **newptr) {
+bool sqlreparser::showClause(const char *ptr, const char **newptr) {
 	debugFunction();
 	return comparePart(ptr,newptr,"show ");
 }
 
-const char *sqlparser::_show="show";
+const char *sqlreparser::_show="show";
 
-bool sqlparser::write(stringbuffer *output) {
+bool sqlreparser::write(stringbuffer *output) {
 	debugFunction();
 	return write(tree->getRootNode()->getFirstTagChild(),output,false);
 }
 
-bool sqlparser::write(xmldomnode *node,
+bool sqlreparser::write(xmldomnode *node,
 				stringbuffer *output,
 				bool omitsiblings) {
 	debugFunction();
@@ -5956,7 +5956,7 @@ bool sqlparser::write(xmldomnode *node,
 	return true;
 }
 
-bool sqlparser::write(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::write(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 
 	// handle the element
@@ -5991,7 +5991,7 @@ bool sqlparser::write(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::handleStart(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::handleStart(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 
 	if (!charstring::compare(
@@ -6562,7 +6562,7 @@ bool sqlparser::handleStart(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::handleEnd(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::handleEnd(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 
 	if (!charstring::compare(
@@ -6659,102 +6659,102 @@ bool sqlparser::handleEnd(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::outputValue(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::outputValue(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append(node->getAttributeValue(_value));
 	return true;
 }
 
-bool sqlparser::space(stringbuffer *output) {
+bool sqlreparser::space(stringbuffer *output) {
 	debugFunction();
 	output->append(" ");
 	return true;
 }
 
-bool sqlparser::comma(stringbuffer *output) {
+bool sqlreparser::comma(stringbuffer *output) {
 	debugFunction();
 	output->append(",");
 	return true;
 }
 
-bool sqlparser::period(stringbuffer *output) {
+bool sqlreparser::period(stringbuffer *output) {
 	debugFunction();
 	output->append(".");
 	return true;
 }
 
-bool sqlparser::leftParen(stringbuffer *output) {
+bool sqlreparser::leftParen(stringbuffer *output) {
 	debugFunction();
 	output->append("(");
 	return true;
 }
 
-bool sqlparser::rightParen(stringbuffer *output) {
+bool sqlreparser::rightParen(stringbuffer *output) {
 	debugFunction();
 	output->append(")");
 	return true;
 }
 
-bool sqlparser::hasSibling(xmldomnode *node) {
+bool sqlreparser::hasSibling(xmldomnode *node) {
 	debugFunction();
 	return !node->getNextTagSibling()->isNullNode();
 }
 
-bool sqlparser::dontAppendSpace(stringbuffer *output) {
+bool sqlreparser::dontAppendSpace(stringbuffer *output) {
 	debugFunction();
 	size_t	length=output->getStringLength();
 	return (length &&
 		character::inSet(output->getString()[length-1]," .(,"));
 }
 
-bool sqlparser::createQuery(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::createQuery(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("create");
 	return true;
 }
 
-bool sqlparser::table(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::table(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("table");
 	return true;
 }
 
-bool sqlparser::global(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::global(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("global");
 	return true;
 }
 
-bool sqlparser::temporary(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::temporary(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("temporary");
 	return true;
 }
 
-bool sqlparser::ifNotExists(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::ifNotExists(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("if not exists");
 	return true;
 }
 
-bool sqlparser::columns(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::columns(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	leftParen(output);
 	return true;
 }
 
-bool sqlparser::endColumns(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endColumns(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	rightParen(output);
 	return true;
 }
 
-bool sqlparser::column(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::column(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;
 }
 
-bool sqlparser::endColumn(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endColumn(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	if (hasSibling(node)) {
 		comma(output);
@@ -6762,178 +6762,178 @@ bool sqlparser::endColumn(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::values(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::values(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	leftParen(output);
 	return true;
 }
 
-bool sqlparser::endValues(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endValues(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	rightParen(output);
 	return true;
 }
 
-bool sqlparser::length(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::length(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::scale(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::scale(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	comma(output);
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::constraints(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::constraints(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;
 }
 
-bool sqlparser::unsignedConstraint(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::unsignedConstraint(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("unsigned");
 	return true;
 }
 
-bool sqlparser::zerofill(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::zerofill(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("zerofill");
 	return true;
 }
 
-bool sqlparser::binary(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::binary(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("binary");
 	return true;
 }
 
-bool sqlparser::characterSet(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::characterSet(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("character set ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::collate(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::collate(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("collate ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::nullable(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::nullable(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("null");
 	return true;
 }
 
-bool sqlparser::notNull(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::notNull(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("not null");
 	return true;
 }
 
-bool sqlparser::defaultValue(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::defaultValue(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("default ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::autoIncrement(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::autoIncrement(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("auto_increment");
 	return true;
 }
 
-bool sqlparser::identity(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::identity(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("identity");
 	return true;
 }
 
-bool sqlparser::uniqueKey(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::uniqueKey(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("unique key");
 	return true;
 }
 
-bool sqlparser::primaryKey(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::primaryKey(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("primary key");
 	return true;
 }
 
-bool sqlparser::key(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::key(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("key");
 	return true;
 }
 
-bool sqlparser::comment(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::comment(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("comment ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::columnFormat(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::columnFormat(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("column_format ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::references(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::references(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("references ");
 	return true;
 }
 
-bool sqlparser::endReferences(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endReferences(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;
 }
 
-bool sqlparser::match(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::match(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("match ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::onDelete(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::onDelete(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("on delete ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::onUpdate(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::onUpdate(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("on update ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::onCommit(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::onCommit(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("on commit ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::as(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::as(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("as ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::constraint(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::constraint(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	const char	*name=node->getAttributeValue("value");
 	if (name) {
@@ -6942,54 +6942,54 @@ bool sqlparser::constraint(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::foreignKey(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::foreignKey(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("foreign key ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::check(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::check(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("check (");
 	return true;
 }
 
-bool sqlparser::endCheck(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endCheck(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append(")");
 	return true;
 }
 
-bool sqlparser::withNoLog(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::withNoLog(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("with no log ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::fulltext(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::fulltext(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("fulltext ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::spatial(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::spatial(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("spatial ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::index(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::index(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("index ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::indexNameDatabase(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::indexNameDatabase(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	if (hasSibling(node)) {
@@ -6998,7 +6998,7 @@ bool sqlparser::indexNameDatabase(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::indexNameSchema(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::indexNameSchema(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	if (hasSibling(node)) {
@@ -7007,27 +7007,27 @@ bool sqlparser::indexNameSchema(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::indexNameIndex(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::indexNameIndex(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::btree(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::btree(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("btree ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::hash(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::hash(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("hash ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::keyBlockSize(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::keyBlockSize(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("key_block_size");
 	if (!charstring::compare(node->getAttributeValue("equals"),"true")) {
@@ -7039,26 +7039,26 @@ bool sqlparser::keyBlockSize(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::withParser(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::withParser(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("with parser ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::synonym(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::synonym(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("synonym ");
 	return true;
 }
 
-bool sqlparser::forClause(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::forClause(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("for ");
 	return true;
 }
 
-bool sqlparser::objectNameDatabase(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::objectNameDatabase(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	if (hasSibling(node)) {
@@ -7067,7 +7067,7 @@ bool sqlparser::objectNameDatabase(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::objectNameSchema(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::objectNameSchema(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	if (hasSibling(node)) {
@@ -7076,43 +7076,43 @@ bool sqlparser::objectNameSchema(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::objectNameObject(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::objectNameObject(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::deleteQuery(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::deleteQuery(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("delete");
 	return true;
 }
 
-bool sqlparser::deleteFrom(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::deleteFrom(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("from");
 	return true;
 }
 
-bool sqlparser::usingClause(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::usingClause(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("using");
 	return true;
 }
 
-bool sqlparser::dropQuery(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::dropQuery(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("drop");
 	return true;
 }
 
-bool sqlparser::ifExists(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::ifExists(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("if exists");
 	return true;
 }
 
-bool sqlparser::endTableNameListItem(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endTableNameListItem(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	if (!node->getNextSibling()->isNullNode()) {
 		comma(output);
@@ -7120,26 +7120,26 @@ bool sqlparser::endTableNameListItem(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::restrictClause(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::restrictClause(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("restrict");
 	return true;
 }
 
-bool sqlparser::cascade(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::cascade(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("cascade");
 	return true;
 }
 
-bool sqlparser::cascadeConstraintsClause(xmldomnode *node,
+bool sqlreparser::cascadeConstraintsClause(xmldomnode *node,
 						stringbuffer *output) {
 	debugFunction();
 	output->append("constraints");
 	return true;
 }
 
-bool sqlparser::tableNameDatabase(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::tableNameDatabase(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	if (hasSibling(node)) {
@@ -7148,7 +7148,7 @@ bool sqlparser::tableNameDatabase(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::tableNameSchema(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::tableNameSchema(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	if (hasSibling(node)) {
@@ -7157,42 +7157,42 @@ bool sqlparser::tableNameSchema(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::tableNameTable(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::tableNameTable(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::name(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::name(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::type(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::type(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::endType(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endType(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;
 }
 
-bool sqlparser::size(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::size(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	leftParen(output);
 	return true;
 }
 
-bool sqlparser::endSize(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endSize(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	rightParen(output);
 	return true;
 }
 
-bool sqlparser::value(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::value(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	if (hasSibling(node)) {
@@ -7201,54 +7201,54 @@ bool sqlparser::value(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::verbatim(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::verbatim(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::insertQuery(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::insertQuery(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("insert");
 	return true;
 }
 
-bool sqlparser::insertInto(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::insertInto(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("into");
 	return true;
 }
 
-bool sqlparser::insertValuesClause(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::insertValuesClause(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("values (");
 	return true;
 }
 
-bool sqlparser::insertValueClause(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::insertValueClause(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("value (");
 	return true;
 }
 
-bool sqlparser::insertValue(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::insertValue(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;
 }
 
-bool sqlparser::endInsertValuesClause(xmldomnode *node, stringbuffer *output) {
-	debugFunction();
-	output->append(")");
-	return true;
-}
-
-bool sqlparser::endInsertValueClause(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endInsertValuesClause(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append(")");
 	return true;
 }
 
-bool sqlparser::endInsertValue(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endInsertValueClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	output->append(")");
+	return true;
+}
+
+bool sqlreparser::endInsertValue(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	if (hasSibling(node)) {
 		comma(output);
@@ -7256,23 +7256,23 @@ bool sqlparser::endInsertValue(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::selectQuery(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::selectQuery(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("select");
 	return true;
 }
 
-bool sqlparser::selectExpressions(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::selectExpressions(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;
 }
 
-bool sqlparser::selectExpression(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::selectExpression(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;
 }
 
-bool sqlparser::endSelectExpression(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endSelectExpression(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	if (hasSibling(node)) {
 		comma(output);
@@ -7280,81 +7280,65 @@ bool sqlparser::endSelectExpression(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::subSelect(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::subSelect(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	leftParen(output);
 	return true;
 }
 
-bool sqlparser::endSubSelect(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endSubSelect(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	rightParen(output);
 	return true;
 }
 
-bool sqlparser::unionClause(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::unionClause(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("union");
 	return true;
 }
 
-bool sqlparser::all(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::all(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("all");
 	return true;
 }
 
-bool sqlparser::alias(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::alias(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::unique(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::unique(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("unique");
 	return true;
 }
 
-bool sqlparser::distinct(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::distinct(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("distinct");
 	return true;
 }
 
-bool sqlparser::from(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::from(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("from");
 	return true;
 }
 
-bool sqlparser::tableReferences(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::tableReferences(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;
 }
 
-bool sqlparser::tableReference(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::tableReference(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;
 }
 
-bool sqlparser::endTableReference(xmldomnode *node, stringbuffer *output) {
-	debugFunction();
-	// write a comma if the next node isn't a join clause
-	xmldomnode	*next=node->getNextTagSibling();
-	if (!next->isNullNode() &&
-		charstring::compare(next->getName(),_join_clause)) {
-		comma(output);
-	}
-	return true;
-}
-
-bool sqlparser::joinClause(xmldomnode *node, stringbuffer *output) {
-	debugFunction();
-	return true;
-}
-
-bool sqlparser::endJoinClause(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endTableReference(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	// write a comma if the next node isn't a join clause
 	xmldomnode	*next=node->getNextTagSibling();
@@ -7365,78 +7349,94 @@ bool sqlparser::endJoinClause(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::inner(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::joinClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	return true;
+}
+
+bool sqlreparser::endJoinClause(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	// write a comma if the next node isn't a join clause
+	xmldomnode	*next=node->getNextTagSibling();
+	if (!next->isNullNode() &&
+		charstring::compare(next->getName(),_join_clause)) {
+		comma(output);
+	}
+	return true;
+}
+
+bool sqlreparser::inner(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("inner");
 	return true;
 }
 
-bool sqlparser::cross(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::cross(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("cross");
 	return true;
 }
 
-bool sqlparser::straightJoin(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::straightJoin(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("straight_join");
 	return true;
 }
 
-bool sqlparser::left(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::left(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("left");
 	return true;
 }
 
-bool sqlparser::right(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::right(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("right");
 	return true;
 }
 
-bool sqlparser::outer(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::outer(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("outer");
 	return true;
 }
 
-bool sqlparser::natural(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::natural(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("natural");
 	return true;
 }
 
-bool sqlparser::join(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::join(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("join");
 	return true;
 }
 
-bool sqlparser::on(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::on(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("on");
 	return true;
 }
 
-bool sqlparser::joinUsing(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::joinUsing(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("using");
 	return true;
 }
 
-bool sqlparser::groupBy(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::groupBy(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("group by");
 	return true;
 }
 
-bool sqlparser::groupByItem(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::groupByItem(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;
 }
 
-bool sqlparser::endGroupByItem(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endGroupByItem(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	// write a comma if the next node is another group-by-item
 	xmldomnode	*next=node->getNextTagSibling();
@@ -7447,30 +7447,30 @@ bool sqlparser::endGroupByItem(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::withRollup(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::withRollup(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("with rollup");
 	return true;
 }
 
-bool sqlparser::having(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::having(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("having");
 	return true;
 }
 
-bool sqlparser::orderBy(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::orderBy(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("order by");
 	return true;
 }
 
-bool sqlparser::orderByItem(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::orderByItem(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;
 }
 
-bool sqlparser::endOrderByItem(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endOrderByItem(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	if (hasSibling(node)) {
 		comma(output);
@@ -7478,108 +7478,108 @@ bool sqlparser::endOrderByItem(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::asc(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::asc(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("asc");
 	return true;
 }
 
-bool sqlparser::desc(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::desc(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("desc");
 	return true;
 }
 
-bool sqlparser::limit(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::limit(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("limit");
 	return true;
 }
 
-bool sqlparser::selectInto(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::selectInto(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("into");
 	return true;
 }
 
-bool sqlparser::procedure(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::procedure(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("procedure");
 	return true;
 }
 
-bool sqlparser::forUpdate(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::forUpdate(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("for update");
 	return true;
 }
 
-bool sqlparser::where(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::where(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("where");
 	return true;
 }
 
-bool sqlparser::andClause(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::andClause(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("and");
 	return true;
 }
 
-bool sqlparser::orClause(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::orClause(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("or");
 	return true;
 }
 
-bool sqlparser::comparison(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::comparison(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;
 }
 
-bool sqlparser::notClause(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::notClause(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("not");
 	return true;
 }
 
-bool sqlparser::group(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::group(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("(");
 	return true;
 }
 
-bool sqlparser::endGroup(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endGroup(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append(")");
 	return true;
 }
 
-bool sqlparser::between(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::between(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("between");
 	return true;
 }
 
-bool sqlparser::in(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::in(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("in ");
 	leftParen(output);
 	return true;
 }
 
-bool sqlparser::endIn(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endIn(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	rightParen(output);
 	return true;
 }
 
-bool sqlparser::inSetItem(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::inSetItem(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;
 }
 
-bool sqlparser::endInSetItem(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endInSetItem(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	if (hasSibling(node)) {
 		comma(output);
@@ -7587,85 +7587,85 @@ bool sqlparser::endInSetItem(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::exists(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::exists(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("exists ");
 	leftParen(output);
 	return true;
 }
 
-bool sqlparser::endExists(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endExists(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	rightParen(output);
 	return true;
 }
 
-bool sqlparser::is(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::is(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("is");
 	return true;
 }
 
-bool sqlparser::like(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::like(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("like");
 	return true;
 }
 
-bool sqlparser::matches(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::matches(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("matches");
 	return true;
 }
 
-bool sqlparser::nullSafeEquals(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::nullSafeEquals(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("<=>");
 	return true;
 }
 
-bool sqlparser::notEquals(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::notEquals(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("!=");
 	return true;
 }
 
-bool sqlparser::lessThan(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::lessThan(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("<");
 	return true;
 }
 
-bool sqlparser::greaterThan(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::greaterThan(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append(">");
 	return true;
 }
 
-bool sqlparser::lessThanOrEqualTo(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::lessThanOrEqualTo(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("<=");
 	return true;
 }
 
-bool sqlparser::greaterThanOrEqualTo(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::greaterThanOrEqualTo(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append(">=");
 	return true;
 }
 
-bool sqlparser::escape(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::escape(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("escape");
 	return true;
 }
 
-bool sqlparser::expression(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::expression(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;
 }
 
-bool sqlparser::intervalQualifier(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::intervalQualifier(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append(node->getAttributeValue(_from));
 	const char	*precision=
@@ -7699,123 +7699,114 @@ bool sqlparser::intervalQualifier(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::outerJoinOperator(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::outerJoinOperator(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("(+)");
 	return true;
 }
 
-bool sqlparser::compliment(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::compliment(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("~");
 	return true;
 }
 
-bool sqlparser::inverse(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::inverse(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("!");
 	return true;
 }
 
-bool sqlparser::negative(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::negative(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("-");
 	return true;
 }
 
-bool sqlparser::plus(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::plus(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("+");
 	return true;
 }
 
-bool sqlparser::minus(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::minus(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("-");
 	return true;
 }
 
-bool sqlparser::times(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::times(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("*");
 	return true;
 }
 
-bool sqlparser::dividedBy(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::dividedBy(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("/");
 	return true;
 }
 
-bool sqlparser::modulo(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::modulo(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("%");
 	return true;
 }
 
-bool sqlparser::bitwiseAnd(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::bitwiseAnd(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("&");
 	return true;
 }
 
-bool sqlparser::bitwiseOr(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::bitwiseOr(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("|");
 	return true;
 }
 
-bool sqlparser::bitwiseXor(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::bitwiseXor(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("^");
 	return true;
 }
 
-bool sqlparser::logicalAnd(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::logicalAnd(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("&&");
 	return true;
 }
 
-bool sqlparser::logicalOr(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::logicalOr(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("||");
 	return true;
 }
 
-bool sqlparser::number(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::number(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::stringLiteral(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::stringLiteral(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::bindVariable(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::bindVariable(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::columnReference(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::columnReference(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;
 }
 
-bool sqlparser::columnNameDatabase(xmldomnode *node, stringbuffer *output) {
-	debugFunction();
-	outputValue(node,output);
-	if (hasSibling(node)) {
-		period(output);
-	}
-	return true;
-}
-
-bool sqlparser::columnNameSchema(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::columnNameDatabase(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	if (hasSibling(node)) {
@@ -7824,7 +7815,7 @@ bool sqlparser::columnNameSchema(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::columnNameTable(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::columnNameSchema(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	if (hasSibling(node)) {
@@ -7833,36 +7824,45 @@ bool sqlparser::columnNameTable(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::columnNameColumn(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::columnNameTable(xmldomnode *node, stringbuffer *output) {
+	debugFunction();
+	outputValue(node,output);
+	if (hasSibling(node)) {
+		period(output);
+	}
+	return true;
+}
+
+bool sqlreparser::columnNameColumn(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::function(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::function(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::parameters(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::parameters(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	leftParen(output);
 	return true;
 }
 
-bool sqlparser::endParameters(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endParameters(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	rightParen(output);
 	return true;
 }
 
-bool sqlparser::parameter(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::parameter(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;
 }
 
-bool sqlparser::endParameter(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endParameter(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	if (hasSibling(node)) {
 		comma(output);
@@ -7870,24 +7870,24 @@ bool sqlparser::endParameter(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::updateQuery(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::updateQuery(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("update");
 	return true;
 }
 
-bool sqlparser::updateSet(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::updateSet(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("set");
 	return true;
 }
 
-bool sqlparser::assignment(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::assignment(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	return true;
 }
 
-bool sqlparser::endAssignment(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::endAssignment(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	if (hasSibling(node)) {
 		output->append(",");
@@ -7895,74 +7895,74 @@ bool sqlparser::endAssignment(xmldomnode *node, stringbuffer *output) {
 	return true;
 }
 
-bool sqlparser::equals(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::equals(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("=");
 	return true;
 }
 
-bool sqlparser::setQuery(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::setQuery(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("set");
 	return true;
 }
 
-bool sqlparser::setSession(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::setSession(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("session");
 	return true;
 }
 
-bool sqlparser::setGlobal(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::setGlobal(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("global");
 	return true;
 }
 
-bool sqlparser::transaction(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::transaction(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("transaction ");
 	return true;
 }
 
-bool sqlparser::isolationLevel(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::isolationLevel(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("isolation level ");
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::lockQuery(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::lockQuery(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("lock");
 	return true;
 }
 
-bool sqlparser::inMode(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::inMode(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("in");
 	return true;
 }
 
-bool sqlparser::lockMode(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::lockMode(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	outputValue(node,output);
 	return true;
 }
 
-bool sqlparser::mode(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::mode(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("mode");
 	return true;
 }
 
-bool sqlparser::noWait(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::noWait(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("nowait");
 	return true;
 }
 
-bool sqlparser::show(xmldomnode *node, stringbuffer *output) {
+bool sqlreparser::show(xmldomnode *node, stringbuffer *output) {
 	debugFunction();
 	output->append("show ");
 	outputValue(node,output);

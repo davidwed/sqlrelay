@@ -111,7 +111,7 @@ SRCS = sqlrlistener.cpp \
 	sqlrservercursor.cpp \
 	sqlrprotocols.cpp \
 	sqlrprotocol.cpp \
-	sqlparser.cpp \
+	sqlrparser.cpp \
 	sqlrtranslations.cpp \
 	sqlrtranslation.cpp \
 	sqlrresultsettranslations.cpp \
@@ -134,7 +134,7 @@ LOBJS = sqlrlistener.lo \
 	sqlrservercursor.lo \
 	sqlrprotocols.lo \
 	sqlrprotocol.lo \
-	sqlparser.lo \
+	sqlrparser.lo \
 	sqlrtranslations.lo \
 	sqlrtranslation.lo \
 	sqlrresultsettranslations.lo \

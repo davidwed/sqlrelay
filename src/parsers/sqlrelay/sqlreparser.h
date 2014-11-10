@@ -1,18 +1,20 @@
 // Copyright (c) 1999-2011  David Muse
 // See the file COPYING for more information
 
-#ifndef SQLPARSER
-#define SQLPARSER
+#ifndef SQLREPARSER
+#define SQLREPARSER
 
 #include <sqlrelay/private/sqlrserverdll.h>
+
+#include <sqlrelay/sqlrparser.h>
 
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
 
-class SQLRSERVER_DLLSPEC sqlparser {
+class SQLRSERVER_DLLSPEC sqlreparser : public sqlrparser {
 	public:
-			sqlparser();
-			~sqlparser();
+			sqlreparser();
+			~sqlreparser();
 
 		bool	parse(const char *query);
 		void	useTree(xmldom *tree);

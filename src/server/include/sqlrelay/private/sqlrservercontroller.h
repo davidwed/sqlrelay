@@ -124,7 +124,8 @@
 		void	initConnStats();
 		void	clearConnStats();
 
-		sqlparser	*newSqlParser();
+		sqlrparser	*newParser();
+		sqlrparser	*newParser(const char *module);
 
 		void	updateClientSessionStartTime();
 		void	updateClientAddr();
@@ -144,7 +145,7 @@
 		sharedmemory	*shmem;
 
 		sqlrprotocols			*sqlrpr;
-		sqlparser			*sqlp;
+		sqlrparser			*sqlrp;
 		sqlrtranslations		*sqlrt;
 		sqlrresultsettranslations	*sqlrrst;
 		sqlrtriggers			*sqlrtr;
@@ -214,7 +215,8 @@
 		bool		debugtriggers;
 		bool		debugbindtranslation;
 
-		dynamiclib		dl;
+		dynamiclib	conndl;
+		dynamiclib	sqlrpdl;
 
 		uint16_t	cursorcount;
 		uint16_t	mincursorcount;

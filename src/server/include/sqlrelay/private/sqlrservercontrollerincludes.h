@@ -22,7 +22,7 @@
 #include <sqlrelay/sqlrservercursor.h>
 #include <sqlrelay/sqlrprotocols.h>
 #include <sqlrelay/sqlrprotocol.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlrparser.h>
 #include <sqlrelay/sqlrtranslations.h>
 #include <sqlrelay/sqlrresultsettranslations.h>
 #include <sqlrelay/sqlrtriggers.h>
