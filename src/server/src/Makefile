@@ -9,6 +9,8 @@ PLUGINSRCS = sqlrserverconnectiondeclarations.cpp \
 		sqlrserverconnectionassignments.cpp \
 		sqlrprotocoldeclarations.cpp \
 		sqlrprotocolassignments.cpp \
+		sqlrparserdeclarations.cpp \
+		sqlrparserassignments.cpp \
 		sqlrloggerdeclarations.cpp \
 		sqlrloggerassignments.cpp \
 		sqlrpwdencdeclarations.cpp \
@@ -25,6 +27,7 @@ PLUGINSRCS = sqlrserverconnectiondeclarations.cpp \
 		sqlrtriggerassignments.cpp
 PLUGINLOBJS = $(shell ls ../../connections/*/*.lo) \
 		$(shell ls ../../protocols/*.lo) \
+		$(shell ls ../../parsers/*.lo) \
 		$(shell ls ../../loggers/*.lo) \
 		$(shell ls ../../pwdencs/*.lo) \
 		$(shell ls ../../auths/*.lo) \
@@ -94,6 +97,7 @@ endif
 endif
 PLUGINLIBS += $(SYBASELIBS)
 PLUGINLIBS += -L$(top_builddir)/src/api/c++/src -lsqlrclient
+PLUGINLIBS += -L$(top_builddir)/src/parsers -lsqlreparser
 endif
 
 CPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) $(CACHEDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPFLAG) -I../include -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"
@@ -218,6 +222,22 @@ sqlrprotocoldeclarations.cpp: sqlrprotocoldeclarations.cpp.in
 sqlrprotocolassignments.cpp: sqlrprotocolassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../../protocols/*.lo`; \
+	do \
+		module=`basename $$file .lo`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrparserdeclarations.cpp: sqlrparserdeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../../parsers/*.lo | grep -v sqlre`; \
+	do \
+		module=`basename $$file .lo`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrparserassignments.cpp: sqlrparserassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../../parsers/*.lo | grep -v sqlre`; \
 	do \
 		module=`basename $$file .lo`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
