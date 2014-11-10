@@ -1,10 +1,7 @@
 // Copyright (c) 2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrlistener.h>
-#include <sqlrelay/sqlrservercontroller.h>
-#include <sqlrelay/sqlrserverconnection.h>
-#include <sqlrelay/sqlrlogger.h>
+#include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
 #include <rudiments/file.h>
 #include <rudiments/permissions.h>

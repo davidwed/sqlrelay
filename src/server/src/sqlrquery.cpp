@@ -1,9 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrquery.h>
-#include <sqlrelay/sqlrserverconnection.h>
-#include <sqlrelay/sqlrservercursor.h>
+#include <sqlrelay/sqlrserver.h>
 #include <rudiments/xmldomnode.h>
 
 sqlrquery::sqlrquery(xmldomnode *parameters) {

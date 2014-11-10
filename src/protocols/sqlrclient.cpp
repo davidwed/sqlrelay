@@ -5,9 +5,7 @@
 
 #include <sqlrelay/private/sqlrserverdll.h>
 
-#include <sqlrelay/sqlrprotocol.h>
-#include <sqlrelay/sqlrservercontroller.h>
-#include <sqlrelay/sqlrservercursor.h>
+#include <sqlrelay/sqlrserver.h>
 
 #include <rudiments/stringbuffer.h>
 #include <rudiments/memorypool.h>

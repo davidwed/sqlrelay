@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2014  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrlistener.h>
+#include <sqlrelay/sqlrserver.h>
 
 #include <rudiments/permissions.h>
 #include <rudiments/unixsocketclient.h>

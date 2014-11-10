@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrlogger.h>
+#include <sqlrelay/sqlrserver.h>
 
 sqlrlogger::sqlrlogger(xmldomnode *parameters) {
 	this->parameters=parameters;

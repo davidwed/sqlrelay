@@ -9,10 +9,9 @@
 #include <sqlucode.h>
 #include <sqltypes.h>
 
-// note that sqlrserverconnection.h must be included after sqltypes.h to
+// note that sqlrserver.h must be included after sqltypes.h to
 // get around a problem with CHAR/xmlChar in gnome-xml
-#include <sqlrelay/sqlrservercontroller.h>
-#include <sqlrelay/sqlrserverconnection.h>
+#include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
 #include <rudiments/stdio.h>
 

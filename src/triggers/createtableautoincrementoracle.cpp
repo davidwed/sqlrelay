@@ -1,10 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrservercontroller.h>
-#include <sqlrelay/sqlrserverconnection.h>
-#include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlrtrigger.h>
+#include <sqlrelay/sqlrserver.h>
 #include <sqlrelay/sqlreparser.h>
 #include <debugprint.h>
 

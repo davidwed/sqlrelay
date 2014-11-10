@@ -5,7 +5,7 @@
 #include <defaults.h>
 
 #include <sqlrelay/sqlrutil.h>
-#include <sqlrelay/sqlrpwdencs.h>
+#include <sqlrelay/sqlrserver.h>
 
 #include <rudiments/commandline.h>
 #include <rudiments/process.h>

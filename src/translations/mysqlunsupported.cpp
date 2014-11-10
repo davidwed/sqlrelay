@@ -1,10 +1,8 @@
 // Copyright (c) 2013  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrserverconnection.h>
-#include <sqlrelay/sqlrservercursor.h>
+#include <sqlrelay/sqlrserver.h>
 #include <sqlrelay/sqlreparser.h>
-#include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
 class mysqlunsupported : public sqlrtranslation {

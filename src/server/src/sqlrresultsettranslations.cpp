@@ -1,9 +1,7 @@
 // Copyright (c) 1999-2011  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrresultsettranslations.h>
-#include <sqlrelay/sqlrserverconnection.h>
-#include <sqlrelay/sqlrservercursor.h>
+#include <sqlrelay/sqlrserver.h>
 #include <debugprint.h>
 
 #include <rudiments/process.h>

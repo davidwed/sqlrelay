@@ -1,7 +1,7 @@
 // Copyright (c) 2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrpwdencs.h>
+#include <sqlrelay/sqlrserver.h>
 
 #include <debugprint.h>
 

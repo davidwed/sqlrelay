@@ -9,7 +9,7 @@ LIBS = -L$(top_builddir)/src/server/src -lsqlrserver $(RUDIMENTSLIBS) $(EXTRALIB
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) -I$(top_builddir)/src/server/include $(RUDIMENTSINCLUDES) -c $< -o $@
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) -I$(top_builddir)/src/util -I$(top_builddir)/src/server/include $(RUDIMENTSINCLUDES) -c $< -o $@
 
 all: sqlrpwdenc_rot.la \
 	sqlrpwdenc_md5.la \

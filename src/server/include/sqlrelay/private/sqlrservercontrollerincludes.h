@@ -15,20 +15,22 @@
 #include <rudiments/signalclasses.h>
 #include <rudiments/datetime.h>
 #include <rudiments/singlylinkedlist.h>
+#include <rudiments/xmldomnode.h>
+#include <rudiments/dynamiclib.h>
 
 #include <sqlrelay/sqlrutil.h>
 
-#include <sqlrelay/sqlrserverconnection.h>
-#include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlrprotocols.h>
-#include <sqlrelay/sqlrprotocol.h>
-#include <sqlrelay/sqlrparser.h>
-#include <sqlrelay/sqlrtranslations.h>
-#include <sqlrelay/sqlrresultsettranslations.h>
-#include <sqlrelay/sqlrtriggers.h>
-#include <sqlrelay/sqlrloggers.h>
-#include <sqlrelay/sqlrqueries.h>
-#include <sqlrelay/sqlrpwdencs.h>
-#include <sqlrelay/sqlrauths.h>
+//#include <sqlrelay/sqlrserverconnection.h>
+//#include <sqlrelay/sqlrservercursor.h>
+//#include <sqlrelay/sqlrprotocols.h>
+//#include <sqlrelay/sqlrprotocol.h>
+//#include <sqlrelay/sqlrparser.h>
+//#include <sqlrelay/sqlrtranslations.h>
+//#include <sqlrelay/sqlrresultsettranslations.h>
+//#include <sqlrelay/sqlrtriggers.h>
+//#include <sqlrelay/sqlrloggers.h>
+//#include <sqlrelay/sqlrqueries.h>
+//#include <sqlrelay/sqlrpwdencs.h>
+//#include <sqlrelay/sqlrauths.h>
 
 #include <sqlrelay/private/sqlrshmdata.h>

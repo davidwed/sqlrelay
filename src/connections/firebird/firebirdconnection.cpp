@@ -1,8 +1,7 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrservercontroller.h>
-#include <sqlrelay/sqlrserverconnection.h>
+#include <sqlrelay/sqlrserver.h>
 #include <rudiments/environment.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/snooze.h>

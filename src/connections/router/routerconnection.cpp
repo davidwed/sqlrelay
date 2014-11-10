@@ -1,8 +1,7 @@
 // Copyright (c) 2006 David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrservercontroller.h>
-#include <sqlrelay/sqlrserverconnection.h>
+#include <sqlrelay/sqlrserver.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/character.h>
 #include <rudiments/regularexpression.h>

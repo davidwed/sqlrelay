@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2013  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrprotocol.h>
+#include <sqlrelay/sqlrserver.h>
 
 sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont) {
 	this->cont=cont;

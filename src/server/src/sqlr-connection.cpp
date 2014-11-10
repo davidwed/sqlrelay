@@ -2,7 +2,7 @@
 // See the file COPYING for more information
 
 #include <config.h>
-#include <sqlrelay/sqlrservercontroller.h>
+#include <sqlrelay/sqlrserver.h>
 #include <rudiments/process.h>
 #include <rudiments/signalclasses.h>
 #include <rudiments/stdio.h>

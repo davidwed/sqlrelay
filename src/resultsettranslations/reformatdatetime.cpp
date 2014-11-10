@@ -1,10 +1,7 @@
 // Copyright (c) 2014  David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrservercontroller.h>
-#include <sqlrelay/sqlrserverconnection.h>
-#include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlrresultsettranslation.h>
+#include <sqlrelay/sqlrserver.h>
 #include <debugprint.h>
 
 class reformatdatetime : public sqlrresultsettranslation {

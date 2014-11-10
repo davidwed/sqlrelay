@@ -6,7 +6,8 @@
 
 #include <sqlrelay/private/sqlrserverdll.h>
 
-#include <sqlrelay/sqlrparser.h>
+//#include <sqlrelay/sqlrparser.h>
+#include <sqlrelay/sqlrserver.h>
 
 #include <rudiments/xmldom.h>
 #include <rudiments/xmldomnode.h>
