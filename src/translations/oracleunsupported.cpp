@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
@@ -36,32 +36,32 @@ bool oracleunsupported::run(sqlrserverconnection *sqlrcon,
 	xmldomnode	*root=querytree->getRootNode();
 
 	// unsupported constraints
-	xmldomnode	*table=root->getFirstTagChild(sqlparser::_create)->
-					getFirstTagChild(sqlparser::_table);
-	xmldomnode	*columns=table->getFirstTagChild(sqlparser::_columns);
-	for (xmldomnode *col=columns->getFirstTagChild(sqlparser::_column);
+	xmldomnode	*table=root->getFirstTagChild(sqlreparser::_create)->
+					getFirstTagChild(sqlreparser::_table);
+	xmldomnode	*columns=table->getFirstTagChild(sqlreparser::_columns);
+	for (xmldomnode *col=columns->getFirstTagChild(sqlreparser::_column);
 			!col->isNullNode();
-			col=col->getNextTagSibling(sqlparser::_column)) {
+			col=col->getNextTagSibling(sqlreparser::_column)) {
 
 		xmldomnode	*constraints=
-			col->getFirstTagChild(sqlparser::_constraints);
+			col->getFirstTagChild(sqlreparser::_constraints);
 		if (constraints->isNullNode()) {
 			continue;
 		}
 
 		const char	*unsupported[]={
-			sqlparser::_unsigned,
-			sqlparser::_zerofill,
-			sqlparser::_binary,
-			sqlparser::_character_set,
-			sqlparser::_collate,
-			sqlparser::_auto_increment,
-			sqlparser::_key,
-			sqlparser::_comment,
-			sqlparser::_column_format,
-			sqlparser::_match,
-			sqlparser::_on_delete,
-			sqlparser::_on_update,
+			sqlreparser::_unsigned,
+			sqlreparser::_zerofill,
+			sqlreparser::_binary,
+			sqlreparser::_character_set,
+			sqlreparser::_collate,
+			sqlreparser::_auto_increment,
+			sqlreparser::_key,
+			sqlreparser::_comment,
+			sqlreparser::_column_format,
+			sqlreparser::_match,
+			sqlreparser::_on_delete,
+			sqlreparser::_on_update,
 			NULL
 		};
 
@@ -81,36 +81,36 @@ bool oracleunsupported::run(sqlrserverconnection *sqlrcon,
 
 	// create with no log
 	xmldomnode	*withnolog=
-			table->getFirstTagChild(sqlparser::_with_no_log);
+			table->getFirstTagChild(sqlreparser::_with_no_log);
 	if (!withnolog->isNullNode()) {
 		withnolog->setAttributeValue("supported","false");
 	}
 
 	// drop temporary
-	xmldomnode	*drop=root->getFirstTagChild(sqlparser::_drop);
+	xmldomnode	*drop=root->getFirstTagChild(sqlreparser::_drop);
 	xmldomnode	*temporary=drop->getFirstTagChild(
-						sqlparser::_drop_temporary);
+						sqlreparser::_drop_temporary);
 	if (!temporary->isNullNode()) {
 		temporary->setAttributeValue("supported","false");
 	}
 
 	// drop restrict
-	table=drop->getFirstTagChild(sqlparser::_table);
+	table=drop->getFirstTagChild(sqlreparser::_table);
 	xmldomnode	*restrictclause=table->getFirstTagChild(
-						sqlparser::_restrict_clause);
+						sqlreparser::_restrict_clause);
 	if (!restrictclause->isNullNode()) {
 		restrictclause->setAttributeValue("supported","false");
 	}
 
 	// set global
-	xmldomnode	*set=root->getFirstTagChild(sqlparser::_set);
-	xmldomnode	*global=set->getFirstTagChild(sqlparser::_set_global);
+	xmldomnode	*set=root->getFirstTagChild(sqlreparser::_set);
+	xmldomnode	*global=set->getFirstTagChild(sqlreparser::_set_global);
 	if (!global->isNullNode()) {
 		global->setAttributeValue("supported","false");
 	}
 
 	// set session
-	xmldomnode	*session=set->getFirstTagChild(sqlparser::_set_session);
+	xmldomnode	*session=set->getFirstTagChild(sqlreparser::_set_session);
 	if (!session->isNullNode()) {
 		session->setAttributeValue("supported","false");
 	}

@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
@@ -46,17 +46,17 @@ void uniquetodistinct::replaceUnique(xmldomnode *node) {
 
 		// look for "select" and "select into" nodes
 		if (!charstring::compare(child->getName(),
-						sqlparser::_select) ||
+						sqlreparser::_select) ||
 			!charstring::compare(child->getName(),
-						sqlparser::_select_into)) {
+						sqlreparser::_select_into)) {
 
 			// look for a child node "unique"
 			xmldomnode	*uniquenode=
-				child->getFirstTagChild(sqlparser::_unique);
+				child->getFirstTagChild(sqlreparser::_unique);
 			if (!uniquenode->isNullNode()) {
 
 				// change it to "distinct"
-				uniquenode->setName(sqlparser::_distinct);
+				uniquenode->setName(sqlreparser::_distinct);
 			}
 		}
 

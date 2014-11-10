@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
@@ -42,15 +42,15 @@ bool createselecttocreateasselect::run(sqlrserverconnection *sqlrcon,
 
 void createselecttocreateasselect::insertAs(xmldomnode *node) {
 
-	xmldomnode	*select=node->getFirstTagChild(sqlparser::_create)->
-					getFirstTagChild(sqlparser::_table)->
-					getFirstTagChild(sqlparser::_select);
+	xmldomnode	*select=node->getFirstTagChild(sqlreparser::_create)->
+					getFirstTagChild(sqlreparser::_table)->
+					getFirstTagChild(sqlreparser::_select);
 	if (select->isNullNode()) {
 		return;
 	}
 
-	if (select->getPreviousTagSibling(sqlparser::_as)->isNullNode()) {
-		select->getParent()->insertTag(sqlparser::_as,
+	if (select->getPreviousTagSibling(sqlreparser::_as)->isNullNode()) {
+		select->getParent()->insertTag(sqlreparser::_as,
 						select->getPosition());
 	}
 }

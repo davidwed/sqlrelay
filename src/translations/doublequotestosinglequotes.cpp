@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
@@ -48,7 +48,7 @@ bool doublequotestosinglequotes::replaceDoubleQuotes(xmldomnode *node) {
 	size_t		valuelength=charstring::length(value);
 
 	// if the node starts and ends with double quotes...
-	if (!charstring::compare(node->getName(),sqlparser::_string_literal) &&
+	if (!charstring::compare(node->getName(),sqlreparser::_string_literal) &&
 			valuelength>=2 &&
 			*value=='"' && *(value+valuelength-1)=='"') {
 

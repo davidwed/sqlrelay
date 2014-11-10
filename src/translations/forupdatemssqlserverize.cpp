@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
@@ -37,28 +37,28 @@ bool forupdatemssqlserverize::run(sqlrserverconnection *sqlrcon,
 
 	// select query...
 	xmldomnode	*selectnode=query->getFirstTagChild(
-						sqlparser::_select);
+						sqlreparser::_select);
 	if (selectnode->isNullNode()) {
 		return true;
 	}
 
 	// from...
 	xmldomnode	*fromnode=selectnode->getFirstTagChild(
-						sqlparser::_from);
+						sqlreparser::_from);
 	if (fromnode->isNullNode()) {
 		return true;
 	}
 
 	// table references...
 	xmldomnode	*tablereferencesnode=fromnode->getFirstTagChild(
-						sqlparser::_table_references);
+						sqlreparser::_table_references);
 	if (tablereferencesnode->isNullNode()) {
 		return true;
 	}
 
 	// for update...
 	xmldomnode	*forupdatenode=selectnode->getFirstTagChild(
-						sqlparser::_for_update);
+						sqlreparser::_for_update);
 	if (forupdatenode->isNullNode()) {
 		return true;
 	}
@@ -69,12 +69,12 @@ bool forupdatemssqlserverize::run(sqlrserverconnection *sqlrcon,
 	// for each table, add a "with (updlock, rowlock)" hint
 	for (xmldomnode	*trnode=
 			tablereferencesnode->getFirstTagChild(
-						sqlparser::_table_reference);
+						sqlreparser::_table_reference);
 			!trnode->isNullNode();
 			trnode=trnode->getNextTagSibling()) {
 
 		// FIXME: do this properly
-		sqlts->newNode(trnode,sqlparser::_alias,
+		sqlts->newNode(trnode,sqlreparser::_alias,
 				"with (updlock, rowlock)");
 	}
 

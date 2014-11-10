@@ -4,7 +4,6 @@
 #include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
 #include <sqlrelay/sqlrresultsettranslation.h>
 #include <debugprint.h>
 

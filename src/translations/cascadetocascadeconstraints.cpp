@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
@@ -42,16 +42,16 @@ bool cascadetocascadeconstraints::run(sqlrserverconnection *sqlrcon,
 
 void cascadetocascadeconstraints::insertConstraints(xmldomnode *node) {
 
-	xmldomnode	*cascade=node->getFirstTagChild(sqlparser::_drop)->
-					getFirstTagChild(sqlparser::_table)->
-					getFirstTagChild(sqlparser::_cascade);
+	xmldomnode	*cascade=node->getFirstTagChild(sqlreparser::_drop)->
+					getFirstTagChild(sqlreparser::_table)->
+					getFirstTagChild(sqlreparser::_cascade);
 	if (cascade->isNullNode()) {
 		return;
 	}
 
-	if (cascade->getFirstTagChild(sqlparser::_cascade_constraints_clause)->
+	if (cascade->getFirstTagChild(sqlreparser::_cascade_constraints_clause)->
 								isNullNode()) {
-		cascade->appendTag(sqlparser::_cascade_constraints_clause);
+		cascade->appendTag(sqlreparser::_cascade_constraints_clause);
 	}
 }
 

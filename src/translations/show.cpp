@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
@@ -36,10 +36,10 @@ bool show::run(sqlrserverconnection *sqlrcon,
 		return true;
 	}
 
-	if (!charstring::compare(node->getName(),sqlparser::_show)) {
+	if (!charstring::compare(node->getName(),sqlreparser::_show)) {
 
 		const char	*value=node->getAttributeValue(
-						sqlparser::_value);
+						sqlreparser::_value);
 
 		if (!charstring::compare(value,"client_encoding")) {
 			
@@ -51,7 +51,7 @@ bool show::run(sqlrserverconnection *sqlrcon,
 					getAttributeValue("client_encoding"));
 			query.append("' from dual");
 
-			sqlparser	sqlp;
+			sqlreparser	sqlp;
 			sqlp.useTree(querytree);
 			sqlp.parse(query.getString());
 		}

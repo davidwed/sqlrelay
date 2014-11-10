@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
@@ -84,7 +84,7 @@ bool concat::translateConcat(sqlrserverconnection *sqlrcon,
 	*found=false;
 
 	// look for an expression
-	if (!charstring::compare(querynode->getName(),sqlparser::_expression)) {
+	if (!charstring::compare(querynode->getName(),sqlreparser::_expression)) {
 
 		// work backwards through the expression, replacing 
 		// pipe-concatenated terms with concat()...
@@ -98,8 +98,8 @@ bool concat::translateConcat(sqlrserverconnection *sqlrcon,
 
 			// convert || (logical or) to plus
 			if (!charstring::compare(childnode->getName(),
-						sqlparser::_logical_or)) {
-				childnode->setName(sqlparser::_plus);
+						sqlreparser::_logical_or)) {
+				childnode->setName(sqlreparser::_plus);
 			}
 
 			// move back through the children
@@ -132,7 +132,7 @@ bool concat::translatePlus(sqlrserverconnection *sqlrcon,
 	*found=false;
 
 	// look for an expression
-	if (!charstring::compare(querynode->getName(),sqlparser::_expression)) {
+	if (!charstring::compare(querynode->getName(),sqlreparser::_expression)) {
 
 		// work backwards through the expression, replacing 
 		// pipe-concatenated terms with concat()...
@@ -146,7 +146,7 @@ bool concat::translatePlus(sqlrserverconnection *sqlrcon,
 
 			// if it's a || (logical or) then convert to concat
 			if (!charstring::compare(childnode->getName(),
-						sqlparser::_logical_or)) {
+						sqlreparser::_logical_or)) {
 
 				// get the args that were being concatenated
 				xmldomnode	*firstarg=
@@ -158,25 +158,25 @@ bool concat::translatePlus(sqlrserverconnection *sqlrcon,
 				xmldomnode	*concat=
 						sqlts->newNodeAfter(
 							querynode,secondarg,
-							sqlparser::_function,
+							sqlreparser::_function,
 							"concat");
 
 				// add parameters to the function
 				xmldomnode	*parameters=
 						sqlts->newNode(
 							concat,
-							sqlparser::_parameters);
+							sqlreparser::_parameters);
 
 				// move the first arg to the first parameter
 				xmldomnode	*parameter=
 						sqlts->newNode(
 							parameters,
-							sqlparser::_parameter);
+							sqlreparser::_parameter);
 				querynode->moveChild(firstarg,parameter,0);
 
 				// move the second arg to the second parameter
 				parameter=sqlts->newNode(parameters,
-							sqlparser::_parameter);
+							sqlreparser::_parameter);
 				querynode->moveChild(secondarg,parameter,0);
 
 				// remove the logical_or

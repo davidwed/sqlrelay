@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 #include <rudiments/process.h>
@@ -63,7 +63,7 @@ void temptablessybaseize::mapCreateTemporaryTableName(
 
 	// create...
 	xmldomnode	*createnode=
-			node->getFirstTagChild(sqlparser::_create);
+			node->getFirstTagChild(sqlreparser::_create);
 	if (createnode->isNullNode()) {
 		return;
 	}
@@ -72,36 +72,36 @@ void temptablessybaseize::mapCreateTemporaryTableName(
 	// (might not exist if we're translating queries
 	// originally meant for a non-oracle db)
 	xmldomnode	*globalnode=
-			createnode->getFirstTagChild(sqlparser::_global);
+			createnode->getFirstTagChild(sqlreparser::_global);
 
 	// temporary...
 	xmldomnode	*temporarynode=
-			createnode->getFirstTagChild(sqlparser::_temporary);
+			createnode->getFirstTagChild(sqlreparser::_temporary);
 	if (temporarynode->isNullNode()) {
 		return;
 	}
 
 	// table...
 	xmldomnode	*tablenode=
-			temporarynode->getNextTagSibling(sqlparser::_table);
+			temporarynode->getNextTagSibling(sqlreparser::_table);
 	if (tablenode->isNullNode()) {
 		return;
 	}
 
 	// table database...
-	node=tablenode->getFirstTagChild(sqlparser::_table_name_database);
-	const char	*database=node->getAttributeValue(sqlparser::_value);
+	node=tablenode->getFirstTagChild(sqlreparser::_table_name_database);
+	const char	*database=node->getAttributeValue(sqlreparser::_value);
 
 	// table schema...
-	node=tablenode->getFirstTagChild(sqlparser::_table_name_schema);
-	const char	*schema=node->getAttributeValue(sqlparser::_value);
+	node=tablenode->getFirstTagChild(sqlreparser::_table_name_schema);
+	const char	*schema=node->getAttributeValue(sqlreparser::_value);
 
 	// table name...
-	node=tablenode->getFirstTagChild(sqlparser::_table_name_table);
+	node=tablenode->getFirstTagChild(sqlreparser::_table_name_table);
 	if (node->isNullNode()) {
 		return;
 	}
-	const char	*oldtable=node->getAttributeValue(sqlparser::_value);
+	const char	*oldtable=node->getAttributeValue(sqlreparser::_value);
 
 	// create a sybase-ized name and put it in the map...
 	databaseobject	*oldtabledbo=sqlts->createDatabaseObject(
@@ -120,7 +120,7 @@ void temptablessybaseize::mapCreateTemporaryTableName(
 
 	// truncate on commit qualifiers
 	xmldomnode	*oncommitnode=
-			tablenode->getFirstTagChild(sqlparser::_on_commit);
+			tablenode->getFirstTagChild(sqlreparser::_on_commit);
 	if (!oncommitnode->isNullNode()) {
 		tablenode->deleteChild(oncommitnode);
 	}
@@ -137,14 +137,14 @@ void temptablessybaseize::mapSelectIntoTableName(sqlrserverconnection *sqlrcon,
 
 	// select query
 	xmldomnode	*selectnode=
-			node->getFirstTagChild(sqlparser::_select);
+			node->getFirstTagChild(sqlreparser::_select);
 	if (selectnode->isNullNode()) {
 		return;
 	}
 
 	// select into
 	xmldomnode	*selectintonode=
-			selectnode->getFirstTagChild(sqlparser::_select_into);
+			selectnode->getFirstTagChild(sqlreparser::_select_into);
 	if (selectintonode->isNullNode()) {
 		return;
 	}
@@ -152,22 +152,22 @@ void temptablessybaseize::mapSelectIntoTableName(sqlrserverconnection *sqlrcon,
 	// temporary...
 	// (might not exist if we're using sybase/mssql)
 	xmldomnode	*temporarynode=
-			selectintonode->getFirstTagChild(sqlparser::_temporary);
+			selectintonode->getFirstTagChild(sqlreparser::_temporary);
 
 	// table database...
-	node=selectintonode->getFirstTagChild(sqlparser::_table_name_database);
-	const char	*database=node->getAttributeValue(sqlparser::_value);
+	node=selectintonode->getFirstTagChild(sqlreparser::_table_name_database);
+	const char	*database=node->getAttributeValue(sqlreparser::_value);
 
 	// table schema...
-	node=selectintonode->getFirstTagChild(sqlparser::_table_name_schema);
-	const char	*schema=node->getAttributeValue(sqlparser::_value);
+	node=selectintonode->getFirstTagChild(sqlreparser::_table_name_schema);
+	const char	*schema=node->getAttributeValue(sqlreparser::_value);
 
 	// table name...
-	node=selectintonode->getFirstTagChild(sqlparser::_table_name_table);
+	node=selectintonode->getFirstTagChild(sqlreparser::_table_name_table);
 	if (node->isNullNode()) {
 		return;
 	}
-	const char	*oldtable=node->getAttributeValue(sqlparser::_value);
+	const char	*oldtable=node->getAttributeValue(sqlreparser::_value);
 
 	// Bail if this is not a temp table.  Select into can be used with
 	// regular tables too.
@@ -218,72 +218,72 @@ bool temptablessybaseize::replaceTempNames(xmldomnode *node) {
 	// if the current node is a table name
 	// then see if it needs to be replaced
 	bool	tablenametable=!charstring::compare(node->getName(),
-						sqlparser::_table_name_table);
+						sqlreparser::_table_name_table);
 	bool	columnnametable=!charstring::compare(node->getName(),
-						sqlparser::_column_name_table);
+						sqlreparser::_column_name_table);
 
 	if (tablenametable || columnnametable) {
 
 		// get the table name
 		const char	*table=node->getAttributeValue(
-						sqlparser::_value);
+						sqlreparser::_value);
 
 		// try to get the database name
 		xmldomnode	*databasenode=
 				(tablenametable)?
 				node->getPreviousTagSibling(
-					sqlparser::_table_name_database):
+					sqlreparser::_table_name_database):
 				node->getPreviousTagSibling(
-					sqlparser::_column_name_database);
+					sqlreparser::_column_name_database);
 		const char	*database=databasenode->getAttributeValue(
-							sqlparser::_value);
+							sqlreparser::_value);
 
 		// try to get the schema name
 		xmldomnode	*schemanode=
 				(tablenametable)?
 				node->getPreviousTagSibling(
-					sqlparser::_table_name_schema):
+					sqlreparser::_table_name_schema):
 				node->getPreviousTagSibling(
-					sqlparser::_column_name_schema);
+					sqlreparser::_column_name_schema);
 		const char	*schema=schemanode->getAttributeValue(
-							sqlparser::_value);
+							sqlreparser::_value);
 
 		// get the replacement table name and update it
 		const char	*newname=NULL;
 		if (sqlts->getReplacementTableName(database,schema,
 							table,&newname)) {
-			node->setAttributeValue(sqlparser::_value,newname);
+			node->setAttributeValue(sqlreparser::_value,newname);
 		}
 	}
 
 	// if the current node is an index name
 	// then see if it needs to be replaced
 	if (!charstring::compare(node->getName(),
-					sqlparser::_index_name_index)) {
+					sqlreparser::_index_name_index)) {
 
 		// get the index name
 		const char	*index=node->getAttributeValue(
-						sqlparser::_value);
+						sqlreparser::_value);
 
 		// try to get the database name
 		xmldomnode	*databasenode=
 				node->getPreviousTagSibling(
-					sqlparser::_index_name_database);
+					sqlreparser::_index_name_database);
 		const char	*database=databasenode->getAttributeValue(
-							sqlparser::_value);
+							sqlreparser::_value);
 
 		// try to get the schema name
 		xmldomnode	*schemanode=
 				node->getPreviousTagSibling(
-					sqlparser::_index_name_schema);
+					sqlreparser::_index_name_schema);
 		const char	*schema=schemanode->getAttributeValue(
-							sqlparser::_value);
+							sqlreparser::_value);
 
 		// get the replacement index name and update it
 		const char	*newname=NULL;
 		if (sqlts->getReplacementIndexName(database,schema,
 							index,&newname)) {
-			node->setAttributeValue(sqlparser::_value,newname);
+			node->setAttributeValue(sqlreparser::_value,newname);
 		}
 	}
 

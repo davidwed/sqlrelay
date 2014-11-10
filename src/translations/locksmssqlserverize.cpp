@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
@@ -36,14 +36,14 @@ bool locksmssqlserverize::run(sqlrserverconnection *sqlrcon,
 
 	// lock query...
 	xmldomnode	*locknode=query->getFirstTagChild(
-						sqlparser::_lock);
+						sqlreparser::_lock);
 	if (locknode->isNullNode()) {
 		return true;
 	}
 
 	// table
 	xmldomnode	*tablenode=locknode->getFirstTagChild(
-						sqlparser::_table);
+						sqlreparser::_table);
 	if (tablenode->isNullNode()) {
 		return true;
 	}
@@ -51,13 +51,13 @@ bool locksmssqlserverize::run(sqlrserverconnection *sqlrcon,
 	// table name
 	xmldomnode	*tablenamedbnode=
 				tablenode->getFirstTagChild(
-					sqlparser::_table_name_database);
+					sqlreparser::_table_name_database);
 	xmldomnode	*tablenameschemanode=
 				tablenode->getFirstTagChild(
-					sqlparser::_table_name_schema);
+					sqlreparser::_table_name_schema);
 	xmldomnode	*tablenametablenode=
 				tablenode->getFirstTagChild(
-					sqlparser::_table_name_table);
+					sqlreparser::_table_name_table);
 	if (tablenametablenode->isNullNode()) {
 		return true;
 	}
@@ -73,14 +73,14 @@ bool locksmssqlserverize::run(sqlrserverconnection *sqlrcon,
 
 	// in
 	xmldomnode	*innode=tablenametablenode->getNextTagSibling(
-							sqlparser::_in_mode);
+							sqlreparser::_in_mode);
 	if (innode->isNullNode()) {
 		return true;
 	}
 
 	// lock mode
 	xmldomnode	*lockmodenode=tablenode->getNextTagSibling(
-						sqlparser::_lock_mode);
+						sqlreparser::_lock_mode);
 	if (lockmodenode->isNullNode()) {
 		return true;
 	}
@@ -93,7 +93,7 @@ bool locksmssqlserverize::run(sqlrserverconnection *sqlrcon,
 
 	// mode
 	xmldomnode	*modenode=tablenode->getNextTagSibling(
-						sqlparser::_mode);
+						sqlreparser::_mode);
 	if (modenode->isNullNode()) {
 		return true;
 	}
@@ -115,7 +115,7 @@ bool locksmssqlserverize::run(sqlrserverconnection *sqlrcon,
 	query->deleteChild(locknode);
 
 	// parse and attach the new query
-	sqlparser	sqlp;
+	sqlreparser	sqlp;
 	sqlp.useTree(querytree);
 	sqlp.parse(newquery.getString());
 

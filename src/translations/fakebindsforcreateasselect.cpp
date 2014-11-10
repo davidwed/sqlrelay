@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
@@ -37,10 +37,10 @@ bool fakebindsforcreateasselect::run(sqlrserverconnection *sqlrcon,
 	debugFunction();
 
 	if (!querytree->getRootNode()->
-				getFirstTagChild(sqlparser::_create)->
-				getFirstTagChild(sqlparser::_table)->
-				getFirstTagChild(sqlparser::_as)->
-				getNextTagSibling(sqlparser::_select)->
+				getFirstTagChild(sqlreparser::_create)->
+				getFirstTagChild(sqlreparser::_table)->
+				getFirstTagChild(sqlreparser::_as)->
+				getNextTagSibling(sqlreparser::_select)->
 				isNullNode()) {
 		sqlrcur->fakeinputbindsforthisquery=true;
 	}

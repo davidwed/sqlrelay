@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
@@ -40,42 +40,42 @@ bool temptablesaddmissingcolumns::run(sqlrserverconnection *sqlrcon,
 
 	// ignore non create-table queries
 	xmldomnode	*table=
-			query->getFirstTagChild(sqlparser::_create)->
-				getFirstTagChild(sqlparser::_table);
+			query->getFirstTagChild(sqlreparser::_create)->
+				getFirstTagChild(sqlreparser::_table);
 	if (table->isNullNode()) {
 		return true;
 	}
 
 	// ignore non-temporary tables
 	xmldomnode	*temporary=
-			query->getFirstTagChild(sqlparser::_create)->
-				getFirstTagChild(sqlparser::_temporary);
+			query->getFirstTagChild(sqlreparser::_create)->
+				getFirstTagChild(sqlreparser::_temporary);
 	if (temporary->isNullNode()) {
 		return true;
 	}
 
 	// if there's already an columns clause then leave it alone
 	xmldomnode	*columns=
-			table->getFirstTagChild(sqlparser::_columns);
+			table->getFirstTagChild(sqlreparser::_columns);
 	if (!columns->isNullNode()) {
 		return true;
 	}
 
 	// get the as clause, bail if it is missing
 	xmldomnode	*as=
-			table->getFirstTagChild(sqlparser::_as);
+			table->getFirstTagChild(sqlreparser::_as);
 	if (as->isNullNode()) {
 		return true;
 	}
 
 	// get the select clause, bail if it is missing
 	xmldomnode	*select=
-			table->getFirstTagChild(sqlparser::_select);
+			table->getFirstTagChild(sqlreparser::_select);
 	if (select->isNullNode()) {
 		return true;
 	}
 	stringbuffer	selectclause;
-	sqlparser	sqlp;
+	sqlreparser	sqlp;
 	if (!sqlp.write(select,&selectclause,false)) {
 		return true;
 	}
@@ -94,7 +94,7 @@ bool temptablesaddmissingcolumns::run(sqlrserverconnection *sqlrcon,
 	if (partscount) {
 
 		// create the columns node
-		columns=sqlts->newNodeBefore(table,as,sqlparser::_columns);
+		columns=sqlts->newNodeBefore(table,as,sqlreparser::_columns);
 
 		for (uint64_t i=0; i<partscount; i++) {
 			xmldomnode	*column=

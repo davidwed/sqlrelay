@@ -2,7 +2,7 @@ top_builddir = ../..
 
 include ../../config.mk
 
-LIBS = -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS)
+LIBS = -L$(top_builddir)/src/parsers -lsqlreparser -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS)
 
 .PHONY: all clean install uninstall
 

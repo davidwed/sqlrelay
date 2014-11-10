@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
@@ -116,15 +116,15 @@ bool translatedatetimes::translateDateTimesInQuery(
 
 	// convert this node...
 	if (!charstring::compare(querynode->getName(),
-					sqlparser::_verbatim) ||
+					sqlreparser::_verbatim) ||
 		!charstring::compare(querynode->getName(),
-					sqlparser::_value) ||
+					sqlreparser::_value) ||
 		!charstring::compare(querynode->getName(),
-					sqlparser::_string_literal)) {
+					sqlreparser::_string_literal)) {
 
 		// get the value
 		const char	*value=querynode->getAttributeValue(
-							sqlparser::_value);
+							sqlreparser::_value);
 
 		// leave it alone unless it's a string
 		// NOTE: This is important to do... In particular, the informix
@@ -191,7 +191,7 @@ bool translatedatetimes::translateDateTimesInQuery(
 
 					// update the value
 					sqlts->setAttribute(querynode,
-							sqlparser::_value,
+							sqlreparser::_value,
 							output.getString());
 
 					// clean up

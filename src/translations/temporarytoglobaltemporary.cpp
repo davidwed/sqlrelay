@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
@@ -42,20 +42,20 @@ bool temporarytoglobaltemporary::run(sqlrserverconnection *sqlrcon,
 void temporarytoglobaltemporary::insertGlobal(xmldomnode *node) {
 
 	xmldomnode	*create=
-			node->getFirstTagChild(sqlparser::_create);
+			node->getFirstTagChild(sqlreparser::_create);
 	if (create->isNullNode()) {
 		return;
 	}
 
 	xmldomnode	*temporary=
-			create->getFirstTagChild(sqlparser::_temporary);
+			create->getFirstTagChild(sqlreparser::_temporary);
 	if (temporary->isNullNode()) {
 		return;
 	}
 
-	if (temporary->getPreviousTagSibling(sqlparser::_global)->
+	if (temporary->getPreviousTagSibling(sqlreparser::_global)->
 							isNullNode()) {
-		create->insertTag(sqlparser::_global,temporary->getPosition());
+		create->insertTag(sqlreparser::_global,temporary->getPosition());
 	}
 }
 

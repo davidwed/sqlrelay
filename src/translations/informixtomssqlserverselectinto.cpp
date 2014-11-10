@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
@@ -39,14 +39,14 @@ bool informixtomssqlserverselectinto::run(sqlrserverconnection *sqlrcon,
 
 	// select query
 	xmldomnode	*selectnode=
-			query->getFirstTagChild(sqlparser::_select);
+			query->getFirstTagChild(sqlreparser::_select);
 	if (selectnode->isNullNode()) {
 		return true;
 	}
 
 	// select into
 	xmldomnode	*selectintonode=
-			selectnode->getFirstTagChild(sqlparser::_select_into);
+			selectnode->getFirstTagChild(sqlreparser::_select_into);
 	if (selectintonode->isNullNode()) {
 		return true;
 	}
@@ -54,7 +54,7 @@ bool informixtomssqlserverselectinto::run(sqlrserverconnection *sqlrcon,
 	// select expressions
 	xmldomnode	*selectexpressionsnode=
 			selectnode->getFirstTagChild(
-					sqlparser::_select_expressions);
+					sqlreparser::_select_expressions);
 	if (selectexpressionsnode->isNullNode()) {
 		return true;
 	}
@@ -66,7 +66,7 @@ bool informixtomssqlserverselectinto::run(sqlrserverconnection *sqlrcon,
 
 	// remove any temporary qualifier
 	xmldomnode	*tempnode=
-			selectintonode->getFirstTagChild(sqlparser::_temporary);
+			selectintonode->getFirstTagChild(sqlreparser::_temporary);
 	if (!tempnode->isNullNode()) {
 		selectintonode->deleteChild(tempnode);
 	}

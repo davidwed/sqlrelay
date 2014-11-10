@@ -3893,9 +3893,9 @@ sqlrparser *sqlrservercontroller::newParser(const char *module) {
 	modulename.append(LIBEXECDIR);
 	modulename.append("/sqlrparser_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
-	if (!parserdl.open(modulename.getString(),true,true)) {
+	if (!sqlrpdl.open(modulename.getString(),true,true)) {
 		stderror.printf("failed to load parser module: %s\n",module);
-		char	*error=parserdl.getError();
+		char	*error=sqlrpdl.getError();
 		stderror.printf("%s\n",error);
 		delete[] error;
 		return NULL;
@@ -3906,10 +3906,10 @@ sqlrparser *sqlrservercontroller::newParser(const char *module) {
 	functionname.append("new_")->append(module);
 	sqlrparser	*(*newParser)()=
 			(sqlrparser *(*)())
-				parserdl.getSymbol(functionname.getString());
+				sqlrpdl.getSymbol(functionname.getString());
 	if (!newParser) {
 		stderror.printf("failed to load parser: %s\n",module);
-		char	*error=parserdl.getError();
+		char	*error=sqlrpdl.getError();
 		stderror.printf("%s\n",error);
 		delete[] error;
 		return NULL;
@@ -3930,7 +3930,7 @@ sqlrparser *sqlrservercontroller::newParser(const char *module) {
 	if (!parser) {
 		stderror.printf("failed to create parser: %s\n",module);
 #ifdef SQLRELAY_ENABLE_SHARED
-		char	*error=parserdl.getError();
+		char	*error=sqlrpdl.getError();
 		stderror.printf("%s\n",error);
 		delete[] error;
 #endif

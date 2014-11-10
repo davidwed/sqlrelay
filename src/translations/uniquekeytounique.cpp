@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
@@ -40,22 +40,22 @@ bool uniquekeytounique::run(sqlrserverconnection *sqlrcon,
 
 void uniquekeytounique::replaceUniqueKey(xmldomnode *node) {
 
-	xmldomnode	*columns=node->getFirstTagChild(sqlparser::_create)->
-					getFirstTagChild(sqlparser::_table)->
-					getFirstTagChild(sqlparser::_columns);
+	xmldomnode	*columns=node->getFirstTagChild(sqlreparser::_create)->
+					getFirstTagChild(sqlreparser::_table)->
+					getFirstTagChild(sqlreparser::_columns);
 	if (columns->isNullNode()) {
 		return;
 	}
 
-	for (xmldomnode *col=columns->getFirstTagChild(sqlparser::_column);
+	for (xmldomnode *col=columns->getFirstTagChild(sqlreparser::_column);
 			!col->isNullNode();
-			col=col->getNextTagSibling(sqlparser::_column)) {
+			col=col->getNextTagSibling(sqlreparser::_column)) {
 
 		xmldomnode	*uniquekey=
-			col->getFirstTagChild(sqlparser::_constraints)->
-				getFirstTagChild(sqlparser::_unique_key);
+			col->getFirstTagChild(sqlreparser::_constraints)->
+				getFirstTagChild(sqlreparser::_unique_key);
 		if (!uniquekey->isNullNode()) {
-			uniquekey->setName(sqlparser::_unique);
+			uniquekey->setName(sqlreparser::_unique);
 		}
 	}
 }

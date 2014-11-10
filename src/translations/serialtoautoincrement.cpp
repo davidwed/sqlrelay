@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
@@ -35,23 +35,23 @@ bool serialtoautoincrement::run(sqlrserverconnection *sqlrcon,
 
 	// for each column of a create query
 	for (xmldomnode *columnnode=querytree->getRootNode()->
-				getFirstTagChild(sqlparser::_create)->
-				getFirstTagChild(sqlparser::_table)->
-				getFirstTagChild(sqlparser::_columns)->
-				getFirstTagChild(sqlparser::_column);
+				getFirstTagChild(sqlreparser::_create)->
+				getFirstTagChild(sqlreparser::_table)->
+				getFirstTagChild(sqlreparser::_columns)->
+				getFirstTagChild(sqlreparser::_column);
 		!columnnode->isNullNode();
-		columnnode=columnnode->getNextTagSibling(sqlparser::_column)) {
+		columnnode=columnnode->getNextTagSibling(sqlreparser::_column)) {
 
 		// get the type node
 		xmldomnode	*typenode=
-			columnnode->getFirstTagChild(sqlparser::_type);
+			columnnode->getFirstTagChild(sqlreparser::_type);
 		if (typenode->isNullNode()) {
 			continue;
 		}
 
 		// skip non-serial types
 		const char	*coltype=
-			typenode->getAttributeValue(sqlparser::_value);
+			typenode->getAttributeValue(sqlreparser::_value);
 		bool	serial=!charstring::compare(coltype,"serial");
 		bool	serial8=!charstring::compare(coltype,"serial8");
 		if (!serial && !serial8) {
@@ -65,18 +65,18 @@ bool serialtoautoincrement::run(sqlrserverconnection *sqlrcon,
 			// type other than "int" such as long, quad or
 			// something else
 		}
-		typenode->setAttributeValue(sqlparser::_value,newcoltype);
+		typenode->setAttributeValue(sqlreparser::_value,newcoltype);
 
 		// find the constraints node or create one
 		xmldomnode	*constraintsnode=
-			columnnode->getFirstTagChild(sqlparser::_constraints);
+			columnnode->getFirstTagChild(sqlreparser::_constraints);
 		if (constraintsnode->isNullNode()) {
 			constraintsnode=sqlts->newNode(columnnode,
-						sqlparser::_constraints);
+						sqlreparser::_constraints);
 		}
 
 		// add auto_increment constraint
-		sqlts->newNode(constraintsnode,sqlparser::_auto_increment);
+		sqlts->newNode(constraintsnode,sqlreparser::_auto_increment);
 	}
 
 	return true;

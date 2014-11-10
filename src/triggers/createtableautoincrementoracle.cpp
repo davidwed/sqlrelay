@@ -5,7 +5,7 @@
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
 #include <sqlrelay/sqlrtrigger.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <debugprint.h>
 
 class createtableautoincrementoracle : public sqlrtrigger {
@@ -43,45 +43,45 @@ bool createtableautoincrementoracle::run(sqlrserverconnection *sqlrcon,
 
 	// create...
 	xmldomnode	*node=querytree->getRootNode()->
-					getFirstTagChild(sqlparser::_create);
+					getFirstTagChild(sqlreparser::_create);
 	if (node->isNullNode()) {
 		return false;
 	}
 
 	// table...
-	xmldomnode	*tablenode=node->getFirstTagChild(sqlparser::_table);
+	xmldomnode	*tablenode=node->getFirstTagChild(sqlreparser::_table);
 	if (node->isNullNode()) {
 		return false;
 	}
 
 	// table name database and schema...
-	node=tablenode->getFirstTagChild(sqlparser::_table_name_database);
-	const char	*database=node->getAttributeValue(sqlparser::_value);
-	node=tablenode->getFirstTagChild(sqlparser::_table_name_schema);
-	const char	*schema=node->getAttributeValue(sqlparser::_value);
+	node=tablenode->getFirstTagChild(sqlreparser::_table_name_database);
+	const char	*database=node->getAttributeValue(sqlreparser::_value);
+	node=tablenode->getFirstTagChild(sqlreparser::_table_name_schema);
+	const char	*schema=node->getAttributeValue(sqlreparser::_value);
 
 	// table name...
-	node=tablenode->getFirstTagChild(sqlparser::_table_name_table);
+	node=tablenode->getFirstTagChild(sqlreparser::_table_name_table);
 	if (node->isNullNode()) {
 		return false;
 	}
-	const char	*table=node->getAttributeValue(sqlparser::_value);
+	const char	*table=node->getAttributeValue(sqlreparser::_value);
 
 	// columns
-	node=tablenode->getFirstTagChild(sqlparser::_columns);
+	node=tablenode->getFirstTagChild(sqlreparser::_columns);
 	if (node->isNullNode()) {
 		return false;
 	}
 
 	// for each column...
-	for (xmldomnode *columnnode=node->getFirstTagChild(sqlparser::_column);
+	for (xmldomnode *columnnode=node->getFirstTagChild(sqlreparser::_column);
 		!columnnode->isNullNode();
-		columnnode=columnnode->getNextTagSibling(sqlparser::_column)) {
+		columnnode=columnnode->getNextTagSibling(sqlreparser::_column)) {
 
 		// constraints...
 		xmldomnode	*constraintsnode=
 			columnnode->getFirstTagChild(
-				sqlparser::_constraints);
+				sqlreparser::_constraints);
 		if (constraintsnode->isNullNode()) {
 			continue;
 		}
@@ -89,7 +89,7 @@ bool createtableautoincrementoracle::run(sqlrserverconnection *sqlrcon,
 		// auto_increment...
 		xmldomnode	*autoincnode=
 			constraintsnode->getFirstTagChild(
-				sqlparser::_auto_increment);
+				sqlreparser::_auto_increment);
 		if (autoincnode->isNullNode()) {
 			continue;
 		}
@@ -97,12 +97,12 @@ bool createtableautoincrementoracle::run(sqlrserverconnection *sqlrcon,
 		// column name
 		xmldomnode	*namenode=
 			columnnode->getFirstTagChild(
-				sqlparser::_name);
+				sqlreparser::_name);
 		if (namenode->isNullNode()) {
 			continue;
 		}
 		const char	*columnname=
-				namenode->getAttributeValue(sqlparser::_value);
+				namenode->getAttributeValue(sqlreparser::_value);
 
 		createSequenceAndTrigger(sqlrcon,sqlrcur,
 					database,schema,table,columnname);

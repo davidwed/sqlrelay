@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <debugprint.h>
 
@@ -40,7 +40,7 @@ bool mysqlunsupported::run(sqlrserverconnection *sqlrcon,
 
 void mysqlunsupported::removeNoWait(xmldomnode *node) {
 
-	if (!charstring::compare(node->getName(),sqlparser::_nowait)) {
+	if (!charstring::compare(node->getName(),sqlreparser::_nowait)) {
 		node->setAttributeValue("supported","false");
 		return;
 	}

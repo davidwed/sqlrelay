@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrservercontroller.h>
 #include <sqlrelay/sqlrserverconnection.h>
 #include <sqlrelay/sqlrservercursor.h>
-#include <sqlrelay/sqlparser.h>
+#include <sqlrelay/sqlreparser.h>
 #include <sqlrelay/sqlrtrigger.h>
 #include <debugprint.h>
 
@@ -45,19 +45,19 @@ bool droptableautoincrementoracle::run(sqlrserverconnection *sqlrcon,
 
 	// drop...
 	xmldomnode	*node=querytree->getRootNode()->
-					getFirstTagChild(sqlparser::_drop);
+					getFirstTagChild(sqlreparser::_drop);
 	if (node->isNullNode()) {
 		return false;
 	}
 
 	// table...
-	node=node->getFirstTagChild(sqlparser::_table);
+	node=node->getFirstTagChild(sqlreparser::_table);
 	if (node->isNullNode()) {
 		return false;
 	}
 
 	// table name list...
-	node=node->getFirstTagChild(sqlparser::_table_name_list);
+	node=node->getFirstTagChild(sqlreparser::_table_name_list);
 	if (node->isNullNode()) {
 		return false;
 	}
@@ -65,30 +65,30 @@ bool droptableautoincrementoracle::run(sqlrserverconnection *sqlrcon,
 	// for each table name...
 	for (xmldomnode *listitemnode=
 			node->getFirstTagChild(
-				sqlparser::_table_name_list_item);
+				sqlreparser::_table_name_list_item);
 		!listitemnode->isNullNode();
 			listitemnode=listitemnode->
 				getNextTagSibling(
-					sqlparser::_table_name_list_item)) {
+					sqlreparser::_table_name_list_item)) {
 
 		// table name database and schema...
 		node=listitemnode->getFirstTagChild(
-					sqlparser::_table_name_database);
+					sqlreparser::_table_name_database);
 		const char	*database=
-				node->getAttributeValue(sqlparser::_value);
+				node->getAttributeValue(sqlreparser::_value);
 		node=listitemnode->getFirstTagChild(
-					sqlparser::_table_name_schema);
+					sqlreparser::_table_name_schema);
 		const char	*schema=
-				node->getAttributeValue(sqlparser::_value);
+				node->getAttributeValue(sqlreparser::_value);
 
 		// table name...
 		node=listitemnode->getFirstTagChild(
-					sqlparser::_table_name_table);
+					sqlreparser::_table_name_table);
 		if (node->isNullNode()) {
 			continue;
 		}
 		const char	*table=
-				node->getAttributeValue(sqlparser::_value);
+				node->getAttributeValue(sqlreparser::_value);
 		if (!table) {
 			continue;
 		}
