@@ -75,8 +75,8 @@ bool temptablesaddmissingcolumns::run(sqlrserverconnection *sqlrcon,
 		return true;
 	}
 	stringbuffer	selectclause;
-	sqlwriter	sqlw;
-	if (!sqlw.write(select,&selectclause,false)) {
+	sqlparser	sqlp;
+	if (!sqlp.write(select,&selectclause,false)) {
 		return true;
 	}
 

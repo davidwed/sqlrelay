@@ -157,7 +157,6 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlparser *sqlp,
-					sqlwriter *sqlw,
 					const char *query,
 					stringbuffer *translatedquery) {
 	debugFunction();
@@ -201,7 +200,7 @@ bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
 		} else {
 
 			if (tree) {
-				if (!sqlw->write(tree,&tempquerystr)) {
+				if (!sqlp->write(&tempquerystr)) {
 					return false;
 				}
 				tree=NULL;
@@ -224,7 +223,7 @@ bool sqlrtranslations::runTranslations(sqlrserverconnection *sqlrcon,
 	}
 
 	if (tree) {
-		if (!sqlw->write(tree,translatedquery)) {
+		if (!sqlp->write(translatedquery)) {
 			return false;
 		}
 	} else {

@@ -112,7 +112,6 @@ SRCS = sqlrlistener.cpp \
 	sqlrprotocols.cpp \
 	sqlrprotocol.cpp \
 	sqlparser.cpp \
-	sqlwriter.cpp \
 	sqlrtranslations.cpp \
 	sqlrtranslation.cpp \
 	sqlrresultsettranslations.cpp \
@@ -136,7 +135,6 @@ LOBJS = sqlrlistener.lo \
 	sqlrprotocols.lo \
 	sqlrprotocol.lo \
 	sqlparser.lo \
-	sqlwriter.lo \
 	sqlrtranslations.lo \
 	sqlrtranslation.lo \
 	sqlrresultsettranslations.lo \
@@ -387,7 +385,6 @@ installheaders:
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrtranslations.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrtrigger.h $(includedir)/sqlrelay
 	$(INSTALL) -m 644 ../include/sqlrelay/sqlrtriggers.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 ../include/sqlrelay/sqlwriter.h $(includedir)/sqlrelay
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
 	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverconnection.h $(includedir)/sqlrelay/private
 	$(INSTALL) -m 644 ../include/sqlrelay/private/sqlrserverconnectionincludes.h $(includedir)/sqlrelay/private
@@ -424,7 +421,6 @@ uninstall:
 	$(RM) $(includedir)/sqlrelay/sqlrtranslations.h
 	$(RM) $(includedir)/sqlrelay/sqlrtrigger.h
 	$(RM) $(includedir)/sqlrelay/sqlrtriggers.h
-	$(RM) $(includedir)/sqlrelay/sqlwriter.h
 	$(RM) $(includedir)/sqlrelay/private/sqlrserverdll.h
 	$(RM) $(includedir)/sqlrelay/private/sqlrshmdata.h
 	$(RM) $(bindir)/sqlr-start$(EXE)

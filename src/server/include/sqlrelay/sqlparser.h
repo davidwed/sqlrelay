@@ -19,6 +19,13 @@ class SQLRSERVER_DLLSPEC sqlparser {
 		xmldom	*getTree();
 		xmldom	*detachTree();
 
+		bool	write(stringbuffer *output);
+		bool	write(xmldomnode *node,
+					stringbuffer *output,
+					bool omitsiblings);
+		bool	write(xmldomnode *node, 
+					stringbuffer *output);
+
 	private:
 		bool	parseInternal(const char *query,
 					bool useescapecharacters);
@@ -1100,6 +1107,452 @@ class SQLRSERVER_DLLSPEC sqlparser {
 		bool	error;
 
 		bool	useescapecharacters;
+
+		// write methods
+		bool	handleStart(xmldomnode *node,
+						stringbuffer *output);
+		bool	handleEnd(xmldomnode *node,
+						stringbuffer *output);
+
+		// generic
+		bool	tableNameDatabase(xmldomnode *node,
+						stringbuffer *output);
+		bool	tableNameSchema(xmldomnode *node,
+						stringbuffer *output);
+		bool	tableNameTable(xmldomnode *node,
+						stringbuffer *output);
+		bool	name(xmldomnode *node,
+					stringbuffer *output);
+		bool	type(xmldomnode *node,
+					stringbuffer *output);
+		bool	endType(xmldomnode *node,
+					stringbuffer *output);
+		bool	size(xmldomnode *node,
+					stringbuffer *output);
+		bool	endSize(xmldomnode *node,
+					stringbuffer *output);
+		bool	value(xmldomnode *node,
+					stringbuffer *output);
+		bool	verbatim(xmldomnode *node,
+					stringbuffer *output);
+
+		// create query...
+		bool	createQuery(xmldomnode *node,
+					stringbuffer *output);
+
+		// table...
+		bool	table(xmldomnode *node,
+					stringbuffer *output);
+		bool	global(xmldomnode *node,
+					stringbuffer *output);
+		bool	temporary(xmldomnode *node,
+					stringbuffer *output);
+		bool	ifNotExists(xmldomnode *node,
+					stringbuffer *output);
+
+		// index...
+		bool	fulltext(xmldomnode *node,
+					stringbuffer *output);
+		bool	spatial(xmldomnode *node,
+					stringbuffer *output);
+		bool	index(xmldomnode *node,
+					stringbuffer *output);
+		bool	indexNameDatabase(xmldomnode *node,
+					stringbuffer *output);
+		bool	indexNameSchema(xmldomnode *node,
+					stringbuffer *output);
+		bool	indexNameIndex(xmldomnode *node,
+					stringbuffer *output);
+		bool	btree(xmldomnode *node,
+					stringbuffer *output);
+		bool	hash(xmldomnode *node,
+					stringbuffer *output);
+		bool	keyBlockSize(xmldomnode *node,
+					stringbuffer *output);
+		bool	withParser(xmldomnode *node,
+					stringbuffer *output);
+
+
+		// synonym...
+		bool	synonym(xmldomnode *node,
+					stringbuffer *output);
+		bool	forClause(xmldomnode *node,
+					stringbuffer *output);
+		bool	objectNameDatabase(xmldomnode *node,
+					stringbuffer *output);
+		bool	objectNameSchema(xmldomnode *node,
+					stringbuffer *output);
+		bool	objectNameObject(xmldomnode *node,
+					stringbuffer *output);
+		
+
+		// column definitions...
+		bool	columns(xmldomnode *node,
+					stringbuffer *output);
+		bool	endColumns(xmldomnode *node,
+					stringbuffer *output);
+		bool	column(xmldomnode *node,
+					stringbuffer *output);
+		bool	endColumn(xmldomnode *node,
+					stringbuffer *output);
+		bool	values(xmldomnode *node,
+					stringbuffer *output);
+		bool	endValues(xmldomnode *node,
+					stringbuffer *output);
+		bool	length(xmldomnode *node,
+					stringbuffer *output);
+		bool	scale(xmldomnode *node,
+					stringbuffer *output);
+
+		// constraints...
+		bool	constraints(xmldomnode *node,
+					stringbuffer *output);
+		bool	unsignedConstraint(xmldomnode *node,
+					stringbuffer *output);
+		bool	zerofill(xmldomnode *node,
+					stringbuffer *output);
+		bool	binary(xmldomnode *node,
+					stringbuffer *output);
+		bool	characterSet(xmldomnode *node,
+					stringbuffer *output);
+		bool	collate(xmldomnode *node,
+					stringbuffer *output);
+		bool	nullable(xmldomnode *node,
+					stringbuffer *output);
+		bool	notNull(xmldomnode *node,
+					stringbuffer *output);
+		bool	defaultValue(xmldomnode *node,
+					stringbuffer *output);
+		bool	autoIncrement(xmldomnode *node,
+					stringbuffer *output);
+		bool	identity(xmldomnode *node,
+					stringbuffer *output);
+		bool	uniqueKey(xmldomnode *node,
+					stringbuffer *output);
+		bool	primaryKey(xmldomnode *node,
+					stringbuffer *output);
+		bool	key(xmldomnode *node,
+					stringbuffer *output);
+		bool	comment(xmldomnode *node,
+					stringbuffer *output);
+		bool	columnFormat(xmldomnode *node,
+					stringbuffer *output);
+		bool	references(xmldomnode *node,
+					stringbuffer *output);
+		bool	endReferences(xmldomnode *node,
+					stringbuffer *output);
+		bool	match(xmldomnode *node,
+					stringbuffer *output);
+		bool	onDelete(xmldomnode *node,
+					stringbuffer *output);
+		bool	onUpdate(xmldomnode *node,
+					stringbuffer *output);
+		bool	onCommit(xmldomnode *node,
+					stringbuffer *output);
+		bool	as(xmldomnode *node,
+					stringbuffer *output);
+		bool	constraint(xmldomnode *node,
+					stringbuffer *output);
+		bool	foreignKey(xmldomnode *node,
+					stringbuffer *output);
+		bool	check(xmldomnode *node,
+					stringbuffer *output);
+		bool	endCheck(xmldomnode *node,
+					stringbuffer *output);
+
+
+		// table creation qualifiers...
+		bool	withNoLog(xmldomnode *node,
+					stringbuffer *output);
+
+
+		// drop...
+		bool	dropQuery(xmldomnode *node,
+					stringbuffer *output);
+		bool	ifExists(xmldomnode *node,
+					stringbuffer *output);
+		bool	endTableNameListItem(xmldomnode *node,
+					stringbuffer *output);
+		bool	restrictClause(xmldomnode *node,
+					stringbuffer *output);
+		bool	cascade(xmldomnode *node,
+					stringbuffer *output);
+		bool	cascadeConstraintsClause(xmldomnode *node,
+					stringbuffer *output);
+
+
+		// insert...
+		bool	insertQuery(xmldomnode *node,
+					stringbuffer *output);
+		bool	insertInto(xmldomnode *node,
+					stringbuffer *output);
+		bool	insertValuesClause(xmldomnode *node,
+					stringbuffer *output);
+		bool	endInsertValuesClause(xmldomnode *node,
+					stringbuffer *output);
+		bool	insertValueClause(xmldomnode *node,
+					stringbuffer *output);
+		bool	endInsertValueClause(xmldomnode *node,
+					stringbuffer *output);
+		bool	insertValue(xmldomnode *node,
+					stringbuffer *output);
+		bool	endInsertValue(xmldomnode *node,
+					stringbuffer *output);
+
+
+		// update...
+		bool	updateQuery(xmldomnode *node,
+					stringbuffer *output);
+		bool	updateSet(xmldomnode *node,
+					stringbuffer *output);
+		bool	assignment(xmldomnode *node,
+					stringbuffer *output);
+		bool	endAssignment(xmldomnode *node,
+					stringbuffer *output);
+		bool	equals(xmldomnode *node,
+					stringbuffer *output);
+
+
+		// delete...
+		bool	deleteQuery(xmldomnode *node,
+					stringbuffer *output);
+		bool	deleteFrom(xmldomnode *node,
+					stringbuffer *output);
+		bool	usingClause(xmldomnode *node,
+					stringbuffer *output);
+
+
+		// select...
+		bool	selectQuery(xmldomnode *node,
+					stringbuffer *output);
+		bool	selectExpressions(xmldomnode *node,
+					stringbuffer *output);
+		bool	selectExpression(xmldomnode *node,
+					stringbuffer *output);
+		bool	endSelectExpression(xmldomnode *node,
+					stringbuffer *output);
+		bool	subSelect(xmldomnode *node,
+					stringbuffer *output);
+		bool	endSubSelect(xmldomnode *node,
+					stringbuffer *output);
+		bool	unionClause(xmldomnode *node,
+					stringbuffer *output);
+		bool	all(xmldomnode *node,
+					stringbuffer *output);
+		bool	alias(xmldomnode *node,
+					stringbuffer *output);
+		bool	unique(xmldomnode *node,
+					stringbuffer *output);
+		bool	distinct(xmldomnode *node,
+					stringbuffer *output);
+		bool	from(xmldomnode *node,
+					stringbuffer *output);
+		bool	tableReferences(xmldomnode *node,
+					stringbuffer *output);
+		bool	tableReference(xmldomnode *node,
+					stringbuffer *output);
+		bool	endTableReference(xmldomnode *node,
+					stringbuffer *output);
+		bool	joinClause(xmldomnode *node,
+					stringbuffer *output);
+		bool	endJoinClause(xmldomnode *node,
+					stringbuffer *output);
+		bool	inner(xmldomnode *node,
+					stringbuffer *output);
+		bool	cross(xmldomnode *node,
+					stringbuffer *output);
+		bool	straightJoin(xmldomnode *node,
+					stringbuffer *output);
+		bool	left(xmldomnode *node,
+					stringbuffer *output);
+		bool	right(xmldomnode *node,
+					stringbuffer *output);
+		bool	outer(xmldomnode *node,
+					stringbuffer *output);
+		bool	natural(xmldomnode *node,
+					stringbuffer *output);
+		bool	join(xmldomnode *node,
+					stringbuffer *output);
+		bool	on(xmldomnode *node,
+					stringbuffer *output);
+		bool	joinUsing(xmldomnode *node,
+					stringbuffer *output);
+		bool	where(xmldomnode *node,
+					stringbuffer *output);
+		bool	andClause(xmldomnode *node,
+					stringbuffer *output);
+		bool	orClause(xmldomnode *node,
+					stringbuffer *output);
+		bool	group(xmldomnode *node,
+					stringbuffer *output);
+		bool	endGroup(xmldomnode *node,
+					stringbuffer *output);
+		bool	comparison(xmldomnode *node,
+					stringbuffer *output);
+		bool	notClause(xmldomnode *node,
+					stringbuffer *output);
+		bool	between(xmldomnode *node,
+					stringbuffer *output);
+		bool	in(xmldomnode *node,
+					stringbuffer *output);
+		bool	endIn(xmldomnode *node,
+					stringbuffer *output);
+		bool	inSetItem(xmldomnode *node,
+					stringbuffer *output);
+		bool	endInSetItem(xmldomnode *node,
+					stringbuffer *output);
+		bool	exists(xmldomnode *node,
+					stringbuffer *output);
+		bool	endExists(xmldomnode *node,
+					stringbuffer *output);
+		bool	is(xmldomnode *node,
+					stringbuffer *output);
+		bool	like(xmldomnode *node,
+					stringbuffer *output);
+		bool	matches(xmldomnode *node,
+					stringbuffer *output);
+		bool	nullSafeEquals(xmldomnode *node,
+					stringbuffer *output);
+		bool	notEquals(xmldomnode *node,
+					stringbuffer *output);
+		bool	lessThan(xmldomnode *node,
+					stringbuffer *output);
+		bool	greaterThan(xmldomnode *node,
+					stringbuffer *output);
+		bool	lessThanOrEqualTo(xmldomnode *node,
+					stringbuffer *output);
+		bool	greaterThanOrEqualTo(xmldomnode *node,
+					stringbuffer *output);
+		bool	escape(xmldomnode *node,
+					stringbuffer *output);
+		bool	expression(xmldomnode *node,
+					stringbuffer *output);
+		bool	intervalQualifier(xmldomnode *node,
+					stringbuffer *output);
+		bool	outerJoinOperator(xmldomnode *node,
+					stringbuffer *output);
+		bool	compliment(xmldomnode *node,
+					stringbuffer *output);
+		bool	inverse(xmldomnode *node,
+					stringbuffer *output);
+		bool	negative(xmldomnode *node,
+					stringbuffer *output);
+		bool	plus(xmldomnode *node,
+					stringbuffer *output);
+		bool	minus(xmldomnode *node,
+					stringbuffer *output);
+		bool	times(xmldomnode *node,
+					stringbuffer *output);
+		bool	dividedBy(xmldomnode *node,
+					stringbuffer *output);
+		bool	modulo(xmldomnode *node,
+					stringbuffer *output);
+		bool	bitwiseAnd(xmldomnode *node,
+					stringbuffer *output);
+		bool	bitwiseOr(xmldomnode *node,
+					stringbuffer *output);
+		bool	bitwiseXor(xmldomnode *node,
+					stringbuffer *output);
+		bool	logicalAnd(xmldomnode *node,
+					stringbuffer *output);
+		bool	logicalOr(xmldomnode *node,
+					stringbuffer *output);
+		bool	number(xmldomnode *node,
+					stringbuffer *output);
+		bool	stringLiteral(xmldomnode *node,
+					stringbuffer *output);
+		bool	bindVariable(xmldomnode *node,
+					stringbuffer *output);
+		bool	columnReference(xmldomnode *node,
+					stringbuffer *output);
+		bool	columnNameDatabase(xmldomnode *node,
+					stringbuffer *output);
+		bool	columnNameSchema(xmldomnode *node,
+					stringbuffer *output);
+		bool	columnNameTable(xmldomnode *node,
+					stringbuffer *output);
+		bool	columnNameColumn(xmldomnode *node,
+					stringbuffer *output);
+		bool	function(xmldomnode *node,
+					stringbuffer *output);
+		bool	parameters(xmldomnode *node,
+					stringbuffer *output);
+		bool	endParameters(xmldomnode *node,
+					stringbuffer *output);
+		bool	parameter(xmldomnode *node,
+					stringbuffer *output);
+		bool	endParameter(xmldomnode *node,
+					stringbuffer *output);
+		bool	groupBy(xmldomnode *node,
+					stringbuffer *output);
+		bool	groupByItem(xmldomnode *node,
+					stringbuffer *output);
+		bool	endGroupByItem(xmldomnode *node,
+					stringbuffer *output);
+		bool	withRollup(xmldomnode *node,
+					stringbuffer *output);
+		bool	having(xmldomnode *node,
+					stringbuffer *output);
+		bool	orderBy(xmldomnode *node,
+					stringbuffer *output);
+		bool	orderByItem(xmldomnode *node,
+					stringbuffer *output);
+		bool	endOrderByItem(xmldomnode *node,
+					stringbuffer *output);
+		bool	asc(xmldomnode *node,
+					stringbuffer *output);
+		bool	desc(xmldomnode *node,
+					stringbuffer *output);
+		bool	limit(xmldomnode *node,
+					stringbuffer *output);
+		bool	selectInto(xmldomnode *node,
+					stringbuffer *output);
+		bool	procedure(xmldomnode *node,
+					stringbuffer *output);
+		bool	forUpdate(xmldomnode *node,
+					stringbuffer *output);
+
+
+		// set...
+		bool	setQuery(xmldomnode *node,
+					stringbuffer *output);
+		bool	setSession(xmldomnode *node,
+					stringbuffer *output);
+		bool	setGlobal(xmldomnode *node,
+					stringbuffer *output);
+		bool	transaction(xmldomnode *node,
+					stringbuffer *output);
+		bool	isolationLevel(xmldomnode *node,
+					stringbuffer *output);
+
+
+		// lock...
+		bool	lockQuery(xmldomnode *node,
+					stringbuffer *output);
+		bool	inMode(xmldomnode *node,
+					stringbuffer *output);
+		bool	lockMode(xmldomnode *node,
+					stringbuffer *output);
+		bool	mode(xmldomnode *node,
+					stringbuffer *output);
+		bool	noWait(xmldomnode *node,
+					stringbuffer *output);
+
+		bool	show(xmldomnode *node,
+					stringbuffer *output);
+
+
+
+		// helper methods
+		bool	outputValue(xmldomnode *node,
+					stringbuffer *output);
+		bool	space(stringbuffer *output);
+		bool	comma(stringbuffer *output);
+		bool	period(stringbuffer *output);
+		bool	leftParen(stringbuffer *output);
+		bool	rightParen(stringbuffer *output);
+		bool	hasSibling(xmldomnode *node);
+		bool	dontAppendSpace(stringbuffer *output);
 };
 
 #endif

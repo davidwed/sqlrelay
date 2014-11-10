@@ -112,7 +112,6 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 	sqlp=NULL;
 	sqlrt=NULL;
 	sqlrrst=NULL;
-	sqlw=NULL;
 	sqlrtr=NULL;
 	sqlrlg=NULL;
 	sqlrq=NULL;
@@ -194,7 +193,6 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete sqlp;
 	delete sqlrt;
 	delete sqlrrst;
-	delete sqlw;
 	delete sqlrtr;
 	delete sqlrlg;
 	delete sqlrq;
@@ -362,7 +360,6 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		sqlp=newSqlParser();
 		sqlrt=new sqlrtranslations(debugsqlrtranslation);
 		sqlrt->loadTranslations(translations);
-		sqlw=newSqlWriter();
 	}
 
 	// get the result set translators
@@ -2219,8 +2216,7 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 
 	// apply translation rules
 	stringbuffer	translatedquery;
-	if (!sqlrt->runTranslations(conn,cursor,sqlp,sqlw,
-						query,&translatedquery)) {
+	if (!sqlrt->runTranslations(conn,cursor,sqlp,query,&translatedquery)) {
 		if (debugsqlrtranslation) {
 			stdoutput.printf("translation failed, "
 						"using original:\n\"%s\"\n\n",
@@ -3882,10 +3878,6 @@ void sqlrservercontroller::clearConnStats() {
 
 sqlparser *sqlrservercontroller::newSqlParser() {
 	return new sqlparser;
-}
-
-sqlwriter *sqlrservercontroller::newSqlWriter() {
-	return new sqlwriter;
 }
 
 void sqlrservercontroller::updateState(enum sqlrconnectionstate_t state) {

@@ -15,7 +15,6 @@
 #include <rudiments/dynamiclib.h>
 #include <sqlrelay/sqlrtranslation.h>
 #include <sqlrelay/sqlparser.h>
-#include <sqlrelay/sqlwriter.h>
 
 class sqlrserverconnection;
 class sqlrservercursor;
@@ -43,7 +42,6 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 		bool	runTranslations(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						sqlparser *sqlp,
-						sqlwriter *sqlw,
 						const char *query,
 						stringbuffer *translatedquery);
 

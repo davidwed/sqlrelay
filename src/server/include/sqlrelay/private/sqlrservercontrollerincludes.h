@@ -25,7 +25,6 @@
 #include <sqlrelay/sqlparser.h>
 #include <sqlrelay/sqlrtranslations.h>
 #include <sqlrelay/sqlrresultsettranslations.h>
-#include <sqlrelay/sqlwriter.h>
 #include <sqlrelay/sqlrtriggers.h>
 #include <sqlrelay/sqlrloggers.h>
 #include <sqlrelay/sqlrqueries.h>

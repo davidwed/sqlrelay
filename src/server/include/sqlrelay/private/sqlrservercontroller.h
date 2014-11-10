@@ -125,7 +125,6 @@
 		void	clearConnStats();
 
 		sqlparser	*newSqlParser();
-		sqlwriter	*newSqlWriter();
 
 		void	updateClientSessionStartTime();
 		void	updateClientAddr();
@@ -148,7 +147,6 @@
 		sqlparser			*sqlp;
 		sqlrtranslations		*sqlrt;
 		sqlrresultsettranslations	*sqlrrst;
-		sqlwriter			*sqlw;
 		sqlrtriggers			*sqlrtr;
 		sqlrloggers			*sqlrlg;
 		sqlrqueries			*sqlrq;
