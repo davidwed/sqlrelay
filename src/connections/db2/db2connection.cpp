@@ -60,6 +60,9 @@ class db2cursor : public sqlrservercursor {
 		void		deallocateResultSetBuffers();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
+		void		encodeBlob(stringbuffer *buffer,
+						const char *data,
+						uint32_t datasize);
 		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -824,6 +827,22 @@ bool db2cursor::prepareQuery(const char *query, uint32_t length) {
 		return false;
 	}
 	return true;
+}
+
+void db2cursor::encodeBlob(stringbuffer *buffer,
+					const char *data, uint32_t datasize) {
+
+	// db2 sort-of follows the SQL Standard:
+	// X'...' where ... is the blob data and each byte of blob data is
+	// converted to two hex characters..
+	// eg: hello -> X'68656C6C6F'
+	// but db2 also requires that the blob() function be used
+
+	buffer->append("blob(X\'");
+	for (uint32_t i=0; i<datasize; i++) {
+		buffer->append(conn->cont->asciiToHex(data[i]));
+	}
+	buffer->append("\')");
 }
 
 bool db2cursor::inputBind(const char *variable,

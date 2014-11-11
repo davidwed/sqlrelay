@@ -44,9 +44,6 @@ class mysqlcursor : public sqlrservercursor {
 #endif
 		bool		supportsNativeBinds(const char *query,
 							uint32_t length);
-		void		encodeBlob(stringbuffer *buffer,
-							const char *data,
-							uint32_t datasize);
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
@@ -695,20 +692,6 @@ bool mysqlcursor::supportsNativeBinds(const char *query, uint32_t length) {
 #else
 	return false;
 #endif
-}
-
-void mysqlcursor::encodeBlob(stringbuffer *buffer,
-					const char *data, uint32_t datasize) {
-
-	// mysql wants each byte of blob data to be converted to two
-	// hex characters...
-	// eg: hello - > 6865656F
-	// mysql also wants it to start with 0x
-
-	buffer->append("0x");
-	for (uint32_t i=0; i<datasize; i++) {
-		buffer->append(conn->cont->asciiToHex(data[i]));
-	}
 }
 
 #ifdef HAVE_MYSQL_STMT_PREPARE

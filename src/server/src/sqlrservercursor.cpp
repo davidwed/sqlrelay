@@ -686,8 +686,17 @@ void sqlrservercursor::performSubstitution(stringbuffer *buffer,
 
 void sqlrservercursor::encodeBlob(stringbuffer *buffer,
 				const char *data, uint32_t datasize) {
-	// by default just append the data
-	buffer->append(data,datasize);
+
+	// by default, follow the SQL Standard:
+	// X'...' where ... is the blob data and each byte of blob data is
+	// converted to two hex characters..
+	// eg: hello -> X'68656C6C6F'
+
+	buffer->append("X\'");
+	for (uint32_t i=0; i<datasize; i++) {
+		buffer->append(conn->cont->asciiToHex(data[i]));
+	}
+	buffer->append('\'');
 }
 
 void sqlrservercursor::setInputBindCount(uint16_t inbindcount) {

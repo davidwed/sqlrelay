@@ -116,8 +116,8 @@ class sybasecursor : public sqlrservercursor {
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 		void		encodeBlob(stringbuffer *buffer,
-							const char *data,
-							uint32_t datasize);
+						const char *data,
+						uint32_t datasize);
 		bool		inputBind(const char *variable,
 						uint16_t variablesize,
 						const char *value,
@@ -858,9 +858,8 @@ void sybasecursor::encodeBlob(stringbuffer *buffer,
 					const char *data, uint32_t datasize) {
 
 	// sybase wants each byte of blob data to be converted to two
-	// hex characters...
-	// eg: hello - > 6865656F
-	// sybase also wants it to start with 0x
+	// hex characters and the whole thing to start with 0x
+	// eg: hello - > 0x68656C6C6F
 
 	buffer->append("0x");
 	for (uint32_t i=0; i<datasize; i++) {
