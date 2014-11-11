@@ -611,7 +611,8 @@ bool sqlrservercursor::fakeInputBinds() {
 	return true;
 }
 
-void sqlrservercursor::performSubstitution(stringbuffer *buffer, int16_t index) {
+void sqlrservercursor::performSubstitution(stringbuffer *buffer,
+							int16_t index) {
 
 	if (inbindvars[index].type==STRING_BIND ||
 		inbindvars[index].type==CLOB_BIND) {
@@ -638,8 +639,11 @@ void sqlrservercursor::performSubstitution(stringbuffer *buffer, int16_t index) 
 
 		buffer->append("'");
 
-	} else if (inbindvars[index].type==CLOB_BIND) {
-		// FIXME: support BLOB_BINDs with an encodeBlob() method
+	} else if (inbindvars[index].type==BLOB_BIND) {
+		buffer->append("'");
+		encodeBlob(buffer,inbindvars[index].value.stringval,
+						inbindvars[index].valuesize);
+		buffer->append("'");
 	} else if (inbindvars[index].type==INTEGER_BIND) {
 		buffer->append(inbindvars[index].value.integerval);
 	} else if (inbindvars[index].type==DOUBLE_BIND) {
@@ -681,6 +685,12 @@ void sqlrservercursor::performSubstitution(stringbuffer *buffer, int16_t index) 
 	} else if (inbindvars[index].type==NULL_BIND) {
 		buffer->append("NULL");
 	}
+}
+
+void sqlrservercursor::encodeBlob(stringbuffer *buffer,
+				const char *data, uint32_t datasize) {
+	// by default just append the data
+	buffer->append(data,datasize);
 }
 
 void sqlrservercursor::setInputBindCount(uint16_t inbindcount) {

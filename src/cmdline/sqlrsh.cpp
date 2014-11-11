@@ -185,6 +185,9 @@ class	sqlrsh {
 		void	inputbind(sqlrcursor *sqlrcur,
 						sqlrshenv *env,
 						const char *command);
+		void	inputbindblob(sqlrcursor *sqlrcur,
+						sqlrshenv *env,
+						const char *command);
 		void	outputbind(sqlrcursor *sqlrcur,
 						sqlrshenv *env,
 						const char *command);
@@ -449,6 +452,7 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"delimiter",9) ||
 		!charstring::compareIgnoringCase(ptr,"delimeter",9) ||
 		!charstring::compareIgnoringCase(ptr,"inputbind ",10) ||
+		!charstring::compareIgnoringCase(ptr,"inputbindblob ",14) ||
 		!charstring::compareIgnoringCase(ptr,"outputbind ",11) ||
 		!charstring::compareIgnoringCase(ptr,"printinputbind",14) ||
 		!charstring::compareIgnoringCase(ptr,"printoutputbind",15) ||
@@ -562,6 +566,9 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"inputbind ",10)) {	
 		inputbind(sqlrcur,env,command);
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"inputbindblob ",14)) {	
+		inputbindblob(sqlrcur,env,command);
 		return;
 	} else if (!charstring::compareIgnoringCase(ptr,"outputbind ",11)) {	
 		outputbind(sqlrcur,env,command);
@@ -830,6 +837,9 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 						bv->dateval.second,
 						bv->dateval.microsecond,
 						bv->dateval.tz);
+			} else if (bv->type==BLOB_BIND) {
+				sqlrcur->inputBindBlob(name,bv->stringval,
+					charstring::length(bv->stringval));
 			} else if (bv->type==NULL_BIND) {
 				sqlrcur->inputBind(name,(const char *)NULL);
 			}
@@ -1271,6 +1281,75 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 	env->inputbinds.setValue(variable,bv);
 }
 
+void sqlrsh::inputbindblob(sqlrcursor *sqlrcur,
+				sqlrshenv *env, const char *command) {
+
+	// sanity check
+	const char	*ptr=command+14;
+	const char	*space=charstring::findFirst(ptr,' ');
+	if (!space) {
+		stdoutput.printf("usage: inputbindblob [variable] = [value]\n");
+		return;
+	}
+
+	// get the variable name
+	char	*variable=charstring::duplicate(ptr,space-ptr);
+
+	// move on
+	ptr=space;
+	if (*(ptr+1)=='=' && *(ptr+2)==' ') {
+		ptr=ptr+3;
+	} else if (!charstring::compareIgnoringCase(ptr+1,"is null")) {
+		ptr=NULL;
+	} else {
+		stdoutput.printf("usage: inputbindblob [variable] = [value]\n");
+		stdoutput.printf("       inputbindblob [variable] is null\n");
+		return;
+	}
+		
+	// get the value
+	char	*value=charstring::duplicate(ptr);
+	charstring::bothTrim(value);
+	size_t	valuelen=charstring::length(value);
+
+	// if the bind variable is already defined, clear it...
+	sqlrshbindvalue	*bv=NULL;
+	if (env->inputbinds.getValue(variable,&bv)) {
+		delete[] bv;
+	}
+
+	// define the variable
+	bv=new sqlrshbindvalue;
+
+	// first handle nulls, then...
+	// anything enclosed in quotes is a string
+	// if it's unquoted, check to see if it's an integer, float or date
+	// if it's not, then it's a string
+	if (!value) {
+		bv->type=NULL_BIND;
+	} else if ((value[0]=='\'' && value[valuelen-1]=='\'') ||
+			(value[0]=='"' && value[valuelen-1]=='"')) {
+
+		bv->type=BLOB_BIND;
+
+		// trim off quotes
+		char	*newvalue=charstring::duplicate(value+1);
+		newvalue[valuelen-2]='\0';
+		delete[] value;
+
+		// unescape the string
+		bv->stringval=charstring::unescape(newvalue);
+		delete[] newvalue;
+
+	} else {
+		bv->type=BLOB_BIND;
+		bv->stringval=value;
+	}
+
+	// put the bind variable in the list
+	env->inputbinds.setValue(variable,bv);
+}
+
 void sqlrsh::outputbind(sqlrcursor *sqlrcur,
 				sqlrshenv *env, const char *command) {
 
@@ -1385,6 +1464,11 @@ void sqlrsh::printbinds(const char *type,
 						bv->dateval.second,
 						bv->dateval.microsecond,
 						bv->dateval.tz);
+		} else if (bv->type==BLOB_BIND) {
+			stdoutput.printf("(BLOB) = ");
+			stdoutput.safePrint(bv->stringval,
+					charstring::length(bv->stringval));
+			stdoutput.printf("\n");
 		} else if (bv->type==NULL_BIND) {
 			stdoutput.printf("NULL\n");
 		}
@@ -1478,6 +1562,7 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	stdoutput.printf("		inputbind [variable] = [integervalue]\n");
 	stdoutput.printf("		inputbind [variable] = [doublevalue]\n");
 	stdoutput.printf("		inputbind [variable] = [MM/DD/YYYY HH:MM:SS:uS TZN]\n");
+	stdoutput.printf("		inputbindblob [variable] = [value]\n");
 	stdoutput.printf("	outputbind ...                 - ");
 	stdoutput.printf("defines an output bind variable\n");
 	stdoutput.printf("		outputbind [variable] string [length]\n");

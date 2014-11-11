@@ -516,6 +516,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 				int16_t hour, int16_t minute, int16_t second,
 				int16_t fraction);
 
+		const char	*asciiToHex(unsigned char ch);
+
 		// connection
 		sqlrserverconnection	*conn;
 
@@ -825,6 +827,8 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 
 		void	performSubstitution(stringbuffer *buffer,
 							int16_t index);
+		virtual void	encodeBlob(stringbuffer *buffer,
+					const char *data, uint32_t datasize);
 		void	abort();
 
 		char		*getQueryBuffer();

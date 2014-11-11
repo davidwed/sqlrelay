@@ -341,6 +341,9 @@ class DLLSPEC oracle8cursor : public sqlrservercursor {
 						int32_t microsecond,
 						const char *tz);
 
+		void		encodeBlob(stringbuffer *buffer,
+					const char *data, uint32_t datasize);
+
 		OCIStmt		*stmt;
 		ub2		stmttype;
 #ifdef OCI_STMT_CACHE
@@ -2222,6 +2225,18 @@ void oracle8cursor::dateToString(char *buffer, uint16_t buffersize,
 		charstring::printf(buffer,buffersize,
 					"%02d-%s-%04d",
 					day,shortmonths[month-1],year);
+	}
+}
+
+void oracle8cursor::encodeBlob(stringbuffer *buffer,
+					const char *data, uint32_t datasize) {
+
+	// oracle wants each byte of blob data to be converted to two
+	// hex characters...
+	// eg: hello - > 6865656F
+
+	for (uint32_t i=0; i<datasize; i++) {
+		buffer->append(conn->cont->asciiToHex(data[i]));
 	}
 }
 
