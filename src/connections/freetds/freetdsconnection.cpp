@@ -98,6 +98,9 @@ class freetdscursor : public sqlrservercursor {
 							uint32_t length);
 		bool		supportsNativeBinds(const char *query,
 							uint32_t length);
+		void		encodeBlob(stringbuffer *buffer,
+							const char *data,
+							uint32_t datasize);
 #ifdef FREETDS_SUPPORTS_CURSORS
 		bool		inputBind(const char *variable,
 						uint16_t variablesize,
@@ -1122,6 +1125,20 @@ bool freetdscursor::supportsNativeBinds(const char *query, uint32_t length) {
 #else
 	return false;
 #endif
+}
+
+void freetdscursor::encodeBlob(stringbuffer *buffer,
+					const char *data, uint32_t datasize) {
+
+	// sybase/mssqlserver want each byte of blob data to be converted to two
+	// hex characters...
+	// eg: hello - > 6865656F
+	// sybase/mssqlserver also want it to start with 0x
+
+	buffer->append("0x");
+	for (uint32_t i=0; i<datasize; i++) {
+		buffer->append(conn->cont->asciiToHex(data[i]));
+	}
 }
 
 void freetdscursor::checkRePrepare() {
