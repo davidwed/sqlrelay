@@ -640,10 +640,8 @@ void sqlrservercursor::performSubstitution(stringbuffer *buffer,
 		buffer->append("'");
 
 	} else if (inbindvars[index].type==BLOB_BIND) {
-		buffer->append("'");
 		encodeBlob(buffer,inbindvars[index].value.stringval,
 						inbindvars[index].valuesize);
-		buffer->append("'");
 	} else if (inbindvars[index].type==INTEGER_BIND) {
 		buffer->append(inbindvars[index].value.integerval);
 	} else if (inbindvars[index].type==DOUBLE_BIND) {

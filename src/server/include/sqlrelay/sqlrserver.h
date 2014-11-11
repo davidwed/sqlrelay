@@ -517,6 +517,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 				int16_t fraction);
 
 		const char	*asciiToHex(unsigned char ch);
+		const char	*asciiToOctal(unsigned char ch);
 
 		// connection
 		sqlrserverconnection	*conn;

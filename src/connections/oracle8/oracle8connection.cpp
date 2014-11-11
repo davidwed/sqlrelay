@@ -342,7 +342,8 @@ class DLLSPEC oracle8cursor : public sqlrservercursor {
 						const char *tz);
 
 		void		encodeBlob(stringbuffer *buffer,
-					const char *data, uint32_t datasize);
+						const char *data,
+						uint32_t datasize);
 
 		OCIStmt		*stmt;
 		ub2		stmttype;
@@ -2234,10 +2235,13 @@ void oracle8cursor::encodeBlob(stringbuffer *buffer,
 	// oracle wants each byte of blob data to be converted to two
 	// hex characters...
 	// eg: hello - > 6865656F
+	// oracle also wants quotes around a blob
 
+	buffer->append('\'');
 	for (uint32_t i=0; i<datasize; i++) {
 		buffer->append(conn->cont->asciiToHex(data[i]));
 	}
+	buffer->append('\'');
 }
 
 bool oracle8cursor::inputBind(const char *variable,

@@ -87,6 +87,9 @@ class postgresqlcursor : public sqlrservercursor {
 #endif
 		bool		supportsNativeBinds(const char *query,
 							uint32_t length);
+		void		encodeBlob(stringbuffer *buffer,
+							const char *data,
+							uint32_t datasize);
 #if defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
 		bool		inputBind(const char *variable, 
@@ -769,6 +772,26 @@ bool postgresqlcursor::supportsNativeBinds(const char *query, uint32_t length) {
 #else
 	return false;
 #endif
+}
+
+void postgresqlcursor::encodeBlob(stringbuffer *buffer,
+					const char *data, uint32_t datasize) {
+
+	// postgresql wants non-printable characters converted to octal with
+	// a preceeding slash
+	// postgresql also wants it to be quoted
+
+	buffer->append("'");
+	for (uint32_t i=0; i<datasize; i++) {
+		if (data[i]<' ' || data[i]>'~' ||
+			data[i]=='\'' || data[i]=='\\') {
+			buffer->append('\\');
+			buffer->append(conn->cont->asciiToOctal(data[i]));
+		} else {
+			buffer->append(data[i]);
+		}
+	}
+	buffer->append("'");
 }
 
 bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
