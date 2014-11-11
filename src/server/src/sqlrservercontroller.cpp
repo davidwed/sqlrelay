@@ -3900,7 +3900,7 @@ void sqlrservercontroller::clearConnStats() {
 sqlrparser *sqlrservercontroller::newParser() {
 	sqlrparser	*p=newParser("enterprise");
 	if (!p) {
-		p=newParser("base");
+		p=newParser("default");
 	}
 	return p;
 }
