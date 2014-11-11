@@ -9,13 +9,6 @@ ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MAKE) -C server all
 endif
 	$(MAKE) -C parsers all
-ifeq ($(TRIGGERS),yes)
-	$(MAKE) -C triggers all
-endif
-ifeq ($(TRANSLATIONS),yes)
-	$(MAKE) -C translations all
-	$(MAKE) -C resultsettranslations all
-endif
 	$(MAKE) -C queries all
 	$(MAKE) -C loggers all
 	$(MAKE) -C protocols all
@@ -31,9 +24,6 @@ clean:
 	$(MAKE) -C util clean
 	$(MAKE) -C api clean
 	$(MAKE) -C parsers clean
-	$(MAKE) -C triggers clean
-	$(MAKE) -C translations clean
-	$(MAKE) -C resultsettranslations clean
 	$(MAKE) -C queries clean
 	$(MAKE) -C loggers clean
 	$(MAKE) -C protocols clean
@@ -50,13 +40,6 @@ ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MAKE) -C server install
 endif
 	$(MAKE) -C parsers install
-ifeq ($(TRIGGERS),yes)
-	$(MAKE) -C triggers install
-endif
-ifeq ($(TRANSLATIONS),yes)
-	$(MAKE) -C translations install
-	$(MAKE) -C resultsettranslations install
-endif
 	$(MAKE) -C queries install
 	$(MAKE) -C loggers install
 	$(MAKE) -C protocols install
@@ -72,9 +55,6 @@ uninstall:
 	$(MAKE) -C util uninstall
 	$(MAKE) -C api uninstall
 	$(MAKE) -C parsers uninstall
-	$(MAKE) -C triggers uninstall
-	$(MAKE) -C translations uninstall
-	$(MAKE) -C resultsettranslations uninstall
 	$(MAKE) -C queries uninstall
 	$(MAKE) -C loggers uninstall
 	$(MAKE) -C protocols uninstall
