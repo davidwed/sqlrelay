@@ -37,4 +37,5 @@ ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 endif
 
 uninstall:
-	$(RM) $(libexecdir)/sqlrauth_*
+	$(RM) $(libexecdir)/sqlrauth_default.*
+	$(RM) $(libexecdir)/sqlrauth_sqlrelay.*
