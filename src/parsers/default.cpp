@@ -4,7 +4,7 @@
 #include <sqlrelay/sqlrserver.h>
 
 extern "C" {
-	sqlrparser	*new_base() {
+	sqlrparser	*new_default() {
 		return new sqlrparser();
 	}
 }
