@@ -3146,6 +3146,23 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		logDebugMessage("done with prepare query");
 
 		if (!success) {
+
+			// update query and error counts
+			incrementQueryCounts(cursor->queryType(query,querylen));
+			incrementTotalErrors();
+
+			// get the error
+			uint32_t	errorlength;
+			int64_t		errnum;
+			bool		liveconnection;
+			errorMessage(cursor,
+					cursor->getErrorBuffer(),
+					maxerrorlength,
+					&errorlength,&errnum,&liveconnection);
+			cursor->setErrorLength(errorlength);
+			cursor->setErrorNumber(errnum);
+			cursor->setLiveConnection(liveconnection);
+
 			return false;
 		}
 
