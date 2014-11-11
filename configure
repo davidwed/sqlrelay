@@ -740,8 +740,6 @@ WNOUNKNOWNPRAGMAS
 WALL
 WERROR
 PIPE
-TRANSLATIONPLUGINLIBS
-TRIGGERPLUGINLIBS
 PYTHONFRAMEWORK
 JNISUFFIX
 MODULESUFFIX
@@ -803,8 +801,6 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
-TRANSLATIONS
-TRIGGERS
 LIBEFENCE
 LIBDMALLOC
 PSQLUSERPATH
@@ -950,8 +946,6 @@ with_pthread_prefix
 with_system_libtool
 enable_dmalloc
 enable_efence
-enable_triggers
-enable_translations
 enable_shared
 enable_static
 with_pic
@@ -1628,8 +1622,6 @@ Optional Features:
   --enable-psql-rpath           Use -rpath when linking the psql replacement library against the SQL Relay client library
   --enable-dmalloc              Use the dmalloc library
   --enable-efence               Use the efence library
-  --enable-triggers             Enable trigger framework (experimental)
-  --enable-translations         Enable translation framework (experimental)
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -3194,22 +3186,6 @@ if test "${enable_efence+set}" = set; then :
   enableval=$enable_efence; LIBEFENCE="-lefence"
 else
   LIBEFENCE=""
-fi
-
-
-# Check whether --enable-triggers was given.
-if test "${enable_triggers+set}" = set; then :
-  enableval=$enable_triggers; TRIGGERS="yes"
-else
-  TRIGGERS=""
-fi
-
-
-# Check whether --enable-translations was given.
-if test "${enable_translations+set}" = set; then :
-  enableval=$enable_translations; TRANSLATIONS="yes"
-else
-  TRANSLATIONS=""
 fi
 
 
@@ -15950,27 +15926,15 @@ _ACEOF
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for plugin dependencies" >&5
 $as_echo_n "checking for plugin dependencies... " >&6; }
 PYTHONFRAMEWORK=""
-TRIGGERPLUGINLIBS=""
-TRANSLATIONPLUGINLIBS=""
-if ( test -n "$CYGWIN" )
-then
-	TRIGGERPLUGINLIBS="-L./ -lsqlrconnection"
-	TRANSLATIONPLUGINLIBS="-L./ -lsqlrconnection"
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: Cygwin style" >&5
-$as_echo "Cygwin style" >&6; }
-elif (test -n "$DARWIN" )
+if (test -n "$DARWIN" )
 then
 	PYTHONFRAMEWORK="-framework Python"
-	TRIGGERPLUGINLIBS="-L./ -lsqlrconnection"
-	TRANSLATIONPLUGINLIBS="-L./ -lsqlrconnection"
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: OSX style" >&5
 $as_echo "OSX style" >&6; }
 else
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: standard unix style" >&5
 $as_echo "standard unix style" >&6; }
 fi
-
-
 
 
 

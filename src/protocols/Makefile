@@ -30,4 +30,4 @@ ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 endif
 
 uninstall:
-	$(RM) $(libexecdir)/sqlrprotocol_*
+	$(RM) $(libexecdir)/sqlrprotocol_sqlrclient.*

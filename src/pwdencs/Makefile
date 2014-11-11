@@ -46,4 +46,6 @@ ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 endif
 
 uninstall:
-	$(RM) $(libexecdir)/sqlrpwdenc_*
+	$(RM) $(libexecdir)/sqlrpwdenc_rot.*
+	$(RM) $(libexecdir)/sqlrpwdenc_md5.*
+	$(RM) $(libexecdir)/sqlrpwdenc_crypt.*

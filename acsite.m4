@@ -605,25 +605,14 @@ AC_DEFUN([FW_CHECK_PLUGIN_DEPENDENCIES],
 [
 AC_MSG_CHECKING(for plugin dependencies)
 PYTHONFRAMEWORK=""
-TRIGGERPLUGINLIBS=""
-TRANSLATIONPLUGINLIBS=""
-if ( test -n "$CYGWIN" )
-then
-	TRIGGERPLUGINLIBS="-L./ -lsqlrconnection"
-	TRANSLATIONPLUGINLIBS="-L./ -lsqlrconnection"
-	AC_MSG_RESULT(Cygwin style)
-elif (test -n "$DARWIN" )
+if (test -n "$DARWIN" )
 then
 	PYTHONFRAMEWORK="-framework Python"
-	TRIGGERPLUGINLIBS="-L./ -lsqlrconnection"
-	TRANSLATIONPLUGINLIBS="-L./ -lsqlrconnection"
 	AC_MSG_RESULT(OSX style)
 else
 	AC_MSG_RESULT(standard unix style)
 fi
 AC_SUBST(PYTHONFRAMEWORK)
-AC_SUBST(TRIGGERPLUGINLIBS)
-AC_SUBST(TRANSLATIONPLUGINLIBS)
 ])
 
 dnl checks if the compiler supports the inline keyword

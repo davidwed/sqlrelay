@@ -38,4 +38,5 @@ ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 endif
 
 uninstall:
-	$(RM) $(libexecdir)/sqlrquery_*
+	$(RM) $(libexecdir)/sqlrquery_sqlrcmdgstat.*
+	$(RM) $(libexecdir)/sqlrquery_sqlrcmdcstat.*

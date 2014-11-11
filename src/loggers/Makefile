@@ -54,4 +54,7 @@ ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 endif
 
 uninstall:
-	$(RM) $(libexecdir)/sqlrlogger_*
+	$(RM) $(libexecdir)/sqlrlogger_custom_nw.*
+	$(RM) $(libexecdir)/sqlrlogger_custom_sc.*
+	$(RM) $(libexecdir)/sqlrlogger_debug.*
+	$(RM) $(libexecdir)/sqlrlogger_slowqueries.*

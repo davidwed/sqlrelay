@@ -504,6 +504,18 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 						const char *endptr);
 		const char	*skipWhitespaceAndComments(const char *query);
 
+		bool parseDateTime(const char *datetime,
+				bool ddmm, bool yyyyddmm,
+				bool supportdotdelimiteddate,
+				int16_t *year, int16_t *month, int16_t *day,
+				int16_t *hour, int16_t *minute, int16_t *second,
+				int16_t *fraction);
+
+		char *convertDateTime(const char *format,
+				int16_t year, int16_t month, int16_t day,
+				int16_t hour, int16_t minute, int16_t second,
+				int16_t fraction);
+
 		// connection
 		sqlrserverconnection	*conn;
 

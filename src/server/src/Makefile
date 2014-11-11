@@ -18,23 +18,14 @@ PLUGINSRCS = sqlrserverconnectiondeclarations.cpp \
 		sqlrauthdeclarations.cpp \
 		sqlrauthassignments.cpp \
 		sqlrquerydeclarations.cpp \
-		sqlrqueryassignments.cpp \
-		sqlrtranslationdeclarations.cpp \
-		sqlrtranslationassignments.cpp \
-		sqlrresultsettranslationdeclarations.cpp \
-		sqlrresultsettranslationassignments.cpp \
-		sqlrtriggerdeclarations.cpp \
-		sqlrtriggerassignments.cpp
+		sqlrqueryassignments.cpp
 PLUGINLOBJS = $(shell ls ../../connections/*/*.lo) \
 		$(shell ls ../../protocols/*.lo) \
 		$(shell ls ../../parsers/*.lo) \
 		$(shell ls ../../loggers/*.lo) \
 		$(shell ls ../../pwdencs/*.lo) \
 		$(shell ls ../../auths/*.lo) \
-		$(shell ls ../../queries/*.lo) \
-		$(shell ls ../../translations/*.lo) \
-		$(shell ls ../../resultsettranslations/*.lo) \
-		$(shell ls ../../triggers/*.lo)
+		$(shell ls ../../queries/*.lo)
 PLUGINLIBS =
 ifneq ($(strip $(DB2LIBSPATH)),)
 ifeq ($(DB2USERPATH),yes)
@@ -302,56 +293,6 @@ sqlrquerydeclarations.cpp: sqlrquerydeclarations.cpp.in
 sqlrqueryassignments.cpp: sqlrqueryassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../../queries/*.lo`; \
-	do \
-		module=`basename $$file .lo`; \
-		sed -e "s|@module@|$$module|g" $< >> $@; \
-	done
-
-sqlrtranslationdeclarations.cpp: sqlrtranslationdeclarations.cpp.in
-	$(RM) $@
-	for file in `ls ../../translations/*.lo`; \
-	do \
-		module=`basename $$file .lo`; \
-		sed -e "s|@module@|$$module|g" $< >> $@; \
-	done
-
-sqlrtranslationassignments.cpp: sqlrtranslationassignments.cpp.in
-	$(RM) $@
-	for file in `ls ../../translations/*.lo`; \
-	do \
-		module=`basename $$file .lo`; \
-		sed -e "s|@module@|$$module|g" $< >> $@; \
-	done
-
-sqlrresultsettranslationdeclarations.cpp: \
-			sqlrresultsettranslationdeclarations.cpp.in
-	$(RM) $@
-	for file in `ls ../../resultsettranslations/*.lo`; \
-	do \
-		module=`basename $$file .lo`; \
-		sed -e "s|@module@|$$module|g" $< >> $@; \
-	done
-
-sqlrresultsettranslationassignments.cpp: \
-			sqlrresultsettranslationassignments.cpp.in
-	$(RM) $@
-	for file in `ls ../../resultsettranslations/*.lo`; \
-	do \
-		module=`basename $$file .lo`; \
-		sed -e "s|@module@|$$module|g" $< >> $@; \
-	done
-
-sqlrtriggerdeclarations.cpp: sqlrtriggerdeclarations.cpp.in
-	$(RM) $@
-	for file in `ls ../../triggers/*.lo`; \
-	do \
-		module=`basename $$file .lo`; \
-		sed -e "s|@module@|$$module|g" $< >> $@; \
-	done
-
-sqlrtriggerassignments.cpp: sqlrtriggerassignments.cpp.in
-	$(RM) $@
-	for file in `ls ../../triggers/*.lo`; \
 	do \
 		module=`basename $$file .lo`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \

@@ -100,9 +100,6 @@
 #define MAXCONNECTIONIDLEN 256
 #define MAXUNIXSOCKETLEN 1024
 #define MAXCONNECTIONS 512
-/*#define STATQPSKEEP 900
-#define STATSQLTEXTLEN 512
-#define STATCLIENTINFOLEN 512*/
 
 // errors...
 // (hopefully the 900000+ range doesn't collide with anyone's native codes)
@@ -157,10 +154,5 @@
 #define SQLR_ERROR_INVALIDBINDVARIABLEFORMAT 900016
 #define SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING \
 	"Invalid bind variable format."
-
-enum clientsessiontype_t {
-	SQLRELAY_CLIENT_SESSION_TYPE=0,
-	MYSQL_CLIENT_SESSION_TYPE
-};
 
 #endif

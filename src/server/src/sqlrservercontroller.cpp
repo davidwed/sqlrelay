@@ -2204,6 +2204,26 @@ const char *sqlrservercontroller::skipWhitespaceAndComments(const char *query) {
 	return ptr;
 }
 
+bool sqlrservercontroller::parseDateTime(
+				const char *datetime, bool ddmm, bool yyyyddmm,
+				bool supportdotdelimiteddate,
+				int16_t *year, int16_t *month, int16_t *day,
+				int16_t *hour, int16_t *minute, int16_t *second,
+				int16_t *fraction) {
+	return ::parseDateTime(datetime,ddmm,yyyyddmm,
+				supportdotdelimiteddate,
+				year,month,day,
+				hour,minute,second,fraction);
+}
+
+char *sqlrservercontroller::convertDateTime(const char *format,
+				int16_t year, int16_t month, int16_t day,
+				int16_t hour, int16_t minute, int16_t second,
+				int16_t fraction) {
+	return ::convertDateTime(format,year,month,day,
+				hour,minute,second,fraction);
+}
+
 bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 
 	const char	*query=cursor->getQueryBuffer();
