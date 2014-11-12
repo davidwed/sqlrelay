@@ -100,13 +100,6 @@ localstatedir=@localstatedir@
 tmpdir=${localstatedir}/sqlrelay/tmp
 
 
-# look for a readable sqlrelay.conf
-if ( test ! -r "${sysconfdir}/sqlrelay.conf" )
-then
-    exit 1
-fi
-
-
 # define lock directory
 lockdir=/tmp
 if ( test -w "/var/lock/subsys" )
@@ -115,14 +108,6 @@ then
 elif ( test -w "/var/lock" )
 then
     lockdir=/var/lock
-fi
-
-
-# define instance file
-instances=/etc/sqlrelay
-if ( test -r "/etc/sysconfig/sqlrelay" )
-then
-    instances=/etc/sysconfig/sqlrelay
 fi
 
 
@@ -157,19 +142,6 @@ cleanup() {
 
 start_sqlrelay() {
 
-    # bail if there's no instances file
-    if ( test ! -r "${instances}" )
-    then
-        return 0
-    fi
-
-    # bail if no instances are defined in the file
-    connids=`grep -v "^#" ${instances}`
-    if ( test -z "${connids}" )
-    then
-        return 0
-    fi
-
     # print Starting if necessary
     if ( test "$BSD" = "yes" -a "$PRINTACTION" = "yes" )
     then
@@ -177,46 +149,31 @@ start_sqlrelay() {
     fi
 
     # on BSD, print:
-    # sqlrelay (instance instance instance)
+    # sqlrelay
     #
     # on non-BSD, print:
-    # Starting sqlrelay (instance): success
-    # Starting sqlrelay (instance): success
-    # Starting sqlrelay (instance): success
+    # Starting sqlrelay: success
     if ( test "$BSD" = "yes" )
     then
-        printf " sqlrelay ("
+        printf " sqlrelay"
     fi
 
-    first="true"
-    for connid in $connids
-    do
-        sqlr-start -id ${connid} 0<&- 1>&- 2>&-
-        RETVAL=$?
-        if ( test "$BSD" = "yes" )
+    sqlr-start 0<&- 1>&- 2>&-
+    RETVAL=$?
+    if ( test "$BSD" != "yes" )
+    then
+        printf "Starting sqlrelay: "
+        if ( test $RETVAL -eq 0 )
         then
-            if ( test "$first" = "true" )
-            then
-                first="false"
-            else
-                printf " "
-            fi
-            printf "${connid}"
+            success
         else
-            printf "Starting sqlrelay (${connid}): "
-            if ( test $RETVAL -eq 0 )
-            then
-                success
-            else
-                failure
-            fi
-            echo
+            failure
         fi
-    done
+        echo
+    fi
 
     if ( test "$BSD" = "yes" )
     then
-        printf ")"
         if ( test "$PRINTACTION" = "yes" )
         then
             echo "."
@@ -235,19 +192,6 @@ start_sqlrelay() {
 
 stop_sqlrelay() {
 
-    # bail if there's no instances file
-    if ( test ! -r "${instances}" )
-    then
-        return 0
-    fi
-
-    # bail if no instances are defined in the file
-    connids=`grep -v "^#" ${instances}`
-    if ( test -z "${connids}" )
-    then
-        return 0
-    fi
-
     # print Stopping if necessary
     if ( test "$BSD" = "yes" -a "$PRINTACTION" = "yes" )
     then
@@ -255,46 +199,31 @@ stop_sqlrelay() {
     fi
 
     # on BSD, print:
-    # sqlrelay (instance instance instance)
+    # sqlrelay
     #
     # on non-BSD, print:
-    # sqlrelay (instance): success
-    # sqlrelay (instance): success
-    # sqlrelay (instance): success
+    # Stopping sqlrelay: success
     if ( test "$BSD" = "yes" )
     then
         printf " sqlrelay ("
     fi
 
-    first="true"
-    for connid in $connids
-    do
-        sqlr-stop -id ${connid} 0<&- 1>&- 2>&-
-        RETVAL=$?
-        if ( test "$BSD" = "yes" )
+    sqlr-stop 0<&- 1>&- 2>&-
+    RETVAL=$?
+    if ( test "$BSD" != "yes" )
+    then
+        printf "Stopping sqlrelay: "
+        if ( test $RETVAL -eq 0 )
         then
-            if ( test "$first" = "true" )
-            then
-                first="false"
-            else
-                printf " "
-            fi
-            printf "${connid}"
+            success
         else
-            printf "Stopping sqlrelay (${connid}): "
-            if ( test $RETVAL -eq 0 )
-            then
-                success
-            else
-                failure
-            fi
-            echo
+            failure
         fi
-    done
+        echo
+    fi
 
     if ( test "$BSD" = "yes" )
     then
-        printf ")"
         if ( test "$PRINTACTION" = "yes" )
         then
             echo "."

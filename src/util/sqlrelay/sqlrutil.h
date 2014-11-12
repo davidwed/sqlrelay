@@ -154,6 +154,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 	public:
 			sqlrconfigfile();
 			~sqlrconfigfile();
+		void	getEnabledIds(const char *config,
+					linkedlist< char * > *idlist);
 		bool	parse(const char *config, const char *id);
 		bool	accessible();
 		const char * const	*getDefaultAddresses();
@@ -238,6 +240,11 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 
 		linkedlist< routecontainer * >	*getRouteList();
 	private:
+		bool			getenabledids;
+		char			*currentid;
+		bool			enabled;
+		linkedlist< char * >	*idlist;
+
 		const char	*id;
 		bool		correctid;
 		bool		done;
@@ -453,7 +460,8 @@ class SQLRUTIL_DLLSPEC sqlrconfigfile : public xmlsax {
 			DATEFORMAT_ATTRIBUTE,
 			TIMEFORMAT_ATTRIBUTE,
 			DATEDDMM_ATTRIBUTE,
-			DATEYYYYDDMM_ATTRIBUTE
+			DATEYYYYDDMM_ATTRIBUTE,
+			ENABLED_ATTRIBUTE,
 		} attribute;
 
 		attribute	currentattribute;

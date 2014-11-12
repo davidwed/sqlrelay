@@ -61,20 +61,6 @@ install:
 		$(INSTALL) -m 644 com.firstworks.sqlrelay.plist $(initroot)/Library/LaunchDaemons; \
 		$(INSTALL) -m 644 com.firstworks.sqlrcachemanager.plist $(initroot)/Library/LaunchDaemons; \
 	fi
-	if ( test -d "/etc/sysconfig" ); \
-	then \
-		if ( test ! -r "$(initroot)/etc/sysconfig/sqlrelay" ); \
-		then \
-			$(MKINSTALLDIRS) $(initroot)/etc/sysconfig; \
-			$(INSTALL) -m 644 sqlrelay $(initroot)/etc/sysconfig/sqlrelay; \
-		fi; \
-	else \
-		if ( test ! -r "$(initroot)/etc/sqlrelay" ); \
-		then \
-			$(MKINSTALLDIRS) $(initroot)/etc; \
-			$(INSTALL) -m 644 sqlrelay $(initroot)/etc/sqlrelay; \
-		fi; \
-	fi
 ifeq ($(initroot),)
 	if ( test -x "/sbin/chkconfig" ); \
 	then \

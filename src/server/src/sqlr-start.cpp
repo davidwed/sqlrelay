@@ -248,7 +248,7 @@ int main(int argc, const char **argv) {
 	sqlrcmdline	cmdl(argc,argv);
 	const char	*localstatedir=cmdl.getValue("-localstatedir");
 	bool		strace=cmdl.found("-strace");
-	const char	*id=cmdl.getId();
+	const char	*id=cmdl.getValue("-id");
 	const char	*config=cmdl.getConfig();
 	bool		overridemaxconn=cmdl.found("-overridemaxconnections");
 
@@ -256,22 +256,36 @@ int main(int argc, const char **argv) {
 	iswindows=!charstring::compareIgnoringCase(
 				sys::getOperatingSystemName(),"Windows");
 
-	// default id warning
-	if (!charstring::compare(cmdl.getId(),DEFAULT_ID)) {
-		stderror.printf("Warning: using default id.\n");
-	}
-
-	// parse the config file(s)
+	// get the id
 	sqlrconfigfile	cfgfile;
-	if (!cfgfile.parse(config,id)) {
-		process::exit(1);
+	linkedlist< char * >	ids;
+	if (id && id[0]) {
+		ids.append(charstring::duplicate(id));
+	} else {
+		cfgfile.getEnabledIds(config,&ids);
 	}
 
-	// start listener, connections, scaler, cachemanager
-	bool	exitstatus=!(startListener(id,config,localstatedir) &&
-			startConnections(&cfgfile,strace,id,config,
-					localstatedir,overridemaxconn) &&
-			startScaler(&cfgfile,id,config,localstatedir));
+	// start each enabled instance
+	int32_t	exitstatus=0;
+	for (linkedlistnode< char * > *node=ids.getFirst();
+					node; node=node->getNext()) {
+
+		// get the id
+		char	*thisid=node->getValue();
+
+		// parse the config file(s) and
+		// start listener, connections and scaler
+		if (!cfgfile.parse(config,thisid) ||
+			!startListener(thisid,config,localstatedir) ||
+			!startConnections(&cfgfile,strace,thisid,config,
+					localstatedir,overridemaxconn) ||
+			!startScaler(&cfgfile,thisid,config,localstatedir)) {
+			exitstatus=1;
+		}
+
+		// clean up
+		delete[] thisid;
+	}
 
 	// many thanks...
 	// these companies don't exist any more so it's

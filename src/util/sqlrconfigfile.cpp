@@ -13,6 +13,8 @@
 #include <defaults.h>
 
 sqlrconfigfile::sqlrconfigfile() : xmlsax() {
+	getenabledids=false;
+	currentid=NULL;
 	addresses=NULL;
 	addresscount=0;
 	port=0;
@@ -92,6 +94,7 @@ sqlrconfigfile::sqlrconfigfile() : xmlsax() {
 
 sqlrconfigfile::~sqlrconfigfile() {
 
+	delete[] currentid;
 	delete[] dbase;
 	delete[] unixport;
 	delete[] endofsession;
@@ -446,6 +449,11 @@ bool sqlrconfigfile::tagStart(const char *name) {
 	const char	*currentname="instance";
 	tag		thistag=currenttag;
 
+	// re-init enabled flag
+	if (!charstring::compare(name,"instance")) {
+		enabled=false;
+	}
+
 	// set the current tag, validate structure in the process
 	switch(currenttag) {
 	
@@ -607,7 +615,7 @@ bool sqlrconfigfile::tagStart(const char *name) {
 			break;
 	}
 	
-	if (!ok) {
+	if (!getenabledids && !ok) {
 		stderror.printf("unexpected tag <%s> within <%s>\n",
 							name,currentname);
 		return false;
@@ -863,6 +871,11 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 					listenerlist.getFirst()->getValue();
 			}
 		}
+
+		// if we're looking for enabled ids then add this one here
+		if (getenabledids && enabled) {
+			idlist->append(charstring::duplicate(currentid));
+		}
 	}
 
 	// Close up the current tag
@@ -1004,7 +1017,8 @@ bool sqlrconfigfile::tagEnd(const char *name) {
 	}
 
 	// we're done if we've found the right instance at this point
-	if (correctid && !charstring::compare((char *)name,"instance")) {
+	if (!getenabledids && correctid &&
+			!charstring::compare((char *)name,"instance")) {
 		done=true;
 	}
 	return true;
@@ -1119,6 +1133,8 @@ bool sqlrconfigfile::attributeName(const char *name) {
 			currentattribute=DATEDDMM_ATTRIBUTE;
 		} else if (!charstring::compare(name,"dateyyyyddmm")) {
 			currentattribute=DATEYYYYDDMM_ATTRIBUTE;
+		} else if (!charstring::compare(name,"enabled")) {
+			currentattribute=ENABLED_ATTRIBUTE;
 		}
 		break;
 
@@ -1313,9 +1329,11 @@ bool sqlrconfigfile::attributeName(const char *name) {
 				tagname="runquery";
 				break;
 		}
-		stderror.printf("WARNING: unrecognized attribute "
-				"\"%s\" within <%s> tag or section\n",
-				name,tagname);
+		if (!getenabledids) {
+			stderror.printf("WARNING: unrecognized attribute "
+					"\"%s\" within <%s> tag or section\n",
+					name,tagname);
+		}
 	}
 
 	// set the current attribute
@@ -1327,6 +1345,12 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 	// don't do anything if we're already done
 	if (done) {
 		return true;
+	}
+
+	// set the current id
+	if (getenabledids && currentattribute==ID_ATTRIBUTE) {
+		delete[] currentid;
+		currentid=charstring::duplicate(value);
 	}
 
 	if (!correctid) {
@@ -1660,6 +1684,8 @@ bool sqlrconfigfile::attributeValue(const char *value) {
 			dateyyyyddmm=
 				!charstring::compareIgnoringCase(value,"yes");
 			dateyyyyddmmset=true;
+		} else if (currentattribute==ENABLED_ATTRIBUTE) {
+			enabled=!charstring::compareIgnoringCase(value,"yes");
 		}
 	}
 	return true;
@@ -1735,6 +1761,7 @@ void sqlrconfigfile::moveRegexList(routecontainer *cur,
 bool sqlrconfigfile::parse(const char *config, const char *id) {
 
 	// init some variables
+	getenabledids=false;
 	this->id=id;
 	correctid=false;
 	done=false;
@@ -1778,6 +1805,49 @@ bool sqlrconfigfile::parse(const char *config, const char *id) {
 	}
 
 	return done;
+}
+
+void sqlrconfigfile::getEnabledIds(const char *config,
+					linkedlist< char * > *idlist) {
+
+	// init some variables
+	getenabledids=true;
+	this->idlist=idlist;
+	correctid=true;
+	done=false;
+
+	// attempt to parse the config file
+	if (!config || !config[0]) {
+		config=DEFAULT_CONFIG_FILE;
+	}
+	parseFile(config);
+
+	// attempt to parse files in the config dir
+	directory	d;
+	stringbuffer	fullpath;
+	const char	*slash=(!charstring::compareIgnoringCase(
+						sys::getOperatingSystemName(),
+						"Windows"))?"\\":"/";
+	if (d.open(DEFAULT_CONFIG_DIR)) {
+		for (;;) {
+			char	*filename=d.read();
+			if (!filename) {
+				break;
+			}
+			if (charstring::compare(filename,".") &&
+				charstring::compare(filename,"..")) {
+
+				fullpath.clear();
+				fullpath.append(DEFAULT_CONFIG_DIR);
+				fullpath.append(slash);
+				fullpath.append(filename);
+				delete[] filename;
+
+				parseFile(fullpath.getString());
+			}
+		}
+	}
+	d.close();
 }
 
 bool sqlrconfigfile::accessible() {
