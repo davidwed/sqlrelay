@@ -43,7 +43,6 @@ distclean: clean
 		config.log \
 		config.status \
 		config.mk \
-		bin/sqlr-stop \
 		bin/sqlrclient-config \
 		bin/sqlrclientwrapper-config \
 		bin/sqlrserver-config \

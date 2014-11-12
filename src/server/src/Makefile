@@ -155,13 +155,14 @@ LOBJS = sqlrlistener.lo \
 all: $(PLUGINSRCS) \
 	libsqlrserver.la \
 	sqlr-start$(EXE) \
+	sqlr-stop$(EXE) \
 	sqlr-listener$(EXE) \
 	sqlr-connection$(EXE) \
 	sqlr-scaler$(EXE) \
 	sqlr-cachemanager$(EXE)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o sqlr-start$(EXE) sqlr-listener$(EXE) sqlr-connection$(EXE) sqlr-scaler$(EXE) sqlr-cachemanager$(EXE)
+	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o sqlr-start$(EXE) sqlr-stop$(EXE) sqlr-listener$(EXE) sqlr-connection$(EXE) sqlr-scaler$(EXE) sqlr-cachemanager$(EXE)
 	if ( test -n "$(PLUGINSRCS)" ); \
 	then \
 		$(RM) $(PLUGINSRCS); \
@@ -173,6 +174,9 @@ libsqlrserver.la: $(SRCS) $(LOBJS)
 
 sqlr-start$(EXE): sqlr-start.cpp sqlr-start.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-start.lo $(LIBS) $(RPATH)
+
+sqlr-stop$(EXE): sqlr-stop.cpp sqlr-stop.lo
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-stop.lo $(LIBS) $(RPATH)
 
 sqlr-listener$(EXE): sqlr-listener.cpp sqlr-listener.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ sqlr-listener.lo $(LIBS) $(RPATH)
@@ -314,6 +318,7 @@ install:
 	$(LIBTOOL) --mode=finish $(libdir)
 	$(MKINSTALLDIRS) $(bindir)
 	$(LTINSTALL) sqlr-start$(EXE) $(bindir)
+	$(LTINSTALL) sqlr-stop$(EXE) $(bindir)
 	$(LTINSTALL) sqlr-listener$(EXE) $(bindir)
 	$(LTINSTALL) sqlr-connection$(EXE) $(bindir)
 	$(LTINSTALL) sqlr-scaler$(EXE) $(bindir)
@@ -342,6 +347,7 @@ uninstall:
 	$(RM) $(includedir)/sqlrelay/private/sqlrserverincludes.h
 	$(RM) $(includedir)/sqlrelay/private/sqlrshmdata.h
 	$(RM) $(bindir)/sqlr-start$(EXE)
+	$(RM) $(bindir)/sqlr-stop$(EXE)
 	$(RM) $(bindir)/sqlr-listener$(EXE)
 	$(RM) $(bindir)/sqlr-connection$(EXE)
 	$(RM) $(bindir)/sqlr-scaler$(EXE)

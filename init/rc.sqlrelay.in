@@ -269,7 +269,7 @@ stop_sqlrelay() {
     first="true"
     for connid in $connids
     do
-        sqlr-stop ${connid} 0<&- 1>&- 2>&-
+        sqlr-stop -id ${connid} 0<&- 1>&- 2>&-
         RETVAL=$?
         if ( test "$BSD" = "yes" )
         then

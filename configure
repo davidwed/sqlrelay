@@ -33251,7 +33251,7 @@ then
 fi
 
 
-MAKELIST="config.mk bin/sqlr-stop bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist test/test sqlrelay-c++.pc sqlrelay-c.pc"
+MAKELIST="config.mk bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist test/test sqlrelay-c++.pc sqlrelay-c.pc"
 ac_config_files="$ac_config_files $MAKELIST"
 
 cat >confcache <<\_ACEOF
@@ -35726,7 +35726,6 @@ if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
 $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
-chmod 755 bin/sqlr-stop
 chmod 755 bin/sqlrclient-config
 chmod 755 bin/sqlrclientwrapper-config
 chmod 755 bin/sqlrserver-config
