@@ -3645,7 +3645,7 @@ void oracle8cursor::closeResultSet() {
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrserverconnection *new_oracle8connection(
-					sqlrservercontroller *cont) {
+						sqlrservercontroller *cont) {
 		return new oracle8connection(cont);
 	}
 }
