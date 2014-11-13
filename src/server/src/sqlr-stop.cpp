@@ -103,11 +103,18 @@ int main(int32_t argc, const char **argv) {
 				continue;
 			}
 
-			// get the pid from the file
+			// build the fully qualified path name of the pid file
 			fqp.clear();
 			fqp.append(piddir.getString());
 			fqp.append((iswindows)?'\\':'/');
 			fqp.append(file);
+
+			// skip the pid file if it's not readable
+			if (!file::readable(fqp.getString())) {
+				continue;
+			}
+			
+			// get the pid from the file
 			char		*pidstr=
 					file::getContents(fqp.getString());
 			uint64_t	pid=
