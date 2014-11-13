@@ -17,3 +17,4 @@ uninstall:
 	$(RM) $(bindir)/sqlrclientwrapper-config
 	$(RM) $(bindir)/sqlrserver-config
 	$(RM) $(bindir)/sqlrconnection-config
+	$(RM) $(bindir)/backupschema
