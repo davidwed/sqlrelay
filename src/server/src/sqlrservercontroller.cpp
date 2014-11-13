@@ -2363,7 +2363,6 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 	// clear bind mappings
 	inbindmappings->clear();
 	outbindmappings->clear();
-	bindmappingspool->deallocate();
 
 	// get query buffer
 	char	*querybuffer=cursor->getQueryBuffer();
@@ -3074,6 +3073,10 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 	// if the query hasn't been prepared then do various translations
 	if (!cursor->prepared) {
+
+		// do this here instead of inside translateBindVariables
+		// because translateQuery might use it
+		bindmappingspool->deallocate();
 
 		// translate query
 		if (enabletranslations && sqlrt) {
