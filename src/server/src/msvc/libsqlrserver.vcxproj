@@ -140,7 +140,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;LOG_DIR="C:\\Program Files (x86)\\Firstworks\\var\\sqlrelay\\log";DEBUG_DIR="C:\\Program Files (x86)\\Firstworks\\var\\sqlrelay\debug;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec\\sqlrelay";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;LOG_DIR="C:\\Program Files (x86)\\Firstworks\\var\\sqlrelay\\log";DEBUG_DIR="C:\\Program Files (x86)\\Firstworks\\var\\sqlrelay\debug";DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec\\sqlrelay";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -165,7 +165,7 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;LOG_DIR="C:\\Program Files\\Firstworks\\var\\sqlrelay\\log";DEBUG_DIR="C:\\Program Files\\Firstworks\\var\\sqlrelay\debug;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec\\sqlrelay";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;LOG_DIR="C:\\Program Files\\Firstworks\\var\\sqlrelay\\log";DEBUG_DIR="C:\\Program Files\\Firstworks\\var\\sqlrelay\debug";DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec\\sqlrelay";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -189,7 +189,7 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;LOG_DIR="C:\\Program Files (x86)\\Firstworks\\var\\sqlrelay\\log";DEBUG_DIR="C:\\Program Files (x86)\\Firstworks\\var\\sqlrelay\debug;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec\\sqlrelay";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;LOG_DIR="C:\\Program Files (x86)\\Firstworks\\var\\sqlrelay\\log";DEBUG_DIR="C:\\Program Files (x86)\\Firstworks\\var\\sqlrelay\debug";DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec\\sqlrelay";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -214,7 +214,7 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;LOG_DIR="C:\\Program Files\\Firstworks\\var\\sqlrelay\\log";DEBUG_DIR="C:\\Program Files\\Firstworks\\var\\sqlrelay\debug;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec\\sqlrelay";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;LOG_DIR="C:\\Program Files\\Firstworks\\var\\sqlrelay\\log";DEBUG_DIR="C:\\Program Files\\Firstworks\\var\\sqlrelay\debug";DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec\\sqlrelay";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -238,7 +238,7 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;LOG_DIR="C:\\Program Files (x86)\\Firstworks\\var\\sqlrelay\\log";DEBUG_DIR="C:\\Program Files (x86)\\Firstworks\\var\\sqlrelay\debug;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec\\sqlrelay";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;LOG_DIR="C:\\Program Files (x86)\\Firstworks\\var\\sqlrelay\\log";DEBUG_DIR="C:\\Program Files (x86)\\Firstworks\\var\\sqlrelay\debug";DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec\\sqlrelay";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -264,7 +264,7 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;LOG_DIR="C:\\Program Files\\Firstworks\\var\\sqlrelay\\log";DEBUG_DIR="C:\\Program Files\\Firstworks\\var\\sqlrelay\debug;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec\\sqlrelay";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;LOG_DIR="C:\\Program Files\\Firstworks\\var\\sqlrelay\\log";DEBUG_DIR="C:\\Program Files\\Firstworks\\var\\sqlrelay\debug";DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec\\sqlrelay";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -289,7 +289,7 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;LOG_DIR="C:\\Program Files (x86)\\Firstworks\\var\\sqlrelay\\log";DEBUG_DIR="C:\\Program Files (x86)\\Firstworks\\var\\sqlrelay\debug;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec\\sqlrelay";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;LOG_DIR="C:\\Program Files (x86)\\Firstworks\\var\\sqlrelay\\log";DEBUG_DIR="C:\\Program Files (x86)\\Firstworks\\var\\sqlrelay\debug";DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files (x86)\\Firstworks\\libexec\\sqlrelay";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -315,7 +315,7 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;LOG_DIR="C:\\Program Files\\Firstworks\\var\\sqlrelay\\log";DEBUG_DIR="C:\\Program Files\\Firstworks\\var\\sqlrelay\debug;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec\\sqlrelay";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBSQLRSERVER_EXPORTS;LOG_DIR="C:\\Program Files\\Firstworks\\var\\sqlrelay\\log";DEBUG_DIR="C:\\Program Files\\Firstworks\\var\\sqlrelay\debug";DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";LIBEXECDIR="C:\\Program Files\\Firstworks\\libexec\\sqlrelay";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -341,12 +341,11 @@ copy /Y config.windows.h config.h</Command>
   <ItemGroup>
     <ClCompile Include="..\sqlrlistener.cpp" />
     <ClCompile Include="..\sqlrservercontroller.cpp" />
+    <ClCompile Include="..\sqlrprotocols.cpp" />
     <ClCompile Include="..\sqlrprotocol.cpp" />
-    <ClCompile Include="..\sqlrclientprotocol.cpp" />
     <ClCompile Include="..\sqlrserverconnection.cpp" />
     <ClCompile Include="..\sqlrservercursor.cpp" />
-    <ClCompile Include="..\sqlparser.cpp" />
-    <ClCompile Include="..\sqlwriter.cpp" />
+    <ClCompile Include="..\sqlrparser.cpp" />
     <ClCompile Include="..\sqlrtranslations.cpp" />
     <ClCompile Include="..\sqlrtranslation.cpp" />
     <ClCompile Include="..\sqlrresultsettranslations.cpp" />
