@@ -1,12 +1,6 @@
 // Copyright (c) 1999-2012  David Muse
 // See the file COPYING for more information
 
-#ifdef _WIN32
-	#define DLLSPEC __declspec(dllexport)
-#else
-	#define DLLSPEC
-#endif
-
 #include <sqlrelay/sqlrserver.h>
 #ifdef HAVE_ORACLE_8i
 	#include <rudiments/regularexpression.h>
@@ -85,7 +79,7 @@ struct datebind {
 	OCIDate		*ocidate;
 };
 
-class DLLSPEC oracle8connection : public sqlrserverconnection {
+class SQLRSERVER_DLLSPEC oracle8connection : public sqlrserverconnection {
 	friend class oracle8cursor;
 	public:
 				oracle8connection(sqlrservercontroller *cont);
@@ -173,7 +167,7 @@ class DLLSPEC oracle8connection : public sqlrserverconnection {
 		bool		disablekeylookup;
 };
 
-class DLLSPEC oracle8cursor : public sqlrservercursor {
+class SQLRSERVER_DLLSPEC oracle8cursor : public sqlrservercursor {
 	friend class oracle8connection;
 	private:
 				oracle8cursor(sqlrserverconnection *conn,
@@ -3650,7 +3644,7 @@ void oracle8cursor::closeResultSet() {
 }
 
 extern "C" {
-	DLLSPEC sqlrserverconnection *new_oracle8connection(
+	SQLRSERVER_DLLSPEC sqlrserverconnection *new_oracle8connection(
 					sqlrservercontroller *cont) {
 		return new oracle8connection(cont);
 	}

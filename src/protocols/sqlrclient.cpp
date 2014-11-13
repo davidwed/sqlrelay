@@ -3,8 +3,6 @@
 
 #include <config.h>
 
-#include <sqlrelay/private/sqlrserverdll.h>
-
 #include <sqlrelay/sqlrserver.h>
 
 #include <rudiments/stringbuffer.h>
@@ -2978,7 +2976,8 @@ bool sqlrclient::getQueryTreeCommand(sqlrservercursor *cursor) {
 }
 
 extern "C" {
-	sqlrprotocol	*new_sqlrclient(sqlrservercontroller *cont) {
+	SQLRSERVER_DLLSPEC sqlrprotocol	*new_sqlrclient(
+					sqlrservercontroller *cont) {
 		return new sqlrclient(cont);
 	}
 }

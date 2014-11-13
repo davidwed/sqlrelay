@@ -122,8 +122,12 @@ msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-connection.vcxproj
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-scaler.vcxproj
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-start.vcxproj
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-stop.vcxproj
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-stop.vcxproj
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlr-cachemanager.vcxproj
-cd ..\..\..\connections\oracle8\msvc
+cd ..\..\..\protocols\msvc
+msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlrprotocol_sqlrclient.vcxproj
+cd ..\..\connections\oracle8\msvc
 msbuild.exe /property:Configuration=%release% /property:Platform=%platform% sqlrconnection_oracle8.vcxproj
 cd ..\..\..\..
 goto end
@@ -165,7 +169,9 @@ msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%
 msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% sqlr-query.vcxproj
 cd ..\..\server\src\msvc
 msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% sqlrserver.sln
-cd ..\..\..\connections\oracle8\msvc
+cd ..\..\..\protocols\msvc
+msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% sqlrprotocol_sqlrclient.vcxproj
+cd ..\..\connections\oracle8\msvc
 msbuild.exe /target:Clean /property:Configuration=%release% /property:Platform=%platform% sqlrconnection_oracle8.sln
 cd ..\..\..\..
 goto end
@@ -277,6 +283,7 @@ copy /Y src\server\src\msvc\%platform%Release\sqlr-listener.exe "C:\%dir%\Firstw
 copy /Y src\server\src\msvc\%platform%Release\sqlr-connection.exe "C:\%dir%\Firstworks\bin"
 copy /Y src\server\src\msvc\%platform%Release\sqlr-scaler.exe "C:\%dir%\Firstworks\bin"
 copy /Y src\server\src\msvc\%platform%Release\sqlr-start.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\server\src\msvc\%platform%Release\sqlr-stop.exe "C:\%dir%\Firstworks\bin"
 copy /Y src\server\src\msvc\%platform%Release\sqlr-cachemanager.exe "C:\%dir%\Firstworks\bin"
 copy /Y src\server\src\msvc\%platform%ReleaseCLR\libsqlrserver.dll "C:\%dir%\Firstworks\bin"
 copy /Y src\server\src\msvc\%platform%ReleaseCLR\libsqlrserver.lib "C:\%dir%\Firstworks\lib"
@@ -284,7 +291,14 @@ copy /Y src\server\src\msvc\%platform%ReleaseCLR\sqlr-listener.exe "C:\%dir%\Fir
 copy /Y src\server\src\msvc\%platform%ReleaseCLR\sqlr-connection.exe "C:\%dir%\Firstworks\bin"
 copy /Y src\server\src\msvc\%platform%ReleaseCLR\sqlr-scaler.exe "C:\%dir%\Firstworks\bin"
 copy /Y src\server\src\msvc\%platform%ReleaseCLR\sqlr-start.exe "C:\%dir%\Firstworks\bin"
+copy /Y src\server\src\msvc\%platform%ReleaseCLR\sqlr-stop.exe "C:\%dir%\Firstworks\bin"
 copy /Y src\server\src\msvc\%platform%ReleaseCLR\sqlr-cachemanager.exe "C:\%dir%\Firstworks\bin"
+
+copy /Y src\protocols\msvc\%platform%Release\sqlrprotocol_sqlrclient.dll "C:\%dir%\Firstworks\libexec\sqlrelay"
+copy /Y src\protocols\msvc\%platform%ReleaseCLR\sqlrprotocol_sqlrclient.dll "C:\%dir%\Firstworks\libexec\sqlrelay"
+
+copy /Y src\connections\oracle8\msvc\%platform%Release\sqlrconnection_oracle8.dll "C:\%dir%\Firstworks\libexec\sqlrelay"
+copy /Y src\connections\oracle8\msvc\%platform%ReleaseCLR\sqlrconnection_oracle8.dll "C:\%dir%\Firstworks\libexec\sqlrelay"
 goto end
 
 

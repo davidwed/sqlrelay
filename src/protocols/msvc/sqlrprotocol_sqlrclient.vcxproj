@@ -145,14 +145,14 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server\include;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\common;..\..\server\include;..\..\util;..\..\..;C:\Program Files (x86)\Firstworks\include;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;oci.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\server\src\msvc\Debug;..\..\..\util\msvc\Debug;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\server\src\msvc\Debug;..\..\util\msvc\Debug;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -170,13 +170,13 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server\include;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;C:\Program Files\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\common;..\..\server\include;..\..\util;..\..\..;C:\Program Files\Firstworks\include;C:\Program Files\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;oci.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\server\src\msvc\x64\Debug;..\..\..\util\msvc\x64\Debug;C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\server\src\msvc\x64\Debug;..\..\util\msvc\x64\Debug;C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -194,14 +194,14 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server\include;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\common;..\..\server\include;..\..\util;..\..\..;C:\Program Files (x86)\Firstworks\include;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;oci.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\server\src\msvc\DebugCLR;..\..\..\util\msvc\DebugCLR;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\server\src\msvc\DebugCLR;..\..\util\msvc\DebugCLR;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -219,13 +219,13 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server\include;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;C:\Program Files\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\common;..\..\server\include;..\..\util;..\..\..;C:\Program Files\Firstworks\include;C:\Program Files\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;oci.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\server\src\msvc\x64\DebugCLR;..\..\..\util\msvc\x64\DebugCLR;C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\server\src\msvc\x64\DebugCLR;..\..\util\msvc\x64\DebugCLR;C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -242,7 +242,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server\include;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\common;..\..\server\include;..\..\util;..\..\..;C:\Program Files (x86)\Firstworks\include;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -251,7 +251,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;oci.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\server\src\msvc\Release;..\..\..\util\msvc\Release;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\server\src\msvc\Release;..\..\util\msvc\Release;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -268,7 +268,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server\include;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;C:\Program Files\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\common;..\..\server\include;..\..\util;..\..\..;C:\Program Files\Firstworks\include;C:\Program Files\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -276,7 +276,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;oci.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\server\src\msvc\x64\Release;..\..\..\util\msvc\x64\Release;C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\server\src\msvc\x64\Release;..\..\util\msvc\x64\Release;C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -293,7 +293,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server\include;..\..\..\util;..\..\..\..;C:\Program Files (x86)\Firstworks\include;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\common;..\..\server\include;..\..\util;..\..\..;C:\Program Files (x86)\Firstworks\include;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -302,7 +302,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;oci.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\server\src\msvc\ReleaseCLR;..\..\..\util\msvc\ReleaseCLR;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\server\src\msvc\ReleaseCLR;..\..\util\msvc\ReleaseCLR;C:\Program Files (x86)\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -319,7 +319,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..;..\..\..\common;..\..\..\server\include;..\..\..\util;..\..\..\..;C:\Program Files\Firstworks\include;C:\Program Files\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\common;..\..\server\include;..\..\util;..\..\..;C:\Program Files\Firstworks\include;C:\Program Files\Oracle\instantclient_12_1\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -327,7 +327,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>libsqlrserver.lib;libsqlrutil.lib;librudiments.lib;oci.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\server\src\msvc\x64\ReleaseCLR;..\..\..\util\msvc\x64\ReleaseCLR;C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\server\src\msvc\x64\ReleaseCLR;..\..\util\msvc\x64\ReleaseCLR;C:\Program Files\Oracle\instantclient_12_1\sdk\lib\msvc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -339,7 +339,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\oracle8connection.cpp" />
+    <ClCompile Include="..\sqlrclient.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
