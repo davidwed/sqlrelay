@@ -51,6 +51,7 @@ sqlrlistener::sqlrlistener() : listener() {
 	clientsockincount=0;
 	clientsockinindex=0;
 	clientsockun=NULL;
+	clientsockunproto=NULL;
 	clientsockuncount=0;
 	clientsockunindex=0;
 

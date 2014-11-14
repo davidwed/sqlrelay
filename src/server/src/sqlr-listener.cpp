@@ -14,13 +14,21 @@ void shutDown(int32_t signum) {
 	process::exit(0);
 }
 
-void handleSignals(void (*shutdownfunction)(int32_t)) {
+int main(int argc, const char **argv) {
+
+	// set up default signal handling
+	process::exitOnCrashOrShutDown();
+
+	#include <version.h>
+
+	// create the listener
+	lsnr=new sqlrlistener();
 
 	// handle kill and crash signals
-	process::handleShutDown(shutdownfunction);
-	process::handleCrash(shutdownfunction);
+	process::handleShutDown(shutDown);
+	process::handleCrash(shutDown);
 
-	// block all other signals except SIGALRM and SIGCHLD
+	// block all signals except SIGALRM and SIGCHLD
 	signalset	set;
 	set.addAllSignals();
 	set.removeShutDownSignals();
@@ -33,20 +41,6 @@ void handleSignals(void (*shutdownfunction)(int32_t)) {
 	set.removeSignal(SIGCHLD);
 	#endif
 	signalmanager::ignoreSignals(&set);
-}
-
-int main(int argc, const char **argv) {
-
-	// set up default signal handling
-	process::exitOnCrashOrShutDown();
-
-	#include <version.h>
-
-	// create the listener
-	lsnr=new sqlrlistener();
-
-	// hande signals
-	handleSignals(shutDown);
 
 	// initialize
 	if (lsnr->init(argc,argv)) {

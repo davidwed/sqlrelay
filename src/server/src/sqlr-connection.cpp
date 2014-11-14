@@ -81,14 +81,23 @@ void shutDown(int32_t signum) {
 	process::exit(exitcode);
 }
 
-void handleSignals(void (*shutdownfunction)(int32_t)) {
+int main(int argc, const char **argv) {
+
+	// set up default signal handling
+	process::exitOnCrashOrShutDown();
+
+	#include <version.h>
+
+	// create the controller
+	cont=new sqlrservercontroller;
+
 
 	// handle kill and crash signals
-	process::handleShutDown(shutdownfunction);
-	process::handleCrash(shutdownfunction);
+	process::handleShutDown(shutDown);
+	process::handleCrash(shutDown);
 
 	// handle various other shutdown conditions
-	shutdownhandler.setHandler(shutdownfunction);
+	shutdownhandler.setHandler(shutDown);
 	// timeouts
 	#ifdef SIGALRM
 	shutdownhandler.handleSignal(SIGALRM);
@@ -127,20 +136,7 @@ void handleSignals(void (*shutdownfunction)(int32_t)) {
 	set.removeSignal(SIGPWR);
 	#endif
 	signalmanager::ignoreSignals(&set);
-}
 
-int main(int argc, const char **argv) {
-
-	// set up default signal handling
-	process::exitOnCrashOrShutDown();
-
-	#include <version.h>
-
-	// create the controller
-	cont=new sqlrservercontroller;
-
-	// handle signals more particularly
-	handleSignals(shutDown);
 
 	// connect to the db
 	bool	result=cont->init(argc,argv);
