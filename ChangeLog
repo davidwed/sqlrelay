@@ -13,6 +13,8 @@
 	moved triggers, translations, resultsettranslations and parser into
 		separate project
 	blobs work when using fake input binds now
+	replaced sqlr-stop script with a binary (for Windows)
+	preliminary support for server components on Windows
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries
