@@ -47,7 +47,6 @@ int main(int32_t argc, const char **argv) {
 	// open the pid directory
 	directory	dir;
 	if (!dir.open(piddir.getString())) {
-
 		stdoutput.printf("failed to open pid directory %s\n",
 							piddir.getString());
 		process::exit(1);

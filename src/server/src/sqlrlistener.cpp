@@ -48,6 +48,7 @@ sqlrlistener::sqlrlistener() : listener() {
 	debugdir=NULL;
 
 	clientsockin=NULL;
+	clientsockinproto=NULL;
 	clientsockincount=0;
 	clientsockinindex=0;
 	clientsockun=NULL;
