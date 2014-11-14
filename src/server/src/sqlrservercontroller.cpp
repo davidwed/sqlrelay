@@ -16,6 +16,7 @@
 #include <rudiments/character.h>
 #include <rudiments/charstring.h>
 #include <rudiments/randomnumber.h>
+#include <rudiments/sys.h>
 #include <rudiments/stdio.h>
 
 #include <defines.h>
@@ -557,9 +558,23 @@ bool sqlrservercontroller::handlePidFile() {
 				"%s/pids/sqlr-listener-%s",
 				tmpdir->getString(),cmdl->getId());
 
+	// On most platforms, 1 second is plenty of time to wait for the
+	// listener to come up, but on 64-bit windows, when running 32-bit
+	// apps, listening on an inet socket can take many seconds.
+	uint8_t	listenertimeout=10;
+	if (!charstring::compareIgnoringCase(
+			sys::getOperatingSystemName(),"Windows") &&
+		(!charstring::compareIgnoringCase(
+			sys::getOperatingSystemArchitecture(),"x86_64") ||
+		!charstring::compareIgnoringCase(
+			sys::getOperatingSystemArchitecture(),"amd64")) &&
+		sizeof(void *)==4) {
+		listenertimeout=100;
+	}
+
 	bool	retval=true;
 	bool	found=false;
-	for (uint8_t i=0; !found && i<10; i++) {
+	for (uint8_t i=0; !found && i<listenertimeout; i++) {
 		if (i) {
 			snooze::microsnooze(0,100000);
 		}
