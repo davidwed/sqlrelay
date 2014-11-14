@@ -392,6 +392,17 @@ void sqlrlistener::setSessionHandlerMethod() {
 		}
 
 		usethreads=true;
+
+	} else {
+
+		if (!charstring::compareIgnoringCase(
+				sys::getOperatingSystemName(),"Windows")) {
+			stderror.printf("Warning: sessionhandler=\"process\" "
+					"not supported on this platform, "
+					"falling back to "
+					"sessionhandler=\"thread\".\n");
+			usethreads=true;
+		}
 	}
 }
 
@@ -1209,6 +1220,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock, const char *protocol) {
 			isforkedthread=true;
 			return;
 		}
+stdoutput.printf("error forking listener thread:\n%s\n",error::getNativeErrorString());
 
 		// error
 		decrementBusyListeners();
@@ -1265,6 +1277,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock, const char *protocol) {
 		delete clientsock;
 
 	} else {
+stdoutput.printf("error forking listener process:\n%s\n",error::getNativeErrorString());
 
 		// error...
 		decrementBusyListeners();
