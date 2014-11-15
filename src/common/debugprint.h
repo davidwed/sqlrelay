@@ -1,8 +1,8 @@
-// Copyright (c) 1999-2011  David Muse
+// Copyright (c) 1999-2014  David Muse
 // See the file COPYING for more information
 
-#ifndef SQLTRANSLATOR_DEBUG_H
-#define SQLTRANSLATOR_DEBUG_H
+#ifndef SQLDEBUGPRINT_H
+#define SQLDEBUGPRINT_H
 
 #include <rudiments/stdio.h>
 #include <stdio.h>
