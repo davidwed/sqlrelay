@@ -1,0 +1,3 @@
+	if (!charstring::compare(parsername.getString(),"@module@")) {
+		parser=new_@module@();
+	} else
