@@ -88,7 +88,6 @@ endif
 endif
 PLUGINLIBS += $(SYBASELIBS)
 PLUGINLIBS += -L$(top_builddir)/src/api/c++/src -lsqlrclient
-PLUGINLIBS += -L$(top_builddir)/src/parsers -lsqlreparser
 endif
 
 CPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(CONFIGFILECPPFLAG) $(CACHEDIRCPPFLAG) $(DEBUGDIRCPPFLAG) $(LOGDIRCPPFLAG) -I../include -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -DLIBEXECDIR=\"$(libexecdir)\"

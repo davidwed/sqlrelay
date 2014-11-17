@@ -10,12 +10,6 @@
 
 #include <config.h>
 
-#ifndef SQLRELAY_ENABLE_SHARED
-	extern "C" {
-		#include "sqlrtranslationdeclarations.cpp"
-	}
-#endif
-
 sqlrtranslations::sqlrtranslations(bool debug) {
 	debugFunction();
 	xmld=NULL;
@@ -135,13 +129,8 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 	sqlrtranslation	*tr=(*newTranslation)(this,translation,debug);
 
 #else
-
 	dynamiclib	*dl=NULL;
-	sqlrtranslation	*tr;
-	#include "sqlrtranslationassignments.cpp"
-	{
-		tr=NULL;
-	}
+	sqlrtranslation	*tr=NULL;
 #endif
 
 	// add the plugin to the list

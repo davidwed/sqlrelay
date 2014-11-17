@@ -9,12 +9,6 @@
 
 #include <config.h>
 
-#ifndef SQLRELAY_ENABLE_SHARED
-	extern "C" {
-		#include "sqlrtriggerdeclarations.cpp"
-	}
-#endif
-
 sqlrtriggers::sqlrtriggers(bool debug) {
 	debugFunction();
 	xmld=NULL;
@@ -150,11 +144,7 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 #else
 
 	dynamiclib	*dl=NULL;
-	sqlrtrigger	*tr;
-	#include "sqlrtriggerassignments.cpp"
-	{
-		tr=NULL;
-	}
+	sqlrtrigger	*tr=NULL;
 #endif
 
 	// add the plugin to the list
