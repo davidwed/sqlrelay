@@ -328,6 +328,27 @@ AC_SUBST(WALL)
 
 
 
+dnl checks to see if -Wno-overloaded-virtual option is needed
+AC_DEFUN([FW_CHECK_WNOOVERLOADEDVIRTUAL],
+[
+
+WNOOVERLOADEDVIRTUAL=""
+AC_MSG_CHECKING(whether -Wno-overloaded-virtual is needed)
+
+# clang's -Wall includes -Woverloaded-virtual, which we don't want
+if ( test -n "`$CC --version 2> /dev/null | grep clang`" )
+then
+	WNOOVERLOADEDVIRTUAL="-Wno-overloaded-virtual"
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+
+AC_SUBST(WNOOVERLOADEDVIRTUAL)
+])
+
+
+
 dnl checks to see if -g3 option works or not
 AC_DEFUN([FW_CHECK_DEBUG],
 [
