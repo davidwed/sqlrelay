@@ -737,6 +737,7 @@ READLINEINCLUDES
 PTHREADLIB
 PTHREADINCLUDES
 WNOUNKNOWNPRAGMAS
+WNOMISMATCHEDTAGS
 WNOOVERLOADEDVIRTUAL
 WALL
 WERROR
@@ -16128,6 +16129,25 @@ $as_echo_n "checking whether -Wno-overloaded-virtual is needed... " >&6; }
 if ( test -n "`$CC --version 2> /dev/null | grep clang`" )
 then
 	WNOOVERLOADEDVIRTUAL="-Wno-overloaded-virtual"
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+
+
+
+WNOMISMATCHEDTAGS=""
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether -Wno-mismatched-tags is needed" >&5
+$as_echo_n "checking whether -Wno-mismatched-tags is needed... " >&6; }
+
+# clang's -Wall includes -Wmismatched-tags, which we don't want
+if ( test -n "`$CC --version 2> /dev/null | grep clang`" )
+then
+	WNOMISMATCHEDTAGS="-Wno-mismatched-tags"
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 else

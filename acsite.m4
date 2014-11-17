@@ -349,6 +349,27 @@ AC_SUBST(WNOOVERLOADEDVIRTUAL)
 
 
 
+dnl checks to see if -Wno-mismatched-tags option is needed
+AC_DEFUN([FW_CHECK_WNOMISMATCHEDTAGS],
+[
+
+WNOMISMATCHEDTAGS=""
+AC_MSG_CHECKING(whether -Wno-mismatched-tags is needed)
+
+# clang's -Wall includes -Wmismatched-tags, which we don't want
+if ( test -n "`$CC --version 2> /dev/null | grep clang`" )
+then
+	WNOMISMATCHEDTAGS="-Wno-mismatched-tags"
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+
+AC_SUBST(WNOMISMATCHEDTAGS)
+])
+
+
+
 dnl checks to see if -g3 option works or not
 AC_DEFUN([FW_CHECK_DEBUG],
 [
