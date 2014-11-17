@@ -25,6 +25,9 @@ extern "C" {
 		#ifndef HAVE_SOCKLEN_T
 			#define HAVE_SOCKLEN_T
 		#endif
+		#ifndef _WCHAR_T_DECLARED
+			#define _WCHAR_T_DECLARED
+		#endif
 		#ifndef _WCHAR_T_DEFINED_
 			#define _WCHAR_T_DEFINED_
 		#endif

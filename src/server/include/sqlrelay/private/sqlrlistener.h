@@ -141,8 +141,6 @@
 
 		sqlrconfigfile		cfgfl;
 
-		uint32_t	runningconnections;
-
 		static	signalhandler		alarmhandler;
 		static	volatile sig_atomic_t	alarmrang;
 
