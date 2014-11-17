@@ -1,1 +1,0 @@
-sqlrtrigger	*new_@module@(xmldomnode *parameters, bool debug);

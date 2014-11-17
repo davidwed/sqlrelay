@@ -117,7 +117,7 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 
 	// load the password encryption itself
 	stringbuffer	functionname;
-	functionname.append("new_")->append(module);
+	functionname.append("new_sqlrpwdenc_")->append(module);
 	sqlrpwdenc *(*newPasswordEncryption)(xmldomnode *)=
 			(sqlrpwdenc *(*)(xmldomnode *))
 				dl->getSymbol(functionname.getString());

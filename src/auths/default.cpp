@@ -119,7 +119,7 @@ bool defaultauth::authenticate(const char *user, const char *password) {
 }
 
 extern "C" {
-	sqlrauth *new_default(xmldomnode *users, sqlrpwdencs *sqlrpe) {
+	sqlrauth *new_sqlrauth_default(xmldomnode *users, sqlrpwdencs *sqlrpe) {
 		return new defaultauth(users,sqlrpe);
 	}
 }

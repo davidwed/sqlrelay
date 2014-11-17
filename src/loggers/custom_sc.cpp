@@ -203,7 +203,7 @@ bool custom_sc::run(sqlrlistener *sqlrl,
 }
 
 extern "C" {
-	sqlrlogger	*new_custom_sc(xmldomnode *parameters) {
+	sqlrlogger	*new_sqlrlogger_custom_sc(xmldomnode *parameters) {
 		return new custom_sc(parameters);
 	}
 }

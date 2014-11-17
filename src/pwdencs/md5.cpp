@@ -422,7 +422,7 @@ char *md5::encrypt(const char *value) {
 }
 
 extern "C" {
-	sqlrpwdenc *new_md5(xmldomnode *parameters) {
+	sqlrpwdenc *new_sqlrpwdenc_md5(xmldomnode *parameters) {
 		return new md5(parameters);
 	}
 }

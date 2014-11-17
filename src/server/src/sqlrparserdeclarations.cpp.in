@@ -1,1 +1,1 @@
-sqlrparser	*new_@module@();
+sqlrparser	*new_sqlrparser_@module@();

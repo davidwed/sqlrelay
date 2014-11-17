@@ -97,7 +97,8 @@ bool sqlrelay::authenticate(const char *user, const char *password) {
 }
 
 extern "C" {
-	sqlrauth *new_sqlrelay(xmldomnode *users, sqlrpwdencs *sqlrpe) {
+	sqlrauth *new_sqlrauth_sqlrelay(xmldomnode *users,
+					sqlrpwdencs *sqlrpe) {
 		return new sqlrelay(users,sqlrpe);
 	}
 }

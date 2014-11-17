@@ -110,7 +110,7 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 
 	// load the query itself
 	stringbuffer	functionname;
-	functionname.append("new_")->append(module);
+	functionname.append("new_sqlrquery_")->append(module);
 	sqlrquery *(*newQuery)(xmldomnode *)=
 			(sqlrquery *(*)(xmldomnode *))
 				dl->getSymbol(functionname.getString());

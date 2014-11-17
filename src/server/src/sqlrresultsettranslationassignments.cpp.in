@@ -1,3 +1,0 @@
-	if (!charstring::compare(module,"@module@")) {
-		rstr=new_@module@(this,resultsettranslation);
-	} else

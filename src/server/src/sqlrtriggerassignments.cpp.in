@@ -1,3 +1,0 @@
-	if (!charstring::compare(module,"@module@")) {
-		tr=new_@module@(trigger,debug);
-	} else

@@ -1,1 +1,0 @@
-sqlrresultsettranslation	*new_@module@(sqlrresultsettranslations *sqlrrsts, xmldomnode *parameters);

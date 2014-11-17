@@ -91,7 +91,7 @@ void sqlrprotocols::loadProtocol(const char *module) {
 
 	// load the password encryption itself
 	stringbuffer	functionname;
-	functionname.append("new_")->append(module);
+	functionname.append("new_sqlrprotocol_")->append(module);
 	sqlrprotocol *(*newProtocol)(sqlrservercontroller *)=
 			(sqlrprotocol *(*)(sqlrservercontroller *))
 				dl->getSymbol(functionname.getString());

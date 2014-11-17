@@ -4036,7 +4036,7 @@ sqlrparser *sqlrservercontroller::newParser(const char *module) {
 
 	// load the parser itself
 	stringbuffer	functionname;
-	functionname.append("new_")->append(module);
+	functionname.append("new_sqlrparser_")->append(module);
 	sqlrparser	*(*newParser)()=
 			(sqlrparser *(*)())
 				sqlrpdl.getSymbol(functionname.getString());

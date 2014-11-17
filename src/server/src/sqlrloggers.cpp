@@ -110,7 +110,7 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 
 	// load the logger itself
 	stringbuffer	functionname;
-	functionname.append("new_")->append(module);
+	functionname.append("new_sqlrlogger_")->append(module);
 	sqlrlogger *(*newLogger)(xmldomnode *)=
 			(sqlrlogger *(*)(xmldomnode *))
 				dl->getSymbol(functionname.getString());

@@ -139,7 +139,7 @@ void debug::closeDebugFile() {
 }
 
 extern "C" {
-	sqlrlogger	*new_debug(xmldomnode *parameters) {
+	sqlrlogger	*new_sqlrlogger_debug(xmldomnode *parameters) {
 		return new debug(parameters);
 	}
 }

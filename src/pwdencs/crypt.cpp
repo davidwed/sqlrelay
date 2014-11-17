@@ -34,7 +34,7 @@ char *crypt_pwdenc::encrypt(const char *value) {
 }
 
 extern "C" {
-	sqlrpwdenc *new_crypt(xmldomnode *parameters) {
+	sqlrpwdenc *new_sqlrpwdenc_crypt(xmldomnode *parameters) {
 		return new crypt_pwdenc(parameters);
 	}
 }

@@ -3056,7 +3056,7 @@ bool sqlrclient::getQueryTreeCommand(sqlrservercursor *cursor) {
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrprotocol	*new_sqlrclient(
+	SQLRSERVER_DLLSPEC sqlrprotocol	*new_sqlrprotocol_sqlrclient(
 					sqlrservercontroller *cont) {
 		return new sqlrclient(cont);
 	}

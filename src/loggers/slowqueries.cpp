@@ -136,7 +136,7 @@ bool slowqueries::run(sqlrlistener *sqlrl,
 }
 
 extern "C" {
-	sqlrlogger	*new_slowqueries(xmldomnode *parameters) {
+	sqlrlogger	*new_sqlrlogger_slowqueries(xmldomnode *parameters) {
 		return new slowqueries(parameters);
 	}
 }

@@ -237,7 +237,7 @@ bool custom_nw::descInputBinds(sqlrserverconnection *sqlrcon,
 }
 
 extern "C" {
-	sqlrlogger	*new_custom_nw(xmldomnode *parameters) {
+	sqlrlogger	*new_sqlrlogger_custom_nw(xmldomnode *parameters) {
 		return new custom_nw(parameters);
 	}
 }

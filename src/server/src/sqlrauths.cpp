@@ -111,7 +111,7 @@ void sqlrauths::loadAuthenticator(xmldomnode *auth,
 
 	// load the password encryption itself
 	stringbuffer	functionname;
-	functionname.append("new_")->append(module);
+	functionname.append("new_sqlrauth_")->append(module);
 	sqlrauth *(*newAuthenticator)(xmldomnode *,
 					sqlrpwdencs *)=
 			(sqlrauth *(*)(xmldomnode *,

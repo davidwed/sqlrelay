@@ -248,7 +248,7 @@ void sqlrcmdcstatcursor::getField(uint32_t col,
 }
 
 extern "C" {
-	sqlrquery	*new_sqlrcmdcstat(xmldomnode *parameters) {
+	sqlrquery	*new_sqlrquery_sqlrcmdcstat(xmldomnode *parameters) {
 		return new sqlrcmdcstat(parameters);
 	}
 }

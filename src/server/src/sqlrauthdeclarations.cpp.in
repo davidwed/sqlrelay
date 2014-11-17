@@ -1,1 +1,1 @@
-sqlrauth	*new_@module@(xmldomnode *parameters, sqlrpwdencs *sqlrpe);
+sqlrauth	*new_sqlrauth_@module@(xmldomnode *parameters, sqlrpwdencs *sqlrpe);

@@ -1,1 +1,0 @@
-sqlrtranslation	*new_@module@(sqlrtranslations *sqlts, xmldomnode *parameters, bool debug);

@@ -65,7 +65,7 @@ char *rot::rotate(const char *value, int64_t count) {
 }
 
 extern "C" {
-	sqlrpwdenc *new_rot(xmldomnode *parameters) {
+	sqlrpwdenc *new_sqlrpwdenc_rot(xmldomnode *parameters) {
 		return new rot(parameters);
 	}
 }
