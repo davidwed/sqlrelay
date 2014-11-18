@@ -113,7 +113,7 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 
 	// load the result set translation itself
 	stringbuffer	functionname;
-	functionname.append("new_")->append(module);
+	functionname.append("new_sqlrresultsettranslation_")->append(module);
 	sqlrresultsettranslation *(*newResultSetTranslation)
 		(sqlrresultsettranslations *, xmldomnode *)=
 		(sqlrresultsettranslation *(*)

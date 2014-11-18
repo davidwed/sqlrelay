@@ -126,7 +126,7 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 
 	// load the trigger itself
 	stringbuffer	functionname;
-	functionname.append("new_")->append(module);
+	functionname.append("new_sqlrtrigger_")->append(module);
 	sqlrtrigger *(*newTrigger)(xmldomnode *, bool)=
 			(sqlrtrigger *(*)(xmldomnode *, bool))
 				dl->getSymbol(functionname.getString());

@@ -112,7 +112,7 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 
 	// load the translation itself
 	stringbuffer	functionname;
-	functionname.append("new_")->append(module);
+	functionname.append("new_sqlrtranslation_")->append(module);
 	sqlrtranslation *(*newTranslation)
 		(sqlrtranslations *, xmldomnode *, bool)=
 		(sqlrtranslation *(*)(sqlrtranslations *, xmldomnode *, bool))
