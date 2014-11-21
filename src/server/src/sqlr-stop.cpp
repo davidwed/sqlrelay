@@ -22,7 +22,7 @@ const char *programs[]={
 
 const char *suffixes[]={"",".","","",NULL};
 
-int main(int32_t argc, const char **argv) {
+int main(int argc, const char **argv) {
 
 	#include <version.h>
 
