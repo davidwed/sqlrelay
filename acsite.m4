@@ -1883,7 +1883,7 @@ then
 
 			if ( test "$ARCH" = "x64" )
 			then
-				FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-DSYB_LP64 -I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libsybct64.$SOSUFFIX],[SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybdb64 -lsybintl64\"],[$SYBASEPATH/lib/libsybct64.a],[SYBASELIBS=\"-L$SYBASEPATH/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybsybtcl64 -lsybsybdb64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\"])
+				FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-DSYB_LP64 -I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libsybct64.$SOSUFFIX],[SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybdb64 -lsybintl64\"],[$SYBASEPATH/lib/libsybct64.a],[SYBASELIBS=\"-L$SYBASEPATH/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybdb64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\"])
 			fi
 		else
 		
@@ -1895,9 +1895,9 @@ then
 
 			FW_CHECK_HEADER_LIB([/opt/sybase/OCS-12_5/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/OCS-12_5/include\"],[/opt/sybase/OCS-12_5/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase/OCS-12_5/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"],[/opt/sybase/OCS-12_5/lib/libct.a],[SYBASELIBS=\"-L/opt/sybase/OCS-12_5/lib -lblk -lct -lcs -lcomn -lsybtcl -lsybdb -lintl\"; SYBASESTATIC=\"$STATICFLAG\"])
 
-			FW_CHECK_HEADER_LIB([/opt/sybase/OCS-15_0/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/OCS-15_0/include\"],[/opt/sybase/OCS-15_0/lib/libsybct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase/OCS-15_0/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybtcl -lsybdb -lsybintl\"],[/opt/sybase/OCS-15_0/lib/libsybct.a],[SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybsybtcl -lsybsybdb -lsybintl\"; SYBASESTATIC=\"$STATICFLAG\"])
+			FW_CHECK_HEADER_LIB([/opt/sybase/OCS-15_0/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sybase/OCS-15_0/include\"],[/opt/sybase/OCS-15_0/lib/libsybct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase/OCS-15_0/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybtcl -lsybintl\"],[/opt/sybase/OCS-15_0/lib/libsybct.a],[SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybtcl -lsybintl\"; SYBASESTATIC=\"$STATICFLAG\"])
 
-			FW_CHECK_HEADER_LIB([/opt/sap/OCS-16_0/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sap/OCS-16_0/include\"],[/opt/sap/OCS-16_0/lib/libsybct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sap/OCS-16_0/lib\"; SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybtcl -lsybdb -lsybintl\"],[/opt/sap/OCS-16_0/lib/libsybct.a],[SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybsybtcl -lsybsybdb -lsybintl\"; SYBASESTATIC=\"$STATICFLAG\"])
+			FW_CHECK_HEADER_LIB([/opt/sap/OCS-16_0/include/ctpublic.h],[SYBASEINCLUDES=\"-I/opt/sap/OCS-16_0/include\"],[/opt/sap/OCS-16_0/lib/libsybct.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sap/OCS-16_0/lib\"; SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybtcl -lsybintl\"],[/opt/sap/OCS-16_0/lib/libsybct.a],[SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybtcl -lsybintl\"; SYBASESTATIC=\"$STATICFLAG\"])
 
 			dnl Link in libsybunic if it's present
 			if ( test -n "$SYBASELIBS" )
@@ -1909,9 +1909,9 @@ then
 			if ( test "$ARCH" = "x64" )
 			then
 
-				FW_CHECK_HEADER_LIB([/opt/sybase/OCS-15_0/include/ctpublic.h],[SYBASEINCLUDES=\"-DSYB_LP64 -I/opt/sybase/OCS-15_0/include\"],[/opt/sybase/OCS-15_0/lib/libsybct64.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase/OCS-15_0/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybdb64 -lsybintl64\"],[/opt/sybase/OCS-15_0/lib/libsybct64.a],[SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybsybtcl64 -lsybsybdb64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\"])
+				FW_CHECK_HEADER_LIB([/opt/sybase/OCS-15_0/include/ctpublic.h],[SYBASEINCLUDES=\"-DSYB_LP64 -I/opt/sybase/OCS-15_0/include\"],[/opt/sybase/OCS-15_0/lib/libsybct64.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase/OCS-15_0/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybintl64\"],[/opt/sybase/OCS-15_0/lib/libsybct64.a],[SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\"])
 
-				FW_CHECK_HEADER_LIB([/opt/sap/OCS-16_0/include/ctpublic.h],[SYBASEINCLUDES=\"-DSYB_LP64 -I/opt/sap/OCS-16_0/include\"],[/opt/sap/OCS-16_0/lib/libsybct64.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sap/OCS-16_0/lib\"; SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybdb64 -lsybintl64\"],[/opt/sap/OCS-16_0/lib/libsybct64.a],[SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybsybtcl64 -lsybsybdb64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\"])
+				FW_CHECK_HEADER_LIB([/opt/sap/OCS-16_0/include/ctpublic.h],[SYBASEINCLUDES=\"-DSYB_LP64 -I/opt/sap/OCS-16_0/include\"],[/opt/sap/OCS-16_0/lib/libsybct64.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sap/OCS-16_0/lib\"; SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybintl64\"],[/opt/sap/OCS-16_0/lib/libsybct64.a],[SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\"])
 
 				dnl Link in libsybunic if it's present
 				if ( test -n "$SYBASELIBS" )

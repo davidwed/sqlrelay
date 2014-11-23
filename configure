@@ -25033,7 +25033,7 @@ then
 		eval "SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybdb64 -lsybintl64\""
 	fi
 else
-	if ( test -n "$SYBASEPATH/lib/libsybct64.a" -a -n "SYBASELIBS=\"-L$SYBASEPATH/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybsybtcl64 -lsybsybdb64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\"" )
+	if ( test -n "$SYBASEPATH/lib/libsybct64.a" -a -n "SYBASELIBS=\"-L$SYBASEPATH/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybdb64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\"" )
 	then
 
 if ( test -r "$SYBASEPATH/lib/libsybct64.a" )
@@ -25044,7 +25044,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "SYBASEINCLUDES=\"-DSYB_LP64 -I$SYBASEPATH/include\""
-			eval "SYBASELIBS=\"-L$SYBASEPATH/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybsybtcl64 -lsybsybdb64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\""
+			eval "SYBASELIBS=\"-L$SYBASEPATH/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybdb64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\""
 		fi
 	fi
 fi
@@ -25232,10 +25232,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "SYBASEINCLUDES=\"-I/opt/sybase/OCS-15_0/include\""
-		eval "SYBASELIBSPATH=\"/opt/sybase/OCS-15_0/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybtcl -lsybdb -lsybintl\""
+		eval "SYBASELIBSPATH=\"/opt/sybase/OCS-15_0/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybtcl -lsybintl\""
 	fi
 else
-	if ( test -n "/opt/sybase/OCS-15_0/lib/libsybct.a" -a -n "SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybsybtcl -lsybsybdb -lsybintl\"; SYBASESTATIC=\"$STATICFLAG\"" )
+	if ( test -n "/opt/sybase/OCS-15_0/lib/libsybct.a" -a -n "SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybtcl -lsybintl\"; SYBASESTATIC=\"$STATICFLAG\"" )
 	then
 
 if ( test -r "/opt/sybase/OCS-15_0/lib/libsybct.a" )
@@ -25246,7 +25246,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "SYBASEINCLUDES=\"-I/opt/sybase/OCS-15_0/include\""
-			eval "SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybsybtcl -lsybsybdb -lsybintl\"; SYBASESTATIC=\"$STATICFLAG\""
+			eval "SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybtcl -lsybintl\"; SYBASESTATIC=\"$STATICFLAG\""
 		fi
 	fi
 fi
@@ -25272,10 +25272,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "SYBASEINCLUDES=\"-I/opt/sap/OCS-16_0/include\""
-		eval "SYBASELIBSPATH=\"/opt/sap/OCS-16_0/lib\"; SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybtcl -lsybdb -lsybintl\""
+		eval "SYBASELIBSPATH=\"/opt/sap/OCS-16_0/lib\"; SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybtcl -lsybintl\""
 	fi
 else
-	if ( test -n "/opt/sap/OCS-16_0/lib/libsybct.a" -a -n "SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybsybtcl -lsybsybdb -lsybintl\"; SYBASESTATIC=\"$STATICFLAG\"" )
+	if ( test -n "/opt/sap/OCS-16_0/lib/libsybct.a" -a -n "SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybtcl -lsybintl\"; SYBASESTATIC=\"$STATICFLAG\"" )
 	then
 
 if ( test -r "/opt/sap/OCS-16_0/lib/libsybct.a" )
@@ -25286,7 +25286,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "SYBASEINCLUDES=\"-I/opt/sap/OCS-16_0/include\""
-			eval "SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybsybtcl -lsybsybdb -lsybintl\"; SYBASESTATIC=\"$STATICFLAG\""
+			eval "SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk -lsybct -lsybcs -lsybcomn -lsybtcl -lsybintl\"; SYBASESTATIC=\"$STATICFLAG\""
 		fi
 	fi
 fi
@@ -25373,10 +25373,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "SYBASEINCLUDES=\"-DSYB_LP64 -I/opt/sybase/OCS-15_0/include\""
-		eval "SYBASELIBSPATH=\"/opt/sybase/OCS-15_0/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybdb64 -lsybintl64\""
+		eval "SYBASELIBSPATH=\"/opt/sybase/OCS-15_0/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybintl64\""
 	fi
 else
-	if ( test -n "/opt/sybase/OCS-15_0/lib/libsybct64.a" -a -n "SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybsybtcl64 -lsybsybdb64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\"" )
+	if ( test -n "/opt/sybase/OCS-15_0/lib/libsybct64.a" -a -n "SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\"" )
 	then
 
 if ( test -r "/opt/sybase/OCS-15_0/lib/libsybct64.a" )
@@ -25387,7 +25387,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "SYBASEINCLUDES=\"-DSYB_LP64 -I/opt/sybase/OCS-15_0/include\""
-			eval "SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybsybtcl64 -lsybsybdb64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\""
+			eval "SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\""
 		fi
 	fi
 fi
@@ -25413,10 +25413,10 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "SYBASEINCLUDES=\"-DSYB_LP64 -I/opt/sap/OCS-16_0/include\""
-		eval "SYBASELIBSPATH=\"/opt/sap/OCS-16_0/lib\"; SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybdb64 -lsybintl64\""
+		eval "SYBASELIBSPATH=\"/opt/sap/OCS-16_0/lib\"; SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybintl64\""
 	fi
 else
-	if ( test -n "/opt/sap/OCS-16_0/lib/libsybct64.a" -a -n "SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybsybtcl64 -lsybsybdb64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\"" )
+	if ( test -n "/opt/sap/OCS-16_0/lib/libsybct64.a" -a -n "SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\"" )
 	then
 
 if ( test -r "/opt/sap/OCS-16_0/lib/libsybct64.a" )
@@ -25427,7 +25427,7 @@ fi
 		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 		then
 			eval "SYBASEINCLUDES=\"-DSYB_LP64 -I/opt/sap/OCS-16_0/include\""
-			eval "SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybsybtcl64 -lsybsybdb64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\""
+			eval "SYBASELIBS=\"-L/opt/sap/OCS-16_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\""
 		fi
 	fi
 fi
