@@ -403,7 +403,6 @@ rm -rf %{buildroot}
 %{_bindir}/sqlr-pwdenc
 %{_libdir}/libsqlrserver-*.so.*
 %{_libdir}/libsqlrutil-*.so.*
-%{_libdir}/libsqlreparser-*.so.*
 %{_libexecdir}/sqlrelay/sqlrlogger_*
 %{_libexecdir}/sqlrelay/sqlrquery_*
 %{_libexecdir}/sqlrelay/sqlrpwdenc_*
@@ -437,9 +436,6 @@ rm -rf %{buildroot}
 %{_libdir}/libsqlrutil.a
 %{_libdir}/libsqlrutil.la
 %{_libdir}/libsqlrutil.so
-%{_libdir}/libsqlreparser.a
-%{_libdir}/libsqlreparser.la
-%{_libdir}/libsqlreparser.so
 
 %files clients
 %defattr(-, root, root)
