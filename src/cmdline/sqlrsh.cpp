@@ -112,6 +112,7 @@ void sqlrshenv::clearbinds(dictionary<char *, sqlrshbindvalue *> *binds) {
 		if (bv->type==DATE_BIND) {
 			delete[] bv->dateval.tz;
 		}
+		delete bv;
 	}
 	binds->clear();
 }
@@ -1217,7 +1218,13 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 	// if the bind variable is already defined, clear it...
 	sqlrshbindvalue	*bv=NULL;
 	if (env->inputbinds.getValue(variable,&bv)) {
-		delete[] bv;
+		if (bv->type==STRING_BIND) {
+			delete[] bv->stringval;
+		}
+		if (bv->type==DATE_BIND) {
+			delete[] bv->dateval.tz;
+		}
+		delete bv;
 	}
 
 	// define the variable
@@ -1315,7 +1322,13 @@ void sqlrsh::inputbindblob(sqlrcursor *sqlrcur,
 	// if the bind variable is already defined, clear it...
 	sqlrshbindvalue	*bv=NULL;
 	if (env->inputbinds.getValue(variable,&bv)) {
-		delete[] bv;
+		if (bv->type==STRING_BIND) {
+			delete[] bv->stringval;
+		}
+		if (bv->type==DATE_BIND) {
+			delete[] bv->dateval.tz;
+		}
+		delete bv;
 	}
 
 	// define the variable
@@ -1365,7 +1378,13 @@ void sqlrsh::outputbind(sqlrcursor *sqlrcur,
 		// if the bind variable is already defined, clear it...
 		sqlrshbindvalue	*bv=NULL;
 		if (env->outputbinds.getValue(parts[1],&bv)) {
-			delete[] bv;
+			if (bv->type==STRING_BIND) {
+				delete[] bv->stringval;
+			}
+			if (bv->type==DATE_BIND) {
+				delete[] bv->dateval.tz;
+			}
+			delete bv;
 		}
 
 		// define the variable
