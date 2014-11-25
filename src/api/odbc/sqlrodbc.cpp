@@ -5174,7 +5174,7 @@ static const char *SQLR_BuildGuid(STMT *stmt,
 	string[18]='-';
 
 	uint16_t	byte=0;
-	for (uint16_t index=20; index<37; index=index+2) {
+	for (uint16_t index=20; index<36; index=index+2) {
 		unsigned char	data=guid->Data4[byte];
 		string[index+1]=SQLR_HexToChar(data%16);
 		data=data/16;

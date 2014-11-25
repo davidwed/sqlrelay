@@ -1107,7 +1107,7 @@ JNIEXPORT jlongArray JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getRowLengt
 	}
 	jlongArray	retarray=env->NewLongArray(colcount);
 	env->SetLongArrayRegion(retarray,0,colcount,jrowlengths);
-	delete jrowlengths;
+	delete[] jrowlengths;
 	return retarray;
 }
 

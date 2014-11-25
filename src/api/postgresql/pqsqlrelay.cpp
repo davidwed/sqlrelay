@@ -275,7 +275,6 @@ void freePGconn(PGconn *conn) {
 	delete[] conn->error;
 
 	delete conn;
-	conn=NULL;
 }
 
 PGconn *PQsetdbLogin(const char *host, const char *port,
@@ -342,9 +341,7 @@ void PQfinish(PGconn *conn) {
 
 void PQreset(PGconn *conn) {
 	debugFunction();
-	PQfinish(conn);
-	PQsetdbLogin(conn->host,conn->port,conn->options,
-			conn->tty,conn->db,conn->user,conn->password);
+	conn->sqlrcon->endSession();
 }
 
 char *PQdb(const PGconn *conn) {
@@ -2088,22 +2085,21 @@ PQdisplayTuples(const PGresult *res,
 
 void
 PQprintTuples(const PGresult *res,
-			  FILE *fout,		/* output stream */
-			  int PrintAttNames,	/* print attribute names or not */
-			  int TerseOutput,	/* delimiter bars or not? */
-			  int colWidth		/* width of column, if 0, use variable
-								 * width */
-)
+		FILE *fout,		/* output stream */
+		int PrintAttNames,	/* print attribute names or not */
+		int TerseOutput,	/* delimiter bars or not? */
+		int colWidth		/* width of column, if 0, use variable
+					 * width */
+		)
 {
 	debugFunction();
 
-	int			nFields;
-	int			nTups;
-	int			i,
-				j;
+	int		nFields;
+	int		nTups;
+	int		i,j;
 	char		formatString[80];
 
-	char	   *tborder = NULL;
+	char		*tborder = NULL;
 
 	nFields = PQnfields(res);
 	nTups = PQntuples(res);
@@ -2115,7 +2111,7 @@ PQprintTuples(const PGresult *res,
 		charstring::printf(formatString,sizeof(formatString),"%%s %%s");
 
 	if (nFields > 0)
-	{							/* only print rows with at least 1 field.  */
+	{	/* only print rows with at least 1 field.  */
 
 		if (!TerseOutput)
 		{
@@ -2162,6 +2158,10 @@ PQprintTuples(const PGresult *res,
 			else
 				fprintf(fout, "|\n%s\n", tborder);
 		}
+	}
+
+	if (tborder) {
+		free(tborder);
 	}
 }
 
@@ -2216,10 +2216,7 @@ PostgresPollingStatusType PQconnectPoll(PGconn *conn) {
 
 int PQresetStart(PGconn *conn) {
 	debugFunction();
-	char	*savestring=conn->conninfo;
-	PQfinish(conn);
-	conn=PQconnectdb(savestring);
-	// return 1 for success, 0 for failure
+	PQreset(conn);
 	return 1;
 }
 

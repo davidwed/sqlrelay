@@ -154,7 +154,7 @@
 
 		filedescriptor	*clientsock;
 
-		const char	*protocol;
+		char		*protocol;
 
 		const char	*user;
 		const char	*password;

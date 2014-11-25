@@ -112,3 +112,6 @@ distclean: clean
 		src/util/msvc/DebugCLR \
 		src/util/msvc/ReleaseCLR \
 		src/util/msvc/x64
+
+cppcheck:
+	cppcheck -j4 --enable=warning,performance,portability src > /dev/null

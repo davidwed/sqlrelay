@@ -1589,11 +1589,12 @@ bool sqlrservercontroller::getProtocol() {
 	if (!protocollen) {
 		protocol=charstring::duplicate(DEFAULT_PROTOCOL);
 	} else {
-		char	*protocol=new char[protocollen+1];
+		protocol=new char[protocollen+1];
 		if (handoffsockun.read(protocol,protocollen)!=protocollen) {
 			logDebugMessage("failed to get the "
 					"client protocol string");
 			delete[] protocol;
+			protocol=NULL;
 			return false;
 		}
 		protocol[protocollen]='\0';

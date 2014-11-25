@@ -19,6 +19,8 @@
 	added various compile flags for clang's aggressive -Wall
 	added support for sybase 16.0
 	removed unnecessary -lsybdb/-lsybdb64 for sybase 15+
+	fixed PQreset, PQresetStart, PQresetPoll in postgresql drop-in
+		replacement lib
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries
