@@ -1055,7 +1055,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	const char	*socket=options[2].optval;
 	int32_t		tries=charstring::toInteger(options[3].optval);
 	int32_t		retrytime=charstring::toInteger(options[4].optval);
-	bool		debug=charstring::toInteger(options[5].optval);
+	const char	*debug=options[5].optval;
 
 	// create a sqlrconnection and attach it to the dbh
 	sqlrdbhandle	*sqlrdbh=new sqlrdbhandle;
@@ -1064,15 +1064,19 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 							dbh->password,
 							tries,retrytime,
 							true);
-	if (debug) {
-		sqlrdbh->sqlrcon->debugOn();
+	if (debug && debug[0]) {
+		if (!charstring::isInteger(debug)) {
+			sqlrdbh->sqlrcon->setDebugFile(debug);
+			sqlrdbh->sqlrcon->debugOn();
+		} else if (charstring::toInteger(debug)) {
+			sqlrdbh->sqlrcon->debugOn();
+			sqlrdbh->sqlrcon->debugPrintFunction(zend_printf);
+		}
 	}
 
 	sqlrdbh->resultsetbuffersize=charstring::toInteger(options[6].optval);
 	sqlrdbh->dontgetcolumninfo=charstring::toInteger(options[7].optval);
 	sqlrdbh->nullsasnulls=charstring::toInteger(options[8].optval);
-
-	sqlrdbh->sqlrcon->debugPrintFunction(zend_printf);
 
 	sqlrdbh->translatebindsonserver=false;
 	sqlrdbh->usesubvars=false;
