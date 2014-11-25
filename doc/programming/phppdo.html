@@ -141,7 +141,7 @@ if (!$dbh) {
 <li><b>socket</b> - The socket that the SQL Relay server is listening on.  Either port or socket must be specified.  If both are specified, socket will be preferred to port.</li>
 <li><b>tries</b> - If a connection fails, it will be retried this many times.</li>
 <li><b>retrytime</b> - If a connection fails, it will be retried on this interval (in seconds).</li>
-<li><b>debug</b> - If this is set to 1 then debug is enabled.  Defaults to 0.</li>
+<li><b>debug</b> - If this is set to 1 or to a file name then debug is enabled.  If set to a file name then debug will be written to the file.  If set to 1 then debug will be written to the browser.  Defaults to 0.</li>
 </ul>
 
 <p>These additional connect string variables control the default statement attributes:</p>

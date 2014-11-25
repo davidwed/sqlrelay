@@ -1064,14 +1064,12 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 							dbh->password,
 							tries,retrytime,
 							true);
-	if (debug && debug[0]) {
-		if (!charstring::isInteger(debug)) {
-			sqlrdbh->sqlrcon->setDebugFile(debug);
-			sqlrdbh->sqlrcon->debugOn();
-		} else if (charstring::toInteger(debug)) {
-			sqlrdbh->sqlrcon->debugOn();
-			sqlrdbh->sqlrcon->debugPrintFunction(zend_printf);
-		}
+	if (!charstring::compare(debug,"1")) {
+		sqlrdbh->sqlrcon->debugOn();
+		sqlrdbh->sqlrcon->debugPrintFunction(zend_printf);
+	} else if (debug && debug[0] && charstring::compare(debug,"0")) {
+		sqlrdbh->sqlrcon->setDebugFile(debug);
+		sqlrdbh->sqlrcon->debugOn();
 	}
 
 	sqlrdbh->resultsetbuffersize=charstring::toInteger(options[6].optval);
