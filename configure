@@ -31899,7 +31899,7 @@ $as_echo_n "checking for xsubpp... " >&6; }
 				PERLCCFLAGS=""
 				PERLOPTIMIZE=""
 				PERLSITEARCH=`ls -d $PERLLIB/*-* 2> /dev/null | head -1`
-				PERLSITELIB=$PERLLIB/site_perl
+				PERLSITELIB=$PERLLIB
 				PERLARCHLIBEXP=$PERLSITEARCH
 				PERLINC="-I$PERLARCHLIBEXP/CORE"
 				PERLINSTALLMAN3DIR=$PERLPREFIX/man/man3
