@@ -986,54 +986,36 @@ bool freetdscursor::open() {
 
 	if (!freetdsconn->dbversion) {
 
-		bool	success=false;
+		// try the various queries that might return the version
+		const char	*query[]={
+			"select @@version",
+			"sp_version installmaster",
+			NULL
+		};
+		CS_INT		index[]={
+			0,1,0
+		};
 
-		// first try the sybase query
-		const char	*query="sp_version installmaster";
-		int32_t		len=charstring::length(query);
-		if (prepareQuery(query,len) &&
-				executeQuery(query,len) &&
-				fetchRow()) {
-			const char	*space=
-				charstring::findFirst(data[1],' ');
-			freetdsconn->dbversion=
-				charstring::duplicate(data[1],space-data[1]);
-			success=true;
-		}
-		closeResultSet();
-		if (success) {
-			return retval;
-		}
+		for (uint32_t i=0; query[i] && !freetdsconn->dbversion; i++) {
 
-		// if that fails, try the sql server query
-		query="select @@version";
-		len=charstring::length(query);
-		if (prepareQuery(query,len) &&
-				executeQuery(query,len) &&
-				fetchRow()) {
-			// parse out the version
-			freetdsconn->sybasedb=false;
-			const char	*dash=
-				charstring::findFirst(data[0]," - ");
-			if (dash) {
-				dash=dash+3;
-				const char	*space=
-					charstring::findFirst(dash,' ');
-				if (space) {
-					freetdsconn->dbversion=
-						charstring::duplicate(
-							dash,space-dash);
-					success=true;
-				}
+			const char	*q=query[i];
+			int32_t		len=charstring::length(q);
+
+			if (prepareQuery(q,len) &&
+					executeQuery(q,len) &&
+					fetchRow()) {
+				freetdsconn->dbversion=
+					charstring::duplicate(data[index[i]]);
 			}
-		}
-		closeResultSet();
-		if (success) {
-			return retval;
+
+			closeResultSet();
 		}
 
-		// hmm, it would appear that neither worked
-		freetdsconn->dbversion=charstring::duplicate("unknown");
+		// fall back to unknown
+		if (!freetdsconn->dbversion) {
+			freetdsconn->dbversion=
+				charstring::duplicate("unknown");
+		}
 	}
 	return retval;
 }
@@ -1963,7 +1945,7 @@ bool freetdscursor::fetchRow() {
 			discardResults();
 		}
 
-		if (fetchresult!=CS_SUCCEED && !rowsread) {
+		if (fetchresult!=CS_SUCCEED || !rowsread) {
 			return false;
 		}
 		maxrow=rowsread;

@@ -768,21 +768,39 @@ bool sybasecursor::open() {
 	}
 
 	if (!sybaseconn->dbversion) {
-		const char	*query="sp_version installmaster";
-		int32_t		len=charstring::length(query);
-		if (!(prepareQuery(query,len) &&
-				executeQuery(query,len) &&
-				fetchRow())) {
+
+		// try the various queries that might return the version
+		const char	*query[]={
+			"select @@version",
+			"sp_version installmaster",
+			NULL
+		};
+		CS_INT		index[]={
+			0,1,0
+		};
+
+		for (uint32_t i=0; query[i] && !sybaseconn->dbversion; i++) {
+
+			const char	*q=query[i];
+			int32_t		len=charstring::length(q);
+
+			if (prepareQuery(q,len) &&
+					executeQuery(q,len) &&
+					fetchRow()) {
+				sybaseconn->dbversion=
+					charstring::duplicate(data[index[i]]);
+			}
+
+			closeResultSet();
+		}
+
+		// fall back to unknown
+		if (!sybaseconn->dbversion) {
 			sybaseconn->dbversion=
 				charstring::duplicate("unknown");
-		} else {
-			const char	*space=
-				charstring::findFirst(data[1],' ');
-			sybaseconn->dbversion=
-				charstring::duplicate(data[1],space-data[1]);
 		}
-		closeResultSet();
 	}
+
 	return retval;
 }
 
@@ -1531,7 +1549,7 @@ bool sybasecursor::fetchRow() {
 	}
 	if (!row) {
 		if (ct_fetch(cmd,CS_UNUSED,CS_UNUSED,CS_UNUSED,
-				&rowsread)!=CS_SUCCEED && !rowsread) {
+				&rowsread)!=CS_SUCCEED || !rowsread) {
 			return false;
 		}
 		maxrow=rowsread;
