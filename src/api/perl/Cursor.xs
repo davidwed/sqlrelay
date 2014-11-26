@@ -30,7 +30,7 @@ extern "C" {
         #ifndef sv_setuv
                 #define sv_setuv sv_setiv
         #endif
-	#ifdef PERLREALLYOLD
+	#ifndef PERLREALLYOLD
         	#undef sv_setpv
         	#define sv_setpv(a,b) Perl_sv_setpv(a,(char *)b)
         	#undef sv_setpvn
