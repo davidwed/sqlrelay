@@ -23,8 +23,12 @@ extern "C" {
 #endif
 
 #ifdef PERL_500
-        #define SvUV SvIV
-        #define sv_setuv sv_setiv
+	#ifndef SvUV
+        	#define SvUV SvIV
+	#endif
+	#ifndef sv_setuv
+        	#define sv_setuv sv_setiv
+	#endif
         #undef sv_setpv
         #define sv_setpv(a,b) Perl_sv_setpv(a,(char *)b)
         #undef sv_setpvn
