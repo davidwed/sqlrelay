@@ -2595,13 +2595,23 @@ then
 			fi
 		fi
 
+		AC_MSG_CHECKING(for xsubpp)
 		XSUBPP=""
 		if ( test -n "$PERL" )
 		then
-			PERLPREFIXCMD=`$PERL -V:prefix`
-			PERLLIBCMD=`$PERL -V:privlibexp`
-			PERLPREFIX=`eval "$PERLPREFIXCMD"; echo $prefix`
-			PERL_LIB=`eval "$PERLLIBCMD"; echo $privlibexp`
+			if ( test -z "`$PERL -V 2>&1 | grep Unrecognized`" )
+			then
+echo "first case"
+				PERLPREFIXCMD=`$PERL -V:prefix`
+				PERLLIBCMD=`$PERL -V:privlibexp`
+				PERLPREFIX=`eval "$PERLPREFIXCMD"; echo $prefix`
+				PERL_LIB=`eval "$PERLLIBCMD"; echo $privlibexp`
+			else
+echo "second case"
+				PERLFPN=`which $PERL 2> /dev/null`
+				PERLPREFIX=`dirname $PERLFPN | sed -e "s|/bin||g"`
+				PERL_LIB=$PERLPREFIX/lib/perl5
+			fi
 			XSUBPP=$PERL_LIB/ExtUtils/xsubpp
 			if ( test ! -r "$XSUBPP" )
 			then
@@ -2619,8 +2629,10 @@ then
 
 		if ( test -r "$XSUBPP" )
 		then
+			AC_MSG_RESULT($XSUBPP)
 			HAVE_PERL="yes"
 		else
+			AC_MSG_RESULT(not found)
 			AC_MSG_WARN(xsubpp not found)
 			AC_MSG_WARN(The Perl API will not be built.)
 		fi
