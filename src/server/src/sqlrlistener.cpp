@@ -134,12 +134,13 @@ void sqlrlistener::cleanUp() {
 
 	delete[] pidfile;
 
-	for (uint64_t csind=0; csind<clientsockincount; csind++) {
+	uint64_t	csind;
+	for (csind=0; csind<clientsockincount; csind++) {
 		delete clientsockin[csind];
 	}
 	delete[] clientsockin;
 	delete[] clientsockinproto;
-	for (uint64_t csind=0; csind<clientsockuncount; csind++) {
+	for (csind=0; csind<clientsockuncount; csind++) {
 		delete clientsockun[csind];
 	}
 	delete[] clientsockun;
