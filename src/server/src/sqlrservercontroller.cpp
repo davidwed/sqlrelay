@@ -2042,7 +2042,7 @@ void sqlrservercontroller::errorMessage(char *errorbuffer,
 						uint32_t *errorlength,
 						int64_t *errorcode,
 						bool *liveconnection) {
-	return conn->errorMessage(errorbuffer,errorbuffersize,
+	conn->errorMessage(errorbuffer,errorbuffersize,
 					errorlength,errorcode,liveconnection);
 }
 
@@ -4900,7 +4900,7 @@ void sqlrservercontroller::errorMessage(sqlrservercursor *cursor,
 						uint32_t *errorlength,
 						int64_t *errorcode,
 						bool *liveconnection) {
-	return cursor->errorMessage(errorbuffer,errorbuffersize,
+	cursor->errorMessage(errorbuffer,errorbuffersize,
 					errorlength,errorcode,liveconnection);
 }
 
@@ -5025,7 +5025,7 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 }
 
 void sqlrservercontroller::nextRow(sqlrservercursor *cursor) {
-	return cursor->nextRow();
+	cursor->nextRow();
 }
 
 void sqlrservercontroller::getField(sqlrservercursor *cursor,
@@ -5082,7 +5082,7 @@ sqlrserverbindvar *sqlrservercontroller::getInputBinds(sqlrservercursor *cursor)
 
 void sqlrservercontroller::setOutputBindCount(sqlrservercursor *cursor,
 						uint16_t outbindcount) {
-	return cursor->setOutputBindCount(outbindcount);
+	cursor->setOutputBindCount(outbindcount);
 }
 
 uint16_t sqlrservercontroller::getOutputBindCount(sqlrservercursor *cursor) {
@@ -5171,7 +5171,7 @@ uint64_t sqlrservercontroller::getQueryStartUSec(sqlrservercursor *cursor) {
 
 void sqlrservercontroller::setQueryEnd(sqlrservercursor *cursor,
 						uint64_t sec, uint64_t usec) {
-	return cursor->setQueryEnd(sec,usec);
+	cursor->setQueryEnd(sec,usec);
 }
 
 uint64_t sqlrservercontroller::getQueryEndSec(sqlrservercursor *cursor) {
@@ -5232,5 +5232,5 @@ bool sqlrservercontroller::getLiveConnection(sqlrservercursor *cursor) {
 
 void sqlrservercontroller::setLiveConnection(sqlrservercursor *cursor,
 						bool liveconnection) {
-	return cursor->setLiveConnection(liveconnection);
+	cursor->setLiveConnection(liveconnection);
 }

@@ -625,9 +625,8 @@ bool sqlrlistener::listenOnClientSockets() {
 	// count sockets and build socket arrays
 	clientsockincount=0;
 	clientsockuncount=0;
-	for (linkedlistnode< listenercontainer * > *node=
-					listenerlist->getFirst();
-					node; node=node->getNext()) {
+	linkedlistnode< listenercontainer * >	*node;
+	for (node=listenerlist->getFirst(); node; node=node->getNext()) {
 		if (node->getValue()->getPort()) {
 			clientsockincount=clientsockincount+
 					node->getValue()->getAddressCount();
@@ -646,9 +645,7 @@ bool sqlrlistener::listenOnClientSockets() {
 
 	// listen on sockets
 	bool	listening=false;
-	for (linkedlistnode< listenercontainer * > *node=
-					listenerlist->getFirst();
-					node; node=node->getNext()) {
+	for (node=listenerlist->getFirst(); node; node=node->getNext()) {
 		if (listenOnClientSocket(node->getValue())) {
 			listening=true;
 		}
