@@ -24,6 +24,7 @@
 	added debug-to-file support to PHP PDO driver
 	fixed subtle row-fetch bug in sybase/freetds drivers that could cause
 		the total row count to be set to garbage
+	fixed support for older versions of perl (5.00x)
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries

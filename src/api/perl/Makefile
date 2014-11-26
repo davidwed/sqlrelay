@@ -17,7 +17,6 @@ else
 PERLSITELIB = $(DESTDIR)$(OVERRIDEPERLSITELIB)
 endif
 PERL_INC = $(DESTDIR)$(shell eval "`$(PERL) -V:archlibexp`"; export archlibexp; echo "-I$$archlibexp/CORE" | sed -e "s|UNKNOWN||g" )
-PERL_LIB = $(DESTDIR)$(shell eval "`$(PERL) -V:privlibexp`"; export privlibexp; echo $$privlibexp | sed -e "s|UNKNOWN||g" )
 ifeq ($(OVERRIDEPERLINSTALLMAN3DIR),)
 PERLINSTALLMAN3DIR = $(DESTDIR)$(shell eval "`$(PERL) -V:installman3dir`"; export installman3dir; echo $$installman3dir | sed -e "s|UNKNOWN||g" )
 else
@@ -41,7 +40,7 @@ endif
 .SUFFIXES: .lo .xs
 
 .xs.cpp:
-	$(PERL) $(XSUBPP) -noprototypes -C++ -typemap $(PERL_LIB)/ExtUtils/typemap -typemap perlobject.map -typemap typemap $< > $<c && mv $<c $@
+	$(PERL) $(XSUBPP) -noprototypes -C++ -typemap $(PERLLIB)/ExtUtils/typemap -typemap perlobject.map -typemap typemap $< > $<c && mv $<c $@
 
 .cpp.lo:
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@

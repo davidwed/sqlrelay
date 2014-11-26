@@ -31864,18 +31864,16 @@ $as_echo_n "checking for xsubpp... " >&6; }
 		then
 			if ( test -z "`$PERL -V 2>&1 | grep Unrecognized`" )
 			then
-echo "first case"
 				PERLPREFIXCMD=`$PERL -V:prefix`
 				PERLLIBCMD=`$PERL -V:privlibexp`
 				PERLPREFIX=`eval "$PERLPREFIXCMD"; echo $prefix`
-				PERL_LIB=`eval "$PERLLIBCMD"; echo $privlibexp`
+				PERLLIB=`eval "$PERLLIBCMD"; echo $privlibexp`
 			else
-echo "second case"
 				PERLFPN=`which $PERL 2> /dev/null`
 				PERLPREFIX=`dirname $PERLFPN | sed -e "s|/bin||g"`
-				PERL_LIB=$PERLPREFIX/lib/perl5
+				PERLLIB=$PERLPREFIX/lib/perl5
 			fi
-			XSUBPP=$PERL_LIB/ExtUtils/xsubpp
+			XSUBPP=$PERLLIB/ExtUtils/xsubpp
 			if ( test ! -r "$XSUBPP" )
 			then
 				XSUBPP="$PERLPREFIX/bin/xsubpp"
