@@ -19,6 +19,7 @@
 #include <rudiments/xmldom.h>
 #include <rudiments/stdio.h>
 #include <rudiments/character.h>
+#include <rudiments/memorypool.h>
 
 #include <defines.h>
 
@@ -81,6 +82,7 @@ class sqlrshenv {
 		bool		autocommit;
 		char		delimiter;
 		dictionary<char *, sqlrshbindvalue *>	inputbinds;
+		memorypool	*inbindpool;
 		dictionary<char *, sqlrshbindvalue *>	outputbinds;
 };
 
@@ -91,11 +93,13 @@ sqlrshenv::sqlrshenv() {
 	final=false;
 	autocommit=false;
 	delimiter=';';
+	inbindpool=new memorypool(512,128,100);
 }
 
 sqlrshenv::~sqlrshenv() {
 	clearbinds(&inputbinds);
 	clearbinds(&outputbinds);
+	delete inbindpool;
 }
 
 void sqlrshenv::clearbinds(dictionary<char *, sqlrshbindvalue *> *binds) {
@@ -109,12 +113,10 @@ void sqlrshenv::clearbinds(dictionary<char *, sqlrshbindvalue *> *binds) {
 		if (bv->type==STRING_BIND) {
 			delete[] bv->stringval;
 		}
-		if (bv->type==DATE_BIND) {
-			delete[] bv->dateval.tz;
-		}
 		delete bv;
 	}
 	binds->clear();
+	inbindpool->deallocate();
 }
 
 enum querytype_t {
@@ -1221,9 +1223,6 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		if (bv->type==STRING_BIND) {
 			delete[] bv->stringval;
 		}
-		if (bv->type==DATE_BIND) {
-			delete[] bv->dateval.tz;
-		}
 		delete bv;
 	}
 
@@ -1264,7 +1263,10 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		bv->dateval.second=dt.getSeconds();
 		bv->dateval.microsecond=charstring::toInteger(
 					charstring::findLast(value,":")+1);
-		bv->dateval.tz=charstring::duplicate(dt.getTimeZoneString());
+		char	*tz=(char *)env->inbindpool->allocate(
+				charstring::length(dt.getTimeZoneString())+1);
+		charstring::copy(tz,dt.getTimeZoneString());
+		bv->dateval.tz=tz;
 		delete[] value;
 
 	} else if (charstring::isInteger(value)) {
@@ -1325,9 +1327,6 @@ void sqlrsh::inputbindblob(sqlrcursor *sqlrcur,
 		if (bv->type==STRING_BIND) {
 			delete[] bv->stringval;
 		}
-		if (bv->type==DATE_BIND) {
-			delete[] bv->dateval.tz;
-		}
 		delete bv;
 	}
 
@@ -1380,9 +1379,6 @@ void sqlrsh::outputbind(sqlrcursor *sqlrcur,
 		if (env->outputbinds.getValue(parts[1],&bv)) {
 			if (bv->type==STRING_BIND) {
 				delete[] bv->stringval;
-			}
-			if (bv->type==DATE_BIND) {
-				delete[] bv->dateval.tz;
 			}
 			delete bv;
 		}
