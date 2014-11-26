@@ -2081,7 +2081,7 @@ bool sqlrservercontroller::getLiveConnection() {
 }
 
 void sqlrservercontroller::setLiveConnection(bool liveconnection) {
-	return conn->setLiveConnection(liveconnection);
+	conn->setLiveConnection(liveconnection);
 }
 
 bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor,
