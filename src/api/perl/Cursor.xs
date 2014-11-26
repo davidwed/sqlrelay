@@ -18,6 +18,7 @@ extern "C" {
 #ifdef CLASS
 	#undef CLASS
 #endif
+
 #ifdef THIS
 	#undef THIS
 #endif
@@ -35,7 +36,7 @@ extern "C" {
         	#undef sv_setpvn
         	#define sv_setpvn(a,b,c) Perl_sv_setpvn(a,(char *)b,c)
 	#else
-		#define CLASS "SQLRCursor"
+		#define CLASS "SQLRelay::SQLRCursor"
         #endif
 #endif
 
@@ -353,9 +354,6 @@ sqlrcursor::getOutputBindLength(variable)
 sqlrcursor *
 sqlrcursor::getOutputBindCursor(variable)
 		const char *variable
-	PREINIT:
-		// on some platforms, this needs to be a
-		// char * rather than const char *
 		char *	CLASS = "SQLRelay::Cursor";
 	CODE:
 		RETVAL=THIS->getOutputBindCursor(variable,true);

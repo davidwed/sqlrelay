@@ -18,6 +18,7 @@ extern "C" {
 #ifdef CLASS
 	#undef CLASS
 #endif
+
 #ifdef THIS
 	#undef THIS
 #endif
@@ -35,7 +36,7 @@ extern "C" {
         	#undef sv_setpvn
         	#define sv_setpvn(a,b,c) Perl_sv_setpvn(a,(char *)b,c)
 	#else
-		#define CLASS "SQLRConnection"
+		#define CLASS "SQLRelay::SQLRConnection"
 	#endif
 #endif
 
