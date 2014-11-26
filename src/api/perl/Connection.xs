@@ -22,17 +22,19 @@ extern "C" {
 	#undef THIS
 #endif
 
-#ifdef PERL_500
+#ifdef PERL500
 	#ifndef SvUV
         	#define SvUV SvIV
 	#endif
 	#ifndef sv_setuv
         	#define sv_setuv sv_setiv
 	#endif
-        #undef sv_setpv
-        #define sv_setpv(a,b) Perl_sv_setpv(a,(char *)b)
-        #undef sv_setpvn
-        #define sv_setpvn(a,b,c) Perl_sv_setpvn(a,(char *)b,c)
+	#ifndef PERLREALLYOLD
+        	#undef sv_setpv
+        	#define sv_setpv(a,b) Perl_sv_setpv(a,(char *)b)
+        	#undef sv_setpvn
+        	#define sv_setpvn(a,b,c) Perl_sv_setpvn(a,(char *)b,c)
+	#endif
 #endif
 
 #ifdef WIN32

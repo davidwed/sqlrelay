@@ -671,7 +671,8 @@ PYTHONLIB
 PYTHONDIR
 PYTHONINCLUDES
 HAVE_PYTHON
-PERL_500
+PERLREALLYOLD
+PERL500
 POD2MAN
 XSUBPP
 PERLPREFIX
@@ -31904,6 +31905,7 @@ $as_echo_n "checking for xsubpp... " >&6; }
 				PERLINC="-I$PERLARCHLIBEXP/CORE"
 				PERLINSTALLMAN3DIR=$PERLPREFIX/man/man3
 				PERLINSTALLMAN3EXT=3
+				PERLREALLYOLD="-DPERLREALLYOLD"
 			fi
 			XSUBPP=$PERLLIB/ExtUtils/xsubpp
 			if ( test ! -r "$XSUBPP" )
@@ -31916,7 +31918,7 @@ $as_echo_n "checking for xsubpp... " >&6; }
 			fi
 			if ( test -n "`$PERL -v | grep version | grep 5\.00`" )
 			then
-				PERL_500="-DPERL_500"
+				PERL500="-DPERL500"
 			fi
 		fi
 
@@ -31934,6 +31936,7 @@ $as_echo "$as_me: WARNING: xsubpp not found" >&2;}
 $as_echo "$as_me: WARNING: The Perl API will not be built." >&2;}
 		fi
 	fi
+
 
 
 

@@ -2633,6 +2633,7 @@ then
 				PERLINC="-I$PERLARCHLIBEXP/CORE"
 				PERLINSTALLMAN3DIR=$PERLPREFIX/man/man3
 				PERLINSTALLMAN3EXT=3
+				PERLREALLYOLD="-DPERLREALLYOLD"
 			fi
 			XSUBPP=$PERLLIB/ExtUtils/xsubpp
 			if ( test ! -r "$XSUBPP" )
@@ -2645,7 +2646,7 @@ then
 			fi
 			if ( test -n "`$PERL -v | grep version | grep 5\.00`" )
 			then
-				PERL_500="-DPERL_500"
+				PERL500="-DPERL500"
 			fi
 		fi
 
@@ -2674,7 +2675,8 @@ then
 	AC_SUBST(PERLPREFIX)
 	AC_SUBST(XSUBPP)
 	AC_SUBST(POD2MAN)
-	AC_SUBST(PERL_500)
+	AC_SUBST(PERL500)
+	AC_SUBST(PERLREALLYOLD)
 fi
 ])
 
