@@ -47,12 +47,14 @@ extern "C" {
 	#define XS_INTERNAL(name) STATIC XSPROTO(name)
 #endif
 
-#ifndef na
-	#define na PL_na
-#endif
+#ifndef PERLREALLYOLD
+	#ifndef na
+		#define na PL_na
+	#endif
 
-#ifndef sv_undef
-	#define sv_undef PL_sv_undef
+	#ifndef sv_undef
+		#define sv_undef PL_sv_undef
+	#endif
 #endif
 
 /* xsubpp outputs __attribute__((noreturn)) this isn't
@@ -354,8 +356,10 @@ sqlrcursor::getOutputBindLength(variable)
 sqlrcursor *
 sqlrcursor::getOutputBindCursor(variable)
 		const char *variable
-		char *	CLASS = "SQLRelay::Cursor";
 	CODE:
+#ifndef PERLREALLYOLD
+		char *	CLASS = "SQLRelay::Cursor";
+#endif
 		RETVAL=THIS->getOutputBindCursor(variable,true);
 	OUTPUT:
 		RETVAL
