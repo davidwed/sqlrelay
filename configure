@@ -675,6 +675,14 @@ PERL_500
 POD2MAN
 XSUBPP
 PERLPREFIX
+PERLINSTALLMAN3EXT
+PERLINSTALLMAN3DIR
+PERLINC
+PERLARCHLIBEXP
+PERLSITELIB
+PERLSITEARCH
+PERLOPTIMIZE
+PERLCCFLAGS
 PERLLIB
 HAVE_PERL
 PERL
@@ -31866,12 +31874,36 @@ $as_echo_n "checking for xsubpp... " >&6; }
 			then
 				PERLPREFIXCMD=`$PERL -V:prefix`
 				PERLLIBCMD=`$PERL -V:privlibexp`
+				PERLCCFLAGSCMD=`$PERL -V:ccflags`
+				PERLOPTIMIZECMD=`$PERL -V:optimize`
+				PERLSITEARCHCMD=`$PERL -V:sitearch`
+				PERLSITELIBCMD=`$PERL -V:sitelib`
+				PERLARCHLIBEXPCMD=`$PERL -V:archlibexp`
+				PERLINSTALLMAN3DIRCMD=`$PERL -V:installman3dir`
+				PERLINSTALLMAN3EXTCMD=`$PERL -V:man3ext`
+
 				PERLPREFIX=`eval "$PERLPREFIXCMD"; echo $prefix`
 				PERLLIB=`eval "$PERLLIBCMD"; echo $privlibexp`
+				PERLCCFLAGS=`eval "$PERLCCFLAGSCMD"; echo $ccflags`
+				PERLOPTIMIZE=`eval "$PERLOPTIMIZECMD"; echo $optimize`
+				PERLSITEARCH=`eval "$PERLSITEARCHCMD"; echo $sitearch`
+				PERLSITELIB=`eval "$PERLSITELIBCMD"; echo $sitelib`
+				PERLARCHLIBEXP=`eval "$PERLARCHLIBEXPCMD"; echo $archlibexp`
+				PERLINC="-I$PERLARCHLIBEXP/CORE"
+				PERLINSTALLMAN3DIR=`eval "$PERLINSTALLMAN3DIRCMD"; echo $installman3dir`
+				PERLINSTALLMAN3EXT=`eval "$PERLINSTALLMAN3EXTCMD"; echo $man3ext`
 			else
 				PERLFPN=`which $PERL 2> /dev/null`
 				PERLPREFIX=`dirname $PERLFPN | sed -e "s|/bin||g"`
 				PERLLIB=$PERLPREFIX/lib/perl5
+				PERLCCFLAGS=""
+				PERLOPTIMIZE=""
+				PERLSITEARCH=$PERLLIB/i386-linux
+				PERLSITELIB=$PERLLIB/site_perl
+				PERLARCHLIBEXP=$PERLSITEARCH/5.003
+				PERLINC="-I$PERLARCHLIBEXP/CORE"
+				PERLINSTALLMAN3DIR=$PERLPREFIX/man/man3
+				PERLINSTALLMAN3EXT=3
 			fi
 			XSUBPP=$PERLLIB/ExtUtils/xsubpp
 			if ( test ! -r "$XSUBPP" )
@@ -31902,6 +31934,14 @@ $as_echo "$as_me: WARNING: xsubpp not found" >&2;}
 $as_echo "$as_me: WARNING: The Perl API will not be built." >&2;}
 		fi
 	fi
+
+
+
+
+
+
+
+
 
 
 
