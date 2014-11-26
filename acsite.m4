@@ -2611,6 +2611,10 @@ then
 			then
 				POD2MAN="pod2man"
 			fi
+			if ( test -n "`$PERL -v | grep version | grep 5\.00`" )
+			then
+				PERL_500="-DPERL_500"
+			fi
 		fi
 
 		if ( test -r "$XSUBPP" )
@@ -2628,6 +2632,7 @@ then
 	AC_SUBST(PERLPREFIX)
 	AC_SUBST(XSUBPP)
 	AC_SUBST(POD2MAN)
+	AC_SUBST(PERL_500)
 fi
 ])
 

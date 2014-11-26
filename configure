@@ -671,6 +671,7 @@ PYTHONLIB
 PYTHONDIR
 PYTHONINCLUDES
 HAVE_PYTHON
+PERL_500
 POD2MAN
 XSUBPP
 PERLPREFIX
@@ -31872,6 +31873,10 @@ fi
 			then
 				POD2MAN="pod2man"
 			fi
+			if ( test -n "`$PERL -v | grep version | grep 5\.00`" )
+			then
+				PERL_500="-DPERL_500"
+			fi
 		fi
 
 		if ( test -r "$XSUBPP" )
@@ -31884,6 +31889,7 @@ $as_echo "$as_me: WARNING: xsubpp not found" >&2;}
 $as_echo "$as_me: WARNING: The Perl API will not be built." >&2;}
 		fi
 	fi
+
 
 
 
