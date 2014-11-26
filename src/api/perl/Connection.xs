@@ -53,7 +53,6 @@ extern "C" {
 typedef class sqlrconnection sqlrconnection;
 
 MODULE = SQLRelay::Connection	PACKAGE = SQLRelay::Connection
-REQUIRE: 1.925
 
 sqlrconnection *
 sqlrconnection::new(server,port,socket,user,password,retrytime,tries)

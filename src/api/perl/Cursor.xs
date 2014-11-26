@@ -68,7 +68,6 @@ extern "C" {
 typedef class sqlrcursor sqlrcursor;
 
 MODULE = SQLRelay::Cursor		PACKAGE = SQLRelay::Cursor
-REQUIRE: 1.925
 
 sqlrcursor *
 sqlrcursor::new(sqlrc)
