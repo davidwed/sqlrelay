@@ -36,7 +36,7 @@ extern "C" {
         	#undef sv_setpvn
         	#define sv_setpvn(a,b,c) Perl_sv_setpvn(a,(char *)b,c)
 	#else
-		#define CLASS "SQLRelay::SQLRCursor"
+		#define CLASS "SQLRelay::Cursor"
         #endif
 #endif
 
