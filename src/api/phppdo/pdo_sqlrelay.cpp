@@ -432,7 +432,6 @@ static int sqlrcursorOutputBindPreExec(sqlrcursor *sqlrcur,
 			sqlrcur->defineOutputBindBlob(name);
 			return 1;
 		case PDO_PARAM_STMT:
-			// FIXME: use pdo_stmt_construct here
 			//sqlrcur->defineOutputBindCursor(name);
 			return 0;
 	}
@@ -475,19 +474,30 @@ static int sqlrcursorBindPostExec(sqlrcursor *sqlrcur,
 			return 1;
 		case PDO_PARAM_LOB:
 			{
-			TSRMLS_FETCH();
-			php_stream	*strm=php_stream_memory_create(
+			php_stream	*strm=NULL;
+			if (Z_TYPE_P(param->parameter)==IS_STRING) {
+				TSRMLS_FETCH();
+				strm=php_stream_memory_create(
 							TEMP_STREAM_DEFAULT);
+			} else if (Z_TYPE_P(param->parameter)==IS_RESOURCE) {
+				TSRMLS_FETCH();
+				php_stream_from_zval_no_verify(
+						strm,&param->parameter);
+			}
+			if (!strm) {
+				return 0;
+			}
 			php_stream_write(strm,
 				sqlrcur->getOutputBindBlob(name),
 				sqlrcur->getOutputBindLength(name));
 			php_stream_seek(strm,0,SEEK_SET);
-			php_stream_to_zval(strm,param->parameter);
+			if (Z_TYPE_P(param->parameter)==IS_STRING) {
+				php_stream_to_zval(strm,param->parameter);
+			}
 			}
 			return 1;
 		case PDO_PARAM_STMT:
-			// FIXME: there's no obvious way to create a PDO
-			// statement object to attach this to
+			// FIXME: use pdo_stmt_construct here
 			//sqlrcur->getOutputBindCursor(name);
 			return 0;
 	}

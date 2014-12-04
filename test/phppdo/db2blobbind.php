@@ -19,12 +19,20 @@
 	$dbh->exec("create table testtable (teststring varchar(200), testblob blob)");
 
 	$value="data from string";
+
+	$stream=fopen("test.blob","w+b");
+	fwrite($stream,"test test test test");
+	fclose($stream);
+
 	$stream=fopen("test.blob","rb");
 
 	$stmt=$dbh->prepare("insert into testtable values (?,?)");
 	$stmt->bindValue(1,$value);
 	$stmt->bindValue(2,$stream,PDO::PARAM_LOB);
 	$stmt->execute();
+
+	fclose($stream);
+	unlink("test.blob");
 
 	$stmt=$dbh->prepare("select * from testtable");
 	$stmt->execute();

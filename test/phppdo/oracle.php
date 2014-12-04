@@ -534,6 +534,27 @@
 	checkSuccess(stream_get_contents($param1),"hello");
 	echo("\n");
 
+	echo("CLOB AND BLOB OUTPUT BIND TO AND FROM FILE: \n");
+	$dbh->exec("drop table testtable1");
+	checkSuccess($dbh->exec("create table testtable1 (testclob clob, testblob blob)"),0);
+	$stmt=$dbh->prepare("insert into testtable1 values ('hello',:var1)");
+	$stream=fopen("test.blob","w+b");
+	fwrite($stream,"hello");
+	fclose($stream);
+	$stream=fopen("test.blob","rb");
+	checkSuccess($stmt->bindValue("var1",$stream,PDO::PARAM_LOB),true);
+	checkSuccess($stmt->execute(),1);
+	fclose($stream);
+	unlink("test.blob");
+	$stmt=$dbh->prepare("begin  select testblob into :blobvar from testtable1; end;");
+	$stream=fopen("test.blob","w+b");
+	checkSuccess($stmt->bindParam(":blobvar",$stream,PDO::PARAM_LOB|PDO::PARAM_INPUT_OUTPUT),true);
+	checkSuccess($stmt->execute(),1);
+	checkSuccess(stream_get_contents($stream),"hello");
+	fclose($stream);
+	unlink("test.blob");
+	echo("\n");
+
 	$dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_SILENT);
 
 	echo("INVALID QUERIES: \n");
