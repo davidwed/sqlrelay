@@ -18,12 +18,12 @@
 	$dbh->exec("drop table testtable");
 	$dbh->exec("create table testtable (teststring varchar(200), testblob blob)");
 
-	$value="test test test";
-	#$value="";
+	$value="data from string";
+	$stream=fopen("test.txt","rb");
 
 	$stmt=$dbh->prepare("insert into testtable values (?,?)");
 	$stmt->bindValue(1,$value);
-	$stmt->bindValue(2,$value,PDO::PARAM_LOB);
+	$stmt->bindValue(2,$stream,PDO::PARAM_LOB);
 	$stmt->execute();
 
 	$stmt=$dbh->prepare("select * from testtable");

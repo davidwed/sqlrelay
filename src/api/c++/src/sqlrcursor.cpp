@@ -3438,9 +3438,14 @@ bool sqlrcursor::parseData() {
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
 			if (buffer) {
-				sqlrc->debugPrint("\"");
-				sqlrc->debugPrint(buffer);
-				sqlrc->debugPrint("\",");
+				if (type==END_LONG_DATA) {
+					sqlrc->debugPrint("\nLOB data:");
+					sqlrc->debugPrintBlob(buffer,length);
+				} else {
+					sqlrc->debugPrint("\"");
+					sqlrc->debugPrint(buffer);
+					sqlrc->debugPrint("\",");
+				}
 			} else {
 				sqlrc->debugPrint(buffer);
 				sqlrc->debugPrint(",");

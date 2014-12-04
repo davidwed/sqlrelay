@@ -25,6 +25,8 @@
 	fixed subtle row-fetch bug in sybase/freetds drivers that could cause
 		the total row count to be set to garbage
 	fixed support for older versions of perl (5.00x)
+	fixed a bug in the DB2 connection that caused blob input binds to be
+		truncated at the first null
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries

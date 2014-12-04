@@ -3,6 +3,7 @@
 
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/environment.h>
+#include <rudiments/snooze.h>
 
 #include <datatypes.h>
 #include <defines.h>
@@ -198,6 +199,7 @@ class db2cursor : public sqlrservercursor {
 		db2column	*column;
 
 		uint16_t	maxbindcount;
+		SQLINTEGER	*blobbindsize;
 		datebind	**outdatebind;
 		char		**outlobbind;
 		SQLINTEGER 	*outlobbindlen;
@@ -712,6 +714,7 @@ db2cursor::db2cursor(sqlrserverconnection *conn, uint16_t id) :
 	stmt=0;
 	lobstmt=0;
 	maxbindcount=conn->cont->cfgfl->getMaxBindCount();
+	blobbindsize=new SQLINTEGER[maxbindcount];
 	outdatebind=new datebind *[maxbindcount];
 	outlobbind=new char *[maxbindcount];
 	outlobbindlen=new SQLINTEGER[maxbindcount];
@@ -724,6 +727,7 @@ db2cursor::db2cursor(sqlrserverconnection *conn, uint16_t id) :
 }
 
 db2cursor::~db2cursor() {
+	delete[] blobbindsize;
 	delete[] outdatebind;
 	delete[] outlobbind;
 	delete[] outlobbindlen;
@@ -969,16 +973,17 @@ bool db2cursor::inputBindBlob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
+	blobbindsize[inbindcount]=valuesize;
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_INPUT,
 				SQL_C_BINARY,
 				SQL_BLOB,
-				0,
+				valuesize,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				(SQLINTEGER *)NULL);
+				&(blobbindsize[inbindcount]));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
