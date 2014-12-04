@@ -29,6 +29,10 @@
 		truncated at the first null
 	added support for binding streams to output bind blobs in the PHP PDO
 		driver
+	updated PHP PDO guide with notes about bind variable formats
+	integrated Samat Yusupov's dbh driver methods for PHP PDO 
+	added stmt driver methods for suspending/resuming result sets to the
+		PHP PDO driver
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries

@@ -1028,23 +1028,65 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 }
 
 static PHP_METHOD(SQLRelay, getConnectionPort) {
-	RETURN_FALSE;
+	pdo_dbh_t	*dbh=
+		(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
+	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
+	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
+	uint16_t	port=sqlrcon->getConnectionPort();
+	RETURN_LONG(port);
 }
 
 static PHP_METHOD(SQLRelay, getConnectionSocket) {
-	RETURN_FALSE;
+	pdo_dbh_t	*dbh=
+		(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
+	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
+	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
+	const char	*socket=sqlrcon->getConnectionSocket();
+	RETURN_STRING((char *)socket,1);
 }
 
 static PHP_METHOD(SQLRelay, suspendSession) {
+	pdo_dbh_t	*dbh=
+		(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
+	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
+	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
+	if (sqlrcon->suspendSession()) {
+		RETURN_TRUE;
+	}
+	sqlrelayError(dbh);
 	RETURN_FALSE;
 }
 
 static PHP_METHOD(SQLRelay, resumeSession) {
+
+	zval	**port;
+	zval	**socket;
+	if (ZEND_NUM_ARGS()!=2 ||
+		zend_get_parameters_ex(2,&port,&socket)==FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+
+	convert_to_long_ex(port);
+	convert_to_string_ex(socket);
+
+	pdo_dbh_t	*dbh=
+		(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
+	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
+	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
+	if (sqlrcon->resumeSession((*port)->value.lval,
+					(*socket)->value.str.val)) {
+		RETURN_TRUE;
+	}
+	sqlrelayError(dbh);
 	RETURN_FALSE;
 }
 
 static PHP_METHOD(SQLRelay, endSession) {
-	RETURN_FALSE;
+	pdo_dbh_t	*dbh=
+		(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
+	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
+	sqlrconnection	*sqlrcon=(sqlrconnection *)sqlrdbh->sqlrcon;
+	sqlrcon->endSession();
 }
 
 // NOTE: don't make this const or it will fail to compile with older PHP
@@ -1062,14 +1104,40 @@ static zend_function_entry sqlrelayConnectionFunctions[] = {
 };
 
 static PHP_METHOD(SQLRelay, getResultSetId) {
-	RETURN_FALSE;
+	pdo_stmt_t	*stmt=
+		(pdo_stmt_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
+	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
+	uint16_t	id=sqlrcur->getResultSetId();
+	RETURN_LONG(id);
 }
 
 static PHP_METHOD(SQLRelay, suspendResultSet) {
-	RETURN_FALSE;
+	pdo_stmt_t	*stmt=
+		(pdo_stmt_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
+	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
+	sqlrcur->suspendResultSet();
+	RETURN_TRUE;
 }
 
 static PHP_METHOD(SQLRelay, resumeResultSet) {
+
+	zval	**port;
+	if (ZEND_NUM_ARGS()!=1 || zend_get_parameters_ex(1,&port)==FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+
+	convert_to_long_ex(port);
+
+	pdo_stmt_t	*stmt=
+		(pdo_stmt_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
+	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
+	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
+	if (sqlrcur->resumeResultSet((*port)->value.lval)) {
+		RETURN_TRUE;
+	}
+	sqlrelayErrorStmt(stmt);
 	RETURN_FALSE;
 }
 
