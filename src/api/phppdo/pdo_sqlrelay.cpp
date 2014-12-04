@@ -1027,6 +1027,76 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 	}
 }
 
+static PHP_METHOD(SQLRelay, getConnectionPort) {
+	RETURN_FALSE;
+}
+
+static PHP_METHOD(SQLRelay, getConnectionSocket) {
+	RETURN_FALSE;
+}
+
+static PHP_METHOD(SQLRelay, suspendSession) {
+	RETURN_FALSE;
+}
+
+static PHP_METHOD(SQLRelay, resumeSession) {
+	RETURN_FALSE;
+}
+
+static PHP_METHOD(SQLRelay, endSession) {
+	RETURN_FALSE;
+}
+
+// NOTE: don't make this const or it will fail to compile with older PHP
+static zend_function_entry sqlrelayConnectionFunctions[] = {
+	PHP_ME(SQLRelay,getConnectionPort,NULL,ZEND_ACC_PUBLIC)
+	PHP_ME(SQLRelay,getConnectionSocket,NULL,ZEND_ACC_PUBLIC)
+	PHP_ME(SQLRelay,suspendSession,NULL,ZEND_ACC_PUBLIC)
+	PHP_ME(SQLRelay,resumeSession,NULL,ZEND_ACC_PUBLIC)
+	PHP_ME(SQLRelay,endSession,NULL,ZEND_ACC_PUBLIC)
+#ifdef PHP_FE_END
+	PHP_FE_END
+#else
+	{NULL,NULL,NULL}
+#endif
+};
+
+static PHP_METHOD(SQLRelay, getResultSetId) {
+	RETURN_FALSE;
+}
+
+static PHP_METHOD(SQLRelay, suspendResultSet) {
+	RETURN_FALSE;
+}
+
+static PHP_METHOD(SQLRelay, resumeResultSet) {
+	RETURN_FALSE;
+}
+
+// NOTE: don't make this const or it will fail to compile with older PHP
+static zend_function_entry sqlrelayCursorFunctions[] = {
+	PHP_ME(SQLRelay,getResultSetId,NULL,ZEND_ACC_PUBLIC)
+	PHP_ME(SQLRelay,suspendResultSet,NULL,ZEND_ACC_PUBLIC)
+	PHP_ME(SQLRelay,resumeResultSet,NULL,ZEND_ACC_PUBLIC)
+#ifdef PHP_FE_END
+	PHP_FE_END
+#else
+	{NULL,NULL,NULL}
+#endif
+};
+
+static const zend_function_entry *sqlrelayGetDriverMethods(pdo_dbh_t *dbh,
+							int kind TSRMLS_DC) {
+	switch (kind) {
+		case PDO_DBH_DRIVER_METHOD_KIND_DBH:
+			return sqlrelayConnectionFunctions;
+		case PDO_DBH_DRIVER_METHOD_KIND_STMT:
+			return sqlrelayCursorFunctions;
+		default:
+			return NULL;
+	}
+}
+
 static struct pdo_dbh_methods sqlrconnectionMethods={
 	sqlrconnectionClose,
 	sqlrconnectionPrepare,
@@ -1039,7 +1109,8 @@ static struct pdo_dbh_methods sqlrconnectionMethods={
 	sqlrconnectionLastInsertId,
 	sqlrconnectionError,
 	sqlrconnectionGetAttribute,
-	NULL // check liveness
+	NULL, // check liveness
+	sqlrelayGetDriverMethods
 };
 
 static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
@@ -1144,16 +1215,6 @@ static PHP_MINFO_FUNCTION(pdo_sqlrelay) {
 	php_info_print_table_end();
 }
 
-
-// NOTE: don't make this const or it will fail to compile with older PHP
-static zend_function_entry sqlrelayFunctions[] = {
-#ifdef PHP_FE_END
-	PHP_FE_END
-#else
-	{NULL,NULL,NULL}
-#endif
-};
-
 #if ZEND_MODULE_API_NO >= 20050922
 // NOTE: don't make this const or it will fail to compile with older PHP
 static zend_module_dep sqlrelayDeps[] = {
@@ -1165,6 +1226,15 @@ static zend_module_dep sqlrelayDeps[] = {
 #endif
 };
 #endif
+
+// NOTE: don't make this const or it will fail to compile with older PHP
+static zend_function_entry sqlrelayFunctions[] = {
+#ifdef PHP_FE_END
+	PHP_FE_END
+#else
+	{NULL,NULL,NULL}
+#endif
+};
 
 zend_module_entry pdo_sqlrelay_module_entry = {
 #if ZEND_MODULE_API_NO >= 20050922
