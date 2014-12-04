@@ -7,7 +7,7 @@
 	$socket="/tmp/test.socket";
 	$user="test";
 	$password="test";
-	$dsn="sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;debug=1";
+	$dsn="sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;debug=0";
 
 
 	$dbh=new PDO($dsn,$user,$password);
@@ -19,7 +19,7 @@
 	$dbh->exec("create table testtable (teststring varchar(200), testblob blob)");
 
 	$value="data from string";
-	$stream=fopen("test.txt","rb");
+	$stream=fopen("test.blob","rb");
 
 	$stmt=$dbh->prepare("insert into testtable values (?,?)");
 	$stmt->bindValue(1,$value);

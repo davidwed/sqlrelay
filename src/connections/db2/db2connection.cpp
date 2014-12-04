@@ -3,7 +3,6 @@
 
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/environment.h>
-#include <rudiments/snooze.h>
 
 #include <datatypes.h>
 #include <defines.h>
