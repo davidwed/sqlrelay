@@ -356,6 +356,8 @@ $stmt->execute();
 </pre>
 </blockquote>
 
+<p>(Note: these examples use colon-delimited variable names.  These are not supported by all databases.  See "A few words about the format of bind variables..." below for more information.)</p>
+
 <p>PDO supports binding integer, string and LOB values.  Oddly, it doesn't
 support binding floating point values.  You have to pass them as strings.
 Also, CLOB's have to be passed as LOB's.</p>
@@ -412,13 +414,56 @@ binding by position, the first bind parameter is number 1, not 0.</p>
 
 <p>However, databases differ widely in their bind variable formats and only SQLite supports both ?'s when binding by position and colon-delimited names when binding by name.</p>
 
-<p>The most efficient thing to do is to ignore the PDO docs and just use whatever bind format supported by the database you're using.</p>
+<p>The most efficient thing to do is to ignore the PDO docs and just use whatever bind format is supported by the database you're using.</p>
+
+<p>With Oracle:</p>
+
+<blockquote>
+insert into testtable values (:var1,:var2,:var3,:var4)
+</blockquote>
+
+<p>or</p>
+
+<blockquote>
+insert into testtable values (:1,:2,:3,:4)
+</blockquote>
+
+<p>With Sybase and MS SQL Server:</p>
+
+<blockquote>
+insert into testtable values (@var1,@var2,@var3,@var4)
+</blockquote>
+
+<p>With DB2, MySQL and Firebird:</p>
+
+<blockquote>
+insert into testtable values (?,?,?,?)
+</blockquote>
+
+<p>With PostgreSQL:</p>
+
+<blockquote>
+insert into testtable values ($1,$2,$3,$4)
+</blockquote>
+
+<p>With SQLite:</p>
+
+<blockquote>
+insert into testtable values (:var1,:var2,:var3,:var4)
+</blockquote>
+
+<p>or</p>
+
+<blockquote>
+insert into testtable values (?,?,?,?)
+</blockquote>
+
 
 <p>However...</p>
 
 <p>Another solution is to configure SQL Relay to translate bind variables by setting translatebindvariables="yes" in the sqlrelay.conf file for the instance you're using.  Simply put, this parameter makes every database support every bind variable format.  See the <a href="../admin/configreference.html">SQL Relay Configuration Reference</a> for more information on this parameter.</p>
 
-<p>A third solution is to configure PDO to emulate prepares by setting the PDO::ATTR_EMULATE_PREPARES attribute to true.  When the SQL Relay driver sees that this is set true, it rewrites the queries and translates the bind variables to substitution variables.  This solution also makes every database support every bind variable format, but the translation is done on the client-side.</p>
+<p>A third solution is to configure PDO to emulate prepares by setting the PDO::ATTR_EMULATE_PREPARES attribute to true.  When the SQL Relay driver sees that this is set true, it rewrites the queries and translates the bind variables to substitution variables.  This solution also makes every database support every bind variable format, but the translation is done on the client-side.  Unfortunately it doesn't work with output bind variables.</p>
 
 <a name="rebinding"></a>
 <span class="heading2">Re-Binding and Re-Execution</span><br><br>
