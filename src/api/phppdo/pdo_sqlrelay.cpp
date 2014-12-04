@@ -1027,7 +1027,7 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 	}
 }
 
-static PHP_METHOD(SQLRelay, getConnectionPort) {
+static PHP_METHOD(PDO_SQLRELAY, getConnectionPort) {
 	pdo_dbh_t	*dbh=
 		(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
@@ -1036,7 +1036,7 @@ static PHP_METHOD(SQLRelay, getConnectionPort) {
 	RETURN_LONG(port);
 }
 
-static PHP_METHOD(SQLRelay, getConnectionSocket) {
+static PHP_METHOD(PDO_SQLRELAY, getConnectionSocket) {
 	pdo_dbh_t	*dbh=
 		(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
@@ -1045,7 +1045,7 @@ static PHP_METHOD(SQLRelay, getConnectionSocket) {
 	RETURN_STRING((char *)socket,1);
 }
 
-static PHP_METHOD(SQLRelay, suspendSession) {
+static PHP_METHOD(PDO_SQLRELAY, suspendSession) {
 	pdo_dbh_t	*dbh=
 		(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
@@ -1057,7 +1057,7 @@ static PHP_METHOD(SQLRelay, suspendSession) {
 	RETURN_FALSE;
 }
 
-static PHP_METHOD(SQLRelay, resumeSession) {
+static PHP_METHOD(PDO_SQLRELAY, resumeSession) {
 
 	zval	**port;
 	zval	**socket;
@@ -1081,7 +1081,7 @@ static PHP_METHOD(SQLRelay, resumeSession) {
 	RETURN_FALSE;
 }
 
-static PHP_METHOD(SQLRelay, endSession) {
+static PHP_METHOD(PDO_SQLRELAY, endSession) {
 	pdo_dbh_t	*dbh=
 		(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
@@ -1091,11 +1091,11 @@ static PHP_METHOD(SQLRelay, endSession) {
 
 // NOTE: don't make this const or it will fail to compile with older PHP
 static zend_function_entry sqlrelayConnectionFunctions[] = {
-	PHP_ME(SQLRelay,getConnectionPort,NULL,ZEND_ACC_PUBLIC)
-	PHP_ME(SQLRelay,getConnectionSocket,NULL,ZEND_ACC_PUBLIC)
-	PHP_ME(SQLRelay,suspendSession,NULL,ZEND_ACC_PUBLIC)
-	PHP_ME(SQLRelay,resumeSession,NULL,ZEND_ACC_PUBLIC)
-	PHP_ME(SQLRelay,endSession,NULL,ZEND_ACC_PUBLIC)
+	PHP_ME(PDO_SQLRELAY,getConnectionPort,NULL,ZEND_ACC_PUBLIC)
+	PHP_ME(PDO_SQLRELAY,getConnectionSocket,NULL,ZEND_ACC_PUBLIC)
+	PHP_ME(PDO_SQLRELAY,suspendSession,NULL,ZEND_ACC_PUBLIC)
+	PHP_ME(PDO_SQLRELAY,resumeSession,NULL,ZEND_ACC_PUBLIC)
+	PHP_ME(PDO_SQLRELAY,endSession,NULL,ZEND_ACC_PUBLIC)
 #ifdef PHP_FE_END
 	PHP_FE_END
 #else
@@ -1103,7 +1103,7 @@ static zend_function_entry sqlrelayConnectionFunctions[] = {
 #endif
 };
 
-static PHP_METHOD(SQLRelay, getResultSetId) {
+static PHP_METHOD(PDO_SQLRELAY, getResultSetId) {
 	pdo_stmt_t	*stmt=
 		(pdo_stmt_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
@@ -1112,7 +1112,7 @@ static PHP_METHOD(SQLRelay, getResultSetId) {
 	RETURN_LONG(id);
 }
 
-static PHP_METHOD(SQLRelay, suspendResultSet) {
+static PHP_METHOD(PDO_SQLRELAY, suspendResultSet) {
 	pdo_stmt_t	*stmt=
 		(pdo_stmt_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
@@ -1121,7 +1121,7 @@ static PHP_METHOD(SQLRelay, suspendResultSet) {
 	RETURN_TRUE;
 }
 
-static PHP_METHOD(SQLRelay, resumeResultSet) {
+static PHP_METHOD(PDO_SQLRELAY, resumeResultSet) {
 
 	zval	**port;
 	if (ZEND_NUM_ARGS()!=1 || zend_get_parameters_ex(1,&port)==FAILURE) {
@@ -1143,9 +1143,9 @@ static PHP_METHOD(SQLRelay, resumeResultSet) {
 
 // NOTE: don't make this const or it will fail to compile with older PHP
 static zend_function_entry sqlrelayCursorFunctions[] = {
-	PHP_ME(SQLRelay,getResultSetId,NULL,ZEND_ACC_PUBLIC)
-	PHP_ME(SQLRelay,suspendResultSet,NULL,ZEND_ACC_PUBLIC)
-	PHP_ME(SQLRelay,resumeResultSet,NULL,ZEND_ACC_PUBLIC)
+	PHP_ME(PDO_SQLRELAY,getResultSetId,NULL,ZEND_ACC_PUBLIC)
+	PHP_ME(PDO_SQLRELAY,suspendResultSet,NULL,ZEND_ACC_PUBLIC)
+	PHP_ME(PDO_SQLRELAY,resumeResultSet,NULL,ZEND_ACC_PUBLIC)
 #ifdef PHP_FE_END
 	PHP_FE_END
 #else
