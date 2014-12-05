@@ -435,6 +435,80 @@
 	checkSuccess($result[4],"testlong2");
 	checkSuccess($result[5],"testclob2");
 	checkSuccess($result[6],"testblob2");
+	checkSuccess($dbh->setAttribute(PDO::ATTR_STRINGIFY_FETCHES,FALSE),1);
+	echo("\n");
+
+	echo("SUSPENDED SESSION: \n");
+	$stmt=$dbh->query("select * from testtable order by testnumber");
+	$stmt->suspendResultSet();
+	checkSuccess($dbh->suspendSession(),1);
+	$port=$dbh->getConnectionPort();
+	$socket=$dbh->getConnectionSocket();
+	checkSuccess($dbh->resumeSession($port,$socket),1);
+	$result=$stmt->fetch(PDO::FETCH_NUM);
+	checkSuccess($result[0],"1");
+	checkSuccess($result[1],"testchar1                               ");
+	checkSuccess($result[2],"testvarchar1");
+	checkSuccess($result[3],"01-JAN-01");
+	checkSuccess(stream_get_contents($result[4]),"testlong1");
+	checkSuccess(stream_get_contents($result[5]),"testclob1");
+	checkSuccess(stream_get_contents($result[6]),"");
+	echo("\n");
+	$stmt=$dbh->query("select * from testtable order by testnumber");
+	$stmt->suspendResultSet();
+	checkSuccess($dbh->suspendSession(),1);
+	$port=$dbh->getConnectionPort();
+	$socket=$dbh->getConnectionSocket();
+	checkSuccess($dbh->resumeSession($port,$socket),1);
+	$result=$stmt->fetch(PDO::FETCH_NUM);
+	checkSuccess($result[0],"1");
+	checkSuccess($result[1],"testchar1                               ");
+	checkSuccess($result[2],"testvarchar1");
+	checkSuccess($result[3],"01-JAN-01");
+	checkSuccess(stream_get_contents($result[4]),"testlong1");
+	checkSuccess(stream_get_contents($result[5]),"testclob1");
+	checkSuccess(stream_get_contents($result[6]),"");
+	echo("\n");
+	$stmt=$dbh->query("select * from testtable order by testnumber");
+	$stmt->suspendResultSet();
+	checkSuccess($dbh->suspendSession(),1);
+	$port=$dbh->getConnectionPort();
+	$socket=$dbh->getConnectionSocket();
+	checkSuccess($dbh->resumeSession($port,$socket),1);
+	$result=$stmt->fetch(PDO::FETCH_NUM);
+	checkSuccess($result[0],"1");
+	checkSuccess($result[1],"testchar1                               ");
+	checkSuccess($result[2],"testvarchar1");
+	checkSuccess($result[3],"01-JAN-01");
+	checkSuccess(stream_get_contents($result[4]),"testlong1");
+	checkSuccess(stream_get_contents($result[5]),"testclob1");
+	checkSuccess(stream_get_contents($result[6]),"");
+	echo("\n");
+
+	echo("SUSPENDED RESULT SET: \n");
+	$stmt=$dbh->prepare("select * from testtable order by testnumber");
+	checkSuccess($stmt->setAttribute(
+				PDO::SQLRELAY_ATTR_RESULT_SET_BUFFER_SIZE,1),1);
+	checkSuccess($stmt->execute(),1);
+	$result=$stmt->fetch(PDO::FETCH_NUM);
+	checkSuccess($result[0],"1");
+	$id=$stmt->getResultSetId();
+	$stmt->suspendResultSet();
+	checkSuccess($dbh->suspendSession(),1);
+	$port=$dbh->getConnectionPort();
+	$socket=$dbh->getConnectionSocket();
+	$dbh=new PDO($dsn,$user,$password);
+	$stmt=$dbh->prepare(null);
+	checkSuccess($dbh->resumeSession($port,$socket),1);
+	$stmt->resumeResultSet($id);
+	$result=$stmt->fetch(PDO::FETCH_NUM);
+	checkSuccess($result[0],"2");
+	$result=$stmt->fetchAll();
+	checkSuccess($result[0][0],"3");
+	checkSuccess($result[1][0],"4");
+	checkSuccess($result[2][0],"5");
+	checkSuccess($result[3][0],"6");
+	checkSuccess($result[4][0],"7");
 	echo("\n");
 
 	echo("COMMIT AND ROLLBACK: \n");
@@ -554,6 +628,7 @@
 	fclose($stream);
 	unlink("test.blob");
 	echo("\n");
+
 
 	$dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_SILENT);
 
