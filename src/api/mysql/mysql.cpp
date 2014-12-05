@@ -239,6 +239,7 @@ struct MYSQL_RES {
 	MYSQL_FIELD		*fields;
 	unsigned long		*lengths;
 	MYSQL_STMT		*stmtbackptr;
+	linkedlist< my_ulonglong >	rowcache;
 };
 
 struct MYSQL;
@@ -1160,17 +1161,21 @@ my_ulonglong mysql_affected_rows(MYSQL *mysql) {
 	return mysql_stmt_affected_rows(mysql->currentstmt);
 }
 
-
 MYSQL_ROW_OFFSET mysql_row_seek(MYSQL_RES *result, MYSQL_ROW_OFFSET offset) {
 	debugFunction();
+	MYSQL_ROW_OFFSET	currentoffset=mysql_row_tell(result);
 	result->previousrow=result->currentrow;
-	result->currentrow=(unsigned long)offset;
-	return (MYSQL_ROW_OFFSET)result->previousrow;
+	result->currentrow=
+		((linkedlistnode< my_ulonglong > *)offset)->getValue();
+	return (MYSQL_ROW_OFFSET)currentoffset;
 }
 
 MYSQL_ROW_OFFSET mysql_row_tell(MYSQL_RES *result) {
 	debugFunction();
-	return (MYSQL_ROW_OFFSET)result->currentrow;
+	linkedlistnode< my_ulonglong >	*rowcachenode=
+		new linkedlistnode< my_ulonglong >(result->currentrow);
+	result->rowcache.append(rowcachenode);
+	return (MYSQL_ROW_OFFSET)rowcachenode;
 }
 
 void mysql_data_seek(MYSQL_RES *result, my_ulonglong offset) {
@@ -2149,6 +2154,7 @@ int mysql_stmt_execute(MYSQL_STMT *stmt) {
 	stmt->result->previousrow=0;
 	stmt->result->currentrow=0;
 	stmt->result->currentfield=0;
+	stmt->result->rowcache.clear();
 	sqlrcursor	*sqlrcur=stmt->result->sqlrcur;
 
 	int	retval=!sqlrcur->executeQuery();
