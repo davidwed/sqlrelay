@@ -777,7 +777,9 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 					PDO_CURSOR_SCROLL TSRMLS_CC)==
 					PDO_CURSOR_FWDONLY;
 	
-	sqlrstmt->sqlrcur->prepareQuery(sql,sqllen);
+	if (sql && sql[0]) {
+		sqlrstmt->sqlrcur->prepareQuery(sql,sqllen);
+	}
 	return 1;
 }
 
@@ -1123,18 +1125,31 @@ static PHP_METHOD(PDO_SQLRELAY, suspendResultSet) {
 
 static PHP_METHOD(PDO_SQLRELAY, resumeResultSet) {
 
-	zval	**port;
-	if (ZEND_NUM_ARGS()!=1 || zend_get_parameters_ex(1,&port)==FAILURE) {
+	zval	**id;
+	if (ZEND_NUM_ARGS()!=1 || zend_get_parameters_ex(1,&id)==FAILURE) {
 		WRONG_PARAM_COUNT;
 	}
 
-	convert_to_long_ex(port);
+	convert_to_long_ex(id);
 
 	pdo_stmt_t	*stmt=
 		(pdo_stmt_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
-	if (sqlrcur->resumeResultSet((*port)->value.lval)) {
+	if (sqlrcur->resumeResultSet((*id)->value.lval)) {
+		stmt->executed=true;
+		stmt->column_count=sqlrcur->colCount();
+		stmt->columns=(pdo_column_data *)
+				ecalloc(stmt->column_count,
+					sizeof(struct pdo_column_data));
+		for (int32_t i=0; i<stmt->column_count; i++) {
+			if (!sqlrcursorDescribe(stmt,i)) {
+				sqlrelayErrorStmt(stmt);
+				RETURN_FALSE;
+			}
+		}
+		stmt->row_count=sqlrcur->affectedRows();
+		sqlrstmt->currentrow=sqlrcur->firstRowIndex()-1;
 		RETURN_TRUE;
 	}
 	sqlrelayErrorStmt(stmt);
