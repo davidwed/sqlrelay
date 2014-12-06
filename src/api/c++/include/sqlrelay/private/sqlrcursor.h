@@ -25,7 +25,7 @@
 		void	sendOutputBinds();
 		void	sendGetColumnInfo();
 		void	defineOutputBindGeneric(const char *variable,
-						uint16_t type,
+						bindvartype_t type,
 						uint32_t valuesize);
 		void	stringVar(bindvar *var,
 					const char *variable,
@@ -52,7 +52,7 @@
 						const char *tz);
 		void	lobVar(bindvar *var, const char *variable,
 					const char *value, uint32_t size,
-					uint16_t type);
+					bindvartype_t type);
 		bindvar	*findVar(const char *variable,
 					bindvar *vars,
 					uint16_t count);

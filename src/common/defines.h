@@ -85,15 +85,6 @@
 #define DONT_RE_EXECUTE 0
 #define RE_EXECUTE 1
 
-#define NULL_BIND 0
-#define STRING_BIND 1
-#define INTEGER_BIND 2
-#define DOUBLE_BIND 3
-#define BLOB_BIND 4
-#define CLOB_BIND 5
-#define CURSOR_BIND 6
-#define DATE_BIND 7
-
 // sizes...
 // FIXME: these are duplicated here and in sqlrshmdata.h
 #define USERSIZE 128

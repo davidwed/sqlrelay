@@ -31,9 +31,9 @@ struct outputbindvar {
 			const char	**tz;
 		} datevalue;
 	} value;
-	uint16_t	valuesize;
-	uint16_t	type;
-	int16_t		*isnull;
+	uint16_t		valuesize;
+	sqlrserverbindvartype_t	type;
+	int16_t			*isnull;
 };
 
 struct cursorbindvar {
@@ -756,7 +756,7 @@ bool routercursor::outputBind(const char *variable,
 				int16_t *isnull) {
 	cur->defineOutputBindString(variable+1,valuesize);
 	obv[obcount].variable=variable+1;
-	obv[obcount].type=STRING_BIND;
+	obv[obcount].type=SQLRSERVERBINDVARTYPE_STRING;
 	obv[obcount].value.stringvalue=value;
 	obv[obcount].valuesize=valuesize;
 	obv[obcount].isnull=isnull;
@@ -770,7 +770,7 @@ bool routercursor::outputBind(const char *variable,
 				int16_t *isnull) {
 	cur->defineOutputBindInteger(variable+1);
 	obv[obcount].variable=variable+1;
-	obv[obcount].type=INTEGER_BIND;
+	obv[obcount].type=SQLRSERVERBINDVARTYPE_INTEGER;
 	obv[obcount].value.intvalue=value;
 	obv[obcount].isnull=isnull;
 	obcount++;
@@ -785,7 +785,7 @@ bool routercursor::outputBind(const char *variable,
 				int16_t *isnull) {
 	cur->defineOutputBindDouble(variable+1);
 	obv[obcount].variable=variable+1;
-	obv[obcount].type=DOUBLE_BIND;
+	obv[obcount].type=SQLRSERVERBINDVARTYPE_DOUBLE;
 	obv[obcount].value.doublevalue=value;
 	obv[obcount].isnull=isnull;
 	obcount++;
@@ -807,7 +807,7 @@ bool routercursor::outputBind(const char *variable,
 				int16_t *isnull) {
 	cur->defineOutputBindDouble(variable+1);
 	obv[obcount].variable=variable+1;
-	obv[obcount].type=DATE_BIND;
+	obv[obcount].type=SQLRSERVERBINDVARTYPE_DATE;
 	obv[obcount].value.datevalue.year=year;
 	obv[obcount].value.datevalue.month=month;
 	obv[obcount].value.datevalue.day=day;
@@ -828,7 +828,7 @@ bool routercursor::outputBindBlob(const char *variable,
 					int16_t *isnull) {
 	cur->defineOutputBindBlob(variable+1);
 	obv[obcount].variable=variable+1;
-	obv[obcount].type=BLOB_BIND;
+	obv[obcount].type=SQLRSERVERBINDVARTYPE_BLOB;
 	obv[obcount].isnull=isnull;
 	obcount++;
 	return true;
@@ -840,7 +840,7 @@ bool routercursor::outputBindClob(const char *variable,
 					int16_t *isnull) {
 	cur->defineOutputBindClob(variable+1);
 	obv[obcount].variable=variable+1;
-	obv[obcount].type=CLOB_BIND;
+	obv[obcount].type=SQLRSERVERBINDVARTYPE_CLOB;
 	obv[obcount].isnull=isnull;
 	obcount++;
 	return true;
@@ -908,7 +908,7 @@ bool routercursor::executeQuery(const char *query, uint32_t length) {
 	for (uint16_t outi=0; outi<obcount; outi++) {
 		const char	*variable=obv[outi].variable;
 		*(obv[outi].isnull)=routerconn->nonnullbindvalue;
-		if (obv[outi].type==STRING_BIND) {
+		if (obv[outi].type==SQLRSERVERBINDVARTYPE_STRING) {
 			const char	*str=cur->getOutputBindString(variable);
 			uint32_t	len=cur->getOutputBindLength(variable);
 			if (str) {
@@ -918,13 +918,13 @@ bool routercursor::executeQuery(const char *query, uint32_t length) {
 				obv[outi].value.stringvalue[0]='\0';
 				*(obv[outi].isnull)=routerconn->nullbindvalue;
 			} 
-		} else if (obv[outi].type==INTEGER_BIND) {
+		} else if (obv[outi].type==SQLRSERVERBINDVARTYPE_INTEGER) {
 			*(obv[outi].value.intvalue)=
 					cur->getOutputBindInteger(variable);
-		} else if (obv[outi].type==DOUBLE_BIND) {
+		} else if (obv[outi].type==SQLRSERVERBINDVARTYPE_DOUBLE) {
 			*(obv[outi].value.doublevalue)=
 					cur->getOutputBindDouble(variable);
-		} else if (obv[outi].type==DATE_BIND) {
+		} else if (obv[outi].type==SQLRSERVERBINDVARTYPE_DATE) {
 			cur->getOutputBindDate(variable,
 					obv[outi].value.datevalue.year,
 					obv[outi].value.datevalue.month,

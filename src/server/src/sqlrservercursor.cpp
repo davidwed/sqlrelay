@@ -613,8 +613,8 @@ bool sqlrservercursor::fakeInputBinds() {
 void sqlrservercursor::performSubstitution(stringbuffer *buffer,
 							int16_t index) {
 
-	if (inbindvars[index].type==STRING_BIND ||
-		inbindvars[index].type==CLOB_BIND) {
+	if (inbindvars[index].type==SQLRSERVERBINDVARTYPE_STRING ||
+		inbindvars[index].type==SQLRSERVERBINDVARTYPE_CLOB) {
 
 		buffer->append("'");
 
@@ -638,12 +638,12 @@ void sqlrservercursor::performSubstitution(stringbuffer *buffer,
 
 		buffer->append("'");
 
-	} else if (inbindvars[index].type==BLOB_BIND) {
+	} else if (inbindvars[index].type==SQLRSERVERBINDVARTYPE_BLOB) {
 		encodeBlob(buffer,inbindvars[index].value.stringval,
 						inbindvars[index].valuesize);
-	} else if (inbindvars[index].type==INTEGER_BIND) {
+	} else if (inbindvars[index].type==SQLRSERVERBINDVARTYPE_INTEGER) {
 		buffer->append(inbindvars[index].value.integerval);
-	} else if (inbindvars[index].type==DOUBLE_BIND) {
+	} else if (inbindvars[index].type==SQLRSERVERBINDVARTYPE_DOUBLE) {
 		char	*dbuf=NULL;
 		if (!inbindvars[index].value.doubleval.precision &&
 				!inbindvars[index].value.doubleval.scale) {
@@ -667,7 +667,7 @@ void sqlrservercursor::performSubstitution(stringbuffer *buffer,
 		}
 		buffer->append(dbuf);
 		delete[] dbuf;
-	} else if (inbindvars[index].type==DATE_BIND) {
+	} else if (inbindvars[index].type==SQLRSERVERBINDVARTYPE_DATE) {
 		char	buf[64];
 		dateToString(buf,sizeof(buf),
 				inbindvars[index].value.dateval.year,
@@ -679,7 +679,7 @@ void sqlrservercursor::performSubstitution(stringbuffer *buffer,
 				inbindvars[index].value.dateval.microsecond,
 				inbindvars[index].value.dateval.tz);
 		buffer->append("'")->append(buf)->append("'");
-	} else if (inbindvars[index].type==NULL_BIND) {
+	} else if (inbindvars[index].type==SQLRSERVERBINDVARTYPE_NULL) {
 		buffer->append("NULL");
 	}
 }

@@ -1282,29 +1282,29 @@ bool sqlrclient::getInputBinds(sqlrservercursor *cursor) {
 		}
 
 		// get the value
-		if (bv->type==NULL_BIND) {
+		if (bv->type==SQLRSERVERBINDVARTYPE_NULL) {
 			getNullBind(bv);
-		} else if (bv->type==STRING_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_STRING) {
 			if (!getStringBind(cursor,bv)) {
 				return false;
 			}
-		} else if (bv->type==INTEGER_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_INTEGER) {
 			if (!getIntegerBind(bv)) {
 				return false;
 			}
-		} else if (bv->type==DOUBLE_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
 			if (!getDoubleBind(bv)) {
 				return false;
 			}
-		} else if (bv->type==DATE_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_DATE) {
 			if (!getDateBind(bv)) {
 				return false;
 			}
-		} else if (bv->type==BLOB_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB) {
 			if (!getLobBind(cursor,bv)) {
 				return false;
 			}
-		} else if (bv->type==CLOB_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
 			if (!getLobBind(cursor,bv)) {
 				return false;
 			}
@@ -1341,7 +1341,7 @@ bool sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 		}
 
 		// get the size of the value
-		if (bv->type==STRING_BIND) {
+		if (bv->type==SQLRSERVERBINDVARTYPE_STRING) {
 			bv->value.stringval=NULL;
 			if (!getBindSize(cursor,bv,&maxstringbindvaluelength)) {
 				return false;
@@ -1355,16 +1355,16 @@ bool sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 				(char *)bindpool->allocateAndClear(
 							bv->valuesize+1);
 			cont->logDebugMessage("STRING");
-		} else if (bv->type==INTEGER_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_INTEGER) {
 			cont->logDebugMessage("INTEGER");
-		} else if (bv->type==DOUBLE_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
 			cont->logDebugMessage("DOUBLE");
 			// these don't typically get set, but they get used
 			// when building debug strings, so we need to
 			// initialize them
 			bv->value.doubleval.precision=0;
 			bv->value.doubleval.scale=0;
-		} else if (bv->type==DATE_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_DATE) {
 			cont->logDebugMessage("DATE");
 			bv->value.dateval.year=0;
 			bv->value.dateval.month=0;
@@ -1381,16 +1381,16 @@ bool sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 			bv->value.dateval.buffer=
 				(char *)bindpool->allocate(
 						bv->value.dateval.buffersize);
-		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB || bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
 			if (!getBindSize(cursor,bv,&maxlobbindvaluelength)) {
 				return false;
 			}
-			if (bv->type==BLOB_BIND) {
+			if (bv->type==SQLRSERVERBINDVARTYPE_BLOB) {
 				cont->logDebugMessage("BLOB");
-			} else if (bv->type==CLOB_BIND) {
+			} else if (bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
 				cont->logDebugMessage("CLOB");
 			}
-		} else if (bv->type==CURSOR_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_CURSOR) {
 			cont->logDebugMessage("CURSOR");
 			sqlrservercursor	*curs=cont->getCursor();
 			if (!curs) {
@@ -1510,13 +1510,15 @@ bool sqlrclient::getBindVarType(sqlrserverbindvar *bv) {
 	debugFunction();
 
 	// get the type
-	ssize_t	result=clientsock->read(&bv->type,idleclienttimeout,0);
+	uint16_t	type;
+	ssize_t	result=clientsock->read(&type,idleclienttimeout,0);
 	if (result!=sizeof(uint16_t)) {
 		cont->logClientProtocolError(NULL,
 				"get binds failed: "
 				"failed to get type",result);
 		return false;
 	}
+	bv->type=(sqlrserverbindvartype_t)type;
 	return true;
 }
 
@@ -1816,10 +1818,10 @@ bool sqlrclient::getLobBind(sqlrservercursor *cursor, sqlrserverbindvar *bv) {
 	// init
 	bv->value.stringval=NULL;
 
-	if (bv->type==BLOB_BIND) {
+	if (bv->type==SQLRSERVERBINDVARTYPE_BLOB) {
 		cont->logDebugMessage("BLOB");
 	}
-	if (bv->type==CLOB_BIND) {
+	if (bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
 		cont->logDebugMessage("CLOB");
 	}
 
@@ -2065,7 +2067,7 @@ void sqlrclient::returnOutputBindValues(sqlrservercursor *cursor) {
 
 			clientsock->write((uint16_t)NULL_DATA);
 
-		} else if (bv->type==BLOB_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB) {
 
 			if (cont->logEnabled()) {
 				debugstr.append("BLOB:");
@@ -2073,7 +2075,7 @@ void sqlrclient::returnOutputBindValues(sqlrservercursor *cursor) {
 
 			returnOutputBindBlob(cursor,i);
 
-		} else if (bv->type==CLOB_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
 
 			if (cont->logEnabled()) {
 				debugstr.append("CLOB:");
@@ -2081,7 +2083,7 @@ void sqlrclient::returnOutputBindValues(sqlrservercursor *cursor) {
 
 			returnOutputBindClob(cursor,i);
 
-		} else if (bv->type==STRING_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_STRING) {
 
 			if (cont->logEnabled()) {
 				debugstr.append("STRING:");
@@ -2094,7 +2096,7 @@ void sqlrclient::returnOutputBindValues(sqlrservercursor *cursor) {
 			clientsock->write(bv->valuesize);
 			clientsock->write(bv->value.stringval,bv->valuesize);
 
-		} else if (bv->type==INTEGER_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_INTEGER) {
 
 			if (cont->logEnabled()) {
 				debugstr.append("INTEGER:");
@@ -2104,7 +2106,7 @@ void sqlrclient::returnOutputBindValues(sqlrservercursor *cursor) {
 			clientsock->write((uint16_t)INTEGER_DATA);
 			clientsock->write((uint64_t)bv->value.integerval);
 
-		} else if (bv->type==DOUBLE_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
 
 			if (cont->logEnabled()) {
 				debugstr.append("DOUBLE:");
@@ -2123,7 +2125,7 @@ void sqlrclient::returnOutputBindValues(sqlrservercursor *cursor) {
 			clientsock->write((uint32_t)bv->value.
 						doubleval.scale);
 
-		} else if (bv->type==DATE_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_DATE) {
 
 			if (cont->logEnabled()) {
 				debugstr.append("DATE:");
@@ -2158,7 +2160,7 @@ void sqlrclient::returnOutputBindValues(sqlrservercursor *cursor) {
 			clientsock->write(length);
 			clientsock->write(bv->value.dateval.tz,length);
 
-		} else if (bv->type==CURSOR_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_CURSOR) {
 
 			if (cont->logEnabled()) {
 				debugstr.append("CURSOR:");

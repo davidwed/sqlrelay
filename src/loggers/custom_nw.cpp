@@ -207,21 +207,22 @@ bool custom_nw::descInputBinds(sqlrserverconnection *sqlrcon,
 			return false;
 		}
 
-		if (bv->type==NULL_BIND) {
+		if (bv->type==SQLRSERVERBINDVARTYPE_NULL) {
 			write_len=charstring::printf(c,remain_len,"NULL]");
-		} else if (bv->type==STRING_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_STRING) {
 			strescape(bv->value.stringval,bindstrbuf,512);
 			write_len=charstring::printf(
 					c,remain_len,"'%s']",bindstrbuf);
-		} else if (bv->type==INTEGER_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_INTEGER) {
 			write_len=charstring::printf(
 					c,remain_len,"'%lld']",
 					(long long)bv->value.integerval);
-		} else if (bv->type==DOUBLE_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
 			write_len=charstring::printf(
 					c,remain_len,"%f]",
 					bv->value.doubleval.value);
-		} else if (bv->type==BLOB_BIND || bv->type==CLOB_BIND) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB ||
+				bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
 			write_len=charstring::printf(
 					c,remain_len,"LOB]");
 		}

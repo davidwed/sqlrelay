@@ -60,6 +60,17 @@ enum sqlrquerytype_t {
 	SQLRQUERYTYPE_ETC
 };
 
+enum sqlrserverbindvartype_t {
+	SQLRSERVERBINDVARTYPE_NULL=0,
+	SQLRSERVERBINDVARTYPE_STRING,
+	SQLRSERVERBINDVARTYPE_INTEGER,
+	SQLRSERVERBINDVARTYPE_DOUBLE,
+	SQLRSERVERBINDVARTYPE_BLOB,
+	SQLRSERVERBINDVARTYPE_CLOB,
+	SQLRSERVERBINDVARTYPE_CURSOR,
+	SQLRSERVERBINDVARTYPE_DATE
+};
+
 class SQLRSERVER_DLLSPEC sqlrserverbindvar {
 	public:
 		char	*variable;
@@ -86,10 +97,10 @@ class SQLRSERVER_DLLSPEC sqlrserverbindvar {
 			} dateval;
 			uint16_t	cursorid;
 		} value;
-		uint32_t	valuesize;
-		uint32_t	resultvaluesize;
-		uint16_t	type;
-		int16_t		isnull;
+		uint32_t		valuesize;
+		uint32_t		resultvaluesize;
+		sqlrserverbindvartype_t	type;
+		int16_t			isnull;
 };
 
 class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {

@@ -2855,7 +2855,8 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 		bind=&cursor->getInputBinds()[in];
 
 		// bind the value to the variable
-		if (bind->type==STRING_BIND || bind->type==NULL_BIND) {
+		if (bind->type==SQLRSERVERBINDVARTYPE_STRING ||
+				bind->type==SQLRSERVERBINDVARTYPE_NULL) {
 			if (!cursor->inputBind(
 					bind->variable,
 					bind->variablesize,
@@ -2864,14 +2865,14 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 					&bind->isnull)) {
 				return false;
 			}
-		} else if (bind->type==INTEGER_BIND) {
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_INTEGER) {
 			if (!cursor->inputBind(
 					bind->variable,
 					bind->variablesize,
 					&bind->value.integerval)) {
 				return false;
 			}
-		} else if (bind->type==DOUBLE_BIND) {
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
 			if (!cursor->inputBind(
 					bind->variable,
 					bind->variablesize,
@@ -2880,7 +2881,7 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 					bind->value.doubleval.scale)) {
 				return false;
 			}
-		} else if (bind->type==DATE_BIND) {
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_DATE) {
 			if (!cursor->inputBind(
 					bind->variable,
 					bind->variablesize,
@@ -2897,7 +2898,7 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 					&bind->isnull)) {
 				return false;
 			}
-		} else if (bind->type==BLOB_BIND) {
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_BLOB) {
 			if (!cursor->inputBindBlob(
 					bind->variable,
 					bind->variablesize,
@@ -2906,7 +2907,7 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 					&bind->isnull)) {
 				return false;
 			}
-		} else if (bind->type==CLOB_BIND) {
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_CLOB) {
 			if (!cursor->inputBindClob(
 					bind->variable,
 					bind->variablesize,
@@ -2923,7 +2924,7 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 		bind=&cursor->getOutputBinds()[out];
 
 		// bind the value to the variable
-		if (bind->type==STRING_BIND) {
+		if (bind->type==SQLRSERVERBINDVARTYPE_STRING) {
 			if (!cursor->outputBind(
 					bind->variable,
 					bind->variablesize,
@@ -2932,7 +2933,7 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 					&bind->isnull)) {
 				return false;
 			}
-		} else if (bind->type==INTEGER_BIND) {
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_INTEGER) {
 			if (!cursor->outputBind(
 					bind->variable,
 					bind->variablesize,
@@ -2940,7 +2941,7 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 					&bind->isnull)) {
 				return false;
 			}
-		} else if (bind->type==DOUBLE_BIND) {
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
 			if (!cursor->outputBind(
 					bind->variable,
 					bind->variablesize,
@@ -2950,7 +2951,7 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 					&bind->isnull)) {
 				return false;
 			}
-		} else if (bind->type==DATE_BIND) {
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_DATE) {
 			if (!cursor->outputBind(
 					bind->variable,
 					bind->variablesize,
@@ -2967,21 +2968,21 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 					&bind->isnull)) {
 				return false;
 			}
-		} else if (bind->type==BLOB_BIND) {
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_BLOB) {
 			if (!cursor->outputBindBlob(
 					bind->variable,
 					bind->variablesize,out,
 					&bind->isnull)) {
 				return false;
 			}
-		} else if (bind->type==CLOB_BIND) {
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_CLOB) {
 			if (!cursor->outputBindClob(
 					bind->variable,
 					bind->variablesize,out,
 					&bind->isnull)) {
 				return false;
 			}
-		} else if (bind->type==CURSOR_BIND) {
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_CURSOR) {
 
 			bool	found=false;
 

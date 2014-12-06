@@ -6,6 +6,17 @@
 
 #include <sqlrelay/private/dll.h>
 
+enum bindvartype_t {
+	BINDVARTYPE_NULL=0,
+	BINDVARTYPE_STRING,
+	BINDVARTYPE_INTEGER,
+	BINDVARTYPE_DOUBLE,
+	BINDVARTYPE_BLOB,
+	BINDVARTYPE_CLOB,
+	BINDVARTYPE_CURSOR,
+	BINDVARTYPE_DATE
+};
+
 class SQLRCLIENT_DLLSPEC bindvar {
 	friend class sqlrcursor;
 	private:
@@ -33,7 +44,7 @@ class SQLRCLIENT_DLLSPEC bindvar {
 		} value;
 		uint32_t	valuesize;
 		uint32_t	resultvaluesize;
-		uint16_t 	type;
+		bindvartype_t 	type;
 		bool		send;
 
 		bool		substituted;

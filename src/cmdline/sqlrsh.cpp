@@ -64,7 +64,7 @@ class sqlrshbindvalue {
 				const char	*tz;
 			} dateval;
 		};
-		uint16_t	type;
+		bindvartype_t	type;
 		uint32_t	outputstringbindlength;
 };
 
@@ -110,7 +110,7 @@ void sqlrshenv::clearbinds(dictionary<char *, sqlrshbindvalue *> *binds) {
 
 		delete[] node->getValue()->getKey();
 		sqlrshbindvalue	*bv=node->getValue()->getValue();
-		if (bv->type==STRING_BIND) {
+		if (bv->type==BINDVARTYPE_STRING) {
 			delete[] bv->stringval;
 		}
 		delete bv;
@@ -822,15 +822,15 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 			const char	*name=node->getValue()->getKey();
 			sqlrshbindvalue	*bv=node->getValue()->getValue();
-			if (bv->type==STRING_BIND) {
+			if (bv->type==BINDVARTYPE_STRING) {
 				sqlrcur->inputBind(name,bv->stringval);
-			} else if (bv->type==INTEGER_BIND) {
+			} else if (bv->type==BINDVARTYPE_INTEGER) {
 				sqlrcur->inputBind(name,bv->integerval);
-			} else if (bv->type==DOUBLE_BIND) {
+			} else if (bv->type==BINDVARTYPE_DOUBLE) {
 				sqlrcur->inputBind(name,bv->doubleval.value,
 							bv->doubleval.precision,
 							bv->doubleval.scale);
-			} else if (bv->type==DATE_BIND) {
+			} else if (bv->type==BINDVARTYPE_DATE) {
 				sqlrcur->inputBind(name,
 						bv->dateval.year,
 						bv->dateval.month,
@@ -840,10 +840,10 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 						bv->dateval.second,
 						bv->dateval.microsecond,
 						bv->dateval.tz);
-			} else if (bv->type==BLOB_BIND) {
+			} else if (bv->type==BINDVARTYPE_BLOB) {
 				sqlrcur->inputBindBlob(name,bv->stringval,
 					charstring::length(bv->stringval));
-			} else if (bv->type==NULL_BIND) {
+			} else if (bv->type==BINDVARTYPE_NULL) {
 				sqlrcur->inputBind(name,(const char *)NULL);
 			}
 		}
@@ -857,15 +857,15 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 			const char	*name=node->getValue()->getKey();
 			sqlrshbindvalue	*bv=node->getValue()->getValue();
-			if (bv->type==STRING_BIND) {
+			if (bv->type==BINDVARTYPE_STRING) {
 				// FIXME: make buffer length variable
 				sqlrcur->defineOutputBindString(name,
 						bv->outputstringbindlength);
-			} else if (bv->type==INTEGER_BIND) {
+			} else if (bv->type==BINDVARTYPE_INTEGER) {
 				sqlrcur->defineOutputBindInteger(name);
-			} else if (bv->type==DOUBLE_BIND) {
+			} else if (bv->type==BINDVARTYPE_DOUBLE) {
 				sqlrcur->defineOutputBindDouble(name);
-			} else if (bv->type==DATE_BIND) {
+			} else if (bv->type==BINDVARTYPE_DATE) {
 				sqlrcur->defineOutputBindDate(name);
 			}
 		}
@@ -881,17 +881,17 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 			const char	*name=node->getValue()->getKey();
 			sqlrshbindvalue	*bv=node->getValue()->getValue();
-			if (bv->type==STRING_BIND) {
+			if (bv->type==BINDVARTYPE_STRING) {
 				delete[] bv->stringval;
 				bv->stringval=charstring::duplicate(
 					sqlrcur->getOutputBindString(name));
-			} else if (bv->type==INTEGER_BIND) {
+			} else if (bv->type==BINDVARTYPE_INTEGER) {
 				bv->integerval=
 					sqlrcur->getOutputBindInteger(name);
-			} else if (bv->type==DOUBLE_BIND) {
+			} else if (bv->type==BINDVARTYPE_DOUBLE) {
 				bv->doubleval.value=
 					sqlrcur->getOutputBindDouble(name);
-			} else if (bv->type==DATE_BIND) {
+			} else if (bv->type==BINDVARTYPE_DATE) {
 				sqlrcur->getOutputBindDate(name,
 						&(bv->dateval.year),
 						&(bv->dateval.month),
@@ -1220,7 +1220,7 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 	// if the bind variable is already defined, clear it...
 	sqlrshbindvalue	*bv=NULL;
 	if (env->inputbinds.getValue(variable,&bv)) {
-		if (bv->type==STRING_BIND) {
+		if (bv->type==BINDVARTYPE_STRING) {
 			delete[] bv->stringval;
 		}
 		delete bv;
@@ -1234,11 +1234,11 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 	// if it's unquoted, check to see if it's an integer, float or date
 	// if it's not, then it's a string
 	if (!value) {
-		bv->type=NULL_BIND;
+		bv->type=BINDVARTYPE_NULL;
 	} else if ((value[0]=='\'' && value[valuelen-1]=='\'') ||
 			(value[0]=='"' && value[valuelen-1]=='"')) {
 
-		bv->type=STRING_BIND;
+		bv->type=BINDVARTYPE_STRING;
 
 		// trim off quotes
 		char	*newvalue=charstring::duplicate(value+1);
@@ -1254,7 +1254,7 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 
 		datetime	dt;
 		dt.initialize(value);
-		bv->type=DATE_BIND;
+		bv->type=BINDVARTYPE_DATE;
 		bv->dateval.year=dt.getYear();
 		bv->dateval.month=dt.getMonth();
 		bv->dateval.day=dt.getDayOfMonth();
@@ -1270,11 +1270,11 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		delete[] value;
 
 	} else if (charstring::isInteger(value)) {
-		bv->type=INTEGER_BIND;
+		bv->type=BINDVARTYPE_INTEGER;
 		bv->integerval=charstring::toInteger(value);
 		delete[] value;
 	} else if (charstring::isNumber(value)) {
-		bv->type=DOUBLE_BIND;
+		bv->type=BINDVARTYPE_DOUBLE;
 		bv->doubleval.value=charstring::toFloat(value);
 		bv->doubleval.precision=valuelen-((value[0]=='-')?2:1);
 		bv->doubleval.scale=
@@ -1282,7 +1282,7 @@ void sqlrsh::inputbind(sqlrcursor *sqlrcur,
 			((value[0]=='-')?0:1);
 		delete[] value;
 	} else {
-		bv->type=STRING_BIND;
+		bv->type=BINDVARTYPE_STRING;
 		bv->stringval=value;
 	}
 
@@ -1324,7 +1324,7 @@ void sqlrsh::inputbindblob(sqlrcursor *sqlrcur,
 	// if the bind variable is already defined, clear it...
 	sqlrshbindvalue	*bv=NULL;
 	if (env->inputbinds.getValue(variable,&bv)) {
-		if (bv->type==STRING_BIND) {
+		if (bv->type==BINDVARTYPE_STRING) {
 			delete[] bv->stringval;
 		}
 		delete bv;
@@ -1338,11 +1338,11 @@ void sqlrsh::inputbindblob(sqlrcursor *sqlrcur,
 	// if it's unquoted, check to see if it's an integer, float or date
 	// if it's not, then it's a string
 	if (!value) {
-		bv->type=NULL_BIND;
+		bv->type=BINDVARTYPE_NULL;
 	} else if ((value[0]=='\'' && value[valuelen-1]=='\'') ||
 			(value[0]=='"' && value[valuelen-1]=='"')) {
 
-		bv->type=BLOB_BIND;
+		bv->type=BINDVARTYPE_BLOB;
 
 		// trim off quotes
 		char	*newvalue=charstring::duplicate(value+1);
@@ -1354,7 +1354,7 @@ void sqlrsh::inputbindblob(sqlrcursor *sqlrcur,
 		delete[] newvalue;
 
 	} else {
-		bv->type=BLOB_BIND;
+		bv->type=BINDVARTYPE_BLOB;
 		bv->stringval=value;
 	}
 
@@ -1377,7 +1377,7 @@ void sqlrsh::outputbind(sqlrcursor *sqlrcur,
 		// if the bind variable is already defined, clear it...
 		sqlrshbindvalue	*bv=NULL;
 		if (env->outputbinds.getValue(parts[1],&bv)) {
-			if (bv->type==STRING_BIND) {
+			if (bv->type==BINDVARTYPE_STRING) {
 				delete[] bv->stringval;
 			}
 			delete bv;
@@ -1389,19 +1389,19 @@ void sqlrsh::outputbind(sqlrcursor *sqlrcur,
 		if (!charstring::compareIgnoringCase(
 						parts[2],"string") &&
 						partcount==4) {
-			bv->type=STRING_BIND;
+			bv->type=BINDVARTYPE_STRING;
 			bv->stringval=NULL;
 			bv->outputstringbindlength=
 				charstring::toInteger(parts[3]);
 		} else if (!charstring::compareIgnoringCase(
 						parts[2],"integer") &&
 						partcount==3) {
-			bv->type=INTEGER_BIND;
+			bv->type=BINDVARTYPE_INTEGER;
 			bv->integerval=0;
 		} else if (!charstring::compareIgnoringCase(
 						parts[2],"double") &&
 						partcount==5) {
-			bv->type=DOUBLE_BIND;
+			bv->type=BINDVARTYPE_DOUBLE;
 			bv->doubleval.value=0.0;
 			bv->doubleval.precision=
 				charstring::toInteger(parts[3]);
@@ -1410,7 +1410,7 @@ void sqlrsh::outputbind(sqlrcursor *sqlrcur,
 		} else if (!charstring::compareIgnoringCase(
 						parts[2],"date") &&
 						partcount==3) {
-			bv->type=DATE_BIND;
+			bv->type=BINDVARTYPE_DATE;
 			bv->dateval.year=0;
 			bv->dateval.month=0;
 			bv->dateval.day=0;
@@ -1456,19 +1456,19 @@ void sqlrsh::printbinds(const char *type,
 
 		stdoutput.printf("    %s ",node->getValue()->getKey());
 		sqlrshbindvalue	*bv=node->getValue()->getValue();
-		if (bv->type==STRING_BIND) {
+		if (bv->type==BINDVARTYPE_STRING) {
 			stdoutput.printf("(STRING) = %s\n",bv->stringval);
-		} else if (bv->type==INTEGER_BIND) {
+		} else if (bv->type==BINDVARTYPE_INTEGER) {
 			stdoutput.printf("(INTEGER) = %lld\n",
 						(long long)bv->integerval);
-		} else if (bv->type==DOUBLE_BIND) {
+		} else if (bv->type==BINDVARTYPE_DOUBLE) {
 			stdoutput.printf("(DOUBLE %d,%d) = %*.*f\n",
 						bv->doubleval.precision,
 						bv->doubleval.scale,
 						(int)bv->doubleval.precision,
 						(int)bv->doubleval.scale,
 						bv->doubleval.value);
-		} else if (bv->type==DATE_BIND) {
+		} else if (bv->type==BINDVARTYPE_DATE) {
 			stdoutput.printf("(DATE) = %02d/%02d/%04d "
 						"%02d:%02d:%02d:%03d %s\n",
 						bv->dateval.month,
@@ -1479,12 +1479,12 @@ void sqlrsh::printbinds(const char *type,
 						bv->dateval.second,
 						bv->dateval.microsecond,
 						bv->dateval.tz);
-		} else if (bv->type==BLOB_BIND) {
+		} else if (bv->type==BINDVARTYPE_BLOB) {
 			stdoutput.printf("(BLOB) = ");
 			stdoutput.safePrint(bv->stringval,
 					charstring::length(bv->stringval));
 			stdoutput.printf("\n");
-		} else if (bv->type==NULL_BIND) {
+		} else if (bv->type==BINDVARTYPE_NULL) {
 			stdoutput.printf("NULL\n");
 		}
 	}
