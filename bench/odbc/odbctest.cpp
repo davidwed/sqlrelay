@@ -74,7 +74,12 @@ int main(int argc, char **argv) {
 		for (int i=0; i<ncols; i++) {
 			SQLBindCol(stmt,i+1,SQL_C_CHAR,
 					field[i],MAX_ITEM_BUFFER_SIZE,
-					(SQLINTEGER *)indicator[i]);
+					#ifdef SQLBINDCOL_SQLLEN
+					(SQLLEN *)indicator[i]
+					#else
+					(SQLINTEGER *)indicator[i]
+					#endif
+					);
 		}
 
 #ifdef HAVE_UNIXODBC

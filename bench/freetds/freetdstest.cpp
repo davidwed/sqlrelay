@@ -5,6 +5,7 @@
 
 #include <stdlib.h>
 #include <rudiments/environment.h>
+#include <rudiments/stdio.h>
 #include <time.h>
 
 #ifdef RUDIMENTS_NAMESPACE
@@ -39,7 +40,7 @@ CS_INT		rowcount;
 int main(int argc, char **argv) {
 
 	if (argc<8) {
-		printf("usage: freetdstest server port user password query iterations queriesperiteration\n");
+		stdoutput.printf("usage: freetdstest server port user password query iterations queriesperiteration\n");
 		exit(0);
 	}
 
@@ -80,7 +81,7 @@ int main(int argc, char **argv) {
 
 		// connect to the database
 		if (ct_connect(conn,(CS_CHAR *)NULL,(CS_INT)0)!=CS_SUCCEED) {
-			printf("ct_connect failed...\n");
+			stdoutput.printf("ct_connect failed...\n");
 			exit(0);
 		}
 
@@ -142,13 +143,13 @@ int main(int argc, char **argv) {
 						if (nullindicator[col][row]>-1
 							&& 
 							datalength[col][row]) {
-							printf("%s,",
+							stdoutput.printf("%s,",
 								data[col][row]);
 						} else {
-							printf("NULL,");
+							stdoutput.printf("NULL,");
 						}
 					}
-					printf("\n");
+					stdoutput.printf("\n");
 				}
 			}
 
@@ -168,6 +169,6 @@ int main(int argc, char **argv) {
 		cs_ctx_drop(context);
 	}
 
-	printf("total system time used: %ld\n",clock());
-	printf("total real time: %ld\n",time(NULL)-starttime);
+	stdoutput.printf("total system time used: %ld\n",clock());
+	stdoutput.printf("total real time: %ld\n",time(NULL)-starttime);
 }
