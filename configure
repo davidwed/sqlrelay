@@ -764,7 +764,6 @@ CYGWIN
 MINGW32
 UNAME
 enable_shared
-LIBTOOLGCC
 CXXCPP
 OTOOL64
 OTOOL
@@ -786,6 +785,7 @@ EGREP
 GREP
 SED
 LIBTOOL
+LIBTOOLGCC
 OBJDUMP
 DLLTOOL
 AS
@@ -5022,6 +5022,16 @@ test -z "$OBJDUMP" && OBJDUMP=objdump
 
 
 
+
+
+
+if ( test "$USE_SYSTEM_LIBTOOL" = "yes" )
+then
+  LIBTOOL="libtool"
+  LIBTOOLGCC="libtool"
+else
+  LIBTOOLGCC="$LIBTOOL.gcc"
+fi
 
 
 case `pwd` in
@@ -15632,16 +15642,6 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 # Only expand once:
-
-
-
-if ( test "$USE_SYSTEM_LIBTOOL" = "yes" )
-then
-  LIBTOOL="libtool"
-  LIBTOOLGCC="libtool"
-else
-  LIBTOOLGCC="$LIBTOOL.gcc"
-fi
 
 
 
