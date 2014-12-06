@@ -976,6 +976,8 @@ bool odbccursor::outputBind(const char *variable,
 
 	outdatebind[outbindcount]=NULL;
 
+	*value=0;
+
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_OUTPUT,
@@ -1007,6 +1009,8 @@ bool odbccursor::outputBind(const char *variable,
 				int16_t *isnull) {
 
 	outdatebind[outbindcount]=NULL;
+
+	*value=0.0;
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),

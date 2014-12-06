@@ -25,7 +25,7 @@
 	fixed subtle row-fetch bug in sybase/freetds drivers that could cause
 		the total row count to be set to garbage
 	fixed support for older versions of perl (5.00x)
-	fixed a bug in the DB2 connection that caused blob input binds to be
+	fixed a bug in the DB2 connoutpection that caused blob input binds to be
 		truncated at the first null
 	added support for binding streams to output bind blobs in the PHP PDO
 		driver
@@ -35,6 +35,8 @@
 		PHP PDO driver
 	added row cache to mysql drop-in replacement library to fix issues on
 		systems with 32-bit pointers
+	fixed subtle db2 output bind bug where a value stored in the database
+		using fewer than 64-bits might be copied out incorrectly
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries

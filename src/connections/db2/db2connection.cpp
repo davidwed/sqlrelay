@@ -383,7 +383,7 @@ bool db2connection::logIn(const char **error) {
 				#else
 				SQL_LOGIN_TIMEOUT,
 				#endif
-				(SQLPOINTER *)timeout,0);
+				(SQLPOINTER)timeout,0);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			*error="Failed to set timeout";
 			SQLFreeHandle(SQL_HANDLE_DBC,dbc);
@@ -1048,6 +1048,8 @@ bool db2cursor::outputBind(const char *variable,
 
 	outdatebind[outbindcount]=NULL;
 
+	*value=0;
+
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
 				SQL_PARAM_OUTPUT,
@@ -1072,6 +1074,8 @@ bool db2cursor::outputBind(const char *variable,
 					int16_t *isnull) {
 
 	outdatebind[outbindcount]=NULL;
+
+	*value=0.0;
 
 	erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),
