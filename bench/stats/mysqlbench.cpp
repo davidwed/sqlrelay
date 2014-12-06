@@ -34,6 +34,11 @@ mysqlbenchconnection::mysqlbenchconnection(
 	dbname=getParam("db");
 	user=getParam("user");
 	password=getParam("password");
+	sslcapath=getParam("sslcapath");
+	sslca=getParam("sslca");
+	sslcert=getParam("sslcert");
+	sslkey=getParam("sslkey");
+	sslcipher=getParam("sslcipher");
 }
 
 mysqlbenchconnection::~mysqlbenchconnection() {
@@ -48,6 +53,10 @@ bool mysqlbenchconnection::connect() {
 		stdoutput.printf("mysql_init failed\n");
 		return false;
 	}
+
+	#ifdef HAVE_MYSQL_SSL_SET
+	mysql_ssl_set(&mysql,sslkey,sslcert,sslca,sslcapath,sslcipher);
+	#endif
 	
 	// log in
 	if (!mysql_real_connect(&mysql,host,user,password,

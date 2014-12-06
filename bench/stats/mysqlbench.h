@@ -39,6 +39,12 @@ class mysqlbenchconnection : public benchconnection {
 		const char	*user;
 		const char	*password;
 
+		const char	*sslcapath;
+		const char	*sslca;
+		const char	*sslcert;
+		const char	*sslkey;
+		const char	*sslcipher;
+
 		MYSQL	mysql;
 
 		bool		firstquery;

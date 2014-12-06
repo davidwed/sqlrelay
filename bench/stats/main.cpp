@@ -43,7 +43,7 @@ int main(int argc, const char **argv) {
 			"	-cols [columns-per-row] \\\n"
 			"	-colsize [characters-per-column] \\\n"
 			"	-iterations [iterations-per-test] \\\n"
-			"	-dbonly|-sqlrelayonly \\n"
+			"	-dbonly|-sqlrelayonly \\\n"
 			"	-debug\n");
 		process::exit(1);
 	}
@@ -162,8 +162,22 @@ int main(int argc, const char **argv) {
 		} else if (!charstring::compare(db,"mysql")) {
 			if (!connectstring) {
 				connectstring=
-					"host=db64;db=testdb;"
-					"user=testuser;password=testpassword;";
+				"host=db64;db=testdb;"
+				"user=testuser;password=testpassword;"
+				;
+			}
+			bm=new mysqlbenchmarks(
+					connectstring,
+					db,queries,rows,
+					cols,colsize,iterations,debug);
+		} else if (!charstring::compare(db,"mysqlssl")) {
+			if (!connectstring) {
+				connectstring=
+				"host=db64;db=testdb;"
+				"user=testuser;password=testpassword;"
+				"sslca=/etc/mysql-ssl/ca-cert.pem;"
+				"sslcert=/etc/mysql-ssl/client-cert.pem;"
+				"sslkey=/etc/mysql-ssl/client-key.pem";
 			}
 			bm=new mysqlbenchmarks(
 					connectstring,
