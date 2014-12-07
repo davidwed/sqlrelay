@@ -48,7 +48,7 @@ sub checkSuccessString {
 
 
 # instantiation
-my $dbh=DBI->connect("DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/test.socket;debug=0","test","test",{AutoCommit=>0}) or die DBI->errstr;
+my $dbh=DBI->connect("DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/test.socket;debug=1","test","test",{AutoCommit=>0}) or die DBI->errstr;
 
 
 # ping
@@ -88,16 +88,18 @@ print("PARAM COUNT: \n");
 checkSuccess($sth->{NUM_OF_PARAMS},4);
 print("\n");
 
-#print("EXECUTE ARRAY: \n");
-#@var1s=(4,5,6);
-#@var2s=("testchar4","testchar5","testchar6");
-#@var3s=("testvarchar4","testvarchar5","testvarchar6");
-#@var4s=("01-JAN-2004","01-JAN-2005","01-JAN-2006");
-#checkSuccess($sth->execute_array({ ArrayTupleStatus => \my @tuple_status },\@var1s,\@var2s,\@var3s,\@var4s),3);
-#for (my $index=0; $index<4; $index++) {
-	#checkSuccess(@tuple_status[$index]->[0],1);
-#}
-#print("\n");
+print("EXECUTE ARRAY: \n");
+@var1s=(4,5,6);
+@var2s=("testchar4","testchar5","testchar6");
+@var3s=("testvarchar4","testvarchar5","testvarchar6");
+@var4s=("01-JAN-2004","01-JAN-2005","01-JAN-2006");
+my ($tuples,$rows) = $sth->execute_array({ ArrayTupleStatus => \my @tuple_status },\@var1s,\@var2s,\@var3s,\@var4s);
+checkSuccess($tuples,3);
+checkSuccess($rows,3);
+for (my $index=0; $index<3; $index++) {
+	checkSuccess(@tuple_status[$index],1);
+}
+print("\n");
 
 #print("BIND PARAM ARRAY: \n");
 
