@@ -201,6 +201,9 @@ void postgresqlconnection::handleConnectString() {
 	cont->setUser(cont->getConnectStringValue("user"));
 	cont->setPassword(cont->getConnectStringValue("password"));
 	sslmode=cont->getConnectStringValue("sslmode");
+	if (!charstring::length(sslmode)) {
+		sslmode="disable";
+	}
 	const char	*typemang=cont->getConnectStringValue("typemangling");
 	if (!typemang ||!charstring::compareIgnoringCase(typemang,"no")) {
 		typemangling=0;

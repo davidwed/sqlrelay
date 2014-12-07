@@ -29,13 +29,36 @@ postgresqlbenchconnection::postgresqlbenchconnection(
 	dbname=getParam("db");
 	user=getParam("user");
 	password=getParam("password");
+	sslmode=getParam("sslmode");
+	if (!charstring::length(sslmode)) {
+		sslmode="disable";
+	}
 }
 
 postgresqlbenchconnection::~postgresqlbenchconnection() {
 }
 
 bool postgresqlbenchconnection::connect() {
+#ifdef HAVE_POSTGRESQL_PQCONNECTDB
+	conninfo.clear();
+	conninfo.append("user=")->append(user);
+	conninfo.append(" password=")->append(password);
+	if (host && host[0]) {
+		conninfo.append(" host=")->append(host);
+	}
+	if (port && port[0]) {
+		conninfo.append(" port=")->append(port);
+	}
+	if (dbname && dbname[0]) {
+		conninfo.append(" dbname=")->append(dbname);
+	}
+	if (sslmode && sslmode[0]) {
+		conninfo.append(" sslmode=")->append(sslmode);
+	}
+	pgconn=PQconnectdb(conninfo.getString());
+#else
 	pgconn=PQsetdbLogin(host,port,NULL,NULL,dbname,user,password);
+#endif
 	if (PQstatus(pgconn)==CONNECTION_BAD) {
 		stdoutput.printf("PQsetdbLogin failed\n");
 		return false;

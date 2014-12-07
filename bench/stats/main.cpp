@@ -203,6 +203,17 @@ int main(int argc, const char **argv) {
 					connectstring,
 					db,queries,rows,
 					cols,colsize,iterations,debug);
+		} else if (!charstring::compare(db,"postgresqlssl")) {
+			if (!connectstring) {
+				connectstring=
+					"user=testuser;password=testpassword;"
+					"db=testdb;host=db64.firstworks.com;"
+					"sslmode=verify-ca;";
+			}
+			bm=new postgresqlbenchmarks(
+					connectstring,
+					db,queries,rows,
+					cols,colsize,iterations,debug);
 		} else if (!charstring::compare(db,"sqlite")) {
 			if (!connectstring) {
 				connectstring=

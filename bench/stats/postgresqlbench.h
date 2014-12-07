@@ -35,6 +35,11 @@ class postgresqlbenchconnection : public benchconnection {
 		const char	*dbname;
 		const char	*user;
 		const char	*password;
+		const char	*sslmode;
+
+#ifdef HAVE_POSTGRESQL_PQCONNECTDB
+		stringbuffer	conninfo;
+#endif
 
 		PGconn	*pgconn;
 };
