@@ -55,10 +55,15 @@ class postgresqlconnection : public sqlrserverconnection {
 		const char	*port;
 		const char	*options;
 		const char	*db;
+		const char	*sslmode;
 		uint16_t	typemangling;
 		const char	*charset;
 		char		*dbversion;
 		char		*hostname;
+
+#ifdef HAVE_POSTGRESQL_PQCONNECTDB
+		stringbuffer	conninfo;
+#endif
 
 		stringbuffer	errormessage;
 
@@ -195,6 +200,7 @@ void postgresqlconnection::handleConnectString() {
 	db=cont->getConnectStringValue("db");
 	cont->setUser(cont->getConnectStringValue("user"));
 	cont->setPassword(cont->getConnectStringValue("password"));
+	sslmode=cont->getConnectStringValue("sslmode");
 	const char	*typemang=cont->getConnectStringValue("typemangling");
 	if (!typemang ||!charstring::compareIgnoringCase(typemang,"no")) {
 		typemangling=0;
@@ -228,8 +234,30 @@ bool postgresqlconnection::logIn(const char **error) {
 	}
 
 	// log in
+#ifdef HAVE_POSTGRESQL_PQCONNECTDB
+	conninfo.clear();
+	conninfo.append("user=")->append(cont->getUser());
+	conninfo.append(" password=")->append(cont->getPassword());
+	if (host && host[0]) {
+		conninfo.append(" host=")->append(host);
+	}
+	if (port && port[0]) {
+		conninfo.append(" port=")->append(port);
+	}
+	if (options && options[0]) {
+		conninfo.append(" options=")->append(options);
+	}
+	if (db && db[0]) {
+		conninfo.append(" dbname=")->append(db);
+	}
+	if (sslmode && sslmode[0]) {
+		conninfo.append(" sslmode=")->append(sslmode);
+	}
+	pgconn=PQconnectdb(conninfo.getString());
+#else
 	pgconn=PQsetdbLogin(host,port,options,NULL,db,
 				cont->getUser(),cont->getPassword());
+#endif
 
 	// check the status of the login
 	if (PQstatus(pgconn)==CONNECTION_BAD) {

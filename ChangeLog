@@ -39,6 +39,7 @@
 		using fewer than 64-bits might be copied out incorrectly
 	fixed a bug that could cause key columns to be duplicated when
 		describing an oracle table and looking up key data is enabled
+	added sslmode parameter for postgreql connections
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries

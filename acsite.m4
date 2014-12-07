@@ -1520,6 +1520,9 @@ then
 
 	if ( test -n "$POSTGRESQLLIBS" )
 	then
+		AC_MSG_CHECKING(if PostgreSQL has PQconnectdb)
+		FW_TRY_LINK([#include <libpq-fe.h>
+#include <stdlib.h>],[PQconnectdb(NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQCONNECTDB,1,Some versions of postgresql have PQconnectdb)],[AC_MSG_RESULT(no)])
 		AC_MSG_CHECKING(if PostgreSQL has PQfmod)
 		FW_TRY_LINK([#include <libpq-fe.h>
 #include <stdlib.h>],[PQfmod(NULL,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQFMOD,1,Some versions of postgresql have PQfmod)],[AC_MSG_RESULT(no)])
