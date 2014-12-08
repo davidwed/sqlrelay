@@ -229,6 +229,57 @@ sub rollback {
 	return $dbh->FETCH('driver_connection')->rollback();
 }
 
+sub get_info {
+
+	my ($dbh,$index)=@_;
+
+	# see GetInfoType for where these numbers come from
+
+	if ($index==2) {
+		# data source name
+		return $dbh->FETCH('driver_connection')->getCurrentDatabase();
+	} elsif ($index==17) {
+		# dbms name
+		if ($dbh->FETCH('driver_dbmsname') eq '') {
+			$dbh->STORE('driver_dbmsname',
+				$dbh->FETCH('driver_connection')->identify());
+		}
+		return $dbh->FETCH('driver_dbmsname');
+	} elsif ($index==18) {
+		# dbms version
+		return $dbh->FETCH('driver_connection')->dbVersion();
+	} elsif ($index==13) {
+		# server name
+		return $dbh->FETCH('driver_connection')->dbHostName();
+	} elsif ($index==47) {
+		# user name
+		return $dbh->FETCH('USER');
+	} elsif ($index==29) {
+		# identifier quote character
+		my $identity=$dbh->get_info(17);
+		if ($identity eq "mysql") {
+			return "`";
+		}
+		return "\"";
+	} elsif ($index==41) {
+		# catalog name separator
+		my $identity=$dbh->get_info(17);
+		if ($identity eq "oracle8") {
+			return "@";
+		}
+		return ".";
+	} elsif ($index==114) {
+		# catalog location
+		my $identity=$dbh->get_info(17);
+		if ($identity eq "oracle8") {
+			return 2;
+		}
+		return 1;
+	}
+
+	return undef;
+}
+
 sub STORE {
 
 	# get parameters
