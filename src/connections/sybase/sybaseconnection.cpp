@@ -420,19 +420,15 @@ bool sybaseconnection::logIn(const char **error) {
 		return false;
 	}
 
-	// FIXME: support this
-	// set encryption
-	/*if (encryption && charstring::toInteger(encryption)==1) {
-		// FIXME: need to set CS_SEC_CHALLENGE/CS_SEC_NEGOTIATE
-		// parameters too
-		CS_INT	enc=CS_TRUE;
-		if (ct_con_props(dbconn,CS_SET,CS_SEC_ENCRYPTION,
-			(CS_VOID *)&enc,
-			CS_UNUSED,(CS_INT *)NULL)!=CS_SUCCEED) {
-			*error=logInError("Failed to set the encryption",5);
-			return false;
-		}
-	}*/
+	#ifdef CS_SEC_ENCRYPTION,
+	CS_INT	enc=CS_TRUE;
+	if (ct_con_props(dbconn,CS_SET,CS_SEC_ENCRYPTION,
+				(CS_VOID *)&enc,CS_UNUSED,
+				(CS_INT *)NULL)!=CS_SUCCEED) {
+		*error=logInError("Failed to enable password encryption",5);
+		return false;
+	}
+	#endif
 
 	// init locale
 	locale=NULL;

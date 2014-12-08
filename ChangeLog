@@ -40,6 +40,9 @@
 	fixed a bug that could cause key columns to be duplicated when
 		describing an oracle table and looking up key data is enabled
 	added sslmode parameter for postgreql connections
+	perl DBI fetchall_arrayref work with maxrows parameters now
+	added begin to perl API and implemented begin_work in perl DBI driver
+	implemented perl DBI get_info
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries

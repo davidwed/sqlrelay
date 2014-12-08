@@ -5,12 +5,25 @@
 
 
 use DBI;
+use DBI::Const::GetInfoType;
 
 sub checkUndef {
 
 	$value=shift(@_);
 
 	if (!defined($value)) {
+		print("success ");
+	} else {
+		print("failure ");
+		exit;
+	}
+}
+
+sub checkDefined {
+
+	$value=shift(@_);
+
+	if (defined($value)) {
 		print("success ");
 	} else {
 		print("failure ");
@@ -48,8 +61,29 @@ sub checkSuccessString {
 
 
 # instantiation
-my $dbh=DBI->connect("DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/test.socket;debug=1","test","test",{AutoCommit=>0}) or die DBI->errstr;
+my $dsn="DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/test.socket;debug=0";
 
+# parse dsn
+print("PARSE DSN: \n");
+my ($scheme,$driver,$attr_string,$attr_hash,$driver_dsn)=DBI->parse_dsn($dsn);
+checkSuccess($scheme,"DBI");
+checkSuccess($driver,"SQLRelay");
+checkSuccess($attr_string,"AutoCommit=>0,PrintError=>0");
+checkSuccess($attr_hash->{AutoCommit},0);
+checkSuccess($attr_hash->{PrintError},0);
+checkSuccess($driver_dsn,"host=localhost;port=9000;socket=/tmp/test.socket;debug=0");
+print("\n");
+
+# connect
+print("CONNECT: \n");
+my $dbh=DBI->connect("DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/test.socket;debug=0","test","test",{AutoCommit=>0,PrintError=>0}) or die DBI->errstr;
+checkSuccessString($dbh->{Type},"db");
+checkDefined($dbh);
+$dbh->disconnect();
+$ENV{"DBI_DSN"} = $dsn;
+my $dbh=DBI->connect(undef,"test","test",{AutoCommit=>0,PrintError=>0}) or die DBI->errstr;
+checkDefined($dbh);
+print("\n");
 
 # ping
 print("PING: \n");
@@ -60,16 +94,31 @@ print("\n");
 $dbh->do("drop table testtable");
 
 print("CREATE TEMPTABLE: \n");
+$dbh->{Executed}=0;
 checkSuccessString($dbh->do("create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date)"),"0E0");
+checkSuccess($dbh->{Executed},1);
 print("\n");
 
 print("INSERT and AFFECTED ROWS: \n");
 checkSuccess($dbh->do("insert into testtable values (1,'testchar1','testvarchar1','01-JAN-2001')"),1);
 print("\n");
 
+print("DO WITH BIND VALUES: \n");
+checkSuccess($dbh->do("insert into testtable values (:var1,:var2,:var3,:var4)",undef,(2,"testchar2","testvarchar2","01-JAN-2002")),1);
+print("\n");
+
 print("EXECUTE WITH BIND VALUES: \n");
+$dbh->{Executed}=0;
 my $sth=$dbh->prepare("insert into testtable values (:var1,:var2,:var3,:var4)");
-checkSuccess($sth->execute(2,"testchar2","testvarchar2","01-JAN-2002"),1);
+checkSuccessString($sth->{Type},"st");
+checkSuccess($dbh->{Kids},1);
+checkSuccess($dbh->{ActiveKids},0);
+checkSuccess($sth->{Active},0);
+checkSuccess($sth->execute(3,"testchar3","testvarchar3","01-JAN-2003"),1);
+checkSuccess($sth->{Active},1);
+checkSuccess($dbh->{ActiveKids},1);
+checkSuccess($sth->{Executed},1);
+checkSuccess($dbh->{Executed},1);
 print("\n");
 
 print("AFFECTED ROWS: \n");
@@ -77,10 +126,10 @@ checkSuccess($sth->rows(),1);
 print("\n");
 
 print("BIND PARAM BY POSITION: \n");
-$sth->bind_param("1",3);
-$sth->bind_param("2","testchar3");
-$sth->bind_param("3","testvarchar3");
-$sth->bind_param("4","01-JAN-2003");
+$sth->bind_param(1,4);
+$sth->bind_param(2,"testchar4");
+$sth->bind_param(3,"testvarchar4");
+$sth->bind_param(4,"01-JAN-2004");
 checkSuccess($sth->execute(),1);
 print("\n");
 
@@ -89,49 +138,39 @@ checkSuccess($sth->{NUM_OF_PARAMS},4);
 print("\n");
 
 print("EXECUTE ARRAY: \n");
-@var1s=(4,5,6);
-@var2s=("testchar4","testchar5","testchar6");
-@var3s=("testvarchar4","testvarchar5","testvarchar6");
-@var4s=("01-JAN-2004","01-JAN-2005","01-JAN-2006");
-my ($tuples,$rows) = $sth->execute_array({ ArrayTupleStatus => \my @tuple_status },\@var1s,\@var2s,\@var3s,\@var4s);
-checkSuccess($tuples,3);
-checkSuccess($rows,3);
-for (my $index=0; $index<3; $index++) {
+@var1s=(5,6);
+@var2s=("testchar5","testchar6");
+@var3s=("testvarchar5","testvarchar6");
+@var4s=("01-JAN-2005","01-JAN-2006");
+$dbh->{Executed}=0;
+my ($tuples,$rows) = $sth->execute_array({ ArrayTupleStatus=>\my @tuple_status },\@var1s,\@var2s,\@var3s,\@var4s);
+checkSuccess($sth->{Executed},1);
+checkSuccess($dbh->{Executed},1);
+checkSuccess($tuples,2);
+checkSuccess($rows,2);
+for (my $index=0; $index<2; $index++) {
 	checkSuccess(@tuple_status[$index],1);
 }
 print("\n");
 
-#print("BIND PARAM ARRAY: \n");
-
-print("BIND BY NAME: \n");
-$sth->bind_param("var1",4);
-$sth->bind_param("var2","testchar4");
-$sth->bind_param("var3","testvarchar4");
-$sth->bind_param("var4","01-JAN-2004");
-checkSuccess($sth->execute(),1);
+print("BIND PARAM ARRAY: \n");
+$sth->bind_param_array(1,[7,8]);
+$sth->bind_param_array(2,["testchar7","testchar8"]);
+$sth->bind_param_array(3,["testvarchar7","testvarchar8"]);
+$sth->bind_param_array(4,["01-JAN-2007","01-JAN-2008"]);
+my ($tuples,$rows) = $sth->execute_array({ ArrayTupleStatus=>\my @tuple_status });
+checkSuccess($tuples,2);
+checkSuccess($rows,2);
+for (my $index=0; $index<2; $index++) {
+	checkSuccess(@tuple_status[$index],1);
+}
 print("\n");
 
 print("BIND BY NAME: \n");
-$sth->bind_param("var1",5);
-$sth->bind_param("var2","testchar5");
-$sth->bind_param("var3","testvarchar5");
-$sth->bind_param("var4","01-JAN-2005");
-checkSuccess($sth->execute(),1);
-print("\n");
-
-print("BIND BY NAME: \n");
-$sth->bind_param("var1",6);
-$sth->bind_param("var2","testchar6");
-$sth->bind_param("var3","testvarchar6");
-$sth->bind_param("var4","01-JAN-2006");
-checkSuccess($sth->execute(),1);
-print("\n");
-
-print("BIND BY NAME: \n");
-$sth->bind_param("var1",7);
-$sth->bind_param("var2","testchar7");
-$sth->bind_param("var3","testvarchar7");
-$sth->bind_param("var4","01-JAN-2007");
+$sth->bind_param("var1",9);
+$sth->bind_param("var2","testchar9");
+$sth->bind_param("var3","testvarchar9");
+$sth->bind_param("var4","01-JAN-2009");
 checkSuccess($sth->execute(),1);
 print("\n");
 
@@ -147,9 +186,9 @@ checkSuccessString($floatvar,'2.5');
 print("\n");
 
 print("OUTPUT BIND BY POSITION: \n");
-$sth->bind_param_inout("1",\$numvar,10);
-$sth->bind_param_inout("2",\$stringvar,10);
-$sth->bind_param_inout("3",\$floatvar,10);
+$sth->bind_param_inout(1,\$numvar,10);
+$sth->bind_param_inout(2,\$stringvar,10);
+$sth->bind_param_inout(3,\$floatvar,10);
 checkSuccess($sth->execute(),1);
 checkSuccessString($numvar,'1');
 checkSuccessString($stringvar,'hello');
@@ -220,52 +259,88 @@ print("\n");
 #print("TYPE INFO: \n");
 #print("\n");
 
-#print("FIELDS BY INDEX: \n");
-#checkSuccessString($cur->getField(0,0),"1");
-#checkSuccessString($cur->getField(0,1),"testchar1                               ");
-#checkSuccessString($cur->getField(0,2),"testvarchar1");
-#checkSuccessString($cur->getField(0,3),"01-JAN-01");
-#print("\n");
-#checkSuccessString($cur->getField(7,0),"8");
-#checkSuccessString($cur->getField(7,1),"testchar8                               ");
-#checkSuccessString($cur->getField(7,2),"testvarchar8");
-#checkSuccessString($cur->getField(7,3),"01-JAN-08");
-#print("\n");
-
-#print("FIELDS BY NAME: \n");
-#checkSuccessString($cur->getField(0,"testnumber"),"1");
-#checkSuccessString($cur->getField(0,"testchar"),"testchar1                               ");
-#checkSuccessString($cur->getField(0,"testvarchar"),"testvarchar1");
-#checkSuccessString($cur->getField(0,"testdate"),"01-JAN-01");
-#print("\n");
-#checkSuccessString($cur->getField(7,"testnumber"),"8");
-#checkSuccessString($cur->getField(7,"testchar"),"testchar8                               ");
-#checkSuccessString($cur->getField(7,"testvarchar"),"testvarchar8");
-#checkSuccessString($cur->getField(7,"testdate"),"01-JAN-08");
-#print("\n");
-
-print("FIELDS BY ARRAYREF: \n");
-$fieldsref=$sth->fetchrow_arrayref;
+print("FETCH: \n");
+$fieldsref=$sth->fetch;
 checkSuccess($$fieldsref[0],1);
 checkSuccessString($$fieldsref[1],"testchar1                               ");
 checkSuccessString($$fieldsref[2],"testvarchar1");
 checkSuccessString($$fieldsref[3],"01-JAN-01");
 print("\n");
 
+print("FIELDS BY ARRAYREF: \n");
+$fieldsref=$sth->fetchrow_arrayref;
+checkSuccess($$fieldsref[0],2);
+checkSuccessString($$fieldsref[1],"testchar2                               ");
+checkSuccessString($$fieldsref[2],"testvarchar2");
+checkSuccessString($$fieldsref[3],"01-JAN-02");
+print("\n");
+
 print("FIELDS BY ARRAY: \n");
 @fields=$sth->fetchrow_array;
-checkSuccess($fields[0],2);
-checkSuccessString($fields[1],"testchar2                               ");
-checkSuccessString($fields[2],"testvarchar2");
-checkSuccessString($fields[3],"01-JAN-02");
+checkSuccess($fields[0],3);
+checkSuccessString($fields[1],"testchar3                               ");
+checkSuccessString($fields[2],"testvarchar3");
+checkSuccessString($fields[3],"01-JAN-03");
 print("\n");
 
 print("FIELDS BY HASH: \n");
 $fieldshashref=$sth->fetchrow_hashref;
-checkSuccess($$fieldshashref{"TESTNUMBER"},3);
-checkSuccessString($$fieldshashref{"TESTCHAR"},"testchar3                               ");
-checkSuccessString($$fieldshashref{"TESTVARCHAR"},"testvarchar3");
-checkSuccessString($$fieldshashref{"TESTDATE"},"01-JAN-03");
+checkSuccess($$fieldshashref{"TESTNUMBER"},4);
+checkSuccessString($$fieldshashref{"TESTCHAR"},"testchar4                               ");
+checkSuccessString($$fieldshashref{"TESTVARCHAR"},"testvarchar4");
+checkSuccessString($$fieldshashref{"TESTDATE"},"01-JAN-04");
+print("\n");
+
+print("FETCHALL_ARRAYREF: \n");
+$sth=$dbh->prepare("select * from testtable order by testnumber");
+checkSuccessString($sth->execute(),"0E0");
+$rows=$sth->fetchall_arrayref();
+checkSuccess($$rows[0][0],1);
+checkSuccessString($$rows[0][1],"testchar1                               ");
+checkSuccessString($$rows[0][2],"testvarchar1");
+checkSuccessString($$rows[0][3],"01-JAN-01");
+checkSuccess($$rows[6][0],7);
+checkSuccessString($$rows[6][1],"testchar7                               ");
+checkSuccessString($$rows[6][2],"testvarchar7");
+checkSuccessString($$rows[6][3],"01-JAN-07");
+print("\n");
+$sth=$dbh->prepare("select * from testtable order by testnumber");
+checkSuccessString($sth->execute(),"0E0");
+$rows=$sth->fetchall_arrayref([2,3]);
+checkSuccessString($$rows[0][0],"testvarchar1");
+checkSuccessString($$rows[0][1],"01-JAN-01");
+checkSuccessString($$rows[6][0],"testvarchar7");
+checkSuccessString($$rows[6][1],"01-JAN-07");
+print("\n");
+$sth=$dbh->prepare("select * from testtable order by testnumber");
+checkSuccessString($sth->execute(),"0E0");
+$rows=$sth->fetchall_arrayref([2,3],1);
+checkSuccessString($$rows[0][0],"testvarchar1");
+checkSuccessString($$rows[0][1],"01-JAN-01");
+checkUndef($$rows[1][0]);
+checkUndef($$rows[1][1]);
+print("\n");
+
+print("FETCHALL_HASHREF: \n");
+$sth=$dbh->prepare("select * from testtable order by testnumber");
+checkSuccessString($sth->execute(),"0E0");
+$rows=$sth->fetchall_hashref("TESTNUMBER");
+checkSuccessString($$rows{1}->{TESTCHAR},"testchar1                               ");
+checkSuccessString($$rows{1}->{TESTVARCHAR},"testvarchar1");
+checkSuccessString($$rows{1}->{TESTDATE},"01-JAN-01");
+checkSuccessString($$rows{7}->{TESTCHAR},"testchar7                               ");
+checkSuccessString($$rows{7}->{TESTVARCHAR},"testvarchar7");
+checkSuccessString($$rows{7}->{TESTDATE},"01-JAN-07");
+print("\n");
+$sth=$dbh->prepare("select * from testtable order by testnumber");
+checkSuccessString($sth->execute(),"0E0");
+$rows=$sth->fetchall_hashref(1);
+checkSuccessString($$rows{1}->{TESTCHAR},"testchar1                               ");
+checkSuccessString($$rows{1}->{TESTVARCHAR},"testvarchar1");
+checkSuccessString($$rows{1}->{TESTDATE},"01-JAN-01");
+checkSuccessString($$rows{7}->{TESTCHAR},"testchar7                               ");
+checkSuccessString($$rows{7}->{TESTVARCHAR},"testvarchar7");
+checkSuccessString($$rows{7}->{TESTDATE},"01-JAN-07");
 print("\n");
 
 print("SELECTROW_ARRAY: \n");
@@ -292,20 +367,6 @@ checkSuccessString($$row{TESTVARCHAR},"testvarchar1");
 checkSuccessString($$row{TESTDATE},"01-JAN-01");
 print("\n");
 
-print("FETCHALL_ARRAYREF: \n");
-$sth=$dbh->prepare("select * from testtable order by testnumber");
-checkSuccessString($sth->execute(),"0E0");
-$rows=$sth->fetchall_arrayref();
-checkSuccess($$rows[0][0],1);
-checkSuccessString($$rows[0][1],"testchar1                               ");
-checkSuccessString($$rows[0][2],"testvarchar1");
-checkSuccessString($$rows[0][3],"01-JAN-01");
-checkSuccess($$rows[6][0],7);
-checkSuccessString($$rows[6][1],"testchar7                               ");
-checkSuccessString($$rows[6][2],"testvarchar7");
-checkSuccessString($$rows[6][3],"01-JAN-07");
-print("\n");
-
 print("SELECTALL_ARRAYREF: \n");
 $rows=$dbh->selectall_arrayref("select * from testtable order by testnumber");
 checkSuccess($$rows[0][0],1);
@@ -317,27 +378,54 @@ checkSuccessString($$rows[6][1],"testchar7                               ");
 checkSuccessString($$rows[6][2],"testvarchar7");
 checkSuccessString($$rows[6][3],"01-JAN-07");
 print("\n");
-
-print("FETCHALL_HASHREF: \n");
 $sth=$dbh->prepare("select * from testtable order by testnumber");
-checkSuccessString($sth->execute(),"0E0");
-$rows=$sth->fetchall_hashref("TESTNUMBER");
-checkSuccessString($$rows{1}->{TESTCHAR},"testchar1                               ");
-checkSuccessString($$rows{1}->{TESTVARCHAR},"testvarchar1");
-checkSuccessString($$rows{1}->{TESTDATE},"01-JAN-01");
-checkSuccessString($$rows{7}->{TESTCHAR},"testchar7                               ");
-checkSuccessString($$rows{7}->{TESTVARCHAR},"testvarchar7");
-checkSuccessString($$rows{7}->{TESTDATE},"01-JAN-07");
+$rows=$dbh->selectall_arrayref($sth);
+checkSuccess($$rows[0][0],1);
+checkSuccessString($$rows[0][1],"testchar1                               ");
+checkSuccessString($$rows[0][2],"testvarchar1");
+checkSuccessString($$rows[0][3],"01-JAN-01");
+checkSuccess($$rows[6][0],7);
+checkSuccessString($$rows[6][1],"testchar7                               ");
+checkSuccessString($$rows[6][2],"testvarchar7");
+checkSuccessString($$rows[6][3],"01-JAN-07");
 print("\n");
-$sth=$dbh->prepare("select * from testtable order by testnumber");
-checkSuccessString($sth->execute(),"0E0");
-$rows=$sth->fetchall_hashref(1);
-checkSuccessString($$rows{1}->{TESTCHAR},"testchar1                               ");
-checkSuccessString($$rows{1}->{TESTVARCHAR},"testvarchar1");
-checkSuccessString($$rows{1}->{TESTDATE},"01-JAN-01");
-checkSuccessString($$rows{7}->{TESTCHAR},"testchar7                               ");
-checkSuccessString($$rows{7}->{TESTVARCHAR},"testvarchar7");
-checkSuccessString($$rows{7}->{TESTDATE},"01-JAN-07");
+$rows=$dbh->selectall_arrayref($sth,{Slice=>[2,3]});
+checkSuccessString($$rows[0][0],"testvarchar1");
+checkSuccessString($$rows[0][1],"01-JAN-01");
+checkSuccessString($$rows[6][0],"testvarchar7");
+checkSuccessString($$rows[6][1],"01-JAN-07");
+print("\n");
+$rows=$dbh->selectall_arrayref($sth,{Slice=>[2,3],MaxRows=>1});
+checkSuccessString($$rows[0][0],"testvarchar1");
+checkSuccessString($$rows[0][1],"01-JAN-01");
+checkUndef($$rows[6][0]);
+checkUndef($$rows[6][1]);
+print("\n");
+$rows=$dbh->selectall_arrayref($sth,{Slice=>{}});
+checkSuccessString($$rows[0]{TESTVARCHAR},"testvarchar1");
+checkSuccessString($$rows[0]{TESTDATE},"01-JAN-01");
+checkSuccessString($$rows[6]{TESTVARCHAR},"testvarchar7");
+checkSuccessString($$rows[6]{TESTDATE},"01-JAN-07");
+@rows=@{$dbh->selectall_arrayref($sth)};
+checkSuccessString($rows[0][0],"1");
+checkSuccessString($rows[0][1],"testchar1                               ");
+checkSuccessString($rows[6][0],"7");
+checkSuccessString($rows[6][1],"testchar7                               ");
+print("\n");
+$rows=$dbh->selectall_arrayref("select * from testtable where testnumber=:var1 or testnumber=:var2 order by testnumber",undef,('1','2'));
+checkSuccessString($rows[0][0],"1");
+checkSuccessString($rows[0][1],"testchar1                               ");
+checkSuccessString($rows[1][0],"2");
+checkSuccessString($rows[1][1],"testchar2                               ");
+checkUndef($$rows[6][0]);
+checkUndef($$rows[6][1]);
+$rows=$dbh->selectall_arrayref("select * from testtable where testnumber=:var1 or testnumber=:var2 order by testnumber",undef,'1','2');
+checkSuccessString($rows[0][0],"1");
+checkSuccessString($rows[0][1],"testchar1                               ");
+checkSuccessString($rows[1][0],"2");
+checkSuccessString($rows[1][1],"testchar2                               ");
+checkUndef($$rows[6][0]);
+checkUndef($$rows[6][1]);
 print("\n");
 
 print("SELECTALL_HASHREF: \n");
@@ -356,6 +444,36 @@ checkSuccessString($$rows{1}->{TESTDATE},"01-JAN-01");
 checkSuccessString($$rows{7}->{TESTCHAR},"testchar7                               ");
 checkSuccessString($$rows{7}->{TESTVARCHAR},"testvarchar7");
 checkSuccessString($$rows{7}->{TESTDATE},"01-JAN-07");
+$sth=$dbh->prepare("select * from testtable order by testnumber");
+$rows=$dbh->selectall_hashref($sth,1);
+checkSuccessString($$rows{1}->{TESTCHAR},"testchar1                               ");
+checkSuccessString($$rows{1}->{TESTVARCHAR},"testvarchar1");
+checkSuccessString($$rows{1}->{TESTDATE},"01-JAN-01");
+checkSuccessString($$rows{7}->{TESTCHAR},"testchar7                               ");
+checkSuccessString($$rows{7}->{TESTVARCHAR},"testvarchar7");
+checkSuccessString($$rows{7}->{TESTDATE},"01-JAN-07");
+print("\n");
+$rows=$dbh->selectall_hashref("select * from testtable where testnumber=:var1 or testnumber=:var2 order by testnumber",1,undef,('1','2'));
+checkSuccessString($$rows{1}->{TESTCHAR},"testchar1                               ");
+checkSuccessString($$rows{1}->{TESTVARCHAR},"testvarchar1");
+checkSuccessString($$rows{1}->{TESTDATE},"01-JAN-01");
+checkSuccessString($$rows{2}->{TESTCHAR},"testchar2                               ");
+checkSuccessString($$rows{2}->{TESTVARCHAR},"testvarchar2");
+checkSuccessString($$rows{2}->{TESTDATE},"01-JAN-02");
+checkUndef($$rows{7}->{TESTCHAR});
+checkUndef($$rows{7}->{TESTVARCHAR});
+checkUndef($$rows{7}->{TESTDATE});
+print("\n");
+$rows=$dbh->selectall_hashref("select * from testtable where testnumber=:var1 or testnumber=:var2 order by testnumber",1,undef,'1','2');
+checkSuccessString($$rows{1}->{TESTCHAR},"testchar1                               ");
+checkSuccessString($$rows{1}->{TESTVARCHAR},"testvarchar1");
+checkSuccessString($$rows{1}->{TESTDATE},"01-JAN-01");
+checkSuccessString($$rows{2}->{TESTCHAR},"testchar2                               ");
+checkSuccessString($$rows{2}->{TESTVARCHAR},"testvarchar2");
+checkSuccessString($$rows{2}->{TESTDATE},"01-JAN-02");
+checkUndef($$rows{7}->{TESTCHAR});
+checkUndef($$rows{7}->{TESTVARCHAR});
+checkUndef($$rows{7}->{TESTDATE});
 print("\n");
 
 print("SELECTCOL_ARRAYREF: \n");
@@ -368,19 +486,64 @@ checkSuccess($$cols[4],5);
 checkSuccess($$cols[5],6);
 checkSuccess($$cols[6],7);
 print("\n");
+$cols=$dbh->selectcol_arrayref("select * from testtable where testnumber=:var1 or testnumber=:var2 order by testnumber",undef,(1,2));
+checkSuccess($$cols[0],1);
+checkSuccess($$cols[1],2);
+checkUndef($$cols[2]);
+checkUndef($$cols[3]);
+checkUndef($$cols[4]);
+checkUndef($$cols[5]);
+checkUndef($$cols[6]);
+print("\n");
+
+print("CHOP BLANKS: \n");
+$dbh->{ChopBlanks}=1;
+$rows=$dbh->selectall_arrayref("select * from testtable order by testnumber");
+checkSuccessString($$rows[0][1],"testchar1");
+checkSuccessString($$rows[6][1],"testchar7");
+$dbh->{ChopBlanks}=0;
+$rows=$dbh->selectall_arrayref("select * from testtable order by testnumber");
+checkSuccessString($$rows[0][1],"testchar1                               ");
+checkSuccessString($$rows[6][1],"testchar7                               ");
+$sth=$dbh->prepare("select * from testtable order by testnumber");
+checkSuccessString($sth->execute(),"0E0");
+$sth->{ChopBlanks}=1;
+$rows=$sth->fetchall_arrayref();
+checkSuccessString($$rows[0][1],"testchar1");
+checkSuccessString($$rows[6][1],"testchar7");
+$sth=$dbh->prepare("select * from testtable order by testnumber");
+checkSuccessString($sth->execute(),"0E0");
+$sth->{ChopBlanks}=0;
+$rows=$sth->fetchall_arrayref();
+checkSuccessString($$rows[0][1],"testchar1                               ");
+checkSuccessString($$rows[6][1],"testchar7                               ");
+print("\n");
 
 print("COMMIT AND ROLLBACK: \n");
 my $dbh2=DBI->connect("DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/test.socket;debug=0","test","test",{AutoCommit=>0}) or die DBI->errstr;
 my @row=$dbh2->selectrow_array("select count(*) from testtable");
 checkSuccess($row[0],0);
+checkSuccess($dbh->{Executed},1);
 checkSuccess($dbh->commit(),1);
+checkSuccess($dbh->{Executed},0);
 @row=$dbh2->selectrow_array("select count(*) from testtable");
-checkSuccess($row[0],7);
+checkSuccess($row[0],9);
 $dbh->{AutoCommit}=1;
 checkSuccess($dbh->do("insert into testtable values (10,'testchar10','testvarchar10','01-JAN-2010')"),1);
 my @row=$dbh2->selectrow_array("select count(*) from testtable");
-checkSuccess($row[0],8);
+checkSuccess($row[0],10);
+$dbh2->disconnect();
 $dbh->{AutoCommit}=0;
+checkSuccess($dbh->do("insert into testtable values (11,'testchar11','testvarchar11','01-JAN-2011')"),1);
+my @row=$dbh->selectrow_array("select count(*) from testtable");
+checkSuccess($row[0],11);
+my @row=$dbh2->selectrow_array("select count(*) from testtable");
+checkSuccess($row[0],10);
+checkSuccess($dbh->{Executed},1);
+checkSuccess($dbh->rollback(),1);
+checkSuccess($dbh->{Executed},0);
+my @row=$dbh2->selectrow_array("select count(*) from testtable");
+checkSuccess($row[0],10);
 print("\n");
 
 # lots of rows
@@ -404,10 +567,10 @@ print("\n");
 print("NULL BINDS: \n");
 $dbh->do("delete from testtable");
 $sth=$dbh->prepare("insert into testtable values (:var1,:var2,:var3,:var4)");
-$sth->bind_param("1",undef);
-$sth->bind_param("2",undef);
-$sth->bind_param("3",undef);
-$sth->bind_param("4",undef);
+$sth->bind_param(1,undef);
+$sth->bind_param(2,undef);
+$sth->bind_param(3,undef);
+$sth->bind_param(4,undef);
 checkSuccess($sth->execute(),1);
 $sth=$dbh->prepare("select * from testtable order by testnumber");
 checkSuccessString($sth->execute(),"0E0");
@@ -432,6 +595,30 @@ checkSuccess($sth->execute(),1);
 $dbh->do("drop table testtable");
 print("\n");
 
+# prepare_cached
+print("PREPARE CACHED: \n");
+$sth=$dbh->prepare_cached("select 1 from dual");
+my $sth1=$dbh->prepare_cached("select 1 from dual");
+my $sth2=$dbh->prepare_cached("select 2 from dual");
+checkSuccess($sth,$sth1);
+$success="false";
+if ($sth2==$sth) {
+	$success="true"
+}
+checkSuccessString($success,"false");
+print("\n");
+
+# get info
+print("GET INFO: \n");
+checkSuccessString($dbh->get_info($GetInfoType{SQL_DATA_SOURCE_NAME}),"TESTUSER");
+checkSuccessString($dbh->get_info($GetInfoType{SQL_DBMS_NAME}),"oracle8");
+checkSuccessString($dbh->get_info($GetInfoType{SQL_DBMS_VER}),"Oracle Database 12c Enterprise Edition Release 12.1.0.1.0 - 64bit Production\nWith the Partitioning, OLAP, Advanced Analytics and Real Application Testing options");
+checkSuccessString($dbh->get_info($GetInfoType{SQL_USER_NAME}),"test");
+checkSuccessString($dbh->get_info($GetInfoType{SQL_IDENTIFIER_QUOTE_CHAR}),"\"");
+checkSuccessString($dbh->get_info($GetInfoType{SQL_CATALOG_NAME_SEPARATOR}),"@");
+checkSuccessString($dbh->get_info($GetInfoType{SQL_CATALOG_LOCATION}),2);
+print("\n");
+
 # invalid queries...
 print("INVALID QUERIES: \n");
 checkSuccess($dbh->do("select * from testtable order by testnumber"),0);
@@ -449,3 +636,6 @@ checkSuccess($dbh->do("create table testtable"),0);
 checkSuccess($dbh->do("create table testtable"),0);
 checkSuccess($dbh->do("create table testtable"),0);
 print("\n");
+
+
+$dbh->disconnect();
