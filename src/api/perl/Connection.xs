@@ -131,6 +131,9 @@ bool
 sqlrconnection::autoCommitOff()
 
 bool
+sqlrconnection::begin()
+
+bool
 sqlrconnection::commit()
 
 bool

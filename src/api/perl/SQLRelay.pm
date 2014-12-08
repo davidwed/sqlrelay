@@ -181,6 +181,22 @@ sub disconnect {
 	$dbh->STORE(Active => 0);
 }
 
+sub begin_work {
+
+	# get parameters
+	my ($dbh)=@_;
+
+	# handle autocommit
+	if ($dbh->FETCH('driver_AutoCommit')) {
+		if ($dbh->FETCH('Warn')) {
+			warn('Commit ineffective while AutoCommit is on');
+		}
+	}
+	
+	# execute a begin
+	return $dbh->FETCH('driver_connection')->begin();
+}
+
 sub commit {
 
 	# get parameters
@@ -374,8 +390,7 @@ sub execute {
 		my $index=1;
 		my $bind_value;
 		foreach $bind_value (@bind_values) {
-			$sth->bind_param($index,$bind_value)
-				or return;
+			$sth->bind_param($index,$bind_value) or return;
 			$index=$index+1;
 		}
 	}
