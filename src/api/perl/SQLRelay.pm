@@ -100,6 +100,9 @@ sub connect {
 	# and can be disconnected
 	$drh->{'dbhs'}->{$dbh}=1;
 
+	# mark this connection Active
+	$dbh->STORE(Active => 1);
+
 	return $dbh;
 }
 
@@ -173,6 +176,9 @@ sub disconnect {
 	# remove references to this database handle from the driver handle
 	delete $dbh->FETCH('driver_database_handle')->{$dbh};
 	delete $dbh->FETCH('driver_database_handle')->{'dbhs'}->{$dbh};
+
+	# mark this connection not Active
+	$dbh->STORE(Active => 0);
 }
 
 sub commit {
@@ -389,8 +395,6 @@ sub execute {
 	my $rowcount=$cursor->rowCount();
 	my @colnames=map {$cursor->getColumnName($_)} (0..$colcount-1);
 	my @coltypes=map {$cursor->getColumnType($_)} (0..$colcount-1);
- 	# With "lazy fetching", we don't have a reliable rowcocunt
- 	# $sth->STORE('driver_NUM_OF_ROWS',$rowcount);
  	if (!$sth->FETCH('NUM_OF_FIELDS')) {
  		$sth->STORE('NUM_OF_FIELDS',$colcount);
  	}
@@ -411,6 +415,9 @@ sub execute {
 		$$variable=$cursor->getOutputBindString($param);
 	}
 
+	# mark this statement Active
+	$sth->STORE(Active => 1);
+
 	my $rows=$sth->rows();
 	if ($rows==0) {
 		return "0E0";
@@ -426,16 +433,11 @@ sub fetchrow_arrayref {
 	# get the number of rows fetched so far
 	my $fetched_rows=$sth->FETCH('driver_FETCHED_ROWS');
 
-	# handle end of result set
-	# With "lazy fetching", this method doesn't work; see below.
-	#if ($fetched_rows==$sth->FETCH('driver_NUM_OF_ROWS')) {
-	#	$sth->finish();
-	#	return undef;
-	#}
-
 	# get a row
 	my @row= $sth->FETCH('driver_cursor')->getRow($fetched_rows);
-	if (scalar(@row) == 0) { $sth->finish(); return undef; }
+	if (scalar(@row) == 0) {
+		$sth->finish(); return undef;
+	}
 
 	# increment the fetched row count
 	$sth->STORE('driver_FETCHED_ROWS',$fetched_rows+1);
@@ -465,6 +467,9 @@ sub finish {
 	
 	# get parameters
 	my ($sth)=@_;
+
+	# mark this statement not Active
+	$sth->STORE(Active => 0);
 
 	# call finish from the DBI class
 	$sth->SUPER::finish();
