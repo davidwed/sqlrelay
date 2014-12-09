@@ -4,6 +4,7 @@ use strict;
 use vars qw($err $errstr $sqlstate $drh);
 use SQLRelay::Connection;
 use SQLRelay::Cursor;
+use Data::Dumper;
 
 use DBI qw(:sql_types);
 
@@ -48,7 +49,7 @@ sub connect {
 	# get parameters
 	my ($drh, $dbname, $user, $password, $attr)=@_;
 
-	local $ENV{DBI_AUTOPROXY} = "" if $ENV{DBI_AUTOPROXY} && $ENV{DBI_AUTOPROXY} =~ /^dbi:SQLRelay/i;
+	local $ENV{DBI_AUTOPROXY}='' if $ENV{DBI_AUTOPROXY} && $ENV{DBI_AUTOPROXY} =~ /^dbi:SQLRelay/i;
 
 	# create a blank database handle
 	my $dbh=DBI::_new_dbh($drh, {
@@ -101,7 +102,7 @@ sub connect {
 	$drh->{'dbhs'}->{$dbh}=1;
 
 	# mark this connection Active
-	$dbh->STORE(Active => 1);
+	$dbh->STORE('Active',1);
 
 	return $dbh;
 }
@@ -127,23 +128,28 @@ package DBD::SQLRelay::db;
 
 $DBD::SQLRelay::db::imp_data_size=0;
 
-sub prepare {
+sub _new_statement {
 
 	# get parameters
-	my ($dbh, $statement, @attribs)=@_;
+	my ($dbh, $statement)=@_;
 
 	# create a blank statement handle
 	my $sth=DBI::_new_sth($dbh,{'Statement'=>$statement});
-	
+
 	# create an Cursor
 	my $cursor=SQLRelay::Cursor->new($dbh->FETCH('driver_connection'));
 
 	# set result set buffer size
-	# FIXME: set from DBI RowCacheSize attribute
-	$cursor->setResultSetBufferSize(100);
+	my $rowcachesize=$dbh->FETCH('RowCacheSize');
+	if (!defined($rowcachesize) || $rowcachesize==0) {
+		$cursor->setResultSetBufferSize(100);
+	} elsif ($rowcachesize<0) {
+		$cursor->setResultSetBufferSize(0);
+	} else {
+		$cursor->setResultSetBufferSize($rowcachesize);
+	}
 
 	# store statement-specific data in the statement handle
-	#$sth->STORE('driver_params',[]);
 	$sth->STORE('driver_database_handle',$dbh);
 	$sth->STORE('driver_is_select',($statement=~/^\s*select/i));
 	$sth->STORE('driver_cursor',$cursor);
@@ -158,10 +164,26 @@ sub prepare {
 	$cursor->clearBinds();
  
  	$cursor->getNullsAsUndefined();
+
+	return $sth;
+}
+
+sub prepare {
+
+	# get parameters
+	my ($dbh, $statement, @attribs)=@_;
+
+	# create a statement
+	my $sth=_new_statement($dbh,$statement);
+
+	# get the cursor from the statement
+	my $cursor=$sth->FETCH('driver_cursor');
+
+	# prepare the query
 	$cursor->prepareQuery($statement);
 
+	# count bind vars
 	$sth->STORE('NUM_OF_PARAMS',$cursor->countBindVariables());
-
 	return $sth;
 }
 
@@ -178,7 +200,7 @@ sub disconnect {
 	delete $dbh->FETCH('driver_database_handle')->{'dbhs'}->{$dbh};
 
 	# mark this connection not Active
-	$dbh->STORE(Active => 0);
+	$dbh->STORE('Active',0);
 }
 
 sub begin_work {
@@ -257,21 +279,21 @@ sub get_info {
 	} elsif ($index==29) {
 		# identifier quote character
 		my $identity=$dbh->get_info(17);
-		if ($identity eq "mysql") {
-			return "`";
+		if ($identity eq 'mysql') {
+			return '`';
 		}
-		return "\"";
+		return '"';
 	} elsif ($index==41) {
 		# catalog name separator
 		my $identity=$dbh->get_info(17);
-		if ($identity eq "oracle8") {
-			return "@";
+		if ($identity eq 'oracle8') {
+			return '@';
 		}
-		return ".";
+		return '.';
 	} elsif ($index==114) {
 		# catalog location
 		my $identity=$dbh->get_info(17);
-		if ($identity eq "oracle8") {
+		if ($identity eq 'oracle8') {
 			return 2;
 		}
 		return 1;
@@ -285,13 +307,26 @@ sub STORE {
 	# get parameters
 	my ($dbh,$attr,$val)=@_;
 
-	# special case for AutoCommit
+	# special cases...
 	if ($attr eq 'AutoCommit') {
 		$dbh->{'driver_AutoCommit'}=$val;
+		my $connection=$dbh->FETCH('driver_connection');
 		if ($val) {
-			$dbh->FETCH('driver_connection')->autoCommitOn();
+			$connection->autoCommitOn();
 		} else {
-			$dbh->FETCH('driver_connection')->autoCommitOff();
+			$connection->autoCommitOff();
+		}
+		return 1;
+	} elsif ($attr eq 'RowCacheSize') {
+		$dbh->{'driver_RowCacheSize'}=$val;
+	} elsif ($attr =~ /^ext_SQLR_Debug$/) {
+		my $connection=$dbh->FETCH('driver_connection');
+		if ($val==1) {
+			$connection->debugOn();
+		} elsif ($val==2) {
+			$connection->debugOff();
+		} else {
+			$connection->setDebugFile($val);
 		}
 		return 1;
 	}
@@ -303,8 +338,8 @@ sub STORE {
 	}
 
 	# if the attribute didn't start with 'driver_' 
-	# then pass it up to the DBI class
-	$dbh->SUPER::STORE($attr,$val);
+	# then pass it up to the parent class
+	return $dbh->SUPER::STORE($attr,$val);
 }
 
 sub FETCH {
@@ -312,9 +347,12 @@ sub FETCH {
 	# get parameters
 	my ($dbh,$attr)=@_;
 
-	# special case for AutoCommit
+	# special cases...
 	if ($attr eq 'AutoCommit') {
 		return $dbh->{'driver_AutoCommit'};
+	}
+	elsif ($attr eq 'RowCacheSize') {
+		return $dbh->{'driver_RowCacheSize'};
 	}
 
 	# handle all other cases
@@ -323,7 +361,7 @@ sub FETCH {
 	}
 
 	# if the attribute didn't start with 'driver_' 
-	# then pass it up to the DBI class
+	# then pass it up to the parent class
 	$dbh->SUPER::FETCH($attr);
 }
 
@@ -345,7 +383,6 @@ sub last_insert_id {
 	return $dbh->FETCH('driver_connection')->getLastInsertId();
 }
 
-
 # statement class
 package DBD::SQLRelay::st;
 
@@ -357,7 +394,7 @@ sub bind_param {
 
 	# bind any variables/values that were passed in
 	my $cursor=$sth->FETCH('driver_cursor');
-	my $dbh = $sth->{'Database'};
+	my $dbh=$sth->{'Database'};
 
 	if ($attr) {
 	
@@ -371,10 +408,10 @@ sub bind_param {
 				$cursor->inputBindBlob($param, $val, length($val)); 
 				return 1; 
 			}
-			return $dbh->DBI::set_err(1,'bind_param: type '.$attr." is not supported.\n");
+			return $dbh->DBI::set_err(1,'bind_param: type '.$attr.' is not supported.');
 
 		} elsif (ref $attr eq 'HASH' && ($attr->{type} || $attr->{Type} || $attr->{TYPE}))  {
-			my $length = $attr->{length} || length $val;
+			my $length=$attr->{length} || length $val;
 			if ($attr->{type} eq 'DBD::SQLRelay::SQL_CLOB') {
 
 				$cursor->inputBindClob($param, $val, $length);	
@@ -383,8 +420,7 @@ sub bind_param {
 				$cursor->inputBindBlob($param, $val, $length);	
 			} else {
 
-		        	return $dbh->DBI::set_err(1, 'bind_param: type ' . $attr->{type} .
-							     " is not supported.\n");
+		        	return $dbh->DBI::set_err(1, 'bind_param: type '.$attr->{type}.' is not supported.');
 			}	
 						
 		} else {
@@ -414,11 +450,11 @@ sub bind_param_inout {
 
 	# store the parameter name in the list of inout parameters
 	my $param_inout_list=$sth->FETCH('driver_param_inout_list');
-	$param_inout_list=$param_inout_list . " $param";
+	$param_inout_list=$param_inout_list.' '.$param;
 	$sth->STORE('driver_param_inout_list',$param_inout_list);
 
 	# store the variable so data can be fetched into it later
-	$sth->STORE("driver_param_inout_$param",$variable);
+	$sth->STORE('driver_param_inout_'.$param,$variable);
 
 	return 1;
 }
@@ -434,8 +470,11 @@ sub execute {
 
 	# Clear and reset binds if they are being passed to execute()
 	if (scalar(@bind_values)) {
-		if (@bind_values != $sth->FETCH('NUM_OF_PARAMS')) {
-			return $dbh->set_err(1,"Expected ".$sth->FETCH('NUM_OF_PARAMS')." bind values but was given ".@bind_values);
+		if (@bind_values!=$sth->FETCH('NUM_OF_PARAMS')) {
+			return $dbh->set_err(1,'Expected '.
+					$sth->FETCH('NUM_OF_PARAMS').
+					' bind values but was given '.
+					@bind_values);
 		}
 
 		my $index=1;
@@ -453,6 +492,7 @@ sub execute {
 			$sth->STORE('NUM_OF_FIELDS',0);
 		}
 		$sth->STORE('driver_FETCHED_ROWS',0);
+		$sth->STORE('driver_RowsInCache',0);
 		return $dbh->DBI::set_err(1,$cursor->errorMessage());
 	}
 
@@ -467,26 +507,27 @@ sub execute {
 	$sth->{NAME}=\@colnames;
 	$sth->{TYPE}=\@coltypes;
 	$sth->STORE('driver_FETCHED_ROWS',0);
+	$sth->STORE('driver_RowsInCache',$cursor->rowCount());
 
 	# get the list of output bind variables and turn it into an array
 	my $param_inout_list=$sth->FETCH('driver_param_inout_list');
- 	my @param_inout_array=split(' ',$param_inout_list || "");
+ 	my @param_inout_array=split(' ',$param_inout_list || '');
 
 	# loop through the array of parameters, for each, get the appropriate
 	# variable and store the output bind data in the variable
 	my $param;
 	foreach $param(@param_inout_array) {
-		my $variable=$sth->FETCH("driver_param_inout_$param");
+		my $variable=$sth->FETCH('driver_param_inout_'.$param);
 		# FIXME: support integer/double/blob/clob's
 		$$variable=$cursor->getOutputBindString($param);
 	}
 
 	# mark this statement Active
-	$sth->STORE(Active => 1);
+	$sth->STORE('Active',1);
 
 	my $rows=$sth->rows();
 	if ($rows==0) {
-		return "0E0";
+		return '0E0';
 	}
 	return $sth->rows;
 }
@@ -500,13 +541,28 @@ sub fetchrow_arrayref {
 	my $fetched_rows=$sth->FETCH('driver_FETCHED_ROWS');
 
 	# get a row
-	my @row= $sth->FETCH('driver_cursor')->getRow($fetched_rows);
-	if (scalar(@row) == 0) {
-		$sth->finish(); return undef;
+	my @row=$sth->FETCH('driver_cursor')->getRow($fetched_rows);
+	if (scalar(@row)==0) {
+		$sth->STORE('driver_RowsInCache',0);
+		$sth->finish();
+		return undef;
 	}
 
 	# increment the fetched row count
 	$sth->STORE('driver_FETCHED_ROWS',$fetched_rows+1);
+
+	# update rows in cache
+	my $rowsincache=$sth->FETCH('driver_RowsInCache');
+	if ($rowsincache==0) {
+		my $rowcachesize=$sth->{'Database'}->FETCH('RowCacheSize');
+		if ($rowcachesize>0) {
+			$rowsincache=$rowcachesize;
+		}
+	}
+	if ($rowsincache>0) {
+		$rowsincache--;
+	}
+	$sth->STORE('driver_RowsInCache',$rowsincache);
 
 	# chop blanks, if that's set
 	if ($sth->FETCH('ChopBlanks')) {
@@ -535,7 +591,7 @@ sub finish {
 	my ($sth)=@_;
 
 	# mark this statement not Active
-	$sth->STORE(Active => 0);
+	$sth->STORE('Active',0);
 
 	# call finish from the DBI class
 	$sth->SUPER::finish();
@@ -546,10 +602,14 @@ sub STORE {
 	# get parameters
 	my ($sth,$attr,$val)=@_;
 
+	# special cases...
 	if ($attr =~ /^ext_SQLR_BufferSize$/) {
-		my $cursor = $sth->FETCH('driver_cursor');
+		my $cursor=$sth->FETCH('driver_cursor');
 		$cursor->setResultSetBufferSize($val);
 		return 1;
+	}
+	elsif ($attr eq 'RowsInCache') {
+		$sth->{'driver_RowsInCache'}=$val;
 	}
 
 	# handle all other cases
@@ -560,7 +620,7 @@ sub STORE {
 
 	# if the attribute didn't start with 'driver_' 
 	# then pass it up to the DBI class
-	$sth->SUPER::STORE($attr,$val);
+	return $sth->SUPER::STORE($attr,$val);
 }
 
 sub FETCH {
@@ -568,9 +628,13 @@ sub FETCH {
 	# get parameters
 	my ($sth,$attr)=@_;
 
+	# special cases...
 	if ($attr =~ /^ext_SQLR_BufferSize$/) {
-		my $cursor = $sth->FETCH('driver_cursor');
+		my $cursor=$sth->FETCH('driver_cursor');
 		return $cursor->getResultSetBufferSize();
+	}
+	elsif ($attr eq 'RowsInCache') {
+		return $sth->{'driver_RowsInCache'};
 	}
 
 	# handle all other cases
