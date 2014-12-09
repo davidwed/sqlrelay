@@ -50,6 +50,8 @@
 	output bind clobs and blobs work in perl DBI now
 	added support for perl DBI ParamValues, ParamTypes and ParamArrays
 		attributes
+	tweaked the odbc driver so it works with the jdbc-odbc bridge and
+		jmeter
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries
