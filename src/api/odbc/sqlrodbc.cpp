@@ -12,6 +12,8 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 
+#define DEBUG_MESSAGES 1
+#include <debugprint.h>
 
 // windows needs this
 // (don't include for __CYGWIN__ though)
@@ -45,23 +47,6 @@ typedef SQLULEN SQLROWSETSIZE;
 #endif
 
 #define ODBC_INI "odbc.ini"
-
-//#define DEBUG_MESSAGES 1
-#ifdef DEBUG_MESSAGES
-	#define debugFunction() stdoutput.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__);
-	#ifdef _MSC_VER
-		#define debugPrintf(format, ...) stdoutput.printf(format, ## __VA_ARGS__);
-	#else
-		#define debugPrintf(format...) stdoutput.printf(format, ## __VA_ARGS__);
-	#endif
-#else
-	#define debugFunction() /* */
-	#ifdef _MSC_VER
-		#define debugPrintf(format, ...) /* */
-	#else
-		#define debugPrintf(format...) /* */
-	#endif
-#endif
 
 extern "C" {
 
@@ -2574,26 +2559,32 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 	}
 
 	// FIXME: implement
-	//SQL_ACCESS_MODE:
-	//SQL_AUTOCOMMIT: settable but not gettable
-	//SQL_LOGIN_TIMEOUT:
-	//SQL_OPT_TRACE:
-	//SQL_OPT_TRACEFILE:
-	//SQL_TRANSLATE_DLL:
-	////SQL_TRANSLATE_OPTION:
-	//SQL_TXN_ISOLATION:
-	//SQL_CURRENT_QUALIFIER:
-	//SQL_ODBC_CURSORS:
-	//SQL_QUIET_MODE:
-	//SQL_PACKET_SIZE:
-	//#if (ODBCVER >= 0x0300)
-	//SQL_ATTR_CONNECTION_TIMEOUT:
-	//SQL_ATTR_DISCONNECT_BEHAVIOR:
-	//SQL_ATTR_ENLIST_IN_DTC:
-	//SQL_ATTR_ENLIST_IN_XA:
-	//SQL_ATTR_AUTO_IPD:
-	//SQL_ATTR_METADATA_ID:
-	//#endif
+	switch (attribute) {
+		/*case SQL_ACCESS_MODE:
+		case SQL_AUTOCOMMIT:
+			// settable but not gettable
+		case SQL_LOGIN_TIMEOUT:
+		case SQL_OPT_TRACE:
+		case SQL_OPT_TRACEFILE:
+		case SQL_TRANSLATE_DLL:
+		case SQL_TRANSLATE_OPTION:
+		case SQL_TXN_ISOLATION:
+		case SQL_CURRENT_QUALIFIER:
+		case SQL_ODBC_CURSORS:
+		case SQL_QUIET_MODE:
+		case SQL_PACKET_SIZE:
+	#if (ODBCVER >= 0x0300)
+		case SQL_ATTR_CONNECTION_TIMEOUT:
+		case SQL_ATTR_DISCONNECT_BEHAVIOR:
+		case SQL_ATTR_ENLIST_IN_DTC:
+		case SQL_ATTR_ENLIST_IN_XA:
+		case SQL_ATTR_AUTO_IPD:
+		case SQL_ATTR_METADATA_ID:
+	#endif*/
+		default:
+			debugPrintf("unsupported attribute: %d\n",attribute);
+			return SQL_SUCCESS;
+	}
 
 	return SQL_ERROR;
 }
@@ -3176,7 +3167,7 @@ SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV environmenthandle,
 			*((SQLUINTEGER *)value)=SQL_CP_MATCH_DEFAULT;
 			break;
 		default:
-			debugPrintf("unsupported attribute\n");
+			debugPrintf("unsupported attribute: %d\n",attribute);
 			break;
 	}
 	return SQL_SUCCESS;
@@ -3746,8 +3737,23 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			debugPrintf("infotype: SQL_SCROLL_OPTIONS\n");
 			*(SQLUINTEGER *)infovalue=SQL_SO_FORWARD_ONLY;
 			break;
+		case SQL_BATCH_ROW_COUNT:
+			debugPrintf("infotype: SQL_BATCH_ROW_COUNT\n");
+			// batch sql is not supported
+			*(SQLUINTEGER *)infovalue=0;
+			break;
+		case SQL_BATCH_SUPPORT:
+			debugPrintf("infotype: SQL_BATCH_SUPPORT\n");
+			// batch sql is not supported
+			*(SQLUINTEGER *)infovalue=0;
+			break;
+		case SQL_PARAM_ARRAY_ROW_COUNTS:
+			debugPrintf("infotype: SQL_PARAM_ARRAY_ROW_COUNTS\n");
+			// batch sql is not supported
+			*(SQLUINTEGER *)infovalue=0;
+			break;
 		default:
-			debugPrintf("unsupported infotype\n");
+			debugPrintf("unsupported infotype: %d\n",infotype);
 			break;
 	}
 
@@ -4107,45 +4113,49 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	if (attribute==SQL_AUTOCOMMIT) {
-		debugPrintf("attribute: SQL_AUTOCOMMIT\n");
-		// use reinterpret_cast to avoid compiler warnings
-		uint64_t	val=reinterpret_cast<uint64_t>(value);
-		if (val==SQL_AUTOCOMMIT_ON) {
-			if (conn->con->autoCommitOn()) {
-				return SQL_SUCCESS;
-			}
-		} else if (val==SQL_AUTOCOMMIT_OFF) {
-			if (conn->con->autoCommitOff()) {
-				return SQL_SUCCESS;
+	switch (attribute) {
+		case SQL_AUTOCOMMIT:
+		{
+			debugPrintf("attribute: SQL_AUTOCOMMIT\n");
+			// use reinterpret_cast to avoid compiler warnings
+			uint64_t	val=reinterpret_cast<uint64_t>(value);
+			if (val==SQL_AUTOCOMMIT_ON) {
+				if (conn->con->autoCommitOn()) {
+					return SQL_SUCCESS;
+				}
+			} else if (val==SQL_AUTOCOMMIT_OFF) {
+				if (conn->con->autoCommitOff()) {
+					return SQL_SUCCESS;
+				}
 			}
 		}
+
+		// FIXME: implement
+ 		/*case SQL_ACCESS_MODE:
+		case SQL_LOGIN_TIMEOUT:
+		case SQL_OPT_TRACE:
+		case SQL_OPT_TRACEFILE:
+		case SQL_TRANSLATE_DLL:
+		case SQL_TRANSLATE_OPTION:
+		case SQL_TXN_ISOLATION:
+		case SQL_CURRENT_QUALIFIER:
+		case SQL_ODBC_CURSORS:
+		case SQL_QUIET_MODE:
+		case SQL_PACKET_SIZE:
+	#if (ODBCVER >= 0x0300)
+		case SQL_ATTR_CONNECTION_TIMEOUT:
+		case SQL_ATTR_DISCONNECT_BEHAVIOR:
+		case SQL_ATTR_ENLIST_IN_DTC:
+		case SQL_ATTR_ENLIST_IN_XA:
+		case SQL_ATTR_AUTO_IPD:
+		case SQL_ATTR_METADATA_ID:
+	#endif*/
+		default:
+			debugPrintf("unsupported attribute: %d\n",attribute);
+			return SQL_SUCCESS;
 	}
 
-	// FIXME: implement
- 	// SQL_ACCESS_MODE
-	// SQL_LOGIN_TIMEOUT
-	// SQL_OPT_TRACE
-	// SQL_OPT_TRACEFILE
-	// SQL_TRANSLATE_DLL
-	// SQL_TRANSLATE_OPTION
-	// SQL_TXN_ISOLATION
-	// SQL_CURRENT_QUALIFIER
-	// SQL_ODBC_CURSORS
-	// SQL_QUIET_MODE
-	// SQL_PACKET_SIZE
-	// #if (ODBCVER >= 0x0300)
-	// SQL_ATTR_CONNECTION_TIMEOUT
-	// SQL_ATTR_DISCONNECT_BEHAVIOR
-	// SQL_ATTR_ENLIST_IN_DTC
-	// SQL_ATTR_ENLIST_IN_XA
-	// SQL_ATTR_AUTO_IPD
-	// SQL_ATTR_METADATA_ID
-	// #endif
-
-	debugPrintf("unsupported attribute\n");
-
-	return SQL_SUCCESS;
+	return SQL_ERROR;
 }
 
 SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC connectionhandle,
@@ -4255,7 +4265,7 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV environmenthandle,
 			return (val==SQL_CP_MATCH_DEFAULT)?
 						SQL_SUCCESS:SQL_ERROR;
 		default:
-			debugPrintf("unsupported attribute\n");
+			debugPrintf("unsupported attribute: %d\n",attribute);
 			return SQL_SUCCESS;
 	}
 }
@@ -4509,7 +4519,8 @@ SQLRETURN SQL_API SQLSetStmtOption(SQLHSTMT statementhandle,
 					SQLUSMALLINT option,
 					SQLULEN value) {
 	debugFunction();
-	return SQLSetStmtAttr(statementhandle,option,(SQLPOINTER)value,0);
+	return SQLR_SQLSetStmtAttr(statementhandle,option,
+						(SQLPOINTER)value,0);
 }
 
 SQLRETURN SQL_API SQLSpecialColumns(SQLHSTMT statementhandle,
