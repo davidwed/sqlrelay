@@ -48,7 +48,8 @@
 	added support for type, length, precision, scale bind variable
 		attributes in perl DBI
 	output bind clobs and blobs work in perl DBI now
-	added support for perl DBI ParamValues and ParamTypes attributes
+	added support for perl DBI ParamValues, ParamTypes and ParamArrays
+		attributes
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries

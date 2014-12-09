@@ -168,6 +168,14 @@ checkSuccess($rows,2);
 for (my $index=0; $index<2; $index++) {
 	checkSuccess(@tuple_status[$index],1);
 }
+checkSuccess($sth->{ParamArrays}->{1}->[0],5);
+checkSuccess($sth->{ParamArrays}->{1}->[1],6);
+checkSuccess($sth->{ParamArrays}->{2}->[0],"testchar5");
+checkSuccess($sth->{ParamArrays}->{2}->[1],"testchar6");
+checkSuccess($sth->{ParamArrays}->{3}->[0],"testvarchar5");
+checkSuccess($sth->{ParamArrays}->{3}->[1],"testvarchar6");
+checkSuccess($sth->{ParamArrays}->{4}->[0],"01-JAN-2005");
+checkSuccess($sth->{ParamArrays}->{4}->[1],"01-JAN-2006");
 print("\n");
 
 print("BIND PARAM ARRAY: \n");
