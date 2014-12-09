@@ -43,6 +43,8 @@
 	perl DBI fetchall_arrayref work with maxrows parameters now
 	added begin to perl API and implemented begin_work in perl DBI driver
 	implemented perl DBI get_info
+	implemented perl DBI RowCacheSize and RowsInCache
+	implemented an ext_SQLR_Debug database handle attribute for perl DBI
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries

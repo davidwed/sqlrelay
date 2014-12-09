@@ -3,9 +3,9 @@
 # Copyright (c) 2001  David Muse
 # See the file COPYING for more information.
 
-
 use DBI;
 use DBI::Const::GetInfoType;
+use Data::Dumper;
 
 sub checkUndef {
 
@@ -61,7 +61,9 @@ sub checkSuccessString {
 
 
 # instantiation
-my $dsn="DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/test.socket;debug=0";
+my $prefix="DBI:SQLRelay:";
+my $connectstring="host=localhost;port=9000;socket=/tmp/test.socket;debug=0";
+my $dsn=$prefix.$connectstring;
 
 # parse dsn
 print("PARSE DSN: \n");
@@ -71,19 +73,21 @@ checkSuccess($driver,"SQLRelay");
 checkSuccess($attr_string,"AutoCommit=>0,PrintError=>0");
 checkSuccess($attr_hash->{AutoCommit},0);
 checkSuccess($attr_hash->{PrintError},0);
-checkSuccess($driver_dsn,"host=localhost;port=9000;socket=/tmp/test.socket;debug=0");
+checkSuccess($driver_dsn,$connectstring);
 print("\n");
 
 # connect
 print("CONNECT: \n");
-my $dbh=DBI->connect("DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/test.socket;debug=0","test","test",{AutoCommit=>0,PrintError=>0}) or die DBI->errstr;
+my $dbh=DBI->connect($dsn,"test","test",{AutoCommit=>0,PrintError=>0}) or die DBI->errstr;
 checkSuccessString($dbh->{Type},"db");
 checkDefined($dbh);
 $dbh->disconnect();
 $ENV{"DBI_DSN"} = $dsn;
 my $dbh=DBI->connect(undef,"test","test",{AutoCommit=>0,PrintError=>0}) or die DBI->errstr;
 checkDefined($dbh);
+checkSuccessString($dbh->{Name},$connectstring);
 print("\n");
+
 
 # ping
 print("PING: \n");
@@ -95,8 +99,10 @@ $dbh->do("drop table testtable");
 
 print("CREATE TEMPTABLE: \n");
 $dbh->{Executed}=0;
-checkSuccessString($dbh->do("create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date)"),"0E0");
+my $stmt="create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date)";
+checkSuccessString($dbh->do($stmt),"0E0");
 checkSuccess($dbh->{Executed},1);
+checkSuccessString($dbh->{Statement},$stmt);
 print("\n");
 
 print("INSERT and AFFECTED ROWS: \n");
@@ -520,7 +526,7 @@ checkSuccessString($$rows[6][1],"testchar7                               ");
 print("\n");
 
 print("COMMIT AND ROLLBACK: \n");
-my $dbh2=DBI->connect("DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/test.socket;debug=0","test","test",{AutoCommit=>0}) or die DBI->errstr;
+my $dbh2=DBI->connect($dsn,"test","test",{AutoCommit=>0}) or die DBI->errstr;
 my @row=$dbh2->selectrow_array("select count(*) from testtable");
 checkSuccess($row[0],0);
 checkSuccess($dbh->{Executed},1);
@@ -544,6 +550,51 @@ checkSuccess($dbh->rollback(),1);
 checkSuccess($dbh->{Executed},0);
 my @row=$dbh2->selectrow_array("select count(*) from testtable");
 checkSuccess($row[0],10);
+print("\n");
+
+# row cache size
+print("ROW CACHE SIZE: \n");
+checkUndef($dbh->{RowCacheSize});
+$sth=$dbh->prepare("select * from testtable order by testnumber");
+checkSuccessString($sth->execute(),"0E0");
+checkSuccess($sth->{RowsInCache},10);
+for (my $i=10; $i>0; $i--) {
+	@row=$sth->fetchrow_array();
+	checkSuccess($sth->{RowsInCache},$i-1);
+}
+print("\n");
+$dbh->{RowCacheSize}=0;
+$sth=$dbh->prepare("select * from testtable order by testnumber");
+checkSuccessString($sth->execute(),"0E0");
+checkSuccess($sth->{RowsInCache},10);
+for (my $i=10; $i>0; $i--) {
+	@row=$sth->fetchrow_array();
+	checkSuccess($sth->{RowsInCache},$i-1);
+}
+print("\n");
+$dbh->{RowCacheSize}=-1;
+$sth=$dbh->prepare("select * from testtable order by testnumber");
+checkSuccessString($sth->execute(),"0E0");
+checkSuccess($sth->{RowsInCache},10);
+for (my $i=10; $i>0; $i--) {
+	@row=$sth->fetchrow_array();
+	checkSuccess($sth->{RowsInCache},$i-1);
+}
+print("\n");
+$dbh->{RowCacheSize}=1;
+$sth=$dbh->prepare("select * from testtable order by testnumber");
+checkSuccessString($sth->execute(),"0E0");
+checkSuccess($sth->{RowsInCache},1);
+for (my $i=10; $i>0; $i--) {
+	@row=$sth->fetchrow_array();
+	checkSuccess($sth->{RowsInCache},0);
+}
+print("\n");
+$dbh->{RowCacheSize}=10;
+$sth=$dbh->prepare("select * from testtable order by testnumber");
+checkSuccessString($sth->execute(),"0E0");
+@rows=@{$sth->fetchall_arrayref()};
+checkSuccess($#rows+1,10);
 print("\n");
 
 # lots of rows
@@ -617,6 +668,17 @@ checkSuccessString($dbh->get_info($GetInfoType{SQL_USER_NAME}),"test");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_IDENTIFIER_QUOTE_CHAR}),"\"");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_CATALOG_NAME_SEPARATOR}),"@");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_CATALOG_LOCATION}),2);
+print("\n");
+
+# quote
+print("QUOTE: \n");
+checkSuccessString($dbh->quote("don't"),"'don''t'");
+checkSuccessString($dbh->quote("don't",SQL_CHAR),"'don''t'");
+checkSuccessString($dbh->quote("don't",SQL_VARCHAR),"'don''t'");
+checkSuccessString($dbh->quote("123",SQL_INTEGER),"'123'");
+print("\n");
+checkSuccessString($dbh->quote_identifier("mytable"),"\"mytable\"");
+checkSuccessString($dbh->quote_identifier("mycatalog","myschema","mytable"),"\"myschema\".\"mytable\"\@\"mycatalog\"");
 print("\n");
 
 # invalid queries...
