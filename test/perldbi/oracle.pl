@@ -80,6 +80,7 @@ print("\n");
 print("CONNECT: \n");
 my $dbh=DBI->connect($dsn,"test","test",{AutoCommit=>0,PrintError=>0}) or die DBI->errstr;
 checkSuccessString($dbh->{Type},"db");
+checkSuccessString($dbh->{Username},"test");
 checkDefined($dbh);
 $dbh->disconnect();
 $ENV{"DBI_DSN"} = $dsn;
@@ -132,10 +133,10 @@ checkSuccess($sth->rows(),1);
 print("\n");
 
 print("BIND PARAM BY POSITION: \n");
-$sth->bind_param(1,4);
-$sth->bind_param(2,"testchar4");
-$sth->bind_param(3,"testvarchar4");
-$sth->bind_param(4,"01-JAN-2004");
+$sth->bind_param(1,4,SQL_INTEGER);
+$sth->bind_param(2,"testchar4",SQL_CHAR);
+$sth->bind_param(3,"testvarchar4",{type=>SQL_VARCHAR,length=>12});
+$sth->bind_param(4,"01-JAN-2004",{type=>SQL_DATETIME});
 checkSuccess($sth->execute(),1);
 print("\n");
 
@@ -643,6 +644,12 @@ my $sth=$dbh->prepare("insert into testtable values (:var1,:var2)");
 $sth->bind_param("var1","testclob",DBD::SQLRelay::SQL_CLOB);
 $sth->bind_param("var2","testblob",{type=>DBD::SQLRelay::SQL_BLOB,length=>8});
 checkSuccess($sth->execute(),1);
+$sth=$dbh->prepare("begin select testclob into :clobvar from testtable;  select testblob into :blobvar from testtable; end;");
+$sth->bind_param_inout("clobvar",\$testclob,undef,DBD::SQLRelay::SQL_CLOB);
+$sth->bind_param_inout("blobvar",\$testblob,undef,DBD::SQLRelay::SQL_BLOB);
+checkSuccess($sth->execute(),1);
+checkSuccessString($testclob,"testclob");
+checkSuccessString($testblob,"testblob");
 $dbh->do("drop table testtable");
 print("\n");
 

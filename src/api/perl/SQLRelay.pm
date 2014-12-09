@@ -389,64 +389,67 @@ package DBD::SQLRelay::st;
 $DBD::SQLRelay::st::imp_data_size=0;
 
 sub bind_param {
+
 	# get parameters
 	my ($sth,$param,$val,$attr)=@_;
 
-	# bind any variables/values that were passed in
-	my $cursor=$sth->FETCH('driver_cursor');
-	my $dbh=$sth->{'Database'};
-
+	# determine type, length, precision, scale...
+	my $type;
+	my $length;
+	my $precision;
+	my $scale;
 	if ($attr) {
-	
 		if (!ref($attr)) {
-
-			if ($attr eq 'DBD::SQLRelay::SQL_CLOB') { 
-				$cursor->inputBindClob($param, $val, length($val)); 
-				return 1; 
-			}
-			elsif ($attr eq 'DBD::SQLRelay::SQL_BLOB') { 
-				$cursor->inputBindBlob($param, $val, length($val)); 
-				return 1; 
-			}
-			return $dbh->DBI::set_err(1,'bind_param: type '.$attr.' is not supported.');
-
-		} elsif (ref $attr eq 'HASH' && ($attr->{type} || $attr->{Type} || $attr->{TYPE}))  {
-			my $length=$attr->{length} || length $val;
-			if ($attr->{type} eq 'DBD::SQLRelay::SQL_CLOB') {
-
-				$cursor->inputBindClob($param, $val, $length);	
-			} elsif ($attr->{type} eq 'DBD::SQLRelay::SQL_BLOB') {
-
-				$cursor->inputBindBlob($param, $val, $length);	
-			} else {
-
-		        	return $dbh->DBI::set_err(1, 'bind_param: type '.$attr->{type}.' is not supported.');
-			}	
-						
-		} else {
-
-		        return $dbh->DBI::set_err(1,'when specifying binding attributes, you must specify at least \'type\'');	
-
+			$type=$attr;
+		} elsif (ref($attr) eq 'HASH') {
+			$type=$attr->{type} || $attr->{Type} || $attr->{TYPE};
+			$length=$attr->{length};
+			$precision=$attr->{precision};
+			$scale=$attr->{scale};
 		}
-	} else {
-
-		# bind any variables/values that were passed in
-		$cursor->inputBind($param, $val, 0, 6);
-
+	}
+	if (!defined($length)) {
+		$length=length($val);
 	}
 
+	# bind the parameter
+	my $cursor=$sth->FETCH('driver_cursor');
+	if ($type eq 'DBD::SQLRelay::SQL_CLOB') {
+		$cursor->inputBindClob($param,$val,$length);
+	} elsif ($type eq 'DBD::SQLRelay::SQL_BLOB') {
+		$cursor->inputBindBlob($param,$val,$length);
+	} elsif (defined($precision) && defined($scale)) {
+		$cursor->inputBind($param,$val,$precision,$scale);
+	} else {
+		$cursor->inputBind($param,$val,$length);
+	}
 	return 1;
 }
 
 sub bind_param_inout {
 
 	# get parameters
-	my ($sth,$param,$variable,$attr)=@_;
+	my ($sth,$param,$variable,$maxlen,$attr)=@_;
 
-	# bind any variables that were passed in
+	# determine type, length, precision, scale...
+	my $type;
+	if ($attr) {
+		if (!ref($attr)) {
+			$type=$attr;
+		} elsif (ref($attr) eq 'HASH') {
+			$type=$attr->{type} || $attr->{Type} || $attr->{TYPE};
+		}
+	}
+
+	# bind the parameter
 	my $cursor=$sth->FETCH('driver_cursor');
-	# FIXME: support integer/double/blob/clob's
-	$cursor->defineOutputBindString($param,$attr);
+	if ($type eq 'DBD::SQLRelay::SQL_CLOB') {
+		$cursor->defineOutputBindClob($param);
+	} elsif ($type eq 'DBD::SQLRelay::SQL_BLOB') {
+		$cursor->defineOutputBindBlob($param);
+	} else {
+		$cursor->defineOutputBindString($param,$maxlen);
+	}
 
 	# store the parameter name in the list of inout parameters
 	my $param_inout_list=$sth->FETCH('driver_param_inout_list');
@@ -455,6 +458,9 @@ sub bind_param_inout {
 
 	# store the variable so data can be fetched into it later
 	$sth->STORE('driver_param_inout_'.$param,$variable);
+
+	# store the variable type
+	$sth->STORE('driver_param_inout_type_'.$param,$type);
 
 	return 1;
 }
@@ -518,8 +524,14 @@ sub execute {
 	my $param;
 	foreach $param(@param_inout_array) {
 		my $variable=$sth->FETCH('driver_param_inout_'.$param);
-		# FIXME: support integer/double/blob/clob's
-		$$variable=$cursor->getOutputBindString($param);
+		my $type=$sth->FETCH('driver_param_inout_type_'.$param);
+		if ($type eq 'DBD::SQLRelay::SQL_CLOB') {
+			$$variable=$cursor->getOutputBindClob($param);
+		} elsif ($type eq 'DBD::SQLRelay::SQL_BLOB') {
+			$$variable=$cursor->getOutputBindBlob($param);
+		} else {
+			$$variable=$cursor->getOutputBindString($param);
+		}
 	}
 
 	# mark this statement Active

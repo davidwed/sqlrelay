@@ -45,6 +45,9 @@
 	implemented perl DBI get_info
 	implemented perl DBI RowCacheSize and RowsInCache
 	implemented an ext_SQLR_Debug database handle attribute for perl DBI
+	added support for type, length, precision, scale bind variable
+		attributes in perl DBI
+	output bind clobs and blobs work in perl DBI now
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries
