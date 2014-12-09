@@ -100,7 +100,7 @@ $dbh->do("drop table testtable");
 
 print("CREATE TEMPTABLE: \n");
 $dbh->{Executed}=0;
-my $stmt="create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date)";
+my $stmt="create table testtable (testnumber number not null, testchar char(40), testvarchar varchar2(40), testdate date)";
 checkSuccessString($dbh->do($stmt),"0E0");
 checkSuccess($dbh->{Executed},1);
 checkSuccessString($dbh->{Statement},$stmt);
@@ -116,8 +116,10 @@ print("\n");
 
 print("EXECUTE WITH BIND VALUES: \n");
 $dbh->{Executed}=0;
-my $sth=$dbh->prepare("insert into testtable values (:var1,:var2,:var3,:var4)");
+$stmt="insert into testtable values (:var1,:var2,:var3,:var4)";
+my $sth=$dbh->prepare($stmt);
 checkSuccessString($sth->{Type},"st");
+checkSuccessString($sth->{Statement},$stmt);
 checkSuccess($dbh->{Kids},1);
 checkSuccess($dbh->{ActiveKids},0);
 checkSuccess($sth->{Active},0);
@@ -137,6 +139,14 @@ $sth->bind_param(1,4,SQL_INTEGER);
 $sth->bind_param(2,"testchar4",SQL_CHAR);
 $sth->bind_param(3,"testvarchar4",{type=>SQL_VARCHAR,length=>12});
 $sth->bind_param(4,"01-JAN-2004",{type=>SQL_DATETIME});
+checkSuccess($sth->{ParamValues}->{1},4);
+checkSuccess($sth->{ParamValues}->{2},"testchar4");
+checkSuccess($sth->{ParamValues}->{3},"testvarchar4");
+checkSuccess($sth->{ParamValues}->{4},"01-JAN-2004");
+checkSuccess($sth->{ParamTypes}->{"var1"},"SQL_INTEGER");
+checkSuccess($sth->{ParamTypes}->{"var2"},"SQL_CHAR");
+checkSuccess($sth->{ParamTypes}->{"var3"},"SQL_VARCHAR");
+checkSuccess($sth->{ParamTypes}->{"var4"},"SQL_DATETIME");
 checkSuccess($sth->execute(),1);
 print("\n");
 
@@ -178,6 +188,14 @@ $sth->bind_param("var1",9);
 $sth->bind_param("var2","testchar9");
 $sth->bind_param("var3","testvarchar9");
 $sth->bind_param("var4","01-JAN-2009");
+checkSuccess($sth->{ParamValues}->{"var1"},9);
+checkSuccess($sth->{ParamValues}->{"var2"},"testchar9");
+checkSuccess($sth->{ParamValues}->{"var3"},"testvarchar9");
+checkSuccess($sth->{ParamValues}->{"var4"},"01-JAN-2009");
+checkSuccess($sth->{ParamTypes}->{"var1"},"SQL_VARCHAR");
+checkSuccess($sth->{ParamTypes}->{"var2"},"SQL_VARCHAR");
+checkSuccess($sth->{ParamTypes}->{"var3"},"SQL_VARCHAR");
+checkSuccess($sth->{ParamTypes}->{"var4"},"SQL_VARCHAR");
 checkSuccess($sth->execute(),1);
 print("\n");
 
@@ -258,6 +276,27 @@ checkSuccessString($sth->{NAME_uc_hash}->{TESTNUMBER},0);
 checkSuccessString($sth->{NAME_uc_hash}->{TESTCHAR},1);
 checkSuccessString($sth->{NAME_uc_hash}->{TESTVARCHAR},2);
 checkSuccessString($sth->{NAME_uc_hash}->{TESTDATE},3);
+print("\n");
+
+print("PRECISION: \n");
+checkSuccessString($sth->{PRECISION}->[0],0);
+checkSuccessString($sth->{PRECISION}->[1],0);
+checkSuccessString($sth->{PRECISION}->[2],0);
+checkSuccessString($sth->{PRECISION}->[3],0);
+print("\n");
+
+print("SCALE: \n");
+checkSuccessString($sth->{SCALE}->[0],129);
+checkSuccessString($sth->{SCALE}->[1],0);
+checkSuccessString($sth->{SCALE}->[2],0);
+checkSuccessString($sth->{SCALE}->[3],0);
+print("\n");
+
+print("NULLABLE: \n");
+checkSuccessString($sth->{NULLABLE}->[0],0);
+checkSuccessString($sth->{NULLABLE}->[1],1);
+checkSuccessString($sth->{NULLABLE}->[2],1);
+checkSuccessString($sth->{NULLABLE}->[3],1);
 print("\n");
 
 #print("TYPE INFO ALL: \n");
@@ -618,16 +657,14 @@ print("\n");
 # null binds
 print("NULL BINDS: \n");
 $dbh->do("delete from testtable");
-$sth=$dbh->prepare("insert into testtable values (:var1,:var2,:var3,:var4)");
+$sth=$dbh->prepare("insert into testtable values (1,:var2,:var3,:var4)");
 $sth->bind_param(1,undef);
 $sth->bind_param(2,undef);
 $sth->bind_param(3,undef);
-$sth->bind_param(4,undef);
 checkSuccess($sth->execute(),1);
 $sth=$dbh->prepare("select * from testtable order by testnumber");
 checkSuccessString($sth->execute(),"0E0");
 @fields=$sth->fetchrow_array;
-checkUndef($fields[0]);
 checkUndef($fields[1]);
 checkUndef($fields[2]);
 checkUndef($fields[3]);

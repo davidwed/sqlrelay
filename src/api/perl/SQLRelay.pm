@@ -319,6 +319,7 @@ sub STORE {
 		return 1;
 	} elsif ($attr eq 'RowCacheSize') {
 		$dbh->{'driver_RowCacheSize'}=$val;
+		return 1;
 	} elsif ($attr =~ /^ext_SQLR_Debug$/) {
 		my $connection=$dbh->FETCH('driver_connection');
 		if ($val==1) {
@@ -423,6 +424,19 @@ sub bind_param {
 	} else {
 		$cursor->inputBind($param,$val,$length);
 	}
+
+	# update ParamValues, ParamTypes
+	if (!$sth->FETCH('ParamValues')) {
+		$sth->STORE('ParamValues',{});
+	}
+	$sth->FETCH('ParamValues')->{$param}=$val;
+	if (!defined($type)) {
+		$type='SQL_VARCHAR';
+	}
+	if (!$sth->FETCH('ParamTypes')) {
+		$sth->STORE('ParamTypes',{});
+	}
+	$sth->FETCH('ParamTypes')->{$param}=$type;
 	return 1;
 }
 
@@ -507,11 +521,17 @@ sub execute {
 	my $rowcount=$cursor->rowCount();
 	my @colnames=map {$cursor->getColumnName($_)} (0..$colcount-1);
 	my @coltypes=map {$cursor->getColumnType($_)} (0..$colcount-1);
+	my @colprecision=map {$cursor->getColumnPrecision($_)} (0..$colcount-1);
+	my @colscale=map {$cursor->getColumnScale($_)} (0..$colcount-1);
+	my @colnullable=map {$cursor->getColumnIsNullable($_)} (0..$colcount-1);
  	if (!$sth->FETCH('NUM_OF_FIELDS')) {
  		$sth->STORE('NUM_OF_FIELDS',$colcount);
  	}
 	$sth->{NAME}=\@colnames;
 	$sth->{TYPE}=\@coltypes;
+	$sth->{PRECISION}=\@colprecision;
+	$sth->{SCALE}=\@colscale;
+	$sth->{NULLABLE}=\@colnullable;
 	$sth->STORE('driver_FETCHED_ROWS',0);
 	$sth->STORE('driver_RowsInCache',$cursor->rowCount());
 
@@ -619,9 +639,15 @@ sub STORE {
 		my $cursor=$sth->FETCH('driver_cursor');
 		$cursor->setResultSetBufferSize($val);
 		return 1;
-	}
-	elsif ($attr eq 'RowsInCache') {
+	} elsif ($attr eq 'RowsInCache') {
 		$sth->{'driver_RowsInCache'}=$val;
+		return 1;
+	} elsif ($attr eq 'ParamValues') {
+		$sth->{'driver_ParamValues'}=$val;
+		return 1;
+	} elsif ($attr eq 'ParamTypes') {
+		$sth->{'driver_ParamTypes'}=$val;
+		return 1;
 	}
 
 	# handle all other cases
@@ -644,9 +670,12 @@ sub FETCH {
 	if ($attr =~ /^ext_SQLR_BufferSize$/) {
 		my $cursor=$sth->FETCH('driver_cursor');
 		return $cursor->getResultSetBufferSize();
-	}
-	elsif ($attr eq 'RowsInCache') {
+	} elsif ($attr eq 'RowsInCache') {
 		return $sth->{'driver_RowsInCache'};
+	} elsif ($attr eq 'ParamValues') {
+		return $sth->{'driver_ParamValues'};
+	} elsif ($attr eq 'ParamTypes') {
+		return $sth->{'driver_ParamTypes'};
 	}
 
 	# handle all other cases
@@ -655,7 +684,7 @@ sub FETCH {
 	}
 
 	# if the attribute didn't start with 'driver_' 
-	# then pass it up to the DBI class
+	# then pass it up to the parent class
 	$sth->SUPER::FETCH($attr);
 }
 
