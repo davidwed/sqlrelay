@@ -193,6 +193,11 @@ if ($DBI::VERSION>=1.22) {
 		checkSuccess(@tuple_status[$index],1);
 	}
 	print("\n");
+} else {
+	$dbh->do("insert into testtable values (5,'testchar5','testvarchar5','01-JAN-2005')");
+	$dbh->do("insert into testtable values (6,'testchar6','testvarchar6','01-JAN-2006')");
+	$dbh->do("insert into testtable values (7,'testchar7','testvarchar7','01-JAN-2007')");
+	$dbh->do("insert into testtable values (8,'testchar8','testvarchar8','01-JAN-2008')");
 }
 
 print("BIND BY NAME: \n");
