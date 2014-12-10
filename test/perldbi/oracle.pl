@@ -180,20 +180,20 @@ if ($DBI::VERSION>=1.22) {
 	checkSuccess($sth->{ParamArrays}->{4}->[0],"01-JAN-2005");
 	checkSuccess($sth->{ParamArrays}->{4}->[1],"01-JAN-2006");
 	print("\n");
-}
 
-print("BIND PARAM ARRAY: \n");
-$sth->bind_param_array(1,[7,8]);
-$sth->bind_param_array(2,["testchar7","testchar8"]);
-$sth->bind_param_array(3,["testvarchar7","testvarchar8"]);
-$sth->bind_param_array(4,["01-JAN-2007","01-JAN-2008"]);
-my ($tuples,$rows)=$sth->execute_array({ ArrayTupleStatus=>\my @tuple_status });
-checkSuccess($tuples,2);
-checkSuccess($rows,2);
-for (my $index=0; $index<2; $index++) {
-	checkSuccess(@tuple_status[$index],1);
+	print("BIND PARAM ARRAY: \n");
+	$sth->bind_param_array(1,[7,8]);
+	$sth->bind_param_array(2,["testchar7","testchar8"]);
+	$sth->bind_param_array(3,["testvarchar7","testvarchar8"]);
+	$sth->bind_param_array(4,["01-JAN-2007","01-JAN-2008"]);
+	my ($tuples,$rows)=$sth->execute_array({ ArrayTupleStatus=>\my @tuple_status });
+	checkSuccess($tuples,2);
+	checkSuccess($rows,2);
+	for (my $index=0; $index<2; $index++) {
+		checkSuccess(@tuple_status[$index],1);
+	}
+	print("\n");
 }
-print("\n");
 
 print("BIND BY NAME: \n");
 $sth->bind_param("var1",9);
