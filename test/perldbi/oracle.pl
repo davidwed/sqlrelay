@@ -188,7 +188,7 @@ if ($DBI::VERSION>=1.22) {
 	$sth->bind_param_array(4,["01-JAN-2007","01-JAN-2008"]);
 	my ($tuples,$rows)=$sth->execute_array({ ArrayTupleStatus=>\my @tuple_status });
 	checkSuccess($tuples,2);
-	checkSuccess($rows,2);
+	checkSuccess($rows,2) if ($DBI::VERSION>=1.60);
 	for (my $index=0; $index<2; $index++) {
 		checkSuccess(@tuple_status[$index],1);
 	}
