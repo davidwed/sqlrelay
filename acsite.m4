@@ -3238,6 +3238,14 @@ AC_DEFUN([FW_CHECK_PHP_PDO],
 		FW_TRY_COMPILE([#include <php.h>
 #include <pdo/php_pdo.h>
 #include <pdo/php_pdo_driver.h>],[pdo_attribute_type a=PDO_ATTR_EMULATE_PREPARES;],[$PHPINCLUDES],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_PHP_PDO_ATTR_EMULATE_PREPARES,1,Some versions of PHP PDO have PDO::ATTR_EMULATE_PREPARES)],[AC_MSG_RESULT(no)])
+
+		AC_MSG_CHECKING(for const zend_function_entry)
+		FW_TRY_COMPILE([#include <php.h>
+#include <pdo/php_pdo.h>
+#include <pdo/php_pdo_driver.h>
+static const zend_function_entry *test(pdo_dbh_t *dbh, int kind TSRMLS_DC) { return 0; }
+static struct pdo_dbh_methods methods={ 0,0,0,0,0,0,0,0,0,0,0,0,test };
+],[],[$PHPINCLUDES],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_PHP_PDO_CONST_ZEND_FUNCTION_ENTRY,1,Some versions of PHP PDO don't support const zend_function_entry)],[AC_MSG_RESULT(no)])
 	fi
 ])
 

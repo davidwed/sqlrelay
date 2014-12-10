@@ -123,6 +123,9 @@
 /* Some versions of PHP PDO have PDO::ATTR_EMULATE_PREPARES */
 #undef HAVE_PHP_PDO_ATTR_EMULATE_PREPARES
 
+/* Some versions of PHP PDO don't support const zend_function_entry */
+#undef HAVE_PHP_PDO_CONST_ZEND_FUNCTION_ENTRY
+
 /* Some versions of postgresql have PQbinaryTuples */
 #undef HAVE_POSTGRESQL_PQBINARYTUPLES
 

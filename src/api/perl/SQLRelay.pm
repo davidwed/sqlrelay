@@ -75,7 +75,6 @@ sub connect {
 			$var=$1;
 			$val=$2;
 			$dsn{$var}=$val;
-			# FIXME: lowercase attributes will be ignored by STORE
 			$dbh->STORE($var,$val);
 		}
 	}

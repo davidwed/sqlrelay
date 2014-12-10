@@ -1168,7 +1168,11 @@ static zend_function_entry sqlrelayCursorFunctions[] = {
 #endif
 };
 
-static const zend_function_entry *sqlrelayGetDriverMethods(pdo_dbh_t *dbh,
+static
+#ifdef HAVE_PHP_PDO_CONST_ZEND_FUNCTION_ENTRY
+const
+#endif
+zend_function_entry *sqlrelayGetDriverMethods(pdo_dbh_t *dbh,
 							int kind TSRMLS_DC) {
 	switch (kind) {
 		case PDO_DBH_DRIVER_METHOD_KIND_DBH:
