@@ -122,12 +122,16 @@ $stmt="insert into testtable values (:var1,:var2,:var3,:var4)";
 my $sth=$dbh->prepare($stmt);
 checkSuccessString($sth->{Type},"st");
 checkSuccessString($sth->{Statement},$stmt);
-checkSuccess($dbh->{Kids},1);
-checkSuccess($dbh->{ActiveKids},0);
+if ($DBI::VERSION>1.40) {
+	checkSuccess($dbh->{Kids},1);
+	checkSuccess($dbh->{ActiveKids},0);
+}
 checkSuccess($sth->{Active},0);
 checkSuccess($sth->execute(3,"testchar3","testvarchar3","01-JAN-2003"),1);
 checkSuccess($sth->{Active},1);
-checkSuccess($dbh->{ActiveKids},1);
+if ($DBI::VERSION>1.40) {
+	checkSuccess($dbh->{ActiveKids},1);
+}
 checkSuccess($sth->{Executed},1) if ($DBI::VERSION>=1.41);
 checkSuccess($dbh->{Executed},1) if ($DBI::VERSION>=1.41);
 print("\n");
