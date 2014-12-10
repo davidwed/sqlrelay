@@ -167,7 +167,7 @@ if ($DBI::VERSION>=1.22) {
 	checkSuccess($sth->{Executed},1) if ($DBI::VERSION>=1.41);
 	checkSuccess($dbh->{Executed},1) if ($DBI::VERSION>=1.41);
 	checkSuccess($tuples,2);
-	checkSuccess($rows,2);
+	checkSuccess($rows,2) if ($DBI::VERSION>=1.60);
 	for (my $index=0; $index<2; $index++) {
 		checkSuccess(@tuple_status[$index],1);
 	}
