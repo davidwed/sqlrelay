@@ -82,7 +82,9 @@ if ($DBI::VERSION>=1.43) {
 print("CONNECT: \n");
 my $dbh=DBI->connect($dsn,"test","test",{AutoCommit=>0,PrintError=>0}) or die DBI->errstr;
 checkSuccessString($dbh->{Type},"db");
-checkSuccessString($dbh->{Username},"test") if ($DBI::VERSION>=1.40);
+if ($DBI::VERSION>=1.40) {
+	checkSuccessString($dbh->{Username},"test");
+}
 checkDefined($dbh);
 $dbh->disconnect();
 $ENV{"DBI_DSN"}=$dsn;
@@ -101,10 +103,14 @@ print("\n");
 $dbh->do("drop table testtable");
 
 print("CREATE TEMPTABLE: \n");
-$dbh->{Executed}=0 if ($DBI::VERSION>=1.41);
+if ($DBI::VERSION>=1.41) {
+	$dbh->{Executed}=0;
+}
 my $stmt="create table testtable (testnumber number not null, testchar char(40), testvarchar varchar2(40), testdate date)";
 checkSuccessString($dbh->do($stmt),"0E0");
-checkSuccess($dbh->{Executed},1) if ($DBI::VERSION>=1.41);
+if ($DBI::VERSION>=1.41) {
+	checkSuccess($dbh->{Executed},1);
+}
 checkSuccessString($dbh->{Statement},$stmt);
 print("\n");
 
@@ -124,15 +130,13 @@ $stmt="insert into testtable values (:var1,:var2,:var3,:var4)";
 my $sth=$dbh->prepare($stmt);
 checkSuccessString($sth->{Type},"st");
 checkSuccessString($sth->{Statement},$stmt);
-if ($DBI::VERSION>1.41) {
-	checkSuccess($dbh->{Kids},1);
-	checkSuccess($dbh->{ActiveKids},0);
-}
+checkSuccess($dbh->{Kids},1);
+checkSuccess($dbh->{ActiveKids},0);
 checkSuccess($sth->{Active},0);
 checkSuccess($sth->execute(3,"testchar3","testvarchar3","01-JAN-2003"),1);
 checkSuccess($sth->{Active},1);
+checkSuccess($dbh->{ActiveKids},1);
 if ($DBI::VERSION>1.41) {
-	checkSuccess($dbh->{ActiveKids},1);
 	checkSuccess($sth->{Executed},1);
 	checkSuccess($dbh->{Executed},1);
 }
@@ -168,12 +172,18 @@ if ($DBI::VERSION>=1.22) {
 	@var2s=("testchar5","testchar6");
 	@var3s=("testvarchar5","testvarchar6");
 	@var4s=("01-JAN-2005","01-JAN-2006");
-	$dbh->{Executed}=0 if ($DBI::VERSION>=1.41);
+	if ($DBI::VERSION>=1.41) {
+		$dbh->{Executed}=0;
+	}
 	my ($tuples,$rows)=$sth->execute_array({ ArrayTupleStatus=>\my @tuple_status },\@var1s,\@var2s,\@var3s,\@var4s);
-	checkSuccess($sth->{Executed},1) if ($DBI::VERSION>=1.41);
-	checkSuccess($dbh->{Executed},1) if ($DBI::VERSION>=1.41);
+	if ($DBI::VERSION>=1.41) {
+		checkSuccess($sth->{Executed},1);
+		checkSuccess($dbh->{Executed},1);
+	}
 	checkSuccess($tuples,2);
-	checkSuccess($rows,2) if ($DBI::VERSION>=1.60);
+	if ($DBI::VERSION>=1.60) {
+		checkSuccess($rows,2);
+	}
 	for (my $index=0; $index<2; $index++) {
 		checkSuccess(@tuple_status[$index],1);
 	}
@@ -194,7 +204,9 @@ if ($DBI::VERSION>=1.22) {
 	$sth->bind_param_array(4,["01-JAN-2007","01-JAN-2008"]);
 	my ($tuples,$rows)=$sth->execute_array({ ArrayTupleStatus=>\my @tuple_status });
 	checkSuccess($tuples,2);
-	checkSuccess($rows,2) if ($DBI::VERSION>=1.60);
+	if ($DBI::VERSION>=1.60) {
+		checkSuccess($rows,2);
+	}
 	for (my $index=0; $index<2; $index++) {
 		checkSuccess(@tuple_status[$index],1);
 	}
@@ -592,9 +604,13 @@ print("COMMIT AND ROLLBACK: \n");
 my $dbh2=DBI->connect($dsn,"test","test",{AutoCommit=>0}) or die DBI->errstr;
 my @row=$dbh2->selectrow_array("select count(*) from testtable");
 checkSuccess($row[0],0);
-checkSuccess($dbh->{Executed},1) if ($DBI::VERSION>=1.41);
+if ($DBI::VERSION>=1.41) {
+	checkSuccess($dbh->{Executed},1);
+}
 checkSuccess($dbh->commit(),1);
-checkSuccess($dbh->{Executed},0) if ($DBI::VERSION>=1.41);
+if ($DBI::VERSION>=1.41) {
+	checkSuccess($dbh->{Executed},0);
+}
 @row=$dbh2->selectrow_array("select count(*) from testtable");
 checkSuccess($row[0],9);
 $dbh->{AutoCommit}=1;
@@ -608,9 +624,13 @@ my @row=$dbh->selectrow_array("select count(*) from testtable");
 checkSuccess($row[0],11);
 my @row=$dbh2->selectrow_array("select count(*) from testtable");
 checkSuccess($row[0],10);
-checkSuccess($dbh->{Executed},1) if ($DBI::VERSION>=1.41);
+if ($DBI::VERSION>=1.41) {
+	checkSuccess($dbh->{Executed},1);
+}
 checkSuccess($dbh->rollback(),1);
-checkSuccess($dbh->{Executed},0) if ($DBI::VERSION>=1.41);
+if ($DBI::VERSION>=1.41) {
+	checkSuccess($dbh->{Executed},0);
+}
 my @row=$dbh2->selectrow_array("select count(*) from testtable");
 checkSuccess($row[0],10);
 print("\n");
