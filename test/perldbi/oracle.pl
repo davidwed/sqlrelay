@@ -62,28 +62,30 @@ sub checkSuccessString {
 
 # instantiation
 my $prefix="DBI:SQLRelay:";
-my $connectstring="host=localhost;port=9000;socket=/tmp/test.socket;debug=0";
+my $connectstring="host=fedora;port=9000;socket=/tmp/test.socket;debug=0";
 my $dsn=$prefix.$connectstring;
 
 # parse dsn
-print("PARSE DSN: \n");
-my ($scheme,$driver,$attr_string,$attr_hash,$driver_dsn)=DBI->parse_dsn($dsn);
-checkSuccess($scheme,"DBI");
-checkSuccess($driver,"SQLRelay");
-checkSuccess($attr_string,"AutoCommit=>0,PrintError=>0");
-checkSuccess($attr_hash->{AutoCommit},0);
-checkSuccess($attr_hash->{PrintError},0);
-checkSuccess($driver_dsn,$connectstring);
-print("\n");
+if ($DBI::VERSION>=1.43) {
+	print("PARSE DSN: \n");
+	my ($scheme,$driver,$attr_string,$attr_hash,$driver_dsn)=DBI->parse_dsn($dsn);
+	checkSuccess($scheme,"DBI");
+	checkSuccess($driver,"SQLRelay");
+	checkSuccess($attr_string,"AutoCommit=>0,PrintError=>0");
+	checkSuccess($attr_hash->{AutoCommit},0);
+	checkSuccess($attr_hash->{PrintError},0);
+	checkSuccess($driver_dsn,$connectstring);
+	print("\n");
+}
 
 # connect
 print("CONNECT: \n");
 my $dbh=DBI->connect($dsn,"test","test",{AutoCommit=>0,PrintError=>0}) or die DBI->errstr;
 checkSuccessString($dbh->{Type},"db");
-checkSuccessString($dbh->{Username},"test");
+checkSuccessString($dbh->{Username},"test") if ($DBI::VERSION>=1.40);
 checkDefined($dbh);
 $dbh->disconnect();
-$ENV{"DBI_DSN"} = $dsn;
+$ENV{"DBI_DSN"}=$dsn;
 my $dbh=DBI->connect(undef,"test","test",{AutoCommit=>0,PrintError=>0}) or die DBI->errstr;
 checkDefined($dbh);
 checkSuccessString($dbh->{Name},$connectstring);
@@ -99,10 +101,10 @@ print("\n");
 $dbh->do("drop table testtable");
 
 print("CREATE TEMPTABLE: \n");
-$dbh->{Executed}=0;
+$dbh->{Executed}=0 if ($DBI::VERSION>=1.41);
 my $stmt="create table testtable (testnumber number not null, testchar char(40), testvarchar varchar2(40), testdate date)";
 checkSuccessString($dbh->do($stmt),"0E0");
-checkSuccess($dbh->{Executed},1);
+checkSuccess($dbh->{Executed},1) if ($DBI::VERSION>=1.41);
 checkSuccessString($dbh->{Statement},$stmt);
 print("\n");
 
@@ -115,7 +117,7 @@ checkSuccess($dbh->do("insert into testtable values (:var1,:var2,:var3,:var4)",u
 print("\n");
 
 print("EXECUTE WITH BIND VALUES: \n");
-$dbh->{Executed}=0;
+$dbh->{Executed}=0 if ($DBI::VERSION>=1.41);
 $stmt="insert into testtable values (:var1,:var2,:var3,:var4)";
 my $sth=$dbh->prepare($stmt);
 checkSuccessString($sth->{Type},"st");
@@ -126,8 +128,8 @@ checkSuccess($sth->{Active},0);
 checkSuccess($sth->execute(3,"testchar3","testvarchar3","01-JAN-2003"),1);
 checkSuccess($sth->{Active},1);
 checkSuccess($dbh->{ActiveKids},1);
-checkSuccess($sth->{Executed},1);
-checkSuccess($dbh->{Executed},1);
+checkSuccess($sth->{Executed},1) if ($DBI::VERSION>=1.41);
+checkSuccess($dbh->{Executed},1) if ($DBI::VERSION>=1.41);
 print("\n");
 
 print("AFFECTED ROWS: \n");
@@ -154,36 +156,38 @@ print("PARAM COUNT: \n");
 checkSuccess($sth->{NUM_OF_PARAMS},4);
 print("\n");
 
-print("EXECUTE ARRAY: \n");
-@var1s=(5,6);
-@var2s=("testchar5","testchar6");
-@var3s=("testvarchar5","testvarchar6");
-@var4s=("01-JAN-2005","01-JAN-2006");
-$dbh->{Executed}=0;
-my ($tuples,$rows) = $sth->execute_array({ ArrayTupleStatus=>\my @tuple_status },\@var1s,\@var2s,\@var3s,\@var4s);
-checkSuccess($sth->{Executed},1);
-checkSuccess($dbh->{Executed},1);
-checkSuccess($tuples,2);
-checkSuccess($rows,2);
-for (my $index=0; $index<2; $index++) {
-	checkSuccess(@tuple_status[$index],1);
+if ($DBI::VERSION>=1.22) {
+	print("EXECUTE ARRAY: \n");
+	@var1s=(5,6);
+	@var2s=("testchar5","testchar6");
+	@var3s=("testvarchar5","testvarchar6");
+	@var4s=("01-JAN-2005","01-JAN-2006");
+	$dbh->{Executed}=0 if ($DBI::VERSION>=1.41);
+	my ($tuples,$rows)=$sth->execute_array({ ArrayTupleStatus=>\my @tuple_status },\@var1s,\@var2s,\@var3s,\@var4s);
+	checkSuccess($sth->{Executed},1) if ($DBI::VERSION>=1.41);
+	checkSuccess($dbh->{Executed},1) if ($DBI::VERSION>=1.41);
+	checkSuccess($tuples,2);
+	checkSuccess($rows,2);
+	for (my $index=0; $index<2; $index++) {
+		checkSuccess(@tuple_status[$index],1);
+	}
+	checkSuccess($sth->{ParamArrays}->{1}->[0],5);
+	checkSuccess($sth->{ParamArrays}->{1}->[1],6);
+	checkSuccess($sth->{ParamArrays}->{2}->[0],"testchar5");
+	checkSuccess($sth->{ParamArrays}->{2}->[1],"testchar6");
+	checkSuccess($sth->{ParamArrays}->{3}->[0],"testvarchar5");
+	checkSuccess($sth->{ParamArrays}->{3}->[1],"testvarchar6");
+	checkSuccess($sth->{ParamArrays}->{4}->[0],"01-JAN-2005");
+	checkSuccess($sth->{ParamArrays}->{4}->[1],"01-JAN-2006");
+	print("\n");
 }
-checkSuccess($sth->{ParamArrays}->{1}->[0],5);
-checkSuccess($sth->{ParamArrays}->{1}->[1],6);
-checkSuccess($sth->{ParamArrays}->{2}->[0],"testchar5");
-checkSuccess($sth->{ParamArrays}->{2}->[1],"testchar6");
-checkSuccess($sth->{ParamArrays}->{3}->[0],"testvarchar5");
-checkSuccess($sth->{ParamArrays}->{3}->[1],"testvarchar6");
-checkSuccess($sth->{ParamArrays}->{4}->[0],"01-JAN-2005");
-checkSuccess($sth->{ParamArrays}->{4}->[1],"01-JAN-2006");
-print("\n");
 
 print("BIND PARAM ARRAY: \n");
 $sth->bind_param_array(1,[7,8]);
 $sth->bind_param_array(2,["testchar7","testchar8"]);
 $sth->bind_param_array(3,["testvarchar7","testvarchar8"]);
 $sth->bind_param_array(4,["01-JAN-2007","01-JAN-2008"]);
-my ($tuples,$rows) = $sth->execute_array({ ArrayTupleStatus=>\my @tuple_status });
+my ($tuples,$rows)=$sth->execute_array({ ArrayTupleStatus=>\my @tuple_status });
 checkSuccess($tuples,2);
 checkSuccess($rows,2);
 for (my $index=0; $index<2; $index++) {
@@ -577,9 +581,9 @@ print("COMMIT AND ROLLBACK: \n");
 my $dbh2=DBI->connect($dsn,"test","test",{AutoCommit=>0}) or die DBI->errstr;
 my @row=$dbh2->selectrow_array("select count(*) from testtable");
 checkSuccess($row[0],0);
-checkSuccess($dbh->{Executed},1);
+checkSuccess($dbh->{Executed},1) if ($DBI::VERSION>=1.41);
 checkSuccess($dbh->commit(),1);
-checkSuccess($dbh->{Executed},0);
+checkSuccess($dbh->{Executed},0) if ($DBI::VERSION>=1.41);
 @row=$dbh2->selectrow_array("select count(*) from testtable");
 checkSuccess($row[0],9);
 $dbh->{AutoCommit}=1;
@@ -593,9 +597,9 @@ my @row=$dbh->selectrow_array("select count(*) from testtable");
 checkSuccess($row[0],11);
 my @row=$dbh2->selectrow_array("select count(*) from testtable");
 checkSuccess($row[0],10);
-checkSuccess($dbh->{Executed},1);
+checkSuccess($dbh->{Executed},1) if ($DBI::VERSION>=1.41);
 checkSuccess($dbh->rollback(),1);
-checkSuccess($dbh->{Executed},0);
+checkSuccess($dbh->{Executed},0) if ($DBI::VERSION>=1.41);
 my @row=$dbh2->selectrow_array("select count(*) from testtable");
 checkSuccess($row[0],10);
 print("\n");
