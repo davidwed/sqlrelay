@@ -70,6 +70,7 @@
 <li><b>instance</b>
 <ul>
 <li><b>id</b> - The ID of this instance.</li>
+<li><b>enabled</b> - Whether to auto-start this instance.  Defaults to "no".  If set to "yes", then this instance will be started when sqlr-start is run with no arguments (as it is in the init scripts which run at boot).</li>
 <li><b>addresses</b> - A comma-delimited list of addresses that the sqlr-listener and sqlr-connection daemons should bind to.  If absent or set to 0.0.0.0, they will bind to all addresses.  Defaults to 0.0.0.0.</li>
 <li><b>port</b> - The port the listener should listen on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to 9000.</li>
 <li><b>socket</b> - The unix socket (filename) the listener should listen on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to /tmp/sqlrelay.socket</li>

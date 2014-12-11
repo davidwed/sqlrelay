@@ -24,12 +24,14 @@
 <p>Use the <b>sqlr-start</b> program to start the SQL Relay server processes.</p>
 
 <blockquote>
-sqlr-start -id ID [-config CONFIGFILE] [-localstatedir LOCALSTATEDIR]
+sqlr-start [-id ID] [-config CONFIGFILE] [-localstatedir LOCALSTATEDIR]
 </blockquote>
 
-<p>The <b>sqlr-start</b> program starts up one instance of <b>sqlr-listener</b>, one instance of <b>sqlr-scaler</b> and the number of <b>sqlr-connection</b> daemons specified in the config file for the given ID.</p>
+<p>When run with the -id option, <b>sqlr-start</b> starts one instance of <b>sqlr-listener</b>, one instance of <b>sqlr-scaler</b> and the number of <b>sqlr-connection</b> daemons specified in the config file for the given ID.</p>
 
-<p>The optional -config CONFIGFILE argument may be used to specify a configuration file.  By default, the file /usr/local/firstworks/etc/sqlrelay.conf and any files under the directory /usr/local/firstworks/etc/sqlrelay.conf.d are used.</p>
+<p>When run without the -id option, <b>sqlr-start</b> starts <b>sqlr-listener</b>, <b>sqlr-scaler</b> and <b>sqlr-connection</b> daemons as appropriate for each instance in the config file who's enabled parameter is set to "yes".</p>
+
+<p>The optional -config CONFIGFILE argument may be used to specify a configuration file.  By default, the file /usr/local/firstworks/etc/sqlrelay.conf and all files under the directory /usr/local/firstworks/etc/sqlrelay.conf.d are used.</p>
 
 <p>If the optional -localstatedir LOCALSTATEDIR argument is used, it is passed to the programs started by <b>sqlr-start</b> as appropriate.</p>
 

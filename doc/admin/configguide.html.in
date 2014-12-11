@@ -18,6 +18,7 @@
 <li><a href="#router">Master-Slave Query Routing</a></li>
 <li><a href="#instances">Multiple Instances</a></li>
 <li><a href="#files">Multiple Files</a></li>
+<li><a href="#autostart">Starting Instances Automatically</a></li>
 <li><a href="#advanced">Advanced Configuration</a></li>
 </ul>
 
@@ -310,6 +311,45 @@ sqlrsh -host <i>sqlrserver</i> -port 9002<br>
 @sqlrelay-multipledb2.conf.html@
 </blockquote>
 
+
+<br><br><a name="autostart"></a>
+<span class="heading2">Starting Instances Automatically</span><br>
+
+<p>In all previous examples sqlr-start has been called with the -id option, specifying which instance to start.  If sqlr-start is called without the -id option then it will start all intances configured with the enabled attribute set to yes.</p>
+
+<p>For example, if the following instances are defined...</p>
+
+<blockquote>
+@sqlrelay-autostart.conf.html@
+</blockquote>
+
+<p>...then calling sqlr-start without the -id parameter will start oracleexample and sybaseexample because enabled="yes" is configured for those instances.  db2example will not be started because enabled="yes" is not configured for that instance.</p>
+
+<p>When installed on most platforms, SQL Relay creates an init script in the appropriate place under /etc.  This init script calls sqlr-start with no -id option.  If configured to run at boot, it will start all instances for which enabled="yes" is configured.</p>
+
+<p>How to enable the init script depends on what platform you are using.</p>
+
+<p>On Linux, Solaris, SCO and other non-BSD Unixes, this usually involves creating a symlink from the file /etc/init.d/sqlrelay to /etc/rc3.d/S85sqlrelay.</p>
+
+<p>Redhat-derived Linux distributions have a chkconfig command that can do this for you.  Debian-derived Linux distributions provide the update-rc.d command.  Older versions of Solaris provide svcadm.  Newer versions of Solaris provide smf.</p>
+
+<p>On FreeBSD you must add a line to /etc/rc.conf like:</p>
+
+<blockquote>
+sqlrelay_enabled=YES
+</blockquote>
+
+<p>On NetBSD you must add a line to /etc/rc.conf like:</p>
+
+<blockquote>
+sqlrelay=YES
+</blockquote>
+
+<p>On OpenBSD you must add a line to /etc/rc.conf like:</p>
+
+<blockquote>
+sqlrelay_flags=""
+</blockquote>
 
 <br><br><a name="advanced"></a>
 <span class="heading2">Advanced Configuration</span><br>
