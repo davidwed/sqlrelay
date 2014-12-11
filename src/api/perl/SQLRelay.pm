@@ -75,13 +75,8 @@ sub connect {
 			$var=$1;
 			$val=$2;
 			$dsn{$var}=$val;
+			$dbh->STORE($var,$val);
 		}
-	}
-
-	# store dsn key/values
-	my $key;
-	foreach $key (keys %dsn) {
-		$dbh->STORE($key,$dsn{$key});
 	}
 	
 	# create an Connection
@@ -143,37 +138,32 @@ sub _new_statement {
 	# create an Cursor
 	my $cursor=SQLRelay::Cursor->new($dbh->FETCH('driver_connection'));
 
-	# set result set buffer size
-	my $rowcachesize=$dbh->FETCH('RowCacheSize');
-	if (!defined($rowcachesize) || $rowcachesize==0) {
-		$cursor->setResultSetBufferSize(100);
-	} elsif ($rowcachesize<0) {
-		$cursor->setResultSetBufferSize(0);
-	} else {
-		$cursor->setResultSetBufferSize($rowcachesize);
-	}
- 
-	# set some behaviors from the connect string
-	if ($dbh->FETCH('DBD::SQLRelay::DontGetColumnInfo')) {
- 		$cursor->dontGetColumnInfo();
-	} else {
- 		$cursor->getColumnInfo();
-	}
-	if ($dbh->FETCH('DBD::SQLRelay::NullsAsEmptyStrings')) {
- 		$cursor->getNullsAsEmptyStrings();
-	} else {
- 		$cursor->getNullsAsUndefined();
-	}
-
-	# store statement-specific data in the statement handle
+	# store statement-specific attributes in the statement handle
 	$sth->STORE('driver_database_handle',$dbh);
 	$sth->STORE('driver_is_select',($statement=~/^\s*select/i));
 	$sth->STORE('driver_cursor',$cursor);
 
- 
- 	for (grep /^ext_SQLR/, keys %$dbh) {
+	# store attributes from the database handle
+ 	for (grep /^DBD::SQLRelay::/, keys %$dbh) {
  		$sth->STORE($_, $dbh->FETCH($_));
  	}
+
+	# handle the row cache size
+	my $rowcachesize=$dbh->FETCH('RowCacheSize');
+	if (!defined($rowcachesize) || $rowcachesize==0) {
+		$sth->STORE('DBD::SQLRelay::ResultSetBufferSize',100);
+	} elsif ($rowcachesize<0) {
+		$sth->STORE('DBD::SQLRelay::ResultSetBufferSize',0);
+	} else {
+		$sth->STORE('DBD::SQLRelay::ResultSetBufferSize',$rowcachesize);
+	}
+
+	# handle nulls/empty-strings
+	my $getnullsasemptystrings=
+		$dbh->FETCH('DBD::SQLRelay::GetNullsAsEmptyStrings');
+	if (!defined($getnullsasemptystrings) || !$getnullsasemptystrings) {
+		$sth->STORE('DBD::SQLRelay::GetNullsAsEmptyStrings',0);
+	}
 
 	# clear any binds still hanging around from
 	# the last time this cursor was used
@@ -378,7 +368,7 @@ sub STORE {
 	}
 
 	# handle other cases
-	if ($attr =~ /^(?:driver_|ext_SQLR_|DBD::SQLRelay::)/) {
+	if ($attr =~ /^(?:driver_|DBD::SQLRelay::)/) {
 		$dbh->{$attr}=$val;
 		return 1;
 	}
@@ -402,7 +392,7 @@ sub FETCH {
 	}
 
 	# handle other cases
-	if ($attr =~ /^(?:driver_|ext_SQLR_|DBD::SQLRelay::)/) {
+	if ($attr =~ /^(?:driver_|DBD::SQLRelay::)/) {
 		return $dbh->{$attr};
 	}
 
@@ -612,7 +602,7 @@ sub fetchrow_arrayref {
 	# update rows in cache
 	my $rowsincache=$sth->FETCH('driver_RowsInCache');
 	if ($rowsincache==0) {
-		my $rowcachesize=$sth->{'Database'}->FETCH('RowCacheSize');
+		my $rowcachesize=$sth->FETCH('RowCacheSize');
 		if ($rowcachesize>0) {
 			$rowsincache=$rowcachesize;
 		}
@@ -675,8 +665,7 @@ sub STORE {
 	my ($sth,$attr,$val)=@_;
 
 	# handle special cases...
-	if ($attr eq "ext_SQLR_BufferSize" or
-		$attr eq "DBD::SQLRelay::ResultSetBufferSize") {
+	if ($attr eq "DBD::SQLRelay::ResultSetBufferSize") {
 		$sth->FETCH('driver_cursor')->setResultSetBufferSize($val);
 		return 1;
 	} elsif ($attr eq "DBD::SQLRelay::DontGetColumnInfo") {
@@ -707,7 +696,7 @@ sub STORE {
 	}
 
 	# handle other cases
-	if ($attr =~ /^(?:driver_|ext_SQLR_|DBD::SQLRelay::)/) {
+	if ($attr =~ /^(?:driver_|DBD::SQLRelay::)/) {
 		$sth->{$attr}=$val;
 		return 1;
 	}
@@ -722,8 +711,7 @@ sub FETCH {
 	my ($sth,$attr)=@_;
 
 	# handle special cases...
-	if ($attr eq "ext_SQLR_BufferSize" or
-		$attr eq "DBD::SQLRelay::ResultSetBufferSize") {
+	if ($attr eq "DBD::SQLRelay::ResultSetBufferSize") {
 		return $sth->FETCH('driver_cursor')->getResultSetBufferSize();
 	} elsif ($attr eq 'RowsInCache') {
 		return $sth->{'driver_RowsInCache'};
@@ -734,7 +722,7 @@ sub FETCH {
 	}
 
 	# handle other cases
-	if ($attr =~ /^(?:driver_|ext_SQLR_|DBD::SQLRelay::)/) {
+	if ($attr =~ /^(?:driver_|DBD::SQLRelay::)/) {
 		return $sth->{$attr};
 	}
 
