@@ -61,7 +61,7 @@ sub checkSuccessString {
 
 
 # instantiation
-my $prefix="DBI:SQLRelay:";
+my $prefix="DBI:SQLRelay(AutoCommit=>0,PrintError=>0):";
 my $connectstring="host=fedora;port=9000;socket=/tmp/test.socket;debug=0";
 my $dsn=$prefix.$connectstring;
 
@@ -69,18 +69,18 @@ my $dsn=$prefix.$connectstring;
 if ($DBI::VERSION>=1.43) {
 	print("PARSE DSN: \n");
 	my ($scheme,$driver,$attr_string,$attr_hash,$driver_dsn)=DBI->parse_dsn($dsn);
-	checkSuccess($scheme,"DBI");
-	checkSuccess($driver,"SQLRelay");
-	#checkSuccessString($attr_string,"AutoCommit=>0,PrintError=>0");
+	checkSuccessString($scheme,"dbi");
+	checkSuccessString($driver,"SQLRelay");
+	checkSuccessString($attr_string,"AutoCommit=>0,PrintError=>0");
 	checkSuccess($attr_hash->{AutoCommit},0);
 	checkSuccess($attr_hash->{PrintError},0);
-	checkSuccess($driver_dsn,$connectstring);
+	checkSuccessString($driver_dsn,$connectstring);
 	print("\n");
 }
 
 # connect
 print("CONNECT: \n");
-my $dbh=DBI->connect($dsn,"test","test",{AutoCommit=>0,PrintError=>0}) or die DBI->errstr;
+my $dbh=DBI->connect($dsn,"test","test") or die DBI->errstr;
 checkSuccessString($dbh->{Type},"db");
 if ($DBI::VERSION>=1.40) {
 	checkSuccessString($dbh->{Username},"test");

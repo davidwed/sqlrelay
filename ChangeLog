@@ -52,6 +52,9 @@
 		attributes
 	tweaked the odbc driver so it works with the jdbc-odbc bridge and
 		jmeter
+	added custom db/statement attributes to perl DBI for
+		DontGetColumnInfo, GetNullsAsEmptyStrings and
+		ResultSetBufferSize
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries

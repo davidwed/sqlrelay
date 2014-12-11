@@ -665,10 +665,10 @@ sub STORE {
 	my ($sth,$attr,$val)=@_;
 
 	# handle special cases...
-	if ($attr eq "DBD::SQLRelay::ResultSetBufferSize") {
+	if ($attr eq 'DBD::SQLRelay::ResultSetBufferSize') {
 		$sth->FETCH('driver_cursor')->setResultSetBufferSize($val);
 		return 1;
-	} elsif ($attr eq "DBD::SQLRelay::DontGetColumnInfo") {
+	} elsif ($attr eq 'DBD::SQLRelay::DontGetColumnInfo') {
 		my $cursor=$sth->FETCH('driver_cursor');
 		if ($val) {
 			$cursor->dontGetColumnInfo();
@@ -676,7 +676,7 @@ sub STORE {
 			$cursor->getColumnInfo();
 		}
 		return 1;
-	} elsif ($attr eq "DBD::SQLRelay::GetNullsAsEmptyStrings") {
+	} elsif ($attr eq 'DBD::SQLRelay::GetNullsAsEmptyStrings') {
 		my $cursor=$sth->FETCH('driver_cursor');
 		if ($val) {
 			$cursor->getNullsAsEmptyStrings();
@@ -711,7 +711,7 @@ sub FETCH {
 	my ($sth,$attr)=@_;
 
 	# handle special cases...
-	if ($attr eq "DBD::SQLRelay::ResultSetBufferSize") {
+	if ($attr eq 'DBD::SQLRelay::ResultSetBufferSize') {
 		return $sth->FETCH('driver_cursor')->getResultSetBufferSize();
 	} elsif ($attr eq 'RowsInCache') {
 		return $sth->{'driver_RowsInCache'};
