@@ -304,8 +304,8 @@ If you would it to come back as a NULL instead, you can call the
 getNullsAsNulls() method.  To revert to the default behavior, you can
 call getNullsAsEmptyStrings().</p>
 
-<p>If you are using Oracle 8i or higher, you can insert data into BLOB
-and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
+<p>You can insert data into BLOB and CLOB columns using the inputBindBlob(),
+inputBindClob() methods.</p>
 
 <blockquote>
 <pre>
@@ -340,7 +340,7 @@ and CLOB columns using the inputBindBlob(), inputBindClob() methods.</p>
 </pre>
 </blockquote>
 
-<p>Likewise, with Oracle 8i, you can retreive BLOB or CLOB data using
+<p>Likewise, you can retreive BLOB or CLOB data using
 defineOutputBindBlob()/getOutputBindBlob() and
 defineOutputBindClob()/getOutputBindClob().</p>
 
@@ -607,7 +607,7 @@ iterate through its result set, inserting rows into another table, using only
 <p>Prior to SQL Relay version 0.25, you would have had to buffer the first
 result set or use 2 database connections instead of just 1.</p>
 
-<p>If you are using stored procedures with Oracle 8i or higher, a stored
+<p>If you are using stored procedures with Oracle, a stored
 procedure can execute a query and return a cursor.  A cursor bind variable can
 then retrieve that cursor.  Your program can retrieve the result set from the
 cursor.  All of this can be accomplished using defineOutputBindCursor(),
@@ -791,12 +791,6 @@ queries may have to be re-parsed and re-compiled each time they are sent.</p>
 
 <p>While many databases support stored procedures.  The syntax for creating
 and executing stored procedures varies greatly between databases.</p>
-
-<p>SQL Relay supports stored procedures for most databases, but there are
-some caveats.  Stored procedures are not currently supported when using FreeTDS
-against Sybase or Microsoft SQL Server.  Blob/Clob bind variables are only
-supported in Oracle 8i or higher.  Sybase stored procedures must use varchar
-output parameters.</p>
 
 <p>Stored procedures typically take input paramters from client programs through
 input bind variables and return values back to client programs either through

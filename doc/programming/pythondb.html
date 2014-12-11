@@ -287,12 +287,6 @@ queries may have to be re-parsed and re-compiled each time they are sent.</p>
 <p>While many databases support stored procedures.  The syntax for creating
 and executing stored procedures varies greatly between databases.</p>
 
-<p>SQL Relay supports stored procedures for most databases, but there are
-some caveats.  Stored procedures are not currently supported when using FreeTDS
-against Sybase or Microsoft SQL Server.  Blob/Clob bind variables are only
-supported in Oracle 8i or higher.  Sybase stored procedures must use varchar
-output parameters.</p>
-
 <p>Stored procedures typically take input paramters from client programs through
 input bind variables and return values back to client programs either through
 bind variables or result sets.  Stored procedures can be broken down into
