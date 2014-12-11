@@ -622,10 +622,24 @@ sub finish {
 	my ($sth)=@_;
 
 	# mark this statement not Active
+	# (older DBI's don't do this in their finish methods)
 	$sth->STORE('Active',0);
 
-	# call finish from the DBI class
+	# call finish from the parent class
 	$sth->SUPER::finish();
+}
+
+sub DESTROY {
+	
+	# get parameters
+	my ($sth)=@_;
+
+	# mark this statement not Active
+	# (older DBI's don't do this in their DESTROY methods)
+	$sth->STORE('Active',0);
+
+	# call finish from the parent class
+	$sth->SUPER::DESTROY();
 }
 
 sub STORE {
@@ -656,7 +670,7 @@ sub STORE {
 	}
 
 	# if the attribute didn't start with 'driver_' 
-	# then pass it up to the DBI class
+	# then pass it up to the parent class
 	return $sth->SUPER::STORE($attr,$val);
 }
 
