@@ -44,8 +44,7 @@
 
 <br><span class="heading2">API Comparison Questions</span><br>
 <ul>
-<li><a href="#cgi">Why should I use SQL Relay with CGI's instead of using a native database API?</a></li>
-<li><a href="#odbc">How does SQL Relay compare to ODBC, JDBC, Perl::DBI, PHP::ADODB, Ruby::DBI or PythonDB?</a></li>
+<li><a href="#cgi">Why should I use SQL Relay with web-based applications instead of using a native database API?</a></li>
 <li><a href="#dbiproxy">How does SQL Relay compare to DBI::Proxy?</a></li>
 <li><a href="#apachedbi">How does SQL Relay compare to Apache::DBI or PHP's internal persistent database connections?</a></li>
 </ul>
@@ -53,8 +52,6 @@
 <br><span class="heading2">Database-Specific Questions</span><br>
 <ul>
 <li><a href="#canxxxdb">Can I use SQL Relay to connect to XXX database?</a></li>
-<li><a href="#whyxxxdb">Why should I use SQL Relay with XXX database?</a></li>
-<li><a href="#features">Does SQL Relay support XXX's specific features?</a></li>
 <li><a href="#oracle">Why can't I get SQL Relay to connect to Oracle?</a></li>
 <li><a href="#sqlserver">Why can't I get SQL Relay to connect to Sybase/Microsoft SQL Server?</a></li>
 <li><a href="#freetds">I know that Sybase and MS SQL Server support affected row counts, so why does the FreeTDS connection return -1's for affected rows?</a></li>
@@ -65,7 +62,6 @@
 <li><a href="#postgresql">Postgresql's native API uses numbers for types but
 SQL Relay mangles them.  How do I get the numbers?</a>
 <li><a href="#nlslang">I'm using a non-ascii character set in my Oracle database, why am I get get garbage back when I do a select?</a></li>
-<li><a href="#sqliterowid">How do I get the last insert rowid from SQLite?</a></li>
 <li><a href="#oracleosauth">How do I use Oracle's OS-Authentication (users identified externally)?</a></li>
 <li><a href="#mysqltrans">Why aren't commit's working in MySQL?</a></li>
 <li><a href="#db2login">Why does the first DB2 query causes SQL Relay to reconnect to the DB?</a></li>
@@ -87,7 +83,6 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <li><a href="#clientcache">How does client-side result-set caching work?</a></li>
 <li><a href="#servercache">What about server-side result-set caching?</a></li>
 <li><a href="#defineoutputbind">What happened to defineOutputBind?</a></li>
-<li><a href="#mysqlinsertid">MySQL Provides mysql_insert_id().  How do I get that from SQL Relay?</a></li>
 </ul>
 
 <br><span class="heading2">Administration Questions</span><br>
@@ -96,7 +91,6 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <li><a href="#firewallhang">If I leave SQL Relay idle for a long time, then come back and try to use it, I get a low level TCP error from the database.  What does that mean?</a></li>
 <li><a href="#ttl">Why doesn't the last connection die off when I set connections=0 and maxconnections to some larger number and let SQL Relay go idle for a long time?</a></li>
 <li><a href="#nobody">Whenever I set maxconnections&gt;connections, it doesn't ever start any new connections and I get "Couldn't parse config file ..." errors on the screen.  What's up with that?</a></li>
-<li><a href="#gui">Where'd the configuration GUI go?</a></li>
 <li><a href="#socketonly">How can I get SQL Relay to only listen on the unix socket and not the inet port?</a></li>
 <li><a href="#dynamicscaling">If I set up SQL Relay to use dynamic scaling, it eventually spawns off as many connections as it can and they never die off.  What's going on?</a></li>
 <li><a href="#maxqueuelengthzero">If I set up SQL Relay to use dynamic scaling with a maxqueuelength=0, sometimes it spawns off new connections even when there should be enough to handle the clients.  What's going on?</a></li>
@@ -288,9 +282,9 @@ databases?</span>
 
 <p>Yes.  Set the authtier attribute of the instance tag in the configuration file to "database".  See the <a href="admin/configreference.html">SQL Relay Configuration Reference</a> for more information.</p>
 
-<p>SQL Relay does it very efficiently when used with Oracle 8i or greater and MySQL version 3.23.3 or greater.  For Oracle, the database must be configured properly.  See <a href="admin/oraclentier.html">this document</a> for step-by-step instructions.</p>
+<p>SQL Relay does it very efficiently when used with Oracle and MySQL.  For Oracle, the database must be configured properly.  See <a href="admin/oraclentier.html">this document</a> for step-by-step instructions.</p>
 
-<p>Oracle 8i or greater and MySQL version 3.23.3 or greater allow a process that is connected to the database to switch users without disconnecting from the database.  When used with other databases, SQL Relay logs out and logs back in to the database whenever it needs to switch users.</p>
+<p>Oracle and MySQL allow a process that is connected to the database to switch users without disconnecting from the database.  When used with other databases, SQL Relay logs out and logs back in to the database whenever it needs to switch users.</p>
 
 <br><a name="routing"></a>
 <span class="heading3">Can I use SQL Relay to send all insert/update/delete's to a master database and distribute select's over a set of slaves?</span>
@@ -360,12 +354,9 @@ ln -s bash sh
 <br><a name="cgi"></a>
 <span class="heading3">Why should I use SQL Relay with web-based applications instead of using a native database API?</span>
 
-<p>Many web-based apps have to log into and out of the database each time they generate a page.  Logging in can take a long time.  Also, native database API libraries are often very large.  Since SQL Relay maintains persistent database connections, is fast to connect to and has a lightweight client API, using SQL Relay with web-based applications generally results in a faster applications that use less memory.</p>
+<p>Many web-based apps have to log into and out of the database each time they generate a page.  With native database API's, connecting directly to the database, logging in can take a long time.  SQL Relay maintains persistent database connections and is much faster to connect to.  Web-based applications generally run faster when using SQL Relay than when using a native API.</p>
 
-<br><a name="odbc"></a>
-<span class="heading3">How does SQL Relay compare to ADO.NET, ODBC, JDBC, Perl::DBI, etc.?</span>
-
-<p>This is sort of an apples-to-oranges comparison.  These API's are primarily targeted as abstraction layers and make no attempt to improve application performance.  Some have features not supported by the SQL Relay client API's but the SQL Relay client API has features not supported by them too.  SQL Relay currently provides drivers for ADO.NET, Perl::DBI, PHP PDO, Ruby::DBI, PythonDB and ODBC and can connect to databases via ODBC.</p>
+<p>Native database API libraries are often very large. The SQL Relay API's are lightweight. Web-based applications that use it generally use less memory than when using a native API.</p>
 
 <br><a name="dbiproxy"></a>
 <span class="heading3">How does SQL Relay compare to DBI::Proxy?</span>
@@ -391,176 +382,6 @@ ln -s bash sh
 <span class="heading3">Can I use SQL Relay to connect to XXX database?</span>
 
 <p>See <a href="features/databases.html">Supported Databases</a>.</p>
-
-<br><a name="whyxxxdb"></a>
-<span class="heading3">Why should I use SQL Relay with XXX database?</span>
-
-<br><br>
-<table border="1">
-<tr>
-<td><b>Database</b></td>
-<td><b>Limit the number of open connections.</b></td>
-<td><b>Distribute over replicated or clustered databases.</b></td>
-<td><b>Overcome the connection delay.</b></td>
-<td><b>Provide remote access.</b></td>
-</tr>
-<tr>
-<td><b>Oracle</b></td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><b>MySQL</b></td>
-<td>Yes</td>
-<td>Yes</td>
-<td>No</td>
-<td>No</td>
-</tr>
-<tr>
-<td><b>PostgreSQL</b></td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><b>Sybase</b></td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><b>DB2</b></td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><b>Firebird</b></td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><b>SQLite</b></td>
-<td>Yes</td>
-<td>Yes</td>
-<td>No</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><b>FreeTDS</b></td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><b>ODBC</b></td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>No</td>
-</tr>
-<tr>
-<td><b>MDB Tools</b></td>
-<td>Yes</td>
-<td>Yes</td>
-<td>No</td>
-<td>Yes</td>
-</tr>
-</table>
-<br><br>
-
-<br><a name="features"></a>
-<span class="heading3">Does SQL Relay support XXX's specific features?</span>
-
-<br><br>
-<table border="1">
-<tr>
-<td><b>Database</b></td>
-<td><b>Queries</b></td>
-<td><b>Bind Variables</b></td>
-<td><b>Procedural Language</b></td>
-<td><b>Auto-Commit</b></td>
-</tr>
-<tr>
-<td><b>Oracle</b></td>
-<td>Yes</td>
-<td>Scalar Input/Output</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><b>MySQL</b></td>
-<td>Yes</td>
-<td>Scalar Input</td>
-<td>No</td>
-<td>No</td>
-</tr>
-<tr>
-<td><b>PostgreSQL</b></td>
-<td>Yes</td>
-<td>Scalar Input</td>
-<td>No</td>
-<td>No</td>
-</tr>
-<tr>
-<td><b>Sybase</b></td>
-<td>Yes</td>
-<td>Scalar Input</td>
-<td>No</td>
-<td>No</td>
-</tr>
-<tr>
-<td><b>DB2</b></td>
-<td>Yes</td>
-<td>Scalar Input/Output</td>
-<td>Unknown</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><b>Firebird</b></td>
-<td>Yes</td>
-<td>Scalar Input</td>
-<td>Unknown</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td><b>SQLite</b></td>
-<td>Yes</td>
-<td>Scalar Input</td>
-<td>No</td>
-<td>No</td>
-</tr>
-<tr>
-<td><b>FreeTDS</b></td>
-<td>Yes</td>
-<td>Scalar Input</td>
-<td>No</td>
-<td>No</td>
-</tr>
-<tr>
-<td><b>ODBC</b></td>
-<td>Yes</td>
-<td>Scalar Input/Output if DB supports it.</td>
-<td>Yes if DB supports it.</td>
-<td>Yes if DB supports it.</td>
-</tr>
-<tr>
-<td><b>MDB Tools</b></td>
-<td>Yes</td>
-<td>Scalar Input</td>
-<td>No.</td>
-<td>No.</td>
-</tr>
-</table>
-<br><br>
 
 <br><a name="oracle"></a>
 <span class="heading3">Why can't I get SQL Relay to connect to Oracle?</span>
@@ -602,12 +423,12 @@ chmod o+r tnsnames.ora
 <br><a name="freetds"></a>
 <span class="heading3">I know that Sybase and MS SQL Server support affected row counts, so why does the FreeTDS connection return -1's for affected rows?</span>
 
-<p>Before version 0.53, calling the FreeTDS function to get the number of affected rows would cause a segmentation fault.  As of version 0.32, SQL Relay figures out what version of FreeTDS is installed at compile time and only enables affected rows if the FreeTDS version is greater than 0.52.  If you compile against an earlier version of FreeTDS, a -1 is returned for affected rows as if the database didn't support the feature.</p>
+<p>Before FreeTDS version 0.53, calling the FreeTDS function to get the number of affected rows would cause a segmentation fault.  As of version 0.32, SQL Relay figures out what version of FreeTDS is installed at compile time and only enables affected rows if the version of FreeTDS is greater than 0.52.  If you compile against an earlier version of FreeTDS, a -1 is returned for affected rows as if the database didn't support the feature.</p>
 
 <br><a name="money"></a>
 <span class="heading3">Why are money types crashing my FreeTDS connections?</span>
 
-<p>Before version 0.53, calling the FreeTDS function ct_fetch when a result set had a MONEY or SMALLMONEY column in it would cause a segmentation fault.  As of version 0.32, SQL Relay figures out what version of FreeTDS is installed at compile time and only enables queries selecting MONEY or SMALLMONEY columns if the FreeTDS version is greater than 0.52.  If you compile against an earlier version of FreeTDS, any attempt to run a query selecting MONEY or SMALLMONEY column will fail with an error indicating that you should recompile SQL Relay against a newer version of FreeTDS.</p>
+<p>Before FreeTDS version 0.53, calling the FreeTDS function ct_fetch when a result set had a MONEY or SMALLMONEY column in it would cause a segmentation fault.  As of version 0.32, SQL Relay figures out what version of FreeTDS is installed at compile time and only enables queries selecting MONEY or SMALLMONEY columns if the version of FreeTDS is greater than 0.52.  If you compile against an earlier version of FreeTDS, any attempt to run a query selecting MONEY or SMALLMONEY column will fail with an error indicating that you should recompile SQL Relay against a newer version of FreeTDS.</p>
 
 <br><a name="pending"></a>
 <span class="heading3">How can I keep from getting "Attempt to initiate a new Adaptive Server operation with results pending" errors when using FreeTDS?</span>
@@ -618,34 +439,18 @@ chmod o+r tnsnames.ora
 
 <p>SQL Relay can work around it by fetching the entire result set and caching it on the client, which is SQL Relay's default behavior, but using setResultSetBufferSize() with a non-0 argument defeats this behavior, causing the result set to be fetched in chunks rather than all-at-once.  If you do this and then run nested selects then the result set from the outer select will still be pending when the inner select is run and FreeTDS will return this error.</p>
 
-<p>So, when using FreeTDS on the server and nested selects on the client, don't use setResultSetBufferSize() with a non-0 argument and everything will work (though it might work slowly and consume inordinate amounts of memory with very large result sets), otherwise you'll get that error.</p>
+<p>So, when using FreeTDS on the server and nested selects on the client, don't use setResultSetBufferSize() with a non-0 argument and everything will work (though with very large result sets it might work slowly and consume inordinate amounts of memory), otherwise you'll get that error.</p>
 
 <p>See the <a href="http://www.freetds.org/faq.html#pending">FreeTDS FAQ</a> for more info.</p>
 
 <br><a name="sybasefreetdsdiff"></a>
 <span class="heading3">What's the difference between the Sybase and FreeTDS connections?</span>
 
-<p>The libsqlrelay_sqlrconnection_sybase.so plugin is compiled against Sybase ctlib; the libraries that come with Sybase Adaptive Server Enterprise.  They use a protocol called TDS (Tabular Data Stream) to talk to the database.</p>
+<p>The sqlrconnection_sybase plugin is compiled against Sybase ctlib; the libraries that come with Sybase Adaptive Server Enterprise.  They use a protocol called TDS (Tabular Data Stream) to talk to the database.</p>
 
-<p>The libsqlrelay_sqlrconnection_freetds.so program is compiled against FreeTDS, an open-source implementation of the TDS protocol and ctlib.</p>
+<p>The sqlrconnection_freetds plugin is compiled against FreeTDS, an open-source implementation of the TDS protocol and ctlib.</p>
 
-<p>Older versions of Microsoft SQL Server are compatible with Sybase ctlib, but newer versions are not.  FreeTDS is compatible with all versions of Sybase Adaptive Server Enterprise and Microsoft SQL Server.</p>
-
-<p>Unfortunately, FreeTDS is an incomplete implementation of TDS.  Depending on the version of FreeTDS you're using, features may be buggy, inconsistent or non-existent.  For example...</p>
-
-<ul>
-<li>Programs compiled against FreeTDS&lt;0.53 crash when fetching MONEY and SMALLMONEY datatypes.  SQL Relay handles this by preventing queries which fetch MONEY or SMALLMONEY datatypes from running if it's compiled against FreeTDS&lt;0.53.</li>
-<li>Programs compiled against FreeTDS&lt;0.53 crash when attempting to find out how many rows were affected by an insert/update/delete query.  SQL Relay handles this by not requesting the affected row count and just returning -1 if it's compiled against FreeTDS&lt;0.53.</li>
-<li>Columns of type CHAR have trailing spaces truncated.  For a CHAR(20) column, inserting a value <pre>'hello'</pre> will be returned as <pre>'hello'</pre> instead of <pre>'hello               '</pre> To add to the problem CHAR and VARCHAR datatypes are both represented as CHAR in FreeTDS and Sybase ctlib, so there's no good way to know whether to append trailing spaces or not.</li>
-<li>Under Sybase ctlib, MONEY datatypes have 2 decmial places by default but can have up to 4.  Under FreeTDS, they have 4 decimal places.</li>
-<li>Date formats are slightly different.  For example, Sybase ctlib returns 1:00 AM on 01/01/2001 as <pre>Jan  1 2001  1:00AM'</pre> while FreeTDS returns it as <pre>Jan  1 2001 01:00:00:000AM'</pre></li>
-<li>Sybase ctlib returns REAL and FLOAT datatypes with arbitrary decimal places.  Inserting 1.1 as a REAL or FLOAT type then selecting it might return 1.09888874310 or something similar.  With FreeTDS, inserting 1.1 then selecting it returns 1.1.  Sybase behaves like FreeTDS for DECIMAL and NUMBER types.</li>
-<li>FreeTDS only supports one cursor per connection.  You can write code that uses multiple cursors, but it will eventually throw errors like: "Error: Attempt to initiate a new SQL Server operation with results pending."  Prior to SQL Relay 0.37, this was a common error to see under certain circumstances.  As of SQL Relay 0.37 the connection daemon funnels everything through a single cursor and this error should no longer appear.  From the client-side as long as you don't use setResultSetBufferSize() to specify a buffer size other than 0, it will appear like more than 1 cursor is available, but in fact only 1 is being used.</li>
-</ul>
-
-<p>There are possibly other inconsistencies, but these are the only ones that I've run into so far.</p>
-
-<p>FreeTDS is great software despite its inconsistencies.  Sybase ctlib is impossibly complex.  Anyone attempting to re-engineer it is braver than I am.  I'm impressed that FreeTDS works as well as it does, and it's getting better with each release.  In fact, it's possible that any or all of those inconsistencies have been fixed in the current release.</p>
+<p>Very old versions of Microsoft SQL Server are compatible with Sybase ctlib, but modern versions are not.  FreeTDS is compatible with all versions of Sybase Adaptive Server Enterprise and Microsoft SQL Server.  So, if you want to access a modern version of Microsoft SQL Server, you must use the FreeTDS connection.  You can also access all versions of Sybase with the FreeTDS connection.</p>
 
 <br><a name="postgresql"></a>
 <span class="heading3">Postgresql's native API uses numbers for types but SQL Relay mangles them.  How do I get the numbers?</span>
@@ -685,12 +490,9 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 
 <p>Other databases don't support any character set translation at all.  Data is just returned from the database as-is, byte-by-byte.</p>
 
-<p>In the case of Oracle and DB2, the <b>nls_lang</b> and <b>lang</b> connect string variables just set the <b>NLS_LANG</b> and <b>LANG</b> environment variables.  The <b>NLS_LANG</b> or <b>LANG</b> environment variables may be set directly to set the character set when using versions of SQL Relay older than listed above.</p>
+<p>In the case of Oracle, the <b>nls_lang</b> connect string variable just sets the <b>NLS_LANG</b> environment variable.  When using versions of SQL Relay older than listed above, the <b>NLS_LANG</b> environment variable must be set prior to running SQL Relay to configure the character set.</p>
 
-<br><a name="sqliterowid"></a>
-<span class="heading3">How do I get the last insert rowid from SQLite?</span>
-
-<p>You can run a special query: "SELECT LAST INSERT ROWID".  When SQL Relay sees this query, it returns a result set with a single field containing the last insert rowid.</p>
+<p>In the case of DB2, the <b>lang</b> connect string variable just sets the <b>LANG</b> environment variable.  When using versions of SQL Relay older than listed above, the <b>LANG</b> environment variable must be set prior to running SQL Relay to configure the character set.</p>
 
 <br><a name="oracleosauth"></a>
 <span class="heading3">How do I use Oracle's OS-Authentication (users identified externally)?</span>
@@ -745,7 +547,9 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 <br><a name="mysqltrans"></a>
 <span class="heading3">Why aren't commit's working in MySQL?</span>
 
-<p>Older versions of MySQL don't support transactions at all but modern versions do, if you create tables using a table type that supports transactions.  The InnoDB table type is the most commonly used transaction-supporting table type.  To use the InnoDB table type, use a create statement like the following:</p>
+<p>How old is your MySQL server?</p>
+
+<p>Ancient versions of MySQL didn't support transactions at all.  Old versions did, but only if you explicitly created tables using a table type that supports transactions like InnoDB:</p>
 
 <blockquote>
 <pre>
@@ -753,24 +557,22 @@ user=myuser;password=mypass;db=testdb;mangletypes=no
 </pre>
 </blockquote>
 
-<p>However, you may be surprised at MySQL's behavior even when you're using InnoDB tables or another table type that supports transactions.</p>
+<p>Modern versions create transaction-capable tables by default.</p>
 
-<p>With most databases, if a client has a connection open and commits a set of inserts, updates or deletes in, then those changes are immediately visible to other clients using separate connections.</p>
+<p>However, if you're accustomed to other databases, you may still be surprised at modern MySQL's transaction behavior.  MySQL supports several <i>isolation levels</i> and the default level is different from other database.  See the official MySQL documentation for more information on this, but a summary follows.</p>
 
-<p>MySQL doesn't support this behavior, at least not with InnoDB tables.  Instead, with MySQL, after beginning a transaction, the database will appear to be unaffected by queries run in other transactions until the transaction you are running is committed.  So, if another client commits a set of inserts, you won't see them until you commit your transaction.</p>
+<p>With most databases, if a client has a connection open and commits a set of inserts, updates or deletes, then those changes are immediately visible to other clients using separate connections.</p>
+
+<p>With MySQL, after beginning a transaction, the database will appear to be unaffected by queries run in other transactions until the transaction you are running is committed.  So, if another client commits a set of inserts, you won't see them until you commit your transaction.</p>
 
 <p>If you're in autocommit mode though and haven't begun a transaction, then you will immediately see all changes committed by other clients.  But as soon as you begin a transaction, you will no longer see changes to the database until you commit your transaction.</p>
 
-<p>It's really a bit more complicated than that.  MySQL supports several different <i>isolation levels</i>, each with slightly different behavior.  See the official MySQL documentation for more information on this.</p>
-
-<p>It's possible (probable?) that non-MySQL databases have different isolation levels as well, but I don't have any experience with different isolation levels in other databases.  It's also possible that there is some way to get the "normal" behavior out of MySQL, perhaps by using a different table type, but again I don't have any experience with that.  If anyone has insight into this, please <a href="mailto:david.muse@firstworks.com">email me</a> about it.</p>
-
-<p>In SQL Relay 0.39, when using MySQL, whenver a client connects to the server, the MySQL connection daemon executes a commit before running the first query to sync things up.  This emulates the behavior that a client would expect if it was making a new connection directly to the database.</p>
+<p>As of SQL Relay 0.39, when using MySQL, whenever a client connects to the server, the MySQL connection daemon executes a commit before running the first query to sync things up.  This emulates the behavior that a client would expect if it was making a new connection directly to the database.</p>
 
 <br><a name="db2login"></a>
 <span class="heading3">Why does the first DB2 query causes SQL Relay to reconnect to the DB?</span>
 
-<p>This started in SQL Relay 0.39, see <a href="gettingstarted/db2.html#caveat">SQL Relay - Getting Started With IBM DB2</a> for information about this.</p>
+<p>This started in SQL Relay 0.39, see <a href="gettingstarted/db2.html#caveat">SQL Relay - Getting Started With IBM DB2</a> for information.</p>
 
 <br><a name="mssqldates"></a>
 <span class="heading3">What's the deal with date columns in MS SQL Server?</span>
@@ -931,12 +733,12 @@ sqlrcon_free<font color="#6b59ce">(</font><font color="#a52829"><b>$</b></font><
 <span class="heading3">How do keep SQL Relay from buffering the entire result 
 set?</span>
 
-<p>For large result sets it can be impractical to buffer the entire result set.  Use the setResultSetBufferSize() method in the C++, Perl, Python, Ruby and Java API's or the sqlrcur_setResultSetBufferSize() function in the C or PHP API's to specify how many rows of the result set to buffer at once.</p>
+<p>For large result sets it can be impractical to buffer the entire result set.  Use the setResultSetBufferSize() method or the sqlrcur_setResultSetBufferSize() function to specify how many rows of the result set to buffer at once.</p>
 
 <br><a name="bindvars"></a>
 <span class="heading3">How do I use bind variables?</span>
 
-<p>That depends on the database you're using.  Oracle supports named bind variables while other databases only support binds by position.  Below are pseudocode examples of both.</p>
+<p>That depends on the database you're using.  Some databases support named bind variables while others only support binds by position.  Below are pseudocode examples of both.</p>
 
 <p>Oracle example:</p>
 <pre>
@@ -977,7 +779,7 @@ delete cur;
 delete con;
 </pre>
 
-<p>Output bind variables work similarly but are only supported on Oracle.</p>
+<p>Output bind variables work similarly.</p>
 
 <pre>
 sqlrconnection	*con=new sqlrconnection(...);
@@ -1002,8 +804,6 @@ delete cur;
 <br><a name="storedprocs"></a>
 <span class="heading3">How do I run stored procedures?</span>
 
-<p>Stored procedures work in most databases that support them, with some caveats.  Stored procedures are not supported when using FreeTDS against Sybase/MS SQL Server.  Binding clob/blob values are only supported in Oracle 8i or greater.  When using stored procedures with Sybase, output parameters must be varchar types.</p>
-
 <p>The syntax for creating and executing a stored procedure is different for each database.  Each of the "Programming with SQL Relay using the XXX API" documents explain how to use stored procedures in detail.</p>
 
 <br><a name="storedprocs"></a>
@@ -1023,11 +823,13 @@ delete cur;
 <span class="heading3">How do I get data out of DML with RETURNING 
 clauses?</span>
 
-<p>DML with RETURNING clauses are only known to work with Oracle.  You can use output bind variables to get data out of DML with RETURNING clauses if the values returned are scalar.  Vector values are not supported.  For example:</p>
+<p>You can use output bind variables to get data out of DML with RETURNING clauses if the values returned are scalar.  For example:</p>
 
 <pre>
 insert into testtable values ("one",2) returning :first, :second
 </pre>
+
+<p>Vector values are not supported.</p>
 
 <br><a name="temptables"></a>
 <span class="heading3">Do temporary tables work with SQL Relay?</span>
@@ -1055,7 +857,7 @@ insert into testtable values ("one",2) returning :first, :second
 <br><a name="servercache"></a>
 <span class="heading3">What about server-side result-set caching?</span>
 
-<p>Server-side result set caching has not been implemented.  This feature is on the TODO list though.</p>
+<p>Server-side result set caching has not been implemented yet.</p>
 
 <br><a name="defineoutputbind"></a>
 <span class="heading3">What happened to defineOutputBind?</span>
@@ -1066,11 +868,6 @@ insert into testtable values ("one",2) returning :first, :second
 
 <p>Apps which used defineOutputBind/getOutputBind must replace those calls with defineOutputBindString/getOutputBindString to get the exact same behavior.</p>
 
-<br><a name="mysqlinsertid"></a>
-<span class="heading3">MySQL Provides mysql_insert_id().  How do I get that from SQL Relay?</span><br>
-
-<p>SQL Relay doesn't provide an API call like mysql_insert_id(), however, when using MySQL as a backend database, you can run the query "select last_insert_id()" to get the last insert_id.</p>
-
 <hr>
 
 <br><span class="heading2">Administration Questions</span><br>
@@ -1078,12 +875,12 @@ insert into testtable values ("one",2) returning :first, :second
 <br><a name="tweaks"></a>
 <span class="heading3">What system parameters can I tweak to get better performance out of SQL Relay?</span><br>
 
-<p>See <a href="tuning.html">Tuning SQL Relay...</a></p>
+<p>See <a href="tuning.html">Tuning SQL Relay</a>.</p>
 
 <br><a name="firewallhang"></a>
 <span class="heading3">If I leave SQL Relay idle for a long time, then come back and try to use it, my program gets hung or I get a low level TCP error from the database.  What does that mean?</span><br>
 
-<p>If you are running SQL Relay on one machine and the database on a seperate machine, and there is a firewall between the two machines, and no queries have been run in a while, the firewall may "close" the connection between SQL Relay and the database by discarding any packets that it receives from either.  The firewall does not send "close packets" to either SQL Relay or the database, so SQL Relay thinks it's still connected to the database, but when it sends a query, the firewall discards it.</p>
+<p>If you are running SQL Relay on one machine and the database on a seperate machine, and there is a firewall between the two machines, and no queries have been run in a while, the firewall may "close" the connection between SQL Relay and the database by discarding any packets that it receives from either.  However, the firewall does not send "close packets" to either SQL Relay or the database.  SQL Relay thinks it's still connected to the database and since the firewall silently discards all packets coming from SQL Relay, it never learns otherwise.</p>
 
 <p>Some database client API's catch this condition and return an obscure error but many do not, they just hang silently forever.</p>
 
@@ -1093,7 +890,7 @@ insert into testtable values ("one",2) returning :first, :second
 
 <p>Another solution is to turn off the time out.</p>
 
-<p>Yet another solution is to set up a cron job that runs a query periodically and keeps the connection from timing out.</p>
+<p>Yet another solution is to set up a cron job that runs a query periodically using sqlrsh to keep the connection from timing out.</p>
 
 <p>You could also just set up the timeout to be so long that it's really unlikely that it will ever occur.  The PIX firewall's default is 1 hour.  You can change it from the PIX's command line using a command such as the following:</p>
 
@@ -1143,14 +940,9 @@ connection:
 <br><a name="nobody"></a>
 <span class="heading3">Whenever I set maxconnections&gt;connections, it doesn't ever start any new connections and I get "Couldn't parse config file ..." errors on the screen.  What's going on?</span><br>
 
-<p>SQL Relay is typically started as root.  The sqlr-start command runs as root and starts up the sqlr-listener, sqlr-connection and sqlr-scaler processes as root.  They then read the config file and switch to run as whatever user/group are specified in the runasuser and runasgroup parameters.  The sqlr-scaler is most likely now running as a non-root user (such as nobody).  When it spawns new connections, they start out running as that same non-root user.  The root user can always read the config file, but the config file may not have permissions set so that the non-root user can read it.  In that case, the sqlr-connection daemon will start up, fail to read the config file, display a message and exit.</p>
+<p>SQL Relay is typically started as root.  The sqlr-start command runs as root and starts up the sqlr-listener, sqlr-connection and sqlr-scaler processes as root.  They then read the config file and switch to run as whatever user/group are specified in the runasuser and runasgroup parameters (usually nobody).  The sqlr-scaler is most likely now running as a non-root user (such as nobody).  When it spawns new connections, they start out running as that same non-root user.  The root user can always read the config file, but the config file may not have permissions set so that the non-root user can read it.  In that case, the sqlr-connection daemon will start up, fail to read the config file, display a message and exit.</p>
 
 <p>To remedy the situation, make sure that the configuration file is readable by each of the users and groups specified in the runasuser/runasgroup attributes inside the file.</p>
-
-<br><a name="gui"></a>
-<span class="heading3">Where'd the configuration GUI go?</span><br>
-
-<p>The GTK-based configuration GUI was removed in version 0.40.  It was buggy, used legacy GTK+ version 1.2 and virtually nobody used it.</p>
 
 <br><a name="socketonly"></a>
 <span class="heading3">How can I get SQL Relay to only listen on the unix socket and not the inet port?</span><br>
@@ -1160,7 +952,7 @@ connection:
 <br><a name="dynamicscaling"></a>
 <span class="heading3">If I set up SQL Relay to use dynamic scaling, it eventually spawns off as many connections as it can and they never die off.  What's up with that?</span><br>
 
-<p>This can happen if a spike of client traffic comes in.  If configured to do so, SQL Relay will fork off more connection daemons to handle the traffic.  Later when the traffic dies down, the connections that were forked off will still end up handling clients.  Each connection daemon will experience longer idle periods than before the spike, but unless those idle periods are shorter than the <i>ttl</i> parameter, the connections will not die off.  Setting the <i>ttl</i> shorter should take care of this, but it may take a lot of fine tuning to find the correct <i>ttl</i>.</p>
+<p>This can happen if a spike of client traffic comes in.  If configured to do so, SQL Relay will fork off more connection daemons to handle the traffic.  Later when the traffic dies down, the connections that were forked off will still end up handling clients.  Each connection daemon will experience longer idle periods than before the spike, but unless those idle periods are shorter than the <i>ttl</i> parameter, the connections will not die off.  Setting the <i>ttl</i> shorter should take care of this, but it may take some fine tuning to find the correct <i>ttl</i>.</p>
 
 <p>As of version 0.41, SQL Relay supports a new parameter: <i>maxsessioncount</i>.  If it is set greater than 0, then connections that were forked off will only handle that many client sessions before dying off, even if it doesn't go idle.  Using this new parameter will ensure that all forked-off connections will eventually die off.  Like the <i>ttl</i>, this parameter still requires some
 tuning but setting it too low will result in poorer performance rather than
