@@ -150,12 +150,12 @@ database.</p>
 <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>DOCTYPE</FONT></B> instances <B><FONT color=#a62828>SYSTEM</FONT></B> <FONT color=#ff00ff>&quot;sqlrelay.dtd&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
 <FONT color=#008a8e>&lt;instances&gt;</FONT>
 
-        <FONT color=#008a8e>&lt;instance id=</FONT><FONT color=#ff00ff>&quot;sqlitetest&quot;</FONT><FONT color=#008a8e> port=</FONT><FONT color=#ff00ff>&quot;9000&quot;</FONT><FONT color=#008a8e> socket=</FONT><FONT color=#ff00ff>&quot;/tmp/sqlitetest.socket&quot;</FONT><FONT color=#008a8e> dbase=</FONT><FONT color=#ff00ff>&quot;sqlite&quot;</FONT><FONT color=#008a8e> connections=</FONT><FONT color=#ff00ff>&quot;3&quot;</FONT><FONT color=#008a8e> maxconnections=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> maxqueuelength=</FONT><FONT color=#ff00ff>&quot;0&quot;</FONT><FONT color=#008a8e> growby=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e> ttl=</FONT><FONT color=#ff00ff>&quot;60&quot;</FONT><FONT color=#008a8e> endofsession=</FONT><FONT color=#ff00ff>&quot;commit&quot;</FONT><FONT color=#008a8e> sessiontimeout=</FONT><FONT color=#ff00ff>&quot;600&quot;</FONT><FONT color=#008a8e> runasuser=</FONT><FONT color=#ff00ff>&quot;testuser&quot;</FONT><FONT color=#008a8e> runasgroup=</FONT><FONT color=#ff00ff>&quot;testuser&quot;</FONT><FONT color=#008a8e> cursors=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;instance id=</FONT><FONT color=#ff00ff>&quot;sqlitetest&quot;</FONT><FONT color=#008a8e> dbase=</FONT><FONT color=#ff00ff>&quot;sqlite&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
                 <FONT color=#008a8e>&lt;users&gt;</FONT>
                         <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;sqlitetest&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;sqlitetest&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/users&gt;</FONT>
                 <FONT color=#008a8e>&lt;connections&gt;</FONT>
-                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;sqlitetest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;db=/usr/local/sqlite/var/testdb&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                        <FONT color=#008a8e>&lt;connection string=</FONT><FONT color=#ff00ff>&quot;db=/usr/local/sqlite/var/testdb&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/connections&gt;</FONT>
         <FONT color=#008a8e>&lt;/instance&gt;</FONT>
 
@@ -177,7 +177,7 @@ database.</p>
 <p>The following command shuts down the SQL Relay instance.</p>
 
 <blockquote>
-<b>sqlr-stop sqlitetest</b>
+<b>sqlr-stop -id sqlitetest</b>
 </blockquote>
 
 <a name="inmemory"></a>

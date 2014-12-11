@@ -1,23 +1,16 @@
 <html>
 
 <head>
-<title>SQL Relay - Getting Started With Sybase</title>
+<title>SQL Relay - Getting Started With SAP/Sybase</title>
 <link rel="stylesheet" href="../css/styles.css">
 </head>
 
 <body>
 
-<span class="heading1">Getting Started With Sybase</span><br>
+<span class="heading1">Getting Started With SAP/Sybase</span><br>
 
 <ul>
 <li><a href="#installation">Installation</a></li>
-<ul>
-<li><a href="#rpmversions">RPM-based Installations</a>
-<ul>
-<li><a href="#debian">Debian Linux</a></li>
-<li><a href="#rpm">RPM-based Linux</a></li>
-</ul>
-<li><a href="#nonrpmversions">Non RPM-based Installations</a>
 <li><a href="#creating">Creating a Database</a></li>
 <li><a href="#accessing">Accessing a Database</a></li>
 <li><a href="#sqlrelay">Accessing a Database With SQL Relay</a></li>
@@ -26,29 +19,36 @@
 <a name="installation"></a>
 <span class="heading1">Installation</span><br>
 
-<p>I've successfully installed and used Sybase Adaptive Server Enterprise 
-versions 11.0.3.3 - 15.7 on Linux.</p>
+<p>I've successfully installed and used SAP/Sybase Adaptive Server Enterprise 
+versions 11.0.3.3 - 16 on Linux.</p>
 
-<p>You can download Sybase ASE from the 
+<p>You can download SAP/Sybase ASE from the 
 <a href="http://www.sybase.com/downloads">downloads section</a> of the Sybase 
 site.</p>
 
-<a name="rpmversions"></a>
-<span class="heading2">RPM-based Installations</span><br>
+<p>Modern versions of ASE (12.5.1 and newer) for Linux are
+distributed as tarballs.  Installation and server initialization are done in a
+single step.  For instructions, see <a href="#creating">Creating a Database</a>
+below.</p>
 
-<p>Versions 11.0.3.3 - 12.5 come as a set of RPM's for Linux.</p>
+<p>Versions 12.5 and older were distributed as RPM's.  They must be installed before the server can be initialized.</p>
 
-<a name="debian"></a>
-<span class="heading3">Debian Linux</span><br>
+<p>To install them on an RPM-based linux system, simply use <i>rpm -i</i>.</p>
 
-<p>The best way to install RPM-based versions of Sybase ASE on Debian Linux
-is to install <i>alien</i> and then use it to convert the Sybase RPM's to DEB
-files and install them with <i>dpkg</i>.  To install alien, run
-<i>apt-get install alien</i>.  Once <i>alien</i> is installed, log in as root
-and use <i>alien</i> to convert the RPM's to DEB's and subsequently install the
-DEB's as follows:</p>
+<p>For example, version 12.5:</p>
 
-<p>For version 12.5:</p>
+<blockquote>
+rpm -i sybase-openclient-12.5.0.1ESD-1.i386.rpm \<br>
+sybase-common-12.5.0.1DE-1.i386.rpm \<br>
+sybase-ase-12.5.0.1ESD-1.i386.rpm<br>
+</blockquote>
+
+<p>To install them on Debian Linux, install <i>alien</i> by running
+<i>apt-get install alien</i> then convert the RPM's to DEB's uisng
+<i>alien --to-deb</i> and install them them with <i>dpkg</i>.</p>
+
+<p>For example, version 12.5:</p>
+
 <blockquote>
 alien --to-deb sybase-openclient-12.5.0.1ESD-1.i386.rpm<br>
 alien --to-deb sybase-common-12.5.0.1DE-1.i386.rpm<br>
@@ -57,66 +57,6 @@ dpkg -i sybase-openclient-12.5.0.1ESD-1.i386.deb<br>
 dpkg -i sybase-common-12.5.0.1DE-1.i386.deb<br>
 dpkg -i sybase-ase-12.5.0.1ESD-1.i386.deb<br>
 </blockquote>
-
-<p>For version 11.9.2:</p>
-<blockquote>
-alien --to-deb sybase-openclient-11.1.1-3.i386.rpm<br>
-alien --to-deb sybase-common-11.9.2-3.i386.rpm<br>
-alien --to-deb sybase-ase-11.9.2-3.i386.rpm<br>
-dpkg -i sybase-openclient-11.1.1-3.i386.deb<br>
-dpkg -i sybase-common-11.9.2-3.i386.deb<br>
-dpkg -i sybase-ase-11.9.2-3.i386.deb<br>
-</blockquote>
-
-<p>For version 11.0.3.3:</p>
-<blockquote>
-alien --to-deb sybase-ase-11_0_3_3-6_i386.rpm<br>
-alien --to-deb sybase-ocsd-11_0_3_3-6_i386.rpm<br>
-alien --to-deb sybase-doc-11_0_4-6_i386.rpm<br>
-dpkg -i sybase-ase-11_0_3_3-6_i386.deb<br>
-dpkg -i sybase-ocsd-11_0_3_3-6_i386.deb<br>
-dpkg -i sybase-doc-11_0_4-6_i386.deb<br>
-</blockquote>
-
-<a name="rpm"></a>
-<span class="heading3">RPM-based Linux</span><br>
-
-<p>Versions 11.9.2 and 11.0.3.3 of Sybase ASE for Linux require glibc version
-2.1.2 or greater.  I was able to install them both on RedHat 6.2, 7.3 and 9.
-I was not able to install them on Redhat 5.2.</p>
-
-<span class="heading4">Version 11.9.2</span><br>
-
-<p>To install version 11.9.2 on RPM Based Linux, you should download the
-following RPMS (at minimum) and install them using <i>rpm -i</i>.  Note that
-while it is possible to have RPMS for versions 11.9.2 and 12.5 installed
-simultaneously, it will cause problems for both versions.  Install one or the
-other, but not both.</p>
-
-<blockquote><b>
-sybase-openclient-11.1.1-3<br>
-sybase-common-11.9.2-3<br>
-sybase-ase-11.9.2-3<br>
-</b></blockquote>
-
-<p>The other RPMS provide documentation and localization support for several
-languages.</p>
-
-<p>During RPM installation, a sybase user will be created.  You should give
-this user a password.</p>
-
-<span class="heading4">Version 11.0.3.3</span><br>
-
-<p>To install version 11.0.3.3 on RPM Based Linux, you should download the
-following RPMS (at minimum) and install them using <i>rpm -i</i>.</p>
-
-<blockquote><b>
-sybase-ase-11.0.3.3-6<br>
-sybase-ocsd-11.0.3.3-6<br>
-</b></blockquote>
-
-<p>The other RPMS provide documentation and localization support for several
-languages.</p>
 
 <p>Version 11.0.3.3 does not create a sybase user when the RPMS are installed.
 After installation, you must run the following commands as root.
@@ -129,23 +69,14 @@ export SYBASE=/opt/sybase<br>
 <p>Answer Yes or y to all questions.  The script will create a sybase user and 
 prompt you for a password.</p>
 
-<a name="nonrpmversions"></a>
-<span class="heading2">Non RPM-based Installations</span><br>
-
-<p>Sybase provides tarballs for versions 12.5.1 - 15.7 for Linux.
-In versions 12.5.2 and 12.5.1, installation and database creation are done in a
-single step.  For instructions for installing versions 12.5.2 and 12.5.1, see
-the instructions below for creating a database.</p>
-
 <a name="creating"></a>
 <span class="heading1">Creating a Database</span><br>
 
-<p>Some Linux distributions set the LANG environment variable to a value
-that is not supported by Sybase ASE prior to 15.0.2.  For example, by default
-LANG=en_US.iso885915 on Redhat 7.3.  Check the value of the LANG environment
-variable, and if necessary, set it to something that is defined in the
-locales.dat file (/opt/sybase-11.9.2/locales/locales.dat for sybase-11.9.2)
-such as en_US for US-english.</p>
+<p>To create a database, the server must first be initialized.</p>
+
+<p>If you are installing ASE 15.0.2 or older, check the LANG
+environment variable first and set it to something simple like en_US as
+opposed to en_US.iso885915.</p>
 
 <p>The instructions for initializing each version are very different.</p>
 
@@ -162,21 +93,21 @@ such as en_US for US-english.</p>
 <p>Once you have initialized the server, you should start the server.  From
 this point on, the database creation process is the same for all versions.</p>
 
-<p>At this point, you should set up your environment.  The Sybase client is
+<p>At this point, you should set up your environment.  The SAP/Sybase client is
 called </i>isql</i>.  Note that <i>unixODBC</i> and <i>Interbase/Firebird</i>
 have a client called <i>isql</i> as well which could be installed in /usr/bin,
 /usr/local/bin or some other path.  If you have <i>unixODBC</i> or
 <i>Interbase/Firebird</i> installed, you'll have to decide which client you
-want the <i>isql</i> command to run.  If you want it to run the Sybase client,
-follow the instructions below.  Otherwise, you'll have to run the Sybase
-<i>isql</i> client by its full pathname which could be
+want the <i>isql</i> command to run.  If you want it to run the SAP/Sybase
+client, follow the instructions below.  Otherwise, you'll have to run the
+SAP/Sybase <i>isql</i> client by its full pathname which could be
 /opt/sybase/OCS-15_0/bin/isql, /opt/sybase/OCS/bin/isql,
 /opt/sybase-12.5/OCS/bin/isql, /opt/sybase-11.9.2/bin/isql
 or some other path.</p>
 
-<p>In the configuration script for your shell, add the path to the Sybase isql
-client to your PATH environment variable as follows.  In these examples,
-/opt/sybase-11.9.2/bin is used, but your Sybase isql client may be installed
+<p>In the configuration script for your shell, add the path to the SAP/Sybase
+isql client to your PATH environment variable as follows.  In these examples,
+/opt/sybase/OCS/bin is used, but your SAP/Sybase isql client may be installed
 elsewhere.</p>
 
 <p>For Bourne shells:</p>
@@ -196,27 +127,27 @@ elsewhere.</p>
 </PRE>
 </blockquote>
 
-<p>Now log out and log back in and you can access the database using the 
-<i>isql</i> client. 
+<p>Now log out and log back in and you can use the <i>isql</i> client to create
+a database.</p>
 
 <p>The initialization process should have created a server named 
-<i>LOCALHOST</i> (or <i>localhost</i> for version 11.9.2 or earlier) with an
-administrative user named <i>sa</i>.  In versions 15.5 and earlier, the
-<i>sa</i> user is created with no password.  Versions 15.7 and later allow you
-to set the password during installation.
+<i>LOCALHOST</i> (or <i>localhost</i> for version 11.9.2 or older) with an
+administrative user named <i>sa</i>.  Versions 15.7 and newer allow you
+to set the password for the <i>sa</i> user during installation.  In versions
+15.5 and older, the user is created with no password.</p>
 
 <p>If you need to set the administrative user's password, log into the database
 with the following command.  When it prompts you for a password, just press
 return.</p>
 
 <blockquote>
-For Sybase 12.5 or later:
+For version 12.5 or newer:
 
 <blockquote>
 <b>isql -U sa -S LOCALHOST</b>
 </blockquote>
 
-For Sybase 11.9.2 or earlier:
+For version 11.9.2 or older:
 
 <blockquote>
 <b>isql -U sa -S localhost</b>
@@ -244,13 +175,13 @@ go
 type <i>sapassword</i>.</p>
 
 <blockquote>
-For Sybase 12.5 or later:
+For version 12.5 or newer:
 
 <blockquote>
 <b>isql -U sa -S LOCALHOST</b>
 </blockquote>
 
-For Sybase 11.9.2 or earlier:
+For version 11.9.2 or older:
 
 <blockquote>
 <b>isql -U sa -S localhost</b>
@@ -273,13 +204,13 @@ quit
 <p>Now log into the database you just created with the following command.</p>
 
 <blockquote>
-For Sybase 12.5 or later:
+For version 12.5 or newer:
 
 <blockquote>
 <b>isql -U sa -S LOCALHOST -D testdb</b>
 </blockquote>
 
-For Sybase 11.9.2 or earlier:
+For version 11.9.2 or older:
 
 <blockquote>
 <b>isql -U sa -S localhost -D testdb</b>
@@ -309,13 +240,13 @@ quit
 promted for a password, enter <i>testpassword</i>.</p>
 
 <blockquote>
-For Sybase 12.5 or later:
+For version 12.5 or newer:
 
 <blockquote>
 <b>isql -U testuser -S LOCALHOST -D testdb</b>
 </blockquote>
 
-For Sybase 11.9.2 or earlier:
+For version 11.9.2 or older:
 
 <blockquote>
 <b>isql -U testuser -S localhost -D testdb</b>
@@ -323,7 +254,7 @@ For Sybase 11.9.2 or earlier:
 
 </blockquote>
 
-<p>A common problem when using Sybase ASE in this minimal configuration is 
+<p>A common problem when using ASE in this minimal configuration is 
 running out of log space.  If you run out of log space, queries will hang until
 space is freed up.  You might get an error like this:</p>
 
@@ -336,14 +267,14 @@ being suspended until space is made available in the log.
 follows.  When it promts you for a password, type <i>sapassword</i>.</p>
 
 <blockquote>
-For Sybase 12.5 or later:
+For version 12.5 or newer:
 
 
 <blockquote>
 <b>isql -U sa -S LOCALHOST -D testdb</b>
 </blockquote>
 
-For Sybase 11.9.2 or earlier:
+For version 11.9.2 or older:
 
 <blockquote>
 <b>isql -U sa -S localhost -D testdb</b>
@@ -363,13 +294,13 @@ go
 <p>A longer term solution is to configure the database to truncate its log at each checkpoint.  To configure this, log into the master database as the <i>sa</i> user as follows.  When it promts you for a password, type <i>sapassword</i>.</p>
 
 <blockquote>
-For Sybase 12.5 or later:
+For version 12.5 or newer:
 
 <blockquote>
 <b>isql -U sa -S LOCALHOST -D master</b>
 </blockquote>
 
-For Sybase 11.9.2 or earlier:
+For version 11.9.2 or older:
 
 <blockquote>
 <b>isql -U sa -S localhost -D master</b>
@@ -389,38 +320,30 @@ go
 <p>This is not something you should do in production.  Without the transaction log, there is no way to recover from certain failure conditions.  It is only safe to do in development or test environments where data could be reconstructed or recovered some other way.</p>
 
 <p>This should be enough to get you started.  To set up more complex 
-configurations, consult the Sybase ASE documentation.</p>
+configurations, consult the ASE documentation.</p>
 
 <a name="accessing"></a>
 <span class="heading1">Accessing a Database</span><br>
 
-<p>Some Linux distributions set the LANG environment variable to a value
-that is not supported by Sybase ASE.  For example, LANG=en_US.iso885915 on
-Redhat 7.3.  If isql fails to start, and complains about the LANG environment variable, set it to something that is defined in the locales.dat file
-(/opt/sybase-11.9.2/locales/locales.dat for sybase-11.9.2) such as en_US for
-US-english.</p>
+<p>If you are installing ASE 15.0.2 or older, check the LANG
+environment variable first and set it to something simple like en_US as
+opposed to en_US.iso885915.</p>
 
-<p>The first step in accessing a Sybase ASE database is setting up your 
-environment.  The Sybase client is called <i>isql</i>.  Note that 
-<i>unixODBC</i> and <i>Interbase</i> both have clients called <i>isql</i> 
-as well which could be installed in /usr/bin, /usr/local/bin or 
-/opt/interbase/bin.  If you have <i>unixODBC</i> or <i>Interbase</i> installed, 
-you'll have to decide which client you want the <i>isql</i> command to run.  If 
-you want it to run the Sybase client, follow the instructions below.  
-Otherwise, you'll have to run the Sybase <i>isql</i> client by its full 
-pathname.</p>
+<p>The first step in accessing a ASE database is setting up your 
+environment.  The SYBASE environment variable must be set to the directory
+that sybase was intalled in.</p>
 
 <p>In the configuration script for whatever shell you use, create an 
-environment variable called SYBASE containing the directory you intalled Sybase
-ASE in.  Then add <i>$SYBASE/bin</i> to your PATH environment variable.</p>
+environment variable called SYBASE containing the directory you intalled 
+ASE in. In these examples, /opt/sybase is used, but your instance of ASE may be
+installed elsewhere.</p>
 
 <p>For Bourne shells:</p>
 
 <blockquote>
 <PRE>
-<FONT color=#008a8e>SYBASE</FONT>=/opt/sybase<FONT color=#ff00ff>-11</FONT>.<FONT color=#ff00ff>9</FONT>.<FONT color=#ff00ff>2</FONT>
-<FONT color=#008a8e>PATH</FONT>=<FONT color=#a620f7>$PATH</FONT>:<FONT color=#a620f7>$SYBASE</FONT>/bin
-<B><FONT color=#a62828>export </FONT></B><FONT color=#008a8e>SYBASE PATH</FONT>
+<FONT color=#008a8e>SYBASE</FONT>=/opt/sybase
+<B><FONT color=#a62828>export </FONT></B><FONT color=#008a8e>SYBASE</FONT>
 </PRE>
 </blockquote>
 
@@ -428,13 +351,12 @@ ASE in.  Then add <i>$SYBASE/bin</i> to your PATH environment variable.</p>
 
 <blockquote>
 <PRE>
-<B><FONT color=#a62828>setenv</FONT></B> <FONT color=#6959cf>SYBASE</FONT> /opt/sybase<FONT color=#ff00ff>-11</FONT>.<FONT color=#ff00ff>9</FONT>.<FONT color=#ff00ff>2</FONT>
-<B><FONT color=#a62828>setenv</FONT></B> <FONT color=#6959cf>PATH</FONT> <B><FONT color=#288a51>${PATH}</FONT></B>:<B><FONT color=#288a51>${SYBASE}</FONT></B>/bin
+<B><FONT color=#a62828>setenv</FONT></B> <FONT color=#6959cf>SYBASE</FONT> /opt/sybase
 </PRE>
 </blockquote>
 
-<p>Now, if you log out and log back in, you can access the database using the 
-<i>isql</i> client.</p>
+<p>Now log out and log back in and you can use the <i>isql</i> client to access
+the database.</p>
 
 <p><i>isql</i> requires a <b>username</b>, <b>server</b> and <b>database</b> 
 name to access a database.  The <b>server</b> parameter does not refer to the
@@ -444,7 +366,7 @@ an entry in the <i>$SYBASE/interfaces</i> file on the machine the database was
 created on.  This entry can then be copied into the <i>$SYBASE/interfaces</i>
 file on other machines to provide them remote access to the database.  Below is
 a sample entry for a server named <i>REMOTEHOST</i> which refers to an instance 
-of Sybase ASE running on <i>testhost.testdomain.com</i>, on port 4100, 
+of ASE running on <i>testhost.testdomain.com</i>, on port 4100, 
 accessible over tcp on ethernet and a similar entry for a server named 
 <i>LOCALHOST</i> which is running on <i>localhost</i>.</p>
 
@@ -567,7 +489,7 @@ The attribute <FONT color=#ff00ff>'exp_row_size'</FONT> is not applicable to tab
 <a name="sqlrelay"></a>
 <span class="heading1">Accessing a Database With SQL Relay</span><br>
 
-<p>Accessing Sybase from SQL Relay requires an instance entry in your 
+<p>Accessing ASE from SQL Relay requires an instance entry in your 
 <i>sqlrelay.conf</i> file for the database that you want 
 to access.  Here is an example <i>sqlrelay.conf</i> which defines an SQL Relay 
 instance called sybasetest.  This instance connects to the <i>testdb</i> 
@@ -579,12 +501,12 @@ password <i>testpassword</i>.</p>
 <FONT color=#008a8e>&lt;!</FONT><B><FONT color=#a62828>DOCTYPE</FONT></B> instances <B><FONT color=#a62828>SYSTEM</FONT></B> <FONT color=#ff00ff>&quot;sqlrelay.dtd&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
 <FONT color=#008a8e>&lt;instances&gt;</FONT>
 
-        <FONT color=#008a8e>&lt;instance id=</FONT><FONT color=#ff00ff>&quot;sybasetest&quot;</FONT><FONT color=#008a8e> port=</FONT><FONT color=#ff00ff>&quot;9000&quot;</FONT><FONT color=#008a8e> socket=</FONT><FONT color=#ff00ff>&quot;/tmp/sybasetest.socket&quot;</FONT><FONT color=#008a8e> dbase=</FONT><FONT color=#ff00ff>&quot;sybase&quot;</FONT><FONT color=#008a8e> connections=</FONT><FONT color=#ff00ff>&quot;3&quot;</FONT><FONT color=#008a8e> maxconnections=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e> maxqueuelength=</FONT><FONT color=#ff00ff>&quot;0&quot;</FONT><FONT color=#008a8e> growby=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e> ttl=</FONT><FONT color=#ff00ff>&quot;60&quot;</FONT><FONT color=#008a8e> endofsession=</FONT><FONT color=#ff00ff>&quot;commit&quot;</FONT><FONT color=#008a8e> sessiontimeout=</FONT><FONT color=#ff00ff>&quot;600&quot;</FONT><FONT color=#008a8e> runasuser=</FONT><FONT color=#ff00ff>&quot;nobody&quot;</FONT><FONT color=#008a8e> runasgroup=</FONT><FONT color=#ff00ff>&quot;nobody&quot;</FONT><FONT color=#008a8e> cursors=</FONT><FONT color=#ff00ff>&quot;5&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
+        <FONT color=#008a8e>&lt;instance id=</FONT><FONT color=#ff00ff>&quot;sybasetest&quot;</FONT><FONT color=#008a8e> dbase=</FONT><FONT color=#ff00ff>&quot;sybase&quot;</FONT><FONT color=#008a8e>&gt;</FONT>
                 <FONT color=#008a8e>&lt;users&gt;</FONT>
                         <FONT color=#008a8e>&lt;user user=</FONT><FONT color=#ff00ff>&quot;sybasetest&quot;</FONT><FONT color=#008a8e> password=</FONT><FONT color=#ff00ff>&quot;sybasetest&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/users&gt;</FONT>
                 <FONT color=#008a8e>&lt;connections&gt;</FONT>
-                        <FONT color=#008a8e>&lt;connection connectionid=</FONT><FONT color=#ff00ff>&quot;sybasetest&quot;</FONT><FONT color=#008a8e> string=</FONT><FONT color=#ff00ff>&quot;server=LOCALHOST;db=testdb;user=testuser;password=testpassword;&quot;</FONT><FONT color=#008a8e> metric=</FONT><FONT color=#ff00ff>&quot;1&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
+                        <FONT color=#008a8e>&lt;connection string=</FONT><FONT color=#ff00ff>&quot;server=LOCALHOST;db=testdb;user=testuser;password=testpassword;&quot;</FONT><FONT color=#008a8e>/&gt;</FONT>
                 <FONT color=#008a8e>&lt;/connections&gt;</FONT>
         <FONT color=#008a8e>&lt;/instance&gt;</FONT>
 
@@ -597,7 +519,7 @@ password <i>testpassword</i>.</p>
 <b>sqlr-start -id sybasetest</b>
 </blockquote>
 
-<p>Note that there are a couple of common problems people have with the Sybase
+<p>Note that there are a couple of common problems people have with the
 connection.  See the <a href="../faq.html">FAQ</a> and the
 <a href="../admin/running.html#problems">common problems</a> section of the document
 on running SQL Relay for more info.</p>
@@ -611,7 +533,7 @@ on running SQL Relay for more info.</p>
 <p>The following command shuts down the SQL Relay instance.</p>
 
 <blockquote>
-<b>sqlr-stop sybasetest</b>
+<b>sqlr-stop -id sybasetest</b>
 </blockquote>
 
 </body>
