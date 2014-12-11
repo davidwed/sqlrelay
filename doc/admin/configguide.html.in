@@ -167,7 +167,7 @@ sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
 
 <p>By default, SQL Relay assumes that it's connecting to an Oracle database, but SQL Relay supports many other databases.  The dbase parameter can be used to specify the database type.</p>
 
-<p>In the following example, SQL Relay is configured to connect to a Sybase database.</p>
+<p>In the following example, SQL Relay is configured to connect to a SAP/Sybase database.</p>
 
 <blockquote>
 @sqlrelay-sybase.conf.html@
@@ -255,7 +255,7 @@ sqlrsh -host <i>sqlrserver</i> -user routeruser -password routerpassword
 
 <p>Any number of SQL Relay instances can be defined in the configuration file.</p>
 
-<p>In following example, instances that connect to Oracle, Sybase and DB2 are defined in the same file.</p>
+<p>In following example, instances that connect to Oracle, SAP/Sybase and DB2 are defined in the same file.</p>
 
 <blockquote>
 @sqlrelay-multiple.conf.html@
@@ -329,7 +329,7 @@ sqlrsh -host <i>sqlrserver</i> -port 9002<br>
 
 <p>How to enable the init script depends on what platform you are using.</p>
 
-<p>On Linux, Solaris, SCO and other non-BSD Unixes, this usually involves creating a symlink from the file /etc/init.d/sqlrelay to /etc/rc3.d/S85sqlrelay.</p>
+<p>On Linux, Solaris, SCO and other non-BSD Unixes, this usually involves creating a symlink from /etc/init.d/sqlrelay to /etc/rc3.d/S85sqlrelay.</p>
 
 <p>Redhat-derived Linux distributions have a chkconfig command that can do this for you.  Debian-derived Linux distributions provide the update-rc.d command.  Older versions of Solaris provide svcadm.  Newer versions of Solaris provide smf.</p>
 

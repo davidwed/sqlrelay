@@ -37,7 +37,7 @@
 
 <p>The <b>instances</b> tag is just the root tag.  Each configuration file should have only one of these tags surrounding all other tags.</p>
 
-<p>Each <b>instance</b> tag defines an instance of SQL Relay.  An instance consists of one sqlr-listener and one or more sqlr-connection daemons.  You can define as many of these as you like in each configuration file.</p>
+<p>Each <b>instance</b> tag defines an instance of SQL Relay.  You can define as many of these as you like in each configuration file.</p>
 
 <p>The <b>users</b> tag surrounds the list of users that may connect to the instance.</p>
 
@@ -49,9 +49,9 @@
 
 <p>The <b>runquery</b> tag surrounds a query to be run at the beginning or end of a session.  Any number (including 0) of these may be specified.</p>
 
-<p>The <b>connections</b> tag surrounds the list of sqlr-connection daemon configurations used by the instance.</p>
+<p>The <b>connections</b> tag surrounds the list of database connection configurations used by the instance.</p>
 
-<p>Each <b>connection</b> tag defines a sqlr-connection daemon configuration.  In most cases, there will be only 1 of these tags.  In cases where clustered or replicated databases are used, the sqlr-connection daemons may need to be able to connect to multiple machines.  In that case, there would be more than 1 line here.  See <a href="loadbalfailover.html">Load Balancing and Failover</a> for more information.</p>
+<p>Each <b>connection</b> tag defines a database connection configuration.  In most cases, there will be only 1 of these tags.  In cases where clustered or replicated databases are used, there would likely be more than 1 line here.  See <a href="loadbalfailover.html">Load Balancing and Failover</a> for more information.</p>
 
 <p>The <b>router</b> tag sets up the instance to route and filter queries to other SQL Relay instances.  If this tag is present, the instance should contain no <b>connections</b> tags.  See <a href="router.html">Query Routing and Filtering</a> for detailed information about configuring SQL Relay to route and filter queries.</p> 
 
@@ -71,25 +71,25 @@
 <ul>
 <li><b>id</b> - The ID of this instance.</li>
 <li><b>enabled</b> - Whether to auto-start this instance.  Defaults to "no".  If set to "yes", then this instance will be started when sqlr-start is run with no arguments (as it is in the init scripts which run at boot).</li>
-<li><b>addresses</b> - A comma-delimited list of addresses that the sqlr-listener and sqlr-connection daemons should bind to.  If absent or set to 0.0.0.0, they will bind to all addresses.  Defaults to 0.0.0.0.</li>
-<li><b>port</b> - The port the listener should listen on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to 9000.</li>
-<li><b>socket</b> - The unix socket (filename) the listener should listen on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to /tmp/sqlrelay.socket</li>
+<li><b>addresses</b> - A comma-delimited list of addresses that the instance should bind to.  If absent or set to 0.0.0.0, it will bind to all addresses.  Defaults to 0.0.0.0.</li>
+<li><b>port</b> - The port to listen for client connections on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to 9000.</li>
+<li><b>socket</b> - The unix socket (filename) to listen for client connections on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to /tmp/sqlrelay.socket</li>
 <li><b>dbase</b> - The type of database the connection daemon should connect to.  Should be one of: "oracle8", "mysql", "postgresql", "sqlite", "freetds", "sybase", "odbc", "db2", "firebird" or "mdbtools".  Defaults to "oracle8".</li>
-<li><b>connections</b> - The number of sqlr-connection daemons to start up when using sqlr-start.  This may be set to any positive number or 0.  Defaults to 5.</li>
-<li><b>maxconnections</b> - The maximum number of sqlr-connection daemons to scale to.  If this is set to a number lower than the value for the <b>connections</b> parameter then it will be automatically bumped up to the value set for <b>connections</b>.  Defaults to the same value as <b>connections</b>.</li>
+<li><b>connections</b> - The number of database connections to open at startup.  This may be set to any positive number or 0.  Defaults to 5.</li>
+<li><b>maxconnections</b> - The maximum number of database connections to scale up to.  If this is set to a number lower than the value for the <b>connections</b> parameter then it will be automatically bumped up to the value set for <b>connections</b>.  Defaults to the same value as <b>connections</b>.</li>
 <li><b>maxqueuelength</b> - The size the queue of waiting clients has to grow to before more connections will be spawned.  Defaults to 0.</li>
 <li><b>growby</b> - The number of connections that will be started at a time when new connections are spawned.  Defaults to 1.</li>
 <li><b>ttl</b> - The number of seconds that an idle connection will stay alive after being spawned dynamically (does not apply to connections spawned by sqlr-start).  Defaults to 60 (one minute).</li>
 <li><b>maxsessioncount</b> - The number of client sessions that a connection will handle after being spawned dynamically before shutting down, even if it never goes idle.  Setting this to 0 will cause the connection to only shut down if it does idle for longer than <b>ttl</b> seconds.  This parameter does not apply to connections spawned by sqlr-start.  Defaults to 0.</li>
 <li><b>endofsession</b> - The command to issue when a client ends its session or dies.  Should be either "commit" or "rollback".  Defaults to "commit".</li>
 <li><b>sessiontimeout</b> - If a client leaves a session open for another client to pick up but no client picks it up, the session will time out after this number of seconds.  Defaults to 600 (10 minutes).</li>
-<li><b>runasuser</b> - The user to run the sqlr-listener, sqlr-connections and sqlr-scaler as.  Note that a configuration file must be readable by this user and the various "temp" directories (usually under /usr/local/firstworks/var/sqlrelay) must be writable by this user.  If this parameter is set to a user other than the user who runs sqlr-start, then unless sqlr-start is run as root, it will not be possible to switch to this user and the following warning will be displayed: <i>Warning: could not change user to <b>user</b>.</i>  Defaults to "nobody".</li>
-<li><b>runasgroup</b> - The group to run the sqlr-listener and sqlr-connections and sqlr-scaler as.  Note that a configuration file must be readable by this group and the various "temp" directories (usually under /usr/local/firstworks/var/sqlrelay) must be writable by this group.  If this parameter is set to a group other than a group that the user who runs sqlr-start belongs to, then unless sqlr-start is run as root, it will not be possible to switch to this group and the following warning will be displayed: <i>Warning: could not change group to <b>group</b>.</i>  Defaults to "nobody".</li>
-<li><b>cursors</b> - The number of database cursors that each sqlr-connection daemon will open and maintain.  More cursors may be opened if needed, but the pool of cursors will shrink back down to this size at the end of each client session.  This may be set to any positive number or 0.  Defaults to 1.</li>
+<li><b>runasuser</b> - The user to run the instance as.  Note that a configuration file must be readable by this user and the various "temp" directories (usually under /usr/local/firstworks/var/sqlrelay) must be writable by this user.  If this parameter is set to a user other than the user who runs sqlr-start, then unless sqlr-start is run as root, it will not be possible to switch to this user and the following warning will be displayed: <i>Warning: could not change user to <b>user</b>.</i>  Defaults to "nobody".</li>
+<li><b>runasgroup</b> - The group to run the instance as.  Note that a configuration file must be readable by this group and the various "temp" directories (usually under /usr/local/firstworks/var/sqlrelay) must be writable by this group.  If this parameter is set to a group other than a group that the user who runs sqlr-start belongs to, then unless sqlr-start is run as root, it will not be possible to switch to this group and the following warning will be displayed: <i>Warning: could not change group to <b>group</b>.</i>  Defaults to "nobody".</li>
+<li><b>cursors</b> - The number of database cursors to open and maintain for each database connection.  More cursors may be opened if needed, but the pool of cursors will shrink back down to this size at the end of each client session.  This may be set to any positive number or 0.  Defaults to 1.</li>
 <li><b>maxcursors</b> - The maximum number of database cursors that may be opened for a single client session.  If this is set to a number lower than the value for the <b>cursors</b> parameter then it will be automatically bumped up to the value set for <b>cursors</b>.  Defaults to the same value as <b>cursors</b>.</li>
 <li><b>cursors_growby</b> - The number of new cursors that will be opened at a time when new cursors are required.  Defaults to 1.</li>
 <li><b>authtier</b> - Where to authenticate, see <a href="#complex">Complex Attributes</a> below.  Can be set to "connection". or "database".  Defaults to connection.</li>
-<li><b>sessionhandler</b> - Method used by the listener to handle a client session.  Options are either "process" (the default) or "thread".  When a client connects to the listener, a child is forked to handle the connection.  The child can be either a process or a thread.  Threads should perform better but aren't supported on all platforms.  Defaults to "process".</li>
+<li><b>sessionhandler</b> - Method used by the listener to handle a client session.  Options are either "thread" (the default as of version 0.58) or "process".  When a client connects to the listener, a child is forked to handle the connection.  The child can be either a process or a thread.  Threads should perform better but aren't supported on all platforms.  Defaults to "thread" (as of version 0.58).</li>
 <li><b>handoff</b> - Method for handing off a client from listener to connection, can be one of: "pass" or "proxy", see <a href="#complex">Complex Attributes</a> below.  Defaults to "pass".</li>
 <li><b>deinedips</b> - A <a href="http://www.regular-expressions.info">regular expression</a> indicating which IP addresses will be denied access (for example, to deny access to all clients: deniedips=".*")  By default, no IP addresses are denied.</li>
 <li><b>allowedips</b> - A <a href="http://www.regular-expressions.info">regular expression</a> indicating which IP addresses will be allowed access, overriding deniedips (for example, to allow access to clients from the 192.168.2.0 and 64.45.22.0 networks: allowedips="(192\.168\.2\..*|64\.45\.22\..*)")  By default, all IP addresses are allowed.</li>
@@ -298,13 +298,13 @@ or a tnsnames-style expression such as:
 
 <br><span class="heading3">Authtier</span><br>
 
-<p>The client will send a user and password to the sqlr-connection daemon when it connects to it.</p>
+<p>The client will send a user and password when it connects to the SQL Relay server.</p>
 
-<p>If the <b>authtier</b> attribute is set to "connection", the sqlr-connection daemon will compare the user/password to the list of user/passwords in a configuration file and accept or reject the client connection.</p>
+<p>If the <b>authtier</b> attribute is set to "connection", then SQL Relay will compare the user/password to the list of user/passwords in a configuration file and accept or reject the client connection.</p>
 
-<p>If the <b>authtier</b> attribute is set to "database", the sqlr-connection daemon will authenticate the user against the database itself rather than against the list of user/passwords in a configuration file.  This causes SQL Relay to switch which user it is logged into the database as.</p>
+<p>If the <b>authtier</b> attribute is set to "database", then SQL Relay will authenticate the user against the database itself rather than against the list of user/passwords in a configuration file.  This causes SQL Relay to switch which user it is logged into the database as.</p>
 
-<p>When SQL Relay is used with Oracle 8i or higher, the sqlr-connection daemon switches users without logging out.  The sqlr-connection daemon must be configured to log into the database as a user that can proxy other users and the client must attempt to log in to <b>SQL Relay</b> as one of the users that can be proxied.  See <a href="oraclentier.html">this document</a> for more information including instructions for configuring Oracle.</p>
+<p>When SQL Relay is used with Oracle 8i or higher, it switches users without logging out.  The database connection must be configured to log into the database as a user that can proxy other users and the client must attempt to log in to SQL Relay as one of the users that can be proxied.  See <a href="oraclentier.html">this document</a> for more information including instructions for configuring Oracle.</p>
 
 <p>When SQL Relay is used with any other database, it simply logs out and logs back in as a different user.  This is somewhat ineffecient and defeats the value of keeping persistent database connections but might be useful for particular applications.</p>
 

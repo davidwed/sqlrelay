@@ -56,6 +56,7 @@
 		DontGetColumnInfo, GetNullsAsEmptyStrings and
 		ResultSetBufferSize
 	added note about JDBC-ODBC bridge removal in Oracle Java 8
+	made threaded listener the default
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries

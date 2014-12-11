@@ -11,6 +11,7 @@
 <li><a href="#localdbconnection">Connect To The Database Using a Local Connection</a></li>
 <li><a href="#unixsocket">Connect To SQL Relay Using a Unix Socket</a></li>
 <li><a href="#handoff">Use a Platform That Supports File Descriptor Passing</a></li>
+<li><a href="#threads">Use a Platform That Supports Threads</a></li>
 <li><a href="#systemparameters">Tweak Various System Parameters</a></li>
 <li><a href="#dontgetcolumninfo">Don't Get Unnecessary Column Info</a></li>
 <li><a href="#resultsetbuffersize">Use Result Set Buffer Size</a></li>
@@ -297,6 +298,22 @@ host/port.</p>
 
 <p>If you want the best performance, you must use a platform that supports file descriptor passing.</p>
 
+
+<br>
+<a name="threads"></a>
+<span class="heading2">Use a Platform That Supports Threads</span><br>
+
+<p>When a client connects to the SQL Relay listener process, it forks off either a thread or child process and waits for an available database connection.  Support for forking a thread, rather than a process was added in version 0.54.</p>
+
+<p>Whether to fork a thread or process can be specified by the "sessionhandler" parameter in ths configuration file.  If you omit this parameter or set sessionhandler="thread" then a thread will be used.  If you set sessionhandler="process" then a child process will be used.  Note that sessionhandler="thread" became the default in version 0.58.  Previously it defaulted to "process".</p>
+
+<p>Forking a thread is faster and lighter than forking a child process, and is the default (as of version 0.58), but it isn't supported on all platforms, especially older platforms.  Also, if the Rudiments library that SQL Relay is built on was intentionally compiled without thread support then SQL Relay will also not be able to use threads.</p>
+
+<p>If SQL Relay is configured to use threads but can't, then it falls back to forking a child process and prints a warning on the screen when the sqlr-listener process starts.</p>
+
+<p>If you want the best performance, you must use a platform that supports threads.</p>
+
+
 <br>
 <a name="systemparameters"></a>
 <span class="heading2">Tweak Various System Parameters</span><br>
@@ -359,15 +376,14 @@ using the ndd command to set the number of milliseconds to wait.  These
 examples set the timeout to 30 seconds.  You should put these commands in a 
 system startup file so they'll be executed at boot time.</p>
 
-<p>For Solaris 2.6 and earlier:  ndd -set /dev/tcp tcp_close_wait_interval 30000</p>
+<p>For Solaris 7 and later:  ndd -set /dev/tcp tcp_time_wait_interval 30000</p>
 
-<p>For Solaris 2.7 and later:  ndd -set /dev/tcp tcp_time_wait_interval 30000</p>
+<p>For Solaris 2.6 and earlier:  ndd -set /dev/tcp tcp_close_wait_interval 30000</p>
 
 <span class="heading3">Port range</span>
 
 <p>Another paramter that you may want to tweak is the range of available ports.
-On Linux 2.2 kernels, it defaults to ports 1024 through 4999.  You can display
-the range by running:</p>
+On Linux, you can display the range by running:</p>
 
 <p>/sbin/sysctl net.ipv4.ip_local_port_range</p>
 

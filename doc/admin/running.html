@@ -48,12 +48,10 @@ sqlr-start [-id ID] [-config CONFIGFILE] [-localstatedir LOCALSTATEDIR]
 <p>The <b>sqlr-stop</b> command is provided to kill running instances of SQL Relay.  It accepts two optional arguments: the id of the instance to kill and SIGKILL.</p>
 
 <blockquote><b>
-sqlr-stop [id] [SIGKILL]
+sqlr-stop [-id ID]
 </b></blockquote>
 
-<p>Running it with an id kills sqlrelay processes that were started with the supplied id.  Running it with no arguments will kill all SQL Relay processes.</p>
-
-<p>Supplying sqlr-stop with the SIGKILL option will cause it to pass the -9 option to the kill command.  It is not possible to supply the SIGKILL option without supplying an id.  Note that when the SIGKILL option is used, semaphores and shared memory segments will be left lying around and will need to be cleaned up.  Use the <b>ipcs</b> and <b>ipcrm</b> commands to clean them up.</p>
+<p>Running it with an ID kills sqlrelay processes that were started with the supplied ID.  Running it with no arguments will kill all SQL Relay processes.</p>
 
 <a name="cmdline"></a>
 <span class="heading2">Using the Command Line Interfaces</span>
@@ -61,10 +59,9 @@ sqlr-stop [id] [SIGKILL]
 <p>Several command line utilities are provided for use with SQL Relay.  The syntax for each is as follows:</p>
 
 <blockquote>
-backupschema HOST PORT USER PASSWORD<br>
+sqlrsh -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD [-script SCRIPT | -command COMMAND]<br>
 sqlr-query -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD -query QUERY<br>
 sqlr-fields -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD -table TABLE<br>
-sqlrsh -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD<br>
 sqlr-export -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD (-table TABLE | -sequence SEQUENCE) &gt; exportfile.xml<br>
 sqlr-import -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD -file exportfile.xml<br>
 </blockquote>
@@ -72,24 +69,22 @@ sqlr-import -host HOST -port PORT -socket SOCKET -user USER -password PASSWORD -
 <p>or, if there's a configuration file that the client can read:</p>
 
 <blockquote>
-sqlr-query -id ID -query QUERY<br>
-sqlr-fields -id ID -table TABLE<br>
-sqlrsh -id ID <br>
-sqlr-export -id ID (-table TABLE | -sequence SEQUENCE) &gt; exportfile.xml<br>
-sqlr-import -id ID -file exportfile.xml<br>
+sqlrsh -id ID [-config CONFIGFILE] [-script SCRIPT | -command COMMAND]<br>
+sqlr-query -id ID [-config CONFIGFILE] -query QUERY<br>
+sqlr-fields -id ID [-config CONFIGFILE] -table TABLE<br>
+sqlr-export -id ID [-config CONFIGFILE] (-table TABLE | -sequence SEQUENCE) &gt; exportfile.xml<br>
+sqlr-import -id ID [-config CONFIGFILE] -file exportfile.xml<br>
 </blockquote>
 
 <p>The HOST, PORT, SOCKET, USER and PASSWORD arguments specify which listener to connect to and what authentication to use.<p>
 
 <p>The ID argument refers to an entry in a configuration file from which host, port, socket, user and passwords can be read.</p>
 
-<p>The <b>sqlr-query</b> command executes the query specified in the QUERY parameter and returns the result set as a quote/comma/return seperated value list to standard output.</p>
+<p><b>sqlrsh</b> is an interactive query tool similar to sqlplus, mysql, psql, isql and the like.  Run it and type help; at the prompt for detailed usage instructions.  When sqlrsh starts up, it reads and executes two rc files, the system rc file (most likely /usr/local/firstworks/etc/sqlrshrc) and a personal rc file .sqlrshrc in your home directory.  These files should contain sqlrsh commands, ending in semicolons, seperated by carraige returns.  Any sqlrsh commands may be used in the rc files, even queries.  If a SCRIPT is supplied with the -script option, then the script is run and sqlrsh exits.  The script can contain any sqlrsh commands, incluing queries.  If a COMMAND is supplied with the -command option, then the command is run and sqlrsh exits.  The command can be single sqlrsh command (or query) or a list of semicolon-delimited commands (or queries).</p>
+
+<p>The <b>sqlr-query</b> command executes the query specified in the QUERY parameter and returns the result set as a quoted CSV to standard output.</p>
 
 <p>The <b>sqlr-fields</b> command returns a comma seperated list of the fields in the table specified by the TABLE argument to standard output.</p>
-
-<p>The <b>backupschema</b> command only works against oracle databases and uses the "select table_name from user_tables" query in combination with the <b>sqlr-query</b> and <b>sqlr-fields</b> commands to generate Oracle SQL Loader control files for all tables owned by the user a particular connection is logged in as.  The command is useful for backing up an entire schema of data to a readily re-importable format.</p>
-
-<p><b>sqlrsh</b> is an interactive query tool similar to (though not as powerful as) SQL Plus, mysql, psql, isql and the like.  Run it and type help; at the prompt for detailed usage instructions.  When sqlrsh starts up, it reads and executes two rc files, the system rc file (most likely /usr/local/firstworks/etc/sqlrshrc) and a personal rc file .sqlrshrc in your home directory.  These files should contain sqlrsh commands, ending in semicolons, seperated by carraige returns.  Any sqlrsh commands may be used in the rc files, even queries.</p>
 
 <p>The <b>sqlr-export</b> command exports the specified table or sequence to a file from which <b>sqlr-import</b> can later re-import it.</p>
 
