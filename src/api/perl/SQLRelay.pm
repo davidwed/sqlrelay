@@ -301,6 +301,37 @@ sub get_info {
 	return undef;
 }
 
+sub ping {
+
+	# get parameters
+	my ($dbh,$attr)=@_;
+
+	# execute a ping
+	return $dbh->FETCH('driver_connection')->ping();
+}
+
+sub last_insert_id {
+
+	# get parameters
+	my ($dbh)=@_;
+
+	# get the last insert id
+	return $dbh->FETCH('driver_connection')->getLastInsertId();
+}
+
+sub DESTROY {
+	
+	# get parameters
+	my ($dbh)=@_;
+
+	# mark this statement not Active
+	# (in case the app didn't call disconnect)
+	$dbh->STORE('Active',0);
+
+	# call DESTROY from the parent class
+	$dbh->SUPER::DESTROY();
+}
+
 sub STORE {
 
 	# get parameters
@@ -363,24 +394,6 @@ sub FETCH {
 	# if the attribute didn't start with 'driver_' 
 	# then pass it up to the parent class
 	$dbh->SUPER::FETCH($attr);
-}
-
-sub ping {
-
-	# get parameters
-	my ($dbh,$attr)=@_;
-
-	# execute a ping
-	return $dbh->FETCH('driver_connection')->ping();
-}
-
-sub last_insert_id {
-
-	# get parameters
-	my ($dbh)=@_;
-
-	# get the last insert id
-	return $dbh->FETCH('driver_connection')->getLastInsertId();
 }
 
 # statement class
@@ -638,7 +651,7 @@ sub DESTROY {
 	# (older DBI's don't do this in their DESTROY methods)
 	$sth->STORE('Active',0);
 
-	# call finish from the parent class
+	# call DESTROY from the parent class
 	$sth->SUPER::DESTROY();
 }
 
