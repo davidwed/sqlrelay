@@ -349,7 +349,7 @@
 	echo("DON'T GET COLUMN INFO: \n");
 	$stmt=$dbh->prepare("select * from testtable order by testnumber");
 	checkSuccess($stmt->setAttribute(
-				PDO::SQLRELAY_ATTR_GET_COLUMN_INFO,0),1);
+				PDO::SQLRELAY_ATTR_DONT_GET_COLUMN_INFO,1),1);
 	checkSuccess($stmt->execute(),true);
 	$meta0=$stmt->getColumnMeta(0);
 	checkSuccess($meta0["name"],null);
@@ -358,7 +358,7 @@
 	checkSuccess($meta0["len"],null);
 	$stmt=$dbh->prepare("select * from testtable order by testnumber");
 	checkSuccess($stmt->setAttribute(
-				PDO::SQLRELAY_ATTR_GET_COLUMN_INFO,1),1);
+				PDO::SQLRELAY_ATTR_DONT_GET_COLUMN_INFO,0),1);
 	checkSuccess($stmt->execute(),true);
 	$meta0=$stmt->getColumnMeta(0);
 	checkSuccess($meta0["name"],"TESTNUMBER");

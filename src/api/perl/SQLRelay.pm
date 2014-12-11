@@ -75,8 +75,13 @@ sub connect {
 			$var=$1;
 			$val=$2;
 			$dsn{$var}=$val;
-			$dbh->STORE($var,$val);
 		}
+	}
+
+	# store dsn key/values
+	my $key;
+	foreach $key (keys %dsn) {
+		$dbh->STORE($key,$dsn{$key});
 	}
 	
 	# create an Connection
@@ -147,6 +152,18 @@ sub _new_statement {
 	} else {
 		$cursor->setResultSetBufferSize($rowcachesize);
 	}
+ 
+	# set some behaviors from the connect string
+	if ($dbh->FETCH('DBD::SQLRelay::DontGetColumnInfo')) {
+ 		$cursor->dontGetColumnInfo();
+	} else {
+ 		$cursor->getColumnInfo();
+	}
+	if ($dbh->FETCH('DBD::SQLRelay::NullsAsEmptyStrings')) {
+ 		$cursor->getNullsAsEmptyStrings();
+	} else {
+ 		$cursor->getNullsAsUndefined();
+	}
 
 	# store statement-specific data in the statement handle
 	$sth->STORE('driver_database_handle',$dbh);
@@ -161,8 +178,6 @@ sub _new_statement {
 	# clear any binds still hanging around from
 	# the last time this cursor was used
 	$cursor->clearBinds();
- 
- 	$cursor->getNullsAsUndefined();
 
 	return $sth;
 }
@@ -337,7 +352,7 @@ sub STORE {
 	# get parameters
 	my ($dbh,$attr,$val)=@_;
 
-	# special cases...
+	# handle special cases...
 	if ($attr eq 'AutoCommit') {
 		$dbh->{'driver_AutoCommit'}=$val;
 		my $connection=$dbh->FETCH('driver_connection');
@@ -350,7 +365,7 @@ sub STORE {
 	} elsif ($attr eq 'RowCacheSize') {
 		$dbh->{'driver_RowCacheSize'}=$val;
 		return 1;
-	} elsif ($attr =~ /^ext_SQLR_Debug$/) {
+	} elsif ($attr eq 'DBD::SQLRelay::Debug') {
 		my $connection=$dbh->FETCH('driver_connection');
 		if ($val==1) {
 			$connection->debugOn();
@@ -362,8 +377,8 @@ sub STORE {
 		return 1;
 	}
 
-	# handle all other cases
-	if ($attr =~ /^(?:driver|ext_SQLR)_/) {
+	# handle other cases
+	if ($attr =~ /^(?:driver_|ext_SQLR_|DBD::SQLRelay::)/) {
 		$dbh->{$attr}=$val;
 		return 1;
 	}
@@ -378,7 +393,7 @@ sub FETCH {
 	# get parameters
 	my ($dbh,$attr)=@_;
 
-	# special cases...
+	# handle special cases...
 	if ($attr eq 'AutoCommit') {
 		return $dbh->{'driver_AutoCommit'};
 	}
@@ -386,13 +401,12 @@ sub FETCH {
 		return $dbh->{'driver_RowCacheSize'};
 	}
 
-	# handle all other cases
-	if ($attr =~ /^(?:driver|ext_SQLR)_/) {
+	# handle other cases
+	if ($attr =~ /^(?:driver_|ext_SQLR_|DBD::SQLRelay::)/) {
 		return $dbh->{$attr};
 	}
 
-	# if the attribute didn't start with 'driver_' 
-	# then pass it up to the parent class
+	# pass it up to the parent class
 	$dbh->SUPER::FETCH($attr);
 }
 
@@ -660,10 +674,26 @@ sub STORE {
 	# get parameters
 	my ($sth,$attr,$val)=@_;
 
-	# special cases...
-	if ($attr =~ /^ext_SQLR_BufferSize$/) {
+	# handle special cases...
+	if ($attr eq "ext_SQLR_BufferSize" or
+		$attr eq "DBD::SQLRelay::ResultSetBufferSize") {
+		$sth->FETCH('driver_cursor')->setResultSetBufferSize($val);
+		return 1;
+	} elsif ($attr eq "DBD::SQLRelay::DontGetColumnInfo") {
 		my $cursor=$sth->FETCH('driver_cursor');
-		$cursor->setResultSetBufferSize($val);
+		if ($val) {
+			$cursor->dontGetColumnInfo();
+		} else {
+			$cursor->getColumnInfo();
+		}
+		return 1;
+	} elsif ($attr eq "DBD::SQLRelay::GetNullsAsEmptyStrings") {
+		my $cursor=$sth->FETCH('driver_cursor');
+		if ($val) {
+			$cursor->getNullsAsEmptyStrings();
+		} else {
+			$cursor->getNullsAsUndefined();
+		}
 		return 1;
 	} elsif ($attr eq 'RowsInCache') {
 		$sth->{'driver_RowsInCache'}=$val;
@@ -676,14 +706,13 @@ sub STORE {
 		return 1;
 	}
 
-	# handle all other cases
-	if ($attr =~ /^driver_/) {
+	# handle other cases
+	if ($attr =~ /^(?:driver_|ext_SQLR_|DBD::SQLRelay::)/) {
 		$sth->{$attr}=$val;
 		return 1;
 	}
 
-	# if the attribute didn't start with 'driver_' 
-	# then pass it up to the parent class
+	# pass it up to the parent class
 	return $sth->SUPER::STORE($attr,$val);
 }
 
@@ -692,10 +721,10 @@ sub FETCH {
 	# get parameters
 	my ($sth,$attr)=@_;
 
-	# special cases...
-	if ($attr =~ /^ext_SQLR_BufferSize$/) {
-		my $cursor=$sth->FETCH('driver_cursor');
-		return $cursor->getResultSetBufferSize();
+	# handle special cases...
+	if ($attr eq "ext_SQLR_BufferSize" or
+		$attr eq "DBD::SQLRelay::ResultSetBufferSize") {
+		return $sth->FETCH('driver_cursor')->getResultSetBufferSize();
 	} elsif ($attr eq 'RowsInCache') {
 		return $sth->{'driver_RowsInCache'};
 	} elsif ($attr eq 'ParamValues') {
@@ -704,8 +733,8 @@ sub FETCH {
 		return $sth->{'driver_ParamTypes'};
 	}
 
-	# handle all other cases
-	if ($attr =~ /^driver_/) {
+	# handle other cases
+	if ($attr =~ /^(?:driver_|ext_SQLR_|DBD::SQLRelay::)/) {
 		return $sth->{$attr};
 	}
 

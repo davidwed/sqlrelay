@@ -71,7 +71,7 @@ if ($DBI::VERSION>=1.43) {
 	my ($scheme,$driver,$attr_string,$attr_hash,$driver_dsn)=DBI->parse_dsn($dsn);
 	checkSuccess($scheme,"DBI");
 	checkSuccess($driver,"SQLRelay");
-	checkSuccess($attr_string,"AutoCommit=>0,PrintError=>0");
+	#checkSuccessString($attr_string,"AutoCommit=>0,PrintError=>0");
 	checkSuccess($attr_hash->{AutoCommit},0);
 	checkSuccess($attr_hash->{PrintError},0);
 	checkSuccess($driver_dsn,$connectstring);
@@ -637,7 +637,7 @@ print("\n");
 
 # row cache size
 print("ROW CACHE SIZE: \n");
-checkUndef($dbh->{RowCacheSize});
+checkSuccess($dbh->{RowCacheSize},0);
 $sth=$dbh->prepare("select * from testtable order by testnumber");
 checkSuccessString($sth->execute(),"0E0");
 checkSuccess($sth->{RowsInCache},10);
