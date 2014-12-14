@@ -24236,17 +24236,20 @@ _ACEOF
 		fi
 	fi
 
-	if ( test "$SQLITEVERSION" = "3" )
+	if ( test -n "$SQLITELIBS" )
 	then
-		SQLITEINCLUDES="-DSQLITE3 $SQLITEINCLUDES"
+
+		if ( test "$SQLITEVERSION" = "3" )
+		then
+			SQLITEINCLUDES="-DSQLITE3 $SQLITEINCLUDES"
 
 cat >>confdefs.h <<_ACEOF
 #define SQLITE_TRANSACTIONAL 1
 _ACEOF
 
-	fi
+		fi
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqlite3_stmt" >&5
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqlite3_stmt" >&5
 $as_echo_n "checking for sqlite3_stmt... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -24285,7 +24288,7 @@ LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqlite3_prepare_v2" >&5
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqlite3_prepare_v2" >&5
 $as_echo_n "checking for sqlite3_prepare_v2... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -24324,7 +24327,7 @@ LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqlite3_malloc" >&5
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqlite3_malloc" >&5
 $as_echo_n "checking for sqlite3_malloc... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -24363,7 +24366,7 @@ LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqlite3_free with char * argument" >&5
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqlite3_free with char * argument" >&5
 $as_echo_n "checking for sqlite3_free with char * argument... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -24401,6 +24404,8 @@ LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
+
+	fi
 
 
 if ( test -n "$SQLITEINCLUDES" )
