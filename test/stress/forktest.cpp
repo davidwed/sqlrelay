@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
 		process::exit(1);
 	}
 
-	host="localhost";
+	host="sqlrserver";
 	port=9000;
 	sock="/tmp/test.socket";
 	login="test";

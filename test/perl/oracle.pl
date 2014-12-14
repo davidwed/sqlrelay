@@ -50,7 +50,7 @@ sub checkSuccessString {
 
 
 # instantiation
-$con=SQLRelay::Connection->new("localhost",9000,"/tmp/test.socket",
+$con=SQLRelay::Connection->new("sqlrserver",9000,"/tmp/test.socket",
 							"test","test",0,1);
 $cur=SQLRelay::Cursor->new($con);
 
@@ -688,7 +688,7 @@ $cur->setResultSetBufferSize(0);
 print("\n");
 
 print("COMMIT AND ROLLBACK: \n");
-$secondcon=SQLRelay::Connection->new("localhost",9000,"/tmp/test.socket",
+$secondcon=SQLRelay::Connection->new("sqlrserver",9000,"/tmp/test.socket",
 							"test","test",0,1);
 $secondcur=SQLRelay::Cursor->new($secondcon);
 checkSuccess($secondcur->sendQuery("select count(*) from testtable"),1);

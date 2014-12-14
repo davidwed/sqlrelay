@@ -4,7 +4,7 @@
 
 int main(int argc, char **argv) {
 
-	sqlrconnection	sqlrcon("localhost",9000,"/tmp/test.socket",
+	sqlrconnection	sqlrcon("sqlrserver",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	sqlrcursor	sqlrcur(&sqlrcon);
 

@@ -10,7 +10,7 @@ require 'dbi'
 
 
 	# instantiation
-	db=DBI.connect("DBI:SQLRelay:host=localhost;port="+
+	db=DBI.connect("DBI:SQLRelay:host=sqlrserver;port="+
 			"9000;socket=/tmp/test.socket;","test","test")
 
 

@@ -22,7 +22,7 @@ def main():
 	PySQLRClient.getNumericFieldsAsNumbers()
 
 	# instantiation
-	con=PySQLRClient.sqlrconnection("localhost",9000,
+	con=PySQLRClient.sqlrconnection("sqlrserver",9000,
 							"/tmp/test.socket",
 							"test","test")
 	cur=PySQLRClient.sqlrcursor(con)

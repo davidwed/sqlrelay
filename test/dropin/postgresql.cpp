@@ -37,7 +37,7 @@ void checkSuccess(int value, int success) {
 
 int	main(int argc, char **argv) {
 
-	const char	*host="localhost";
+	const char	*host="sqlrserver";
 	const char	*port="9000";
 	const char	*user="test";
 	const char	*password="test";

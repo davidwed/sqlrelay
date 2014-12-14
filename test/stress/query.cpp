@@ -4,7 +4,7 @@
 #include <rudiments/stdio.h>
 
 int main() {
-	//sqlrconnection	sqlrcon("localhost",9000,"/tmp/test.socket",
+	//sqlrconnection	sqlrcon("sqlrserver",9000,"/tmp/test.socket",
 							//"test","test",0,1);
 	//sqlrcursor	sqlrcur(&sqlrcon);
 
@@ -15,7 +15,7 @@ int main() {
 	uint32_t	loop=0;
 	for (;;) {
 
-		sqlrconnection	sqlrcon("localhost",9000,"/tmp/test.socket",
+		sqlrconnection	sqlrcon("sqlrserver",9000,"/tmp/test.socket",
 							"test","test",0,1);
 		sqlrcursor	sqlrcur(&sqlrcon);
 

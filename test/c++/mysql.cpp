@@ -73,7 +73,7 @@ int	main(int argc, char **argv) {
 	uint32_t	*fieldlens;
 
 	// instantiation
-	con=new sqlrconnection("localhost",9000,"/tmp/test.socket",
+	con=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	cur=new sqlrcursor(con);
 
@@ -1001,7 +1001,7 @@ int	main(int argc, char **argv) {
 	// Note: Mysql's default isolation level is repeatable-read,
 	// not read-committed like most other db's.  Both sessions must
 	// commit to see the changes that each other has made.
-	secondcon=new sqlrconnection("localhost",9000,"/tmp/test.socket",
+	secondcon=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);

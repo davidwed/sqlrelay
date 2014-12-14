@@ -77,7 +77,7 @@ int	main(int argc, char **argv) {
 	uint32_t	*fieldlens;
 
 	// instantiation
-	con=sqlrcon_alloc("localhost",9000,
+	con=sqlrcon_alloc("sqlrserver",9000,
 				"/tmp/test.socket","test","test",0,1);
 	cur=sqlrcur_alloc(con);
 

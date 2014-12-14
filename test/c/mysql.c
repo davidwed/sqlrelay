@@ -68,7 +68,7 @@ int	main(int argc, char **argv) {
 
 
 	// instantiation
-	con=sqlrcon_alloc("localhost",9000,
+	con=sqlrcon_alloc("sqlrserver",9000,
 				"/tmp/test.socket","test","test",0,1);
 	cur=sqlrcur_alloc(con);
 
@@ -900,7 +900,7 @@ int	main(int argc, char **argv) {
 	// Note: Mysql's default isolation level is repeatable-read,
 	// not read-committed like most other db's.  Both sessions must
 	// commit to see the changes that each other has made.
-	secondcon=sqlrcon_alloc("localhost",9000,
+	secondcon=sqlrcon_alloc("sqlrserver",9000,
 				"/tmp/test.socket","test","test",0,1);
 	secondcur=sqlrcur_alloc(secondcon);
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);

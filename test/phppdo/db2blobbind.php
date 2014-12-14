@@ -2,7 +2,7 @@
 
 	print("\n");
 
-	$host="localhost";
+	$host="sqlrserver";
 	$port=9000;
 	$socket="/tmp/test.socket";
 	$user="test";

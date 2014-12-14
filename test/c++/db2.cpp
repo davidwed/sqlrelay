@@ -84,7 +84,7 @@ int	main(int argc, char **argv) {
 	uint32_t	*fieldlens;
 
 	// instantiation
-	con=new sqlrconnection("localhost",9000,"/tmp/test.socket",
+	con=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	cur=new sqlrcursor(con);
 

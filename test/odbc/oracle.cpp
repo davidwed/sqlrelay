@@ -763,7 +763,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("COMMIT AND ROLLBACK: \n");
-	secondcon=new sqlrconnection("localhost",9000,"/tmp/test.socket",
+	secondcon=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);

@@ -45,7 +45,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 #endif
 
-	const char	*host="localhost";
+	const char	*host="sqlrserver";
 	const char	*port="9000";
 	const char	*socket="/tmp/test.socket";
 	const char	*user="test";

@@ -143,7 +143,7 @@ class oracle {
 	
 	
 		// instantiation
-		SQLRConnection con=new SQLRConnection("localhost",
+		SQLRConnection con=new SQLRConnection("sqlrserver",
 						(short)9000,
 						"/tmp/test.socket",
 						"test","test",0,1);
@@ -808,7 +808,7 @@ class oracle {
 		System.out.println();
 	
 		System.out.println("COMMIT AND ROLLBACK: ");
-		SQLRConnection secondcon=new SQLRConnection("localhost",
+		SQLRConnection secondcon=new SQLRConnection("sqlrserver",
 						(short)9000,
 						"/tmp/test.socket",
 						"test","test",0,1);
