@@ -86,7 +86,7 @@ use.</p>
 
 main() {
 
-        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
 
         ... execute some queries ...
 
@@ -102,11 +102,6 @@ query, sqlrcur_ping() or sqlrcur_identify() is run.</p>
 connection daemons, so care should be taken to minimize the length of a
 session.</p>
 
-<p>If you're using a transactional database, ending a session has a catch.
-Database connection daemons can be configured to send either a commit or
-rollback at the end of a session if DML queries were executed during the
-session with no commit or rollback.  Program accordingly.</p>
-
 <a name="query"></a>
 <span class="heading2">Executing Queries</span><br><br>
 
@@ -119,7 +114,7 @@ session with no commit or rollback.  Program accordingly.</p>
 
 main() {
 
-        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         sqlrcur      cur=sqlrcur_alloc(con);
 
         sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;select * from my_table&quot;</FONT>);
@@ -210,7 +205,7 @@ query failed.  You can find out why by calling sqlrcur_errorMessage().</p>
 
 main() {
 
-        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         sqlrcur      cur=sqlrcur_alloc(con);
 
         <B><FONT color=#a52a2a>if</FONT></B> (!sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;select * from my_nonexistant_table&quot;</FONT>)) {
@@ -249,7 +244,7 @@ scale.</p>
 
 main() {
 
-        sqlrcon      con=sqlrcon_alloc(<font color="#ff00ff">&quot;host&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+        sqlrcon      con=sqlrcon_alloc(<font color="#ff00ff">&quot;sqlrserver&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;/tmp/test.socket&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
         sqlrcur      cur=sqlrcur_alloc(con);
 
         sqlrcur_prepareQuery(cur,<font color="#ff00ff">&quot;select * from mytable $(whereclause)&quot;</font>)
@@ -280,7 +275,7 @@ provides methods for defining and retrieving output bind variables.</p>
 
 main() {
 
-        sqlrcon      con=sqlrcon_alloc(<font color="#ff00ff">&quot;host&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+        sqlrcon      con=sqlrcon_alloc(<font color="#ff00ff">&quot;sqlrserver&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;/tmp/test.socket&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
         sqlrcur      cur=sqlrcur_alloc(con);
 
         sqlrcur_prepareQuery(cur,<font color="#ff00ff">&quot;begin  :result1:=addTwoIntegers(:integer1,:integer2);  :result2=addTwoFloats(:float1,:float2);  :result3=convertToString(:integer3); end;&quot;</font>);
@@ -319,7 +314,7 @@ call getNullsAsEmptyStrings().</p>
 
 main() {
 
-        sqlrcon      con=sqlrcon_alloc(<font color="#ff00ff">&quot;host&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+        sqlrcon      con=sqlrcon_alloc(<font color="#ff00ff">&quot;sqlrserver&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;/tmp/test.socket&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
         sqlrcur      cur=sqlrcur_alloc(con);
 
         sqlrcur_executeQuery(cur,<font color="#ff00ff">&quot;create table images (image blob, description clob)&quot;</font>);
@@ -357,7 +352,7 @@ defineOutputBindClob()/getOutputBindClob().</p>
 
 main() {
 
-        sqlrcon      con=sqlrcon_alloc(<font color="#ff00ff">&quot;host&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+        sqlrcon      con=sqlrcon_alloc(<font color="#ff00ff">&quot;sqlrserver&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;/tmp/test.socket&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
         sqlrcur      cur=sqlrcur_alloc(con);
 
         sqlrcur_prepareQuery(cur,<font color="#ff00ff">&quot;begin  select image into :image from images;  select description into :desc from images;  end;&quot;</font>);
@@ -406,7 +401,7 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 
 main() {
 
-        sqlrcon      con=sqlrcon_alloc(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#f800f8>&quot;sqlrserver&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
         sqlrcur      cur=sqlrcur_alloc(con);
 
         sqlrcur_prepareQuery(cur,<FONT color=#f800f8>&quot;select * from mytable where mycolumn&gt;:value&quot;</FONT>);
@@ -449,7 +444,7 @@ main() {
 
         <B><FONT color=#2e8b57>int</FONT></B>        row,col;
 
-        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         sqlrcur      cur=sqlrcur_alloc(con);
 
         sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;select * from my_table&quot;</FONT>);
@@ -485,7 +480,7 @@ main() {
 
         <B><FONT color=#2e8b57>int</FONT></B>        row,col;
 
-        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         sqlrcur      cur=sqlrcur_alloc(con);
 
         sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;select * from my_table&quot;</FONT>);
@@ -557,7 +552,7 @@ main() {
         <B><FONT color=#2e8b57>int</FONT></B>     col;
         <B><FONT color=#2e8b57>char</FONT></B>    *field;
 
-        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         sqlrcur      cur=sqlrcur_alloc(con);
 
         sqlrcur_setResultSetBufferSize(cur,<FONT color=#ff00ff>5</FONT>);
@@ -614,7 +609,7 @@ main() {
         sqlrcur      cursor2;
         <B><FONT color=#288850>int</FONT></B>          index;
 
-        con=new sqlrcon_alloc(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
+        con=new sqlrcon_alloc(<FONT color=#f800f8>&quot;sqlrserver&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
         cursor1=new sqlrcur_alloc(con);
         cursor2=new sqlrcur_alloc(con);
 
@@ -654,7 +649,7 @@ main() {
 
         <B><FONT color=#2e8b57>int</FONT></B>        i,j;
 
-        sqlrcon         con=sqlrcon_alloc(<font color="#f800f8">&quot;host&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;user&quot;</font>,<font color="#f800f8">&quot;password&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+        sqlrcon         con=sqlrcon_alloc(<font color="#f800f8">&quot;sqlrserver&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;/tmp/test.socket&quot;</font>,<font color="#f800f8">&quot;user&quot;</font>,<font color="#f800f8">&quot;password&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
         sqlrcur         cur=sqlrcur_alloc(con);
 
         sqlrcur_prepareQuery(cur,<font color="#f800f8">&quot;begin  :curs:=sp_mytable; end;&quot;</font>);
@@ -705,7 +700,7 @@ main() {
 
         <B><FONT color=#2e8b57>int</FONT></B>        i;
 
-        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         sqlrcur      cur=sqlrcur_alloc(con);
 
         sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;select * from my_table&quot;</FONT>);
@@ -752,7 +747,7 @@ main() {
 
         <B><FONT color=#2e8b57>int</FONT></B>        i;
 
-        sqlrcon         con=sqlrcon_alloc(<font color="#f800f8">&quot;host&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;user&quot;</font>,<font color="#f800f8">&quot;password&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+        sqlrcon         con=sqlrcon_alloc(<font color="#f800f8">&quot;sqlrserver&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;/tmp/test.socket&quot;</font>,<font color="#f800f8">&quot;user&quot;</font>,<font color="#f800f8">&quot;password&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
         sqlrcur         cur=sqlrcur_alloc(con);
 
         <font color="#0000f8">// column names will be forced to upper case</font>
@@ -1906,7 +1901,7 @@ main() {
 
         <B><FONT color=#2e8b57>char</FONT></B>       *filename;
 
-        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         sqlrcur      cur=sqlrcur_alloc(con);
 
 	... generate a unique file name ...
@@ -1940,7 +1935,7 @@ main() {
 
         ... get the page to display from the previous page ...
 
-        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         sqlrcur      cur=sqlrcur_alloc(con);
 
         sqlrcur_openCachedResultSet(cur,filename);
@@ -1980,7 +1975,7 @@ main() {
         <B><FONT color=#2e8b57>char</FONT></B>       *socket;
         <B><FONT color=#2e8b57>int</FONT></B>        rs;
 
-        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         sqlrcur      cur=sqlrcur_alloc(con);
 
         sqlrcur_sendQuery(cur,<FONT color=#ff00ff>&quot;insert into my_table values (1,2,3)&quot;</FONT>);
@@ -2009,7 +2004,7 @@ main() {
 
         ... get rs, port and socket from previous page ...
 
-        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrcon      con=sqlrcon_alloc(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         sqlrcur      cur=sqlrcur_alloc(con);
 
         sqlrcon_resumeSession(con,port,socket);

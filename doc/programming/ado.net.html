@@ -50,7 +50,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
 			sqlrcon.Open();
 		}
 	}
@@ -77,11 +77,6 @@ query is run.</p>
 connection daemons, so care should be taken to minimize the length of a
 session.</p>
 
-<p>If you're using a transactional database, ending a session has a catch.
-Database connection daemons can be configured to send either a commit or
-rollback at the end of a session if DML queries were executed during the
-session with no commit or rollback.  Program accordingly.</p>
-
 <a name="query"></a>
 <span class="heading2">Executing Queries</span><br><br>
 
@@ -104,7 +99,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
 			sqlrcon.Open();
 
 
@@ -171,7 +166,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
 			sqlrcon.Open();
 
 			SQLRelayTransaction sqlrtran = sqlrcon.BeginTransaction();
@@ -232,7 +227,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
 			sqlrcon.Open();
 
 			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
@@ -276,7 +271,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
 			sqlrcon.Open();
 
 			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
@@ -313,7 +308,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
 			sqlrcon.Open();
 
 			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
@@ -362,7 +357,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
 			sqlrcon.Open();
 
 			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
@@ -435,7 +430,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
 			sqlrcon.Open();
 
 			// Prepare the query...
@@ -504,7 +499,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
 			sqlrcon.Open();
 
 			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
@@ -591,7 +586,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
 			sqlrcon.Open();
 
 			SQLRelayCommand sqlrcom1 = (SQLRelayComand)sqlrcon.CreateCommand();
@@ -649,7 +644,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
 			sqlrcon.Open();
 
 			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
@@ -692,7 +687,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=fedora:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
 			sqlrcon.Open();
 
 			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();

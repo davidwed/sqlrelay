@@ -32,7 +32,7 @@ use.</p>
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRDB
 
-con=PySQLRDB.connect('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+con=PySQLRDB.connect('<FONT color=#ff00ff>sqlrserver</FONT>',9000,'<FONT color=#f800f8>/tmp/test.socket</FONT>','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=con.cursor()
 
 ... execute some queries ...
@@ -46,11 +46,6 @@ execute() is run.</p>
 connection daemons, so care should be taken to minimize the length of a
 session.</p>
 
-<p>If you're using a transactional database, ending a session has a catch.
-Database connection daemons can be configured to send either a commit or
-rollback at the end of a session if DML queries were executed during the
-session with no commit or rollback.  Program accordingly.</p>
-
 <a name="query"></a>
 <span class="heading2">Executing Queries</span><br><br>
 
@@ -60,7 +55,7 @@ session with no commit or rollback.  Program accordingly.</p>
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRDB
 
-con=PySQLRDB.connect('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+con=PySQLRDB.connect('<FONT color=#ff00ff>sqlrserver</FONT>',9000,'<FONT color=#f800f8>/tmp/test.socket</FONT>','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=con.cursor()
 
 cur.execute('<FONT color=#ff00ff>select * from my_table</FONT>')
@@ -120,7 +115,7 @@ You can find out why by catching the exception.</p>
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRDB
 
-con=PySQLRDB.connect('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+con=PySQLRDB.connect('<FONT color=#ff00ff>sqlrserver</FONT>',9000,'<FONT color=#f800f8>/tmp/test.socket</FONT>','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=con.cursor()
 
 <B><FONT color=#a52a2a>try</FONT></B>:
@@ -145,7 +140,7 @@ for using bind variables in those queries.</p>
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRDB
 
-con=PySQLRDB.connect('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+con=PySQLRDB.connect('<FONT color=#ff00ff>sqlrserver</FONT>',9000,'<FONT color=#f800f8>/tmp/test.socket</FONT>','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=con.cursor()
 
 cur.execute('<FONT color=#ff00ff>select * from my_table where column1&gt;:val1 and column2=:val2 and column3&lt;:val3</FONT>',{'<FONT color=#ff00ff>val1</FONT>':1,'<FONT color=#ff00ff>val2</FONT>':'<FONT color=#ff00ff>hello</FONT>','<FONT color=#ff00ff>val3</FONT>':50.546})
@@ -176,7 +171,7 @@ each dictionary of bind variable/values.</p>
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRDB
 
-con=PySQLRDB.connect('<FONT color=#f800f8>host</FONT>',9000,'','<FONT color=#f800f8>user</FONT>','<FONT color=#f800f8>password</FONT>',0,1)
+con=PySQLRDB.connect('<FONT color=#f800f8>sqlrserver</FONT>',9000,'<FONT color=#f800f8>/tmp/test.socket</FONT>','<FONT color=#f800f8>user</FONT>','<FONT color=#f800f8>password</FONT>',0,1)
 cur=con.cursor()
 
 cur.executemany('<FONT color=#ff00ff>insert into my_table values (:val1,:val2,:val3)</FONT>',
@@ -202,7 +197,7 @@ a select query or the number of rows affected by an insert/update/delete query.
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRDB
 
-con=PySQLRDB.connect('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+con=PySQLRDB.connect('<FONT color=#ff00ff>sqlrserver</FONT>',9000,'<FONT color=#f800f8>/tmp/test.socket</FONT>','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=con.cursor()
 
 cur.execute('<FONT color=#ff00ff>select * from my_table</FONT>')
@@ -237,7 +232,7 @@ iterate through its result set, inserting rows into another table, using only
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRDB
 
-con=PySQLRDB.sqlrconnection('<FONT color=#f800f8>host</FONT>',9000,'','<FONT color=#f800f8>user</FONT>','<FONT color=#f800f8>password</FONT>',0,1)
+con=PySQLRDB.connect('<FONT color=#f800f8>sqlrserver</FONT>',9000,'<FONT color=#f800f8>/tmp/test.socket</FONT>','<FONT color=#f800f8>user</FONT>','<FONT color=#f800f8>password</FONT>',0,1)
 cursor1=con.cursor()
 cursor2=con.cursor()
 
@@ -259,7 +254,7 @@ containing its name, type and length. </p>
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRDB
 
-con=PySQLRDB.connect('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+con=PySQLRDB.connect('<FONT color=#ff00ff>sqlrserver</FONT>',9000,'<FONT color=#f800f8>/tmp/test.socket</FONT>','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=con.cursor()
 
 cur.execute('<FONT color=#ff00ff>select * from my_table</FONT>')

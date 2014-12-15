@@ -35,7 +35,7 @@ use.</p>
 <pre>
 load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;/tmp/test.socket&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
 <font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
         ... execute some queries ...
@@ -49,11 +49,6 @@ query, ping() or identify() is run.</p>
 connection daemons, so care should be taken to minimize the length of a
 session.</p>
 
-<p>If you're using a transactional database, ending a session has a catch.
-Database connection daemons can be configured to send either a commit or
-rollback at the end of a session if DML queries were executed during the
-session with no commit or rollback.  Program accordingly.</p>
-
 <a name="query"></a>
 <span class="heading2">Executing Queries</span><br><br>
 
@@ -63,7 +58,7 @@ session with no commit or rollback.  Program accordingly.</p>
 <pre>
 load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;/tmp/test.socket&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
 <font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
 catch {<font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;select * from my_table&quot;</font>}
@@ -148,7 +143,7 @@ You can find out why by catching the error and displaying it.</p>
 <pre>
 load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;/tmp/test.socket&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
 <font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
 catch {<font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;select * from my_table&quot;</font>} error
@@ -183,7 +178,7 @@ scale.</p>
 <pre>
 load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;/tmp/test.socket&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
 <font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
 <font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;select * from mytable $(whereclause)&quot;</font>
@@ -208,7 +203,7 @@ provides methods for defining and retrieving output bind variables.</p>
 <pre>
 load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;/tmp/test.socket&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
 <font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
 <font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;begin  :result1:=addTwoIntegers(:integer1,:integer2);  :result2=addTwoFloats(:float1,:float2);  :result3=convertToString(:integer3); end;&quot;</font>
@@ -242,7 +237,7 @@ inputBindClob() methods.</p>
 <pre>
 load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;/tmp/test.socket&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
 <font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
 <font color="#008b8b">$cur</font> executeQuery <font color="#ff00ff">&quot;create table images (image blob, description clob)&quot;</font>
@@ -268,7 +263,7 @@ defineOutputBindClob()/getOutputBindClob().</p>
 <pre>
 load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;/tmp/test.socket&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
 <font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
 <font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;begin  select image into :image from images;  select description into :desc from images;  end;&quot;</font>
@@ -310,7 +305,7 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 <pre>
 load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;/tmp/test.socket&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
 <font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
 <font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;select * from mytable where mycolumn&gt;:value&quot;</font>
@@ -343,7 +338,7 @@ result sets.</p>
 <pre>
 load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;/tmp/test.socket&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
 <font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
 <font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;select * from my_table&quot;</font>
@@ -367,7 +362,7 @@ a long or double, you can use getFieldAsLong() and getFieldAsDouble().</p>
 <pre>
 load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;/tmp/test.socket&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
 <font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
 <font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;select * from my_table&quot;</font>
@@ -421,7 +416,7 @@ index of the first row of the currently buffered chunk.</p>
 <pre>
 load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;/tmp/test.socket&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
 <font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
 <font color="#008b8b">$cur</font> setResultSetBufferSize <font color="#ff00ff">2</font>
@@ -457,7 +452,7 @@ iterate through its result set, inserting rows into another table, using only
 <pre>
 load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;/tmp/test.socket&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
 <font color="#a52a2a"><b>set</b></font> cursor1 [<font color="#008b8b">$con</font> sqlrcur]
 <font color="#a52a2a"><b>set</b></font> cursor2 [<font color="#008b8b">$con</font> sqlrcur]
 
@@ -487,7 +482,7 @@ getOutputBindCursor() and fetchFromOutputBindCursor().</p>
 <pre>
 load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;/tmp/test.socket&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
 <font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
 <font color="#008b8b">$cur</font> prepareQuery <font color="#ff00ff">&quot;begin  :curs:=sp_mytable; end;&quot;</font>
@@ -526,7 +521,7 @@ always returned as false.</p>
 <pre>
 load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;/tmp/test.socket&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
 <font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
 <font color="#008b8b">$cur</font> sendQuery <font color="#ff00ff">&quot;select * from my_table&quot;</font>
@@ -577,7 +572,7 @@ database.</p>
 <pre>
 load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
+<font color="#a52a2a"><b>set</b></font> con [sqlrcon -server <font color="#ff00ff">&quot;host&quot;</font> -port <font color="#ff00ff">9000</font> -socket <font color="#ff00ff">&quot;/tmp/test.socket&quot;</font> -user <font color="#ff00ff">&quot;user&quot;</font> -password <font color="#ff00ff">&quot;password&quot;</font> -retrytime <font color="#ff00ff">0</font> -tries <font color="#ff00ff">1</font>]
 <font color="#a52a2a"><b>set</b></font> cur [<font color="#008b8b">$con</font> sqlrcur]
 
 <font color="#0000ff"># column names will be forced to upper case</font>

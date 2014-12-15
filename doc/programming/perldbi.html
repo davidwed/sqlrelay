@@ -34,7 +34,7 @@ use.</p>
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 ... <FONT color=#008888>execute</FONT> <FONT color=#008888>some</FONT> <FONT color=#008888>queries</FONT> ...
 
@@ -42,17 +42,41 @@ use.</p>
 </PRE>
 </blockquote>
 
+<p>The following connect string variables control attributes of the connection:</p>
+
+
+<ul>
+<li><b>host</b> - The SQL Relay server to connect to.</li>
+<li><b>port</b> - The port that the SQL Relay server is listening on.  Either port or socket must be specified.  If both are specified, socket will be preferred to port.</li>
+<li><b>socket</b> - The socket that the SQL Relay server is listening on.  Either port or socket must be specified.  If both are specified, socket will be preferred to port.</li>
+<li><b>tries</b> - If a connection fails, it will be retried this many times.</li>
+<li><b>retrytime</b> - If a connection fails, it will be retried on this interval (in seconds).</li>
+<li><b>debug</b> - If this is set to 1 or to a file name then debug is enabled.  If set to a file name then debug will be written to the file.  If set to 1 then debug will be written to the browser.  Defaults to 0.</li>
+</ul>
+
+<p>These additional connect string variables control the default statement attributes:</p>
+
+<ul>
+<li><b>resultsetbuffersize</b> - Sets the number of rows to buffer at a time.  See <a href="#largeresultsets">Dealing With Large Result Sets</a> below.  If set to 0 (the default) then the entire result set is buffered.</li>
+<li><b>dontgetcolumninfo</b> - If this is set to 1 then column info is not fetched with the result set.  If set to 0 then column info is fetched.  Defaults to 0.</li>
+<li><b>nullsasnulls</b> - If this is set to 1 then NULL values are returned as nulls.  If set to 0 then NULL values are returned as empty strings or nulls.  Defaults to 0.</li>
+</ul>
+
+<p>Setting one of the statement attribute connect string variables has the same effect as if the corresponding statement handle attribute were set immediately after creating each statement.  See <a href="#driverspecific">Driver-Specific Attributes</a> below.</p>
+
+<p>The other two parameters following the connect string are.</p>
+
+<ul>
+<li><b>user</b> - The username to use when logging into SQL Relay.</li>
+<li><b>password</b> - The password to use when logging into SQL Relay.</li>
+</ul>
+
 <p>After calling the connect(), a session is established when the first 
 execute() is run.</p>
 
 <p>For the duration of the session, the client occupies one of the database
 connection daemons, so care should be taken to minimize the length of a
 session.</p>
-
-<p>If you're using a transactional database, ending a session has a catch.
-Database connection daemons can be configured to send either a commit or
-rollback at the end of a session if DML queries were executed during the
-session with no commit or rollback.  Program accordingly.</p>
 
 <a name="query"></a>
 <span class="heading2">Executing Queries</span><br><br>
@@ -65,7 +89,7 @@ session with no commit or rollback.  Program accordingly.</p>
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from user_tables</FONT><FONT color=#f800f8>&quot;</FONT>);
 
@@ -153,7 +177,7 @@ error in DBI-&gt;errstr.
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>)
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>)
         <B><FONT color=#a02828>or</FONT></B> <B><FONT color=#a02828>die</FONT></B> <FONT color=#008888>DBI</FONT>-&gt;<FONT color=#008888>errstr</FONT>;
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from user_tables</FONT><FONT color=#f800f8>&quot;</FONT>)
@@ -188,7 +212,7 @@ variable.</p>
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_table where col1=:1 and col2=:2 and col3=:3</FONT><FONT color=#f800f8>&quot;</FONT>);
 
@@ -213,7 +237,7 @@ binding a BLOB, you need to pass a hash containing type and length values.</p>
 
 <font color="#a52a2a"><b>use </b></font>DBI;
 
-<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$dbh</font>=DBI-&gt;<font color="#a52a2a"><b>connect</b></font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">DBI:SQLRelay:host=testhost;port=9000;socket=</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">testuser</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">testpassword</font><font color="#ff00ff">&quot;</font>);
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$dbh</font>=DBI-&gt;<font color="#a52a2a"><b>connect</b></font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">testuser</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">testpassword</font><font color="#ff00ff">&quot;</font>);
 
 <font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">insert into mytable values (:clobval,:blobval)</font><font color="#ff00ff">&quot;</font>);
 
@@ -241,7 +265,7 @@ buffer to reserve for the value.</p>
 
 <font color="#a52829"><b>use </b></font>DBI;
 
-<font color="#a52829"><b>my</b></font> <font color="#008a8c">$dbh</font>=DBI-&gt;<font color="#a52829"><b>connect</b></font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">DBI:SQLRelay:host=testhost;port=9000;socket=</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">testuser</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">testpassword</font><font color="#ff00ff">&quot;</font>);
+<font color="#a52829"><b>my</b></font> <font color="#008a8c">$dbh</font>=DBI-&gt;<font color="#a52829"><b>connect</b></font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">testuser</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">testpassword</font><font color="#ff00ff">&quot;</font>);
 
 <font color="#a52829"><b>my</b></font> <font color="#008a8c">$sth</font>=<font color="#008a8c">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">begin; :1='hello'; :2=1; :3=5.5; end;</font><font color="#ff00ff">&quot;</font>);
 
@@ -270,7 +294,7 @@ parameter must be "undef".</p>
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_table where col1=:0 and col2=:1 and col3=:2</FONT><FONT color=#f800f8>&quot;</FONT>);
 
@@ -296,7 +320,7 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_table where col1=:0 and col2=:1 and col3=:2</FONT><FONT color=#f800f8>&quot;</FONT>);
 
@@ -332,7 +356,7 @@ called.</p>
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from user_tables</FONT><FONT color=#f800f8>&quot;</FONT>);
 
@@ -359,7 +383,7 @@ bind_columns() parameter must be "undef".</p>
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_table</FONT><FONT color=#f800f8>&quot;</FONT>);
 
@@ -391,7 +415,7 @@ iterate through its result set, inserting rows into another table, using only
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth1</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_first_table</FONT><FONT color=#f800f8>&quot;</FONT>);
 
@@ -420,7 +444,7 @@ They are accessible as follows:</p>
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=testhost;port=9000;socket=</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_table</FONT><FONT color=#f800f8>&quot;</FONT>);
 

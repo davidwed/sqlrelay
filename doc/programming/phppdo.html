@@ -126,7 +126,7 @@ use.</p>
 
 <blockquote>
 <pre>
-$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
 }
@@ -168,11 +168,6 @@ query is run.</p>
 connection daemons, so care should be taken to minimize the length of a
 session.</p>
 
-<p>If you're using a transactional database, ending a session has a catch.
-Database connection daemons can be configured to send either a commit or
-rollback at the end of a session if DML queries were executed during the
-session with no commit or rollback.  Program accordingly.</p>
-
 <a name="query"></a>
 <span class="heading2">Executing Queries</span><br><br>
 
@@ -181,7 +176,7 @@ best used with DML or DDL queries.</p>
 
 <blockquote>
 <pre>
-$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
 }
@@ -198,7 +193,7 @@ return result sets.</p>
 
 <blockquote>
 <pre>
-$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
 }
@@ -225,7 +220,7 @@ ODBC.</p>
 
 <blockquote>
 <pre>
-$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
 }
@@ -310,7 +305,7 @@ objects.</p>
 
 <blockquote>
 <pre>
-$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
 }
@@ -342,7 +337,7 @@ the bindValue() method.</p>
 
 <blockquote>
 <pre>
-$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
 }
@@ -371,7 +366,7 @@ flag with the variable type.</p>
 
 <blockquote>
 <pre>
-$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
 }
@@ -391,7 +386,7 @@ streams, so you have to use stream functions to access them.</p>
 
 <blockquote>
 <pre>
-$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
 }
@@ -475,7 +470,7 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 
 <blockquote>
 <pre>
-$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
 }
@@ -511,7 +506,7 @@ arrays (the default).</p>
 
 <blockquote>
 <pre>
-$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
 }
@@ -528,7 +523,7 @@ values into preallocated variables.</p>
 
 <blockquote>
 <pre>
-$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
 }
@@ -559,7 +554,7 @@ an entire result set in one step.</p>
 
 <blockquote>
 <pre>
-$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
 }
@@ -581,7 +576,7 @@ set too.</p>
 
 <blockquote>
 <pre>
-$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
 }
@@ -644,7 +639,7 @@ iterate through its result set, inserting rows into another table, using only
 
 <blockquote>
 <pre>
-$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
 }
@@ -674,7 +669,7 @@ type, length and various flags are available from getColumnMeta().</p>
 
 <blockquote>
 <pre>
-$dbh=new PDO("sqlrelay:host=fedora;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
+$dbh=new PDO("sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0","testuser","testpassword");
 if (!$dbh) {
 	die("connection failed");
 }

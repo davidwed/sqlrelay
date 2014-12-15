@@ -32,7 +32,7 @@ use.</p>
 <PRE>
 <FONT color=#a020f0>require</FONT> <FONT color=#6a5acd>'</FONT><FONT color=#ff00ff>dbi</FONT><FONT color=#6a5acd>'</FONT>
 
-db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/mysock.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
+db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
 
 ... execute some queries ...
 </PRE>
@@ -45,11 +45,6 @@ first execute() is run.</p>
 connection daemons, so care should be taken to minimize the length of a
 session.</p>
 
-<p>If you're using a transactional database, ending a session has a catch.
-Database connection daemons can be configured to send either a commit or
-rollback at the end of a session if DML queries were executed during the
-session with no commit or rollback.  Program accordingly.</p>
-
 <a name="query"></a>
 <span class="heading2">Executing Queries</span><br><br>
 
@@ -59,7 +54,7 @@ session with no commit or rollback.  Program accordingly.</p>
 <PRE>
 <FONT color=#a020f0>require</FONT> <FONT color=#6a5acd>'</FONT><FONT color=#ff00ff>dbi</FONT><FONT color=#6a5acd>'</FONT>
 
-db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/mysock.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
+db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
 
 stmt=db.prepare(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>select * from mytable</FONT><FONT color=#6a5acd>&quot;</FONT>)
 
@@ -144,7 +139,7 @@ You can find out why by catching the exception.</p>
 <FONT color=#a020f0>require</FONT> <FONT color=#6a5acd>'</FONT><FONT color=#ff00ff>dbi</FONT><FONT color=#6a5acd>'</FONT>
 
 <B><FONT color=#a52a2a>begin</FONT></B>
-        db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/mysock.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
+        db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
 
         stmt=db.prepare(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>select * from mytable</FONT><FONT color=#6a5acd>&quot;</FONT>)
 
@@ -171,7 +166,7 @@ bind_param method for using bind variables in those queries.</p>
 <PRE>
 <FONT color=#a020f0>require</FONT> <FONT color=#6a5acd>'</FONT><FONT color=#ff00ff>dbi</FONT><FONT color=#6a5acd>'</FONT>
 
-db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/mysock.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
+db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
 
 stmt=db.prepare(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>select * from mytable where column1&gt;:val1 and column2=:val2 and column3&lt;val3</FONT><FONT color=#6a5acd>&quot;</FONT>)
 
@@ -203,7 +198,7 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 <PRE>
 <FONT color=#a020f0>require</FONT> <FONT color=#6a5acd>'</FONT><FONT color=#ff00ff>dbi</FONT><FONT color=#6a5acd>'</FONT>
 
-db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/mysock.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
+db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
 
 stmt=db.prepare(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>select * from mytable where column1&amp;gt;:val1 and column2=:val2 and column3&amp;lt;val3</FONT><FONT color=#6a5acd>&quot;</FONT>)
 
@@ -248,7 +243,7 @@ query.</p>
 <PRE>
 <FONT color=#a020f0>require</FONT> <FONT color=#6a5acd>'</FONT><FONT color=#ff00ff>dbi</FONT><FONT color=#6a5acd>'</FONT>
 
-db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/mysock.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
+db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
 
 stmt=db.prepare(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>select * from mytable</FONT><FONT color=#6a5acd>&quot;</FONT>)
 
@@ -289,7 +284,7 @@ can use it to skip forward or backward.</p>
 <PRE>
 <FONT color=#a020f0>require</FONT> <FONT color=#6a5acd>'</FONT><FONT color=#ff00ff>dbi</FONT><FONT color=#6a5acd>'</FONT>
 
-db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/mysock.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
+db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
 
 stmt=db.prepare(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>select * from mytable</FONT><FONT color=#6a5acd>&quot;</FONT>)
 
@@ -348,7 +343,7 @@ connection for both operations.</p>
 <PRE>
 <FONT color=#a020f0>require</FONT> <FONT color=#6a5acd>'</FONT><FONT color=#ff00ff>dbi</FONT><FONT color=#6a5acd>'</FONT>
 
-db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/mysock.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
+db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
 
 stmt1=db.prepare(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>select * from mytable</FONT><FONT color=#6a5acd>&quot;</FONT>)
 stmt2=db.prepare(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>insert into my_other_table values (:var1,:var2:,var3)</FONT><FONT color=#6a5acd>&quot;</FONT>)
@@ -375,7 +370,7 @@ contains 'name', 'type_name' and 'precision' keys.</p>
 <PRE>
 <FONT color=#a020f0>require</FONT> <FONT color=#6a5acd>'</FONT><FONT color=#ff00ff>dbi</FONT><FONT color=#6a5acd>'</FONT>
 
-db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=localhost;port=9000;socket=/tmp/mysock.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
+db=<FONT color=#6a5acd>DBI</FONT>.connect(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>myuser</FONT><FONT color=#6a5acd>&quot;</FONT>,<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>mypassword</FONT><FONT color=#6a5acd>&quot;</FONT>)
 
 stmt=db.prepare(<FONT color=#6a5acd>&quot;</FONT><FONT color=#ff00ff>select * from mytable</FONT><FONT color=#6a5acd>&quot;</FONT>)
 

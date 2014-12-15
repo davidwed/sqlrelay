@@ -69,7 +69,7 @@ use.</p>
 
 main() {
 
-       sqlrconnection      con=<B><FONT color=#a02828>new</FONT></B> sqlrconnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
+       sqlrconnection      con=<B><FONT color=#a02828>new</FONT></B> sqlrconnection(<FONT color=#f800f8>&quot;sqlrserver&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
 
        ... execute some queries ...
 
@@ -85,11 +85,6 @@ query, ping() or identify() is run.</p>
 connection daemons, so care should be taken to minimize the length of a
 session.</p>
 
-<p>If you're using a transactional database, ending a session has a catch.
-Database connection daemons can be configured to send either a commit or
-rollback at the end of a session if DML queries were executed during the
-session with no commit or rollback.  Program accordingly.</p>
-
 <a name="query"></a>
 <span class="heading2">Executing Queries</span><br><br>
 
@@ -102,7 +97,7 @@ query.  The same cursor may be used over and over.</p>
 
 main() {
 
-        sqlrconnection      *con=<B><FONT color=#a02828>new</FONT></B> sqlrconnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
+        sqlrconnection      *con=<B><FONT color=#a02828>new</FONT></B> sqlrconnection(<FONT color=#f800f8>&quot;sqlrserver&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
         sqlrcursor          *cur=<B><FONT color=#a02828>new</FONT></B> sqlrcursor(con);
 
         cur-&gt;sendQuery(<FONT color=#f800f8>&quot;select * from my_table&quot;</FONT>);
@@ -194,7 +189,7 @@ You can find out why by calling errorMessage().</p>
 
 main() {
 
-        sqlrconnection      *con=<B><FONT color=#a02828>new</FONT></B> sqlrconnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
+        sqlrconnection      *con=<B><FONT color=#a02828>new</FONT></B> sqlrconnection(<FONT color=#f800f8>&quot;sqlrserver&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
         sqlrcursor          *cur=<B><FONT color=#a02828>new</FONT></B> sqlrcursor(con);
 
         <B><FONT color=#a02828>if</FONT></B> (!cur-&gt;sendQuery(<FONT color=#f800f8>&quot;select * from my_nonexistant_table&quot;</FONT>)) {
@@ -233,7 +228,7 @@ scale.</p>
 
 main() {
 
-        sqlrconnection      *con=<font color="#a52a2a"><b>new</b></font> sqlrconnection(<font color="#ff00ff">&quot;host&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+        sqlrconnection      *con=<font color="#a52a2a"><b>new</b></font> sqlrconnection(<font color="#ff00ff">&quot;sqlrserver&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;/tmp/test.socket&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
         sqlrcursor          *cur=<font color="#a52a2a"><b>new</b></font> sqlrcursor(con);
 
         cur-&gt;prepareQuery(<font color="#ff00ff">&quot;select * from mytable $(whereclause)&quot;</font>)
@@ -264,7 +259,7 @@ provides methods for defining and retrieving output bind variables.</p>
 
 main() {
 
-        sqlrconnection      *con=<font color="#a52a2a"><b>new</b></font> sqlrconnection(<font color="#ff00ff">&quot;host&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+        sqlrconnection      *con=<font color="#a52a2a"><b>new</b></font> sqlrconnection(<font color="#ff00ff">&quot;sqlrserver&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;/tmp/test.socket&quot;</font>,<font color="#ff00ff">&quot;user&quot;</font>,<font color="#ff00ff">&quot;password&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
         sqlrcursor          *cur=<font color="#a52a2a"><b>new</b></font> sqlrcursor(con);
 
         cur-&gt;prepareQuery(<font color="#ff00ff">&quot;begin  :result1:=addTwoIntegers(:integer1,:integer2);  :result2=addTwoFloats(:float1,:float2);  :result3=convertToString(:integer3); end;&quot;</font>);
@@ -304,7 +299,7 @@ inputBindClob() methods.</p>
 
 main() {
 
-        sqlrconnection      *con=<font color="#a02828"><b>new</b></font> sqlrconnection(<font color="#f800f8">&quot;host&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;user&quot;</font>,<font color="#f800f8">&quot;password&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+        sqlrconnection      *con=<font color="#a02828"><b>new</b></font> sqlrconnection(<font color="#f800f8">&quot;sqlrserver&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;/tmp/test.socket&quot;</font>,<font color="#f800f8">&quot;user&quot;</font>,<font color="#f800f8">&quot;password&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
         sqlrcursor          *cur=<font color="#a02828"><b>new</b></font> sqlrcursor(con);
 
         cur-&gt;executeQuery(<font color="#f800f8">&quot;create table images (image blob, description clob)&quot;</font>);
@@ -342,7 +337,7 @@ defineOutputBindClob()/getOutputBindClob().</p>
 
 main() {
 
-        sqlrconnection      *con=<font color="#a02828"><b>new</b></font> sqlrconnection(<font color="#f800f8">&quot;host&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;user&quot;</font>,<font color="#f800f8">&quot;password&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+        sqlrconnection      *con=<font color="#a02828"><b>new</b></font> sqlrconnection(<font color="#f800f8">&quot;sqlrserver&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;/tmp/test.socket&quot;</font>,<font color="#f800f8">&quot;user&quot;</font>,<font color="#f800f8">&quot;password&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
         sqlrcursor          *cur=<font color="#a02828"><b>new</b></font> sqlrcursor(con);
 
         cur-&gt;prepareQuery(<font color="#f800f8">&quot;begin  select image into :image from images;  select description into :desc from images;  end;&quot;</font>);
@@ -390,7 +385,7 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 
 main() {
 
-        sqlrconnection      *con=<B><FONT color=#a02828>new</FONT></B> sqlrconnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
+        sqlrconnection      *con=<B><FONT color=#a02828>new</FONT></B> sqlrconnection(<FONT color=#f800f8>&quot;sqlrserver&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
         sqlrcursor          *cur=<B><FONT color=#a02828>new</FONT></B> sqlrcursor(con);
 
         cur-&gt;prepareQuery(<FONT color=#f800f8>&quot;select * from mytable where mycolumn&gt;:value&quot;</FONT>);
@@ -430,7 +425,7 @@ result sets.</p>
 
 main() {
 
-        sqlrconnection      *con=<B><FONT color=#a02828>new</FONT></B> sqlrconnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
+        sqlrconnection      *con=<B><FONT color=#a02828>new</FONT></B> sqlrconnection(<FONT color=#f800f8>&quot;sqlrserver&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
         sqlrcursor          *cur=<B><FONT color=#a02828>new</FONT></B> sqlrcursor(con);
 
         cur-&gt;sendQuery(<FONT color=#f800f8>&quot;select * from my_table&quot;</FONT>);
@@ -462,7 +457,7 @@ fields in the row.</p>
 
 main() {
 
-        sqlrconnection      *con=<B><FONT color=#a52a2a>new</FONT></B> sqlrconnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrconnection      *con=<B><FONT color=#a52a2a>new</FONT></B> sqlrconnection(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         sqlrcursor          *cur=<B><FONT color=#a02828>new</FONT></B> sqlrcursor(con);
 
         cur-&gt;sendQuery(<FONT color=#ff00ff>&quot;select * from my_table&quot;</FONT>);
@@ -529,7 +524,7 @@ index of the first row of the currently buffered chunk.</p>
 
 main() {
 
-        sqlrconnection      *con=<B><FONT color=#a52a2a>new</FONT></B> sqlrconnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrconnection      *con=<B><FONT color=#a52a2a>new</FONT></B> sqlrconnection(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         sqlrcursor          *cur=<B><FONT color=#a02828>new</FONT></B> sqlrcursor(con);
 
         cur-&gt;setResultSetBufferSize(<FONT color=#ff00ff>5</FONT>);
@@ -585,7 +580,7 @@ iterate through its result set, inserting rows into another table, using only
 
 main() {
 
-        sqlrconnection      *con=<B><FONT color=#a02828>new</FONT></B> sqlrconnection(<FONT color=#f800f8>&quot;host&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
+        sqlrconnection      *con=<B><FONT color=#a02828>new</FONT></B> sqlrconnection(<FONT color=#f800f8>&quot;sqlrserver&quot;</FONT>,<FONT color=#f800f8>9000</FONT>,<FONT color=#f800f8>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#f800f8>&quot;user&quot;</FONT>,<FONT color=#f800f8>&quot;password&quot;</FONT>,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT>);
         sqlrcursor          *cursor1=<B><FONT color=#a02828>new</FONT></B> sqlrcursor(con);
         sqlrcursor          *cursor2=<B><FONT color=#a02828>new</FONT></B> sqlrcursor(con);
 
@@ -635,7 +630,7 @@ Program code:
 
 main() {
 
-        sqlrconnection      *con=<font color="#a02828"><b>new</b></font> sqlrconnection(<font color="#f800f8">&quot;host&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;user&quot;</font>,<font color="#f800f8">&quot;password&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+        sqlrconnection      *con=<font color="#a02828"><b>new</b></font> sqlrconnection(<font color="#f800f8">&quot;sqlrserver&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;/tmp/test.socket&quot;</font>,<font color="#f800f8">&quot;user&quot;</font>,<font color="#f800f8">&quot;password&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
         sqlrcursor          *cur=<font color="#a02828"><b>new</b></font> sqlrcursor(con);
 
         cur-&gt;prepareQuery(<font color="#f800f8">&quot;begin  :curs:=sp_mytable; end;&quot;</font>);
@@ -684,7 +679,7 @@ always returned as false.</p>
 
 main() {
 
-        sqlrconnection      *con=<B><FONT color=#a52a2a>new</FONT></B> sqlrconnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrconnection      *con=<B><FONT color=#a52a2a>new</FONT></B> sqlrconnection(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         sqlrcursor          *cur=<B><FONT color=#a02828>new</FONT></B> sqlrcursor(con);
 
         cur-&gt;sendQuery(<FONT color=#ff00ff>&quot;select * from my_table&quot;</FONT>);
@@ -729,7 +724,7 @@ database.</p>
 
 main() {
 
-        sqlrconnection      *con=<font color="#a02828"><b>new</b></font> sqlrconnection(<font color="#f800f8">&quot;host&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;user&quot;</font>,<font color="#f800f8">&quot;password&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+        sqlrconnection      *con=<font color="#a02828"><b>new</b></font> sqlrconnection(<font color="#f800f8">&quot;sqlrserver&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;/tmp/test.socket&quot;</font>,<font color="#f800f8">&quot;user&quot;</font>,<font color="#f800f8">&quot;password&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
         sqlrcursor          *cur=<font color="#a02828"><b>new</b></font> sqlrcursor(con);
 
         <font color="#0000f8">// column names will be forced to upper case</font>
@@ -1887,7 +1882,7 @@ just open the file for each page of the report.</p>
 
 main() {
 
-        sqlrconnection      *con=<B><FONT color=#a52a2a>new</FONT></B> sqlrconnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrconnection      *con=<B><FONT color=#a52a2a>new</FONT></B> sqlrconnection(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         sqlrcursor          *cur=<B><FONT color=#a02828>new</FONT></B> sqlrcursor(con);
 
 	... generate a unique filename ...
@@ -1919,7 +1914,7 @@ main() {
 
         ... get the page to display from the previous page ...
 
-        sqlrconnection      *con=<B><FONT color=#a52a2a>new</FONT></B> sqlrconnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrconnection      *con=<B><FONT color=#a52a2a>new</FONT></B> sqlrconnection(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         sqlrcursor          *cur=<B><FONT color=#a02828>new</FONT></B> sqlrcursor(con);
 
         cur-&gt;openCachedResultSet(filename);
@@ -1954,7 +1949,7 @@ is possible.</p>
 
 main() {
 
-        sqlrconnection      *con=<B><FONT color=#a52a2a>new</FONT></B> sqlrconnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrconnection      *con=<B><FONT color=#a52a2a>new</FONT></B> sqlrconnection(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         sqlrcursor          *cur=<B><FONT color=#a02828>new</FONT></B> sqlrcursor(con);
 
         cur-&gt;sendQuery(<FONT color=#ff00ff>&quot;insert into my_table values (1,2,3)&quot;</FONT>);
@@ -1982,7 +1977,7 @@ main() {
 
         ... get rs, port and socket from previous page ...
 
-        sqlrconnection      *con=<B><FONT color=#a52a2a>new</FONT></B> sqlrconnection(<FONT color=#ff00ff>&quot;host&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+        sqlrconnection      *con=<B><FONT color=#a52a2a>new</FONT></B> sqlrconnection(<FONT color=#ff00ff>&quot;sqlrserver&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;user&quot;</FONT>,<FONT color=#ff00ff>&quot;password&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
         sqlrcursor          *cur=<B><FONT color=#a02828>new</FONT></B> sqlrcursor(con);
 
         con-&gt;resumeSession(port,socket);

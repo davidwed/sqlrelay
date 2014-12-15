@@ -35,7 +35,7 @@ use.</p>
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRClient
 
-con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>sqlrserver</FONT>',9000,'<FONT color=#ff00ff>/tmp/test.socket</FONT>','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=PySQLRClient.sqlrcursor(con)
 
 ... execute some queries ...
@@ -49,11 +49,6 @@ query, ping() or identify() is run.</p>
 connection daemons, so care should be taken to minimize the length of a
 session.</p>
 
-<p>If you're using a transactional database, ending a session has a catch.
-Database connection daemons can be configured to send either a commit or
-rollback at the end of a session if DML queries were executed during the
-session with no commit or rollback.  Program accordingly.</p>
-
 <a name="query"></a>
 <span class="heading2">Executing Queries</span><br><br>
 
@@ -63,7 +58,7 @@ session with no commit or rollback.  Program accordingly.</p>
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRClient
 
-con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>sqlrserver</FONT>',9000,'<FONT color=#ff00ff>/tmp/test.socket</FONT>','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=PySQLRClient.sqlrcursor(con)
 
 cur.sendQuery('<FONT color=#ff00ff>select * from my_table</FONT>')
@@ -147,7 +142,7 @@ You can find out why by calling errorMessage().</p>
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRClient
 
-con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>sqlrserver</FONT>',9000,'<FONT color=#ff00ff>/tmp/test.socket</FONT>','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=PySQLRClient.sqlrcursor(con)
 
 <B><FONT color=#a52a2a>if</FONT></B> (!cur.sendQuery('<FONT color=#ff00ff>select * from my_nonexistant_table</FONT>')):
@@ -228,7 +223,7 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRClient
 
-con=PySQLRClient.sqlrconnection('<FONT color=#f800f8>host</FONT>',9000,'','<FONT color=#f800f8>user</FONT>','<FONT color=#f800f8>password</FONT>',0,1)
+con=PySQLRClient.sqlrconnection('<FONT color=#f800f8>sqlrserver</FONT>',9000,'<FONT color=#ff00ff>/tmp/test.socket</FONT>','<FONT color=#f800f8>user</FONT>','<FONT color=#f800f8>password</FONT>',0,1)
 cur=PySQLRClient.sqlrcursor(con)
 
 cur.prepareQuery('<FONT color=#f800f8>select * from mytable where mycolumn&gt;:value</FONT>')
@@ -261,7 +256,7 @@ result sets.</p>
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRClient
 
-con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>sqlrserver</FONT>',9000,'<FONT color=#ff00ff>/tmp/test.socket</FONT>','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=PySQLRClient.sqlrcursor(con)
 
 cur.sendQuery('<FONT color=#ff00ff>select * from my_table</FONT>')
@@ -284,7 +279,7 @@ getRowRange() to get a range of rows.</p>
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRClient
 
-con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>sqlrserver</FONT>',9000,'<FONT color=#ff00ff>/tmp/test.socket</FONT>','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=PySQLRClient.sqlrcursor(con)
 
 cur.sendQuery('<FONT color=#ff00ff>select * from my_table</FONT>')
@@ -342,7 +337,7 @@ index of the first row of the currently buffered chunk.</p>
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRClient
 
-con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>sqlrserver</FONT>',9000,'<FONT color=#ff00ff>/tmp/test.socket</FONT>','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=PySQLRClient.sqlrcursor(con)
 
 cur.setResultSetBufferSize(5)
@@ -387,7 +382,7 @@ iterate through its result set, inserting rows into another table, using only
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRClient
 
-con=PySQLRClient.sqlrconnection('<FONT color=#f800f8>host</FONT>',9000,'','<FONT color=#f800f8>user</FONT>','<FONT color=#f800f8>password</FONT>',0,1)
+con=PySQLRClient.sqlrconnection('<FONT color=#f800f8>sqlrserver</FONT>',9000,'<FONT color=#ff00ff>/tmp/test.socket</FONT>','<FONT color=#f800f8>user</FONT>','<FONT color=#f800f8>password</FONT>',0,1)
 cursor1=PySQLRClient.sqlrcursor(con)
 cursor2=PySQLRClient.sqlrcursor(con)
 
@@ -416,7 +411,7 @@ getOutputBindCursor() and fetchFromOutputBindCursor().</p>
 <pre>
 <font color="#a020f0">from</font> SQLRelay <font color="#a020f0">import</font> PySQLRClient
 
-con=PySQLRClient.sqlrconnection(&quot;<font color="#f800f8">host</font>&quot;,9000,&quot;&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,0,1)
+con=PySQLRClient.sqlrconnection(&quot;<font color="#f800f8">sqlrserver</font>&quot;,9000,&quot;&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,0,1)
 cur=PySQLRClient.sqlrcursor(con)
 
 cur.prepareQuery(&quot;<font color="#f800f8">begin  :curs:=sp_mytable end;</font>&quot;)
@@ -454,7 +449,7 @@ always returned as false.</p>
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRClient
 
-con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>sqlrserver</FONT>',9000,'<FONT color=#ff00ff>/tmp/test.socket</FONT>','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=PySQLRClient.sqlrcursor(con)
 
 cur.sendQuery('<FONT color=#ff00ff>select * from my_table</FONT>')
@@ -490,7 +485,7 @@ database.</p>
 <pre>
 <font color="#a020f0">from</font> SQLRelay <font color="#a020f0">import</font> PySQLRClient
 
-con=PySQLRClient.sqlrconnection(&quot;<font color="#f800f8">host</font>&quot;,9000,&quot;&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,0,1)
+con=PySQLRClient.sqlrconnection(&quot;<font color="#f800f8">sqlrserver</font>&quot;,9000,&quot;&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,0,1)
 cur=PySQLRClient.sqlrcursor(con)
 
 <font color="#0000f8"># column names will be forced to upper case</font>
@@ -1636,7 +1631,7 @@ just open the file for each page of the report.</p>
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRClient
 
-con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>sqlrserver</FONT>',9000,'<FONT color=#ff00ff>/tmp/test.socket</FONT>','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=PySQLRClient.sqlrcursor(con)
 
 ... generate a unique file name ...
@@ -1661,7 +1656,7 @@ cur.cacheOff()
 
 ... get the page to display <FONT color=#a020f0>from</FONT> the previous page ...
 
-con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>sqlrserver</FONT>',9000,'<FONT color=#ff00ff>/tmp/test.socket</FONT>','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=PySQLRClient.sqlrcursor(con)
 
 cur.openCachedResultSet(filename)
@@ -1688,7 +1683,7 @@ is possible.</p>
 <PRE>
 <FONT color=#a020f0>from</FONT> SQLRelay <FONT color=#a020f0>import</FONT> PySQLRClient
 
-con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>sqlrserver</FONT>',9000,'<FONT color=#ff00ff>/tmp/test.socket</FONT>','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=PySQLRClient.sqlrcursor(con)
 
 cur.sendQuery('<FONT color=#ff00ff>insert into my_table values (1,2,3)</FONT>')
@@ -1710,7 +1705,7 @@ socket=con.getConnectionSocket()
 
 ... get port and socket from previous page ...
 
-con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>host</FONT>',9000,'','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
+con=PySQLRClient.sqlrconnection('<FONT color=#ff00ff>sqlrserver</FONT>',9000,'<FONT color=#ff00ff>/tmp/test.socket</FONT>','<FONT color=#ff00ff>user</FONT>','<FONT color=#ff00ff>password</FONT>',0,1)
 cur=PySQLRClient.sqlrcursor(con)
 
 con.resumeSession(port,socket)

@@ -36,7 +36,7 @@ use.</p>
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>sqlrserver</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
 
         ... execute some queries ...
 </PRE>
@@ -49,11 +49,6 @@ query, ping() or identify() is run.</p>
 connection daemons, so care should be taken to minimize the length of a
 session.</p>
 
-<p>If you're using a transactional database, ending a session has a catch.
-Database connection daemons can be configured to send either a commit or
-rollback at the end of a session if DML queries were executed during the
-session with no commit or rollback.  Program accordingly.</p>
-
 <a name="query"></a>
 <span class="heading2">Executing Queries</span><br><br>
 
@@ -64,7 +59,7 @@ session with no commit or rollback.  Program accordingly.</p>
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>sqlrserver</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
 <FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$cur</FONT>-&gt;sendQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>select * from my_table</FONT><FONT color=#ff00ff>&quot;</FONT>);
@@ -150,7 +145,7 @@ You can find out why by calling errorMessage().</p>
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>sqlrserver</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
 <FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <B><FONT color=#a52a2a>if</FONT></B> (!<FONT color=#008b8b>$cur</FONT>-&gt;sendQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>select * from my_nonexistant_table</FONT><FONT color=#ff00ff>&quot;</FONT>)) {
@@ -184,7 +179,7 @@ scale.</p>
 <font color="#a52a2a"><b>use </b></font>SQLRelay::Connection;
 <font color="#a52a2a"><b>use </b></font>SQLRelay::Cursor;
 
-<font color="#008b8b">$con</font>=SQLRelay::Connection-&gt;<font color="#a52a2a"><b>new</b></font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">host</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">user</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">password</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+<font color="#008b8b">$con</font>=SQLRelay::Connection-&gt;<font color="#a52a2a"><b>new</b></font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">sqlrserver</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;/tmp/test.socket&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">user</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">password</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
 <font color="#008b8b">$cur</font>=SQLRelay::Cursor-&gt;<font color="#a52a2a"><b>new</b></font>(<font color="#008b8b">$con</font>);
 
 <font color="#008b8b">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">select * from mytable </font><font color="#6a5acd">\$</font><font color="#ff00ff">(whereclause)</font><font color="#ff00ff">&quot;</font>)
@@ -210,7 +205,7 @@ provides methods for defining and retrieving output bind variables.</p>
 <font color="#a52a2a"><b>use </b></font>SQLRelay::Connection;
 <font color="#a52a2a"><b>use </b></font>SQLRelay::Cursor;
 
-<font color="#008b8b">$con</font>=SQLRelay::Connection-&gt;<font color="#a52a2a"><b>new</b></font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">host</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">user</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">password</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+<font color="#008b8b">$con</font>=SQLRelay::Connection-&gt;<font color="#a52a2a"><b>new</b></font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">sqlrserver</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;/tmp/test.socket&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">user</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">password</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
 <font color="#008b8b">$cur</font>=SQLRelay::Cursor-&gt;<font color="#a52a2a"><b>new</b></font>(<font color="#008b8b">$con</font>);
 
 <font color="#008b8b">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">begin  :result1:=addTwoIntegers(:integer1,:integer2);  :result2=addTwoFloats(:float1,:float2);  :result3=convertToString(:integer3); end;</font><font color="#ff00ff">&quot;</font>);
@@ -245,7 +240,7 @@ inputBindClob() methods.</p>
 <font color="#a52a2a"><b>use </b></font>SQLRelay::Connection;
 <font color="#a52a2a"><b>use </b></font>SQLRelay::Cursor;
 
-<font color="#008b8b">$con</font>=SQLRelay::Connection-&gt;<font color="#a52a2a"><b>new</b></font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">host</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">user</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">password</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+<font color="#008b8b">$con</font>=SQLRelay::Connection-&gt;<font color="#a52a2a"><b>new</b></font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">sqlrserver</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;/tmp/test.socket&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">user</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">password</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
 <font color="#008b8b">$cur</font>=SQLRelay::Cursor-&gt;<font color="#a52a2a"><b>new</b></font>(<font color="#008b8b">$con</font>);
 
 <font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$imagedata</font>;
@@ -276,7 +271,7 @@ defineOutputBindClob()/getOutputBindClob().</p>
 <font color="#a52a2a"><b>use </b></font>SQLRelay::Connection;
 <font color="#a52a2a"><b>use </b></font>SQLRelay::Cursor;
 
-<font color="#008b8b">$con</font>=SQLRelay::Connection-&gt;<font color="#a52a2a"><b>new</b></font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">host</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">user</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">password</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
+<font color="#008b8b">$con</font>=SQLRelay::Connection-&gt;<font color="#a52a2a"><b>new</b></font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">sqlrserver</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">9000</font>,<font color="#ff00ff">&quot;/tmp/test.socket&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">user</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">password</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font>);
 <font color="#008b8b">$cur</font>=SQLRelay::Cursor-&gt;<font color="#a52a2a"><b>new</b></font>(<font color="#008b8b">$con</font>);
 
 <font color="#008b8b">$cur</font>-&gt;prepareQuery(<font color="#ff00ff">&quot;</font><font color="#ff00ff">begin  select image into :image from images;  select description into :desc from images;  end;</font><font color="#ff00ff">&quot;</font>);
@@ -319,7 +314,7 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 <font color="#a02828"><b>use </b></font>SQLRelay::Connection;
 <font color="#a02828"><b>use </b></font>SQLRelay::Cursor;
 
-<font color="#008888">$con</font>=SQLRelay::Connection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">host</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+<font color="#008888">$con</font>=SQLRelay::Connection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">sqlrserver</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;/tmp/test.socket&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
 <font color="#008888">$cur</font>=SQLRelay::Cursor-&gt;<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
 
 <font color="#008888">$cur</font>-&gt;prepareQuery(<font color="#f800f8">&quot;</font><font color="#f800f8">select * from mytable where mycolumn&gt;:value</font><font color="#f800f8">&quot;</font>);
@@ -353,7 +348,7 @@ result sets.</p>
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>sqlrserver</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
 <FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$cur</FONT>-&gt;sendQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>select * from my_table</FONT><FONT color=#ff00ff>&quot;</FONT>);
@@ -379,7 +374,7 @@ a long or double, you can use getFieldAsLong() and getFieldAsDouble().</p>
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>sqlrserver</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
 <FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$cur</FONT>-&gt;sendQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>select * from my_table</FONT><FONT color=#ff00ff>&quot;</FONT>);
@@ -440,7 +435,7 @@ index of the first row of the currently buffered chunk.</p>
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>sqlrserver</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
 <FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$cur</FONT>-&gt;setResultSetBufferSize(<FONT color=#ff00ff>5</FONT>);
@@ -490,7 +485,7 @@ iterate through its result set, inserting rows into another table, using only
 <font color="#a02828"><b>use </b></font>SQLRelay::Connection;
 <font color="#a02828"><b>use </b></font>SQLRelay::Cursor;
 
-<font color="#008888">$con</font>=SQLRelay::Connection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">host</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+<font color="#008888">$con</font>=SQLRelay::Connection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">sqlrserver</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;/tmp/test.socket&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
 <font color="#008888">$cursor1</font>=SQLRelay::Cursor-&gt;<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
 <font color="#008888">$cursor2</font>=SQLRelay::Cursor-&gt;<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
 
@@ -522,7 +517,7 @@ getOutputBindCursor() and fetchFromOutputBindCursor().</p>
 <font color="#a02828"><b>use </b></font>SQLRelay::Connection;
 <font color="#a02828"><b>use </b></font>SQLRelay::Cursor;
 
-<font color="#008888">$con</font>=SQLRelay::Connection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">host</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+<font color="#008888">$con</font>=SQLRelay::Connection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">sqlrserver</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;/tmp/test.socket&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
 <font color="#008888">$cur</font>=SQLRelay::Cursor-&gt;<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
 
 <font color="#008888">$cur</font>-&gt;prepareQuery(<font color="#f800f8">&quot;</font><font color="#f800f8">begin  :curs:=sp_mytable; end;</font><font color="#f800f8">&quot;</font>);
@@ -563,7 +558,7 @@ always returned as false.</p>
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>sqlrserver</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
 <FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$cur</FONT>-&gt;sendQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>select * from my_table</FONT><FONT color=#ff00ff>&quot;</FONT>);
@@ -602,7 +597,7 @@ database.</p>
 <font color="#a02828"><b>use </b></font>SQLRelay::Connection;
 <font color="#a02828"><b>use </b></font>SQLRelay::Cursor;
 
-<font color="#008888">$con</font>=SQLRelay::Connection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">host</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
+<font color="#008888">$con</font>=SQLRelay::Connection-&gt;<font color="#a02828"><b>new</b></font>(<font color="#f800f8">&quot;</font><font color="#f800f8">sqlrserver</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">9000</font>,<font color="#f800f8">&quot;/tmp/test.socket&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">user</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">&quot;</font><font color="#f800f8">password</font><font color="#f800f8">&quot;</font>,<font color="#f800f8">0</font>,<font color="#f800f8">1</font>);
 <font color="#008888">$cur</font>=SQLRelay::Cursor-&gt;<font color="#a02828"><b>new</b></font>(<font color="#008888">$con</font>);
 
 <font color="#0000f8"># column names will be forced to upper case</font>
@@ -1766,7 +1761,7 @@ just open the file for each page of the report.</p>
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>sqlrserver</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
 <FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 	... generate a unique file name ...
@@ -1792,7 +1787,7 @@ just open the file for each page of the report.</p>
 
         ... get the page to display from the previous page ...
 
-<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>sqlrserver</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
 <FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$cur</FONT>-&gt;openCachedResultSet(filename);
@@ -1822,7 +1817,7 @@ is possible.</p>
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Connection;
 <B><FONT color=#a52a2a>use </FONT></B>SQLRelay::Cursor;
 
-<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>sqlrserver</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
 <FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$cur</FONT>-&gt;sendQuery(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>insert into my_table values (1,2,3)</FONT><FONT color=#ff00ff>&quot;</FONT>);
@@ -1845,7 +1840,7 @@ is possible.</p>
 
         ... get rs, port <B><FONT color=#a52a2a>and</FONT></B> <B><FONT color=#a52a2a>socket</FONT></B> from previous page ...
 
-<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>host</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
+<FONT color=#008b8b>$con</FONT>=SQLRelay::Connection-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>sqlrserver</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>9000</FONT>,<FONT color=#ff00ff>&quot;/tmp/test.socket&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>user</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>&quot;</FONT><FONT color=#ff00ff>password</FONT><FONT color=#ff00ff>&quot;</FONT>,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT>);
 <FONT color=#008b8b>$cur</FONT>=SQLRelay::Cursor-&gt;<B><FONT color=#a52a2a>new</FONT></B>(<FONT color=#008b8b>$con</FONT>);
 
 <FONT color=#008b8b>$con</FONT>-&gt;resumeSession(port,<FONT color=#a52a2a>$socket</FONT>);

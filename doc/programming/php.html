@@ -85,7 +85,7 @@ use.</p>
 <PRE>
 <FONT color=#6a5acd>&lt;?</FONT>
 
-     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
 
      <B><FONT color=#a52a2a>...</FONT></B> execute some queries <B><FONT color=#a52a2a>...</FONT></B>
 
@@ -101,11 +101,6 @@ query, sqlrcur_ping() or sqlrcur_identify() is run.</p>
 connection daemons, so care should be taken to minimize the length of a
 session.</p>
 
-<p>If you're using a transactional database, ending a session has a catch.
-Database connection daemons can be configured to send either a commit or
-rollback at the end of a session if DML queries were executed during the
-session with no commit or rollback.  Program accordingly.</p>
-
 <a name="query"></a>
 <span class="heading2">Executing Queries</span><br><br>
 
@@ -115,7 +110,7 @@ session with no commit or rollback.  Program accordingly.</p>
 <PRE>
 <FONT color=#6a5acd>&lt;?</FONT>
 
-     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
      <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
 
      sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>select * from my_table</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
@@ -204,7 +199,7 @@ query failed.  You can find out why by calling sqlrcur_errorMessage().</p>
 <PRE>
 <FONT color=#6a5acd>&lt;?</FONT>
 
-     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
      <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
 
      <B><FONT color=#a52a2a>if</FONT></B> <FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>!</FONT></B>sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>select * from my_nonexistant_table</FONT>&quot;<FONT color=#6a5acd>))</FONT> <FONT color=#6a5acd>{</FONT>
@@ -242,7 +237,7 @@ scale.</p>
 <pre>
 <font color="#6a5acd">&lt;?</font>
 
-     <font color="#a52a2a"><b>$</b></font><font color="#008b8b">con</font><font color="#a52a2a"><b>=</b></font>sqlrcon_alloc<font color="#6a5acd">(</font>&quot;<font color="#ff00ff">host</font>&quot;,<font color="#ff00ff">9000</font>,&quot;&quot;,&quot;<font color="#ff00ff">user</font>&quot;,&quot;<font color="#ff00ff">password</font>&quot;,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font><font color="#6a5acd">)</font>;
+     <font color="#a52a2a"><b>$</b></font><font color="#008b8b">con</font><font color="#a52a2a"><b>=</b></font>sqlrcon_alloc<font color="#6a5acd">(</font>&quot;<font color="#ff00ff">sqlrserver</font>&quot;,<font color="#ff00ff">9000</font>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<font color="#ff00ff">user</font>&quot;,&quot;<font color="#ff00ff">password</font>&quot;,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font><font color="#6a5acd">)</font>;
      <font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font><font color="#a52a2a"><b>=</b></font>sqlrcur_alloc<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">con</font><font color="#6a5acd">)</font>;
 
      sqlrcur_prepareQuery<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font>,&quot;<font color="#ff00ff">select * from mytable $(whereclause)</font>&quot;<font color="#6a5acd">)</font>
@@ -272,7 +267,7 @@ provides methods for defining and retrieving output bind variables.</p>
 <pre>
 <font color="#6a5acd">&lt;?</font>
 
-     <font color="#a52a2a"><b>$</b></font><font color="#008b8b">con</font><font color="#a52a2a"><b>=</b></font>sqlrcon_alloc<font color="#6a5acd">(</font>&quot;<font color="#ff00ff">host</font>&quot;,<font color="#ff00ff">9000</font>,&quot;&quot;,&quot;<font color="#ff00ff">user</font>&quot;,&quot;<font color="#ff00ff">password</font>&quot;,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font><font color="#6a5acd">)</font>;
+     <font color="#a52a2a"><b>$</b></font><font color="#008b8b">con</font><font color="#a52a2a"><b>=</b></font>sqlrcon_alloc<font color="#6a5acd">(</font>&quot;<font color="#ff00ff">sqlrserver</font>&quot;,<font color="#ff00ff">9000</font>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<font color="#ff00ff">user</font>&quot;,&quot;<font color="#ff00ff">password</font>&quot;,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font><font color="#6a5acd">)</font>;
      <font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font><font color="#a52a2a"><b>=</b></font>sqlrcur_alloc<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">con</font><font color="#6a5acd">)</font>;
 
      sqlrcur_prepareQuery<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font>,&quot;<font color="#ff00ff">begin  :result1:=addTwoIntegers(:integer1,:integer2);  :result2=addTwoFloats(:float1,:float2);  :result3=convertToString(:integer3); end;</font>&quot;<font color="#6a5acd">)</font>;
@@ -311,7 +306,7 @@ inputBindClob() methods.</p>
 <pre>
 <font color="#6a5acd">&lt;?</font>
 
-     <font color="#a52a2a"><b>$</b></font><font color="#008b8b">con</font><font color="#a52a2a"><b>=</b></font>sqlrcon_alloc<font color="#6a5acd">(</font>&quot;<font color="#ff00ff">host</font>&quot;,<font color="#ff00ff">9000</font>,&quot;&quot;,&quot;<font color="#ff00ff">user</font>&quot;,&quot;<font color="#ff00ff">password</font>&quot;,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font><font color="#6a5acd">)</font>;
+     <font color="#a52a2a"><b>$</b></font><font color="#008b8b">con</font><font color="#a52a2a"><b>=</b></font>sqlrcon_alloc<font color="#6a5acd">(</font>&quot;<font color="#ff00ff">sqlrserver</font>&quot;,<font color="#ff00ff">9000</font>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<font color="#ff00ff">user</font>&quot;,&quot;<font color="#ff00ff">password</font>&quot;,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font><font color="#6a5acd">)</font>;
      <font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font><font color="#a52a2a"><b>=</b></font>sqlrcur_alloc<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">con</font><font color="#6a5acd">)</font>;
 
      sqlrcur_executeQuery<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font>,&quot;<font color="#ff00ff">create table images (image blob, description clob)</font>&quot;<font color="#6a5acd">)</font>;
@@ -348,7 +343,7 @@ defineOutputBindClob()/getOutputBindClob().</p>
 <pre>
 <font color="#6a5acd">&lt;?</font>
 
-     <font color="#a52a2a"><b>$</b></font><font color="#008b8b">con</font><font color="#a52a2a"><b>=</b></font>sqlrcon_alloc<font color="#6a5acd">(</font>&quot;<font color="#ff00ff">host</font>&quot;,<font color="#ff00ff">9000</font>,&quot;&quot;,&quot;<font color="#ff00ff">user</font>&quot;,&quot;<font color="#ff00ff">password</font>&quot;,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font><font color="#6a5acd">)</font>;
+     <font color="#a52a2a"><b>$</b></font><font color="#008b8b">con</font><font color="#a52a2a"><b>=</b></font>sqlrcon_alloc<font color="#6a5acd">(</font>&quot;<font color="#ff00ff">sqlrserver</font>&quot;,<font color="#ff00ff">9000</font>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<font color="#ff00ff">user</font>&quot;,&quot;<font color="#ff00ff">password</font>&quot;,<font color="#ff00ff">0</font>,<font color="#ff00ff">1</font><font color="#6a5acd">)</font>;
      <font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font><font color="#a52a2a"><b>=</b></font>sqlrcur_alloc<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">con</font><font color="#6a5acd">)</font>;
 
      sqlrcur_prepareQuery<font color="#6a5acd">(</font><font color="#a52a2a"><b>$</b></font><font color="#008b8b">cur</font>,&quot;<font color="#ff00ff">begin  select image into :image from images;  select description into :desc from images;  end;</font>&quot;<font color="#6a5acd">)</font>;
@@ -395,7 +390,7 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 <PRE>
 <FONT color=#6858c8>&lt;?</FONT>
 
-       <B><FONT color=#a02828>$</FONT></B><FONT color=#008888>con</FONT><B><FONT color=#a02828>=</FONT></B>sqlrcon_alloc<FONT color=#6858c8>(</FONT>&quot;<FONT color=#f800f8>host</FONT>&quot;,<FONT color=#f800f8>9000</FONT>,&quot;&quot;,&quot;<FONT color=#f800f8>user</FONT>&quot;,&quot;<FONT color=#f800f8>password</FONT>&quot;,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT><FONT color=#6858c8>)</FONT>;
+       <B><FONT color=#a02828>$</FONT></B><FONT color=#008888>con</FONT><B><FONT color=#a02828>=</FONT></B>sqlrcon_alloc<FONT color=#6858c8>(</FONT>&quot;<FONT color=#f800f8>sqlrserver</FONT>&quot;,<FONT color=#f800f8>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#f800f8>user</FONT>&quot;,&quot;<FONT color=#f800f8>password</FONT>&quot;,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT><FONT color=#6858c8>)</FONT>;
        <B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cur</FONT><B><FONT color=#a02828>=</FONT></B>sqlrcur_alloc<FONT color=#6858c8>(</FONT>con<FONT color=#6858c8>)</FONT>;
 
        sqlrcur_prepareQuery<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cur</FONT>,&quot;<FONT color=#f800f8>select * from mytable where mycolumn&gt;:value</FONT>&quot;<FONT color=#6858c8>)</FONT>;
@@ -432,7 +427,7 @@ are useful for processing result sets.</p>
 <PRE>
 <FONT color=#6a5acd>&lt;?</FONT>
 
-     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
      <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
 
      sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>select * from my_table</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
@@ -464,7 +459,7 @@ row.</p>
 <PRE>
 <FONT color=#6a5acd>&lt;?</FONT>
 
-     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
      <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
 
      sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>select * from my_table</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
@@ -529,7 +524,7 @@ function returns the index of the first row of the currently buffered chunk.</p>
 <PRE>
 <FONT color=#6a5acd>&lt;?</FONT>
 
-     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
      <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
 
      sqlrcur_setResultSetBufferSize<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,<FONT color=#ff00ff>5</FONT><FONT color=#6a5acd>)</FONT>;
@@ -581,7 +576,7 @@ iterate through its result set, inserting rows into another table, using only
 <PRE>
 <FONT color=#6858c8>&lt;?</FONT>
 
-        <B><FONT color=#a02828>$</FONT></B><FONT color=#008888>con</FONT><B><FONT color=#a02828>=</FONT></B>sqlrcon_alloc<FONT color=#6858c8>(</FONT>&quot;<FONT color=#f800f8>host</FONT>&quot;,<FONT color=#f800f8>9000</FONT>,&quot;&quot;,&quot;<FONT color=#f800f8>user</FONT>&quot;,&quot;<FONT color=#f800f8>password</FONT>&quot;,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT><FONT color=#6858c8>)</FONT>;
+        <B><FONT color=#a02828>$</FONT></B><FONT color=#008888>con</FONT><B><FONT color=#a02828>=</FONT></B>sqlrcon_alloc<FONT color=#6858c8>(</FONT>&quot;<FONT color=#f800f8>sqlrserver</FONT>&quot;,<FONT color=#f800f8>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#f800f8>user</FONT>&quot;,&quot;<FONT color=#f800f8>password</FONT>&quot;,<FONT color=#f800f8>0</FONT>,<FONT color=#f800f8>1</FONT><FONT color=#6858c8>)</FONT>;
         <B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cursor1</FONT><B><FONT color=#a02828>=</FONT></B>sqlrcur_alloc<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>con</FONT><FONT color=#6858c8>)</FONT>;
         <B><FONT color=#a02828>$</FONT></B><FONT color=#008888>cursor2</FONT><B><FONT color=#a02828>=</FONT></B>sqlrcur_alloc<FONT color=#6858c8>(</FONT><B><FONT color=#a02828>$</FONT></B><FONT color=#008888>con</FONT><FONT color=#6858c8>)</FONT>;
 
@@ -617,7 +612,7 @@ getOutputBindCursor() and fetchFromOutputBindCursor().</p>
 <pre>
 <font color="#6858c8">&lt;?</font>
 
-        <font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#a02828"><b>=</b></font>sqlrcon_alloc<font color="#6858c8">(</font>&quot;<font color="#f800f8">host</font>&quot;,<font color="#f800f8">9000</font>,&quot;&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,<font color="#f800f8">0</font>,<font color="#f800f8">1</font><font color="#6858c8">)</font>;
+        <font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#a02828"><b>=</b></font>sqlrcon_alloc<font color="#6858c8">(</font>&quot;<font color="#f800f8">sqlrserver</font>&quot;,<font color="#f800f8">9000</font>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,<font color="#f800f8">0</font>,<font color="#f800f8">1</font><font color="#6858c8">)</font>;
         <font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#a02828"><b>=</b></font>sqlrcur_alloc<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#6858c8">)</font>;
 
         sqlrcur_prepareQuery<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">cur</font>,&quot;<font color="#f800f8">begin  :curs:=sp_mytable; end;</font>&quot;<font color="#6858c8">)</font>;
@@ -664,7 +659,7 @@ always returned as false.</p>
 <PRE>
 <FONT color=#6a5acd>&lt;?</FONT>
 
-     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
      <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
 
      sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>select * from my_table</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
@@ -733,7 +728,7 @@ database.</p>
 <pre>
 <font color="#6858c8">&lt;?</font>
 
-        <font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#a02828"><b>=</b></font>sqlrcon_alloc<font color="#6858c8">(</font>&quot;<font color="#f800f8">host</font>&quot;,<font color="#f800f8">9000</font>,&quot;&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,<font color="#f800f8">0</font>,<font color="#f800f8">1</font><font color="#6858c8">)</font>;
+        <font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#a02828"><b>=</b></font>sqlrcon_alloc<font color="#6858c8">(</font>&quot;<font color="#f800f8">sqlrserver</font>&quot;,<font color="#f800f8">9000</font>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<font color="#f800f8">user</font>&quot;,&quot;<font color="#f800f8">password</font>&quot;,<font color="#f800f8">0</font>,<font color="#f800f8">1</font><font color="#6858c8">)</font>;
         <font color="#a02828"><b>$</b></font><font color="#008888">cur</font><font color="#a02828"><b>=</b></font>sqlrcur_alloc<font color="#6858c8">(</font><font color="#a02828"><b>$</b></font><font color="#008888">con</font><font color="#6858c8">)</font>;
 
         <font color="#0000f8"># column names will be forced to upper case</font>
@@ -1894,7 +1889,7 @@ just open the file for each page of the report.</p>
 <PRE>
 <FONT color=#6a5acd>&lt;?</FONT>
 
-     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
      <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
 
      <B><FONT color=#a52a2a>...</FONT></B> generate a unique file name <B><FONT color=#a52a2a>...</FONT></B>
@@ -1923,7 +1918,7 @@ just open the file for each page of the report.</p>
 
      <B><FONT color=#a52a2a>...</FONT></B> get the page to display from the previous page <B><FONT color=#a52a2a>...</FONT></B>
 
-     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
      <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
 
      sqlrcur_openCachedResultSet<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,filename<FONT color=#6a5acd>)</FONT>;
@@ -1957,7 +1952,7 @@ is possible.</p>
 <PRE>
 <FONT color=#6a5acd>&lt;?</FONT>
 
-     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
      <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
 
      sqlrcur_sendQuery<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT>,&quot;<FONT color=#ff00ff>insert into my_table values (1,2,3)</FONT>&quot;<FONT color=#6a5acd>)</FONT>;
@@ -1983,7 +1978,7 @@ is possible.</p>
 
      <B><FONT color=#a52a2a>...</FONT></B> get rs, port <B><FONT color=#a52a2a>and</FONT></B> socket from previous page <B><FONT color=#a52a2a>...</FONT></B>
 
-     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>host</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
+     <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcon_alloc<FONT color=#6a5acd>(</FONT>&quot;<FONT color=#ff00ff>sqlrserver</FONT>&quot;,<FONT color=#ff00ff>9000</FONT>,&quot;<FONT color=#ff00ff>/tmp/test.socket</FONT>&quot;,&quot;<FONT color=#ff00ff>user</FONT>&quot;,&quot;<FONT color=#ff00ff>password</FONT>&quot;,<FONT color=#ff00ff>0</FONT>,<FONT color=#ff00ff>1</FONT><FONT color=#6a5acd>)</FONT>;
      <B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>cur</FONT><B><FONT color=#a52a2a>=</FONT></B>sqlrcur_alloc<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT><FONT color=#6a5acd>)</FONT>;
 
      sqlrcon_resumeSession<FONT color=#6a5acd>(</FONT><B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>con</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>port</FONT>,<B><FONT color=#a52a2a>$</FONT></B><FONT color=#008b8b>socket</FONT><FONT color=#6a5acd>)</FONT>;

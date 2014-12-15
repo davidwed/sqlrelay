@@ -63,7 +63,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 
 			... execute some queries ...
 		}
@@ -78,11 +78,6 @@ query, ping() or identify() is run.</p>
 <p>For the duration of the session, the client occupies one of the database
 connection daemons, so care should be taken to minimize the length of a
 session.</p>
-
-<p>If you're using a transactional database, ending a session has a catch.
-Database connection daemons can be configured to send either a commit or
-rollback at the end of a session if DML queries were executed during the
-session with no commit or rollback.  Program accordingly.</p>
 
 <a name="query"></a>
 <span class="heading2">Executing Queries</span><br><br>
@@ -101,7 +96,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cur = new SQLRCursor(con);
 
 			cur.sendQuery("select * from my_table");
@@ -198,7 +193,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cur = new SQLRCursor(con);
 
 
@@ -242,7 +237,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cur = new SQLRCursor(con);
 
         		cur.prepareQuery("select * from mytable $(whereclause)")
@@ -277,7 +272,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cur = new SQLRCursor(con);
 
 			cur.prepareQuery("begin  :result1:=addTwoIntegers(:integer1,:integer2);  :result2=addTwoFloats(:float1,:float2);  :result3=convertToString(:integer3); end;");
@@ -321,7 +316,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cur = new SQLRCursor(con);
 
         		cur.executeQuery("create table images (image blob, description clob)");
@@ -361,7 +356,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cur = new SQLRCursor(con);
 
 			cur.prepareQuery("begin  select image into :image from images;  select description into :desc from images;  end;");
@@ -413,7 +408,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cur = new SQLRCursor(con);
 
 			cur.prepareQuery("select * from mytable where mycolumn&gt;:value");
@@ -456,7 +451,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cur = new SQLRCursor(con);
 
 			cur.sendQuery("select * from my_table");
@@ -494,7 +489,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cur = new SQLRCursor(con);
 
 			cur.sendQuery("select * from my_table");
@@ -567,7 +562,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cur = new SQLRCursor(con);
 
 			cur.setResultSetBufferSize(5);
@@ -634,7 +629,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cursor1 = new SQLRCursor(con);
 			SQLRCursor cursor2 = new SQLRCursor(con);
 
@@ -687,7 +682,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cur = new SQLRCursor(con);
 
 			cur.prepareQuery("begin  :curs:=sp_mytable; end;");
@@ -740,7 +735,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cur = new SQLRCursor(con);
 
         		cur.sendQuery("select * from my_table");
@@ -803,7 +798,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cur = new SQLRCursor(con);
 
 			// column names will be forced to upper case
@@ -1973,7 +1968,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cur = new SQLRCursor(con);
 
 			... generate a unique filename ...
@@ -2009,7 +2004,7 @@ namespace SQLRExamples
 
         		... get the page to display from the previous page ...
 
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cur = new SQLRCursor(con);
 
         		cur.openCachedResultSet(filename);
@@ -2051,7 +2046,7 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cur = new SQLRCursor(con);
 
 			cur.sendQuery("insert into my_table values (1,2,3)");
@@ -2083,7 +2078,7 @@ namespace SQLRExamples
 		{
 			... get rs, port and socket from previous page ...
 
-			SQLRConnection con = new SQLRConnection("host", 9000, "", "user", "password", 0, 1);
+			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/test.socket", "user", "password", 0, 1);
 			SQLRCursor cur = new SQLRCursor(con);
 
 			con.resumeSession(port, socket);
