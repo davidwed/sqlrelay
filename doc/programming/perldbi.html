@@ -236,8 +236,32 @@ variable.</p>
 </PRE>
 </blockquote>
 
-<p>You can also bind CLOB's and BLOB's using the DBD::SQLRelay::SQL_CLOB and DBD::SQLRelay::SQL_BLOB extensions.  When
-binding a BLOB, you need to pass a hash containing type and length values.</p>
+<p>The precision and scale parameters can be used to specify a precision
+and scale for floating point numbers.</p>
+
+<blockquote>
+<pre>
+<font color="#a020f0">#!/usr/bin/env perl</font>
+
+<font color="#a52a2a"><b>use </b></font>DBI;
+
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$dbh</font>=DBI-&gt;<font color="#a52a2a"><b>connect</b></font>(<font color="#ff00ff">&quot;</font><font color="#ff00ff">DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">testuser</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">testpassword</font><font color="#ff00ff">&quot;</font>);
+
+<font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">insert into mytable values (:floatval)</font><font color="#ff00ff">&quot;</font>);
+
+<font color="#008b8b">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">:floatval</font>,<font color="#ff00ff">5.5</font>,{<font color="#a52a2a">precision</font>=&gt;10,<font color="#a52a2a"><b>scale</b></font>=&gt;<font color="#ff00ff">3</font>});
+
+<font color="#008b8b">$sth</font>-&gt;execute();
+
+... process the result set ...
+
+<font color="#008b8b">$dbh</font>-&gt;disconnect;
+</pre>
+</blockquote>
+
+<p>You can also bind CLOB's and BLOB's using the DBD::SQLRelay::SQL_CLOB and
+DBD::SQLRelay::SQL_BLOB extensions.  When binding a BLOB, you need to pass a
+hash containing type and length values.</p>
 
 <blockquote>
 <pre>
@@ -250,7 +274,7 @@ binding a BLOB, you need to pass a hash containing type and length values.</p>
 <font color="#a52a2a"><b>my</b></font> <font color="#008b8b">$sth</font>=<font color="#008b8b">$dbh</font>-&gt;prepare(<font color="#ff00ff">&quot;</font><font color="#ff00ff">insert into mytable values (:clobval,:blobval)</font><font color="#ff00ff">&quot;</font>);
 
 <font color="#008b8b">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">:clobval</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">test clob</font><font color="#ff00ff">&quot;</font>,DBD::SQLRelay::SQL_CLOB);
-<font color="#008b8b">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">:blobval</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">test blob</font><font color="#ff00ff">&quot;</font>,{<font color="#ff00ff">type</font>=&gt;DBD::SQLRelay::SQL_BLOB,<font color="#a52a2a"><b>length</b></font>=&gt;<font color="#ff00ff">9</font>});
+<font color="#008b8b">$sth</font>-&gt;bind_param(<font color="#ff00ff">&quot;</font><font color="#ff00ff">:blobval</font><font color="#ff00ff">&quot;</font>,<font color="#ff00ff">&quot;</font><font color="#ff00ff">test blob</font><font color="#ff00ff">&quot;</font>,{<font color="#a52a2a">type</font>=&gt;DBD::SQLRelay::SQL_BLOB,<font color="#a52a2a"><b>length</b></font>=&gt;<font color="#ff00ff">9</font>});
 
 <font color="#008b8b">$sth</font>-&gt;execute();
 
