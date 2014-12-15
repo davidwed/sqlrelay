@@ -53,7 +53,7 @@ use.</p>
 <li><b>socket</b> - The socket that the SQL Relay server is listening on.  Either port or socket must be specified.  If both are specified, socket will be preferred to port.</li>
 <li><b>tries</b> - If a connection fails, it will be retried this many times.</li>
 <li><b>retrytime</b> - If a connection fails, it will be retried on this interval (in seconds).</li>
-<li><b>debug</b> - If this is set to 1 or to a file name then debug is enabled.  If set to a file name then debug will be written to the file.  If set to 1 then debug will be written to the browser.  Defaults to 0.</li>
+<li><b>debug</b> - If this is set to 1 or to a file name then debug is enabled.  If set to a file name then debug will be written to the file.  If set to 1 then debug will be written to standard output.  Defaults to 0.</li>
 </ul>
 
 <p>Database handle attributes may be specified in the SQLRelay component of the connect string to control connection and statement behavior.  For example:</p>
@@ -1654,7 +1654,13 @@ following.</p>
 <a name="driverspecific"></a>
 <span class="heading2">Driver-Specific Attributes</span><br><br>
 
-<p>Perl DBI allows drivers to define their own attributes for database handles and statements.  These attributes can be set to control various parameters unique to the driver.  SQL Relay implements several of these to interface with some of the more obscure native client API methods.</p>
+<p>Perl DBI allows drivers to define their own attributes for database handles and statements.  These attributes can be set to control various parameters unique to the driver.  SQL Relay implements several of these.</p>
+
+<p>Database handle attributes defined by the SQL Relay driver:</p>
+
+<ul>
+<li><b>DBD::SQLRelay::Debug</b> - set-only (1, 0 or file name), when set to 1, debug is enabled to standard output, when set to 0, debug is disabled, when set to a file name, debug is sent to that file.</li>
+</ul>
 
 <p>Statement handle attributes defined by the SQL Relay driver:</p>
 
