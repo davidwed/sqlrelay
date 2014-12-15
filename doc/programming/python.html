@@ -1625,7 +1625,7 @@ query for every page every time and dumping all but the 20 rows you want to
 display, you can run the query once, cache the result set to a local file and
 just open the file for each page of the report.</p>
 
-<p>First CGI:</p>
+<p>First page:</p>
 
 <blockquote>
 <PRE>
@@ -1646,7 +1646,7 @@ cur.cacheOff()
 </PRE>
 </blockquote>
 
-<p>Second CGI:</p>
+<p>Second page:</p>
 
 <blockquote>
 <PRE>
@@ -1677,7 +1677,7 @@ con.endSession()
 multiple pages.  Since SQL Relay sessions can be suspended and resumed, this
 is possible.</p>
 
-<p>First CGI:</p>
+<p>First page:</p>
 
 <blockquote>
 <PRE>
@@ -1697,7 +1697,7 @@ socket=con.getConnectionSocket()
 </PRE>
 </blockquote>
 
-<p>Second CGI:</p>
+<p>Second page:</p>
 
 <blockquote>
 <PRE>
@@ -1716,7 +1716,7 @@ con.endSession()
 </blockquote>
 
 <p>You can also distribute the processing of a result set across a series of
-CGI's using suspended sessions.  If you're buffering a result set in chunks
+pages using suspended sessions.  If you're buffering a result set in chunks
 instead of all at once and suspend a session, when you resume the session you 
 can continue to retrieve rows from the result set.</p>
 
