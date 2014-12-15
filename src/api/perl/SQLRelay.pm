@@ -89,7 +89,12 @@ sub connect {
 							$dsn{'tries'});
 
 	# turn on debugging if debugging was specified in the dsn
-	$connection->debugOn() if $dsn{'debug'};
+	if ($dsn{'debug'} eq "1") {
+		$connection->debugOn();
+	} elsif ($dsn{'debug'} ne "0") {
+		$connection->setDebugFile($dsn{'debug'});
+		$connection->debugOn();
+	}
 
 	# store some references in the database handle
 	$dbh->STORE('driver_database_handle',$drh);
@@ -150,10 +155,10 @@ sub _new_statement {
 
 	# handle the row cache size
 	my $rowcachesize=$dbh->FETCH('RowCacheSize');
-	if (!defined($rowcachesize) || $rowcachesize==0) {
-		$sth->STORE('DBD::SQLRelay::ResultSetBufferSize',100);
-	} elsif ($rowcachesize<0) {
+	if (!defined($rowcachesize) || $rowcachesize<0) {
 		$sth->STORE('DBD::SQLRelay::ResultSetBufferSize',0);
+	} elsif ($rowcachesize==0) {
+		$sth->STORE('DBD::SQLRelay::ResultSetBufferSize',100);
 	} else {
 		$sth->STORE('DBD::SQLRelay::ResultSetBufferSize',$rowcachesize);
 	}
