@@ -16,10 +16,12 @@
 <li><a href="#bindvars">Bind Variables</a></li>
 <li><a href="#rebinding">Re-Binding and Re-Executing</a></li>
 <li><a href="#fields">Accessing Fields in the Result Set</a></li>
-<li><a href="#cursors">Cursors</a></li>
+<li><a href="#largeresultsets">Dealing With Large Result Sets</a></li>
+<li><a href="#statements">Statements</a></li>
 <li><a href="#columns">Getting Column Information</a></li>
 <li><a href="#storedprocedures">Stored Procedures</a></li>
 <li><a href="#lastinsertid">Getting the Last Insert ID</a></li>
+<li><a href="#driverspecific">Driver-Specific Attributes</a></li>
 </ul>
 
 <a name="session"></a>
@@ -34,7 +36,7 @@ use.</p>
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 ... <FONT color=#008888>execute</FONT> <FONT color=#008888>some</FONT> <FONT color=#008888>queries</FONT> ...
 
@@ -54,12 +56,18 @@ use.</p>
 <li><b>debug</b> - If this is set to 1 or to a file name then debug is enabled.  If set to a file name then debug will be written to the file.  If set to 1 then debug will be written to the browser.  Defaults to 0.</li>
 </ul>
 
-<p>These additional connect string variables control the default statement attributes:</p>
+<p>Database handle attributes may be specified in the SQLRelay component of the connect string to control connection and statement behavior.  For example:</p>
+
+<blockquote>
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay(AutoCommit=&gt;0,PrintError=&gt;0):host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+</blockquote>
+
+<p>In addition to the standard database handle attributes (such as AutoCommit, PrintError, etc.), these additional connect string variables control some default statement attributes:</p>
 
 <ul>
-<li><b>resultsetbuffersize</b> - Sets the number of rows to buffer at a time.  See <a href="#largeresultsets">Dealing With Large Result Sets</a> below.  If set to 0 (the default) then the entire result set is buffered.</li>
-<li><b>dontgetcolumninfo</b> - If this is set to 1 then column info is not fetched with the result set.  If set to 0 then column info is fetched.  Defaults to 0.</li>
-<li><b>nullsasnulls</b> - If this is set to 1 then NULL values are returned as nulls.  If set to 0 then NULL values are returned as empty strings or nulls.  Defaults to 0.</li>
+<li><b>DBD::SQLRelay::ResultSetBufferSize</b> - Sets the number of rows to buffer at a time.  See <a href="#largeresultsets">Dealing With Large Result Sets</a> below.  If set to 0 (the default) then the entire result set is buffered.</li>
+<li><b>DBD::SQLRelay::DontGetColumnInfo</b> - If this is set to 1 then column info is not fetched with the result set.  If set to 0 then column info is fetched.  Defaults to 0.</li>
+<li><b>DBD::SQLRelay::GetNullsaAsEmptyStrings</b> - If this is set to 1 then NULL values are returned as empty strings.  If set to 0 then NULL values are returned as nulls.  Defaults to 0.</li>
 </ul>
 
 <p>Setting one of the statement attribute connect string variables has the same effect as if the corresponding statement handle attribute were set immediately after creating each statement.  See <a href="#driverspecific">Driver-Specific Attributes</a> below.</p>
@@ -89,7 +97,7 @@ session.</p>
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from user_tables</FONT><FONT color=#f800f8>&quot;</FONT>);
 
@@ -177,7 +185,7 @@ error in DBI-&gt;errstr.
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>)
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>)
         <B><FONT color=#a02828>or</FONT></B> <B><FONT color=#a02828>die</FONT></B> <FONT color=#008888>DBI</FONT>-&gt;<FONT color=#008888>errstr</FONT>;
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from user_tables</FONT><FONT color=#f800f8>&quot;</FONT>)
@@ -212,7 +220,7 @@ variable.</p>
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_table where col1=:1 and col2=:2 and col3=:3</FONT><FONT color=#f800f8>&quot;</FONT>);
 
@@ -294,7 +302,7 @@ parameter must be "undef".</p>
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_table where col1=:0 and col2=:1 and col3=:2</FONT><FONT color=#f800f8>&quot;</FONT>);
 
@@ -320,7 +328,7 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_table where col1=:0 and col2=:1 and col3=:2</FONT><FONT color=#f800f8>&quot;</FONT>);
 
@@ -356,7 +364,7 @@ called.</p>
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from user_tables</FONT><FONT color=#f800f8>&quot;</FONT>);
 
@@ -383,7 +391,7 @@ bind_columns() parameter must be "undef".</p>
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_table</FONT><FONT color=#f800f8>&quot;</FONT>);
 
@@ -399,10 +407,95 @@ bind_columns() parameter must be "undef".</p>
 </blockquote>
 
 
-<a name="cursors"></a>
-<span class="heading2">Cursors</span><br><br>
+<a name="largeresultsets"></a>
+<span class="heading2">Dealing With Large Result Sets</span><br><br>
 
-<p>Cursors make it possible to execute queries while processing the result
+<p>SQL Relay normally buffers the entire result set.  This can speed things up 
+at the cost of memory.  With large enough result sets, it makes sense to buffer
+the result set in chunks instead of all at once.</p>
+
+<p>Perl DBI provides a RowCacheSize database handle attribute to control the
+numer of rows to buffer at a time.  This attribute may be specified in the
+connect string or as a database handle attribute prior to the execution of a
+query.  If left undefined or set to -1 then the entire result set will be
+buffered.  If set to 0 then the driver will decide how many rows to buffer.  If
+set to a specific number other than 0 or -1 then that many rows will be
+buffered.</p>
+
+<p>The statement handle attribute DBD::SQLRelay::ResultSetBufferSize may also
+be used to set the number of rows to buffer at a time.  This attribute is a
+little more flexible because as a statement handle attribute it can be altered
+after prepare but before execute, or in between executes.  It can also be
+specified in the connect string.</p>
+
+<p>When buffering the result set in chunks, calls to fetch() cause the chunk
+containing the requested field to be fetched.  Rows in that chunk are
+accessible but rows before it are not.</p>
+
+<p>For example, if you set the result set buffer size to 5 and execute a query
+that returns 20 rows, rows 0-4 are available at once, then rows 5-9, then 10-14,
+then 15-19.  When rows 5-9 are available, fetching row 0 will return false and
+fetching row 11 will cause rows 10-14 to be fetched and return the requested
+row.</p>
+
+<p>The following code sets the result set buffer size using RowCacheSize in the
+connect string.</p>
+
+<blockquote>
+<pre>
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay(RowCacheSize=&gt;5):host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+</pre>
+</blockquote>
+
+<p>The following code sets the result set buffer size using RowCacheSize to 5.</p>
+
+<blockquote>
+<pre>
+$dbh-&gt;{RowCacheSize}=5;
+</pre>
+</blockquote>
+
+<p>The following code retrieves the result set buffer size using
+RowCacheSize.</p>
+
+<blockquote>
+<pre>
+$rsbs=$dbh-&gt;{RowCacheSize};
+</pre>
+</blockquote>
+
+<p>The following code sets the result set buffer size using ResultSetBufferSize
+
+in the connect string.</p>
+
+<blockquote>
+<pre>
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay(DBD::SQLRelay::ResultSetBufferSize=&gt;5):host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+</pre>
+</blockquote>
+
+<p>The following code sets the result set buffer size using ResultSetBufferSize
+to 5.</p>
+
+<blockquote>
+<pre>
+$sth-&gt;{DBD::SQLRelay::ResultSetBufferSize}=5;
+</pre>
+</blockquote>
+
+<p>The following code retrieves the result set buffer size using
+ResultSetBufferSize.</p>
+
+<blockquote>
+<pre>
+$rsbs=$sth-&gt;{DBD::SQLRelay::ResultSetBufferSize};
+</pre>
+</blockquote>
+
+<a name="statements"></a>
+<span class="heading2">Statements</span><br><br>
+
+<p>It's possible to execute new queries while processing the result
 set of another query.  You can select rows from a table in one query, then 
 iterate through its result set, inserting rows into another table, using only 
 1 database connection for both operations.</p>
@@ -415,7 +508,7 @@ iterate through its result set, inserting rows into another table, using only
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth1</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_first_table</FONT><FONT color=#f800f8>&quot;</FONT>);
 
@@ -444,7 +537,7 @@ They are accessible as follows:</p>
 
 <FONT color=#008888>use</FONT> <FONT color=#008888>DBI</FONT>;
 
-<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
+<B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$dbh</FONT>=<FONT color=#008888>DBI</FONT>-&gt;<B><FONT color=#a02828>connect</FONT></B>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testuser</FONT><FONT color=#f800f8>&quot;</FONT>,<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>testpassword</FONT><FONT color=#f800f8>&quot;</FONT>);
 
 <B><FONT color=#a02828>my</FONT></B> <FONT color=#008888>$sth</FONT>=<FONT color=#008888>$dbh</FONT>-&gt;<FONT color=#008888>prepare</FONT>(<FONT color=#f800f8>&quot;</FONT><FONT color=#f800f8>select * from my_table</FONT><FONT color=#f800f8>&quot;</FONT>);
 
@@ -1558,6 +1651,20 @@ following.</p>
 <b>select last insert rowid</b>
 </blockquote>
 
+<a name="driverspecific"></a>
+<span class="heading2">Driver-Specific Attributes</span><br><br>
+
+<p>Perl DBI allows drivers to define their own attributes for database handles and statements.  These attributes can be set to control various parameters unique to the driver.  SQL Relay implements several of these to interface with some of the more obscure native client API methods.</p>
+
+<p>Statement handle attributes defined by the SQL Relay driver:</p>
+
+<ul>
+<li><b>DBD::SQLRelay::ResultSetBufferSize</b> - get/set, returns or sets the result set buffer size as described <a href="#largeresultsets">above</a>.</li>
+<li><b>DBD::SQLRelay::DontGetColumnInfo</b> - set-only (1 or 0), sets whether or not to fetch column info with the result set, default (0) is to return column info</li>
+<li><b>PDO::SQLRelay::GetNullsAsEmptyStrings</b> - set-only (1 or 0), sets whether to return NULL values as empty strings or nulls, default (0) is to return NULL values as nulls</li>
+</ul>
+
+<p>Default values for the statement handle attributes can be set as database handle attributes in the connect string.  Setting the corresponding connect string variable has the same effect as if the statement handle attribute were set immediately after creating the statement.  See <a href="#session">Establishing a Session</a> above.</p>
 
 </body>
 </html>

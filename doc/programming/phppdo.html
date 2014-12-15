@@ -149,7 +149,7 @@ if (!$dbh) {
 <ul>
 <li><b>resultsetbuffersize</b> - Sets the number of rows to buffer at a time.  See <a href="#largeresultsets">Dealing With Large Result Sets</a> below.  If set to 0 (the default) then the entire result set is buffered.</li>
 <li><b>dontgetcolumninfo</b> - If this is set to 1 then column info is not fetched with the result set.  If set to 0 then column info is fetched.  Defaults to 0.</li>
-<li><b>nullsasnulls</b> - If this is set to 1 then NULL values are returned as nulls.  If set to 0 then NULL values are returned as empty strings or nulls.  Defaults to 0.</li>
+<li><b>nullsasnulls</b> - If this is set to 1 then NULL values are returned as nulls.  If set to 0 then NULL values are returned as empty strings.  Defaults to 0.</li>
 </ul>
 
 <p>Setting one of the statement attribute connect string variables has the same effect as if the corresponding statement handle attribute were set immediately after creating each statement.  See <a href="#driverspecific">Driver-Specific Attributes</a> below.</p>
