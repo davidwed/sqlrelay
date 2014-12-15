@@ -16,6 +16,7 @@
 <li><a href="#database">Database Configuration</a></li>
 <li><a href="#cluster">Replicated or Clustered Databases</a></li>
 <li><a href="#router">Master-Slave Query Routing</a></li>
+<li><a href="#sessionqueries">Session-Queries</a></li>
 <li><a href="#instances">Multiple Instances</a></li>
 <li><a href="#files">Multiple Files</a></li>
 <li><a href="#autostart">Starting Instances Automatically</a></li>
@@ -248,6 +249,24 @@ sqlrsh -host <i>sqlrserver</i> -user routeruser -password routerpassword
 </blockquote>
 
 <p>See the <a href="router.html">Query Routing and Filtering</a> for more information on query routing.</p>
+
+
+<br><br><a name="sessionqueries"></a>
+<span class="heading2">Session-Queries</span><br>
+
+<p>SQL Relay can be configured to run a set of queries at the beginning and end of each client session.</p>
+
+<p>By far the most common use for this feature is that some database parameter needs to be reconfigured but you don't have permission or bouncing the database is out of the question, or something like that.  For example, lets say you are using an Oracle database, but your app requires dates to be formatted like MM/DD/YYYY instead of DD-MON-YYYY.  Ideally you'd alter the nls_date_format in the instance but you can't, for some reason.</p>
+
+<p>You can use SQL Relay's session queries to work around the problem.</p>
+
+<p>In this example, the date format is set to MM/DD/YYYY at the beginning of the session and then reset back to DD-MON-YYYY at the end.</p>
+
+<blockquote>
+@sqlrelay-sessionqueries.conf.html@
+</blockquote>
+
+<p>Actually, in this example, there's no need to set the date format back to DD-MON-YYYY but it's done here for illustrative purposes.</p>
 
 
 <br><br><a name="instances"></a>
