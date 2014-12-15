@@ -7,52 +7,51 @@
 
 <body>
 
-<span class="heading1">SQL Relay</span><br><br>
+<span class="header">SQL Relay</span>
 
-<p>SQL Relay is a powerful database connection management solution.</p>
+<p class="indented">SQL Relay is a powerful database connection management solution.</p>
 
-<img class="indented" src="images/sqlrelay.png">
+<img class="indented" style="float: left; margin-right: 20px" src="images/sqlrelay.png">
 
-<p>With SQL Relay, you can speed up and enhance the scalability of database-driven web-based applications, access databases from unsupported platforms, throttle database access, distribute access to clustered or replicated databases, route queries and migrate applications from one database to another.</p>
+<br><br>
+
+<p>With SQL Relay, you can speed up and enhance the scalability of database-driven web-based applications, access databases from unsupported platforms, throttle database access, distribute load over clustered or replicated databases,<br>route queries and migrate applications from one database to another.</p>
+
+<br style="clear: both">
 
 <hr>
 
-<span class="heading2">Server Features</span><br>
+<span class="header">Advantages</span><br>
 
 <p class="indented">
-<a href="features/connectionpooling.html">Persistent database connection pooling</a> - makes database-driven web-based applications faster and more efficient<br>
-<a href="features/proxying.html">Proxying</a> - access databases from unsupported platforms<br>
+<a href="features/connectionpooling.html">Persistent Database Connection Pooling</a> - makes database-driven web-based applications faster and more efficient<br>
+<a href="features/proxying.html">Proxying</a> - provides access to databases from unsupported platforms<br>
 <a href="features/throttling.html">Throttling</a> - prevents databases from becoming overloaded<br>
-<a href="features/loadbalancing.html">Load Balancing</a> - distributes access over replicated or clustered databases<br>
+<a href="features/loadbalancing.html">Load Balancing</a> - distributes load over replicated or clustered databases<br>
 <a href="features/queryrouting.html">Query Routing and Filtering</a> - conditionally sends queries to one database or another<br>
-<a href="features/databases.html">Database Support</a> - a wide variety commercial and open-source databases are supported<br>
+<br>
+<a href="features/databases.html">Database Support</a> - a wide variety of commercial and open-source databases are supported<br>
+<a href="features/dbabstractionlayers.html">Abstraction Layer Support</a> - drivers for most popular database abstraction layers are provided<br>
+<a href="features/dropinreplacementlibs.html">Drop-In Replacement Libraries</a> - allow many native MySQL or PostgreSQL applications to use SQL Relay without modification<br>
+<a href="features/languages.html">Native API</a> - the powerful native SQL Relay client API supports a wide variety of programming languages<br>
+<br>
+<a href="features/substitutionandbindvars.html">Substitution and Bind Variables</a> - make frequently run queries faster and more efficient<br>
+<a href="features/multirowfetches.html">Multi-Row Fetches</a> - reduce the number of network round-trips<br>
+<a href="features/resultsetcaching.html">Client-Side Result Set Caching</a> - makes paging faster and easier<br>
+<a href="features/suspendedtx.html">Suspended Transactions</a> - allow a single transaction to span multiple web pages<br>
 </p>
 
 <hr>
 
-<span class="heading2">Client API Features</span><br>
+<span class="header">Getting Started With Databases</span><br>
 
-<p class="indented">
-<a href="features/substitutionandbindvars.html">Substitution and bind variables</a> - makes frequently run queries faster and more efficient<br>
-<a href="features/multirowfetches.html">Multi-row fetches</a> - reduces the number of network round-trips<br>
-<a href="features/resultsetcaching.html">Client-side result set caching</a> - makes paging faster and easier<br>
-<a href="features/suspendedtx.html">Suspended transactions</a> - allows a single transaction to span multiple web pages<br>
-<a href="features/languages.html">Language Support</a> - a wide variety of programming languages are supported<br>
-<a href="features/dbabstractionlayers.html">Abstraction Layer Support</a> - many database abstraction layers are supported<br>
-<a href="features/dropinreplacementlibs.html">Drop-In Replacement Libraries</a> - aims an existing MySQL or PostgreSQL app at SQL Relay without modification<br>
-</p>
-
-<hr>
-
-<span class="heading2">Getting Started With Databases</span><br>
-
-<p>SQL Relay supports many different databases. However, setting up a database before even trying to use SQL Relay with it can be a challenge. These documents include step-by-step instructions for setting up databases on various platforms. </p>
+<p>SQL Relay supports many different databases. However, just setting up a database before even trying to use SQL Relay with it can be a challenge. These documents include step-by-step instructions for setting up various databases on various platforms.</p>
 
 <p class="indented">
 <a href="gettingstarted/oracle.html">Getting Started With Oracle</a><br>
 <a href="gettingstarted/mysql.html">Getting Started With MySQL</a><br>
 <a href="gettingstarted/postgresql.html">Getting Started With PostgreSQL</a><br>
-<a href="gettingstarted/sybase.html">Getting Started With SAP/Sybase</a><br>
+<a href="gettingstarted/sybase.html">Getting Started With Sybase</a><br>
 <a href="gettingstarted/msde.html">Getting Started With Microsoft SQL Server 2000 Desktop Engine</a><br>
 <a href="gettingstarted/db2.html">Getting Started With IBM DB2</a><br>
 <a href="gettingstarted/firebird.html">Getting Started With Firebird</a><br>
@@ -64,7 +63,7 @@
 
 <hr>
 
-<span class="heading2">Administering SQL Relay</span><br>
+<span class="header">Administering SQL Relay</span><br>
 
 <p class="indented">
 <a href="admin/installing.html">Installing SQL Relay</a><br>
@@ -78,20 +77,47 @@
 
 <hr>
 
-<span class="heading2">Drop-In Replacement Libraries</span><br>
+<span class="header">Connecting Applications to SQL Relay</span><br>
 
-<p>If you have an existing application that uses the native database API for MySQL or PostgreSQL, and are running into some of the problems that SQL Relay was designed to solve.  You may be able to use SQL Relay without modifying your existing code.</p>
+<p>SQL Relay provides drivers for most popular database abstraction layers.</p>
 
+<blockquote>
+<div style="float: left;">
+<p class="indented">
+<b>Guides:</b><br>
+<a href="programming/ado.net.html">ADO.NET</a><br>
+<a href="programming/perldbi.html">Perl DBI</a><br>
+<a href="programming/pythondb.html">Python DB</a><br>
+<a href="programming/rubydbi.html">Ruby DBI</a><br>
+<a href="programming/phppdo.html">PHP PDO</a><br>
+<a href="programming/odbc.html">ODBC</a><br>
+<a href="programming/jdbc.html">JDBC</a><br>
+</p>
+</div>
+
+<div style="float: left;">
+<p class="indented">
+<b>References</b>:<br>
+<a href="api/ado.net/html/annotated.html">ADO.NET</a><br>
+<a href="api/perl/SQLRelay.html">Perl DBI</a><br>
+<a href="api/python/PySQLRDB.py.html">Python DB</a><br>
+<a href="api/ruby/dbidoc/index.html">Ruby DBI</a><br>
+</p>
+</div>
+</blockquote>
+
+<div style="clear: both;"></div>
+
+<p>Drop-In Replacement Libraries allow many native MySQL or PostgreSQL applications to use SQL Relay without modification.</p>
+
+<blockquote>
 <p class="indented">
 <a href="dropin/mysql.html">MySQL</a><br>
 <a href="dropin/postgresql.html">PostgreSQL</a><br>
 </p>
+</blockquote>
 
-<hr>
-
-<span class="heading2">Developing with SQL Relay</span><br>
-
-<p>SQL Relay provides native client API's for many different programming languages.</p>
+<p>If you are developing a new application, consider using the native SQL Relay client API as your database abstraction layer and take advantage of powerful features like suspended sessions, result set caching and tuning options.</p>
 
 <blockquote>
 <div style="float: left;">
@@ -128,51 +154,24 @@
 
 <div style="clear: both;"></div>
 
-<p>SQL Relay also provides drivers for many database abstraction layers.</p>
-
-<blockquote>
-<div style="float: left;">
-<p class="indented">
-<b>Guides:</b><br>
-<a href="programming/ado.net.html">ADO.NET</a><br>
-<a href="programming/perldbi.html">Perl DBI</a><br>
-<a href="programming/pythondb.html">Python DB</a><br>
-<a href="programming/rubydbi.html">Ruby DBI</a><br>
-<a href="programming/phppdo.html">PHP PDO</a><br>
-<a href="programming/odbc.html">ODBC</a><br>
-<a href="programming/jdbc.html">JDBC</a><br>
-</p>
-</div>
-
-<div style="float: left;">
-<p class="indented">
-<b>References</b>:<br>
-<a href="api/ado.net/html/annotated.html">ADO.NET</a><br>
-<a href="api/perl/SQLRelay.html">Perl DBI</a><br>
-<a href="api/python/PySQLRDB.py.html">Python DB</a><br>
-<a href="api/ruby/dbidoc/index.html">Ruby DBI</a><br>
-</p>
-</div>
-</blockquote>
-
-<div style="clear: both;"></div>
+<p>If you're developing or deploying SQL Relay client software in a Windows environment, you might want to check out <a href="libfirstworks/index.html">libfirstworks</a> too.</p>
 
 <hr>
 
-<span class="heading2">SQL Relay Extension Modules</span><br>
+<span class="header">SQL Relay Extension Modules</span><br>
 
 <p>SQL Relay can be extended via modules.  Use existing modules or develop your own.</p>
 
 <p class="indented">
-<a href="modules/passwordencryption.html">Password Encryption</a><br>
-<a href="modules/logger.html">Logger</a><br>
+<a href="modules/passwordencryption.html">Password Encryption Modules</a><br>
+<a href="modules/logger.html">Logger Modules</a><br>
 </p>
 
 <div style="clear: both;"></div>
 
 <hr>
 
-<span class="heading2">Frequently Asked Questions</span><br>
+<span class="header">Frequently Asked Questions</span><br>
 
 <p class="indented">
 <a href="faq.html">FAQ</a><br>
