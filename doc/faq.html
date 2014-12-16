@@ -109,7 +109,7 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <br><a name="whatis"></a>
 <span class="heading3">What is SQL Relay?</span><br>
 
-<p>SQL Relay is powerful database-access middleware consisting of a server-based connection pool and client API's for using it.</p>
+<p>SQL Relay is a database connection management solution.</p>
 
 <img src="images/sqlrelay.png">
 
@@ -120,13 +120,13 @@ SQL Relay mangles them.  How do I get the numbers?</a>
 <p><b>Persistent database connection pooling</b> - makes database driven web-based applications faster and more efficient<br>
 Solves - "I've analyzed my app's performance and it seems to be spending a lot of time just logging into the database."</p>
 
-<p><b>Proxing</b> - access dtabases from unsupported platforms<br>
-Solves - "I need to access Oracle and MS SQL Server from FreeBSD (or other unsupported platform)."</p>
+<p><b>Proxing</b> - access databases from unsupported platforms<br>
+Solves - "I need to access MS SQL Server from Linux or Oracle from FreeBSD (or other unsupported platform)."</p>
 
 <p><b>Throttling</b> - prevents databases from becoming overloaded<br>
 Solves - "When I run enough web servers to handle the traffic, it slams the database, even though most of the database connections appear to be idle."</p>
 
-<p><b>Load Balancing</b> - distributes access over replicated or clustered databases<br>
+<p><b>Load Balancing</b> - distributes traffic over replicated or clustered databases<br>
 Solves - "I can't afford a load balancing appliance to distribute access to the nodes in my database cluster."</li>
 
 <p><b>Query Routing</b> - conditionally sends queries to one database or another<br>
@@ -143,11 +143,11 @@ Solves - "I wrote my app using the native MySQL API but the company is migrating
 
 <p>SQL Relay is powerful but it does have some limits.</p>
 
-<p>It is a tool in a chain - another tier in a multi-tiered application - designed to solve specific problems.  It is not a database-enabled application development environment like Access or Delphi or modern equivalents.  It's not a reporting gateway like Crystal Reports.  It is not a database itself.  The server components currently require a unix-like system (including Linux or Mac OS X) and client support on Windows is limited to C/C++, C# and ADO.NET.</p>
+<p>It is a tool in a chain - another tier in a multi-tiered application - designed to solve specific problems.  It is not a database-enabled application development environment like Access or Delphi or modern equivalents.  It's not a reporting gateway like Crystal Reports.  It is not a database itself.  The server components currently require a unix-like system (including Linux or Mac OS X).</p>
 
 <p>There are some features that SQL Relay currently lacks that are either being worked on, or at least planned though.</p>
 
-<p>SQL Relay is not currently a transparent database gateway.  Ie. you can't currently aim SQL Relay at MySQL and aim your app at SQL Relay.  SQL Relay has it's own client/server protocol and API.  If your app uses a database abstraction API like ODBC or Perl DBI, you would need to use the SQL Relay driver.  You could also potentially use the SQL Relay Drop-in Replacement Library for MySQL.  Otherwise you'd need to modify your app to use the SQL Relay API.  Efforts are underway to add support for several native database protocols though.</p>
+<p>SQL Relay is not currently a transparent database gateway.  Ie. you can't currently just aim SQL Relay at MySQL and aim your app at SQL Relay.  SQL Relay has it's own client/server protocol and API.  If your app uses a database abstraction API like PHP PDO, Perl DBI or ODBC, you would need to update the connect string to use the SQL Relay driver.  You could also potentially use the SQL Relay Drop-in Replacement Library for MySQL.  Otherwise you'd need to modify your app to use the SQL Relay API.  Efforts are underway to add support for several native database protocols though.</p>
 
 <p>SQL Relay can provide a single-point of access for replicated databases but it does not provide replication.  It cannot keep multiple databases in sync.</p>
 
@@ -231,23 +231,23 @@ Solves - "I wrote my app using the native MySQL API but the company is migrating
 <br><a name="howwork"></a>
 <span class="heading3">How does SQL Relay work?</span>
 
-<p>SQL Relay's connection daemons log into and maintain sessions with 
+<p>SQL Relay's connection daemons log in and maintain connections to
 databases.  These connection daemons advertise themselves with a listener 
-daemon which listens on an inet and/or unix port for client connections.
+daemon which listens on an inet and/or unix socket for client connections.
 When a client connects to the listener, if a connection daemon is available, 
 the listener hands off the client to that connection.  If no connection daemon
 is available, the client must wait in queue until one is.  Once a client
 is handed off to a connection daemon, the client communicates to the database 
-through the session maintained by that daemon.</p>
+through the connection maintained by that daemon.</p>
 
 <br><a name="efficiency"></a>
 <span class="heading3">How can SQL Relay speed up or improve the efficiency of my website?</span>
 
 <p>There are many way that SQL Relay can speed up or improve the efficiency of your website, but here some common examples.</p>
 
-<p>Let's say you're running CGI's againt a transactional database such as PostgreSQL, MS SQL Server or Oracle.  CGI's have to log into and out of the database each time they run.  If you use SQL Relay to maintain persistent connections to the database and just log into and out of SQL Relay, you can reduce the amount of time spent establishing database connections and handle more CGI requests per-second.  This is both because the time-cost of connecting to SQL Relay is smaller than the time-cost of connecting to a transactional database, and because the SQL Relay client library is smaller than most database client libraries, resulting in a more lightweight CGI.</p>
+<p>Let's say you're running CGI's againt a database like Oracle, MS SQL Server or DB2.  CGI's have to log into and out of the database each time they run.  If you use SQL Relay to maintain persistent connections to the database and just log into and out of SQL Relay, you can reduce the amount of time spent establishing database connections and handle more requests per-second.  This is both because the time-cost of connecting to SQL Relay is smaller than the time-cost of connecting to a transactional database, and because the SQL Relay client library is smaller than most database client libraries, resulting in a more lightweight program.</p>
 
-<p>Let's say you're using Apache, PHP and Oracle and you determine by doing all sorts of analysis that you need to keep 30 Apache processes running to provide adequate response.  Since most of your site isn't database-driven, on average, no more than 5 PHP's actually access the database simultaneously.  Currently, you're using persistent connections to defeat the time-cost of logging into Oracle, but you have to maintain 30 connections (1 per web server process) which takes up a lot of memory on both the web server and database server and you really only need 5 connections. By using SQL Relay you can reduce the number of Oracle connections to the 5 that you need, continue to run 30 Apache processes and reclaim the wasted memory on both machines.</p>
+<p>Let's say you're using Apache, mod_php and Oracle and you determine by doing all sorts of analysis that you need to keep 30 Apache processes running to provide adequate response.  Since most of your site isn't database-driven, on average, no more than 5 PHP's actually access the database simultaneously.  Currently, you're using persistent connections to defeat the time-cost of logging into Oracle, but you have to maintain 30 connections (1 per web server process) which takes up a lot of memory on both the web server and database server and you really only need 5 connections. By using SQL Relay you can reduce the number of Oracle connections to the 5 that you need, continue to run 30 Apache processes and reclaim the wasted memory on both machines.</p>
 
 <p>Many websites run a combination of PHP's and Perl modules.  Perl modules can use Apache::DBI and PHP's have a persistent database connection system, but a PHP cannot use an Apache::DBI connection and a Perl module cannot use a PHP persistent connection.  Thus in order to make sure that there are enough database connections for each platform, many more web-server processes have to be run, perhaps twice as many.  If the PHP's and Perl modules used SQL Relay instead, they could share databse connections and reduce the number of web-server processes and database connections.</p>
 
