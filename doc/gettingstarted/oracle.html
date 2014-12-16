@@ -12,16 +12,12 @@
 <ul>
 <li><a href="#installation">Installation</a></li>
 <ul>
-<li><a href="#solaris">Solaris</a></li>
-<li><a href="#linux">Linux</a></li>
-<ul>
 <li><a href="#users">Create Users, Groups and Directories</a></li>
 <li><a href="#memory">Make Sure You Have Enough Memory</a></li>
 <li><a href="#development">Install the Development Software</a></li>
 <li><a href="#env">Set Up the Environment</a></li>
 <li><a href="#oracle">Install Oracle</a></li>
 <li><a href="#startingatboot">Starting the Database at Boot Time</a></li>
-</ul>
 </ul>
 <li><a href="#creating">Creating a Database</a></li>
 <li><a href="#accessing">Accessing a Database</a></li>
@@ -31,8 +27,7 @@
 <a name="installation"></a>
 <span class="heading1">Installation</span><br>
 
-<p>I've sucessfully installed Oracle on Linux and I've
-witnessed many Solaris installations.</p>
+<p>I've sucessfully installed Oracle on Linux and Solaris.</p>
 
 <p>When installing Oracle, the most common mistake I've made is having too 
 little physical ram or swap.  The second most common mistake I've made is not 
@@ -41,25 +36,9 @@ installation instructions that come with Oracle for each platform indicate how
 much ram and swap you need and how to configure the kernel properly.  I 
 recommend meeting these requirements prior to installation.</p>
 
-<a name="solaris"></a>
-<span class="heading2">Solaris</span><br>
-
-<p>Oracle versions 8.1.5-11.2.0 for Solaris have been or are currently available
-for download from <a target="_blank" href="http://technet.oracle.com">technet.oracle.com</a> 
-or on CD.  Installation appears to be as simple as following the directions.  
-Note that for Solaris, these versions of Oracle will fail to create a database 
-at installation time unless the kernel is configured properly to support more 
-and larger shared memory segments and semaphores.  Aside from neglecting this 
-step, I've never seen or heard of anyone having much difficulty with these 
-versions on Solaris.</p>
-
-<a name="linux"></a>
-<span class="heading2">Linux</span><br>
-
-<p>Oracle has supported Linux since version 8.0.5. Versions 8.0.5 through 11.2.0
-have been or are currently available from 
-<a target="_blank" href="http://technet.oracle.com">technet.oracle.com</a> and have been 
-available on CD from various sources as well.</p>
+<p>Versions 8.0.5 through 12c have been or are currently available from 
+<a target="_blank" href="http://technet.oracle.com">technet.oracle.com</a>
+and have been available on CD from various sources as well.</p>
 
 <a name="users"></a>
 <span class="heading3">Create Users, Groups and Directories</span><br>
@@ -424,6 +403,19 @@ and run on that version of Linux.</p>
 </tr>
 <tr>
 <th>Fedora Core 19</th>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td><a href="oracle/linux/fedoracore/19/12c.html">Yes</a></td>
+</tr>
+<tr>
+<th>Fedora Core 20</th>
 <td>No</td>
 <td>No</td>
 <td>No</td>

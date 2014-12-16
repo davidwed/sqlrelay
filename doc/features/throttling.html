@@ -5,17 +5,19 @@
 </head>
 <body>
 
-<span class="heading1">Throttling</span><br><br>
+<span class="heading1">Throttling</span><br>
 
 <p>Throttling limits the number of connections to a given database and queues clients rather than denying them access outright.  This can maximize the value of a per-connection licensing scheme and preventing database overload.</p>
 
-<span class="heading2">Per-Connection Licensing Schemes</span><br><br>
+<br>
+<span class="heading2">Per-Connection Licensing Schemes</span><br>
 
-<p>Throttling is especially helpful when migrating from an in-house database to a cloud-service database with a per-connection licensing scheme.  Your in-house databae may have allowed any number of connections, but you may only be able to afford a certain number of connections to the cloud.</p>
+<p>Throttling is especially helpful when migrating from an in-house database to a cloud-service database with a per-connection licensing scheme.  Your in-house database may have allowed any number of connections, but you may only be able to afford a certain number of connections to the cloud.</p>
 
 <p>SQL Relay can be configured to open the exact number of connections that you paid for and funnel all of your database traffic through them.  If you paid for 10 connections, but every now and then you get a burst of traffic and 15 clients need to connect, 5 of them will be queued rather than rejected.</p>
 
-<span class="heading2">Database Overload</span><br><br>
+<br>
+<span class="heading2">Database Overload</span><br>
 
 <p>"Too many connections." is a common error seen by MySQL users.</p>
 
