@@ -8,7 +8,7 @@
 <span class="heading1">Programming with SQL Relay using the Perl API</span><br><br>
 
 <ul>
-<li><a href="#session">Establishing a Sessions</a></li>
+<li><a href="#session">Establishing a Session</a></li>
 <li><a href="#query">Executing Queries</a></li>
 <li><a href="#commit">Commits and Rollbacks</a></li>
 <li><a href="#temptables">Temporary Tables</a></li>
@@ -43,10 +43,10 @@ use.</p>
 </blockquote>
 
 <p>After calling the constructor, a session is established when the first 
-query, ping() or identify() is run.</p>
+query is run.</p>
 
 <p>For the duration of the session, the client occupies one of the database
-connection daemons, so care should be taken to minimize the length of a
+connections, so care should be taken to minimize the length of a
 session.</p>
 
 <a name="query"></a>
@@ -502,9 +502,6 @@ iterate through its result set, inserting rows into another table, using only
 }
 </pre>
 </blockquote>
-
-<p>Prior to SQL Relay version 0.25, you would have had to buffer the first
-result set or use 2 database connections instead of just 1.</p>
 
 <p>If you are using stored procedures with Oracle, a stored
 procedure can execute a query and return a cursor.  A cursor bind variable can
