@@ -24,17 +24,17 @@
 <a name="localdbconnection"></a>
 <span class="heading2">Connect To The Database Using a Local Connection</span><br>
 
-<p>One of the most common mistakes that people make when using SQL Relay is
-running SQL Relay on the same machine as the database, but not using a "local
-connection" to the database.  It's an easy mistake to make, but when remedied,
-it can result in a substantial improvement in performance.</p>
+<p>One of the most common mistakes that people make when running SQL Relay on
+the same machine as the database is not using a "local connection" to the
+database.  It's an easy mistake to make, but when remedied, it can result in a
+substantial improvement in performance.</p>
 
 <p>Most databases support "remote connections" (usually over an inet socket) and
-"local connections" (usually over a unix socket).  If you're running SQL Relay
-on a seperate machine from the database, you have to configure it to connect to
-the database using a remote connection.  However, if you're running SQL Relay
-on the same machine as the database, then you should configure it to connect to
-the database using a local connection if possible.</p>
+"local connections" (usually over a unix socket or IPC).  If you're running SQL
+Relay on a seperate machine from the database, you have to configure it to
+connect to the database using a remote connection.  However, if you're running
+SQL Relay on the same machine as the database, then you should configure it to
+connect to the database using a local connection if possible.</p>
 
 <span class="heading3">MySQL</span>
 
@@ -230,9 +230,9 @@ Just configure the connect string to use the local database.  For example:</p>
 <font color="#ff00ff">db=testdb</font>
 </blockquote>
 
-<span class="heading3">Sybase</span>
+<span class="heading3">SAP/Sybase</span>
 
-<p>As far as I can tell, Sybase only supports client connections over inet
+<p>As far as I can tell, SAP/Sybase only supports client connections over inet
 sockets.  If anyone knows differently, send mail to
 <a href="mailto:david.muse@firstworks.com">david.muse@firstworks.com</a>.</p>
 
@@ -279,7 +279,7 @@ sqlrconnection  *con=<font color="#a52829"><b>new</b></font> sqlrconnection(<fon
 <p>The client will first try the unix socket, then if it can't connect, it will
 try the host/port.</p>
 
-<p>Make sure to type the filename of the unix socket correctly :)  I've seen
+<p>Make sure to type the filename of the unix socket correctly.  I've seen
 several cases where people were really confused why they were getting bad
 performance even though they were using unix sockets.  They had just typed the
 unix socket file name wrong and it was trying it, failing, then falling back to
@@ -430,7 +430,7 @@ finding it may dramatically improve that query's performance.</p>
 <a name="memoryusage"></a>
 <span class="heading2">Memory Usage</span><br>
 
-<p>Many database API's allocate memory internally to store result sets.  However, Oracle, DB2, Sybase, FreeTDS and ODBC allow you to allocate buffers yourself and fetch result sets into these buffers.  When using these databases, SQL Relay preallocates a result set buffer and re-uses it over and over rather than dynamically allocating memory for each result set.  This improves performance at the cost of memory.  There are parameters for tuning the size of the result set buffer though.</p>
+<p>Many database API's allocate memory internally to store result sets.  However, Oracle, DB2, SAP/Sybase, FreeTDS and ODBC allow you to allocate buffers yourself and fetch result sets into these buffers.  When using these databases, SQL Relay preallocates a result set buffer and re-uses it over and over rather than dynamically allocating memory for each result set.  This improves performance at the cost of memory.  There are parameters for tuning the size of the result set buffer though.</p>
 
 <p>The size of the result set buffer is determined by 3 parameters:</p>
 
@@ -450,9 +450,9 @@ finding it may dramatically improve that query's performance.</p>
 </ul>
 </ul>
 
-<p>The third parameter might be a little confusing.  Some databases only support single-row fetches; you run a query, then fetch 1 row at a time from the database.  Oracle, DB2 and Sybase support array fetches; you can run a query and then fetch any number of rows from the database in a single round-trip.  This can improve performance significantly.</p>
+<p>The third parameter might be a little confusing.  Some databases only support single-row fetches; you run a query, then fetch 1 row at a time from the database.  Oracle, DB2 and SAP/Sybase support array fetches; you can run a query and then fetch any number of rows from the database in a single round-trip.  This can improve performance significantly.</p>
 
-<p>The default result set buffer size for Oracle, DB2 and Sybase is 80mb (256 fields per row * 32768 bytes per field * 10 rows to fetch at once).  FreeTDS and ODBC don't support multi-row fetches so its default buffer size is about 8mb (256*32768*1 bytes).</p>
+<p>The default result set buffer size for Oracle, DB2 and SAP/Sybase is 80mb (256 fields per row * 32768 bytes per field * 10 rows to fetch at once).  FreeTDS and ODBC don't support multi-row fetches so its default buffer size is about 8mb (256*32768*1 bytes).</p>
 
 <p>It is important to note that each cursor contains a result set buffer and each connection opens a configurable number of cursors.<p>
 
@@ -466,7 +466,7 @@ finding it may dramatically improve that query's performance.</p>
 
 <p>There is no rule of thumb for the "number of rows of the result set to fetch at once" parameter.  More tends to be better, but not always.  You may have to tune this by trial and error.</p>
 
-<p>For Oracle, Sybase and DB2, the maxselectlistsize, maxitembuffersize and fetchatonce parameters of the string attribute of the connection tag in the configuration file may be set to control these values at run time.  For FreeTDS, the maxselectlistsize and maxitembuffersize parameters are available but the fetchatonce parameter is not.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for details.</p>
+<p>For Oracle, SAP/Sybase and DB2, the maxselectlistsize, maxitembuffersize and fetchatonce parameters of the string attribute of the connection tag in the configuration file may be set to control these values at run time.  For FreeTDS, the maxselectlistsize and maxitembuffersize parameters are available but the fetchatonce parameter is not.  See the <a href="configreference.html">SQL Relay Configuration Reference</a> for details.</p>
 
 <p>Possibly more important than the parameters controlling the result set buffer size though, are the cursors and connections parameters as they are both multipliers.  See tips below for each.</p>
 

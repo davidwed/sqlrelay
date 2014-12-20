@@ -34,9 +34,9 @@
 <p>To use the SQL Relay drop-in replacement library for MySQL clients, you first
 need to determine what version of MySQL your existing application was compiled
 against.  There are 4 different drop-in replacement libraries.  One each for
-MySQL versions 3.xx, 4.0, 4.1, 5.0 and 5.1.  MySQL's native data structures
-changed a bit between the different versions.  If you use the wrong library your
-program will most likely crash.</p>
+MySQL versions 3.xx, 4.0, 4.1, 5.0 and 5.1 or higher.  MySQL's native data
+structures changed a bit between the different versions.  If you use the wrong
+library your program will most likely crash.</p>
 
 <p>You can find out which library is installed on your system  by running the following command.</p>
 
@@ -48,7 +48,7 @@ program will most likely crash.</p>
 mysql  Ver 14.14 Distrib <b>5.1.60</b>, for redhat-linux-gnu (i386) using readline 5.1
 </pre></blockquote>
 
-<p>The section in bold above is the important section.</p>
+<p>The number after Distrib is the version.</p>
 
 <p>Below is a chart mapping version numbers and which library to use:</p>
 
