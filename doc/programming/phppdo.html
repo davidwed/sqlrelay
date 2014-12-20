@@ -87,7 +87,7 @@ extension=php_pdo_sqlrelay.dll
 <p>(the <i>extension_dir</i> value might need to be changed, depending on where PHP is installed on your system)</p>
 
 <p>It is possible, even likely that the configuration file already contains a 
-ine to load the pdo.so (or php_pdo.dll) module, so look through the file and
+line to load the pdo.so (or php_pdo.dll) module, so look through the file and
 verify whether it is or not before loading it again.</p>
 
 <p>Also, some Linux and Unix distributions have PDO compiled directly into the
@@ -207,12 +207,12 @@ $stmt=$dbh->query("select * from testtable"));
 <span class="heading2">Transactions</span><br><br>
 
 <p>Run begin() to start a transaction.  To complete a transaction, run commit()
-or rollBack().  You should use the commit() and rollback() functions rather than
+or rollBack().  You should use the commit() and rollBack() functions rather than
 sending a "commit" or "rollback" query.  There are two reasons for this.  First,
 it's much more efficient to call the functions.  Second, if you're writing code
 that can run on transactional or non-transactional databases, some
 non-transactional databases will throw errors if they receive a "commit" or
-"rollback" query, but by calling the commit() and rollback() functions you
+"rollback" query, but by calling the commit() and rollBack() functions you
 instruct the database connection daemon to call the commit and rollback API
 functions for that database rather than issuing them as queries.  If the API's
 have no commit or rollback functions, the calls do nothing and the database

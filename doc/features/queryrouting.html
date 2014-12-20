@@ -7,6 +7,8 @@
 
 <span class="heading1">Query Routing and Filtering</span><br><br>
 
+<p>Solves - "My database is getting slammed. I could replicate it but then I'd have to rewrite my app to send DML to the master and somehow distribute selects over the slaves."</p>
+
 <p>Query routing sends queries that match one pattern to one set of database servers and queries that match another pattern to another set of servers.  A comon use for query routing is to route DML and DDL queries to a master and distribute select queries over a pool of slaves.</p>
 
 <img src="../images/queryrouting.png">
