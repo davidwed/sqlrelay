@@ -420,7 +420,7 @@ bool sybaseconnection::logIn(const char **error) {
 		return false;
 	}
 
-	#ifdef CS_SEC_ENCRYPTION,
+	#ifdef CS_SEC_ENCRYPTION
 	CS_INT	enc=CS_TRUE;
 	if (ct_con_props(dbconn,CS_SET,CS_SEC_ENCRYPTION,
 				(CS_VOID *)&enc,CS_UNUSED,
