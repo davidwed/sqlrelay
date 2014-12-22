@@ -51,7 +51,7 @@ Buildroot: %{_tmppath}/%{name}-root
 	%define phpconfdir /etc/php.d
 %endif
 
-BuildRequires: rudiments-devel >= 0.34
+BuildRequires: rudiments-devel
 %{!?_without_mysql:BuildRequires: ,mysql-devel}
 %{!?_without_odbc:BuildRequires: ,unixODBC-devel}
 %{!?_without_postgresql:BuildRequires: ,postgresql-devel}
