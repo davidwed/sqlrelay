@@ -487,6 +487,7 @@ static int sqlrcursorBindPostExec(sqlrcursor *sqlrcur,
 			if (!strm) {
 				return 0;
 			}
+			TSRMLS_FETCH();
 			php_stream_write(strm,
 				sqlrcur->getOutputBindBlob(name),
 				sqlrcur->getOutputBindLength(name));
@@ -1143,7 +1144,7 @@ static PHP_METHOD(PDO_SQLRELAY, resumeResultSet) {
 				ecalloc(stmt->column_count,
 					sizeof(struct pdo_column_data));
 		for (int32_t i=0; i<stmt->column_count; i++) {
-			if (!sqlrcursorDescribe(stmt,i)) {
+			if (!sqlrcursorDescribe(stmt,i TSRMLS_CC)) {
 				sqlrelayErrorStmt(stmt);
 				RETURN_FALSE;
 			}
@@ -1197,7 +1198,7 @@ static struct pdo_dbh_methods sqlrconnectionMethods={
 	sqlrconnectionError,
 	sqlrconnectionGetAttribute,
 	NULL, // check liveness
-	sqlrelayGetDriverMethods
+	(pdo_dbh_get_driver_methods_func)sqlrelayGetDriverMethods
 };
 
 static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
