@@ -1095,9 +1095,7 @@ bool sqlrservercontroller::listen() {
 
 		waitForAvailableDatabase();
 		initSession();
-stdoutput.printf("announce availability - sem(0)=%d sem(3)=%d\n",semset->getValue(0),semset->getValue(3));
 		if (!announceAvailability(unixsocket,inetport,connectionid)) {
-stdoutput.printf("  failed\n");
 			return true;
 		}
 
@@ -1105,7 +1103,6 @@ stdoutput.printf("  failed\n");
 		bool	loopback=false;
 		for (;;) {
 
-stdoutput.printf("wait for client\n");
 			int	success=waitForClient();
 
 			if (success==1) {
