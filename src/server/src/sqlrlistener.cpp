@@ -396,8 +396,7 @@ void sqlrlistener::setSessionHandlerMethod() {
 
 	} else {
 
-		if (!charstring::compareIgnoringCase(
-				sys::getOperatingSystemName(),"Windows")) {
+		if (!process::supportsFork()) {
 			stderror.printf("Warning: sessionhandler=\"process\" "
 					"not supported on this platform, "
 					"falling back to "
@@ -1411,14 +1410,20 @@ bool sqlrlistener::acquireShmAccess() {
 		return false;
 	}
 
-	// Loop, waiting.  Retry the wait if it was interrupted by a signal,
-	// other than an alarm, but bail if an alarm interrupted it.
+	// Loop, waiting.  Bail if interrupted by an alarm.
 	bool	result=true;
-	semset->dontRetryInterruptedOperations();
-	do {
-		result=semset->waitWithUndo(1);
-	} while (!result && error::getErrorNumber()==EINTR && alarmrang!=1);
-	semset->retryInterruptedOperations();
+	if (sys::signalsInterruptSystemCalls()) {
+		semset->dontRetryInterruptedOperations();
+		do {
+			result=semset->waitWithUndo(1);
+		} while (!result && error::getErrorNumber()==EINTR &&
+							alarmrang!=1);
+		semset->retryInterruptedOperations();
+	} else {
+		do {
+			result=semset->waitWithUndo(1,0,500000000);
+		} while (!result && alarmrang!=1);
+	}
 
 	// handle alarm...
 	if (alarmrang) {
@@ -1481,14 +1486,20 @@ bool sqlrlistener::acceptAvailableConnection(bool *alldbsdown) {
 		return false;
 	}
 
-	// Loop, waiting.  Retry the wait if it was interrupted by a signal,
-	// other than an alarm, but if an alarm interrupted it then bail.
+	// Loop, waiting.  Bail if interrupted by an alarm.
 	bool	result=true;
-	semset->dontRetryInterruptedOperations();
-	do {
-		result=semset->wait(2);
-	} while (!result && error::getErrorNumber()==EINTR && alarmrang!=1);
-	semset->retryInterruptedOperations();
+	if (sys::signalsInterruptSystemCalls()) {
+		semset->dontRetryInterruptedOperations();
+		do {
+			result=semset->wait(2);
+		} while (!result && error::getErrorNumber()==EINTR &&
+							alarmrang!=1);
+		semset->retryInterruptedOperations();
+	} else {
+		do {
+			result=semset->wait(2,0,500000000);
+		} while (!result && alarmrang!=1);
+	}
 
 	// handle alarm...
 	if (alarmrang) {

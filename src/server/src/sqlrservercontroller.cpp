@@ -146,8 +146,6 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 	proxymode=false;
 	proxypid=0;
 
-	iswindows=!charstring::compareIgnoringCase(
-			sys::getOperatingSystemName(),"Windows");
 }
 
 sqlrservercontroller::~sqlrservercontroller() {
@@ -565,7 +563,8 @@ bool sqlrservercontroller::handlePidFile() {
 	// listener to come up, but on 64-bit windows, when running 32-bit
 	// apps, listening on an inet socket can take many seconds.
 	uint8_t	listenertimeout=10;
-	if (iswindows &&
+	if (!charstring::compareIgnoringCase(
+			sys::getOperatingSystemName(),"Windows") &&
 		(!charstring::compareIgnoringCase(
 			sys::getOperatingSystemArchitecture(),"x86_64") ||
 		!charstring::compareIgnoringCase(
@@ -3916,20 +3915,18 @@ bool sqlrservercontroller::acquireAnnounceMutex() {
 
 	// Loop, waiting.  Bail if interrupted by an alarm.
 	bool	result=true;
-	if (iswindows) {
-		// alarms don't interrupt system calls on windows so we have to
-		// break out of the wait periodically to see if the alarm rang
-		do {
-			result=semset->waitWithUndo(0,0,500000000);
-		} while (!result && alarmrang!=1);
-	} else {
+	if (sys::signalsInterruptSystemCalls()) {
 		semset->dontRetryInterruptedOperations();
 		do {
 			result=semset->waitWithUndo(0);
 		} while (!result && error::getErrorNumber()==EINTR &&
 							alarmrang!=1);
+		semset->retryInterruptedOperations();
+	} else {
+		do {
+			result=semset->waitWithUndo(0,0,500000000);
+		} while (!result && alarmrang!=1);
 	}
-	semset->retryInterruptedOperations();
 
 	// handle alarm...
 	if (alarmrang) {
@@ -3964,21 +3961,19 @@ bool sqlrservercontroller::waitForListenerToFinishReading() {
 	// machine was super, super busy, then it might happen.
 
 	// Loop, waiting.  Bail if interrupted by an alarm.
-	semset->dontRetryInterruptedOperations();
 	bool	result=true;
-	if (iswindows) {
-		// alarms don't interrupt system calls on windows so we have to
-		// break out of the wait periodically to see if the alarm rang
-		do {
-			result=semset->wait(3,0,500000000);
-		} while (!result && alarmrang!=1);
-	} else {
+	if (sys::signalsInterruptSystemCalls()) {
+		semset->dontRetryInterruptedOperations();
 		do {
 			result=semset->wait(3);
 		} while (!result && error::getErrorNumber()==EINTR &&
 							alarmrang!=1);
+		semset->retryInterruptedOperations();
+	} else {
+		do {
+			result=semset->wait(3,0,500000000);
+		} while (!result && alarmrang!=1);
 	}
-	semset->retryInterruptedOperations();
 
 	// We signalled semaphore 2 earlier in signalListenerToRead() and we
 	// need to undo that operation.  We don't want to rely on undo's though
