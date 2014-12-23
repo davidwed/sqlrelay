@@ -1095,7 +1095,9 @@ bool sqlrservercontroller::listen() {
 
 		waitForAvailableDatabase();
 		initSession();
+stdoutput.printf("announce availability - sem(0)=%d sem(3)=%d\n",semset->getValue(0),semset->getValue(3));
 		if (!announceAvailability(unixsocket,inetport,connectionid)) {
+stdoutput.printf("  failed\n");
 			return true;
 		}
 
@@ -1103,6 +1105,7 @@ bool sqlrservercontroller::listen() {
 		bool	loopback=false;
 		for (;;) {
 
+stdoutput.printf("wait for client\n");
 			int	success=waitForClient();
 
 			if (success==1) {
@@ -3914,17 +3917,16 @@ bool sqlrservercontroller::acquireAnnounceMutex() {
 	// below and not interrupt it.  If that happens, the ttl would be
 	// ignored.
 
-	// Loop, waiting.  Retry the wait if it was interrupted by a signal
-	// other than an alarm, but bail if an alarm interrupted it.
-	semset->dontRetryInterruptedOperations();
+	// Loop, waiting.  Bail if interrupted by an alarm.
 	bool	result=true;
-	// alarms don't interrupt system calls on windows so we have to
-	// break out of the wait periodically to see if the alarm rang
 	if (iswindows) {
+		// alarms don't interrupt system calls on windows so we have to
+		// break out of the wait periodically to see if the alarm rang
 		do {
 			result=semset->waitWithUndo(0,0,500000000);
 		} while (!result && alarmrang!=1);
 	} else {
+		semset->dontRetryInterruptedOperations();
 		do {
 			result=semset->waitWithUndo(0);
 		} while (!result && error::getErrorNumber()==EINTR &&
@@ -3951,7 +3953,7 @@ void sqlrservercontroller::releaseAnnounceMutex() {
 
 void sqlrservercontroller::signalListenerToRead() {
 	logDebugMessage("signalling listener to read");
-	semset->signalWithUndo(2);
+	semset->signal(2);
 	logDebugMessage("done signalling listener to read");
 }
 
@@ -3964,13 +3966,12 @@ bool sqlrservercontroller::waitForListenerToFinishReading() {
 	// is highly unlikely as the minimum ttl is 1 second, but I guess if a
 	// machine was super, super busy, then it might happen.
 
-	// Loop, waiting.  Retry the wait if it was interrupted by a signal
-	// other than an alarm, but bail if an alarm interrupted it.
+	// Loop, waiting.  Bail if interrupted by an alarm.
 	semset->dontRetryInterruptedOperations();
 	bool	result=true;
-	// alarms don't interrupt system calls on windows so we have to
-	// break out of the wait periodically to see if the alarm rang
 	if (iswindows) {
+		// alarms don't interrupt system calls on windows so we have to
+		// break out of the wait periodically to see if the alarm rang
 		do {
 			result=semset->wait(3,0,500000000);
 		} while (!result && alarmrang!=1);
@@ -3981,6 +3982,14 @@ bool sqlrservercontroller::waitForListenerToFinishReading() {
 							alarmrang!=1);
 	}
 	semset->retryInterruptedOperations();
+
+	// We signalled semaphore 2 earlier in signalListenerToRead() and we
+	// need to undo that operation.  We don't want to rely on undo's though
+	// because this isn't a mutex and besides, not all platforms support
+	// undo's.
+	if (alarmrang) {
+		semset->wait(2);
+	}
 
 	// Reset this semaphore to 0.
 	// It can get left incremented if another sqlr-connection is killed

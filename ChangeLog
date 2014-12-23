@@ -58,6 +58,11 @@
 		ResultSetBufferSize
 	added note about JDBC-ODBC bridge removal in Oracle Java 8
 	made threaded listener the default
+	tweaks to sqlr-connection/sqlr-scaler processes to deal with lack of
+		SIGCHLD/waitpid() on windows
+	the signal on semaphore 2 is now undone manually when sqlr-connections
+		shut down and doesn't rely on semaphore undo's for normal
+		operation
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries
