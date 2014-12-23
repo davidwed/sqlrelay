@@ -145,6 +145,9 @@ sqlrservercontroller::sqlrservercontroller() : listener() {
 
 	proxymode=false;
 	proxypid=0;
+
+	iswindows=!charstring::compareIgnoringCase(
+			sys::getOperatingSystemName(),"Windows");
 }
 
 sqlrservercontroller::~sqlrservercontroller() {
@@ -562,8 +565,7 @@ bool sqlrservercontroller::handlePidFile() {
 	// listener to come up, but on 64-bit windows, when running 32-bit
 	// apps, listening on an inet socket can take many seconds.
 	uint8_t	listenertimeout=10;
-	if (!charstring::compareIgnoringCase(
-			sys::getOperatingSystemName(),"Windows") &&
+	if (iswindows &&
 		(!charstring::compareIgnoringCase(
 			sys::getOperatingSystemArchitecture(),"x86_64") ||
 		!charstring::compareIgnoringCase(
@@ -3735,9 +3737,8 @@ void sqlrservercontroller::shutDown() {
 		inclientsession=false;
 	}
 
-	// decrement the connection counter
-	if (decrementonclose && cfgfl->getDynamicScaling() &&
-						semset && shmem) {
+	// decrement the connection counter or signal the scaler to
+	if (decrementonclose && cfgfl->getDynamicScaling() && semset && shmem) {
 		decrementConnectionCount();
 	}
 
@@ -3762,6 +3763,15 @@ void sqlrservercontroller::shutDown() {
 		delete serversockin[index];
 	}
 	delete[] serversockin;
+
+	// The scaler might need to decrement the connection count after
+	// waiting for the child to exit.  On unix-like platforms, we can
+	// handle that with SIGCHLD/waitpid().  On other platforms we can
+	// do it with a semaphore.
+	if (!decrementonclose && cfgfl->getDynamicScaling() &&
+		semset && shmem && !process::supportsGetChildStateChange()) {
+		semset->signal(11);
+	}
 
 	logDebugMessage("done closing connection");
 }
@@ -3836,7 +3846,7 @@ bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 	// connect to the semaphore set
 	logDebugMessage("attaching to semaphores...");
 	semset=new semaphoreset();
-	if (!semset->attach(file::generateKey(idfilename,1),11)) {
+	if (!semset->attach(file::generateKey(idfilename,1),12)) {
 		char	*err=error::getErrorString();
 		stderror.printf("Couldn't attach to semaphore set: ");
 		stderror.printf("%s\n",err);
@@ -3908,9 +3918,18 @@ bool sqlrservercontroller::acquireAnnounceMutex() {
 	// other than an alarm, but bail if an alarm interrupted it.
 	semset->dontRetryInterruptedOperations();
 	bool	result=true;
-	do {
-		result=semset->waitWithUndo(0);
-	} while (!result && error::getErrorNumber()==EINTR && alarmrang!=1);
+	// alarms don't interrupt system calls on windows so we have to
+	// break out of the wait periodically to see if the alarm rang
+	if (iswindows) {
+		do {
+			result=semset->waitWithUndo(0,0,500000000);
+		} while (!result && alarmrang!=1);
+	} else {
+		do {
+			result=semset->waitWithUndo(0);
+		} while (!result && error::getErrorNumber()==EINTR &&
+							alarmrang!=1);
+	}
 	semset->retryInterruptedOperations();
 
 	// handle alarm...
@@ -3949,9 +3968,18 @@ bool sqlrservercontroller::waitForListenerToFinishReading() {
 	// other than an alarm, but bail if an alarm interrupted it.
 	semset->dontRetryInterruptedOperations();
 	bool	result=true;
-	do {
-		result=semset->wait(3);
-	} while (!result && error::getErrorNumber()==EINTR && alarmrang!=1);
+	// alarms don't interrupt system calls on windows so we have to
+	// break out of the wait periodically to see if the alarm rang
+	if (iswindows) {
+		do {
+			result=semset->wait(3,0,500000000);
+		} while (!result && alarmrang!=1);
+	} else {
+		do {
+			result=semset->wait(3);
+		} while (!result && error::getErrorNumber()==EINTR &&
+							alarmrang!=1);
+	}
 	semset->retryInterruptedOperations();
 
 	// Reset this semaphore to 0.

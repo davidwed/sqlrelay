@@ -525,7 +525,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	//       connection waits for the listener to read its registration
 	//       listener signals when it's done reading a registration
 	//
-	// connection/lisetner/scaler interlocks:
+	// connection/listener/scaler interlocks:
 	// 6 - scaler/listener: used to decide whether to scale or not
 	//       listener signals after incrementing connected client count
 	//       scaler waits before counting sessions/connections
@@ -544,6 +544,9 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	//       scaler waits for the connection count to increase
 	//		 (in effect, waiting for a new connection to fire up)
 	//       connection signals after increasing connection count
+	// 11 - scaler/connection:
+	//       scaler waits for the connection to signal to indicate that
+	//	 its exiting on platforms that don't support SIGCHLD/waitpid()
 	//
 	// statistics:
 	// 9 - coordinates access to statistics shared memory segment
@@ -551,11 +554,11 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	// main listenter process/listener children:
 	// 10 - listener: number of busy listeners
 	//
-	int32_t	vals[11]={1,1,0,0,1,1,0,0,0,1,0};
+	int32_t	vals[12]={1,1,0,0,1,1,0,0,0,1,0,0};
 	semset=new semaphoreset();
-	if (!semset->create(key,permissions::ownerReadWrite(),11,vals)) {
+	if (!semset->create(key,permissions::ownerReadWrite(),12,vals)) {
 		semError(id,semset->getId());
-		semset->attach(key,11);
+		semset->attach(key,12);
 		return false;
 	}
 
@@ -1218,7 +1221,6 @@ void sqlrlistener::forkChild(filedescriptor *clientsock, const char *protocol) {
 			isforkedthread=true;
 			return;
 		}
-stdoutput.printf("error forking listener thread:\n%s\n",error::getNativeErrorString());
 
 		// error
 		decrementBusyListeners();
@@ -1275,7 +1277,6 @@ stdoutput.printf("error forking listener thread:\n%s\n",error::getNativeErrorStr
 		delete clientsock;
 
 	} else {
-stdoutput.printf("error forking listener process:\n%s\n",error::getNativeErrorString());
 
 		// error...
 		decrementBusyListeners();

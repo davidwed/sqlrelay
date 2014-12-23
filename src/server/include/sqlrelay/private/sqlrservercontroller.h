@@ -270,3 +270,5 @@
 		singlylinkedlist< char * >	sessiontemptablesfortrunc;
 		singlylinkedlist< char * >	transtemptablesfordrop;
 		singlylinkedlist< char * >	transtemptablesfortrunc;
+
+		bool		iswindows;

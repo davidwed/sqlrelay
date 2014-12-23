@@ -113,10 +113,10 @@
 /* #undef HAVE_MYSQL_STMT_PREPARE */
 
 /* oci.h */
-/* #undef HAVE_OCI_H */
+#define HAVE_OCI_H
 
 /* Oracle 8i or greater */
-/* #undef HAVE_ORACLE_8i */
+#define HAVE_ORACLE_8i
 
 /* Some versions of postgresql have PQbinaryTuples */
 /* #undef HAVE_POSTGRESQL_PQBINARYTUPLES */

@@ -83,8 +83,22 @@ bool scaler::initScaler(int argc, const char **argv) {
 	charstring::printf(listenerpidfile,listenerpidfilelen,
 				"%s/pids/sqlr-listener-%s",
 				tmpdir->getString(),id);
+
+	// On most platforms, 3 seconds is plenty of time to wait for the
+	// listener to come up, but on 64-bit windows, when running 32-bit
+	// apps, listening on an inet socket can take many seconds.
+	uint8_t	listenertimeout=30;
+	if (iswindows &&
+		(!charstring::compareIgnoringCase(
+			sys::getOperatingSystemArchitecture(),"x86_64") ||
+		!charstring::compareIgnoringCase(
+			sys::getOperatingSystemArchitecture(),"amd64")) &&
+		sizeof(void *)==4) {
+		listenertimeout=100;
+	}
+
 	bool	found=false;
-	for (uint8_t i=0; !found && i<20; i++) {
+	for (uint8_t i=0; !found && i<listenertimeout; i++) {
 		if (i) {
 			snooze::microsnooze(0,100000);
 		}
@@ -264,7 +278,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 
 	// connect to the semaphore set
 	semset=new semaphoreset;
-	if (!semset->attach(key,11)) {
+	if (!semset->attach(key,12)) {
 		char	*err=error::getErrorString();
 		stderror.printf("Couldn't attach to semaphore set: ");
 		stderror.printf("%s\n",err);
@@ -319,47 +333,64 @@ bool scaler::reapChildren(pid_t connpid) {
 	bool	reaped=false;
 
 	for (;;) {
-		childstatechange	childstate;
-		int32_t			exitstatus=0;
-		int32_t			signum=0;
-		bool			coredump=false;
-		int	pid=process::getChildStateChange(connpid,
+
+		// We need to decrement the connection count after waiting for
+		// the child to exit.  On unix-like platforms, we can handle
+		// that with SIGCHLD/waitpid().  On other platforms we can
+		// do it with a semaphore.
+
+		if (process::supportsGetChildStateChange()) {
+
+			childstatechange	childstate;
+			int32_t			exitstatus=0;
+			int32_t			signum=0;
+			bool			coredump=false;
+			int	pid=process::getChildStateChange(connpid,
 						false,true,true,
 						&childstate,
 						&exitstatus,&signum,&coredump);
-		if (pid<1) {
-			break;
+			if (pid<1) {
+				break;
+			}
+
+			if (childstate==EXIT_CHILDSTATECHANGE) {
+				if (exitstatus) {
+					stderror.printf(
+						"Connection (pid=%d) "
+						"exited with code %d\n",
+						pid,exitstatus);
+				}
+			} else if (childstate==TERMINATED_CHILDSTATECHANGE) {
+				if (coredump) {
+					stderror.printf(
+						"Connection (pid=%d) "
+						"terminated by signal %d, "
+						"with coredump\n",
+						pid,signum);
+				} else {
+					stderror.printf(
+						"Connection (pid=%d) "
+						"terminated by signal %d\n",
+						pid,signum);
+				}
+			} else if (childstate==STOPPED_CHILDSTATECHANGE) {
+				// this shouldn't happen
+				stderror.printf("Connection (pid=%d) "
+							"stopped",pid);
+			} else if (childstate==CONTINUED_CHILDSTATECHANGE) {
+				// this shouldn't happen
+				stderror.printf("Connection (pid=%d) "
+							"continued",pid);
+			}
+
+		} else {
+			if (!semset->wait(11,0,0)) {
+				break;
+			}
 		}
 
-		reaped=true;
 		decrementConnectionCount();
-
-		if (childstate==EXIT_CHILDSTATECHANGE) {
-			if (exitstatus) {
-				stderror.printf(
-					"Connection (pid=%d) exited "
-					"with code %d\n",
-					pid,exitstatus);
-			}
-		} else if (childstate==TERMINATED_CHILDSTATECHANGE) {
-			if (coredump) {
-				stderror.printf(
-					"Connection (pid=%d) terminated "
-					"by signal %d, with coredump\n",
-					pid,signum);
-			} else {
-				stderror.printf(
-					"Connection (pid=%d) terminated "
-					"by signal %d\n",
-					pid,signum);
-			}
-		} else if (childstate==STOPPED_CHILDSTATECHANGE) {
-			// this shouldn't happen
-			stderror.printf("Connection (pid=%d) stopped",pid);
-		} else if (childstate==CONTINUED_CHILDSTATECHANGE) {
-			// this shouldn't happen
-			stderror.printf("Connection (pid=%d) continued",pid);
-		}
+		reaped=true;
 	}
 
 	return reaped;
