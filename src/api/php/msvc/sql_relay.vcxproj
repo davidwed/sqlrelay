@@ -146,7 +146,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\PHP\dev\include\php;C:\PHP\dev\include\php\main;C:\PHP\dev\include\php\TSRM;C:\PHP\dev\include\php\Zend;C:\PHP\dev\include\php\ext;C:\PHP\dev\include\php\ext\date\lib;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\PHP\dev\include\php;C:\PHP\dev\include\php\main;C:\PHP\dev\include\php\TSRM;C:\PHP\dev\include\php\Zend;C:\PHP\dev\include\php\ext;C:\PHP\dev\include\php\ext\date\lib;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -156,7 +156,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>..\..\c++\msvc\Debug;C:\Program Files (x86)\Firstworks\lib;C:\PHP\dev;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\c++\msvc\Debug;C:\Program Files\Firstworks\lib;C:\PHP\dev;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;php5ts.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -195,7 +195,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\PHP\dev\include\php;C:\PHP\dev\include\php\main;C:\PHP\dev\include\php\TSRM;C:\PHP\dev\include\php\Zend;C:\PHP\dev\include\php\ext;C:\PHP\dev\include\php\ext\date\lib;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\PHP\dev\include\php;C:\PHP\dev\include\php\main;C:\PHP\dev\include\php\TSRM;C:\PHP\dev\include\php\Zend;C:\PHP\dev\include\php\ext;C:\PHP\dev\include\php\ext\date\lib;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -205,7 +205,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>..\..\c++\msvc\DebugCLR;C:\Program Files (x86)\Firstworks\lib;C:\PHP\dev;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\c++\msvc\DebugCLR;C:\Program Files\Firstworks\lib;C:\PHP\dev;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;php5ts.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -244,7 +244,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\PHP\dev\include\php;C:\PHP\dev\include\php\main;C:\PHP\dev\include\php\TSRM;C:\PHP\dev\include\php\Zend;C:\PHP\dev\include\php\ext;C:\PHP\dev\include\php\ext\date\lib;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\PHP\dev\include\php;C:\PHP\dev\include\php\main;C:\PHP\dev\include\php\TSRM;C:\PHP\dev\include\php\Zend;C:\PHP\dev\include\php\ext;C:\PHP\dev\include\php\ext\date\lib;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -255,7 +255,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\c++\msvc\Release;C:\Program Files (x86)\Firstworks\lib;C:\PHP\dev;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\c++\msvc\Release;C:\Program Files\Firstworks\lib;C:\PHP\dev;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;php5ts.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -295,7 +295,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\PHP\dev\include\php;C:\PHP\dev\include\php\main;C:\PHP\dev\include\php\TSRM;C:\PHP\dev\include\php\Zend;C:\PHP\dev\include\php\ext;C:\PHP\dev\include\php\ext\date\lib;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\PHP\dev\include\php;C:\PHP\dev\include\php\main;C:\PHP\dev\include\php\TSRM;C:\PHP\dev\include\php\Zend;C:\PHP\dev\include\php\ext;C:\PHP\dev\include\php\ext\date\lib;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -306,7 +306,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\c++\msvc\ReleaseCLR;C:\Program Files (x86)\Firstworks\lib;C:\PHP\dev;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\c++\msvc\ReleaseCLR;C:\Program Files\Firstworks\lib;C:\PHP\dev;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;php5ts.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>

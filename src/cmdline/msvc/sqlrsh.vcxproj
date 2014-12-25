@@ -108,7 +108,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>..\..\api\c++\msvc\Debug;..\..\util\msvc\Debug;c:\Program Files (x86)\Firstworks\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\api\c++\msvc\Debug;..\..\util\msvc\Debug;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -116,7 +116,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>..\..\api\c++\msvc\DebugCLR;..\..\util\msvc\DebugCLR;c:\Program Files (x86)\Firstworks\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\api\c++\msvc\DebugCLR;..\..\util\msvc\DebugCLR;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -124,7 +124,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>..\..\api\c++\msvc\Release;..\..\util\msvc\Release;c:\Program Files (x86)\Firstworks\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\api\c++\msvc\Release;..\..\util\msvc\Release;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -132,7 +132,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>..\..\api\c++\msvc\ReleaseCLR;..\..\util\msvc\ReleaseCLR;c:\Program Files (x86)\Firstworks\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\..\api\c++\msvc\ReleaseCLR;..\..\util\msvc\ReleaseCLR;c:\Program Files\Firstworks\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -140,8 +140,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;_DEBUG;_WINDOWS;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";SYSTEM_SQLRSHRC="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrshrc";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\api\c++\include;..\..\..;..\..\common;..\..\util;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;_DEBUG;_WINDOWS;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";SYSTEM_SQLRSHRC="C:\\Program Files\\Firstworks\\etc\\sqlrshrc";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\api\c++\include;..\..\..;..\..\common;..\..\util;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -187,8 +187,8 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;_DEBUG;_WINDOWS;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";SYSTEM_SQLRSHRC="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrshrc";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\api\c++\include;..\..\..;..\..\common;..\..\util;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;_DEBUG;_WINDOWS;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";SYSTEM_SQLRSHRC="C:\\Program Files\\Firstworks\\etc\\sqlrshrc";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\api\c++\include;..\..\..;..\..\common;..\..\util;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -234,8 +234,8 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;NDEBUG;_WINDOWS;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";SYSTEM_SQLRSHRC="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrshrc";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\api\c++\include;..\..\..;..\..\common;..\..\util;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;NDEBUG;_WINDOWS;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";SYSTEM_SQLRSHRC="C:\\Program Files\\Firstworks\\etc\\sqlrshrc";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\api\c++\include;..\..\..;..\..\common;..\..\util;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -283,8 +283,8 @@ copy /Y config.windows.h config.h</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;NDEBUG;_WINDOWS;DEFAULT_CONFIG_FILE="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrelay.conf";SYSTEM_SQLRSHRC="C:\\Program Files (x86)\\Firstworks\\etc\\sqlrshrc";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\api\c++\include;..\..\..;..\..\common;..\..\util;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;NDEBUG;_WINDOWS;DEFAULT_CONFIG_FILE="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf";SYSTEM_SQLRSHRC="C:\\Program Files\\Firstworks\\etc\\sqlrshrc";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\api\c++\include;..\..\..;..\..\common;..\..\util;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>

@@ -145,7 +145,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\Perl\lib\CORE;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\Perl\lib\CORE;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -155,7 +155,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>..\..\c++\msvc\Debug;C:\Program Files (x86)\Firstworks\lib;C:\Perl\lib\CORE;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\c++\msvc\Debug;C:\Program Files\Firstworks\lib;C:\Perl\lib\CORE;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;perl516.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -192,7 +192,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\Perl\lib\CORE;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\Perl\lib\CORE;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -202,7 +202,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>..\..\c++\msvc\DebugCLR;C:\Program Files (x86)\Firstworks\lib;C:\Perl\lib\CORE;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\c++\msvc\DebugCLR;C:\Program Files\Firstworks\lib;C:\Perl\lib\CORE;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;perl516.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -239,7 +239,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\Perl\lib\CORE;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\Perl\lib\CORE;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -250,7 +250,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\c++\msvc\Release;C:\Program Files (x86)\Firstworks\lib;C:\Perl\lib\CORE;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\c++\msvc\Release;C:\Program Files\Firstworks\lib;C:\Perl\lib\CORE;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;perl516.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -288,7 +288,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_USE_32BIT_TIME_T;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\Perl\lib\CORE;C:\Program Files (x86)\Firstworks\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..;..\..\..\common;..\..\c++\include;C:\Perl\lib\CORE;C:\Program Files\Firstworks\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -299,7 +299,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\c++\msvc\ReleaseCLR;C:\Program Files (x86)\Firstworks\lib;C:\Perl\lib\CORE;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\c++\msvc\ReleaseCLR;C:\Program Files\Firstworks\lib;C:\Perl\lib\CORE;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;perl516.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
