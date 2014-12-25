@@ -179,7 +179,7 @@ goto end
 
 :install
 set first=true
-set dir=Program Files (x86)
+set dir=Program Files
 set platform=
 set perl=Perl
 goto installone
@@ -308,7 +308,7 @@ set dir=Program Files
 set perl=Perl64
 call :uninstallone
 set first=false
-set dir=Program Files (x86)
+set dir=Program Files
 set perl=Perl
 call :uninstallone
 goto end
