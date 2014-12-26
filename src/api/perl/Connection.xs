@@ -11,6 +11,17 @@
 #include "../../c++/include/sqlrelay/sqlrclient.h"
 #include <EXTERN.h>
 #define explicit
+
+// msvc < 2013 (version 18.00) don't have stdbool.h
+// active perl 5.20 and up require either stdbool.h or this workaround
+#if defined(WIN32) && _MSC_VER<1800
+	#include <patchlevel.h>
+	#if PERL_REVISION>5 || (PERL_REVISION==5 && PERL_VERSION>=20)
+		#define PERL_BOOL_AS_CHAR
+		#define __inline__ inline
+	#endif
+#endif
+
 extern "C" {
 	#include <perl.h>
 }
