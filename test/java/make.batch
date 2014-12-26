@@ -1,21 +1,9 @@
 if "%1"=="" goto all
-if "%1"=="64" goto all64
 if "%1"=="all" goto all
 if "%1"=="clean" goto clean
 goto end
 
 :all
-"C:\Program Files (x86)\Java\jdk1.8.0_20\bin\javac" -classpath "C:\Program Files (x86)\Firstworks\java\sqlrelay.jar" db2.java
-"C:\Program Files (x86)\Java\jdk1.8.0_20\bin\javac" -classpath "C:\Program Files (x86)\Firstworks\java\sqlrelay.jar" firebird.java
-"C:\Program Files (x86)\Java\jdk1.8.0_20\bin\javac" -classpath "C:\Program Files (x86)\Firstworks\java\sqlrelay.jar" freetds.java
-"C:\Program Files (x86)\Java\jdk1.8.0_20\bin\javac" -classpath "C:\Program Files (x86)\Firstworks\java\sqlrelay.jar" mysql.java
-"C:\Program Files (x86)\Java\jdk1.8.0_20\bin\javac" -classpath "C:\Program Files (x86)\Firstworks\java\sqlrelay.jar" oracle.java
-"C:\Program Files (x86)\Java\jdk1.8.0_20\bin\javac" -classpath "C:\Program Files (x86)\Firstworks\java\sqlrelay.jar" postgresql.java
-"C:\Program Files (x86)\Java\jdk1.8.0_20\bin\javac" -classpath "C:\Program Files (x86)\Firstworks\java\sqlrelay.jar" sqlite.java
-"C:\Program Files (x86)\Java\jdk1.8.0_20\bin\javac" -classpath "C:\Program Files (x86)\Firstworks\java\sqlrelay.jar" sybase.java
-goto end
-
-:all64
 "C:\Program Files\Java\jdk1.8.0_20\bin\javac" -classpath "C:\Program Files\Firstworks\java\sqlrelay.jar" db2.java
 "C:\Program Files\Java\jdk1.8.0_20\bin\javac" -classpath "C:\Program Files\Firstworks\java\sqlrelay.jar" firebird.java
 "C:\Program Files\Java\jdk1.8.0_20\bin\javac" -classpath "C:\Program Files\Firstworks\java\sqlrelay.jar" freetds.java
