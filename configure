@@ -676,7 +676,7 @@ PERL500
 POD2MAN
 XSUBPP
 PERLPREFIX
-PERLINSTALLMAN3EXT
+PERLMAN3EXT
 PERLINSTALLMAN3DIR
 PERLINC
 PERLARCHLIBEXP
@@ -31924,7 +31924,7 @@ $as_echo_n "checking for xsubpp... " >&6; }
 				PERLSITELIBCMD=`$PERL -V:sitelib`
 				PERLARCHLIBEXPCMD=`$PERL -V:archlibexp`
 				PERLINSTALLMAN3DIRCMD=`$PERL -V:installman3dir`
-				PERLINSTALLMAN3EXTCMD=`$PERL -V:man3ext`
+				PERLMAN3EXTCMD=`$PERL -V:man3ext`
 
 				PERLPREFIX=`eval "$PERLPREFIXCMD"; echo $prefix`
 				PERLLIB=`eval "$PERLLIBCMD"; echo $privlibexp`
@@ -31935,7 +31935,7 @@ $as_echo_n "checking for xsubpp... " >&6; }
 				PERLARCHLIBEXP=`eval "$PERLARCHLIBEXPCMD"; echo $archlibexp`
 				PERLINC="-I$PERLARCHLIBEXP/CORE"
 				PERLINSTALLMAN3DIR=`eval "$PERLINSTALLMAN3DIRCMD"; echo $installman3dir`
-				PERLINSTALLMAN3EXT=`eval "$PERLINSTALLMAN3EXTCMD"; echo $man3ext`
+				PERLMAN3EXT=`eval "$PERLMAN3EXTCMD"; echo $man3ext`
 			else
 				PERLFPN=`which $PERL 2> /dev/null`
 				PERLPREFIX=`dirname $PERLFPN | sed -e "s|/bin||g"`
@@ -31947,7 +31947,7 @@ $as_echo_n "checking for xsubpp... " >&6; }
 				PERLARCHLIBEXP=$PERLSITEARCH
 				PERLINC="-I$PERLARCHLIBEXP/CORE"
 				PERLINSTALLMAN3DIR=$PERLPREFIX/man/man3
-				PERLINSTALLMAN3EXT=3
+				PERLMAN3EXT=3
 				PERLREALLYOLD="-DPERLREALLYOLD"
 			fi
 			XSUBPP=$PERLLIB/ExtUtils/xsubpp
