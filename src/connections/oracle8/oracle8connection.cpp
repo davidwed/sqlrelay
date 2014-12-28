@@ -3591,16 +3591,19 @@ void oracle8cursor::closeResultSet() {
 			def[i]=NULL;
 
 			// free column resources...
-			// For some reason, it's not always safe to do this for
-			// a cursor that was bound to a result set from a
-			// stored procedure.  Sometimes it works but other
-			// times it crashes.  This could be an OCI bug.
-			// I'm not sure.  It wish I knew more about exactly
-			// when it succeeds or fails, as this leaks memory.
-			if (desc[i].paramd && !bound) {
-				OCIDescriptorFree(
-					(dvoid *)desc[i].paramd,
-					OCI_DTYPE_PARAM);
+			if (desc[i].paramd) {
+				// For some reason, it's not always safe to do
+				// this for a cursor that was bound to a result
+				// set from a stored procedure.  Sometimes it
+				// works but other times it crashes.  This could
+				// be an OCI bug.  I'm not sure.  It wish I
+				// knew more about exactly when it succeeds or
+				// fails, as this leaks memory.
+				if (!bound) {
+					OCIDescriptorFree(
+						(dvoid *)desc[i].paramd,
+						OCI_DTYPE_PARAM);
+				}
 				desc[i].paramd=NULL;
 			}
 		}
