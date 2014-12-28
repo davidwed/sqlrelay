@@ -63,6 +63,8 @@
 	the signal on semaphore 2 is now undone manually when sqlr-connections
 		shut down and doesn't rely on semaphore undo's for normal
 		operation
+	subtly tweaked freeing of Oracle column-info buffers to work around
+		a crash that could occur after using a cursor bind
 
 0.57 - fixed an overloaded virtual function error in sqlr-status
 	fixed parsing of "term as type" clauses in queries
