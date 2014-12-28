@@ -40,19 +40,23 @@ include the sqlrclientwrapper.h file.<p>
 </blockquote>
 
 <p>You'll also need to link against the sqlrclientwrapper, sqlrclient and 
-rudiments libraries.  The include file is usually found in 
+rudiments libraries.</p>
+
+<p>On Linux and Unix, the header files are usually found under
 /usr/local/firstworks/include and the libraries are usually found in 
 /usr/local/firstworks/lib.</p>
 
+<p>On Windows, the header files are usually found under C:\Program Files\Firstworks\include, the .lib files are usually found under C:\Program Files\Firstworks\lib and the .dll files are usually found under C:\Program Files\Firstworks\bin.</p>
+
 <p>The command to compile your .c file to object code will look something like
-this (assuming you're using the GNU C compiler):</p>
+this (assuming you're using the GNU C compiler on Linux or Unix):</p>
 
 <blockquote>
 gcc -I/usr/local/firstworks/include -c myprogram.c
 </blockquote>
 
 <p>The command to compile your .o file to an executable will look something like
-this (assuming you're using the GNU C++ compiler):</p>
+this (assuming you're using the GNU C++ compiler on Linux or Unix):</p>
 
 <blockquote>
 g++ -o myprogram myprogram.o -L/usr/local/firstworks/lib -lsqlrclientwrapper -lsqlrclient -lrudiments

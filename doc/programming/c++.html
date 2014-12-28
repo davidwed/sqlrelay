@@ -38,19 +38,21 @@ include the sqlrclient.h file.<p>
 </PRE>
 </blockquote>
 
-<p>You'll also need to link against the sqlrclient and rudiments libraries.
-The include file is usually found in /usr/local/firstworks/include and the
-libraries are usually found in /usr/local/firstworks/lib.</p>
+<p>You'll also need to link against the sqlrclient and rudiments libraries.</p>
+
+<p>On Linux and Unix, the header files are usually found under /usr/local/firstworks/include and the libraries are usually found in /usr/local/firstworks/lib.</p>
+
+<p>On Windows, the header files are usually found under C:\Program Files\Firstworks\include, the .lib files are usually found under C:\Program Files\Firstworks\lib and the .dll files are usually found under C:\Program Files\Firstworks\bin.</p>
 
 <p>The command to compile your .C file to object code will look something like
-this (assuming you're using GNU C++):</p>
+this (assuming you're using GNU C++ on Linux or Unix):</p>
 
 <blockquote>
 g++ -I/usr/local/firstworks/include -c myprogram.C
 </blockquote>
 
 <p>The command to compile your .o file to an executable will look something like
-this (assuming you're using GNU C++):</p>
+this (assuming you're using GNU C++ on Linux or Unix):</p>
 
 <blockquote>
 g++ -o myprogram myprogram.o -L/usr/local/firstworks/lib -lsqlrclient -lrudiments
