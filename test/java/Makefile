@@ -5,30 +5,14 @@ include ../../config.mk
 .PHONY: all clean
 
 all:
-ifneq ($(strip $(DB2LIBS)),)
 	$(MAKE) db2.class
-endif
-ifneq ($(strip $(FREETDSLIBS)),)
 	$(MAKE) freetds.class
-endif
-ifneq ($(strip $(FIREBIRDLIBS)),)
 	$(MAKE) firebird.class
-endif
-ifneq ($(strip $(MYSQLLIBS)),)
 	$(MAKE) mysql.class
-endif
-ifneq ($(strip $(ORACLELIBS)),)
 	$(MAKE) oracle.class
-endif
-ifneq ($(strip $(POSTGRESQLLIBS)),)
 	$(MAKE) postgresql.class
-endif
-ifneq ($(strip $(SQLITELIBS)),)
 	$(MAKE) sqlite.class
-endif
-ifneq ($(strip $(SYBASELIBS)),)
 	$(MAKE) sybase.class
-endif
 
 clean:
 	$(RM) *.class cachefile* sqlnet.log

@@ -13,37 +13,19 @@ LIBS = -L$(libdir) -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE)
 	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all:
-ifneq ($(strip $(DB2LIBS)),)
 	$(MAKE) db2
 	$(MAKE) db27
 	$(MAKE) db26
-endif
-ifneq ($(strip $(FREETDSLIBS)),)
 	$(MAKE) freetds
-endif
-ifneq ($(strip $(FIREBIRDLIBS)),)
 	$(MAKE) firebird
-endif
-ifneq ($(strip $(MYSQLLIBS)),)
 	$(MAKE) mysql
-endif
-ifneq ($(strip $(ORACLELIBS)),)
 	$(MAKE) oracle
 	$(MAKE) oracle8
 	$(MAKE) oracle7
-endif
-ifneq ($(strip $(POSTGRESQLLIBS)),)
 	$(MAKE) postgresql
-endif
-ifneq ($(strip $(SQLITELIBS)),)
 	$(MAKE) sqlite
-endif
-ifneq ($(strip $(SYBASELIBS)),)
 	$(MAKE) sybase
-endif
-ifneq ($(ENABLE_ROUTER)),)
 	$(MAKE) router
-endif
 
 db2: db2.cpp db2.lo
 	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ db2.lo $(LIBS)

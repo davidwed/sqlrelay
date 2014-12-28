@@ -13,30 +13,14 @@ LIBS = -L$(libdir) -lsqlrclientwrapper -lsqlrclient $(RUDIMENTSLIBS) $(LIBEFENCE
 	$(LIBTOOLGCC) --mode=compile $(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 all:
-ifneq ($(strip $(DB2LIBS)),)
 	$(MAKE) db2
-endif
-ifneq ($(strip $(FREETDSLIBS)),)
 	$(MAKE) freetds
-endif
-ifneq ($(strip $(FIREBIRDLIBS)),)
 	$(MAKE) firebird
-endif
-ifneq ($(strip $(MYSQLLIBS)),)
 	$(MAKE) mysql
-endif
-ifneq ($(strip $(ORACLELIBS)),)
 	$(MAKE) oracle
-endif
-ifneq ($(strip $(POSTGRESQLLIBS)),)
 	$(MAKE) postgresql
-endif
-ifneq ($(strip $(SQLITELIBS)),)
 	$(MAKE) sqlite
-endif
-ifneq ($(strip $(SYBASELIBS)),)
 	$(MAKE) sybase
-endif
 
 db2: db2.c db2.lo
 	$(LIBTOOLGCC) --mode=link $(CC) $(LDFLAGS) -o $@ db2.lo $(LIBS)
