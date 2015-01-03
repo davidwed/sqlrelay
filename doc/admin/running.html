@@ -13,10 +13,7 @@
 <li><a href="#cmdline">Using The Command Line Interfaces</a></li>
 <li><a href="#status">Using The Status Monitor</a></li>
 <li><a href="#problems">Common Problems</a></li>
-<li><a href="#cygwin">Cygwin Considerations</a></li>
 </ul>
-
-<p>Note: if you are using SQL Relay on Cygwin, see <a href="#cygwin">Cygwin Considerations</a> below.</p>
 
 <a name="sqlrstart"></a>
 <span class="heading2">Starting SQL Relay</span>
@@ -87,8 +84,6 @@ sqlr-import -id ID [-config CONFIGFILE] -file exportfile.xml<br>
 <p><b>sqlr-export</b> and <b>sqlr-import</b> may be used to export data from one database and import it into another database, even if the databases are dissimilar (eg. one is PostgreSQL and the other is MySQL), if the structures of the tables in both databases are compatible.</p>
 
 <p>On Windows, if you built SQL Relay natively using Visual Studio, then the command-line clients can be run from the Windows Command Line or DOS Prompt.  Adding C:\Program Files\Firstworks\bin to the PATH environment variable makes this easier, though is is not essential.  You could just change directories to C:\Program Files\Firstworks\bin and run the programs from there.</p>
-
-<p>If you built SQL Relay under Cygwin then you must use the Cygwin shell to run the command-line clients.</p>
 
 
 <a name="status"></a>
@@ -205,21 +200,6 @@ instance.</li>
 <li><p>The SQL Relay daemons also use temporary files, usually located in /usr/local/firstworks/var/sqlrelay/tmp.  That directory should have 777 permissions, but sometimes it doesn't.  The sockseq file in that directory should have 666 permissions, but sometimes it doesn't.  The files named ID and ID-CONNECTIONID owned by the user that started the connections in that directory should get removed by <b>sqlr-stop</b>, but sometimes they don't.  Sometimes <b>sqlr-stop</b> isn't even used to stop the daemons.</p></li>
 </ul>
 </ul>
-
-<a name="cygwin"></a>
-<span class="heading2">Cygwin Considerations</span>
-
-<p>If you are not running SQL Relay under Cygwin then you can skip this section.</p>
-
-<p>If you are running SQL Relay under Cygwin then you must first install the Cygwin IPC server.  SQL Relay makes extensive use of shared memory and semaphores.  The Cygwin IPC server simulates these facilities on Windows.  Install the server as a service and start it up following the instructions <a href="http://cygwin.com/cygwin-ug-net/using-cygserver.html">here</a>.
-
-<p>After installing the Cygwin IPC server, you need to add a CYGWIN environment variable.  Use the System control panel to add an environment variable called CYGWIN with the value <b>server</b>.</p>
-
-<p>Once the IPC server is running, start up the database and follow the standard instructions below for running SQL Relay.</p> 
-
-<p>Make sure to execute the instructions from within a Cygwin shell rather than from the Windows Command Line or DOS shell.  Do not ssh into your windows machine and run from SQL Relay from that shell.  When logging in over ssh, the CYGWIN environment variable get's overridden and doesn't contain <b>server</b>, preventing SQL Relay from using the Cygwin IPC server.</p>
-
-<p>Currently, there is no facility for installing SQL Relay as a service, so it must be started and stopped manually from a Cygwin shell.</p>
 
 </body>
 </html>

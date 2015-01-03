@@ -30,7 +30,7 @@
 <a name="platforms"></a>
 <span class="heading2">Supported Platforms</span>
 
-<p>All SQL Relay components should build and run on relatively modern versions of Linux, Unix or Unix-like systems including Solaris, FreeBSD, NetBSD, OpenBSD, Mac OS X, Haiku and Cygwin, though there are currently some performance and compatibility issues under Cygwin.</p>
+<p>All SQL Relay components should build and run on relatively modern versions of Linux, Unix or Unix-like systems including Solaris, FreeBSD, NetBSD, OpenBSD, Mac OS X, Haiku and Cygwin.</p>
 
 <p>x86 and x86_64 platforms are supported, as are non-x86 architectures such as ARM, Sparc, Mips, PPC and others.</p>
 
@@ -56,7 +56,7 @@
 <a target="_blank" href="http://www.erlang.org">Erlang</a>.
 </p>
 
-<p>Note that the Ruby, TCL and Erlang API's are not supported on Windows, though they may work under Cygwin.</p>
+<p>Note that the Ruby, TCL and Erlang API's are not supported natively on Windows.</p>
 
 <p>To build the API's natively on Windows, you need to install Microsoft Visual Studio or Microsoft Visual Studio Express.</p>
 
@@ -76,7 +76,7 @@
 <a target="_blank" href="http://mdbtools.sourceforge.net">MDB Tools</a> for accessing MS Access Databases.
 </p>
 
-<p>Note that the database connection components are not supported natively under Windows though some do work under Cygwin.</p>
+<p>Note that the database connection components are not supported natively under Windows.</p>
 
 
 <br>
@@ -89,7 +89,7 @@
 
 <p>You can download the most current source distribution of SQL Relay from <a target="_top" href="http://sqlrelay.sourceforge.net">sqlrelay.sourceforge.net</a>.</p>
 
-<p>For Linux, Unix or Cygwin installations, download the tar.gz file.</p>
+<p>For Linux or Unix installations, download the tar.gz file.</p>
 
 
 <a name="extracting"></a>
@@ -130,14 +130,6 @@ configure --prefix=/usr/local
 <blockquote><b>
 configure --help
 </b></blockquote>
-
-<p>There are several things to note when using Cygwin.</p>
-
-<ul>
-<li>You must use the Cygwin shell to build SQL Relay, rather than the Windows Command Line or DOS prompt.</li>
-<li>The <b>file</b> command must be present.  If it is not, the build will fail and you will get a very cryptic error.</li>
-<li>SQL Relay cannot be built against non-Cygwin dll's.  You can't, for instance, build against the Oracle, SAP/Sybase, the native Windows version of MySQL or the native Windows versions of Perl, Python, PHP, etc.  Many languages and a few databases come with Cygwin though and others can be compiled from source under Cygwin.</li>
-</ul>
 
 <a name="installing"></a>
 <span class="heading2">Installing SQL Relay</span>
