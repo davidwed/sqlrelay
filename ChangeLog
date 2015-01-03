@@ -1,3 +1,5 @@
+0.59 -
+
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d
 	removed support for undocumented ~/.sqlrelay.conf
