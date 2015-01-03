@@ -1,4 +1,4 @@
-0.59 -
+0.59 - updated docs, removed some Cygwin-specific info
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d
