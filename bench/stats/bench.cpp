@@ -4,8 +4,6 @@
 
 // for pow()
 #include <math.h>
-// for fflush and stdout
-#include <stdio.h>
 
 #include "bench.h"
 
@@ -363,7 +361,7 @@ void benchmarks::benchSelect(const char *selectquery,
 					}
 					stdoutput.printf("%d",
 						(iter+1)/(iterations/10));
-					fflush(stdout);
+					stdoutput.flush();
 					if (iter+1==iterations) {
 						stdoutput.printf("\n");
 					}

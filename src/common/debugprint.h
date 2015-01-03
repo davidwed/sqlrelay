@@ -5,15 +5,14 @@
 #define SQLDEBUGPRINT_H
 
 #include <rudiments/stdio.h>
-#include <stdio.h>
 
 //#define DEBUG_MESSAGES 1
 #ifdef DEBUG_MESSAGES
-	#define debugFunction() stdoutput.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); fflush(stdout);
+	#define debugFunction() stdoutput.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); stdoutput.flush();
 	#ifdef _MSC_VER
-		#define debugPrintf(args,...) stdoutput.printf(args,__VA_ARGS__); fflush(stdout);
+		#define debugPrintf(args,...) stdoutput.printf(args,__VA_ARGS__); stdoutput.flush();
 	#else
-		#define debugPrintf(args...) stdoutput.printf(args); fflush(stdout);
+		#define debugPrintf(args...) stdoutput.printf(args); stdoutput.flush();
 	#endif
 #else
 	#define debugFunction() /* */

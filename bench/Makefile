@@ -43,3 +43,4 @@ clean:
 	$(MAKE) -C firebird clean
 	$(MAKE) -C sybase clean
 	$(MAKE) -C sqlrelay clean
+	$(MAKE) -C stats clean

@@ -3,9 +3,9 @@
 
 #include "../../config.h"
 #include <sqlrelay/sqlrclient.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <rudiments/charstring.h>
+#include <rudiments/process.h>
+#include <rudiments/stdio.h>
 
 sqlrconnection	*con;
 sqlrcursor	*cur;
@@ -16,35 +16,35 @@ void checkSuccess(const char *value, const char *success) {
 
 	if (!success) {
 		if (!value) {
-			printf("success ");
+			stdoutput.printf("success ");
 			return;
 		} else {
-			printf("failure %s!=%s\n",value,success);
+			stdoutput.printf("failure %s!=%s\n",value,success);
 			delete cur;
 			delete con;
-			exit(0);
+			process::exit(0);
 		}
 	}
 
-	if (!strcmp(value,success)) {
-		printf("success ");
+	if (!charstring::compare(value,success)) {
+		stdoutput.printf("success ");
 	} else {
-		printf("failure %s!=%s\n",value,success);
+		stdoutput.printf("failure %s!=%s\n",value,success);
 		delete cur;
 		delete con;
-		exit(0);
+		process::exit(0);
 	}
 }
 
 void checkSuccess(int value, int success) {
 
 	if (value==success) {
-		printf("success ");
+		stdoutput.printf("success ");
 	} else {
-		printf("failure %d!=%d\n",value,success);
+		stdoutput.printf("failure %d!=%d\n",value,success);
 		delete cur;
 		delete con;
-		exit(0);
+		process::exit(0);
 	}
 }
 
@@ -70,14 +70,14 @@ int	main(int argc, char **argv) {
 	cur=new sqlrcursor(con);
 
 	// get database type
-	printf("IDENTIFY: \n");
+	stdoutput.printf("IDENTIFY: \n");
 	checkSuccess(con->identify(),"sqlite");
-	printf("\n");
+	stdoutput.printf("\n");
 
 	// ping
-	printf("PING: \n");
+	stdoutput.printf("PING: \n");
 	checkSuccess(con->ping(),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
 	// drop existing table
 	cur->sendQuery("begin transaction");
@@ -85,25 +85,25 @@ int	main(int argc, char **argv) {
 	con->commit();
 
 	// create a new table
-	printf("CREATE TEMPTABLE: \n");
+	stdoutput.printf("CREATE TEMPTABLE: \n");
 	cur->sendQuery("begin transaction");
 	checkSuccess(cur->sendQuery("create table testtable (testint int, testfloat float, testchar char(40), testvarchar varchar(40), testclob clob, testblob blob)"),1);
 	con->commit();
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("INSERT: \n");
+	stdoutput.printf("INSERT: \n");
 	cur->sendQuery("begin transaction");
 	checkSuccess(cur->sendQuery("insert into testtable values (1,1.1,'testchar1','testvarchar1','testclob1','testblob1')"),1);
 	checkSuccess(cur->sendQuery("insert into testtable values (2,2.2,'testchar2','testvarchar2','testclob2','testblob2')"),1);
 	checkSuccess(cur->sendQuery("insert into testtable values (3,3.3,'testchar3','testvarchar3','testclob3','testblob3')"),1);
 	checkSuccess(cur->sendQuery("insert into testtable values (4,4.4,'testchar4','testvarchar4','testclob4','testblob4')"),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("AFFECTED ROWS: \n");
+	stdoutput.printf("AFFECTED ROWS: \n");
 	checkSuccess(cur->affectedRows(),0);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("BIND BY NAME: \n");
+	stdoutput.printf("BIND BY NAME: \n");
 	cur->prepareQuery("insert into testtable values (:var1,:var2,:var3,:var4,:var5,:var6)");
 	checkSuccess(cur->countBindVariables(),6);
 	cur->inputBind("var1",5);
@@ -129,9 +129,9 @@ int	main(int argc, char **argv) {
 	cur->inputBindClob("var5","testclob7",9);
 	cur->inputBindBlob("var6","testblob7",9);
 	checkSuccess(cur->executeQuery(),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("BIND BY NAME WITH VALIDATION: \n");
+	stdoutput.printf("BIND BY NAME WITH VALIDATION: \n");
 	cur->clearBinds();
 	cur->inputBind("var1",8);
 	cur->inputBind("var2",8.8,4,1);
@@ -141,17 +141,17 @@ int	main(int argc, char **argv) {
 	cur->inputBindBlob("var6","testblob8",9);
 	cur->validateBinds();
 	checkSuccess(cur->executeQuery(),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("SELECT: \n");
+	stdoutput.printf("SELECT: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testint"),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("COLUMN COUNT: \n");
+	stdoutput.printf("COLUMN COUNT: \n");
 	checkSuccess(cur->colCount(),6);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("COLUMN NAMES: \n");
+	stdoutput.printf("COLUMN NAMES: \n");
 	checkSuccess(cur->getColumnName(0),"testint");
 	checkSuccess(cur->getColumnName(1),"testfloat");
 	checkSuccess(cur->getColumnName(2),"testchar");
@@ -161,9 +161,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(cols[1],"testfloat");
 	checkSuccess(cols[2],"testchar");
 	checkSuccess(cols[3],"testvarchar");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("COLUMN TYPES: \n");
+	stdoutput.printf("COLUMN TYPES: \n");
 	#ifdef HAVE_SQLITE3_STMT
 	checkSuccess(cur->getColumnType((uint32_t)0),"INTEGER");
 	checkSuccess(cur->getColumnType("testint"),"INTEGER");
@@ -191,9 +191,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType(5),"UNKNOWN");
 	checkSuccess(cur->getColumnType("testblob"),"UNKNOWN");
 	#endif
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("COLUMN LENGTH: \n");
+	stdoutput.printf("COLUMN LENGTH: \n");
 	checkSuccess(cur->getColumnLength((uint32_t)0),0);
 	checkSuccess(cur->getColumnLength("testint"),0);
 	checkSuccess(cur->getColumnLength(1),0);
@@ -206,9 +206,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnLength("testclob"),0);
 	checkSuccess(cur->getColumnLength(5),0);
 	checkSuccess(cur->getColumnLength("testblob"),0);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("LONGEST COLUMN: \n");
+	stdoutput.printf("LONGEST COLUMN: \n");
 	checkSuccess(cur->getLongest((uint32_t)0),1);
 	checkSuccess(cur->getLongest("testint"),1);
 	checkSuccess(cur->getLongest(1),3);
@@ -221,93 +221,93 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getLongest("testclob"),9);
 	checkSuccess(cur->getLongest(5),9);
 	checkSuccess(cur->getLongest("testblob"),9);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("ROW COUNT: \n");
+	stdoutput.printf("ROW COUNT: \n");
 	checkSuccess(cur->rowCount(),8);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("TOTAL ROWS: \n");
+	stdoutput.printf("TOTAL ROWS: \n");
 	#ifdef HAVE_SQLITE3_STMT
 	checkSuccess(cur->totalRows(),0);
 	#else
 	checkSuccess(cur->totalRows(),8);
 	#endif
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("FIRST ROW INDEX: \n");
+	stdoutput.printf("FIRST ROW INDEX: \n");
 	checkSuccess(cur->firstRowIndex(),0);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("END OF RESULT SET: \n");
+	stdoutput.printf("END OF RESULT SET: \n");
 	checkSuccess(cur->endOfResultSet(),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("FIELDS BY INDEX: \n");
+	stdoutput.printf("FIELDS BY INDEX: \n");
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(cur->getField(0,1),"1.1");
 	checkSuccess(cur->getField(0,2),"testchar1");
 	checkSuccess(cur->getField(0,3),"testvarchar1");
 	checkSuccess(cur->getField(0,4),"testclob1");
 	checkSuccess(cur->getField(0,5),"testblob1");
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->getField(7,(uint32_t)0),"8");
 	checkSuccess(cur->getField(7,1),"8.8");
 	checkSuccess(cur->getField(7,2),"testchar8");
 	checkSuccess(cur->getField(7,3),"testvarchar8");
 	checkSuccess(cur->getField(7,4),"testclob8");
 	checkSuccess(cur->getField(7,5),"testblob8");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("FIELD LENGTHS BY INDEX: \n");
+	stdoutput.printf("FIELD LENGTHS BY INDEX: \n");
 	checkSuccess(cur->getFieldLength(0,(uint32_t)0),1);
 	checkSuccess(cur->getFieldLength(0,1),3);
 	checkSuccess(cur->getFieldLength(0,2),9);
 	checkSuccess(cur->getFieldLength(0,3),12);
 	checkSuccess(cur->getFieldLength(0,4),9);
 	checkSuccess(cur->getFieldLength(0,5),9);
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->getFieldLength(7,(uint32_t)0),1);
 	checkSuccess(cur->getFieldLength(7,1),3);
 	checkSuccess(cur->getFieldLength(7,2),9);
 	checkSuccess(cur->getFieldLength(7,3),12);
 	checkSuccess(cur->getFieldLength(7,4),9);
 	checkSuccess(cur->getFieldLength(7,5),9);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("FIELDS BY NAME: \n");
+	stdoutput.printf("FIELDS BY NAME: \n");
 	checkSuccess(cur->getField(0,"testint"),"1");
 	checkSuccess(cur->getField(0,"testfloat"),"1.1");
 	checkSuccess(cur->getField(0,"testchar"),"testchar1");
 	checkSuccess(cur->getField(0,"testvarchar"),"testvarchar1");
 	checkSuccess(cur->getField(0,"testclob"),"testclob1");
 	checkSuccess(cur->getField(0,"testblob"),"testblob1");
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->getField(7,"testint"),"8");
 	checkSuccess(cur->getField(7,"testfloat"),"8.8");
 	checkSuccess(cur->getField(7,"testchar"),"testchar8");
 	checkSuccess(cur->getField(7,"testvarchar"),"testvarchar8");
 	checkSuccess(cur->getField(7,"testclob"),"testclob8");
 	checkSuccess(cur->getField(7,"testblob"),"testblob8");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("FIELD LENGTHS BY NAME: \n");
+	stdoutput.printf("FIELD LENGTHS BY NAME: \n");
 	checkSuccess(cur->getFieldLength(0,"testint"),1);
 	checkSuccess(cur->getFieldLength(0,"testfloat"),3);
 	checkSuccess(cur->getFieldLength(0,"testchar"),9);
 	checkSuccess(cur->getFieldLength(0,"testvarchar"),12);
 	checkSuccess(cur->getFieldLength(0,"testclob"),9);
 	checkSuccess(cur->getFieldLength(0,"testblob"),9);
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->getFieldLength(7,"testint"),1);
 	checkSuccess(cur->getFieldLength(7,"testfloat"),3);
 	checkSuccess(cur->getFieldLength(7,"testchar"),9);
 	checkSuccess(cur->getFieldLength(7,"testvarchar"),12);
 	checkSuccess(cur->getFieldLength(7,"testclob"),9);
 	checkSuccess(cur->getFieldLength(7,"testblob"),9);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("FIELDS BY ARRAY: \n");
+	stdoutput.printf("FIELDS BY ARRAY: \n");
 	fields=cur->getRow(0);
 	checkSuccess(fields[0],"1");
 	checkSuccess(fields[1],"1.1");
@@ -315,9 +315,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(fields[3],"testvarchar1");
 	checkSuccess(fields[4],"testclob1");
 	checkSuccess(fields[5],"testblob1");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("FIELD LENGTHS BY ARRAY: \n");
+	stdoutput.printf("FIELD LENGTHS BY ARRAY: \n");
 	fieldlens=cur->getRowLengths(0);
 	checkSuccess(fieldlens[0],1);
 	checkSuccess(fieldlens[1],3);
@@ -325,9 +325,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(fieldlens[3],12);
 	checkSuccess(fieldlens[4],9);
 	checkSuccess(fieldlens[5],9);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("INDIVIDUAL SUBSTITUTIONS: \n");
+	stdoutput.printf("INDIVIDUAL SUBSTITUTIONS: \n");
 	cur->sendQuery("drop table testtable1");
 	checkSuccess(cur->sendQuery("create table testtable1 (col1 int, col2 char, col3 float)"),1);
 	cur->prepareQuery("insert into testtable1 values ($(var1),'$(var2)',$(var3))");
@@ -335,62 +335,62 @@ int	main(int argc, char **argv) {
 	cur->substitution("var2","hello");
 	cur->substitution("var3",10.5556,6,4);
 	checkSuccess(cur->executeQuery(),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("FIELDS: \n");
+	stdoutput.printf("FIELDS: \n");
 	checkSuccess(cur->sendQuery("select * from testtable1"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(cur->getField(0,1),"hello");
 	checkSuccess(cur->getField(0,2),"10.5556");
 	checkSuccess(cur->sendQuery("delete from testtable1"),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("ARRAY SUBSTITUTIONS: \n");
+	stdoutput.printf("ARRAY SUBSTITUTIONS: \n");
 	cur->prepareQuery("insert into testtable1 values ('$(var1)','$(var2)','$(var3)')");
 	cur->substitutions(subvars,subvalstrings);
 	checkSuccess(cur->executeQuery(),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("FIELDS: \n");
+	stdoutput.printf("FIELDS: \n");
 	checkSuccess(cur->sendQuery("select * from testtable1"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"hi");
 	checkSuccess(cur->getField(0,1),"hello");
 	checkSuccess(cur->getField(0,2),"bye");
 	checkSuccess(cur->sendQuery("delete from testtable1"),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
 
-	printf("ARRAY SUBSTITUTIONS: \n");
+	stdoutput.printf("ARRAY SUBSTITUTIONS: \n");
 	cur->prepareQuery("insert into testtable1 values ($(var1),'$(var2)',$(var3))");
 	cur->substitutions(subvars,subvallongs);
 	checkSuccess(cur->executeQuery(),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("FIELDS: \n");
+	stdoutput.printf("FIELDS: \n");
 	checkSuccess(cur->sendQuery("select * from testtable1"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(cur->getField(0,1),"2");
 	checkSuccess(cur->getField(0,2),"3.0");
 	checkSuccess(cur->sendQuery("delete from testtable1"),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
 
-	printf("ARRAY SUBSTITUTIONS: \n");
+	stdoutput.printf("ARRAY SUBSTITUTIONS: \n");
 	cur->prepareQuery("insert into testtable1 values ($(var1),'$(var2)',$(var3))");
 	cur->substitutions(subvars,subvaldoubles,precs,scales);
 	checkSuccess(cur->executeQuery(),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("FIELDS: \n");
+	stdoutput.printf("FIELDS: \n");
 	checkSuccess(cur->sendQuery("select * from testtable1"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"10.55");
 	checkSuccess(cur->getField(0,1),"10.556");
 	checkSuccess(cur->getField(0,2),"10.5556");
 	checkSuccess(cur->sendQuery("delete from testtable1"),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
 
-	printf("NULLS as Nulls: \n");
+	stdoutput.printf("NULLS as Nulls: \n");
 	cur->getNullsAsNulls();
 	checkSuccess(cur->sendQuery("insert into testtable1 values (1,NULL,NULL)"),1);
 	checkSuccess(cur->sendQuery("select * from testtable1"),1);
@@ -403,38 +403,38 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,1),"");
 	checkSuccess(cur->getField(0,2),"");
 	cur->getNullsAsNulls();
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("RESULT SET BUFFER SIZE: \n");
+	stdoutput.printf("RESULT SET BUFFER SIZE: \n");
 	checkSuccess(cur->getResultSetBufferSize(),0);
 	cur->setResultSetBufferSize(2);
 	checkSuccess(cur->sendQuery("select * from testtable order by testint"),1);
 	checkSuccess(cur->getResultSetBufferSize(),2);
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->firstRowIndex(),0);
 	checkSuccess(cur->endOfResultSet(),0);
 	checkSuccess(cur->rowCount(),2);
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(cur->getField(1,(uint32_t)0),"2");
 	checkSuccess(cur->getField(2,(uint32_t)0),"3");
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->firstRowIndex(),2);
 	checkSuccess(cur->endOfResultSet(),0);
 	checkSuccess(cur->rowCount(),4);
 	checkSuccess(cur->getField(6,(uint32_t)0),"7");
 	checkSuccess(cur->getField(7,(uint32_t)0),"8");
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->firstRowIndex(),6);
 	checkSuccess(cur->endOfResultSet(),0);
 	checkSuccess(cur->rowCount(),8);
 	checkSuccess(cur->getField(8,(uint32_t)0),NULL);
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->firstRowIndex(),8);
 	checkSuccess(cur->endOfResultSet(),1);
 	checkSuccess(cur->rowCount(),8);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("DONT GET COLUMN INFO: \n");
+	stdoutput.printf("DONT GET COLUMN INFO: \n");
 	cur->dontGetColumnInfo();
 	checkSuccess(cur->sendQuery("select * from testtable order by testint"),1);
 	checkSuccess(cur->getColumnName(0),NULL);
@@ -449,16 +449,16 @@ int	main(int argc, char **argv) {
 	#else
 	checkSuccess(cur->getColumnType((uint32_t)0),"UNKNOWN");
 	#endif
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("SUSPENDED SESSION: \n");
+	stdoutput.printf("SUSPENDED SESSION: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testint"),1);
 	cur->suspendResultSet();
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
 	socket=strdup(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(cur->getField(1,(uint32_t)0),"2");
 	checkSuccess(cur->getField(2,(uint32_t)0),"3");
@@ -467,9 +467,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(5,(uint32_t)0),"6");
 	checkSuccess(cur->getField(6,(uint32_t)0),"7");
 	checkSuccess(cur->getField(7,(uint32_t)0),"8");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("SUSPENDED RESULT SET: \n");
+	stdoutput.printf("SUSPENDED RESULT SET: \n");
 	cur->setResultSetBufferSize(2);
 	checkSuccess(cur->sendQuery("select * from testtable order by testint"),1);
 	checkSuccess(cur->getField(2,(uint32_t)0),"3");
@@ -480,24 +480,24 @@ int	main(int argc, char **argv) {
 	socket=strdup(con->getConnectionSocket());
 	checkSuccess(con->resumeSession(port,socket),1);
 	checkSuccess(cur->resumeResultSet(id),1);
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->firstRowIndex(),4);
 	checkSuccess(cur->endOfResultSet(),0);
 	checkSuccess(cur->rowCount(),6);
 	checkSuccess(cur->getField(7,(uint32_t)0),"8");
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->firstRowIndex(),6);
 	checkSuccess(cur->endOfResultSet(),0);
 	checkSuccess(cur->rowCount(),8);
 	checkSuccess(cur->getField(8,(uint32_t)0),NULL);
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->firstRowIndex(),8);
 	checkSuccess(cur->endOfResultSet(),1);
 	checkSuccess(cur->rowCount(),8);
 	cur->setResultSetBufferSize(0);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("CACHED RESULT SET: \n");
+	stdoutput.printf("CACHED RESULT SET: \n");
 	cur->cacheToFile("cachefile1");
 	cur->setCacheTtl(200);
 	checkSuccess(cur->sendQuery("select * from testtable order by testint"),1);
@@ -507,13 +507,13 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->openCachedResultSet(filename),1);
 	checkSuccess(cur->getField(7,(uint32_t)0),"8");
 	delete[] filename;
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("COLUMN COUNT FOR CACHED RESULT SET: \n");
+	stdoutput.printf("COLUMN COUNT FOR CACHED RESULT SET: \n");
 	checkSuccess(cur->colCount(),6);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("COLUMN NAMES FOR CACHED RESULT SET: \n");
+	stdoutput.printf("COLUMN NAMES FOR CACHED RESULT SET: \n");
 	checkSuccess(cur->getColumnName(0),"testint");
 	checkSuccess(cur->getColumnName(1),"testfloat");
 	checkSuccess(cur->getColumnName(2),"testchar");
@@ -527,9 +527,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(cols[3],"testvarchar");
 	checkSuccess(cols[4],"testclob");
 	checkSuccess(cols[5],"testblob");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("CACHED RESULT SET WITH RESULT SET BUFFER SIZE: \n");
+	stdoutput.printf("CACHED RESULT SET WITH RESULT SET BUFFER SIZE: \n");
 	cur->setResultSetBufferSize(2);
 	cur->cacheToFile("cachefile1");
 	cur->setCacheTtl(200);
@@ -542,18 +542,18 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(8,(uint32_t)0),NULL);
 	cur->setResultSetBufferSize(0);
 	delete[] filename;
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("FROM ONE CACHE FILE TO ANOTHER: \n");
+	stdoutput.printf("FROM ONE CACHE FILE TO ANOTHER: \n");
 	cur->cacheToFile("cachefile2");
 	checkSuccess(cur->openCachedResultSet("cachefile1"),1);
 	cur->cacheOff();
 	checkSuccess(cur->openCachedResultSet("cachefile2"),1);
 	checkSuccess(cur->getField(7,(uint32_t)0),"8");
 	checkSuccess(cur->getField(8,(uint32_t)0),NULL);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("FROM ONE CACHE FILE TO ANOTHER WITH RESULT SET BUFFER SIZE: \n");
+	stdoutput.printf("FROM ONE CACHE FILE TO ANOTHER WITH RESULT SET BUFFER SIZE: \n");
 	cur->setResultSetBufferSize(2);
 	cur->cacheToFile("cachefile2");
 	checkSuccess(cur->openCachedResultSet("cachefile1"),1);
@@ -562,9 +562,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(7,(uint32_t)0),"8");
 	checkSuccess(cur->getField(8,(uint32_t)0),NULL);
 	cur->setResultSetBufferSize(0);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("CACHED RESULT SET WITH SUSPEND AND RESULT SET BUFFER SIZE: \n");
+	stdoutput.printf("CACHED RESULT SET WITH SUSPEND AND RESULT SET BUFFER SIZE: \n");
 	cur->setResultSetBufferSize(2);
 	cur->cacheToFile("cachefile1");
 	cur->setCacheTtl(200);
@@ -577,33 +577,33 @@ int	main(int argc, char **argv) {
 	checkSuccess(con->suspendSession(),1);
 	port=con->getConnectionPort();
 	socket=strdup(con->getConnectionSocket());
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(con->resumeSession(port,socket),1);
 	checkSuccess(cur->resumeCachedResultSet(id,filename),1);
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->firstRowIndex(),4);
 	checkSuccess(cur->endOfResultSet(),0);
 	checkSuccess(cur->rowCount(),6);
 	checkSuccess(cur->getField(7,(uint32_t)0),"8");
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->firstRowIndex(),6);
 	checkSuccess(cur->endOfResultSet(),0);
 	checkSuccess(cur->rowCount(),8);
 	checkSuccess(cur->getField(8,(uint32_t)0),NULL);
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->firstRowIndex(),8);
 	checkSuccess(cur->endOfResultSet(),1);
 	checkSuccess(cur->rowCount(),8);
 	cur->cacheOff();
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->openCachedResultSet(filename),1);
 	checkSuccess(cur->getField(7,(uint32_t)0),"8");
 	checkSuccess(cur->getField(8,(uint32_t)0),NULL);
 	cur->setResultSetBufferSize(0);
 	delete[] filename;
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("COMMIT AND ROLLBACK: \n");
+	stdoutput.printf("COMMIT AND ROLLBACK: \n");
 	secondcon=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
@@ -615,9 +615,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("insert into testtable values (10,10.1,'testchar10','testvarchar10','testclob10','testblob10')"),1);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"9");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("FINISHED SUSPENDED SESSION: \n");
+	stdoutput.printf("FINISHED SUSPENDED SESSION: \n");
 	checkSuccess(cur->sendQuery("select * from testtable"),1);
 	checkSuccess(cur->getField(4,(uint32_t)0),"5");
 	checkSuccess(cur->getField(5,(uint32_t)0),"6");
@@ -634,49 +634,49 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(5,(uint32_t)0),NULL);
 	checkSuccess(cur->getField(6,(uint32_t)0),NULL);
 	checkSuccess(cur->getField(7,(uint32_t)0),NULL);
-	printf("\n");
+	stdoutput.printf("\n");
 
 	// drop existing table
 	cur->sendQuery("drop table testtable");
 
 	// temporary tables
-	printf("TEMPORARY TABLES: \n");
+	stdoutput.printf("TEMPORARY TABLES: \n");
 	cur->sendQuery("drop table temptable\n");
 	cur->sendQuery("create temporary table temptable (col1 int)");
 	checkSuccess(cur->sendQuery("insert into temptable values (1)"),1);
 	checkSuccess(cur->sendQuery("select count(*) from temptable"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	con->endSession();
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->sendQuery("select count(*) from temptable"),0);
 	cur->sendQuery("drop table temptable\n");
-	printf("\n");
+	stdoutput.printf("\n");
 
 	// last insert row id
-	printf("LAST INSERT ROW ID: \n");
+	stdoutput.printf("LAST INSERT ROW ID: \n");
 	checkSuccess(cur->sendQuery("select last insert rowid"),1);
 	checkSuccess(cur->colCount(),1);
 	checkSuccess(cur->rowCount(),1);
 	checkSuccess(cur->getColumnName(0),"LASTINSERTROWID");
 	checkSuccess(!charstring::length(cur->getField(0,(uint32_t)0)),0);
-	printf("\n");
+	stdoutput.printf("\n");
 
 	// invalid queries...
-	printf("INVALID QUERIES: \n");
+	stdoutput.printf("INVALID QUERIES: \n");
 	checkSuccess(cur->sendQuery("select * from testtable"),0);
 	checkSuccess(cur->sendQuery("select * from testtable"),0);
 	checkSuccess(cur->sendQuery("select * from testtable"),0);
 	checkSuccess(cur->sendQuery("select * from testtable"),0);
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->sendQuery("insert into testtable values (1,2,3,4)"),0);
 	checkSuccess(cur->sendQuery("insert into testtable values (1,2,3,4)"),0);
 	checkSuccess(cur->sendQuery("insert into testtable values (1,2,3,4)"),0);
 	checkSuccess(cur->sendQuery("insert into testtable values (1,2,3,4)"),0);
-	printf("\n");
+	stdoutput.printf("\n");
 	checkSuccess(cur->sendQuery("create table testtable"),0);
 	checkSuccess(cur->sendQuery("create table testtable"),0);
 	checkSuccess(cur->sendQuery("create table testtable"),0);
 	checkSuccess(cur->sendQuery("create table testtable"),0);
-	printf("\n");
+	stdoutput.printf("\n");
 
 }
