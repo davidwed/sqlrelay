@@ -475,7 +475,7 @@ bool sybaseconnection::logIn(const char **error, const char **warning) {
 		return false;
 	}
 
-	// If the password has expired then the db will allow the login
+	// If the password has expired then the db may allow the login
 	// but every query will fail.  "ping" the db here to see if we get
 	// that error or not.
 	bool	retval=true;

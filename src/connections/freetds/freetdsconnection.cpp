@@ -536,15 +536,44 @@ bool freetdsconnection::logIn(const char **error, const char **warning) {
 		*error=logInError("Failed to connect to the database",6);
 		return false;
 	}
-	return true;
+
+	// If the password has expired then the db may allow the login
+	// but every query will fail.  "ping" the db here to see if we get
+	// that error or not.
+	bool	retval=true;
+	CS_COMMAND	*cmd;
+	if (ct_cmd_alloc(dbconn,&cmd)!=CS_SUCCEED) {
+		*error=logInError("Failed to allocate ping command",6);
+		return false;
+	}
+	if (ct_command(cmd,CS_LANG_CMD,(CS_CHAR *)"select 1",8,
+						CS_UNUSED)!=CS_SUCCEED) {
+		*error=logInError("Failed to create ping command",6);
+		return false;
+	}
+	if (ct_send(cmd)!=CS_SUCCEED) {
+		*error=logInError("Failed to send ping command",6);
+		return false;
+	}
+	CS_INT	resultstype;
+	if (ct_results(cmd,&resultstype)==CS_FAIL || resultstype==CS_CMD_FAIL) {
+		*error=logInError(NULL,6);
+		retval=false;
+	}
+	ct_cancel(NULL,cmd,CS_CANCEL_ALL);
+	ct_cmd_drop(cmd);
+
+	return retval;
 }
 
 const char *freetdsconnection::logInError(const char *error, uint16_t stage) {
 
 	loginerror.clear();
-	loginerror.append(error);
+	if (error) {
+		loginerror.append(error)->append(": ");
+	}
 	if (errorstring.getStringLength()) {
-		loginerror.append(": ")->append(errorstring.getString());
+		loginerror.append(errorstring.getString());
 	}
 
 	if (stage>5) {
