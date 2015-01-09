@@ -172,6 +172,9 @@ bool custom_sc::run(sqlrlistener *sqlrl,
 		case SQLRLOGGER_EVENTTYPE_INTERNAL_ERROR:
 			logbuffer.append("SQL Relay internal error");
 			break;
+		case SQLRLOGGER_EVENTTYPE_INTERNAL_WARNING:
+			logbuffer.append("SQL Relay internal warning");
+			break;
 		default:
 			// ignore all other events
 			return true;

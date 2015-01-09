@@ -793,7 +793,7 @@ bool sqlrservercontroller::logIn(bool printerrors) {
 			if (warning) {
 				debugstr.append(": ")->append(warning);
 			}
-			logInternalError(NULL,debugstr.getString());
+			logInternalWarning(NULL,debugstr.getString());
 		}
 	}
 
@@ -4823,6 +4823,24 @@ void sqlrservercontroller::logInternalError(sqlrservercursor *cursor,
 			SQLRLOGGER_LOGLEVEL_ERROR,
 			SQLRLOGGER_EVENTTYPE_INTERNAL_ERROR,
 			errorbuffer.getString());
+}
+
+void sqlrservercontroller::logInternalWarning(sqlrservercursor *cursor,
+							const char *info) {
+	if (!sqlrlg) {
+		return;
+	}
+	stringbuffer	warningbuffer;
+	warningbuffer.append(info);
+	if (error::getErrorNumber()) {
+		char	*error=error::getErrorString();
+		warningbuffer.append(": ")->append(error);
+		delete[] error;
+	}
+	sqlrlg->runLoggers(NULL,conn,cursor,
+			SQLRLOGGER_LOGLEVEL_WARNING,
+			SQLRLOGGER_EVENTTYPE_INTERNAL_WARNING,
+			warningbuffer.getString());
 }
 
 void sqlrservercontroller::alarmHandler(int32_t signum) {

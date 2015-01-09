@@ -271,6 +271,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 		void	logQuery(sqlrservercursor *cursor);
 		void	logInternalError(sqlrservercursor *cursor,
 							const char *info);
+		void	logInternalWarning(sqlrservercursor *cursor,
+							const char *info);
 
 
 		// cursor api...
@@ -1034,6 +1036,7 @@ enum sqlrlogger_eventtype_t {
 	SQLRLOGGER_EVENTTYPE_DB_WARNING,
 	SQLRLOGGER_EVENTTYPE_QUERY,
 	SQLRLOGGER_EVENTTYPE_INTERNAL_ERROR,
+	SQLRLOGGER_EVENTTYPE_INTERNAL_WARNING,
 	SQLRLOGGER_EVENTTYPE_DEBUG_MESSAGE
 };
 

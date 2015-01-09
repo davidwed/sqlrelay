@@ -494,7 +494,9 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 				(SQLCHAR *)password_asc,SQL_NTS);
 #endif
 	
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+	if (erg==SQL_SUCCESS_WITH_INFO) {
+		*warning=logInError(NULL);
+	} else if (erg!=SQL_SUCCESS) {
 		*error=logInError("SQLConnect failed");
 #if (ODBCVER >= 0x0300)
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
@@ -511,7 +513,9 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 const char *odbcconnection::logInError(const char *errmsg) {
 
 	errormessage.clear();
-	errormessage.append(errmsg)->append(": ");
+	if (errmsg) {
+		errormessage.append(errmsg)->append(": ");
+	}
 
 	// get the error message from db2
 	SQLCHAR		state[10];

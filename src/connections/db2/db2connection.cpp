@@ -396,7 +396,9 @@ bool db2connection::logIn(const char **error, const char **warning) {
 	erg=SQLConnect(dbc,(SQLCHAR *)server,SQL_NTS,
 				(SQLCHAR *)cont->getUser(),SQL_NTS,
 				(SQLCHAR *)cont->getPassword(),SQL_NTS);
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+	if (erg==SQL_SUCCESS_WITH_INFO) {
+		*warning=logInError(NULL);
+	} else if (erg!=SQL_SUCCESS) {
 		*error=logInError("SQLConnect failed");
 		SQLFreeHandle(SQL_HANDLE_DBC,dbc);
 		SQLFreeHandle(SQL_HANDLE_ENV,env);
@@ -411,7 +413,9 @@ bool db2connection::logIn(const char **error, const char **warning) {
 const char *db2connection::logInError(const char *errmsg) {
 
 	errormessage.clear();
-	errormessage.append(errmsg)->append(": ");
+	if (errmsg) {
+		errormessage.append(errmsg)->append(": ");
+	}
 
 	// get the error message from db2
 	SQLCHAR		state[10];
