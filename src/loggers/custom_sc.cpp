@@ -111,8 +111,9 @@ bool custom_sc::run(sqlrlistener *sqlrl,
 	logbuffer.append(datebuffer)->append(' ');
 
 	// append the event type and log level
-	// (except for db errors which are handled specially)
-	if (event!=SQLRLOGGER_EVENTTYPE_DB_ERROR) {
+	// (except for db errors/warnings which are handled specially)
+	if (event!=SQLRLOGGER_EVENTTYPE_DB_ERROR &&
+		event!=SQLRLOGGER_EVENTTYPE_DB_WARNING) {
 		logbuffer.append(eventType(event))->append(' ');
 		logbuffer.append(logLevel(level))->append(": ");
 	}
@@ -154,6 +155,7 @@ bool custom_sc::run(sqlrlistener *sqlrl,
 			logbuffer.append(sqlrcon->cont->dbIpAddress());
 			break;
 		case SQLRLOGGER_EVENTTYPE_DB_ERROR:
+		case SQLRLOGGER_EVENTTYPE_DB_WARNING:
 			{
 			const char	*colon=charstring::findFirst(info,':');
 			if (colon) {
@@ -176,8 +178,10 @@ bool custom_sc::run(sqlrlistener *sqlrl,
 	}
 
 	// append info, if there was any
-	// (except for db errors which are handled specially)
-	if (charstring::length(info) && event!=SQLRLOGGER_EVENTTYPE_DB_ERROR) {
+	// (except for db errors/warnings which are handled specially)
+	if (charstring::length(info) &&
+		(event!=SQLRLOGGER_EVENTTYPE_DB_ERROR &&
+		event!=SQLRLOGGER_EVENTTYPE_DB_WARNING)) {
 		logbuffer.append(": ");
 		logbuffer.append(info);
 	}

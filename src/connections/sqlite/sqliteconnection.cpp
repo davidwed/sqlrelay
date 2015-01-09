@@ -38,7 +38,7 @@ class sqliteconnection : public sqlrserverconnection {
 				~sqliteconnection();
 	private:
 		void		handleConnectString();
-		bool		logIn(const char **error);
+		bool		logIn(const char **error, const char **warning);
 		sqlrservercursor	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrservercursor *curs);
 		void		logOut();
@@ -178,7 +178,7 @@ void sqliteconnection::handleConnectString() {
 	db=cont->getConnectStringValue("db");
 }
 
-bool sqliteconnection::logIn(const char **error) {
+bool sqliteconnection::logIn(const char **error, const char **warning) {
 #ifdef SQLITE_TRANSACTIONAL
 	#ifdef SQLITE3
 		if (sqlite3_open(db,&sqliteptr)==SQLITE_OK) {

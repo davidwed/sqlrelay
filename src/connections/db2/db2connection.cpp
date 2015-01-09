@@ -220,7 +220,7 @@ class db2connection : public sqlrserverconnection {
 	private:
 		void	handleConnectString();
 		bool	mustDetachBeforeLogIn();
-		bool	logIn(const char **error);
+		bool	logIn(const char **error, const char **warning);
 		const char	*logInError(const char *errmsg);
 		void	dbVersionSpecificTasks();
 		sqlrservercursor	*newCursor(uint16_t id);
@@ -350,7 +350,7 @@ bool db2connection::mustDetachBeforeLogIn() {
 	#endif
 }
 
-bool db2connection::logIn(const char **error) {
+bool db2connection::logIn(const char **error, const char **warning) {
 
 	// set the LANG environment variable
 	if (charstring::length(lang) && !environment::setValue("LANG",lang)) {

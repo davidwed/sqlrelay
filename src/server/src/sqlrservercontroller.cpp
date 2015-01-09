@@ -762,7 +762,8 @@ bool sqlrservercontroller::logIn(bool printerrors) {
 
 	// attempt to log in
 	const char	*err=NULL;
-	if (!conn->logIn(&err)) {
+	const char	*warning=NULL;
+	if (!conn->logIn(&err,&warning)) {
 		if (printerrors) {
 			stderror.printf("Couldn't log into database.\n");
 			if (err) {
@@ -778,6 +779,22 @@ bool sqlrservercontroller::logIn(bool printerrors) {
 			logInternalError(NULL,debugstr.getString());
 		}
 		return false;
+	}
+	if (warning) {
+		if (printerrors) {
+			stderror.printf("Warning logging into database.\n");
+			if (warning) {
+				stderror.printf("%s\n",warning);
+			}
+		}
+		if (sqlrlg) {
+			debugstr.clear();
+			debugstr.append("database login warning");
+			if (warning) {
+				debugstr.append(": ")->append(warning);
+			}
+			logInternalError(NULL,debugstr.getString());
+		}
 	}
 
 	// success... update stats
@@ -4758,13 +4775,25 @@ void sqlrservercontroller::logDbLogOut() {
 			NULL);
 }
 
-void sqlrservercontroller::logDbError(sqlrservercursor *cursor, const char *info) {
+void sqlrservercontroller::logDbError(sqlrservercursor *cursor,
+						const char *info) {
 	if (!sqlrlg) {
 		return;
 	}
 	sqlrlg->runLoggers(NULL,conn,cursor,
 			SQLRLOGGER_LOGLEVEL_ERROR,
 			SQLRLOGGER_EVENTTYPE_DB_ERROR,
+			info);
+}
+
+void sqlrservercontroller::logDbWarning(sqlrservercursor *cursor,
+						const char *info) {
+	if (!sqlrlg) {
+		return;
+	}
+	sqlrlg->runLoggers(NULL,conn,cursor,
+			SQLRLOGGER_LOGLEVEL_WARNING,
+			SQLRLOGGER_EVENTTYPE_DB_WARNING,
 			info);
 }
 

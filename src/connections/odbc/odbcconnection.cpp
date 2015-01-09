@@ -201,7 +201,7 @@ class odbcconnection : public sqlrserverconnection {
 			odbcconnection(sqlrservercontroller *cont);
 	private:
 		void		handleConnectString();
-		bool		logIn(const char **error);
+		bool		logIn(const char **error, const char **warning);
 		const char	*logInError(const char *errmsg);
 		sqlrservercursor	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrservercursor *curs);
@@ -416,7 +416,7 @@ void odbcconnection::handleConnectString() {
 	}
 }
 
-bool odbcconnection::logIn(const char **error) {
+bool odbcconnection::logIn(const char **error, const char **warning) {
 
 	// allocate environment handle
 #if (ODBCVER >= 0x0300)

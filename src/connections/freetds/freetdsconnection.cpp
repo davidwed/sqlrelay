@@ -247,7 +247,7 @@ class freetdsconnection : public sqlrserverconnection {
 			~freetdsconnection();
 	private:
 		void	handleConnectString();
-		bool	logIn(const char **error);
+		bool	logIn(const char **error, const char **warning);
 		const char	*logInError(const char *error, uint16_t stage);
 		sqlrservercursor	*newCursor(uint16_t id);
 		void	deleteCursor(sqlrservercursor *curs);
@@ -369,7 +369,7 @@ void freetdsconnection::handleConnectString() {
 	}
 }
 
-bool freetdsconnection::logIn(const char **error) {
+bool freetdsconnection::logIn(const char **error, const char **warning) {
 
 	// set sybase
 	if (sybase && sybase[0] && !environment::setValue("SYBASE",sybase)) {

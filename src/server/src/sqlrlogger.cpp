@@ -37,6 +37,7 @@ static const char *eventtypes[]={
 	"DB_LOGIN",
 	"DB_LOGOUT",
 	"DB_ERROR",
+	"DB_WARNING",
 	"QUERY",
 	"INTERNAL_ERROR",
 	"DEBUG_MESSAGE"

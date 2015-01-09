@@ -156,7 +156,7 @@ class mysqlconnection : public sqlrserverconnection {
 				~mysqlconnection();
 	private:
 		void		handleConnectString();
-		bool		logIn(const char **error);
+		bool		logIn(const char **error, const char **warning);
 #ifdef HAVE_MYSQL_CHANGE_USER
 		bool		changeUser(const char *newuser,
 						const char *newpassword);
@@ -269,7 +269,7 @@ void mysqlconnection::handleConnectString() {
 			cont->getConnectStringValue("ignorespace"),"yes");
 }
 
-bool mysqlconnection::logIn(const char **error) {
+bool mysqlconnection::logIn(const char **error, const char **warning) {
 
 	// Handle host.
 	// For really old versions of mysql, a NULL host indicates that the

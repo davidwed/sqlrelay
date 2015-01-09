@@ -89,7 +89,7 @@ class SQLRSERVER_DLLSPEC oracle8connection : public sqlrserverconnection {
 #ifdef HAVE_ORACLE_8i
 		bool		tempTableDropReLogIn();
 #endif
-		bool		logIn(const char **error);
+		bool		logIn(const char **error, const char **warning);
 		const char	*logInError(const char *errmsg);
 		sqlrservercursor	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrservercursor *curs);
@@ -548,7 +548,7 @@ bool oracle8connection::tempTableDropReLogIn() {
 }
 #endif
 
-bool oracle8connection::logIn(const char **error) {
+bool oracle8connection::logIn(const char **error, const char **warning) {
 
 	// get user/password
 	const char	*user=cont->getUser();
@@ -751,7 +751,12 @@ bool oracle8connection::logIn(const char **error) {
 #endif
 
 	// begin the session
-	if (OCISessionBegin(svc,err,session,cred,mode)!=OCI_SUCCESS) {
+	sword	result=OCISessionBegin(svc,err,session,cred,mode);
+	if (result==OCI_SUCCESS_WITH_INFO) {
+		// This can happen if the password will expire soon,
+		// or possibly for other reasons.
+		*warning=logInError(NULL); 
+	} else if (result!=OCI_SUCCESS) {
 		*error=logInError("OCISessionBegin() failed");
 		OCIHandleFree(err,OCI_HTYPE_SESSION);
 		OCIServerDetach(srv,err,OCI_DEFAULT);
@@ -940,7 +945,9 @@ bool oracle8connection::logIn(const char **error) {
 const char *oracle8connection::logInError(const char *errmsg) {
 
 	errormessage.clear();
-	errormessage.append(errmsg)->append(": ");
+	if (errmsg) {
+		errormessage.append(errmsg)->append(": ");
+	}
 
 	// get the error message from oracle
 	text	message[1024];

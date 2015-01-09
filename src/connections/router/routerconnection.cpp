@@ -49,7 +49,7 @@ class routerconnection : public sqlrserverconnection {
 	private:
 		bool		supportsAuthOnDatabase();
 		void		handleConnectString();
-		bool		logIn(const char **error);
+		bool		logIn(const char **error, const char **warning);
 		sqlrservercursor	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrservercursor *curs);
 		void		logOut();
@@ -327,7 +327,7 @@ void routerconnection::handleConnectString() {
 	}
 }
 
-bool routerconnection::logIn(const char **error) {
+bool routerconnection::logIn(const char **error, const char **warning) {
 	justloggedin=true;
 	return true;
 }

@@ -211,7 +211,7 @@ class firebirdconnection : public sqlrserverconnection {
 			~firebirdconnection();
 	private:
 		void	handleConnectString();
-		bool	logIn(const char **error);
+		bool	logIn(const char **error, const char **warning);
 		sqlrservercursor	*newCursor(uint16_t id);
 		void	deleteCursor(sqlrservercursor *curs);
 		void	logOut();
@@ -333,7 +333,7 @@ void firebirdconnection::handleConnectString() {
 	}
 }
 
-bool firebirdconnection::logIn(const char **err) {
+bool firebirdconnection::logIn(const char **err, const char **warning) {
 
 	// initialize a parameter buffer
 	char	*dpbptr=dpb;

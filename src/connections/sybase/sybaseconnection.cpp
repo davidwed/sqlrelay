@@ -27,7 +27,7 @@ class sybaseconnection : public sqlrserverconnection {
 			~sybaseconnection();
 	private:
 		void		handleConnectString();
-		bool		logIn(const char **error);
+		bool		logIn(const char **error, const char **warning);
 		const char	*logInError(const char *error, uint16_t stage);
 		sqlrservercursor	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrservercursor *curs);
@@ -302,7 +302,7 @@ void sybaseconnection::handleConnectString() {
 	}
 }
 
-bool sybaseconnection::logIn(const char **error) {
+bool sybaseconnection::logIn(const char **error, const char **warning) {
 
 	// set sybase
 	if (sybase && sybase[0] && !environment::setValue("SYBASE",sybase)) {

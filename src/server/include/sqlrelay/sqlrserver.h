@@ -264,7 +264,10 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller : public listener {
 							ssize_t result);
 		void	logDbLogIn();
 		void	logDbLogOut();
-		void	logDbError(sqlrservercursor *cursor, const char *info);
+		void	logDbError(sqlrservercursor *cursor,
+							const char *info);
+		void	logDbWarning(sqlrservercursor *cursor,
+							const char *info);
 		void	logQuery(sqlrservercursor *cursor);
 		void	logInternalError(sqlrservercursor *cursor,
 							const char *info);
@@ -554,7 +557,8 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual bool	supportsAuthOnDatabase();
 		virtual	void	handleConnectString()=0;
 
-		virtual	bool	logIn(const char **error)=0;
+		virtual	bool	logIn(const char **error,
+					const char **warning)=0;
 		virtual	void	logOut()=0;
 
 		virtual	bool	changeUser(const char *newuser,
@@ -1027,6 +1031,7 @@ enum sqlrlogger_eventtype_t {
 	SQLRLOGGER_EVENTTYPE_DB_LOGIN,
 	SQLRLOGGER_EVENTTYPE_DB_LOGOUT,
 	SQLRLOGGER_EVENTTYPE_DB_ERROR,
+	SQLRLOGGER_EVENTTYPE_DB_WARNING,
 	SQLRLOGGER_EVENTTYPE_QUERY,
 	SQLRLOGGER_EVENTTYPE_INTERNAL_ERROR,
 	SQLRLOGGER_EVENTTYPE_DEBUG_MESSAGE

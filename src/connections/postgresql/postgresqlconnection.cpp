@@ -20,7 +20,7 @@ class postgresqlconnection : public sqlrserverconnection {
 			~postgresqlconnection();
 	private:
 		void		handleConnectString();
-		bool		logIn(const char **error);
+		bool		logIn(const char **error, const char **warning);
 		const char	*logInError(const char *errmsg);
 		sqlrservercursor	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrservercursor *curs);
@@ -227,7 +227,7 @@ void postgresqlconnection::handleConnectString() {
 	}
 }
 
-bool postgresqlconnection::logIn(const char **error) {
+bool postgresqlconnection::logIn(const char **error, const char **warning) {
 
 	// initialize the datatype storage buffers
 	if (typemangling==2) {
