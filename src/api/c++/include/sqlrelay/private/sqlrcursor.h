@@ -127,14 +127,14 @@
 		bool		reexecute;
 
 		// substitution variables
-		bindvar		subvars[MAXVAR];
+		bindvar		subvars[OPTIMISTIC_BIND_COUNT];
 		int16_t		subcount;
 		bool		dirtysubs;
 
 		// bind variables
-		bindvar		inbindvars[MAXVAR];
+		bindvar		inbindvars[OPTIMISTIC_BIND_COUNT];
 		uint16_t	inbindcount;
-		bindvar		outbindvars[MAXVAR];
+		bindvar		outbindvars[OPTIMISTIC_BIND_COUNT];
 		uint16_t	outbindcount;
 		bool		validatebinds;
 		bool		dirtybinds;

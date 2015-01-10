@@ -844,7 +844,7 @@ void sqlrcursor::clearVariables() {
 void sqlrcursor::initVariables() {
 
 	// initialize the bind and substitution variables
-	for (int16_t i=0; i<MAXVAR; i++) {
+	for (int16_t i=0; i<OPTIMISTIC_BIND_COUNT; i++) {
 		subvars[i].variable=NULL;
 		subvars[i].value.stringval=NULL;
 		subvars[i].type=BINDVARTYPE_STRING;
@@ -863,7 +863,7 @@ void sqlrcursor::deleteVariables() {
 
 	// if we were copying values, delete them
 	if (copyrefs) {
-		for (int16_t i=0; i<MAXVAR; i++) {
+		for (int16_t i=0; i<OPTIMISTIC_BIND_COUNT; i++) {
 			delete[] inbindvars[i].variable;
 			if (inbindvars[i].type==BINDVARTYPE_STRING) {
 				delete[] inbindvars[i].value.stringval;
@@ -884,7 +884,7 @@ void sqlrcursor::deleteVariables() {
 	}
 
 	// output binds are deleted no matter what
-	for (int16_t i=0; i<MAXVAR; i++) {
+	for (int16_t i=0; i<OPTIMISTIC_BIND_COUNT; i++) {
 		if (outbindvars[i].type==BINDVARTYPE_STRING) {
 			delete[] outbindvars[i].value.stringval;
 		}
@@ -901,7 +901,7 @@ void sqlrcursor::substitution(const char *variable, const char *value) {
 	}
 	bindvar	*bv=findVar(variable,subvars,subcount);
 	if (!bv) {
-		if (subcount>=MAXVAR) {
+		if (subcount>=OPTIMISTIC_BIND_COUNT) {
 			return;
 		}
 		bv=&subvars[subcount];
@@ -917,7 +917,7 @@ void sqlrcursor::substitution(const char *variable, int64_t value) {
 	}
 	bindvar	*bv=findVar(variable,subvars,subcount);
 	if (!bv) {
-		if (subcount>=MAXVAR) {
+		if (subcount>=OPTIMISTIC_BIND_COUNT) {
 			return;
 		}
 		bv=&subvars[subcount];
@@ -934,7 +934,7 @@ void sqlrcursor::substitution(const char *variable, double value,
 	}
 	bindvar	*bv=findVar(variable,subvars,subcount);
 	if (!bv) {
-		if (subcount>=MAXVAR) {
+		if (subcount>=OPTIMISTIC_BIND_COUNT) {
 			return;
 		}
 		bv=&subvars[subcount];
@@ -956,7 +956,7 @@ void sqlrcursor::inputBindBlob(const char *variable, const char *value,
 	}
 	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
 	if (!bv) {
-		if (inbindcount>=MAXVAR) {
+		if (inbindcount>=OPTIMISTIC_BIND_COUNT) {
 			return;
 		}
 		bv=&inbindvars[inbindcount];
@@ -974,7 +974,7 @@ void sqlrcursor::inputBindClob(const char *variable, const char *value,
 	}
 	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
 	if (!bv) {
-		if (inbindcount>=MAXVAR) {
+		if (inbindcount>=OPTIMISTIC_BIND_COUNT) {
 			return;
 		}
 		bv=&inbindvars[inbindcount];
@@ -991,7 +991,7 @@ void sqlrcursor::inputBind(const char *variable, const char *value) {
 	}
 	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
 	if (!bv) {
-		if (inbindcount>=MAXVAR) {
+		if (inbindcount>=OPTIMISTIC_BIND_COUNT) {
 			return;
 		}
 		bv=&inbindvars[inbindcount];
@@ -1009,7 +1009,7 @@ void sqlrcursor::inputBind(const char *variable, const char *value,
 	}
 	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
 	if (!bv) {
-		if (inbindcount>=MAXVAR) {
+		if (inbindcount>=OPTIMISTIC_BIND_COUNT) {
 			return;
 		}
 		bv=&inbindvars[inbindcount];
@@ -1026,7 +1026,7 @@ void sqlrcursor::inputBind(const char *variable, int64_t value) {
 	}
 	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
 	if (!bv) {
-		if (inbindcount>=MAXVAR) {
+		if (inbindcount>=OPTIMISTIC_BIND_COUNT) {
 			return;
 		}
 		bv=&inbindvars[inbindcount];
@@ -1044,7 +1044,7 @@ void sqlrcursor::inputBind(const char *variable, double value,
 	}
 	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
 	if (!bv) {
-		if (inbindcount>=MAXVAR) {
+		if (inbindcount>=OPTIMISTIC_BIND_COUNT) {
 			return;
 		}
 		bv=&inbindvars[inbindcount];
@@ -1064,7 +1064,7 @@ void sqlrcursor::inputBind(const char *variable,
 	}
 	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
 	if (!bv) {
-		if (inbindcount>=MAXVAR) {
+		if (inbindcount>=OPTIMISTIC_BIND_COUNT) {
 			return;
 		}
 		bv=&inbindvars[inbindcount];
@@ -1271,7 +1271,7 @@ void sqlrcursor::defineOutputBindGeneric(const char *variable,
 
 	bindvar	*bv=findVar(variable,outbindvars,outbindcount);
 	if (!bv) {
-		if (outbindcount>=MAXVAR) {
+		if (outbindcount>=OPTIMISTIC_BIND_COUNT) {
 			return;
 		}
 		bv=&outbindvars[outbindcount];

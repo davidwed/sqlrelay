@@ -1,11 +1,12 @@
 // Copyright (c) 1999-2001  David Muse
 // See the COPYING file for more information.
 
-#define MAXVAR 256
-
 #ifndef MAXPATHLEN
 	#define MAXPATHLEN 256
 #endif
+
+// we're optimistic that the average query will contain 256 bind variables
+#define OPTIMISTIC_BIND_COUNT 256
 
 // we're optimistic that the average query will contain 15 columns whose names
 // average 10 characters in length
