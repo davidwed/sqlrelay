@@ -1269,19 +1269,16 @@ void sqlrcursor::defineOutputBindGeneric(const char *variable,
 		dirtybinds=true;
 	}
 
-	// clean up old values
+	// clean up old values and set new values
 	if (preexisting) {
 		if (bv->type==BINDVARTYPE_STRING) {
 			delete[] bv->value.stringval;
-			bv->value.stringval=NULL;
 		} else if (bv->type==BINDVARTYPE_BLOB ||
 				bv->type==BINDVARTYPE_CLOB) {
 			delete[] bv->value.lobval;
-			bv->value.lobval=NULL;
 		}
 	}
 	if (copyrefs) {
-		// clean up old variable and set new variable
 		if (preexisting) {
 			delete[] bv->variable;
 		}
@@ -1290,6 +1287,11 @@ void sqlrcursor::defineOutputBindGeneric(const char *variable,
 		bv->variable=(char *)variable;
 	}
 	bv->type=type;
+	if (bv->type==BINDVARTYPE_STRING) {
+		bv->value.stringval=NULL;
+	} else if (bv->type==BINDVARTYPE_BLOB || bv->type==BINDVARTYPE_CLOB) {
+		bv->value.lobval=NULL;
+	}
 	bv->valuesize=valuesize;
 	bv->resultvaluesize=0;
 	bv->send=true;
@@ -2829,13 +2831,16 @@ bool sqlrcursor::parseOutputBinds() {
 					(*outbindvars)[count].value.
 							stringval[0]='\0';
 				}
-			} else if ((*outbindvars)[count].type==BINDVARTYPE_INTEGER) {
+			} else if ((*outbindvars)[count].type==
+						BINDVARTYPE_INTEGER) {
 				(*outbindvars)[count].value.integerval=0;
-			} else if ((*outbindvars)[count].type==BINDVARTYPE_DOUBLE) {
+			} else if ((*outbindvars)[count].type==
+						BINDVARTYPE_DOUBLE) {
 				(*outbindvars)[count].value.doubleval.value=0;
 				(*outbindvars)[count].value.doubleval.precision=0;
 				(*outbindvars)[count].value.doubleval.scale=0;
-			} else if ((*outbindvars)[count].type==BINDVARTYPE_DATE) {
+			} else if ((*outbindvars)[count].type==
+						BINDVARTYPE_DATE) {
 				(*outbindvars)[count].value.dateval.year=0;
 				(*outbindvars)[count].value.dateval.month=0;
 				(*outbindvars)[count].value.dateval.day=0;
