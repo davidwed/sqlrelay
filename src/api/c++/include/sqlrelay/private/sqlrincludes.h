@@ -4,6 +4,7 @@
 
 #include <rudiments/inetsocketclient.h>
 #include <rudiments/unixsocketclient.h>
+#include <rudiments/dynamicarray.h>
 #include <rudiments/memorypool.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/file.h>

@@ -13,6 +13,9 @@
 #define NEED_DATATYPESTRING
 #include <datatypes.h>
 
+// we're optimistic that the average query will contain 16 bind variables
+#define OPTIMISTIC_BIND_COUNT 16
+
 sqlrcursor::sqlrcursor(sqlrconnection *sqlrc, bool copyreferences) {
 	init(sqlrc,copyreferences);
 }
@@ -97,8 +100,10 @@ void sqlrcursor::init(sqlrconnection *sqlrc, bool copyreferences) {
 	havecursorid=false;
 
 	// initialize all bind/substitution-related variables
+	subvars=new dynamicarray<bindvar>(OPTIMISTIC_BIND_COUNT,16);
+	inbindvars=new dynamicarray<bindvar>(OPTIMISTIC_BIND_COUNT,16);
+	outbindvars=new dynamicarray<bindvar>(OPTIMISTIC_BIND_COUNT,16);
 	clearVariables();
-	initVariables();
 }
 
 sqlrcursor::~sqlrcursor() {
@@ -110,6 +115,9 @@ sqlrcursor::~sqlrcursor() {
 
 	// deallocate copied references
 	deleteVariables();
+	delete outbindvars;
+	delete inbindvars;
+	delete subvars;
 
 	// deallocate the query buffer
 	delete[] querybuffer;
@@ -398,27 +406,27 @@ void sqlrcursor::cacheOutputBinds(uint32_t count) {
 	uint16_t	len;
 	for (uint32_t i=0; i<count; i++) {
 
-		cachedest->write((uint16_t)outbindvars[i].type);
+		cachedest->write((uint16_t)(*outbindvars)[i].type);
 
-		len=charstring::length(outbindvars[i].variable);
+		len=charstring::length((*outbindvars)[i].variable);
 		cachedest->write(len);
-		cachedest->write(outbindvars[i].variable,len);
+		cachedest->write((*outbindvars)[i].variable,len);
 
-		len=outbindvars[i].resultvaluesize;
+		len=(*outbindvars)[i].resultvaluesize;
 		cachedest->write(len);
-		if (outbindvars[i].type==BINDVARTYPE_STRING ||
-				outbindvars[i].type==BINDVARTYPE_BLOB ||
-				outbindvars[i].type==BINDVARTYPE_CLOB) {
-			cachedest->write(outbindvars[i].value.stringval,len);
-			cachedest->write(outbindvars[i].value.lobval,len);
-		} else if (outbindvars[i].type==BINDVARTYPE_INTEGER) {
-			cachedest->write(outbindvars[i].value.integerval);
-		} else if (outbindvars[i].type==BINDVARTYPE_DOUBLE) {
-			cachedest->write(outbindvars[i].value.
+		if ((*outbindvars)[i].type==BINDVARTYPE_STRING ||
+				(*outbindvars)[i].type==BINDVARTYPE_BLOB ||
+				(*outbindvars)[i].type==BINDVARTYPE_CLOB) {
+			cachedest->write((*outbindvars)[i].value.stringval,len);
+			cachedest->write((*outbindvars)[i].value.lobval,len);
+		} else if ((*outbindvars)[i].type==BINDVARTYPE_INTEGER) {
+			cachedest->write((*outbindvars)[i].value.integerval);
+		} else if ((*outbindvars)[i].type==BINDVARTYPE_DOUBLE) {
+			cachedest->write((*outbindvars)[i].value.
 						doubleval.value);
-			cachedest->write(outbindvars[i].value.
+			cachedest->write((*outbindvars)[i].value.
 						doubleval.precision);
-			cachedest->write(outbindvars[i].value.
+			cachedest->write((*outbindvars)[i].value.
 						doubleval.scale);
 		}
 	}
@@ -833,64 +841,62 @@ uint16_t sqlrcursor::countBindVariables() const {
 
 void sqlrcursor::clearVariables() {
 
-	// setting the bind/substitution variable 
-	// counts to 0 effectively clears them
-	subcount=0;
+	deleteSubstitutionVariables();
+	subvars->clear();
 	dirtysubs=false;
 	dirtybinds=false;
 	clearBinds();
 }
 
-void sqlrcursor::initVariables() {
+void sqlrcursor::deleteVariables() {
+	deleteSubstitutionVariables();
+	deleteInputBindVariables();
+	deleteOutputBindVariables();
+}
 
-	// initialize the bind and substitution variables
-	for (int16_t i=0; i<OPTIMISTIC_BIND_COUNT; i++) {
-		subvars[i].variable=NULL;
-		subvars[i].value.stringval=NULL;
-		subvars[i].type=BINDVARTYPE_STRING;
-		subvars[i].substituted=false;
-		subvars[i].donesubstituting=false;
-		inbindvars[i].variable=NULL;
-		inbindvars[i].value.stringval=NULL;
-		inbindvars[i].type=BINDVARTYPE_STRING;
-		outbindvars[i].variable=NULL;
-		outbindvars[i].value.stringval=NULL;
-		outbindvars[i].type=BINDVARTYPE_STRING;
+void sqlrcursor::deleteSubstitutionVariables() {
+
+	if (copyrefs) {
+		for (uint64_t i=0; i<subvars->getLength(); i++) {
+			delete[] (*subvars)[i].variable;
+			if ((*subvars)[i].type==BINDVARTYPE_STRING) {
+				delete[] (*subvars)[i].value.stringval;
+			}
+			if ((*subvars)[i].type==BINDVARTYPE_DATE) {
+				delete[] (*subvars)[i].value.dateval.tz;
+			}
+		}
 	}
 }
 
-void sqlrcursor::deleteVariables() {
+void sqlrcursor::deleteInputBindVariables() {
 
-	// if we were copying values, delete them
 	if (copyrefs) {
-		for (int16_t i=0; i<OPTIMISTIC_BIND_COUNT; i++) {
-			delete[] inbindvars[i].variable;
-			if (inbindvars[i].type==BINDVARTYPE_STRING) {
-				delete[] inbindvars[i].value.stringval;
+		for (uint64_t i=0; i<inbindvars->getLength(); i++) {
+			delete[] (*inbindvars)[i].variable;
+			if ((*inbindvars)[i].type==BINDVARTYPE_STRING) {
+				delete[] (*inbindvars)[i].value.stringval;
 			}
-			if (inbindvars[i].type==BINDVARTYPE_BLOB ||
-				inbindvars[i].type==BINDVARTYPE_CLOB) {
-				delete[] inbindvars[i].value.lobval;
-			}
-			delete[] outbindvars[i].variable;
-			delete[] subvars[i].variable;
-			if (subvars[i].type==BINDVARTYPE_STRING) {
-				delete[] subvars[i].value.stringval;
-			}
-			if (subvars[i].type==BINDVARTYPE_DATE) {
-				delete[] subvars[i].value.dateval.tz;
+			if ((*inbindvars)[i].type==BINDVARTYPE_BLOB ||
+				(*inbindvars)[i].type==BINDVARTYPE_CLOB) {
+				delete[] (*inbindvars)[i].value.lobval;
 			}
 		}
 	}
+}
 
-	// output binds are deleted no matter what
-	for (int16_t i=0; i<OPTIMISTIC_BIND_COUNT; i++) {
-		if (outbindvars[i].type==BINDVARTYPE_STRING) {
-			delete[] outbindvars[i].value.stringval;
+void sqlrcursor::deleteOutputBindVariables() {
+
+	for (uint64_t i=0; i<outbindvars->getLength(); i++) {
+		if (copyrefs) {
+			delete[] (*outbindvars)[i].variable;
 		}
-		if (outbindvars[i].type==BINDVARTYPE_BLOB ||
-			outbindvars[i].type==BINDVARTYPE_CLOB) {
-			delete[] outbindvars[i].value.lobval;
+		if ((*outbindvars)[i].type==BINDVARTYPE_STRING) {
+			delete[] (*outbindvars)[i].value.stringval;
+		}
+		if ((*outbindvars)[i].type==BINDVARTYPE_BLOB ||
+			(*outbindvars)[i].type==BINDVARTYPE_CLOB) {
+			delete[] (*outbindvars)[i].value.lobval;
 		}
 	}
 }
@@ -899,14 +905,13 @@ void sqlrcursor::substitution(const char *variable, const char *value) {
 	if (!variable || !variable[0]) {
 		return;
 	}
-	bindvar	*bv=findVar(variable,subvars,subcount);
+	bool	preexisting=true;
+	bindvar	*bv=findVar(variable,subvars);
 	if (!bv) {
-		if (subcount>=OPTIMISTIC_BIND_COUNT) {
-			return;
-		}
-		bv=&subvars[subcount];
-		subcount++;
+		bv=&(*subvars)[subvars->getLength()];
+		preexisting=false;
 	}
+	initVar(bv,variable,preexisting);
 	stringVar(bv,variable,value);
 	dirtysubs=true;
 }
@@ -915,14 +920,13 @@ void sqlrcursor::substitution(const char *variable, int64_t value) {
 	if (!variable || !variable[0]) {
 		return;
 	}
-	bindvar	*bv=findVar(variable,subvars,subcount);
+	bool	preexisting=true;
+	bindvar	*bv=findVar(variable,subvars);
 	if (!bv) {
-		if (subcount>=OPTIMISTIC_BIND_COUNT) {
-			return;
-		}
-		bv=&subvars[subcount];
-		subcount++;
+		bv=&(*subvars)[subvars->getLength()];
+		preexisting=false;
 	}
+	initVar(bv,variable,preexisting);
 	integerVar(bv,variable,value);
 	dirtysubs=true;
 }
@@ -932,21 +936,24 @@ void sqlrcursor::substitution(const char *variable, double value,
 	if (!variable || !variable[0]) {
 		return;
 	}
-	bindvar	*bv=findVar(variable,subvars,subcount);
+	bool	preexisting=true;
+	bindvar	*bv=findVar(variable,subvars);
 	if (!bv) {
-		if (subcount>=OPTIMISTIC_BIND_COUNT) {
-			return;
-		}
-		bv=&subvars[subcount];
-		subcount++;
+		bv=&(*subvars)[subvars->getLength()];
+		preexisting=false;
 	}
+	initVar(bv,variable,preexisting);
 	doubleVar(bv,variable,value,precision,scale);
 	dirtysubs=true;
 }
 
 void sqlrcursor::clearBinds() {
-	inbindcount=0;
-	outbindcount=0;
+
+	deleteInputBindVariables();
+	inbindvars->clear();
+
+	deleteOutputBindVariables();
+	outbindvars->clear();
 }
 
 void sqlrcursor::inputBindBlob(const char *variable, const char *value,
@@ -954,14 +961,13 @@ void sqlrcursor::inputBindBlob(const char *variable, const char *value,
 	if (!variable || !variable[0]) {
 		return;
 	}
-	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
+	bool	preexisting=true;
+	bindvar	*bv=findVar(variable,inbindvars);
 	if (!bv) {
-		if (inbindcount>=OPTIMISTIC_BIND_COUNT) {
-			return;
-		}
-		bv=&inbindvars[inbindcount];
-		inbindcount++;
+		bv=&(*inbindvars)[inbindvars->getLength()];
+		preexisting=false;
 	}
+	initVar(bv,variable,preexisting);
 	lobVar(bv,variable,value,size,BINDVARTYPE_BLOB);
 	bv->send=true;
 	dirtybinds=true;
@@ -972,14 +978,13 @@ void sqlrcursor::inputBindClob(const char *variable, const char *value,
 	if (!variable || !variable[0]) {
 		return;
 	}
-	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
+	bool	preexisting=true;
+	bindvar	*bv=findVar(variable,inbindvars);
 	if (!bv) {
-		if (inbindcount>=OPTIMISTIC_BIND_COUNT) {
-			return;
-		}
-		bv=&inbindvars[inbindcount];
-		inbindcount++;
+		bv=&(*inbindvars)[inbindvars->getLength()];
+		preexisting=false;
 	}
+	initVar(bv,variable,preexisting);
 	lobVar(bv,variable,value,size,BINDVARTYPE_CLOB);
 	bv->send=true;
 	dirtybinds=true;
@@ -989,14 +994,13 @@ void sqlrcursor::inputBind(const char *variable, const char *value) {
 	if (!variable || !variable[0]) {
 		return;
 	}
-	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
+	bool	preexisting=true;
+	bindvar	*bv=findVar(variable,inbindvars);
 	if (!bv) {
-		if (inbindcount>=OPTIMISTIC_BIND_COUNT) {
-			return;
-		}
-		bv=&inbindvars[inbindcount];
-		inbindcount++;
+		bv=&(*inbindvars)[inbindvars->getLength()];
+		preexisting=false;
 	}
+	initVar(bv,variable,preexisting);
 	stringVar(bv,variable,value);
 	bv->send=true;
 	dirtybinds=true;
@@ -1007,14 +1011,13 @@ void sqlrcursor::inputBind(const char *variable, const char *value,
 	if (!variable || !variable[0]) {
 		return;
 	}
-	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
+	bool	preexisting=true;
+	bindvar	*bv=findVar(variable,inbindvars);
 	if (!bv) {
-		if (inbindcount>=OPTIMISTIC_BIND_COUNT) {
-			return;
-		}
-		bv=&inbindvars[inbindcount];
-		inbindcount++;
+		bv=&(*inbindvars)[inbindvars->getLength()];
+		preexisting=false;
 	}
+	initVar(bv,variable,preexisting);
 	stringVar(bv,variable,value,valuesize);
 	bv->send=true;
 	dirtybinds=true;
@@ -1024,14 +1027,13 @@ void sqlrcursor::inputBind(const char *variable, int64_t value) {
 	if (!variable || !variable[0]) {
 		return;
 	}
-	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
+	bool	preexisting=true;
+	bindvar	*bv=findVar(variable,inbindvars);
 	if (!bv) {
-		if (inbindcount>=OPTIMISTIC_BIND_COUNT) {
-			return;
-		}
-		bv=&inbindvars[inbindcount];
-		inbindcount++;
+		bv=&(*inbindvars)[inbindvars->getLength()];
+		preexisting=false;
 	}
+	initVar(bv,variable,preexisting);
 	integerVar(bv,variable,value);
 	bv->send=true;
 	dirtybinds=true;
@@ -1042,14 +1044,13 @@ void sqlrcursor::inputBind(const char *variable, double value,
 	if (!variable || !variable[0]) {
 		return;
 	}
-	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
+	bool	preexisting=true;
+	bindvar	*bv=findVar(variable,inbindvars);
 	if (!bv) {
-		if (inbindcount>=OPTIMISTIC_BIND_COUNT) {
-			return;
-		}
-		bv=&inbindvars[inbindcount];
-		inbindcount++;
+		bv=&(*inbindvars)[inbindvars->getLength()];
+		preexisting=false;
 	}
+	initVar(bv,variable,preexisting);
 	doubleVar(bv,variable,value,precision,scale);
 	bv->send=true;
 	dirtybinds=true;
@@ -1062,14 +1063,13 @@ void sqlrcursor::inputBind(const char *variable,
 	if (!variable || !variable[0]) {
 		return;
 	}
-	bindvar	*bv=findVar(variable,inbindvars,inbindcount);
+	bool	preexisting=true;
+	bindvar	*bv=findVar(variable,inbindvars);
 	if (!bv) {
-		if (inbindcount>=OPTIMISTIC_BIND_COUNT) {
-			return;
-		}
-		bv=&inbindvars[inbindcount];
-		inbindcount++;
+		bv=&(*inbindvars)[inbindvars->getLength()];
+		preexisting=false;
 	}
+	initVar(bv,variable,preexisting);
 	dateVar(bv,variable,year,month,day,hour,minute,second,microsecond,tz);
 	bv->send=true;
 	dirtybinds=true;
@@ -1125,8 +1125,6 @@ void sqlrcursor::stringVar(bindvar *var, const char *variable,
 						const char *value,
 						uint32_t valuesize) {
 
-	initVar(var,variable);
-
 	// store the value, handle NULL values too
 	if (value) {
 		if (copyrefs) {
@@ -1142,14 +1140,12 @@ void sqlrcursor::stringVar(bindvar *var, const char *variable,
 }
 
 void sqlrcursor::integerVar(bindvar *var, const char *variable, int64_t value) {
-	initVar(var,variable);
 	var->type=BINDVARTYPE_INTEGER;
 	var->value.integerval=value;
 }
 
 void sqlrcursor::doubleVar(bindvar *var, const char *variable, double value,
 					uint32_t precision, uint32_t scale) {
-	initVar(var,variable);
 	var->type=BINDVARTYPE_DOUBLE;
 	var->value.doubleval.value=value;
 	var->value.doubleval.precision=precision;
@@ -1160,7 +1156,6 @@ void sqlrcursor::dateVar(bindvar *var, const char *variable,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
 				int32_t microsecond, const char *tz) {
-	initVar(var,variable);
 	var->type=BINDVARTYPE_DATE;
 	var->value.dateval.year=year;
 	var->value.dateval.month=month;
@@ -1178,8 +1173,6 @@ void sqlrcursor::dateVar(bindvar *var, const char *variable,
 
 void sqlrcursor::lobVar(bindvar *var, const char *variable,
 			const char *value, uint32_t size, bindvartype_t type) {
-
-	initVar(var,variable);
 
 	// Store the value, handle NULL values too.
 	// For LOB's empty strings are handled as NULL's as well, this is
@@ -1199,32 +1192,31 @@ void sqlrcursor::lobVar(bindvar *var, const char *variable,
 }
 
 bindvar *sqlrcursor::findVar(const char *variable,
-				bindvar *vars, uint16_t count) {
-	for (uint16_t i=0; i<count; i++) {
-		if (!charstring::compare(vars[i].variable,variable)) {
-			return &(vars[i]);
+				dynamicarray<bindvar> *vars) {
+	for (uint16_t i=0; i<vars->getLength(); i++) {
+		if (!charstring::compare((*vars)[i].variable,variable)) {
+			return &((*vars)[i]);
 		}
 	}
 	return NULL;
 }
 
-void sqlrcursor::initVar(bindvar *var, const char *variable) {
+void sqlrcursor::initVar(bindvar *var, const char *variable, bool preexisting) {
 
 	// clear any old variable name that was stored and assign the new 
 	// variable name also clear any old value that was stored in this 
 	// variable
 	if (copyrefs) {
-		delete[] var->variable;
-		var->variable=charstring::duplicate(variable);
-
-		if (var->type==BINDVARTYPE_STRING &&
-				var->value.stringval) {
-			delete[] var->value.stringval;
-		} else if ((var->type==BINDVARTYPE_BLOB ||
-				var->type==BINDVARTYPE_CLOB) &&
-				var->value.lobval) {
-			delete[] var->value.lobval;
+		if (preexisting) {
+			delete[] var->variable;
+			if (var->type==BINDVARTYPE_STRING) {
+				delete[] var->value.stringval;
+			} else if (var->type==BINDVARTYPE_BLOB ||
+					var->type==BINDVARTYPE_CLOB) {
+				delete[] var->value.lobval;
+			}
 		}
+		var->variable=charstring::duplicate(variable);
 	} else {
 		var->variable=(char *)variable;
 	}
@@ -1269,14 +1261,10 @@ void sqlrcursor::defineOutputBindGeneric(const char *variable,
 		return;
 	}
 
-	bindvar	*bv=findVar(variable,outbindvars,outbindcount);
+	bindvar	*bv=findVar(variable,outbindvars);
 	if (!bv) {
-		if (outbindcount>=OPTIMISTIC_BIND_COUNT) {
-			return;
-		}
-		bv=&outbindvars[outbindcount];
+		bv=&(*outbindvars)[outbindvars->getLength()];
 		dirtybinds=true;
-		outbindcount++;
 	}
 
 	// clean up old values
@@ -1303,11 +1291,11 @@ void sqlrcursor::defineOutputBindGeneric(const char *variable,
 const char *sqlrcursor::getOutputBindString(const char *variable) {
 
 	if (variable) {
-		for (int16_t i=0; i<outbindcount; i++) {
+		for (uint64_t i=0; i<outbindvars->getLength(); i++) {
 			if (!charstring::compare(
-					outbindvars[i].variable,variable) &&
-					outbindvars[i].type==BINDVARTYPE_STRING) {
-				return outbindvars[i].value.stringval;
+				(*outbindvars)[i].variable,variable) &&
+				(*outbindvars)[i].type==BINDVARTYPE_STRING) {
+				return (*outbindvars)[i].value.stringval;
 			}
 		}
 	}
@@ -1317,10 +1305,10 @@ const char *sqlrcursor::getOutputBindString(const char *variable) {
 uint32_t sqlrcursor::getOutputBindLength(const char *variable) {
 
 	if (variable) {
-		for (int16_t i=0; i<outbindcount; i++) {
-			if (!charstring::compare(outbindvars[i].variable,
-								variable)) {
-				return outbindvars[i].resultvaluesize;
+		for (uint64_t i=0; i<outbindvars->getLength(); i++) {
+			if (!charstring::compare(
+				(*outbindvars)[i].variable,variable)) {
+				return (*outbindvars)[i].resultvaluesize;
 			}
 		}
 	}
@@ -1330,11 +1318,11 @@ uint32_t sqlrcursor::getOutputBindLength(const char *variable) {
 const char *sqlrcursor::getOutputBindBlob(const char *variable) {
 
 	if (variable) {
-		for (int16_t i=0; i<outbindcount; i++) {
+		for (uint64_t i=0; i<outbindvars->getLength(); i++) {
 			if (!charstring::compare(
-					outbindvars[i].variable,variable) &&
-					outbindvars[i].type==BINDVARTYPE_BLOB) {
-				return outbindvars[i].value.lobval;
+				(*outbindvars)[i].variable,variable) &&
+				(*outbindvars)[i].type==BINDVARTYPE_BLOB) {
+				return (*outbindvars)[i].value.lobval;
 			}
 		}
 	}
@@ -1344,11 +1332,11 @@ const char *sqlrcursor::getOutputBindBlob(const char *variable) {
 const char *sqlrcursor::getOutputBindClob(const char *variable) {
 
 	if (variable) {
-		for (int16_t i=0; i<outbindcount; i++) {
+		for (uint64_t i=0; i<outbindvars->getLength(); i++) {
 			if (!charstring::compare(
-					outbindvars[i].variable,variable) &&
-					outbindvars[i].type==BINDVARTYPE_CLOB) {
-				return outbindvars[i].value.lobval;
+				(*outbindvars)[i].variable,variable) &&
+				(*outbindvars)[i].type==BINDVARTYPE_CLOB) {
+				return (*outbindvars)[i].value.lobval;
 			}
 		}
 	}
@@ -1358,11 +1346,11 @@ const char *sqlrcursor::getOutputBindClob(const char *variable) {
 int64_t sqlrcursor::getOutputBindInteger(const char *variable) {
 
 	if (variable) {
-		for (int16_t i=0; i<outbindcount; i++) {
+		for (uint64_t i=0; i<outbindvars->getLength(); i++) {
 			if (!charstring::compare(
-					outbindvars[i].variable,variable) &&
-					outbindvars[i].type==BINDVARTYPE_INTEGER) {
-				return outbindvars[i].value.integerval;
+				(*outbindvars)[i].variable,variable) &&
+				(*outbindvars)[i].type==BINDVARTYPE_INTEGER) {
+				return (*outbindvars)[i].value.integerval;
 			}
 		}
 	}
@@ -1372,11 +1360,11 @@ int64_t sqlrcursor::getOutputBindInteger(const char *variable) {
 double sqlrcursor::getOutputBindDouble(const char *variable) {
 
 	if (variable) {
-		for (int16_t i=0; i<outbindcount; i++) {
+		for (uint64_t i=0; i<outbindvars->getLength(); i++) {
 			if (!charstring::compare(
-					outbindvars[i].variable,variable) &&
-					outbindvars[i].type==BINDVARTYPE_DOUBLE) {
-				return outbindvars[i].value.doubleval.value;
+				(*outbindvars)[i].variable,variable) &&
+				(*outbindvars)[i].type==BINDVARTYPE_DOUBLE) {
+				return (*outbindvars)[i].value.doubleval.value;
 			}
 		}
 	}
@@ -1389,19 +1377,19 @@ bool sqlrcursor::getOutputBindDate(const char *variable,
 			int32_t *microsecond, const char **tz) {
 
 	if (variable) {
-		for (int16_t i=0; i<outbindcount; i++) {
+		for (uint64_t i=0; i<outbindvars->getLength(); i++) {
 			if (!charstring::compare(
-					outbindvars[i].variable,variable) &&
-					outbindvars[i].type==BINDVARTYPE_DATE) {
-				*year=outbindvars[i].value.dateval.year;
-				*month=outbindvars[i].value.dateval.month;
-				*day=outbindvars[i].value.dateval.day;
-				*hour=outbindvars[i].value.dateval.hour;
-				*minute=outbindvars[i].value.dateval.minute;
-				*second=outbindvars[i].value.dateval.second;
-				*microsecond=outbindvars[i].
+				(*outbindvars)[i].variable,variable) &&
+				(*outbindvars)[i].type==BINDVARTYPE_DATE) {
+				*year=(*outbindvars)[i].value.dateval.year;
+				*month=(*outbindvars)[i].value.dateval.month;
+				*day=(*outbindvars)[i].value.dateval.day;
+				*hour=(*outbindvars)[i].value.dateval.hour;
+				*minute=(*outbindvars)[i].value.dateval.minute;
+				*second=(*outbindvars)[i].value.dateval.second;
+				*microsecond=(*outbindvars)[i].
 						value.dateval.microsecond;
-				*tz=outbindvars[i].value.dateval.tz;
+				*tz=(*outbindvars)[i].value.dateval.tz;
 				return true;
 			}
 		}
@@ -1427,9 +1415,9 @@ sqlrcursor *sqlrcursor::getOutputBindCursor(const char *variable,
 
 bool sqlrcursor::outputBindCursorIdIsValid(const char *variable) {
 	if (variable) {
-		for (int16_t i=0; i<outbindcount; i++) {
-			if (!charstring::compare(outbindvars[i].variable,
-								variable)) {
+		for (uint64_t i=0; i<outbindvars->getLength(); i++) {
+			if (!charstring::compare(
+				(*outbindvars)[i].variable,variable)) {
 				return true;
 			}
 		}
@@ -1440,10 +1428,10 @@ bool sqlrcursor::outputBindCursorIdIsValid(const char *variable) {
 uint16_t sqlrcursor::getOutputBindCursorId(const char *variable) {
 
 	if (variable) {
-		for (int16_t i=0; i<outbindcount; i++) {
-			if (!charstring::compare(outbindvars[i].variable,
-								variable)) {
-				return outbindvars[i].value.cursorid;
+		for (uint64_t i=0; i<outbindvars->getLength(); i++) {
+			if (!charstring::compare(
+				(*outbindvars)[i].variable,variable)) {
+				return (*outbindvars)[i].value.cursorid;
 			}
 		}
 	}
@@ -1457,14 +1445,14 @@ void sqlrcursor::validateBinds() {
 bool sqlrcursor::validBind(const char *variable) {
 	performSubstitutions();
 	validateBindsInternal();
-	for (uint16_t in=0; in<inbindcount; in++) {
-		if (!charstring::compare(inbindvars[in].variable,variable)) {
-			return inbindvars[in].send;
+	for (uint64_t in=0; in<inbindvars->getLength(); in++) {
+		if (!charstring::compare((*inbindvars)[in].variable,variable)) {
+			return (*inbindvars)[in].send;
 		}
 	}
-	for (uint16_t out=0; out<outbindcount; out++) {
-		if (!charstring::compare(outbindvars[out].variable,variable)) {
-			return outbindvars[out].send;
+	for (uint64_t out=0; out<outbindvars->getLength(); out++) {
+		if (!charstring::compare((*outbindvars)[out].variable,variable)) {
+			return (*outbindvars)[out].send;
 		}
 	}
 	return false;
@@ -1496,7 +1484,7 @@ bool sqlrcursor::executeQuery() {
 
 void sqlrcursor::performSubstitutions() {
 
-	if (!subcount || !dirtysubs) {
+	if (!subvars->getLength() || !dirtysubs) {
 		return;
 	}
 
@@ -1584,17 +1572,18 @@ void sqlrcursor::performSubstitutions() {
 	
 			// first iterate through the arrays passed in
 			found=false;
-			for (uint16_t i=0; i<subcount && !found; i++) {
+			for (uint64_t i=0;
+				i<subvars->getLength() && !found; i++) {
 
 	
 				// if we find a match, write the 
 				// value to the container and skip 
 				// past the $(variable)
 				len=charstring::length(
-						subvars[i].variable);
-				if (!subvars[i].donesubstituting &&
+						(*subvars)[i].variable);
+				if (!(*subvars)[i].donesubstituting &&
 					!charstring::compare((ptr+2),
-						subvars[i].variable,len) &&
+						(*subvars)[i].variable,len) &&
 						(*(ptr+2+len))==')') {
 	
 					if (inbraces) {
@@ -1634,8 +1623,8 @@ void sqlrcursor::performSubstitutions() {
 
 	// mark all vars that were substituted in as "done" so the next time
 	// this method gets called, they won't be processed.
-	for (uint16_t i=0; i<subcount; i++) {
-		subvars[i].donesubstituting=subvars[i].substituted;
+	for (uint64_t i=0; i<subvars->getLength(); i++) {
+		(*subvars)[i].donesubstituting=(*subvars)[i].substituted;
 	}
 
 	delete[] querybuffer;
@@ -1658,15 +1647,13 @@ void sqlrcursor::validateBindsInternal() {
 	const char	*after;
 	bool		found;
 	int		len;
-	uint16_t	count;
 
 	// check each input bind
-	count=inbindcount;
-	for (uint16_t in=0; in<count; in++) {
+	for (uint64_t in=0; in<inbindvars->getLength(); in++) {
 
 		// don't check bind-by-position variables
-		len=charstring::length(inbindvars[in].variable);
-		if (charstring::isInteger(inbindvars[in].variable,len)) {
+		len=charstring::length((*inbindvars)[in].variable);
+		if (charstring::isInteger((*inbindvars)[in].variable,len)) {
 			continue;
 		}
 
@@ -1678,7 +1665,7 @@ void sqlrcursor::validateBindsInternal() {
 		// table_name's would match, but only the second is a bind
 		// variable
 		while ((ptr=charstring::findFirst(start,
-					inbindvars[in].variable))) {
+					(*inbindvars)[in].variable))) {
 
 			// for a match to be a bind variable, it must be 
 			// preceded by a colon or at-sign and can't be followed
@@ -1697,16 +1684,15 @@ void sqlrcursor::validateBindsInternal() {
 			}
 		}
 
-		inbindvars[in].send=found;
+		(*inbindvars)[in].send=found;
 	}
 
 	// check each output bind
-	count=outbindcount;
-	for (uint16_t out=0; out<count; out++) {
+	for (uint64_t out=0; out<outbindvars->getLength(); out++) {
 
 		// don't check bind-by-position variables
-		len=charstring::length(outbindvars[out].variable);
-		if (charstring::isInteger(outbindvars[out].variable,len)) {
+		len=charstring::length((*outbindvars)[out].variable);
+		if (charstring::isInteger((*outbindvars)[out].variable,len)) {
 			continue;
 		}
 
@@ -1717,7 +1703,7 @@ void sqlrcursor::validateBindsInternal() {
 		// "select * from table where table_name=:table_name", both
 		// table_name's would match, but only 1 is correct
 		while ((ptr=charstring::findFirst(start,
-					outbindvars[out].variable))) {
+					(*outbindvars)[out].variable))) {
 
 			// for a match to be a bind variable, it must be 
 			// preceded by a colon and can't be followed by an
@@ -1736,22 +1722,22 @@ void sqlrcursor::validateBindsInternal() {
 			}
 		}
 
-		outbindvars[out].send=found;
+		(*outbindvars)[out].send=found;
 	}
 }
 
 void sqlrcursor::performSubstitution(stringbuffer *buffer, uint16_t which) {
 
-	if (subvars[which].type==BINDVARTYPE_STRING) {
-		buffer->append(subvars[which].value.stringval);
-	} else if (subvars[which].type==BINDVARTYPE_INTEGER) {
-		buffer->append(subvars[which].value.integerval);
-	} else if (subvars[which].type==BINDVARTYPE_DOUBLE) {
-		buffer->append(subvars[which].value.doubleval.value,
-				subvars[which].value.doubleval.precision,
-				subvars[which].value.doubleval.scale);
+	if ((*subvars)[which].type==BINDVARTYPE_STRING) {
+		buffer->append((*subvars)[which].value.stringval);
+	} else if ((*subvars)[which].type==BINDVARTYPE_INTEGER) {
+		buffer->append((*subvars)[which].value.integerval);
+	} else if ((*subvars)[which].type==BINDVARTYPE_DOUBLE) {
+		buffer->append((*subvars)[which].value.doubleval.value,
+				(*subvars)[which].value.doubleval.precision,
+				(*subvars)[which].value.doubleval.scale);
 	}
-	subvars[which].substituted=true;
+	(*subvars)[which].substituted=true;
 }
 
 bool sqlrcursor::runQuery(const char *query) {
@@ -1899,194 +1885,198 @@ void sqlrcursor::sendInputBinds() {
 	// index
 	uint16_t	i=0;
 
-	// adjust inbindcount
-	uint16_t	count=inbindcount;
+	// count number of vars to send
+	uint16_t	count=inbindvars->getLength();
 	for (i=0; i<count; i++) {
-		if (!inbindvars[i].send) {
-			inbindcount--;
+		if (!(*inbindvars)[i].send) {
+			count--;
 		}
 	}
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Sending ");
-		sqlrc->debugPrint((int64_t)inbindcount);
+		sqlrc->debugPrint((int64_t)count);
 		sqlrc->debugPrint(" Input Bind Variables:\n");
 		sqlrc->debugPreEnd();
 	}
 
 	// write the input bind variables/values to the server.
-	sqlrc->cs->write(inbindcount);
-	count=inbindcount;
+	sqlrc->cs->write(count);
 	uint16_t	size;
-	for (i=0; i<count; i++) {
+	i=0;
+	while (i<count) {
 
 		// don't send anything if the send flag is turned off
-		if (!inbindvars[i].send) {
-			count++;
+		if (!(*inbindvars)[i].send) {
 			continue;
 		}
 
 		// send the variable
-		size=charstring::length(inbindvars[i].variable);
+		size=charstring::length((*inbindvars)[i].variable);
 		sqlrc->cs->write(size);
-		sqlrc->cs->write(inbindvars[i].variable,(size_t)size);
+		sqlrc->cs->write((*inbindvars)[i].variable,(size_t)size);
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
-			sqlrc->debugPrint(inbindvars[i].variable);
+			sqlrc->debugPrint((*inbindvars)[i].variable);
 			sqlrc->debugPrint("(");
 			sqlrc->debugPrint((int64_t)size);
 		}
 
 		// send the type
-		sqlrc->cs->write((uint16_t)inbindvars[i].type);
+		sqlrc->cs->write((uint16_t)(*inbindvars)[i].type);
 
 		// send the value
-		if (inbindvars[i].type==BINDVARTYPE_NULL) {
+		if ((*inbindvars)[i].type==BINDVARTYPE_NULL) {
 
 			if (sqlrc->debug) {
 				sqlrc->debugPrint(":NULL)\n");
 				sqlrc->debugPreEnd();
 			}
 
-		} else if (inbindvars[i].type==BINDVARTYPE_STRING) {
+		} else if ((*inbindvars)[i].type==BINDVARTYPE_STRING) {
 
-			sqlrc->cs->write(inbindvars[i].valuesize);
-			if (inbindvars[i].valuesize>0) {
-				sqlrc->cs->write(inbindvars[i].value.stringval,
-					(size_t)inbindvars[i].valuesize);
+			sqlrc->cs->write((*inbindvars)[i].valuesize);
+			if ((*inbindvars)[i].valuesize>0) {
+				sqlrc->cs->write((*inbindvars)[i].
+							value.stringval,
+					(size_t)(*inbindvars)[i].valuesize);
 			}
 
 			if (sqlrc->debug) {
 				sqlrc->debugPrint(":STRING)=");
-				sqlrc->debugPrint(inbindvars[i].
+				sqlrc->debugPrint((*inbindvars)[i].
 							value.stringval);
 				sqlrc->debugPrint("(");
-				sqlrc->debugPrint((int64_t)inbindvars[i].
+				sqlrc->debugPrint((int64_t)(*inbindvars)[i].
 								valuesize);
 				sqlrc->debugPrint(")");
 				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();
 			}
 
-		} else if (inbindvars[i].type==BINDVARTYPE_INTEGER) {
+		} else if ((*inbindvars)[i].type==BINDVARTYPE_INTEGER) {
 
-			sqlrc->cs->write((uint64_t)inbindvars[i].
+			sqlrc->cs->write((uint64_t)(*inbindvars)[i].
 							value.integerval);
 
 			if (sqlrc->debug) {
 				sqlrc->debugPrint(":LONG)=");
-				sqlrc->debugPrint((int64_t)inbindvars[i].
+				sqlrc->debugPrint((int64_t)(*inbindvars)[i].
 							value.integerval);
 				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();
 			}
 
-		} else if (inbindvars[i].type==BINDVARTYPE_DOUBLE) {
+		} else if ((*inbindvars)[i].type==BINDVARTYPE_DOUBLE) {
 
-			sqlrc->cs->write((double)inbindvars[i].value.
+			sqlrc->cs->write((double)(*inbindvars)[i].value.
 							doubleval.value);
-			sqlrc->cs->write(inbindvars[i].value.
+			sqlrc->cs->write((*inbindvars)[i].value.
 							doubleval.precision);
-			sqlrc->cs->write(inbindvars[i].value.
+			sqlrc->cs->write((*inbindvars)[i].value.
 							doubleval.scale);
 
 			if (sqlrc->debug) {
 				sqlrc->debugPrint(":DOUBLE)=");
-				sqlrc->debugPrint(inbindvars[i].value.
+				sqlrc->debugPrint((*inbindvars)[i].value.
 							doubleval.value);
 				sqlrc->debugPrint(":");
-				sqlrc->debugPrint((int64_t)inbindvars[i].value.
-							doubleval.precision);
+				sqlrc->debugPrint((int64_t)(*inbindvars)[i].
+						value.doubleval.precision);
 				sqlrc->debugPrint(",");
-				sqlrc->debugPrint((int64_t)inbindvars[i].value.
-							doubleval.scale);
+				sqlrc->debugPrint((int64_t)(*inbindvars)[i].
+						value.doubleval.scale);
 				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();
 			}
 
-		} else if (inbindvars[i].type==BINDVARTYPE_DATE) {
+		} else if ((*inbindvars)[i].type==BINDVARTYPE_DATE) {
 
 			sqlrc->cs->write((uint16_t)
-					inbindvars[i].value.dateval.year);
+					(*inbindvars)[i].value.dateval.year);
 			sqlrc->cs->write((uint16_t)
-					inbindvars[i].value.dateval.month);
+					(*inbindvars)[i].value.dateval.month);
 			sqlrc->cs->write((uint16_t)
-					inbindvars[i].value.dateval.day);
+					(*inbindvars)[i].value.dateval.day);
 			sqlrc->cs->write((uint16_t)
-					inbindvars[i].value.dateval.hour);
+					(*inbindvars)[i].value.dateval.hour);
 			sqlrc->cs->write((uint16_t)
-					inbindvars[i].value.dateval.minute);
+					(*inbindvars)[i].value.dateval.minute);
 			sqlrc->cs->write((uint16_t)
-					inbindvars[i].value.dateval.second);
+					(*inbindvars)[i].value.dateval.second);
 			sqlrc->cs->write((uint32_t)
-					inbindvars[i].value.
+					(*inbindvars)[i].value.
 							dateval.microsecond);
 			sqlrc->cs->write((uint16_t)
 					charstring::length(
-					inbindvars[i].value.dateval.tz));
-			sqlrc->cs->write(inbindvars[i].value.dateval.tz);
+					(*inbindvars)[i].value.dateval.tz));
+			sqlrc->cs->write((*inbindvars)[i].value.dateval.tz);
 
 			if (sqlrc->debug) {
 				sqlrc->debugPrint(":DATE)=");
 				sqlrc->debugPrint((int64_t)
-					inbindvars[i].value.dateval.year);
+					(*inbindvars)[i].value.dateval.year);
 				sqlrc->debugPrint("-");
 				sqlrc->debugPrint((int64_t)
-					inbindvars[i].value.dateval.month);
+					(*inbindvars)[i].value.dateval.month);
 				sqlrc->debugPrint("-");
 				sqlrc->debugPrint((int64_t)
-					inbindvars[i].value.dateval.day);
+					(*inbindvars)[i].value.dateval.day);
 				sqlrc->debugPrint(" ");
 				sqlrc->debugPrint((int64_t)
-					inbindvars[i].value.dateval.hour);
+					(*inbindvars)[i].value.dateval.hour);
 				sqlrc->debugPrint(":");
 				sqlrc->debugPrint((int64_t)
-					inbindvars[i].value.dateval.minute);
+					(*inbindvars)[i].value.dateval.minute);
 				sqlrc->debugPrint(":");
 				sqlrc->debugPrint((int64_t)
-					inbindvars[i].value.dateval.second);
+					(*inbindvars)[i].value.dateval.second);
 				sqlrc->debugPrint(":");
 				sqlrc->debugPrint((int64_t)
-					inbindvars[i].value.
+					(*inbindvars)[i].value.
 						dateval.microsecond);
 				sqlrc->debugPrint(" ");
 				sqlrc->debugPrint(
-					inbindvars[i].value.dateval.tz);
+					(*inbindvars)[i].value.dateval.tz);
 				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();
 			}
 
-		} else if (inbindvars[i].type==BINDVARTYPE_BLOB ||
-				inbindvars[i].type==BINDVARTYPE_CLOB) {
+		} else if ((*inbindvars)[i].type==BINDVARTYPE_BLOB ||
+				(*inbindvars)[i].type==BINDVARTYPE_CLOB) {
 
-			sqlrc->cs->write(inbindvars[i].valuesize);
-			if (inbindvars[i].valuesize>0) {
-				sqlrc->cs->write(inbindvars[i].
+			sqlrc->cs->write((*inbindvars)[i].valuesize);
+			if ((*inbindvars)[i].valuesize>0) {
+				sqlrc->cs->write((*inbindvars)[i].
 					value.lobval,
-					(size_t)inbindvars[i].valuesize);
+					(size_t)(*inbindvars)[i].valuesize);
 			}
 
 			if (sqlrc->debug) {
-				if (inbindvars[i].type==BINDVARTYPE_BLOB) {
+				if ((*inbindvars)[i].type==
+							BINDVARTYPE_BLOB) {
 					sqlrc->debugPrint(":BLOB)=");
 					sqlrc->debugPrintBlob(
-						inbindvars[i].value.lobval,
-						inbindvars[i].valuesize);
-				} else if (inbindvars[i].type==BINDVARTYPE_CLOB) {
+						(*inbindvars)[i].value.lobval,
+						(*inbindvars)[i].valuesize);
+				} else if ((*inbindvars)[i].type==
+							BINDVARTYPE_CLOB) {
 					sqlrc->debugPrint(":CLOB)=");
 					sqlrc->debugPrintClob(
-						inbindvars[i].value.lobval,
-						inbindvars[i].valuesize);
+						(*inbindvars)[i].value.lobval,
+						(*inbindvars)[i].valuesize);
 				}
 				sqlrc->debugPrint("(");
-				sqlrc->debugPrint((int64_t)inbindvars[i].
+				sqlrc->debugPrint((int64_t)(*inbindvars)[i].
 								valuesize);
 				sqlrc->debugPrint(")");
 				sqlrc->debugPrint("\n");
 				sqlrc->debugPreEnd();
 			}
 		}
+
+		i++;
 	}
 }
 
@@ -2095,51 +2085,50 @@ void sqlrcursor::sendOutputBinds() {
 	// index
 	uint16_t	i=0;
 
-	// adjust outbindcount
-	uint16_t	count=outbindcount;
+	// count number of vars to send
+	uint16_t	count=outbindvars->getLength();
 	for (i=0; i<count; i++) {
-		if (!outbindvars[i].send) {
-			outbindcount--;
+		if (!(*outbindvars)[i].send) {
+			count--;
 		}
 	}
 
 	if (sqlrc->debug) {
 		sqlrc->debugPreStart();
 		sqlrc->debugPrint("Sending ");
-		sqlrc->debugPrint((int64_t)outbindcount);
+		sqlrc->debugPrint((int64_t)count);
 		sqlrc->debugPrint(" Output Bind Variables:\n");
 		sqlrc->debugPreEnd();
 	}
 
 	// write the output bind variables to the server.
-	sqlrc->cs->write(outbindcount);
+	sqlrc->cs->write(count);
 	uint16_t	size;
-	count=outbindcount;
-	for (i=0; i<count; i++) {
+	i=0;
+	while (i<count) {
 
 		// don't send anything if the send flag is turned off
-		if (!outbindvars[i].send) {
-			count++;
+		if (!(*outbindvars)[i].send) {
 			continue;
 		}
 
 		// send the variable, type and size that the buffer needs to be
-		size=charstring::length(outbindvars[i].variable);
+		size=charstring::length((*outbindvars)[i].variable);
 		sqlrc->cs->write(size);
-		sqlrc->cs->write(outbindvars[i].variable,(size_t)size);
-		sqlrc->cs->write((uint16_t)outbindvars[i].type);
-		if (outbindvars[i].type==BINDVARTYPE_STRING ||
-			outbindvars[i].type==BINDVARTYPE_BLOB ||
-			outbindvars[i].type==BINDVARTYPE_CLOB ||
-			outbindvars[i].type==BINDVARTYPE_NULL) {
-			sqlrc->cs->write(outbindvars[i].valuesize);
+		sqlrc->cs->write((*outbindvars)[i].variable,(size_t)size);
+		sqlrc->cs->write((uint16_t)(*outbindvars)[i].type);
+		if ((*outbindvars)[i].type==BINDVARTYPE_STRING ||
+			(*outbindvars)[i].type==BINDVARTYPE_BLOB ||
+			(*outbindvars)[i].type==BINDVARTYPE_CLOB ||
+			(*outbindvars)[i].type==BINDVARTYPE_NULL) {
+			sqlrc->cs->write((*outbindvars)[i].valuesize);
 		}
 
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
-			sqlrc->debugPrint(outbindvars[i].variable);
+			sqlrc->debugPrint((*outbindvars)[i].variable);
 			const char	*bindtype=NULL;
-			switch (outbindvars[i].type) {
+			switch ((*outbindvars)[i].type) {
 				case BINDVARTYPE_NULL:
 					bindtype="(NULL)";
 					break;
@@ -2166,12 +2155,12 @@ void sqlrcursor::sendOutputBinds() {
 					break;
 			}
 			sqlrc->debugPrint(bindtype);
-			if (outbindvars[i].type==BINDVARTYPE_STRING ||
-				outbindvars[i].type==BINDVARTYPE_BLOB ||
-				outbindvars[i].type==BINDVARTYPE_CLOB ||
-				outbindvars[i].type==BINDVARTYPE_NULL) {
+			if ((*outbindvars)[i].type==BINDVARTYPE_STRING ||
+				(*outbindvars)[i].type==BINDVARTYPE_BLOB ||
+				(*outbindvars)[i].type==BINDVARTYPE_CLOB ||
+				(*outbindvars)[i].type==BINDVARTYPE_NULL) {
 				sqlrc->debugPrint("(");
-				sqlrc->debugPrint((int64_t)outbindvars[i].
+				sqlrc->debugPrint((int64_t)(*outbindvars)[i].
 								valuesize);
 				sqlrc->debugPrint(")");
 			}
@@ -2820,38 +2809,38 @@ bool sqlrcursor::parseOutputBinds() {
 			}
 
 			// handle a null value
-			outbindvars[count].resultvaluesize=0;
-			if (outbindvars[count].type==BINDVARTYPE_STRING) {
+			(*outbindvars)[count].resultvaluesize=0;
+			if ((*outbindvars)[count].type==BINDVARTYPE_STRING) {
 				if (returnnulls) {
-					outbindvars[count].value.
+					(*outbindvars)[count].value.
 							stringval=NULL;
 				} else {
-					outbindvars[count].value.
+					(*outbindvars)[count].value.
 							stringval=new char[1];
-					outbindvars[count].value.
+					(*outbindvars)[count].value.
 							stringval[0]='\0';
 				}
-			} else if (outbindvars[count].type==BINDVARTYPE_INTEGER) {
-				outbindvars[count].value.integerval=0;
-			} else if (outbindvars[count].type==BINDVARTYPE_DOUBLE) {
-				outbindvars[count].value.doubleval.value=0;
-				outbindvars[count].value.doubleval.precision=0;
-				outbindvars[count].value.doubleval.scale=0;
-			} else if (outbindvars[count].type==BINDVARTYPE_DATE) {
-				outbindvars[count].value.dateval.year=0;
-				outbindvars[count].value.dateval.month=0;
-				outbindvars[count].value.dateval.day=0;
-				outbindvars[count].value.dateval.hour=0;
-				outbindvars[count].value.dateval.minute=0;
-				outbindvars[count].value.dateval.second=0;
-				outbindvars[count].value.dateval.microsecond=0;
+			} else if ((*outbindvars)[count].type==BINDVARTYPE_INTEGER) {
+				(*outbindvars)[count].value.integerval=0;
+			} else if ((*outbindvars)[count].type==BINDVARTYPE_DOUBLE) {
+				(*outbindvars)[count].value.doubleval.value=0;
+				(*outbindvars)[count].value.doubleval.precision=0;
+				(*outbindvars)[count].value.doubleval.scale=0;
+			} else if ((*outbindvars)[count].type==BINDVARTYPE_DATE) {
+				(*outbindvars)[count].value.dateval.year=0;
+				(*outbindvars)[count].value.dateval.month=0;
+				(*outbindvars)[count].value.dateval.day=0;
+				(*outbindvars)[count].value.dateval.hour=0;
+				(*outbindvars)[count].value.dateval.minute=0;
+				(*outbindvars)[count].value.dateval.second=0;
+				(*outbindvars)[count].value.dateval.microsecond=0;
 				if (returnnulls) {
-					outbindvars[count].
+					(*outbindvars)[count].
 						value.dateval.tz=NULL;
 				} else {
-					outbindvars[count].
+					(*outbindvars)[count].
 						value.dateval.tz=new char[1];
-					outbindvars[count].
+					(*outbindvars)[count].
 						value.dateval.tz[0]='\0';
 				}
 			} 
@@ -2875,8 +2864,8 @@ bool sqlrcursor::parseOutputBinds() {
 					"A network error may have occurred.");
 				return false;
 			}
-			outbindvars[count].resultvaluesize=length;
-			outbindvars[count].value.stringval=new char[length+1];
+			(*outbindvars)[count].resultvaluesize=length;
+			(*outbindvars)[count].value.stringval=new char[length+1];
 
 			if (sqlrc->debug) {
 				sqlrc->debugPreStart();
@@ -2887,13 +2876,13 @@ bool sqlrcursor::parseOutputBinds() {
 			}
 
 			// get the value
-			if ((uint32_t)getString(outbindvars[count].value.
+			if ((uint32_t)getString((*outbindvars)[count].value.
 						stringval,length)!=length) {
 				setError("Failed to get string value.\n "
 					"A network error may have occurred.");
 				return false;
 			}
-			outbindvars[count].value.stringval[length]='\0';
+			(*outbindvars)[count].value.stringval[length]='\0';
 
 			if (sqlrc->debug) {
 				sqlrc->debugPreStart();
@@ -2911,7 +2900,7 @@ bool sqlrcursor::parseOutputBinds() {
 			}
 
 			// get the value
-			if (getLongLong((uint64_t *)&outbindvars[count].
+			if (getLongLong((uint64_t *)&(*outbindvars)[count].
 					value.integerval)!=sizeof(uint64_t)) {
 				setError("Failed to get integer value.\n "
 					"A network error may have occurred.");
@@ -2934,7 +2923,7 @@ bool sqlrcursor::parseOutputBinds() {
 			}
 
 			// get the value
-			if (getDouble(&outbindvars[count].value.
+			if (getDouble(&(*outbindvars)[count].value.
 						doubleval.value)!=
 						sizeof(double)) {
 				setError("Failed to get double value.\n "
@@ -2943,7 +2932,7 @@ bool sqlrcursor::parseOutputBinds() {
 			}
 
 			// get the precision
-			if (getLong(&outbindvars[count].value.
+			if (getLong(&(*outbindvars)[count].value.
 						doubleval.precision)!=
 						sizeof(uint32_t)) {
 				setError("Failed to get precision.\n "
@@ -2952,7 +2941,7 @@ bool sqlrcursor::parseOutputBinds() {
 			}
 
 			// get the scale
-			if (getLong(&outbindvars[count].value.
+			if (getLong(&(*outbindvars)[count].value.
 						doubleval.scale)!=
 						sizeof(uint32_t)) {
 				setError("Failed to get scale.\n "
@@ -2983,7 +2972,7 @@ bool sqlrcursor::parseOutputBinds() {
 					"A network error may have occurred.");
 				return false;
 			}
-			outbindvars[count].value.dateval.year=(int16_t)temp;
+			(*outbindvars)[count].value.dateval.year=(int16_t)temp;
 
 			// get the month
 			if (getShort(&temp)!=sizeof(uint16_t)) {
@@ -2991,7 +2980,7 @@ bool sqlrcursor::parseOutputBinds() {
 					"A network error may have occurred.");
 				return false;
 			}
-			outbindvars[count].value.dateval.month=(int16_t)temp;
+			(*outbindvars)[count].value.dateval.month=(int16_t)temp;
 
 			// get the day
 			if (getShort(&temp)!=sizeof(uint16_t)) {
@@ -2999,7 +2988,7 @@ bool sqlrcursor::parseOutputBinds() {
 					"A network error may have occurred.");
 				return false;
 			}
-			outbindvars[count].value.dateval.day=(int16_t)temp;
+			(*outbindvars)[count].value.dateval.day=(int16_t)temp;
 
 			// get the hour
 			if (getShort(&temp)!=sizeof(uint16_t)) {
@@ -3007,7 +2996,7 @@ bool sqlrcursor::parseOutputBinds() {
 					"A network error may have occurred.");
 				return false;
 			}
-			outbindvars[count].value.dateval.hour=(int16_t)temp;
+			(*outbindvars)[count].value.dateval.hour=(int16_t)temp;
 
 			// get the minute
 			if (getShort(&temp)!=sizeof(uint16_t)) {
@@ -3015,7 +3004,7 @@ bool sqlrcursor::parseOutputBinds() {
 					"A network error may have occurred.");
 				return false;
 			}
-			outbindvars[count].value.dateval.minute=(int16_t)temp;
+			(*outbindvars)[count].value.dateval.minute=(int16_t)temp;
 
 			// get the second
 			if (getShort(&temp)!=sizeof(uint16_t)) {
@@ -3023,7 +3012,7 @@ bool sqlrcursor::parseOutputBinds() {
 					"A network error may have occurred.");
 				return false;
 			}
-			outbindvars[count].value.dateval.second=(int16_t)temp;
+			(*outbindvars)[count].value.dateval.second=(int16_t)temp;
 
 			// get the microsecond
 			uint32_t	temp32;
@@ -3032,7 +3021,7 @@ bool sqlrcursor::parseOutputBinds() {
 					"A network error may have occurred.");
 				return false;
 			}
-			outbindvars[count].value.
+			(*outbindvars)[count].value.
 					dateval.microsecond=(int32_t)temp32;
 
 			// get the timezone length
@@ -3042,16 +3031,16 @@ bool sqlrcursor::parseOutputBinds() {
 					"A network error may have occurred.");
 				return false;
 			}
-			outbindvars[count].value.dateval.tz=new char[length+1];
+			(*outbindvars)[count].value.dateval.tz=new char[length+1];
 
 			// get the timezone
-			if ((uint16_t)getString(outbindvars[count].value.
+			if ((uint16_t)getString((*outbindvars)[count].value.
 						dateval.tz,length)!=length) {
 				setError("Failed to get timezone.\n "
 					"A network error may have occurred.");
 				return false;
 			}
-			outbindvars[count].value. dateval.tz[length]='\0';
+			(*outbindvars)[count].value. dateval.tz[length]='\0';
 
 			if (sqlrc->debug) {
 				sqlrc->debugPreStart();
@@ -3070,7 +3059,7 @@ bool sqlrcursor::parseOutputBinds() {
 
 			// get the cursor id
 			if (getShort((uint16_t *)
-					&(outbindvars[count].value.cursorid))!=
+					&((*outbindvars)[count].value.cursorid))!=
 						sizeof(uint16_t)) {
 				setError("Failed to get cursor id.\n "
 					"A network error may have occurred.");
@@ -3173,67 +3162,67 @@ bool sqlrcursor::parseOutputBinds() {
 			// include the NULL) is available from
 			// getOutputBindLength.
 			buffer[totallength]='\0';
-			outbindvars[count].value.lobval=buffer;
-			outbindvars[count].resultvaluesize=totallength;
+			(*outbindvars)[count].value.lobval=buffer;
+			(*outbindvars)[count].resultvaluesize=totallength;
 		}
 
 		if (sqlrc->debug) {
 			sqlrc->debugPreStart();
-			sqlrc->debugPrint(outbindvars[count].variable);
+			sqlrc->debugPrint((*outbindvars)[count].variable);
 			sqlrc->debugPrint("=");
-			if (outbindvars[count].type==
+			if ((*outbindvars)[count].type==
 						BINDVARTYPE_BLOB) {
 				sqlrc->debugPrintBlob(
-					outbindvars[count].value.lobval,
-					outbindvars[count].resultvaluesize);
-			} else if (outbindvars[count].type==
+					(*outbindvars)[count].value.lobval,
+					(*outbindvars)[count].resultvaluesize);
+			} else if ((*outbindvars)[count].type==
 						BINDVARTYPE_CLOB) {
 				sqlrc->debugPrintClob(
-					outbindvars[count].value.lobval,
-					outbindvars[count].resultvaluesize);
-			} else if (outbindvars[count].type==
+					(*outbindvars)[count].value.lobval,
+					(*outbindvars)[count].resultvaluesize);
+			} else if ((*outbindvars)[count].type==
 						BINDVARTYPE_CURSOR) {
-				sqlrc->debugPrint((int64_t)outbindvars[count].
+				sqlrc->debugPrint((int64_t)(*outbindvars)[count].
 								value.cursorid);
-			} else if (outbindvars[count].type==
+			} else if ((*outbindvars)[count].type==
 						BINDVARTYPE_INTEGER) {
-				sqlrc->debugPrint(outbindvars[count].
+				sqlrc->debugPrint((*outbindvars)[count].
 							value.integerval);
-			} else if (outbindvars[count].type==
+			} else if ((*outbindvars)[count].type==
 						BINDVARTYPE_DOUBLE) {
-				sqlrc->debugPrint(outbindvars[count].
+				sqlrc->debugPrint((*outbindvars)[count].
 						value.doubleval.value);
 				sqlrc->debugPrint("(");
-				sqlrc->debugPrint((int64_t)outbindvars[count].
+				sqlrc->debugPrint((int64_t)(*outbindvars)[count].
 						value.doubleval.precision);
 				sqlrc->debugPrint(",");
-				sqlrc->debugPrint((int64_t)outbindvars[count].
+				sqlrc->debugPrint((int64_t)(*outbindvars)[count].
 						value.doubleval.scale);
 				sqlrc->debugPrint(")");
-			} else if (outbindvars[count].type==
+			} else if ((*outbindvars)[count].type==
 						BINDVARTYPE_DATE) {
-				sqlrc->debugPrint((int64_t)outbindvars[count].
+				sqlrc->debugPrint((int64_t)(*outbindvars)[count].
 							value.dateval.year);
 				sqlrc->debugPrint("-");
-				sqlrc->debugPrint((int64_t)outbindvars[count].
+				sqlrc->debugPrint((int64_t)(*outbindvars)[count].
 							value.dateval.month);
 				sqlrc->debugPrint("-");
-				sqlrc->debugPrint((int64_t)outbindvars[count].
+				sqlrc->debugPrint((int64_t)(*outbindvars)[count].
 							value.dateval.day);
 				sqlrc->debugPrint(" ");
-				sqlrc->debugPrint((int64_t)outbindvars[count].
+				sqlrc->debugPrint((int64_t)(*outbindvars)[count].
 							value.dateval.hour);
 				sqlrc->debugPrint(":");
-				sqlrc->debugPrint((int64_t)outbindvars[count].
+				sqlrc->debugPrint((int64_t)(*outbindvars)[count].
 							value.dateval.minute);
 				sqlrc->debugPrint(":");
-				sqlrc->debugPrint((int64_t)outbindvars[count].
+				sqlrc->debugPrint((int64_t)(*outbindvars)[count].
 							value.dateval.second);
 				sqlrc->debugPrint(" ");
-				sqlrc->debugPrint(outbindvars[count].
+				sqlrc->debugPrint((*outbindvars)[count].
 							value.dateval.tz);
 			} else {
-				sqlrc->debugPrint(outbindvars[count].
+				sqlrc->debugPrint((*outbindvars)[count].
 							value.stringval);
 			}
 			sqlrc->debugPrint("\n");

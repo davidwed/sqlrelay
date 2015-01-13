@@ -11,7 +11,9 @@
 		void	clearColumns();
 		void	clearRows();
 		void	clearVariables();
-		void	initVariables();
+		void	deleteSubstitutionVariables();
+		void	deleteInputBindVariables();
+		void	deleteOutputBindVariables();
 		void	deleteVariables();
 
 		void	initQueryBuffer(uint32_t querylength);
@@ -54,9 +56,10 @@
 					const char *value, uint32_t size,
 					bindvartype_t type);
 		bindvar	*findVar(const char *variable,
-					bindvar *vars,
-					uint16_t count);
-		void	initVar(bindvar *var, const char *variable);
+					dynamicarray<bindvar> *vars);
+		void	initVar(bindvar *var,
+					const char *variable,
+					bool preexisting);
 		void	performSubstitution(stringbuffer *buffer,
 							uint16_t which);
 		bool	runQuery(const char *query);
@@ -127,17 +130,14 @@
 		bool		reexecute;
 
 		// substitution variables
-		bindvar		subvars[OPTIMISTIC_BIND_COUNT];
-		int16_t		subcount;
-		bool		dirtysubs;
+		dynamicarray<bindvar>	*subvars;
+		bool			dirtysubs;
 
 		// bind variables
-		bindvar		inbindvars[OPTIMISTIC_BIND_COUNT];
-		uint16_t	inbindcount;
-		bindvar		outbindvars[OPTIMISTIC_BIND_COUNT];
-		uint16_t	outbindcount;
-		bool		validatebinds;
-		bool		dirtybinds;
+		dynamicarray<bindvar>	*inbindvars;
+		dynamicarray<bindvar>	*outbindvars;
+		bool			validatebinds;
+		bool			dirtybinds;
 
 		// result set
 		uint64_t	rsbuffersize;
