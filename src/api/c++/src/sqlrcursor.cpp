@@ -1262,22 +1262,29 @@ void sqlrcursor::defineOutputBindGeneric(const char *variable,
 	}
 
 	bindvar	*bv=findVar(variable,outbindvars);
+	bool	preexisting=true;
 	if (!bv) {
 		bv=&(*outbindvars)[outbindvars->getLength()];
+		preexisting=false;
 		dirtybinds=true;
 	}
 
 	// clean up old values
-	if (bv->type==BINDVARTYPE_STRING) {
-		delete[] bv->value.stringval;
-		bv->value.stringval=NULL;
-	} else if (bv->type==BINDVARTYPE_BLOB || bv->type==BINDVARTYPE_CLOB) {
-		delete[] bv->value.lobval;
-		bv->value.lobval=NULL;
+	if (preexisting) {
+		if (bv->type==BINDVARTYPE_STRING) {
+			delete[] bv->value.stringval;
+			bv->value.stringval=NULL;
+		} else if (bv->type==BINDVARTYPE_BLOB ||
+				bv->type==BINDVARTYPE_CLOB) {
+			delete[] bv->value.lobval;
+			bv->value.lobval=NULL;
+		}
 	}
 	if (copyrefs) {
 		// clean up old variable and set new variable
-		delete[] bv->variable;
+		if (preexisting) {
+			delete[] bv->variable;
+		}
 		bv->variable=charstring::duplicate(variable);
 	} else {
 		bv->variable=(char *)variable;
@@ -2167,6 +2174,8 @@ void sqlrcursor::sendOutputBinds() {
 			sqlrc->debugPrint("\n");
 			sqlrc->debugPreEnd();
 		}
+
+		i++;
 	}
 }
 
