@@ -633,9 +633,8 @@ bool sqlrlistener::listenOnClientSockets() {
 			clientsockincount=clientsockincount+
 					node->getValue()->getAddressCount();
 		}
-		if (node->getValue()->getSocket()) {
-			clientsockuncount=clientsockuncount+
-					node->getValue()->getAddressCount();
+		if (charstring::length(node->getValue()->getSocket())) {
+			clientsockuncount=clientsockuncount+1;
 		}
 	}
 	clientsockin=new inetsocketserver *[clientsockincount];
