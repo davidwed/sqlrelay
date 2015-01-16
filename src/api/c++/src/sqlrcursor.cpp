@@ -1455,12 +1455,14 @@ bool sqlrcursor::validBind(const char *variable) {
 	performSubstitutions();
 	validateBindsInternal();
 	for (uint64_t in=0; in<inbindvars->getLength(); in++) {
-		if (!charstring::compare((*inbindvars)[in].variable,variable)) {
+		if (!charstring::compare(
+			(*inbindvars)[in].variable,variable)) {
 			return (*inbindvars)[in].send;
 		}
 	}
 	for (uint64_t out=0; out<outbindvars->getLength(); out++) {
-		if (!charstring::compare((*outbindvars)[out].variable,variable)) {
+		if (!charstring::compare(
+			(*outbindvars)[out].variable,variable)) {
 			return (*outbindvars)[out].send;
 		}
 	}
@@ -3073,8 +3075,8 @@ bool sqlrcursor::parseOutputBinds() {
 
 			// get the cursor id
 			if (getShort((uint16_t *)
-					&((*outbindvars)[count].value.cursorid))!=
-						sizeof(uint16_t)) {
+				&((*outbindvars)[count].value.cursorid))!=
+				sizeof(uint16_t)) {
 				setError("Failed to get cursor id.\n "
 					"A network error may have occurred.");
 				return false;
