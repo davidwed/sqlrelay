@@ -202,6 +202,7 @@ class db2cursor : public sqlrservercursor {
 		datebind	**outdatebind;
 		char		**outlobbind;
 		SQLINTEGER 	*outlobbindlen;
+		SQLINTEGER	sqlnulldata;
 
 		uint64_t	rowgroupindex;
 		uint64_t	totalinrowgroup;
@@ -726,6 +727,7 @@ db2cursor::db2cursor(sqlrserverconnection *conn, uint16_t id) :
 		outlobbind[i]=NULL;
 		outlobbindlen[i]=0;
 	}
+	sqlnulldata=SQL_NULL_DATA;
 	allocateResultSetBuffers(db2conn->maxselectlistsize);
 }
 
@@ -870,7 +872,7 @@ bool db2cursor::inputBind(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				(SQLINTEGER *)NULL);
+				(SQLINTEGER *)&sqlnulldata);
 	} else {
 		erg=SQLBindParameter(stmt,
 				charstring::toInteger(variable+1),

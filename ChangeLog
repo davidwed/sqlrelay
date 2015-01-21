@@ -2,6 +2,7 @@
 	added support for login warnings
 	made bind variable buffers dynamic on the client side
 	added maxbindvars parameter on the server side
+	binding a NULL to an integer works with db2 now
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d
