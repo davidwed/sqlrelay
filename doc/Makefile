@@ -32,21 +32,6 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/css
 	$(MKINSTALLDIRS) $(docdir)/modules
 	$(MKINSTALLDIRS) $(docdir)/programming
-	$(MKINSTALLDIRS) $(docdir)/gettingstarted
-	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle
-	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux
-	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/redhat
-	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/redhat/5
-	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/redhat/6
-	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/redhat/7
-	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/redhat/8
-	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/redhat/9
-	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/fedoracore/1
-	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/fedoracore/2
-	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/fedoracore/3
-	$(MKINSTALLDIRS) $(docdir)/gettingstarted/oracle/linux/fedoracore/5
-	$(MKINSTALLDIRS) $(docdir)/gettingstarted/sybase
-	$(MKINSTALLDIRS) $(docdir)/gettingstarted/db2
 	$(INSTALL) -m 644 index.html $(docdir)
 	$(INSTALL) -m 644 faq.html $(docdir)
 	$(INSTALL) -m 644 admin/configguide.html $(docdir)/admin
@@ -206,35 +191,6 @@ install:
 	$(INSTALL) -m 644 programming/rubydbi.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/java.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/tcl.html $(docdir)/programming
-	$(INSTALL) -m 644 gettingstarted/db2.html $(docdir)/gettingstarted
-	$(INSTALL) -m 644 gettingstarted/firebird.html $(docdir)/gettingstarted
-	$(INSTALL) -m 644 gettingstarted/msde.html $(docdir)/gettingstarted
-	$(INSTALL) -m 644 gettingstarted/mysql.html $(docdir)/gettingstarted
-	$(INSTALL) -m 644 gettingstarted/oracle.html $(docdir)/gettingstarted
-	$(INSTALL) -m 644 gettingstarted/postgresql.html $(docdir)/gettingstarted
-	$(INSTALL) -m 644 gettingstarted/sqlite.html $(docdir)/gettingstarted
-	$(INSTALL) -m 644 gettingstarted/sybase.html $(docdir)/gettingstarted
-	$(INSTALL) -m 644 gettingstarted/blackray.html $(docdir)/gettingstarted
-	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/5/805.html $(docdir)/gettingstarted/oracle/linux/redhat/5
-	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/6/8i.html $(docdir)/gettingstarted/oracle/linux/redhat/6
-	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/7/8i.html $(docdir)/gettingstarted/oracle/linux/redhat/7
-	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/8/9iR2.html $(docdir)/gettingstarted/oracle/linux/redhat/8
-	$(INSTALL) -m 644 gettingstarted/oracle/linux/redhat/9/9iR2.html $(docdir)/gettingstarted/oracle/linux/redhat/9
-	$(INSTALL) -m 644 gettingstarted/oracle/linux/fedoracore/1/9iR2.html $(docdir)/gettingstarted/oracle/linux/fedoracore/1
-	$(INSTALL) -m 644 gettingstarted/oracle/linux/fedoracore/1/10g.html $(docdir)/gettingstarted/oracle/linux/fedoracore/1
-	$(INSTALL) -m 644 gettingstarted/oracle/linux/fedoracore/2/10g.html $(docdir)/gettingstarted/oracle/linux/fedoracore/2
-	$(INSTALL) -m 644 gettingstarted/oracle/linux/fedoracore/3/10g.html $(docdir)/gettingstarted/oracle/linux/fedoracore/3
-	$(INSTALL) -m 644 gettingstarted/oracle/linux/fedoracore/5/10g.html $(docdir)/gettingstarted/oracle/linux/fedoracore/5
-	$(INSTALL) -m 644 gettingstarted/sybase/11.0.3.3.html $(docdir)/gettingstarted/sybase/11.0.3.3.html
-	$(INSTALL) -m 644 gettingstarted/sybase/11.9.2.html $(docdir)/gettingstarted/sybase/11.9.2.html
-	$(INSTALL) -m 644 gettingstarted/sybase/12.5.1.html $(docdir)/gettingstarted/sybase/12.5.1.html
-	$(INSTALL) -m 644 gettingstarted/sybase/12.5.2.html $(docdir)/gettingstarted/sybase/12.5.2.html
-	$(INSTALL) -m 644 gettingstarted/sybase/15.0.2.html $(docdir)/gettingstarted/sybase/15.0.2.html
-	$(INSTALL) -m 644 gettingstarted/db2/72.html $(docdir)/gettingstarted/db2/72.html
-	$(INSTALL) -m 644 gettingstarted/db2/81.html $(docdir)/gettingstarted/db2/81.html
-	$(INSTALL) -m 644 gettingstarted/db2/824.html $(docdir)/gettingstarted/db2/824.html
-	$(INSTALL) -m 644 gettingstarted/db2/82.html $(docdir)/gettingstarted/db2/82.html
-	$(INSTALL) -m 644 gettingstarted/db2/91.html $(docdir)/gettingstarted/db2/91.html
 
 uninstall:
 	$(RMTREE) $(docdir)
