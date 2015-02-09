@@ -1,46 +1,100 @@
+top_builddir = ..
+
 include ../config.mk
 
 .PHONY: all clean
 
-all: 
-ifneq ($(ORACLELIBS),)
-	$(MAKE) -C oracle8 all
+CPPFLAGS = \
+	$(BASECPPFLAGS) \
+	$(RUDIMENTSINCLUDES) \
+	-I$(top_builddir)/src/api/c++/include \
+	$(DB2INCLUDES) \
+	$(FIREBIRDINCLUDES) \
+	$(FREETDSINCLUDES) \
+	$(MYSQLINCLUDES) \
+	$(ORACLEINCLUDES) \
+	$(POSTGRESQLINCLUDES) \
+	$(SQLITEINCLUDES) \
+	$(SYBASEINCLUDES)
+
+LIBS = \
+	-L$(top_builddir)/src/api/c++/src \
+	-lsqlrclient \
+	$(RUDIMENTSLIBS) \
+	$(EXTRALIBS)
+
+ifneq ($(strip $(DB2LIBSPATH)),)
+	LIBS += -R $(DB2LIBSPATH)
 endif
-ifneq ($(MYSQLLIBS),)
-	$(MAKE) -C mysql all
+LIBS += $(DB2LIBS)
+
+ifneq ($(strip $(FIREBIRDLIBSPATH)),)
+	LIBS += -R $(FIREBIRDLIBSPATH)
 endif
-ifneq ($(POSTGRESQLLIBS),)
-	$(MAKE) -C postgresql all
+LIBS += $(FIREBIRDLIBS)
+
+ifneq ($(strip $(FREETDSLIBSPATH)),)
+	LIBS += -R $(FREETDSLIBSPATH)
 endif
-ifneq ($(SQLITELIBS),)
-	$(MAKE) -C sqlite all
+LIBS += $(FREETDSLIBS)
+
+ifneq ($(strip $(MYSQLLIBSPATH)),)
+	LIBS += -R $(MYSQLLIBSPATH)
 endif
-ifneq ($(FREETDSLIBS),)
-	$(MAKE) -C freetds all
+LIBS += $(MYSQLLIBS)
+
+ifneq ($(strip $(ORACLELIBSPATH)),)
+	LIBS += -R $(ORACLELIBSPATH)
 endif
-ifneq ($(ODBCLIBS),)
-	$(MAKE) -C odbc all
+LIBS += $(ORACLELIBS)
+
+ifneq ($(strip $(POSTGRESQLLIBSPATH)),)
+	LIBS += -R $(POSTGRESQLLIBSPATH)
 endif
-ifneq ($(DB2LIBS),)
-	$(MAKE) -C db2 all
+LIBS += $(POSTGRESQLLIBS)
+
+ifneq ($(strip $(SQLITELIBSPATH)),)
+	LIBS += -R $(SQLITELIBSPATH)
 endif
-ifneq ($(FIREBIRDLIBS),)
-	$(MAKE) -C firebird all
+LIBS += $(SQLITELIBS)
+
+ifneq ($(strip $(SYBASELIBSPATH)),)
+	LIBS += -R $(SYBASELIBSPATH)
 endif
-ifneq ($(SYBASELIBS),)
-	$(MAKE) -C sybase all
-endif
-	$(MAKE) -C sqlrelay all
+LIBS += $(SYBASELIBS)
+
+SRCS = bench.cpp main.cpp \
+	sqlrelaybench.cpp \
+	db2bench.cpp \
+	firebirdbench.cpp \
+	freetdsbench.cpp \
+	mysqlbench.cpp \
+	oraclebench.cpp \
+	postgresqlbench.cpp \
+	sqlitebench.cpp \
+	sybasebench.cpp
+
+LOBJS = bench.lo main.lo \
+	sqlrelaybench.lo \
+	db2bench.lo \
+	firebirdbench.lo \
+	freetdsbench.lo \
+	mysqlbench.lo \
+	oraclebench.lo \
+	postgresqlbench.lo \
+	sqlitebench.lo \
+	sybasebench.lo
+
+.SUFFIXES: .lo
+
+.cpp.lo:
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+all: sqlr-bench
 
 clean:
-	$(MAKE) -C oracle8 clean
-	$(MAKE) -C mysql clean
-	$(MAKE) -C postgresql clean
-	$(MAKE) -C sqlite clean
-	$(MAKE) -C freetds clean
-	$(MAKE) -C odbc clean
-	$(MAKE) -C db2 clean
-	$(MAKE) -C firebird clean
-	$(MAKE) -C sybase clean
-	$(MAKE) -C sqlrelay clean
-	$(MAKE) -C stats clean
+	$(LIBTOOL) --mode=clean $(RM) sqlr-bench *.lo *.o
+	$(RM) sqlr-bench
+
+sqlr-bench: $(SRCS) $(LOBJS)
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS)
