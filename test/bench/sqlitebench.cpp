@@ -1,6 +1,6 @@
 // Copyright (c) 2014  David Muse
 // See the file COPYING for more information
-#include "../config.h"
+#include "../../config.h"
 
 #include "sqlitebench.h"
 

@@ -3,7 +3,7 @@
 #ifndef DB2_BENCH_H
 #define DB2_BENCH_H
 
-#include "../config.h"
+#include "../../config.h"
 
 #include "bench.h"
 
