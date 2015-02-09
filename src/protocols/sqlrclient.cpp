@@ -385,7 +385,7 @@ sqlrclientexitstatus_t sqlrclient::clientSession() {
 		cont->endSession();
 	}
 
-	// If an error occurred, the client cound still be sending an entire
+	// If an error occurred, the client could still be sending an entire
 	// session's worth of data before it reads the error and closes the
 	// socket.  We have to absorb all of that data.  We shouldn't just loop
 	// forever though, that would provide a point of entry for a DOS attack.
