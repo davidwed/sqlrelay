@@ -4,6 +4,11 @@
 	added maxbindvars parameter on the server side
 	binding a NULL to an integer works with db2 now
 	moved getting started with DB docs into the cloud
+	added a semaphore to ensure that the listener doesn't hand off the
+		client to the connection until the connection is ready,
+		elimiating a race condition on the handoff socket that could
+		occur if the connection timed out waiting for the listener
+		just after the listener had decided to use that connection
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d
