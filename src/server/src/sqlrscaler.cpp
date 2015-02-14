@@ -278,7 +278,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 
 	// connect to the semaphore set
 	semset=new semaphoreset;
-	if (!semset->attach(key,12)) {
+	if (!semset->attach(key,13)) {
 		char	*err=error::getErrorString();
 		stderror.printf("Couldn't attach to semaphore set: ");
 		stderror.printf("%s\n",err);

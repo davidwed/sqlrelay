@@ -60,7 +60,7 @@ int main(int argc, const char **argv) {
 
 	// attach to the semaphore set for the specified instance
 	semaphoreset	semset;
-	if (!semset.attach(key,11)) {
+	if (!semset.attach(key,13)) {
 		char	*err=error::getErrorString();
 		stderror.printf("Couldn't attach to semaphore set: ");
 		stderror.printf("%s\n",err);
@@ -72,7 +72,7 @@ int main(int argc, const char **argv) {
 	semset.waitWithUndo(9);
 	shmdata		statistics=*shm;
 	semset.signalWithUndo(9);
-	#define SEM_COUNT	11
+	#define SEM_COUNT	13
 	int32_t	sem[SEM_COUNT];
 	for (uint16_t i=0; i<SEM_COUNT; i++) {
 		sem[i]=semset.getValue(i);
@@ -134,6 +134,8 @@ int main(int argc, const char **argv) {
 	printTriggeredStatus(sem[2]);
 	stdoutput.printf("  Done Accepting Available Connection (c-w, l-s) : ");
 	printTriggeredStatus(sem[3]);
+	stdoutput.printf("  Connection Ready For Handoff (l-w, c-s)        : ");
+	printTriggeredStatus(sem[12]);
 	stdoutput.printf("  Evaluate Connection Count (s-w, l-s)           : ");
 	printTriggeredStatus(sem[6]);
 	stdoutput.printf("  Done Evaluating Connection Count (l-w, s-s)    : ");
@@ -148,13 +150,14 @@ int main(int argc, const char **argv) {
 	stdoutput.printf("\n");
 
 	stdoutput.printf("Raw Semaphores:\n"
-		"  +---------------------------------------------+\n"
-		"  | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |  10 |\n"
-		"  +---+---+---+---+---+---+---+---+---+---+-----+\n"
-		"  | %d | %d | %d | %d | %d | %d | %d | %d | %d | %d | %3d |\n"
-		"  +---------------------------------------------+\n",
+		"  +-------------------------------------------------------+\n"
+		"  | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |  10 | 11 | 12 |\n"
+		"  +---+---+---+---+---+---+---+---+---+---+-----+----+----+\n"
+		"  | %d | %d | %d | %d | %d | %d | %d | %d | %d | %d | %3d | %2d | %2d |\n"
+		"  +-------------------------------------------------------+\n",
 		sem[0],sem[1],sem[2],sem[3],sem[4],
-		sem[5],sem[6],sem[7],sem[8],sem[9],sem[10]
+		sem[5],sem[6],sem[7],sem[8],sem[9],
+		sem[10],sem[11],sem[12]
 		);
 
 	process::exit(0);

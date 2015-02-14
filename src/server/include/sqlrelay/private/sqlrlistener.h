@@ -38,6 +38,7 @@
 		bool	releaseShmAccess();
 		bool	acceptAvailableConnection(bool *alldbsdown);
 		bool	doneAcceptingAvailableConnection();
+		void	waitForConnectionToBeReadyForHandoff();
 		bool	handOffOrProxyClient(filedescriptor *sock,
 					const char *protocol, thread *thr);
 		bool	getAConnection(uint32_t *connectionpid,

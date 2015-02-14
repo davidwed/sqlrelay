@@ -515,37 +515,38 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	// 1 - listener:   connection registration mutex
 	//
 	// connection/listener registration interlocks:
-	// 2 - connection/listener: ensures that it's safe for a listener to
-	//			  read a registration
-	//       listener waits for a connection to register itself
-	//       connection signals when it's done registering
-	// 3 - connection/listener: ensures that it's safe for a connection to
-	//			  register itself
-	//       connection waits for the listener to read its registration
-	//       listener signals when it's done reading a registration
+	// 2 - connection/listener: 
+	//       * listener waits
+	//       * connection signals when it's done registering itself
+	// 3 - connection/listener:
+	//       * connection waits
+	//       * listener signals when it's done reading the registration
+	// 12 - connection/listener:
+	//       * listener waits
+	//       * connection signals when it's ready to be handed a client
 	//
 	// connection/listener/scaler interlocks:
 	// 6 - scaler/listener: used to decide whether to scale or not
-	//       listener signals after incrementing connected client count
-	//       scaler waits before counting sessions/connections
+	//       * listener signals after incrementing connected client count
+	//       * scaler waits before counting sessions/connections
 	// 4 - connection/scaler: connection count mutex
-	//       connection increases/decreases connection count
-	//       scalar reads connection count
+	//       * connection increases/decreases connection count
+	//       * scalar reads connection count
 	// 5 - connection/listener: connected client count mutex
-	//       listener increases connected client count when
-	//       	a client connects
-	//       connection decreases connected client count when
-	//       	a client disconnects
+	//       * listener increases connected client count when
+	//         a client connects
+	//       * connection decreases connected client count when
+	//         a client disconnects
 	// 7 - scaler/listener: used to decide whether to scale or not
-	//       scaler signals after counting sessions/connections
-	//       listener waits for scaler to count sessions/connections
+	//       * scaler signals after counting sessions/connections
+	//       * listener waits for scaler to count sessions/connections
 	// 8 - scaler/connection:
-	//       scaler waits for the connection count to increase
+	//       * scaler waits for the connection count to increase
 	//		 (in effect, waiting for a new connection to fire up)
-	//       connection signals after increasing connection count
+	//       * connection signals after increasing connection count
 	// 11 - scaler/connection:
-	//       scaler waits for the connection to signal to indicate that
-	//	 its exiting on platforms that don't support SIGCHLD/waitpid()
+	//       * scaler waits for the connection to signal to indicate that
+	//	 * its exiting on platforms that don't support SIGCHLD/waitpid()
 	//
 	// statistics:
 	// 9 - coordinates access to statistics shared memory segment
@@ -553,13 +554,27 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	// main listenter process/listener children:
 	// 10 - listener: number of busy listeners
 	//
-	int32_t	vals[12]={1,1,0,0,1,1,0,0,0,1,0,0};
+	int32_t	vals[13]={1,1,0,0,1,1,0,0,0,1,0,0,0};
 	semset=new semaphoreset();
-	if (!semset->create(key,permissions::ownerReadWrite(),12,vals)) {
+	if (!semset->create(key,permissions::ownerReadWrite(),13,vals)) {
 		semError(id,semset->getId());
-		semset->attach(key,12);
+		semset->attach(key,13);
 		return false;
 	}
+
+	// issue warning about ttl if necessary
+	if (cfgfl.getTtl()>0 &&
+			!semset->supportsTimedSemaphoreOperations() &&
+			!sys::signalsInterruptSystemCalls()) {
+		stderror.printf("Warning: ttl forced to 0...\n"
+				"         semaphore waits cannot be "
+				"interrupted:\n"
+				"         system doesn't support timed "
+				"semaphore operations and\n"
+				"         signals don't interrupt system "
+				"calls\n");
+	}
+
 
 	return true;
 }
@@ -1366,8 +1381,8 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 			if (!connectionsock.passSocket(
 					sock->getFileDescriptor())) {
 
-				// this could fail if a connection died because
-				// it's ttl ran out
+				// this could fail if a connection
+				// died because its ttl expired
 				logInternalError("failed to pass "
 						"file descriptor");
 				continue;
@@ -1378,8 +1393,8 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 			// proxy the client
 			if (!proxyClient(connectionpid,&connectionsock,sock)) {
 
-				// this could fail if a connection died because
-				// it's ttl ran out
+				// this could fail if a connection
+				// died because its ttl expired
 				continue;
 			}
 		}
@@ -1410,6 +1425,7 @@ bool sqlrlistener::acquireShmAccess() {
 	}
 
 	// Loop, waiting.  Bail if interrupted by an alarm.
+	// FIXME: refactor this, similarly to controller
 	bool	result=true;
 	if (sys::signalsInterruptSystemCalls()) {
 		semset->dontRetryInterruptedOperations();
@@ -1486,6 +1502,7 @@ bool sqlrlistener::acceptAvailableConnection(bool *alldbsdown) {
 	}
 
 	// Loop, waiting.  Bail if interrupted by an alarm.
+	// FIXME: refactor this, similarly to controller
 	bool	result=true;
 	if (sys::signalsInterruptSystemCalls()) {
 		semset->dontRetryInterruptedOperations();
@@ -1532,12 +1549,18 @@ bool sqlrlistener::doneAcceptingAvailableConnection() {
 	logDebugMessage("signalling accepted connection");
 
 	if (!semset->signal(3)) {
-		logDebugMessage("failed to signal accapted connection");
+		logDebugMessage("failed to signal accepted connection");
 		return false;
 	}
 
 	logDebugMessage("succeeded signalling accepted connection");
 	return true;
+}
+
+void sqlrlistener::waitForConnectionToBeReadyForHandoff() {
+	logDebugMessage("waiting for connection to be ready for handoff");
+	semset->wait(12);
+	logDebugMessage("done waiting for connection to be ready for handoff");
 }
 
 struct alarmthreadattr {
@@ -1565,6 +1588,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		alarmthreadattr	*ata=NULL;
 
 		// set an alarm
+		bool	alarmon=false;
 		if (usealarm) {
 			alarmrang=0;
 			if (isforkedthread) {
@@ -1579,6 +1603,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			} else {
 				signalmanager::alarm(listenertimeout);
 			}
+			alarmon=true;
 		}
 
 		// set "all db's down" flag
@@ -1603,14 +1628,10 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 				} else {
 					signalmanager::alarm(0);
 				}
+				alarmon=false;
 			}
 
 			if (ok) {
-
-				// This section should be executed without
-				// returns or breaks so that
-				// signalAcceptedConnection will get called at
-				// the end, no matter what...
 
 				// get the pid
 				*connectionpid=
@@ -1625,7 +1646,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		}
 
 		// turn off the alarm
-		if (usealarm) {
+		if (usealarm && alarmon) {
 			if (isforkedthread) {
 				alarmthread->cancel();
 			} else {
@@ -1636,6 +1657,10 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		// clean up alarm thread stuff
 		delete alarmthread;
 		delete ata;
+
+		// wait for the connection to let us know that it's ready
+		// to have a client handed off to it
+		waitForConnectionToBeReadyForHandoff();
 
 		// execute this only if code above executed without errors...
 		if (ok) {

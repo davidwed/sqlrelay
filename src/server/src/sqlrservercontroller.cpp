@@ -257,7 +257,15 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get the time to live from the command line
 	const char	*ttlstr=cmdl->getValue("-ttl");
-	ttl=(ttlstr)?charstring::toInteger(cmdl->getValue("-ttl")):-1;
+	ttl=(ttlstr[0])?charstring::toInteger(ttlstr):-1;
+
+	// if there's no way to interrupt a semaphore wait,
+	// then force the ttl to zero
+	if (ttl>0 && !semset->supportsTimedSemaphoreOperations() &&
+				!sys::signalsInterruptSystemCalls()) {
+		ttl=0;
+	}
+
 
 	silent=cmdl->found("-silent");
 
@@ -442,12 +450,15 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	sqlrpr=new sqlrprotocols(this);
 	sqlrpr->loadProtocols();
 
-	// set a handler for SIGALRMs
+	// set a handler for SIGALARMs, if necessary
 	#ifdef SIGALRM
-	alarmhandler.setHandler(alarmHandler);
-	alarmhandler.handleSignal(SIGALRM);
+	if (ttl>0 && !semset->supportsTimedSemaphoreOperations() &&
+				sys::signalsInterruptSystemCalls()) {
+		alarmhandler.setHandler(alarmHandler);
+		alarmhandler.handleSignal(SIGALRM);
+	}
 	#endif
-	
+
 	return true;
 }
 
@@ -1177,7 +1188,7 @@ bool sqlrservercontroller::listen() {
 					return false;
 				}
 
-				if (ttl==0) {
+				if (!ttl) {
 					return true;
 				}
 
@@ -1294,18 +1305,24 @@ bool sqlrservercontroller::announceAvailability(const char *unixsocket,
 		registerForHandoff();
 	}
 
+	// save the original ttl
+	int32_t	originalttl=ttl;
+
+	// get the time before announcing
+	time_t	before=0;
+	if (originalttl>0) {
+		datetime	dt;
+		dt.getSystemDateAndTime();
+		before=dt.getEpoch();
+	}
+
 	// get a pointer to the shared memory segment
 	shmdata	*shmemptr=getAnnounceBuffer();
 
-	// set time-to-live alarm
-	if (ttl>0) {
-		alarmrang=0;
-		signalmanager::alarm(ttl);
-	}
-
 	// This will fall through if the ttl was reached while waiting.
 	// In that case, since we failed to acquire the announce mutex,
-	// we don't need to release it.
+	// we don't need to release it.  We also don't need to reset the
+	// ttl because we're going to exit.
 	if (!acquireAnnounceMutex()) {
 		logDebugMessage("ttl reached, aborting announcing availabilty");
 		return false;
@@ -1320,22 +1337,57 @@ bool sqlrservercontroller::announceAvailability(const char *unixsocket,
 
 	signalListenerToRead();
 
+	// get the time after announcing and update the ttl
+	if (originalttl>0) {
+		datetime	dt;
+		dt.getSystemDateAndTime();
+		ttl=ttl-(dt.getEpoch()-before);
+	}
+
 	// This will fall through if the ttl was reached while waiting.
 	// Since we acquired the announce mutex earlier though, we need to
 	// release it in either case.
-	bool	retval=waitForListenerToFinishReading();
-
-	// turn off the alarm
-	signalmanager::alarm(0);
+	bool	success=false;
+	if (originalttl<=0 || ttl) {
+		success=waitForListenerToFinishReading();
+	}
 
 	releaseAnnounceMutex();
 
-	if (retval) {
+	if (success) {
+		// reset ttl
+		ttl=originalttl;
+
 		logDebugMessage("done announcing availability...");
 	} else {
+		// a timeout must have occurred...
+
+		// We signalled earlier in signalListenerToRead() but now we
+		// need to undo that operation.  We don't want to rely on
+		// undo's though because this isn't a mutex and not all
+		// platforms support undo's.
+		unSignalListenerToRead();
+
+		// Close the handoff socket.  At this point, the listener
+		// will have read the connection data and will attempt to
+		// hand off the client to this connection.  The socket must
+		// be closed when it tries so the handoff will fail and the
+		// listener can loop back and try again with a different
+		// connection.
+		handoffsockun.close();
+
 		logDebugMessage("ttl reached, aborting announcing availabilty");
 	}
-	return retval;
+
+	// signal the listener to hand off...
+	// Do this whether the wait above timed out or not.  At this point,
+	// the listener is committed to using this connection.  If a timeout
+	// did occur, and this connection is going to exit, that's OK.  Since
+	// the handoff socket was closed above, the handoff will fail, and the
+	// listener will loop back and try again with a different connection.
+	signalListenerToHandoff();
+
+	return success;
 }
 
 void sqlrservercontroller::registerForHandoff() {
@@ -3862,7 +3914,7 @@ bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 	// connect to the semaphore set
 	logDebugMessage("attaching to semaphores...");
 	semset=new semaphoreset();
-	if (!semset->attach(file::generateKey(idfilename,1),12)) {
+	if (!semset->attach(file::generateKey(idfilename,1),13)) {
 		char	*err=error::getErrorString();
 		stderror.printf("Couldn't attach to semaphore set: ");
 		stderror.printf("%s\n",err);
@@ -3926,34 +3978,34 @@ bool sqlrservercontroller::acquireAnnounceMutex() {
 
 	updateState(WAIT_SEMAPHORE);
 
-	// FIXME: It's possible that the alarm could ring prior to the wait
-	// below and not interrupt it.  If that happens, the ttl would be
-	// ignored.
-
-	// Loop, waiting.  Bail if interrupted by an alarm.
-	bool	result=true;
-	if (sys::signalsInterruptSystemCalls()) {
-		semset->dontRetryInterruptedOperations();
-		do {
-			result=semset->waitWithUndo(0);
-		} while (!result && error::getErrorNumber()==EINTR &&
-							alarmrang!=1);
-		semset->retryInterruptedOperations();
+	// Wait.  Bail if ttl is exceeded
+	bool	result=false;
+	if (ttl>0) {
+		if (semset->supportsTimedSemaphoreOperations()) {
+			result=semset->waitWithUndo(0,ttl,0);
+		} else if (sys::signalsInterruptSystemCalls()) {
+			semset->dontRetryInterruptedOperations();
+			alarmrang=0;
+			signalmanager::alarm(ttl);
+			do {
+				error::setErrorNumber(0);
+				result=semset->waitWithUndo(0);
+			} while (!result &&
+					error::getErrorNumber()==EINTR &&
+					!alarmrang);
+			signalmanager::alarm(0);
+			semset->retryInterruptedOperations();
+		}
 	} else {
-		do {
-			result=semset->waitWithUndo(0,0,500000000);
-		} while (!result && alarmrang!=1);
+		result=semset->waitWithUndo(0);
 	}
-
-	// handle alarm...
-	if (alarmrang) {
+	if (result) {
+		logDebugMessage("done acquiring announce mutex");
+	} else {
 		logDebugMessage("ttl reached, aborting "
 				"acquiring announce mutex");
-		return false;
 	}
-
-	logDebugMessage("done acquiring announce mutex");
-	return true;
+	return result;
 }
 
 void sqlrservercontroller::releaseAnnounceMutex() {
@@ -3968,54 +4020,55 @@ void sqlrservercontroller::signalListenerToRead() {
 	logDebugMessage("done signalling listener to read");
 }
 
+void sqlrservercontroller::unSignalListenerToRead() {
+	semset->wait(2);
+}
+
 bool sqlrservercontroller::waitForListenerToFinishReading() {
 
 	logDebugMessage("waiting for listener");
 
-	// It's possible that the alarm could ring prior to the wait below and
-	// not interrupt it.  If that happens, the ttl would be ignored.  This
-	// is highly unlikely as the minimum ttl is 1 second, but I guess if a
-	// machine was super, super busy, then it might happen.
-
-	// Loop, waiting.  Bail if interrupted by an alarm.
-	bool	result=true;
-	if (sys::signalsInterruptSystemCalls()) {
-		semset->dontRetryInterruptedOperations();
-		do {
-			result=semset->wait(3);
-		} while (!result && error::getErrorNumber()==EINTR &&
-							alarmrang!=1);
-		semset->retryInterruptedOperations();
+	// Wait.  Bail if ttl is exceeded
+	bool	result=false;
+	if (ttl>0) {
+		if (semset->supportsTimedSemaphoreOperations()) {
+			result=semset->wait(3,ttl,0);
+		} else if (sys::signalsInterruptSystemCalls()) {
+			semset->dontRetryInterruptedOperations();
+			alarmrang=0;
+			signalmanager::alarm(ttl);
+			do {
+				error::setErrorNumber(0);
+				result=semset->wait(3);
+			} while (!result &&
+					error::getErrorNumber()==EINTR &&
+					!alarmrang);
+			signalmanager::alarm(0);
+			semset->retryInterruptedOperations();
+		}
 	} else {
-		do {
-			result=semset->wait(3,0,500000000);
-		} while (!result && alarmrang!=1);
+		result=semset->wait(3);
+	}
+	if (result) {
+		logDebugMessage("done waiting for listener");
+	} else {
+		logDebugMessage("ttl reached, aborting waiting for listener");
 	}
 
-	// We signalled semaphore 2 earlier in signalListenerToRead() and we
-	// need to undo that operation.  We don't want to rely on undo's though
-	// because this isn't a mutex and besides, not all platforms support
-	// undo's.
-	if (alarmrang) {
-		semset->wait(2);
-	}
-
-	// Reset this semaphore to 0.
-	// It can get left incremented if another sqlr-connection is killed
-	// between calls to signalListenerToRead() and this method.
-	// It's ok to reset it here becuase no one except this process has
-	// access to this semaphore at this time because of the lock on
-	// AnnounceMutex (semaphore 0).
+	// Reset this semaphore to 0.  It can get left incremented if another
+	// sqlr-connection is killed between calls to signalListenerToRead()
+	// and this method.  It's ok to reset it here becuase no one except
+	// uthis process has access to this semaphore at this time because of
+	// the lock on the announce mutex (semaphore 0).
 	semset->setValue(3,0);
 
-	// handle alarm...
-	if (alarmrang) {
-		logDebugMessage("ttl reached, aborting waiting for listener");
-		return false;
-	}
+	return result;
+}
 
-	logDebugMessage("done waiting for listener");
-	return true;
+void sqlrservercontroller::signalListenerToHandoff() {
+	logDebugMessage("signalling listener to handoff");
+	semset->signal(12);
+	logDebugMessage("done signalling listener to handoff");
 }
 
 void sqlrservercontroller::acquireConnectionCountMutex() {

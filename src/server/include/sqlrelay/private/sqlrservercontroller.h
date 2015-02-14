@@ -114,7 +114,9 @@
 		void	releaseAnnounceMutex();
 
 		void	signalListenerToRead();
+		void	unSignalListenerToRead();
 		bool	waitForListenerToFinishReading();
+		void	signalListenerToHandoff();
 
 		void	acquireConnectionCountMutex();
 		void	releaseConnectionCountMutex();
@@ -135,7 +137,7 @@
 		void	sessionEndQueries();
 		void	sessionQuery(const char *query);
 
-		static void	alarmHandler(int32_t signum);
+		static void     alarmHandler(int32_t signum);
 
 		sqlrcmdline	*cmdl;
 
@@ -263,8 +265,8 @@
 		char		*reformattedfield;
 		uint32_t	reformattedfieldlength;
 
-		static	signalhandler		alarmhandler;
-		static	volatile sig_atomic_t	alarmrang;
+		static  signalhandler           alarmhandler;
+		static  volatile sig_atomic_t   alarmrang;
 
 		singlylinkedlist< char * >	sessiontemptablesfordrop;
 		singlylinkedlist< char * >	sessiontemptablesfortrunc;
