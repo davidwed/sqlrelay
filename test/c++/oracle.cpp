@@ -120,7 +120,7 @@ int	main(int argc, char **argv) {
 	con=new sqlrconnection("sqlrserver",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	cur=new sqlrcursor(con);
-
+/*
 	// get database type
 	stdoutput.printf("IDENTIFY: \n");
 	checkSuccess(con->identify(),"oracle8");
@@ -976,10 +976,10 @@ int	main(int argc, char **argv) {
 
 	// drop existing table
 	cur->sendQuery("drop table testtable");
-
+*/
 
 	// temporary tables
-	stdoutput.printf("TEMPORARY TABLES: \n");
+	/*stdoutput.printf("TEMPORARY TABLES: \n");
 	cur->sendQuery("drop table temptabledelete\n");
 	cur->sendQuery("create global temporary table temptabledelete (col1 number) on commit delete rows");
 	checkSuccess(cur->sendQuery("insert into temptabledelete values (1)"),1);
@@ -990,22 +990,22 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,(uint32_t)0),"0");
 	cur->sendQuery("drop table temptabledelete\n");
 	stdoutput.printf("\n");
-	cur->sendQuery("drop table temptablepreserve\n");
+	cur->sendQuery("drop table temptablepreserve\n");*/
 	cur->sendQuery("create global temporary table temptablepreserve (col1 number) on commit preserve rows");
 	checkSuccess(cur->sendQuery("insert into temptablepreserve values (1)"),1);
 	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"1");
-	checkSuccess(con->commit(),1);
-	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"1");
-	con->endSession();
-	stdoutput.printf("\n");
-	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"0");
+	//checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	//checkSuccess(con->commit(),1);
+	//checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
+	//checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	//con->endSession();
+	//stdoutput.printf("\n");
+	//checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
+	//checkSuccess(cur->getField(0,(uint32_t)0),"0");
 	cur->sendQuery("drop table temptablepreserve\n");
 	stdoutput.printf("\n");
 
-
+/*
 	// stored procedures
 	stdoutput.printf("STORED PROCEDURE: \n");
 	// return no value
@@ -1052,7 +1052,7 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop function testproc");
 	cur->sendQuery("drop procedure testproc");
 	stdoutput.printf("\n");
-
+*/
 
 	// in/out variables
 	/*stdoutput.printf("IN/OUT VARIABLES: \n");
@@ -1067,7 +1067,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");*/
 
 
-
+/*
 	// rebinding
 	stdoutput.printf("REBINDING: \n");
 	cur->sendQuery("drop procedure testproc");
@@ -1104,7 +1104,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("create table testtable"),0);
 	checkSuccess(cur->sendQuery("create table testtable"),0);
 	stdoutput.printf("\n");
-
+*/
 
 	delete cur;
 	delete con;

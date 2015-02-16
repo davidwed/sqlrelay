@@ -315,6 +315,10 @@ void sqlrservercursor::checkForTempTable(const char *query, uint32_t length) {
 	conn->cont->addSessionTempTableForDrop(tablename.getString());
 }
 
+const char *sqlrservercursor::truncateTableQuery() {
+	return "delete from";
+}
+
 bool sqlrservercursor::executeQuery(const char *query, uint32_t length) {
 	// by default, do nothing...
 	return true;

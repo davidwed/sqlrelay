@@ -3639,16 +3639,17 @@ void sqlrservercontroller::endSession() {
 
 void sqlrservercontroller::dropTempTables(sqlrservercursor *cursor) {
 
-	// some databases require us to re-login before dropping temp tables
-	if (sessiontemptablesfordrop.getLength() &&
-			conn->tempTableDropReLogIn()) {
-		reLogIn();
-	}
-
 	// run through the temp table list, dropping tables
 	for (singlylinkedlistnode< char * >
 				*sln=sessiontemptablesfordrop.getFirst();
 						sln; sln=sln->getNext()) {
+
+		// some databases (oracle) require us to truncate the
+		// table before it can be dropped
+		if (conn->tempTableTruncateBeforeDrop()) {
+			truncateTempTable(cursor,sln->getValue());
+		}
+
 		dropTempTable(cursor,sln->getValue());
 		delete[] sln->getValue();
 	}
@@ -3708,7 +3709,8 @@ void sqlrservercontroller::truncateTempTables(sqlrservercursor *cursor) {
 void sqlrservercontroller::truncateTempTable(sqlrservercursor *cursor,
 						const char *tablename) {
 	stringbuffer	truncatequery;
-	truncatequery.append("delete from ")->append(tablename);
+	truncatequery.append(cursor->truncateTableQuery());
+	truncatequery.append(" ")->append(tablename);
 	if (prepareQuery(cursor,truncatequery.getString(),
 					truncatequery.getStringLength())) {
 		executeQuery(cursor);

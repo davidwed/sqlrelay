@@ -637,7 +637,7 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual bool		bindValueIsNull(int16_t isnull);
 
 		virtual const char	*tempTableDropPrefix();
-		virtual bool		tempTableDropReLogIn();
+		virtual bool		tempTableTruncateBeforeDrop();
 
 		virtual void		endSession();
 
@@ -774,6 +774,7 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		virtual void	closeLobOutputBind(uint16_t index);
 		virtual void	checkForTempTable(const char *query,
 							uint32_t length);
+		virtual	const char	*truncateTableQuery();
 		virtual	bool	executeQuery(const char *query,
 							uint32_t length);
 		virtual bool	fetchFromBindCursor();

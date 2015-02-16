@@ -9,6 +9,14 @@
 		elimiating a race condition on the handoff socket that could
 		occur if the connection timed out waiting for the listener
 		just after the listener had decided to use that connection
+	oracle temp tables that need to be truncated at the end of the session
+		are truncated with "truncate table xxx" now rather than
+		"delete from xxx"
+	oracle temp tables that need to be dropped at the end of the session
+		are truncated first, rather than the connection re-logging in
+	an ora-14452 error (basically indicating that a temp table can only be
+		dropped after being truncated, or if the current session ends)
+		does not automatically trigger a re-login any more
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d

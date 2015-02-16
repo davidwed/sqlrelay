@@ -87,7 +87,7 @@ class SQLRSERVER_DLLSPEC oracle8connection : public sqlrserverconnection {
 	private:
 		void		handleConnectString();
 #ifdef HAVE_ORACLE_8i
-		bool		tempTableDropReLogIn();
+		bool		tempTableTruncateBeforeDrop();
 #endif
 		bool		logIn(const char **error, const char **warning);
 		const char	*logInError(const char *errmsg);
@@ -161,7 +161,7 @@ class SQLRSERVER_DLLSPEC oracle8connection : public sqlrserverconnection {
 #endif
 #ifdef HAVE_ORACLE_8i
 		bool		droptemptables;
-		bool		temptabledroprelogin;
+		bool		temptabletruncatebeforedrop;
 #endif
 		bool		rejectduplicatebinds;
 		bool		disablekeylookup;
@@ -287,6 +287,7 @@ class SQLRSERVER_DLLSPEC oracle8cursor : public sqlrservercursor {
 #ifdef HAVE_ORACLE_8i
 		void		checkForTempTable(const char *query,
 							uint32_t length);
+		const char	*truncateTableQuery();
 #endif
 		bool		queryIsNotSelect();
 		void		errorMessage(char *errorbuffer,
@@ -438,7 +439,7 @@ oracle8connection::oracle8connection(sqlrservercontroller *cont) :
 #endif
 #ifdef HAVE_ORACLE_8i
 	droptemptables=false;
-	temptabledroprelogin=false;
+	temptabletruncatebeforedrop=false;
 #endif
 	rejectduplicatebinds=false;
 	disablekeylookup=false;
@@ -533,15 +534,16 @@ void oracle8connection::handleConnectString() {
 }
 
 #ifdef HAVE_ORACLE_8i
-bool oracle8connection::tempTableDropReLogIn() {
+bool oracle8connection::tempTableTruncateBeforeDrop() {
 	// When dropping temporary tables, if any of those tables were created
-	// with "on commit preserve rows" then the session has to exit before
-	// the table can be dropped or oracle will return the following error:
-	// ORA-14452: attempt to create, alter or drop an index on temporary
-	// table already in use
+	// with "on commit preserve rows" then the table has to be truncated
+	// before it can be dropped or oracle will return the following error:
+	// ORA-14452: attempt to create, alter or drop an index on
+	// temporary table already in use
+	//
 	// It's not really clear why, but that's the case.
-	if (temptabledroprelogin) {
-		temptabledroprelogin=false;
+	if (temptabletruncatebeforedrop) {
+		temptabletruncatebeforedrop=false;
 		return true;
 	}
 	return false;
@@ -1109,25 +1111,12 @@ void oracle8connection::errorMessage(char *errorbuffer,
 		case 3114: // not connected to ORACLE
 		case 3113: // end-of-file on communication channel
 		case 3135: // connection lost contact
-		case 14452: // attempt to create, alter or drop an index on
-				// temporary table already in use
-				// (see note below)
 			*liveconnection=false;
 			break;
 		default:
 			*liveconnection=true;
 			break;
 	}
-
-	// Note:
-	// When dropping temporary tables, if any of those tables were created
-	// with "on commit preserve rows" then the session has to exit before
-	// the table can be dropped or oracle will return the following error:
-	// ORA-14452: attempt to create, alter or drop an index on temporary
-	// table already in use
-	// It's not really clear why, but that's the case.  If we encounter
-	// this error, then we'll declare the db down.  SQL Relay will then
-	// relogin and reexecute the query when it comes back up.
 }
 
 const char *oracle8connection::pingQuery() {
@@ -2949,16 +2938,16 @@ void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 	if (oracle8conn->droptemptables) {
 
 		// When dropping temporary tables, if any of those tables were
-		// created with "on commit preserve rows" then the session has
-		// to exit before the table can be dropped or oracle will return
+		// created with "on commit preserve rows" then the table has to
+		// be truncated before it can be dropped or oracle will return
 		// the following error:
 		// ORA-14452: attempt to create, alter or drop an index on
 		// temporary table already in use
 		//
 		// It's not really clear why, but that's the case.
-		// As such, we'll set a flag to cause a relogin if the query
+		// As such, we'll set a flag to cause truncation if the query
 		// contained that clause.
-		oracle8conn->temptabledroprelogin=preserverowsoncommit;
+		oracle8conn->temptabletruncatebeforedrop=preserverowsoncommit;
 
 		// if "droptemptables" was specified...
 		conn->cont->addSessionTempTableForDrop(tablename.getString());
@@ -2971,6 +2960,10 @@ void oracle8cursor::checkForTempTable(const char *query, uint32_t length) {
 		// be though, so we'll set it up to be truncated manually.
 		conn->cont->addSessionTempTableForTrunc(tablename.getString());
 	}
+}
+
+const char *oracle8cursor::truncateTableQuery() {
+	return "truncate table";
 }
 #endif
 

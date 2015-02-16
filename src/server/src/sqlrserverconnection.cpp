@@ -623,7 +623,7 @@ const char *sqlrserverconnection::tempTableDropPrefix() {
 	return "";
 }
 
-bool sqlrserverconnection::tempTableDropReLogIn() {
+bool sqlrserverconnection::tempTableTruncateBeforeDrop() {
 	return false;
 }
 
