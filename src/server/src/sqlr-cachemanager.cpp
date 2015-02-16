@@ -125,9 +125,8 @@ void sqlrcachemanager::scan() {
 			if (dir.open(currentdir->dirname)) {
 
 				// loop through directory, erasing
-				uint32_t	index=0;
 				for (;;) {
-					char	*name=dir.getChildName(index);
+					char	*name=dir.read();
 					if (!name) {
 						break;
 					}
@@ -138,7 +137,6 @@ void sqlrcachemanager::scan() {
 						erase(currentdir->dirname,name);
 					}
 					delete[] name;
-					index++;
 				}
 
 				// close the directory
