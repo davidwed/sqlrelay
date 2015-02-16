@@ -973,7 +973,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"0");
-	cur->sendQuery("drop table temptablepreserve\n");
+	checkSuccess(cur->sendQuery("drop table temptablepreserve\n"),1);
 	printf("\n");
 
 
