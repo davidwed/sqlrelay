@@ -35,7 +35,7 @@ void	runQuery(uint32_t seed) {
 			if (!sqlrcur.sendQuery(query)) {
 				stdoutput.printf("error: %s\n",
 						sqlrcur.errorMessage());
-				//exit(0);
+				//process::exit(0);
 			} else {
 				successcount++;
 			}

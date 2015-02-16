@@ -6,6 +6,10 @@ include ../../config.mk
 
 .SUFFIXES: .lo
 
+CPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
+LIBS = $(RUDIMENTSLIBS) $(LIBEFENCE)
+
+
 all:
 ifneq ($(strip $(MYSQLLIBS)),)
 	$(MAKE) mysql
@@ -15,16 +19,16 @@ ifneq ($(strip $(POSTGRESQLLIBS)),)
 endif
 
 mysql.lo: mysql.cpp
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(BASECPPFLAGS) -I$(top_builddir) $(MYSQLINCLUDES) -c $< -o $@
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -I$(top_builddir) $(MYSQLINCLUDES) -c $< -o $@
 
 postgresql.lo: postgresql.cpp
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(BASECPPFLAGS) -I$(top_builddir) $(POSTGRESQLINCLUDES) -c $< -o $@
+	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -I$(top_builddir) $(POSTGRESQLINCLUDES) -c $< -o $@
 
 mysql: mysql.cpp mysql.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ mysql.lo $(MYSQLLIBS)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ mysql.lo $(MYSQLLIBS) $(LIBS)
 
 postgresql: postgresql.cpp postgresql.lo
-	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ postgresql.lo $(POSTGRESQLLIBS)
+	$(LIBTOOL) --mode=link $(CXX) $(LDFLAGS) -o $@ postgresql.lo $(POSTGRESQLLIBS) $(LIBS)
 
 clean:
 	$(LIBTOOL) --mode=clean $(RM) *.lo *.o mysql postgresql

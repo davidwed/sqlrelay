@@ -1,26 +1,26 @@
 #include <libpq-fe.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <rudiments/charstring.h>
+#include <rudiments/process.h>
+#include <rudiments/stdio.h>
 
 void checkSuccess(const char *value, const char *success) {
 	//printf("\"%s\"=\"%s\"\n",value,success);
 
 	if (!success) {
 		if (!value) {
-			printf("success ");
+			stdoutput.printf("success ");
 			return;
 		} else {
-			printf("failure ");
-			exit(0);
+			stdoutput.printf("failure ");
+			process::exit(0);
 		}
 	}
 
-	if (!strcmp(value,success)) {
-		printf("success ");
+	if (!charstring::compare(value,success)) {
+		stdoutput.printf("success ");
 	} else {
-		printf("failure ");
-		exit(0);
+		stdoutput.printf("failure ");
+		process::exit(0);
 	}
 }
 
@@ -28,10 +28,10 @@ void checkSuccess(int value, int success) {
 	//printf("\"%d\"=\"%d\"\n",value,success);
 
 	if (value==success) {
-		printf("success ");
+		stdoutput.printf("success ");
 	} else {
-		printf("failure ");
-		exit(0);
+		stdoutput.printf("failure ");
+		process::exit(0);
 	}
 }
 
@@ -43,7 +43,7 @@ int	main(int argc, char **argv) {
 	const char	*password="test";
 	const char	*db="testdb";
 
-	printf("PQresStatus:\n");
+	stdoutput.printf("PQresStatus:\n");
 	checkSuccess(PQresStatus(PGRES_EMPTY_QUERY),"PGRES_EMPTY_QUERY");
 	checkSuccess(PQresStatus(PGRES_COMMAND_OK),"PGRES_COMMAND_OK");
 	checkSuccess(PQresStatus(PGRES_TUPLES_OK),"PGRES_TUPLES_OK");
@@ -53,95 +53,96 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQresStatus(PGRES_NONFATAL_ERROR),"PGRES_NONFATAL_ERROR");
 	checkSuccess(PQresStatus(PGRES_FATAL_ERROR),"PGRES_FATAL_ERROR");
 
-	printf("PQstatus:\n");
+	stdoutput.printf("PQstatus:\n");
 	PGconn	*pgconn=PQsetdbLogin(host,port,NULL,NULL,db,user,password);
 	checkSuccess(PQstatus(pgconn),CONNECTION_OK);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQdb:\n");
+	stdoutput.printf("PQdb:\n");
 	checkSuccess(PQdb(pgconn),db);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQuser:\n");
+	stdoutput.printf("PQuser:\n");
 	checkSuccess(PQuser(pgconn),user);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQpass:\n");
+	stdoutput.printf("PQpass:\n");
 	checkSuccess(PQpass(pgconn),password);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQhost:\n");
+	stdoutput.printf("PQhost:\n");
 	checkSuccess(PQhost(pgconn),host);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQport:\n");
-	checkSuccess(PQport(pgconn),(strlen(port)?port:(char *)"5432"));
-	printf("\n");
+	stdoutput.printf("PQport:\n");
+	checkSuccess(PQport(pgconn),
+			(charstring::length(port)?port:(char *)"5432"));
+	stdoutput.printf("\n");
 
-	printf("PQtty:\n");
+	stdoutput.printf("PQtty:\n");
 	checkSuccess(PQtty(pgconn),"");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQoptions:\n");
+	stdoutput.printf("PQoptions:\n");
 	checkSuccess(PQoptions(pgconn),"");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQstatus:\n");
+	stdoutput.printf("PQstatus:\n");
 	PQfinish(pgconn);
 	char	conninfo[1024];
-	sprintf(conninfo,
+	charstring::printf(conninfo,sizeof(conninfo),
 		"host='%s' port='%s' user='%s' password='%s' dbname='%s'",
 						host,port,user,password,db);
 	pgconn=PQconnectdb(conninfo);
 	checkSuccess(PQstatus(pgconn),CONNECTION_OK);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQdb:\n");
+	stdoutput.printf("PQdb:\n");
 	checkSuccess(PQdb(pgconn),db);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQuser:\n");
+	stdoutput.printf("PQuser:\n");
 	checkSuccess(PQuser(pgconn),user);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQpass:\n");
+	stdoutput.printf("PQpass:\n");
 	checkSuccess(PQpass(pgconn),password);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQhost:\n");
+	stdoutput.printf("PQhost:\n");
 	checkSuccess(PQhost(pgconn),host);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQport:\n");
+	stdoutput.printf("PQport:\n");
 	checkSuccess(PQport(pgconn),port);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQtty:\n");
+	stdoutput.printf("PQtty:\n");
 	checkSuccess(PQtty(pgconn),"");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQoptions:\n");
+	stdoutput.printf("PQoptions:\n");
 	checkSuccess(PQoptions(pgconn),"");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQresetStart:\n");
+	stdoutput.printf("PQresetStart:\n");
 	PQresetStart(pgconn);
 	pgconn=PQconnectdb(conninfo);
 	checkSuccess(PQstatus(pgconn),CONNECTION_OK);
-	printf("\n");
+	stdoutput.printf("\n");
 
 	const char	*query="drop table testtable";
 	PGresult	*pgresult=PQexec(pgconn,query);
 	PQclear(pgresult);
 
-	printf("PQexec: create\n");
+	stdoutput.printf("PQexec: create\n");
 	query="create table testtable (testint int, testfloat float, testreal real, testsmallint smallint, testchar char(40), testvarchar varchar(40), testdate date, testtime time, testtimestamp timestamp)";
 	pgresult=PQexec(pgconn,query);
 	checkSuccess(PQresultStatus(pgresult),PGRES_COMMAND_OK);
 	PQclear(pgresult);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQexec: insert\n");
+	stdoutput.printf("PQexec: insert\n");
 	query="insert into testtable values (1,1.1,1.1,1,'testchar1','testvarchar1','01/01/2001','01:00:00',NULL)";
 	pgresult=PQexec(pgconn,query);
 	checkSuccess(PQresultStatus(pgresult),PGRES_COMMAND_OK);
@@ -152,23 +153,23 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQresultStatus(pgresult),PGRES_COMMAND_OK);
 	checkSuccess(PQcmdTuples(pgresult),"1");
 	PQclear(pgresult);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQexec: select\n");
+	stdoutput.printf("PQexec: select\n");
 	query="select * from testtable";
 	pgresult=PQexec(pgconn,query);
 	checkSuccess(PQresultStatus(pgresult),PGRES_TUPLES_OK);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQnfields:\n");
+	stdoutput.printf("PQnfields:\n");
 	checkSuccess(PQnfields(pgresult),9);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQntuples:\n");
+	stdoutput.printf("PQntuples:\n");
 	checkSuccess(PQntuples(pgresult),2);
-	printf("\n");
+	stdoutput.printf("\n");
 	
-	printf("PQfname:\n");
+	stdoutput.printf("PQfname:\n");
 	checkSuccess(PQfname(pgresult,0),"testint");
 	checkSuccess(PQfname(pgresult,1),"testfloat");
 	checkSuccess(PQfname(pgresult,2),"testreal");
@@ -178,9 +179,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQfname(pgresult,6),"testdate");
 	checkSuccess(PQfname(pgresult,7),"testtime");
 	checkSuccess(PQfname(pgresult,8),"testtimestamp");
-	printf("\n");
+	stdoutput.printf("\n");
 	
-	printf("PQftype:\n");
+	stdoutput.printf("PQftype:\n");
 	checkSuccess(PQftype(pgresult,0),23);
 	checkSuccess(PQftype(pgresult,1),701);
 	checkSuccess(PQftype(pgresult,2),700);
@@ -190,9 +191,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQftype(pgresult,6),1082);
 	checkSuccess(PQftype(pgresult,7),1083);
 	checkSuccess(PQftype(pgresult,8),1114);
-	printf("\n");
+	stdoutput.printf("\n");
 	
-	printf("PQfsize:\n");
+	stdoutput.printf("PQfsize:\n");
 	checkSuccess(PQfsize(pgresult,0),4);
 	checkSuccess(PQfsize(pgresult,1),8);
 	checkSuccess(PQfsize(pgresult,2),4);
@@ -202,9 +203,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQfsize(pgresult,6),4);
 	checkSuccess(PQfsize(pgresult,7),8);
 	checkSuccess(PQfsize(pgresult,8),8);
-	printf("\n");
+	stdoutput.printf("\n");
 	
-	printf("PQfmod:\n");
+	stdoutput.printf("PQfmod:\n");
 	checkSuccess(PQfmod(pgresult,0),-1);
 	checkSuccess(PQfmod(pgresult,1),-1);
 	checkSuccess(PQfmod(pgresult,2),-1);
@@ -214,13 +215,13 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQfmod(pgresult,6),-1);
 	checkSuccess(PQfmod(pgresult,7),-1);
 	checkSuccess(PQfmod(pgresult,8),-1);
-	printf("\n");
+	stdoutput.printf("\n");
 	
-	printf("PQbinaryTuples:\n");
+	stdoutput.printf("PQbinaryTuples:\n");
 	checkSuccess(PQbinaryTuples(pgresult),0);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQgetisnull:\n");
+	stdoutput.printf("PQgetisnull:\n");
 	checkSuccess(PQgetisnull(pgresult,0,0),0);
 	checkSuccess(PQgetisnull(pgresult,0,1),0);
 	checkSuccess(PQgetisnull(pgresult,0,2),0);
@@ -237,9 +238,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQgetisnull(pgresult,1,5),0);
 	checkSuccess(PQgetisnull(pgresult,1,6),0);
 	checkSuccess(PQgetisnull(pgresult,1,7),0);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQgetvalue:\n");
+	stdoutput.printf("PQgetvalue:\n");
 	checkSuccess(PQgetvalue(pgresult,0,0),"1");
 	checkSuccess(PQgetvalue(pgresult,0,1),"1.1");
 	checkSuccess(PQgetvalue(pgresult,0,2),"1.1");
@@ -256,9 +257,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQgetvalue(pgresult,1,5),"testvarchar2");
 	checkSuccess(PQgetvalue(pgresult,1,6),"2002-01-01");
 	checkSuccess(PQgetvalue(pgresult,1,7),"02:00:00");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQgetlength:\n");
+	stdoutput.printf("PQgetlength:\n");
 	checkSuccess(PQgetlength(pgresult,0,0),1);
 	checkSuccess(PQgetlength(pgresult,0,1),3);
 	checkSuccess(PQgetlength(pgresult,0,2),3);
@@ -275,14 +276,14 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQgetlength(pgresult,1,5),12);
 	checkSuccess(PQgetlength(pgresult,1,6),10);
 	checkSuccess(PQgetlength(pgresult,1,7),8);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("PQescapeString:\n");
+	stdoutput.printf("PQescapeString:\n");
 	char	to[1024];
 	const char	*from=" \\ ' ";
-	checkSuccess(PQescapeString(to,from,strlen(from)),7);
+	checkSuccess(PQescapeString(to,from,charstring::length(from)),7);
 	checkSuccess(to," \\\\ '' ");
-	printf("\n");
+	stdoutput.printf("\n");
 
 	//PQescapeBytea
 	// PQunescapeBytea

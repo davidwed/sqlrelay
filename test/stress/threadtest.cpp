@@ -26,7 +26,7 @@ void runQuery(void *id) {
 	con->endSession();
 	
 	for (uint64_t i=0; i<cur->rowCount(); i++) {
-		stdoutput.printf("%d  ",(int)id);
+		stdoutput.printf("%lld  ",(int64_t)id);
 		for (uint32_t j=0; j<cur->colCount(); j++) {
 			stdoutput.printf("\"%s\",",cur->getField(i,j));
 		}
@@ -54,12 +54,12 @@ int main(int argc, char **argv) {
 
 	thread	th[threadcount];
 
-	for (int i=0; i<threadcount; i++) {
+	for (int64_t i=0; i<threadcount; i++) {
 		th[i].setFunction((void *(*)(void *))runQuery,(void *)i);
 		th[i].create();
 	}
 
-	for (int i=0; i<threadcount; i++) {
+	for (int64_t i=0; i<threadcount; i++) {
 		th[i].join(NULL);
 	}
 	process::exit(1);

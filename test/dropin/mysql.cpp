@@ -1,38 +1,38 @@
 #include <mysql/mysql.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <rudiments/process.h>
+#include <rudiments/charstring.h>
+#include <rudiments/stdio.h>
 #include <config.h>
 
-void checkSuccess(char *value, char *success) {
-	//printf("\"%s\"=\"%s\"\n",value,success);
+void checkSuccess(const char *value, const char *success) {
+	//stdoutput.printf("\"%s\"=\"%s\"\n",value,success);
 
 	if (!success) {
 		if (!value) {
-			printf("success ");
+			stdoutput.printf("success ");
 			return;
 		} else {
-			printf("failure ");
-			exit(0);
+			stdoutput.printf("failure ");
+			process::exit(0);
 		}
 	}
 
-	if (!strcmp(value,success)) {
-		printf("success ");
+	if (!charstring::compare(value,success)) {
+		stdoutput.printf("success ");
 	} else {
-		printf("failure ");
-		exit(0);
+		stdoutput.printf("failure ");
+		process::exit(0);
 	}
 }
 
 void checkSuccess(int value, int success) {
-	//printf("\"%d\"=\"%d\"\n",value,success);
+	//stdoutput.printf("\"%d\"=\"%d\"\n",value,success);
 
 	if (value==success) {
-		printf("success ");
+		stdoutput.printf("success ");
 	} else {
-		printf("failure ");
-		exit(0);
+		stdoutput.printf("failure ");
+		process::exit(0);
 	}
 }
 
@@ -40,9 +40,9 @@ int	main(int argc, char **argv) {
 
 	MYSQL	mysql;
 #ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
-	printf("mysql_init\n");
+	stdoutput.printf("mysql_init\n");
 	checkSuccess((long)mysql_init(&mysql),(long)&mysql);
-	printf("\n");
+	stdoutput.printf("\n");
 #endif
 
 	const char	*host="sqlrserver";
@@ -52,78 +52,80 @@ int	main(int argc, char **argv) {
 	const char	*password="test";
 
 #ifdef HAVE_MYSQL_REAL_CONNECT_FOR_SURE
-	printf("mysql_real_connect\n");
+	stdoutput.printf("mysql_real_connect\n");
 #if MYSQL_VERSION_ID>=32200
 	checkSuccess((long)mysql_real_connect(&mysql,host,user,password,"",
-					atoi(port),socket,0),(long)&mysql);
+					charstring::toInteger(port),
+					socket,0),(long)&mysql);
 #else
 	checkSuccess((long)mysql_real_connect(&mysql,host,user,password,
-					atoi(port),socket,0),(long)&mysql);
+					charstring::toInteger(port),
+					socket,0),(long)&mysql);
 	// mysql_select_db...
 #endif
 #else
 	checkSuccess((long)mysql_connect(&mysql,host,user,password),
 					(long)mysql);
 #endif
-	printf("\n");
+	stdoutput.printf("\n");
 
 #ifdef HAVE_MYSQL_PING
-	printf("mysql_ping\n");
+	stdoutput.printf("mysql_ping\n");
 	checkSuccess(mysql_ping(&mysql),0);
-	printf("\n");
+	stdoutput.printf("\n");
 #endif
 
-	printf("mysql_character_set_name:\n");
+	stdoutput.printf("mysql_character_set_name:\n");
 	checkSuccess((char *)mysql_character_set_name(&mysql),"latin1");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	char	*query="drop table testdb.testtable";
-	mysql_real_query(&mysql,query,strlen(query));
+	const char	*query="drop table testdb.testtable";
+	mysql_real_query(&mysql,query,charstring::length(query));
 
-	printf("mysql_real_query: create\n");
+	stdoutput.printf("mysql_real_query: create\n");
 	query="create table testdb.testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testtext text, testvarchar varchar(40), testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testtimestamp timestamp)";
-	checkSuccess(mysql_real_query(&mysql,query,strlen(query)),0);
-	printf("\n");
+	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	stdoutput.printf("\n");
 
-	printf("mysql_real_query: insert\n");
+	stdoutput.printf("mysql_real_query: insert\n");
 	query="insert into testdb.testtable values (1,1,1,1,1,1.1,1.1,1.1,'2001-01-01','01:00:00','2001-01-01 01:00:00','2001','char1','text1','varchar1','tinytext1','mediumtext1','longtext1',NULL)";
-	checkSuccess(mysql_real_query(&mysql,query,strlen(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
 	checkSuccess(mysql_affected_rows(&mysql),1);
 	query="insert into testdb.testtable values (2,2,2,2,2,2.1,2.1,2.1,'2002-01-01','02:00:00','2002-01-01 02:00:00','2002','char2','text2','varchar2','tinytext2','mediumtext2','longtext2',NULL)";
-	checkSuccess(mysql_real_query(&mysql,query,strlen(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
 	checkSuccess(mysql_affected_rows(&mysql),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
 	// mysql_insert_id...
 	// mysql_info...
 
 
 
-	printf("mysql_real_query: select\n");
+	stdoutput.printf("mysql_real_query: select\n");
 	query="select * from testdb.testtable";
-	checkSuccess(mysql_real_query(&mysql,query,strlen(query)),0);
-	printf("\n");
+	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	stdoutput.printf("\n");
 
-	printf("mysql_field_count:\n");
+	stdoutput.printf("mysql_field_count:\n");
 	checkSuccess(mysql_field_count(&mysql),19);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("mysql_store_result:\n");
+	stdoutput.printf("mysql_store_result:\n");
 	MYSQL_RES	*result=mysql_store_result(&mysql);
 
-	printf("mysql_num_fields:\n");
+	stdoutput.printf("mysql_num_fields:\n");
 	checkSuccess(mysql_num_fields(result),19);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("mysql_num_rows:\n");
+	stdoutput.printf("mysql_num_rows:\n");
 	checkSuccess(mysql_num_rows(result),2);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("mysql_field_seek:\n");
+	stdoutput.printf("mysql_field_seek:\n");
 	checkSuccess(mysql_field_seek(result,0),0);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("mysql_fetch_field/mysql_field_tell:\n");
+	stdoutput.printf("mysql_fetch_field/mysql_field_tell:\n");
 	MYSQL_FIELD	*field;
 	field=mysql_fetch_field(result);
 	checkSuccess(mysql_field_tell(result),1);
@@ -182,13 +184,13 @@ int	main(int argc, char **argv) {
 	field=mysql_fetch_field(result);
 	checkSuccess(mysql_field_tell(result),19);
 	checkSuccess(field->name,"testtimestamp");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("mysql_field_seek:\n");
+	stdoutput.printf("mysql_field_seek:\n");
 	checkSuccess(mysql_field_seek(result,0),19);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("mysql_fetch_field_direct:\n");
+	stdoutput.printf("mysql_fetch_field_direct:\n");
 	field=mysql_fetch_field_direct(result,0);
 	checkSuccess(field->name,"testtinyint");
 	field=mysql_fetch_field_direct(result,1);
@@ -227,10 +229,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(field->name,"testlongtext");
 	field=mysql_fetch_field_direct(result,18);
 	checkSuccess(field->name,"testtimestamp");
-	printf("\n");
+	stdoutput.printf("\n");
 
 #if 0
-	printf("mysql_fetch_fields:\n");
+	stdoutput.printf("mysql_fetch_fields:\n");
 	field=mysql_fetch_fields(result);
 	checkSuccess(field[0].name,"testtinyint");
 	checkSuccess(field[1].name,"testsmallint");
@@ -251,10 +253,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(field[16].name,"testmediumtext");
 	checkSuccess(field[17].name,"testlongtext");
 	checkSuccess(field[18].name,"testtimestamp");
-	printf("\n");
+	stdoutput.printf("\n");
 #endif
 
-	printf("mysql_fetch_row:\n");
+	stdoutput.printf("mysql_fetch_row:\n");
 	MYSQL_ROW	row;
 	row=mysql_fetch_row(result);
 	checkSuccess(row[0],"1");
@@ -275,9 +277,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(row[15],"tinytext1");
 	checkSuccess(row[16],"mediumtext1");
 	checkSuccess(row[17],"longtext1");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("mysql_fetch_lengths:\n");
+	stdoutput.printf("mysql_fetch_lengths:\n");
 	unsigned long	*lengths;
 	lengths=mysql_fetch_lengths(result);
 	checkSuccess(lengths[0],1);
@@ -298,9 +300,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(lengths[15],9);
 	checkSuccess(lengths[16],11);
 	checkSuccess(lengths[17],9);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("mysql_fetch_row:\n");
+	stdoutput.printf("mysql_fetch_row:\n");
 	row=mysql_fetch_row(result);
 	checkSuccess(row[0],"2");
 	checkSuccess(row[1],"2");
@@ -320,15 +322,15 @@ int	main(int argc, char **argv) {
 	checkSuccess(row[15],"tinytext2");
 	checkSuccess(row[16],"mediumtext2");
 	checkSuccess(row[17],"longtext2");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("mysql_data_seek:\n");
+	stdoutput.printf("mysql_data_seek:\n");
 	mysql_data_seek(result,0);
 	row=mysql_fetch_row(result);
 	checkSuccess(row[0],"1");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("mysql_row_tell/mysql_row_seek:\n");
+	stdoutput.printf("mysql_row_tell/mysql_row_seek:\n");
 	mysql_data_seek(result,0);
 	MYSQL_ROW_OFFSET	zerorowoffset=mysql_row_tell(result);
 	row=mysql_fetch_row(result);
@@ -338,28 +340,28 @@ int	main(int argc, char **argv) {
 	mysql_row_seek(result,zerorowoffset);
 	row=mysql_fetch_row(result);
 	checkSuccess(row[0],"1");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("mysql_eof:\n");
+	stdoutput.printf("mysql_eof:\n");
 	mysql_data_seek(result,1);
 	row=mysql_fetch_row(result);
 	checkSuccess(mysql_eof(result),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
 	mysql_free_result(result);
 
 
 
-	printf("mysql_real_query: select\n");
+	stdoutput.printf("mysql_real_query: select\n");
 	query="select * from testdb.testtable";
-	checkSuccess(mysql_real_query(&mysql,query,strlen(query)),0);
-	printf("\n");
+	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	stdoutput.printf("\n");
 
-	printf("mysql_use_result:\n");
+	stdoutput.printf("mysql_use_result:\n");
 	result=mysql_use_result(&mysql);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("mysql_fetch_row:\n");
+	stdoutput.printf("mysql_fetch_row:\n");
 	row=mysql_fetch_row(result);
 	checkSuccess(row[0],"1");
 	checkSuccess(row[1],"1");
@@ -399,35 +401,35 @@ int	main(int argc, char **argv) {
 	checkSuccess(row[16],"mediumtext2");
 	checkSuccess(row[17],"longtext2");
 	checkSuccess((long)mysql_fetch_row(result),0);
-	printf("\n");
+	stdoutput.printf("\n");
 
 	mysql_free_result(result);
 
 
-	printf("mysql_real_query: drop\n");
+	stdoutput.printf("mysql_real_query: drop\n");
 	query="drop table testdb.testtable";
-	checkSuccess(mysql_real_query(&mysql,query,strlen(query)),0);
-	printf("\n");
+	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	stdoutput.printf("\n");
 
-	printf("mysql_escape_string:\n");
+	stdoutput.printf("mysql_escape_string:\n");
 	char	to[100];
 	char	from[100];
-	sprintf(from," ' \" \n \r \\ ; %c ",26);
+	charstring::printf(from,sizeof(from)," ' \" \n \r \\ ; %c ",26);
 	checkSuccess(mysql_escape_string(to,from,15),21);
 	checkSuccess(to," \\' \\\" \\n \\r \\\\ ; \\Z ");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("mysql_real_escape_string:\n");
+	stdoutput.printf("mysql_real_escape_string:\n");
 	checkSuccess(mysql_real_escape_string(&mysql,to,from,15),21);
 	checkSuccess(to," \\' \\\" \\n \\r \\\\ ; \\Z ");
-	printf("\n");
+	stdoutput.printf("\n");
 
-	printf("mysql_get_*_info:\n");
-	printf("server: %s\n",mysql_get_server_info(&mysql));
-	printf("client: %s\n",mysql_get_client_info());
-	printf("host: %s\n",mysql_get_host_info(&mysql));
-	printf("proto: %d\n",mysql_get_proto_info(&mysql));
-	printf("\n");
+	stdoutput.printf("mysql_get_*_info:\n");
+	stdoutput.printf("server: %s\n",mysql_get_server_info(&mysql));
+	stdoutput.printf("client: %s\n",mysql_get_client_info());
+	stdoutput.printf("host: %s\n",mysql_get_host_info(&mysql));
+	stdoutput.printf("proto: %d\n",mysql_get_proto_info(&mysql));
+	stdoutput.printf("\n");
 	
 
 	// mysql_error
