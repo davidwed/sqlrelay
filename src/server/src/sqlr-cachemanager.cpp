@@ -172,7 +172,7 @@ void sqlrcachemanager::erase(const char *dirname, const char *filename) {
 		if (!charstring::compare(magicid,"SQLRELAYCACHE",13)) {
 
 			// get the ttl
-			int32_t ttl;
+			int64_t ttl;
 			fl.read(&ttl);
 	
 			fl.close();

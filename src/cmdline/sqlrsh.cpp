@@ -84,6 +84,7 @@ class sqlrshenv {
 		dictionary<char *, sqlrshbindvalue *>	inputbinds;
 		memorypool	*inbindpool;
 		dictionary<char *, sqlrshbindvalue *>	outputbinds;
+		char		*cacheto;
 };
 
 sqlrshenv::sqlrshenv() {
@@ -94,12 +95,14 @@ sqlrshenv::sqlrshenv() {
 	autocommit=false;
 	delimiter=';';
 	inbindpool=new memorypool(512,128,100);
+	cacheto=NULL;
 }
 
 sqlrshenv::~sqlrshenv() {
 	clearbinds(&inputbinds);
 	clearbinds(&outputbinds);
 	delete inbindpool;
+	delete[] cacheto;
 }
 
 void sqlrshenv::clearbinds(dictionary<char *, sqlrshbindvalue *> *binds) {
@@ -203,6 +206,10 @@ class	sqlrsh {
 		void	getclientinfo(sqlrconnection *sqlrcon);
 		void	responseTimeout(sqlrconnection *sqlrcon,
 						const char *command);
+		void	cache(sqlrshenv *env, sqlrcursor *sqlrcur,
+							const char *command);
+		void	openCache(sqlrshenv *env, sqlrcursor *sqlrcur,
+							const char *command);
 		void	displayHelp(sqlrshenv *env);
 		void	interactWithUser(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur, sqlrshenv *env);
@@ -472,7 +479,9 @@ int sqlrsh::commandType(const char *command) {
 					"getresultsetbuffersize") ||
 		!charstring::compareIgnoringCase(ptr,"endsession") ||
 		!charstring::compareIgnoringCase(ptr,"querytree") ||
-		!charstring::compareIgnoringCase(ptr,"response timeout",16)) {
+		!charstring::compareIgnoringCase(ptr,"response timeout",16) ||
+		!charstring::compareIgnoringCase(ptr,"cache ",6) ||
+		!charstring::compareIgnoringCase(ptr,"opencache ",10)) {
 
 		// return value of 1 is internal command
 		return 1;
@@ -629,6 +638,12 @@ void sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(
 					ptr,"response timeout",16)) {
 		responseTimeout(sqlrcon,command);
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"cache ",6)) {
+		cache(env,sqlrcur,command);
+		return;
+	} else if (!charstring::compareIgnoringCase(ptr,"opencache ",10)) {
+		openCache(env,sqlrcur,command);
 		return;
 	} else {
 		return;
@@ -1529,6 +1544,110 @@ void sqlrsh::responseTimeout(sqlrconnection *sqlrcon, const char *command) {
 	stdoutput.printf("Response Timeout set to %d.%04d seconds\n",sec,msec);
 }
 
+void sqlrsh::cache(sqlrshenv *env, sqlrcursor *sqlrcur, const char *command) {
+
+	// move to file name
+	const char	*ptr=command+6;
+
+	// skip whitespace
+	while (*ptr==' ') {
+		ptr++;
+	}
+
+	// bail if no file name was given
+	if (!*ptr) {
+		stdoutput.printf("	No file name given\n\n");
+		return;
+	}
+
+	// build filename
+	stringbuffer	fn;
+	if (CACHE_DIR[0]=='/') {
+		if (*ptr!='/') {
+			fn.append(CACHE_DIR)->append('/');
+		}
+	} else if (!charstring::compare(CACHE_DIR+1,":\\",2)) {
+		if (!charstring::compare(ptr+1,":\\",2)) {
+			fn.append(CACHE_DIR)->append('\\');
+		}
+	}
+	bool	inquotes=false;
+	while (*ptr) {
+		if (*ptr=='"') {
+			inquotes=!inquotes;
+		}
+		if (*ptr==' ' && !inquotes) {
+			break;
+		}
+		fn.append(*ptr);
+		ptr++;
+	}
+	delete[] env->cacheto;
+	env->cacheto=fn.detachString();
+
+	// find ttl
+	while (*ptr==' ') {
+		ptr++;
+	}
+	uint32_t	cachettl=600;
+	if (*ptr) {
+		cachettl=charstring::toInteger(ptr);
+	}
+
+	stdoutput.printf("	Caching To       : %s\n",env->cacheto);
+	stdoutput.printf("	Cache TTL Set To : %lld seconds\n\n",cachettl);
+
+	// begin caching
+	sqlrcur->cacheToFile(env->cacheto);
+	sqlrcur->setCacheTtl(cachettl);
+}
+
+void sqlrsh::openCache(sqlrshenv *env,
+			sqlrcursor *sqlrcur, const char *command) {
+
+	// move to file name
+	command=command+10;
+
+	// skip whitespace
+	while (*command==' ') {
+		command++;
+	}
+
+	// bail if no file name was given
+	if (!*command) {
+		return;
+	}
+
+	// if the file name starts with a slash then use it as-is, otherwise
+	// prepend the default cache directory.
+	stringbuffer	filename;
+	if (CACHE_DIR[0]=='/') {
+		if (*command!='/') {
+			filename.append(CACHE_DIR)->append('/');
+		}
+	} else if (!charstring::compare(CACHE_DIR+1,":\\",2)) {
+		if (!charstring::compare(command+1,":\\",2)) {
+			filename.append(CACHE_DIR)->append('\\');
+		}
+	}
+	filename.append(command);
+
+	// init stats
+	initStats(env);
+
+	// open the cached result set
+	sqlrcur->openCachedResultSet(filename.getString());
+
+	// display the header
+	displayHeader(sqlrcur,env);
+
+	// display the result set
+	displayResultSet(sqlrcur,env);
+
+	// display statistics
+	displayStats(sqlrcur,env);
+}
+
 void sqlrsh::displayHelp(sqlrshenv *env) {
 
 	stdoutput.printf("\n");
@@ -1613,6 +1732,8 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	stdoutput.printf("	setresultsetbuffersize size	- fetch size rows at a time\n");
 	stdoutput.printf("	getresultsetbuffersize 		- shows rows fetched at a time\n\n");
 	stdoutput.printf("	endsession		- ends the current session\n\n");
+	stdoutput.printf("	cache [filename] [ttl]	- caches the next result set to \"filename\"\n	                      	  with ttl of \"ttl\"\n");
+	stdoutput.printf("	opencache [filename] 	- opens and displays cached result set \n				  in \"filename\"\n\n");
 	stdoutput.printf("	exit/quit		- ");
 	stdoutput.printf("exits\n\n");
 	stdoutput.printf("	All commands must be followed by the delimiter: %c\n",

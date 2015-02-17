@@ -17,6 +17,10 @@
 	an ora-14452 error (basically indicating that a temp table can only be
 		dropped after being truncated, or if the current session ends)
 		does not automatically trigger a re-login any more
+	updated cachemanager to use directory::read() directly instead of
+		directory::getChildName(index)
+	added cache and opencache commands to sqlrsh
+	made cache ttl a 64-bit number
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d

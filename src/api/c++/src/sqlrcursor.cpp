@@ -8,6 +8,7 @@
 #include <rudiments/datetime.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/character.h>
+#include <rudiments/filesystem.h>
 #include <rudiments/error.h>
 #include <defines.h>
 #define NEED_DATATYPESTRING
@@ -274,6 +275,17 @@ void sqlrcursor::startCaching() {
 
 	if (cachedest && cachedestind) {
 
+		// calculate and set write buffer size
+		// FIXME: I think rudiments bugs keep this from working...
+		/*filesystem	fs;
+		if (fs.initialize(cachedestname)) {
+			off64_t	optblocksize=fs.getOptimumTransferBlockSize();
+			cachedest->setWriteBufferSize(
+					(optblocksize)?optblocksize:1024);
+			cachedestind->setWriteBufferSize(
+					(optblocksize)?optblocksize:1024);
+		}*/
+
 		if (!resumed) {
 
 			// write "magic" identifier to head of files
@@ -283,7 +295,7 @@ void sqlrcursor::startCaching() {
 			// write ttl to files
 			datetime	dt;
 			dt.getSystemDateAndTime();
-			int32_t	expiration=dt.getEpoch()+cachettl;
+			int64_t	expiration=dt.getEpoch()+cachettl;
 			cachedest->write(expiration);
 			cachedestind->write(expiration);
 		}
@@ -451,7 +463,7 @@ void sqlrcursor::cacheData() {
 		// seek to the right place in the index file and write the
 		// destination file offset
 		cachedestind->setPositionRelativeToBeginning(
-			13+sizeof(int32_t)+((firstrowindex+i)*sizeof(int64_t)));
+			13+sizeof(int64_t)+((firstrowindex+i)*sizeof(int64_t)));
 		cachedestind->write(position);
 
 		// write the row to the cache file
@@ -493,6 +505,9 @@ void sqlrcursor::finishCaching() {
 
 	// terminate the result set
 	cachedest->write((uint16_t)END_RESULT_SET);
+	// FIXME: I think rudiments bugs keep this from working...
+	/*cachedest->flushWriteBuffer(-1,-1);
+	cachedestind->flushWriteBuffer(-1,-1);*/
 
 	// close the cache file and clean up
 	clearCacheDest();
@@ -2335,7 +2350,7 @@ bool sqlrcursor::skipRows(bool getallrows, uint64_t rowtoget) {
 
 		// get the row offset from the index
 		cachesourceind->setPositionRelativeToBeginning(
-				13+sizeof(int32_t)+(rowcount*sizeof(int64_t)));
+				13+sizeof(int64_t)+(rowcount*sizeof(int64_t)));
 		int64_t	rowoffset;
 		if (cachesourceind->read(&rowoffset)!=sizeof(int64_t)) {
 			setError("The cache file index appears to be corrupt.");
@@ -3778,10 +3793,10 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 
 		// make sure it's a cache file and skip the ttl
 		char		magicid[13];
-		uint32_t	longvar;
+		uint64_t	ttl;
 		if (getString(magicid,13)==13 &&
 			!charstring::compare(magicid,"SQLRELAYCACHE",13) &&
-			getLong(&longvar)==sizeof(uint32_t)) {
+			getLongLong(&ttl)==sizeof(uint64_t)) {
 
 			// process the result set
 			if (rsbuffersize) {
