@@ -25,11 +25,14 @@ class custom_sc : public sqlrlogger {
 		char	*querylogname;
 		sqlrlogger_loglevel_t	loglevel;
 		stringbuffer		logbuffer;
+		bool			enabled;
 };
 
 custom_sc::custom_sc(xmldomnode *parameters) : sqlrlogger(parameters) {
 	querylogname=NULL;
 	loglevel=SQLRLOGGER_LOGLEVEL_ERROR;
+	enabled=charstring::compareIgnoringCase(
+			parameters->getAttributeValue("enabled"),"no");
 }
 
 custom_sc::~custom_sc() {
@@ -38,6 +41,10 @@ custom_sc::~custom_sc() {
 
 bool custom_sc::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
 	debugFunction();
+
+	if (!enabled) {
+		return true;
+	}
 
 	// get log level
 	const char	*ll=parameters->getAttributeValue("loglevel");
@@ -79,6 +86,10 @@ bool custom_sc::run(sqlrlistener *sqlrl,
 				sqlrlogger_eventtype_t event,
 				const char *info) {
 	debugFunction();
+
+	if (!enabled) {
+		return true;
+	}
 
 	// bail if log level is too low
 	if (level<loglevel) {

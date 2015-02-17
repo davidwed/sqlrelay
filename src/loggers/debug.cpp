@@ -29,6 +29,7 @@ class debug : public sqlrlogger {
 		char			*dbgfilename;
 		mode_t			dbgfileperms;
 		const char		*name;
+		bool			enabled;
 		bool			loglistener;
 		bool			logconnection;
 };
@@ -43,6 +44,8 @@ debug::debug(xmldomnode *parameters) : sqlrlogger(parameters) {
 	}
 	dbgfileperms=permissions::evalPermString(permstring);
 	name=NULL;
+	enabled=charstring::compareIgnoringCase(
+			parameters->getAttributeValue("enabled"),"no");
 	loglistener=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("listener"),"no");
 	logconnection=charstring::compareIgnoringCase(
@@ -55,6 +58,10 @@ debug::~debug() {
 }
 
 bool debug::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
+
+	if (!enabled) {
+		return true;
+	}
 
 	closeDebugFile();
 	delete[] dbgfilename;
@@ -87,6 +94,9 @@ bool debug::run(sqlrlistener *sqlrl,
 				sqlrlogger_loglevel_t level,
 				sqlrlogger_eventtype_t event,
 				const char *info) {
+	if (!enabled) {
+		return true;
+	}
 	if (sqlrl && !loglistener) {
 		return true;
 	}

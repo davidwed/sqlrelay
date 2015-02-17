@@ -21,6 +21,7 @@
 		directory::getChildName(index)
 	added cache and opencache commands to sqlrsh
 	made cache ttl a 64-bit number
+	added enabled="yes"/"no" parameter to logger modules
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d

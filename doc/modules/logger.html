@@ -34,11 +34,15 @@
 </font>
 </blockquote>
 
-<p>The <i>module</i> attribute specifies which module to load.  The <i>listener</i> and <i>connection</i> attributes are parameters for the module.  Different modules may have different parameters, or may have no parameters.  In this case, listener="yes" tells the module to log debug info for the sqlr-listener processes and connection="yes" tells the module to log debug info for the sqlr-connection processes.</p>
+<p>The <i>module</i> attribute specifies which module to load.  The <i>listener</i> and <i>connection</i> attributes are parameters for the module.</p>
+
+<p>Different modules may have different parameters.  In this case, listener="yes" tells the module to log debug info for the sqlr-listener processes and connection="yes" tells the module to log debug info for the sqlr-connection processes.</p>
+
+<p>Currently, all log modules have an <i>enabled</i> parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.</p>
 
 <p>Multiple log modules may be loaded by specifying multiple logger tags.</p>
 
-<p>Internally, at startup the SQL Relay server processes create instances of the specified logger modules and initialize them.  Then, as they run, the call the logger modules' "run" method, passing in an event type, log level and log message.  The modules then react to the different events, log levels and messages in a module-specific manner.  The "debug" logger module, for example logs every event type at every log level, while the "slowqueries" logger module only logs queries and ignores all other event types.</p>
+<p>Internally, at startup the SQL Relay server processes create instances of the specified logger modules and initialize them.  Then, as they run, the call the logger modules' "run" method, passing in an event type, log level and log message.  The modules then react to the different events, log levels and messages in a module-specific manner.  The "debug" logger module, for example, logs every event type at every log level, while the "slowqueries" logger module only logs queries and ignores all other event types.</p>
 
 <br><a name="available"></a>
 <span class="heading2">Available Modules</span><br>

@@ -31,10 +31,13 @@ class custom_nw : public sqlrlogger {
 		file	querylog;
 		char	*querylogname;
 		char	querylogbuf[102400];
+		bool	enabled;
 };
 
 custom_nw::custom_nw(xmldomnode *parameters) : sqlrlogger(parameters) {
 	querylogname=NULL;
+	enabled=charstring::compareIgnoringCase(
+			parameters->getAttributeValue("enabled"),"no");
 }
 
 custom_nw::~custom_nw() {
@@ -43,6 +46,10 @@ custom_nw::~custom_nw() {
 
 bool custom_nw::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
 	debugFunction();
+
+	if (!enabled) {
+		return true;
+	}
 
 	const char	*logdir=
 			(sqlrcon)?sqlrcon->cont->getLogDir():sqlrl->getLogDir();
@@ -79,6 +86,10 @@ bool custom_nw::run(sqlrlistener *sqlrl,
 				sqlrlogger_eventtype_t event,
 				const char *info) {
 	debugFunction();
+
+	if (!enabled) {
+		return true;
+	}
 
 	// don't do anything unless we got INFO/QUERY
 	if (level!=SQLRLOGGER_LOGLEVEL_INFO ||
@@ -142,7 +153,7 @@ bool custom_nw::run(sqlrlistener *sqlrl,
 		sec+usec/1000000.0,
 		errorcodebuf,
 		(long long)sqlrcur->getTotalRowsFetched(),
-        	infobuf,
+		infobuf,
 		sqlbuf,
 		sec+usec/1000000.0,
 		sqlrcon->cont->connstats->clientaddr,

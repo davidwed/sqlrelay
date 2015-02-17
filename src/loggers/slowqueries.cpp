@@ -27,6 +27,7 @@ class slowqueries : public sqlrlogger {
 		uint64_t	sec;
 		uint64_t	usec;
 		uint64_t	totalusec;
+		bool		enabled;
 };
 
 slowqueries::slowqueries(xmldomnode *parameters) : sqlrlogger(parameters) {
@@ -34,6 +35,8 @@ slowqueries::slowqueries(xmldomnode *parameters) : sqlrlogger(parameters) {
 	sec=charstring::toInteger(parameters->getAttributeValue("sec"));
 	usec=charstring::toInteger(parameters->getAttributeValue("usec"));
 	totalusec=sec*1000000+usec;
+	enabled=charstring::compareIgnoringCase(
+			parameters->getAttributeValue("enabled"),"no");
 }
 
 slowqueries::~slowqueries() {
@@ -42,6 +45,10 @@ slowqueries::~slowqueries() {
 }
 
 bool slowqueries::init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon) {
+
+	if (!enabled) {
+		return true;
+	}
 
 	// don't log anything for the listener
 	if (!sqlrcon) {
@@ -84,6 +91,10 @@ bool slowqueries::run(sqlrlistener *sqlrl,
 				sqlrlogger_loglevel_t level,
 				sqlrlogger_eventtype_t event,
 				const char *info) {
+
+	if (!enabled) {
+		return true;
+	}
 
 	// don't log anything for the listener
 	if (!sqlrcon) {
