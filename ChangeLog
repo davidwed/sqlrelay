@@ -24,6 +24,7 @@
 	added enabled="yes"/"no" parameter to logger modules
 	updated odbc connection code to use new/delete and rudiments methods
 		rather than malloc/free and native calls
+	retired Ruby DBI driver
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d

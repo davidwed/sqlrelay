@@ -28,30 +28,26 @@ The SQLRelay software package is really several packages:
 	hereafter refered to as The SQLRelay PHP PDO API.
 
 7) Source code, scripts and binaries found in the src/api/ruby 
-	directory of the SQL Relay source distribution except for SQLRelay.rb. 
+	directory of the SQL Relay source distribution.
         This package is hereafter refered to as The SQLRelay Ruby API.
 
-8) The file SQLRelay.rb found in the src/api/ruby directory of the SQL Relay
-	source distribution.  This package is hereafter refered to as
-	The SQLRelay Ruby DBD.
-
-9) Source code, scripts and binaries found in the src/api/tcl
+8) Source code, scripts and binaries found in the src/api/tcl
 	directory of the SQL Relay source distribution.  This package is
 	hereafter refered to as The SQLRelay TCL API.
 
-10) Source code, scripts and binaries found in the src/api/postgresql
+9) Source code, scripts and binaries found in the src/api/postgresql
 	directory of the SQL Relay source distribution.  This package is
 	hereafter refered to as The SQLRelay PostgreSQL Drop-In API.
 
-11) Source code, scripts and binaries found in the src/api/mysql
+10) Source code, scripts and binaries found in the src/api/mysql
 	directory of the SQL Relay source distribution.  This package is
 	hereafter refered to as The SQLRelay MySQL Drop-In API.
 
-12) Source code, scripts and binaries found in the src/api/odbc
+11) Source code, scripts and binaries found in the src/api/odbc
 	directory of the SQL Relay source distribution.  This package is
 	hereafter refered to as The SQLRelay ODBC API
 
-13) Header files that may be used to build modules to extend the functionality
+12) Header files that may be used to build modules to extend the functionality
 	of SQL Relay, found in various directories of the SQL Relay source
 	distribution: sqlrauth.h, sqlrlogger.h, sqlrpwdenc.h, sqlrquery.h,
 	sqlrtranslation.h, and sqlrtrigger.h
@@ -163,25 +159,6 @@ You should have received a copy of the GNU Library General Public
 License along with this library; if not, write to the
 Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA  02111-1307, USA.
-
---------------------------------------------------------------------------------
-
-The SQLRelay Ruby DBD
-Copyright (c) 2001  Michael Neuman
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 --------------------------------------------------------------------------------
 

@@ -19,10 +19,6 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/classes/SQLRConnection.src
 	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/classes/SQLRCursor.src
 	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/files
-	$(MKINSTALLDIRS) $(docdir)/api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Database.src
-	$(MKINSTALLDIRS) $(docdir)/api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Driver.src
-	$(MKINSTALLDIRS) $(docdir)/api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Statement.src
-	$(MKINSTALLDIRS) $(docdir)/api/ruby/dbidoc/files
 	$(MKINSTALLDIRS) $(docdir)/api/java
 	$(MKINSTALLDIRS) $(docdir)/api/tcl
 	$(MKINSTALLDIRS) $(docdir)/dropin
@@ -89,42 +85,6 @@ install:
 	for file in `ls api/ruby/doc/files/*.html`; \
 	do \
 		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/doc/files; \
-	done
-	for file in `ls api/ruby/dbidoc/*.html api/ruby/dbidoc/*.css`; \
-	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc; \
-	done
-	for file in `ls api/ruby/dbidoc/classes/*.html`; \
-	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes; \
-	done
-	for file in `ls api/ruby/dbidoc/classes/DBI/*.html`; \
-	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI; \
-	done
-	for file in `ls api/ruby/dbidoc/classes/DBI/DBD/*.html`; \
-	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBD; \
-	done
-	for file in `ls api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/*.html`; \
-	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBD/SQLRelay; \
-	done
-	for file in `ls api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Database.src/*.html`; \
-	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Database.src; \
-	done
-	for file in `ls api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Driver.src/*.html`; \
-	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Driver.src; \
-	done
-	for file in `ls api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Statement.src/*.html`; \
-	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/classes/DBI/DBD/SQLRelay/Statement.src; \
-	done
-	for file in `ls api/ruby/dbidoc/files/*.html`; \
-	do \
-		$(INSTALL) -m 644 $$file $(docdir)/api/ruby/dbidoc/files; \
 	done
 	$(INSTALL) -m 644 api/java/allclasses-frame.html $(docdir)/api/java
 	$(INSTALL) -m 644 api/java/allclasses-noframe.html $(docdir)/api/java
