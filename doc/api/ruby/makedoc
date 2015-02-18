@@ -4,10 +4,3 @@ rm -f sqlrelay.cpp
 sed -e "s|(CAST)||" ../../../src/api/ruby/sqlrelay.cpp > sqlrelay.cpp
 rdoc sqlrelay.cpp
 rm -f sqlrelay.cpp
-
-find dbidoc -name "*.html" -print | xargs rm -f
-find dbidoc -name "*.css" -print | xargs rm -f
-rm -f SQLRelay.rb
-cp ../../../src/api/ruby/SQLRelay.rb .
-rdoc --op dbidoc SQLRelay.rb
-rm -f SQLRelay.rb

@@ -188,7 +188,6 @@ install:
 	$(INSTALL) -m 644 programming/python.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/pythondb.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/ruby.html $(docdir)/programming
-	$(INSTALL) -m 644 programming/rubydbi.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/java.html $(docdir)/programming
 	$(INSTALL) -m 644 programming/tcl.html $(docdir)/programming
 
