@@ -51,10 +51,13 @@ int main(int argc, const char **argv) {
 		host="localhost";
 		port=cfgfile.getDefaultPort();
 		socket=cfgfile.getDefaultSocket();
-		usercontainer	*currentnode=
-				cfgfile.getUserList()->getFirst()->getValue();
-		user=currentnode->getUser();
-		password=currentnode->getPassword();
+		linkedlistnode< usercontainer * >	*firstuser=
+					cfgfile.getUserList()->getFirst();
+		if (firstuser) {
+			usercontainer	*currentnode=firstuser->getValue();
+			user=currentnode->getUser();
+			password=currentnode->getPassword();
+		}
 	}
 
 	sqlrconnection	sqlrcon(host,port,socket,user,password,0,1);
