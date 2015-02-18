@@ -2739,7 +2739,7 @@ then
 		
 			for j in "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
 			do
-				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j" "/opt/csw/include/python$j" "/sw/include/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/include/python$j"
+				for i in "/usr/include/python$j" "/usr/local/include/python$j" "/usr/pkg/include/python$j" "/usr/local/python$j/include/python$j" "/opt/sfw/include/python$j" "/usr/sfw/include/python$j" "/opt/csw/include/python$j" "/sw/include/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/include/python$j" "/boot/common/include/python$j"
 				do
 					PYTHONINCLUDES=""
 					for k in "mu" "m" "u" ""
@@ -2760,7 +2760,7 @@ then
 					fi
 				done
 
-				for i in "/usr/lib64/python$j" "/usr/lib/python$j" "/usr/local/lib64/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib64/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j" "/usr/sfw/lib/python$j" "/sfw/lib/python$j" "/opt/csw/lib/python$j" "/sw/lib/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/lib/python$j"
+				for i in "/usr/lib64/python$j" "/usr/lib/python$j" "/usr/local/lib64/python$j" "/usr/local/lib/python$j" "/usr/pkg/lib/python$j" "/usr/local/python$j/lib64/python$j" "/usr/local/python$j/lib/python$j" "/opt/sfw/lib/python$j" "/usr/sfw/lib/python$j" "/sfw/lib/python$j" "/opt/csw/lib/python$j" "/sw/lib/python$j" "/System/Library/Frameworks/Python.framework/Versions/Current/lib/python$j" "/boot/common/lib/python$j"
 				do
 
 					PYTHONDIR=""
