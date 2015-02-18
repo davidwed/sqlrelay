@@ -13,6 +13,7 @@
 // get around a problem with CHAR/xmlChar in gnome-xml
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
+#include <rudiments/error.h>
 #include <rudiments/stdio.h>
 
 #include <datatypes.h>
@@ -21,12 +22,6 @@
 #ifdef HAVE_IODBC
 	#include <iodbcinst.h>
 #endif
-
-// for perror
-#include <stdio.h>
-
-// for malloc/free
-#include <stdlib.h>
 
 #define FETCH_AT_ONCE		10
 #define MAX_SELECT_LIST_SIZE	256
@@ -259,6 +254,12 @@ class odbcconnection : public sqlrserverconnection {
 char *buffers[200];
 int nextbuf=0;
 
+void printerror(const char *error) {
+	char	*err=error::getErrorString();
+	stderror.printf("%s: %s\n",error,err);
+	delete[] err;
+}
+
 int ucslen(char* str) {
 	char *ptr=str;
 	int res=0;
@@ -273,13 +274,14 @@ char *conv_to_user_coding(char *inbuf) {
 	
 	size_t	insize=ucslen(inbuf)*2;
 	size_t	avail=insize+4;
-	char	*outbuf=(char*)malloc(avail);
+	//char	*outbuf=(char*)malloc(avail);
+	char	*outbuf=new char[avail];
 	char	*wrptr=outbuf;
 
 	iconv_t	cd=iconv_open(USER_CODING,"UCS-2");
 	if (cd==(iconv_t)-1) {
 		/* Something went wrong. */
-		perror ("error in iconv_open");
+		printerror("error in iconv_open");
 
 		/* Terminate the output string. */
 		*outbuf='\0';
@@ -305,7 +307,7 @@ char *conv_to_user_coding(char *inbuf) {
 	}
 
 	if (iconv_close(cd)!=0) {
-		perror("iconv_close");
+		printerror("iconv_close");
 	}
 	return outbuf;
 }
@@ -314,13 +316,14 @@ char *conv_to_ucs(char *inbuf) {
 	
 	size_t	insize=charstring::length(inbuf);
 	size_t	avail=insize*2+4;
-	char	*outbuf=(char *)malloc(avail);
+	//char	*outbuf=(char *)malloc(avail);
+	char	*outbuf=new char[avail];
 	char	*wrptr=outbuf;
 
 	iconv_t	cd=iconv_open("UCS-2",USER_CODING);
 	if (cd==(iconv_t)-1) {
 		/* Something went wrong.  */
-		perror("error in iconv_open");
+		printerror("error in iconv_open");
 
 		/* Terminate the output string.  */
 		*outbuf = L'\0';
@@ -346,7 +349,7 @@ char *conv_to_ucs(char *inbuf) {
 	}
 
 	if (iconv_close (cd) != 0) {
-		perror("error in iconv_close");
+		printerror("error in iconv_close");
 	}
 	return outbuf;
 }
@@ -448,13 +451,13 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 				(SQLWCHAR *)password_ucs,SQL_NTS);
 				
 	if (user_ucs) {
-		free(user_ucs);
+		delete[] user_ucs;
 	}
 	if (password_ucs) {
-		free(password_ucs);
+		delete[] password_ucs;
 	}
 	if (dsn_ucs) {
-		free(dsn_ucs);
+		delete[] dsn_ucs;
 	}
 #else
 	erg=SQLConnect(dbc,(SQLCHAR *)dsn_asc,SQL_NTS,
@@ -704,13 +707,13 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 	while (nextbuf>0) {
 		nextbuf--;
 		if (buffers[nextbuf]) {
-			free(buffers[nextbuf]);
+			delete[] buffers[nextbuf];
 		}
 	}
 	char *query_ucs=conv_to_ucs((char*)query);
 	erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
 	if (query_ucs) {
-		free(query_ucs);
+		delete[] query_ucs;
 	}
 #else
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
@@ -1565,7 +1568,7 @@ bool odbccursor::fetchRow() {
 				charstring::copy(field[i],u);
 				indicator[i]=len;
 				if (u) {
-					free(u);
+					delete[] u;
 				}
 			}
 		}
