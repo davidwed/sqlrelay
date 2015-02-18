@@ -821,7 +821,6 @@ ERLANGUSERPATH
 TCLUSERPATH
 PHPUSERPATH
 JAVAUSERPATH
-OVERRIDERUBYSITELIBDIR
 OVERRIDERUBYSITEARCHDIR
 PYTHONUSERPATH
 OVERRIDEPERLMAN3EXT
@@ -937,7 +936,6 @@ with_python_dir
 with_ruby_prefix
 enable_ruby
 with_ruby_site_arch_dir
-with_ruby_site_lib_dir
 with_java_prefix
 enable_java
 enable_java_rpath
@@ -1669,7 +1667,6 @@ Optional Packages:
   --with-python-dir             Path to install Python driver
   --with-ruby-prefix            Location of Ruby
   --with-ruby-site-arch-dir     Override Ruby's built-in sitearchdir variable (location to install binary ruby modules)
-  --with-ruby-site-lib-dir      Override Ruby's built-in sitelibdir variable (location to install binary ruby modules)
   --with-java-prefix            Location of Java
   --with-php-prefix             Location of PHP
   --with-php-ext-dir            Path to install PHP modules
@@ -3028,15 +3025,6 @@ if test "${with_ruby_site_arch_dir+set}" = set; then :
   withval=$with_ruby_site_arch_dir; OVERRIDERUBYSITEARCHDIR="$withval"
 else
   OVERRIDERUBYSITEARCHDIR=""
-fi
-
-
-
-# Check whether --with-ruby-site-lib-dir was given.
-if test "${with_ruby_site_lib_dir+set}" = set; then :
-  withval=$with_ruby_site_lib_dir; OVERRIDERUBYSITELIBDIR="$withval"
-else
-  OVERRIDERUBYSITELIBDIR=""
 fi
 
 

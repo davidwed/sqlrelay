@@ -243,11 +243,6 @@ AC_ARG_WITH(ruby-site-arch-dir,
 	OVERRIDERUBYSITEARCHDIR="$withval",
 	OVERRIDERUBYSITEARCHDIR="")
 	AC_SUBST(OVERRIDERUBYSITEARCHDIR)
-AC_ARG_WITH(ruby-site-lib-dir,
-	[  --with-ruby-site-lib-dir      Override Ruby's built-in sitelibdir variable (location to install binary ruby modules)],
-	OVERRIDERUBYSITELIBDIR="$withval",
-	OVERRIDERUBYSITELIBDIR="")
-	AC_SUBST(OVERRIDERUBYSITELIBDIR)
 AC_ARG_WITH(java-prefix,
 	[  --with-java-prefix            Location of Java],
 	JAVAPATH="$withval",
