@@ -25,6 +25,8 @@
 	updated odbc connection code to use new/delete and rudiments methods
 		rather than malloc/free and native calls
 	retired Ruby DBI driver
+	fixed command line client crash when using -id "instance" with an
+		instance that uses authtier="database"
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d
