@@ -1725,6 +1725,8 @@ bool db2cursor::getLobFieldSegment(uint32_t col,
 }
 
 void db2cursor::closeResultSet() {
+	SQLCloseCursor(stmt);
+
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		delete outdatebind[i];
 		outdatebind[i]=NULL;

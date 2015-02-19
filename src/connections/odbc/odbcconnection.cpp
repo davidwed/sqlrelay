@@ -1620,6 +1620,7 @@ void odbccursor::nextRow() {
 }
 
 void odbccursor::closeResultSet() {
+	SQLCloseCursor(stmt);
 
 	for (uint16_t i=0; i<conn->cont->cfgfl->getMaxBindCount(); i++) {
 		delete outdatebind[i];
