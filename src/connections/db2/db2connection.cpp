@@ -240,6 +240,7 @@ class db2connection : public sqlrserverconnection {
 					int64_t	*errorcode,
 					bool *liveconnection);
 		bool	liveConnection(SQLINTEGER nativeerror,
+					const char *errorbuffer,
 					SQLSMALLINT errlength);
 		const char	*pingQuery();
 		const char	*identify();
@@ -584,10 +585,11 @@ void db2connection::errorMessage(char *errorbuffer,
 	// set return values
 	*errorlength=errlength;
 	*errorcode=nativeerrnum;
-	*liveconnection=liveConnection(nativeerrnum,errlength);
+	*liveconnection=liveConnection(nativeerrnum,errorbuffer,errlength);
 }
 
 bool db2connection::liveConnection(SQLINTEGER nativeerrnum,
+					const char *errorbuffer,
 					SQLSMALLINT errlength) {
 
 	// When the DB goes down, DB2 first reports one error:
@@ -598,6 +600,9 @@ bool db2connection::liveConnection(SQLINTEGER nativeerrnum,
 	// then upon repeated attempts to run a query, it reports:
 	//	[IBM][CLI Driver] CLI0106E  Connection is closed. SQLSTATE=08003
 	//	(in this case nativeerrnum==-99999 and errlength==64)
+	//	(unforutnately other errors have the same error number and
+	//	length, such as "Invalid cursor state." so we have to
+	//	discriminate a bit for this one)
 	// here's another one for -1224
 	//	[IBM][CLI Driver] SQL1224N  The database manager is not able to
 	//	 accept new requests, has terminated all requests in progress,
@@ -612,7 +617,8 @@ bool db2connection::liveConnection(SQLINTEGER nativeerrnum,
 	//	variable depending on the host name/ip address of the server
 	//	and other things, so we'll only test for the error number)
 	return !((nativeerrnum==-1224 && errlength==184) ||
-		(nativeerrnum==-99999 && errlength==64) ||
+		(nativeerrnum==-99999 && errlength==64 &&
+		charstring::contains(errorbuffer,"Connection is closed")) ||
 		(nativeerrnum==-1224 && errlength==220) ||
 		(nativeerrnum==-30081));
 }
@@ -1403,7 +1409,8 @@ void db2cursor::errorMessage(char *errorbuffer,
 	// set return values
 	*errorlength=errlength;
 	*errorcode=nativeerrnum;
-	*liveconnection=db2conn->liveConnection(nativeerrnum,errlength);
+	*liveconnection=db2conn->liveConnection(nativeerrnum,
+						errorbuffer,errlength);
 }
 
 uint64_t db2cursor::affectedRows() {
