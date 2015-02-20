@@ -29,7 +29,6 @@ void checkSuccess(const char *value, const char *success) {
 		stdoutput.printf("success ");
 	} else {
 		stdoutput.printf("\"%s\"!=\"%s\"\n",value,success);
-stdoutput.printf("%d!=%d\n",charstring::length(value),charstring::length(success));
 		stdoutput.printf("failure ");
 		delete cur;
 		delete con;
@@ -67,7 +66,7 @@ int	main(int argc, char **argv) {
 
 	const char	*bindvars[13]={"1","2","3","4","5","6","7","8","9","10","11","12",NULL};
 	const char	*bindvals[13]={"4","4","4","4.4","4.4","4.4",
-			"testchar4","testvarchar4","01/01/2004","04:00:00","testclob4","testblob4",NULL};
+			"testchar4","testvarchar4","01/01/2004","04:00:00","testclob4",NULL,NULL};
 	const char	*subvars[4]={"var1","var2","var3",NULL};
 	const char	*subvalstrings[3]={"hi","hello","bye"};
 	int64_t		subvallongs[3]={1,2,3};
@@ -109,7 +108,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	stdoutput.printf("BIND BY POSITION: \n");
-	cur->prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,NULL,?,blob(cast(? as char(9))))");
+	cur->prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,NULL,?,?)");
 	checkSuccess(cur->countBindVariables(),12);
 	cur->inputBind("1",2);
 	cur->inputBind("2",2);
@@ -122,7 +121,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("9","01/01/2002");
 	cur->inputBind("10","02:00:00");
 	cur->inputBindClob("11","testclob1",9);
-	cur->inputBind("12","testblob1");
+	cur->inputBindBlob("12","testblob1",9);
 	checkSuccess(cur->executeQuery(),1);
 	cur->clearBinds();
 	cur->inputBind("1",3);
@@ -136,7 +135,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("9","01/01/2003");
 	cur->inputBind("10","03:00:00");
 	cur->inputBindClob("11","testclob3",9);
-	cur->inputBind("12","testblob3");
+	cur->inputBindBlob("12","testblob3",9);
 	checkSuccess(cur->executeQuery(),1);
 	stdoutput.printf("\n");
 
