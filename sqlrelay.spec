@@ -367,6 +367,13 @@ if [ $1 = 0 ]; then
 fi
 
 %postun
+if [ "'ls %{_libexecdir}/sqlrelay | wc -l'" = "0" ]; then
+	rmdir %{_libexecdir}/sqlrelay
+fi
+if [ "'ls %{_includedir}/sqlrelay | wc -l'" = "0" ]; then
+	rm -rf %{_includedir}/sqlrelay
+fi
+rm -rf %{_localstatedir}/sqlrelay
 /sbin/ldconfig
 if [ "$1" -ge "1" ]; then
 	/sbin/service sqlrelay condrestart >/dev/null 2>&1 || :
