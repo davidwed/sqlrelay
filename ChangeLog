@@ -30,6 +30,7 @@
 	fixed bugs that could make reexecuted db2 selects fail and cause a
 		database re-login loop
 	tweaked spec file to remove empty directories on uninstall
+	fixed typo that could sometimes cause a listener crash
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d
