@@ -966,7 +966,7 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 		for (csind=0; csind<clientsockuncount; csind++) {
 			if (fd==clientsockun[csind]) {
 				uss=clientsockun[csind];
-				protocol=clientsockinproto[csind];
+				protocol=clientsockunproto[csind];
 				break;
 			}
 		}
