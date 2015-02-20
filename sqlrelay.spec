@@ -367,13 +367,6 @@ if [ $1 = 0 ]; then
 fi
 
 %postun
-if [ "'ls %{_libexecdir}/sqlrelay | wc -l'" = "0" ]; then
-	rmdir %{_libexecdir}/sqlrelay
-fi
-if [ "'ls %{_includedir}/sqlrelay | wc -l'" = "0" ]; then
-	rm -rf %{_includedir}/sqlrelay
-fi
-rm -rf %{_localstatedir}/sqlrelay
 /sbin/ldconfig
 if [ "$1" -ge "1" ]; then
 	/sbin/service sqlrelay condrestart >/dev/null 2>&1 || :
@@ -401,18 +394,24 @@ rm -rf %{buildroot}
 %{_bindir}/sqlr-pwdenc
 %{_libdir}/libsqlrserver-*.so.*
 %{_libdir}/libsqlrutil-*.so.*
+%{_libexecdir}/sqlrelay
 %{_libexecdir}/sqlrelay/sqlrlogger_*
 %{_libexecdir}/sqlrelay/sqlrquery_*
 %{_libexecdir}/sqlrelay/sqlrpwdenc_*
 %{_libexecdir}/sqlrelay/sqlrauth_*
 %{_libexecdir}/sqlrelay/sqlrparser_*
 %{_libexecdir}/sqlrelay/sqlrprotocol_*
+%{_localstatedir}/sqlrelay
 %{_localstatedir}/sqlrelay/tmp
 %{_localstatedir}/sqlrelay/debug
+%{_localstatedir}/sqlrelay/log
+%{_localstatedir}/sqlrelay/cache
 
 %files server-devel
 %defattr(-, root, root)
 %{_bindir}/sqlrserver-config
+%{_includedir}/sqlrelay
+%{_includedir}/sqlrelay/private
 %{_includedir}/sqlrelay/sqlrserver.h
 %{_includedir}/sqlrelay/private/sqlrconnection.h
 %{_includedir}/sqlrelay/private/sqlrcursor.h
@@ -444,7 +443,6 @@ rm -rf %{buildroot}
 %files client-runtime-c++
 %defattr(-, root, root)
 %{_libdir}/libsqlrclient-*.so.*
-%{_localstatedir}/sqlrelay/cache
 
 %files client-runtime-c
 %defattr(-, root, root)
