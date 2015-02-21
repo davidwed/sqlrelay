@@ -12,7 +12,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 
-#define DEBUG_MESSAGES 1
+//#define DEBUG_MESSAGES 1
 #include <debugprint.h>
 
 // windows needs this
