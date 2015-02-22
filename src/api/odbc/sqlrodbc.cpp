@@ -13,7 +13,7 @@
 #include <rudiments/stdio.h>
 
 #define DEBUG_MESSAGES 1
-//#define DEBUG_TO_FILE 1
+#define DEBUG_TO_FILE 1
 #include <debugprint.h>
 
 // windows needs this
@@ -109,6 +109,7 @@ struct outputbind {
 struct STMT {
 	sqlrcursor				*cur;
 	uint64_t				currentfetchrow;
+	uint64_t				currentstartrow;
 	uint64_t				currentgetdatarow;
 	CONN					*conn;
 	char					*name;
@@ -256,6 +257,7 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 			stmt->cur=new sqlrcursor(conn->con);
 			*outputhandle=(SQLHANDLE)stmt;
 			stmt->currentfetchrow=0;
+			stmt->currentstartrow=0;
 			stmt->currentgetdatarow=0;
 			stmt->conn=conn;
 			conn->stmtlist.append(stmt);
@@ -2344,6 +2346,7 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 
 	// reinit row indices
 	stmt->currentfetchrow=0;
+	stmt->currentstartrow=0;
 	stmt->currentgetdatarow=0;
 
 	// clear the error
@@ -2398,6 +2401,7 @@ SQLRETURN SQL_API SQLR_SQLExecute(SQLHSTMT statementhandle) {
 	// reinit row indices
 	stmt->currentfetchrow=0;
 	stmt->currentgetdatarow=0;
+	stmt->currentgetdatarow=0;
 
 	// clear the error
 	SQLR_STMTClearError(stmt);
@@ -2443,17 +2447,28 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 	}
 
 	// fetch the row
-	if (!stmt->cur->getRow(stmt->currentfetchrow)) {
-		return SQL_NO_DATA_FOUND;
-	}
+	SQLRETURN	fetchresult=
+			(stmt->cur->getRow(stmt->currentfetchrow))?
+					SQL_SUCCESS:SQL_NO_DATA_FOUND;
 
 	// Update the number of rows that were fetched in this operation.
-	uint64_t	firstrowindex=stmt->cur->firstRowIndex();
-	uint64_t	rowcount=stmt->cur->rowCount();
-	uint64_t	lastrowindex=(rowcount)?rowcount-1:0;
-	uint64_t	bufferedrowcount=lastrowindex-firstrowindex;
-	uint64_t	rowsfetched=(firstrowindex==stmt->currentfetchrow)?
+	// (hide the fact that SQL Relay caches the entire result set unless
+	// we're explicitly fetching more than 1 row at a time)
+	uint64_t	rowstofetch=stmt->cur->getResultSetBufferSize();
+	uint64_t	rowsfetched=0;
+	if (fetchresult==SQL_NO_DATA_FOUND) {
+		rowsfetched=0;
+	} else if (rowstofetch) {
+		uint64_t	firstrowindex=stmt->cur->firstRowIndex();
+		uint64_t	rowcount=stmt->cur->rowCount();
+		uint64_t	lastrowindex=(rowcount)?rowcount-1:0;
+		uint64_t	bufferedrowcount=lastrowindex-firstrowindex;
+		rowsfetched=(firstrowindex==stmt->currentfetchrow)?
 							bufferedrowcount:0;
+	} else {
+		rowstofetch=1;
+		rowsfetched=1;
+	}
 
 	// FIXME: set pcrow if SQLExtendedFetch is called,
 	// and don't set rowsfetchedptr
@@ -2465,7 +2480,7 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 	}
 
 	// update row statuses
-	for (SQLULEN i=0; i<stmt->cur->getResultSetBufferSize(); i++) {
+	for (SQLULEN i=0; i<rowstofetch; i++) {
 		SQLUSMALLINT	status=(i<rowsfetched)?
 					SQL_ROW_SUCCESS:SQL_ROW_NOROW;
 
@@ -2474,16 +2489,15 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 		if (rgfrowstatus) {
 			rgfrowstatus[i]=status;
 		}
-		if (stmt->rowstatusptr[i]) {
+		if (stmt->rowstatusptr && stmt->rowstatusptr[i]) {
 			stmt->rowstatusptr[i]=status;
 		}
 	}
 
 	// update column binds
 	uint32_t	colcount=stmt->cur->colCount();
-	for (uint64_t row=0; row<rowsfetched; row++) {
+	for (uint64_t row=0; row<rowstofetch; row++) {
 
-stdoutput.printf("currentgetdatarow=%lld\n",stmt->currentgetdatarow);
 		for (uint32_t index=0; index<colcount; index++) {
 
 			// get the bound field, if this field isn't bound,
@@ -2494,7 +2508,7 @@ stdoutput.printf("currentgetdatarow=%lld\n",stmt->currentgetdatarow);
 			}
 
 			// get the data into the bound column
-			SQLRETURN	result=
+			SQLRETURN	getdataresult=
 					SQLR_SQLGetData(
 						statementhandle,
 						index+1,
@@ -2504,9 +2518,9 @@ stdoutput.printf("currentgetdatarow=%lld\n",stmt->currentgetdatarow);
 							(field->bufferlength*
 							row),
 						field->bufferlength,
-						field->strlen_or_ind);
-			if (result!=SQL_SUCCESS) {
-				return result;
+						&(field->strlen_or_ind[row]));
+			if (getdataresult!=SQL_SUCCESS) {
+				return getdataresult;
 			}
 		}
 
@@ -2514,10 +2528,14 @@ stdoutput.printf("currentgetdatarow=%lld\n",stmt->currentgetdatarow);
 		stmt->currentgetdatarow++;
 	}
 
+	// reset the current SQLGetData row
+	stmt->currentgetdatarow=stmt->currentfetchrow;
+
 	// move on to the next rowset
+	stmt->currentstartrow=stmt->currentfetchrow;
 	stmt->currentfetchrow=stmt->currentfetchrow+rowsfetched;
 
-	return SQL_SUCCESS;
+	return fetchresult;
 }
 
 SQLRETURN SQL_API SQLFetch(SQLHSTMT statementhandle) {
@@ -2857,7 +2875,9 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	debugPrintf("columnnumber: %d\n",(int)columnnumber);
+	debugPrintf("row   : %d\n",(int)stmt->currentgetdatarow);
+	debugPrintf("column: %d\n",(int)columnnumber);
+	debugPrintf("bufferlength: %d\n",(int)bufferlength);
 
 	// make sure we're attempting to get a valid column
 	uint32_t	colcount=stmt->cur->colCount();
@@ -2900,6 +2920,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			charstring::safeCopy((char *)targetvalue,
 						bufferlength,
 						field,fieldlength+1);
+			debugPrintf("value: %s\n",(char *)targetvalue);
 			}
 			break;
 		case SQL_C_SSHORT:
@@ -2908,6 +2929,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("targettype: SQL_C_(X)SHORT\n");
 			*((short *)targetvalue)=
 				(short)charstring::toInteger(field);
+			debugPrintf("value: %d\n",*((short *)targetvalue));
 			if (strlen_or_ind) {
 				*strlen_or_ind=sizeof(short);
 			}
@@ -2919,6 +2941,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("targettype: SQL_C_(X)LONG\n");
 			*((long *)targetvalue)=
 				(long)charstring::toInteger(field);
+			debugPrintf("value: %ld\n",*((long *)targetvalue));
 			if (strlen_or_ind) {
 				*strlen_or_ind=sizeof(long);
 			}
@@ -2927,6 +2950,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("targettype: SQL_C_FLOAT\n");
 			*((float *)targetvalue)=
 				(float)charstring::toFloat(field);
+			debugPrintf("value: %f\n",*((float *)targetvalue));
 			if (strlen_or_ind) {
 				*strlen_or_ind=sizeof(float);
 			}
@@ -2935,6 +2959,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("targettype: SQL_C_DOUBLE\n");
 			*((double *)targetvalue)=
 				(double)charstring::toFloat(field);
+			debugPrintf("value: %f\n",*((double *)targetvalue));
 			if (strlen_or_ind) {
 				*strlen_or_ind=sizeof(double);
 			}
@@ -2944,6 +2969,8 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			((unsigned char *)targetvalue)[0]=
 				(charstring::contains("YyTt",field) ||
 				charstring::toInteger(field))?'1':'0';
+			debugPrintf("value: %c\n",
+					*((unsigned char *)targetvalue));
 			*strlen_or_ind=sizeof(unsigned char);
 			break;
 		case SQL_C_STINYINT:
@@ -2952,6 +2979,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("targettype: SQL_C_(X)TINYINT\n");
 			*((char *)targetvalue)=
 				charstring::toInteger(field);
+			debugPrintf("value: %c\n",*((char *)targetvalue));
 			if (strlen_or_ind) {
 				*strlen_or_ind=sizeof(char);
 			}
@@ -2961,6 +2989,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("targettype: SQL_C_(X)BIGINT\n");
 			*((int64_t *)targetvalue)=
 				charstring::toInteger(field);
+			debugPrintf("value: %lld\n",*((int64_t *)targetvalue));
 			if (strlen_or_ind) {
 				*strlen_or_ind=sizeof(int64_t);
 			}
@@ -3030,6 +3059,9 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("invalid targettype\n");
 			return SQL_ERROR;
 	}
+
+	debugPrintf("fieldlength: %d\n",*strlen_or_ind);
+
 	return SQL_SUCCESS;
 }
 
@@ -3923,10 +3955,10 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			// FIXME: is this true for all db's?
 			strval="\"";
 			break;
-		/*case SQL_GETDATA_EXTENSIONS:
+		case SQL_GETDATA_EXTENSIONS:
 			debugPrintf("infotype: SQL_GETDATA_EXTENSIONS\n");
 			*(SQLUINTEGER *)infovalue=SQL_GD_BLOCK;
-			break;*/
+			break;
 		default:
 			debugPrintf("unsupported infotype: %d\n",infotype);
 			break;
@@ -5163,9 +5195,17 @@ SQLRETURN SQL_API SQLSetPos(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
-	// FIXME: I think this could be supported
-	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+	if (foption==SQL_POSITION) {
+		if (!irow) {
+			irow=1;
+		}
+		stmt->currentgetdatarow=stmt->currentstartrow+irow-1;
+		debugPrintf("currentgetdatarow=%lld\n",
+				stmt->currentgetdatarow);
+		return SQL_SUCCESS;
+	}
 
+	SQLR_STMTSetError(stmt,NULL,0,"IM001");
 	return SQL_ERROR;
 }
 
