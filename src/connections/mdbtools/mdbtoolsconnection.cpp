@@ -229,7 +229,12 @@ void mdbtoolsconnection::errorMessage(char *errorbuffer,
 					bool *liveconnection) {
 	charstring::safeCopy(errorbuffer,errorbufferlength,"error",5);
 	*errorlength=5;
-	*errorcode=0;
+	// MDBTools doesn't have an error number per-se.  We'll set it
+	// to 1 though, because 0 typically means "no error has occurred"
+	// and some apps respond that way if errorcode is set to 0.
+	// This ends up being important when using:
+	// Oracle dblink -> ODBC -> SQL Relay -> MDBTools
+	*errorcode=1;
 	*liveconnection=true;
 }
 

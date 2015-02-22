@@ -31,6 +31,9 @@
 		database re-login loop
 	tweaked spec file to remove empty directories on uninstall
 	fixed typo that could sometimes cause a listener crash
+	postgresql and mdbtools return error code of 1 rather than 0 for all
+		errors now
+	tweaked odbc driver to work with Oracle Heterogenous Agent (dblinks)
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d

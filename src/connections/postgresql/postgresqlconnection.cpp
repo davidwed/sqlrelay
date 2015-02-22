@@ -378,8 +378,12 @@ void postgresqlconnection::errorMessage(char *errorbuffer,
 	*errorlength=charstring::length(errorstring);
 	charstring::safeCopy(errorbuffer,errorbufferlength,
 					errorstring,*errorlength);
-	// FIXME: set this
-	*errorcode=0;
+	// PostgreSQL doesn't have an error number per-se.  We'll set it
+	// to 1 though, because 0 typically means "no error has occurred"
+	// and some apps respond that way if errorcode is set to 0.
+	// This ends up being important when using:
+	// Oracle dblink -> ODBC -> SQL Relay -> PostgreSQL
+	*errorcode=1;
 	*liveconnection=(PQstatus(pgconn)==CONNECTION_OK);
 }
 
