@@ -1717,9 +1717,36 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
+	// FIXME: I suspect I'll be revisiting his in the future...
+	//
+	// SQLGetConnectAttr(SQL_ATTR_CURRENT_CATALOG) returns the
+	// "current db name".  In most db's, this is the instance but in others
+	// (Oracle) it's the schema.  Most db's don't have a concept of
+	// instance.schema.table though, just instance.table or schema.table
+	// so the two are usually interchangeable.
+	//
+	// Since this function supports all three (but calls the instance the
+	// catalog), an app might pass in "the current catalog" as either the
+	// catalog name or the schema name.
+	//
+	// If it's passed in as the catalog, what would the app pass in as the
+	// schema?  Maybe nothing.  But maybe, erroneously, the user it used
+	// to log into SQL Relay.  The Oracle Heterogenous Agent does this.
+	//
+	// A workaround it to use either the catalog, or the schema, but not
+	// both, and prefer the catalog.
+	//
+	// Unfortunately, I'll bet that there are apps out there that need to
+	// use both, and I'll bet that I'll be revisiting this code someday.
 	stringbuffer	table;
-	SQLR_BuildTableName(&table,catalogname,namelength1,
-				schemaname,namelength2,tablename,namelength3);
+	if (catalogname && catalogname[0]) {
+		SQLR_BuildTableName(&table,catalogname,namelength1,
+					NULL,0,tablename,namelength3);
+	} else if (schemaname && schemaname[0]) {
+		SQLR_BuildTableName(&table,NULL,0,
+					schemaname,namelength2,
+					tablename,namelength3);
+	}
 
 	char	*wild=NULL;
 	if (namelength4==SQL_NTS) {
@@ -2851,9 +2878,22 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 		case SQL_OPT_TRACEFILE:
 		case SQL_TRANSLATE_DLL:
 		case SQL_TRANSLATE_OPTION:
-		case SQL_TXN_ISOLATION:
+		case SQL_TXN_ISOLATION:*/
+
+		//case SQL_ATTR_CURRENT_CATALOG: (dup of SQL_CURRENT_QUALIFIER)
 		case SQL_CURRENT_QUALIFIER:
-		case SQL_ODBC_CURSORS:
+			{
+			debugPrintf("  attribute: SQL_CURRENT_QUALIFIER/"
+						"SQL_ATTR_CURRENT_CATALOG\n");
+			const char	*db=conn->con->getCurrentDatabase();
+			*stringlength=charstring::length(db);
+			charstring::safeCopy((char *)value,bufferlength,
+							db,*stringlength);
+			debugPrintf("    current catalog: %s\n",db);
+			return SQL_SUCCESS;
+			}
+
+		/*case SQL_ODBC_CURSORS:
 		case SQL_QUIET_MODE:
 		case SQL_PACKET_SIZE:
 	#if (ODBCVER >= 0x0300)
@@ -3446,7 +3486,8 @@ SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV environmenthandle,
 		case SQL_ATTR_ODBC_VERSION:
 			debugPrintf("  attribute: SQL_ATTR_ODBC_VERSION\n");
 			*((SQLINTEGER *)value)=env->odbcversion;
-			debugPrintf("  odbcversion: %d\n",(int)env->odbcversion);
+			debugPrintf("    odbcversion: %d\n",
+						(int)env->odbcversion);
 			break;
 		case SQL_ATTR_CONNECTION_POOLING:
 			debugPrintf("  attribute: SQL_ATTR_CONNECTION_POOLING\n");
