@@ -1150,8 +1150,8 @@ static SQLSMALLINT SQLR_MapCColumnType(sqlrcursor *cur, uint32_t col) {
 			return SQL_C_TIME;
 		case SQL_TYPE_TIMESTAMP:
 			return SQL_C_TIMESTAMP;
-		// dup of SQL_TIME
 		// case SQL_INTERVAL:
+		// 	(dup of SQL_TIME)
 		case SQL_TIME:
 			return SQL_C_TIME;
 		case SQL_TIMESTAMP:
@@ -1215,8 +1215,8 @@ static SQLULEN SQLR_GetColumnSize(sqlrcursor *cur, uint32_t col) {
 			return 8;
 		case SQL_TYPE_TIMESTAMP:
 			return 25;
-		// dup of SQL_TIME
 		// case SQL_INTERVAL:
+		// 	(dup of SQL_TIME)
 		case SQL_TIME:
 			return 25;
 		case SQL_TIMESTAMP:
@@ -1284,6 +1284,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			break;
 		case SQL_DESC_TYPE:
 		//case SQL_DESC_CONCISE_TYPE:
+		//	(dup of SQL_COLUMN_TYPE)
 		case SQL_COLUMN_TYPE:
 			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_TYPE/"
@@ -1363,6 +1364,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		//case SQL_DESC_AUTO_UNIQUE_VALUE:
+		//	(dup of SQL_COLUMN_AUTO_INCREMENT)
 		case SQL_COLUMN_AUTO_INCREMENT:
 			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_AUTO_UNIQUE_VALUE/"
@@ -1400,6 +1402,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			}
 			break;
 		//case SQL_DESC_CASE_SENSITIVE:
+		//	(dup of SQL_COLUMN_CASE_SENSITIVE)
 		case SQL_COLUMN_CASE_SENSITIVE:
 			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_CASE_SENSITIVE\n");
@@ -1409,6 +1412,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		//case SQL_DESC_CATALOG_NAME:
+		//	(dup of SQL_COLUMN_QUALIFIER_NAME)
 		case SQL_COLUMN_QUALIFIER_NAME:
 			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_CATALOG_NAME/"
@@ -1424,6 +1428,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			}
 			break;
 		//case SQL_DESC_DISPLAY_SIZE:
+		//	(dup of SQL_COLUMN_DISPLAY_SIZE)
 		case SQL_COLUMN_DISPLAY_SIZE:
 			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_DISPLAY_SIZE\n");
@@ -1432,6 +1437,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		//case SQL_DESC_FIXED_PREC_SCALE
+		//	(dup of SQL_COLUMN_MONEY)
 		case SQL_COLUMN_MONEY:
 			{
 			debugPrintf("  fieldidentifier: "
@@ -1452,6 +1458,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			}
 			break;
 		//case SQL_DESC_LABEL
+		//	(dup of SQL_COLUMN_LABEL)
 		case SQL_COLUMN_LABEL:
 			{
 			debugPrintf("  fieldidentifier: "
@@ -1556,6 +1563,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		//case SQL_DESC_SCHEMA_NAME
+		//	(dup of SQL_COLUMN_OWNER_NAME)
 		case SQL_COLUMN_OWNER_NAME:
 			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_SCHEMA_NAME/"
@@ -1571,6 +1579,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			}
 			break;
 		//case SQL_DESC_SEARCHABLE
+		//	(dup of SQL_COLUMN_SEARCHABLE)
 		case SQL_COLUMN_SEARCHABLE:
 			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_SEARCHABLE\n");
@@ -1579,6 +1588,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			debugPrintf("  updatable: SQL_SEARCHABLE\n");
 			break;
 		//case SQL_DESC_TYPE_NAME
+		//	(dup of SQL_COLUMN_TYPE_NAME)
 		case SQL_COLUMN_TYPE_NAME:
 			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_TYPE_NAME\n");
@@ -1597,6 +1607,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			}
 			break;
 		//case SQL_DESC_TABLE_NAME
+		//	(dup of SQL_COLUMN_TABLE_NAME)
 		case SQL_COLUMN_TABLE_NAME:
 			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_TABLE_NAME\n");
@@ -1611,6 +1622,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			}
 			break;
 		//case SQL_DESC_UNSIGNED
+		//	(dup of SQL_COLUMN_UNSIGNED)
 		case SQL_COLUMN_UNSIGNED:
 			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_UNSIGNED\n");
@@ -1620,6 +1632,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		//case SQL_DESC_UPDATABLE
+		//	(dup of SQL_COLUMN_UPDATABLE)
 		case SQL_COLUMN_UPDATABLE:
 			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_UPDATEABLE\n");
@@ -2279,7 +2292,8 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 					(long)stmt->cur->getOutputBindInteger(
 								parametername);
 				break;
-			//case SQL_C_BOOKMARK: (dup of SQL_C_ULONG)
+			//case SQL_C_BOOKMARK:
+			//	(dup of SQL_C_ULONG)
 			case SQL_C_ULONG:
 				debugPrintf("  valuetype: "
 					"SQL_C_ULONG/SQL_C_BOOKMARK\n");
@@ -2424,7 +2438,8 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 					stmt->cur->getOutputBindLength(
 							parametername));
 				break;
-			//case SQL_C_VARBOOKMARK: (dup of SQL_C_BINARY)
+			//case SQL_C_VARBOOKMARK:
+			//	(dup of SQL_C_BINARY)
 			case SQL_C_BINARY:
 				{
 				debugPrintf("  valuetype: "
@@ -2880,7 +2895,8 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 		case SQL_TRANSLATE_OPTION:
 		case SQL_TXN_ISOLATION:*/
 
-		//case SQL_ATTR_CURRENT_CATALOG: (dup of SQL_CURRENT_QUALIFIER)
+		//case SQL_ATTR_CURRENT_CATALOG:
+		//	(dup of SQL_CURRENT_QUALIFIER)
 		case SQL_CURRENT_QUALIFIER:
 			{
 			debugPrintf("  attribute: SQL_CURRENT_QUALIFIER/"
@@ -3140,7 +3156,8 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			break;
 		case SQL_C_SLONG:
 		case SQL_C_LONG:
-		//case SQL_C_BOOKMARK: (dup of SQL_C_ULONG)
+		//case SQL_C_BOOKMARK:
+		//	(dup of SQL_C_ULONG)
 		case SQL_C_ULONG:
 			debugPrintf("  targettype: SQL_C_(X)LONG\n");
 			*((long *)targetvalue)=
@@ -3182,7 +3199,8 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 				charstring::toInteger(field);
 			debugPrintf("  value: %lld\n",*((int64_t *)targetvalue));
 			break;
-		//case SQL_C_VARBOOKMARK: (dup of SQL_C_BINARY)
+		//case SQL_C_VARBOOKMARK:
+		//	(dup of SQL_C_BINARY)
 		case SQL_C_BINARY:
 			{
 			debugPrintf("  targettype: "
@@ -5740,7 +5758,8 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 				SQLR_BuildInterval(stmt,parameternumber,
 					(SQL_INTERVAL_STRUCT *)parametervalue));
 			break;
-		//case SQL_C_VARBOOKMARK: (dup of SQL_C_BINARY)
+		//case SQL_C_VARBOOKMARK:
+		//	(dup of SQL_C_BINARY)
 		case SQL_C_BINARY:
 			debugPrintf("  valuetype: "
 				"SQL_C_BINARY/SQL_C_VARBOOKMARK\n");
@@ -5783,7 +5802,8 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 			stmt->cur->inputBind(parametername,
 					(int64_t)(*((char *)parametervalue)));
 			break;
-		//case SQL_C_BOOKMARK: (dup of SQL_C_ULONG)
+		//case SQL_C_BOOKMARK:
+		//	(dup of SQL_C_ULONG)
 		case SQL_C_ULONG:
 			debugPrintf("  valuetype: SQL_C_ULONG/SQL_C_BOOKMARK\n");
 			stmt->cur->inputBind(parametername,
@@ -5865,7 +5885,8 @@ static SQLRETURN SQLR_OutputBindParameter(SQLHSTMT statementhandle,
 		case SQL_C_SLONG:
 		case SQL_C_SSHORT:
 		case SQL_C_STINYINT:
-		//case SQL_C_BOOKMARK: dup of SQL_C_ULONG
+		//case SQL_C_BOOKMARK:
+		//	(dup of SQL_C_ULONG)
 		case SQL_C_ULONG:
 		case SQL_C_USHORT:
 		case SQL_C_UTINYINT:
@@ -5915,7 +5936,8 @@ static SQLRETURN SQLR_OutputBindParameter(SQLHSTMT statementhandle,
 			// bind as a string, the result will be parsed
 			stmt->cur->defineOutputBindString(parametername,128);
 			break;
-		//case SQL_C_VARBOOKMARK: dup of SQL_C_BINARY:
+		//case SQL_C_VARBOOKMARK:
+		//	(dup of SQL_C_BINARY)
 		case SQL_C_BINARY:
 			debugPrintf("  valuetype: "
 				"SQL_C_BINARY/SQL_C_VARBOOKMARK\n");
