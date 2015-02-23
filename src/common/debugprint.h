@@ -22,6 +22,7 @@
 		#else
 			#define debugPrintf(args...) { file f; f.open("/tmp/sqlrdebug.txt",O_RDWR|O_APPEND|O_CREAT,permissions::evalPermString("rw-r--r--")); f.printf(args); f.close(); }
 		#endif
+		#define debugSafePrint(a,b) { file f; f.open("/tmp/sqlrdebug.txt",O_RDWR|O_APPEND|O_CREAT,permissions::evalPermString("rw-r--r--")); f.safePrint(a,b); f.close(); }
 	#else
 		#define debugFunction() stdoutput.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); stdoutput.flush();
 		#ifdef _MSC_VER
@@ -29,6 +30,7 @@
 		#else
 			#define debugPrintf(args...) stdoutput.printf(args); stdoutput.flush();
 		#endif
+		#define debugSafePrint(a,b) stdoutput.safePrint(a,b); stdoutput.flush();
 	#endif
 #else
 	#define debugFunction() /* */

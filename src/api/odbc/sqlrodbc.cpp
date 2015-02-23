@@ -159,9 +159,9 @@ static void SQLR_ENVSetError(ENV *env, const char *error,
 	env->error=charstring::duplicate((error)?error:"");
 	env->errn=errn;
 	env->sqlstate=(sqlstate)?sqlstate:"";
-	debugPrintf("error: %s\n",env->error);
-	debugPrintf("errn: %lld\n",env->errn);
-	debugPrintf("sqlstate: %s\n",env->sqlstate);
+	debugPrintf("  error: %s\n",env->error);
+	debugPrintf("  errn: %lld\n",env->errn);
+	debugPrintf("  sqlstate: %s\n",env->sqlstate);
 }
 
 /*static void SQLR_ENVClearError(ENV *env) {
@@ -179,9 +179,9 @@ static void SQLR_CONNSetError(CONN *conn, const char *error,
 	conn->error=charstring::duplicate((error)?error:"");
 	conn->errn=errn;
 	conn->sqlstate=(sqlstate)?sqlstate:"";
-	debugPrintf("error: %s\n",conn->error);
-	debugPrintf("errn: %lld\n",conn->errn);
-	debugPrintf("sqlstate: %s\n",conn->sqlstate);
+	debugPrintf("  error: %s\n",conn->error);
+	debugPrintf("  errn: %lld\n",conn->errn);
+	debugPrintf("  sqlstate: %s\n",conn->sqlstate);
 }
 
 /*static void SQLR_CONNClearError(CONN *conn) {
@@ -199,9 +199,9 @@ static void SQLR_STMTSetError(STMT *stmt, const char *error,
 	stmt->error=charstring::duplicate((error)?error:"");
 	stmt->errn=errn;
 	stmt->sqlstate=(sqlstate)?sqlstate:"";
-	debugPrintf("error: %s\n",stmt->error);
-	debugPrintf("errn: %lld\n",stmt->errn);
-	debugPrintf("sqlstate: %s\n",stmt->sqlstate);
+	debugPrintf("  error: %s\n",stmt->error);
+	debugPrintf("  errn: %lld\n",stmt->errn);
+	debugPrintf("  sqlstate: %s\n",stmt->sqlstate);
 }
 
 static void SQLR_STMTClearError(STMT *stmt) {
@@ -217,7 +217,7 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 	switch (handletype) {
 		case SQL_HANDLE_ENV:
 			{
-			debugPrintf("handletype: SQL_HANDLE_ENV\n");
+			debugPrintf("  handletype: SQL_HANDLE_ENV\n");
 			ENV	*env=new ENV;
 			env->odbcversion=0;
 			*outputhandle=(SQLHANDLE)env;
@@ -228,10 +228,10 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 			}
 		case SQL_HANDLE_DBC:
 			{
-			debugPrintf("handletype: SQL_HANDLE_DBC\n");
+			debugPrintf("  handletype: SQL_HANDLE_DBC\n");
 			ENV	*env=(ENV *)inputhandle;
 			if (inputhandle==SQL_NULL_HENV || !env) {
-				debugPrintf("NULL env handle\n");
+				debugPrintf("  NULL env handle\n");
 				return SQL_INVALID_HANDLE;
 			}
 			CONN	*conn=new CONN;
@@ -246,11 +246,11 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 			}
 		case SQL_HANDLE_STMT:
 			{
-			debugPrintf("handletype: SQL_HANDLE_STMT\n");
+			debugPrintf("  handletype: SQL_HANDLE_STMT\n");
 			CONN	*conn=(CONN *)inputhandle;
 			if (inputhandle==SQL_NULL_HANDLE ||
 						!conn || !conn->con) {
-				debugPrintf("NULL conn handle\n");
+				debugPrintf("  NULL conn handle\n");
 				return SQL_INVALID_HANDLE;
 			}
 			STMT	*stmt=new STMT;
@@ -280,11 +280,11 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 			return SQL_SUCCESS;
 			}
 		case SQL_HANDLE_DESC:
-			debugPrintf("handletype: SQL_HANDLE_DESC\n");
+			debugPrintf("  handletype: SQL_HANDLE_DESC\n");
 			// FIXME: no idea what to do here
 			return SQL_ERROR;
 		default:
-			debugPrintf("invalid handletype\n");
+			debugPrintf("  invalid handletype\n");
 			break;
 	}
 	return SQL_ERROR;
@@ -361,6 +361,85 @@ static SQLLEN SQLR_GetCColumnTypeSize(SQLSMALLINT targettype) {
 	}
 }
 
+static const char *SQLR_GetCColumnTypeName(SQLSMALLINT targettype) {
+	switch (targettype) {
+		case SQL_C_CHAR:
+			return "SQL_C_CHAR";
+		case SQL_C_BIT:
+			return "SQL_C_BIT";
+		case SQL_C_SHORT:
+			return "SQL_C_SHORT";
+		case SQL_C_USHORT:
+			return "SQL_C_USHORT";
+		case SQL_C_SSHORT:
+			return "SQL_C_SSHORT";
+		case SQL_C_TINYINT:
+			return "SQL_C_TINYINT";
+		case SQL_C_UTINYINT:
+			return "SQL_C_UTINYINT";
+		case SQL_C_STINYINT:
+			return "SQL_C_STINYINT";
+		case SQL_C_LONG:
+			return "SQL_C_LONG";
+		case SQL_C_ULONG:
+			return "SQL_C_ULONG";
+		case SQL_C_SLONG:
+			return "SQL_C_SLONG";
+		case SQL_C_SBIGINT:
+			return "SQL_C_SBIGINT";
+		case SQL_C_UBIGINT:
+			return "SQL_C_UBIGINT";
+		case SQL_C_FLOAT:
+			return "SQL_C_FLOAT";
+		case SQL_C_DOUBLE:
+			return "SQL_C_DOUBLE";
+		case SQL_C_NUMERIC:
+			return "SQL_C_NUMERIC";
+		case SQL_C_DATE:
+			return "SQL_C_DATE";
+		case SQL_C_TYPE_DATE:
+			return "SQL_C_TYPE_DATE";
+		case SQL_C_TIME:
+			return "SQL_C_TIME";
+		case SQL_C_TYPE_TIME:
+			return "SQL_C_TYPE_TIME";
+		case SQL_C_TIMESTAMP:
+			return "SQL_C_TIMESTAMP";
+		case SQL_C_TYPE_TIMESTAMP:
+			return "SQL_C_TYPE_TIMESTAMP";
+		case SQL_C_INTERVAL_YEAR:
+			return "SQL_C_INTERVAL_YEAR";
+		case SQL_C_INTERVAL_MONTH:
+			return "SQL_C_INTERVAL_MONTH";
+		case SQL_C_INTERVAL_DAY:
+			return "SQL_C_INTERVAL_DAY";
+		case SQL_C_INTERVAL_HOUR:
+			return "SQL_C_INTERVAL_HOUR";
+		case SQL_C_INTERVAL_MINUTE:
+			return "SQL_C_INTERVAL_MINUTE";
+		case SQL_C_INTERVAL_SECOND:
+			return "SQL_C_INTERVAL_SECOND";
+		case SQL_C_INTERVAL_YEAR_TO_MONTH:
+			return "SQL_C_INTERVAL_YEAR_TO_MONTH";
+		case SQL_C_INTERVAL_DAY_TO_HOUR:
+			return "SQL_C_INTERVAL_DAY_TO_HOUR";
+		case SQL_C_INTERVAL_DAY_TO_MINUTE:
+			return "SQL_C_INTERVAL_DAY_TO_MINUTE";
+		case SQL_C_INTERVAL_DAY_TO_SECOND:
+			return "SQL_C_INTERVAL_DAY_TO_SECOND";
+		case SQL_C_INTERVAL_HOUR_TO_MINUTE:
+			return "SQL_C_INTERVAL_HOUR_TO_MINUTE";
+		case SQL_C_INTERVAL_HOUR_TO_SECOND:
+			return "SQL_C_INTERVAL_HOUR_TO_SECOND";
+		case SQL_C_INTERVAL_MINUTE_TO_SECOND:
+			return "SQL_C_INTERVAL_MINUTE_TO_SECOND";
+		case SQL_C_GUID:
+			return "SQL_C_GUID";
+		default:
+			return "unknown";
+	}
+}
+
 SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementhandle,
 					SQLUSMALLINT columnnumber,
 					SQLSMALLINT targettype,
@@ -368,15 +447,18 @@ SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementhandle,
 					SQLLEN bufferlength,
 					SQLLEN *strlen_or_ind) {
 	debugFunction();
-	debugPrintf("columnnumber: %d\n",(int)columnnumber);
+	debugPrintf("  columnnumber: %d\n",(int)columnnumber);
+	debugPrintf("  targettype  : %s\n",SQLR_GetCColumnTypeName(targettype));
+	debugPrintf("  bufferlength (supplied) : %lld\n",(uint64_t)bufferlength);
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
 	if (columnnumber<1) {
+		debugPrintf("  invalid column: %d\n",columnnumber);
 		SQLR_STMTSetError(stmt,NULL,0,"07009");
 		return SQL_ERROR;
 	}
@@ -392,6 +474,9 @@ SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementhandle,
 	field->strlen_or_ind=strlen_or_ind;
 
 	stmt->fieldlist.setValue(columnnumber-1,field);
+
+	debugPrintf("  bufferlength (from type): %lld\n",
+				(uint64_t)field->bufferlength);
 
 	return SQL_SUCCESS;
 }
@@ -433,7 +518,7 @@ SQLRETURN SQL_API SQLCancel(SQLHSTMT statementhandle) {
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -474,7 +559,7 @@ static SQLRETURN SQLR_SQLCloseCursor(SQLHSTMT statementhandle) {
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -1091,6 +1176,63 @@ static SQLSMALLINT SQLR_MapCColumnType(sqlrcursor *cur, uint32_t col) {
 	return SQL_C_CHAR;
 }
 
+static SQLULEN SQLR_GetColumnSize(sqlrcursor *cur, uint32_t col) {
+	switch (SQLR_MapColumnType(cur,col)) {
+		case SQL_UNKNOWN_TYPE:
+		case SQL_CHAR:
+		case SQL_NUMERIC:
+		case SQL_DECIMAL:
+		case SQL_VARCHAR:
+		case SQL_LONGVARCHAR:
+		case SQL_BINARY:
+		case SQL_VARBINARY:
+		case SQL_LONGVARBINARY:
+			{
+			// FIXME: this really ought to be sorted out in the
+			// connection code, rather than here.
+			uint32_t	precision=cur->getColumnPrecision(col);
+			uint32_t	length=cur->getColumnLength(col);
+			uint32_t	size=(length>precision)?
+							length:precision;
+			// FIXME: is there a better fallback value?
+			return (size)?size:32768;
+			}
+		case SQL_INTEGER:
+			return 10;
+		case SQL_SMALLINT:
+			return 5;
+		case SQL_FLOAT:
+			return 15;
+		case SQL_REAL:
+			return 7;
+		case SQL_DOUBLE:
+			return 15;
+		case SQL_DATETIME:
+			return 25;
+		case SQL_TYPE_DATE:
+			return 10;
+		case SQL_TYPE_TIME:
+			return 8;
+		case SQL_TYPE_TIMESTAMP:
+			return 25;
+		// dup of SQL_TIME
+		// case SQL_INTERVAL:
+		case SQL_TIME:
+			return 25;
+		case SQL_TIMESTAMP:
+			return 25;
+		case SQL_BIGINT:
+			return 20;
+		case SQL_TINYINT:
+			return 3;
+		case SQL_BIT:
+			return 1;
+		case SQL_GUID:
+			return 36;
+	}
+	return SQL_C_CHAR;
+}
+
 static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 					SQLUSMALLINT columnnumber,
 					SQLUSMALLINT fieldidentifier,
@@ -1099,12 +1241,12 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 					SQLSMALLINT *stringlength,
 					NUMERICATTRIBUTETYPE numericattribute) {
 	debugFunction();
-	debugPrintf("columnnumber: %d\n",(int)columnnumber);
-	debugPrintf("bufferlength: %d\n",(int)bufferlength);
+	debugPrintf("  columnnumber: %d\n",(int)columnnumber);
+	debugPrintf("  bufferlength: %d\n",(int)bufferlength);
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -1122,8 +1264,8 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 
 	// make sure we're attempting to get a valid column
 	uint32_t	colcount=stmt->cur->colCount();
-	debugPrintf("colcount: %d\n",(int)colcount);
 	if (columnnumber<1 || columnnumber>colcount) {
+		debugPrintf("  invalid column: %d\n",columnnumber);
 		SQLR_STMTSetError(stmt,NULL,0,"07009");
 		return SQL_ERROR;
 	}
@@ -1134,65 +1276,66 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 	switch (fieldidentifier) {
 		case SQL_DESC_COUNT:
 		case SQL_COLUMN_COUNT:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_COUNT\n");
 			*(SQLSMALLINT *)numericattribute=colcount;
-			debugPrintf("count: %lld\n",
+			debugPrintf("  count: %lld\n",
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		case SQL_DESC_TYPE:
 		//case SQL_DESC_CONCISE_TYPE:
 		case SQL_COLUMN_TYPE:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_TYPE/"
 					"SQL_DESC_CONCISE_TYPE/"
 					"COLUMN_TYPE\n");
 			*(SQLSMALLINT *)numericattribute=
 					SQLR_MapColumnType(stmt->cur,col);
-			debugPrintf("type: %lld\n",
+			debugPrintf("  type: %lld\n",
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		case SQL_DESC_LENGTH:
 		case SQL_DESC_OCTET_LENGTH:
 		case SQL_COLUMN_LENGTH:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_LENGTH/COLUMN_LENGTH/"
 					"SQL_DESC_OCTET_LENGTH\n");
 			*(SQLINTEGER *)numericattribute=
-					stmt->cur->getColumnLength(col);
-			debugPrintf("length: %lld\n",
+					SQLR_GetColumnSize(stmt->cur,col);
+			debugPrintf("  length: %lld\n",
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		case SQL_DESC_PRECISION:
 		case SQL_COLUMN_PRECISION:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_PRECISION\n");
 			*(SQLSMALLINT *)numericattribute=
 					stmt->cur->getColumnPrecision(col);
-			debugPrintf("precision: %lld\n",
+			debugPrintf("  precision: %lld\n",
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		case SQL_DESC_SCALE:
 		case SQL_COLUMN_SCALE:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_SCALE\n");
 			*(SQLSMALLINT *)numericattribute=
 					stmt->cur->getColumnScale(col);
-			debugPrintf("scale: %lld\n",
+			debugPrintf("  scale: %lld\n",
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		case SQL_DESC_NULLABLE:
 		case SQL_COLUMN_NULLABLE:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_NULLABLE\n");
 			*(SQLSMALLINT *)numericattribute=
-					stmt->cur->getColumnIsNullable(col);
-			debugPrintf("nullable: %lld\n",
+					(stmt->cur->getColumnIsNullable(col))?
+						SQL_NULLABLE:SQL_NO_NULLS;
+			debugPrintf("  nullable: %lld\n",
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		case SQL_DESC_NAME:
 		case SQL_COLUMN_NAME:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_NAME\n");
 			{
 			// SQL Relay doesn't know about column aliases,
@@ -1200,133 +1343,133 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			const char *name=stmt->cur->getColumnName(col);
 			charstring::safeCopy((char *)characterattribute,
 							bufferlength,name);
-			debugPrintf("name: \"%s\"\n",
+			debugPrintf("  name: \"%s\"\n",
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=charstring::length(name);
-				debugPrintf("length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",(int)*stringlength);
 			}
 			}
 			break;
 		case SQL_DESC_UNNAMED:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_UNNAMED\n");
 			if (charstring::length(stmt->cur->getColumnName(col))) {
 				*(SQLSMALLINT *)numericattribute=SQL_NAMED;
 			} else {
 				*(SQLSMALLINT *)numericattribute=SQL_UNNAMED;
 			} 
-			debugPrintf("unnamed: %lld\n",
+			debugPrintf("  unnamed: %lld\n",
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		//case SQL_DESC_AUTO_UNIQUE_VALUE:
 		case SQL_COLUMN_AUTO_INCREMENT:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_AUTO_UNIQUE_VALUE/"
 					"SQL_COLUMN_AUTO_INCREMENT\n");
 			*(SQLINTEGER *)numericattribute=stmt->cur->
 					getColumnIsAutoIncrement(col);
-			debugPrintf("auto-increment: %lld\n",
+			debugPrintf("  auto-increment: %lld\n",
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		case SQL_DESC_BASE_COLUMN_NAME:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_BASE_COLUMN_NAME\n");
 			// SQL Relay doesn't know this, in particular, return
 			// an empty string.
 			charstring::safeCopy((char *)characterattribute,
 							bufferlength,"");
-			debugPrintf("base column name: \"%s\"\n",
+			debugPrintf("  base column name: \"%s\"\n",
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=0;
-				debugPrintf("length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",(int)*stringlength);
 			}
 			break;
 		case SQL_DESC_BASE_TABLE_NAME:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_BASE_TABLE_NAME\n");
 			// SQL Relay doesn't know this, return an empty string.
 			charstring::safeCopy((char *)characterattribute,
 							bufferlength,"");
-			debugPrintf("base table name: \"%s\"\n",
+			debugPrintf("  base table name: \"%s\"\n",
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=0;
-				debugPrintf("length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",(int)*stringlength);
 			}
 			break;
 		//case SQL_DESC_CASE_SENSITIVE:
 		case SQL_COLUMN_CASE_SENSITIVE:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_CASE_SENSITIVE\n");
 			// not supported, return true
 			*(SQLSMALLINT *)numericattribute=SQL_TRUE;
-			debugPrintf("case sensitive: %lld\n",
+			debugPrintf("  case sensitive: %lld\n",
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		//case SQL_DESC_CATALOG_NAME:
 		case SQL_COLUMN_QUALIFIER_NAME:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_CATALOG_NAME/"
 					"SQL_COLUMN_QUALIFIER_NAME\n");
 			// not supported, return empty string
 			charstring::safeCopy((char *)characterattribute,
 							bufferlength,"");
-			debugPrintf("column qualifier name: \"%s\"\n",
+			debugPrintf("  column qualifier name: \"%s\"\n",
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=0;
-				debugPrintf("length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",(int)*stringlength);
 			}
 			break;
 		//case SQL_DESC_DISPLAY_SIZE:
 		case SQL_COLUMN_DISPLAY_SIZE:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_DISPLAY_SIZE\n");
 			*(SQLLEN *)numericattribute=stmt->cur->getLongest(col);
-			debugPrintf("display size: %lld\n",
+			debugPrintf("  display size: %lld\n",
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		//case SQL_DESC_FIXED_PREC_SCALE
 		case SQL_COLUMN_MONEY:
 			{
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_FIXED_PREC_SCALE/"
 					"SQL_COLUMN_MONEY\n");
 			const char	*type=stmt->cur->getColumnType(col);
-			debugPrintf("fixed prec scale: ");
+			debugPrintf("  fixed prec scale: ");
 			if (!charstring::compareIgnoringCase(
 							type,"money") ||
 				!charstring::compareIgnoringCase(
 							type,"smallmoney")) {
 				*(SQLSMALLINT *)numericattribute=SQL_TRUE;
-				debugPrintf("true\n");
+				debugPrintf("  true\n");
 			} else {
 				*(SQLSMALLINT *)numericattribute=SQL_FALSE;
-				debugPrintf("false\n");
+				debugPrintf("  false\n");
 			}
 			}
 			break;
 		//case SQL_DESC_LABEL
 		case SQL_COLUMN_LABEL:
 			{
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_LABEL\n");
 			const char *name=stmt->cur->getColumnName(col);
 			charstring::safeCopy((char *)characterattribute,
 							bufferlength,name);
-			debugPrintf("label: \"%s\"\n",
+			debugPrintf("  label: \"%s\"\n",
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=charstring::length(name);
-				debugPrintf("length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",(int)*stringlength);
 			}
 			}
 			break;
 		case SQL_DESC_LITERAL_PREFIX:
 			{
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_LITERAL_PREFIX\n");
 			// single-quote for char, 0x for binary
 			SQLSMALLINT	type=SQLR_MapColumnType(stmt->cur,col);
@@ -1353,16 +1496,16 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 					*stringlength=0;
 				}
 			}
-			debugPrintf("literal prefix: %s\n",
+			debugPrintf("  literal prefix: %s\n",
 					(const char *)characterattribute);
 			if (stringlength) {
-				debugPrintf("length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",(int)*stringlength);
 			}
 			}
 			break;
 		case SQL_DESC_LITERAL_SUFFIX:
 			{
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_LITERAL_SUFFIX\n");
 			// single-quote for char
 			SQLSMALLINT	type=SQLR_MapColumnType(stmt->cur,col);
@@ -1381,122 +1524,122 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 					*stringlength=0;
 				}
 			}
-			debugPrintf("literal prefix: %s\n",
+			debugPrintf("  literal prefix: %s\n",
 					(const char *)characterattribute);
 			if (stringlength) {
-				debugPrintf("length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",(int)*stringlength);
 			}
 			}
 			break;
 		case SQL_DESC_LOCAL_TYPE_NAME:
 			{
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_LOCAL_TYPE_NAME\n");
 			const char *name=stmt->cur->getColumnType(col);
 			charstring::safeCopy((char *)characterattribute,
 							bufferlength,name);
-			debugPrintf("local type name: \"%s\"\n",
+			debugPrintf("  local type name: \"%s\"\n",
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=charstring::length(name);
-				debugPrintf("length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",(int)*stringlength);
 			}
 			}
 			break;
 		case SQL_DESC_NUM_PREC_RADIX:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_NUM_PREC_RADIX\n");
 			// FIXME: 2 for approximate numeric types,
 			// 10 for exact numeric types, 0 otherwise
 			*(SQLINTEGER *)numericattribute=0;
-			debugPrintf("num prec radix: %lld\n",
+			debugPrintf("  num prec radix: %lld\n",
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		//case SQL_DESC_SCHEMA_NAME
 		case SQL_COLUMN_OWNER_NAME:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_SCHEMA_NAME/"
 					"SQL_COLUMN_OWNER_NAME\n");
 			// SQL Relay doesn't know this, return an empty string.
 			charstring::safeCopy((char *)characterattribute,
 							bufferlength,"");
-			debugPrintf("owner name: \"%s\"\n",
+			debugPrintf("  owner name: \"%s\"\n",
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=0;
-				debugPrintf("length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",(int)*stringlength);
 			}
 			break;
 		//case SQL_DESC_SEARCHABLE
 		case SQL_COLUMN_SEARCHABLE:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_SEARCHABLE\n");
 			// not supported, return searchable
 			*(SQLINTEGER *)numericattribute=SQL_SEARCHABLE;
-			debugPrintf("updatable: SQL_SEARCHABLE\n");
+			debugPrintf("  updatable: SQL_SEARCHABLE\n");
 			break;
 		//case SQL_DESC_TYPE_NAME
 		case SQL_COLUMN_TYPE_NAME:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_TYPE_NAME\n");
 			{
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC_LOCAL_TYPE_NAME\n");
 			const char *name=stmt->cur->getColumnType(col);
 			charstring::safeCopy((char *)characterattribute,
 							bufferlength,name);
-			debugPrintf("type name: \"%s\"\n",
+			debugPrintf("  type name: \"%s\"\n",
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=charstring::length(name);
-				debugPrintf("length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",(int)*stringlength);
 			}
 			}
 			break;
 		//case SQL_DESC_TABLE_NAME
 		case SQL_COLUMN_TABLE_NAME:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_TABLE_NAME\n");
 			// not supported, return an empty string
 			charstring::safeCopy((char *)characterattribute,
 							bufferlength,"");
-			debugPrintf("table name: \"%s\"\n",
+			debugPrintf("  table name: \"%s\"\n",
 					(const char *)characterattribute);
 			if (stringlength) {
 				*stringlength=0;
-				debugPrintf("length: %d\n",(int)*stringlength);
+				debugPrintf("  length: %d\n",(int)*stringlength);
 			}
 			break;
 		//case SQL_DESC_UNSIGNED
 		case SQL_COLUMN_UNSIGNED:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_UNSIGNED\n");
 			*(SQLSMALLINT *)numericattribute=
 					stmt->cur->getColumnIsUnsigned(col);
-			debugPrintf("unsigned: %lld\n",
+			debugPrintf("  unsigned: %lld\n",
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		//case SQL_DESC_UPDATABLE
 		case SQL_COLUMN_UPDATABLE:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_DESC/COLUMN_UPDATEABLE\n");
 			// not supported, return unknown
 			*(SQLINTEGER *)numericattribute=
 					SQL_ATTR_READWRITE_UNKNOWN;
-			debugPrintf("updatable: SQL_ATTR_READWRITE_UNKNOWN\n");
+			debugPrintf("  updatable: SQL_ATTR_READWRITE_UNKNOWN\n");
 			break;
 		#if (ODBCVER < 0x0300)
 		case SQL_COLUMN_DRIVER_START:
-			debugPrintf("fieldidentifier: "
+			debugPrintf("  fieldidentifier: "
 					"SQL_COLUMN_DRIVER_START\n");
 			// not supported, return 0
 			*(SQLINTEGER *)numericattribute=0;
-			debugPrintf("driver start: %lld\n",
+			debugPrintf("  driver start: %lld\n",
 				(int64_t)*(SQLSMALLINT *)numericattribute);
 			break;
 		#endif
 		default:
-			debugPrintf("invalid valuetype\n");
+			debugPrintf("  invalid valuetype\n");
 			return SQL_ERROR;
 	}
 
@@ -1570,7 +1713,7 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -1586,8 +1729,8 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 							namelength4);
 	}
 
-	debugPrintf("table: %s\n",table.getString());
-	debugPrintf("wild: %s\n",(wild)?wild:"");
+	debugPrintf("  table: %s\n",table.getString());
+	debugPrintf("  wild: %s\n",(wild)?wild:"");
 
 	SQLRETURN	retval=
 			(stmt->cur->getColumnList(table.getString(),wild))?
@@ -1608,7 +1751,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 
 	CONN	*conn=(CONN *)connectionhandle;
 	if (connectionhandle==SQL_NULL_HANDLE || !conn) {
-		debugPrintf("NULL conn handle\n");
+		debugPrintf("  NULL conn handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -1666,14 +1809,14 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					ODBC_INI);
 	conn->tries=(int32_t)charstring::toInteger(triesbuf);
 
-	debugPrintf("DSN: %s\n",dsn);
-	debugPrintf("Server: %s\n",conn->server);
-	debugPrintf("Port: %d\n",(int)conn->port);
-	debugPrintf("Socket: %s\n",conn->socket);
-	debugPrintf("User: %s\n",conn->user);
-	debugPrintf("Password: %s\n",conn->password);
-	debugPrintf("RetryTime: %d\n",(int)conn->retrytime);
-	debugPrintf("Tries: %d\n",(int)conn->tries);
+	debugPrintf("  DSN: %s\n",dsn);
+	debugPrintf("  Server: %s\n",conn->server);
+	debugPrintf("  Port: %d\n",(int)conn->port);
+	debugPrintf("  Socket: %s\n",conn->socket);
+	debugPrintf("  User: %s\n",conn->user);
+	debugPrintf("  Password: %s\n",conn->password);
+	debugPrintf("  RetryTime: %d\n",(int)conn->retrytime);
+	debugPrintf("  Tries: %d\n",(int)conn->tries);
 
 	// create connection
 	conn->con=new sqlrconnection(conn->server,
@@ -1736,17 +1879,18 @@ SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT statementhandle,
 					SQLSMALLINT *decimaldigits,
 					SQLSMALLINT *nullable) {
 	debugFunction();
-	debugPrintf("columnnumber: %d\n",(int)columnnumber);
+	debugPrintf("  columnnumber : %d\n",(int)columnnumber);
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
 	// make sure we're attempting to get a valid column
 	uint32_t	colcount=stmt->cur->colCount();
 	if (columnnumber<1 || columnnumber>colcount) {
+		debugPrintf("  invalid column: %d\n",columnnumber);
 		SQLR_STMTSetError(stmt,NULL,0,"07009");
 		return SQL_ERROR;
 	}
@@ -1754,22 +1898,33 @@ SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT statementhandle,
 	// get a zero-based version of the columnnumber
 	uint32_t	col=columnnumber-1;
 
-	charstring::safeCopy((char *)columnname,bufferlength,
-				stmt->cur->getColumnName(col));
+	if (columnname) {
+		charstring::safeCopy((char *)columnname,bufferlength,
+					stmt->cur->getColumnName(col));
+		debugPrintf("  columnname   : %s\n",columnname);
+	}
 	if (namelength) {
 		*namelength=charstring::length(columnname);
+		debugPrintf("  namelength   : %d\n",*namelength);
 	}
 	if (datatype) {
 		*datatype=SQLR_MapColumnType(stmt->cur,col);
+		debugPrintf("  datatype     : %s\n",
+					stmt->cur->getColumnType(col));
 	}
 	if (columnsize) {
-		*columnsize=(SQLSMALLINT)stmt->cur->getColumnPrecision(col);
+		*columnsize=SQLR_GetColumnSize(stmt->cur,col);
+		debugPrintf("  columnsize   : %lld\n",(uint64_t)*columnsize);
 	}
 	if (decimaldigits) {
 		*decimaldigits=(SQLSMALLINT)stmt->cur->getColumnScale(col);
+		debugPrintf("  decimaldigits: %d\n",*decimaldigits);
 	}
 	if (nullable) {
-		*nullable=(SQLSMALLINT)stmt->cur->getColumnIsNullable(col);
+		*nullable=(stmt->cur->getColumnIsNullable(col))?
+						SQL_NULLABLE:SQL_NO_NULLS;
+		debugPrintf("  nullable     : %d\n",
+				stmt->cur->getColumnIsNullable(col));
 	}
 
 	return SQL_SUCCESS;
@@ -1780,7 +1935,7 @@ SQLRETURN SQL_API SQLDisconnect(SQLHDBC connectionhandle) {
 
 	CONN	*conn=(CONN *)connectionhandle;
 	if (connectionhandle==SQL_NULL_HANDLE || !conn || !conn->con) {
-		debugPrintf("NULL conn handle\n");
+		debugPrintf("  NULL conn handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -1797,11 +1952,11 @@ static SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
 	switch (handletype) {
 		case SQL_HANDLE_ENV:
 		{
-			debugPrintf("handletype: SQL_HANDLE_ENV\n");
+			debugPrintf("  handletype: SQL_HANDLE_ENV\n");
 
 			ENV	*env=(ENV *)handle;
 			if (handle==SQL_NULL_HENV || !env) {
-				debugPrintf("NULL env handle\n");
+				debugPrintf("  NULL env handle\n");
 				return SQL_INVALID_HANDLE;
 			}
 
@@ -1820,11 +1975,11 @@ static SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
 		}
 		case SQL_HANDLE_DBC:
 		{
-			debugPrintf("handletype: SQL_HANDLE_DBC\n");
+			debugPrintf("  handletype: SQL_HANDLE_DBC\n");
 
 			CONN	*conn=(CONN *)handle;
 			if (handle==SQL_NULL_HANDLE || !conn || !conn->con) {
-				debugPrintf("NULL conn handle\n");
+				debugPrintf("  NULL conn handle\n");
 				return SQL_INVALID_HANDLE;
 			}
 
@@ -1837,7 +1992,7 @@ static SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
 			return SQL_SUCCESS;
 		}
 		default:
-			debugPrintf("invalid handletype\n");
+			debugPrintf("  invalid handletype\n");
 			return SQL_ERROR;
 	}
 }
@@ -1887,7 +2042,7 @@ SQLRETURN SQL_API SQLError(SQLHENV environmenthandle,
 					nativeerror,messagetext,
 					bufferlength,textlength);
 	}
-	debugPrintf("no valid handle\n");
+	debugPrintf("  no valid handle\n");
 	return SQL_INVALID_HANDLE;
 }
 
@@ -2079,7 +2234,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 
 		switch (ob->valuetype) {
 			case SQL_C_CHAR:
-				debugPrintf("valuetype: SQL_C_CHAR\n");
+				debugPrintf("  valuetype: SQL_C_CHAR\n");
 				// make sure to null-terminate
 				charstring::safeCopy(
 					(char *)ob->parametervalue,
@@ -2091,7 +2246,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				break;
 			case SQL_C_SLONG:
 			case SQL_C_LONG:
-				debugPrintf("valuetype: "
+				debugPrintf("  valuetype: "
 					"SQL_C_SLONG/SQL_C_LONG\n");
 				*((long *)ob->parametervalue)=
 					(long)stmt->cur->getOutputBindInteger(
@@ -2099,7 +2254,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				break;
 			//case SQL_C_BOOKMARK: (dup of SQL_C_ULONG)
 			case SQL_C_ULONG:
-				debugPrintf("valuetype: "
+				debugPrintf("  valuetype: "
 					"SQL_C_ULONG/SQL_C_BOOKMARK\n");
 				*((unsigned long *)ob->parametervalue)=
 					(unsigned long)
@@ -2108,33 +2263,33 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				break;
 			case SQL_C_SSHORT:
 			case SQL_C_SHORT:
-				debugPrintf("valuetype: "
+				debugPrintf("  valuetype: "
 					"SQL_C_SSHORT/SQL_C_SHORT\n");
 				*((short *)ob->parametervalue)=
 					(short)stmt->cur->getOutputBindInteger(
 								parametername);
 				break;
 			case SQL_C_USHORT:
-				debugPrintf("valuetype: SQL_C_USHORT\n");
+				debugPrintf("  valuetype: SQL_C_USHORT\n");
 				*((unsigned short *)ob->parametervalue)=
 					(unsigned short)
 					stmt->cur->getOutputBindInteger(
 								parametername);
 				break;
 			case SQL_C_FLOAT:
-				debugPrintf("valuetype: SQL_C_FLOAT\n");
+				debugPrintf("  valuetype: SQL_C_FLOAT\n");
 				*((float *)ob->parametervalue)=
 					(float)stmt->cur->getOutputBindDouble(
 								parametername);
 				break;
 			case SQL_C_DOUBLE:
-				debugPrintf("valuetype: SQL_C_DOUBLE\n");
+				debugPrintf("  valuetype: SQL_C_DOUBLE\n");
 				*((double *)ob->parametervalue)=
 					(double)stmt->cur->getOutputBindDouble(
 								parametername);
 				break;
 			case SQL_C_NUMERIC:
-				debugPrintf("valuetype: SQL_C_NUMERIC\n");
+				debugPrintf("  valuetype: SQL_C_NUMERIC\n");
 				SQLR_ParseNumeric(
 					(SQL_NUMERIC_STRUCT *)
 							ob->parametervalue,
@@ -2146,7 +2301,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 			case SQL_C_DATE:
 			case SQL_C_TYPE_DATE:
 				{
-				debugPrintf("valuetype: "
+				debugPrintf("  valuetype: "
 					"SQL_C_DATE/SQL_C_TYPE_DATE\n");
 				int16_t	year;
 				int16_t	month;
@@ -2170,7 +2325,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 			case SQL_C_TIME:
 			case SQL_C_TYPE_TIME:
 				{
-				debugPrintf("valuetype: "
+				debugPrintf("  valuetype: "
 					"SQL_C_TIME/SQL_C_TYPE_TIME\n");
 				int16_t	year;
 				int16_t	month;
@@ -2194,7 +2349,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 			case SQL_C_TIMESTAMP:
 			case SQL_C_TYPE_TIMESTAMP:
 				{
-				debugPrintf("valuetype: "
+				debugPrintf("  valuetype: "
 					"SQL_C_TIMESTAMP/"
 					"SQL_C_TYPE_TIMESTAMP\n");
 				int16_t	year;
@@ -2233,7 +2388,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 			case SQL_C_INTERVAL_HOUR_TO_MINUTE:
 			case SQL_C_INTERVAL_HOUR_TO_SECOND:
 			case SQL_C_INTERVAL_MINUTE_TO_SECOND:
-				debugPrintf("valuetype: SQL_C_INTERVAL_XXX\n");
+				debugPrintf("  valuetype: SQL_C_INTERVAL_XXX\n");
 				SQLR_ParseInterval(
 					(SQL_INTERVAL_STRUCT *)
 							ob->parametervalue,
@@ -2245,7 +2400,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 			//case SQL_C_VARBOOKMARK: (dup of SQL_C_BINARY)
 			case SQL_C_BINARY:
 				{
-				debugPrintf("valuetype: "
+				debugPrintf("  valuetype: "
 					"SQL_C_BINARY/SQL_C_VARBOOKMARK\n");
 				charstring::safeCopy(
 					(char *)ob->parametervalue,
@@ -2258,7 +2413,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				}
 			case SQL_C_BIT:
 				{
-				debugPrintf("valuetype: SQL_C_BIT\n");
+				debugPrintf("  valuetype: SQL_C_BIT\n");
 				const char	*val=
 					stmt->cur->getOutputBindString(
 								parametername);
@@ -2268,33 +2423,33 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				}
 				break;
 			case SQL_C_SBIGINT:
-				debugPrintf("valuetype: SQL_C_SBIGINT\n");
+				debugPrintf("  valuetype: SQL_C_SBIGINT\n");
 				*((int64_t *)ob->parametervalue)=
 				(int64_t)stmt->cur->getOutputBindInteger(
 								parametername);
 				break;
 			case SQL_C_UBIGINT:
-				debugPrintf("valuetype: SQL_C_UBIGINT\n");
+				debugPrintf("  valuetype: SQL_C_UBIGINT\n");
 				*((uint64_t *)ob->parametervalue)=
 				(uint64_t)stmt->cur->getOutputBindInteger(
 								parametername);
 				break;
 			case SQL_C_TINYINT:
 			case SQL_C_STINYINT:
-				debugPrintf("valuetype: "
+				debugPrintf("  valuetype: "
 					"SQL_C_TINYINT/SQL_C_STINYINT\n");
 				*((char *)ob->parametervalue)=
 				(char)stmt->cur->getOutputBindInteger(
 								parametername);
 				break;
 			case SQL_C_UTINYINT:
-				debugPrintf("valuetype: SQL_C_UTINYINT\n");
+				debugPrintf("  valuetype: SQL_C_UTINYINT\n");
 				*((unsigned char *)ob->parametervalue)=
 				(unsigned char)stmt->cur->getOutputBindInteger(
 								parametername);
 				break;
 			case SQL_C_GUID:
-				debugPrintf("valuetype: SQL_C_GUID\n");
+				debugPrintf("  valuetype: SQL_C_GUID\n");
 				SQLR_ParseGuid(
 					(SQLGUID *)ob->parametervalue,
 					stmt->cur->getOutputBindString(
@@ -2303,7 +2458,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 							parametername));
 				break;
 			default:
-				debugPrintf("invalue valuetype\n");
+				debugPrintf("  invalue valuetype\n");
 				break;
 		}
 	}
@@ -2340,7 +2495,7 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -2360,7 +2515,7 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 	#ifdef DEBUG_MESSAGES
 	stringbuffer	debugstr;
 	debugstr.append(statementtext,statementtextlength);
-	debugPrintf("statement: \"%s\",%d)\n",
+	debugPrintf("  statement: \"%s\",%d)\n",
 			debugstr.getString(),(int)statementtextlength);
 	#endif
 	bool	result=stmt->cur->sendQuery((const char *)statementtext,
@@ -2386,14 +2541,14 @@ SQLRETURN SQL_API SQLR_SQLExecute(SQLHSTMT statementhandle) {
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
 	// don't actually do anything if the statement
 	// was already executed by SQLNumResultCols
 	if (stmt->executedbynumresultcols) {
-		debugPrintf("already executed by SQLNumResultCols...\n");
+		debugPrintf("  already executed by SQLNumResultCols...\n");
 		stmt->executedbynumresultcols=false;
 		return stmt->executedbynumresultcolsresult;
 	}
@@ -2442,7 +2597,7 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -2462,13 +2617,16 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle, SQLULEN *pcrow,
 		uint64_t	firstrowindex=stmt->cur->firstRowIndex();
 		uint64_t	rowcount=stmt->cur->rowCount();
 		uint64_t	lastrowindex=(rowcount)?rowcount-1:0;
-		uint64_t	bufferedrowcount=lastrowindex-firstrowindex;
+		uint64_t	bufferedrowcount=lastrowindex-firstrowindex+1;
 		rowsfetched=(firstrowindex==stmt->currentfetchrow)?
 							bufferedrowcount:0;
 	} else {
 		rowstofetch=1;
 		rowsfetched=1;
 	}
+
+	debugPrintf("  rowstofetch: %lld\n",rowstofetch);
+	debugPrintf("  rowsfetched: %lld\n",rowsfetched);
 
 	// FIXME: set pcrow if SQLExtendedFetch is called,
 	// and don't set rowsfetchedptr
@@ -2550,13 +2708,13 @@ SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
 	// for now we only support SQL_FETCH_NEXT
 	if (fetchorientation!=SQL_FETCH_NEXT) {
-		debugPrintf("invalid fetchorientation\n");
+		debugPrintf("  invalid fetchorientation\n");
 		stmt->sqlstate="HY106";
 		return SQL_ERROR;
 	}
@@ -2582,10 +2740,10 @@ static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 	switch (handletype) {
 		case SQL_HANDLE_ENV:
 			{
-			debugPrintf("handletype: SQL_HANDLE_ENV\n");
+			debugPrintf("  handletype: SQL_HANDLE_ENV\n");
 			ENV	*env=(ENV *)handle;
 			if (handle==SQL_NULL_HENV || !env) {
-				debugPrintf("NULL env handle\n");
+				debugPrintf("  NULL env handle\n");
 				return SQL_INVALID_HANDLE;
 			}
 			env->connlist.clear();
@@ -2595,10 +2753,10 @@ static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 			}
 		case SQL_HANDLE_DBC:
 			{
-			debugPrintf("handletype: SQL_HANDLE_DBC\n");
+			debugPrintf("  handletype: SQL_HANDLE_DBC\n");
 			CONN	*conn=(CONN *)handle;
 			if (handle==SQL_NULL_HANDLE || !conn || !conn->con) {
-				debugPrintf("NULL conn handle\n");
+				debugPrintf("  NULL conn handle\n");
 				return SQL_INVALID_HANDLE;
 			}
 			conn->env->connlist.removeAll(conn);
@@ -2610,10 +2768,10 @@ static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 			}
 		case SQL_HANDLE_STMT:
 			{
-			debugPrintf("handletype: SQL_HANDLE_STMT\n");
+			debugPrintf("  handletype: SQL_HANDLE_STMT\n");
 			STMT	*stmt=(STMT *)handle;
 			if (handle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-				debugPrintf("NULL stmt handle\n");
+				debugPrintf("  NULL stmt handle\n");
 				return SQL_INVALID_HANDLE;
 			}
 			stmt->conn->stmtlist.removeAll(stmt);
@@ -2624,12 +2782,12 @@ static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 			return SQL_SUCCESS;
 			}
 		case SQL_HANDLE_DESC:
-			debugPrintf("handletype: SQL_HANDLE_DESC\n");
+			debugPrintf("  handletype: SQL_HANDLE_DESC\n");
 			// FIXME: no idea what to do here,
 			// for now just report success
 			return SQL_SUCCESS;
 		default:
-			debugPrintf("invalid handletype\n");
+			debugPrintf("  invalid handletype\n");
 			return SQL_ERROR;
 	}
 }
@@ -2644,28 +2802,28 @@ SQLRETURN SQL_API SQLFreeStmt(SQLHSTMT statementhandle, SQLUSMALLINT option) {
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
 	switch (option) {
 		case SQL_CLOSE:
-			debugPrintf("option: SQL_CLOSE\n");
+			debugPrintf("  option: SQL_CLOSE\n");
 			return SQLR_SQLCloseCursor(statementhandle);
 		case SQL_DROP:
-			debugPrintf("option: SQL_DROP\n");
+			debugPrintf("  option: SQL_DROP\n");
 			return SQLR_SQLFreeHandle(SQL_HANDLE_STMT,
 						(SQLHANDLE)statementhandle);
 		case SQL_UNBIND:
-			debugPrintf("option: SQL_UNBIND\n");
+			debugPrintf("  option: SQL_UNBIND\n");
 			stmt->fieldlist.clear();
 			return SQL_SUCCESS;
 		case SQL_RESET_PARAMS:
-			debugPrintf("option: SQL_RESET_PARAMS\n");
+			debugPrintf("  option: SQL_RESET_PARAMS\n");
 			SQLR_ResetParams(stmt);
 			return SQL_SUCCESS;
 		default:
-			debugPrintf("invalid option\n");
+			debugPrintf("  invalid option\n");
 			return SQL_ERROR;
 	}
 }
@@ -2679,7 +2837,7 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 
 	CONN	*conn=(CONN *)connectionhandle;
 	if (connectionhandle==SQL_NULL_HANDLE || !conn || !conn->con) {
-		debugPrintf("NULL conn handle\n");
+		debugPrintf("  NULL conn handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -2707,7 +2865,7 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 		case SQL_ATTR_METADATA_ID:
 	#endif*/
 		default:
-			debugPrintf("unsupported attribute: %d\n",attribute);
+			debugPrintf("  unsupported attribute: %d\n",attribute);
 			return SQL_SUCCESS;
 	}
 
@@ -2739,7 +2897,7 @@ SQLRETURN SQL_API SQLGetCursorName(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -2871,17 +3029,18 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
-	debugPrintf("row   : %d\n",(int)stmt->currentgetdatarow);
-	debugPrintf("column: %d\n",(int)columnnumber);
-	debugPrintf("bufferlength: %d\n",(int)bufferlength);
+	debugPrintf("  row   : %d\n",(int)stmt->currentgetdatarow);
+	debugPrintf("  column: %d\n",(int)columnnumber);
+	debugPrintf("  bufferlength: %d\n",(int)bufferlength);
 
 	// make sure we're attempting to get a valid column
 	uint32_t	colcount=stmt->cur->colCount();
 	if (columnnumber<1 || columnnumber>colcount) {
+		debugPrintf("  invalid column: %d\n",columnnumber);
 		SQLR_STMTSetError(stmt,NULL,0,"07009");
 		return SQL_ERROR;
 	}
@@ -2894,12 +3053,15 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 					stmt->currentgetdatarow,col);
 	uint32_t	fieldlength=stmt->cur->getFieldLength(
 					stmt->currentgetdatarow,col);
-
-	// initialize NULL indicator
-	*strlen_or_ind=SQL_NULL_DATA;
+	debugPrintf("  field      : %s\n",field);
+	debugPrintf("  fieldlength: %d\n",fieldlength);
 
 	// handle NULL fields
 	if (!field) {
+		if (strlen_or_ind) {
+			*strlen_or_ind=SQL_NULL_DATA;
+		}
+		debugPrintf("  null field\n");
 		return SQL_SUCCESS;
 	}
 
@@ -2908,11 +3070,16 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 		targettype=SQLR_MapCColumnType(stmt->cur,col);
 	}
 
+	// initialize strlen indicator
+	if (strlen_or_ind) {
+		*strlen_or_ind=SQLR_GetCColumnTypeSize(targettype);
+	}
+
 	// get the field data
 	switch (targettype) {
 		case SQL_C_CHAR:
 			{
-			debugPrintf("targettype: SQL_C_CHAR\n");
+			debugPrintf("  targettype: SQL_C_CHAR\n");
 			if (strlen_or_ind) {
 				*strlen_or_ind=fieldlength;
 			}
@@ -2920,120 +3087,103 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			charstring::safeCopy((char *)targetvalue,
 						bufferlength,
 						field,fieldlength+1);
-			debugPrintf("value: %s\n",(char *)targetvalue);
+			debugPrintf("  value: %s\n",(char *)targetvalue);
 			}
 			break;
 		case SQL_C_SSHORT:
 		case SQL_C_SHORT:
 		case SQL_C_USHORT:
-			debugPrintf("targettype: SQL_C_(X)SHORT\n");
+			debugPrintf("  targettype: SQL_C_(X)SHORT\n");
 			*((short *)targetvalue)=
 				(short)charstring::toInteger(field);
-			debugPrintf("value: %d\n",*((short *)targetvalue));
-			if (strlen_or_ind) {
-				*strlen_or_ind=sizeof(short);
-			}
+			debugPrintf("  value: %d\n",*((short *)targetvalue));
 			break;
 		case SQL_C_SLONG:
 		case SQL_C_LONG:
 		//case SQL_C_BOOKMARK: (dup of SQL_C_ULONG)
 		case SQL_C_ULONG:
-			debugPrintf("targettype: SQL_C_(X)LONG\n");
+			debugPrintf("  targettype: SQL_C_(X)LONG\n");
 			*((long *)targetvalue)=
 				(long)charstring::toInteger(field);
-			debugPrintf("value: %ld\n",*((long *)targetvalue));
-			if (strlen_or_ind) {
-				*strlen_or_ind=sizeof(long);
-			}
+			debugPrintf("  value: %ld\n",*((long *)targetvalue));
 			break;
 		case SQL_C_FLOAT:
-			debugPrintf("targettype: SQL_C_FLOAT\n");
+			debugPrintf("  targettype: SQL_C_FLOAT\n");
 			*((float *)targetvalue)=
 				(float)charstring::toFloat(field);
-			debugPrintf("value: %f\n",*((float *)targetvalue));
-			if (strlen_or_ind) {
-				*strlen_or_ind=sizeof(float);
-			}
+			debugPrintf("  value: %f\n",*((float *)targetvalue));
 			break;
 		case SQL_C_DOUBLE:
-			debugPrintf("targettype: SQL_C_DOUBLE\n");
+			debugPrintf("  targettype: SQL_C_DOUBLE\n");
 			*((double *)targetvalue)=
 				(double)charstring::toFloat(field);
-			debugPrintf("value: %f\n",*((double *)targetvalue));
-			if (strlen_or_ind) {
-				*strlen_or_ind=sizeof(double);
-			}
+			debugPrintf("  value: %f\n",*((double *)targetvalue));
 			break;
 		case SQL_C_BIT:
-			debugPrintf("targettype: SQL_C_BIT\n");
+			debugPrintf("  targettype: SQL_C_BIT\n");
 			((unsigned char *)targetvalue)[0]=
 				(charstring::contains("YyTt",field) ||
 				charstring::toInteger(field))?'1':'0';
-			debugPrintf("value: %c\n",
+			debugPrintf("  value: %c\n",
 					*((unsigned char *)targetvalue));
-			*strlen_or_ind=sizeof(unsigned char);
 			break;
 		case SQL_C_STINYINT:
 		case SQL_C_TINYINT:
 		case SQL_C_UTINYINT:
-			debugPrintf("targettype: SQL_C_(X)TINYINT\n");
+			debugPrintf("  targettype: SQL_C_(X)TINYINT\n");
 			*((char *)targetvalue)=
 				charstring::toInteger(field);
-			debugPrintf("value: %c\n",*((char *)targetvalue));
-			if (strlen_or_ind) {
-				*strlen_or_ind=sizeof(char);
-			}
+			debugPrintf("  value: %c\n",*((char *)targetvalue));
 			break;
 		case SQL_C_SBIGINT:
 		case SQL_C_UBIGINT:
-			debugPrintf("targettype: SQL_C_(X)BIGINT\n");
+			debugPrintf("  targettype: SQL_C_(X)BIGINT\n");
 			*((int64_t *)targetvalue)=
 				charstring::toInteger(field);
-			debugPrintf("value: %lld\n",*((int64_t *)targetvalue));
-			if (strlen_or_ind) {
-				*strlen_or_ind=sizeof(int64_t);
-			}
+			debugPrintf("  value: %lld\n",*((int64_t *)targetvalue));
 			break;
 		//case SQL_C_VARBOOKMARK: (dup of SQL_C_BINARY)
 		case SQL_C_BINARY:
 			{
-			debugPrintf("targettype: "
+			debugPrintf("  targettype: "
 				"SQL_C_BINARY/SQL_C_VARBOOKMARK\n");
-			uint32_t	sizetocopy=fieldlength;
-			if (bufferlength<(SQLLEN)sizetocopy) {
-				sizetocopy=bufferlength;
-			}
+			uint32_t	sizetocopy=
+					(bufferlength<fieldlength)?
+						bufferlength:fieldlength;
 			if (strlen_or_ind) {
-				*strlen_or_ind=sizetocopy;
+				*strlen_or_ind=fieldlength;
 			}
 			bytestring::copy((void *)targetvalue,
 					(const void *)field,sizetocopy);
+			debugPrintf("  value: ");
+			debugSafePrint((char *)targetvalue,sizetocopy);
+			debugPrintf("\n");
 			}
 			break;
 		case SQL_C_DATE:
 		case SQL_C_TYPE_DATE:
-			debugPrintf("targettype: SQL_C_DATE/SQL_C_TYPE_DATE\n");
+			debugPrintf("  targettype: SQL_C_DATE/SQL_C_TYPE_DATE\n");
 			SQLR_ParseDate((DATE_STRUCT *)targetvalue,field);
 			break;
 		case SQL_C_TIME:
 		case SQL_C_TYPE_TIME:
-			debugPrintf("targettype: SQL_C_TIME/SQL_C_TYPE_TIME\n");
+			debugPrintf("  targettype: SQL_C_TIME/SQL_C_TYPE_TIME\n");
 			SQLR_ParseTime((TIME_STRUCT *)targetvalue,field);
 			break;
 		case SQL_C_TIMESTAMP:
 		case SQL_C_TYPE_TIMESTAMP:
-			debugPrintf("targettype: "
+			debugPrintf("  targettype: "
 				"SQL_C_TIMESTAMP/SQL_C_TYPE_TIMESTAMP\n");
 			SQLR_ParseTimeStamp(
 				(TIMESTAMP_STRUCT *)targetvalue,field);
 			break;
 		case SQL_C_NUMERIC:
-			debugPrintf("targettype: SQL_C_NUMERIC\n");
+			debugPrintf("  targettype: SQL_C_NUMERIC\n");
 			SQLR_ParseNumeric((SQL_NUMERIC_STRUCT *)targetvalue,
 							field,fieldlength);
 			break;
 		case SQL_C_GUID:
-			debugPrintf("targettype: SQL_C_GUID\n");
+			debugPrintf("  targettype: SQL_C_GUID\n");
 			SQLR_ParseGuid((SQLGUID *)targetvalue,
 						field,fieldlength);
 			break;
@@ -3050,17 +3200,17 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 		case SQL_C_INTERVAL_HOUR_TO_MINUTE:
 		case SQL_C_INTERVAL_HOUR_TO_SECOND:
 		case SQL_C_INTERVAL_MINUTE_TO_SECOND:
-			debugPrintf("targettype: SQL_C_INTERVAL_XXX\n");
+			debugPrintf("  targettype: SQL_C_INTERVAL_XXX\n");
 			SQLR_ParseInterval((SQL_INTERVAL_STRUCT *)
 						targetvalue,
 						field,fieldlength);
 			break;
 		default:
-			debugPrintf("invalid targettype\n");
+			debugPrintf("  invalid targettype\n");
 			return SQL_ERROR;
 	}
 
-	debugPrintf("fieldlength: %d\n",*strlen_or_ind);
+	debugPrintf("  strlen_or_ind: %d\n",(strlen_or_ind)?*strlen_or_ind:0);
 
 	return SQL_SUCCESS;
 }
@@ -3121,10 +3271,10 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 	switch (handletype) {
 		case SQL_HANDLE_ENV:
 			{
-			debugPrintf("handletype: SQL_HANDLE_ENV\n");
+			debugPrintf("  handletype: SQL_HANDLE_ENV\n");
 			ENV	*env=(ENV *)handle;
 			if (handle==SQL_NULL_HENV || !env) {
-				debugPrintf("NULL env handle\n");
+				debugPrintf("  NULL env handle\n");
 				return SQL_INVALID_HANDLE;
 			}
 			// not supported
@@ -3135,10 +3285,10 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 			{
 			CONN	*conn=(CONN *)handle;
 			if (handle==SQL_NULL_HSTMT || !conn) {
-				debugPrintf("NULL conn handle\n");
+				debugPrintf("  NULL conn handle\n");
 				return SQL_INVALID_HANDLE;
 			}
-			debugPrintf("handletype: SQL_HANDLE_DBC\n");
+			debugPrintf("  handletype: SQL_HANDLE_DBC\n");
 			// not supported
 			SQLR_CONNSetError(conn,NULL,0,"IM001");
 			return SQL_ERROR;
@@ -3147,10 +3297,10 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 			{
 			STMT	*stmt=(STMT *)handle;
 			if (handle==SQL_NULL_HSTMT || !stmt) {
-				debugPrintf("NULL stmt handle\n");
+				debugPrintf("  NULL stmt handle\n");
 				return SQL_INVALID_HANDLE;
 			}
-			debugPrintf("handletype: SQL_HANDLE_STMT\n");
+			debugPrintf("  handletype: SQL_HANDLE_STMT\n");
 			// FIXME: there are tons more of these...
 			if (diagidentifier==SQL_DIAG_ROW_COUNT) {
 				*(SQLLEN *)diaginfo=stmt->cur->affectedRows();
@@ -3161,11 +3311,11 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 			return SQL_ERROR;
 			}
 		case SQL_HANDLE_DESC:
-			debugPrintf("handletype: SQL_HANDLE_DESC\n");
+			debugPrintf("  handletype: SQL_HANDLE_DESC\n");
 			// not supported
 			return SQL_ERROR;
 	}
-	debugPrintf("invalid handletype\n");
+	debugPrintf("  invalid handletype\n");
 	return SQL_ERROR;
 }
 
@@ -3179,7 +3329,7 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 					SQLSMALLINT *textlength) {
 	debugFunction();
 
-	debugPrintf("recnumber: %d\n",(int)recnumber);
+	debugPrintf("  recnumber: %d\n",(int)recnumber);
 
 	// SQL Relay doesn't have more than 1 error record
 	if (recnumber>1) {
@@ -3194,10 +3344,10 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 	switch (handletype) {
 		case SQL_HANDLE_ENV:
 			{
-			debugPrintf("handletype: SQL_HANDLE_ENV\n");
+			debugPrintf("  handletype: SQL_HANDLE_ENV\n");
 			ENV	*env=(ENV *)handle;
 			if (handle==SQL_NULL_HSTMT || !env) {
-				debugPrintf("NULL env handle\n");
+				debugPrintf("  NULL env handle\n");
 				return SQL_INVALID_HANDLE;
 			}
 			error=env->error;
@@ -3207,10 +3357,10 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 			break;
 		case SQL_HANDLE_DBC:
 			{
-			debugPrintf("handletype: SQL_HANDLE_DBC\n");
+			debugPrintf("  handletype: SQL_HANDLE_DBC\n");
 			CONN	*conn=(CONN *)handle;
 			if (handle==SQL_NULL_HSTMT || !conn) {
-				debugPrintf("NULL conn handle\n");
+				debugPrintf("  NULL conn handle\n");
 				return SQL_INVALID_HANDLE;
 			}
 			error=conn->error;
@@ -3220,10 +3370,10 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 			break;
 		case SQL_HANDLE_STMT:
 			{
-			debugPrintf("handletype: SQL_HANDLE_STMT\n");
+			debugPrintf("  handletype: SQL_HANDLE_STMT\n");
 			STMT	*stmt=(STMT *)handle;
 			if (handle==SQL_NULL_HSTMT || !stmt) {
-				debugPrintf("NULL stmt handle\n");
+				debugPrintf("  NULL stmt handle\n");
 				return SQL_INVALID_HANDLE;
 			}
 			error=stmt->error;
@@ -3232,18 +3382,18 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 			}
 			break;
 		case SQL_HANDLE_DESC:
-			debugPrintf("handletype: SQL_HANDLE_DESC\n");
+			debugPrintf("  handletype: SQL_HANDLE_DESC\n");
 			// not supported
 			return SQL_ERROR;
 		default:
-			debugPrintf("invalid handletype\n");
+			debugPrintf("  invalid handletype\n");
 			return SQL_ERROR;
 	}
 
-	debugPrintf("messagetext: %s\n",(error)?error:"");
-	debugPrintf("bufferlength: %d\n",bufferlength);
-	debugPrintf("nativeerror: %lld\n",(int64_t)errn);
-	debugPrintf("sqlstate: %s\n",(sqlst)?sqlst:"");
+	debugPrintf("  messagetext: %s\n",(error)?error:"");
+	debugPrintf("  bufferlength: %d\n",bufferlength);
+	debugPrintf("  nativeerror: %lld\n",(int64_t)errn);
+	debugPrintf("  sqlstate: %s\n",(sqlst)?sqlst:"");
 
 	// copy out the error and sqlstate
 	charstring::safeCopy((char *)messagetext,(size_t)bufferlength,error);
@@ -3282,36 +3432,36 @@ SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV environmenthandle,
 
 	ENV	*env=(ENV *)environmenthandle;
 	if (environmenthandle==SQL_NULL_HENV || !env) {
-		debugPrintf("NULL env handle\n");
+		debugPrintf("  NULL env handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
 	switch (attribute) {
 		case SQL_ATTR_OUTPUT_NTS:
-			debugPrintf("attribute: SQL_ATTR_OUTPUT_NTS\n");
+			debugPrintf("  attribute: SQL_ATTR_OUTPUT_NTS\n");
 			// this one is hardcoded to true
 			// and can't be set to false
 			*((SQLINTEGER *)value)=SQL_TRUE;
 			break;
 		case SQL_ATTR_ODBC_VERSION:
-			debugPrintf("attribute: SQL_ATTR_ODBC_VERSION\n");
+			debugPrintf("  attribute: SQL_ATTR_ODBC_VERSION\n");
 			*((SQLINTEGER *)value)=env->odbcversion;
-			debugPrintf("odbcversion: %d\n",(int)env->odbcversion);
+			debugPrintf("  odbcversion: %d\n",(int)env->odbcversion);
 			break;
 		case SQL_ATTR_CONNECTION_POOLING:
-			debugPrintf("attribute: SQL_ATTR_CONNECTION_POOLING\n");
+			debugPrintf("  attribute: SQL_ATTR_CONNECTION_POOLING\n");
 			// this one is hardcoded to "off"
 			// and can't be changed
 			*((SQLUINTEGER *)value)=SQL_CP_OFF;
 			break;
 		case SQL_ATTR_CP_MATCH:
-			debugPrintf("attribute: SQL_ATTR_CP_MATCH\n");
+			debugPrintf("  attribute: SQL_ATTR_CP_MATCH\n");
 			// this one is hardcoded to "default"
 			// and can't be changed
 			*((SQLUINTEGER *)value)=SQL_CP_MATCH_DEFAULT;
 			break;
 		default:
-			debugPrintf("unsupported attribute: %d\n",attribute);
+			debugPrintf("  unsupported attribute: %d\n",attribute);
 			break;
 	}
 	return SQL_SUCCESS;
@@ -3324,506 +3474,506 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 
 	CONN	*conn=(CONN *)connectionhandle;
 	if (connectionhandle==SQL_NULL_HANDLE || !conn || !conn->con) {
-		debugPrintf("NULL conn handle\n");
+		debugPrintf("  NULL conn handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
 	switch (functionid) {
 		case SQL_API_SQLALLOCCONNECT:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLALLOCCONNECT "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLALLOCENV:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLALLOCENV "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLALLOCHANDLE:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLALLOCHANDLE "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#endif
 		case SQL_API_SQLALLOCSTMT:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLALLOCSTMT "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLBINDCOL:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLBINDCOL "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLBINDPARAM:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLBINDPARAM "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLCLOSECURSOR:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLCLOSECURSOR "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLCOLATTRIBUTE:
 		//case SQL_API_SQLCOLATTRIBUTES:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLCOLATTRIBUTE "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#endif
 		case SQL_API_SQLCONNECT:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLCONNECT "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLCOPYDESC:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLCOPYDESC "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		#endif
 		case SQL_API_SQLDESCRIBECOL:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLDESCRIBECOL "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLDISCONNECT:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLDISCONNECT "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLENDTRAN:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLENDTRAN "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#endif
 		case SQL_API_SQLERROR:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLERROR "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLEXECDIRECT:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLEXECDIRECT "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLEXECUTE:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLEXECUTE "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLFETCH:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLFETCH "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLFETCHSCROLL:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLFETCHSCROLL "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#endif
 		case SQL_API_SQLFREECONNECT:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLFREECONNECT "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLFREEENV:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLFREEENV "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLFREEHANDLE:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLFREEHANDLE "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#endif
 		case SQL_API_SQLFREESTMT:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLFREESTMT "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLGETCONNECTOPTION:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLGETCONNECTOPTION "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLGETCURSORNAME:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLGETCURSORNAME "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLGETDATA:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLGETDATA "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLGETDIAGFIELD:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLGETDIAGFIELD "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLGETDIAGREC:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLGETDIAGREC "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLGETENVATTR:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLGETENVATTR "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#endif
 		case SQL_API_SQLGETFUNCTIONS:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLGETFUNCTIONS "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLGETINFO:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLGETINFO "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLGETSTMTATTR:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLGETSTMTATTR "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#endif
 		case SQL_API_SQLGETSTMTOPTION:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLGETSTMTOPTION "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLGETTYPEINFO:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLGETTYPEINFO "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLNUMRESULTCOLS:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLNUMRESULTCOLS "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLPREPARE:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLPREPARE "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLROWCOUNT:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLROWCOUNT "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLSETCONNECTATTR:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLSETCONNECTATTR "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#endif
 		case SQL_API_SQLSETCONNECTOPTION:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLSETCONNECTOPTION "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLSETCURSORNAME:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLSETCURSORNAME "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLSETENVATTR:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLSETENVATTR "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#endif
 		case SQL_API_SQLSETPARAM:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLSETPARAM "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLSETSTMTATTR:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLSETSTMTATTR "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#endif
 		case SQL_API_SQLSETSTMTOPTION:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLSETSTMTOPTION "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLTRANSACT:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLTRANSACT "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLALLOCHANDLESTD:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLALLOCHANDLESTD "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#endif
 		case SQL_API_SQLBINDPARAMETER:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLBINDPARAMETER "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLBROWSECONNECT:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLBROWSECONNECT "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLDRIVERCONNECT:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLDRIVERCONNECT "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLEXTENDEDFETCH:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLEXTENDEDFETCH "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLMORERESULTS:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLMORERESULTS "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLNUMPARAMS:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLNUMPARAMS "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLPARAMOPTIONS:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLPARAMOPTIONS "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLSETPOS:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLSETPOS "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLSETSCROLLOPTIONS:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLSETSCROLLOPTIONS "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLCANCEL:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLCANCEL "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLCOLUMNS:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLCOLUMNS "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		case SQL_API_SQLDATASOURCES:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLDATASOURCES "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLPUTDATA:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLPUTDATA "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLPARAMDATA:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLPARAMDATA "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLGETCONNECTATTR:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLGETCONNECTATTR "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#endif
 		case SQL_API_SQLSPECIALCOLUMNS:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLSPECIALCOLUMNS "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLSTATISTICS:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLSTATISTICS "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLTABLES:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLTABLES "
 				"- true\n");
 			*supported=SQL_TRUE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLBULKOPERATIONS:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLBULKOPERATIONS "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		#endif
 		case SQL_API_SQLCOLUMNPRIVILEGES:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLCOLUMNPRIVILEGES "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLDESCRIBEPARAM:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLDESCRIBEPARAM "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLFOREIGNKEYS:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLFOREIGNKEYS "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLNATIVESQL:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLNATIVESQL "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLPRIMARYKEYS:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLPRIMARYKEYS "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLPROCEDURECOLUMNS:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLPROCEDURECOLUMNS "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLPROCEDURES:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLPROCEDURES "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLTABLEPRIVILEGES:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLTABLEPRIVILEGES "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLDRIVERS:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLDRIVERS "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_API_SQLGETDESCFIELD:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLGETDESCFIELD "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLGETDESCREC:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLGETDESCREC "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLSETDESCFIELD:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLSETDESCFIELD "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLSETDESCREC:
-			debugPrintf("functionid: "
+			debugPrintf("  functionid: "
 				"SQL_API_SQLSETDESCREC "
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
 		#endif
 		default:
-			debugPrintf("invalid functionid");
+			debugPrintf("  invalid functionid");
 			return SQL_ERROR;
 	}
 
@@ -3839,7 +3989,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 
 	CONN	*conn=(CONN *)connectionhandle;
 	if (connectionhandle==SQL_NULL_HANDLE || !conn || !conn->con) {
-		debugPrintf("NULL conn handle\n");
+		debugPrintf("  NULL conn handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -3849,75 +3999,75 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 	// http://vieka.com/esqldoc/esqlref/htm/odbcsqlgetinfo.htm
 	switch (infotype) {
 		case SQL_DRIVER_ODBC_VER:
-			debugPrintf("infotype: SQL_DRIVER_ODBC_VER\n");
+			debugPrintf("  infotype: SQL_DRIVER_ODBC_VER\n");
 			strval="03.00";
 			break;
 		case SQL_DRIVER_NAME:
-			debugPrintf("infotype: SQL_DRIVER_NAME\n");
+			debugPrintf("  infotype: SQL_DRIVER_NAME\n");
 			strval="SQL Relay";
 			break;
 		case SQL_DRIVER_VER:
-			debugPrintf("infotype: SQL_DRIVER_VER\n");
+			debugPrintf("  infotype: SQL_DRIVER_VER\n");
 			strval=conn->con->clientVersion();
 			break;
 		case SQL_DBMS_NAME:
-			debugPrintf("infotype: SQL_DBMS_NAME\n");
+			debugPrintf("  infotype: SQL_DBMS_NAME\n");
 			strval=conn->con->identify();
 			break;
 		case SQL_DBMS_VER:
-			debugPrintf("infotype: SQL_DBMS_VER\n");
+			debugPrintf("  infotype: SQL_DBMS_VER\n");
 			strval=conn->con->dbVersion();
 			break;
 		case SQL_CURSOR_COMMIT_BEHAVIOR:
-			debugPrintf("infotype: SQL_CURSOR_COMMIT_BEHAVIOR\n");
+			debugPrintf("  infotype: SQL_CURSOR_COMMIT_BEHAVIOR\n");
 			// FIXME: is this true for all db's?
 			*(SQLUINTEGER *)infovalue=SQL_CB_CLOSE;
 			break;
 		case SQL_CURSOR_ROLLBACK_BEHAVIOR:
-			debugPrintf("infotype: SQL_CURSOR_ROLLBACK_BEHAVIOR\n");
+			debugPrintf("  infotype: SQL_CURSOR_ROLLBACK_BEHAVIOR\n");
 			// FIXME: is this true for all db's?
 			*(SQLUINTEGER *)infovalue=SQL_CB_CLOSE;
 			break;
 		case SQL_DATABASE_NAME:
-			debugPrintf("infotype: SQL_DATABASE_NAME\n");
+			debugPrintf("  infotype: SQL_DATABASE_NAME\n");
 			strval=conn->con->getCurrentDatabase();
 			break;
 		case SQL_TXN_CAPABLE:
-			debugPrintf("infotype: SQL_TXN_CAPABLE\n");
+			debugPrintf("  infotype: SQL_TXN_CAPABLE\n");
 			// FIXME: this isn't true for all db's
 			*(SQLUSMALLINT *)infovalue=SQL_TC_ALL;
 			break;
 		case SQL_SCROLL_OPTIONS:
-			debugPrintf("infotype: SQL_SCROLL_OPTIONS\n");
+			debugPrintf("  infotype: SQL_SCROLL_OPTIONS\n");
 			*(SQLUINTEGER *)infovalue=SQL_SO_FORWARD_ONLY;
 			break;
 		case SQL_BATCH_ROW_COUNT:
-			debugPrintf("infotype: SQL_BATCH_ROW_COUNT\n");
+			debugPrintf("  infotype: SQL_BATCH_ROW_COUNT\n");
 			// batch sql is not supported
 			*(SQLUINTEGER *)infovalue=0;
 			break;
 		case SQL_BATCH_SUPPORT:
-			debugPrintf("infotype: SQL_BATCH_SUPPORT\n");
+			debugPrintf("  infotype: SQL_BATCH_SUPPORT\n");
 			// batch sql is not supported
 			*(SQLUINTEGER *)infovalue=0;
 			break;
 		case SQL_PARAM_ARRAY_ROW_COUNTS:
-			debugPrintf("infotype: SQL_PARAM_ARRAY_ROW_COUNTS\n");
+			debugPrintf("  infotype: SQL_PARAM_ARRAY_ROW_COUNTS\n");
 			// batch sql is not supported
 			*(SQLUINTEGER *)infovalue=0;
 			break;
 		case SQL_CATALOG_NAME:
-			debugPrintf("infotype: SQL_CATALOG_NAME\n");
+			debugPrintf("  infotype: SQL_CATALOG_NAME\n");
 			// FIXME: this isn't true for all db's
 			strval="Y";
 			break;
 		case SQL_MAX_CATALOG_NAME_LEN:
-			debugPrintf("infotype: SQL_MAX_CATALOG_NAME_LEN\n");
+			debugPrintf("  infotype: SQL_MAX_CATALOG_NAME_LEN\n");
 			// 0 means no max length or unknown
 			*(SQLUINTEGER *)infovalue=0;
 			break;
 		case SQL_SCHEMA_USAGE:
-			debugPrintf("infotype: SQL_SCHEMA_USAGE\n");
+			debugPrintf("  infotype: SQL_SCHEMA_USAGE\n");
 			// FIXME: this isn't true for all db's
 			*(SQLUINTEGER *)infovalue=
 					SQL_SU_DML_STATEMENTS|
@@ -3927,7 +4077,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_SU_PRIVILEGE_DEFINITION;
 			break;
 		case SQL_TXN_ISOLATION_OPTION:
-			debugPrintf("infotype: SQL_TXN_ISOLATION_OPTION\n");
+			debugPrintf("  infotype: SQL_TXN_ISOLATION_OPTION\n");
 			// FIXME: this isn't true for all db's
 			*(SQLUINTEGER *)infovalue=
 					SQL_TXN_READ_UNCOMMITTED|
@@ -3936,41 +4086,41 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQL_TXN_SERIALIZABLE;
 			break;
 		case SQL_MAX_SCHEMA_NAME_LEN:
-			debugPrintf("infotype: SQL_MAX_SCHEMA_NAME_LEN\n");
+			debugPrintf("  infotype: SQL_MAX_SCHEMA_NAME_LEN\n");
 			// 0 means no max length or unknown
 			*(SQLUINTEGER *)infovalue=0;
 			break;
 		case SQL_MAX_TABLE_NAME_LEN:
-			debugPrintf("infotype: SQL_MAX_TABLE_NAME_LEN\n");
+			debugPrintf("  infotype: SQL_MAX_TABLE_NAME_LEN\n");
 			// 0 means no max length or unknown
 			*(SQLUINTEGER *)infovalue=0;
 			break;
 		case SQL_MAX_PROCEDURE_NAME_LEN:
-			debugPrintf("infotype: SQL_MAX_PROCEDURE_NAME_LEN\n");
+			debugPrintf("  infotype: SQL_MAX_PROCEDURE_NAME_LEN\n");
 			// 0 means no max length or unknown
 			*(SQLUINTEGER *)infovalue=0;
 			break;
 		case SQL_IDENTIFIER_QUOTE_CHAR:
-			debugPrintf("infotype: SQL_IDENTIFIER_QUOTE_CHAR\n");
+			debugPrintf("  infotype: SQL_IDENTIFIER_QUOTE_CHAR\n");
 			// FIXME: is this true for all db's?
 			strval="\"";
 			break;
 		case SQL_GETDATA_EXTENSIONS:
-			debugPrintf("infotype: SQL_GETDATA_EXTENSIONS\n");
+			debugPrintf("  infotype: SQL_GETDATA_EXTENSIONS\n");
 			*(SQLUINTEGER *)infovalue=SQL_GD_BLOCK;
 			break;
 		default:
-			debugPrintf("unsupported infotype: %d\n",infotype);
+			debugPrintf("  unsupported infotype: %d\n",infotype);
 			break;
 	}
 
 	// copy out the string value
 	if (strval) {
 		charstring::safeCopy((char *)infovalue,bufferlength,strval);
-		debugPrintf("infovalue: %s\n",(const char *)infovalue);
+		debugPrintf("  infovalue: %s\n",(const char *)infovalue);
 		if (stringlength) {
 			*stringlength=charstring::length(strval);
-			debugPrintf("stringlength: %d\n",(int)*stringlength);
+			debugPrintf("  stringlength: %d\n",(int)*stringlength);
 		}
 	}
 
@@ -3986,54 +4136,54 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
 	switch (attribute) {
 		#if (ODBCVER >= 0x0300)
 		case SQL_ATTR_APP_ROW_DESC:
-			debugPrintf("attribute: SQL_ATTR_APP_ROW_DESC\n");
+			debugPrintf("  attribute: SQL_ATTR_APP_ROW_DESC\n");
 			*(rowdesc **)value=stmt->approwdesc;
 			break;
 		case SQL_ATTR_APP_PARAM_DESC:
-			debugPrintf("attribute: SQL_ATTR_APP_PARAM_DESC\n");
+			debugPrintf("  attribute: SQL_ATTR_APP_PARAM_DESC\n");
 			*(paramdesc **)value=stmt->appparamdesc;
 			break;
 		case SQL_ATTR_IMP_ROW_DESC:
-			debugPrintf("attribute: SQL_ATTR_IMP_ROW_DESC\n");
+			debugPrintf("  attribute: SQL_ATTR_IMP_ROW_DESC\n");
 			*(rowdesc **)value=stmt->improwdesc;
 			break;
 		case SQL_ATTR_IMP_PARAM_DESC:
-			debugPrintf("attribute: SQL_ATTR_IMP_PARAM_DESC\n");
+			debugPrintf("  attribute: SQL_ATTR_IMP_PARAM_DESC\n");
 			*(paramdesc **)value=stmt->impparamdesc;
 			break;
 		case SQL_ATTR_CURSOR_SCROLLABLE:
-			debugPrintf("attribute: SQL_ATTR_CURSOR_SCROLLABLE\n");
+			debugPrintf("  attribute: SQL_ATTR_CURSOR_SCROLLABLE\n");
 			*(SQLULEN *)value=SQL_NONSCROLLABLE;
 			break;
 		case SQL_ATTR_CURSOR_SENSITIVITY:
-			debugPrintf("attribute: SQL_ATTR_CURSOR_SENSITIVITY\n");
+			debugPrintf("  attribute: SQL_ATTR_CURSOR_SENSITIVITY\n");
 			*(SQLULEN *)value=SQL_UNSPECIFIED;
 			break;
 		#endif
 		//case SQL_ATTR_QUERY_TIMEOUT:
 		case SQL_QUERY_TIMEOUT:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_QUERY_TIMEOUT/"
 					"SQL_QUERY_TIMEOUT\n");
 			*(SQLULEN *)value=0;
 			break;
 		//case SQL_ATTR_MAX_ROWS:
 		case SQL_MAX_ROWS:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_MAX_ROWS/"
 					"SQL_MAX_ROWS:\n");
 			*(SQLULEN *)value=0;
 			break;
 		//case SQL_ATTR_NOSCAN:
 		case SQL_NOSCAN:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_NOSCAN/"
 					"SQL_NOSCAN\n");
 			// FIXME: is this true for all db's?
@@ -4041,21 +4191,21 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 			break;
 		//case SQL_ATTR_MAX_LENGTH:
 		case SQL_MAX_LENGTH:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_MAX_LENGTH/"
 					"SQL_MAX_LENGTH\n");
 			*(SQLULEN *)value=0;
 			break;
 		//case SQL_ATTR_ASYNC_ENABLE:
 		case SQL_ASYNC_ENABLE:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_ASYNC_ENABLE/"
 					"SQL_ASYNC_ENABLE\n");
 			*(SQLULEN *)value=SQL_ASYNC_ENABLE_OFF;
 			break;
 		//case SQL_ATTR_ROW_BIND_TYPE:
 		case SQL_BIND_TYPE:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_BIND_TYPE/"
 					"SQL_BIND_TYPE\n");
 			*(SQLULEN *)value=stmt->rowbindtype;
@@ -4063,30 +4213,30 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 		//case SQL_ATTR_CONCURRENCY:
 		//case SQL_ATTR_CURSOR_TYPE:
 		case SQL_CURSOR_TYPE:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_CONCURRENCY/"
 					"SQL_ATTR_CURSOR_TYPE/"
 					"SQL_CURSOR_TYPE\n");
 			*(SQLULEN *)value=SQL_CURSOR_FORWARD_ONLY;
 			break;
 		case SQL_CONCURRENCY:
-			debugPrintf("attribute: SQL_CONCURRENCY\n");
+			debugPrintf("  attribute: SQL_CONCURRENCY\n");
 			*(SQLULEN *)value=SQL_CONCUR_READ_ONLY;
 			break;
 		//case SQL_ATTR_KEYSET_SIZE:
 		case SQL_KEYSET_SIZE:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_KEYSET_SIZE/"
 					"SQL_KEYSET_SIZE\n");
 			*(SQLULEN *)value=0;
 			break;
 		case SQL_ROWSET_SIZE:
-			debugPrintf("attribute: SQL_ROWSET_SIZE\n");
+			debugPrintf("  attribute: SQL_ROWSET_SIZE\n");
 			*(SQLULEN *)value=stmt->cur->getResultSetBufferSize();
 			break;
 		//case SQL_ATTR_SIMULATE_CURSOR:
 		case SQL_SIMULATE_CURSOR:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_SIMULATE_CURSOR/"
 					"SQL_SIMULATE_CURSOR\n");
 			// FIXME: I'm not sure this is true...
@@ -4094,99 +4244,99 @@ static SQLRETURN SQLR_SQLGetStmtAttr(SQLHSTMT statementhandle,
 			break;
 		//case SQL_ATTR_RETRIEVE_DATA:
 		case SQL_RETRIEVE_DATA:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_RETRIEVE_DATA/"
 					"SQL_RETRIEVE_DATA\n");
 			*(SQLULEN *)value=SQL_RD_ON;
 			break;
 		//case SQL_ATTR_USE_BOOKMARKS:
 		case SQL_USE_BOOKMARKS:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_USE_BOOKMARKS/"
 					"SQL_USE_BOOKMARKS\n");
 			*(SQLULEN *)value=SQL_UB_OFF;
 			break;
 		case SQL_GET_BOOKMARK:
-			debugPrintf("attribute: SQL_GET_BOOKMARK\n");
+			debugPrintf("  attribute: SQL_GET_BOOKMARK\n");
 			// FIXME: implement
 			break;
 		// case SQL_ATTR_ROW_NUMBER
 		case SQL_ROW_NUMBER:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_ROW_NUMBER/"
 					"SQL_ROW_NUMBER\n");
 			// FIXME: implement
 			break;
 		#if (ODBCVER >= 0x0300)
 		case SQL_ATTR_ENABLE_AUTO_IPD:
-			debugPrintf("attribute: SQL_ATTR_ENABLE_AUTO_IPD\n");
+			debugPrintf("  attribute: SQL_ATTR_ENABLE_AUTO_IPD\n");
 			*(SQLULEN *)value=SQL_TRUE;
 			break;
 		case SQL_ATTR_FETCH_BOOKMARK_PTR:
-			debugPrintf("attribute: SQL_ATTR_FETCH_BOOKMARK_PTR\n");
+			debugPrintf("  attribute: SQL_ATTR_FETCH_BOOKMARK_PTR\n");
 			// FIXME: implement
 			break;
 		case SQL_ATTR_PARAM_BIND_OFFSET_PTR:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_PARAM_BIND_OFFSET_PTR\n");
 			// FIXME: implement
 			break;
 		case SQL_ATTR_PARAM_BIND_TYPE:
-			debugPrintf("attribute: SQL_ATTR_PARAM_BIND_TYPE\n");
+			debugPrintf("  attribute: SQL_ATTR_PARAM_BIND_TYPE\n");
 			// FIXME: implement
 			break;
 		case SQL_ATTR_PARAM_OPERATION_PTR:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_PARAM_OPERATION_PTR\n");
 			// FIXME: implement
 			break;
 		case SQL_ATTR_PARAM_STATUS_PTR:
-			debugPrintf("attribute: SQL_ATTR_PARAM_STATUS_PTR\n");
+			debugPrintf("  attribute: SQL_ATTR_PARAM_STATUS_PTR\n");
 			// FIXME: implement
 			break;
 		case SQL_ATTR_PARAMS_PROCESSED_PTR:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_PARAMS_PROCESSED_PTR\n");
 			// FIXME: implement
 			break;
 		case SQL_ATTR_PARAMSET_SIZE:
-			debugPrintf("attribute: SQL_ATTR_PARAMSET_SIZE\n");
+			debugPrintf("  attribute: SQL_ATTR_PARAMSET_SIZE\n");
 			// FIXME: implement
 			break;
 		case SQL_ATTR_ROW_BIND_OFFSET_PTR:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_ROW_BIND_OFFSET_PTR\n");
 			// FIXME: implement
 			break;
 		case SQL_ATTR_ROW_OPERATION_PTR:
-			debugPrintf("attribute: SQL_ATTR_ROW_OPERATION_PTR\n");
+			debugPrintf("  attribute: SQL_ATTR_ROW_OPERATION_PTR\n");
 			// FIXME: implement
 			break;
 		case SQL_ATTR_ROW_STATUS_PTR:
-			debugPrintf("attribute: SQL_ATTR_ROW_STATUS_PTR\n");
+			debugPrintf("  attribute: SQL_ATTR_ROW_STATUS_PTR\n");
 			*(SQLUSMALLINT **)value=stmt->rowstatusptr;
 			break;
 		case SQL_ATTR_ROWS_FETCHED_PTR:
-			debugPrintf("attribute: SQL_ATTR_ROWS_FETCHED_PTR\n");
+			debugPrintf("  attribute: SQL_ATTR_ROWS_FETCHED_PTR\n");
 			*(SQLROWSETSIZE **)value=stmt->rowsfetchedptr;
 			break;
 		case SQL_ATTR_ROW_ARRAY_SIZE:
-			debugPrintf("attribute: SQL_ATTR_ROW_ARRAY_SIZE\n");
+			debugPrintf("  attribute: SQL_ATTR_ROW_ARRAY_SIZE\n");
 			*(SQLULEN *)value=stmt->cur->getResultSetBufferSize();
 			break;
 		#endif
 		#if (ODBCVER < 0x0300)
 		case SQL_STMT_OPT_MAX:
-			debugPrintf("attribute: SQL_STMT_OPT_MAX\n");
+			debugPrintf("  attribute: SQL_STMT_OPT_MAX\n");
 			// FIXME: implement
 			break;
 		case SQL_STMT_OPT_MIN:
-			debugPrintf("attribute: SQL_STMT_OPT_MIN\n");
+			debugPrintf("  attribute: SQL_STMT_OPT_MIN\n");
 			// FIXME: implement
 			break;
 		#endif
 		default:
-			debugPrintf("invalid attribute\n");
+			debugPrintf("  invalid attribute\n");
 			return SQL_ERROR;
 	}
 	return SQL_SUCCESS;
@@ -4224,7 +4374,7 @@ SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -4234,14 +4384,14 @@ SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT statementhandle,
 	// to execution.  SQL Relay doesn't but we can fake that by executing
 	// here and bypassing the next attempt to execute.
 	if (!stmt->executed) {
-		debugPrintf("not executed yet...\n");
+		debugPrintf("  not executed yet...\n");
 		stmt->executedbynumresultcolsresult=SQLR_SQLExecute(stmt);
 		stmt->executedbynumresultcols=true;
 		result=stmt->executedbynumresultcolsresult;
 	}
 
 	*columncount=(SQLSMALLINT)stmt->cur->colCount();
-	debugPrintf("columncount: %d\n",(int)*columncount);
+	debugPrintf("  columncount: %d\n",(int)*columncount);
 
 	return result;
 }
@@ -4252,7 +4402,7 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -4269,7 +4419,7 @@ SQLRETURN SQL_API SQLPrepare(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -4281,7 +4431,7 @@ SQLRETURN SQL_API SQLPrepare(SQLHSTMT statementhandle,
 	#ifdef DEBUG_MESSAGES
 	stringbuffer	debugstr;
 	debugstr.append(statementtext,statementtextlength);
-	debugPrintf("statement: \"%s\",%d)\n",
+	debugPrintf("  statement: \"%s\",%d)\n",
 			debugstr.getString(),(int)statementtextlength);
 	#endif
 	stmt->cur->prepareQuery((const char *)statementtext,
@@ -4301,7 +4451,7 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -4317,7 +4467,7 @@ SQLRETURN SQL_API SQLRowCount(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -4334,7 +4484,7 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 
 	CONN	*conn=(CONN *)connectionhandle;
 	if (connectionhandle==SQL_NULL_HANDLE || !conn || !conn->con) {
-		debugPrintf("NULL conn handle\n");
+		debugPrintf("  NULL conn handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -4342,7 +4492,7 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		#ifdef SQL_AUTOCOMMIT
 		case SQL_AUTOCOMMIT:
 		{
-			debugPrintf("attribute: SQL_AUTOCOMMIT\n");
+			debugPrintf("  attribute: SQL_AUTOCOMMIT\n");
 			// use reinterpret_cast to avoid compiler warnings
 			uint64_t	val=reinterpret_cast<uint64_t>(value);
 			if (val==SQL_AUTOCOMMIT_ON) {
@@ -4376,7 +4526,7 @@ static SQLRETURN SQLR_SQLSetConnectAttr(SQLHDBC connectionhandle,
 		case SQL_ATTR_METADATA_ID:
 	#endif*/
 		default:
-			debugPrintf("unsupported attribute: %d\n",attribute);
+			debugPrintf("  unsupported attribute: %d\n",attribute);
 			return SQL_SUCCESS;
 	}
 
@@ -4407,7 +4557,7 @@ SQLRETURN SQL_API SQLSetCursorName(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -4455,7 +4605,7 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV environmenthandle,
 
 	ENV	*env=(ENV *)environmenthandle;
 	if (environmenthandle==SQL_NULL_HENV || !env) {
-		debugPrintf("NULL env handle\n");
+		debugPrintf("  NULL env handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -4465,11 +4615,11 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV environmenthandle,
 
 	switch (attribute) {
 		case SQL_ATTR_OUTPUT_NTS:
-			debugPrintf("attribute: SQL_ATTR_OUTPUT_NTS\n");
+			debugPrintf("  attribute: SQL_ATTR_OUTPUT_NTS\n");
 			// this can't be set to false
 			return (val==SQL_TRUE)?SQL_SUCCESS:SQL_ERROR;
 		case SQL_ATTR_ODBC_VERSION:
-			debugPrintf("attribute: SQL_ATTR_ODBC_VERSION\n");
+			debugPrintf("  attribute: SQL_ATTR_ODBC_VERSION\n");
 			switch (val) {
 				case SQL_OV_ODBC2:
 					env->odbcversion=SQL_OV_ODBC2;
@@ -4478,19 +4628,19 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV environmenthandle,
 					env->odbcversion=SQL_OV_ODBC3;
 					break;
 			}
-			debugPrintf("odbcversion: %d\n",(int)env->odbcversion);
+			debugPrintf("  odbcversion: %d\n",(int)env->odbcversion);
 			return SQL_SUCCESS;
 		case SQL_ATTR_CONNECTION_POOLING:
-			debugPrintf("attribute: SQL_ATTR_CONNECTION_POOLING\n");
+			debugPrintf("  attribute: SQL_ATTR_CONNECTION_POOLING\n");
 			// this can't be set on
 			return (val==SQL_CP_OFF)?SQL_SUCCESS:SQL_ERROR;
 		case SQL_ATTR_CP_MATCH:
-			debugPrintf("attribute: SQL_ATTR_CP_MATCH\n");
+			debugPrintf("  attribute: SQL_ATTR_CP_MATCH\n");
 			// this can't be set to anything but default
 			return (val==SQL_CP_MATCH_DEFAULT)?
 						SQL_SUCCESS:SQL_ERROR;
 		default:
-			debugPrintf("unsupported attribute: %d\n",attribute);
+			debugPrintf("  unsupported attribute: %d\n",attribute);
 			return SQL_SUCCESS;
 	}
 }
@@ -4524,78 +4674,78 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
 	switch (attribute) {
 		#if (ODBCVER >= 0x0300)
 		case SQL_ATTR_APP_ROW_DESC:
-			debugPrintf("attribute: SQL_ATTR_APP_ROW_DESC\n");
+			debugPrintf("  attribute: SQL_ATTR_APP_ROW_DESC\n");
 			stmt->approwdesc=(rowdesc *)value;
 			if (stmt->approwdesc==SQL_NULL_DESC) {
 				stmt->approwdesc=stmt->improwdesc;
 			}
 			return SQL_SUCCESS;
 		case SQL_ATTR_APP_PARAM_DESC:
-			debugPrintf("attribute: SQL_ATTR_APP_PARAM_DESC\n");
+			debugPrintf("  attribute: SQL_ATTR_APP_PARAM_DESC\n");
 			stmt->appparamdesc=(paramdesc *)value;
 			if (stmt->appparamdesc==SQL_NULL_DESC) {
 				stmt->appparamdesc=stmt->impparamdesc;
 			}
 			return SQL_SUCCESS;
 		case SQL_ATTR_IMP_ROW_DESC:
-			debugPrintf("attribute: SQL_ATTR_IMP_ROW_DESC\n");
+			debugPrintf("  attribute: SQL_ATTR_IMP_ROW_DESC\n");
 			// read-only
 			return SQL_ERROR;
 		case SQL_ATTR_IMP_PARAM_DESC:
-			debugPrintf("attribute: SQL_ATTR_IMP_PARAM_DESC\n");
+			debugPrintf("  attribute: SQL_ATTR_IMP_PARAM_DESC\n");
 			// read-only
 			return SQL_ERROR;
 		case SQL_ATTR_CURSOR_SCROLLABLE:
-			debugPrintf("attribute: SQL_ATTR_CURSOR_SCROLLABLE\n");
+			debugPrintf("  attribute: SQL_ATTR_CURSOR_SCROLLABLE\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_CURSOR_SENSITIVITY:
-			debugPrintf("attribute: SQL_ATTR_CURSOR_SENSITIVITY\n");
+			debugPrintf("  attribute: SQL_ATTR_CURSOR_SENSITIVITY\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		#endif
 		//case SQL_ATTR_QUERY_TIMEOUT:
 		case SQL_QUERY_TIMEOUT:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_QUERY_TIMEOUT/"
 					"SQL_QUERY_TIMEOUT\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		//case SQL_ATTR_MAX_ROWS:
 		case SQL_MAX_ROWS:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_MAX_ROWS/"
 					"SQL_MAX_ROWS\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		//case SQL_ATTR_NOSCAN:
 		case SQL_NOSCAN:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_NOSCAN/"
 					"SQL_NOSCAN\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		//case SQL_ATTR_MAX_LENGTH:
 		case SQL_MAX_LENGTH:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_MAX_LENGTH/"
 					"SQL_MAX_LENGTH\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ASYNC_ENABLE:
-			debugPrintf("attribute: SQL_ASYNC_ENABLE\n");
+			debugPrintf("  attribute: SQL_ASYNC_ENABLE\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		//case SQL_ATTR_ROW_BIND_TYPE:
 		case SQL_BIND_TYPE:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_ROW_BIND_TYPE/"
 					"SQL_BIND_TYPE: "
 					"%lld\n",(uint64_t)(value));
@@ -4604,125 +4754,125 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 		//case SQL_ATTR_CONCURRENCY:
 		//case SQL_ATTR_CURSOR_TYPE:
 		case SQL_CURSOR_TYPE:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_CONCURRENCY/"
 					"SQL_ATTR_CURSOR_TYPE/"
 					"SQL_CURSOR_TYPE\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_CONCURRENCY:
-			debugPrintf("attribute: SQL_CONCURRENCY\n");
+			debugPrintf("  attribute: SQL_CONCURRENCY\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		//case SQL_ATTR_KEYSET_SIZE:
 		case SQL_KEYSET_SIZE:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_KEYSET_SIZE/"
 					"SQL_KEYSET_SIZE\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ROWSET_SIZE:
-			debugPrintf("attribute: SQL_ROWSET_SIZE\n");
+			debugPrintf("  attribute: SQL_ROWSET_SIZE\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		//case SQL_ATTR_SIMULATE_CURSOR:
 		case SQL_SIMULATE_CURSOR:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_SIMULATE_CURSOR/"
 					"SQL_SIMULATE_CURSOR\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		//case SQL_ATTR_RETRIEVE_DATA:
 		case SQL_RETRIEVE_DATA:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_RETRIEVE_DATA/"
 					"SQL_RETRIEVE_DATA\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		//case SQL_ATTR_USE_BOOKMARKS:
 		case SQL_USE_BOOKMARKS:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_USE_BOOKMARKS/"
 					"SQL_USE_BOOKMARKS\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_GET_BOOKMARK:
-			debugPrintf("attribute: SQL_GET_BOOKMARK\n");
+			debugPrintf("  attribute: SQL_GET_BOOKMARK\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		//case SQL_ATTR_ROW_NUMBER:
 		case SQL_ROW_NUMBER:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_ROW_NUMBER/"
 					"SQL_ROW_NUMBER\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		#if (ODBCVER >= 0x0300)
 		case SQL_ATTR_ENABLE_AUTO_IPD:
-			debugPrintf("attribute: SQL_ATTR_ENABLE_AUTO_IPD\n");
+			debugPrintf("  attribute: SQL_ATTR_ENABLE_AUTO_IPD\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_FETCH_BOOKMARK_PTR:
-			debugPrintf("attribute: SQL_ATTR_FETCH_BOOKMARK_PTR\n");
+			debugPrintf("  attribute: SQL_ATTR_FETCH_BOOKMARK_PTR\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_PARAM_BIND_OFFSET_PTR:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_PARAM_BIND_OFFSET_PTR\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_PARAM_BIND_TYPE:
-			debugPrintf("attribute: SQL_ATTR_PARAM_BIND_TYPE\n");
+			debugPrintf("  attribute: SQL_ATTR_PARAM_BIND_TYPE\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_PARAM_OPERATION_PTR:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_PARAM_OPERATION_PTR\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_PARAM_STATUS_PTR:
-			debugPrintf("attribute: SQL_ATTR_PARAM_STATUS_PTR\n");
+			debugPrintf("  attribute: SQL_ATTR_PARAM_STATUS_PTR\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_PARAMS_PROCESSED_PTR:
-			debugPrintf("attribute: "
+			debugPrintf("  attribute: "
 					"SQL_ATTR_PARAMS_PROCESSED_PTR\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_PARAMSET_SIZE:
-			debugPrintf("attribute: SQL_ATTR_PARAMSET_SIZE\n");
+			debugPrintf("  attribute: SQL_ATTR_PARAMSET_SIZE\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_ROW_BIND_OFFSET_PTR:
-			debugPrintf("attribute: "	
+			debugPrintf("  attribute: "	
 					"SQL_ATTR_ROW_BIND_OFFSET_PTR\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_ROW_OPERATION_PTR:
-			debugPrintf("attribute: SQL_ATTR_ROW_OPERATION_PTR\n");
+			debugPrintf("  attribute: SQL_ATTR_ROW_OPERATION_PTR\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_ATTR_ROW_STATUS_PTR:
-			debugPrintf("attribute: SQL_ATTR_ROW_STATUS_PTR\n");
+			debugPrintf("  attribute: SQL_ATTR_ROW_STATUS_PTR\n");
 			stmt->rowstatusptr=(SQLUSMALLINT *)value;
 			return SQL_SUCCESS;
 		case SQL_ATTR_ROWS_FETCHED_PTR:
-			debugPrintf("attribute: SQL_ATTR_ROWS_FETCHED_PTR\n");
+			debugPrintf("  attribute: SQL_ATTR_ROWS_FETCHED_PTR\n");
 			stmt->rowsfetchedptr=(SQLROWSETSIZE *)value;
 			return SQL_SUCCESS;
 		case SQL_ATTR_ROW_ARRAY_SIZE:
-			debugPrintf("attribute: SQL_ATTR_ROW_ARRAY_SIZE: "
+			debugPrintf("  attribute: SQL_ATTR_ROW_ARRAY_SIZE: "
 						"%lld\n",(uint64_t)(value));
 			stmt->cur->setResultSetBufferSize((uint64_t)value);
 			return SQL_SUCCESS;
 		#endif
 		#if (ODBCVER < 0x0300)
 		case SQL_STMT_OPT_MAX:
-			debugPrintf("attribute: SQL_STMT_OPT_MAX\n");
+			debugPrintf("  attribute: SQL_STMT_OPT_MAX\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		case SQL_STMT_OPT_MIN:
-			debugPrintf("attribute: SQL_STMT_OPT_MIN\n");
+			debugPrintf("  attribute: SQL_STMT_OPT_MIN\n");
 			// FIXME: implement
 			return SQL_SUCCESS;
 		#endif
@@ -4762,7 +4912,7 @@ SQLRETURN SQL_API SQLSpecialColumns(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -4785,7 +4935,7 @@ SQLRETURN SQL_API SQLStatistics(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -4808,7 +4958,7 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -4819,7 +4969,7 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 		wild=charstring::duplicate((const char *)tablename,
 							namelength3);
 	}
-	debugPrintf("wild: %s\n",(wild)?wild:"");
+	debugPrintf("  wild: %s\n",(wild)?wild:"");
 
 	SQLRETURN	retval=(stmt->cur->getTableList(wild))?
 						SQL_SUCCESS:SQL_ERROR;
@@ -4844,7 +4994,7 @@ SQLRETURN SQL_API SQLTransact(SQLHENV environmenthandle,
 					environmenthandle,
 					completiontype);
 	} else {
-		debugPrintf("no valid handle\n");
+		debugPrintf("  no valid handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 }
@@ -4861,7 +5011,7 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 
 	CONN	*conn=(CONN *)hdbc;
 	if (hdbc==SQL_NULL_HANDLE || !conn) {
-		debugPrintf("NULL conn handle\n");
+		debugPrintf("  NULL conn handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -4875,7 +5025,7 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 					(const char *)szconnstrin,
 					cbconnstrin);
 	}
-	debugPrintf("connectstring: %s\n",nulltermconnstr);
+	debugPrintf("  connectstring: %s\n",nulltermconnstr);
 
 	// parse out DSN, UID and PWD from the connect string
 	parameterstring	pstr;
@@ -4893,26 +5043,26 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 		authentication=pstr.getValue("pwd");
 	}
 
-	debugPrintf("servername: %s\n",servername);
-	debugPrintf("username: %s\n",username);
-	debugPrintf("authentication: %s\n",authentication);
+	debugPrintf("  servername: %s\n",servername);
+	debugPrintf("  username: %s\n",username);
+	debugPrintf("  authentication: %s\n",authentication);
 
 	// just support SQL_DRIVER_NOPROMPT for now
 	switch (fdrivercompletion) {
 		case SQL_DRIVER_PROMPT:
-			debugPrintf("fbdrivercompletion: "
+			debugPrintf("  fbdrivercompletion: "
 					"SQL_DRIVER_PROMPT\n");
 			return SQL_ERROR;
 		case SQL_DRIVER_COMPLETE:
-			debugPrintf("fbdrivercompletion: "
+			debugPrintf("  fbdrivercompletion: "
 					"SQL_DRIVER_COMPLETE\n");
 			return SQL_ERROR;
 		case SQL_DRIVER_COMPLETE_REQUIRED:
-			debugPrintf("fbdrivercompletion: "
+			debugPrintf("  fbdrivercompletion: "
 					"SQL_DRIVER_COMPLETE_REQUIRED\n");
 			return SQL_ERROR;
 		case SQL_DRIVER_NOPROMPT:
-			debugPrintf("fbdrivercompletion: "
+			debugPrintf("  fbdrivercompletion: "
 					"SQL_DRIVER_NOPROMPT\n");
 			if (!charstring::length(servername)) {
 				return SQL_ERROR;
@@ -4951,7 +5101,7 @@ SQLRETURN SQL_API SQLBulkOperations(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -4991,7 +5141,7 @@ SQLRETURN SQL_API SQLColumnPrivileges(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -5011,7 +5161,7 @@ SQLRETURN SQL_API SQLDescribeParam(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -5058,7 +5208,7 @@ SQLRETURN SQL_API SQLForeignKeys(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -5091,7 +5241,7 @@ SQLRETURN SQL_API SQLNumParams(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -5129,7 +5279,7 @@ SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -5152,7 +5302,7 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -5173,7 +5323,7 @@ SQLRETURN SQL_API SQLProcedures(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -5191,7 +5341,7 @@ SQLRETURN SQL_API SQLSetPos(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -5200,7 +5350,7 @@ SQLRETURN SQL_API SQLSetPos(SQLHSTMT statementhandle,
 			irow=1;
 		}
 		stmt->currentgetdatarow=stmt->currentstartrow+irow-1;
-		debugPrintf("currentgetdatarow=%lld\n",
+		debugPrintf("  currentgetdatarow=%lld\n",
 				stmt->currentgetdatarow);
 		return SQL_SUCCESS;
 	}
@@ -5220,7 +5370,7 @@ SQLRETURN SQL_API SQLTablePrivileges(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -5245,7 +5395,7 @@ SQLRETURN SQL_API SQLDrivers(SQLHENV environmenthandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -5452,7 +5602,7 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -5463,36 +5613,36 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 
 	switch (valuetype) {
 		case SQL_C_CHAR:
-			debugPrintf("valuetype: SQL_C_CHAR\n");
+			debugPrintf("  valuetype: SQL_C_CHAR\n");
 			stmt->cur->inputBind(parametername,
 					(const char *)parametervalue);
 			break;
 		case SQL_C_LONG:
-			debugPrintf("valuetype: SQL_C_LONG\n");
+			debugPrintf("  valuetype: SQL_C_LONG\n");
 			stmt->cur->inputBind(parametername,
 					(int64_t)(*((long *)parametervalue)));
 			break;
 		case SQL_C_SHORT:
-			debugPrintf("valuetype: SQL_C_SHORT\n");
+			debugPrintf("  valuetype: SQL_C_SHORT\n");
 			stmt->cur->inputBind(parametername,
 					(int64_t)(*((short *)parametervalue)));
 			break;
 		case SQL_C_FLOAT:
-			debugPrintf("valuetype: SQL_C_FLOAT\n");
+			debugPrintf("  valuetype: SQL_C_FLOAT\n");
 			stmt->cur->inputBind(parametername,
 					(float)(*((double *)parametervalue)),
 					lengthprecision,
 					parameterscale);
 			break;
 		case SQL_C_DOUBLE:
-			debugPrintf("valuetype: SQL_C_DOUBLE\n");
+			debugPrintf("  valuetype: SQL_C_DOUBLE\n");
 			stmt->cur->inputBind(parametername,
 					*((double *)parametervalue),
 					lengthprecision,
 					parameterscale);
 			break;
 		case SQL_C_NUMERIC:
-			debugPrintf("valuetype: SQL_C_NUMERIC\n");
+			debugPrintf("  valuetype: SQL_C_NUMERIC\n");
 			stmt->cur->inputBind(parametername,
 				SQLR_BuildNumeric(stmt,parameternumber,
 					(SQL_NUMERIC_STRUCT *)parametervalue));
@@ -5500,7 +5650,7 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 		case SQL_C_DATE:
 		case SQL_C_TYPE_DATE:
 			{
-			debugPrintf("valuetype: SQL_C_DATE/SQL_C_TYPE_DATE\n");
+			debugPrintf("  valuetype: SQL_C_DATE/SQL_C_TYPE_DATE\n");
 			DATE_STRUCT	*ds=(DATE_STRUCT *)parametervalue;
 			stmt->cur->inputBind(parametername,
 						ds->year,ds->month,ds->day,
@@ -5510,7 +5660,7 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 		case SQL_C_TIME:
 		case SQL_C_TYPE_TIME:
 			{
-			debugPrintf("valuetype: SQL_C_TIME/SQL_C_TYPE_TIME\n");
+			debugPrintf("  valuetype: SQL_C_TIME/SQL_C_TYPE_TIME\n");
 			TIME_STRUCT	*ts=(TIME_STRUCT *)parametervalue;
 			stmt->cur->inputBind(parametername,
 						0,0,0,
@@ -5521,7 +5671,7 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 		case SQL_C_TIMESTAMP:
 		case SQL_C_TYPE_TIMESTAMP:
 			{
-			debugPrintf("valuetype: "
+			debugPrintf("  valuetype: "
 				"SQL_C_TIMESTAMP/SQL_C_TYPE_TIMESTAMP\n");
 			TIMESTAMP_STRUCT	*tss=
 					(TIMESTAMP_STRUCT *)parametervalue;
@@ -5544,21 +5694,21 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 		case SQL_C_INTERVAL_HOUR_TO_MINUTE:
 		case SQL_C_INTERVAL_HOUR_TO_SECOND:
 		case SQL_C_INTERVAL_MINUTE_TO_SECOND:
-			debugPrintf("valuetype: SQL_C_INTERVAL_XXX\n");
+			debugPrintf("  valuetype: SQL_C_INTERVAL_XXX\n");
 			stmt->cur->inputBind(parametername,
 				SQLR_BuildInterval(stmt,parameternumber,
 					(SQL_INTERVAL_STRUCT *)parametervalue));
 			break;
 		//case SQL_C_VARBOOKMARK: (dup of SQL_C_BINARY)
 		case SQL_C_BINARY:
-			debugPrintf("valuetype: "
+			debugPrintf("  valuetype: "
 				"SQL_C_BINARY/SQL_C_VARBOOKMARK\n");
 			stmt->cur->inputBindBlob(parametername,
 					(const char *)parametervalue,
 					lengthprecision);
 			break;
 		case SQL_C_BIT:
-			debugPrintf("valuetype: SQL_C_BIT\n");
+			debugPrintf("  valuetype: SQL_C_BIT\n");
 			stmt->cur->inputBind(parametername,
 				(charstring::contains("YyTt",
 					(const char *)parametervalue) ||
@@ -5566,58 +5716,58 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 					(const char *)parametervalue))?"1":"0");
 			break;
 		case SQL_C_SBIGINT:
-			debugPrintf("valuetype: SQL_C_BIGINT\n");
+			debugPrintf("  valuetype: SQL_C_BIGINT\n");
 			stmt->cur->inputBind(parametername,
 				(int64_t)(*((int64_t *)parametervalue)));
 			break;
 		case SQL_C_UBIGINT:
-			debugPrintf("valuetype: SQL_C_UBIGINT\n");
+			debugPrintf("  valuetype: SQL_C_UBIGINT\n");
 			stmt->cur->inputBind(parametername,
 				(int64_t)(*((uint64_t *)parametervalue)));
 			break;
 		case SQL_C_SLONG:
-			debugPrintf("valuetype: SQL_C_SLONG\n");
+			debugPrintf("  valuetype: SQL_C_SLONG\n");
 			stmt->cur->inputBind(parametername,
 					(int64_t)(*((long *)parametervalue)));
 			break;
 		case SQL_C_SSHORT:
-			debugPrintf("valuetype: SQL_C_SSHORT\n");
+			debugPrintf("  valuetype: SQL_C_SSHORT\n");
 			stmt->cur->inputBind(parametername,
 					(int64_t)(*((short *)parametervalue)));
 			break;
 		case SQL_C_TINYINT:
 		case SQL_C_STINYINT:
-			debugPrintf("valuetype: "
+			debugPrintf("  valuetype: "
 				"SQL_C_TINYINT/SQL_C_STINYINT\n");
 			stmt->cur->inputBind(parametername,
 					(int64_t)(*((char *)parametervalue)));
 			break;
 		//case SQL_C_BOOKMARK: (dup of SQL_C_ULONG)
 		case SQL_C_ULONG:
-			debugPrintf("valuetype: SQL_C_ULONG/SQL_C_BOOKMARK\n");
+			debugPrintf("  valuetype: SQL_C_ULONG/SQL_C_BOOKMARK\n");
 			stmt->cur->inputBind(parametername,
 				(int64_t)(*((unsigned long *)parametervalue)));
 			break;
 		case SQL_C_USHORT:
-			debugPrintf("valuetype: SQL_C_USHORT\n");
+			debugPrintf("  valuetype: SQL_C_USHORT\n");
 			stmt->cur->inputBind(parametername,
 				(int64_t)(*((unsigned short *)parametervalue)));
 			break;
 		case SQL_C_UTINYINT:
-			debugPrintf("valuetype: SQL_C_UTINYINT\n");
+			debugPrintf("  valuetype: SQL_C_UTINYINT\n");
 			stmt->cur->inputBind(parametername,
 				(int64_t)(*((unsigned char *)parametervalue)));
 			break;
 		case SQL_C_GUID:
 			{
-			debugPrintf("valuetype: SQL_C_GUID\n");
+			debugPrintf("  valuetype: SQL_C_GUID\n");
 			stmt->cur->inputBind(parametername,
 				SQLR_BuildGuid(stmt,parameternumber,
 						(SQLGUID *)parametervalue));
 			}
 			break;
 		default:
-			debugPrintf("invalid valuetype\n");
+			debugPrintf("  invalid valuetype\n");
 			retval=SQL_ERROR;
 			break;
 	}
@@ -5639,7 +5789,7 @@ static SQLRETURN SQLR_OutputBindParameter(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
@@ -5662,7 +5812,7 @@ static SQLRETURN SQLR_OutputBindParameter(SQLHSTMT statementhandle,
 	switch (valuetype) {
 		case SQL_C_CHAR:
 		case SQL_C_BIT:
-			debugPrintf("valuetype: SQL_C_CHAR/SQL_C_BIT\n");
+			debugPrintf("  valuetype: SQL_C_CHAR/SQL_C_BIT\n");
 			stmt->cur->defineOutputBindString(parametername,
 								bufferlength);
 			break;
@@ -5678,32 +5828,32 @@ static SQLRETURN SQLR_OutputBindParameter(SQLHSTMT statementhandle,
 		case SQL_C_ULONG:
 		case SQL_C_USHORT:
 		case SQL_C_UTINYINT:
-			debugPrintf("valuetype: SQL_C_(INT of some kind)\n");
+			debugPrintf("  valuetype: SQL_C_(INT of some kind)\n");
 			stmt->cur->defineOutputBindInteger(parametername);
 			break;
 		case SQL_C_FLOAT:
 		case SQL_C_DOUBLE:
-			debugPrintf("valuetype: SQL_C_FLOAT/SQL_C_DOUBLE\n");
+			debugPrintf("  valuetype: SQL_C_FLOAT/SQL_C_DOUBLE\n");
 			stmt->cur->defineOutputBindDouble(parametername);
 			break;
 		case SQL_C_NUMERIC:
-			debugPrintf("valuetype: SQL_C_NUMERIC\n");
+			debugPrintf("  valuetype: SQL_C_NUMERIC\n");
 			// bind as a string, the result will be parsed
 			stmt->cur->defineOutputBindString(parametername,128);
 			break;
 		case SQL_C_DATE:
 		case SQL_C_TYPE_DATE:
-			debugPrintf("valuetype: SQL_C_DATE/SQL_C_TYPE_DATE\n");
+			debugPrintf("  valuetype: SQL_C_DATE/SQL_C_TYPE_DATE\n");
 			stmt->cur->defineOutputBindDate(parametername);
 			break;
 		case SQL_C_TIME:
 		case SQL_C_TYPE_TIME:
-			debugPrintf("valuetype: SQL_C_TIME/SQL_C_TYPE_TIME\n");
+			debugPrintf("  valuetype: SQL_C_TIME/SQL_C_TYPE_TIME\n");
 			stmt->cur->defineOutputBindDate(parametername);
 			break;
 		case SQL_C_TIMESTAMP:
 		case SQL_C_TYPE_TIMESTAMP:
-			debugPrintf("valuetype: "
+			debugPrintf("  valuetype: "
 				"SQL_C_TIMESTAMP/SQL_C_TYPE_TIMESTAMP\n");
 			stmt->cur->defineOutputBindDate(parametername);
 			break;
@@ -5720,23 +5870,23 @@ static SQLRETURN SQLR_OutputBindParameter(SQLHSTMT statementhandle,
 		case SQL_C_INTERVAL_HOUR_TO_MINUTE:
 		case SQL_C_INTERVAL_HOUR_TO_SECOND:
 		case SQL_C_INTERVAL_MINUTE_TO_SECOND:
-			debugPrintf("valuetype: SQL_C_INTERVAL_XXX\n");
+			debugPrintf("  valuetype: SQL_C_INTERVAL_XXX\n");
 			// bind as a string, the result will be parsed
 			stmt->cur->defineOutputBindString(parametername,128);
 			break;
 		//case SQL_C_VARBOOKMARK: dup of SQL_C_BINARY:
 		case SQL_C_BINARY:
-			debugPrintf("valuetype: "
+			debugPrintf("  valuetype: "
 				"SQL_C_BINARY/SQL_C_VARBOOKMARK\n");
 			stmt->cur->defineOutputBindBlob(parametername);
 			break;
 		case SQL_C_GUID:
-			debugPrintf("valuetype: SQL_C_GUID\n");
+			debugPrintf("  valuetype: SQL_C_GUID\n");
 			// bind as a string, the result will be parsed
 			stmt->cur->defineOutputBindString(parametername,128);
 			break;
 		default:
-			debugPrintf("invalid valuetype\n");
+			debugPrintf("  invalid valuetype\n");
 			retval=SQL_ERROR;
 			break;
 	}
@@ -5760,13 +5910,13 @@ static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
 
 	STMT	*stmt=(STMT *)statementhandle;
 	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("NULL stmt handle\n");
+		debugPrintf("  NULL stmt handle\n");
 		return SQL_INVALID_HANDLE;
 	}
 
 	switch (inputoutputtype) {
 		case SQL_PARAM_INPUT:
-			debugPrintf("parametertype: SQL_PARAM_INPUT\n");
+			debugPrintf("  parametertype: SQL_PARAM_INPUT\n");
 			return SQLR_InputBindParameter(statementhandle,
 							parameternumber,
 							valuetype,
@@ -5775,11 +5925,11 @@ static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
 							parametervalue,
 							strlen_or_ind);
 		case SQL_PARAM_INPUT_OUTPUT:
-			debugPrintf("parametertype: SQL_PARAM_INPUT_OUTPUT\n");
+			debugPrintf("  parametertype: SQL_PARAM_INPUT_OUTPUT\n");
 			// SQL Relay doesn't currently support in/out params
 			return SQL_ERROR;
 		case SQL_PARAM_OUTPUT:
-			debugPrintf("parametertype: SQL_PARAM_OUTPUT\n");
+			debugPrintf("  parametertype: SQL_PARAM_OUTPUT\n");
 			return SQLR_OutputBindParameter(statementhandle,
 							parameternumber,
 							valuetype,
@@ -5789,7 +5939,7 @@ static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
 							bufferlength,
 							strlen_or_ind);
 		default:
-			debugPrintf("invalid parametertype\n");
+			debugPrintf("  invalid parametertype\n");
 			return SQL_ERROR;
 	}
 }
