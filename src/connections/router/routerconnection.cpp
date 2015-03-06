@@ -425,6 +425,7 @@ bool routerconnection::autoCommitOff() {
 
 bool routerconnection::commit() {
 
+stdoutput.printf("commit...\n");
 	// commit all connections, if any fail, return failure
 	// FIXME: use 2 stage commit...
 	bool	result=true;
@@ -445,8 +446,9 @@ bool routerconnection::commit() {
 
 bool routerconnection::rollback() {
 
-	// commit all connections, if any fail, return failure
-	// FIXME: use 2 stage commit...
+stdoutput.printf("rollback...\n");
+	// rollback all connections, if any fail, return failure
+	// FIXME: use 2 stage rollback...
 	bool	result=true;
 	for (uint16_t index=0; index<concount; index++) {
 		if (!cons[index]) {
@@ -1000,6 +1002,7 @@ void routercursor::checkForTempTable(const char *query, uint32_t length) {
 
 bool routercursor::begin(const char *query, uint32_t length) {
 
+stdoutput.printf("begin...\n");
 	bool	result=true;
 	for (uint16_t index=0; index<routerconn->concount; index++) {
 
@@ -1011,13 +1014,16 @@ bool routercursor::begin(const char *query, uint32_t length) {
 		// for others, just set autocommit off
 		bool	res=false;
 		if (routerconn->beginquery[index]) {
+stdoutput.printf("  running \"%s\"\n",routerconn->beginquery[index]);
 			res=curs[index]->sendQuery(
 						routerconn->beginquery[index],
 						length);
 			if (!res) {
+stdoutput.printf("  begin failed\n");
 				routerconn->beginQueryFailed(index);
 			}
 		} else {
+stdoutput.printf("  setting autocommit off\n");
 			res=routerconn->cons[index]->autoCommitOff();
 			if (!res) {
 				routerconn->autoCommitOffFailed(index);

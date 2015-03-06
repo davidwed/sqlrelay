@@ -3,6 +3,7 @@
 
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/hostentry.h>
+#include <rudiments/process.h>
 
 #include <defines.h>
 

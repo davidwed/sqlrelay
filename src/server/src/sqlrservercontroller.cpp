@@ -2882,8 +2882,9 @@ sqlrservercursor *sqlrservercontroller::useCustomQueryCursor(
 	}
 
 	// see if the query matches one of the custom queries
-	// FIXME: the 0 isn't safe, none of the custom queries do anything with
-	// the id, but they might in the future so it needs to be unique
+	// FIXME: the 0 below isn't safe, none of the custom queries do
+	// anything with the id, but they might in the future so it needs to be
+	// unique
 	sqlrquerycursor	*customcursor=sqlrq->match(conn,
 						cursor->getQueryBuffer(),
 						cursor->getQueryLength(),0);
@@ -3324,14 +3325,13 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	// was the query a commit or rollback?
 	commitOrRollback(cursor);
 
-	// On success, autocommit if necessary.
+	// On success, commit if necessary.
 	// Connection classes could override autoCommitOn() and autoCommitOff()
 	// to do database API-specific things, but will not set 
 	// fakeautocommit, so this code won't get called at all for those 
 	// connections.
-	// FIXME: when faking autocommit, a BEGIN on a db that supports them
-	// could cause commit to be called immediately
 	if (success && conn->isTransactional() &&
+			!conn->supportsTransactionBlocks() &&
 			needcommitorrollback &&
 			conn->getFakeAutoCommit() &&
 			conn->getAutoCommit()) {

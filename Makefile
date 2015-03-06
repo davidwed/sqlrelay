@@ -9,7 +9,6 @@ all:
 
 clean:
 	$(MAKE) -C src clean
-	$(MAKE) -C bench clean
 	$(RMTREE) .pics */.pics */*/.pics */*/*/.pics */*/*/*/.pics */*/*/*/*/.pics
 	$(MAKE) -C test clean
 
