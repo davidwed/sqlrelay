@@ -142,6 +142,7 @@
       <RegisterOutput>false</RegisterOutput>
       <AdditionalLibraryDirectories>..\..\c++\msvc\Debug;C:\Program Files\Firstworks\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>..\sqlrodbc.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -159,6 +160,7 @@
       <RegisterOutput>false</RegisterOutput>
       <AdditionalLibraryDirectories>..\..\c++\msvc\Debug;C:\Program Files\Firstworks\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>..\sqlrodbc.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|Win32'">
@@ -177,6 +179,7 @@
       <RegisterOutput>false</RegisterOutput>
       <AdditionalLibraryDirectories>..\..\c++\msvc\DebugCLR;C:\Program Files\Firstworks\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>..\sqlrodbc.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCLR|x64'">
@@ -194,6 +197,7 @@
       <RegisterOutput>false</RegisterOutput>
       <AdditionalLibraryDirectories>..\..\c++\msvc\x64\DebugCLR;C:\Program Files\Firstworks\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>..\sqlrodbc.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -212,6 +216,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\..\c++\msvc\Release;C:\Program Files\Firstworks\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>..\sqlrodbc.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -229,6 +234,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\..\c++\msvc\x64\Release;C:\Program Files\Firstworks\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>..\sqlrodbc.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|Win32'">
@@ -247,6 +253,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\..\c++\msvc\ReleaseCLR;C:\Program Files\Firstworks\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>..\sqlrodbc.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCLR|x64'">
@@ -264,10 +271,14 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\..\c++\msvc\x64\ReleaseCLR;C:\Program Files\Firstworks\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libsqlrclient.lib;librudiments.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>..\sqlrodbc.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\sqlrodbc.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\sqlrodbc.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
