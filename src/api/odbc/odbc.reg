@@ -1,24 +1,19 @@
 Windows Registry Editor Version 5.00
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBCINST.INI\ODBC Drivers]
-"SQL Relay"=-
+[HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBC.INI\ODBC Data Sources]
+"mysqlrdsn"=-
+"My SQL Relay DSN"=-
 
-[-HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBCINST.INI\SQL Relay]
+[HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBC.INI\ODBC Data Sources]
+"My SQL Relay DSN"="SQL Relay"
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\ODBC\ODBCINST.INI\ODBC Drivers]
-"SQL Relay"=-
+[-HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBC.INI\mysqlrdsn]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBC.INI\My SQL Relay DSN]
 
-[-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\ODBC\ODBCINST.INI\SQL Relay]
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\ODBC\ODBCINST.INI\ODBC Drivers]
-"SQL Relay"="Installed"
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\ODBC\ODBCINST.INI\SQL Relay]
-"APILevel"="2"
-"ConnectFunctions"="YYY"
+[HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBC.INI\My SQL Relay DSN]
+"Description"="My SQL Relay DSN"
 "Driver"="C:\\Program Files\\Firstworks\\bin\\libsqlrodbc.dll"
-"DriverODBCVer"="03.00"
-"FileUsage"="1"
-"Setup"="C:\\Program Files\\Firstworks\\bin\\libsqlrodbc.dll"
-"SQLLevel"="1"
-"UsageCount"=dword:0
+"Server"="sqlrserver"
+"Port"=dword:2328
+"User"="test"
+"Password"="test"

@@ -13,11 +13,10 @@
 #include <rudiments/stdio.h>
 
 #define DEBUG_MESSAGES 1
-#define DEBUG_TO_FILE 1
+//#define DEBUG_TO_FILE 1
 #include <debugprint.h>
 
-// windows needs this
-// (don't include for __CYGWIN__ though)
+// windows needs this (don't include for __CYGWIN__ though)
 #ifdef _WIN32
 	#include <windows.h>
 #endif
