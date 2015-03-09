@@ -10,7 +10,7 @@
 #ifdef DEBUG_TO_FILE
 	#include <rudiments/file.h>
 	#include <rudiments/permissions.h>
-# else
+#else
 	#include <rudiments/stdio.h>
 #endif
 
@@ -23,6 +23,7 @@
 			#define debugPrintf(args...) { file f; f.open("/tmp/sqlrdebug.txt",O_RDWR|O_APPEND|O_CREAT,permissions::evalPermString("rw-r--r--")); f.printf(args); f.close(); }
 		#endif
 		#define debugSafePrint(a,b) { file f; f.open("/tmp/sqlrdebug.txt",O_RDWR|O_APPEND|O_CREAT,permissions::evalPermString("rw-r--r--")); f.safePrint(a,b); f.close(); }
+		#define debugPrintButs(a) { file f; f.open("/tmp/sqlrdebug.txt",O_RDWR|O_APPEND|O_CREAT,permissions::evalPermString("rw-r--r--")); f.printBits(a); f.close(); }
 	#else
 		#define debugFunction() stdoutput.printf("%s:%s():%d:\n",__FILE__,__FUNCTION__,__LINE__); stdoutput.flush();
 		#ifdef _MSC_VER
@@ -31,6 +32,7 @@
 			#define debugPrintf(args...) stdoutput.printf(args); stdoutput.flush();
 		#endif
 		#define debugSafePrint(a,b) stdoutput.safePrint(a,b); stdoutput.flush();
+		#define debugPrintBits(a) stdoutput.printBits(a); stdoutput.flush();
 	#endif
 #else
 	#define debugFunction() /* */
@@ -39,6 +41,8 @@
 	#else
 		#define debugPrintf(args...) /* */
 	#endif
+	#define debugSafePrint(a,b) /* */
+	#define debugPrintBits(a) /* */
 #endif
 
 #endif

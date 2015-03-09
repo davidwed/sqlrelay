@@ -163,10 +163,10 @@ static void SQLR_ENVSetError(ENV *env, const char *error,
 	debugPrintf("  sqlstate: %s\n",env->sqlstate);
 }
 
-/*static void SQLR_ENVClearError(ENV *env) {
+static void SQLR_ENVClearError(ENV *env) {
 	debugFunction();
-	SQLR_ENVSetError(env,NULL,0,NULL);
-}*/
+	SQLR_ENVSetError(env,NULL,0,"00000");
+}
 
 static void SQLR_CONNSetError(CONN *conn, const char *error,
 				int64_t errn, const char *sqlstate) {
@@ -183,10 +183,10 @@ static void SQLR_CONNSetError(CONN *conn, const char *error,
 	debugPrintf("  sqlstate: %s\n",conn->sqlstate);
 }
 
-/*static void SQLR_CONNClearError(CONN *conn) {
+static void SQLR_CONNClearError(CONN *conn) {
 	debugFunction();
-	SQLR_CONNSetError(conn,NULL,0,NULL);
-}*/
+	SQLR_CONNSetError(conn,NULL,0,"00000");
+}
 
 static void SQLR_STMTSetError(STMT *stmt, const char *error,
 				int64_t errn, const char *sqlstate) {
@@ -205,7 +205,7 @@ static void SQLR_STMTSetError(STMT *stmt, const char *error,
 
 static void SQLR_STMTClearError(STMT *stmt) {
 	debugFunction();
-	SQLR_STMTSetError(stmt,NULL,0,NULL);
+	SQLR_STMTSetError(stmt,NULL,0,"00000");
 }
 
 static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
@@ -217,12 +217,13 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 		case SQL_HANDLE_ENV:
 			{
 			debugPrintf("  handletype: SQL_HANDLE_ENV\n");
-			ENV	*env=new ENV;
-			env->odbcversion=0;
-			*outputhandle=(SQLHANDLE)env;
-			env->error=NULL;
-			env->errn=0;
-			env->sqlstate=NULL;
+			if (outputhandle) {
+				ENV	*env=new ENV;
+				env->odbcversion=0;
+				*outputhandle=(SQLHANDLE)env;
+				env->error=NULL;
+				SQLR_ENVClearError(env);
+			}
 			return SQL_SUCCESS;
 			}
 		case SQL_HANDLE_DBC:
@@ -231,16 +232,20 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 			ENV	*env=(ENV *)inputhandle;
 			if (inputhandle==SQL_NULL_HENV || !env) {
 				debugPrintf("  NULL env handle\n");
+				if (outputhandle) {
+					*outputhandle=SQL_NULL_HENV;
+				}
 				return SQL_INVALID_HANDLE;
 			}
-			CONN	*conn=new CONN;
-			conn->con=NULL;
-			*outputhandle=(SQLHANDLE)conn;
-			conn->error=NULL;
-			conn->errn=0;
-			conn->sqlstate=NULL;
-			env->connlist.append(conn);
-			conn->env=env;
+			if (outputhandle) {
+				CONN	*conn=new CONN;
+				conn->con=NULL;
+				*outputhandle=(SQLHANDLE)conn;
+				conn->error=NULL;
+				SQLR_CONNClearError(conn);
+				env->connlist.append(conn);
+				conn->env=env;
+			}
 			return SQL_SUCCESS;
 			}
 		case SQL_HANDLE_STMT:
@@ -250,32 +255,34 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 			if (inputhandle==SQL_NULL_HANDLE ||
 						!conn || !conn->con) {
 				debugPrintf("  NULL conn handle\n");
+				*outputhandle=SQL_NULL_HENV;
 				return SQL_INVALID_HANDLE;
 			}
-			STMT	*stmt=new STMT;
-			stmt->cur=new sqlrcursor(conn->con);
-			*outputhandle=(SQLHANDLE)stmt;
-			stmt->currentfetchrow=0;
-			stmt->currentstartrow=0;
-			stmt->currentgetdatarow=0;
-			stmt->conn=conn;
-			conn->stmtlist.append(stmt);
-			stmt->name=NULL;
-			stmt->error=NULL;
-			stmt->errn=0;
-			stmt->sqlstate=NULL;
-			stmt->improwdesc=new rowdesc;
-			stmt->improwdesc->stmt=stmt;
-			stmt->impparamdesc=new paramdesc;
-			stmt->impparamdesc->stmt=stmt;
-			stmt->approwdesc=stmt->improwdesc;
-			stmt->appparamdesc=stmt->impparamdesc;
-			stmt->rowsfetchedptr=NULL;
-			stmt->rowstatusptr=NULL;
-			stmt->executed=false;
-			stmt->executedbynumresultcols=false;
-			stmt->executedbynumresultcolsresult=SQL_SUCCESS;
-			stmt->rowbindtype=SQL_BIND_BY_COLUMN;
+			if (outputhandle) {
+				STMT	*stmt=new STMT;
+				stmt->cur=new sqlrcursor(conn->con);
+				*outputhandle=(SQLHANDLE)stmt;
+				stmt->currentfetchrow=0;
+				stmt->currentstartrow=0;
+				stmt->currentgetdatarow=0;
+				stmt->conn=conn;
+				conn->stmtlist.append(stmt);
+				stmt->name=NULL;
+				stmt->error=NULL;
+				SQLR_STMTClearError(stmt);
+				stmt->improwdesc=new rowdesc;
+				stmt->improwdesc->stmt=stmt;
+				stmt->impparamdesc=new paramdesc;
+				stmt->impparamdesc->stmt=stmt;
+				stmt->approwdesc=stmt->improwdesc;
+				stmt->appparamdesc=stmt->impparamdesc;
+				stmt->rowsfetchedptr=NULL;
+				stmt->rowstatusptr=NULL;
+				stmt->executed=false;
+				stmt->executedbynumresultcols=false;
+				stmt->executedbynumresultcolsresult=SQL_SUCCESS;
+				stmt->rowbindtype=SQL_BIND_BY_COLUMN;
+			}
 			return SQL_SUCCESS;
 			}
 		case SQL_HANDLE_DESC:
@@ -283,7 +290,7 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 			// FIXME: no idea what to do here
 			return SQL_ERROR;
 		default:
-			debugPrintf("  invalid handletype\n");
+			debugPrintf("  invalid handletype: %d\n",handletype);
 			break;
 	}
 	return SQL_ERROR;
@@ -293,12 +300,14 @@ SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT handletype,
 					SQLHANDLE inputhandle,
 					SQLHANDLE *outputhandle) {
 	debugFunction();
+stdoutput.printf("SQLAllocHandle: %d...\n",handletype);
 	return SQLR_SQLAllocHandle(handletype,inputhandle,outputhandle);
 }
 
 SQLRETURN SQL_API SQLAllocStmt(SQLHDBC connectionhandle,
 					SQLHSTMT *statementhandle) {
 	debugFunction();
+stdoutput.printf("SQLAllocStmt...\n");
 	return SQLR_SQLAllocHandle(SQL_HANDLE_STMT,
 				(SQLHANDLE)connectionhandle,
 				(SQLHANDLE *)statementhandle);
@@ -1794,15 +1803,20 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 		return SQL_INVALID_HANDLE;
 	}
 
+	// copy the dsn, sometimes it's not NULL-terminated
+	char	*dsncopy=new char[dsnlength+1];
+	charstring::copy(dsncopy,(const char *)dsn,(size_t)dsnlength);
+	dsncopy[dsnlength]='\0';
+
 	// get data from dsn
-	SQLGetPrivateProfileString((const char *)dsn,"Server","",
+	SQLGetPrivateProfileString((const char *)dsncopy,"Server","",
 					conn->server,sizeof(conn->server),
 					ODBC_INI);
 	char	portbuf[6];
-	SQLGetPrivateProfileString((const char *)dsn,"Port","",
+	SQLGetPrivateProfileString((const char *)dsncopy,"Port","",
 					portbuf,sizeof(portbuf),ODBC_INI);
 	conn->port=(uint16_t)charstring::toUnsignedInteger(portbuf);
-	SQLGetPrivateProfileString((const char *)dsn,"Socket","",
+	SQLGetPrivateProfileString((const char *)dsncopy,"Socket","",
 					conn->socket,sizeof(conn->socket),
 					ODBC_INI);
 	if (charstring::length(user)) {
@@ -1817,7 +1831,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 						userlength);
 		}
 	} else {
-		SQLGetPrivateProfileString((const char *)dsn,"User","",
+		SQLGetPrivateProfileString((const char *)dsncopy,"User","",
 					conn->user,sizeof(conn->user),
 					ODBC_INI);
 	}
@@ -1833,22 +1847,23 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 						(const char *)password);
 		}
 	} else {
-		SQLGetPrivateProfileString((const char *)dsn,"Password","",
+		SQLGetPrivateProfileString((const char *)dsncopy,"Password","",
 					conn->password,sizeof(conn->password),
 					ODBC_INI);
 	}
 	char	retrytimebuf[6];
-	SQLGetPrivateProfileString((const char *)dsn,"RetryTime","0",
+	SQLGetPrivateProfileString((const char *)dsncopy,"RetryTime","0",
 					retrytimebuf,sizeof(retrytimebuf),
 					ODBC_INI);
 	conn->retrytime=(int32_t)charstring::toInteger(retrytimebuf);
 	char	triesbuf[6];
-	SQLGetPrivateProfileString((const char *)dsn,"Tries","1",
+	SQLGetPrivateProfileString((const char *)dsncopy,"Tries","1",
 					triesbuf,sizeof(triesbuf),
 					ODBC_INI);
 	conn->tries=(int32_t)charstring::toInteger(triesbuf);
 
-	debugPrintf("  DSN: %s\n",dsn);
+	debugPrintf("  DSN: %s\n",dsncopy);
+	debugPrintf("  DSN Length: %d\n",dsnlength);
 	debugPrintf("  Server: %s\n",conn->server);
 	debugPrintf("  Port: %d\n",(int)conn->port);
 	debugPrintf("  Socket: %s\n",conn->socket);
@@ -1869,6 +1884,9 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	#ifdef DEBUG_MESSAGES
 	conn->con->debugOn();
 	#endif
+
+	// clean up
+	delete[] dsncopy;
 
 	return SQL_SUCCESS;
 }
@@ -2567,11 +2585,13 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementhandle,
 
 	// handle success
 	if (result) {
+		debugPrintf("  success\n");
 		SQLR_FetchOutputBinds(stmt);
 		return SQL_SUCCESS;
 	}
 
 	// handle error
+	debugPrintf("  error\n");
 	SQLR_STMTSetError(stmt,stmt->cur->errorMessage(),
 				stmt->cur->errorNumber(),NULL);
 	return SQL_ERROR;
@@ -3311,6 +3331,16 @@ SQLRETURN SQL_API SQLGetDescRec(SQLHDESC DescriptorHandle,
 	return SQL_ERROR;
 }
 
+static const char *odbc3states[]={
+	"01S00","01S01","01S02","01S06","01S07","07S01","08S01",
+	"21S01","21S02","25S01","25S02","25S03",
+	"42S01","42S02","42S11","42S12","42S21","42S22",
+	"HY095","HY097","HY098","HY099","HY100","HY101","HY105",
+	"HY107","HY109","HY110","HY111","HYT00","HYT01",
+	"IM001","IM002","IM003","IM004","IM005","IM006","IM007",
+	"IM008","IM010","IM011","IM012",NULL
+};
+
 SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 					SQLHANDLE handle,
 					SQLSMALLINT recnumber,
@@ -3319,6 +3349,8 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 					SQLSMALLINT bufferlength,
 					SQLSMALLINT *stringlength) {
 	debugFunction();
+
+	debugPrintf("  recnumber: %d\n",(int)recnumber);
 
 	// SQL Relay doesn't have more than 1 error record
 	if (recnumber>1) {
@@ -3329,48 +3361,98 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 		case SQL_HANDLE_ENV:
 			{
 			debugPrintf("  handletype: SQL_HANDLE_ENV\n");
+			debugPrintf("  diagidentifier: %d\n",diagidentifier);
 			ENV	*env=(ENV *)handle;
 			if (handle==SQL_NULL_HENV || !env) {
 				debugPrintf("  NULL env handle\n");
 				return SQL_INVALID_HANDLE;
 			}
-			// not supported
-			SQLR_ENVSetError(env,NULL,0,"IM001");
-			return SQL_ERROR;
+			// nothing currently supported
+			debugPrintf("  diagidentifier: %d\n",diagidentifier);
+			return SQL_NO_DATA;
 			}
 		case SQL_HANDLE_DBC:
 			{
+			debugPrintf("  handletype: SQL_HANDLE_DBC\n");
+
+			// invalid handle...
 			CONN	*conn=(CONN *)handle;
 			if (handle==SQL_NULL_HSTMT || !conn) {
 				debugPrintf("  NULL conn handle\n");
 				return SQL_INVALID_HANDLE;
 			}
-			debugPrintf("  handletype: SQL_HANDLE_DBC\n");
-			// not supported
-			SQLR_CONNSetError(conn,NULL,0,"IM001");
-			return SQL_ERROR;
+
+			// get the requested data
+			const char	*di=NULL;
+			switch (diagidentifier) {
+				case SQL_DIAG_CLASS_ORIGIN:
+					debugPrintf("  diagidentifier: "
+						"SQL_DIAG_CLASS_ORIGIN\n");
+					if (!charstring::compare(
+						conn->sqlstate,"IM",2)) {
+						di="ODBC 3.0";
+					} else {
+						di="ISO 9075";
+					}
+					break;
+				case SQL_DIAG_SUBCLASS_ORIGIN:
+					debugPrintf("  diagidentifier: "
+						"SQL_DIAG_SUBCLASS_ORIGIN\n");
+					if (charstring::inSet(
+							conn->sqlstate,
+							odbc3states)) {
+						di="ODBC 3.0";
+					} else {
+						di="ISO 9075";
+					}
+					break;
+				case SQL_DIAG_CONNECTION_NAME:
+					debugPrintf("  diagidentifier: "
+						"SQL_DIAG_CONNECTION_NAME\n");
+					// return the server name for this too
+					di=conn->server;
+					break;
+				case SQL_DIAG_SERVER_NAME:
+					debugPrintf("  diagidentifier: "
+						"SQL_DIAG_SERVER_NAME\n");
+					di=conn->server;
+					break;
+				default:
+					// anything else is not supported
+					debugPrintf("  diagidentifier: %d\n",
+								diagidentifier);
+					return SQL_NO_DATA;
+			}
+
+			// copy out the data
+			charstring::copy((char *)diaginfo,di);
+
+			debugPrintf("  diaginfo: %s\n",(char *)diaginfo);
+
+			return SQL_SUCCESS;
 			}
 		case SQL_HANDLE_STMT:
 			{
+			debugPrintf("  handletype: SQL_HANDLE_STMT\n");
 			STMT	*stmt=(STMT *)handle;
 			if (handle==SQL_NULL_HSTMT || !stmt) {
 				debugPrintf("  NULL stmt handle\n");
 				return SQL_INVALID_HANDLE;
 			}
-			debugPrintf("  handletype: SQL_HANDLE_STMT\n");
-			// FIXME: there are tons more of these...
 			if (diagidentifier==SQL_DIAG_ROW_COUNT) {
+				debugPrintf("  diagidentifier: "
+						"SQL_DIAG_ROW_COUNT\n");
 				*(SQLLEN *)diaginfo=stmt->cur->affectedRows();
 				return SQL_SUCCESS;
 			}
 			// anything else is not supported
-			SQLR_STMTSetError(stmt,NULL,0,"IM001");
-			return SQL_ERROR;
+			return SQL_NO_DATA;
 			}
 		case SQL_HANDLE_DESC:
 			debugPrintf("  handletype: SQL_HANDLE_DESC\n");
+			debugPrintf("  diagidentifier: %d\n",diagidentifier);
 			// not supported
-			return SQL_ERROR;
+			return SQL_NO_DATA;
 	}
 	debugPrintf("  invalid handletype\n");
 	return SQL_ERROR;
@@ -3447,12 +3529,18 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 			return SQL_ERROR;
 	}
 
-	debugPrintf("  messagetext: %s\n",(error)?error:"");
-	debugPrintf("  bufferlength: %d\n",bufferlength);
-	debugPrintf("  nativeerror: %lld\n",(int64_t)errn);
-	debugPrintf("  sqlstate: %s\n",(sqlst)?sqlst:"");
+	// finagle sqlst
+	if (!sqlst || !sqlst[0]) {
+		if (error && error[0]) {
+			// General error
+			sqlst="HY000";
+		} else {
+			// success
+			sqlst="00000";
+		}
+	}
 
-	// copy out the error and sqlstate
+	// copy out the data
 	charstring::safeCopy((char *)messagetext,(size_t)bufferlength,error);
 	*textlength=charstring::length(error);
 	if (*textlength>bufferlength) {
@@ -3461,7 +3549,13 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 	if (nativeerror) {
 		*nativeerror=errn;
 	}
-	charstring::copy((char *)sqlstate,(sqlst && sqlst[0])?sqlst:"HYOOO");
+	charstring::copy((char *)sqlstate,sqlst);
+
+	debugPrintf("  sqlstate: %s\n",(sqlst)?sqlst:"");
+	debugPrintf("  nativeerror: %lld\n",(int64_t)errn);
+	debugPrintf("  messagetext: %s\n",(error)?error:"");
+	debugPrintf("  bufferlength: %d\n",bufferlength);
+	debugPrintf("  textlength: %d\n",*textlength);
 
 	return SQL_SUCCESS;
 }
@@ -3525,7 +3619,7 @@ SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV environmenthandle,
 	return SQL_SUCCESS;
 }
 
-SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
+SQLRETURN SQL_API SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
 					SQLUSMALLINT functionid,
 					SQLUSMALLINT *supported) {
 	debugFunction();
@@ -3537,6 +3631,30 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 	}
 
 	switch (functionid) {
+		case SQL_API_ALL_FUNCTIONS:
+			debugPrintf("  functionid: "
+				"SQL_API_ALL_FUNCTIONS "
+				"- true\n");
+
+			for (uint16_t i=0; i<100; i++) {
+				if (i==SQL_API_ALL_FUNCTIONS
+					#if (ODBCVER >= 0x0300)
+					|| i==SQL_API_ODBC3_ALL_FUNCTIONS
+					#endif
+					) {
+					supported[i]=SQL_TRUE;
+				} else {
+					SQLR_SQLGetFunctions(
+							connectionhandle,
+							i,&supported[i]);
+				}
+			}
+
+			// clear any error that might have been set during
+			// the recursive call
+			SQLR_CONNClearError(conn);
+
+			break;
 		case SQL_API_SQLALLOCCONNECT:
 			debugPrintf("  functionid: "
 				"SQL_API_SQLALLOCCONNECT "
@@ -4029,13 +4147,68 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
 				"- false\n");
 			*supported=SQL_FALSE;
 			break;
+		case SQL_API_ODBC3_ALL_FUNCTIONS:
+			debugPrintf("  functionid: "
+				"SQL_API_ODBC3_ALL_FUNCTIONS "
+				"- true\n");
+
+			// populate the bitmap...
+			for (uint16_t i=0;
+				i<SQL_API_ODBC3_ALL_FUNCTIONS_SIZE*16; i++) {
+
+				// determine the bitmap element
+				// and position within the element
+				uint16_t	element=i/16;
+				uint16_t	position=i%16;
+
+				// init the bitmap element
+				if (!position) {
+					supported[element]=0;
+				}
+
+				// is this function supported?
+				SQLUSMALLINT	sup=SQL_FALSE;
+				if (i==SQL_API_ALL_FUNCTIONS ||
+					i==SQL_API_ODBC3_ALL_FUNCTIONS) {
+					sup=SQL_TRUE;
+				} else {
+					SQLR_SQLGetFunctions(
+							connectionhandle,
+							i,&sup);
+				}
+
+				// update the bitmap
+				supported[element]|=sup<<position;
+
+				// debug...
+				debugPrintf("%d(%d:%d) = %d  ",
+						i,element,position,sup);
+				debugPrintf("(%d = ",element);
+				debugPrintBits((uint16_t)supported[element]);
+				debugPrintf(")\n");
+			}
+
+			// clear any error that might have been set during
+			// the recursive call
+			SQLR_CONNClearError(conn);
+			break;
 		#endif
 		default:
-			debugPrintf("  invalid functionid");
+			debugPrintf("  invalid functionid: %d\n",functionid);
+			*supported=SQL_FALSE;
+			SQLR_CONNSetError(conn,"Function type out of range",
+								0,"HY095");
 			return SQL_ERROR;
 	}
 
 	return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLGetFunctions(SQLHDBC connectionhandle,
+					SQLUSMALLINT functionid,
+					SQLUSMALLINT *supported) {
+	debugFunction();
+	return SQLR_SQLGetFunctions(connectionhandle,functionid,supported);
 }
 
 SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
@@ -4045,8 +4218,11 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 					SQLSMALLINT *stringlength) {
 	debugFunction();
 
+	// some bits of info need a valid conn handle, but others don't
 	CONN	*conn=(CONN *)connectionhandle;
-	if (connectionhandle==SQL_NULL_HANDLE || !conn || !conn->con) {
+	if ((connectionhandle==SQL_NULL_HANDLE || !conn || !conn->con) &&
+		(infotype==SQL_DRIVER_VER || infotype==SQL_DBMS_NAME ||
+		infotype==SQL_DBMS_VER || infotype==SQL_DATABASE_NAME)) {
 		debugPrintf("  NULL conn handle\n");
 		return SQL_INVALID_HANDLE;
 	}
@@ -5088,9 +5264,9 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 	// parse out DSN, UID and PWD from the connect string
 	parameterstring	pstr;
 	pstr.parse(nulltermconnstr);
-	const char	*servername=pstr.getValue("DSN");
-	if (!charstring::length(servername)) {
-		servername=pstr.getValue("dsn");
+	const char	*dsn=pstr.getValue("DSN");
+	if (!charstring::length(dsn)) {
+		dsn=pstr.getValue("dsn");
 	}
 	const char	*username=pstr.getValue("UID");
 	if (!charstring::length(username)) {
@@ -5101,31 +5277,33 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 		authentication=pstr.getValue("pwd");
 	}
 
-	debugPrintf("  servername: %s\n",servername);
+	debugPrintf("  dsn: %s\n",dsn);
 	debugPrintf("  username: %s\n",username);
 	debugPrintf("  authentication: %s\n",authentication);
 
-	// just support SQL_DRIVER_NOPROMPT for now
+	// for now, don't do any prompting...
 	switch (fdrivercompletion) {
 		case SQL_DRIVER_PROMPT:
 			debugPrintf("  fbdrivercompletion: "
 					"SQL_DRIVER_PROMPT\n");
-			return SQL_ERROR;
+			break;
 		case SQL_DRIVER_COMPLETE:
 			debugPrintf("  fbdrivercompletion: "
 					"SQL_DRIVER_COMPLETE\n");
-			return SQL_ERROR;
+			break;
 		case SQL_DRIVER_COMPLETE_REQUIRED:
 			debugPrintf("  fbdrivercompletion: "
 					"SQL_DRIVER_COMPLETE_REQUIRED\n");
-			return SQL_ERROR;
+			break;
 		case SQL_DRIVER_NOPROMPT:
 			debugPrintf("  fbdrivercompletion: "
 					"SQL_DRIVER_NOPROMPT\n");
-			if (!charstring::length(servername)) {
-				return SQL_ERROR;
-			}
 			break;
+	}
+
+	// the dsn must be valid
+	if (!charstring::length(dsn)) {
+		return SQL_ERROR;
 	}
 
 	// since we don't support prompting and updating the connect string...
@@ -5140,8 +5318,8 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 
 	// connect
 	SQLRETURN	retval=SQLR_SQLConnect(hdbc,
-					(SQLCHAR *)servername,
-					charstring::length(servername),
+					(SQLCHAR *)dsn,
+					charstring::length(dsn),
 					(SQLCHAR *)username,
 					charstring::length(username),
 					(SQLCHAR *)authentication,

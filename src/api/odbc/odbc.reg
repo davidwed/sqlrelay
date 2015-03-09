@@ -14,6 +14,6 @@ Windows Registry Editor Version 5.00
 "Description"="My SQL Relay DSN"
 "Driver"="C:\\Program Files\\Firstworks\\bin\\libsqlrodbc.dll"
 "Server"="sqlrserver"
-"Port"=dword:2328
+"Port"="9000"
 "User"="test"
 "Password"="test"
