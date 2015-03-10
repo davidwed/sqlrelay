@@ -12,7 +12,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 
-#define DEBUG_MESSAGES 1
+//#define DEBUG_MESSAGES 1
 //#define DEBUG_TO_FILE 1
 #include <debugprint.h>
 
@@ -78,6 +78,7 @@ struct CONN {
 	char				password[1024];
 	int32_t				retrytime;
 	int32_t				tries;
+	bool				debug;
 };
 
 struct rowdesc {
@@ -296,18 +297,28 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 	return SQL_ERROR;
 }
 
+SQLRETURN SQL_API SQLAllocHandleStd(SQLSMALLINT handletype,
+					SQLHANDLE inputhandle,
+					SQLHANDLE *outputhandle) {
+	debugFunction();
+	if (handletype==SQL_HANDLE_ENV) {
+		#if (ODBCVER >= 0x0300)
+		((ENV *)inputhandle)->odbcversion=SQL_OV_ODBC3;
+		#endif
+	}
+	return SQLR_SQLAllocHandle(handletype,inputhandle,outputhandle);
+}
+
 SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT handletype,
 					SQLHANDLE inputhandle,
 					SQLHANDLE *outputhandle) {
 	debugFunction();
-stdoutput.printf("SQLAllocHandle: %d...\n",handletype);
 	return SQLR_SQLAllocHandle(handletype,inputhandle,outputhandle);
 }
 
 SQLRETURN SQL_API SQLAllocStmt(SQLHDBC connectionhandle,
 					SQLHSTMT *statementhandle) {
 	debugFunction();
-stdoutput.printf("SQLAllocStmt...\n");
 	return SQLR_SQLAllocHandle(SQL_HANDLE_STMT,
 				(SQLHANDLE)connectionhandle,
 				(SQLHANDLE *)statementhandle);
@@ -521,18 +532,46 @@ SQLRETURN SQL_API SQLBindParam(SQLHSTMT statementhandle,
 					strlen_or_ind);
 }
 
-SQLRETURN SQL_API SQLCancel(SQLHSTMT statementhandle) {
+SQLRETURN SQL_API SQLR_SQLCancelHandle(SQLSMALLINT handletype,
+						SQLHANDLE handle) {
 	debugFunction();
 
-	STMT	*stmt=(STMT *)statementhandle;
-	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
-		debugPrintf("  NULL stmt handle\n");
-		return SQL_INVALID_HANDLE;
+	if (handletype==SQL_HANDLE_ENV) {
+		ENV	*env=(ENV *)handle;
+		if (handle==SQL_NULL_HENV || !env) {
+			debugPrintf("  NULL env handle\n");
+			return SQL_INVALID_HANDLE;
+		}
+		SQLR_ENVSetError(env,
+			"Invalid attribute/option identifier",0,"HY092");
+	} else if (handletype==SQL_HANDLE_DBC) {
+		CONN	*conn=(CONN *)handle;
+		if (handle==SQL_NULL_HANDLE || !conn || !conn->con) {
+			debugPrintf("  NULL conn handle\n");
+			return SQL_INVALID_HANDLE;
+		}
+		SQLR_CONNSetError(conn,
+			"Driver does not support this function",0,"IM001");
+	} else if (handletype==SQL_HANDLE_STMT) {
+		STMT	*stmt=(STMT *)handle;
+		if (handle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+			debugPrintf("  NULL stmt handle\n");
+			return SQL_INVALID_HANDLE;
+		}
+		SQLR_STMTSetError(stmt,
+			"Driver does not support this function",0,"IM001");
 	}
-
-	// not supported
-	SQLR_STMTSetError(stmt,NULL,0,"IM001");
 	return SQL_ERROR;
+}
+
+SQLRETURN SQL_API SQLCancel(SQLHSTMT statementhandle) {
+	debugFunction();
+	return SQLR_SQLCancelHandle(SQL_HANDLE_STMT,(SQLHANDLE)statementhandle);
+}
+
+SQLRETURN SQL_API SQLCancelHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
+	debugFunction();
+	return SQLR_SQLCancelHandle(handletype,handle);
 }
 
 static void SQLR_ResetParams(STMT *stmt) {
@@ -1861,6 +1900,11 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					triesbuf,sizeof(triesbuf),
 					ODBC_INI);
 	conn->tries=(int32_t)charstring::toInteger(triesbuf);
+	char	debugbuf[6];
+	SQLGetPrivateProfileString((const char *)dsncopy,"Debug","0",
+					debugbuf,sizeof(debugbuf),
+					ODBC_INI);
+	conn->debug=(charstring::toInteger(debugbuf)!=0);
 
 	debugPrintf("  DSN: %s\n",dsncopy);
 	debugPrintf("  DSN Length: %d\n",dsnlength);
@@ -1871,6 +1915,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	debugPrintf("  Password: %s\n",conn->password);
 	debugPrintf("  RetryTime: %d\n",(int)conn->retrytime);
 	debugPrintf("  Tries: %d\n",(int)conn->tries);
+	debugPrintf("  Debug: %d\n",(int)conn->debug);
 
 	// create connection
 	conn->con=new sqlrconnection(conn->server,
@@ -1884,6 +1929,10 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	#ifdef DEBUG_MESSAGES
 	conn->con->debugOn();
 	#endif
+
+	if (conn->debug) {
+		conn->con->debugOn();
+	}
 
 	// clean up
 	delete[] dsncopy;
@@ -1906,8 +1955,8 @@ SQLRETURN SQL_API SQLConnect(SQLHDBC connectionhandle,
 SQLRETURN SQL_API SQLCopyDesc(SQLHDESC SourceDescHandle,
 					SQLHDESC TargetDescHandle) {
 	debugFunction();
-	// currently this doesn't do anything
-	// because SQLAllocHandle doesn't do anything
+	// FIXME: do something?
+	// I guess the desc handles are ARD, APD, IRD and IPD's.
 	return SQL_SUCCESS;
 }
 
@@ -3718,8 +3767,8 @@ SQLRETURN SQL_API SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
 		case SQL_API_SQLCOPYDESC:
 			debugPrintf("  functionid: "
 				"SQL_API_SQLCOPYDESC "
-				"- false\n");
-			*supported=SQL_FALSE;
+				"- true\n");
+			*supported=SQL_TRUE;
 			break;
 		#endif
 		case SQL_API_SQLDESCRIBECOL:
@@ -3996,6 +4045,7 @@ SQLRETURN SQL_API SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
 			debugPrintf("  functionid: "
 				"SQL_API_SQLSETPOS "
 				"- false\n");
+			// FIXME: this is implemented, sort-of...
 			*supported=SQL_FALSE;
 			break;
 		case SQL_API_SQLSETSCROLLOPTIONS:
@@ -4191,6 +4241,14 @@ SQLRETURN SQL_API SQLR_SQLGetFunctions(SQLHDBC connectionhandle,
 			// clear any error that might have been set during
 			// the recursive call
 			SQLR_CONNClearError(conn);
+			break;
+		#endif
+		#if (ODBCVER >= 0x0380)
+		case SQL_API_SQLCANCELHANDLE:
+			debugPrintf("  functionid: "
+				"SQL_API_SQLCANCELHANDLE "
+				"- false\n");
+			*supported=SQL_FALSE;
 			break;
 		#endif
 		default:
@@ -4641,7 +4699,8 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 	}
 
 	// not supported
-	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+	SQLR_STMTSetError(stmt,
+			"Driver does not support this function",0,"IM001");
 
 	return SQL_ERROR;
 }
@@ -4690,7 +4749,8 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT statementhandle,
 	}
 
 	// not supported
-	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+	SQLR_STMTSetError(stmt,
+			"Driver does not support this function",0,"IM001");
 
 	return SQL_ERROR;
 }
@@ -4858,9 +4918,11 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV environmenthandle,
 				case SQL_OV_ODBC2:
 					env->odbcversion=SQL_OV_ODBC2;
 					break;
+				#if (ODBCVER >= 0x0300)
 				case SQL_OV_ODBC3:
 					env->odbcversion=SQL_OV_ODBC3;
 					break;
+				#endif
 			}
 			debugPrintf("  odbcversion: %d\n",(int)env->odbcversion);
 			return SQL_SUCCESS;
@@ -5039,8 +5101,8 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			debugPrintf("  attribute: "
 					"SQL_ATTR_ROW_NUMBER/"
 					"SQL_ROW_NUMBER\n");
-			// FIXME: implement
-			return SQL_SUCCESS;
+			// read-only
+			return SQL_ERROR;
 		#if (ODBCVER >= 0x0300)
 		case SQL_ATTR_ENABLE_AUTO_IPD:
 			debugPrintf("  attribute: SQL_ATTR_ENABLE_AUTO_IPD\n");
@@ -5151,7 +5213,8 @@ SQLRETURN SQL_API SQLSpecialColumns(SQLHSTMT statementhandle,
 	}
 
 	// not supported
-	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+	SQLR_STMTSetError(stmt,
+			"Driver does not support this function",0,"IM001");
 
 	return SQL_ERROR;
 }
@@ -5174,7 +5237,8 @@ SQLRETURN SQL_API SQLStatistics(SQLHSTMT statementhandle,
 	}
 
 	// not supported
-	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+	SQLR_STMTSetError(stmt,
+			"Driver does not support this function",0,"IM001");
 
 	return SQL_ERROR;
 }
@@ -5342,7 +5406,8 @@ SQLRETURN SQL_API SQLBulkOperations(SQLHSTMT statementhandle,
 	}
 
 	// not supported
-	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+	SQLR_STMTSetError(stmt,
+			"Driver does not support this function",0,"IM001");
 
 	return SQL_ERROR;
 }
@@ -5382,7 +5447,8 @@ SQLRETURN SQL_API SQLColumnPrivileges(SQLHSTMT statementhandle,
 	}
 
 	// not supported
-	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+	SQLR_STMTSetError(stmt,
+			"Driver does not support this function",0,"IM001");
 
 	return SQL_ERROR;
 }
@@ -5402,7 +5468,8 @@ SQLRETURN SQL_API SQLDescribeParam(SQLHSTMT statementhandle,
 	}
 
 	// not supported
-	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+	SQLR_STMTSetError(stmt,
+			"Driver does not support this function",0,"IM001");
 
 	return SQL_ERROR;
 }
@@ -5449,7 +5516,8 @@ SQLRETURN SQL_API SQLForeignKeys(SQLHSTMT statementhandle,
 	}
 
 	// not supported
-	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+	SQLR_STMTSetError(stmt,
+			"Driver does not support this function",0,"IM001");
 
 	return SQL_ERROR;
 }
@@ -5520,7 +5588,8 @@ SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT statementhandle,
 	}
 
 	// not supported
-	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+	SQLR_STMTSetError(stmt,
+			"Driver does not support this function",0,"IM001");
 
 	return SQL_ERROR;
 }
@@ -5543,7 +5612,8 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 	}
 
 	// not supported
-	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+	SQLR_STMTSetError(stmt,
+			"Driver does not support this function",0,"IM001");
 
 	return SQL_ERROR;
 }
@@ -5564,7 +5634,8 @@ SQLRETURN SQL_API SQLProcedures(SQLHSTMT statementhandle,
 	}
 
 	// not supported
-	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+	SQLR_STMTSetError(stmt,
+			"Driver does not support this function",0,"IM001");
 
 	return SQL_ERROR;
 }
@@ -5591,7 +5662,8 @@ SQLRETURN SQL_API SQLSetPos(SQLHSTMT statementhandle,
 		return SQL_SUCCESS;
 	}
 
-	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+	SQLR_STMTSetError(stmt,
+			"Driver does not support this function",0,"IM001");
 	return SQL_ERROR;
 }
 
@@ -5611,7 +5683,8 @@ SQLRETURN SQL_API SQLTablePrivileges(SQLHSTMT statementhandle,
 	}
 
 	// not supported
-	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+	SQLR_STMTSetError(stmt,
+			"Driver does not support this function",0,"IM001");
 
 	return SQL_ERROR;
 }
@@ -5636,7 +5709,8 @@ SQLRETURN SQL_API SQLDrivers(SQLHENV environmenthandle,
 	}
 
 	// not supported
-	SQLR_STMTSetError(stmt,NULL,0,"IM001");
+	SQLR_STMTSetError(stmt,
+			"Driver does not support this function",0,"IM001");
 
 	return SQL_ERROR;
 }

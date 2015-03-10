@@ -15,3 +15,6 @@ Windows Registry Editor Version 5.00
 "Port"="9000"
 "User"="test"
 "Password"="test"
+"RetryTime"="0"
+"Tries"="1"
+"Debug"="0"
