@@ -380,6 +380,7 @@ static SQLLEN SQLR_GetCColumnTypeSize(SQLSMALLINT targettype) {
 	}
 }
 
+#ifdef DEBUG_MESSAGES
 static const char *SQLR_GetCColumnTypeName(SQLSMALLINT targettype) {
 	switch (targettype) {
 		case SQL_C_CHAR:
@@ -458,6 +459,7 @@ static const char *SQLR_GetCColumnTypeName(SQLSMALLINT targettype) {
 			return "unknown";
 	}
 }
+#endif
 
 SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementhandle,
 					SQLUSMALLINT columnnumber,
