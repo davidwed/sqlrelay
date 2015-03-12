@@ -1,0 +1,6 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBC.INI\ODBC Data Sources]
+"My SQL Relay DSN"=-
+
+[-HKEY_LOCAL_MACHINE\SOFTWARE\ODBC\ODBC.INI\My SQL Relay DSN]

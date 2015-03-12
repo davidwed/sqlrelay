@@ -36,6 +36,7 @@
 	tweaked odbc driver to work with Oracle Heterogenous Agent (dblinks)
 	fixed bugs related to autocommit with db's that support transaction
 		blocks
+	implemented the ODBC driver-manager dialog for windows
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d
