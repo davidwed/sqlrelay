@@ -6289,14 +6289,26 @@ SQLRETURN SQL_API SQLBindParameter(SQLHSTMT statementhandle,
 #define SQLR_BOX	101
 #define SQLR_LABEL	102
 #define SQLR_EDIT	103
-#define SQLR_BUTTON	104
+#define SQLR_OK		104
+#define SQLR_CANCEL	105
 
 static HINSTANCE	hinst;
+static HWND		mainwindow;
+static HWND		dsnedit;
+static HWND		serveredit;
+static HWND		portedit;
+static HWND		socketedit;
+static HWND		useredit;
+static HWND		passwordedit;
+static HWND		retrytimeedit;
+static HWND		triesedit;
+static HWND		debugedit;
+
 static const char	sqlrwindowclass[]="SQLRWindowClass";
 static const int	labelwidth=55;
-static const int	labelheight=20;
+static const int	labelheight=18;
 static const int	labeloffset=2;
-static const int	labelcount=8;
+static const int	labelcount=9;
 static const int	xoffset=8;
 static const int	yoffset=8;
 static const int	mainwindowwidth=300;
@@ -6310,7 +6322,9 @@ static const int	buttonwidth=74;
 static const int	mainwindowheight=yoffset+
 					labelboxheight+yoffset+
 					buttonheight+yoffset;
-static dictionary< const char *, char * >	dsndict;
+
+static WORD				dsnrequest;
+static dictionary< char *, char * >	dsndict;
 
 BOOL DllMain(HANDLE hinstdll, DWORD fdwreason, LPVOID lpvreserved) {
 	if (fdwreason==DLL_PROCESS_ATTACH) {
@@ -6319,7 +6333,7 @@ BOOL DllMain(HANDLE hinstdll, DWORD fdwreason, LPVOID lpvreserved) {
 	return TRUE;
 }
 
-void createLabel(HWND parent, const char *label,
+static void createLabel(HWND parent, const char *label,
 			int x, int y, int width, int height) {
 	HWND	labelwin=CreateWindow("STATIC",label,
 					WS_CHILD|WS_VISIBLE|SS_RIGHT,
@@ -6331,33 +6345,51 @@ void createLabel(HWND parent, const char *label,
 			MAKELPARAM(FALSE,0));
 }
 
-void createEdit(HWND parent, const char *defaultvalue,
-			int x, int y, int width, int height) {
+static HWND createEdit(HWND parent, const char *defaultvalue,
+			int x, int y, int width, int height,
+			int charlimit, bool numeric, bool first) {
+	DWORD	style=WS_CHILD|WS_VISIBLE|WS_BORDER|WS_TABSTOP|ES_LEFT;
+	if (numeric) {
+		style|=ES_NUMBER;
+	}
+	if (first) {
+		style|=WS_GROUP;
+	}
 	HWND	editwin=CreateWindow("EDIT",(defaultvalue)?defaultvalue:"",
-					WS_CHILD|WS_VISIBLE|WS_BORDER|ES_LEFT,
-					x,y,width,height,
+					style,x,y,width,height,
 					parent,(HMENU)SQLR_EDIT,hinst,NULL);
 	SendMessage(editwin,
 			WM_SETFONT,
 			(WPARAM)GetStockObject(DEFAULT_GUI_FONT),
 			MAKELPARAM(FALSE,0));
+	SendMessage(editwin,
+			EM_SETLIMITTEXT,
+			MAKEWPARAM(charlimit,0),
+			MAKELPARAM(FALSE,0));
+	return editwin;
 }
 
-void createButton(HWND parent, const char *label, int x, int y) {
-	HWND	buttonwin=CreateWindow("BUTTON",label,
-					WS_CHILD|WS_VISIBLE,
+static void createButton(HWND parent, const char *label,
+					int x, int y, HMENU id,
+					bool first) {
+	DWORD	style=WS_CHILD|WS_VISIBLE|WS_TABSTOP;
+	if (first) {
+		style|=WS_GROUP;
+	}
+	HWND	buttonwin=CreateWindow("BUTTON",label,style,
 					x,y,buttonwidth,buttonheight,
-					parent,(HMENU)SQLR_BUTTON,hinst,NULL);
+					parent,id,hinst,NULL);
 	SendMessage(buttonwin,
 			WM_SETFONT,
 			(WPARAM)GetStockObject(DEFAULT_GUI_FONT),
 			MAKELPARAM(FALSE,0));
 }
 
-void createControls(HWND hwnd) {
+static void createControls(HWND hwnd) {
 
 	// create a box to surround the labels and edits
-	HWND	box=CreateWindow("STATIC","",
+	HWND	box=CreateWindowEx(WS_EX_CONTROLPARENT,
+				"STATIC","",
 				WS_CHILD|WS_VISIBLE|SS_GRAYFRAME,
 				xoffset,yoffset,
 				labelboxwidth,
@@ -6367,7 +6399,9 @@ void createControls(HWND hwnd) {
 	// create labels...
 	int	x=xoffset;
 	int	y=yoffset;
-	createLabel(box,"Server",x,y,labelwidth,labelheight);
+	createLabel(box,"DSN Name",x,y,labelwidth,labelheight);
+	createLabel(box,"Server",x,y+=(labelheight+labeloffset),
+					labelwidth,labelheight);
 	createLabel(box,"Port",x,y+=(labelheight+labeloffset),
 					labelwidth,labelheight);
 	createLabel(box,"Socket",x,y+=(labelheight+labeloffset),
@@ -6386,31 +6420,270 @@ void createControls(HWND hwnd) {
 	// create edits...
 	x=xoffset+labelwidth+xoffset;
 	y=yoffset;
-	createEdit(box,dsndict.getValue("Server"),
-			x,y,editwidth,labelheight);
-	createEdit(box,dsndict.getValue("Port"),
-			x,y+=(labelheight+labeloffset),editwidth,labelheight);
-	createEdit(box,dsndict.getValue("Socket"),
-			x,y+=(labelheight+labeloffset),editwidth,labelheight);
-	createEdit(box,dsndict.getValue("User"),
-			x,y+=(labelheight+labeloffset),editwidth,labelheight);
-	createEdit(box,dsndict.getValue("Password"),
-			x,y+=(labelheight+labeloffset),editwidth,labelheight);
-	createEdit(box,dsndict.getValue("RetryTime"),
-			x,y+=(labelheight+labeloffset),editwidth,labelheight);
-	createEdit(box,dsndict.getValue("Tries"),
-			x,y+=(labelheight+labeloffset),editwidth,labelheight);
-	createEdit(box,dsndict.getValue("Debug"),
-			x,y+=(labelheight+labeloffset),editwidth,labelheight);
+	dsnedit=createEdit(box,dsndict.getValue("DSN"),
+			x,y,editwidth,labelheight,
+			1024,false,true);
+	serveredit=createEdit(box,dsndict.getValue("Server"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1024,false,false);
+	portedit=createEdit(box,dsndict.getValue("Port"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			6,true,false);
+	socketedit=createEdit(box,dsndict.getValue("Socket"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1024,false,false);
+	useredit=createEdit(box,dsndict.getValue("User"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1024,false,false);
+	passwordedit=createEdit(box,dsndict.getValue("Password"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1024,false,false);
+	retrytimeedit=createEdit(box,dsndict.getValue("RetryTime"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			11,true,false);
+	triesedit=createEdit(box,dsndict.getValue("Tries"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			11,true,false);
+	debugedit=createEdit(box,dsndict.getValue("Debug"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1,true,false);
 
 	// create buttons...
 	x=mainwindowwidth-xoffset-buttonwidth-xoffset-buttonwidth;
 	y=yoffset+labelboxheight+yoffset;
-	createButton(hwnd,"OK",x,y);
-	createButton(hwnd,"Cancel",x+=buttonwidth+xoffset,y);
+	createButton(hwnd,"OK",x,y,(HMENU)SQLR_OK,true);
+	createButton(hwnd,"Cancel",x+=buttonwidth+xoffset,y,
+					(HMENU)SQLR_CANCEL,false);
+
+	// set focus
+	SetFocus(dsnedit);
 }
 
-LRESULT CALLBACK windowProc(HWND hwnd, UINT umsg,
+static void parseDsn(const char *dsn) {
+
+	// dsn is formatted like:
+	// DSN=xxx\0Server=xxx\0Port=xxx\0\0
+	for (const char *c=dsn; *c; c=c+charstring::length(c)+1) {
+		char		**parts;
+		uint64_t	partcount;
+		charstring::split(c,"=",true,&parts,&partcount);
+		dsndict.setValue(parts[0],parts[1]);
+	}
+
+	// But, actually, it usually just contains the DSN name itself and
+	// the rest of the bits of data have to be fetched...
+
+	// get the name of the dsn that we were given, bail if it's empty
+	const char	*dsnval=dsndict.getValue("DSN");
+	if (!charstring::length(dsn)) {
+		return;
+	}
+
+	// get the rest of the data...
+	if (!dsndict.getValue("Server")) {
+		char	*server=new char[1024];
+		SQLGetPrivateProfileString(dsnval,"Server","",
+						server,1024,ODBC_INI);
+		dsndict.setValue("Server",server);
+	}
+	if (!dsndict.getValue("Port")) {
+		char	*port=new char[6];
+		SQLGetPrivateProfileString(dsnval,"Port","9000",
+						port,6,ODBC_INI);
+		dsndict.setValue("Port",port);
+	}
+	if (!dsndict.getValue("Socket")) {
+		char	*socket=new char[1024];
+		SQLGetPrivateProfileString(dsnval,"Socket","",
+						socket,1024,ODBC_INI);
+		dsndict.setValue("Socket",socket);
+	}
+	if (!dsndict.getValue("User")) {
+		char	*user=new char[1024];
+		SQLGetPrivateProfileString(dsnval,"User","",
+						user,1024,ODBC_INI);
+		dsndict.setValue("User",user);
+	}
+	if (!dsndict.getValue("Password")) {
+		char	*password=new char[1024];
+		SQLGetPrivateProfileString(dsnval,"Password","",
+						password,1024,ODBC_INI);
+		dsndict.setValue("Password",password);
+	}
+	if (!dsndict.getValue("RetryTime")) {
+		char	*retrytime=new char[11];
+		SQLGetPrivateProfileString(dsnval,"RetryTime","0",
+						retrytime,11,ODBC_INI);
+		dsndict.setValue("RetryTime",retrytime);
+	}
+	if (!dsndict.getValue("Tries")) {
+		char	*tries=new char[11];
+		SQLGetPrivateProfileString(dsnval,"Tries","1",
+						tries,11,ODBC_INI);
+		dsndict.setValue("Tries",tries);
+	}
+	if (!dsndict.getValue("Debug")) {
+		char	*debug=new char[2];
+		SQLGetPrivateProfileString(dsnval,"Debug","0",
+						debug,2,ODBC_INI);
+		dsndict.setValue("Debug",debug);
+	}
+	dsndict.print();
+}
+
+static void dsnError() {
+
+	DWORD	pferrorcode;
+	char	errormsg[SQL_MAX_MESSAGE_LENGTH+1];
+	
+	for (WORD ierror=1; ierror<=16; ierror++) {
+		if (SQLInstallerError(ierror,&pferrorcode,
+					errormsg,sizeof(errormsg),
+					NULL)==SQL_NO_DATA) {
+			return;
+		}
+
+		MessageBox(NULL,errormsg,"Error",MB_OK|MB_ICONERROR);
+	}
+}
+
+static bool validDsn() {
+
+	// FIXME: SQLValidDSN always seems to return false
+	return true;
+
+	if (SQLValidDSN(dsndict.getValue("DSN"))==FALSE) {
+		dsnError();
+		return false;
+	}
+	return true;
+}
+
+static bool removeDsn() {
+	if (SQLRemoveDSNFromIni(dsndict.getValue("DSN"))==FALSE) {
+		dsnError();
+		return false;
+	}
+	return true;
+}
+
+static void getDsnFromUi() {
+
+	// populate dsndict from values in edit windows...
+
+	// DSN...
+	int	len=GetWindowTextLength(dsnedit);
+	char	*data=new char[len+1];
+	GetWindowText(dsnedit,data,len+1);
+	delete[] dsndict.getValue("DSN");
+	dsndict.setValue("DSN",data);
+
+	// Server...
+	len=GetWindowTextLength(serveredit);
+	data=new char[len+1];
+	GetWindowText(serveredit,data,len+1);
+	delete[] dsndict.getValue("Server");
+	dsndict.setValue("Server",data);
+
+	// Port...
+	len=GetWindowTextLength(portedit);
+	data=new char[len+1];
+	GetWindowText(portedit,data,len+1);
+	delete[] dsndict.getValue("Port");
+	dsndict.setValue("Port",data);
+
+	// Socket...
+	len=GetWindowTextLength(socketedit);
+	data=new char[len+1];
+	GetWindowText(socketedit,data,len+1);
+	delete[] dsndict.getValue("Socket");
+	dsndict.setValue("Socket",data);
+
+	// User...
+	len=GetWindowTextLength(useredit);
+	data=new char[len+1];
+	GetWindowText(useredit,data,len+1);
+	delete[] dsndict.getValue("User");
+	dsndict.setValue("User",data);
+
+	// Password...
+	len=GetWindowTextLength(passwordedit);
+	data=new char[len+1];
+	GetWindowText(passwordedit,data,len+1);
+	delete[] dsndict.getValue("Password");
+	dsndict.setValue("Password",data);
+
+	// Retry Time...
+	len=GetWindowTextLength(retrytimeedit);
+	data=new char[len+1];
+	GetWindowText(retrytimeedit,data,len+1);
+	delete[] dsndict.getValue("RetryTime");
+	dsndict.setValue("RetryTime",data);
+
+	// Tries...
+	len=GetWindowTextLength(triesedit);
+	data=new char[len+1];
+	GetWindowText(triesedit,data,len+1);
+	delete[] dsndict.getValue("Tries");
+	dsndict.setValue("Tries",data);
+
+	// Debug...
+	len=GetWindowTextLength(debugedit);
+	data=new char[len+1];
+	GetWindowText(debugedit,data,len+1);
+	delete[] dsndict.getValue("Debug");
+	dsndict.setValue("Debug",data);
+}
+
+static bool writeDsn() {
+	const char	*dsnname=dsndict.getValue("DSN");
+	if (SQLWriteDSNToIni(dsnname,"SQL Relay")==FALSE) {
+		dsnError();
+		return false;
+	}
+	for (linkedlistnode< char * > *key=dsndict.getKeys()->getFirst();
+						key; key=key->getNext()) {
+		if (!charstring::compare(key->getValue(),"DSN")) {
+			continue;
+		}
+		if (SQLWritePrivateProfileString(
+					dsnname,
+					key->getValue(),
+					dsndict.getValue(key->getValue()),
+					ODBC_INI)==FALSE) {
+			return false;
+		}
+	}
+	return true;
+}
+
+
+static bool saveDsn() {
+
+	// validate dsn
+	if (!validDsn()) {
+		return false;
+	}
+
+	// add/config...
+	bool	success=false;
+	switch (dsnrequest) {
+		case ODBC_ADD_DSN:
+			getDsnFromUi();
+			success=writeDsn();
+			break;
+		case ODBC_CONFIG_DSN:
+			if (removeDsn()) {
+				getDsnFromUi();
+				success=writeDsn();
+			}
+			break;
+	}
+
+	return success;
+}
+
+static LRESULT CALLBACK windowProc(HWND hwnd, UINT umsg,
 				WPARAM wparam, LPARAM lparam) {
 	switch (umsg) {
 		case WM_CREATE:
@@ -6422,15 +6695,17 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT umsg,
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			break;
-		/*case WM_CTLCOLORSTATIC:
+		case WM_COMMAND:
 			switch (GetDlgCtrlID((HWND)lparam)) {
-				case SQLR_LABEL:
-					return 0;
-				case SQLR_BOX:
-					return 0;
-				default:
-					return 0;
-			}*/
+				case SQLR_OK:
+					if (saveDsn()) {
+						DestroyWindow(mainwindow);
+					}
+					break;
+				case SQLR_CANCEL:
+					DestroyWindow(mainwindow);
+					break;
+			}
 		default:
 			return DefWindowProc(hwnd,umsg,wparam,lparam);
 	}
@@ -6441,37 +6716,24 @@ BOOL INSTAPI ConfigDSN(HWND hwndparent, WORD frequest,
 			LPCSTR lpszdriver, LPCSTR lpszattributes) {
 	debugFunction();
 
-	// parse lpszattributes
-	const char	*dsn="";
-	const char	*driver="";
-	// FIXME: actually parse the dsn
-	dsndict.setValue("Server",charstring::duplicate("localhost"));
-	dsndict.setValue("Port",charstring::duplicate("9000"));
-	dsndict.setValue("Socket",charstring::duplicate(""));
-	dsndict.setValue("User",charstring::duplicate(""));
-	dsndict.setValue("Password",charstring::duplicate(""));
-	dsndict.setValue("RetryTime",charstring::duplicate("0"));
-	dsndict.setValue("Tries",charstring::duplicate("1"));
-	dsndict.setValue("Debug",charstring::duplicate("0"));
-
-	// handle remove...
-	if (frequest==ODBC_REMOVE_DSN) {
-		return SQLRemoveDSNFromIni(dsn);
-	}
-
-	// handle add/config...
-	/*case ODBC_ADD_DSN:
-		return (SQLValidDSN(dsn)==TRUE &&
-			SQLWriteDSNtoIni(dsn,driver)==TRUE)?TRUE:FALSE;
-	case ODBC_CONFIG_DSN:
-		return (SQLValidDSN(dsn)==TRUE &&
-			SQLRemoveDSNFromIni(dsn)==TRUE && 
-			SQLWriteDSNtoIni(dsn,driver)==TRUE)?TRUE:FALSE;*/
-
 	// sanity check
 	if (!hwndparent) {
+		// FIXME: actually, if this is null, just use the
+		// data provided in lpszattributes non-interactively
 		return FALSE;
 	}
+
+	// parse the dsn
+	parseDsn(lpszattributes);
+
+	// handle remove directly...
+	if (frequest==ODBC_REMOVE_DSN) {
+		bool	success=(validDsn() && removeDsn());
+		return (success)?TRUE:FALSE;
+	}
+
+	// save request type
+	dsnrequest=frequest;
 
 	// display a dialog box displaying values supplied in lpszattributes
 	// and prompting the user for data not supplied
@@ -6504,7 +6766,8 @@ BOOL INSTAPI ConfigDSN(HWND hwndparent, WORD frequest,
 			false);
 
 	// create the dialog window...
-	HWND	mainwindow=CreateWindow(sqlrwindowclass,
+	mainwindow=CreateWindowEx(WS_EX_CONTROLPARENT,
+				sqlrwindowclass,
 				(frequest==ODBC_ADD_DSN)?
 					"Create a New Data Source to SQL Relay":
 					"SQL Relay Data Source Configuration",
@@ -6527,9 +6790,17 @@ BOOL INSTAPI ConfigDSN(HWND hwndparent, WORD frequest,
 	UpdateWindow(mainwindow);
 	MSG	msg;
 	while (GetMessage(&msg,NULL,0,0)>0) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		if (IsDialogMessage(mainwindow,&msg)==FALSE) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
 	}
+
+	// clean up
+	UnregisterClass(sqlrwindowclass,hinst);
+
+	// FIXME: clean up dsndict
+
 	return TRUE;
 }
 
