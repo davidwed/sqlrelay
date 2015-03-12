@@ -2382,13 +2382,127 @@
                         {
                             "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_9200A076B1754B748517280A49B2EAF6"
                             {
-                            "Name" = "8:[Manufacturer]"
+                            "Name" = "8:ODBC"
                             "Condition" = "8:"
                             "AlwaysCreate" = "11:FALSE"
                             "DeleteAtUninstall" = "11:FALSE"
                             "Transitive" = "11:FALSE"
                                 "Keys"
                                 {
+                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_A83F6CFA0B2C479491D7E9738CEAAE7B"
+                                    {
+                                    "Name" = "8:ODBCINST.INI"
+                                    "Condition" = "8:"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "DeleteAtUninstall" = "11:FALSE"
+                                    "Transitive" = "11:FALSE"
+                                        "Keys"
+                                        {
+                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_A2DE4F5A15A1489DAF8948A47C3819CA"
+                                            {
+                                            "Name" = "8:SQL Relay"
+                                            "Condition" = "8:"
+                                            "AlwaysCreate" = "11:FALSE"
+                                            "DeleteAtUninstall" = "11:FALSE"
+                                            "Transitive" = "11:FALSE"
+                                                "Keys"
+                                                {
+                                                }
+                                                "Values"
+                                                {
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_4DA2E657870E42FBB32426444C81E4F2"
+                                                    {
+                                                    "Name" = "8:Setup"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:C:\\Program Files\\Firstworks\\bin\\libsqlrodbc.dll"
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_56A6330D6944434A8F3486F47D3E2C6F"
+                                                    {
+                                                    "Name" = "8:APILevel"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:2"
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_87696EAF79334FFFB23CFF62A76D5A0B"
+                                                    {
+                                                    "Name" = "8:ConnectFunctions"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:YYY"
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_BC369FF8A1D440E9B78382FFCD91B22E"
+                                                    {
+                                                    "Name" = "8:DriverODBCVer"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:3.00"
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_E2AB765EE40B4C0EAC1D348134FF5CE4"
+                                                    {
+                                                    "Name" = "8:FileUsage"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:1"
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_E31BCA284AC348A5B81BCF6DDE90EA07"
+                                                    {
+                                                    "Name" = "8:SQLLevel"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:1"
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_E981114A0327447194B3244E79163EB2"
+                                                    {
+                                                    "Name" = "8:UsageCount"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:3"
+                                                    "Value" = "3:0"
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_F2CB56E77E544A529F290C50252FEBE2"
+                                                    {
+                                                    "Name" = "8:Driver"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:C:\\Program Files\\Firstworks\\bin\\libsqlrodbc.dll"
+                                                    }
+                                                }
+                                            }
+                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_D15D68F8A32F496B9D9DF4A478E9614E"
+                                            {
+                                            "Name" = "8:ODBC Drivers"
+                                            "Condition" = "8:"
+                                            "AlwaysCreate" = "11:FALSE"
+                                            "DeleteAtUninstall" = "11:FALSE"
+                                            "Transitive" = "11:FALSE"
+                                                "Keys"
+                                                {
+                                                }
+                                                "Values"
+                                                {
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_69BD605288FD463894494EA39A6CA78E"
+                                                    {
+                                                    "Name" = "8:SQL Relay"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:Installed"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        "Values"
+                                        {
+                                        }
+                                    }
                                 }
                                 "Values"
                                 {
