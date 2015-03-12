@@ -6476,6 +6476,13 @@ static void parseDsn(const char *dsn) {
 	// get the name of the dsn that we were given, bail if it's empty
 	const char	*dsnval=dsndict.getValue("DSN");
 	if (!charstring::length(dsn)) {
+
+		// provide some defaults...
+		dsndict.setValue("Port",charstring::duplicate("9000"));
+		dsndict.setValue("RetryTime",charstring::duplicate("0"));
+		dsndict.setValue("Tries",charstring::duplicate("1"));
+		dsndict.setValue("Debug",charstring::duplicate("0"));
+
 		return;
 	}
 
