@@ -11,8 +11,9 @@
 #include <rudiments/character.h>
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
+#include <rudiments/error.h>
 
-//#define DEBUG_MESSAGES 1
+#define DEBUG_MESSAGES 1
 //#define DEBUG_TO_FILE 1
 #include <debugprint.h>
 
@@ -6285,31 +6286,251 @@ SQLRETURN SQL_API SQLBindParameter(SQLHSTMT statementhandle,
 
 #ifdef _WIN32
 
+#define SQLR_BOX	101
+#define SQLR_LABEL	102
+#define SQLR_EDIT	103
+#define SQLR_BUTTON	104
+
+static HINSTANCE	hinst;
+static const char	sqlrwindowclass[]="SQLRWindowClass";
+static const int	labelwidth=55;
+static const int	labelheight=20;
+static const int	labeloffset=2;
+static const int	labelcount=8;
+static const int	xoffset=8;
+static const int	yoffset=8;
+static const int	mainwindowwidth=300;
+static const int	labelboxwidth=mainwindowwidth-yoffset*2;
+static const int	editwidth=labelboxwidth-xoffset-labelwidth-xoffset*2;
+static const int	labelboxheight=yoffset+
+					labelcount*labelheight+
+					labelcount*labeloffset+yoffset;
+static const int	buttonheight=24;
+static const int	buttonwidth=74;
+static const int	mainwindowheight=yoffset+
+					labelboxheight+yoffset+
+					buttonheight+yoffset;
+static dictionary< const char *, char * >	dsndict;
+
+BOOL DllMain(HANDLE hinstdll, DWORD fdwreason, LPVOID lpvreserved) {
+	if (fdwreason==DLL_PROCESS_ATTACH) {
+		hinst=(HINSTANCE)hinstdll;
+	}
+	return TRUE;
+}
+
+void createLabel(HWND parent, const char *label,
+			int x, int y, int width, int height) {
+	HWND	labelwin=CreateWindow("STATIC",label,
+					WS_CHILD|WS_VISIBLE|SS_RIGHT,
+					x,y,width,height,
+					parent,(HMENU)SQLR_LABEL,hinst,NULL);
+	SendMessage(labelwin,
+			WM_SETFONT,
+			(WPARAM)GetStockObject(DEFAULT_GUI_FONT),
+			MAKELPARAM(FALSE,0));
+}
+
+void createEdit(HWND parent, const char *defaultvalue,
+			int x, int y, int width, int height) {
+	HWND	editwin=CreateWindow("EDIT",(defaultvalue)?defaultvalue:"",
+					WS_CHILD|WS_VISIBLE|WS_BORDER|ES_LEFT,
+					x,y,width,height,
+					parent,(HMENU)SQLR_EDIT,hinst,NULL);
+	SendMessage(editwin,
+			WM_SETFONT,
+			(WPARAM)GetStockObject(DEFAULT_GUI_FONT),
+			MAKELPARAM(FALSE,0));
+}
+
+void createButton(HWND parent, const char *label, int x, int y) {
+	HWND	buttonwin=CreateWindow("BUTTON",label,
+					WS_CHILD|WS_VISIBLE,
+					x,y,buttonwidth,buttonheight,
+					parent,(HMENU)SQLR_BUTTON,hinst,NULL);
+	SendMessage(buttonwin,
+			WM_SETFONT,
+			(WPARAM)GetStockObject(DEFAULT_GUI_FONT),
+			MAKELPARAM(FALSE,0));
+}
+
+void createControls(HWND hwnd) {
+
+	// create a box to surround the labels and edits
+	HWND	box=CreateWindow("STATIC","",
+				WS_CHILD|WS_VISIBLE|SS_GRAYFRAME,
+				xoffset,yoffset,
+				labelboxwidth,
+				labelboxheight,
+				hwnd,(HMENU)SQLR_BOX,hinst,NULL);
+
+	// create labels...
+	int	x=xoffset;
+	int	y=yoffset;
+	createLabel(box,"Server",x,y,labelwidth,labelheight);
+	createLabel(box,"Port",x,y+=(labelheight+labeloffset),
+					labelwidth,labelheight);
+	createLabel(box,"Socket",x,y+=(labelheight+labeloffset),
+					labelwidth,labelheight);
+	createLabel(box,"User",x,y+=(labelheight+labeloffset),
+					labelwidth,labelheight);
+	createLabel(box,"Password",x,y+=(labelheight+labeloffset),
+					labelwidth,labelheight);
+	createLabel(box,"Retry Time",x,y+=(labelheight+labeloffset),
+					labelwidth,labelheight);
+	createLabel(box,"Tries",x,y+=(labelheight+labeloffset),
+					labelwidth,labelheight);
+	createLabel(box,"Debug",x,y+=(labelheight+labeloffset),
+					labelwidth,labelheight);
+
+	// create edits...
+	x=xoffset+labelwidth+xoffset;
+	y=yoffset;
+	createEdit(box,dsndict.getValue("Server"),
+			x,y,editwidth,labelheight);
+	createEdit(box,dsndict.getValue("Port"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight);
+	createEdit(box,dsndict.getValue("Socket"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight);
+	createEdit(box,dsndict.getValue("User"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight);
+	createEdit(box,dsndict.getValue("Password"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight);
+	createEdit(box,dsndict.getValue("RetryTime"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight);
+	createEdit(box,dsndict.getValue("Tries"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight);
+	createEdit(box,dsndict.getValue("Debug"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight);
+
+	// create buttons...
+	x=mainwindowwidth-xoffset-buttonwidth-xoffset-buttonwidth;
+	y=yoffset+labelboxheight+yoffset;
+	createButton(hwnd,"OK",x,y);
+	createButton(hwnd,"Cancel",x+=buttonwidth+xoffset,y);
+}
+
+LRESULT CALLBACK windowProc(HWND hwnd, UINT umsg,
+				WPARAM wparam, LPARAM lparam) {
+	switch (umsg) {
+		case WM_CREATE:
+			createControls(hwnd);
+			break;
+		case WM_CLOSE:
+			DestroyWindow(hwnd);
+			break;
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			break;
+		/*case WM_CTLCOLORSTATIC:
+			switch (GetDlgCtrlID((HWND)lparam)) {
+				case SQLR_LABEL:
+					return 0;
+				case SQLR_BOX:
+					return 0;
+				default:
+					return 0;
+			}*/
+		default:
+			return DefWindowProc(hwnd,umsg,wparam,lparam);
+	}
+	return 0;
+}
+
 BOOL INSTAPI ConfigDSN(HWND hwndparent, WORD frequest,
-		LPCSTR lpszdriver, LPCSTR lpszattributes) {
+			LPCSTR lpszdriver, LPCSTR lpszattributes) {
+	debugFunction();
 
 	// parse lpszattributes
+	const char	*dsn="";
+	const char	*driver="";
+	// FIXME: actually parse the dsn
+	dsndict.setValue("Server",charstring::duplicate("localhost"));
+	dsndict.setValue("Port",charstring::duplicate("9000"));
+	dsndict.setValue("Socket",charstring::duplicate(""));
+	dsndict.setValue("User",charstring::duplicate(""));
+	dsndict.setValue("Password",charstring::duplicate(""));
+	dsndict.setValue("RetryTime",charstring::duplicate("0"));
+	dsndict.setValue("Tries",charstring::duplicate("1"));
+	dsndict.setValue("Debug",charstring::duplicate("0"));
 
-	// if hwndparent isn't NULL, display a dialog box displaying values
-	// supplied in lpszattributes and prompting the user for data not
-	// supplied
-
-	switch (frequest) {
-		case ODBC_ADD_DSN:
-			// validate DSN with SQLValidDSN
-			// call SQLWriteDSNToIni
-			break;
-		case ODBC_CONFIG_DSN:
-			// validate DSN with SQLValidDSN
-			// then
-			// call SQLRemoveDSNFromIni and SQLWriteDSNToIni
-			break;
-		case ODBC_REMOVE_DSN:
-			// call SQLRemoveDSNFromIni	
-			break;
+	// handle remove...
+	if (frequest==ODBC_REMOVE_DSN) {
+		return SQLRemoveDSNFromIni(dsn);
 	}
 
-	return FALSE;
+	// handle add/config...
+	/*case ODBC_ADD_DSN:
+		return (SQLValidDSN(dsn)==TRUE &&
+			SQLWriteDSNtoIni(dsn,driver)==TRUE)?TRUE:FALSE;
+	case ODBC_CONFIG_DSN:
+		return (SQLValidDSN(dsn)==TRUE &&
+			SQLRemoveDSNFromIni(dsn)==TRUE && 
+			SQLWriteDSNtoIni(dsn,driver)==TRUE)?TRUE:FALSE;*/
+
+	// sanity check
+	if (!hwndparent) {
+		return FALSE;
+	}
+
+	// display a dialog box displaying values supplied in lpszattributes
+	// and prompting the user for data not supplied
+
+	// create a window class...
+	WNDCLASS	wcx;
+	wcx.style=0;
+	wcx.lpfnWndProc=windowProc;
+	wcx.cbClsExtra=0;
+	wcx.cbWndExtra=0;
+	wcx.hInstance=hinst;
+	wcx.hIcon=LoadIcon(NULL,IDI_APPLICATION);
+	wcx.hCursor=LoadCursor(NULL,IDC_ARROW);
+	wcx.hbrBackground=(HBRUSH)COLOR_WINDOW;
+	wcx.lpszMenuName=NULL;
+	wcx.lpszClassName=sqlrwindowclass;
+	if (RegisterClass(&wcx)==FALSE) {
+		return FALSE;
+	}
+
+	// figure out how big the outside of the window needs to be,
+	// based on the desired size of the inside...
+	RECT	rect;
+	rect.left=0;
+	rect.top=0;
+	rect.right=mainwindowwidth;
+	rect.bottom=mainwindowheight;
+	AdjustWindowRect(&rect,
+			WS_CAPTION|WS_SYSMENU|WS_THICKFRAME,
+			false);
+
+	// create the dialog window...
+	HWND	mainwindow=CreateWindow(sqlrwindowclass,
+				(frequest==ODBC_ADD_DSN)?
+					"Create a New Data Source to SQL Relay":
+					"SQL Relay Data Source Configuration",
+				WS_OVERLAPPED|WS_CAPTION|
+				WS_SYSMENU|WS_THICKFRAME,
+				CW_USEDEFAULT,
+				CW_USEDEFAULT,
+				rect.right-rect.left,
+				rect.bottom-rect.top,
+				NULL,
+				NULL,
+				hinst,
+				NULL);
+	if (!mainwindow) {
+		return FALSE;
+	}
+
+	// show the window and take input...
+	ShowWindow(mainwindow,SW_SHOWDEFAULT);
+	UpdateWindow(mainwindow);
+	MSG	msg;
+	while (GetMessage(&msg,NULL,0,0)>0) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	return TRUE;
 }
 
 #endif

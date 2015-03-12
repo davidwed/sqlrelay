@@ -77,3 +77,4 @@ SQLSetPos
 SQLTablePrivileges
 SQLDrivers
 SQLBindParameter
+ConfigDSN
