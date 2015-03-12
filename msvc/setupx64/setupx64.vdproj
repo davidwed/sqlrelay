@@ -949,11 +949,6 @@
             "AssemblyAsmDisplayName" = "8:SQLRClient, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_54FBD918C88146BE99B6CF9756F4F939"
-                    {
-                    "Name" = "8:SQLRClient.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:..\\..\\src\\api\\cs\\SQLRClient\\bin\\Release\\SQLRClient.dll"
             "TargetName" = "8:"
@@ -2330,13 +2325,127 @@
                         {
                             "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_954C92649EE146C69766F6F25FC5789F"
                             {
-                            "Name" = "8:[Manufacturer]"
+                            "Name" = "8:ODBC"
                             "Condition" = "8:"
                             "AlwaysCreate" = "11:FALSE"
                             "DeleteAtUninstall" = "11:FALSE"
                             "Transitive" = "11:FALSE"
                                 "Keys"
                                 {
+                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_3BD423AF07174F49B7E1B58914295C51"
+                                    {
+                                    "Name" = "8:ODBCINST.INI"
+                                    "Condition" = "8:"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "DeleteAtUninstall" = "11:FALSE"
+                                    "Transitive" = "11:FALSE"
+                                        "Keys"
+                                        {
+                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_34399436C5A646B2B4272418A28D52C5"
+                                            {
+                                            "Name" = "8:SQL Relay"
+                                            "Condition" = "8:"
+                                            "AlwaysCreate" = "11:FALSE"
+                                            "DeleteAtUninstall" = "11:FALSE"
+                                            "Transitive" = "11:FALSE"
+                                                "Keys"
+                                                {
+                                                }
+                                                "Values"
+                                                {
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_4953A9A316D945A4A21E384694E9D817"
+                                                    {
+                                                    "Name" = "8:UsageCount"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:3"
+                                                    "Value" = "3:0"
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_5C791E6823364A5F8CDF48EF0F91EF51"
+                                                    {
+                                                    "Name" = "8:ConnectFunctions"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:YYY"
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_871741FBCA8C43FCA3543A7E871B39C2"
+                                                    {
+                                                    "Name" = "8:Driver"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:C:\\Program Files\\Firstworks\\bin\\libsqlrodbc.dll"
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_9A6BE19A789C4AFEABD7D329AFFBDC14"
+                                                    {
+                                                    "Name" = "8:SQLLevel"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:1"
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_B46BA4A885554B9287C2042A9644C55A"
+                                                    {
+                                                    "Name" = "8:Setup"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:C:\\Program Files\\Firstworks\\bin\\libsqlrodbc.dll"
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_C0BDFB6AD1244D74BAE880C669E9C807"
+                                                    {
+                                                    "Name" = "8:FileUsage"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:1"
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_C1F065FAEE124FF2A27962C64E107206"
+                                                    {
+                                                    "Name" = "8:DriverODBCVer"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:3.00"
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_C2078259338E4DAC81D8CB32491E969E"
+                                                    {
+                                                    "Name" = "8:API Level"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:2"
+                                                    }
+                                                }
+                                            }
+                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_B721624A6E5F41AA8278814AC1F30178"
+                                            {
+                                            "Name" = "8:ODBC Drivers"
+                                            "Condition" = "8:"
+                                            "AlwaysCreate" = "11:FALSE"
+                                            "DeleteAtUninstall" = "11:FALSE"
+                                            "Transitive" = "11:FALSE"
+                                                "Keys"
+                                                {
+                                                }
+                                                "Values"
+                                                {
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_503C861D17534F3C89FE6B3D2B89D3AA"
+                                                    {
+                                                    "Name" = "8:SQL Relay"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:Installed"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        "Values"
+                                        {
+                                        }
+                                    }
                                 }
                                 "Values"
                                 {

@@ -37,6 +37,7 @@
 	fixed bugs related to autocommit with db's that support transaction
 		blocks
 	implemented the ODBC driver-manager dialog for windows
+	updated windows installer to install ODBC registry settings
 
 0.58 - updated spawn() calls to detach on windows
 	added support for sqlrelay.conf.d
