@@ -35,7 +35,7 @@ install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
-	$(LTINSTALL) $(CP) sqlrelay.$(LIBEXT) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay/sqlrelay.$(MODULESUFFIX)
+	$(LTINSTALL) $(CP) sqlrelay.$(LIBEXT) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
 
 installlib:
 	$(MKINSTALLDIRS) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
