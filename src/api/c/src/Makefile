@@ -20,26 +20,40 @@ LOBJS = sqlrclientwrapper.lo
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-all: libsqlrclientwrapper.la
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+
+all: libsqlrclientwrapper.$(LIBEXT)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
-	$(RMTREE) .libs
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 
-libsqlrclientwrapper.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined $(LIBS)
+libsqlrclientwrapper.$(LIBEXT): $(SRCS) $(LOBJS)
+	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
 
-install:
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libsqlrclientwrapper.la $(libdir)/libsqlrclientwrapper.la
-	$(LIBTOOL) --mode=finish $(libdir)
+install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(cachedir)
 	chmod 777 $(cachedir)
 
-uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrclientwrapper.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrclientwrapper_p.la
+installdll:
+	$(MKINSTALLDIRS) $(bindir)
+	$(LTINSTALL) $(CP) libsqlrclientwrapper.$(LIBEXT) $(bindir)
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) $(CP) libsqlrclientwrapper.lib $(libdir)
+
+installlib:
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) $(CP) libsqlrclientwrapper.$(LIBEXT) $(libdir)
+	$(LTFINISH) $(libdir)
+
+uninstall: $(UNINSTALLLIB)
 	$(RMTREE) $(cachedir)
-	$(RMTREE) $(prefix)/lib/sqlrelay/cache
+
+uninstalldll:
+	$(LTUNINSTALL) $(RM) $(bindir)/libsqlrclientwrapper.$(LIBEXT)
+	$(LTUNINSTALL) $(RM) $(libdir)/libsqlrclientwrapper.lib
+
+uninstalllib:
+	$(LTUNINSTALL) $(RM) $(libdir)/libsqlrclientwrapper.$(LIBEXT)
