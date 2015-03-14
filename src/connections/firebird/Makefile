@@ -16,27 +16,34 @@ LOBJS= firebirdconnection.lo
 .SUFFIXES: .lo .d.lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-all: sqlrconnection_firebird.la
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+
+all: sqlrconnection_firebird.$(LIBEXT)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-sqlrconnection_firebird.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libexecdir) -avoid-version -module -no-undefined
+sqlrconnection_firebird.$(LIBEXT): $(SRCS) $(LOBJS)
+	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) $(MODLINKFLAGS)
 
-install:
+install: $(INSTALLLIB)
+
+installdll:
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_firebird.$(LIBEXT) $(libexecdir)
+
+installlib:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrconnection_firebird.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_firebird.$(LIBEXT) $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_firebird.a
-	$(RM) $(libexecdir)/sqlrconnection_firebird.la
+	$(RM) $(libexecdir)/sqlrconnection_firebird.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_firebird.so so $(MODULESUFFIX)
 endif
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_firebird.*
-	$(RM) $(libdir)/libsqlrelay_sqlrconnection_firebird*
-	$(RM) $(bindir)/sqlr-connection-firebird$(EXE)

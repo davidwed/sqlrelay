@@ -16,27 +16,34 @@ LOBJS= sybaseconnection.lo
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-all: sqlrconnection_sybase.la
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+
+all: sqlrconnection_sybase.$(LIBEXT)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-sqlrconnection_sybase.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libexecdir) -avoid-version -module -no-undefined
+sqlrconnection_sybase.$(LIBEXT): $(SRCS) $(LOBJS)
+	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) $(MODLINKFLAGS)
 
-install:
+install: $(INSTALLLIB)
+
+installdll:
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_sybase.$(LIBEXT) $(libexecdir)
+
+installlib:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrconnection_sybase.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_sybase.$(LIBEXT) $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_sybase.a
-	$(RM) $(libexecdir)/sqlrconnection_sybase.la
+	$(RM) $(libexecdir)/sqlrconnection_sybase.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_sybase.so so $(MODULESUFFIX)
 endif
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_sybase.*
-	$(RM) $(libdir)/libsqlrelay_sqlrconnection_sybase*
-	$(RM) $(bindir)/sqlr-connection-sybase$(EXE)

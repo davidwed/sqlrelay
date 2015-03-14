@@ -16,27 +16,34 @@ LOBJS= freetdsconnection.lo
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-all: sqlrconnection_freetds.la
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+
+all: sqlrconnection_freetds.$(LIBEXT)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-sqlrconnection_freetds.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) -rpath $(libexecdir) -avoid-version -module -no-undefined
+sqlrconnection_freetds.$(LIBEXT): $(SRCS) $(LOBJS)
+	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LIBS) $(RPATH) $(MODLINKFLAGS)
 
-install:
+install: $(INSTALLLIB)
+
+installdll:
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_freetds.$(LIBEXT) $(libexecdir)
+
+installlib:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrconnection_freetds.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrconnection_freetds.$(LIBEXT) $(libexecdir)
 	$(RM) $(libexecdir)/sqlrconnection_freetds.a
-	$(RM) $(libexecdir)/sqlrconnection_freetds.la
+	$(RM) $(libexecdir)/sqlrconnection_freetds.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/sqlrconnection_freetds.so so $(MODULESUFFIX)
 endif
 
 uninstall:
 	$(RM) $(libexecdir)/sqlrconnection_freetds.*
-	$(RM) $(libdir)/libsqlrelay_sqlrconnection_freetds*
-	$(RM) $(bindir)/sqlr-connection-freetds$(EXE)
