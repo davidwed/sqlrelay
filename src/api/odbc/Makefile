@@ -24,10 +24,11 @@ endif
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
 
-all: libsqlrodbc.la
+all: libsqlrodbc.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(RMTREE) .libs
 
 libsqlrodbc.$(LIBEXT): sqlrodbc.cpp sqlrodbc.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ sqlrodbc.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(LIBS)

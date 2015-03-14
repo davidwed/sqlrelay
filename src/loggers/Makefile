@@ -7,47 +7,59 @@ LIBS = -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util 
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) $(DEBUGDIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server/include $(RUDIMENTSINCLUDES) $(LOGDIRCPPFLAG) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) $(DEBUGDIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server/include $(RUDIMENTSINCLUDES) $(LOGDIRCPPFLAG) $(COMPILE) $< $(OUT)$@
 
-all: sqlrlogger_debug.la \
-	sqlrlogger_slowqueries.la \
-	sqlrlogger_custom_nw.la \
-	sqlrlogger_custom_sc.la
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) $(DEBUGDIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server/include $(RUDIMENTSINCLUDES) $(LOGDIRCPPFLAG) $(COMPILE) $<
+
+all: sqlrlogger_debug.$(LIBEXT) \
+	sqlrlogger_slowqueries.$(LIBEXT) \
+	sqlrlogger_custom_nw.$(LIBEXT) \
+	sqlrlogger_custom_sc.$(LIBEXT)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-sqlrlogger_debug.la: debug.cpp debug.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ debug.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+sqlrlogger_debug.$(LIBEXT): debug.cpp debug.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ debug.$(OBJ) $(LDFLAGS) $(LIBS) $(MODLINKFLAGS)
 
-sqlrlogger_slowqueries.la: slowqueries.cpp slowqueries.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ slowqueries.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+sqlrlogger_slowqueries.$(LIBEXT): slowqueries.cpp slowqueries.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ slowqueries.$(OBJ) $(LDFLAGS) $(LIBS) $(MODLINKFLAGS)
 
-sqlrlogger_custom_nw.la: custom_nw.cpp custom_nw.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ custom_nw.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+sqlrlogger_custom_nw.$(LIBEXT): custom_nw.cpp custom_nw.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ custom_nw.$(OBJ) $(LDFLAGS) $(LIBS) $(MODLINKFLAGS)
 
-sqlrlogger_custom_sc.la: custom_sc.cpp custom_sc.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ custom_sc.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+sqlrlogger_custom_sc.$(LIBEXT): custom_sc.cpp custom_sc.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ custom_sc.$(OBJ) $(LDFLAGS) $(LIBS) $(MODLINKFLAGS)
 
-install:
+install: $(INSTALLLIB)
+
+installdll:
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrlogger_debug.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrlogger_slowqueries.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrlogger_custom_nw.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrlogger_custom_sc.$(LIBEXT) $(libexecdir)
+
+installlib:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrlogger_debug.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrlogger_debug.$(LIBEXT) $(libexecdir)
 	$(RM) $(libexecdir)/sqlrlogger_debug.a
-	$(RM) $(libexecdir)/sqlrlogger_debug.la
+	$(RM) $(libexecdir)/sqlrlogger_debug.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/sqlrlogger_debug.so so $(MODULESUFFIX)
-	$(LTINSTALL) $(CP) sqlrlogger_slowqueries.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrlogger_slowqueries.$(LIBEXT) $(libexecdir)
 	$(RM) $(libexecdir)/sqlrlogger_slowqueries.a
-	$(RM) $(libexecdir)/sqlrlogger_slowqueries.la
+	$(RM) $(libexecdir)/sqlrlogger_slowqueries.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/sqlrlogger_slowqueries.so so $(MODULESUFFIX)
-	$(LTINSTALL) $(CP) sqlrlogger_custom_nw.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrlogger_custom_nw.$(LIBEXT) $(libexecdir)
 	$(RM) $(libexecdir)/sqlrlogger_custom_nw.a
-	$(RM) $(libexecdir)/sqlrlogger_custom_nw.la
+	$(RM) $(libexecdir)/sqlrlogger_custom_nw.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/sqlrlogger_custom_nw.so so $(MODULESUFFIX)
-	$(LTINSTALL) $(CP) sqlrlogger_custom_sc.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrlogger_custom_sc.$(LIBEXT) $(libexecdir)
 	$(RM) $(libexecdir)/sqlrlogger_custom_sc.a
-	$(RM) $(libexecdir)/sqlrlogger_custom_sc.la
+	$(RM) $(libexecdir)/sqlrlogger_custom_sc.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/sqlrlogger_custom_sc.so so $(MODULESUFFIX)
 endif
 

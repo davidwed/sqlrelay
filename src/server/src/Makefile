@@ -167,6 +167,7 @@ clean:
 	then \
 		$(RM) $(PLUGINSRCS); \
 	fi
+	$(RMTREE) .libs
 
 libsqlrserver.$(LIBEXT): $(SRCS) $(LOBJS)
 	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LINKFLAGS) -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(PLUGINLIBS) $(EXTRALIBS)

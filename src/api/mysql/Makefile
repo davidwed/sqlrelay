@@ -52,6 +52,7 @@ mysql51.obj: mysql.cpp
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(RMTREE) .libs
 
 libmysql3sqlrelay.$(LIBEXT): mysql.cpp mysql3.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ mysql3.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(LIBS)

@@ -24,10 +24,11 @@ endif
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
 
-all: libpqsqlrelay.la
+all: libpqsqlrelay.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(RMTREE) .libs
 
 libpqsqlrelay.$(LIBEXT): pqsqlrelay.cpp pqsqlrelay.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ pqsqlrelay.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(LIBS)

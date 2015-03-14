@@ -59,6 +59,7 @@ LINK = @CXX@
 AR = @AR@
 LDFLAGS = @LDFLAGS@
 LINKFLAGS = -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+MODLINKFLAGS = -rpath $(libexecdir) -avoid-version -module -no-undefined
 LIBPATH = -L
 LIB = -l
 INSTALLLIB = installlib

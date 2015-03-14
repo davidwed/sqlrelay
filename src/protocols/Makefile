@@ -7,23 +7,32 @@ LIBS = -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util 
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) -I$(top_builddir)/ -I$(top_builddir)/src/server/include -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) -I$(top_builddir)/ -I$(top_builddir)/src/server/include -I$(top_builddir)/src/common -I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) $(COMPILE) $< $(OUT)$@
 
-all: sqlrprotocol_sqlrclient.la
+.cpp.odj:
+	$(CXX) $(CXXFLAGS) $(WERROR) $(BASECPPFLAGS) /I$(top_builddir)/ /I$(top_builddir)/src/server/include /I$(top_builddir)/src/common /I$(top_builddir)/src/util $(RUDIMENTSINCLUDES) $(COMPILE) $<
+
+all: sqlrprotocol_sqlrclient.$(LIBEXT)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-sqlrprotocol_sqlrclient.la: sqlrclient.cpp sqlrclient.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrclient.lo $(LDFLAGS) $(LIBS) -rpath $(libexecdir) -avoid-version -module -no-undefined
+sqlrprotocol_sqlrclient.$(LIBEXT): sqlrclient.cpp sqlrclient.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ sqlrclient.$(OBJ) $(LDFLAGS) $(LIBS) $(MODLINKFLAGS)
 
-install:
+install: $(INSTALLLIB)
+
+installdll:
+	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrprotocol_sqlrclient.$(LIBEXT) $(libexecdir)
+
+installlib:
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) sqlrprotocol_sqlrclient.la $(libexecdir)
+	$(LTINSTALL) $(CP) sqlrprotocol_sqlrclient.$(LIBEXT) $(libexecdir)
 	$(RM) $(libexecdir)/sqlrprotocol_sqlrclient.a
-	$(RM) $(libexecdir)/sqlrprotocol_sqlrclient.la
+	$(RM) $(libexecdir)/sqlrprotocol_sqlrclient.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/sqlrprotocol_sqlrclient.so so $(MODULESUFFIX)
 endif
 
