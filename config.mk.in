@@ -69,6 +69,7 @@ LIBEXT = la
 
 # install commands
 LTINSTALL = $(LIBTOOL) --mode=install
+MV = mv
 CP = cp
 CHMOD = chmod
 MKINSTALLDIRS = $(top_builddir)/mkinstalldirs

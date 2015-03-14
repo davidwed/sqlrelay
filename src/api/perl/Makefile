@@ -38,45 +38,33 @@ endif
 .SUFFIXES: .lo .xs
 
 .xs.cpp:
-	$(PERL) $(XSUBPP) -C++ -typemap $(PERLLIB)/ExtUtils/typemap -typemap perlobject.map -typemap typemap $< > $<c && mv $<c $@
+	$(PERL) $(XSUBPP) -C++ -typemap $(PERLLIB)/ExtUtils/typemap -typemap perlobject.map -typemap typemap $< > $<c
+	$(MV) $<c $@
 
 .cpp.lo:
-	echo perloptimize: $(PERLOPTIMIZE)
-	echo perloptimize_local: $(PERLOPTIMIZE_LOCAL)
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-all: Connection.la Cursor.la
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+
+all: Connection.$(LIBEXT) Cursor.$(LIBEXT)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.cpp *.la *.lo* *.o *.so *.$(PERLMAN3EXT_LOCAL) errors*
+	$(LTCLEAN) $(RM) *.cpp *.lo *.o *.odj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.so *.$(PERLMAN3EXT_LOCAL)
 	$(RMTREE) .libs
 
-Connection.la: Connection.xs Connection.cpp Connection.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ Connection.lo $(LDFLAGS) $(LIBS) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection $(RPATH) -avoid-version -module -no-undefined
+Connection.$(LIBEXT): Connection.xs Connection.cpp Connection.lo
+	$(LTLINK) $(CXX) $(OUT)$@ Connection.$(OBJ) $(LDFLAGS) $(LIBS) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection $(RPATH) $(MODLINKFLAGS)
 
-Cursor.la: Cursor.xs Cursor.cpp Cursor.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ Cursor.lo $(LDFLAGS) $(LIBS) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor $(RPATH) -avoid-version -module -no-undefined
+Cursor.$(LIBEXT): Cursor.xs Cursor.cpp Cursor.lo
+	$(LTLINK) $(CXX) $(OUT)$@ Cursor.$(OBJ) $(LDFLAGS) $(LIBS) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor $(RPATH) $(MODLINKFLAGS)
 
 
-install:
-	$(MKINSTALLDIRS) $(PERLSITEARCH_LOCAL)/SQLRelay
+install: $(INSTALLLIB)
 	$(INSTALL) -m 644 Connection.pm $(PERLSITEARCH_LOCAL)/SQLRelay
 	$(INSTALL) -m 644 Cursor.pm $(PERLSITEARCH_LOCAL)/SQLRelay
 	$(MKINSTALLDIRS) $(PERLSITELIB_LOCAL)/DBD
 	$(INSTALL) -m 644 SQLRelay.pm $(PERLSITELIB_LOCAL)/DBD
-	$(MKINSTALLDIRS) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection
-	$(MKINSTALLDIRS) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor
-	$(MKINSTALLDIRS) $(PERLSITEARCH_LOCAL)/auto/DBD/SQLRelay
-	$(LTINSTALL) $(CP) Connection.la $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection
-	$(CHMOD) 755 $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/Connection.la
-	$(LTINSTALL) $(CP) Cursor.la $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor
-	$(CHMOD) 755 $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor/Cursor.la
-	$(RM) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/Connection.a
-	$(RM) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/Connection.la
-	$(RM) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor/Cursor.a
-	$(RM) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor/Cursor.la
-	$(MODULERENAME) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/Connection.so so $(MODULESUFFIX)
-	$(MODULERENAME) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor/Cursor.so so $(MODULESUFFIX)
 	touch $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/Connection.bs
 	touch $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor/Cursor.bs
 	echo $(PERLSITEARCH_LOCAL)/SQLRelay/Connection.pm > $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/.packlist
@@ -103,6 +91,32 @@ ifneq ($(PERLINSTALLMAN3DIR_LOCAL),)
 	echo $(PERLINSTALLMAN3DIR_LOCAL)/DBD::SQLRelay.$(PERLMAN3EXT_LOCAL) >> $(PERLSITEARCH_LOCAL)/auto/DBD/SQLRelay/.packlist
 endif
 endif
+
+installdll:
+	$(MKINSTALLDIRS) $(PERLSITEARCH_LOCAL)/SQLRelay
+	$(MKINSTALLDIRS) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection
+	$(MKINSTALLDIRS) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor
+	$(MKINSTALLDIRS) $(PERLSITEARCH_LOCAL)/auto/DBD/SQLRelay
+	$(LTINSTALL) $(CP) Connection.$(LIBEXT) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/Connection.$(MODULESUFFIX)
+	$(CHMOD) 755 $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/Connection.$(MODULESUFFIX)
+	$(LTINSTALL) $(CP) Cursor.$(LIBEXT) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor/Cursor.$(MODULESUFFIX)
+	$(CHMOD) 755 $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor/Cursor.$(MODULESUFFIX)
+
+installlib:
+	$(MKINSTALLDIRS) $(PERLSITEARCH_LOCAL)/SQLRelay
+	$(MKINSTALLDIRS) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection
+	$(MKINSTALLDIRS) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor
+	$(MKINSTALLDIRS) $(PERLSITEARCH_LOCAL)/auto/DBD/SQLRelay
+	$(LTINSTALL) $(CP) Connection.$(LIBEXT) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection
+	$(CHMOD) 755 $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/Connection.$(LIBEXT)
+	$(LTINSTALL) $(CP) Cursor.$(LIBEXT) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor
+	$(CHMOD) 755 $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor/Cursor.$(LIBEXT)
+	$(RM) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/Connection.a
+	$(RM) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/Connection.$(LIBEXT)
+	$(RM) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor/Cursor.a
+	$(RM) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor/Cursor.$(LIBEXT)
+	$(MODULERENAME) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/Connection.so so $(MODULESUFFIX)
+	$(MODULERENAME) $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor/Cursor.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) `cat $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection/.packlist`

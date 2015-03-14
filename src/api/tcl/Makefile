@@ -11,29 +11,37 @@ ifeq ($(TCLUSERPATH),yes)
 endif
 endif
 
-SRCS = sqlrelayCmd.cpp
-LOBJS = sqlrelayCmd.lo
-
-all: sqlrelay.la
-
-clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o *.so
-	$(RMTREE) .libs
-
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-sqlrelay.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(TCLLIBSPATH)/sqlrelay $(RPATH) -avoid-version -module -no-undefined
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+	
 
-install: sqlrelay.la
+all: sqlrelay.$(LIBEXT)
+
+clean:
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
+	$(RMTREE) .libs
+
+sqlrelay.$(LIBEXT): sqlrelayCmd.cpp sqlrelayCmd.lo
+	$(LTLINK) $(LINK) $(OUT)$@ sqlrelayCmd.$(OBJ) $(LDFLAGS) $(LIBS) -rpath $(TCLLIBSPATH)/sqlrelay $(RPATH) $(MODLINKFLAGS)
+
+install: $(INSTALLLIB)
+	$(CP) pkgIndex.tcl $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(CHMOD) 644 $(DESTDIR)$(TCLLIBSPATH)/sqlrelay/pkgIndex.tcl
+
+installdll:
 	$(MKINSTALLDIRS) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
-	$(LTINSTALL) $(CP) sqlrelay.la $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
-	$(RM) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay/sqlrelay.la
+	$(LTINSTALL) $(CP) sqlrelay.$(LIBEXT) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay/sqlrelay.$(MODULESUFFIX)
+
+installlib:
+	$(MKINSTALLDIRS) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(LTINSTALL) $(CP) sqlrelay.$(LIBEXT) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
+	$(RM) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay/sqlrelay.$(LIBEXT)
 	$(RM) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay/sqlrelay.a
-	$(INSTALL) -m 644 pkgIndex.tcl $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
 
 uninstall:
 	$(RMTREE) $(DESTDIR)$(TCLLIBSPATH)/sqlrelay

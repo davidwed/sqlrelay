@@ -19,17 +19,14 @@ ifeq ($(RUBYUSERPATH),yes)
 endif
 endif
 
-SRCS = sqlrelay.cpp
-LOBJS = sqlrelay.lo
-
 .SUFFIXES: .lo
 
 .cpp.lo:
 	cp rubyincludes1.h rubyincludes.h; \
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ 2> errors1; \
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@ 2> errors1; \
 	if ( test ! -r sqlrelay.lo ); then \
 		cp rubyincludes2.h rubyincludes.h; \
-		$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ 2> errors2; \
+		$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@ 2> errors2; \
 		if ( test ! -r sqlrelay.lo ); then \
 			if ( test -s errors1 ); then \
 				echo "first try errors : "; cat errors1; echo; \
@@ -47,16 +44,22 @@ LOBJS = sqlrelay.lo
 	$(RM) errors1 errors2 rubyincludes.h
 
 
-all: sqlrelay.la
+all: sqlrelay.$(LIBEXT)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o *.so
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.so
 	$(RMTREE) .libs
 
-sqlrelay.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) $(LIBS) -rpath $(RUBYSITEARCHDIR) $(RPATH) -avoid-version -module -no-undefined
+sqlrelay.$(LIBEXT): sqlrelay.cpp sqlrelay.lo
+	$(LTLINK) $(LINK) $(OUT)$@ sqlrelay.$(OBJ) $(LDFLAGS) $(LIBS) -rpath $(RUBYSITEARCHDIR) $(RPATH) $(MODLINKFLAGS)
 
-install: sqlrelay.la
+install: $(INSTALLLIB)
+
+installdll:
+	$(MKINSTALLDIRS) $(DESTDIR)$(RUBYSITEARCHDIR)
+	$(LTINSTALL) $(CP) sqlrelay.la $(DESTDIR)$(RUBYSITEARCHDIR)/sqlrelay.$(MODULESUFFIX)
+
+installlib:
 	$(MKINSTALLDIRS) $(DESTDIR)$(RUBYSITEARCHDIR)
 	$(LTINSTALL) $(CP) sqlrelay.la $(DESTDIR)$(RUBYSITEARCHDIR)
 	$(RM) $(DESTDIR)$(RUBYSITEARCHDIR)/sqlrelay.a

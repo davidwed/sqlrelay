@@ -14,22 +14,21 @@ endif
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPILE_DL=1 -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPILE_DL=1 $(COMPILE) $< $(OUT)$@
 
-all: sql_relay.la
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) /D COMPILE_DL=1 $(COMPILE) $<
+
+all: sql_relay.$(LIBEXT)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o *.so
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 	$(RMTREE) .libs
 
-sql_relay.la: sql_relay.cpp sql_relay.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sql_relay.lo $(LDFLAGS) $(LIBS) -rpath $(PHPEXTDIR) $(RPATH) -avoid-version -module
+sql_relay.$(LIBEXT): sql_relay.cpp sql_relay.lo
+	$(LTLINK) $(LINK) $(OUT)$@ sql_relay.$(OBJ) $(LDFLAGS) $(LIBS) -rpath $(PHPEXTDIR) $(RPATH) $(MODLINKFLAGS)
 
-install: sql_relay.la
-	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
-	$(LTINSTALL) $(CP) sql_relay.la $(DESTDIR)$(PHPEXTDIR)
-	$(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.la
-	$(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.a
+install: $(INSTALLLIB)
 	if ( test "$(PHPCONFSTYLE)" = "fedora" -o "$(PHPCONFSTYLE)" = "suse" -o "$(PHPCONFSTYLE)" = "solaris" ); \
 	then \
 		$(MKINSTALLDIRS) $(DESTDIR)$(PHPCONFDIR); \
@@ -59,6 +58,16 @@ install: sql_relay.la
 			done; \
 		fi; \
 	fi
+
+installdll:
+	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
+	$(LTINSTALL) $(CP) sql_relay.$(LIBEXT) $(DESTDIR)$(PHPEXTDIR)
+
+installlib:
+	$(MKINSTALLDIRS) $(DESTDIR)$(PHPEXTDIR)
+	$(LTINSTALL) $(CP) sql_relay.$(LIBEXT) $(DESTDIR)$(PHPEXTDIR)
+	$(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.$(LIBEXT)
+	$(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.a
 
 uninstall:
 	$(RM) $(DESTDIR)$(PHPEXTDIR)/sql_relay.so
