@@ -2,8 +2,6 @@ top_builddir = ..
 
 include ../config.mk
 
-.PHONY: all install uninstall
-
 all:
 
 install:

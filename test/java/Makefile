@@ -2,8 +2,6 @@ top_builddir = ../..
 
 include ../../config.mk
 
-.PHONY: all clean
-
 all:
 	$(MAKE) db2.class
 	$(MAKE) freetds.class

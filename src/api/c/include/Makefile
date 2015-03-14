@@ -1,18 +1,19 @@
-top_builddir = ../../../..
+top_builddir = ../../../../
 
 include ../../../../config.mk
-
-.PHONY: all install uninstall
 
 all:
 
 install:
-	$(INSTALL) -m 644 sqlrelay/sqlrclientwrapper.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 sqlrelay/private/sqlrclientwrapper.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 sqlrelay/private/wrapperdll.h $(includedir)/sqlrelay/private
+	$(CP) sqlrelay/sqlrclientwrapper.h $(includedir)/sqlrelay
+	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrclientwrapper.h
+	$(CP) sqlrelay/private/sqlrclientwrapper.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrclientwrapper.h
+	$(CP) sqlrelay/private/wrapperdll.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/wrapperdll.h
 
 uninstall:
-	$(RM) $(includedir)/sqlrclientwrapper.h
-	$(RM) $(includedir)/sqlrelay/sqlrclientwrapper.h
-	$(RM) $(includedir)/sqlrelay/private/sqlrclientwrapper.h
-	$(RM) $(includedir)/sqlrelay/private/wrapperdll.h
+	$(RM) $(includedir)/sqlrclientwrapper.h \
+		$(includedir)/sqlrelay/sqlrclientwrapper.h \
+		$(includedir)/sqlrelay/private/sqlrclientwrapper.h \
+		$(includedir)/sqlrelay/private/wrapperdll.h

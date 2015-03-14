@@ -2,8 +2,6 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-.PHONY: install uninstall
-
 install:
 	if ( test -n "$(HAVE_ZOPE)" -a -n "$(HAVE_PYTHON)" ); then \
 		$(RMTREE) $(DESTDIR)$(ZOPEDIR)/ZSQLRelayDA; \

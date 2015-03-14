@@ -2,8 +2,6 @@ top_builddir = ../../../..
 
 include ../../../../config.mk
 
-.PHONY: all clean install uninstall
-
 ifeq ($(MINGW32),yes)
 DLLEXPORTS = -DLIBSQLRCLIENT_EXPORTS
 endif
@@ -18,26 +16,40 @@ LOBJS = sqlrconnection.lo sqlrcursor.lo row.lo
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
 
-all: libsqlrclient.la
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+
+all: libsqlrclient.$(LIBEXT)
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
-	$(RMTREE) .libs
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *pdb *.manifest
 
-libsqlrclient.la: $(SRCS) $(LOBJS)
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(LOBJS) $(LDFLAGS) -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined $(LIBS)
+libsqlrclient.$(LIBEXT): $(SRCS) $(LOBJS)
+	$(LTLINK) $(LINK) $(OUT)$@ $(LOBJS) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
 
-install:
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) libsqlrclient.la $(libdir)/libsqlrclient.la
-	$(LIBTOOL) --mode=finish $(libdir)
+install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(cachedir)
-	chmod 777 $(cachedir)
+	$(CHMOD) 777 $(cachedir)
 
-uninstall:
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrclient.la
-	$(LIBTOOL) --mode=uninstall $(RM) $(libdir)/libsqlrclient_p.la
+installdll::
+	$(MKINSTALLDIRS) $(bindir)
+	$(LTINSTALL) $(CP) libsqlrclient.$(LIBEXT) $(bindir)
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) $(CP) libsqlrclient.lib $(libdir)
+
+installlib:
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) $(CP) libsqlrclient.$(LIBEXT) $(libdir)
+	$(LTFINISH) $(libdir)
+
+uninstall: $(UNINSTALLLIB)
 	$(RMTREE) $(cachedir)
-	$(RMTREE) $(prefix)/lib/sqlrelay/cache
+
+uninstalldll:
+	$(LTUNINSTALL) $(RM) $(bindir)/libsqlrclient.$(LIBEXT)
+	$(LTUNINSTALL) $(RM) $(libdir)/libsqlrclient.lib
+
+uninstalllib:
+	$(LTUNINSTALL) $(RM) $(libdir)/libsqlrclient.$(LIBEXT)

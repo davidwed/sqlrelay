@@ -2,8 +2,6 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-.PHONY: all clean install uninstall
-
 CPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(PYTHONINCLUDES) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES)
 LIBS = $(PYTHONLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 RPATH =

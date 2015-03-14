@@ -2,18 +2,20 @@ top_builddir = ..
 
 include ../config.mk
 
-.PHONY: install uninstall
-
 install:
 	$(MKINSTALLDIRS) $(sysconfdir)
 	$(MKINSTALLDIRS) $(sysconfdir)/sqlrelay.conf.d
-	$(INSTALL) -m 644 sqlrelay.conf.example $(sysconfdir)
-	$(INSTALL) -m 644 sqlrelay.dtd $(sysconfdir)
-	$(INSTALL) -m 644 sqlrelay.xsd $(sysconfdir)
-	$(INSTALL) -m 644 sqlrelay.conf.example $(EXAMPLEDIR)/sqlrelay.conf
+	$(INSTALL) sqlrelay.conf.example $(sysconfdir)
+	$(CHMOD) 644 $(sysconfdir)/sqlrelay.conf.example
+	$(INSTALL) sqlrelay.dtd $(sysconfdir)
+	$(CHMOD) 644 $(sysconfdir)/sqlrelay.dtd
+	$(INSTALL) sqlrelay.xsd $(sysconfdir)
+	$(CHMOD) 644 $(sysconfdir)/sqlrelay.xsd
+	$(INSTALL) sqlrelay.conf.example $(EXAMPLEDIR)/sqlrelay.conf
+	$(CHMOD) 644 $(EXAMPLEDIR)/sqlrelay.conf
 
 uninstall:
-	$(RM) $(sysconfdir)/sqlrelay.conf.example
-	$(RM) $(sysconfdir)/sqlrelay.xsd
-	$(RM) $(sysconfdir)/sqlrelay.dtd
-	$(RM) $(EXAMPLEDIR)/sqlrelay.conf
+	$(RM) $(sysconfdir)/sqlrelay.conf.example \
+		$(sysconfdir)/sqlrelay.xsd \
+		$(sysconfdir)/sqlrelay.dtd \
+		$(EXAMPLEDIR)/sqlrelay.conf

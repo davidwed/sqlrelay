@@ -1,65 +1,63 @@
 include ../config.mk
 
-.PHONY: all clean install uninstall
-
 all:
-	$(MAKE) -C util all
-	$(MAKE) -C api all
+	cd util $(AND) $(MAKE) all
+	cd api $(AND) $(MAKE) all
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
-	$(MAKE) -C server all
+	cd server $(AND) $(MAKE) all
 endif
-	$(MAKE) -C parsers all
-	$(MAKE) -C queries all
-	$(MAKE) -C loggers all
-	$(MAKE) -C protocols all
-	$(MAKE) -C pwdencs all
-	$(MAKE) -C auths all
-	$(MAKE) -C connections all
+	cd parsers $(AND) $(MAKE) all
+	cd queries $(AND) $(MAKE) all
+	cd loggers $(AND) $(MAKE) all
+	cd protocols $(AND) $(MAKE) all
+	cd pwdencs $(AND) $(MAKE) all
+	cd auths $(AND) $(MAKE) all
+	cd connections $(AND) $(MAKE) all
 ifeq ($(SQLRELAY_ENABLE_SHARED),no)
-	$(MAKE) -C server all
+	cd server $(AND) $(MAKE) all
 endif
-	$(MAKE) -C cmdline all
+	cd cmdline $(AND) $(MAKE) all
 
 clean:
-	$(MAKE) -C util clean
-	$(MAKE) -C api clean
-	$(MAKE) -C parsers clean
-	$(MAKE) -C queries clean
-	$(MAKE) -C loggers clean
-	$(MAKE) -C protocols clean
-	$(MAKE) -C pwdencs clean
-	$(MAKE) -C auths clean
-	$(MAKE) -C connections clean
-	$(MAKE) -C server clean
-	$(MAKE) -C cmdline clean
+	cd util $(AND) $(MAKE) clean
+	cd api $(AND) $(MAKE) clean
+	cd parsers $(AND) $(MAKE) clean
+	cd queries $(AND) $(MAKE) clean
+	cd loggers $(AND) $(MAKE) clean
+	cd protocols $(AND) $(MAKE) clean
+	cd pwdencs $(AND) $(MAKE) clean
+	cd auths $(AND) $(MAKE) clean
+	cd connections $(AND) $(MAKE) clean
+	cd server $(AND) $(MAKE) clean
+	cd cmdline $(AND) $(MAKE) clean
 
 install:
-	$(MAKE) -C util install
-	$(MAKE) -C api install
+	cd util $(AND) $(MAKE) install
+	cd api $(AND) $(MAKE) install
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
-	$(MAKE) -C server install
+	cd server $(AND) $(MAKE) install
 endif
-	$(MAKE) -C parsers install
-	$(MAKE) -C queries install
-	$(MAKE) -C loggers install
-	$(MAKE) -C protocols install
-	$(MAKE) -C pwdencs install
-	$(MAKE) -C auths install
-	$(MAKE) -C connections install
+	cd parsers $(AND) $(MAKE) install
+	cd queries $(AND) $(MAKE) install
+	cd loggers $(AND) $(MAKE) install
+	cd protocols $(AND) $(MAKE) install
+	cd pwdencs $(AND) $(MAKE) install
+	cd auths $(AND) $(MAKE) install
+	cd connections $(AND) $(MAKE) install
 ifeq ($(SQLRELAY_ENABLE_SHARED),no)
-	$(MAKE) -C server install
+	cd server $(AND) $(MAKE) install
 endif
-	$(MAKE) -C cmdline install
+	cd cmdline $(AND) $(MAKE) install
 
 uninstall:
-	$(MAKE) -C util uninstall
-	$(MAKE) -C api uninstall
-	$(MAKE) -C parsers uninstall
-	$(MAKE) -C queries uninstall
-	$(MAKE) -C loggers uninstall
-	$(MAKE) -C protocols uninstall
-	$(MAKE) -C pwdencs uninstall
-	$(MAKE) -C auths uninstall
-	$(MAKE) -C connections uninstall
-	$(MAKE) -C server uninstall
-	$(MAKE) -C cmdline uninstall
+	cd util $(AND) $(MAKE) uninstall
+	cd api $(AND) $(MAKE) uninstall
+	cd parsers $(AND) $(MAKE) uninstall
+	cd queries $(AND) $(MAKE) uninstall
+	cd loggers $(AND) $(MAKE) uninstall
+	cd protocols $(AND) $(MAKE) uninstall
+	cd pwdencs $(AND) $(MAKE) uninstall
+	cd auths $(AND) $(MAKE) uninstall
+	cd connections $(AND) $(MAKE) uninstall
+	cd server $(AND) $(MAKE) uninstall
+	cd cmdline $(AND) $(MAKE) uninstall

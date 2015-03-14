@@ -2,8 +2,6 @@ top_builddir = ..
 
 include ../config.mk
 
-.PHONY: install uninstall
-
 UID = $(shell id | grep "uid=0" )
 
 ifneq ($(initscript_prefix),)
@@ -132,18 +130,18 @@ uninstall:
 	then \
 		/sbin/chkconfig --del sqlrcachemanager; \
 	fi
-	$(RM) $(initroot)/etc/rc.d/init.d/sqlrelay
-	$(RM) $(initroot)/etc/rc.d/init.d/sqlrcachemanager
-	$(RM) $(initroot)/etc/rc.d/rc.sqlrelay
-	$(RM) $(initroot)/etc/rc.d/rc.sqlrcachemanager
-	$(RM) $(initroot)/etc/init.d/sqlrelay
-	$(RM) $(initroot)/etc/init.d/sqlrcachemanager
-	$(RM) $(initroot)/rc.d/sqlrelay
-	$(RM) $(initroot)/rc.d/sqlrcachemanager
-	$(RM) $(initroot)/usr/pkg/etc/rc.d/sqlrelay
-	$(RM) $(initroot)/usr/pkg/etc/rc.d/sqlrcachemanager
-	$(RM) $(initroot)/usr/local/etc/rc.d/sqlrelay
-	$(RM) $(initroot)/usr/local/etc/rc.d/sqlrcachemanager
+	$(RM) $(initroot)/etc/rc.d/init.d/sqlrelay \
+		$(initroot)/etc/rc.d/init.d/sqlrcachemanager \
+		$(initroot)/etc/rc.d/rc.sqlrelay \
+		$(initroot)/etc/rc.d/rc.sqlrcachemanager \
+		$(initroot)/etc/init.d/sqlrelay \
+		$(initroot)/etc/init.d/sqlrcachemanager \
+		$(initroot)/rc.d/sqlrelay \
+		$(initroot)/rc.d/sqlrcachemanager \
+		$(initroot)/usr/pkg/etc/rc.d/sqlrelay \
+		$(initroot)/usr/pkg/etc/rc.d/sqlrcachemanager \
+		$(initroot)/usr/local/etc/rc.d/sqlrelay \
+		$(initroot)/usr/local/etc/rc.d/sqlrcachemanager
 	if ( test -x "/usr/sbin/update-rc.d" ); \
 	then \
 		/usr/sbin/update-rc.d sqlrelay remove; \
@@ -154,22 +152,22 @@ uninstall:
 		/bin/launchctl unload /Library/LaunchDaemons/com.firstworks.sqlrcachemanager.plist; \
 	elif ( test ! -x "/sbin/chkconfig" ); \
 	then \
-		$(RM) /etc/rc0.d/*sqlrelay; \
-		$(RM) /etc/rc1.d/*sqlrelay; \
-		$(RM) /etc/rc2.d/*sqlrelay; \
-		$(RM) /etc/rc3.d/*sqlrelay; \
-		$(RM) /etc/rc4.d/*sqlrelay; \
-		$(RM) /etc/rc5.d/*sqlrelay; \
-		$(RM) /etc/rc6.d/*sqlrelay; \
-		$(RM) /etc/rc0.d/*sqlrcachemanager; \
-		$(RM) /etc/rc1.d/*sqlrcachemanager; \
-		$(RM) /etc/rc2.d/*sqlrcachemanager; \
-		$(RM) /etc/rc3.d/*sqlrcachemanager; \
-		$(RM) /etc/rc4.d/*sqlrcachemanager; \
-		$(RM) /etc/rc5.d/*sqlrcachemanager; \
-		$(RM) /etc/rc6.d/*sqlrcachemanager; \
+		$(RM) /etc/rc0.d/*sqlrelay \
+			/etc/rc1.d/*sqlrelay \
+			/etc/rc2.d/*sqlrelay \
+			/etc/rc3.d/*sqlrelay \
+			/etc/rc4.d/*sqlrelay \
+			/etc/rc5.d/*sqlrelay \
+			/etc/rc6.d/*sqlrelay \
+			/etc/rc0.d/*sqlrcachemanager \
+			/etc/rc1.d/*sqlrcachemanager \
+			/etc/rc2.d/*sqlrcachemanager \
+			/etc/rc3.d/*sqlrcachemanager \
+			/etc/rc4.d/*sqlrcachemanager \
+			/etc/rc5.d/*sqlrcachemanager \
+			/etc/rc6.d/*sqlrcachemanager; \
 	fi
-	$(RM) $(initroot)/Library/LaunchDaemons/com.firstworks.sqlrelay.plist
-	$(RM) $(initroot)/Library/LaunchDaemons/com.firstworks.sqlrcachemanager.plist
-	$(RM) $(initroot)/etc/sysconfig/sqlrelay
-	$(RM) $(initroot)/etc/sqlrelay
+	$(RM) $(initroot)/Library/LaunchDaemons/com.firstworks.sqlrelay.plist \
+		$(initroot)/Library/LaunchDaemons/com.firstworks.sqlrcachemanager.plist \
+		$(initroot)/etc/sysconfig/sqlrelay \
+		$(initroot)/etc/sqlrelay

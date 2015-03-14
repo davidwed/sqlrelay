@@ -2,8 +2,6 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-.PHONY: all clean install uninstall
-
 ifeq ($(DESTDIR),)
 	INSTPREFIX = 
 else

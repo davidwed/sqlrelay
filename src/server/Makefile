@@ -1,13 +1,13 @@
-.PHONY: all clean install uninstall
+include ../../config.mk
 
 all:
-	$(MAKE) -C src all
+	cd src $(AND) $(MAKE) all
 
 clean:
-	$(MAKE) -C src clean
+	cd src $(AND) $(MAKE) clean
 
 install:
-	$(MAKE) -C src install
+	cd src $(AND) $(MAKE) install
 
 uninstall:
-	$(MAKE) -C src uninstall
+	cd src $(AND) $(MAKE) uninstall

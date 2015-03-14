@@ -2,31 +2,38 @@ top_builddir = ../../../..
 
 include ../../../../config.mk
 
-.PHONY: all install uninstall
-
 all:
 
 install:
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 sqlrelay/sqlrclient.h $(includedir)/sqlrelay
-	$(INSTALL) -m 644 sqlrelay/private/bindvar.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 sqlrelay/private/column.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 sqlrelay/private/row.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 sqlrelay/private/sqlrconnection.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 sqlrelay/private/sqlrdefines.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 sqlrelay/private/sqlrincludes.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 sqlrelay/private/sqlrcursor.h $(includedir)/sqlrelay/private
-	$(INSTALL) -m 644 sqlrelay/private/dll.h $(includedir)/sqlrelay/private
+	$(CP) sqlrelay/sqlrclient.h $(includedir)/sqlrelay
+	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrclient.h
+	$(CP) sqlrelay/private/bindvar.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/bindvar.h
+	$(CP) sqlrelay/private/column.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/column.h
+	$(CP) sqlrelay/private/row.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/row.h
+	$(CP) sqlrelay/private/sqlrconnection.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrconnection.h
+	$(CP) sqlrelay/private/sqlrdefines.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrdefines.h
+	$(CP) sqlrelay/private/sqlrincludes.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrincludes.h
+	$(CP) sqlrelay/private/sqlrcursor.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrcursor.h
+	$(CP) sqlrelay/private/dll.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/dll.h
 
 uninstall:
-	$(RM) $(includedir)/sqlrclient.h
-	$(RM) $(includedir)/private/bindvar.h
-	$(RM) $(includedir)/private/column.h
-	$(RM) $(includedir)/private/field.h
-	$(RM) $(includedir)/private/row.h
-	$(RM) $(includedir)/private/sqlrconnection.h
-	$(RM) $(includedir)/private/sqlrdefines.h
-	$(RM) $(includedir)/private/sqlrincludes.h
-	$(RM) $(includedir)/private/sqlrcursor.h
+	$(RM) $(includedir)/sqlrclient.h \
+		$(includedir)/private/bindvar.h \
+		$(includedir)/private/column.h \
+		$(includedir)/private/field.h \
+		$(includedir)/private/row.h \
+		$(includedir)/private/sqlrconnection.h \
+		$(includedir)/private/sqlrdefines.h \
+		$(includedir)/private/sqlrincludes.h \
+		$(includedir)/private/sqlrcursor.h
 	$(RMTREE) $(includedir)/sqlrelay

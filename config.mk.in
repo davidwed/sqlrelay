@@ -1,6 +1,3 @@
-SHELL = @SHELL@
-VPATH = @srcdir@
-
 SQLR_VERSION = @SQLR_VERSION@
 SONAME_VERSION_INFO = @SONAME_VERSION_INFO@
 
@@ -24,40 +21,62 @@ debugdir = ${localstatedir}/sqlrelay/debug
 logdir = ${localstatedir}/sqlrelay/log
 initscript_prefix = @initscript_prefix@
 
-# compiler to use
+# command separator
+AND = ;
+
+# shell
+SHELL = @SHELL@
+
+# libtool command
+LIBTOOL = @LIBTOOL@
+LIBTOOLGCC = @LIBTOOL@
+
+# compile commands
+LTCOMPILE = $(LIBTOOL) --mode=compile
 CC = @CC@
 CXX = @CXX@
-
-# includes and defines (-I and -D flags)
+COMPILE = -c
+OUT = -o 
 BASECPPFLAGS = @CPPFLAGS@ @PTHREADINCLUDES@
+EXPORTSCPPFLAGS =
+EXTRACPPFLAGS =
+CXXFLAGS = @CXXFLAGS@ @WALL@ @PIPE@ @WNOLONGDOUBLE@ @WNOOVERLOADEDVIRTUAL@
+CFLAGS = @CFLAGS@ @WALL@ @PIPE@ @WNOLONGDOUBLE@ @WNOOVERLOADEDVIRTUAL@
+WERROR = @WERROR@
+WNOUNKNOWNPRAGMAS = @WNOUNKNOWNPRAGMAS@
+WNOMISMATCHEDTAGS = @WNOMISMATCHEDTAGS@
+INC = -I
+OBJ = lo
 TMPDIRCPPFLAG = -DTMP_DIR=\"$(tmpdir)\"
 DEBUGDIRCPPFLAG = -DDEBUG_DIR=\"$(debugdir)\"
 LOGDIRCPPFLAG = -DLOG_DIR=\"$(logdir)\"
 CONFIGFILECPPFLAG = -DDEFAULT_CONFIG_FILE=\"$(sysconfdir)/sqlrelay.conf\" -DDEFAULT_CONFIG_DIR=\"$(sysconfdir)/sqlrelay.conf.d\"
 CACHEDIRCPPFLAG = -DCACHE_DIR=\"$(cachedir)\"
 
-# link flags (-s, -static, -melf, -belf, etc.)
+# linker flags
+LTLINK = $(LIBTOOL) --mode=link
+LINK = @CXX@
+AR = @AR@
 LDFLAGS = @LDFLAGS@
+LINKFLAGS = -rpath $(libdir) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+LIBPATH = -L
+LIB = -l
+INSTALLLIB = installlib
+UNINSTALLLIB = uninstalllib
+DLLEXT = 
+LIBEXT = la
 
-# debug and optimization flags (-g, -O2, etc.)
-CXXFLAGS = @CXXFLAGS@ @WALL@ @PIPE@ @WNOLONGDOUBLE@ @WNOOVERLOADEDVIRTUAL@
-CFLAGS = @CFLAGS@ @WALL@ @PIPE@ @WNOLONGDOUBLE@ @WNOOVERLOADEDVIRTUAL@
-WERROR = @WERROR@
-WNOUNKNOWNPRAGMAS = @WNOUNKNOWNPRAGMAS@
-WNOMISMATCHEDTAGS = @WNOMISMATCHEDTAGS@
-
-# libtool command
-LIBTOOL = @LIBTOOL@
-LIBTOOLGCC = @LIBTOOL@
-
-# install command
+# install commands
 LTINSTALL = $(LIBTOOL) --mode=install $(top_builddir)/install-sh -c
-INSTALL = $(top_builddir)/install-sh -c
-
-# mkinstalldirs command
+CP = cp
+CHMOD = chmod
 MKINSTALLDIRS = $(top_builddir)/mkinstalldirs
+INSTALL = $(top_builddir)/install-sh -c
+LTFINISH = $(LIBTOOL) --mode=finish
 
-# commands to erase files and directories
+#uninstall/clean commands
+LTUNINSTALL = $(LIBTOOL) --mode=uninstall
+LTCLEAN = $(LIBTOOL) --mode=clean
 RM = rm -f
 RMTREE = rm -rf
 

@@ -2,8 +2,6 @@ top_builddir = ../..
 
 include ../../config.mk
 
-.PHONY: all clean
-
 CPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(ODBCINCLUDES)
 LIBS = $(RUDIMENTSLIBS) $(ODBCLIBS) $(LIBEFENCE)
 

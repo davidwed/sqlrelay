@@ -1,25 +1,21 @@
 include ../config.mk
 
-.PHONY: all clean
-
 all:
-	$(MAKE) -C c all
-	$(MAKE) -C c++ all
-ifneq ($(HAVE_JAVA),)
-	$(MAKE) -C java all
-endif
-	$(MAKE) -C dropin all
-	$(MAKE) -C bench all
-	$(MAKE) -C stress all
+	cd c $(AND) $(MAKE) all
+	cd c++ $(AND) $(MAKE) all
+	cd java $(AND) $(MAKE) all
+	cd dropin $(AND) $(MAKE) all
+	cd bench $(AND) $(MAKE) all
+	cd stress $(AND) $(MAKE) all
 
 clean:
-	$(MAKE) -C c clean
-	$(MAKE) -C c++ clean
-	$(MAKE) -C java clean
-	$(MAKE) -C perl clean
-	$(MAKE) -C python clean
-	$(MAKE) -C ruby clean
-	$(MAKE) -C tcl clean
-	$(MAKE) -C dropin clean
-	$(MAKE) -C bench clean
-	$(MAKE) -C stress clean
+	cd c $(AND) $(MAKE) clean
+	cd c++ $(AND) $(MAKE) clean
+	cd java $(AND) $(MAKE) clean
+	cd perl $(AND) $(MAKE) clean
+	cd python $(AND) $(MAKE) clean
+	cd ruby $(AND) $(MAKE) clean
+	cd tcl $(AND) $(MAKE) clean
+	cd dropin $(AND) $(MAKE) clean
+	cd bench $(AND) $(MAKE) clean
+	cd stress $(AND) $(MAKE) clean

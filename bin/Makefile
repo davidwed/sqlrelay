@@ -2,19 +2,20 @@ top_builddir = ..
 
 include ../config.mk
 
-.PHONY: install uninstall
-
 install:
 	$(MKINSTALLDIRS) $(bindir)
-	$(INSTALL) sqlrclient-config $(bindir)
-	$(INSTALL) sqlrclientwrapper-config $(bindir)
-	$(INSTALL) sqlrserver-config $(bindir)
+	$(CP) sqlrclient-config $(bindir)
+	$(CHMOD) 755 $(bindir)/sqlrclient-config
+	$(CP) sqlrclientwrapper-config $(bindir)
+	$(CHMOD) 755 $(bindir)/sqlrclientwrapper-config
+	$(CP) sqlrserver-config $(bindir)
+	$(CHMOD) 755 $(bindir)/sqlrserver-config
 
 uninstall:
-	$(RM) $(bindir)/sqlr-kill
-	$(RM) $(bindir)/killsqlr
-	$(RM) $(bindir)/sqlrclient-config
-	$(RM) $(bindir)/sqlrclientwrapper-config
-	$(RM) $(bindir)/sqlrserver-config
-	$(RM) $(bindir)/sqlrconnection-config
-	$(RM) $(bindir)/backupschema
+	$(RM) $(bindir)/sqlr-kill \
+		$(bindir)/killsqlr \
+		$(bindir)/sqlrclient-config \
+		$(bindir)/sqlrclientwrapper-config \
+		$(bindir)/sqlrserver-config \
+		$(bindir)/sqlrconnection-config \
+		$(bindir)/backupschema

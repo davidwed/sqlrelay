@@ -2,8 +2,6 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-.PHONY: all clean install uninstall
-
 RUBYCFLAGS = $(shell LANG=POSIX $(RUBY) getcflags.rb | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $(MAKE) -s -f - | grep -v Entering | grep -v Leaving )
 
 ifeq ($(OVERRIDERUBYSITEARCHDIR),)

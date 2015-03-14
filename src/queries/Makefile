@@ -4,8 +4,6 @@ include ../../config.mk
 
 LIBS = -L$(top_builddir)/src/server/src -lsqlrserver -L$(top_builddir)/src/util -lsqlrutil $(RUDIMENTSLIBS) $(EXTRALIBS)
 
-.PHONY: all clean install uninstall
-
 .SUFFIXES: .lo
 
 .cpp.lo:

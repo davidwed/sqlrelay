@@ -2,36 +2,35 @@ top_builddir = .
 
 include config.mk
 
-.PHONY: all clean install uninstall distclean
-
 all:
-	$(MAKE) -C src all
+	cd src $(AND) $(MAKE) all
 
 clean:
-	$(MAKE) -C src clean
-	$(RMTREE) .pics */.pics */*/.pics */*/*/.pics */*/*/*/.pics */*/*/*/*/.pics
-	$(MAKE) -C test clean
+	cd src $(AND) $(MAKE) clean
+	cd test $(AND) $(MAKE) clean
 
 install:
-	$(MAKE) -C src install
-	$(MAKE) -C bin install
-	$(MAKE) -C etc install
-	$(MAKE) -C init install
-	$(MAKE) -C man install
-	$(MAKE) -C doc install
+	cd src $(AND) $(MAKE) install
+	cd bin $(AND) $(MAKE) install
+	cd etc $(AND) $(MAKE) install
+	cd init $(AND) $(MAKE) install
+	cd man $(AND) $(MAKE) install
+	cd doc $(AND) $(MAKE) install
 	$(MKINSTALLDIRS) $(libdir)/pkgconfig
-	$(INSTALL) -m 0644 sqlrelay-c.pc $(libdir)/pkgconfig/sqlrelay-c.pc
-	$(INSTALL) -m 0644 sqlrelay-c++.pc $(libdir)/pkgconfig/sqlrelay-c++.pc
+	$(CP) sqlrelay-c.pc $(libdir)/pkgconfig/sqlrelay-c.pc
+	$(CHMOD) 0644 $(libdir)/pkgconfig/sqlrelay-c.pc
+	$(CP) sqlrelay-c++.pc $(libdir)/pkgconfig/sqlrelay-c++.pc
+	$(CHMOD) 0644 $(libdir)/pkgconfig/sqlrelay-c++.pc
 
 uninstall:
-	$(MAKE) -C src uninstall
-	$(MAKE) -C bin uninstall
-	$(MAKE) -C etc uninstall
-	$(MAKE) -C init uninstall
-	$(MAKE) -C man uninstall
-	$(MAKE) -C doc uninstall
-	$(RM) $(libdir)/pkgconfig/sqlrelay-c.pc
-	$(RM) $(libdir)/pkgconfig/sqlrelay-c++.pc
+	cd src $(AND) $(MAKE) uninstall
+	cd bin $(AND) $(MAKE) uninstall
+	cd etc $(AND) $(MAKE) uninstall
+	cd init $(AND) $(MAKE) uninstall
+	cd man $(AND) $(MAKE) uninstall
+	cd doc $(AND) $(MAKE) uninstall
+	$(RM) $(libdir)/pkgconfig/sqlrelay-c.pc \
+		$(libdir)/pkgconfig/sqlrelay-c++.pc
 	$(RMTREE) $(libexecdir)
 
 distclean: clean
@@ -110,7 +109,13 @@ distclean: clean
 		src/util/msvc/Release \
 		src/util/msvc/DebugCLR \
 		src/util/msvc/ReleaseCLR \
-		src/util/msvc/x64
+		src/util/msvc/x64 \
+		.pics \
+		*/.pics \
+		*/*/.pics \
+		*/*/*/.pics \
+		*/*/*/*/.pics \
+		*/*/*/*/*/.pics
 
 cppcheck:
 	cppcheck -j4 --enable=warning,performance,portability src > /dev/null

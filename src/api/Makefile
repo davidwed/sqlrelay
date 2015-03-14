@@ -1,139 +1,137 @@
 include ../../config.mk
 
-.PHONY: all clean install uninstall
-
 all:
-	$(MAKE) -C c++ all
-	$(MAKE) -C c all
+	cd c++ $(AND) $(MAKE) all
+	cd c $(AND) $(MAKE) all
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
-	$(MAKE) -C postgresql all
-	$(MAKE) -C mysql all
+	cd postgresql $(AND) $(MAKE) all
+	cd mysql $(AND) $(MAKE) all
 ifneq ($(ODBCLIBS),)
-	$(MAKE) -C odbc all
+	cd odbc $(AND) $(MAKE) all
 endif
 ifneq ($(HAVE_PYTHON),)
-	$(MAKE) -C python all
+	cd python $(AND) $(MAKE) all
 endif
 ifneq ($(HAVE_PERL),)
-	$(MAKE) -C perl -f Makefile all
+	cd perl $(AND) $(MAKE) all
 endif
 ifneq ($(HAVE_RUBY),)
-	$(MAKE) -C ruby all
+	cd ruby $(AND) $(MAKE) all
 endif
 ifneq ($(HAVE_PHP),)
-	$(MAKE) -C php all
+	cd php $(AND) $(MAKE) all
 endif
 ifneq ($(HAVE_PHP_PDO),)
-	$(MAKE) -C phppdo all
+	cd phppdo $(AND) $(MAKE) all
 endif
 ifneq ($(HAVE_JAVA),)
-	$(MAKE) -C java all
+	cd java $(AND) $(MAKE) all
 endif
 ifneq ($(HAVE_TCL),)
-	$(MAKE) -C tcl all
+	cd tcl $(AND) $(MAKE) all
 endif
 ifneq ($(HAVE_ERLANG),)
-	$(MAKE) -C erlang all
+	cd erlang $(AND) $(MAKE) all
 endif
 endif
 
 clean:
-	$(MAKE) -C c++ clean
-	$(MAKE) -C c clean
-	$(MAKE) -C postgresql clean
-	$(MAKE) -C mysql clean
+	cd c++ $(AND) $(MAKE) clean
+	cd c $(AND) $(MAKE) clean
+	cd postgresql $(AND) $(MAKE) clean
+	cd mysql $(AND) $(MAKE) clean
 ifneq ($(ODBCLIBS),)
-	$(MAKE) -C odbc clean
+	cd odbc $(AND) $(MAKE) clean
 endif
 ifneq ($(HAVE_PYTHON),)
-	$(MAKE) -C python clean
+	cd python $(AND) $(MAKE) clean
 endif
 ifneq ($(HAVE_PERL),)
-	$(MAKE) -C perl -f Makefile clean
+	cd perl $(AND) $(MAKE) clean
 endif
 ifneq ($(HAVE_RUBY),)
-	$(MAKE) -C ruby clean
+	cd ruby $(AND) $(MAKE) clean
 endif
 ifneq ($(HAVE_PHP),)
-	$(MAKE) -C php clean
+	cd php $(AND) $(MAKE) clean
 endif
 ifneq ($(HAVE_PHP_PDO),)
-	$(MAKE) -C phppdo clean
+	cd phppdo $(AND) $(MAKE) clean
 endif
 ifneq ($(HAVE_JAVA),)
-	$(MAKE) -C java clean
+	cd java $(AND) $(MAKE) clean
 endif
 ifneq ($(HAVE_TCL),)
-	$(MAKE) -C tcl clean
+	cd tcl $(AND) $(MAKE) clean
 endif
 ifneq ($(HAVE_ERLANG),)
-	$(MAKE) -C erlang clean
+	cd erlang $(AND) $(MAKE) clean
 endif
 
 install:
-	$(MAKE) -C c++ install
-	$(MAKE) -C c install
+	cd c++ $(AND) $(MAKE) install
+	cd c $(AND) $(MAKE) install
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
-	$(MAKE) -C postgresql install
-	$(MAKE) -C mysql install
+	cd postgresql $(AND) $(MAKE) install
+	cd mysql $(AND) $(MAKE) install
 ifneq ($(ODBCLIBS),)
-	$(MAKE) -C odbc install
+	cd odbc $(AND) $(MAKE) install
 endif
 ifneq ($(HAVE_PYTHON),)
-	$(MAKE) -C python install
+	cd python $(AND) $(MAKE) install
 endif
 ifneq ($(HAVE_PERL),)
-	$(MAKE) -C perl -f Makefile install
+	cd perl $(AND) $(MAKE) install
 endif
 ifneq ($(HAVE_RUBY),)
-	$(MAKE) -C ruby install
+	cd ruby $(AND) $(MAKE) install
 endif
 ifneq ($(HAVE_PHP),)
-	$(MAKE) -C php install
+	cd php $(AND) $(MAKE) install
 endif
 ifneq ($(HAVE_PHP_PDO),)
-	$(MAKE) -C phppdo install
+	cd phppdo $(AND) $(MAKE) install
 endif
 ifneq ($(HAVE_JAVA),)
-	$(MAKE) -C java install
+	cd java $(AND) $(MAKE) install
 endif
 ifneq ($(HAVE_TCL),)
-	$(MAKE) -C tcl install
+	cd tcl $(AND) $(MAKE) install
 endif
 ifneq ($(HAVE_ERLANG),)
-	$(MAKE) -C erlang install
+	cd erlang $(AND) $(MAKE) install
 endif
 endif
 
 uninstall:
-	$(MAKE) -C c++ uninstall
-	$(MAKE) -C c uninstall
-	$(MAKE) -C postgresql uninstall
-	$(MAKE) -C mysql uninstall
+	cd c++ $(AND) $(MAKE) uninstall
+	cd c $(AND) $(MAKE) uninstall
+	cd postgresql $(AND) $(MAKE) uninstall
+	cd mysql $(AND) $(MAKE) uninstall
 ifneq ($(ODBCLIBS),)
-	$(MAKE) -C odbc uninstall
+	cd odbc $(AND) $(MAKE) uninstall
 endif
 ifneq ($(HAVE_PYTHON),)
-	$(MAKE) -C python uninstall
+	cd python $(AND) $(MAKE) uninstall
 endif
 ifneq ($(HAVE_PERL),)
-	$(MAKE) -C perl -f Makefile uninstall
+	cd perl $(AND) $(MAKE) uninstall
 endif
 ifneq ($(HAVE_RUBY),)
-	$(MAKE) -C ruby uninstall
+	cd ruby $(AND) $(MAKE) uninstall
 endif
 ifneq ($(HAVE_PHP),)
-	$(MAKE) -C php uninstall
+	cd php $(AND) $(MAKE) uninstall
 endif
 ifneq ($(HAVE_PHP_PDO),)
-	$(MAKE) -C phppdo uninstall
+	cd phppdo $(AND) $(MAKE) uninstall
 endif
 ifneq ($(HAVE_JAVA),)
-	$(MAKE) -C java uninstall
+	cd java $(AND) $(MAKE) uninstall
 endif
 ifneq ($(HAVE_TCL),)
-	$(MAKE) -C tcl uninstall
+	cd tcl $(AND) $(MAKE) uninstall
 endif
 ifneq ($(HAVE_ERLANG),)
-	$(MAKE) -C erlang uninstall
+	cd erlang $(AND) $(MAKE) uninstall
 endif

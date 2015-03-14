@@ -2,8 +2,6 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-.PHONY: all clean install uninstall
-
 CPPFLAGS = $(BASECPPFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++/include $(RUDIMENTSINCLUDES) $(PHPINCLUDES)
 LIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++/src -lsqlrclient $(RUDIMENTSLIBS)
 RPATH =

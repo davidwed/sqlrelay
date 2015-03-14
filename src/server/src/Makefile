@@ -2,8 +2,6 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-.PHONY: all clean install uninstall
-
 ifeq ($(SQLRELAY_ENABLE_SHARED),no)
 PLUGINSRCS = sqlrserverconnectiondeclarations.cpp \
 		sqlrserverconnectionassignments.cpp \

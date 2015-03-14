@@ -2,8 +2,6 @@ top_builddir = ../..
 
 include ../../config.mk
 
-.PHONY: all clean
-
 .SUFFIXES: .lo
 
 CPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
