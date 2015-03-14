@@ -16,25 +16,38 @@ ifeq ($(PSQLUSERPATH),yes)
 endif
 endif
 
-all: libsqlrodbc.la
-
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
+
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
+
+all: libsqlrodbc.la
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
-	$(RMTREE) .libs
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 
-libsqlrodbc.la: sqlrodbc.cpp sqlrodbc.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ sqlrodbc.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+libsqlrodbc.$(LIBEXT): sqlrodbc.cpp sqlrodbc.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ sqlrodbc.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
 
-install:
+install: $(INSTALLLIB)
+
+installdll:
+	$(MKINSTALLDIRS) $(bindir)
+	$(LTINSTALL) $(CP) libsqlrodbc.$(LIBEXT) $(bindir)
+
+installlib:
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libsqlrodbc.la $(libdir)
+	$(LTINSTALL) $(CP) libsqlrodbc.$(LIBEXT) $(libdir)
 	$(RM) $(libdir)/libsqlrodbc.a
-	$(RM) $(libdir)/libsqlrodbc.la
+	$(RM) $(libdir)/libsqlrodbc.$(LIBEXT)
 
-uninstall:
+uninstall: $(UNINSTALLLIB)
+
+uninstalldll:
+	$(RM) $(bindir)/libsqlrodbc*
+
+uninstalllib:
 	$(RM) $(libdir)/libsqlrodbc*

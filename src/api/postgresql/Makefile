@@ -19,22 +19,35 @@ endif
 .SUFFIXES: .lo
 
 .cpp.lo:
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $< $(OUT)$@
+
+.cpp.obj:
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(COMPILE) $<
 
 all: libpqsqlrelay.la
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
-	$(RMTREE) .libs
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 
-libpqsqlrelay.la: pqsqlrelay.cpp pqsqlrelay.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ pqsqlrelay.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+libpqsqlrelay.$(LIBEXT): pqsqlrelay.cpp pqsqlrelay.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ pqsqlrelay.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
 
-install:
+install: $(INSTALLLIB)
+
+installdll:
+	$(MKINSTALLDIRS) $(bindir)
+	$(LTINSTALL) $(CP) libpqsqlrelay.$(LIBEXT) $(bindir)
+
+installlib:
 	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libpqsqlrelay.la $(libdir)
+	$(LTINSTALL) $(CP) libpqsqlrelay.$(LIBEXT) $(libdir)
 	$(RM) $(libdir)/libpqsqlrelay.a
-	$(RM) $(libdir)/libpqsqlrelay.la
+	$(RM) $(libdir)/libpqsqlrelay.$(LIBEXT)
 
-uninstall:
+uninstall: $(UNINSTALLLIB)
+
+uninstalldll:
+	$(RM) $(bindir)/libpqsqlrelay*
+
+uninstalllib:
 	$(RM) $(libdir)/libpqsqlrelay*

@@ -16,66 +16,95 @@ ifeq ($(PSQLUSERPATH),yes)
 endif
 endif
 
-all: libmysql3sqlrelay.la libmysql40sqlrelay.la libmysql41sqlrelay.la libmysql50sqlrelay.la libmysql51sqlrelay.la
+all: libmysql3sqlrelay.$(LIBEXT) libmysql40sqlrelay.$(LIBEXT) libmysql41sqlrelay.$(LIBEXT) libmysql50sqlrelay.$(LIBEXT) libmysql51sqlrelay.$(LIBEXT)
 
 .SUFFIXES: .lo
 
 mysql3.lo: mysql.cpp
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_3=1 -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_3=1 $(COMPILE) $< $(OUT)$@
+
+mysql3.obj: mysql.cpp
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) /D COMPAT_MYSQL_3=1 $(COMPILE) $<
 
 mysql40.lo: mysql.cpp
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_4_0=1 -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_4_0=1 $(COMPILE) $< $(OUT)$@
+
+mysql40.obj: mysql.cpp
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) /D COMPAT_MYSQL_4_0=1 $(COMPILE) $<
 
 mysql41.lo: mysql.cpp
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_4_1=1 -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_4_1=1 $(COMPILE) $< $(OUT)$@
+
+mysql41.obj: mysql.cpp
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) /D COMPAT_MYSQL_4_1=1 $(COMPILE) $<
 
 mysql50.lo: mysql.cpp
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_5_0=1 -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_5_0=1 $(COMPILE) $< $(OUT)$@
+
+mysql50.obj: mysql.cpp
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) /D COMPAT_MYSQL_5_0=1 $(COMPILE) $<
 
 mysql51.lo: mysql.cpp
-	$(LIBTOOL) --mode=compile $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_5_1=1 -c $< -o $@
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -DCOMPAT_MYSQL_5_1=1 $(COMPILE) $< $(OUT)$@
+
+mysql51.obj: mysql.cpp
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) /D COMPAT_MYSQL_5_1=1 $(COMPILE) $<
 
 clean:
-	$(LIBTOOL) --mode=clean $(RM) *.la *.lo *.o
-	$(RMTREE) .libs
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest
 
-libmysql3sqlrelay.la: mysql.cpp mysql3.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ mysql3.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+libmysql3sqlrelay.$(LIBEXT): mysql.cpp mysql3.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ mysql3.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
 
-libmysql40sqlrelay.la: mysql.cpp mysql40.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ mysql40.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+libmysql40sqlrelay.$(LIBEXT): mysql.cpp mysql40.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ mysql40.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
 
-libmysql41sqlrelay.la: mysql.cpp mysql41.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ mysql41.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+libmysql41sqlrelay.$(LIBEXT): mysql.cpp mysql41.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ mysql41.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
 
-libmysql50sqlrelay.la: mysql.cpp mysql50.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ mysql50.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+libmysql50sqlrelay.$(LIBEXT): mysql.cpp mysql50.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ mysql50.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
 
-libmysql51sqlrelay.la: mysql.cpp mysql51.lo
-	$(LIBTOOL) --mode=link $(CXX) -o $@ mysql51.lo $(LDFLAGS) $(LIBS) -rpath $(libdir) $(RPATH) -release $(SQLR_VERSION) -version-info $(SONAME_VERSION_INFO) -no-undefined
+libmysql51sqlrelay.$(LIBEXT): mysql.cpp mysql51.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ mysql51.$(OBJ) $(LDFLAGS) $(LINKFLAGS) $(LIBS)
 
-install:
+install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(EXAMPLEDIR)
 	$(INSTALL) -m 644 sample-oracle-mysql-errors.map $(EXAMPLEDIR)
 	$(INSTALL) -m 644 sample-mssqlserver-mysql-errors.map $(EXAMPLEDIR)
-	$(MKINSTALLDIRS) $(libdir)
-	$(LTINSTALL) $(CP) libmysql3sqlrelay.la $(libdir)
-	$(RM) $(libdir)/libmysql3sqlrelay.a
-	$(RM) $(libdir)/libmysql3sqlrelay.la
-	$(LTINSTALL) $(CP) libmysql40sqlrelay.la $(libdir)
-	$(RM) $(libdir)/libmysql40sqlrelay.a
-	$(RM) $(libdir)/libmysql40sqlrelay.la
-	$(LTINSTALL) $(CP) libmysql41sqlrelay.la $(libdir)
-	$(RM) $(libdir)/libmysql41sqlrelay.a
-	$(RM) $(libdir)/libmysql41sqlrelay.la
-	$(LTINSTALL) $(CP) libmysql50sqlrelay.la $(libdir)
-	$(RM) $(libdir)/libmysql50sqlrelay.a
-	$(RM) $(libdir)/libmysql50sqlrelay.la
-	$(LTINSTALL) $(CP) libmysql51sqlrelay.la $(libdir)
-	$(RM) $(libdir)/libmysql51sqlrelay.a
-	$(RM) $(libdir)/libmysql51sqlrelay.la
 
-uninstall:
+installdll:
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) $(CP) libmysql3sqlrelay.$(LIBEXT) $(bindir)
+	$(LTINSTALL) $(CP) libmysql40sqlrelay.$(LIBEXT) $(bindir)
+	$(LTINSTALL) $(CP) libmysql41sqlrelay.$(LIBEXT) $(bindir)
+	$(LTINSTALL) $(CP) libmysql50sqlrelay.$(LIBEXT) $(bindir)
+	$(LTINSTALL) $(CP) libmysql51sqlrelay.$(LIBEXT) $(bindir)
+
+installlib:
+	$(MKINSTALLDIRS) $(libdir)
+	$(LTINSTALL) $(CP) libmysql3sqlrelay.$(LIBEXT) $(libdir)
+	$(RM) $(libdir)/libmysql3sqlrelay.a
+	$(RM) $(libdir)/libmysql3sqlrelay.$(LIBEXT)
+	$(LTINSTALL) $(CP) libmysql40sqlrelay.$(LIBEXT) $(libdir)
+	$(RM) $(libdir)/libmysql40sqlrelay.a
+	$(RM) $(libdir)/libmysql40sqlrelay.$(LIBEXT)
+	$(LTINSTALL) $(CP) libmysql41sqlrelay.$(LIBEXT) $(libdir)
+	$(RM) $(libdir)/libmysql41sqlrelay.a
+	$(RM) $(libdir)/libmysql41sqlrelay.$(LIBEXT)
+	$(LTINSTALL) $(CP) libmysql50sqlrelay.$(LIBEXT) $(libdir)
+	$(RM) $(libdir)/libmysql50sqlrelay.a
+	$(RM) $(libdir)/libmysql50sqlrelay.$(LIBEXT)
+	$(LTINSTALL) $(CP) libmysql51sqlrelay.$(LIBEXT) $(libdir)
+	$(RM) $(libdir)/libmysql51sqlrelay.a
+	$(RM) $(libdir)/libmysql51sqlrelay.$(LIBEXT)
+
+uninstall: $(UNINSTALLLIB)
 	$(RM) $(EXAMPLEDIR)/sample-oracle-mysql-errors.map
 	$(RM) $(EXAMPLEDIR)/sample-mssqlserver-mysql-errors.map
+
+uninstalldll:
+	$(RM) $(bindir)/libmysql*sqlrelay*
+
+uninstalllib:
 	$(RM) $(libdir)/libmysql*sqlrelay*
